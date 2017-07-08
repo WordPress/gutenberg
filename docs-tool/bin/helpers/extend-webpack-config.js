@@ -22,7 +22,7 @@ module.exports = function( webpackConfig, usersCwd ) {
 
 	// Adding the markdown loader and exclude if from the file loader
 	webpackConfig.module.rules.forEach( rule => {
-		if ( rule.loader === require.resolve('file-loader') ) {
+		if ( rule.loader === require.resolve( 'file-loader' ) ) {
 			rule.exclude.push( /\.md/ );
 		}
 	} );
@@ -30,4 +30,4 @@ module.exports = function( webpackConfig, usersCwd ) {
 		test: /\.md/,
 		use: require.resolve( 'raw-loader' ),
 	} );
-}
+};

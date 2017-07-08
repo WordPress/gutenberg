@@ -1,7 +1,9 @@
 # Adding a stylesheet
 
+{% codetabs %}
+{% ES5 %}
 ```js
-// block.js (ES5)
+// block.js
 var el = wp.element.createElement;
 
 wp.blocks.registerBlockType( 'mytheme/block', {
@@ -16,9 +18,9 @@ wp.blocks.registerBlockType( 'mytheme/block', {
 	},
 } );
 ```
-
+{% ESnext %}
 ```js
-// block.js (ESnext)
+// block.js
 const { registerBlockType } = wp.blocks;
 
 registerBlockType( 'mytheme/block', {
@@ -33,7 +35,7 @@ registerBlockType( 'mytheme/block', {
 	},
 } );
 ```
-
+{% end %}
 ```css
 /* style.css */
 

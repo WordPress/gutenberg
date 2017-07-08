@@ -1,7 +1,9 @@
 # Writing your first block
 
+{% codetabs %}
+{% ES5 %}
 ```js
-// block.js (ES5)
+// block.js
 var el = wp.element.createElement;
 var blockStyle = { backgroundColor: '#900', color: '#fff', padding: '20px' };
 
@@ -17,9 +19,9 @@ wp.blocks.registerBlockType( 'mytheme/block', {
 	},
 } );
 ```
-
+{% ESnext %}
 ```js
-// block.js (ESnext)
+// block.js
 const { registerBlockType } = wp.blocks;
 const blockStyle = { backgroundColor: '#900', color: '#fff', padding: '20px' };
 
@@ -35,3 +37,4 @@ registerBlockType( 'mytheme/block', {
 	},
 } );
 ```
+{% end %}

@@ -1,16 +1,13 @@
-import React from 'react';
 import { find } from 'lodash';
-import ReactMarkdown from 'react-markdown';
 
 const stories = [];
 
 export function addStory( story ) {
-	const { name, parents = [], markdown } = story;
+	const { name, parents = [] } = story;
 	stories.push( {
 		path: '/' + parents.concat( name ).join( '/' ),
 		id: parents.concat( name ).join( '.' ),
 		parent: parents.join( '.' ),
-		Component: markdown ? () => <ReactMarkdown source={ markdown } /> : story.Component,
 		...story,
 	} );
 }

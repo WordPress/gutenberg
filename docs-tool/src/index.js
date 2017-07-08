@@ -5,7 +5,7 @@ import 'prismjs/themes/prism.css';
 
 import 'config';
 
-import App from './App';
+import App from './components/App';
 import registerServiceWorker from './registerServiceWorker';
 import './styles/main.css';
 
