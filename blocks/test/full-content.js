@@ -121,9 +121,13 @@ describe( 'full post content fixture', () => {
 			}
 
 			const parserOutputExpected = JSON.parse( parserOutputExpectedString );
-			expect(
-				parserOutputActual
-			).toEqual( parserOutputExpected );
+			try {
+				expect(
+					parserOutputActual
+				).toEqual( parserOutputExpected );
+			} catch ( err ) {
+				throw new Error( format( 'File \'%s.parsed.json\' does not match expected value.', f ) );
+			}
 
 			const blocksActual = parse( content );
 			const blocksActualNormalized = normalizeParsedBlocks( blocksActual );
@@ -145,9 +149,13 @@ describe( 'full post content fixture', () => {
 			}
 
 			const blocksExpected = JSON.parse( blocksExpectedString );
-			expect(
-				blocksActualNormalized
-			).toEqual( blocksExpected );
+			try {
+				expect(
+					blocksActualNormalized
+				).toEqual( blocksExpected );
+			} catch ( err ) {
+				throw new Error( format( 'File \'%s.json\' does not match expected value', f ) );
+			}
 
 			const serializedActual = serialize( blocksActual );
 			let serializedExpected = readFixtureFile( f + '.serialized.html' );
@@ -163,9 +171,13 @@ describe( 'full post content fixture', () => {
 				}
 			}
 
-			expect(
-				serializedActual
-			).toEqual( serializedExpected.replace( /\n$/, '' ) );
+			try {
+				expect(
+					serializedActual
+				).toEqual( serializedExpected.replace( /\n$/, '' ) );
+			} catch ( err ) {
+				throw new Error( format( 'File \'%s.serialized.html\' does not match expected value', f ) );
+			}
 		} );
 	} );
 
