@@ -1,5 +1,5 @@
 /**
- * External dependencies
+ * Internal dependencies
  */
 import { naiveCss2Jsx } from '../format-list';
 

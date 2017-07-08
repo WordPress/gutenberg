@@ -1,5 +1,5 @@
 /**
- * External dependencies
+ * Internal dependencies
  */
 import { createElement, renderToString, concatChildren, switchChildrenNodeName } from '../';
 

@@ -1,5 +1,5 @@
 /**
- * External dependencies
+ * Internal dependencies
  */
 import { undoable, combineUndoableReducers } from '../undoable-reducer';
 

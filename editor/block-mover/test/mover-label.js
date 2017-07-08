@@ -1,5 +1,5 @@
 /**
- * External dependencies
+ * Internal dependencies
  */
 import { getBlockMoverLabel, getMultiBlockMoverLabel } from '../mover-label';
 
@@ -19,8 +19,8 @@ describe( 'block mover', () => {
 				false,
 				dirUp,
 			) ).toBe(
-                `Block "${ type }" is at the beginning of the content and can’t be moved up`
-            );
+				`Block "${ type }" is at the beginning of the content and can’t be moved up`
+			);
 		} );
 
 		it( 'Should generate a title for the last item moving down', () => {
