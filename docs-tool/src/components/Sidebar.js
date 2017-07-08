@@ -10,7 +10,6 @@ function MenuItem( { item } ) {
 			{ ! children.length && <Link to={ item.path }>{ item.title }</Link> }
 			{ !! children.length && (
 				<div className="expandable">
-					<span className="dashicons dashicons-arrow-down-alt2"></span>
 					<Link to={ item.path }>{ item.title }</Link>
 				</div>
 			) }
