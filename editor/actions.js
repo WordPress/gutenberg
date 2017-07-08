@@ -111,30 +111,24 @@ export function mergeBlocks( blockA, blockB ) {
 }
 
 /**
- * Returns an action object used in signalling that the user has begun to type
- * within a block's editable field.
+ * Returns an action object used in signalling that the user has begun to type.
  *
- * @param  {String} uid Block UID
  * @return {Object}     Action object
  */
-export function startTypingInBlock( uid ) {
+export function startTyping() {
 	return {
 		type: 'START_TYPING',
-		uid,
 	};
 }
 
 /**
- * Returns an action object used in signalling that the user has stopped typing
- * within a block's editable field.
+ * Returns an action object used in signalling that the user has stopped typing.
  *
- * @param  {String} uid Block UID
  * @return {Object}     Action object
  */
-export function stopTypingInBlock( uid ) {
+export function stopTyping() {
 	return {
 		type: 'STOP_TYPING',
-		uid,
 	};
 }
 

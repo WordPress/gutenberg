@@ -559,12 +559,8 @@ export function getBlockFocus( state, uid ) {
  * @param  {Object}  uid   Block unique ID
  * @return {Boolean}       Whether user is typing within block
  */
-export function isTypingInBlock( state, uid ) {
-	if ( ! isBlockSelected( state, uid ) ) {
-		return false;
-	}
-
-	return state.selectedBlock.typing;
+export function isTypingInEditor( state ) {
+	return state.isTyping;
 }
 
 /**

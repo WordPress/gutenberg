@@ -286,7 +286,6 @@ export function selectedBlock( state = {}, action ) {
 				? state
 				: {
 					uid: action.uid,
-					typing: false,
 					focus: action.uid === state.uid ? state.focus : {},
 				};
 
@@ -298,45 +297,19 @@ export function selectedBlock( state = {}, action ) {
 			const firstUid = first( action.uids );
 			return firstUid === state.uid
 				? state
-				: { uid: firstUid, typing: false, focus: {} };
+				: { uid: firstUid, focus: {} };
 		}
 
 		case 'INSERT_BLOCKS':
 			return {
 				uid: action.blocks[ 0 ].uid,
-				typing: false,
 				focus: {},
 			};
 
 		case 'UPDATE_FOCUS':
 			return {
 				uid: action.uid,
-				typing: state.uid === action.uid ? state.typing : false,
 				focus: action.config || {},
-			};
-
-		case 'START_TYPING':
-			if ( action.uid !== state.uid ) {
-				return {
-					uid: action.uid,
-					typing: true,
-					focus: {},
-				};
-			}
-
-			return {
-				...state,
-				typing: true,
-			};
-
-		case 'STOP_TYPING':
-			if ( action.uid !== state.uid ) {
-				return state;
-			}
-
-			return {
-				...state,
-				typing: false,
 			};
 
 		case 'REPLACE_BLOCKS':
@@ -346,9 +319,27 @@ export function selectedBlock( state = {}, action ) {
 
 			return {
 				uid: action.blocks[ 0 ].uid,
-				typing: false,
 				focus: {},
 			};
+	}
+
+	return state;
+}
+
+/**
+ * Reducer returning typing state.
+ *
+ * @param  {Boolean} state  Current state
+ * @param  {Object}  action Dispatched action
+ * @return {Boolean}        Updated state
+ */
+export function isTyping( state = false, action ) {
+	switch ( action.type ) {
+		case 'START_TYPING':
+			return true;
+
+		case 'STOP_TYPING':
+			return false;
 	}
 
 	return state;
@@ -528,6 +519,7 @@ export function createReduxStore() {
 		editor,
 		currentPost,
 		selectedBlock,
+		isTyping,
 		multiSelectedBlocks,
 		hoveredBlock,
 		showInsertionPoint,
