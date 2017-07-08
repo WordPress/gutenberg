@@ -17,6 +17,7 @@ import InspectorControls from '../../inspector-controls';
 import TextControl from '../../inspector-controls/text-control';
 import ToggleControl from '../../inspector-controls/toggle-control';
 import BlockDescription from '../../block-description';
+import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
 const MIN_POSTS = 1;
@@ -112,13 +113,7 @@ registerBlockType( 'core/latest-posts', {
 
 			return [
 				focus && (
-					<InspectorControls key="inspector">
-						<BlockDescription>
-							<p>{ __( 'Shows a list of your site\'s most recent posts.' ) }</p>
-						</BlockDescription>
-						<h3>{ __( 'Latest Posts Settings' ) }</h3>
-
-						<p>{ __( 'Alignment' ) }</p>
+					<BlockControls key="controls">
 						<BlockAlignmentToolbar
 							value={ align }
 							onChange={ ( nextAlign ) => {
@@ -126,6 +121,14 @@ registerBlockType( 'core/latest-posts', {
 							} }
 							controls={ [ 'left', 'center', 'right', 'wide', 'full' ] }
 						/>
+					</BlockControls>
+				),
+				focus && (
+					<InspectorControls key="inspector">
+						<BlockDescription>
+							<p>{ __( 'Shows a list of your site\'s most recent posts.' ) }</p>
+						</BlockDescription>
+						<h3>{ __( 'Latest Posts Settings' ) }</h3>
 
 						<ToggleControl
 							label={ __( 'Display post date' ) }
