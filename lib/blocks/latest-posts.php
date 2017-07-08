@@ -48,7 +48,7 @@ function gutenberg_render_block_core_latest_posts( $attributes ) {
 		$posts_content .= "<li><a href='{$post_permalink}'>{$post_title}</a></li>\n";
 	}
 
-	$class = 'blocks-latest-posts ' . esc_attr( 'align' . $align );
+	$class = 'wp-block-latest-posts ' . esc_attr( 'align' . $align );
 
 	$block_content = <<<CONTENT
 <div class="{$class}">
