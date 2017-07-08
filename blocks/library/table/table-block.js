@@ -1,3 +1,11 @@
+/**
+ * External dependencies
+ */
+import { get } from 'lodash';
+
+/**
+ * Internal dependencies
+ */
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import { Toolbar, DropdownMenu } from 'components';
@@ -52,20 +60,31 @@ export default class TableBlock extends wp.element.Component {
 		};
 	}
 
-	componentDidUpdate( prevProps ) {
-		if ( prevProps.focus && ! this.props.focus && this.editor ) {
-			this.editor.plugins.table.cellSelection.clear();
+	clearSelectionHandling() {
+		const cellSelectionPlugin = get(
+			this.state,
+			'editor.plugins.table.cellSelection'
+		);
+		if ( cellSelectionPlugin && cellSelectionPlugin.clear ) {
+			cellSelectionPlugin.clear();
 		}
 	}
 
 	handleSetup( editor, focus ) {
-		// select the end of the first table cell
 		editor.on( 'init', () => {
 			const cell = editor.getBody().querySelector( 'td,th' );
 			if ( cell && focus ) {
+				// Select the end of the first table cell.
 				cell.focus();
 				editor.selection.select( cell, true );
 				editor.selection.collapse( false );
+			} else if ( ! focus ) {
+				// Work around a bug in the TinyMCE table plugin that leaves
+				// selection handling enabled when it shouldn't.  Unfortunately
+				// we need a `setTimeout` here because the `cellSelection`
+				// plugin is not initialized until a later TinyMCE `init` event
+				// callback.
+				setTimeout( () => this.clearSelectionHandling(), 0 );
 			}
 		} );
 		this.setState( { editor } );
