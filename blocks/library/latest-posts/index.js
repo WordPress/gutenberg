@@ -16,6 +16,7 @@ import InspectorControls from '../../inspector-controls';
 import TextControl from '../../inspector-controls/text-control';
 import ToggleControl from '../../inspector-controls/toggle-control';
 import BlockDescription from '../../block-description';
+import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
 const MIN_POSTS = 1;
 const MAX_POSTS = 100;
@@ -30,6 +31,13 @@ registerBlockType( 'core/latest-posts', {
 	defaultAttributes: {
 		postsToShow: 5,
 		displayPostDate: false,
+	},
+
+	getEditWrapperProps( attributes ) {
+		const { align } = attributes;
+		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
+			return { 'data-align': align };
+		}
 	},
 
 	edit: class extends Component {
@@ -85,6 +93,7 @@ registerBlockType( 'core/latest-posts', {
 
 		render() {
 			const { latestPosts } = this.state;
+			const { setAttributes } = this.props;
 
 			if ( ! latestPosts.length ) {
 				return (
@@ -98,7 +107,7 @@ registerBlockType( 'core/latest-posts', {
 			}
 
 			const { focus } = this.props;
-			const { displayPostDate } = this.props.attributes;
+			const { displayPostDate, align } = this.props.attributes;
 
 			return [
 				focus && (
@@ -107,6 +116,16 @@ registerBlockType( 'core/latest-posts', {
 							<p>{ __( 'Shows a list of your site\'s most recent posts.' ) }</p>
 						</BlockDescription>
 						<h3>{ __( 'Latest Posts Settings' ) }</h3>
+
+						<p>{ __( 'Alignment' ) }</p>
+						<BlockAlignmentToolbar
+							value={ align }
+							onChange={ ( nextAlign ) => {
+								setAttributes( { align: nextAlign } );
+							} }
+							controls={ [ 'left', 'center', 'right', 'wide', 'full' ] }
+						/>
+
 						<ToggleControl
 							label={ __( 'Display post date' ) }
 							checked={ displayPostDate }
