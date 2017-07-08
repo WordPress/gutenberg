@@ -67,15 +67,15 @@ function gutenberg_register_scripts_and_styles() {
 			'meridiem'      => (object) $wp_locale->meridiem,
 			'relative' => array(
 				/* translators: %s: duration */
-				'future' => __( '%s from now' ),
+				'future' => __( '%s from now', 'default' ),
 				/* translators: %s: duration */
-				'past'   => __( '%s ago' ),
+				'past'   => __( '%s ago', 'default' ),
 			),
 		),
 		'formats' => array(
-			'time'     => get_option( 'time_format', __( 'g:i a' ) ),
-			'date'     => get_option( 'date_format', __( 'F j, Y' ) ),
-			'datetime' => __( 'F j, Y g:i a' ),
+			'time'     => get_option( 'time_format', __( 'g:i a', 'default' ) ),
+			'date'     => get_option( 'date_format', __( 'F j, Y', 'default' ) ),
+			'datetime' => __( 'F j, Y g:i a', 'default' ),
 		),
 		'timezone' => array(
 			'offset' => get_option( 'gmt_offset', 0 ),
