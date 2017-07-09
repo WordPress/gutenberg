@@ -126,7 +126,11 @@ describe( 'full post content fixture', () => {
 					parserOutputActual
 				).toEqual( parserOutputExpected );
 			} catch ( err ) {
-				throw new Error( format( 'File \'%s.parsed.json\' does not match expected value.', f ) );
+				throw new Error( format(
+					'File \'%s.parsed.json\' does not match expected value:\n\n%s',
+					f,
+					err.message
+				) );
 			}
 
 			const blocksActual = parse( content );
@@ -154,7 +158,11 @@ describe( 'full post content fixture', () => {
 					blocksActualNormalized
 				).toEqual( blocksExpected );
 			} catch ( err ) {
-				throw new Error( format( 'File \'%s.json\' does not match expected value', f ) );
+				throw new Error( format(
+					'File \'%s.json\' does not match expected value:\n\n%s',
+					f,
+					err.message
+				) );
 			}
 
 			const serializedActual = serialize( blocksActual );
@@ -172,11 +180,15 @@ describe( 'full post content fixture', () => {
 			}
 
 			try {
-				expect(
-					serializedActual
-				).toEqual( serializedExpected.replace( /\n$/, '' ) );
+				expect( serializedActual ).toEqual(
+					serializedExpected.replace( /\n$/, '' )
+				);
 			} catch ( err ) {
-				throw new Error( format( 'File \'%s.serialized.html\' does not match expected value', f ) );
+				throw new Error( format(
+					'File \'%s.serialized.html\' does not match expected value:\n\n%s',
+					f,
+					err.message
+				) );
 			}
 		} );
 	} );
