@@ -13,6 +13,7 @@ import {
 	hasEditorRedo,
 	isEditedPostNew,
 	isEditedPostDirty,
+	isCleanNewPost,
 	getCurrentPost,
 	getCurrentPostId,
 	getCurrentPostType,
@@ -174,9 +175,45 @@ describe( 'selectors', () => {
 				editor: {
 					dirty: false,
 				},
+				currentPost: {},
 			};
 
 			expect( isEditedPostDirty( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isCleanNewPost', () => {
+		it( 'should return true when the post is not dirty and has not been saved before', () => {
+			const state = {
+				editor: {
+					dirty: false,
+				},
+				currentPost: {},
+			};
+
+			expect( isCleanNewPost( state ) ).to.be.true();
+		} );
+
+		it( 'should return false when the post is not dirty but the post has been saved', () => {
+			const state = {
+				editor: {
+					dirty: false,
+				},
+				currentPost: { id: 1 },
+			};
+
+			expect( isCleanNewPost( state ) ).to.be.false();
+		} );
+
+		it( 'should return false when the post is dirty but the post has not been saved', () => {
+			const state = {
+				editor: {
+					dirty: true,
+					currentPost: {},
+				},
+			};
+
+			expect( isCleanNewPost( state ) ).to.be.false();
 		} );
 	} );
 
