@@ -24,7 +24,7 @@ This list is manually curated to include valuable contributions by volunteers th
 - @paulwilde
 - @mitogh
 - @codebykat
-- @ahmadawais
+- @ahmadawais (@mrahmadawais on WP.org)
 - @kopepasah
 - @circlecube
 - @adamsilverstein
