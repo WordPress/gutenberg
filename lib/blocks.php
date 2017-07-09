@@ -90,9 +90,16 @@ function do_blocks( $content ) {
 		$block_name = isset( $block['blockName'] ) ? $block['blockName'] : null;
 		$attributes = is_array( $block['attrs'] ) ? $block['attrs'] : array();
 		if ( $block_name && isset( $wp_registered_blocks[ $block_name ] ) ) {
+
+			$content = null;
+			if ( isset( $block['rawContent'] ) ) {
+				$content = $block['rawContent'];
+			}
+
 			$content_after_blocks .= call_user_func(
 				$wp_registered_blocks[ $block_name ]['render'],
-				$attributes
+				$attributes,
+				$content
 			);
 		} else {
 			$content_after_blocks .= $block['rawContent'];

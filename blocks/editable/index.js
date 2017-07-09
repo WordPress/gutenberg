@@ -435,12 +435,12 @@ export default class Editable extends Component {
 	}
 
 	changeFormats( formats ) {
-		if ( this.state.bookmark ) {
-			this.editor.selection.moveToBookmark( this.state.bookmark );
-		}
-
 		forEach( formats, ( formatValue, format ) => {
 			if ( format === 'link' ) {
+				if ( this.state.bookmark ) {
+					this.editor.selection.moveToBookmark( this.state.bookmark );
+				}
+
 				if ( formatValue !== undefined ) {
 					const anchor = this.editor.dom.getParent( this.editor.selection.getNode(), 'a' );
 					if ( ! anchor ) {
