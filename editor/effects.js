@@ -39,8 +39,10 @@ export default {
 	RESET_POST( action, store ) {
 		populateDocumentTitle( action.post.title ? action.post.title.raw : '', isCleanNewPost( store.getState() ) );
 	},
-	EDIT_POST_TITLE( action, store ) {
-		populateDocumentTitle( action.postTitle, isCleanNewPost( store.getState() ) );
+	EDIT_POST( action, store ) {
+		if ( undefined !== action.edits.title ) {
+			populateDocumentTitle( action.edits.title, isCleanNewPost( store.getState() ) );
+		}
 	},
 	REQUEST_POST_UPDATE( action, store ) {
 		const { dispatch, getState } = store;

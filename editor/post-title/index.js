@@ -18,7 +18,7 @@ import { ENTER } from 'utils/keycodes';
  */
 import './style.scss';
 import { getEditedPostTitle } from '../selectors';
-import { editPost, editPostTitle, clearSelectedBlock } from '../actions';
+import { editPost, clearSelectedBlock } from '../actions';
 import PostPermalink from '../post-permalink';
 
 /**
@@ -119,7 +119,6 @@ export default connect(
 		return {
 			onUpdate( title ) {
 				dispatch( editPost( { title } ) );
-				dispatch( editPostTitle( title ) );
 			},
 			clearSelectedBlock() {
 				dispatch( clearSelectedBlock() );

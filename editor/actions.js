@@ -82,13 +82,6 @@ export function hideInsertionPoint() {
 	};
 }
 
-export function editPostTitle( postTitle ) {
-	return {
-		type: 'EDIT_POST_TITLE',
-		postTitle,
-	};
-}
-
 export function editPost( edits ) {
 	return {
 		type: 'EDIT_POST',
