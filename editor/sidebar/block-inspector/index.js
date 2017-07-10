@@ -20,7 +20,7 @@ import { getSelectedBlock } from '../../selectors';
 
 const BlockInspector = ( { selectedBlock, ...props } ) => {
 	if ( ! selectedBlock ) {
-		return null;
+		return <span>{ __( 'No block selected.' ) }</span>;
 	}
 
 	const blockType = getBlockType( selectedBlock.name );
@@ -42,7 +42,6 @@ const BlockInspector = ( { selectedBlock, ...props } ) => {
 
 	return (
 		<Panel>
-			<PanelHeader label={ header } />
 			<PanelBody>
 				<Slot name="Inspector.Controls" />
 			</PanelBody>

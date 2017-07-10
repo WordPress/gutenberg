@@ -107,3 +107,14 @@
 .editor-layout.is-sidebar-opened .editor-text-editor__formatting {
 	margin-right: $sidebar-width;
 }
+
+.editor-sidebar__mode-tab {
+	border-bottom: 3px solid transparent;
+	cursor: pointer;
+	height: 50px;
+	line-height: 50px;
+	padding: 0 20px;
+	&.is-active {
+		border-bottom-color: $blue-medium-500;
+	}
+}

@@ -23,19 +23,6 @@ import LastRevision from '../last-revision';
 const PostSettings = ( { toggleSidebar } ) => {
 	return (
 		<Panel>
-			<PanelHeader label={ __( 'Post Settings' ) } >
-				<div className="editor-sidebar-post-settings__icons">
-					<IconButton
-						icon="admin-settings"
-						label={ __( 'WordPress settings' ) }
-					/>
-					<IconButton
-						onClick={ toggleSidebar }
-						icon="no-alt"
-						label={ __( 'Close post settings sidebar' ) }
-					/>
-				</div>
-			</PanelHeader>
 			<PostStatus />
 			<LastRevision />
 			<PostTaxonomies />

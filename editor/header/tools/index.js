@@ -39,7 +39,7 @@ function Tools( { undo, redo, hasUndo, hasRedo, isSidebarOpened, toggleSidebar }
 			<PreviewButton />
 			<div className="editor-tools__tabs">
 				<IconButton icon="admin-generic" onClick={ toggleSidebar } isToggled={ isSidebarOpened }>
-					{ __( 'Post Settings' ) }
+					{ __( 'Settings' ) }
 				</IconButton>
 			</div>
 			<PublishButton />
