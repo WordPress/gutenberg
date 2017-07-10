@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 /**
  * Internal Dependencies
  */
-import MarkdownContent from './MarkdownContent';
+import MarkdownContent from './markdown-content';
 import { getNextStory, getPreviousStory } from '../config';
 
 class Page extends Component {

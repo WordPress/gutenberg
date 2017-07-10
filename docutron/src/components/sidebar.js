@@ -6,7 +6,7 @@ import React, { Component } from 'react';
 /**
  * Internal Dependencies
  */
-import MenuItem from './MenuItem';
+import MenuItem from './menu-item';
 import { getStories } from '../config';
 
 class Sidebar extends Component {

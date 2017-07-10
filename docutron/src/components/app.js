@@ -8,9 +8,9 @@ import { BrowserRouter, Route } from 'react-router-dom';
  * Internal Dependencies
  */
 import { getStories } from '../config';
-import Header from './Header';
-import Sidebar from './Sidebar';
-import Page from './Page';
+import Header from './header';
+import Sidebar from './sidebar';
+import Page from './page';
 
 function App() {
 	return (

@@ -7,7 +7,7 @@ import React from 'react';
  * Internal dependencies
  */
 import markdown from '../markdown';
-import Tabs from './Tabs';
+import Tabs from './tabs';
 
 function MarkdownContent( { content } ) {
 	const blocks = markdown( content );
