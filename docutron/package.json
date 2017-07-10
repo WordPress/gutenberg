@@ -1,6 +1,6 @@
 {
   "name": "docutron",
-  "version": "0.1.0",
+  "version": "5000.0.0",
   "dependencies": {
     "lodash": "^4.17.4",
     "markdown-it": "^8.3.1",
