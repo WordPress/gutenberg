@@ -3,7 +3,6 @@
 /**
  * External dependencies
  */
-
 import { expect } from 'chai';
 import sinon from 'sinon';
 import { __ } from 'i18n';
@@ -11,7 +10,6 @@ import { __ } from 'i18n';
 /**
  * Internal dependencies
  */
-
 import {
 	registerCategory,
 	sortCategoriesBy,
