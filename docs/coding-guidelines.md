@@ -1,5 +1,4 @@
-Coding Guidelines
-=================
+# Coding Guidelines
 
 This living document serves to prescribe coding guidelines specific to the Gutenberg editor project. Base coding guidelines follow the [WordPress Coding Standards](https://codex.wordpress.org/WordPress_Coding_Standards). The following sections outline additional patterns and conventions used in the Gutenberg project.
 

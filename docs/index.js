@@ -66,6 +66,20 @@ addStory( {
 
 addStory( {
 	parents: [ 'reference' ],
+	name: 'design-principles',
+	title: 'Design Principles',
+	markdown: require( './design.md' ),
+} );
+
+addStory( {
+	parents: [ 'reference' ],
+	name: 'coding-guidelines',
+	title: 'Coding Guidelines',
+	markdown: require( './coding-guidelines.md' ),
+} );
+
+addStory( {
+	parents: [ 'reference' ],
 	name: 'faq',
 	title: 'Frequently Asked Questions',
 	markdown: require( './faq.md' ),

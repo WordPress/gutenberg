@@ -1,5 +1,4 @@
-Gutenberg Design
-================
+# Design Principles
 
 This living document serves to describe some of the design principles and patterns that have served to form the editor interface.
 
