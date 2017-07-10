@@ -1,4 +1,4 @@
 build
 coverage
 vendor
-docutron/node_modules
+node_modules
