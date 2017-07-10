@@ -5,7 +5,7 @@ const stories = [];
 export function addStory( story ) {
 	const { name, parents = [] } = story;
 	stories.push( {
-		path: '/' + parents.concat( name ).join( '/' ),
+		path: '/' + parents.concat( name ).join( '/' ) + '/',
 		id: parents.concat( name ).join( '.' ),
 		parent: parents.join( '.' ),
 		...story,
