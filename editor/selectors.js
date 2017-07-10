@@ -21,13 +21,13 @@ export function getEditorMode( state ) {
 }
 
 /**
- * Returns the current sidebar mode.
+ * Returns the current active panel for the sidebar.
  *
  * @param  {Object}  state Global application state
- * @return {String}        Sidebar mode
+ * @return {String}        Active sidebar panel
  */
-export function getSidebarMode( state ) {
-	return state.sidebarMode;
+export function getActivePanel( state ) {
+	return state.panel;
 }
 
 /**

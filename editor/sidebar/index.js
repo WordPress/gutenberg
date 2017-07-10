@@ -15,14 +15,14 @@ import './style.scss';
 import PostSettings from './post-settings';
 import BlockInspector from './block-inspector';
 import Header from './header';
-import { getSelectedBlock, getSidebarMode } from '../selectors';
+import { getSelectedBlock, getActivePanel } from '../selectors';
 
-const Sidebar = ( { selectedBlock, sidebarMode } ) => {
+const Sidebar = ( { selectedBlock, panel } ) => {
 	return (
 		<div className="editor-sidebar">
 			<Header />
-			{ sidebarMode === 'document' && <PostSettings /> }
-			{ sidebarMode === 'block' && <BlockInspector /> }
+			{ panel === 'document' && <PostSettings /> }
+			{ panel === 'block' && <BlockInspector /> }
 		</div>
 	);
 };
@@ -31,7 +31,7 @@ export default connect(
 	( state ) => {
 		return {
 			selectedBlock: getSelectedBlock( state ),
-			sidebarMode: getSidebarMode( state ),
+			panel: getActivePanel( state ),
 		};
 	}
 )( withFocusReturn( Sidebar ) );

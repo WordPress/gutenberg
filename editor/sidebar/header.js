@@ -12,20 +12,20 @@ import { IconButton } from 'components';
 /**
  * Internal Dependencies
  */
-import { getSidebarMode } from 'editor/selectors';
+import { getActivePanel } from 'editor/selectors';
 
-const SidebarHeader = ( { mode, onSelectMode, toggleSidebar } ) => {
+const SidebarHeader = ( { panel, onSetPanel, toggleSidebar } ) => {
 	return (
 		<div className="components-panel__header">
 			<h2
-				onClick={ () => onSelectMode( 'document' ) }
-				className={ `editor-sidebar__mode-tab ${ mode === 'document' ? 'is-active' : '' }` }
+				onClick={ () => onSetPanel( 'document' ) }
+				className={ `editor-sidebar__mode-tab ${ panel === 'document' ? 'is-active' : '' }` }
 			>
 				{ __( 'Document' ) }
 			</h2>
 			<h2
-				onClick={ () => onSelectMode( 'block' ) }
-				className={ `editor-sidebar__mode-tab ${ mode === 'block' ? 'is-active' : '' }` }
+				onClick={ () => onSetPanel( 'block' ) }
+				className={ `editor-sidebar__mode-tab ${ panel === 'block' ? 'is-active' : '' }` }
 			>
 				{ __( 'Block' ) }
 			</h2>
@@ -40,13 +40,13 @@ const SidebarHeader = ( { mode, onSelectMode, toggleSidebar } ) => {
 
 export default connect(
 	( state ) => ( {
-		mode: getSidebarMode( state ),
+		panel: getActivePanel( state ),
 	} ),
 	( dispatch ) => ( {
-		onSelectMode( mode ) {
+		onSetPanel( panel ) {
 			dispatch( {
-				type: 'SELECT_SIDEBAR_MODE',
-				sidebarMode: mode,
+				type: 'SET_ACTIVE_PANEL',
+				panel: panel,
 			} );
 		},
 		toggleSidebar: () => dispatch( { type: 'TOGGLE_SIDEBAR' } ),

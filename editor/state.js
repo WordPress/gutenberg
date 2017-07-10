@@ -428,10 +428,10 @@ export function isSidebarOpened( state = ! isMobile, action ) {
 	return state;
 }
 
-export function sidebarMode( state = 'document', action ) {
+export function panel( state = 'document', action ) {
 	switch ( action.type ) {
-		case 'SELECT_SIDEBAR_MODE':
-			return action.sidebarMode;
+		case 'SET_ACTIVE_PANEL':
+			return action.panel;
 	}
 
 	return state;
@@ -505,7 +505,7 @@ export function createReduxStore() {
 		showInsertionPoint,
 		mode,
 		isSidebarOpened,
-		sidebarMode,
+		panel,
 		saving,
 		notices,
 	} ) );
