@@ -15,6 +15,7 @@ describe( 'IconButton', () => {
 			const iconButton = shallow( <IconButton /> );
 			expect( iconButton.hasClass( 'components-icon-button' ) ).to.be.true();
 			expect( iconButton.prop( 'aria-label' ) ).to.be.undefined();
+			expect( iconButton.prop( 'title' ) ).to.be.undefined();
 		} );
 
 		it( 'should render a Dashicon component matching the wordpress icon', () => {
@@ -44,12 +45,12 @@ describe( 'IconButton', () => {
 
 		it( 'should add a title attribute when the title property is used', () => {
 			const iconButton = shallow( <IconButton title="WordPress" /> );
-			expect( iconButton.props().title ).to.equal( 'WordPress' );
+			expect( iconButton.prop( 'title' ) ).to.equal( 'WordPress' );
 		} );
 
 		it( 'should add a title attribute using the label property value in absence of the title property', () => {
 			const iconButton = shallow( <IconButton label="WordPress" /> );
-			expect( iconButton.props().title ).to.equal( 'WordPress' );
+			expect( iconButton.prop( 'title' ) ).to.equal( 'WordPress' );
 		} );
 	} );
 } );
