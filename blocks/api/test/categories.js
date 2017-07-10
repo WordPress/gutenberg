@@ -39,7 +39,7 @@ describe( 'categories', () => {
 			expect( categories ).to.be.undefined();
 		} );
 
-		it( 'should reject categories with empty slug', () => {
+		it( 'should reject categories with slug not defined', () => {
 			const categories = registerCategory( { title: __( 'Custom Blocks' ) } );
 			expect( console.error ).to.have.been.calledWith( 'The Block category slug must be defined' );
 			expect( categories ).to.be.undefined();
@@ -82,7 +82,7 @@ describe( 'categories', () => {
 		} );
 	} );
 	describe( 'setCategoryOrder()', () => {
-		it( 'should reject empty slug', () => {
+		it( 'should reject slug not defined', () => {
 			const categories = setCategoryOrder();
 			expect( console.error ).to.have.been.calledWith( 'The slug must be defined' );
 			expect( categories ).to.be.undefined();
@@ -106,7 +106,7 @@ describe( 'categories', () => {
 			expect( categories ).to.be.undefined();
 		} );
 
-		it( 'should reject order if it is not an integer', () => {
+		it( 'should reject order if it is a string', () => {
 			const categories = setCategoryOrder( 'custom-blocks', '2' );
 			expect( console.error ).to.have.been.calledWith( 'The order must be an integer' );
 			expect( categories ).to.be.undefined();
