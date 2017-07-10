@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 const path = require( 'path' );
+
 const extendsConfig = require( './helpers/extend-webpack-config' );
 const usersCwd = process.cwd();
 
