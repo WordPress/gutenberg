@@ -20,15 +20,11 @@ import {
 	getCurrentPostType,
 	getBlocks,
 	getPostEdits,
-	isCleanNewPost,
+	getDocumentTitle,
 } from './selectors';
 
-let originalDocumentTitle;
-
-function populateDocumentTitle( title, isCleanNew = false ) {
-	if ( ! title.trim() ) {
-		title = isCleanNew ? __( 'New post' ) : __( '(Untitled)' );
-	}
+let originalDocumentTitle; // @todo Obtain document.title template from PHP export?
+function populateDocumentTitle( title ) {
 	if ( ! originalDocumentTitle ) {
 		originalDocumentTitle = document.title;
 	}
@@ -37,11 +33,15 @@ function populateDocumentTitle( title, isCleanNew = false ) {
 
 export default {
 	RESET_POST( action, store ) {
-		populateDocumentTitle( action.post.title ? action.post.title.raw : '', isCleanNewPost( store.getState() ) );
+		setTimeout( () => { // Next-tick to ensure action has been applied to state in store .
+			populateDocumentTitle( getDocumentTitle( store.getState() ) );
+		} );
 	},
 	EDIT_POST( action, store ) {
 		if ( undefined !== action.edits.title ) {
-			populateDocumentTitle( action.edits.title, isCleanNewPost( store.getState() ) );
+			setTimeout( () => {
+				populateDocumentTitle( getDocumentTitle( store.getState() ) );
+			} );
 		}
 	},
 	REQUEST_POST_UPDATE( action, store ) {

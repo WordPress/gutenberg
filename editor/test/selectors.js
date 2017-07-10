@@ -19,6 +19,7 @@ import {
 	getCurrentPostType,
 	getPostEdits,
 	getEditedPostTitle,
+	getDocumentTitle,
 	getEditedPostExcerpt,
 	getEditedPostVisibility,
 	isEditedPostPublished,
@@ -53,6 +54,11 @@ import {
 	getSuggestedPostFormat,
 	getNotices,
 } from '../selectors';
+
+/**
+ * WordPress dependencies
+ */
+import { __ } from 'i18n';
 
 describe( 'selectors', () => {
 	describe( 'getEditorMode', () => {
@@ -294,6 +300,77 @@ describe( 'selectors', () => {
 			};
 
 			expect( getEditedPostTitle( state ) ).toBe( 'youcha' );
+		} );
+	} );
+
+	describe( 'getDocumentTitle', () => {
+		it( 'should return current title unedited existing post', () => {
+			const state = {
+				currentPost: {
+					id: 123,
+					title: { raw: 'The Title' },
+				},
+				editor: {
+					dirty: false,
+				},
+			};
+
+			expect( getDocumentTitle( state ) ).to.equal( 'The Title' );
+		} );
+
+		it( 'should return current title for edited existing post', () => {
+			const state = {
+				currentPost: {
+					id: 123,
+					title: { raw: 'The Title' },
+				},
+				editor: {
+					dirty: true,
+					edits: { title: 'Modified Title' },
+				},
+			};
+
+			expect( getDocumentTitle( state ) ).to.equal( 'Modified Title' );
+		} );
+
+		it( 'should return new post title when new post is clean', () => {
+			const state = {
+				currentPost: {
+					title: { raw: '' },
+				},
+				editor: {
+					dirty: false,
+				},
+			};
+
+			expect( getDocumentTitle( state ) ).to.equal( __( 'New post' ) );
+		} );
+
+		it( 'should return untitled title when new post is dirty', () => {
+			const state = {
+				currentPost: {
+					title: { raw: '' },
+				},
+				editor: {
+					dirty: true,
+				},
+			};
+
+			expect( getDocumentTitle( state ) ).to.equal( __( '(Untitled)' ) );
+		} );
+
+		it( 'should return untitled title', () => {
+			const state = {
+				currentPost: {
+					id: 123,
+					title: { raw: '' },
+				},
+				editor: {
+					dirty: true,
+				},
+			};
+
+			expect( getDocumentTitle( state ) ).to.equal( __( '(Untitled)' ) );
 		} );
 	} );
 
