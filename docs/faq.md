@@ -1,4 +1,4 @@
-# Gutenberg F.A.Q.
+# Frequently Asked Questions
 
 ## What is Gutenberg?
 
