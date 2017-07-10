@@ -1,9 +1,7 @@
 /**
  * External dependencies
  */
-import { expect } from 'chai';
 import { shallow } from 'enzyme';
-import sinon from 'sinon';
 
 /**
  * Internal dependencies
@@ -20,7 +18,7 @@ describe( 'SavedState', () => {
 				isSaveable={ false } />
 		);
 
-		expect( wrapper.text() ).to.equal( 'Saving' );
+		expect( wrapper.text() ).toBe( 'Saving' );
 	} );
 
 	it( 'returns null if the post is not saveable', () => {
@@ -32,7 +30,7 @@ describe( 'SavedState', () => {
 				isSaveable={ false } />
 		);
 
-		expect( wrapper.type() ).to.be.null();
+		expect( wrapper.type() ).toBeNull();
 	} );
 
 	it( 'should return Saved text if not new and not dirty', () => {
@@ -44,13 +42,13 @@ describe( 'SavedState', () => {
 				isSaveable={ true } />
 		);
 
-		expect( wrapper.childAt( 0 ).name() ).to.equal( 'Dashicon' );
-		expect( wrapper.childAt( 1 ).text() ).to.equal( 'Saved' );
+		expect( wrapper.childAt( 0 ).name() ).toBe( 'Dashicon' );
+		expect( wrapper.childAt( 1 ).text() ).toBe( 'Saved' );
 	} );
 
 	it( 'should return Save button if edits to be saved', () => {
-		const statusSpy = sinon.spy();
-		const saveSpy = sinon.spy();
+		const statusSpy = jest.fn();
+		const saveSpy = jest.fn();
 		const wrapper = shallow(
 			<SavedState
 				isNew={ false }
@@ -61,10 +59,10 @@ describe( 'SavedState', () => {
 				onSave={ saveSpy } />
 		);
 
-		expect( wrapper.name() ).to.equal( 'Button' );
-		expect( wrapper.childAt( 0 ).text() ).to.equal( 'Save' );
+		expect( wrapper.name() ).toBe( 'Button' );
+		expect( wrapper.childAt( 0 ).text() ).toBe( 'Save' );
 		wrapper.simulate( 'click' );
-		expect( statusSpy ).to.have.been.calledWith( 'draft' );
-		expect( saveSpy ).to.have.been.called();
+		expect( statusSpy ).toHaveBeenCalledWith( 'draft' );
+		expect( saveSpy ).toHaveBeenCalled();
 	} );
 } );
