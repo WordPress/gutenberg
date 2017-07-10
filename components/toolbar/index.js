@@ -35,6 +35,7 @@ function Toolbar( { controls = [], children } ) {
 						<IconButton
 							icon={ control.icon }
 							label={ control.title }
+							title={ control.title }
 							data-subscript={ control.subscript }
 							onClick={ ( event ) => {
 								event.stopPropagation();
