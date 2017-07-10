@@ -17,8 +17,16 @@ var Details = wp.media.view.Attachment.Details,
 TwoColumn = Details.extend({
 	template: wp.template( 'attachment-details-two-column' ),
 
+	initialize: function() {
+		this.controller.on( 'content:activate:edit-details', _.bind( this.editAttachment, this ) );
+
+		Details.prototype.initialize.apply( this, arguments );
+	},
+
 	editAttachment: function( event ) {
-		event.preventDefault();
+		if ( event ) {
+			event.preventDefault();
+		}
 		this.controller.content.mode( 'edit-image' );
 	},
 

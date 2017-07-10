@@ -81,38 +81,42 @@ Manage = MediaFrame.extend({
 		this.bindRegionModeHandlers();
 		this.render();
 		this.bindSearchHandler();
+
+		wp.media.frames.browse = this;
 	},
 
 	bindSearchHandler: function() {
 		var search = this.$( '#media-search-input' ),
-			currentSearch = this.options.container.data( 'search' ),
 			searchView = this.browserView.toolbar.get( 'search' ).$el,
 			listMode = this.$( '.view-list' ),
 
-			input  = _.debounce( function (e) {
+			input  = _.throttle( function (e) {
 				var val = $( e.currentTarget ).val(),
 					url = '';
 
 				if ( val ) {
 					url += '?search=' + val;
+					this.gridRouter.navigate( this.gridRouter.baseUrl( url ), { replace: true } );
 				}
-				this.gridRouter.navigate( this.gridRouter.baseUrl( url ) );
 			}, 1000 );
 
 		// Update the URL when entering search string (at most once per second)
 		search.on( 'input', _.bind( input, this ) );
-		searchView.val( currentSearch ).trigger( 'input' );
 
-		this.gridRouter.on( 'route:search', function () {
-			var href = window.location.href;
-			if ( href.indexOf( 'mode=' ) > -1 ) {
-				href = href.replace( /mode=[^&]+/g, 'mode=list' );
-			} else {
-				href += href.indexOf( '?' ) > -1 ? '&mode=list' : '?mode=list';
-			}
-			href = href.replace( 'search=', 's=' );
-			listMode.prop( 'href', href );
-		} );
+		this.gridRouter
+			.on( 'route:search', function () {
+				var href = window.location.href;
+				if ( href.indexOf( 'mode=' ) > -1 ) {
+					href = href.replace( /mode=[^&]+/g, 'mode=list' );
+				} else {
+					href += href.indexOf( '?' ) > -1 ? '&mode=list' : '?mode=list';
+				}
+				href = href.replace( 'search=', 's=' );
+				listMode.prop( 'href', href );
+			})
+			.on( 'route:reset', function() {
+				searchView.val( '' ).trigger( 'input' );
+			});
 	},
 
 	/**
@@ -204,12 +208,16 @@ Manage = MediaFrame.extend({
 	 */
 	openEditAttachmentModal: function( model ) {
 		// Create a new EditAttachment frame, passing along the library and the attachment model.
-		wp.media( {
-			frame:       'edit-attachments',
-			controller:  this,
-			library:     this.state().get('library'),
-			model:       model
-		} );
+		if ( wp.media.frames.edit ) {
+			wp.media.frames.edit.open().trigger( 'refresh', model );
+		} else {
+			wp.media.frames.edit = wp.media( {
+				frame:       'edit-attachments',
+				controller:  this,
+				library:     this.state().get('library'),
+				model:       model
+			} );
+		}
 	},
 
 	/**
