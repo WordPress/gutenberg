@@ -19,3 +19,13 @@
 .blocks-gallery__placeholder-instructions {
 	margin: 1.8em 0;
 }
+
+.wp-block-gallery .blocks-editable {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	figcaption {
+		position: static;
+	}
+}
