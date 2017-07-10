@@ -1,13 +1,13 @@
 import MarkdownIt from 'markdown-it';
 import markdownItPrismPlugin from 'markdown-it-prism';
-import markdownItAnchorPlugin from 'markdown-it-anchor';
+import markdownItTOCAndAnchorPlugin from 'markdown-it-toc-and-anchor';
 import { compact } from 'lodash';
 
 const parser = new MarkdownIt( {
 	html: true,
 } );
 parser
-	.use( markdownItAnchorPlugin )
+	.use( markdownItTOCAndAnchorPlugin )
 	.use( markdownItPrismPlugin );
 
 const blockParsers = {
