@@ -13,7 +13,7 @@ import 'config';
 /**
  * Internal Dependencies
  */
-import App from './components/App';
+import App from './components/app';
 import registerServiceWorker from './registerServiceWorker';
 import './styles/main.css';
 
