@@ -133,13 +133,13 @@
     "lint": "eslint . .storybook",
     "dev": "cross-env BABEL_ENV=default webpack --watch",
     "test": "npm run lint && npm run test-unit",
-    "ci": "concurrently \"npm run build\" \"npm run lint\" \"npm run test-unit:coverage-ci\"",
+    "ci": "concurrently \"npm run lint && npm run build\" \"npm run test-unit:coverage-ci\"",
     "package-plugin": "./bin/build-plugin-zip.sh",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "test-unit": "jest",
     "test-unit:coverage": "jest --coverage",
-    "test-unit:coverage-ci": "jest --coverage && coveralls < coverage/lcov.info",
+    "test-unit:coverage-ci": "jest --coverage --maxWorkers 1 && coveralls < coverage/lcov.info",
     "test-unit:watch": "jest --watch"
   }
 }
