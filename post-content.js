@@ -12,6 +12,9 @@ window._wpGutenbergPost = {
 			'<section className="cover-image wp-block-cover-image" style={ { backgroundImage: \'url("https://cldup.com/GCwahb3aOb.jpg");\' } }><h2>Of mountains & printing presses</h2></section>',
 			'<!-- /wp:core/cover-image -->',
 
+			'<!-- more Keep on reading! -->',
+			'<!-- noteaser -->',
+
 			'<!-- wp:core/text { "project": { "name": "gutenberg", "for": "WordPress" }, "isAwesome": true } -->',
 			'<p>The goal of this new editor is to make adding rich content to WordPress simple and enjoyable. This whole post is composed of <em>pieces of content</em>—somewhat similar to LEGO bricks—that you can move around and interact with. Move your cursor around and you\'ll notice the different blocks light up with outlines and arrows. Press the arrows to reposition blocks quickly, without fearing about losing things in the process of copying and pasting.</p>',
 			'<!-- /wp:core/text -->',
@@ -159,9 +162,10 @@ window._wpGutenbergPost = {
 			'<hr class="wp-block-separator" />',
 			'<!-- /wp:core/separator -->',
 
-			'<!-- wp:core/table -->',
-			'<table class="widefat wp-block-table"><thead><tr><th>Version</th><th>Musician</th><th>Date</th></tr></thead><tbody><tr><th><a href="https://wordpress.org/news/2015/12/clifford/">4.4</a></th><td>Clifford Brown</td><td>December 8, 2015</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2016/04/coleman/">4.5</a></th><td>Coleman Hawkins</td><td>April 12, 2016</td></tr><tr><th><a href="https://wordpress.org/news/2016/08/pepper/">4.6</a></th><td>Pepper Adams</td><td>August 16, 2016</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2016/12/vaughan/">4.7</a></th><td>Sarah Vaughan</td><td>December 6, 2016</td></tr></tbody></table>',
-			'<!-- /wp:core/table -->',
+			// Remove until #1795 is fixed.
+			// '<!-- wp:core/table -->',
+			// '<table class="widefat wp-block-table"><thead><tr><th>Version</th><th>Musician</th><th>Date</th></tr></thead><tbody><tr><th><a href="https://wordpress.org/news/2015/12/clifford/">4.4</a></th><td>Clifford Brown</td><td>December 8, 2015</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2016/04/coleman/">4.5</a></th><td>Coleman Hawkins</td><td>April 12, 2016</td></tr><tr><th><a href="https://wordpress.org/news/2016/08/pepper/">4.6</a></th><td>Pepper Adams</td><td>August 16, 2016</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2016/12/vaughan/">4.7</a></th><td>Sarah Vaughan</td><td>December 6, 2016</td></tr></tbody></table>',
+			// '<!-- /wp:core/table -->',
 
 			'<!-- wp:core/heading -->',
 			'<h2>All that you can embed!</h2>',

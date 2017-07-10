@@ -11,8 +11,9 @@ import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
  * WordPress dependencies
  */
 import { Children, Component } from 'element';
-import { BACKSPACE, ESCAPE, DELETE } from 'utils/keycodes';
+import { BACKSPACE, ESCAPE, DELETE, UP, DOWN, LEFT, RIGHT } from 'utils/keycodes';
 import { getBlockType, getBlockDefaultClassname } from 'blocks';
+import { __, sprintf } from 'i18n';
 
 /**
  * Internal dependencies
@@ -23,7 +24,7 @@ import BlockSwitcher from '../../block-switcher';
 import {
 	focusBlock,
 	mergeBlocks,
-	insertBlock,
+	insertBlocks,
 	clearSelectedBlock,
 	startTypingInBlock,
 	stopTypingInBlock,
@@ -58,6 +59,9 @@ class VisualEditorBlock extends Component {
 		this.mergeBlocks = this.mergeBlocks.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
+		this.onKeyDown = this.onKeyDown.bind( this );
+		this.onKeyUp = this.onKeyUp.bind( this );
+		this.handleArrowKey = this.handleArrowKey.bind( this );
 		this.previousOffset = null;
 	}
 
@@ -233,9 +237,68 @@ class VisualEditorBlock extends Component {
 		this.props.onSelect();
 	}
 
+	onKeyDown( event ) {
+		const { keyCode } = event;
+
+		this.handleArrowKey( event );
+
+		if ( keyCode === UP || keyCode === LEFT || keyCode === DOWN || keyCode === RIGHT ) {
+			const selection = window.getSelection();
+			this.lastRange = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+		}
+	}
+
+	onKeyUp( event ) {
+		this.removeOrDeselect( event );
+		this.handleArrowKey( event );
+	}
+
+	handleArrowKey( event ) {
+		const { keyCode, target } = event;
+		const moveUp = ( keyCode === UP || keyCode === LEFT );
+		const moveDown = ( keyCode === DOWN || keyCode === RIGHT );
+		const selectors = [
+			'*[contenteditable="true"]',
+			'*[tabindex]',
+			'textarea',
+			'input',
+		].join( ',' );
+
+		if ( moveUp || moveDown ) {
+			const selection = window.getSelection();
+			const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+
+			// If there's no movement, so we're either at the end of start, or
+			// no text input at all.
+			if ( range !== this.lastRange ) {
+				return;
+			}
+
+			const focusableNodes = Array.from( document.querySelectorAll( selectors ) );
+
+			if ( moveUp ) {
+				focusableNodes.reverse();
+			}
+
+			const targetNode = focusableNodes
+				.slice( focusableNodes.indexOf( target ) )
+				.reduce( ( result, node ) => {
+					return result || ( node.contains( target ) ? null : node );
+				}, null );
+
+			if ( targetNode ) {
+				targetNode.focus();
+			}
+		}
+
+		delete this.lastRange;
+	}
+
 	render() {
 		const { block, multiSelectedBlockUids } = this.props;
 		const blockType = getBlockType( block.name );
+		// translators: %s: Type of block (i.e. Text, Image etc)
+		const blockLabel = sprintf( __( 'Block: %s' ), blockType.title );
 		const { className = getBlockDefaultClassname( block.name ) } = blockType;
 		// The block as rendered in the editor is composed of general block UI
 		// (mover, toolbar, wrapper) and the display of the block content, which
@@ -262,7 +325,7 @@ class VisualEditorBlock extends Component {
 			'is-hovered': isHovered,
 		} );
 
-		const { onMouseLeave, onFocus, onInsertAfter } = this.props;
+		const { onMouseLeave, onFocus, onInsertBlocksAfter } = this.props;
 
 		// Determine whether the block has props to apply to the wrapper.
 		let wrapperProps;
@@ -275,7 +338,8 @@ class VisualEditorBlock extends Component {
 		return (
 			<div
 				ref={ this.bindBlockNode }
-				onKeyDown={ this.removeOrDeselect }
+				onKeyDown={ this.onKeyDown }
+				onKeyUp={ this.onKeyUp }
 				onFocus={ this.onFocus }
 				onMouseMove={ this.maybeHover }
 				onMouseEnter={ this.maybeHover }
@@ -283,6 +347,7 @@ class VisualEditorBlock extends Component {
 				className={ wrapperClassname }
 				data-type={ block.name }
 				tabIndex="0"
+				aria-label={ blockLabel }
 				{ ...wrapperProps }
 			>
 				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
@@ -315,7 +380,7 @@ class VisualEditorBlock extends Component {
 						focus={ focus }
 						attributes={ block.attributes }
 						setAttributes={ this.setAttributes }
-						insertBlockAfter={ onInsertAfter }
+						insertBlocksAfter={ onInsertBlocksAfter }
 						setFocus={ partial( onFocus, block.uid ) }
 						mergeBlocks={ this.mergeBlocks }
 						className={ className }
@@ -385,8 +450,8 @@ export default connect(
 			} );
 		},
 
-		onInsertAfter( block ) {
-			dispatch( insertBlock( block, ownProps.uid ) );
+		onInsertBlocksAfter( blocks ) {
+			dispatch( insertBlocks( blocks, ownProps.uid ) );
 		},
 
 		onFocus( ...args ) {

@@ -58,7 +58,10 @@ registerBlockType( 'core/cover-image', {
 					<Toolbar>
 						<li>
 							<MediaUploadButton
-								buttonProps={ { className: 'components-icon-button components-toolbar__control' } }
+								buttonProps={ {
+									className: 'components-icon-button components-toolbar__control',
+									'aria-label': __( 'Edit image' ),
+								} }
 								onSelect={ onSelectImage }
 								type="image"
 								value={ id }
@@ -85,7 +88,6 @@ registerBlockType( 'core/cover-image', {
 						buttonProps={ uploadButtonProps }
 						onSelect={ onSelectImage }
 						type="image"
-						autoOpen
 					>
 						{ __( 'Insert from Media Library' ) }
 					</MediaUploadButton>
@@ -132,7 +134,6 @@ registerBlockType( 'core/cover-image', {
 							focus={ focus }
 							onFocus={ setFocus }
 							onChange={ ( value ) => setAttributes( { title: value } ) }
-							inline
 							inlineToolbar
 						/>
 					) : null }

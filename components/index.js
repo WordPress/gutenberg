@@ -15,6 +15,7 @@ export { default as ResponsiveWrapper } from './responsive-wrapper';
 export { default as SandBox } from './sandbox';
 export { default as Spinner } from './spinner';
 export { default as Toolbar } from './toolbar';
+export { default as DropdownMenu } from './dropdown-menu';
 export { default as Popover } from './popover';
 
 // Higher-Order Components

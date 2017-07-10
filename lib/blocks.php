@@ -62,7 +62,7 @@ function do_blocks( $content ) {
 	foreach ( $blocks as $block ) {
 		$block_name = isset( $block['blockName'] ) ? $block['blockName'] : null;
 		$attributes = is_array( $block['attrs'] ) ? $block['attrs'] : array();
-		$raw_content = isset( $block['rawContent'] ) ? $block['rawContent'] : '';
+		$raw_content = isset( $block['rawContent'] ) ? $block['rawContent'] : null;
 
 		if ( $block_name ) {
 			$block_type = $registry->get_registered( $block_name );
@@ -72,7 +72,9 @@ function do_blocks( $content ) {
 			}
 		}
 
-		$content_after_blocks .= $raw_content;
+		if ( $raw_content ) {
+			$content_after_blocks .= $raw_content;
+		}
 	}
 
 	return $content_after_blocks;
