@@ -58,7 +58,7 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-01', {
 const { registerBlockType } = wp.blocks;
 const blockStyle = { backgroundColor: '#900', color: '#fff', padding: '20px' };
 
-registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-01', {
+registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-01', {
 	title: 'Hello World (Step 1)',
 
 	icon: 'universal-access-alt',

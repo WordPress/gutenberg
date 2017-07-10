@@ -90,7 +90,7 @@ const {
 } = wp.blocks;
 const { children } = children;
 
-registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
+registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 	title: 'Hello World (Step 4)',
 
 	icon: 'universal-access-alt',

@@ -60,7 +60,7 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-03', {
 const { registerBlockType, Editable, query } = wp.blocks;
 const { children } = query;
 
-registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-03', {
+registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-03', {
 	title: 'Hello World (Step 3)',
 
 	icon: 'universal-access-alt',
