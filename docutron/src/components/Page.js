@@ -1,6 +1,5 @@
 import React, { Component } from 'react'; // eslint-disable-line no-unused-vars
 import { Link } from 'react-router-dom';
-import Prism from 'prismjs';
 
 import { getNextStory, getPreviousStory } from 'docutron';
 import markdown from '../markdown';
@@ -17,10 +16,6 @@ class Tabs extends Component {
 		return () => {
 			this.setState( { activeTab: index } );
 		};
-	}
-
-	componentDidUpdate() {
-		Prism.highlightAll();
 	}
 
 	render() {
@@ -65,7 +60,6 @@ function MarkdownContent( { content } ) {
 
 class Page extends Component {
 	componentDidMount() {
-		Prism.highlightAll();
 		window.scrollTo( 0, 0 );
 	}
 
