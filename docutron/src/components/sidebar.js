@@ -32,7 +32,11 @@ class Sidebar extends Component {
 			<div id="secondary" className="widget-area">
 				<div className="secondary-content">
 					<aside className="widget widget_search">
-						<form id="searchform" className="searchform" role="search">
+						<form
+							id="searchform"
+							className="searchform"
+							role="search"
+							onSubmit={ ( event ) => event.preventDefault() }>
 							<label htmlFor="s" className="screen-reader-text">Filter</label>
 							<input
 								type="search"
