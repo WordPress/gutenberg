@@ -1,8 +1,6 @@
 const path = require( 'path' );
 
-module.exports = function( webpackConfig, usersCwd ) {
-	const docsFolder = 'docs';
-
+module.exports = function( webpackConfig, usersCwd, docsFolder ) {
 	// Adding "docutron" alias
 	webpackConfig.resolve.alias.docutron = path.resolve( __dirname, '../../src/config/' );
 
