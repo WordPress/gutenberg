@@ -17,7 +17,7 @@ import { ENTER } from 'utils/keycodes';
  * Internal dependencies
  */
 import './style.scss';
-import { getEditedPostTitle } from '../selectors';
+import { getEditedPostTitle, getEditorMode } from '../selectors';
 import { editPost, clearSelectedBlock } from '../actions';
 import PostPermalink from '../post-permalink';
 
@@ -86,7 +86,7 @@ class PostTitle extends Component {
 	}
 
 	render() {
-		const { title } = this.props;
+		const { title, mode } = this.props;
 		const { isSelected } = this.state;
 		const className = classnames( 'editor-post-title', { 'is-selected': isSelected } );
 
@@ -100,10 +100,11 @@ class PostTitle extends Component {
 						value={ title }
 						onChange={ this.onChange }
 						placeholder={ __( 'Add title' ) }
+						onBlur={ this.onUnselect }
 						onFocus={ this.onSelect }
 						onClick={ this.onSelect }
 						onKeyDown={ this.onKeyDown }
-						onKeyPress={ this.onUnselect }
+						onKeyPress={ mode === 'visual' && this.onUnselect }
 					/>
 				</h1>
 			</div>
@@ -114,6 +115,7 @@ class PostTitle extends Component {
 export default connect(
 	( state ) => ( {
 		title: getEditedPostTitle( state ),
+		mode: getEditorMode( state ),
 	} ),
 	( dispatch ) => {
 		return {

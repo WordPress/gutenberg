@@ -20,12 +20,10 @@
 
 	&:hover h1 {
 		outline: 1px solid $light-gray-500;
-		transition: 0.2s outline;
 	}
 
 	&.is-selected h1 {
 		outline: 2px solid $light-gray-500;
-		transition: 0.2s outline;
 	}
 
 	.editor-text-editor & {
@@ -33,8 +31,12 @@
 		padding-right: 20px;
 
 		h1 {
-			margin: 0 -10px;
-			padding: 0 10px;
+			margin: 0;
+			padding: 0 5px;
+		}
+
+		&.is-selected h1 {
+			outline: 2px solid $dark-gray-500;
 		}
 
 		@include break-large() {
