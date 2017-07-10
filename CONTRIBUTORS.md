@@ -26,7 +26,7 @@ This list is manually curated to include valuable contributions by volunteers th
 | @paulwilde | |
 | @mitogh | |
 | @codebykat | |
-| @ahmadawais | |
+| @ahmadawais | @mrahmadawais |
 | @kopepasah | |
 | @circlecube | |
 | @adamsilverstein | |
