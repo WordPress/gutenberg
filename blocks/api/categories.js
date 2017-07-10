@@ -4,6 +4,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { sortBy, findIndex } from 'lodash';
 
 /**
  * Block categories.
@@ -13,7 +14,7 @@ import { __ } from '@wordpress/i18n';
  *
  * @var {Array} categories
  */
-const categories = [
+let categories = [
 	{ slug: 'common', title: __( 'Common Blocks' ) },
 	{ slug: 'formatting', title: __( 'Formatting' ) },
 	{ slug: 'layout', title: __( 'Layout Blocks' ) },
@@ -60,7 +61,7 @@ export function registerCategory( cat ) {
 	}
 	if ( categories.find( x => x.slug === cat.slug ) ) {
 		console.error(
-			'Block category "' + cat.slug + '" is already registered.'
+			'Block category "' + cat.slug + '" is already registered'
 		);
 		return;
 	}
@@ -73,4 +74,54 @@ export function registerCategory( cat ) {
 
 	categories.push( cat );
 	return categories;
+}
+
+/**
+ * Sort categories by key
+ *
+ * @param {String} key The key to sort by
+ */
+export function sortCategoriesBy( key ) {
+	if ( ! key ) {
+		console.error(
+			'The key must be defined'
+		);
+		return;
+	}
+	if ( typeof key !== 'string' ) {
+		console.error(
+			'The key must be a string'
+		);
+		return;
+	}
+	categories = sortBy( categories, key );
+}
+
+/**
+ * Set the property 'order' for a category
+ *
+ * @param {String}    slug    The slug for the category
+ * @param {Number}    order   The order for the category
+ */
+export function setCategoryOrder( slug, order ) {
+	const pos = findIndex( categories, ( category ) => category.slug === slug );
+	if ( ! slug ) {
+		console.error(
+			'The slug must be defined'
+		);
+		return;
+	}
+	if ( typeof slug !== 'string' ) {
+		console.error(
+			'The slug must be a string'
+		);
+		return;
+	}
+	if ( ! ( order === parseInt( order, 10 ) ) ) {
+		console.error(
+			'The order must be an integer'
+		);
+		return;
+	}
+	categories[ pos ].order = order;
 }
