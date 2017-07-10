@@ -89,7 +89,7 @@ function normalizeParsedBlocks( blocks ) {
 
 describe( 'full post content fixture', () => {
 	beforeAll( () => {
-		// Registers all blocks
+		// Register all blocks.
 		require( 'blocks' );
 	} );
 
