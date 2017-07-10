@@ -28,7 +28,7 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-02', {
 ```
 {% ESNext %}
 ```js
-const { registerBlockType } wp.blocks;
+const { registerBlockType } = wp.blocks;
 
 registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-02', {
 	title: 'Hello World (Step 2)',
