@@ -1,7 +1,9 @@
 import MarkdownIt from 'markdown-it';
+import markdownItAnchorPlugin from 'markdown-it-anchor';
 import { compact } from 'lodash';
 
 const parser = new MarkdownIt();
+parser.use( markdownItAnchorPlugin );
 
 const blockParsers = {
 	raw( content ) {
