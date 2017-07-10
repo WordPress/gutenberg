@@ -20,7 +20,6 @@
     "jed": "^1.1.1",
     "js-beautify": "^1.6.12",
     "lodash": "^4.17.4",
-    "markdown-it-anchor": "^4.0.0",
     "moment": "^2.18.1",
     "moment-timezone": "^0.5.13",
     "react": "^15.5.4",
