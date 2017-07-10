@@ -1,10 +1,21 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import { find } from 'lodash';
 
 import { getStories, getChildren } from 'docutron';
 
-function MenuItem( { item } ) {
+function MenuItem( { item, searchResults } ) {
 	const children = getChildren( item.id );
+	const isVisible = ! searchResults ||
+		!! find( searchResults, ( story ) => {
+			return story.id === item.id ||
+				( story.parents && story.parents.indexOf( item.id ) !== -1 );
+		} );
+
+	if ( ! isVisible ) {
+		return null;
+	}
+
 	return (
 		<li>
 			{ ! children.length && <Link to={ item.path }>{ item.title }</Link> }
@@ -16,7 +27,7 @@ function MenuItem( { item } ) {
 			{ !! children.length && (
 				<ul>
 					{ children.map( ( story, index ) => (
-						<MenuItem key={ index } item={ story } />
+						<MenuItem key={ index } item={ story } searchResults={ searchResults } />
 					) ) }
 				</ul>
 			) }
@@ -24,26 +35,61 @@ function MenuItem( { item } ) {
 	);
 }
 
-function Sidebar() {
-	return (
-		<div id="secondary" className="widget-area">
-			<div className="secondary-content">
-				<aside id="handbook" className="widget widget_wporg_handbook_pages">
-					<h2 className="widget-title">Chapters</h2>
-					<div className="menu-table-of-contents-container">
-						<ul>
-							{ getStories()
-								.filter( ( story ) => ! story.parent )
-									.map( ( story, index ) => (
-										<MenuItem key={ index } item={ story } />
-									) )
-							}
-						</ul>
-					</div>
-				</aside>
+class Sidebar extends Component {
+	constructor() {
+		super( ...arguments );
+		this.state = {
+			searchValue: '',
+		};
+		this.onChangeSearchValue = this.onChangeSearchValue.bind( this );
+	}
+
+	onChangeSearchValue( event ) {
+		this.setState( { searchValue: event.target.value } );
+	}
+
+	render() {
+		const searchResults = this.state.searchValue
+			? getStories()
+				.filter( ( story ) => story.title.toLowerCase().indexOf( this.state.searchValue.toLowerCase() ) !== -1 )
+			: null;
+
+		return (
+			<div id="secondary" className="widget-area">
+				<div className="secondary-content">
+					<aside className="widget widget_search">
+						<form id="searchform" className="searchform" role="search">
+							<label htmlFor="s" className="screen-reader-text">Filter</label>
+							<input
+								type="search"
+								className="field"
+								name="s"
+								value={ this.state.searchValue }
+								id="s"
+								placeholder="Filter …"
+								onChange={ this.onChangeSearchValue }
+							/>
+							<input type="submit" className="submit" id="searchsubmit" value="Filter" />
+						</form>
+					</aside>
+
+					<aside id="handbook" className="widget widget_wporg_handbook_pages">
+						<h2 className="widget-title">Chapters</h2>
+						<div className="menu-table-of-contents-container">
+							<ul>
+								{ getStories()
+									.filter( ( story ) => ! story.parent )
+										.map( ( story, index ) => (
+											<MenuItem key={ index } item={ story } searchResults={ searchResults } />
+										) )
+								}
+							</ul>
+						</div>
+					</aside>
+				</div>
 			</div>
-		</div>
-	);
+		);
+	}
 }
 
 export default Sidebar;
