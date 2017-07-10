@@ -24,6 +24,7 @@ function loadStories() {
 	require( '../editor/story' );
 	require( '../components/story' );
 	require( '../components/button/story' );
+	require( '../components/dashicon/story' );
 	require( '../components/higher-order/story' );
 	require( '../components/higher-order/with-instance-id/story' );
 }
