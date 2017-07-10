@@ -124,8 +124,10 @@
 	line-height: 50px;
 	padding: 0 20px;
 	margin-left: 0;
+	font-weight: 400;
 
 	&.is-active {
 		border-bottom-color: $blue-medium-500;
+		font-weight: 600;
 	}
 }
