@@ -1,0 +1,13 @@
+[
+    {
+        "blockName": "core-embed/funnyordie",
+        "attrs": {
+            "url": "https://funnyordie.com/"
+        },
+        "rawContent": "\n<figure class=\"wp-block-embed-funnyordie\">\n    https://funnyordie.com/\n    <figcaption>Embedded content from funnyordie</figcaption>\n</figure>\n"
+    },
+    {
+        "attrs": {},
+        "rawContent": "\n"
+    }
+]

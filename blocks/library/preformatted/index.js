@@ -1,4 +1,9 @@
 /**
+ * WordPress
+ */
+import { __ } from 'i18n';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
@@ -8,7 +13,7 @@ import Editable from '../../editable';
 const { children } = query;
 
 registerBlockType( 'core/preformatted', {
-	title: wp.i18n.__( 'Preformatted' ),
+	title: __( 'Preformatted' ),
 
 	icon: 'text',
 
@@ -37,7 +42,7 @@ registerBlockType( 'core/preformatted', {
 		],
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus } ) {
+	edit( { attributes, setAttributes, focus, setFocus, className } ) {
 		const { content } = attributes;
 
 		return (
@@ -51,6 +56,8 @@ registerBlockType( 'core/preformatted', {
 				} }
 				focus={ focus }
 				onFocus={ setFocus }
+				placeholder={ __( 'Write preformatted text…' ) }
+				className={ className }
 			/>
 		);
 	},

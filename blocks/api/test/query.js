@@ -5,6 +5,11 @@ import { expect } from 'chai';
 import { parse } from 'hpq';
 
 /**
+ * WordPress dependencies
+ */
+import { renderToString } from 'element';
+
+/**
  * Internal dependencies
  */
 import * as query from '../query';
@@ -29,7 +34,24 @@ describe( 'query', () => {
 			const html = '<blockquote><p>A delicious sundae dessert</p></blockquote>';
 			const match = parse( html, query.children() );
 
-			expect( wp.element.renderToString( match ) ).to.equal( html );
+			expect( renderToString( match ) ).to.equal( html );
+		} );
+	} );
+
+	describe( 'node()', () => {
+		it( 'should return a matcher function', () => {
+			const matcher = query.node();
+
+			expect( matcher ).to.be.a( 'function' );
+		} );
+
+		it( 'should return HTML equivalent WPElement of matched element', () => {
+			// Assumption here is that we can cleanly convert back and forth
+			// between a string and WPElement representation
+			const html = '<blockquote><p>A delicious sundae dessert</p></blockquote>';
+			const match = parse( html, query.node() );
+
+			expect( wp.element.renderToString( match ) ).to.equal( `<body>${ html }</body>` );
 		} );
 	} );
 } );

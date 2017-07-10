@@ -7,16 +7,19 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
+import { __ } from 'i18n';
+import { Component } from 'element';
 import { IconButton } from 'components';
+import { createBlock } from 'blocks';
 
 /**
  * Internal dependencies
  */
 import InserterMenu from './menu';
-import { getBlockSelectionEnd, getSelectedBlock } from '../selectors';
-import { insertBlock, clearInsertionPoint } from '../actions';
+import { getBlockInsertionPoint, getEditorMode } from '../selectors';
+import { insertBlock, hideInsertionPoint } from '../actions';
 
-class Inserter extends wp.element.Component {
+class Inserter extends Component {
 	constructor() {
 		super( ...arguments );
 		this.toggle = this.toggle.bind( this );
@@ -28,9 +31,9 @@ class Inserter extends wp.element.Component {
 	}
 
 	toggle() {
-		this.setState( {
-			opened: ! this.state.opened,
-		} );
+		this.setState( ( state ) => ( {
+			opened: ! state.opened,
+		} ) );
 	}
 
 	close() {
@@ -39,18 +42,11 @@ class Inserter extends wp.element.Component {
 		} );
 	}
 
-	insertBlock( slug ) {
-		if ( slug ) {
-			const { selectedBlock, lastMultiSelectedBlock, onInsertBlock } = this.props;
-			let insertionPoint = null;
-			if ( lastMultiSelectedBlock ) {
-				insertionPoint = lastMultiSelectedBlock;
-			} else if ( selectedBlock ) {
-				insertionPoint = selectedBlock.uid;
-			}
-
+	insertBlock( name ) {
+		if ( name ) {
+			const { insertionPoint, onInsertBlock } = this.props;
 			onInsertBlock(
-				slug,
+				name,
 				insertionPoint
 			);
 		}
@@ -74,7 +70,7 @@ class Inserter extends wp.element.Component {
 			<div className="editor-inserter">
 				<IconButton
 					icon="insert"
-					label={ wp.i18n.__( 'Insert block' ) }
+					label={ __( 'Insert block' ) }
 					onClick={ this.toggle }
 					className="editor-inserter__toggle"
 					aria-haspopup="true"
@@ -96,15 +92,15 @@ class Inserter extends wp.element.Component {
 export default connect(
 	( state ) => {
 		return {
-			selectedBlock: getSelectedBlock( state ),
-			lastMultiSelectedBlock: getBlockSelectionEnd( state ),
+			insertionPoint: getBlockInsertionPoint( state ),
+			mode: getEditorMode( state ),
 		};
 	},
 	( dispatch ) => ( {
-		onInsertBlock( slug, after ) {
-			dispatch( clearInsertionPoint() );
+		onInsertBlock( name, after ) {
+			dispatch( hideInsertionPoint() );
 			dispatch( insertBlock(
-				wp.blocks.createBlock( slug ),
+				createBlock( name ),
 				after
 			) );
 		},

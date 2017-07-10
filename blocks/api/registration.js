@@ -1,99 +1,141 @@
-/* eslint-disable no-console */
+/* eslint no-console: [ 'error', { allow: [ 'error' ] } ] */
 
 /**
- * Block settings keyed by block slug.
+ * External dependencies
+ */
+import { isFunction } from 'lodash';
+
+/**
+ * Block settings keyed by block name.
  *
  * @type {Object}
  */
 const blocks = {};
 
 /**
- * Slug of block handling unknown types.
+ * Name of block handling unknown types.
  *
  * @type {?string}
  */
 let unknownTypeHandler;
 
 /**
- * Registers a new block provided a unique slug and an object defining its
+ * Name of the default block.
+ *
+ * @type {?string}
+ */
+let defaultBlockName;
+
+/**
+ * Registers a new block provided a unique name and an object defining its
  * behavior. Once registered, the block is made available as an option to any
  * editor interface where blocks are implemented.
  *
- * @param  {string}   slug     Block slug
+ * @param  {string}   name     Block name
  * @param  {Object}   settings Block settings
  * @return {?WPBlock}          The block, if it has been successfully
  *                             registered; otherwise `undefined`.
  */
-export function registerBlockType( slug, settings ) {
-	if ( typeof slug !== 'string' ) {
+export function registerBlockType( name, settings ) {
+	if ( typeof name !== 'string' ) {
 		console.error(
-			'Block slugs must be strings.'
+			'Block names must be strings.'
 		);
 		return;
 	}
-	if ( ! /^[a-z0-9-]+\/[a-z0-9-]+$/.test( slug ) ) {
+	if ( ! /^[a-z0-9-]+\/[a-z0-9-]+$/.test( name ) ) {
 		console.error(
-			'Block slugs must contain a namespace prefix. Example: my-plugin/my-custom-block'
+			'Block names must contain a namespace prefix. Example: my-plugin/my-custom-block'
 		);
 		return;
 	}
-	if ( blocks[ slug ] ) {
+	if ( ! settings || ! isFunction( settings.save ) ) {
 		console.error(
-			'Block "' + slug + '" is already registered.'
+			'The "save" property must be specified and must be a valid function.'
 		);
 		return;
 	}
-	const block = Object.assign( { slug }, settings );
-	blocks[ slug ] = block;
+	if ( 'edit' in settings && ! isFunction( settings.edit ) ) {
+		console.error(
+			'The "edit" property must be a valid function.'
+		);
+		return;
+	}
+	if ( blocks[ name ] ) {
+		console.error(
+			'Block "' + name + '" is already registered.'
+		);
+		return;
+	}
+	const block = Object.assign( { name }, settings );
+	blocks[ name ] = block;
 	return block;
 }
 
 /**
  * Unregisters a block.
  *
- * @param  {string}   slug Block slug
+ * @param  {string}   name Block name
  * @return {?WPBlock}      The previous block value, if it has been
  *                         successfully unregistered; otherwise `undefined`.
  */
-export function unregisterBlockType( slug ) {
-	if ( ! blocks[ slug ] ) {
+export function unregisterBlockType( name ) {
+	if ( ! blocks[ name ] ) {
 		console.error(
-			'Block "' + slug + '" is not registered.'
+			'Block "' + name + '" is not registered.'
 		);
 		return;
 	}
-	const oldBlock = blocks[ slug ];
-	delete blocks[ slug ];
+	const oldBlock = blocks[ name ];
+	delete blocks[ name ];
 	return oldBlock;
 }
 
 /**
- * Assigns slug of block handling unknown block types.
+ * Assigns name of block handling unknown block types.
  *
- * @param {string} slug Block slug
+ * @param {string} name Block name
  */
-export function setUnknownTypeHandler( slug ) {
-	unknownTypeHandler = slug;
+export function setUnknownTypeHandler( name ) {
+	unknownTypeHandler = name;
 }
 
 /**
- * Retrieves slug of block handling unknown block types, or undefined if no
+ * Retrieves name of block handling unknown block types, or undefined if no
  * handler has been defined.
  *
- * @return {?string} Blog slug
+ * @return {?string} Blog name
  */
 export function getUnknownTypeHandler() {
 	return unknownTypeHandler;
 }
 
 /**
+ * Assigns the default block name
+ *
+ * @param {string} name Block name
+ */
+export function setDefaultBlock( name ) {
+	defaultBlockName = name;
+}
+
+/**
+ * Retrieves the default block name
+ *
+ * @return {?string} Blog name
+ */
+export function getDefaultBlock() {
+	return defaultBlockName;
+}
+
+/**
  * Returns a registered block type.
  *
- * @param  {string}  slug Block slug
+ * @param  {string}  name Block name
  * @return {?Object}      Block type
  */
-export function getBlockType( slug ) {
-	return blocks[ slug ];
+export function getBlockType( name ) {
+	return blocks[ name ];
 }
 
 /**

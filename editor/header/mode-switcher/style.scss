@@ -20,7 +20,7 @@
 		cursor: pointer;
 		box-shadow: none;
 		padding-right: 0;
-		font-size: 13px;
+		font-size: $default-font-size;
 		height: auto;
 
 		@include break-small {
@@ -33,6 +33,12 @@
 		z-index: z-index( '.editor-mode-switcher .dashicon' );
 		margin-left: -24px;
 		margin-top: -1px;
+
+		display: none;
+
+		@include break-small {
+			display: block;
+		}
 	}
 
 	&:hover,

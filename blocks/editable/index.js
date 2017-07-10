@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import tinymce from 'tinymce';
 import classnames from 'classnames';
 import { last, isEqual, omitBy, forEach, merge, identity, find } from 'lodash';
 import { nodeListToReact } from 'dom-react';
@@ -10,7 +11,9 @@ import 'element-closest';
 /**
  * WordPress dependencies
  */
-import { BACKSPACE, DELETE } from 'utils/keycodes';
+import { createElement, Component, renderToString } from 'element';
+import { parse, pasteHandler } from '../api';
+import { BACKSPACE, DELETE, ENTER } from 'utils/keycodes';
 
 /**
  * Internal dependencies
@@ -19,7 +22,7 @@ import './style.scss';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
 
-function createElement( type, props, ...children ) {
+function createTinyMCEElement( type, props, ...children ) {
 	if ( props[ 'data-mce-bogus' ] === 'all' ) {
 		return null;
 	}
@@ -28,14 +31,14 @@ function createElement( type, props, ...children ) {
 		return children;
 	}
 
-	return wp.element.createElement(
+	return createElement(
 		type,
 		omitBy( props, ( value, key ) => key.indexOf( 'data-mce-' ) === 0 ),
 		...children
 	);
 }
 
-export default class Editable extends wp.element.Component {
+export default class Editable extends Component {
 	constructor( props ) {
 		super( ...arguments );
 
@@ -50,6 +53,7 @@ export default class Editable extends wp.element.Component {
 		this.onKeyUp = this.onKeyUp.bind( this );
 		this.changeFormats = this.changeFormats.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
+		this.onPastePostProcess = this.onPastePostProcess.bind( this );
 
 		this.state = {
 			formats: {},
@@ -61,7 +65,7 @@ export default class Editable extends wp.element.Component {
 	getSettings( settings ) {
 		return ( this.props.getSettings || identity )( {
 			...settings,
-			forced_root_block: this.props.inline ? false : 'p',
+			forced_root_block: this.props.multiline || false,
 		} );
 	}
 
@@ -75,6 +79,7 @@ export default class Editable extends wp.element.Component {
 		editor.on( 'keydown', this.onKeyDown );
 		editor.on( 'keyup', this.onKeyUp );
 		editor.on( 'selectionChange', this.onSelectionChange );
+		editor.on( 'PastePostProcess', this.onPastePostProcess );
 
 		if ( this.props.onSetup ) {
 			this.props.onSetup( editor );
@@ -104,11 +109,10 @@ export default class Editable extends wp.element.Component {
 			return;
 		}
 
-		const content = this.getContent();
 		const collapsed = this.editor.selection.isCollapsed();
 
 		this.setState( {
-			empty: ! content || ! content.length,
+			empty: tinymce.DOM.isEmpty( this.editor.getBody() ),
 		} );
 
 		if (
@@ -119,6 +123,38 @@ export default class Editable extends wp.element.Component {
 				...this.props.focus,
 				collapsed,
 			} );
+		}
+	}
+
+	onPastePostProcess( event ) {
+		const childNodes = Array.from( event.node.childNodes );
+		const isBlockDelimiter = ( node ) =>
+			node.nodeType === 8 && /^ wp:/.test( node.nodeValue );
+		const isDoubleBR = ( node ) =>
+			node.nodeName === 'BR' && node.previousSibling && node.previousSibling.nodeName === 'BR';
+		const isBlockPart = ( node ) =>
+			isDoubleBR( node ) || this.editor.dom.isBlock( node );
+
+		// If there's no `onSplit` prop, content will later be converted to
+		// inline content.
+		if ( this.props.onSplit ) {
+			let blocks = [];
+
+			// Internal paste, so parse.
+			if ( childNodes.some( isBlockDelimiter ) ) {
+				blocks = parse( event.node.innerHTML.replace( /<meta[^>]+>/, '' ) );
+			// External paste with block level content, so attempt to assign
+			// blocks.
+			} else if ( childNodes.some( isBlockPart ) ) {
+				blocks = pasteHandler( childNodes );
+			}
+
+			if ( blocks.length ) {
+				// We must wait for TinyMCE to clean up paste containers after this
+				// event.
+				window.setTimeout( () => this.splitContent( blocks ), 0 );
+				event.preventDefault();
+			}
 		}
 	}
 
@@ -206,16 +242,70 @@ export default class Editable extends wp.element.Component {
 			event.preventDefault();
 			event.stopImmediatePropagation();
 		}
+
+		// If we click shift+Enter on inline Editables, we avoid creating two contenteditables
+		// We also split the content and call the onSplit prop if provided.
+		if ( event.keyCode === ENTER && event.shiftKey && ! this.props.multiline ) {
+			event.preventDefault();
+
+			if ( this.props.onSplit ) {
+				this.splitContent();
+			}
+		}
 	}
 
 	onKeyUp( { keyCode } ) {
 		if ( keyCode === BACKSPACE ) {
 			this.onSelectionChange();
 		}
+
+		if ( keyCode === ENTER && ! this.props.multiline && this.props.onSplit ) {
+			const endNode = this.editor.selection.getEnd();
+
+			// Make sure the current selection is on a line break.
+			if ( endNode.nodeName !== 'BR' ) {
+				return;
+			}
+
+			const prevNode = endNode.previousSibling;
+
+			// Make sure the previous node is a line break. We only want to
+			// split on a double line break.
+			if ( ! prevNode || prevNode.nodeName !== 'BR' ) {
+				return;
+			}
+
+			this.editor.dom.remove( prevNode );
+			this.editor.dom.remove( endNode );
+			this.splitContent();
+		}
+	}
+
+	splitContent( blocks = [] ) {
+		const { dom } = this.editor;
+		const rootNode = this.editor.getBody();
+		const beforeRange = dom.createRng();
+		const afterRange = dom.createRng();
+		const selectionRange = this.editor.selection.getRng();
+
+		beforeRange.setStart( rootNode, 0 );
+		beforeRange.setEnd( selectionRange.startContainer, selectionRange.startOffset );
+
+		afterRange.setStart( selectionRange.endContainer, selectionRange.endOffset );
+		afterRange.setEnd( rootNode, dom.nodeIndex( rootNode.lastChild ) + 1 );
+
+		const beforeFragment = beforeRange.extractContents();
+		const afterFragment = afterRange.extractContents();
+
+		const beforeElement = nodeListToReact( beforeFragment.childNodes, createTinyMCEElement );
+		const afterElement = nodeListToReact( afterFragment.childNodes, createTinyMCEElement );
+
+		this.setContent( beforeElement );
+		this.props.onSplit( beforeElement, afterElement, ...blocks );
 	}
 
 	onNewBlock() {
-		if ( this.props.tagName || ! this.props.onSplit ) {
+		if ( this.props.multiline !== 'p' || ! this.props.onSplit ) {
 			return;
 		}
 
@@ -257,8 +347,8 @@ export default class Editable extends wp.element.Component {
 		this.setContent( this.props.value );
 
 		this.props.onSplit(
-			nodeListToReact( before, createElement ),
-			nodeListToReact( after, createElement )
+			nodeListToReact( before, createTinyMCEElement ),
+			nodeListToReact( after, createTinyMCEElement )
 		);
 	}
 
@@ -266,7 +356,7 @@ export default class Editable extends wp.element.Component {
 		const formats = {};
 		const link = find( parents, ( node ) => node.nodeName.toLowerCase() === 'a' );
 		if ( link ) {
-			formats.link = { value: link.getAttribute( 'href' ), link };
+			formats.link = { value: link.getAttribute( 'href' ) || '', link };
 		}
 		const activeFormats = this.editor.formatter.matchAll( [	'bold', 'italic', 'strikethrough' ] );
 		activeFormats.forEach( ( activeFormat ) => formats[ activeFormat ] = true );
@@ -292,24 +382,29 @@ export default class Editable extends wp.element.Component {
 			content = '';
 		}
 
-		content = wp.element.renderToString( content );
+		content = renderToString( content );
 		this.editor.setContent( content, { format: 'raw' } );
 	}
 
 	getContent() {
-		return nodeListToReact( this.editor.getBody().childNodes || [], createElement );
+		return nodeListToReact( this.editor.getBody().childNodes || [], createTinyMCEElement );
 	}
 
 	updateFocus() {
 		const { focus } = this.props;
+		const isActive = this.isActive();
+
 		if ( focus ) {
-			this.editor.focus();
+			if ( ! isActive ) {
+				this.editor.focus();
+			}
+
 			// Offset = -1 means we should focus the end of the editable
-			if ( focus.offset === -1 ) {
+			if ( focus.offset === -1 && ! this.isEndOfEditor() ) {
 				this.editor.selection.select( this.editor.getBody(), true );
 				this.editor.selection.collapse( false );
 			}
-		} else {
+		} else if ( isActive ) {
 			this.editor.getBody().blur();
 		}
 	}
@@ -340,12 +435,12 @@ export default class Editable extends wp.element.Component {
 	}
 
 	changeFormats( formats ) {
-		if ( this.state.bookmark ) {
-			this.editor.selection.moveToBookmark( this.state.bookmark );
-		}
-
 		forEach( formats, ( formatValue, format ) => {
 			if ( format === 'link' ) {
+				if ( this.state.bookmark ) {
+					this.editor.selection.moveToBookmark( this.state.bookmark );
+				}
+
 				if ( formatValue !== undefined ) {
 					const anchor = this.editor.dom.getParent( this.editor.selection.getNode(), 'a' );
 					if ( ! anchor ) {
@@ -365,16 +460,16 @@ export default class Editable extends wp.element.Component {
 			}
 		} );
 
-		this.setState( {
-			formats: merge( {}, this.state.formats, formats ),
-		} );
+		this.setState( ( state ) => ( {
+			formats: merge( {}, state.formats, formats ),
+		} ) );
 
 		this.editor.setDirty( true );
 	}
 
 	render() {
 		const {
-			tagName,
+			tagName: Tagname = 'div',
 			style,
 			value,
 			focus,
@@ -382,12 +477,14 @@ export default class Editable extends wp.element.Component {
 			inlineToolbar = false,
 			formattingControls,
 			placeholder,
+			multiline: MultilineTag,
 		} = this.props;
 
 		// Generating a key that includes `tagName` ensures that if the tag
 		// changes, we unmount and destroy the previous TinyMCE element, then
 		// mount and initialize a new child element in its place.
-		const key = [ 'editor', tagName ].join();
+		const key = [ 'editor', Tagname ].join();
+		const isPlaceholderVisible = placeholder && this.state.empty;
 		const classes = classnames( className, 'blocks-editable' );
 
 		const formatToolbar = (
@@ -412,15 +509,23 @@ export default class Editable extends wp.element.Component {
 					</div>
 				}
 				<TinyMCE
-					tagName={ tagName }
+					tagName={ Tagname }
 					getSettings={ this.getSettings }
 					onSetup={ this.onSetup }
 					style={ style }
 					defaultValue={ value }
-					isEmpty={ this.state.empty }
-					placeholder={ placeholder }
+					isPlaceholderVisible={ isPlaceholderVisible }
+					label={ placeholder }
 					key={ key }
 				/>
+				{ isPlaceholderVisible &&
+					<Tagname
+						className="blocks-editable__tinymce"
+						style={ style }
+					>
+						{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }
+					</Tagname>
+				}
 			</div>
 		);
 	}

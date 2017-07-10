@@ -3,6 +3,7 @@
  */
 import { expect } from 'chai';
 import sinon from 'sinon';
+import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,17 +17,19 @@ import { mergeBlocks, focusBlock, replaceBlocks } from '../actions';
 import effects from '../effects';
 
 describe( 'effects', () => {
+	const defaultBlockSettings = { save: noop };
+
 	describe( '.MERGE_BLOCKS', () => {
 		const handler = effects.MERGE_BLOCKS;
 
 		afterEach( () => {
 			getBlockTypes().forEach( ( block ) => {
-				unregisterBlockType( block.slug );
+				unregisterBlockType( block.name );
 			} );
 		} );
 
 		it( 'should only focus the blockA if the blockA has no merge function', () => {
-			registerBlockType( 'core/test-block', {} );
+			registerBlockType( 'core/test-block', defaultBlockSettings );
 			const blockA = {
 				uid: 'chicken',
 				name: 'core/test-block',
@@ -49,6 +52,7 @@ describe( 'effects', () => {
 						content: attributes.content + ' ' + attributesToMerge.content,
 					};
 				},
+				save: noop,
 			} );
 			const blockA = {
 				uid: 'chicken',
@@ -79,8 +83,9 @@ describe( 'effects', () => {
 						content: attributes.content + ' ' + attributesToMerge.content,
 					};
 				},
+				save: noop,
 			} );
-			registerBlockType( 'core/test-block-2', {} );
+			registerBlockType( 'core/test-block-2', defaultBlockSettings );
 			const blockA = {
 				uid: 'chicken',
 				name: 'core/test-block',
@@ -104,6 +109,7 @@ describe( 'effects', () => {
 						content: attributes.content + ' ' + attributesToMerge.content,
 					};
 				},
+				save: noop,
 			} );
 			registerBlockType( 'core/test-block-2', {
 				transforms: {
@@ -117,6 +123,7 @@ describe( 'effects', () => {
 						},
 					} ],
 				},
+				save: noop,
 			} );
 			const blockA = {
 				uid: 'chicken',

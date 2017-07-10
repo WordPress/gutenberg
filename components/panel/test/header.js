@@ -20,9 +20,9 @@ describe( 'PanelHeader', () => {
 
 		it( 'should render a label matching the text provided in the prop', () => {
 			const panelHeader = shallow( <PanelHeader label="Some Text" /> );
-			const label = panelHeader.find( 'strong' ).shallow();
+			const label = panelHeader.find( 'h2' ).shallow();
 			expect( label.text() ).to.equal( 'Some Text' );
-			expect( label.type() ).to.equal( 'strong' );
+			expect( label.type() ).to.equal( 'h2' );
 		} );
 
 		it( 'should render child elements in the panel header body when provided', () => {

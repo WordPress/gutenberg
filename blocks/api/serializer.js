@@ -1,8 +1,14 @@
 /**
  * External dependencies
  */
-import { difference } from 'lodash';
+import { isEmpty, reduce, isObject } from 'lodash';
 import { html as beautifyHtml } from 'js-beautify';
+import classnames from 'classnames';
+
+/**
+ * WordPress dependencies
+ */
+import { Component, createElement, renderToString, cloneElement, Children } from 'element';
 
 /**
  * Internal dependencies
@@ -11,18 +17,30 @@ import { getBlockType } from './registration';
 import { parseBlockAttributes } from './parser';
 
 /**
- * Given a block's save render implementation and attributes, returns the
+ * Returns the block's default classname from its name
+ *
+ * @param {String}   blockName  The block name
+ * @return {string}             The block's default class
+ */
+export function getBlockDefaultClassname( blockName ) {
+	// Drop common prefixes: 'core/' or 'core-' (in 'core-embed/')
+	return 'wp-block-' + blockName.replace( /\//, '-' ).replace( /^core-/, '' );
+}
+
+/**
+ * Given a block type containg a save render implementation and attributes, returns the
  * static markup to be saved.
  *
- * @param  {Function|WPComponent} save       Save render implementation
+ * @param  {Object}               blockType  Block type
  * @param  {Object}               attributes Block attributes
  * @return {string}                          Save content
  */
-export function getSaveContent( save, attributes ) {
+export function getSaveContent( blockType, attributes ) {
+	const { save, className = getBlockDefaultClassname( blockType.name ) } = blockType;
 	let rawContent;
 
-	if ( save.prototype instanceof wp.element.Component ) {
-		rawContent = wp.element.createElement( save, { attributes } );
+	if ( save.prototype instanceof Component ) {
+		rawContent = createElement( save, { attributes } );
 	} else {
 		rawContent = save( { attributes } );
 
@@ -32,35 +50,91 @@ export function getSaveContent( save, attributes ) {
 		}
 	}
 
+	// Adding a generic classname
+	const addClassnameToElement = ( element ) => {
+		if ( ! element || ! isObject( element ) || ! className ) {
+			return element;
+		}
+
+		const updatedClassName = classnames( className, element.props.className );
+		return cloneElement( element, { className: updatedClassName } );
+	};
+	const contentWithClassname = Children.map( rawContent, addClassnameToElement );
+
 	// Otherwise, infer as element
-	return wp.element.renderToString( rawContent );
+	return renderToString( contentWithClassname );
 }
 
 /**
- * Returns comment attributes as serialized string, determined by subset of
- * difference between actual attributes of a block and those expected based
- * on its settings.
+ * Returns attributes which ought to be saved
+ * and serialized into the block comment header
  *
- * @param  {Object} realAttributes     Actual block attributes
- * @param  {Object} expectedAttributes Expected block attributes
- * @return {string}                    Comment attributes
+ * When a block exists in memory it contains as its attributes
+ * both those which come from the block comment header _and_
+ * those which come from parsing the contents of the block.
+ *
+ * This function returns only those attributes which are
+ * needed to persist and which cannot already be inferred
+ * from the block content.
+ *
+ * @param {Object<String,*>}   allAttributes         Attributes from in-memory block data
+ * @param {Object<String,*>}   attributesFromContent Attributes which are inferred from block content
+ * @returns {Object<String,*>} filtered set of attributes for minimum save/serialization
  */
-export function getCommentAttributes( realAttributes, expectedAttributes ) {
-	// Find difference and build into object subset of attributes.
-	const keys = difference(
-		Object.keys( realAttributes ),
-		Object.keys( expectedAttributes )
+export function getCommentAttributes( allAttributes, attributesFromContent ) {
+	// Iterate over attributes and produce the set to save
+	return reduce(
+		Object.keys( allAttributes ),
+		( toSave, key ) => {
+			const allValue = allAttributes[ key ];
+			const contentValue = attributesFromContent[ key ];
+
+			// save only if attribute if not inferred from the content and if valued
+			return ! ( contentValue !== undefined || allValue === undefined )
+				? Object.assign( toSave, { [ key ]: allValue } )
+				: toSave;
+		},
+		{},
 	);
+}
 
-	// Serialize the comment attributes as `key="value"`.
-	return keys.reduce( ( memo, key ) => {
-		const value = realAttributes[ key ];
-		if ( undefined === value ) {
-			return memo;
-		}
+export function serializeAttributes( attrs ) {
+	return JSON.stringify( attrs )
+		.replace( /--/g, '\\u002d\\u002d' ) // don't break HTML comments
+		.replace( /</g, '\\u003c' ) // don't break standard-non-compliant tools
+		.replace( />/g, '\\u003e' ) // ibid
+		.replace( /&/g, '\\u0026' ); // ibid
+}
 
-		return memo + `${ key }="${ value }" `;
-	}, '' );
+export function serializeBlock( block ) {
+	const blockName = block.name;
+	const blockType = getBlockType( blockName );
+	const saveContent = getSaveContent( blockType, block.attributes );
+	const saveAttributes = getCommentAttributes( block.attributes, parseBlockAttributes( saveContent, blockType.attributes ) );
+
+	if ( 'wp:core/more' === blockName ) {
+		return `<!-- more ${ saveAttributes.customText ? `${ saveAttributes.customText } ` : '' }-->${ saveAttributes.noTeaser ? '\n<!--noteaser-->' : '' }`;
+	}
+
+	const serializedAttributes = ! isEmpty( saveAttributes )
+		? serializeAttributes( saveAttributes ) + ' '
+		: '';
+
+	if ( ! saveContent ) {
+		return `<!-- wp:${ blockName } ${ serializedAttributes }/-->`;
+	}
+
+	return (
+		`<!-- wp:${ blockName } ${ serializedAttributes }-->\n` +
+
+		/** make more readable - @see https://github.com/WordPress/gutenberg/pull/663 */
+		beautifyHtml( saveContent, {
+			indent_inner_html: true,
+			wrap_line_length: 0,
+		} ) +
+
+		`\n<!-- /wp:${ blockName } -->`
+	);
 }
 
 /**
@@ -70,28 +144,5 @@ export function getCommentAttributes( realAttributes, expectedAttributes ) {
  * @return {String}        The post content
  */
 export default function serialize( blocks ) {
-	return blocks.reduce( ( memo, block ) => {
-		const blockName = block.name;
-		const blockType = getBlockType( blockName );
-		const saveContent = getSaveContent( blockType.save, block.attributes );
-		const beautifyOptions = {
-			indent_inner_html: true,
-			wrap_line_length: 0,
-		};
-
-		return memo + (
-			'<!-- wp:' +
-			blockName +
-			' ' +
-			getCommentAttributes(
-				block.attributes,
-				parseBlockAttributes( saveContent, blockType )
-			) +
-			'-->' +
-			( saveContent ? '\n' + beautifyHtml( saveContent, beautifyOptions ) + '\n' : '' ) +
-			'<!-- /wp:' +
-			blockName +
-			' -->'
-		) + '\n\n';
-	}, '' );
+	return blocks.map( serializeBlock ).join( '\n\n' );
 }

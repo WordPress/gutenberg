@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "1a5dd686e18346fa4dbc564b7b90f4a1",
+    "content-hash": "32ce56503bf0964a5c611d6f0dba56dd",
     "packages": [],
     "packages-dev": [
         {
@@ -87,20 +87,20 @@
         },
         {
             "name": "wp-coding-standards/wpcs",
-            "version": "0.11.0",
+            "version": "dev-develop",
             "source": {
                 "type": "git",
                 "url": "https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards.git",
-                "reference": "407e4b85f547a5251185f89ceae6599917343388"
+                "reference": "0999ed3fcf74acf9ed7ed047f8f159b7fa93e9b6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WordPress-Coding-Standards/WordPress-Coding-Standards/zipball/407e4b85f547a5251185f89ceae6599917343388",
-                "reference": "407e4b85f547a5251185f89ceae6599917343388",
+                "url": "https://api.github.com/repos/WordPress-Coding-Standards/WordPress-Coding-Standards/zipball/0999ed3fcf74acf9ed7ed047f8f159b7fa93e9b6",
+                "reference": "0999ed3fcf74acf9ed7ed047f8f159b7fa93e9b6",
                 "shasum": ""
             },
             "require": {
-                "squizlabs/php_codesniffer": "^2.8.1"
+                "squizlabs/php_codesniffer": "^2.9.0"
             },
             "type": "library",
             "notification-url": "https://packagist.org/downloads/",
@@ -119,12 +119,14 @@
                 "standards",
                 "wordpress"
             ],
-            "time": "2017-03-20T23:17:58+00:00"
+            "time": "2017-06-25T21:13:08+00:00"
         }
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "wp-coding-standards/wpcs": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],

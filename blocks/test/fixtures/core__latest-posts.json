@@ -1,0 +1,10 @@
+[
+    {
+        "uid": "_uid_0",
+        "name": "core/latest-posts",
+        "attributes": {
+            "postsToShow": 5,
+            "displayPostDate": false
+        }
+    }
+]

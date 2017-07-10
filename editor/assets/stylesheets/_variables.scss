@@ -46,8 +46,10 @@ $text-editor-font-size: 14px;
 $editor-line-height: 1.8;
 $big-font-size: 18px;
 $item-spacing: 10px;
+$panel-padding: 16px;
 $header-height: 56px;
 $sidebar-width: 280px;
+$sidebar-panel-header-height: 50px;
 $admin-bar-height: 32px;
 $admin-bar-height-big: 46px;
 $admin-sidebar-width: 160px;
@@ -55,16 +57,19 @@ $admin-sidebar-width-big: 190px;
 $admin-sidebar-width-collapsed: 36px;
 $shadow-popover: 0px 3px 20px rgba( $dark-gray-900, .1 ), 0px 1px 3px rgba( $dark-gray-900, .1 );
 $text-editor-max-width: 760px;
+$button-focus-style: 0 0 0 1px $blue-medium-400, 0 0 2px 1px $blue-medium-400;
 
 /* Editor */
 $text-editor-max-width: 760px;
-$visual-editor-max-width: 700px;
+$visual-editor-max-width: 636px;
 $block-controls-height: 38px;
 $icon-button-size: 36px;
 
 /* Blocks */
 $block-padding: 14px;
 $block-mover-margin: 18px;
+$block-mover-padding-hidden: 10px;
+$block-mover-padding-visible: 32px;
 
 /* Media Queries */
 

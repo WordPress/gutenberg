@@ -3,8 +3,14 @@
  */
 import tinymce from 'tinymce';
 import { isEqual } from 'lodash';
+import classnames from 'classnames';
 
-export default class TinyMCE extends wp.element.Component {
+/**
+ * WordPress dependencies
+ */
+import { Component, Children, createElement } from 'element';
+
+export default class TinyMCE extends Component {
 	componentDidMount() {
 		this.initialize();
 	}
@@ -18,10 +24,11 @@ export default class TinyMCE extends wp.element.Component {
 	}
 
 	componentWillReceiveProps( nextProps ) {
-		const isEmpty = String( nextProps.isEmpty );
+		const name = 'data-is-placeholder-visible';
+		const isPlaceholderVisible = String( !! nextProps.isPlaceholderVisible );
 
-		if ( this.editorNode.getAttribute( 'data-is-empty' ) !== isEmpty ) {
-			this.editorNode.setAttribute( 'data-is-empty', isEmpty );
+		if ( this.editorNode.getAttribute( name ) !== isPlaceholderVisible ) {
+			this.editorNode.setAttribute( name, isPlaceholderVisible );
 		}
 
 		if ( ! isEqual( this.props.style, nextProps.style ) ) {
@@ -48,10 +55,13 @@ export default class TinyMCE extends wp.element.Component {
 			browser_spellcheck: true,
 			entity_encoding: 'raw',
 			convert_urls: false,
+			plugins: [],
 			formats: {
 				strikethrough: { inline: 'del' },
 			},
 		} );
+
+		settings.plugins.push( 'paste' );
 
 		tinymce.init( {
 			...settings,
@@ -68,23 +78,23 @@ export default class TinyMCE extends wp.element.Component {
 	}
 
 	render() {
-		const { tagName = 'div', style, defaultValue, placeholder } = this.props;
+		const { tagName = 'div', style, defaultValue, label, className } = this.props;
 
 		// If a default value is provided, render it into the DOM even before
 		// TinyMCE finishes initializing. This avoids a short delay by allowing
 		// us to show and focus the content before it's truly ready to edit.
 		let children;
 		if ( defaultValue ) {
-			children = wp.element.Children.toArray( defaultValue );
+			children = Children.toArray( defaultValue );
 		}
 
-		return wp.element.createElement( tagName, {
+		return createElement( tagName, {
 			ref: ( node ) => this.editorNode = node,
 			contentEditable: true,
 			suppressContentEditableWarning: true,
-			className: 'blocks-editable__tinymce',
+			className: classnames( className, 'blocks-editable__tinymce' ),
 			style,
-			'data-placeholder': placeholder,
+			'aria-label': label,
 		}, children );
 	}
 }

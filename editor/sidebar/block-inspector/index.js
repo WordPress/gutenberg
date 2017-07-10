@@ -2,11 +2,14 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import { Slot } from 'react-slot-fill';
 
 /**
  * WordPress dependencies
  */
+import { __ } from 'i18n';
 import { Panel, PanelHeader, PanelBody } from 'components';
+import { getBlockType } from 'blocks';
 
 /**
  * Internal Dependencies
@@ -20,6 +23,8 @@ const BlockInspector = ( { selectedBlock, ...props } ) => {
 		return null;
 	}
 
+	const blockType = getBlockType( selectedBlock.name );
+
 	const onDeselect = ( event ) => {
 		event.preventDefault();
 		props.deselectBlock( selectedBlock.uid );
@@ -27,7 +32,11 @@ const BlockInspector = ( { selectedBlock, ...props } ) => {
 
 	const header = (
 		<strong>
-			<a href="" onClick={ onDeselect } className="editor-block-inspector__deselect-post">Post</a> → Block
+			<a href="" onClick={ onDeselect } className="editor-block-inspector__deselect-post">
+				{ __( 'Post Settings' ) }
+			</a>
+			{ ' → ' }
+			{ blockType.title }
 		</strong>
 	);
 
@@ -35,12 +44,7 @@ const BlockInspector = ( { selectedBlock, ...props } ) => {
 		<Panel>
 			<PanelHeader label={ header } />
 			<PanelBody>
-				<div>{ selectedBlock.name } settings...</div>
-				<ul>
-					{ Object.keys( selectedBlock.attributes ).map( ( attribute, index ) => (
-						<li key={ index }>{ attribute }: { selectedBlock.attributes[ attribute ] }</li>
-					) ) }
-				</ul>
+				<Slot name="Inspector.Controls" />
 			</PanelBody>
 		</Panel>
 	);

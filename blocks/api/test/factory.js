@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { expect } from 'chai';
+import { noop } from 'lodash';
 
 /**
  * Internal dependencies
@@ -10,10 +11,12 @@ import { createBlock, switchToBlockType } from '../factory';
 import { getBlockTypes, unregisterBlockType, setUnknownTypeHandler, registerBlockType } from '../registration';
 
 describe( 'block factory', () => {
+	const defaultBlockSettings = { save: noop };
+
 	afterEach( () => {
 		setUnknownTypeHandler( undefined );
 		getBlockTypes().forEach( ( block ) => {
-			unregisterBlockType( block.slug );
+			unregisterBlockType( block.name );
 		} );
 	} );
 
@@ -23,6 +26,7 @@ describe( 'block factory', () => {
 				defaultAttributes: {
 					includesDefault: true,
 				},
+				save: noop,
 			} );
 			const block = createBlock( 'core/test-block', {
 				align: 'left',
@@ -50,8 +54,9 @@ describe( 'block factory', () => {
 						},
 					} ],
 				},
+				save: noop,
 			} );
-			registerBlockType( 'core/text-block', {} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
 
 			const block = {
 				uid: 1,
@@ -73,7 +78,7 @@ describe( 'block factory', () => {
 		} );
 
 		it( 'should switch the blockType of a block using the "transform to"', () => {
-			registerBlockType( 'core/updated-text-block', {} );
+			registerBlockType( 'core/updated-text-block', defaultBlockSettings );
 			registerBlockType( 'core/text-block', {
 				transforms: {
 					to: [ {
@@ -85,6 +90,7 @@ describe( 'block factory', () => {
 						},
 					} ],
 				},
+				save: noop,
 			} );
 
 			const block = {
@@ -107,8 +113,8 @@ describe( 'block factory', () => {
 		} );
 
 		it( 'should return null if no transformation is found', () => {
-			registerBlockType( 'core/updated-text-block', {} );
-			registerBlockType( 'core/text-block', {} );
+			registerBlockType( 'core/updated-text-block', defaultBlockSettings );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
 
 			const block = {
 				uid: 1,
@@ -131,8 +137,9 @@ describe( 'block factory', () => {
 						transform: () => null,
 					} ],
 				},
+				save: noop,
 			} );
-			registerBlockType( 'core/text-block', {} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
 
 			const block = {
 				uid: 1,
@@ -155,8 +162,9 @@ describe( 'block factory', () => {
 						transform: () => [],
 					} ],
 				},
+				save: noop,
 			} );
-			registerBlockType( 'core/text-block', {} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
 
 			const block = {
 				uid: 1,
@@ -185,8 +193,9 @@ describe( 'block factory', () => {
 						},
 					} ],
 				},
+				save: noop,
 			} );
-			registerBlockType( 'core/text-block', {} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
 
 			const block = {
 				uid: 1,
@@ -220,8 +229,9 @@ describe( 'block factory', () => {
 						},
 					} ],
 				},
+				save: noop,
 			} );
-			registerBlockType( 'core/text-block', {} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
 
 			const block = {
 				uid: 1,
@@ -237,7 +247,7 @@ describe( 'block factory', () => {
 		} );
 
 		it( 'should reject single transformations with unexpected block types', () => {
-			registerBlockType( 'core/updated-text-block', {} );
+			registerBlockType( 'core/updated-text-block', defaultBlockSettings );
 			registerBlockType( 'core/text-block', {
 				transforms: {
 					to: [ {
@@ -249,6 +259,7 @@ describe( 'block factory', () => {
 						},
 					} ],
 				},
+				save: noop,
 			} );
 
 			const block = {
@@ -265,7 +276,7 @@ describe( 'block factory', () => {
 		} );
 
 		it( 'should reject array transformations with unexpected block types', () => {
-			registerBlockType( 'core/updated-text-block', {} );
+			registerBlockType( 'core/updated-text-block', defaultBlockSettings );
 			registerBlockType( 'core/text-block', {
 				transforms: {
 					to: [ {
@@ -282,6 +293,7 @@ describe( 'block factory', () => {
 						},
 					} ],
 				},
+				save: noop,
 			} );
 
 			const block = {
@@ -298,7 +310,7 @@ describe( 'block factory', () => {
 		} );
 
 		it( 'should accept valid array transformations', () => {
-			registerBlockType( 'core/updated-text-block', {} );
+			registerBlockType( 'core/updated-text-block', defaultBlockSettings );
 			registerBlockType( 'core/text-block', {
 				transforms: {
 					to: [ {
@@ -315,6 +327,7 @@ describe( 'block factory', () => {
 						},
 					} ],
 				},
+				save: noop,
 			} );
 
 			const block = {

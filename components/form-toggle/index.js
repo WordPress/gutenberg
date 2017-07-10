@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import classnames from 'classnames';
 import { noop } from 'lodash';
 
 /**
@@ -15,7 +15,7 @@ import { __ } from 'i18n';
 import './style.scss';
 
 function FormToggle( { className, checked, id, onChange = noop, showHint = true } ) {
-	const wrapperClasses = classNames(
+	const wrapperClasses = classnames(
 		'components-form-toggle',
 		className,
 		{ 'is-checked': checked }
@@ -27,7 +27,7 @@ function FormToggle( { className, checked, id, onChange = noop, showHint = true 
 				className="components-form-toggle__input"
 				id={ id }
 				type="checkbox"
-				value={ checked }
+				checked={ checked }
 				onChange={ onChange }
 			/>
 			{ showHint &&

@@ -1,0 +1,12 @@
+[
+    {
+        "uid": "_uid_0",
+        "name": "core-embed/reddit",
+        "attributes": {
+            "url": "https://reddit.com/",
+            "caption": [
+                "Embedded content from reddit"
+            ]
+        }
+    }
+]

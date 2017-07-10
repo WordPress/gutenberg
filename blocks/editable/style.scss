@@ -3,12 +3,11 @@
 }
 
 .blocks-editable__tinymce {
-	> p:first-child {
-		margin-top: 0;
-	}
+	margin: 0;
+	position: relative;
 
-	> p:last-child {
-		margin-bottom: 0;
+	> p:empty {
+		min-height: $editor-font-size * $editor-line-height;
 	}
 
 	&:focus {
@@ -40,16 +39,38 @@
 		background: $light-gray-400;
 	}
 
-	&[data-is-empty="true"] {
-		position: relative;
+	&[data-is-placeholder-visible="true"] {
+		position: absolute;
+		top: 0;
+		width: 100%;
+		margin-top: 0;
+
+		& > p {
+			margin-top: 0;
+		}
 	}
 
-	&[data-is-empty="true"]:before {
-		content: attr( data-placeholder );
+	& + .blocks-editable__tinymce {
 		opacity: 0.5;
 		pointer-events: none;
-		position: absolute;
 	}
+}
+
+.has-drop-cap .blocks-editable__tinymce:not( :focus )  {
+	&:first-letter {
+		float: left;
+		font-size: 4.1em;
+		line-height: 0.7;
+		font-family: serif;
+		font-weight: bold;
+		margin: .07em .23em 0 0;
+		text-transform: uppercase;
+		font-style: normal;
+	}
+}
+
+.has-drop-cap:not( :focus )  {
+	overflow: hidden;
 }
 
 .block-editable__inline-toolbar {
@@ -75,7 +96,6 @@ figcaption.blocks-editable__tinymce {
 	}
 }
 
-
 .editable-format-toolbar {
 	display: inline-flex;
 }
@@ -96,7 +116,7 @@ figcaption.blocks-editable__tinymce {
 
 input.editable-format-toolbar__link-input {
 	padding: 10px;
-	font-size: 13px;
+	font-size: $default-font-size;
 	width: 100%;
 	border: none;
 	outline: none;

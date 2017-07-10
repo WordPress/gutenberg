@@ -1,0 +1,12 @@
+[
+    {
+        "uid": "_uid_0",
+        "name": "core-embed/meetup-com",
+        "attributes": {
+            "url": "https://meetup.com/",
+            "caption": [
+                "Embedded content from meetup-com"
+            ]
+        }
+    }
+]

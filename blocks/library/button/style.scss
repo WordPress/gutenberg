@@ -1,34 +1,3 @@
-$blocks-button__height: 46px;
-
-.blocks-button {
-	font-family: $default-font;
-	display: inline-block;
-	text-decoration: none;
-	font-size: $big-font-size;
-	margin: 0;
-	padding: 0 24px;
-	height: $blocks-button__height;
-	line-height: $blocks-button__height;
-	cursor: default;
-	border-radius: $blocks-button__height / 2;
-	white-space: nowrap;
-	background: $blue-medium-400;
-	color: $white;
-	vertical-align: top;
-	position: relative;
-
-	&:hover {
-		color: $white;
-	}
-
-	.editable-format-toolbar__link-modal {
-		z-index: 2;
-		top: $blocks-button__height + 2px;
-		left: 50%;
-		transform: translateX( -50% );
-	}
-}
-
 .editor-visual-editor__block[data-type="core/button"] {
 	&[data-align="center"] {
 		text-align: center;

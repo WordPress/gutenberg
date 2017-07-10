@@ -7,6 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { __ } from 'i18n';
 import { Button } from 'components';
 
 /**
@@ -18,6 +19,7 @@ import {
 	isEditedPostPublished,
 	isEditedPostBeingScheduled,
 	getEditedPostVisibility,
+	isEditedPostSaveable,
 	isEditedPostPublishable,
 } from '../../selectors';
 
@@ -29,15 +31,16 @@ function PublishButton( {
 	isBeingScheduled,
 	visibility,
 	isPublishable,
+	isSaveable,
 } ) {
-	const buttonEnabled = ! isSaving && isPublishable;
+	const buttonEnabled = ! isSaving && isPublishable && isSaveable;
 	let buttonText;
 	if ( isPublished ) {
-		buttonText = wp.i18n.__( 'Update' );
+		buttonText = __( 'Update' );
 	} else if ( isBeingScheduled ) {
-		buttonText = wp.i18n.__( 'Schedule' );
+		buttonText = __( 'Schedule' );
 	} else {
-		buttonText = wp.i18n.__( 'Publish' );
+		buttonText = __( 'Publish' );
 	}
 	let publishStatus = 'publish';
 	if ( isBeingScheduled ) {
@@ -47,21 +50,21 @@ function PublishButton( {
 	}
 	const className = classnames( 'editor-tools__publish-button', { 'is-saving': isSaving } );
 	const onClick = () => {
-		onStatusChange( publishStatus );
-		onSave();
+		const doSave = isPublished ||
+			! process.env.NODE_ENV === 'production' ||
+			window.confirm( __( 'Keep in mind this plugin is a beta version and will not display correctly on your theme.' ) ); // eslint-disable-line no-alert
+		if ( doSave ) {
+			onStatusChange( publishStatus );
+			onSave();
+		}
 	};
-
-	const buttonDisabledHint = process.env.NODE_ENV === 'production'
-		? wp.i18n.__( 'The Save button is disabled during early alpha releases.' )
-		: null;
 
 	return (
 		<Button
 			isPrimary
 			isLarge
 			onClick={ onClick }
-			disabled={ ! buttonEnabled || process.env.NODE_ENV === 'production' }
-			title={ buttonDisabledHint }
+			disabled={ ! buttonEnabled }
 			className={ className }
 		>
 			{ buttonText }
@@ -75,6 +78,7 @@ export default connect(
 		isPublished: isEditedPostPublished( state ),
 		isBeingScheduled: isEditedPostBeingScheduled( state ),
 		visibility: getEditedPostVisibility( state ),
+		isSaveable: isEditedPostSaveable( state ),
 		isPublishable: isEditedPostPublishable( state ),
 	} ),
 	{

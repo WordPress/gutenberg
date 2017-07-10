@@ -4,14 +4,16 @@
 	"extends": [
 		"wordpress",
 		"plugin:react/recommended",
-		"plugin:jsx-a11y/recommended"
-	],
+		"plugin:jsx-a11y/recommended",
+		"plugin:jest/recommended"
+  ],
 	"env": {
 		"browser": false,
 		"es6": true,
 		"node": true,
-		"mocha": true
-	},
+		"mocha": true,
+		"jest/globals": true
+  },
 	"parserOptions": {
 		"sourceType": "module",
 		"ecmaFeatures": {
@@ -26,7 +28,8 @@
 	},
 	"plugins": [
 		"react",
-		"jsx-a11y"
+		"jsx-a11y",
+		"jest"
 	],
 	"settings": {
 		"react": {
@@ -46,6 +49,7 @@
 		"eol-last": "error",
 		"func-call-spacing": "error",
 		"indent": [ "error", "tab", { "SwitchCase": 1 } ],
+		"jest/valid-expect": "off",
 		"jsx-quotes": "error",
 		"key-spacing": "error",
 		"keyword-spacing": "error",

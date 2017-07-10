@@ -1,0 +1,21 @@
+.wp-block-gallery.is-placeholder {
+	margin: -15px;
+	padding: 6em 0;
+	border: 2px solid $light-gray-500;
+	text-align: center;
+}
+
+.blocks-gallery__placeholder-label {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: bold;
+
+	.dashicon {
+		margin-right: 1ch;
+	}
+}
+
+.blocks-gallery__placeholder-instructions {
+	margin: 1.8em 0;
+}

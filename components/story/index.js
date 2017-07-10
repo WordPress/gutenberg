@@ -12,4 +12,4 @@ import readme from '../README.md';
 
 storiesOf( 'Components', module )
 	.addDecorator( withKnobs )
-	.add( 'Welcome', () => <ReactMarkdown source={ readme } /> );
+	.add( 'Intro', () => <ReactMarkdown source={ readme } /> );

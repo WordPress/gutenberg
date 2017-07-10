@@ -1,22 +1,27 @@
 # Gutenberg
+[![Build Status](https://img.shields.io/travis/WordPress/gutenberg/master.svg)](https://travis-ci.org/WordPress/gutenberg)
+[![Coverage](https://img.shields.io/coveralls/WordPress/gutenberg/master.svg)](https://coveralls.io/github/WordPress/gutenberg)
 
-Prototyping since 1440.
+Printing since 1440.
 
 ![Text block](https://wpcoredesign.mystagingwebsite.com/gutenberg/gutenberg.png)
 
-This is the development and prototyping hub for the editor focus in core.
-Gutenberg is the project name. Conversations and discussions take place in #core-editor in Slack. This is our kickoff goal:
+This is the development hub for the <a href="https://make.wordpress.org/core/2017/01/04/focus-tech-and-design-leads/">editor focus in core</a>. Gutenberg is the project name. If you want the latest release for your WordPress, <a href="https://wordpress.org/plugins/gutenberg/">download Gutenberg from the WordPress.org plugins repository</a>. Conversations and discussions take place in #core-editor on <a href="https://make.wordpress.org/chat/">the core WordPress Slack</a>. This is our kickoff goal:
 
 > The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery. — Matt Mullenweg
 
-WordPress already supports a large amount of "blocks", but doesn't surface them very well, nor does it give them much in the way of layout options. By embracing the blocky nature, we can hopefully surface the blocks that already exist, as well as attach more advanced layout options to each of them, allowing you to easily write richer posts, like <a href="http://moc.co/sandbox/example-post/">this example post</a>.
+WordPress already supports a large amount of "blocks", but doesn't surface them very well, nor does it give them much in the way of layout options. By embracing the blocky nature of rich post content, we will surface the blocks that already exist, as well as provide more advanced layout options for each of them. This will allow you to easily compose beautiful posts like <a href="http://moc.co/sandbox/example-post/">this example</a>.
 
-## Overview
+## Contributors
+
+Gutenberg is built by many contributors and volunteers. Please see the full list in <a href="CONTRIBUTORS.md">CONTRIBUTORS.md</a>.
+
+## Further Reading
 
 - <a href="https://make.wordpress.org/core/2017/01/17/editor-technical-overview/">Editor Technical Overview</a>
-- <a href="https://wpcoredesign.mystagingwebsite.com/gutenberg/">Editor Mockups</a>
-- <a href="https://wordpress.github.io/gutenberg/">Prototypes</a>.
-- <a href="https://github.com/Automattic/wp-post-grammar">WP Post grammar parser</a>.
+- <a href="https://make.wordpress.org/core/2017/05/05/editor-how-little-blocks-work/">How Blocks Work</a>
+- <a href="https://github.com/Automattic/wp-post-grammar">WP Post Grammar Parser</a>
+- <a href="https://make.wordpress.org/core/tag/gutenberg/">Development updates on make.wordpress.org</a>
 
 ## How You Can Contribute
 
@@ -24,7 +29,7 @@ Please see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Why
 
-One thing that sets WordPress apart from other systems is that it allows you to create as rich a post layout as you can imagine. But only if you know HTML & CSS and build your own custom theme. By thinking of the editor as a tool to let you write rich posts, and in a few clicks create beautiful layouts, hopefully we can make people start to _love_ WordPress, as opposed to pick it because it's what everyone else uses to blog.
+One thing that sets WordPress apart from other systems is that it allows you to create as rich a post layout as you can imagine -- but only if you know HTML & CSS and build your own custom theme. By thinking of the editor as a tool to let you write rich posts, and in a few clicks create beautiful layouts, hopefully, we can make people start to _love_ WordPress, as opposed to pick it because it's what everyone else uses to blog.
 
 ## Ingredients
 
@@ -36,6 +41,6 @@ By showing critical UI in the body of the content, many can get their basic blog
 
 **Advanced Formatting**
 
-When the Post Settings sidebar is open — which it is by default — you are essentially in advanced layout mode. By default you'll see all your metaboxes right there.
+When the Post Settings sidebar is open — which it is by default — you are essentially in advanced layout mode. By default, you'll see all your metaboxes right there.
 
 Every block can be _inspected_ by clicking it. And every block has advanced layout options available in the inspector; text might have drop-cap, image might have fixed position scrolling. As such, block attributes fall in two camps — the most important ones available right on the block, advanced ones living in the sidebar inspector.

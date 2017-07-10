@@ -1,15 +1,18 @@
 /**
  * External dependencies
  */
+import optimist from 'redux-optimist';
 import { combineReducers, applyMiddleware, createStore } from 'redux';
 import refx from 'refx';
-import { keyBy, first, last, omit, without, flowRight } from 'lodash';
+import { reduce, keyBy, first, last, omit, without, flowRight } from 'lodash';
 
 /**
  * Internal dependencies
  */
 import { combineUndoableReducers } from './utils/undoable-reducer';
 import effects from './effects';
+
+const isMobile = window.innerWidth < 782;
 
 /**
  * Undoable reducer returning the editor post state, including blocks parsed
@@ -30,11 +33,27 @@ export const editor = combineUndoableReducers( {
 		switch ( action.type ) {
 			case 'EDIT_POST':
 			case 'SETUP_NEW_POST':
-				return {
-					...state,
-					...action.edits,
-				};
+				return reduce( action.edits, ( result, value, key ) => {
+					// Only assign into result if not already same value
+					if ( value !== state[ key ] ) {
+						// Avoid mutating original state by creating shallow
+						// clone. Should only occur once per reduce.
+						if ( result === state ) {
+							result = { ...state };
+						}
+
+						result[ key ] = value;
+					}
+
+					return result;
+				}, state );
+
 			case 'CLEAR_POST_EDITS':
+				// Don't return a new object if there's not any edits
+				if ( ! Object.keys( state ).length ) {
+					return state;
+				}
+
 				return {};
 		}
 
@@ -48,12 +67,13 @@ export const editor = combineUndoableReducers( {
 				return false;
 
 			case 'UPDATE_BLOCK':
-			case 'INSERT_BLOCK':
+			case 'INSERT_BLOCKS':
 			case 'MOVE_BLOCKS_DOWN':
 			case 'MOVE_BLOCKS_UP':
 			case 'REPLACE_BLOCKS':
 			case 'REMOVE_BLOCKS':
 			case 'EDIT_POST':
+			case 'MARK_DIRTY':
 				return true;
 		}
 
@@ -66,6 +86,32 @@ export const editor = combineUndoableReducers( {
 				return keyBy( action.blocks, 'uid' );
 
 			case 'UPDATE_BLOCK':
+				// Ignore updates if block isn't known
+				if ( ! state[ action.uid ] ) {
+					return state;
+				}
+
+				// Consider as updates only changed values
+				const nextBlock = reduce( action.updates, ( result, value, key ) => {
+					if ( value !== result[ key ] ) {
+						// Avoid mutating original block by creating shallow clone
+						if ( result === state[ action.uid ] ) {
+							result = { ...state[ action.uid ] };
+						}
+
+						result[ key ] = value;
+					}
+
+					return result;
+				}, state[ action.uid ] );
+
+				// Skip update if nothing has been changed. The reference will
+				// match the original block if `reduce` had no changed values.
+				if ( nextBlock === state[ action.uid ] ) {
+					return state;
+				}
+
+				// Otherwise merge updates into state
 				return {
 					...state,
 					[ action.uid ]: {
@@ -74,10 +120,10 @@ export const editor = combineUndoableReducers( {
 					},
 				};
 
-			case 'INSERT_BLOCK':
+			case 'INSERT_BLOCKS':
 				return {
 					...state,
-					[ action.block.uid ]: action.block,
+					...keyBy( action.blocks, 'uid' ),
 				};
 
 			case 'REPLACE_BLOCKS':
@@ -103,11 +149,11 @@ export const editor = combineUndoableReducers( {
 			case 'RESET_BLOCKS':
 				return action.blocks.map( ( { uid } ) => uid );
 
-			case 'INSERT_BLOCK': {
+			case 'INSERT_BLOCKS': {
 				const position = action.after ? state.indexOf( action.after ) + 1 : state.length;
 				return [
 					...state.slice( 0, position ),
-					action.block.uid,
+					...action.blocks.map( block => block.uid ),
 					...state.slice( position ),
 				];
 			}
@@ -185,11 +231,11 @@ export const editor = combineUndoableReducers( {
  */
 export function currentPost( state = {}, action ) {
 	switch ( action.type ) {
-		case 'RESET_BLOCKS':
-			return action.post || state;
-
-		case 'REQUEST_POST_UPDATE_SUCCESS':
+		case 'RESET_POST':
 			return action.post;
+
+		case 'UPDATE_POST':
+			return { ...state, ...action.edits };
 	}
 
 	return state;
@@ -227,9 +273,9 @@ export function selectedBlock( state = {}, action ) {
 				: { uid: firstUid, typing: false, focus: {} };
 		}
 
-		case 'INSERT_BLOCK':
+		case 'INSERT_BLOCKS':
 			return {
-				uid: action.block.uid,
+				uid: action.blocks[ 0 ].uid,
 				typing: false,
 				focus: {},
 			};
@@ -253,6 +299,16 @@ export function selectedBlock( state = {}, action ) {
 			return {
 				...state,
 				typing: true,
+			};
+
+		case 'STOP_TYPING':
+			if ( action.uid !== state.uid ) {
+				return state;
+			}
+
+			return {
+				...state,
+				typing: false,
 			};
 
 		case 'REPLACE_BLOCKS':
@@ -281,7 +337,7 @@ export function multiSelectedBlocks( state = { start: null, end: null }, action 
 	switch ( action.type ) {
 		case 'CLEAR_SELECTED_BLOCK':
 		case 'TOGGLE_BLOCK_SELECTED':
-		case 'INSERT_BLOCK':
+		case 'INSERT_BLOCKS':
 			return {
 				start: null,
 				end: null,
@@ -336,17 +392,12 @@ export function hoveredBlock( state = null, action ) {
  * @param  {Object} action Dispatched action
  * @return {Object}        Updated state
  */
-export function insertionPoint( state = { show: false }, action ) {
+export function showInsertionPoint( state = false, action ) {
 	switch ( action.type ) {
-		case 'SET_INSERTION_POINT':
-			return {
-				show: true,
-				uid: action.uid,
-			};
-		case 'CLEAR_INSERTION_POINT':
-			return {
-				show: false,
-			};
+		case 'SHOW_INSERTION_POINT':
+			return true;
+		case 'HIDE_INSERTION_POINT':
+			return false;
 	}
 
 	return state;
@@ -368,7 +419,7 @@ export function mode( state = 'visual', action ) {
 	return state;
 }
 
-export function isSidebarOpened( state = false, action ) {
+export function isSidebarOpened( state = ! isMobile, action ) {
 	switch ( action.type ) {
 		case 'TOGGLE_SIDEBAR':
 			return ! state;
@@ -412,23 +463,42 @@ export function saving( state = {}, action ) {
 	return state;
 }
 
+export function notices( state = {}, action ) {
+	switch ( action.type ) {
+		case 'CREATE_NOTICE':
+			return {
+				...state,
+				[ action.notice.id ]: action.notice,
+			};
+		case 'REMOVE_NOTICE':
+			if ( ! state.hasOwnProperty( action.noticeId ) ) {
+				return state;
+			}
+
+			return omit( state, action.noticeId );
+	}
+
+	return state;
+}
+
 /**
  * Creates a new instance of a Redux store.
  *
  * @return {Redux.Store} Redux store
  */
 export function createReduxStore() {
-	const reducer = combineReducers( {
+	const reducer = optimist( combineReducers( {
 		editor,
 		currentPost,
 		selectedBlock,
 		multiSelectedBlocks,
 		hoveredBlock,
-		insertionPoint,
+		showInsertionPoint,
 		mode,
 		isSidebarOpened,
 		saving,
-	} );
+		notices,
+	} ) );
 
 	const enhancers = [ applyMiddleware( refx( effects ) ) ];
 	if ( window.__REDUX_DEVTOOLS_EXTENSION__ ) {

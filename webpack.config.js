@@ -1,10 +1,40 @@
 /**
  * External dependencies
  */
-
-const glob = require( 'glob' );
 const webpack = require( 'webpack' );
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
+
+// Main CSS loader for everything but blocks..
+const mainCSSExtractTextPlugin = new ExtractTextPlugin( {
+	filename: './[name]/build/style.css',
+} );
+
+// CSS loader for styles specific to block editing.
+const editBlocksCSSPlugin = new ExtractTextPlugin( {
+	filename: './blocks/build/edit-blocks.css',
+} );
+
+// CSS loader for styles specific to blocks in general.
+const blocksCSSPlugin = new ExtractTextPlugin( {
+	filename: './blocks/build/style.css',
+} );
+
+// Configuration for the ExtractTextPlugin.
+const extractConfig = {
+	use: [
+		{ loader: 'raw-loader' },
+		{ loader: 'postcss-loader' },
+		{
+			loader: 'sass-loader',
+			query: {
+				includePaths: [ 'editor/assets/stylesheets' ],
+				data: '@import "variables"; @import "mixins"; @import "animations";@import "z-index";',
+				outputStyle: 'production' === process.env.NODE_ENV ?
+					'compressed' : 'nested',
+			},
+		},
+	],
+};
 
 const entryPointNames = [
 	'element',
@@ -65,22 +95,28 @@ const config = {
 				use: 'babel-loader',
 			},
 			{
+				test: /block\.s?css$/,
+				include: [
+					/blocks/,
+				],
+				use: blocksCSSPlugin.extract( extractConfig ),
+			},
+			{
 				test: /\.s?css$/,
-				use: ExtractTextPlugin.extract( {
-					use: [
-						{ loader: 'raw-loader' },
-						{ loader: 'postcss-loader' },
-						{
-							loader: 'sass-loader',
-							query: {
-								includePaths: [ 'editor/assets/stylesheets' ],
-								data: '@import "variables"; @import "mixins"; @import "animations";@import "z-index";',
-								outputStyle: 'production' === process.env.NODE_ENV ?
-									'compressed' : 'nested',
-							},
-						},
-					],
-				} ),
+				include: [
+					/blocks/,
+				],
+				exclude: [
+					/block\.s?css$/,
+				],
+				use: editBlocksCSSPlugin.extract( extractConfig ),
+			},
+			{
+				test: /\.s?css$/,
+				exclude: [
+					/blocks/,
+				],
+				use: mainCSSExtractTextPlugin.extract( extractConfig ),
 			},
 		],
 	},
@@ -88,9 +124,9 @@ const config = {
 		new webpack.DefinePlugin( {
 			'process.env.NODE_ENV': JSON.stringify( process.env.NODE_ENV || 'development' ),
 		} ),
-		new ExtractTextPlugin( {
-			filename: './[name]/build/style.css',
-		} ),
+		blocksCSSPlugin,
+		editBlocksCSSPlugin,
+		mainCSSExtractTextPlugin,
 		new webpack.LoaderOptionsPlugin( {
 			minimize: process.env.NODE_ENV === 'production',
 			debug: process.env.NODE_ENV !== 'production',
@@ -109,38 +145,6 @@ const config = {
 switch ( process.env.NODE_ENV ) {
 	case 'production':
 		config.plugins.push( new webpack.optimize.UglifyJsPlugin() );
-		break;
-
-	case 'test':
-		config.target = 'node';
-		config.node = {
-			__dirname: true,
-		};
-		config.module.rules = [
-			...entryPointNames.map( ( entry ) => ( {
-				test: require.resolve( './' + entry + '/index.js' ),
-				use: 'expose-loader?wp.' + entry,
-			} ) ),
-			...config.module.rules,
-		];
-		const testFiles = glob.sync(
-			'./{' + Object.keys( config.entry ).sort() + '}/**/test/*.js'
-		);
-		config.entry = [
-			...entryPointNames.map(
-				entryPointName => './' + entryPointName + '/index.js'
-			),
-			...testFiles.filter( f => /full-content\.js$/.test( f ) ),
-			...testFiles.filter( f => ! /full-content\.js$/.test( f ) ),
-		];
-		config.externals = [ require( 'webpack-node-externals' )() ];
-		config.output = {
-			filename: 'build/test.js',
-			path: __dirname,
-		};
-		config.plugins.push( new webpack.ProvidePlugin( {
-			tinymce: 'tinymce/tinymce',
-		} ) );
 		break;
 
 	default:

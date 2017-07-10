@@ -14,7 +14,7 @@ import { getBlockType } from 'blocks';
  * Internal dependencies
  */
 import './style.scss';
-import { isFirstBlock, isLastBlock, getBlockOrder, getBlock } from '../selectors';
+import { isFirstBlock, isLastBlock, getBlockIndex, getBlock } from '../selectors';
 import { getBlockMoverLabel } from './mover-label';
 
 function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex } ) {
@@ -60,7 +60,7 @@ export default connect(
 	( state, ownProps ) => ( {
 		isFirst: isFirstBlock( state, first( ownProps.uids ) ),
 		isLast: isLastBlock( state, last( ownProps.uids ) ),
-		firstIndex: getBlockOrder( state, first( ownProps.uids ) ),
+		firstIndex: getBlockIndex( state, first( ownProps.uids ) ),
 		blockType: getBlockType( getBlock( state, first( ownProps.uids ) ).name ),
 	} ),
 	( dispatch, ownProps ) => ( {
