@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'; // eslint-disable-line no-unused-vars
 import { BrowserRouter, Route } from 'react-router-dom';
 
 import { getStories } from 'glutenberg';

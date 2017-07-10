@@ -12,7 +12,8 @@
 		"es6": true,
 		"node": true,
 		"mocha": true,
-		"jest/globals": true
+		"jest/globals": true,
+    "worker": true
   },
 	"parserOptions": {
 		"sourceType": "module",
