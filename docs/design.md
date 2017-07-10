@@ -1,11 +1,10 @@
-Gutenberg Design
-================
+# Design Principles
 
 This living document serves to describe some of the design principles and patterns that have served to form the editor interface.
 
 ## Goal
 
-The all-encompassing goal of Gutenberg is to create a post and page building experience that makes it easy to create _rich post layouts_. From the <a href="https://make.wordpress.org/core/2017/01/04/focus-tech-and-design-leads/">kickoff post<a/>:
+The all-encompassing goal of Gutenberg is to create a post and page building experience that makes it easy to create _rich post layouts_. From the [kickoff post](https://make.wordpress.org/core/2017/01/04/focus-tech-and-design-leads/):
 
 > The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.
 

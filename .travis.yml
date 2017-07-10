@@ -80,10 +80,16 @@ script:
     fi
 
 before_deploy:
-  - npm install && npm run build-storybook
+  - npm install
+  - cd docutron
+  - npm install
+  - cd ../
+  - npm run docs-build
 
 deploy:
-  provider: surge
-  project: ./storybook-static/
-  domain: gutenberg-devdoc.surge.sh
+  provider: pages
+  local_dir: ./docutron/build/
   skip_cleanup: true
+  github_token: $GITHUB_TOKEN
+  on:
+    branch: master
