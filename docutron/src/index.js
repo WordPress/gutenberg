@@ -1,7 +1,7 @@
 /**
  * External Dependencies
  */
-import React from 'react'; // eslint-disable-line no-unused-vars
+import React from 'react';
 import { render } from 'react-snapshot';
 import 'prismjs/themes/prism.css';
 
