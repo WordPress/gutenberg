@@ -43,7 +43,7 @@ import {
 	isFirstMultiSelectedBlock,
 	isBlockHovered,
 	getBlockFocus,
-	isTypingInEditor,
+	isTyping,
 	getBlockInsertionPoint,
 	isBlockInsertionPointVisible,
 	isSavingPost,
@@ -966,13 +966,13 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'isTypingInEditor', () => {
+	describe( 'isTyping', () => {
 		it( 'should return the isTyping flag if the block is selected', () => {
 			const state = {
 				isTyping: true,
 			};
 
-			expect( isTypingInEditor( state ) ).toBe( true );
+			expect( isTyping( state ) ).toBe( true );
 		} );
 
 		it( 'should return false if the block is not selected', () => {
@@ -980,7 +980,7 @@ describe( 'selectors', () => {
 				isTyping: false,
 			};
 
-			expect( isTypingInEditor( state ) ).toBe( false );
+			expect( isTyping( state ) ).toBe( false );
 		} );
 	} );
 

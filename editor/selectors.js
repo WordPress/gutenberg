@@ -552,14 +552,12 @@ export function getBlockFocus( state, uid ) {
 }
 
 /**
- * Returns true if the user is typing within the block corresponding to the
- * specified unique ID, or false otherwise.
+ * Returns true if the user is typing, or false otherwise.
  *
  * @param  {Object}  state Global application state
- * @param  {Object}  uid   Block unique ID
- * @return {Boolean}       Whether user is typing within block
+ * @return {Boolean}       Whether user is typing
  */
-export function isTypingInEditor( state ) {
+export function isTyping( state ) {
 	return state.isTyping;
 }
 
