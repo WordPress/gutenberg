@@ -66,6 +66,7 @@ function MarkdownContent( { content } ) {
 class Page extends Component {
 	componentDidMount() {
 		Prism.highlightAll();
+		window.scrollTo( 0, 0 );
 	}
 
 	render() {
