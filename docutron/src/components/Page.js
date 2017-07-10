@@ -3,41 +3,7 @@ import { Link } from 'react-router-dom';
 
 import { getNextStory, getPreviousStory } from 'docutron';
 import markdown from '../markdown';
-
-class Tabs extends Component {
-	constructor() {
-		super( ...arguments );
-		this.state = {
-			activeTab: 0,
-		};
-	}
-
-	selectTab( index ) {
-		return () => {
-			this.setState( { activeTab: index } );
-		};
-	}
-
-	render() {
-		const { tabs } = this.props;
-		const activeTab = tabs[ this.state.activeTab ];
-
-		return (
-			<div>
-				{ tabs.map( ( tab, index ) => (
-					<button
-						key={ index }
-						onClick={ this.selectTab( index ) }
-						className={ index === this.state.activeTab ? 'components-code-tab is-active' : 'components-code-tab' }
-					>
-						{ tab.name }
-					</button>
-				) ) }
-				{ activeTab && <div dangerouslySetInnerHTML={ { __html: activeTab.content } } /> }
-			</div>
-		);
-	}
-}
+import Tabs from './Tabs';
 
 function MarkdownContent( { content } ) {
 	const blocks = markdown( content );
