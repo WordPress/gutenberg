@@ -1,11 +1,13 @@
 const path = require( 'path' );
 
 module.exports = function( webpackConfig, usersCwd ) {
+	const docsFolder = 'docs';
+
 	// Adding "glutenberg" alias
 	webpackConfig.resolve.alias.glutenberg = path.resolve( __dirname, '../../src/config/' );
 
 	// Loading the config folder
-	webpackConfig.resolve.alias.config = path.resolve( usersCwd, process.argv[ 2 ] );
+	webpackConfig.resolve.alias.config = path.resolve( usersCwd, docsFolder );
 	webpackConfig.resolve.modules = webpackConfig.resolve.modules.concat( [ webpackConfig.resolve.alias.config ] );
 
 	// Using the user's node_modules

@@ -1,7 +1,6 @@
 {
-  "name": "docs-tool",
+  "name": "glutenberg",
   "version": "0.1.0",
-  "private": true,
   "dependencies": {
     "lodash": "^4.17.4",
     "markdown-it": "^8.3.1",
@@ -11,11 +10,8 @@
     "react-router-dom": "^4.1.1",
     "react-scripts": "1.0.10"
   },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
-  },
-  "devDependencies": {}
+  "devDependencies": {},
+  "bin" : {
+    "glutenberg" : "./bin/cli.js"
+  }
 }

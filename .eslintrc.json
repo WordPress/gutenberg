@@ -13,7 +13,7 @@
 		"node": true,
 		"mocha": true,
 		"jest/globals": true,
-    "worker": true
+		"worker": true
   },
 	"parserOptions": {
 		"sourceType": "module",
