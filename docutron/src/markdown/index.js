@@ -2,7 +2,9 @@ import MarkdownIt from 'markdown-it';
 import markdownItAnchorPlugin from 'markdown-it-anchor';
 import { compact } from 'lodash';
 
-const parser = new MarkdownIt();
+const parser = new MarkdownIt( {
+	html: true,
+} );
 parser.use( markdownItAnchorPlugin );
 
 const blockParsers = {
