@@ -40,5 +40,15 @@ describe( 'IconButton', () => {
 			const iconButton = shallow( <IconButton test="test" /> );
 			expect( iconButton.props().test ).toBe( 'test' );
 		} );
+
+		it( 'should add a title attribute when the title property is used', () => {
+			const iconButton = shallow( <IconButton title="WordPress" /> );
+			expect( iconButton.props().title ).to.equal( 'WordPress' );
+		} );
+
+		it( 'should add a title attribute using the label property value in absence of the title property', () => {
+			const iconButton = shallow( <IconButton label="WordPress" /> );
+			expect( iconButton.props().title ).to.equal( 'WordPress' );
+		} );
 	} );
 } );

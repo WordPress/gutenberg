@@ -37,6 +37,7 @@ describe( 'Toolbar', () => {
 			expect( listItem.props() ).toMatchObject( {
 				icon: 'wordpress',
 				label: 'WordPress',
+				title: 'WordPress',
 				'data-subscript': 'wp',
 				'aria-pressed': false,
 				className: 'components-toolbar__control',
