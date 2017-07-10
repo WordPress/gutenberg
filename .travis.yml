@@ -91,4 +91,3 @@ deploy:
   project: ./docutron/build/
   domain: gutenberg-devdoc.surge.sh
   skip_cleanup: true
-  all_branches: true
