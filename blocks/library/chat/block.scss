@@ -1,0 +1,48 @@
+.wp-block-chat {
+	font-family: $editor-html-font;
+
+	> p {
+		margin: 0;
+
+		&:first-child .chat-author {
+			margin-top: 0;
+		}
+	}
+
+	.chat-author {
+		display: block;
+		margin-top: 1em;
+		color: $blue-wordpress;
+	}
+
+	.chat-message {
+		margin-left: 1em;
+	}
+
+	&.is-compact {
+		.chat-author {
+			display: inline;
+			margin: 0 .5em 0 0;
+		}
+
+		.chat-message {
+			margin-left: 0;
+		}
+	}
+
+	.chat-author-1 .chat-author {
+		color: $alert-yellow;
+	}
+
+	.chat-author-2 .chat-author {
+		color: $alert-red;
+	}
+
+	.chat-author-3 .chat-author {
+		color: $alert-green;
+	}
+
+	.chat-author-4 .chat-author {
+		color: $dark-gray-800;
+	}
+}
