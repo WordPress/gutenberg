@@ -2,6 +2,7 @@ import React from 'react'; // eslint-disable-line no-unused-vars
 import { BrowserRouter, Route } from 'react-router-dom';
 
 import { getStories } from 'docutron';
+import Header from './Header';
 import Sidebar from './Sidebar';
 import Page from './Page';
 
@@ -9,6 +10,7 @@ function App() {
 	return (
 		<BrowserRouter>
 			<div className="single-handbook">
+				<Header />
 				<div id="page">
 					<div id="main" className="site-main clear">
 						<Sidebar />

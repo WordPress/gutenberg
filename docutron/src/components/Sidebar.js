@@ -28,8 +28,8 @@ function Sidebar() {
 	return (
 		<div id="secondary" className="widget-area">
 			<div className="secondary-content">
-				<aside className="widget widget_wporg_handbook_pages">
-					<h2 className="widget-title">Documentation</h2>
+				<aside id="handbook" className="widget widget_wporg_handbook_pages">
+					<h2 className="widget-title">Chapters</h2>
 					<div className="menu-table-of-contents-container">
 						<ul>
 							{ getStories()
