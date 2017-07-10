@@ -27,13 +27,17 @@ class Page extends Component {
 
 				<div className="navigation">
 					{ !! previousStory && (
-						<p className="nav-older" rel="previous">
-							<Link to={ previousStory.path }>{ '←' } { previousStory.title }</Link>
+						<p className="nav-older">
+							<Link to={ previousStory.path } rel="previous">
+								← { previousStory.title }
+							</Link>
 						</p>
 					) }
 					{ !! nextStory && (
-						<p className="nav-newer" rel="next">
-							<Link to={ nextStory.path }>{ nextStory.title } { '→' }</Link>
+						<p className="nav-newer">
+							<Link to={ nextStory.path } rel="next">
+								{ nextStory.title } →
+							</Link>
 						</p>
 					) }
 				</div>
