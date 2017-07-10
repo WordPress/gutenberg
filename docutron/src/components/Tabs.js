@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react';
+import store from 'store';
 import { EventEmitter } from 'events';
 
 // Create a shared event emitter so that changes to a preference from one code
@@ -13,7 +14,7 @@ class Tabs extends PureComponent {
 
 		const key = this.getPreferenceKey( props.tabs );
 		this.state = {
-			activeTab: Number( window.localStorage.getItem( key ) ) || 0,
+			activeTab: Number( store.get( key ) ) || 0,
 		};
 	}
 
@@ -38,8 +39,7 @@ class Tabs extends PureComponent {
 	selectTab( index ) {
 		return () => {
 			const key = this.getPreferenceKey( this.props.tabs );
-			window.localStorage.setItem( key, index );
-
+			store.set( key, index );
 			bus.emit( 'change', key, index );
 		};
 	}
