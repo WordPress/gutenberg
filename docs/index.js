@@ -1,4 +1,4 @@
-import { addStory } from 'glutenberg';
+import { addStory } from 'glutenberg';
 
 import intro from './readme.md';
 import faq from './faq.md';
@@ -26,21 +26,21 @@ addStory( {
 } );
 
 addStory( {
-	parents: [ 'blocks' ],
+	parents: [ 'blocks' ],
 	name: 'step1',
 	title: 'Step 1',
 	markdown: step1,
 } );
 
 addStory( {
-	parents: [ 'blocks' ],
+	parents: [ 'blocks' ],
 	name: 'step2',
 	title: 'Step 2',
 	markdown: step2,
 } );
 
 addStory( {
-	parents: [ 'blocks' ],
+	parents: [ 'blocks' ],
 	name: 'step3',
 	title: 'Step 3',
 	markdown: step3,
