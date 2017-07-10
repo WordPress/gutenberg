@@ -41,7 +41,7 @@ import {
 	isBlockSelected,
 	isBlockMultiSelected,
 	isFirstMultiSelectedBlock,
-	isTypingInEditor,
+	isTyping,
 } from '../../selectors';
 
 function FirstChild( { children } ) {
@@ -103,9 +103,8 @@ class VisualEditorBlock extends Component {
 		}
 
 		// Bind or unbind mousemove from page when user starts or stops typing
-		const { isTyping } = this.props;
-		if ( isTyping !== prevProps.isTyping ) {
-			if ( isTyping ) {
+		if ( this.props.isTyping !== prevProps.isTyping ) {
+			if ( this.props.isTyping ) {
 				document.addEventListener( 'mousemove', this.stopTypingOnMouseMove );
 			} else {
 				this.removeStopTypingListener();
@@ -147,9 +146,8 @@ class VisualEditorBlock extends Component {
 		//  - The current block is not selected (e.g. after a split occurs,
 		//    we'll still receive the keyDown event, but the focus has since
 		//    shifted to the newly created block)
-		const { isTyping, isSelected, onStartTyping } = this.props;
-		if ( ! isTyping && isSelected ) {
-			onStartTyping();
+		if ( ! this.props.isTyping && this.props.isSelected ) {
+			this.props.onStartTyping();
 		}
 	}
 
@@ -324,8 +322,8 @@ class VisualEditorBlock extends Component {
 		}
 
 		// Generate the wrapper class names handling the different states of the block.
-		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected, isTyping, focus } = this.props;
-		const showUI = isSelected && ( ! isTyping || focus.collapsed === false );
+		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected, focus } = this.props;
+		const showUI = isSelected && ( ! this.props.isTyping || focus.collapsed === false );
 		const { showMobileControls } = this.state;
 		const wrapperClassname = classnames( 'editor-visual-editor__block', {
 			'is-selected': showUI,
@@ -424,7 +422,7 @@ export default connect(
 			isFirstMultiSelected: isFirstMultiSelectedBlock( state, ownProps.uid ),
 			isHovered: isBlockHovered( state, ownProps.uid ),
 			focus: getBlockFocus( state, ownProps.uid ),
-			isTyping: isTypingInEditor( state ),
+			isTyping: isTyping( state ),
 			order: getBlockIndex( state, ownProps.uid ),
 		};
 	},
