@@ -1,4 +1,4 @@
-import React from 'react'; // eslint-disable-line no-unused-vars
+import React from 'react';
 
 const header = (
 	<header id="masthead" className="site-header" role="banner">
