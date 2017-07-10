@@ -84,7 +84,7 @@ before_deploy:
   - cd docutron
   - npm install
   - cd ../
-  - npm run build-docs
+  - npm run docs-build
 
 deploy:
   provider: surge
