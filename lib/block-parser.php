@@ -1,18 +1,10 @@
 <?php
 
-if (!class_exists('Gutenberg_Block_Parser_State', false)):
-
-class Gutenberg_Block_Parser_State {
-	public $block_stack;
-}
-
-endif;
-
 if (!class_exists('Gutenberg_Block_Parser', false)):
 
 class Gutenberg_Block_Parser {
-	const BLOCK_COMMENT_OPEN  = '(^<!--)';
-	const BLOCK_COMMENT_CLOSE = '(^/?-->)';
+	const BLOCK_COMMENT_OPEN  = '(^<!--[ \t\r\n]+wp:)';
+	const BLOCK_COMMENT_CLOSE = '(^[ \t\r\n]+/?-->)';
 	const BLOCK_NAME          = '(^[[:alpha:]](?:[[:alnum:]]|/[[:alnum:]])*)i';
 	const BLOCK_ATTRIBUTES    = '(^{(?:((?!}[ \t\r\n]+/?-->).)*)})';
 	const WS                  = '(^[ \t\r\n])';
@@ -20,29 +12,123 @@ class Gutenberg_Block_Parser {
 
 	const MAX_RUNTIME         = 1; // give up after one second
 
-	public function parse($input) {
+	public static function parse($input) {
 		$tic = microtime( true );
 
+		$remaining = $input;
+		$output = array();
+		$block_stack = array();
+
 		// trampoline for stack-safe recursion of the actual parser
-		while ( $this->input && ( microtime( true ) - $tic ) < self::MAX_RUNTIME ) {
-			return $this->proceed( $input );
+		while ( $remaining && ( microtime( true ) - $tic ) < self::MAX_RUNTIME ) {
+			list(
+				$remaining,
+				$output,
+				$block_stack,
+			) = self::proceed( $remaining, $output, $block_stack );
+		}
+
+		return $output;
+	}
+
+	public static function proceed( $input, $output, $block_stack ) {
+		// open a new block
+		$opener = self::block_opening( $input );
+
+		if ( ! empty( $opener ) ) {
+			list( list( $block_name, $attrs ), $remaining ) = $opener;
+
+			return array(
+				$remaining,
+				$output,
+				array_merge( $block_stack, array( self::block( $block_name, $attrs, '' ) ) )
+			);
+		}
+
+		$open_blocks = array_slice( $block_stack, 0 );
+		$this_block = array_pop( $open_blocks );
+
+		// close out the block
+		$closer = self::block_closing( $input );
+
+		if ( ! empty( $closer ) ) {
+			// must be in an open block
+			if ( ! $this_block ) {
+				return array(
+					'',
+					array_merge( $output, array( self::freeform( $input ) ) ),
+					$block_stack
+				);
+			}
+
+			list( $block_name, $remaining ) = $closer;
+
+			// we have a block mismatch and can go no further
+			if ( $block_name !== $this_block[ 'blockName' ] ) {
+				return array(
+					'',
+					array_merge( $output, array( self::freeform( $input ) ) ),
+					$block_stack
+				);
+			}
+
+			// close the block and update the parent's raw content
+			$parent_block = array_pop( $open_blocks );
+
+			// not every block has a parent
+			if ( ! isset( $parent_block ) ) {
+				return array(
+					$remaining,
+					array_merge( $output, array( $this_block ) ),
+					$open_blocks
+				);
+			}
+
+			$parent_block[ 'rawContent' ] .= $this_block[ 'rawContent' ];
+
+			return array(
+				$remaining,
+				$output,
+				array_merge( $open_blocks, array( $parent_block ) )
+			);
+		}
+
+		// eat raw content
+		$chunk = self::raw_chunk( $input );
+
+		if ( ! empty( $chunk ) ) {
+			list( $raw_content, $remaining ) = $chunk;
+
+			// we can come before a block opens
+			if ( ! $this_block ) {
+				return array(
+					$remaining,
+					array_merge( $output, array( self::freeform( $raw_content ) ) ),
+					$block_stack
+				);
+			}
+
+			// or we can add to the inside content of an open block
+			$this_block[ 'rawContent' ] .= $raw_content;
+
+			return array(
+				$remaining,
+				$output,
+				array_merge( $open_blocks, array( $this_block ) )
+			);
 		}
 	}
 
-	public function proceed( $input ) {
-		return succeed( 'test', $input );
-	}
-
-	public static function block_void( $input ) {
+	public static function block_opening( $input ) {
 		$result = self::sequence( array(
-			array( 'self::ignore', array( 'self::match', array( '(^<!--[ \t\r\n]+wp:)' ) ) ),
+			array( 'self::ignore', array( 'self::match', array( self::BLOCK_COMMENT_OPEN ) ) ),
 			array( 'self::match',  array( self::BLOCK_NAME ) ),
 			array( 'self::first_of', array( array(
-				array( 'self::ignore',   array( 'self::match', array( '(^[ \t\r\n]+/-->)' ) ) ),
+				array( 'self::ignore',   array( 'self::match', array( self::BLOCK_COMMENT_CLOSE ) ) ),
 				array( 'self::sequence', array( array(
 					array( 'self::ignore', array( 'self::match', array( self::WSS ) ) ),
 					array( 'self::match',  array( self::BLOCK_ATTRIBUTES ) ),
-					array( 'self::ignore', array( 'self::match', array( '(^[ \t\r\n]+/-->)' ) ) )
+					array( 'self::ignore', array( 'self::match', array( self::BLOCK_COMMENT_CLOSE ) ) )
 				) ) )
 			) ) )
 		), $input );
@@ -56,7 +142,35 @@ class Gutenberg_Block_Parser {
 			? json_decode( $raw_attrs, true )
 			: array();
 
-		return array( self::block( $blockName, $attrs, '' ), $remaining );
+		return array( array( $blockName, $attrs ), $remaining );
+	}
+
+	public static function block_closing( $input ) {
+		$result = self::sequence( array(
+			array( 'self::ignore', array( 'self::match', array( '(^<!--[ \t\r\n]+/wp:)' ) ) ),
+			array( 'self::match', array( self::BLOCK_NAME ) ),
+			array( 'self::ignore', array( 'self::match', array( self::BLOCK_COMMENT_CLOSE ) ) )
+		), $input );
+
+		if ( empty( $result ) ) {
+			return array();
+		}
+
+		list( list( list( $blockName ) ), $remaining ) = $result;
+
+		return array( $blockName, $remaining );
+	}
+
+	public static function raw_chunk( $input ) {
+		$result = self::match( '(^((?!<!--[ \t\r\n]+/?wp:).)*)', $input );
+
+		if ( empty( $result ) ) {
+			return $result;
+		}
+
+		list( list( $chunk ), $remaining ) = $result;
+
+		return array( $chunk, $remaining );
 	}
 
 	//-----------------------------------------
@@ -198,7 +312,7 @@ class Gutenberg_Block_Parser {
 	}
 
 	public static function freeform( $rawContent ) {
-		return self::block( 'freeform', array(), $rawContent );
+		return self::block( 'core/freeform', array(), $rawContent );
 	}
 }
 
