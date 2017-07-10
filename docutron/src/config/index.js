@@ -1,3 +1,6 @@
+/**
+ * External Dependencies
+ */
 import { find } from 'lodash';
 
 const stories = [];

@@ -1,8 +1,14 @@
+/**
+ * External Dependencies
+ */
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { find } from 'lodash';
 
-import { getStories, getChildren } from 'docutron';
+/**
+ * Internal Dependencies
+ */
+import { getStories, getChildren } from '../config';
 
 function MenuItem( { item, searchResults } ) {
 	const children = getChildren( item.id );

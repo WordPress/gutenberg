@@ -1,3 +1,6 @@
+/**
+ * External Dependencies
+ */
 import React, { PureComponent } from 'react';
 import store from 'store';
 import { EventEmitter } from 'events';

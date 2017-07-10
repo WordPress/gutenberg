@@ -1,3 +1,6 @@
+/**
+ * External Dependencies
+ */
 import MarkdownIt from 'markdown-it';
 import markdownItPrismPlugin from 'markdown-it-prism';
 import markdownItTOCAndAnchorPlugin from 'markdown-it-toc-and-anchor';

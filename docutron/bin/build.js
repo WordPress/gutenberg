@@ -1,7 +1,15 @@
 #!/usr/bin/env node
+
+/**
+ * External Dependencies
+ */
 const path = require( 'path' );
 
+/**
+ * Internal Dependencies
+ */
 const extendsConfig = require( './helpers/extend-webpack-config' );
+
 const usersCwd = process.cwd();
 const docsFolder = process.argv[ 2 ];
 

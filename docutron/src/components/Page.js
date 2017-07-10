@@ -1,7 +1,13 @@
+/**
+ * External Dependencies
+ */
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 
-import { getNextStory, getPreviousStory } from 'docutron';
+/**
+ * Internal Dependencies
+ */
+import { getNextStory, getPreviousStory } from '../config';
 import markdown from '../markdown';
 import Tabs from './Tabs';
 

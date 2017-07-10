@@ -1,3 +1,6 @@
+/**
+ * External Dependencies
+ */
 const path = require( 'path' );
 
 module.exports = function( webpackConfig, usersCwd, docsFolder ) {

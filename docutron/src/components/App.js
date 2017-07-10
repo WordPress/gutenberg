@@ -1,7 +1,13 @@
+/**
+ * External Dependencies
+ */
 import React from 'react';
 import { BrowserRouter, Route } from 'react-router-dom';
 
-import { getStories } from 'docutron';
+/**
+ * Internal Dependencies
+ */
+import { getStories } from '../config';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Page from './Page';

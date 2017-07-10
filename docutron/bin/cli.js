@@ -1,6 +1,11 @@
 #!/usr/bin/env node
+
+/**
+ * External Dependencies
+ */
 const path = require( 'path' );
 const childProcess = require( 'child_process' );
+
 const command = process.argv[ 2 ];
 const docsFolder = process.argv[ 3 ] || 'docs';
 
