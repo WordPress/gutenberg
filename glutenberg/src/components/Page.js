@@ -33,7 +33,7 @@ class Tabs extends Component {
 					<button
 						key={ index }
 						onClick={ this.selectTab( index ) }
-						className={ index === this.state.activeTab ? 'is-active' : '' }
+						className={ index === this.state.activeTab ? 'components-code-tab is-active' : 'components-code-tab' }
 					>
 						{ tab.name }
 					</button>
