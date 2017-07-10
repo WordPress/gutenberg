@@ -1,7 +1,7 @@
 import React from 'react'; // eslint-disable-line no-unused-vars
 import { Link } from 'react-router-dom';
 
-import { getStories, getChildren } from 'glutenberg';
+import { getStories, getChildren } from 'docutron';
 
 function MenuItem( { item } ) {
 	const children = getChildren( item.id );

@@ -1,7 +1,7 @@
 import React from 'react'; // eslint-disable-line no-unused-vars
 import { BrowserRouter, Route } from 'react-router-dom';
 
-import { getStories } from 'glutenberg';
+import { getStories } from 'docutron';
 import Sidebar from './Sidebar';
 import Page from './Page';
 

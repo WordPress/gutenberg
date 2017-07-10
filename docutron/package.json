@@ -1,5 +1,5 @@
 {
-  "name": "glutenberg",
+  "name": "docutron",
   "version": "0.1.0",
   "dependencies": {
     "lodash": "^4.17.4",
@@ -13,6 +13,6 @@
   },
   "devDependencies": {},
   "bin": {
-    "glutenberg": "./bin/cli.js"
+    "docutron": "./bin/cli.js"
   }
 }

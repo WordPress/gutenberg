@@ -3,8 +3,8 @@ const path = require( 'path' );
 module.exports = function( webpackConfig, usersCwd ) {
 	const docsFolder = 'docs';
 
-	// Adding "glutenberg" alias
-	webpackConfig.resolve.alias.glutenberg = path.resolve( __dirname, '../../src/config/' );
+	// Adding "docutron" alias
+	webpackConfig.resolve.alias.docutron = path.resolve( __dirname, '../../src/config/' );
 
 	// Loading the config folder
 	webpackConfig.resolve.alias.config = path.resolve( usersCwd, docsFolder );

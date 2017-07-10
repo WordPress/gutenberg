@@ -2,7 +2,7 @@ import React, { Component } from 'react'; // eslint-disable-line no-unused-vars
 import { Link } from 'react-router-dom';
 import Prism from 'prismjs';
 
-import { getNextStory, getPreviousStory } from 'glutenberg';
+import { getNextStory, getPreviousStory } from 'docutron';
 import markdown from '../markdown';
 
 class Tabs extends Component {

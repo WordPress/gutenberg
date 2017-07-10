@@ -1,4 +1,4 @@
-import { addStory } from 'glutenberg';
+import { addStory } from 'docutron';
 
 import intro from './readme.md';
 import faq from './faq.md';
