@@ -15,9 +15,10 @@ import { IconButton } from 'components';
 import './style.scss';
 import { isEditorSidebarOpened } from 'editor/selectors';
 
-function BlockSettingsMenu( { onDelete, selectBlock, isSidebarOpened, toggleSidebar } ) {
+function BlockSettingsMenu( { onDelete, selectBlock, isSidebarOpened, toggleSidebar, setSidebarMode } ) {
 	const toggleInspector = () => {
 		selectBlock();
+		setSidebarMode();
 		if ( ! isSidebarOpened ) {
 			toggleSidebar();
 		}
@@ -57,6 +58,12 @@ export default connect(
 				type: 'TOGGLE_BLOCK_SELECTED',
 				selected: true,
 				uid: ownProps.uid,
+			} );
+		},
+		setSidebarMode() {
+			dispatch( {
+				type: 'SELECT_SIDEBAR_MODE',
+				sidebarMode: 'block',
 			} );
 		},
 		toggleSidebar() {
