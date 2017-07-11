@@ -6,8 +6,7 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { Panel, PanelHeader, IconButton } from 'components';
+import { Panel } from 'components';
 
 /**
  * Internal Dependencies
@@ -20,7 +19,7 @@ import FeaturedImage from '../featured-image';
 import DiscussionPanel from '../discussion-panel';
 import LastRevision from '../last-revision';
 
-const PostSettings = ( { toggleSidebar } ) => {
+const PostSettings = () => {
 	return (
 		<Panel>
 			<PostStatus />

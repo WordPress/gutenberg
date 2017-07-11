@@ -15,9 +15,9 @@ import './style.scss';
 import PostSettings from './post-settings';
 import BlockInspector from './block-inspector';
 import Header from './header';
-import { getSelectedBlock, getActivePanel } from '../selectors';
+import { getActivePanel } from '../selectors';
 
-const Sidebar = ( { selectedBlock, panel } ) => {
+const Sidebar = ( { panel } ) => {
 	return (
 		<div className="editor-sidebar">
 			<Header />
@@ -30,7 +30,6 @@ const Sidebar = ( { selectedBlock, panel } ) => {
 export default connect(
 	( state ) => {
 		return {
-			selectedBlock: getSelectedBlock( state ),
 			panel: getActivePanel( state ),
 		};
 	}
