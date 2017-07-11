@@ -87,9 +87,7 @@ before_deploy:
   - npm run docs-build
 
 deploy:
-  provider: pages
+  provider: surge
   local_dir: ./docutron/build/
   skip_cleanup: true
-  github_token: $GITHUB_TOKEN
-  on:
-    branch: master
+  domain: gutenberg-devdoc.surge.sh
