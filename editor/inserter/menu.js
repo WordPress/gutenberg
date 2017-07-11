@@ -32,11 +32,10 @@ class InserterMenu extends Component {
 		this.filter = this.filter.bind( this );
 		this.setSearchFocus = this.setSearchFocus.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
-		this.applySearchFilter = this.applySearchFilter.bind( this );
+		this.searchBlocks = this.searchBlocks.bind( this );
 		this.getBlocksForCurrentTab = this.getBlocksForCurrentTab.bind( this );
 		this.sortBlocks = this.sortBlocks.bind( this );
 		this.addRecentBlocks = this.addRecentBlocks.bind( this );
-		this.filterRecentForSearch = this.filterRecentForSearch.bind( this );
 	}
 
 	componentDidMount() {
@@ -57,9 +56,9 @@ class InserterMenu extends Component {
 		} );
 	}
 
-	selectBlock( blockType ) {
+	selectBlock( name ) {
 		return () => {
-			this.props.onSelect( blockType.name );
+			this.props.onSelect( name );
 			this.setState( {
 				filterValue: '',
 				currentFocus: null,
@@ -67,7 +66,7 @@ class InserterMenu extends Component {
 		};
 	}
 
-	applySearchFilter( blockTypes ) {
+	searchBlocks( blockTypes ) {
 		const matchesSearch = ( block ) => block.title.toLowerCase().indexOf( this.state.filterValue.toLowerCase() ) !== -1;
 		return filter( blockTypes, matchesSearch );
 	}
@@ -104,22 +103,16 @@ class InserterMenu extends Component {
 		return blocksByCategory;
 	}
 
-	filterRecentForSearch( blocksByCategory ) {
-		blocksByCategory.recent = this.applySearchFilter( blocksByCategory.recent );
-		return blocksByCategory;
-	}
-
 	groupByCategory( blockTypes ) {
 		return groupBy( blockTypes, ( blockType ) => blockType.category );
 	}
 
 	getVisibleBlocksByCategory( blockTypes ) {
 		return flow(
-			this.applySearchFilter,
+			this.searchBlocks,
 			this.sortBlocks,
 			this.groupByCategory,
-			this.addRecentBlocks,
-			this.filterRecentForSearch
+			this.addRecentBlocks
 		)( blockTypes );
 	}
 
@@ -168,7 +161,7 @@ class InserterMenu extends Component {
 
 	focusNext() {
 		const sortedByCategory = flow(
-			this.applySearchFilter,
+			this.searchBlocks,
 			this.sortBlocks,
 		)( this.getBlocksForCurrentTab() );
 
@@ -183,7 +176,7 @@ class InserterMenu extends Component {
 
 	focusPrevious() {
 		const sortedByCategory = flow(
-			this.applySearchFilter,
+			this.searchBlocks,
 			this.sortBlocks,
 		)( this.getBlocksForCurrentTab() );
 
@@ -262,7 +255,7 @@ class InserterMenu extends Component {
 				role="menuitem"
 				key={ block.name }
 				className="editor-inserter__block"
-				onClick={ this.selectBlock( block ) }
+				onClick={ this.selectBlock( block.name ) }
 				ref={ this.bindReferenceNode( block.name ) }
 				tabIndex="-1"
 				onMouseEnter={ this.props.showInsertionPoint }
