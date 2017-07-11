@@ -107,3 +107,34 @@
 .editor-layout.is-sidebar-opened .editor-text-editor__formatting {
 	margin-right: $sidebar-width;
 }
+
+.components-panel__header.editor-sidebar__panel-tabs {
+	justify-content: flex-start;
+	padding-left: 0;
+
+	.components-icon-button {
+		margin-left: auto;
+	}
+}
+
+.editor-sidebar__panel-tab {
+	background: transparent;
+	border: none;
+	border-bottom: 3px solid transparent;
+	cursor: pointer;
+	height: 50px;
+	line-height: 50px;
+	padding: 0 20px;
+	margin-left: 0;
+	font-weight: 400;
+
+	&.is-active {
+		border-bottom-color: $blue-medium-500;
+		font-weight: 600;
+	}
+
+	&:focus {
+		box-shadow: $button-focus-style;
+		outline: none;
+	}
+}

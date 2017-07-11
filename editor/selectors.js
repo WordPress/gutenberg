@@ -21,6 +21,16 @@ export function getEditorMode( state ) {
 }
 
 /**
+ * Returns the current active panel for the sidebar.
+ *
+ * @param  {Object}  state Global application state
+ * @return {String}        Active sidebar panel
+ */
+export function getActivePanel( state ) {
+	return state.panel;
+}
+
+/**
  * Returns true if the editor sidebar panel is open, or false otherwise.
  *
  * @param  {Object}  state Global application state

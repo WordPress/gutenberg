@@ -428,6 +428,15 @@ export function isSidebarOpened( state = ! isMobile, action ) {
 	return state;
 }
 
+export function panel( state = 'document', action ) {
+	switch ( action.type ) {
+		case 'SET_ACTIVE_PANEL':
+			return action.panel;
+	}
+
+	return state;
+}
+
 /**
  * Reducer returning current network request state (whether a request to the WP
  * REST API is in progress, successful, or failed).
@@ -496,6 +505,7 @@ export function createReduxStore() {
 		showInsertionPoint,
 		mode,
 		isSidebarOpened,
+		panel,
 		saving,
 		notices,
 	} ) );
