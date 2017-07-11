@@ -88,6 +88,6 @@ before_deploy:
 
 deploy:
   provider: surge
-  local_dir: ./docutron/build/
+  project: ./docutron/build/
   skip_cleanup: true
   domain: gutenberg-devdoc.surge.sh
