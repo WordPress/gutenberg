@@ -196,4 +196,20 @@ jQuery( function() {
 
         deepEqual( wp.shortcode.attrs('foo not="a blocker" bar baz'), expected, 'attr parsed numeric attributes');
     });
+
+	test( 'attrs() should return numeric attributes created with single, double, and no quotes', function() {
+		var expected = {
+			'named': {}, 'numeric' : ['foo', 'bar', 'baz']
+		};
+
+		deepEqual( wp.shortcode.attrs('foo "bar" \'baz\''), expected, 'attr parsed numeric attributes');
+	});
+	
+	test( 'attrs() should return mixed attributes created with single, double, and no quotes', function() {
+		var expected = {
+			'named': { a: 'foo', b: 'bar', c: 'baz' }, 'numeric' : ['foo', 'bar', 'baz']
+		};
+
+		deepEqual( wp.shortcode.attrs('a="foo" b=\'bar\' c=baz foo "bar" \'baz\''), expected, 'attr parsed numeric attributes');
+	});
 });

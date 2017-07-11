@@ -840,4 +840,34 @@ EOF;
 		);
 		return wp_json_encode( $arr );
 	}
+
+	/**
+	 * @ticket 37304
+	 *
+	 * Test 'value' syntax for empty attributes
+	 */
+	function test_empty_single_quote_attribute() {
+		$out = do_shortcode( '[test-shortcode-tag a="foo" b=\'bar\' c=baz foo \'bar\' "baz" ]test empty atts[/test-shortcode-tag]' );
+		$this->assertEquals( array( 'a' => 'foo', 'b' => 'bar', 'c' => 'baz', 0 => 'foo', 1 => 'bar', 2 => 'baz' ), $this->atts );
+	}
+
+	/**
+	 * @ticket 37304
+	 */
+	function test_positional_atts_single_quotes() {
+		$out = do_shortcode( "[test-shortcode-tag 'something in quotes' 'something else']" );
+		$this->assertEquals( '', $out );
+		$this->assertEquals( array( 0 => 'something in quotes', 1 => 'something else' ), $this->atts );
+		$this->assertEquals( 'test-shortcode-tag', $this->tagname );
+	}
+
+	/**
+	 * @ticket 37304
+	 */
+	function test_positional_atts_mixed_quotes() {
+		$out = do_shortcode( "[test-shortcode-tag 'something in quotes' \"something else\" 123 foo bar='baz' example=\"test\" ]" );
+		$this->assertEquals( '', $out );
+		$this->assertEquals( array( 0 => 'something in quotes', 1 => 'something else', 2 => '123', 3 => 'foo', 'bar' => 'baz', 'example' => 'test'), $this->atts );
+		$this->assertEquals( 'test-shortcode-tag', $this->tagname );
+	}
 }
