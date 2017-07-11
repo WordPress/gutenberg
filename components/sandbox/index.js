@@ -78,10 +78,13 @@ export default class Sandbox extends wp.element.Component {
 				}
 
 				function sendResize() {
+					var clientBoundingRect, computedStyle;
+					clientBoundingRect = document.body.getBoundingClientRect();
+					computedStyle = getComputedStyle( document.body );
 					window.top.postMessage( {
 						action: 'resize',
-						width: document.body.scrollWidth,
-						height: document.body.scrollHeight
+						width: clientBoundingRect.width + parseFloat( computedStyle.marginLeft ) + parseFloat( computedStyle.marginRight ),
+						height: clientBoundingRect.height + parseFloat( computedStyle.marginTop ) + parseFloat( computedStyle.marginBottom )
 					}, '*' );
 				}
 
