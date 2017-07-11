@@ -269,7 +269,6 @@ class InserterMenu extends Component {
 
 	switchTab( tab ) {
 		this.setState( { tab: tab } );
-		this.setSearchFocus();
 	}
 
 	render() {
