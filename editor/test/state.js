@@ -29,7 +29,11 @@ import {
 describe( 'state', () => {
 	describe( 'editor()', () => {
 		beforeAll( () => {
-			registerBlockType( 'core/test-block', { save: noop } );
+			registerBlockType( 'core/test-block', {
+				save: noop,
+				edit: noop,
+				category: 'common',
+			} );
 		} );
 
 		afterAll( () => {
@@ -76,6 +80,42 @@ describe( 'state', () => {
 			expect( Object.keys( state.blocksByUid ) ).toHaveLength( 2 );
 			expect( values( state.blocksByUid )[ 1 ].uid ).toBe( 'ribs' );
 			expect( state.blockOrder ).toEqual( [ 'chicken', 'ribs' ] );
+		} );
+
+		it( 'should record recently used blocks', () => {
+			const original = editor( undefined, {} );
+			const state = editor( original, {
+				type: 'INSERT_BLOCKS',
+				blocks: [ {
+					uid: 'bacon',
+					name: 'core-embed/twitter',
+				} ],
+			} );
+
+			expect( state.recentlyUsedBlocks[ 0 ] ).toEqual( 'core-embed/twitter' );
+
+			const twoRecentBlocks = editor( state, {
+				type: 'INSERT_BLOCKS',
+				blocks: [ {
+					uid: 'eggs',
+					name: 'core-embed/youtube',
+				} ],
+			} );
+
+			expect( twoRecentBlocks.recentlyUsedBlocks[ 0 ] ).toEqual( 'core-embed/youtube' );
+			expect( twoRecentBlocks.recentlyUsedBlocks[ 1 ] ).toEqual( 'core-embed/twitter' );
+		} );
+
+		it( 'should populate recently used blocks with the common category', () => {
+			const initial = editor( undefined, {
+				type: 'SETUP_NEW_POST',
+				edits: {
+					status: 'draft',
+					title: 'post title',
+				},
+			} );
+
+			expect( initial.recentlyUsedBlocks ).toEqual( expect.arrayContaining( [ 'core/test-block', 'core/text' ] ) );
 		} );
 
 		it( 'should replace the block', () => {

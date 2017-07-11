@@ -7,6 +7,11 @@ import refx from 'refx';
 import { reduce, keyBy, first, last, omit, without, flowRight } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { getBlockTypes } from 'blocks';
+
+/**
  * Internal dependencies
  */
 import { combineUndoableReducers } from './utils/undoable-reducer';
@@ -217,6 +222,28 @@ export const editor = combineUndoableReducers( {
 				return without( state, ...action.uids );
 		}
 
+		return state;
+	},
+
+	recentlyUsedBlocks( state = [], action ) {
+		const maxRecent = 8;
+		switch ( action.type ) {
+			case 'SETUP_NEW_POST':
+				// This is where we initially populate the recently used blocks,
+				// for now this inserts blocks from the common category.
+				return getBlockTypes()
+					.filter( ( blockType ) => 'common' === blockType.category )
+					.slice( 0, maxRecent )
+					.map( ( blockType ) => blockType.name );
+			case 'INSERT_BLOCKS':
+				// This is where we record the block usage so it can show up in
+				// the recent blocks.
+				let newState = [ ...state ];
+				action.blocks.forEach( ( block ) => {
+					newState = [ block.name, ...without( newState, block.name ) ];
+				} );
+				return newState.slice( 0, maxRecent );
+		}
 		return state;
 	},
 }, { resetTypes: [ 'RESET_BLOCKS' ] } );

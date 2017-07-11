@@ -6,6 +6,11 @@ import { first, last, get, values } from 'lodash';
 import createSelector from 'rememo';
 
 /**
+ * WordPress dependencies
+ */
+import { getBlockType } from 'blocks';
+
+/**
  * Internal dependencies
  */
 import { addQueryArgs } from './utils/url';
@@ -667,4 +672,15 @@ export function getSuggestedPostFormat( state ) {
  */
 export function getNotices( state ) {
 	return values( state.notices );
+}
+
+/**
+ * Resolves the list of recently used block names into a list of block type settings.
+ *
+ * @param {Object} state Global application state
+ * @return {Array}       List of recently used blocks
+ */
+export function getRecentlyUsedBlocks( state ) {
+	// resolves the block names in the state to the block type settings
+	return state.editor.recentlyUsedBlocks.map( blockType => getBlockType( blockType ) );
 }
