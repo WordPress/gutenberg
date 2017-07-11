@@ -84,27 +84,26 @@ describe( 'state', () => {
 
 		it( 'should record recently used blocks', () => {
 			const original = editor( undefined, {} );
-			expect( original.recentlyUsedBlocks ).to.not.include( 'core-embed/twitter' );
-
 			const state = editor( original, {
-				type: 'INSERT_BLOCK',
-				block: {
+				type: 'INSERT_BLOCKS',
+				blocks: [ {
 					uid: 'bacon',
 					name: 'core-embed/twitter',
-				},
+				} ],
 			} );
 
-			expect( state.recentlyUsedBlocks ).to.eql( [ 'core-embed/twitter' ] );
+			expect( state.recentlyUsedBlocks[ 0 ] ).toEqual( 'core-embed/twitter' );
 
 			const twoRecentBlocks = editor( state, {
-				type: 'INSERT_BLOCK',
-				block: {
+				type: 'INSERT_BLOCKS',
+				blocks: [ {
 					uid: 'eggs',
 					name: 'core-embed/youtube',
-				},
+				} ],
 			} );
 
-			expect( twoRecentBlocks.recentlyUsedBlocks ).to.eql( [ 'core-embed/youtube', 'core-embed/twitter' ] );
+			expect( twoRecentBlocks.recentlyUsedBlocks[ 0 ] ).toEqual( 'core-embed/youtube' );
+			expect( twoRecentBlocks.recentlyUsedBlocks[ 1 ] ).toEqual( 'core-embed/twitter' );
 		} );
 
 		it( 'should populate recently used blocks with the common category', () => {
@@ -116,7 +115,7 @@ describe( 'state', () => {
 				},
 			} );
 
-			expect( initial.recentlyUsedBlocks ).to.have.eql( [ 'core/test-block' ] );
+			expect( initial.recentlyUsedBlocks ).toEqual( expect.arrayContaining( [ 'core/test-block', 'core/text' ] ) );
 		} );
 
 		it( 'should replace the block', () => {

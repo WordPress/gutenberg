@@ -235,13 +235,14 @@ export const editor = combineUndoableReducers( {
 					.filter( ( blockType ) => 'common' === blockType.category )
 					.slice( 0, maxRecent )
 					.map( ( blockType ) => blockType.name );
-			case 'INSERT_BLOCK':
+			case 'INSERT_BLOCKS':
 				// This is where we record the block usage so it can show up in
 				// the recent blocks.
-				return [
-					action.block.name,
-					...without( state, action.block.name ),
-				].slice( 0, maxRecent );
+				let newState = [ ...state ];
+				action.blocks.forEach( ( block ) => {
+					newState = [ block.name, ...without( newState, block.name ) ];
+				} );
+				return newState.slice( 0, maxRecent );
 		}
 		return state;
 	},

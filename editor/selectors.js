@@ -2,7 +2,7 @@
  * External dependencies
  */
 import moment from 'moment';
-import { first, last, get, values, sortBy } from 'lodash';
+import { first, last, get, values } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -677,10 +677,6 @@ export function getNotices( state ) {
  * @return {Array}       List of recently used blocks
  */
 export function getRecentlyUsedBlocks( state ) {
-	// resolves the block names in the state to the block type settings,
-	// and orders by title so they don't jump around as much in the recent tab
-	return sortBy(
-		state.editor.recentlyUsedBlocks.map( blockType => getBlockType( blockType ) ),
-		( blockType ) => blockType.title
-	);
+	// resolves the block names in the state to the block type settings
+	return state.editor.recentlyUsedBlocks.map( blockType => getBlockType( blockType ) );
 }
