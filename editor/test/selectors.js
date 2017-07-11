@@ -197,7 +197,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 			};
 
-			expect( isCleanNewPost( state ) ).to.be.true();
+			expect( isCleanNewPost( state ) ).toBe( true );
 		} );
 
 		it( 'should return false when the post is not dirty but the post has been saved', () => {
@@ -208,7 +208,7 @@ describe( 'selectors', () => {
 				currentPost: { id: 1 },
 			};
 
-			expect( isCleanNewPost( state ) ).to.be.false();
+			expect( isCleanNewPost( state ) ).toBe( false );
 		} );
 
 		it( 'should return false when the post is dirty but the post has not been saved', () => {
@@ -219,7 +219,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isCleanNewPost( state ) ).to.be.false();
+			expect( isCleanNewPost( state ) ).toBe( false );
 		} );
 	} );
 
@@ -315,7 +315,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getDocumentTitle( state ) ).to.equal( 'The Title' );
+			expect( getDocumentTitle( state ) ).toBe( 'The Title' );
 		} );
 
 		it( 'should return current title for edited existing post', () => {
@@ -330,7 +330,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getDocumentTitle( state ) ).to.equal( 'Modified Title' );
+			expect( getDocumentTitle( state ) ).toBe( 'Modified Title' );
 		} );
 
 		it( 'should return new post title when new post is clean', () => {
@@ -343,7 +343,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getDocumentTitle( state ) ).to.equal( __( 'New post' ) );
+			expect( getDocumentTitle( state ) ).toBe( __( 'New post' ) );
 		} );
 
 		it( 'should return untitled title when new post is dirty', () => {
@@ -356,7 +356,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getDocumentTitle( state ) ).to.equal( __( '(Untitled)' ) );
+			expect( getDocumentTitle( state ) ).toBe( __( '(Untitled)' ) );
 		} );
 
 		it( 'should return untitled title', () => {
@@ -370,7 +370,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getDocumentTitle( state ) ).to.equal( __( '(Untitled)' ) );
+			expect( getDocumentTitle( state ) ).toBe( __( '(Untitled)' ) );
 		} );
 	} );
 
