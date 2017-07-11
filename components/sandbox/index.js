@@ -73,7 +73,7 @@ export default class Sandbox extends wp.element.Component {
 			( function() {
 				var observer;
 
-				if ( ! window.MutationObserver || ! document.body || ! window.top ) {
+				if ( ! window.MutationObserver || ! document.body || ! window.parent ) {
 					return;
 				}
 
@@ -81,7 +81,7 @@ export default class Sandbox extends wp.element.Component {
 					var clientBoundingRect, computedStyle;
 					clientBoundingRect = document.body.getBoundingClientRect();
 					computedStyle = getComputedStyle( document.body );
-					window.top.postMessage( {
+					window.parent.postMessage( {
 						action: 'resize',
 						width: clientBoundingRect.width + parseFloat( computedStyle.marginLeft ) + parseFloat( computedStyle.marginRight ),
 						height: clientBoundingRect.height + parseFloat( computedStyle.marginTop ) + parseFloat( computedStyle.marginBottom )
