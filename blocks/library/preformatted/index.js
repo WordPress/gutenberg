@@ -13,7 +13,7 @@ import Editable from '../../editable';
 const { children } = query;
 
 registerBlockType( 'core/preformatted', {
-	title: __( 'Preformatted Text' ),
+	title: __( 'Preformatted' ),
 
 	icon: 'text',
 
