@@ -17,18 +17,18 @@ import { getActivePanel } from 'editor/selectors';
 const SidebarHeader = ( { panel, onSetPanel, toggleSidebar } ) => {
 	return (
 		<div className="components-panel__header editor-sidebar__panel-tabs">
-			<h2
+			<button
 				onClick={ () => onSetPanel( 'document' ) }
 				className={ `editor-sidebar__panel-tab ${ panel === 'document' ? 'is-active' : '' }` }
 			>
 				{ __( 'Document' ) }
-			</h2>
-			<h2
+			</button>
+			<button
 				onClick={ () => onSetPanel( 'block' ) }
 				className={ `editor-sidebar__panel-tab ${ panel === 'block' ? 'is-active' : '' }` }
 			>
 				{ __( 'Block' ) }
-			</h2>
+			</button>
 			<IconButton
 				onClick={ toggleSidebar }
 				icon="no-alt"
