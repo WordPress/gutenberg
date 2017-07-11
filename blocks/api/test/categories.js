@@ -59,7 +59,7 @@ describe( 'categories', () => {
 
 		it( 'should store the new category', () => {
 			const categories = registerCategory( { slug: 'custom-blocks', title: 'Custom Blocks' } );
-			expect(categories).toEqual( jasmine.arrayContaining( [ { slug: 'custom-blocks', title: 'Custom Blocks' } ] ) );
+			expect( categories ).toEqual( jasmine.arrayContaining( [ { slug: 'custom-blocks', title: 'Custom Blocks' } ] ) );
 		} );
 
 		it( 'should reject categories already registered', () => {
