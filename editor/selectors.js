@@ -6,9 +6,13 @@ import { first, last, get, values } from 'lodash';
 import createSelector from 'rememo';
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
 import { getBlockType } from 'blocks';
+
+/**
+ * Internal dependencies
+ */
 import { addQueryArgs } from './utils/url';
 
 /**
