@@ -51,18 +51,22 @@ class UrlInput extends Component {
 						<IconButton
 							className="components-url-input__back"
 							icon="arrow-left-alt"
-							label={ __( 'Back' ) }
+							label={ __( 'Close' ) }
 							onClick={ this.toggle }
 						/>
 						<input
 							className="editable-format-toolbar__link-input"
 							type="url"
 							value={ url }
-							aria-label={ __( 'Enter URL' ) }
+							aria-label={ __( 'URL' ) }
 							onChange={ onChange }
 							placeholder={ __( 'Paste URL or type' ) }
 						/>
-						<IconButton icon="editor-break" type="submit" />
+						<IconButton
+							icon="editor-break"
+							label={ __( 'Submit' ) }
+							type="submit"
+						/>
 					</form>
 				}
 			</li>
