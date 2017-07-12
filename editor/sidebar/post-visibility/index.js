@@ -106,7 +106,12 @@ class PostVisibility extends Component {
 		return (
 			<div className="editor-post-visibility">
 				<span>{ __( 'Visibility' ) }</span>
-				<button type="button" aria-expanded={ this.state.opened } className="editor-post-visibility__toggle button-link" onClick={ this.toggleDialog }>
+				<button
+					type="button"
+					aria-expanded={ this.state.opened }
+					className="editor-post-visibility__toggle button-link"
+					onClick={ this.toggleDialog }
+				>
 					{ getVisibilityLabel( visibility ) }
 				</button>
 
