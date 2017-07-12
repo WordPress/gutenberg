@@ -137,7 +137,9 @@ class PostVisibility extends Component {
 									<label
 										htmlFor={ `editor-post-${ value }-${ instanceId }` }
 										className="editor-post-visibility__dialog-label"
-									>{ label }</label>
+									>
+										{ label }
+									</label>
 									{ <p id={ `editor-post-${ value }-${ instanceId }-description` } className="editor-post-visibility__dialog-info">{ info }</p> }
 								</div>
 							) ) }
