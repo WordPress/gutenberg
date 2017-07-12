@@ -81,6 +81,12 @@ function unregister_block_type( $name ) {
 function do_blocks( $content ) {
 	global $wp_registered_blocks;
 
+	if ( ! extension_loaded( 'mbstring' ) ) {
+		// Skip server-side rendering of blocks until WordPress/gutenberg#1611
+		// is properly fixed.
+		return $content;
+	}
+
 	$parser = new Gutenberg_PEG_Parser;
 	$blocks = $parser->parse( $content );
 

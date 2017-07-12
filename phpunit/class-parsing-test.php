@@ -42,6 +42,12 @@ class Parsing_Test extends WP_UnitTestCase {
 	 * @dataProvider parsing_test_filenames
 	 */
 	function test_parser_output( $html_filename, $parsed_json_filename ) {
+		if ( ! extension_loaded( 'mbstring' ) ) {
+			$this->markTestSkipped(
+				'The mbstring PHP extension is not installed.'
+			);
+		}
+
 		$html_path        = self::$fixtures_dir . '/' . $html_filename;
 		$parsed_json_path = self::$fixtures_dir . '/' . $parsed_json_filename;
 

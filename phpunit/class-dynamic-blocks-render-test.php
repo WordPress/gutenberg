@@ -44,6 +44,12 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 	 * @covers do_blocks
 	 */
 	function test_dynamic_block_rendering() {
+		if ( ! extension_loaded( 'mbstring' ) ) {
+			$this->markTestSkipped(
+				'The mbstring PHP extension is not installed.'
+			);
+		}
+
 		$settings = array(
 			'render' => array(
 				$this,
@@ -80,6 +86,12 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 	 * @covers do_blocks
 	 */
 	function test_dynamic_block_rendering_with_content() {
+		if ( ! extension_loaded( 'mbstring' ) ) {
+			$this->markTestSkipped(
+				'The mbstring PHP extension is not installed.'
+			);
+		}
+
 		$settings = array(
 			'render' => array(
 				$this,
