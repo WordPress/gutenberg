@@ -38,6 +38,7 @@ class UrlInput extends Component {
 			<li className="components-url-input">
 				<IconButton
 					icon="admin-links"
+					label={ __( 'Edit Image Link' ) }
 					onClick={ this.toggle }
 					className={ classnames( 'components-toolbar__control', {
 						'is-active': url,
@@ -47,15 +48,25 @@ class UrlInput extends Component {
 					<form
 						className="editable-format-toolbar__link-modal"
 						onSubmit={ this.submitLink }>
-						<IconButton className="components-url-input__back" icon="arrow-left-alt" onClick={ this.toggle } />
+						<IconButton
+							className="components-url-input__back"
+							icon="arrow-left-alt"
+							label={ __( 'Close' ) }
+							onClick={ this.toggle }
+						/>
 						<input
 							className="editable-format-toolbar__link-input"
 							type="url"
 							value={ url }
+							aria-label={ __( 'URL' ) }
 							onChange={ onChange }
 							placeholder={ __( 'Paste URL or type' ) }
 						/>
-						<IconButton icon="editor-break" type="submit" />
+						<IconButton
+							icon="editor-break"
+							label={ __( 'Submit' ) }
+							type="submit"
+						/>
 					</form>
 				}
 			</li>
