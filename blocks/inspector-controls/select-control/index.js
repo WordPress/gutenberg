@@ -28,11 +28,11 @@ function SelectControl( { label, selected, instanceId, onBlur, options = [], ...
 			>
 				{ options.map( ( option ) =>
 					<option
-						key={ option.value }
-						value={ option.value }
-						selected={ option.value === selected }
+						key={ option }
+						value={ option }
+						selected={ option === selected }
 					>
-						{ label }
+						{ option }
 					</option>
 				) }
 			</select>
