@@ -10,26 +10,29 @@
 if ( getenv( 'RUN_SLOW_TESTS' ) ) {
 	class Performance_Test extends WP_UnitTestCase {
 		function test_parse_large_post() {
-			$start = microtime( true );
-			$start_mem = memory_get_usage();
-
 			$html = file_get_contents(
 				dirname( __FILE__ ) . '/fixtures/long-content.html'
 			);
 			$parser = new Gutenberg_PEG_Parser;
+
+			$start = microtime( true );
+			$start_mem = memory_get_usage();
+
 			$parser->parse( $html );
 
 			$time = microtime( true ) - $start;
 			$mem = memory_get_usage() - $start_mem;
 
+			if ( getenv( 'SHOW_PERFORMANCE_INFO' ) ) {
+				error_log( '' );
+				error_log( 'Memory used (KB) : ' . round( $mem / 1024 ) );
+				error_log( 'Time (ms)        : ' . round( $time * 1000 ) );
+			}
+
 			$this->assertLessThanOrEqual(
 				0.3, // Seconds.
 				$time,
-				sprintf(
-					"Parsing 'phpunit/fixtures/long-content.html' took too long. Time: %s (seconds), memory used: %sKB.",
-					( round( $time * 100 ) / 100 ),
-					round( $mem / 1024 )
-				)
+				"Parsing 'phpunit/fixtures/long-content.html' took too long."
 			);
 		}
 	}
