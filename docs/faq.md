@@ -119,14 +119,13 @@ This also <a href="https://github.com/WordPress/gutenberg/issues/1516">gives us 
 In JS:
 
 ```js
-wp.blocks.parse( postContent );
+var blocks = wp.blocks.parse( postContent );
 ```
 
 In PHP:
 
 ```php
-$parser = new Gutenberg_PEG_Parser;
-$blocks = $parser->parse( $post_content );
+$blocks = gutenberg_parse_blocks( $post_content );
 ```
 ## Why should I start using this once released?
 Blocks are likely to become the main way users interact with content. Users are going to be discovering functionality in the new universal inserter tool, with a richer block interface that provides more layout opportunities.

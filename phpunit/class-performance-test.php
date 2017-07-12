@@ -13,12 +13,11 @@ if ( getenv( 'RUN_SLOW_TESTS' ) ) {
 			$html = file_get_contents(
 				dirname( __FILE__ ) . '/fixtures/long-content.html'
 			);
-			$parser = new Gutenberg_PEG_Parser;
 
 			$start = microtime( true );
 			$start_mem = memory_get_usage();
 
-			$parser->parse( $html );
+			$blocks = gutenberg_parse_blocks( $html );
 
 			$time = microtime( true ) - $start;
 			$mem = memory_get_usage() - $start_mem;

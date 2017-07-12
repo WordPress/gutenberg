@@ -70,19 +70,30 @@ function unregister_block_type( $name ) {
 }
 
 /**
- * Renders the dynamic blocks into the post content
+ * Parses blocks out of a content string.
+ *
+ * @since 0.5.0
+ *
+ * @param  string $content Post content.
+ * @return array  Array of parsedblock objects.
+ */
+function gutenberg_parse_blocks( $content ) {
+	$parser = new Gutenberg_PEG_Parser;
+	return $parser->parse( _gutenberg_utf8_split( $content, 100000 ) );
+}
+
+/**
+ * Parses dynamic blocks out of `post_content` and re-renders them.
  *
  * @since 0.1.0
  *
  * @param  string $content Post content.
- *
  * @return string          Updated post content.
  */
 function do_blocks( $content ) {
 	global $wp_registered_blocks;
 
-	$parser = new Gutenberg_PEG_Parser;
-	$blocks = $parser->parse( $content );
+	$blocks = gutenberg_parse_blocks( $content );
 
 	$content_after_blocks = '';
 

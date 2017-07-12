@@ -1622,8 +1622,12 @@ class Gutenberg_PEG_Parser {
     $options = count($arguments) > 1 ? $arguments[1] : array();
     $this->cleanup_state();
 
-    preg_match_all("/./us", $input, $match);
-    $this->input = $match[0];
+    if (is_array($input)) {
+        $this->input = $input;
+    } else {
+        preg_match_all("/./us", $input, $match);
+        $this->input = $match[0];
+    }
     $this->input_length = count($this->input);
 
     $this->peg_FAILED = new stdClass;
