@@ -159,10 +159,8 @@ export default class Sandbox extends wp.element.Component {
 				scrolling="no"
 				sandbox="allow-scripts allow-same-origin allow-presentation"
 				onLoad={ this.trySandbox }
-				style={ {
-					width: this.state.width,
-					height: this.state.height,
-				} } />
+				width={ Math.ceil( this.state.width ) }
+				height={ Math.ceil( this.state.height ) } />
 		);
 	}
 }
