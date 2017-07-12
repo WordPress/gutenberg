@@ -386,7 +386,7 @@ class VisualEditorBlock extends Component {
 									aria-expanded={ true }
 									label={ __( 'Toggle Controls' ) }
 								>
-									<Dashicon icon="admin-settings" />
+									<Dashicon icon="ellipsis" />
 								</IconButton>
 							</Toolbar>
 						</div>
