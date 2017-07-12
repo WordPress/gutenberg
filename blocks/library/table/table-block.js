@@ -89,6 +89,7 @@ export default class TableBlock extends wp.element.Component {
 						<li>
 							<DropdownMenu
 								icon="editor-table"
+								label={ wp.i18n.__( 'Edit Table' ) }
 								controls={
 									TABLE_CONTROLS.map( ( control ) => ( {
 										...control,
