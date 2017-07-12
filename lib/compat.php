@@ -61,7 +61,7 @@ function _gutenberg_utf8_split( $str ) {
 		if ( count( $pieces ) > 1 ) {
 			$str = array_pop( $pieces );
 		} else {
-			$str = null;
+			break;
 		}
 	} while ( $str );
 
