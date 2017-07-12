@@ -79,7 +79,7 @@ function unregister_block_type( $name ) {
  */
 function gutenberg_parse_blocks( $content ) {
 	$parser = new Gutenberg_PEG_Parser;
-	return $parser->parse( _gutenberg_utf8_split( $content, 100000 ) );
+	return $parser->parse( _gutenberg_utf8_split( $content ) );
 }
 
 /**

@@ -17,11 +17,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Based on WordPress' _mb_substr() compat function.
  *
  * @param string $str        The string to split.
- * @param int    $max_length Optional. The maximum number of array elements to
- *                           return. Default 1000.
  * @return array
  */
-function _gutenberg_utf8_split( $str, $max_length = 1000 ) {
+function _gutenberg_utf8_split( $str ) {
 	if ( _wp_can_use_pcre_u() ) {
 		// Use the regex unicode support to separate the UTF-8 characters into
 		// an array.
@@ -48,12 +46,12 @@ function _gutenberg_utf8_split( $str, $max_length = 1000 ) {
 		// in that last round.
 		array_pop( $chars );
 
-		// Split by UTF-8 character, limit to $max_length characters (last
-		// array element will contain the rest of the string).
+		// Split by UTF-8 character, limit to 1000 characters (last array
+		// element will contain the rest of the string).
 		$pieces = preg_split(
 			$regex,
 			$str,
-			$max_length,
+			1000,
 			PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY
 		);
 
