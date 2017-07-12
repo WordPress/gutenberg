@@ -4,6 +4,11 @@
 import { shallow } from 'enzyme';
 
 /**
+ * WordPress dependencies
+ */
+import { Component } from 'element';
+
+/**
  * Internal dependencies
  */
 import BlockIcon from '../';
@@ -32,5 +37,19 @@ describe( 'BlockIcon', () => {
 		const wrapper = shallow( <BlockIcon icon={ <span /> } /> );
 
 		expect( wrapper.name() ).toBe( 'span' );
+	} );
+
+	it( 'renders a component', () => {
+		const wrapper = shallow(
+			<BlockIcon icon={
+				class MyComponent extends Component {
+					render() {
+						return <span />;
+					}
+				}
+			} />
+		);
+
+		expect( wrapper.name() ).toBe( 'MyComponent' );
 	} );
 } );
