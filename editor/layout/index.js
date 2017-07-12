@@ -17,6 +17,7 @@ import Header from '../header';
 import Sidebar from '../sidebar';
 import TextEditor from '../modes/text-editor';
 import VisualEditor from '../modes/visual-editor';
+import UnsavedChangesWarning from '../unsaved-changes-warning';
 import { removeNotice } from '../actions';
 import {
 	getEditorMode,
@@ -32,6 +33,7 @@ function Layout( { mode, isSidebarOpened, notices, ...props } ) {
 	return (
 		<div className={ className }>
 			<NoticeList onRemove={ props.removeNotice } notices={ notices } />
+			<UnsavedChangesWarning />
 			<Header />
 			<div className="editor-layout__content">
 				{ mode === 'text' && <TextEditor /> }

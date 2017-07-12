@@ -13,7 +13,6 @@ import 'moment-timezone/moment-timezone-utils';
 import { parse } from 'blocks';
 import { render } from 'element';
 import { settings } from 'date';
-import { __ } from 'i18n';
 
 /**
  * Internal dependencies
@@ -21,9 +20,6 @@ import { __ } from 'i18n';
 import './assets/stylesheets/main.scss';
 import Layout from './layout';
 import { createReduxStore } from './state';
-import {
-	isEditedPostDirty,
-} from './selectors';
 
 // Configure moment globally
 moment.locale( settings.l10n.locale );
@@ -85,15 +81,6 @@ export function createEditorInstance( id, post ) {
 	const store = createReduxStore();
 
 	preparePostState( store, post );
-
-	const warnDirtyBeforeUnload = ( event ) => {
-		const state = store.getState();
-		if ( isEditedPostDirty( state ) ) {
-			event.returnValue = __( 'You have unsaved changes. If you proceed, they will be lost.' );
-			return event.returnValue;
-		}
-	};
-	window.addEventListener( 'beforeunload', warnDirtyBeforeUnload );
 
 	render(
 		<ReduxProvider store={ store }>
