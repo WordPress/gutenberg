@@ -1,0 +1,18 @@
+ul.components-toolbar > li.components-url-input {
+	position: inherit;	// let the dialog position according to parent
+}
+
+.components-url-input .components-url-input__back {
+	margin-right: 4px;
+	overflow: visible;
+
+	&::after {
+		content: '';
+		position: absolute;
+		display: block;
+		width: 1px;
+		height: 24px;
+		right: -1px;
+		background: $light-gray-500;
+	}
+}

@@ -31,13 +31,29 @@ registerBlockType( 'core/text', {
 		content: query( 'p', children() ),
 	},
 
+	transforms: {
+		from: [
+			{
+				type: 'raw',
+				matcher: ( node ) => (
+					node.nodeName === 'P' &&
+					// Do not allow embedded content.
+					! node.querySelector( 'audio, canvas, embed, iframe, img, math, object, svg, video' )
+				),
+				attributes: {
+					content: query( 'p', children() ),
+				},
+			},
+		],
+	},
+
 	merge( attributes, attributesToMerge ) {
 		return {
 			content: concatChildren( attributes.content, attributesToMerge.content ),
 		};
 	},
 
-	edit( { attributes, setAttributes, insertBlockAfter, focus, setFocus, mergeBlocks } ) {
+	edit( { attributes, setAttributes, insertBlocksAfter, focus, setFocus, mergeBlocks } ) {
 		const { align, content, dropCap } = attributes;
 		const toggleDropCap = () => setAttributes( { dropCap: ! dropCap } );
 		return [
@@ -65,7 +81,6 @@ registerBlockType( 'core/text', {
 				</InspectorControls>
 			),
 			<Editable
-				inline
 				tagName="p"
 				key="editable"
 				value={ content }
@@ -76,11 +91,12 @@ registerBlockType( 'core/text', {
 				} }
 				focus={ focus }
 				onFocus={ setFocus }
-				onSplit={ ( before, after ) => {
+				onSplit={ ( before, after, ...blocks ) => {
 					setAttributes( { content: before } );
-					insertBlockAfter( createBlock( 'core/text', {
-						content: after,
-					} ) );
+					insertBlocksAfter( [
+						...blocks,
+						createBlock( 'core/text', { content: after } ),
+					] );
 				} }
 				onMerge={ mergeBlocks }
 				style={ { textAlign: align } }

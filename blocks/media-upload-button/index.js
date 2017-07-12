@@ -28,12 +28,6 @@ class MediaUploadButton extends Component {
 		this.frame.on( 'open', this.onOpen );
 	}
 
-	componentDidMount() {
-		if ( !! this.props.autoOpen ) {
-			setTimeout( () => this.frame.open() );
-		}
-	}
-
 	componentWillUnmount() {
 		this.frame.remove();
 	}

@@ -88,7 +88,6 @@ registerBlockType( 'core/cover-image', {
 						buttonProps={ uploadButtonProps }
 						onSelect={ onSelectImage }
 						type="image"
-						autoOpen
 					>
 						{ __( 'Insert from Media Library' ) }
 					</MediaUploadButton>
@@ -135,7 +134,6 @@ registerBlockType( 'core/cover-image', {
 							focus={ focus }
 							onFocus={ setFocus }
 							onChange={ ( value ) => setAttributes( { title: value } ) }
-							inline
 							inlineToolbar
 						/>
 					) : null }

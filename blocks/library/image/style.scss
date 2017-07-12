@@ -6,3 +6,10 @@
 		width: 100%;
 	}
 }
+
+.editor-visual-editor__block[data-type="core/image"] {
+	.editable-format-toolbar__link-modal {
+		top: 0;
+		left: 0;
+	}
+}

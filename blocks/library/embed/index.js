@@ -189,7 +189,6 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 								focus={ focus }
 								onFocus={ setFocus }
 								onChange={ ( value ) => setAttributes( { caption: value } ) }
-								inline
 								inlineToolbar
 							/>
 						) : null }
@@ -199,15 +198,12 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 		},
 
 		save( { attributes } ) {
-			const { url, caption, align } = attributes;
-			if ( ! caption || ! caption.length ) {
-				return url;
-			}
+			const { url, caption = [], align } = attributes;
 
 			return (
-				<figure className={ align && `align${ align }` }>{ '\n' }
-					{ url }
-					<figcaption>{ caption }</figcaption>
+				<figure className={ align && `align${ align }` }>
+					{ `\n${ url }\n` /* URL needs to be on its own line. */ }
+					{ caption.length > 0 && <figcaption>{ caption }</figcaption> }
 				</figure>
 			);
 		},

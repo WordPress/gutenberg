@@ -69,6 +69,14 @@ registerBlockType( 'core/heading', {
 					} );
 				},
 			},
+			{
+				type: 'raw',
+				matcher: ( node ) => /H\d/.test( node.nodeName ),
+				attributes: {
+					content: children( 'h1,h2,h3,h4,h5,h6' ),
+					nodeName: prop( 'h1,h2,h3,h4,h5,h6', 'nodeName' ),
+				},
+			},
 		],
 		to: [
 			{
@@ -89,7 +97,7 @@ registerBlockType( 'core/heading', {
 		};
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, insertBlockAfter } ) {
+	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, insertBlocksAfter } ) {
 		const { align, content, nodeName = 'H2' } = attributes;
 
 		return [
@@ -142,12 +150,12 @@ registerBlockType( 'core/heading', {
 				onFocus={ setFocus }
 				onChange={ ( value ) => setAttributes( { content: value } ) }
 				onMerge={ mergeBlocks }
-				inline
-				onSplit={ ( before, after ) => {
+				onSplit={ ( before, after, ...blocks ) => {
 					setAttributes( { content: before } );
-					insertBlockAfter( createBlock( 'core/text', {
-						content: after,
-					} ) );
+					insertBlocksAfter( [
+						...blocks,
+						createBlock( 'core/text', { content: after } ),
+					] );
 				} }
 				style={ { textAlign: align } }
 				placeholder={ __( 'Write heading…' ) }

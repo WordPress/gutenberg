@@ -4,7 +4,7 @@
         "attrs": {
             "url": "https://wordpress.tv/"
         },
-        "rawContent": "\n<figure class=\"wp-block-core-embed-wordpress-tv\">\n    https://wordpress.tv/\n    <figcaption>Embedded content from wordpress-tv</figcaption>\n</figure>\n"
+        "rawContent": "\n<figure class=\"wp-block-embed-wordpress-tv\">\n    https://wordpress.tv/\n    <figcaption>Embedded content from wordpress-tv</figcaption>\n</figure>\n"
     },
     {
         "attrs": {},

@@ -1,8 +1,6 @@
 /**
  * External dependencies
  */
-import { expect } from 'chai';
-import sinon from 'sinon';
 import { noop } from 'lodash';
 
 /**
@@ -38,11 +36,11 @@ describe( 'effects', () => {
 				uid: 'ribs',
 				name: 'core/test-block',
 			};
-			const dispatch = sinon.spy();
+			const dispatch = jest.fn();
 			handler( mergeBlocks( blockA, blockB ), { dispatch } );
 
-			expect( dispatch ).to.have.been.calledOnce();
-			expect( dispatch ).to.have.been.calledWith( focusBlock( 'chicken' ) );
+			expect( dispatch ).toHaveBeenCalledTimes( 1 );
+			expect( dispatch ).toHaveBeenCalledWith( focusBlock( 'chicken' ) );
 		} );
 
 		it( 'should merge the blocks if blocks of the same type', () => {
@@ -64,12 +62,12 @@ describe( 'effects', () => {
 				name: 'core/test-block',
 				attributes: { content: 'ribs' },
 			};
-			const dispatch = sinon.spy();
+			const dispatch = jest.fn();
 			handler( mergeBlocks( blockA, blockB ), { dispatch } );
 
-			expect( dispatch ).to.have.been.calledTwice();
-			expect( dispatch ).to.have.been.calledWith( focusBlock( 'chicken', { offset: -1 } ) );
-			expect( dispatch ).to.have.been.calledWith( replaceBlocks( [ 'chicken', 'ribs' ], [ {
+			expect( dispatch ).toHaveBeenCalledTimes( 2 );
+			expect( dispatch ).toHaveBeenCalledWith( focusBlock( 'chicken', { offset: -1 } ) );
+			expect( dispatch ).toHaveBeenCalledWith( replaceBlocks( [ 'chicken', 'ribs' ], [ {
 				uid: 'chicken',
 				name: 'core/test-block',
 				attributes: { content: 'chicken ribs' },
@@ -96,10 +94,10 @@ describe( 'effects', () => {
 				name: 'core/test-block2',
 				attributes: { content: 'ribs' },
 			};
-			const dispatch = sinon.spy();
+			const dispatch = jest.fn();
 			handler( mergeBlocks( blockA, blockB ), { dispatch } );
 
-			expect( dispatch ).to.not.have.been.called();
+			expect( dispatch ).not.toHaveBeenCalled();
 		} );
 
 		it( 'should transform and merge the blocks', () => {
@@ -135,12 +133,12 @@ describe( 'effects', () => {
 				name: 'core/test-block-2',
 				attributes: { content2: 'ribs' },
 			};
-			const dispatch = sinon.spy();
+			const dispatch = jest.fn();
 			handler( mergeBlocks( blockA, blockB ), { dispatch } );
 
-			expect( dispatch ).to.have.been.calledTwice();
-			expect( dispatch ).to.have.been.calledWith( focusBlock( 'chicken', { offset: -1 } ) );
-			expect( dispatch ).to.have.been.calledWith( replaceBlocks( [ 'chicken', 'ribs' ], [ {
+			expect( dispatch ).toHaveBeenCalledTimes( 2 );
+			expect( dispatch ).toHaveBeenCalledWith( focusBlock( 'chicken', { offset: -1 } ) );
+			expect( dispatch ).toHaveBeenCalledWith( replaceBlocks( [ 'chicken', 'ribs' ], [ {
 				uid: 'chicken',
 				name: 'core/test-block',
 				attributes: { content: 'chicken ribs' },

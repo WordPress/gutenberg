@@ -20,7 +20,7 @@
 		cursor: pointer;
 		box-shadow: none;
 		padding-right: 0;
-		font-size: 13px;
+		font-size: $default-font-size;
 		height: auto;
 
 		@include break-small {
