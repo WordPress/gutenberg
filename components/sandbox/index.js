@@ -78,13 +78,11 @@ export default class Sandbox extends wp.element.Component {
 				}
 
 				function sendResize() {
-					var clientBoundingRect, computedStyle;
-					clientBoundingRect = document.body.getBoundingClientRect();
-					computedStyle = getComputedStyle( document.body );
+					var clientBoundingRect = document.body.getBoundingClientRect();
 					window.parent.postMessage( {
 						action: 'resize',
-						width: clientBoundingRect.width + parseFloat( computedStyle.marginLeft ) + parseFloat( computedStyle.marginRight ),
-						height: clientBoundingRect.height + parseFloat( computedStyle.marginTop ) + parseFloat( computedStyle.marginBottom )
+						width: clientBoundingRect.width,
+						height: clientBoundingRect.height
 					}, '*' );
 				}
 
@@ -129,7 +127,7 @@ export default class Sandbox extends wp.element.Component {
 				<head>
 					<title>{ this.props.title }</title>
 				</head>
-				<body data-resizable-iframe-connected="data-resizable-iframe-connected">
+				<body data-resizable-iframe-connected="data-resizable-iframe-connected" style={ { margin: 0 } }>
 					<div dangerouslySetInnerHTML={ { __html: this.props.html } } />
 					<script type="text/javascript" dangerouslySetInnerHTML={ { __html: observeAndResizeJS } } />
 				</body>
