@@ -73,15 +73,16 @@ export default class Sandbox extends wp.element.Component {
 			( function() {
 				var observer;
 
-				if ( ! window.MutationObserver || ! document.body || ! window.top ) {
+				if ( ! window.MutationObserver || ! document.body || ! window.parent ) {
 					return;
 				}
 
 				function sendResize() {
-					window.top.postMessage( {
+					var clientBoundingRect = document.body.getBoundingClientRect();
+					window.parent.postMessage( {
 						action: 'resize',
-						width: document.body.offsetWidth,
-						height: document.body.offsetHeight
+						width: clientBoundingRect.width,
+						height: clientBoundingRect.height
 					}, '*' );
 				}
 
@@ -126,7 +127,7 @@ export default class Sandbox extends wp.element.Component {
 				<head>
 					<title>{ this.props.title }</title>
 				</head>
-				<body data-resizable-iframe-connected="data-resizable-iframe-connected">
+				<body data-resizable-iframe-connected="data-resizable-iframe-connected" style={ { margin: 0 } }>
 					<div dangerouslySetInnerHTML={ { __html: this.props.html } } />
 					<script type="text/javascript" dangerouslySetInnerHTML={ { __html: observeAndResizeJS } } />
 				</body>
@@ -156,8 +157,8 @@ export default class Sandbox extends wp.element.Component {
 				scrolling="no"
 				sandbox="allow-scripts allow-same-origin allow-presentation"
 				onLoad={ this.trySandbox }
-				width={ this.state.width }
-				height={ this.state.height } />
+				width={ Math.ceil( this.state.width ) }
+				height={ Math.ceil( this.state.height ) } />
 		);
 	}
 }
