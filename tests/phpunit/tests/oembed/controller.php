@@ -10,6 +10,7 @@ class Test_oEmbed_Controller extends WP_UnitTestCase {
 	 */
 	protected $server;
 	protected static $editor;
+	protected static $administrator;
 	protected static $subscriber;
 	const YOUTUBE_VIDEO_ID = 'OQSNhk5ICTI';
 	const INVALID_OEMBED_URL = 'https://www.notreallyanoembedprovider.com/watch?v=awesome-cat-video';
@@ -21,6 +22,10 @@ class Test_oEmbed_Controller extends WP_UnitTestCase {
 		self::$editor = $factory->user->create( array(
 			'role'       => 'editor',
 			'user_email' => 'editor@example.com',
+		) );
+		self::$administrator = $factory->user->create( array(
+			'role'       => 'administrator',
+			'user_email' => 'administrator@example.com',
 		) );
 	}
 
@@ -477,14 +482,22 @@ class Test_oEmbed_Controller extends WP_UnitTestCase {
 
 	public function test_proxy_with_valid_oembed_provider() {
 		wp_set_current_user( self::$editor );
-
 		$request = new WP_REST_Request( 'GET', '/oembed/1.0/proxy' );
 		$request->set_param( 'url', 'https://www.youtube.com/watch?v=' . self::YOUTUBE_VIDEO_ID );
+		$request->set_param( '_wpnonce', wp_create_nonce( 'wp_rest' ) );
 		$response = $this->server->dispatch( $request );
 		$this->assertEquals( 200, $response->get_status() );
 		$this->assertEquals( 1, $this->request_count );
 
 		// Subsequent request is cached and so it should not cause a request.
+		$this->server->dispatch( $request );
+		$this->assertEquals( 1, $this->request_count );
+
+		// Rest with another user should also be cached.
+		wp_set_current_user( self::$administrator );
+		$request = new WP_REST_Request( 'GET', '/oembed/1.0/proxy' );
+		$request->set_param( 'url', 'https://www.youtube.com/watch?v=' . self::YOUTUBE_VIDEO_ID );
+		$request->set_param( '_wpnonce', wp_create_nonce( 'wp_rest' ) );
 		$response = $this->server->dispatch( $request );
 		$this->assertEquals( 1, $this->request_count );
 
