@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import './style.scss';
 import IconButton from '../icon-button';
 
-function Toolbar( { controls = [], children, className = '' } ) {
+function Toolbar( { controls = [], children, className } ) {
 	if (
 		( ! controls || ! controls.length ) &&
 		! children

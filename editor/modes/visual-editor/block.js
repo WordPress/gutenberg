@@ -11,7 +11,7 @@ import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
  * WordPress dependencies
  */
 import { Children, Component } from 'element';
-import { Dashicon, IconButton, Toolbar } from 'components';
+import { IconButton, Toolbar } from 'components';
 import { BACKSPACE, ESCAPE, DELETE, UP, DOWN, LEFT, RIGHT } from 'utils/keycodes';
 import { getBlockType, getBlockDefaultClassname } from 'blocks';
 import { __, sprintf } from 'i18n';
@@ -330,11 +330,12 @@ class VisualEditorBlock extends Component {
 		// Generate the wrapper class names handling the different states of the block.
 		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected, isTyping, focus } = this.props;
 		const showUI = isSelected && ( ! isTyping || ! focus.collapsed );
+		const { showMobileControls } = this.state;
 		const wrapperClassname = classnames( 'editor-visual-editor__block', {
 			'is-selected': showUI,
 			'is-multi-selected': isMultiSelected,
 			'is-hovered': isHovered,
-			'is-showing-mobile-controls': this.state.showMobileControls,
+			'is-showing-mobile-controls': showMobileControls,
 		} );
 
 		const { onMouseLeave, onFocus, onInsertBlocksAfter } = this.props;
@@ -382,12 +383,10 @@ class VisualEditorBlock extends Component {
 								<IconButton
 									className="editor-visual-editor__mobile-toggle"
 									onClick={ this.toggleMobileControls }
-									aria-label={ __( 'Toggle extra block controls' ) }
-									aria-expanded={ true }
-									label={ __( 'Toggle Controls' ) }
-								>
-									<Dashicon icon="ellipsis" />
-								</IconButton>
+									aria-expanded={ showMobileControls }
+									label={ __( 'Toggle extra controls' ) }
+									icon="ellipsis"
+								/>
 							</Toolbar>
 						</div>
 					</CSSTransitionGroup>

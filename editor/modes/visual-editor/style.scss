@@ -66,13 +66,18 @@
 	}
 
 	&.is-showing-mobile-controls {
-		.editor-visual-editor__block-controls > div {
+		.editor-visual-editor__block-controls > :not( .editor-visual-editor__mobile-tools ) {
 			display: none;
 		}
 		.editor-visual-editor__mobile-tools {
 			align-items: baseline;
 			display: flex;
 			width: 100%;
+
+			@include break-small {
+				display: none;
+			}
+
 			.editor-block-mover,
 			.editor-block-settings-menu {
 				display: block;
@@ -82,8 +87,8 @@
 					margin: 0 5px;
 				}
 			}
+
 			.editor-block-settings-menu {
-				z-index: 99;
 				left: 80px;
 				right: auto;
 			}
