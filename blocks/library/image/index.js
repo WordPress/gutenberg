@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from 'i18n';
@@ -118,6 +123,9 @@ registerBlockType( 'core/image', {
 		}
 
 		const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
+		const classes = classnames( className, {
+			'is-transient': 0 === url.indexOf( 'blob:' ),
+		} );
 
 		// Disable reason: Each block can be selected by clicking on it
 
@@ -133,7 +141,7 @@ registerBlockType( 'core/image', {
 					<TextControl label={ __( 'Alternate Text' ) } value={ alt } onChange={ updateAlt } />
 				</InspectorControls>
 			),
-			<figure key="image" className={ className }>
+			<figure key="image" className={ classes }>
 				<img src={ url } alt={ alt } onClick={ setFocus } />
 				{ ( caption && caption.length > 0 ) || !! focus ? (
 					<Editable

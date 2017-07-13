@@ -5,6 +5,10 @@
 		display: block;
 		width: 100%;
 	}
+
+	&.is-transient img {
+		@include loading_fade;
+	}
 }
 
 .editor-visual-editor__block[data-type="core/image"] {
