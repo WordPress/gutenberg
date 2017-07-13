@@ -542,7 +542,7 @@ describe( 'state', () => {
 		} );
 
 		describe( 'blocksByUid', () => {
-			it( 'should return with block updates', () => {
+			it( 'should return with attribute block updates', () => {
 				const original = editor( undefined, {
 					type: 'RESET_BLOCKS',
 					blocks: [ {
@@ -551,12 +551,10 @@ describe( 'state', () => {
 					} ],
 				} );
 				const state = editor( original, {
-					type: 'UPDATE_BLOCK',
+					type: 'UPDATE_BLOCK_ATTRIBUTES',
 					uid: 'kumquat',
-					updates: {
-						attributes: {
-							updated: true,
-						},
+					attributes: {
+						updated: true,
 					},
 				} );
 
@@ -569,12 +567,10 @@ describe( 'state', () => {
 					blocks: [],
 				} );
 				const state = editor( original, {
-					type: 'UPDATE_BLOCK',
+					type: 'UPDATE_BLOCK_ATTRIBUTES',
 					uid: 'kumquat',
-					updates: {
-						attributes: {
-							updated: true,
-						},
+					attributes: {
+						updated: true,
 					},
 				} );
 
@@ -592,12 +588,10 @@ describe( 'state', () => {
 					} ],
 				} );
 				const state = editor( original, {
-					type: 'UPDATE_BLOCK',
+					type: 'UPDATE_BLOCK_ATTRIBUTES',
 					uid: 'kumquat',
-					updates: {
-						attributes: {
-							updated: true,
-						},
+					attributes: {
+						updated: true,
 					},
 				} );
 
