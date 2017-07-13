@@ -429,7 +429,9 @@ export default connect(
 		};
 	},
 	( dispatch, ownProps ) => ( {
-		onChange: updateBlockAttributes,
+		onChange( uid, attributes ) {
+			dispatch( updateBlockAttributes( uid, attributes ) );
+		},
 
 		onSelect() {
 			dispatch( {
