@@ -18,6 +18,7 @@ if ( gutenberg_can_init() ) {
 	// Load API functions, register scripts and actions, etc.
 	require_once dirname( __FILE__ ) . '/lib/blocks.php';
 	require_once dirname( __FILE__ ) . '/lib/client-assets.php';
+	require_once dirname( __FILE__ ) . '/lib/compat.php';
 	require_once dirname( __FILE__ ) . '/lib/i18n.php';
 	require_once dirname( __FILE__ ) . '/lib/parser.php';
 	require_once dirname( __FILE__ ) . '/lib/register.php';

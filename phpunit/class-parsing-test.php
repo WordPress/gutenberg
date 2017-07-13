@@ -42,12 +42,6 @@ class Parsing_Test extends WP_UnitTestCase {
 	 * @dataProvider parsing_test_filenames
 	 */
 	function test_parser_output( $html_filename, $parsed_json_filename ) {
-		if ( ! extension_loaded( 'mbstring' ) ) {
-			$this->markTestSkipped(
-				'The mbstring PHP extension is not installed.'
-			);
-		}
-
 		$html_path        = self::$fixtures_dir . '/' . $html_filename;
 		$parsed_json_path = self::$fixtures_dir . '/' . $parsed_json_filename;
 
@@ -60,8 +54,7 @@ class Parsing_Test extends WP_UnitTestCase {
 		$html            = file_get_contents( $html_path );
 		$expected_parsed = json_decode( file_get_contents( $parsed_json_path ), true );
 
-		$parser = new Gutenberg_PEG_Parser;
-		$result = $parser->parse( $html );
+		$result = gutenberg_parse_blocks( $html );
 
 		$this->assertEquals(
 			$expected_parsed,
