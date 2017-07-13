@@ -75,7 +75,7 @@ function unregister_block_type( $name ) {
  * @since 0.5.0
  *
  * @param  string $content Post content.
- * @return array  Array of parsedblock objects.
+ * @return array  Array of parsed block objects.
  */
 function gutenberg_parse_blocks( $content ) {
 	$parser = new Gutenberg_PEG_Parser;
