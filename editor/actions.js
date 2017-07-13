@@ -166,6 +166,6 @@ export function removeNotice( id ) {
 	};
 }
 
-export const successNotice = partial( createNotice, 'success' );
-export const errorNotice = partial( createNotice, 'error' );
-export const warningNotice = partial( createNotice, 'warning' );
+export const createSuccessNotice = partial( createNotice, 'success' );
+export const createErrorNotice = partial( createNotice, 'error' );
+export const createWarningNotice = partial( createNotice, 'warning' );
