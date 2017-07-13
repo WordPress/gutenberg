@@ -16,7 +16,6 @@ import { CHAR_A } from 'utils/keycodes';
  */
 import './style.scss';
 import VisualEditorBlockList from './block-list';
-import MediaDropZone from '../../media-drop-zone';
 import PostTitle from '../../post-title';
 import { getBlockUids } from '../../selectors';
 import { clearSelectedBlock, multiSelect } from '../../actions';
@@ -78,7 +77,6 @@ class VisualEditor extends Component {
 				onKeyDown={ this.onKeyDown }
 				ref={ this.bindContainer }
 			>
-				<MediaDropZone />
 				<PostTitle />
 				<VisualEditorBlockList ref={ this.bindBlocksContainer } />
 			</div>
