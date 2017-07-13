@@ -14,6 +14,7 @@ import { Panel, PanelBody } from 'components';
  * Internal Dependencies
  */
 import './style.scss';
+import BlockInspectorClassName from './class-name';
 import { getSelectedBlock } from '../../selectors';
 
 const BlockInspector = ( { selectedBlock } ) => {
@@ -24,6 +25,7 @@ const BlockInspector = ( { selectedBlock } ) => {
 	return (
 		<Panel>
 			<PanelBody>
+				<BlockInspectorClassName />
 				<Slot name="Inspector.Controls" />
 			</PanelBody>
 		</Panel>

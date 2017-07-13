@@ -56,7 +56,12 @@ export function getSaveContent( blockType, attributes ) {
 			return element;
 		}
 
-		const updatedClassName = classnames( className, element.props.className );
+		const updatedClassName = classnames(
+			className,
+			element.props.className,
+			attributes.className
+		);
+
 		return cloneElement( element, { className: updatedClassName } );
 	};
 	const contentWithClassname = Children.map( rawContent, addClassnameToElement );

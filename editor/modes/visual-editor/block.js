@@ -403,7 +403,7 @@ class VisualEditorBlock extends Component {
 						insertBlocksAfter={ onInsertBlocksAfter }
 						setFocus={ partial( onFocus, block.uid ) }
 						mergeBlocks={ this.mergeBlocks }
-						className={ className }
+						className={ classnames( className, block.attributes.className ) }
 						id={ block.uid }
 					/>
 				</div>
