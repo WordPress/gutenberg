@@ -148,13 +148,6 @@ export default {
 						message: __( 'An unknown error occurred.' ),
 					} ),
 				} );
-				let message;
-				if ( err.responseJSON && err.responseJSON.message ) {
-					message = err.responseJSON.message;
-				} else {
-					message = __( 'Trashing failed' );
-				}
-				dispatch( errorNotice( message ) );
 			}
 		);
 	},
@@ -165,6 +158,10 @@ export default {
 			post_type: postType,
 			ids: postId,
 		} );
+	},
+	TRASH_POST_FAILURE( action, store ) {
+		const message = action.error.message && action.error.code !== 'unknown_error' ? action.error.message : __( 'Trashing failed' );
+		store.dispatch( errorNotice( message ) );
 	},
 	MERGE_BLOCKS( action, store ) {
 		const { dispatch } = store;
