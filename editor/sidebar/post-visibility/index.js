@@ -9,8 +9,9 @@ import { find } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, findDOMNode } from '@wordpress/element';
 import { PanelRow, Popover, withInstanceId } from '@wordpress/components';
+import { keycodes } from '@wordpress/utils';
 
 /**
  * Internal Dependencies
@@ -22,6 +23,8 @@ import {
 } from '../../selectors';
 import { editPost, savePost } from '../../actions';
 
+const { ESCAPE } = keycodes;
+
 class PostVisibility extends Component {
 	constructor( props ) {
 		super( ...arguments );
@@ -30,6 +33,8 @@ class PostVisibility extends Component {
 		this.setPublic = this.setPublic.bind( this );
 		this.setPrivate = this.setPrivate.bind( this );
 		this.setPasswordProtected = this.setPasswordProtected.bind( this );
+		this.handleKeyDown = this.handleKeyDown.bind( this );
+		this.handleBlur = this.handleBlur.bind( this );
 
 		this.state = {
 			opened: false,
@@ -71,6 +76,45 @@ class PostVisibility extends Component {
 		this.setState( { opened: false } );
 	}
 
+	handleBlur( event ) {
+		if ( this.state.opened && event.relatedTarget !== null ) {
+			const wrapper = findDOMNode( this );
+			const toggle = wrapper.querySelector( '.editor-post-visibility__toggle' );
+			const dialog = wrapper.querySelector( '.editor-post-visibility__dialog' );
+
+			if ( ! dialog.contains( event.relatedTarget ) ) {
+				this.setState( { opened: false } );
+				toggle.focus();
+			}
+		}
+	}
+
+	handleKeyDown( event ) {
+		if ( this.state.opened && event.keyCode === ESCAPE ) {
+			const wrapper = findDOMNode( this );
+			const toggle = wrapper.querySelector( '.editor-post-visibility__toggle' );
+
+			if ( event.target === toggle ) {
+				return;
+			}
+
+			event.preventDefault();
+			event.stopPropagation();
+			this.setState( { opened: false } );
+			toggle.focus();
+		}
+	}
+
+	componentDidMount() {
+		const node = findDOMNode( this );
+		node.addEventListener( 'keydown', this.handleKeyDown, false );
+	}
+
+	componentWillUnmount() {
+		const node = findDOMNode( this );
+		node.removeEventListener( 'keydown', this.handleKeyDown, false );
+	}
+
 	render() {
 		const { status, visibility, password, onUpdateVisibility, instanceId } = this.props;
 
@@ -101,8 +145,6 @@ class PostVisibility extends Component {
 		];
 		const getVisibilityLabel = () => find( visibilityOptions, { value: visibility } ).label;
 
-		// Disable Reason: The input is inside the label, we shouldn't need the htmlFor
-		/* eslint-disable jsx-a11y/label-has-for */
 		return (
 			<PanelRow className="editor-post-visibility">
 				<span>{ __( 'Visibility' ) }</span>
@@ -167,7 +209,6 @@ class PostVisibility extends Component {
 				</span>
 			</PanelRow>
 		);
-		/* eslint-enable jsx-a11y/label-has-for */
 	}
 }
 
