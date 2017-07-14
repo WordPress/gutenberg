@@ -20,7 +20,7 @@ const TableOfContents = ( { blocks } ) => {
 	const headings = filter( blocks, ( block ) => block.name === 'core/heading' );
 
 	return (
-		<PanelBody title={ __( 'Table of Contents (experimental)' ) } initialOpen={ false }>
+		<PanelBody title={ __( 'Table of Content (experimental)' ) } initialOpen={ false }>
 			<div className="table-of-content__items">
 				{ headings.length > 1 && <p><strong>{ sprintf( '%d Headings', headings.length ) }</strong></p> }
 				{ headings.map( ( heading, index ) =>
