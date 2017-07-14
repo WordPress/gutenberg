@@ -607,6 +607,97 @@ module.exports = function(grunt) {
 				dest: '.'
 			}
 		},
+		replace: {
+			emojiRegex: {
+				options: {
+					patterns: [
+						{
+							match: /\/\/ START: emoji regex[\S\s]*\/\/ END: emoji regex/g,
+							replacement: function () {
+								var twemoji = grunt.file.read( SOURCE_DIR + 'wp-includes/js/twemoji.js' ),
+									found = twemoji.match( /re = \/(.*)\/g,/ ),
+									emojiRegex = found[1],
+									regex = '',
+									entities = '';
+
+								/*
+								 * Twemoji does some nifty regex optimisations, splitting up surrogate pairs unit, searching by
+								 * ranges of individual units, and compressing sets of individual units. This is super useful for
+								 * reducing the size of the regex.
+								 *
+								 * Unfortunately, PCRE doesn't allow regexes to search for individual units, so we can't just
+								 * blindly copy the Twemoji regex.
+								 *
+								 * The good news is, we don't have to worry about size restrictions, so we can just unravel the
+								 * entire regex, and convert it to a PCRE-friendly format.
+								 */
+
+								// Convert ranges: "\udc68-\udc6a" becomes "\udc68\udc69\udc6a".
+								emojiRegex = emojiRegex.replace( /(\\u\w{4})\-(\\u\w{4})/g, function ( match, first, last ) {
+									var start = parseInt( first.substr( 2 ), 16 );
+									var end = parseInt( last.substr( 2 ), 16 );
+
+									var replace = '';
+
+									for( var counter = start; counter <= end; counter++ ) {
+										replace += '\\u' + counter.toString( 16 );
+									}
+
+									return replace;
+								} );
+
+								// Convert sets: "\u200d[\u2640\u2642]\ufe0f" becomes "\u200d\u2640\ufe0f|\u200d\u2642\ufe0f".
+								emojiRegex = emojiRegex.replace( /((?:\\u\w{4})*)\[((?:\\u\w{4})+)\]((?:\\u\w{4})*)/g, function ( match, before, middle, after ) {
+									//return params[1].split( '\\u' ).join( '|' + params[0] + '\\u' ).substr( 1 );
+									if ( ! before && ! after ) {
+										return match;
+									}
+									var set = middle.match( /.{1,6}/g );
+
+									return before + set.join( after + '|' + before ) + after;
+								} );
+
+								// Convert surrogate pairs to their equivalent unicode scalar: "\ud83d\udc68" becomes "\u1f468".
+								emojiRegex = emojiRegex.replace( /(\\ud[89a-f][0-9a-f]{2})(\\ud[89a-f][0-9a-f]{2})/g, function ( match, first, second ) {
+									var high = parseInt( first.substr( 2 ), 16 );
+									var low = parseInt( second.substr( 2 ), 16 );
+
+									var scalar = ( ( high - 0xD800 ) * 0x400 ) + ( low - 0xDC00 ) + 0x10000;
+
+									return '\\u' + scalar.toString( 16 );
+								} );
+
+								// Convert JavaScript-style code points to PHP-style: "\u1f468" becomes "\x{1f468}".
+								emojiRegex = emojiRegex.replace( /\\u(\w+)/g, '\\x{$1}' );
+
+								// Convert PHP-style code points to HTML entities: "\x{1f468}" becomes "&#x1f468;".
+								entities = emojiRegex.replace( /\\x{(\w+)}/g, '&#x$1;' );
+								entities = entities.replace( /\[([^\]]+)\]/g, function( match, codepoint ) {
+									return '(?:' + codepoint.replace( /;&/g, ';|&' ) + ')';
+								} );
+
+								regex += '// START: emoji regex\n';
+								regex += '\t$codepoints = \'/(' + emojiRegex + ')/u\';\n';
+								regex += '\t$entities = \'/(' + entities + ')/u\';\n';
+								regex += '\t// END: emoji regex';
+
+								return regex;
+							}
+						}
+					]
+				},
+				files: [
+					{
+						expand: true,
+						flatten: true,
+						src: [
+							SOURCE_DIR + 'wp-includes/formatting.php'
+						],
+						dest: SOURCE_DIR + 'wp-includes/'
+					}
+				]
+			}
+		},
 		_watch: {
 			all: {
 				files: [
@@ -718,6 +809,10 @@ module.exports = function(grunt) {
 		'phpunit'
 	] );
 
+	grunt.registerTask( 'precommit:emoji', [
+		'replace:emojiRegex'
+	] );
+
 	grunt.registerTask( 'precommit', 'Runs test and build tasks in preparation for a commit', function() {
 		var done = this.async();
 		var map = {
@@ -783,6 +878,11 @@ module.exports = function(grunt) {
 							taskList.push( 'precommit:' + extension );
 						}
 					} );
+
+					if ( [ 'twemoji.js' ].some( testPath ) ) {
+						grunt.log.writeln( 'twemoji.js has updated. Running `precommit:emoji.' );
+						taskList.push( 'precommit:emoji' );
+					}
 				}
 
 				grunt.task.run( taskList );
