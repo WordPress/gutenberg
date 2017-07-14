@@ -98,7 +98,7 @@ registerBlockType( 'core/heading', {
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, insertBlocksAfter } ) {
-		const { align, content, nodeName = 'H2' } = attributes;
+		const { align, content, nodeName = 'H2', placeholder } = attributes;
 
 		return [
 			focus && (
@@ -158,7 +158,7 @@ registerBlockType( 'core/heading', {
 					] );
 				} }
 				style={ { textAlign: align } }
-				placeholder={ __( 'Write heading…' ) }
+				placeholder={ placeholder || __( 'Write heading…' ) }
 			/>,
 		];
 	},
