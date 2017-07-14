@@ -661,6 +661,82 @@ class Tests_Multisite_Site_Query extends WP_UnitTestCase {
 
 		$this->assertEqualSets( $expected, $found );
 	}
+
+	/**
+	 * @ticket 41197
+	 */
+	public function test_wp_site_query_cache_with_different_fields_no_count() {
+		global $wpdb;
+		$q                 = new WP_Site_Query();
+		$query_1           = $q->query( array(
+			'fields'     => 'all',
+			'network_id' => self::$network_ids['wordpress.org/'],
+			'number'     => 3,
+			'order'      => 'ASC',
+		) );
+		$number_of_queries = $wpdb->num_queries;
+
+		$query_2 = $q->query( array(
+			'fields'     => 'ids',
+			'network_id' => self::$network_ids['wordpress.org/'],
+			'number'     => 3,
+			'order'      => 'ASC',
+		) );
+
+		$this->assertEquals( $number_of_queries, $wpdb->num_queries );
+	}
+
+	/**
+	 * @ticket 41197
+	 */
+	public function test_wp_site_query_cache_with_different_fields_active_count() {
+		global $wpdb;
+		$q                 = new WP_Site_Query();
+
+		$query_1 = $q->query( array(
+			'fields'     => 'all',
+			'network_id' => self::$network_ids['wordpress.org/'],
+			'number'     => 3,
+			'order'      => 'ASC',
+			'count'      => true,
+		) );
+		$number_of_queries = $wpdb->num_queries;
+
+		$query_2 = $q->query( array(
+			'fields'     => 'ids',
+			'network_id' => self::$network_ids['wordpress.org/'],
+			'number'     => 3,
+			'order'      => 'ASC',
+			'count'      => true,
+		) );
+		$this->assertEquals( $number_of_queries, $wpdb->num_queries );
+	}
+
+	/**
+	 * @ticket 41197
+	 */
+	public function test_wp_site_query_cache_with_same_fields_different_count() {
+		global $wpdb;
+		$q = new WP_Site_Query();
+
+		$query_1 = $q->query( array(
+			'fields'     => 'ids',
+			'network_id' => self::$network_ids['wordpress.org/'],
+			'number'     => 3,
+			'order'      => 'ASC',
+		) );
+
+		$number_of_queries = $wpdb->num_queries;
+
+		$query_2 = $q->query( array(
+			'fields'     => 'ids',
+			'network_id' => self::$network_ids['wordpress.org/'],
+			'number'     => 3,
+			'order'      => 'ASC',
+			'count'      => true,
+		) );
+		$this->assertEquals( $number_of_queries + 1, $wpdb->num_queries );
+	}
 }
 
 endif;
