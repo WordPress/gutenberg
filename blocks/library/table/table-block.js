@@ -1,6 +1,7 @@
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import { Toolbar, DropdownMenu } from 'components';
+import { __ } from 'i18n';
 
 function execCommand( command ) {
 	return ( editor ) => {
@@ -13,32 +14,32 @@ function execCommand( command ) {
 const TABLE_CONTROLS = [
 	{
 		icon: 'table-row-before',
-		title: wp.i18n.__( 'Insert Row Before' ),
+		title: __( 'Insert Row Before' ),
 		onClick: execCommand( 'mceTableInsertRowBefore' ),
 	},
 	{
 		icon: 'table-row-after',
-		title: wp.i18n.__( 'Insert Row After' ),
+		title: __( 'Insert Row After' ),
 		onClick: execCommand( 'mceTableInsertRowAfter' ),
 	},
 	{
 		icon: 'table-row-delete',
-		title: wp.i18n.__( 'Delete Row' ),
+		title: __( 'Delete Row' ),
 		onClick: execCommand( 'mceTableDeleteRow' ),
 	},
 	{
 		icon: 'table-col-before',
-		title: wp.i18n.__( 'Insert Column Before' ),
+		title: __( 'Insert Column Before' ),
 		onClick: execCommand( 'mceTableInsertColBefore' ),
 	},
 	{
 		icon: 'table-col-after',
-		title: wp.i18n.__( 'Insert Column After' ),
+		title: __( 'Insert Column After' ),
 		onClick: execCommand( 'mceTableInsertColAfter' ),
 	},
 	{
 		icon: 'table-col-delete',
-		title: wp.i18n.__( 'Delete Column' ),
+		title: __( 'Delete Column' ),
 		onClick: execCommand( 'mceTableDeleteCol' ),
 	},
 ];
@@ -89,6 +90,7 @@ export default class TableBlock extends wp.element.Component {
 						<li>
 							<DropdownMenu
 								icon="editor-table"
+								label={ __( 'Edit Table' ) }
 								controls={
 									TABLE_CONTROLS.map( ( control ) => ( {
 										...control,
