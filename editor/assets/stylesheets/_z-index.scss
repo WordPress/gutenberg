@@ -1,3 +1,7 @@
+// Stores a list of z-index values in a central location.  For clarity, when a
+// specific value is needed, add a comment explaining why (what other rules the
+// value is designed to work with).
+
 $z-layers: (
 	'.editor-mode-switcher .dashicon': -1,
 	'.editor-block-switcher__arrow': 1,
@@ -13,9 +17,18 @@ $z-layers: (
 	'.editor-post-visibility__dialog': 30,
 	'.editor-post-schedule__dialog': 30,
 	'.editor-block-mover': 30,
-	'.editor-sidebar': 100000,	// only used on mobile
-	'.components-notice-list': 100000,
-	'.components-popover': 100000,
+
+	// Show sidebar above wp-admin navigation bar for mobile viewports:
+	// #wpadminbar { z-index: 99999 }
+	'.editor-sidebar': 100000,
+
+	// Show notices below expanded wp-admin submenus:
+	// #adminmenuwrap { z-index: 9990 }
+	'.components-notice-list': 9989,
+
+	// Show popovers above wp-admin menus and submenus:
+	// #adminmenuwrap { z-index: 9990 }
+	'.components-popover': 9999,
 );
 
 @function z-index( $key ) {
