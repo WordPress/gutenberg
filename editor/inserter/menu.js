@@ -50,14 +50,14 @@ class InserterMenu extends Component {
 	}
 
 	componentDidUpdate() {
-		const visibleBlocks = this.getVisibleBlocks( getBlockTypes() );
+		const searchResults = this.searchBlocks( getBlockTypes() );
 		// Announce the blocks search results to screen readers.
-		if ( !! visibleBlocks.length ) {
+		if ( !! searchResults.length ) {
 			this.debouncedSpeakAssertive( sprintf( _n(
 				'%d result found',
 				'%d results found',
-				visibleBlocks.length
-			), visibleBlocks.length ) );
+				searchResults.length
+			), searchResults.length ) );
 		} else {
 			this.debouncedSpeakAssertive( __( 'No results.' ) );
 		}
