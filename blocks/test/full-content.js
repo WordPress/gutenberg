@@ -16,15 +16,10 @@ import { getBlockTypes } from '../api/registration';
 
 const fixturesDir = path.join( __dirname, 'fixtures' );
 
-// We expect 4 different types of files for each fixture:
-//  - fixture.html            : original content
-//  - fixture.parsed.json     : parser output
-//  - fixture.json            : blocks structure
-//  - fixture.serialized.html : re-serialized content
 // Get the "base" name for each fixture first.
 const fileBasenames = uniq(
 	fs.readdirSync( fixturesDir )
-		.filter( f => /(\.html|\.json)$/.test( f ) )
+		.filter( f => /\.html$/.test( f ) )
 		.map( f => f.replace( /\..+$/, '' ) )
 );
 
@@ -37,13 +32,6 @@ function readFixtureFile( filename ) {
 	} catch ( err ) {
 		return null;
 	}
-}
-
-function writeFixtureFile( filename, content ) {
-	fs.writeFileSync(
-		path.join( fixturesDir, filename ),
-		content
-	);
 }
 
 function normalizeReactTree( element ) {
@@ -93,110 +81,51 @@ describe( 'full post content fixture', () => {
 		require( 'blocks' );
 	} );
 
+	it( 'has 54 fixtures', () => {
+		expect( fileBasenames ).toHaveLength( 54 );
+	} );
+
 	fileBasenames.forEach( f => {
-		it( f, () => {
-			const content = readFixtureFile( f + '.html' );
-			if ( content === null ) {
-				throw new Error(
-					'Missing fixture file: ' + f + '.html'
-				);
-			}
+		describe( f, () => {
+			let content;
 
-			const parserOutputActual = grammarParse( content );
-			let parserOutputExpectedString = readFixtureFile( f + '.parsed.json' );
+			beforeAll( () => {
+				content = readFixtureFile( f + '.html' );
+			} );
 
-			if ( ! parserOutputExpectedString ) {
-				if ( process.env.GENERATE_MISSING_FIXTURES ) {
-					parserOutputExpectedString = JSON.stringify(
-						parserOutputActual,
-						null,
-						4
-					) + '\n';
-					writeFixtureFile( f + '.parsed.json', parserOutputExpectedString );
-				} else {
-					throw new Error(
-						'Missing fixture file: ' + f + '.parsed.json'
-					);
-				}
-			}
+			it( `has non empty fixture file ${ f }.html`, () => {
+				expect( content ).toBeTruthy();
+			} );
 
-			const parserOutputExpected = JSON.parse( parserOutputExpectedString );
-			try {
-				expect(
-					parserOutputActual
-				).toEqual( parserOutputExpected );
-			} catch ( err ) {
-				throw new Error( format(
-					'File \'%s.parsed.json\' does not match expected value:\n\n%s',
-					f,
-					err.message
-				) );
-			}
+			it( 'gets parsed properly', () => {
+				const parserOutput = grammarParse( content );
 
-			const blocksActual = parse( content );
-			const blocksActualNormalized = normalizeParsedBlocks( blocksActual );
-			let blocksExpectedString = readFixtureFile( f + '.json' );
+				expect( parserOutput ).toMatchSnapshot();
+			} );
 
-			if ( ! blocksExpectedString ) {
-				if ( process.env.GENERATE_MISSING_FIXTURES ) {
-					blocksExpectedString = JSON.stringify(
-						blocksActualNormalized,
-						null,
-						4
-					) + '\n';
-					writeFixtureFile( f + '.json', blocksExpectedString );
-				} else {
-					throw new Error(
-						'Missing fixture file: ' + f + '.json'
-					);
-				}
-			}
+			it( 'gets blocks normalized properly', () => {
+				const blocks = parse( content );
+				const blocksNormalized = normalizeParsedBlocks( blocks );
 
-			const blocksExpected = JSON.parse( blocksExpectedString );
-			try {
-				expect(
-					blocksActualNormalized
-				).toEqual( blocksExpected );
-			} catch ( err ) {
-				throw new Error( format(
-					'File \'%s.json\' does not match expected value:\n\n%s',
-					f,
-					err.message
-				) );
-			}
+				expect( blocksNormalized ).toMatchSnapshot();
+			} );
 
-			const serializedActual = serialize( blocksActual );
-			let serializedExpected = readFixtureFile( f + '.serialized.html' );
+			it( 'gets parsed and serialized properly', () => {
+				const blocks = parse( content );
+				const serialized = serialize( blocks );
 
-			if ( ! serializedExpected ) {
-				if ( process.env.GENERATE_MISSING_FIXTURES ) {
-					serializedExpected = serializedActual;
-					writeFixtureFile( f + '.serialized.html', serializedExpected );
-				} else {
-					throw new Error(
-						'Missing fixture file: ' + f + '.serialized.html'
-					);
-				}
-			}
-
-			try {
-				expect( serializedActual ).toEqual(
-					serializedExpected.replace( /\n$/, '' )
-				);
-			} catch ( err ) {
-				throw new Error( format(
-					'File \'%s.serialized.html\' does not match expected value:\n\n%s',
-					f,
-					err.message
-				) );
-			}
+				expect( serialized ).toMatchSnapshot();
+			} );
 		} );
 	} );
 
 	it( 'should be present for each block', () => {
 		const errors = [];
+		const blockTypes = getBlockTypes();
 
-		getBlockTypes().map( block => block.name ).forEach( name => {
+		expect( blockTypes ).toHaveLength( 51 );
+
+		blockTypes.map( block => block.name ).forEach( name => {
 			const nameToFilename = name.replace( /\//g, '__' );
 			const foundFixtures = fileBasenames
 				.filter( basename => (

@@ -1,0 +1,2760 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`full post content fixture core__button__center gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "align": "center",
+      "text": Array [
+        "Help build Gutenberg",
+      ],
+      "url": "https://github.com/WordPress/gutenberg",
+    },
+    "name": "core/button",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core__button__center gets parsed and serialized properly 1`] = `
+"<!-- wp:core/button {\\"align\\":\\"center\\"} -->
+<div class=\\"wp-block-button aligncenter\\"><a href=\\"https://github.com/WordPress/gutenberg\\">Help build Gutenberg</a></div>
+<!-- /wp:core/button -->"
+`;
+
+exports[`full post content fixture core__button__center gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "align": "center",
+    },
+    "blockName": "core/button",
+    "rawContent": "
+<div class=\\"wp-block-button aligncenter\\"><a href=\\"https://github.com/WordPress/gutenberg\\">Help build Gutenberg</a></div>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core__code gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "content": "export default function MyButton() {
+	return <Button>Click Me!</Button>;
+}",
+    },
+    "name": "core/code",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core__code gets parsed and serialized properly 1`] = `
+"<!-- wp:core/code -->
+<pre class=\\"wp-block-code\\"><code>export default function MyButton() {
+	return &lt;Button&gt;Click Me!&lt;/Button&gt;;
+}</code></pre>
+<!-- /wp:core/code -->"
+`;
+
+exports[`full post content fixture core__code gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": null,
+    "blockName": "core/code",
+    "rawContent": "
+<pre class=\\"wp-block-code\\"><code>export default function MyButton() {
+	return &lt;Button&gt;Click Me!&lt;/Button&gt;;
+}</code></pre>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core__cover-image gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "title": "Guten Berg!",
+      "url": "https://cldup.com/uuUqE_dXzy.jpg",
+    },
+    "name": "core/cover-image",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core__cover-image gets parsed and serialized properly 1`] = `
+"<!-- wp:core/cover-image {\\"url\\":\\"https://cldup.com/uuUqE_dXzy.jpg\\"} -->
+<section class=\\"wp-block-cover-image\\">
+    <section class=\\"cover-image\\" style=\\"background-image:url(https://cldup.com/uuUqE_dXzy.jpg);\\">
+        <h2>Guten Berg!</h2>
+    </section>
+</section>
+<!-- /wp:core/cover-image -->"
+`;
+
+exports[`full post content fixture core__cover-image gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://cldup.com/uuUqE_dXzy.jpg",
+    },
+    "blockName": "core/cover-image",
+    "rawContent": "
+<section class=\\"wp-block-cover-image\\">
+	<section class=\\"cover-image\\" style=\\"background-image:url(https://cldup.com/uuUqE_dXzy.jpg);\\">
+		<h2>Guten Berg!</h2>
+	</section>
+</section>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core__embed gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [
+        "Embedded content from an example URL",
+      ],
+      "url": "https://example.com/",
+    },
+    "name": "core/embed",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core__embed gets parsed and serialized properly 1`] = `
+"<!-- wp:core/embed {\\"url\\":\\"https://example.com/\\"} -->
+<figure class=\\"wp-block-embed\\">
+    https://example.com/
+    <figcaption>Embedded content from an example URL</figcaption>
+</figure>
+<!-- /wp:core/embed -->"
+`;
+
+exports[`full post content fixture core__embed gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://example.com/",
+    },
+    "blockName": "core/embed",
+    "rawContent": "
+<figure class=\\"wp-block-embed\\">
+    https://example.com/
+    <figcaption>Embedded content from an example URL</figcaption>
+</figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core__freeform gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "content": Array [
+        "Testing freeform block with some
+",
+        Object {
+          "attributes": Object {
+            "className": "wp-some-class",
+          },
+          "children": Array [
+            "
+	HTML ",
+            Object {
+              "attributes": Object {
+                "style": Object {
+                  "color": "red",
+                },
+              },
+              "children": "content",
+              "type": "span",
+            },
+            "
+",
+          ],
+          "type": "div",
+        },
+      ],
+    },
+    "name": "core/freeform",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core__freeform gets parsed and serialized properly 1`] = `
+"<!-- wp:core/freeform -->
+Testing freeform block with some
+<div class=\\"wp-block-freeform wp-some-class\\">
+    HTML <span style=\\"color:red;\\">content</span>
+</div>
+<!-- /wp:core/freeform -->"
+`;
+
+exports[`full post content fixture core__freeform gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": null,
+    "blockName": "core/freeform",
+    "rawContent": "
+Testing freeform block with some
+<div class=\\"wp-some-class\\">
+	HTML <span style=\\"color: red;\\">content</span>
+</div>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core__gallery gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "images": Array [
+        Object {
+          "alt": "title",
+          "id": 1,
+          "mime": "image/jpeg",
+          "sizes": Object {
+            "full": Object {
+              "height": 1080,
+              "orientation": "portrait",
+              "url": "https://cldup.com/uuUqE_dXzy.jpg",
+              "width": 810,
+            },
+          },
+          "subtype": "jpeg",
+          "type": "image",
+          "url": "https://cldup.com/uuUqE_dXzy.jpg",
+        },
+        Object {
+          "alt": "title",
+          "id": 2,
+          "mime": "image/jpeg",
+          "sizes": Object {
+            "full": Object {
+              "height": 1080,
+              "orientation": "landscape",
+              "url": "http://google.com/hi.png",
+              "width": 1440,
+            },
+          },
+          "subtype": "jpeg",
+          "type": "image",
+          "url": "http://google.com/hi.png",
+        },
+      ],
+    },
+    "name": "core/gallery",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core__gallery gets parsed and serialized properly 1`] = `
+"<!-- wp:core/gallery {\\"images\\":[{\\"sizes\\":{\\"full\\":{\\"url\\":\\"https://cldup.com/uuUqE_dXzy.jpg\\",\\"height\\":1080,\\"width\\":810,\\"orientation\\":\\"portrait\\"}},\\"mime\\":\\"image/jpeg\\",\\"type\\":\\"image\\",\\"subtype\\":\\"jpeg\\",\\"id\\":1,\\"url\\":\\"https://cldup.com/uuUqE_dXzy.jpg\\",\\"alt\\":\\"title\\"},{\\"sizes\\":{\\"full\\":{\\"url\\":\\"http://google.com/hi.png\\",\\"height\\":1080,\\"width\\":1440,\\"orientation\\":\\"landscape\\"}},\\"mime\\":\\"image/jpeg\\",\\"type\\":\\"image\\",\\"subtype\\":\\"jpeg\\",\\"id\\":2,\\"url\\":\\"http://google.com/hi.png\\",\\"alt\\":\\"title\\"}]} -->
+<div class=\\"wp-block-gallery alignnone columns-2 is-cropped\\">
+    <figure class=\\"blocks-gallery-image\\"><img src=\\"https://cldup.com/uuUqE_dXzy.jpg\\" alt=\\"title\\" /></figure>
+    <figure class=\\"blocks-gallery-image\\"><img src=\\"http://google.com/hi.png\\" alt=\\"title\\" /></figure>
+</div>
+<!-- /wp:core/gallery -->"
+`;
+
+exports[`full post content fixture core__gallery gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "images": Array [
+        Object {
+          "alt": "title",
+          "id": 1,
+          "mime": "image/jpeg",
+          "sizes": Object {
+            "full": Object {
+              "height": 1080,
+              "orientation": "portrait",
+              "url": "https://cldup.com/uuUqE_dXzy.jpg",
+              "width": 810,
+            },
+          },
+          "subtype": "jpeg",
+          "type": "image",
+          "url": "https://cldup.com/uuUqE_dXzy.jpg",
+        },
+        Object {
+          "alt": "title",
+          "id": 2,
+          "mime": "image/jpeg",
+          "sizes": Object {
+            "full": Object {
+              "height": 1080,
+              "orientation": "landscape",
+              "url": "http://google.com/hi.png",
+              "width": 1440,
+            },
+          },
+          "subtype": "jpeg",
+          "type": "image",
+          "url": "http://google.com/hi.png",
+        },
+      ],
+    },
+    "blockName": "core/gallery",
+    "rawContent": "
+<div class=\\"wp-block-gallery\\">
+	<figure class=\\"blocks-gallery-image\\">
+		<img src=\\"https://cldup.com/uuUqE_dXzy.jpg\\" alt=\\"title\\" />
+	</figure>
+	<figure class=\\"blocks-gallery-image\\">
+		<img src=\\"http://google.com/hi.png\\" alt=\\"title\\" />
+	</figure>
+</div>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core__heading__h2 gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "content": Array [
+        "A picture is worth a thousand words, or so the saying goes",
+      ],
+      "nodeName": "H2",
+    },
+    "name": "core/heading",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core__heading__h2 gets parsed and serialized properly 1`] = `
+"<!-- wp:core/heading -->
+<h2>A picture is worth a thousand words, or so the saying goes</h2>
+<!-- /wp:core/heading -->"
+`;
+
+exports[`full post content fixture core__heading__h2 gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": null,
+    "blockName": "core/heading",
+    "rawContent": "
+<h2>A picture is worth a thousand words, or so the saying goes</h2>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core__heading__h2-em gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "content": Array [
+        "The ",
+        Object {
+          "children": "Inserter",
+          "type": "em",
+        },
+        " Tool",
+      ],
+      "nodeName": "H2",
+    },
+    "name": "core/heading",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core__heading__h2-em gets parsed and serialized properly 1`] = `
+"<!-- wp:core/heading -->
+<h2>The <em>Inserter</em> Tool</h2>
+<!-- /wp:core/heading -->"
+`;
+
+exports[`full post content fixture core__heading__h2-em gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": null,
+    "blockName": "core/heading",
+    "rawContent": "
+<h2>The <em>Inserter</em> Tool</h2>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core__html gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "content": "<h1>Some HTML code</h1>
+<marquee>This text will scroll from right to left</marquee>",
+    },
+    "name": "core/html",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core__html gets parsed and serialized properly 1`] = `
+"<!-- wp:core/html -->
+<h1>Some HTML code</h1>
+<marquee>This text will scroll from right to left</marquee>
+<!-- /wp:core/html -->"
+`;
+
+exports[`full post content fixture core__html gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": null,
+    "blockName": "core/html",
+    "rawContent": "
+<h1>Some HTML code</h1>
+<marquee>This text will scroll from right to left</marquee>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core__image gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [],
+      "url": "https://cldup.com/uuUqE_dXzy.jpg",
+    },
+    "name": "core/image",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core__image gets parsed and serialized properly 1`] = `
+"<!-- wp:core/image -->
+<figure class=\\"wp-block-image\\"><img src=\\"https://cldup.com/uuUqE_dXzy.jpg\\" /></figure>
+<!-- /wp:core/image -->"
+`;
+
+exports[`full post content fixture core__image gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": null,
+    "blockName": "core/image",
+    "rawContent": "
+<figure class=\\"wp-block-image\\"><img src=\\"https://cldup.com/uuUqE_dXzy.jpg\\" /></figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core__image__center-caption gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "align": "center",
+      "caption": Array [
+        "Give it a try. Press the \\"really wide\\" button on the image toolbar.",
+      ],
+      "url": "https://cldup.com/YLYhpou2oq.jpg",
+    },
+    "name": "core/image",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core__image__center-caption gets parsed and serialized properly 1`] = `
+"<!-- wp:core/image {\\"align\\":\\"center\\"} -->
+<figure class=\\"wp-block-image aligncenter\\"><img src=\\"https://cldup.com/YLYhpou2oq.jpg\\" />
+    <figcaption>Give it a try. Press the &quot;really wide&quot; button on the image toolbar.</figcaption>
+</figure>
+<!-- /wp:core/image -->"
+`;
+
+exports[`full post content fixture core__image__center-caption gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "align": "center",
+    },
+    "blockName": "core/image",
+    "rawContent": "
+<figure class=\\"wp-block-image\\"><img src=\\"https://cldup.com/YLYhpou2oq.jpg\\" class=\\"aligncenter\\"/><figcaption>Give it a try. Press the &quot;really wide&quot; button on the image toolbar.</figcaption></figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core__latest-posts gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "displayPostDate": false,
+      "postsToShow": 5,
+    },
+    "name": "core/latest-posts",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core__latest-posts gets parsed and serialized properly 1`] = `"<!-- wp:core/latest-posts {\\"postsToShow\\":5,\\"displayPostDate\\":false} /-->"`;
+
+exports[`full post content fixture core__latest-posts gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "displayPostDate": false,
+      "postsToShow": 5,
+    },
+    "blockName": "core/latest-posts",
+    "rawContent": "",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core__list__ul gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "nodeName": "UL",
+      "values": Array [
+        Object {
+          "children": "Text & Headings",
+          "type": "li",
+        },
+        Object {
+          "children": "Images & Videos",
+          "type": "li",
+        },
+        Object {
+          "children": "Galleries",
+          "type": "li",
+        },
+        Object {
+          "children": "Embeds, like YouTube, Tweets, or other WordPress posts.",
+          "type": "li",
+        },
+        Object {
+          "children": "Layout blocks, like Buttons, Hero Images, Separators, etc.",
+          "type": "li",
+        },
+        Object {
+          "children": Array [
+            "And ",
+            Object {
+              "children": "Lists",
+              "type": "em",
+            },
+            " like this one of course :)",
+          ],
+          "type": "li",
+        },
+      ],
+    },
+    "name": "core/list",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core__list__ul gets parsed and serialized properly 1`] = `
+"<!-- wp:core/list -->
+<ul>
+    <li>Text &amp; Headings</li>
+    <li>Images &amp; Videos</li>
+    <li>Galleries</li>
+    <li>Embeds, like YouTube, Tweets, or other WordPress posts.</li>
+    <li>Layout blocks, like Buttons, Hero Images, Separators, etc.</li>
+    <li>And <em>Lists</em> like this one of course :)</li>
+</ul>
+<!-- /wp:core/list -->"
+`;
+
+exports[`full post content fixture core__list__ul gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": null,
+    "blockName": "core/list",
+    "rawContent": "
+<ul><li>Text & Headings</li><li>Images & Videos</li><li>Galleries</li><li>Embeds, like YouTube, Tweets, or other WordPress posts.</li><li>Layout blocks, like Buttons, Hero Images, Separators, etc.</li><li>And <em>Lists</em> like this one of course :)</li></ul>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core__preformatted gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "content": Array [
+        "Some ",
+        Object {
+          "children": "preformatted",
+          "type": "em",
+        },
+        " text...",
+        Object {
+          "type": "br",
+        },
+        "And more!",
+      ],
+    },
+    "name": "core/preformatted",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core__preformatted gets parsed and serialized properly 1`] = `
+"<!-- wp:core/preformatted -->
+<pre class=\\"wp-block-preformatted\\">Some <em>preformatted</em> text...<br/>And more!</pre>
+<!-- /wp:core/preformatted -->"
+`;
+
+exports[`full post content fixture core__preformatted gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": null,
+    "blockName": "core/preformatted",
+    "rawContent": "
+<pre class=\\"wp-block-preformatted\\">Some <em>preformatted</em> text...<br>And more!</pre>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core__pullquote gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "citation": Array [
+        "...with a caption",
+      ],
+      "value": Array [
+        Array [
+          "Testing pullquote block...",
+        ],
+      ],
+    },
+    "name": "core/pullquote",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core__pullquote gets parsed and serialized properly 1`] = `
+"<!-- wp:core/pullquote -->
+<blockquote class=\\"wp-block-pullquote alignnone\\">
+    <p>Testing pullquote block...</p>
+    <footer>...with a caption</footer>
+</blockquote>
+<!-- /wp:core/pullquote -->"
+`;
+
+exports[`full post content fixture core__pullquote gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": null,
+    "blockName": "core/pullquote",
+    "rawContent": "
+<blockquote class=\\"wp-block-pullquote\\">
+<p>Testing pullquote block...</p><footer>...with a caption</footer>
+</blockquote>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core__quote__style-1 gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "citation": Array [
+        "Matt Mullenweg, 2017",
+      ],
+      "style": "1",
+      "value": Array [
+        Object {
+          "children": "The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.",
+          "type": "p",
+        },
+      ],
+    },
+    "name": "core/quote",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core__quote__style-1 gets parsed and serialized properly 1`] = `
+"<!-- wp:core/quote {\\"style\\":\\"1\\"} -->
+<blockquote class=\\"wp-block-quote blocks-quote-style-1\\">
+    <p>The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.</p>
+    <footer>Matt Mullenweg, 2017</footer>
+</blockquote>
+<!-- /wp:core/quote -->"
+`;
+
+exports[`full post content fixture core__quote__style-1 gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "style": "1",
+    },
+    "blockName": "core/quote",
+    "rawContent": "
+<blockquote class=\\"wp-block-quote blocks-quote-style-1\\"><p>The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.</p><footer>Matt Mullenweg, 2017</footer></blockquote>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core__quote__style-2 gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "citation": Array [
+        "Maya Angelou",
+      ],
+      "style": "2",
+      "value": Array [
+        Object {
+          "children": "There is no greater agony than bearing an untold story inside you.",
+          "type": "p",
+        },
+      ],
+    },
+    "name": "core/quote",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core__quote__style-2 gets parsed and serialized properly 1`] = `
+"<!-- wp:core/quote {\\"style\\":\\"2\\"} -->
+<blockquote class=\\"wp-block-quote blocks-quote-style-2\\">
+    <p>There is no greater agony than bearing an untold story inside you.</p>
+    <footer>Maya Angelou</footer>
+</blockquote>
+<!-- /wp:core/quote -->"
+`;
+
+exports[`full post content fixture core__quote__style-2 gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "style": "2",
+    },
+    "blockName": "core/quote",
+    "rawContent": "
+<blockquote class=\\"wp-block-quote blocks-quote-style-2\\"><p>There is no greater agony than bearing an untold story inside you.</p><footer>Maya Angelou</footer></blockquote>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core__separator gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {},
+    "name": "core/separator",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core__separator gets parsed and serialized properly 1`] = `
+"<!-- wp:core/separator -->
+<hr class=\\"wp-block-separator\\" />
+<!-- /wp:core/separator -->"
+`;
+
+exports[`full post content fixture core__separator gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": null,
+    "blockName": "core/separator",
+    "rawContent": "
+<hr class=\\"wp-block-separator\\" />
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core__table gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "content": Array [
+        Object {
+          "children": Object {
+            "children": Array [
+              Object {
+                "children": "Version",
+                "type": "th",
+              },
+              Object {
+                "children": "Musician",
+                "type": "th",
+              },
+              Object {
+                "children": "Date",
+                "type": "th",
+              },
+            ],
+            "type": "tr",
+          },
+          "type": "thead",
+        },
+        Object {
+          "children": Array [
+            Object {
+              "children": Array [
+                Object {
+                  "children": Object {
+                    "attributes": Object {
+                      "href": "https://wordpress.org/news/2003/05/wordpress-now-available/",
+                    },
+                    "children": ".70",
+                    "type": "a",
+                  },
+                  "type": "td",
+                },
+                Object {
+                  "children": "No musician chosen.",
+                  "type": "td",
+                },
+                Object {
+                  "children": "May 27, 2003",
+                  "type": "td",
+                },
+              ],
+              "type": "tr",
+            },
+            Object {
+              "children": Array [
+                Object {
+                  "children": Object {
+                    "attributes": Object {
+                      "href": "https://wordpress.org/news/2004/01/wordpress-10/",
+                    },
+                    "children": "1.0",
+                    "type": "a",
+                  },
+                  "type": "td",
+                },
+                Object {
+                  "children": "Miles Davis",
+                  "type": "td",
+                },
+                Object {
+                  "children": "January 3, 2004",
+                  "type": "td",
+                },
+              ],
+              "type": "tr",
+            },
+            Object {
+              "children": Array [
+                Object {
+                  "children": Array [
+                    "Lots of versions skipped, see ",
+                    Object {
+                      "attributes": Object {
+                        "href": "https://codex.wordpress.org/WordPress_Versions",
+                      },
+                      "children": "the full list",
+                      "type": "a",
+                    },
+                  ],
+                  "type": "td",
+                },
+                Object {
+                  "children": "…",
+                  "type": "td",
+                },
+                Object {
+                  "children": "…",
+                  "type": "td",
+                },
+              ],
+              "type": "tr",
+            },
+            Object {
+              "children": Array [
+                Object {
+                  "children": Object {
+                    "attributes": Object {
+                      "href": "https://wordpress.org/news/2015/12/clifford/",
+                    },
+                    "children": "4.4",
+                    "type": "a",
+                  },
+                  "type": "td",
+                },
+                Object {
+                  "children": "Clifford Brown",
+                  "type": "td",
+                },
+                Object {
+                  "children": "December 8, 2015",
+                  "type": "td",
+                },
+              ],
+              "type": "tr",
+            },
+            Object {
+              "children": Array [
+                Object {
+                  "children": Object {
+                    "attributes": Object {
+                      "href": "https://wordpress.org/news/2016/04/coleman/",
+                    },
+                    "children": "4.5",
+                    "type": "a",
+                  },
+                  "type": "td",
+                },
+                Object {
+                  "children": "Coleman Hawkins",
+                  "type": "td",
+                },
+                Object {
+                  "children": "April 12, 2016",
+                  "type": "td",
+                },
+              ],
+              "type": "tr",
+            },
+            Object {
+              "children": Array [
+                Object {
+                  "children": Object {
+                    "attributes": Object {
+                      "href": "https://wordpress.org/news/2016/08/pepper/",
+                    },
+                    "children": "4.6",
+                    "type": "a",
+                  },
+                  "type": "td",
+                },
+                Object {
+                  "children": "Pepper Adams",
+                  "type": "td",
+                },
+                Object {
+                  "children": "August 16, 2016",
+                  "type": "td",
+                },
+              ],
+              "type": "tr",
+            },
+            Object {
+              "children": Array [
+                Object {
+                  "children": Object {
+                    "attributes": Object {
+                      "href": "https://wordpress.org/news/2016/12/vaughan/",
+                    },
+                    "children": "4.7",
+                    "type": "a",
+                  },
+                  "type": "td",
+                },
+                Object {
+                  "children": "Sarah Vaughan",
+                  "type": "td",
+                },
+                Object {
+                  "children": "December 6, 2016",
+                  "type": "td",
+                },
+              ],
+              "type": "tr",
+            },
+          ],
+          "type": "tbody",
+        },
+      ],
+    },
+    "name": "core/table",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core__table gets parsed and serialized properly 1`] = `
+"<!-- wp:core/table -->
+<table class=\\"wp-block-table\\">
+    <thead>
+        <tr>
+            <th>Version</th>
+            <th>Musician</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><a href=\\"https://wordpress.org/news/2003/05/wordpress-now-available/\\">.70</a></td>
+            <td>No musician chosen.</td>
+            <td>May 27, 2003</td>
+        </tr>
+        <tr>
+            <td><a href=\\"https://wordpress.org/news/2004/01/wordpress-10/\\">1.0</a></td>
+            <td>Miles Davis</td>
+            <td>January 3, 2004</td>
+        </tr>
+        <tr>
+            <td>Lots of versions skipped, see <a href=\\"https://codex.wordpress.org/WordPress_Versions\\">the full list</a></td>
+            <td>…</td>
+            <td>…</td>
+        </tr>
+        <tr>
+            <td><a href=\\"https://wordpress.org/news/2015/12/clifford/\\">4.4</a></td>
+            <td>Clifford Brown</td>
+            <td>December 8, 2015</td>
+        </tr>
+        <tr>
+            <td><a href=\\"https://wordpress.org/news/2016/04/coleman/\\">4.5</a></td>
+            <td>Coleman Hawkins</td>
+            <td>April 12, 2016</td>
+        </tr>
+        <tr>
+            <td><a href=\\"https://wordpress.org/news/2016/08/pepper/\\">4.6</a></td>
+            <td>Pepper Adams</td>
+            <td>August 16, 2016</td>
+        </tr>
+        <tr>
+            <td><a href=\\"https://wordpress.org/news/2016/12/vaughan/\\">4.7</a></td>
+            <td>Sarah Vaughan</td>
+            <td>December 6, 2016</td>
+        </tr>
+    </tbody>
+</table>
+<!-- /wp:core/table -->"
+`;
+
+exports[`full post content fixture core__table gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": null,
+    "blockName": "core/table",
+    "rawContent": "
+<table><thead><tr><th>Version</th><th>Musician</th><th>Date</th></tr></thead><tbody><tr><td><a href=\\"https://wordpress.org/news/2003/05/wordpress-now-available/\\">.70</a></td><td>No musician chosen.</td><td>May 27, 2003</td></tr><tr><td><a href=\\"https://wordpress.org/news/2004/01/wordpress-10/\\">1.0</a></td><td>Miles Davis</td><td>January 3, 2004</td></tr><tr><td>Lots of versions skipped, see <a href=\\"https://codex.wordpress.org/WordPress_Versions\\">the full list</a></td><td>&hellip;</td><td>&hellip;</td></tr><tr><td><a href=\\"https://wordpress.org/news/2015/12/clifford/\\">4.4</a></td><td>Clifford Brown</td><td>December 8, 2015</td></tr><tr><td><a href=\\"https://wordpress.org/news/2016/04/coleman/\\">4.5</a></td><td>Coleman Hawkins</td><td>April 12, 2016</td></tr><tr><td><a href=\\"https://wordpress.org/news/2016/08/pepper/\\">4.6</a></td><td>Pepper Adams</td><td>August 16, 2016</td></tr><tr><td><a href=\\"https://wordpress.org/news/2016/12/vaughan/\\">4.7</a></td><td>Sarah Vaughan</td><td>December 6, 2016</td></tr></tbody></table>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+
+",
+  },
+]
+`;
+
+exports[`full post content fixture core__text__align-right gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "align": "right",
+      "content": Array [
+        Array [
+          "... like this one, which is separate from the above and right aligned.",
+        ],
+      ],
+    },
+    "name": "core/text",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core__text__align-right gets parsed and serialized properly 1`] = `
+"<!-- wp:core/text {\\"align\\":\\"right\\"} -->
+<p style=\\"text-align:right;\\">... like this one, which is separate from the above and right aligned.</p>
+<!-- /wp:core/text -->"
+`;
+
+exports[`full post content fixture core__text__align-right gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "align": "right",
+    },
+    "blockName": "core/text",
+    "rawContent": "
+<p style=\\"text-align:right;\\">... like this one, which is separate from the above and right aligned.</p>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__animoto gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [
+        "Embedded content from animoto",
+      ],
+      "url": "https://animoto.com/",
+    },
+    "name": "core-embed/animoto",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__animoto gets parsed and serialized properly 1`] = `
+"<!-- wp:core-embed/animoto {\\"url\\":\\"https://animoto.com/\\"} -->
+<figure class=\\"wp-block-embed-animoto\\">
+    https://animoto.com/
+    <figcaption>Embedded content from animoto</figcaption>
+</figure>
+<!-- /wp:core-embed/animoto -->"
+`;
+
+exports[`full post content fixture core-embed__animoto gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://animoto.com/",
+    },
+    "blockName": "core-embed/animoto",
+    "rawContent": "
+<figure class=\\"wp-block-embed-animoto\\">
+    https://animoto.com/
+    <figcaption>Embedded content from animoto</figcaption>
+</figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__cloudup gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [
+        "Embedded content from cloudup",
+      ],
+      "url": "https://cloudup.com/",
+    },
+    "name": "core-embed/cloudup",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__cloudup gets parsed and serialized properly 1`] = `
+"<!-- wp:core-embed/cloudup {\\"url\\":\\"https://cloudup.com/\\"} -->
+<figure class=\\"wp-block-embed-cloudup\\">
+    https://cloudup.com/
+    <figcaption>Embedded content from cloudup</figcaption>
+</figure>
+<!-- /wp:core-embed/cloudup -->"
+`;
+
+exports[`full post content fixture core-embed__cloudup gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://cloudup.com/",
+    },
+    "blockName": "core-embed/cloudup",
+    "rawContent": "
+<figure class=\\"wp-block-embed-cloudup\\">
+    https://cloudup.com/
+    <figcaption>Embedded content from cloudup</figcaption>
+</figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__collegehumor gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [
+        "Embedded content from collegehumor",
+      ],
+      "url": "https://collegehumor.com/",
+    },
+    "name": "core-embed/collegehumor",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__collegehumor gets parsed and serialized properly 1`] = `
+"<!-- wp:core-embed/collegehumor {\\"url\\":\\"https://collegehumor.com/\\"} -->
+<figure class=\\"wp-block-embed-collegehumor\\">
+    https://collegehumor.com/
+    <figcaption>Embedded content from collegehumor</figcaption>
+</figure>
+<!-- /wp:core-embed/collegehumor -->"
+`;
+
+exports[`full post content fixture core-embed__collegehumor gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://collegehumor.com/",
+    },
+    "blockName": "core-embed/collegehumor",
+    "rawContent": "
+<figure class=\\"wp-block-embed-collegehumor\\">
+    https://collegehumor.com/
+    <figcaption>Embedded content from collegehumor</figcaption>
+</figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__dailymotion gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [
+        "Embedded content from dailymotion",
+      ],
+      "url": "https://dailymotion.com/",
+    },
+    "name": "core-embed/dailymotion",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__dailymotion gets parsed and serialized properly 1`] = `
+"<!-- wp:core-embed/dailymotion {\\"url\\":\\"https://dailymotion.com/\\"} -->
+<figure class=\\"wp-block-embed-dailymotion\\">
+    https://dailymotion.com/
+    <figcaption>Embedded content from dailymotion</figcaption>
+</figure>
+<!-- /wp:core-embed/dailymotion -->"
+`;
+
+exports[`full post content fixture core-embed__dailymotion gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://dailymotion.com/",
+    },
+    "blockName": "core-embed/dailymotion",
+    "rawContent": "
+<figure class=\\"wp-block-embed-dailymotion\\">
+    https://dailymotion.com/
+    <figcaption>Embedded content from dailymotion</figcaption>
+</figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__facebook gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [
+        "Embedded content from facebook",
+      ],
+      "url": "https://facebook.com/",
+    },
+    "name": "core-embed/facebook",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__facebook gets parsed and serialized properly 1`] = `
+"<!-- wp:core-embed/facebook {\\"url\\":\\"https://facebook.com/\\"} -->
+<figure class=\\"wp-block-embed-facebook\\">
+    https://facebook.com/
+    <figcaption>Embedded content from facebook</figcaption>
+</figure>
+<!-- /wp:core-embed/facebook -->"
+`;
+
+exports[`full post content fixture core-embed__facebook gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://facebook.com/",
+    },
+    "blockName": "core-embed/facebook",
+    "rawContent": "
+<figure class=\\"wp-block-embed-facebook\\">
+    https://facebook.com/
+    <figcaption>Embedded content from facebook</figcaption>
+</figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__flickr gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [
+        "Embedded content from flickr",
+      ],
+      "url": "https://flickr.com/",
+    },
+    "name": "core-embed/flickr",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__flickr gets parsed and serialized properly 1`] = `
+"<!-- wp:core-embed/flickr {\\"url\\":\\"https://flickr.com/\\"} -->
+<figure class=\\"wp-block-embed-flickr\\">
+    https://flickr.com/
+    <figcaption>Embedded content from flickr</figcaption>
+</figure>
+<!-- /wp:core-embed/flickr -->"
+`;
+
+exports[`full post content fixture core-embed__flickr gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://flickr.com/",
+    },
+    "blockName": "core-embed/flickr",
+    "rawContent": "
+<figure class=\\"wp-block-embed-flickr\\">
+    https://flickr.com/
+    <figcaption>Embedded content from flickr</figcaption>
+</figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__funnyordie gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [
+        "Embedded content from funnyordie",
+      ],
+      "url": "https://funnyordie.com/",
+    },
+    "name": "core-embed/funnyordie",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__funnyordie gets parsed and serialized properly 1`] = `
+"<!-- wp:core-embed/funnyordie {\\"url\\":\\"https://funnyordie.com/\\"} -->
+<figure class=\\"wp-block-embed-funnyordie\\">
+    https://funnyordie.com/
+    <figcaption>Embedded content from funnyordie</figcaption>
+</figure>
+<!-- /wp:core-embed/funnyordie -->"
+`;
+
+exports[`full post content fixture core-embed__funnyordie gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://funnyordie.com/",
+    },
+    "blockName": "core-embed/funnyordie",
+    "rawContent": "
+<figure class=\\"wp-block-embed-funnyordie\\">
+    https://funnyordie.com/
+    <figcaption>Embedded content from funnyordie</figcaption>
+</figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__hulu gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [
+        "Embedded content from hulu",
+      ],
+      "url": "https://hulu.com/",
+    },
+    "name": "core-embed/hulu",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__hulu gets parsed and serialized properly 1`] = `
+"<!-- wp:core-embed/hulu {\\"url\\":\\"https://hulu.com/\\"} -->
+<figure class=\\"wp-block-embed-hulu\\">
+    https://hulu.com/
+    <figcaption>Embedded content from hulu</figcaption>
+</figure>
+<!-- /wp:core-embed/hulu -->"
+`;
+
+exports[`full post content fixture core-embed__hulu gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://hulu.com/",
+    },
+    "blockName": "core-embed/hulu",
+    "rawContent": "
+<figure class=\\"wp-block-embed-hulu\\">
+    https://hulu.com/
+    <figcaption>Embedded content from hulu</figcaption>
+</figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__imgur gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [
+        "Embedded content from imgur",
+      ],
+      "url": "https://imgur.com/",
+    },
+    "name": "core-embed/imgur",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__imgur gets parsed and serialized properly 1`] = `
+"<!-- wp:core-embed/imgur {\\"url\\":\\"https://imgur.com/\\"} -->
+<figure class=\\"wp-block-embed-imgur\\">
+    https://imgur.com/
+    <figcaption>Embedded content from imgur</figcaption>
+</figure>
+<!-- /wp:core-embed/imgur -->"
+`;
+
+exports[`full post content fixture core-embed__imgur gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://imgur.com/",
+    },
+    "blockName": "core-embed/imgur",
+    "rawContent": "
+<figure class=\\"wp-block-embed-imgur\\">
+    https://imgur.com/
+    <figcaption>Embedded content from imgur</figcaption>
+</figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__instagram gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [
+        "Embedded content from instagram",
+      ],
+      "url": "https://instagram.com/",
+    },
+    "name": "core-embed/instagram",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__instagram gets parsed and serialized properly 1`] = `
+"<!-- wp:core-embed/instagram {\\"url\\":\\"https://instagram.com/\\"} -->
+<figure class=\\"wp-block-embed-instagram\\">
+    https://instagram.com/
+    <figcaption>Embedded content from instagram</figcaption>
+</figure>
+<!-- /wp:core-embed/instagram -->"
+`;
+
+exports[`full post content fixture core-embed__instagram gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://instagram.com/",
+    },
+    "blockName": "core-embed/instagram",
+    "rawContent": "
+<figure class=\\"wp-block-embed-instagram\\">
+    https://instagram.com/
+    <figcaption>Embedded content from instagram</figcaption>
+</figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__issuu gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [
+        "Embedded content from issuu",
+      ],
+      "url": "https://issuu.com/",
+    },
+    "name": "core-embed/issuu",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__issuu gets parsed and serialized properly 1`] = `
+"<!-- wp:core-embed/issuu {\\"url\\":\\"https://issuu.com/\\"} -->
+<figure class=\\"wp-block-embed-issuu\\">
+    https://issuu.com/
+    <figcaption>Embedded content from issuu</figcaption>
+</figure>
+<!-- /wp:core-embed/issuu -->"
+`;
+
+exports[`full post content fixture core-embed__issuu gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://issuu.com/",
+    },
+    "blockName": "core-embed/issuu",
+    "rawContent": "
+<figure class=\\"wp-block-embed-issuu\\">
+    https://issuu.com/
+    <figcaption>Embedded content from issuu</figcaption>
+</figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__kickstarter gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [
+        "Embedded content from kickstarter",
+      ],
+      "url": "https://kickstarter.com/",
+    },
+    "name": "core-embed/kickstarter",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__kickstarter gets parsed and serialized properly 1`] = `
+"<!-- wp:core-embed/kickstarter {\\"url\\":\\"https://kickstarter.com/\\"} -->
+<figure class=\\"wp-block-embed-kickstarter\\">
+    https://kickstarter.com/
+    <figcaption>Embedded content from kickstarter</figcaption>
+</figure>
+<!-- /wp:core-embed/kickstarter -->"
+`;
+
+exports[`full post content fixture core-embed__kickstarter gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://kickstarter.com/",
+    },
+    "blockName": "core-embed/kickstarter",
+    "rawContent": "
+<figure class=\\"wp-block-embed-kickstarter\\">
+    https://kickstarter.com/
+    <figcaption>Embedded content from kickstarter</figcaption>
+</figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__meetup-com gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [
+        "Embedded content from meetup-com",
+      ],
+      "url": "https://meetup.com/",
+    },
+    "name": "core-embed/meetup-com",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__meetup-com gets parsed and serialized properly 1`] = `
+"<!-- wp:core-embed/meetup-com {\\"url\\":\\"https://meetup.com/\\"} -->
+<figure class=\\"wp-block-embed-meetup-com\\">
+    https://meetup.com/
+    <figcaption>Embedded content from meetup-com</figcaption>
+</figure>
+<!-- /wp:core-embed/meetup-com -->"
+`;
+
+exports[`full post content fixture core-embed__meetup-com gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://meetup.com/",
+    },
+    "blockName": "core-embed/meetup-com",
+    "rawContent": "
+<figure class=\\"wp-block-embed-meetup-com\\">
+    https://meetup.com/
+    <figcaption>Embedded content from meetup-com</figcaption>
+</figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__mixcloud gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [
+        "Embedded content from mixcloud",
+      ],
+      "url": "https://mixcloud.com/",
+    },
+    "name": "core-embed/mixcloud",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__mixcloud gets parsed and serialized properly 1`] = `
+"<!-- wp:core-embed/mixcloud {\\"url\\":\\"https://mixcloud.com/\\"} -->
+<figure class=\\"wp-block-embed-mixcloud\\">
+    https://mixcloud.com/
+    <figcaption>Embedded content from mixcloud</figcaption>
+</figure>
+<!-- /wp:core-embed/mixcloud -->"
+`;
+
+exports[`full post content fixture core-embed__mixcloud gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://mixcloud.com/",
+    },
+    "blockName": "core-embed/mixcloud",
+    "rawContent": "
+<figure class=\\"wp-block-embed-mixcloud\\">
+    https://mixcloud.com/
+    <figcaption>Embedded content from mixcloud</figcaption>
+</figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__photobucket gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [
+        "Embedded content from photobucket",
+      ],
+      "url": "https://photobucket.com/",
+    },
+    "name": "core-embed/photobucket",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__photobucket gets parsed and serialized properly 1`] = `
+"<!-- wp:core-embed/photobucket {\\"url\\":\\"https://photobucket.com/\\"} -->
+<figure class=\\"wp-block-embed-photobucket\\">
+    https://photobucket.com/
+    <figcaption>Embedded content from photobucket</figcaption>
+</figure>
+<!-- /wp:core-embed/photobucket -->"
+`;
+
+exports[`full post content fixture core-embed__photobucket gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://photobucket.com/",
+    },
+    "blockName": "core-embed/photobucket",
+    "rawContent": "
+<figure class=\\"wp-block-embed-photobucket\\">
+    https://photobucket.com/
+    <figcaption>Embedded content from photobucket</figcaption>
+</figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__polldaddy gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [
+        "Embedded content from polldaddy",
+      ],
+      "url": "https://polldaddy.com/",
+    },
+    "name": "core-embed/polldaddy",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__polldaddy gets parsed and serialized properly 1`] = `
+"<!-- wp:core-embed/polldaddy {\\"url\\":\\"https://polldaddy.com/\\"} -->
+<figure class=\\"wp-block-embed-polldaddy\\">
+    https://polldaddy.com/
+    <figcaption>Embedded content from polldaddy</figcaption>
+</figure>
+<!-- /wp:core-embed/polldaddy -->"
+`;
+
+exports[`full post content fixture core-embed__polldaddy gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://polldaddy.com/",
+    },
+    "blockName": "core-embed/polldaddy",
+    "rawContent": "
+<figure class=\\"wp-block-embed-polldaddy\\">
+    https://polldaddy.com/
+    <figcaption>Embedded content from polldaddy</figcaption>
+</figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__reddit gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [
+        "Embedded content from reddit",
+      ],
+      "url": "https://reddit.com/",
+    },
+    "name": "core-embed/reddit",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__reddit gets parsed and serialized properly 1`] = `
+"<!-- wp:core-embed/reddit {\\"url\\":\\"https://reddit.com/\\"} -->
+<figure class=\\"wp-block-embed-reddit\\">
+    https://reddit.com/
+    <figcaption>Embedded content from reddit</figcaption>
+</figure>
+<!-- /wp:core-embed/reddit -->"
+`;
+
+exports[`full post content fixture core-embed__reddit gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://reddit.com/",
+    },
+    "blockName": "core-embed/reddit",
+    "rawContent": "
+<figure class=\\"wp-block-embed-reddit\\">
+    https://reddit.com/
+    <figcaption>Embedded content from reddit</figcaption>
+</figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__reverbnation gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [
+        "Embedded content from reverbnation",
+      ],
+      "url": "https://reverbnation.com/",
+    },
+    "name": "core-embed/reverbnation",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__reverbnation gets parsed and serialized properly 1`] = `
+"<!-- wp:core-embed/reverbnation {\\"url\\":\\"https://reverbnation.com/\\"} -->
+<figure class=\\"wp-block-embed-reverbnation\\">
+    https://reverbnation.com/
+    <figcaption>Embedded content from reverbnation</figcaption>
+</figure>
+<!-- /wp:core-embed/reverbnation -->"
+`;
+
+exports[`full post content fixture core-embed__reverbnation gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://reverbnation.com/",
+    },
+    "blockName": "core-embed/reverbnation",
+    "rawContent": "
+<figure class=\\"wp-block-embed-reverbnation\\">
+    https://reverbnation.com/
+    <figcaption>Embedded content from reverbnation</figcaption>
+</figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__screencast gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [
+        "Embedded content from screencast",
+      ],
+      "url": "https://screencast.com/",
+    },
+    "name": "core-embed/screencast",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__screencast gets parsed and serialized properly 1`] = `
+"<!-- wp:core-embed/screencast {\\"url\\":\\"https://screencast.com/\\"} -->
+<figure class=\\"wp-block-embed-screencast\\">
+    https://screencast.com/
+    <figcaption>Embedded content from screencast</figcaption>
+</figure>
+<!-- /wp:core-embed/screencast -->"
+`;
+
+exports[`full post content fixture core-embed__screencast gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://screencast.com/",
+    },
+    "blockName": "core-embed/screencast",
+    "rawContent": "
+<figure class=\\"wp-block-embed-screencast\\">
+    https://screencast.com/
+    <figcaption>Embedded content from screencast</figcaption>
+</figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__scribd gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [
+        "Embedded content from scribd",
+      ],
+      "url": "https://scribd.com/",
+    },
+    "name": "core-embed/scribd",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__scribd gets parsed and serialized properly 1`] = `
+"<!-- wp:core-embed/scribd {\\"url\\":\\"https://scribd.com/\\"} -->
+<figure class=\\"wp-block-embed-scribd\\">
+    https://scribd.com/
+    <figcaption>Embedded content from scribd</figcaption>
+</figure>
+<!-- /wp:core-embed/scribd -->"
+`;
+
+exports[`full post content fixture core-embed__scribd gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://scribd.com/",
+    },
+    "blockName": "core-embed/scribd",
+    "rawContent": "
+<figure class=\\"wp-block-embed-scribd\\">
+    https://scribd.com/
+    <figcaption>Embedded content from scribd</figcaption>
+</figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__slideshare gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [
+        "Embedded content from slideshare",
+      ],
+      "url": "https://slideshare.com/",
+    },
+    "name": "core-embed/slideshare",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__slideshare gets parsed and serialized properly 1`] = `
+"<!-- wp:core-embed/slideshare {\\"url\\":\\"https://slideshare.com/\\"} -->
+<figure class=\\"wp-block-embed-slideshare\\">
+    https://slideshare.com/
+    <figcaption>Embedded content from slideshare</figcaption>
+</figure>
+<!-- /wp:core-embed/slideshare -->"
+`;
+
+exports[`full post content fixture core-embed__slideshare gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://slideshare.com/",
+    },
+    "blockName": "core-embed/slideshare",
+    "rawContent": "
+<figure class=\\"wp-block-embed-slideshare\\">
+    https://slideshare.com/
+    <figcaption>Embedded content from slideshare</figcaption>
+</figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__smugmug gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [
+        "Embedded content from smugmug",
+      ],
+      "url": "https://smugmug.com/",
+    },
+    "name": "core-embed/smugmug",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__smugmug gets parsed and serialized properly 1`] = `
+"<!-- wp:core-embed/smugmug {\\"url\\":\\"https://smugmug.com/\\"} -->
+<figure class=\\"wp-block-embed-smugmug\\">
+    https://smugmug.com/
+    <figcaption>Embedded content from smugmug</figcaption>
+</figure>
+<!-- /wp:core-embed/smugmug -->"
+`;
+
+exports[`full post content fixture core-embed__smugmug gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://smugmug.com/",
+    },
+    "blockName": "core-embed/smugmug",
+    "rawContent": "
+<figure class=\\"wp-block-embed-smugmug\\">
+    https://smugmug.com/
+    <figcaption>Embedded content from smugmug</figcaption>
+</figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__soundcloud gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [
+        "Embedded content from soundcloud",
+      ],
+      "url": "https://soundcloud.com/",
+    },
+    "name": "core-embed/soundcloud",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__soundcloud gets parsed and serialized properly 1`] = `
+"<!-- wp:core-embed/soundcloud {\\"url\\":\\"https://soundcloud.com/\\"} -->
+<figure class=\\"wp-block-embed-soundcloud\\">
+    https://soundcloud.com/
+    <figcaption>Embedded content from soundcloud</figcaption>
+</figure>
+<!-- /wp:core-embed/soundcloud -->"
+`;
+
+exports[`full post content fixture core-embed__soundcloud gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://soundcloud.com/",
+    },
+    "blockName": "core-embed/soundcloud",
+    "rawContent": "
+<figure class=\\"wp-block-embed-soundcloud\\">
+    https://soundcloud.com/
+    <figcaption>Embedded content from soundcloud</figcaption>
+</figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__speaker gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [
+        "Embedded content from speaker",
+      ],
+      "url": "https://speaker.com/",
+    },
+    "name": "core-embed/speaker",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__speaker gets parsed and serialized properly 1`] = `
+"<!-- wp:core-embed/speaker {\\"url\\":\\"https://speaker.com/\\"} -->
+<figure class=\\"wp-block-embed-speaker\\">
+    https://speaker.com/
+    <figcaption>Embedded content from speaker</figcaption>
+</figure>
+<!-- /wp:core-embed/speaker -->"
+`;
+
+exports[`full post content fixture core-embed__speaker gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://speaker.com/",
+    },
+    "blockName": "core-embed/speaker",
+    "rawContent": "
+<figure class=\\"wp-block-embed-speaker\\">
+    https://speaker.com/
+    <figcaption>Embedded content from speaker</figcaption>
+</figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__spotify gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [
+        "Embedded content from spotify",
+      ],
+      "url": "https://spotify.com/",
+    },
+    "name": "core-embed/spotify",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__spotify gets parsed and serialized properly 1`] = `
+"<!-- wp:core-embed/spotify {\\"url\\":\\"https://spotify.com/\\"} -->
+<figure class=\\"wp-block-embed-spotify\\">
+    https://spotify.com/
+    <figcaption>Embedded content from spotify</figcaption>
+</figure>
+<!-- /wp:core-embed/spotify -->"
+`;
+
+exports[`full post content fixture core-embed__spotify gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://spotify.com/",
+    },
+    "blockName": "core-embed/spotify",
+    "rawContent": "
+<figure class=\\"wp-block-embed-spotify\\">
+    https://spotify.com/
+    <figcaption>Embedded content from spotify</figcaption>
+</figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__ted gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [
+        "Embedded content from ted",
+      ],
+      "url": "https://ted.com/",
+    },
+    "name": "core-embed/ted",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__ted gets parsed and serialized properly 1`] = `
+"<!-- wp:core-embed/ted {\\"url\\":\\"https://ted.com/\\"} -->
+<figure class=\\"wp-block-embed-ted\\">
+    https://ted.com/
+    <figcaption>Embedded content from ted</figcaption>
+</figure>
+<!-- /wp:core-embed/ted -->"
+`;
+
+exports[`full post content fixture core-embed__ted gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://ted.com/",
+    },
+    "blockName": "core-embed/ted",
+    "rawContent": "
+<figure class=\\"wp-block-embed-ted\\">
+    https://ted.com/
+    <figcaption>Embedded content from ted</figcaption>
+</figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__tumblr gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [
+        "Embedded content from tumblr",
+      ],
+      "url": "https://tumblr.com/",
+    },
+    "name": "core-embed/tumblr",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__tumblr gets parsed and serialized properly 1`] = `
+"<!-- wp:core-embed/tumblr {\\"url\\":\\"https://tumblr.com/\\"} -->
+<figure class=\\"wp-block-embed-tumblr\\">
+    https://tumblr.com/
+    <figcaption>Embedded content from tumblr</figcaption>
+</figure>
+<!-- /wp:core-embed/tumblr -->"
+`;
+
+exports[`full post content fixture core-embed__tumblr gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://tumblr.com/",
+    },
+    "blockName": "core-embed/tumblr",
+    "rawContent": "
+<figure class=\\"wp-block-embed-tumblr\\">
+    https://tumblr.com/
+    <figcaption>Embedded content from tumblr</figcaption>
+</figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__twitter gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [
+        "We are Automattic",
+      ],
+      "url": "https://twitter.com/automattic",
+    },
+    "name": "core-embed/twitter",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__twitter gets parsed and serialized properly 1`] = `
+"<!-- wp:core-embed/twitter {\\"url\\":\\"https://twitter.com/automattic\\"} -->
+<figure class=\\"wp-block-embed-twitter\\">
+    https://twitter.com/automattic
+    <figcaption>We are Automattic</figcaption>
+</figure>
+<!-- /wp:core-embed/twitter -->"
+`;
+
+exports[`full post content fixture core-embed__twitter gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://twitter.com/automattic",
+    },
+    "blockName": "core-embed/twitter",
+    "rawContent": "
+<figure class=\\"wp-block-embed-twitter\\">
+    https://twitter.com/automattic
+    <figcaption>We are Automattic</figcaption>
+</figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__videopress gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [
+        "Embedded content from videopress",
+      ],
+      "url": "https://videopress.com/",
+    },
+    "name": "core-embed/videopress",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__videopress gets parsed and serialized properly 1`] = `
+"<!-- wp:core-embed/videopress {\\"url\\":\\"https://videopress.com/\\"} -->
+<figure class=\\"wp-block-embed-videopress\\">
+    https://videopress.com/
+    <figcaption>Embedded content from videopress</figcaption>
+</figure>
+<!-- /wp:core-embed/videopress -->"
+`;
+
+exports[`full post content fixture core-embed__videopress gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://videopress.com/",
+    },
+    "blockName": "core-embed/videopress",
+    "rawContent": "
+<figure class=\\"wp-block-embed-videopress\\">
+    https://videopress.com/
+    <figcaption>Embedded content from videopress</figcaption>
+</figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__vimeo gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [
+        "Embedded content from vimeo",
+      ],
+      "url": "https://vimeo.com/",
+    },
+    "name": "core-embed/vimeo",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__vimeo gets parsed and serialized properly 1`] = `
+"<!-- wp:core-embed/vimeo {\\"url\\":\\"https://vimeo.com/\\"} -->
+<figure class=\\"wp-block-embed-vimeo\\">
+    https://vimeo.com/
+    <figcaption>Embedded content from vimeo</figcaption>
+</figure>
+<!-- /wp:core-embed/vimeo -->"
+`;
+
+exports[`full post content fixture core-embed__vimeo gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://vimeo.com/",
+    },
+    "blockName": "core-embed/vimeo",
+    "rawContent": "
+<figure class=\\"wp-block-embed-vimeo\\">
+    https://vimeo.com/
+    <figcaption>Embedded content from vimeo</figcaption>
+</figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__vine gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [
+        "Embedded content from vine",
+      ],
+      "url": "https://vine.com/",
+    },
+    "name": "core-embed/vine",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__vine gets parsed and serialized properly 1`] = `
+"<!-- wp:core-embed/vine {\\"url\\":\\"https://vine.com/\\"} -->
+<figure class=\\"wp-block-embed-vine\\">
+    https://vine.com/
+    <figcaption>Embedded content from vine</figcaption>
+</figure>
+<!-- /wp:core-embed/vine -->"
+`;
+
+exports[`full post content fixture core-embed__vine gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://vine.com/",
+    },
+    "blockName": "core-embed/vine",
+    "rawContent": "
+<figure class=\\"wp-block-embed-vine\\">
+    https://vine.com/
+    <figcaption>Embedded content from vine</figcaption>
+</figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__wordpress gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [
+        "Embedded content from WordPress",
+      ],
+      "url": "https://wordpress.com/",
+    },
+    "name": "core-embed/wordpress",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__wordpress gets parsed and serialized properly 1`] = `
+"<!-- wp:core-embed/wordpress {\\"url\\":\\"https://wordpress.com/\\"} -->
+<figure class=\\"wp-block-embed-wordpress\\">
+    https://wordpress.com/
+    <figcaption>Embedded content from WordPress</figcaption>
+</figure>
+<!-- /wp:core-embed/wordpress -->"
+`;
+
+exports[`full post content fixture core-embed__wordpress gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://wordpress.com/",
+    },
+    "blockName": "core-embed/wordpress",
+    "rawContent": "
+<figure class=\\"wp-block-embed-wordpress\\">
+    https://wordpress.com/
+    <figcaption>Embedded content from WordPress</figcaption>
+</figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__wordpress-tv gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [
+        "Embedded content from wordpress-tv",
+      ],
+      "url": "https://wordpress.tv/",
+    },
+    "name": "core-embed/wordpress-tv",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__wordpress-tv gets parsed and serialized properly 1`] = `
+"<!-- wp:core-embed/wordpress-tv {\\"url\\":\\"https://wordpress.tv/\\"} -->
+<figure class=\\"wp-block-embed-wordpress-tv\\">
+    https://wordpress.tv/
+    <figcaption>Embedded content from wordpress-tv</figcaption>
+</figure>
+<!-- /wp:core-embed/wordpress-tv -->"
+`;
+
+exports[`full post content fixture core-embed__wordpress-tv gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://wordpress.tv/",
+    },
+    "blockName": "core-embed/wordpress-tv",
+    "rawContent": "
+<figure class=\\"wp-block-embed-wordpress-tv\\">
+    https://wordpress.tv/
+    <figcaption>Embedded content from wordpress-tv</figcaption>
+</figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__youtube gets blocks normalized properly 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "caption": Array [
+        "Embedded content from youtube",
+      ],
+      "url": "https://youtube.com/",
+    },
+    "name": "core-embed/youtube",
+    "uid": "_uid_0",
+  },
+]
+`;
+
+exports[`full post content fixture core-embed__youtube gets parsed and serialized properly 1`] = `
+"<!-- wp:core-embed/youtube {\\"url\\":\\"https://youtube.com/\\"} -->
+<figure class=\\"wp-block-embed-youtube\\">
+    https://youtube.com/
+    <figcaption>Embedded content from youtube</figcaption>
+</figure>
+<!-- /wp:core-embed/youtube -->"
+`;
+
+exports[`full post content fixture core-embed__youtube gets parsed properly 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "url": "https://youtube.com/",
+    },
+    "blockName": "core-embed/youtube",
+    "rawContent": "
+<figure class=\\"wp-block-embed-youtube\\">
+    https://youtube.com/
+    <figcaption>Embedded content from youtube</figcaption>
+</figure>
+",
+  },
+  Object {
+    "attrs": Object {},
+    "rawContent": "
+",
+  },
+]
+`;
