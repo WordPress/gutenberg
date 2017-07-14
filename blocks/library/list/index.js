@@ -227,13 +227,13 @@ registerBlockType( 'core/list', {
 						controls={ [
 							{
 								icon: 'editor-ul',
-								title: __( 'Convert to unordered' ),
+								title: __( 'Convert to unordered list' ),
 								isActive: this.isListActive( 'UL' ),
 								onClick: this.createSetListType( 'UL', 'InsertUnorderedList' ),
 							},
 							{
 								icon: 'editor-ol',
-								title: __( 'Convert to ordered' ),
+								title: __( 'Convert to ordered list' ),
 								isActive: this.isListActive( 'OL' ),
 								onClick: this.createSetListType( 'OL', 'InsertOrderedList' ),
 							},
