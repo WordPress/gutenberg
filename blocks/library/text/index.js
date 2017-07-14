@@ -101,7 +101,7 @@ registerBlockType( 'core/text', {
 				onMerge={ mergeBlocks }
 				style={ { textAlign: align } }
 				className={ dropCap && 'has-drop-cap' }
-				placeholder={ placeholder || __( 'Write…' ) }
+				placeholder={ placeholder || __( 'New Paragraph' ) }
 			/>,
 		];
 	},
