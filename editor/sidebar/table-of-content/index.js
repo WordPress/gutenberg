@@ -28,11 +28,11 @@ const TableOfContents = ( { blocks } ) => {
 					<div
 						key={ `heading-${ index }` }
 						className={ classnames( 'table-of-content__item', `is-${ heading.attributes.nodeName }`, {
-							'is-invalid': heading.attributes.content.length === 0,
+							'is-invalid': ! heading.attributes.content || heading.attributes.content.length === 0,
 						} ) }
 					>
 						<strong>{ heading.attributes.nodeName }</strong>
-						{ heading.attributes.content.length > 0
+						{ heading.attributes.content && heading.attributes.content.length > 0
 							? heading.attributes.content
 							: <em>{ __( '(Missing header text)' ) }</em>
 						}
