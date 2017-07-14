@@ -7,7 +7,7 @@ import { filter } from 'lodash';
 /**
  * WordPress Dependencies
  */
-import { __ } from 'i18n';
+import { __, sprintf } from 'i18n';
 import { PanelBody } from 'components';
 
 /**
@@ -22,6 +22,7 @@ const TableOfContents = ( { blocks } ) => {
 	return (
 		<PanelBody title={ __( 'Table of Contents (experimental)' ) } initialOpen={ false }>
 			<div className="table-of-content__items">
+				{ headings.length > 1 && <p><strong>{ sprintf( '%d Headings', headings.length ) }</strong></p> }
 				{ headings.map( ( heading, index ) =>
 					<div key={ `heading-${ index }` } className={ `table-of-content__item is-${ heading.attributes.nodeName }` }>
 						{ heading.attributes.content && heading.attributes.content[ 0 ] } <strong>{ heading.attributes.nodeName }</strong>
