@@ -101,7 +101,6 @@ class Tests_Formatting_Emoji extends WP_UnitTestCase {
 				'🧚',
 				'&#x1f9da;',
 			),
-
 		);
 	}
 
@@ -114,7 +113,7 @@ class Tests_Formatting_Emoji extends WP_UnitTestCase {
 	}
 
 	public function data_wp_staticize_emoji() {
-		return array(
+		$data = array(
 			array(
 				// Not emoji
 				'’',
@@ -123,20 +122,27 @@ class Tests_Formatting_Emoji extends WP_UnitTestCase {
 			array(
 				// Simple emoji
 				'🙂',
-				'<img src="' . $this->png_cdn . '1f642.png" alt="🙂" class="wp-smiley" style="height: 1em; max-height: 1em;" />',
+				'<img src="' . $this->png_cdn . '1f642.png" alt="" class="wp-smiley" style="height: 1em; max-height: 1em;" />',
 			),
 			array(
 				// Skin tone, gender, ZWJ, emoji selector
 				'👮🏼‍♀️',
-				'<img src="' . $this->png_cdn . '1f46e-1f3fc-200d-2640-fe0f.png" alt="👮🏼‍♀️" class="wp-smiley" style="height: 1em; max-height: 1em;" />',
+				'<img src="' . $this->png_cdn . '1f46e-1f3fc-200d-2640-fe0f.png" alt="" class="wp-smiley" style="height: 1em; max-height: 1em;" />',
 			),
 			array(
 				// Unicode 10
 				'🧚',
-				'<img src="' . $this->png_cdn . '1f9da.png" alt="🧚" class="wp-smiley" style="height: 1em; max-height: 1em;" />',
+				'<img src="' . $this->png_cdn . '1f9da.png" alt="" class="wp-smiley" style="height: 1em; max-height: 1em;" />',
 			),
-
 		);
+
+		// Older versions of PHP don't html_entity_decode() emoji, so we need to make sure they're testing in the expected form.
+		foreach ( $data as $key => $datum ) {
+			$emoji = html_entity_decode( wp_encode_emoji( $datum[0] ) );
+			$data[ $key ][1] = str_replace( 'alt=""', 'alt="' . $emoji . '"', $datum[1] );
+		}
+
+		return $data;
 	}
 
 	/**
