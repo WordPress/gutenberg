@@ -51,12 +51,12 @@ const FREEFORM_CONTROLS = [
 		{
 			id: 'bullist',
 			icon: 'editor-ul',
-			title: __( 'Convert to unordered list' ),
+			title: __( 'Convert to unordered' ),
 		},
 		{
 			id: 'numlist',
 			icon: 'editor-ol',
-			title: __( 'Convert to ordered list' ),
+			title: __( 'Convert to ordered' ),
 		},
 	],
 	[
