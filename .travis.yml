@@ -15,7 +15,7 @@ cache:
 
 before_install:
   - nvm install 6.11.1 && nvm use 6.11.1
-  - if [[ `npm -v ` != 5* ]]; then npm i -g npm@5; fi
+  - npm install --global npm@5
 
 matrix:
   include:
