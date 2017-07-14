@@ -25,7 +25,11 @@ const TableOfContents = ( { blocks } ) => {
 				{ headings.length > 1 && <p><strong>{ sprintf( '%d Headings', headings.length ) }</strong></p> }
 				{ headings.map( ( heading, index ) =>
 					<div key={ `heading-${ index }` } className={ `table-of-content__item is-${ heading.attributes.nodeName }` }>
-						<strong>{ heading.attributes.nodeName }</strong> { heading.attributes.content }
+						<strong>{ heading.attributes.nodeName }</strong>
+						{ heading.attributes.content.length > 0
+							? heading.attributes.content
+							: <em>{ __( '(Missing header text)' ) }</em>
+						}
 					</div>
 				) }
 			</div>
