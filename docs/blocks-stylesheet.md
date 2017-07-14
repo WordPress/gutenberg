@@ -59,7 +59,7 @@ The class name is generated using the block's name prefixed with `wp-block-`, re
 }
 ```
 
-## Enqueuing Block Styles
+## Editor-only Block Styles
 
 Like scripts, your block's editor-specific styles should be enqueued during the `enqueue_block_editor_assets` action.
 
@@ -82,7 +82,7 @@ function gutenberg_boilerplate_enqueue_block_editor_assets() {
 add_action( 'enqueue_block_editor_assets', 'gutenberg_boilerplate_enqueue_block_editor_assets' );
 ```
 
-## Front-End Styling
+## General Block Styling
 
 While a block's scripts are only necessary to load in the editor, you'll want to load styles both on the front of your site and in the editor. You may even want distinct styles in each context.
 
@@ -103,3 +103,5 @@ add_action( 'enqueue_block_assets', 'gutenberg_boilerplate_es5_enqueue_common_as
 ```
 
 The `enqueue_block_assets` action is triggered both in the editor and on the front of the site. Since your block is likely to share some styles in both contexts, you can consider `style.css` as the base stylesheet, placing editor-specific styles in `editor.css`.
+
+> If you'd like the styles to be limited to the frontend only you can us `enqueue_block_assets` along with a call like `if ( ! is_admin() ) {}` etc.
