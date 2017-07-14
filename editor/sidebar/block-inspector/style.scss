@@ -7,3 +7,10 @@
 		color: inherit;
 	}
 }
+
+.editor-block-inspector__no-blocks {
+	display: block;
+	font-size: $default-font-size;
+	margin: 32px 16px;
+	text-align: center;
+}

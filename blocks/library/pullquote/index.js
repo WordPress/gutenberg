@@ -7,6 +7,7 @@ import { __ } from 'i18n';
  * Internal dependencies
  */
 import './style.scss';
+import './block.scss';
 import { registerBlockType, query as hpq } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
@@ -50,6 +51,7 @@ registerBlockType( 'core/pullquote', {
 			),
 			<blockquote key="quote" className={ className }>
 				<Editable
+					multiline="p"
 					value={ value }
 					onChange={
 						( nextValue ) => setAttributes( {
@@ -73,7 +75,6 @@ registerBlockType( 'core/pullquote', {
 						}
 						focus={ focus && focus.editable === 'citation' ? focus : null }
 						onFocus={ ( props ) => setFocus( { ...props, editable: 'citation' } ) }
-						inline
 					/>
 				) }
 			</blockquote>,

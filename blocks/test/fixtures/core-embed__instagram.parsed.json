@@ -4,7 +4,7 @@
         "attrs": {
             "url": "https://instagram.com/"
         },
-        "rawContent": "\n<figure class=\"wp-block-core-embed-instagram\">\n    https://instagram.com/\n    <figcaption>Embedded content from instagram</figcaption>\n</figure>\n"
+        "rawContent": "\n<figure class=\"wp-block-embed-instagram\">\n    https://instagram.com/\n    <figcaption>Embedded content from instagram</figcaption>\n</figure>\n"
     },
     {
         "attrs": {},

@@ -19,6 +19,7 @@ import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import InspectorControls from '../../inspector-controls';
 import AlignmentToolbar from '../../alignment-toolbar';
+import BlockDescription from '../../block-description';
 
 const { children, prop } = query;
 
@@ -68,6 +69,14 @@ registerBlockType( 'core/heading', {
 					} );
 				},
 			},
+			{
+				type: 'raw',
+				matcher: ( node ) => /H\d/.test( node.nodeName ),
+				attributes: {
+					content: children( 'h1,h2,h3,h4,h5,h6' ),
+					nodeName: prop( 'h1,h2,h3,h4,h5,h6', 'nodeName' ),
+				},
+			},
 		],
 		to: [
 			{
@@ -88,7 +97,7 @@ registerBlockType( 'core/heading', {
 		};
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, insertBlockAfter } ) {
+	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, insertBlocksAfter } ) {
 		const { align, content, nodeName = 'H2' } = attributes;
 
 		return [
@@ -108,7 +117,11 @@ registerBlockType( 'core/heading', {
 			),
 			focus && (
 				<InspectorControls key="inspector">
-					<h3>{ __( 'Heading Size' ) }</h3>
+					<BlockDescription>
+						<p>{ __( 'Search engines use the headings to index the structure and content of your web pages.' ) }</p>
+					</BlockDescription>
+					<h3>{ __( 'Heading Settings' ) }</h3>
+					<p>{ __( 'Size' ) }</p>
 					<Toolbar
 						controls={
 							'123456'.split( '' ).map( ( level ) => ( {
@@ -120,7 +133,7 @@ registerBlockType( 'core/heading', {
 							} ) )
 						}
 					/>
-					<h3>{ __( 'Text Alignment' ) }</h3>
+					<p>{ __( 'Text Alignment' ) }</p>
 					<AlignmentToolbar
 						value={ align }
 						onChange={ ( nextAlign ) => {
@@ -137,12 +150,12 @@ registerBlockType( 'core/heading', {
 				onFocus={ setFocus }
 				onChange={ ( value ) => setAttributes( { content: value } ) }
 				onMerge={ mergeBlocks }
-				inline
-				onSplit={ ( before, after ) => {
+				onSplit={ ( before, after, ...blocks ) => {
 					setAttributes( { content: before } );
-					insertBlockAfter( createBlock( 'core/text', {
-						content: after,
-					} ) );
+					insertBlocksAfter( [
+						...blocks,
+						createBlock( 'core/text', { content: after } ),
+					] );
 				} }
 				style={ { textAlign: align } }
 				placeholder={ __( 'Write heading…' ) }

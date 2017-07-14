@@ -14,6 +14,7 @@ import BlockControls from '../../block-controls';
 import Editable from '../../editable';
 import InspectorControls from '../../inspector-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
+import BlockDescription from '../../block-description';
 
 const { children, query } = hpq;
 
@@ -30,13 +31,29 @@ registerBlockType( 'core/text', {
 		content: query( 'p', children() ),
 	},
 
+	transforms: {
+		from: [
+			{
+				type: 'raw',
+				matcher: ( node ) => (
+					node.nodeName === 'P' &&
+					// Do not allow embedded content.
+					! node.querySelector( 'audio, canvas, embed, iframe, img, math, object, svg, video' )
+				),
+				attributes: {
+					content: query( 'p', children() ),
+				},
+			},
+		],
+	},
+
 	merge( attributes, attributesToMerge ) {
 		return {
 			content: concatChildren( attributes.content, attributesToMerge.content ),
 		};
 	},
 
-	edit( { attributes, setAttributes, insertBlockAfter, focus, setFocus, mergeBlocks } ) {
+	edit( { attributes, setAttributes, insertBlocksAfter, focus, setFocus, mergeBlocks } ) {
 		const { align, content, dropCap } = attributes;
 		const toggleDropCap = () => setAttributes( { dropCap: ! dropCap } );
 		return [
@@ -52,6 +69,10 @@ registerBlockType( 'core/text', {
 			),
 			focus && (
 				<InspectorControls key="inspector">
+					<BlockDescription>
+						<p>{ __( 'Text. Great things start here.' ) }</p>
+					</BlockDescription>
+					<h3>{ __( 'Text Settings' ) }</h3>
 					<ToggleControl
 						label={ __( 'Drop Cap' ) }
 						checked={ !! dropCap }
@@ -60,7 +81,6 @@ registerBlockType( 'core/text', {
 				</InspectorControls>
 			),
 			<Editable
-				inline
 				tagName="p"
 				key="editable"
 				value={ content }
@@ -71,11 +91,12 @@ registerBlockType( 'core/text', {
 				} }
 				focus={ focus }
 				onFocus={ setFocus }
-				onSplit={ ( before, after ) => {
+				onSplit={ ( before, after, ...blocks ) => {
 					setAttributes( { content: before } );
-					insertBlockAfter( createBlock( 'core/text', {
-						content: after,
-					} ) );
+					insertBlocksAfter( [
+						...blocks,
+						createBlock( 'core/text', { content: after } ),
+					] );
 				} }
 				onMerge={ mergeBlocks }
 				style={ { textAlign: align } }

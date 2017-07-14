@@ -15,6 +15,8 @@ import InspectorControls from '../../inspector-controls';
 import TextControl from '../../inspector-controls/text-control';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
+import BlockDescription from '../../block-description';
+import UrlInput from '../../url-input';
 
 const { attr, children } = query;
 
@@ -29,6 +31,24 @@ registerBlockType( 'core/image', {
 		url: attr( 'img', 'src' ),
 		alt: attr( 'img', 'alt' ),
 		caption: children( 'figcaption' ),
+		href: attr( 'a', 'href' ),
+	},
+
+	transforms: {
+		from: [
+			{
+				type: 'raw',
+				matcher: ( node ) => (
+					node.nodeName === 'IMG' ||
+					( ! node.textContent && node.querySelector( 'img' ) )
+				),
+				attributes: {
+					url: attr( 'img', 'src' ),
+					alt: attr( 'img', 'alt' ),
+					caption: children( 'figcaption' ),
+				},
+			},
+		],
 	},
 
 	getEditWrapperProps( attributes ) {
@@ -39,13 +59,14 @@ registerBlockType( 'core/image', {
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus, className } ) {
-		const { url, alt, caption, align, id } = attributes;
+		const { url, alt, caption, align, id, href } = attributes;
 		const updateAlt = ( newAlt ) => setAttributes( { alt: newAlt } );
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		const onSelectImage = ( media ) => {
 			setAttributes( { url: media.url, alt: media.alt, caption: media.caption, id: media.id } );
 		};
 		const uploadButtonProps = { isLarge: true };
+		const onSetHref = ( event ) => setAttributes( { href: event.target.value } );
 
 		const controls = (
 			focus && (
@@ -59,7 +80,10 @@ registerBlockType( 'core/image', {
 					<Toolbar>
 						<li>
 							<MediaUploadButton
-								buttonProps={ { className: 'components-icon-button components-toolbar__control' } }
+								buttonProps={ {
+									className: 'components-icon-button components-toolbar__control',
+									'aria-label': __( 'Edit image' ),
+								} }
 								onSelect={ onSelectImage }
 								type="image"
 								value={ id }
@@ -67,6 +91,7 @@ registerBlockType( 'core/image', {
 								<Dashicon icon="edit" />
 							</MediaUploadButton>
 						</li>
+						<UrlInput onChange={ onSetHref } url={ href } />
 					</Toolbar>
 				</BlockControls>
 			)
@@ -84,8 +109,7 @@ registerBlockType( 'core/image', {
 					<MediaUploadButton
 						buttonProps={ uploadButtonProps }
 						onSelect={ onSelectImage }
-						type="format-image"
-						autoOpen
+						type="image"
 					>
 						{ __( 'Insert from Media Library' ) }
 					</MediaUploadButton>
@@ -102,6 +126,10 @@ registerBlockType( 'core/image', {
 			controls,
 			focus && (
 				<InspectorControls key="inspector">
+					<BlockDescription>
+						<p>{ __( 'Worth a thousand words.' ) }</p>
+					</BlockDescription>
+					<h3>{ __( 'Image Settings' ) }</h3>
 					<TextControl label={ __( 'Alternate Text' ) } value={ alt } onChange={ updateAlt } />
 				</InspectorControls>
 			),
@@ -115,7 +143,6 @@ registerBlockType( 'core/image', {
 						focus={ focus && focus.editable === 'caption' ? focus : undefined }
 						onFocus={ focusCaption }
 						onChange={ ( value ) => setAttributes( { caption: value } ) }
-						inline
 						inlineToolbar
 					/>
 				) : null }
@@ -125,17 +152,13 @@ registerBlockType( 'core/image', {
 	},
 
 	save( { attributes } ) {
-		const { url, alt, caption, align = 'none' } = attributes;
-
-		// If there's no caption set only save the image element.
-		if ( ! caption || ! caption.length ) {
-			return <img src={ url } alt={ alt } className={ `align${ align }` } />;
-		}
+		const { url, alt, caption = [], align, href } = attributes;
+		const image = <img src={ url } alt={ alt } />;
 
 		return (
-			<figure className={ `align${ align }` }>
-				<img src={ url } alt={ alt } />
-				<figcaption>{ caption }</figcaption>
+			<figure className={ align && `align${ align }` }>
+				{ href ? <a href={ href }>{ image }</a> : image }
+				{ caption.length > 0 && <figcaption>{ caption }</figcaption> }
 			</figure>
 		);
 	},

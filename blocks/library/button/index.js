@@ -8,6 +8,7 @@ import { IconButton } from 'components';
  * Internal dependencies
  */
 import './style.scss';
+import './block.scss';
 import { registerBlockType, query } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
@@ -53,7 +54,6 @@ registerBlockType( 'core/button', {
 					focus={ focus }
 					onFocus={ setFocus }
 					onChange={ ( value ) => setAttributes( { text: value } ) }
-					inline
 					formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
 				/>
 				{ focus &&

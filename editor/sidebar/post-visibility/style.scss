@@ -62,12 +62,15 @@
 .editor-post-visibility__dialog-legend {
 	font-weight: 600;
 	font-size: 0.9em;
-
 }
 
-.editor-post-visibility__dialog-label {
-	display: block;
+.editor-post-visibility__choice {
 	margin: 10px 0;
+}
+
+.editor-post-visibility__dialog-radio,
+.editor-post-visibility__dialog-label {
+	vertical-align: top;
 }
 
 .editor-post-visibility__dialog-password-input {
@@ -79,5 +82,6 @@
 	color: $dark-gray-200;
 	padding-left: 20px;
 	font-style: italic;
-	margin-top: 4px;
+	margin: 4px 0 0;
+	line-height: 1.4;
 }

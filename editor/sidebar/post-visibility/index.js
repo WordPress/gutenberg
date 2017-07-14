@@ -4,6 +4,7 @@
 import { connect } from 'react-redux';
 import clickOutside from 'react-click-outside';
 import { find } from 'lodash';
+import { withInstanceId } from 'components';
 
 /**
  * WordPress dependencies
@@ -36,8 +37,7 @@ class PostVisibility extends Component {
 		};
 	}
 
-	toggleDialog( event ) {
-		event.preventDefault();
+	toggleDialog() {
 		this.setState( ( state ) => ( { opened: ! state.opened } ) );
 	}
 
@@ -56,8 +56,8 @@ class PostVisibility extends Component {
 		const { onUpdateVisibility, onSave } = this.props;
 
 		onUpdateVisibility( 'private' );
+		this.setState( { hasPassword: false } );
 		onSave();
-		this.setState( { opened: false } );
 	}
 
 	setPasswordProtected() {
@@ -72,7 +72,7 @@ class PostVisibility extends Component {
 	}
 
 	render() {
-		const { status, visibility, password, onUpdateVisibility } = this.props;
+		const { status, visibility, password, onUpdateVisibility, instanceId } = this.props;
 
 		const updatePassword = ( event ) => onUpdateVisibility( status, event.target.value );
 
@@ -106,35 +106,61 @@ class PostVisibility extends Component {
 		return (
 			<div className="editor-post-visibility">
 				<span>{ __( 'Visibility' ) }</span>
-				<button className="editor-post-visibility__toggle button-link" onClick={ this.toggleDialog }>
+				<button
+					type="button"
+					aria-expanded={ this.state.opened }
+					className="editor-post-visibility__toggle button-link"
+					onClick={ this.toggleDialog }
+				>
 					{ getVisibilityLabel( visibility ) }
 				</button>
 
 				{ this.state.opened &&
 					<div className="editor-post-visibility__dialog">
 						<div className="editor-post-visibility__dialog-arrow" />
-						<div className="editor-post-visibility__dialog-legend">
-							{ __( 'Post Visibility' ) }
-						</div>
-						{ visibilityOptions.map( ( { value, label, info, onSelect, checked } ) => (
-							<label key={ value } className="editor-post-visibility__dialog-label">
-								<input
-									type="radio"
-									value={ value }
-									onChange={ onSelect }
-									checked={ checked } />
-								{ label }
-								{ <div className="editor-post-visibility__dialog-info">{ info }</div> }
-							</label>
-						) ) }
+						<fieldset>
+							<legend className="editor-post-visibility__dialog-legend">
+								{ __( 'Post Visibility' ) }
+							</legend>
+							{ visibilityOptions.map( ( { value, label, info, onSelect, checked } ) => (
+								<div key={ value } className="editor-post-visibility__choice">
+									<input
+										type="radio"
+										name={ `editor-post-visibility__setting-${ instanceId }` }
+										value={ value }
+										onChange={ onSelect }
+										checked={ checked }
+										id={ `editor-post-${ value }-${ instanceId }` }
+										aria-describedby={ `editor-post-${ value }-${ instanceId }-description` }
+										className="editor-post-visibility__dialog-radio"
+									/>
+									<label
+										htmlFor={ `editor-post-${ value }-${ instanceId }` }
+										className="editor-post-visibility__dialog-label"
+									>
+										{ label }
+									</label>
+									{ <p id={ `editor-post-${ value }-${ instanceId }-description` } className="editor-post-visibility__dialog-info">{ info }</p> }
+								</div>
+							) ) }
+						</fieldset>
 						{ this.state.hasPassword &&
-							<input
-								className="editor-post-visibility__dialog-password-input"
-								type="text"
-								onChange={ updatePassword }
-								value={ password }
-								placeholder={ __( 'Create password' ) }
-							/>
+							<div className="editor-post-visibility__dialog-password">
+								<label
+									htmlFor={ `editor-post-visibility__dialog-password-input-${ instanceId }` }
+									className="screen-reader-text"
+								>
+									{ __( 'Create password' ) }
+								</label>
+								<input
+									className="editor-post-visibility__dialog-password-input"
+									id={ `editor-post-visibility__dialog-password-input-${ instanceId }` }
+									type="text"
+									onChange={ updatePassword }
+									value={ password }
+									placeholder={ __( 'Use a secure password' ) }
+								/>
+							</div>
 						}
 					</div>
 				}
@@ -156,5 +182,4 @@ export default connect(
 			return editPost( { status, password } );
 		},
 	}
-)( clickOutside( PostVisibility ) );
-
+)( withInstanceId( clickOutside( PostVisibility ) ) );

@@ -12,7 +12,7 @@ import { Toolbar } from 'components';
 /**
  * Internal dependencies
  */
-import './style.scss';
+import './block.scss';
 import { registerBlockType, createBlock, query as hpq } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
@@ -142,6 +142,7 @@ registerBlockType( 'core/quote', {
 				className={ `${ className } blocks-quote-style-${ style }` }
 			>
 				<Editable
+					multiline="p"
 					value={ value }
 					onChange={
 						( nextValue ) => setAttributes( {
@@ -166,7 +167,6 @@ registerBlockType( 'core/quote', {
 						}
 						focus={ focusedEditable === 'citation' ? focus : null }
 						onFocus={ ( props ) => setFocus( { ...props, editable: 'citation' } ) }
-						inline
 					/>
 				) }
 			</blockquote>,

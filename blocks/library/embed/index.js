@@ -138,14 +138,17 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 				}
 
 				if ( ! html ) {
+					const label = sprintf( __( '%s URL' ), title );
+
 					return [
 						controls,
-						<Placeholder key="placeholder" icon={ icon } label={ sprintf( __( '%s URL' ), title ) } className="wp-block-embed">
+						<Placeholder key="placeholder" icon={ icon } label={ label } className="wp-block-embed">
 							<form onSubmit={ this.doServerSideRender }>
 								<input
 									type="url"
 									value={ url || '' }
 									className="components-placeholder__input"
+									aria-label={ label }
 									placeholder={ __( 'Enter URL to embed here…' ) }
 									onChange={ ( event ) => setAttributes( { url: event.target.value } ) } />
 								<Button
@@ -161,7 +164,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 
 				const parsedUrl = parse( url );
 				const cannotPreview = includes( HOSTS_NO_PREVIEWS, parsedUrl.host.replace( /^www\./, '' ) );
-				const iframeTitle = 'Embedded content from ' + parsedUrl.host;
+				const iframeTitle = sprintf( __( 'Embedded content from %s' ), parsedUrl.host );
 				let typeClassName = 'wp-block-embed';
 				if ( 'video' === type ) {
 					typeClassName += ' is-video';
@@ -186,7 +189,6 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 								focus={ focus }
 								onFocus={ setFocus }
 								onChange={ ( value ) => setAttributes( { caption: value } ) }
-								inline
 								inlineToolbar
 							/>
 						) : null }
@@ -196,15 +198,12 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 		},
 
 		save( { attributes } ) {
-			const { url, caption, align } = attributes;
-			if ( ! caption || ! caption.length ) {
-				return url;
-			}
+			const { url, caption = [], align } = attributes;
 
 			return (
-				<figure className={ align && `align${ align }` }>{ '\n' }
-					{ url }
-					<figcaption>{ caption }</figcaption>
+				<figure className={ align && `align${ align }` }>
+					{ `\n${ url }\n` /* URL needs to be on its own line. */ }
+					{ caption.length > 0 && <figcaption>{ caption }</figcaption> }
 				</figure>
 			);
 		},

@@ -102,7 +102,14 @@ registerBlockType( 'core/list', {
 					} );
 				},
 			},
-
+			{
+				type: 'raw',
+				matcher: ( node ) => node.nodeName === 'OL' || node.nodeName === 'UL',
+				attributes: {
+					nodeName: prop( 'ol,ul', 'nodeName' ),
+					values: children( 'ol,ul' ),
+				},
+			},
 		],
 		to: [
 			{
@@ -157,6 +164,19 @@ registerBlockType( 'core/list', {
 					internalListType: this.findInternalListType( nodeInfo ),
 				} );
 			} );
+
+			// this checks for languages that do not typically have square brackets on their keyboards
+			const lang = window.navigator.browserLanguage || window.navigator.language;
+			const keyboardHasSqBracket = ! /^(?:fr|nl|sv|ru|de|es|it)/.test( lang );
+
+			if ( keyboardHasSqBracket ) {
+				// keycode 219 = '[' and keycode 221 = ']'
+				editor.shortcuts.add( 'meta+219', 'Decrease indent', 'Outdent' );
+				editor.shortcuts.add( 'meta+221', 'Increase indent', 'Indent' );
+			} else {
+				editor.shortcuts.add( 'meta+shift+m', 'Decrease indent', 'Outdent' );
+				editor.shortcuts.add( 'meta+m', 'Increase indent', 'Indent' );
+			}
 
 			this.editor = editor;
 		}
@@ -231,6 +251,7 @@ registerBlockType( 'core/list', {
 					/>
 				),
 				<Editable
+					multiline="li"
 					key="editable"
 					tagName={ nodeName.toLowerCase() }
 					getSettings={ this.getEditorSettings }
@@ -240,6 +261,7 @@ registerBlockType( 'core/list', {
 					focus={ focus }
 					onFocus={ setFocus }
 					className="blocks-list"
+					placeholder={ __( 'Write list…' ) }
 				/>,
 			];
 		}

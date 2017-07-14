@@ -41,6 +41,7 @@ The `value` property is handled in a manner similar to controlled form component
   Otherwise the REST API won't save them.)
 - `onChange` - Function to call when the tokens have changed. An array of new
   tokens is passed to the callback.
+- `onInputChange` - Function to call when the users types in the input field. It can be used to trigger autocomplete requests.
 - `onFocus` - Function to call when the TokenField has been focused on. The event is passed to the callback. Useful for analytics.
 - `suggestions` - An array of strings to present to the user as suggested
   tokens.

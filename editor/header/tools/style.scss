@@ -76,6 +76,11 @@
 	}
 }
 
+// Needs specificity to override bleed
+.wp-core-ui .button.button-large.editor-tools__publish-button {
+	margin-bottom: 0;
+}
+
 .editor-tools__publish-button.is-saving,
 .editor-tools__publish-button.is-saving:disabled {
 	position: relative;

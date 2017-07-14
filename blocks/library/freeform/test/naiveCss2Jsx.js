@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-import { expect } from 'chai';
-/**
  * Internal dependencies
  */
 import { naiveCss2Jsx } from '../format-list';
@@ -14,7 +10,7 @@ describe( 'naiveCss2Jsx', () => {
 			'font-style:normal;text-decoration:none;text-transform:none;' +
 			'color:rgb(68, 68, 68);background-color:transparent;border:;' +
 			'border-radius:;outline:;text-shadow:none;'
-		) ).to.deep.equal( {
+		) ).toEqual( {
 			fontFamily: '"Noto Serif",serif',
 			fontSize: '16px',
 			fontWeight: '400',
@@ -35,7 +31,7 @@ describe( 'naiveCss2Jsx', () => {
 			'font-style:normal;text-decoration:none;text-transform:none;' +
 			'color:rgb(35, 40, 45);background-color:transparent;border:;' +
 			'border-radius:;outline:;text-shadow:none;'
-		) ).to.deep.equal( {
+		) ).toEqual( {
 			fontFamily: '"Noto Serif",serif',
 			fontSize: '32px',
 			fontWeight: '600',
@@ -56,7 +52,7 @@ describe( 'naiveCss2Jsx', () => {
 			'font-style:normal;text-decoration:none;text-transform:none;' +
 			'color:rgb(35, 40, 45);background-color:transparent;border:;' +
 			'border-radius:;outline:;text-shadow:none;'
-		) ).to.deep.equal( {
+		) ).toEqual( {
 			fontFamily: '"Noto Serif",serif',
 			fontSize: '20.8px',
 			fontWeight: '600',
@@ -77,7 +73,7 @@ describe( 'naiveCss2Jsx', () => {
 			'font-style:normal;text-decoration:none;text-transform:none;' +
 			'color:rgb(68, 68, 68);background-color:transparent;border:;' +
 			'border-radius:;outline:;text-shadow:none;'
-		) ).to.deep.equal( {
+		) ).toEqual( {
 			fontFamily: '"Noto Serif",serif',
 			fontSize: '16px',
 			fontWeight: '600',
@@ -98,7 +94,7 @@ describe( 'naiveCss2Jsx', () => {
 			'font-style:normal;text-decoration:none;text-transform:none;' +
 			'color:rgb(68, 68, 68);background-color:transparent;border:;' +
 			'border-radius:;outline:;text-shadow:none;'
-		) ).to.deep.equal( {
+		) ).toEqual( {
 			fontFamily: '"Noto Serif",serif',
 			fontSize: '13.2833px',
 			fontWeight: '600',
@@ -119,7 +115,7 @@ describe( 'naiveCss2Jsx', () => {
 			'font-style:normal;text-decoration:none;text-transform:none;' +
 			'color:rgb(68, 68, 68);background-color:transparent;border:;' +
 			'border-radius:;outline:;text-shadow:none;'
-		) ).to.deep.equal( {
+		) ).toEqual( {
 			fontFamily: '"Noto Serif",serif',
 			fontSize: '10.7167px',
 			fontWeight: '600',
@@ -140,7 +136,7 @@ describe( 'naiveCss2Jsx', () => {
 			'font-style:normal;text-decoration:none;text-transform:none;' +
 			'color:rgb(68, 68, 68);background-color:transparent;border:;' +
 			'border-radius:;outline:;text-shadow:none;'
-		) ).to.deep.equal( {
+		) ).toEqual( {
 			fontFamily: 'monospace',
 			fontSize: '16px',
 			fontWeight: '400',
