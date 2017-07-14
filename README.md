@@ -12,6 +12,8 @@ This is the development hub for the <a href="https://make.wordpress.org/core/201
 
 WordPress already supports a large amount of "blocks", but doesn't surface them very well, nor does it give them much in the way of layout options. By embracing the blocky nature of rich post content, we will surface the blocks that already exist, as well as provide more advanced layout options for each of them. This will allow you to easily compose beautiful posts like <a href="http://moc.co/sandbox/example-post/">this example</a>.
 
+Check out the <a href="https://github.com/WordPress/gutenberg/blob/master/docs/faq.md">FAQ</a> for answers to the most common questions about the project.
+
 ## Contributors
 
 Gutenberg is built by many contributors and volunteers. Please see the full list in <a href="CONTRIBUTORS.md">CONTRIBUTORS.md</a>.
