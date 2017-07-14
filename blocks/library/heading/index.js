@@ -37,6 +37,10 @@ registerBlockType( 'core/heading', {
 		nodeName: prop( 'h1,h2,h3,h4,h5,h6', 'nodeName' ),
 	},
 
+	defaultAttributes: {
+		nodeName: 'H2',
+	},
+
 	transforms: {
 		from: [
 			{
@@ -98,7 +102,7 @@ registerBlockType( 'core/heading', {
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, insertBlocksAfter } ) {
-		const { align, content, nodeName = 'H2', placeholder } = attributes;
+		const { align, content, nodeName, placeholder } = attributes;
 
 		return [
 			focus && (
@@ -164,7 +168,7 @@ registerBlockType( 'core/heading', {
 	},
 
 	save( { attributes } ) {
-		const { align, nodeName = 'H2', content } = attributes;
+		const { align, nodeName, content } = attributes;
 		const Tag = nodeName.toLowerCase();
 
 		return (
