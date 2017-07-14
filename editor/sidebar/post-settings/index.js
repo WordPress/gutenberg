@@ -18,7 +18,7 @@ import PostTaxonomies from '../post-taxonomies';
 import FeaturedImage from '../featured-image';
 import DiscussionPanel from '../discussion-panel';
 import LastRevision from '../last-revision';
-import TableOfContent from '../table-of-content';
+import TableOfContents from '../table-of-contents';
 
 const PostSettings = () => {
 	return (
@@ -29,7 +29,7 @@ const PostSettings = () => {
 			<FeaturedImage />
 			<PostExcerpt />
 			<DiscussionPanel />
-			<TableOfContent />
+			<TableOfContents />
 		</Panel>
 	);
 };

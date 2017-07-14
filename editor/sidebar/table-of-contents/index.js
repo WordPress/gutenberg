@@ -21,13 +21,13 @@ const TableOfContents = ( { blocks } ) => {
 	const headings = filter( blocks, ( block ) => block.name === 'core/heading' );
 
 	return (
-		<PanelBody title={ __( 'Table of Content (experimental)' ) } initialOpen={ false }>
-			<div className="table-of-content__items">
+		<PanelBody title={ __( 'Table of Contents (experimental)' ) } initialOpen={ false }>
+			<div className="table-of-contents__items">
 				{ headings.length > 1 && <p><strong>{ sprintf( '%d Headings', headings.length ) }</strong></p> }
 				{ headings.map( ( heading, index ) =>
 					<div
 						key={ `heading-${ index }` }
-						className={ classnames( 'table-of-content__item', `is-${ heading.attributes.nodeName }`, {
+						className={ classnames( 'table-of-contents__item', `is-${ heading.attributes.nodeName }`, {
 							'is-invalid': ! heading.attributes.content || heading.attributes.content.length === 0,
 						} ) }
 					>
