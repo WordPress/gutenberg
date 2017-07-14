@@ -17,24 +17,24 @@
 		color: $light-gray-500;
 		margin-right: 4px;
 	}
-}
 
-.is-H2::before {
-	content: '—';
-}
+	.is-H2::before {
+		content: '—';
+	}
 
-.is-H3::before {
-	content: '——';
-}
+	.is-H3::before {
+		content: '——';
+	}
 
-.is-H4::before {
-	content: '———';
-}
+	.is-H4::before {
+		content: '———';
+	}
 
-.is-H5::before {
-	content: '————';
-}
+	.is-H5::before {
+		content: '————';
+	}
 
-.is-H6::before {
-	content: '—————';
+	.is-H6::before {
+		content: '—————';
+	}
 }
