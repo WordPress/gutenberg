@@ -4,9 +4,7 @@
         "name": "core-embed/funnyordie",
         "attributes": {
             "url": "https://funnyordie.com/",
-            "caption": [
-                "Embedded content from funnyordie"
-            ]
+            "caption": "Embedded content from funnyordie"
         }
     }
 ]

@@ -3,6 +3,7 @@
  */
 import { isEmpty, reduce, isObject } from 'lodash';
 import { html as beautifyHtml } from 'js-beautify';
+import traverse from 'react-traverse';
 import classnames from 'classnames';
 
 /**
@@ -37,37 +38,53 @@ export function getBlockDefaultClassname( blockName ) {
  */
 export function getSaveContent( blockType, attributes ) {
 	const { save, className = getBlockDefaultClassname( blockType.name ) } = blockType;
-	let rawContent;
 
+	let content;
 	if ( save.prototype instanceof Component ) {
-		rawContent = createElement( save, { attributes } );
+		content = createElement( save, { attributes } );
 	} else {
-		rawContent = save( { attributes } );
+		content = save( { attributes } );
 
 		// Special-case function render implementation to allow raw HTML return
-		if ( 'string' === typeof rawContent ) {
-			return rawContent;
+		if ( 'string' === typeof content ) {
+			return content;
 		}
 	}
 
-	// Adding a generic classname
-	const addClassnameToElement = ( element ) => {
-		if ( ! element || ! isObject( element ) || ! className ) {
-			return element;
-		}
+	content = traverse( content, {
+		DOMElement( { node, traverseChildren } ) {
+			if ( 'string' === typeof node.props.children ) {
+				return cloneElement( node, {
+					...node.props,
+					dangerouslySetInnerHTML: {
+						__html: node.props.children,
+					},
+					children: undefined,
+				} );
+			}
 
-		const updatedClassName = classnames(
-			className,
-			element.props.className,
-			attributes.className
-		);
+			return cloneElement( node, node.props, ...traverseChildren() );
+		},
+	} );
 
-		return cloneElement( element, { className: updatedClassName } );
-	};
-	const contentWithClassname = Children.map( rawContent, addClassnameToElement );
+	if ( false !== className ) {
+		content = Children.map( content, ( element ) => {
+			if ( ! element || ! isObject( element ) ) {
+				return element;
+			}
+
+			return cloneElement( element, {
+				className: classnames(
+					className,
+					element.props.className,
+					attributes.className
+				),
+			} );
+		} );
+	}
 
 	// Otherwise, infer as element
-	return renderToString( contentWithClassname );
+	return renderToString( content );
 }
 
 /**

@@ -4,9 +4,7 @@
         "name": "core-embed/flickr",
         "attributes": {
             "url": "https://flickr.com/",
-            "caption": [
-                "Embedded content from flickr"
-            ]
+            "caption": "Embedded content from flickr"
         }
     }
 ]

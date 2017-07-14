@@ -3,18 +3,7 @@
         "uid": "_uid_0",
         "name": "core/verse",
         "attributes": {
-            "content": [
-                "A ",
-                {
-                    "type": "em",
-                    "children": "verse"
-                },
-                "…",
-                {
-                    "type": "br"
-                },
-                "And more!"
-            ]
+            "content": "A <em>verse</em>…<br>And more!"
         }
     }
 ]

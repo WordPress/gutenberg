@@ -4,9 +4,7 @@
         "name": "core-embed/facebook",
         "attributes": {
             "url": "https://facebook.com/",
-            "caption": [
-                "Embedded content from facebook"
-            ]
+            "caption": "Embedded content from facebook"
         }
     }
 ]

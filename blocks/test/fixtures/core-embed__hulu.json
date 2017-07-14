@@ -4,9 +4,7 @@
         "name": "core-embed/hulu",
         "attributes": {
             "url": "https://hulu.com/",
-            "caption": [
-                "Embedded content from hulu"
-            ]
+            "caption": "Embedded content from hulu"
         }
     }
 ]

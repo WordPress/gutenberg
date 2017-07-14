@@ -4,9 +4,7 @@
         "name": "core-embed/reddit",
         "attributes": {
             "url": "https://reddit.com/",
-            "caption": [
-                "Embedded content from reddit"
-            ]
+            "caption": "Embedded content from reddit"
         }
     }
 ]

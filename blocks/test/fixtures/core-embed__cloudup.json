@@ -4,9 +4,7 @@
         "name": "core-embed/cloudup",
         "attributes": {
             "url": "https://cloudup.com/",
-            "caption": [
-                "Embedded content from cloudup"
-            ]
+            "caption": "Embedded content from cloudup"
         }
     }
 ]

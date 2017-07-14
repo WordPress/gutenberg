@@ -4,13 +4,9 @@
         "name": "core/pullquote",
         "attributes": {
             "value": [
-                [
-                    "Testing pullquote block..."
-                ]
+                "Testing pullquote block..."
             ],
-            "citation": [
-                "...with a caption"
-            ]
+            "citation": "...with a caption"
         }
     }
 ]

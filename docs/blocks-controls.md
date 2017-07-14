@@ -18,7 +18,7 @@ var el = wp.element.createElement,
 	Editable = wp.blocks.Editable,
 	BlockControls = wp.blocks.BlockControls,
 	AlignmentToolbar = wp.blocks.AlignmentToolbar,
-	children = wp.blocks.query.children;
+	html = wp.blocks.query.html;
 
 registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 	title: 'Hello World (Step 4)',
@@ -28,7 +28,7 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 	category: 'layout',
 
 	attributes: {
-		content: children( 'p' ),
+		content: html( 'p' ),
 	},
 
 	edit: function( props ) {
@@ -88,7 +88,7 @@ const {
 	AlignmentToolbar,
 	query
 } = wp.blocks;
-const { children } = children;
+const { html } = query;
 
 registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 	title: 'Hello World (Step 4)',
@@ -98,7 +98,7 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 	category: 'layout',
 
 	attributes: {
-		content: children( 'p' ),
+		content: html( 'p' ),
 	},
 
 	edit( { attributes, setAttributes, focus } ) {

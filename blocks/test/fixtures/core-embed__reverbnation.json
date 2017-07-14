@@ -4,9 +4,7 @@
         "name": "core-embed/reverbnation",
         "attributes": {
             "url": "https://reverbnation.com/",
-            "caption": [
-                "Embedded content from reverbnation"
-            ]
+            "caption": "Embedded content from reverbnation"
         }
     }
 ]

@@ -4,9 +4,7 @@
         "name": "core-embed/polldaddy",
         "attributes": {
             "url": "https://polldaddy.com/",
-            "caption": [
-                "Embedded content from polldaddy"
-            ]
+            "caption": "Embedded content from polldaddy"
         }
     }
 ]

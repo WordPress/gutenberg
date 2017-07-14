@@ -4,9 +4,7 @@
         "name": "core-embed/photobucket",
         "attributes": {
             "url": "https://photobucket.com/",
-            "caption": [
-                "Embedded content from photobucket"
-            ]
+            "caption": "Embedded content from photobucket"
         }
     }
 ]

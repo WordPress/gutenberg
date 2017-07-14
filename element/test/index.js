@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { createElement, renderToString, concatChildren, switchChildrenNodeName } from '../';
+import { createElement, renderToString, switchChildrenNodeName } from '../';
 
 describe( 'element', () => {
 	describe( 'renderToString', () => {
@@ -28,26 +28,6 @@ describe( 'element', () => {
 			expect( renderToString(
 				createElement( 'strong', null, 'Courgette' )
 			) ).toBe( '<strong>Courgette</strong>' );
-		} );
-	} );
-
-	describe( 'concatChildren', () => {
-		it( 'should return an empty array for undefined children', () => {
-			expect( concatChildren() ).toEqual( [] );
-		} );
-
-		it( 'should concat the string arrays', () => {
-			expect( concatChildren( [ 'a' ], 'b' ) ).toEqual( [ 'a', 'b' ] );
-		} );
-
-		it( 'should concat the object arrays and rewrite keys', () => {
-			const concat = concatChildren(
-				[ createElement( 'strong', {}, 'Courgette' ) ],
-				createElement( 'strong', {}, 'Concombre' )
-			);
-			expect( concat.length ).toBe( 2 );
-			expect( concat[ 0 ].key ).toBe( '0,0' );
-			expect( concat[ 1 ].key ).toBe( '1,0' );
 		} );
 	} );
 

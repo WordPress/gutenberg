@@ -13,7 +13,7 @@ import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
-const { children, query } = hpq;
+const { html, query } = hpq;
 
 registerBlockType( 'core/pullquote', {
 
@@ -24,8 +24,8 @@ registerBlockType( 'core/pullquote', {
 	category: 'formatting',
 
 	attributes: {
-		value: query( 'blockquote > p', children() ),
-		citation: children( 'footer' ),
+		value: query( 'blockquote > p', html() ),
+		citation: html( 'footer' ),
 	},
 
 	getEditWrapperProps( attributes ) {

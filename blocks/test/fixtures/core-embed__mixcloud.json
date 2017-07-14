@@ -4,9 +4,7 @@
         "name": "core-embed/mixcloud",
         "attributes": {
             "url": "https://mixcloud.com/",
-            "caption": [
-                "Embedded content from mixcloud"
-            ]
+            "caption": "Embedded content from mixcloud"
         }
     }
 ]

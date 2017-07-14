@@ -4,9 +4,7 @@
         "name": "core-embed/imgur",
         "attributes": {
             "url": "https://imgur.com/",
-            "caption": [
-                "Embedded content from imgur"
-            ]
+            "caption": "Embedded content from imgur"
         }
     }
 ]

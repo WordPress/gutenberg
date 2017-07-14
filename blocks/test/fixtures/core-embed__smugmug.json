@@ -4,9 +4,7 @@
         "name": "core-embed/smugmug",
         "attributes": {
             "url": "https://smugmug.com/",
-            "caption": [
-                "Embedded content from smugmug"
-            ]
+            "caption": "Embedded content from smugmug"
         }
     }
 ]

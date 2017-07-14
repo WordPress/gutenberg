@@ -4,9 +4,7 @@
         "name": "core-embed/videopress",
         "attributes": {
             "url": "https://videopress.com/",
-            "caption": [
-                "Embedded content from videopress"
-            ]
+            "caption": "Embedded content from videopress"
         }
     }
 ]

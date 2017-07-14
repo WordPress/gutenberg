@@ -4,9 +4,7 @@
         "name": "core-embed/animoto",
         "attributes": {
             "url": "https://animoto.com/",
-            "caption": [
-                "Embedded content from animoto"
-            ]
+            "caption": "Embedded content from animoto"
         }
     }
 ]

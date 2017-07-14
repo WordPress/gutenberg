@@ -4,9 +4,7 @@
         "name": "core-embed/vine",
         "attributes": {
             "url": "https://vine.com/",
-            "caption": [
-                "Embedded content from vine"
-            ]
+            "caption": "Embedded content from vine"
         }
     }
 ]

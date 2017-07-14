@@ -18,7 +18,7 @@ import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
 import Editable from '../../editable';
 
-const { children, node, query } = hpq;
+const { html, node, query } = hpq;
 
 registerBlockType( 'core/quote', {
 	title: __( 'Quote' ),
@@ -27,7 +27,7 @@ registerBlockType( 'core/quote', {
 
 	attributes: {
 		value: query( 'blockquote > p', node() ),
-		citation: children( 'footer' ),
+		citation: html( 'footer' ),
 	},
 
 	defaultAttributes: {
@@ -60,21 +60,20 @@ registerBlockType( 'core/quote', {
 				type: 'block',
 				blocks: [ 'core/text' ],
 				transform: ( { value, citation, ...attrs } ) => {
-					const textElement = value[ 0 ];
-					if ( ! textElement ) {
+					const textContent = value[ 0 ];
+					if ( ! textContent ) {
 						return createBlock( 'core/text', {
 							content: citation,
 						} );
 					}
-					const textContent = isString( textElement ) ? textElement : textElement.props.children;
-					if ( Array.isArray( value ) || citation ) {
+					if ( citation ) {
 						const text = createBlock( 'core/text', {
 							content: textContent,
 						} );
 						const quote = createBlock( 'core/quote', {
 							...attrs,
 							citation,
-							value: Array.isArray( value ) ? value.slice( 1 ) : '',
+							value: value.slice( 1 ),
 						} );
 
 						return [ text, quote ];
@@ -88,11 +87,8 @@ registerBlockType( 'core/quote', {
 				type: 'block',
 				blocks: [ 'core/heading' ],
 				transform: ( { value, citation, ...attrs } ) => {
-					const isMultiParagraph = Array.isArray( value ) && isObject( value[ 0 ] ) && value[ 0 ].type === 'p';
-					const headingElement = isMultiParagraph ? value[ 0 ] : value;
-					const headingContent = isObject( headingElement ) && value[ 0 ].type === 'p'
-						? headingElement.props.children
-						: headingElement;
+					const isMultiParagraph = value.length > 1;
+					const headingContent = value[ 0 ];
 					if ( isMultiParagraph || citation ) {
 						const heading = createBlock( 'core/heading', {
 							content: headingContent,
@@ -100,7 +96,7 @@ registerBlockType( 'core/quote', {
 						const quote = createBlock( 'core/quote', {
 							...attrs,
 							citation,
-							value: Array.isArray( value ) ? value.slice( 1 ) : '',
+							value: value.slice( 1 ),
 						} );
 
 						return [ heading, quote ];

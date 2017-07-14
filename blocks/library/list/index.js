@@ -1,67 +1,37 @@
 /**
  * WordPress dependencies
  */
-import { Component, createElement, Children, concatChildren } from 'element';
+import { Component, createElement } from 'element';
 import { find } from 'lodash';
 import { __ } from 'i18n';
+import { parse } from 'hpq';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, query as hpq, createBlock } from '../../api';
+import { registerBlockType, query as matchers, createBlock } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 
-const { children, prop } = hpq;
+const { query, html, prop } = matchers;
 
 const fromBrDelimitedContent = ( content ) => {
 	if ( undefined === content ) {
 		// converting an empty block to a list block
 		return content;
 	}
-	const listItems = [];
-	listItems.push( createElement( 'li', [], [] ) );
-	content.forEach( function( element, elementIndex, elements ) {
-		// "split" the incoming content on 'br' elements
-		if ( 'br' === element.type && elementIndex < elements.length - 1 ) {
-			// if is br and there are more elements to come, push a new list item
-			listItems.push( createElement( 'li', [], [] ) );
-		} else {
-			listItems[ listItems.length - 1 ].props.children.push( element );
-		}
-	} );
-	return listItems;
+
+	return content.split( /<br\s*\/?>/ );
 };
 
-const toBrDelimitedContent = ( values ) => {
-	if ( undefined === values ) {
+const toBrDelimitedContent = ( items ) => {
+	if ( undefined === items ) {
 		// converting an empty list
-		return values;
+		return items;
 	}
-	const content = [];
-	values.forEach( function( li, liIndex, listItems ) {
-		Children.toArray( li.props.children ).forEach( function( element, elementIndex, liChildren ) {
-			if ( 'ul' === element.type || 'ol' === element.type ) { // lists within lists
-				// we know we've just finished processing a list item, so break the text
-				content.push( createElement( 'br' ) );
-				// push each element from the child list's converted content
-				content.push.apply( content, toBrDelimitedContent( Children.toArray( element.props.children ) ) );
-				// add a break if there are more list items to come, because the recursive call won't
-				// have added it when it finished processing the child list because it thinks the content ended
-				if ( liIndex !== listItems.length - 1 ) {
-					content.push( createElement( 'br' ) );
-				}
-			} else {
-				content.push( element );
-				if ( elementIndex === liChildren.length - 1 && liIndex !== listItems.length - 1 ) {
-					// last element in this list item, but not last element overall
-					content.push( createElement( 'br' ) );
-				}
-			}
-		} );
-	} );
-	return content;
+
+	return items.join( '<br>' );
 };
 
 registerBlockType( 'core/list', {
@@ -71,7 +41,7 @@ registerBlockType( 'core/list', {
 
 	attributes: {
 		nodeName: prop( 'ol,ul', 'nodeName' ),
-		values: children( 'ol,ul' ),
+		items: query( 'li', html() ),
 	},
 
 	className: false,
@@ -84,7 +54,7 @@ registerBlockType( 'core/list', {
 				transform: ( { content } ) => {
 					return createBlock( 'core/list', {
 						nodeName: 'ul',
-						values: fromBrDelimitedContent( content ),
+						items: fromBrDelimitedContent( content ),
 					} );
 				},
 			},
@@ -92,13 +62,14 @@ registerBlockType( 'core/list', {
 				type: 'block',
 				blocks: [ 'core/quote' ],
 				transform: ( { value, citation } ) => {
-					const listItems = fromBrDelimitedContent( value );
-					const values = citation
-						? concatChildren( listItems, <li>{ citation }</li> )
-						: listItems;
+					const items = fromBrDelimitedContent( value );
+					if ( citation ) {
+						items.push( `<li>${ citation }</li>` );
+					}
+
 					return createBlock( 'core/list', {
 						nodeName: 'ul',
-						values,
+						items,
 					} );
 				},
 			},
@@ -107,7 +78,7 @@ registerBlockType( 'core/list', {
 				matcher: ( node ) => node.nodeName === 'OL' || node.nodeName === 'UL',
 				attributes: {
 					nodeName: prop( 'ol,ul', 'nodeName' ),
-					values: children( 'ol,ul' ),
+					items: query( 'li', html() ),
 				},
 			},
 		],
@@ -115,18 +86,18 @@ registerBlockType( 'core/list', {
 			{
 				type: 'block',
 				blocks: [ 'core/text' ],
-				transform: ( { values } ) => {
+				transform: ( { items } ) => {
 					return createBlock( 'core/text', {
-						content: toBrDelimitedContent( values ),
+						content: toBrDelimitedContent( items ),
 					} );
 				},
 			},
 			{
 				type: 'block',
 				blocks: [ 'core/quote' ],
-				transform: ( { values } ) => {
+				transform: ( { items } ) => {
 					return createBlock( 'core/quote', {
-						value: toBrDelimitedContent( values ),
+						value: toBrDelimitedContent( items ),
 					} );
 				},
 			},
@@ -139,7 +110,7 @@ registerBlockType( 'core/list', {
 
 			this.setupEditor = this.setupEditor.bind( this );
 			this.getEditorSettings = this.getEditorSettings.bind( this );
-			this.setNextValues = this.setNextValues.bind( this );
+			this.setNextItems = this.setNextItems.bind( this );
 
 			this.state = {
 				internalListType: null,
@@ -212,13 +183,17 @@ registerBlockType( 'core/list', {
 			};
 		}
 
-		setNextValues( nextValues ) {
-			this.props.setAttributes( { values: nextValues } );
+		setNextItems( nextContent ) {
+			const nextItems = parse( nextContent, query( 'li', html() ) );
+			this.props.setAttributes( { items: nextItems } );
 		}
 
 		render() {
 			const { attributes, focus, setFocus } = this.props;
-			const { nodeName = 'OL', values = [] } = attributes;
+			const { nodeName = 'OL', items = [] } = attributes;
+			const value = items.reduce( ( result, item ) => (
+				result + `<li>${ item }</li>`
+			), '' );
 
 			return [
 				focus && (
@@ -256,8 +231,8 @@ registerBlockType( 'core/list', {
 					tagName={ nodeName.toLowerCase() }
 					getSettings={ this.getEditorSettings }
 					onSetup={ this.setupEditor }
-					onChange={ this.setNextValues }
-					value={ values }
+					onChange={ this.setNextItems }
+					value={ value }
 					focus={ focus }
 					onFocus={ setFocus }
 					className="blocks-list"
@@ -268,12 +243,15 @@ registerBlockType( 'core/list', {
 	},
 
 	save( { attributes } ) {
-		const { nodeName = 'OL', values = [] } = attributes;
+		const { nodeName = 'OL', items = [] } = attributes;
+		const value = items.reduce( ( result, item ) => (
+			result + `<li>${ item }</li>`
+		), '' );
 
 		return createElement(
 			nodeName.toLowerCase(),
 			null,
-			values
+			value
 		);
 	},
 } );

@@ -4,9 +4,7 @@
         "name": "core-embed/twitter",
         "attributes": {
             "url": "https://twitter.com/automattic",
-            "caption": [
-                "We are Automattic"
-            ]
+            "caption": "We are Automattic"
         }
     }
 ]

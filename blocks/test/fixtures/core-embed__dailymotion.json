@@ -4,9 +4,7 @@
         "name": "core-embed/dailymotion",
         "attributes": {
             "url": "https://dailymotion.com/",
-            "caption": [
-                "Embedded content from dailymotion"
-            ]
+            "caption": "Embedded content from dailymotion"
         }
     }
 ]
