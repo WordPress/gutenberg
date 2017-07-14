@@ -14,7 +14,7 @@ import { Panel, PanelBody } from 'components';
  * Internal Dependencies
  */
 import './style.scss';
-import { deselectBlock } from '../../actions';
+import BlockInspectorClassName from './class-name';
 import { getSelectedBlock } from '../../selectors';
 
 const BlockInspector = ( { selectedBlock } ) => {
@@ -26,6 +26,7 @@ const BlockInspector = ( { selectedBlock } ) => {
 		<Panel>
 			<PanelBody>
 				<Slot name="Inspector.Controls" />
+				<BlockInspectorClassName />
 			</PanelBody>
 		</Panel>
 	);
@@ -36,6 +37,5 @@ export default connect(
 		return {
 			selectedBlock: getSelectedBlock( state ),
 		};
-	},
-	{ deselectBlock }
+	}
 )( BlockInspector );

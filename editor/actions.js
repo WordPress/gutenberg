@@ -4,6 +4,22 @@
 import uuid from 'uuid/v4';
 import { partial } from 'lodash';
 
+/**
+ * Returns an action object used in signalling that the block with the
+ * specified UID has been updated.
+ *
+ * @param  {String} uid        Block UID
+ * @param  {Object} attributes Block attributes to be merged
+ * @return {Object}            Action object
+ */
+export function updateBlockAttributes( uid, attributes ) {
+	return {
+		type: 'UPDATE_BLOCK_ATTRIBUTES',
+		uid,
+		attributes,
+	};
+}
+
 export function focusBlock( uid, config ) {
 	return {
 		type: 'UPDATE_FOCUS',

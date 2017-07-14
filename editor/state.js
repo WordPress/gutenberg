@@ -72,7 +72,7 @@ export const editor = combineUndoableReducers( {
 			case 'TRASH_POST_SUCCESS':
 				return false;
 
-			case 'UPDATE_BLOCK':
+			case 'UPDATE_BLOCK_ATTRIBUTES':
 			case 'INSERT_BLOCKS':
 			case 'MOVE_BLOCKS_DOWN':
 			case 'MOVE_BLOCKS_UP':
@@ -91,14 +91,14 @@ export const editor = combineUndoableReducers( {
 			case 'RESET_BLOCKS':
 				return keyBy( action.blocks, 'uid' );
 
-			case 'UPDATE_BLOCK':
+			case 'UPDATE_BLOCK_ATTRIBUTES':
 				// Ignore updates if block isn't known
 				if ( ! state[ action.uid ] ) {
 					return state;
 				}
 
 				// Consider as updates only changed values
-				const nextBlock = reduce( action.updates, ( result, value, key ) => {
+				const nextAttributes = reduce( action.attributes, ( result, value, key ) => {
 					if ( value !== result[ key ] ) {
 						// Avoid mutating original block by creating shallow clone
 						if ( result === state[ action.uid ] ) {
@@ -109,20 +109,20 @@ export const editor = combineUndoableReducers( {
 					}
 
 					return result;
-				}, state[ action.uid ] );
+				}, state[ action.uid ].attributes );
 
 				// Skip update if nothing has been changed. The reference will
 				// match the original block if `reduce` had no changed values.
-				if ( nextBlock === state[ action.uid ] ) {
+				if ( nextAttributes === state[ action.uid ].attributes ) {
 					return state;
 				}
 
-				// Otherwise merge updates into state
+				// Otherwise merge attributes into state
 				return {
 					...state,
 					[ action.uid ]: {
 						...state[ action.uid ],
-						...action.updates,
+						attributes: nextAttributes,
 					},
 				};
 

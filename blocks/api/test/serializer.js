@@ -67,6 +67,24 @@ describe( 'block serializer', () => {
 				expect( saved ).toBe( '<div class="apples">Bananas</div>' );
 			} );
 
+			it( 'should include additional classes in block attributes', () => {
+				const saved = getSaveContent(
+					{
+						save: ( { attributes } ) => createElement( 'div', {
+							className: 'fruit',
+						}, attributes.fruit ),
+						name: 'myplugin/fruit',
+						className: 'apples',
+					},
+					{
+						fruit: 'Bananas',
+						className: 'fresh',
+					}
+				);
+
+				expect( saved ).toBe( '<div class="apples fruit fresh">Bananas</div>' );
+			} );
+
 			it( 'should not add a className if falsy', () => {
 				const saved = getSaveContent(
 					{
