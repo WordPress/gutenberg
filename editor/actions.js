@@ -111,6 +111,31 @@ export function mergeBlocks( blockA, blockB ) {
 }
 
 /**
+ * Returns an action object used in signalling that the blocks
+ * corresponding to the specified UID set are to be removed.
+ *
+ * @param  {String[]} uids Block UIDs
+ * @return {Object}        Action object
+ */
+export function removeBlocks( uids ) {
+	return {
+		type: 'REMOVE_BLOCKS',
+		uids,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the block with the
+ * specified UID is to be removed.
+ *
+ * @param  {String} uid Block UID
+ * @return {Object}     Action object
+ */
+export function removeBlock( uid ) {
+	return removeBlocks( [ uid ] );
+}
+
+/**
  * Returns an action object used in signalling that the user has begun to type.
  *
  * @return {Object}     Action object
@@ -166,6 +191,6 @@ export function removeNotice( id ) {
 	};
 }
 
-export const successNotice = partial( createNotice, 'success' );
-export const errorNotice = partial( createNotice, 'error' );
-export const warningNotice = partial( createNotice, 'warning' );
+export const createSuccessNotice = partial( createNotice, 'success' );
+export const createErrorNotice = partial( createNotice, 'error' );
+export const createWarningNotice = partial( createNotice, 'warning' );

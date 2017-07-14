@@ -28,8 +28,8 @@ describe( 'Dashicon', () => {
 			expect( dashicon.hasClass( 'dashicons-wordpress' ) ).toBe( true );
 			expect( dashicon.type() ).toBe( 'svg' );
 			expect( dashicon.prop( 'xmlns' ) ).toBe( 'http://www.w3.org/2000/svg' );
-			expect( dashicon.prop( 'width' ) ).toBe( '20' );
-			expect( dashicon.prop( 'height' ) ).toBe( '20' );
+			expect( dashicon.prop( 'width' ) ).toBe( 20 );
+			expect( dashicon.prop( 'height' ) ).toBe( 20 );
 			expect( dashicon.prop( 'viewBox' ) ).toBe( '0 0 20 20' );
 		} );
 

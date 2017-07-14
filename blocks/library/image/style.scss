@@ -1,9 +1,14 @@
 .wp-block-image {
+	position: relative;
 	margin: 0;
 
 	img {
 		display: block;
 		width: 100%;
+	}
+
+	&.is-transient img {
+		@include loading_fade;
 	}
 }
 

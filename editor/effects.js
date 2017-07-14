@@ -14,7 +14,7 @@ import { __ } from 'i18n';
  * Internal dependencies
  */
 import { getGutenbergURL, getWPAdminURL } from './utils/url';
-import { focusBlock, replaceBlocks, successNotice, errorNotice } from './actions';
+import { focusBlock, replaceBlocks, createSuccessNotice, createErrorNotice } from './actions';
 import {
 	getCurrentPost,
 	getCurrentPostType,
@@ -93,7 +93,7 @@ export default {
 			const noticeMessage = ! isPublished && publishStatus.indexOf( post.status ) !== -1
 				? messages[ post.status ]
 				: __( 'Post updated!' );
-			dispatch( successNotice(
+			dispatch( createSuccessNotice(
 				<p>
 					<span>{ noticeMessage }</span>
 					{ ' ' }
@@ -126,7 +126,7 @@ export default {
 		const noticeMessage = ! isPublished && publishStatus.indexOf( edits.status ) !== -1
 			? messages[ edits.status ]
 			: __( 'Updating failed' );
-		dispatch( errorNotice( noticeMessage ) );
+		dispatch( createErrorNotice( noticeMessage ) );
 	},
 	TRASH_POST( action, store ) {
 		const { dispatch, getState } = store;
@@ -165,7 +165,7 @@ export default {
 	},
 	TRASH_POST_FAILURE( action, store ) {
 		const message = action.error.message && action.error.code !== 'unknown_error' ? action.error.message : __( 'Trashing failed' );
-		store.dispatch( errorNotice( message ) );
+		store.dispatch( createErrorNotice( message ) );
 	},
 	MERGE_BLOCKS( action, store ) {
 		const { dispatch } = store;
