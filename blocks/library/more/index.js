@@ -23,6 +23,14 @@ registerBlockType( 'core/more', {
 
 	className: false,
 
+	attributes: {
+		text: String,
+		noTeaser: {
+			type: Boolean,
+			defaultValue: false,
+		},
+	},
+
 	edit( { attributes, setAttributes, focus, setFocus } ) {
 		const { text, noTeaser } = attributes;
 

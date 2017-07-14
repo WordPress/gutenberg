@@ -33,11 +33,24 @@ registerBlockType( 'core/latest-posts', {
 
 	category: 'widgets',
 
-	defaultAttributes: {
-		postsToShow: 5,
-		displayPostDate: false,
-		layout: 'list',
-		columns: 3,
+	attributes: {
+		postsToShow: {
+			type: Number,
+			defaultValue: 5,
+		},
+		displayPostDate: {
+			type: Boolean,
+			defaultValue: false,
+		},
+		layout: {
+			type: String,
+			defaultValue: 'list',
+		},
+		columns: {
+			type: Number,
+			defaultValue: 3,
+		},
+		align: String,
 	},
 
 	getEditWrapperProps( attributes ) {

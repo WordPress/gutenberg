@@ -26,6 +26,10 @@ registerBlockType( 'core/pullquote', {
 	attributes: {
 		value: query( 'blockquote > p', node() ),
 		citation: children( 'footer' ),
+		align: {
+			type: String,
+			defaultValue: 'none',
+		},
 	},
 
 	getEditWrapperProps( attributes ) {
@@ -81,7 +85,7 @@ registerBlockType( 'core/pullquote', {
 	},
 
 	save( { attributes } ) {
-		const { value, citation, align = 'none' } = attributes;
+		const { value, citation, align } = attributes;
 
 		return (
 			<blockquote className={ `align${ align }` }>

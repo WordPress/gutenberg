@@ -37,6 +37,8 @@ registerBlockType( 'core/image', {
 		alt: attr( 'img', 'alt' ),
 		caption: children( 'figcaption' ),
 		href: attr( 'a', 'href' ),
+		id: Number,
+		align: String,
 	},
 
 	transforms: {
@@ -201,7 +203,7 @@ registerBlockType( 'core/image', {
 	},
 
 	save( { attributes } ) {
-		const { url, alt, caption = [], align, href } = attributes;
+		const { url, alt, caption, align, href } = attributes;
 		const image = <img src={ url } alt={ alt } />;
 
 		return (

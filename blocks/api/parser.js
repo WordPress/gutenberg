@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { parse as hpqParse } from 'hpq';
-import { pickBy } from 'lodash';
+import { isPlainObject, mapValues, pickBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -18,28 +18,61 @@ import { createBlock } from './factory';
 import { isValidBlock } from './validation';
 
 /**
+ * Returns true if the provided function is a valid attribute matcher, or false
+ * otherwise.
+ *
+ * Matchers are implemented as functions receiving a DOM node to select data
+ * from. Using the DOM is incidental and we shouldn't guarantee a contract that
+ * this be provided, else block implementers may feel inclined to use the node.
+ * Instead, matchers are intended as a generic interface to query data from any
+ * tree shape. Here we pick only matchers which include an internal flag.
+ *
+ * @param  {Function} matcher Function to test
+ * @return {Boolean}          Whether function is an attribute matcher
+ */
+export function isValidMatcher( matcher ) {
+	return !! matcher && '_wpBlocksKnownMatcher' in matcher;
+}
+
+/**
  * Returns the block attributes parsed from raw content.
  *
- * @param  {String} rawContent    Raw block content
- * @param  {Object} attributes    Block attribute matchers
- * @return {Object}               Block attributes
+ * @param  {String} rawContent Raw block content
+ * @param  {Object} sources    Block attribute matchers
+ * @return {Object}            Block attributes
  */
-export function parseBlockAttributes( rawContent, attributes ) {
-	if ( 'function' === typeof attributes ) {
-		return attributes( rawContent );
-	} else if ( attributes ) {
-		// Matchers are implemented as functions that receive a DOM node from
-		// which to select data. Use of the DOM is incidental and we shouldn't
-		// guarantee a contract that this be provided, else block implementers
-		// may feel compelled to use the node. Instead, matchers are intended
-		// as a generic interface to query data from any tree shape. Here we
-		// pick only matchers which include an internal flag.
-		const knownMatchers = pickBy( attributes, '_wpBlocksKnownMatcher' );
+export function getMatcherAttributes( rawContent, sources ) {
+	const matchers = mapValues(
+		// Parse only sources with matcher defined
+		pickBy( sources, ( source ) => isValidMatcher( source.matcher ) ),
 
-		return hpqParse( rawContent, knownMatchers );
+		// Transform to object where matcher is value
+		( source ) => source.matcher
+	);
+
+	return hpqParse( rawContent, matchers );
+}
+
+/**
+ * Returns an attribute source in normalized (object) form. A source may be
+ * specified in shorthand form as a constructor or attribute matcher, or in its
+ * expanded form as an object with any of `type`, `matcher`, and `defaultValue`
+ * values.
+ *
+ * @param  {(Object|Function)} source Source to normalize
+ * @return {Object}                   Normalized source
+ */
+export function getNormalizedAttributeSource( source ) {
+	if ( isPlainObject( source ) ) {
+		return source;
+	} if ( 'function' === typeof source ) {
+		// Function may be either matcher or a constructor. Quack quack.
+		if ( isValidMatcher( source ) ) {
+			return { matcher: source };
+		}
+
+		return { type: source };
 	}
-
-	return {};
 }
 
 /**
@@ -51,18 +84,31 @@ export function parseBlockAttributes( rawContent, attributes ) {
  * @return {Object}                All block attributes
  */
 export function getBlockAttributes( blockType, rawContent, attributes ) {
-	// Merge any attributes present in comment delimiters with those
-	// that are specified in the block implementation.
-	attributes = attributes || {};
-	if ( blockType ) {
-		attributes = {
-			...blockType.defaultAttributes,
-			...attributes,
-			...parseBlockAttributes( rawContent, blockType.attributes ),
-		};
-	}
+	const sources = mapValues( blockType.attributes, getNormalizedAttributeSource );
 
-	return attributes;
+	// Merge matcher values into attributes parsed from comment delimiters
+	attributes = {
+		...attributes,
+		...getMatcherAttributes( rawContent, sources ),
+	};
+
+	return mapValues( sources, ( source, key ) => {
+		const value = attributes[ key ];
+
+		// Return default if attribute value not assigned
+		if ( undefined === value ) {
+			// Nest the condition so that constructor coercion never occurs if
+			// value is undefined and block type doesn't specify default value
+			if ( 'defaultValue' in source ) {
+				return source.defaultValue;
+			}
+		} else if ( source.type && source.type.prototype.valueOf ) {
+			// Coerce to constructor value if source type
+			return ( new source.type( value ) ).valueOf();
+		}
+
+		return value;
+	} );
 }
 
 /**

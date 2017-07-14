@@ -23,7 +23,7 @@ import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
-const { attr, children } = query;
+const { children } = query;
 
 // These embeds do not work in sandboxes
 const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
@@ -37,8 +37,9 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms } 
 		category,
 
 		attributes: {
-			title: attr( 'iframe', 'title' ),
+			url: String,
 			caption: children( 'figcaption' ),
+			align: String,
 		},
 
 		transforms,
@@ -207,7 +208,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms } 
 		},
 
 		save( { attributes } ) {
-			const { url, caption = [], align } = attributes;
+			const { url, caption, align } = attributes;
 
 			return (
 				<figure className={ align && `align${ align }` }>

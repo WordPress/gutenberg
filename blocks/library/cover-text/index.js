@@ -28,7 +28,16 @@ registerBlockType( 'core/cover-text', {
 	category: 'formatting',
 
 	attributes: {
+		align: String,
+		width: String,
 		content: query( 'p', children() ),
+		dropCap: {
+			type: Boolean,
+			defaultValue: false,
+		},
+		placeholder: String,
+		textColor: String,
+		backgroundColor: String,
 	},
 
 	getEditWrapperProps( attributes ) {

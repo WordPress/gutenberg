@@ -21,16 +21,16 @@ registerBlockType( 'core/table', {
 	category: 'formatting',
 
 	attributes: {
-		content: children( 'table' ),
-	},
-
-	defaultAttributes: {
-		content: [
-			<tbody key="1">
-				<tr><td><br /></td><td><br /></td></tr>
-				<tr><td><br /></td><td><br /></td></tr>
-			</tbody>,
-		],
+		content: {
+			matcher: children( 'table' ),
+			defaultValue: [
+				<tbody key="1">
+					<tr><td><br /></td><td><br /></td></tr>
+					<tr><td><br /></td><td><br /></td></tr>
+				</tbody>,
+			],
+		},
+		align: String,
 	},
 
 	getEditWrapperProps( attributes ) {

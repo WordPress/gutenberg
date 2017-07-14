@@ -32,10 +32,17 @@ registerBlockType( 'core/cover-image', {
 
 	attributes: {
 		title: text( 'h2' ),
-	},
-
-	defaultAttributes: {
-		hasBackgroundDim: true,
+		url: String,
+		align: String,
+		id: Number,
+		hasParallax: {
+			type: Boolean,
+			defaultValue: false,
+		},
+		hasBackgroundDim: {
+			type: Boolean,
+			defaultValue: true,
+		},
 	},
 
 	getEditWrapperProps( attributes ) {

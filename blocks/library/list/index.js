@@ -74,13 +74,14 @@ registerBlockType( 'core/list', {
 	category: 'common',
 
 	attributes: {
-		nodeName: prop( 'ol,ul', 'nodeName' ),
-		values: children( 'ol,ul' ),
-	},
-
-	defaultAttributes: {
-		nodeName: 'UL',
-		values: [],
+		nodeName: {
+			matcher: prop( 'ol,ul', 'nodeName' ),
+			defaultValue: 'UL',
+		},
+		values: {
+			matcher: children( 'ol,ul' ),
+			defaultValue: [],
+		},
 	},
 
 	className: false,
