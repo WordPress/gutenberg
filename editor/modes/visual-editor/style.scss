@@ -65,6 +65,39 @@
 		transition: 0.2s outline;
 	}
 
+	&.is-showing-mobile-controls {
+		.editor-visual-editor__block-controls > :not( .editor-visual-editor__mobile-tools ) {
+			display: none;
+		}
+		.editor-visual-editor__mobile-tools {
+			align-items: baseline;
+			display: flex;
+			width: 100%;
+
+			@include break-small {
+				display: none;
+			}
+
+			.editor-block-mover,
+			.editor-block-settings-menu {
+				display: block;
+				display: flex;
+				position: static;
+				.components-button {
+					margin: 0 5px;
+				}
+			}
+
+			.editor-block-settings-menu {
+				left: 80px;
+				right: auto;
+			}
+			.editor-visual-editor__mobile-toggle {
+				margin-left: auto;
+			}
+		}
+	}
+
 	&.is-multi-selected *::selection {
 		background: transparent;
 	}
@@ -222,7 +255,6 @@
 	z-index: z-index( '.editor-visual-editor__block-controls' );
 	margin-top: -$block-controls-height - $item-spacing;
 	margin-bottom: $item-spacing + 20px;	// 20px is the offset from the bottom of the selected block where it stops sticking
-	width: 0;
 	white-space: nowrap;
 	height: $block-controls-height;
 
@@ -254,6 +286,10 @@ $sticky-bottom-offset: 20px;
 
 .editor-visual-editor__block-controls .components-toolbar {
 	margin-right: -1px;
+
+	&.editor-visual-editor__mobile-tools {
+		margin-left: auto;
+	}
 
 	// Larger viewports
 	@include break-small() {
@@ -338,5 +374,15 @@ $sticky-bottom-offset: 20px;
 	&:hover > .editor-inserter__block,
 	&:focus > .editor-inserter__block {
 		opacity: 1;
+	}
+}
+
+.editor-visual-editor__mobile-tools {
+	@include break-small {
+		display: none;
+	}
+	.editor-block-mover,
+	.editor-block-settings-menu {
+		display: none;
 	}
 }
