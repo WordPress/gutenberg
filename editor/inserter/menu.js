@@ -11,14 +11,13 @@ import { __, _n, sprintf } from 'i18n';
 import { Component } from 'element';
 import { Popover, withFocusReturn, withInstanceId } from 'components';
 import { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } from 'utils/keycodes';
-import { getCategories, getBlockTypes } from 'blocks';
+import { getCategories, getBlockTypes, BlockIcon } from 'blocks';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import { getBlocks, getRecentlyUsedBlocks } from '../selectors';
-import BlockIcon from '../block-icon';
 import { showInsertionPoint, hideInsertionPoint } from '../actions';
 
 class InserterMenu extends Component {
