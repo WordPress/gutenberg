@@ -25,7 +25,7 @@ const TableOfContents = ( { blocks } ) => {
 				{ headings.length > 1 && <p><strong>{ sprintf( '%d Headings', headings.length ) }</strong></p> }
 				{ headings.map( ( heading, index ) =>
 					<div key={ `heading-${ index }` } className={ `table-of-content__item is-${ heading.attributes.nodeName }` }>
-						{ heading.attributes.content && heading.attributes.content[ 0 ] } <strong>{ heading.attributes.nodeName }</strong>
+						{ heading.attributes.content } <strong>{ heading.attributes.nodeName }</strong>
 					</div>
 				) }
 			</div>
