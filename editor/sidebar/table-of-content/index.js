@@ -3,6 +3,7 @@
  */
 import { connect } from 'react-redux';
 import { filter } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress Dependencies
@@ -24,7 +25,12 @@ const TableOfContents = ( { blocks } ) => {
 			<div className="table-of-content__items">
 				{ headings.length > 1 && <p><strong>{ sprintf( '%d Headings', headings.length ) }</strong></p> }
 				{ headings.map( ( heading, index ) =>
-					<div key={ `heading-${ index }` } className={ `table-of-content__item is-${ heading.attributes.nodeName }` }>
+					<div
+						key={ `heading-${ index }` }
+						className={ classnames( 'table-of-content__item', `is-${ heading.attributes.nodeName }`, {
+							'is-invalid': heading.attributes.content.length === 0,
+						} ) }
+					>
 						<strong>{ heading.attributes.nodeName }</strong>
 						{ heading.attributes.content.length > 0
 							? heading.attributes.content
