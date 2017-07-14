@@ -10,6 +10,7 @@ if ( is_multisite() ) :
  */
 class Tests_Multisite_Site extends WP_UnitTestCase {
 	protected $suppress = false;
+	protected static $network_ids;
 
 	function setUp() {
 		global $wpdb;
@@ -21,6 +22,26 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		global $wpdb;
 		$wpdb->suppress_errors( $this->suppress );
 		parent::tearDown();
+	}
+
+	public static function wpSetUpBeforeClass( $factory ) {
+		self::$network_ids = array(
+			'make.wordpress.org/' => array( 'domain' => 'make.wordpress.org', 'path' => '/' ),
+		);
+
+		foreach ( self::$network_ids as &$id ) {
+			$id = $factory->network->create( $id );
+		}
+		unset( $id );
+	}
+
+	public static function wpTearDownAfterClass() {
+		global $wpdb;
+
+		foreach( self::$network_ids as $id ) {
+			$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->sitemeta} WHERE site_id = %d", $id ) );
+			$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->site} WHERE id= %d", $id ) );
+		}
 	}
 
 	function test_switch_restore_blog() {
@@ -978,6 +999,22 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 
 		$this->assertNotWPError( $blog_id );
 		$this->assertSame( '', get_blog_option( $blog_id, 'WPLANG' ) );
+	}
+
+	/**
+	 * @ticket 40503
+	 */
+	function test_different_network_language() {
+		$network = get_network( self::$network_ids['make.wordpress.org/'] );
+
+		add_filter( 'sanitize_option_WPLANG', array( $this, 'filter_allow_unavailable_languages' ), 10, 3 );
+
+		update_network_option( self::$network_ids['make.wordpress.org/'], 'WPLANG', 'wibble' );
+		$blog_id = wpmu_create_blog( $network->domain, '/de-de/', 'New Blog', get_current_user_id(), array(), $network->id );
+
+		remove_filter( 'sanitize_option_WPLANG', array( $this, 'filter_allow_unavailable_languages' ), 10 );
+
+		$this->assertSame( get_network_option( self::$network_ids['make.wordpress.org/'], 'WPLANG' ), get_blog_option( $blog_id, 'WPLANG' ) );
 	}
 
 	/**
