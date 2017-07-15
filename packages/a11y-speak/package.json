@@ -1,0 +1,29 @@
+{
+  "name": "a11y-speak",
+  "description": "",
+  "homepage": "https://github.com/Yoast/",
+  "keywords": [
+    "Yoast",
+    "a11y",
+    "aria-live"
+  ],
+  "main": "a11y-speak.js",
+  "license": "GPL-3.0",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Yoast/a11y-speak"
+  },
+  "devDependencies": {
+    "eslint-config-yoast": "^1.0.0",
+    "eslint-plugin-yoast": "^1.0.0",
+    "grunt": "^0.4.5",
+    "grunt-contrib-uglify": "^1.0.1",
+    "grunt-contrib-watch": "^1.0.0",
+    "grunt-eslint": "^18.0.0",
+    "load-grunt-config": "^0.19.1"
+  },
+  "bugs": {
+    "url": "https://github.com/Yoast/a11y-speak/issues"
+  }
+}
