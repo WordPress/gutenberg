@@ -25,6 +25,10 @@ registerBlockType( 'core/text', {
 
 	category: 'common',
 
+	defaultAttributes: {
+		dropCap: false,
+	},
+
 	className: false,
 
 	attributes: {

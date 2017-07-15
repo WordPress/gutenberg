@@ -181,6 +181,10 @@ describe( 'block serializer', () => {
 	describe( 'serialize()', () => {
 		it( 'should serialize the post content properly', () => {
 			const blockType = {
+				defaultAttributes: {
+					foo: true,
+					bar: false,
+				},
 				attributes: ( rawContent ) => {
 					return {
 						content: rawContent,
@@ -195,13 +199,14 @@ describe( 'block serializer', () => {
 				{
 					name: 'core/test-block',
 					attributes: {
+						foo: false,
 						content: 'Ribs & Chicken',
 						stuff: 'left & right -- but <not>',
 					},
 					isValid: true,
 				},
 			];
-			const expectedPostContent = '<!-- wp:core/test-block {"stuff":"left \\u0026 right \\u002d\\u002d but \\u003cnot\\u003e"} -->\n<p class="wp-block-test-block">Ribs & Chicken</p>\n<!-- /wp:core/test-block -->';
+			const expectedPostContent = '<!-- wp:core/test-block {"foo":false,"stuff":"left \\u0026 right \\u002d\\u002d but \\u003cnot\\u003e"} -->\n<p class="wp-block-test-block">Ribs & Chicken</p>\n<!-- /wp:core/test-block -->';
 
 			expect( serialize( blockList ) ).toEqual( expectedPostContent );
 		} );
