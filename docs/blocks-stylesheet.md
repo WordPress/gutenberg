@@ -104,4 +104,4 @@ add_action( 'enqueue_block_assets', 'gutenberg_boilerplate_es5_enqueue_common_as
 
 The `enqueue_block_assets` action is triggered both in the editor and on the front of the site. Since your block is likely to share some styles in both contexts, you can consider `style.css` as the base stylesheet, placing editor-specific styles in `editor.css`.
 
-> If you'd like the styles to be limited to the front end only you can us `enqueue_block_assets` along with a call like `if ( ! is_admin() ) {}` etc.
+> If you'd like the scripts to be limited to your site's front end only, you can use `enqueue_block_assets` along with a call like `if ( ! is_admin() ) {}` etc.
