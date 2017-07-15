@@ -1,43 +1,8 @@
+import addContainer from './addContainer';
+import clear from './clear';
+import domReady from './domReady';
+
 let containerPolite, containerAssertive, previousMessage = "";
-
-/**
- * Build the live regions markup.
- *
- * @param {String} ariaLive Optional. Value for the "aria-live" attribute, default "polite".
- *
- * @returns {Object} $container The ARIA live region jQuery object.
- */
-const addContainer = function( ariaLive ) {
-	ariaLive = ariaLive || "polite";
-
-	let container = document.createElement( "div" );
-	container.id = "a11y-speak-" + ariaLive;
-	container.className = "a11y-speak-region";
-
-	let screenReaderTextStyle = "clip: rect(1px, 1px, 1px, 1px); position: absolute; height: 1px; width: 1px; overflow: hidden; word-wrap: normal;";
-	container.setAttribute( "style", screenReaderTextStyle );
-	container.setAttribute( "aria-live", ariaLive );
-	container.setAttribute( "aria-relevant", "additions text" );
-	container.setAttribute( "aria-atomic", "true" );
-
-	document.querySelector( "body" ).appendChild( container );
-	return container;
-};
-
-/**
- * Specify a function to execute when the DOM is fully loaded.
- *
- * @param {Function} callback A function to execute after the DOM is ready.
- *
- * @returns {void}
- */
-const domReady = function( callback ) {
-	if ( document.readyState === "complete" || ( document.readyState !== "loading" && !document.documentElement.doScroll ) ) {
-		return callback();
-	}
-
-	document.addEventListener( "DOMContentLoaded", callback );
-};
 
 /**
  * Create the live regions when the DOM is fully loaded.
@@ -53,16 +18,6 @@ domReady( function() {
 		containerAssertive = addContainer( "assertive" );
 	}
 } );
-
-/**
- * Clear the live regions.
- */
-const clear = function() {
-	let regions = document.querySelectorAll( ".a11y-speak-region" );
-	for ( let i = 0; i < regions.length; i++ ) {
-		regions[ i ].textContent = "";
-	}
-};
 
 /**
  * Update the ARIA live notification area text node.
