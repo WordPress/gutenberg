@@ -1,4 +1,4 @@
-var containerPolite, containerAssertive, previousMessage = "";
+let containerPolite, containerAssertive, previousMessage = "";
 
 /**
  * Build the live regions markup.
@@ -7,16 +7,15 @@ var containerPolite, containerAssertive, previousMessage = "";
  *
  * @returns {Object} $container The ARIA live region jQuery object.
  */
-var addContainer = function( ariaLive ) {
+const addContainer = function( ariaLive ) {
 	ariaLive = ariaLive || "polite";
 
-	var container = document.createElement( "div" );
+	let container = document.createElement( "div" );
 	container.id = "a11y-speak-" + ariaLive;
 	container.className = "a11y-speak-region";
 
-	var screenReaderTextStyle = "clip: rect(1px, 1px, 1px, 1px); position: absolute; height: 1px; width: 1px; overflow: hidden; word-wrap: normal;";
+	let screenReaderTextStyle = "clip: rect(1px, 1px, 1px, 1px); position: absolute; height: 1px; width: 1px; overflow: hidden; word-wrap: normal;";
 	container.setAttribute( "style", screenReaderTextStyle );
-
 	container.setAttribute( "aria-live", ariaLive );
 	container.setAttribute( "aria-relevant", "additions text" );
 	container.setAttribute( "aria-atomic", "true" );
@@ -32,7 +31,7 @@ var addContainer = function( ariaLive ) {
  *
  * @returns {void}
  */
-var domReady = function( callback ) {
+const domReady = function( callback ) {
 	if ( document.readyState === "complete" || ( document.readyState !== "loading" && !document.documentElement.doScroll ) ) {
 		return callback();
 	}
@@ -58,9 +57,9 @@ domReady( function() {
 /**
  * Clear the live regions.
  */
-var clear = function() {
-	var regions = document.querySelectorAll( ".a11y-speak-region" );
-	for ( var i = 0; i < regions.length; i++ ) {
+const clear = function() {
+	let regions = document.querySelectorAll( ".a11y-speak-region" );
+	for ( let i = 0; i < regions.length; i++ ) {
 		regions[ i ].textContent = "";
 	}
 };
@@ -72,7 +71,7 @@ var clear = function() {
  * @param {String} ariaLive Optional. The politeness level for aria-live. Possible values:
  *                          polite or assertive. Default polite.
  */
-var A11ySpeak = function( message, ariaLive ) {
+export const A11ySpeak = function( message, ariaLive ) {
 	// Clear previous messages to allow repeated strings being read out.
 	clear();
 
@@ -97,5 +96,3 @@ var A11ySpeak = function( message, ariaLive ) {
 		containerPolite.textContent = message;
 	}
 };
-
-module.exports = A11ySpeak;
