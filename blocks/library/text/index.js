@@ -113,7 +113,7 @@ registerBlockType( 'core/text', {
 
 	save( { attributes } ) {
 		const { align, content, dropCap } = attributes;
-		const className = dropCap && 'has-drop-cap';
+		const className = dropCap ? 'has-drop-cap' : null;
 
 		if ( ! align ) {
 			return <p className={ className }>{ content }</p>;
