@@ -264,5 +264,5 @@ function gutenberg_can_edit_post( $post_id ) {
  */
 function gutenberg_post_has_blocks( $post_id ) {
 	$post = get_post( $post_id );
-	return $post && preg_match( '#<!-- wp:\w+#', $post->post_content );
+	return $post && strpos( $post->post_content, '<!-- wp:' ) !== false;
 }
