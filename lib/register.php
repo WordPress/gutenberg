@@ -140,8 +140,8 @@ add_action( 'admin_init', 'gutenberg_add_edit_links_filters' );
  *
  * @since 0.1.0
  *
- * @param  array $actions Post actions.
- * @param  array $post    Edited post.
+ * @param  array   $actions Post actions.
+ * @param  WP_Post $post    Edited post.
  *
  * @return array          Updated post actions.
  */
@@ -161,11 +161,13 @@ function gutenberg_add_edit_links( $actions, $post ) {
 		remove_filter( 'get_edit_post_link', 'gutenberg_filter_edit_post_link', 10 );
 		$edit_url = get_edit_post_link( $post->ID, 'raw' );
 		add_filter( 'get_edit_post_link', 'gutenberg_filter_edit_post_link', 10, 3 );
+		$link_class = 'gutenberg';
 	} else {
 		$text = __( 'Gutenberg', 'gutenberg' );
 		/* translators: %s: post title */
 		$label = __( 'Edit &#8220;%s&#8221; in the Gutenberg editor', 'gutenberg' );
 		$edit_url = gutenberg_get_edit_post_url( $post->ID );
+		$link_class = 'classic';
 	}
 
 	if ( 'trash' !== $post->post_status && apply_filters( 'gutenberg_add_edit_link_for_post_type', true, $post_type, $post ) ) {
@@ -184,7 +186,7 @@ function gutenberg_add_edit_links( $actions, $post ) {
 		$actions = array_merge(
 			array_slice( $actions, 0, $edit_offset + 1 ),
 			array(
-				'gutenberg hide-if-no-js' => $gutenberg_action,
+				"$link_class hide-if-no-js" => $gutenberg_action,
 			),
 			array_slice( $actions, $edit_offset + 1 )
 		);
