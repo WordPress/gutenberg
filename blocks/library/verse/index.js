@@ -15,7 +15,7 @@ const { children } = query;
 registerBlockType( 'core/verse', {
 	title: __( 'Verse' ),
 
-	icon: 'carrot',
+	icon: 'edit',
 
 	category: 'formatting',
 
