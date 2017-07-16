@@ -1,5 +1,5 @@
 /**
- * Clear the live regions.
+ * Clear the a11y-speak-region elements.
  */
 const clear = function() {
 	let regions = document.querySelectorAll( ".a11y-speak-region" );
