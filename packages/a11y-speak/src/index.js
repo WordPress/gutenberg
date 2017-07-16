@@ -9,15 +9,15 @@ let containerPolite, containerAssertive = '';
  * Create the live regions.
  */
 const setup = function() {
-	containerPolite = document.getElementById( 'a11y-speak-polite' );
-	containerAssertive = document.getElementById( 'a11y-speak-assertive' );
+  containerPolite = document.getElementById( 'a11y-speak-polite' );
+  containerAssertive = document.getElementById( 'a11y-speak-assertive' );
 
-	if ( containerPolite === null ) {
-		containerPolite = addContainer( 'polite' );
-	}
-	if ( containerAssertive === null ) {
-		containerAssertive = addContainer( 'assertive' );
-	}
+  if ( containerPolite === null ) {
+    containerPolite = addContainer( 'polite' );
+  }
+  if ( containerAssertive === null ) {
+    containerAssertive = addContainer( 'assertive' );
+  }
 };
 
 /**
@@ -33,16 +33,16 @@ domReady( setup );
  *                          polite or assertive. Default polite.
  */
 const A11ySpeak = function( message, ariaLive ) {
-	// Clear previous messages to allow repeated strings being read out.
-	clear();
+  // Clear previous messages to allow repeated strings being read out.
+  clear();
 
-	message = filterMessage( message );
+  message = filterMessage( message );
 
-	if ( containerAssertive && 'assertive' === ariaLive ) {
-		containerAssertive.textContent = message;
-	} else if ( containerPolite ) {
-		containerPolite.textContent = message;
-	}
+  if ( containerAssertive && 'assertive' === ariaLive ) {
+    containerAssertive.textContent = message;
+  } else if ( containerPolite ) {
+    containerPolite.textContent = message;
+  }
 };
 
 export default A11ySpeak;
