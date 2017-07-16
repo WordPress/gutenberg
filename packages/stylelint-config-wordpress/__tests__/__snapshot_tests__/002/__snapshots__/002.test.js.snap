@@ -7,7 +7,6 @@ Array [
     "errored": undefined,
     "ignored": undefined,
     "invalidOptionWarnings": Array [],
-    "parseErrors": Array [],
     "source": "002/stylesheet.css",
     "warnings": Array [],
   },
