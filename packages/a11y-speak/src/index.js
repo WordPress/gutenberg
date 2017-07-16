@@ -3,20 +3,20 @@ import clear from './clear';
 import domReady from './domReady';
 import filterMessage from './filterMessage';
 
-let containerPolite, containerAssertive = "";
+let containerPolite, containerAssertive = '';
 
 /**
  * Create the live regions.
  */
 const setup = function() {
-	containerPolite = document.getElementById( "a11y-speak-polite" );
-	containerAssertive = document.getElementById( "a11y-speak-assertive" );
+	containerPolite = document.getElementById( 'a11y-speak-polite' );
+	containerAssertive = document.getElementById( 'a11y-speak-assertive' );
 
 	if ( containerPolite === null ) {
-		containerPolite = addContainer( "polite" );
+		containerPolite = addContainer( 'polite' );
 	}
 	if ( containerAssertive === null ) {
-		containerAssertive = addContainer( "assertive" );
+		containerAssertive = addContainer( 'assertive' );
 	}
 };
 
@@ -38,7 +38,7 @@ const A11ySpeak = function( message, ariaLive ) {
 
 	message = filterMessage( message );
 
-	if ( containerAssertive && "assertive" === ariaLive ) {
+	if ( containerAssertive && 'assertive' === ariaLive ) {
 		containerAssertive.textContent = message;
 	} else if ( containerPolite ) {
 		containerPolite.textContent = message;

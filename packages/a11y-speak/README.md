@@ -23,13 +23,13 @@ For context I'll quote [this article on WordPress.org](https://make.wordpress.or
 To make the `wp.a11y.speak` functionality more universally available, we've decided to create a dedicated JS module for it, called `A11ySpeak`. Usage is very simple:
 
 ```JS
-var A11ySpeak = require("A11ySpeak");
+var A11ySpeak = require('A11ySpeak');
 
 // For polite messages that shouldn't interrupt what screen readers are currently announcing.
-A11ySpeak( "The message you want to send to the ARIA live region" );
+A11ySpeak( 'The message you want to send to the ARIA live region' );
 
 // For assertive messages that should interrupt what screen readers are currently announcing.
-A11ySpeak( "The message you want to send to the ARIA live region", "assertive" );
+A11ySpeak( 'The message you want to send to the ARIA live region', 'assertive' );
 ```
 
 ## Browser support

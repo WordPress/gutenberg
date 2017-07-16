@@ -6,11 +6,11 @@
  * @returns {void}
  */
 const domReady = function( callback ) {
-	if ( document.readyState === "complete" || ( document.readyState !== "loading" && !document.documentElement.doScroll ) ) {
+	if ( document.readyState === 'complete' || ( document.readyState !== 'loading' && !document.documentElement.doScroll ) ) {
 		return callback();
 	}
 
-	document.addEventListener( "DOMContentLoaded", callback );
+	document.addEventListener( 'DOMContentLoaded', callback );
 };
 
 export default domReady;

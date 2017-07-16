@@ -1,18 +1,18 @@
 import A11ySpeak from '../';
 
-jest.mock( "../clear", () => {
+jest.mock( '../clear', () => {
 	return jest.fn();
 } );
-jest.mock( "../domReady", () => {
+jest.mock( '../domReady', () => {
 	return jest.fn( ( callback ) => { callback(); } );
 } );
-jest.mock( "../filterMessage", () => {
+jest.mock( '../filterMessage', () => {
 	return jest.fn( ( message ) => { return message; } );
 } );
 
-import clear from "../clear";
-import domReady from "../domReady";
-import filterMessage from "../filterMessage";
+import clear from '../clear';
+import domReady from '../domReady';
+import filterMessage from '../filterMessage';
 
 describe( 'A11ySpeak', () => {
 	let containerPolite = document.getElementById( 'a11y-speak-polite' );
