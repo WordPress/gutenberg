@@ -6,6 +6,7 @@ git:
 branches:
   only:
     - master
+    - /^greenkeeper/.*$/
 
 language: node_js
 
@@ -20,6 +21,11 @@ node_js:
 
 before_install:
   - npm install -g npm@latest
+  - npm i -g greenkeeper-lockfile@1
+
+before_script: greenkeeper-lockfile-update
+
+after_script: greenkeeper-lockfile-upload
 
 notifications:
   slack:
