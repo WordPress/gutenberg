@@ -1,0 +1,24 @@
+/**
+ * Theme Name: BuddyPress Default
+ * Theme URI: http://buddypress.org/extend/themes/
+ * Description: Clean and stylish, BuddyPress Default lets you build a social network straight out of the box. Make it yours with a custom menu, header image, and background. Along with five widgetized areas (one in the sidebar, four in the footer), BP-Default supports featured images (as custom header images on posts and pages) and is furnished with an optional one-column page template that removes the sidebar, and a stylesheet for the admin Visual Editor.
+ * Version: 2.4.0
+ * Author: the BuddyPress team
+ * Author URI: http://buddypress.org
+ * License: GNU General Public License
+ * License URI: license.txt
+ * Tags: blue, buddypress, custom-background, custom-header, custom-menu, editor-style, featured-image-header, featured-images, fixed-width, light, right-sidebar, rtl-language-support, sticky-post, threaded-comments, translation-ready, two-columns, white
+ *
+ *** IMPORTANT - DO NOT COPY THIS THEME **
+ *
+ * If you want to make a custom theme based on this theme, DO NOT copy and edit it. By
+ * doing this you will make updates and maintainence much harder for yourself.
+ * Instead, please read this codex page on how to build a BuddyPress child theme:
+ *
+ * http://codex.buddypress.org/how-to-guides/building-a-buddypress-child-theme/
+ *
+ ***
+ *
+ * This file intentionally left blank. CSS is enqueued in functions.php
+ *
+ */

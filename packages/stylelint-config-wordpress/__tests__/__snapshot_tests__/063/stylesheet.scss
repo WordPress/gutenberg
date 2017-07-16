@@ -1,0 +1,2094 @@
+// Stylesheet Guidence Notes
+// Table of content represents a guide to sections of the sheet.
+// Note that not all sections may be described in the body of the
+// rulesets only those that require styles for a given theme.
+// Sub sections might not exist but can be added as required
+// as per BP Lists - 'activity' section.
+
+// We follow the dictats of the parent theme in respect of media queries,
+// font sizing etc. Media queries are used in a modular sense (OOCSS)
+// rather than described as blocks to the end of the sheet, this aids ease
+// of managing media queries, scalability & flexibility.
+
+// Twentyfourteen Media Queries / Breakpoints
+//@media screen and (max-width: 400px)
+//@media screen and (min-width: 401px)
+//@media screen and (min-width: 594px)
+//@media screen and (min-width: 673px)
+//@media screen and (min-width: 783px)
+//@media screen and (min-width: 810px)
+//@media screen and (min-width: 846px)
+//@media screen and (min-width: 1008px)
+//@media screen and (min-width: 1040px)
+//@media screen and (min-width: 1110px)
+
+// Mixins and Variables
+
+// Common margin values
+$spacing-val-lg: 40px;
+$spacing-val-md: 20px;
+$spacing-val-sm: 10px;
+$spacing-val-xs: 5px;
+
+// A simple mixin to handle font-sizing to match 2014 body 100% approach
+@mixin font-size($font-size: 16) {
+	$rem-font-value: ($font-size / 16);
+	font-size: ($font-size * 1px);
+	font-size: $rem-font-value + rem;
+}
+
+// To allow mixins to pass VendorPrefix scss-lint tests we disable lint-test
+// for specific blocks / rulesets
+// until such time as exemption lists can be built for the scss-lint.yml?
+// Any vendor prefix properties / mixins need to be in this block
+// scss-lint:disable VendorPrefix
+
+// Border border-radius mixins
+@mixin border-radius($radius) {
+	-webkit-border-radius: $radius;
+	-moz-border-radius: $radius;
+	-ms-border-radius: $radius;
+	border-radius: $radius;
+	background-clip: padding-box;
+}
+
+@mixin border-top-radius($radius) {
+	-webkit-border-top-right-radius: $radius;
+	border-top-right-radius: $radius;
+	-webkit-border-top-left-radius: $radius;
+	border-top-left-radius: $radius;
+	background-clip: padding-box;
+}
+
+@mixin border-right-radius($radius) {
+	-webkit-border-bottom-right-radius: $radius;
+	border-bottom-right-radius: $radius;
+	-webkit-border-top-right-radius: $radius;
+	border-top-right-radius: $radius;
+	background-clip: padding-box;
+}
+
+@mixin border-bottom-radius($radius) {
+	-webkit-border-bottom-right-radius: $radius;
+	border-bottom-right-radius: $radius;
+	-webkit-border-bottom-left-radius: $radius;
+	border-bottom-left-radius: $radius;
+	background-clip: padding-box;
+}
+
+@mixin border-left-radius($radius) {
+	-webkit-border-bottom-left-radius: $radius;
+	border-bottom-left-radius: $radius;
+	-webkit-border-top-left-radius: $radius;
+	border-top-left-radius: $radius;
+	background-clip: padding-box;
+}
+
+// Box sizing
+@mixin box-model($box-model: border-box) {
+	-webkit-box-sizing: $box-model;
+	-moz-box-sizing: $box-model;
+	box-sizing: $box-model;
+}
+
+// Calc
+@mixin calc($property, $expression) {
+	#{$property}: -webkit-calc(#{$expression});
+	#{$property}: -moz-calc(#{$expression});
+	#{$property}: calc(#{$expression});
+}
+
+// Re-enable the VendorPrefix lint test
+// scss-lint:enable VendorPrefix
+
+// BP message boxes
+@mixin message-box($background, $text-color: null) {
+
+	@if $text-color {
+		// if a param was passed through
+		$text-color: $text-color;
+	} @else {
+		$text-color: darken($background, 50%);
+	}
+
+	background: lighten($background, 10%);
+	border: 1px solid darken($background, 10%);
+	color: $text-color;
+}
+
+// titles dark backgrounds
+@mixin title-background-dark() {
+	background: lighten($dark-background, 30%);
+	color: $dark-back-text-color;
+}
+
+// Variabals: color definitions
+$content-background:     #fff;
+$dark-back-text-color:   #fff;
+$light-background:       #f7f7f7;
+$medium-background:      #949494;
+$dark-background:        #000;
+$border-color:           #000; // border color can be varied using rgba
+$border-med:             rgba(#000, 0.2);
+$border-light:           rgba(#000, 0.1); // BP dividers
+$body-text:              #2b2b2b; // 2015 body text color
+$bp-button-hover:        #ededed; // this is the default BP button hover background
+$notice-warning:         #d05656;
+$notice-info:            #9fd1e2;
+$notice-update:          #ced98c;
+$stripe-odd:             #ebf0ff;
+$stripe-even:            #dbe5ff;
+$unread:                 #cddaff;
+$link-action:            #c82b2b;
+
+// 2014 font family
+@mixin default-font() {
+	font-family: Lato, sans-serif;
+}
+
+/*------------------------------------------------------------------------------
+
+This is the BuddyPress companion stylesheet for
+the WordPress Twentyfourteen theme.
+
+This sheet supports the primary BuddyPress styles in buddypress.css
+
+If you are running as a child theme of twentyfourteen this stylesheet will be
+loaded by default. If you want to modify the styles the normal BP Theme Compat
+hierarchy works and you can copy the file to buddypress/css/ or community/css/
+in your child themes root & either start over or modify the ruelesets.
+
+If you do not require the styles you can dequeue them from the themes
+functions file.
+
+Please see this codex article for more information:
+http://codex.buddypress.org/themes/buddypress-companion-stylesheets/
+
+--------------------------------------------------------------------------------
+>>> TABLE OF CONTENTS:
+--------------------------------------------------------------------------------
+1.0 Theme Structural Elements
+2.0 - Navigation - General
+	2.1 - Navs - Object Nav / Sub Nav (item-list-tabs)
+	2.2 - Pagination
+3.0 - Images
+4.0 - BP Lists / Loops Generic
+	4.1 - Activity Loop
+		4.1.1 - Activity Whats new
+		4.1.2 - Activity Listing
+		4.1.3 - Activity Comments
+	4.2 - Members Loop
+	4.3 - Groups Loop
+	4.4 - Blogs Loop
+5.0 - Directories - Members, Groups, Blogs, Forums
+6.0 - Single Item screens: User Account & Single Group Screens
+	6.1 - Item Headers: Global
+		6.1.1 - Item-header: Groups;
+		6.1.2 -  item-header: User Accounts
+	6.2 - Item Body: Global
+		6.2.1 - item-body: Groups
+			6.2.1.1- Management settings screens
+			6.2.1.2 - Group members list
+			6.2.1.3 - Group Send Invites
+		6.2.2 - item-body: User Accounts
+			6.2.2.1 - classes, pag, filters
+			6.2.2.2 - Extended Profiles
+			6.2.2.3 - Groups
+			6.2.2.4 - friends
+			6.2.2.5 - Private Messaging Threads
+			6.2.2.6 - Settings
+7.0 - Forms  -  General
+8.0 - Tables -  General
+9.0 - Error / Success Messages
+10.0 - Ajax Loading
+11.0 - Widgets
+------------------------------------------------------------------------------*/
+
+/**
+*-------------------------------------------------------------------------------
+* @section - 1.0 - Theme - Structural Elements
+*-------------------------------------------------------------------------------
+*/
+
+// Twentyfourteen  adds a generic grouped ruleset of clear:both;
+// for all heading h# elements this is problematic where floats are concerned
+// We reset this here under our #buddypress namespace
+#buddypress {
+
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		clear: none;
+	}
+}
+
+// As BP screens have specific content lets adjust the themes primary elements
+// to maximise the screen real estate for BP pages.
+
+.buddypress {
+
+	.site-content {
+		padding-bottom: $spacing-val-md;
+		padding-top: 4%;
+
+		@media screen and (min-width: 59.6875em) {
+			padding-top: 0;
+		}
+
+		article {
+			margin: 0 4%;
+			padding-top: 0;
+
+			.entry-header,
+			.entry-content {
+				max-width: 100%;
+				padding: 0;
+			}
+
+			#buddypress {
+				margin-bottom: $spacing-val-lg;
+			}
+
+		} // .article
+	} // .content
+} // .buddypress ( body class )
+
+/**
+* ------------------------------------------------------------------------------
+* @section 2.0 - Navigation - General
+*-------------------------------------------------------------------------------
+*/
+
+/**
+*----------------------------------------------------------
+* @subsection 2.1 - Object Nav / Subnav (item-list-tabs)
+*
+* The main navigational elements for all BP screens
+*----------------------------------------------------------
+*/
+#buddypress {
+
+	.item-list-tabs {
+
+		ul {
+
+			li {
+				width: 100%;
+			}
+
+			@media screen and (min-width: 400px) {
+
+				li {
+					width: 50%;
+				}
+			}
+
+			@media screen and (min-width: 594px) {
+
+				li {
+					width: auto;
+				}
+			}
+
+			a {
+				color: #1b6e08;
+			}
+		}
+	}
+}
+
+.directory #buddypress {
+
+	.item-list-tabs {
+
+		ul:before,
+		ul:after {
+			content: " ";
+			display: table;
+		}
+
+		ul:after {
+			clear: both;
+		}
+
+		ul {
+			border-bottom: 1px solid $border-med;
+			padding-bottom: $spacing-val-sm;
+		}
+
+		@media screen and (min-width: 783px) {
+
+			ul {
+				padding-bottom: 0;
+
+				li.selected {
+					border: 1px solid $border-med;
+					border-bottom-color: $content-background;
+
+					@include border-top-radius(4px);
+					margin-bottom: -1px;
+
+					a {
+						background: none;
+						outline: none;
+					}
+				}
+			}
+		} // close @media
+	} // close .item-list-tabs
+
+	#subnav {
+
+		ul {
+			border-bottom: 0;
+		}
+
+		a {
+			color: #1b6e08;
+		}
+
+	} // close #subnav
+} // close .directory #buddypress
+
+/* List last filters global */
+#buddypress {
+
+	#subnav {
+
+		li#activity-filter-select.last {
+			line-height: 2.1;
+			margin-top: 0;
+		}
+	}
+}
+
+// Add a little bottom margin & border seperation to object/subnav
+// & keep subnav to horizontal up to vert nav display for user/group screens
+
+@media screen and (max-width: 783px) {
+
+	#buddypress {
+
+		#object-nav {
+
+			ul {
+				border-bottom: 1px solid $border-med;
+				overflow: hidden;
+				padding-bottom: $spacing-val-sm;
+			}
+		}
+
+		div#subnav.item-list-tabs {
+			margin-bottom: $spacing-val-lg;
+
+			ul {
+
+				li {
+					width: auto;
+				}
+			}
+		}
+	}
+
+} // close @media
+
+/*__ Vertical Menu User Account Screens __*/
+
+// This block contains the rules to re-factor the item-body structural element
+// to sit alongside the vert menu & menu item styles.
+
+// Boders & backgrounds for user/group navs rely on one color
+// set this here for convenience of changing and clarity
+$nav-background-border: #bebebe;
+
+@media screen and (min-width: 783px) {
+
+	.bp-user,
+	.single-item.groups {
+
+		#buddypress {
+			background: lighten($nav-background-border, 10%);
+		}
+	}
+
+	#buddypress {
+
+		#item-header,
+		#item-body {
+			background: #fff;
+		}
+
+		#item-body {
+			border-left: 1px solid $nav-background-border;
+		}
+
+		#object-nav {
+			background: lighten($nav-background-border, 10%);
+			border-right: 1px solid $nav-background-border;
+			float: left;
+			margin-right: -1px;
+			width: 200px;
+
+			ul {
+				border-bottom: 0;
+				border-top: 1px solid $nav-background-border;
+				padding: 0;
+
+				li {
+					float: none;
+					overflow: hidden;
+
+					&:focus,
+					&:hover {
+						background: lighten($nav-background-border, 20%);
+					}
+
+					span {
+						border-radius: 10%;
+						float: right;
+						margin-right: 15px;
+					}
+				}
+
+				li.current {
+					background: lighten($nav-background-border, 20%);
+				}
+			}
+		}
+
+		#item-body {
+			overflow: hidden;
+			padding: 0 $spacing-val-md;
+			width: auto;
+
+			#subnav {
+				border: 1px solid $nav-background-border;
+				border-left: 0;
+				border-right: 0;
+				margin: 0 (-$spacing-val-md) $spacing-val-md;
+
+				li:focus,
+				li:hover {
+					background: lighten($nav-background-border, 20%);
+				}
+
+				li.current {
+					background: lighten($nav-background-border, 20%);
+				}
+
+				li#activity-filter-select {
+
+					&:focus,
+					&:hover {
+						background: none;
+					}
+
+					select {
+						max-width: 130px;
+					}
+				}
+
+			}
+		}
+	} // close  #buddypress
+} // close @media
+
+/**
+*----------------------------------------------------------
+* @subsection 2.2 - Pagination
+*----------------------------------------------------------
+*/
+
+#buddypress {
+
+	div.pagination {
+
+		.pag-count {
+			margin-left: 0;
+		}
+	}
+}
+
+/**
+*-------------------------------------------------------------------------------
+* @section 4.0 - BP Lists / Loops Generic
+*-------------------------------------------------------------------------------
+*/
+#buddypress {
+
+	.item-list {
+
+		.item-title {
+
+			a {
+				display: block;
+
+				@include font-size(22);
+				text-decoration: none;
+			}
+
+			span.update,
+			span a {
+
+				@include font-size(12);
+			}
+		}
+	}
+}
+
+// This block:
+// - Manages li items, Stacks them small screen, floated left at wider screens.
+// - Adjusts display of action buttons at small screen
+
+#buddypress {
+
+	ul.item-list {
+
+		li {
+			overflow: hidden !important; // buddypress styles over specified
+
+			.item-avatar {
+				float: none;
+				margin-bottom: $spacing-val-md;
+				text-align: center;
+
+				a {
+
+					img.avatar {
+						float: none;
+					}
+				}
+			}
+
+			div.item-title {
+				float: none;
+				width: 100%;
+
+				> a {
+					text-align: center;
+				}
+			}
+
+			.item {
+				margin-left: 0;
+			}
+
+			// groups group description
+			div.item-desc {
+				margin-left: 0;
+				width: auto;
+			}
+
+			div.action {
+				clear: both;
+				float: none;
+				margin: 0;
+				position: relative;
+				text-align: left;
+
+				div {
+					margin: 0 0 $spacing-val-sm;
+				}
+
+			} // close .action
+
+			// item-list buttons blocked/full width for mobile/small screens
+
+			.activity-meta,
+			.action {
+				float: none;
+
+				a,
+				div {
+					display: block;
+					margin: $spacing-val-xs 0;
+				}
+			}
+
+			@media screen and (min-width: 594px) {
+
+				.item-avatar {
+					float: left;
+					margin-bottom: 0;
+				}
+
+				div.item-title > a {
+					text-align: left;
+				}
+
+				.item {
+					float: right;
+					margin-left: 5%;
+					width: 80%;
+				}
+
+				.activity-meta {
+					clear: both;
+
+					a,
+					div {
+						display: inline-block;
+						margin: $spacing-val-xs $spacing-val-xs 0 0;
+					}
+				}
+
+			} // close @media
+
+			@media screen and (min-width: 783px) {
+
+				.item {
+					float: left;
+					width: 55%;
+
+					div.item-desc {
+						margin: 0;
+						width: auto;
+					}
+				}
+
+				div.action {
+					clear: none;
+					float: right;
+					top: 0;
+					width: 25%;
+
+					div {
+						display: block;
+
+						a {
+
+							@include box-model(border-box);
+							display: block;
+							width: 100%;
+						}
+					}
+
+					.meta {
+						text-align: center;
+					}
+				} // close .action
+
+			} // close @media
+
+			.meta,
+			.item-meta .activity {
+				font-style: italic;
+			}
+
+		} // close li
+	} // ul.item-list
+} // close #budypress
+
+/**
+*------------------------------------------------------------
+* @section 4.1 - Activity
+*------------------------------------------------------------
+*/
+
+/**
+*-------------------------------------------------
+* @subsection 4.1.1 - Activity What's New
+*-------------------------------------------------
+*/
+#buddypress {
+
+	form#whats-new-form {
+		margin: $spacing-val-lg 0;
+
+		#whats-new-avatar {
+			float: none;
+			margin-bottom: $spacing-val-md;
+			text-align: center;
+		}
+
+		#whats-new-content,
+		p.activity-greeting {
+			margin-left: 0;
+			padding-left: 0;
+		}
+
+		// Line-height issue inherited from BP rules, override.
+		p.activity-greeting {
+			clear: left;
+			line-height: inherit;
+			margin-bottom: $spacing-val-xs;
+		}
+
+		#whats-new-content {
+
+			@media screen and (max-width: 594px) {
+
+				#whats-new-options {
+					display: flex;
+					flex-direction: column;
+
+					#whats-new-submit {
+						order: 2;
+
+						input {
+							width: 100%;
+						}
+					}
+
+					#whats-new-post-in-box {
+						margin-top: $spacing-val-sm;
+						order: 1;
+
+						select {
+							margin-top: $spacing-val-xs;
+							max-width: 100%;
+							width: 100%;
+						}
+					}
+				}
+			}
+		} // close whats-new-content.active
+
+		@media screen and (min-width: 594px) {
+
+			#whats-new-avatar {
+				float: left;
+			}
+
+			#whats-new-content,
+			p.activity-greeting {
+				clear: none;
+				overflow: hidden;
+				padding-left: $spacing-val-md;
+			}
+		}
+	} // close form#whats-new-form
+
+} // close #buddypress
+
+/**
+*-------------------------------------------------
+* @subsection 4.1.2 - Activity Listing
+*-------------------------------------------------
+*/
+
+#buddypress {
+
+	#activity-stream {
+		margin-top: $spacing-val-lg;
+	}
+
+	.activity-list {
+
+		li.activity-item:not(.mini) {
+
+			.activity-avatar {
+				float: none;
+				margin-bottom: $spacing-val-sm;
+				text-align: center;
+
+				img.avatar {
+					display: inline;
+					float: none;
+				}
+			}
+		}
+
+		li.mini {
+
+			.activity-avatar {
+
+				img.avatar {
+					margin-left: 0;
+				}
+			}
+
+			.activity-meta {
+
+				a {
+
+					@include font-size(12);
+				}
+			}
+		}
+
+		.activity-content {
+			margin: 0;
+
+			.activity-header {
+				margin: -0.5em 0 0;
+
+				> p {
+					line-height: 1.4;
+					margin-top: -$spacing-val-sm;
+				}
+
+				// BP adds !important. need to override prop val
+				img.avatar {
+					margin-bottom: 0 !important;
+					vertical-align: middle;
+				}
+			}
+
+			.activity-inner {
+				margin: $spacing-val-sm 0;
+			}
+		}
+
+		@media screen and (min-width: 594px) {
+
+			li.activity-item:not(.mini) {
+
+				.activity-avatar {
+					float: left;
+					margin: 0 $spacing-val-md 0 0;
+
+					img.avatar {
+						display: inline;
+						float: none;
+					}
+				}
+			}
+
+			li.mini {
+
+				.activity-avatar {
+					margin: 0 $spacing-val-sm 0 5%;
+				}
+			}
+
+			.activity-content {
+				margin-left: 0;
+				overflow: hidden;
+			}
+		}
+
+	} // close .activity-list
+} // close #buddypress
+
+// Activity Single Item 'Permalink' Page
+body.activity-permalink {
+
+	#buddypress {
+		// remove user account faux column background
+		background: transparent;
+
+		.activity-list {
+
+			li {
+
+				@media screen and (max-width: 760px) {
+
+					.activity-content,
+					.activity-comments {
+						margin-left: 0;
+					}
+				}
+			}
+		}
+	}
+}
+
+/**
+*-------------------------------------------------
+* @subsection 4.1.3 - Activity Comments
+*-------------------------------------------------
+*/
+
+#buddypress {
+
+	.activity {
+
+		.activity-comments {
+			margin-left: 0;
+			margin-top: 5px;
+
+			@media screen and (min-width: 594px) {
+				margin-left: 70px;
+			}
+
+			a {
+				color: #1b6e08;
+			}
+
+			ul {
+				background: rgba($light-background, 0.6);
+				margin: 30px 0 0 2px;
+			}
+
+			ul ul {
+				border-left: 1px solid $border-light;
+				padding-left: 2%;
+			}
+
+			.acomment-meta {
+				color: #737373;
+			}
+
+			// Display the user avatar stacked up to 594px
+			// reduce/widen the content margins
+			@media screen and (max-width: 400px) {
+
+				.acomment-avatar {
+					display: block;
+					text-align: center;
+
+					a,
+					img.avatar {
+						display: inline;
+						float: none;
+					}
+				}
+
+				.acomment-content,
+				.acomment-meta,
+				.acomment-options {
+					margin: $spacing-val-xs;
+				}
+
+				.acomment-content {
+					padding: 0 $spacing-val-sm;
+				}
+			} // close @media
+
+			.ac-form {
+
+				input[type="submit"],
+				.ac-reply-cancel {
+					color: rgba($body-text, 0.8);
+					display: inline-block;
+					font-family: inherit;
+
+					@include font-size(12);
+					font-weight: 400;
+					line-height: 1.2;
+					padding: 4px 10px;
+					text-transform: lowercase;
+					width: 100px;
+				}
+
+				.ac-reply-cancel {
+					border: 1px solid $border-med;
+					text-align: center;
+
+					&:focus,
+					&:hover {
+						background: $bp-button-hover;
+					}
+				}
+
+			} // close .ac-form
+
+		} // close .activity-comments
+	} // close .activity
+
+} // close #buddypress
+
+
+/**
+*------------------------------------------------------------
+* @section 4.2 - Members Loop
+*------------------------------------------------------------
+*/
+
+
+/*
+*-------------------------------------------------------------------------------
+* @section 6.0 - Single Item screens
+*-------------------------------------------------------------------------------
+*/
+
+/* groups & user account page entry title */
+.single-item.groups,
+.bp-user {
+
+	.entry-title {
+
+		@include title-background-dark();
+		@include font-size(22);
+		margin-bottom: $spacing-val-sm;
+		padding: 0.2em;
+	}
+
+	@media screen and (min-width: 673px) {
+
+		.entry-title {
+
+			@include font-size(28);
+		}
+	}
+
+} // close #buddypress
+
+/**
+*------------------------------------------------------------
+* @subsection 6.1 - Item Header: Global
+*------------------------------------------------------------
+*/
+// override BP margins - users/groups manage their own styles later on
+#buddypress {
+
+	div#item-header {
+		padding-bottom: $spacing-val-sm;
+
+		img.avatar {
+			margin: 0 $spacing-val-md $spacing-val-sm 0;
+		}
+
+		// Prevent messages block abutting bottom of floats, with padding-top
+		#message {
+			clear: both;
+			margin-bottom: $spacing-val-xs;
+			padding-top: $spacing-val-sm;
+
+			p {
+				margin-bottom: 0;
+			}
+		}
+	}
+}
+
+/**
+*-------------------------------------------------
+* @subsection 6.1.1 - item-header: Groups
+*-------------------------------------------------
+*/
+.single-item.groups {
+
+	#buddypress {
+
+		@media screen and (max-width: 594px) {
+
+			div#item-header {
+				display: flex;
+				flex-direction: column;
+
+				#item-header-avatar {
+					order: 1;
+					text-align: center;
+
+					a {
+						border-bottom: 0;
+
+						img {
+							display: inline-block;
+							float: none;
+						}
+					}
+				}
+
+				#item-header-content {
+					order: 2;
+				}
+
+				#item-actions {
+					margin-left: 0;
+					order: 3;
+					text-align: left;
+
+					ul {
+						margin-left: 0;
+
+						li {
+							float: left;
+						}
+					}
+				} // close #item-actions
+
+				#message {
+					order: 4;
+				}
+
+			}
+		} // close @media
+
+		#item-header {
+
+			#item-actions {
+				float: none;
+				margin: 0 0 0 $spacing-val-md;
+				width: auto;
+
+				h2 {
+
+					@include font-size(20);
+				}
+			}
+
+			#item-header-avatar {
+				text-align: center;
+			}
+
+			#item-header-content {
+				float: none;
+				overflow: hidden;
+			}
+
+			@media screen and (min-width: 594px) {
+
+				#item-actions {
+					float: right;
+				}
+
+				#item-header-avatar {
+					float: left;
+				}
+
+				#item-header-content {
+					float: none;
+					overflow: hidden;
+				}
+			}// close @media
+
+		}
+	}
+} // close .single-item.groups
+
+/**
+*-------------------------------------------------
+* @subsection 6.1.2 - item-header: User Accounts
+*-------------------------------------------------
+*/
+
+.bp-user #buddypress {
+
+	#item-header {
+
+		#item-header-avatar {
+			text-align: center;
+			width: 100%;
+
+			img {
+				float: none;
+			}
+		}
+
+		#latest-update {
+			margin-bottom: $spacing-val-sm;
+		}
+
+		@media screen and (max-width: 594px) {
+
+			#item-buttons {
+
+				div.generic-button {
+					display: inline-block;
+					float: none;
+					margin: 0 0 $spacing-val-xs 0;
+					width: 100%;
+
+					a {
+
+						@include box-model();
+						display: block;
+						width: 100%;
+					}
+				}
+			}
+		}
+
+		@media screen and (min-width: 673px) {
+
+			#item-header-avatar {
+				float: left;
+				overflow: hidden;
+				text-align: left;
+				width: 20%;
+			}
+
+			#item-header-content {
+				float: right;
+				width: 78%;
+
+				#latest-update {
+					margin-bottom: $spacing-val-md;
+				}
+			}
+		}
+
+	} // close #item-header
+
+} // close .bp-user #buddypress
+
+/**
+*------------------------------------------------------------
+* @subsection 6.2 - Item Body: Global
+*------------------------------------------------------------
+*/
+
+/**
+*-------------------------------------------------
+* @subsection 6.2.1 - item-body: Groups
+*-------------------------------------------------
+*/
+
+/**
+	*------------------------------
+	* 6.2.1.1 - Groups Management
+	*------------------------------
+	*/
+
+/* Settings */
+
+#group-settings-form,
+#create-group-form {
+
+	.radio {
+
+		strong {
+
+			@include font-size(18);
+		}
+
+		ul {
+			color: lighten($body-text, 25%);
+		}
+	}
+
+	#group-creation-previous {
+		margin: $spacing-val-sm 0;
+	}
+}
+
+/* Manage Members */
+.groups.manage-members {
+
+	#group-settings-form {
+
+		h3 {
+			margin-top: $spacing-val-lg;
+		}
+
+		.item-list {
+			background: $light-background;
+			border-top: 0;
+			padding: 0 0.5em;
+
+			li {
+				border-bottom: 1px solid $border-light;
+
+				&:last-child {
+					border-bottom: 0;
+				}
+
+				img,
+				h5 {
+					clear: none;
+					float: left;
+
+					> a {
+						border-bottom: 0;
+						color: #22830c;
+					}
+				}
+
+				span.small {
+					display: block;
+					float: none;
+					margin-top: $spacing-val-sm;
+					width: 100%;
+
+					a {
+						display: inline-block;
+						margin: $spacing-val-xs 0;
+						width: 100%;
+
+						@media screen and (min-width: 38.75em) {
+							width: auto;
+						}
+					}
+				}
+
+				h5 {
+					margin: 0;
+				}
+
+			}
+		}
+	}
+} // close .groups.manage-members
+
+/**
+	*------------------------------
+	* 6.2.1.2 - Group Members List
+	*------------------------------
+	*/
+
+#buddypress {
+
+	#members-group-list {
+
+		.item-list {
+
+			h5 {
+				display: inline-block;
+				margin: 0;
+			}
+
+			span.activity {
+				padding-left: $spacing-val-sm;
+			}
+		}
+	}
+} // close #buddypress
+
+#buddypress {
+
+	#item-body {
+
+		#subnav {
+
+			li.groups-members-search:focus,
+			li.groups-members-search:hover,
+			li.last:focus,
+			li.last:hover {
+				background: none;
+			}
+		}
+	}
+}
+
+// Need to target groups members via body classes
+.groups.group-members {
+
+	#subnav {
+
+		ul:before,
+		ul:after {
+			content: " ";
+			display: table;
+		}
+
+		ul:after {
+			clear: both;
+		}
+
+		ul {
+			padding: $spacing-val-xs 0;
+		}
+
+
+		li {
+
+			@media screen and (max-width: 400px) {
+				background: $content-background;
+				padding: $spacing-val-sm 0;
+				width: 100% !important;
+			}
+
+			#search-members-form {
+
+				@include box-model(border-box);
+				float: left;
+
+				@media screen and (max-width: 400px) {
+					margin: 0;
+					width: 100%;
+
+					label {
+
+						input[type="text"] {
+							width: 100%;
+						}
+					}
+				}
+
+				@media screen and (min-width: 783px) {
+					margin-left: 3px;
+				}
+			}
+
+		}
+
+	} // close #subnav
+} // close .groups.group-members
+
+/**
+	*------------------------------
+	* 6.2.1.3 - Groups Send Invites
+	*------------------------------
+	*/
+
+.send-invites {
+
+	#buddypress {
+
+		#item-body {
+
+			@media screen and (min-width: 783px) {
+				border-top: 1px solid $nav-background-border;
+			}
+
+			@media screen and (max-width: 400px) {
+
+				.left-menu {
+					float: none;
+
+					#invite-list {
+						height: auto;
+						width: auto;
+					}
+				}
+
+				.main-column {
+					margin-left: 0;
+				}
+			}
+
+			li {
+
+				img.avatar {
+					display: block;
+					float: none;
+					margin: $spacing-val-sm auto;
+				}
+
+				.action {
+					margin-top: $spacing-val-sm;
+					text-align: left;
+					width: 100%;
+
+					@media screen and (min-width: 38.75em) {
+						text-align: right;
+					}
+				}
+			}
+
+			@media screen and (min-width: 594px) {
+
+				#invite-list {
+					width: 160px;
+				}
+
+				.main-column {
+					margin-left: 190px;
+				}
+
+				li {
+
+					img.avatar {
+						float: left;
+						margin: 0 $spacing-val-sm 0 0;
+					}
+				}
+			}
+
+		}
+	}
+}
+
+/**
+*-------------------------------------------------
+* @subsection 6.2.2 - item-body: User Accounts
+*-------------------------------------------------
+*/
+
+
+/**
+	*------------------------------
+	* 6.2.2.2 - Extended Profiles
+	*------------------------------
+	*/
+
+
+#buddypress {
+
+	.profile {
+
+		.bp-widget {
+
+			h2 {
+				background: $medium-background;
+				color: #fff;
+				padding: 0.4em 0.2em;
+			}
+		}
+
+		// Edit profile
+
+		#profile-edit-form {
+
+			.button-nav:before,
+			.button-nav:after {
+				content: " ";
+				display: table;
+			}
+
+			.button-nav:after {
+				clear: both;
+			}
+
+			ul.button-nav {
+				border-bottom: 1px solid $border-light;
+				margin-left: 0;
+
+				li {
+					float: left;
+					margin-bottom: 0;
+
+					&.current {
+						border: 1px solid $border-light;
+						border-bottom-color: #fff;
+						margin-bottom: -1px;
+					}
+				} // li
+
+				a {
+					background: none;
+					border: 0;
+
+					@include font-size(18);
+				}
+			} //.button-nav
+
+			.field-visibility-settings-toggle,
+			.field-visibility-settings {
+
+				@include font-size(14);
+			}
+
+			.field-visibility-settings-close,
+			.visibility-toggle-link {
+				background: $dark-background;
+				color: #fff;
+				padding: 0.2em 0.5em;
+			}
+		} // close profile form
+
+	} // close .profile
+} // close #buddypress - user acounts item-body
+
+/**
+	*------------------------------
+	* @subsection 6.2.2.5 - Messaging
+	*------------------------------
+	*/
+
+#buddypress {
+
+	table#message-threads {
+		border-left: 1px solid $border-med;
+		border-right: 1px solid $border-med;
+
+		tbody > tr:first-child {
+
+			td.bulk-select-check,
+			td.thread-from {
+				border-top: 1px solid $border-med;
+			}
+		}
+
+		tr {
+
+			td {
+				background: $content-background;
+				border-right: 0 !important;
+
+				@include box-model(border-box);
+				display: inline-block;
+				float: left;
+			}
+
+			td.thread-star,
+			td.thread-options {
+				border-bottom-color: darken($border-med, 5%);
+				border-bottom-width: 2px;
+				border-left: 0;
+				height: 2.4em;
+				padding-bottom: 0.2em;
+				padding-top: 0.2em;
+
+				@media screen and (max-width: 549px) {
+					padding-top: 0;
+				}
+			}
+
+			td.bulk-select-check,
+			td.thread-from {
+				border-left: 0;
+				height: 2.6em;
+
+				@media screen and (max-width: 320px) {
+					height: 5.2em;
+				}
+			}
+
+			td.thread-from,
+			td.thread-options {
+				border-left: 0;
+
+				@include calc(width, "100% - 30px");
+				margin-left: 0;
+			}
+
+			td.thread-info {
+				border-left: 0;
+				padding-left: 41px;
+				width: 100%;
+			}
+
+			td.thread-options {
+				text-align: right;
+
+				a {
+
+					@include font-size(12);
+					line-height: 2.2;
+				}
+			}
+
+			span.from {
+				display: none;
+			}
+
+			span.activity {
+				display: block;
+				float: right;
+				line-height: 2;
+
+				@media screen and (max-width: 320px) {
+					clear: both;
+
+					@include font-size(11);
+					width: 100%;
+				}
+			}
+		}
+
+		tr.unread {
+
+			td {
+				background: lighten($unread, 7%);
+				border-color: $border-med;
+				border-top: 0;
+				border-width: 1px;
+			}
+		}
+
+		th {
+			display: none;
+		}
+
+		th.bulk-select-all {
+			border-bottom: 0;
+			display: inline-block;
+			text-align: left;
+		}
+
+		th.bulk-select-all,
+		td.bulk-select-check,
+		td.thread-star {
+			border-right: 0;
+			width: 30px;
+		}
+
+	} // close #messages-threads
+
+	#message-thread {
+
+		#message-subject {
+
+			@include title-background-dark();
+			padding: 0.5em;
+		}
+
+		.message-box {
+
+			.message-metadata {
+				margin-bottom: $spacing-val-sm;
+			}
+
+			.message-content {
+				clear: left;
+				margin-left: 0;
+			}
+		}
+	}
+
+	.acfb-holder {
+		list-style: none;
+		margin: 0;
+
+		li {
+			margin-left: 0;
+		}
+
+		li.friend-tab {
+			background: lighten($notice-info, 20%);
+			border: inherit;
+			margin-right: 0;
+			padding: 0.5em;
+
+			span.p {
+				// the 'X' close
+				padding-left: $spacing-val-sm;
+
+				&:focus,
+				&:hover {
+					color: $link-action;
+					cursor: pointer;
+				}
+			}
+
+			a {
+				border-bottom: 0;
+				text-decoration: none;
+
+				img {
+					// this is the tiny user avatar
+					display: inline;
+					height: 20px;
+					vertical-align: middle;
+					width: 20px !important; // override inline style
+				}
+			}
+		}
+	}
+
+	#message-threads.sitewide-notices {
+
+		td {
+			width: 100%;
+
+			strong {
+
+				@include title-background-dark();
+				@include font-size(16);
+				display: block;
+				margin-bottom: 0.4em;
+				padding: 0.2em;
+			}
+
+			a {
+				display: inline-block;
+				line-height: initial;
+			}
+		}
+
+		td:first-child {
+			display: none;
+		}
+
+		td:first-child + td + td {
+			// notice date
+			border-bottom: 0;
+
+			span {
+				line-height: 1;
+			}
+		}
+
+		td:last-child {
+			// notice actions
+			border-bottom-color: $border-med;
+			line-height: 1;
+			text-align: right;
+
+			a:last-child {
+				// hide the 'x' text
+				line-height: 0;
+				margin-left: 0.7em;
+				text-indent: -999em;
+			}
+
+			a:last-child:after {
+				content: attr(title);
+				display: block;
+				line-height: initial;
+				text-indent: 0;
+			}
+		}
+	}
+
+} // close #buddypress - user acounts item-body
+
+.bp-user {
+
+	// acfb auto complete name list sits in doc footer before body close
+	.ac_results {
+		background: #eee;
+		padding-left: $spacing-val-sm;
+
+		ul {
+			margin: 0;
+		}
+
+		li {
+			margin: $spacing-val-sm 0;
+
+			&:focus,
+			&:hover {
+				cursor: pointer;
+			}
+		}
+	}
+
+}
+
+/**
+	*------------------------------
+	* @subsection 6.2.2.6 - Settings
+	*------------------------------
+	*/
+
+#buddypress {
+
+	#settings-form {
+		// 'p' = email notification screen sub heading
+		> p {
+
+			@include font-size(20);
+		}
+	}
+
+	table.notification-settings {
+
+		td.yes,
+		td.no {
+			vertical-align: middle;
+		}
+	}
+	// Profile table td widths
+	table.profile-settings {
+		width: 100%;
+
+		th.field-group-name,
+		td.field-name {
+			width: 50%;
+		}
+
+		@media screen and (min-width: 401px) {
+
+			th.field-group-name,
+			td.field-name {
+				width: 70%;
+			}
+		}
+
+		td.field-visibility {
+
+			select {
+				width: 100%;
+			}
+		}
+	}
+} // close #buddypress - user acounts item-body
+
+/*------------------------------------------------------------------------------
+* @section - 7.0 - Forms  - General
+*-------------------------------------------------------------------------------
+*/
+
+// Match BP form elements to Themes(2014) styling where styles
+// are not inherited or being overriden.
+#buddypress {
+
+	input[type="text"],
+	input[type="email"],
+	input[type="password"],
+	input[type="submit"],
+	select,
+	textarea {
+		border: 1px solid $border-med;
+	}
+
+	.standard-form {
+
+		input[type="text"],
+		input[type="email"],
+		input[type="password"],
+		input[type="submit"],
+		textarea {
+			width: 100%;
+		}
+	}
+
+	// BP :(
+	#send-reply.standard-form textarea {
+		width: 100%;
+	}
+
+	div.activity-comments {
+
+		form {
+
+			.ac-textarea {
+				background: $light-background;
+				border: 1px solid $border-med;
+
+				textarea {
+					background: none;
+					border: 0;
+				}
+			}
+		}
+	}
+
+} // close #buddypress
+
+#buddypress {
+
+	div.dir-search,
+	div.message-search,
+	li.groups-members-search {
+		clear: both;
+		float: none;
+		margin: $spacing-val-sm 0;
+
+		// Stylise the seach form elements, in part this deals with padding
+		// issues on the submit & sizing issues between bp styles & twentyfourteen
+		form {
+			border: 1px solid #ccc;
+			overflow: hidden;
+
+			label {
+				float: left;
+				width: 80%;
+			}
+
+			input[type="text"] {
+				float: left;
+				margin: 0;
+				width: 80%;
+			}
+
+			input[type="text"],
+			input[type="submit"] {
+				border: 0;
+
+				@include font-size(14);
+				line-height: inherit;
+			}
+
+			input[type="text"] {
+				border-right: 1px solid #ccc;
+				padding: 0.2em 0 0.2em 0.2em;
+			}
+
+			input[type="submit"] {
+				float: right;
+				font-weight: 400;
+				padding: 0.2em 1em;
+				text-align: center;
+				text-transform: none;
+				width: 20%;
+			}
+
+		}// close form
+
+	} // close .dir-search, .message-search
+
+	// Shift the search parent to the right and allow to shrinkwrap
+	@media screen and (min-width: 401px) {
+
+		div.dir-search,
+		div.message-search {
+			clear: none;
+			float: right;
+
+			form {
+
+				label,
+				input[type="submit"],
+				input[type="text"] {
+					width: auto;
+				}
+			}
+		}
+
+		div.message-search {
+			margin: 3px 0 0;
+		}
+
+		li.groups-members-search {
+
+			form {
+
+				label,
+				input[type="submit"],
+				input[type="text"] {
+					width: auto;
+				}
+			}
+		}
+
+	} // close @media
+
+} // close #buddypress
+
+/**
+*-------------------------------------------------------------------------------
+* @section 8.0 - Tables General
+*-------------------------------------------------------------------------------
+*/
+#buddypress {
+
+	table {
+		border-color: $border-med;
+
+		.alt a {
+			color: #22820c;
+		}
+	}
+}
+
+/*__ User Account tables __*/
+
+/**
+*-------------------------------------------------------------------------------
+* @section 9.0 - Error / Success messages
+*-------------------------------------------------------------------------------
+*/
+// message args ($variable-color, text-color)
+// Leave text-color undefined to automagically set text color
+// to background color darker by 50%
+#buddypress {
+
+	div#message {
+
+		p {
+
+			@include font-size(18);
+			font-weight: 700;
+		}
+
+		&.info {
+
+			p {
+
+				@include message-box($notice-info);
+			}
+		}
+
+		&.updated {
+
+			p {
+
+				@include message-box($notice-update);
+			}
+		}
+
+	} // close #message
+
+} // close  #buddypress
+
+// Without direct classes on our messages ( 'warning' )
+// we need to use the body classes
+// @todo If this class .warning is included in main BP styles remove from here
+.delete-group {
+
+	#buddypress {
+
+		div#message.info {
+
+			p {
+
+				@include message-box($notice-warning);
+			}
+		}
+	}
+}
+
+/**
+*-------------------------------------------------------------------------------
+* @section 10.0 - Ajax Loading, Widgets, General classes
+*-------------------------------------------------------------------------------
+*/

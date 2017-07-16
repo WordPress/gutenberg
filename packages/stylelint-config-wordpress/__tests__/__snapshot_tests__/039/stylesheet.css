@@ -1,0 +1,413 @@
+div.bp-avatar-status,
+div.bp-cover-image-status {
+	clear: both;
+	margin: 1em 0;
+}
+
+div.bp-avatar-status p.updated,
+div.bp-cover-image-status p.updated {
+	display: block;
+	padding: 10px 15px;
+}
+
+div.bp-avatar-status p.success,
+div.bp-cover-image-status p.success {
+	background-color: #efc;
+	border: 1px solid #591;
+	color: #250;
+}
+
+div.bp-avatar-status p.error,
+div.bp-cover-image-status p.error {
+	background-color: #fdc;
+	border: 1px solid #a00;
+	color: #800;
+}
+
+div.bp-avatar-status .bp-progress,
+div.bp-cover-image-status .bp-progress {
+	background: none;
+	border: 1px solid #d1d1d1;
+	float: right;
+	height: 22px;
+	line-height: 2;
+	margin: 6px 10px 0 0;
+	margin-bottom: 2px;
+	padding: 0;
+	overflow: hidden;
+	width: 200px;
+}
+
+div.bp-avatar-status .bp-bar,
+div.bp-cover-image-status .bp-bar {
+	background-color: #c3ff88;
+	width: 0;
+	height: 100%;
+	z-index: 9;
+}
+
+.bp-uploader-progress div.error {
+	background-color: #fdc;
+	border: 1px solid #a00;
+	color: #800;
+	display: block;
+	font-size: 90%;
+	padding: 10px 15px;
+}
+
+/* stylelint-disable selector-id-pattern */
+#buddypress p.warning,
+body.users_page_bp-profile-edit.modal-open #TB_ajaxContent p.warning,
+body.profile_page_bp-profile-edit.modal-open #TB_ajaxContent p.warning {
+	background-color: #ffd;
+	border: 1px solid #cb2;
+	color: #440;
+	display: block;
+	font-size: 90%;
+	margin: 1em 0;
+	padding: 10px 15px;
+}
+/* stylelint-enable */
+
+div.bp-avatar-nav {
+	background: transparent;
+	clear: both;
+	margin: 10px 0;
+	overflow: hidden;
+}
+
+.avatar-nav-items {
+	margin: 0;
+	padding: 0;
+}
+
+.bp-avatar-nav .avatar-nav-items li.avatar-nav-item {
+	float: left !important;
+	margin: 0;
+	list-style: none;
+}
+
+.avatar-nav-items li a {
+	display: block;
+	padding: 5px 10px;
+	text-decoration: none;
+}
+
+.bp-avatar-nav	ul:before,
+.bp-avatar-nav	ul:after {
+	content: " ";
+	display: table;
+}
+
+.bp-avatar-nav	ul:after {
+	clear: both;
+}
+
+.bp-avatar-nav	ul {
+	border-bottom: 1px solid #ccc;
+	margin-bottom: 10px;
+}
+
+.bp-avatar-nav	ul.avatar-nav-items li.current {
+	border: 1px solid #ccc;
+	border-bottom-color: #fff;
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	margin-bottom: -1px;
+}
+
+.bp-avatar-nav	li.current a {
+	background: none;
+	color: inherit;
+	font-weight: 700;
+	opacity: 0.8;
+	outline: 0;
+}
+
+#drag-drop-area {
+	border: 4px dashed #bbb;
+	height: 200px;
+}
+
+.drag-drop.drag-over #drag-drop-area {
+	border-color: #83b4d8;
+}
+
+.drag-drop-inside p {
+	display: none;
+}
+
+.drag-drop-inside p.drag-drop-buttons {
+	margin-top: 80px;
+	text-align: center;
+}
+
+.drag-drop .drag-drop-inside p.drag-drop-buttons {
+	margin: auto;
+	text-align: inherit;
+}
+
+.moxie-shim.moxie-shim-html5 input {
+	cursor: pointer;
+}
+
+.drag-drop #drag-drop-area {
+	box-sizing: border-box;
+	display: table;
+	height: 100%;
+	width: 100%;
+}
+
+.drag-drop .drag-drop-inside {
+	display: table-cell;
+	padding: 40px 0;
+	text-align: center;
+	vertical-align: middle;
+}
+
+.drag-drop .drag-drop-inside p,
+.drag-drop-inside p.drag-drop-buttons {
+	display: block;
+}
+
+.drag-drop .drag-drop-inside p {
+	color: #767676;
+	font-size: 110%;
+	margin: 5px 0;
+	text-align: center;
+}
+
+.drag-drop-inside p.drag-drop-info {
+	margin-top: 0;
+}
+
+#avatar-to-crop {
+	margin: 0 auto 20px;
+	text-align: left;
+}
+
+#bp-webcam-avatar #avatar-to-crop {
+	float: left;
+	margin: 0 0 20px;
+}
+
+#avatar-to-crop .jcrop-holder {
+	margin: 0 auto;
+}
+
+.avatar-crop-management {
+	clear: left;
+	overflow: hidden;
+	padding-top: 20px;
+	text-align: center;
+}
+
+#bp-webcam-avatar .avatar-crop-management {
+	clear: none;
+	float: none;
+	overflow: visible;
+	padding-top: 0;
+	width: auto;
+}
+
+#avatar-crop-pane {
+	margin: 0 auto;
+	overflow: hidden;
+}
+
+#bp-webcam-avatar #avatar-to-crop {
+	border: 1px solid #eee;
+	max-width: 100%;
+	width: 100%;
+}
+
+@media screen and (min-width: 801px) {
+
+	#bp-webcam-avatar #avatar-to-crop {
+		max-width: 64%;
+		width: 64%;
+	}
+}
+
+#avatar-crop-actions a {
+	display: block;
+}
+
+#bp-webcam-avatar #avatar-crop-actions {
+	float: left;
+	margin: 0 0 20px;
+	width: 50%;
+}
+
+#avatar-crop-actions a.button {
+	margin-top: 10px;
+}
+
+#bp-webcam-avatar #avatar-crop-actions a.button {
+	display: block;
+	margin: 0 0 5px;
+	padding: 4px 0;
+	width: 100%;
+}
+
+#avatar-to-crop img,
+#avatar-crop-pane img,
+#avatar-crop-pane canvas,
+#avatar-upload-form img,
+#create-group-form img,
+#group-settings-form img {
+	border: none !important;
+	max-width: none !important;
+}
+
+#bp-webcam-avatar video {
+	float: left;
+	margin-bottom: 0;
+	max-width: 100%;
+	width: 100%;
+	-webkit-transform: scaleX(-1);
+	transform: scaleX(-1);
+}
+
+#bp-webcam-avatar #avatar-crop-pane {
+	border: 2px dashed #bbb;
+	clear: left;
+	float: right;
+	margin: 0  40px 10px 0;
+	overflow: hidden;
+}
+
+/**
+*  Users can define avatar constants with new dimension values
+*  If they do, we'll ensure the layouts preserved by enforcing a max width
+*  that matches bp default settings.
+*/
+#bp-webcam-avatar .avatar-crop-management #avatar-crop-pane {
+	max-width: 150px;
+	max-height: 150px;
+}
+
+#avatar-crop-pane canvas {
+	height: auto;
+	width: 100%;
+	max-width: 100%;
+}
+
+.group-avatar .bp-avatar .avatar-crop-management {
+	margin-left: 0;
+	padding-top: 0;
+	width: auto;
+}
+
+.bp-avatar .item {
+	overflow: hidden;
+}
+
+.bp-avatar .avatar-crop-management.adjust {
+	float: left;
+	clear: none;
+	padding-top: 0;
+}
+
+.bp-avatar #avatar-to-crop.adjust {
+	float: left;
+	margin-right: 20px;
+}
+
+@media screen and (max-width: 480px) {
+
+	#bp-webcam-avatar .avatar-crop-management #avatar-crop-actions,
+	#bp-webcam-avatar .avatar-crop-management #avatar-crop-pane {
+		float: none;
+	}
+
+	#bp-webcam-avatar .avatar-crop-management #avatar-crop-pane {
+		margin: 0 auto 10px;
+	}
+
+	#bp-webcam-avatar .avatar-crop-management #avatar-crop-actions {
+		width: auto;
+	}
+
+}
+
+@media screen and (min-width: 801px) {
+
+	#bp-webcam-avatar .avatar-crop-management {
+		clear: none;
+		float: right;
+	}
+
+	#bp-webcam-avatar .avatar-crop-management #avatar-crop-pane {
+		float: none;
+		margin: 0 auto 10px;
+	}
+
+	#bp-webcam-avatar .avatar-crop-management #avatar-crop-actions {
+		float: left;
+		width: 100%;
+	}
+
+}
+
+
+/** Admin Profile **/
+/* stylelint-disable selector-id-pattern */
+body.users_page_bp-profile-edit.modal-open #TB_ajaxContent,
+body.profile_page_bp-profile-edit.modal-open #TB_ajaxContent {
+	height: 95% !important;
+	width: 95% !important;
+}
+
+body.users_page_bp-profile-edit.modal-open #TB_ajaxContent p.updated,
+body.users_page_bp-profile-edit.modal-open #TB_ajaxContent p.warning,
+body.profile_page_bp-profile-edit.modal-open #TB_ajaxContent p.updated,
+body.profile_page_bp-profile-edit.modal-open #TB_ajaxContent p.warning {
+	display: block;
+	padding: 10px 15px;
+}
+
+.wp-admin #TB_window .bp-avatar #avatar-to-crop {
+	float: left;
+	margin: 0;
+}
+
+.wp-admin #TB_window .bp-avatar #bp-webcam-avatar #avatar-to-crop {
+	margin-bottom: 20px;
+}
+
+@media screen and (min-width: 783px) {
+
+	.wp-admin #TB_window .bp-avatar .avatar-crop-management {
+		clear: none;
+		float: left;
+		margin-left: 20px;
+		padding-top: 0;
+		text-align: center;
+
+	}
+
+}
+
+.wp-admin #TB_window .bp-avatar #avatar-to-crop video {
+	width: 100%;
+}
+
+.wp-admin #TB_window .bp-avatar .avatar-crop-management a.button {
+	height: auto;
+	line-height: inherit;
+}
+
+@media screen and (min-width: 810px) {
+
+	.wp-admin #TB_window .bp-avatar #bp-webcam-avatar #avatar-to-crop {
+		max-width: none;
+		width: 76%;
+	}
+
+	.wp-admin #TB_window #bp-webcam-avatar .avatar-crop-management {
+		max-width: none;
+		width: auto;
+	}
+}
+/* stylelint-enable */

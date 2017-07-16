@@ -1,0 +1,2021 @@
+/*--------------------------------------------------------------
+
+This is the BuddyPress companion stylesheet for
+the WordPress Twentyeleven theme.
+
+This sheet supports the primary BuddyPress styles in buddypress.css
+
+If you are running as a child theme of twentyeleven this stylesheet will be
+loaded by default. If you want to modify the styles the normal BP Theme Compat
+hierarchy works and you can copy the file to buddypress/css/ or community/css/
+in your child themes root & either start over or modify the rulesets.
+
+If you do not require the styles you can dequeue them from the themes
+functions file.
+
+Please see this codex article for more information:
+http://codex.buddypress.org/themes/buddypress-companion-stylesheets/
+
+----------------------------------------------------------------
+>>> TABLE OF CONTENTS:
+----------------------------------------------------------------
+1.0 Theme Structural Elements & overrides
+2.0 - Navigation - General
+	2.1 - Navs - Object Nav / Sub Nav (item-list-tabs)
+	2.2 - Pagination
+3.0 - Images
+4.0 - BP Lists / Loops Generic
+	4.1 - Activity Loop
+		4.1.1 Whats New Activity
+		4.1.2 - Activity Listing
+		4.1.3 - Activity Comments
+	4.2 - Members Loop
+	4.3 - Groups Loop
+	4.4 - Blogs Loop
+5.0 - Directories - Members, Groups, Blogs, Register, activation
+6.0 - Single Item screens: User Account & Single Group Screens
+	6.1 - Item Headers: Global
+		6.1.1 - item-header: Groups
+		6.1.2 - item-header: User Accounts
+	6.2 - Item Body: Global
+		6.2.1 - item-body: Groups
+			6.2.1.1 - Management settings screens
+			6.2.1.2 - Group members list
+		6.2.2 - item-body: User Accounts
+			6.2.2.1 - classes, pag, filters
+			6.2.2.2 - Extended Profiles
+			6.2.2.3 - Groups
+			6.2.2.4 - friends
+			6.2.2.5 - Private Messaging Threads
+			6.2.2.6 - Settings
+			6.2.2.7 - Notifications
+7.0 - Forms  -  General
+8.0 - Tables -  General
+9.0 - Error / Success Messages
+10.0 - Ajax Loading, Widgets, General classes
+--------------------------------------------------------------*/
+/**
+*-------------------------------------------------------------------------------
+* @section 1.0 - Theme - Structural Elements. overrides, Globals
+*-------------------------------------------------------------------------------
+*/
+.buddypress div.clear {
+	display: none;
+}
+
+body.buddypress:not(.page-template-sidebar-page) #content {
+	margin: 0 10%;
+	width: auto;
+}
+
+body.buddypress:not(.page-template-sidebar-page) #content .entry-header,
+body.buddypress:not(.page-template-sidebar-page) #content .entry-content {
+	width: auto;
+}
+
+.buddypress.singular.page .hentry {
+	padding-top: 0;
+}
+
+/**
+*-------------------------------------------------------------------------------
+* @section 2.0 - Navigation - General
+*-------------------------------------------------------------------------------
+*/
+/**
+*----------------------------------------------------------
+* @section 2.1 - Navs Object Nav / Sub Nav (item-list-tabs)
+*
+* The main navigational elements for all BP screens
+*----------------------------------------------------------
+*/
+/* Here we start things off */
+#buddypress div.item-list-tabs ul li.selected a,
+#buddypress div.item-list-tabs ul li.current a {
+	background: inherit;
+	opacity: 1;
+}
+
+#buddypress div.item-list-tabs ul {
+	overflow: hidden;
+	padding: 0;
+}
+
+#buddypress div.item-list-tabs ul li a:focus, #buddypress div.item-list-tabs ul li a:hover {
+	color: #555;
+}
+
+#buddypress div.item-list-tabs ul li a:visited {
+	color: #21759b;
+}
+
+#buddypress div.item-list-tabs ul li a span {
+	border-radius: 25%;
+}
+
+@media screen and (max-width: 450px) {
+	.bp-user #buddypress #object-nav {
+		border: 1px solid #eaeaea;
+		overflow: visible;
+		padding: 5px;
+	}
+	.bp-user #buddypress #object-nav ul {
+		border: 0;
+		height: 0;
+		transition: height 0.3s ease-in-out 0.7s;
+		visibility: hidden;
+	}
+	.bp-user #buddypress #object-nav:before {
+		content: "Menu \021E9";
+		display: inline;
+		opacity: 0.7;
+	}
+	.bp-user #buddypress #object-nav:focus:before, .bp-user #buddypress #object-nav:hover:before, .bp-user #buddypress #object-nav:active:before {
+		content: "Menu \021E7";
+	}
+	.bp-user #buddypress #object-nav:focus ul, .bp-user #buddypress #object-nav:hover ul, .bp-user #buddypress #object-nav:active ul {
+		min-height: 320px;
+		opacity: 1;
+		visibility: visible;
+	}
+	.bp-user #buddypress #subnav {
+		clear: both;
+	}
+}
+
+/*__ Horizontal menus __*/
+#buddypress #object-nav ul {
+	overflow: hidden;
+}
+
+#buddypress #object-nav ul li {
+	float: none;
+}
+
+@media screen and (max-width: 650px) {
+	#buddypress #object-nav ul li:not(:last-child) {
+		border-bottom: 1px solid #eaeaea;
+	}
+	#buddypress #object-nav ul li:not(.selected):focus, #buddypress #object-nav ul li:not(.selected):hover {
+		background: #f2f2f2;
+	}
+}
+
+@media screen and (min-width: 650px) {
+	#buddypress #object-nav ul li {
+		float: left;
+	}
+}
+
+#buddypress div#subnav.item-list-tabs {
+	margin-top: 0;
+}
+
+#buddypress div#subnav.item-list-tabs ul {
+	border-bottom: 0;
+	border-top: 1px solid #d4d0ba;
+	margin-top: 5px;
+	padding: 0;
+}
+
+#buddypress div#subnav.item-list-tabs ul li.last {
+	background: #fff;
+	float: right;
+	margin-top: 0;
+	padding: 5px 0 5px;
+	text-align: right;
+	width: 230px;
+}
+
+@media screen and (max-width: 450px) {
+	#buddypress div#subnav.item-list-tabs ul li.last {
+		float: none;
+		width: auto;
+	}
+}
+
+#buddypress div#subnav.item-list-tabs ul li.last select,
+#buddypress div#subnav.item-list-tabs ul li.last select:focus {
+	background: transparent;
+	border: 0;
+	outline: 0;
+	padding: 0;
+}
+
+#buddypress div#subnav.item-list-tabs ul li.last select,
+#buddypress div#subnav.item-list-tabs ul li.last label,
+#buddypress div#subnav.item-list-tabs ul li.last option {
+	font-size: 14px;
+	font-size: 0.9333333333rem;
+}
+
+#buddypress div#subnav.item-list-tabs ul li.last select {
+	font-style: italic;
+}
+
+#buddypress div#subnav.item-list-tabs ul li.last select option {
+	font-style: normal;
+}
+
+.bp-user #buddypress div#subnav.item-list-tabs li.last {
+	margin-left: 0;
+	text-align: right;
+}
+
+@media screen and (max-width: 450px) {
+	.bp-user #buddypress div#subnav.item-list-tabs li.last {
+		clear: left;
+		float: none;
+		margin-left: 10px;
+		text-align: left;
+	}
+}
+
+/*__ Vertical menu User Account / Group single screens __*/
+@media screen and (min-width: 800px) {
+	body.bp-user #buddypress #item-header,
+	body.bp-user #buddypress #item-body {
+		background: #fff;
+	}
+	body.bp-user #buddypress #object-nav {
+		border-right: 1px solid #ddd;
+		float: left;
+		margin-right: -1px;
+		width: 200px;
+	}
+	body.bp-user #buddypress #object-nav ul {
+		background: none;
+		border-bottom: 0;
+		padding: 0;
+	}
+	body.bp-user #buddypress #object-nav ul li {
+		float: none;
+		overflow: hidden;
+	}
+	body.bp-user #buddypress #object-nav ul li.selected {
+		background: #ddd;
+	}
+	body.bp-user #buddypress #object-nav ul li span {
+		background: #fff;
+		border-radius: 10%;
+		float: right;
+		margin-right: 2px;
+	}
+	body.bp-user #buddypress #item-body {
+		border-left: 1px solid #ddd;
+		overflow: hidden;
+		padding: 0 0 0 25px;
+		width: auto;
+	}
+	body.bp-user #buddypress #item-body #subnav {
+		margin: 0 0 0 -25px;
+	}
+	body.bp-user #buddypress #item-body #subnav ul {
+		margin-top: 0;
+	}
+}
+
+@media screen and (min-width: 650px) {
+	#main #buddypress #group-create-tabs.item-list-tabs ul:before,
+	#main #buddypress #group-create-tabs.item-list-tabs ul:after {
+		content: " ";
+		display: table;
+	}
+	#main #buddypress #group-create-tabs.item-list-tabs ul:after {
+		clear: both;
+	}
+	#main #buddypress #group-create-tabs.item-list-tabs ul {
+		background: none;
+		border: 0;
+		border-bottom: 1px solid #ddd;
+		overflow: visible;
+		padding-bottom: 0;
+	}
+	#main #buddypress #group-create-tabs.item-list-tabs ul li {
+		float: left;
+		width: auto;
+	}
+	#main #buddypress #group-create-tabs.item-list-tabs ul li.selected,
+	#main #buddypress #group-create-tabs.item-list-tabs ul li.current {
+		border: 1px solid #ddd;
+		border-bottom-color: #fff;
+		-webkit-border-top-right-radius: 4px;
+		border-top-right-radius: 4px;
+		-webkit-border-top-left-radius: 4px;
+		border-top-left-radius: 4px;
+		background-clip: padding-box;
+		margin-bottom: -1px;
+	}
+	#main #buddypress #group-create-tabs.item-list-tabs ul li.selected a,
+	#main #buddypress #group-create-tabs.item-list-tabs ul li.current a {
+		background: none;
+		color: #373737;
+		outline: none;
+	}
+	#main #buddypress #subnav ul {
+		border-bottom: 0;
+	}
+}
+
+/**
+*----------------------------------------------------------
+* @section 2.2 - Pagination
+*----------------------------------------------------------
+*/
+#buddypress div.pagination {
+	box-shadow: none;
+	min-height: 0;
+}
+
+#buddypress div.pagination:before, #buddypress div.pagination:after {
+	height: 0;
+	width: 0;
+}
+
+#buddypress div.pagination .pag-count {
+	margin-left: 0;
+}
+
+#buddypress div.pagination .pagination-links {
+	margin-right: 0;
+}
+
+#buddypress div.pagination .pagination-links span,
+#buddypress div.pagination .pagination-links a {
+	height: auto;
+	line-height: 1;
+	padding: 5px;
+}
+
+#buddypress div.pagination .pagination-links .prev,
+#buddypress div.pagination .pagination-links .next {
+	background-color: transparent;
+	color: inherit;
+	overflow: visible;
+	width: auto;
+}
+
+#buddypress div.pagination .pagination-links .prev:before,
+#buddypress div.pagination .pagination-links .next:before {
+	display: none;
+}
+
+#buddypress div.pagination .pagination-links .prev {
+	left: auto;
+	position: static;
+}
+
+#buddypress div.pagination .pagination-links .next {
+	position: static;
+	right: auto;
+}
+
+/**
+*-------------------------------------------------------------------------------
+* @section 4.0 - BP Lists / Loops Generic
+*-------------------------------------------------------------------------------
+*/
+#buddypress ul.item-list {
+	border-top: 0;
+}
+
+#buddypress ul.item-list li {
+	overflow: hidden !important;
+}
+
+#buddypress ul.item-list li .item-avatar {
+	margin-bottom: 15px;
+	text-align: center;
+}
+
+@media screen and (min-width: 650px) {
+	#buddypress ul.item-list li .item-avatar {
+		margin-bottom: 0;
+	}
+}
+
+#buddypress ul.item-list li .item-avatar a {
+	border-bottom: 0;
+}
+
+#buddypress ul.item-list li .item-avatar img.avatar {
+	display: inline-block;
+	float: none;
+	margin-bottom: 15px;
+}
+
+@media screen and (min-width: 450px) {
+	#buddypress ul.item-list li .item-avatar img.avatar {
+		display: block;
+		float: left;
+	}
+}
+
+#buddypress ul.item-list li .item {
+	margin-left: 0;
+	overflow: hidden;
+}
+
+#buddypress ul.item-list li .item .item-meta {
+	text-align: center;
+}
+
+@media screen and (min-width: 61.5625em) {
+	#buddypress ul.item-list li .item .item-meta {
+		text-align: left;
+	}
+}
+
+#buddypress ul.item-list li .item span.activity {
+	font-style: italic;
+}
+
+#buddypress ul.item-list li .item .item-desc {
+	margin-left: 0;
+	width: 94%;
+}
+
+#buddypress ul.item-list li .item .item-title {
+	font-size: 16px;
+	font-size: 1.0666666667rem;
+	line-height: 1.2;
+	text-align: center;
+	width: 100%;
+}
+
+@media screen and (min-width: 450px) {
+	#buddypress ul.item-list li .item .item-title {
+		text-align: left;
+	}
+}
+
+#buddypress ul.item-list li .item .item-title > a {
+	text-decoration: none;
+}
+
+#buddypress ul.item-list li .item .item-title > a:visited {
+	color: #21759b;
+}
+
+#buddypress ul.item-list li .item .item-title .update {
+	display: block;
+	font-size: 12px;
+	font-size: 0.8rem;
+	padding: 15px 0;
+	text-align: left;
+}
+
+@media screen and (min-width: 650px) {
+	#buddypress ul.item-list li .item .item-title .update {
+		font-size: 14px;
+		font-size: 0.9333333333rem;
+	}
+}
+
+@media screen and (min-width: 650px) {
+	#buddypress ul.item-list li .item-avatar,
+	#buddypress ul.item-list li .item,
+	#buddypress ul.item-list li .action {
+		float: left;
+	}
+	#buddypress ul.item-list li .item {
+		left: 5%;
+		margin-left: 0;
+		position: relative;
+		width: 55%;
+	}
+	#buddypress ul.item-list li .item .item-title {
+		font-size: 18px;
+		font-size: 1.2rem;
+	}
+}
+
+#buddypress ul.item-list li div.action {
+	clear: left;
+	float: none;
+	margin: 0;
+	margin-left: 0;
+	padding: 15px 0 5px;
+	position: relative;
+	text-align: left;
+	top: 0;
+}
+
+@media screen and (min-width: 650px) {
+	#buddypress ul.item-list li div.action {
+		clear: none;
+		float: right;
+		margin-bottom: 0;
+		padding: 0;
+	}
+}
+
+#buddypress ul.item-list li div.action div {
+	display: inline-block;
+	margin: 5px 0;
+	width: 100%;
+}
+
+#buddypress ul.item-list li div.action div a {
+	display: block;
+}
+
+@media screen and (min-width: 37em) {
+	#buddypress ul.item-list li div.action div {
+		margin: 0 15px 5px 0;
+		width: auto;
+	}
+}
+
+@media screen and (min-width: 650px) {
+	#buddypress ul.item-list li div.action div {
+		clear: right;
+		float: right;
+		margin: 0 0 15px 0;
+	}
+}
+
+#buddypress ul.item-list li div.action .meta {
+	font-style: italic;
+}
+
+/**
+*----------------------------------------------------------
+* @section 4.1 - Activity
+*----------------------------------------------------------
+*/
+/**
+*-----------------------------------------------------
+* @section 4.1.1 - Activity Whats New
+*-----------------------------------------------------
+*/
+#buddypress form#whats-new-form p.activity-greeting {
+	line-height: 1.4;
+}
+
+@media screen and (max-width: 650px) {
+	#buddypress form#whats-new-form #whats-new-content {
+		clear: left;
+		margin: 15px 0 25px;
+		padding: 15px 0 0;
+	}
+}
+
+#buddypress form#whats-new-form #whats-new-content.active #whats-new-options[style] #whats-new-post-in-box {
+	border: 1px solid rgba(212, 208, 186, 0.5);
+	float: left;
+	font-size: 12px;
+	font-size: 0.8rem;
+	line-height: 1.6;
+	margin-top: 12px;
+	padding-left: 0.2em;
+	width: 100%;
+}
+
+#buddypress form#whats-new-form #whats-new-content.active #whats-new-options[style] #whats-new-post-in-box select {
+	background: none;
+	border: 0;
+	float: right;
+	margin: 0;
+	max-width: 220px;
+	min-height: 1.5em;
+	padding: 0 0 0 0.4em;
+}
+
+@media screen and (min-width: 30em) {
+	#buddypress form#whats-new-form #whats-new-content.active #whats-new-options[style] #whats-new-post-in-box {
+		width: auto;
+	}
+	#buddypress form#whats-new-form #whats-new-content.active #whats-new-options[style] #whats-new-submit {
+		font-size: 12px;
+		font-size: 0.8rem;
+		float: right;
+	}
+	#buddypress form#whats-new-form #whats-new-content.active #whats-new-options[style] #whats-new-submit input {
+		padding: 0 6px;
+	}
+}
+
+#buddypress #item-body form#whats-new-form {
+	margin: 50px 0;
+}
+
+/**
+*-----------------------------------------------------
+* @section 4.1.2 - Activity Listing
+*-----------------------------------------------------
+*/
+#buddypress #activity-stream li {
+	padding: 25px 0 15px;
+}
+
+#buddypress #activity-stream li.load-newest a {
+	display: block;
+}
+
+#buddypress #activity-stream li .activity-avatar {
+	float: none;
+	text-align: center;
+}
+
+#buddypress #activity-stream li .activity-avatar a {
+	display: inline-block;
+}
+
+#buddypress #activity-stream li .activity-avatar a img.avatar {
+	display: inline;
+	float: none;
+	height: 60px;
+	margin-bottom: 25px;
+	margin-left: 0;
+	width: 60px;
+}
+
+#buddypress #activity-stream li .activity-content,
+#buddypress #activity-stream li .activity-comments {
+	margin-left: 0;
+}
+
+#buddypress #activity-stream li .activity-header {
+	font-size: 14px;
+	font-size: 0.9333333333rem;
+}
+
+#buddypress #activity-stream li .activity-header a:visited {
+	color: #21759b;
+}
+
+#buddypress #activity-stream li .activity-inner img {
+	height: auto;
+}
+
+@media screen and (min-width: 650px) {
+	#buddypress #activity-stream li .activity-avatar {
+		float: left;
+		margin-right: 15px;
+		text-align: left;
+	}
+	#buddypress #activity-stream li .activity-avatar a {
+		border-bottom: 0;
+	}
+	#buddypress #activity-stream li .activity-content {
+		margin: 0;
+		overflow: hidden;
+	}
+	#buddypress #activity-stream li .activity-content .activity-header {
+		font-size: 16px;
+		font-size: 1.0666666667rem;
+	}
+	#buddypress #activity-stream li .activity-comments {
+		margin-left: 70px;
+	}
+}
+
+#buddypress #activity-stream li.mini .activity-avatar a img.avatar {
+	height: 30px;
+	margin-left: 15px;
+	width: 30px;
+}
+
+#buddypress #activity-stream li.mini .activity-content .activity-header {
+	font-size: 14px;
+	font-size: 0.9333333333rem;
+}
+
+#buddypress #activity-stream li.mini .activity-content .activity-meta a {
+	font-size: 12px;
+	font-size: 0.8rem;
+}
+
+#buddypress #activity-stream .activity-content {
+	margin-top: -12px;
+}
+
+#buddypress #activity-stream .activity-content .activity-header {
+	line-height: inherit;
+	margin-right: 0;
+}
+
+#buddypress #activity-stream .activity-content .activity-header p {
+	border-bottom: 1px solid rgba(234, 234, 234, 0.6);
+	margin-top: 0;
+	padding: 0 0.2em;
+}
+
+#buddypress #activity-stream .activity-content .activity-header img.avatar {
+	display: inline-block;
+	margin-bottom: 0 !important;
+}
+
+#buddypress #activity-stream .activity-content .activity-meta a {
+	display: block;
+	font-size: 14px;
+	font-size: 0.9333333333rem;
+	margin-bottom: 5px;
+	padding: 0.2em 0.5em;
+}
+
+@media screen and (min-width: 650px) {
+	#buddypress #activity-stream .activity-content .activity-meta a {
+		float: left;
+		margin-bottom: 0;
+	}
+}
+
+#buddypress #activity-stream .load-more {
+	background: #f7f7f7;
+	border: 1px solid transparent;
+	padding: 15px;
+}
+
+#buddypress #activity-stream .load-more:focus, #buddypress #activity-stream .load-more:hover {
+	background: #f4f4f4;
+	border: 1px solid rgba(159, 209, 226, 0.3);
+}
+
+#buddypress #activity-stream .load-more a {
+	display: block;
+}
+
+/* Single activity view  - activity permalink */
+.activity-permalink #buddypress #activity-stream li.activity-item {
+	padding: 25px;
+}
+
+.activity-permalink #buddypress #activity-stream li.mini .activity-header {
+	font-size: 16px;
+	font-size: 1.0666666667rem;
+	margin-bottom: 50px;
+}
+
+@media screen and (min-width: 650px) {
+	.activity-permalink #buddypress #activity-stream li.mini .activity-header {
+		font-size: 20px;
+		font-size: 1.3333333333rem;
+	}
+}
+
+.activity-permalink #buddypress #activity-stream li.mini .activity-header p {
+	padding: 25px;
+}
+
+.activity-permalink #buddypress #activity-stream .activity-comments {
+	margin-left: 0;
+}
+
+/**
+*-----------------------------------------------------
+* @section 4.1.3 - Activity Comments
+*-----------------------------------------------------
+*/
+#buddypress #activity-stream .activity-comments {
+	position: relative;
+}
+
+#buddypress #activity-stream .activity-comments > ul {
+	background: rgba(247, 247, 247, 0.6);
+	margin: 15px 0 0 2px;
+}
+
+#buddypress #activity-stream .activity-comments > ul > li:hover * {
+	color: #555;
+}
+
+#buddypress #activity-stream .activity-comments > ul > li .acomment-meta,
+#buddypress #activity-stream .activity-comments > ul > li .acomment-content {
+	font-size: 12px;
+	font-size: 0.8rem;
+}
+
+#buddypress #activity-stream .activity-comments .ac-form {
+	border: 1px solid #d4d0ba;
+	box-sizing: border-box;
+	margin: 15px 0;
+	width: 100%;
+}
+
+#buddypress #activity-stream .activity-comments .ac-form input[type="submit"],
+#buddypress #activity-stream .activity-comments .ac-form .ac-reply-cancel {
+	color: rgba(55, 55, 55, 0.8);
+	display: inline-block;
+	font-family: inherit;
+	font-size: 12px;
+	font-size: 0.8rem;
+	font-weight: 400;
+	line-height: 1.2;
+	padding: 4px 10px;
+	text-transform: lowercase;
+	width: 100px;
+}
+
+#buddypress #activity-stream .activity-comments .ac-form .ac-reply-cancel {
+	border: 1px solid rgba(212, 208, 186, 0.7);
+	text-align: center;
+}
+
+#buddypress #activity-stream .activity-comments .ac-form .ac-reply-cancel:focus, #buddypress #activity-stream .activity-comments .ac-form .ac-reply-cancel:hover {
+	background: #ededed;
+}
+
+/**
+*----------------------------------------------------------
+* @section 4.2 - Members Loop
+*----------------------------------------------------------
+*/
+@media screen and (min-width: 650px) {
+	#buddypress #members-list li .item-avatar,
+	#buddypress #members-list li .item {
+		float: left;
+	}
+	#buddypress #members-list li .action {
+		float: right;
+	}
+}
+
+/**
+*-------------------------------------------------------------------------------
+* @section 5.0 - Directories
+*-------------------------------------------------------------------------------
+*/
+/**
+*-----------------------------------------------------------
+* @subsection Registration
+*-----------------------------------------------------------
+*/
+#buddypress #signup_form.standard-form #profile-details-section,
+#buddypress #signup_form.standard-form #basic-details-section,
+#buddypress #signup_form.standard-form #blog-details-section {
+	float: none;
+	width: 100%;
+}
+
+@media screen and (min-width: 37.5em) {
+	#buddypress #signup_form.standard-form #profile-details-section,
+	#buddypress #signup_form.standard-form #basic-details-section,
+	#buddypress #signup_form.standard-form #blog-details-section {
+		width: 48%;
+	}
+}
+
+@media screen and (min-width: 37.5em) {
+	#buddypress #signup_form.standard-form #profile-details-section {
+		float: right;
+	}
+	#buddypress #signup_form.standard-form #basic-details-section {
+		float: left;
+	}
+}
+
+/**
+*-------------------------------------------------------------------------------
+* @section 6.0 - Single Item screens: User Account & Single Group Screens
+*-------------------------------------------------------------------------------
+*/
+.bp-user #buddypress a:visited {
+	color: #21759b;
+}
+
+/**
+*-----------------------------------------------------------
+* @subsection 6.1 - Item Header Global
+*-----------------------------------------------------------
+*/
+.bp-user #buddypress #item-header-content #item-meta,
+.single-item.groups #buddypress #item-header-content #item-meta {
+	font-size: 14px;
+	font-size: 0.9333333333rem;
+	text-align: left;
+}
+
+.bp-user #buddypress #item-header-content #item-meta p,
+.single-item.groups #buddypress #item-header-content #item-meta p {
+	margin-bottom: 0.5em;
+}
+
+@media screen and (max-width: 37.5em) {
+	.bp-user h1,
+	.bp-user #item-header-content,
+	.single-item.groups h1,
+	.single-item.groups #item-header-content {
+		text-align: center;
+	}
+}
+
+@media screen and (max-width: 46.25em) {
+	.bp-user main header.entry-header,
+	.single-item.groups main header.entry-header {
+		padding-bottom: 1rem;
+	}
+}
+
+@media screen and (max-width: 37.5em) {
+	.bp-user #buddypress h1,
+	.single-item.groups #buddypress h1 {
+		margin-bottom: 0;
+	}
+	.bp-user #buddypress #item-header-avatar img.avatar,
+	.single-item.groups #buddypress #item-header-avatar img.avatar {
+		margin-right: 0;
+	}
+	.bp-user #buddypress #item-header-content,
+	.single-item.groups #buddypress #item-header-content {
+		width: 100%;
+	}
+	.bp-user #buddypress #item-header-content .user-nicename,
+	.single-item.groups #buddypress #item-header-content .user-nicename {
+		color: #555;
+	}
+}
+
+@media screen and (max-width: 46.25em) {
+	.bp-user #buddypress #item-header .generic-button,
+	.single-item.groups #buddypress #item-header .generic-button {
+		float: none;
+		margin: 1.5em 0 0;
+	}
+}
+
+@media screen and (max-width: 800px) {
+	#buddypress #item-header-cover-image #item-header-content .user-nicename {
+		color: #555;
+		text-shadow: none;
+	}
+}
+
+/**
+*-----------------------------------------------------
+* @subsection 6.1.1 - item-header Groups
+*
+* Group Specific Item Header
+*-----------------------------------------------------
+*/
+@media screen and (max-width: 46.25em) {
+	.single-item.groups #buddypress #item-header #item-meta {
+		margin-bottom: 25px;
+	}
+}
+
+@media screen and (max-width: 50em) {
+	.single-item.groups #buddypress div#item-header {
+		display: flex;
+		flex-direction: column;
+	}
+	.single-item.groups #buddypress div#item-header #item-header-avatar {
+		order: 1;
+		text-align: center;
+	}
+	.single-item.groups #buddypress div#item-header #item-header-avatar a {
+		border-bottom: 0;
+	}
+	.single-item.groups #buddypress div#item-header #item-header-avatar a img {
+		display: inline-block;
+		float: none;
+	}
+	.single-item.groups #buddypress div#item-header #item-header-content {
+		order: 2;
+	}
+	.single-item.groups #buddypress div#item-header #item-actions {
+		order: 3;
+	}
+	.single-item.groups #buddypress div#item-header #item-actions h2 {
+		border-bottom: 1px solid #eaeaea;
+		text-align: center;
+	}
+}
+
+.single-item.groups #buddypress div#item-header {
+	padding-bottom: 50px;
+}
+
+.single-item.groups #buddypress div#item-header #item-header-content {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.single-item.groups #buddypress div#item-header div#item-actions {
+	margin: 0 !important;
+	width: 100%;
+}
+
+@media screen and (min-width: 50em) {
+	.single-item.groups #buddypress div#item-header div#item-actions {
+		border-left: 1px solid #eaeaea;
+		clear: none;
+		float: right;
+		padding-left: 0.2em;
+		width: 30%;
+	}
+}
+
+@media screen and (min-width: 46.25em) {
+	.single-item.groups #buddypress div#item-header div#item-actions {
+		width: 40%;
+	}
+}
+
+.single-item.groups #buddypress div#item-header div#item-actions ul {
+	margin-top: 0;
+	padding-left: 0;
+}
+
+.single-item.groups #buddypress div#item-header div#item-actions h2 {
+	font-size: 14px;
+	font-size: 0.9333333333rem;
+	font-weight: 700;
+	line-height: 1.4;
+}
+
+.single-item.groups #buddypress div#item-header div#item-actions #group-admins li,
+.single-item.groups #buddypress div#item-header div#item-actions #group-mods li {
+	margin: 0;
+}
+
+@media screen and (min-width: 650px) {
+	.single-item.groups #buddypress div#item-header #item-header-avatar,
+	.single-item.groups #buddypress div#item-header #item-header-content {
+		float: left;
+	}
+	.single-item.groups #buddypress div#item-header #item-header-content {
+		margin-left: 2%;
+		padding: 0 0.5em;
+	}
+	.single-item.groups #buddypress div#item-header div#item-actions {
+		float: right;
+		width: 28%;
+	}
+}
+
+@media screen and (min-width: 64em) {
+	.single-item.groups #buddypress div#item-header #item-header-content {
+		width: 40%;
+	}
+}
+
+.single-item.groups #buddypress #cover-image-container #item-header-cover-image #item-actions {
+	margin-top: 225px !important;
+}
+
+@media screen and (min-width: 50em) and (max-width: 60em) {
+	.single-item.groups #buddypress #cover-image-container #item-header-cover-image #item-header-content {
+		max-width: 60% !important;
+		width: 60% !important;
+	}
+}
+
+@media screen and (max-width: 64em) {
+	.single-item.groups #buddypress #cover-image-container #item-header-cover-image #item-actions {
+		border: 0;
+		clear: both;
+		margin-top: 0 !important;
+		max-width: 100% !important;
+		padding-top: 0 !important;
+		width: auto;
+	}
+	.single-item.groups #buddypress #cover-image-container #item-header-cover-image #item-actions h2 {
+		border-bottom: 1px solid #eaeaea;
+	}
+}
+
+/**
+*-----------------------------------------------------
+* @subsection 6.1.2 - Item Header User Accounts
+*
+* User Accounts Specific Item Header
+*-----------------------------------------------------
+*/
+.bp-user #buddypress #item-header #item-header-avatar {
+	text-align: center;
+}
+
+.bp-user #buddypress #item-header #item-header-avatar img.avatar,
+.bp-user #buddypress #item-header #item-header-avatar a {
+	border-bottom: 0;
+	display: inline-block;
+	float: none;
+}
+
+.bp-user #buddypress #item-header #item-header-content #item-buttons .generic-button {
+	margin-right: 5px;
+}
+
+@media screen and (min-width: 650px) {
+	.bp-user #buddypress #item-header #item-header-avatar {
+		float: left;
+	}
+	.bp-user #buddypress #item-header #item-header-avatar a {
+		float: left;
+	}
+	.bp-user #buddypress #item-header #item-header-content {
+		float: right;
+		margin-right: 0%;
+		width: 69%;
+	}
+}
+
+/**
+*-----------------------------------------------------------
+* @subsection 6.2 - Item Body: Global
+*-----------------------------------------------------------
+*/
+/**
+*----------------------------------------------------
+* @subsection 6.2.1 - Item Body Groups
+*
+* Groups specific item body rules -  screens
+*----------------------------------------------------
+*/
+/**
+*-----------------------------------------
+* @subsection 6.2.1.1 - Group Management
+*-----------------------------------------
+*/
+.groups #group-settings-form h3 {
+	background: #555;
+	color: #fff;
+	padding: 0.2em;
+}
+
+.groups.edit-details #group-settings-form label {
+	margin-bottom: 0;
+	padding: 0.2em;
+	width: 80%;
+}
+
+.groups.edit-details #group-settings-form textarea + p label {
+	background: none;
+	color: inherit;
+	font-size: 14px;
+	font-size: 0.9333333333rem;
+	width: auto;
+}
+
+.groups.edit-details #group-settings-form textarea {
+	height: auto;
+	min-height: 100px;
+	overflow: auto;
+}
+
+.groups.group-settings #group-settings-form div.radio label {
+	font-weight: 700;
+	padding: 0.2em;
+}
+
+.groups.group-settings #group-settings-form div.radio label ul {
+	color: rgba(55, 55, 55, 0.6);
+	font-size: 14px;
+	font-size: 0.9333333333rem;
+}
+
+.groups.group-avatar form > p {
+	margin-top: 25px;
+}
+
+.groups.manage-members #group-settings-form .item-list li {
+	border-bottom: 1px solid #eaeaea;
+}
+
+@media screen and (min-width: 650px) {
+	.groups.manage-members #group-settings-form .item-list li img,
+	.groups.manage-members #group-settings-form .item-list li h5 {
+		float: left;
+	}
+}
+
+.groups.manage-members #group-settings-form .item-list li img > a,
+.groups.manage-members #group-settings-form .item-list li h5 > a {
+	border-bottom: 0;
+}
+
+.groups.manage-members #group-settings-form .item-list li span.small {
+	clear: left;
+	display: block;
+	float: none;
+	margin-top: 15px;
+	width: 100%;
+}
+
+.groups.manage-members #group-settings-form .item-list li span.small a {
+	display: block;
+	margin: 5px 0;
+}
+
+@media screen and (min-width: 650px) {
+	.groups.manage-members #group-settings-form .item-list li span.small a {
+		display: inline-block;
+	}
+}
+
+.groups.manage-members #group-settings-form .item-list li h5 {
+	margin: 0;
+}
+
+/**
+*-----------------------------------------
+* @subsection 6.2.1.2 - Group members
+*-----------------------------------------
+*/
+.groups.group-members #subnav li {
+	width: 100%;
+}
+
+@media screen and (max-width: 450px) {
+	.groups.group-members #subnav li {
+		background: #fff;
+		padding: 25px 0;
+	}
+}
+
+.groups.group-members #subnav li #search-members-form {
+	float: right;
+	margin: 5px 0 0 0;
+}
+
+.groups.group-members #subnav li #search-members-form label input[type="text"] {
+	box-shadow: none;
+}
+
+@media screen and (max-width: 450px) {
+	.groups.group-members #subnav li #search-members-form label input[type="text"] {
+		width: 100%;
+	}
+}
+
+/**
+*-----------------------------------------------------
+* @subsection 6.2.2 - Item Body User Accounts
+*
+* User Account specific component item body rules
+*-----------------------------------------------------
+*/
+/**
+*--------------------------------------------
+* @subsection 6.2.2.1 - classes, pag, filters
+*--------------------------------------------
+*/
+.bp-user #buddypress table th {
+	font-size: 13px;
+	font-size: 0.8666666667rem;
+}
+
+.bp-user #buddypress table td {
+	font-size: 12px;
+	font-size: 0.8rem;
+}
+
+@media screen and (min-width: 650px) {
+	.bp-user #buddypress table th {
+		font-size: 16px;
+		font-size: 1.0666666667rem;
+	}
+	.bp-user #buddypress table td {
+		font-size: 14px;
+		font-size: 0.9333333333rem;
+	}
+}
+
+.bp-user #buddypress .pag-count {
+	font-style: italic;
+}
+
+.bp-user #buddypress .notifications-options-nav,
+.bp-user #buddypress .messages-options-nav {
+	float: left;
+	width: 100%;
+}
+
+@media screen and (min-width: 37.5em) {
+	.bp-user #buddypress .notifications-options-nav,
+	.bp-user #buddypress .messages-options-nav {
+		width: 40%;
+	}
+}
+
+.bp-user #buddypress .notifications-options-nav select,
+.bp-user #buddypress .notifications-options-nav input,
+.bp-user #buddypress .messages-options-nav select,
+.bp-user #buddypress .messages-options-nav input {
+	font-size: 14px;
+	font-size: 0.9333333333rem;
+	outline: 0;
+	padding: 0;
+}
+
+.bp-user #buddypress .notifications-options-nav select,
+.bp-user #buddypress .messages-options-nav select {
+	float: left;
+	margin-right: 0;
+	width: 49%;
+}
+
+@media screen and (min-width: 37.5em) {
+	.bp-user #buddypress .notifications-options-nav select,
+	.bp-user #buddypress .messages-options-nav select {
+		width: auto;
+	}
+}
+
+.bp-user #buddypress .notifications-options-nav input,
+.bp-user #buddypress .messages-options-nav input {
+	float: left;
+	font-family: inherit;
+	line-height: 20px;
+	margin-left: 1%;
+	width: 50%;
+}
+
+@media screen and (min-width: 37.5em) {
+	.bp-user #buddypress .notifications-options-nav input,
+	.bp-user #buddypress .messages-options-nav input {
+		width: auto;
+	}
+}
+
+.bp-user #buddypress .notifications-options-nav input[disabled="disabled"]:focus, .bp-user #buddypress .notifications-options-nav input[disabled="disabled"]:hover,
+.bp-user #buddypress .messages-options-nav input[disabled="disabled"]:focus,
+.bp-user #buddypress .messages-options-nav input[disabled="disabled"]:hover {
+	background: none;
+}
+
+/**
+	*-------------------------------------------
+	* @subsection 6.2.2.2 - Extended Profiles
+	*-------------------------------------------
+	*/
+.bp-user #buddypress .profile .bp-widget h2 {
+	background: #6f6e6e;
+	color: #fff;
+	margin-bottom: 0;
+	padding: 0.4em;
+}
+
+.bp-user #buddypress .profile .bp-widget table {
+	margin-top: 0;
+}
+
+.bp-user #buddypress .profile #profile-edit-form .button-nav:before,
+.bp-user #buddypress .profile #profile-edit-form .button-nav:after {
+	content: " ";
+	display: table;
+}
+
+.bp-user #buddypress .profile #profile-edit-form .button-nav:after {
+	clear: both;
+}
+
+.bp-user #buddypress .profile #profile-edit-form ul.button-nav {
+	border-bottom: 1px solid #eaeaea;
+	margin-left: 0;
+}
+
+.bp-user #buddypress .profile #profile-edit-form ul.button-nav li {
+	float: left;
+	margin-bottom: 0;
+}
+
+.bp-user #buddypress .profile #profile-edit-form ul.button-nav li.current {
+	border: 1px solid #eaeaea;
+	border-bottom-color: #fff;
+	margin-bottom: -1px;
+}
+
+.bp-user #buddypress .profile #profile-edit-form ul.button-nav a {
+	background: none;
+	border: 0;
+	font-size: 18px;
+	font-size: 1.2rem;
+}
+
+.bp-user #buddypress .profile #profile-edit-form .field-visibility-settings-toggle {
+	margin: 5px 0 25px;
+}
+
+.bp-user #buddypress .profile #profile-edit-form .field-visibility-settings-toggle,
+.bp-user #buddypress .profile #profile-edit-form .field-visibility-settings {
+	font-size: 14px;
+	font-size: 0.9333333333rem;
+}
+
+.bp-user #buddypress .profile #profile-edit-form .field-visibility-settings-close,
+.bp-user #buddypress .profile #profile-edit-form .visibility-toggle-link {
+	background: #6f6e6e;
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+	-ms-border-radius: 2px;
+	border-radius: 2px;
+	background-clip: padding-box;
+	color: #eee;
+	font-weight: 700;
+	padding: 0.1em 0.5em;
+	text-decoration: none;
+}
+
+.bp-user #buddypress .profile #profile-edit-form .field-visibility-settings-close:focus, .bp-user #buddypress .profile #profile-edit-form .field-visibility-settings-close:hover,
+.bp-user #buddypress .profile #profile-edit-form .visibility-toggle-link:focus,
+.bp-user #buddypress .profile #profile-edit-form .visibility-toggle-link:hover {
+	color: #fff;
+}
+
+.bp-user #buddypress .profile .bp-avatar #bp-delete-avatar a {
+	font-size: inherit;
+}
+
+/**
+	*-------------------------------------------
+	* @subsection 6.2.2.5 - Private Messaging
+	*-------------------------------------------
+	*/
+.bp-user #buddypress #message-thread a {
+	border-bottom: 0;
+}
+
+.bp-user #buddypress #message-thread #message-subject {
+	background: #6f6e6e;
+	color: #fff;
+	padding: 0.3em 0 0.3em 0.2em;
+}
+
+.bp-user #buddypress #message-thread #message-recipients {
+	font-style: italic;
+}
+
+.bp-user #buddypress #message-thread #message-recipients a.confirm {
+	border: 1px solid #eaeaea;
+	font-style: normal;
+}
+
+.bp-user #buddypress #message-thread #message-recipients .highlight {
+	font-size: 100%;
+}
+
+.bp-user #buddypress #message-thread .message-metadata:after {
+	clear: both;
+	content: "";
+	display: table;
+}
+
+.bp-user #buddypress #message-thread .message-metadata img.avatar {
+	float: none;
+}
+
+@media screen and (min-width: 46.25em) {
+	.bp-user #buddypress #message-thread .message-metadata img.avatar {
+		float: left;
+	}
+}
+
+.bp-user #buddypress #message-thread .message-metadata .message-star-actions {
+	float: right;
+	margin-right: 5px;
+	position: static;
+}
+
+.bp-user #buddypress #message-thread .message-content {
+	background: #f7f7f7;
+	border: 1px solid #eaeaea;
+	margin: 15px 0 0 0;
+	padding: 0.3em;
+}
+
+.bp-user #buddypress #message-thread #send-reply .message-content {
+	background: #fff;
+	border: 0;
+}
+
+.bp-user #buddypress #message-thread .alt {
+	background: #fff;
+}
+
+.bp-user #buddypress #message-threads thead tr {
+	background: #6f6e6e;
+}
+
+.bp-user #buddypress #message-threads tr td {
+	background: #fff;
+	box-sizing: border-box;
+	display: inline-block;
+	float: left;
+}
+
+.bp-user #buddypress #message-threads tr td.thread-star,
+.bp-user #buddypress #message-threads tr td.thread-options {
+	border-bottom: 1px solid #ccc;
+	height: 2.4em;
+	padding-bottom: 0.2em;
+	padding-top: 0.2em;
+}
+
+@media screen and (max-width: 46.25em) {
+	.bp-user #buddypress #message-threads tr td.thread-star,
+	.bp-user #buddypress #message-threads tr td.thread-options {
+		padding-top: 0;
+	}
+}
+
+.bp-user #buddypress #message-threads tr td.thread-star {
+	vertical-align: middle;
+}
+
+.bp-user #buddypress #message-threads tr td.thread-star .message-action-star,
+.bp-user #buddypress #message-threads tr td.thread-star .message-action-unstar {
+	line-height: 1.2;
+}
+
+.bp-user #buddypress #message-threads tr td.thread-star span.icon:before {
+	font-size: 14px;
+	font-size: 0.9333333333rem;
+}
+
+.bp-user #buddypress #message-threads tr td.bulk-select-check,
+.bp-user #buddypress #message-threads tr td.thread-from {
+	height: 3em;
+}
+
+@media screen and (max-width: 37.5em) {
+	.bp-user #buddypress #message-threads tr td.bulk-select-check,
+	.bp-user #buddypress #message-threads tr td.thread-from {
+		height: 5.2em;
+	}
+}
+
+.bp-user #buddypress #message-threads tr td.thread-from,
+.bp-user #buddypress #message-threads tr td.thread-options {
+	border-left: 0 !important;
+	width: -webkit-calc(100% - 30px);
+	width: -moz-calc(100% - 30px);
+	width: calc(100% - 30px);
+	margin-left: 0;
+}
+
+.bp-user #buddypress #message-threads tr td.thread-info {
+	padding-left: 41px;
+	width: 100%;
+}
+
+.bp-user #buddypress #message-threads tr td.thread-options {
+	text-align: right;
+}
+
+.bp-user #buddypress #message-threads tr td.thread-options a {
+	font-size: 12px;
+	font-size: 0.8rem;
+	line-height: 1.2;
+}
+
+.bp-user #buddypress #message-threads tr span.from {
+	display: none;
+}
+
+.bp-user #buddypress #message-threads tr span.activity {
+	display: block;
+	float: right;
+	line-height: 2;
+}
+
+@media screen and (max-width: 37.5em) {
+	.bp-user #buddypress #message-threads tr span.activity {
+		clear: both;
+		font-size: 11px;
+		font-size: 0.7333333333rem;
+		width: 100%;
+	}
+}
+
+.bp-user #buddypress #message-threads tr.unread td {
+	border-color: #eaeaea;
+}
+
+.bp-user #buddypress #message-threads th {
+	display: none;
+}
+
+.bp-user #buddypress #message-threads th.bulk-select-all {
+	border-bottom: 0;
+	display: inline-block;
+	text-align: left;
+}
+
+.bp-user #buddypress #message-threads th.bulk-select-all,
+.bp-user #buddypress #message-threads td.bulk-select-check,
+.bp-user #buddypress #message-threads td.thread-star {
+	border-right: 0;
+	width: 30px;
+}
+
+.bp-user #buddypress #send_message_form input,
+.bp-user #buddypress #send_message_form textarea {
+	box-sizing: border-box;
+}
+
+.bp-user #buddypress .acfb-holder {
+	list-style: none;
+}
+
+.bp-user #buddypress .acfb-holder li {
+	margin-left: 0;
+}
+
+.bp-user #buddypress .acfb-holder li.friend-tab {
+	background: #edf7fa;
+	border: inherit;
+	margin-right: 0;
+	padding: 0.5em;
+}
+
+.bp-user #buddypress .acfb-holder li.friend-tab span.p {
+	padding-left: 15px;
+}
+
+.bp-user #buddypress .acfb-holder li.friend-tab span.p:focus, .bp-user #buddypress .acfb-holder li.friend-tab span.p:hover {
+	color: #c82b2b;
+	cursor: pointer;
+}
+
+.bp-user #buddypress .acfb-holder li.friend-tab a {
+	border-bottom: 0;
+	text-decoration: none;
+}
+
+.bp-user #buddypress .acfb-holder li.friend-tab a img {
+	display: inline;
+	height: 20px;
+	vertical-align: middle;
+	width: 20px !important;
+}
+
+.bp-user #buddypress #message-threads.sitewide-notices tr {
+	margin: 3em 0;
+}
+
+.bp-user #buddypress #message-threads.sitewide-notices td {
+	width: 100%;
+}
+
+.bp-user #buddypress #message-threads.sitewide-notices td strong {
+	background: #6f6e6e;
+	color: #fff;
+	display: block;
+	margin-bottom: 0.4em;
+	padding-left: 0.2em;
+}
+
+.bp-user #buddypress #message-threads.sitewide-notices td a {
+	display: inline-block;
+}
+
+.bp-user #buddypress #message-threads.sitewide-notices td a.button {
+	border: 1px solid #d4d0ba;
+	line-height: initial;
+	padding: 0.4em 0.3em;
+}
+
+.bp-user #buddypress #message-threads.sitewide-notices td:first-child {
+	display: none;
+}
+
+.bp-user #buddypress #message-threads.sitewide-notices td:nth-child(2) strong {
+	margin: -8px -8px 8px;
+}
+
+.bp-user #buddypress #message-threads.sitewide-notices td:first-child + td + td {
+	border-bottom: 0;
+}
+
+.bp-user #buddypress #message-threads.sitewide-notices td:first-child + td + td span {
+	line-height: 1;
+}
+
+.bp-user #buddypress #message-threads.sitewide-notices td:last-child {
+	line-height: 1;
+	padding-bottom: 1em;
+	text-align: right;
+}
+
+.bp-user #buddypress #message-threads.sitewide-notices td:last-child a:last-child {
+	line-height: 0;
+	margin-left: 0.7em;
+	text-indent: -999em;
+}
+
+.bp-user #buddypress #message-threads.sitewide-notices td:last-child a:last-child:after {
+	content: attr(title);
+	display: block;
+	line-height: initial;
+	text-indent: 0;
+}
+
+.bp-user .ac_results {
+	background: #eee;
+	padding-left: 15px;
+}
+
+.bp-user .ac_results li {
+	margin: 15px 0;
+}
+
+.bp-user .ac_results li:focus, .bp-user .ac_results li:hover {
+	cursor: pointer;
+}
+
+.bp-user .ac_results li img {
+	vertical-align: bottom;
+}
+
+/**
+	*------------------------------
+	* @subsection 6.2.2.6 - Settings
+	*------------------------------
+	*/
+.bp-user #buddypress #settings-form > p {
+	font-size: 20px;
+	font-size: 1.3333333333rem;
+	margin: 25px 0 15px;
+}
+
+.bp-user #buddypress table.notification-settings td.yes,
+.bp-user #buddypress table.notification-settings td.no {
+	vertical-align: middle;
+}
+
+.bp-user #buddypress table.profile-settings {
+	width: 100%;
+}
+
+.bp-user #buddypress table.profile-settings th.field-group-name,
+.bp-user #buddypress table.profile-settings td.field-name {
+	width: 50%;
+}
+
+@media screen and (min-width: 46.25em) {
+	.bp-user #buddypress table.profile-settings th.field-group-name,
+	.bp-user #buddypress table.profile-settings td.field-name {
+		width: 70%;
+	}
+}
+
+.bp-user #buddypress table.profile-settings th.title,
+.bp-user #buddypress table.profile-settings td.field-visibility {
+	width: 30%;
+}
+
+.bp-user #buddypress table.profile-settings td.field-visibility select {
+	width: 100%;
+}
+
+/**
+	*------------------------------------
+	* @subsection 6.2.2.6 - Notifications
+	*------------------------------------
+	*/
+/**
+*-------------------------------------------------------------------------------
+* @section 7.0 - Forms  - General
+*-------------------------------------------------------------------------------
+*/
+#main #buddypress .standard-form li {
+	float: none;
+}
+
+#main #buddypress .standard-form input[type="text"],
+#main #buddypress .standard-form input[type="email"],
+#main #buddypress .standard-form input[type="password"],
+#main #buddypress .standard-form textarea {
+	width: 100%;
+}
+
+#buddypress div.activity-comments form .ac-textarea {
+	background: #f7f7f7;
+	border: 1px solid rgba(212, 208, 186, 0.5);
+}
+
+#buddypress div.activity-comments form .ac-textarea textarea {
+	background: none;
+	border: 0;
+}
+
+#buddypress .standard-form input[type="text"],
+#buddypress .standard-form input[type="email"],
+#buddypress .standard-form input[type="password"],
+#buddypress .standard-form button,
+#buddypress .standard-form select,
+#buddypress .standard-form textarea {
+	border-color: rgba(212, 208, 186, 0.5);
+	border-width: 1px;
+}
+
+#buddypress #signup_form.standard-form div.submit {
+	float: none;
+}
+
+#buddypress #signup_form.standard-form div.submit input {
+	margin-right: 0;
+}
+
+#buddypress div.dir-search,
+#buddypress div.message-search,
+#buddypress li.groups-members-search {
+	float: none;
+	margin: 15px 0;
+}
+
+#buddypress div.dir-search form,
+#buddypress div.message-search form,
+#buddypress li.groups-members-search form {
+	border: 1px solid rgba(212, 208, 186, 0.6);
+	overflow: hidden;
+}
+
+#buddypress div.dir-search form label,
+#buddypress div.message-search form label,
+#buddypress li.groups-members-search form label {
+	float: left;
+	width: 70%;
+}
+
+#buddypress div.dir-search form input[type="text"],
+#buddypress div.dir-search form input[type="submit"],
+#buddypress div.message-search form input[type="text"],
+#buddypress div.message-search form input[type="submit"],
+#buddypress li.groups-members-search form input[type="text"],
+#buddypress li.groups-members-search form input[type="submit"] {
+	border: 0;
+	border-radius: 0;
+	box-shadow: none;
+	box-sizing: border-box;
+	font-size: 14px;
+	font-size: 0.9333333333rem;
+	line-height: 1.8;
+	min-height: 2rem;
+}
+
+#buddypress div.dir-search form input[type="text"],
+#buddypress div.message-search form input[type="text"],
+#buddypress li.groups-members-search form input[type="text"] {
+	border-right: 1px solid rgba(212, 208, 186, 0.6);
+	float: left;
+	margin: 0;
+	padding: 0 0.2em;
+	width: 70%;
+}
+
+#buddypress div.dir-search form input[type="submit"],
+#buddypress div.message-search form input[type="submit"],
+#buddypress li.groups-members-search form input[type="submit"] {
+	float: right;
+	font-weight: 400;
+	padding: 0 1em;
+	text-align: center;
+	text-transform: none;
+	width: 30%;
+}
+
+@media screen and (min-width: 37.5em) {
+	#buddypress div.dir-search,
+	#buddypress div.message-search,
+	#buddypress li.groups-members-search {
+		float: right;
+		margin-bottom: 5px !important;
+	}
+	#buddypress div.dir-search form label,
+	#buddypress div.dir-search form input[type="text"],
+	#buddypress div.dir-search form input[type="submit"],
+	#buddypress div.message-search form label,
+	#buddypress div.message-search form input[type="text"],
+	#buddypress div.message-search form input[type="submit"],
+	#buddypress li.groups-members-search form label,
+	#buddypress li.groups-members-search form input[type="text"],
+	#buddypress li.groups-members-search form input[type="submit"] {
+		width: auto;
+	}
+}
+
+@media screen and (min-width: 800px) {
+	#buddypress .dir-search form input[type="text"],
+	#buddypress .message-search form input[type="text"] {
+		font-size: 16px;
+		font-size: 1.0666666667rem;
+	}
+	#buddypress .dir-search form input[type="submit"],
+	#buddypress .message-search form input[type="submit"] {
+		font-size: 16px;
+		font-size: 1.0666666667rem;
+	}
+}
+
+/**
+*-------------------------------------------------------------------------------
+* @section 8.0 - Tables - General
+*-------------------------------------------------------------------------------
+*/
+.bp-user #buddypress table {
+	font-size: 14px;
+	font-size: 0.9333333333rem;
+	margin: 25px 0;
+}
+
+.bp-user #buddypress table tr th {
+	background: #6f6e6e;
+	border-color: #b7b7b7;
+	color: #fff;
+	font-size: 16px;
+	font-size: 1.0666666667rem;
+	padding: 0 8px;
+	text-transform: capitalize;
+}
+
+.bp-user #buddypress table tr td {
+	padding: 8px;
+}
+
+.bp-user #buddypress table p {
+	margin-bottom: 0.5em;
+}
+
+@media screen and (min-width: 55em) {
+	.bp-user #buddypress table {
+		font-size: 16px;
+		font-size: 1.0666666667rem;
+	}
+}
+
+.bp-user #buddypress .notifications th,
+.bp-user #buddypress .messages-notices th {
+	width: 30%;
+}
+
+.bp-user #buddypress .notifications th.bulk-select-all,
+.bp-user #buddypress .messages-notices th.bulk-select-all {
+	text-align: center;
+	width: 10%;
+}
+
+.bp-user #buddypress .notifications th.actions,
+.bp-user #buddypress .messages-notices th.actions {
+	text-align: center;
+}
+
+.bp-user #buddypress .notifications .bulk-select-check,
+.bp-user #buddypress .notifications .thread-star,
+.bp-user #buddypress .messages-notices .bulk-select-check,
+.bp-user #buddypress .messages-notices .thread-star {
+	text-align: center;
+}
+
+.bp-user #buddypress .notifications .notification-actions,
+.bp-user #buddypress .notifications td.thread-options,
+.bp-user #buddypress .messages-notices .notification-actions,
+.bp-user #buddypress .messages-notices td.thread-options {
+	text-align: center;
+}
+
+.bp-user #buddypress .notifications .notification-actions a,
+.bp-user #buddypress .notifications td.thread-options a,
+.bp-user #buddypress .messages-notices .notification-actions a,
+.bp-user #buddypress .messages-notices td.thread-options a {
+	display: inline-block;
+	margin: 0;
+	padding: 0;
+}
+
+.bp-user #buddypress .notifications td .button,
+.bp-user #buddypress .messages-notices td .button {
+	border: 0;
+	display: block;
+	padding: 0;
+	text-align: center;
+}
+
+/**
+*-------------------------------------------------------------------------------
+* @section 9.0 - Error / Success messages
+*-------------------------------------------------------------------------------
+*/
+#buddypress div#message p {
+	font-size: 18px;
+	font-size: 1.2rem;
+	font-weight: 700;
+}
+
+#buddypress div#message.info p {
+	background: #c6e4ee;
+	border: 1px solid #78bed6;
+	color: #1e5264;
+}
+
+#buddypress div#message.updated p {
+	background: #dee6b2;
+	border: 1px solid #becc66;
+	color: #454d19;
+}
+
+.delete-group #buddypress div#message.info p {
+	background: #db7e7e;
+	border: 1px solid #be3535;
+	color: #1f0808;
+}
+
+/**
+*-------------------------------------------------------------------------------
+* @section 10.0 - Ajax Loading, Widgets, General classes
+*-------------------------------------------------------------------------------
+*/

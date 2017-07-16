@@ -1,0 +1,237 @@
+body:not(.wp-admin) {
+	padding-top: 25px !important;
+}
+
+#wp-admin-bar {
+	position: fixed;
+	top: 0;
+	right: 0;
+	height: 25px;
+	font-size: 11px;
+	width: 100%;
+	z-index: 9999;
+}
+
+#wp-admin-bar .padder {
+	position: relative;
+	padding: 0;
+	width: 100%;
+	margin: 0 auto;
+	background: url(../images/60pc_black.png);
+	height: 25px;
+}
+
+body#bp-default #wp-admin-bar .padder {
+	max-width: 1250px;
+}
+
+#wp-admin-bar * {
+	z-index: 999;
+}
+
+#wp-admin-bar div#admin-bar-logo {
+	position: absolute;
+	top: 5px;
+	right: 10px;
+}
+
+#wp-admin-bar a img {
+	border: none;
+}
+
+#wp-admin-bar li {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	line-height: 1;
+	text-align: right;
+}
+
+#wp-admin-bar li a {
+	padding: 7px 15px;
+	color: #eee;
+	text-decoration: none;
+	font-size: 11px;
+}
+
+#wp-admin-bar li.alt {
+	border: none;
+}
+
+#wp-admin-bar li.no-arrow a {
+	padding-left: 15px;
+}
+
+#wp-admin-bar ul li ul li a span {
+	display: none;
+}
+
+#wp-admin-bar li:hover,
+#wp-admin-bar li.hover {
+	position: static;
+}
+
+#admin-bar-logo {
+	float: right;
+	font-weight: 700;
+	font-size: 11px;
+	padding: 5px 8px;
+	margin: 0;
+	text-decoration: none;
+	color: #fff;
+}
+
+body#bp-default #admin-bar-logo {
+	padding: 2px 8px;
+}
+
+/* all lists */
+#wp-admin-bar ul {
+	margin: 0;
+	list-style: none;
+	line-height: 1;
+	cursor: pointer;
+	height: auto;
+	padding: 0;
+}
+
+/* all list items */
+#wp-admin-bar ul li {
+	padding: 0;
+	float: right;
+	position: relative;
+	background: url(../images/admin-menu-arrow.gif) 88% 53% no-repeat;
+	padding-left: 11px;
+}
+
+#wp-admin-bar ul li.no-arrow {
+	background: none;
+	padding-left: 0;
+}
+
+#wp-admin-bar ul li ul li {
+	background-image: none;
+}
+
+#wp-admin-bar ul li.align-right {
+	position: absolute;
+	left: 0;
+}
+
+#wp-admin-bar ul li a {
+	display: block;
+}
+
+#wp-admin-bar ul.main-nav li:hover,
+#wp-admin-bar ul.main-nav li.sfhover,
+#wp-admin-bar ul.main-nav li ul li.sfhover {
+	background-color: #333;
+}
+
+/* second-level lists */
+#wp-admin-bar ul li ul {
+	position: absolute;
+	width: 185px;
+	right: -999em;
+	margin-right: 0;
+	background: #333;
+	border: 1px solid #222;
+	-moz-box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	-webkit-box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius-topright: 0;
+	-webkit-border-top-right-radius: 0;
+	-moz-border-radius-topleft: 0;
+	-webkit-border-top-left-radius: 0;
+}
+
+#wp-admin-bar ul li > ul {
+	border-top: none;
+}
+
+#wp-admin-bar ul li ul a {
+	color: #eee;
+}
+
+#wp-admin-bar ul li ul li {
+	float: right;
+	width: 174px;
+	margin: 0;
+}
+
+#wp-admin-bar ul li ul li:hover a {
+	color: #fff;
+}
+
+#wp-admin-bar ul li div.admin-bar-clear {
+	clear: both;
+}
+
+#wp-admin-bar ul.main-nav li ul li:hover,
+#wp-admin-bar ul.main-nav li ul li.sfhover,
+#wp-admin-bar ul.main-nav li ul li.sfhover {
+	background-color: #222;
+}
+
+/* third-and-above-level lists */
+#wp-admin-bar ul li ul ul {
+	margin: -25px 184px 0 0;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+}
+
+#wp-admin-bar ul li ul li:hover ul li a {
+	color: #eee;
+}
+
+#wp-admin-bar ul li ul li ul li:hover a {
+	color: #fff;
+}
+
+#wp-admin-bar ul li:hover ul,
+#wp-admin-bar ul li ul li:hover ul,
+#wp-admin-bar ul li.sfhover ul,
+#wp-admin-bar ul li ul li.sfhover ul {
+	right: auto;
+}
+
+#wp-admin-bar ul li.align-right:hover ul {
+	left: 0;
+}
+
+#wp-admin-bar ul li:hover ul ul,
+#wp-admin-bar li.sfhover ul li ul {
+	right: -999em;
+}
+
+/* Menu item css */
+#wp-admin-bar img.avatar {
+	float: right;
+	margin-left: 8px;
+}
+
+#wp-admin-bar span.activity {
+	display: block;
+	margin-right: 34px;
+	padding: 0;
+}
+
+#wp-admin-bar ul.author-list li a {
+	height: 17px;
+}
+
+#wp-admin-bar ul li#bp-adminbar-notifications-menu a span {
+	padding: 0 6px;
+	margin-right: 2px;
+	background: #fff;
+	color: #000;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+}
+
+#wp-admin-bar-user-info img.avatar {
+	height: 64px;
+	width: 64px;
+}

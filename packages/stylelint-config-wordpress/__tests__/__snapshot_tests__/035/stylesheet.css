@@ -1,0 +1,108 @@
+.atwho-view {
+	background: rgba(204, 204, 204, 0.8);
+	border-radius: 2px;
+	border: 1px solid rgb(204, 204, 204);
+	box-shadow: 0 0 5px rgba(204, 204, 204, 0.25), 0 0 1px #fff;
+	color: #d84800;
+	display: none;
+	font-family: sans-serif;
+	margin-top: 18px;
+	position: absolute;
+	top: 0;
+	z-index: 1000; /* >999 for wp-admin */
+}
+
+/* rtl:ignore */
+.atwho-view {
+	left: 0;
+}
+
+.atwho-view ul {
+	background: #fff;
+	list-style: none;
+	margin: auto;
+	padding: 0;
+}
+
+.atwho-view ul li {
+	border-bottom: 1px solid #efefef;
+	box-sizing: content-box;
+	cursor: pointer;
+	display: block;
+	font-size: 14px;
+	height: 20px;
+	line-height: 20px;
+	margin: 0;
+	overflow: hidden;
+	padding: 5px 10px;
+}
+
+.atwho-view img {
+	border-radius: 2px;
+	float: right;
+	height: 20px;
+	margin-top: 0;
+	width: 20px;
+}
+
+.atwho-view strong {
+	background: #efefef;
+	font-weight: 700;
+}
+
+.atwho-view .username strong {
+	color: #d54e21;
+}
+
+.atwho-view small {
+	color: #aaa;
+	float: right;
+	font-size: smaller;
+	font-weight: 400;
+	margin: 0 10px 0 40px;
+}
+
+.atwho-view .cur {
+	background: rgba(239, 239, 239, 0.5);
+}
+
+@media (max-width: 900px) {
+
+	.atwho-view img {
+		float: left;
+		margin: 0 10px 0 0;
+	}
+}
+
+@media (max-width: 400px) {
+
+	.atwho-view ul li {
+		font-size: 16px;
+		line-height: 23px;
+		padding: 13px;
+	}
+
+	.atwho-view ul li img {
+		height: 30px;
+		margin-top: -5px;
+		width: 30px;
+	}
+
+	.atwho-view {
+		border-radius: 0;
+		height: 100%;
+		left: 0 !important;
+		width: 100%;
+	}
+
+	.atwho-view ul li .username {
+		display: inline-block;
+		margin: -10px 0 0 0;
+		padding: 10px 0;
+	}
+
+	.atwho-view ul li small {
+		display: inline-block;
+		margin-left: 20px;
+	}
+}

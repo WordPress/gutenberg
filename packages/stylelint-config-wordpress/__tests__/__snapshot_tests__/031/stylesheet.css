@@ -1,0 +1,43 @@
+/*
+Theme Name: BuddyPress Default
+Description: Used to style the TinyMCE editor (RTL version).
+*/
+
+html .mceContentBody .alignright {
+	float: left;
+	margin-left: auto;
+	margin-right: 15px;
+}
+html .mceContentBody .alignleft {
+	float: right;
+	margin-left: 15px;
+	margin-right: auto;
+}
+dl {
+	margin-left: auto;
+	margin-right: 0;
+}
+html .mceContentBody img.alignright {
+	margin: 0 7px 2px 0;
+}
+html .mceContentBody img.alignleft {
+	margin: 0 0 2px 7px;
+}
+dd.wp-caption p.wp-caption-text,
+.wp-caption p.wp-caption-text {
+	padding: 0 0 5px 4px;
+}
+html .mceContentBody ul,
+html .mceContentBody ol,
+html .mceContentBody dl {
+	margin: 0 1.5em 18px 0;
+}
+
+html .mceContentBody table th:first {
+	border-left: 1px solid #eaeaea;
+	border-right: 0;
+}
+html .mceContentBody table tr td.label {
+	border-left: 1px solid #eaeaea;
+	border-right: 0;
+}

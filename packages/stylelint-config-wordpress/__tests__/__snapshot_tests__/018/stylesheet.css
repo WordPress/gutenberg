@@ -1,0 +1,286 @@
+/**** BP Members Profile Administration Screens
+* TO DO: Organize and clean up stylesheet.
+****/
+
+div#profile-page.wrap form#your-profile {
+	position: relative;
+	padding-top: 50px;
+}
+
+div#profile-page.wrap form#your-profile h3:first-of-type {
+	margin-top: 5em;
+}
+
+div#profile-page.wrap form#your-profile #profile-nav {
+	position: absolute;
+	top: 0;
+	width: 97%;
+}
+
+div#community-profile-page #profile-nav {
+	margin-bottom: 1em;
+}
+
+#bp_members_admin_user_stats ul {
+	margin-bottom: 0;
+}
+
+div#community-profile-page li.bp-members-profile-stats:before,
+div#community-profile-page li.bp-friends-profile-stats:before,
+div#community-profile-page li.bp-groups-profile-stats:before,
+div#community-profile-page li.bp-blogs-profile-stats:before,
+div#community-profile-page a.bp-xprofile-avatar-user-admin:before,
+div#community-profile-page a.bp-xprofile-avatar-user-edit:before {
+	font: 400 20px/1 dashicons;
+	speak: none;
+	display: inline-block;
+	padding: 0 0 0 2px;
+	top: 0;
+	right: -1px;
+	position: relative;
+	vertical-align: top;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	text-decoration: none !important;
+	color: #888;
+}
+
+div#community-profile-page li.bp-members-profile-stats:before {
+	content: "\f130";
+}
+
+div#community-profile-page li.bp-friends-profile-stats:before {
+	content: "\f454";
+}
+
+div#community-profile-page li.bp-groups-profile-stats:before {
+	content: "\f456";
+}
+
+div#community-profile-page li.bp-blogs-profile-stats:before {
+	content: "\f120";
+}
+
+div#community-profile-page a.bp-xprofile-avatar-user-admin:before {
+	content: "\f182";
+}
+
+div#community-profile-page a.bp-xprofile-avatar-user-edit:before {
+	content: "\f107";
+}
+
+div#community-profile-page div#bp_xprofile_user_admin_avatar div.avatar {
+	width: 150px;
+	margin: 0 auto;
+}
+
+div#community-profile-page div#bp_xprofile_user_admin_avatar div.avatar img {
+	max-width: 100%;
+	height: auto;
+}
+
+div#community-profile-page div#bp_xprofile_user_admin_avatar a {
+	display: block;
+	margin: 1em 0;
+}
+
+div#community-profile-page p.not-activated {
+	margin: 1em 1em 0;
+	color: #f00;
+}
+
+#community-profile-page #submitdiv #publishing-action {
+	float: none;
+	width: 100%;
+}
+
+.bp-view-profile {
+	float: right;
+}
+
+.alt {
+	background: none;
+}
+
+.bp-profile-field {
+	border-bottom: dotted 1px #ccc;
+	font-size: 14px;
+	margin: 15px 0;
+	padding: 10px;
+}
+
+.bp-profile-field:last-child {
+	border-bottom: 0;
+}
+
+.bp-profile-field p {
+	font-size: 14px;
+}
+
+.field_type_textarea legend,
+.field_type_multiselectbox legend,
+.field_type_radio .radio legend,
+.field_type_checkbox .checkbox legend {  /* these fields are usually pretty tall, so align the label for better consistency */
+	vertical-align: top;
+}
+
+.bp-profile-field .description {  /* description also sits in the right side column */
+	margin: 10px 200px 12px 0;
+	text-align: right;
+}
+
+.bp-profile-field .wp-editor-wrap {
+	margin-right: 200px;
+}
+
+.field_type_checkbox .description,
+.field_type_datebox .description,
+.field_type_radio .description {
+	margin-top: 0;
+}
+
+.clear-value {  /* 'clear value' option also sits in the right side column */
+	display: block;
+	font-size: 12px;
+	margin-right: 200px;
+}
+
+/* force checkboxes to new lines, in the right side column */
+.field_type_checkbox label,
+.field_type_radio label {
+	display: block;
+	margin-bottom: 1em;
+	margin-right: 200px;
+	width: auto;
+}
+
+.field_type_datebox select:nth-of-type(1) {
+	margin-right: 200px;
+}
+
+.field_type_radio .radio .input-options label,
+.field_type_checkbox .checkbox .input-options label {
+
+	/* force checkboxes and radio buttons to new lines */
+	display: block;
+}
+
+.field_type_checkbox .checkbox .input-options,
+.field_type_datebox .datebox .input-options,
+.field_type_radio .radio .input-options {
+
+	/* make the checkboxes, select menus, and radio buttons sit in the
+	right side column */
+	display: inline-block;
+}
+
+.field-visibility-settings-notoggle,
+.field-visibility-settings-toggle {  /* visibility settings go in the left column */
+	margin: 10px 200px 10px 0;
+	text-align: right;
+}
+
+.field-visibility-settings {  /* visibility settings go in the left column */
+	display: none;
+	margin-right: 200px;
+}
+
+.field-visibility-settings .button {  /* visibility setting close button */
+	margin-bottom: 15px;
+}
+
+.field-visibility-settings label {
+	clear: right;
+	display: block;
+	margin-bottom: 1em;
+}
+
+#normal-sortables .field-visibility-settings legend {  /* id required for css selector weight */
+	font-size: 14px;
+	font-weight: 600;
+}
+
+#your-profile .bp-profile-field legend {
+	float: right; /* Firefox will not apply display: inline-block to legends */
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 1.4;
+	margin-bottom: 1em;
+	text-align: right;
+	vertical-align: middle;
+	width: 192px;
+}
+
+.bp-profile-field .radio .clear-value {
+	margin-top: 10px;
+}
+
+@media screen and (max-width: 782px) {
+
+	#your-profile .bp-profile-field legend {
+		float: none;
+		clear: right;
+		display: block;
+		margin-bottom: 12px;
+	}
+
+	#your-profile .field_type_multiselectbox select {
+		height: auto;
+	}
+
+	.field_type_checkbox label,
+	.field_type_radio label {
+		margin-right: 0;
+	}
+
+	.bp-profile-field .checkbox input[type="checkbox"],
+	.bp-profile-field .radio input[type="radio"] {
+		vertical-align: top;
+	}
+
+	.bp-profile-field .clear-value,
+	.bp-profile-field .description,
+	.bp-profile-field input[type="checkbox"],
+	.bp-profile-field input[type="email"],
+	.bp-profile-field input[type="number"],
+	.bp-profile-field input[type="radio"],
+	.bp-profile-field input[type="text"],
+	.bp-profile-field input[type="url"],
+	.bp-profile-field select:nth-of-type(1),
+	.bp-profile-field .wp-editor-wrap,
+	.field-visibility-settings-notoggle,
+	.field-visibility-settings-toggle {
+		clear: right;
+		margin-right: 50px;
+	}
+
+	.field-visibility-settings {
+		margin-right: 100px;
+	}
+
+	#your-profile .field_multiselectbox select {
+		height: auto;
+	}
+}
+
+@media screen and (max-width: 480px) {
+
+	.bp-profile-field .clear-value,
+	.bp-profile-field .description,
+	.bp-profile-field input[type="checkbox"],
+	.bp-profile-field input[type="email"],
+	.bp-profile-field input[type="number"],
+	.bp-profile-field input[type="radio"],
+	.bp-profile-field input[type="text"],
+	.bp-profile-field input[type="url"],
+	.bp-profile-field select:nth-of-type(1),
+	.bp-profile-field .wp-editor-wrap,
+	.field-visibility-settings-notoggle,
+	.field-visibility-settings-toggle {
+		margin-right: 0;
+	}
+
+	.field-visibility-settings {
+		margin-right: 50px;
+	}
+}

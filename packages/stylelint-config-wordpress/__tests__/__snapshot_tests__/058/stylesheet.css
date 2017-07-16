@@ -1,0 +1,419 @@
+/* Profile field group main admin page */
+@-o-keyframes tab-throb {
+
+	from {
+		box-shadow: 0 0 10px #1e8cbe;
+	}
+
+	50% {
+		box-shadow: 0 0 0 #1e8cbe;
+	}
+
+	to {
+		box-shadow: 0 0 10px #1e8cbe;
+	}
+}
+
+@-webkit-keyframes tab-throb {
+
+	from {
+		box-shadow: 0 0 10px #1e8cbe;
+	}
+
+	50% {
+		box-shadow: 0 0 0 #1e8cbe;
+	}
+
+	to {
+		box-shadow: 0 0 10px #1e8cbe;
+	}
+}
+
+@-moz-keyframes tab-throb {
+
+	from {
+		box-shadow: 0 0 10px #1e8cbe;
+	}
+
+	50% {
+		box-shadow: 0 0 0 #1e8cbe;
+	}
+
+	to {
+		box-shadow: 0 0 10px #1e8cbe;
+	}
+}
+
+#profile-field-form {
+	margin-top: 12px;
+}
+
+#tabs {
+	position: relative;
+}
+
+p.nofields {
+	margin: 20px 0 0;
+}
+
+/* Field group tabs */
+ul#field-group-tabs {
+	float: left;
+	padding: 0 0 0 15px;
+	margin: 0;
+	display: none;
+}
+
+ul#field-group-tabs li {
+	float: left;
+	margin-right: 8px;
+	margin-bottom: -1px;
+}
+
+ul#field-group-tabs li.ui-state-hover a.ui-tab {
+	color: #d54e21;
+}
+
+ul#field-group-tabs li.ui-state-acceptable:not(.ui-state-active) a.ui-tab {
+	-webkit-animation: tab-throb 2s infinite;
+	-moz-animation: tab-throb 2s infinite;
+	-o-animation: tab-throb 2s infinite;
+	animation: tab-throb 2s infinite;
+}
+
+ul#field-group-tabs li.drop-candidate.ui-state-acceptable:not(.ui-state-active) a.ui-tab {
+	-webkit-box-shadow: 0 0 10px #0f0;
+	-moz-box-shadow: 0 0 10px #0f0;
+	-o-box-shadow: 0 0 10px #0f0;
+	box-shadow: 0 0 10px #0f0;
+	-webkit-animation: none;
+	-moz-animation: none;
+	-o-animation: none;
+	animation: none;
+	color: #000;
+}
+
+ul#field-group-tabs li a.ui-tab {
+	font-size: 14px;
+	display: block;
+	margin-top: 3px;
+	padding: 5px 10px 6px;
+	border: 1px solid #e5e5e5;
+	background-color: #f5f5f5;
+	text-decoration: none;
+	color: #000;
+	outline: none;
+}
+
+/* Selected tab */
+ul#field-group-tabs li.ui-state-active a.ui-tab {
+	background-color: #fff;
+	margin-top: 0;
+	padding: 7px 10px;
+	border-bottom: 1px solid transparent;
+	color: #000;
+}
+
+/* Toolbar */
+.tab-toolbar {
+	clear: left;
+	background: #fff;
+	border-width: 1px;
+	border-color: #e5e5e5;
+	border-style: solid;
+	-webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+	padding: 10px;
+	margin-bottom: 10px;
+}
+
+.bp-option a.delete,
+.field-wrapper a.deletion,
+.tab-toolbar a.deletion {
+	color: #a00;
+	border-bottom: 1px solid #a00;
+	text-decoration: none;
+	padding: 0;
+}
+
+div.delete-button {
+	float: right;
+	line-height: 28px;
+}
+
+div.field-group {
+	clear: left;
+}
+
+.field-group {
+	cursor: default;
+	border: 1px solid #e5e5e5;
+	background: #fff;
+	-webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+	margin-top: 10px;
+	padding: 0 20px 20px;
+}
+
+.field-group .xprofile-field {
+	position: relative;
+}
+
+.field-group fieldset {
+	position: relative;
+	border: 1px solid #ddd;
+	margin: 20px 0 0;
+	cursor: move;
+	background: #fafafa;
+	padding: 10px 0 0;
+}
+
+.field-group fieldset legend {
+	position: absolute;
+	top: 10px;
+	left: 10px;
+	padding: 0;
+}
+
+fieldset.radio div div label,
+fieldset.checkbox div label {
+	margin-right: 20px;
+}
+
+fieldset.clear-value {
+	margin-left: 10px;
+}
+
+fieldset div.field-wrapper {
+	padding: 25px 10px 10px;
+}
+
+.field-group div.actions {
+	float: none;
+	border-top: 1px solid #ddd;
+	margin: 10px 0 0;
+	padding-top: 10px;
+}
+
+.field-group div.actions a,
+.field-group div.actions button,
+.field-group div.actions input {
+	float: none;
+}
+
+.field-group fieldset:hover {
+	border-color: #999;
+}
+
+.field-group fieldset:hover div.actions {
+	display: block;
+}
+
+.bp-options-box .ui-sortable-placeholder,
+#field-group-tabs .ui-sortable-placeholder,
+.field-group fieldset.ui-sortable-placeholder {
+	border: 1px dashed #999;
+	background-color: #fff;
+	visibility: visible !important;
+}
+
+#field-group-tabs .ui-sortable-placeholder {
+	background: transparent;
+	border-bottom: none;
+	margin: -1px 6px -1px 0;
+}
+
+ul.forTab {
+	list-style: none;
+	padding: 0;
+	margin: 0 0 0 1em;
+}
+
+ul.forTab li {
+	margin: 0 0 1em;
+}
+
+ul.forTab li label {
+	display: block;
+}
+
+ul.forTab li input {
+	font-size: 1.4em;
+}
+
+p.success {
+	background: #0f0;
+}
+
+p.err {
+	border-top: 2px solid #f00;
+	border-bottom: 2px solid #f00;
+	color: #f00;
+	padding: 5px 0;
+	width: 40%;
+}
+
+span.desc,
+span.signup-description {
+	display: block;
+	font-size: 11px;
+	color: #555;
+}
+
+ul.multi-checkbox {
+	margin: 0 5px 0 0;
+	padding: 0.5em 0.9em;
+	height: 10em;
+	overflow: auto;
+	list-style: none;
+	border: solid 1px #ccc;
+	width: 90%;
+}
+
+ul.multi-checkbox li {
+	padding: 0;
+	margin: 0;
+}
+
+div.bp-option {
+	background: #fafafa;
+	border: 1px solid #dfdfdf;
+	margin: 10px 0;
+	padding: 10px 5px;
+}
+
+div.bp-option:hover {
+	border: 1px solid #999;
+}
+
+.bp-option-icon {
+	font: 400 20px/1 dashicons;
+	speak: none;
+	display: inline-block;
+	padding: 0 0 0 2px;
+	top: 5px;
+	position: relative;
+	vertical-align: top;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	text-decoration: none !important;
+	color: #888;
+}
+
+div.bp-option .grabber:before {
+	content: "\f329";
+}
+
+th a {
+	background: #fff;
+	padding: 2px 5px;
+	top: -2px;
+}
+
+textarea#description,
+textarea#group_description {
+	border: 1px solid #ddd;
+	width: 100%;
+}
+
+#bp-xprofile-add-field .titlewrap,
+#bp-xprofile-add-field-group .titlewrap {
+	margin-bottom: 20px;
+}
+
+#bp-xprofile-add-field #post-body-content {
+	margin-bottom: 0;
+}
+
+span.member-type-none-notice,
+p.member-type-none-notice {
+	color: #f00;
+}
+
+.hide {
+	display: none;
+	visibility: hidden;
+}
+
+/* xProfile Field Type - Date */
+
+.form-table.bp-date-options {
+	margin: 0 8px;
+}
+
+.form-table.bp-date-options th {
+	width: 150px;
+}
+
+.form-table td .date-format-section select {
+	margin-top: -2px;
+}
+
+.date-format-label {
+	display: inline-block;
+	width: 150px;
+}
+
+.date-format-custom-value,
+.date-range-numeric {
+	width: 56px;
+}
+
+.bp-date-range-type-label {
+	float: left;
+	font-style: italic;
+	width: auto;
+}
+
+.bp-date-range-type-values {
+	margin-right: 25px;
+	padding-left: 100px;
+}
+
+#bp-xprofile-add-field select#fieldtype {
+	max-width: 100%;
+	word-wrap: break-word;
+	word-break: break-all; /* e.g. Chinese, Japanese, Korean chars */
+}
+
+@media screen and (max-width: 782px) {
+
+	.bp-date-formats .bp-date-format-option:first-of-type {
+		margin-top: 1em;
+	}
+
+	.bp-range-types .bp-date-format-option {
+		margin-bottom: 1em;
+		margin-top: 1em;
+	}
+
+	.form-table td input.date-format-custom-value,
+	.form-table td input.date-range-numeric {
+		display: inline-block;
+		margin-right: 10px;
+		width: 56px;
+	}
+
+	.form-table td .bp-date-range-type-values select {
+		display: inline-block;
+		width: auto;
+	}
+
+	.bp-date-range-type-label {
+		float: none;
+		width: auto;
+	}
+
+	.bp-date-range-type-values {
+		padding-left: 0;
+		margin-left: 35px;
+	}
+}
+
+@media screen and (max-width: 480px) {
+
+	.form-table .bp-range-types label {
+		clear: both;
+		display: block;
+	}
+}

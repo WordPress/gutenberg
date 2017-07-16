@@ -1,0 +1,31 @@
+/*
+Theme Name: Kakumei Blue
+Theme URI: http://bbpress.org/
+Description: The "revolutionized" new face of bbPress... in blue.
+Version: 1.0
+Author: <a href="http://avalonstar.com">Bryan Veloso</a> with updates by <a href="http://unlettered.org">Sam Bauers</a>
+Author URI: 
+*/
+
+
+@import url('../kakumei/style.css');
+
+a { color: #32689b; text-decoration: none; }
+a:hover { color: #001364; }
+#header { background-image: url('images/page_header_bblogo.png'); }
+#header div.search input.submit:hover { color: #001364; }
+#header div.search input.submit:active { border-color: #001364; }
+form.login input.submit:hover { color: #001364; }
+form.login input.submit:active { border-color: #001364; }
+input#tagformsub:hover { color: #001364; }
+input#tagformsub:active { border-color: #001364; }
+.sticky { background: #adb9e1; }
+#thread li.pingback { background-color: #d8dcf2; border-color: #d8dcf2; }
+#thread li.pingback .threadpost { background-color: #d8dcf2; }
+#topic-move input { color: #32689b; }
+#topic-move input:hover { color: #001364; }
+#latest tr:hover, #forumlist tr:hover, #favorites tr:hover { background: #d8dcf2; }
+#profile-menu li a:hover { background: #d8dcf2; }
+a.prev.page-numbers:hover, a.next.page-numbers:hover { color: #001364; }
+p.submit input:hover { color: #001364; }
+p.submit input:active { border-color: #001364; }

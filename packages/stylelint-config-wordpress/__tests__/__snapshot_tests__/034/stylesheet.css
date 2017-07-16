@@ -1,0 +1,105 @@
+.akismet-status {
+	float: right;
+}
+
+.akismet-status a {
+	color: #aaa;
+	font-style: italic;
+}
+
+.akismet-history {
+	margin: 13px;
+}
+
+.akismet-history div {
+	margin-bottom: 13px;
+}
+
+.akismet-history span {
+	color: #999;
+}
+
+#wp-bp-activities-wrap {
+	padding: 5px 0;
+}
+
+#bp-activities {
+	height: 120px;
+}
+
+#bp-replyhead {
+	font-size: 1em;
+	line-height: 1.4;
+	margin: 0;
+}
+
+#bp-replysubmit {
+	margin: 0;
+	padding: 0 0 3px;
+	text-align: center;
+}
+
+#bp-replysubmit .error {
+	color: #f00;
+	line-height: 21px;
+	text-align: center;
+	vertical-align: center;
+}
+
+#bp-replysubmit img.waiting {
+	float: right;
+	padding: 4px 10px 0;
+	vertical-align: top;
+}
+
+#bp-activities-form .column-response img {
+	float: left;
+	margin-bottom: 5px;
+	margin-right: 10px;
+	margin-top: 1px;
+}
+
+.activity-errors {
+	list-style-type: disc;
+	margin-left: 2em;
+}
+
+#bp_activity_action div.inside,
+#bp_activity_content div.inside {
+	line-height: 0;
+}
+
+#bp_activity_action h3,
+#bp_activity_content h3 {
+	cursor: auto;
+}
+
+#bp_activity_action td.mceIframeContainer,
+#bp_activity_content td.mceIframeContainer {
+	background-color: #fff;
+}
+
+#post-body #bp-activities-action_resize,
+#post-body #bp-activities-content_resize {
+	position: inherit;
+	margin-top: -2px;
+}
+
+#bp_activity_link input {
+	width: 99%;
+}
+
+#bp-activities-primaryid {
+	margin-bottom: 1em;
+}
+
+.column-action {
+	width: 12%;
+}
+
+@media screen and (max-width: 782px) {
+
+	body.toplevel_page_bp-activity .wp-list-table tr:not(.inline-edit-row):not(.no-items) td:not(.check-column) {
+		display: table-cell;
+	}
+}

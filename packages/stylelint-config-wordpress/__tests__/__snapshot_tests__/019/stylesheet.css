@@ -1,0 +1,86 @@
+.ac_results {
+	padding: 0;
+	overflow: hidden;
+	z-index: 99999;
+	background: #fff;
+	border: 1px solid #ccc;
+	-moz-border-radius-bottomright: 3px;
+	-khtml-border-bottom-right-radius: 3px;
+	-webkit-border-bottom-right-radius: 3px;
+	border-bottom-right-radius: 3px;
+	-moz-border-radius-bottomleft: 3px;
+	-khtml-border-bottom-left-radius: 3px;
+	-webkit-border-bottom-left-radius: 3px;
+	border-bottom-left-radius: 3px;
+}
+
+.ac_results ul {
+	width: 100%;
+	list-style: none;
+	list-style-position: outside;
+	padding: 0;
+	margin: 0;
+}
+
+.ac_results li {
+	margin: 0;
+	padding: 5px 10px;
+	cursor: pointer;
+	display: block;
+	font-size: 1em;
+	line-height: 16px;
+	overflow: hidden;
+}
+
+.ac_results li img {
+	margin-left: 5px;
+}
+
+.ac_odd {
+	background-color: #f0f0f0;
+}
+
+.ac_over {
+	background-color: #888;
+	color: #fff;
+}
+
+ul.acfb-holder {
+	margin: 0;
+	height: auto !important;
+	height: 1%;
+	overflow: hidden;
+	padding: 0;
+	list-style: none;
+}
+
+ul.acfb-holder li {
+	float: right;
+	margin: 0 0 4px 5px;
+	list-style-type: none;
+}
+
+ul.acfb-holder li.friend-tab {
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border: 1px solid #ffe7c7;
+	padding: 2px 7px;
+	background: #fff9df;
+	font-size: 1em;
+}
+
+li.friend-tab img.avatar {
+	border-width: 2px !important;
+	vertical-align: middle;
+}
+
+li.friend-tab span.p {
+	padding-right: 5px;
+	font-size: 0.8em;
+	cursor: pointer;
+}
+
+input#send-to-input {
+	width: 275px;
+}
