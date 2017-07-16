@@ -40,11 +40,13 @@
     "eslint-plugin-wordpress": "git://github.com/WordPress-Coding-Standards/eslint-plugin-wordpress.git#b65ae0cea1199c9714641ed3be7ea98fcb27dd6c",
     "eslint-plugin-jest": "^20.0.0",
     "jest": "^20.0.0",
+    "lodash": "^4.17.4",
     "npm-run-all": "^4.0.0",
     "npmpub": "^3.0.3",
     "remark-cli": "^3.0.0",
     "remark-preset-lint-consistent": "^2.0.0",
     "remark-preset-lint-recommended": "^2.0.0",
+    "strip-ansi": "^4.0.0",
     "stylelint": "^7.10.1"
   },
   "peerDependencies": {
@@ -52,6 +54,7 @@
   },
   "scripts": {
     "dry-release": "npmpub --dry --verbose",
+    "jest": "jest",
     "lint:js": "eslint . --ignore-path .gitignore",
     "lint:md": "remark . --quiet --frail",
     "lint": "npm-run-all --parallel lint:*",
@@ -61,7 +64,14 @@
     "watch": "jest --watch"
   },
   "jest": {
+    "roots": [
+      "__tests__"
+    ],
     "testEnvironment": "node",
+    "testMatch": [
+      "<rootDir>/__tests__/*.js",
+      "<rootDir>/__tests__/**/?(*.)test.js"
+    ],
     "verbose": true
   },
   "remarkConfig": {
