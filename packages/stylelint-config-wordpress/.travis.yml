@@ -25,6 +25,8 @@ before_install:
 
 before_script: greenkeeper-lockfile-update
 
+script: npm run jest -- --runInBand
+
 after_script: greenkeeper-lockfile-upload
 
 notifications:
