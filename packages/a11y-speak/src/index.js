@@ -6,9 +6,9 @@ import filterMessage from './filterMessage';
 let containerPolite, containerAssertive = "";
 
 /**
- * Create the live regions when the DOM is fully loaded.
+ * Create the live regions.
  */
-domReady( function() {
+const setup = function() {
 	containerPolite = document.getElementById( "a11y-speak-polite" );
 	containerAssertive = document.getElementById( "a11y-speak-assertive" );
 
@@ -18,7 +18,12 @@ domReady( function() {
 	if ( containerAssertive === null ) {
 		containerAssertive = addContainer( "assertive" );
 	}
-} );
+};
+
+/**
+ * Run setup on domReady.
+ */
+domReady( setup );
 
 /**
  * Update the ARIA live notification area text node.
