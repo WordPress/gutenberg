@@ -47,7 +47,7 @@
     "remark-preset-lint-consistent": "^2.0.0",
     "remark-preset-lint-recommended": "^2.0.0",
     "strip-ansi": "^4.0.0",
-    "stylelint": "^7.10.1"
+    "stylelint": "^8.0.0"
   },
   "peerDependencies": {
     "stylelint": "^7.10.1"
