@@ -57,6 +57,7 @@ module.exports = {
 		'max-empty-lines': 2,
 		'max-line-length': [ 80, {
 			ignore: 'non-comments',
+			ignorePattern: ['/(https?://[0-9,a-z]*.*)|(^description\\:.+)|(^tags\\:.+)/i'],
 		} ],
 		'media-feature-colon-space-after': 'always',
 		'media-feature-colon-space-before': 'never',
