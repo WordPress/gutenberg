@@ -11,13 +11,6 @@ Array [
     "source": "006/stylesheet.scss",
     "warnings": Array [
       Object {
-        "column": 1,
-        "line": 5,
-        "rule": "at-rule-no-unknown",
-        "severity": "error",
-        "text": "Unexpected unknown at-rule \\"@mixin\\" (at-rule-no-unknown)",
-      },
-      Object {
         "column": 13,
         "line": 10,
         "rule": "declaration-colon-newline-after",

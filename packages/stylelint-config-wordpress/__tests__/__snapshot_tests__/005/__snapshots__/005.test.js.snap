@@ -18,13 +18,6 @@ Array [
         "text": "Expected empty line before at-rule (at-rule-empty-line-before)",
       },
       Object {
-        "column": 3,
-        "line": 51,
-        "rule": "at-rule-no-unknown",
-        "severity": "error",
-        "text": "Unexpected unknown at-rule \\"@include\\" (at-rule-no-unknown)",
-      },
-      Object {
         "column": 23,
         "line": 377,
         "rule": "function-parentheses-space-inside",
