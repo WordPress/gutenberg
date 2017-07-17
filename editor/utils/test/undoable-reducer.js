@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { expect } from 'chai';
-
-/**
  * Internal dependencies
  */
 import { undoable, combineUndoableReducers } from '../undoable-reducer';
@@ -17,8 +12,8 @@ describe( 'undoableReducer', () => {
 		it( 'should return a new reducer', () => {
 			const reducer = undoable( counter );
 
-			expect( reducer ).to.be.a( 'function' );
-			expect( reducer( undefined, {} ) ).to.eql( {
+			expect( typeof reducer ).toBe( 'function' );
+			expect( reducer( undefined, {} ) ).toEqual( {
 				past: [],
 				present: 0,
 				future: [],
@@ -32,7 +27,7 @@ describe( 'undoableReducer', () => {
 			state = reducer( undefined, {} );
 			state = reducer( state, { type: 'INCREMENT' } );
 
-			expect( state ).to.eql( {
+			expect( state ).toEqual( {
 				past: [ 0 ],
 				present: 1,
 				future: [],
@@ -47,7 +42,7 @@ describe( 'undoableReducer', () => {
 			state = reducer( state, { type: 'INCREMENT' } );
 			state = reducer( state, { type: 'UNDO' } );
 
-			expect( state ).to.eql( {
+			expect( state ).toEqual( {
 				past: [],
 				present: 0,
 				future: [ 1 ],
@@ -63,7 +58,7 @@ describe( 'undoableReducer', () => {
 			state = reducer( state, { type: 'UNDO' } );
 			state = reducer( state, { type: 'REDO' } );
 
-			expect( state ).to.eql( {
+			expect( state ).toEqual( {
 				past: [ 0 ],
 				present: 1,
 				future: [],
@@ -80,7 +75,7 @@ describe( 'undoableReducer', () => {
 			state = reducer( state, { type: 'INCREMENT' } );
 			state = reducer( state, { type: 'INCREMENT' } );
 
-			expect( state ).to.eql( {
+			expect( state ).toEqual( {
 				past: [ 1, 2 ],
 				present: 3,
 				future: [],
@@ -95,10 +90,9 @@ describe( 'undoableReducer', () => {
 			} );
 			const state = reducer( undefined, {} );
 
-			expect( reducer ).to.be.a( 'function' );
-			expect( state ).to.have.keys( 'history' );
-			expect( state.count ).to.equal( 0 );
-			expect( state.history ).to.eql( {
+			expect( typeof reducer ).toBe( 'function' );
+			expect( state.count ).toBe( 0 );
+			expect( state.history ).toEqual( {
 				past: [],
 				present: {
 					count: 0,

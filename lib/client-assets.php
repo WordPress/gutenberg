@@ -67,15 +67,15 @@ function gutenberg_register_scripts_and_styles() {
 			'meridiem'      => (object) $wp_locale->meridiem,
 			'relative' => array(
 				/* translators: %s: duration */
-				'future' => __( '%s from now' ),
+				'future' => __( '%s from now', 'default' ),
 				/* translators: %s: duration */
-				'past'   => __( '%s ago' ),
+				'past'   => __( '%s ago', 'default' ),
 			),
 		),
 		'formats' => array(
-			'time'     => get_option( 'time_format', __( 'g:i a' ) ),
-			'date'     => get_option( 'date_format', __( 'F j, Y' ) ),
-			'datetime' => __( 'F j, Y g:i a' ),
+			'time'     => get_option( 'time_format', __( 'g:i a', 'default' ) ),
+			'date'     => get_option( 'date_format', __( 'F j, Y', 'default' ) ),
+			'datetime' => __( 'F j, Y g:i a', 'default' ),
 		),
 		'timezone' => array(
 			'offset' => get_option( 'gmt_offset', 0 ),
@@ -103,7 +103,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-blocks',
 		gutenberg_url( 'blocks/build/index.js' ),
-		array( 'wp-element', 'wp-components', 'wp-utils', 'tinymce-nightly', 'tinymce-nightly-lists', 'tinymce-nightly-paste' ),
+		array( 'wp-element', 'wp-components', 'wp-utils', 'tinymce-nightly', 'tinymce-nightly-lists', 'tinymce-nightly-paste', 'tinymce-nightly-table' ),
 		filemtime( gutenberg_dir_path() . 'blocks/build/index.js' )
 	);
 
@@ -175,6 +175,11 @@ function gutenberg_register_vendor_scripts() {
 	gutenberg_register_vendor_script(
 		'tinymce-nightly-paste',
 		'https://fiddle.azurewebsites.net/tinymce/nightly/plugins/paste/plugin' . $suffix . '.js',
+		array( 'tinymce-nightly' )
+	);
+	gutenberg_register_vendor_script(
+		'tinymce-nightly-table',
+		'https://fiddle.azurewebsites.net/tinymce/nightly/plugins/table/plugin' . $suffix . '.js',
 		array( 'tinymce-nightly' )
 	);
 }
@@ -360,6 +365,43 @@ function gutenberg_get_post_to_edit( $post_id ) {
 }
 
 /**
+ * Handles the enqueueing of block scripts and styles that are common to both
+ * the editor and the front-end.
+ *
+ * Note: This function must remain *before*
+ * `gutenberg_editor_scripts_and_styles` so that editor-specific stylesheets
+ * are loaded last.
+ *
+ * @since 0.4.0
+ */
+function gutenberg_common_scripts_and_styles() {
+	// Enqueue basic styles built out of Gutenberg through `npm build`.
+	wp_enqueue_style( 'wp-blocks' );
+
+	/*
+	 * Enqueue block styles built through plugins.  This lives in a separate
+	 * action for a couple of reasons: (1) we want to load these assets
+	 * (usually stylesheets) in *both* frontend and editor contexts, and (2)
+	 * one day we may need to be smarter about whether assets are included
+	 * based on whether blocks are actually present on the page.
+	 */
+
+	/**
+	 * Fires after enqueuing block assets for both editor and front-end.
+	 *
+	 * Call `add_action` on any hook before 'wp_enqueue_scripts'.
+	 *
+	 * In the function call you supply, simply use `wp_enqueue_script` and
+	 * `wp_enqueue_style` to add your functionality to the Gutenberg editor.
+	 *
+	 * @since 0.4.0
+	 */
+	do_action( 'enqueue_block_assets' );
+}
+add_action( 'wp_enqueue_scripts', 'gutenberg_common_scripts_and_styles' );
+add_action( 'admin_enqueue_scripts', 'gutenberg_common_scripts_and_styles' );
+
+/**
  * Scripts & Styles.
  *
  * Enqueues the needed scripts and styles when visiting the top-level page of
@@ -369,7 +411,7 @@ function gutenberg_get_post_to_edit( $post_id ) {
  *
  * @param string $hook Screen name.
  */
-function gutenberg_scripts_and_styles( $hook ) {
+function gutenberg_editor_scripts_and_styles( $hook ) {
 	if ( ! preg_match( '/(toplevel|gutenberg)_page_gutenberg(-demo)?/', $hook, $page_match ) ) {
 		return;
 	}
@@ -380,6 +422,11 @@ function gutenberg_scripts_and_styles( $hook ) {
 	 * Scripts
 	 */
 	wp_enqueue_media();
+	wp_enqueue_editor();
+
+	wp_add_inline_script(
+		'editor', 'window.wp.oldEditor = window.wp.editor;', 'after'
+	);
 
 	gutenberg_extend_wp_api_backbone_client();
 
@@ -387,10 +434,70 @@ function gutenberg_scripts_and_styles( $hook ) {
 	wp_enqueue_script(
 		'wp-editor',
 		gutenberg_url( 'editor/build/index.js' ),
-		array( 'wp-api', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element', 'wp-components', 'wp-utils' ),
+		array( 'wp-api', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element', 'wp-components', 'wp-utils', 'editor' ),
 		filemtime( gutenberg_dir_path() . 'editor/build/index.js' ),
 		true // enqueue in the footer.
 	);
+
+	wp_localize_script( 'wp-editor', 'wpEditorL10n', array(
+		'tinymce' => array(
+			'baseURL' => includes_url( 'js/tinymce' ),
+			'suffix' => SCRIPT_DEBUG ? '' : '.min',
+			'settings' => apply_filters( 'tiny_mce_before_init', array(
+				'external_plugins' => apply_filters( 'mce_external_plugins', array() ),
+				'plugins' => array_unique( apply_filters( 'tiny_mce_plugins', array(
+					'charmap',
+					'colorpicker',
+					'hr',
+					'lists',
+					'media',
+					'paste',
+					'tabfocus',
+					'textcolor',
+					'fullscreen',
+					'wordpress',
+					'wpautoresize',
+					'wpeditimage',
+					'wpemoji',
+					'wpgallery',
+					'wplink',
+					'wpdialogs',
+					'wptextpattern',
+					'wpview',
+				) ) ),
+				'toolbar1' => implode( ',', array_merge( apply_filters( 'mce_buttons', array(
+					'formatselect',
+					'bold',
+					'italic',
+					'bullist',
+					'numlist',
+					'blockquote',
+					'alignleft',
+					'aligncenter',
+					'alignright',
+					'link',
+					'unlink',
+					'wp_more',
+					'spellchecker',
+				), 'editor' ), array( 'kitchensink' ) ) ),
+				'toolbar2' => implode( ',', apply_filters( 'mce_buttons_2', array(
+					'strikethrough',
+					'hr',
+					'forecolor',
+					'pastetext',
+					'removeformat',
+					'charmap',
+					'outdent',
+					'indent',
+					'undo',
+					'redo',
+					'wp_help',
+				), 'editor' ) ),
+				'toolbar3' => implode( ',', apply_filters( 'mce_buttons_3', array(), 'editor' ) ),
+				'toolbar4' => implode( ',', apply_filters( 'mce_buttons_4', array(), 'editor' ) ),
+			), 'editor' ),
+		),
+	) );
 
 	// Register `wp-utils` as a dependency of `word-count` to ensure that
 	// `wp-utils` doesn't clobbber `word-count`.  See WordPress/gutenberg#1569.
@@ -462,14 +569,17 @@ function gutenberg_scripts_and_styles( $hook ) {
 		array( 'wp-components', 'wp-blocks', 'wp-edit-blocks' ),
 		filemtime( gutenberg_dir_path() . 'editor/build/style.css' )
 	);
-}
-add_action( 'admin_enqueue_scripts', 'gutenberg_scripts_and_styles' );
 
-/**
- * Handles the enqueueing of front end scripts and styles from Gutenberg.
- */
-function gutenberg_frontend_scripts_and_styles() {
-	// Enqueue basic styles built out of Gutenberg through npm build.
-	wp_enqueue_style( 'wp-blocks' );
+	/**
+	 * Fires after block assets have been enqueued for the editing interface.
+	 *
+	 * Call `add_action` on any hook before 'admin_enqueue_scripts'.
+	 *
+	 * In the function call you supply, simply use `wp_enqueue_script` and
+	 * `wp_enqueue_style` to add your functionality to the Gutenberg editor.
+	 *
+	 * @since 0.4.0
+	 */
+	do_action( 'enqueue_block_editor_assets' );
 }
-add_action( 'wp_enqueue_scripts', 'gutenberg_frontend_scripts_and_styles' );
+add_action( 'admin_enqueue_scripts', 'gutenberg_editor_scripts_and_styles' );

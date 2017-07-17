@@ -38,7 +38,7 @@ Gutenberg contains both PHP and JavaScript code, and encourages testing and code
 
 ### JavaScript Testing
 
-Tests for JavaScript use [Mocha](https://mochajs.org/) as the test runner and [Chai BDD](http://chaijs.com/api/bdd/) as an assertion library (with a [small variation](https://github.com/prodatakey/dirty-chai) on assertion properties). If needed, you can also use [Sinon](http://sinonjs.org/) for mocking and [Enzyme](https://github.com/airbnb/enzyme) for React component testing.
+Tests for JavaScript use [Jest](http://facebook.github.io/jest/) as the test runner. If needed, you can also use [Enzyme](https://github.com/airbnb/enzyme) for React component testing.
 
 Assuming you've followed the instructions above to install Node and project dependencies, tests can be run from the command-line with NPM:
 
@@ -52,13 +52,13 @@ Code style in JavaScript is enforced using [ESLint](http://eslint.org/). The abo
 
 ### PHP Testing
 
-Tests for PHP use [PHPUnit](https://phpunit.de/) as the testing framework. Before starting, you should install PHPUnit and have a copy of [WordPress Develop](https://github.com/WordPress/wordpress-develop) available. If the Gutenberg plugin is installed in the context of a WordPress Develop site, you can run `phpunit` directly from the command-line. Otherwise, you will need to specify the path to WordPress Develop's test directory as an environment variable:
+Tests for PHP use [PHPUnit](https://phpunit.de/) as the testing framework. Before starting, you should install PHPUnit and have a copy of [WordPress Develop](https://github.com/WordPress/wordpress-develop) available and setup a [`wp-tests-config.php`](https://make.wordpress.org/core/handbook/testing/automated-testing/phpunit/#setup) file. If the Gutenberg plugin is installed in the context of a WordPress Develop site, you can run `phpunit` directly from the command-line. Otherwise, you will need to specify the path to WordPress Develop's test directory as an environment variable:
 
 ```
 WP_TESTS_DIR=/path/to/wordpress-develop/tests/phpunit phpunit
 ```
 
-Code style in PHP is enforced using [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer). It is recommended that you install PHP_CodeSniffer and the WordPress-specific code standard ruleset using [Composer](https://getcomposer.org/). With Composer installed, run `composer install` from the project directory to install dependencies, then `composer run-script lint` to verify PHP code standards.
+Code style in PHP is enforced using [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer). It is recommended that you install PHP_CodeSniffer and the [WordPress Coding Standards for PHP_CodeSniffer](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards#installation) ruleset using [Composer](https://getcomposer.org/). With Composer installed, run `composer install` from the project directory to install dependencies, then `composer run-script lint` to verify PHP code standards.
 
 ## How Designers Can Contribute
 

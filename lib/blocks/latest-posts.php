@@ -28,6 +28,11 @@ function gutenberg_render_block_core_latest_posts( $attributes ) {
 		}
 	}
 
+	$align = 'center';
+	if ( isset( $attributes['align'] ) && in_array( $attributes['align'], array( 'left', 'right', 'wide', 'full' ), true ) ) {
+		$align = $attributes['align'];
+	}
+
 	$recent_posts = wp_get_recent_posts( array(
 		'numberposts' => $posts_to_show,
 		'post_status' => 'publish',
@@ -43,8 +48,10 @@ function gutenberg_render_block_core_latest_posts( $attributes ) {
 		$posts_content .= "<li><a href='{$post_permalink}'>{$post_title}</a></li>\n";
 	}
 
+	$class = 'wp-block-latest-posts ' . esc_attr( 'align' . $align );
+
 	$block_content = <<<CONTENT
-<div class="blocks-latest-posts">
+<div class="{$class}">
 	<ul>
 		{$posts_content}
 	</ul>

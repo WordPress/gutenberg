@@ -33,9 +33,9 @@
 		content: '';
 		position: absolute;
 		top: 0;
-		right: $block-padding * 2 + $block-mover-margin;
+		right: 0;
 		bottom: 0;
-		left: $block-padding * 2 + $block-mover-margin;
+		left: 0;
 		background: rgba( 0,0,0,.5 );
 	}
 

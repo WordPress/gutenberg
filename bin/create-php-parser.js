@@ -14,6 +14,7 @@ const parser = pegjs.generate(
 		phpegjs: {
 			parserNamespace: null,
 			parserGlobalNamePrefix: 'Gutenberg_PEG_',
+			mbstringAllowed: false,
 		},
 	}
 );

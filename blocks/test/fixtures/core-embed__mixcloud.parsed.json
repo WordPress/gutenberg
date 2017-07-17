@@ -4,7 +4,7 @@
         "attrs": {
             "url": "https://mixcloud.com/"
         },
-        "rawContent": "\n<figure class=\"wp-block-core-embed-mixcloud\">\n    https://mixcloud.com/\n    <figcaption>Embedded content from mixcloud</figcaption>\n</figure>\n"
+        "rawContent": "\n<figure class=\"wp-block-embed-mixcloud\">\n    https://mixcloud.com/\n    <figcaption>Embedded content from mixcloud</figcaption>\n</figure>\n"
     },
     {
         "attrs": {},

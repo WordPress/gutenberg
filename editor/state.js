@@ -7,6 +7,11 @@ import refx from 'refx';
 import { reduce, keyBy, first, last, omit, without, flowRight } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { getBlockTypes } from 'blocks';
+
+/**
  * Internal dependencies
  */
 import { combineUndoableReducers } from './utils/undoable-reducer';
@@ -64,10 +69,11 @@ export const editor = combineUndoableReducers( {
 		switch ( action.type ) {
 			case 'RESET_BLOCKS':
 			case 'REQUEST_POST_UPDATE_SUCCESS':
+			case 'TRASH_POST_SUCCESS':
 				return false;
 
-			case 'UPDATE_BLOCK':
-			case 'INSERT_BLOCK':
+			case 'UPDATE_BLOCK_ATTRIBUTES':
+			case 'INSERT_BLOCKS':
 			case 'MOVE_BLOCKS_DOWN':
 			case 'MOVE_BLOCKS_UP':
 			case 'REPLACE_BLOCKS':
@@ -85,14 +91,14 @@ export const editor = combineUndoableReducers( {
 			case 'RESET_BLOCKS':
 				return keyBy( action.blocks, 'uid' );
 
-			case 'UPDATE_BLOCK':
+			case 'UPDATE_BLOCK_ATTRIBUTES':
 				// Ignore updates if block isn't known
 				if ( ! state[ action.uid ] ) {
 					return state;
 				}
 
 				// Consider as updates only changed values
-				const nextBlock = reduce( action.updates, ( result, value, key ) => {
+				const nextAttributes = reduce( action.attributes, ( result, value, key ) => {
 					if ( value !== result[ key ] ) {
 						// Avoid mutating original block by creating shallow clone
 						if ( result === state[ action.uid ] ) {
@@ -103,27 +109,27 @@ export const editor = combineUndoableReducers( {
 					}
 
 					return result;
-				}, state[ action.uid ] );
+				}, state[ action.uid ].attributes );
 
 				// Skip update if nothing has been changed. The reference will
 				// match the original block if `reduce` had no changed values.
-				if ( nextBlock === state[ action.uid ] ) {
+				if ( nextAttributes === state[ action.uid ].attributes ) {
 					return state;
 				}
 
-				// Otherwise merge updates into state
+				// Otherwise merge attributes into state
 				return {
 					...state,
 					[ action.uid ]: {
 						...state[ action.uid ],
-						...action.updates,
+						attributes: nextAttributes,
 					},
 				};
 
-			case 'INSERT_BLOCK':
+			case 'INSERT_BLOCKS':
 				return {
 					...state,
-					[ action.block.uid ]: action.block,
+					...keyBy( action.blocks, 'uid' ),
 				};
 
 			case 'REPLACE_BLOCKS':
@@ -149,11 +155,11 @@ export const editor = combineUndoableReducers( {
 			case 'RESET_BLOCKS':
 				return action.blocks.map( ( { uid } ) => uid );
 
-			case 'INSERT_BLOCK': {
+			case 'INSERT_BLOCKS': {
 				const position = action.after ? state.indexOf( action.after ) + 1 : state.length;
 				return [
 					...state.slice( 0, position ),
-					action.block.uid,
+					...action.blocks.map( block => block.uid ),
 					...state.slice( position ),
 				];
 			}
@@ -219,6 +225,28 @@ export const editor = combineUndoableReducers( {
 
 		return state;
 	},
+
+	recentlyUsedBlocks( state = [], action ) {
+		const maxRecent = 8;
+		switch ( action.type ) {
+			case 'SETUP_NEW_POST':
+				// This is where we initially populate the recently used blocks,
+				// for now this inserts blocks from the common category.
+				return getBlockTypes()
+					.filter( ( blockType ) => 'common' === blockType.category )
+					.slice( 0, maxRecent )
+					.map( ( blockType ) => blockType.name );
+			case 'INSERT_BLOCKS':
+				// This is where we record the block usage so it can show up in
+				// the recent blocks.
+				let newState = [ ...state ];
+				action.blocks.forEach( ( block ) => {
+					newState = [ block.name, ...without( newState, block.name ) ];
+				} );
+				return newState.slice( 0, maxRecent );
+		}
+		return state;
+	},
 }, { resetTypes: [ 'RESET_BLOCKS' ] } );
 
 /**
@@ -258,7 +286,6 @@ export function selectedBlock( state = {}, action ) {
 				? state
 				: {
 					uid: action.uid,
-					typing: false,
 					focus: action.uid === state.uid ? state.focus : {},
 				};
 
@@ -270,45 +297,19 @@ export function selectedBlock( state = {}, action ) {
 			const firstUid = first( action.uids );
 			return firstUid === state.uid
 				? state
-				: { uid: firstUid, typing: false, focus: {} };
+				: { uid: firstUid, focus: {} };
 		}
 
-		case 'INSERT_BLOCK':
+		case 'INSERT_BLOCKS':
 			return {
-				uid: action.block.uid,
-				typing: false,
+				uid: action.blocks[ 0 ].uid,
 				focus: {},
 			};
 
 		case 'UPDATE_FOCUS':
 			return {
 				uid: action.uid,
-				typing: state.uid === action.uid ? state.typing : false,
 				focus: action.config || {},
-			};
-
-		case 'START_TYPING':
-			if ( action.uid !== state.uid ) {
-				return {
-					uid: action.uid,
-					typing: true,
-					focus: {},
-				};
-			}
-
-			return {
-				...state,
-				typing: true,
-			};
-
-		case 'STOP_TYPING':
-			if ( action.uid !== state.uid ) {
-				return state;
-			}
-
-			return {
-				...state,
-				typing: false,
 			};
 
 		case 'REPLACE_BLOCKS':
@@ -318,9 +319,27 @@ export function selectedBlock( state = {}, action ) {
 
 			return {
 				uid: action.blocks[ 0 ].uid,
-				typing: false,
 				focus: {},
 			};
+	}
+
+	return state;
+}
+
+/**
+ * Reducer returning typing state.
+ *
+ * @param  {Boolean} state  Current state
+ * @param  {Object}  action Dispatched action
+ * @return {Boolean}        Updated state
+ */
+export function isTyping( state = false, action ) {
+	switch ( action.type ) {
+		case 'START_TYPING':
+			return true;
+
+		case 'STOP_TYPING':
+			return false;
 	}
 
 	return state;
@@ -337,7 +356,7 @@ export function multiSelectedBlocks( state = { start: null, end: null }, action 
 	switch ( action.type ) {
 		case 'CLEAR_SELECTED_BLOCK':
 		case 'TOGGLE_BLOCK_SELECTED':
-		case 'INSERT_BLOCK':
+		case 'INSERT_BLOCKS':
 			return {
 				start: null,
 				end: null,
@@ -428,6 +447,15 @@ export function isSidebarOpened( state = ! isMobile, action ) {
 	return state;
 }
 
+export function panel( state = 'document', action ) {
+	switch ( action.type ) {
+		case 'SET_ACTIVE_PANEL':
+			return action.panel;
+	}
+
+	return state;
+}
+
 /**
  * Reducer returning current network request state (whether a request to the WP
  * REST API is in progress, successful, or failed).
@@ -491,11 +519,13 @@ export function createReduxStore() {
 		editor,
 		currentPost,
 		selectedBlock,
+		isTyping,
 		multiSelectedBlocks,
 		hoveredBlock,
 		showInsertionPoint,
 		mode,
 		isSidebarOpened,
+		panel,
 		saving,
 		notices,
 	} ) );

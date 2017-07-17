@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { expect } from 'chai';
+import { noop } from 'lodash';
 
 /**
  * Internal dependencies
@@ -10,6 +10,8 @@ import { createBlock, switchToBlockType } from '../factory';
 import { getBlockTypes, unregisterBlockType, setUnknownTypeHandler, registerBlockType } from '../registration';
 
 describe( 'block factory', () => {
+	const defaultBlockSettings = { save: noop };
+
 	afterEach( () => {
 		setUnknownTypeHandler( undefined );
 		getBlockTypes().forEach( ( block ) => {
@@ -23,17 +25,18 @@ describe( 'block factory', () => {
 				defaultAttributes: {
 					includesDefault: true,
 				},
+				save: noop,
 			} );
 			const block = createBlock( 'core/test-block', {
 				align: 'left',
 			} );
 
-			expect( block.name ).to.eql( 'core/test-block' );
-			expect( block.attributes ).to.eql( {
+			expect( block.name ).toEqual( 'core/test-block' );
+			expect( block.attributes ).toEqual( {
 				includesDefault: true,
 				align: 'left',
 			} );
-			expect( block.uid ).to.be.a( 'string' );
+			expect( typeof block.uid ).toBe( 'string' );
 		} );
 	} );
 
@@ -50,8 +53,9 @@ describe( 'block factory', () => {
 						},
 					} ],
 				},
+				save: noop,
 			} );
-			registerBlockType( 'core/text-block', {} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
 
 			const block = {
 				uid: 1,
@@ -63,7 +67,7 @@ describe( 'block factory', () => {
 
 			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
 
-			expect( updatedBlock ).to.eql( [ {
+			expect( updatedBlock ).toEqual( [ {
 				uid: 1,
 				name: 'core/updated-text-block',
 				attributes: {
@@ -73,7 +77,7 @@ describe( 'block factory', () => {
 		} );
 
 		it( 'should switch the blockType of a block using the "transform to"', () => {
-			registerBlockType( 'core/updated-text-block', {} );
+			registerBlockType( 'core/updated-text-block', defaultBlockSettings );
 			registerBlockType( 'core/text-block', {
 				transforms: {
 					to: [ {
@@ -85,6 +89,7 @@ describe( 'block factory', () => {
 						},
 					} ],
 				},
+				save: noop,
 			} );
 
 			const block = {
@@ -97,7 +102,7 @@ describe( 'block factory', () => {
 
 			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
 
-			expect( updatedBlock ).to.eql( [ {
+			expect( updatedBlock ).toEqual( [ {
 				uid: 1,
 				name: 'core/updated-text-block',
 				attributes: {
@@ -107,8 +112,8 @@ describe( 'block factory', () => {
 		} );
 
 		it( 'should return null if no transformation is found', () => {
-			registerBlockType( 'core/updated-text-block', {} );
-			registerBlockType( 'core/text-block', {} );
+			registerBlockType( 'core/updated-text-block', defaultBlockSettings );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
 
 			const block = {
 				uid: 1,
@@ -120,7 +125,7 @@ describe( 'block factory', () => {
 
 			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
 
-			expect( updatedBlock ).to.be.null();
+			expect( updatedBlock ).toBeNull();
 		} );
 
 		it( 'should reject transformations that return null', () => {
@@ -131,8 +136,9 @@ describe( 'block factory', () => {
 						transform: () => null,
 					} ],
 				},
+				save: noop,
 			} );
-			registerBlockType( 'core/text-block', {} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
 
 			const block = {
 				uid: 1,
@@ -144,7 +150,7 @@ describe( 'block factory', () => {
 
 			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
 
-			expect( updatedBlock ).to.be.null();
+			expect( updatedBlock ).toBeNull();
 		} );
 
 		it( 'should reject transformations that return an empty array', () => {
@@ -155,8 +161,9 @@ describe( 'block factory', () => {
 						transform: () => [],
 					} ],
 				},
+				save: noop,
 			} );
-			registerBlockType( 'core/text-block', {} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
 
 			const block = {
 				uid: 1,
@@ -168,7 +175,7 @@ describe( 'block factory', () => {
 
 			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
 
-			expect( updatedBlock ).to.be.null();
+			expect( updatedBlock ).toBeNull();
 		} );
 
 		it( 'should reject single transformations that do not include block types', () => {
@@ -185,8 +192,9 @@ describe( 'block factory', () => {
 						},
 					} ],
 				},
+				save: noop,
 			} );
-			registerBlockType( 'core/text-block', {} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
 
 			const block = {
 				uid: 1,
@@ -198,7 +206,7 @@ describe( 'block factory', () => {
 
 			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
 
-			expect( updatedBlock ).to.be.null();
+			expect( updatedBlock ).toBeNull();
 		} );
 
 		it( 'should reject array transformations that do not include block types', () => {
@@ -220,8 +228,9 @@ describe( 'block factory', () => {
 						},
 					} ],
 				},
+				save: noop,
 			} );
-			registerBlockType( 'core/text-block', {} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
 
 			const block = {
 				uid: 1,
@@ -233,11 +242,11 @@ describe( 'block factory', () => {
 
 			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
 
-			expect( updatedBlock ).to.be.null();
+			expect( updatedBlock ).toBeNull();
 		} );
 
 		it( 'should reject single transformations with unexpected block types', () => {
-			registerBlockType( 'core/updated-text-block', {} );
+			registerBlockType( 'core/updated-text-block', defaultBlockSettings );
 			registerBlockType( 'core/text-block', {
 				transforms: {
 					to: [ {
@@ -249,6 +258,7 @@ describe( 'block factory', () => {
 						},
 					} ],
 				},
+				save: noop,
 			} );
 
 			const block = {
@@ -261,11 +271,11 @@ describe( 'block factory', () => {
 
 			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
 
-			expect( updatedBlock ).to.eql( null );
+			expect( updatedBlock ).toEqual( null );
 		} );
 
 		it( 'should reject array transformations with unexpected block types', () => {
-			registerBlockType( 'core/updated-text-block', {} );
+			registerBlockType( 'core/updated-text-block', defaultBlockSettings );
 			registerBlockType( 'core/text-block', {
 				transforms: {
 					to: [ {
@@ -282,6 +292,7 @@ describe( 'block factory', () => {
 						},
 					} ],
 				},
+				save: noop,
 			} );
 
 			const block = {
@@ -294,11 +305,11 @@ describe( 'block factory', () => {
 
 			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
 
-			expect( updatedBlock ).to.eql( null );
+			expect( updatedBlock ).toEqual( null );
 		} );
 
 		it( 'should accept valid array transformations', () => {
-			registerBlockType( 'core/updated-text-block', {} );
+			registerBlockType( 'core/updated-text-block', defaultBlockSettings );
 			registerBlockType( 'core/text-block', {
 				transforms: {
 					to: [ {
@@ -315,6 +326,7 @@ describe( 'block factory', () => {
 						},
 					} ],
 				},
+				save: noop,
 			} );
 
 			const block = {
@@ -330,12 +342,13 @@ describe( 'block factory', () => {
 			// Make sure the block UIDs are set as expected: the first
 			// transformed block whose type matches the "destination" type gets
 			// to keep the existing block's UID.
-			expect( updatedBlock ).to.have.lengthOf( 2 );
-			expect( updatedBlock[ 0 ].uid ).to.exist().and.not.eql( 1 );
-			expect( updatedBlock[ 1 ].uid ).to.eql( 1 );
+			expect( updatedBlock ).toHaveLength( 2 );
+			expect( updatedBlock[ 0 ].uid ).toBeDefined();
+			expect( updatedBlock[ 0 ].uid ).not.toEqual( 1 );
+			expect( updatedBlock[ 1 ].uid ).toEqual( 1 );
 			updatedBlock[ 0 ].uid = 2;
 
-			expect( updatedBlock ).to.eql( [ {
+			expect( updatedBlock ).toEqual( [ {
 				uid: 2,
 				name: 'core/text-block',
 				attributes: {

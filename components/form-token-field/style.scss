@@ -176,7 +176,7 @@ input[type="text"].components-form-token-field__input {
 .components-form-token-field__suggestion {
 	color: $dark-gray-500;
 	display: block;
-	font-size: 13px;
+	font-size: $default-font-size;
 	padding: 4px 8px;
 	cursor: pointer;
 

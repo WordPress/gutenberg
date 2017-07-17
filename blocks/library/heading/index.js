@@ -37,6 +37,10 @@ registerBlockType( 'core/heading', {
 		nodeName: prop( 'h1,h2,h3,h4,h5,h6', 'nodeName' ),
 	},
 
+	defaultAttributes: {
+		nodeName: 'H2',
+	},
+
 	transforms: {
 		from: [
 			{
@@ -69,6 +73,14 @@ registerBlockType( 'core/heading', {
 					} );
 				},
 			},
+			{
+				type: 'raw',
+				matcher: ( node ) => /H\d/.test( node.nodeName ),
+				attributes: {
+					content: children( 'h1,h2,h3,h4,h5,h6' ),
+					nodeName: prop( 'h1,h2,h3,h4,h5,h6', 'nodeName' ),
+				},
+			},
 		],
 		to: [
 			{
@@ -89,8 +101,8 @@ registerBlockType( 'core/heading', {
 		};
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, insertBlockAfter } ) {
-		const { align, content, nodeName = 'H2' } = attributes;
+	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, insertBlocksAfter } ) {
+		const { align, content, nodeName, placeholder } = attributes;
 
 		return [
 			focus && (
@@ -142,21 +154,21 @@ registerBlockType( 'core/heading', {
 				onFocus={ setFocus }
 				onChange={ ( value ) => setAttributes( { content: value } ) }
 				onMerge={ mergeBlocks }
-				inline
-				onSplit={ ( before, after ) => {
+				onSplit={ ( before, after, ...blocks ) => {
 					setAttributes( { content: before } );
-					insertBlockAfter( createBlock( 'core/text', {
-						content: after,
-					} ) );
+					insertBlocksAfter( [
+						...blocks,
+						createBlock( 'core/text', { content: after } ),
+					] );
 				} }
 				style={ { textAlign: align } }
-				placeholder={ __( 'Write heading…' ) }
+				placeholder={ placeholder || __( 'Write heading…' ) }
 			/>,
 		];
 	},
 
 	save( { attributes } ) {
-		const { align, nodeName = 'H2', content } = attributes;
+		const { align, nodeName, content } = attributes;
 		const Tag = nodeName.toLowerCase();
 
 		return (

@@ -4,7 +4,6 @@
 import fs from 'fs';
 import path from 'path';
 import { uniq, isObject, omit, startsWith } from 'lodash';
-import { expect } from 'chai';
 import { format } from 'util';
 
 /**
@@ -89,9 +88,19 @@ function normalizeParsedBlocks( blocks ) {
 }
 
 describe( 'full post content fixture', () => {
+	beforeAll( () => {
+		// Register all blocks.
+		require( 'blocks' );
+	} );
+
 	fileBasenames.forEach( f => {
 		it( f, () => {
 			const content = readFixtureFile( f + '.html' );
+			if ( content === null ) {
+				throw new Error(
+					'Missing fixture file: ' + f + '.html'
+				);
+			}
 
 			const parserOutputActual = grammarParse( content );
 			let parserOutputExpectedString = readFixtureFile( f + '.parsed.json' );
@@ -112,7 +121,17 @@ describe( 'full post content fixture', () => {
 			}
 
 			const parserOutputExpected = JSON.parse( parserOutputExpectedString );
-			expect( parserOutputActual ).to.eql( parserOutputExpected );
+			try {
+				expect(
+					parserOutputActual
+				).toEqual( parserOutputExpected );
+			} catch ( err ) {
+				throw new Error( format(
+					'File \'%s.parsed.json\' does not match expected value:\n\n%s',
+					f,
+					err.message
+				) );
+			}
 
 			const blocksActual = parse( content );
 			const blocksActualNormalized = normalizeParsedBlocks( blocksActual );
@@ -134,7 +153,17 @@ describe( 'full post content fixture', () => {
 			}
 
 			const blocksExpected = JSON.parse( blocksExpectedString );
-			expect( blocksActualNormalized ).to.eql( blocksExpected );
+			try {
+				expect(
+					blocksActualNormalized
+				).toEqual( blocksExpected );
+			} catch ( err ) {
+				throw new Error( format(
+					'File \'%s.json\' does not match expected value:\n\n%s',
+					f,
+					err.message
+				) );
+			}
 
 			const serializedActual = serialize( blocksActual );
 			let serializedExpected = readFixtureFile( f + '.serialized.html' );
@@ -150,7 +179,17 @@ describe( 'full post content fixture', () => {
 				}
 			}
 
-			expect( serializedActual.trim() ).to.eql( serializedExpected.trim() );
+			try {
+				expect( serializedActual ).toEqual(
+					serializedExpected.replace( /\n$/, '' )
+				);
+			} catch ( err ) {
+				throw new Error( format(
+					'File \'%s.serialized.html\' does not match expected value:\n\n%s',
+					f,
+					err.message
+				) );
+			}
 		} );
 	} );
 

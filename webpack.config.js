@@ -1,8 +1,6 @@
 /**
  * External dependencies
  */
-
-const glob = require( 'glob' );
 const webpack = require( 'webpack' );
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 
@@ -147,35 +145,6 @@ const config = {
 switch ( process.env.NODE_ENV ) {
 	case 'production':
 		config.plugins.push( new webpack.optimize.UglifyJsPlugin() );
-		break;
-
-	case 'test':
-		config.target = 'node';
-		config.node = {
-			__dirname: true,
-		};
-		config.module.rules = [
-			...entryPointNames.map( ( entry ) => ( {
-				test: require.resolve( './' + entry + '/index.js' ),
-				use: 'expose-loader?wp.' + entry,
-			} ) ),
-			...config.module.rules,
-		];
-		const testFiles = glob.sync(
-			'./{' + Object.keys( config.entry ).sort() + '}/**/test/*.js'
-		);
-		config.entry = [
-			...entryPointNames.map(
-				entryPointName => './' + entryPointName + '/index.js'
-			),
-			...testFiles.filter( f => /full-content\.js$/.test( f ) ),
-			...testFiles.filter( f => ! /full-content\.js$/.test( f ) ),
-		];
-		config.externals = [ require( 'webpack-node-externals' )() ];
-		config.output = {
-			filename: 'build/test.js',
-			path: __dirname,
-		};
 		break;
 
 	default:

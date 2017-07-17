@@ -1,20 +1,12 @@
 .editor-visual-editor__block[data-type="core/table"] {
-	table {
-		border-collapse: collapse;
-		width: 100%;
-	}
 
-	td, th {
-		padding: 0.5em;
-		border: 1px solid currentColor;
-	}
-
-	th {
-		background: $light-gray-200;
+	.editor-visual-editor__block-controls > div {
+		display: flex;
 	}
 
 	&[data-align="left"],
 	&[data-align="right"] {
+		min-width: 33%;
 		max-width: 50%;
 	}
 
@@ -27,8 +19,20 @@
 		float: right;
 		margin-left: $block-padding;
 	}
+}
 
-	&[data-align="wide"] {
+.wp-block-table {
+	table {
+		border-collapse: collapse;
+		width: 100%;
+	}
 
+	td, th {
+		padding: 0.5em;
+		border: 1px solid currentColor;
+	}
+
+	td[data-mce-selected="1"], th[data-mce-selected="1"] {
+		background-color: $light-gray-500;
 	}
 }

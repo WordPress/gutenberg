@@ -1,8 +1,13 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from 'i18n';
-import { Placeholder, Dashicon, Toolbar } from 'components';
+import { Placeholder, Dashicon, Toolbar, DropZone } from 'components';
 
 /**
  * Internal dependencies
@@ -16,6 +21,7 @@ import TextControl from '../../inspector-controls/text-control';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import BlockDescription from '../../block-description';
+import UrlInput from '../../url-input';
 
 const { attr, children } = query;
 
@@ -30,6 +36,24 @@ registerBlockType( 'core/image', {
 		url: attr( 'img', 'src' ),
 		alt: attr( 'img', 'alt' ),
 		caption: children( 'figcaption' ),
+		href: attr( 'a', 'href' ),
+	},
+
+	transforms: {
+		from: [
+			{
+				type: 'raw',
+				matcher: ( node ) => (
+					node.nodeName === 'IMG' ||
+					( ! node.textContent && node.querySelector( 'img' ) )
+				),
+				attributes: {
+					url: attr( 'img', 'src' ),
+					alt: attr( 'img', 'alt' ),
+					caption: children( 'figcaption' ),
+				},
+			},
+		],
 	},
 
 	getEditWrapperProps( attributes ) {
@@ -40,13 +64,14 @@ registerBlockType( 'core/image', {
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus, className } ) {
-		const { url, alt, caption, align, id } = attributes;
+		const { url, alt, caption, align, id, href } = attributes;
 		const updateAlt = ( newAlt ) => setAttributes( { alt: newAlt } );
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		const onSelectImage = ( media ) => {
 			setAttributes( { url: media.url, alt: media.alt, caption: media.caption, id: media.id } );
 		};
 		const uploadButtonProps = { isLarge: true };
+		const onSetHref = ( event ) => setAttributes( { href: event.target.value } );
 
 		const controls = (
 			focus && (
@@ -60,7 +85,10 @@ registerBlockType( 'core/image', {
 					<Toolbar>
 						<li>
 							<MediaUploadButton
-								buttonProps={ { className: 'components-icon-button components-toolbar__control' } }
+								buttonProps={ {
+									className: 'components-icon-button components-toolbar__control',
+									'aria-label': __( 'Edit image' ),
+								} }
 								onSelect={ onSelectImage }
 								type="image"
 								value={ id }
@@ -68,6 +96,7 @@ registerBlockType( 'core/image', {
 								<Dashicon icon="edit" />
 							</MediaUploadButton>
 						</li>
+						<UrlInput onChange={ onSetHref } url={ href } />
 					</Toolbar>
 				</BlockControls>
 			)
@@ -82,11 +111,43 @@ registerBlockType( 'core/image', {
 					icon="format-image"
 					label={ __( 'Image' ) }
 					className={ className }>
+					<DropZone
+						onFilesDrop={ ( files ) => {
+							const media = files[ 0 ];
+
+							// Only allow image uploads
+							if ( ! /^image\//.test( media.type ) ) {
+								return;
+							}
+
+							// Use File API to assign temporary URL from upload
+							setAttributes( {
+								url: window.URL.createObjectURL( media ),
+							} );
+
+							// Create upload payload
+							const data = new window.FormData();
+							data.append( 'file', media );
+
+							new wp.api.models.Media().save( null, {
+								data: data,
+								contentType: false,
+							} ).done( ( savedMedia ) => {
+								setAttributes( {
+									id: savedMedia.id,
+									url: savedMedia.source_url,
+								} );
+							} ).fail( () => {
+								// Reset to empty on failure.
+								// TODO: Better failure messaging
+								setAttributes( { url: null } );
+							} );
+						} }
+					/>
 					<MediaUploadButton
 						buttonProps={ uploadButtonProps }
 						onSelect={ onSelectImage }
-						type="format-image"
-						autoOpen
+						type="image"
 					>
 						{ __( 'Insert from Media Library' ) }
 					</MediaUploadButton>
@@ -95,6 +156,9 @@ registerBlockType( 'core/image', {
 		}
 
 		const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
+		const classes = classnames( className, {
+			'is-transient': 0 === url.indexOf( 'blob:' ),
+		} );
 
 		// Disable reason: Each block can be selected by clicking on it
 
@@ -110,7 +174,7 @@ registerBlockType( 'core/image', {
 					<TextControl label={ __( 'Alternate Text' ) } value={ alt } onChange={ updateAlt } />
 				</InspectorControls>
 			),
-			<figure key="image" className={ className }>
+			<figure key="image" className={ classes }>
 				<img src={ url } alt={ alt } onClick={ setFocus } />
 				{ ( caption && caption.length > 0 ) || !! focus ? (
 					<Editable
@@ -120,7 +184,6 @@ registerBlockType( 'core/image', {
 						focus={ focus && focus.editable === 'caption' ? focus : undefined }
 						onFocus={ focusCaption }
 						onChange={ ( value ) => setAttributes( { caption: value } ) }
-						inline
 						inlineToolbar
 					/>
 				) : null }
@@ -130,17 +193,13 @@ registerBlockType( 'core/image', {
 	},
 
 	save( { attributes } ) {
-		const { url, alt, caption, align = 'none' } = attributes;
-
-		// If there's no caption set only save the image element.
-		if ( ! caption || ! caption.length ) {
-			return <img src={ url } alt={ alt } className={ `align${ align }` } />;
-		}
+		const { url, alt, caption = [], align, href } = attributes;
+		const image = <img src={ url } alt={ alt } />;
 
 		return (
-			<figure className={ `align${ align }` }>
-				<img src={ url } alt={ alt } />
-				<figcaption>{ caption }</figcaption>
+			<figure className={ align && `align${ align }` }>
+				{ href ? <a href={ href }>{ image }</a> : image }
+				{ caption.length > 0 && <figcaption>{ caption }</figcaption> }
 			</figure>
 		);
 	},

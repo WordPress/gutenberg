@@ -4,13 +4,15 @@
 	"extends": [
 		"wordpress",
 		"plugin:react/recommended",
-		"plugin:jsx-a11y/recommended"
+		"plugin:jsx-a11y/recommended",
+		"plugin:jest/recommended"
 	],
 	"env": {
 		"browser": false,
 		"es6": true,
 		"node": true,
-		"mocha": true
+		"mocha": true,
+		"jest/globals": true
 	},
 	"parserOptions": {
 		"sourceType": "module",
@@ -26,7 +28,8 @@
 	},
 	"plugins": [
 		"react",
-		"jsx-a11y"
+		"jsx-a11y",
+		"jest"
 	],
 	"settings": {
 		"react": {

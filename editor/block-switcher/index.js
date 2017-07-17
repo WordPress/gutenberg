@@ -56,7 +56,7 @@ class BlockSwitcher extends Component {
 		const blockType = getBlockType( this.props.block.name );
 		const blocksToBeTransformedFrom = reduce( getBlockTypes(), ( memo, block ) => {
 			const transformFrom = get( block, 'transforms.from', [] );
-			const transformation = find( transformFrom, t => t.blocks.indexOf( this.props.block.name ) !== -1 );
+			const transformation = find( transformFrom, t => t.type === 'block' && t.blocks.indexOf( this.props.block.name ) !== -1 );
 			return transformation ? memo.concat( [ block.name ] ) : memo;
 		}, [] );
 		const blocksToBeTransformedTo = get( blockType, 'transforms.to', [] )

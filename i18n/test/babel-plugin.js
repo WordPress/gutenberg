@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { expect } from 'chai';
 import { transform } from 'babel-core';
 import traverse from 'babel-traverse';
 
@@ -19,11 +18,11 @@ describe( 'babel-plugin', () => {
 
 	describe( '.isValidTranslationKey()', () => {
 		it( 'should return false if not one of valid keys', () => {
-			expect( isValidTranslationKey( 'foo' ) ).to.be.false();
+			expect( isValidTranslationKey( 'foo' ) ).toBe( false );
 		} );
 
 		it( 'should return true if one of valid keys', () => {
-			expect( isValidTranslationKey( 'msgid' ) ).to.be.true();
+			expect( isValidTranslationKey( 'msgid' ) ).toBe( true );
 		} );
 	} );
 
@@ -32,14 +31,14 @@ describe( 'babel-plugin', () => {
 			const a = { msgid: 'foo' };
 			const b = { msgid: 'bar' };
 
-			expect( isSameTranslation( a, b ) ).to.be.false();
+			expect( isSameTranslation( a, b ) ).toBe( false );
 		} );
 
 		it( 'should return true if all translation keys the same', () => {
 			const a = { msgid: 'foo', comments: { reference: 'a' } };
 			const b = { msgid: 'foo', comments: { reference: 'b' } };
 
-			expect( isSameTranslation( a, b ) ).to.be.true();
+			expect( isSameTranslation( a, b ) ).toBe( true );
 		} );
 	} );
 
@@ -58,37 +57,37 @@ describe( 'babel-plugin', () => {
 		it( 'should not return translator comment on same line but after call expression', () => {
 			const comment = getCommentFromString( '__( \'Hello world\' ); // translators: Greeting' );
 
-			expect( comment ).to.be.undefined();
+			expect( comment ).toBeUndefined();
 		} );
 
 		it( 'should return translator comment on leading comments', () => {
 			const comment = getCommentFromString( '// translators: Greeting\n__( \'Hello world\' );' );
 
-			expect( comment ).to.equal( 'Greeting' );
+			expect( comment ).toBe( 'Greeting' );
 		} );
 
 		it( 'should be case insensitive to translator prefix', () => {
 			const comment = getCommentFromString( '// TrANslAtORs: Greeting\n__( \'Hello world\' );' );
 
-			expect( comment ).to.equal( 'Greeting' );
+			expect( comment ).toBe( 'Greeting' );
 		} );
 
 		it( 'should traverse up parents until it encounters comment', () => {
 			const comment = getCommentFromString( '// translators: Greeting\nconst string = __( \'Hello world\' );' );
 
-			expect( comment ).to.equal( 'Greeting' );
+			expect( comment ).toBe( 'Greeting' );
 		} );
 
 		it( 'should not consider comment if it does not end on same or previous line', () => {
 			const comment = getCommentFromString( '// translators: Greeting\n\n__( \'Hello world\' );' );
 
-			expect( comment ).to.be.undefined();
+			expect( comment ).toBeUndefined();
 		} );
 
 		it( 'should use multi-line comment starting many lines previous', () => {
 			const comment = getCommentFromString( '/* translators: Long comment\nspanning multiple \nlines */\nconst string = __( \'Hello world\' );' );
 
-			expect( comment ).to.equal( 'Long comment spanning multiple lines' );
+			expect( comment ).toBe( 'Long comment spanning multiple lines' );
 		} );
 	} );
 } );

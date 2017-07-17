@@ -1,10 +1,13 @@
 
-.wp-block-latest-posts {
-	padding-left: 2.5em;
-}
+.editor-visual-editor__block[data-type="core/latest-posts"] {
 
-.wp-block-latest-posts__post-date {
-	display: block;
-	color: $dark-gray-100;
-	font-size: $default-font-size;
+	.wp-block-latest-posts {
+		padding-left: 2.5em;
+	}
+
+	.wp-block-latest-posts__post-date {
+		display: block;
+		color: $dark-gray-100;
+		font-size: $default-font-size;
+	}
 }

@@ -23,21 +23,21 @@ function register_block_type( $name, $settings ) {
 	global $wp_registered_blocks;
 
 	if ( ! is_string( $name ) ) {
-		$message = __( 'Block names must be strings.' );
+		$message = __( 'Block names must be strings.', 'gutenberg' );
 		_doing_it_wrong( __FUNCTION__, $message, '0.1.0' );
 		return false;
 	}
 
 	$name_matcher = '/^[a-z0-9-]+\/[a-z0-9-]+$/';
 	if ( ! preg_match( $name_matcher, $name ) ) {
-		$message = __( 'Block names must contain a namespace prefix. Example: my-plugin/my-custom-block' );
+		$message = __( 'Block names must contain a namespace prefix. Example: my-plugin/my-custom-block', 'gutenberg' );
 		_doing_it_wrong( __FUNCTION__, $message, '0.1.0' );
 		return false;
 	}
 
 	if ( isset( $wp_registered_blocks[ $name ] ) ) {
 		/* translators: 1: block name */
-		$message = sprintf( __( 'Block "%s" is already registered.' ), $name );
+		$message = sprintf( __( 'Block "%s" is already registered.', 'gutenberg' ), $name );
 		_doing_it_wrong( __FUNCTION__, $message, '0.1.0' );
 		return false;
 	}
@@ -59,7 +59,7 @@ function unregister_block_type( $name ) {
 	global $wp_registered_blocks;
 	if ( ! isset( $wp_registered_blocks[ $name ] ) ) {
 		/* translators: 1: block name */
-		$message = sprintf( __( 'Block "%s" is not registered.' ), $name );
+		$message = sprintf( __( 'Block "%s" is not registered.', 'gutenberg' ), $name );
 		_doing_it_wrong( __FUNCTION__, $message, '0.1.0' );
 		return false;
 	}
@@ -70,19 +70,30 @@ function unregister_block_type( $name ) {
 }
 
 /**
- * Renders the dynamic blocks into the post content
+ * Parses blocks out of a content string.
+ *
+ * @since 0.5.0
+ *
+ * @param  string $content Post content.
+ * @return array  Array of parsed block objects.
+ */
+function gutenberg_parse_blocks( $content ) {
+	$parser = new Gutenberg_PEG_Parser;
+	return $parser->parse( _gutenberg_utf8_split( $content ) );
+}
+
+/**
+ * Parses dynamic blocks out of `post_content` and re-renders them.
  *
  * @since 0.1.0
  *
  * @param  string $content Post content.
- *
  * @return string          Updated post content.
  */
 function do_blocks( $content ) {
 	global $wp_registered_blocks;
 
-	$parser = new Gutenberg_PEG_Parser;
-	$blocks = $parser->parse( $content );
+	$blocks = gutenberg_parse_blocks( $content );
 
 	$content_after_blocks = '';
 
@@ -90,9 +101,16 @@ function do_blocks( $content ) {
 		$block_name = isset( $block['blockName'] ) ? $block['blockName'] : null;
 		$attributes = is_array( $block['attrs'] ) ? $block['attrs'] : array();
 		if ( $block_name && isset( $wp_registered_blocks[ $block_name ] ) ) {
+
+			$content = null;
+			if ( isset( $block['rawContent'] ) ) {
+				$content = $block['rawContent'];
+			}
+
 			$content_after_blocks .= call_user_func(
 				$wp_registered_blocks[ $block_name ]['render'],
-				$attributes
+				$attributes,
+				$content
 			);
 		} else {
 			$content_after_blocks .= $block['rawContent'];

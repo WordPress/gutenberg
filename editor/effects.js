@@ -14,7 +14,7 @@ import { __ } from 'i18n';
  * Internal dependencies
  */
 import { getGutenbergURL, getWPAdminURL } from './utils/url';
-import { focusBlock, replaceBlocks, successNotice, errorNotice } from './actions';
+import { focusBlock, replaceBlocks, createSuccessNotice, createErrorNotice } from './actions';
 import {
 	getCurrentPost,
 	getCurrentPostType,
@@ -83,7 +83,7 @@ export default {
 		const messages = {
 			publish: __( 'Post published!' ),
 			'private': __( 'Post published privately!' ),
-			future: __( 'Post schduled!' ),
+			future: __( 'Post scheduled!' ),
 		};
 
 		// If we save a non published post, we don't show any notice
@@ -93,7 +93,7 @@ export default {
 			const noticeMessage = ! isPublished && publishStatus.indexOf( post.status ) !== -1
 				? messages[ post.status ]
 				: __( 'Post updated!' );
-			dispatch( successNotice(
+			dispatch( createSuccessNotice(
 				<p>
 					<span>{ noticeMessage }</span>
 					{ ' ' }
@@ -126,26 +126,46 @@ export default {
 		const noticeMessage = ! isPublished && publishStatus.indexOf( edits.status ) !== -1
 			? messages[ edits.status ]
 			: __( 'Updating failed' );
-		dispatch( errorNotice( noticeMessage ) );
+		dispatch( createErrorNotice( noticeMessage ) );
 	},
 	TRASH_POST( action, store ) {
 		const { dispatch, getState } = store;
 		const { postId } = action;
 		const Model = wp.api.getPostTypeModel( getCurrentPostType( getState() ) );
-		new Model( { id: postId } ).destroy().done( () => {
-			dispatch( {
-				...action,
-				type: 'TRASH_POST_SUCCESS',
-			} );
-		} );
+		new Model( { id: postId } ).destroy().then(
+			() => {
+				dispatch( {
+					...action,
+					type: 'TRASH_POST_SUCCESS',
+				} );
+			},
+			( err ) => {
+				dispatch( {
+					...action,
+					type: 'TRASH_POST_FAILURE',
+					error: get( err, 'responseJSON', {
+						code: 'unknown_error',
+						message: __( 'An unknown error occurred.' ),
+					} ),
+				} );
+			}
+		);
 	},
 	TRASH_POST_SUCCESS( action ) {
 		const { postId, postType } = action;
-		window.location.href = getWPAdminURL( 'edit.php', {
-			trashed: 1,
-			post_type: postType,
-			ids: postId,
+
+		// Delay redirect to ensure store has been updated with the successful trash.
+		setTimeout( () => {
+			window.location.href = getWPAdminURL( 'edit.php', {
+				trashed: 1,
+				post_type: postType,
+				ids: postId,
+			} );
 		} );
+	},
+	TRASH_POST_FAILURE( action, store ) {
+		const message = action.error.message && action.error.code !== 'unknown_error' ? action.error.message : __( 'Trashing failed' );
+		store.dispatch( createErrorNotice( message ) );
 	},
 	MERGE_BLOCKS( action, store ) {
 		const { dispatch } = store;

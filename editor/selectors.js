@@ -6,6 +6,11 @@ import { first, last, get, values } from 'lodash';
 import createSelector from 'rememo';
 
 /**
+ * WordPress dependencies
+ */
+import { getBlockType } from 'blocks';
+
+/**
  * Internal dependencies
  */
 import { addQueryArgs } from './utils/url';
@@ -18,6 +23,16 @@ import { addQueryArgs } from './utils/url';
  */
 export function getEditorMode( state ) {
 	return state.mode;
+}
+
+/**
+ * Returns the current active panel for the sidebar.
+ *
+ * @param  {Object}  state Global application state
+ * @return {String}        Active sidebar panel
+ */
+export function getActivePanel( state ) {
+	return state.panel;
 }
 
 /**
@@ -537,19 +552,13 @@ export function getBlockFocus( state, uid ) {
 }
 
 /**
- * Returns true if the user is typing within the block corresponding to the
- * specified unique ID, or false otherwise.
+ * Returns true if the user is typing, or false otherwise.
  *
  * @param  {Object}  state Global application state
- * @param  {Object}  uid   Block unique ID
- * @return {Boolean}       Whether user is typing within block
+ * @return {Boolean}       Whether user is typing
  */
-export function isTypingInBlock( state, uid ) {
-	if ( ! isBlockSelected( state, uid ) ) {
-		return false;
-	}
-
-	return state.selectedBlock.typing;
+export function isTyping( state ) {
+	return state.isTyping;
 }
 
 /**
@@ -657,4 +666,15 @@ export function getSuggestedPostFormat( state ) {
  */
 export function getNotices( state ) {
 	return values( state.notices );
+}
+
+/**
+ * Resolves the list of recently used block names into a list of block type settings.
+ *
+ * @param {Object} state Global application state
+ * @return {Array}       List of recently used blocks
+ */
+export function getRecentlyUsedBlocks( state ) {
+	// resolves the block names in the state to the block type settings
+	return state.editor.recentlyUsedBlocks.map( blockType => getBlockType( blockType ) );
 }
