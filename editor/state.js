@@ -229,7 +229,7 @@ export const editor = combineUndoableReducers( {
 	recentlyUsedBlocks( state = [], action ) {
 		const maxRecent = 8;
 		switch ( action.type ) {
-			case 'SETUP_NEW_POST':
+			case 'RESET_POST':
 				// This is where we initially populate the recently used blocks,
 				// for now this inserts blocks from the common category.
 				return getBlockTypes()

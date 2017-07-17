@@ -109,7 +109,7 @@ describe( 'state', () => {
 
 		it( 'should populate recently used blocks with the common category', () => {
 			const initial = editor( undefined, {
-				type: 'SETUP_NEW_POST',
+				type: 'RESET_POST',
 				edits: {
 					status: 'draft',
 					title: 'post title',
