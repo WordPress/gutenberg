@@ -3,10 +3,11 @@
         "uid": "_uid_0",
         "name": "core/heading",
         "attributes": {
+            "nodeName": "H2",
             "content": [
                 "A picture is worth a thousand words, or so the saying goes"
-            ],
-            "nodeName": "H2"
-        }
+            ]
+        },
+        "isValid": true
     }
 ]

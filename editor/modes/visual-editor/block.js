@@ -19,6 +19,7 @@ import { __, sprintf } from 'i18n';
 /**
  * Internal dependencies
  */
+import InvalidBlockWarning from './invalid-block-warning';
 import BlockMover from '../../block-mover';
 import BlockRightMenu from '../../block-settings-menu';
 import BlockSwitcher from '../../block-switcher';
@@ -302,7 +303,8 @@ class VisualEditorBlock extends Component {
 
 	render() {
 		const { block, multiSelectedBlockUids } = this.props;
-		const blockType = getBlockType( block.name );
+		const { name: blockName, isValid } = block;
+		const blockType = getBlockType( blockName );
 		// translators: %s: Type of block (i.e. Text, Image etc)
 		const blockLabel = sprintf( __( 'Block: %s' ), blockType.title );
 		const { className = getBlockDefaultClassname( block.name ) } = blockType;
@@ -324,9 +326,10 @@ class VisualEditorBlock extends Component {
 
 		// Generate the wrapper class names handling the different states of the block.
 		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected, focus } = this.props;
-		const showUI = isSelected && ( ! this.props.isTyping || focus.collapsed === false );
+		const showUI = isValid && isSelected && ( ! this.props.isTyping || focus.collapsed === false );
 		const { showMobileControls } = this.state;
 		const wrapperClassname = classnames( 'editor-visual-editor__block', {
+			'is-invalid': ! isValid,
 			'is-selected': showUI,
 			'is-multi-selected': isMultiSelected,
 			'is-hovered': isHovered,
@@ -354,7 +357,7 @@ class VisualEditorBlock extends Component {
 				onMouseLeave={ onMouseLeave }
 				className={ wrapperClassname }
 				data-type={ block.name }
-				tabIndex="0"
+				tabIndex={ isValid ? 0 : -1 }
 				aria-label={ blockLabel }
 				{ ...wrapperProps }
 			>
@@ -394,6 +397,7 @@ class VisualEditorBlock extends Component {
 					onDragStart={ ( event ) => event.preventDefault() }
 					onMouseDown={ this.onPointerDown }
 					onTouchStart={ this.onPointerDown }
+					className="editor-visual-editor__block-edit"
 				>
 					<BlockEdit
 						focus={ focus }
@@ -406,6 +410,7 @@ class VisualEditorBlock extends Component {
 						id={ block.uid }
 					/>
 				</div>
+				{ ! isValid && <InvalidBlockWarning /> }
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */

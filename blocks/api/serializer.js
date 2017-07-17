@@ -111,10 +111,33 @@ export function serializeAttributes( attrs ) {
 		.replace( /&/g, '\\u0026' ); // ibid
 }
 
+/**
+ * Returns HTML markup processed by a markup beautifier configured for use in
+ * block serialization.
+ *
+ * @param  {String} content Original HTML
+ * @return {String}         Beautiful HTML
+ */
+export function getBeautifulContent( content ) {
+	return beautifyHtml( content, {
+		indent_inner_html: true,
+		wrap_line_length: 0,
+	} );
+}
+
 export function serializeBlock( block ) {
 	const blockName = block.name;
 	const blockType = getBlockType( blockName );
-	const saveContent = getSaveContent( blockType, block.attributes );
+
+	let saveContent;
+	if ( block.isValid ) {
+		saveContent = getSaveContent( blockType, block.attributes );
+	} else {
+		// If block was parsed as invalid, skip serialization behavior and opt
+		// to use original content instead so we don't destroy user content.
+		saveContent = block.originalContent;
+	}
+
 	const saveAttributes = getCommentAttributes( block.attributes, parseBlockAttributes( saveContent, blockType.attributes ) );
 
 	if ( 'wp:core/more' === blockName ) {
@@ -131,13 +154,7 @@ export function serializeBlock( block ) {
 
 	return (
 		`<!-- wp:${ blockName } ${ serializedAttributes }-->\n` +
-
-		/** make more readable - @see https://github.com/WordPress/gutenberg/pull/663 */
-		beautifyHtml( saveContent, {
-			indent_inner_html: true,
-			wrap_line_length: 0,
-		} ) +
-
+		getBeautifulContent( saveContent ) +
 		`\n<!-- /wp:${ blockName } -->`
 	);
 }

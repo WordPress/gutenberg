@@ -5,8 +5,11 @@
         "attributes": {
             "align": "right",
             "content": [
-                [ "... like this one, which is separate from the above and right aligned." ]
+                [
+                    "... like this one, which is separate from the above and right aligned."
+                ]
             ]
-        }
+        },
+        "isValid": true
     }
 ]
