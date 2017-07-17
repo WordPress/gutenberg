@@ -16,7 +16,6 @@ import { getLatestPosts } from './data.js';
 import InspectorControls from '../../inspector-controls';
 import TextControl from '../../inspector-controls/text-control';
 import ToggleControl from '../../inspector-controls/toggle-control';
-import BlockDescription from '../../block-description';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
@@ -25,6 +24,8 @@ const MAX_POSTS = 100;
 
 registerBlockType( 'core/latest-posts', {
 	title: __( 'Latest Posts' ),
+
+	description: __( 'Shows a list of your site\'s most recent posts.' ),
 
 	icon: 'list-view',
 
@@ -125,9 +126,6 @@ registerBlockType( 'core/latest-posts', {
 				),
 				focus && (
 					<InspectorControls key="inspector">
-						<BlockDescription>
-							<p>{ __( 'Shows a list of your site\'s most recent posts.' ) }</p>
-						</BlockDescription>
 						<h3>{ __( 'Latest Posts Settings' ) }</h3>
 
 						<ToggleControl

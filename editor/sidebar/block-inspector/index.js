@@ -9,6 +9,7 @@ import { Slot } from 'react-slot-fill';
  */
 import { __ } from 'i18n';
 import { Panel, PanelBody } from 'components';
+import { getBlockType } from 'blocks';
 
 /**
  * Internal Dependencies
@@ -18,13 +19,21 @@ import BlockInspectorClassName from './class-name';
 import { getSelectedBlock } from '../../selectors';
 
 const BlockInspector = ( { selectedBlock } ) => {
-	if ( ! selectedBlock ) {
+	let blockType;
+	if ( ! selectedBlock || ! ( blockType = getBlockType( selectedBlock.name ) ) ) {
 		return <span className="editor-block-inspector__no-blocks">{ __( 'No block selected.' ) }</span>;
 	}
+
+	const { description } = blockType;
 
 	return (
 		<Panel>
 			<PanelBody>
+				{ description && (
+					<p className="editor-block-inspector__description">
+						{ description }
+					</p>
+				) }
 				<Slot name="Inspector.Controls" />
 				<BlockInspectorClassName />
 			</PanelBody>

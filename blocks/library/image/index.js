@@ -20,13 +20,14 @@ import InspectorControls from '../../inspector-controls';
 import TextControl from '../../inspector-controls/text-control';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
-import BlockDescription from '../../block-description';
 import UrlInput from '../../url-input';
 
 const { attr, children } = query;
 
 registerBlockType( 'core/image', {
 	title: __( 'Image' ),
+
+	description: __( 'Worth a thousand words.' ),
 
 	icon: 'format-image',
 
@@ -167,9 +168,6 @@ registerBlockType( 'core/image', {
 			controls,
 			focus && (
 				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'Worth a thousand words.' ) }</p>
-					</BlockDescription>
 					<h3>{ __( 'Image Settings' ) }</h3>
 					<TextControl label={ __( 'Alternate Text' ) } value={ alt } onChange={ updateAlt } />
 				</InspectorControls>
