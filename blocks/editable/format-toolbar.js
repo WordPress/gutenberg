@@ -156,7 +156,7 @@ class FormatToolbar extends Component {
 							className="screen-reader-text"
 							htmlFor={ linkInputId }
 						>
-								{ __( 'URL' ) }
+							{ __( 'URL' ) }
 						</label>
 						<input
 							autoFocus
