@@ -9,7 +9,7 @@ import { find } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component, findDOMNode } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { PanelRow, Popover, withInstanceId } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
 
@@ -77,42 +77,18 @@ class PostVisibility extends Component {
 	}
 
 	handleBlur( event ) {
-		if ( this.state.opened && event.relatedTarget !== null ) {
-			const wrapper = findDOMNode( this );
-			const toggle = wrapper.querySelector( '.editor-post-visibility__toggle' );
-			const dialog = wrapper.querySelector( '.editor-post-visibility__dialog' );
-
-			if ( ! dialog.contains( event.relatedTarget ) ) {
-				this.setState( { opened: false } );
-				toggle.focus();
-			}
+		if ( this.state.opened && event.relatedTarget !== null && ! this.dialog.contains( event.relatedTarget ) ) {
+			this.setState( { opened: false } );
 		}
 	}
 
 	handleKeyDown( event ) {
 		if ( this.state.opened && event.keyCode === ESCAPE ) {
-			const wrapper = findDOMNode( this );
-			const toggle = wrapper.querySelector( '.editor-post-visibility__toggle' );
-
-			if ( event.target === toggle ) {
-				return;
-			}
-
 			event.preventDefault();
 			event.stopPropagation();
 			this.setState( { opened: false } );
-			toggle.focus();
+			this.toggle.focus();
 		}
-	}
-
-	componentDidMount() {
-		const node = findDOMNode( this );
-		node.addEventListener( 'keydown', this.handleKeyDown, false );
-	}
-
-	componentWillUnmount() {
-		const node = findDOMNode( this );
-		node.removeEventListener( 'keydown', this.handleKeyDown, false );
 	}
 
 	render() {
@@ -154,12 +130,19 @@ class PostVisibility extends Component {
 						aria-expanded={ this.state.opened }
 						className="editor-post-visibility__toggle button-link"
 						onClick={ this.toggleDialog }
+						ref={ toggle => this.toggle = toggle }
 					>
 						{ getVisibilityLabel( visibility ) }
 					</button>
 
 					{ this.state.opened &&
-						<Popover position="bottom left" className="editor-post-visibility__dialog">
+						<Popover
+							position="bottom left"
+							className="editor-post-visibility__dialog"
+							onKeyDown={ this.handleKeyDown }
+							onBlur={ this.handleBlur }
+							ref={ dialog => this.dialog = dialog }
+						>
 							<fieldset>
 								<legend className="editor-post-visibility__dialog-legend">
 									{ __( 'Post Visibility' ) }
