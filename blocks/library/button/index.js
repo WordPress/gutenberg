@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from 'i18n';
-import { IconButton } from 'components';
+import { IconButton, withInstanceId } from 'components';
 
 /**
  * Internal dependencies
@@ -36,9 +36,10 @@ registerBlockType( 'core/button', {
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, className } ) {
+	edit: withInstanceId( ( { attributes, setAttributes, focus, setFocus, className, instanceId } ) => {
 		const { text, url, title, align } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
+		const linkInputId = `editable-format-toolbar__button-link-input-${ instanceId }`;
 
 		return [
 			focus && (
@@ -60,10 +61,15 @@ registerBlockType( 'core/button', {
 					<form
 						className="editable-format-toolbar__link-modal"
 						onSubmit={ ( event ) => event.preventDefault() }>
-						<label className="screen-reader-text" htmlFor="editable-format-toolbar__link-input">{ __( 'URL' ) }</label>
+						<label
+							className="screen-reader-text"
+							htmlFor={ linkInputId }
+						>
+							{ __( 'URL' ) }
+						</label>
 						<input
 							className="editable-format-toolbar__link-input"
-							id="editable-format-toolbar__link-input"
+							id={ linkInputId }
 							type="url"
 							required
 							value={ url }
@@ -75,7 +81,7 @@ registerBlockType( 'core/button', {
 				}
 			</span>,
 		];
-	},
+	} ),
 
 	save( { attributes } ) {
 		const { url, text, title, align = 'none' } = attributes;
