@@ -131,7 +131,7 @@ window._wpGutenbergPost = {
 }</code></pre>',
 			'<!-- /wp:core/code -->',
 
-			'<!-- wp:core/gallery {"align":"wide"} -->',
+			'<!-- wp:core/gallery {"align":"wide","images":[{"url":"https://cldup.com/GCwahb3aOb.jpg","alt":""},{"url":"https://cldup.com/lUUQPv6w9c.jpg","alt":""}]} -->',
 			'<div class="blocks-gallery alignwide columns-2 wp-block-gallery">',
 			'<figure class="blocks-gallery-image"><img src="https://cldup.com/GCwahb3aOb.jpg" alt="" /></figure>',
 			'<figure class="blocks-gallery-image"><img src="https://cldup.com/lUUQPv6w9c.jpg" alt="" /></figure>',
