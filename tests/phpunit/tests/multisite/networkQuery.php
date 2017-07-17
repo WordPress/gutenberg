@@ -379,6 +379,79 @@ class Tests_Multisite_Network_Query extends WP_UnitTestCase {
 
 		$this->assertEquals( $expected, $found );
 	}
+
+	/**
+	 * @ticket 41347
+	 */
+	public function test_wp_network_query_cache_with_different_fields_no_count() {
+		global $wpdb;
+
+		$q                 = new WP_Network_Query();
+		$query_1           = $q->query( array(
+			'fields'     => 'all',
+			'number'     => 3,
+			'order'      => 'ASC',
+		) );
+		$number_of_queries = $wpdb->num_queries;
+
+		$query_2 = $q->query( array(
+			'fields'     => 'ids',
+			'number'     => 3,
+			'order'      => 'ASC',
+		) );
+
+		$this->assertEquals( $number_of_queries, $wpdb->num_queries );
+	}
+
+	/**
+	 * @ticket 41347
+	 */
+	public function test_wp_network_query_cache_with_different_fields_active_count() {
+		global $wpdb;
+
+		$q = new WP_Network_Query();
+
+		$query_1           = $q->query( array(
+			'fields'     => 'all',
+			'number'     => 3,
+			'order'      => 'ASC',
+			'count'      => true,
+		) );
+		$number_of_queries = $wpdb->num_queries;
+
+		$query_2 = $q->query( array(
+			'fields'     => 'ids',
+			'number'     => 3,
+			'order'      => 'ASC',
+			'count'      => true,
+		) );
+		$this->assertEquals( $number_of_queries, $wpdb->num_queries );
+	}
+
+	/**
+	 * @ticket 41347
+	 */
+	public function test_wp_network_query_cache_with_same_fields_different_count() {
+		global $wpdb;
+
+		$q = new WP_Network_Query();
+
+		$query_1 = $q->query( array(
+			'fields'     => 'ids',
+			'number'     => 3,
+			'order'      => 'ASC',
+		) );
+
+		$number_of_queries = $wpdb->num_queries;
+
+		$query_2 = $q->query( array(
+			'fields'     => 'ids',
+			'number'     => 3,
+			'order'      => 'ASC',
+			'count'      => true,
+		) );
+		$this->assertEquals( $number_of_queries + 1, $wpdb->num_queries );
+	}
 }
 
 endif;
