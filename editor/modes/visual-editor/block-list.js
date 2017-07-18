@@ -48,8 +48,7 @@ class VisualEditorBlockList extends Component {
 		this.setLastClientY = this.setLastClientY.bind( this );
 		this.onPointerMove = throttle( this.onPointerMove.bind( this ), 250 );
 		this.onPlaceholderKeyDown = this.onPlaceholderKeyDown.bind( this );
-		this.onContinueWritingFocus = this.onContinueWritingFocus.bind( this );
-		this.onContinueWritingBlur = this.onContinueWritingBlur.bind( this );
+		this.toggleContinueWritingControls = this.toggleContinueWritingControls.bind( this );
 		// Browser does not fire `*move` event when the pointer position changes
 		// relative to the document, so fire it with the last known position.
 		this.onScroll = () => this.onPointerMove( { clientY: this.lastClientY } );
@@ -203,16 +202,8 @@ class VisualEditorBlockList extends Component {
 		this.props.onInsertBlock( newBlock );
 	}
 
-	onContinueWritingFocus() {
-		this.setState( {
-			showContinueWritingControls: true,
-		} );
-	}
-
-	onContinueWritingBlur() {
-		this.setState( {
-			showContinueWritingControls: false,
-		} );
+	toggleContinueWritingControls( showContinueWritingControls ) {
+		return () => this.setState( { showContinueWritingControls } );
 	}
 
 	render() {
@@ -232,7 +223,7 @@ class VisualEditorBlockList extends Component {
 			]
 			: blocks;
 		const continueWritingClassname = classnames( 'editor-visual-editor__continue-writing', {
-			'show-controls': this.state.showContinueWritingControls,
+			'is-showing-controls': this.state.showContinueWritingControls,
 		} );
 
 		return (
@@ -270,11 +261,12 @@ class VisualEditorBlockList extends Component {
 				}
 				<div
 					className={ continueWritingClassname }
-					onFocus={ this.onContinueWritingFocus }
-					onBlur={ this.onContinueWritingBlur }
+					onFocus={ this.toggleContinueWritingControls( true ) }
+					onBlur={ this.toggleContinueWritingControls( false ) }
 				>
 					<Inserter position="top right" />
 					<button
+						type="button"
 						className="editor-inserter__block"
 						onClick={ () => this.insertBlock( 'core/text' ) }
 						aria-label={ __( 'Insert text block' ) }
@@ -283,6 +275,7 @@ class VisualEditorBlockList extends Component {
 						{ __( 'Text' ) }
 					</button>
 					<button
+						type="button"
 						className="editor-inserter__block"
 						onClick={ () => this.insertBlock( 'core/image' ) }
 						aria-label={ __( 'Insert image block' ) }
