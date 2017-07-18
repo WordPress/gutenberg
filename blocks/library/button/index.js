@@ -36,7 +36,7 @@ registerBlockType( 'core/button', {
 		}
 	},
 
-	edit: ( { attributes, setAttributes, focus, setFocus, className } ) => {
+	edit( { attributes, setAttributes, focus, setFocus, className } ) {
 		const { text, url, title, align } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 
