@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from 'i18n';
-import { Toolbar, Placeholder } from 'components';
+import { Button, Toolbar, Placeholder } from 'components';
 import { pick } from 'lodash';
 
 /**
@@ -22,6 +22,39 @@ import BlockDescription from '../../block-description';
 
 const MAX_COLUMNS = 8;
 
+const createMediaLibrary = ( attributes, setAttributes ) => {
+	const frameConfig = {
+		frame: 'post',
+		title: __( 'Create Gallery' ),
+		button: {
+			text: __( 'Select' ),
+		},
+		multiple: 'add',
+		state: 'gallery',
+		toolbar: 'main-gallery',
+		menu: 'gallery',
+		selection: new wp.media.model.Selection( attributes.images, { multiple: true } ),
+	};
+
+	const createFrame = wp.media( frameConfig );
+
+	// the frameConfig settings dont carry to other state modals
+	// so requires setting this attribute directory to not show settings
+	createFrame.state( 'gallery' ).attributes.displaySettings = false;
+
+	function updateFn() {
+		setAttributes( {
+			images: this.frame.state().attributes.library.models.map( ( a ) => {
+				return a.attributes;
+			} ),
+		} );
+	}
+
+	createFrame.on( 'insert', updateFn );
+	createFrame.state( 'gallery-edit' ).on( 'update', updateFn );
+	createFrame.open( 'gutenberg-gallery' );
+};
+
 const editMediaLibrary = ( attributes, setAttributes ) => {
 	const frameConfig = {
 		frame: 'post',
@@ -31,6 +64,7 @@ const editMediaLibrary = ( attributes, setAttributes ) => {
 		},
 		multiple: true,
 		state: 'gallery-edit',
+
 		selection: new wp.media.model.Selection( attributes.images, { multiple: true } ),
 	};
 
@@ -115,14 +149,11 @@ registerBlockType( 'core/gallery', {
 					icon="format-gallery"
 					label={ __( 'Gallery' ) }
 					className={ className }>
-					<MediaUploadButton
-						buttonProps={ uploadButtonProps }
-						onSelect={ setMediaUrl }
-						type="image"
-						multiple="true"
+					<Button
+						onClick={ () => createMediaLibrary( attributes, setAttributes ) }
 					>
 						{ __( 'Insert from Media Library' ) }
-					</MediaUploadButton>
+					</Button>
 				</Placeholder>,
 			];
 		}
