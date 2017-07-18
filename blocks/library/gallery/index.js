@@ -11,7 +11,6 @@ import { pick } from 'lodash';
 import './style.scss';
 import './block.scss';
 import { registerBlockType } from '../../api';
-import MediaUploadButton from '../../media-upload-button';
 import InspectorControls from '../../inspector-controls';
 import RangeControl from '../../inspector-controls/range-control';
 import ToggleControl from '../../inspector-controls/toggle-control';
@@ -21,6 +20,13 @@ import GalleryImage from './gallery-image';
 import BlockDescription from '../../block-description';
 
 const MAX_COLUMNS = 8;
+
+// the media library image object contains numerous attributes
+// we only need this set to display the image in the library
+const slimImageObjects = ( imgs ) => {
+	const attrSet = [ 'sizes', 'mime', 'type', 'subtype', 'id', 'url', 'alt' ];
+	return imgs.map( ( img ) => pick( img, attrSet ) );
+};
 
 const createMediaLibrary = ( attributes, setAttributes ) => {
 	const frameConfig = {
@@ -44,9 +50,9 @@ const createMediaLibrary = ( attributes, setAttributes ) => {
 
 	function updateFn() {
 		setAttributes( {
-			images: this.frame.state().attributes.library.models.map( ( a ) => {
+			images: slimImageObjects( this.frame.state().attributes.library.models.map( ( a ) => {
 				return a.attributes;
-			} ),
+			} ) ),
 		} );
 	}
 
@@ -76,22 +82,15 @@ const editMediaLibrary = ( attributes, setAttributes ) => {
 
 	function updateFn() {
 		setAttributes( {
-			images: this.frame.state().attributes.library.models.map( ( a ) => {
+			images: slimImageObjects( this.frame.state().attributes.library.models.map( ( a ) => {
 				return a.attributes;
-			} ),
+			} ) ),
 		} );
 	}
 
 	editFrame.on( 'insert', updateFn );
 	editFrame.state( 'gallery-edit' ).on( 'update', updateFn );
 	editFrame.open( 'gutenberg-gallery' );
-};
-
-// the media library image object contains numerous attributes
-// we only need this set to display the image in the library
-const slimImageObjects = ( imgs ) => {
-	const attrSet = [ 'sizes', 'mime', 'type', 'subtype', 'id', 'url', 'alt' ];
-	return imgs.map( ( img ) => pick( img, attrSet ) );
 };
 
 function defaultColumnsNumber( attributes ) {
@@ -138,9 +137,6 @@ registerBlockType( 'core/gallery', {
 		);
 
 		if ( images.length === 0 ) {
-			const setMediaUrl = ( imgs ) => setAttributes( { images: slimImageObjects( imgs ) } );
-			const uploadButtonProps = { isLarge: true };
-
 			return [
 				controls,
 				<Placeholder
@@ -150,6 +146,7 @@ registerBlockType( 'core/gallery', {
 					label={ __( 'Gallery' ) }
 					className={ className }>
 					<Button
+						isLarge="true"
 						onClick={ () => createMediaLibrary( attributes, setAttributes ) }
 					>
 						{ __( 'Insert from Media Library' ) }
