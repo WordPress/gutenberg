@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { last, take, clone, uniq, map, difference, each, identity, some, throttle } from 'lodash';
+import { last, take, clone, uniq, map, difference, each, identity, some, debounce } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -46,7 +46,7 @@ class FormTokenField extends Component {
 		this.onInputChange = this.onInputChange.bind( this );
 		this.bindInput = this.bindInput.bind( this );
 		this.bindTokensAndInput = this.bindTokensAndInput.bind( this );
-		this.throlltedSpeak = throttle( this.speak.bind( this ), 1000 );
+		this.debouncedSpeakAssertive = debounce( this.speakAssertive.bind( this ), 500 );
 	}
 
 	componentDidUpdate() {
@@ -62,6 +62,10 @@ class FormTokenField extends Component {
 				incompleteTokenValue: '',
 			} );
 		}
+	}
+
+	componentWillUnmount() {
+		this.debouncedSpeakAssertive.cancel();
 	}
 
 	bindInput( ref ) {
@@ -193,13 +197,13 @@ class FormTokenField extends Component {
 		if ( showMessage ) {
 			const matchingSuggestions = this.getMatchingSuggestions( tokenValue );
 			if ( !! matchingSuggestions.length ) {
-				this.throlltedSpeak( sprintf( _n(
+				this.debouncedSpeakAssertive( sprintf( _n(
 					'%d result found, use up and down arrow keys to navigate.',
 					'%d results found, use up and down arrow keys to navigate.',
 					matchingSuggestions.length
 				), matchingSuggestions.length ) );
 			} else {
-				this.throlltedSpeak( __( 'No results.' ) );
+				this.debouncedSpeakAssertive( __( 'No results.' ) );
 			}
 		}
 	}
@@ -340,7 +344,7 @@ class FormTokenField extends Component {
 
 	addNewToken( token ) {
 		this.addNewTokens( [ token ] );
-		this.speak( this.props.messages.added );
+		this.speakAssertive( this.props.messages.added );
 
 		this.setState( {
 			incompleteTokenValue: '',
@@ -358,7 +362,7 @@ class FormTokenField extends Component {
 			return this.getTokenValue( item ) !== this.getTokenValue( token );
 		} );
 		this.props.onChange( newTokens );
-		this.speak( this.props.messages.removed );
+		this.speakAssertive( this.props.messages.removed );
 	}
 
 	getTokenValue( token ) {
@@ -402,7 +406,7 @@ class FormTokenField extends Component {
 		return take( suggestions, maxSuggestions );
 	}
 
-	speak( message ) {
+	speakAssertive( message ) {
 		wp.a11y.speak( message, 'assertive' );
 	}
 
