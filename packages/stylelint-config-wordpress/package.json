@@ -82,6 +82,6 @@
   },
   "dependencies": {
     "stylelint-config-recommended": "^1.0.0",
-    "stylelint-scss": "^1.4.4"
+    "stylelint-scss": "^1.5.1"
   }
 }

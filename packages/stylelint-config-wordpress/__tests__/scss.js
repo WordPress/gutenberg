@@ -47,19 +47,19 @@ describe( 'flags warnings with invalid scss', () => {
 
 	it( 'flags seven warnings', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings.length ).toBe( 7 )
+			expect( data.results[0].warnings.length ).toBe( 6 )
 		) );
 	});
 
 	it( 'correct first warning text', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[0].text ).toBe( 'Unexpected unknown at-rule "@unknown" (at-rule-no-unknown)' )
+			expect( data.results[0].warnings[0].text ).toBe( 'Unexpected empty line before at-rule (at-rule-empty-line-before)' )
 		) );
 	});
 
 	it( 'correct first warning rule flagged', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[0].rule ).toBe( 'at-rule-no-unknown' )
+			expect( data.results[0].warnings[0].rule ).toBe( 'at-rule-empty-line-before' )
 		) );
 	});
 
@@ -71,25 +71,25 @@ describe( 'flags warnings with invalid scss', () => {
 
 	it( 'correct first warning line number', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[0].line ).toBe( 1 )
+			expect( data.results[0].warnings[0].line ).toBe( 22 )
 		) );
 	});
 
 	it( 'correct first warning column number', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[0].column ).toBe( 1 )
+			expect( data.results[0].warnings[0].column ).toBe( 2 )
 		) );
 	});
 
 	it( 'correct second warning text', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[1].text ).toBe( 'Unexpected unknown at-rule "@debug" (at-rule-no-unknown)' )
+			expect( data.results[0].warnings[1].text ).toBe( 'Expected single space before "{" (block-opening-brace-space-before)' )
 		) );
 	});
 
 	it( 'correct second warning rule flagged', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[1].rule ).toBe( 'at-rule-no-unknown' )
+			expect( data.results[0].warnings[1].rule ).toBe( 'block-opening-brace-space-before' )
 		) );
 	});
 
@@ -101,25 +101,25 @@ describe( 'flags warnings with invalid scss', () => {
 
 	it( 'correct second warning line number', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[1].line ).toBe( 7 )
+			expect( data.results[0].warnings[1].line ).toBe( 14 )
 		) );
 	});
 
 	it( 'correct second warning column number', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[1].column ).toBe( 2 )
+			expect( data.results[0].warnings[1].column ).toBe( 5 )
 		) );
 	});
 
 	it( 'correct third warning text', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[2].text ).toBe( 'Unexpected empty line before at-rule (at-rule-empty-line-before)' )
+			expect( data.results[0].warnings[2].text ).toBe( 'Unxpected empty line before @else (scss/at-else-empty-line-before)' )
 		) );
 	});
 
 	it( 'correct third warning rule flagged', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[2].rule ).toBe( 'at-rule-empty-line-before' )
+			expect( data.results[0].warnings[2].rule ).toBe( 'scss/at-else-empty-line-before' )
 		) );
 	});
 
@@ -131,131 +131,101 @@ describe( 'flags warnings with invalid scss', () => {
 
 	it( 'correct third warning line number', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[2].line ).toBe( 22 )
+			expect( data.results[0].warnings[2].line ).toBe( 14 )
 		) );
 	});
 
 	it( 'correct third warning column number', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[2].column ).toBe( 2 )
+			expect( data.results[0].warnings[2].column ).toBe( 1 )
 		) );
 	});
 
 	it( 'correct forth warning text', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[2].text ).toBe( 'Unexpected empty line before at-rule (at-rule-empty-line-before)' )
+			expect( data.results[0].warnings[3].text ).toBe( 'Unexpected unknown at-rule "@unknown" (at-rule-no-unknown) (scss/at-rule-no-unknown)' )
 		) );
 	});
 
 	it( 'correct forth warning rule flagged', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[2].rule ).toBe( 'at-rule-empty-line-before' )
+			expect( data.results[0].warnings[3].rule ).toBe( 'scss/at-rule-no-unknown' )
 		) );
 	});
 
 	it( 'correct forth warning severity flagged', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[2].severity ).toBe( 'error' )
+			expect( data.results[0].warnings[3].severity ).toBe( 'error' )
 		) );
 	});
 
 	it( 'correct forth warning line number', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[2].line ).toBe( 22 )
+			expect( data.results[0].warnings[3].line ).toBe( 1 )
 		) );
 	});
 
 	it( 'correct forth warning column number', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[2].column ).toBe( 2 )
+			expect( data.results[0].warnings[3].column ).toBe( 1 )
 		) );
 	});
 
 	it( 'correct fifth warning text', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[3].text ).toBe( 'Expected single space before "{" (block-opening-brace-space-before)' )
+			expect( data.results[0].warnings[4].text ).toBe( 'Unexpected newline after "}" of @if statement (scss/at-if-closing-brace-newline-after)' )
 		) );
 	});
 
 	it( 'correct fifth warning rule flagged', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[3].rule ).toBe( 'block-opening-brace-space-before' )
+			expect( data.results[0].warnings[4].rule ).toBe( 'scss/at-if-closing-brace-newline-after' )
 		) );
 	});
 
 	it( 'correct fifth warning severity flagged', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[3].severity ).toBe( 'error' )
+			expect( data.results[0].warnings[4].severity ).toBe( 'error' )
 		) );
 	});
 
 	it( 'correct fifth warning line number', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[3].line ).toBe( 14 )
+			expect( data.results[0].warnings[4].line ).toBe( 12 )
 		) );
 	});
 
 	it( 'correct fifth warning column number', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[3].column ).toBe( 5 )
+			expect( data.results[0].warnings[4].column ).toBe( 2 )
 		) );
 	});
 
 	it( 'correct sixth warning text', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[4].text ).toBe( 'Unxpected empty line before @else (scss/at-else-empty-line-before)' )
+			expect( data.results[0].warnings[5].text ).toBe( 'Expected single space after "}" of @if statement (scss/at-if-closing-brace-space-after)' )
 		) );
 	});
 
 	it( 'correct sixth warning rule flagged', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[4].rule ).toBe( 'scss/at-else-empty-line-before' )
+			expect( data.results[0].warnings[5].rule ).toBe( 'scss/at-if-closing-brace-space-after' )
 		) );
 	});
 
 	it( 'correct sixth warning severity flagged', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[4].severity ).toBe( 'error' )
+			expect( data.results[0].warnings[5].severity ).toBe( 'error' )
 		) );
 	});
 
 	it( 'correct sixth warning line number', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[4].line ).toBe( 14 )
-		) );
-	});
-
-	it( 'correct sixth warning column number', () => {
-		return result.then( data => (
-			expect( data.results[0].warnings[4].column ).toBe( 1 )
-		) );
-	});
-
-	it( 'correct seventh warning text', () => {
-		return result.then( data => (
-			expect( data.results[0].warnings[5].text ).toBe( 'Unexpected newline after "}" of @if statement (scss/at-if-closing-brace-newline-after)' )
-		) );
-	});
-
-	it( 'correct seventh warning rule flagged', () => {
-		return result.then( data => (
-			expect( data.results[0].warnings[5].rule ).toBe( 'scss/at-if-closing-brace-newline-after' )
-		) );
-	});
-
-	it( 'correct seventh warning severity flagged', () => {
-		return result.then( data => (
-			expect( data.results[0].warnings[5].severity ).toBe( 'error' )
-		) );
-	});
-
-	it( 'correct seventh warning line number', () => {
-		return result.then( data => (
 			expect( data.results[0].warnings[5].line ).toBe( 12 )
 		) );
 	});
 
-	it( 'correct seventh warning column number', () => {
+	it( 'correct sixth warning column number', () => {
 		return result.then( data => (
 			expect( data.results[0].warnings[5].column ).toBe( 2 )
 		) );
