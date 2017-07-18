@@ -77,6 +77,7 @@ export default class TableBlock extends wp.element.Component {
 				getSettings={ ( settings ) => ( {
 					...settings,
 					plugins: ( settings.plugins || [] ).concat( 'table' ),
+					table_tab_navigation: false,
 				} ) }
 				onSetup={ ( editor ) => this.handleSetup( editor, focus ) }
 				onChange={ onChange }
