@@ -941,6 +941,20 @@ Array [
         "severity": "error",
         "text": "Expected newline after \\",\\" (selector-list-comma-newline-after)",
       },
+      Object {
+        "column": 2,
+        "line": 67,
+        "rule": "declaration-block-no-redundant-longhand-properties",
+        "severity": "error",
+        "text": "Expected shorthand property \\"-webkit-border-radius\\" (declaration-block-no-redundant-longhand-properties)",
+      },
+      Object {
+        "column": 2,
+        "line": 81,
+        "rule": "declaration-block-no-redundant-longhand-properties",
+        "severity": "error",
+        "text": "Expected shorthand property \\"-webkit-border-radius\\" (declaration-block-no-redundant-longhand-properties)",
+      },
     ],
   },
 ]

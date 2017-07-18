@@ -4,12 +4,20 @@ exports[`064 1`] = `
 Array [
   Object {
     "deprecations": Array [],
-    "errored": undefined,
+    "errored": true,
     "ignored": undefined,
     "invalidOptionWarnings": Array [],
     "parseErrors": Array [],
     "source": "064/stylesheet.scss",
-    "warnings": Array [],
+    "warnings": Array [
+      Object {
+        "column": 41,
+        "line": 234,
+        "rule": "block-no-empty",
+        "severity": "error",
+        "text": "Unexpected empty block (block-no-empty)",
+      },
+    ],
   },
 ]
 `;
