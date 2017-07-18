@@ -60,9 +60,9 @@ const openMediaLibrary = ( frameConfig, attributes, setAttributes ) => {
 
 	function updateFn() {
 		setAttributes( {
-			images: this.frame.state().attributes.library.models.map( ( a ) => {
+			images: slimImageObjects( this.frame.state().attributes.library.models.map( ( a ) => {
 				return a.attributes;
-			} ),
+			} ) ),
 		} );
 	}
 
