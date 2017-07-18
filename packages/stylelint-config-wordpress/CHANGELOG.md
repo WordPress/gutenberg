@@ -1,3 +1,7 @@
+# HEAD
+
+-   Changed: `stylelint-config-wordpress` now extends [`stylelint-config-recommended`](https://github.com/stylelint/stylelint-config-recommended), which turns on the `at-rule-no-unknown`, `block-no-empty`, `comment-no-empty`, `declaration-block-no-ignored-properties`, `declaration-block-no-redundant-longhand-properties`, `font-family-no-duplicate-names`, `media-feature-name-no-unknown`, `no-empty-source` rule. These rules are part of stylelint's [possible errors](https://github.com/stylelint/stylelint/blob/master/docs/user-guide/rules.md#possible-errors) rules.
+
 # 11.0.0
 
 -   Added: `declaration-property-unit-whitelist` rule to allow `px` and exclude `%` and `em` units  in `line-height` values.
