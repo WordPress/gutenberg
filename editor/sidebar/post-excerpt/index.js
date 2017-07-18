@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __ } from 'i18n';
-import { PanelBody } from 'components';
+import { ExternalLink, PanelBody } from 'components';
 
 /**
  * Internal Dependencies
@@ -28,9 +28,9 @@ function PostExcerpt( { excerpt, onUpdateExcerpt } ) {
 				placeholder={ __( 'Write an excerpt (optional)' ) }
 				aria-label={ __( 'Excerpt' ) }
 			/>
-			<a href="https://codex.wordpress.org/Excerpt" target="_blank">
+			<ExternalLink href="https://codex.wordpress.org/Excerpt">
 				{ __( 'Learn more about manual excerpts' ) }
-			</a>
+			</ExternalLink>
 		</PanelBody>
 	);
 }
