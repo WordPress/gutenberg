@@ -3,7 +3,7 @@
  */
 import { __ } from 'i18n';
 import { Component } from 'element';
-import { IconButton, Toolbar } from 'components';
+import { IconButton, Toolbar, withInstanceId } from 'components';
 import { ESCAPE } from 'utils/keycodes';
 
 const FORMATTING_CONTROLS = [
@@ -119,10 +119,11 @@ class FormatToolbar extends Component {
 	}
 
 	render() {
-		const { formats, focusPosition, enabledControls = DEFAULT_CONTROLS } = this.props;
+		const { formats, focusPosition, enabledControls = DEFAULT_CONTROLS, instanceId } = this.props;
 		const linkStyle = focusPosition
 			? { position: 'absolute', ...focusPosition }
 			: null;
+		const linkInputId = 'editable-format-toolbar__link-input-' + instanceId;
 
 		const toolbarControls = FORMATTING_CONTROLS
 			.filter( control => enabledControls.indexOf( control.format ) !== -1 )
@@ -151,17 +152,24 @@ class FormatToolbar extends Component {
 						className="editable-format-toolbar__link-modal"
 						style={ linkStyle }
 						onSubmit={ this.submitLink }>
+						<label
+							className="screen-reader-text"
+							htmlFor={ linkInputId }
+						>
+							{ __( 'URL' ) }
+						</label>
 						<input
 							autoFocus
 							className="editable-format-toolbar__link-input"
+							id={ linkInputId }
 							type="url"
 							required
 							value={ this.state.linkValue }
 							onChange={ this.updateLinkValue }
 							placeholder={ __( 'Paste URL or type' ) }
 						/>
-						<IconButton icon="editor-break" type="submit" />
-						<IconButton icon="editor-unlink" onClick={ this.dropLink } />
+						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
+						<IconButton icon="editor-unlink" label={ __( 'Remove link' ) } onClick={ this.dropLink } />
 					</form>
 				}
 
@@ -174,8 +182,8 @@ class FormatToolbar extends Component {
 						>
 							{ this.state.linkValue && decodeURI( this.state.linkValue ) }
 						</a>
-						<IconButton icon="edit" onClick={ this.editLink } />
-						<IconButton icon="editor-unlink" onClick={ this.dropLink } />
+						<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ this.editLink } />
+						<IconButton icon="editor-unlink" label={ __( 'Remove link' ) } onClick={ this.dropLink } />
 					</div>
 				}
 			</div>
@@ -184,4 +192,4 @@ class FormatToolbar extends Component {
 	}
 }
 
-export default FormatToolbar;
+export default withInstanceId( FormatToolbar );
