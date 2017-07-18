@@ -1,6 +1,7 @@
 'use strict';
 
 module.exports = {
+	extends: 'stylelint-config-recommended',
 	rules: {
 		'at-rule-empty-line-before': [ 'always', {
 			except: ['blockless-after-blockless'],
@@ -17,7 +18,6 @@ module.exports = {
 		'color-hex-case': 'lower',
 		'color-hex-length': 'short',
 		'color-named': 'never',
-		'color-no-invalid-hex': true,
 		'comment-empty-line-before': [ 'always', {
 			ignore: ['stylelint-commands'],
 		} ],
@@ -26,7 +26,6 @@ module.exports = {
 		'declaration-block-no-duplicate-properties': [ true, {
 			ignore: ['consecutive-duplicates'],
 		} ],
-		'declaration-block-no-shorthand-property-overrides': true,
 		'declaration-block-semicolon-newline-after': 'always',
 		'declaration-block-semicolon-space-before': 'never',
 		'declaration-block-trailing-semicolon': 'always',
@@ -40,10 +39,8 @@ module.exports = {
 		'font-weight-notation': [ 'numeric', {
 			ignore: ['relative'],
 		} ],
-		'function-calc-no-unspaced-operator': true,
 		'function-comma-space-after': 'always',
 		'function-comma-space-before': 'never',
-		'function-linear-gradient-no-nonstandard-direction': true,
 		'function-max-empty-lines': 1,
 		'function-name-case': [ 'lower', {
 			ignoreFunctions: ['/^DXImageTransform.Microsoft.*$/'],
@@ -52,7 +49,6 @@ module.exports = {
 		'function-url-quotes': 'never',
 		'function-whitespace-after': 'always',
 		indentation: 'tab',
-		'keyframe-declaration-no-important': true,
 		'length-zero-no-unit': true,
 		'max-empty-lines': 2,
 		'max-line-length': [ 80, {
@@ -67,13 +63,10 @@ module.exports = {
 		'media-query-list-comma-space-after': 'always-single-line',
 		'media-query-list-comma-space-before': 'never',
 		'no-eol-whitespace': true,
-		'no-extra-semicolons': true,
-		'no-invalid-double-slash-comments': true,
 		'no-missing-end-of-source-newline': true,
 		'number-leading-zero': 'always',
 		'number-no-trailing-zeros': true,
 		'property-case': 'lower',
-		'property-no-unknown': true,
 		'rule-empty-line-before': [ 'always', {
 			ignore: ['after-comment'],
 		} ],
@@ -99,18 +92,12 @@ module.exports = {
 		'selector-list-comma-space-before': 'never',
 		'selector-max-empty-lines': 0,
 		'selector-pseudo-class-case': 'lower',
-		'selector-pseudo-class-no-unknown': true,
 		'selector-pseudo-class-parentheses-space-inside': 'never',
 		'selector-pseudo-element-case': 'lower',
 		'selector-pseudo-element-colon-notation': 'single',
-		'selector-pseudo-element-no-unknown': true,
 		'selector-type-case': 'lower',
-		'selector-type-no-unknown': true,
-		'shorthand-property-no-redundant-values': true,
-		'string-no-newline': true,
 		'string-quotes': 'double',
 		'unit-case': 'lower',
-		'unit-no-unknown': true,
 		'value-keyword-case': 'lower',
 		'value-list-comma-newline-after': 'always-multi-line',
 		'value-list-comma-space-after': 'always-single-line',
