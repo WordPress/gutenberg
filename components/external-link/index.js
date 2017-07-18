@@ -22,11 +22,16 @@ function ExternalLink( { href, children, className, rel = '', ...additionalProps
 		'noreferrer',
 		'noopener',
 	] ) ).join( ' ' );
-	const classes = classnames( 'new-window-icon', className );
+	const classes = classnames( 'components-external-link', className );
 	return (
 		<a { ...additionalProps } className={ classes } href={ href } target="_blank" rel={ rel }>
 			{ children }
-			<span className="screen-reader-text">{ __( '(opens in a new window)' ) }</span>
+			<span className="screen-reader-text">
+				{
+					/* translators: accessibility text */
+					__( '(opens in a new window)' )
+				}
+			</span>
 			<Dashicon icon="external" />
 		</a>
 	);
