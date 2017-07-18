@@ -47,7 +47,7 @@ describe( 'flags warnings with invalid media queries css', () => {
 
 	it( 'flags ten warnings', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings.length ).toBe( 10 )
+			expect( data.results[0].warnings.length ).toBe( 11 )
 		) );
 	});
 
@@ -341,13 +341,43 @@ describe( 'flags warnings with invalid media queries css', () => {
 
 	it( 'correct tenth warning line number', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[9].line ).toBe( 38 )
+			expect( data.results[0].warnings[9].line ).toBe( 40 )
 		) );
 	});
 
 	it( 'correct tenth warning column number', () => {
 		return result.then( data => (
 			expect( data.results[0].warnings[9].column ).toBe( 27 )
+		) );
+	});
+
+	it( 'correct eleventh warning text', () => {
+		return result.then( data => (
+			expect( data.results[0].warnings[10].text ).toBe( 'Unexpected unknown media feature name "max-width 699px" (media-feature-name-no-unknown)' )
+		) );
+	});
+
+	it( 'correct eleventh warning rule flagged', () => {
+		return result.then( data => (
+			expect( data.results[0].warnings[10].rule ).toBe( 'media-feature-name-no-unknown' )
+		) );
+	});
+
+	it( 'correct eleventh warning severity flagged', () => {
+		return result.then( data => (
+			expect( data.results[0].warnings[10].severity ).toBe( 'error' )
+		) );
+	});
+
+	it( 'correct eleventh warning line number', () => {
+		return result.then( data => (
+			expect( data.results[0].warnings[10].line ).toBe( 11 )
+		) );
+	});
+
+	it( 'correct eleventh warning column number', () => {
+		return result.then( data => (
+			expect( data.results[0].warnings[10].column ).toBe( 17 )
 		) );
 	});
 });

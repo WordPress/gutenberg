@@ -1,17 +1,22 @@
 .foo {
 
 	> .bar {
+		margin: 0;
 	}
 }
 
 p {
 
-	&.foo {}
+	&.foo {
+		margin: 0;
+	}
 }
 
 p {
 
-	.foo > & {}
+	.foo > & {
+		margin: 0;
+	}
 }
 
 p {

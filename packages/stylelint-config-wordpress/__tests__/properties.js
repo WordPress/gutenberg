@@ -113,13 +113,13 @@ describe( 'flags warnings with invalid properties css', () => {
 
 	it( 'correct third warning text', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[2].text ).toBe( 'Unexpected shorthand "margin" after "margin-left" (declaration-block-no-shorthand-property-overrides)' )
+			expect( data.results[0].warnings[2].text ).toBe( 'Expected single space after ":" with a single-line declaration (declaration-colon-space-after)' )
 		) );
 	});
 
 	it( 'correct third warning rule flagged', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[2].rule ).toBe( 'declaration-block-no-shorthand-property-overrides' )
+			expect( data.results[0].warnings[2].rule ).toBe( 'declaration-colon-space-after' )
 		) );
 	});
 
@@ -131,25 +131,25 @@ describe( 'flags warnings with invalid properties css', () => {
 
 	it( 'correct third warning line number', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[2].line ).toBe( 5 )
+			expect( data.results[0].warnings[2].line ).toBe( 2 )
 		) );
 	});
 
 	it( 'correct third warning column number', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[2].column ).toBe( 2 )
+			expect( data.results[0].warnings[2].column ).toBe( 13 )
 		) );
 	});
 
 	it( 'correct forth warning text', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[3].text ).toBe( 'Expected single space after ":" with a single-line declaration (declaration-colon-space-after)' )
+			expect( data.results[0].warnings[3].text ).toBe( 'Expected "PX" to be "px" (unit-case)' )
 		) );
 	});
 
 	it( 'correct forth warning rule flagged', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[3].rule ).toBe( 'declaration-colon-space-after' )
+			expect( data.results[0].warnings[3].rule ).toBe( 'unit-case' )
 		) );
 	});
 
@@ -161,25 +161,25 @@ describe( 'flags warnings with invalid properties css', () => {
 
 	it( 'correct forth warning line number', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[3].line ).toBe( 2 )
+			expect( data.results[0].warnings[3].line ).toBe( 4 )
 		) );
 	});
 
 	it( 'correct forth warning column number', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[3].column ).toBe( 13 )
+			expect( data.results[0].warnings[3].column ).toBe( 15 )
 		) );
 	});
 
 	it( 'correct fifth warning text', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[4].text ).toBe( 'Unexpected unknown property "argin" (property-no-unknown)' )
+			expect( data.results[0].warnings[4].text ).toBe( 'Expected "BLOCK" to be "block" (value-keyword-case)' )
 		) );
 	});
 
 	it( 'correct fifth warning rule flagged', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[4].rule ).toBe( 'property-no-unknown' )
+			expect( data.results[0].warnings[4].rule ).toBe( 'value-keyword-case' )
 		) );
 	});
 
@@ -191,25 +191,25 @@ describe( 'flags warnings with invalid properties css', () => {
 
 	it( 'correct fifth warning line number', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[4].line ).toBe( 6 )
+			expect( data.results[0].warnings[4].line ).toBe( 3 )
 		) );
 	});
 
 	it( 'correct fifth warning column number', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[4].column ).toBe( 2 )
+			expect( data.results[0].warnings[4].column ).toBe( 11 )
 		) );
 	});
 
 	it( 'correct sixth warning text', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[5].text ).toBe( 'Expected "PX" to be "px" (unit-case)' )
+			expect( data.results[0].warnings[5].text ).toBe( 'Unexpected shorthand "margin" after "margin-left" (declaration-block-no-shorthand-property-overrides)' )
 		) );
 	});
 
 	it( 'correct sixth warning rule flagged', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[5].rule ).toBe( 'unit-case' )
+			expect( data.results[0].warnings[5].rule ).toBe( 'declaration-block-no-shorthand-property-overrides' )
 		) );
 	});
 
@@ -221,25 +221,25 @@ describe( 'flags warnings with invalid properties css', () => {
 
 	it( 'correct sixth warning line number', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[5].line ).toBe( 4 )
+			expect( data.results[0].warnings[5].line ).toBe( 5 )
 		) );
 	});
 
 	it( 'correct sixth warning column number', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[5].column ).toBe( 15 )
+			expect( data.results[0].warnings[5].column ).toBe( 2 )
 		) );
 	});
 
 	it( 'correct seventh warning text', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[6].text ).toBe( 'Expected "BLOCK" to be "block" (value-keyword-case)' )
+			expect( data.results[0].warnings[6].text ).toBe( 'Unexpected unknown property "argin" (property-no-unknown)' )
 		) );
 	});
 
 	it( 'correct seventh warning rule flagged', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[6].rule ).toBe( 'value-keyword-case' )
+			expect( data.results[0].warnings[6].rule ).toBe( 'property-no-unknown' )
 		) );
 	});
 
@@ -251,13 +251,13 @@ describe( 'flags warnings with invalid properties css', () => {
 
 	it( 'correct seventh warning line number', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[6].line ).toBe( 3 )
+			expect( data.results[0].warnings[6].line ).toBe( 6 )
 		) );
 	});
 
 	it( 'correct seventh warning column number', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[6].column ).toBe( 11 )
+			expect( data.results[0].warnings[6].column ).toBe( 2 )
 		) );
 	});
 });

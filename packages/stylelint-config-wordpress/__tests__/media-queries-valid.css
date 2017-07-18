@@ -4,6 +4,10 @@
 }
 
 @media screen and (color),
-	projection and (color) {}
+	projection and (color) {
+	top: 0.2em;
+}
 
-@media screen and (color), projection and (color) {}
+@media screen and (color), projection and (color) {
+	top: 0.2em;
+}

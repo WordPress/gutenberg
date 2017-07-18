@@ -101,7 +101,7 @@ describe( 'flags warnings with invalid selectors scss', () => {
 
 	it( 'correct second warning line number', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[1].line ).toBe( 9 )
+			expect( data.results[0].warnings[1].line ).toBe( 10 )
 		) );
 	});
 
@@ -131,7 +131,7 @@ describe( 'flags warnings with invalid selectors scss', () => {
 
 	it( 'correct third warning line number', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[2].line ).toBe( 14 )
+			expect( data.results[0].warnings[2].line ).toBe( 17 )
 		) );
 	});
 
@@ -161,7 +161,7 @@ describe( 'flags warnings with invalid selectors scss', () => {
 
 	it( 'correct forth warning line number', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[3].line ).toBe( 19 )
+			expect( data.results[0].warnings[3].line ).toBe( 24 )
 		) );
 	});
 
