@@ -28,69 +28,47 @@ const slimImageObjects = ( imgs ) => {
 	return imgs.map( ( img ) => pick( img, attrSet ) );
 };
 
-const createMediaLibrary = ( attributes, setAttributes ) => {
-	const frameConfig = {
-		frame: 'post',
-		title: __( 'Create Gallery' ),
-		button: {
-			text: __( 'Select' ),
-		},
-		multiple: 'add',
-		state: 'gallery',
-		toolbar: 'main-gallery',
-		menu: 'gallery',
-		selection: new wp.media.model.Selection( attributes.images, { multiple: true } ),
-	};
-
-	const createFrame = wp.media( frameConfig );
-
-	// the frameConfig settings dont carry to other state modals
-	// so requires setting this attribute directory to not show settings
-	createFrame.state( 'gallery' ).attributes.displaySettings = false;
-
-	function updateFn() {
-		setAttributes( {
-			images: slimImageObjects( this.frame.state().attributes.library.models.map( ( a ) => {
-				return a.attributes;
-			} ) ),
-		} );
-	}
-
-	createFrame.on( 'insert', updateFn );
-	createFrame.state( 'gallery-edit' ).on( 'update', updateFn );
-	createFrame.open( 'gutenberg-gallery' );
+const createFrameConfig = {
+	frame: 'post',
+	title: __( 'Create Gallery' ),
+	button: {
+		text: __( 'Select' ),
+	},
+	multiple: true,
+	state: 'gallery',
+	toolbar: 'main-gallery',
+	menu: 'gallery',
 };
 
-const editMediaLibrary = ( attributes, setAttributes ) => {
-	const frameConfig = {
-		frame: 'post',
-		title: __( 'Update Gallery media' ),
-		button: {
-			text: __( 'Select' ),
-		},
-		multiple: true,
-		state: 'gallery-edit',
+const editFrameConfig = {
+	frame: 'post',
+	title: __( 'Update Gallery media' ),
+	button: {
+		text: __( 'Select' ),
+	},
+	multiple: true,
+	state: 'gallery-edit',
+};
 
-		selection: new wp.media.model.Selection( attributes.images, { multiple: true } ),
-	};
-
-	const editFrame = wp.media( frameConfig );
+const openMediaLibrary = ( frameConfig, attributes, setAttributes ) => {
+	frameConfig.selection = new wp.media.model.Selection( attributes.images, { multiple: true } );
+	const mediaFrame = wp.media( frameConfig );
 
 	// the frameConfig settings dont carry to other state modals
 	// so requires setting this attribute directory to not show settings
-	editFrame.state( 'gallery-edit' ).attributes.displaySettings = false;
+	mediaFrame.state( 'gallery' ).attributes.displaySettings = false;
 
 	function updateFn() {
 		setAttributes( {
-			images: slimImageObjects( this.frame.state().attributes.library.models.map( ( a ) => {
+			images: this.frame.state().attributes.library.models.map( ( a ) => {
 				return a.attributes;
-			} ) ),
+			} ),
 		} );
 	}
 
-	editFrame.on( 'insert', updateFn );
-	editFrame.state( 'gallery-edit' ).on( 'update', updateFn );
-	editFrame.open( 'gutenberg-gallery' );
+	mediaFrame.on( 'insert', updateFn );
+	mediaFrame.state( 'gallery-edit' ).on( 'update', updateFn );
+	mediaFrame.open( 'gutenberg-gallery' );
 };
 
 function defaultColumnsNumber( attributes ) {
@@ -129,7 +107,7 @@ registerBlockType( 'core/gallery', {
 						<Toolbar controls={ [ {
 							icon: 'edit',
 							title: __( 'Edit Gallery' ),
-							onClick: () => editMediaLibrary( attributes, setAttributes ),
+							onClick: () => openMediaLibrary( editFrameConfig, attributes, setAttributes ),
 						} ] } />
 					) }
 				</BlockControls>
@@ -147,7 +125,7 @@ registerBlockType( 'core/gallery', {
 					className={ className }>
 					<Button
 						isLarge="true"
-						onClick={ () => createMediaLibrary( attributes, setAttributes ) }
+						onClick={ () => openMediaLibrary( createFrameConfig, attributes, setAttributes ) }
 					>
 						{ __( 'Insert from Media Library' ) }
 					</Button>
