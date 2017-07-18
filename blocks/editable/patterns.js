@@ -1,10 +1,8 @@
-/* eslint-disable */
-
 /**
  * External dependencies
  */
 import tinymce from 'tinymce';
-import { find, get, escapeRegExp, trimStart, partition, drop } from 'lodash';
+import { find, get, escapeRegExp, partition, drop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -40,7 +38,7 @@ export default function( editor ) {
 	);
 
 	const inlinePatterns = settings.inline || [
-		{ delimiter: '`', format: 'code' }
+		{ delimiter: '`', format: 'code' },
 	];
 
 	let canUndo;
@@ -73,22 +71,21 @@ export default function( editor ) {
 	}, true );
 
 	function inline() {
-		var rng = editor.selection.getRng();
-		var node = rng.startContainer;
-		var offset = rng.startOffset;
-		var startOffset;
-		var endOffset;
-		var pattern;
-		var format;
-		var zero;
+		const rng = editor.selection.getRng();
+		const node = rng.startContainer;
+		const offset = rng.startOffset;
+		let startOffset;
+		let endOffset;
+		let pattern;
+		let zero;
 
 		// We need a non empty text node with an offset greater than zero.
 		if ( ! node || node.nodeType !== 3 || ! node.data.length || ! offset ) {
 			return;
 		}
 
-		var string = node.data.slice( 0, offset );
-		var lastChar = node.data.charAt( offset - 1 );
+		const string = node.data.slice( 0, offset );
+		const lastChar = node.data.charAt( offset - 1 );
 
 		tinymce.each( inlinePatterns, function( p ) {
 			// Character before selection should be delimiter.
@@ -96,20 +93,20 @@ export default function( editor ) {
 				return;
 			}
 
-			var escDelimiter = escapeRegExp( p.delimiter );
-			var delimiterFirstChar = p.delimiter.charAt( 0 );
-			var regExp = new RegExp( '(.*)' + escDelimiter + '.+' + escDelimiter + '$' );
-			var match = string.match( regExp );
+			const escDelimiter = escapeRegExp( p.delimiter );
+			const delimiterFirstChar = p.delimiter.charAt( 0 );
+			const regExp = new RegExp( '(.*)' + escDelimiter + '.+' + escDelimiter + '$' );
+			const match = string.match( regExp );
 
 			if ( ! match ) {
 				return;
 			}
 
-			startOffset = match[1].length;
+			startOffset = match[ 1 ].length;
 			endOffset = offset - p.delimiter.length;
 
-			var before = string.charAt( startOffset - 1 );
-			var after = string.charAt( startOffset + p.delimiter.length );
+			const before = string.charAt( startOffset - 1 );
+			const after = string.charAt( startOffset + p.delimiter.length );
 
 			// test*test* => format applied
 			// test *test* => applied
@@ -134,21 +131,21 @@ export default function( editor ) {
 			return;
 		}
 
-		format = editor.formatter.get( pattern.format );
+		const format = editor.formatter.get( pattern.format );
 
-		if ( format && format[0].inline ) {
+		if ( format && format[ 0 ].inline ) {
 			editor.undoManager.add();
 
 			editor.undoManager.transact( function() {
 				node.insertData( offset, '\uFEFF' );
 
-				node = node.splitText( startOffset );
-				zero = node.splitText( offset - startOffset );
+				const newNode = node.splitText( startOffset );
+				zero = newNode.splitText( offset - startOffset );
 
-				node.deleteData( 0, pattern.delimiter.length );
-				node.deleteData( node.data.length - pattern.delimiter.length, pattern.delimiter.length );
+				newNode.deleteData( 0, pattern.delimiter.length );
+				newNode.deleteData( newNode.data.length - pattern.delimiter.length, pattern.delimiter.length );
 
-				editor.formatter.apply( pattern.format, {}, node );
+				editor.formatter.apply( pattern.format, {}, newNode );
 
 				editor.selection.setCursorLocation( zero, 1 );
 			} );
@@ -158,13 +155,13 @@ export default function( editor ) {
 				canUndo = 'space';
 
 				editor.once( 'selectionchange', function() {
-					var offset;
+					let offset2;
 
 					if ( zero ) {
-						offset = zero.data.indexOf( '\uFEFF' );
+						offset2 = zero.data.indexOf( '\uFEFF' );
 
-						if ( offset !== -1 ) {
-							zero.deleteData( offset, offset + 1 );
+						if ( offset2 !== -1 ) {
+							zero.deleteData( offset2, offset2 + 1 );
 						}
 					}
 				} );
@@ -188,10 +185,12 @@ export default function( editor ) {
 
 		const firstText = content[ 0 ];
 
-		const { result, pattern } = spacePatterns.reduce( ( acc, pattern ) => {
-			const result = pattern.regExp.exec( firstText );
-			return result ? { result, pattern } : acc;
-		}, null );
+		const { result, pattern } = spacePatterns.reduce( ( acc, item ) => {
+			return acc.result ? acc : {
+				result: item.regExp.exec( firstText ),
+				pattern: item,
+			};
+		}, {} );
 
 		if ( ! result ) {
 			return;
@@ -228,7 +227,7 @@ export default function( editor ) {
 			return;
 		}
 
-		const pattern = find( enterPatterns, ( { regExp } ) => regExp.test( content[ 0 ] ) )
+		const pattern = find( enterPatterns, ( { regExp } ) => regExp.test( content[ 0 ] ) );
 
 		if ( ! pattern ) {
 			return;
