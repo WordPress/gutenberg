@@ -63,10 +63,7 @@ registerBlockType( 'core/button', {
 						<input
 							className="editable-format-toolbar__link-input"
 							type="url"
-							aria-label={
-								/* translators: accessibility text */
-								__( 'URL' )
-							}
+							aria-label={ __( 'URL' ) }
 							required
 							value={ url }
 							onChange={ ( event ) => setAttributes( { url: event.target.value } ) }

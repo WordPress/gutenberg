@@ -155,10 +155,7 @@ class FormatToolbar extends Component {
 							autoFocus
 							className="editable-format-toolbar__link-input"
 							type="url"
-							aria-label={
-								/* translators: accessibility text */
-								__( 'URL' )
-							}
+							aria-label={ __( 'URL' ) }
 							required
 							value={ this.state.linkValue }
 							onChange={ this.updateLinkValue }
