@@ -21,6 +21,13 @@ class Test_WP_Widget_Custom_HTML extends WP_UnitTestCase {
 	protected $widget_custom_html_content_args;
 
 	/**
+	 * Args passed to the widget_text filter.
+	 *
+	 * @var array
+	 */
+	protected $widget_text_args;
+
+	/**
 	 * Test constructor.
 	 *
 	 * @covers WP_Widget_Custom_HTML::__constructor
@@ -52,22 +59,26 @@ class Test_WP_Widget_Custom_HTML extends WP_UnitTestCase {
 			'content' => $content,
 		);
 
-		$this->assertEquals( 10, has_filter( 'widget_custom_html_content', 'balanceTags' ) );
-
 		update_option( 'use_balanceTags', 0 );
 		add_filter( 'widget_custom_html_content', array( $this, 'filter_widget_custom_html_content' ), 5, 3 );
+		add_filter( 'widget_text', array( $this, 'filter_widget_text' ), 10, 3 );
 		ob_start();
 		$this->widget_custom_html_content_args = null;
+		$this->widget_text_args = null;
 		$widget->widget( $args, $instance );
 		$output = ob_get_clean();
 		$this->assertNotEmpty( $this->widget_custom_html_content_args );
-		$this->assertContains( '[filter:widget_custom_html_content]', $output );
+		$this->assertNotEmpty( $this->widget_text_args );
+		$this->assertContains( '[filter:widget_text][filter:widget_custom_html_content]', $output );
 		$this->assertNotContains( '<p>', $output );
 		$this->assertNotContains( '<br>', $output );
 		$this->assertNotContains( '</u>', $output );
+		$this->assertEquals( $instance, $this->widget_text_args[1] );
 		$this->assertEquals( $instance, $this->widget_custom_html_content_args[1] );
+		$this->assertSame( $widget, $this->widget_text_args[2] );
 		$this->assertSame( $widget, $this->widget_custom_html_content_args[2] );
 		remove_filter( 'widget_custom_html_content', array( $this, 'filter_widget_custom_html_content' ), 5, 3 );
+		remove_filter( 'widget_text', array( $this, 'filter_widget_text' ), 10 );
 
 		update_option( 'use_balanceTags', 1 );
 		ob_start();
@@ -77,7 +88,21 @@ class Test_WP_Widget_Custom_HTML extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Filters the content of the Custom HTML widget.
+	 * Filters the content of the Custom HTML widget using the legacy widget_text filter.
+	 *
+	 * @param string                $text     The widget content.
+	 * @param array                 $instance Array of settings for the current widget.
+	 * @param WP_Widget_Custom_HTML $widget   Current widget instance.
+	 * @return string Widget content.
+	 */
+	function filter_widget_text( $text, $instance, $widget ) {
+		$this->widget_text_args = array( $text, $instance, $widget );
+		$text .= '[filter:widget_text]';
+		return $text;
+	}
+
+	/**
+	 * Filters the content of the Custom HTML widget using the dedicated widget_custom_html_content filter.
 	 *
 	 * @param string                $widget_content The widget content.
 	 * @param array                 $instance       Array of settings for the current widget.
@@ -85,8 +110,7 @@ class Test_WP_Widget_Custom_HTML extends WP_UnitTestCase {
 	 * @return string Widget content.
 	 */
 	function filter_widget_custom_html_content( $widget_content, $instance, $widget ) {
-		$this->widget_custom_html_content_args = func_get_args();
-
+		$this->widget_custom_html_content_args = array( $widget_content, $instance, $widget );
 		$widget_content .= '[filter:widget_custom_html_content]';
 		return $widget_content;
 	}
