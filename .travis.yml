@@ -1,4 +1,5 @@
 sudo: false
+dist: trusty
 language: php
 cache:
   apt: true
@@ -22,7 +23,9 @@ matrix:
   - php: 5.5
   - php: 5.4
   - php: 5.3
+    dist: precise
   - php: 5.2
+    dist: precise
   - php: nightly
   allow_failures:
   - php: nightly
