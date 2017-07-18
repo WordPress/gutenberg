@@ -20,7 +20,7 @@ function ExternalLink( { href, children, className, rel = '', ...additionalProps
 		...rel.split( ' ' ),
 		'external',
 		'noreferrer',
-		'noopener'
+		'noopener',
 	] ) ).join( ' ' );
 	const classes = classnames( 'new-window-icon', className );
 	return (
