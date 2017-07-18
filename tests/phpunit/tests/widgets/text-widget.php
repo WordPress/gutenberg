@@ -266,6 +266,18 @@ class Test_WP_Widget_Text extends WP_UnitTestCase {
 		$this->assertFalse( $widget->is_legacy_instance( $instance ), 'Not legacy when text is empty.' );
 
 		$instance = array_merge( $base_instance, array(
+			'text' => "\nOne line",
+			'filter' => false,
+		) );
+		$this->assertFalse( $widget->is_legacy_instance( $instance ), 'Not legacy when there is leading whitespace.' );
+
+		$instance = array_merge( $base_instance, array(
+			'text' => "\nOne line\n\n",
+			'filter' => false,
+		) );
+		$this->assertFalse( $widget->is_legacy_instance( $instance ), 'Not legacy when there is trailing whitespace.' );
+
+		$instance = array_merge( $base_instance, array(
 			'text' => "One\nTwo",
 			'filter' => false,
 		) );
@@ -294,12 +306,6 @@ class Test_WP_Widget_Text extends WP_UnitTestCase {
 			'filter' => true,
 		) );
 		$this->assertTrue( $widget->is_legacy_instance( $instance ), 'Legacy when HTML comment is present.' );
-
-		$instance = array_merge( $base_instance, array(
-			'text' => 'Here is a [gallery]',
-			'filter' => true,
-		) );
-		$this->assertTrue( $widget->is_legacy_instance( $instance ), 'Legacy mode when a shortcode is present.' );
 
 		// Check text examples that will not migrate to TinyMCE.
 		$legacy_text_examples = array(
