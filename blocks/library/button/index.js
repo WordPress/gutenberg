@@ -63,12 +63,13 @@ registerBlockType( 'core/button', {
 						<input
 							className="editable-format-toolbar__link-input"
 							type="url"
+							aria-label={ __( 'URL' ) }
 							required
 							value={ url }
 							onChange={ ( event ) => setAttributes( { url: event.target.value } ) }
 							placeholder={ __( 'Paste URL or type' ) }
 						/>
-						<IconButton icon="editor-break" type="submit" />
+						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
 					</form>
 				}
 			</span>,

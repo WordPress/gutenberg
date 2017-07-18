@@ -155,13 +155,14 @@ class FormatToolbar extends Component {
 							autoFocus
 							className="editable-format-toolbar__link-input"
 							type="url"
+							aria-label={ __( 'URL' ) }
 							required
 							value={ this.state.linkValue }
 							onChange={ this.updateLinkValue }
 							placeholder={ __( 'Paste URL or type' ) }
 						/>
-						<IconButton icon="editor-break" type="submit" />
-						<IconButton icon="editor-unlink" onClick={ this.dropLink } />
+						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
+						<IconButton icon="editor-unlink" label={ __( 'Remove link' ) } onClick={ this.dropLink } />
 					</form>
 				}
 
@@ -174,8 +175,8 @@ class FormatToolbar extends Component {
 						>
 							{ this.state.linkValue && decodeURI( this.state.linkValue ) }
 						</a>
-						<IconButton icon="edit" onClick={ this.editLink } />
-						<IconButton icon="editor-unlink" onClick={ this.dropLink } />
+						<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ this.editLink } />
+						<IconButton icon="editor-unlink" label={ __( 'Remove link' ) } onClick={ this.dropLink } />
 					</div>
 				}
 			</div>
