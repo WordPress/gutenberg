@@ -81,6 +81,18 @@ registerBlockType( 'core/heading', {
 					nodeName: prop( 'h1,h2,h3,h4,h5,h6', 'nodeName' ),
 				},
 			},
+			{
+				type: 'pattern',
+				regExp: /^(#{2,6})\s/,
+				transform: ( { content, match } ) => {
+					const level = match[ 1 ].length;
+
+					return createBlock( 'core/heading', {
+						nodeName: `H${ level }`,
+						content,
+					} );
+				},
+			},
 		],
 		to: [
 			{

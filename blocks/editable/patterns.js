@@ -4,7 +4,7 @@
  * External dependencies
  */
 import tinymce from 'tinymce';
-import { find, get, escapeRegExp, trimStart, partition } from 'lodash';
+import { find, get, escapeRegExp, trimStart, partition, drop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -25,8 +25,8 @@ export default function( editor ) {
 	const getContent = this.getContent.bind( this );
 	const { onReplace } = this.props;
 
-	var VK = tinymce.util.VK;
-	var settings = editor.settings.wptextpattern || {};
+	const VK = tinymce.util.VK;
+	const settings = editor.settings.wptextpattern || {};
 
 	const patterns = getBlockTypes().reduce( ( acc, blockType ) => {
 		const transformsFrom = get( blockType, 'transforms.from', [] );
@@ -34,15 +34,16 @@ export default function( editor ) {
 		return [ ...acc, ...transforms ];
 	}, [] );
 
-	const [ enterPatterns, spacePatterns ] = partition( patterns, ( { regExp } ) =>
-		regExp.source.endsWith( '$' )
+	const [ enterPatterns, spacePatterns ] = partition(
+		patterns,
+		( { regExp } ) => regExp.source.endsWith( '$' ),
 	);
 
-	var inlinePatterns = settings.inline || [
+	const inlinePatterns = settings.inline || [
 		{ delimiter: '`', format: 'code' }
 	];
 
-	var canUndo;
+	let canUndo;
 
 	editor.on( 'selectionchange', function() {
 		canUndo = null;
@@ -171,77 +172,50 @@ export default function( editor ) {
 		}
 	}
 
-	function firstTextNode( node ) {
-		var parent = editor.dom.getParent( node, 'p' ),
-			child;
-
-		if ( ! parent ) {
-			return;
-		}
-
-		while ( child = parent.firstChild ) {
-			if ( child.nodeType !== 3 ) {
-				parent = child;
-			} else {
-				break;
-			}
-		}
-
-		if ( ! child ) {
-			return;
-		}
-
-		if ( ! child.data ) {
-			if ( child.nextSibling && child.nextSibling.nodeType === 3 ) {
-				child = child.nextSibling;
-			} else {
-				child = null;
-			}
-		}
-
-		return child;
-	}
-
 	function space() {
 		if ( ! onReplace ) {
 			return;
 		}
 
-		var rng = editor.selection.getRng(),
-			node = rng.startContainer,
-			parent,
-			text;
+		// Merge text nodes.
+		editor.getBody().normalize();
 
-		if ( ! node || firstTextNode( node ) !== node ) {
+		const content = getContent();
+
+		if ( ! content.length ) {
 			return;
 		}
 
-		parent = node.parentNode;
-		text = node.data;
+		const firstText = content[ 0 ];
 
-		tinymce.each( spacePatterns, function( pattern ) {
-			var match = text.match( pattern.regExp );
+		const { result, pattern } = spacePatterns.reduce( ( acc, pattern ) => {
+			const result = pattern.regExp.exec( firstText );
+			return result ? { result, pattern } : acc;
+		}, null );
 
-			if ( ! match || rng.startOffset !== match[0].length ) {
-				return;
-			}
+		if ( ! result ) {
+			return;
+		}
 
-			node.deleteData( 0, match[0].length );
+		const range = editor.selection.getRng();
+		const matchLength = result[ 0 ].length;
+		const remainingText = firstText.slice( matchLength );
 
-			if ( ! parent.innerHTML ) {
-				parent.appendChild( document.createElement( 'br' ) );
-			}
+		// The caret position must be at the end of the match.
+		if ( range.startOffset !== matchLength ) {
+			return;
+		}
 
-			const block = pattern.transform( { content: getContent() } );
-
-			onReplace( [ block ] );
-
-			return false;
+		const block = pattern.transform( {
+			content: [ remainingText, ...drop( content ) ],
+			match: result,
 		} );
+
+		onReplace( [ block ] );
 	}
 
 	function enter() {
-		if ( ! onReplace || ! inline ) {
+		if ( ! onReplace ) {
 			return;
 		}
 
