@@ -1,9 +1,13 @@
-# HEAD
+# 12.0.0
 
 -   Changed: `stylelint-config-wordpress` now extends [`stylelint-config-recommended`](https://github.com/stylelint/stylelint-config-recommended), which turns on the `at-rule-no-unknown`, `block-no-empty`, `comment-no-empty`, `declaration-block-no-ignored-properties`, `declaration-block-no-redundant-longhand-properties`, `font-family-no-duplicate-names`, `media-feature-name-no-unknown`, `no-empty-source` rule. These rules are part of stylelint's [possible errors](https://github.com/stylelint/stylelint/blob/master/docs/user-guide/rules.md#possible-errors) rules.
 -   Removed: `stylelint-scss < 1.5.1` compatibility.
+-   Removed: Removed style guide docs.
 -   Removed: `at-rule-no-unknown` custom `ignoreAtRules` options in `stylelint-config-wordpress/scss` shared config.
 -   Added: `scss/at-rule-no-unknown` rule in `stylelint-config-wordpress/scss` shared config.
+-   Added: NodeJS 8.x.x support.
+-   Added: npm 5.x.x support.
+-   Added: Jest snapshots to help detect and prevent regressions.
 
 # 11.0.0
 
