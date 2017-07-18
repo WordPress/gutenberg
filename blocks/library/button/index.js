@@ -36,7 +36,7 @@ registerBlockType( 'core/button', {
 		}
 	},
 
-	edit: withInstanceId( ( {attributes, setAttributes, focus, setFocus, className, instanceId } ) => {
+	edit: withInstanceId( ( { attributes, setAttributes, focus, setFocus, className, instanceId } ) => {
 		const { text, url, title, align } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		const linkInputId = `editable-format-toolbar__button-link-input-${ instanceId }`;
