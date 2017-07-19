@@ -303,7 +303,6 @@ function createRemoveAllByType( type ) {
 export removeFilter = createRemoveHookByType( 'filters' );
 export removeAction = createRemoveHookByType( 'actions' );
 
-
 // Do action/apply filter functions.
 export doAction =     createRunHookByType( 'actions', runDoAction );
 export applyFilters = createRunHookByType( 'filters', runApplyFilters );
@@ -312,9 +311,11 @@ export applyFilters = createRunHookByType( 'filters', runApplyFilters );
 export addAction = createAddHookByType( 'actions' );
 export addFilter = createAddHookByType( 'filters' );
 
-// Doing functions.
-export doingAction = createDoingHookByType( 'actions' ), /* True for actions until;next action fired. */
-export doingFilter = createDoingHookByType( 'filters' ), /* True for filters while;filter is being applied. */
+// Doing action: true until next action fired.
+export doingAction = createDoingHookByType( 'actions' ),
+
+// Doing filter: true while filter is being applied.
+export doingFilter = createDoingHookByType( 'filters' ),
 
 // Did functions.
 export didAction = createDidHookByType( 'actions' );
