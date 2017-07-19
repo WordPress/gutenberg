@@ -225,13 +225,24 @@ export const editor = combineUndoableReducers( {
 
 		return state;
 	},
+}, { resetTypes: [ 'RESET_BLOCKS' ] } );
 
+/**
+ * Reducer loading and saving user specific data, such as preferences and
+ * block usage.
+ *
+ * @param  {Object} state  Current state
+ * @param  {Object} action Dispatched action
+ * @return {Object}        Updated state
+ */
+export const userData = combineReducers( {
 	recentlyUsedBlocks( state = [], action ) {
 		const maxRecent = 8;
 		switch ( action.type ) {
-			case 'SETUP_NEW_POST':
+			case 'LOAD_USER_DATA':
 				// This is where we initially populate the recently used blocks,
-				// for now this inserts blocks from the common category.
+				// for now this inserts blocks from the common category, but will
+				// load this from an API in the future.
 				return getBlockTypes()
 					.filter( ( blockType ) => 'common' === blockType.category )
 					.slice( 0, maxRecent )
@@ -247,7 +258,7 @@ export const editor = combineUndoableReducers( {
 		}
 		return state;
 	},
-}, { resetTypes: [ 'RESET_BLOCKS' ] } );
+} );
 
 /**
  * Reducer returning the last-known state of the current post, in the format
@@ -528,6 +539,7 @@ export function createReduxStore() {
 		panel,
 		saving,
 		notices,
+		userData,
 	} ) );
 
 	const enhancers = [ applyMiddleware( refx( effects ) ) ];

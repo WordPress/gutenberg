@@ -80,6 +80,10 @@ function preparePostState( store, post ) {
 export function createEditorInstance( id, post ) {
 	const store = createReduxStore();
 
+	store.dispatch( {
+		type: 'LOAD_USER_DATA',
+	} );
+
 	preparePostState( store, post );
 
 	render(
