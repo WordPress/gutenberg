@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from 'i18n';
-import { Toolbar, Placeholder } from 'components';
+import { Button, Toolbar, Placeholder } from 'components';
 import { pick } from 'lodash';
 
 /**
@@ -11,7 +11,6 @@ import { pick } from 'lodash';
 import './style.scss';
 import './block.scss';
 import { registerBlockType } from '../../api';
-import MediaUploadButton from '../../media-upload-button';
 import InspectorControls from '../../inspector-controls';
 import RangeControl from '../../inspector-controls/range-control';
 import ToggleControl from '../../inspector-controls/toggle-control';
@@ -22,42 +21,54 @@ import BlockDescription from '../../block-description';
 
 const MAX_COLUMNS = 8;
 
-const editMediaLibrary = ( attributes, setAttributes ) => {
-	const frameConfig = {
-		frame: 'post',
-		title: __( 'Update Gallery media' ),
-		button: {
-			text: __( 'Select' ),
-		},
-		multiple: true,
-		state: 'gallery-edit',
-		selection: new wp.media.model.Selection( attributes.images, { multiple: true } ),
-	};
-
-	const editFrame = wp.media( frameConfig );
-
-	// the frameConfig settings dont carry to other state modals
-	// so requires setting this attribute directory to not show settings
-	editFrame.state( 'gallery-edit' ).attributes.displaySettings = false;
-
-	function updateFn() {
-		setAttributes( {
-			images: this.frame.state().attributes.library.models.map( ( a ) => {
-				return a.attributes;
-			} ),
-		} );
-	}
-
-	editFrame.on( 'insert', updateFn );
-	editFrame.state( 'gallery-edit' ).on( 'update', updateFn );
-	editFrame.open( 'gutenberg-gallery' );
-};
-
 // the media library image object contains numerous attributes
 // we only need this set to display the image in the library
 const slimImageObjects = ( imgs ) => {
 	const attrSet = [ 'sizes', 'mime', 'type', 'subtype', 'id', 'url', 'alt' ];
 	return imgs.map( ( img ) => pick( img, attrSet ) );
+};
+
+const createFrameConfig = {
+	frame: 'post',
+	title: __( 'Create Gallery' ),
+	button: {
+		text: __( 'Select' ),
+	},
+	multiple: true,
+	state: 'gallery',
+	toolbar: 'main-gallery',
+	menu: 'gallery',
+};
+
+const editFrameConfig = {
+	frame: 'post',
+	title: __( 'Update Gallery media' ),
+	button: {
+		text: __( 'Select' ),
+	},
+	multiple: true,
+	state: 'gallery-edit',
+};
+
+const openMediaLibrary = ( frameConfig, attributes, setAttributes ) => {
+	frameConfig.selection = new wp.media.model.Selection( attributes.images, { multiple: true } );
+	const mediaFrame = wp.media( frameConfig );
+
+	// the frameConfig settings dont carry to other state modals
+	// so requires setting this attribute directory to not show settings
+	mediaFrame.state( 'gallery' ).attributes.displaySettings = false;
+
+	function updateFn() {
+		setAttributes( {
+			images: slimImageObjects( this.frame.state().attributes.library.models.map( ( a ) => {
+				return a.attributes;
+			} ) ),
+		} );
+	}
+
+	mediaFrame.on( 'insert', updateFn );
+	mediaFrame.state( 'gallery-edit' ).on( 'update', updateFn );
+	mediaFrame.open( 'gutenberg-gallery' );
 };
 
 function defaultColumnsNumber( attributes ) {
@@ -96,7 +107,7 @@ registerBlockType( 'core/gallery', {
 						<Toolbar controls={ [ {
 							icon: 'edit',
 							title: __( 'Edit Gallery' ),
-							onClick: () => editMediaLibrary( attributes, setAttributes ),
+							onClick: () => openMediaLibrary( editFrameConfig, attributes, setAttributes ),
 						} ] } />
 					) }
 				</BlockControls>
@@ -104,9 +115,6 @@ registerBlockType( 'core/gallery', {
 		);
 
 		if ( images.length === 0 ) {
-			const setMediaUrl = ( imgs ) => setAttributes( { images: slimImageObjects( imgs ) } );
-			const uploadButtonProps = { isLarge: true };
-
 			return [
 				controls,
 				<Placeholder
@@ -115,14 +123,12 @@ registerBlockType( 'core/gallery', {
 					icon="format-gallery"
 					label={ __( 'Gallery' ) }
 					className={ className }>
-					<MediaUploadButton
-						buttonProps={ uploadButtonProps }
-						onSelect={ setMediaUrl }
-						type="image"
-						multiple="true"
+					<Button
+						isLarge="true"
+						onClick={ () => openMediaLibrary( createFrameConfig, attributes, setAttributes ) }
 					>
 						{ __( 'Insert from Media Library' ) }
-					</MediaUploadButton>
+					</Button>
 				</Placeholder>,
 			];
 		}
