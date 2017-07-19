@@ -134,6 +134,25 @@ export function queueAutosave() {
 }
 
 /**
+ * Returns an action object used in signalling that undo history should
+ * restore last popped state.
+ *
+ * @return {Object} Action object
+ */
+export function redo() {
+	return { type: 'REDO' };
+}
+
+/**
+ * Returns an action object used in signalling that undo history should pop.
+ *
+ * @return {Object} Action object
+ */
+export function undo() {
+	return { type: 'UNDO' };
+}
+
+/**
  * Returns an action object used in signalling that the blocks
  * corresponding to the specified UID set are to be removed.
  *
