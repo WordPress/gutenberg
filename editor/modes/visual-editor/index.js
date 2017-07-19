@@ -19,7 +19,6 @@ import VisualEditorBlockList from './block-list';
 import PostTitle from '../../post-title';
 import { getBlockUids } from '../../selectors';
 import { clearSelectedBlock, multiSelect } from '../../actions';
-import { isEditableElement } from '../../utils/dom';
 
 class VisualEditor extends Component {
 	constructor() {
@@ -53,10 +52,6 @@ class VisualEditor extends Component {
 	}
 
 	selectAll( event ) {
-		if ( isEditableElement( document.activeElement ) ) {
-			return;
-		}
-
 		const { uids } = this.props;
 		event.preventDefault();
 		this.props.multiSelect( first( uids ), last( uids ) );
