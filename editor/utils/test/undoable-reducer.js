@@ -49,6 +49,21 @@ describe( 'undoableReducer', () => {
 			} );
 		} );
 
+		it( 'should not perform undo on empty past', () => {
+			const reducer = undoable( counter );
+
+			let state;
+			state = reducer( undefined, {} );
+			state = reducer( state, { type: 'INCREMENT' } );
+			state = reducer( state, { type: 'UNDO' } );
+
+			expect( state ).toEqual( {
+				past: [],
+				present: 0,
+				future: [ 1 ],
+			} );
+		} );
+
 		it( 'should perform redo', () => {
 			const reducer = undoable( counter );
 
@@ -56,6 +71,21 @@ describe( 'undoableReducer', () => {
 			state = reducer( undefined, {} );
 			state = reducer( state, { type: 'INCREMENT' } );
 			state = reducer( state, { type: 'UNDO' } );
+			state = reducer( state, { type: 'UNDO' } );
+
+			expect( state ).toEqual( {
+				past: [],
+				present: 0,
+				future: [ 1 ],
+			} );
+		} );
+
+		it( 'should not perform redo on empty future', () => {
+			const reducer = undoable( counter );
+
+			let state;
+			state = reducer( undefined, {} );
+			state = reducer( state, { type: 'INCREMENT' } );
 			state = reducer( state, { type: 'REDO' } );
 
 			expect( state ).toEqual( {
