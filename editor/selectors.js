@@ -247,6 +247,8 @@ export function getEditedPostTitle( state ) {
 		: state.editor.edits.title;
 }
 
+let originalDocumentTitle = null;
+
 /**
  * Gets the document title to be used.
  *
@@ -255,10 +257,14 @@ export function getEditedPostTitle( state ) {
  */
 export function getDocumentTitle( state ) {
 	let title = getEditedPostTitle( state );
-	if ( '' === title.trim() ) {
+	if ( null === originalDocumentTitle ) {
+		originalDocumentTitle = document.title || __( 'Gutenberg' );
+	}
+
+	if ( ! title || '' === title.trim() ) {
 		title = isCleanNewPost( state ) ? __( 'New post' ) : __( '(Untitled)' );
 	}
-	return title;
+	return title + ' | ' + originalDocumentTitle;
 }
 
 /**

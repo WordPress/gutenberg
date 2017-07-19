@@ -20,30 +20,9 @@ import {
 	getCurrentPostType,
 	getBlocks,
 	getPostEdits,
-	getDocumentTitle,
 } from './selectors';
 
-let originalDocumentTitle; // @todo Obtain document.title template from PHP export?
-function populateDocumentTitle( title ) {
-	if ( ! originalDocumentTitle ) {
-		originalDocumentTitle = document.title;
-	}
-	document.title = title + ' | ' + originalDocumentTitle;
-}
-
 export default {
-	RESET_POST( action, store ) {
-		setTimeout( () => { // Next-tick to ensure action has been applied to state in store .
-			populateDocumentTitle( getDocumentTitle( store.getState() ) );
-		} );
-	},
-	EDIT_POST( action, store ) {
-		if ( undefined !== action.edits.title ) {
-			setTimeout( () => {
-				populateDocumentTitle( getDocumentTitle( store.getState() ) );
-			} );
-		}
-	},
 	REQUEST_POST_UPDATE( action, store ) {
 		const { dispatch, getState } = store;
 		const state = getState();
