@@ -57,6 +57,7 @@ class VisualEditor extends Component {
 		if (
 			! isEditableElement( document.activeElement ) &&
 			( event.ctrlKey || event.metaKey ) &&
+			! event.shiftKey &&
 			event.keyCode === CHAR_A
 		) {
 			event.preventDefault();
