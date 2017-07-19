@@ -61,7 +61,7 @@ class Gutenberg_User_Preferences {
 	 *
 	 * @param      int              $user_id User ID.
 	 * @param      string           $preference_name Preference name.
-	 * @preference mixed            Preference value to store.
+	 * @param      mixed            Preference value to store.
 	 * @return     bool             If the store was successful.
 	 */
 	public static function set_preference( $user_id, $preference_name, $value ) {
