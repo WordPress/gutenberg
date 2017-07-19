@@ -153,7 +153,7 @@ export function getEditedPostAttribute( state, attributeName ) {
  * "private", "password", or "public".
  *
  * @param  {Object} state Global application state
- * @return {String}       Post visiblity
+ * @return {String}       Post visibility
  */
 export function getEditedPostVisibility( state ) {
 	const status = getEditedPostAttribute( state, 'status' );
@@ -171,7 +171,7 @@ export function getEditedPostVisibility( state ) {
  * Return true if the post being edited has already been published.
  *
  * @param  {Object}   state Global application state
- * @return {Boolearn}       Whether the post has been bublished
+ * @return {Boolean}        Whether the post has been published
  */
 export function isEditedPostPublished( state ) {
 	const post = getCurrentPost( state );
@@ -184,7 +184,7 @@ export function isEditedPostPublished( state ) {
  * Return true if the post being edited can be published
  *
  * @param  {Object}   state Global application state
- * @return {Boolearn}       Whether the post can been bublished
+ * @return {Boolean}        Whether the post can been published
  */
 export function isEditedPostPublishable( state ) {
 	const post = getCurrentPost( state );
@@ -211,7 +211,7 @@ export function isEditedPostSaveable( state ) {
  * unsaved status values.
  *
  * @param  {Object}   state Global application state
- * @return {Boolearn}       Whether the post has been bublished
+ * @return {Boolean}        Whether the post has been published
  */
 export function isEditedPostBeingScheduled( state ) {
 	const date = getEditedPostAttribute( state, 'date' );
@@ -382,7 +382,7 @@ export function getLastMultiSelectedBlockUid( state ) {
  * otherwise.
  *
  * @param  {Object}  state Global application state
- * @param  {Object}  uid   Block unique ID
+ * @param  {String}  uid   Block unique ID
  * @return {Boolean}       Whether block is first in mult-selection
  */
 export function isFirstMultiSelectedBlock( state, uid ) {
@@ -394,7 +394,7 @@ export function isFirstMultiSelectedBlock( state, uid ) {
  * false otherwise.
  *
  * @param  {Object} state Global application state
- * @param  {Object} uid   Block unique ID
+ * @param  {String} uid   Block unique ID
  * @return {Boolean}      Whether block is in multi-selection set
  */
 export function isBlockMultiSelected( state, uid ) {
@@ -457,7 +457,7 @@ export function getBlockIndex( state, uid ) {
  * first block of the post, or false otherwise.
  *
  * @param  {Object}  state Global application state
- * @param  {Object}  uid   Block unique ID
+ * @param  {String}  uid   Block unique ID
  * @return {Boolean}       Whether block is first in post
  */
 export function isFirstBlock( state, uid ) {
@@ -469,7 +469,7 @@ export function isFirstBlock( state, uid ) {
  * last block of the post, or false otherwise.
  *
  * @param  {Object}  state Global application state
- * @param  {Object}  uid   Block unique ID
+ * @param  {String}  uid   Block unique ID
  * @return {Boolean}       Whether block is last in post
  */
 export function isLastBlock( state, uid ) {
@@ -481,7 +481,7 @@ export function isLastBlock( state, uid ) {
  * specified unique ID.
  *
  * @param  {Object} state Global application state
- * @param  {Object} uid   Block unique ID
+ * @param  {String} uid   Block unique ID
  * @return {Object}       Block occurring before specified unique ID
  */
 export function getPreviousBlock( state, uid ) {
@@ -494,7 +494,7 @@ export function getPreviousBlock( state, uid ) {
  * specified unique ID.
  *
  * @param  {Object} state Global application state
- * @param  {Object} uid   Block unique ID
+ * @param  {String} uid   Block unique ID
  * @return {Object}       Block occurring after specified unique ID
  */
 export function getNextBlock( state, uid ) {
@@ -509,7 +509,7 @@ export function getNextBlock( state, uid ) {
  * specified unique ID is not the selected block.
  *
  * @param  {Object} state Global application state
- * @param  {Object} uid   Block unique ID
+ * @param  {String} uid   Block unique ID
  * @return {Boolean}      Whether block is selected and multi-selection exists
  */
 export function isBlockSelected( state, uid ) {
@@ -527,7 +527,7 @@ export function isBlockSelected( state, uid ) {
  * specified unique ID, or false otherwise.
  *
  * @param  {Object} state Global application state
- * @param  {Object} uid   Block unique ID
+ * @param  {String} uid   Block unique ID
  * @return {Boolean}      Whether block is hovered
  */
 export function isBlockHovered( state, uid ) {
@@ -540,7 +540,7 @@ export function isBlockHovered( state, uid ) {
  * to manage the content of this object, defaulting to an empty object.
  *
  * @param  {Object} state Global application state
- * @param  {Object} uid   Block unique ID
+ * @param  {String} uid   Block unique ID
  * @return {Object}       Block focus state
  */
 export function getBlockFocus( state, uid ) {
