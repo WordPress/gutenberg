@@ -315,7 +315,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getDocumentTitle( state ) ).toBe( 'The Title | ' + __( 'Gutenberg' ) );
+			expect( getDocumentTitle( state ) ).toBe( 'The Title' );
 		} );
 
 		it( 'should return current title for edited existing post', () => {
@@ -330,7 +330,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getDocumentTitle( state ) ).toBe( 'Modified Title | ' + __( 'Gutenberg' ) );
+			expect( getDocumentTitle( state ) ).toBe( 'Modified Title' );
 		} );
 
 		it( 'should return new post title when new post is clean', () => {
@@ -343,7 +343,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getDocumentTitle( state ) ).toBe( __( 'New post' ) + ' | ' + __( 'Gutenberg' ) );
+			expect( getDocumentTitle( state ) ).toBe( __( 'New post' ) );
 		} );
 
 		it( 'should return untitled title when new post is dirty', () => {
@@ -356,7 +356,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getDocumentTitle( state ) ).toBe( __( '(Untitled)' ) + ' | ' + __( 'Gutenberg' ) );
+			expect( getDocumentTitle( state ) ).toBe( __( '(Untitled)' ) );
 		} );
 
 		it( 'should return untitled title', () => {
@@ -370,7 +370,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getDocumentTitle( state ) ).toBe( __( '(Untitled)' ) + ' | ' + __( 'Gutenberg' ) );
+			expect( getDocumentTitle( state ) ).toBe( __( '(Untitled)' ) );
 		} );
 	} );
 
