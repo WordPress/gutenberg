@@ -9,7 +9,7 @@ import { first, last } from 'lodash';
  */
 import { __ } from 'i18n';
 import { Component, findDOMNode } from 'element';
-import { CHAR_A } from 'utils/keycodes';
+import { KeyboardShortcuts } from 'components';
 
 /**
  * Internal dependencies
@@ -27,7 +27,7 @@ class VisualEditor extends Component {
 		this.bindContainer = this.bindContainer.bind( this );
 		this.bindBlocksContainer = this.bindBlocksContainer.bind( this );
 		this.onClick = this.onClick.bind( this );
-		this.onKeyDown = this.onKeyDown.bind( this );
+		this.selectAll = this.selectAll.bind( this );
 	}
 
 	componentDidMount() {
@@ -52,16 +52,14 @@ class VisualEditor extends Component {
 		}
 	}
 
-	onKeyDown( event ) {
-		const { uids } = this.props;
-		if (
-			! isEditableElement( document.activeElement ) &&
-			( event.ctrlKey || event.metaKey ) &&
-			event.keyCode === CHAR_A
-		) {
-			event.preventDefault();
-			this.props.multiSelect( first( uids ), last( uids ) );
+	selectAll( event ) {
+		if ( isEditableElement( document.activeElement ) ) {
+			return;
 		}
+
+		const { uids } = this.props;
+		event.preventDefault();
+		this.props.multiSelect( first( uids ), last( uids ) );
 	}
 
 	render() {
@@ -77,6 +75,9 @@ class VisualEditor extends Component {
 				onKeyDown={ this.onKeyDown }
 				ref={ this.bindContainer }
 			>
+				<KeyboardShortcuts shortcuts={ {
+					'mod+a': this.selectAll,
+				} } />
 				<PostTitle />
 				<VisualEditorBlockList ref={ this.bindBlocksContainer } />
 			</div>
