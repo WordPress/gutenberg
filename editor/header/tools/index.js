@@ -13,6 +13,8 @@ import { IconButton } from 'components';
  * Internal dependencies
  */
 import './style.scss';
+import ModeSwitcher from '../mode-switcher';
+import SavedState from '../saved-state';
 import Inserter from '../../inserter';
 import PublishButton from './publish-button';
 import PreviewButton from './preview-button';
@@ -21,6 +23,9 @@ import { isEditorSidebarOpened, hasEditorUndo, hasEditorRedo } from '../../selec
 function Tools( { undo, redo, hasUndo, hasRedo, isSidebarOpened, toggleSidebar } ) {
 	return (
 		<div className="editor-tools">
+			<PublishButton />
+			<SavedState />
+			<PreviewButton />
 			<IconButton
 				className="editor-tools__undo"
 				icon="undo"
@@ -36,13 +41,12 @@ function Tools( { undo, redo, hasUndo, hasRedo, isSidebarOpened, toggleSidebar }
 			<Inserter position="bottom">
 				{ __( 'Insert' ) }
 			</Inserter>
-			<PreviewButton />
+			<ModeSwitcher />
 			<div className="editor-tools__tabs">
 				<IconButton icon="admin-generic" onClick={ toggleSidebar } isToggled={ isSidebarOpened }>
 					{ __( 'Settings' ) }
 				</IconButton>
 			</div>
-			<PublishButton />
 		</div>
 	);
 }

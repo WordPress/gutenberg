@@ -13,8 +13,6 @@ import { IconButton } from 'components';
  * Internal dependencies
  */
 import './style.scss';
-import ModeSwitcher from './mode-switcher';
-import SavedState from './saved-state';
 import Tools from './tools';
 import { getMultiSelectedBlockUids } from '../selectors';
 import { clearSelectedBlock } from '../actions';
@@ -51,8 +49,6 @@ function Header( { multiSelectedBlockUids, onRemove, onDeselect } ) {
 
 	return (
 		<header className="editor-header">
-			<ModeSwitcher />
-			<SavedState />
 			<Tools />
 		</header>
 	);
