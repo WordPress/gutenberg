@@ -111,6 +111,29 @@ export function mergeBlocks( blockA, blockB ) {
 }
 
 /**
+ * Returns an action object used in signalling that the post should autosave.
+ *
+ * @return {Object} Action object
+ */
+export function autosave() {
+	return {
+		type: 'AUTOSAVE',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the post should be queued
+ * for autosave after a delay.
+ *
+ * @return {Object} Action object
+ */
+export function queueAutosave() {
+	return {
+		type: 'QUEUE_AUTOSAVE',
+	};
+}
+
+/**
  * Returns an action object used in signalling that the blocks
  * corresponding to the specified UID set are to be removed.
  *

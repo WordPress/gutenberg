@@ -13,9 +13,14 @@ import { getBlockTypes, unregisterBlockType, registerBlockType, createBlock } fr
  */
 import { mergeBlocks, focusBlock, replaceBlocks } from '../actions';
 import effects from '../effects';
+import * as selectors from '../selectors';
+
+jest.mock( '../selectors' );
 
 describe( 'effects', () => {
 	const defaultBlockSettings = { save: noop };
+
+	beforeEach( () => jest.resetAllMocks() );
 
 	describe( '.MERGE_BLOCKS', () => {
 		const handler = effects.MERGE_BLOCKS;
@@ -143,6 +148,47 @@ describe( 'effects', () => {
 				name: 'core/test-block',
 				attributes: { content: 'chicken ribs' },
 			} ] ) );
+		} );
+	} );
+
+	describe( '.AUTOSAVE', () => {
+		const handler = effects.AUTOSAVE;
+		const store = { getState: () => {} };
+
+		it( 'should do nothing for unsaveable', () => {
+			selectors.isEditedPostSaveable.mockReturnValue( false );
+			selectors.isEditedPostDirty.mockReturnValue( true );
+			selectors.isCurrentPostPublished.mockReturnValue( false );
+
+			expect( handler( {}, store ) ).toBeUndefined();
+		} );
+
+		it( 'should do nothing for clean', () => {
+			selectors.isEditedPostSaveable.mockReturnValue( true );
+			selectors.isEditedPostDirty.mockReturnValue( false );
+			selectors.isCurrentPostPublished.mockReturnValue( false );
+
+			expect( handler( {}, store ) ).toBeUndefined();
+		} );
+
+		it( 'should return autosave action for saveable, dirty, published post', () => {
+			selectors.isEditedPostSaveable.mockReturnValue( true );
+			selectors.isEditedPostDirty.mockReturnValue( true );
+			selectors.isCurrentPostPublished.mockReturnValue( true );
+
+			expect( handler( {}, store ) ).toBeUndefined();
+			// TODO: Publish autosave
+			// expect( handler( {}, store ) ).toEqual( { } );
+		} );
+
+		it( 'should return update action for saveable, dirty draft', () => {
+			selectors.isEditedPostSaveable.mockReturnValue( true );
+			selectors.isEditedPostDirty.mockReturnValue( true );
+			selectors.isCurrentPostPublished.mockReturnValue( false );
+
+			expect( handler( {}, store ) ).toEqual( {
+				type: 'REQUEST_POST_UPDATE',
+			} );
 		} );
 	} );
 } );
