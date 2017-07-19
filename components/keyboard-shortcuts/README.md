@@ -36,6 +36,8 @@ class SelectAllDetection extends Component {
 }
 ```
 
+__Note:__ The value of each shortcut should be a consistent function reference, not an anonymous function. Otherwise, the callback will not be correctly unbound when the component unmounts.
+
 ## Props
 
 The component accepts the following props:
