@@ -71,102 +71,103 @@ export default function( editor ) {
 	}, true );
 
 	function inline() {
-		const rng = editor.selection.getRng();
-		const node = rng.startContainer;
-		const offset = rng.startOffset;
-		let startOffset;
-		let endOffset;
-		let pattern;
-		let zero;
+		const range = editor.selection.getRng();
+		const node = range.startContainer;
+		const carretOffset = range.startOffset;
 
 		// We need a non empty text node with an offset greater than zero.
-		if ( ! node || node.nodeType !== 3 || ! node.data.length || ! offset ) {
+		if ( ! node || node.nodeType !== 3 || ! node.data.length || ! carretOffset ) {
 			return;
 		}
 
-		const string = node.data.slice( 0, offset );
-		const lastChar = node.data.charAt( offset - 1 );
+		const textBeforeCaret = node.data.slice( 0, carretOffset );
+		const charBeforeCaret = node.data.charAt( carretOffset - 1 );
 
-		tinymce.each( inlinePatterns, function( p ) {
-			// Character before selection should be delimiter.
-			if ( lastChar !== p.delimiter.slice( -1 ) ) {
-				return;
+		const { start, pattern } = inlinePatterns.reduce( ( acc, item ) => {
+			if ( acc.result ) {
+				return acc;
 			}
 
-			const escDelimiter = escapeRegExp( p.delimiter );
-			const delimiterFirstChar = p.delimiter.charAt( 0 );
-			const regExp = new RegExp( '(.*)' + escDelimiter + '.+' + escDelimiter + '$' );
-			const match = string.match( regExp );
+			if ( charBeforeCaret !== item.delimiter.slice( -1 ) ) {
+				return acc;
+			}
+
+			const escapedDelimiter = escapeRegExp( item.delimiter );
+			const regExp = new RegExp( '(.*)' + escapedDelimiter + '.+' + escapedDelimiter + '$' );
+			const match = textBeforeCaret.match( regExp );
 
 			if ( ! match ) {
-				return;
+				return acc;
 			}
 
-			startOffset = match[ 1 ].length;
-			endOffset = offset - p.delimiter.length;
-
-			const before = string.charAt( startOffset - 1 );
-			const after = string.charAt( startOffset + p.delimiter.length );
+			const startOffset = match[ 1 ].length;
+			const endOffset = carretOffset - item.delimiter.length;
+			const before = textBeforeCaret.charAt( startOffset - 1 );
+			const after = textBeforeCaret.charAt( startOffset + item.delimiter.length );
+			const delimiterFirstChar = item.delimiter.charAt( 0 );
 
 			// test*test* => format applied
 			// test *test* => applied
 			// test* test* => not applied
 			if ( startOffset && /\S/.test( before ) ) {
 				if ( /\s/.test( after ) || before === delimiterFirstChar ) {
-					return;
+					return acc;
 				}
 			}
 
+			const contentRegEx = new RegExp( '^[\\s' + escapeRegExp( delimiterFirstChar ) + ']+$' );
+			const content = textBeforeCaret.slice( startOffset, endOffset );
+
 			// Do not replace when only whitespace and delimiter characters.
-			if ( ( new RegExp( '^[\\s' + escapeRegExp( delimiterFirstChar ) + ']+$' ) ).test( string.slice( startOffset, endOffset ) ) ) {
-				return;
+			if ( contentRegEx.test( content ) ) {
+				return acc;
 			}
 
-			pattern = p;
-
-			return false;
-		} );
+			return {
+				start: startOffset,
+				pattern: item,
+			};
+		}, {} );
 
 		if ( ! pattern ) {
 			return;
 		}
 
-		const format = editor.formatter.get( pattern.format );
+		const { delimiter, format } = pattern;
+		const formats = editor.formatter.get( format );
 
-		if ( format && format[ 0 ].inline ) {
-			editor.undoManager.add();
+		if ( ! formats || ! formats[ 0 ].inline ) {
+			return;
+		}
 
-			editor.undoManager.transact( function() {
-				node.insertData( offset, '\uFEFF' );
+		editor.undoManager.add();
+		editor.undoManager.transact( () => {
+			node.insertData( carretOffset, '\uFEFF' );
 
-				const newNode = node.splitText( startOffset );
-				zero = newNode.splitText( offset - startOffset );
+			const newNode = node.splitText( start );
+			const zero = newNode.splitText( carretOffset - start );
 
-				newNode.deleteData( 0, pattern.delimiter.length );
-				newNode.deleteData( newNode.data.length - pattern.delimiter.length, pattern.delimiter.length );
+			newNode.deleteData( 0, delimiter.length );
+			newNode.deleteData( newNode.data.length - delimiter.length, delimiter.length );
 
-				editor.formatter.apply( pattern.format, {}, newNode );
-
-				editor.selection.setCursorLocation( zero, 1 );
-			} );
+			editor.formatter.apply( format, {}, newNode );
+			editor.selection.setCursorLocation( zero, 1 );
 
 			// We need to wait for native events to be triggered.
-			setTimeout( function() {
+			setTimeout( () => {
 				canUndo = 'space';
 
-				editor.once( 'selectionchange', function() {
-					let offset2;
-
+				editor.once( 'selectionchange', () => {
 					if ( zero ) {
-						offset2 = zero.data.indexOf( '\uFEFF' );
+						const zeroOffset = zero.data.indexOf( '\uFEFF' );
 
-						if ( offset2 !== -1 ) {
-							zero.deleteData( offset2, offset2 + 1 );
+						if ( zeroOffset !== -1 ) {
+							zero.deleteData( zeroOffset, zeroOffset + 1 );
 						}
 					}
 				} );
 			} );
-		}
+		} );
 	}
 
 	function space() {
