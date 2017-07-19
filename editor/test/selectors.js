@@ -22,7 +22,7 @@ import {
 	getDocumentTitle,
 	getEditedPostExcerpt,
 	getEditedPostVisibility,
-	isEditedPostPublished,
+	isCurrentPostPublished,
 	isEditedPostPublishable,
 	isEditedPostSaveable,
 	isEditedPostBeingScheduled,
@@ -490,7 +490,7 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'isEditedPostPublished', () => {
+	describe( 'isCurrentPostPublished', () => {
 		it( 'should return true for public posts', () => {
 			const state = {
 				currentPost: {
@@ -498,7 +498,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditedPostPublished( state ) ).toBe( true );
+			expect( isCurrentPostPublished( state ) ).toBe( true );
 		} );
 
 		it( 'should return true for private posts', () => {
@@ -508,7 +508,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditedPostPublished( state ) ).toBe( true );
+			expect( isCurrentPostPublished( state ) ).toBe( true );
 		} );
 
 		it( 'should return false for draft posts', () => {
@@ -518,7 +518,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditedPostPublished( state ) ).toBe( false );
+			expect( isCurrentPostPublished( state ) ).toBe( false );
 		} );
 
 		it( 'should return true for old scheduled posts', () => {
@@ -529,7 +529,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditedPostPublished( state ) ).toBe( true );
+			expect( isCurrentPostPublished( state ) ).toBe( true );
 		} );
 	} );
 
