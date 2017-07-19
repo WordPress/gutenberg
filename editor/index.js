@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { bindActionCreators } from 'redux';
 import { Provider as ReduxProvider } from 'react-redux';
 import { Provider as SlotFillProvider } from 'react-slot-fill';
 import moment from 'moment-timezone';
@@ -9,7 +10,7 @@ import 'moment-timezone/moment-timezone-utils';
 /**
  * WordPress dependencies
  */
-import { parse } from 'blocks';
+import { EditableProvider, parse } from 'blocks';
 import { render } from 'element';
 import { settings } from 'date';
 
@@ -19,6 +20,7 @@ import { settings } from 'date';
 import './assets/stylesheets/main.scss';
 import Layout from './layout';
 import { createReduxStore } from './state';
+import { undo } from './actions';
 
 // Configure moment globally
 moment.locale( settings.l10n.locale );
@@ -86,7 +88,13 @@ export function createEditorInstance( id, post ) {
 	render(
 		<ReduxProvider store={ store }>
 			<SlotFillProvider>
-				<Layout />
+				<EditableProvider {
+					...bindActionCreators( {
+						onUndo: undo,
+					}, store.dispatch ) }
+				>
+					<Layout />
+				</EditableProvider>
 			</SlotFillProvider>
 		</ReduxProvider>,
 		document.getElementById( id )

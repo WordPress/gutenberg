@@ -18,5 +18,6 @@ export { default as BlockControls } from './block-controls';
 export { default as BlockDescription } from './block-description';
 export { default as BlockIcon } from './block-icon';
 export { default as Editable } from './editable';
+export { default as EditableProvider } from './editable/provider';
 export { default as InspectorControls } from './inspector-controls';
 export { default as MediaUploadButton } from './media-upload-button';
