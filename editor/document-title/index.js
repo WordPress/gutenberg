@@ -10,12 +10,27 @@ import { Component } from 'react';
 import { getDocumentTitle } from '../selectors';
 
 class DocumentTitle extends Component {
-	componentWillMount() {
+
+	constructor( props ) {
+		super( props );
 		this.originalDocumentTitle = document.title;
 	}
 
+	setDocumentTitle( title ) {
+		document.title = title + ' | ' + this.originalDocumentTitle;
+	}
+
+	componentDidMount() {
+		this.setDocumentTitle( this.props.title );
+	}
+
+	componentWillReceiveProps( nextProps ) {
+		if ( nextProps.title !== this.props.title ) {
+			this.setDocumentTitle( nextProps.title );
+		}
+	}
+
 	render() {
-		document.title = this.props.title + ' | ' + this.originalDocumentTitle;
 		return null;
 	}
 
