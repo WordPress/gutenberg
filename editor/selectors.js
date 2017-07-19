@@ -242,9 +242,11 @@ export function isEditedPostBeingScheduled( state ) {
  * @return {String}       Raw post title
  */
 export function getEditedPostTitle( state ) {
-	return get( state.editor, 'edits.title' ) === undefined
-		? get( state.currentPost, 'title.raw' )
-		: state.editor.edits.title;
+	const editedTitle = get( state.editor, 'edits.title' );
+	if ( editedTitle !== undefined ) {
+		return editedTitle;
+	}
+	return get( state.currentPost, 'title.raw' );
 }
 
 /**

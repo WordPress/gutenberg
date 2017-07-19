@@ -603,22 +603,22 @@ describe( 'state', () => {
 
 	describe( 'currentPost()', () => {
 		it( 'should reset a post object', () => {
-			const original = deepFreeze( { title: 'unmodified' } );
+			const original = deepFreeze( { title: { raw: 'unmodified' } } );
 
 			const state = currentPost( original, {
 				type: 'RESET_POST',
 				post: {
-					title: 'new post',
+					title: { raw: 'new post' },
 				},
 			} );
 
 			expect( state ).toEqual( {
-				title: 'new post',
+				title: { raw: 'new post' },
 			} );
 		} );
 
 		it( 'should update the post object with UPDATE_POST', () => {
-			const original = deepFreeze( { title: 'unmodified', status: 'publish' } );
+			const original = deepFreeze( { title: { raw: 'unmodified' }, status: 'publish' } );
 
 			const state = currentPost( original, {
 				type: 'UPDATE_POST',
@@ -628,7 +628,7 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( {
-				title: 'updated post object from server',
+				title: { raw: 'updated post object from server' },
 				status: 'publish',
 			} );
 		} );
