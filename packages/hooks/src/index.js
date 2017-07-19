@@ -67,10 +67,12 @@ function createAddHookByType( type ) {
 /**
  * Returns a function which, when invoked, will remove a specified hook.
  *
- * @param  {string}   type Type for which hooks are to be removed
- * @return {Function}      Hook remover
+ * @param  {string}   type      Type for which hooks are to be removed.
+ * @param  {bool}     removeAll Whether to always remove all hooked callbacks.
+ *
+ * @return {Function}           Hook remover.
  */
-function createRemoveHookByType( type ) {
+function createRemoveHookByType( type, removeAll ) {
 	/**
 	 * Removes the specified hook by resetting its value.
 	 *
@@ -86,7 +88,7 @@ function createRemoveHookByType( type ) {
 			return;
 		}
 
-		if ( callback ) {
+		if ( callback && ! removeAll ) {
 			// Try to find specified callback to remove
 			handlers = HOOKS[ type ][ hook ];
 			for ( i = handlers.length - 1; i >= 0; i-- ) {
@@ -154,7 +156,6 @@ function runDoAction( action, args ) {
 		handlers[ i ].callback.apply( null, args );
 		HOOKS.actions[ action ].runs = HOOKS.actions[ action ].runs ? HOOKS.actions[ action ].runs + 1 : 1;
 	}
-
 }
 
 /**
@@ -292,12 +293,10 @@ function createHasHookByType( type ) {
 }
 
 /**
- * Remove all the actions registered to a hook,
+ * Remove all the actions registered to a hook.
  */
 function createRemoveAllByType( type ) {
-	return function( action, type ) {
-
-	};
+	return createRemoveHookByType( type, true );
 }
 
 // Remove functions.
