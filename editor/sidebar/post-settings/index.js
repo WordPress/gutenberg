@@ -14,6 +14,7 @@ import FeaturedImage from '../featured-image';
 import DiscussionPanel from '../discussion-panel';
 import LastRevision from '../last-revision';
 import TableOfContents from '../table-of-contents';
+import PageAttributes from '../page-attributes';
 
 const panel = (
 	<Panel>
@@ -23,6 +24,7 @@ const panel = (
 		<FeaturedImage />
 		<PostExcerpt />
 		<DiscussionPanel />
+		<PageAttributes />
 		<TableOfContents />
 	</Panel>
 );
