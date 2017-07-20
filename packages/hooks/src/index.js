@@ -245,7 +245,7 @@ function createCurrentHook( hooksArray ) {
  * @param  {string} type   Type of hooks to check.
  * @param {string}  action The name of the action to check for, if omitted will check for any action being performed.
  *
- * @return {[type]}      [description]
+ * @return {bool}          Whether the hook is being executed.
  */
 function createDoingHook( hooksArray ) {
 	return function( action ) {
@@ -268,7 +268,7 @@ function createDoingHook( hooksArray ) {
  * @param {string} hooksArray Hooks array of hooks to check.
  * @param {string} action     The action to check.
  *
- * @return {[type]}      [description]
+ * @return {number}           The number of times the hook has run.
  */
 function createDidHook( hooksArray ) {
 	return function( action ) {
