@@ -4,7 +4,6 @@ import createRemoveHook from './createRemoveHook';
 import createRemoveAllHook from './createRemoveAllHook';
 import createHasHook from './createHasHook';
 import createRunHook from './createRunHook';
-import createCurrentHook from './createCurrentHook';
 import createDoingHook from './createDoingHook';
 import createDidHook from './createDidHook';
 
@@ -29,7 +28,7 @@ export const doAction     = createRunHook( HOOKS.actions );
 export const applyFilters = createRunHook( HOOKS.filters, true );
 
 // Current action/filter functions.
-export const currentFilter = createCurrentHook( HOOKS.filters );
+export const currentFilter = () => HOOKS.filters.current || null;
 
 // Doing action/filter: true while a hook is being run.
 export const doingAction = createDoingHook( HOOKS.actions );
