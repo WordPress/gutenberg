@@ -16,6 +16,11 @@ import { getBlockType } from 'blocks';
 import { addQueryArgs } from './utils/url';
 
 /**
+ * WordPress dependencies
+ */
+import { __ } from 'i18n';
+
+/**
  * Returns the current editing mode.
  *
  * @param  {Object} state Global application state
@@ -86,6 +91,17 @@ export function isEditedPostNew( state ) {
  */
 export function isEditedPostDirty( state ) {
 	return state.editor.dirty;
+}
+
+/**
+ * Returns true if there are no unsaved values for the current edit session and if
+ * the currently edited post is new (and has never been saved before).
+ *
+ * @param  {Object}  state Global application state
+ * @return {Boolean}       Whether new post and unsaved values exist
+ */
+export function isCleanNewPost( state ) {
+	return ! isEditedPostDirty( state ) && isEditedPostNew( state );
 }
 
 /**
@@ -226,9 +242,30 @@ export function isEditedPostBeingScheduled( state ) {
  * @return {String}       Raw post title
  */
 export function getEditedPostTitle( state ) {
-	return state.editor.edits.title === undefined
-		? get( state.currentPost, 'title.raw' )
-		: state.editor.edits.title;
+	const editedTitle = getPostEdits( state ).title;
+	if ( editedTitle !== undefined ) {
+		return editedTitle;
+	}
+	const currentPost = getCurrentPost( state );
+	if ( currentPost.title && currentPost.title.raw ) {
+		return currentPost.title.raw;
+	}
+	return '';
+}
+
+/**
+ * Gets the document title to be used.
+ *
+ * @param  {Object}  state Global application state
+ * @return {string}        Document title
+ */
+export function getDocumentTitle( state ) {
+	let title = getEditedPostTitle( state );
+
+	if ( ! title.trim() ) {
+		title = isCleanNewPost( state ) ? __( 'New post' ) : __( '(Untitled)' );
+	}
+	return title;
 }
 
 /**

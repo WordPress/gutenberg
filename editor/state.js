@@ -4,7 +4,7 @@
 import optimist from 'redux-optimist';
 import { combineReducers, applyMiddleware, createStore } from 'redux';
 import refx from 'refx';
-import { reduce, keyBy, first, last, omit, without, flowRight } from 'lodash';
+import { reduce, keyBy, first, last, omit, without, flowRight, forOwn } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -18,6 +18,7 @@ import { combineUndoableReducers } from './utils/undoable-reducer';
 import effects from './effects';
 
 const isMobile = window.innerWidth < 782;
+const renderedPostProps = new Set( [ 'guid', 'title', 'excerpt', 'content' ] );
 
 /**
  * Undoable reducer returning the editor post state, including blocks parsed
@@ -274,7 +275,15 @@ export function currentPost( state = {}, action ) {
 			return action.post;
 
 		case 'UPDATE_POST':
-			return { ...state, ...action.edits };
+			const post = { ...state };
+			forOwn( action.edits, ( value, key ) => {
+				if ( renderedPostProps.has( key ) ) {
+					post[ key ] = { raw: value };
+				} else {
+					post[ key ] = value;
+				}
+			} );
+			return post;
 	}
 
 	return state;
