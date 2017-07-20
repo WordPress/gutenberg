@@ -1,6 +1,7 @@
 /**
- * Internal Dependencies.
+ * Internal dependencies
  */
+import HOOKS from '../hooks';
 import {
 	addAction,
 	addFilter,
@@ -38,12 +39,23 @@ function action_b() {
 function action_c() {
 	window.actionValue += 'c';
 }
-window.actionValue = '';
+
+beforeEach( () => {
+	window.actionValue = '';
+	// Reset state in between tests (clear all callbacks, `didAction` counts,
+	// etc.)  Just reseting HOOKS.actions and HOOKS.filters is not enough
+	// because the internal functions have references to the original objects.
+	[ HOOKS.actions, HOOKS.filters ].forEach( hooks => {
+		for ( const k in hooks ) {
+			delete hooks[ k ];
+		}
+	} );
+} );
 
 describe( 'add and remove a filter', () => {
 	it( 'should leave the value unfiltered', () => {
 		addFilter( 'test.filter', filter_a );
-		removeFilter( 'test.filter' );
+		removeAllFilters( 'test.filter' );
 		expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'test' );
 	} );
 } );
@@ -52,7 +64,7 @@ describe( 'add a filter and run it', () => {
 	it( 'should filter the value', () => {
 		addFilter( 'test.filter', filter_a );
 		expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testa' );
-		removeFilter( 'test.filter' );
+		removeAllFilters( 'test.filter' );
 	} );
 } );
 
@@ -61,7 +73,7 @@ describe( 'add 2 filters in a row and run them', () => {
 		addFilter( 'test.filter', filter_a );
 		addFilter( 'test.filter', filter_b );
 		expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testab' );
-		removeFilter( 'test.filter' );
+		removeAllFilters( 'test.filter' );
 	} );
 } );
 
@@ -71,7 +83,7 @@ describe( 'add 3 filters with different priorities and run them', () => {
 		addFilter( 'test.filter', filter_b, 2 );
 		addFilter( 'test.filter', filter_c, 8 );
 		expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testbca' );
-		removeFilter( 'test.filter' );
+		removeAllFilters( 'test.filter' );
 	} );
 } );
 
@@ -79,7 +91,7 @@ describe( 'add and remove an action', () => {
 	it( 'should leave the action unhooked', () => {
 		window.actionValue = '';
 		addAction( 'test.action', action_a );
-		removeAction( 'test.action' );
+		removeAllActions( 'test.action' );
 		doAction( 'test.action' );
 		expect( window.actionValue ).toBe( '' );
 	} );
@@ -91,7 +103,7 @@ describe( 'add an action and run it', function() {
 		addAction( 'test.action', action_a );
 		doAction( 'test.action' );
 		expect( window.actionValue ).toBe( 'a' );
-		removeAction( 'test.action' );
+		removeAllActions( 'test.action' );
 	} );
 } );
 
@@ -102,7 +114,7 @@ describe( 'add 2 actions in a row and then run them', function() {
 		addAction( 'test.action', action_b );
 		doAction( 'test.action' );
 		expect( window.actionValue ).toBe( 'ab' );
-		removeAction( 'test.action' );
+		removeAllActions( 'test.action' );
 	} );
 } );
 
@@ -114,7 +126,7 @@ describe( 'add 3 actions with different priorities and run them', function() {
 		addAction( 'test.action', action_c, 8 );
 		doAction( 'test.action' );
 		expect( window.actionValue ).toBe( 'bca' );
-		removeAction( 'test.action' );
+		removeAllActions( 'test.action' );
 	} );
 } );
 
@@ -128,7 +140,7 @@ describe( 'pass in two arguments to an action', function() {
 			expect( arg2 ).toBe( b );
 		} );
 		doAction( 'test.action', arg1, arg2 );
-		removeAction( 'test.action' );
+		removeAllActions( 'test.action' );
 
 		expect( arg1 ).toBe( 10 );
 		expect( arg2 ).toBe( 20 );
@@ -147,7 +159,7 @@ describe( 'fire action multiple times', function() {
 		addAction( 'test.action', func );
 		doAction( 'test.action' );
 		doAction( 'test.action' );
-		removeAction( 'test.action' );
+		removeAllActions( 'test.action' );
 	} );
 } );
 
@@ -161,7 +173,7 @@ describe( 'remove specific action callback', function() {
 		removeAction( 'test.action', action_b );
 		doAction( 'test.action' );
 		expect( window.actionValue ).toBe( 'ca' );
-		removeAction( 'test.action' );
+		removeAllActions( 'test.action' );
 	} );
 } );
 
@@ -186,7 +198,7 @@ describe( 'remove specific filter callback', function() {
 
 		removeFilter( 'test.filter', filter_b );
 		expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testca' );
-		removeFilter( 'test.filter' );
+		removeAllFilters( 'test.filter' );
 	} );
 } );
 
@@ -206,8 +218,6 @@ describe( 'Test doingAction, didAction and hasAction.', function() {
 	it( 'should', () => {
 		let actionCalls = 0;
 
-		// Reset state for testing.
-		removeAction( 'test.action' );
 		addAction( 'another.action', () => {} );
 		doAction( 'another.action' );
 
@@ -244,11 +254,11 @@ describe( 'Test doingAction, didAction and hasAction.', function() {
 		expect( actionCalls ).toBe( 2 );
 		expect( didAction( 'test.action' ) ).toBe( 2 );
 
-		removeAction( 'test.action' );
+		removeAllActions( 'test.action' );
 
 		// Verify state is reset appropriately.
 		expect( doingAction( 'test.action' ) ).toBe( false );
-		expect( didAction( 'test.action' ) ).toBe( 0 );
+		expect( didAction( 'test.action' ) ).toBe( 2 );
 		expect( hasAction( 'test.action' ) ).toBe( false );
 
 		doAction( 'another.action' );
@@ -256,7 +266,6 @@ describe( 'Test doingAction, didAction and hasAction.', function() {
 
 		// Verify hasAction returns false when no matching action.
 		expect( hasAction( 'notatest.action' ) ).toBe( false );
-
 	} );
 } );
 
@@ -283,7 +292,10 @@ describe( 'Verify doingFilter, didFilter and hasFilter.', function() {
 		expect( doingFilter( 'notatest.filter' ) ).toBe( false );
 		expect( currentFilter() ).toBe( null );
 
-		removeFilter( 'runtest.filter' );
+		removeAllFilters( 'runtest.filter' );
+
+		expect( hasFilter( 'runtest.filter' ) ).toBe( false );
+		expect( didFilter( 'runtest.filter' ) ).toBe( 1 );
 	} );
 } );
 

@@ -8,9 +8,9 @@
  */
 const createDidHook = function( hooksArray ) {
 	return function( action ) {
-		return hooksArray && hooksArray[ action ] && hooksArray[ action ].runs ?
-			hooksArray[ action ].runs :
-			0;
+		return hooksArray[ action ] && hooksArray[ action ].runs
+			? hooksArray[ action ].runs
+			: 0;
 	};
 }
 
