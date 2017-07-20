@@ -32,10 +32,7 @@ function createAddHook( hooks ) {
 			return;
 		}
 
-		const handler = {
-			callback: callback,
-			priority: priority,
-		};
+		const handler = { callback, priority };
 		let handlers;
 
 		if ( hooks.hasOwnProperty( hookName ) ) {
