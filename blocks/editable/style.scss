@@ -6,8 +6,18 @@
 	margin: 0;
 	position: relative;
 
-	> p:empty {
-		min-height: $editor-font-size * $editor-line-height;
+	> p {
+		&:empty {
+			min-height: $editor-font-size * $editor-line-height;
+		}
+
+		&:first-child {
+			margin-top: 0;
+		}
+
+		&:last-child {
+			margin-bottom: 0;
+		}
 	}
 
 	&:focus {

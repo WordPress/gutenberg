@@ -7,6 +7,7 @@ import './embed';
 import './list';
 import './separator';
 import './button';
+import './paragraph';
 import './pullquote';
 import './table';
 import './preformatted';

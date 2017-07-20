@@ -8,7 +8,7 @@ import { concatChildren } from 'element';
  * Internal dependencies
  */
 import './block.scss';
-import { registerBlockType, createBlock, query as hpq, setDefaultBlock } from '../../api';
+import { registerBlockType, createBlock, query as hpq } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
 import Editable from '../../editable';
@@ -18,8 +18,8 @@ import BlockDescription from '../../block-description';
 
 const { children, query } = hpq;
 
-registerBlockType( 'core/text', {
-	title: __( 'Text' ),
+registerBlockType( 'core/paragraph', {
+	title: __( 'Paragraph' ),
 
 	icon: 'text',
 
@@ -81,7 +81,7 @@ registerBlockType( 'core/text', {
 				</InspectorControls>
 			),
 			<Editable
-				multiline="p"
+				tagName="p"
 				key="editable"
 				value={ content }
 				onChange={ ( nextContent ) => {
@@ -95,13 +95,13 @@ registerBlockType( 'core/text', {
 					setAttributes( { content: before } );
 					insertBlocksAfter( [
 						...blocks,
-						createBlock( 'core/text', { content: after } ),
+						createBlock( 'core/paragraph', { content: after } ),
 					] );
 				} }
 				onMerge={ mergeBlocks }
 				style={ { textAlign: align } }
 				className={ dropCap && 'has-drop-cap' }
-				placeholder={ placeholder || __( 'Write your story' ) }
+				placeholder={ placeholder || __( 'New Paragraph' ) }
 			/>,
 		];
 	},
@@ -117,5 +117,3 @@ registerBlockType( 'core/text', {
 		return <p style={ { textAlign: align } } className={ className }>{ content }</p>;
 	},
 } );
-
-setDefaultBlock( 'core/text' );
