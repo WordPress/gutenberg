@@ -2,21 +2,21 @@
  * Internal Dependencies.
  */
 import {
-	doAction,
-	applyFilters,
 	addAction,
 	addFilter,
+	removeAction,
+	removeFilter,
+	removeAllActions,
+	removeAllFilters,
+	hasAction,
+	hasFilter,
+	doAction,
+	applyFilters,
+	currentFilter,
 	doingAction,
 	doingFilter,
 	didAction,
 	didFilter,
-	hasAction,
-	hasFilter,
-	removeFilter,
-	removeAction,
-	removeAllActions,
-	removeAllFilters,
-	currentFilter
 } from '../';
 
 function filter_a( str ) {
