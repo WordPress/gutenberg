@@ -11,7 +11,7 @@ import { throttle, reduce, noop } from 'lodash';
 import { __ } from 'i18n';
 import { Component } from 'element';
 import { serialize, getDefaultBlock, createBlock } from 'blocks';
-import { IconButton, Dashicon } from 'components';
+import { IconButton } from 'components';
 import { ENTER } from 'utils/keycodes';
 
 /**
