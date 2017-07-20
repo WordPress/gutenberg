@@ -12,6 +12,7 @@ import {
 	hasFilter,
 	doAction,
 	applyFilters,
+	currentAction,
 	currentFilter,
 	doingAction,
 	doingFilter,
@@ -218,6 +219,7 @@ describe( 'Test doingAction, didAction and hasAction.', function() {
 
 		addAction( 'test.action', () => {
 			actionCalls++;
+			expect( currentAction() ).toBe( 'test.action' );
 			expect( doingAction( 'test.action' ) ).toBe( true );
 		} );
 
@@ -233,6 +235,10 @@ describe( 'Test doingAction, didAction and hasAction.', function() {
 		expect( doingAction( 'test.action' ) ).toBe( false );
 		expect( didAction( 'test.action' ) ).toBe( 1 );
 		expect( hasAction( 'test.action' ) ).toBe( true );
+		expect( doingAction() ).toBe( false );
+		expect( doingAction( 'test.action' ) ).toBe( false );
+		expect( doingAction( 'notatest.action' ) ).toBe( false );
+		expect( currentAction() ).toBe( null );
 
 		doAction( 'test.action' );
 		expect( actionCalls ).toBe( 2 );
