@@ -11,7 +11,7 @@ import { throttle, reduce, noop } from 'lodash';
 import { __ } from 'i18n';
 import { Component } from 'element';
 import { serialize, getDefaultBlock, createBlock } from 'blocks';
-import { Dashicon } from 'components';
+import { IconButton, Dashicon } from 'components';
 import { ENTER } from 'utils/keycodes';
 
 /**
@@ -265,24 +265,22 @@ class VisualEditorBlockList extends Component {
 					onBlur={ this.toggleContinueWritingControls( false ) }
 				>
 					<Inserter position="top right" />
-					<button
-						type="button"
+					<IconButton
+						icon="text"
 						className="editor-inserter__block"
 						onClick={ () => this.insertBlock( 'core/text' ) }
 						aria-label={ __( 'Insert text block' ) }
 					>
-						<Dashicon icon="text" />
 						{ __( 'Text' ) }
-					</button>
-					<button
-						type="button"
+					</IconButton>
+					<IconButton
+						icon="format-image"
 						className="editor-inserter__block"
 						onClick={ () => this.insertBlock( 'core/image' ) }
 						aria-label={ __( 'Insert image block' ) }
 					>
-						<Dashicon icon="format-image" />
 						{ __( 'Image' ) }
-					</button>
+					</IconButton>
 				</div>
 			</div>
 		);
