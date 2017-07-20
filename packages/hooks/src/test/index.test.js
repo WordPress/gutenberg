@@ -79,6 +79,55 @@ test( 'add 3 filters with different priorities and run them', () => {
 	removeAllFilters( 'test.filter' );
 } );
 
+test( 'filters with the same and different priorities', () => {
+	const callbacks = {};
+
+	[ 1, 2, 3, 4 ].forEach( priority => {
+		[ 'a', 'b', 'c', 'd' ].forEach( string => {
+			callbacks[ 'fn_' + priority + string ] = value => {
+				return value.concat( priority + string );
+			};
+		} );
+	} );
+
+	addFilter( 'test_order', callbacks.fn_3a, 3 );
+	addFilter( 'test_order', callbacks.fn_3b, 3 );
+	addFilter( 'test_order', callbacks.fn_3c, 3 );
+	addFilter( 'test_order', callbacks.fn_2a, 2 );
+	addFilter( 'test_order', callbacks.fn_2b, 2 );
+	addFilter( 'test_order', callbacks.fn_2c, 2 );
+
+	expect( applyFilters( 'test_order', [] ) ).toEqual(
+		[ '2a', '2b', '2c', '3a', '3b', '3c' ]
+	);
+
+	removeFilter( 'test_order', callbacks.fn_2b );
+	removeFilter( 'test_order', callbacks.fn_3a );
+
+	expect( applyFilters( 'test_order', [] ) ).toEqual(
+		[ '2a', '2c', '3b', '3c' ]
+	);
+
+	addFilter( 'test_order', callbacks.fn_4a, 4 );
+	addFilter( 'test_order', callbacks.fn_4b, 4 );
+	addFilter( 'test_order', callbacks.fn_1a, 1 );
+	addFilter( 'test_order', callbacks.fn_4c, 4 );
+	addFilter( 'test_order', callbacks.fn_1b, 1 );
+	addFilter( 'test_order', callbacks.fn_3d, 3 );
+	addFilter( 'test_order', callbacks.fn_4d, 4 );
+	addFilter( 'test_order', callbacks.fn_1c, 1 );
+	addFilter( 'test_order', callbacks.fn_2d, 2 );
+	addFilter( 'test_order', callbacks.fn_1d, 1 );
+
+	expect( applyFilters( 'test_order', [] ) ).toEqual( [
+		// all except 2b and 3a, which we removed earlier
+		'1a', '1b', '1c', '1d',
+		'2a', '2c', '2d',
+		'3b', '3c', '3d',
+		'4a', '4b', '4c', '4d',
+	] );
+} );
+
 test( 'add and remove an action', () => {
 	window.actionValue = '';
 	addAction( 'test.action', action_a );
