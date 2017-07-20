@@ -61,14 +61,12 @@ test( 'add and remove a filter', () => {
 test( 'add a filter and run it', () => {
 	addFilter( 'test.filter', filter_a );
 	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testa' );
-	removeAllFilters( 'test.filter' );
 } );
 
 test( 'add 2 filters in a row and run them', () => {
 	addFilter( 'test.filter', filter_a );
 	addFilter( 'test.filter', filter_b );
 	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testab' );
-	removeAllFilters( 'test.filter' );
 } );
 
 test( 'add 3 filters with different priorities and run them', () => {
@@ -76,7 +74,6 @@ test( 'add 3 filters with different priorities and run them', () => {
 	addFilter( 'test.filter', filter_b, 2 );
 	addFilter( 'test.filter', filter_c, 8 );
 	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testbca' );
-	removeAllFilters( 'test.filter' );
 } );
 
 test( 'filters with the same and different priorities', () => {
@@ -129,7 +126,6 @@ test( 'filters with the same and different priorities', () => {
 } );
 
 test( 'add and remove an action', () => {
-	window.actionValue = '';
 	addAction( 'test.action', action_a );
 	removeAllActions( 'test.action' );
 	doAction( 'test.action' );
@@ -137,30 +133,24 @@ test( 'add and remove an action', () => {
 } );
 
 test( 'add an action and run it', function() {
-	window.actionValue = '';
 	addAction( 'test.action', action_a );
 	doAction( 'test.action' );
 	expect( window.actionValue ).toBe( 'a' );
-	removeAllActions( 'test.action' );
 } );
 
 test( 'add 2 actions in a row and then run them', function() {
-	window.actionValue = '';
 	addAction( 'test.action', action_a );
 	addAction( 'test.action', action_b );
 	doAction( 'test.action' );
 	expect( window.actionValue ).toBe( 'ab' );
-	removeAllActions( 'test.action' );
 } );
 
 test( 'add 3 actions with different priorities and run them', function() {
-	window.actionValue = '';
 	addAction( 'test.action', action_a );
 	addAction( 'test.action', action_b, 2 );
 	addAction( 'test.action', action_c, 8 );
 	doAction( 'test.action' );
 	expect( window.actionValue ).toBe( 'bca' );
-	removeAllActions( 'test.action' );
 } );
 
 test( 'pass in two arguments to an action', function() {
@@ -172,7 +162,6 @@ test( 'pass in two arguments to an action', function() {
 		expect( b ).toBe( arg2 );
 	} );
 	doAction( 'test.action', arg1, arg2 );
-	removeAllActions( 'test.action' );
 } );
 
 test( 'fire action multiple times', function() {
@@ -185,11 +174,9 @@ test( 'fire action multiple times', function() {
 	addAction( 'test.action', func );
 	doAction( 'test.action' );
 	doAction( 'test.action' );
-	removeAllActions( 'test.action' );
 } );
 
 test( 'remove specific action callback', function() {
-	window.actionValue = '';
 	addAction( 'test.action', action_a );
 	addAction( 'test.action', action_b, 2 );
 	addAction( 'test.action', action_c, 8 );
@@ -197,11 +184,9 @@ test( 'remove specific action callback', function() {
 	removeAction( 'test.action', action_b );
 	doAction( 'test.action' );
 	expect( window.actionValue ).toBe( 'ca' );
-	removeAllActions( 'test.action' );
 } );
 
 test( 'remove all action callbacks', function() {
-	window.actionValue = '';
 	addAction( 'test.action', action_a );
 	addAction( 'test.action', action_b, 2 );
 	addAction( 'test.action', action_c, 8 );
@@ -218,7 +203,6 @@ test( 'remove specific filter callback', function() {
 
 	removeFilter( 'test.filter', filter_b );
 	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testca' );
-	removeAllFilters( 'test.filter' );
 } );
 
 test( 'remove all filter callbacks', function() {
