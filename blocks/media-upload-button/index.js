@@ -4,6 +4,7 @@
 import { Component } from 'element';
 import { __ } from 'i18n';
 import { Button } from 'components';
+import { pick } from 'lodash';
 
 // Getter for the sake of unit tests.
 const getGalleryDetailsMediaFrame = () => {
@@ -47,6 +48,13 @@ const getGalleryDetailsMediaFrame = () => {
 			] );
 		},
 	} );
+};
+
+// the media library image object contains numerous attributes
+// we only need this set to display the image in the library
+const slimImageObjects = ( imgs ) => {
+	const attrSet = [ 'sizes', 'mime', 'type', 'subtype', 'id', 'url', 'alt' ];
+	return imgs.map( ( img ) => pick( img, attrSet ) );
 };
 
 class MediaUploadButton extends Component {
@@ -99,7 +107,7 @@ class MediaUploadButton extends Component {
 			return;
 		}
 		if ( multiple ) {
-			onSelect( selectedImages.models.map( ( model ) => model.toJSON() ) );
+			onSelect( slimImageObjects( selectedImages.models.map( ( model ) => model.toJSON() ) ) );
 		} else {
 			onSelect( selectedImages.models[ 0 ].toJSON() );
 		}
