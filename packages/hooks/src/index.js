@@ -2,15 +2,18 @@
  * Contains the registered hooks, keyed by hook type. Each hook type is an
  * array of objects with priority and callback of each registered hook.
  */
-var HOOKS = {};
+var HOOKS = {
+	actions: [],
+	filters: []
+};
 
 /**
  * Returns a function which, when invoked, will add a hook.
  *
- * @param  {string}   type Type for which hooks are to be added
- * @return {Function}      Hook added
+ * @param  {string}   hooksArray Hooks array to which hooks are to be added
+ * @return {Function}            Hook added.
  */
-function createAddHookByType( type ) {
+function createAddHook( hooksArray ) {
 	/**
 	 * Adds the hook to the appropriate hooks container
 	 *
@@ -36,19 +39,14 @@ function createAddHookByType( type ) {
 			return;
 		}
 
-		// Check if adding first of type
-		if ( ! HOOKS[ type ] ) {
-			HOOKS[ type ] = {};
-		}
-
 		hookObject = {
 			callback: callback,
 			priority: priority
 		};
 
-		if ( HOOKS[ type ].hasOwnProperty( hook ) ) {
+		if ( hooksArray.hasOwnProperty( hook ) ) {
 			// Append and re-sort amongst existing
-			hooks = HOOKS[ type ][ hook ];
+			hooks = hooksArray[ hook ];
 			hooks.push( hookObject );
 			hooks = sortHooks( hooks );
 		} else {
@@ -56,37 +54,37 @@ function createAddHookByType( type ) {
 			hooks = [ hookObject ];
 		}
 
-		HOOKS[ type ][ hook ] = hooks;
+		hooksArray[ hook ] = hooks;
 	};
 }
 
 /**
  * Returns a function which, when invoked, will remove a specified hook.
  *
- * @param  {string}   type      Type for which hooks are to be removed.
- * @param  {bool}     removeAll Whether to always remove all hooked callbacks.
+ * @param  {string}   hooksArray Hooks array from which hooks are to be removed.
+ * @param  {bool}     removeAll  Whether to always remove all hooked callbacks.
  *
  * @return {Function}           Hook remover.
  */
-function createRemoveHookByType( type, removeAll ) {
+function createRemoveHook( hooksArray, removeAll ) {
 	/**
 	 * Removes the specified hook by resetting its value.
 	 *
 	 * @param {string}    hook     Name of hook to remove
-	 * @param {?Function} callback The specific callback to be removed. If
+	 * @param {?Function} callback The specific callback to be removed. Optional, if
 	 *                             omitted, clears all callbacks.
 	 */
 	return function( hook, callback ) {
 		var handlers, i;
 
 		// Baily early if no hooks exist by this name
-		if ( ! HOOKS[ type ] || ! HOOKS[ type ].hasOwnProperty( hook ) ) {
+		if ( ! hooksArray || ! hooksArray.hasOwnProperty( hook ) ) {
 			return;
 		}
 
 		if ( callback && ! removeAll ) {
 			// Try to find specified callback to remove
-			handlers = HOOKS[ type ][ hook ];
+			handlers = hooksArray[ hook ];
 			for ( i = handlers.length - 1; i >= 0; i-- ) {
 				if ( handlers[ i ].callback === callback ) {
 					handlers.splice( i, 1 );
@@ -94,7 +92,7 @@ function createRemoveHookByType( type, removeAll ) {
 			}
 		} else {
 			// Reset hooks to empty
-			delete HOOKS[ type ][ hook ];
+			delete hooksArray[ hook ];
 		}
 	};
 }
@@ -104,11 +102,10 @@ function createRemoveHookByType( type, removeAll ) {
  * hooks of the specified type by calling upon runner with its hook name
  * and arguments.
  *
- * @param  {string}   type   Type for which hooks are to be run, one of 'action' or 'filter'.
  * @param  {Function} runner Function to invoke for each hook callback
  * @return {Function}        Hook runner
  */
-function createRunHookByType( type, runner ) {
+function createRunHook( runner ) {
 	/**
 	 * Runs the specified hook.
 	 *
@@ -152,6 +149,7 @@ function runDoAction( action, args ) {
 		handlers[ i ].callback.apply( null, args );
 		HOOKS.actions[ action ].runs = HOOKS.actions[ action ].runs ? HOOKS.actions[ action ].runs + 1 : 1;
 	}
+
 }
 
 /**
@@ -211,13 +209,21 @@ function sortHooks( hooks ) {
 /**
  * See what action is currently being executed.
  *
- * @param  {string} type   Type of hooks to check, one of 'action' or 'filter'.
- * @param {string}  action The name of the action to check for.
+ * @param  {string} hooksArray Hooks array of hooks to check.
+ * @param {string}  action     The name of the action to check for.
  *
- * @return {[type]}      [description]
+ * @return {Function}          A function that gets the currently executing filter,
  */
-function createCurrentHookByType( type ) {
-	return function( action ) {
+function createCurrentHook( hooksArray ) {
+
+	/**
+	 * Get the current active hook.
+	 *
+	 * @param {string}  action The name of the action to check for, if omitted will check for any action being performed.
+	 *
+	 * @return {string}          Returns the currently executing action, or false if none.
+	 */
+	return function() {
 
 		// If the action was not passed, check for any current hook.
 		if ( 'undefined' === typeof action ) {
@@ -225,8 +231,8 @@ function createCurrentHookByType( type ) {
 		}
 
 		// Return the current hook.
-		return HOOKS[ type ] && HOOKS[ type ].current ?
-			HOOKS[ type ].current :
+		return hooksArray && hooksArray.current ?
+			hooksArray.current :
 			false;
 	};
 }
@@ -236,22 +242,22 @@ function createCurrentHookByType( type ) {
 /**
  * Checks to see if an action is currently being executed.
  *
- * @param  {string} type   Type of hooks to check, one of 'action' or 'filter'.
+ * @param  {string} type   Type of hooks to check.
  * @param {string}  action The name of the action to check for, if omitted will check for any action being performed.
  *
  * @return {[type]}      [description]
  */
-function createDoingHookByType( type ) {
+function createDoingHook( hooksArray ) {
 	return function( action ) {
 
 		// If the action was not passed, check for any current hook.
 		if ( 'undefined' === typeof action ) {
-			return 'undefined' !== typeof HOOKS[ type ].current;
+			return 'undefined' !== typeof hooksArray.current;
 		}
 
 		// Return the current hook.
-		return HOOKS[ type ] && HOOKS[ type ].current ?
-			action === HOOKS[ type ].current :
+		return hooksArray && hooksArray.current ?
+			action === hooksArray.current :
 			false;
 	};
 }
@@ -259,15 +265,15 @@ function createDoingHookByType( type ) {
 /**
  * Retrieve the number of times an action is fired.
  *
- * @param  {string} type   Type for which hooks to check, one of 'action' or 'filter'.
- * @param {string}  action The action to check.
+ * @param {string} hooksArray Hooks array of hooks to check.
+ * @param {string} action     The action to check.
  *
  * @return {[type]}      [description]
  */
-function createDidHookByType( type ) {
+function createDidHook( hooksArray ) {
 	return function( action ) {
-		return HOOKS[ type ] && HOOKS[ type ][ action ] && HOOKS[ type ][ action ].runs ?
-			HOOKS[ type ][ action ].runs :
+		return hooksArray && hooksArray[ action ] && hooksArray[ action ].runs ?
+			hooksArray[ action ].runs :
 			0;
 	};
 }
@@ -275,55 +281,61 @@ function createDidHookByType( type ) {
 /**
  * Check to see if an action is registered for a hook.
  *
- * @param  {string} type   Type for which hooks to check, one of 'action' or 'filter'.
- * @param {string}  action  The action to check.
+ * @param {string} hooksArray Hooks array of hooks to check.
+ * @param {string} action     The action to check.
  *
  * @return {bool}      Whether an action has been registered for a hook.
  */
-function createHasHookByType( type ) {
+function createHasHook( hooksArray ) {
 	return function( action ) {
-		return HOOKS[ type ] && HOOKS[ type ][ action ] ?
-			!! HOOKS[ type ][ action ] :
+		return hooksArray && hooksArray[ action ] ?
+			!! hooksArray[ action ] :
 			false;
 	};
 }
 
 /**
  * Remove all the actions registered to a hook.
+ *
+ * @param {string} hooksArray Hooks array of hooks to check.
+ *
+ * @return {Function}         All hook remover.
  */
-function createRemoveAllByType( type ) {
-	return createRemoveHookByType( type, true );
+function createRemoveAllHook( hooksArray ) {
+	return createRemoveHook( hooksArray, true );
 }
 
 // Remove functions.
-export removeFilter = createRemoveHookByType( 'filters' );
-export removeAction = createRemoveHookByType( 'actions' );
+export const removeFilter = createRemoveHook( HOOKS.filters );
+export const removeAction = createRemoveHook( HOOKS.actions );
+
 
 // Do action/apply filter functions.
-export doAction =     createRunHookByType( 'actions', runDoAction );
-export applyFilters = createRunHookByType( 'filters', runApplyFilters );
+export const doAction =     createRunHook( runDoAction );
+export const applyFilters = createRunHook( runApplyFilters );
 
 // Add functions.
-export addAction = createAddHookByType( 'actions' );
-export addFilter = createAddHookByType( 'filters' );
+export const addAction = createAddHook( HOOKS.actions );
+export const addFilter = createAddHook( HOOKS.filters );
 
 // Doing action: true until next action fired.
-export doingAction = createDoingHookByType( 'actions' ),
+export const doingAction = createDoingHook( HOOKS.actions );
 
 // Doing filter: true while filter is being applied.
-export doingFilter = createDoingHookByType( 'filters' ),
+export const doingFilter = createDoingHook( HOOKS.filters );
 
 // Did functions.
-export didAction = createDidHookByType( 'actions' );
-export didFilter = createDidHookByType( 'filters' );
+export const didAction = createDidHook( HOOKS.actions );
+export const didFilter = createDidHook( HOOKS.filters );
 
 // Has functions.
-export hasAction = createHasHookByType( 'actions' );
-export hasFilter = createHasHookByType( 'filters' );
+export const hasAction = createHasHook( HOOKS.actions );
+export const hasFilter = createHasHook( HOOKS.filters );
 
 // Remove all functions.
-export removeAllActions = createRemoveAllByType( 'actions' );
-export removeAllFilters = createRemoveAllByType( 'filters' );
+export const removeAllActions = createRemoveAllHook( HOOKS.actions );
+export const removeAllFilters = createRemoveAllHook( HOOKS.filters );
 
 // Current filter.
-export currentFilter = createCurrentHookByType( 'filters' );
+export const currentFilter = createCurrentHook( HOOKS.filters );
+
