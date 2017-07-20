@@ -1,5 +1,3 @@
-import sortHooks from './sortHooks';
-
 /**
  * Returns a function which, when invoked, will add a hook.
  *
@@ -43,10 +41,17 @@ function createAddHook( hooks ) {
 		let handlers;
 
 		if ( hooks.hasOwnProperty( hookName ) ) {
-			// Append and re-sort amongst the existing callbacks.
+			// Find the correct insert index of the new hook.
 			handlers = hooks[ hookName ];
-			handlers.push( handler );
-			handlers = sortHooks( handlers );
+			let i = 0;
+			while ( i < handlers.length ) {
+				if ( handlers[ i ].priority > priority ) {
+					break;
+				}
+				i++;
+			}
+			// Insert (or append) the new hook.
+			handlers.splice( i, 0, handler );
 		} else {
 			// This is the first hook of its type.
 			handlers = [ handler ];
