@@ -12,6 +12,7 @@ import {
 	hasFilter,
 	doAction,
 	applyFilters,
+	currentAction,
 	currentFilter,
 	doingAction,
 	doingFilter,
@@ -36,9 +37,6 @@ function action_b() {
 }
 function action_c() {
 	window.actionValue += 'c';
-}
-function filter_check() {
-	expect( doingFilter( 'runtest.filter' ) ).toBeTruthy();
 }
 window.actionValue = '';
 
@@ -221,6 +219,7 @@ describe( 'Test doingAction, didAction and hasAction.', function() {
 
 		addAction( 'test.action', () => {
 			actionCalls++;
+			expect( currentAction() ).toBe( 'test.action' );
 			expect( doingAction( 'test.action' ) ).toBe( true );
 		} );
 
@@ -236,6 +235,10 @@ describe( 'Test doingAction, didAction and hasAction.', function() {
 		expect( doingAction( 'test.action' ) ).toBe( false );
 		expect( didAction( 'test.action' ) ).toBe( 1 );
 		expect( hasAction( 'test.action' ) ).toBe( true );
+		expect( doingAction() ).toBe( false );
+		expect( doingAction( 'test.action' ) ).toBe( false );
+		expect( doingAction( 'notatest.action' ) ).toBe( false );
+		expect( currentAction() ).toBe( null );
 
 		doAction( 'test.action' );
 		expect( actionCalls ).toBe( 2 );
@@ -259,13 +262,26 @@ describe( 'Test doingAction, didAction and hasAction.', function() {
 
 describe( 'Verify doingFilter, didFilter and hasFilter.', function() {
 	it( 'should', () => {
-		addFilter( 'runtest.filter', filter_check );
+		let filterCalls = 0;
+
+		addFilter( 'runtest.filter', arg => {
+			filterCalls++;
+			expect( currentFilter() ).toBe( 'runtest.filter' );
+			expect( doingFilter( 'runtest.filter' ) ).toBeTruthy();
+			return arg;
+		} );
 
 		// Verify filter added and running.
-		var test = applyFilters( 'runtest.filter', true );
-		expect( didFilter( 'runtest.filter' ), 1, 'The runtest.filter has run once.' );
-		expect( hasFilter( 'runtest.filter' ), 'The runtest.filter is registered.' );
-		expect( ! hasFilter( 'notatest.filter' ), 'The notatest.filter is not registered.' );
+		const test = applyFilters( 'runtest.filter', 'someValue' );
+		expect( test ).toBe( 'someValue' );
+		expect( filterCalls ).toBe( 1 );
+		expect( didFilter( 'runtest.filter' ) ).toBe( 1 );
+		expect( hasFilter( 'runtest.filter' ) ).toBe( true );
+		expect( hasFilter( 'notatest.filter' ) ).toBe( false );
+		expect( doingFilter() ).toBe( false );
+		expect( doingFilter( 'runtest.filter' ) ).toBe( false );
+		expect( doingFilter( 'notatest.filter' ) ).toBe( false );
+		expect( currentFilter() ).toBe( null );
 
 		removeFilter( 'runtest.filter' );
 	} );
