@@ -24,7 +24,9 @@ var pathToData = {
 	'wp-json/wp/v2/taxonomy': mockedApiResponse.TaxonomyModel,
 	'wp-json/wp/v2/status': mockedApiResponse.StatusModel,
 	'wp-json/wp/v2/type': mockedApiResponse.TypeModel,
-	'wp-json/js-widgets/v1/': jsWidgetsEndpointSchema
+	'wp-json/js-widgets/v1/': jsWidgetsEndpointSchema,
+	'wp-json/wp/v2/users/me': mockedApiResponse.me,
+	'wp-json/wp/v2/settings': mockedApiResponse.settings
 };
 
 /**

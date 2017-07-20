@@ -115,7 +115,9 @@
 		'Page',
 		'Post',
 		'Tag',
-		'User'
+		'User',
+		'UsersMe',
+		'Settings'
 	];
 
 	_.each( modelsWithIdsClassNames, function( className ) {
@@ -130,12 +132,12 @@
 				assert.ok( theModel, 'We can instantiate wp.api.models.' + className );
 				theModel.fetch().done( function(  ) {
 					var theModel2 = new wp.api.models[ className ]();
-					theModel2.set( 'id', theModel.attributes[0].id );
+					theModel2.set( 'id', theModel.attributes.id );
 					theModel2.fetch().done( function() {
 
 						// We were able to retrieve the model.
 						assert.equal(
-							theModel.attributes[0].id,
+							theModel.attributes.id,
 							theModel2.get( 'id' ) ,
 							'We should be able to get a ' + className
 						);
