@@ -42,7 +42,7 @@ class User_Preferences_API_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertEquals( 200, $response->get_status() );
 
 		// Each valid preference should be present.
-		foreach ( Gutenberg_User_Preferences::VALID_PREFERENCES as $preference ) {
+		foreach ( Gutenberg_User_Preferences::$valid_preferences as $preference ) {
 			$this->assertArrayHasKey( $preference, $response->data );
 		}
 	}

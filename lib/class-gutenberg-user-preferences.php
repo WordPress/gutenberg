@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * User preference management.
  */
 class Gutenberg_User_Preferences {
-	const VALID_PREFERENCES = array(
+	public static $valid_preferences = array(
 		'block_usage',
 		'layout_config',
 	);
@@ -25,7 +25,7 @@ class Gutenberg_User_Preferences {
 	 * @return bool   If the preference name is valid preference.
 	 */
 	public static function is_valid_preference_name( $preference_name ) {
-		return in_array( $preference_name, self::VALID_PREFERENCES );
+		return in_array( $preference_name, self::$valid_preferences );
 	}
 
 	/**
@@ -64,7 +64,7 @@ class Gutenberg_User_Preferences {
 	public static function get_preferences( $request ) {
 		$user_id = get_current_user_id();
 		$preferences = array();
-		foreach ( self::VALID_PREFERENCES as $preference_name ) {
+		foreach ( self::$valid_preferences as $preference_name ) {
 			$preferences[ $preference_name ] = get_user_meta( $user_id, 'gutenberg_' . $preference_name );
 		}
 		return $preferences;
