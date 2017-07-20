@@ -1,11 +1,10 @@
 #wpbody .editor-mode-switcher {	/* #wpbody for extra specificity */
 	position: relative;
+	margin-left: auto;
 	margin-right: $item-spacing;
-	padding-right: $item-spacing;
 	color: $dark-gray-500;
 	align-items: center;
 	cursor: pointer;
-	border-right: 1px solid $light-gray-500;
 	outline: none;
 	display: flex;
 	align-items: center;

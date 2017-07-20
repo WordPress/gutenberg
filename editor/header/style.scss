@@ -3,9 +3,6 @@
 	padding: $item-spacing;
 	border-bottom: 1px solid $light-gray-500;
 	background: $white;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
 	z-index: z-index( '.editor-header' );
 	left: 0;
 	right: 0;
