@@ -26,6 +26,9 @@ function Tools( { undo, redo, hasUndo, hasRedo, isSidebarOpened, toggleSidebar }
 			<PublishButton />
 			<SavedState />
 			<PreviewButton />
+			<Inserter position="bottom">
+				{ __( 'Insert' ) }
+			</Inserter>
 			<IconButton
 				className="editor-tools__undo"
 				icon="undo"
@@ -38,9 +41,6 @@ function Tools( { undo, redo, hasUndo, hasRedo, isSidebarOpened, toggleSidebar }
 				label={ __( 'Redo' ) }
 				disabled={ ! hasRedo }
 				onClick={ redo } />
-			<Inserter position="bottom">
-				{ __( 'Insert' ) }
-			</Inserter>
 			<ModeSwitcher />
 			<div className="editor-tools__tabs">
 				<IconButton icon="admin-generic" onClick={ toggleSidebar } isToggled={ isSidebarOpened }>
