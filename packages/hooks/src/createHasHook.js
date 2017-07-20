@@ -1,16 +1,25 @@
 /**
- * Check to see if an action is registered for a hook.
+ * Returns a function which, when invoked, will return whether any handlers are
+ * attached to a particular hook.
  *
- * @param {string} hooksArray Hooks array of hooks to check.
- * @param {string} action     The action to check.
+ * @param  {Object}   hooks Stored hooks, keyed by hook name.
  *
- * @return {bool}      Whether an action has been registered for a hook.
+ * @return {Function}       Function that returns whether any handlers are
+ *                          attached to a particular hook.
  */
-const createHasHook = function( hooksArray ) {
-	return function( action ) {
-		return hooksArray && hooksArray[ action ] ?
-			!! hooksArray[ action ] :
-			false;
+function createHasHook( hooks ) {
+	/**
+	 * Returns how many handlers are attached for the given hook.
+	 *
+	 * @param  {string}  hookName The name of the hook to check for.
+	 *
+	 * @return {number}           The number of handlers that are attached to
+	 *                            the given hook.
+	 */
+	return function hasHook( hookName ) {
+		return hooks.hasOwnProperty( hookName )
+			? hooks[ hookName ].length
+			: 0;
 	};
 }
 

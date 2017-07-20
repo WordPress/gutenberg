@@ -1,6 +1,7 @@
 /**
- * Internal Dependencies.
+ * Internal dependencies
  */
+import HOOKS from '../hooks';
 import {
 	addAction,
 	addFilter,
@@ -38,253 +39,261 @@ function action_b() {
 function action_c() {
 	window.actionValue += 'c';
 }
-window.actionValue = '';
 
-describe( 'add and remove a filter', () => {
-	it( 'should leave the value unfiltered', () => {
-		addFilter( 'test.filter', filter_a );
-		removeFilter( 'test.filter' );
-		expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'test' );
+beforeEach( () => {
+	window.actionValue = '';
+	// Reset state in between tests (clear all callbacks, `didAction` counts,
+	// etc.)  Just reseting HOOKS.actions and HOOKS.filters is not enough
+	// because the internal functions have references to the original objects.
+	[ HOOKS.actions, HOOKS.filters ].forEach( hooks => {
+		for ( const k in hooks ) {
+			delete hooks[ k ];
+		}
 	} );
 } );
 
-describe( 'add a filter and run it', () => {
-	it( 'should filter the value', () => {
-		addFilter( 'test.filter', filter_a );
-		expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testa' );
-		removeFilter( 'test.filter' );
-	} );
+test( 'add and remove a filter', () => {
+	addFilter( 'test.filter', filter_a );
+	removeAllFilters( 'test.filter' );
+	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'test' );
 } );
 
-describe( 'add 2 filters in a row and run them', () => {
-	it( 'both filters should apply', () => {
-		addFilter( 'test.filter', filter_a );
-		addFilter( 'test.filter', filter_b );
-		expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testab' );
-		removeFilter( 'test.filter' );
-	} );
+test( 'add a filter and run it', () => {
+	addFilter( 'test.filter', filter_a );
+	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testa' );
 } );
 
-describe( 'add 3 filters with different priorities and run them', () => {
-	it( 'should run in order', () => {
-		addFilter( 'test.filter', filter_a );
-		addFilter( 'test.filter', filter_b, 2 );
-		addFilter( 'test.filter', filter_c, 8 );
-		expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testbca' );
-		removeFilter( 'test.filter' );
-	} );
+test( 'add 2 filters in a row and run them', () => {
+	addFilter( 'test.filter', filter_a );
+	addFilter( 'test.filter', filter_b );
+	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testab' );
 } );
 
-describe( 'add and remove an action', () => {
-	it( 'should leave the action unhooked', () => {
-		window.actionValue = '';
-		addAction( 'test.action', action_a );
-		removeAction( 'test.action' );
-		doAction( 'test.action' );
-		expect( window.actionValue ).toBe( '' );
-	} );
+test( 'add 3 filters with different priorities and run them', () => {
+	addFilter( 'test.filter', filter_a );
+	addFilter( 'test.filter', filter_b, 2 );
+	addFilter( 'test.filter', filter_c, 8 );
+	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testbca' );
 } );
 
-describe( 'add an action and run it', function() {
-	it( 'should', () => {
-		window.actionValue = '';
-		addAction( 'test.action', action_a );
-		doAction( 'test.action' );
-		expect( window.actionValue ).toBe( 'a' );
-		removeAction( 'test.action' );
-	} );
-} );
+test( 'filters with the same and different priorities', () => {
+	const callbacks = {};
 
-describe( 'add 2 actions in a row and then run them', function() {
-	it( 'should', () => {
-		window.actionValue = '';
-		addAction( 'test.action', action_a );
-		addAction( 'test.action', action_b );
-		doAction( 'test.action' );
-		expect( window.actionValue ).toBe( 'ab' );
-		removeAction( 'test.action' );
-	} );
-} );
-
-describe( 'add 3 actions with different priorities and run them', function() {
-	it( 'should', () => {
-		window.actionValue = '';
-		addAction( 'test.action', action_a );
-		addAction( 'test.action', action_b, 2 );
-		addAction( 'test.action', action_c, 8 );
-		doAction( 'test.action' );
-		expect( window.actionValue ).toBe( 'bca' );
-		removeAction( 'test.action' );
-	} );
-} );
-
-describe( 'pass in two arguments to an action', function() {
-	it( 'should', () => {
-		var arg1 = 10,
-			arg2 = 20;
-
-		addAction( 'test.action', function( a, b ) {
-			expect( arg1 ).toBe( a );
-			expect( arg2 ).toBe( b );
+	[ 1, 2, 3, 4 ].forEach( priority => {
+		[ 'a', 'b', 'c', 'd' ].forEach( string => {
+			callbacks[ 'fn_' + priority + string ] = value => {
+				return value.concat( priority + string );
+			};
 		} );
-		doAction( 'test.action', arg1, arg2 );
-		removeAction( 'test.action' );
-
-		expect( arg1 ).toBe( 10 );
-		expect( arg2 ).toBe( 20 );
 	} );
+
+	addFilter( 'test_order', callbacks.fn_3a, 3 );
+	addFilter( 'test_order', callbacks.fn_3b, 3 );
+	addFilter( 'test_order', callbacks.fn_3c, 3 );
+	addFilter( 'test_order', callbacks.fn_2a, 2 );
+	addFilter( 'test_order', callbacks.fn_2b, 2 );
+	addFilter( 'test_order', callbacks.fn_2c, 2 );
+
+	expect( applyFilters( 'test_order', [] ) ).toEqual(
+		[ '2a', '2b', '2c', '3a', '3b', '3c' ]
+	);
+
+	removeFilter( 'test_order', callbacks.fn_2b );
+	removeFilter( 'test_order', callbacks.fn_3a );
+
+	expect( applyFilters( 'test_order', [] ) ).toEqual(
+		[ '2a', '2c', '3b', '3c' ]
+	);
+
+	addFilter( 'test_order', callbacks.fn_4a, 4 );
+	addFilter( 'test_order', callbacks.fn_4b, 4 );
+	addFilter( 'test_order', callbacks.fn_1a, 1 );
+	addFilter( 'test_order', callbacks.fn_4c, 4 );
+	addFilter( 'test_order', callbacks.fn_1b, 1 );
+	addFilter( 'test_order', callbacks.fn_3d, 3 );
+	addFilter( 'test_order', callbacks.fn_4d, 4 );
+	addFilter( 'test_order', callbacks.fn_1c, 1 );
+	addFilter( 'test_order', callbacks.fn_2d, 2 );
+	addFilter( 'test_order', callbacks.fn_1d, 1 );
+
+	expect( applyFilters( 'test_order', [] ) ).toEqual( [
+		// all except 2b and 3a, which we removed earlier
+		'1a', '1b', '1c', '1d',
+		'2a', '2c', '2d',
+		'3b', '3c', '3d',
+		'4a', '4b', '4c', '4d',
+	] );
 } );
 
-describe( 'fire action multiple times', function() {
-	it( 'should', () => {
-		var func;
-		expect.assertions(2);
-
-		func = function() {
-			expect( true ).toBe( true );
-		};
-
-		addAction( 'test.action', func );
-		doAction( 'test.action' );
-		doAction( 'test.action' );
-		removeAction( 'test.action' );
-	} );
+test( 'add and remove an action', () => {
+	addAction( 'test.action', action_a );
+	removeAllActions( 'test.action' );
+	doAction( 'test.action' );
+	expect( window.actionValue ).toBe( '' );
 } );
 
-describe( 'remove specific action callback', function() {
-	it( 'should', () => {
-		window.actionValue = '';
-		addAction( 'test.action', action_a );
-		addAction( 'test.action', action_b, 2 );
-		addAction( 'test.action', action_c, 8 );
-
-		removeAction( 'test.action', action_b );
-		doAction( 'test.action' );
-		expect( window.actionValue ).toBe( 'ca' );
-		removeAction( 'test.action' );
-	} );
+test( 'add an action and run it', function() {
+	addAction( 'test.action', action_a );
+	doAction( 'test.action' );
+	expect( window.actionValue ).toBe( 'a' );
 } );
 
-describe( 'remove all action callbacks', function() {
-	it( 'should', () => {
-		window.actionValue = '';
-		addAction( 'test.action', action_a );
-		addAction( 'test.action', action_b, 2 );
-		addAction( 'test.action', action_c, 8 );
-
-		removeAllActions( 'test.action' );
-		doAction( 'test.action' );
-		expect( window.actionValue ).toBe( '' );
-	} );
+test( 'add 2 actions in a row and then run them', function() {
+	addAction( 'test.action', action_a );
+	addAction( 'test.action', action_b );
+	doAction( 'test.action' );
+	expect( window.actionValue ).toBe( 'ab' );
 } );
 
-describe( 'remove specific filter callback', function() {
-	it( 'should', () => {
-		addFilter( 'test.filter', filter_a );
-		addFilter( 'test.filter', filter_b, 2 );
-		addFilter( 'test.filter', filter_c, 8 );
-
-		removeFilter( 'test.filter', filter_b );
-		expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testca' );
-		removeFilter( 'test.filter' );
-	} );
+test( 'add 3 actions with different priorities and run them', function() {
+	addAction( 'test.action', action_a );
+	addAction( 'test.action', action_b, 2 );
+	addAction( 'test.action', action_c, 8 );
+	doAction( 'test.action' );
+	expect( window.actionValue ).toBe( 'bca' );
 } );
 
-describe( 'remove all filter callbacks', function() {
-	it( 'should', () => {
-		addFilter( 'test.filter', filter_a );
-		addFilter( 'test.filter', filter_b, 2 );
-		addFilter( 'test.filter', filter_c, 8 );
+test( 'pass in two arguments to an action', function() {
+	const arg1 = { a: 10 };
+	const arg2 = { b: 20 };
 
-		removeAllFilters( 'test.filter' );
-		expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'test' );
+	addAction( 'test.action', function( a, b ) {
+		expect( a ).toBe( arg1 );
+		expect( b ).toBe( arg2 );
 	} );
+	doAction( 'test.action', arg1, arg2 );
+} );
+
+test( 'fire action multiple times', function() {
+	expect.assertions( 2 );
+
+	function func() {
+		expect( true ).toBe( true );
+	};
+
+	addAction( 'test.action', func );
+	doAction( 'test.action' );
+	doAction( 'test.action' );
+} );
+
+test( 'remove specific action callback', function() {
+	addAction( 'test.action', action_a );
+	addAction( 'test.action', action_b, 2 );
+	addAction( 'test.action', action_c, 8 );
+
+	removeAction( 'test.action', action_b );
+	doAction( 'test.action' );
+	expect( window.actionValue ).toBe( 'ca' );
+} );
+
+test( 'remove all action callbacks', function() {
+	addAction( 'test.action', action_a );
+	addAction( 'test.action', action_b, 2 );
+	addAction( 'test.action', action_c, 8 );
+
+	removeAllActions( 'test.action' );
+	doAction( 'test.action' );
+	expect( window.actionValue ).toBe( '' );
+} );
+
+test( 'remove specific filter callback', function() {
+	addFilter( 'test.filter', filter_a );
+	addFilter( 'test.filter', filter_b, 2 );
+	addFilter( 'test.filter', filter_c, 8 );
+
+	removeFilter( 'test.filter', filter_b );
+	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testca' );
+} );
+
+test( 'remove all filter callbacks', function() {
+	addFilter( 'test.filter', filter_a );
+	addFilter( 'test.filter', filter_b, 2 );
+	addFilter( 'test.filter', filter_c, 8 );
+
+	removeAllFilters( 'test.filter' );
+	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'test' );
 } );
 
 // Test doingAction, didAction, hasAction.
-describe( 'Test doingAction, didAction and hasAction.', function() {
-	it( 'should', () => {
-		let actionCalls = 0;
+test( 'Test doingAction, didAction and hasAction.', function() {
+	let actionCalls = 0;
 
-		// Reset state for testing.
-		removeAction( 'test.action' );
-		addAction( 'another.action', () => {} );
-		doAction( 'another.action' );
+	addAction( 'another.action', () => {} );
+	doAction( 'another.action' );
 
-		// Verify no action is running yet.
-		expect( doingAction( 'test.action' ) ).toBe( false );
+	// Verify no action is running yet.
+	expect( doingAction( 'test.action' ) ).toBe( false );
 
-		expect( didAction( 'test.action' ) ).toBe( 0 );
-		expect( hasAction( 'test.action' ) ).toBe( false );
+	expect( didAction( 'test.action' ) ).toBe( 0 );
+	expect( hasAction( 'test.action' ) ).toBe( 0 );
 
-		addAction( 'test.action', () => {
-			actionCalls++;
-			expect( currentAction() ).toBe( 'test.action' );
-			expect( doingAction( 'test.action' ) ).toBe( true );
-		} );
-
-		// Verify action added, not running yet.
-		expect( doingAction( 'test.action' ) ).toBe( false );
-		expect( didAction( 'test.action' ) ).toBe( 0 );
-		expect( hasAction( 'test.action' ) ).toBe( true );
-
-		doAction( 'test.action' );
-
-		// Verify action added and running.
-		expect( actionCalls ).toBe( 1 );
-		expect( doingAction( 'test.action' ) ).toBe( false );
-		expect( didAction( 'test.action' ) ).toBe( 1 );
-		expect( hasAction( 'test.action' ) ).toBe( true );
-		expect( doingAction() ).toBe( false );
-		expect( doingAction( 'test.action' ) ).toBe( false );
-		expect( doingAction( 'notatest.action' ) ).toBe( false );
-		expect( currentAction() ).toBe( null );
-
-		doAction( 'test.action' );
-		expect( actionCalls ).toBe( 2 );
-		expect( didAction( 'test.action' ) ).toBe( 2 );
-
-		removeAction( 'test.action' );
-
-		// Verify state is reset appropriately.
-		expect( doingAction( 'test.action' ) ).toBe( false );
-		expect( didAction( 'test.action' ) ).toBe( 0 );
-		expect( hasAction( 'test.action' ) ).toBe( false );
-
-		doAction( 'another.action' );
-		expect( doingAction( 'test.action' ) ).toBe( false );
-
-		// Verify hasAction returns false when no matching action.
-		expect( hasAction( 'notatest.action' ) ).toBe( false );
-
+	addAction( 'test.action', () => {
+		actionCalls++;
+		expect( currentAction() ).toBe( 'test.action' );
+		expect( doingAction() ).toBe( true );
+		expect( doingAction( 'test.action' ) ).toBe( true );
 	} );
+
+	// Verify action added, not running yet.
+	expect( doingAction( 'test.action' ) ).toBe( false );
+	expect( didAction( 'test.action' ) ).toBe( 0 );
+	expect( hasAction( 'test.action' ) ).toBe( 1 );
+
+	doAction( 'test.action' );
+
+	// Verify action added and running.
+	expect( actionCalls ).toBe( 1 );
+	expect( doingAction( 'test.action' ) ).toBe( false );
+	expect( didAction( 'test.action' ) ).toBe( 1 );
+	expect( hasAction( 'test.action' ) ).toBe( 1 );
+	expect( doingAction() ).toBe( false );
+	expect( doingAction( 'test.action' ) ).toBe( false );
+	expect( doingAction( 'notatest.action' ) ).toBe( false );
+	expect( currentAction() ).toBe( null );
+
+	doAction( 'test.action' );
+	expect( actionCalls ).toBe( 2 );
+	expect( didAction( 'test.action' ) ).toBe( 2 );
+
+	removeAllActions( 'test.action' );
+
+	// Verify state is reset appropriately.
+	expect( doingAction( 'test.action' ) ).toBe( false );
+	expect( didAction( 'test.action' ) ).toBe( 2 );
+	expect( hasAction( 'test.action' ) ).toBe( 0 );
+
+	doAction( 'another.action' );
+	expect( doingAction( 'test.action' ) ).toBe( false );
+
+	// Verify hasAction returns 0 when no matching action.
+	expect( hasAction( 'notatest.action' ) ).toBe( 0 );
 } );
 
-describe( 'Verify doingFilter, didFilter and hasFilter.', function() {
-	it( 'should', () => {
-		let filterCalls = 0;
+test( 'Verify doingFilter, didFilter and hasFilter.', function() {
+	let filterCalls = 0;
 
-		addFilter( 'runtest.filter', arg => {
-			filterCalls++;
-			expect( currentFilter() ).toBe( 'runtest.filter' );
-			expect( doingFilter( 'runtest.filter' ) ).toBeTruthy();
-			return arg;
-		} );
-
-		// Verify filter added and running.
-		const test = applyFilters( 'runtest.filter', 'someValue' );
-		expect( test ).toBe( 'someValue' );
-		expect( filterCalls ).toBe( 1 );
-		expect( didFilter( 'runtest.filter' ) ).toBe( 1 );
-		expect( hasFilter( 'runtest.filter' ) ).toBe( true );
-		expect( hasFilter( 'notatest.filter' ) ).toBe( false );
-		expect( doingFilter() ).toBe( false );
-		expect( doingFilter( 'runtest.filter' ) ).toBe( false );
-		expect( doingFilter( 'notatest.filter' ) ).toBe( false );
-		expect( currentFilter() ).toBe( null );
-
-		removeFilter( 'runtest.filter' );
+	addFilter( 'runtest.filter', arg => {
+		filterCalls++;
+		expect( currentFilter() ).toBe( 'runtest.filter' );
+		expect( doingFilter() ).toBe( true );
+		expect( doingFilter( 'runtest.filter' ) ).toBe( true );
+		return arg;
 	} );
+
+	// Verify filter added and running.
+	const test = applyFilters( 'runtest.filter', 'someValue' );
+	expect( test ).toBe( 'someValue' );
+	expect( filterCalls ).toBe( 1 );
+	expect( didFilter( 'runtest.filter' ) ).toBe( 1 );
+	expect( hasFilter( 'runtest.filter' ) ).toBe( 1 );
+	expect( hasFilter( 'notatest.filter' ) ).toBe( 0 );
+	expect( doingFilter() ).toBe( false );
+	expect( doingFilter( 'runtest.filter' ) ).toBe( false );
+	expect( doingFilter( 'notatest.filter' ) ).toBe( false );
+	expect( currentFilter() ).toBe( null );
+
+	removeAllFilters( 'runtest.filter' );
+
+	expect( hasFilter( 'runtest.filter' ) ).toBe( 0 );
+	expect( didFilter( 'runtest.filter' ) ).toBe( 1 );
 } );
-
-

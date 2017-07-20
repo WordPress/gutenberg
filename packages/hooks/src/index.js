@@ -1,7 +1,6 @@
 import HOOKS from './hooks';
 import createAddHook from './createAddHook';
 import createRemoveHook from './createRemoveHook';
-import createRemoveAllHook from './createRemoveAllHook';
 import createHasHook from './createHasHook';
 import createRunHook from './createRunHook';
 import createDoingHook from './createDoingHook';
@@ -20,8 +19,8 @@ export const hasAction = createHasHook( HOOKS.actions );
 export const hasFilter = createHasHook( HOOKS.filters );
 
 // Remove all actions/filters functions.
-export const removeAllActions = createRemoveAllHook( HOOKS.actions );
-export const removeAllFilters = createRemoveAllHook( HOOKS.filters );
+export const removeAllActions = createRemoveHook( HOOKS.actions, true );
+export const removeAllFilters = createRemoveHook( HOOKS.filters, true );
 
 // Do action/apply filters functions.
 export const doAction     = createRunHook( HOOKS.actions );

@@ -1,16 +1,23 @@
 /**
- * Retrieve the number of times an action is fired.
+ * Returns a function which, when invoked, will return the number of times a
+ * hook has been called.
  *
- * @param {string} hooksArray Hooks array of hooks to check.
- * @param {string} action     The action to check.
+ * @param  {Object}   hooks Stored hooks, keyed by hook name.
  *
- * @return {number}           The number of times the hook has run.
+ * @return {Function}       Function that returns a hook's call count.
  */
-const createDidHook = function( hooksArray ) {
-	return function( action ) {
-		return hooksArray && hooksArray[ action ] && hooksArray[ action ].runs ?
-			hooksArray[ action ].runs :
-			0;
+function createDidHook( hooks ) {
+	/**
+	 * Returns the number of times an action has been fired.
+	 *
+	 * @param  {string} hookName The hook name to check.
+	 *
+	 * @return {number}          The number of times the hook has run.
+	 */
+	return function didHook( hookName ) {
+		return hooks.hasOwnProperty( hookName ) && hooks[ hookName ].runs
+			? hooks[ hookName ].runs
+			: 0;
 	};
 }
 

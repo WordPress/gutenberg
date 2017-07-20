@@ -1,22 +1,26 @@
-import sortHooks from './sortHooks';
-
 /**
  * Returns a function which, when invoked, will add a hook.
  *
- * @param  {string}   hooksArray Hooks array to which hooks are to be added
- * @return {Function}            Hook added.
+ * @param  {Object}   hooks Stored hooks, keyed by hook name.
+ *
+ * @return {Function}       Function that adds a new hook.
  */
-const createAddHook = function( hooksArray ) {
+function createAddHook( hooks ) {
 	/**
-	 * Adds the hook to the appropriate hooks container
+	 * Adds the hook to the appropriate hooks container.
 	 *
-	 * @param {string}   hook     Name of hook to add
+	 * @param {string}   hookName Name of hook to add
 	 * @param {Function} callback Function to call when the hook is run
 	 * @param {?number}  priority Priority of this hook (default=10)
 	 */
-	return function( hook, callback, priority ) {
-		var hookObject, hooks;
-		if ( typeof hook !== 'string' || typeof callback !== 'function' ) {
+	return function addHook( hookName, callback, priority ) {
+		if ( typeof hookName !== 'string' ) {
+			console.error( 'The hook name must be a string.' );
+			return;
+		}
+
+		if ( typeof callback !== 'function' ) {
+			console.error( 'The hook callback must be a function.' );
 			return;
 		}
 
@@ -29,25 +33,31 @@ const createAddHook = function( hooksArray ) {
 
 		// Validate numeric priority
 		if ( isNaN( priority ) ) {
+			console.error( 'The hook priority must be omitted or a number.' );
 			return;
 		}
 
-		hookObject = {
-			callback: callback,
-			priority: priority
-		};
+		const handler = { callback, priority };
+		let handlers;
 
-		if ( hooksArray.hasOwnProperty( hook ) ) {
-			// Append and re-sort amongst existing
-			hooks = hooksArray[ hook ];
-			hooks.push( hookObject );
-			hooks = sortHooks( hooks );
+		if ( hooks.hasOwnProperty( hookName ) ) {
+			// Find the correct insert index of the new hook.
+			handlers = hooks[ hookName ];
+			let i = 0;
+			while ( i < handlers.length ) {
+				if ( handlers[ i ].priority > priority ) {
+					break;
+				}
+				i++;
+			}
+			// Insert (or append) the new hook.
+			handlers.splice( i, 0, handler );
 		} else {
-			// First of its type needs no sort
-			hooks = [ hookObject ];
+			// This is the first hook of its type.
+			handlers = [ handler ];
 		}
 
-		hooksArray[ hook ] = hooks;
+		hooks[ hookName ] = handlers;
 	};
 }
 

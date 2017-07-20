@@ -1,23 +1,31 @@
 /**
- * Checks to see if an action is currently being executed.
+ * Returns a function which, when invoked, will return whether a hook is
+ * currently being executed.
  *
- * @param  {string} type   Type of hooks to check.
- * @param {string}  action The name of the action to check for, if omitted will check for any action being performed.
+ * @param  {Object}   hooks Stored hooks, keyed by hook name.
  *
- * @return {bool}          Whether the hook is being executed.
+ * @return {Function}       Function that returns whether a hook is currently
+ *                          being executed.
  */
-const createDoingHook = function( hooksArray ) {
-	return function( action ) {
-
-		// If the action was not passed, check for any current hook.
-		if ( 'undefined' === typeof action ) {
-			return 'undefined' !== typeof hooksArray.current;
+function createDoingHook( hooks ) {
+	/**
+	 * Returns whether a hook is currently being executed.
+	 *
+	 * @param  {?string} hookName The name of the hook to check for.  If
+	 *                            omitted, will check for any hook being executed.
+	 *
+	 * @return {bool}             Whether the hook is being executed.
+	 */
+	return function doingHook( hookName ) {
+		// If the hookName was not passed, check for any current hook.
+		if ( 'undefined' === typeof hookName ) {
+			return 'undefined' !== typeof hooks.current;
 		}
 
 		// Return the current hook.
-		return hooksArray && hooksArray.current ?
-			action === hooksArray.current :
-			false;
+		return hooks.current
+			? hookName === hooks.current
+			: false;
 	};
 }
 

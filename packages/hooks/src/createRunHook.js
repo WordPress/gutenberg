@@ -1,23 +1,24 @@
 /**
- * Returns a function which, when invoked, will execute all registered
- * hooks of the specified type by calling upon runner with its hook name
- * and arguments.
+ * Returns a function which, when invoked, will execute all callbacks
+ * registered to a hook of the specified type, optionally returning the final
+ * value of the call chain.
  *
- * @param  {Function} hooks          Object that contains the hooks to run.
- * @param  {bool}     returnFirstArg Whether each hook callback is expected to
+ * @param  {Object}   hooks          Stored hooks, keyed by hook name.
+ * @param  {?bool}    returnFirstArg Whether each hook callback is expected to
  *                                   return its first argument.
- * @return {Function}        Hook runner
+ *
+ * @return {Function}                Function that runs hook callbacks.
  */
-const createRunHook = function( hooks, returnFirstArg ) {
+function createRunHook( hooks, returnFirstArg ) {
 	/**
-	 * Runs the specified hook.
+	 * Runs all callbacks for the specified hook.
 	 *
-	 * @param  {string} hookName The hook to run
-	 * @param  {...*}   args     Arguments to pass to the hook callbacks
-	 * @return {*}               Return value of runner, if applicable
-	 * @private
+	 * @param  {string} hookName The name of the hook to run.
+	 * @param  {...*}   args     Arguments to pass to the hook callbacks.
+	 *
+	 * @return {*}               Return value of runner, if applicable.
 	 */
-	return function runner( hookName, ...args ) {
+	return function runHooks( hookName, ...args ) {
 		const handlers = hooks[ hookName ];
 		let maybeReturnValue = args[ 0 ];
 
