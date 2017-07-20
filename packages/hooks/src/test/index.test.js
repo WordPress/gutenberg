@@ -206,47 +206,53 @@ describe( 'remove all filter callbacks', function() {
 // Test doingAction, didAction, hasAction.
 describe( 'Test doingAction, didAction and hasAction.', function() {
 	it( 'should', () => {
+		let actionCalls = 0;
 
 		// Reset state for testing.
 		removeAction( 'test.action' );
-		addAction( 'another.action', function(){} );
+		addAction( 'another.action', () => {} );
 		doAction( 'another.action' );
 
 		// Verify no action is running yet.
-		expect( ! doingAction( 'test.action' ) ).toBeTruthy();
+		expect( doingAction( 'test.action' ) ).toBe( false );
 
 		expect( didAction( 'test.action' ) ).toBe( 0 );
-		expect( ! hasAction( 'test.action' ) ).toBeTruthy();
+		expect( hasAction( 'test.action' ) ).toBe( false );
 
-		addAction( 'test.action', action_a );
+		addAction( 'test.action', () => {
+			actionCalls++;
+			expect( doingAction( 'test.action' ) ).toBe( true );
+		} );
 
 		// Verify action added, not running yet.
-		expect( ! doingAction( 'test.action' ) ).toBeTruthy();
+		expect( doingAction( 'test.action' ) ).toBe( false );
 		expect( didAction( 'test.action' ) ).toBe( 0 );
-		expect( hasAction( 'test.action' ) ).toBeTruthy();
+		expect( hasAction( 'test.action' ) ).toBe( true );
 
 		doAction( 'test.action' );
 
 		// Verify action added and running.
-		expect( doingAction( 'test.action' ) ).toBeTruthy();
+		expect( actionCalls ).toBe( 1 );
+		expect( doingAction( 'test.action' ) ).toBe( false );
 		expect( didAction( 'test.action' ) ).toBe( 1 );
-		expect( hasAction( 'test.action' ) ).toBeTruthy();
+		expect( hasAction( 'test.action' ) ).toBe( true );
 
 		doAction( 'test.action' );
+		expect( actionCalls ).toBe( 2 );
 		expect( didAction( 'test.action' ) ).toBe( 2 );
 
 		removeAction( 'test.action' );
 
 		// Verify state is reset appropriately.
-		expect( doingAction( 'test.action' ) ).toBeTruthy();
+		expect( doingAction( 'test.action' ) ).toBe( false );
 		expect( didAction( 'test.action' ) ).toBe( 0 );
-		expect( ! hasAction( 'test.action' ) ).toBeTruthy();
+		expect( hasAction( 'test.action' ) ).toBe( false );
 
 		doAction( 'another.action' );
-		expect( ! doingAction( 'test.action' ) ).toBeTruthy();
+		expect( doingAction( 'test.action' ) ).toBe( false );
 
 		// Verify hasAction returns false when no matching action.
-		expect( ! hasAction( 'notatest.action' ) ).toBeTruthy();
+		expect( hasAction( 'notatest.action' ) ).toBe( false );
 
 	} );
 } );
