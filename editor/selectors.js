@@ -242,11 +242,15 @@ export function isEditedPostBeingScheduled( state ) {
  * @return {String}       Raw post title
  */
 export function getEditedPostTitle( state ) {
-	const editedTitle = get( state.editor, 'edits.title' );
+	const editedTitle = getPostEdits( state ).title;
 	if ( editedTitle !== undefined ) {
 		return editedTitle;
 	}
-	return get( state.currentPost, 'title.raw' );
+	const currentPost = getCurrentPost( state );
+	if ( currentPost.title && currentPost.title.raw ) {
+		return currentPost.title.raw;
+	}
+	return '';
 }
 
 /**
@@ -258,7 +262,7 @@ export function getEditedPostTitle( state ) {
 export function getDocumentTitle( state ) {
 	let title = getEditedPostTitle( state );
 
-	if ( ! title || '' === title.trim() ) {
+	if ( ! title.trim() ) {
 		title = isCleanNewPost( state ) ? __( 'New post' ) : __( '(Untitled)' );
 	}
 	return title;

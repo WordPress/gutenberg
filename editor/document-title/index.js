@@ -30,12 +30,12 @@ class DocumentTitle extends Component {
 		}
 	}
 
-	render() {
-		return null;
-	}
-
 	componentWillUnmount() {
 		document.title = this.originalDocumentTitle;
+	}
+
+	render() {
+		return null;
 	}
 }
 

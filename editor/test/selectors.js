@@ -312,6 +312,7 @@ describe( 'selectors', () => {
 				},
 				editor: {
 					dirty: false,
+					edits: {},
 				},
 			};
 
@@ -340,6 +341,7 @@ describe( 'selectors', () => {
 				},
 				editor: {
 					dirty: false,
+					edits: {},
 				},
 			};
 
@@ -353,6 +355,7 @@ describe( 'selectors', () => {
 				},
 				editor: {
 					dirty: true,
+					edits: {},
 				},
 			};
 
@@ -367,6 +370,7 @@ describe( 'selectors', () => {
 				},
 				editor: {
 					dirty: true,
+					edits: {},
 				},
 			};
 
