@@ -164,25 +164,21 @@ test( 'add 3 actions with different priorities and run them', function() {
 } );
 
 test( 'pass in two arguments to an action', function() {
-	var arg1 = 10,
-		arg2 = 20;
+	const arg1 = { a: 10 };
+	const arg2 = { b: 20 };
 
 	addAction( 'test.action', function( a, b ) {
-		expect( arg1 ).toBe( a );
-		expect( arg2 ).toBe( b );
+		expect( a ).toBe( arg1 );
+		expect( b ).toBe( arg2 );
 	} );
 	doAction( 'test.action', arg1, arg2 );
 	removeAllActions( 'test.action' );
-
-	expect( arg1 ).toBe( 10 );
-	expect( arg2 ).toBe( 20 );
 } );
 
 test( 'fire action multiple times', function() {
-	var func;
-	expect.assertions(2);
+	expect.assertions( 2 );
 
-	func = function() {
+	function func() {
 		expect( true ).toBe( true );
 	};
 
