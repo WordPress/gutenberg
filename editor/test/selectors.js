@@ -148,16 +148,24 @@ describe( 'selectors', () => {
 	describe( 'isEditedPostNew', () => {
 		it( 'should return true when the post is new', () => {
 			const state = {
-				currentPost: {},
+				currentPost: {
+					status: 'auto-draft',
+				},
+				editor: {
+					edits: {},
+				},
 			};
 
 			expect( isEditedPostNew( state ) ).toBe( true );
 		} );
 
-		it( 'should return false when the post has an ID', () => {
+		it( 'should return false when the post is not new', () => {
 			const state = {
 				currentPost: {
-					id: 1,
+					status: 'draft',
+				},
+				editor: {
+					edits: {},
 				},
 			};
 
@@ -193,8 +201,12 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					dirty: false,
+					edits: {},
 				},
-				currentPost: {},
+				currentPost: {
+					id: 1,
+					status: 'auto-draft',
+				},
 			};
 
 			expect( isCleanNewPost( state ) ).toBe( true );
@@ -204,8 +216,12 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					dirty: false,
+					edits: {},
 				},
-				currentPost: { id: 1 },
+				currentPost: {
+					id: 1,
+					status: 'draft',
+				},
 			};
 
 			expect( isCleanNewPost( state ) ).toBe( false );
@@ -215,7 +231,11 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					dirty: true,
-					currentPost: {},
+					edits: {},
+				},
+				currentPost: {
+					id: 1,
+					status: 'auto-draft',
 				},
 			};
 
@@ -337,6 +357,8 @@ describe( 'selectors', () => {
 		it( 'should return new post title when new post is clean', () => {
 			const state = {
 				currentPost: {
+					id: 1,
+					status: 'auto-draft',
 					title: { raw: '' },
 				},
 				editor: {
@@ -351,6 +373,8 @@ describe( 'selectors', () => {
 		it( 'should return untitled title when new post is dirty', () => {
 			const state = {
 				currentPost: {
+					id: 1,
+					status: 'auto-draft',
 					title: { raw: '' },
 				},
 				editor: {
@@ -366,6 +390,7 @@ describe( 'selectors', () => {
 			const state = {
 				currentPost: {
 					id: 123,
+					status: 'draft',
 					title: { raw: '' },
 				},
 				editor: {

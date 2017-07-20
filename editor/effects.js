@@ -27,17 +27,13 @@ export default {
 		const { dispatch, getState } = store;
 		const state = getState();
 		const post = getCurrentPost( state );
-		const isNew = ! post.id;
 		const edits = getPostEdits( state );
 		const toSend = {
 			...edits,
 			content: serialize( getBlocks( state ) ),
+			id: post.id,
 		};
 		const transactionId = uniqueId();
-
-		if ( ! isNew ) {
-			toSend.id = post.id;
-		}
 
 		dispatch( {
 			type: 'CLEAR_POST_EDITS',
@@ -58,7 +54,6 @@ export default {
 				type: 'REQUEST_POST_UPDATE_SUCCESS',
 				previousPost: post,
 				post: newPost,
-				isNew,
 				optimist: { type: COMMIT, id: transactionId },
 			} );
 		} ).fail( ( err ) => {
@@ -75,7 +70,7 @@ export default {
 		} );
 	},
 	REQUEST_POST_UPDATE_SUCCESS( action, store ) {
-		const { previousPost, post, isNew } = action;
+		const { previousPost, post } = action;
 		const { dispatch } = store;
 
 		const publishStatus = [ 'publish', 'private', 'future' ];
@@ -102,13 +97,15 @@ export default {
 			) );
 		}
 
-		if ( ! isNew ) {
-			return;
+		if ( get( window.history.state, 'id' ) !== post.id ) {
+			window.history.replaceState(
+				{ id: post.id },
+				'Post ' + post.id,
+				getGutenbergURL( {
+					post_id: post.id,
+				} )
+			);
 		}
-		const newURL = getGutenbergURL( {
-			post_id: post.id,
-		} );
-		window.history.replaceState( {}, 'Post ' + post.id, newURL );
 	},
 	REQUEST_POST_UPDATE_FAILURE( action, store ) {
 		const { post, edits } = action;
