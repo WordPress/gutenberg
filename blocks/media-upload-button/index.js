@@ -52,9 +52,13 @@ const getGalleryDetailsMediaFrame = () => {
 
 // the media library image object contains numerous attributes
 // we only need this set to display the image in the library
-const slimImageObjects = ( imgs ) => {
+const slimImageObject = ( img ) => {
 	const attrSet = [ 'sizes', 'mime', 'type', 'subtype', 'id', 'url', 'alt' ];
-	return imgs.map( ( img ) => pick( img, attrSet ) );
+	return pick( img, attrSet );
+};
+
+const slimImageObjects = ( imgs ) => {
+	return imgs.map( ( img ) => slimImageObject( img ) );
 };
 
 class MediaUploadButton extends Component {
@@ -109,7 +113,7 @@ class MediaUploadButton extends Component {
 		if ( multiple ) {
 			onSelect( slimImageObjects( selectedImages.models.map( ( model ) => model.toJSON() ) ) );
 		} else {
-			onSelect( selectedImages.models[ 0 ].toJSON() );
+			onSelect( slimImageObject( selectedImages.models[ 0 ].toJSON() ) );
 		}
 	}
 
