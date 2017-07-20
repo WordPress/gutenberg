@@ -13,6 +13,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * User preference management.
  */
 class Gutenberg_User_Preferences {
+	/**
+	 * Used to validate preference names are correct.
+	 *
+	 * @var Array $valid_preferences List of valid preference names.
+	 */
 	public static $valid_preferences = array(
 		'block_usage',
 		'layout_config',
