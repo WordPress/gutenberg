@@ -9,7 +9,7 @@
  *
  * @return {Function}                Function that runs hook callbacks.
  */
-const createRunHook = function( hooks, returnFirstArg ) {
+function createRunHook( hooks, returnFirstArg ) {
 	/**
 	 * Runs all callbacks for the specified hook.
 	 *

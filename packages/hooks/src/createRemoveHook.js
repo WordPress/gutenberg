@@ -7,7 +7,7 @@
  *
  * @return {Function}            Function that removes hooks.
  */
-const createRemoveHook = function( hooks, removeAll ) {
+function createRemoveHook( hooks, removeAll ) {
 	/**
 	 * Removes the specified callback (or all callbacks) from the hook with a
 	 * given name.
