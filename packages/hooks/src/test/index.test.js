@@ -230,6 +230,7 @@ describe( 'Test doingAction, didAction and hasAction.', function() {
 		addAction( 'test.action', () => {
 			actionCalls++;
 			expect( currentAction() ).toBe( 'test.action' );
+			expect( doingAction() ).toBe( true );
 			expect( doingAction( 'test.action' ) ).toBe( true );
 		} );
 
@@ -276,7 +277,8 @@ describe( 'Verify doingFilter, didFilter and hasFilter.', function() {
 		addFilter( 'runtest.filter', arg => {
 			filterCalls++;
 			expect( currentFilter() ).toBe( 'runtest.filter' );
-			expect( doingFilter( 'runtest.filter' ) ).toBeTruthy();
+			expect( doingFilter() ).toBe( true );
+			expect( doingFilter( 'runtest.filter' ) ).toBe( true );
 			return arg;
 		} );
 

@@ -1,25 +1,28 @@
 /**
- * Use an insert sort for keeping our hooks organized based on priority.
+ * Use an insert sort to keep hook handlers organized based on priority.
  *
  * @see http://jsperf.com/javascript-sort
  *
- * @param  {Array} hooks Array of the hooks to sort
- * @return {Array}       The sorted array
+ * @param  {Array} handlers Array of the handlers to sort
+ * @return {Array}          The sorted array
  * @private
  */
-const sortHooks = function( hooks ) {
+const sortHooks = function( handlers ) {
 	var i, tmpHook, j, prevHook;
-	for ( i = 1; i < hooks.length; i++ ) {
-		tmpHook = hooks[ i ];
+	for ( i = 1; i < handlers.length; i++ ) {
+		tmpHook = handlers[ i ];
 		j = i;
-		while ( ( prevHook = hooks[ j - 1 ] ) && prevHook.priority > tmpHook.priority ) {
-			hooks[ j ] = hooks[ j - 1 ];
+		while (
+			( prevHook = handlers[ j - 1 ] ) &&
+			prevHook.priority > tmpHook.priority
+		) {
+			handlers[ j ] = handlers[ j - 1 ];
 			--j;
 		}
-		hooks[ j ] = tmpHook;
+		handlers[ j ] = tmpHook;
 	}
 
-	return hooks;
+	return handlers;
 }
 
 export default sortHooks;

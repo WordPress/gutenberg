@@ -3,20 +3,20 @@ import sortHooks from './sortHooks';
 /**
  * Returns a function which, when invoked, will add a hook.
  *
- * @param  {string}   hooksArray Hooks array to which hooks are to be added
- * @return {Function}            Hook added.
+ * @param  {Object}   hooks Stored hooks, keyed by hook name.
+ *
+ * @return {Function}       Function that adds a new hook.
  */
-const createAddHook = function( hooksArray ) {
+function createAddHook( hooks ) {
 	/**
-	 * Adds the hook to the appropriate hooks container
+	 * Adds the hook to the appropriate hooks container.
 	 *
-	 * @param {string}   hook     Name of hook to add
+	 * @param {string}   hookName Name of hook to add
 	 * @param {Function} callback Function to call when the hook is run
 	 * @param {?number}  priority Priority of this hook (default=10)
 	 */
-	return function( hook, callback, priority ) {
-		var hookObject, hooks;
-		if ( typeof hook !== 'string' || typeof callback !== 'function' ) {
+	return function addHook( hookName, callback, priority ) {
+		if ( typeof hookName !== 'string' || typeof callback !== 'function' ) {
 			return;
 		}
 
@@ -32,22 +32,23 @@ const createAddHook = function( hooksArray ) {
 			return;
 		}
 
-		hookObject = {
+		const handler = {
 			callback: callback,
-			priority: priority
+			priority: priority,
 		};
+		let handlers;
 
-		if ( hooksArray.hasOwnProperty( hook ) ) {
-			// Append and re-sort amongst existing
-			hooks = hooksArray[ hook ];
-			hooks.push( hookObject );
-			hooks = sortHooks( hooks );
+		if ( hooks.hasOwnProperty( hookName ) ) {
+			// Append and re-sort amongst the existing callbacks.
+			handlers = hooks[ hookName ];
+			handlers.push( handler );
+			handlers = sortHooks( handlers );
 		} else {
-			// First of its type needs no sort
-			hooks = [ hookObject ];
+			// This is the first hook of its type.
+			handlers = [ handler ];
 		}
 
-		hooksArray[ hook ] = hooks;
+		hooks[ hookName ] = handlers;
 	};
 }
 
