@@ -1,9 +1,8 @@
 /**
- * External dependencies
+ * External Dependencies
  */
 import { connect } from 'react-redux';
 import { filter } from 'lodash';
-import classnames from 'classnames';
 
 /**
  * WordPress Dependencies
@@ -15,6 +14,7 @@ import { PanelBody } from 'components';
  * Internal Dependencies
  */
 import './style.scss';
+import TableOfContentsItem from './item';
 import { getBlocks } from '../../selectors';
 
 const headingToInt = ( heading ) => {
@@ -42,7 +42,12 @@ const headingsReducer = ( [ hs, previousLevel, index ], heading ) => {
 		let i = previousLevel + 1;
 		while ( i < headingLevel ) {
 			hs.push(
-				<MissingTocItem key={ index++ } nodeName={ `H${ i }` } />
+				<TableOfContentsItem
+					key={ index++ }
+					level={ i }
+				>
+					<em>{ __( '(Missing header level)' ) }</em>
+				</TableOfContentsItem>
 			);
 			i++;
 		}
@@ -50,42 +55,21 @@ const headingsReducer = ( [ hs, previousLevel, index ], heading ) => {
 
 	return [
 		hs.concat(
-			<TocItem
+			<TableOfContentsItem
 				key={ index++ }
-				nodeName={ heading.attributes.nodeName }
+				level={ headingLevel }
 				valid={ valid }
 			>
 				{ heading.attributes.content.length
 					? heading.attributes.content
 					: <em>{ __( '(Empty header)' ) }</em>
 				}
-			</TocItem>
+			</TableOfContentsItem>
 		),
 		headingLevel,
 		index,
 	];
 };
-
-const TocItem = ( { valid, nodeName, children } ) => (
-	<div
-		className={ classnames(
-			'table-of-contents__item',
-			`is-${ nodeName }`,
-			{
-				'is-invalid': ! valid,
-			}
-		) }
-	>
-		<strong>{ nodeName }</strong>
-		{ children }
-	</div>
-);
-
-const MissingTocItem = ( { nodeName } ) => (
-	<TocItem nodeName={ nodeName }>
-		<em>{ __( '(Missing header level)' ) }</em>
-	</TocItem>
-);
 
 const TableOfContents = ( { blocks } ) => {
 	const headings = filter( blocks, ( block ) => block.name === 'core/heading' );
