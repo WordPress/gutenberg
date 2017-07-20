@@ -24,14 +24,13 @@ function createRemoveHook( hooks, removeAll ) {
 		}
 
 		if ( removeAll ) {
-			const runs = hooks[ hookName ].runs;
-			hooks[ hookName ] = [];
-			if ( runs ) {
-				hooks[ hookName ].runs = runs;
-			}
+			hooks[ hookName ] = {
+				runs: hooks[ hookName ].runs,
+				handlers: [],
+			};
 		} else if ( callback ) {
 			// Try to find the specified callback to remove.
-			const handlers = hooks[ hookName ];
+			const handlers = hooks[ hookName ].handlers;
 			for ( let i = handlers.length - 1; i >= 0; i-- ) {
 				if ( handlers[ i ].callback === callback ) {
 					handlers.splice( i, 1 );
