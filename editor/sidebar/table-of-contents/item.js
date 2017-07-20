@@ -3,13 +3,17 @@
  */
 import classnames from 'classnames';
 
-const TableOfContentsItem = ( { valid, level, children } ) => (
+const TableOfContentsItem = ( {
+	children,
+	isValid,
+	level,
+} ) => (
 	<div
 		className={ classnames(
 			'table-of-contents__item',
 			`is-H${ level }`,
 			{
-				'is-invalid': ! valid,
+				'is-invalid': ! isValid,
 			}
 		) }
 	>
