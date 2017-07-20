@@ -418,12 +418,6 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 	$is_demo = isset( $page_match[2] );
 
-	/**
-	 * Scripts
-	 */
-	wp_enqueue_media();
-	wp_enqueue_editor();
-
 	wp_add_inline_script(
 		'editor', 'window.wp.oldEditor = window.wp.editor;', 'after'
 	);
@@ -573,6 +567,14 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 	// Initialize the editor.
 	wp_add_inline_script( 'wp-editor', 'wp.api.init().done( function() { wp.editor.createEditorInstance( \'editor\', window._wpGutenbergPost ); } );' );
+
+	/**
+	 * Scripts
+	 */
+	wp_enqueue_media( array(
+		'post' => $post_to_edit['id'],
+	) );
+	wp_enqueue_editor();
 
 	/**
 	 * Styles
