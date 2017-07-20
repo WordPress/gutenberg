@@ -14,8 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @return void
  */
-function gutenburg_register_routes() {
+function gutenberg_register_routes() {
 	Gutenberg_User_Preferences::register_routes();
 }
 
-add_action( 'rest_api_init', 'gutenburg_register_routes' );
+add_action( 'rest_api_init', 'gutenberg_register_routes' );

@@ -65,7 +65,7 @@ class Gutenberg_User_Preferences {
 		$user_id = get_current_user_id();
 		$preferences = array();
 		foreach ( self::VALID_PREFERENCES as $preference_name ) {
-			$preferences[ $preference_name ] = get_user_meta( $user_id, 'gutenburg_' . $preference_name );
+			$preferences[ $preference_name ] = get_user_meta( $user_id, 'gutenberg_' . $preference_name );
 		}
 		return $preferences;
 	}
@@ -89,7 +89,7 @@ class Gutenberg_User_Preferences {
 		}
 
 		foreach ( $params['preferences'] as $preference_name => $value ) {
-			update_user_meta( $user_id, 'gutenburg_' . $preference_name, $value );
+			update_user_meta( $user_id, 'gutenberg_' . $preference_name, $value );
 		}
 
 		return true;
@@ -101,7 +101,7 @@ class Gutenberg_User_Preferences {
 	 * @return void
 	 */
 	public static function register_routes() {
-		register_rest_route( 'gutenburg/v1', '/user-preferences', array(
+		register_rest_route( 'gutenberg/v1', '/user-preferences', array(
 			array(
 				'methods'  => WP_REST_Server::READABLE,
 				'callback' => 'Gutenberg_User_Preferences::get_preferences',
