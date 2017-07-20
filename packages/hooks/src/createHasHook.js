@@ -18,7 +18,7 @@ function createHasHook( hooks ) {
 	 */
 	return function hasHook( hookName ) {
 		return hooks.hasOwnProperty( hookName )
-			? hooks[ hookName ].length
+			? hooks[ hookName ].handlers.length
 			: 0;
 	};
 }

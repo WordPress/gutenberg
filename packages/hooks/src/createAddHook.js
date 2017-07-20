@@ -31,11 +31,10 @@ function createAddHook( hooks ) {
 		}
 
 		const handler = { callback, priority };
-		let handlers;
 
 		if ( hooks.hasOwnProperty( hookName ) ) {
 			// Find the correct insert index of the new hook.
-			handlers = hooks[ hookName ];
+			const handlers = hooks[ hookName ].handlers;
 			let i = 0;
 			while ( i < handlers.length ) {
 				if ( handlers[ i ].priority > priority ) {
@@ -47,10 +46,11 @@ function createAddHook( hooks ) {
 			handlers.splice( i, 0, handler );
 		} else {
 			// This is the first hook of its type.
-			handlers = [ handler ];
+			hooks[ hookName ] = {
+				handlers: [ handler ],
+				runs: 0,
+			};
 		}
-
-		hooks[ hookName ] = handlers;
 	};
 }
 
