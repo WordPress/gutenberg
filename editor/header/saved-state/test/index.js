@@ -18,10 +18,10 @@ describe( 'SavedState', () => {
 				isSaveable={ false } />
 		);
 
-		expect( wrapper.text() ).toBe( 'Saving' );
+		expect( wrapper.childAt( 0 ).text() ).toBe( 'Saving' );
 	} );
 
-	it( 'returns null if the post is not saveable', () => {
+	it( 'returns disabled button if the post is not saveable', () => {
 		const wrapper = shallow(
 			<SavedState
 				isNew
@@ -30,7 +30,7 @@ describe( 'SavedState', () => {
 				isSaveable={ false } />
 		);
 
-		expect( wrapper.type() ).toBeNull();
+		expect( wrapper.prop( 'disabled' ) ).toEqual( true );
 	} );
 
 	it( 'should return Saved text if not new and not dirty', () => {
@@ -42,8 +42,7 @@ describe( 'SavedState', () => {
 				isSaveable={ true } />
 		);
 
-		expect( wrapper.childAt( 0 ).name() ).toBe( 'Dashicon' );
-		expect( wrapper.childAt( 1 ).text() ).toBe( 'Saved' );
+		expect( wrapper.childAt( 0 ).text() ).toBe( 'Saved' );
 	} );
 
 	it( 'should return Save button if edits to be saved', () => {
@@ -59,7 +58,7 @@ describe( 'SavedState', () => {
 				onSave={ saveSpy } />
 		);
 
-		expect( wrapper.name() ).toBe( 'Button' );
+		expect( wrapper.name() ).toBe( 'IconButton' );
 		expect( wrapper.childAt( 0 ).text() ).toBe( 'Save' );
 		wrapper.simulate( 'click' );
 		expect( statusSpy ).toHaveBeenCalledWith( 'draft' );

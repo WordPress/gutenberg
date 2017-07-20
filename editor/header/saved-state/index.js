@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __ } from 'i18n';
-import { Dashicon, Button, IconButton } from 'components';
+import { IconButton } from 'components';
 
 /**
  * Internal dependencies
@@ -43,7 +43,6 @@ export function SavedState( { isNew, isDirty, isSaving, isSaveable, status, onSt
 	}
 
 	const onClick = () => {
-		console.log( "clicked" );
 		onStatusChange( status || 'draft' );
 		onSave();
 	};
