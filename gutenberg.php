@@ -22,7 +22,7 @@ if ( gutenberg_can_init() ) {
 	require_once dirname( __FILE__ ) . '/lib/i18n.php';
 	require_once dirname( __FILE__ ) . '/lib/parser.php';
 	require_once dirname( __FILE__ ) . '/lib/register.php';
-	require_once dirname( __FILE__ ) . '/lib/preferences.php';
+	require_once dirname( __FILE__ ) . '/lib/class-gutenberg-user-preferences.php';
 	require_once dirname( __FILE__ ) . '/lib/api.php';
 
 	// Register server-side code for individual blocks.
