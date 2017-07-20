@@ -225,7 +225,7 @@ describe( 'Test doingAction, didAction and hasAction.', function() {
 		expect( doingAction( 'test.action' ) ).toBe( false );
 
 		expect( didAction( 'test.action' ) ).toBe( 0 );
-		expect( hasAction( 'test.action' ) ).toBe( false );
+		expect( hasAction( 'test.action' ) ).toBe( 0 );
 
 		addAction( 'test.action', () => {
 			actionCalls++;
@@ -237,7 +237,7 @@ describe( 'Test doingAction, didAction and hasAction.', function() {
 		// Verify action added, not running yet.
 		expect( doingAction( 'test.action' ) ).toBe( false );
 		expect( didAction( 'test.action' ) ).toBe( 0 );
-		expect( hasAction( 'test.action' ) ).toBe( true );
+		expect( hasAction( 'test.action' ) ).toBe( 1 );
 
 		doAction( 'test.action' );
 
@@ -245,7 +245,7 @@ describe( 'Test doingAction, didAction and hasAction.', function() {
 		expect( actionCalls ).toBe( 1 );
 		expect( doingAction( 'test.action' ) ).toBe( false );
 		expect( didAction( 'test.action' ) ).toBe( 1 );
-		expect( hasAction( 'test.action' ) ).toBe( true );
+		expect( hasAction( 'test.action' ) ).toBe( 1 );
 		expect( doingAction() ).toBe( false );
 		expect( doingAction( 'test.action' ) ).toBe( false );
 		expect( doingAction( 'notatest.action' ) ).toBe( false );
@@ -260,13 +260,13 @@ describe( 'Test doingAction, didAction and hasAction.', function() {
 		// Verify state is reset appropriately.
 		expect( doingAction( 'test.action' ) ).toBe( false );
 		expect( didAction( 'test.action' ) ).toBe( 2 );
-		expect( hasAction( 'test.action' ) ).toBe( false );
+		expect( hasAction( 'test.action' ) ).toBe( 0 );
 
 		doAction( 'another.action' );
 		expect( doingAction( 'test.action' ) ).toBe( false );
 
-		// Verify hasAction returns false when no matching action.
-		expect( hasAction( 'notatest.action' ) ).toBe( false );
+		// Verify hasAction returns 0 when no matching action.
+		expect( hasAction( 'notatest.action' ) ).toBe( 0 );
 	} );
 } );
 
@@ -287,8 +287,8 @@ describe( 'Verify doingFilter, didFilter and hasFilter.', function() {
 		expect( test ).toBe( 'someValue' );
 		expect( filterCalls ).toBe( 1 );
 		expect( didFilter( 'runtest.filter' ) ).toBe( 1 );
-		expect( hasFilter( 'runtest.filter' ) ).toBe( true );
-		expect( hasFilter( 'notatest.filter' ) ).toBe( false );
+		expect( hasFilter( 'runtest.filter' ) ).toBe( 1 );
+		expect( hasFilter( 'notatest.filter' ) ).toBe( 0 );
 		expect( doingFilter() ).toBe( false );
 		expect( doingFilter( 'runtest.filter' ) ).toBe( false );
 		expect( doingFilter( 'notatest.filter' ) ).toBe( false );
@@ -296,7 +296,7 @@ describe( 'Verify doingFilter, didFilter and hasFilter.', function() {
 
 		removeAllFilters( 'runtest.filter' );
 
-		expect( hasFilter( 'runtest.filter' ) ).toBe( false );
+		expect( hasFilter( 'runtest.filter' ) ).toBe( 0 );
 		expect( didFilter( 'runtest.filter' ) ).toBe( 1 );
 	} );
 } );
