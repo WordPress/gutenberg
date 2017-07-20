@@ -3,8 +3,8 @@
  * array of objects with priority and callback of each registered hook.
  */
 var HOOKS = {
-	actions: [],
-	filters: []
+	actions: {},
+	filters: {},
 };
 
 export default HOOKS;
