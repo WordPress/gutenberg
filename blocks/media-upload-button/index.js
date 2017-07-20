@@ -57,10 +57,6 @@ const slimImageObject = ( img ) => {
 	return pick( img, attrSet );
 };
 
-const slimImageObjects = ( imgs ) => {
-	return imgs.map( ( img ) => slimImageObject( img ) );
-};
-
 class MediaUploadButton extends Component {
 	constructor( { multiple = false, type, gallery = false } ) {
 		super( ...arguments );
@@ -111,7 +107,7 @@ class MediaUploadButton extends Component {
 			return;
 		}
 		if ( multiple ) {
-			onSelect( slimImageObjects( selectedImages.models.map( ( model ) => model.toJSON() ) ) );
+			onSelect( selectedImages.models.map( ( model ) => slimImageObject( model.toJSON() ) ) );
 		} else {
 			onSelect( slimImageObject( selectedImages.models[ 0 ].toJSON() ) );
 		}
