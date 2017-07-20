@@ -29,6 +29,9 @@ class DropdownMenu extends wp.element.Component {
 		this.focusPrevious = this.focusPrevious.bind( this );
 		this.focusNext = this.focusNext.bind( this );
 		this.handleKeyDown = this.handleKeyDown.bind( this );
+		this.handleKeyUp = this.handleKeyUp.bind( this );
+		this.handleFocus = this.handleFocus.bind( this );
+		this.handleBlur = this.handleBlur.bind( this );
 		this.menuRef = null;
 		this.state = {
 			open: false,
@@ -47,10 +50,26 @@ class DropdownMenu extends wp.element.Component {
 		this.closeMenu();
 	}
 
+	handleFocus() {
+		this.hasFocus = true;
+	}
+
+	handleBlur() {
+		this.hasFocus = false;
+
+		this.maybeCloseMenuOnBlur = setTimeout( () => {
+			this.closeMenu();
+		}, 200 );
+	}
+
 	closeMenu() {
-		this.setState( {
-			open: false,
-		} );
+		clearTimeout( this.maybeCloseMenuOnBlur );
+
+		if ( ! this.hasFocus ) {
+			this.setState( {
+				open: false,
+			} );
+		}
 	}
 
 	toggleMenu() {
@@ -83,15 +102,25 @@ class DropdownMenu extends wp.element.Component {
 
 	focusPrevious() {
 		const i = this.findActiveIndex();
-		const prevI = i <= -1 ? -1 : i - 1;
+		const maxI = this.props.controls.length - 1;
+		const prevI = i <= 0 ? maxI : i - 1;
 		this.focusIndex( prevI );
 	}
 
 	focusNext() {
 		const i = this.findActiveIndex();
 		const maxI = this.props.controls.length - 1;
-		const nextI = i >= maxI ? maxI : i + 1;
+		const nextI = i >= maxI ? 0 : i + 1;
 		this.focusIndex( nextI );
+	}
+
+	handleKeyUp( event) {
+		/*
+		 * VisualEditorBlock uses keyup to deselect the block. We need to stop
+		 * propagation of keyup after Escape has been pressed to close the menu
+		 * otherwise the whole block toolbar will disappear.
+		 */
+		event.stopPropagation();
 	}
 
 	handleKeyDown( keydown ) {
@@ -100,21 +129,11 @@ class DropdownMenu extends wp.element.Component {
 				case ESCAPE:
 					keydown.preventDefault();
 					keydown.stopPropagation();
-					this.closeMenu();
 					const node = findDOMNode( this );
 					const toggle = node.querySelector( '.components-dropdown-menu__toggle' );
 					toggle.focus();
 					if ( this.props.onSelect ) {
 						this.props.onSelect( null );
-					}
-					break;
-
-				case TAB:
-					keydown.preventDefault();
-					if ( keydown.shiftKey ) {
-						this.focusPrevious();
-					} else {
-						this.focusNext();
 					}
 					break;
 
@@ -154,6 +173,7 @@ class DropdownMenu extends wp.element.Component {
 	}
 
 	componentWillUnmount() {
+		clearTimeout( this.maybeCloseMenuOnBlur );
 		const node = findDOMNode( this );
 		node.removeEventListener( 'keydown', this.handleKeyDown, false );
 	}
@@ -172,7 +192,7 @@ class DropdownMenu extends wp.element.Component {
 		}
 
 		return (
-			<div className="components-dropdown-menu">
+			<div className="components-dropdown-menu" onKeyUp={ this.handleKeyUp }>
 				<IconButton
 					className={
 						classnames( 'components-dropdown-menu__toggle', {
@@ -193,6 +213,9 @@ class DropdownMenu extends wp.element.Component {
 						role="menu"
 						aria-label={ menuLabel }
 						ref={ this.bindMenuRef }
+						onFocus={ this.handleFocus }
+						onBlur={ this.handleBlur }
+						tabIndex="-1"
 					>
 						{ controls.map( ( control, index ) => (
 							<IconButton
@@ -210,6 +233,7 @@ class DropdownMenu extends wp.element.Component {
 								className="components-dropdown-menu__menu-item"
 								icon={ control.icon }
 								role="menuitem"
+								tabIndex="-1"
 							>
 								{ control.title }
 							</IconButton>
