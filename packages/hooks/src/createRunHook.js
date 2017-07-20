@@ -3,26 +3,42 @@
  * hooks of the specified type by calling upon runner with its hook name
  * and arguments.
  *
- * @param  {Function} runner Function to invoke for each hook callback
+ * @param  {Function} hooks          Object that contains the hooks to run.
+ * @param  {bool}     returnFirstArg Whether each hook callback is expected to
+ *                                   return its first argument.
  * @return {Function}        Hook runner
  */
-const createRunHook = function( runner ) {
+const createRunHook = function( hooks, returnFirstArg ) {
 	/**
 	 * Runs the specified hook.
 	 *
-	 * @param  {string} hook The hook to run
-	 * @param  {...*}   args Arguments to pass to the action/filter
-	 * @return {*}           Return value of runner, if applicable
+	 * @param  {string} hookName The hook to run
+	 * @param  {...*}   args     Arguments to pass to the hook callbacks
+	 * @return {*}               Return value of runner, if applicable
 	 * @private
 	 */
-	return function( /* hook, ...args */ ) {
-		var args, hook;
+	return function runner( hookName, ...args ) {
+		const handlers = hooks[ hookName ];
+		let maybeReturnValue = args[ 0 ];
 
-		args = Array.prototype.slice.call( arguments );
-		hook = args.shift();
+		if ( ! handlers ) {
+			return ( returnFirstArg ? maybeReturnValue : undefined );
+		}
 
-		if ( typeof hook === 'string' ) {
-			return runner( hook, args );
+		hooks.current = hookName;
+		handlers.runs = ( handlers.runs || 0 ) + 1;
+
+		handlers.forEach( handler => {
+			maybeReturnValue = handler.callback.apply( null, args );
+			if ( returnFirstArg ) {
+				args[ 0 ] = maybeReturnValue;
+			}
+		} );
+
+		delete hooks.current;
+
+		if ( returnFirstArg ) {
+			return maybeReturnValue;
 		}
 	};
 }

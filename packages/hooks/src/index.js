@@ -1,47 +1,40 @@
 import HOOKS from './hooks';
 import createAddHook from './createAddHook';
 import createRemoveHook from './createRemoveHook';
+import createRemoveAllHook from './createRemoveAllHook';
+import createHasHook from './createHasHook';
 import createRunHook from './createRunHook';
-import runDoAction from './runDoAction';
-import runApplyFilters from './runApplyFilters';
 import createCurrentHook from './createCurrentHook';
 import createDoingHook from './createDoingHook';
 import createDidHook from './createDidHook';
-import createHasHook from './createHasHook';
-import createRemoveAllHook from './createRemoveAllHook';
 
-
-// Remove functions.
-export const removeFilter = createRemoveHook( HOOKS.filters );
-export const removeAction = createRemoveHook( HOOKS.actions );
-
-
-// Do action/apply filter functions.
-export const doAction =     createRunHook( runDoAction );
-export const applyFilters = createRunHook( runApplyFilters );
-
-// Add functions.
+// Add action/filter functions.
 export const addAction = createAddHook( HOOKS.actions );
 export const addFilter = createAddHook( HOOKS.filters );
 
-// Doing action: true until next action fired.
-export const doingAction = createDoingHook( HOOKS.actions );
+// Remove action/filter functions.
+export const removeAction = createRemoveHook( HOOKS.actions );
+export const removeFilter = createRemoveHook( HOOKS.filters );
 
-// Doing filter: true while filter is being applied.
-export const doingFilter = createDoingHook( HOOKS.filters );
-
-// Did functions.
-export const didAction = createDidHook( HOOKS.actions );
-export const didFilter = createDidHook( HOOKS.filters );
-
-// Has functions.
+// Has action/filter functions.
 export const hasAction = createHasHook( HOOKS.actions );
 export const hasFilter = createHasHook( HOOKS.filters );
 
-// Remove all functions.
+// Remove all actions/filters functions.
 export const removeAllActions = createRemoveAllHook( HOOKS.actions );
 export const removeAllFilters = createRemoveAllHook( HOOKS.filters );
 
-// Current filter.
+// Do action/apply filters functions.
+export const doAction     = createRunHook( HOOKS.actions );
+export const applyFilters = createRunHook( HOOKS.filters, true );
+
+// Current action/filter functions.
 export const currentFilter = createCurrentHook( HOOKS.filters );
 
+// Doing action/filter: true while a hook is being run.
+export const doingAction = createDoingHook( HOOKS.actions );
+export const doingFilter = createDoingHook( HOOKS.filters );
+
+// Did action/filter functions.
+export const didAction = createDidHook( HOOKS.actions );
+export const didFilter = createDidHook( HOOKS.filters );
