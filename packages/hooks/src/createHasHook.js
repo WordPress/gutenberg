@@ -8,9 +8,9 @@
  */
 const createHasHook = function( hooksArray ) {
 	return function( action ) {
-		return hooksArray && hooksArray[ action ] ?
-			!! hooksArray[ action ] :
-			false;
+		return hooksArray && hooksArray[ action ]
+			? hooksArray[ action ].length > 0
+			: false;
 	};
 }
 
