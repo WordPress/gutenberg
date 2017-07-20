@@ -16,7 +16,13 @@ function createAddHook( hooks ) {
 	 * @param {?number}  priority Priority of this hook (default=10)
 	 */
 	return function addHook( hookName, callback, priority ) {
-		if ( typeof hookName !== 'string' || typeof callback !== 'function' ) {
+		if ( typeof hookName !== 'string' ) {
+			console.error( 'The hook name must be a string.' );
+			return;
+		}
+
+		if ( typeof callback !== 'function' ) {
+			console.error( 'The hook callback must be a function.' );
 			return;
 		}
 
@@ -29,6 +35,7 @@ function createAddHook( hooks ) {
 
 		// Validate numeric priority
 		if ( isNaN( priority ) ) {
+			console.error( 'The hook priority must be omitted or a number.' );
 			return;
 		}
 
