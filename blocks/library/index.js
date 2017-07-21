@@ -16,3 +16,4 @@ import './freeform';
 import './latest-posts';
 import './cover-image';
 import './verse';
+import './template';
