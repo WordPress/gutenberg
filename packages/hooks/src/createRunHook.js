@@ -34,7 +34,8 @@ function createRunHook( hooks, returnFirstArg ) {
 				: undefined;
 		}
 
-		hooks.current = hookName;
+		hooks.__current = hooks.__current || [];
+		hooks.__current.push( hookName );
 		hooks[ hookName ].runs++;
 
 		let maybeReturnValue = args[ 0 ];
@@ -45,10 +46,12 @@ function createRunHook( hooks, returnFirstArg ) {
 			}
 		} );
 
-		delete hooks.current;
+		hooks.__current.pop();
 
 		if ( returnFirstArg ) {
 			return maybeReturnValue;
+		} else {
+			return false;
 		}
 	};
 }

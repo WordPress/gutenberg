@@ -19,12 +19,12 @@ function createDoingHook( hooks ) {
 	return function doingHook( hookName ) {
 		// If the hookName was not passed, check for any current hook.
 		if ( 'undefined' === typeof hookName ) {
-			return 'undefined' !== typeof hooks.current;
+			return 'undefined' !== typeof hooks.__current[0];
 		}
 
-		// Return the current hook.
-		return hooks.current
-			? hookName === hooks.current
+		// Return the __current hook.
+		return hooks.__current[0]
+			? hookName === hooks.__current[0]
 			: false;
 	};
 }

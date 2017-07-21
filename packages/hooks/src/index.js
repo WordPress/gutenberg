@@ -27,8 +27,8 @@ export const doAction     = createRunHook( HOOKS.actions );
 export const applyFilters = createRunHook( HOOKS.filters, true );
 
 // Current action/filter functions.
-export const currentAction = () => HOOKS.actions.current || null;
-export const currentFilter = () => HOOKS.filters.current || null;
+export const currentAction = () => HOOKS.actions.__current[0] || null;
+export const currentFilter = () => HOOKS.filters.__current[0] || null;
 
 // Doing action/filter: true while a hook is being run.
 export const doingAction = createDoingHook( HOOKS.actions );
