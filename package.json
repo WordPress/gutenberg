@@ -12,6 +12,7 @@
   ],
   "dependencies": {
     "@wordpress/url": "0.1.0-beta.1",
+    "balanced-match": "^1.0.0",
     "classnames": "^2.2.5",
     "clipboard": "^1.7.1",
     "dom-react": "^2.2.0",
