@@ -205,6 +205,16 @@ test( 'remove specific filter callback', function() {
 	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testca' );
 } );
 
+test( 'remove a filter callback of lower priority when running hook', function() {
+
+	addFilter( 'test.filter', filter_a, 1 );
+	addFilter( 'test.filter', filter_b, 3 );
+	addFilter( 'test.filter', filter_c, 4 );
+	addFilter( 'test.filter', filter_a_removesb, 2 );
+
+	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testac' );
+} );
+
 test( 'remove all filter callbacks', function() {
 	addFilter( 'test.filter', filter_a );
 	addFilter( 'test.filter', filter_b, 2 );
