@@ -59,7 +59,7 @@ class DropdownMenu extends wp.element.Component {
 
 		this.maybeCloseMenuOnBlur = setTimeout( () => {
 			this.closeMenu();
-		}, 200 );
+		}, 100 );
 	}
 
 	closeMenu() {
@@ -114,13 +114,18 @@ class DropdownMenu extends wp.element.Component {
 		this.focusIndex( nextI );
 	}
 
-	handleKeyUp( event) {
-		/*
-		 * VisualEditorBlock uses keyup to deselect the block. We need to stop
-		 * propagation of keyup after Escape has been pressed to close the menu
-		 * otherwise the whole block toolbar will disappear.
-		 */
-		event.stopPropagation();
+	handleKeyUp( event ) {
+		// TODO: find a better way to isolate events on nested components see GH issue #1973.
+		if ( this.state.open ) {
+			/*
+			 * VisualEditorBlock uses keyup to deselect the block. When the menu is
+			 * open we need to stop propagation of keyup after Escape has been pressed
+			 * to close the menu, otherwise the whole block toolbar will disappear.
+			 * When the menu is closed, Escape will make the toolbar disappear as intended.
+			 */
+			event.stopPropagation();
+		}
+
 	}
 
 	handleKeyDown( keydown ) {
@@ -176,6 +181,13 @@ class DropdownMenu extends wp.element.Component {
 		clearTimeout( this.maybeCloseMenuOnBlur );
 		const node = findDOMNode( this );
 		node.removeEventListener( 'keydown', this.handleKeyDown, false );
+	}
+
+	componentDidUpdate( prevProps, prevState ) {
+		// Focus the first item when the menu opens.
+		if ( ! prevState.open && this.state.open ) {
+			this.focusIndex( 0 );
+		}
 	}
 
 	render() {
