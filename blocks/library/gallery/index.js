@@ -22,6 +22,63 @@ import BlockDescription from '../../block-description';
 
 const MAX_COLUMNS = 8;
 
+// Getter for the sake of unit tests.
+const getGalleryMediaFrame = () => {
+	/**
+	 * Custom gallery details frame.
+	 *
+	 * @link https://github.com/xwp/wp-core-media-widgets/blob/905edbccfc2a623b73a93dac803c5335519d7837/wp-admin/js/widgets/media-gallery-widget.js
+	 * @class GalleryDetailsMediaFrame
+	 * @constructor
+	 */
+	return wp.media.view.MediaFrame.Post.extend( {
+		initialize: function() {
+			_.defaults( this.options, {
+				selection: [],
+				library: {},
+				multiple: 'add',
+				state: 'gallery',
+			} );
+
+			wp.media.view.MediaFrame.Post.prototype.initialize.apply( this, arguments );
+		},
+
+		/**
+		 * Create the default states.
+		 *
+		 * @returns {void}
+		 */
+		createStates: function createStates() {
+			this.states.add( [
+				new wp.media.controller.Library( {
+					id: 'gallery',
+					title: wp.media.view.l10n.createGalleryTitle,
+					priority: 40,
+					toolbar: 'main-gallery',
+					filterable: 'uploaded',
+					multiple: 'add',
+					editable: false,
+
+					library: wp.media.query( _.defaults( {
+						type: 'image',
+					}, this.options.library ) ),
+				} ),
+
+				new wp.media.controller.GalleryEdit( {
+					library: this.options.selection,
+					editing: this.options.editing,
+					menu: 'gallery',
+					displaySettings: false,
+				} ),
+
+				new wp.media.controller.GalleryAdd(),
+			] );
+		},
+	} );
+};
+
+const GalleryMediaFrame = getGalleryMediaFrame();
+
 const editMediaLibrary = ( attributes, setAttributes ) => {
 	const frameConfig = {
 		frame: 'post',
@@ -118,9 +175,8 @@ registerBlockType( 'core/gallery', {
 					<MediaUploadButton
 						buttonProps={ uploadButtonProps }
 						onSelect={ setMediaUrl }
-						type="image"
-						multiple="true"
-						gallery="true"
+						frame={ GalleryMediaFrame }
+						multiple={ true }
 					>
 						{ __( 'Insert from Media Library' ) }
 					</MediaUploadButton>

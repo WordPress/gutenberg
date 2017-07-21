@@ -6,60 +6,17 @@ import { __ } from 'i18n';
 import { Button } from 'components';
 import { pick } from 'lodash';
 
-// Getter for the sake of unit tests.
-const getGalleryDetailsMediaFrame = () => {
-	/**
-	 * Custom gallery details frame.
-	 *
-	 * @link https://github.com/xwp/wp-core-media-widgets/blob/905edbccfc2a623b73a93dac803c5335519d7837/wp-admin/js/widgets/media-gallery-widget.js
-	 * @class GalleryDetailsMediaFrame
-	 * @constructor
-	 */
-	return wp.media.view.MediaFrame.Post.extend( {
-
-		/**
-		 * Create the default states.
-		 *
-		 * @returns {void}
-		 */
-		createStates: function createStates() {
-			this.states.add( [
-				new wp.media.controller.Library( {
-					id: 'gallery',
-					title: wp.media.view.l10n.createGalleryTitle,
-					priority: 40,
-					toolbar: 'main-gallery',
-					filterable: 'uploaded',
-					multiple: 'add',
-					editable: false,
-
-					library: wp.media.query( _.defaults( {
-						type: 'image',
-					}, this.options.library ) ),
-				} ),
-
-				new wp.media.controller.GalleryEdit( {
-					library: this.options.selection,
-					editing: this.options.editing,
-					menu: 'gallery',
-					displaySettings: false,
-				} ),
-
-				new wp.media.controller.GalleryAdd(),
-			] );
-		},
-	} );
-};
-
-// the media library image object contains numerous attributes
-// we only need this set to display the image in the library
+/*
+ * The media library image object contains numerous attributes
+ * we only need this set to display the image in the library.
+ */
 const slimImageObject = ( img ) => {
 	const attrSet = [ 'sizes', 'mime', 'type', 'subtype', 'id', 'url', 'alt' ];
 	return pick( img, attrSet );
 };
 
 class MediaUploadButton extends Component {
-	constructor( { multiple = false, type, gallery = false } ) {
+	constructor( { multiple = false, type, frame = false } ) {
 		super( ...arguments );
 		this.openModal = this.openModal.bind( this );
 		this.onSelect = this.onSelect.bind( this );
@@ -77,13 +34,9 @@ class MediaUploadButton extends Component {
 			frameConfig.library = { type };
 		}
 
-		if ( gallery ) {
-			const GalleryDetailsMediaFrame = getGalleryDetailsMediaFrame();
-			this.frame = new GalleryDetailsMediaFrame( {
-				frame: 'select',
-				mimeType: type,
-				state: 'gallery',
-			} );
+		// Use a frame workflow passed to the button if it exists.
+		if ( frame ) {
+			this.frame = new frame();
 			wp.media.frame = this.frame;
 		} else {
 			this.frame = wp.media( frameConfig );
