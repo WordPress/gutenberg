@@ -10,8 +10,7 @@
     "lerna": "^2.0.0-rc.5",
     "mkdirp": "^0.5.1",
     "rimraf": "^2.6.1",
-    "webpack": "^3.3.0",
-    "babel-loader": "^7.1.1"
+    "webpack": "^3.3.0"
   },
   "scripts": {
     "build-clean": "rimraf ./packages/*/build ./packages/*/build-browser ./packages/*/build-module",
