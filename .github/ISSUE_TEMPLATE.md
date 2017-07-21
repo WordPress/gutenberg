@@ -19,7 +19,7 @@ BEFORE POSTING YOUR ISSUE:
 2.
 3.
 4.
-<!-- Provide what browser you are using and any other specfics to your setup -->
+<!-- Provide what browser you are using and any other specifics to your setup -->
 
 ## Expected Behavior
 <!-- If you're describing a bug, tell us what should happen -->
