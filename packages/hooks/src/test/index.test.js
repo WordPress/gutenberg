@@ -239,6 +239,15 @@ test( 'remove a filter callback of higher priority when running hook', function(
 
 	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testabc' );
 } );
+test( 'remove one hook in a callback before adding another', function() {
+	addFilter( 'test.filter', filter_a, 1 );
+	addFilter( 'test.filter', filter_b, 3 );
+	addFilter( 'test.filter', filter_c, 5 );
+	addFilter( 'test.filter', filter_a_removesb, 4 );
+
+	// Fails!!! only a & b run, not c.
+	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testabc' );
+} );
 
 test( 'remove a filter callback of same priority when running hook', function() {
 
