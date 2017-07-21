@@ -39,6 +39,10 @@ function action_b() {
 function action_c() {
 	window.actionValue += 'c';
 }
+function filter_a_removesb( str ) {
+	removeFilter( 'test.filter', filter_b );
+	return str;
+}
 
 beforeEach( () => {
 	window.actionValue = '';
@@ -211,6 +215,16 @@ test( 'remove a filter callback of lower priority when running hook', function()
 	addFilter( 'test.filter', filter_b, 3 );
 	addFilter( 'test.filter', filter_c, 4 );
 	addFilter( 'test.filter', filter_a_removesb, 2 );
+
+	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testac' );
+} );
+
+test( 'remove a filter callback of same priority when running hook', function() {
+
+	addFilter( 'test.filter', filter_a, 1 );
+	addFilter( 'test.filter', filter_a_removesb, 2 );
+	addFilter( 'test.filter', filter_b, 2 );
+	addFilter( 'test.filter', filter_c, 4 );
 
 	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testac' );
 } );
