@@ -13,7 +13,7 @@ import 'moment-timezone/moment-timezone-utils';
  */
 import { EditableProvider } from '@wordpress/blocks';
 import { createElement, render } from '@wordpress/element';
-import { PopoverProvider } from '@wordpress/components';
+import { ApiProvider, PopoverProvider } from '@wordpress/components';
 import { settings as dateSettings } from '@wordpress/date';
 
 /**
@@ -118,6 +118,16 @@ export function createEditorInstance( id, post, settings ) {
 		[
 			PopoverProvider,
 			{ target },
+		],
+
+		// ApiProvider
+		//
+		//  - context.getApiSchema
+		//  - context.getApiRoot
+		//  - context.getApiNonce
+		[
+			ApiProvider,
+			{ ...wpApiSettings },
 		],
 	];
 
