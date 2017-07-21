@@ -70,6 +70,7 @@ class Test_WP_Widget_Custom_HTML extends WP_UnitTestCase {
 		$this->assertNotEmpty( $this->widget_custom_html_content_args );
 		$this->assertNotEmpty( $this->widget_text_args );
 		$this->assertContains( '[filter:widget_text][filter:widget_custom_html_content]', $output );
+		$this->assertContains( '<div class="textwidget custom-html-widget">', $output );
 		$this->assertNotContains( '<p>', $output );
 		$this->assertNotContains( '<br>', $output );
 		$this->assertNotContains( '</u>', $output );
