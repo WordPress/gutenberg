@@ -11,7 +11,7 @@ import { findIndex } from 'lodash';
 import IconButton from 'components/icon-button';
 import Dashicon from 'components/dashicon';
 import { findDOMNode } from 'element';
-import { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } from 'utils/keycodes';
+import { ESCAPE, LEFT, UP, RIGHT, DOWN } from 'utils/keycodes';
 
 /**
  * Internal dependencies
@@ -21,7 +21,7 @@ import './style.scss';
 class DropdownMenu extends wp.element.Component {
 	constructor() {
 		super( ...arguments );
-		this.bindMenuRef = this.bindMenuRef.bind( this );
+		this.bindMenuReferenceNode = this.bindMenuReferenceNode.bind( this );
 		this.closeMenu = this.closeMenu.bind( this );
 		this.toggleMenu = this.toggleMenu.bind( this );
 		this.findActiveIndex = this.findActiveIndex.bind( this );
@@ -32,14 +32,14 @@ class DropdownMenu extends wp.element.Component {
 		this.handleKeyUp = this.handleKeyUp.bind( this );
 		this.handleFocus = this.handleFocus.bind( this );
 		this.handleBlur = this.handleBlur.bind( this );
-		this.menuRef = null;
+		this.menuNode = null;
 		this.state = {
 			open: false,
 		};
 	}
 
-	bindMenuRef( node ) {
-		this.menuRef = node;
+	bindMenuReferenceNode( node ) {
+		this.menuNode = node;
 	}
 
 	handleClickOutside() {
@@ -79,23 +79,21 @@ class DropdownMenu extends wp.element.Component {
 	}
 
 	findActiveIndex() {
-		if ( this.menuRef ) {
-			const menu = findDOMNode( this.menuRef );
+		if ( this.menuNode ) {
 			const menuItem = document.activeElement;
-			if ( menuItem.parentNode === menu ) {
-				return findIndex( menu.children, ( child ) => child === menuItem );
+			if ( menuItem.parentNode === this.menuNode ) {
+				return findIndex( this.menuNode.children, ( child ) => child === menuItem );
 			}
 			return -1;
 		}
 	}
 
 	focusIndex( index ) {
-		if ( this.menuRef ) {
-			const menu = findDOMNode( this.menuRef );
+		if ( this.menuNode ) {
 			if ( index < 0 ) {
-				menu.previousElementSibling.focus();
+				this.menuNode.previousElementSibling.focus();
 			} else {
-				menu.children[ index ].focus();
+				this.menuNode.children[ index ].focus();
 			}
 		}
 	}
@@ -125,7 +123,6 @@ class DropdownMenu extends wp.element.Component {
 			 */
 			event.stopPropagation();
 		}
-
 	}
 
 	handleKeyDown( keydown ) {
@@ -172,15 +169,8 @@ class DropdownMenu extends wp.element.Component {
 		}
 	}
 
-	componentDidMount() {
-		const node = findDOMNode( this );
-		node.addEventListener( 'keydown', this.handleKeyDown, false );
-	}
-
 	componentWillUnmount() {
 		clearTimeout( this.maybeCloseMenuOnBlur );
-		const node = findDOMNode( this );
-		node.removeEventListener( 'keydown', this.handleKeyDown, false );
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
@@ -203,8 +193,13 @@ class DropdownMenu extends wp.element.Component {
 			return null;
 		}
 
+		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
-			<div className="components-dropdown-menu" onKeyUp={ this.handleKeyUp }>
+			<div
+				className="components-dropdown-menu"
+				onKeyDown={ this.handleKeyDown }
+				onKeyUp={ this.handleKeyUp }
+			>
 				<IconButton
 					className={
 						classnames( 'components-dropdown-menu__toggle', {
@@ -224,7 +219,7 @@ class DropdownMenu extends wp.element.Component {
 						className="components-dropdown-menu__menu"
 						role="menu"
 						aria-label={ menuLabel }
-						ref={ this.bindMenuRef }
+						ref={ this.bindMenuReferenceNode }
 						onFocus={ this.handleFocus }
 						onBlur={ this.handleBlur }
 						tabIndex="-1"
@@ -254,6 +249,7 @@ class DropdownMenu extends wp.element.Component {
 				}
 			</div>
 		);
+		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
 }
 
