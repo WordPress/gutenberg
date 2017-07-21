@@ -51,7 +51,7 @@ class Test_WP_Widget_Custom_HTML extends WP_UnitTestCase {
 		$args = array(
 			'before_title'  => '<h2>',
 			'after_title'   => "</h2>\n",
-			'before_widget' => '<section>',
+			'before_widget' => '<section id="custom_html-5" class="widget widget_custom_html">',
 			'after_widget'  => "</section>\n",
 		);
 		$instance = array(
@@ -70,7 +70,8 @@ class Test_WP_Widget_Custom_HTML extends WP_UnitTestCase {
 		$this->assertNotEmpty( $this->widget_custom_html_content_args );
 		$this->assertNotEmpty( $this->widget_text_args );
 		$this->assertContains( '[filter:widget_text][filter:widget_custom_html_content]', $output );
-		$this->assertContains( '<div class="textwidget custom-html-widget">', $output );
+		$this->assertContains( '<section id="custom_html-5" class="widget_text widget widget_custom_html">', $output );
+		$this->assertContains( 'class="widget_text widget widget_custom_html"', $output );
 		$this->assertNotContains( '<p>', $output );
 		$this->assertNotContains( '<br>', $output );
 		$this->assertNotContains( '</u>', $output );
