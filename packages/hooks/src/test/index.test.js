@@ -24,23 +24,34 @@ import {
 function filter_a( str ) {
 	return str + 'a';
 }
+
 function filter_b( str ) {
 	return str + 'b';
 }
+
 function filter_c( str ) {
 	return str + 'c';
 }
+
 function action_a() {
 	window.actionValue += 'a';
 }
+
 function action_b() {
 	window.actionValue += 'b';
 }
+
 function action_c() {
 	window.actionValue += 'c';
 }
+
 function filter_a_removesb( str ) {
 	removeFilter( 'test.filter', filter_b );
+	return str;
+}
+
+function filter_that_applies_recursively( str ) {
+	applyFilters( 'test.filter', str );
 	return str;
 }
 
@@ -321,3 +332,11 @@ test( 'Verify doingFilter, didFilter and hasFilter.', function() {
 	expect( hasFilter( 'runtest.filter' ) ).toBe( 0 );
 	expect( didFilter( 'runtest.filter' ) ).toBe( 1 );
 } );
+
+test( 'recursively calling a filter', function() {
+
+	addFilter( 'test.filter', filter_that_applies_recursively, 10 );
+
+	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'test' );
+} );
+

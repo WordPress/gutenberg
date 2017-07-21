@@ -39,10 +39,18 @@ function createRunHook( hooks, returnFirstArg ) {
 		hooks[ hookName ].runs++;
 
 		let maybeReturnValue = args[ 0 ];
+
 		handlers.forEach( handler => {
-			maybeReturnValue = handler.callback.apply( null, args );
-			if ( returnFirstArg ) {
-				args[ 0 ] = maybeReturnValue;
+			if ( handler.callback !== hooks.currentCallback ) {
+
+				// Prevent hook recursion.
+				hooks.currentCallback = handler.callback;
+				maybeReturnValue = handler.callback.apply( null, args );
+				hooks.currentCallback = false;
+
+				if ( returnFirstArg ) {
+					args[ 0 ] = maybeReturnValue;
+				}
 			}
 		} );
 
