@@ -269,7 +269,7 @@ class VisualEditorBlockList extends Component {
 						icon="text"
 						className="editor-inserter__block"
 						onClick={ () => this.insertBlock( 'core/text' ) }
-						aria-label={ __( 'Insert text block' ) }
+						label={ __( 'Insert text block' ) }
 					>
 						{ __( 'Text' ) }
 					</IconButton>
@@ -277,7 +277,7 @@ class VisualEditorBlockList extends Component {
 						icon="format-image"
 						className="editor-inserter__block"
 						onClick={ () => this.insertBlock( 'core/image' ) }
-						aria-label={ __( 'Insert image block' ) }
+						label={ __( 'Insert image block' ) }
 					>
 						{ __( 'Image' ) }
 					</IconButton>
