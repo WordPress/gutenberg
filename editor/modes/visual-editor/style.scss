@@ -371,9 +371,11 @@ $sticky-bottom-offset: 20px;
 		width: auto;
 		font-family: $default-font;
 		font-size: $default-font-size;
+		box-shadow: none;
 	}
+
 	&:hover > .editor-inserter__block,
-	&:focus > .editor-inserter__block {
+	&.is-showing-controls > .editor-inserter__block {
 		opacity: 1;
 	}
 }
