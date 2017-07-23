@@ -23,7 +23,7 @@ abstract class WP_Ajax_UnitTestCase extends WP_UnitTestCase {
 	protected $_last_response = '';
 
 	/**
-	 * List of ajax actions called via POST
+	 * List of ajax actions called via GET
 	 * @var array
 	 */
 	protected static $_core_actions_get = array(
@@ -38,7 +38,7 @@ abstract class WP_Ajax_UnitTestCase extends WP_UnitTestCase {
 	protected $_error_level = 0;
 
 	/**
-	 * List of ajax actions called via GET
+	 * List of ajax actions called via POST
 	 * @var array
 	 */
 	protected static $_core_actions_post = array(
@@ -79,7 +79,7 @@ abstract class WP_Ajax_UnitTestCase extends WP_UnitTestCase {
 
 	/**
 	 * Set up the test fixture.
-	 * Override wp_die(), pretend to be ajax, and suppres E_WARNINGs
+	 * Override wp_die(), pretend to be ajax, and suppress E_WARNINGs
 	 */
 	public function setUp() {
 		parent::setUp();
