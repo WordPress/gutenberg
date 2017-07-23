@@ -2,13 +2,12 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { __ } from 'i18n';
-import { Dashicon, Button } from 'components';
+import { IconButton } from 'components';
 
 /**
  * Internal dependencies
@@ -26,26 +25,21 @@ import {
 
 export function SavedState( { isNew, isDirty, isSaving, isSaveable, status, onStatusChange, onSave } ) {
 	const className = 'editor-saved-state';
-
-	if ( isSaving ) {
-		return (
-			<span className={ className }>
-				{ __( 'Saving' ) }
-			</span>
-		);
-	}
+	let buttonLabel = __( 'Save' );
+	let isDisabled = false;
 
 	if ( ! isSaveable ) {
-		return null;
+		isDisabled = true;
+	}
+
+	if ( isSaving ) {
+		buttonLabel = __( 'Saving' );
+		isDisabled = true;
 	}
 
 	if ( ! isNew && ! isDirty ) {
-		return (
-			<span className={ className }>
-				<Dashicon icon="saved" />
-				{ __( 'Saved' ) }
-			</span>
-		);
+		buttonLabel = __( 'Saved' );
+		isDisabled = true;
 	}
 
 	const onClick = () => {
@@ -54,9 +48,14 @@ export function SavedState( { isNew, isDirty, isSaving, isSaveable, status, onSt
 	};
 
 	return (
-		<Button className={ classnames( className, 'button-link' ) } onClick={ onClick }>
-			{ __( 'Save' ) }
-		</Button>
+		<IconButton
+			className={ className }
+			onClick={ onClick }
+			icon="saved"
+			disabled={ isDisabled }
+		>
+			{ buttonLabel }
+		</IconButton>
 	);
 }
 

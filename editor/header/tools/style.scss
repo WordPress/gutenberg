@@ -4,6 +4,7 @@
 	align-items: center;
 }
 
+.editor-preview-button,
 .editor-tools__undo,
 .editor-tools__redo {
 	display: none;
@@ -22,14 +23,15 @@
 }
 
 .editor-tools__tabs {
-	margin: 0 $item-spacing;
-	padding: 0;
+	width: auto;
 	border-left: 1px solid $light-gray-500;
-	border-right: 1px solid $light-gray-500;
+	margin: 0;
+	padding: 0;
 	display: flex;
 	align-items: center;
 
 	@include break-medium {
+		width: 270px;
 		padding: 0 0 0 $item-spacing;
 	}
 
@@ -41,7 +43,6 @@
 		border: none;
 		background: none;
 		color: $dark-gray-500;
-		margin-right: 0;
 		cursor: pointer;
 		height: 30px;
 		padding: 0 10px;
@@ -55,7 +56,7 @@
 
 		@include break-medium() {
 			width: auto;
-			margin-right: $item-spacing;
+			margin-left: auto;
 		}
 	}
 
@@ -79,6 +80,7 @@
 // Needs specificity to override bleed
 .wp-core-ui .button.button-large.editor-tools__publish-button {
 	margin-bottom: 0;
+	margin-right: $item-spacing;
 }
 
 .editor-tools__publish-button.is-saving,
@@ -110,4 +112,8 @@
 		z-index: -1;
 		@include move_background;
 	}
+}
+
+.editor-preview-button {
+	margin-right: $item-spacing;
 }
