@@ -42,6 +42,7 @@ const getGalleryDetailsMediaFrame = () => {
 					library: this.options.selection,
 					editing: this.options.editing,
 					menu: 'gallery',
+					displaySettings: false,
 				} ),
 
 				new wp.media.controller.GalleryAdd(),
