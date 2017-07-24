@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flow, groupBy, sortBy, findIndex, filter, debounce } from 'lodash';
+import { flow, groupBy, sortBy, findIndex, filter, debounce, find } from 'lodash';
 import { connect } from 'react-redux';
 
 /**
@@ -63,8 +63,8 @@ class InserterMenu extends Component {
 		}
 	}
 
-	isDisabledBlock( block ) {
-		return block.useOnce && find( this.props.blocks, ( { name } ) => block.name === name );
+	isDisabledBlock( blockType ) {
+		return blockType.useOnce && find( this.props.blocks, ( { name } ) => blockType.name === name );
 	}
 
 	bindReferenceNode( nodeName ) {
@@ -152,12 +152,12 @@ class InserterMenu extends Component {
 		}
 
 		// Return the name of the next block type.
-		const block = blockTypes[ nextIndex ];
-		if ( this.isDisabledBlock( block ) ) {
+		const blockType = blockTypes[ nextIndex ];
+		if ( this.isDisabledBlock( blockType ) ) {
 			return this.findByIncrement( blockTypes, increment > 0 ? increment + 1 : increment - 1 );
 		}
 
-		return block.name;
+		return blockType.name;
 	}
 
 	findNext( blockTypes ) {
