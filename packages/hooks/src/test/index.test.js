@@ -60,11 +60,6 @@ function action_c() {
 	window.actionValue += 'c';
 }
 
-function filter_that_applies_recursively( str ) {
-	applyFilters( 'test.filter', str );
-	return str;
-}
-
 beforeEach( () => {
 	window.actionValue = '';
 	// Reset state in between tests (clear all callbacks, `didAction` counts,
@@ -377,9 +372,13 @@ test( 'Verify doingFilter, didFilter and hasFilter.', function() {
 } );
 
 test( 'recursively calling a filter', function() {
+	addFilter( 'test.filter', value => {
+		if ( value.length === 7 ) {
+			return value;
+		}
+		return applyFilters( 'test.filter', value + 'X' );
+	} );
 
-	addFilter( 'test.filter', filter_that_applies_recursively, 10 );
-
-	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'test' );
+	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testXXX' );
 } );
 
