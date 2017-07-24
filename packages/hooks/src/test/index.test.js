@@ -391,7 +391,7 @@ test( 'current filter when multiple filters are running', () => {
 		return value.concat( currentFilter() );
 	} );
 
-	expect( applyFilters( 'test.filter1', [ 'test' ] ) ).toBe(
+	expect( applyFilters( 'test.filter1', [ 'test' ] ) ).toEqual(
 		[ 'test', 'test.filter1', 'test.filter2' ]
 	);
 } );

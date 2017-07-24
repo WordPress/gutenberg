@@ -3,6 +3,7 @@ import createAddHook from './createAddHook';
 import createRemoveHook from './createRemoveHook';
 import createHasHook from './createHasHook';
 import createRunHook from './createRunHook';
+import createCurrentHook from './createCurrentHook';
 import createDoingHook from './createDoingHook';
 import createDidHook from './createDidHook';
 
@@ -27,8 +28,8 @@ export const doAction     = createRunHook( HOOKS.actions );
 export const applyFilters = createRunHook( HOOKS.filters, true );
 
 // Current action/filter functions.
-export const currentAction = () => HOOKS.actions.__current[0] || null;
-export const currentFilter = () => HOOKS.filters.__current[0] || null;
+export const currentAction = createCurrentHook( HOOKS.actions );
+export const currentFilter = createCurrentHook( HOOKS.filters );
 
 // Doing action/filter: true while a hook is being run.
 export const doingAction = createDoingHook( HOOKS.actions );
