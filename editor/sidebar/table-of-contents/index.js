@@ -20,8 +20,8 @@ import { getBlocks } from '../../selectors';
 /**
  * Module Constants
  */
-const missingHeadingContent = <em>{ __( '(Missing header level)' ) }</em>;
-const emptyHeadingContent = <em>{ __( '(Empty header)' ) }</em>;
+const missingHeadingContent = <em>{ __( '(Missing heading level)' ) }</em>;
+const emptyHeadingContent = <em>{ __( '(Empty heading)' ) }</em>;
 
 const getHeadingLevel = heading => {
 	switch ( heading.attributes.nodeName ) {
