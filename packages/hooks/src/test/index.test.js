@@ -472,14 +472,14 @@ test( 'adding and removing filters with recursion', () => {
 	function removeRecurseAndAdd2( val ) {
 		expect( removeFilter( 'remove_and_add', removeRecurseAndAdd2 ) ).toEqual( 1 );
 		val += '-' + applyFilters( 'remove_and_add', '' ) + '-';
-		addFilter( 'remove_and_add', removeRecurseAndAdd2, 11 );
+		addFilter( 'remove_and_add', removeRecurseAndAdd2, 10 );
 		return val + '2';
 	}
 
 	addFilter( 'remove_and_add', val => val + '1', 11 );
-	addFilter( 'remove_and_add', removeRecurseAndAdd2, 11 );
-	addFilter( 'remove_and_add', val => val + '3', 11 );
-	addFilter( 'remove_and_add', val => val + '4', 12 );
+	addFilter( 'remove_and_add', removeRecurseAndAdd2, 12 );
+	addFilter( 'remove_and_add', val => val + '3', 13 );
+	addFilter( 'remove_and_add', val => val + '4', 14 );
 
 	expect( applyFilters( 'remove_and_add', '' ) ).toEqual( '1-134-234' );
 } );
