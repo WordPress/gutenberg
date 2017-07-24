@@ -81,6 +81,10 @@ afterEach( () => {
 	console.error = consoleErrorOriginal;
 } );
 
+test( 'run a filter with no callbacks', () => {
+	expect( applyFilters( 'test.filter', 42 ) ).toEqual( 42 );
+} );
+
 test( 'add and remove a filter', () => {
 	addFilter( 'test.filter', filter_a );
 	expect( removeAllFilters( 'test.filter' ) ).toEqual( 1 );
