@@ -54,10 +54,9 @@ const isEmptyHeading = heading => ! heading.attributes.content || heading.attrib
 const TableOfContents = ( { blocks } ) => {
 	const headings = filter( blocks, ( block ) => block.name === 'core/heading' );
 
-	const tocItems = [];
 	let prevHeadingLevel = 1;
 
-	headings.forEach( ( heading, index ) => {
+	const tocItems = headings.map( ( heading, index ) => {
 		const headingLevel = getHeadingLevel( heading );
 		const isEmpty = isEmptyHeading( heading );
 
@@ -71,9 +70,11 @@ const TableOfContents = ( { blocks } ) => {
 			headingLevel
 		);
 
-		tocItems.push(
+		prevHeadingLevel = headingLevel;
+
+		return (
 			<TableOfContentsItem
-				key={ index++ }
+				key={ index }
 				level={ headingLevel }
 				isValid={ isValid }
 			>
@@ -81,8 +82,6 @@ const TableOfContents = ( { blocks } ) => {
 				{ isIncorrectLevel && incorrectLevelContent }
 			</TableOfContentsItem>
 		);
-
-		prevHeadingLevel = headingLevel;
 	} );
 
 	return (
