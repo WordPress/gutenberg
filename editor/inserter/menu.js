@@ -282,8 +282,8 @@ class InserterMenu extends Component {
 				onClick={ this.selectBlock( block.name ) }
 				ref={ this.bindReferenceNode( block.name ) }
 				tabIndex="-1"
-				onMouseEnter={ this.props.showInsertionPoint }
-				onMouseLeave={ this.props.hideInsertionPoint }
+				onMouseEnter={ ! disabled && this.props.showInsertionPoint }
+				onMouseLeave={ ! disabled && this.props.hideInsertionPoint }
 				disabled={ disabled }
 			>
 				<Dashicon icon={ block.icon } />
