@@ -98,10 +98,38 @@ test( 'add 2 filters in a row and run them', () => {
 	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testab' );
 } );
 
+test( 'cannot add filters with non-string names', () => {
+	addFilter( 42, () => null );
+	expect( console.error ).toHaveBeenCalledWith(
+		'The hook name must be a string.'
+	);
+} );
+
 test( 'cannot add filters named with __ prefix', () => {
 	addFilter( '__test', () => null );
 	expect( console.error ).toHaveBeenCalledWith(
 		'The hook name cannot begin with `__`.'
+	);
+} );
+
+test( 'cannot add filters with non-function callbacks', () => {
+	addFilter( 'test', '42' );
+	expect( console.error ).toHaveBeenCalledWith(
+		'The hook callback must be a function.'
+	);
+} );
+
+test( 'cannot add filters with non-numeric priorities', () => {
+	addFilter( 'test', () => null, '42' );
+	expect( console.error ).toHaveBeenCalledWith(
+		'If specified, the hook priority must be a number.'
+	);
+} );
+
+test( 'cannot run filters with non-string names', () => {
+	expect( applyFilters( () => {}, 42 ) ).toBe( undefined );
+	expect( console.error ).toHaveBeenCalledWith(
+		'The hook name must be a string.'
 	);
 } );
 
