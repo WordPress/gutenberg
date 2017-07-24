@@ -21,7 +21,7 @@ const { children, query } = hpq;
 registerBlockType( 'core/paragraph', {
 	title: __( 'Paragraph' ),
 
-	icon: 'text',
+	icon: 'editor-paragraph',
 
 	category: 'common',
 
