@@ -172,7 +172,7 @@ describe( 'full post content fixture', () => {
 
 			if ( ! serializedExpected ) {
 				if ( process.env.GENERATE_MISSING_FIXTURES ) {
-					serializedExpected = serializedActual;
+					serializedExpected = serializedActual + '\n';
 					writeFixtureFile( f + '.serialized.html', serializedExpected );
 				} else {
 					throw new Error(

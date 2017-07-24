@@ -1,0 +1,21 @@
+[
+    {
+        "uid": "_uid_0",
+        "name": "core/pullquote",
+        "attributes": {
+            "value": [
+                {
+                    "type": "p",
+                    "children": "Paragraph one"
+                },
+                {
+                    "type": "p",
+                    "children": "Paragraph two"
+                }
+            ],
+            "citation": [
+                "by whoever"
+            ]
+        }
+    }
+]
