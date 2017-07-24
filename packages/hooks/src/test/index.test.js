@@ -467,3 +467,19 @@ test( 'current filter when multiple filters are running', () => {
 
 	expect( currentFilter() ).toBe( null );
 } );
+
+test( 'adding and removing filters with recursion', () => {
+	function removeRecurseAndAdd2( val ) {
+		expect( removeFilter( 'remove_and_add', removeRecurseAndAdd2 ) ).toEqual( 1 );
+		val += '-' + applyFilters( 'remove_and_add', '' ) + '-';
+		addFilter( 'remove_and_add', removeRecurseAndAdd2, 11 );
+		return val + '2';
+	}
+
+	addFilter( 'remove_and_add', val => val + '1', 11 );
+	addFilter( 'remove_and_add', removeRecurseAndAdd2, 11 );
+	addFilter( 'remove_and_add', val => val + '3', 11 );
+	addFilter( 'remove_and_add', val => val + '4', 12 );
+
+	expect( applyFilters( 'remove_and_add', '' ) ).toEqual( '1-134-234' );
+} );
