@@ -264,6 +264,33 @@ test( 'fire action multiple times', () => {
 	doAction( 'test.action' );
 } );
 
+test( 'add a filter before the one currently executing', () => {
+	addFilter( 'test.filter', val => {
+		addFilter( 'test.filter', val => val + 'a', 1 );
+		return val + 'b';
+	}, 2 );
+
+	expect( applyFilters( 'test.filter', 'test_' ) ).toEqual( 'test_b' );
+} );
+
+test( 'add a filter after the one currently executing', () => {
+	addFilter( 'test.filter', val => {
+		addFilter( 'test.filter', val => val + 'b', 2 );
+		return val + 'a';
+	}, 1 );
+
+	expect( applyFilters( 'test.filter', 'test_' ) ).toEqual( 'test_ab' );
+} );
+
+test( 'add a filter immediately after the one currently executing', () => {
+	addFilter( 'test.filter', val => {
+		addFilter( 'test.filter', val => val + 'b', 1 );
+		return val + 'a';
+	}, 1 );
+
+	expect( applyFilters( 'test.filter', 'test_' ) ).toEqual( 'test_ab' );
+} );
+
 test( 'remove specific action callback', () => {
 	addAction( 'test.action', action_a );
 	addAction( 'test.action', action_b, 2 );
