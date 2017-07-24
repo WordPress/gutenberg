@@ -5,9 +5,10 @@
         "isValid": false,
         "attributes": {
             "value": [
-                [
-                    "Testing pullquote block..."
-                ]
+                {
+                    "type": "p",
+                    "children": "Testing pullquote block..."
+                }
             ],
             "citation": [
                 "...with a caption"
