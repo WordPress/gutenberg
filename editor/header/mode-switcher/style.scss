@@ -14,35 +14,39 @@
 		background: transparent;
 		line-height: 1;
 		border: 0;
-		border-radius: 0;
-		-webkit-appearance: none;
-		outline: none;
+		border-radius: 4px;
+		appearance: none;
 		cursor: pointer;
 		box-shadow: none;
-		padding-right: 0;
+		padding: 10px 8px;
 		font-size: $default-font-size;
+		line-height: 16px;
 		height: auto;
 
+		/* IE10+ */
+		&::-ms-expand {
+			display: none;
+		}
+
 		@include break-small {
-			padding-right: 24px;
+			padding-right: 26px;
+		}
+
+		&:focus {
+			outline: none;
+			box-shadow: 0 0 0 1px $blue-medium-400, 0 0 2px 1px $blue-medium-400;
 		}
 	}
 
 	.dashicon {
 		position: relative;
-		z-index: z-index( '.editor-mode-switcher .dashicon' );
-		margin-left: -24px;
-		margin-top: -1px;
-
+		left: -26px;
+		margin-right: -20px;
+		pointer-events: none;
 		display: none;
 
 		@include break-small {
 			display: block;
 		}
-	}
-
-	&:hover,
-	select:hover {
-		color: $dark-gray-900;
 	}
 }
