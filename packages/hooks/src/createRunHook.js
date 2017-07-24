@@ -68,8 +68,6 @@ function createRunHook( hooks, returnFirstArg ) {
 
 		if ( returnFirstArg ) {
 			return maybeReturnValue;
-		} else {
-			return false;
 		}
 	};
 }

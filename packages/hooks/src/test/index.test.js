@@ -216,7 +216,7 @@ test( 'filters with the same and different priorities', () => {
 test( 'add and remove an action', () => {
 	addAction( 'test.action', action_a );
 	expect( removeAllActions( 'test.action' ) ).toEqual( 1 );
-	doAction( 'test.action' );
+	expect( doAction( 'test.action' ) ).toBe( undefined );
 	expect( window.actionValue ).toBe( '' );
 } );
 
