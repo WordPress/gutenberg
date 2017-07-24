@@ -33,6 +33,21 @@ function filter_c( str ) {
 	return str + 'c';
 }
 
+function filter_b_removes_self( str ) {
+	removeFilter( 'test.filter', filter_b_removes_self );
+	return str + 'b';
+}
+
+function filter_removes_b( str ) {
+	removeFilter( 'test.filter', filter_b );
+	return str;
+}
+
+function filter_removes_c( str ) {
+	removeFilter( 'test.filter', filter_c );
+	return str;
+}
+
 function action_a() {
 	window.actionValue += 'a';
 }
@@ -43,11 +58,6 @@ function action_b() {
 
 function action_c() {
 	window.actionValue += 'c';
-}
-
-function filter_a_removesb( str ) {
-	removeFilter( 'test.filter', filter_b );
-	return str;
 }
 
 function filter_that_applies_recursively( str ) {
@@ -220,40 +230,53 @@ test( 'remove specific filter callback', function() {
 	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testca' );
 } );
 
-test( 'remove a filter callback of lower priority when running hook', function() {
+test( 'filter removes a callback that has already executed', function() {
+	addFilter( 'test.filter', filter_a, 1 );
+	addFilter( 'test.filter', filter_b, 3 );
+	addFilter( 'test.filter', filter_c, 5 );
+	addFilter( 'test.filter', filter_removes_b, 4 );
 
+	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testabc' );
+} );
+
+test( 'filter removes a callback that has already executed (same priority)', function() {
+	addFilter( 'test.filter', filter_a, 1 );
+	addFilter( 'test.filter', filter_b, 2 );
+	addFilter( 'test.filter', filter_removes_b, 2 );
+	addFilter( 'test.filter', filter_c, 4 );
+
+	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testabc' );
+} );
+
+test( 'filter removes the current callback', function() {
+	addFilter( 'test.filter', filter_a, 1 );
+	addFilter( 'test.filter', filter_b_removes_self, 3 );
+	addFilter( 'test.filter', filter_c, 5 );
+
+	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testabc' );
+} );
+
+test( 'filter removes a callback that has not yet executed (last)', function() {
+	addFilter( 'test.filter', filter_a, 1 );
+	addFilter( 'test.filter', filter_b, 3 );
+	addFilter( 'test.filter', filter_c, 5 );
+	addFilter( 'test.filter', filter_removes_c, 4 );
+
+	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testab' );
+} );
+
+test( 'filter removes a callback that has not yet executed (middle)', function() {
 	addFilter( 'test.filter', filter_a, 1 );
 	addFilter( 'test.filter', filter_b, 3 );
 	addFilter( 'test.filter', filter_c, 4 );
-	addFilter( 'test.filter', filter_a_removesb, 2 );
+	addFilter( 'test.filter', filter_removes_b, 2 );
 
 	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testac' );
 } );
 
-test( 'remove a filter callback of higher priority when running hook', function() {
-
+test( 'filter removes a callback that has not yet executed (same priority)', function() {
 	addFilter( 'test.filter', filter_a, 1 );
-	addFilter( 'test.filter', filter_b, 3 );
-	addFilter( 'test.filter', filter_c, 5 );
-	addFilter( 'test.filter', filter_a_removesb, 6 );
-
-	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testabc' );
-} );
-test( 'remove one hook in a callback before adding another', function() {
-	addFilter( 'test.filter', filter_a, 1 );
-	addFilter( 'test.filter', filter_b, 3 );
-	addFilter( 'test.filter', filter_c, 5 );
-	addFilter( 'test.filter', filter_a_removesb, 4 );
-
-	// Fails!!! only a & b run, not c.
-	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testabc' );
-} );
-
-test( 'remove a filter callback of same priority when running hook', function() {
-
-	addFilter( 'test.filter', filter_a, 1 );
-	// Note: works if added first, adding after may need fixing.
-	addFilter( 'test.filter', filter_a_removesb, 2 );
+	addFilter( 'test.filter', filter_removes_b, 2 );
 	addFilter( 'test.filter', filter_b, 2 );
 	addFilter( 'test.filter', filter_c, 4 );
 
