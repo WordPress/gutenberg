@@ -85,7 +85,6 @@
 		"no-undef-init": "error",
 		"no-unreachable": "error",
 		"no-unsafe-negation": "error",
-		"no-use-before-define": [ "error", "nofunc" ],
 		"no-useless-computed-key": "error",
 		"no-useless-constructor": "error",
 		"no-useless-return": "error",
