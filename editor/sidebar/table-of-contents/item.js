@@ -10,15 +10,19 @@ const TableOfContentsItem = ( {
 } ) => (
 	<div
 		className={ classnames(
-			'table-of-contents__item',
+			'table-of-contents-item',
 			`is-h${ level }`,
 			{
 				'is-invalid': ! isValid,
 			}
 		) }
 	>
-		<strong>H{ level }</strong>
-		{ children }
+		<strong className="table-of-contents-item__level">
+			H{ level }
+		</strong>
+		<div className="table-of-contents-item__content">
+			{ children }
+		</div>
 	</div>
 );
 

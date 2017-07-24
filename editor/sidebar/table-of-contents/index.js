@@ -21,7 +21,10 @@ import { getBlocks } from '../../selectors';
  * Module Constants
  */
 const emptyHeadingContent = <em>{ __( '(Empty heading)' ) }</em>;
-const incorrectLevelContent = [ <br />, <em>{ __( '(Incorrect heading level)' ) }</em> ];
+const incorrectLevelContent = [
+	<br key="incorrect-break" />,
+	<em key="incorrect-message">{ __( '(Incorrect heading level)' ) }</em>,
+];
 
 const getHeadingLevel = heading => {
 	switch ( heading.attributes.nodeName ) {
