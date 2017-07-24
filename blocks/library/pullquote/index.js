@@ -13,7 +13,7 @@ import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
-const { children, query } = hpq;
+const { children, query, node } = hpq;
 
 registerBlockType( 'core/pullquote', {
 
@@ -24,7 +24,7 @@ registerBlockType( 'core/pullquote', {
 	category: 'formatting',
 
 	attributes: {
-		value: query( 'blockquote > p', children() ),
+		value: query( 'blockquote > p', node() ),
 		citation: children( 'footer' ),
 	},
 
@@ -86,9 +86,7 @@ registerBlockType( 'core/pullquote', {
 
 		return (
 			<blockquote className={ `align${ align }` }>
-				{ value && value.map( ( paragraph, i ) => (
-					<p key={ i }>{ paragraph }</p>
-				) ) }
+				{ value }
 
 				{ citation && citation.length > 0 && (
 					<footer>{ citation }</footer>
