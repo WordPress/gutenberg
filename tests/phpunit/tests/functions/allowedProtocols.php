@@ -39,7 +39,7 @@ class Tests_Functions_AllowedProtocols extends WP_UnitTestCase {
 	function data_example_urls() {
 		return array(
 			array( 'http', 'http://example.com' ), // RFC7230
-			array( 'https', 'http://example.com' ), // RFC7230
+			array( 'https', 'https://example.com' ), // RFC7230
 			array( 'ftp', 'ftp://example.com' ), // RFC1738
 			array( 'ftps', 'ftps://example.com' ),
 			array( 'mailto', 'mailto://someone@example.com' ), // RFC6068
