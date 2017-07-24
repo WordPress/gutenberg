@@ -509,13 +509,13 @@ describe( 'state', () => {
 
 		describe( 'blocksByUid', () => {
 			it( 'should return with attribute block updates', () => {
-				const original = editor( undefined, {
+				const original = deepFreeze( editor( undefined, {
 					type: 'RESET_BLOCKS',
 					blocks: [ {
 						uid: 'kumquat',
 						attributes: {},
 					} ],
-				} );
+				} ) );
 				const state = editor( original, {
 					type: 'UPDATE_BLOCK_ATTRIBUTES',
 					uid: 'kumquat',
@@ -527,11 +527,35 @@ describe( 'state', () => {
 				expect( state.blocksByUid.kumquat.attributes.updated ).toBe( true );
 			} );
 
+			it( 'should accumulate attribute block updates', () => {
+				const original = deepFreeze( editor( undefined, {
+					type: 'RESET_BLOCKS',
+					blocks: [ {
+						uid: 'kumquat',
+						attributes: {
+							updated: true,
+						},
+					} ],
+				} ) );
+				const state = editor( original, {
+					type: 'UPDATE_BLOCK_ATTRIBUTES',
+					uid: 'kumquat',
+					attributes: {
+						moreUpdated: true,
+					},
+				} );
+
+				expect( state.blocksByUid.kumquat.attributes ).toEqual( {
+					updated: true,
+					moreUpdated: true,
+				} );
+			} );
+
 			it( 'should ignore updates to non-existant block', () => {
-				const original = editor( undefined, {
+				const original = deepFreeze( editor( undefined, {
 					type: 'RESET_BLOCKS',
 					blocks: [],
-				} );
+				} ) );
 				const state = editor( original, {
 					type: 'UPDATE_BLOCK_ATTRIBUTES',
 					uid: 'kumquat',
@@ -544,7 +568,7 @@ describe( 'state', () => {
 			} );
 
 			it( 'should return with same reference if no changes in updates', () => {
-				const original = editor( undefined, {
+				const original = deepFreeze( editor( undefined, {
 					type: 'RESET_BLOCKS',
 					blocks: [ {
 						uid: 'kumquat',
@@ -552,7 +576,7 @@ describe( 'state', () => {
 							updated: true,
 						},
 					} ],
-				} );
+				} ) );
 				const state = editor( original, {
 					type: 'UPDATE_BLOCK_ATTRIBUTES',
 					uid: 'kumquat',

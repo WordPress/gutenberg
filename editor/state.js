@@ -102,8 +102,8 @@ export const editor = combineUndoableReducers( {
 				const nextAttributes = reduce( action.attributes, ( result, value, key ) => {
 					if ( value !== result[ key ] ) {
 						// Avoid mutating original block by creating shallow clone
-						if ( result === state[ action.uid ] ) {
-							result = { ...state[ action.uid ] };
+						if ( result === state[ action.uid ].attributes ) {
+							result = { ...result };
 						}
 
 						result[ key ] = value;
