@@ -32,8 +32,7 @@ $toggle-border-width: 2px;
 		}
 	}
 
-	&:after {
-		content: '';
+	&__thumb {
 		display: block;
 		position: absolute;
 		top: $toggle-border-width * 2;
@@ -41,14 +40,24 @@ $toggle-border-width: 2px;
 		width: $toggle-height - ( $toggle-border-width * 4 );
 		height: $toggle-height - ( $toggle-border-width * 4 );
 		border-radius: 50%;
-		background: $dark-gray-500;
+		border: 2px solid $dark-gray-500;
+		background: $white;
 		transition: 0.1s transform ease;
 	}
 
+	&__input:focus + &__thumb {
+		background: $dark-gray-500;
+	}
+
 	&.is-checked {
-		&:after {
-			background-color: $white;
+		.components-form-toggle__thumb {
+			border: 2px solid $white;
+			background-color: $blue-medium-500;
 			transform: translateX( $toggle-width - ( $toggle-border-width * 4 ) - ( $toggle-height - ( $toggle-border-width * 4 ) ) );
+		}
+
+		.components-form-toggle__input:focus + .components-form-toggle__thumb {
+			background-color: $white;
 		}
 
 		&:before {

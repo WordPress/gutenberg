@@ -35,6 +35,7 @@ function FormToggle( { className, checked, id, onChange = noop, showHint = true 
 					{ checked ? __( 'On' ) : __( 'Off' ) }
 				</span>
 			}
+			<span className="components-form-toggle__thumb"></span>
 		</span>
 	);
 }
