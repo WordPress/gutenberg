@@ -248,7 +248,9 @@ export default class Editable extends Component {
 		if ( event.keyCode === ENTER && ! this.props.multiline ) {
 			event.preventDefault();
 
-			if ( this.props.onSplit ) {
+			if ( event.shiftKey || ! this.props.onSplit ) {
+				this.editor.execCommand( 'InsertLineBreak', false, event );
+			} else {
 				this.splitContent();
 			}
 		}
