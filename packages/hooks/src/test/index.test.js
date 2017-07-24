@@ -382,3 +382,16 @@ test( 'recursively calling a filter', () => {
 	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testXXX' );
 } );
 
+test( 'current filter when multiple filters are running', () => {
+	addFilter( 'test.filter1', value => {
+		return applyFilters( 'test.filter2', value.concat( currentFilter() ) );
+	} );
+
+	addFilter( 'test.filter2', value => {
+		return value.concat( currentFilter() );
+	} );
+
+	expect( applyFilters( 'test.filter1', [ 'test' ] ) ).toBe(
+		[ 'test', 'test.filter1', 'test.filter2' ]
+	);
+} );
