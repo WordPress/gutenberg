@@ -83,8 +83,9 @@ afterEach( () => {
 
 test( 'add and remove a filter', () => {
 	addFilter( 'test.filter', filter_a );
-	removeAllFilters( 'test.filter' );
+	expect( removeAllFilters( 'test.filter' ) ).toEqual( 1 );
 	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'test' );
+	expect( removeAllFilters( 'test.filter' ) ).toEqual( 0 );
 } );
 
 test( 'add a filter and run it', () => {
@@ -96,6 +97,11 @@ test( 'add 2 filters in a row and run them', () => {
 	addFilter( 'test.filter', filter_a );
 	addFilter( 'test.filter', filter_b );
 	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testab' );
+} );
+
+test( 'remove a non-existent filter', () => {
+	expect( removeFilter( 'test.filter', filter_a ) ).toEqual( 0 );
+	expect( removeAllFilters( 'test.filter' ) ).toEqual( 0 );
 } );
 
 test( 'cannot add filters with non-string names', () => {
@@ -198,7 +204,7 @@ test( 'filters with the same and different priorities', () => {
 
 test( 'add and remove an action', () => {
 	addAction( 'test.action', action_a );
-	removeAllActions( 'test.action' );
+	expect( removeAllActions( 'test.action' ) ).toEqual( 1 );
 	doAction( 'test.action' );
 	expect( window.actionValue ).toBe( '' );
 } );
@@ -252,7 +258,7 @@ test( 'remove specific action callback', () => {
 	addAction( 'test.action', action_b, 2 );
 	addAction( 'test.action', action_c, 8 );
 
-	removeAction( 'test.action', action_b );
+	expect( removeAction( 'test.action', action_b ) ).toEqual( 1 );
 	doAction( 'test.action' );
 	expect( window.actionValue ).toBe( 'ca' );
 } );
@@ -262,7 +268,7 @@ test( 'remove all action callbacks', () => {
 	addAction( 'test.action', action_b, 2 );
 	addAction( 'test.action', action_c, 8 );
 
-	removeAllActions( 'test.action' );
+	expect( removeAllActions( 'test.action' ) ).toEqual( 3 );
 	doAction( 'test.action' );
 	expect( window.actionValue ).toBe( '' );
 } );
@@ -272,7 +278,7 @@ test( 'remove specific filter callback', () => {
 	addFilter( 'test.filter', filter_b, 2 );
 	addFilter( 'test.filter', filter_c, 8 );
 
-	removeFilter( 'test.filter', filter_b );
+	expect( removeFilter( 'test.filter', filter_b ) ).toEqual( 1 );
 	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testca' );
 } );
 
@@ -334,7 +340,7 @@ test( 'remove all filter callbacks', () => {
 	addFilter( 'test.filter', filter_b, 2 );
 	addFilter( 'test.filter', filter_c, 8 );
 
-	removeAllFilters( 'test.filter' );
+	expect( removeAllFilters( 'test.filter' ) ).toEqual( 3 );
 	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'test' );
 } );
 
@@ -379,7 +385,7 @@ test( 'Test doingAction, didAction and hasAction.', () => {
 	expect( actionCalls ).toBe( 2 );
 	expect( didAction( 'test.action' ) ).toBe( 2 );
 
-	removeAllActions( 'test.action' );
+	expect( removeAllActions( 'test.action' ) ).toEqual( 1 );
 
 	// Verify state is reset appropriately.
 	expect( doingAction( 'test.action' ) ).toBe( false );
@@ -416,7 +422,7 @@ test( 'Verify doingFilter, didFilter and hasFilter.', () => {
 	expect( doingFilter( 'notatest.filter' ) ).toBe( false );
 	expect( currentFilter() ).toBe( null );
 
-	removeAllFilters( 'runtest.filter' );
+	expect( removeAllFilters( 'runtest.filter' ) ).toEqual( 1 );
 
 	expect( hasFilter( 'runtest.filter' ) ).toBe( 0 );
 	expect( didFilter( 'runtest.filter' ) ).toBe( 1 );

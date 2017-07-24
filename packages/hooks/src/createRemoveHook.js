@@ -16,14 +16,19 @@ function createRemoveHook( hooks, removeAll ) {
 	 * @param {?Function} callback The specific callback to be removed.  If
 	 *                             omitted (and `removeAll` is truthy), clears
 	 *                             all callbacks.
+	 *
+	 * @return {number}            The number of callbacks removed.
 	 */
 	return function removeHook( hookName, callback ) {
 		// Bail if no hooks exist by this name
 		if ( ! hooks.hasOwnProperty( hookName ) ) {
-			return;
+			return 0;
 		}
 
+		let handlersRemoved = 0;
+
 		if ( removeAll ) {
+			handlersRemoved = hooks[ hookName ].handlers.length;
 			hooks[ hookName ] = {
 				runs: hooks[ hookName ].runs,
 				handlers: [],
@@ -34,9 +39,12 @@ function createRemoveHook( hooks, removeAll ) {
 			for ( let i = handlers.length - 1; i >= 0; i-- ) {
 				if ( handlers[ i ].callback === callback ) {
 					handlers.splice( i, 1 );
+					handlersRemoved++;
 				}
 			}
 		}
+
+		return handlersRemoved;
 	};
 }
 
