@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 /**
  * Internal dependencies
  */
@@ -60,6 +62,8 @@ function action_c() {
 	window.actionValue += 'c';
 }
 
+const consoleErrorOriginal = console.error;
+
 beforeEach( () => {
 	window.actionValue = '';
 	// Reset state in between tests (clear all callbacks, `didAction` counts,
@@ -70,6 +74,11 @@ beforeEach( () => {
 			delete hooks[ k ];
 		}
 	} );
+	console.error = jest.fn();
+} );
+
+afterEach( () => {
+	console.error = consoleErrorOriginal;
 } );
 
 test( 'add and remove a filter', () => {
@@ -87,6 +96,14 @@ test( 'add 2 filters in a row and run them', () => {
 	addFilter( 'test.filter', filter_a );
 	addFilter( 'test.filter', filter_b );
 	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testab' );
+} );
+
+test( 'cannot add filters named with __ prefix' , () => {
+	addFilter( '__test', () => null );
+	expect( console.error ).toHaveBeenCalledWith(
+		'The hook name cannot begin with `__`.'
+	);
+	expect( applyFilters( '__test', 42 ) ).toBe( 42 );
 } );
 
 test( 'add 3 filters with different priorities and run them', () => {

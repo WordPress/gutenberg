@@ -19,6 +19,11 @@ function createAddHook( hooks ) {
 			return;
 		}
 
+		if ( /^__/.test( hookName ) ) {
+			console.error( 'The hook name cannot begin with `__`.' );
+			return;
+		}
+
 		if ( typeof callback !== 'function' ) {
 			console.error( 'The hook callback must be a function.' );
 			return;
