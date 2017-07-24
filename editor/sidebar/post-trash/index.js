@@ -13,11 +13,15 @@ import { Button, Dashicon } from 'components';
  * Internal dependencies
  */
 import './style.scss';
-import { getCurrentPostId, getCurrentPostType } from '../../selectors';
+import {
+	isEditedPostNew,
+	getCurrentPostId,
+	getCurrentPostType,
+} from '../../selectors';
 import { trashPost } from '../../actions';
 
-function PostTrash( { postId, postType, ...props } ) {
-	if ( ! postId ) {
+function PostTrash( { isNew, postId, postType, ...props } ) {
+	if ( isNew || ! postId ) {
 		return null;
 	}
 
@@ -34,6 +38,7 @@ function PostTrash( { postId, postType, ...props } ) {
 export default connect(
 	( state ) => {
 		return {
+			isNew: isEditedPostNew( state ),
 			postId: getCurrentPostId( state ),
 			postType: getCurrentPostType( state ),
 		};

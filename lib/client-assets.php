@@ -418,12 +418,6 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 	$is_demo = isset( $page_match[2] );
 
-	/**
-	 * Scripts
-	 */
-	wp_enqueue_media();
-	wp_enqueue_editor();
-
 	wp_add_inline_script(
 		'editor', 'window.wp.oldEditor = window.wp.editor;', 'after'
 	);
@@ -506,41 +500,60 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	// Now load the `word-count` script from core.
 	wp_enqueue_script( 'word-count' );
 
+	// Parse post type from parameters.
+	$post_type = null;
+	if ( ! isset( $_GET['post_type'] ) ) {
+		$post_type = 'post';
+	} else {
+		$post_types = get_post_types( array(
+			'show_ui' => true,
+		) );
+
+		if ( in_array( $_GET['post_type'], $post_types ) ) {
+			$post_type = $_GET['post_type'];
+		} else {
+			wp_die( __( 'Invalid post type.', 'gutenberg' ) );
+		}
+	}
+
+	// Parse post ID from parameters.
 	$post_id = null;
 	if ( isset( $_GET['post_id'] ) && (int) $_GET['post_id'] > 0 ) {
 		$post_id = (int) $_GET['post_id'];
 	}
 
-	$post_to_edit = null;
-	if ( $post_id ) {
-		$post_to_edit = gutenberg_get_post_to_edit( $post_id );
-		if ( is_wp_error( $post_to_edit ) ) {
-			wp_die( $post_to_edit->get_error_message() );
-		}
+	// Create an auto-draft if new post.
+	if ( ! $post_id ) {
+		$default_post_to_edit = get_default_post_to_edit( $post_type, true );
+		$post_id = $default_post_to_edit->ID;
 	}
 
-	// Initialize the post data...
-	if ( $post_to_edit ) {
-		// ...with a real post
-		wp_add_inline_script(
-			'wp-editor',
-			'window._wpGutenbergPost = ' . wp_json_encode( $post_to_edit ) . ';'
+	// Generate API-prepared post from post ID.
+	$post_to_edit = gutenberg_get_post_to_edit( $post_id );
+	if ( is_wp_error( $post_to_edit ) ) {
+		wp_die( $post_to_edit->get_error_message() );
+	}
+
+	// Set initial title to empty string for auto draft for duration of edit.
+	if ( 'auto-draft' === $post_to_edit['status'] ) {
+		$default_title = apply_filters( 'default_title', '' );
+		$post_to_edit['title'] = array(
+			'raw'      => $default_title,
+			'rendered' => apply_filters( 'the_title', $default_title, $post_id ),
 		);
-	} elseif ( $is_demo ) {
-		// ...with some test content
+	}
+
+	// Initialize the post data.
+	wp_add_inline_script(
+		'wp-editor',
+		'window._wpGutenbergPost = ' . wp_json_encode( $post_to_edit ) . ';'
+	);
+
+	// Prepopulate with some test content in demo.
+	if ( $is_demo ) {
 		wp_add_inline_script(
 			'wp-editor',
 			file_get_contents( gutenberg_dir_path() . 'post-content.js' )
-		);
-	} else {
-		// ...with a new empty post
-		// TODO: Error handling if we tried and failed to get a post above
-		$empty_post = array(
-			'type' => 'post',
-		);
-		wp_add_inline_script(
-			'wp-editor',
-			'window._wpGutenbergPost = ' . wp_json_encode( $empty_post ) . ';'
 		);
 	}
 
@@ -554,6 +567,14 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 	// Initialize the editor.
 	wp_add_inline_script( 'wp-editor', 'wp.api.init().done( function() { wp.editor.createEditorInstance( \'editor\', window._wpGutenbergPost ); } );' );
+
+	/**
+	 * Scripts
+	 */
+	wp_enqueue_media( array(
+		'post' => $post_to_edit['id'],
+	) );
+	wp_enqueue_editor();
 
 	/**
 	 * Styles
