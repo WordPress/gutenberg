@@ -104,6 +104,13 @@ test( 'remove a non-existent filter', () => {
 	expect( removeAllFilters( 'test.filter' ) ).toEqual( 0 );
 } );
 
+test( 'remove an invalid callback from a filter', () => {
+	expect( removeFilter( 'test.filter', 42 ) ).toEqual( undefined );
+	expect( console.error ).toHaveBeenCalledWith(
+		'The hook callback to remove must be a function.'
+	);
+} );
+
 test( 'cannot add filters with non-string names', () => {
 	addFilter( 42, () => null );
 	expect( console.error ).toHaveBeenCalledWith(

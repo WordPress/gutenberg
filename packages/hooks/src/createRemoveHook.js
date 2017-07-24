@@ -20,6 +20,11 @@ function createRemoveHook( hooks, removeAll ) {
 	 * @return {number}            The number of callbacks removed.
 	 */
 	return function removeHook( hookName, callback ) {
+		if ( ! removeAll && typeof callback !== 'function' ) {
+			console.error( 'The hook callback to remove must be a function.' );
+			return;
+		}
+
 		// Bail if no hooks exist by this name
 		if ( ! hooks.hasOwnProperty( hookName ) ) {
 			return 0;
@@ -33,7 +38,7 @@ function createRemoveHook( hooks, removeAll ) {
 				runs: hooks[ hookName ].runs,
 				handlers: [],
 			};
-		} else if ( callback ) {
+		} else {
 			// Try to find the specified callback to remove.
 			const handlers = hooks[ hookName ].handlers;
 			for ( let i = handlers.length - 1; i >= 0; i-- ) {
