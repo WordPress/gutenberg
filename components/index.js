@@ -7,6 +7,7 @@ export { default as ExternalLink } from './external-link';
 export { default as FormToggle } from './form-toggle';
 export { default as FormTokenField } from './form-token-field';
 export { default as IconButton } from './icon-button';
+export { default as Inert } from './inert';
 export { default as KeyboardShortcuts } from './keyboard-shortcuts';
 export { default as Notice } from './notice';
 export { default as NoticeList } from './notice/list';

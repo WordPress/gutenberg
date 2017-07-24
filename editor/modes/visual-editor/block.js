@@ -11,7 +11,7 @@ import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
  * WordPress dependencies
  */
 import { Children, Component } from 'element';
-import { IconButton, Toolbar } from 'components';
+import { IconButton, Toolbar, Inert } from 'components';
 import { BACKSPACE, ESCAPE, DELETE, UP, DOWN, LEFT, RIGHT } from 'utils/keycodes';
 import { getBlockType, getBlockDefaultClassname } from 'blocks';
 import { __, sprintf } from 'i18n';
@@ -344,6 +344,19 @@ class VisualEditorBlock extends Component {
 			wrapperProps = blockType.getEditWrapperProps( block.attributes );
 		}
 
+		const edit = (
+			<BlockEdit
+				focus={ focus }
+				attributes={ block.attributes }
+				setAttributes={ this.setAttributes }
+				insertBlocksAfter={ onInsertBlocksAfter }
+				setFocus={ partial( onFocus, block.uid ) }
+				mergeBlocks={ this.mergeBlocks }
+				className={ classnames( className, block.attributes.className ) }
+				id={ block.uid }
+			/>
+		);
+
 		// Disable reason: Each block can be selected by clicking on it
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
@@ -399,16 +412,7 @@ class VisualEditorBlock extends Component {
 					onTouchStart={ this.onPointerDown }
 					className="editor-visual-editor__block-edit"
 				>
-					<BlockEdit
-						focus={ focus }
-						attributes={ block.attributes }
-						setAttributes={ this.setAttributes }
-						insertBlocksAfter={ onInsertBlocksAfter }
-						setFocus={ partial( onFocus, block.uid ) }
-						mergeBlocks={ this.mergeBlocks }
-						className={ classnames( className, block.attributes.className ) }
-						id={ block.uid }
-					/>
+					{ isValid ? edit : <Inert>{ edit }</Inert> }
 				</div>
 				{ ! isValid && <InvalidBlockWarning /> }
 			</div>
