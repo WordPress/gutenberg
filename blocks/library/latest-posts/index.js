@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Component } from 'element';
-import { Placeholder, Spinner } from 'components';
+import { Placeholder, Toolbar, Spinner } from 'components';
 import { __ } from 'i18n';
 import moment from 'moment';
 
@@ -33,6 +33,7 @@ registerBlockType( 'core/latest-posts', {
 	defaultAttributes: {
 		postsToShow: 5,
 		displayPostDate: false,
+		layout: 'list',
 	},
 
 	getEditWrapperProps( attributes ) {
@@ -109,7 +110,21 @@ registerBlockType( 'core/latest-posts', {
 			}
 
 			const { focus } = this.props;
-			const { displayPostDate, align } = this.props.attributes;
+			const { displayPostDate, align, layout } = this.props.attributes;
+			const layoutControls = [
+				{
+					icon: 'list-view',
+					title: __( 'List View' ),
+					onClick: () => setAttributes( { layout: 'list' } ),
+					isActive: layout === 'list',
+				},
+				{
+					icon: 'grid-view',
+					title: __( 'Grid View' ),
+					onClick: () => setAttributes( { layout: 'grid' } ),
+					isActive: layout === 'grid',
+				},
+			];
 
 			return [
 				focus && (
@@ -121,6 +136,7 @@ registerBlockType( 'core/latest-posts', {
 							} }
 							controls={ [ 'left', 'center', 'right', 'wide', 'full' ] }
 						/>
+						<Toolbar controls={ layoutControls } />
 					</BlockControls>
 				),
 				focus && (
