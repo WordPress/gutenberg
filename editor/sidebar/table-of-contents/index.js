@@ -20,8 +20,8 @@ import { getBlocks } from '../../selectors';
 /**
  * Module Constants
  */
-const missingHeadingContent = <em>{ __( '(Missing heading level)' ) }</em>;
 const emptyHeadingContent = <em>{ __( '(Empty heading)' ) }</em>;
+const incorrectLevelContent = [ <br />, <em>{ __( '(Incorrect heading level)' ) }</em> ];
 
 const getHeadingLevel = heading => {
 	switch ( heading.attributes.nodeName ) {
@@ -57,18 +57,16 @@ const TableOfContents = ( { blocks } ) => {
 	headings.forEach( ( heading, index ) => {
 		const headingLevel = getHeadingLevel( heading );
 		const isEmpty = isEmptyHeading( heading );
-		let isValid = ! isEmpty && headingLevel;
-		// Headings can go up by one or down by any amount. Otherwise there are missing levels.
-		if ( headingLevel > prevHeadingLevel + 1 ) {
-			isValid = false;
-			for ( let missingLevel = prevHeadingLevel + 1; headingLevel > missingLevel; missingLevel++ ) {
-				tocItems.push(
-					<TableOfContentsItem key={ `${ index }.${ missingLevel }` } level={ missingLevel }>
-						{ missingHeadingContent }
-					</TableOfContentsItem>
-				);
-			}
-		}
+
+		// Headings remain the same, go up by one, or down by any amount.
+		// Otherwise there are missing levels.
+		const isIncorrectLevel = headingLevel > prevHeadingLevel + 1;
+
+		const isValid = (
+			! isEmpty &&
+			! isIncorrectLevel &&
+			headingLevel
+		);
 
 		tocItems.push(
 			<TableOfContentsItem
@@ -77,6 +75,7 @@ const TableOfContents = ( { blocks } ) => {
 				isValid={ isValid }
 			>
 				{ isEmpty ? emptyHeadingContent : heading.attributes.content }
+				{ isIncorrectLevel && incorrectLevelContent }
 			</TableOfContentsItem>
 		);
 
