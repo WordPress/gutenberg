@@ -44,25 +44,25 @@ function createRunHook( hooks, returnFirstArg ) {
 				: undefined;
 		}
 
+		const hookInfo = {
+			name: hookName,
+			currentIndex: 0,
+		};
+
 		hooks.__current = hooks.__current || [];
-		hooks.__current.push( hookName );
+		hooks.__current.push( hookInfo );
 		hooks[ hookName ].runs++;
 
 		let maybeReturnValue = args[ 0 ];
 
-		handlers.forEach( handler => {
-			if ( handler.callback !== hooks.currentCallback ) {
-
-				// Prevent hook recursion.
-				hooks.currentCallback = handler.callback;
-				maybeReturnValue = handler.callback.apply( null, args );
-				hooks.currentCallback = false;
-
-				if ( returnFirstArg ) {
-					args[ 0 ] = maybeReturnValue;
-				}
+		while ( hookInfo.currentIndex < handlers.length ) {
+			const handler = handlers[ hookInfo.currentIndex ];
+			maybeReturnValue = handler.callback.apply( null, args );
+			if ( returnFirstArg ) {
+				args[ 0 ] = maybeReturnValue;
 			}
-		} );
+			hookInfo.currentIndex++;
+		}
 
 		hooks.__current.pop();
 

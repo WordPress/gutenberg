@@ -20,7 +20,7 @@ function createCurrentHook( hooks, returnFirstArg ) {
 			return null;
 		}
 
-		return hooks.__current[ hooks.__current.length - 1 ];
+		return hooks.__current[ hooks.__current.length - 1 ].name;
 	};
 }
 
