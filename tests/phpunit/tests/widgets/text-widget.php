@@ -457,7 +457,7 @@ class Test_WP_Widget_Text extends WP_UnitTestCase {
 		$widget->form( $instance );
 		$form = ob_get_clean();
 		$this->assertContains( 'class="visual" type="hidden" value=""', $form );
-		$this->assertNotContains( 'class="visual" type="hidden" value="1"', $form );
+		$this->assertNotContains( 'class="visual" type="hidden" value="on"', $form );
 
 		$instance = array(
 			'title' => 'Title',
@@ -468,7 +468,7 @@ class Test_WP_Widget_Text extends WP_UnitTestCase {
 		ob_start();
 		$widget->form( $instance );
 		$form = ob_get_clean();
-		$this->assertContains( 'class="visual" type="hidden" value="1"', $form );
+		$this->assertContains( 'class="visual" type="hidden" value="on"', $form );
 		$this->assertNotContains( 'class="visual" type="hidden" value=""', $form );
 
 		$instance = array(
@@ -480,7 +480,7 @@ class Test_WP_Widget_Text extends WP_UnitTestCase {
 		ob_start();
 		$widget->form( $instance );
 		$form = ob_get_clean();
-		$this->assertContains( 'class="visual" type="hidden" value="1"', $form );
+		$this->assertContains( 'class="visual" type="hidden" value="on"', $form );
 		$this->assertNotContains( 'class="visual" type="hidden" value=""', $form );
 
 		$instance = array(
@@ -493,7 +493,7 @@ class Test_WP_Widget_Text extends WP_UnitTestCase {
 		ob_start();
 		$widget->form( $instance );
 		$form = ob_get_clean();
-		$this->assertContains( 'class="visual" type="hidden" value="1"', $form );
+		$this->assertContains( 'class="visual" type="hidden" value="on"', $form );
 		$this->assertNotContains( 'class="visual" type="hidden" value=""', $form );
 	}
 
