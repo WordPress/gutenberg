@@ -19,6 +19,16 @@ function createRunHook( hooks, returnFirstArg ) {
 	 * @return {*}               Return value of runner, if applicable.
 	 */
 	return function runHooks( hookName, ...args ) {
+		if ( typeof hookName !== 'string' ) {
+			console.error( 'The hook name must be a string.' );
+			return;
+		}
+
+		if ( /^__/.test( hookName ) ) {
+			console.error( 'The hook name cannot begin with `__`.' );
+			return;
+		}
+
 		if ( ! hooks.hasOwnProperty( hookName ) ) {
 			hooks[ hookName ] = {
 				runs: 0,

@@ -98,12 +98,18 @@ test( 'add 2 filters in a row and run them', () => {
 	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testab' );
 } );
 
-test( 'cannot add filters named with __ prefix' , () => {
+test( 'cannot add filters named with __ prefix', () => {
 	addFilter( '__test', () => null );
 	expect( console.error ).toHaveBeenCalledWith(
 		'The hook name cannot begin with `__`.'
 	);
-	expect( applyFilters( '__test', 42 ) ).toBe( 42 );
+} );
+
+test( 'cannot run filters named with __ prefix', () => {
+	expect( applyFilters( '__test', 42 ) ).toBe( undefined );
+	expect( console.error ).toHaveBeenCalledWith(
+		'The hook name cannot begin with `__`.'
+	);
 } );
 
 test( 'add 3 filters with different priorities and run them', () => {
