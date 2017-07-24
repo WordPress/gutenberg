@@ -31,7 +31,7 @@ function gutenberg_wordpress_version_notice() {
 function gutenberg_can_init() {
 	global $wp_version;
 
-	if ( version_compare( $wp_version, '4.8', '<' ) ) {
+	if ( version_compare( strtok( $wp_version, '-' ), '4.8', '<' ) ) {
 		add_action( 'admin_notices', 'gutenberg_wordpress_version_notice' );
 		return false;
 	}
