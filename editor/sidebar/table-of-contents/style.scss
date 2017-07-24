@@ -23,23 +23,23 @@
 		margin-right: 4px;
 	}
 
-	&.is-H2::before {
+	&.is-h2::before {
 		content: '—';
 	}
 
-	&.is-H3::before {
+	&.is-h3::before {
 		content: '——';
 	}
 
-	&.is-H4::before {
+	&.is-h4::before {
 		content: '———';
 	}
 
-	&.is-H5::before {
+	&.is-h5::before {
 		content: '————';
 	}
 
-	&.is-H6::before {
+	&.is-h6::before {
 		content: '—————';
 	}
 }

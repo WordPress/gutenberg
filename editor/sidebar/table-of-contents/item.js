@@ -11,7 +11,7 @@ const TableOfContentsItem = ( {
 	<div
 		className={ classnames(
 			'table-of-contents__item',
-			`is-H${ level }`,
+			`is-h${ level }`,
 			{
 				'is-invalid': ! isValid,
 			}
