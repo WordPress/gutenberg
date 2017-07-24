@@ -44,19 +44,25 @@ function gutenberg_render_block_core_latest_posts( $attributes ) {
 		$post_id = $post['ID'];
 		$post_permalink = get_permalink( $post_id );
 		$post_title = get_the_title( $post_id );
+		$post_the_date = get_the_date( false, $post_id );
+		$post_date = '';
 
-		$posts_content .= "<li><a href='{$post_permalink}'>{$post_title}</a></li>\n";
+		if ( $attributes['displayPostDate'] ) {
+			$post_date = "<span class='wp-block-latest-posts__post-date'>{$post_the_date}</span>";
+		}
+
+		$posts_content .= "<li><a href='{$post_permalink}'>{$post_title}</a>{$post_date}</li>\n";
 	}
 
 	$class = 'wp-block-latest-posts ' . esc_attr( 'align' . $align );
+	if ( $attributes['layout'] === 'grid' ) {
+		$class .= ' is-grid';
+	}
 
 	$block_content = <<<CONTENT
-<div class="{$class}">
-	<ul>
-		{$posts_content}
-	</ul>
-</div>
-
+<ul class="{$class}">
+	{$posts_content}
+</ul>
 CONTENT;
 
 	return $block_content;
