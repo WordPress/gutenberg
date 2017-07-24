@@ -5,6 +5,7 @@ import { Component } from 'element';
 import { Placeholder, Toolbar, Spinner } from 'components';
 import { __ } from 'i18n';
 import moment from 'moment';
+import classnames from 'classnames';
 
 /**
  * Internal dependencies
@@ -161,7 +162,12 @@ registerBlockType( 'core/latest-posts', {
 						/>
 					</InspectorControls>
 				),
-				<ul className={ this.props.className } key="latest-posts">
+				<ul
+					className={ classnames( this.props.className, {
+						'is-grid': layout === 'grid',
+					} ) }
+					key="latest-posts"
+				>
 					{ latestPosts.map( ( post, i ) =>
 						<li key={ i }>
 							<a href={ post.link } target="_blank">{ post.title.rendered }</a>
