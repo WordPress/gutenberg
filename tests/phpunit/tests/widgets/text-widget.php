@@ -82,17 +82,18 @@ class Test_WP_Widget_Text extends WP_UnitTestCase {
 			'before_widget' => '<section>',
 			'after_widget'  => "</section>\n",
 		);
+
+		add_filter( 'widget_text_content', array( $this, 'filter_widget_text_content' ), 5, 3 );
+		add_filter( 'widget_text', array( $this, 'filter_widget_text' ), 5, 3 );
+
+		// Test with filter=false, implicit legacy mode.
+		$this->widget_text_content_args = null;
+		ob_start();
 		$instance = array(
 			'title'  => 'Foo',
 			'text'   => $text,
 			'filter' => false,
 		);
-
-		add_filter( 'widget_text_content', array( $this, 'filter_widget_text_content' ), 5, 3 );
-		add_filter( 'widget_text', array( $this, 'filter_widget_text' ), 5, 3 );
-
-		// Test with filter=false.
-		ob_start();
 		$widget->widget( $args, $instance );
 		$output = ob_get_clean();
 		$this->assertNotContains( '<p>', $output );
@@ -102,8 +103,13 @@ class Test_WP_Widget_Text extends WP_UnitTestCase {
 		$this->assertContains( '[filter:widget_text]', $output );
 		$this->assertNotContains( '[filter:widget_text_content]', $output );
 
-		// Test with filter=true.
-		$instance['filter'] = true;
+		// Test with filter=true, implicit legacy mode.
+		$this->widget_text_content_args = null;
+		$instance = array(
+			'title'  => 'Foo',
+			'text'   => $text,
+			'filter' => true,
+		);
 		ob_start();
 		$widget->widget( $args, $instance );
 		$output = ob_get_clean();
@@ -117,22 +123,97 @@ class Test_WP_Widget_Text extends WP_UnitTestCase {
 		$this->assertContains( '[filter:widget_text]', $output );
 		$this->assertNotContains( '[filter:widget_text_content]', $output );
 
-		// Test with filter=content, the upgraded widget.
-		$instance['filter'] = 'content';
+		// Test with filter=content, the upgraded widget, in 4.8.0 only.
+		$this->widget_text_content_args = null;
+		$instance = array(
+			'title'  => 'Foo',
+			'text'   => $text,
+			'filter' => 'content',
+		);
+		$expected_instance = array_merge( $instance, array(
+			'filter' => true,
+			'visual' => true,
+		) );
 		ob_start();
 		$widget->widget( $args, $instance );
 		$output = ob_get_clean();
 		$this->assertContains( '<p>', $output );
 		$this->assertContains( '<br />', $output );
 		$this->assertCount( 3, $this->widget_text_args );
-		$this->assertEquals( $instance['text'], $this->widget_text_args[0] );
-		$this->assertEquals( $instance, $this->widget_text_args[1] );
+		$this->assertEquals( $expected_instance['text'], $this->widget_text_args[0] );
+		$this->assertEquals( $expected_instance, $this->widget_text_args[1] );
 		$this->assertEquals( $widget, $this->widget_text_args[2] );
 		$this->assertCount( 3, $this->widget_text_content_args );
-		$this->assertEquals( $instance['text'] . '[filter:widget_text]', $this->widget_text_content_args[0] );
-		$this->assertEquals( $instance, $this->widget_text_content_args[1] );
+		$this->assertEquals( $expected_instance['text'] . '[filter:widget_text]', $this->widget_text_content_args[0] );
+		$this->assertEquals( $expected_instance, $this->widget_text_content_args[1] );
 		$this->assertEquals( $widget, $this->widget_text_content_args[2] );
-		$this->assertContains( wpautop( $instance['text'] . '[filter:widget_text][filter:widget_text_content]' ), $output );
+		$this->assertContains( wpautop( $expected_instance['text'] . '[filter:widget_text][filter:widget_text_content]' ), $output );
+
+		// Test with filter=true&visual=true, the upgraded widget, in 4.8.1 and above.
+		$this->widget_text_content_args = null;
+		$instance = array(
+			'title'  => 'Foo',
+			'text'   => $text,
+			'filter' => true,
+			'visual' => true,
+		);
+		$expected_instance = $instance;
+		ob_start();
+		$widget->widget( $args, $instance );
+		$output = ob_get_clean();
+		$this->assertContains( '<p>', $output );
+		$this->assertContains( '<br />', $output );
+		$this->assertCount( 3, $this->widget_text_args );
+		$this->assertEquals( $expected_instance['text'], $this->widget_text_args[0] );
+		$this->assertEquals( $expected_instance, $this->widget_text_args[1] );
+		$this->assertEquals( $widget, $this->widget_text_args[2] );
+		$this->assertCount( 3, $this->widget_text_content_args );
+		$this->assertEquals( $expected_instance['text'] . '[filter:widget_text]', $this->widget_text_content_args[0] );
+		$this->assertEquals( $expected_instance, $this->widget_text_content_args[1] );
+		$this->assertEquals( $widget, $this->widget_text_content_args[2] );
+		$this->assertContains( wpautop( $expected_instance['text'] . '[filter:widget_text][filter:widget_text_content]' ), $output );
+
+		// Test with filter=true&visual=true, the upgraded widget, in 4.8.1 and above.
+		$this->widget_text_content_args = null;
+		$instance = array(
+			'title'  => 'Foo',
+			'text'   => $text,
+			'filter' => true,
+			'visual' => false,
+		);
+		$expected_instance = $instance;
+		ob_start();
+		$widget->widget( $args, $instance );
+		$output = ob_get_clean();
+		$this->assertContains( '<p>', $output );
+		$this->assertContains( '<br />', $output );
+		$this->assertCount( 3, $this->widget_text_args );
+		$this->assertEquals( $expected_instance['text'], $this->widget_text_args[0] );
+		$this->assertEquals( $expected_instance, $this->widget_text_args[1] );
+		$this->assertEquals( $widget, $this->widget_text_args[2] );
+		$this->assertNull( $this->widget_text_content_args );
+		$this->assertContains( wpautop( $expected_instance['text'] . '[filter:widget_text]' ), $output );
+
+		// Test with filter=false&visual=false, the upgraded widget, in 4.8.1 and above.
+		$this->widget_text_content_args = null;
+		$instance = array(
+			'title'  => 'Foo',
+			'text'   => $text,
+			'filter' => false,
+			'visual' => false,
+		);
+		$expected_instance = $instance;
+		ob_start();
+		$widget->widget( $args, $instance );
+		$output = ob_get_clean();
+		$this->assertNotContains( '<p>', $output );
+		$this->assertNotContains( '<br />', $output );
+		$this->assertCount( 3, $this->widget_text_args );
+		$this->assertEquals( $expected_instance['text'], $this->widget_text_args[0] );
+		$this->assertEquals( $expected_instance, $this->widget_text_args[1] );
+		$this->assertEquals( $widget, $this->widget_text_args[2] );
+		$this->assertNull( $this->widget_text_content_args );
+		$this->assertContains( $expected_instance['text'] . '[filter:widget_text]', $output );
 	}
 
 	/**
@@ -250,14 +331,19 @@ class Test_WP_Widget_Text extends WP_UnitTestCase {
 		);
 
 		$instance = array_merge( $base_instance, array(
-			'legacy' => true,
+			'visual' => false,
 		) );
-		$this->assertTrue( $widget->is_legacy_instance( $instance ), 'Legacy when legacy prop is present.' );
+		$this->assertTrue( $widget->is_legacy_instance( $instance ), 'Legacy when visual=false prop is present.' );
+
+		$instance = array_merge( $base_instance, array(
+			'visual' => true,
+		) );
+		$this->assertFalse( $widget->is_legacy_instance( $instance ), 'Not legacy when visual=true prop is present.' );
 
 		$instance = array_merge( $base_instance, array(
 			'filter' => 'content',
 		) );
-		$this->assertFalse( $widget->is_legacy_instance( $instance ), 'Not legacy when filter is explicitly content.' );
+		$this->assertFalse( $widget->is_legacy_instance( $instance ), 'Not legacy when filter is explicitly content (in WP 4.8.0 only).' );
 
 		$instance = array_merge( $base_instance, array(
 			'text' => '',
@@ -364,13 +450,14 @@ class Test_WP_Widget_Text extends WP_UnitTestCase {
 			'title' => 'Title',
 			'text' => 'Text',
 			'filter' => false,
-			'legacy' => true,
+			'visual' => false,
 		);
 		$this->assertTrue( $widget->is_legacy_instance( $instance ) );
 		ob_start();
 		$widget->form( $instance );
 		$form = ob_get_clean();
-		$this->assertContains( 'class="legacy"', $form );
+		$this->assertContains( 'class="visual" type="hidden" value=""', $form );
+		$this->assertNotContains( 'class="visual" type="hidden" value="1"', $form );
 
 		$instance = array(
 			'title' => 'Title',
@@ -381,7 +468,33 @@ class Test_WP_Widget_Text extends WP_UnitTestCase {
 		ob_start();
 		$widget->form( $instance );
 		$form = ob_get_clean();
-		$this->assertNotContains( 'class="legacy"', $form );
+		$this->assertContains( 'class="visual" type="hidden" value="1"', $form );
+		$this->assertNotContains( 'class="visual" type="hidden" value=""', $form );
+
+		$instance = array(
+			'title' => 'Title',
+			'text' => 'Text',
+			'filter' => true,
+		);
+		$this->assertFalse( $widget->is_legacy_instance( $instance ) );
+		ob_start();
+		$widget->form( $instance );
+		$form = ob_get_clean();
+		$this->assertContains( 'class="visual" type="hidden" value="1"', $form );
+		$this->assertNotContains( 'class="visual" type="hidden" value=""', $form );
+
+		$instance = array(
+			'title' => 'Title',
+			'text' => 'Text',
+			'filter' => true,
+			'visual' => true,
+		);
+		$this->assertFalse( $widget->is_legacy_instance( $instance ) );
+		ob_start();
+		$widget->form( $instance );
+		$form = ob_get_clean();
+		$this->assertContains( 'class="visual" type="hidden" value="1"', $form );
+		$this->assertNotContains( 'class="visual" type="hidden" value=""', $form );
 	}
 
 	/**
@@ -394,30 +507,30 @@ class Test_WP_Widget_Text extends WP_UnitTestCase {
 		$instance = array(
 			'title' => "The\nTitle",
 			'text'  => "The\n\nText",
-			'filter' => 'content',
+			'filter' => true,
+			'visual' => true,
 		);
 
 		wp_set_current_user( $this->factory()->user->create( array(
 			'role' => 'administrator',
 		) ) );
 
-		// Should return valid instance in legacy mode since filter=false and there are line breaks.
 		$expected = array(
 			'title'  => sanitize_text_field( $instance['title'] ),
 			'text'   => $instance['text'],
-			'filter' => 'content',
+			'filter' => true,
+			'visual' => true,
 		);
 		$result = $widget->update( $instance, array() );
 		$this->assertEquals( $expected, $result );
 		$this->assertTrue( ! empty( $expected['filter'] ), 'Expected filter prop to be truthy, to handle case where 4.8 is downgraded to 4.7.' );
 
-		// Make sure KSES is applying as expected.
 		add_filter( 'map_meta_cap', array( $this, 'grant_unfiltered_html_cap' ), 10, 2 );
 		$this->assertTrue( current_user_can( 'unfiltered_html' ) );
 		$instance['text'] = '<script>alert( "Howdy!" );</script>';
 		$expected['text'] = $instance['text'];
 		$result = $widget->update( $instance, array() );
-		$this->assertEquals( $expected, $result );
+		$this->assertEquals( $expected, $result, 'KSES should apply as expected.' );
 		remove_filter( 'map_meta_cap', array( $this, 'grant_unfiltered_html_cap' ) );
 
 		add_filter( 'map_meta_cap', array( $this, 'revoke_unfiltered_html_cap' ), 10, 2 );
@@ -425,7 +538,7 @@ class Test_WP_Widget_Text extends WP_UnitTestCase {
 		$instance['text'] = '<script>alert( "Howdy!" );</script>';
 		$expected['text'] = wp_kses_post( $instance['text'] );
 		$result = $widget->update( $instance, array() );
-		$this->assertEquals( $expected, $result );
+		$this->assertEquals( $expected, $result, 'KSES should not apply since user can unfiltered_html.' );
 		remove_filter( 'map_meta_cap', array( $this, 'revoke_unfiltered_html_cap' ), 10 );
 	}
 
@@ -437,48 +550,150 @@ class Test_WP_Widget_Text extends WP_UnitTestCase {
 	function test_update_legacy() {
 		$widget = new WP_Widget_Text();
 
-		// Updating a widget with explicit filter=true persists with legacy mode.
+		// --
+		$instance = array(
+			'title' => 'Legacy',
+			'text' => 'Text',
+			'filter' => false,
+		);
+		$result = $widget->update( $instance, array() );
+		$this->assertEquals( $instance, $result, 'Updating a widget without visual prop and explicit filter=false leaves visual prop absent' );
+
+		// --
 		$instance = array(
 			'title' => 'Legacy',
 			'text' => 'Text',
 			'filter' => true,
 		);
 		$result = $widget->update( $instance, array() );
-		$expected = array_merge( $instance, array(
-			'legacy' => true,
-			'filter' => true,
-		) );
-		$this->assertEquals( $expected, $result );
+		$this->assertEquals( $instance, $result, 'Updating a widget without visual prop and explicit filter=true leaves legacy prop absent.' );
 
-		// Updating a widget with explicit filter=false persists with legacy mode.
-		$instance['filter'] = false;
-		$result = $widget->update( $instance, array() );
-		$expected = array_merge( $instance, array(
-			'legacy' => true,
+		// --
+		$instance = array(
+			'title' => 'Legacy',
+			'text' => 'Text',
+			'visual' => true,
+		);
+		$old_instance = array_merge( $instance, array(
 			'filter' => false,
 		) );
-		$this->assertEquals( $expected, $result );
+		$expected = array_merge( $instance, array(
+			'filter' => true,
+		) );
+		$result = $widget->update( $instance, $old_instance );
+		$this->assertEquals( $expected, $result, 'Updating a pre-existing widget with visual mode forces filter to be true.' );
 
-		// Updating a widget in legacy form results in filter=false when checkbox not checked.
-		$instance['filter'] = true;
+		// --
+		$instance = array(
+			'title' => 'Legacy',
+			'text' => 'Text',
+			'filter' => true,
+		);
+		$old_instance = array_merge( $instance, array(
+			'visual' => true,
+		) );
+		$result = $widget->update( $instance, $old_instance );
+		$expected = array_merge( $instance, array(
+			'visual' => true,
+		) );
+		$this->assertEquals( $expected, $result, 'Updating a pre-existing visual widget retains visual mode when updated.' );
+
+		// --
+		$instance = array(
+			'title' => 'Legacy',
+			'text' => 'Text',
+		);
+		$old_instance = array_merge( $instance, array(
+			'visual' => true,
+		) );
+		$result = $widget->update( $instance, $old_instance );
+		$expected = array_merge( $instance, array(
+			'visual' => true,
+			'filter' => true,
+		) );
+		$this->assertEquals( $expected, $result, 'Updating a pre-existing visual widget retains visual=true and supplies missing filter=true.' );
+
+		// --
+		$instance = array(
+			'title' => 'Legacy',
+			'text' => 'Text',
+			'visual' => true,
+		);
+		$expected = array_merge( $instance, array(
+			'filter' => true,
+		) );
+		$result = $widget->update( $instance, array() );
+		$this->assertEquals( $expected, $result, 'Updating a widget with explicit visual=true and absent filter prop causes filter to be set to true.' );
+
+		// --
+		$instance = array(
+			'title' => 'Legacy',
+			'text' => 'Text',
+			'visual' => false,
+		);
 		$result = $widget->update( $instance, array() );
 		$expected = array_merge( $instance, array(
-			'legacy' => true,
-			'filter' => true,
+			'filter' => false,
 		) );
-		$this->assertEquals( $expected, $result );
+		$this->assertEquals( $expected, $result, 'Updating a widget in legacy mode results in filter=false as if checkbox not checked.' );
 
-		// Updating a widget that previously had legacy form results in filter persisting.
-		unset( $instance['legacy'] );
-		$instance['filter'] = true;
-		$result = $widget->update( $instance, array(
-			'legacy' => true,
-		) );
-		$expected = array_merge( $instance, array(
-			'legacy' => true,
+		// --
+		$instance = array(
+			'title' => 'Title',
+			'text' => 'Text',
+			'filter' => false,
+		);
+		$old_instance = array_merge( $instance, array(
+			'visual' => false,
 			'filter' => true,
 		) );
-		$this->assertEquals( $expected, $result );
+		$result = $widget->update( $instance, $old_instance );
+		$expected = array_merge( $instance, array(
+			'visual' => false,
+			'filter' => false,
+		) );
+		$this->assertEquals( $expected, $result, 'Updating a widget that previously had legacy form results in filter allowed to be false.' );
+
+		// --
+		$instance = array(
+			'title' => 'Title',
+			'text' => 'Text',
+			'filter' => 'content',
+		);
+		$result = $widget->update( $instance, array() );
+		$expected = array_merge( $instance, array(
+			'filter' => true,
+			'visual' => true,
+		) );
+		$this->assertEquals( $expected, $result, 'Updating a widget that had \'content\' as its filter value persists non-legacy mode. This only existed in WP 4.8.0.' );
+
+		// --
+		$instance = array(
+			'title' => 'Title',
+			'text' => 'Text',
+		);
+		$old_instance = array_merge( $instance, array(
+			'filter' => 'content',
+		) );
+		$result = $widget->update( $instance, $old_instance );
+		$expected = array_merge( $instance, array(
+			'visual' => true,
+			'filter' => true,
+		) );
+		$this->assertEquals( $expected, $result, 'Updating a pre-existing widget with the filter=content prop in WP 4.8.0 upgrades to filter=true&visual=true.' );
+
+		// --
+		$instance = array(
+			'title' => 'Title',
+			'text' => 'Text',
+			'filter' => 'content',
+		);
+		$result = $widget->update( $instance, array() );
+		$expected = array_merge( $instance, array(
+			'filter' => true,
+			'visual' => true,
+		) );
+		$this->assertEquals( $expected, $result, 'Updating a widget with filter=content (from WP 4.8.0) upgrades to filter=true&visual=true.' );
 	}
 
 	/**

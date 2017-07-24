@@ -59,6 +59,14 @@ class Test_WP_Widget_Custom_HTML extends WP_UnitTestCase {
 			'content' => $content,
 		);
 
+		// Convert Custom HTML widget instance into Text widget instance data.
+		$text_widget_instance = array_merge( $instance, array(
+			'text' => $instance['content'],
+			'filter' => false,
+			'visual' => false,
+		) );
+		unset( $text_widget_instance['content'] );
+
 		update_option( 'use_balanceTags', 0 );
 		add_filter( 'widget_custom_html_content', array( $this, 'filter_widget_custom_html_content' ), 5, 3 );
 		add_filter( 'widget_text', array( $this, 'filter_widget_text' ), 10, 3 );
@@ -75,11 +83,11 @@ class Test_WP_Widget_Custom_HTML extends WP_UnitTestCase {
 		$this->assertNotContains( '<p>', $output );
 		$this->assertNotContains( '<br>', $output );
 		$this->assertNotContains( '</u>', $output );
-		$this->assertEquals( $instance, $this->widget_text_args[1] );
+		$this->assertEquals( $text_widget_instance, $this->widget_text_args[1] );
 		$this->assertEquals( $instance, $this->widget_custom_html_content_args[1] );
 		$this->assertSame( $widget, $this->widget_text_args[2] );
 		$this->assertSame( $widget, $this->widget_custom_html_content_args[2] );
-		remove_filter( 'widget_custom_html_content', array( $this, 'filter_widget_custom_html_content' ), 5, 3 );
+		remove_filter( 'widget_custom_html_content', array( $this, 'filter_widget_custom_html_content' ), 5 );
 		remove_filter( 'widget_text', array( $this, 'filter_widget_text' ), 10 );
 
 		update_option( 'use_balanceTags', 1 );
