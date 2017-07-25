@@ -4,6 +4,7 @@
 import { Component } from '@wordpress/element';
 import { Placeholder, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import moment from 'moment';
 
 /**
  * Internal dependencies
@@ -125,7 +126,7 @@ registerBlockType( 'core/latest-comments', {
 			}
 
 			const { focus } = this.props;
-			const { align } = this.props.attributes;
+			const { align, displayTimestamp } = this.props.attributes;
 
 			return [
 				focus && (
@@ -178,6 +179,11 @@ registerBlockType( 'core/latest-comments', {
 					{ latestComments.map( ( comment, i ) =>
 						<li key={ i }>
 							<a href={ comment.link } target="_blank">{ comment.link }</a>
+							{ displayTimestamp && comment.date_gmt &&
+								<span className={ `${ this.props.className }__comment-timestamp` }>
+									{ moment( comment.date_gmt ).local().format( 'MMM DD h:mm A' ) }
+								</span>
+							}
 						</li>
 					) }
 				</ul>,

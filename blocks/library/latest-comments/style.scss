@@ -5,4 +5,10 @@
 		padding-left: 2.5em;
 	}
 
+	.wp-block-latest-comments__comment-timestamp {
+		display: block;
+		color: $dark-gray-100;
+		font-size: $default-font-size;
+	}
+
 }
