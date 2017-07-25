@@ -10,7 +10,7 @@ import scrollIntoView from 'dom-scroll-into-view';
  */
 import { __ } from 'i18n';
 import { Component } from 'element';
-import { UP, DOWN } from 'utils/keycodes';
+import { UP, DOWN, ENTER } from 'utils/keycodes';
 import { Spinner } from 'components';
 
 class LinkInput extends Component {
@@ -104,6 +104,16 @@ class LinkInput extends Component {
 					selectedSuggestion: nextIndex,
 				} );
 				break;
+			}
+			case ENTER: {
+				if ( this.state.selectedSuggestion ) {
+					event.stopPropagation();
+					const post = this.state.posts[ this.state.selectedSuggestion ];
+					this.props.onChange( post.link );
+					this.setState( {
+						showSuggestions: false,
+					} );
+				}
 			}
 		}
 	}
