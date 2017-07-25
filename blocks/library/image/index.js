@@ -21,7 +21,7 @@ import TextControl from '../../inspector-controls/text-control';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import BlockDescription from '../../block-description';
-import UrlInput from '../../url-input';
+import UrlInputButton from '../../url-input/button';
 
 const { attr, children } = query;
 
@@ -96,7 +96,7 @@ registerBlockType( 'core/image', {
 								<Dashicon icon="edit" />
 							</MediaUploadButton>
 						</li>
-						<UrlInput onChange={ onSetHref } url={ href } />
+						<UrlInputButton onChange={ onSetHref } url={ href } />
 					</Toolbar>
 				</BlockControls>
 			)

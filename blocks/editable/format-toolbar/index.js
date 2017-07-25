@@ -10,7 +10,7 @@ import { ESCAPE } from 'utils/keycodes';
  * Internal dependencies
  */
 import './style.scss';
-import LinkInput from './link-input';
+import UrlInput from '../../url-input';
 
 const FORMATTING_CONTROLS = [
 	{
@@ -154,7 +154,7 @@ class FormatToolbar extends Component {
 						className="blocks-format-toolbar__link-modal"
 						style={ linkStyle }
 						onSubmit={ this.submitLink }>
-						<LinkInput value={ this.state.linkValue } onChange={ this.updateLinkValue } />
+						<UrlInput value={ this.state.linkValue } onChange={ this.updateLinkValue } />
 						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
 						<IconButton icon="editor-unlink" label={ __( 'Remove link' ) } onClick={ this.dropLink } />
 					</form>
