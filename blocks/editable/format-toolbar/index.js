@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { isUndefined } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from 'i18n';
@@ -69,17 +74,19 @@ class FormatToolbar extends Component {
 	}
 
 	componentWillReceiveProps( nextProps ) {
-		const newState = {
-			linkValue: nextProps.formats.link ? nextProps.formats.link.value : '',
-		};
+		// Update the link value if the focused link node changes
 		if (
-			! this.props.formats.link ||
-			! nextProps.formats.link ||
-			this.props.formats.link.node !== nextProps.formats.link.node
+			isUndefined( nextProps.formats.link ) !== isUndefined( this.props.formats.link ) ||
+			(
+				nextProps.formats.link && this.props.formats.link &&
+				nextProps.formats.link.node !== this.props.formats.link.node
+			)
 		) {
-			newState.isEditingLink = false;
+			this.setState( {
+				linkValue: nextProps.formats.link ? nextProps.formats.link.value : '',
+				isEditingLink: false,
+			} );
 		}
-		this.setState( newState );
 	}
 
 	toggleFormat( format ) {
