@@ -14,6 +14,7 @@ import { registerBlockType } from '../../api';
 import { getLatestComments } from './data.js';
 import InspectorControls from '../../inspector-controls';
 import TextControl from '../../inspector-controls/text-control';
+import ToggleControl from '../../inspector-controls/toggle-control';
 import BlockDescription from '../../block-description';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
@@ -30,6 +31,9 @@ registerBlockType( 'core/latest-comments', {
 
 	defaultAttributes: {
 		commentsToShow: 5,
+		displayAvatar: true,
+		displayExcerpt: true,
+		displayTimestamp: true,
 	},
 
 	getEditWrapperProps( attributes ) {
@@ -42,6 +46,9 @@ registerBlockType( 'core/latest-comments', {
 	edit: class extends Component {
 		constructor() {
 			super( ...arguments );
+			this.toggleDisplayAvatar = this.toggleDisplayAvatar.bind( this );
+			this.toggleDisplayExcerpt = this.toggleDisplayExcerpt.bind( this );
+			this.toggleDisplayTimestamp = this.toggleDisplayTimestamp.bind( this );
 			this.changeCommentsToShow = this.changeCommentsToShow.bind( this );
 
 			const { commentsToShow } = this.props.attributes;
@@ -73,6 +80,27 @@ registerBlockType( 'core/latest-comments', {
 
 				setAttributes( { commentsToShow: commentsToShowNext } );
 			}
+		}
+
+		toggleDisplayAvatar() {
+			const { displayAvatar } = this.props.attributes;
+			const { setAttributes } = this.props;
+
+			setAttributes( { displayAvatar: ! displayAvatar } );
+		}
+
+		toggleDisplayExcerpt() {
+			const { displayExcerpt } = this.props.attributes;
+			const { setAttributes } = this.props;
+
+			setAttributes( { displayExcerpt: ! displayExcerpt } );
+		}
+
+		toggleDisplayTimestamp() {
+			const { displayTimestamp } = this.props.attributes;
+			const { setAttributes } = this.props;
+
+			setAttributes( { displayTimestamp: ! displayTimestamp } );
 		}
 
 		changeCommentsToShow( commentsToShow ) {
@@ -117,6 +145,24 @@ registerBlockType( 'core/latest-comments', {
 							<p>{ __( 'Shows a list of your site\'s most recent comments.' ) }</p>
 						</BlockDescription>
 						<h3>{ __( 'Latest Comments Settings' ) }</h3>
+
+						<ToggleControl
+							label={ __( 'Display avatar' ) }
+							checked={ this.props.attributes.displayAvatar }
+							onChange={ this.toggleDisplayAvatar }
+						/>
+
+						<ToggleControl
+							label={ __( 'Display excerpt' ) }
+							checked={ this.props.attributes.displayExcerpt }
+							onChange={ this.toggleDisplayExcerpt }
+						/>
+
+						<ToggleControl
+							label={ __( 'Display timestamp' ) }
+							checked={ this.props.attributes.displayTimestamp }
+							onChange={ this.toggleDisplayTimestamp }
+						/>
 
 						<TextControl
 							label={ __( 'Number of comments to show' ) }

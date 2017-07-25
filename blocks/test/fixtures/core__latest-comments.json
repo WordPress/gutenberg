@@ -3,7 +3,10 @@
         "uid": "_uid_0",
         "name": "core/latest-comments",
         "attributes": {
-            "commentsToShow": 5
+            "commentsToShow": 5,
+            "displayAvatar": true,
+            "displayExcerpt": true,
+            "displayTimestamp": true
         }
     }
 ]
