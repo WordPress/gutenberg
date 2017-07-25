@@ -30,7 +30,6 @@ function SelectControl( { label, selected, instanceId, onBlur, options = [], ...
 					<option
 						key={ option.value }
 						value={ option.value }
-						selected={ option.value === selected }
 					>
 						{ option.label }
 					</option>
