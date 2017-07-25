@@ -181,7 +181,7 @@ registerBlockType( 'core/latest-comments', {
 							{ displayAvatar && comment.author_avatar_urls[ 96 ] &&
 								<img className={ `${ this.props.className }__comment-avatar` } alt={ comment.author_name } src={ comment.author_avatar_urls[ 96 ] } />
 							}
-							<a href={ comment.link } target="_blank">{ comment._embedded.up[ 0 ].title.rendered }</a>
+							<a href={ comment.link } target="_blank">{ comment._embedded.up[ 0 ].title.rendered.trim() || __( '(Untitled)' ) }</a>
 							{ displayTimestamp && comment.date_gmt &&
 								<span className={ `${ this.props.className }__comment-timestamp` }>
 									{ moment( comment.date_gmt ).local().format( 'MMM DD h:mm A' ) }
