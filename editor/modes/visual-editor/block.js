@@ -11,7 +11,7 @@ import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
  * WordPress dependencies
  */
 import { Children, Component } from 'element';
-import { IconButton, Toolbar, Inert } from 'components';
+import { IconButton, Toolbar } from 'components';
 import { BACKSPACE, ESCAPE, DELETE, UP, DOWN, LEFT, RIGHT } from 'utils/keycodes';
 import { getBlockType, getBlockDefaultClassname } from 'blocks';
 import { __, sprintf } from 'i18n';
@@ -307,7 +307,6 @@ class VisualEditorBlock extends Component {
 		const blockType = getBlockType( blockName );
 		// translators: %s: Type of block (i.e. Text, Image etc)
 		const blockLabel = sprintf( __( 'Block: %s' ), blockType.title );
-		const { className = getBlockDefaultClassname( block.name ) } = blockType;
 		// The block as rendered in the editor is composed of general block UI
 		// (mover, toolbar, wrapper) and the display of the block content, which
 		// is referred to as <BlockEdit />.
@@ -344,18 +343,9 @@ class VisualEditorBlock extends Component {
 			wrapperProps = blockType.getEditWrapperProps( block.attributes );
 		}
 
-		const edit = (
-			<BlockEdit
-				focus={ focus }
-				attributes={ block.attributes }
-				setAttributes={ this.setAttributes }
-				insertBlocksAfter={ onInsertBlocksAfter }
-				setFocus={ partial( onFocus, block.uid ) }
-				mergeBlocks={ this.mergeBlocks }
-				className={ classnames( className, block.attributes.className ) }
-				id={ block.uid }
-			/>
-		);
+		// Generate a class name for the block's editable form
+		let { className = getBlockDefaultClassname( block.name ) } = blockType;
+		className = classnames( className, block.attributes.className );
 
 		// Disable reason: Each block can be selected by clicking on it
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
@@ -412,7 +402,24 @@ class VisualEditorBlock extends Component {
 					onTouchStart={ this.onPointerDown }
 					className="editor-visual-editor__block-edit"
 				>
-					{ isValid ? edit : <Inert>{ edit }</Inert> }
+					{ isValid && (
+						<BlockEdit
+							focus={ focus }
+							attributes={ block.attributes }
+							setAttributes={ this.setAttributes }
+							insertBlocksAfter={ onInsertBlocksAfter }
+							setFocus={ partial( onFocus, block.uid ) }
+							mergeBlocks={ this.mergeBlocks }
+							className={ className }
+							id={ block.uid }
+						/>
+					) }
+					{ ! isValid && (
+						blockType.save( {
+							attributes: block.attributes,
+							className,
+						} )
+					) }
 				</div>
 				{ ! isValid && <InvalidBlockWarning /> }
 			</div>
