@@ -32,7 +32,7 @@ domReady( setup );
  * @param {String} ariaLive Optional. The politeness level for aria-live. Possible values:
  *                          polite or assertive. Default polite.
  */
-const A11ySpeak = function( message, ariaLive ) {
+export const speak = function( message, ariaLive ) {
   // Clear previous messages to allow repeated strings being read out.
   clear();
 
@@ -44,5 +44,3 @@ const A11ySpeak = function( message, ariaLive ) {
     containerPolite.textContent = message;
   }
 };
-
-export default A11ySpeak;
