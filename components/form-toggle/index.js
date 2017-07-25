@@ -30,12 +30,13 @@ function FormToggle( { className, checked, id, onChange = noop, showHint = true 
 				checked={ checked }
 				onChange={ onChange }
 			/>
+			<span className="components-form-toggle__track"></span>
+			<span className="components-form-toggle__thumb"></span>
 			{ showHint &&
 				<span className="components-form-toggle__hint" aria-hidden>
 					{ checked ? __( 'On' ) : __( 'Off' ) }
 				</span>
 			}
-			<span className="components-form-toggle__thumb"></span>
 		</span>
 	);
 }
