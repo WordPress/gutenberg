@@ -11,6 +11,7 @@ import './style.scss';
 import './block.scss';
 import { registerBlockType, query } from '../../api';
 import Editable from '../../editable';
+import LinkInput from '../../editable/format-toolbar/link-input';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
@@ -58,16 +59,11 @@ registerBlockType( 'core/button', {
 				/>
 				{ focus &&
 					<form
-						className="editable-format-toolbar__link-modal"
+						className="blocks-format-toolbar__link-modal"
 						onSubmit={ ( event ) => event.preventDefault() }>
-						<input
-							className="editable-format-toolbar__link-input"
-							type="url"
-							aria-label={ __( 'URL' ) }
-							required
+						<LinkInput
 							value={ url }
-							onChange={ ( event ) => setAttributes( { url: event.target.value } ) }
-							placeholder={ __( 'Paste URL or type' ) }
+							onChange={ ( value ) => setAttributes( { url: value } ) }
 						/>
 						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
 					</form>
