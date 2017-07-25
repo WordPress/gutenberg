@@ -71,7 +71,7 @@ function gutenberg_render_block_core_latest_posts( $attributes ) {
 	}
 
 	$class = 'wp-block-latest-posts ' . esc_attr( 'align' . $align );
-	if ( 'grid' === $attributes['layout'] ) {
+	if ( isset( $attributes['layout'] ) && 'grid' === $attributes['layout'] ) {
 		$class .= ' is-grid';
 	}
 
