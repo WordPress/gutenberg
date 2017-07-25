@@ -18,8 +18,10 @@ $blocks-button__height: 46px;
 	position: relative;
 
 	a {
+		box-shadow: none !important;
 		color: $white;
-		text-decoration: none;
+		cursor: pointer;
+		text-decoration: none !important;
 	}
 
 	&:hover {
