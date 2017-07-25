@@ -15,8 +15,14 @@
 function gutenberg_render_block_core_latest_posts( $attributes ) {
 	$posts_to_show = 5;
 
-	if ( array_key_exists( 'poststoshow', $attributes ) ) {
+	$posts_to_show_attr = null;
+	if ( array_key_exists( 'postsToShow', $attributes ) ) {
+		$posts_to_show_attr = $attributes['postsToShow'];
+	} elseif ( array_key_exists( 'poststoshow', $attributes ) ) {
 		$posts_to_show_attr = $attributes['poststoshow'];
+	}
+	if ( null !== $posts_to_show_attr ) {
+		$posts_to_show_attr = $attributes['postsToShow'];
 
 		// Basic attribute validation.
 		if (
@@ -24,7 +30,7 @@ function gutenberg_render_block_core_latest_posts( $attributes ) {
 			$posts_to_show_attr > 0 &&
 			$posts_to_show_attr < 100
 		) {
-			$posts_to_show = $attributes['poststoshow'];
+			$posts_to_show = intval( $posts_to_show_attr );
 		}
 	}
 
