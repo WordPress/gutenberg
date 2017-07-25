@@ -36,6 +36,7 @@ class Tests_User_GetUsersWithNoRole extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 22993
+	 * @ticket 36196
 	 * @group multisite
 	 * @group ms-required
 	 */
@@ -56,21 +57,27 @@ class Tests_User_GetUsersWithNoRole extends WP_UnitTestCase {
 			'user_id' => $editor,
 		) );
 
-		// Add users to blogs
+		// Add editor to blog 1
 		add_user_to_blog( $blog_1, $editor, 'editor' );
 
 		// Test users on root site
 		$users = wp_get_users_with_no_role();
-		$this->assertSame( array(), $users );
+		$this->assertSame( array(
+			"{$nobody}",
+		), $users );
 
 		// Test users counts on blog 1
-		switch_to_blog( $blog_1 );
-		$users = wp_get_users_with_no_role();
-		restore_current_blog();
-
-		// Test users on root site
+		$users = wp_get_users_with_no_role( $blog_1 );
 		$this->assertSame( array(), $users );
 
+		// Add admin to blog 1 with no role
+		add_user_to_blog( $blog_1, $admin, '' );
+
+		// Re-test users counts on blog 1
+		$users = wp_get_users_with_no_role( $blog_1 );
+		$this->assertSame( array(
+			"{$admin}",
+		), $users );
 	}
 
 	/**

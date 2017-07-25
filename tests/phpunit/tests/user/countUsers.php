@@ -52,6 +52,7 @@ class Tests_User_CountUsers extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 22993
+	 * @ticket 36196
 	 * @group multisite
 	 * @group ms-required
 	 *
@@ -103,7 +104,7 @@ class Tests_User_CountUsers extends WP_UnitTestCase {
 			'author'        => 1,
 			'contributor'   => 1,
 			'subscriber'    => 1,
-			'none'          => 0,
+			'none'          => 2,
 		), $count['avail_roles'] );
 
 		// Test users counts on blog 1
