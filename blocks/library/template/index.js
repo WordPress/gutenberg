@@ -10,14 +10,14 @@ import { registerBlockType, createBlock } from '../../api';
 
 function template( mode ) {
 	return function( { attributes, setAttributes } ) {
-		return <p>
+		return <span>
 			Hi, my name is {
 				'edit' === mode ?
 					<input type="text" placeholder="Peter" value={ attributes.name } onChange={ ( e ) => setAttributes( { name: e.target.value } ) } />
 					: <span>{ attributes.name }</span>
 			}! <br />
 			#intro { tagify( attributes.name ) }
-		</p>;
+		</span>;
 	};
 }
 
