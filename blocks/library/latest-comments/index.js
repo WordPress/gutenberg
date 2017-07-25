@@ -178,7 +178,7 @@ registerBlockType( 'core/latest-comments', {
 				<ul className={ this.props.className } key="latest-comments">
 					{ latestComments.map( ( comment, i ) =>
 						<li key={ i }>
-							<a href={ comment.link } target="_blank">{ comment.link }</a>
+							<a href={ comment.link } target="_blank">{ comment._embedded.up[0].title.rendered }</a>
 							{ displayTimestamp && comment.date_gmt &&
 								<span className={ `${ this.props.className }__comment-timestamp` }>
 									{ moment( comment.date_gmt ).local().format( 'MMM DD h:mm A' ) }
