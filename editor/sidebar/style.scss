@@ -28,19 +28,13 @@
 		overflow: auto;
 		height: 100%;
 		padding-top: $sidebar-panel-header-height;
+		margin-top: -1px;
+		margin-bottom: -1px;
 
 		@include break-small() {
 			overflow: inherit;
 			height: auto;
 			padding-top: 0;
-		}
-
-		&:first-child {
-			margin-top: -1px;
-		}
-
-		&:last-child {
-			margin-bottom: -1px;
 		}
 	}
 
@@ -111,6 +105,8 @@
 .components-panel__header.editor-sidebar__panel-tabs {
 	justify-content: flex-start;
 	padding-left: 0;
+	padding-right: $panel-padding / 2;
+	border-top: 0;
 
 	.components-icon-button {
 		margin-left: auto;
