@@ -178,7 +178,7 @@ registerBlockType( 'core/latest-posts', {
 							<a href={ post.link } target="_blank">{ post.title.rendered.trim() || __( '(Untitled)' ) }</a>
 							{ displayPostDate && post.date_gmt &&
 								<time dateTime={ moment( post.date_gmt ).utc().format() } className={ `${ this.props.className }__post-date` }>
-									{ moment( post.date_gmt ).local().format( 'MMM DD h:mm A' ) }
+									{ moment( post.date_gmt ).local().format( 'MMMM DD, Y' ) }
 								</time>
 							}
 						</li>
