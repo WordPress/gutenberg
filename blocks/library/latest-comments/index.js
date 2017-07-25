@@ -126,7 +126,7 @@ registerBlockType( 'core/latest-comments', {
 			}
 
 			const { focus } = this.props;
-			const { align, displayAvatar, displayTimestamp } = this.props.attributes;
+			const { align, displayAvatar, displayTimestamp, displayExcerpt } = this.props.attributes;
 
 			return [
 				focus && (
@@ -186,6 +186,9 @@ registerBlockType( 'core/latest-comments', {
 								<span className={ `${ this.props.className }__comment-timestamp` }>
 									{ moment( comment.date_gmt ).local().format( 'MMM DD h:mm A' ) }
 								</span>
+							}
+							{ displayExcerpt && comment.content &&
+								<div className={ `${ this.props.className }__comment-excerpt` } dangerouslySetInnerHTML={ { __html: comment.content.rendered } } />
 							}
 						</li>
 					) }
