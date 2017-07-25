@@ -139,9 +139,19 @@ class InserterMenu extends Component {
 
 	findByIncrement( blockTypes, increment = 1 ) {
 		const currentIndex = findIndex( blockTypes, ( blockType ) => this.state.currentFocus === blockType.name );
-		const nextIndex = currentIndex + increment;
 		const highestIndex = blockTypes.length - 1;
 		const lowestIndex = 0;
+
+		let nextIndex = currentIndex;
+		let blockType;
+		do {
+			nextIndex += increment;
+			// Return the name of the next block type.
+			blockType = blockTypes[ nextIndex ];
+			if ( blockType && ! this.isDisabledBlock( blockType ) ) {
+				return blockType.name;
+			}
+		} while ( blockType );
 
 		if ( nextIndex > highestIndex ) {
 			return 'search';
@@ -150,14 +160,6 @@ class InserterMenu extends Component {
 		if ( nextIndex < lowestIndex ) {
 			return 'search';
 		}
-
-		// Return the name of the next block type.
-		const blockType = blockTypes[ nextIndex ];
-		if ( this.isDisabledBlock( blockType ) ) {
-			return this.findByIncrement( blockTypes, increment > 0 ? increment + 1 : increment - 1 );
-		}
-
-		return blockType.name;
 	}
 
 	findNext( blockTypes ) {
