@@ -340,7 +340,7 @@ export default class Editable extends Component {
 		const formats = {};
 		const link = find( parents, ( node ) => node.nodeName.toLowerCase() === 'a' );
 		if ( link ) {
-			formats.link = { value: link.getAttribute( 'href' ) || '', link };
+			formats.link = { value: link.getAttribute( 'href' ) || '', node: link };
 		}
 		const activeFormats = this.editor.formatter.matchAll( [	'bold', 'italic', 'strikethrough' ] );
 		activeFormats.forEach( ( activeFormat ) => formats[ activeFormat ] = true );
