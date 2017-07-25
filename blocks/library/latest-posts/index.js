@@ -91,7 +91,6 @@ registerBlockType( 'core/latest-posts', {
 
 		changePostsToShow( postsToShow ) {
 			const { setAttributes } = this.props;
-
 			setAttributes( { postsToShow: parseInt( postsToShow, 10 ) || 0 } );
 		}
 
@@ -108,6 +107,12 @@ registerBlockType( 'core/latest-posts', {
 						<Spinner />
 					</Placeholder>
 				);
+			}
+
+			// Removing posts from display should be instant.
+			const postsDifference = latestPosts.length - this.props.attributes.postsToShow;
+			if ( postsDifference > 0 ) {
+				latestPosts.splice( this.props.attributes.postsToShow, postsDifference );
 			}
 
 			const { focus } = this.props;
