@@ -126,7 +126,7 @@ registerBlockType( 'core/latest-comments', {
 			}
 
 			const { focus } = this.props;
-			const { align, displayTimestamp } = this.props.attributes;
+			const { align, displayAvatar, displayTimestamp } = this.props.attributes;
 
 			return [
 				focus && (
@@ -149,7 +149,7 @@ registerBlockType( 'core/latest-comments', {
 
 						<ToggleControl
 							label={ __( 'Display avatar' ) }
-							checked={ this.props.attributes.displayAvatar }
+							checked={ displayAvatar }
 							onChange={ this.toggleDisplayAvatar }
 						/>
 
@@ -161,7 +161,7 @@ registerBlockType( 'core/latest-comments', {
 
 						<ToggleControl
 							label={ __( 'Display timestamp' ) }
-							checked={ this.props.attributes.displayTimestamp }
+							checked={ displayTimestamp }
 							onChange={ this.toggleDisplayTimestamp }
 						/>
 
@@ -178,7 +178,10 @@ registerBlockType( 'core/latest-comments', {
 				<ul className={ this.props.className } key="latest-comments">
 					{ latestComments.map( ( comment, i ) =>
 						<li key={ i }>
-							<a href={ comment.link } target="_blank">{ comment._embedded.up[0].title.rendered }</a>
+							{ displayAvatar && comment.author_avatar_urls[ 96 ] &&
+								<img className={ `${ this.props.className }__comment-avatar` } alt={ comment.author_name } src={ comment.author_avatar_urls[ 96 ] } />
+							}
+							<a href={ comment.link } target="_blank">{ comment._embedded.up[ 0 ].title.rendered }</a>
 							{ displayTimestamp && comment.date_gmt &&
 								<span className={ `${ this.props.className }__comment-timestamp` }>
 									{ moment( comment.date_gmt ).local().format( 'MMM DD h:mm A' ) }

@@ -11,7 +11,7 @@ export function getLatestComments( commentsToShow = 5 ) {
 	const comments = commentsCollection.fetch( {
 		data: {
 			per_page: commentsToShow,
-			_embed: true
+			_embed: true,
 		},
 	} );
 
