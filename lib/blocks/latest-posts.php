@@ -49,10 +49,14 @@ function gutenberg_render_block_core_latest_posts( $attributes ) {
 	foreach ( $recent_posts as $post ) {
 		$post_id = $post['ID'];
 
+		$title = get_the_title( $post_id );
+		if ( ! $title ) {
+			$title = __( '(Untitled)', 'gutenberg' );
+		}
 		$posts_content .= sprintf(
 			'<li><a href="%1$s">%2$s</a>',
 			esc_url( get_permalink( $post_id ) ),
-			esc_html( get_the_title( $post_id ) )
+			esc_html( $title )
 		);
 
 		if ( $attributes['displayPostDate'] ) {
