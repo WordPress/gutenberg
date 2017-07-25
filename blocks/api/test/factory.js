@@ -6,8 +6,9 @@ import { noop } from 'lodash';
 /**
  * Internal dependencies
  */
-import { createBlock, switchToBlockType } from '../factory';
+import { createBlock, switchToBlockType, transformComponentToText } from '../factory';
 import { getBlockTypes, unregisterBlockType, setUnknownTypeHandler, registerBlockType } from '../registration';
+import { Component } from 'element'
 
 describe( 'block factory', () => {
 	const defaultBlockSettings = { save: noop };
@@ -359,6 +360,70 @@ describe( 'block factory', () => {
 				name: 'core/updated-text-block',
 				attributes: {
 					value: 'smoked ribs',
+				},
+			} ] );
+		} );
+	} );
+	describe( 'transformComponentToText()', () => {
+		it( 'should transform a stateless edit/save component to a text block', () => {
+			const Save = ( { attributes } ) => <span>Hi, { attributes.name }</span>;
+			registerBlockType( 'test/hi', {
+				transforms: {
+					to: [ transformComponentToText( Save ) ],
+				},
+				edit: noop,
+				save: Save,
+			} );
+			registerBlockType( 'core/text', defaultBlockSettings );
+
+			const block = {
+				uid: 1,
+				name: 'test/hi',
+				attributes: {
+					name: 'Baba',
+				},
+			};
+
+			const updatedBlock = switchToBlockType( block, 'core/text' );
+
+			expect( updatedBlock ).toEqual( [ {
+				uid: 1,
+				name: 'core/text',
+				attributes: {
+					content: <Save attributes={ { name: 'Baba' } } />,
+				},
+			} ] );
+		} );
+		it( 'should transform a full-blown edit/save component to a text block', () => {
+			const Save = class extends Component {
+				render() {
+					return <span>Howdy, { this.props.attributes.name }</span>;
+				}
+			};
+			registerBlockType( 'test/hi', {
+				transforms: {
+					to: [ transformComponentToText( Save ) ],
+				},
+				edit: noop,
+				save: Save,
+			} );
+			registerBlockType( 'core/text', defaultBlockSettings );
+
+			const block = {
+				uid: 1,
+				name: 'test/hi',
+				attributes: {
+					name: 'Baba',
+				},
+			};
+
+			const updatedBlock = switchToBlockType( block, 'core/text' );
+
+			expect( updatedBlock ).toEqual( [ {
+				uid: 1,
+				name: 'core/text',
+				attributes: {
+					content: <Save attributes={ { name: 'Baba' } } />,
 				},
 			} ] );
 		} );

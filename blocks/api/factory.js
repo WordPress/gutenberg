@@ -97,3 +97,17 @@ export function switchToBlockType( block, name ) {
 		};
 	} );
 }
+
+/**
+ * Gives us a `to` transformation that renders the given component into a text block
+ *
+ * @param  {Object} Component The component to render, it must accept an `attributes` prop. It must include only inline elements, because the text block is a `p`.
+ * @return {Object}           The transformation
+ */
+export function transformComponentToText( Component ) {
+	return {
+		type: 'block',
+		blocks: [ 'core/text' ],
+		transform: ( attributes ) => createBlock( 'core/text', { content: <Component attributes={ attributes } /> } ),
+	};
+}
