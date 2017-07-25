@@ -16,3 +16,9 @@ ul.components-toolbar > li.components-url-input {
 		background: $light-gray-500;
 	}
 }
+
+
+.components-url-input .blocks-format-toolbar__link-input-suggestions {
+	left: -40px;
+	right: -32px;
+}

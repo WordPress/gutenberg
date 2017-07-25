@@ -11,6 +11,11 @@ import { __ } from 'i18n';
 import { Component } from 'element';
 import { IconButton } from 'components';
 
+/**
+ * Internal dependencies
+ */
+import LinkInput from '../editable/format-toolbar/link-input';
+
 class UrlInput extends Component {
 	constructor() {
 		super( ...arguments );
@@ -46,7 +51,7 @@ class UrlInput extends Component {
 				/>
 				{ expanded &&
 					<form
-						className="editable-format-toolbar__link-modal"
+						className="blocks-format-toolbar__link-modal"
 						onSubmit={ this.submitLink }>
 						<IconButton
 							className="components-url-input__back"
@@ -54,14 +59,7 @@ class UrlInput extends Component {
 							label={ __( 'Close' ) }
 							onClick={ this.toggle }
 						/>
-						<input
-							className="editable-format-toolbar__link-input"
-							type="url"
-							value={ url }
-							aria-label={ __( 'URL' ) }
-							onChange={ onChange }
-							placeholder={ __( 'Paste URL or type' ) }
-						/>
+						<LinkInput value={ url || '' } onChange={ onChange } />
 						<IconButton
 							icon="editor-break"
 							label={ __( 'Submit' ) }

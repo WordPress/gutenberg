@@ -71,7 +71,7 @@ registerBlockType( 'core/image', {
 			setAttributes( { url: media.url, alt: media.alt, caption: media.caption, id: media.id } );
 		};
 		const uploadButtonProps = { isLarge: true };
-		const onSetHref = ( event ) => setAttributes( { href: event.target.value } );
+		const onSetHref = ( value ) => setAttributes( { href: value } );
 
 		const controls = (
 			focus && (
