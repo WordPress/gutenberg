@@ -249,15 +249,16 @@ class VisualEditorBlockList extends Component {
 					);
 				} ) }
 				{ ! blocks.length &&
-					<input
-						type="text"
-						readOnly
-						className="editor-visual-editor__placeholder"
-						value={ __( 'Write your story' ) }
-						onFocus={ this.appendDefaultBlock }
-						onClick={ noop }
-						onKeyDown={ noop }
-					/>
+					<div className="editor-visual-editor__placeholder">
+						<input
+							type="text"
+							readOnly
+							value={ __( 'Write your story' ) }
+							onFocus={ this.appendDefaultBlock }
+							onClick={ noop }
+							onKeyDown={ noop }
+						/>
+					</div>
 				}
 				<div
 					className={ continueWritingClassname }
