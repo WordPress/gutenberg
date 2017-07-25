@@ -19,6 +19,16 @@ function createRunHook( hooks, returnFirstArg ) {
 	 * @return {*}               Return value of runner, if applicable.
 	 */
 	return function runHooks( hookName, ...args ) {
+		if ( typeof hookName !== 'string' ) {
+			console.error( 'The hook name must be a string.' );
+			return;
+		}
+
+		if ( /^__/.test( hookName ) ) {
+			console.error( 'The hook name cannot begin with `__`.' );
+			return;
+		}
+
 		if ( ! hooks.hasOwnProperty( hookName ) ) {
 			hooks[ hookName ] = {
 				runs: 0,
@@ -34,32 +44,30 @@ function createRunHook( hooks, returnFirstArg ) {
 				: undefined;
 		}
 
+		const hookInfo = {
+			name: hookName,
+			currentIndex: 0,
+		};
+
 		hooks.__current = hooks.__current || [];
-		hooks.__current.push( hookName );
+		hooks.__current.push( hookInfo );
 		hooks[ hookName ].runs++;
 
 		let maybeReturnValue = args[ 0 ];
 
-		handlers.forEach( handler => {
-			if ( handler.callback !== hooks.currentCallback ) {
-
-				// Prevent hook recursion.
-				hooks.currentCallback = handler.callback;
-				maybeReturnValue = handler.callback.apply( null, args );
-				hooks.currentCallback = false;
-
-				if ( returnFirstArg ) {
-					args[ 0 ] = maybeReturnValue;
-				}
+		while ( hookInfo.currentIndex < handlers.length ) {
+			const handler = handlers[ hookInfo.currentIndex ];
+			maybeReturnValue = handler.callback.apply( null, args );
+			if ( returnFirstArg ) {
+				args[ 0 ] = maybeReturnValue;
 			}
-		} );
+			hookInfo.currentIndex++;
+		}
 
 		hooks.__current.pop();
 
 		if ( returnFirstArg ) {
 			return maybeReturnValue;
-		} else {
-			return false;
 		}
 	};
 }

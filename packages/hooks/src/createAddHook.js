@@ -19,6 +19,11 @@ function createAddHook( hooks ) {
 			return;
 		}
 
+		if ( /^__/.test( hookName ) ) {
+			console.error( 'The hook name cannot begin with `__`.' );
+			return;
+		}
+
 		if ( typeof callback !== 'function' ) {
 			console.error( 'The hook callback must be a function.' );
 			return;
@@ -44,6 +49,15 @@ function createAddHook( hooks ) {
 			}
 			// Insert (or append) the new hook.
 			handlers.splice( i, 0, handler );
+			// We may also be currently executing this hook.  If the callback
+			// we're adding would come after the current callback, there's no
+			// problem; otherwise we need to increase the execution index of
+			// any other runs by 1 to account for the added element.
+			( hooks.__current || [] ).forEach( hookInfo => {
+				if ( hookInfo.name === hookName && hookInfo.currentIndex >= i ) {
+					hookInfo.currentIndex++;
+				}
+			} );
 		} else {
 			// This is the first hook of its type.
 			hooks[ hookName ] = {

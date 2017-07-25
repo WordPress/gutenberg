@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 /**
  * Internal dependencies
  */
@@ -33,6 +35,21 @@ function filter_c( str ) {
 	return str + 'c';
 }
 
+function filter_b_removes_self( str ) {
+	removeFilter( 'test.filter', filter_b_removes_self );
+	return str + 'b';
+}
+
+function filter_removes_b( str ) {
+	removeFilter( 'test.filter', filter_b );
+	return str;
+}
+
+function filter_removes_c( str ) {
+	removeFilter( 'test.filter', filter_c );
+	return str;
+}
+
 function action_a() {
 	window.actionValue += 'a';
 }
@@ -45,15 +62,7 @@ function action_c() {
 	window.actionValue += 'c';
 }
 
-function filter_a_removesb( str ) {
-	removeFilter( 'test.filter', filter_b );
-	return str;
-}
-
-function filter_that_applies_recursively( str ) {
-	applyFilters( 'test.filter', str );
-	return str;
-}
+const consoleErrorOriginal = console.error;
 
 beforeEach( () => {
 	window.actionValue = '';
@@ -65,12 +74,22 @@ beforeEach( () => {
 			delete hooks[ k ];
 		}
 	} );
+	console.error = jest.fn();
+} );
+
+afterEach( () => {
+	console.error = consoleErrorOriginal;
+} );
+
+test( 'run a filter with no callbacks', () => {
+	expect( applyFilters( 'test.filter', 42 ) ).toEqual( 42 );
 } );
 
 test( 'add and remove a filter', () => {
 	addFilter( 'test.filter', filter_a );
-	removeAllFilters( 'test.filter' );
+	expect( removeAllFilters( 'test.filter' ) ).toEqual( 1 );
 	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'test' );
+	expect( removeAllFilters( 'test.filter' ) ).toEqual( 0 );
 } );
 
 test( 'add a filter and run it', () => {
@@ -82,6 +101,60 @@ test( 'add 2 filters in a row and run them', () => {
 	addFilter( 'test.filter', filter_a );
 	addFilter( 'test.filter', filter_b );
 	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testab' );
+} );
+
+test( 'remove a non-existent filter', () => {
+	expect( removeFilter( 'test.filter', filter_a ) ).toEqual( 0 );
+	expect( removeAllFilters( 'test.filter' ) ).toEqual( 0 );
+} );
+
+test( 'remove an invalid callback from a filter', () => {
+	expect( removeFilter( 'test.filter', 42 ) ).toEqual( undefined );
+	expect( console.error ).toHaveBeenCalledWith(
+		'The hook callback to remove must be a function.'
+	);
+} );
+
+test( 'cannot add filters with non-string names', () => {
+	addFilter( 42, () => null );
+	expect( console.error ).toHaveBeenCalledWith(
+		'The hook name must be a string.'
+	);
+} );
+
+test( 'cannot add filters named with __ prefix', () => {
+	addFilter( '__test', () => null );
+	expect( console.error ).toHaveBeenCalledWith(
+		'The hook name cannot begin with `__`.'
+	);
+} );
+
+test( 'cannot add filters with non-function callbacks', () => {
+	addFilter( 'test', '42' );
+	expect( console.error ).toHaveBeenCalledWith(
+		'The hook callback must be a function.'
+	);
+} );
+
+test( 'cannot add filters with non-numeric priorities', () => {
+	addFilter( 'test', () => null, '42' );
+	expect( console.error ).toHaveBeenCalledWith(
+		'If specified, the hook priority must be a number.'
+	);
+} );
+
+test( 'cannot run filters with non-string names', () => {
+	expect( applyFilters( () => {}, 42 ) ).toBe( undefined );
+	expect( console.error ).toHaveBeenCalledWith(
+		'The hook name must be a string.'
+	);
+} );
+
+test( 'cannot run filters named with __ prefix', () => {
+	expect( applyFilters( '__test', 42 ) ).toBe( undefined );
+	expect( console.error ).toHaveBeenCalledWith(
+		'The hook name cannot begin with `__`.'
+	);
 } );
 
 test( 'add 3 filters with different priorities and run them', () => {
@@ -142,25 +215,25 @@ test( 'filters with the same and different priorities', () => {
 
 test( 'add and remove an action', () => {
 	addAction( 'test.action', action_a );
-	removeAllActions( 'test.action' );
-	doAction( 'test.action' );
+	expect( removeAllActions( 'test.action' ) ).toEqual( 1 );
+	expect( doAction( 'test.action' ) ).toBe( undefined );
 	expect( window.actionValue ).toBe( '' );
 } );
 
-test( 'add an action and run it', function() {
+test( 'add an action and run it', () => {
 	addAction( 'test.action', action_a );
 	doAction( 'test.action' );
 	expect( window.actionValue ).toBe( 'a' );
 } );
 
-test( 'add 2 actions in a row and then run them', function() {
+test( 'add 2 actions in a row and then run them', () => {
 	addAction( 'test.action', action_a );
 	addAction( 'test.action', action_b );
 	doAction( 'test.action' );
 	expect( window.actionValue ).toBe( 'ab' );
 } );
 
-test( 'add 3 actions with different priorities and run them', function() {
+test( 'add 3 actions with different priorities and run them', () => {
 	addAction( 'test.action', action_a );
 	addAction( 'test.action', action_b, 2 );
 	addAction( 'test.action', action_c, 8 );
@@ -168,18 +241,18 @@ test( 'add 3 actions with different priorities and run them', function() {
 	expect( window.actionValue ).toBe( 'bca' );
 } );
 
-test( 'pass in two arguments to an action', function() {
+test( 'pass in two arguments to an action', () => {
 	const arg1 = { a: 10 };
 	const arg2 = { b: 20 };
 
-	addAction( 'test.action', function( a, b ) {
+	addAction( 'test.action', ( a, b ) => {
 		expect( a ).toBe( arg1 );
 		expect( b ).toBe( arg2 );
 	} );
 	doAction( 'test.action', arg1, arg2 );
 } );
 
-test( 'fire action multiple times', function() {
+test( 'fire action multiple times', () => {
 	expect.assertions( 2 );
 
 	function func() {
@@ -191,86 +264,126 @@ test( 'fire action multiple times', function() {
 	doAction( 'test.action' );
 } );
 
-test( 'remove specific action callback', function() {
+test( 'add a filter before the one currently executing', () => {
+	addFilter( 'test.filter', val => {
+		addFilter( 'test.filter', val => val + 'a', 1 );
+		return val + 'b';
+	}, 2 );
+
+	expect( applyFilters( 'test.filter', 'test_' ) ).toEqual( 'test_b' );
+} );
+
+test( 'add a filter after the one currently executing', () => {
+	addFilter( 'test.filter', val => {
+		addFilter( 'test.filter', val => val + 'b', 2 );
+		return val + 'a';
+	}, 1 );
+
+	expect( applyFilters( 'test.filter', 'test_' ) ).toEqual( 'test_ab' );
+} );
+
+test( 'add a filter immediately after the one currently executing', () => {
+	addFilter( 'test.filter', val => {
+		addFilter( 'test.filter', val => val + 'b', 1 );
+		return val + 'a';
+	}, 1 );
+
+	expect( applyFilters( 'test.filter', 'test_' ) ).toEqual( 'test_ab' );
+} );
+
+test( 'remove specific action callback', () => {
 	addAction( 'test.action', action_a );
 	addAction( 'test.action', action_b, 2 );
 	addAction( 'test.action', action_c, 8 );
 
-	removeAction( 'test.action', action_b );
+	expect( removeAction( 'test.action', action_b ) ).toEqual( 1 );
 	doAction( 'test.action' );
 	expect( window.actionValue ).toBe( 'ca' );
 } );
 
-test( 'remove all action callbacks', function() {
+test( 'remove all action callbacks', () => {
 	addAction( 'test.action', action_a );
 	addAction( 'test.action', action_b, 2 );
 	addAction( 'test.action', action_c, 8 );
 
-	removeAllActions( 'test.action' );
+	expect( removeAllActions( 'test.action' ) ).toEqual( 3 );
 	doAction( 'test.action' );
 	expect( window.actionValue ).toBe( '' );
 } );
 
-test( 'remove specific filter callback', function() {
+test( 'remove specific filter callback', () => {
 	addFilter( 'test.filter', filter_a );
 	addFilter( 'test.filter', filter_b, 2 );
 	addFilter( 'test.filter', filter_c, 8 );
 
-	removeFilter( 'test.filter', filter_b );
+	expect( removeFilter( 'test.filter', filter_b ) ).toEqual( 1 );
 	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testca' );
 } );
 
-test( 'remove a filter callback of lower priority when running hook', function() {
+test( 'filter removes a callback that has already executed', () => {
+	addFilter( 'test.filter', filter_a, 1 );
+	addFilter( 'test.filter', filter_b, 3 );
+	addFilter( 'test.filter', filter_c, 5 );
+	addFilter( 'test.filter', filter_removes_b, 4 );
 
+	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testabc' );
+} );
+
+test( 'filter removes a callback that has already executed (same priority)', () => {
+	addFilter( 'test.filter', filter_a, 1 );
+	addFilter( 'test.filter', filter_b, 2 );
+	addFilter( 'test.filter', filter_removes_b, 2 );
+	addFilter( 'test.filter', filter_c, 4 );
+
+	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testabc' );
+} );
+
+test( 'filter removes the current callback', () => {
+	addFilter( 'test.filter', filter_a, 1 );
+	addFilter( 'test.filter', filter_b_removes_self, 3 );
+	addFilter( 'test.filter', filter_c, 5 );
+
+	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testabc' );
+} );
+
+test( 'filter removes a callback that has not yet executed (last)', () => {
+	addFilter( 'test.filter', filter_a, 1 );
+	addFilter( 'test.filter', filter_b, 3 );
+	addFilter( 'test.filter', filter_c, 5 );
+	addFilter( 'test.filter', filter_removes_c, 4 );
+
+	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testab' );
+} );
+
+test( 'filter removes a callback that has not yet executed (middle)', () => {
 	addFilter( 'test.filter', filter_a, 1 );
 	addFilter( 'test.filter', filter_b, 3 );
 	addFilter( 'test.filter', filter_c, 4 );
-	addFilter( 'test.filter', filter_a_removesb, 2 );
+	addFilter( 'test.filter', filter_removes_b, 2 );
 
 	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testac' );
 } );
 
-test( 'remove a filter callback of higher priority when running hook', function() {
-
+test( 'filter removes a callback that has not yet executed (same priority)', () => {
 	addFilter( 'test.filter', filter_a, 1 );
-	addFilter( 'test.filter', filter_b, 3 );
-	addFilter( 'test.filter', filter_c, 5 );
-	addFilter( 'test.filter', filter_a_removesb, 6 );
-
-	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testabc' );
-} );
-test( 'remove one hook in a callback before adding another', function() {
-	addFilter( 'test.filter', filter_a, 1 );
-	addFilter( 'test.filter', filter_b, 3 );
-	addFilter( 'test.filter', filter_c, 5 );
-	addFilter( 'test.filter', filter_a_removesb, 4 );
-
-	// Fails!!! only a & b run, not c.
-	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testabc' );
-} );
-
-test( 'remove a filter callback of same priority when running hook', function() {
-
-	addFilter( 'test.filter', filter_a, 1 );
-	// Note: works if added first, adding after may need fixing.
-	addFilter( 'test.filter', filter_a_removesb, 2 );
+	addFilter( 'test.filter', filter_removes_b, 2 );
 	addFilter( 'test.filter', filter_b, 2 );
 	addFilter( 'test.filter', filter_c, 4 );
 
 	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testac' );
 } );
 
-test( 'remove all filter callbacks', function() {
+test( 'remove all filter callbacks', () => {
 	addFilter( 'test.filter', filter_a );
 	addFilter( 'test.filter', filter_b, 2 );
 	addFilter( 'test.filter', filter_c, 8 );
 
-	removeAllFilters( 'test.filter' );
+	expect( removeAllFilters( 'test.filter' ) ).toEqual( 3 );
 	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'test' );
 } );
 
 // Test doingAction, didAction, hasAction.
-test( 'Test doingAction, didAction and hasAction.', function() {
+test( 'Test doingAction, didAction and hasAction.', () => {
 	let actionCalls = 0;
 
 	addAction( 'another.action', () => {} );
@@ -310,7 +423,7 @@ test( 'Test doingAction, didAction and hasAction.', function() {
 	expect( actionCalls ).toBe( 2 );
 	expect( didAction( 'test.action' ) ).toBe( 2 );
 
-	removeAllActions( 'test.action' );
+	expect( removeAllActions( 'test.action' ) ).toEqual( 1 );
 
 	// Verify state is reset appropriately.
 	expect( doingAction( 'test.action' ) ).toBe( false );
@@ -324,7 +437,7 @@ test( 'Test doingAction, didAction and hasAction.', function() {
 	expect( hasAction( 'notatest.action' ) ).toBe( 0 );
 } );
 
-test( 'Verify doingFilter, didFilter and hasFilter.', function() {
+test( 'Verify doingFilter, didFilter and hasFilter.', () => {
 	let filterCalls = 0;
 
 	addFilter( 'runtest.filter', arg => {
@@ -347,16 +460,53 @@ test( 'Verify doingFilter, didFilter and hasFilter.', function() {
 	expect( doingFilter( 'notatest.filter' ) ).toBe( false );
 	expect( currentFilter() ).toBe( null );
 
-	removeAllFilters( 'runtest.filter' );
+	expect( removeAllFilters( 'runtest.filter' ) ).toEqual( 1 );
 
 	expect( hasFilter( 'runtest.filter' ) ).toBe( 0 );
 	expect( didFilter( 'runtest.filter' ) ).toBe( 1 );
 } );
 
-test( 'recursively calling a filter', function() {
+test( 'recursively calling a filter', () => {
+	addFilter( 'test.filter', value => {
+		if ( value.length === 7 ) {
+			return value;
+		}
+		return applyFilters( 'test.filter', value + 'X' );
+	} );
 
-	addFilter( 'test.filter', filter_that_applies_recursively, 10 );
-
-	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'test' );
+	expect( applyFilters( 'test.filter', 'test' ) ).toBe( 'testXXX' );
 } );
 
+test( 'current filter when multiple filters are running', () => {
+	addFilter( 'test.filter1', value => {
+		return applyFilters( 'test.filter2', value.concat( currentFilter() ) );
+	} );
+
+	addFilter( 'test.filter2', value => {
+		return value.concat( currentFilter() );
+	} );
+
+	expect( currentFilter() ).toBe( null );
+
+	expect( applyFilters( 'test.filter1', [ 'test' ] ) ).toEqual(
+		[ 'test', 'test.filter1', 'test.filter2' ]
+	);
+
+	expect( currentFilter() ).toBe( null );
+} );
+
+test( 'adding and removing filters with recursion', () => {
+	function removeRecurseAndAdd2( val ) {
+		expect( removeFilter( 'remove_and_add', removeRecurseAndAdd2 ) ).toEqual( 1 );
+		val += '-' + applyFilters( 'remove_and_add', '' ) + '-';
+		addFilter( 'remove_and_add', removeRecurseAndAdd2, 10 );
+		return val + '2';
+	}
+
+	addFilter( 'remove_and_add', val => val + '1', 11 );
+	addFilter( 'remove_and_add', removeRecurseAndAdd2, 12 );
+	addFilter( 'remove_and_add', val => val + '3', 13 );
+	addFilter( 'remove_and_add', val => val + '4', 14 );
+
+	expect( applyFilters( 'remove_and_add', '' ) ).toEqual( '1-134-234' );
+} );

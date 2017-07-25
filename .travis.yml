@@ -3,7 +3,9 @@ language: node_js
 node_js:
   - '8'
   - '6'
-script: true
+
+script: npm run test:coverage-ci
+
 notifications:
   slack:
     rooms:
@@ -11,3 +13,4 @@ notifications:
     on_start: never
     on_success: change
     on_failure: always
+    on_pull_requests: false
