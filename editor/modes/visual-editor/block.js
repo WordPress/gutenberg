@@ -259,12 +259,13 @@ class VisualEditorBlock extends Component {
 		const { keyCode, target } = event;
 		const moveUp = ( keyCode === UP || keyCode === LEFT );
 		const moveDown = ( keyCode === DOWN || keyCode === RIGHT );
+		const wrapperClassname = '.editor-visual-editor';
 		const selectors = [
 			'*[contenteditable="true"]',
 			'*[tabindex]',
 			'textarea',
 			'input',
-		].join( ',' );
+		].map( ( selector ) => `${ wrapperClassname } ${ selector }` ).join( ',' );
 
 		if ( moveUp || moveDown ) {
 			const selection = window.getSelection();
