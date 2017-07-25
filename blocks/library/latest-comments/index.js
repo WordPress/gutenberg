@@ -154,15 +154,15 @@ registerBlockType( 'core/latest-comments', {
 						/>
 
 						<ToggleControl
-							label={ __( 'Display excerpt' ) }
-							checked={ this.props.attributes.displayExcerpt }
-							onChange={ this.toggleDisplayExcerpt }
-						/>
-
-						<ToggleControl
 							label={ __( 'Display timestamp' ) }
 							checked={ displayTimestamp }
 							onChange={ this.toggleDisplayTimestamp }
+						/>
+
+						<ToggleControl
+							label={ __( 'Display excerpt' ) }
+							checked={ this.props.attributes.displayExcerpt }
+							onChange={ this.toggleDisplayExcerpt }
 						/>
 
 						<TextControl
