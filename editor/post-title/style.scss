@@ -3,19 +3,25 @@
 	margin-left: auto;
 	margin-right: auto;
 	position: relative;
-	margin-bottom: 10px;
-	max-width: $visual-editor-max-width - ( 2 * $block-mover-margin );
+	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );
+	padding: 5px 0;
 
-	@include break-small {
-		max-width: $visual-editor-max-width;
+	@include break-small() {
+		padding: 5px ( $block-padding + $block-mover-padding-visible );
 	}
 
 	h1 {
 		outline: 1px solid transparent;
-		margin: 0;
-		padding: #{ $block-padding / 2 } #{ $block-padding - 2px };
 		font-size: $editor-font-size;
 		transition: 0.2s outline;
+		margin-top: 0;
+		margin-bottom: 0;
+		padding: $block-padding;
+
+		@include break-small() {
+			margin-left: -$block-padding;
+			margin-right: -$block-padding;
+		}
 	}
 
 	&:hover h1 {
@@ -38,7 +44,6 @@
 		}
 
 		@include break-large() {
-			max-width: $text-editor-max-width;
 			margin: 0 auto;
 			padding: 0;
 		}
