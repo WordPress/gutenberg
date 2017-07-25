@@ -84,6 +84,11 @@ registerBlockType( 'core/button', {
 							color={ color }
 							onChangeComplete={ ( colorValue ) => setAttributes( { color: colorValue.hex } ) }
 						/>
+						<InspectorControls.TextControl
+							label={ __( 'Hex Color' ) }
+							value={ color }
+							onChange={ ( value ) => setAttributes( { color: value } ) }
+						/>
 					</InspectorControls>
 				}
 			),
