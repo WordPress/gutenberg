@@ -3,11 +3,8 @@
 
 	.wp-block-latest-posts {
 		padding-left: 2.5em;
-	}
-
-	.wp-block-latest-posts__post-date {
-		display: block;
-		color: $dark-gray-100;
-		font-size: $default-font-size;
+		&.is-grid {
+			padding-left: 0;
+		}
 	}
 }
