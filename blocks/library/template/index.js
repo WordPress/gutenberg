@@ -6,15 +6,16 @@ import { __ } from 'i18n';
 /**
  * Internal dependencies
  */
-import { registerBlockType, createBlock } from '../../api';
+import { registerBlockType, transformComponentToText } from '../../api';
+import AttributeInput from 'components/attribute-input';
 
 function template( mode ) {
 	return function( { attributes, setAttributes } ) {
 		return <span>
 			Hi, my name is {
 				'edit' === mode ?
-					<input type="text" placeholder="Peter" value={ attributes.name } onChange={ ( e ) => setAttributes( { name: e.target.value } ) } />
-					: <span>{ attributes.name }</span>
+					<AttributeInput type="text" placeholder="Peter" value={ attributes.name } attribute="name" setAttributes={ setAttributes } /> :
+					attributes.name
 			}! <br />
 			#intro { tagify( attributes.name ) }
 		</span>;
@@ -31,17 +32,10 @@ registerBlockType( 'core/template', {
 		name: '',
 	},
 	transforms: {
-		to: [
-			{
-				type: 'block',
-				blocks: [ 'core/text' ],
-				transform: ( attributes ) => createBlock( 'core/text', { content: template( 'save' )( { attributes } ) } ),
-			},
-		],
+		to: [ transformComponentToText( template( 'save' ) ) ],
 	},
 
 	icon: 'list-view',
-
 	category: 'widgets',
 
 	edit: template( 'edit' ),
