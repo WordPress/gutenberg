@@ -11,7 +11,7 @@ import './style.scss';
 import './block.scss';
 import { registerBlockType, query } from '../../api';
 import Editable from '../../editable';
-import LinkInput from '../../editable/format-toolbar/link-input';
+import UrlInput from '../../url-input';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
@@ -61,7 +61,7 @@ registerBlockType( 'core/button', {
 					<form
 						className="blocks-format-toolbar__link-modal"
 						onSubmit={ ( event ) => event.preventDefault() }>
-						<LinkInput
+						<UrlInput
 							value={ url }
 							onChange={ ( value ) => setAttributes( { url: value } ) }
 						/>
