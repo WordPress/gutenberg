@@ -547,7 +547,7 @@ class Tests_REST_Request extends WP_UnitTestCase {
 			),
 			array(
 				'permalink_structure' => '',
-				'original_url'        => 'http://' . WP_TESTS_DOMAIN . '/?rest_route=%2Fwp%2Fv2%2Fposts%2F1&foo=bar',
+				'original_url'        => 'http://' . WP_TESTS_DOMAIN . '/index.php?rest_route=%2Fwp%2Fv2%2Fposts%2F1&foo=bar',
 			),
 		);
 	}

@@ -314,9 +314,9 @@ class Tests_REST_API extends WP_UnitTestCase {
 
 		// In non-pretty case, we get a query string to invoke the rest router.
 		$this->set_permalink_structure( '' );
-		$this->assertEquals( 'http://' . WP_TESTS_DOMAIN . '/?rest_route=/', get_rest_url() );
-
+		$this->assertEquals( 'http://' . WP_TESTS_DOMAIN . '/index.php?rest_route=/', get_rest_url() );
 	}
+
 	/**
 	 * @ticket 34299
 	 */
