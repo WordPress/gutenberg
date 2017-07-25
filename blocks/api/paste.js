@@ -9,6 +9,7 @@ import { find, get } from 'lodash';
 import { createBlock } from './factory';
 import { getBlockTypes, getUnknownTypeHandler } from './registration';
 import { parseBlockAttributes } from './parser';
+import gDocs from './paste/google-docs';
 
 /**
  * Normalises array nodes of any node type to an array of block level nodes.
@@ -70,7 +71,12 @@ export function normaliseToBlockLevelNodes( nodes ) {
 }
 
 export default function( nodes ) {
-	return normaliseToBlockLevelNodes( nodes ).map( ( node ) => {
+	let tehNodes = nodes;
+	if ( gDocs.test( nodes ) ) {
+		tehNodes = gDocs.run( nodes );
+	}
+
+	return normaliseToBlockLevelNodes( tehNodes ).map( ( node ) => {
 		const block = getBlockTypes().reduce( ( acc, blockType ) => {
 			if ( acc ) {
 				return acc;
