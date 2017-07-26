@@ -1,10 +1,8 @@
-function run( nodes ) {
-	return nodes.filter( node => {
-		return 'TABLE' !== node.nodeName;
+export default function( nodes ) {
+	return nodes
+	.filter( node => 'TABLE' !== node.nodeName )
+	.map( node => {
+		// TODO Remove junk <span>s
+		return node;
 	} );
 }
-
-export default {
-	test: () => true,
-	run,
-};
