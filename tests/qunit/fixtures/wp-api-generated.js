@@ -3568,7 +3568,7 @@ mockedApiResponse.PostsCollection = [
         "_links": {
             "self": [
                 {
-                    "href": "http://example.org/?rest_route=/wp/v2/posts/3"
+                    "href": "http://example.org/index.php?rest_route=/wp/v2/posts/3"
                 }
             ],
             "collection": [
@@ -3584,29 +3584,29 @@ mockedApiResponse.PostsCollection = [
             "replies": [
                 {
                     "embeddable": true,
-                    "href": "http://example.org/?rest_route=%2Fwp%2Fv2%2Fcomments&post=3"
+                    "href": "http://example.org/index.php?rest_route=%2Fwp%2Fv2%2Fcomments&post=3"
                 }
             ],
             "version-history": [
                 {
-                    "href": "http://example.org/?rest_route=/wp/v2/posts/3/revisions"
+                    "href": "http://example.org/index.php?rest_route=/wp/v2/posts/3/revisions"
                 }
             ],
             "wp:attachment": [
                 {
-                    "href": "http://example.org/?rest_route=%2Fwp%2Fv2%2Fmedia&parent=3"
+                    "href": "http://example.org/index.php?rest_route=%2Fwp%2Fv2%2Fmedia&parent=3"
                 }
             ],
             "wp:term": [
                 {
                     "taxonomy": "category",
                     "embeddable": true,
-                    "href": "http://example.org/?rest_route=%2Fwp%2Fv2%2Fcategories&post=3"
+                    "href": "http://example.org/index.php?rest_route=%2Fwp%2Fv2%2Fcategories&post=3"
                 },
                 {
                     "taxonomy": "post_tag",
                     "embeddable": true,
-                    "href": "http://example.org/?rest_route=%2Fwp%2Fv2%2Ftags&post=3"
+                    "href": "http://example.org/index.php?rest_route=%2Fwp%2Fv2%2Ftags&post=3"
                 }
             ],
             "curies": [
@@ -3683,7 +3683,7 @@ mockedApiResponse.postRevisions = [
         "_links": {
             "parent": [
                 {
-                    "href": "http://example.org/?rest_route=/wp/v2/posts/3"
+                    "href": "http://example.org/index.php?rest_route=/wp/v2/posts/3"
                 }
             ]
         }
@@ -3749,7 +3749,7 @@ mockedApiResponse.PagesCollection = [
         "_links": {
             "self": [
                 {
-                    "href": "http://example.org/?rest_route=/wp/v2/pages/5"
+                    "href": "http://example.org/index.php?rest_route=/wp/v2/pages/5"
                 }
             ],
             "collection": [
@@ -3765,17 +3765,17 @@ mockedApiResponse.PagesCollection = [
             "replies": [
                 {
                     "embeddable": true,
-                    "href": "http://example.org/?rest_route=%2Fwp%2Fv2%2Fcomments&post=5"
+                    "href": "http://example.org/index.php?rest_route=%2Fwp%2Fv2%2Fcomments&post=5"
                 }
             ],
             "version-history": [
                 {
-                    "href": "http://example.org/?rest_route=/wp/v2/pages/5/revisions"
+                    "href": "http://example.org/index.php?rest_route=/wp/v2/pages/5/revisions"
                 }
             ],
             "wp:attachment": [
                 {
-                    "href": "http://example.org/?rest_route=%2Fwp%2Fv2%2Fmedia&parent=5"
+                    "href": "http://example.org/index.php?rest_route=%2Fwp%2Fv2%2Fmedia&parent=5"
                 }
             ],
             "curies": [
@@ -3848,7 +3848,7 @@ mockedApiResponse.pageRevisions = [
         "_links": {
             "parent": [
                 {
-                    "href": "http://example.org/?rest_route=/wp/v2/pages/5"
+                    "href": "http://example.org/index.php?rest_route=/wp/v2/pages/5"
                 }
             ]
         }
@@ -3915,7 +3915,7 @@ mockedApiResponse.MediaCollection = [
         "_links": {
             "self": [
                 {
-                    "href": "http://example.org/?rest_route=/wp/v2/media/7"
+                    "href": "http://example.org/index.php?rest_route=/wp/v2/media/7"
                 }
             ],
             "collection": [
@@ -3931,7 +3931,7 @@ mockedApiResponse.MediaCollection = [
             "replies": [
                 {
                     "embeddable": true,
-                    "href": "http://example.org/?rest_route=%2Fwp%2Fv2%2Fcomments&post=7"
+                    "href": "http://example.org/index.php?rest_route=%2Fwp%2Fv2%2Fcomments&post=7"
                 }
             ]
         }
@@ -4300,7 +4300,7 @@ mockedApiResponse.TagsCollection = [
         "_links": {
             "self": [
                 {
-                    "href": "http://example.org/?rest_route=/wp/v2/tags/2"
+                    "href": "http://example.org/index.php?rest_route=/wp/v2/tags/2"
                 }
             ],
             "collection": [
@@ -4315,7 +4315,7 @@ mockedApiResponse.TagsCollection = [
             ],
             "wp:post_type": [
                 {
-                    "href": "http://example.org/?rest_route=%2Fwp%2Fv2%2Fposts&tags=2"
+                    "href": "http://example.org/index.php?rest_route=%2Fwp%2Fv2%2Fposts&tags=2"
                 }
             ],
             "curies": [
@@ -4383,7 +4383,7 @@ mockedApiResponse.UsersCollection = [
         "_links": {
             "self": [
                 {
-                    "href": "http://example.org/?rest_route=/wp/v2/users/2"
+                    "href": "http://example.org/index.php?rest_route=/wp/v2/users/2"
                 }
             ],
             "collection": [
@@ -4450,7 +4450,7 @@ mockedApiResponse.CommentsCollection = [
         "_links": {
             "self": [
                 {
-                    "href": "http://example.org/?rest_route=/wp/v2/comments/2"
+                    "href": "http://example.org/index.php?rest_route=/wp/v2/comments/2"
                 }
             ],
             "collection": [
@@ -4462,7 +4462,7 @@ mockedApiResponse.CommentsCollection = [
                 {
                     "embeddable": true,
                     "post_type": "post",
-                    "href": "http://example.org/?rest_route=/wp/v2/posts/3"
+                    "href": "http://example.org/index.php?rest_route=/wp/v2/posts/3"
                 }
             ]
         }
