@@ -34,8 +34,10 @@ function register_block_type( $name, $args = array() ) {
  * Unregisters a block type.
  *
  * @since 0.1.0
+ * @since 0.6.0 Now also accepts a WP_Block_Type instance as first parameter.
  *
- * @param string $name Block type name including namespace.
+ * @param string|WP_Block_Type $name Block type name including namespace, or alternatively a
+ *                                   complete WP_Block_Type instance.
  * @return WP_Block_Type|false The unregistered block type on success, or false on failure.
  */
 function unregister_block_type( $name ) {

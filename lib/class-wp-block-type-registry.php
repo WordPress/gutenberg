@@ -90,10 +90,15 @@ final class WP_Block_Type_Registry {
 	 * @since 0.6.0
 	 * @access public
 	 *
-	 * @param string $name Block type name including namespace.
+	 * @param string|WP_Block_Type $name Block type name including namespace, or alternatively a
+	 *                                   complete WP_Block_Type instance.
 	 * @return WP_Block_Type|false The unregistered block type on success, or false on failure.
 	 */
 	public function unregister( $name ) {
+		if ( is_a( $name, 'WP_Block_Type' ) ) {
+			$name = $name->name;
+		}
+
 		if ( ! $this->is_registered( $name ) ) {
 			/* translators: 1: block name */
 			$message = sprintf( __( 'Block type "%s" is not registered.', 'gutenberg' ), $name );
