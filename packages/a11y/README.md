@@ -2,6 +2,14 @@
 
 Collection of JS modules for enhancing accessibility.
 
+## Installation
+
+Install the module
+
+```bash
+npm install @wordpress/a11y --save
+```
+
 ## speak
 
 Allows you to easily announce dynamic interface updates to screen readers using ARIA live regions. This module is inspired by the `speak` function in wp-a11y.js
