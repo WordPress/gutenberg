@@ -31,6 +31,7 @@ export function createBlock( name, attributes = {} ) {
 	return {
 		uid: uuid(),
 		name,
+		isValid: true,
 		attributes: {
 			...defaultAttributes,
 			...attributes,
