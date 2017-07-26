@@ -20,8 +20,7 @@ registerBlockType( 'core/more', {
 
 	category: 'layout',
 
-	attributes: {
-	},
+	useOnce: true,
 
 	edit( { attributes, setAttributes, className, focus, setFocus } ) {
 		const { text, noTeaser } = attributes;
