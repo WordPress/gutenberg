@@ -165,7 +165,9 @@ describe( 'full post content fixture', () => {
 				) );
 			}
 
-			const serializedActual = serialize( blocksActual );
+			// `serialize` doesn't have a trailing newline, but the fixture
+			// files should.
+			const serializedActual = serialize( blocksActual ) + '\n';
 			let serializedExpected = readFixtureFile( f + '.serialized.html' );
 
 			if ( ! serializedExpected ) {
@@ -180,9 +182,7 @@ describe( 'full post content fixture', () => {
 			}
 
 			try {
-				expect( serializedActual ).toEqual(
-					serializedExpected.replace( /\n$/, '' )
-				);
+				expect( serializedActual ).toEqual( serializedExpected );
 			} catch ( err ) {
 				throw new Error( format(
 					'File \'%s.serialized.html\' does not match expected value:\n\n%s',
