@@ -134,6 +134,10 @@ export default class Sandbox extends wp.element.Component {
 				width: 100%;
 				height: 100%;
 			}
+			body > div > * {
+				margin-top: 0 !important;	/* has to have !important to override inline styles */
+				margin-bottom: 0 !important;
+			}
 		`;
 
 		// put the html snippet into a html document, and then write it to the iframe's document
