@@ -111,13 +111,7 @@
     ],
     "setupTestFrameworkScriptFile": "<rootDir>/test/setup-test-framework.js",
     "testMatch": [
-      "**/blocks/**/test/*.js",
-      "**/components/**/test/*.js",
-      "**/date/**/test/*.js",
-      "**/editor/**/test/*.js",
-      "**/element/**/test/*.js",
-      "**/i18n/**/test/*.js",
-      "**/utils/**/test/*.js"
+      "<rootDir>/(blocks|components|date|editor|element|i18n|utils)/**/test/*.js"
     ],
     "timers": "fake",
     "transform": {
