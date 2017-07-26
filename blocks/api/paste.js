@@ -1,13 +1,7 @@
 /**
  * External dependencies
  */
-import { nodeListToReact } from 'dom-react';
 import { find, get } from 'lodash';
-
-/**
- * WordPress dependencies
- */
-import { createElement } from 'element';
 
 /**
  * Internal dependencies
@@ -100,7 +94,7 @@ export default function( nodes ) {
 		}
 
 		return createBlock( getUnknownTypeHandler(), {
-			content: nodeListToReact( [ node ], createElement ),
+			content: node.outerHTML,
 		} );
 	} );
 }
