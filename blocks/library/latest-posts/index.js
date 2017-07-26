@@ -159,13 +159,15 @@ registerBlockType( 'core/latest-posts', {
 							checked={ displayPostDate }
 							onChange={ this.toggleDisplayPostDate }
 						/>
-						<RangeControl
-							label={ __( 'Columns' ) }
-							value={ columns }
-							onChange={ ( event ) => setAttributes( { columns: event.target.value } ) }
-							min="2"
-							max={ Math.min( MAX_POSTS_COLUMNS, latestPosts.length ) }
-						/>
+						{ layout === 'grid' &&
+							<RangeControl
+								label={ __( 'Columns' ) }
+								value={ columns }
+								onChange={ ( event ) => setAttributes( { columns: event.target.value } ) }
+								min="2"
+								max={ Math.min( MAX_POSTS_COLUMNS, latestPosts.length ) }
+							/>
+						}
 						<TextControl
 							label={ __( 'Number of posts to show' ) }
 							type="number"
