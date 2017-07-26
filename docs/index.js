@@ -59,6 +59,13 @@ addStory( {
 
 addStory( {
 	parents: [ 'reference' ],
+	name: 'theme-support',
+	title: 'Theme Support',
+	markdown: require( './themes.md' ),
+} );
+
+addStory( {
+	parents: [ 'reference' ],
 	name: 'glossary',
 	title: 'Glossary',
 	markdown: require( './glossary.md' ),
