@@ -7,7 +7,7 @@ import TableBlock from './table-block';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
-const { children } = hpq;
+const { html } = hpq;
 
 registerBlockType( 'core/table', {
 	title: wp.i18n.__( 'Table' ),
@@ -15,7 +15,7 @@ registerBlockType( 'core/table', {
 	category: 'formatting',
 
 	attributes: {
-		content: children( 'table' ),
+		content: html( 'table' ),
 	},
 
 	defaultAttributes: {

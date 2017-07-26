@@ -4,9 +4,7 @@
         "name": "core-embed/wordpress",
         "attributes": {
             "url": "https://wordpress.com/",
-            "caption": [
-                "Embedded content from WordPress"
-            ]
+            "caption": "Embedded content from WordPress"
         }
     }
 ]

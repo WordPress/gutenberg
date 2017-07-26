@@ -3,15 +3,14 @@
  */
 import tinymce from 'tinymce';
 import classnames from 'classnames';
-import { last, isEqual, omitBy, forEach, merge, identity, find } from 'lodash';
-import { nodeListToReact } from 'dom-react';
+import { last, isEqual, forEach, merge, identity, find } from 'lodash';
 import { Fill } from 'react-slot-fill';
 import 'element-closest';
 
 /**
  * WordPress dependencies
  */
-import { createElement, Component, renderToString } from 'element';
+import { Component } from 'element';
 import { parse, pasteHandler } from '../api';
 import { BACKSPACE, DELETE, ENTER } from 'utils/keycodes';
 
@@ -22,20 +21,16 @@ import './style.scss';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
 
-function createTinyMCEElement( type, props, ...children ) {
-	if ( props[ 'data-mce-bogus' ] === 'all' ) {
-		return null;
-	}
+function getNodesHTML( nodes ) {
+	const tempParent = document.createElement( 'div' );
+	nodes.forEach( ( node ) => tempParent.appendChild( node ) );
+	return tempParent.innerHTML;
+}
 
-	if ( props.hasOwnProperty( 'data-mce-bogus' ) ) {
-		return children;
-	}
-
-	return createElement(
-		type,
-		omitBy( props, ( value, key ) => key.indexOf( 'data-mce-' ) === 0 ),
-		...children
-	);
+function getFragmentHTML( fragment ) {
+	const tempParent = document.createElement( 'div' );
+	tempParent.appendChild( fragment );
+	return tempParent.innerHTML;
 }
 
 export default class Editable extends Component {
@@ -278,11 +273,11 @@ export default class Editable extends Component {
 		const beforeFragment = beforeRange.extractContents();
 		const afterFragment = afterRange.extractContents();
 
-		const beforeElement = nodeListToReact( beforeFragment.childNodes, createTinyMCEElement );
-		const afterElement = nodeListToReact( afterFragment.childNodes, createTinyMCEElement );
+		const beforeContent = getFragmentHTML( beforeFragment );
+		const afterContent = getFragmentHTML( afterFragment );
 
-		this.setContent( beforeElement );
-		this.props.onSplit( beforeElement, afterElement, ...blocks );
+		this.setContent( beforeContent );
+		this.props.onSplit( beforeContent, afterContent, ...blocks );
 	}
 
 	onNewBlock() {
@@ -328,8 +323,8 @@ export default class Editable extends Component {
 		this.setContent( this.props.value );
 
 		this.props.onSplit(
-			nodeListToReact( before, createTinyMCEElement ),
-			nodeListToReact( after, createTinyMCEElement )
+			getNodesHTML( before ),
+			getNodesHTML( after )
 		);
 	}
 
@@ -363,12 +358,11 @@ export default class Editable extends Component {
 			content = '';
 		}
 
-		content = renderToString( content );
 		this.editor.setContent( content, { format: 'raw' } );
 	}
 
 	getContent() {
-		return nodeListToReact( this.editor.getBody().childNodes || [], createTinyMCEElement );
+		return this.editor.getContent( { format: 'raw' } );
 	}
 
 	updateFocus() {
@@ -404,8 +398,8 @@ export default class Editable extends Component {
 			this.props.tagName === prevProps.tagName &&
 			this.props.value !== prevProps.value &&
 			this.props.value !== this.savedContent &&
-			! isEqual( this.props.value, prevProps.value ) &&
-			! isEqual( this.props.value, this.savedContent )
+			this.props.value !== prevProps.value &&
+			this.props.value !== this.savedContent
 		) {
 			this.updateContent();
 		}

@@ -4,9 +4,7 @@
         "name": "core-embed/ted",
         "attributes": {
             "url": "https://ted.com/",
-            "caption": [
-                "Embedded content from ted"
-            ]
+            "caption": "Embedded content from ted"
         }
     }
 ]

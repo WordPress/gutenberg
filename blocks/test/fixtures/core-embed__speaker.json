@@ -4,9 +4,7 @@
         "name": "core-embed/speaker",
         "attributes": {
             "url": "https://speaker.com/",
-            "caption": [
-                "Embedded content from speaker"
-            ]
+            "caption": "Embedded content from speaker"
         }
     }
 ]

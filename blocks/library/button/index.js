@@ -21,7 +21,7 @@ import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import InspectorControls from '../../inspector-controls';
 
-const { attr, children } = query;
+const { attr, html } = query;
 
 registerBlockType( 'core/button', {
 	title: __( 'Button' ),
@@ -33,7 +33,7 @@ registerBlockType( 'core/button', {
 	attributes: {
 		url: attr( 'a', 'href' ),
 		title: attr( 'a', 'title' ),
-		text: children( 'a' ),
+		text: html( 'a' ),
 	},
 
 	getEditWrapperProps( attributes ) {

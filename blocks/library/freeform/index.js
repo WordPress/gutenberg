@@ -10,7 +10,7 @@ import './style.scss';
 import { registerBlockType, query, setUnknownTypeHandler } from '../../api';
 import OldEditor from './old-editor';
 
-const { prop } = query;
+const { html } = query;
 
 registerBlockType( 'core/freeform', {
 	title: __( 'Classic Text' ),
@@ -20,7 +20,7 @@ registerBlockType( 'core/freeform', {
 	category: 'formatting',
 
 	attributes: {
-		content: prop( 'innerHTML' ),
+		content: html(),
 	},
 
 	edit: OldEditor,

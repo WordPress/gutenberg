@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { __ } from 'i18n';
-import { concatChildren } from 'element';
 
 /**
  * Internal dependencies
@@ -16,7 +15,7 @@ import InspectorControls from '../../inspector-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
 import BlockDescription from '../../block-description';
 
-const { children, query } = hpq;
+const { html, query } = hpq;
 
 registerBlockType( 'core/text', {
 	title: __( 'Text' ),
@@ -28,7 +27,7 @@ registerBlockType( 'core/text', {
 	className: false,
 
 	attributes: {
-		content: query( 'p', children() ),
+		content: query( 'p', html() ),
 	},
 
 	transforms: {
@@ -41,7 +40,7 @@ registerBlockType( 'core/text', {
 					! node.querySelector( 'audio, canvas, embed, iframe, img, math, object, svg, video' )
 				),
 				attributes: {
-					content: query( 'p', children() ),
+					content: query( 'p', html() ),
 				},
 			},
 		],
@@ -49,7 +48,7 @@ registerBlockType( 'core/text', {
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: concatChildren( attributes.content, attributesToMerge.content ),
+			content: attributes.content + attributesToMerge.content,
 		};
 	},
 

@@ -10,7 +10,7 @@ import './style.scss';
 import { registerBlockType, createBlock, query } from '../../api';
 import Editable from '../../editable';
 
-const { children } = query;
+const { html } = query;
 
 registerBlockType( 'core/verse', {
 	title: __( 'Verse' ),
@@ -20,7 +20,7 @@ registerBlockType( 'core/verse', {
 	category: 'formatting',
 
 	attributes: {
-		content: children( 'pre' ),
+		content: html( 'pre' ),
 	},
 
 	transforms: {

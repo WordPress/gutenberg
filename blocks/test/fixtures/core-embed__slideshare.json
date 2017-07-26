@@ -4,9 +4,7 @@
         "name": "core-embed/slideshare",
         "attributes": {
             "url": "https://slideshare.com/",
-            "caption": [
-                "Embedded content from slideshare"
-            ]
+            "caption": "Embedded content from slideshare"
         }
     }
 ]

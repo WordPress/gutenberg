@@ -80,28 +80,6 @@ export function renderToString( element ) {
 }
 
 /**
- * Concatenate two or more React children objects
- *
- * @param  {...?Object} childrenArguments Array of children arguments (array of arrays/strings/objects) to concatenate
- * @return {Array}                        The concatenated value
- */
-export function concatChildren( ...childrenArguments ) {
-	return childrenArguments.reduce( ( memo, children, i ) => {
-		Children.forEach( children, ( child, j ) => {
-			if ( child && 'string' !== typeof child ) {
-				child = cloneElement( child, {
-					key: [ i, j ].join(),
-				} );
-			}
-
-			memo.push( child );
-		} );
-
-		return memo;
-	}, [] );
-}
-
-/**
  * Switches the nodeName of all the elements in the children object
  *
  * @param  {?Object} children  Children object

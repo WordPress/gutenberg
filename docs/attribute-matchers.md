@@ -21,23 +21,17 @@ _Example_: Extract the `src` attribute from an image found in the block's markup
 // { "url": "https://lorempixel.com/1200/800/" }
 ```
 
-### `children`
+### `html`
 
-Use `children` to extract child nodes of the matched element, returned as an array of virtual elements. This is most commonly used in combination with the `Editable` component.
+Use `html` to extract inner HTML of the matched element. This is most commonly used in combination with the `Editable` component.
 
-_Example_: Extract child nodes from a paragraph of rich text.
+_Example_: Extract HTML from a paragraph of rich text.
 
 ```js
 {
-	content: children( 'p' )	
+	content: html( 'p' )	
 }
-// {
-//   "content": [
-//     "Vestibulum eu ",
-//     { "type": "strong", "children": "tortor" }, 
-//     " vel urna."
-//   ]
-// }
+// { "content": "Vestibulum eu <strong>tortor</strong> vel urna." }
 ```
 
 ### `query`

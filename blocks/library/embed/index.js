@@ -20,7 +20,7 @@ import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
-const { attr, children } = query;
+const { attr, html } = query;
 
 // These embeds do not work in sandboxes
 const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
@@ -35,7 +35,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 
 		attributes: {
 			title: attr( 'iframe', 'title' ),
-			caption: children( 'figcaption' ),
+			caption: html( 'figcaption' ),
 		},
 
 		getEditWrapperProps( attributes ) {
@@ -95,11 +95,16 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 							return;
 						}
 						response.json().then( ( obj ) => {
-							const { html, type } = obj;
-							if ( html ) {
-								this.setState( { html, type } );
-							} else if ( 'photo' === type ) {
-								this.setState( { html: this.getPhotoHtml( obj ), type } );
+							if ( obj.html ) {
+								this.setState( {
+									html: obj.html,
+									type: obj.type,
+								} );
+							} else if ( 'photo' === obj.type ) {
+								this.setState( {
+									html: this.getPhotoHtml( obj ),
+									type: obj.type,
+								} );
 							} else {
 								this.setState( { error: true } );
 							}
@@ -110,7 +115,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 			}
 
 			render() {
-				const { html, type, error, fetching } = this.state;
+				const { type, error, fetching } = this.state;
 				const { align, url, caption } = this.props.attributes;
 				const { setAttributes, focus, setFocus } = this.props;
 				const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
@@ -137,7 +142,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 					];
 				}
 
-				if ( ! html ) {
+				if ( ! this.state.html ) {
 					const label = sprintf( __( '%s URL' ), title );
 
 					return [
@@ -180,7 +185,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 							</Placeholder>
 						) : (
 							<div className="wp-block-embed__wrapper">
-								<SandBox html={ html } title={ iframeTitle } type={ type } />
+								<SandBox html={ this.state.html } title={ iframeTitle } type={ type } />
 							</div>
 						) }
 						{ ( caption && caption.length > 0 ) || !! focus ? (

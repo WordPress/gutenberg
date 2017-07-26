@@ -23,7 +23,7 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import BlockDescription from '../../block-description';
 import UrlInputButton from '../../url-input/button';
 
-const { attr, children } = query;
+const { attr, html } = query;
 
 registerBlockType( 'core/image', {
 	title: __( 'Image' ),
@@ -35,7 +35,7 @@ registerBlockType( 'core/image', {
 	attributes: {
 		url: attr( 'img', 'src' ),
 		alt: attr( 'img', 'alt' ),
-		caption: children( 'figcaption' ),
+		caption: html( 'figcaption' ),
 		href: attr( 'a', 'href' ),
 	},
 
@@ -50,7 +50,7 @@ registerBlockType( 'core/image', {
 				attributes: {
 					url: attr( 'img', 'src' ),
 					alt: attr( 'img', 'alt' ),
-					caption: children( 'figcaption' ),
+					caption: html( 'figcaption' ),
 				},
 			},
 		],

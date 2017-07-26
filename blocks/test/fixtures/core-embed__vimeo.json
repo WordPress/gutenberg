@@ -4,9 +4,7 @@
         "name": "core-embed/vimeo",
         "attributes": {
             "url": "https://vimeo.com/",
-            "caption": [
-                "Embedded content from vimeo"
-            ]
+            "caption": "Embedded content from vimeo"
         }
     }
 ]

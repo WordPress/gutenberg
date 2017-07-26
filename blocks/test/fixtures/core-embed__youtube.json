@@ -4,9 +4,7 @@
         "name": "core-embed/youtube",
         "attributes": {
             "url": "https://youtube.com/",
-            "caption": [
-                "Embedded content from youtube"
-            ]
+            "caption": "Embedded content from youtube"
         }
     }
 ]

@@ -4,9 +4,7 @@
         "name": "core-embed/tumblr",
         "attributes": {
             "url": "https://tumblr.com/",
-            "caption": [
-                "Embedded content from tumblr"
-            ]
+            "caption": "Embedded content from tumblr"
         }
     }
 ]

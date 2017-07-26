@@ -4,9 +4,7 @@
         "name": "core-embed/wordpress-tv",
         "attributes": {
             "url": "https://wordpress.tv/",
-            "caption": [
-                "Embedded content from wordpress-tv"
-            ]
+            "caption": "Embedded content from wordpress-tv"
         }
     }
 ]

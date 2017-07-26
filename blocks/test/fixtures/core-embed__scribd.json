@@ -4,9 +4,7 @@
         "name": "core-embed/scribd",
         "attributes": {
             "url": "https://scribd.com/",
-            "caption": [
-                "Embedded content from scribd"
-            ]
+            "caption": "Embedded content from scribd"
         }
     }
 ]
