@@ -10,6 +10,7 @@
 		overflow: hidden;
 		white-space: nowrap;
 		margin: 0 auto;
+		vertical-align: middle;
 
 		> span {
 			position: relative;
@@ -20,15 +21,15 @@
 			font-family: $default-font;
 			color: $dark-gray-300;
 			background: $white;
-			padding-left: 4px;
-			padding-right: 4px;
+			padding-left: 8px;
+			padding-right: 8px;
 		}
 	}
 
 	&:before {
 		content: '';
 		position: absolute;
-		top: 50%;
+		top: calc( 50% + 2px );
 		left: $block-mover-padding-visible + $block-padding;
 		right: $block-mover-padding-visible + $block-padding;
 		border-top: 3px dashed $light-gray-700;
