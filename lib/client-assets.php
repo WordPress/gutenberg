@@ -35,6 +35,34 @@ function gutenberg_url( $path ) {
 }
 
 /**
+ * Returns contents of an inline script used in appending polyfill scripts for
+ * browsers which fail the provided tests. The provided array is a mapping from
+ * a condition to verify feature support to its polyfill script handle.
+ *
+ * @param array $tests Features to detect.
+ * @return string Conditional polyfill inline script.
+ */
+function gutenberg_get_script_polyfill( $tests ) {
+	global $wp_scripts;
+
+	$polyfill = '';
+	foreach ( $tests as $test => $handle ) {
+		$polyfill .= (
+			// Test presence of feature...
+			'( ' . $test . ' ) || ' .
+			// ...appending polyfill on any failures. Cautious viewers may balk
+			// at the `document.write`. Its caveat of synchronous mid-stream
+			// blocking write is exactly the behavior we need though.
+			'document.write( \'<script src="' .
+			esc_url( $wp_scripts->registered[ $handle ]->src ) .
+			'"></scr\' + \'ipt>\' );'
+		);
+	}
+
+	return $polyfill;
+}
+
+/**
  * Registers common scripts and styles to be used as dependencies of the editor
  * and plugins.
  *
@@ -105,6 +133,14 @@ function gutenberg_register_scripts_and_styles() {
 		gutenberg_url( 'blocks/build/index.js' ),
 		array( 'wp-element', 'wp-components', 'wp-utils', 'tinymce-nightly', 'tinymce-nightly-lists', 'tinymce-nightly-paste', 'tinymce-nightly-table', 'media-views', 'media-models' ),
 		filemtime( gutenberg_dir_path() . 'blocks/build/index.js' )
+	);
+	wp_add_inline_script(
+		'wp-blocks',
+		gutenberg_get_script_polyfill( array(
+			'\'Promise\' in window' => 'promise',
+			'\'fetch\' in window'   => 'fetch',
+		) ),
+		'before'
 	);
 
 	// Editor Styles.
@@ -181,6 +217,14 @@ function gutenberg_register_vendor_scripts() {
 		'tinymce-nightly-table',
 		'https://fiddle.azurewebsites.net/tinymce/nightly/plugins/table/plugin' . $suffix . '.js',
 		array( 'tinymce-nightly' )
+	);
+	gutenberg_register_vendor_script(
+		'fetch',
+		'https://unpkg.com/whatwg-fetch/fetch.js'
+	);
+	gutenberg_register_vendor_script(
+		'promise',
+		'https://unpkg.com/promise-polyfill/promise' . $suffix . '.js'
 	);
 }
 
