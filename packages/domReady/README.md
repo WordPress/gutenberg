@@ -1,0 +1,25 @@
+# @wordpress/domReady
+
+Executes a function after the DOM has loaded.
+
+## Installation
+
+Install the module
+
+```bash
+npm install @wordpress/domReady --save
+```
+
+### Usage
+
+```JS
+import domReady from '@wordpress/domReady';
+
+domReady( function() {
+	//do something after DOM loads.
+} );
+```
+
+## Browser support
+
+See https://make.wordpress.org/design/handbook/design-guide/browser-support/

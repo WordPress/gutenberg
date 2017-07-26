@@ -1,6 +1,6 @@
 import addContainer from './addContainer';
 import clear from './clear';
-import domReady from './domReady';
+import domReady from '../../domReady/src/';
 import filterMessage from './filterMessage';
 
 let containerPolite, containerAssertive = '';

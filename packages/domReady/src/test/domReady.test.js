@@ -1,4 +1,4 @@
-import domReady from '../domReady';
+import domReady from '../';
 
 let callback = jest.fn( () => {} );
 

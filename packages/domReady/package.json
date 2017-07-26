@@ -1,0 +1,21 @@
+{
+  "name": "@wordpress/domReady",
+  "version": "0.0.1",
+  "description": "Execute callback after the DOM is loaded.",
+  "homepage": "https://github.com/WordPress/packages/tree/master/packages/domReady/README.md",
+  "author": "WordPress",
+  "keywords": [
+    "DOM",
+    "Readystate"
+  ],
+  "main": "build/index.js",
+  "module": "build-module/index.js",
+  "browser": "build-browser/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WordPress/packages.git"
+  },
+  "bugs": {
+    "url": "https://github.com/WordPress/packages/issues"
+  }
+}
