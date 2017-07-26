@@ -2,12 +2,12 @@
     {
         "uid": "_uid_0",
         "name": "core-embed/instagram",
+        "isValid": true,
         "attributes": {
             "url": "https://instagram.com/",
             "caption": [
                 "Embedded content from instagram"
             ]
-        },
-        "isValid": true
+        }
     }
 ]

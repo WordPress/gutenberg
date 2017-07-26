@@ -2,12 +2,12 @@
     {
         "uid": "_uid_0",
         "name": "core/embed",
+        "isValid": true,
         "attributes": {
             "url": "https://example.com/",
             "caption": [
                 "Embedded content from an example URL"
             ]
-        },
-        "isValid": true
+        }
     }
 ]

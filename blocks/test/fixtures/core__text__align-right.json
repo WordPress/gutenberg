@@ -2,6 +2,7 @@
     {
         "uid": "_uid_0",
         "name": "core/text",
+        "isValid": true,
         "attributes": {
             "align": "right",
             "content": [
@@ -9,7 +10,6 @@
                     "... like this one, which is separate from the above and right aligned."
                 ]
             ]
-        },
-        "isValid": true
+        }
     }
 ]

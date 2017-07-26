@@ -2,12 +2,12 @@
     {
         "uid": "_uid_0",
         "name": "core-embed/vine",
+        "isValid": true,
         "attributes": {
             "url": "https://vine.com/",
             "caption": [
                 "Embedded content from vine"
             ]
-        },
-        "isValid": true
+        }
     }
 ]

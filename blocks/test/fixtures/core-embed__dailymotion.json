@@ -2,12 +2,12 @@
     {
         "uid": "_uid_0",
         "name": "core-embed/dailymotion",
+        "isValid": true,
         "attributes": {
             "url": "https://dailymotion.com/",
             "caption": [
                 "Embedded content from dailymotion"
             ]
-        },
-        "isValid": true
+        }
     }
 ]

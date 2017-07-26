@@ -2,6 +2,7 @@
     {
         "uid": "_uid_0",
         "name": "core/heading",
+        "isValid": true,
         "attributes": {
             "nodeName": "H2",
             "content": [
@@ -12,7 +13,6 @@
                 },
                 " Tool"
             ]
-        },
-        "isValid": true
+        }
     }
 ]

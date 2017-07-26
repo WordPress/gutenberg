@@ -2,6 +2,7 @@
     {
         "uid": "_uid_0",
         "name": "core/quote",
+        "isValid": true,
         "attributes": {
             "value": [
                 {
@@ -13,7 +14,6 @@
             "citation": [
                 "Maya Angelou"
             ]
-        },
-        "isValid": true
+        }
     }
 ]

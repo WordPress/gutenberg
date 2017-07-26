@@ -2,12 +2,12 @@
     {
         "uid": "_uid_0",
         "name": "core-embed/mixcloud",
+        "isValid": true,
         "attributes": {
             "url": "https://mixcloud.com/",
             "caption": [
                 "Embedded content from mixcloud"
             ]
-        },
-        "isValid": true
+        }
     }
 ]

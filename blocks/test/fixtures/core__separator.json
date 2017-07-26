@@ -2,7 +2,7 @@
     {
         "uid": "_uid_0",
         "name": "core/separator",
-        "attributes": {},
-        "isValid": true
+        "isValid": true,
+        "attributes": {}
     }
 ]

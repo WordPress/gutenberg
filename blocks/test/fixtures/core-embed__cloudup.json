@@ -2,12 +2,12 @@
     {
         "uid": "_uid_0",
         "name": "core-embed/cloudup",
+        "isValid": true,
         "attributes": {
             "url": "https://cloudup.com/",
             "caption": [
                 "Embedded content from cloudup"
             ]
-        },
-        "isValid": true
+        }
     }
 ]

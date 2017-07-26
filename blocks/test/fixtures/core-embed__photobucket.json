@@ -2,12 +2,12 @@
     {
         "uid": "_uid_0",
         "name": "core-embed/photobucket",
+        "isValid": true,
         "attributes": {
             "url": "https://photobucket.com/",
             "caption": [
                 "Embedded content from photobucket"
             ]
-        },
-        "isValid": true
+        }
     }
 ]

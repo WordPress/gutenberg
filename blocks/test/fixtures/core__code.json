@@ -2,9 +2,9 @@
     {
         "uid": "_uid_0",
         "name": "core/code",
+        "isValid": true,
         "attributes": {
             "content": "export default function MyButton() {\n\treturn <Button>Click Me!</Button>;\n}"
-        },
-        "isValid": true
+        }
     }
 ]

@@ -2,12 +2,12 @@
     {
         "uid": "_uid_0",
         "name": "core-embed/flickr",
+        "isValid": true,
         "attributes": {
             "url": "https://flickr.com/",
             "caption": [
                 "Embedded content from flickr"
             ]
-        },
-        "isValid": true
+        }
     }
 ]

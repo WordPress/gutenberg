@@ -2,10 +2,10 @@
     {
         "uid": "_uid_0",
         "name": "core/image",
+        "isValid": true,
         "attributes": {
             "url": "https://cldup.com/uuUqE_dXzy.jpg",
             "caption": []
-        },
-        "isValid": true
+        }
     }
 ]
