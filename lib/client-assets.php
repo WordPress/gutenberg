@@ -616,7 +616,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	);
 	wp_add_inline_script( 'wp-editor', 'wp.api.init().done( function() {'
 		. 'wp.editor.createEditorInstance( \'editor\', window._wpGutenbergPost, ' . json_encode( $editor_settings ) . ' ); '
-		.'} );'
+		. '} );'
 	);
 
 	/**
