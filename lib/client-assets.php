@@ -535,7 +535,8 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	}
 
 	// Set initial title to empty string for auto draft for duration of edit.
-	if ( 'auto-draft' === $post_to_edit['status'] ) {
+	$is_new_post = 'auto-draft' === $post_to_edit['status'];
+	if ( $is_new_post ) {
 		$default_title = apply_filters( 'default_title', '' );
 		$post_to_edit['title'] = array(
 			'raw'      => $default_title,
@@ -550,7 +551,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	);
 
 	// Prepopulate with some test content in demo.
-	if ( $is_demo ) {
+	if ( $is_new_post && $is_demo ) {
 		wp_add_inline_script(
 			'wp-editor',
 			file_get_contents( gutenberg_dir_path() . 'post-content.js' )
