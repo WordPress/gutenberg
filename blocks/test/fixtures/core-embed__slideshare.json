@@ -2,12 +2,12 @@
     {
         "uid": "_uid_0",
         "name": "core-embed/slideshare",
+        "isValid": true,
         "attributes": {
             "url": "https://slideshare.com/",
             "caption": [
                 "Embedded content from slideshare"
             ]
-        },
-        "isValid": true
+        }
     }
 ]

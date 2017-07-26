@@ -2,12 +2,12 @@
     {
         "uid": "_uid_0",
         "name": "core-embed/smugmug",
+        "isValid": true,
         "attributes": {
             "url": "https://smugmug.com/",
             "caption": [
                 "Embedded content from smugmug"
             ]
-        },
-        "isValid": true
+        }
     }
 ]

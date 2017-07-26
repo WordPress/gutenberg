@@ -2,12 +2,12 @@
     {
         "uid": "_uid_0",
         "name": "core-embed/facebook",
+        "isValid": true,
         "attributes": {
             "url": "https://facebook.com/",
             "caption": [
                 "Embedded content from facebook"
             ]
-        },
-        "isValid": true
+        }
     }
 ]

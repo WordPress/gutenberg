@@ -2,12 +2,12 @@
     {
         "uid": "_uid_0",
         "name": "core-embed/meetup-com",
+        "isValid": true,
         "attributes": {
             "url": "https://meetup.com/",
             "caption": [
                 "Embedded content from meetup-com"
             ]
-        },
-        "isValid": true
+        }
     }
 ]

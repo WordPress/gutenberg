@@ -2,6 +2,7 @@
     {
         "uid": "_uid_0",
         "name": "core/pullquote",
+        "isValid": false,
         "attributes": {
             "value": [
                 [
@@ -12,7 +13,6 @@
                 "...with a caption"
             ]
         },
-        "isValid": false,
         "originalContent": "<blockquote class=\"wp-block-pullquote\">\n<p>Testing pullquote block...</p><footer>...with a caption</footer>\n</blockquote>"
     }
 ]

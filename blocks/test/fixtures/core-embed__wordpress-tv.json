@@ -2,12 +2,12 @@
     {
         "uid": "_uid_0",
         "name": "core-embed/wordpress-tv",
+        "isValid": true,
         "attributes": {
             "url": "https://wordpress.tv/",
             "caption": [
                 "Embedded content from wordpress-tv"
             ]
-        },
-        "isValid": true
+        }
     }
 ]
