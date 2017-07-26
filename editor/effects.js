@@ -22,6 +22,7 @@ import {
 	autosave,
 	queueAutosave,
 	savePost,
+	editPost,
 } from './actions';
 import {
 	getCurrentPost,
@@ -30,6 +31,7 @@ import {
 	getPostEdits,
 	isCurrentPostPublished,
 	isEditedPostDirty,
+	isEditedPostNew,
 	isEditedPostSaveable,
 } from './selectors';
 
@@ -219,7 +221,7 @@ export default {
 		) );
 	},
 	AUTOSAVE( action, store ) {
-		const { getState } = store;
+		const { getState, dispatch } = store;
 		const state = getState();
 		if ( ! isEditedPostSaveable( state ) || ! isEditedPostDirty( state ) ) {
 			return;
@@ -234,7 +236,12 @@ export default {
 			return;
 		}
 
-		return savePost();
+		// Change status from auto-draft to draft
+		if ( isEditedPostNew( state ) ) {
+			dispatch( editPost( { status: 'draft' } ) );
+		}
+
+		dispatch( savePost() );
 	},
 	QUEUE_AUTOSAVE: debounce( ( action, store ) => {
 		store.dispatch( autosave() );

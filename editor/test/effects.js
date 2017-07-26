@@ -11,7 +11,7 @@ import { getBlockTypes, unregisterBlockType, registerBlockType, createBlock } fr
 /**
  * Internal dependencies
  */
-import { mergeBlocks, focusBlock, replaceBlocks } from '../actions';
+import { mergeBlocks, focusBlock, replaceBlocks, editPost, savePost } from '../actions';
 import effects from '../effects';
 import * as selectors from '../selectors';
 
@@ -153,42 +153,60 @@ describe( 'effects', () => {
 
 	describe( '.AUTOSAVE', () => {
 		const handler = effects.AUTOSAVE;
-		const store = { getState: () => {} };
+		const dispatch = jest.fn();
+		const store = { getState: () => {}, dispatch };
 
 		it( 'should do nothing for unsaveable', () => {
 			selectors.isEditedPostSaveable.mockReturnValue( false );
 			selectors.isEditedPostDirty.mockReturnValue( true );
 			selectors.isCurrentPostPublished.mockReturnValue( false );
+			selectors.isEditedPostNew.mockReturnValue( true );
 
-			expect( handler( {}, store ) ).toBeUndefined();
+			expect( dispatch ).not.toHaveBeenCalled();
 		} );
 
 		it( 'should do nothing for clean', () => {
 			selectors.isEditedPostSaveable.mockReturnValue( true );
 			selectors.isEditedPostDirty.mockReturnValue( false );
 			selectors.isCurrentPostPublished.mockReturnValue( false );
+			selectors.isEditedPostNew.mockReturnValue( true );
 
-			expect( handler( {}, store ) ).toBeUndefined();
+			expect( dispatch ).not.toHaveBeenCalled();
 		} );
 
 		it( 'should return autosave action for saveable, dirty, published post', () => {
 			selectors.isEditedPostSaveable.mockReturnValue( true );
 			selectors.isEditedPostDirty.mockReturnValue( true );
 			selectors.isCurrentPostPublished.mockReturnValue( true );
+			selectors.isEditedPostNew.mockReturnValue( true );
 
-			expect( handler( {}, store ) ).toBeUndefined();
 			// TODO: Publish autosave
-			// expect( handler( {}, store ) ).toEqual( { } );
+			expect( dispatch ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should set auto-draft to draft before save', () => {
+			selectors.isEditedPostSaveable.mockReturnValue( true );
+			selectors.isEditedPostDirty.mockReturnValue( true );
+			selectors.isCurrentPostPublished.mockReturnValue( false );
+			selectors.isEditedPostNew.mockReturnValue( true );
+
+			handler( {}, store );
+
+			expect( dispatch ).toHaveBeenCalledTimes( 2 );
+			expect( dispatch ).toHaveBeenCalledWith( editPost( { status: 'draft' } ) );
+			expect( dispatch ).toHaveBeenCalledWith( savePost() );
 		} );
 
 		it( 'should return update action for saveable, dirty draft', () => {
 			selectors.isEditedPostSaveable.mockReturnValue( true );
 			selectors.isEditedPostDirty.mockReturnValue( true );
 			selectors.isCurrentPostPublished.mockReturnValue( false );
+			selectors.isEditedPostNew.mockReturnValue( false );
 
-			expect( handler( {}, store ) ).toEqual( {
-				type: 'REQUEST_POST_UPDATE',
-			} );
+			handler( {}, store );
+
+			expect( dispatch ).toHaveBeenCalledTimes( 1 );
+			expect( dispatch ).toHaveBeenCalledWith( savePost() );
 		} );
 	} );
 } );
