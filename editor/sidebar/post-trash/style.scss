@@ -1,14 +1,10 @@
 .editor-post-trash {
-	display: flex;
-	justify-content: flex-end;
-	align-items: center;
-	cursor: pointer;
-	color: inherit;
-	flex-grow: 1;
-	color: $alert-red;
-	
+	margin-left: auto !important;
+	text-decoration: underline;
+
 	.dashicon {
-		margin-right: -10px;
-		margin-left: 10px;
+		display: inline-block;
+		vertical-align: middle;
+		margin: -3px -4px 0 10px;
 	}
 }

@@ -1,22 +1,23 @@
 /**
  * External dependencies
  */
-import { flow, groupBy, sortBy, findIndex, filter } from 'lodash';
+import { flow, groupBy, sortBy, findIndex, filter, debounce, find } from 'lodash';
 import { connect } from 'react-redux';
 
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
+import { __, _n, sprintf } from 'i18n';
 import { Component } from 'element';
-import { Dashicon, Popover, withFocusReturn, withInstanceId } from 'components';
+import { Popover, withFocusReturn, withInstanceId } from 'components';
 import { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } from 'utils/keycodes';
-import { getCategories, getBlockTypes } from 'blocks';
+import { getCategories, getBlockTypes, BlockIcon } from 'blocks';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
+import { getBlocks, getRecentlyUsedBlocks } from '../selectors';
 import { showInsertionPoint, hideInsertionPoint } from '../actions';
 
 class InserterMenu extends Component {
@@ -29,11 +30,14 @@ class InserterMenu extends Component {
 			tab: 'recent',
 		};
 		this.filter = this.filter.bind( this );
-		this.isShownBlock = this.isShownBlock.bind( this );
 		this.setSearchFocus = this.setSearchFocus.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
-		this.getVisibleBlocks = this.getVisibleBlocks.bind( this );
-		this.sortBlocksByCategory = this.sortBlocksByCategory.bind( this );
+		this.searchBlocks = this.searchBlocks.bind( this );
+		this.getBlocksForCurrentTab = this.getBlocksForCurrentTab.bind( this );
+		this.sortBlocks = this.sortBlocks.bind( this );
+		this.addRecentBlocks = this.addRecentBlocks.bind( this );
+		const speakAssertive = ( message ) => wp.a11y.speak( message, 'assertive' );
+		this.debouncedSpeakAssertive = debounce( speakAssertive, 500 );
 	}
 
 	componentDidMount() {
@@ -42,10 +46,25 @@ class InserterMenu extends Component {
 
 	componentWillUnmount() {
 		document.removeEventListener( 'keydown', this.onKeyDown );
+		this.debouncedSpeakAssertive.cancel();
 	}
 
-	isShownBlock( block ) {
-		return block.title.toLowerCase().indexOf( this.state.filterValue.toLowerCase() ) !== -1;
+	componentDidUpdate() {
+		const searchResults = this.searchBlocks( getBlockTypes() );
+		// Announce the blocks search results to screen readers.
+		if ( !! searchResults.length ) {
+			this.debouncedSpeakAssertive( sprintf( _n(
+				'%d result found',
+				'%d results found',
+				searchResults.length
+			), searchResults.length ) );
+		} else {
+			this.debouncedSpeakAssertive( __( 'No results.' ) );
+		}
+	}
+
+	isDisabledBlock( blockType ) {
+		return blockType.useOnce && find( this.props.blocks, ( { name } ) => blockType.name === name );
 	}
 
 	bindReferenceNode( nodeName ) {
@@ -68,16 +87,41 @@ class InserterMenu extends Component {
 		};
 	}
 
-	getVisibleBlocks( blockTypes ) {
-		return filter( blockTypes, this.isShownBlock );
+	searchBlocks( blockTypes ) {
+		const matchesSearch = ( block ) => block.title.toLowerCase().indexOf( this.state.filterValue.toLowerCase() ) !== -1;
+		return filter( blockTypes, matchesSearch );
 	}
 
-	sortBlocksByCategory( blockTypes ) {
+	getBlocksForCurrentTab() {
+		// if we're searching, use everything, otherwise just get the blocks visible in this tab
+		if ( this.state.filterValue ) {
+			return getBlockTypes();
+		}
+		switch ( this.state.tab ) {
+			case 'recent':
+				return this.props.recentlyUsedBlocks;
+			case 'blocks':
+				return filter( getBlockTypes(), ( block ) => block.category !== 'embed' );
+			case 'embeds':
+				return filter( getBlockTypes(), ( block ) => block.category === 'embed' );
+		}
+	}
+
+	sortBlocks( blockTypes ) {
+		if ( 'recent' === this.state.tab && ! this.state.filterValue ) {
+			return blockTypes;
+		}
+
 		const getCategoryIndex = ( item ) => {
 			return findIndex( getCategories(), ( category ) => category.slug === item.category );
 		};
 
 		return sortBy( blockTypes, getCategoryIndex );
+	}
+
+	addRecentBlocks( blocksByCategory ) {
+		blocksByCategory.recent = this.props.recentlyUsedBlocks;
+		return blocksByCategory;
 	}
 
 	groupByCategory( blockTypes ) {
@@ -86,31 +130,36 @@ class InserterMenu extends Component {
 
 	getVisibleBlocksByCategory( blockTypes ) {
 		return flow(
-			this.getVisibleBlocks,
-			this.sortBlocksByCategory,
-			this.groupByCategory
+			this.searchBlocks,
+			this.sortBlocks,
+			this.groupByCategory,
+			this.addRecentBlocks
 		)( blockTypes );
 	}
 
 	findByIncrement( blockTypes, increment = 1 ) {
-		// Prepend a fake search block to the list to cycle through.
-		const list = [ { name: 'search' }, ...blockTypes ];
-
-		const currentIndex = findIndex( list, ( blockType ) => this.state.currentFocus === blockType.name );
-		const nextIndex = currentIndex + increment;
-		const highestIndex = list.length - 1;
+		const currentIndex = findIndex( blockTypes, ( blockType ) => this.state.currentFocus === blockType.name );
+		const highestIndex = blockTypes.length - 1;
 		const lowestIndex = 0;
 
+		let nextIndex = currentIndex;
+		let blockType;
+		do {
+			nextIndex += increment;
+			// Return the name of the next block type.
+			blockType = blockTypes[ nextIndex ];
+			if ( blockType && ! this.isDisabledBlock( blockType ) ) {
+				return blockType.name;
+			}
+		} while ( blockType );
+
 		if ( nextIndex > highestIndex ) {
-			return list[ lowestIndex ].name;
+			return 'search';
 		}
 
 		if ( nextIndex < lowestIndex ) {
-			return list[ highestIndex ].name;
+			return 'search';
 		}
-
-		// Return the name of the next block type.
-		return list[ nextIndex ].name;
 	}
 
 	findNext( blockTypes ) {
@@ -137,9 +186,9 @@ class InserterMenu extends Component {
 
 	focusNext() {
 		const sortedByCategory = flow(
-			this.getVisibleBlocks,
-			this.sortBlocksByCategory,
-		)( getBlockTypes() );
+			this.searchBlocks,
+			this.sortBlocks,
+		)( this.getBlocksForCurrentTab() );
 
 		// If the block list is empty return early.
 		if ( ! sortedByCategory.length ) {
@@ -152,9 +201,9 @@ class InserterMenu extends Component {
 
 	focusPrevious() {
 		const sortedByCategory = flow(
-			this.getVisibleBlocks,
-			this.sortBlocksByCategory,
-		)( getBlockTypes() );
+			this.searchBlocks,
+			this.sortBlocks,
+		)( this.getBlocksForCurrentTab() );
 
 		// If the block list is empty return early.
 		if ( ! sortedByCategory.length ) {
@@ -226,6 +275,7 @@ class InserterMenu extends Component {
 	}
 
 	getBlockItem( block ) {
+		const disabled = this.isDisabledBlock( block );
 		return (
 			<button
 				role="menuitem"
@@ -234,10 +284,11 @@ class InserterMenu extends Component {
 				onClick={ this.selectBlock( block.name ) }
 				ref={ this.bindReferenceNode( block.name ) }
 				tabIndex="-1"
-				onMouseEnter={ this.props.showInsertionPoint }
-				onMouseLeave={ this.props.hideInsertionPoint }
+				onMouseEnter={ ! disabled && this.props.showInsertionPoint }
+				onMouseLeave={ ! disabled && this.props.hideInsertionPoint }
+				disabled={ disabled }
 			>
-				<Dashicon icon={ block.icon } />
+				<BlockIcon icon={ block.icon } />
 				{ block.title }
 			</button>
 		);
@@ -249,7 +300,8 @@ class InserterMenu extends Component {
 
 	render() {
 		const { position, instanceId } = this.props;
-		const visibleBlocksByCategory = this.getVisibleBlocksByCategory( getBlockTypes() );
+		const isSearching = this.state.filterValue;
+		const visibleBlocksByCategory = this.getVisibleBlocksByCategory( this.getBlocksForCurrentTab() );
 
 		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
@@ -269,26 +321,22 @@ class InserterMenu extends Component {
 					tabIndex="-1"
 				/>
 				<div role="menu" className="editor-inserter__content">
-					{ this.state.tab === 'recent' &&
+					{ this.state.tab === 'recent' && ! isSearching &&
 						<div className="editor-inserter__recent">
-							{ getCategories()
-								.map( ( category ) => category.slug === 'common' && !! visibleBlocksByCategory[ category.slug ] && (
-									<div
-										className="editor-inserter__category-blocks"
-										role="menu"
-										tabIndex="0"
-										aria-labelledby={ `editor-inserter__separator-${ category.slug }-${ instanceId }` }
-										key={ category.slug }
-									>
-										{ visibleBlocksByCategory[ category.slug ].map( ( block ) => this.getBlockItem( block ) ) }
-									</div>
-								) )
-							}
+							<div
+								className="editor-inserter__category-blocks"
+								role="menu"
+								tabIndex="0"
+								aria-labelledby={ `editor-inserter__separator-${ 'recent' }-${ instanceId }` }
+								key={ 'recent' }
+							>
+								{ visibleBlocksByCategory.recent.map( ( block ) => this.getBlockItem( block ) ) }
+							</div>
 						</div>
 					}
-					{ this.state.tab === 'blocks' &&
+					{ this.state.tab === 'blocks' && ! isSearching &&
 						getCategories()
-							.map( ( category ) => category.slug !== 'embed' && !! visibleBlocksByCategory[ category.slug ] && (
+							.map( ( category ) => !! visibleBlocksByCategory[ category.slug ] && (
 								<div key={ category.slug }>
 									<div
 										className="editor-inserter__separator"
@@ -308,9 +356,9 @@ class InserterMenu extends Component {
 								</div>
 							) )
 					}
-					{ this.state.tab === 'embeds' &&
+					{ this.state.tab === 'embeds' && ! isSearching &&
 						getCategories()
-							.map( ( category ) => category.slug === 'embed' && !! visibleBlocksByCategory[ category.slug ] && (
+							.map( ( category ) => !! visibleBlocksByCategory[ category.slug ] && (
 								<div
 									className="editor-inserter__category-blocks"
 									role="menu"
@@ -322,27 +370,51 @@ class InserterMenu extends Component {
 								</div>
 							) )
 					}
+					{ isSearching &&
+						getCategories()
+							.map( ( category ) => !! visibleBlocksByCategory[ category.slug ] && (
+								<div key={ category.slug }>
+									<div
+										className="editor-inserter__separator"
+										id={ `editor-inserter__separator-${ category.slug }-${ instanceId }` }
+										aria-hidden="true"
+									>
+										{ category.title }
+									</div>
+									<div
+										className="editor-inserter__category-blocks"
+										role="menu"
+										tabIndex="0"
+										aria-labelledby={ `editor-inserter__separator-${ category.slug }-${ instanceId }` }
+									>
+										{ visibleBlocksByCategory[ category.slug ].map( ( block ) => this.getBlockItem( block ) ) }
+									</div>
+								</div>
+							) )
+					}
 				</div>
-				<div className="editor-inserter__tabs is-recent">
-					<button
-						className={ `editor-inserter__tab ${ this.state.tab === 'recent' ? 'is-active' : '' }` }
-						onClick={ () => this.switchTab( 'recent' ) }
-					>
-						{ __( 'Recent' ) }
-					</button>
-					<button
-						className={ `editor-inserter__tab ${ this.state.tab === 'blocks' ? 'is-active' : '' }` }
-						onClick={ () => this.switchTab( 'blocks' ) }
-					>
-						{ __( 'Blocks' ) }
-					</button>
-					<button
-						className={ `editor-inserter__tab ${ this.state.tab === 'embeds' ? 'is-active' : '' }` }
-						onClick={ () => this.switchTab( 'embeds' ) }
-					>
-						{ __( 'Embeds' ) }
-					</button>
-				</div>
+				{ ! isSearching &&
+					<div className="editor-inserter__tabs is-recent">
+						<button
+							className={ `editor-inserter__tab ${ this.state.tab === 'recent' ? 'is-active' : '' }` }
+							onClick={ () => this.switchTab( 'recent' ) }
+						>
+							{ __( 'Recent' ) }
+						</button>
+						<button
+							className={ `editor-inserter__tab ${ this.state.tab === 'blocks' ? 'is-active' : '' }` }
+							onClick={ () => this.switchTab( 'blocks' ) }
+						>
+							{ __( 'Blocks' ) }
+						</button>
+						<button
+							className={ `editor-inserter__tab ${ this.state.tab === 'embeds' ? 'is-active' : '' }` }
+							onClick={ () => this.switchTab( 'embeds' ) }
+						>
+							{ __( 'Embeds' ) }
+						</button>
+					</div>
+				}
 			</Popover>
 		);
 		/* eslint-enable jsx-a11y/no-autofocus */
@@ -350,7 +422,12 @@ class InserterMenu extends Component {
 }
 
 const connectComponent = connect(
-	undefined,
+	( state ) => {
+		return {
+			recentlyUsedBlocks: getRecentlyUsedBlocks( state ),
+			blocks: getBlocks( state ),
+		};
+	},
 	{ showInsertionPoint, hideInsertionPoint }
 );
 

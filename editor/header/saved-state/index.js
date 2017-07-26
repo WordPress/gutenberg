@@ -49,7 +49,10 @@ export function SavedState( { isNew, isDirty, isSaving, isSaveable, status, onSt
 	}
 
 	const onClick = () => {
-		onStatusChange( status || 'draft' );
+		if ( 'auto-draft' === status ) {
+			onStatusChange( 'draft' );
+		}
+
 		onSave();
 	};
 

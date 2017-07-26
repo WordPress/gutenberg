@@ -1,6 +1,6 @@
 {
   "name": "gutenberg",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "A new WordPress editor experience",
   "main": "build/app.js",
   "repository": "git+https://github.com/WordPress/gutenberg.git",
@@ -22,9 +22,12 @@
     "lodash": "^4.17.4",
     "moment": "^2.18.1",
     "moment-timezone": "^0.5.13",
+    "mousetrap": "^1.6.1",
+    "prop-types": "^15.5.10",
     "react": "^15.5.4",
     "react-autosize-textarea": "^0.4.2",
     "react-click-outside": "^2.3.0",
+    "react-color": "2.13.4",
     "react-datepicker": "^0.46.0",
     "react-dom": "^15.5.4",
     "react-redux": "^5.0.4",
@@ -37,10 +40,6 @@
     "uuid": "^3.0.1"
   },
   "devDependencies": {
-    "@storybook/addon-info": "^3.0.1",
-    "@storybook/addon-knobs": "^3.0.1",
-    "@storybook/addon-options": "^3.0.1",
-    "@storybook/react": "^3.0.0",
     "autoprefixer": "^6.7.7",
     "babel-core": "^6.24.0",
     "babel-eslint": "^7.2.0",
@@ -69,7 +68,7 @@
     "node-sass": "^4.5.0",
     "pegjs": "^0.10.0",
     "pegjs-loader": "^0.5.1",
-    "phpegjs": "1.0.0-beta5",
+    "phpegjs": "1.0.0-beta7",
     "postcss-loader": "^1.3.3",
     "prismjs": "^1.6.0",
     "raw-loader": "^0.5.1",
@@ -112,13 +111,7 @@
     ],
     "setupTestFrameworkScriptFile": "<rootDir>/test/setup-test-framework.js",
     "testMatch": [
-      "**/blocks/**/test/*.js",
-      "**/components/**/test/*.js",
-      "**/date/**/test/*.js",
-      "**/editor/**/test/*.js",
-      "**/element/**/test/*.js",
-      "**/i18n/**/test/*.js",
-      "**/utils/**/test/*.js"
+      "<rootDir>/(blocks|components|date|editor|element|i18n|utils)/**/test/*.js"
     ],
     "timers": "fake",
     "transform": {
@@ -130,16 +123,16 @@
   "scripts": {
     "build": "cross-env BABEL_ENV=default NODE_ENV=production webpack",
     "gettext-strings": "cross-env BABEL_ENV=gettext webpack",
-    "lint": "eslint . .storybook",
+    "lint": "eslint .",
     "dev": "cross-env BABEL_ENV=default webpack --watch",
     "test": "npm run lint && npm run test-unit",
-    "ci": "concurrently \"npm run build\" \"npm run lint\" \"npm run test-unit:coverage-ci\"",
+    "ci": "concurrently \"npm run lint && npm run build\" \"npm run test-unit:coverage-ci\"",
     "package-plugin": "./bin/build-plugin-zip.sh",
-    "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook",
+    "docs-start": "./docutron/bin/cli.js start",
+    "docs-build": "./docutron/bin/cli.js build",
     "test-unit": "jest",
     "test-unit:coverage": "jest --coverage",
-    "test-unit:coverage-ci": "jest --coverage && coveralls < coverage/lcov.info",
+    "test-unit:coverage-ci": "jest --coverage --maxWorkers 1 && coveralls < coverage/lcov.info",
     "test-unit:watch": "jest --watch"
   }
 }

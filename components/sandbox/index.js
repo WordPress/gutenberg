@@ -69,19 +69,24 @@ export default class Sandbox extends wp.element.Component {
 			return;
 		}
 
+		// sandboxing video content needs to explicitly set the height of the sandbox
+		// based on a 16:9 ratio for the content to be responsive
+		const heightCalculation = 'video' === this.props.type ? 'clientBoundingRect.width / 16 * 9' : 'clientBoundingRect.height';
+
 		const observeAndResizeJS = `
 			( function() {
 				var observer;
 
-				if ( ! window.MutationObserver || ! document.body || ! window.top ) {
+				if ( ! window.MutationObserver || ! document.body || ! window.parent ) {
 					return;
 				}
 
 				function sendResize() {
-					window.top.postMessage( {
+					var clientBoundingRect = document.body.getBoundingClientRect();
+					window.parent.postMessage( {
 						action: 'resize',
-						width: document.body.offsetWidth,
-						height: document.body.offsetHeight
+						width: clientBoundingRect.width,
+						height: ${ heightCalculation }
 					}, '*' );
 				}
 
@@ -119,14 +124,31 @@ export default class Sandbox extends wp.element.Component {
 				sendResize();
 		} )();`;
 
+		const style = `
+			body {
+				margin: 0;
+			}
+			body.video,
+			body.video > div,
+			body.video > div > iframe {
+				width: 100%;
+				height: 100%;
+			}
+			body > div > * {
+				margin-top: 0 !important;	/* has to have !important to override inline styles */
+				margin-bottom: 0 !important;
+			}
+		`;
+
 		// put the html snippet into a html document, and then write it to the iframe's document
 		// we can use this in the future to inject custom styles or scripts
 		const htmlDoc = (
 			<html lang={ document.documentElement.lang }>
 				<head>
 					<title>{ this.props.title }</title>
+					<style dangerouslySetInnerHTML={ { __html: style } } />
 				</head>
-				<body data-resizable-iframe-connected="data-resizable-iframe-connected">
+				<body data-resizable-iframe-connected="data-resizable-iframe-connected" className={ this.props.type }>
 					<div dangerouslySetInnerHTML={ { __html: this.props.html } } />
 					<script type="text/javascript" dangerouslySetInnerHTML={ { __html: observeAndResizeJS } } />
 				</body>
@@ -156,8 +178,8 @@ export default class Sandbox extends wp.element.Component {
 				scrolling="no"
 				sandbox="allow-scripts allow-same-origin allow-presentation"
 				onLoad={ this.trySandbox }
-				width={ this.state.width }
-				height={ this.state.height } />
+				width={ Math.ceil( this.state.width ) }
+				height={ Math.ceil( this.state.height ) } />
 		);
 	}
 }

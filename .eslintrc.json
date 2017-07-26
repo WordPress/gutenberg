@@ -6,14 +6,14 @@
 		"plugin:react/recommended",
 		"plugin:jsx-a11y/recommended",
 		"plugin:jest/recommended"
-  ],
+	],
 	"env": {
 		"browser": false,
 		"es6": true,
 		"node": true,
 		"mocha": true,
 		"jest/globals": true
-  },
+	},
 	"parserOptions": {
 		"sourceType": "module",
 		"ecmaFeatures": {

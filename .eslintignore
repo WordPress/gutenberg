@@ -1,4 +1,4 @@
 build
 coverage
-docs
 vendor
+node_modules

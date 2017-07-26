@@ -179,7 +179,9 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 								<p className="components-placeholder__error">{ __( 'Previews for this are unavailable in the editor, sorry!' ) }</p>
 							</Placeholder>
 						) : (
-							<SandBox html={ html } title={ iframeTitle } />
+							<div className="wp-block-embed__wrapper">
+								<SandBox html={ html } title={ iframeTitle } type={ type } />
+							</div>
 						) }
 						{ ( caption && caption.length > 0 ) || !! focus ? (
 							<Editable

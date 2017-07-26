@@ -103,7 +103,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-blocks',
 		gutenberg_url( 'blocks/build/index.js' ),
-		array( 'wp-element', 'wp-components', 'wp-utils', 'tinymce-nightly', 'tinymce-nightly-lists', 'tinymce-nightly-paste', 'tinymce-nightly-table' ),
+		array( 'wp-element', 'wp-components', 'wp-utils', 'tinymce-nightly', 'tinymce-nightly-lists', 'tinymce-nightly-paste', 'tinymce-nightly-table', 'media-views', 'media-models' ),
 		filemtime( gutenberg_dir_path() . 'blocks/build/index.js' )
 	);
 
@@ -418,10 +418,9 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 	$is_demo = isset( $page_match[2] );
 
-	/**
-	 * Scripts
-	 */
-	wp_enqueue_media();
+	wp_add_inline_script(
+		'editor', 'window.wp.oldEditor = window.wp.editor;', 'after'
+	);
 
 	gutenberg_extend_wp_api_backbone_client();
 
@@ -429,10 +428,70 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	wp_enqueue_script(
 		'wp-editor',
 		gutenberg_url( 'editor/build/index.js' ),
-		array( 'wp-api', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element', 'wp-components', 'wp-utils' ),
+		array( 'wp-api', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element', 'wp-components', 'wp-utils', 'editor' ),
 		filemtime( gutenberg_dir_path() . 'editor/build/index.js' ),
 		true // enqueue in the footer.
 	);
+
+	wp_localize_script( 'wp-editor', 'wpEditorL10n', array(
+		'tinymce' => array(
+			'baseURL' => includes_url( 'js/tinymce' ),
+			'suffix' => SCRIPT_DEBUG ? '' : '.min',
+			'settings' => apply_filters( 'tiny_mce_before_init', array(
+				'external_plugins' => apply_filters( 'mce_external_plugins', array() ),
+				'plugins' => array_unique( apply_filters( 'tiny_mce_plugins', array(
+					'charmap',
+					'colorpicker',
+					'hr',
+					'lists',
+					'media',
+					'paste',
+					'tabfocus',
+					'textcolor',
+					'fullscreen',
+					'wordpress',
+					'wpautoresize',
+					'wpeditimage',
+					'wpemoji',
+					'wpgallery',
+					'wplink',
+					'wpdialogs',
+					'wptextpattern',
+					'wpview',
+				) ) ),
+				'toolbar1' => implode( ',', array_merge( apply_filters( 'mce_buttons', array(
+					'formatselect',
+					'bold',
+					'italic',
+					'bullist',
+					'numlist',
+					'blockquote',
+					'alignleft',
+					'aligncenter',
+					'alignright',
+					'link',
+					'unlink',
+					'wp_more',
+					'spellchecker',
+				), 'editor' ), array( 'kitchensink' ) ) ),
+				'toolbar2' => implode( ',', apply_filters( 'mce_buttons_2', array(
+					'strikethrough',
+					'hr',
+					'forecolor',
+					'pastetext',
+					'removeformat',
+					'charmap',
+					'outdent',
+					'indent',
+					'undo',
+					'redo',
+					'wp_help',
+				), 'editor' ) ),
+				'toolbar3' => implode( ',', apply_filters( 'mce_buttons_3', array(), 'editor' ) ),
+				'toolbar4' => implode( ',', apply_filters( 'mce_buttons_4', array(), 'editor' ) ),
+			), 'editor' ),
+		),
+	) );
 
 	// Register `wp-utils` as a dependency of `word-count` to ensure that
 	// `wp-utils` doesn't clobbber `word-count`.  See WordPress/gutenberg#1569.
@@ -441,41 +500,60 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	// Now load the `word-count` script from core.
 	wp_enqueue_script( 'word-count' );
 
+	// Parse post type from parameters.
+	$post_type = null;
+	if ( ! isset( $_GET['post_type'] ) ) {
+		$post_type = 'post';
+	} else {
+		$post_types = get_post_types( array(
+			'show_ui' => true,
+		) );
+
+		if ( in_array( $_GET['post_type'], $post_types ) ) {
+			$post_type = $_GET['post_type'];
+		} else {
+			wp_die( __( 'Invalid post type.', 'gutenberg' ) );
+		}
+	}
+
+	// Parse post ID from parameters.
 	$post_id = null;
 	if ( isset( $_GET['post_id'] ) && (int) $_GET['post_id'] > 0 ) {
 		$post_id = (int) $_GET['post_id'];
 	}
 
-	$post_to_edit = null;
-	if ( $post_id ) {
-		$post_to_edit = gutenberg_get_post_to_edit( $post_id );
-		if ( is_wp_error( $post_to_edit ) ) {
-			wp_die( $post_to_edit->get_error_message() );
-		}
+	// Create an auto-draft if new post.
+	if ( ! $post_id ) {
+		$default_post_to_edit = get_default_post_to_edit( $post_type, true );
+		$post_id = $default_post_to_edit->ID;
 	}
 
-	// Initialize the post data...
-	if ( $post_to_edit ) {
-		// ...with a real post
-		wp_add_inline_script(
-			'wp-editor',
-			'window._wpGutenbergPost = ' . wp_json_encode( $post_to_edit ) . ';'
+	// Generate API-prepared post from post ID.
+	$post_to_edit = gutenberg_get_post_to_edit( $post_id );
+	if ( is_wp_error( $post_to_edit ) ) {
+		wp_die( $post_to_edit->get_error_message() );
+	}
+
+	// Set initial title to empty string for auto draft for duration of edit.
+	if ( 'auto-draft' === $post_to_edit['status'] ) {
+		$default_title = apply_filters( 'default_title', '' );
+		$post_to_edit['title'] = array(
+			'raw'      => $default_title,
+			'rendered' => apply_filters( 'the_title', $default_title, $post_id ),
 		);
-	} elseif ( $is_demo ) {
-		// ...with some test content
+	}
+
+	// Initialize the post data.
+	wp_add_inline_script(
+		'wp-editor',
+		'window._wpGutenbergPost = ' . wp_json_encode( $post_to_edit ) . ';'
+	);
+
+	// Prepopulate with some test content in demo.
+	if ( $is_demo ) {
 		wp_add_inline_script(
 			'wp-editor',
 			file_get_contents( gutenberg_dir_path() . 'post-content.js' )
-		);
-	} else {
-		// ...with a new empty post
-		// TODO: Error handling if we tried and failed to get a post above
-		$empty_post = array(
-			'type' => 'post',
-		);
-		wp_add_inline_script(
-			'wp-editor',
-			'window._wpGutenbergPost = ' . wp_json_encode( $empty_post ) . ';'
 		);
 	}
 
@@ -489,6 +567,14 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 	// Initialize the editor.
 	wp_add_inline_script( 'wp-editor', 'wp.api.init().done( function() { wp.editor.createEditorInstance( \'editor\', window._wpGutenbergPost ); } );' );
+
+	/**
+	 * Scripts
+	 */
+	wp_enqueue_media( array(
+		'post' => $post_to_edit['id'],
+	) );
+	wp_enqueue_editor();
 
 	/**
 	 * Styles

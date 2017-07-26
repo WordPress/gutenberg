@@ -13,14 +13,16 @@ import {
 	hasEditorRedo,
 	isEditedPostNew,
 	isEditedPostDirty,
+	isCleanNewPost,
 	getCurrentPost,
 	getCurrentPostId,
 	getCurrentPostType,
 	getPostEdits,
 	getEditedPostTitle,
+	getDocumentTitle,
 	getEditedPostExcerpt,
 	getEditedPostVisibility,
-	isEditedPostPublished,
+	isCurrentPostPublished,
 	isEditedPostPublishable,
 	isEditedPostSaveable,
 	isEditedPostBeingScheduled,
@@ -43,7 +45,7 @@ import {
 	isFirstMultiSelectedBlock,
 	isBlockHovered,
 	getBlockFocus,
-	isTypingInBlock,
+	isTyping,
 	getBlockInsertionPoint,
 	isBlockInsertionPointVisible,
 	isSavingPost,
@@ -52,6 +54,11 @@ import {
 	getSuggestedPostFormat,
 	getNotices,
 } from '../selectors';
+
+/**
+ * WordPress dependencies
+ */
+import { __ } from 'i18n';
 
 describe( 'selectors', () => {
 	describe( 'getEditorMode', () => {
@@ -141,16 +148,24 @@ describe( 'selectors', () => {
 	describe( 'isEditedPostNew', () => {
 		it( 'should return true when the post is new', () => {
 			const state = {
-				currentPost: {},
+				currentPost: {
+					status: 'auto-draft',
+				},
+				editor: {
+					edits: {},
+				},
 			};
 
 			expect( isEditedPostNew( state ) ).toBe( true );
 		} );
 
-		it( 'should return false when the post has an ID', () => {
+		it( 'should return false when the post is not new', () => {
 			const state = {
 				currentPost: {
-					id: 1,
+					status: 'draft',
+				},
+				editor: {
+					edits: {},
 				},
 			};
 
@@ -174,9 +189,57 @@ describe( 'selectors', () => {
 				editor: {
 					dirty: false,
 				},
+				currentPost: {},
 			};
 
 			expect( isEditedPostDirty( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isCleanNewPost', () => {
+		it( 'should return true when the post is not dirty and has not been saved before', () => {
+			const state = {
+				editor: {
+					dirty: false,
+					edits: {},
+				},
+				currentPost: {
+					id: 1,
+					status: 'auto-draft',
+				},
+			};
+
+			expect( isCleanNewPost( state ) ).toBe( true );
+		} );
+
+		it( 'should return false when the post is not dirty but the post has been saved', () => {
+			const state = {
+				editor: {
+					dirty: false,
+					edits: {},
+				},
+				currentPost: {
+					id: 1,
+					status: 'draft',
+				},
+			};
+
+			expect( isCleanNewPost( state ) ).toBe( false );
+		} );
+
+		it( 'should return false when the post is dirty but the post has not been saved', () => {
+			const state = {
+				editor: {
+					dirty: true,
+					edits: {},
+				},
+				currentPost: {
+					id: 1,
+					status: 'auto-draft',
+				},
+			};
+
+			expect( isCleanNewPost( state ) ).toBe( false );
 		} );
 	} );
 
@@ -257,6 +320,86 @@ describe( 'selectors', () => {
 			};
 
 			expect( getEditedPostTitle( state ) ).toBe( 'youcha' );
+		} );
+	} );
+
+	describe( 'getDocumentTitle', () => {
+		it( 'should return current title unedited existing post', () => {
+			const state = {
+				currentPost: {
+					id: 123,
+					title: { raw: 'The Title' },
+				},
+				editor: {
+					dirty: false,
+					edits: {},
+				},
+			};
+
+			expect( getDocumentTitle( state ) ).toBe( 'The Title' );
+		} );
+
+		it( 'should return current title for edited existing post', () => {
+			const state = {
+				currentPost: {
+					id: 123,
+					title: { raw: 'The Title' },
+				},
+				editor: {
+					dirty: true,
+					edits: { title: 'Modified Title' },
+				},
+			};
+
+			expect( getDocumentTitle( state ) ).toBe( 'Modified Title' );
+		} );
+
+		it( 'should return new post title when new post is clean', () => {
+			const state = {
+				currentPost: {
+					id: 1,
+					status: 'auto-draft',
+					title: { raw: '' },
+				},
+				editor: {
+					dirty: false,
+					edits: {},
+				},
+			};
+
+			expect( getDocumentTitle( state ) ).toBe( __( 'New post' ) );
+		} );
+
+		it( 'should return untitled title when new post is dirty', () => {
+			const state = {
+				currentPost: {
+					id: 1,
+					status: 'auto-draft',
+					title: { raw: '' },
+				},
+				editor: {
+					dirty: true,
+					edits: {},
+				},
+			};
+
+			expect( getDocumentTitle( state ) ).toBe( __( '(Untitled)' ) );
+		} );
+
+		it( 'should return untitled title', () => {
+			const state = {
+				currentPost: {
+					id: 123,
+					status: 'draft',
+					title: { raw: '' },
+				},
+				editor: {
+					dirty: true,
+					edits: {},
+				},
+			};
+
+			expect( getDocumentTitle( state ) ).toBe( __( '(Untitled)' ) );
 		} );
 	} );
 
@@ -347,7 +490,7 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'isEditedPostPublished', () => {
+	describe( 'isCurrentPostPublished', () => {
 		it( 'should return true for public posts', () => {
 			const state = {
 				currentPost: {
@@ -355,7 +498,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditedPostPublished( state ) ).toBe( true );
+			expect( isCurrentPostPublished( state ) ).toBe( true );
 		} );
 
 		it( 'should return true for private posts', () => {
@@ -365,7 +508,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditedPostPublished( state ) ).toBe( true );
+			expect( isCurrentPostPublished( state ) ).toBe( true );
 		} );
 
 		it( 'should return false for draft posts', () => {
@@ -375,7 +518,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditedPostPublished( state ) ).toBe( false );
+			expect( isCurrentPostPublished( state ) ).toBe( false );
 		} );
 
 		it( 'should return true for old scheduled posts', () => {
@@ -386,7 +529,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditedPostPublished( state ) ).toBe( true );
+			expect( isCurrentPostPublished( state ) ).toBe( true );
 		} );
 	} );
 
@@ -966,29 +1109,21 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'isTypingInBlock', () => {
+	describe( 'isTyping', () => {
 		it( 'should return the isTyping flag if the block is selected', () => {
 			const state = {
-				selectedBlock: {
-					uid: 123,
-					typing: true,
-				},
-				multiSelectedBlocks: {},
+				isTyping: true,
 			};
 
-			expect( isTypingInBlock( state, 123 ) ).toBe( true );
+			expect( isTyping( state ) ).toBe( true );
 		} );
 
 		it( 'should return false if the block is not selected', () => {
 			const state = {
-				selectedBlock: {
-					uid: 123,
-					typing: true,
-				},
-				multiSelectedBlocks: {},
+				isTyping: false,
 			};
 
-			expect( isTypingInBlock( state, 23 ) ).toBe( false );
+			expect( isTyping( state ) ).toBe( false );
 		} );
 	} );
 
@@ -998,7 +1133,6 @@ describe( 'selectors', () => {
 				mode: 'visual',
 				selectedBlock: {
 					uid: 2,
-					typing: true,
 				},
 				multiSelectedBlocks: {},
 				editor: {
@@ -1046,7 +1180,6 @@ describe( 'selectors', () => {
 				mode: 'text',
 				selectedBlock: {
 					uid: 2,
-					typing: true,
 				},
 				multiSelectedBlocks: {},
 				editor: {

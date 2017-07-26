@@ -18,8 +18,10 @@ $blocks-button__height: 46px;
 	position: relative;
 
 	a {
+		box-shadow: none !important;
 		color: $white;
-		text-decoration: none;
+		cursor: pointer;
+		text-decoration: none !important;
 	}
 
 	&:hover {
@@ -28,12 +30,5 @@ $blocks-button__height: 46px;
 
 	&.aligncenter {
 		display: inline-block;
-	}
-
-	.editable-format-toolbar__link-modal {
-		z-index: 2;
-		top: $blocks-button__height + 2px;
-		left: 50%;
-		transform: translateX( -50% );
 	}
 }

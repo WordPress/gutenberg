@@ -88,8 +88,14 @@ input[type="search"].editor-inserter__search {
 	background: none;
 	line-height: 20px;
 
-	&:hover,
-	&:focus {
+
+	&:disabled {
+		opacity: 0.6;
+		cursor: default;
+	}
+
+	&:hover:not(:disabled),
+	&:focus:not(:disabled) {
 		color: $blue-medium-500;
 		outline: none;
 		position: relative;

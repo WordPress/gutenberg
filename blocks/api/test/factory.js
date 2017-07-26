@@ -36,6 +36,7 @@ describe( 'block factory', () => {
 				includesDefault: true,
 				align: 'left',
 			} );
+			expect( block.isValid ).toBe( true );
 			expect( typeof block.uid ).toBe( 'string' );
 		} );
 	} );

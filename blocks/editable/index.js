@@ -245,10 +245,12 @@ export default class Editable extends Component {
 
 		// If we click shift+Enter on inline Editables, we avoid creating two contenteditables
 		// We also split the content and call the onSplit prop if provided.
-		if ( event.keyCode === ENTER && event.shiftKey && ! this.props.multiline ) {
+		if ( event.keyCode === ENTER && ! this.props.multiline ) {
 			event.preventDefault();
 
-			if ( this.props.onSplit ) {
+			if ( event.shiftKey || ! this.props.onSplit ) {
+				this.editor.execCommand( 'InsertLineBreak', false, event );
+			} else {
 				this.splitContent();
 			}
 		}
@@ -257,27 +259,6 @@ export default class Editable extends Component {
 	onKeyUp( { keyCode } ) {
 		if ( keyCode === BACKSPACE ) {
 			this.onSelectionChange();
-		}
-
-		if ( keyCode === ENTER && ! this.props.multiline && this.props.onSplit ) {
-			const endNode = this.editor.selection.getEnd();
-
-			// Make sure the current selection is on a line break.
-			if ( endNode.nodeName !== 'BR' ) {
-				return;
-			}
-
-			const prevNode = endNode.previousSibling;
-
-			// Make sure the previous node is a line break. We only want to
-			// split on a double line break.
-			if ( ! prevNode || prevNode.nodeName !== 'BR' ) {
-				return;
-			}
-
-			this.editor.dom.remove( prevNode );
-			this.editor.dom.remove( endNode );
-			this.splitContent();
 		}
 	}
 

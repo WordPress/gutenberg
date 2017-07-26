@@ -2,6 +2,7 @@
     {
         "uid": "_uid_0",
         "name": "core-embed/imgur",
+        "isValid": true,
         "attributes": {
             "url": "https://imgur.com/",
             "caption": [

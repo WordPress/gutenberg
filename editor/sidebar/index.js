@@ -14,13 +14,15 @@ import { withFocusReturn } from 'components';
 import './style.scss';
 import PostSettings from './post-settings';
 import BlockInspector from './block-inspector';
-import { getSelectedBlock } from '../selectors';
+import Header from './header';
+import { getActivePanel } from '../selectors';
 
-const Sidebar = ( { selectedBlock } ) => {
+const Sidebar = ( { panel } ) => {
 	return (
 		<div className="editor-sidebar">
-			{ ! selectedBlock && <PostSettings /> }
-			{ selectedBlock && <BlockInspector /> }
+			<Header />
+			{ panel === 'document' && <PostSettings /> }
+			{ panel === 'block' && <BlockInspector /> }
 		</div>
 	);
 };
@@ -28,7 +30,7 @@ const Sidebar = ( { selectedBlock } ) => {
 export default connect(
 	( state ) => {
 		return {
-			selectedBlock: getSelectedBlock( state ),
+			panel: getActivePanel( state ),
 		};
 	}
 )( withFocusReturn( Sidebar ) );

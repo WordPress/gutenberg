@@ -4,6 +4,22 @@
 import uuid from 'uuid/v4';
 import { partial } from 'lodash';
 
+/**
+ * Returns an action object used in signalling that the block with the
+ * specified UID has been updated.
+ *
+ * @param  {String} uid        Block UID
+ * @param  {Object} attributes Block attributes to be merged
+ * @return {Object}            Action object
+ */
+export function updateBlockAttributes( uid, attributes ) {
+	return {
+		type: 'UPDATE_BLOCK_ATTRIBUTES',
+		uid,
+		attributes,
+	};
+}
+
 export function focusBlock( uid, config ) {
 	return {
 		type: 'UPDATE_FOCUS',
@@ -95,30 +111,72 @@ export function mergeBlocks( blockA, blockB ) {
 }
 
 /**
- * Returns an action object used in signalling that the user has begun to type
- * within a block's editable field.
+ * Returns an action object used in signalling that the post should autosave.
  *
- * @param  {String} uid Block UID
- * @return {Object}     Action object
+ * @return {Object} Action object
  */
-export function startTypingInBlock( uid ) {
+export function autosave() {
 	return {
-		type: 'START_TYPING',
-		uid,
+		type: 'AUTOSAVE',
 	};
 }
 
 /**
- * Returns an action object used in signalling that the user has stopped typing
- * within a block's editable field.
+ * Returns an action object used in signalling that the post should be queued
+ * for autosave after a delay.
+ *
+ * @return {Object} Action object
+ */
+export function queueAutosave() {
+	return {
+		type: 'QUEUE_AUTOSAVE',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the blocks
+ * corresponding to the specified UID set are to be removed.
+ *
+ * @param  {String[]} uids Block UIDs
+ * @return {Object}        Action object
+ */
+export function removeBlocks( uids ) {
+	return {
+		type: 'REMOVE_BLOCKS',
+		uids,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the block with the
+ * specified UID is to be removed.
  *
  * @param  {String} uid Block UID
  * @return {Object}     Action object
  */
-export function stopTypingInBlock( uid ) {
+export function removeBlock( uid ) {
+	return removeBlocks( [ uid ] );
+}
+
+/**
+ * Returns an action object used in signalling that the user has begun to type.
+ *
+ * @return {Object}     Action object
+ */
+export function startTyping() {
+	return {
+		type: 'START_TYPING',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user has stopped typing.
+ *
+ * @return {Object}     Action object
+ */
+export function stopTyping() {
 	return {
 		type: 'STOP_TYPING',
-		uid,
 	};
 }
 
@@ -156,6 +214,6 @@ export function removeNotice( id ) {
 	};
 }
 
-export const successNotice = partial( createNotice, 'success' );
-export const errorNotice = partial( createNotice, 'error' );
-export const warningNotice = partial( createNotice, 'warning' );
+export const createSuccessNotice = partial( createNotice, 'success' );
+export const createErrorNotice = partial( createNotice, 'error' );
+export const createWarningNotice = partial( createNotice, 'warning' );

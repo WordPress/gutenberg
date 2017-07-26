@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, uniqueId } from 'lodash';
+import { get, uniqueId, debounce } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -14,12 +14,25 @@ import { __ } from 'i18n';
  * Internal dependencies
  */
 import { getGutenbergURL, getWPAdminURL } from './utils/url';
-import { focusBlock, replaceBlocks, successNotice, errorNotice } from './actions';
+import {
+	focusBlock,
+	replaceBlocks,
+	createSuccessNotice,
+	createErrorNotice,
+	autosave,
+	queueAutosave,
+	savePost,
+	editPost,
+} from './actions';
 import {
 	getCurrentPost,
 	getCurrentPostType,
 	getBlocks,
 	getPostEdits,
+	isCurrentPostPublished,
+	isEditedPostDirty,
+	isEditedPostNew,
+	isEditedPostSaveable,
 } from './selectors';
 
 export default {
@@ -27,17 +40,13 @@ export default {
 		const { dispatch, getState } = store;
 		const state = getState();
 		const post = getCurrentPost( state );
-		const isNew = ! post.id;
 		const edits = getPostEdits( state );
 		const toSend = {
 			...edits,
 			content: serialize( getBlocks( state ) ),
+			id: post.id,
 		};
 		const transactionId = uniqueId();
-
-		if ( ! isNew ) {
-			toSend.id = post.id;
-		}
 
 		dispatch( {
 			type: 'CLEAR_POST_EDITS',
@@ -58,7 +67,6 @@ export default {
 				type: 'REQUEST_POST_UPDATE_SUCCESS',
 				previousPost: post,
 				post: newPost,
-				isNew,
 				optimist: { type: COMMIT, id: transactionId },
 			} );
 		} ).fail( ( err ) => {
@@ -75,7 +83,7 @@ export default {
 		} );
 	},
 	REQUEST_POST_UPDATE_SUCCESS( action, store ) {
-		const { previousPost, post, isNew } = action;
+		const { previousPost, post } = action;
 		const { dispatch } = store;
 
 		const publishStatus = [ 'publish', 'private', 'future' ];
@@ -83,7 +91,7 @@ export default {
 		const messages = {
 			publish: __( 'Post published!' ),
 			'private': __( 'Post published privately!' ),
-			future: __( 'Post schduled!' ),
+			future: __( 'Post scheduled!' ),
 		};
 
 		// If we save a non published post, we don't show any notice
@@ -93,7 +101,7 @@ export default {
 			const noticeMessage = ! isPublished && publishStatus.indexOf( post.status ) !== -1
 				? messages[ post.status ]
 				: __( 'Post updated!' );
-			dispatch( successNotice(
+			dispatch( createSuccessNotice(
 				<p>
 					<span>{ noticeMessage }</span>
 					{ ' ' }
@@ -102,13 +110,15 @@ export default {
 			) );
 		}
 
-		if ( ! isNew ) {
-			return;
+		if ( get( window.history.state, 'id' ) !== post.id ) {
+			window.history.replaceState(
+				{ id: post.id },
+				'Post ' + post.id,
+				getGutenbergURL( {
+					post_id: post.id,
+				} )
+			);
 		}
-		const newURL = getGutenbergURL( {
-			post_id: post.id,
-		} );
-		window.history.replaceState( {}, 'Post ' + post.id, newURL );
 	},
 	REQUEST_POST_UPDATE_FAILURE( action, store ) {
 		const { post, edits } = action;
@@ -126,26 +136,46 @@ export default {
 		const noticeMessage = ! isPublished && publishStatus.indexOf( edits.status ) !== -1
 			? messages[ edits.status ]
 			: __( 'Updating failed' );
-		dispatch( errorNotice( noticeMessage ) );
+		dispatch( createErrorNotice( noticeMessage ) );
 	},
 	TRASH_POST( action, store ) {
 		const { dispatch, getState } = store;
 		const { postId } = action;
 		const Model = wp.api.getPostTypeModel( getCurrentPostType( getState() ) );
-		new Model( { id: postId } ).destroy().done( () => {
-			dispatch( {
-				...action,
-				type: 'TRASH_POST_SUCCESS',
-			} );
-		} );
+		new Model( { id: postId } ).destroy().then(
+			() => {
+				dispatch( {
+					...action,
+					type: 'TRASH_POST_SUCCESS',
+				} );
+			},
+			( err ) => {
+				dispatch( {
+					...action,
+					type: 'TRASH_POST_FAILURE',
+					error: get( err, 'responseJSON', {
+						code: 'unknown_error',
+						message: __( 'An unknown error occurred.' ),
+					} ),
+				} );
+			}
+		);
 	},
 	TRASH_POST_SUCCESS( action ) {
 		const { postId, postType } = action;
-		window.location.href = getWPAdminURL( 'edit.php', {
-			trashed: 1,
-			post_type: postType,
-			ids: postId,
+
+		// Delay redirect to ensure store has been updated with the successful trash.
+		setTimeout( () => {
+			window.location.href = getWPAdminURL( 'edit.php', {
+				trashed: 1,
+				post_type: postType,
+				ids: postId,
+			} );
 		} );
+	},
+	TRASH_POST_FAILURE( action, store ) {
+		const message = action.error.message && action.error.code !== 'unknown_error' ? action.error.message : __( 'Trashing failed' );
+		store.dispatch( createErrorNotice( message ) );
 	},
 	MERGE_BLOCKS( action, store ) {
 		const { dispatch } = store;
@@ -190,4 +220,38 @@ export default {
 			]
 		) );
 	},
+	AUTOSAVE( action, store ) {
+		const { getState, dispatch } = store;
+		const state = getState();
+		if ( ! isEditedPostSaveable( state ) || ! isEditedPostDirty( state ) ) {
+			return;
+		}
+
+		if ( isCurrentPostPublished( state ) ) {
+			// TODO: Publish autosave.
+			//  - Autosaves are created as revisions for published posts, but
+			//    the necessary REST API behavior does not yet exist
+			//  - May need to check for whether the status of the edited post
+			//    has changed from the saved copy (i.e. published -> pending)
+			return;
+		}
+
+		// Change status from auto-draft to draft
+		if ( isEditedPostNew( state ) ) {
+			dispatch( editPost( { status: 'draft' } ) );
+		}
+
+		dispatch( savePost() );
+	},
+	QUEUE_AUTOSAVE: debounce( ( action, store ) => {
+		store.dispatch( autosave() );
+	}, 10000 ),
+	UPDATE_BLOCK_ATTRIBUTES: () => queueAutosave(),
+	INSERT_BLOCKS: () => queueAutosave(),
+	MOVE_BLOCKS_DOWN: () => queueAutosave(),
+	MOVE_BLOCKS_UP: () => queueAutosave(),
+	REPLACE_BLOCKS: () => queueAutosave(),
+	REMOVE_BLOCKS: () => queueAutosave(),
+	EDIT_POST: () => queueAutosave(),
+	MARK_DIRTY: () => queueAutosave(),
 };

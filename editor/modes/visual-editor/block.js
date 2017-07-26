@@ -11,6 +11,7 @@ import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
  * WordPress dependencies
  */
 import { Children, Component } from 'element';
+import { IconButton, Toolbar } from 'components';
 import { BACKSPACE, ESCAPE, DELETE, UP, DOWN, LEFT, RIGHT } from 'utils/keycodes';
 import { getBlockType, getBlockDefaultClassname } from 'blocks';
 import { __, sprintf } from 'i18n';
@@ -18,16 +19,19 @@ import { __, sprintf } from 'i18n';
 /**
  * Internal dependencies
  */
+import InvalidBlockWarning from './invalid-block-warning';
 import BlockMover from '../../block-mover';
 import BlockRightMenu from '../../block-settings-menu';
 import BlockSwitcher from '../../block-switcher';
 import {
+	updateBlockAttributes,
 	focusBlock,
 	mergeBlocks,
 	insertBlocks,
+	removeBlocks,
 	clearSelectedBlock,
-	startTypingInBlock,
-	stopTypingInBlock,
+	startTyping,
+	stopTyping,
 } from '../../actions';
 import {
 	getPreviousBlock,
@@ -39,7 +43,7 @@ import {
 	isBlockSelected,
 	isBlockMultiSelected,
 	isFirstMultiSelectedBlock,
-	isTypingInBlock,
+	isTyping,
 } from '../../selectors';
 
 function FirstChild( { children } ) {
@@ -50,6 +54,9 @@ function FirstChild( { children } ) {
 class VisualEditorBlock extends Component {
 	constructor() {
 		super( ...arguments );
+		this.state = {
+			showMobileControls: false,
+		};
 		this.bindBlockNode = this.bindBlockNode.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
 		this.maybeHover = this.maybeHover.bind( this );
@@ -62,6 +69,7 @@ class VisualEditorBlock extends Component {
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onKeyUp = this.onKeyUp.bind( this );
 		this.handleArrowKey = this.handleArrowKey.bind( this );
+		this.toggleMobileControls = this.toggleMobileControls.bind( this );
 		this.previousOffset = null;
 	}
 
@@ -97,9 +105,8 @@ class VisualEditorBlock extends Component {
 		}
 
 		// Bind or unbind mousemove from page when user starts or stops typing
-		const { isTyping } = this.props;
-		if ( isTyping !== prevProps.isTyping ) {
-			if ( isTyping ) {
+		if ( this.props.isTyping !== prevProps.isTyping ) {
+			if ( this.props.isTyping ) {
 				document.addEventListener( 'mousemove', this.stopTypingOnMouseMove );
 			} else {
 				this.removeStopTypingListener();
@@ -122,12 +129,7 @@ class VisualEditorBlock extends Component {
 
 	setAttributes( attributes ) {
 		const { block, onChange } = this.props;
-		onChange( block.uid, {
-			attributes: {
-				...block.attributes,
-				...attributes,
-			},
-		} );
+		onChange( block.uid, attributes );
 	}
 
 	maybeHover() {
@@ -146,9 +148,8 @@ class VisualEditorBlock extends Component {
 		//  - The current block is not selected (e.g. after a split occurs,
 		//    we'll still receive the keyDown event, but the focus has since
 		//    shifted to the newly created block)
-		const { isTyping, isSelected, onStartTyping } = this.props;
-		if ( ! isTyping && isSelected ) {
-			onStartTyping();
+		if ( ! this.props.isTyping && this.props.isSelected ) {
+			this.props.onStartTyping();
 		}
 	}
 
@@ -294,12 +295,18 @@ class VisualEditorBlock extends Component {
 		delete this.lastRange;
 	}
 
+	toggleMobileControls() {
+		this.setState( {
+			showMobileControls: ! this.state.showMobileControls,
+		} );
+	}
+
 	render() {
 		const { block, multiSelectedBlockUids } = this.props;
-		const blockType = getBlockType( block.name );
+		const { name: blockName, isValid } = block;
+		const blockType = getBlockType( blockName );
 		// translators: %s: Type of block (i.e. Text, Image etc)
 		const blockLabel = sprintf( __( 'Block: %s' ), blockType.title );
-		const { className = getBlockDefaultClassname( block.name ) } = blockType;
 		// The block as rendered in the editor is composed of general block UI
 		// (mover, toolbar, wrapper) and the display of the block content, which
 		// is referred to as <BlockEdit />.
@@ -317,12 +324,15 @@ class VisualEditorBlock extends Component {
 		}
 
 		// Generate the wrapper class names handling the different states of the block.
-		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected, isTyping, focus } = this.props;
-		const showUI = isSelected && ( ! isTyping || ! focus.collapsed );
+		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected, focus } = this.props;
+		const showUI = isSelected && ( ! this.props.isTyping || focus.collapsed === false );
+		const { showMobileControls } = this.state;
 		const wrapperClassname = classnames( 'editor-visual-editor__block', {
+			'is-invalid': ! isValid,
 			'is-selected': showUI,
 			'is-multi-selected': isMultiSelected,
 			'is-hovered': isHovered,
+			'is-showing-mobile-controls': showMobileControls,
 		} );
 
 		const { onMouseLeave, onFocus, onInsertBlocksAfter } = this.props;
@@ -332,6 +342,10 @@ class VisualEditorBlock extends Component {
 		if ( blockType.getEditWrapperProps ) {
 			wrapperProps = blockType.getEditWrapperProps( block.attributes );
 		}
+
+		// Generate a class name for the block's editable form
+		let { className = getBlockDefaultClassname( block.name ) } = blockType;
+		className = classnames( className, block.attributes.className );
 
 		// Disable reason: Each block can be selected by clicking on it
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
@@ -352,7 +366,7 @@ class VisualEditorBlock extends Component {
 			>
 				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
 				{ ( showUI || isHovered ) && <BlockRightMenu uid={ block.uid } /> }
-				{ showUI &&
+				{ showUI && isValid &&
 					<CSSTransitionGroup
 						transitionName={ { appear: 'is-appearing', appearActive: 'is-appearing-active' } }
 						transitionAppear={ true }
@@ -364,6 +378,17 @@ class VisualEditorBlock extends Component {
 						<div className="editor-visual-editor__block-controls">
 							<BlockSwitcher uid={ block.uid } />
 							<Slot name="Formatting.Toolbar" />
+							<Toolbar className="editor-visual-editor__mobile-tools">
+								{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
+								{ ( showUI || isHovered ) && <BlockRightMenu uid={ block.uid } /> }
+								<IconButton
+									className="editor-visual-editor__mobile-toggle"
+									onClick={ this.toggleMobileControls }
+									aria-expanded={ showMobileControls }
+									label={ __( 'Toggle extra controls' ) }
+									icon="ellipsis"
+								/>
+							</Toolbar>
 						</div>
 					</CSSTransitionGroup>
 				}
@@ -375,18 +400,28 @@ class VisualEditorBlock extends Component {
 					onDragStart={ ( event ) => event.preventDefault() }
 					onMouseDown={ this.onPointerDown }
 					onTouchStart={ this.onPointerDown }
+					className="editor-visual-editor__block-edit"
 				>
-					<BlockEdit
-						focus={ focus }
-						attributes={ block.attributes }
-						setAttributes={ this.setAttributes }
-						insertBlocksAfter={ onInsertBlocksAfter }
-						setFocus={ partial( onFocus, block.uid ) }
-						mergeBlocks={ this.mergeBlocks }
-						className={ className }
-						id={ block.uid }
-					/>
+					{ isValid && (
+						<BlockEdit
+							focus={ focus }
+							attributes={ block.attributes }
+							setAttributes={ this.setAttributes }
+							insertBlocksAfter={ onInsertBlocksAfter }
+							setFocus={ partial( onFocus, block.uid ) }
+							mergeBlocks={ this.mergeBlocks }
+							className={ className }
+							id={ block.uid }
+						/>
+					) }
+					{ ! isValid && (
+						blockType.save( {
+							attributes: block.attributes,
+							className,
+						} )
+					) }
 				</div>
+				{ ! isValid && <InvalidBlockWarning /> }
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
@@ -404,18 +439,15 @@ export default connect(
 			isFirstMultiSelected: isFirstMultiSelectedBlock( state, ownProps.uid ),
 			isHovered: isBlockHovered( state, ownProps.uid ),
 			focus: getBlockFocus( state, ownProps.uid ),
-			isTyping: isTypingInBlock( state, ownProps.uid ),
+			isTyping: isTyping( state ),
 			order: getBlockIndex( state, ownProps.uid ),
 		};
 	},
 	( dispatch, ownProps ) => ( {
-		onChange( uid, updates ) {
-			dispatch( {
-				type: 'UPDATE_BLOCK',
-				uid,
-				updates,
-			} );
+		onChange( uid, attributes ) {
+			dispatch( updateBlockAttributes( uid, attributes ) );
 		},
+
 		onSelect() {
 			dispatch( {
 				type: 'TOGGLE_BLOCK_SELECTED',
@@ -428,11 +460,11 @@ export default connect(
 		},
 
 		onStartTyping() {
-			dispatch( startTypingInBlock( ownProps.uid ) );
+			dispatch( startTyping() );
 		},
 
 		onStopTyping() {
-			dispatch( stopTypingInBlock( ownProps.uid ) );
+			dispatch( stopTyping() );
 		},
 
 		onHover() {
@@ -459,10 +491,7 @@ export default connect(
 		},
 
 		onRemove( uids ) {
-			dispatch( {
-				type: 'REMOVE_BLOCKS',
-				uids,
-			} );
+			dispatch( removeBlocks( uids ) );
 		},
 
 		onMerge( ...args ) {

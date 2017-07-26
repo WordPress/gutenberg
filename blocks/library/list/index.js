@@ -165,6 +165,19 @@ registerBlockType( 'core/list', {
 				} );
 			} );
 
+			// this checks for languages that do not typically have square brackets on their keyboards
+			const lang = window.navigator.browserLanguage || window.navigator.language;
+			const keyboardHasSqBracket = ! /^(?:fr|nl|sv|ru|de|es|it)/.test( lang );
+
+			if ( keyboardHasSqBracket ) {
+				// keycode 219 = '[' and keycode 221 = ']'
+				editor.shortcuts.add( 'meta+219', 'Decrease indent', 'Outdent' );
+				editor.shortcuts.add( 'meta+221', 'Increase indent', 'Indent' );
+			} else {
+				editor.shortcuts.add( 'meta+shift+m', 'Decrease indent', 'Outdent' );
+				editor.shortcuts.add( 'meta+m', 'Increase indent', 'Indent' );
+			}
+
 			this.editor = editor;
 		}
 
@@ -214,13 +227,13 @@ registerBlockType( 'core/list', {
 						controls={ [
 							{
 								icon: 'editor-ul',
-								title: __( 'Convert to unordered' ),
+								title: __( 'Convert to unordered list' ),
 								isActive: this.isListActive( 'UL' ),
 								onClick: this.createSetListType( 'UL', 'InsertUnorderedList' ),
 							},
 							{
 								icon: 'editor-ol',
-								title: __( 'Convert to ordered' ),
+								title: __( 'Convert to ordered list' ),
 								isActive: this.isListActive( 'OL' ),
 								onClick: this.createSetListType( 'OL', 'InsertOrderedList' ),
 							},

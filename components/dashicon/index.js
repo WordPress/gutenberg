@@ -12,7 +12,8 @@ export default class Dashicon extends wp.element.Component {
 	shouldComponentUpdate( nextProps ) {
 		return (
 			this.props.icon !== nextProps.icon ||
-			this.props.className !== nextProps.className
+			this.props.className !== nextProps.className ||
+			this.props.size !== nextProps.size
 		);
 	}
 
@@ -820,9 +821,17 @@ export default class Dashicon extends wp.element.Component {
 		}
 
 		const iconClass = [ 'dashicon', 'dashicons-' + icon, className ].filter( Boolean ).join( ' ' );
+		const { size = 20 } = this.props;
 
 		return (
-			<svg aria-hidden="true" role="img" className={ iconClass } xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
+			<svg
+				aria-hidden="true"
+				role="img"
+				className={ iconClass }
+				xmlns="http://www.w3.org/2000/svg"
+				width={ size }
+				height={ size }
+				viewBox="0 0 20 20">
 				<path d={ path } />
 			</svg>
 		);

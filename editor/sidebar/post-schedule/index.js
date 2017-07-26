@@ -12,6 +12,7 @@ import moment from 'moment';
 import { __ } from 'i18n';
 import { Component } from 'element';
 import { dateI18n, settings } from 'date';
+import { PanelRow } from 'components';
 
 /**
  * Internal dependencies
@@ -58,7 +59,7 @@ class PostSchedule extends Component {
 		);
 
 		return (
-			<div className="editor-post-schedule">
+			<PanelRow className="editor-post-schedule">
 				<span>{ __( 'Publish' ) }</span>
 				<button
 					type="button"
@@ -85,7 +86,7 @@ class PostSchedule extends Component {
 						/>
 					</div>
 				}
-			</div>
+			</PanelRow>
 		);
 	}
 }

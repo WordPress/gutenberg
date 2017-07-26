@@ -19,6 +19,13 @@
 	@include break-medium() {
 		margin-right: 4px;
 	}
+
+	@include break-mobile {
+		&.dashicons-undo,
+		&.dashicons-redo {
+			margin-right: 0;
+		}
+	}
 }
 
 .editor-tools__tabs {

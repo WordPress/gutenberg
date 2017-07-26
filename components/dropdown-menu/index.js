@@ -121,12 +121,14 @@ class DropdownMenu extends wp.element.Component {
 				case LEFT:
 				case UP:
 					keydown.preventDefault();
+					keydown.stopPropagation();
 					this.focusPrevious();
 					break;
 
 				case RIGHT:
 				case DOWN:
 					keydown.preventDefault();
+					keydown.stopPropagation();
 					this.focusNext();
 					break;
 
