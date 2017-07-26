@@ -13,6 +13,7 @@ export { default as NoticeList } from './notice/list';
 export { default as Panel } from './panel';
 export { default as PanelHeader } from './panel/header';
 export { default as PanelBody } from './panel/body';
+export { default as PanelRow } from './panel/row';
 export { default as Placeholder } from './placeholder';
 export { default as ResponsiveWrapper } from './responsive-wrapper';
 export { default as SandBox } from './sandbox';

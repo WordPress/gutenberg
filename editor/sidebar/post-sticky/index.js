@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __ } from 'i18n';
-import { FormToggle, withInstanceId } from 'components';
+import { PanelRow, FormToggle, withInstanceId } from 'components';
 
 /**
  * Internal dependencies
@@ -23,7 +23,7 @@ function PostSticky( { onUpdateSticky, postType, postSticky = false, instanceId 
 	const stickyToggleId = 'post-sticky-toggle-' + instanceId;
 
 	return (
-		<div className="editor-post-status__row">
+		<PanelRow>
 			<label htmlFor={ stickyToggleId }>{ __( 'Stick to the front page' ) }</label>
 			<FormToggle
 				checked={ postSticky }
@@ -31,7 +31,7 @@ function PostSticky( { onUpdateSticky, postType, postSticky = false, instanceId 
 				showHint={ false }
 				id={ stickyToggleId }
 			/>
-		</div>
+		</PanelRow>
 	);
 }
 

@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __ } from 'i18n';
-import { Button, Dashicon } from 'components';
+import { PanelRow, Button, Dashicon } from 'components';
 
 /**
  * Internal dependencies
@@ -28,10 +28,12 @@ function PostTrash( { isNew, postId, postType, ...props } ) {
 	const onClick = () => props.trashPost( postId, postType );
 
 	return (
-		<Button className="editor-post-trash button-link button-link-delete" onClick={ onClick }>
-			{ __( 'Move to trash' ) }
-			<Dashicon icon="trash" />
-		</Button>
+		<PanelRow>
+			<Button className="editor-post-trash button-link button-link-delete" onClick={ onClick }>
+				{ __( 'Move to trash' ) }
+				<Dashicon icon="trash" />
+			</Button>
+		</PanelRow>
 	);
 }
 

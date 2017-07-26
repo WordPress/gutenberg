@@ -4,13 +4,13 @@
 import { connect } from 'react-redux';
 import clickOutside from 'react-click-outside';
 import { find } from 'lodash';
-import { withInstanceId } from 'components';
 
 /**
  * WordPress dependencies
  */
 import { __ } from 'i18n';
 import { Component } from 'element';
+import { PanelRow, withInstanceId } from 'components';
 
 /**
  * Internal Dependencies
@@ -104,7 +104,7 @@ class PostVisibility extends Component {
 		// Disable Reason: The input is inside the label, we shouldn't need the htmlFor
 		/* eslint-disable jsx-a11y/label-has-for */
 		return (
-			<div className="editor-post-visibility">
+			<PanelRow className="editor-post-visibility">
 				<span>{ __( 'Visibility' ) }</span>
 				<button
 					type="button"
@@ -164,7 +164,7 @@ class PostVisibility extends Component {
 						}
 					</div>
 				}
-			</div>
+			</PanelRow>
 		);
 		/* eslint-enable jsx-a11y/label-has-for */
 	}

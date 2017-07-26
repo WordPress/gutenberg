@@ -8,12 +8,11 @@ import { connect } from 'react-redux';
  */
 import { __ } from 'i18n';
 import { Component } from 'element';
-import { PanelBody, FormToggle, withInstanceId } from 'components';
+import { PanelBody, PanelRow, FormToggle, withInstanceId } from 'components';
 
 /**
  * Internal Dependencies
  */
-import './style.scss';
 import PostVisibility from '../post-visibility';
 import PostTrash from '../post-trash';
 import PostSchedule from '../post-schedule';
@@ -48,7 +47,7 @@ class PostStatus extends Component {
 		return (
 			<PanelBody title={ __( 'Status & Visibility' ) }>
 				{ ! isPublished &&
-					<div className="editor-post-status__row">
+					<PanelRow>
 						<label htmlFor={ pendingId }>{ __( 'Pending review' ) }</label>
 						<FormToggle
 							id={ pendingId }
@@ -56,22 +55,16 @@ class PostStatus extends Component {
 							onChange={ this.togglePendingStatus }
 							showHint={ false }
 						/>
-					</div>
+					</PanelRow>
 				}
-				<div className="editor-post-status__row">
-					<PostVisibility />
-				</div>
-				<div className="editor-post-status__row">
-					<PostSchedule />
-				</div>
-				<div className="editor-post-status__row">
+				<PostVisibility />
+				<PostSchedule />
+				<PanelRow>
 					<span>{ __( 'Post Format' ) }</span>
 					<span>{ format }</span>
-				</div>
+				</PanelRow>
 				<PostSticky />
-				<div className="editor-post-status__row">
-					<PostTrash />
-				</div>
+				<PostTrash />
 			</PanelBody>
 		);
 	}

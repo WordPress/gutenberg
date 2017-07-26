@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { Panel } from 'components';
@@ -19,24 +14,19 @@ import FeaturedImage from '../featured-image';
 import DiscussionPanel from '../discussion-panel';
 import LastRevision from '../last-revision';
 import TableOfContents from '../table-of-contents';
+import PageAttributes from '../page-attributes';
 
-const PostSettings = () => {
-	return (
-		<Panel>
-			<PostStatus />
-			<LastRevision />
-			<PostTaxonomies />
-			<FeaturedImage />
-			<PostExcerpt />
-			<DiscussionPanel />
-			<TableOfContents />
-		</Panel>
-	);
-};
+const panel = (
+	<Panel>
+		<PostStatus />
+		<LastRevision />
+		<PostTaxonomies />
+		<FeaturedImage />
+		<PostExcerpt />
+		<DiscussionPanel />
+		<PageAttributes />
+		<TableOfContents />
+	</Panel>
+);
 
-export default connect(
-	undefined,
-	( dispatch ) => ( {
-		toggleSidebar: () => dispatch( { type: 'TOGGLE_SIDEBAR' } ),
-	} )
-)( PostSettings );
+export default () => panel;
