@@ -126,7 +126,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 						</BlockControls>
 					)
 				);
-$
+
 				if ( fetching ) {
 					return [
 						controls,
