@@ -9,9 +9,9 @@ import { connect } from 'react-redux';
  */
 import { __, _n, sprintf } from 'i18n';
 import { Component } from 'element';
-import { Dashicon, Popover, withFocusReturn, withInstanceId } from 'components';
+import { Popover, withFocusReturn, withInstanceId } from 'components';
 import { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } from 'utils/keycodes';
-import { getCategories, getBlockTypes } from 'blocks';
+import { getCategories, getBlockTypes, BlockIcon } from 'blocks';
 
 /**
  * Internal dependencies
@@ -288,7 +288,7 @@ class InserterMenu extends Component {
 				onMouseLeave={ ! disabled && this.props.hideInsertionPoint }
 				disabled={ disabled }
 			>
-				<Dashicon icon={ block.icon } />
+				<BlockIcon icon={ block.icon } />
 				{ block.title }
 			</button>
 		);
