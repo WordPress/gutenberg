@@ -75,6 +75,10 @@ function gutenberg_render_block_core_latest_posts( $attributes ) {
 		$class .= ' is-grid';
 	}
 
+	if ( isset( $attributes['columns'] ) ) {
+		$class .= ' columns-' . $attributes['columns'];
+	}
+
 	$block_content = <<<CONTENT
 <ul class="{$class}">
 	{$posts_content}
