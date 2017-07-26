@@ -49,7 +49,6 @@ registerBlockType( 'core/more', {
 					focus={ focus }
 					onFocus={ setFocus }
 					onChange={ ( value ) => setAttributes( { text: value } ) }
-					inline
 					formattingControls={ [] }
 				/>
 			</div>,
