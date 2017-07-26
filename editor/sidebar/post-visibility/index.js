@@ -157,7 +157,7 @@ class PostVisibility extends Component {
 									id={ `editor-post-visibility__dialog-password-input-${ instanceId }` }
 									type="text"
 									onChange={ updatePassword }
-									value={ password }
+									value={ password || '' }
 									placeholder={ __( 'Use a secure password' ) }
 								/>
 							</div>
