@@ -1,6 +1,6 @@
 import addContainer from './addContainer';
 import clear from './clear';
-import domReady from '../../domReady/src/';
+import domReady from '@wordpress/domReady';
 import filterMessage from './filterMessage';
 
 let containerPolite, containerAssertive = '';
