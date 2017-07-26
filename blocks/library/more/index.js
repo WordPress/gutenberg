@@ -22,7 +22,9 @@ registerBlockType( 'core/more', {
 
 	useOnce: true,
 
-	edit( { attributes, setAttributes, className, focus, setFocus } ) {
+	className: false,
+
+	edit( { attributes, setAttributes, focus, setFocus } ) {
 		const { text, noTeaser } = attributes;
 
 		const toggleNoTeaser = () => setAttributes( { noTeaser: ! noTeaser } );
@@ -30,6 +32,9 @@ registerBlockType( 'core/more', {
 		return [
 			focus && (
 				<InspectorControls key="inspector">
+					<BlockDescription>
+						<p>{ __( '"More" allows you to break your post into a part shown on index pages, and the subsequent after clicking a "Read More" link.' ) }</p>
+					</BlockDescription>
 					<ToggleControl
 						label={ __( 'Hide the teaser before the "More" tag' ) }
 						checked={ !! noTeaser }
@@ -37,7 +42,7 @@ registerBlockType( 'core/more', {
 					/>
 				</InspectorControls>
 			),
-			<div key="more-tag" className={ className }>
+			<div key="more-tag" className="wp-block-more">
 				<Editable
 					tagName="span"
 					value={ text || __( 'Read more' ) }
@@ -47,13 +52,6 @@ registerBlockType( 'core/more', {
 					inline
 					formattingControls={ [] }
 				/>
-				{ focus &&
-					<InspectorControls key="inspector">
-						<BlockDescription>
-							<p>{ __( '"More" allows you to break your post into a part shown on index pages, and the subsequent after clicking a "Read More" link.' ) }</p>
-						</BlockDescription>
-					</InspectorControls>
-				}
 			</div>,
 		];
 	},
