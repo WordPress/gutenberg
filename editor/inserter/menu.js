@@ -20,7 +20,7 @@ import './style.scss';
 import { getBlocks, getRecentlyUsedBlocks } from '../selectors';
 import { showInsertionPoint, hideInsertionPoint } from '../actions';
 
-class InserterMenu extends Component {
+export class InserterMenu extends Component {
 	constructor() {
 		super( ...arguments );
 		this.nodes = {};
