@@ -14,12 +14,13 @@ import BlockControls from '../../block-controls';
 import Editable from '../../editable';
 import InspectorControls from '../../inspector-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
-import BlockDescription from '../../block-description';
 
 const { children, query } = hpq;
 
 registerBlockType( 'core/text', {
 	title: __( 'Text' ),
+
+	description: __( 'Text. Great things start here.' ),
 
 	icon: 'text',
 
@@ -69,9 +70,6 @@ registerBlockType( 'core/text', {
 			),
 			focus && (
 				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'Text. Great things start here.' ) }</p>
-					</BlockDescription>
 					<h3>{ __( 'Text Settings' ) }</h3>
 					<ToggleControl
 						label={ __( 'Drop Cap' ) }

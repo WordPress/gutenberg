@@ -18,7 +18,6 @@ import ToggleControl from '../../inspector-controls/toggle-control';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import GalleryImage from './gallery-image';
-import BlockDescription from '../../block-description';
 
 const MAX_COLUMNS = 8;
 
@@ -67,7 +66,11 @@ function defaultColumnsNumber( attributes ) {
 
 registerBlockType( 'core/gallery', {
 	title: __( 'Gallery' ),
+
+	description: __( 'Image galleries are a great way to share groups of pictures on your site.' ),
+
 	icon: 'format-gallery',
+
 	category: 'common',
 
 	getEditWrapperProps( attributes ) {
@@ -132,9 +135,6 @@ registerBlockType( 'core/gallery', {
 			controls,
 			focus && images.length > 1 && (
 				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'Image galleries are a great way to share groups of pictures on your site.' ) }</p>
-					</BlockDescription>
 					<h3>{ __( 'Gallery Settings' ) }</h3>
 					<RangeControl
 						label={ __( 'Columns' ) }

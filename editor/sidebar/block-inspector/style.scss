@@ -14,3 +14,10 @@
 	margin: 32px 16px;
 	text-align: center;
 }
+
+.editor-block-inspector__description {
+	padding-bottom: 1.5em;
+	margin: 0 0 1.5em;
+	border-bottom: 1px solid $light-gray-500;
+	font-style: italic;
+}
