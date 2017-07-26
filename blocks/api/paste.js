@@ -11,7 +11,6 @@ import { getBlockTypes, getUnknownTypeHandler } from './registration';
 import { parseBlockAttributes } from './parser';
 import gDocs from './paste/google-docs';
 import stripAttributes from './paste/strip-attributes';
-import logNodes from './paste/log-nodes';
 
 /**
  * Normalises array nodes of any node type to an array of block level nodes.
@@ -73,7 +72,7 @@ export function normaliseToBlockLevelNodes( nodes ) {
 }
 
 export default function( nodes ) {
-	const prepare = compose( [ normaliseToBlockLevelNodes, gDocs, logNodes, stripAttributes ] );
+	const prepare = compose( [ normaliseToBlockLevelNodes, gDocs, stripAttributes ] );
 
 	return prepare( nodes ).map( ( node ) => {
 		const block = getBlockTypes().reduce( ( acc, blockType ) => {
