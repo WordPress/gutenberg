@@ -2,9 +2,10 @@
     {
         "blockName": "core/cover-image",
         "attrs": {
-            "url": "https://cldup.com/uuUqE_dXzy.jpg"
+            "url": "https://cldup.com/uuUqE_dXzy.jpg",
+            "hasBackgroundDim": true
         },
-        "rawContent": "\n<section class=\"wp-block-cover-image\">\n\t<section class=\"cover-image\" style=\"background-image:url(https://cldup.com/uuUqE_dXzy.jpg);\">\n\t\t<h2>Guten Berg!</h2>\n\t</section>\n</section>\n"
+        "rawContent": "\n<section class=\"wp-block-cover-image has-background-dim\" style=\"background-image:url(https://cldup.com/uuUqE_dXzy.jpg);\">\n    <h2>Guten Berg!</h2>\n</section>\n"
     },
     {
         "attrs": {},
