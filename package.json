@@ -109,6 +109,9 @@
       "<rootDir>/test/setup-globals.js",
       "<rootDir>/test/setup-wp-aliases.js"
     ],
+    "testPathIgnorePatterns": [
+      "<rootDir>/test"
+    ],
     "setupTestFrameworkScriptFile": "<rootDir>/test/setup-test-framework.js",
     "testMatch": [
       "**/blocks/**/test/*.js",
