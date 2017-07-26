@@ -19,6 +19,7 @@ import { __, sprintf } from 'i18n';
 /**
  * Internal dependencies
  */
+import InvalidBlockWarning from './invalid-block-warning';
 import BlockMover from '../../block-mover';
 import BlockRightMenu from '../../block-settings-menu';
 import BlockSwitcher from '../../block-switcher';
@@ -302,10 +303,10 @@ class VisualEditorBlock extends Component {
 
 	render() {
 		const { block, multiSelectedBlockUids } = this.props;
-		const blockType = getBlockType( block.name );
+		const { name: blockName, isValid } = block;
+		const blockType = getBlockType( blockName );
 		// translators: %s: Type of block (i.e. Text, Image etc)
 		const blockLabel = sprintf( __( 'Block: %s' ), blockType.title );
-		const { className = getBlockDefaultClassname( block.name ) } = blockType;
 		// The block as rendered in the editor is composed of general block UI
 		// (mover, toolbar, wrapper) and the display of the block content, which
 		// is referred to as <BlockEdit />.
@@ -327,6 +328,7 @@ class VisualEditorBlock extends Component {
 		const showUI = isSelected && ( ! this.props.isTyping || focus.collapsed === false );
 		const { showMobileControls } = this.state;
 		const wrapperClassname = classnames( 'editor-visual-editor__block', {
+			'is-invalid': ! isValid,
 			'is-selected': showUI,
 			'is-multi-selected': isMultiSelected,
 			'is-hovered': isHovered,
@@ -340,6 +342,10 @@ class VisualEditorBlock extends Component {
 		if ( blockType.getEditWrapperProps ) {
 			wrapperProps = blockType.getEditWrapperProps( block.attributes );
 		}
+
+		// Generate a class name for the block's editable form
+		let { className = getBlockDefaultClassname( block.name ) } = blockType;
+		className = classnames( className, block.attributes.className );
 
 		// Disable reason: Each block can be selected by clicking on it
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
@@ -360,7 +366,7 @@ class VisualEditorBlock extends Component {
 			>
 				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
 				{ ( showUI || isHovered ) && <BlockRightMenu uid={ block.uid } /> }
-				{ showUI &&
+				{ showUI && isValid &&
 					<CSSTransitionGroup
 						transitionName={ { appear: 'is-appearing', appearActive: 'is-appearing-active' } }
 						transitionAppear={ true }
@@ -394,18 +400,28 @@ class VisualEditorBlock extends Component {
 					onDragStart={ ( event ) => event.preventDefault() }
 					onMouseDown={ this.onPointerDown }
 					onTouchStart={ this.onPointerDown }
+					className="editor-visual-editor__block-edit"
 				>
-					<BlockEdit
-						focus={ focus }
-						attributes={ block.attributes }
-						setAttributes={ this.setAttributes }
-						insertBlocksAfter={ onInsertBlocksAfter }
-						setFocus={ partial( onFocus, block.uid ) }
-						mergeBlocks={ this.mergeBlocks }
-						className={ classnames( className, block.attributes.className ) }
-						id={ block.uid }
-					/>
+					{ isValid && (
+						<BlockEdit
+							focus={ focus }
+							attributes={ block.attributes }
+							setAttributes={ this.setAttributes }
+							insertBlocksAfter={ onInsertBlocksAfter }
+							setFocus={ partial( onFocus, block.uid ) }
+							mergeBlocks={ this.mergeBlocks }
+							className={ className }
+							id={ block.uid }
+						/>
+					) }
+					{ ! isValid && (
+						blockType.save( {
+							attributes: block.attributes,
+							className,
+						} )
+					) }
 				</div>
+				{ ! isValid && <InvalidBlockWarning /> }
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */

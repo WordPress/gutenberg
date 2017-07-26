@@ -10,6 +10,7 @@ import { text } from '../query';
 import {
 	getBlockAttributes,
 	parseBlockAttributes,
+	isValidBlock,
 	createBlockWithFallback,
 	default as parse,
 } from '../parser';
@@ -17,11 +18,14 @@ import {
 	registerBlockType,
 	unregisterBlockType,
 	getBlockTypes,
+	getBlockType,
 	setUnknownTypeHandler,
 } from '../registration';
 
 describe( 'block parser', () => {
-	const defaultBlockSettings = { save: noop };
+	const defaultBlockSettings = {
+		save: ( { attributes } ) => attributes.fruit,
+	};
 
 	afterEach( () => {
 		setUnknownTypeHandler( undefined );
@@ -86,6 +90,28 @@ describe( 'block parser', () => {
 				topic: 'none',
 				content: 'Ribs & Chicken',
 			} );
+		} );
+	} );
+
+	describe( 'isValidBlock()', () => {
+		it( 'returns false is block is not valid', () => {
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+
+			expect( isValidBlock(
+				'Apples',
+				getBlockType( 'core/test-block' ),
+				{ fruit: 'Bananas' }
+			) ).toBe( false );
+		} );
+
+		it( 'returns true is block is valid', () => {
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+
+			expect( isValidBlock(
+				'Bananas',
+				getBlockType( 'core/test-block' ),
+				{ fruit: 'Bananas' }
+			) ).toBe( true );
 		} );
 	} );
 

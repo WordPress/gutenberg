@@ -7,23 +7,23 @@ window._wpGutenbergPost.title = {
 
 window._wpGutenbergPost.content = {
 	raw: [
-		'<!-- wp:core/cover-image { "url": "https://cldup.com/GCwahb3aOb.jpg", "align": "full", "hasParallax": true } -->',
-		'<section className="cover-image wp-block-cover-image" style={ { backgroundImage: \'url("https://cldup.com/GCwahb3aOb.jpg");\' } }><h2>Of mountains & printing presses</h2></section>',
+		'<!-- wp:core/cover-image {"url":"https://cldup.com/GCwahb3aOb.jpg","align":"full","hasParallax":true} -->',
+		'<section class="wp-block-cover-image cover-image" style="background-image: url(https://cldup.com/GCwahb3aOb.jpg);"><h2>Of mountains &amp; printing presses</h2></section>',
 		'<!-- /wp:core/cover-image -->',
 
 		'<!-- more Keep on reading! -->',
 		'<!-- noteaser -->',
 
-		'<!-- wp:core/text { "project": { "name": "gutenberg", "for": "WordPress" }, "isAwesome": true } -->',
-		'<p>The goal of this new editor is to make adding rich content to WordPress simple and enjoyable. This whole post is composed of <em>pieces of content</em>—somewhat similar to LEGO bricks—that you can move around and interact with. Move your cursor around and you\'ll notice the different blocks light up with outlines and arrows. Press the arrows to reposition blocks quickly, without fearing about losing things in the process of copying and pasting.</p>',
+		'<!-- wp:core/text -->',
+		'<p>The goal of this new editor is to make adding rich content to WordPress simple and enjoyable. This whole post is composed of <em>pieces of content</em>—somewhat similar to LEGO bricks—that you can move around and interact with. Move your cursor around and you&#x27;ll notice the different blocks light up with outlines and arrows. Press the arrows to reposition blocks quickly, without fearing about losing things in the process of copying and pasting.</p>',
 		'<!-- /wp:core/text -->',
 
 		'<!-- wp:core/text -->',
 		'<p>What you are reading now is a <strong>text block</strong>, the most basic block of all. The text block has its own controls to be moved freely around the post...</p>',
 		'<!-- /wp:core/text -->',
 
-		'<!-- wp:core/text { "align": "right" } -->',
-		'<p style="text-align:right;">... like this one, which is right aligned.</p>',
+		'<!-- wp:core/text {"align":"right"} -->',
+		'<p style="text-align:right">... like this one, which is right aligned.</p>',
 		'<!-- /wp:core/text -->',
 
 		'<!-- wp:core/more /-->',
@@ -37,15 +37,15 @@ window._wpGutenbergPost.content = {
 		'<!-- /wp:core/heading -->',
 
 		'<!-- wp:core/text -->',
-		'<p>Handling images and media with the utmost care is a primary focus of the new editor. Hopefully, you\'ll find aspects of adding captions or going full-width with your pictures much easier and robust than before.</p>',
+		'<p>Handling images and media with the utmost care is a primary focus of the new editor. Hopefully, you&#x27;ll find aspects of adding captions or going full-width with your pictures much easier and robust than before.</p>',
 		'<!-- /wp:core/text -->',
 
-		'<!-- wp:core/image { "align": "center" } -->',
-		'<figure class="wp-block-image"><img alt="Beautiful landscape" src="https://cldup.com/YLYhpou2oq.jpg" class="aligncenter"/><figcaption>Give it a try. Press the &quot;really wide&quot; button on the image toolbar.</figcaption></figure>',
+		'<!-- wp:core/image {"align":"center"} -->',
+		'<figure class="wp-block-image aligncenter"><img src="https://cldup.com/YLYhpou2oq.jpg" alt="Beautiful landscape" /><figcaption>Give it a try. Press the &quot;really wide&quot; button on the image toolbar.</figcaption></figure>',
 		'<!-- /wp:core/image -->',
 
 		'<!-- wp:core/text -->',
-		'<p>Try selecting and removing or editing the caption, now you don\'t have to be careful about selecting the image or other text by mistake and ruining the presentation.</p>',
+		'<p>Try selecting and removing or editing the caption, now you don&#x27;t have to be careful about selecting the image or other text by mistake and ruining the presentation.</p>',
 		'<!-- /wp:core/text -->',
 
 		'<!-- wp:core/heading -->',
@@ -53,15 +53,15 @@ window._wpGutenbergPost.content = {
 		'<!-- /wp:core/heading -->',
 
 		'<!-- wp:core/text -->',
-		'<p>Imagine everything that WordPress can do is available to you quickly and in the same place on the interface. No need to figure out HTML tags, classes, or remember complicated shortcode syntax. That\'s the spirit behind the inserter—the <code>(+)</code> button you\'ll see around the editor—which allows you to browse all available content blocks and insert them into your post. Plugins and themes are able to register their own, opening up all sort of possibilities for rich editing and publishing.</p>',
+		'<p>Imagine everything that WordPress can do is available to you quickly and in the same place on the interface. No need to figure out HTML tags, classes, or remember complicated shortcode syntax. That&#x27;s the spirit behind the inserter—the <code>(+)</code> button you&#x27;ll see around the editor—which allows you to browse all available content blocks and insert them into your post. Plugins and themes are able to register their own, opening up all sort of possibilities for rich editing and publishing.</p>',
 		'<!-- /wp:core/text -->',
 
 		'<!-- wp:core/text -->',
-		'<p>Go give it a try, you may discover things WordPress can already insert into your posts that you didn\'t know about. Here\'s a short list of what you can currently find there:</p>',
+		'<p>Go give it a try, you may discover things WordPress can already insert into your posts that you didn&#x27;t know about. Here&#x27;s a short list of what you can currently find there:</p>',
 		'<!-- /wp:core/text -->',
 
 		'<!-- wp:core/list -->',
-		'<ul><li>Text & Headings</li><li>Images & Videos</li><li>Galleries</li><li>Embeds, like YouTube, Tweets, or other WordPress posts.</li><li>Layout blocks, like Buttons, Hero Images, Separators, etc.</li><li>And <em>Lists</em> like this one of course :)</li></ul>',
+		'<ul><li>Text &amp; Headings</li><li>Images &amp; Videos</li><li>Galleries</li><li>Embeds, like YouTube, Tweets, or other WordPress posts.</li><li>Layout blocks, like Buttons, Hero Images, Separators, etc.</li><li>And <em>Lists</em> like this one of course :)</li></ul>',
 		'<!-- /wp:core/list -->',
 
 		'<!-- wp:core/text -->',
@@ -69,7 +69,7 @@ window._wpGutenbergPost.content = {
 		'<!-- /wp:core/text -->',
 
 		'<!-- wp:core/button { "align": "center" } -->',
-		'<div class="aligncenter wp-block-button"><a href="https://github.com/WordPress/gutenberg"><span>Help build Gutenberg</span></a></div>',
+		'<div class="wp-block-button aligncenter"><a href="https://github.com/WordPress/gutenberg"><span>Help build Gutenberg</span></a></div>',
 		'<!-- /wp:core/button -->',
 
 		'<!-- wp:core/separator -->',
@@ -84,20 +84,20 @@ window._wpGutenbergPost.content = {
 		'<p>A huge benefit of blocks is that you can edit them in place and manipulate your content directly. Instead of having fields for editing things like the source of a quote, or the text of a button, you can directly change the content. Try editing the following quote:</p>',
 		'<!-- /wp:core/text -->',
 
-		'<!-- wp:core/quote { "style": 1 } -->',
-		'<blockquote class="blocks-quote-style-1 wp-block-quote"><p>The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.</p><footer>Matt Mullenweg, 2017</footer></blockquote>',
+		'<!-- wp:core/quote {"style":1} -->',
+		'<blockquote class="wp-block-quote blocks-quote-style-1"><p>The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.</p><footer>Matt Mullenweg, 2017</footer></blockquote>',
 		'<!-- /wp:core/quote -->',
 
 		'<!-- wp:core/text -->',
-		'<p>The information corresponding to the source of the quote is a separate text field, similar to captions under images, so the structure of the quote is protected even if you select, modify, or remove the source. It\'s always easy to add it back.</p>',
+		'<p>The information corresponding to the source of the quote is a separate text field, similar to captions under images, so the structure of the quote is protected even if you select, modify, or remove the source. It&#x27;s always easy to add it back.</p>',
 		'<!-- /wp:core/text -->',
 
 		'<!-- wp:core/text -->',
 		'<p>Blocks can be anything you need. For instance, you may want to insert a subdued quote as part of the composition of your text, or you may prefer to display a giant stylized one. All of these options are available in the inserter.</p>',
 		'<!-- /wp:core/text -->',
 
-		'<!-- wp:core/quote { "style": 2 } -->',
-		'<blockquote class="blocks-quote-style-2 wp-block-quote"><p>There is no greater agony than bearing an untold story inside you.</p><footer>Maya Angelou</footer></blockquote>',
+		'<!-- wp:core/quote {"style":2} -->',
+		'<blockquote class="wp-block-quote blocks-quote-style-2"><p>There is no greater agony than bearing an untold story inside you.</p><footer>Maya Angelou</footer></blockquote>',
 		'<!-- /wp:core/quote -->',
 
 		'<!-- wp:core/separator -->',
@@ -112,8 +112,8 @@ window._wpGutenbergPost.content = {
 		'<p>Ea veniam homero eam. Ex inimicus molestiae cum, debet scaevola at eos. Vis assum veritus ut, has ea nostrud accusata, offendit appareat comprehensam ea pro. Ad quo quem veritus appellantur, te est quas phaedrum, eum alia habeo ad. Ei est erroribus imperdiet, omnis dicam propriae sed no. His vitae oratio fierent ne, cu duo tota eligendi, electram rationibus in qui.</p>',
 		'<!-- /wp:core/text -->',
 
-		'<!-- wp:core/image { "align": "wide" } -->',
-		'<figure class="wp-block-image"><img alt="Accessibility is important don\'t forget image alt attribute" src="https://cldup.com/uuUqE_dXzy.jpg" /></figure>',
+		'<!-- wp:core/image {"align":"wide"} -->',
+		'<figure class="wp-block-image alignwide"><img src="https://cldup.com/uuUqE_dXzy.jpg" alt="Accessibility is important don&#x27;t forget image alt attribute" /></figure>',
 		'<!-- /wp:core/image -->',
 
 		'<!-- wp:core/text -->',
@@ -128,17 +128,18 @@ window._wpGutenbergPost.content = {
 		'<pre class="wp-block-code"><code>export default function MyButton() {\n\
 return &lt;Button&gt;Click Me!&lt;/Button&gt;;\n\
 }</code></pre>',
+
 		'<!-- /wp:core/code -->',
 
 		'<!-- wp:core/gallery {"align":"wide","images":[{"url":"https://cldup.com/GCwahb3aOb.jpg","alt":""},{"url":"https://cldup.com/lUUQPv6w9c.jpg","alt":""}]} -->',
-		'<div class="blocks-gallery alignwide columns-2 wp-block-gallery">',
+		'<div class="wp-block-gallery alignwide columns-2 is-cropped">',
 		'<figure class="blocks-gallery-image"><img src="https://cldup.com/GCwahb3aOb.jpg" alt="" /></figure>',
 		'<figure class="blocks-gallery-image"><img src="https://cldup.com/lUUQPv6w9c.jpg" alt="" /></figure>',
 		'</div>',
 		'<!-- /wp:core/gallery -->',
 
 		'<!-- wp:core/preformatted -->',
-		'<pre class="wp-block-preformatted">An old silent pond...<br>A frog jumps into the pond,<br>splash! Silence again.</pre>',
+		'<pre class="wp-block-preformatted">An old silent pond...<br/>A frog jumps into the pond,<br/>splash! Silence again.</pre>',
 		'<!-- /wp:core/preformatted -->',
 
 		'<!-- wp:core/text -->',
@@ -154,7 +155,7 @@ return &lt;Button&gt;Click Me!&lt;/Button&gt;;\n\
 		'<!-- /wp:core/list -->',
 
 		'<!-- wp:core/pullquote -->',
-		'<blockquote class="blocks-pullquote wp-block-pullquote"><p>Code is Poetry</p><footer>The WordPress community</footer></blockquote>',
+		'<blockquote class="wp-block-pullquote alignnone"><p>Code is Poetry</p><footer>The WordPress community</footer></blockquote>',
 		'<!-- /wp:core/pullquote -->',
 
 		'<!-- wp:core/separator -->',
@@ -170,16 +171,16 @@ return &lt;Button&gt;Click Me!&lt;/Button&gt;;\n\
 		'<h2>All that you can embed!</h2>',
 		'<!-- /wp:core/heading -->',
 
-		'<!-- wp:core/embed { "url": "https://www.youtube.com/watch?v=Nl6U7UotA-M" } -->',
-		'<figure class="wp-block-embed">https://www.youtube.com/watch?v=Nl6U7UotA-M<figcaption>State of the Word 2016</figcaption></figure>',
+		'<!-- wp:core/embed {"url":"https://www.youtube.com/watch?v=Nl6U7UotA-M"} -->',
+		'<figure class="wp-block-embed">\nhttps://www.youtube.com/watch?v=Nl6U7UotA-M\n<figcaption>State of the Word 2016</figcaption></figure>',
 		'<!-- /wp:core/embed -->',
 
-		'<!-- wp:core/embed { "url": "https://twitter.com/photomatt/status/868657763970404352" } -->',
-		'https://twitter.com/photomatt/status/868657763970404352',
+		'<!-- wp:core/embed {"url":"https://twitter.com/photomatt/status/868657763970404352"} -->',
+		'<figure class="wp-block-embed">\nhttps://twitter.com/photomatt/status/868657763970404352\n</figure>',
 		'<!-- /wp:core/embed -->',
 
-		'<!-- wp:core/embed { "url": "https://make.wordpress.org/core/2017/01/17/editor-technical-overview/" } -->',
-		'https://make.wordpress.org/core/2017/01/17/editor-technical-overview/',
+		'<!-- wp:core/embed {"url":"https://make.wordpress.org/core/2017/01/17/editor-technical-overview/"} -->',
+		'<figure class="wp-block-embed">\nhttps://make.wordpress.org/core/2017/01/17/editor-technical-overview/\n</figure>',
 		'<!-- /wp:core/embed -->',
 
 	].join( '' ),

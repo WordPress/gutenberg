@@ -6,13 +6,26 @@ import { createElement, Component } from 'element';
 /**
  * Internal dependencies
  */
-import serialize, { getCommentAttributes, getSaveContent, serializeAttributes } from '../serializer';
+import serialize, {
+	getCommentAttributes,
+	getBeautifulContent,
+	getSaveContent,
+	serializeAttributes,
+} from '../serializer';
 import { getBlockTypes, registerBlockType, unregisterBlockType } from '../registration';
 
 describe( 'block serializer', () => {
 	afterEach( () => {
 		getBlockTypes().forEach( block => {
 			unregisterBlockType( block.name );
+		} );
+	} );
+
+	describe( 'getBeautifulContent()', () => {
+		it( 'returns beautiful content', () => {
+			const content = getBeautifulContent( '<div><div>Beautiful</div></div>' );
+
+			expect( content ).toBe( '<div>\n    <div>Beautiful</div>\n</div>' );
 		} );
 	} );
 
@@ -185,6 +198,7 @@ describe( 'block serializer', () => {
 						content: 'Ribs & Chicken',
 						stuff: 'left & right -- but <not>',
 					},
+					isValid: true,
 				},
 			];
 			const expectedPostContent = '<!-- wp:core/test-block {"stuff":"left \\u0026 right \\u002d\\u002d but \\u003cnot\\u003e"} -->\n<p class="wp-block-test-block">Ribs & Chicken</p>\n<!-- /wp:core/test-block -->';

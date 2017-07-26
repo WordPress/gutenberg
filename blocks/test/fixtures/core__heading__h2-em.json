@@ -3,6 +3,7 @@
         "uid": "_uid_0",
         "name": "core/heading",
         "attributes": {
+            "nodeName": "H2",
             "content": [
                 "The ",
                 {
@@ -10,8 +11,8 @@
                     "children": "Inserter"
                 },
                 " Tool"
-            ],
-            "nodeName": "H2"
-        }
+            ]
+        },
+        "isValid": true
     }
 ]

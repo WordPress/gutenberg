@@ -4,6 +4,7 @@
         "name": "core/freeform",
         "attributes": {
             "content": "Testing freeform block with some\n<div class=\"wp-some-class\">\n\tHTML <span style=\"color: red;\">content</span>\n</div>"
-        }
+        },
+        "isValid": true
     }
 ]
