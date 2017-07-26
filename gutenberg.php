@@ -16,6 +16,8 @@ define( 'GUTENBERG_DEVELOPMENT_MODE', true );
 require_once dirname( __FILE__ ) . '/lib/init-checks.php';
 if ( gutenberg_can_init() ) {
 	// Load API functions, register scripts and actions, etc.
+	require_once dirname( __FILE__ ) . '/lib/class-wp-block-type.php';
+	require_once dirname( __FILE__ ) . '/lib/class-wp-block-type-registry.php';
 	require_once dirname( __FILE__ ) . '/lib/blocks.php';
 	require_once dirname( __FILE__ ) . '/lib/client-assets.php';
 	require_once dirname( __FILE__ ) . '/lib/compat.php';

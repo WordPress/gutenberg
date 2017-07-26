@@ -85,5 +85,5 @@ CONTENT;
 }
 
 register_block_type( 'core/latest-posts', array(
-	'render' => 'gutenberg_render_block_core_latest_posts',
+	'render_callback' => 'gutenberg_render_block_core_latest_posts',
 ) );
