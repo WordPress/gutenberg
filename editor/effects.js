@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, uniqueId } from 'lodash';
+import { get, uniqueId, debounce } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -14,12 +14,25 @@ import { __ } from 'i18n';
  * Internal dependencies
  */
 import { getGutenbergURL, getWPAdminURL } from './utils/url';
-import { focusBlock, replaceBlocks, createSuccessNotice, createErrorNotice } from './actions';
+import {
+	focusBlock,
+	replaceBlocks,
+	createSuccessNotice,
+	createErrorNotice,
+	autosave,
+	queueAutosave,
+	savePost,
+	editPost,
+} from './actions';
 import {
 	getCurrentPost,
 	getCurrentPostType,
 	getBlocks,
 	getPostEdits,
+	isCurrentPostPublished,
+	isEditedPostDirty,
+	isEditedPostNew,
+	isEditedPostSaveable,
 } from './selectors';
 
 export default {
@@ -207,4 +220,38 @@ export default {
 			]
 		) );
 	},
+	AUTOSAVE( action, store ) {
+		const { getState, dispatch } = store;
+		const state = getState();
+		if ( ! isEditedPostSaveable( state ) || ! isEditedPostDirty( state ) ) {
+			return;
+		}
+
+		if ( isCurrentPostPublished( state ) ) {
+			// TODO: Publish autosave.
+			//  - Autosaves are created as revisions for published posts, but
+			//    the necessary REST API behavior does not yet exist
+			//  - May need to check for whether the status of the edited post
+			//    has changed from the saved copy (i.e. published -> pending)
+			return;
+		}
+
+		// Change status from auto-draft to draft
+		if ( isEditedPostNew( state ) ) {
+			dispatch( editPost( { status: 'draft' } ) );
+		}
+
+		dispatch( savePost() );
+	},
+	QUEUE_AUTOSAVE: debounce( ( action, store ) => {
+		store.dispatch( autosave() );
+	}, 10000 ),
+	UPDATE_BLOCK_ATTRIBUTES: () => queueAutosave(),
+	INSERT_BLOCKS: () => queueAutosave(),
+	MOVE_BLOCKS_DOWN: () => queueAutosave(),
+	MOVE_BLOCKS_UP: () => queueAutosave(),
+	REPLACE_BLOCKS: () => queueAutosave(),
+	REMOVE_BLOCKS: () => queueAutosave(),
+	EDIT_POST: () => queueAutosave(),
+	MARK_DIRTY: () => queueAutosave(),
 };
