@@ -112,7 +112,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 			render() {
 				const { html, type, error, fetching } = this.state;
 				const { align, url, caption } = this.props.attributes;
-				const { setAttributes, focus, setFocus } = this.props;
+				const { setAttributes, focus, setFocus, settings } = this.props;
 				const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 
 				const controls = (
@@ -121,7 +121,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 							<BlockAlignmentToolbar
 								value={ align }
 								onChange={ updateAlignment }
-								controls={ [ 'left', 'center', 'right', 'wide', 'full' ] }
+								controls={ [ 'left', 'center', 'right' ].concat( settings.wideImages ? [ 'wide', 'full' ] : [] ) }
 							/>
 						</BlockControls>
 					)

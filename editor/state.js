@@ -240,7 +240,7 @@ export const userData = combineReducers( {
 	recentlyUsedBlocks( state = [], action ) {
 		const maxRecent = 8;
 		switch ( action.type ) {
-			case 'LOAD_USER_DATA':
+			case 'SETUP_EDITOR':
 				// This is where we initially populate the recently used blocks,
 				// for now this inserts blocks from the common category, but will
 				// load this from an API in the future.
@@ -529,6 +529,15 @@ export function notices( state = {}, action ) {
 	return state;
 }
 
+export function settings( state = {}, action ) {
+	switch ( action.type ) {
+		case 'SETUP_EDITOR':
+			return action.settings;
+	}
+
+	return state;
+}
+
 /**
  * Creates a new instance of a Redux store.
  *
@@ -549,6 +558,7 @@ export function createReduxStore() {
 		saving,
 		notices,
 		userData,
+		settings,
 	} ) );
 
 	const enhancers = [ applyMiddleware( refx( effects ) ) ];
