@@ -2,11 +2,18 @@
     {
         "uid": "_uid_0",
         "name": "core/pullquote",
+        "isValid": true,
         "attributes": {
             "value": [
                 {
                     "type": "p",
-                    "children": "Paragraph one"
+                    "children": [
+                        "Paragraph ",
+                        {
+                            "type": "strong",
+                            "children": "one"
+                        }
+                    ]
                 },
                 {
                     "type": "p",
@@ -14,7 +21,7 @@
                 }
             ],
             "citation": [
-                "by whoever"
+                "by whomever"
             ]
         }
     }
