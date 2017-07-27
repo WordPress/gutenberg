@@ -89,6 +89,14 @@ if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; t
     pear channel-discover pear.symfony-project.com
     pear install pear.symfony-project.com/YAML-1.0.2
 
+    # manually go back to the system php, we can't use `phpbrew switch-off`
+    # because we're running a version of php that phpbrew doesn't work with at this point
+    unset PHPBREW_PHP
+    unset PHPBREW_PATH
+    eval `$BIN env`
+    __phpbrew_set_path
+    __phpbrew_reinit
+
     # clean up build directory
     rm -rf $HOME/.phpbrew/build/*
   fi
@@ -101,14 +109,9 @@ if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; t
   source $HOME/.phpbrew/bashrc
 
   if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]]; then
-    # only switch if we're not already switched, or else phpbrew crashes
-    if [[ -z "$PHPBREW_PHP" ]]; then
-      phpbrew use 5.2.17
-    fi
+    phpbrew use 5.2.17
   else
-    if [[ -z "$PHPBREW_PHP" ]]; then
-      phpbrew use 5.3.29
-    fi
+    phpbrew use 5.3.29
   fi
 
 elif [[ ${TRAVIS_PHP_VERSION:0:2} == "5." ]]; then
