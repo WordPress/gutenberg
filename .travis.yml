@@ -41,6 +41,7 @@ before_script:
 
         # php and phpunit installs should be cached, only build if they're not there.
         if [ ! -f $HOME/.phpbrew/bashrc ]; then
+          set -ex
           # install build dependencies for building php (yes, for phpbrew, php is a dependency)
           sudo apt-get install -y php5-dev autoconf automake curl libcurl3-openssl-dev build-essential \
           libxslt1-dev re2c libxml2-dev php5-cli bison libbz2-dev libreadline-dev libfreetype6-dev \
@@ -59,6 +60,7 @@ before_script:
 
           # build PHP and install PHPUnit
           if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]]; then
+            echo "Building for 5.2"
             # PHP5.2 requires a patch to compile, so download it
             cd $HOME
             mkdir patches
@@ -108,6 +110,7 @@ before_script:
             pear install pear.symfony-project.com/YAML-1.0.2
 
           else
+            echo "Building for 5.3"
             # build PHP5.3
             $HOME/bin/phpbrew install --patch patches/node.patch 5.3 +default +mysql=shared +pdo \
             +gettext +phar +openssl=shared -- --with-openssl-dir=/usr/include/openssl
