@@ -29,6 +29,7 @@ if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; t
   chmod +x $HOME/php-utils-bin/phpbrew
 
   # symlink to phpunit3.6 in the ph5.2 installation
+  PHP52_PATH=$HOME/.phpbrew/php/php-5.2.17
   ln -s ${PHP52_PATH}/lib/php/phpunit/phpunit.php $HOME/php-utils-bin/phpunit-3.6
 
   # install phpunit4.8
@@ -58,7 +59,6 @@ if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; t
       # install PHPUnit 3.6. The only install method available is from source, using git branches old
       # enough that they don't rely on any PHP5.3+ features. This clones each needed dependency
       # and then we add the paths to the include_path by setting up an extra .ini file
-      PHP52_PATH=$HOME/.phpbrew/php/php-5.2.17
       cd ${PHP52_PATH}/lib/php
 
       # dependencies
