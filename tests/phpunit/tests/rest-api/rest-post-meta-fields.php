@@ -393,6 +393,8 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 		$response = $this->server->dispatch( $request );
 		remove_filter( 'query', array( $this, 'error_insert_query' ) );
 		$wpdb->show_errors = true;
+
+		$this->assertErrorResponse( 'rest_meta_database_error', $response, 500 );
 	}
 
 	public function test_set_value_invalid_type() {

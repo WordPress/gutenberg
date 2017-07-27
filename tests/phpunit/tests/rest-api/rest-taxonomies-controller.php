@@ -111,14 +111,23 @@ class WP_Test_REST_Taxonomies_Controller extends WP_Test_REST_Controller_Testcas
 
 	public function test_create_item() {
 		/** Taxonomies can't be created **/
+		$request = new WP_REST_Request( 'POST', '/wp/v2/taxonomies' );
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 404, $response->get_status() );
 	}
 
 	public function test_update_item() {
 		/** Taxonomies can't be updated **/
+		$request = new WP_REST_Request( 'POST', '/wp/v2/taxonomies/category' );
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 404, $response->get_status() );
 	}
 
 	public function test_delete_item() {
 		/** Taxonomies can't be deleted **/
+		$request = new WP_REST_Request( 'DELETE', '/wp/v2/taxonomies/category' );
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 404, $response->get_status() );
 	}
 
 	public function test_prepare_item() {

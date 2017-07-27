@@ -101,14 +101,23 @@ class WP_Test_REST_Post_Statuses_Controller extends WP_Test_REST_Controller_Test
 
 	public function test_create_item() {
 		/** Post statuses can't be created **/
+		$request = new WP_REST_Request( 'POST', '/wp/v2/statuses' );
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 404, $response->get_status() );
 	}
 
 	public function test_update_item() {
 		/** Post statuses can't be updated **/
+		$request = new WP_REST_Request( 'POST', '/wp/v2/statuses/draft' );
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 404, $response->get_status() );
 	}
 
 	public function test_delete_item() {
 		/** Post statuses can't be deleted **/
+		$request = new WP_REST_Request( 'DELETE', '/wp/v2/statuses/draft' );
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 404, $response->get_status() );
 	}
 
 	public function test_prepare_item() {
