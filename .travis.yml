@@ -47,6 +47,7 @@ before_script:
 
         # php and phpunit installs should be cached, only build if they're not there.
         if [ ! -f $PHPBREW_BUILT_CHECK ]; then
+          ORIG_DIR=`pwd`
           # install build dependencies for building php (yes, for phpbrew, php is a dependency)
           sudo apt-get install -y php5-dev autoconf automake curl libcurl3-openssl-dev build-essential \
           libxslt1-dev re2c libxml2-dev php5-cli bison libbz2-dev libreadline-dev libfreetype6-dev \
@@ -54,14 +55,14 @@ before_script:
           libicu-dev libmhash-dev libmcrypt-dev libmysqlclient-dev libmysqld-dev git
 
           # install phpbrew for this user
-          mkdir $HOME/bin
-          cd $HOME/bin
+          mkdir $HOME/php-utils-bin
+          cd $HOME/php-utils-bin
           curl -L -O https://github.com/phpbrew/phpbrew/raw/master/phpbrew
           chmod +x phpbrew
 
           # init with known --old to get 5.2 and 5.3
-          $HOME/bin/phpbrew init
-          $HOME/bin/phpbrew known --old
+          $HOME/php-utils-bin/phpbrew init
+          $HOME/php-utils-bin/phpbrew known --old
 
           # build PHP and install PHPUnit
           if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]]; then
@@ -73,7 +74,7 @@ before_script:
             # build PHP5.2
             tail -F $HOME/.phpbrew/build/php-5.2.17/build.log &
             TAIL_PID=$!
-            $HOME/bin/phpbrew install --patch patches/node.patch 5.2 +default +mysql=shared +pdo \
+            $HOME/php-utils-bin/phpbrew install --patch patches/node.patch 5.2 +default +mysql=shared +pdo \
             +gettext +phar +openssl=shared -- --with-openssl-dir=/usr/include/openssl --enable-spl
             kill -TERM $TAIL_PID
 
@@ -107,8 +108,8 @@ before_script:
             mkdir -p $HOME/.phpbrew/php/php-5.2.17/var/db
             echo "include_path=.:${PHP52_PATH}/lib/php:${PHP52_PATH}/lib/php/dbunit:${PHP52_PATH}/lib/php/php-code-coverage:${PHP52_PATH}/lib/php/php-file-iterator:${PHP52_PATH}/lib/php/php-invoker:${PHP52_PATH}/lib/php/php-text-template:${PHP52_PATH}/lib/php/php-timer:${PHP52_PATH}/lib/php/php-token-stream:${PHP52_PATH}/lib/php/phpunit-mock-objects:${PHP52_PATH}/lib/php/phpunit-selenium:${PHP52_PATH}/lib/php/phpunit-story:${PHP52_PATH}/lib/php/phpunit" > ${PHP52_PATH}/var/db/path.ini
 
-            # symlink from $HOME/bin to phpunit.php with the right version number. 'phpunit' will be aliased to this.
-            ln -s ${PHP52_PATH}/lib/php/phpunit/phpunit.php $HOME/bin/phpunit-3.6
+            # symlink from $HOME/php-utils-bin to phpunit.php with the right version number. 'phpunit' will be aliased to this.
+            ln -s ${PHP52_PATH}/lib/php/phpunit/phpunit.php $HOME/php-utils-bin/phpunit-3.6
 
             # one more PHPUnit dependency that we need to install using pear under PHP5.2
             cd $HOME
@@ -122,11 +123,11 @@ before_script:
             # build PHP5.3
             tail -F $HOME/.phpbrew/build/php-5.3.29/build.log &
             TAIL_PID=$!
-            $HOME/bin/phpbrew install --patch patches/node.patch 5.3 +default +mysql=shared +pdo \
+            $HOME/php-utils-bin/phpbrew install --patch patches/node.patch 5.3 +default +mysql=shared +pdo \
             +gettext +phar +openssl=shared -- --with-openssl-dir=/usr/include/openssl
             kill -TERM $TAIL_PID
-            curl -L -o $HOME/bin/phpunit-4.8 https://phar.phpunit.de/phpunit-4.8.9.phar
-            chmod +x $HOME/bin/phpunit-4.8
+            curl -L -o $HOME/php-utils-bin/phpunit-4.8 https://phar.phpunit.de/phpunit-4.8.9.phar
+            chmod +x $HOME/php-utils-bin/phpunit-4.8
           fi
         fi
 
@@ -143,13 +144,14 @@ before_script:
           if [[ -z "$PHPBREW_PHP" ]]; then
             phpbrew use 5.2.17
           fi
-          alias phpunit=$HOME/bin/phpunit-3.6
+          alias phpunit=$HOME/php-utils-bin/phpunit-3.6
         else
           if [[ -z "$PHPBREW_PHP" ]]; then
             phpbrew use 5.3.29
           fi
-          alias phpunit=$HOME/bin/phpunit-4.8
+          alias phpunit=$HOME/php-utils-bin/phpunit-4.8
         fi
+        cd $ORIG_DIR
       elif [[ ${TRAVIS_PHP_VERSION:0:2} == "5." ]]; then
         # all other PHP 5.x versions
         mkdir -p $HOME/phpunit-bin
