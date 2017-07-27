@@ -66,7 +66,7 @@ describe( 'InserterMenu', () => {
 		registerBlockType( youtubeBlock.name, youtubeBlock );
 	} );
 
-	it( 'Should show the recent tab by default', () => {
+	it( 'should show the recent tab by default', () => {
 		const wrapper = shallow(
 			<InserterMenu
 				instanceId={ 1 }
@@ -80,7 +80,7 @@ describe( 'InserterMenu', () => {
 		expect( visibleBlocks.length ).toBe( 0 );
 	} );
 
-	it( 'Should show the recently used blocks in the recent tab', () => {
+	it( 'should show the recently used blocks in the recent tab', () => {
 		const wrapper = shallow(
 			<InserterMenu
 				instanceId={ 1 }
@@ -94,7 +94,7 @@ describe( 'InserterMenu', () => {
 		expect( visibleBlocks.childAt( 1 ).text() ).toBe( 'Advanced Text' );
 	} );
 
-	it( 'The embed tab should show blocks from the embed category', () => {
+	it( 'should show blocks from the embed category in the embed tab', () => {
 		const wrapper = shallow(
 			<InserterMenu
 				instanceId={ 1 }
@@ -112,7 +112,7 @@ describe( 'InserterMenu', () => {
 		expect( visibleBlocks.childAt( 1 ).text() ).toBe( 'Youtube' );
 	} );
 
-	it( 'The blocks tab should show show all the blocks except the embeds', () => {
+	it( 'should show all blocks except embeds in the blocks tab', () => {
 		const wrapper = shallow(
 			<InserterMenu
 				instanceId={ 1 }
@@ -129,7 +129,7 @@ describe( 'InserterMenu', () => {
 		expect( visibleBlocks.length ).toBe( 3 );
 	} );
 
-	it( 'Should disable the block allowed to be used only once', () => {
+	it( 'should disable already used blocks with `usedOnce`', () => {
 		const wrapper = shallow(
 			<InserterMenu
 				instanceId={ 1 }
