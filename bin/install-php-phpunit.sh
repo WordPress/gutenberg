@@ -93,9 +93,9 @@ if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; t
     # because we're running a version of php that phpbrew doesn't work with at this point
     unset PHPBREW_PHP
     unset PHPBREW_PATH
-    eval `$BIN env`
     __phpbrew_set_path
     __phpbrew_reinit
+    eval `$BIN env`
 
     # clean up build directory
     rm -rf $HOME/.phpbrew/build/*
