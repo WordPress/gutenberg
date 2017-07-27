@@ -176,6 +176,11 @@ before_script:
 
 script:
   - |
+    # confirm the php and phpunit versions we're running with in the test output
+    echo Versions in use:
+    php -v
+    phpunit --version
+    echo --------
     if [[ ! -z "$WP_VERSION" ]] ; then
       # Run the build because otherwise there will be a bunch of warnings about
       # failed `stat` calls from `filemtime()`.
