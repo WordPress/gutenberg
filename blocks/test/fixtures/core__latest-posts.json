@@ -3,6 +3,7 @@
         "uid": "_uid_0",
         "name": "core/latest-posts",
         "attributes": {
+            "columns": 3,
             "postsToShow": 5,
             "layout": "list",
             "displayPostDate": false
