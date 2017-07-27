@@ -143,7 +143,7 @@ registerBlockType( 'core/latest-posts', {
 							onChange={ ( nextAlign ) => {
 								setAttributes( { align: nextAlign } );
 							} }
-							controls={ [ 'left', 'center', 'right' ].concat( settings.wideImages ? [ 'wide', 'full' ] : [] ) }
+							wideControlsEnabled={ settings.wideImages }
 						/>
 						<Toolbar controls={ layoutControls } />
 					</BlockControls>

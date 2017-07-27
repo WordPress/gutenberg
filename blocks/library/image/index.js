@@ -79,7 +79,7 @@ registerBlockType( 'core/image', {
 					<BlockAlignmentToolbar
 						value={ align }
 						onChange={ updateAlignment }
-						controls={ [ 'left', 'center', 'right' ].concat( settings.wideImages ? [ 'wide', 'full' ] : [] ) }
+						wideControlsEnabled={ settings.wideImages }
 					/>
 
 					<Toolbar>
