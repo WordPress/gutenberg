@@ -1,4 +1,4 @@
-import { speak } from '../';
+import { setup, speak } from '../';
 
 jest.mock( '../clear', () => {
   return jest.fn();
@@ -52,6 +52,51 @@ describe( 'speak', () => {
       speak( 'polite message', 'polite' );
       expect( containerPolite.textContent ).toBe( 'polite message' );
       expect( containerAssertive.textContent ).toBe( '' );
+    } );
+  } );
+
+  describe( 'when somehow the assertive container is not present', () => {
+    beforeEach( () => {
+      document.getElementById( 'a11y-speak-assertive' ).remove();
+    } );
+
+    afterEach( () => {
+      setup();
+      containerAssertive = document.getElementById( 'a11y-speak-assertive' );
+    } );
+
+    it( 'should set the textcontent of the polite aria-live region', () => {
+      speak( 'message', 'assertive' );
+      expect( containerPolite.textContent ).toBe( 'message' );
+      expect( document.getElementById( 'a11y-speak-assertive' ) ).toBe( null );
+    } );
+  } );
+
+  describe( 'when somehow the both containers are not present', () => {
+    beforeEach( () => {
+      containerAssertive.remove();
+      containerPolite.remove();
+    } );
+
+    afterEach( () => {
+      setup();
+      containerPolite = document.getElementById( 'a11y-speak-polite' );
+      containerAssertive = document.getElementById( 'a11y-speak-assertive' );
+    } );
+
+    it( 'should set the textcontent of the polite aria-live region', () => {
+      expect( document.getElementById( 'a11y-speak-polite' ) ).toBe( null );
+      expect( document.getElementById( 'a11y-speak-assertive' ) ).toBe( null );
+    } );
+  } );
+
+  describe( 'setup when the elements already exist', () => {
+    it( 'should not create the aria live regions again', () => {
+      let before = document.getElementsByClassName( 'a11y-speak-region' ).length;
+      setup();
+      let after = document.getElementsByClassName( 'a11y-speak-region' ).length;
+
+      expect( before ).toBe( after );
     } );
   } );
 } );

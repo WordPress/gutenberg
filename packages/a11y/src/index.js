@@ -3,14 +3,12 @@ import clear from './clear';
 import domReady from '@wordpress/dom-ready';
 import filterMessage from './filterMessage';
 
-let containerPolite, containerAssertive = '';
-
 /**
  * Create the live regions.
  */
-const setup = function() {
-  containerPolite = document.getElementById( 'a11y-speak-polite' );
-  containerAssertive = document.getElementById( 'a11y-speak-assertive' );
+export const setup = function() {
+  let containerPolite = document.getElementById( 'a11y-speak-polite' );
+  let containerAssertive = document.getElementById( 'a11y-speak-assertive' );
 
   if ( containerPolite === null ) {
     containerPolite = addContainer( 'polite' );
@@ -37,6 +35,9 @@ export const speak = function( message, ariaLive ) {
   clear();
 
   message = filterMessage( message );
+
+  let containerPolite = document.getElementById( 'a11y-speak-polite' );
+  let containerAssertive = document.getElementById( 'a11y-speak-assertive' );
 
   if ( containerAssertive && 'assertive' === ariaLive ) {
     containerAssertive.textContent = message;
