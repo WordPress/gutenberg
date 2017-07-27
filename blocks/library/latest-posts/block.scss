@@ -12,9 +12,27 @@
 		list-style: none;
 
 		li {
-			flex-grow: 1;
 			margin: 0 16px 16px 0;
 		}
+	}
+
+	&.columns-1 li {
+		width: calc( ( 100% / 1 ) - 16px );
+	}
+	&.columns-2 li {
+		width: calc( ( 100% / 2 ) - 16px );
+	}
+	&.columns-3 li {
+		width: calc( ( 100% / 3 ) - 16px );
+	}
+	&.columns-4 li {
+		width: calc( ( 100% / 4 ) - 16px );
+	}
+	&.columns-5 li {
+		width: calc( ( 100% / 5 ) - 16px );
+	}
+	&.columns-6 li {
+		width: calc( ( 100% / 6 ) - 16px );
 	}
 }
 

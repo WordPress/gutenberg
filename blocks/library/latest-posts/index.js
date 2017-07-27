@@ -17,12 +17,14 @@ import { getLatestPosts } from './data.js';
 import InspectorControls from '../../inspector-controls';
 import TextControl from '../../inspector-controls/text-control';
 import ToggleControl from '../../inspector-controls/toggle-control';
+import RangeControl from '../../inspector-controls/range-control';
 import BlockDescription from '../../block-description';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
 const MIN_POSTS = 1;
 const MAX_POSTS = 100;
+const MAX_POSTS_COLUMNS = 6;
 
 registerBlockType( 'core/latest-posts', {
 	title: __( 'Latest Posts' ),
@@ -35,6 +37,7 @@ registerBlockType( 'core/latest-posts', {
 		postsToShow: 5,
 		displayPostDate: false,
 		layout: 'list',
+		columns: 3,
 	},
 
 	getEditWrapperProps( attributes ) {
@@ -116,7 +119,7 @@ registerBlockType( 'core/latest-posts', {
 			}
 
 			const { focus } = this.props;
-			const { displayPostDate, align, layout } = this.props.attributes;
+			const { displayPostDate, align, layout, columns } = this.props.attributes;
 			const layoutControls = [
 				{
 					icon: 'list-view',
@@ -151,12 +154,20 @@ registerBlockType( 'core/latest-posts', {
 							<p>{ __( 'Shows a list of your site\'s most recent posts.' ) }</p>
 						</BlockDescription>
 						<h3>{ __( 'Latest Posts Settings' ) }</h3>
-
 						<ToggleControl
 							label={ __( 'Display post date' ) }
 							checked={ displayPostDate }
 							onChange={ this.toggleDisplayPostDate }
 						/>
+						{ layout === 'grid' &&
+							<RangeControl
+								label={ __( 'Columns' ) }
+								value={ columns }
+								onChange={ ( event ) => setAttributes( { columns: event.target.value } ) }
+								min="2"
+								max={ Math.min( MAX_POSTS_COLUMNS, latestPosts.length ) }
+							/>
+						}
 						<TextControl
 							label={ __( 'Number of posts to show' ) }
 							type="number"
@@ -168,7 +179,7 @@ registerBlockType( 'core/latest-posts', {
 					</InspectorControls>
 				),
 				<ul
-					className={ classnames( this.props.className, {
+					className={ classnames( this.props.className, 'columns-' + columns, {
 						'is-grid': layout === 'grid',
 					} ) }
 					key="latest-posts"
