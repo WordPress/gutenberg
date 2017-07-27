@@ -34,6 +34,7 @@ matrix:
 before_script:
   - export PATH="$HOME/.composer/vendor/bin:$PATH"
   - |
+    ORIG_DIR=`pwd`
     if [[ ! -z "$WP_VERSION" ]] ; then
       bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
       if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; then
@@ -49,7 +50,7 @@ before_script:
 
         # php and phpunit installs should be cached, only build if they're not there.
         if [ ! -f $PHPBREW_BUILT_CHECK ]; then
-          ORIG_DIR=`pwd`
+          
           # install build dependencies for building php (yes, for phpbrew, php is a dependency)
           sudo apt-get install -y php5-dev autoconf automake curl libcurl3-openssl-dev build-essential \
           libxslt1-dev re2c libxml2-dev php5-cli bison libbz2-dev libreadline-dev libfreetype6-dev \
@@ -174,13 +175,7 @@ before_script:
 
     # got to check our php-utils-bin first, as we're overriding travis' phpunit shim
     export PATH=$HOME/php-utils-bin:$PATH
-
-    # confirm the php and phpunit versions we're running with in the test output
-    echo Versions in use after before_script:
-    php -v
-    which phpunit
-    phpunit --version
-    echo --------
+    cd $ORIG_DIR
   - |
     if [[ "$TRAVISCI" == "phpcs" ]] ; then
       composer install
@@ -188,16 +183,6 @@ before_script:
 
 script:
   - |
-    # debug
-    echo DEBUG-NIKKI
-    alias
-    echo $PATH
-    which phpunit
-    phpunit --version
-    $HOME/.phpbrew/php/php-5.2.17/lib/php/phpunit/phpunit.php --version
-    echo --------
-    # end debug
-
     if [[ ! -z "$WP_VERSION" ]] ; then
       # Run the build because otherwise there will be a bunch of warnings about
       # failed `stat` calls from `filemtime()`.
