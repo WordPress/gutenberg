@@ -23,7 +23,7 @@ if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; t
     # install phpbrew for this user
     mkdir $HOME/php-utils-bin
     cd $HOME/php-utils-bin
-    curl -L -O https://github.com/phpbrew/phpbrew/raw/master/phpbrew
+    curl -L -O https://github.com/phpbrew/phpbrew/raw/f6a422e1ba49293ee73bc4c317795c021bc57020/phpbrew
     chmod +x phpbrew
 
     # init with known --old to get 5.2 and 5.3

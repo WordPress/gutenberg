@@ -9,3 +9,5 @@ elif [[ ${PHP_VERSION:0:7} == "PHP 5.3" ]]; then
 else
 	`which phpunit` "$@"
 fi
+
+exit $?
