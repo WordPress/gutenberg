@@ -243,7 +243,9 @@
 		}
 
 		.editor-block-mover {
-			display: none;
+			top: -30px;
+			left: 10px;
+			height: auto;
 		}
 
 		.editor-block-settings-menu {
@@ -252,6 +254,7 @@
 			height: auto;
 		}
 
+		.editor-block-mover__control,
 		.editor-block-settings-menu__control {
 			float: left;
 			margin-right: 8px;
