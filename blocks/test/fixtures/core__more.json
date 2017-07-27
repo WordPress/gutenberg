@@ -1,10 +1,10 @@
 [
-  {
-    "uid": "_uid_0",
-    "name": "core/more",
-    "attributes": {
-      "text": "Continue reading",
-      "noTeaser": true
+    {
+        "uid": "_uid_0",
+        "name": "core/more",
+        "attributes": {
+            "customText": null,
+            "noTeaser": false
+        }
     }
-  }
 ]
