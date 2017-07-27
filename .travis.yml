@@ -180,6 +180,9 @@ before_script:
 
     chmod +x $HOME/php-utils-bin/phpunit
 
+    # got to check our php-utils-bin first, as we're overriding travis' phpunit shim
+    export PATH=~/php-utils-bin:$PATH
+
     # confirm the php and phpunit versions we're running with in the test output
     echo Versions in use:
     php -v
