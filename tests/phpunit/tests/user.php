@@ -1204,4 +1204,72 @@ class Tests_User extends WP_UnitTestCase {
 	function action_check_passwords_blank_pw( $user_login, &$pass1 ) {
 		$pass1 = '';
 	}
+
+	/**
+	 * @ticket 16470
+	 */
+	function test_send_confirmation_on_profile_email() {
+		reset_phpmailer_instance();
+		$was_confirmation_email_sent = false;
+
+		$user = $this->factory()->user->create_and_get( array(
+			'user_email' => 'before@example.com',
+		) );
+
+		$_POST['email']   = 'after@example.com';
+		$_POST['user_id'] = $user->ID;
+
+		wp_set_current_user( $user->ID );
+
+		do_action( 'personal_options_update' );
+
+		if ( ! empty( $GLOBALS['phpmailer']->mock_sent ) ) {
+			$was_confirmation_email_sent = ( isset( $GLOBALS['phpmailer']->mock_sent[0] ) && 'after@example.com' == $GLOBALS['phpmailer']->mock_sent[0]['to'][0][0] );
+		}
+
+		// A confirmation email is sent.
+		$this->assertTrue( $was_confirmation_email_sent );
+
+		// The new email address gets put into user_meta.
+		$new_email_meta = get_user_meta( $user->ID, '_new_email', true );
+		$this->assertEquals( 'after@example.com', $new_email_meta['newemail'] );
+
+		// The email address of the user doesn't change. $_POST['email'] should be the email address pre-update.
+		$this->assertEquals( $_POST['email'], $user->user_email );
+	}
+
+	/**
+	 * @ticket 16470
+	 */
+	function test_remove_send_confirmation_on_profile_email() {
+		remove_action( 'personal_options_update', 'send_confirmation_on_profile_email' );
+
+		reset_phpmailer_instance();
+		$was_confirmation_email_sent = false;
+
+		$user = $this->factory()->user->create_and_get( array(
+			'user_email' => 'before@example.com',
+		) );
+
+		$_POST['email']   = 'after@example.com';
+		$_POST['user_id'] = $user->ID;
+
+		wp_set_current_user( $user->ID );
+
+		do_action( 'personal_options_update' );
+
+		if ( ! empty( $GLOBALS['phpmailer']->mock_sent ) ) {
+			$was_confirmation_email_sent = ( isset( $GLOBALS['phpmailer']->mock_sent[0] ) && 'after@example.com' == $GLOBALS['phpmailer']->mock_sent[0]['to'][0][0] );
+		}
+
+		// No confirmation email is sent.
+		$this->assertFalse( $was_confirmation_email_sent );
+
+		// No usermeta is created.
+		$new_email_meta = get_user_meta( $user->ID, '_new_email', true );
+		$this->assertEmpty( $new_email_meta );
+
+		// $_POST['email'] should be the email address posted from the form.
+		$this->assertEquals( $_POST['email'], 'after@example.com' );
+	}
 }
