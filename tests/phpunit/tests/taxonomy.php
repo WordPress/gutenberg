@@ -764,7 +764,8 @@ class Tests_Taxonomy extends WP_UnitTestCase {
 
 		register_taxonomy( 'foo', 'post' );
 
-		$this->assertSame( 1, count( $wp_filter['wp_ajax_add-foo'] ) );
+		$this->assertArrayHasKey( 'wp_ajax_add-foo', $wp_filter );
+		$this->assertSame( 1, count( $wp_filter['wp_ajax_add-foo']->callbacks ) );
 		$this->assertTrue( unregister_taxonomy( 'foo' ) );
 		$this->assertArrayNotHasKey( 'wp_ajax_add-foo', $wp_filter );
 	}
