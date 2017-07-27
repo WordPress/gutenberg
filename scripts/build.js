@@ -25,7 +25,7 @@ const BUILD_DIR = {
 	module: 'build-module',
 	browser: 'build-browser',
 };
-const OK = chalk.reset.inverse.bold.green( ' DONE ' );
+const DONE = chalk.reset.inverse.bold.green( ' DONE ' );
 
 /**
  * Babel Configuration
@@ -136,13 +136,13 @@ function buildFileFor( file, silent, environment ) {
  */
 function buildPackage( packagePath ) {
 	const srcDir = path.resolve( packagePath, SRC_DIR );
-	const pattern = path.resolve( srcDir, '**/*' );
-	const files = glob.sync( pattern, { nodir: true } );
+	const files = glob.sync( srcDir + '/**/*.js', { nodir: true } )
+		.filter( file => ! /\.test\.js/.test( file ) );
 
 	process.stdout.write( `${ path.basename( packagePath ) }\n` );
 
 	files.forEach( file => buildFile( file, true ) );
-	process.stdout.write( `${ OK }\n` );
+	process.stdout.write( `${ DONE }\n` );
 }
 
 process.stdout.write( chalk.inverse( '>> Building packages \n' ) );
