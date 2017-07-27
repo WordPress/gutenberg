@@ -166,6 +166,9 @@ describe( 'InserterMenu', () => {
 		);
 		wrapper.setState( { filterValue: 'text' } );
 
-		expect( wrapper ).toMatchSnapshot();
+		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
+		expect( visibleBlocks.length ).toBe( 2 );
+		expect( visibleBlocks.at( 0 ).childAt( 1 ).text() ).toBe( 'Text' );
+		expect( visibleBlocks.at( 1 ).childAt( 1 ).text() ).toBe( 'Advanced Text' );
 	} );
 } );
