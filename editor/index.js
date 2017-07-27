@@ -22,7 +22,15 @@ import Layout from './layout';
 import { createReduxStore } from './state';
 import { undo } from './actions';
 
-const defaultSettings = {
+/**
+ * The default editor settings
+ * You can override any default settings when calling createEditorInstance
+ *
+ *  wideImages   boolean   Enable/Disable Wide/Full Alignments
+ *
+ * @var {Object} DEFAULT_SETTINGS
+ */
+const DEFAULT_SETTINGS = {
 	wideImages: false,
 };
 
@@ -81,7 +89,7 @@ function preparePostState( store, post ) {
  * @param {Object} post            API entity for post to edit  (type required)
  * @param {Object} editorSettings  Editor settings object
  */
-export function createEditorInstance( id, post, editorSettings = defaultSettings ) {
+export function createEditorInstance( id, post, editorSettings = DEFAULT_SETTINGS ) {
 	const store = createReduxStore();
 
 	store.dispatch( {
