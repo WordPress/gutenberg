@@ -6,6 +6,7 @@ import './quote';
 import './embed';
 import './list';
 import './separator';
+import './more';
 import './button';
 import './pullquote';
 import './table';

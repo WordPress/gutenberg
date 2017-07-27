@@ -205,9 +205,11 @@ describe( 'full post content fixture', () => {
 				) )
 				.map( basename => {
 					const filename = basename + '.html';
+					const parsedBlockFilename = basename + '.json';
 					return {
 						filename,
 						contents: readFixtureFile( filename ),
+						parsed: JSON.parse( readFixtureFile( parsedBlockFilename ) )[ 0 ],
 					};
 				} )
 				.filter( fixture => fixture.contents !== null );
@@ -221,10 +223,7 @@ describe( 'full post content fixture', () => {
 			}
 
 			foundFixtures.forEach( fixture => {
-				const delimiter = new RegExp(
-					'<!--\\s*wp:' + name + '(\\s+|\\s*-->)'
-				);
-				if ( ! delimiter.test( fixture.contents ) ) {
+				if ( name !== fixture.parsed.name ) {
 					errors.push( format(
 						'Expected fixture file \'%s\' to test the \'%s\' block.',
 						fixture.filename,
