@@ -16,7 +16,7 @@ class Tests_Import_Postmeta extends WP_Import_UnitTestCase {
 			define( 'WP_LOAD_IMPORTERS', true );
 
 		if ( ! file_exists( DIR_TESTDATA . '/plugins/wordpress-importer/wordpress-importer.php' ) ) {
-			$this->fail( 'This test requires the WordPress Importer plugin to be installed. See: https://make.wordpress.org/core/handbook/contribute/git/#unit-tests' );
+			$this->fail( 'This test requires the WordPress Importer plugin to be installed in the test suite. See: https://make.wordpress.org/core/handbook/contribute/git/#unit-tests' );
 		}
 
 		require_once DIR_TESTDATA . '/plugins/wordpress-importer/wordpress-importer.php';
