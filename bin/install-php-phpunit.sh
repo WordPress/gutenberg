@@ -12,6 +12,7 @@ THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 mkdir -p $HOME/php-utils-bin
 
 if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; then
+  set -e
   # install php runtime dependencies
   sudo apt-get install -y curl libxml2 libfreetype6 libpng12-0 libjpeg8 libgd3 libxpm4 \
   libltdl7 openssl gettext libgettextpo0 libmhash2 libmcrypt4 mysql-client
@@ -120,6 +121,7 @@ if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; t
   if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]]; then
     # only switch if we're not already switched, or else phpbrew crashes
     if [[ -z "$PHPBREW_PHP" ]]; then
+      ls $HOME/.phpbrew/
       phpbrew use 5.2.17
     fi
     alias phpunit=$HOME/php-utils-bin/phpunit-3.6
@@ -129,6 +131,7 @@ if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; t
     fi
     alias phpunit=$HOME/php-utils-bin/phpunit-4.8
   fi
+  set +e
 elif [[ ${TRAVIS_PHP_VERSION:0:2} == "5." ]]; then
   # all other PHP 5.x versions
   mkdir -p $HOME/phpunit-bin
