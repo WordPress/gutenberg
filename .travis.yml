@@ -22,8 +22,8 @@ matrix:
       env: WP_VERSION=latest
     - php: 5.6
       env: WP_VERSION=latest
-    - php: 5.2
-      env: WP_VERSION=latest
+    - php: 7.1
+      env: WP_VERSION=latest SWITCH_TO_PHP=5.2
     - php: 5.6
       env: TRAVISCI=phpcs
     - php: 7.1
@@ -34,7 +34,7 @@ before_script:
   - |
     if [[ ! -z "$WP_VERSION" ]] ; then
       bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
-      if [[ ${TRAVIS_PHP_VERSION:0:3} == "5.2" ]] || [[ ${TRAVIS_PHP_VERSION:0:3} == "5.3" ]]; then
+      if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; then
         # install php runtime dependencies
         sudo apt-get install -y curl libxml2 libfreetype6 libpng12-0 libjpeg8 libgd3 libxpm4 \
         libltdl7 openssl gettext libgettextpo0 libmhash2 libmcrypt4 mysql-client
@@ -58,7 +58,7 @@ before_script:
           $HOME/bin/phpbrew known --old
 
           # build PHP and install PHPUnit
-          if [[ ${TRAVIS_PHP_VERSION:0:3} == "5.2" ]]; then
+          if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]]; then
             # PHP5.2 requires a patch to compile, so download it
             cd $HOME
             mkdir patches
@@ -120,7 +120,7 @@ before_script:
         cd $HOME
         export PHPBREW_RC_ENABLE=1
         source .phpbrew/bashrc
-        if [[ ${TRAVIS_PHP_VERSION:0:3} == "5.2" ]]; then
+        if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]]; then
           phpbrew use 5.2.17
           alias phpunit=$HOME/bin/phpunit-3.6
         else
