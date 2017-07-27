@@ -1,9 +1,0 @@
-codecov:
-  status:
-    project:
-      diff-change:
-        enabled: true
-        target: auto
-        threshold: 1
-
-comment: false
