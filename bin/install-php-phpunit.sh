@@ -1,6 +1,8 @@
 #!/bin/bash
 
 ORIG_DIR=`pwd`;
+THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; then
   # install php runtime dependencies
   sudo apt-get install -y curl libxml2 libfreetype6 libpng12-0 libjpeg8 libgd3 libxpm4 \
@@ -37,7 +39,7 @@ if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; t
       # build PHP5.2
       tail -F $HOME/.phpbrew/build/php-5.2.17/build.log &
       TAIL_PID=$!
-      $HOME/php-utils-bin/phpbrew install --patch patches/node.patch --patch patches/openssl.patch 5.2 +default +mysql +pdo \
+      $HOME/php-utils-bin/phpbrew install --patch ${THIS_DIR}/patches/node.patch --patch ${THIS_DIR}/patches/openssl.patch 5.2 +default +mysql +pdo \
       +gettext +phar +openssl -- --with-openssl-dir=/usr/include/openssl --enable-spl --with-mysql --with-mysqli=/usr/bin/mysql_config --with-pdo-mysql=/usr
       kill -TERM $TAIL_PID
 
@@ -84,7 +86,7 @@ if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; t
       # build PHP5.3
       tail -F $HOME/.phpbrew/build/php-5.3.29/build.log &
       TAIL_PID=$!
-      $HOME/php-utils-bin/phpbrew install --patch patches/node.patch --patch patches/openssl.patch 5.3 +default +mysql +pdo \
+      $HOME/php-utils-bin/phpbrew install --patch ${THIS_DIR}/patches/node.patch --patch ${THIS_DIR}/patches/openssl.patch 5.3 +default +mysql +pdo \
       +gettext +phar +openssl -- --with-openssl-dir=/usr/include/openssl --enable-spl --with-mysql --with-mysqli=/usr/bin/mysql_config --with-pdo-mysql=/usr
       kill -TERM $TAIL_PID
       curl -L -o $HOME/php-utils-bin/phpunit-4.8 https://phar.phpunit.de/phpunit-4.8.9.phar
@@ -124,7 +126,7 @@ else
 fi
 
 # install a script that calls the right phpunit version, depending on the php version running
-cp phpunit-shim.sh $HOME/php-utils-bin/phpunit
+cp ${THIS_DIR}/phpunit-shim.sh $HOME/php-utils-bin/phpunit
 chmod +x $HOME/php-utils-bin/phpunit
 
 # got to check our php-utils-bin first, as we're overriding travis' phpunit shim
