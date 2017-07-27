@@ -30,6 +30,14 @@ const advancedTextBlock = {
 	category: 'common',
 };
 
+const someOtherBlock = {
+	name: 'core/some-other-block',
+	title: 'Some Other Block',
+	save: noop,
+	edit: noop,
+	category: 'common',
+};
+
 const moreBlock = {
 	name: 'core/more-block',
 	title: 'More',
@@ -62,6 +70,7 @@ describe( 'InserterMenu', () => {
 		unregisterAllBlocks();
 		registerBlockType( textBlock.name, textBlock );
 		registerBlockType( advancedTextBlock.name, advancedTextBlock );
+		registerBlockType( someOtherBlock.name, someOtherBlock );
 		registerBlockType( moreBlock.name, moreBlock );
 		registerBlockType( youtubeBlock.name, youtubeBlock );
 	} );
@@ -126,7 +135,7 @@ describe( 'InserterMenu', () => {
 		const activeCategory = wrapper.find( '.editor-inserter__tab .is-active' );
 		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
 		expect( activeCategory.text() ).toBe( 'Blocks' );
-		expect( visibleBlocks.length ).toBe( 3 );
+		expect( visibleBlocks.length ).toBe( 4 );
 	} );
 
 	it( 'should disable already used blocks with `usedOnce`', () => {
@@ -143,5 +152,18 @@ describe( 'InserterMenu', () => {
 		const visibleBlocks = wrapper.find( '.editor-inserter__block[disabled]' );
 		expect( visibleBlocks.length ).toBe( 1 );
 		expect( visibleBlocks.childAt( 1 ).text() ).toBe( 'More' );
+	} );
+
+	it( 'should allow searching for blocks', () => {
+		const wrapper = shallow(
+			<InserterMenu
+				instanceId={ 1 }
+				blocks={ [] }
+				recentlyUsedBlocks={ [] }
+			/>
+		);
+		wrapper.setState( { filterValue: 'text' } );
+
+		expect( wrapper ).toMatchSnapshot();
 	} );
 } );
