@@ -431,6 +431,10 @@ $sticky-bottom-offset: 20px;
 		font-family: $default-font;
 		font-size: $default-font-size;
 		box-shadow: none;
+
+		&:active {
+			background: none;
+		}
 	}
 
 	&:hover > .editor-inserter__block,
