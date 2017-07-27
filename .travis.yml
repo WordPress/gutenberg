@@ -38,26 +38,22 @@ before_script:
         # install php runtime dependencies
         sudo apt-get install -y curl libxml2 libfreetype6 libpng12-0 libjpeg8 libgd3 libxpm4 \
         libltdl7 openssl gettext libgettextpo0 libmhash2 libmcrypt4 mysql-client
-
         # php and phpunit installs should be cached, only build if they're not there.
         if [ ! -f $HOME/.phpbrew/bashrc ]; then
-          set -ex
+          set -x
           # install build dependencies for building php (yes, for phpbrew, php is a dependency)
           sudo apt-get install -y php5-dev autoconf automake curl libcurl3-openssl-dev build-essential \
           libxslt1-dev re2c libxml2-dev php5-cli bison libbz2-dev libreadline-dev libfreetype6-dev \
           libpng12-dev libjpeg-dev libjpeg8-dev libgd-dev libltdl-dev libssl-dev libgettextpo-dev \
           libicu-dev libmhash-dev libmcrypt-dev libmysqlclient-dev libmysqld-dev git
-
           # install phpbrew for this user
           mkdir $HOME/bin
           cd $HOME/bin
           curl -L -O https://github.com/phpbrew/phpbrew/raw/master/phpbrew
           chmod +x phpbrew
-
           # init with known --old to get 5.2 and 5.3
           $HOME/bin/phpbrew init
           $HOME/bin/phpbrew known --old
-
           # build PHP and install PHPUnit
           if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]]; then
             echo "Building for 5.2"
@@ -65,17 +61,14 @@ before_script:
             cd $HOME
             mkdir patches
             curl -s https://mail.gnome.org/archives/xml/2012-August/txtbgxGXAvz4N.txt > patches/node.patch
-
             # build PHP5.2
             $HOME/bin/phpbrew install --patch patches/node.patch 5.2 +default +mysql=shared +pdo \
             +gettext +phar +openssl=shared -- --with-openssl-dir=/usr/include/openssl --enable-spl
-
             # install PHPUnit 3.6. The only install method available is from source, using git branches old
             # enough that they don't rely on any PHP5.3+ features. This clones each needed dependency
             # and then we add the paths to the include_path by setting up an extra .ini file
             PHP52_PATH=$HOME/.phpbrew/php/php-5.2.17
             cd ${PHP52_PATH}/lib/php
-
             # dependencies
             git clone --depth=1 --branch=1.1   git://github.com/sebastianbergmann/dbunit.git
             git clone --depth=1 --branch=1.1   git://github.com/sebastianbergmann/php-code-coverage.git
@@ -87,20 +80,15 @@ before_script:
             git clone --depth=1 --branch=1.1   git://github.com/sebastianbergmann/phpunit-mock-objects.git
             git clone --depth=1 --branch=1.1   git://github.com/sebastianbergmann/phpunit-selenium.git
             git clone --depth=1 --branch=1.0.0 git://github.com/sebastianbergmann/phpunit-story.git
-
             # and the version of phpunit that we expect to run with php 5.2
             git clone --depth=1 --branch=3.6   git://github.com/sebastianbergmann/phpunit.git
-
             # fix up the version number of phpunit
             sed -i 's/@package_version@/3.6-git/g' phpunit/PHPUnit/Runner/Version.php
-
             # now set up an ini file that adds all of the above to include_path for the PHP5.2 install
             mkdir -p $HOME/.phpbrew/php/php-5.2.17/var/db
             echo "include_path=.:${PHP52_PATH}/lib/php:${PHP52_PATH}/lib/php/dbunit:${PHP52_PATH}/lib/php/php-code-coverage:${PHP52_PATH}/lib/php/php-file-iterator:${PHP52_PATH}/lib/php/php-invoker:${PHP52_PATH}/lib/php/php-text-template:${PHP52_PATH}/lib/php/php-timer:${PHP52_PATH}/lib/php/php-token-stream:${PHP52_PATH}/lib/php/phpunit-mock-objects:${PHP52_PATH}/lib/php/phpunit-selenium:${PHP52_PATH}/lib/php/phpunit-story:${PHP52_PATH}/lib/php/phpunit" > ${PHP52_PATH}/var/db/path.ini
-
             # symlink from $HOME/bin to phpunit.php with the right version number. 'phpunit' will be aliased to this.
             ln -s ${PHP52_PATH}/lib/php/phpunit/phpunit.php $HOME/bin/phpunit-3.6
-
             # one more PHPUnit dependency that we need to install using pear under PHP5.2
             cd $HOME
             export PHPBREW_RC_ENABLE=1
@@ -108,7 +96,6 @@ before_script:
             phpbrew use 5.2.17
             pear channel-discover pear.symfony-project.com
             pear install pear.symfony-project.com/YAML-1.0.2
-
           else
             echo "Building for 5.3"
             # build PHP5.3
