@@ -498,47 +498,6 @@ class Tests_Multisite_User extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Ensure email change confirmation emails do not contain encoded HTML entities
-	 * @ticket 40015
-	 */
-	function test_ms_send_confirmation_on_profile_email_html_entities_decoded() {
-
-		$old_current = get_current_user_id();
-		$user_id = self::factory()->user->create( array(
-			'role'       => 'subscriber',
-			'user_email' => 'old-email@test.dev',
-		) );
-		wp_set_current_user( $user_id );
-
-		reset_phpmailer_instance();
-
-		// Give the site and blog a name containing HTML entities
-		update_site_option( 'site_name', '&#039;Test&#039; site&#039;s &quot;name&quot; has &lt;html entities&gt; &amp;' );
-		update_option( 'blogname', '&#039;Test&#039; blog&#039;s &quot;name&quot; has &lt;html entities&gt; &amp;' );
-
-		// Set $_POST['email'] with new e-mail and $_POST['id'] with user's ID.
-		$_POST['user_id'] = $user_id;
-		$_POST['email'] = 'new-email@test.dev';
-		send_confirmation_on_profile_email( );
-
-		$mailer = tests_retrieve_phpmailer_instance();
-
-		$recipient = $mailer->get_recipient( 'to' );
-		$email = $mailer->get_sent();
-
-		// Assert reciepient is correct
-		$this->assertSame( 'new-email@test.dev', $recipient->address, 'Admin email change notification recipient not as expected' );
-
-		// Assert that HTML entites have been decode in body and subject
-		$this->assertContains( '\'Test\' site\'s "name" has <html entities> &', $email->body, 'Email body does not contain the decoded HTML entities' );
-		$this->assertNotContains( '&#039;Test&#039; site&#039;s &quot;name&quot; has &lt;html entities&gt; &amp;', $email->body, 'Email body does contains HTML entities' );
-		$this->assertContains( '\'Test\' blog\'s "name" has <html entities> &', $email->subject, 'Email subject does not contain the decoded HTML entities' );
-		$this->assertNotContains( '&#039;Test&#039; blog&#039;s &quot;name&quot; has &lt;html entities&gt; &amp;', $email->subject, 'Email subject does contains HTML entities' );
-
-		wp_set_current_user( $old_current );
-	}
-
-	/**
 	 * A confirmation e-mail should not be sent if user's new e-mail:
 	 * - Matches their existing email, or
 	 * - is not a valid e-mail, or
