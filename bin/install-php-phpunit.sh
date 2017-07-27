@@ -9,10 +9,11 @@
 ORIG_DIR=`pwd`;
 THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-mkdir -p $HOME/php-utils-bin
-
 if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; then
   PHPBREW_BUILT_CHECK=$HOME/.phpbrew/bashrc
+
+  # directory to store phpbrew and old phpunit in
+  mkdir -p $HOME/php-utils-bin
 
   # install the phpunit shim to run the right phpunit version for these old php versions
 	cp ${THIS_DIR}/phpunit-shim.sh $HOME/php-utils-bin/phpunit
