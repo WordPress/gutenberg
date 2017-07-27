@@ -61,3 +61,442 @@ exports[`InserterMenu should allow searching for blocks 1`] = `
   </div>
 </Popover>
 `;
+
+exports[`InserterMenu should disable already used blocks with \`usedOnce\` 1`] = `
+<Popover
+  className="editor-inserter__menu"
+>
+  <label
+    className="screen-reader-text"
+    htmlFor="editor-inserter__search-1"
+  >
+    Search blocks
+  </label>
+  <input
+    autoFocus={true}
+    className="editor-inserter__search"
+    id="editor-inserter__search-1"
+    onChange={[Function]}
+    onClick={[Function]}
+    placeholder="Search…"
+    tabIndex="-1"
+    type="search"
+  />
+  <div
+    className="editor-inserter__content"
+    role="menu"
+  >
+    <div>
+      <div
+        aria-hidden="true"
+        className="editor-inserter__separator"
+        id="editor-inserter__separator-common-1"
+      >
+        Common Blocks
+      </div>
+      <div
+        aria-labelledby="editor-inserter__separator-common-1"
+        className="editor-inserter__category-blocks"
+        role="menu"
+        tabIndex="0"
+      >
+        <button
+          className="editor-inserter__block"
+          onClick={[Function]}
+          role="menuitem"
+          tabIndex="-1"
+        >
+          <BlockIcon />
+          Text
+        </button>
+        <button
+          className="editor-inserter__block"
+          onClick={[Function]}
+          role="menuitem"
+          tabIndex="-1"
+        >
+          <BlockIcon />
+          Advanced Text
+        </button>
+        <button
+          className="editor-inserter__block"
+          onClick={[Function]}
+          role="menuitem"
+          tabIndex="-1"
+        >
+          <BlockIcon />
+          Some Other Block
+        </button>
+      </div>
+    </div>
+    <div>
+      <div
+        aria-hidden="true"
+        className="editor-inserter__separator"
+        id="editor-inserter__separator-layout-1"
+      >
+        Layout Blocks
+      </div>
+      <div
+        aria-labelledby="editor-inserter__separator-layout-1"
+        className="editor-inserter__category-blocks"
+        role="menu"
+        tabIndex="0"
+      >
+        <button
+          className="editor-inserter__block"
+          disabled={
+            Object {
+              "name": "core/more-block",
+            }
+          }
+          onClick={[Function]}
+          onMouseEnter={false}
+          onMouseLeave={false}
+          role="menuitem"
+          tabIndex="-1"
+        >
+          <BlockIcon />
+          More
+        </button>
+      </div>
+    </div>
+  </div>
+  <div
+    className="editor-inserter__tabs is-recent"
+  >
+    <button
+      className="editor-inserter__tab "
+      onClick={[Function]}
+    >
+      Recent
+    </button>
+    <button
+      className="editor-inserter__tab is-active"
+      onClick={[Function]}
+    >
+      Blocks
+    </button>
+    <button
+      className="editor-inserter__tab "
+      onClick={[Function]}
+    >
+      Embeds
+    </button>
+  </div>
+</Popover>
+`;
+
+exports[`InserterMenu should show all blocks except embeds in the blocks tab 1`] = `
+<Popover
+  className="editor-inserter__menu"
+>
+  <label
+    className="screen-reader-text"
+    htmlFor="editor-inserter__search-1"
+  >
+    Search blocks
+  </label>
+  <input
+    autoFocus={true}
+    className="editor-inserter__search"
+    id="editor-inserter__search-1"
+    onChange={[Function]}
+    onClick={[Function]}
+    placeholder="Search…"
+    tabIndex="-1"
+    type="search"
+  />
+  <div
+    className="editor-inserter__content"
+    role="menu"
+  >
+    <div>
+      <div
+        aria-hidden="true"
+        className="editor-inserter__separator"
+        id="editor-inserter__separator-common-1"
+      >
+        Common Blocks
+      </div>
+      <div
+        aria-labelledby="editor-inserter__separator-common-1"
+        className="editor-inserter__category-blocks"
+        role="menu"
+        tabIndex="0"
+      >
+        <button
+          className="editor-inserter__block"
+          onClick={[Function]}
+          role="menuitem"
+          tabIndex="-1"
+        >
+          <BlockIcon />
+          Text
+        </button>
+        <button
+          className="editor-inserter__block"
+          onClick={[Function]}
+          role="menuitem"
+          tabIndex="-1"
+        >
+          <BlockIcon />
+          Advanced Text
+        </button>
+        <button
+          className="editor-inserter__block"
+          onClick={[Function]}
+          role="menuitem"
+          tabIndex="-1"
+        >
+          <BlockIcon />
+          Some Other Block
+        </button>
+      </div>
+    </div>
+    <div>
+      <div
+        aria-hidden="true"
+        className="editor-inserter__separator"
+        id="editor-inserter__separator-layout-1"
+      >
+        Layout Blocks
+      </div>
+      <div
+        aria-labelledby="editor-inserter__separator-layout-1"
+        className="editor-inserter__category-blocks"
+        role="menu"
+        tabIndex="0"
+      >
+        <button
+          className="editor-inserter__block"
+          onClick={[Function]}
+          role="menuitem"
+          tabIndex="-1"
+        >
+          <BlockIcon />
+          More
+        </button>
+      </div>
+    </div>
+  </div>
+  <div
+    className="editor-inserter__tabs is-recent"
+  >
+    <button
+      className="editor-inserter__tab "
+      onClick={[Function]}
+    >
+      Recent
+    </button>
+    <button
+      className="editor-inserter__tab is-active"
+      onClick={[Function]}
+    >
+      Blocks
+    </button>
+    <button
+      className="editor-inserter__tab "
+      onClick={[Function]}
+    >
+      Embeds
+    </button>
+  </div>
+</Popover>
+`;
+
+exports[`InserterMenu should show blocks from the embed category in the embed tab 1`] = `
+<Popover
+  className="editor-inserter__menu"
+>
+  <label
+    className="screen-reader-text"
+    htmlFor="editor-inserter__search-1"
+  >
+    Search blocks
+  </label>
+  <input
+    autoFocus={true}
+    className="editor-inserter__search"
+    id="editor-inserter__search-1"
+    onChange={[Function]}
+    onClick={[Function]}
+    placeholder="Search…"
+    tabIndex="-1"
+    type="search"
+  />
+  <div
+    className="editor-inserter__content"
+    role="menu"
+  >
+    <div
+      aria-labelledby="editor-inserter__separator-embed-1"
+      className="editor-inserter__category-blocks"
+      role="menu"
+      tabIndex="0"
+    >
+      <button
+        className="editor-inserter__block"
+        onClick={[Function]}
+        role="menuitem"
+        tabIndex="-1"
+      >
+        <BlockIcon />
+        Youtube
+      </button>
+    </div>
+  </div>
+  <div
+    className="editor-inserter__tabs is-recent"
+  >
+    <button
+      className="editor-inserter__tab "
+      onClick={[Function]}
+    >
+      Recent
+    </button>
+    <button
+      className="editor-inserter__tab "
+      onClick={[Function]}
+    >
+      Blocks
+    </button>
+    <button
+      className="editor-inserter__tab is-active"
+      onClick={[Function]}
+    >
+      Embeds
+    </button>
+  </div>
+</Popover>
+`;
+
+exports[`InserterMenu should show the recent tab by default 1`] = `
+<Popover
+  className="editor-inserter__menu"
+>
+  <label
+    className="screen-reader-text"
+    htmlFor="editor-inserter__search-1"
+  >
+    Search blocks
+  </label>
+  <input
+    autoFocus={true}
+    className="editor-inserter__search"
+    id="editor-inserter__search-1"
+    onChange={[Function]}
+    onClick={[Function]}
+    placeholder="Search…"
+    tabIndex="-1"
+    type="search"
+  />
+  <div
+    className="editor-inserter__content"
+    role="menu"
+  >
+    <div
+      className="editor-inserter__recent"
+    >
+      <div
+        aria-labelledby="editor-inserter__separator-recent-1"
+        className="editor-inserter__category-blocks"
+        role="menu"
+        tabIndex="0"
+      />
+    </div>
+  </div>
+  <div
+    className="editor-inserter__tabs is-recent"
+  >
+    <button
+      className="editor-inserter__tab is-active"
+      onClick={[Function]}
+    >
+      Recent
+    </button>
+    <button
+      className="editor-inserter__tab "
+      onClick={[Function]}
+    >
+      Blocks
+    </button>
+    <button
+      className="editor-inserter__tab "
+      onClick={[Function]}
+    >
+      Embeds
+    </button>
+  </div>
+</Popover>
+`;
+
+exports[`InserterMenu should show the recently used blocks in the recent tab 1`] = `
+<Popover
+  className="editor-inserter__menu"
+>
+  <label
+    className="screen-reader-text"
+    htmlFor="editor-inserter__search-1"
+  >
+    Search blocks
+  </label>
+  <input
+    autoFocus={true}
+    className="editor-inserter__search"
+    id="editor-inserter__search-1"
+    onChange={[Function]}
+    onClick={[Function]}
+    placeholder="Search…"
+    tabIndex="-1"
+    type="search"
+  />
+  <div
+    className="editor-inserter__content"
+    role="menu"
+  >
+    <div
+      className="editor-inserter__recent"
+    >
+      <div
+        aria-labelledby="editor-inserter__separator-recent-1"
+        className="editor-inserter__category-blocks"
+        role="menu"
+        tabIndex="0"
+      >
+        <button
+          className="editor-inserter__block"
+          onClick={[Function]}
+          role="menuitem"
+          tabIndex="-1"
+        >
+          <BlockIcon />
+          Advanced Text
+        </button>
+      </div>
+    </div>
+  </div>
+  <div
+    className="editor-inserter__tabs is-recent"
+  >
+    <button
+      className="editor-inserter__tab is-active"
+      onClick={[Function]}
+    >
+      Recent
+    </button>
+    <button
+      className="editor-inserter__tab "
+      onClick={[Function]}
+    >
+      Blocks
+    </button>
+    <button
+      className="editor-inserter__tab "
+      onClick={[Function]}
+    >
+      Embeds
+    </button>
+  </div>
+</Popover>
+`;
