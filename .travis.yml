@@ -72,12 +72,14 @@ before_script:
             # PHP5.2 requires a patch to compile, so download it
             cd $HOME
             mkdir patches
-            curl -s https://mail.gnome.org/archives/xml/2012-August/txtbgxGXAvz4N.txt > patches/node.patch
+            curl -L -o patches/node.patch https://mail.gnome.org/archives/xml/2012-August/txtbgxGXAvz4N.txt
+            curl -L -o patches/openssl.patch "https://bugs.php.net/patch-display.php?bug_id=54736&patch=debian_patches_disable_SSLv2_for_openssl_1_0_0.patch&revision=1305414559&download=1"
+
 
             # build PHP5.2
             tail -F $HOME/.phpbrew/build/php-5.2.17/build.log &
             TAIL_PID=$!
-            $HOME/php-utils-bin/phpbrew install --patch patches/node.patch 5.2 +default +mysql=shared +pdo \
+            $HOME/php-utils-bin/phpbrew install --patch patches/node.patch 5.2 --patch patches/openssl.patch +default +mysql=shared +pdo \
             +gettext +phar +openssl=shared -- --with-openssl-dir=/usr/include/openssl --enable-spl
             kill -TERM $TAIL_PID
 
@@ -124,8 +126,8 @@ before_script:
             # build PHP5.3
             tail -F $HOME/.phpbrew/build/php-5.3.29/build.log &
             TAIL_PID=$!
-            $HOME/php-utils-bin/phpbrew install --patch patches/node.patch 5.3 +default +mysql=shared +pdo \
-            +gettext +phar +openssl=shared -- --with-openssl-dir=/usr/include/openssl
+            $HOME/php-utils-bin/phpbrew install --patch patches/node.patch --patch patches/openssl.patch 5.3 +default +mysql +pdo \
+            +gettext +phar +openssl -- --with-openssl-dir=/usr/include/openssl --enable-spl
             kill -TERM $TAIL_PID
             curl -L -o $HOME/php-utils-bin/phpunit-4.8 https://phar.phpunit.de/phpunit-4.8.9.phar
             chmod +x $HOME/php-utils-bin/phpunit-4.8
