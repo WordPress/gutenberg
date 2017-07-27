@@ -79,7 +79,7 @@ export function hasEditorRedo( state ) {
  * @return {Boolean}       Whether the post is new
  */
 export function isEditedPostNew( state ) {
-	return getEditedPostAttribute( state, 'status' ) === 'auto-draft';
+	return getCurrentPost( state ).status === 'auto-draft';
 }
 
 /**
