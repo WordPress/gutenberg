@@ -12,6 +12,7 @@
 	background: $dark-gray-500;
 	border: 4px solid transparent;
 	background-clip: padding-box;
+	box-sizing: border-box;
 }
 
 @mixin range-track() {
@@ -23,23 +24,18 @@
 
 .blocks-range-control__input {
 	width: 100%;
-	margin-top: -3px;
 	margin-left: $item-spacing;
-
+	padding: 0;
 	-webkit-appearance: none;
 	background: transparent;
-
 
 	/**
  	 * Thumb
  	 */
 
-	&::-webkit-slider-thumb {
-		-webkit-appearance: none;
-	}
-
 	// webkit
 	&::-webkit-slider-thumb {
+		-webkit-appearance: none;
 		@include range-thumb();
 		margin-top: -7px;	// necessary for chrome
 	}
@@ -49,11 +45,31 @@
 		@include range-thumb();
 	}
 
+	// ie
+	&::-ms-thumb {
+		@include range-thumb();
+		margin-top: 0;	// necessary because edge inherits from chrome
+		height: 14px;
+		width: 14px;
+		border: 2px solid transparent;
+	}
+
 	&:focus {
 		outline: none;
 	}
 
+	// webkit
 	&:focus::-webkit-slider-thumb {
+		box-shadow: $button-focus-style;;
+	}
+
+	// moz
+	&:focus::-moz-range-thumb {
+		box-shadow: $button-focus-style;;
+	}
+
+	// ie
+	&:focus::-ms-thumb {
 		box-shadow: $button-focus-style;;
 	}
 
@@ -61,11 +77,23 @@
  	 * Track
  	 */
 
+	 // webkit
 	&::-webkit-slider-runnable-track {
+		@include range-track();
+		margin-top: -4px;
+	}
+
+	// moz
+	&::-moz-range-track {
 		@include range-track();
 	}
 
-	&::-moz-range-track {
+	// ie
+	&::-ms-track {
+		margin-top: -4px;
+		background: transparent;
+		border-color: transparent;
+		color: transparent;
 		@include range-track();
 	}
 }
