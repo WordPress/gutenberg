@@ -123,9 +123,9 @@ describe( 'InserterMenu', () => {
 				recentlyUsedBlocks={ [] }
 			/>
 		);
-		const embedTab = wrapper.find( '.editor-inserter__tab' )
+		const blocksTab = wrapper.find( '.editor-inserter__tab' )
 			.filterWhere( ( node ) => node.text() === 'Blocks' );
-		embedTab.simulate( 'click' );
+		blocksTab.simulate( 'click' );
 
 		expect( enzymeToJson( wrapper ) ).toMatchSnapshot();
 	} );
@@ -138,9 +138,9 @@ describe( 'InserterMenu', () => {
 				recentlyUsedBlocks={ [] }
 			/>
 		);
-		const embedTab = wrapper.find( '.editor-inserter__tab' )
+		const blocksTab = wrapper.find( '.editor-inserter__tab' )
 			.filterWhere( ( node ) => node.text() === 'Blocks' );
-		embedTab.simulate( 'click' );
+		blocksTab.simulate( 'click' );
 
 		expect( enzymeToJson( wrapper ) ).toMatchSnapshot();
 	} );
