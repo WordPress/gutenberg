@@ -28,6 +28,13 @@ if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; t
   curl -L -o $HOME/php-utils-bin/phpbrew https://github.com/phpbrew/phpbrew/raw/f6a422e1ba49293ee73bc4c317795c021bc57020/phpbrew
   chmod +x $HOME/php-utils-bin/phpbrew
 
+  # symlink to phpunit3.6 in the ph5.2 installation
+  ln -s ${PHP52_PATH}/lib/php/phpunit/phpunit.php $HOME/php-utils-bin/phpunit-3.6
+
+  # install phpunit4.8
+  curl -L -o $HOME/php-utils-bin/phpunit-4.8 https://phar.phpunit.de/phpunit-4.8.9.phar
+  chmod +x $HOME/php-utils-bin/phpunit-4.8
+
 	# got to check our php-utils-bin first, as we're overriding travis' phpunit shim
 	export PATH=$HOME/php-utils-bin:$PATH
 
@@ -76,9 +83,6 @@ if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; t
       mkdir -p $HOME/.phpbrew/php/php-5.2.17/var/db
       echo "include_path=.:${PHP52_PATH}/lib/php:${PHP52_PATH}/lib/php/dbunit:${PHP52_PATH}/lib/php/php-code-coverage:${PHP52_PATH}/lib/php/php-file-iterator:${PHP52_PATH}/lib/php/php-invoker:${PHP52_PATH}/lib/php/php-text-template:${PHP52_PATH}/lib/php/php-timer:${PHP52_PATH}/lib/php/php-token-stream:${PHP52_PATH}/lib/php/phpunit-mock-objects:${PHP52_PATH}/lib/php/phpunit-selenium:${PHP52_PATH}/lib/php/phpunit-story:${PHP52_PATH}/lib/php/phpunit" > ${PHP52_PATH}/var/db/path.ini
 
-      # symlink from $HOME/php-utils-bin to phpunit.php with the right version number. 'phpunit' will be aliased to this.
-      ln -s ${PHP52_PATH}/lib/php/phpunit/phpunit.php $HOME/php-utils-bin/phpunit-3.6
-
       # one more PHPUnit dependency that we need to install using pear under PHP5.2
       cd $HOME
       export PHPBREW_RC_ENABLE=1
@@ -94,8 +98,6 @@ if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; t
       $HOME/php-utils-bin/phpbrew install --patch ${THIS_DIR}/patches/node.patch --patch ${THIS_DIR}/patches/openssl.patch 5.3 +default +mysql +pdo \
       +gettext +phar +openssl -- --with-openssl-dir=/usr/include/openssl --enable-spl --with-mysql --with-mysqli=/usr/bin/mysql_config --with-pdo-mysql=/usr
       kill -TERM $TAIL_PID
-      curl -L -o $HOME/php-utils-bin/phpunit-4.8 https://phar.phpunit.de/phpunit-4.8.9.phar
-      chmod +x $HOME/php-utils-bin/phpunit-4.8
     fi
 
     # clean up build directory
