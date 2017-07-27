@@ -2,6 +2,7 @@
 
 ORIG_DIR=`pwd`;
 THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+mkdir $HOME/php-utils-bin
 
 if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; then
   # install php runtime dependencies
@@ -24,7 +25,6 @@ if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; t
     libicu-dev libmhash-dev libmcrypt-dev libmysqlclient-dev libmysqld-dev git
 
     # install phpbrew for this user
-    mkdir $HOME/php-utils-bin
     cd $HOME/php-utils-bin
     curl -L -O https://github.com/phpbrew/phpbrew/raw/f6a422e1ba49293ee73bc4c317795c021bc57020/phpbrew
     chmod +x phpbrew
