@@ -1,0 +1,10 @@
+[
+    {
+        "uid": "_uid_0",
+        "name": "core/more",
+        "attributes": {
+            "customText": "Continue Reading",
+            "noTeaser": true
+        }
+    }
+]
