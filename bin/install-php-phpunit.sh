@@ -24,23 +24,16 @@ if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; t
 	cp ${THIS_DIR}/phpunit-shim.sh $HOME/php-utils-bin/phpunit
 	chmod +x $HOME/php-utils-bin/phpunit
 
+  # install phpbrew
+  curl -L -o $HOME/php-utils-bin/phpbrew https://github.com/phpbrew/phpbrew/raw/f6a422e1ba49293ee73bc4c317795c021bc57020/phpbrew
+  chmod +x $HOME/php-utils-bin/phpbrew
+
 	# got to check our php-utils-bin first, as we're overriding travis' phpunit shim
 	export PATH=$HOME/php-utils-bin:$PATH
 
   # php and phpunit installs should be cached, only build if they're not there.
   if [ ! -f $PHPBREW_BUILT_CHECK ]; then
     
-    # install build dependencies for building php (yes, for phpbrew, php is a dependency)
-    #sudo apt-get install -y php5-dev autoconf automake curl libcurl3-openssl-dev build-essential \
-    #libxslt1-dev re2c libxml2-dev php5-cli bison libbz2-dev libreadline-dev libfreetype6-dev \
-    #libpng12-dev libjpeg-dev libjpeg8-dev libgd-dev libltdl-dev libssl-dev libgettextpo-dev \
-    #libicu-dev libmhash-dev libmcrypt-dev libmysqlclient-dev libmysqld-dev git
-
-    # install phpbrew for this user
-    cd $HOME/php-utils-bin
-    curl -L -O https://github.com/phpbrew/phpbrew/raw/f6a422e1ba49293ee73bc4c317795c021bc57020/phpbrew
-    chmod +x phpbrew
-
     # init with known --old to get 5.2 and 5.3
     $HOME/php-utils-bin/phpbrew init
     $HOME/php-utils-bin/phpbrew known --old
@@ -104,10 +97,11 @@ if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; t
       curl -L -o $HOME/php-utils-bin/phpunit-4.8 https://phar.phpunit.de/phpunit-4.8.9.phar
       chmod +x $HOME/php-utils-bin/phpunit-4.8
     fi
+
+    # clean up build directory
+    rm -rf $HOME/.phpbrew/build/*
   fi
 
-  # clean up build directory
-  rm -rf $HOME/.phpbrew/build/*
 
   # all needed php versions and phpunit versions are installed, either from the above
   # install script, or from travis cache, so switch to using them
