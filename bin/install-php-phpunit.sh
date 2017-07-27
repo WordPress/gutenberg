@@ -1,5 +1,6 @@
 #!/bin/bash
 
+ORIG_DIR=`pwd`;
 if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; then
   # install php runtime dependencies
   sudo apt-get install -y curl libxml2 libfreetype6 libpng12-0 libjpeg8 libgd3 libxpm4 \
@@ -128,3 +129,5 @@ chmod +x $HOME/php-utils-bin/phpunit
 
 # got to check our php-utils-bin first, as we're overriding travis' phpunit shim
 export PATH=$HOME/php-utils-bin:$PATH
+
+cd $ORIG_DIR
