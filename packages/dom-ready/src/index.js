@@ -6,7 +6,7 @@
  * @returns {void}
  */
 const domReady = function( callback ) {
-  if ( document.readyState === 'complete' || ( document.readyState !== 'loading' && !document.documentElement.doScroll ) ) {
+  if ( document.readyState === 'complete' ) {
     return callback();
   }
 
