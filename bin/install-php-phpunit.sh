@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Uses phpbrew to install older php versions on modern(ish) distros.
+# Installs a shim that selects the correct phpunit version to run
+# if using an older version of php.
+
 # we have to save and restore the original working directory, because
 # phpbrew can mess up if we don't run it from the home directory
 ORIG_DIR=`pwd`;
