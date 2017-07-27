@@ -181,6 +181,16 @@ script:
     php -v
     phpunit --version
     echo --------
+
+    # debug
+    env
+    alias
+    ls -lh $HOME/php-utils-bin
+    ls -lh $HOME/.phpbrew/php/php-5.2.17/lib/php/
+    grep -r 3.6 $HOME/.phpbrew/php/php-5.2.17/lib/php/*
+    $HOME/.phpbrew/php/php-5.2.17/lib/php/phpunit/phpunit.php
+    # end debug
+
     if [[ ! -z "$WP_VERSION" ]] ; then
       # Run the build because otherwise there will be a bunch of warnings about
       # failed `stat` calls from `filemtime()`.
