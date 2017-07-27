@@ -15,6 +15,7 @@ matrix:
   - php: 7.1
     env: WP_TRAVISCI=travis:js
   - php: 7.1
+  - php: 7.2
   - php: 7.0
   - php: 5.6
   - php: 5.6
@@ -29,6 +30,7 @@ matrix:
   - php: nightly
   allow_failures:
   - php: nightly
+  - php: 7.2
 before_install:
 - |
   if [[ "$WP_TRAVISCI" == "travis:phpunit" ]]; then
