@@ -84,8 +84,10 @@ describe( 'InserterMenu', () => {
 				recentlyUsedBlocks={ [] }
 			/>
 		);
-
-		expect( enzymeToJson( wrapper ) ).toMatchSnapshot();
+		const activeCategory = wrapper.find( '.editor-inserter__tab .is-active' );
+		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
+		expect( activeCategory.text() ).toBe( 'Recent' );
+		expect( visibleBlocks.length ).toBe( 0 );
 	} );
 
 	it( 'should show the recently used blocks in the recent tab', () => {
@@ -96,8 +98,10 @@ describe( 'InserterMenu', () => {
 				recentlyUsedBlocks={ [ advancedTextBlock ] }
 			/>
 		);
-
-		expect( enzymeToJson( wrapper ) ).toMatchSnapshot();
+		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
+		expect( visibleBlocks.length ).toBe( 1 );
+		expect( visibleBlocks.childAt( 0 ).name() ).toBe( 'BlockIcon' );
+		expect( visibleBlocks.childAt( 1 ).text() ).toBe( 'Advanced Text' );
 	} );
 
 	it( 'should show blocks from the embed category in the embed tab', () => {
@@ -111,8 +115,11 @@ describe( 'InserterMenu', () => {
 		const embedTab = wrapper.find( '.editor-inserter__tab' )
 			.filterWhere( ( node ) => node.text() === 'Embeds' );
 		embedTab.simulate( 'click' );
-
-		expect( enzymeToJson( wrapper ) ).toMatchSnapshot();
+		const activeCategory = wrapper.find( '.editor-inserter__tab .is-active' );
+		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
+		expect( activeCategory.text() ).toBe( 'Embeds' );
+		expect( visibleBlocks.length ).toBe( 1 );
+		expect( visibleBlocks.childAt( 1 ).text() ).toBe( 'Youtube' );
 	} );
 
 	it( 'should show all blocks except embeds in the blocks tab', () => {
@@ -127,7 +134,10 @@ describe( 'InserterMenu', () => {
 			.filterWhere( ( node ) => node.text() === 'Blocks' );
 		blocksTab.simulate( 'click' );
 
-		expect( enzymeToJson( wrapper ) ).toMatchSnapshot();
+		const activeCategory = wrapper.find( '.editor-inserter__tab .is-active' );
+		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
+		expect( activeCategory.text() ).toBe( 'Blocks' );
+		expect( visibleBlocks.length ).toBe( 4 );
 	} );
 
 	it( 'should disable already used blocks with `usedOnce`', () => {
@@ -142,7 +152,9 @@ describe( 'InserterMenu', () => {
 			.filterWhere( ( node ) => node.text() === 'Blocks' );
 		blocksTab.simulate( 'click' );
 
-		expect( enzymeToJson( wrapper ) ).toMatchSnapshot();
+		const visibleBlocks = wrapper.find( '.editor-inserter__block[disabled]' );
+		expect( visibleBlocks.length ).toBe( 1 );
+		expect( visibleBlocks.childAt( 1 ).text() ).toBe( 'More' );
 	} );
 
 	it( 'should allow searching for blocks', () => {
