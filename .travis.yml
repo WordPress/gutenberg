@@ -39,8 +39,14 @@ before_script:
         sudo apt-get install -y curl libxml2 libfreetype6 libpng12-0 libjpeg8 libgd3 libxpm4 \
         libltdl7 openssl gettext libgettextpo0 libmhash2 libmcrypt4 mysql-client
 
+        if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]]; then
+          PHPBREW_BUILT_CHECK=$HOME/.phpbrew/php/php-5.2.17/bin/php
+        else
+          PHPBREW_BUILT_CHECK=$HOME/.phpbrew/php/php-5.3.29/bin/php
+        fi
+
         # php and phpunit installs should be cached, only build if they're not there.
-        if [ ! -f $HOME/.phpbrew/bashrc ]; then
+        if [ ! -f $PHPBREW_BUILT_CHECK ]; then
           # install build dependencies for building php (yes, for phpbrew, php is a dependency)
           sudo apt-get install -y php5-dev autoconf automake curl libcurl3-openssl-dev build-essential \
           libxslt1-dev re2c libxml2-dev php5-cli bison libbz2-dev libreadline-dev libfreetype6-dev \
@@ -123,16 +129,25 @@ before_script:
             chmod +x $HOME/bin/phpunit-4.8
           fi
         fi
+
+        # clean up build directory
+        rm -rf $HOME/.phpbrew/build/*
+
         # all needed php versions and phpunit versions are installed, either from the above
         # install script, or from travis cache, so switch to using them
         cd $HOME
         export PHPBREW_RC_ENABLE=1
-        source .phpbrew/bashrc
+        source $HOME/.phpbrew/bashrc
         if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]]; then
-          phpbrew use 5.2.17
+          # only switch if we're not already switched, or else phpbrew crashes
+          if [[ -z "$PHPBREW_PHP" ]]; then
+            phpbrew use 5.2.17
+          fi
           alias phpunit=$HOME/bin/phpunit-3.6
         else
-          phpbrew use 5.3.29
+          if [[ -z "$PHPBREW_PHP" ]]; then
+            phpbrew use 5.3.29
+          fi
           alias phpunit=$HOME/bin/phpunit-4.8
         fi
       elif [[ ${TRAVIS_PHP_VERSION:0:2} == "5." ]]; then
