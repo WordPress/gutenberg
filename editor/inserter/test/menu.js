@@ -48,8 +48,16 @@ const moreBlock = {
 };
 
 const youtubeBlock = {
-	name: 'core/youtube-block',
-	title: 'Youtube',
+	name: 'core-embed/youtube',
+	title: 'YouTube',
+	save: noop,
+	edit: noop,
+	category: 'embed',
+};
+
+const textEmbedBlock = {
+	name: 'core-embed/a-text-embed',
+	title: 'A Text Embed',
 	save: noop,
 	edit: noop,
 	category: 'embed',
@@ -73,6 +81,7 @@ describe( 'InserterMenu', () => {
 		registerBlockType( someOtherBlock.name, someOtherBlock );
 		registerBlockType( moreBlock.name, moreBlock );
 		registerBlockType( youtubeBlock.name, youtubeBlock );
+		registerBlockType( textEmbedBlock.name, textEmbedBlock );
 	} );
 
 	it( 'should show the recent tab by default', () => {
@@ -122,8 +131,9 @@ describe( 'InserterMenu', () => {
 		expect( activeCategory.text() ).toBe( 'Embeds' );
 
 		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
-		expect( visibleBlocks.length ).toBe( 1 );
-		expect( visibleBlocks.at( 0 ).childAt( 1 ).text() ).toBe( 'Youtube' );
+		expect( visibleBlocks.length ).toBe( 2 );
+		expect( visibleBlocks.at( 0 ).childAt( 1 ).text() ).toBe( 'YouTube' );
+		expect( visibleBlocks.at( 1 ).childAt( 1 ).text() ).toBe( 'A Text Embed' );
 	} );
 
 	it( 'should show all blocks except embeds in the blocks tab', () => {
@@ -176,9 +186,13 @@ describe( 'InserterMenu', () => {
 		);
 		wrapper.setState( { filterValue: 'text' } );
 
+		const tabs = wrapper.find( '.editor-inserter__tab' );
+		expect( tabs.length ).toBe( 0 );
+
 		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
-		expect( visibleBlocks.length ).toBe( 2 );
+		expect( visibleBlocks.length ).toBe( 3 );
 		expect( visibleBlocks.at( 0 ).childAt( 1 ).text() ).toBe( 'Text' );
 		expect( visibleBlocks.at( 1 ).childAt( 1 ).text() ).toBe( 'Advanced Text' );
+		expect( visibleBlocks.at( 2 ).childAt( 1 ).text() ).toBe( 'A Text Embed' );
 	} );
 } );
