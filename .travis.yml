@@ -65,7 +65,7 @@ before_script:
             curl -s https://mail.gnome.org/archives/xml/2012-August/txtbgxGXAvz4N.txt > patches/node.patch
 
             # build PHP5.2
-            tail -F $HOME/.phpbrew/build/php-5.2.17/build.log 
+            tail -F $HOME/.phpbrew/build/php-5.2.17/build.log &
             TAIL_PID=$!
             $HOME/bin/phpbrew install --patch patches/node.patch 5.2 +default +mysql=shared +pdo \
             +gettext +phar +openssl=shared -- --with-openssl-dir=/usr/include/openssl --enable-spl
@@ -112,7 +112,7 @@ before_script:
 
           else
             # build PHP5.3
-            tail -F $HOME/.phpbrew/build/php-5.3.29/build.log 
+            tail -F $HOME/.phpbrew/build/php-5.3.29/build.log &
             TAIL_PID=$!
             $HOME/bin/phpbrew install --patch patches/node.patch 5.3 +default +mysql=shared +pdo \
             +gettext +phar +openssl=shared -- --with-openssl-dir=/usr/include/openssl
