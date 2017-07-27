@@ -13,9 +13,6 @@ mkdir -p $HOME/php-utils-bin
 
 if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; then
   set -e
-  # install php runtime dependencies
-  sudo apt-get install -y curl libxml2 libfreetype6 libpng12-0 libjpeg8 libgd3 libxpm4 \
-  libltdl7 openssl gettext libgettextpo0 libmhash2 libmcrypt4 mysql-client
 
   if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]]; then
     PHPBREW_BUILT_CHECK=$HOME/.phpbrew/php/php-5.2.17/bin/php
@@ -34,10 +31,10 @@ if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; t
   if [ ! -f $PHPBREW_BUILT_CHECK ]; then
     
     # install build dependencies for building php (yes, for phpbrew, php is a dependency)
-    sudo apt-get install -y php5-dev autoconf automake curl libcurl3-openssl-dev build-essential \
-    libxslt1-dev re2c libxml2-dev php5-cli bison libbz2-dev libreadline-dev libfreetype6-dev \
-    libpng12-dev libjpeg-dev libjpeg8-dev libgd-dev libltdl-dev libssl-dev libgettextpo-dev \
-    libicu-dev libmhash-dev libmcrypt-dev libmysqlclient-dev libmysqld-dev git
+    #sudo apt-get install -y php5-dev autoconf automake curl libcurl3-openssl-dev build-essential \
+    #libxslt1-dev re2c libxml2-dev php5-cli bison libbz2-dev libreadline-dev libfreetype6-dev \
+    #libpng12-dev libjpeg-dev libjpeg8-dev libgd-dev libltdl-dev libssl-dev libgettextpo-dev \
+    #libicu-dev libmhash-dev libmcrypt-dev libmysqlclient-dev libmysqld-dev git
 
     # install phpbrew for this user
     cd $HOME/php-utils-bin
