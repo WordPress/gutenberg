@@ -10,9 +10,21 @@
 	.blocks-gallery-image {
 		flex-grow: 1;
 		margin: 0 16px 16px 0;
+		position: relative;
 
 		img {
 			max-width: 100%;
+		}
+
+		figcaption {
+			position: absolute;
+				bottom: 0;
+			background: rgba(0,0,0,0.7);
+			padding: 8px 16px;
+			left: 0;
+			right: 0;
+			color: white;
+			font-size: 13px;
 		}
 	}
 

@@ -77,7 +77,7 @@ registerBlockType( 'core/gallery', {
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, className } ) {
+	edit( { attributes, setAttributes, focus, setFocus, className } ) {
 		const { images = [], columns = defaultColumnsNumber( attributes ), align = 'none' } = attributes;
 		const setColumnsNumber = ( event ) => setAttributes( { columns: event.target.value } );
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
@@ -102,6 +102,8 @@ registerBlockType( 'core/gallery', {
 				</BlockControls>
 			)
 		);
+
+		const focusImage = ( imgId ) => setFocus( { image: imgId } );
 
 		if ( images.length === 0 ) {
 			const setMediaUrl = ( imgs ) => setAttributes( { images: slimImageObjects( imgs ) } );
@@ -152,7 +154,12 @@ registerBlockType( 'core/gallery', {
 			),
 			<div key="gallery" className={ `${ className } align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` }>
 				{ images.map( ( img ) => (
-					<GalleryImage key={ img.url } img={ img } />
+					<GalleryImage
+						key={ img.url }
+						img={ img }
+						onSelect={ () => focusImage( img.id ) }
+						focus={ focus && focus.image === img.id }
+					/>
 				) ) }
 			</div>,
 		];
