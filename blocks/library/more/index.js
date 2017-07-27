@@ -8,7 +8,6 @@ import { __ } from 'i18n';
  */
 import './style.scss';
 import { registerBlockType } from '../../api';
-import Editable from '../../editable';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
 import ToggleControl from '../../inspector-controls/toggle-control';
@@ -28,6 +27,9 @@ registerBlockType( 'core/more', {
 		const { text, noTeaser } = attributes;
 
 		const toggleNoTeaser = () => setAttributes( { noTeaser: ! noTeaser } );
+		const defaultText = __( 'Read more' );
+		const value = text !== undefined ? text : defaultText;
+		const inputLength = value.length ? value.length + 1 : 1;
 
 		return [
 			focus && (
@@ -43,13 +45,12 @@ registerBlockType( 'core/more', {
 				</InspectorControls>
 			),
 			<div key="more-tag" className="wp-block-more">
-				<Editable
-					tagName="span"
-					value={ text || __( 'Read more' ) }
-					focus={ focus }
+				<input
+					type="text"
+					value={ value }
+					size={ inputLength }
+					onChange={ ( event ) => setAttributes( { text: event.target.value } ) }
 					onFocus={ setFocus }
-					onChange={ ( value ) => setAttributes( { text: value } ) }
-					formattingControls={ [] }
 				/>
 			</div>,
 		];
