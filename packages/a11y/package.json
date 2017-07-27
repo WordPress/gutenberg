@@ -19,6 +19,6 @@
     "url": "https://github.com/WordPress/packages/issues"
   },
 	"dependencies": {
-		"@wordpress/domReady": "^0.0.1"
+		"@wordpress/dom-ready": "^0.0.1"
 	}
 }

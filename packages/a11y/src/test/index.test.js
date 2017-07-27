@@ -3,7 +3,7 @@ import { speak } from '../';
 jest.mock( '../clear', () => {
   return jest.fn();
 } );
-jest.mock( '@wordpress/domReady', () => {
+jest.mock( '@wordpress/dom-ready', () => {
   return jest.fn( ( callback ) => { callback(); } );
 } );
 jest.mock( '../filterMessage', () => {
@@ -11,7 +11,7 @@ jest.mock( '../filterMessage', () => {
 } );
 
 import clear from '../clear';
-import domReady from '@wordpress/domReady';
+import domReady from '@wordpress/dom-ready';
 import filterMessage from '../filterMessage';
 
 describe( 'speak', () => {
