@@ -2,8 +2,9 @@
     {
         "uid": "_uid_0",
         "name": "core/pullquote",
-        "isValid": false,
+        "isValid": true,
         "attributes": {
+            "align": "none",
             "value": [
                 {
                     "type": "p",
@@ -13,7 +14,6 @@
             "citation": [
                 "...with a caption"
             ]
-        },
-        "originalContent": "<blockquote class=\"wp-block-pullquote\">\n<p>Testing pullquote block...</p><footer>...with a caption</footer>\n</blockquote>"
+        }
     }
 ]

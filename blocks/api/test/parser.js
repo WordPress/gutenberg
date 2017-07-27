@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import { text } from '../query';
@@ -25,6 +20,12 @@ import {
 describe( 'block parser', () => {
 	const defaultBlockSettings = {
 		save: ( { attributes } ) => attributes.fruit,
+	};
+	const identityBlock = {
+		attributes( rawContent ) {
+			return { content: rawContent };
+		},
+		save: ( { attributes } ) => attributes.content,
 	};
 
 	afterEach( () => {
@@ -95,10 +96,10 @@ describe( 'block parser', () => {
 
 	describe( 'isValidBlock()', () => {
 		it( 'returns false is block is not valid', () => {
-			registerBlockType( 'core/test-block', defaultBlockSettings );
-
+			/* eslint-disable no-console */
 			const env = process.env.NODE_ENV;
 			process.env.NODE_ENV = 'production';
+			registerBlockType( 'core/test-block', defaultBlockSettings );
 
 			expect( isValidBlock(
 				'Apples',
@@ -107,6 +108,7 @@ describe( 'block parser', () => {
 			) ).toBe( false );
 
 			process.env.NODE_ENV = env;
+			/* eslint-enable no-console */
 		} );
 
 		it( 'returns true is block is valid', () => {
@@ -122,7 +124,7 @@ describe( 'block parser', () => {
 
 	describe( 'createBlockWithFallback', () => {
 		it( 'should create the requested block if it exists', () => {
-			registerBlockType( 'core/test-block', defaultBlockSettings );
+			registerBlockType( 'core/test-block', identityBlock );
 
 			const block = createBlockWithFallback(
 				'core/test-block',
@@ -130,19 +132,22 @@ describe( 'block parser', () => {
 				{ attr: 'value' }
 			);
 			expect( block.name ).toEqual( 'core/test-block' );
-			expect( block.attributes ).toEqual( { attr: 'value' } );
+			expect( block.attributes ).toEqual( {
+				attr: 'value',
+				content: 'content',
+			} );
 		} );
 
 		it( 'should create the requested block with no attributes if it exists', () => {
-			registerBlockType( 'core/test-block', defaultBlockSettings );
+			registerBlockType( 'core/test-block', identityBlock );
 
 			const block = createBlockWithFallback( 'core/test-block', 'content' );
 			expect( block.name ).toEqual( 'core/test-block' );
-			expect( block.attributes ).toEqual( {} );
+			expect( block.attributes ).toEqual( { content: 'content' } );
 		} );
 
 		it( 'should fall back to the unknown type handler for unknown blocks if present', () => {
-			registerBlockType( 'core/unknown-block', defaultBlockSettings );
+			registerBlockType( 'core/unknown-block', identityBlock );
 			setUnknownTypeHandler( 'core/unknown-block' );
 
 			const block = createBlockWithFallback(
@@ -151,16 +156,19 @@ describe( 'block parser', () => {
 				{ attr: 'value' }
 			);
 			expect( block.name ).toEqual( 'core/unknown-block' );
-			expect( block.attributes ).toEqual( { attr: 'value' } );
+			expect( block.attributes ).toEqual( {
+				attr: 'value',
+				content: 'content',
+			} );
 		} );
 
 		it( 'should fall back to the unknown type handler if block type not specified', () => {
-			registerBlockType( 'core/unknown-block', defaultBlockSettings );
+			registerBlockType( 'core/unknown-block', identityBlock );
 			setUnknownTypeHandler( 'core/unknown-block' );
 
 			const block = createBlockWithFallback( null, 'content' );
 			expect( block.name ).toEqual( 'core/unknown-block' );
-			expect( block.attributes ).toEqual( {} );
+			expect( block.attributes ).toEqual( { content: 'content' } );
 		} );
 
 		it( 'should not create a block if no unknown type handler', () => {
@@ -171,15 +179,7 @@ describe( 'block parser', () => {
 
 	describe( 'parse()', () => {
 		it( 'should parse the post content, including block attributes', () => {
-			registerBlockType( 'core/test-block', {
-				// Currently this is the only way to test block content parsing?
-				attributes: function( rawContent ) {
-					return {
-						content: rawContent,
-					};
-				},
-				save: noop,
-			} );
+			registerBlockType( 'core/test-block', identityBlock );
 
 			const parsed = parse(
 				'<!-- wp:core/test-block {"smoked":"yes","url":"http://google.com","chicken":"ribs & \'wings\'"} -->' +
@@ -205,17 +205,10 @@ describe( 'block parser', () => {
 		} );
 
 		it( 'should parse the post content, ignoring unknown blocks', () => {
-			registerBlockType( 'core/test-block', {
-				attributes: function( rawContent ) {
-					return {
-						content: rawContent + ' & Chicken',
-					};
-				},
-				save: noop,
-			} );
+			registerBlockType( 'core/test-block', identityBlock );
 
 			const parsed = parse(
-				'<!-- wp:core/test-block -->\nRibs\n<!-- /wp:core/test-block -->' +
+				'<!-- wp:core/test-block -->Ribs & Chicken<!-- /wp:core/test-block -->' +
 				'<p>Broccoli</p>' +
 				'<!-- wp:core/unknown-block -->Ribs<!-- /wp:core/unknown-block -->'
 			);
@@ -230,12 +223,12 @@ describe( 'block parser', () => {
 
 		it( 'should parse the post content, using unknown block handler', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
-			registerBlockType( 'core/unknown-block', defaultBlockSettings );
+			registerBlockType( 'core/unknown-block', identityBlock );
 
 			setUnknownTypeHandler( 'core/unknown-block' );
 
 			const parsed = parse(
-				'<!-- wp:core/test-block -->Ribs<!-- /wp:core/test-block -->' +
+				'<!-- wp:core/test-block {"fruit":"Bananas"} -->Bananas<!-- /wp:core/test-block -->' +
 				'<p>Broccoli</p>' +
 				'<!-- wp:core/unknown-block -->Ribs<!-- /wp:core/unknown-block -->'
 			);
@@ -250,23 +243,15 @@ describe( 'block parser', () => {
 
 		it( 'should parse the post content, including raw HTML at each end', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
-			registerBlockType( 'core/unknown-block', {
-				// Currently this is the only way to test block content parsing?
-				attributes: function( rawContent ) {
-					return {
-						content: rawContent,
-					};
-				},
-				save: noop,
-			} );
+			registerBlockType( 'core/unknown-block', identityBlock );
 
 			setUnknownTypeHandler( 'core/unknown-block' );
 
 			const parsed = parse(
 				'<p>Cauliflower</p>' +
-				'<!-- wp:core/test-block -->Ribs<!-- /wp:core/test-block -->' +
+				'<!-- wp:core/test-block {"fruit":"Bananas"} -->Bananas<!-- /wp:core/test-block -->' +
 				'\n<p>Broccoli</p>\n' +
-				'<!-- wp:core/test-block -->Ribs<!-- /wp:core/test-block -->' +
+				'<!-- wp:core/test-block {"fruit":"Bananas"} -->Bananas<!-- /wp:core/test-block -->' +
 				'<p>Romanesco</p>'
 			);
 

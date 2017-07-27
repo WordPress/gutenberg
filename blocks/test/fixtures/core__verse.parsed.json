@@ -2,7 +2,7 @@
     {
         "blockName": "core/verse",
         "attrs": null,
-        "rawContent": "\n<pre class=\"wp-block-verse\">A <em>verse</em>…<br>And more!</pre>\n"
+        "rawContent": "\n<pre class=\"wp-block-verse\">A <em>verse</em>…<br/>And more!</pre>\n"
     },
     {
         "attrs": {},

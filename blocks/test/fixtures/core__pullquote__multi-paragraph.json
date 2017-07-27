@@ -4,6 +4,7 @@
         "name": "core/pullquote",
         "isValid": true,
         "attributes": {
+            "align": "none",
             "value": [
                 {
                     "type": "p",
