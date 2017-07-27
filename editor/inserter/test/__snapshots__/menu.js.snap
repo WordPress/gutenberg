@@ -1,366 +1,63 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`InserterMenu should allow searching for blocks 1`] = `
-ShallowWrapper {
-  "complexSelector": ComplexSelector {
-    "buildPredicate": [Function],
-    "childrenOfNode": [Function],
-    "findWhereUnwrapped": [Function],
-  },
-  "length": 1,
-  "node": <Popover
-    className="editor-inserter__menu"
-    position={undefined}
+<Popover
+  className="editor-inserter__menu"
 >
-    <label
-        className="screen-reader-text"
-        htmlFor="editor-inserter__search-1"
-    >
-        Search blocks
-    </label>
-    <input
-        autoFocus={true}
-        className="editor-inserter__search"
-        id="editor-inserter__search-1"
-        onChange={[Function]}
-        onClick={[Function]}
-        placeholder="Search…"
-        tabIndex="-1"
-        type="search"
-    />
-    <div
-        className="editor-inserter__content"
-        role="menu"
-    >
-        <div>
-            <div
-                aria-hidden="true"
-                className="editor-inserter__separator"
-                id="editor-inserter__separator-common-1"
-            >
-                Common Blocks
-            </div>
-            <div
-                aria-labelledby="editor-inserter__separator-common-1"
-                className="editor-inserter__category-blocks"
-                role="menu"
-                tabIndex="0"
-            >
-                <button
-                    className="editor-inserter__block"
-                    disabled={undefined}
-                    onClick={[Function]}
-                    onMouseEnter={undefined}
-                    onMouseLeave={undefined}
-                    role="menuitem"
-                    tabIndex="-1"
-                >
-                    <BlockIcon
-                        icon={undefined}
-                    />
-                    Text
-                </button>
-                <button
-                    className="editor-inserter__block"
-                    disabled={undefined}
-                    onClick={[Function]}
-                    onMouseEnter={undefined}
-                    onMouseLeave={undefined}
-                    role="menuitem"
-                    tabIndex="-1"
-                >
-                    <BlockIcon
-                        icon={undefined}
-                    />
-                    Advanced Text
-                </button>
-            </div>
-        </div>
-    </div>
-</Popover>,
-  "nodes": Array [
-    <Popover
-      className="editor-inserter__menu"
-      position={undefined}
->
-      <label
-            className="screen-reader-text"
-            htmlFor="editor-inserter__search-1"
-      >
-            Search blocks
-      </label>
-      <input
-            autoFocus={true}
-            className="editor-inserter__search"
-            id="editor-inserter__search-1"
-            onChange={[Function]}
-            onClick={[Function]}
-            placeholder="Search…"
-            tabIndex="-1"
-            type="search"
-      />
+  <label
+    className="screen-reader-text"
+    htmlFor="editor-inserter__search-1"
+  >
+    Search blocks
+  </label>
+  <input
+    autoFocus={true}
+    className="editor-inserter__search"
+    id="editor-inserter__search-1"
+    onChange={[Function]}
+    onClick={[Function]}
+    placeholder="Search…"
+    tabIndex="-1"
+    type="search"
+  />
+  <div
+    className="editor-inserter__content"
+    role="menu"
+  >
+    <div>
       <div
-            className="editor-inserter__content"
-            role="menu"
+        aria-hidden="true"
+        className="editor-inserter__separator"
+        id="editor-inserter__separator-common-1"
       >
-            <div>
-                  <div
-                        aria-hidden="true"
-                        className="editor-inserter__separator"
-                        id="editor-inserter__separator-common-1"
-                  >
-                        Common Blocks
-                  </div>
-                  <div
-                        aria-labelledby="editor-inserter__separator-common-1"
-                        className="editor-inserter__category-blocks"
-                        role="menu"
-                        tabIndex="0"
-                  >
-                        <button
-                              className="editor-inserter__block"
-                              disabled={undefined}
-                              onClick={[Function]}
-                              onMouseEnter={undefined}
-                              onMouseLeave={undefined}
-                              role="menuitem"
-                              tabIndex="-1"
-                        >
-                              <BlockIcon
-                                    icon={undefined}
-                              />
-                              Text
-                        </button>
-                        <button
-                              className="editor-inserter__block"
-                              disabled={undefined}
-                              onClick={[Function]}
-                              onMouseEnter={undefined}
-                              onMouseLeave={undefined}
-                              role="menuitem"
-                              tabIndex="-1"
-                        >
-                              <BlockIcon
-                                    icon={undefined}
-                              />
-                              Advanced Text
-                        </button>
-                  </div>
-            </div>
+        Common Blocks
       </div>
-</Popover>,
-  ],
-  "options": Object {},
-  "renderer": ReactShallowRenderer {
-    "_instance": ShallowComponentWrapper {
-      "_calledComponentWillUnmount": false,
-      "_compositeType": 0,
-      "_context": Object {},
-      "_currentElement": <InserterMenu
-        blocks={Array []}
-        instanceId={1}
-        recentlyUsedBlocks={Array []}
-/>,
-      "_debugID": 11,
-      "_hostContainerInfo": null,
-      "_hostParent": null,
-      "_instance": InserterMenu {
-        "_reactInternalInstance": [Circular],
-        "addRecentBlocks": [Function],
-        "context": Object {},
-        "debouncedSpeakAssertive": [Function],
-        "filter": [Function],
-        "getBlocksForCurrentTab": [Function],
-        "nodes": Object {},
-        "onKeyDown": [Function],
-        "props": Object {
-          "blocks": Array [],
-          "instanceId": 1,
-          "recentlyUsedBlocks": Array [],
-        },
-        "refs": Object {},
-        "searchBlocks": [Function],
-        "setSearchFocus": [Function],
-        "sortBlocks": [Function],
-        "state": Object {
-          "currentFocus": "search",
-          "filterValue": "text",
-          "tab": "recent",
-        },
-        "updater": Object {
-          "enqueueCallback": [Function],
-          "enqueueCallbackInternal": [Function],
-          "enqueueElementInternal": [Function],
-          "enqueueForceUpdate": [Function],
-          "enqueueReplaceState": [Function],
-          "enqueueSetState": [Function],
-          "isMounted": [Function],
-          "validateCallback": [Function],
-        },
-      },
-      "_mountOrder": 6,
-      "_pendingCallbacks": null,
-      "_pendingElement": null,
-      "_pendingForceUpdate": false,
-      "_pendingReplaceState": false,
-      "_pendingStateQueue": null,
-      "_renderedComponent": NoopInternalComponent {
-        "_currentElement": <Popover
-          className="editor-inserter__menu"
-          position={undefined}
->
-          <label
-                    className="screen-reader-text"
-                    htmlFor="editor-inserter__search-1"
-          >
-                    Search blocks
-          </label>
-          <input
-                    autoFocus={true}
-                    className="editor-inserter__search"
-                    id="editor-inserter__search-1"
-                    onChange={[Function]}
-                    onClick={[Function]}
-                    placeholder="Search…"
-                    tabIndex="-1"
-                    type="search"
-          />
-          <div
-                    className="editor-inserter__content"
-                    role="menu"
-          >
-                    <div>
-                              <div
-                                        aria-hidden="true"
-                                        className="editor-inserter__separator"
-                                        id="editor-inserter__separator-common-1"
-                              >
-                                        Common Blocks
-                              </div>
-                              <div
-                                        aria-labelledby="editor-inserter__separator-common-1"
-                                        className="editor-inserter__category-blocks"
-                                        role="menu"
-                                        tabIndex="0"
-                              >
-                                        <button
-                                                  className="editor-inserter__block"
-                                                  disabled={undefined}
-                                                  onClick={[Function]}
-                                                  onMouseEnter={undefined}
-                                                  onMouseLeave={undefined}
-                                                  role="menuitem"
-                                                  tabIndex="-1"
-                                        >
-                                                  <BlockIcon
-                                                            icon={undefined}
-                                                  />
-                                                  Text
-                                        </button>
-                                        <button
-                                                  className="editor-inserter__block"
-                                                  disabled={undefined}
-                                                  onClick={[Function]}
-                                                  onMouseEnter={undefined}
-                                                  onMouseLeave={undefined}
-                                                  role="menuitem"
-                                                  tabIndex="-1"
-                                        >
-                                                  <BlockIcon
-                                                            icon={undefined}
-                                                  />
-                                                  Advanced Text
-                                        </button>
-                              </div>
-                    </div>
-          </div>
-</Popover>,
-        "_debugID": 12,
-        "_renderedOutput": <Popover
-          className="editor-inserter__menu"
-          position={undefined}
->
-          <label
-                    className="screen-reader-text"
-                    htmlFor="editor-inserter__search-1"
-          >
-                    Search blocks
-          </label>
-          <input
-                    autoFocus={true}
-                    className="editor-inserter__search"
-                    id="editor-inserter__search-1"
-                    onChange={[Function]}
-                    onClick={[Function]}
-                    placeholder="Search…"
-                    tabIndex="-1"
-                    type="search"
-          />
-          <div
-                    className="editor-inserter__content"
-                    role="menu"
-          >
-                    <div>
-                              <div
-                                        aria-hidden="true"
-                                        className="editor-inserter__separator"
-                                        id="editor-inserter__separator-common-1"
-                              >
-                                        Common Blocks
-                              </div>
-                              <div
-                                        aria-labelledby="editor-inserter__separator-common-1"
-                                        className="editor-inserter__category-blocks"
-                                        role="menu"
-                                        tabIndex="0"
-                              >
-                                        <button
-                                                  className="editor-inserter__block"
-                                                  disabled={undefined}
-                                                  onClick={[Function]}
-                                                  onMouseEnter={undefined}
-                                                  onMouseLeave={undefined}
-                                                  role="menuitem"
-                                                  tabIndex="-1"
-                                        >
-                                                  <BlockIcon
-                                                            icon={undefined}
-                                                  />
-                                                  Text
-                                        </button>
-                                        <button
-                                                  className="editor-inserter__block"
-                                                  disabled={undefined}
-                                                  onClick={[Function]}
-                                                  onMouseEnter={undefined}
-                                                  onMouseLeave={undefined}
-                                                  role="menuitem"
-                                                  tabIndex="-1"
-                                        >
-                                                  <BlockIcon
-                                                            icon={undefined}
-                                                  />
-                                                  Advanced Text
-                                        </button>
-                              </div>
-                    </div>
-          </div>
-</Popover>,
-      },
-      "_renderedNodeType": 1,
-      "_rootNodeID": 0,
-      "_topLevelWrapper": null,
-      "_updateBatchNumber": null,
-      "_warnedAboutRefsInRender": false,
-    },
-    "getRenderOutput": [Function],
-    "render": [Function],
-  },
-  "root": [Circular],
-  "unrendered": <InserterMenu
-    blocks={Array []}
-    instanceId={1}
-    recentlyUsedBlocks={Array []}
-/>,
-}
+      <div
+        aria-labelledby="editor-inserter__separator-common-1"
+        className="editor-inserter__category-blocks"
+        role="menu"
+        tabIndex="0"
+      >
+        <button
+          className="editor-inserter__block"
+          onClick={[Function]}
+          role="menuitem"
+          tabIndex="-1"
+        >
+          <BlockIcon />
+          Text
+        </button>
+        <button
+          className="editor-inserter__block"
+          onClick={[Function]}
+          role="menuitem"
+          tabIndex="-1"
+        >
+          <BlockIcon />
+          Advanced Text
+        </button>
+      </div>
+    </div>
+  </div>
+</Popover>
 `;
