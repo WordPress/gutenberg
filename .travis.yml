@@ -197,6 +197,9 @@ script:
         sleep .2 # Otherwise Travis doesn't want to print the whole message
         exit 1
       fi
+      echo Running with the following versions:
+      php -v
+      phpunit -v
       # Check parser syntax
       php lib/parser.php || exit 1
       # Run PHPUnit tests
