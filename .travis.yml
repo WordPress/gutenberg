@@ -92,6 +92,8 @@ before_script:
             # and the version of phpunit that we expect to run with php 5.2
             git clone --depth=1 --branch=3.6   git://github.com/sebastianbergmann/phpunit.git
 
+            set -x
+
             # fix up the version number of phpunit
             sed -i 's/@package_version@/3.6-git/g' phpunit/PHPUnit/Runner/Version.php
 
