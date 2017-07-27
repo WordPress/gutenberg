@@ -1,9 +1,0 @@
-coverage:
-  status:
-    project:
-      diff_change:
-        enabled: true
-        target: auto
-        threshold: 1
-
-comment: false
