@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { shallow } from 'enzyme';
-import enzymeToJson from 'enzyme-to-json';
 import { noop } from 'lodash';
 
 /**
@@ -167,6 +166,6 @@ describe( 'InserterMenu', () => {
 		);
 		wrapper.setState( { filterValue: 'text' } );
 
-		expect( enzymeToJson( wrapper ) ).toMatchSnapshot();
+		expect( wrapper ).toMatchSnapshot();
 	} );
 } );

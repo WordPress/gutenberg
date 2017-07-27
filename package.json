@@ -55,7 +55,6 @@
     "cross-env": "^3.2.4",
     "deep-freeze": "0.0.1",
     "enzyme": "^2.8.2",
-    "enzyme-to-json": "^1.5.1",
     "eslint": "^3.17.1",
     "eslint-config-wordpress": "^1.1.0",
     "eslint-plugin-jest": "~20.0.3",
