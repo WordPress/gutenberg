@@ -24,12 +24,29 @@ import BlockDescription from '../../block-description';
 
 const { children, query } = hpq;
 
+function palette() {
+	return [
+		'#f78da7',
+		'#eb144c',
+		'#ff6900',
+		'#fcb900',
+		'#7bdcb5',
+		'#00d084',
+		'#8ed1fc',
+		'#0693e3',
+		'#eee',
+		'#abb8c3',
+		'#444',
+		'#111',
+	];
+}
+
 registerBlockType( 'core/cover-text', {
 	title: __( 'Cover Text' ),
 
 	icon: 'text',
 
-	category: 'common',
+	category: 'formatting',
 
 	attributes: {
 		content: query( 'p', children() ),
@@ -79,16 +96,14 @@ registerBlockType( 'core/cover-text', {
 					<h3>{ __( 'Background Color' ) }</h3>
 					<CirclePicker
 						color={ backgroundColor }
-						colors={
-							[ "#f78da7", "#eb144c", "#ff6900", "#fcb900", "#7bdcb5", "#00d084", "#8ed1fc", "#0693e3", "#eee", "#abb8c3", "#444", "#111" ]
-						}
+						colors={ palette() }
 						onChangeComplete={ ( colorValue ) => setAttributes( { backgroundColor: colorValue.hex } ) }
 						style={ { marginBottom: '20px' } }
 					/>
 					<h3>{ __( 'Text Color' ) }</h3>
 					<CirclePicker
 						color={ textColor }
-						colors={ [ "#f78da7", "#eb144c", "#ff6900", "#fcb900", "#7bdcb5", "#00d084", "#8ed1fc", "#0693e3", "#eee", "#abb8c3", "#444", "#111" ] }
+						colors={ palette() }
 						onChangeComplete={ ( colorValue ) => setAttributes( { textColor: colorValue.hex } ) }
 					/>
 				</InspectorControls>
