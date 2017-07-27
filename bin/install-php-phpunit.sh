@@ -12,8 +12,6 @@ THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 mkdir -p $HOME/php-utils-bin
 
 if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; then
-  set -e
-
   if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]]; then
     PHPBREW_BUILT_CHECK=$HOME/.phpbrew/php/php-5.2.17/bin/php
   else
@@ -114,17 +112,13 @@ if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; t
   if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]]; then
     # only switch if we're not already switched, or else phpbrew crashes
     if [[ -z "$PHPBREW_PHP" ]]; then
-      ls $HOME/.phpbrew/
       phpbrew use 5.2.17
     fi
-    alias phpunit=$HOME/php-utils-bin/phpunit-3.6
   else
     if [[ -z "$PHPBREW_PHP" ]]; then
       phpbrew use 5.3.29
     fi
-    alias phpunit=$HOME/php-utils-bin/phpunit-4.8
   fi
-  set +e
 elif [[ ${TRAVIS_PHP_VERSION:0:2} == "5." ]]; then
   # all other PHP 5.x versions
   mkdir -p $HOME/phpunit-bin
