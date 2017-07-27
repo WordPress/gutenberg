@@ -102,7 +102,8 @@ describe( 'InserterMenu', () => {
 				recentlyUsedBlocks={ [] }
 			/>
 		);
-		const embedTab = wrapper.find( '.editor-inserter__tab' ).filterWhere( ( node ) => node.text() === 'Embeds' );
+		const embedTab = wrapper.find( '.editor-inserter__tab' )
+			.filterWhere( ( node ) => node.text() === 'Embeds' );
 		embedTab.simulate( 'click' );
 		const activeCategory = wrapper.find( '.editor-inserter__tab .is-active' );
 		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
@@ -119,7 +120,8 @@ describe( 'InserterMenu', () => {
 				recentlyUsedBlocks={ [] }
 			/>
 		);
-		const embedTab = wrapper.find( '.editor-inserter__tab' ).filterWhere( ( node ) => node.text() === 'Blocks' );
+		const embedTab = wrapper.find( '.editor-inserter__tab' )
+			.filterWhere( ( node ) => node.text() === 'Blocks' );
 		embedTab.simulate( 'click' );
 		const activeCategory = wrapper.find( '.editor-inserter__tab .is-active' );
 		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
@@ -135,7 +137,8 @@ describe( 'InserterMenu', () => {
 				recentlyUsedBlocks={ [] }
 			/>
 		);
-		const embedTab = wrapper.find( '.editor-inserter__tab' ).filterWhere( ( node ) => node.text() === 'Blocks' );
+		const embedTab = wrapper.find( '.editor-inserter__tab' )
+			.filterWhere( ( node ) => node.text() === 'Blocks' );
 		embedTab.simulate( 'click' );
 		const visibleBlocks = wrapper.find( '.editor-inserter__block[disabled]' );
 		expect( visibleBlocks.length ).toBe( 1 );
