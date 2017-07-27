@@ -1,7 +1,7 @@
-codecov:
+coverage:
   status:
     project:
-      diff-change:
+      diff_change:
         enabled: true
         target: auto
         threshold: 1
