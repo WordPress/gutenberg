@@ -1,9 +1,11 @@
 .editor-block-settings-menu {
 	position: absolute;
-	top: 10px;
+	top: 0;
 	right: 0;
+	height: $text-editor-font-size * 4; // same height as an empty paragraph
+	padding: 6px 0 6px 14px; // handles hover area
 
-	// Mobile, to be revisited
+	// Mobile
 	display: none;
 
 	@include break-small {
@@ -22,7 +24,6 @@
 	width: 20px;
 	height: 20px;
 	border-radius: 50%;
-	margin-bottom: 8px;
 
 	&[aria-disabled="true"] {
 		cursor: default;
@@ -32,5 +33,9 @@
 
 	.dashicon {
 		display: block;
+	}
+
+	&:first-child {
+		margin-bottom: 4px;
 	}
 }

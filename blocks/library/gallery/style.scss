@@ -19,3 +19,7 @@
 .blocks-gallery__placeholder-instructions {
 	margin: 1.8em 0;
 }
+
+.editor-visual-editor__block[data-type="core/gallery"] .editor-visual-editor__block-edit {
+	overflow: hidden;
+}

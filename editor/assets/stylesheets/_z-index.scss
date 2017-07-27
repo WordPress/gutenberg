@@ -13,10 +13,10 @@ $z-layers: (
 	'.editor-inserter__tabs': 1,
 	'.editor-inserter__tab.is-active': 1,
 	'.components-panel__header': 1,
+	'.editor-block-mover': 10,
 	'.editor-header': 20,
 	'.editor-post-visibility__dialog': 30,
 	'.editor-post-schedule__dialog': 30,
-	'.editor-block-mover': 30,
 
 	// Show drop zone above most standard content, but below any overlays
 	'.components-drop-zone': 100,
