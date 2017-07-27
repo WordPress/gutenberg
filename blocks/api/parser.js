@@ -129,13 +129,54 @@ export function isValidBlock( rawContent, blockType, attributes ) {
 
 	const isValid = ( actual === expected );
 
-	if ( ! isValid && 'production' !== process.env.NODE_ENV ) {
-		// eslint-disable-next-line no-console
-		console.error(
-			'Invalid block parse\n' +
-				'\tExpected: ' + expected + '\n' +
-				'\tActual:   ' + actual
-		);
+	if ( ! isValid ) {
+		// NOTE: DO NOT COLLAPSE THESE CONDITIONS OR CONVERT COMMONJS TO ES2015
+		// IMPORTS. They are intentionally written as such because minification
+		// will drop this unreachable block in production environments.
+		if ( 'production' !== process.env.NODE_ENV ) {
+			const chalk = require( 'chalk' );
+			let message = 'Invalid block parse for ';
+
+			// Chalk automatically detects its environment to determine whether
+			// ANSI codes are supported. In these environments we provide a nicely
+			// colored error message for invalid parse.
+			//
+			// TODO: Teach browsers to ANSI
+			if ( chalk.enabled ) {
+				const { diffLines } = require( 'diff' );
+				const diff = diffLines( actual, expected );
+				message += chalk.bold( blockType.name ) + ':\n\n';
+				message += chalk.bgGreen( 'Expected' ) + ' ' + chalk.bgRed( 'Actual' ) + '\n\n';
+
+				message += diff.reduce( ( result, part ) => {
+					let { value } = part;
+					if ( part.removed ) {
+						value = value.replace( /\n$/, '' );
+						value = value.replace( /^/gm, '- ' );
+						value = chalk.red( value );
+					} else if ( part.added ) {
+						value = value.replace( /\n$/, '' );
+						value = value.replace( /^/gm, '+ ' );
+						value = '\n' + value;
+						value = chalk.green( value );
+						value += '\n';
+					}
+
+					return result + value;
+				}, '' );
+			} else {
+				message += blockType.name + ':\n\n' +
+					'Expected:\n\n' + expected + '\n\n' +
+					'Actual:\n\n' + actual;
+			}
+
+			if ( 'test' === process.env.NODE_ENV ) {
+				throw new Error( message );
+			} else {
+				// eslint-disable-next-line no-console
+				console.warn( message );
+			}
+		}
 	}
 
 	return isValid;

@@ -97,11 +97,16 @@ describe( 'block parser', () => {
 		it( 'returns false is block is not valid', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
+			const env = process.env.NODE_ENV;
+			process.env.NODE_ENV = 'production';
+
 			expect( isValidBlock(
 				'Apples',
 				getBlockType( 'core/test-block' ),
 				{ fruit: 'Bananas' }
 			) ).toBe( false );
+
+			process.env.NODE_ENV = env;
 		} );
 
 		it( 'returns true is block is valid', () => {

@@ -54,6 +54,7 @@
     "concurrently": "^3.4.0",
     "cross-env": "^3.2.4",
     "deep-freeze": "0.0.1",
+    "diff": "^3.3.0",
     "enzyme": "^2.8.2",
     "eslint": "^3.17.1",
     "eslint-config-wordpress": "^1.1.0",
