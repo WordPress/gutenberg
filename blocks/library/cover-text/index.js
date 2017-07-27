@@ -44,7 +44,7 @@ function palette() {
 registerBlockType( 'core/cover-text', {
 	title: __( 'Cover Text' ),
 
-	icon: 'text',
+	icon: 'admin-customizer',
 
 	category: 'formatting',
 
