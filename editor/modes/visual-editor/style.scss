@@ -243,9 +243,29 @@
 		}
 
 		.editor-block-mover {
-			top: -30px;
-			left: 10px;
-			height: auto;
+			display: none;
+		}
+
+		@include break-wide() {
+			.editor-block-mover {
+				display: block;
+			}
+
+			.editor-block-mover {
+				top: -30px;
+				left: 10px;
+				height: auto;
+			}
+
+			.editor-block-mover__control {
+				float: left;
+				margin-right: 8px;
+			}
+		}
+
+		.editor-block-settings-menu__control {
+			float: left;
+			margin-right: 8px;
 		}
 
 		.editor-block-settings-menu {
@@ -253,18 +273,14 @@
 			right: 10px;
 			height: auto;
 		}
-
-		.editor-block-mover__control,
-		.editor-block-settings-menu__control {
-			float: left;
-			margin-right: 8px;
-		}
 	}
 
 	&[data-align="full"],
 	&[data-align="wide"] {
 		.editor-visual-editor__block-controls {
-			width: $visual-editor-max-width - $block-padding - $block-padding;
+			@include break-small() {
+				width: $visual-editor-max-width - $block-padding - $block-padding;
+			}
 			margin-left: auto;
 			margin-right: auto;
 		}
