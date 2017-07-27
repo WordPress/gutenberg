@@ -373,6 +373,18 @@ function gutenberg_extend_wp_api_backbone_client() {
 		};
 JS;
 	wp_add_inline_script( 'wp-api', $script );
+
+	// Localize the wp-api settings and schema.
+	$schema_response = rest_do_request( new WP_REST_Request( 'GET', '/wp/v2' ) );
+	if ( ! $schema_response->is_error() ) {
+		wp_localize_script( 'wp-api', 'wpApiSettings', array(
+			'root'          => esc_url_raw( get_rest_url() ),
+			'nonce'         => wp_create_nonce( 'wp_rest' ),
+			'versionString' => 'wp/v2/',
+			'schema'        => $schema_response->get_data(),
+			'cacheSchema'   => true,
+		) );
+	}
 }
 
 /**
