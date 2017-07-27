@@ -184,6 +184,8 @@ script:
 
     # debug
     echo DEBUG-NIKKI
+    alias
+    which phpunit
     phpunit --version
     $HOME/.phpbrew/php/php-5.2.17/lib/php/phpunit/phpunit.php --version
     echo --------
