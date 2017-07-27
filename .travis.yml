@@ -12,8 +12,7 @@ cache:
   directories:
     - vendor
     - $HOME/.composer/cache
-    - $HOME/.phpbrew/php/php-5.2.17
-    - $HOME/.phpbrew/php/php-5.3.29
+    - $HOME/.phpbrew
 
 before_install:
   - nvm install 7 && nvm use 7
