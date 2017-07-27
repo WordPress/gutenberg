@@ -53,7 +53,7 @@ registerBlockType( 'core/text', {
 		};
 	},
 
-	edit( { attributes, setAttributes, insertBlocksAfter, focus, setFocus, mergeBlocks } ) {
+	edit( { attributes, setAttributes, insertBlocksAfter, focus, setFocus, mergeBlocks, onReplace } ) {
 		const { align, content, dropCap, placeholder } = attributes;
 		const toggleDropCap = () => setAttributes( { dropCap: ! dropCap } );
 		return [
@@ -99,6 +99,7 @@ registerBlockType( 'core/text', {
 					] );
 				} }
 				onMerge={ mergeBlocks }
+				onReplace={ onReplace }
 				style={ { textAlign: align } }
 				className={ dropCap && 'has-drop-cap' }
 				placeholder={ placeholder || __( 'New Paragraph' ) }

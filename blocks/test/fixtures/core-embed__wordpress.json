@@ -2,6 +2,7 @@
     {
         "uid": "_uid_0",
         "name": "core-embed/wordpress",
+        "isValid": true,
         "attributes": {
             "url": "https://wordpress.com/",
             "caption": [

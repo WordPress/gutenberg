@@ -54,6 +54,15 @@ registerBlockType( 'core/quote', {
 					} );
 				},
 			},
+			{
+				type: 'pattern',
+				regExp: /^>\s/,
+				transform: ( { content } ) => {
+					return createBlock( 'core/quote', {
+						value: content,
+					} );
+				},
+			},
 		],
 		to: [
 			{
@@ -121,13 +130,12 @@ registerBlockType( 'core/quote', {
 			focus && (
 				<BlockControls key="controls">
 					<Toolbar controls={ [ 1, 2 ].map( ( variation ) => ( {
-						icon: 'format-quote',
+						icon: 1 === variation ? 'format-quote' : 'testimonial',
 						title: sprintf( __( 'Quote style %d' ), variation ),
 						isActive: Number( style ) === variation,
 						onClick() {
 							setAttributes( { style: variation } );
 						},
-						subscript: variation,
 					} ) ) } />
 					<AlignmentToolbar
 						value={ align }

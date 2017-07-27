@@ -2,6 +2,7 @@
     {
         "uid": "_uid_0",
         "name": "core/freeform",
+        "isValid": true,
         "attributes": {
             "content": "Testing freeform block with some\n<div class=\"wp-some-class\">\n\tHTML <span style=\"color: red;\">content</span>\n</div>"
         }

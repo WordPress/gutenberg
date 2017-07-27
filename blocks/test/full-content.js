@@ -165,12 +165,14 @@ describe( 'full post content fixture', () => {
 				) );
 			}
 
-			const serializedActual = serialize( blocksActual );
+			// `serialize` doesn't have a trailing newline, but the fixture
+			// files should.
+			const serializedActual = serialize( blocksActual ) + '\n';
 			let serializedExpected = readFixtureFile( f + '.serialized.html' );
 
 			if ( ! serializedExpected ) {
 				if ( process.env.GENERATE_MISSING_FIXTURES ) {
-					serializedExpected = serializedActual;
+					serializedExpected = serializedActual + '\n';
 					writeFixtureFile( f + '.serialized.html', serializedExpected );
 				} else {
 					throw new Error(
@@ -180,9 +182,7 @@ describe( 'full post content fixture', () => {
 			}
 
 			try {
-				expect( serializedActual ).toEqual(
-					serializedExpected.replace( /\n$/, '' )
-				);
+				expect( serializedActual ).toEqual( serializedExpected );
 			} catch ( err ) {
 				throw new Error( format(
 					'File \'%s.serialized.html\' does not match expected value:\n\n%s',
@@ -205,9 +205,11 @@ describe( 'full post content fixture', () => {
 				) )
 				.map( basename => {
 					const filename = basename + '.html';
+					const parsedBlockFilename = basename + '.json';
 					return {
 						filename,
 						contents: readFixtureFile( filename ),
+						parsed: JSON.parse( readFixtureFile( parsedBlockFilename ) )[ 0 ],
 					};
 				} )
 				.filter( fixture => fixture.contents !== null );
@@ -221,10 +223,7 @@ describe( 'full post content fixture', () => {
 			}
 
 			foundFixtures.forEach( fixture => {
-				const delimiter = new RegExp(
-					'<!--\\s*wp:' + name + '(\\s+|\\s*-->)'
-				);
-				if ( ! delimiter.test( fixture.contents ) ) {
+				if ( name !== fixture.parsed.name ) {
 					errors.push( format(
 						'Expected fixture file \'%s\' to test the \'%s\' block.',
 						fixture.filename,

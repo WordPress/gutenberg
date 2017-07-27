@@ -1,0 +1,13 @@
+[
+    {
+        "blockName": "core/cover-text",
+        "attrs": {
+            "backgroundColor": "#fcb900"
+        },
+        "rawContent": "\n<div style=\"background-color:#fcb900\"><p>Text with color.</p></div>\n"
+    },
+    {
+        "attrs": {},
+        "rawContent": "\n"
+    }
+]

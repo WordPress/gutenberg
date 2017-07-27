@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { CirclePicker } from 'react-color';
+
+/**
  * WordPress dependencies
  */
 import { __ } from 'i18n';
@@ -14,6 +19,7 @@ import Editable from '../../editable';
 import UrlInput from '../../url-input';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
+import InspectorControls from '../../inspector-controls';
 
 const { attr, children } = query;
 
@@ -38,7 +44,7 @@ registerBlockType( 'core/button', {
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus, className } ) {
-		const { text, url, title, align } = attributes;
+		const { text, url, title, align, color } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 
 		return [
@@ -47,7 +53,7 @@ registerBlockType( 'core/button', {
 					<BlockAlignmentToolbar value={ align } onChange={ updateAlignment } />
 				</BlockControls>
 			),
-			<span key="button" className={ className } title={ title }>
+			<span key="button" className={ className } title={ title } style={ { backgroundColor: color } } >
 				<Editable
 					tagName="span"
 					placeholder={ __( 'Write label…' ) }
@@ -68,15 +74,29 @@ registerBlockType( 'core/button', {
 						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
 					</form>
 				}
+				{ focus &&
+					<InspectorControls key="inspector">
+						<CirclePicker
+							color={ color }
+							onChangeComplete={ ( colorValue ) => setAttributes( { color: colorValue.hex } ) }
+						/>
+						<InspectorControls.TextControl
+							label={ __( 'Hex Color' ) }
+							value={ color }
+							onChange={ ( value ) => setAttributes( { color: value } ) }
+						/>
+					</InspectorControls>
+				}
+			),
 			</span>,
 		];
 	},
 
 	save( { attributes } ) {
-		const { url, text, title, align = 'none' } = attributes;
+		const { url, text, title, align = 'none', color } = attributes;
 
 		return (
-			<div className={ `align${ align }` }>
+			<div className={ `align${ align }` } style={ { backgroundColor: color } }>
 				<a href={ url } title={ title }>
 					{ text }
 				</a>

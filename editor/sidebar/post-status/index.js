@@ -20,7 +20,7 @@ import PostSticky from '../post-sticky';
 import {
 	getEditedPostAttribute,
 	getSuggestedPostFormat,
-	isEditedPostPublished,
+	isCurrentPostPublished,
 } from '../../selectors';
 import { editPost } from '../../actions';
 
@@ -74,7 +74,7 @@ export default connect(
 	( state ) => ( {
 		status: getEditedPostAttribute( state, 'status' ),
 		suggestedFormat: getSuggestedPostFormat( state ),
-		isPublished: isEditedPostPublished( state ),
+		isPublished: isCurrentPostPublished( state ),
 	} ),
 	( dispatch ) => {
 		return {

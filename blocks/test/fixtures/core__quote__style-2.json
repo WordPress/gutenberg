@@ -2,14 +2,15 @@
     {
         "uid": "_uid_0",
         "name": "core/quote",
+        "isValid": true,
         "attributes": {
-            "style": "2",
             "value": [
                 {
-                    "children": "There is no greater agony than bearing an untold story inside you.",
-                    "type": "p"
+                    "type": "p",
+                    "children": "There is no greater agony than bearing an untold story inside you."
                 }
             ],
+            "style": "2",
             "citation": [
                 "Maya Angelou"
             ]
