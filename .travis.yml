@@ -13,7 +13,6 @@ cache:
     - vendor
     - $HOME/.composer/cache
 #    - $HOME/.phpbrew
-#    - $HOME/php-utils-bin
 
 before_install:
   - nvm install 7 && nvm use 7
@@ -22,14 +21,14 @@ matrix:
   include:
     - php: 7.1
       env: WP_VERSION=latest
-    - php: 5.6
-      env: WP_VERSION=latest
-    - php: 7.1
-      env: WP_VERSION=latest SWITCH_TO_PHP=5.2
-    - php: 5.6
-      env: TRAVISCI=phpcs
-    - php: 7.1
-      env: TRAVISCI=js
+#    - php: 5.6
+#      env: WP_VERSION=latest
+#    - php: 7.1
+#      env: WP_VERSION=latest SWITCH_TO_PHP=5.2
+#    - php: 5.6
+#      env: TRAVISCI=phpcs
+#    - php: 7.1
+#      env: TRAVISCI=js
 
 before_script:
   - export PATH="$HOME/.composer/vendor/bin:$PATH"

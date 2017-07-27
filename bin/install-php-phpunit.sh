@@ -1,8 +1,11 @@
 #!/bin/bash
 
+# we have to save and restore the original working directory, because
+# phpbrew can mess up if we don't run it from the home directory
 ORIG_DIR=`pwd`;
 THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-mkdir $HOME/php-utils-bin
+
+mkdir -p $HOME/php-utils-bin
 
 if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; then
   # install php runtime dependencies
@@ -14,6 +17,13 @@ if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; t
   else
     PHPBREW_BUILT_CHECK=$HOME/.phpbrew/php/php-5.3.29/bin/php
   fi
+
+  # install the phpunit shim to run the right phpunit version for these old php versions
+	cp ${THIS_DIR}/phpunit-shim.sh $HOME/php-utils-bin/phpunit
+	chmod +x $HOME/php-utils-bin/phpunit
+
+	# got to check our php-utils-bin first, as we're overriding travis' phpunit shim
+	export PATH=$HOME/php-utils-bin:$PATH
 
   # php and phpunit installs should be cached, only build if they're not there.
   if [ ! -f $PHPBREW_BUILT_CHECK ]; then
@@ -125,11 +135,5 @@ else
   composer global require "phpunit/phpunit=5.7.*"
 fi
 
-# install a script that calls the right phpunit version, depending on the php version running
-cp ${THIS_DIR}/phpunit-shim.sh $HOME/php-utils-bin/phpunit
-chmod +x $HOME/php-utils-bin/phpunit
-
-# got to check our php-utils-bin first, as we're overriding travis' phpunit shim
-export PATH=$HOME/php-utils-bin:$PATH
 
 cd $ORIG_DIR
