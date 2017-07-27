@@ -11,7 +11,7 @@ import { findIndex } from 'lodash';
 import IconButton from 'components/icon-button';
 import Dashicon from 'components/dashicon';
 import { findDOMNode } from 'element';
-import { ESCAPE, LEFT, UP, RIGHT, DOWN } from 'utils/keycodes';
+import { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } from 'utils/keycodes';
 
 /**
  * Internal dependencies
@@ -30,8 +30,6 @@ class DropdownMenu extends wp.element.Component {
 		this.focusNext = this.focusNext.bind( this );
 		this.handleKeyDown = this.handleKeyDown.bind( this );
 		this.handleKeyUp = this.handleKeyUp.bind( this );
-		this.handleFocus = this.handleFocus.bind( this );
-		this.handleBlur = this.handleBlur.bind( this );
 		this.menuNode = null;
 		this.state = {
 			open: false,
@@ -50,26 +48,10 @@ class DropdownMenu extends wp.element.Component {
 		this.closeMenu();
 	}
 
-	handleFocus() {
-		this.hasFocus = true;
-	}
-
-	handleBlur() {
-		this.hasFocus = false;
-
-		this.maybeCloseMenuOnBlur = setTimeout( () => {
-			this.closeMenu();
-		}, 100 );
-	}
-
 	closeMenu() {
-		clearTimeout( this.maybeCloseMenuOnBlur );
-
-		if ( ! this.hasFocus ) {
-			this.setState( {
-				open: false,
-			} );
-		}
+		this.setState( {
+			open: false,
+		} );
 	}
 
 	toggleMenu() {
@@ -90,11 +72,7 @@ class DropdownMenu extends wp.element.Component {
 
 	focusIndex( index ) {
 		if ( this.menuNode ) {
-			if ( index < 0 ) {
-				this.menuNode.previousElementSibling.focus();
-			} else {
-				this.menuNode.children[ index ].focus();
-			}
+			this.menuNode.children[ index ].focus();
 		}
 	}
 
@@ -114,29 +92,31 @@ class DropdownMenu extends wp.element.Component {
 
 	handleKeyUp( event ) {
 		// TODO: find a better way to isolate events on nested components see GH issue #1973.
-		if ( this.state.open ) {
-			/*
-			 * VisualEditorBlock uses keyup to deselect the block. When the menu is
-			 * open we need to stop propagation of keyup after Escape has been pressed
-			 * to close the menu, otherwise the whole block toolbar will disappear.
-			 * When the menu is closed, Escape will make the toolbar disappear as intended.
-			 */
+		/*
+		 * VisualEditorBlock uses a keyup event to deselect the block. When the
+		 * menu is open we need to stop propagation after Escape has been pressed
+		 * so we use a keyup event instead of keydown, otherwise the whole block
+		 * toolbar will disappear.
+		 */
+		if ( event.keyCode === ESCAPE && this.state.open ) {
+			event.preventDefault();
 			event.stopPropagation();
+			const node = findDOMNode( this );
+			const toggle = node.querySelector( '.components-dropdown-menu__toggle' );
+			toggle.focus();
+			this.closeMenu();
+			if ( this.props.onSelect ) {
+				this.props.onSelect( null );
+			}
 		}
 	}
 
 	handleKeyDown( keydown ) {
 		if ( this.state.open ) {
 			switch ( keydown.keyCode ) {
-				case ESCAPE:
-					keydown.preventDefault();
+				case TAB:
 					keydown.stopPropagation();
-					const node = findDOMNode( this );
-					const toggle = node.querySelector( '.components-dropdown-menu__toggle' );
-					toggle.focus();
-					if ( this.props.onSelect ) {
-						this.props.onSelect( null );
-					}
+					this.closeMenu();
 					break;
 
 				case LEFT:
@@ -160,6 +140,7 @@ class DropdownMenu extends wp.element.Component {
 			switch ( keydown.keyCode ) {
 				case DOWN:
 					keydown.preventDefault();
+					keydown.stopPropagation();
 					this.toggleMenu();
 					break;
 
@@ -167,10 +148,6 @@ class DropdownMenu extends wp.element.Component {
 					break;
 			}
 		}
-	}
-
-	componentWillUnmount() {
-		clearTimeout( this.maybeCloseMenuOnBlur );
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
@@ -220,9 +197,6 @@ class DropdownMenu extends wp.element.Component {
 						role="menu"
 						aria-label={ menuLabel }
 						ref={ this.bindMenuReferenceNode }
-						onFocus={ this.handleFocus }
-						onBlur={ this.handleBlur }
-						tabIndex="-1"
 					>
 						{ controls.map( ( control, index ) => (
 							<IconButton
