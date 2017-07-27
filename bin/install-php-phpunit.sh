@@ -84,7 +84,7 @@ if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; t
       # one more PHPUnit dependency that we need to install using pear under PHP5.2
       cd $HOME
       export PHPBREW_RC_ENABLE=1
-      source $HOME/.phpbrew/bashrc
+      source $THIS_DIR/phpbrew.bashrc
       phpbrew use 5.2.17
       pear channel-discover pear.symfony-project.com
       pear install pear.symfony-project.com/YAML-1.0.2
@@ -108,7 +108,7 @@ if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; t
   cd $HOME
   export PATH=$HOME/php-utils-bin:$PATH
   export PHPBREW_RC_ENABLE=1
-  source $HOME/.phpbrew/bashrc
+  source $THIS_DIR/phpbrew.bashrc
   if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]]; then
     # only switch if we're not already switched, or else phpbrew crashes
     if [[ -z "$PHPBREW_PHP" ]]; then
