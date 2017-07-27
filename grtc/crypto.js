@@ -14,7 +14,7 @@ const crypto = {
 
 				const newKeys = {
 					publicKey: forge.pki.publicKeyToPem( keypair.publicKey ),
-					privateKey: forge.pki.privateKeyToPem( keypair.privateKey )
+					privateKey: forge.pki.privateKeyToPem( keypair.privateKey ),
 				};
 
 				resolve( newKeys );

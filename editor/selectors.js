@@ -726,9 +726,15 @@ export function getRecentlyUsedBlocks( state ) {
  */
 export function getPeerData( state, uid ) {
 	const { peerID, peerName, peerColor, blocksByUid } = state.collaborationMode;
+	const grtcProps = state.collaborationData;
+	let peerMetaData = {
+		peerID: null,
+		peerName: null,
+		peerColor: {},
+	};
 
-	if ( peerColor && peerID && peerName && peerID !== window.grtcProps.peerID && blocksByUid === uid ) {
-		const peerMetaData = {
+	if ( peerColor && peerID && peerName && peerID !== grtcProps.peerID && blocksByUid === uid ) {
+		peerMetaData = {
 			peerID,
 			peerName,
 			peerColor: {
@@ -736,21 +742,20 @@ export function getPeerData( state, uid ) {
 				'border-bottom': '2px solid ' + peerColor,
 			},
 		};
-		window.grtcProps.lastPeerData = {
-			...peerMetaData,
-			blockID: blocksByUid,
-		};
-		return peerMetaData;
+		// grtcProps.lastPeerData = {
+		// 	...peerMetaData,
+		// 	blockID: blocksByUid,
+		// };
+		// return peerMetaData;
 	}
 
 	// This is to avoid unsetting current another peer border, This is basically storing last block peer data.
-	if ( window.grtcProps.lastPeerData && peerID === window.grtcProps.peerID && window.grtcProps.lastPeerData.blockID === uid ) {
-		return window.grtcProps.lastPeerData;
+	if ( grtcProps.lastPeerData && peerID === grtcProps.peerID && grtcProps.lastPeerData.blockID === uid ) {
+		//return grtcProps.lastPeerData;
 	}
 
 	return {
-		peerID: null,
-		peerName: null,
-		peerColor: {},
+		peerMetaData,
+		grtcProps,
 	};
 }

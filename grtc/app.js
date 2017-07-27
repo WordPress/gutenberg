@@ -1,11 +1,11 @@
 'use strict';
 
-const Peer = require( 'simple-peer' );
-const uuidv1 = require( 'uuid/v1' );
-const uuidv4 = require( 'uuid/v4' );
-const EventEmitter = require( 'events' ).EventEmitter;
+import Peer from 'simple-peer';
+import uuidv4 from 'uuid/v4';
+import uuidv1 from 'uuid/v1';
+import { EventEmitter } from 'events';
 
-const crypto = require( './crypto' );
+import crypto from './crypto';
 
 /**
  * Signal class that uses promise not event emitters and can be used standalone.

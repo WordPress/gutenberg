@@ -534,6 +534,20 @@ export function notices( state = {}, action ) {
 	return state;
 }
 
+export function collaborationData( state = {}, action ) {
+	switch ( action.type ) {
+		case 'COLLABORATION_LOCAL_DATA':
+			return {
+				...state,
+				peerColor: action.peerColor,
+				peerID: action.peerID,
+				lastPeerData: action.lastPeerData,
+				peerName: action.peerName,
+			};
+	}
+	return state;
+}
+
 export function collaborationMode( state = {}, action ) {
 	switch ( action.type ) {
 		case 'COLLABORATION_MODE':
@@ -562,7 +576,7 @@ const grtcMiddleware = function( { dispatch } ) {
 	const grtcAPI = window.location.origin + '/wp-json/collaborate';
 	const peerID = GRTC.uuid();
 
-	const grtcProps = window.grtcProps = {
+	const grtcProps = {
 		peerColor: GRTC.randomColor(),
 		peerID,
 		lastPeerData: null,
@@ -607,6 +621,10 @@ const grtcMiddleware = function( { dispatch } ) {
 	function startMode( id, url ) {
 		getUsername().then( ( username ) => {
 			grtcProps.peerName = username;
+			dispatch( {
+				type: 'COLLABORATION_LOCAL_DATA',
+				...grtcProps,
+			} );
 			grtc = new GRTC( id, url, username );
 			grtc.on( 'peerData', onReceivedAction );
 			// Temporary change for testing, Not using alert. Need UI.
@@ -684,6 +702,7 @@ export function createReduxStore() {
 		notices,
 		userData,
 		collaborationMode,
+		collaborationData,
 	} ) );
 
 	const enhancers = [ applyMiddleware( refx( effects ), grtcMiddleware ) ];

@@ -225,7 +225,7 @@ class VisualEditorBlock extends Component {
 
 	onFocus( event ) {
 		if ( event.target === this.node ) {
-			this.props.onSelect();
+			this.props.onSelect( this.props.peerData.grtcProps );
 		}
 	}
 
@@ -236,7 +236,7 @@ class VisualEditorBlock extends Component {
 		}
 
 		this.props.onSelectionStart();
-		this.props.onSelect();
+		this.props.onSelect( this.props.peerData.grtcProps );
 	}
 
 	onKeyDown( event ) {
@@ -304,7 +304,7 @@ class VisualEditorBlock extends Component {
 
 	render() {
 		const { block, multiSelectedBlockUids } = this.props;
-		const { peerName, peerID, peerColor } = this.props.peerData;
+		const { peerName, peerID, peerColor } = this.props.peerData.peerMetaData;
 		const blockType = getBlockType( block.name );
 		// translators: %s: Type of block (i.e. Text, Image etc)
 		const blockLabel = sprintf( __( 'Block: %s' ), blockType.title );
@@ -444,13 +444,13 @@ export default connect(
 			dispatch( updateBlockAttributes( uid, attributes ) );
 		},
 
-		onSelect() {
+		onSelect( grtcProps ) {
 			dispatch( {
 				type: 'TOGGLE_BLOCK_SELECTED',
 				selected: true,
 				uid: ownProps.uid,
 			} );
-			dispatch( collaborationState( window.grtcProps, ownProps.uid ) );
+			dispatch( collaborationState( grtcProps, ownProps.uid ) );
 		},
 
 		onDeselect() {
