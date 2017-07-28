@@ -84,3 +84,27 @@ body.gutenberg_page_gutenberg-demo {
 		}
 	}
 }
+
+/**
+ * Scroll individual containers instead
+ */
+
+body.toplevel_page_gutenberg,
+body.gutenberg_page_gutenberg-demo {
+	overflow: hidden;
+
+	#wpwrap,
+	#wpbody,
+	#wpbody-content,
+	.gutenberg,
+	.gutenberg__editor,
+	.editor-layout {
+		height: 100%;
+	}
+
+	.editor-layout__content {
+		height: 100%;
+		overflow: auto;
+		-webkit-overflow-scrolling: touch;
+	}
+}
