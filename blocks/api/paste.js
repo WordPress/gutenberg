@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, get } from 'lodash';
+import { find, get, flowRight as compose } from 'lodash';
 
 /**
  * Internal dependencies
@@ -9,6 +9,10 @@ import { find, get } from 'lodash';
 import { createBlock } from './factory';
 import { getBlockTypes, getUnknownTypeHandler } from './registration';
 import { parseBlockAttributes } from './parser';
+import { ELEMENT_NODE, TEXT_NODE } from 'utils/nodetypes';
+import convertTables from './paste/convert-tables';
+import stripAttributes from './paste/strip-attributes';
+import removeSpans from './paste/remove-spans';
 
 /**
  * Normalises array nodes of any node type to an array of block level nodes.
@@ -26,14 +30,14 @@ export function normaliseToBlockLevelNodes( nodes ) {
 		const node = decu.firstChild;
 
 		// Text nodes: wrap in a paragraph, or append to previous.
-		if ( node.nodeType === 3 ) {
+		if ( node.nodeType === TEXT_NODE ) {
 			if ( ! accu.lastChild || accu.lastChild.nodeName !== 'P' ) {
 				accu.appendChild( document.createElement( 'P' ) );
 			}
 
 			accu.lastChild.appendChild( node );
 		// Element nodes.
-		} else if ( node.nodeType === 1 ) {
+		} else if ( node.nodeType === ELEMENT_NODE ) {
 			// BR nodes: create a new paragraph on double, or append to previous.
 			if ( node.nodeName === 'BR' ) {
 				if ( node.nextSibling && node.nextSibling.nodeName === 'BR' ) {
@@ -70,7 +74,9 @@ export function normaliseToBlockLevelNodes( nodes ) {
 }
 
 export default function( nodes ) {
-	return normaliseToBlockLevelNodes( nodes ).map( ( node ) => {
+	const prepare = compose( [ normaliseToBlockLevelNodes, removeSpans, stripAttributes, convertTables ] );
+
+	return prepare( nodes ).map( ( node ) => {
 		const block = getBlockTypes().reduce( ( acc, blockType ) => {
 			if ( acc ) {
 				return acc;
