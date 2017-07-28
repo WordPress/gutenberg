@@ -2,7 +2,7 @@
  * External dependencies
  */
 import tinymce from 'tinymce';
-import { find, get, escapeRegExp, partition, drop } from 'lodash';
+import { endsWith, find, get, escapeRegExp, partition, drop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -34,7 +34,7 @@ export default function( editor ) {
 
 	const [ enterPatterns, spacePatterns ] = partition(
 		patterns,
-		( { regExp } ) => regExp.source.endsWith( '$' ),
+		( { regExp } ) => endsWith( regExp.source, '$' ),
 	);
 
 	const inlinePatterns = settings.inline || [
