@@ -12,7 +12,7 @@ import 'element-closest';
  * WordPress dependencies
  */
 import { createElement, Component, renderToString } from 'element';
-import { parse, pasteHandler } from '../api';
+import { parse, pasteHandler, getBlockTypes, getUnknownTypeHandler } from '../api';
 import { BACKSPACE, DELETE, ENTER } from 'utils/keycodes';
 
 /**
@@ -145,7 +145,7 @@ export default class Editable extends Component {
 
 			// Internal paste, so parse.
 			if ( childNodes.some( isBlockDelimiter ) ) {
-				blocks = parse( event.node.innerHTML.replace( /<meta[^>]+>/, '' ) );
+				blocks = parse( getBlockTypes(), getUnknownTypeHandler(), event.node.innerHTML.replace( /<meta[^>]+>/, '' ) );
 			// External paste with block level content, so attempt to assign
 			// blocks.
 			} else if ( childNodes.some( isBlockPart ) ) {

@@ -2,13 +2,12 @@
  * External dependencies
  */
 import { parse as hpqParse } from 'hpq';
-import { pickBy } from 'lodash';
+import { pickBy, find } from 'lodash';
 
 /**
  * Internal dependencies
  */
 import { parse as grammarParse } from './post.pegjs';
-import { getBlockType, getUnknownTypeHandler } from './registration';
 import { createBlock } from './factory';
 import { getBeautifulContent, getSaveContent } from './serializer';
 
@@ -63,31 +62,23 @@ export function getBlockAttributes( blockType, rawContent, attributes ) {
 /**
  * Creates a block with fallback to the unknown type handler.
  *
- * @param  {?String} name       Block type name
- * @param  {String}  rawContent Raw block content
- * @param  {?Object} attributes Attributes obtained from block delimiters
- * @return {?Object}            An initialized block object (if possible)
+ * @param  {Object} blockType          Block type name
+ * @param  {Object} fallbackBlockType  Fallback Block type name
+ * @param  {String}  rawContent        Raw block content
+ * @param  {?Object} attributes        Attributes obtained from block delimiters
+ * @return {?Object}                   An initialized block object (if possible)
  */
-export function createBlockWithFallback( name, rawContent, attributes ) {
-	// Use type from block content, otherwise find unknown handler.
-	name = name || getUnknownTypeHandler();
-
-	// Try finding type for known block name, else fall back again.
-	let blockType = getBlockType( name );
-	const fallbackBlock = getUnknownTypeHandler();
-	if ( ! blockType ) {
-		name = fallbackBlock;
-		blockType = getBlockType( name );
-	}
+export function createBlockWithFallback( blockType, fallbackBlockType, rawContent, attributes ) {
+	const parsedBlockType = blockType || fallbackBlockType;
 
 	// Include in set only if type were determined.
 	// TODO do we ever expect there to not be an unknown type handler?
-	if ( blockType && ( rawContent || name !== fallbackBlock ) ) {
+	if ( parsedBlockType && ( rawContent || parsedBlockType !== fallbackBlockType ) ) {
 		// TODO allow blocks to opt-in to receiving a tree instead of a string.
 		// Gradually convert all blocks to this new format, then remove the
 		// string serialization.
 		const block = createBlock(
-			name,
+			blockType,
 			getBlockAttributes( blockType, rawContent, attributes )
 		);
 
@@ -138,13 +129,18 @@ export function isValidBlock( rawContent, blockType, attributes ) {
 /**
  * Parses the post content with a PegJS grammar and returns a list of blocks.
  *
- * @param  {String} content The post content
- * @return {Array}          Block list
+ * @param  {String} content            The post content
+ * @param  {Array}  blockTypes         Block Types
+ * @param  {String} fallbackBlockName  Fallback Block Name
+ * @return {Array}                     Block list
  */
-export function parseWithGrammar( content ) {
+export function parseWithGrammar( content, blockTypes, fallbackBlockName ) {
+	const getBlockType = ( name ) => find( blockTypes, ( bt ) => bt.name === name );
+	const fallbackBlockType = getBlockType( fallbackBlockName );
 	return grammarParse( content ).reduce( ( memo, blockNode ) => {
 		const { blockName, rawContent, attrs } = blockNode;
-		const block = createBlockWithFallback( blockName, rawContent.trim(), attrs );
+		const blockType = getBlockType( blockName );
+		const block = createBlockWithFallback( blockType, fallbackBlockType, rawContent.trim(), attrs );
 		if ( block ) {
 			memo.push( block );
 		}

@@ -1,8 +1,12 @@
 /**
- * External Dependencies
+ * External dependencies
  */
-import uuid from 'uuid/v4';
-import { partial } from 'lodash';
+import { find } from 'lodash';
+
+/**
+ * WordPress Dependencies
+ */
+import { switchToBlockType } from 'blocks';
 
 /**
  * Returns an action object used in signalling that the block with the
@@ -82,57 +86,6 @@ export function hideInsertionPoint() {
 	};
 }
 
-export function editPost( edits ) {
-	return {
-		type: 'EDIT_POST',
-		edits,
-	};
-}
-
-export function savePost() {
-	return {
-		type: 'REQUEST_POST_UPDATE',
-	};
-}
-
-export function trashPost( postId, postType ) {
-	return {
-		type: 'TRASH_POST',
-		postId,
-		postType,
-	};
-}
-
-export function mergeBlocks( blockA, blockB ) {
-	return {
-		type: 'MERGE_BLOCKS',
-		blocks: [ blockA, blockB ],
-	};
-}
-
-/**
- * Returns an action object used in signalling that the post should autosave.
- *
- * @return {Object} Action object
- */
-export function autosave() {
-	return {
-		type: 'AUTOSAVE',
-	};
-}
-
-/**
- * Returns an action object used in signalling that the post should be queued
- * for autosave after a delay.
- *
- * @return {Object} Action object
- */
-export function queueAutosave() {
-	return {
-		type: 'QUEUE_AUTOSAVE',
-	};
-}
-
 /**
  * Returns an action object used in signalling that the blocks
  * corresponding to the specified UID set are to be removed.
@@ -180,40 +133,46 @@ export function stopTyping() {
 	};
 }
 
-/**
- * Returns an action object used to create a notice
- *
- * @param {String}     status   The notice status
- * @param {WPElement}  content  The notice content
- * @param {String}     id       The notice id
- *
- * @return {Object}             Action object
- */
-export function createNotice( status, content, id = uuid() ) {
-	return {
-		type: 'CREATE_NOTICE',
-		notice: {
-			id,
-			status,
-			content,
-		},
-	};
-}
+export function mergeBlocks( dispatch, blocks, blockTypes ) {
+	const [ blockA, blockB ] = blocks;
+	const blockType = find( blockTypes, ( bt ) => bt.name === blockA.name );
+	const mergedBlockType = find( blockTypes, ( bt ) => bt.name === blockB.name );
 
-/**
- * Returns an action object used to remove a notice
- *
- * @param {String}  id  The notice id
- *
- * @return {Object}     Action object
- */
-export function removeNotice( id ) {
-	return {
-		type: 'REMOVE_NOTICE',
-		noticeId: id,
-	};
-}
+	// Only focus the previous block if it's not mergeable
+	if ( ! blockType.merge ) {
+		dispatch( focusBlock( blockA.uid ) );
+		return;
+	}
 
-export const createSuccessNotice = partial( createNotice, 'success' );
-export const createErrorNotice = partial( createNotice, 'error' );
-export const createWarningNotice = partial( createNotice, 'warning' );
+	// We can only merge blocks with similar types
+	// thus, we transform the block to merge first
+	const blocksWithTheSameType = blockA.name === blockB.name
+		? [ blockB ]
+		: switchToBlockType( blockB, mergedBlockType, blockType );
+
+	// If the block types can not match, do nothing
+	if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
+		return;
+	}
+
+	// Calling the merge to update the attributes and remove the block to be merged
+	const updatedAttributes = blockType.merge(
+		blockA.attributes,
+		blocksWithTheSameType[ 0 ].attributes
+	);
+
+	dispatch( focusBlock( blockA.uid, { offset: -1 } ) );
+	dispatch( replaceBlocks(
+		[ blockA.uid, blockB.uid ],
+		[
+			{
+				...blockA,
+				attributes: {
+					...blockA.attributes,
+					...updatedAttributes,
+				},
+			},
+			...blocksWithTheSameType.slice( 1 ),
+		]
+	) );
+}

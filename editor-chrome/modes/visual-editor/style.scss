@@ -1,0 +1,20 @@
+.editor-chrome-visual-editor {
+	position: relative;
+	margin: 0 auto;
+	padding: 50px 0;	// Floating up/down arrows invisible
+
+	&,
+	& p {
+		font-family: $editor-font;
+		font-size: $editor-font-size;
+		line-height: $editor-line-height;
+	}
+
+	@include break-small() {
+		padding: 50px 0;
+	}
+
+	@include break-large() {
+		padding: 60px 0;
+	}
+}

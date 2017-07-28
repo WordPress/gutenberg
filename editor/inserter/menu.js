@@ -11,13 +11,13 @@ import { __, _n, sprintf } from 'i18n';
 import { Component } from 'element';
 import { Popover, withFocusReturn, withInstanceId } from 'components';
 import { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } from 'utils/keycodes';
-import { getCategories, getBlockTypes, BlockIcon } from 'blocks';
+import { BlockIcon } from 'blocks';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { getBlocks, getRecentlyUsedBlocks } from '../selectors';
+import { getBlocks, getRecentlyUsedBlocks, getCategories, getBlockTypes } from '../selectors';
 import { showInsertionPoint, hideInsertionPoint } from '../actions';
 
 class InserterMenu extends Component {
@@ -50,7 +50,7 @@ class InserterMenu extends Component {
 	}
 
 	componentDidUpdate() {
-		const searchResults = this.searchBlocks( getBlockTypes() );
+		const searchResults = this.searchBlocks( this.props.blockTypes );
 		// Announce the blocks search results to screen readers.
 		if ( !! searchResults.length ) {
 			this.debouncedSpeakAssertive( sprintf( _n(
@@ -95,15 +95,15 @@ class InserterMenu extends Component {
 	getBlocksForCurrentTab() {
 		// if we're searching, use everything, otherwise just get the blocks visible in this tab
 		if ( this.state.filterValue ) {
-			return getBlockTypes();
+			return this.props.blockTypes;
 		}
 		switch ( this.state.tab ) {
 			case 'recent':
 				return this.props.recentlyUsedBlocks;
 			case 'blocks':
-				return filter( getBlockTypes(), ( block ) => block.category !== 'embed' );
+				return filter( this.props.blockTypes, ( block ) => block.category !== 'embed' );
 			case 'embeds':
-				return filter( getBlockTypes(), ( block ) => block.category === 'embed' );
+				return filter( this.props.blockTypes, ( block ) => block.category === 'embed' );
 		}
 	}
 
@@ -113,7 +113,7 @@ class InserterMenu extends Component {
 		}
 
 		const getCategoryIndex = ( item ) => {
-			return findIndex( getCategories(), ( category ) => category.slug === item.category );
+			return findIndex( this.props.categories, ( category ) => category.slug === item.category );
 		};
 
 		return sortBy( blockTypes, getCategoryIndex );
@@ -299,7 +299,7 @@ class InserterMenu extends Component {
 	}
 
 	render() {
-		const { position, instanceId } = this.props;
+		const { position, instanceId, categories } = this.props;
 		const isSearching = this.state.filterValue;
 		const visibleBlocksByCategory = this.getVisibleBlocksByCategory( this.getBlocksForCurrentTab() );
 
@@ -335,7 +335,7 @@ class InserterMenu extends Component {
 						</div>
 					}
 					{ this.state.tab === 'blocks' && ! isSearching &&
-						getCategories()
+						categories
 							.map( ( category ) => !! visibleBlocksByCategory[ category.slug ] && (
 								<div key={ category.slug }>
 									<div
@@ -357,7 +357,7 @@ class InserterMenu extends Component {
 							) )
 					}
 					{ this.state.tab === 'embeds' && ! isSearching &&
-						getCategories()
+						categories
 							.map( ( category ) => !! visibleBlocksByCategory[ category.slug ] && (
 								<div
 									className="editor-inserter__category-blocks"
@@ -371,7 +371,7 @@ class InserterMenu extends Component {
 							) )
 					}
 					{ isSearching &&
-						getCategories()
+						categories
 							.map( ( category ) => !! visibleBlocksByCategory[ category.slug ] && (
 								<div key={ category.slug }>
 									<div
@@ -426,9 +426,15 @@ const connectComponent = connect(
 		return {
 			recentlyUsedBlocks: getRecentlyUsedBlocks( state ),
 			blocks: getBlocks( state ),
+			blockTypes: getBlockTypes( state ),
+			categories: getCategories( state ),
 		};
 	},
-	{ showInsertionPoint, hideInsertionPoint }
+	{ showInsertionPoint, hideInsertionPoint },
+	undefined,
+	{
+		storeKey: 'editor',
+	}
 );
 
 export default flow(

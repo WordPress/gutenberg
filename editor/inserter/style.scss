@@ -154,3 +154,36 @@ input[type="search"].editor-inserter__search {
 		outline: none;
 	}
 }
+
+
+.editor-inserter__full {
+	display: flex;
+	align-items: baseline;
+	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );
+	margin: 0 auto;
+	clear: both;
+
+	padding: 0;
+	@include break-small() {
+		padding: 0 ( $block-mover-padding-visible );
+	}
+
+	> .editor-inserter__block {
+		opacity: 0;
+		transition: opacity 150ms;
+		margin: 0 10px;
+		width: auto;
+		font-family: $default-font;
+		font-size: $default-font-size;
+		box-shadow: none;
+
+		&:active {
+			background: none;
+		}
+	}
+
+	&:hover > .editor-inserter__block,
+	&.is-showing-controls > .editor-inserter__block {
+		opacity: 1;
+	}
+}

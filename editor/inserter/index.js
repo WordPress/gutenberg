@@ -3,6 +3,7 @@
  */
 import clickOutside from 'react-click-outside';
 import { connect } from 'react-redux';
+import { find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,7 +17,7 @@ import { createBlock } from 'blocks';
  * Internal dependencies
  */
 import InserterMenu from './menu';
-import { getBlockInsertionPoint, getEditorMode } from '../selectors';
+import { getBlockInsertionPoint, getBlockTypes } from '../selectors';
 import { insertBlock, hideInsertionPoint } from '../actions';
 
 class Inserter extends Component {
@@ -44,9 +45,9 @@ class Inserter extends Component {
 
 	insertBlock( name ) {
 		if ( name ) {
-			const { insertionPoint, onInsertBlock } = this.props;
+			const { insertionPoint, onInsertBlock, blockTypes } = this.props;
 			onInsertBlock(
-				name,
+				find( blockTypes, ( blockType ) => blockType.name === name ),
 				insertionPoint
 			);
 		}
@@ -93,16 +94,20 @@ export default connect(
 	( state ) => {
 		return {
 			insertionPoint: getBlockInsertionPoint( state ),
-			mode: getEditorMode( state ),
+			blockTypes: getBlockTypes( state ),
 		};
 	},
 	( dispatch ) => ( {
-		onInsertBlock( name, after ) {
+		onInsertBlock( blockType, after ) {
 			dispatch( hideInsertionPoint() );
 			dispatch( insertBlock(
-				createBlock( name ),
+				createBlock( blockType ),
 				after
 			) );
 		},
-	} )
+	} ),
+	undefined,
+	{
+		storeKey: 'editor',
+	}
 )( clickOutside( Inserter ) );

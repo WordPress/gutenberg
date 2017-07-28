@@ -1,0 +1,14 @@
+.editor-multi-selection-header {
+	background: $blue-medium-100;
+	border-bottom: 1px solid $blue-medium-200;
+}
+
+.editor-multi-selection-header__count {
+	padding-right: $item-spacing;
+	color: $dark-gray-500;
+	border-right: 1px solid $light-gray-500;
+}
+
+.editor-multi-selection-header__clear {
+	margin: 0 0 0 auto;
+}

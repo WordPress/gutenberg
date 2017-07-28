@@ -70,8 +70,10 @@ export function normaliseToBlockLevelNodes( nodes ) {
 }
 
 export default function( nodes ) {
+	const blockTypes = getBlockTypes();
+	const unknownTypeBlockType = find( blockTypes, ( bt ) => bt.name === getUnknownTypeHandler() );
 	return normaliseToBlockLevelNodes( nodes ).map( ( node ) => {
-		const block = getBlockTypes().reduce( ( acc, blockType ) => {
+		const block = blockTypes.reduce( ( acc, blockType ) => {
 			if ( acc ) {
 				return acc;
 			}
@@ -83,17 +85,17 @@ export default function( nodes ) {
 				return acc;
 			}
 
-			const { name, defaultAttributes = [] } = blockType;
+			const { defaultAttributes = [] } = blockType;
 			const attributes = parseBlockAttributes( node.outerHTML, transform.attributes );
 
-			return createBlock( name, { ...defaultAttributes, ...attributes } );
+			return createBlock( blockType, { ...defaultAttributes, ...attributes } );
 		}, null );
 
 		if ( block ) {
 			return block;
 		}
 
-		return createBlock( getUnknownTypeHandler(), {
+		return createBlock( unknownTypeBlockType, {
 			content: node.outerHTML,
 		} );
 	} );

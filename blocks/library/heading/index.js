@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isObject } from 'lodash';
+import { isObject, find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -113,8 +113,9 @@ registerBlockType( 'core/heading', {
 		};
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, insertBlocksAfter } ) {
+	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, insertBlocksAfter, editorConfig } ) {
 		const { align, content, nodeName, placeholder } = attributes;
+		const getBlockType = ( name ) => find( editorConfig.blockTypes, ( bt ) => bt.name === name );
 
 		return [
 			focus && (
@@ -170,7 +171,7 @@ registerBlockType( 'core/heading', {
 					setAttributes( { content: before } );
 					insertBlocksAfter( [
 						...blocks,
-						createBlock( 'core/text', { content: after } ),
+						createBlock( getBlockType( 'core/text' ), { content: after } ),
 					] );
 				} }
 				style={ { textAlign: align } }

@@ -1,0 +1,36 @@
+/**
+ * External dependencies
+ */
+import { connect } from 'react-redux';
+
+/**
+ * WordPress Dependencies
+ */
+import { withFocusReturn } from 'components';
+import { BlockInspector } from 'editor';
+
+/**
+ * Internal Dependencies
+ */
+import './style.scss';
+import PostSettings from './post-settings';
+import Header from './header';
+import { getActivePanel } from '../selectors';
+
+const Sidebar = ( { panel } ) => {
+	return (
+		<div className="editor-sidebar">
+			<Header />
+			{ panel === 'document' && <PostSettings /> }
+			{ panel === 'block' && <BlockInspector /> }
+		</div>
+	);
+};
+
+export default connect(
+	( state ) => {
+		return {
+			panel: getActivePanel( state ),
+		};
+	}
+)( withFocusReturn( Sidebar ) );

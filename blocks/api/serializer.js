@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, reduce, isObject } from 'lodash';
+import { isEmpty, reduce, isObject, find } from 'lodash';
 import { html as beautifyHtml } from 'js-beautify';
 import classnames from 'classnames';
 
@@ -13,7 +13,6 @@ import { Component, createElement, renderToString, cloneElement, Children } from
 /**
  * Internal dependencies
  */
-import { getBlockType } from './registration';
 import { parseBlockAttributes } from './parser';
 
 /**
@@ -125,9 +124,8 @@ export function getBeautifulContent( content ) {
 	} );
 }
 
-export function serializeBlock( block ) {
+export function serializeBlock( block, blockType ) {
 	const blockName = block.name;
-	const blockType = getBlockType( blockName );
 
 	let saveContent;
 	if ( block.isValid ) {
@@ -162,9 +160,15 @@ export function serializeBlock( block ) {
 /**
  * Takes a block list and returns the serialized post content.
  *
- * @param  {Array}  blocks Block list
- * @return {String}        The post content
+ * @param  {Array}  blocks     Block list
+ * @param  {Array}  blockTypes Block Types
+ * @return {String}            The post content
  */
-export default function serialize( blocks ) {
-	return blocks.map( serializeBlock ).join( '\n\n' );
+export default function serialize( blocks, blockTypes ) {
+	const getBlockType = ( name ) => find( blockTypes, ( bt ) => bt.name === name );
+	return blocks
+		.map( ( block ) =>
+			serializeBlock( block, getBlockType( block.name ) )
+		)
+		.join( '\n\n' );
 }

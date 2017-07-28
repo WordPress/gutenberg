@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { find } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from 'i18n';
@@ -53,9 +58,10 @@ registerBlockType( 'core/text', {
 		};
 	},
 
-	edit( { attributes, setAttributes, insertBlocksAfter, focus, setFocus, mergeBlocks, onReplace } ) {
+	edit( { attributes, setAttributes, insertBlocksAfter, focus, setFocus, mergeBlocks, onReplace, editorConfig } ) {
 		const { align, content, dropCap, placeholder } = attributes;
 		const toggleDropCap = () => setAttributes( { dropCap: ! dropCap } );
+		const getBlockType = ( name ) => find( editorConfig.blockTypes, ( bt ) => bt.name === name );
 		return [
 			focus && (
 				<BlockControls key="controls">
@@ -95,7 +101,7 @@ registerBlockType( 'core/text', {
 					setAttributes( { content: before } );
 					insertBlocksAfter( [
 						...blocks,
-						createBlock( 'core/text', { content: after } ),
+						createBlock( getBlockType( 'core/text' ), { content: after } ),
 					] );
 				} }
 				onMerge={ mergeBlocks }
