@@ -20,7 +20,8 @@ import './style.scss';
 class DropdownMenu extends wp.element.Component {
 	constructor() {
 		super( ...arguments );
-		this.bindMenuReferenceNode = this.bindMenuReferenceNode.bind( this );
+
+		this.bindReferenceNode = this.bindReferenceNode.bind( this );
 		this.closeMenu = this.closeMenu.bind( this );
 		this.toggleMenu = this.toggleMenu.bind( this );
 		this.findActiveIndex = this.findActiveIndex.bind( this );
@@ -29,7 +30,9 @@ class DropdownMenu extends wp.element.Component {
 		this.focusNext = this.focusNext.bind( this );
 		this.handleKeyDown = this.handleKeyDown.bind( this );
 		this.handleKeyUp = this.handleKeyUp.bind( this );
+
 		this.nodes = {};
+
 		this.state = {
 			open: false,
 		};
