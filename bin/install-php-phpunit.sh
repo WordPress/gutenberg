@@ -8,6 +8,23 @@
 # phpbrew can mess up if we don't run it from the home directory
 ORIG_DIR=`pwd`;
 THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+PHP52_PATH=$HOME/.phpbrew/php/php-5.2.17
+
+# install phpunit
+
+mkdir -p $HOME/phpunit-bin
+
+if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]]; then
+  # use the phpunit in the PHP5.2 installation
+  ln -s ${PHP52_PATH}/lib/php/phpunit/phpunit.php $HOME/phpunit-bin/phpunit
+elif [[ ${SWITCH_TO_PHP:0:2} == "5." ]]; then
+  wget -O $HOME/phpunit-bin/phpunit https://phar.phpunit.de/phpunit-4.8.phar
+  chmod +x $HOME/phpunit-bin/phpunit
+else
+  composer global require "phpunit/phpunit=6.*"
+fi
+
+export PATH=$HOME/phpunit-bin/:$PATH
 
 if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; then
   PHPBREW_BUILT_CHECK=$HOME/.phpbrew/bashrc
@@ -15,26 +32,14 @@ if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; t
   # directory to store phpbrew and old phpunit in
   mkdir -p $HOME/php-utils-bin
 
-  # install the phpunit shim to run the right phpunit version for these old php versions
-	cp ${THIS_DIR}/phpunit-shim.sh $HOME/php-utils-bin/phpunit
-	chmod +x $HOME/php-utils-bin/phpunit
-
   # install phpbrew
   curl -L -o $HOME/php-utils-bin/phpbrew https://github.com/phpbrew/phpbrew/raw/f6a422e1ba49293ee73bc4c317795c021bc57020/phpbrew
   chmod +x $HOME/php-utils-bin/phpbrew
 
-  # symlink to phpunit3.6 in the ph5.2 installation
-  PHP52_PATH=$HOME/.phpbrew/php/php-5.2.17
-  ln -s ${PHP52_PATH}/lib/php/phpunit/phpunit.php $HOME/php-utils-bin/phpunit-3.6
-
-  # install phpunit4.8
-  curl -L -o $HOME/php-utils-bin/phpunit-4.8 https://phar.phpunit.de/phpunit-4.8.9.phar
-  chmod +x $HOME/php-utils-bin/phpunit-4.8
-
-	# got to check our php-utils-bin first, as we're overriding travis' phpunit shim
+  # needs to be on the path for switching php versions to work
 	export PATH=$HOME/php-utils-bin:$PATH
 
-  # php and phpunit installs should be cached, only build if they're not there.
+  # php and phpunit3.6 installs should be cached, only build if they're not there.
   if [ ! -f $PHPBREW_BUILT_CHECK ]; then
     
     # init with known --old to get 5.2 and 5.3
@@ -79,7 +84,7 @@ if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; t
     sed -i 's/@package_version@/3.6-git/g' phpunit/PHPUnit/Runner/Version.php
 
     # now set up an ini file that adds all of the above to include_path for the PHP5.2 install
-    mkdir -p $HOME/.phpbrew/php/php-5.2.17/var/db
+    mkdir -p ${PHP52_PATH}/var/db
     echo "include_path=.:${PHP52_PATH}/lib/php:${PHP52_PATH}/lib/php/dbunit:${PHP52_PATH}/lib/php/php-code-coverage:${PHP52_PATH}/lib/php/php-file-iterator:${PHP52_PATH}/lib/php/php-invoker:${PHP52_PATH}/lib/php/php-text-template:${PHP52_PATH}/lib/php/php-timer:${PHP52_PATH}/lib/php/php-token-stream:${PHP52_PATH}/lib/php/phpunit-mock-objects:${PHP52_PATH}/lib/php/phpunit-selenium:${PHP52_PATH}/lib/php/phpunit-story:${PHP52_PATH}/lib/php/phpunit" > ${PHP52_PATH}/var/db/path.ini
 
     # one more PHPUnit dependency that we need to install using pear under PHP5.2
@@ -105,7 +110,6 @@ if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; t
   # all needed php versions and phpunit versions are installed, either from the above
   # install script, or from travis cache, so switch to using them
   cd $HOME
-  export PATH=$HOME/php-utils-bin:$PATH
   export PHPBREW_RC_ENABLE=1
   source $HOME/.phpbrew/bashrc
 
@@ -114,15 +118,6 @@ if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; t
   else
     phpbrew use 5.3.29
   fi
-
-elif [[ ${TRAVIS_PHP_VERSION:0:2} == "5." ]]; then
-  # all other PHP 5.x versions
-  mkdir -p $HOME/phpunit-bin
-  wget -O $HOME/phpunit-bin/phpunit https://phar.phpunit.de/phpunit-4.8.phar
-  chmod +x $HOME/phpunit-bin/phpunit
-  export PATH=$HOME/phpunit-bin/:$PATH
-else
-  composer global require "phpunit/phpunit=5.7.*"
 fi
 
 cd $ORIG_DIR
