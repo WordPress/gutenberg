@@ -13,6 +13,7 @@ import serialize, {
 	serializeAttributes,
 } from '../serializer';
 import { getBlockTypes, registerBlockType, unregisterBlockType } from '../registration';
+import { createBlock } from '../';
 
 describe( 'block serializer', () => {
 	afterEach( () => {
@@ -195,20 +196,15 @@ describe( 'block serializer', () => {
 				},
 			};
 			registerBlockType( 'core/test-block', blockType );
-			const blockList = [
-				{
-					name: 'core/test-block',
-					attributes: {
-						foo: false,
-						content: 'Ribs & Chicken',
-						stuff: 'left & right -- but <not>',
-					},
-					isValid: true,
-				},
-			];
+
+			const block = createBlock( 'core/test-block', {
+				foo: false,
+				content: 'Ribs & Chicken',
+				stuff: 'left & right -- but <not>',
+			} );
 			const expectedPostContent = '<!-- wp:core/test-block {"foo":false,"stuff":"left \\u0026 right \\u002d\\u002d but \\u003cnot\\u003e"} -->\n<p class="wp-block-test-block">Ribs & Chicken</p>\n<!-- /wp:core/test-block -->';
 
-			expect( serialize( blockList ) ).toEqual( expectedPostContent );
+			expect( serialize( [ block ] ) ).toEqual( expectedPostContent );
 		} );
 	} );
 } );
