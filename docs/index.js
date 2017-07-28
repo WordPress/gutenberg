@@ -52,9 +52,9 @@ addStory( {
 
 addStory( {
 	parents: [ 'reference' ],
-	name: 'attribute-matchers',
-	title: 'Attribute Matchers',
-	markdown: require( './attribute-matchers.md' ),
+	name: 'attribute-sources',
+	title: 'Attribute Sources',
+	markdown: require( './attribute-sources.md' ),
 } );
 
 addStory( {

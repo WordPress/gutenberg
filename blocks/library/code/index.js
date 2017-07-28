@@ -12,9 +12,9 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, query, createBlock } from '../../api';
+import { registerBlockType, source, createBlock } from '../../api';
 
-const { prop } = query;
+const { prop } = source;
 
 registerBlockType( 'core/code', {
 	title: __( 'Code' ),

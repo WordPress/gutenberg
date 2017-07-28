@@ -1,12 +1,12 @@
-# Attribute Matchers
+# Attribute Sources
 
-Attribute matchers are used to define the strategy by which block attribute values are extracted from saved post content. They provide a mechanism to map from the saved markup to a JavaScript representation of a block.
+Attribute sources are used to define the strategy by which block attribute values are extracted from saved post content. They provide a mechanism to map from the saved markup to a JavaScript representation of a block.
 
-Each matcher accepts an optional selector as the first argument. If a selector is specified, the matcher behavior will be run against the corresponding element(s) contained within the block. Otherwise it will be run against the block's root node.
+Each source accepts an optional selector as the first argument. If a selector is specified, the source behavior will be run against the corresponding element(s) contained within the block. Otherwise it will be run against the block's root node.
 
-Under the hood, attribute matchers are a superset of functionality provided by [hpq](https://github.com/aduth/hpq), a small library used to parse and query HTML markup into an object shape. In an object of attributes matchers, you can name the keys as you see fit. The resulting object will assign as a value to each key the result of its attribute matcher.
+Under the hood, attribute sources are a superset of functionality provided by [hpq](https://github.com/aduth/hpq), a small library used to parse and query HTML markup into an object shape. In an object of attributes sources, you can name the keys as you see fit. The resulting object will assign as a value to each key the result of its attribute source.
 
-## Common Matchers
+## Common Sources
 
 ### `attr`
 
@@ -46,7 +46,7 @@ _Example_: Extract child nodes from a paragraph of rich text.
 
 ### `query`
 
-Use `query` to extract an array of values from markup. Entries of the array are determined by the selector argument, where each matched element within the block will have an entry structured corresponding to the second argument, an object of attribute matchers.
+Use `query` to extract an array of values from markup. Entries of the array are determined by the selector argument, where each matched element within the block will have an entry structured corresponding to the second argument, an object of attribute sources.
 
 _Example_: Extract `src` and `alt` from each image element in the block's markup.
 

@@ -7,10 +7,10 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, createBlock, query } from '../../api';
+import { registerBlockType, createBlock, source } from '../../api';
 import Editable from '../../editable';
 
-const { children } = query;
+const { children } = source;
 
 registerBlockType( 'core/preformatted', {
 	title: __( 'Preformatted' ),

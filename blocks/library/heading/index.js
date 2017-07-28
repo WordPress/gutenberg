@@ -9,14 +9,14 @@ import { Toolbar } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, createBlock, query } from '../../api';
+import { registerBlockType, createBlock, source } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import InspectorControls from '../../inspector-controls';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockDescription from '../../block-description';
 
-const { children, prop } = query;
+const { children, prop } = source;
 
 registerBlockType( 'core/heading', {
 	title: __( 'Heading' ),
@@ -58,7 +58,7 @@ registerBlockType( 'core/heading', {
 			},
 			{
 				type: 'raw',
-				matcher: ( node ) => /H\d/.test( node.nodeName ),
+				source: ( node ) => /H\d/.test( node.nodeName ),
 				attributes: {
 					content: children( 'h1,h2,h3,h4,h5,h6' ),
 					nodeName: prop( 'h1,h2,h3,h4,h5,h6', 'nodeName' ),

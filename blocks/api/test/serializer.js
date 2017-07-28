@@ -6,7 +6,7 @@ import { createElement, Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { text } from '../query';
+import { text } from '../source';
 import serialize, {
 	getCommentAttributes,
 	getBeautifulContent,

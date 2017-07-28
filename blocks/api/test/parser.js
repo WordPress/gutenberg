@@ -6,7 +6,7 @@ import { noop } from 'lodash';
 /**
  * Internal dependencies
  */
-import { text, attr, html } from '../query';
+import { text, attr, html } from '../source';
 import {
 	isValidSource,
 	getBlockAttributes,

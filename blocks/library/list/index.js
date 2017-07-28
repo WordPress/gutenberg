@@ -13,11 +13,11 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, query as hpq, createBlock } from '../../api';
+import { registerBlockType, source, createBlock } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 
-const { children, prop } = hpq;
+const { children, prop } = source;
 
 const fromBrDelimitedContent = ( content ) => {
 	if ( undefined === content ) {
@@ -116,7 +116,7 @@ registerBlockType( 'core/list', {
 			},
 			{
 				type: 'raw',
-				matcher: ( node ) => node.nodeName === 'OL' || node.nodeName === 'UL',
+				source: ( node ) => node.nodeName === 'OL' || node.nodeName === 'UL',
 				attributes: {
 					nodeName: prop( 'ol,ul', 'nodeName' ),
 					values: children( 'ol,ul' ),

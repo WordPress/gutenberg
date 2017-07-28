@@ -90,7 +90,7 @@ export default function( nodes ) {
 			const transformsFrom = get( blockType, 'transforms.from', [] );
 			const transform = find( transformsFrom, ( { type } ) => type === 'raw' );
 
-			if ( ! transform || ! transform.matcher( node ) ) {
+			if ( ! transform || ! transform.source( node ) ) {
 				return acc;
 			}
 
