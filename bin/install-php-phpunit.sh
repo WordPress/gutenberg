@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # Uses phpbrew to install older php versions on modern(ish) distros.
-# Installs a shim that selects the correct phpunit version to run
-# if using an older version of php.
+# Installs the correct version of phpunit for the requested php
+# version. ~/.phpbrew is expected to be cached so we only have
+# to build php the first time.
 
 # we have to save and restore the original working directory, because
 # phpbrew can mess up if we don't run it from the home directory
