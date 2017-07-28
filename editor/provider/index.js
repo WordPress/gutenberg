@@ -7,7 +7,6 @@ import { createProvider } from 'react-redux';
  * WordPress dependencies
  */
 import { Component } from 'element';
-import { serialize, parse } from 'blocks';
 
 /**
  * Internal dependencies
@@ -25,30 +24,21 @@ class Provider extends Component {
 			type: 'INIT_EDITOR',
 			config: this.props.config,
 		} );
-		let blocks = getBlocks( this.store.getState() );
+		this.blocks = getBlocks( this.store.getState() );
 		this.store.subscribe( () => {
 			const newBlocks = getBlocks( this.store.getState() );
-			if ( blocks !== newBlocks ) {
-				this.currentValue = serialize( newBlocks, this.props.config.blockTypes );
-				this.props.onChange( this.currentValue );
-				blocks = newBlocks;
+			if ( this.blocks !== newBlocks ) {
+				this.props.onChange( newBlocks );
+				this.blocks = newBlocks;
 			}
 		} );
 	}
 
-	componentWillReceiveProps( newProps ) {
-		// Rest blocks if the value changed from outside the editor
-		if (
-			newProps.value !== this.props.value &&
-			newProps.value !== this.currentValue
-		) {
+	componentDidUpdate() {
+		if ( this.props.value !== this.blocks ) {
 			this.store.dispatch( {
 				type: 'RESET_BLOCKS',
-				blocks: parse(
-					newProps.value,
-					this.props.config.blockTypes,
-					this.props.config.fallbackBlockType
-				),
+				blocks: this.props.value,
 			} );
 		}
 	}

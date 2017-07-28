@@ -78,14 +78,14 @@ export function createBlockWithFallback( blockType, fallbackBlockType, rawConten
 		// Gradually convert all blocks to this new format, then remove the
 		// string serialization.
 		const block = createBlock(
-			blockType,
-			getBlockAttributes( blockType, rawContent, attributes )
+			parsedBlockType,
+			getBlockAttributes( parsedBlockType, rawContent, attributes )
 		);
 
 		// Validate that the parsed block is valid, meaning that if we were to
 		// reserialize it given the assumed attributes, the markup matches the
 		// original value. Otherwise, preserve original to avoid destruction.
-		block.isValid = isValidBlock( rawContent, blockType, block.attributes );
+		block.isValid = isValidBlock( rawContent, parsedBlockType, block.attributes );
 		if ( ! block.isValid ) {
 			block.originalContent = rawContent;
 		}

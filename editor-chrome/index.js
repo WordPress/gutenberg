@@ -41,22 +41,13 @@ if ( settings.timezone.string ) {
  *
  * @param {Redux.Store} store         Redux store instance
  * @param {Object}      post          Bootstrapped post object
- * @param {Array}       editorConfig  Editor Config
  */
-function preparePostState( store, post, editorConfig ) {
+function preparePostState( store, post ) {
 	// Set current post into state
 	store.dispatch( {
 		type: 'RESET_POST',
 		post,
 	} );
-
-	// Parse content as blocks
-	if ( post.content.raw ) {
-		store.dispatch( {
-			type: 'RESET_BLOCKS',
-			blocks: parse( post.content.raw, editorConfig.blockTypes, editorConfig.fallbackBlockType ),
-		} );
-	}
 
 	// Include auto draft title in edits while not flagging post as dirty
 	if ( post.status === 'auto-draft' ) {
@@ -87,7 +78,7 @@ export function createEditorInstance( id, post ) {
 	store.dispatch( {
 		type: 'LOAD_USER_DATA',
 	} );
-	preparePostState( store, post, editorConfig );
+	preparePostState( store, post );
 
 	render(
 		<ReduxProvider store={ store }>

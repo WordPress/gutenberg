@@ -9,6 +9,8 @@ import classnames from 'classnames';
  */
 import { NoticeList } from 'components';
 import { Provider as EditorProvider } from 'editor';
+import { parse, serialize } from 'blocks';
+import { Component } from 'element';
 
 /**
  * Internal dependencies
@@ -28,28 +30,68 @@ import {
 	getEditedPostContent,
 } from '../selectors';
 
-function Layout( { config, value, mode, isSidebarOpened, notices, ...props } ) {
-	const className = classnames( 'editor-layout', {
-		'is-sidebar-opened': isSidebarOpened,
-	} );
+class Layout extends Component {
+	constructor() {
+		super( ...arguments );
+		this.onChangeBlocks = this.onChangeBlocks.bind( this );
+		this.onChangeHtml = this.onChangeHtml.bind( this );
+		this.state = {
+			blocks: [],
+			html: '',
+		};
+	}
 
-	const onChangeContent = ( content ) => props.editPost( { content } );
+	onChangeBlocks( blocks ) {
+		const html = serialize( blocks, this.props.config.blockTypes );
+		this.setState( {
+			blocks,
+			html,
+		} );
+		this.props.editPost( { content: html } );
+	}
 
-	return (
-		<EditorProvider config={ config } value={ value } onChange={ onChangeContent }>
-			<div className={ className }>
-				<DocumentTitle />
-				<NoticeList onRemove={ props.removeNotice } notices={ notices } />
-				<UnsavedChangesWarning />
-				<Header />
-				<div className="editor-layout__content">
-					{ mode === 'text' && <TextEditor value={ value } onChange={ onChangeContent } /> }
-					{ mode === 'visual' && <VisualEditor /> }
+	onChangeHtml( html ) {
+		const { blockTypes, fallbackBlockType } = this.props.config;
+		const blocks = parse( html, blockTypes, fallbackBlockType );
+		console.log( html, blocks );
+		this.setState( {
+			blocks,
+			html,
+		} );
+		this.props.editPost( { content: html } );
+	}
+
+	componentDidMount() {
+		const { blockTypes, fallbackBlockType } = this.props.config;
+		this.setState( {
+			html: this.props.value,
+			blocks: parse( this.props.value, blockTypes, fallbackBlockType ),
+		} );
+	}
+
+	render() {
+		const { config, mode, isSidebarOpened, notices, ...props } = this.props;
+		const className = classnames( 'editor-layout', {
+			'is-sidebar-opened': isSidebarOpened,
+		} );
+		const { blocks, html } = this.state;
+
+		return (
+			<EditorProvider config={ config } value={ blocks } onChange={ this.onChangeBlocks }>
+				<div className={ className }>
+					<DocumentTitle />
+					<NoticeList onRemove={ props.removeNotice } notices={ notices } />
+					<UnsavedChangesWarning />
+					<Header />
+					<div className="editor-layout__content">
+						{ mode === 'text' && <TextEditor value={ html } onChange={ this.onChangeHtml } /> }
+						{ mode === 'visual' && <VisualEditor /> }
+					</div>
+					{ isSidebarOpened && <Sidebar /> }
 				</div>
-				{ isSidebarOpened && <Sidebar /> }
-			</div>
-		</EditorProvider>
-	);
+			</EditorProvider>
+		);
+	}
 }
 
 export default connect(

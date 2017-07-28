@@ -198,12 +198,6 @@ export default {
 	QUEUE_AUTOSAVE: debounce( ( action, store ) => {
 		store.dispatch( autosave() );
 	}, 10000 ),
-	UPDATE_BLOCK_ATTRIBUTES: () => queueAutosave(),
-	INSERT_BLOCKS: () => queueAutosave(),
-	MOVE_BLOCKS_DOWN: () => queueAutosave(),
-	MOVE_BLOCKS_UP: () => queueAutosave(),
-	REPLACE_BLOCKS: () => queueAutosave(),
-	REMOVE_BLOCKS: () => queueAutosave(),
 	EDIT_POST: () => queueAutosave(),
 	MARK_DIRTY: () => queueAutosave(),
 };
