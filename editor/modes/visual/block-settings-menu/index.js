@@ -54,5 +54,9 @@ export default connect(
 				uid: ownProps.uid,
 			} );
 		},
-	} )
+	} ),
+	undefined,
+	{
+		storeKey: 'editor',
+	}
 )( BlockSettingsMenu );

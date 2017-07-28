@@ -7,6 +7,7 @@ import { __ } from 'i18n';
 /**
  * Internal Dependencies
  */
+import './style.scss';
 import PostTitle from '../../post-title';
 
 function VisualEditorWrapper() {

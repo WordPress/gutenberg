@@ -599,7 +599,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	wp_enqueue_style(
 		'wp-editor-chrome',
 		gutenberg_url( 'editor-chrome/build/style.css' ),
-		array( 'wp-editor', 'wp-components', 'wp-blocks', 'wp-edit-blocks' ),
+		array( 'wp-components', 'wp-blocks', 'wp-edit-blocks', 'wp-editor' ),
 		filemtime( gutenberg_dir_path() . 'editor-chrome/build/style.css' )
 	);
 
