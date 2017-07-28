@@ -10,7 +10,6 @@ import { findIndex } from 'lodash';
  */
 import IconButton from 'components/icon-button';
 import Dashicon from 'components/dashicon';
-import { findDOMNode } from 'element';
 import { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } from 'utils/keycodes';
 
 /**
@@ -30,14 +29,16 @@ class DropdownMenu extends wp.element.Component {
 		this.focusNext = this.focusNext.bind( this );
 		this.handleKeyDown = this.handleKeyDown.bind( this );
 		this.handleKeyUp = this.handleKeyUp.bind( this );
-		this.menuNode = null;
+		this.nodes = {};
 		this.state = {
 			open: false,
 		};
 	}
 
-	bindMenuReferenceNode( node ) {
-		this.menuNode = node;
+	bindReferenceNode( name ) {
+		return ( node ) => {
+			this.nodes[ name ] = node;
+		};
 	}
 
 	handleClickOutside() {
@@ -61,18 +62,18 @@ class DropdownMenu extends wp.element.Component {
 	}
 
 	findActiveIndex() {
-		if ( this.menuNode ) {
+		if ( this.nodes.menu ) {
 			const menuItem = document.activeElement;
-			if ( menuItem.parentNode === this.menuNode ) {
-				return findIndex( this.menuNode.children, ( child ) => child === menuItem );
+			if ( menuItem.parentNode === this.nodes.menu ) {
+				return findIndex( this.nodes.menu.children, ( child ) => child === menuItem );
 			}
 			return -1;
 		}
 	}
 
 	focusIndex( index ) {
-		if ( this.menuNode ) {
-			this.menuNode.children[ index ].focus();
+		if ( this.nodes.menu ) {
+			this.nodes.menu.children[ index ].focus();
 		}
 	}
 
@@ -101,9 +102,7 @@ class DropdownMenu extends wp.element.Component {
 		if ( event.keyCode === ESCAPE && this.state.open ) {
 			event.preventDefault();
 			event.stopPropagation();
-			const node = findDOMNode( this );
-			const toggle = node.querySelector( '.components-dropdown-menu__toggle' );
-			toggle.focus();
+			this.nodes.toggle.focus();
 			this.closeMenu();
 			if ( this.props.onSelect ) {
 				this.props.onSelect( null );
@@ -188,6 +187,7 @@ class DropdownMenu extends wp.element.Component {
 					aria-haspopup="true"
 					aria-expanded={ this.state.open }
 					label={ label }
+					ref={ this.bindReferenceNode( 'toggle' ) }
 				>
 					<Dashicon icon="arrow-down" />
 				</IconButton>
@@ -196,7 +196,7 @@ class DropdownMenu extends wp.element.Component {
 						className="components-dropdown-menu__menu"
 						role="menu"
 						aria-label={ menuLabel }
-						ref={ this.bindMenuReferenceNode }
+						ref={ this.bindReferenceNode( 'menu' ) }
 					>
 						{ controls.map( ( control, index ) => (
 							<IconButton
