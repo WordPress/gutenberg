@@ -17,7 +17,7 @@ class Block_Type_Test extends WP_UnitTestCase {
 		);
 
 		$block_type = new WP_Block_Type( $name, $args );
-		$this->assertEquals( 1, 2 );
+
 		$this->assertSame( $name, $block_type->name );
 		$this->assertSame( $args['render_callback'], $block_type->render_callback );
 		$this->assertSame( $args['foo'], $block_type->foo );
