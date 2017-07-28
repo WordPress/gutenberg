@@ -10,7 +10,7 @@ import { createBlock } from './factory';
 import { getBlockTypes, getUnknownTypeHandler } from './registration';
 import { parseBlockAttributes } from './parser';
 import { ELEMENT_NODE, TEXT_NODE } from 'utils/nodetypes';
-import gDocs from './paste/google-docs';
+import convertTables from './paste/convert-tables';
 import stripAttributes from './paste/strip-attributes';
 import removeSpans from './paste/remove-spans';
 
@@ -74,7 +74,7 @@ export function normaliseToBlockLevelNodes( nodes ) {
 }
 
 export default function( nodes ) {
-	const prepare = compose( [ normaliseToBlockLevelNodes, removeSpans, stripAttributes, gDocs ] );
+	const prepare = compose( [ normaliseToBlockLevelNodes, removeSpans, stripAttributes, convertTables ] );
 
 	return prepare( nodes ).map( ( node ) => {
 		const block = getBlockTypes().reduce( ( acc, blockType ) => {
