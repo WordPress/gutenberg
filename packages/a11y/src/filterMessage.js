@@ -1,4 +1,4 @@
-let previousMessage = ''
+let previousMessage = '';
 
 /**
  * Filter the message to be announced to the screenreader.
@@ -9,22 +9,22 @@ let previousMessage = ''
  */
 const filterMessage = function( message ) {
 
-  /*
-   * Strip HTML tags (if any) from the message string. Ideally, messages should
-   * be simple strings, carefully crafted for specific use with A11ySpeak.
-   * When re-using already existing strings this will ensure simple HTML to be
-   * stripped out and replaced with a space. Browsers will collapse multiple
-   * spaces natively.
-   */
-  message = message.replace( /<[^<>]+>/g, ' ' );
+	/*
+	 * Strip HTML tags (if any) from the message string. Ideally, messages should
+	 * be simple strings, carefully crafted for specific use with A11ySpeak.
+	 * When re-using already existing strings this will ensure simple HTML to be
+	 * stripped out and replaced with a space. Browsers will collapse multiple
+	 * spaces natively.
+	 */
+	message = message.replace( /<[^<>]+>/g, ' ' );
 
-  if ( previousMessage === message ) {
-    message = message + '\u00A0';
-  }
+	if ( previousMessage === message ) {
+		message += '\u00A0';
+	}
 
-  previousMessage = message;
+	previousMessage = message;
 
-  return message;
+	return message;
 };
 
 export default filterMessage;

@@ -7,15 +7,15 @@ import filterMessage from './filterMessage';
  * Create the live regions.
  */
 export const setup = function() {
-  let containerPolite = document.getElementById( 'a11y-speak-polite' );
-  let containerAssertive = document.getElementById( 'a11y-speak-assertive' );
+	let containerPolite = document.getElementById( 'a11y-speak-polite' );
+	let containerAssertive = document.getElementById( 'a11y-speak-assertive' );
 
-  if ( containerPolite === null ) {
-    containerPolite = addContainer( 'polite' );
-  }
-  if ( containerAssertive === null ) {
-    containerAssertive = addContainer( 'assertive' );
-  }
+	if ( containerPolite === null ) {
+		containerPolite = addContainer( 'polite' );
+	}
+	if ( containerAssertive === null ) {
+		containerAssertive = addContainer( 'assertive' );
+	}
 };
 
 /**
@@ -31,17 +31,17 @@ domReady( setup );
  *                          polite or assertive. Default polite.
  */
 export const speak = function( message, ariaLive ) {
-  // Clear previous messages to allow repeated strings being read out.
-  clear();
+	// Clear previous messages to allow repeated strings being read out.
+	clear();
 
-  message = filterMessage( message );
+	message = filterMessage( message );
 
-  let containerPolite = document.getElementById( 'a11y-speak-polite' );
-  let containerAssertive = document.getElementById( 'a11y-speak-assertive' );
+	let containerPolite = document.getElementById( 'a11y-speak-polite' );
+	let containerAssertive = document.getElementById( 'a11y-speak-assertive' );
 
-  if ( containerAssertive && 'assertive' === ariaLive ) {
-    containerAssertive.textContent = message;
-  } else if ( containerPolite ) {
-    containerPolite.textContent = message;
-  }
+	if ( containerAssertive && 'assertive' === ariaLive ) {
+		containerAssertive.textContent = message;
+	} else if ( containerPolite ) {
+		containerPolite.textContent = message;
+	}
 };
