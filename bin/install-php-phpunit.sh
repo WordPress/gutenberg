@@ -17,7 +17,7 @@ mkdir -p $HOME/phpunit-bin
 if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]]; then
   # use the phpunit in the PHP5.2 installation
   ln -s ${PHP52_PATH}/lib/php/phpunit/phpunit.php $HOME/phpunit-bin/phpunit
-elif [[ ${SWITCH_TO_PHP:0:2} == "5." ]]; then
+elif [[ ${TRAVIS_PHP_VERSION:0:2} == "5." ]] || [[ ${SWITCH_TO_PHP:0:2} == "5." ]]; then
   wget -O $HOME/phpunit-bin/phpunit https://phar.phpunit.de/phpunit-4.8.phar
   chmod +x $HOME/phpunit-bin/phpunit
 else
