@@ -18,7 +18,7 @@ import './style.scss';
 import VisualEditorBlockList from './block-list';
 import PostTitle from '../../post-title';
 import { getBlockUids } from '../../selectors';
-import { clearSelectedBlock, multiSelect } from '../../actions';
+import { clearSelectedBlock, multiSelect, redo, undo } from '../../actions';
 
 class VisualEditor extends Component {
 	constructor() {
@@ -27,6 +27,7 @@ class VisualEditor extends Component {
 		this.bindBlocksContainer = this.bindBlocksContainer.bind( this );
 		this.onClick = this.onClick.bind( this );
 		this.selectAll = this.selectAll.bind( this );
+		this.undoOrRedo = this.undoOrRedo.bind( this );
 	}
 
 	componentDidMount() {
@@ -52,9 +53,20 @@ class VisualEditor extends Component {
 	}
 
 	selectAll( event ) {
-		const { uids } = this.props;
+		const { uids, onMultiSelect } = this.props;
 		event.preventDefault();
-		this.props.multiSelect( first( uids ), last( uids ) );
+		onMultiSelect( first( uids ), last( uids ) );
+	}
+
+	undoOrRedo( event ) {
+		const { onRedo, onUndo } = this.props;
+		if ( event.shiftKey ) {
+			onRedo();
+		} else {
+			onUndo();
+		}
+
+		event.preventDefault();
 	}
 
 	render() {
@@ -72,6 +84,8 @@ class VisualEditor extends Component {
 			>
 				<KeyboardShortcuts shortcuts={ {
 					'mod+a': this.selectAll,
+					'mod+z': this.undoOrRedo,
+					'mod+shift+z': this.undoOrRedo,
 				} } />
 				<PostTitle />
 				<VisualEditorBlockList ref={ this.bindBlocksContainer } />
@@ -89,6 +103,8 @@ export default connect(
 	},
 	{
 		clearSelectedBlock,
-		multiSelect,
+		onMultiSelect: multiSelect,
+		onRedo: redo,
+		onUndo: undo,
 	}
 )( VisualEditor );
