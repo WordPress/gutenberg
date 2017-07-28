@@ -77,8 +77,6 @@ const getGalleryMediaFrame = () => {
 	} );
 };
 
-const GalleryMediaFrame = getGalleryMediaFrame();
-
 const editMediaLibrary = ( attributes, setAttributes ) => {
 	const frameConfig = {
 		frame: 'post',
@@ -175,7 +173,7 @@ registerBlockType( 'core/gallery', {
 					<MediaUploadButton
 						buttonProps={ uploadButtonProps }
 						onSelect={ setMediaUrl }
-						frame={ GalleryMediaFrame }
+						frame={ getGalleryMediaFrame() }
 						multiple={ true }
 					>
 						{ __( 'Insert from Media Library' ) }
