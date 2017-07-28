@@ -33,6 +33,12 @@ describe( 'SavedState', () => {
 		expect( wrapper.type() ).toBeNull();
 	} );
 
+	it( 'returns null if the post is published', () => {
+		const wrapper = shallow( <SavedState isPublished /> );
+
+		expect( wrapper.type() ).toBeNull();
+	} );
+
 	it( 'should return Saved text if not new and not dirty', () => {
 		const wrapper = shallow(
 			<SavedState
