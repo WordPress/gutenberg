@@ -1,12 +1,14 @@
 [
     {
         "uid": "_uid_0",
-        "isValid": false,
         "name": "core/cover-text",
+        "isValid": false,
         "attributes": {
             "backgroundColor": "#fcb900",
             "content": [
-                [ "Text with color." ]
+                [
+                    "Text with color."
+                ]
             ]
         },
         "originalContent": "<div style=\"background-color:#fcb900\"><p>Text with color.</p></div>"

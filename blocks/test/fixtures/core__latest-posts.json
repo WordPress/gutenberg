@@ -4,10 +4,10 @@
         "name": "core/latest-posts",
         "isValid": true,
         "attributes": {
-            "columns": 3,
             "postsToShow": 5,
             "displayPostDate": false,
-            "layout": "list"
+            "layout": "list",
+            "columns": 3
         }
     }
 ]
