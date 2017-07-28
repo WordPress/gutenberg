@@ -26,6 +26,7 @@
 		border-left: none;
 		border-right: none;
 		overflow: auto;
+		-webkit-overflow-scrolling: touch;
 		height: 100%;
 		padding-top: $sidebar-panel-header-height;
 		margin-top: -1px;
