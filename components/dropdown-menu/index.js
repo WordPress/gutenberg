@@ -10,7 +10,7 @@ import { findIndex } from 'lodash';
  */
 import IconButton from 'components/icon-button';
 import Dashicon from 'components/dashicon';
-import { findDOMNode } from 'element';
+import { Component, findDOMNode } from 'element';
 import { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } from 'utils/keycodes';
 
 /**
@@ -18,7 +18,7 @@ import { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } from 'utils/keycodes';
  */
 import './style.scss';
 
-class DropdownMenu extends wp.element.Component {
+class DropdownMenu extends Component {
 	constructor() {
 		super( ...arguments );
 
