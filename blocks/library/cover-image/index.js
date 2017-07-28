@@ -34,6 +34,10 @@ registerBlockType( 'core/cover-image', {
 		title: text( 'h2' ),
 	},
 
+	defaultAttributes: {
+		hasBackgroundDim: true,
+	},
+
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
 		if ( -1 !== validAlignments.indexOf( align ) ) {
@@ -42,7 +46,7 @@ registerBlockType( 'core/cover-image', {
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus, className } ) {
-		const { url, title, align, id, hasParallax, hasBackgroundDim = true } = attributes;
+		const { url, title, align, id, hasParallax, hasBackgroundDim } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		const onSelectImage = ( media ) => setAttributes( { url: media.url, id: media.id } );
 
@@ -96,8 +100,7 @@ registerBlockType( 'core/cover-image', {
 		}
 
 		const style = { backgroundImage: `url(${ url })` };
-		const sectionClasses = classnames( {
-			'cover-image': true,
+		const classes = classnames( className, {
 			'has-parallax': hasParallax,
 			'has-background-dim': hasBackgroundDim,
 		} );
@@ -124,40 +127,40 @@ registerBlockType( 'core/cover-image', {
 					/>
 				</InspectorControls>
 			),
-			<section key="cover-image" className={ className }>
-				<section className={ sectionClasses } data-url={ url } style={ style }>
-					{ title || !! focus ? (
-						<Editable
-							tagName="h2"
-							placeholder={ __( 'Write title…' ) }
-							value={ title }
-							focus={ focus }
-							onFocus={ setFocus }
-							onChange={ ( value ) => setAttributes( { title: value } ) }
-							inlineToolbar
-						/>
-					) : null }
-				</section>
+			<section
+				key="preview"
+				data-url={ url }
+				style={ style }
+				className={ classes }
+			>
+				{ title || !! focus ? (
+					<Editable
+						tagName="h2"
+						placeholder={ __( 'Write title…' ) }
+						value={ title }
+						focus={ focus }
+						onFocus={ setFocus }
+						onChange={ ( value ) => setAttributes( { title: value } ) }
+						inlineToolbar
+					/>
+				) : null }
 			</section>,
 		];
 	},
 
-	save( { attributes } ) {
+	save( { attributes, className } ) {
 		const { url, title, hasParallax, hasBackgroundDim } = attributes;
 		const style = {
 			backgroundImage: `url(${ url })`,
 		};
-		const sectionClasses = classnames( {
-			'cover-image': true,
+		const classes = classnames( className, {
 			'has-parallax': hasParallax,
 			'has-background-dim': hasBackgroundDim,
 		} );
 
 		return (
-			<section>
-				<section className={ sectionClasses } style={ style }>
-					<h2>{ title }</h2>
-				</section>
+			<section className={ classes } style={ style }>
+				<h2>{ title }</h2>
 			</section>
 		);
 	},

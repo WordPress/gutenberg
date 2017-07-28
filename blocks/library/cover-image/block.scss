@@ -1,6 +1,12 @@
 .wp-block-cover-image {
-	margin: 0;
 	position: relative;
+	background-size: cover;
+	height: 430px;
+	width: 100%;
+	margin: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 
 	h2 {
 		color: white;
@@ -12,20 +18,11 @@
 		text-align: center;
 	}
 
-	.cover-image {
-		background-size: cover;
-		height: 430px;
-		width: 100%;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
-
-	.has-parallax {
+	&.has-parallax {
 		background-attachment: fixed;
 	}
 
-	.has-background-dim.cover-image:before {
+	&.has-background-dim:before {
 		content: '';
 		position: absolute;
 		top: 0;
