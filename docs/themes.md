@@ -11,5 +11,7 @@ Some advanced block features require opt-in support in the theme itself as it's 
 Some blocks such as the image block have the possibility to define a "wide" or "full" alignment by adding the corresponding classname to the block's wrapper ( `alignwide` or `alignfull` ). A theme can opt-in for this feature by calling:
 
 ```php
-add_theme_support( 'wide-images' );
+add_theme_support( 'gutenberg', array(
+   'wide-images' => true,
+) );
 ```
