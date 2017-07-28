@@ -10,6 +10,7 @@ import { findIndex } from 'lodash';
  */
 import IconButton from 'components/icon-button';
 import Dashicon from 'components/dashicon';
+import { findDOMNode } from 'element';
 import { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } from 'utils/keycodes';
 
 /**
@@ -105,7 +106,8 @@ class DropdownMenu extends wp.element.Component {
 		if ( event.keyCode === ESCAPE && this.state.open ) {
 			event.preventDefault();
 			event.stopPropagation();
-			this.nodes.toggle.focus();
+			// eslint-disable-next-line react/no-find-dom-node
+			findDOMNode( this.nodes.toggle ).focus();
 			this.closeMenu();
 			if ( this.props.onSelect ) {
 				this.props.onSelect( null );
