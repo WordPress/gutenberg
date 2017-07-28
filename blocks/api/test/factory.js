@@ -58,23 +58,19 @@ describe( 'block factory', () => {
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
 
-			const block = {
-				uid: 1,
-				name: 'core/text-block',
-				attributes: {
-					value: 'ribs',
-				},
-			};
+			const block = createBlock( 'core/text-block', {
+				value: 'ribs',
+			} );
 
-			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
+			const transformedBlocks = switchToBlockType( block, 'core/updated-text-block' );
 
-			expect( updatedBlock ).toEqual( [ {
-				uid: 1,
-				name: 'core/updated-text-block',
-				attributes: {
-					value: 'chicken ribs',
-				},
-			} ] );
+			expect( transformedBlocks ).toHaveLength( 1 );
+			expect( transformedBlocks[ 0 ] ).toHaveProperty( 'uid' );
+			expect( transformedBlocks[ 0 ].name ).toBe( 'core/updated-text-block' );
+			expect( transformedBlocks[ 0 ].isValid ).toBe( true );
+			expect( transformedBlocks[ 0 ].attributes ).toEqual( {
+				value: 'chicken ribs',
+			} );
 		} );
 
 		it( 'should switch the blockType of a block using the "transform to"', () => {
@@ -93,40 +89,32 @@ describe( 'block factory', () => {
 				save: noop,
 			} );
 
-			const block = {
-				uid: 1,
-				name: 'core/text-block',
-				attributes: {
-					value: 'ribs',
-				},
-			};
+			const block = createBlock( 'core/text-block', {
+				value: 'ribs',
+			} );
 
-			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
+			const transformedBlocks = switchToBlockType( block, 'core/updated-text-block' );
 
-			expect( updatedBlock ).toEqual( [ {
-				uid: 1,
-				name: 'core/updated-text-block',
-				attributes: {
-					value: 'chicken ribs',
-				},
-			} ] );
+			expect( transformedBlocks ).toHaveLength( 1 );
+			expect( transformedBlocks[ 0 ] ).toHaveProperty( 'uid' );
+			expect( transformedBlocks[ 0 ].name ).toBe( 'core/updated-text-block' );
+			expect( transformedBlocks[ 0 ].isValid ).toBe( true );
+			expect( transformedBlocks[ 0 ].attributes ).toEqual( {
+				value: 'chicken ribs',
+			} );
 		} );
 
 		it( 'should return null if no transformation is found', () => {
 			registerBlockType( 'core/updated-text-block', defaultBlockSettings );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
 
-			const block = {
-				uid: 1,
-				name: 'core/text-block',
-				attributes: {
-					value: 'ribs',
-				},
-			};
+			const block = createBlock( 'core/text-block', {
+				value: 'ribs',
+			} );
 
-			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
+			const transformedBlocks = switchToBlockType( block, 'core/updated-text-block' );
 
-			expect( updatedBlock ).toBeNull();
+			expect( transformedBlocks ).toBeNull();
 		} );
 
 		it( 'should reject transformations that return null', () => {
@@ -141,17 +129,13 @@ describe( 'block factory', () => {
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
 
-			const block = {
-				uid: 1,
-				name: 'core/text-block',
-				attributes: {
-					value: 'ribs',
-				},
-			};
+			const block = createBlock( 'core/text-block', {
+				value: 'ribs',
+			} );
 
-			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
+			const transformedBlocks = switchToBlockType( block, 'core/updated-text-block' );
 
-			expect( updatedBlock ).toBeNull();
+			expect( transformedBlocks ).toBeNull();
 		} );
 
 		it( 'should reject transformations that return an empty array', () => {
@@ -166,17 +150,13 @@ describe( 'block factory', () => {
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
 
-			const block = {
-				uid: 1,
-				name: 'core/text-block',
-				attributes: {
-					value: 'ribs',
-				},
-			};
+			const block = createBlock( 'core/text-block', {
+				value: 'ribs',
+			} );
 
-			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
+			const transformedBlocks = switchToBlockType( block, 'core/updated-text-block' );
 
-			expect( updatedBlock ).toBeNull();
+			expect( transformedBlocks ).toBeNull();
 		} );
 
 		it( 'should reject single transformations that do not include block types', () => {
@@ -197,17 +177,13 @@ describe( 'block factory', () => {
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
 
-			const block = {
-				uid: 1,
-				name: 'core/text-block',
-				attributes: {
-					value: 'ribs',
-				},
-			};
+			const block = createBlock( 'core/text-block', {
+				value: 'ribs',
+			} );
 
-			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
+			const transformedBlocks = switchToBlockType( block, 'core/updated-text-block' );
 
-			expect( updatedBlock ).toBeNull();
+			expect( transformedBlocks ).toBeNull();
 		} );
 
 		it( 'should reject array transformations that do not include block types', () => {
@@ -233,17 +209,13 @@ describe( 'block factory', () => {
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
 
-			const block = {
-				uid: 1,
-				name: 'core/text-block',
-				attributes: {
-					value: 'ribs',
-				},
-			};
+			const block = createBlock( 'core/text-block', {
+				value: 'ribs',
+			} );
 
-			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
+			const transformedBlocks = switchToBlockType( block, 'core/updated-text-block' );
 
-			expect( updatedBlock ).toBeNull();
+			expect( transformedBlocks ).toBeNull();
 		} );
 
 		it( 'should reject single transformations with unexpected block types', () => {
@@ -262,17 +234,13 @@ describe( 'block factory', () => {
 				save: noop,
 			} );
 
-			const block = {
-				uid: 1,
-				name: 'core/text-block',
-				attributes: {
-					value: 'ribs',
-				},
-			};
+			const block = createBlock( 'core/text-block', {
+				value: 'ribs',
+			} );
 
-			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
+			const transformedBlocks = switchToBlockType( block, 'core/updated-text-block' );
 
-			expect( updatedBlock ).toEqual( null );
+			expect( transformedBlocks ).toBeNull();
 		} );
 
 		it( 'should reject array transformations with unexpected block types', () => {
@@ -296,17 +264,13 @@ describe( 'block factory', () => {
 				save: noop,
 			} );
 
-			const block = {
-				uid: 1,
-				name: 'core/text-block',
-				attributes: {
-					value: 'ribs',
-				},
-			};
+			const block = createBlock( 'core/text-block', {
+				value: 'ribs',
+			} );
 
-			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
+			const transformedBlocks = switchToBlockType( block, 'core/updated-text-block' );
 
-			expect( updatedBlock ).toEqual( null );
+			expect( transformedBlocks ).toEqual( null );
 		} );
 
 		it( 'should accept valid array transformations', () => {
@@ -330,38 +294,30 @@ describe( 'block factory', () => {
 				save: noop,
 			} );
 
-			const block = {
-				uid: 1,
-				name: 'core/text-block',
-				attributes: {
-					value: 'ribs',
-				},
-			};
+			const block = createBlock( 'core/text-block', {
+				value: 'ribs',
+			} );
 
-			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
+			const transformedBlocks = switchToBlockType( block, 'core/updated-text-block' );
 
 			// Make sure the block UIDs are set as expected: the first
 			// transformed block whose type matches the "destination" type gets
 			// to keep the existing block's UID.
-			expect( updatedBlock ).toHaveLength( 2 );
-			expect( updatedBlock[ 0 ].uid ).toBeDefined();
-			expect( updatedBlock[ 0 ].uid ).not.toEqual( 1 );
-			expect( updatedBlock[ 1 ].uid ).toEqual( 1 );
-			updatedBlock[ 0 ].uid = 2;
-
-			expect( updatedBlock ).toEqual( [ {
-				uid: 2,
-				name: 'core/text-block',
-				attributes: {
-					value: 'chicken ribs',
-				},
-			}, {
-				uid: 1,
-				name: 'core/updated-text-block',
-				attributes: {
-					value: 'smoked ribs',
-				},
-			} ] );
+			expect( transformedBlocks ).toHaveLength( 2 );
+			expect( transformedBlocks[ 0 ] ).toHaveProperty( 'uid' );
+			expect( transformedBlocks[ 0 ].uid ).not.toBe( block.uid );
+			expect( transformedBlocks[ 0 ].name ).toBe( 'core/text-block' );
+			expect( transformedBlocks[ 0 ].isValid ).toBe( true );
+			expect( transformedBlocks[ 0 ].attributes ).toEqual( {
+				value: 'chicken ribs',
+			} );
+			expect( transformedBlocks[ 1 ].uid ).toBe( block.uid );
+			expect( transformedBlocks[ 1 ] ).toHaveProperty( 'uid' );
+			expect( transformedBlocks[ 1 ].name ).toBe( 'core/updated-text-block' );
+			expect( transformedBlocks[ 1 ].isValid ).toBe( true );
+			expect( transformedBlocks[ 1 ].attributes ).toEqual( {
+				value: 'smoked ribs',
+			} );
 		} );
 	} );
 } );
