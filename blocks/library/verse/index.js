@@ -9,6 +9,8 @@ import { __ } from 'i18n';
 import './style.scss';
 import { registerBlockType, createBlock, query } from '../../api';
 import Editable from '../../editable';
+import InspectorControls from '../../inspector-controls';
+import BlockDescription from '../../block-description';
 
 const { children } = query;
 
@@ -45,9 +47,17 @@ registerBlockType( 'core/verse', {
 	edit( { attributes, setAttributes, focus, setFocus, className } ) {
 		const { content } = attributes;
 
-		return (
+		return [
+			focus && (
+				<InspectorControls key="inspector">
+					<BlockDescription>
+						<p>{ __( 'Write poetry and other literary expressions honoring all spaces and line-breaks.' ) }</p>
+					</BlockDescription>
+				</InspectorControls>
+			),
 			<Editable
 				tagName="pre"
+				key="editable"
 				value={ content }
 				onChange={ ( nextContent ) => {
 					setAttributes( {
@@ -59,8 +69,8 @@ registerBlockType( 'core/verse', {
 				placeholder={ __( 'Write…' ) }
 				className={ className }
 				formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
-			/>
-		);
+			/>,
+		];
 	},
 
 	save( { attributes, className } ) {
