@@ -47,9 +47,7 @@ registerBlockType( 'core/latest-comments', {
 	edit: class extends Component {
 		constructor() {
 			super( ...arguments );
-			this.toggleDisplayAvatar = this.toggleDisplayAvatar.bind( this );
-			this.toggleDisplayExcerpt = this.toggleDisplayExcerpt.bind( this );
-			this.toggleDisplayTimestamp = this.toggleDisplayTimestamp.bind( this );
+			this.toggleHandler = this.toggleHandler.bind( this );
 			this.changeCommentsToShow = this.changeCommentsToShow.bind( this );
 
 			const { commentsToShow } = this.props.attributes;
@@ -83,25 +81,13 @@ registerBlockType( 'core/latest-comments', {
 			}
 		}
 
-		toggleDisplayAvatar() {
-			const { displayAvatar } = this.props.attributes;
-			const { setAttributes } = this.props;
+		toggleHandler( propName ) {
+			return () => {
+				const value = this.props.attributes[ propName ];
+				const { setAttributes } = this.props;
 
-			setAttributes( { displayAvatar: ! displayAvatar } );
-		}
-
-		toggleDisplayExcerpt() {
-			const { displayExcerpt } = this.props.attributes;
-			const { setAttributes } = this.props;
-
-			setAttributes( { displayExcerpt: ! displayExcerpt } );
-		}
-
-		toggleDisplayTimestamp() {
-			const { displayTimestamp } = this.props.attributes;
-			const { setAttributes } = this.props;
-
-			setAttributes( { displayTimestamp: ! displayTimestamp } );
+				setAttributes( { [ propName ]: ! value } );
+			};
 		}
 
 		changeCommentsToShow( commentsToShow ) {
@@ -150,19 +136,19 @@ registerBlockType( 'core/latest-comments', {
 						<ToggleControl
 							label={ __( 'Display avatar' ) }
 							checked={ displayAvatar }
-							onChange={ this.toggleDisplayAvatar }
+							onChange={ this.toggleHandler( 'displayAvatar' ) }
 						/>
 
 						<ToggleControl
 							label={ __( 'Display timestamp' ) }
 							checked={ displayTimestamp }
-							onChange={ this.toggleDisplayTimestamp }
+							onChange={ this.toggleHandler( 'displayTimestamp' ) }
 						/>
 
 						<ToggleControl
 							label={ __( 'Display excerpt' ) }
 							checked={ this.props.attributes.displayExcerpt }
-							onChange={ this.toggleDisplayExcerpt }
+							onChange={ this.toggleHandler( 'displayExcerpt' ) }
 						/>
 
 						<TextControl
