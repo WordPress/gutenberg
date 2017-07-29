@@ -94,8 +94,8 @@ function tests_retrieve_phpmailer_instance() {
  */
 function reset_phpmailer_instance() {
 	$mailer = tests_retrieve_phpmailer_instance();
-	if ( $mailer && isset( $mailer->mock_sent ) ) {
-		unset( $mailer->mock_sent );
+	if ( $mailer ) {
+		$GLOBALS['phpmailer'] = new MockPHPMailer( true );
 		return true;
 	}
 
