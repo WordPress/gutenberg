@@ -3,7 +3,17 @@
  */
 import tinymce from 'tinymce';
 import classnames from 'classnames';
-import { last, isEqual, omitBy, forEach, merge, identity, find } from 'lodash';
+import {
+	last,
+	isEqual,
+	omitBy,
+	forEach,
+	merge,
+	identity,
+	find,
+	defer,
+	noop,
+} from 'lodash';
 import { nodeListToReact } from 'dom-react';
 import { Fill } from 'react-slot-fill';
 import 'element-closest';
@@ -54,6 +64,7 @@ export default class Editable extends Component {
 		this.onKeyUp = this.onKeyUp.bind( this );
 		this.changeFormats = this.changeFormats.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
+		this.maybePropagateUndo = this.maybePropagateUndo.bind( this );
 		this.onPastePostProcess = this.onPastePostProcess.bind( this );
 
 		this.state = {
@@ -80,6 +91,7 @@ export default class Editable extends Component {
 		editor.on( 'keydown', this.onKeyDown );
 		editor.on( 'keyup', this.onKeyUp );
 		editor.on( 'selectionChange', this.onSelectionChange );
+		editor.on( 'BeforeExecCommand', this.maybePropagateUndo );
 		editor.on( 'PastePostProcess', this.onPastePostProcess );
 
 		patterns.apply( this, [ editor ] );
@@ -126,6 +138,23 @@ export default class Editable extends Component {
 				...this.props.focus,
 				collapsed,
 			} );
+		}
+	}
+
+	maybePropagateUndo( event ) {
+		const { onUndo } = this.context;
+		if ( onUndo && event.command === 'Undo' && ! this.editor.undoManager.hasUndo() ) {
+			// When user attempts Undo when empty Undo stack, propagate undo
+			// action to context handler. The compromise here is that: TinyMCE
+			// handles Undo until change, at which point `editor.save` resets
+			// history. If no history exists, let context handler have a turn.
+			// Defer in case an immediate undo causes TinyMCE to be destroyed,
+			// if other undo behaviors test presence of an input field.
+			defer( onUndo );
+
+			// We could return false here to stop other TinyMCE event handlers
+			// from running, but we assume TinyMCE won't do anything on an
+			// empty undo stack anyways.
 		}
 	}
 
@@ -514,3 +543,7 @@ export default class Editable extends Component {
 		);
 	}
 }
+
+Editable.contextTypes = {
+	onUndo: noop,
+};

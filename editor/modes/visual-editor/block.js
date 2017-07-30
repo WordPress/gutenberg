@@ -78,6 +78,10 @@ class VisualEditorBlock extends Component {
 		if ( this.props.focus ) {
 			this.node.focus();
 		}
+
+		if ( this.props.isTyping ) {
+			document.addEventListener( 'mousemove', this.stopTypingOnMouseMove );
+		}
 	}
 
 	componentWillReceiveProps( newProps ) {

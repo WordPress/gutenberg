@@ -133,9 +133,9 @@ registerBlockType( 'core/cover-text', {
 		const className = dropCap && 'has-drop-cap';
 
 		if ( ! align ) {
-			return <div style={ { backgroundColor: backgroundColor, textColor: textColor } }><p className={ className }>{ content }</p></div>;
+			return <div style={ { backgroundColor: backgroundColor, color: textColor } }><p className={ className }>{ content }</p></div>;
 		}
 
-		return <div style={ { backgroundColor: backgroundColor, textColor: textColor } }><p style={ { textAlign: align } } className={ className }>{ content }</p></div>;
+		return <div style={ { backgroundColor: backgroundColor, color: textColor } }><p style={ { textAlign: align } } className={ className }>{ content }</p></div>;
 	},
 } );
