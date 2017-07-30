@@ -207,7 +207,7 @@ class Tests_Admin_Includes_Post extends WP_UnitTestCase {
 	/**
 	 * @ticket 27792
 	 */
-	function test_bulk_edit_posts_stomping() {
+	public function test_bulk_edit_posts_stomping() {
 		wp_set_current_user( self::$admin_id );
 
 		$post1 = self::factory()->post->create( array(
@@ -242,6 +242,31 @@ class Tests_Admin_Includes_Post extends WP_UnitTestCase {
 		$this->assertEquals( self::$author_ids[1], $post->post_author );
 		$this->assertEquals( 'closed', $post->comment_status );
 		$this->assertEquals( 'closed', $post->ping_status );
+	}
+
+	/**
+	 * @ticket 41396
+	 */
+	public function test_bulk_edit_posts_should_set_post_format_before_wp_update_post_runs() {
+		wp_set_current_user( self::$admin_id );
+
+		$request = array(
+			'post_format' => 'aside',
+			'_status'     => -1,
+			'post'        => array( self::$post_id ),
+		);
+
+		add_action( 'save_post', array( $this, 'check_post_format' ) );
+
+		bulk_edit_posts( $request );
+
+		remove_action( 'save_post', array( $this, 'check_post_format' ) );
+	}
+
+	public function check_post_format( $post_id ) {
+		if ( self::$post_id === $post_id ) {
+			$this->assertEquals( 'aside', get_post_format( $post_id ) );
+		}
 	}
 
 	/**
