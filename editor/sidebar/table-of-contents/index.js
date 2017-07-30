@@ -18,7 +18,9 @@ import './style.scss';
 import { getBlocks } from '../../selectors';
 
 const TableOfContents = ( { blocks } ) => {
-	const headings = filter( blocks, ( block ) => block.name === 'core/heading' );
+	const headings = filter( blocks, ( block ) =>
+		block.name === 'core/title' || block.name === 'core/heading'
+	);
 
 	return (
 		<PanelBody title={ __( 'Table of Contents (experimental)' ) } initialOpen={ false }>
@@ -28,10 +30,14 @@ const TableOfContents = ( { blocks } ) => {
 					<div
 						key={ `heading-${ index }` }
 						className={ classnames( 'table-of-contents__item', `is-${ heading.attributes.nodeName }`, {
-							'is-invalid': ! heading.attributes.content || heading.attributes.content.length === 0,
+							'is-invalid': (
+								! heading.attributes.content ||
+								heading.attributes.content.length === 0 ||
+								( heading.name === 'core/title' && index )
+							),
 						} ) }
 					>
-						<strong>{ heading.attributes.nodeName }</strong>
+						<strong>{ heading.attributes.nodeName || 'H1' }</strong>
 						{ heading.attributes.content && heading.attributes.content.length > 0
 							? heading.attributes.content
 							: <em>{ __( '(Missing header text)' ) }</em>

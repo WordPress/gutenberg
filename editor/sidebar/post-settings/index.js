@@ -15,6 +15,7 @@ import DiscussionPanel from '../discussion-panel';
 import LastRevision from '../last-revision';
 import TableOfContents from '../table-of-contents';
 import PageAttributes from '../page-attributes';
+import PostPermalink from '../post-permalink';
 
 const panel = (
 	<Panel>
@@ -22,6 +23,7 @@ const panel = (
 		<LastRevision />
 		<PostTaxonomies />
 		<FeaturedImage />
+		<PostPermalink />
 		<PostExcerpt />
 		<DiscussionPanel />
 		<PageAttributes />
