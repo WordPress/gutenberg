@@ -2662,18 +2662,25 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 	public function test_comment_query_should_be_cached() {
 		global $wpdb;
 
-		$q = new WP_Comment_Query( array(
-			'post_id' => self::$post_id,
-			'fields' => 'ids',
-		) );
-
 		$c = wp_insert_comment( array(
 			'comment_author' => 'Foo',
 			'comment_author_email' => 'foo@example.com',
 			'comment_post_ID' => self::$post_id,
 		) );
 
+		$q = new WP_Comment_Query( array(
+			'post_id' => self::$post_id,
+			'fields' => 'ids',
+		) );
+
 		$num_queries = $wpdb->num_queries;
+
+		$q2 = new WP_Comment_Query( array(
+			'post_id' => self::$post_id,
+			'fields' => 'ids',
+		) );
+
+		$this->assertSame( $num_queries, $wpdb->num_queries );
 	}
 
 	public function test_created_comment_should_invalidate_query_cache() {
