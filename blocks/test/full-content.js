@@ -3,7 +3,7 @@
  */
 import fs from 'fs';
 import path from 'path';
-import { uniq, isObject, omit, startsWith } from 'lodash';
+import { uniq, isObject, omit, startsWith, get } from 'lodash';
 import { format } from 'util';
 
 /**
@@ -172,7 +172,7 @@ describe( 'full post content fixture', () => {
 
 			if ( ! serializedExpected ) {
 				if ( process.env.GENERATE_MISSING_FIXTURES ) {
-					serializedExpected = serializedActual + '\n';
+					serializedExpected = serializedActual;
 					writeFixtureFile( f + '.serialized.html', serializedExpected );
 				} else {
 					throw new Error(
@@ -204,15 +204,23 @@ describe( 'full post content fixture', () => {
 					startsWith( basename, nameToFilename + '__' )
 				) )
 				.map( basename => {
-					const filename = basename + '.html';
-					const parsedBlockFilename = basename + '.json';
+					// The file that contains the input HTML for this test.
+					const inputFilename = basename + '.html';
+					// The parser output for this test.  For missing files,
+					// JSON.parse( null ) === null.
+					const parserOutput = JSON.parse(
+						readFixtureFile( basename + '.json' )
+					);
+					// The name of the first block that this fixture file
+					// contains (if any).
+					const firstBlock = get( parserOutput, [ '0', 'name' ], null );
 					return {
-						filename,
-						contents: readFixtureFile( filename ),
-						parsed: JSON.parse( readFixtureFile( parsedBlockFilename ) )[ 0 ],
+						filename: inputFilename,
+						parserOutput,
+						firstBlock,
 					};
 				} )
-				.filter( fixture => fixture.contents !== null );
+				.filter( fixture => fixture.parserOutput !== null );
 
 			if ( ! foundFixtures.length ) {
 				errors.push( format(
@@ -223,7 +231,7 @@ describe( 'full post content fixture', () => {
 			}
 
 			foundFixtures.forEach( fixture => {
-				if ( name !== fixture.parsed.name ) {
+				if ( name !== fixture.firstBlock ) {
 					errors.push( format(
 						'Expected fixture file \'%s\' to test the \'%s\' block.',
 						fixture.filename,
