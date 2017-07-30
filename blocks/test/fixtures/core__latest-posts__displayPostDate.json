@@ -1,0 +1,13 @@
+[
+    {
+        "uid": "_uid_0",
+        "name": "core/latest-posts",
+        "isValid": true,
+        "attributes": {
+            "postsToShow": 5,
+            "displayPostDate": true,
+            "layout": "list",
+            "columns": 3
+        }
+    }
+]
