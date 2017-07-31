@@ -168,7 +168,7 @@ registerBlockType( 'core/list', {
 
 		isListActive( listType ) {
 			const { internalListType } = this.state;
-			const { nodeName = 'OL' } = this.props.attributes;
+			const { nodeName = 'UL' } = this.props.attributes;
 
 			return listType === ( internalListType ? internalListType : nodeName );
 		}
@@ -238,7 +238,7 @@ registerBlockType( 'core/list', {
 
 		render() {
 			const { attributes, focus, setFocus } = this.props;
-			const { nodeName = 'OL', values = [] } = attributes;
+			const { nodeName = 'UL', values = [] } = attributes;
 
 			return [
 				focus && (
@@ -288,7 +288,7 @@ registerBlockType( 'core/list', {
 	},
 
 	save( { attributes } ) {
-		const { nodeName = 'OL', values = [] } = attributes;
+		const { nodeName = 'UL', values = [] } = attributes;
 
 		return createElement(
 			nodeName.toLowerCase(),
