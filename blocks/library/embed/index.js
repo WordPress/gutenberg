@@ -84,7 +84,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 					event.preventDefault();
 				}
 				const { url } = this.props.attributes;
-				const apiURL = wpApiSettings.root + 'oembed/1.0/proxy?url=' + encodeURIComponent( url ) + '&_wpnonce=' + wpApiSettings.nonce;
+				const apiURL = wpApiSettings.root + 'oembed/1.0/proxy?url=' + encodeURIComponent( url ) + '&maxwidth=608&_wpnonce=' + wpApiSettings.nonce;
 
 				this.setState( { error: false, fetching: true } );
 				window.fetch( apiURL, {
