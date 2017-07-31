@@ -109,9 +109,6 @@ class DropdownMenu extends Component {
 			// eslint-disable-next-line react/no-find-dom-node
 			findDOMNode( this.nodes.toggle ).focus();
 			this.closeMenu();
-			if ( this.props.onSelect ) {
-				this.props.onSelect( null );
-			}
 		}
 	}
 
@@ -167,7 +164,6 @@ class DropdownMenu extends Component {
 			label,
 			menuLabel,
 			controls,
-			onSelect,
 		} = this.props;
 
 		if ( ! controls || ! controls.length ) {
@@ -211,9 +207,6 @@ class DropdownMenu extends Component {
 									this.closeMenu();
 									if ( control.onClick ) {
 										control.onClick();
-									}
-									if ( onSelect ) {
-										onSelect( index );
 									}
 								} }
 								className="components-dropdown-menu__menu-item"
