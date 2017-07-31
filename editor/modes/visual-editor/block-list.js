@@ -211,7 +211,6 @@ class VisualEditorBlockList extends Component {
 			blocks,
 			showInsertionPoint,
 			insertionPoint,
-			multiSelectedBlockUids,
 		} = this.props;
 
 		const insertionPointIndex = blocks.indexOf( insertionPoint );
@@ -244,7 +243,6 @@ class VisualEditorBlockList extends Component {
 							uid={ uid }
 							blockRef={ ( ref ) => this.setBlockRef( ref, uid ) }
 							onSelectionStart={ () => this.onSelectionStart( uid ) }
-							multiSelectedBlockUids={ multiSelectedBlockUids }
 						/>
 					);
 				} ) }
