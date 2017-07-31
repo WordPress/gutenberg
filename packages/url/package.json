@@ -8,11 +8,7 @@
   "description": "WordPress URL utilities",
   "main": "build/index.js",
   "module": "build-module/index.js",
-  "browser": "build-browser/index.js",
   "author": "WordPress",
   "license": "GPL-2.0+",
-  "dependencies": {
-    "querystring": "^0.2.0",
-    "url": "^0.11.0"
-  }
+  "dependencies": {}
 }

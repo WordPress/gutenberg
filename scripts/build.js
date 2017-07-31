@@ -23,7 +23,6 @@ const SRC_DIR = 'src';
 const BUILD_DIR = {
 	main: 'build',
 	module: 'build-module',
-	browser: 'build-browser',
 };
 const DONE = chalk.reset.inverse.bold.green( ' DONE ' );
 
@@ -47,11 +46,6 @@ const babelConfigs = {
 			) ],
 		] }
 	),
-	browser: Object.assign(
-		{},
-		babelDefaultConfig,
-		{ plugins: [ ...babelDefaultConfig.plugins, 'transform-runtime' ] }
-	)
 };
 
 /**
@@ -100,7 +94,6 @@ function getBuildPath( file, buildFolder ) {
 function buildFile( file, silent ) {
 	buildFileFor( file, silent, 'main' );
 	buildFileFor( file, silent, 'module' );
-	buildFileFor( file, silent, 'browser' );
 }
 
 /**
