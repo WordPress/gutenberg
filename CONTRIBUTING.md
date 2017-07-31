@@ -52,7 +52,7 @@ Code style in JavaScript is enforced using [ESLint](http://eslint.org/). The abo
 
 ### JavaScript Test Coverage
 
-JavaScript test coverage is available at [Coveralls](https://coveralls.io/github/WordPress/gutenberg). _Code coverage_ is a way of measuring the amount of code covered by the tests in the test suite of a project.
+JavaScript test coverage is available at [Codecov](https://codecov.io/gh/WordPress/gutenberg). _Code coverage_ is a way of measuring the amount of code covered by the tests in the test suite of a project.
 
 ### PHP Testing
 
