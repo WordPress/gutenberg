@@ -179,7 +179,7 @@ class UrlInput extends Component {
 					aria-expanded={ showSuggestions }
 					aria-autocomplete="list"
 					aria-owns={ `blocks-url-input-suggestions-${ instanceId }` }
-					aria-activedescendant={ selectedSuggestion ? `blocks-url-input-suggestion-${ instanceId }-${ selectedSuggestion }` : undefined }
+					aria-activedescendant={ selectedSuggestion !== null ? `blocks-url-input-suggestion-${ instanceId }-${ selectedSuggestion }` : undefined }
 				/>
 
 				{ ( loading ) && <Spinner /> }
@@ -197,7 +197,7 @@ class UrlInput extends Component {
 								key={ post.id }
 								role="option"
 								tabIndex="-1"
-								id={ `blocks-url-input-suggestion-${ instanceId }-${ selectedSuggestion }` }
+								id={ `blocks-url-input-suggestion-${ instanceId }-${ index }` }
 								ref={ this.bindSuggestionNode( index ) }
 								className={ classnames( 'blocks-url-input__suggestion', {
 									'is-selected': index === selectedSuggestion,
