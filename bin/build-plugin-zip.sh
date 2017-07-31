@@ -68,7 +68,7 @@ mv gutenberg.tmp.php gutenberg.php
 zip -r gutenberg.zip \
 	gutenberg.php \
 	lib/*.php \
-	lib/blocks/*.php \
+	blocks/library/*/*.php \
 	post-content.js \
 	$vendor_scripts \
 	blocks/build/*.{js,map} \
