@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { pick, noop } from 'lodash';
+import { EventEmitter } from 'events/';
+import { pick, noop, isEqual } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,11 +16,26 @@ import { Component } from 'element';
  * any Editable instance.
  */
 class EditableProvider extends Component {
+	componentWillMount() {
+		this.focusEmitter = new EventEmitter();
+	}
+
 	getChildContext() {
-		return pick(
-			this.props,
-			Object.keys( this.constructor.childContextTypes )
-		);
+		const { focusEmitter } = this;
+
+		return {
+			focusEmitter,
+			...pick(
+				this.props,
+				Object.keys( this.constructor.childContextTypes )
+			),
+		};
+	}
+
+	componentWillReceiveProps( nextProps ) {
+		if ( ! isEqual( nextProps.focus, this.props.focus ) ) {
+			this.focusEmitter.emit( 'change' );
+		}
 	}
 
 	render() {
@@ -29,6 +45,9 @@ class EditableProvider extends Component {
 
 EditableProvider.childContextTypes = {
 	onUndo: noop,
+	focus: noop,
+	onFocus: noop,
+	focusEmitter: noop,
 };
 
 export default EditableProvider;

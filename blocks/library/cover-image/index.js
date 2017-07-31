@@ -45,7 +45,7 @@ registerBlockType( 'core/cover-image', {
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, className, settings } ) {
+	edit( { attributes, setAttributes, focus, className, settings } ) {
 		const { url, title, align, id, hasParallax, hasBackgroundDim } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		const onSelectImage = ( media ) => setAttributes( { url: media.url, id: media.id } );
@@ -138,8 +138,6 @@ registerBlockType( 'core/cover-image', {
 						tagName="h2"
 						placeholder={ __( 'Write title…' ) }
 						value={ title }
-						focus={ focus }
-						onFocus={ setFocus }
 						onChange={ ( value ) => setAttributes( { title: value } ) }
 						inlineToolbar
 					/>

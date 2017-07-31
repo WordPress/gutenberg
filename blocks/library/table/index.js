@@ -34,7 +34,7 @@ registerBlockType( 'core/table', {
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, className, settings } ) {
+	edit( { attributes, setAttributes, focus, className, settings } ) {
 		const { content } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		return [
@@ -54,7 +54,6 @@ registerBlockType( 'core/table', {
 				} }
 				content={ content }
 				focus={ focus }
-				onFocus={ setFocus }
 				className={ className }
 			/>,
 		];

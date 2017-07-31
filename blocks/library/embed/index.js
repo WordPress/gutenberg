@@ -112,7 +112,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 			render() {
 				const { html, type, error, fetching } = this.state;
 				const { align, url, caption } = this.props.attributes;
-				const { setAttributes, focus, setFocus, settings } = this.props;
+				const { setAttributes, focus, settings } = this.props;
 				const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 
 				const controls = (
@@ -188,8 +188,6 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 								tagName="figcaption"
 								placeholder={ __( 'Write caption…' ) }
 								value={ caption }
-								focus={ focus }
-								onFocus={ setFocus }
 								onChange={ ( value ) => setAttributes( { caption: value } ) }
 								inlineToolbar
 							/>

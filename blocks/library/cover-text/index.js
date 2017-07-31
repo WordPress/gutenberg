@@ -65,7 +65,7 @@ registerBlockType( 'core/cover-text', {
 		};
 	},
 
-	edit( { attributes, setAttributes, className, focus, setFocus, mergeBlocks } ) {
+	edit( { attributes, setAttributes, className, focus, mergeBlocks } ) {
 		const { align, width, content, dropCap, placeholder, textColor, backgroundColor } = attributes;
 		const toggleDropCap = () => setAttributes( { dropCap: ! dropCap } );
 		return [
@@ -117,8 +117,6 @@ registerBlockType( 'core/cover-text', {
 							content: nextContent,
 						} );
 					} }
-					focus={ focus }
-					onFocus={ setFocus }
 					onMerge={ mergeBlocks }
 					style={ { textAlign: align } }
 					className={ dropCap && 'has-drop-cap' }

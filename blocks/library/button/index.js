@@ -43,7 +43,7 @@ registerBlockType( 'core/button', {
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, className } ) {
+	edit( { attributes, setAttributes, focus, className } ) {
 		const { text, url, title, align, color } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 
@@ -58,8 +58,6 @@ registerBlockType( 'core/button', {
 					tagName="span"
 					placeholder={ __( 'Write label…' ) }
 					value={ text }
-					focus={ focus }
-					onFocus={ setFocus }
 					onChange={ ( value ) => setAttributes( { text: value } ) }
 					formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
 				/>

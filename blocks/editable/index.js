@@ -12,7 +12,6 @@ import {
 	identity,
 	find,
 	defer,
-	noop,
 } from 'lodash';
 import { nodeListToReact } from 'dom-react';
 import { Fill } from 'react-slot-fill';
@@ -32,6 +31,7 @@ import './style.scss';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
 import patterns from './patterns';
+import withEditableContext from './with-editable-context';
 
 function createTinyMCEElement( type, props, ...children ) {
 	if ( props[ 'data-mce-bogus' ] === 'all' ) {
@@ -49,7 +49,7 @@ function createTinyMCEElement( type, props, ...children ) {
 	);
 }
 
-export default class Editable extends Component {
+class Editable extends Component {
 	constructor( props ) {
 		super( ...arguments );
 
@@ -544,6 +544,4 @@ export default class Editable extends Component {
 	}
 }
 
-Editable.contextTypes = {
-	onUndo: noop,
-};
+export default withEditableContext( Editable );

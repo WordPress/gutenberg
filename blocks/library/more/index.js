@@ -23,7 +23,7 @@ registerBlockType( 'core/more', {
 
 	className: false,
 
-	edit( { attributes, setAttributes, focus, setFocus } ) {
+	edit( { attributes, setAttributes, focus } ) {
 		const { text, noTeaser } = attributes;
 
 		const toggleNoTeaser = () => setAttributes( { noTeaser: ! noTeaser } );
@@ -50,7 +50,6 @@ registerBlockType( 'core/more', {
 					value={ value }
 					size={ inputLength }
 					onChange={ ( event ) => setAttributes( { text: event.target.value } ) }
-					onFocus={ setFocus }
 				/>
 			</div>,
 		];
