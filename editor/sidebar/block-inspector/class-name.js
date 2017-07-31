@@ -36,10 +36,13 @@ class BlockInspectorClassName extends Component {
 		}
 
 		return (
-			<InspectorControls.TextControl
-				label={ __( 'Additional CSS Class' ) }
-				value={ selectedBlock.attributes.className }
-				onChange={ this.setClassName } />
+			<div>
+				<h3>{ __( 'Block Settings' ) }</h3>
+				<InspectorControls.TextControl
+					label={ __( 'Additional CSS Class' ) }
+					value={ selectedBlock.attributes.className }
+					onChange={ this.setClassName } />
+			</div>
 		);
 	}
 }
