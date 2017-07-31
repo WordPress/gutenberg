@@ -14,12 +14,18 @@ import MediaUploadButton from '../../media-upload-button';
 import InspectorControls from '../../inspector-controls';
 import RangeControl from '../../inspector-controls/range-control';
 import ToggleControl from '../../inspector-controls/toggle-control';
+import SelectControl from '../../inspector-controls/select-control';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import GalleryImage from './gallery-image';
 import BlockDescription from '../../block-description';
 
 const MAX_COLUMNS = 8;
+const linkOptions = [
+	{ value: 'attachment', label: __( 'Attachment' ) },
+	{ value: 'media', label: __( 'Media' ) },
+	{ value: 'none', label: __( 'None' ) },
+];
 
 const editMediaLibrary = ( attributes, setAttributes ) => {
 	const frameConfig = {
@@ -71,9 +77,11 @@ registerBlockType( 'core/gallery', {
 
 	edit( { attributes, setAttributes, focus, className } ) {
 		const { images = [], columns = defaultColumnsNumber( attributes ), align = 'none' } = attributes;
+		const setLinkto = ( value ) => setAttributes( { linkto: value } );
 		const setColumnsNumber = ( event ) => setAttributes( { columns: event.target.value } );
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		const { imageCrop = true } = attributes;
+		const { linkto = 'none' } = attributes;
 		const toggleImageCrop = () => setAttributes( { imageCrop: ! imageCrop } );
 
 		const controls = (
@@ -127,6 +135,12 @@ registerBlockType( 'core/gallery', {
 						<p>{ __( 'Image galleries are a great way to share groups of pictures on your site.' ) }</p>
 					</BlockDescription>
 					<h3>{ __( 'Gallery Settings' ) }</h3>
+					<SelectControl
+						label={ __( 'Link to' ) }
+						selected={ linkto }
+						onBlur={ setLinkto }
+						options={ linkOptions }
+					/>
 					<RangeControl
 						label={ __( 'Columns' ) }
 						value={ columns }
