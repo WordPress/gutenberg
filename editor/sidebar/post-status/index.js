@@ -17,6 +17,7 @@ import PostVisibility from '../post-visibility';
 import PostTrash from '../post-trash';
 import PostSchedule from '../post-schedule';
 import PostSticky from '../post-sticky';
+import PostAuthor from '../post-author';
 import {
 	getEditedPostAttribute,
 	getSuggestedPostFormat,
@@ -64,6 +65,7 @@ class PostStatus extends Component {
 					<span>{ format }</span>
 				</PanelRow>
 				<PostSticky />
+				<PostAuthor />
 				<PostTrash />
 			</PanelBody>
 		);
