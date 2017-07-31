@@ -1,4 +1,4 @@
-# Gutenberg F.A.Q.
+# Frequently Asked Questions
 
 ## What is Gutenberg?
 
@@ -119,20 +119,19 @@ This also <a href="https://github.com/WordPress/gutenberg/issues/1516">gives us 
 In JS:
 
 ```js
-wp.blocks.parse( postContent );
+var blocks = wp.blocks.parse( postContent );
 ```
 
 In PHP:
 
 ```php
-$parser = new Gutenberg_PEG_Parser;
-$blocks = $parser->parse( $post_content );
+$blocks = gutenberg_parse_blocks( $post_content );
 ```
 ## Why should I start using this once released?
 Blocks are likely to become the main way users interact with content. Users are going to be discovering functionality in the new universal inserter tool, with a richer block interface that provides more layout opportunities.
 
 ## What features will be available at launch? What does the post-launch roadmap look like?
-As part of the focus on the editor in 2017, a focus on customization and sitebuilding is next. From <a href=”https://make.wordpress.org/core/2017/01/04/focus-tech-and-design-leads/”>the kickoff post</a>:
+As part of the focus on the editor in 2017, a focus on customization and sitebuilding is next. From [the kickoff post](https://make.wordpress.org/core/2017/01/04/focus-tech-and-design-leads/):
 
 > The customizer will help out the editor at first, then shift to bring those fundamental building blocks into something that could allow customization “outside of the box” of post_content, including sidebars and possibly even an entire theme.
 

@@ -7,12 +7,11 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __ } from 'i18n';
-import { PanelBody, FormToggle, withInstanceId } from 'components';
+import { PanelBody, PanelRow, FormToggle, withInstanceId } from 'components';
 
 /**
  * Internal Dependencies
  */
-import './style.scss';
 import { getEditedPostAttribute } from '../../selectors';
 import { editPost } from '../../actions';
 
@@ -25,7 +24,7 @@ function DiscussionPanel( { pingStatus = 'open', commentStatus = 'open', instanc
 
 	return (
 		<PanelBody title={ __( 'Discussion' ) } initialOpen={ false }>
-			<div className="editor-discussion-panel__row">
+			<PanelRow>
 				<label htmlFor={ commentsToggleId }>{ __( 'Allow Comments' ) }</label>
 				<FormToggle
 					checked={ commentStatus === 'open' }
@@ -33,8 +32,8 @@ function DiscussionPanel( { pingStatus = 'open', commentStatus = 'open', instanc
 					showHint={ false }
 					id={ commentsToggleId }
 				/>
-			</div>
-			<div className="editor-discussion-panel__row">
+			</PanelRow>
+			<PanelRow>
 				<label htmlFor={ pingbacksToggleId }>{ __( 'Allow Pingbacks & Trackbacks' ) }</label>
 				<FormToggle
 					checked={ pingStatus === 'open' }
@@ -42,7 +41,7 @@ function DiscussionPanel( { pingStatus = 'open', commentStatus = 'open', instanc
 					showHint={ false }
 					id={ pingbacksToggleId }
 				/>
-			</div>
+			</PanelRow>
 		</PanelBody>
 	);
 }

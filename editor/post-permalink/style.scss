@@ -2,15 +2,20 @@
 	display: inline-flex;
 	align-items: center;
 	position: absolute;
-	top: -36px;
-	left: $block-padding;
-	right: $block-padding;
+	top: -34px;
 	box-shadow: $shadow-popover;
 	border: 1px solid $light-gray-500;
 	background: $white;
 	padding: 5px;
 	font-family: $default-font;
 	font-size: $default-font-size;
+	left: 0;
+	right: 0;
+
+	@include break-small() {
+		left: $block-padding + $block-mover-padding-visible - 2px;
+		right: $block-padding + $block-mover-padding-visible - 2px;
+	}
 }
 
 .editor-post-permalink__label {

@@ -2,6 +2,7 @@
     {
         "uid": "_uid_0",
         "name": "core-embed/youtube",
+        "isValid": true,
         "attributes": {
             "url": "https://youtube.com/",
             "caption": [

@@ -31,7 +31,7 @@ WP_Tag_More
   = "<!--" WS* "more" customText:(WS+ text:$((!(WS* "-->") .)+) { /** <?php return $text; ?> **/ return text })? WS* "-->" noTeaser:(WS* "<!--noteaser-->")?
   { /** <?php
     return array(
-       'blockName' => 'wp:core/more',
+       'blockName' => 'core/more',
        'attrs' => array(
          'customText' => $customText,
          'noTeaser' => (bool) $noTeaser
@@ -40,7 +40,7 @@ WP_Tag_More
     );
     ?> **/
     return {
-      blockName: 'wp:core/more',
+      blockName: 'core/more',
       attrs: {
         customText: customText,
         noTeaser: !! noTeaser
@@ -95,7 +95,7 @@ WP_Block_Balanced
   }
 
 WP_Block_Html
-  = ts:(!WP_Block_Balanced !WP_Block_Void c:Any {
+  = ts:(!WP_Block_Balanced !WP_Block_Void !WP_Tag_More c:Any {
     /** <?php return $c; ?> **/
     return c;
   })+

@@ -2,23 +2,29 @@
  * WordPress dependencies
  */
 import { Component } from 'element';
-import { Placeholder, Spinner } from 'components';
+import { Placeholder, Toolbar, Spinner } from 'components';
 import { __ } from 'i18n';
 import moment from 'moment';
+import classnames from 'classnames';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
+import './block.scss';
 import { registerBlockType } from '../../api';
 import { getLatestPosts } from './data.js';
 import InspectorControls from '../../inspector-controls';
 import TextControl from '../../inspector-controls/text-control';
 import ToggleControl from '../../inspector-controls/toggle-control';
+import RangeControl from '../../inspector-controls/range-control';
 import BlockDescription from '../../block-description';
+import BlockControls from '../../block-controls';
+import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
 const MIN_POSTS = 1;
 const MAX_POSTS = 100;
+const MAX_POSTS_COLUMNS = 6;
 
 registerBlockType( 'core/latest-posts', {
 	title: __( 'Latest Posts' ),
@@ -30,6 +36,15 @@ registerBlockType( 'core/latest-posts', {
 	defaultAttributes: {
 		postsToShow: 5,
 		displayPostDate: false,
+		layout: 'list',
+		columns: 3,
+	},
+
+	getEditWrapperProps( attributes ) {
+		const { align } = attributes;
+		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
+			return { 'data-align': align };
+		}
 	},
 
 	edit: class extends Component {
@@ -79,12 +94,12 @@ registerBlockType( 'core/latest-posts', {
 
 		changePostsToShow( postsToShow ) {
 			const { setAttributes } = this.props;
-
 			setAttributes( { postsToShow: parseInt( postsToShow, 10 ) || 0 } );
 		}
 
 		render() {
 			const { latestPosts } = this.state;
+			const { setAttributes } = this.props;
 
 			if ( ! latestPosts.length ) {
 				return (
@@ -97,10 +112,42 @@ registerBlockType( 'core/latest-posts', {
 				);
 			}
 
+			// Removing posts from display should be instant.
+			const postsDifference = latestPosts.length - this.props.attributes.postsToShow;
+			if ( postsDifference > 0 ) {
+				latestPosts.splice( this.props.attributes.postsToShow, postsDifference );
+			}
+
 			const { focus } = this.props;
-			const { displayPostDate } = this.props.attributes;
+			const { displayPostDate, align, layout, columns } = this.props.attributes;
+			const layoutControls = [
+				{
+					icon: 'list-view',
+					title: __( 'List View' ),
+					onClick: () => setAttributes( { layout: 'list' } ),
+					isActive: layout === 'list',
+				},
+				{
+					icon: 'grid-view',
+					title: __( 'Grid View' ),
+					onClick: () => setAttributes( { layout: 'grid' } ),
+					isActive: layout === 'grid',
+				},
+			];
 
 			return [
+				focus && (
+					<BlockControls key="controls">
+						<BlockAlignmentToolbar
+							value={ align }
+							onChange={ ( nextAlign ) => {
+								setAttributes( { align: nextAlign } );
+							} }
+							controls={ [ 'left', 'center', 'right', 'wide', 'full' ] }
+						/>
+						<Toolbar controls={ layoutControls } />
+					</BlockControls>
+				),
 				focus && (
 					<InspectorControls key="inspector">
 						<BlockDescription>
@@ -112,6 +159,15 @@ registerBlockType( 'core/latest-posts', {
 							checked={ displayPostDate }
 							onChange={ this.toggleDisplayPostDate }
 						/>
+						{ layout === 'grid' &&
+							<RangeControl
+								label={ __( 'Columns' ) }
+								value={ columns }
+								onChange={ ( event ) => setAttributes( { columns: event.target.value } ) }
+								min="2"
+								max={ Math.min( MAX_POSTS_COLUMNS, latestPosts.length ) }
+							/>
+						}
 						<TextControl
 							label={ __( 'Number of posts to show' ) }
 							type="number"
@@ -122,14 +178,19 @@ registerBlockType( 'core/latest-posts', {
 						/>
 					</InspectorControls>
 				),
-				<ul className={ this.props.className } key="latest-posts">
+				<ul
+					className={ classnames( this.props.className, 'columns-' + columns, {
+						'is-grid': layout === 'grid',
+					} ) }
+					key="latest-posts"
+				>
 					{ latestPosts.map( ( post, i ) =>
 						<li key={ i }>
-							<a href={ post.link }>{ post.title.rendered }</a>
+							<a href={ post.link } target="_blank">{ post.title.rendered.trim() || __( '(Untitled)' ) }</a>
 							{ displayPostDate && post.date_gmt &&
-								<span className={ `${ this.props.className }__post-date` }>
-									{ moment( post.date_gmt ).local().format( 'MMM DD h:mm A' ) }
-								</span>
+								<time dateTime={ moment( post.date_gmt ).utc().format() } className={ `${ this.props.className }__post-date` }>
+									{ moment( post.date_gmt ).local().format( 'MMMM DD, Y' ) }
+								</time>
 							}
 						</li>
 					) }

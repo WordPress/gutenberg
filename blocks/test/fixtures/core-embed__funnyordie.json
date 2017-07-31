@@ -2,6 +2,7 @@
     {
         "uid": "_uid_0",
         "name": "core-embed/funnyordie",
+        "isValid": true,
         "attributes": {
             "url": "https://funnyordie.com/",
             "caption": [

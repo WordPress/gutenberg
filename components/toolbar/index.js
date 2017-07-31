@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import './style.scss';
 import IconButton from '../icon-button';
 
-function Toolbar( { controls = [], children } ) {
+function Toolbar( { controls = [], children, className } ) {
 	if (
 		( ! controls || ! controls.length ) &&
 		! children
@@ -24,7 +24,7 @@ function Toolbar( { controls = [], children } ) {
 	}
 
 	return (
-		<ul className="components-toolbar">
+		<ul className={ classnames( 'components-toolbar', className ) }>
 			{ controlSets.reduce( ( result, controlSet, setIndex ) => [
 				...result,
 				...controlSet.map( ( control, controlIndex ) => (

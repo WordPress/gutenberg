@@ -1,6 +1,6 @@
 # Gutenberg
 [![Build Status](https://img.shields.io/travis/WordPress/gutenberg/master.svg)](https://travis-ci.org/WordPress/gutenberg)
-[![Coverage](https://img.shields.io/coveralls/WordPress/gutenberg/master.svg)](https://coveralls.io/github/WordPress/gutenberg)
+[![Coverage](https://img.shields.io/codecov/c/github/WordPress/gutenberg/master.svg)](https://codecov.io/gh/WordPress/gutenberg)
 
 Printing since 1440.
 
@@ -12,6 +12,8 @@ This is the development hub for the <a href="https://make.wordpress.org/core/201
 
 WordPress already supports a large amount of "blocks", but doesn't surface them very well, nor does it give them much in the way of layout options. By embracing the blocky nature of rich post content, we will surface the blocks that already exist, as well as provide more advanced layout options for each of them. This will allow you to easily compose beautiful posts like <a href="http://moc.co/sandbox/example-post/">this example</a>.
 
+Check out the <a href="https://github.com/WordPress/gutenberg/blob/master/docs/faq.md">FAQ</a> for answers to the most common questions about the project.
+
 ## Contributors
 
 Gutenberg is built by many contributors and volunteers. Please see the full list in <a href="CONTRIBUTORS.md">CONTRIBUTORS.md</a>.
@@ -22,6 +24,7 @@ Gutenberg is built by many contributors and volunteers. Please see the full list
 - <a href="https://make.wordpress.org/core/2017/05/05/editor-how-little-blocks-work/">How Blocks Work</a>
 - <a href="https://github.com/Automattic/wp-post-grammar">WP Post Grammar Parser</a>
 - <a href="https://make.wordpress.org/core/tag/gutenberg/">Development updates on make.wordpress.org</a>
+- <a href="http://gutenberg-devdoc.surge.sh/">Documentation: Creating Blocks, Reference and Guidelines</a>
 
 ## How You Can Contribute
 

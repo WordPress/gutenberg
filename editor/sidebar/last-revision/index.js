@@ -15,7 +15,12 @@ import PanelBody from 'components/panel/body';
  * Internal dependencies
  */
 import './style.scss';
-import { getCurrentPostId, getCurrentPostType, isSavingPost } from '../../selectors';
+import {
+	isEditedPostNew,
+	getCurrentPostId,
+	getCurrentPostType,
+	isSavingPost,
+} from '../../selectors';
 import { getWPAdminURL } from '../../utils/url';
 
 class LastRevision extends Component {
@@ -51,19 +56,19 @@ class LastRevision extends Component {
 	}
 
 	fetchRevisions() {
-		if ( ! this.props.postId ) {
+		const { isNew, postId, postType } = this.props;
+		if ( isNew || ! postId ) {
 			this.setState( { loading: false } );
 			return;
 		}
 		this.setState( { loading: true } );
-		const postIdToLoad = this.props.postId;
-		const Collection = wp.api.getPostTypeRevisionsCollection( this.props.postType );
+		const Collection = wp.api.getPostTypeRevisionsCollection( postType );
 		if ( ! Collection ) {
 			return;
 		}
-		this.fetchRevisionsRequest = new Collection( {}, { parent: postIdToLoad } ).fetch()
+		this.fetchRevisionsRequest = new Collection( {}, { parent: postId } ).fetch()
 			.done( ( revisions ) => {
-				if ( this.props.postId !== postIdToLoad ) {
+				if ( this.props.postId !== postId ) {
 					return;
 				}
 				this.setState( {
@@ -72,7 +77,7 @@ class LastRevision extends Component {
 				} );
 			} )
 			.fail( () => {
-				if ( this.props.postId !== postIdToLoad ) {
+				if ( this.props.postId !== postId ) {
 					return;
 				}
 				this.setState( {
@@ -112,6 +117,7 @@ class LastRevision extends Component {
 export default connect(
 	( state ) => {
 		return {
+			isNew: isEditedPostNew( state ),
 			postId: getCurrentPostId( state ),
 			postType: getCurrentPostType( state ),
 			isSaving: isSavingPost( state ),

@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { expect } from 'chai';
 import moment from 'moment';
 
 /**
@@ -14,14 +13,16 @@ import {
 	hasEditorRedo,
 	isEditedPostNew,
 	isEditedPostDirty,
+	isCleanNewPost,
 	getCurrentPost,
 	getCurrentPostId,
 	getCurrentPostType,
 	getPostEdits,
 	getEditedPostTitle,
+	getDocumentTitle,
 	getEditedPostExcerpt,
 	getEditedPostVisibility,
-	isEditedPostPublished,
+	isCurrentPostPublished,
 	isEditedPostPublishable,
 	isEditedPostSaveable,
 	isEditedPostBeingScheduled,
@@ -44,7 +45,7 @@ import {
 	isFirstMultiSelectedBlock,
 	isBlockHovered,
 	getBlockFocus,
-	isTypingInBlock,
+	isTyping,
 	getBlockInsertionPoint,
 	isBlockInsertionPointVisible,
 	isSavingPost,
@@ -54,6 +55,11 @@ import {
 	getNotices,
 } from '../selectors';
 
+/**
+ * WordPress dependencies
+ */
+import { __ } from 'i18n';
+
 describe( 'selectors', () => {
 	describe( 'getEditorMode', () => {
 		it( 'should return the selected editor mode', () => {
@@ -61,7 +67,7 @@ describe( 'selectors', () => {
 				mode: 'visual',
 			};
 
-			expect( getEditorMode( state ) ).to.eql( 'visual' );
+			expect( getEditorMode( state ) ).toEqual( 'visual' );
 		} );
 	} );
 
@@ -71,7 +77,7 @@ describe( 'selectors', () => {
 				isSidebarOpened: true,
 			};
 
-			expect( isEditorSidebarOpened( state ) ).to.be.true();
+			expect( isEditorSidebarOpened( state ) ).toBe( true );
 		} );
 
 		it( 'should return false when the sidebar is opened', () => {
@@ -79,7 +85,7 @@ describe( 'selectors', () => {
 				isSidebarOpened: false,
 			};
 
-			expect( isEditorSidebarOpened( state ) ).to.be.false();
+			expect( isEditorSidebarOpened( state ) ).toBe( false );
 		} );
 	} );
 
@@ -95,7 +101,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( hasEditorUndo( state ) ).to.be.true();
+			expect( hasEditorUndo( state ) ).toBe( true );
 		} );
 
 		it( 'should return false when the past history is empty', () => {
@@ -107,7 +113,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( hasEditorUndo( state ) ).to.be.false();
+			expect( hasEditorUndo( state ) ).toBe( false );
 		} );
 	} );
 
@@ -123,7 +129,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( hasEditorRedo( state ) ).to.be.true();
+			expect( hasEditorRedo( state ) ).toBe( true );
 		} );
 
 		it( 'should return false when the future history is empty', () => {
@@ -135,27 +141,35 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( hasEditorRedo( state ) ).to.be.false();
+			expect( hasEditorRedo( state ) ).toBe( false );
 		} );
 	} );
 
 	describe( 'isEditedPostNew', () => {
 		it( 'should return true when the post is new', () => {
 			const state = {
-				currentPost: {},
-			};
-
-			expect( isEditedPostNew( state ) ).to.be.true();
-		} );
-
-		it( 'should return false when the post has an ID', () => {
-			const state = {
 				currentPost: {
-					id: 1,
+					status: 'auto-draft',
+				},
+				editor: {
+					edits: {},
 				},
 			};
 
-			expect( isEditedPostNew( state ) ).to.be.false();
+			expect( isEditedPostNew( state ) ).toBe( true );
+		} );
+
+		it( 'should return false when the post is not new', () => {
+			const state = {
+				currentPost: {
+					status: 'draft',
+				},
+				editor: {
+					edits: {},
+				},
+			};
+
+			expect( isEditedPostNew( state ) ).toBe( false );
 		} );
 	} );
 
@@ -167,7 +181,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditedPostDirty( state ) ).to.be.true();
+			expect( isEditedPostDirty( state ) ).toBe( true );
 		} );
 
 		it( 'should return false when the post is not dirty', () => {
@@ -175,9 +189,57 @@ describe( 'selectors', () => {
 				editor: {
 					dirty: false,
 				},
+				currentPost: {},
 			};
 
-			expect( isEditedPostDirty( state ) ).to.be.false();
+			expect( isEditedPostDirty( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isCleanNewPost', () => {
+		it( 'should return true when the post is not dirty and has not been saved before', () => {
+			const state = {
+				editor: {
+					dirty: false,
+					edits: {},
+				},
+				currentPost: {
+					id: 1,
+					status: 'auto-draft',
+				},
+			};
+
+			expect( isCleanNewPost( state ) ).toBe( true );
+		} );
+
+		it( 'should return false when the post is not dirty but the post has been saved', () => {
+			const state = {
+				editor: {
+					dirty: false,
+					edits: {},
+				},
+				currentPost: {
+					id: 1,
+					status: 'draft',
+				},
+			};
+
+			expect( isCleanNewPost( state ) ).toBe( false );
+		} );
+
+		it( 'should return false when the post is dirty but the post has not been saved', () => {
+			const state = {
+				editor: {
+					dirty: true,
+					edits: {},
+				},
+				currentPost: {
+					id: 1,
+					status: 'auto-draft',
+				},
+			};
+
+			expect( isCleanNewPost( state ) ).toBe( false );
 		} );
 	} );
 
@@ -187,7 +249,7 @@ describe( 'selectors', () => {
 				currentPost: { id: 1 },
 			};
 
-			expect( getCurrentPost( state ) ).to.eql( { id: 1 } );
+			expect( getCurrentPost( state ) ).toEqual( { id: 1 } );
 		} );
 	} );
 
@@ -197,7 +259,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 			};
 
-			expect( getCurrentPostId( state ) ).to.be.null();
+			expect( getCurrentPostId( state ) ).toBeNull();
 		} );
 
 		it( 'should return the current post ID', () => {
@@ -205,7 +267,7 @@ describe( 'selectors', () => {
 				currentPost: { id: 1 },
 			};
 
-			expect( getCurrentPostId( state ) ).to.equal( 1 );
+			expect( getCurrentPostId( state ) ).toBe( 1 );
 		} );
 	} );
 
@@ -217,7 +279,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getCurrentPostType( state ) ).to.equal( 'post' );
+			expect( getCurrentPostType( state ) ).toBe( 'post' );
 		} );
 	} );
 
@@ -229,7 +291,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getPostEdits( state ) ).to.eql( { title: 'terga' } );
+			expect( getPostEdits( state ) ).toEqual( { title: 'terga' } );
 		} );
 	} );
 
@@ -244,7 +306,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getEditedPostTitle( state ) ).to.equal( 'sassel' );
+			expect( getEditedPostTitle( state ) ).toBe( 'sassel' );
 		} );
 
 		it( 'should return the edited title', () => {
@@ -257,7 +319,87 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getEditedPostTitle( state ) ).to.equal( 'youcha' );
+			expect( getEditedPostTitle( state ) ).toBe( 'youcha' );
+		} );
+	} );
+
+	describe( 'getDocumentTitle', () => {
+		it( 'should return current title unedited existing post', () => {
+			const state = {
+				currentPost: {
+					id: 123,
+					title: { raw: 'The Title' },
+				},
+				editor: {
+					dirty: false,
+					edits: {},
+				},
+			};
+
+			expect( getDocumentTitle( state ) ).toBe( 'The Title' );
+		} );
+
+		it( 'should return current title for edited existing post', () => {
+			const state = {
+				currentPost: {
+					id: 123,
+					title: { raw: 'The Title' },
+				},
+				editor: {
+					dirty: true,
+					edits: { title: 'Modified Title' },
+				},
+			};
+
+			expect( getDocumentTitle( state ) ).toBe( 'Modified Title' );
+		} );
+
+		it( 'should return new post title when new post is clean', () => {
+			const state = {
+				currentPost: {
+					id: 1,
+					status: 'auto-draft',
+					title: { raw: '' },
+				},
+				editor: {
+					dirty: false,
+					edits: {},
+				},
+			};
+
+			expect( getDocumentTitle( state ) ).toBe( __( 'New post' ) );
+		} );
+
+		it( 'should return untitled title when new post is dirty', () => {
+			const state = {
+				currentPost: {
+					id: 1,
+					status: 'auto-draft',
+					title: { raw: '' },
+				},
+				editor: {
+					dirty: true,
+					edits: {},
+				},
+			};
+
+			expect( getDocumentTitle( state ) ).toBe( __( '(Untitled)' ) );
+		} );
+
+		it( 'should return untitled title', () => {
+			const state = {
+				currentPost: {
+					id: 123,
+					status: 'draft',
+					title: { raw: '' },
+				},
+				editor: {
+					dirty: true,
+					edits: {},
+				},
+			};
+
+			expect( getDocumentTitle( state ) ).toBe( __( '(Untitled)' ) );
 		} );
 	} );
 
@@ -272,7 +414,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getEditedPostExcerpt( state ) ).to.equal( 'sassel' );
+			expect( getEditedPostExcerpt( state ) ).toBe( 'sassel' );
 		} );
 
 		it( 'should return the edited excerpt', () => {
@@ -285,7 +427,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getEditedPostExcerpt( state ) ).to.equal( 'youcha' );
+			expect( getEditedPostExcerpt( state ) ).toBe( 'youcha' );
 		} );
 	} );
 
@@ -300,7 +442,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getEditedPostVisibility( state ) ).to.equal( 'public' );
+			expect( getEditedPostVisibility( state ) ).toBe( 'public' );
 		} );
 
 		it( 'should return private for private posts', () => {
@@ -313,7 +455,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getEditedPostVisibility( state ) ).to.equal( 'private' );
+			expect( getEditedPostVisibility( state ) ).toBe( 'private' );
 		} );
 
 		it( 'should return private for password for password protected posts', () => {
@@ -327,7 +469,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getEditedPostVisibility( state ) ).to.equal( 'password' );
+			expect( getEditedPostVisibility( state ) ).toBe( 'password' );
 		} );
 
 		it( 'should use the edited status and password if edits present', () => {
@@ -344,11 +486,11 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getEditedPostVisibility( state ) ).to.equal( 'private' );
+			expect( getEditedPostVisibility( state ) ).toBe( 'private' );
 		} );
 	} );
 
-	describe( 'isEditedPostPublished', () => {
+	describe( 'isCurrentPostPublished', () => {
 		it( 'should return true for public posts', () => {
 			const state = {
 				currentPost: {
@@ -356,7 +498,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditedPostPublished( state ) ).to.be.true();
+			expect( isCurrentPostPublished( state ) ).toBe( true );
 		} );
 
 		it( 'should return true for private posts', () => {
@@ -366,7 +508,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditedPostPublished( state ) ).to.be.true();
+			expect( isCurrentPostPublished( state ) ).toBe( true );
 		} );
 
 		it( 'should return false for draft posts', () => {
@@ -376,7 +518,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditedPostPublished( state ) ).to.be.false();
+			expect( isCurrentPostPublished( state ) ).toBe( false );
 		} );
 
 		it( 'should return true for old scheduled posts', () => {
@@ -387,7 +529,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditedPostPublished( state ) ).to.be.true();
+			expect( isCurrentPostPublished( state ) ).toBe( true );
 		} );
 	} );
 
@@ -402,7 +544,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditedPostPublishable( state ) ).to.be.true();
+			expect( isEditedPostPublishable( state ) ).toBe( true );
 		} );
 
 		it( 'should return true for draft posts', () => {
@@ -415,7 +557,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditedPostPublishable( state ) ).to.be.true();
+			expect( isEditedPostPublishable( state ) ).toBe( true );
 		} );
 
 		it( 'should return false for published posts', () => {
@@ -428,7 +570,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditedPostPublishable( state ) ).to.be.false();
+			expect( isEditedPostPublishable( state ) ).toBe( false );
 		} );
 
 		it( 'should return false for private posts', () => {
@@ -441,7 +583,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditedPostPublishable( state ) ).to.be.false();
+			expect( isEditedPostPublishable( state ) ).toBe( false );
 		} );
 
 		it( 'should return false for scheduled posts', () => {
@@ -454,7 +596,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditedPostPublishable( state ) ).to.be.false();
+			expect( isEditedPostPublishable( state ) ).toBe( false );
 		} );
 
 		it( 'should return true for dirty posts', () => {
@@ -467,7 +609,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditedPostPublishable( state ) ).to.be.true();
+			expect( isEditedPostPublishable( state ) ).toBe( true );
 		} );
 	} );
 
@@ -482,7 +624,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 			};
 
-			expect( isEditedPostSaveable( state ) ).to.be.false();
+			expect( isEditedPostSaveable( state ) ).toBe( false );
 		} );
 
 		it( 'should return true if the post has a title', () => {
@@ -497,7 +639,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditedPostSaveable( state ) ).to.be.true();
+			expect( isEditedPostSaveable( state ) ).toBe( true );
 		} );
 
 		it( 'should return true if the post has an excerpt', () => {
@@ -512,7 +654,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditedPostSaveable( state ) ).to.be.true();
+			expect( isEditedPostSaveable( state ) ).toBe( true );
 		} );
 
 		it( 'should return true if the post has content', () => {
@@ -527,7 +669,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 			};
 
-			expect( isEditedPostSaveable( state ) ).to.be.true();
+			expect( isEditedPostSaveable( state ) ).toBe( true );
 		} );
 	} );
 
@@ -539,7 +681,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditedPostBeingScheduled( state ) ).to.be.true();
+			expect( isEditedPostBeingScheduled( state ) ).toBe( true );
 		} );
 
 		it( 'should return false for posts with an old date', () => {
@@ -549,7 +691,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditedPostBeingScheduled( state ) ).to.be.false();
+			expect( isEditedPostBeingScheduled( state ) ).toBe( false );
 		} );
 	} );
 
@@ -559,7 +701,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 			};
 
-			expect( getEditedPostPreviewLink( state ) ).to.be.null();
+			expect( getEditedPostPreviewLink( state ) ).toBeNull();
 		} );
 
 		it( 'should return the correct url adding a preview parameter to the query string', () => {
@@ -569,7 +711,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getEditedPostPreviewLink( state ) ).to.equal( 'https://andalouses.com/beach?preview=true' );
+			expect( getEditedPostPreviewLink( state ) ).toBe( 'https://andalouses.com/beach?preview=true' );
 		} );
 	} );
 
@@ -583,7 +725,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getBlock( state, 123 ) ).to.eql( { uid: 123, name: 'core/text' } );
+			expect( getBlock( state, 123 ) ).toEqual( { uid: 123, name: 'core/text' } );
 		} );
 	} );
 
@@ -599,7 +741,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getBlocks( state ) ).to.eql( [
+			expect( getBlocks( state ) ).toEqual( [
 				{ uid: 123, name: 'core/text' },
 				{ uid: 23, name: 'core/heading' },
 			] );
@@ -618,7 +760,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getBlockCount( state ) ).to.equal( 2 );
+			expect( getBlockCount( state ) ).toBe( 2 );
 		} );
 	} );
 
@@ -635,7 +777,7 @@ describe( 'selectors', () => {
 				multiSelectedBlocks: {},
 			};
 
-			expect( getSelectedBlock( state ) ).to.equal( null );
+			expect( getSelectedBlock( state ) ).toBe( null );
 		} );
 
 		it( 'should return null if there is multi selection', () => {
@@ -650,7 +792,7 @@ describe( 'selectors', () => {
 				multiSelectedBlocks: { start: 23, end: 123 },
 			};
 
-			expect( getSelectedBlock( state ) ).to.equal( null );
+			expect( getSelectedBlock( state ) ).toBe( null );
 		} );
 
 		it( 'should return the selected block', () => {
@@ -665,7 +807,7 @@ describe( 'selectors', () => {
 				multiSelectedBlocks: {},
 			};
 
-			expect( getSelectedBlock( state ) ).to.equal( state.editor.blocksByUid[ 23 ] );
+			expect( getSelectedBlock( state ) ).toBe( state.editor.blocksByUid[ 23 ] );
 		} );
 	} );
 
@@ -678,7 +820,7 @@ describe( 'selectors', () => {
 				multiSelectedBlocks: { start: null, end: null },
 			};
 
-			expect( getMultiSelectedBlockUids( state ) ).to.eql( [] );
+			expect( getMultiSelectedBlockUids( state ) ).toEqual( [] );
 		} );
 
 		it( 'should return selected block uids if there is multi selection', () => {
@@ -689,7 +831,7 @@ describe( 'selectors', () => {
 				multiSelectedBlocks: { start: 2, end: 4 },
 			};
 
-			expect( getMultiSelectedBlockUids( state ) ).to.eql( [ 4, 3, 2 ] );
+			expect( getMultiSelectedBlockUids( state ) ).toEqual( [ 4, 3, 2 ] );
 		} );
 	} );
 
@@ -702,7 +844,7 @@ describe( 'selectors', () => {
 				multiSelectedBlocks: { start: null, end: null },
 			};
 
-			expect( getMultiSelectedBlocksStartUid( state ) ).to.be.null();
+			expect( getMultiSelectedBlocksStartUid( state ) ).toBeNull();
 		} );
 
 		it( 'returns multi selection start', () => {
@@ -713,7 +855,7 @@ describe( 'selectors', () => {
 				multiSelectedBlocks: { start: 2, end: 4 },
 			};
 
-			expect( getMultiSelectedBlocksStartUid( state ) ).to.equal( 2 );
+			expect( getMultiSelectedBlocksStartUid( state ) ).toBe( 2 );
 		} );
 	} );
 
@@ -726,7 +868,7 @@ describe( 'selectors', () => {
 				multiSelectedBlocks: { start: null, end: null },
 			};
 
-			expect( getMultiSelectedBlocksEndUid( state ) ).to.be.null();
+			expect( getMultiSelectedBlocksEndUid( state ) ).toBeNull();
 		} );
 
 		it( 'returns multi selection end', () => {
@@ -737,7 +879,7 @@ describe( 'selectors', () => {
 				multiSelectedBlocks: { start: 2, end: 4 },
 			};
 
-			expect( getMultiSelectedBlocksEndUid( state ) ).to.equal( 4 );
+			expect( getMultiSelectedBlocksEndUid( state ) ).toBe( 4 );
 		} );
 	} );
 
@@ -749,7 +891,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getBlockUids( state ) ).to.eql( [ 123, 23 ] );
+			expect( getBlockUids( state ) ).toEqual( [ 123, 23 ] );
 		} );
 	} );
 
@@ -761,7 +903,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getBlockIndex( state, 23 ) ).to.equal( 1 );
+			expect( getBlockIndex( state, 23 ) ).toBe( 1 );
 		} );
 	} );
 
@@ -773,7 +915,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isFirstBlock( state, 123 ) ).to.be.true();
+			expect( isFirstBlock( state, 123 ) ).toBe( true );
 		} );
 
 		it( 'should return false when the block is not first', () => {
@@ -783,7 +925,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isFirstBlock( state, 23 ) ).to.be.false();
+			expect( isFirstBlock( state, 23 ) ).toBe( false );
 		} );
 	} );
 
@@ -795,7 +937,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isLastBlock( state, 23 ) ).to.be.true();
+			expect( isLastBlock( state, 23 ) ).toBe( true );
 		} );
 
 		it( 'should return false when the block is not last', () => {
@@ -805,7 +947,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isLastBlock( state, 123 ) ).to.be.false();
+			expect( isLastBlock( state, 123 ) ).toBe( false );
 		} );
 	} );
 
@@ -821,9 +963,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getPreviousBlock( state, 23 ) ).to.eql(
-				{ uid: 123, name: 'core/text' },
-			);
+			expect( getPreviousBlock( state, 23 ) ).toEqual( { uid: 123, name: 'core/text' } );
 		} );
 
 		it( 'should return null for the first block', () => {
@@ -837,7 +977,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getPreviousBlock( state, 123 ) ).to.be.null();
+			expect( getPreviousBlock( state, 123 ) ).toBeNull();
 		} );
 	} );
 
@@ -853,9 +993,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getNextBlock( state, 123 ) ).to.eql(
-				{ uid: 23, name: 'core/heading' },
-			);
+			expect( getNextBlock( state, 123 ) ).toEqual( { uid: 23, name: 'core/heading' } );
 		} );
 
 		it( 'should return null for the last block', () => {
@@ -869,7 +1007,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getNextBlock( state, 23 ) ).to.be.null();
+			expect( getNextBlock( state, 23 ) ).toBeNull();
 		} );
 	} );
 
@@ -880,7 +1018,7 @@ describe( 'selectors', () => {
 				multiSelectedBlocks: {},
 			};
 
-			expect( isBlockSelected( state, 123 ) ).to.be.true();
+			expect( isBlockSelected( state, 123 ) ).toBe( true );
 		} );
 
 		it( 'should return false if the block is not selected', () => {
@@ -889,7 +1027,7 @@ describe( 'selectors', () => {
 				multiSelectedBlocks: {},
 			};
 
-			expect( isBlockSelected( state, 23 ) ).to.be.false();
+			expect( isBlockSelected( state, 23 ) ).toBe( false );
 		} );
 	} );
 
@@ -902,11 +1040,11 @@ describe( 'selectors', () => {
 		};
 
 		it( 'should return true if the block is multi selected', () => {
-			expect( isBlockMultiSelected( state, 3 ) ).to.be.true();
+			expect( isBlockMultiSelected( state, 3 ) ).toBe( true );
 		} );
 
 		it( 'should return false if the block is not multi selected', () => {
-			expect( isBlockMultiSelected( state, 5 ) ).to.be.false();
+			expect( isBlockMultiSelected( state, 5 ) ).toBe( false );
 		} );
 	} );
 
@@ -919,11 +1057,11 @@ describe( 'selectors', () => {
 		};
 
 		it( 'should return true if the block is first in multi selection', () => {
-			expect( isFirstMultiSelectedBlock( state, 4 ) ).to.be.true();
+			expect( isFirstMultiSelectedBlock( state, 4 ) ).toBe( true );
 		} );
 
 		it( 'should return false if the block is not first in multi selection', () => {
-			expect( isFirstMultiSelectedBlock( state, 3 ) ).to.be.false();
+			expect( isFirstMultiSelectedBlock( state, 3 ) ).toBe( false );
 		} );
 	} );
 
@@ -933,7 +1071,7 @@ describe( 'selectors', () => {
 				hoveredBlock: 123,
 			};
 
-			expect( isBlockHovered( state, 123 ) ).to.be.true();
+			expect( isBlockHovered( state, 123 ) ).toBe( true );
 		} );
 
 		it( 'should return false if the block is not hovered', () => {
@@ -941,7 +1079,7 @@ describe( 'selectors', () => {
 				hoveredBlock: 123,
 			};
 
-			expect( isBlockHovered( state, 23 ) ).to.be.false();
+			expect( isBlockHovered( state, 23 ) ).toBe( false );
 		} );
 	} );
 
@@ -955,7 +1093,7 @@ describe( 'selectors', () => {
 				multiSelectedBlocks: {},
 			};
 
-			expect( getBlockFocus( state, 123 ) ).to.be.eql( { editable: 'cite' } );
+			expect( getBlockFocus( state, 123 ) ).toEqual( { editable: 'cite' } );
 		} );
 
 		it( 'should return null if the block is not selected', () => {
@@ -967,33 +1105,25 @@ describe( 'selectors', () => {
 				multiSelectedBlocks: {},
 			};
 
-			expect( getBlockFocus( state, 23 ) ).to.be.eql( null );
+			expect( getBlockFocus( state, 23 ) ).toEqual( null );
 		} );
 	} );
 
-	describe( 'isTypingInBlock', () => {
+	describe( 'isTyping', () => {
 		it( 'should return the isTyping flag if the block is selected', () => {
 			const state = {
-				selectedBlock: {
-					uid: 123,
-					typing: true,
-				},
-				multiSelectedBlocks: {},
+				isTyping: true,
 			};
 
-			expect( isTypingInBlock( state, 123 ) ).to.be.true();
+			expect( isTyping( state ) ).toBe( true );
 		} );
 
 		it( 'should return false if the block is not selected', () => {
 			const state = {
-				selectedBlock: {
-					uid: 123,
-					typing: true,
-				},
-				multiSelectedBlocks: {},
+				isTyping: false,
 			};
 
-			expect( isTypingInBlock( state, 23 ) ).to.be.false();
+			expect( isTyping( state ) ).toBe( false );
 		} );
 	} );
 
@@ -1003,7 +1133,6 @@ describe( 'selectors', () => {
 				mode: 'visual',
 				selectedBlock: {
 					uid: 2,
-					typing: true,
 				},
 				multiSelectedBlocks: {},
 				editor: {
@@ -1014,7 +1143,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getBlockInsertionPoint( state ) ).to.equal( 2 );
+			expect( getBlockInsertionPoint( state ) ).toBe( 2 );
 		} );
 
 		it( 'should return the last multi selected uid', () => {
@@ -1030,7 +1159,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getBlockInsertionPoint( state ) ).to.equal( 2 );
+			expect( getBlockInsertionPoint( state ) ).toBe( 2 );
 		} );
 
 		it( 'should return the last block if no selection', () => {
@@ -1043,7 +1172,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getBlockInsertionPoint( state ) ).to.equal( 3 );
+			expect( getBlockInsertionPoint( state ) ).toBe( 3 );
 		} );
 
 		it( 'should return the last block for the text mode', () => {
@@ -1051,7 +1180,6 @@ describe( 'selectors', () => {
 				mode: 'text',
 				selectedBlock: {
 					uid: 2,
-					typing: true,
 				},
 				multiSelectedBlocks: {},
 				editor: {
@@ -1059,7 +1187,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getBlockInsertionPoint( state ) ).to.equal( 3 );
+			expect( getBlockInsertionPoint( state ) ).toBe( 3 );
 		} );
 	} );
 
@@ -1069,7 +1197,7 @@ describe( 'selectors', () => {
 				showInsertionPoint: true,
 			};
 
-			expect( isBlockInsertionPointVisible( state ) ).to.be.true();
+			expect( isBlockInsertionPointVisible( state ) ).toBe( true );
 		} );
 	} );
 
@@ -1081,7 +1209,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isSavingPost( state ) ).to.be.true();
+			expect( isSavingPost( state ) ).toBe( true );
 		} );
 
 		it( 'should return false if the post is currently being saved', () => {
@@ -1091,7 +1219,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isSavingPost( state ) ).to.be.false();
+			expect( isSavingPost( state ) ).toBe( false );
 		} );
 	} );
 
@@ -1103,7 +1231,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( didPostSaveRequestSucceed( state ) ).to.be.true();
+			expect( didPostSaveRequestSucceed( state ) ).toBe( true );
 		} );
 
 		it( 'should return true if the post save request has failed', () => {
@@ -1113,7 +1241,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( didPostSaveRequestSucceed( state ) ).to.be.false();
+			expect( didPostSaveRequestSucceed( state ) ).toBe( false );
 		} );
 	} );
 
@@ -1125,7 +1253,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( didPostSaveRequestFail( state ) ).to.be.true();
+			expect( didPostSaveRequestFail( state ) ).toBe( true );
 		} );
 
 		it( 'should return true if the post save request is successful', () => {
@@ -1135,7 +1263,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( didPostSaveRequestFail( state ) ).to.be.false();
+			expect( didPostSaveRequestFail( state ) ).toBe( false );
 		} );
 	} );
 
@@ -1148,7 +1276,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getSuggestedPostFormat( state ) ).to.be.null();
+			expect( getSuggestedPostFormat( state ) ).toBeNull();
 		} );
 
 		it( 'returns null if there is more than one block in the post', () => {
@@ -1162,7 +1290,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getSuggestedPostFormat( state ) ).to.be.null();
+			expect( getSuggestedPostFormat( state ) ).toBeNull();
 		} );
 
 		it( 'returns Image if the first block is of type `core/image`', () => {
@@ -1175,7 +1303,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getSuggestedPostFormat( state ) ).to.equal( 'Image' );
+			expect( getSuggestedPostFormat( state ) ).toBe( 'Image' );
 		} );
 
 		it( 'returns Quote if the first block is of type `core/quote`', () => {
@@ -1188,7 +1316,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getSuggestedPostFormat( state ) ).to.equal( 'Quote' );
+			expect( getSuggestedPostFormat( state ) ).toBe( 'Quote' );
 		} );
 	} );
 
@@ -1201,7 +1329,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getNotices( state ) ).to.eql( [
+			expect( getNotices( state ) ).toEqual( [
 				state.notices.b,
 				state.notices.a,
 			] );

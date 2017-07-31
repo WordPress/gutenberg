@@ -10,6 +10,7 @@ import { pickBy } from 'lodash';
 import { parse as grammarParse } from './post.pegjs';
 import { getBlockType, getUnknownTypeHandler } from './registration';
 import { createBlock } from './factory';
+import { getBeautifulContent, getSaveContent } from './serializer';
 
 /**
  * Returns the block attributes parsed from raw content.
@@ -81,16 +82,57 @@ export function createBlockWithFallback( name, rawContent, attributes ) {
 
 	// Include in set only if type were determined.
 	// TODO do we ever expect there to not be an unknown type handler?
-	if ( blockType && ( rawContent.trim() || name !== fallbackBlock ) ) {
+	if ( blockType && ( rawContent || name !== fallbackBlock ) ) {
 		// TODO allow blocks to opt-in to receiving a tree instead of a string.
 		// Gradually convert all blocks to this new format, then remove the
 		// string serialization.
 		const block = createBlock(
 			name,
-			getBlockAttributes( blockType, rawContent.trim(), attributes )
+			getBlockAttributes( blockType, rawContent, attributes )
 		);
+
+		// Validate that the parsed block is valid, meaning that if we were to
+		// reserialize it given the assumed attributes, the markup matches the
+		// original value. Otherwise, preserve original to avoid destruction.
+		block.isValid = isValidBlock( rawContent, blockType, block.attributes );
+		if ( ! block.isValid ) {
+			block.originalContent = rawContent;
+		}
+
 		return block;
 	}
+}
+
+/**
+ * Returns true if the parsed block is valid given the input content. A block
+ * is considered valid if, when serialized with assumed attributes, the content
+ * matches the original value.
+ *
+ * Logs to console in development environments when invalid.
+ *
+ * @param  {String}  rawContent Original block content
+ * @param  {String}  blockType  Block type
+ * @param  {Object}  attributes Parsed block attributes
+ * @return {Boolean}            Whether block is valid
+ */
+export function isValidBlock( rawContent, blockType, attributes ) {
+	const [ actual, expected ] = [
+		rawContent,
+		getSaveContent( blockType, attributes ),
+	].map( getBeautifulContent );
+
+	const isValid = ( actual === expected );
+
+	if ( ! isValid && 'development' === process.env.NODE_ENV ) {
+		// eslint-disable-next-line no-console
+		console.error(
+			'Invalid block parse\n' +
+				'\tExpected: ' + expected + '\n' +
+				'\tActual:   ' + actual
+		);
+	}
+
+	return isValid;
 }
 
 /**
@@ -102,7 +144,7 @@ export function createBlockWithFallback( name, rawContent, attributes ) {
 export function parseWithGrammar( content ) {
 	return grammarParse( content ).reduce( ( memo, blockNode ) => {
 		const { blockName, rawContent, attrs } = blockNode;
-		const block = createBlockWithFallback( blockName, rawContent, attrs );
+		const block = createBlockWithFallback( blockName, rawContent.trim(), attrs );
 		if ( block ) {
 			memo.push( block );
 		}

@@ -32,7 +32,7 @@ function SelectControl( { label, selected, instanceId, onBlur, options = [], ...
 						value={ option.value }
 						selected={ option.value === selected }
 					>
-						{ label }
+						{ option.label }
 					</option>
 				) }
 			</select>

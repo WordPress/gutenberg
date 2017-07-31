@@ -2,46 +2,35 @@
     {
         "uid": "_uid_0",
         "name": "core/table",
+        "isValid": false,
         "attributes": {
             "content": [
-                "\n    ",
                 {
                     "type": "thead",
-                    "children": [
-                        "\n        ",
-                        {
-                            "type": "tr",
-                            "children": [
-                                "\n            ",
-                                {
-                                    "type": "th",
-                                    "children": "Version"
-                                },
-                                "\n            ",
-                                {
-                                    "type": "th",
-                                    "children": "Musician"
-                                },
-                                "\n            ",
-                                {
-                                    "type": "th",
-                                    "children": "Date"
-                                },
-                                "\n        "
-                            ]
-                        },
-                        "\n    "
-                    ]
+                    "children": {
+                        "type": "tr",
+                        "children": [
+                            {
+                                "type": "th",
+                                "children": "Version"
+                            },
+                            {
+                                "type": "th",
+                                "children": "Musician"
+                            },
+                            {
+                                "type": "th",
+                                "children": "Date"
+                            }
+                        ]
+                    }
                 },
-                "\n    ",
                 {
                     "type": "tbody",
                     "children": [
-                        "\n        ",
                         {
                             "type": "tr",
                             "children": [
-                                "\n            ",
                                 {
                                     "type": "td",
                                     "children": {
@@ -52,24 +41,19 @@
                                         "children": ".70"
                                     }
                                 },
-                                "\n            ",
                                 {
                                     "type": "td",
                                     "children": "No musician chosen."
                                 },
-                                "\n            ",
                                 {
                                     "type": "td",
                                     "children": "May 27, 2003"
-                                },
-                                "\n        "
+                                }
                             ]
                         },
-                        "\n        ",
                         {
                             "type": "tr",
                             "children": [
-                                "\n            ",
                                 {
                                     "type": "td",
                                     "children": {
@@ -80,24 +64,19 @@
                                         "children": "1.0"
                                     }
                                 },
-                                "\n            ",
                                 {
                                     "type": "td",
                                     "children": "Miles Davis"
                                 },
-                                "\n            ",
                                 {
                                     "type": "td",
                                     "children": "January 3, 2004"
-                                },
-                                "\n        "
+                                }
                             ]
                         },
-                        "\n        ",
                         {
                             "type": "tr",
                             "children": [
-                                "\n            ",
                                 {
                                     "type": "td",
                                     "children": [
@@ -111,24 +90,19 @@
                                         }
                                     ]
                                 },
-                                "\n            ",
                                 {
                                     "type": "td",
                                     "children": "…"
                                 },
-                                "\n            ",
                                 {
                                     "type": "td",
                                     "children": "…"
-                                },
-                                "\n        "
+                                }
                             ]
                         },
-                        "\n        ",
                         {
                             "type": "tr",
                             "children": [
-                                "\n            ",
                                 {
                                     "type": "td",
                                     "children": {
@@ -139,24 +113,19 @@
                                         "children": "4.4"
                                     }
                                 },
-                                "\n            ",
                                 {
                                     "type": "td",
                                     "children": "Clifford Brown"
                                 },
-                                "\n            ",
                                 {
                                     "type": "td",
                                     "children": "December 8, 2015"
-                                },
-                                "\n        "
+                                }
                             ]
                         },
-                        "\n        ",
                         {
                             "type": "tr",
                             "children": [
-                                "\n            ",
                                 {
                                     "type": "td",
                                     "children": {
@@ -167,24 +136,19 @@
                                         "children": "4.5"
                                     }
                                 },
-                                "\n            ",
                                 {
                                     "type": "td",
                                     "children": "Coleman Hawkins"
                                 },
-                                "\n            ",
                                 {
                                     "type": "td",
                                     "children": "April 12, 2016"
-                                },
-                                "\n        "
+                                }
                             ]
                         },
-                        "\n        ",
                         {
                             "type": "tr",
                             "children": [
-                                "\n            ",
                                 {
                                     "type": "td",
                                     "children": {
@@ -195,24 +159,19 @@
                                         "children": "4.6"
                                     }
                                 },
-                                "\n            ",
                                 {
                                     "type": "td",
                                     "children": "Pepper Adams"
                                 },
-                                "\n            ",
                                 {
                                     "type": "td",
                                     "children": "August 16, 2016"
-                                },
-                                "\n        "
+                                }
                             ]
                         },
-                        "\n        ",
                         {
                             "type": "tr",
                             "children": [
-                                "\n            ",
                                 {
                                     "type": "td",
                                     "children": {
@@ -223,24 +182,20 @@
                                         "children": "4.7"
                                     }
                                 },
-                                "\n            ",
                                 {
                                     "type": "td",
                                     "children": "Sarah Vaughan"
                                 },
-                                "\n            ",
                                 {
                                     "type": "td",
                                     "children": "December 6, 2016"
-                                },
-                                "\n        "
+                                }
                             ]
-                        },
-                        "\n    "
+                        }
                     ]
-                },
-                "\n"
+                }
             ]
-        }
+        },
+        "originalContent": "<table><thead><tr><th>Version</th><th>Musician</th><th>Date</th></tr></thead><tbody><tr><td><a href=\"https://wordpress.org/news/2003/05/wordpress-now-available/\">.70</a></td><td>No musician chosen.</td><td>May 27, 2003</td></tr><tr><td><a href=\"https://wordpress.org/news/2004/01/wordpress-10/\">1.0</a></td><td>Miles Davis</td><td>January 3, 2004</td></tr><tr><td>Lots of versions skipped, see <a href=\"https://codex.wordpress.org/WordPress_Versions\">the full list</a></td><td>&hellip;</td><td>&hellip;</td></tr><tr><td><a href=\"https://wordpress.org/news/2015/12/clifford/\">4.4</a></td><td>Clifford Brown</td><td>December 8, 2015</td></tr><tr><td><a href=\"https://wordpress.org/news/2016/04/coleman/\">4.5</a></td><td>Coleman Hawkins</td><td>April 12, 2016</td></tr><tr><td><a href=\"https://wordpress.org/news/2016/08/pepper/\">4.6</a></td><td>Pepper Adams</td><td>August 16, 2016</td></tr><tr><td><a href=\"https://wordpress.org/news/2016/12/vaughan/\">4.7</a></td><td>Sarah Vaughan</td><td>December 6, 2016</td></tr></tbody></table>"
     }
 ]

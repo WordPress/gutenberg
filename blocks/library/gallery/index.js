@@ -120,6 +120,7 @@ registerBlockType( 'core/gallery', {
 						onSelect={ setMediaUrl }
 						type="image"
 						multiple="true"
+						gallery="true"
 					>
 						{ __( 'Insert from Media Library' ) }
 					</MediaUploadButton>

@@ -25,6 +25,10 @@ registerBlockType( 'core/text', {
 
 	category: 'common',
 
+	defaultAttributes: {
+		dropCap: false,
+	},
+
 	className: false,
 
 	attributes: {
@@ -53,8 +57,8 @@ registerBlockType( 'core/text', {
 		};
 	},
 
-	edit( { attributes, setAttributes, insertBlocksAfter, focus, setFocus, mergeBlocks } ) {
-		const { align, content, dropCap } = attributes;
+	edit( { attributes, setAttributes, insertBlocksAfter, focus, setFocus, mergeBlocks, onReplace } ) {
+		const { align, content, dropCap, placeholder } = attributes;
 		const toggleDropCap = () => setAttributes( { dropCap: ! dropCap } );
 		return [
 			focus && (
@@ -99,16 +103,17 @@ registerBlockType( 'core/text', {
 					] );
 				} }
 				onMerge={ mergeBlocks }
+				onReplace={ onReplace }
 				style={ { textAlign: align } }
 				className={ dropCap && 'has-drop-cap' }
-				placeholder={ __( 'Write…' ) }
+				placeholder={ placeholder || __( 'New Paragraph' ) }
 			/>,
 		];
 	},
 
 	save( { attributes } ) {
 		const { align, content, dropCap } = attributes;
-		const className = dropCap && 'has-drop-cap';
+		const className = dropCap ? 'has-drop-cap' : null;
 
 		if ( ! align ) {
 			return <p className={ className }>{ content }</p>;

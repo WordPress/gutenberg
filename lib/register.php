@@ -44,7 +44,7 @@ function gutenberg_menu() {
 
 	add_submenu_page(
 		'gutenberg',
-		__( 'New Post', 'gutenberg' ),
+		__( 'Gutenberg', 'gutenberg' ),
 		__( 'New Post', 'gutenberg' ),
 		'edit_posts',
 		'gutenberg',

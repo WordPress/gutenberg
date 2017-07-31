@@ -31,6 +31,7 @@ export function createBlock( name, attributes = {} ) {
 	return {
 		uid: uuid(),
 		name,
+		isValid: true,
 		attributes: {
 			...defaultAttributes,
 			...attributes,
@@ -87,13 +88,10 @@ export function switchToBlockType( block, name ) {
 		return null;
 	}
 
-	return transformationResults.map( ( result, index ) => {
-		return {
-			// The first transformed block whose type matches the "destination"
-			// type gets to keep the existing block's UID.
-			uid: index === firstSwitchedBlock ? block.uid : result.uid,
-			name: result.name,
-			attributes: result.attributes,
-		};
-	} );
+	return transformationResults.map( ( result, index ) => ( {
+		...result,
+		// The first transformed block whose type matches the "destination"
+		// type gets to keep the existing block's UID.
+		uid: index === firstSwitchedBlock ? block.uid : result.uid,
+	} ) );
 }

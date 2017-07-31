@@ -1,4 +1,5 @@
 sudo: false
+dist: trusty
 
 language: php
 
@@ -11,9 +12,11 @@ cache:
   directories:
     - vendor
     - $HOME/.composer/cache
+    - $HOME/.phpbrew
 
 before_install:
-  - nvm install 7 && nvm use 7
+  - nvm install 6.11.1 && nvm use 6.11.1
+  - npm install --global npm@5
 
 matrix:
   include:
@@ -21,8 +24,10 @@ matrix:
       env: WP_VERSION=latest
     - php: 5.6
       env: WP_VERSION=latest
-    - php: 5.2
-      env: WP_VERSION=latest
+    - php: 7.1
+      env: WP_VERSION=latest SWITCH_TO_PHP=5.3
+    - php: 7.1
+      env: WP_VERSION=latest SWITCH_TO_PHP=5.2
     - php: 5.6
       env: TRAVISCI=phpcs
     - php: 7.1
@@ -32,15 +37,10 @@ before_script:
   - export PATH="$HOME/.composer/vendor/bin:$PATH"
   - |
     if [[ ! -z "$WP_VERSION" ]] ; then
+      set -e
       bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
-      if [[ ${TRAVIS_PHP_VERSION:0:2} == "5." ]]; then
-        mkdir -p $HOME/phpunit-bin
-        wget -O $HOME/phpunit-bin/phpunit https://phar.phpunit.de/phpunit-4.8.phar
-        chmod +x $HOME/phpunit-bin/phpunit
-        export PATH=$PATH:$HOME/phpunit-bin/
-      else
-        composer global require "phpunit/phpunit=5.7.*"
-      fi
+      source bin/install-php-phpunit.sh
+      set +e
     fi
   - |
     if [[ "$TRAVISCI" == "phpcs" ]] ; then
@@ -63,6 +63,9 @@ script:
         sleep .2 # Otherwise Travis doesn't want to print the whole message
         exit 1
       fi
+      echo Running with the following versions:
+      php -v
+      phpunit -v
       # Check parser syntax
       php lib/parser.php || exit 1
       # Run PHPUnit tests
@@ -80,10 +83,14 @@ script:
     fi
 
 before_deploy:
-  - npm install && npm run build-storybook
+  - npm install
+  - cd docutron
+  - npm install
+  - cd ../
+  - npm run docs-build
 
 deploy:
   provider: surge
-  project: ./storybook-static/
-  domain: gutenberg-devdoc.surge.sh
+  project: ./docutron/build/
   skip_cleanup: true
+  domain: gutenberg-devdoc.surge.sh

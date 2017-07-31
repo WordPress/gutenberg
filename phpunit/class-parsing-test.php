@@ -54,8 +54,7 @@ class Parsing_Test extends WP_UnitTestCase {
 		$html            = file_get_contents( $html_path );
 		$expected_parsed = json_decode( file_get_contents( $parsed_json_path ), true );
 
-		$parser = new Gutenberg_PEG_Parser;
-		$result = $parser->parse( $html );
+		$result = gutenberg_parse_blocks( $html );
 
 		$this->assertEquals(
 			$expected_parsed,

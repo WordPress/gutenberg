@@ -3,8 +3,7 @@
  */
 import fs from 'fs';
 import path from 'path';
-import { uniq, isObject, omit, startsWith } from 'lodash';
-import { expect } from 'chai';
+import { uniq, isObject, omit, startsWith, get } from 'lodash';
 import { format } from 'util';
 
 /**
@@ -89,8 +88,8 @@ function normalizeParsedBlocks( blocks ) {
 }
 
 describe( 'full post content fixture', () => {
-	before( () => {
-		// Registers all blocks
+	beforeAll( () => {
+		// Register all blocks.
 		require( 'blocks' );
 	} );
 
@@ -122,12 +121,17 @@ describe( 'full post content fixture', () => {
 			}
 
 			const parserOutputExpected = JSON.parse( parserOutputExpectedString );
-			expect(
-				parserOutputActual
-			).to.eql(
-				parserOutputExpected,
-				format( 'File \'%s.parsed.json\' does not match expected value', f )
-			);
+			try {
+				expect(
+					parserOutputActual
+				).toEqual( parserOutputExpected );
+			} catch ( err ) {
+				throw new Error( format(
+					'File \'%s.parsed.json\' does not match expected value:\n\n%s',
+					f,
+					err.message
+				) );
+			}
 
 			const blocksActual = parse( content );
 			const blocksActualNormalized = normalizeParsedBlocks( blocksActual );
@@ -149,14 +153,21 @@ describe( 'full post content fixture', () => {
 			}
 
 			const blocksExpected = JSON.parse( blocksExpectedString );
-			expect(
-				blocksActualNormalized
-			).to.eql(
-				blocksExpected,
-				format( 'File \'%s.json\' does not match expected value', f )
-			);
+			try {
+				expect(
+					blocksActualNormalized
+				).toEqual( blocksExpected );
+			} catch ( err ) {
+				throw new Error( format(
+					'File \'%s.json\' does not match expected value:\n\n%s',
+					f,
+					err.message
+				) );
+			}
 
-			const serializedActual = serialize( blocksActual );
+			// `serialize` doesn't have a trailing newline, but the fixture
+			// files should.
+			const serializedActual = serialize( blocksActual ) + '\n';
 			let serializedExpected = readFixtureFile( f + '.serialized.html' );
 
 			if ( ! serializedExpected ) {
@@ -170,12 +181,15 @@ describe( 'full post content fixture', () => {
 				}
 			}
 
-			expect(
-				serializedActual
-			).to.eql(
-				serializedExpected.replace( /\n$/, '' ),
-				format( 'File \'%s.serialized.html\' does not match expected value', f )
-			);
+			try {
+				expect( serializedActual ).toEqual( serializedExpected );
+			} catch ( err ) {
+				throw new Error( format(
+					'File \'%s.serialized.html\' does not match expected value:\n\n%s',
+					f,
+					err.message
+				) );
+			}
 		} );
 	} );
 
@@ -190,13 +204,23 @@ describe( 'full post content fixture', () => {
 					startsWith( basename, nameToFilename + '__' )
 				) )
 				.map( basename => {
-					const filename = basename + '.html';
+					// The file that contains the input HTML for this test.
+					const inputFilename = basename + '.html';
+					// The parser output for this test.  For missing files,
+					// JSON.parse( null ) === null.
+					const parserOutput = JSON.parse(
+						readFixtureFile( basename + '.json' )
+					);
+					// The name of the first block that this fixture file
+					// contains (if any).
+					const firstBlock = get( parserOutput, [ '0', 'name' ], null );
 					return {
-						filename,
-						contents: readFixtureFile( filename ),
+						filename: inputFilename,
+						parserOutput,
+						firstBlock,
 					};
 				} )
-				.filter( fixture => fixture.contents !== null );
+				.filter( fixture => fixture.parserOutput !== null );
 
 			if ( ! foundFixtures.length ) {
 				errors.push( format(
@@ -207,10 +231,7 @@ describe( 'full post content fixture', () => {
 			}
 
 			foundFixtures.forEach( fixture => {
-				const delimiter = new RegExp(
-					'<!--\\s*wp:' + name + '(\\s+|\\s*-->)'
-				);
-				if ( ! delimiter.test( fixture.contents ) ) {
+				if ( name !== fixture.firstBlock ) {
 					errors.push( format(
 						'Expected fixture file \'%s\' to test the \'%s\' block.',
 						fixture.filename,

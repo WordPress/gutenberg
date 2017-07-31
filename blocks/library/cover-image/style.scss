@@ -3,49 +3,6 @@
 		position: inherit;
 	}
 
-	.wp-block-cover-image {
-		margin: 0;
-
-		h2 {
-			color: white;
-			font-size: 24pt;
-			line-height: 1em;
-			max-width: $visual-editor-max-width;
-			padding: $block-padding;
-			text-align: center;
-		}
-	}
-
-	.cover-image {
-		background-size: cover;
-		height: 430px;
-		width: 100%;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
-
-	.has-parallax {
-		background-attachment: fixed;
-	}
-
-	.cover-image.has-background-dim::before {
-		content: '';
-		position: absolute;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 0;
-		background: rgba( 0,0,0,.5 );
-	}
-
-	&[data-align="full"] .cover-image::before {
-		right: 0;
-		left: 0;
-	}
-}
-
-.cover-image {
 	.blocks-editable__tinymce a {
 		color: white;
 	}

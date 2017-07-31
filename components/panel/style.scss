@@ -54,21 +54,20 @@
 .components-panel .components-panel__body-title {
 	display: block;
 	padding: 0;
-	margin: 0;
+	margin: -15px;
 	font-size: inherit;
 }
 
 .components-panel__body-toggle.components-icon-button {
 	position: relative;
-	padding: 0;
-	padding-right: 20px;
+	padding: 15px;
 	outline: none;
 	width: 100%;
 	font-weight: 600;
 
 	.dashicon {
 		position: absolute;
-		right: 0;
+		right: 10px;
 		top: 50%;
 		transform: translateY( -50% );
 	}
@@ -76,4 +75,19 @@
 
 .components-panel__body-toggle-icon {
 	margin-right: -5px;
+}
+
+.components-panel__row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-top: 20px;
+
+	&:empty {
+		margin-top: 0;
+	}
+}
+
+.components-panel .circle-picker {
+	padding-bottom: 20px;
 }

@@ -2,9 +2,12 @@
     {
         "uid": "_uid_0",
         "name": "core/latest-posts",
+        "isValid": true,
         "attributes": {
             "postsToShow": 5,
-            "displayPostDate": false
+            "displayPostDate": false,
+            "layout": "list",
+            "columns": 3
         }
     }
 ]

@@ -14,7 +14,7 @@ import { Component, findDOMNode } from 'element';
  */
 function withFocusReturn( WrappedComponent ) {
 	return class extends Component {
-		componentDidMount() {
+		componentWillMount() {
 			this.activeElement = document.activeElement;
 		}
 

@@ -1,14 +1,19 @@
 .wp-block-image {
+	position: relative;
 	margin: 0;
 
 	img {
 		display: block;
 		width: 100%;
 	}
+
+	&.is-transient img {
+		@include loading_fade;
+	}
 }
 
 .editor-visual-editor__block[data-type="core/image"] {
-	.editable-format-toolbar__link-modal {
+	.blocks-format-toolbar__link-modal {
 		top: 0;
 		left: 0;
 	}

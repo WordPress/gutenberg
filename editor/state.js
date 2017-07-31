@@ -4,7 +4,12 @@
 import optimist from 'redux-optimist';
 import { combineReducers, applyMiddleware, createStore } from 'redux';
 import refx from 'refx';
-import { reduce, keyBy, first, last, omit, without, flowRight } from 'lodash';
+import { reduce, keyBy, first, last, omit, without, flowRight, forOwn } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { getBlockTypes } from 'blocks';
 
 /**
  * Internal dependencies
@@ -13,6 +18,7 @@ import { combineUndoableReducers } from './utils/undoable-reducer';
 import effects from './effects';
 
 const isMobile = window.innerWidth < 782;
+const renderedPostProps = new Set( [ 'guid', 'title', 'excerpt', 'content' ] );
 
 /**
  * Undoable reducer returning the editor post state, including blocks parsed
@@ -64,9 +70,10 @@ export const editor = combineUndoableReducers( {
 		switch ( action.type ) {
 			case 'RESET_BLOCKS':
 			case 'REQUEST_POST_UPDATE_SUCCESS':
+			case 'TRASH_POST_SUCCESS':
 				return false;
 
-			case 'UPDATE_BLOCK':
+			case 'UPDATE_BLOCK_ATTRIBUTES':
 			case 'INSERT_BLOCKS':
 			case 'MOVE_BLOCKS_DOWN':
 			case 'MOVE_BLOCKS_UP':
@@ -85,38 +92,38 @@ export const editor = combineUndoableReducers( {
 			case 'RESET_BLOCKS':
 				return keyBy( action.blocks, 'uid' );
 
-			case 'UPDATE_BLOCK':
+			case 'UPDATE_BLOCK_ATTRIBUTES':
 				// Ignore updates if block isn't known
 				if ( ! state[ action.uid ] ) {
 					return state;
 				}
 
 				// Consider as updates only changed values
-				const nextBlock = reduce( action.updates, ( result, value, key ) => {
+				const nextAttributes = reduce( action.attributes, ( result, value, key ) => {
 					if ( value !== result[ key ] ) {
 						// Avoid mutating original block by creating shallow clone
-						if ( result === state[ action.uid ] ) {
-							result = { ...state[ action.uid ] };
+						if ( result === state[ action.uid ].attributes ) {
+							result = { ...result };
 						}
 
 						result[ key ] = value;
 					}
 
 					return result;
-				}, state[ action.uid ] );
+				}, state[ action.uid ].attributes );
 
 				// Skip update if nothing has been changed. The reference will
 				// match the original block if `reduce` had no changed values.
-				if ( nextBlock === state[ action.uid ] ) {
+				if ( nextAttributes === state[ action.uid ].attributes ) {
 					return state;
 				}
 
-				// Otherwise merge updates into state
+				// Otherwise merge attributes into state
 				return {
 					...state,
 					[ action.uid ]: {
 						...state[ action.uid ],
-						...action.updates,
+						attributes: nextAttributes,
 					},
 				};
 
@@ -222,6 +229,39 @@ export const editor = combineUndoableReducers( {
 }, { resetTypes: [ 'RESET_BLOCKS' ] } );
 
 /**
+ * Reducer loading and saving user specific data, such as preferences and
+ * block usage.
+ *
+ * @param  {Object} state  Current state
+ * @param  {Object} action Dispatched action
+ * @return {Object}        Updated state
+ */
+export const userData = combineReducers( {
+	recentlyUsedBlocks( state = [], action ) {
+		const maxRecent = 8;
+		switch ( action.type ) {
+			case 'LOAD_USER_DATA':
+				// This is where we initially populate the recently used blocks,
+				// for now this inserts blocks from the common category, but will
+				// load this from an API in the future.
+				return getBlockTypes()
+					.filter( ( blockType ) => 'common' === blockType.category )
+					.slice( 0, maxRecent )
+					.map( ( blockType ) => blockType.name );
+			case 'INSERT_BLOCKS':
+				// This is where we record the block usage so it can show up in
+				// the recent blocks.
+				let newState = [ ...state ];
+				action.blocks.forEach( ( block ) => {
+					newState = [ block.name, ...without( newState, block.name ) ];
+				} );
+				return newState.slice( 0, maxRecent );
+		}
+		return state;
+	},
+} );
+
+/**
  * Reducer returning the last-known state of the current post, in the format
  * returned by the WP REST API.
  *
@@ -235,7 +275,15 @@ export function currentPost( state = {}, action ) {
 			return action.post;
 
 		case 'UPDATE_POST':
-			return { ...state, ...action.edits };
+			const post = { ...state };
+			forOwn( action.edits, ( value, key ) => {
+				if ( renderedPostProps.has( key ) ) {
+					post[ key ] = { raw: value };
+				} else {
+					post[ key ] = value;
+				}
+			} );
+			return post;
 	}
 
 	return state;
@@ -258,7 +306,6 @@ export function selectedBlock( state = {}, action ) {
 				? state
 				: {
 					uid: action.uid,
-					typing: false,
 					focus: action.uid === state.uid ? state.focus : {},
 				};
 
@@ -270,45 +317,19 @@ export function selectedBlock( state = {}, action ) {
 			const firstUid = first( action.uids );
 			return firstUid === state.uid
 				? state
-				: { uid: firstUid, typing: false, focus: {} };
+				: { uid: firstUid, focus: {} };
 		}
 
 		case 'INSERT_BLOCKS':
 			return {
 				uid: action.blocks[ 0 ].uid,
-				typing: false,
 				focus: {},
 			};
 
 		case 'UPDATE_FOCUS':
 			return {
 				uid: action.uid,
-				typing: state.uid === action.uid ? state.typing : false,
 				focus: action.config || {},
-			};
-
-		case 'START_TYPING':
-			if ( action.uid !== state.uid ) {
-				return {
-					uid: action.uid,
-					typing: true,
-					focus: {},
-				};
-			}
-
-			return {
-				...state,
-				typing: true,
-			};
-
-		case 'STOP_TYPING':
-			if ( action.uid !== state.uid ) {
-				return state;
-			}
-
-			return {
-				...state,
-				typing: false,
 			};
 
 		case 'REPLACE_BLOCKS':
@@ -318,9 +339,27 @@ export function selectedBlock( state = {}, action ) {
 
 			return {
 				uid: action.blocks[ 0 ].uid,
-				typing: false,
 				focus: {},
 			};
+	}
+
+	return state;
+}
+
+/**
+ * Reducer returning typing state.
+ *
+ * @param  {Boolean} state  Current state
+ * @param  {Object}  action Dispatched action
+ * @return {Boolean}        Updated state
+ */
+export function isTyping( state = false, action ) {
+	switch ( action.type ) {
+		case 'START_TYPING':
+			return true;
+
+		case 'STOP_TYPING':
+			return false;
 	}
 
 	return state;
@@ -428,13 +467,22 @@ export function isSidebarOpened( state = ! isMobile, action ) {
 	return state;
 }
 
+export function panel( state = 'document', action ) {
+	switch ( action.type ) {
+		case 'SET_ACTIVE_PANEL':
+			return action.panel;
+	}
+
+	return state;
+}
+
 /**
  * Reducer returning current network request state (whether a request to the WP
  * REST API is in progress, successful, or failed).
  *
- * @param  {string} state  Current state
+ * @param  {Object} state  Current state
  * @param  {Object} action Dispatched action
- * @return {string}        Updated state
+ * @return {Object}        Updated state
  */
 export function saving( state = {}, action ) {
 	switch ( action.type ) {
@@ -491,13 +539,16 @@ export function createReduxStore() {
 		editor,
 		currentPost,
 		selectedBlock,
+		isTyping,
 		multiSelectedBlocks,
 		hoveredBlock,
 		showInsertionPoint,
 		mode,
 		isSidebarOpened,
+		panel,
 		saving,
 		notices,
+		userData,
 	} ) );
 
 	const enhancers = [ applyMiddleware( refx( effects ) ) ];

@@ -2,6 +2,7 @@
     {
         "uid": "_uid_0",
         "name": "core-embed/kickstarter",
+        "isValid": true,
         "attributes": {
             "url": "https://kickstarter.com/",
             "caption": [

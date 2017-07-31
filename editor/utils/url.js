@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { parse, format } from 'url';
-import { parse as parseQueryString, stringify } from 'querystring';
 
 /**
  * Appends arguments to the query string of the url
@@ -28,12 +27,7 @@ export function addQueryArgs( url, args ) {
  * @return {String}        URL
  */
 export function getGutenbergURL( query = {} ) {
-	const [ baseURL, currentQuery = '' ] = window.location.href.split( '?' );
-	const qs = parseQueryString( currentQuery );
-	return baseURL + '?' + stringify( {
-		...qs,
-		...query,
-	} );
+	return addQueryArgs( window.location.href, query );
 }
 
 /**
@@ -45,6 +39,5 @@ export function getGutenbergURL( query = {} ) {
  * @return {String}        URL
  */
 export function getWPAdminURL( page, query ) {
-	const querystring = query ? '?' + stringify( query ) : '';
-	return page + querystring;
+	return addQueryArgs( page, query );
 }

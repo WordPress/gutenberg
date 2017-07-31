@@ -37,6 +37,10 @@ registerBlockType( 'core/heading', {
 		nodeName: prop( 'h1,h2,h3,h4,h5,h6', 'nodeName' ),
 	},
 
+	defaultAttributes: {
+		nodeName: 'H2',
+	},
+
 	transforms: {
 		from: [
 			{
@@ -77,6 +81,18 @@ registerBlockType( 'core/heading', {
 					nodeName: prop( 'h1,h2,h3,h4,h5,h6', 'nodeName' ),
 				},
 			},
+			{
+				type: 'pattern',
+				regExp: /^(#{2,6})\s/,
+				transform: ( { content, match } ) => {
+					const level = match[ 1 ].length;
+
+					return createBlock( 'core/heading', {
+						nodeName: `H${ level }`,
+						content,
+					} );
+				},
+			},
 		],
 		to: [
 			{
@@ -98,7 +114,7 @@ registerBlockType( 'core/heading', {
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, insertBlocksAfter } ) {
-		const { align, content, nodeName = 'H2' } = attributes;
+		const { align, content, nodeName, placeholder } = attributes;
 
 		return [
 			focus && (
@@ -158,13 +174,13 @@ registerBlockType( 'core/heading', {
 					] );
 				} }
 				style={ { textAlign: align } }
-				placeholder={ __( 'Write heading…' ) }
+				placeholder={ placeholder || __( 'Write heading…' ) }
 			/>,
 		];
 	},
 
 	save( { attributes } ) {
-		const { align, nodeName = 'H2', content } = attributes;
+		const { align, nodeName, content } = attributes;
 		const Tag = nodeName.toLowerCase();
 
 		return (

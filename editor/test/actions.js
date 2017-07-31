@@ -1,16 +1,11 @@
 /**
- * External dependencies
- */
-import { expect } from 'chai';
-
-/**
  * Internal dependencies
  */
 import {
 	focusBlock,
 	replaceBlocks,
-	startTypingInBlock,
-	stopTypingInBlock,
+	startTyping,
+	stopTyping,
 } from '../actions';
 
 describe( 'actions', () => {
@@ -20,7 +15,7 @@ describe( 'actions', () => {
 				editable: 'cite',
 			};
 
-			expect( focusBlock( 'chicken', focusConfig ) ).to.eql( {
+			expect( focusBlock( 'chicken', focusConfig ) ).toEqual( {
 				type: 'UPDATE_FOCUS',
 				uid: 'chicken',
 				config: focusConfig,
@@ -34,7 +29,7 @@ describe( 'actions', () => {
 				uid: 'ribs',
 			} ];
 
-			expect( replaceBlocks( [ 'chicken' ], blocks ) ).to.eql( {
+			expect( replaceBlocks( [ 'chicken' ], blocks ) ).toEqual( {
 				type: 'REPLACE_BLOCKS',
 				uids: [ 'chicken' ],
 				blocks,
@@ -42,20 +37,18 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'startTypingInBlock', () => {
+	describe( 'startTyping', () => {
 		it( 'should return the START_TYPING action', () => {
-			expect( startTypingInBlock( 'chicken' ) ).to.eql( {
+			expect( startTyping() ).toEqual( {
 				type: 'START_TYPING',
-				uid: 'chicken',
 			} );
 		} );
 	} );
 
-	describe( 'stopTypingInBlock', () => {
+	describe( 'stopTyping', () => {
 		it( 'should return the STOP_TYPING action', () => {
-			expect( stopTypingInBlock( 'chicken' ) ).to.eql( {
+			expect( stopTyping() ).toEqual( {
 				type: 'STOP_TYPING',
-				uid: 'chicken',
 			} );
 		} );
 	} );

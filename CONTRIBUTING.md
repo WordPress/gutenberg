@@ -2,7 +2,9 @@
 
 ## Installing & Building the Plugin
 
-Gutenberg is a Node-based project, built primarily in JavaScript. Be sure to have <a href="https://nodejs.org/en/">Node installed first</a>. If you already have Node installed, make sure it's version 6.10.3 or higher for this plugin to work correctly. You can check your Node version by typing `node -v` in the Terminal prompt.
+Gutenberg is a Node.js-based project, built primarily in JavaScript. Be sure to have <a href="https://nodejs.org/en/">Node.js installed first</a>. If you already have Node.js installed, make sure it's version 6.11.1 or higher for this plugin to work correctly. You can check your Node.js version by typing `node -v` in the Terminal prompt. 
+
+You should also have the latest release of <a href="https://npmjs.org">npm installed</a>, npm is a separate project from Node.js and is updated frequently. If you've just installed Node.js which includes a version of npm within the installation you most likely will need to also update your npm install. To update npm, type this into your terminal: `npm install npm@latest -g`
 
 To test the plugin, or to contribute to it, you can clone this repository and build the plugin files using Node. How you do that depends on whether you're developing locally or uploading the plugin to a remote host.
 
@@ -38,7 +40,7 @@ Gutenberg contains both PHP and JavaScript code, and encourages testing and code
 
 ### JavaScript Testing
 
-Tests for JavaScript use [Jest](http://facebook.github.io/jest//) as the test runner. If needed, you can also use [Sinon](http://sinonjs.org/) for mocking and [Enzyme](https://github.com/airbnb/enzyme) for React component testing.
+Tests for JavaScript use [Jest](http://facebook.github.io/jest/) as the test runner. If needed, you can also use [Enzyme](https://github.com/airbnb/enzyme) for React component testing.
 
 Assuming you've followed the instructions above to install Node and project dependencies, tests can be run from the command-line with NPM:
 

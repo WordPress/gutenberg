@@ -14,7 +14,7 @@ import { Dashicon, ClipboardButton, Button } from 'components';
  * Internal Dependencies
  */
 import './style.scss';
-import { getEditedPostAttribute } from '../selectors';
+import { isEditedPostNew, getEditedPostAttribute } from '../selectors';
 
 class PostPermalink extends Component {
 	constructor() {
@@ -43,8 +43,8 @@ class PostPermalink extends Component {
 	}
 
 	render() {
-		const { link } = this.props;
-		if ( ! link ) {
+		const { isNew, link } = this.props;
+		if ( isNew || ! link ) {
 			return null;
 		}
 
@@ -66,6 +66,7 @@ class PostPermalink extends Component {
 export default connect(
 	( state ) => {
 		return {
+			isNew: isEditedPostNew( state ),
 			link: getEditedPostAttribute( state, 'link' ),
 		};
 	}
