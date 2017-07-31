@@ -45,6 +45,7 @@ import {
 	isBlockMultiSelected,
 	isFirstMultiSelectedBlock,
 	isTyping,
+	getMultiSelectedBlockUids,
 	getEditorSettings,
 } from '../../selectors';
 
@@ -180,7 +181,6 @@ class VisualEditorBlock extends Component {
 		const { keyCode, target } = event;
 		const {
 			uid,
-			multiSelectedBlockUids,
 			previousBlock,
 			onRemove,
 			onFocus,
@@ -188,19 +188,15 @@ class VisualEditorBlock extends Component {
 		} = this.props;
 
 		// Remove block on backspace.
-		if ( BACKSPACE === keyCode || DELETE === keyCode ) {
-			if ( target === this.node ) {
-				event.preventDefault();
-				onRemove( [ uid ] );
+		if (
+			target === this.node &&
+			( BACKSPACE === keyCode || DELETE === keyCode )
+		) {
+			event.preventDefault();
+			onRemove( [ uid ] );
 
-				if ( previousBlock ) {
-					onFocus( previousBlock.uid, { offset: -1 } );
-				}
-			}
-
-			if ( multiSelectedBlockUids.length ) {
-				event.preventDefault();
-				onRemove( multiSelectedBlockUids );
+			if ( previousBlock ) {
+				onFocus( previousBlock.uid, { offset: -1 } );
 			}
 		}
 
@@ -450,6 +446,7 @@ export default connect(
 			focus: getBlockFocus( state, ownProps.uid ),
 			isTyping: isTyping( state ),
 			order: getBlockIndex( state, ownProps.uid ),
+			multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
 			settings: getEditorSettings( state ),
 		};
 	},

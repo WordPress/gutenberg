@@ -17,8 +17,8 @@ import { KeyboardShortcuts } from 'components';
 import './style.scss';
 import VisualEditorBlockList from './block-list';
 import PostTitle from '../../post-title';
-import { getBlockUids } from '../../selectors';
-import { clearSelectedBlock, multiSelect, redo, undo } from '../../actions';
+import { getBlockUids, getMultiSelectedBlockUids } from '../../selectors';
+import { clearSelectedBlock, multiSelect, redo, undo, removeBlocks } from '../../actions';
 
 class VisualEditor extends Component {
 	constructor() {
@@ -28,6 +28,7 @@ class VisualEditor extends Component {
 		this.onClick = this.onClick.bind( this );
 		this.selectAll = this.selectAll.bind( this );
 		this.undoOrRedo = this.undoOrRedo.bind( this );
+		this.deleteSelectedBlocks = this.deleteSelectedBlocks.bind( this );
 	}
 
 	componentDidMount() {
@@ -69,6 +70,14 @@ class VisualEditor extends Component {
 		event.preventDefault();
 	}
 
+	deleteSelectedBlocks( event ) {
+		const { multiSelectedBlockUids, onRemove } = this.props;
+		if ( multiSelectedBlockUids.length ) {
+			event.preventDefault();
+			onRemove( multiSelectedBlockUids );
+		}
+	}
+
 	render() {
 		// Disable reason: Clicking the canvas should clear the selection
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
@@ -86,6 +95,8 @@ class VisualEditor extends Component {
 					'mod+a': this.selectAll,
 					'mod+z': this.undoOrRedo,
 					'mod+shift+z': this.undoOrRedo,
+					backspace: this.deleteSelectedBlocks,
+					del: this.deleteSelectedBlocks,
 				} } />
 				<PostTitle />
 				<VisualEditorBlockList ref={ this.bindBlocksContainer } />
@@ -99,6 +110,7 @@ export default connect(
 	( state ) => {
 		return {
 			uids: getBlockUids( state ),
+			multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
 		};
 	},
 	{
@@ -106,5 +118,6 @@ export default connect(
 		onMultiSelect: multiSelect,
 		onRedo: redo,
 		onUndo: undo,
+		onRemove: removeBlocks,
 	}
 )( VisualEditor );
