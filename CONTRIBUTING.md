@@ -52,10 +52,6 @@ To run unit tests only, use `npm run test-unit` instead.
 
 Code style in JavaScript is enforced using [ESLint](http://eslint.org/). The above `npm test` will execute both unit tests and code linting. Code linting can be verified independently by running `npm run lint`.
 
-### JavaScript Test Coverage
-
-JavaScript test coverage is available at [Codecov](https://codecov.io/gh/WordPress/gutenberg). _Code coverage_ is a way of measuring the amount of code covered by the tests in the test suite of a project.
-
 ### PHP Testing
 
 Tests for PHP use [PHPUnit](https://phpunit.de/) as the testing framework. Before starting, you should install PHPUnit and have a copy of [WordPress Develop](https://github.com/WordPress/wordpress-develop) available and setup a [`wp-tests-config.php`](https://make.wordpress.org/core/handbook/testing/automated-testing/phpunit/#setup) file. If the Gutenberg plugin is installed in the context of a WordPress Develop site, you can run `phpunit` directly from the command-line. Otherwise, you will need to specify the path to WordPress Develop's test directory as an environment variable:
@@ -65,6 +61,14 @@ WP_TESTS_DIR=/path/to/wordpress-develop/tests/phpunit phpunit
 ```
 
 Code style in PHP is enforced using [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer). It is recommended that you install PHP_CodeSniffer and the [WordPress Coding Standards for PHP_CodeSniffer](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards#installation) ruleset using [Composer](https://getcomposer.org/). With Composer installed, run `composer install` from the project directory to install dependencies, then `composer run-script lint` to verify PHP code standards.
+
+### Code Coverage
+
+Code coverage is measured for each PR using the
+[codecov.io](https://codecov.io/gh/WordPress/gutenberg)
+tool.
+[Code coverage](https://en.wikipedia.org/wiki/Code_coverage)
+is a way of measuring the amount of code covered by the tests in the test suite of a project.  In Gutenberg, it is currently measured for JavaScript code only.
 
 ## How Designers Can Contribute
 
