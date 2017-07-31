@@ -3,7 +3,6 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Toolbar, Placeholder } from '@wordpress/components';
-import { pick } from 'lodash';
 
 /**
  * Internal dependencies
