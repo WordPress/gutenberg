@@ -28,6 +28,24 @@
 	}
 }
 
+@media ( max-width: $break-mobile ) {
+	.editor-tools .editor-inserter .components-popover {
+		margin-top: 0;
+
+		&:before,
+		&:after {
+			display: none;
+		}
+	}
+
+	.editor-tools .editor-inserter .components-popover__content {
+		width: 100vw;
+		left: 0;
+		right: 0;
+		margin: 0;
+	}
+}
+
 .editor-tools__tabs {
 	margin: 0 $item-spacing;
 	padding: 0;

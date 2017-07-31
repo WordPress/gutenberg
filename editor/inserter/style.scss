@@ -33,7 +33,7 @@
 }
 
 .editor-inserter__content {
-	height: calc( 100vh - #{ $admin-bar-height-big + $header-height + $icon-button-size } );
+	height: calc( 100vh - #{ $admin-bar-height-big + $header-height + $icon-button-size + $inserter-tabs-height } );
 
 	@include break-medium {
 		height: 240px;

@@ -1,26 +1,10 @@
 .components-popover {
-	box-shadow: $shadow-popover;
-	border: 1px solid $light-gray-500;
 	position: absolute;
-	background: $white;
 	z-index: z-index( ".components-popover" );
-	left: 0;
-	right: 0;
-
-	@include break-medium {
-		width: 300px;
-		left: -122px;
-		right: auto;
-		height: auto;
-	}
+	left: 50%;
 
 	&:before {
-		border: 10px dashed $light-gray-500;
-		display: none;
-
-		@include break-medium {
-			display: block;
-		}
+		border: 10px solid $light-gray-500;
 	}
 
 	&:after {
@@ -31,7 +15,6 @@
 	&:after {
 		content: "";
 		position: absolute;
-		left: 50%;
 		margin-left: -10px;
 		height: 0;
 		width: 0;
@@ -41,7 +24,8 @@
 	}
 
 	&.is-top {
-		bottom: 42px;
+		bottom: 100%;
+		margin-bottom: 10px;
 
 		&:before {
 			bottom: -10px;
@@ -59,11 +43,8 @@
 	}
 
 	&.is-bottom {
-		top: $admin-bar-height-big + $item-spacing -1px;
-
-		@include break-medium {
-			top: $admin-bar-height + $item-spacing;
-		}
+		top: 100%;
+		margin-top: 10px;
 
 		&:before {
 			top: -10px;
@@ -79,24 +60,41 @@
 			border-top: none;
 		}
 	}
+}
 
-	&.is-right {
-		left: -32px;
+.components-popover__content {
+	position: absolute;
+	box-shadow: $shadow-popover;
+	border: 1px solid $light-gray-500;
+	background: $white;
+	width: calc( 100vw - 20px );
 
-		&:before,
-		&:after {
-			left: 49px;
-		}
+	@include break-medium {
+		width: 300px;
 	}
 
-	&.is-left {
-		left: auto;
-		right: -42px;
+	.components-popover.is-top & {
+		bottom: 100%;
+	}
 
-		&:before,
-		&:after {
-			left: auto;
-			right: 49px;
-		}
+	.components-popover.is-bottom & {
+		top: 100%;
+	}
+
+	.components-popover.is-center & {
+		left: 50%;
+		transform: translateX( -50% );
+	}
+
+	.components-popover.is-right & {
+		position: absolute;
+		left: 100%;
+		margin-left: -24px;
+	}
+
+	.components-popover.is-left & {
+		position: absolute;
+		right: 100%;
+		margin-right: -24px;
 	}
 }
