@@ -22,8 +22,8 @@ import BlockDescription from '../../block-description';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
-	{ value: 'attachment', label: __( 'Attachment' ) },
-	{ value: 'media', label: __( 'Media' ) },
+	{ value: 'attachment', label: __( 'Attachment Page' ) },
+	{ value: 'media', label: __( 'Media File' ) },
 	{ value: 'none', label: __( 'None' ) },
 ];
 
