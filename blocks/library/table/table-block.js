@@ -67,7 +67,7 @@ export default class TableBlock extends wp.element.Component {
 	}
 
 	render() {
-		const { content, focus, onFocus, onChange, className } = this.props;
+		const { content, focus, onChange, className } = this.props;
 
 		return [
 			<Editable
@@ -82,8 +82,6 @@ export default class TableBlock extends wp.element.Component {
 				onSetup={ ( editor ) => this.handleSetup( editor, focus ) }
 				onChange={ onChange }
 				value={ content }
-				focus={ focus }
-				onFocus={ onFocus }
 			/>,
 			focus && (
 				<BlockControls key="menu">

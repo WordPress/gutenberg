@@ -113,7 +113,7 @@ registerBlockType( 'core/heading', {
 		};
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, insertBlocksAfter } ) {
+	edit( { attributes, setAttributes, focus, mergeBlocks, insertBlocksAfter } ) {
 		const { align, content, nodeName, placeholder } = attributes;
 
 		return [
@@ -162,8 +162,6 @@ registerBlockType( 'core/heading', {
 				key="editable"
 				tagName={ nodeName.toLowerCase() }
 				value={ content }
-				focus={ focus }
-				onFocus={ setFocus }
 				onChange={ ( value ) => setAttributes( { content: value } ) }
 				onMerge={ mergeBlocks }
 				onSplit={ ( before, after, ...blocks ) => {

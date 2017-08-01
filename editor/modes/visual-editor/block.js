@@ -13,7 +13,7 @@ import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
 import { Children, Component } from 'element';
 import { IconButton, Toolbar } from 'components';
 import { BACKSPACE, ESCAPE, DELETE, UP, DOWN, LEFT, RIGHT } from 'utils/keycodes';
-import { getBlockType, getBlockDefaultClassname } from 'blocks';
+import { EditableProvider, getBlockType, getBlockDefaultClassname } from 'blocks';
 import { __, sprintf } from 'i18n';
 
 /**
@@ -24,6 +24,7 @@ import BlockMover from '../../block-mover';
 import BlockRightMenu from '../../block-settings-menu';
 import BlockSwitcher from '../../block-switcher';
 import {
+	undo,
 	updateBlockAttributes,
 	focusBlock,
 	mergeBlocks,
@@ -410,18 +411,24 @@ class VisualEditorBlock extends Component {
 					className="editor-visual-editor__block-edit"
 				>
 					{ isValid && (
-						<BlockEdit
+						<EditableProvider
+							onUndo={ this.props.onUndo }
+							onFocus={ partial( onFocus, block.uid ) }
 							focus={ focus }
-							attributes={ block.attributes }
-							setAttributes={ this.setAttributes }
-							insertBlocksAfter={ onInsertBlocksAfter }
-							onReplace={ onReplace }
-							setFocus={ partial( onFocus, block.uid ) }
-							mergeBlocks={ this.mergeBlocks }
-							className={ className }
-							settings={ settings }
-							id={ block.uid }
-						/>
+						>
+							<BlockEdit
+								focus={ focus }
+								attributes={ block.attributes }
+								setAttributes={ this.setAttributes }
+								insertBlocksAfter={ onInsertBlocksAfter }
+								onReplace={ onReplace }
+								setFocus={ partial( onFocus, block.uid ) }
+								mergeBlocks={ this.mergeBlocks }
+								className={ className }
+								settings={ settings }
+								id={ block.uid }
+							/>
+						</EditableProvider>
 					) }
 					{ ! isValid && (
 						blockType.save( {
@@ -510,6 +517,10 @@ export default connect(
 
 		onReplace( blocks ) {
 			dispatch( replaceBlocks( [ ownProps.uid ], blocks ) );
+		},
+
+		onUndo() {
+			dispatch( undo() );
 		},
 	} )
 )( VisualEditorBlock );

@@ -237,7 +237,7 @@ registerBlockType( 'core/list', {
 		}
 
 		render() {
-			const { attributes, focus, setFocus } = this.props;
+			const { attributes, focus } = this.props;
 			const { nodeName = 'OL', values = [] } = attributes;
 
 			return [
@@ -278,8 +278,6 @@ registerBlockType( 'core/list', {
 					onSetup={ this.setupEditor }
 					onChange={ this.setNextValues }
 					value={ values }
-					focus={ focus }
-					onFocus={ setFocus }
 					className="blocks-list"
 					placeholder={ __( 'Write list…' ) }
 				/>,
