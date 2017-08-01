@@ -15,30 +15,30 @@ import { Component } from 'element';
  *
  * @return {Component}                   Component with an instanceId prop.
  */
-function withAssertiveMessages( WrappedComponent ) {
+function withA11yMessages( WrappedComponent ) {
 	return class extends Component {
 		constructor() {
 			super( ...arguments );
-			this.debouncedSpeakAssertive = debounce( this.speakAssertive.bind( this ), 500 );
+			this.debouncedSpeak = debounce( this.speak.bind( this ), 500 );
 		}
 
-		speakAssertive( message ) {
-			wp.a11y.speak( message, 'assertive' );
+		speak( message, type = 'assertive' ) {
+			wp.a11y.speak( message, type );
 		}
 
 		componentWillUnmount() {
-			this.debouncedSpeakAssertive.cancel();
+			this.debouncedSpeak.cancel();
 		}
 
 		render() {
 			return (
 				<WrappedComponent { ...this.props }
-					speakAssertive={ this.speakAssertive }
-					debouncedSpeakAssertive={ this.debouncedSpeakAssertive }
+					speak={ this.speak }
+					debouncedSpeak={ this.debouncedSpeak }
 				/>
 			);
 		}
 	};
 }
 
-export default withAssertiveMessages;
+export default withA11yMessages;

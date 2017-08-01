@@ -11,7 +11,7 @@ import scrollIntoView from 'dom-scroll-into-view';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
-import { Spinner, withInstanceId, withAssertiveMessages } from '@wordpress/components';
+import { Spinner, withInstanceId, withA11yMessages } from '@wordpress/components';
 
 const { UP, DOWN, ENTER } = keycodes;
 
@@ -76,13 +76,13 @@ class UrlInput extends Component {
 					} );
 
 					if ( !! posts.length ) {
-						this.props.debouncedSpeakAssertive( sprintf( _n(
+						this.props.debouncedSpeak( sprintf( _n(
 							'%d result found, use up and down arrow keys to navigate.',
 							'%d results found, use up and down arrow keys to navigate.',
 							posts.length
 						), posts.length ) );
 					} else {
-						this.props.debouncedSpeakAssertive( __( 'No results.' ) );
+						this.props.debouncedSpeak( __( 'No results.' ) );
 					}
 				},
 				( xhr ) => {
@@ -214,4 +214,4 @@ class UrlInput extends Component {
 	}
 }
 
-export default withAssertiveMessages( withInstanceId( UrlInput ) );
+export default withA11yMessages( withInstanceId( UrlInput ) );

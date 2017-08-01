@@ -18,7 +18,7 @@ import Token from './token';
 import TokenInput from './token-input';
 import SuggestionsList from './suggestions-list';
 import withInstanceId from '../higher-order/with-instance-id';
-import withAssertiveMessages from '../higher-order/with-assertive-messages';
+import withA11yMessages from '../higher-order/with-a11y-messages';
 
 const initialState = {
 	incompleteTokenValue: '',
@@ -193,13 +193,13 @@ class FormTokenField extends Component {
 		if ( showMessage ) {
 			const matchingSuggestions = this.getMatchingSuggestions( tokenValue );
 			if ( !! matchingSuggestions.length ) {
-				this.props.debouncedSpeakAssertive( sprintf( _n(
+				this.props.debouncedSpeak( sprintf( _n(
 					'%d result found, use up and down arrow keys to navigate.',
 					'%d results found, use up and down arrow keys to navigate.',
 					matchingSuggestions.length
 				), matchingSuggestions.length ) );
 			} else {
-				this.props.debouncedSpeakAssertive( __( 'No results.' ) );
+				this.props.debouncedSpeak( __( 'No results.' ) );
 			}
 		}
 	}
@@ -340,7 +340,7 @@ class FormTokenField extends Component {
 
 	addNewToken( token ) {
 		this.addNewTokens( [ token ] );
-		this.props.speakAssertive( this.props.messages.added );
+		this.props.speak( this.props.messages.added );
 
 		this.setState( {
 			incompleteTokenValue: '',
@@ -358,7 +358,7 @@ class FormTokenField extends Component {
 			return this.getTokenValue( item ) !== this.getTokenValue( token );
 		} );
 		this.props.onChange( newTokens );
-		this.props.speakAssertive( this.props.messages.removed );
+		this.props.speak( this.props.messages.removed );
 	}
 
 	getTokenValue( token ) {
@@ -564,4 +564,4 @@ FormTokenField.defaultProps = {
 	},
 };
 
-export default withAssertiveMessages( withInstanceId( FormTokenField ) );
+export default withA11yMessages( withInstanceId( FormTokenField ) );
