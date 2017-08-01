@@ -65,7 +65,7 @@ registerBlockType( 'core/cover-text', {
 		};
 	},
 
-	edit( { attributes, setAttributes, className, focus, setFocus, mergeBlocks } ) {
+	edit( { attributes, setAttributes, className, focus, setFocus, mergeBlocks, settings } ) {
 		const { align, width, content, dropCap, placeholder, textColor, backgroundColor } = attributes;
 		const toggleDropCap = () => setAttributes( { dropCap: ! dropCap } );
 		return [
@@ -75,6 +75,7 @@ registerBlockType( 'core/cover-text', {
 						value={ width }
 						onChange={ ( nextWidth ) => setAttributes( { width: nextWidth } ) }
 						controls={ [ 'center', 'wide', 'full' ] }
+						wideControlsEnabled={ settings.wideImages }
 					/>
 					<AlignmentToolbar
 						value={ align }
