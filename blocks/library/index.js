@@ -18,4 +18,5 @@ import './latest-posts';
 import './categories';
 import './cover-image';
 import './cover-text';
+import './text-columns';
 import './verse';
