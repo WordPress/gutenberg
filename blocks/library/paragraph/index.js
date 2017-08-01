@@ -19,9 +19,9 @@ import BlockDescription from '../../block-description';
 const { children, query } = hpq;
 
 registerBlockType( 'core/paragraph', {
-	title: __( 'Text' ),
+	title: __( 'Paragraph' ),
 
-	icon: 'text',
+	icon: 'editor-paragraph',
 
 	category: 'common',
 

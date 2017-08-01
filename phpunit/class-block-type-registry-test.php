@@ -45,7 +45,7 @@ class Block_Type_Registry_Test extends WP_UnitTestCase {
 	 * @expectedIncorrectUsage WP_Block_Type_Registry::register
 	 */
 	function test_invalid_names_without_namespace() {
-		$result = $this->registry->register( 'text', array() );
+		$result = $this->registry->register( 'paragraph', array() );
 		$this->assertFalse( $result );
 	}
 
@@ -65,7 +65,7 @@ class Block_Type_Registry_Test extends WP_UnitTestCase {
 	function test_register_block_type() {
 		$name     = 'core/paragraph';
 		$settings = array(
-			'icon' => 'text',
+			'icon' => 'editor-paragraph',
 		);
 
 		$block_type = $this->registry->register( $name, $settings );
@@ -82,7 +82,7 @@ class Block_Type_Registry_Test extends WP_UnitTestCase {
 	function test_register_block_type_twice() {
 		$name     = 'core/paragraph';
 		$settings = array(
-			'icon' => 'text',
+			'icon' => 'editor-paragraph',
 		);
 
 		$result = $this->registry->register( $name, $settings );
@@ -117,7 +117,7 @@ class Block_Type_Registry_Test extends WP_UnitTestCase {
 	function test_unregister_block_type() {
 		$name     = 'core/paragraph';
 		$settings = array(
-			'icon' => 'text',
+			'icon' => 'editor-paragraph',
 		);
 
 		$this->registry->register( $name, $settings );
