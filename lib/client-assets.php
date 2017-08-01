@@ -611,7 +611,14 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	);
 
 	// Initialize the editor.
-	wp_add_inline_script( 'wp-editor', 'wp.api.init().done( function() { wp.editor.createEditorInstance( \'editor\', window._wpGutenbergPost ); } );' );
+	$gutenberg_theme_support = get_theme_support( 'gutenberg' );
+	$editor_settings = array(
+		'wideImages' => $gutenberg_theme_support ? $gutenberg_theme_support[0]['wide-images'] : false,
+	);
+	wp_add_inline_script( 'wp-editor', 'wp.api.init().done( function() {'
+		. 'wp.editor.createEditorInstance( \'editor\', window._wpGutenbergPost, ' . json_encode( $editor_settings ) . ' ); '
+		. '} );'
+	);
 
 	/**
 	 * Scripts

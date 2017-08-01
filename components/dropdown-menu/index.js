@@ -10,7 +10,7 @@ import { findIndex } from 'lodash';
  */
 import IconButton from 'components/icon-button';
 import Dashicon from 'components/dashicon';
-import { findDOMNode } from 'element';
+import { Component, findDOMNode } from 'element';
 import { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } from 'utils/keycodes';
 
 /**
@@ -18,10 +18,11 @@ import { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } from 'utils/keycodes';
  */
 import './style.scss';
 
-class DropdownMenu extends wp.element.Component {
+class DropdownMenu extends Component {
 	constructor() {
 		super( ...arguments );
-		this.bindMenuRef = this.bindMenuRef.bind( this );
+
+		this.bindReferenceNode = this.bindReferenceNode.bind( this );
 		this.closeMenu = this.closeMenu.bind( this );
 		this.toggleMenu = this.toggleMenu.bind( this );
 		this.findActiveIndex = this.findActiveIndex.bind( this );
@@ -29,14 +30,19 @@ class DropdownMenu extends wp.element.Component {
 		this.focusPrevious = this.focusPrevious.bind( this );
 		this.focusNext = this.focusNext.bind( this );
 		this.handleKeyDown = this.handleKeyDown.bind( this );
-		this.menuRef = null;
+		this.handleKeyUp = this.handleKeyUp.bind( this );
+
+		this.nodes = {};
+
 		this.state = {
 			open: false,
 		};
 	}
 
-	bindMenuRef( node ) {
-		this.menuRef = node;
+	bindReferenceNode( name ) {
+		return ( node ) => {
+			this.nodes[ name ] = node;
+		};
 	}
 
 	handleClickOutside() {
@@ -60,62 +66,61 @@ class DropdownMenu extends wp.element.Component {
 	}
 
 	findActiveIndex() {
-		if ( this.menuRef ) {
-			const menu = findDOMNode( this.menuRef );
+		if ( this.nodes.menu ) {
 			const menuItem = document.activeElement;
-			if ( menuItem.parentNode === menu ) {
-				return findIndex( menu.children, ( child ) => child === menuItem );
+			if ( menuItem.parentNode === this.nodes.menu ) {
+				return findIndex( this.nodes.menu.children, ( child ) => child === menuItem );
 			}
 			return -1;
 		}
 	}
 
 	focusIndex( index ) {
-		if ( this.menuRef ) {
-			const menu = findDOMNode( this.menuRef );
-			if ( index < 0 ) {
-				menu.previousElementSibling.focus();
-			} else {
-				menu.children[ index ].focus();
-			}
+		if ( this.nodes.menu ) {
+			this.nodes.menu.children[ index ].focus();
 		}
 	}
 
 	focusPrevious() {
 		const i = this.findActiveIndex();
-		const prevI = i <= -1 ? -1 : i - 1;
+		const maxI = this.props.controls.length - 1;
+		const prevI = i <= 0 ? maxI : i - 1;
 		this.focusIndex( prevI );
 	}
 
 	focusNext() {
 		const i = this.findActiveIndex();
 		const maxI = this.props.controls.length - 1;
-		const nextI = i >= maxI ? maxI : i + 1;
+		const nextI = i >= maxI ? 0 : i + 1;
 		this.focusIndex( nextI );
+	}
+
+	handleKeyUp( event ) {
+		// TODO: find a better way to isolate events on nested components see GH issue #1973.
+		/*
+		 * VisualEditorBlock uses a keyup event to deselect the block. When the
+		 * menu is open we need to stop propagation after Escape has been pressed
+		 * so we use a keyup event instead of keydown, otherwise the whole block
+		 * toolbar will disappear.
+		 */
+		if ( event.keyCode === ESCAPE && this.state.open ) {
+			event.preventDefault();
+			event.stopPropagation();
+			// eslint-disable-next-line react/no-find-dom-node
+			findDOMNode( this.nodes.toggle ).focus();
+			this.closeMenu();
+			if ( this.props.onSelect ) {
+				this.props.onSelect( null );
+			}
+		}
 	}
 
 	handleKeyDown( keydown ) {
 		if ( this.state.open ) {
 			switch ( keydown.keyCode ) {
-				case ESCAPE:
-					keydown.preventDefault();
+				case TAB:
 					keydown.stopPropagation();
 					this.closeMenu();
-					const node = findDOMNode( this );
-					const toggle = node.querySelector( '.components-dropdown-menu__toggle' );
-					toggle.focus();
-					if ( this.props.onSelect ) {
-						this.props.onSelect( null );
-					}
-					break;
-
-				case TAB:
-					keydown.preventDefault();
-					if ( keydown.shiftKey ) {
-						this.focusPrevious();
-					} else {
-						this.focusNext();
-					}
 					break;
 
 				case LEFT:
@@ -139,6 +144,7 @@ class DropdownMenu extends wp.element.Component {
 			switch ( keydown.keyCode ) {
 				case DOWN:
 					keydown.preventDefault();
+					keydown.stopPropagation();
 					this.toggleMenu();
 					break;
 
@@ -148,14 +154,11 @@ class DropdownMenu extends wp.element.Component {
 		}
 	}
 
-	componentDidMount() {
-		const node = findDOMNode( this );
-		node.addEventListener( 'keydown', this.handleKeyDown, false );
-	}
-
-	componentWillUnmount() {
-		const node = findDOMNode( this );
-		node.removeEventListener( 'keydown', this.handleKeyDown, false );
+	componentDidUpdate( prevProps, prevState ) {
+		// Focus the first item when the menu opens.
+		if ( ! prevState.open && this.state.open ) {
+			this.focusIndex( 0 );
+		}
 	}
 
 	render() {
@@ -171,8 +174,13 @@ class DropdownMenu extends wp.element.Component {
 			return null;
 		}
 
+		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
-			<div className="components-dropdown-menu">
+			<div
+				className="components-dropdown-menu"
+				onKeyDown={ this.handleKeyDown }
+				onKeyUp={ this.handleKeyUp }
+			>
 				<IconButton
 					className={
 						classnames( 'components-dropdown-menu__toggle', {
@@ -184,6 +192,7 @@ class DropdownMenu extends wp.element.Component {
 					aria-haspopup="true"
 					aria-expanded={ this.state.open }
 					label={ label }
+					ref={ this.bindReferenceNode( 'toggle' ) }
 				>
 					<Dashicon icon="arrow-down" />
 				</IconButton>
@@ -192,7 +201,7 @@ class DropdownMenu extends wp.element.Component {
 						className="components-dropdown-menu__menu"
 						role="menu"
 						aria-label={ menuLabel }
-						ref={ this.bindMenuRef }
+						ref={ this.bindReferenceNode( 'menu' ) }
 					>
 						{ controls.map( ( control, index ) => (
 							<IconButton
@@ -210,6 +219,7 @@ class DropdownMenu extends wp.element.Component {
 								className="components-dropdown-menu__menu-item"
 								icon={ control.icon }
 								role="menuitem"
+								tabIndex="-1"
 							>
 								{ control.title }
 							</IconButton>
@@ -218,6 +228,7 @@ class DropdownMenu extends wp.element.Component {
 				}
 			</div>
 		);
+		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
 }
 

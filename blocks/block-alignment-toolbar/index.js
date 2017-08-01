@@ -28,11 +28,14 @@ const BLOCK_ALIGNMENTS_CONTROLS = {
 };
 
 const DEFAULT_CONTROLS = [ 'left', 'center', 'right' ];
+const WIDE_CONTROLS = [ 'wide', 'full' ];
 
-export default function BlockAlignmentToolbar( { value, onChange, controls = DEFAULT_CONTROLS } ) {
+export default function BlockAlignmentToolbar( { value, onChange, wideControlsEnabled = false } ) {
 	function applyOrUnset( align ) {
 		return () => onChange( value === align ? undefined : align );
 	}
+
+	const controls = DEFAULT_CONTROLS.concat( wideControlsEnabled ? WIDE_CONTROLS : [] );
 
 	return (
 		<Toolbar

@@ -30,7 +30,7 @@ export PATH=$HOME/phpunit-bin/:$PATH
 if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; then
   PHPBREW_BUILT_CHECK=$HOME/.phpbrew/bashrc
 
-  # directory to store phpbrew and old phpunit in
+  # directory to install phpbrew into
   mkdir -p $HOME/php-utils-bin
 
   # install phpbrew

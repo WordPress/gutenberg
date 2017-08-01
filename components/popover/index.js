@@ -17,7 +17,7 @@ class Popover extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.bindNode = this.bindNode.bind( this );
+		this.bindContent = this.bindContent.bind( this );
 
 		this.state = {
 			forcedYAxis: null,
@@ -45,7 +45,7 @@ class Popover extends Component {
 	}
 
 	setForcedPositions() {
-		const rect = this.node.getBoundingClientRect();
+		const rect = this.content.getBoundingClientRect();
 
 		// Check exceeding top or bottom of viewport
 		if ( rect.top < 0 ) {
@@ -62,8 +62,8 @@ class Popover extends Component {
 		}
 	}
 
-	bindNode( node ) {
-		this.node = node;
+	bindContent( node ) {
+		this.content = node;
 	}
 
 	render() {
@@ -79,11 +79,10 @@ class Popover extends Component {
 		);
 
 		return (
-			<div
-				ref={ this.bindNode }
-				className={ classes }
-				tabIndex="0">
-				{ children }
+			<div className={ classes } tabIndex="0">
+				<div ref={ this.bindContent } className="components-popover__content">
+					{ children }
+				</div>
 			</div>
 		);
 	}

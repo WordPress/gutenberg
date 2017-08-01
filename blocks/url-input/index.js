@@ -1,17 +1,17 @@
 /**
  * External dependencies
  */
-import { throttle } from 'lodash';
+import { throttle, debounce } from 'lodash';
 import classnames from 'classnames';
 import scrollIntoView from 'dom-scroll-into-view';
 
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
+import { __, sprintf, _n } from 'i18n';
 import { Component } from 'element';
 import { UP, DOWN, ENTER } from 'utils/keycodes';
-import { Spinner } from 'components';
+import { Spinner, withInstanceId } from 'components';
 
 class UrlInput extends Component {
 	constructor() {
@@ -20,6 +20,7 @@ class UrlInput extends Component {
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.bindListNode = this.bindListNode.bind( this );
 		this.updateSuggestions = throttle( this.updateSuggestions.bind( this ), 200 );
+		this.debouncedSpeakAssertive = debounce( this.speakAssertive.bind( this ), 500 );
 		this.suggestionNodes = [];
 		this.state = {
 			posts: [],
@@ -70,6 +71,16 @@ class UrlInput extends Component {
 						posts,
 						loading: false,
 					} );
+
+					if ( !! posts.length ) {
+						this.debouncedSpeakAssertive( sprintf( _n(
+							'%d result found, use up and down arrow keys to navigate.',
+							'%d results found, use up and down arrow keys to navigate.',
+							posts.length
+						), posts.length ) );
+					} else {
+						this.debouncedSpeakAssertive( __( 'No results.' ) );
+					}
 				},
 				( xhr ) => {
 					if ( xhr.statusText === 'abort' ) {
@@ -83,8 +94,9 @@ class UrlInput extends Component {
 	}
 
 	onChange( event ) {
-		this.props.onChange( event.target.value );
-		this.updateSuggestions( event.target.value );
+		const inputValue = event.target.value;
+		this.props.onChange( inputValue );
+		this.updateSuggestions( inputValue );
 	}
 
 	onKeyDown( event ) {
@@ -92,6 +104,7 @@ class UrlInput extends Component {
 		switch ( event.keyCode ) {
 			case UP: {
 				event.stopPropagation();
+				event.preventDefault();
 				const previousIndex = ! selectedSuggestion ? posts.length - 1 : selectedSuggestion - 1;
 				this.setState( {
 					selectedSuggestion: previousIndex,
@@ -100,6 +113,7 @@ class UrlInput extends Component {
 			}
 			case DOWN: {
 				event.stopPropagation();
+				event.preventDefault();
 				const nextIndex = selectedSuggestion === null || ( selectedSuggestion === posts.length - 1 ) ? 0 : selectedSuggestion + 1;
 				this.setState( {
 					selectedSuggestion: nextIndex,
@@ -119,10 +133,15 @@ class UrlInput extends Component {
 		}
 	}
 
+	speakAssertive( message ) {
+		wp.a11y.speak( message, 'assertive' );
+	}
+
 	componentWillUnmount() {
 		if ( this.suggestionsRequest ) {
 			this.suggestionsRequest.abort();
 		}
+		this.debouncedSpeakAssertive.cancel();
 	}
 
 	componentDidUpdate() {
@@ -142,7 +161,7 @@ class UrlInput extends Component {
 	}
 
 	render() {
-		const { value } = this.props;
+		const { value, instanceId } = this.props;
 		const { showSuggestions, posts, selectedSuggestion, loading } = this.state;
 		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
@@ -156,23 +175,35 @@ class UrlInput extends Component {
 					onChange={ this.onChange }
 					placeholder={ __( 'Paste URL or type' ) }
 					onKeyDown={ this.onKeyDown }
+					role="combobox"
+					aria-expanded={ showSuggestions }
+					aria-autocomplete="list"
+					aria-owns={ `blocks-url-input-suggestions-${ instanceId }` }
+					aria-activedescendant={ selectedSuggestion !== null ? `blocks-url-input-suggestion-${ instanceId }-${ selectedSuggestion }` : undefined }
 				/>
 
 				{ ( loading ) && <Spinner /> }
 
 				{ showSuggestions && !! posts.length &&
 					<div
+						id={ `blocks-url-input-suggestions-${ instanceId }` }
+						tabIndex="-1"
 						className="blocks-url-input__suggestions"
 						ref={ this.bindListNode }
+						role="listbox"
 					>
 						{ posts.map( ( post, index ) => (
 							<button
 								key={ post.id }
+								role="option"
+								tabIndex="-1"
+								id={ `blocks-url-input-suggestion-${ instanceId }-${ index }` }
 								ref={ this.bindSuggestionNode( index ) }
 								className={ classnames( 'blocks-url-input__suggestion', {
 									'is-selected': index === selectedSuggestion,
 								} ) }
 								onClick={ () => this.props.onChange( post.link ) }
+								aria-selected={ index === selectedSuggestion }
 							>
 								{ post.title.rendered }
 							</button>
@@ -185,4 +216,4 @@ class UrlInput extends Component {
 	}
 }
 
-export default UrlInput;
+export default withInstanceId( UrlInput );

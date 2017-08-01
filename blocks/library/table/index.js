@@ -34,7 +34,7 @@ registerBlockType( 'core/table', {
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, className } ) {
+	edit( { attributes, setAttributes, focus, setFocus, className, settings } ) {
 		const { content } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		return [
@@ -43,7 +43,7 @@ registerBlockType( 'core/table', {
 					<BlockAlignmentToolbar
 						value={ attributes.align }
 						onChange={ updateAlignment }
-						controls={ [ 'left', 'center', 'right', 'wide', 'full' ] }
+						wideControlsEnabled={ settings.wideImages }
 					/>
 				</BlockControls>
 			),

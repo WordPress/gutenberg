@@ -59,7 +59,7 @@ export function SavedState( { isNew, isPublished, isDirty, isSaving, isSaveable,
 
 	return (
 		<Button className={ classnames( className, 'button-link' ) } onClick={ onClick }>
-			{ __( 'Save' ) }
+			{ __( 'Save Draft' ) }
 		</Button>
 	);
 }

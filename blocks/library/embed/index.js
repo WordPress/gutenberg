@@ -10,6 +10,7 @@ import { includes } from 'lodash';
 import { __, sprintf } from 'i18n';
 import { Component } from 'element';
 import { Button, Placeholder, Spinner, SandBox } from 'components';
+import { addQueryArgs } from 'editor/utils/url';
 
 /**
  * Internal dependencies
@@ -84,7 +85,10 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 					event.preventDefault();
 				}
 				const { url } = this.props.attributes;
-				const apiURL = wpApiSettings.root + 'oembed/1.0/proxy?url=' + encodeURIComponent( url ) + '&_wpnonce=' + wpApiSettings.nonce;
+				const apiURL = addQueryArgs( wpApiSettings.root + 'oembed/1.0/proxy', {
+					url: url,
+					_wpnonce: wpApiSettings.nonce,
+				} );
 
 				this.setState( { error: false, fetching: true } );
 				window.fetch( apiURL, {
@@ -112,7 +116,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 			render() {
 				const { html, type, error, fetching } = this.state;
 				const { align, url, caption } = this.props.attributes;
-				const { setAttributes, focus, setFocus } = this.props;
+				const { setAttributes, focus, setFocus, settings } = this.props;
 				const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 
 				const controls = (
@@ -121,7 +125,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 							<BlockAlignmentToolbar
 								value={ align }
 								onChange={ updateAlignment }
-								controls={ [ 'left', 'center', 'right', 'wide', 'full' ] }
+								wideControlsEnabled={ settings.wideImages }
 							/>
 						</BlockControls>
 					)
