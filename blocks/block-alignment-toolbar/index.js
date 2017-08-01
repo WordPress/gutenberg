@@ -27,20 +27,22 @@ const BLOCK_ALIGNMENTS_CONTROLS = {
 	},
 };
 
-const DEFAULT_CONTROLS = [ 'left', 'center', 'right' ];
+const DEFAULT_CONTROLS = [ 'left', 'center', 'right', 'wide', 'full' ];
 const WIDE_CONTROLS = [ 'wide', 'full' ];
 
-export default function BlockAlignmentToolbar( { value, onChange, wideControlsEnabled = false } ) {
+export default function BlockAlignmentToolbar( { value, onChange, controls = DEFAULT_CONTROLS, wideControlsEnabled = false } ) {
 	function applyOrUnset( align ) {
 		return () => onChange( value === align ? undefined : align );
 	}
 
-	const controls = DEFAULT_CONTROLS.concat( wideControlsEnabled ? WIDE_CONTROLS : [] );
+	const enabledControls = wideControlsEnabled
+		? controls
+		: controls.filter( ( control ) => WIDE_CONTROLS.indexOf( control ) === -1 );
 
 	return (
 		<Toolbar
 			controls={
-				controls.map( control => {
+				enabledControls.map( control => {
 					return {
 						...BLOCK_ALIGNMENTS_CONTROLS[ control ],
 						isActive: value === control,
