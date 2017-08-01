@@ -21,7 +21,7 @@ registerBlockType( 'core/verse', {
 
 	category: 'formatting',
 
-	keywords: [ 'poetry' ],
+	keywords: [ __( 'poetry' ) ],
 
 	attributes: {
 		content: children( 'pre' ),
