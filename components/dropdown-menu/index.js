@@ -87,8 +87,7 @@ export class DropdownMenu extends Component {
 			return;
 		}
 
-		const maxIndex = controls.length - 1;
-		const nextIndex = activeIndex >= maxIndex ? 0 : activeIndex + 1;
+		const nextIndex = ( activeIndex + 1 ) % controls.length;
 		this.focusIndex( nextIndex );
 	}
 
