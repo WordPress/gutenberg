@@ -12,7 +12,7 @@ import { registerBlockType, unregisterBlockType, getBlockTypes } from 'blocks';
 /**
  * Internal dependencies
  */
-import { InserterMenu } from '../menu';
+import { InserterMenu, searchBlocks } from '../menu';
 
 const textBlock = {
 	name: 'core/text-block',
@@ -53,6 +53,7 @@ const youtubeBlock = {
 	save: noop,
 	edit: noop,
 	category: 'embed',
+	keywords: [ 'google' ],
 };
 
 const textEmbedBlock = {
@@ -194,5 +195,21 @@ describe( 'InserterMenu', () => {
 		expect( visibleBlocks.at( 0 ).childAt( 1 ).text() ).toBe( 'Text' );
 		expect( visibleBlocks.at( 1 ).childAt( 1 ).text() ).toBe( 'Advanced Text' );
 		expect( visibleBlocks.at( 2 ).childAt( 1 ).text() ).toBe( 'A Text Embed' );
+	} );
+} );
+
+describe( 'searchBlocks', () => {
+	it( 'should search blocks using the title ignoring case', () => {
+		const blocks = [ textBlock, advancedTextBlock, moreBlock, youtubeBlock, textEmbedBlock ];
+		expect( searchBlocks( blocks, 'TEXT' ) ).toEqual(
+			[ textBlock, advancedTextBlock, textEmbedBlock ]
+		);
+	} );
+
+	it( 'should search blocks using the keywords', () => {
+		const blocks = [ textBlock, advancedTextBlock, moreBlock, youtubeBlock, textEmbedBlock ];
+		expect( searchBlocks( blocks, 'GOOGL' ) ).toEqual(
+			[ youtubeBlock ]
+		);
 	} );
 } );

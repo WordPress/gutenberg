@@ -88,6 +88,13 @@ describe( 'blocks', () => {
 			expect( block ).toBeUndefined();
 		} );
 
+		it( 'should reject blocks with more than 3 keywords', () => {
+			const blockType = { save: noop, keywords: [ 'apple', 'orange', 'lemon', 'pineapple' ] },
+				block = registerBlockType( 'my-plugin/fancy-block-7', blockType );
+			expect( console.error ).toHaveBeenCalledWith( 'The block "my-plugin/fancy-block-7" can have a maximum of 3 keywords.' );
+			expect( block ).toBeUndefined();
+		} );
+
 		it( 'should store a copy of block type', () => {
 			const blockType = { settingName: 'settingValue', save: noop };
 			registerBlockType( 'core/test-block-with-settings', blockType );
