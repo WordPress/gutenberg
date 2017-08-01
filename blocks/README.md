@@ -246,6 +246,7 @@ editor interface where blocks are implemented.
 - `save( { attributes: Object } ): WPElement | String` - Returns an element
   describing the markup of a block to be saved in the published content. This
   function is called before save and when switching to an editor's HTML view.
+- `keywords` - An optional array of keywords used to filter the block list.
 
 ### `wp.blocks.getBlockType( name: string )`
 
