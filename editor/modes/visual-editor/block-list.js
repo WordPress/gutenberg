@@ -29,6 +29,7 @@ import {
 	getMultiSelectedBlockUids,
 } from '../../selectors';
 import { insertBlock, multiSelect } from '../../actions';
+import { bumpStat } from '../../utils/tracking';
 
 const INSERTION_POINT_PLACEHOLDER = '[[insertion-point]]';
 const { ENTER } = keycodes;
@@ -201,6 +202,8 @@ class VisualEditorBlockList extends Component {
 	insertBlock( name ) {
 		const newBlock = createBlock( name );
 		this.props.onInsertBlock( newBlock );
+		bumpStat( 'add_block_quick', name.replace( /\//g, '__' ) );
+		bumpStat( 'add_block_total', name.replace( /\//g, '__' ) );
 	}
 
 	toggleContinueWritingControls( showContinueWritingControls ) {

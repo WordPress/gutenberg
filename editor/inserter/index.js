@@ -18,6 +18,7 @@ import { createBlock } from '@wordpress/blocks';
 import InserterMenu from './menu';
 import { getBlockInsertionPoint, getEditorMode } from '../selectors';
 import { insertBlock, hideInsertionPoint } from '../actions';
+import { bumpStat } from '../utils/tracking';
 
 class Inserter extends Component {
 	constructor() {
@@ -49,6 +50,8 @@ class Inserter extends Component {
 				name,
 				insertionPoint
 			);
+			bumpStat( 'add_block_inserter', name.replace( /\//g, '__' ) );
+			bumpStat( 'add_block_total', name.replace( /\//g, '__' ) );
 		}
 
 		this.close();
