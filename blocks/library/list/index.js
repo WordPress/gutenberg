@@ -88,7 +88,7 @@ registerBlockType( 'core/list', {
 				blocks: [ 'core/text' ],
 				transform: ( { content } ) => {
 					return createBlock( 'core/list', {
-						nodeName: 'ul',
+						nodeName: 'UL',
 						values: fromBrDelimitedContent( content ),
 					} );
 				},
@@ -102,7 +102,7 @@ registerBlockType( 'core/list', {
 						? concatChildren( listItems, <li>{ citation }</li> )
 						: listItems;
 					return createBlock( 'core/list', {
-						nodeName: 'ul',
+						nodeName: 'UL',
 						values,
 					} );
 				},
@@ -120,7 +120,7 @@ registerBlockType( 'core/list', {
 				regExp: /^[*-]\s/,
 				transform: ( { content } ) => {
 					return createBlock( 'core/list', {
-						nodeName: 'ul',
+						nodeName: 'UL',
 						values: fromBrDelimitedContent( content ),
 					} );
 				},
@@ -130,7 +130,7 @@ registerBlockType( 'core/list', {
 				regExp: /^1[.)]\s/,
 				transform: ( { content } ) => {
 					return createBlock( 'core/list', {
-						nodeName: 'ol',
+						nodeName: 'OL',
 						values: fromBrDelimitedContent( content ),
 					} );
 				},
