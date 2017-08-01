@@ -251,7 +251,7 @@ class Test_WP_Widget_Media_Video extends WP_UnitTestCase {
 		$widget->enqueue_preview_scripts();
 		$this->assertTrue( wp_script_is( 'wp-mediaelement' ) );
 		$this->assertTrue( wp_style_is( 'wp-mediaelement' ) );
-		$this->assertTrue( wp_script_is( 'froogaloop' ) );
+		$this->assertTrue( wp_script_is( 'mediaelement-vimeo' ) );
 
 		$wp_scripts = null;
 		$wp_styles = null;
@@ -259,7 +259,7 @@ class Test_WP_Widget_Media_Video extends WP_UnitTestCase {
 		$widget->enqueue_preview_scripts();
 		$this->assertFalse( wp_script_is( 'wp-mediaelement' ) );
 		$this->assertFalse( wp_style_is( 'wp-mediaelement' ) );
-		$this->assertTrue( wp_script_is( 'froogaloop' ) );
+		$this->assertFalse( wp_script_is( 'mediaelement-vimeo' ) );
 	}
 
 	/**
