@@ -47,6 +47,10 @@ function gutenberg_get_script_polyfill( $tests ) {
 
 	$polyfill = '';
 	foreach ( $tests as $test => $handle ) {
+		if ( ! array_key_exists( $handle, $wp_scripts->registered ) ) {
+			continue;
+		}
+
 		$polyfill .= (
 			// Test presence of feature...
 			'( ' . $test . ' ) || ' .
