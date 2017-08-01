@@ -111,6 +111,12 @@ registerBlockType( 'core/latest-comments', {
 				);
 			}
 
+			// Removing comments from display should be instant.
+			const commentsDifference = latestComments.length - this.props.attributes.commentsToShow;
+			if ( commentsDifference > 0 ) {
+				latestComments.splice( this.props.attributes.commentsToShow, commentsDifference );
+			}
+
 			const { focus } = this.props;
 			const { align, displayAvatar, displayTimestamp, displayExcerpt } = this.props.attributes;
 
