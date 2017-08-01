@@ -67,6 +67,12 @@ export function registerBlockType( name, settings ) {
 		);
 		return;
 	}
+	if ( 'keywords' in settings && settings.keywords.length > 3 ) {
+		console.error(
+			'The block "' + name + '" can have a maximum of 3 keywords.'
+		);
+		return;
+	}
 	const block = Object.assign( { name }, settings );
 	blocks[ name ] = block;
 	return block;

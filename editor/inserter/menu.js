@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flow, groupBy, sortBy, findIndex, filter, debounce, find } from 'lodash';
+import { flow, groupBy, sortBy, findIndex, filter, debounce, find, some } from 'lodash';
 import { connect } from 'react-redux';
 
 /**
@@ -19,6 +19,15 @@ import { getCategories, getBlockTypes, BlockIcon } from 'blocks';
 import './style.scss';
 import { getBlocks, getRecentlyUsedBlocks } from '../selectors';
 import { showInsertionPoint, hideInsertionPoint } from '../actions';
+
+export const searchBlocks = ( blocks, searchTerm ) => {
+	const normalizedSearchTerm = searchTerm.toLowerCase();
+	const matchSearch = ( string ) => string.toLowerCase().indexOf( normalizedSearchTerm ) !== -1;
+
+	return blocks.filter( ( block ) =>
+		matchSearch( block.title ) || some( block.keywords, matchSearch )
+	);
+};
 
 export class InserterMenu extends Component {
 	constructor() {
@@ -88,8 +97,7 @@ export class InserterMenu extends Component {
 	}
 
 	searchBlocks( blockTypes ) {
-		const matchesSearch = ( block ) => block.title.toLowerCase().indexOf( this.state.filterValue.toLowerCase() ) !== -1;
-		return filter( blockTypes, matchesSearch );
+		return searchBlocks( blockTypes, this.state.filterValue );
 	}
 
 	getBlocksForCurrentTab() {
