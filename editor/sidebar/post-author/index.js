@@ -27,7 +27,6 @@ class PostAuthor extends Component {
 
 	fetchAuthors() {
 		this.fetchAuthorsRequest = new wp.api.collections.Users().fetch( { data: {
-			roles: 'author,editor,administrator',
 			per_page: 100,
 		} } );
 		this.fetchAuthorsRequest.then( ( authors ) => {
@@ -40,9 +39,7 @@ class PostAuthor extends Component {
 	}
 
 	componentWillUnmount() {
-		if ( this.fetchAuthorsRequest ) {
-			return this.fetchAuthorsRequest.abort();
-		}
+		this.fetchAuthorsRequest.abort();
 	}
 
 	render() {
