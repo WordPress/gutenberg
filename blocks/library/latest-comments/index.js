@@ -1,10 +1,16 @@
 /**
+ * External dependencies
+ */
+import { keys, max } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
 import { Placeholder, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import moment from 'moment';
+import classnames from 'classnames';
 
 /**
  * Internal dependencies
@@ -167,23 +173,32 @@ registerBlockType( 'core/latest-comments', {
 						/>
 					</InspectorControls>
 				),
-				<ul className={ this.props.className } key="latest-comments">
-					{ latestComments.map( ( comment, i ) =>
-						<li key={ i }>
-							{ displayAvatar && comment.author_avatar_urls[ 96 ] &&
-								<img className={ `${ this.props.className }__comment-avatar` } alt={ comment.author_name } src={ comment.author_avatar_urls[ 96 ] } />
+				<ul
+					className={ classnames( this.props.className, {
+						'has-avatars': displayAvatar,
+					} ) }
+					key="latest-comments">
+					{ latestComments.map( ( comment, i ) => {
+						let maxSize;
+						if ( displayAvatar ) {
+							maxSize = max( keys( comment.author_avatar_urls ) );
+						}
+
+						return <li key={ i }>
+							{ displayAvatar && maxSize &&
+								<img className={ `${ this.props.className }__comment-avatar` } alt={ comment.author_name } src={ comment.author_avatar_urls[ maxSize ] } />
 							}
 							<a href={ comment.link } target="_blank">{ comment._embedded.up[ 0 ].title.rendered.trim() || __( '(Untitled)' ) }</a>
 							{ displayTimestamp && comment.date_gmt &&
-								<span className={ `${ this.props.className }__comment-timestamp` }>
+								<time dateTime={ moment( comment.date_gmt ).utc().format() } className={ `${ this.props.className }__comment-timestamp` }>
 									{ moment( comment.date_gmt ).local().format( 'MMM DD h:mm A' ) }
-								</span>
+								</time>
 							}
 							{ displayExcerpt && comment.content &&
 								<div className={ `${ this.props.className }__comment-excerpt` } dangerouslySetInnerHTML={ { __html: comment.content.rendered } } />
 							}
-						</li>
-					) }
+						</li>;
+					} ) }
 				</ul>,
 			];
 		}

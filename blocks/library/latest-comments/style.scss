@@ -5,17 +5,7 @@
 		padding-left: 2.5em;
 	}
 
-	.wp-block-latest-comments__comment-avatar {
-		display: block;
-		float: left;
-		height: 48px;
-		width: 48px;
-		border-radius: 24px;
-		margin-right: 5px;
-	}
-
 	.wp-block-latest-comments__comment-timestamp {
-		display: block;
 		color: $dark-gray-100;
 		font-size: $default-font-size;
 	}
