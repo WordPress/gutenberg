@@ -46,7 +46,6 @@ import {
 	isFirstMultiSelectedBlock,
 	isTyping,
 	getMultiSelectedBlockUids,
-	getEditorSettings,
 } from '../../selectors';
 
 function FirstChild( { children } ) {
@@ -305,7 +304,7 @@ class VisualEditorBlock extends Component {
 	}
 
 	render() {
-		const { block, multiSelectedBlockUids, settings } = this.props;
+		const { block, multiSelectedBlockUids } = this.props;
 		const { name: blockName, isValid } = block;
 		const blockType = getBlockType( blockName );
 		// translators: %s: Type of block (i.e. Text, Image etc)
@@ -415,7 +414,6 @@ class VisualEditorBlock extends Component {
 							setFocus={ partial( onFocus, block.uid ) }
 							mergeBlocks={ this.mergeBlocks }
 							className={ className }
-							settings={ settings }
 							id={ block.uid }
 						/>
 					) }
@@ -447,7 +445,6 @@ export default connect(
 			isTyping: isTyping( state ),
 			order: getBlockIndex( state, ownProps.uid ),
 			multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
-			settings: getEditorSettings( state ),
 		};
 	},
 	( dispatch, ownProps ) => ( {

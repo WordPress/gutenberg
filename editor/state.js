@@ -529,15 +529,6 @@ export function notices( state = {}, action ) {
 	return state;
 }
 
-export function settings( state = {}, action ) {
-	switch ( action.type ) {
-		case 'SETUP_EDITOR':
-			return action.settings;
-	}
-
-	return state;
-}
-
 /**
  * Creates a new instance of a Redux store.
  *
@@ -558,7 +549,6 @@ export function createReduxStore() {
 		saving,
 		notices,
 		userData,
-		settings,
 	} ) );
 
 	const enhancers = [ applyMiddleware( refx( effects ) ) ];

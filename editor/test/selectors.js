@@ -53,7 +53,6 @@ import {
 	didPostSaveRequestFail,
 	getSuggestedPostFormat,
 	getNotices,
-	getEditorSettings,
 } from '../selectors';
 
 /**
@@ -1334,20 +1333,6 @@ describe( 'selectors', () => {
 				state.notices.b,
 				state.notices.a,
 			] );
-		} );
-	} );
-
-	describe( 'getEditorSettings', () => {
-		it( 'should return the settings object', () => {
-			const state = {
-				settings: {
-					wideImages: true,
-				},
-			};
-
-			expect( getEditorSettings( state ) ).toEqual( {
-				wideImages: true,
-			} );
 		} );
 	} );
 } );

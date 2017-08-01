@@ -77,7 +77,7 @@ registerBlockType( 'core/gallery', {
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, className, settings } ) {
+	edit( { attributes, setAttributes, focus, className } ) {
 		const { images = [], columns = defaultColumnsNumber( attributes ), align = 'none' } = attributes;
 		const setColumnsNumber = ( event ) => setAttributes( { columns: event.target.value } );
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
@@ -90,7 +90,6 @@ registerBlockType( 'core/gallery', {
 					<BlockAlignmentToolbar
 						value={ align }
 						onChange={ updateAlignment }
-						wideControlsEnabled={ settings.wideImages }
 					/>
 					{ !! images.length && (
 						<Toolbar controls={ [ {

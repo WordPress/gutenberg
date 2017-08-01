@@ -715,13 +715,3 @@ export function getRecentlyUsedBlocks( state ) {
 	// resolves the block names in the state to the block type settings
 	return state.userData.recentlyUsedBlocks.map( blockType => getBlockType( blockType ) );
 }
-
-/**
- * Get the editor settings.
- *
- * @param {Object} state Global application state
- * @return {Object}      The editor settings
- */
-export function getEditorSettings( state ) {
-	return state.settings;
-}
