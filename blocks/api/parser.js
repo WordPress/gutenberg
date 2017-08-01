@@ -72,6 +72,12 @@ export function createBlockWithFallback( name, rawContent, attributes ) {
 	// Use type from block content, otherwise find unknown handler.
 	name = name || getUnknownTypeHandler();
 
+	// Convert 'core/text' blocks in existing content to the new
+	// 'core/paragraph'.
+	if ( name === 'core/text' ) {
+		name = 'core/paragraph';
+	}
+
 	// Try finding type for known block name, else fall back again.
 	let blockType = getBlockType( name );
 	const fallbackBlock = getUnknownTypeHandler();
