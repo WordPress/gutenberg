@@ -4,10 +4,10 @@ jest.mock( '../clear', () => {
 	return jest.fn();
 });
 jest.mock( '@wordpress/dom-ready', () => {
-	return jest.fn( ( callback ) => { callback(); });
+	return jest.fn(( callback ) => { callback(); });
 });
 jest.mock( '../filterMessage', () => {
-	return jest.fn( ( message ) => { return message; });
+	return jest.fn(( message ) => { return message; });
 });
 
 import clear from '../clear';
@@ -18,7 +18,7 @@ describe( 'speak', () => {
 	let containerPolite = document.getElementById( 'a11y-speak-polite' );
 	let containerAssertive = document.getElementById( 'a11y-speak-assertive' );
 
-	beforeEach( () => {
+	beforeEach(() => {
 		containerPolite.textContent = '';
 		containerAssertive.textContent = '';
 	});
@@ -56,11 +56,11 @@ describe( 'speak', () => {
 	});
 
 	describe( 'when somehow the assertive container is not present', () => {
-		beforeEach( () => {
+		beforeEach(() => {
 			document.getElementById( 'a11y-speak-assertive' ).remove();
 		});
 
-		afterEach( () => {
+		afterEach(() => {
 			setup();
 			containerAssertive = document.getElementById( 'a11y-speak-assertive' );
 		});
@@ -73,12 +73,12 @@ describe( 'speak', () => {
 	});
 
 	describe( 'when somehow the both containers are not present', () => {
-		beforeEach( () => {
+		beforeEach(() => {
 			containerAssertive.remove();
 			containerPolite.remove();
 		});
 
-		afterEach( () => {
+		afterEach(() => {
 			setup();
 			containerPolite = document.getElementById( 'a11y-speak-polite' );
 			containerAssertive = document.getElementById( 'a11y-speak-assertive' );
