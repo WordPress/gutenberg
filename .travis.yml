@@ -65,7 +65,7 @@ script:
       fi
       echo Running with the following versions:
       php -v
-      phpunit -v
+      phpunit --version
       # Check parser syntax
       php lib/parser.php || exit 1
       # Run PHPUnit tests
