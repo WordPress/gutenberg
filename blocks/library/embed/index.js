@@ -10,7 +10,6 @@ import { includes } from 'lodash';
 import { __, sprintf } from 'i18n';
 import { Component } from 'element';
 import { Button, Placeholder, Spinner, SandBox } from 'components';
-import { addQueryArgs } from 'editor/utils/url';
 
 /**
  * Internal dependencies
@@ -85,10 +84,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 					event.preventDefault();
 				}
 				const { url } = this.props.attributes;
-				const apiURL = addQueryArgs( wpApiSettings.root + 'oembed/1.0/proxy', {
-					url: url,
-					_wpnonce: wpApiSettings.nonce,
-				} );
+				const apiURL = wpApiSettings.root + 'oembed/1.0/proxy?url=' + encodeURIComponent( url ) + '&_wpnonce=' + wpApiSettings.nonce;
 
 				this.setState( { error: false, fetching: true } );
 				window.fetch( apiURL, {
@@ -221,6 +217,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Embed',
 		icon: 'video-alt3',
+		category: 'embed-common',
 	} )
 );
 registerBlockType(
@@ -228,6 +225,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Animoto',
 		icon: 'video-alt3',
+		category: 'embed-video',
 	} )
 );
 registerBlockType(
@@ -235,6 +233,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Cloudup',
 		icon: 'cloud',
+		category: 'embed-image',
 	} )
 );
 registerBlockType(
@@ -242,6 +241,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'CollegeHumor',
 		icon: 'video-alt3',
+		category: 'embed-video',
 	} )
 );
 registerBlockType(
@@ -249,6 +249,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Dailymotion',
 		icon: 'video-alt3',
+		category: 'embed-video',
 	} )
 );
 registerBlockType(
@@ -256,6 +257,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Facebook',
 		icon: 'facebook',
+		category: 'embed-common',
 	} )
 );
 registerBlockType(
@@ -263,6 +265,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Flickr',
 		icon: 'format-image',
+		category: 'embed-image',
 	} )
 );
 registerBlockType(
@@ -270,12 +273,14 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Funny or Die',
 		icon: 'video-alt3',
+		category: 'embed-video',
 	} ) );
 registerBlockType(
 	'core-embed/hulu',
 	getEmbedBlockSettings( {
 		title: 'Hulu',
 		icon: 'video-alt3',
+		category: 'embed-video',
 	} )
 );
 registerBlockType(
@@ -283,6 +288,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Imgur',
 		icon: 'format-image',
+		category: 'embed-image',
 	} )
 );
 registerBlockType(
@@ -290,6 +296,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Instagram',
 		icon: 'camera',
+		category: 'embed-common',
 	} )
 );
 registerBlockType(
@@ -297,6 +304,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Issuu',
 		icon: 'media-default',
+		category: 'embed-docs',
 	} )
 );
 registerBlockType(
@@ -304,6 +312,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Kickstarter',
 		icon: 'lightbulb',
+		category: 'embed-social',
 	} )
 );
 registerBlockType(
@@ -311,6 +320,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Meetup.com',
 		icon: 'location-alt',
+		category: 'embed-social',
 	} )
 );
 registerBlockType(
@@ -318,6 +328,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Mixcloud',
 		icon: 'format-audio',
+		category: 'embed-audio',
 	} )
 );
 registerBlockType(
@@ -325,6 +336,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Photobucket',
 		icon: 'camera',
+		category: 'embed-image',
 	} )
 );
 registerBlockType(
@@ -332,6 +344,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Polldaddy',
 		icon: 'yes',
+		category: 'embed-social',
 	} )
 );
 registerBlockType(
@@ -339,6 +352,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Reddit',
 		icon: 'share',
+		category: 'embed-social',
 	} )
 );
 registerBlockType(
@@ -346,6 +360,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'ReverbNation',
 		icon: 'format-audio',
+		category: 'embed-audio',
 	} )
 );
 registerBlockType(
@@ -353,6 +368,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Screencast',
 		icon: 'video-alt3',
+		category: 'embed-video',
 	} )
 );
 registerBlockType(
@@ -360,6 +376,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Scribd',
 		icon: 'book-alt',
+		category: 'embed-docs',
 	} )
 );
 registerBlockType(
@@ -367,6 +384,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Slideshare',
 		icon: 'slides',
+		category: 'embed-docs',
 	} )
 );
 registerBlockType(
@@ -374,6 +392,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'SmugMug',
 		icon: 'camera',
+		category: 'embed-image',
 	} )
 );
 registerBlockType(
@@ -381,6 +400,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'SoundCloud',
 		icon: 'format-audio',
+		category: 'embed-common',
 	} )
 );
 registerBlockType(
@@ -388,6 +408,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Speaker',
 		icon: 'format-audio',
+		category: 'embed-audio',
 	} )
 );
 registerBlockType(
@@ -395,6 +416,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Spotify',
 		icon: 'format-audio',
+		category: 'embed-audio',
 	} )
 );
 registerBlockType(
@@ -402,6 +424,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'TED',
 		icon: 'video-alt3',
+		category: 'embed-video',
 	} )
 );
 registerBlockType(
@@ -409,6 +432,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Tumblr',
 		icon: 'share',
+		category: 'embed-common',
 	} )
 );
 registerBlockType(
@@ -416,6 +440,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Twitter',
 		icon: 'twitter',
+		category: 'embed-social',
 	} )
 );
 registerBlockType(
@@ -423,6 +448,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'VideoPress',
 		icon: 'video-alt3',
+		category: 'embed-video',
 	} )
 );
 registerBlockType(
@@ -430,6 +456,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Vimeo',
 		icon: 'video-alt3',
+		category: 'embed-video',
 	} )
 );
 registerBlockType(
@@ -437,6 +464,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Vine',
 		icon: 'video-alt3',
+		category: 'embed-social',
 	} )
 );
 registerBlockType(
@@ -444,6 +472,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'WordPress',
 		icon: 'wordpress',
+		category: 'embed-common',
 	} )
 );
 registerBlockType(
@@ -451,6 +480,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'WordPress.tv',
 		icon: 'video-alt3',
+		category: 'embed-video',
 	} )
 );
 registerBlockType(
@@ -458,5 +488,6 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'YouTube',
 		icon: 'video-alt3',
+		category: 'embed-common',
 	} )
 );

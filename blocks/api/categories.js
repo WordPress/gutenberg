@@ -16,7 +16,12 @@ const categories = [
 	{ slug: 'formatting', title: __( 'Formatting' ) },
 	{ slug: 'layout', title: __( 'Layout Blocks' ) },
 	{ slug: 'widgets', title: __( 'Widgets' ) },
-	{ slug: 'embed', title: __( 'Embed' ) },
+	{ slug: 'embed-common', title: __( 'Common' ) },
+	{ slug: 'embed-audio', title: __( 'Audio' ) },
+	{ slug: 'embed-video', title: __( 'Video' ) },
+	{ slug: 'embed-social', title: __( 'Social Media' ) },
+	{ slug: 'embed-image', title: __( 'Images' ) },
+	{ slug: 'embed-docs', title: __( 'Blogs and Documents' ) },
 ];
 
 /**

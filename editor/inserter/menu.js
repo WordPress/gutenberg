@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flow, groupBy, sortBy, findIndex, filter, debounce, find, some } from 'lodash';
+import { flow, groupBy, sortBy, findIndex, filter, debounce, find, some, startsWith } from 'lodash';
 import { connect } from 'react-redux';
 
 /**
@@ -109,9 +109,9 @@ export class InserterMenu extends Component {
 			case 'recent':
 				return this.props.recentlyUsedBlocks;
 			case 'blocks':
-				return filter( getBlockTypes(), ( block ) => block.category !== 'embed' );
+				return filter( getBlockTypes(), ( block ) => ! startsWith( block.category, 'embed' ) );
 			case 'embeds':
-				return filter( getBlockTypes(), ( block ) => block.category === 'embed' );
+				return filter( getBlockTypes(), ( block ) => startsWith( block.category, 'embed' ) );
 		}
 	}
 
@@ -342,7 +342,7 @@ export class InserterMenu extends Component {
 							</div>
 						</div>
 					}
-					{ this.state.tab === 'blocks' && ! isSearching &&
+					{ ! isSearching && this.state.tab !== 'recent' &&
 						getCategories()
 							.map( ( category ) => !! visibleBlocksByCategory[ category.slug ] && (
 								<div key={ category.slug }>
@@ -361,20 +361,6 @@ export class InserterMenu extends Component {
 									>
 										{ visibleBlocksByCategory[ category.slug ].map( ( block ) => this.getBlockItem( block ) ) }
 									</div>
-								</div>
-							) )
-					}
-					{ this.state.tab === 'embeds' && ! isSearching &&
-						getCategories()
-							.map( ( category ) => !! visibleBlocksByCategory[ category.slug ] && (
-								<div
-									className="editor-inserter__category-blocks"
-									role="menu"
-									tabIndex="0"
-									aria-labelledby={ `editor-inserter__separator-${ category.slug }-${ instanceId }` }
-									key={ category.slug }
-								>
-									{ visibleBlocksByCategory[ category.slug ].map( ( block ) => this.getBlockItem( block ) ) }
 								</div>
 							) )
 					}
