@@ -109,9 +109,7 @@ export class InserterMenu extends Component {
 			case 'recent':
 				return this.props.recentlyUsedBlocks;
 			case 'blocks':
-				return filter( getBlockTypes(), ( block ) => block.category !== 'embed' );
-			case 'embeds':
-				return filter( getBlockTypes(), ( block ) => block.category === 'embed' );
+				return getBlockTypes();
 		}
 	}
 
@@ -414,12 +412,6 @@ export class InserterMenu extends Component {
 							onClick={ () => this.switchTab( 'blocks' ) }
 						>
 							{ __( 'Blocks' ) }
-						</button>
-						<button
-							className={ `editor-inserter__tab ${ this.state.tab === 'embeds' ? 'is-active' : '' }` }
-							onClick={ () => this.switchTab( 'embeds' ) }
-						>
-							{ __( 'Embeds' ) }
 						</button>
 					</div>
 				}

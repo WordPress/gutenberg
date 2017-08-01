@@ -16,7 +16,7 @@ const categories = [
 	{ slug: 'formatting', title: __( 'Formatting' ) },
 	{ slug: 'layout', title: __( 'Layout Blocks' ) },
 	{ slug: 'widgets', title: __( 'Widgets' ) },
-	{ slug: 'embed', title: __( 'Embed' ) },
+	{ slug: 'embed', title: __( 'Embed From Other Sites' ) },
 ];
 
 /**
