@@ -10,7 +10,6 @@
   ],
   "main": "build/index.js",
   "module": "build-module/index.js",
-  "browser": "build-browser/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/WordPress/packages.git"
