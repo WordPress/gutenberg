@@ -18,6 +18,6 @@
     "url": "https://github.com/WordPress/packages/issues"
   },
 	"dependencies": {
-		"@wordpress/dom-ready": "^0.1.0"
+		"@wordpress/dom-ready": "^0.1.0-dev"
 	}
 }
