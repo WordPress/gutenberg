@@ -303,20 +303,25 @@ export default class Editable extends Component {
 		const afterRange = dom.createRng();
 		const selectionRange = this.editor.selection.getRng();
 
-		beforeRange.setStart( rootNode, 0 );
-		beforeRange.setEnd( selectionRange.startContainer, selectionRange.startOffset );
+		if ( rootNode.childNodes.length ) {
+			beforeRange.setStart( rootNode, 0 );
+			beforeRange.setEnd( selectionRange.startContainer, selectionRange.startOffset );
 
-		afterRange.setStart( selectionRange.endContainer, selectionRange.endOffset );
-		afterRange.setEnd( rootNode, dom.nodeIndex( rootNode.lastChild ) + 1 );
+			afterRange.setStart( selectionRange.endContainer, selectionRange.endOffset );
+			afterRange.setEnd( rootNode, dom.nodeIndex( rootNode.lastChild ) + 1 );
 
-		const beforeFragment = beforeRange.extractContents();
-		const afterFragment = afterRange.extractContents();
+			const beforeFragment = beforeRange.extractContents();
+			const afterFragment = afterRange.extractContents();
 
-		const beforeElement = nodeListToReact( beforeFragment.childNodes, createTinyMCEElement );
-		const afterElement = nodeListToReact( afterFragment.childNodes, createTinyMCEElement );
+			const beforeElement = nodeListToReact( beforeFragment.childNodes, createTinyMCEElement );
+			const afterElement = nodeListToReact( afterFragment.childNodes, createTinyMCEElement );
 
-		this.setContent( beforeElement );
-		this.props.onSplit( beforeElement, afterElement, ...blocks );
+			this.setContent( beforeElement );
+			this.props.onSplit( beforeElement, afterElement, ...blocks );
+		} else {
+			this.setContent( [] );
+			this.props.onSplit( [], [], ...blocks );
+		}
 	}
 
 	onNewBlock() {
