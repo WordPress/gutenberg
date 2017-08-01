@@ -63,7 +63,9 @@ class UrlInput extends Component {
 		this.suggestionsRequest = new wp.api.collections.Posts().fetch( { data: {
 			search: value,
 			per_page: 20,
+			orderby: 'relevance',
 		} } );
+
 		this.suggestionsRequest
 			.then(
 				( posts ) => {
