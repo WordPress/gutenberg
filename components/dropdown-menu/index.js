@@ -17,7 +17,7 @@ import { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } from 'utils/keycodes';
  */
 import './style.scss';
 
-class DropdownMenu extends Component {
+export class DropdownMenu extends Component {
 	constructor() {
 		super( ...arguments );
 
