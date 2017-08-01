@@ -234,5 +234,6 @@ export function removeNotice( id ) {
 }
 
 export const createSuccessNotice = partial( createNotice, 'success' );
+export const createInfoNotice = partial( createNotice, 'info' );
 export const createErrorNotice = partial( createNotice, 'error' );
 export const createWarningNotice = partial( createNotice, 'warning' );
