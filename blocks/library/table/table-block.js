@@ -3,9 +3,28 @@ import BlockControls from '../../block-controls';
 import { Toolbar, DropdownMenu } from 'components';
 import { __ } from 'i18n';
 
+function isTableSelected( editor ) {
+	return editor.dom.getParent(
+		editor.selection.getStart( true ),
+		'table'
+	);
+}
+
+function selectFirstCell( editor ) {
+	const cell = editor.getBody().querySelector( 'td,th' );
+	if ( cell ) {
+		cell.focus();
+		editor.selection.select( cell, true );
+		editor.selection.collapse( false );
+	}
+}
+
 function execCommand( command ) {
 	return ( editor ) => {
 		if ( editor ) {
+			if ( ! isTableSelected( editor ) ) {
+				selectFirstCell( editor );
+			}
 			editor.execCommand( command );
 		}
 	};
@@ -56,11 +75,8 @@ export default class TableBlock extends wp.element.Component {
 	handleSetup( editor, focus ) {
 		// select the end of the first table cell
 		editor.on( 'init', () => {
-			const cell = editor.getBody().querySelector( 'td,th' );
-			if ( cell && focus ) {
-				cell.focus();
-				editor.selection.select( cell, true );
-				editor.selection.collapse( false );
+			if ( focus ) {
+				selectFirstCell( editor );
 			}
 		} );
 		this.setState( { editor } );
