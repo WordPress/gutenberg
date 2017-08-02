@@ -41,7 +41,9 @@ registerBlockType( 'core/quote', {
 				blocks: [ 'core/paragraph' ],
 				transform: ( { content } ) => {
 					return createBlock( 'core/quote', {
-						value: content,
+						value: [
+							<p key="1">{ content }</p>,
+						],
 					} );
 				},
 			},
@@ -50,7 +52,9 @@ registerBlockType( 'core/quote', {
 				blocks: [ 'core/heading' ],
 				transform: ( { content } ) => {
 					return createBlock( 'core/quote', {
-						value: content,
+						value: [
+							<p key="1">{ content }</p>,
+						],
 					} );
 				},
 			},
@@ -59,7 +63,9 @@ registerBlockType( 'core/quote', {
 				regExp: /^>\s/,
 				transform: ( { content } ) => {
 					return createBlock( 'core/quote', {
-						value: content,
+						value: [
+							<p key="1">{ content }</p>,
+						],
 					} );
 				},
 			},
@@ -185,15 +191,11 @@ registerBlockType( 'core/quote', {
 		const { align, value, citation, style = 1 } = attributes;
 
 		return (
-			<blockquote className={ `blocks-quote-style-${ style }` }>
-				{ value && value.map( ( paragraph, i ) => (
-					<p
-						key={ i }
-						style={ { textAlign: align ? align : null } }
-					>
-						{ isString( paragraph ) ? paragraph : paragraph.props.children }
-					</p>
-				) ) }
+			<blockquote
+				className={ `blocks-quote-style-${ style }` }
+				style={ { textAlign: align ? align : null } }
+			>
+				{ value.map( ( paragraph, i ) => <p key={ i }>{ paragraph.props.children }</p> ) }
 				{ citation && citation.length > 0 && (
 					<footer>{ citation }</footer>
 				) }

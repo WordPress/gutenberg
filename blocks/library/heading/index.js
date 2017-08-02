@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isObject } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -46,28 +41,7 @@ registerBlockType( 'core/heading', {
 			{
 				type: 'block',
 				blocks: [ 'core/paragraph' ],
-				transform: ( { content, ...attrs } ) => {
-					const isMultiParagraph = Array.isArray( content ) && isObject( content[ 0 ] ) && content[ 0 ].type === 'p';
-					if ( isMultiParagraph ) {
-						const headingContent = isObject( content[ 0 ] ) && content[ 0 ].type === 'p'
-							? content[ 0 ].props.children
-							: content[ 0 ];
-						const heading = createBlock( 'core/heading', {
-							content: headingContent,
-						} );
-						const blocks = [ heading ];
-
-						const remainingContent = content.slice( 1 );
-						if ( remainingContent.length ) {
-							const text = createBlock( 'core/paragraph', {
-								...attrs,
-								content: remainingContent,
-							} );
-							blocks.push( text );
-						}
-
-						return blocks;
-					}
+				transform: ( { content } ) => {
 					return createBlock( 'core/heading', {
 						content,
 					} );
