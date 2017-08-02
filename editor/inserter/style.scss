@@ -71,6 +71,18 @@ input[type="search"].editor-inserter__search {
 	padding: 8px;
 }
 
+.editor-inserter__menu.components-popover.is-center .components-popover__content {
+	@media ( max-width: #{ $break-medium - 1 } ) {
+		border-width: 0;
+		position: fixed;
+		left: 0;
+		right: 0;
+		top: $admin-bar-height-big + $header-height;
+		transform: none;
+		width: 100vw;
+	}
+}
+
 .editor-inserter__menu.is-bottom:after {
 	border-bottom-color: $white;
 }

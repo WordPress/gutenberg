@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { createElement, Component, cloneElement, Children } from 'react';
-import { render, findDOMNode } from 'react-dom';
+import { render, findDOMNode, unstable_createPortal } from 'react-dom'; // eslint-disable-line camelcase
 import { renderToStaticMarkup } from 'react-dom/server';
 import { isString } from 'lodash';
 
@@ -50,6 +50,16 @@ export { cloneElement };
 export { findDOMNode };
 
 export { Children };
+
+/**
+ * Creates a portal into which a component can be rendered.
+ *
+ * @see https://github.com/facebook/react/issues/10309#issuecomment-318433235
+ *
+ * @param {Component} component Component
+ * @param {Element}   target    DOM node into which element should be rendered
+ */
+export { unstable_createPortal as createPortal }; // eslint-disable-line camelcase
 
 /**
  * Renders a given element into a string
