@@ -36,8 +36,6 @@ class SelectAllDetection extends Component {
 }
 ```
 
-__Note:__ The value of each shortcut should be a consistent function reference, not an anonymous function. Otherwise, the callback will not be correctly unbound when the component unmounts.
-
 __Note:__ The callback will not be invoked if the key combination occurs in an editable field.
 
 ## Props

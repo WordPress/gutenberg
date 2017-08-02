@@ -20,7 +20,11 @@ class KeyboardShortcuts extends Component {
 
 	toggleBindings( isActive ) {
 		forEach( this.props.shortcuts, ( callback, key ) => {
-			Mousetrap[ isActive ? 'bind' : 'unbind' ]( key, callback );
+			if ( isActive ) {
+				Mousetrap.bind( key, callback );
+				return;
+			}
+			Mousetrap.unbind( key );
 		} );
 	}
 
