@@ -2,10 +2,8 @@
     {
         "blockName": "core/latest-comments",
         "attrs": {
-            "commentsToShow": 5,
-            "displayAvatar": true,
-            "displayExcerpt": true,
-            "displayTimestamp": true
+            "commentsToShow": 6,
+            "displayExcerpt": false
         },
         "rawContent": ""
     },
