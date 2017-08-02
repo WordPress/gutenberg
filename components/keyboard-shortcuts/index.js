@@ -11,17 +11,14 @@ import { Component } from 'element';
 
 class KeyboardShortcuts extends Component {
 	componentWillMount() {
-		this.toggleBindings( true );
+		this.mousetrap = new Mousetrap;
+		forEach( this.props.shortcuts, ( callback, key ) => {
+			this.mousetrap.bind( key, callback );
+		} );
 	}
 
 	componentWillUnmount() {
-		this.toggleBindings( false );
-	}
-
-	toggleBindings( isActive ) {
-		forEach( this.props.shortcuts, ( callback, key ) => {
-			Mousetrap[ isActive ? 'bind' : 'unbind' ]( key, callback );
-		} );
+		this.mousetrap.reset();
 	}
 
 	render() {
