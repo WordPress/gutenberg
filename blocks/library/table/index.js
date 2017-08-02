@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 import './style.scss';
-import './block.scss';
 import { registerBlockType, query as hpq } from '../../api';
 import TableBlock from './table-block';
 import BlockControls from '../../block-controls';
