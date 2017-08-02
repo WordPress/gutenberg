@@ -196,6 +196,26 @@ describe( 'InserterMenu', () => {
 		expect( visibleBlocks.at( 1 ).childAt( 1 ).text() ).toBe( 'Advanced Text' );
 		expect( visibleBlocks.at( 2 ).childAt( 1 ).text() ).toBe( 'A Text Embed' );
 	} );
+
+	it( 'should trim whitespace of search terms', () => {
+		const wrapper = shallow(
+			<InserterMenu
+				instanceId={ 1 }
+				blocks={ [] }
+				recentlyUsedBlocks={ [] }
+			/>
+		);
+		wrapper.setState( { filterValue: ' text' } );
+
+		const tabs = wrapper.find( '.editor-inserter__tab' );
+		expect( tabs.length ).toBe( 0 );
+
+		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
+		expect( visibleBlocks.length ).toBe( 3 );
+		expect( visibleBlocks.at( 0 ).childAt( 1 ).text() ).toBe( 'Text' );
+		expect( visibleBlocks.at( 1 ).childAt( 1 ).text() ).toBe( 'Advanced Text' );
+		expect( visibleBlocks.at( 2 ).childAt( 1 ).text() ).toBe( 'A Text Embed' );
+	} );
 } );
 
 describe( 'searchBlocks', () => {
