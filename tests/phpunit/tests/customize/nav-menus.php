@@ -861,19 +861,27 @@ class Test_WP_Customize_Nav_Menus extends WP_UnitTestCase {
 	/**
 	 * Test the filter_wp_nav_menu method.
 	 *
-	 * @see WP_Customize_Nav_Menus::filter_wp_nav_menu()
+	 * @covers WP_Customize_Nav_Menus::filter_wp_nav_menu()
+	 * @covers WP_Customize_Nav_Menus::filter_wp_nav_menu_args()
 	 */
 	function test_filter_wp_nav_menu() {
 		do_action( 'customize_register', $this->wp_customize );
 		$menus = new WP_Customize_Nav_Menus( $this->wp_customize );
 
-		$args = $menus->filter_wp_nav_menu_args( array(
+		$original_args = array(
 			'echo'        => true,
 			'menu'        => wp_create_nav_menu( 'Foo' ),
 			'fallback_cb' => 'wp_page_menu',
 			'walker'      => '',
 			'items_wrap'  => '<ul id="%1$s" class="%2$s">%3$s</ul>',
-		) );
+		);
+
+		// Add global namespace prefix to check #41488.
+		if ( version_compare( PHP_VERSION, '5.3', '>=' ) ) {
+			$original_args['fallback_cb'] = '\\' . $original_args['fallback_cb'];
+		}
+
+		$args = $menus->filter_wp_nav_menu_args( $original_args );
 
 		ob_start();
 		wp_nav_menu( $args );
@@ -883,7 +891,10 @@ class Test_WP_Customize_Nav_Menus extends WP_UnitTestCase {
 
 		$this->assertContains( sprintf( ' data-customize-partial-id="nav_menu_instance[%s]"', $args['customize_preview_nav_menus_args']['args_hmac'] ), $result );
 		$this->assertContains( ' data-customize-partial-type="nav_menu_instance"', $result );
-		$this->assertContains( ' data-customize-partial-placement-context="', $result );
+		$this->assertTrue( (bool) preg_match( '/data-customize-partial-placement-context="(.+?)"/', $result, $matches ) );
+		$context = json_decode( html_entity_decode( $matches[1] ), true );
+		$this->assertEquals( $original_args, wp_array_slice_assoc( $context, array_keys( $original_args ) ) ); // Because assertArraySubset is not available in PHP 5.2.
+		$this->assertTrue( $context['can_partial_refresh'] );
 	}
 
 	/**
