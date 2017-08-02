@@ -106,16 +106,13 @@ class PostVisibility extends Component {
 		return (
 			<PanelRow className="editor-post-visibility">
 				<span>{ __( 'Visibility' ) }</span>
-				<span className="editor-post-visibility__button-wrapper">
-					<button
-						type="button"
-						aria-expanded={ this.state.opened }
-						className="editor-post-visibility__toggle button-link"
-						onClick={ this.toggleDialog }
-					>
-						{ getVisibilityLabel( visibility ) }
-					</button>
-
+				<button
+					type="button"
+					aria-expanded={ this.state.opened }
+					className="editor-post-visibility__toggle button-link"
+					onClick={ this.toggleDialog }
+				>
+					{ getVisibilityLabel( visibility ) }
 					{ this.state.opened &&
 						<Popover position="bottom left" className="editor-post-visibility__dialog">
 							<fieldset>
@@ -164,7 +161,7 @@ class PostVisibility extends Component {
 							}
 						</Popover>
 					}
-				</span>
+				</button>
 			</PanelRow>
 		);
 		/* eslint-enable jsx-a11y/label-has-for */
