@@ -138,8 +138,7 @@ input[type="search"].editor-inserter__search {
 	position: sticky;
 	top: 0;
 	background: rgba( 255, 255, 255, 0.9 );
-	border-bottom: 1px solid $light-gray-500;
-	border-top: 1px solid $light-gray-500;
+	box-shadow: inset 0 -1px 0 0 $light-gray-500, 0 -1px 0 0 $light-gray-500;
 }
 
 .editor-inserter__tabs {
