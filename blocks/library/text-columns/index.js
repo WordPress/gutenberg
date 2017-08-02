@@ -26,7 +26,7 @@ const { children, query } = hpq;
 registerBlockType( 'core/text-columns', {
 	title: __( 'Text Columns' ),
 
-	icon: 'format-aside',
+	icon: 'columns',
 
 	category: 'formatting',
 
