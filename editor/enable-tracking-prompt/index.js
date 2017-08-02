@@ -15,10 +15,10 @@ import { Button } from 'components';
 import './style.scss';
 import { removeNotice } from '../actions';
 
-function EnableTrackingPrompt( { dispatchRemoveNotice } ) {
+function EnableTrackingPrompt( props ) {
 	function dismissTrackingPrompt( result ) {
 		window.setUserSetting( 'gutenberg_tracking', result );
-		dispatchRemoveNotice( 'notice:enable-tracking-prompt' );
+		props.removeNotice( 'notice:enable-tracking-prompt' );
 	}
 
 	return (
@@ -51,6 +51,6 @@ function EnableTrackingPrompt( { dispatchRemoveNotice } ) {
 
 export default connect(
 	undefined,
-	{ dispatchRemoveNotice: removeNotice }
+	{ removeNotice }
 )( EnableTrackingPrompt );
 
