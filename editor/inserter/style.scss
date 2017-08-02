@@ -130,11 +130,16 @@ input[type="search"].editor-inserter__search {
 
 .editor-inserter__separator {
 	display: block;
-	margin: 0;
-	padding: 18px 14px 0 14px;
+	margin: -1px 0 0;
+	padding: 12px 14px;
 	font-size: $default-font-size;
 	font-weight: 600;
 	text-align: center;
+	position: sticky;
+	top: 0;
+	background: rgba( 255, 255, 255, 0.9 );
+	border-bottom: 1px solid $light-gray-500;
+	border-top: 1px solid $light-gray-500;
 }
 
 .editor-inserter__tabs {
