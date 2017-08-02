@@ -293,19 +293,18 @@ registerBlockType( 'core/list', {
 					placeholder={ __( 'Write list…' ) }
 					onSplit={ ( before, after, ...blocks ) => {
 						if ( ! blocks.length ) {
-							blocks = [
-								createBlock( 'core/text' ),
-							];
+							blocks.push( createBlock( 'core/text' ) );
+						}
+
+						if ( after.length ) {
+							blocks.push( createBlock( 'core/list', {
+								nodeName,
+								values: after,
+							} ) );
 						}
 
 						setAttributes( { values: before } );
-						insertBlocksAfter( [
-							...blocks,
-							createBlock( 'core/list', {
-								nodeName,
-								values: after,
-							} ),
-						] );
+						insertBlocksAfter( blocks );
 					} }
 				/>,
 			];
