@@ -3,17 +3,15 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
-import { Slot } from 'react-slot-fill';
 import { partial } from 'lodash';
-import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
 
 /**
  * WordPress dependencies
  */
-import { Children, Component } from '@wordpress/element';
-import { IconButton, Toolbar } from '@wordpress/components';
+import { Component } from '@wordpress/element';
+import { IconButton, Toolbar, Popover } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
-import { getBlockType, getBlockDefaultClassname, createBlock } from '@wordpress/blocks';
+import { getBlockType, getBlockDefaultClassname, createBlock, BlockControls } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -52,11 +50,6 @@ import {
 } from '../../selectors';
 
 const { BACKSPACE, ESCAPE, DELETE, UP, DOWN, LEFT, RIGHT, ENTER } = keycodes;
-
-function FirstChild( { children } ) {
-	const childrenArray = Children.toArray( children );
-	return childrenArray[ 0 ] || null;
-}
 
 class VisualEditorBlock extends Component {
 	constructor() {
@@ -149,9 +142,9 @@ class VisualEditorBlock extends Component {
 	}
 
 	maybeHover() {
-		const { isHovered, isSelected, isMultiSelected, onHover } = this.props;
+		const { isHovered, isMultiSelected, onHover } = this.props;
 
-		if ( isHovered || isSelected || isMultiSelected ) {
+		if ( isHovered || isMultiSelected ) {
 			return;
 		}
 
@@ -326,11 +319,37 @@ class VisualEditorBlock extends Component {
 	}
 
 	render() {
-		const { block, multiSelectedBlockUids } = this.props;
+		const {
+			block,
+			multiSelectedBlockUids,
+			isHovered,
+			isSelected,
+			isMultiSelected,
+			isFirstMultiSelected,
+			focus,
+			onMouseLeave,
+			onFocus,
+			onInsertBlocksAfter,
+			onReplace,
+		} = this.props;
+		const { error, showMobileControls } = this.state;
+
 		const { name: blockName, isValid } = block;
 		const blockType = getBlockType( blockName );
+		// Generate a class name for the block's editable form
+		let { className = getBlockDefaultClassname( block.name ) } = blockType;
+		className = classnames( className, block.attributes.className );
 		// translators: %s: Type of block (i.e. Text, Image etc)
 		const blockLabel = sprintf( __( 'Block: %s' ), blockType.title );
+		const showUI = isHovered && ! this.props.isTyping;
+		// Generate the wrapper class names handling the different states of the block.
+		const wrapperClassname = classnames( 'editor-visual-editor__block', {
+			'has-warning': ! isValid || !! error,
+			'has-visible-ui': showUI,
+			'is-selected': isSelected,
+			'is-multi-selected': isMultiSelected,
+		} );
+
 		// The block as rendered in the editor is composed of general block UI
 		// (mover, toolbar, wrapper) and the display of the block content, which
 		// is referred to as <BlockEdit />.
@@ -347,29 +366,11 @@ class VisualEditorBlock extends Component {
 			return null;
 		}
 
-		// Generate the wrapper class names handling the different states of the block.
-		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected, focus } = this.props;
-		const showUI = isSelected && ( ! this.props.isTyping || focus.collapsed === false );
-		const { error, showMobileControls } = this.state;
-		const wrapperClassname = classnames( 'editor-visual-editor__block', {
-			'has-warning': ! isValid || !! error,
-			'is-selected': showUI,
-			'is-multi-selected': isMultiSelected,
-			'is-hovered': isHovered,
-			'is-showing-mobile-controls': showMobileControls,
-		} );
-
-		const { onMouseLeave, onFocus, onInsertBlocksAfter, onReplace } = this.props;
-
 		// Determine whether the block has props to apply to the wrapper.
 		let wrapperProps;
 		if ( blockType.getEditWrapperProps ) {
 			wrapperProps = blockType.getEditWrapperProps( block.attributes );
 		}
-
-		// Generate a class name for the block's editable form
-		let { className = getBlockDefaultClassname( block.name ) } = blockType;
-		className = classnames( className, block.attributes.className );
 
 		// Disable reason: Each block can be selected by clicking on it
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
@@ -379,7 +380,6 @@ class VisualEditorBlock extends Component {
 				onKeyDown={ this.onKeyDown }
 				onKeyUp={ this.onKeyUp }
 				onFocus={ this.onFocus }
-				onMouseMove={ this.maybeHover }
 				onMouseEnter={ this.maybeHover }
 				onMouseLeave={ onMouseLeave }
 				className={ wrapperClassname }
@@ -388,36 +388,26 @@ class VisualEditorBlock extends Component {
 				aria-label={ blockLabel }
 				{ ...wrapperProps }
 			>
-				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
-				{ ( showUI || isHovered ) && <BlockRightMenu uid={ block.uid } /> }
-				{ showUI && isValid &&
-					<CSSTransitionGroup
-						transitionName={ { appear: 'is-appearing', appearActive: 'is-appearing-active' } }
-						transitionAppear={ true }
-						transitionAppearTimeout={ 100 }
-						transitionEnter={ false }
-						transitionLeave={ false }
-						component={ FirstChild }
-					>
-						<div className="editor-visual-editor__block-controls">
-							<div className="editor-visual-editor__group">
-								<BlockSwitcher uid={ block.uid } />
-								<Slot name="Formatting.Toolbar" />
-								<Toolbar className="editor-visual-editor__mobile-tools">
-									{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
-									{ ( showUI || isHovered ) && <BlockRightMenu uid={ block.uid } /> }
-									<IconButton
-										className="editor-visual-editor__mobile-toggle"
-										onClick={ this.toggleMobileControls }
-										aria-expanded={ showMobileControls }
-										label={ __( 'Toggle extra controls' ) }
-										icon="ellipsis"
-									/>
-								</Toolbar>
-							</div>
-						</div>
-					</CSSTransitionGroup>
-				}
+				{ showUI && <BlockMover uids={ [ block.uid ] } /> }
+				{ showUI && <BlockRightMenu uid={ block.uid } /> }
+				{ isSelected && (
+					<BlockControls>
+						<Toolbar className="editor-visual-editor__mobile-menu">
+							<IconButton
+								className="editor-visual-editor__mobile-toggle"
+								onClick={ this.toggleMobileControls }
+								aria-expanded={ showMobileControls }
+								label={ __( 'Toggle extra controls' ) }
+								icon="ellipsis"
+							/>
+							<Popover className="editor-visual-editor__mobile-tools" isOpen={ showMobileControls } position="bottom left">
+								<BlockMover uids={ [ block.uid ] } />
+								<BlockRightMenu uid={ block.uid } />
+							</Popover>
+						</Toolbar>
+						<BlockSwitcher uid={ block.uid } />
+					</BlockControls>
+				) }
 				{ isFirstMultiSelected && (
 					<BlockMover uids={ multiSelectedBlockUids } />
 				) }

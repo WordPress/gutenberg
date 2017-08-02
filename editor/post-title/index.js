@@ -12,6 +12,7 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
+import { BlockControls } from 'blocks';
 
 /**
  * Internal dependencies
@@ -91,9 +92,10 @@ class PostTitle extends Component {
 		const { isSelected } = this.state;
 		const className = classnames( 'editor-post-title', { 'is-selected': isSelected } );
 
+
 		return (
 			<div className={ className }>
-				{ isSelected && <PostPermalink /> }
+				{ isSelected && <BlockControls><PostPermalink /></BlockControls> }
 				<h1>
 					<Textarea
 						ref={ this.bindTextarea }

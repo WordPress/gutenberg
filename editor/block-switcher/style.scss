@@ -1,10 +1,9 @@
 .editor-block-switcher {
-	border: 1px solid $light-gray-500;
-	background-color: $white;
+	display: inline-block;
+	border-right: 1px solid $light-gray-500;
 	font-family: $default-font;
 	font-size: $default-font-size;
 	line-height: $default-line-height;
-	margin-right: -1px;
 }
 
 .editor-block-switcher__toggle {

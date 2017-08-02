@@ -584,15 +584,6 @@ describe( 'state', () => {
 			expect( state ).toBe( 'kumquat' );
 		} );
 
-		it( 'should return null when a block is selected', () => {
-			const state = hoveredBlock( 'kumquat', {
-				type: 'SELECT_BLOCK',
-				uid: 'kumquat',
-			} );
-
-			expect( state ).toBeNull();
-		} );
-
 		it( 'should replace the hovered block', () => {
 			const state = hoveredBlock( 'chicken', {
 				type: 'REPLACE_BLOCKS',

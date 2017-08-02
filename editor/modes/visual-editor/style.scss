@@ -1,7 +1,6 @@
 .editor-visual-editor {
 	position: relative;
 	margin: 0 auto;
-	padding: 50px 0;	// Floating up/down arrows invisible
 
 	&,
 	& p {
@@ -73,47 +72,13 @@
 		background-color: rgba( $white, 0.6 );
 	}
 
-	&.is-hovered:before {
+	&.is-selected:before {
+		outline: 1px solid $light-gray-200;
+	}
+
+	&.has-visible-ui:before {
 		outline: 1px solid $light-gray-500;
 		transition: 0.2s outline;
-	}
-
-	&.is-selected:before {
-		outline: 2px solid $light-gray-500;
-		transition: 0.2s outline;
-	}
-
-	&.is-showing-mobile-controls {
-		.editor-visual-editor__group > :not( .editor-visual-editor__mobile-tools ) {
-			display: none;
-		}
-		.editor-visual-editor__mobile-tools {
-			align-items: baseline;
-			display: flex;
-			width: 100%;
-
-			@include break-small {
-				display: none;
-			}
-
-			.editor-block-mover,
-			.editor-block-settings-menu {
-				display: block;
-				display: flex;
-				position: static;
-				.components-button {
-					margin: 0 5px;
-				}
-			}
-
-			.editor-block-settings-menu {
-				left: 80px;
-				right: auto;
-			}
-			.editor-visual-editor__mobile-toggle {
-				margin-left: auto;
-			}
-		}
 	}
 
 	&.is-multi-selected *::selection {
@@ -287,9 +252,39 @@
 	}
 }
 
+.editor-visual-editor__mobile-menu {
+	float: right;
+	@include break-small {
+		display: none;
+	}
+}
+
+.editor-visual-editor__mobile-tools {
+	align-items: baseline;
+	display: flex;
+	width: 100%;
+
+	.editor-block-mover,
+	.editor-block-settings-menu {
+		display: block;
+		display: flex;
+		position: static;
+		.components-button {
+			margin: 0 5px;
+		}
+	}
+
+	.editor-block-settings-menu {
+		left: 80px;
+		right: auto;
+	}
+	.editor-visual-editor__mobile-toggle {
+		margin-left: auto;
+	}
+}
+
 .editor-visual-editor__block-controls {
 	display: flex;
-	position: sticky;
 	z-index: z-index( '.editor-visual-editor__block-controls' );
 	margin-top: -$block-controls-height - $item-spacing;
 	margin-bottom: $item-spacing + 20px;	// 20px is the offset from the bottom of the selected block where it stops sticking
@@ -331,23 +326,6 @@
 
 	@include break-small() {
 		width: auto;
-	}
-}
-
-$sticky-bottom-offset: 20px;
-.editor-visual-editor__block-controls + div {
-	// prevent collapsing margins between block and toolbar, matches the 20px bottom offset
- 	margin-top: -$sticky-bottom-offset - 1px;
-	padding-top: 1px;
- }
-
-.editor-visual-editor__block-controls .components-toolbar {
-	margin-right: -1px;
-
-	&.editor-visual-editor__mobile-tools {
-		margin-left: auto;
-		margin-top: -1px;
-		margin-bottom: -1px;
 	}
 }
 
@@ -459,16 +437,6 @@ $sticky-bottom-offset: 20px;
 	}
 }
 
-.editor-visual-editor__mobile-tools {
-	@include break-small {
-		display: none;
-	}
-	.editor-block-mover,
-	.editor-block-settings-menu {
-		display: none;
-	}
-}
-
 .editor-visual-editor__block-warning {
 	z-index: z-index( '.editor-visual-editor__block-warning' );
 	position: absolute;
@@ -497,4 +465,68 @@ $sticky-bottom-offset: 20px;
 	.button + .button {
 		margin-left: $item-spacing;
 	}
+}
+
+.editor-visual-editor__block-toolbar {
+	z-index: z-index( '.editor-visual-editor__block-toolbar' );
+	background: $white;
+	border-bottom: 1px solid $light-gray-500;
+	top: $header-height;
+	left: 0;
+	right: 0;
+	position: sticky;
+
+	@include break-small() {
+		top: $admin-bar-height-big + $header-height;
+		position: fixed;
+	}
+
+	@include break-medium() {
+		top: $admin-bar-height + $header-height;
+	}
+}
+
+.sticky-menu .editor-visual-editor__block-toolbar {	/* Sticky is when on smaller breakpoints, nav menu is manually opened */
+	@include break-medium() {
+		left: $admin-sidebar-width;
+	}
+}
+
+.auto-fold .editor-visual-editor__block-toolbar {		/* Auto fold is when on smaller breakpoints, nav menu auto colllapses */
+	@include break-medium() {
+		left: $admin-sidebar-width-collapsed;
+	}
+
+	@include break-large() {
+		left: $admin-sidebar-width;
+	}
+}
+
+/* Sidebar manually collapsed */
+.folded .editor-visual-editor__block-toolbar {
+	left: $admin-sidebar-width-collapsed;
+}
+
+/* Mobile menu opened */
+.auto-fold .wp-responsive-open .editor-visual-editor__block-toolbar {
+	left: $admin-sidebar-width-big;
+	right: -$admin-sidebar-width-big;
+}
+
+/* RTL */
+.rtl.auto-fold .editor-visual-editor__block-toolbar {
+	@include break-medium() {
+		left: 0;
+		right: $admin-sidebar-width-collapsed;
+	}
+
+	@include break-large() {
+		left: 0;
+		right: $admin-sidebar-width;
+	}
+}
+
+.rtl.auto-fold .wp-responsive-open .editor-visual-editor__block-toolbar {
+	left: -$admin-sidebar-width-big;
+	right: $admin-sidebar-width-big;
 }

@@ -392,7 +392,6 @@ export function hoveredBlock( state = null, action ) {
 	switch ( action.type ) {
 		case 'TOGGLE_BLOCK_HOVERED':
 			return action.hovered ? action.uid : null;
-		case 'SELECT_BLOCK':
 		case 'START_TYPING':
 		case 'MULTI_SELECT':
 			return null;
