@@ -431,9 +431,15 @@ $sticky-bottom-offset: 20px;
 		font-family: $default-font;
 		font-size: $default-font-size;
 		box-shadow: none;
+		flex-direction: row;
 
 		&:active {
 			background: none;
+		}
+
+		.dashicon {
+			margin-bottom: 0;
+			margin-right: 8px;
 		}
 	}
 
