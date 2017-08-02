@@ -184,11 +184,22 @@ registerBlockType( 'core/latest-comments', {
 							maxSize = max( keys( comment.author_avatar_urls ) );
 						}
 
+						let author;
+						if ( comment.author && comment._embedded.author[ 0 ] ) {
+							author = <a className={ `${ this.props.className }__comment-author` } href={ comment._embedded.author[ 0 ].link } target="_blank" rel="noopener noreferrer">{ comment._embedded.author[ 0 ].name }</a>;
+						} else if ( comment.author_url ) {
+							author = <a className={ `${ this.props.className }__comment-author` } href={ comment.author_url } target="_blank" rel="noopener noreferrer">{ comment.author_name }</a>;
+						} else {
+							author = <a className={ `${ this.props.className }__comment-author` }>{ comment.author_name }</a>;
+						}
+
 						return <li key={ i }>
 							{ displayAvatar && maxSize &&
 								<img className={ `${ this.props.className }__comment-avatar` } alt={ comment.author_name } src={ comment.author_avatar_urls[ maxSize ] } />
 							}
-							<a href={ comment.link } target="_blank">{ comment._embedded.up[ 0 ].title.rendered.trim() || __( '(Untitled)' ) }</a>
+							{ author }
+							{ __( ' on ' ) }
+							<a className={ `${ this.props.className }__comment-link` } href={ comment.link } target="_blank" rel="noopener noreferrer">{ comment._embedded.up[ 0 ].title.rendered.trim() || __( '(Untitled)' ) }</a>
 							{ displayTimestamp && comment.date_gmt &&
 								<time dateTime={ moment( comment.date_gmt ).utc().format() } className={ `${ this.props.className }__comment-timestamp` }>
 									{ moment( comment.date_gmt ).local().format( 'MMM DD h:mm A' ) }

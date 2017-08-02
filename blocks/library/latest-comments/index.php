@@ -53,13 +53,26 @@ function gutenberg_render_block_core_latest_comments( $attributes ) {
 		foreach ( $comments as $comment ) {
 			$list_items_markup .= '<li class="recentcomments">';
 			if ( $attributes['displayAvatar'] ) {
-				$avatar = get_avatar( $comment, 48 );
+				$avatar = get_avatar( $comment, 48, '', '', array(
+					'class' => 'wp-block-latest-comments__comment-avatar',
+				) );
 				if ( $avatar ) {
 					$list_items_markup .= $avatar;
 				}
 			}
 
-			$list_items_markup .= '<a href="' . esc_url( get_comment_link( $comment ) ) . '">' . get_the_title( $comment->comment_post_ID ) . '</a>';
+			$author_url = get_comment_author_url( $comment );
+			if ( empty( $author_url ) && ! empty( $comment->user_id ) ) {
+				$author_url = get_author_posts_url( $comment->user_id );
+			}
+			if ( $author_url ) {
+				$list_items_markup .= '<a class="wp-block-latest-comments__comment-author" href="' . esc_url( $author_url ) . '">' . get_comment_author( $comment ) . '</a>';
+			} else {
+				$list_items_markup .= '<a class="wp-block-latest-comments__comment-author">' . get_comment_author( $comment ) . '</a>';
+			}
+
+			$list_items_markup .= __( ' on ', 'gutenberg' );
+			$list_items_markup .= '<a class="wp-block-latest-comments__comment-link" href="' . esc_url( get_comment_link( $comment ) ) . '">' . get_the_title( $comment->comment_post_ID ) . '</a>';
 
 			if ( $attributes['displayTimestamp'] ) {
 				$list_items_markup .= sprintf(
