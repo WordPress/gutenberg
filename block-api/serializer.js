@@ -13,7 +13,7 @@ import { Component, createElement, renderToString, cloneElement, Children } from
 /**
  * Internal dependencies
  */
-import { getBlockType } from './registration';
+import { getBlockType } from './config';
 
 /**
  * Returns the block's default classname from its name
@@ -131,9 +131,8 @@ export function getBeautifulContent( content ) {
 	} );
 }
 
-export function serializeBlock( block ) {
+export function serializeBlock( block, blockType ) {
 	const blockName = block.name;
-	const blockType = getBlockType( blockName );
 
 	let saveContent;
 	if ( block.isValid ) {
@@ -169,8 +168,11 @@ export function serializeBlock( block ) {
  * Takes a block or set of blocks and returns the serialized post content.
  *
  * @param  {Array}  blocks Block(s) to serialize
+ * @param  {Object} config Block Types config
  * @return {String}        The post content
  */
-export default function serialize( blocks ) {
-	return castArray( blocks ).map( serializeBlock ).join( '\n\n' );
+export default function serialize( blocks, config ) {
+	return castArray( blocks )
+		.map( ( block ) => serializeBlock( block, getBlockType( block.name, config ) ) )
+		.join( '\n\n' );
 }

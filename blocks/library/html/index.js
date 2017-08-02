@@ -8,12 +8,13 @@ import TextareaAutosize from 'react-autosize-textarea';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
+import { source } from '@wordpress/block-api';
 
 /**
  * Internal dependencies
  */
 import './editor.scss';
-import { registerBlockType, source } from '../../api';
+import { registerBlockType } from '../../api';
 import BlockControls from '../../block-controls';
 
 const { html } = source;

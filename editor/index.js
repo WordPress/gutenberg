@@ -11,7 +11,7 @@ import 'moment-timezone/moment-timezone-utils';
 /**
  * WordPress dependencies
  */
-import { EditableProvider } from '@wordpress/blocks';
+import { EditableProvider, getBlockTypes, getUnknownTypeHandlerName, getDefaultBlock, getCategories } from '@wordpress/blocks';
 import { createElement, render } from '@wordpress/element';
 import { PopoverProvider } from '@wordpress/components';
 import { settings as dateSettings } from '@wordpress/date';
@@ -71,9 +71,16 @@ export function createEditorInstance( id, post, settings ) {
 	settings = {
 		...DEFAULT_SETTINGS,
 		...settings,
+		blockTypes: getBlockTypes(),
+		fallbackBlockName: getUnknownTypeHandlerName(),
+		defaultBlockName: getDefaultBlock(),
+		categories: getCategories(),
 	};
 
-	store.dispatch( { type: 'SETUP_EDITOR' } );
+	store.dispatch( {
+		type: 'SETUP_EDITOR',
+		settings,
+	} );
 
 	store.dispatch( setInitialPost( post ) );
 

@@ -3,12 +3,13 @@
  */
 import { __ } from '@wordpress/i18n';
 import { concatChildren } from '@wordpress/element';
+import { source, createBlock } from '@wordpress/block-api';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, createBlock, source, setDefaultBlock } from '../../api';
+import { registerBlockType, setDefaultBlock } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
 import Editable from '../../editable';
@@ -18,7 +19,7 @@ import BlockDescription from '../../block-description';
 
 const { children } = source;
 
-registerBlockType( 'core/paragraph', {
+const textBlockType = registerBlockType( 'core/paragraph', {
 	title: __( 'Paragraph' ),
 
 	icon: 'editor-paragraph',
@@ -107,7 +108,7 @@ registerBlockType( 'core/paragraph', {
 					setAttributes( { content: before } );
 					insertBlocksAfter( [
 						...blocks,
-						createBlock( 'core/paragraph', { content: after } ),
+						createBlock( textBlockType, { content: after } ),
 					] );
 				} }
 				onMerge={ mergeBlocks }

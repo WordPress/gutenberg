@@ -894,6 +894,9 @@ describe( 'selectors', () => {
 					blockOrder: [],
 					edits: {},
 				},
+				editorSettings: {
+					blockTypes: [],
+				},
 				currentPost: {},
 			};
 
@@ -906,6 +909,9 @@ describe( 'selectors', () => {
 					blocksByUid: {},
 					blockOrder: [],
 					edits: {},
+				},
+				editorSettings: {
+					blockTypes: [],
 				},
 				currentPost: {
 					title: 'sassel',
@@ -921,6 +927,9 @@ describe( 'selectors', () => {
 					blocksByUid: {},
 					blockOrder: [],
 					edits: {},
+				},
+				editorSettings: {
+					blockTypes: [],
 				},
 				currentPost: {
 					excerpt: 'sassel',
@@ -944,6 +953,16 @@ describe( 'selectors', () => {
 					},
 					blockOrder: [ 123 ],
 					edits: {},
+				},
+				editorSettings: {
+					blockTypes: [ {
+						name: 'core/test-block',
+						attributes: {
+							text: {
+								type: 'string',
+							},
+						},
+					} ],
 				},
 				currentPost: {},
 			};

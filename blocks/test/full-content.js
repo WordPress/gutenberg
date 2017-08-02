@@ -9,12 +9,16 @@ import { format } from 'util';
 /**
  * Internal dependencies
  */
-import parse from '../api/parser';
-import { parse as grammarParse } from '../api/post.pegjs';
-import serialize from '../api/serializer';
+import { parse, serialize, grammarParse } from '@wordpress/block-api';
 import { getBlockTypes } from '../api/registration';
 
+// This import registers the blocks
+import '../library';
+
 const fixturesDir = path.join( __dirname, 'fixtures' );
+const settings = {
+	blockTypes: getBlockTypes(),
+};
 
 // We expect 4 different types of files for each fixture:
 //  - fixture.html            : original content
@@ -133,7 +137,7 @@ describe( 'full post content fixture', () => {
 				) );
 			}
 
-			const blocksActual = parse( content );
+			const blocksActual = parse( content, settings );
 			const blocksActualNormalized = normalizeParsedBlocks( blocksActual );
 			let blocksExpectedString = readFixtureFile( f + '.json' );
 
@@ -167,7 +171,7 @@ describe( 'full post content fixture', () => {
 
 			// `serialize` doesn't have a trailing newline, but the fixture
 			// files should.
-			const serializedActual = serialize( blocksActual ) + '\n';
+			const serializedActual = serialize( blocksActual, settings ) + '\n';
 			let serializedExpected = readFixtureFile( f + '.serialized.html' );
 
 			if ( ! serializedExpected ) {

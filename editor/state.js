@@ -8,11 +8,6 @@ import multi from 'redux-multi';
 import { reduce, keyBy, first, last, omit, without, flowRight, mapValues } from 'lodash';
 
 /**
- * WordPress dependencies
- */
-import { getBlockTypes } from '@wordpress/blocks';
-
-/**
  * Internal dependencies
  */
 import { combineUndoableReducers } from './utils/undoable-reducer';
@@ -251,7 +246,7 @@ export const userData = combineReducers( {
 				// This is where we initially populate the recently used blocks,
 				// for now this inserts blocks from the common category, but will
 				// load this from an API in the future.
-				return getBlockTypes()
+				return action.settings.blockTypes
 					.filter( ( blockType ) => 'common' === blockType.category )
 					.slice( 0, maxRecent )
 					.map( ( blockType ) => blockType.name );
@@ -512,6 +507,15 @@ export function notices( state = {}, action ) {
 	return state;
 }
 
+export function editorSettings( state = { blockTypes: [] }, action ) {
+	switch ( action.type ) {
+		case 'SETUP_EDITOR':
+			return action.settings;
+	}
+
+	return state;
+}
+
 /**
  * Creates a new instance of a Redux store.
  *
@@ -531,6 +535,7 @@ export function createReduxStore() {
 		saving,
 		notices,
 		userData,
+		editorSettings,
 	} ) );
 
 	const enhancers = [ applyMiddleware( multi, refx( effects ) ) ];

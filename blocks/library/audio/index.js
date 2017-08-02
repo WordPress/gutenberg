@@ -7,12 +7,13 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Placeholder } from '@wordpress/components';
+import { source } from '@wordpress/block-api';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, source } from '../../api';
+import { registerBlockType } from '../../api';
 import MediaUploadButton from '../../media-upload-button';
 
 const { attr } = source;

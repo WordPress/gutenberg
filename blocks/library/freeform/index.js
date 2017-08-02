@@ -2,12 +2,13 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { source } from '@wordpress/block-api';
 
 /**
  * Internal dependencies
  */
 import './editor.scss';
-import { registerBlockType, source, setUnknownTypeHandlerName } from '../../api';
+import { registerBlockType, setUnknownTypeHandlerName } from '../../api';
 import OldEditor from './old-editor';
 
 const { prop } = source;

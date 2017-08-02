@@ -8,17 +8,19 @@ import { isString, isObject } from 'lodash';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { Toolbar } from '@wordpress/components';
+import { source } from '@wordpress/block-api';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, createBlock, source } from '../../api';
+import { registerBlockType } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
 import Editable from '../../editable';
 
 const { children, node, query } = source;
+const createTransformationBlock = ( name, attributes ) => ( { name, attributes } );
 
 registerBlockType( 'core/quote', {
 	title: __( 'Quote' ),
@@ -50,7 +52,7 @@ registerBlockType( 'core/quote', {
 				type: 'block',
 				blocks: [ 'core/paragraph' ],
 				transform: ( { content } ) => {
-					return createBlock( 'core/quote', {
+					return createTransformationBlock( 'core/quote', {
 						value: [
 							<p key="1">{ content }</p>,
 						],
@@ -61,7 +63,7 @@ registerBlockType( 'core/quote', {
 				type: 'block',
 				blocks: [ 'core/heading' ],
 				transform: ( { content } ) => {
-					return createBlock( 'core/quote', {
+					return createTransformationBlock( 'core/quote', {
 						value: [
 							<p key="1">{ content }</p>,
 						],
@@ -72,7 +74,7 @@ registerBlockType( 'core/quote', {
 				type: 'pattern',
 				regExp: /^>\s/,
 				transform: ( { content } ) => {
-					return createBlock( 'core/quote', {
+					return createTransformationBlock( 'core/quote', {
 						value: [
 							<p key="1">{ content }</p>,
 						],
@@ -87,16 +89,16 @@ registerBlockType( 'core/quote', {
 				transform: ( { value, citation, ...attrs } ) => {
 					const textElement = value[ 0 ];
 					if ( ! textElement ) {
-						return createBlock( 'core/paragraph', {
+						return createTransformationBlock( 'core/paragraph', {
 							content: citation,
 						} );
 					}
 					const textContent = isString( textElement ) ? textElement : textElement.props.children;
 					if ( Array.isArray( value ) || citation ) {
-						const text = createBlock( 'core/paragraph', {
+						const text = createTransformationBlock( 'core/paragraph', {
 							content: textContent,
 						} );
-						const quote = createBlock( 'core/quote', {
+						const quote = createTransformationBlock( 'core/quote', {
 							...attrs,
 							citation,
 							value: Array.isArray( value ) ? value.slice( 1 ) : '',
@@ -104,7 +106,7 @@ registerBlockType( 'core/quote', {
 
 						return [ text, quote ];
 					}
-					return createBlock( 'core/paragraph', {
+					return createTransformationBlock( 'core/paragraph', {
 						content: textContent,
 					} );
 				},
@@ -119,10 +121,10 @@ registerBlockType( 'core/quote', {
 						? headingElement.props.children
 						: headingElement;
 					if ( isMultiParagraph || citation ) {
-						const heading = createBlock( 'core/heading', {
+						const heading = createTransformationBlock( 'core/heading', {
 							content: headingContent,
 						} );
-						const quote = createBlock( 'core/quote', {
+						const quote = createTransformationBlock( 'core/quote', {
 							...attrs,
 							citation,
 							value: Array.isArray( value ) ? value.slice( 1 ) : '',
@@ -130,7 +132,7 @@ registerBlockType( 'core/quote', {
 
 						return [ heading, quote ];
 					}
-					return createBlock( 'core/heading', {
+					return createTransformationBlock( 'core/heading', {
 						content: headingContent,
 					} );
 				},

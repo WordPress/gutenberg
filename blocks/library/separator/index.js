@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, createBlock } from '../../api';
+import { registerBlockType } from '../../api';
 
 registerBlockType( 'core/separator', {
 	title: __( 'Separator' ),
@@ -24,7 +24,7 @@ registerBlockType( 'core/separator', {
 				type: 'pattern',
 				trigger: 'enter',
 				regExp: /^-{3,}$/,
-				transform: () => createBlock( 'core/separator' ),
+				transform: () => ( { name: 'core/separator', attributes: {} } ),
 			},
 		],
 	},

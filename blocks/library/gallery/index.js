@@ -4,13 +4,14 @@
 import { __ } from '@wordpress/i18n';
 import { mediaUpload } from '@wordpress/utils';
 import { Dashicon, Toolbar, Placeholder, FormFileUpload } from '@wordpress/components';
+import { source } from '@wordpress/block-api';
 
 /**
  * Internal dependencies
  */
 import './editor.scss';
 import './style.scss';
-import { registerBlockType, source } from '../../api';
+import { registerBlockType } from '../../api';
 import MediaUploadButton from '../../media-upload-button';
 import InspectorControls from '../../inspector-controls';
 import RangeControl from '../../inspector-controls/range-control';

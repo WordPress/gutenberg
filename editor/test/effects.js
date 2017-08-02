@@ -4,11 +4,6 @@
 import { noop } from 'lodash';
 
 /**
- * WordPress dependencies
- */
-import { getBlockTypes, unregisterBlockType, registerBlockType, createBlock } from '@wordpress/blocks';
-
-/**
  * Internal dependencies
  */
 import {
@@ -26,21 +21,14 @@ import * as selectors from '../selectors';
 jest.mock( '../selectors' );
 
 describe( 'effects', () => {
-	const defaultBlockSettings = { save: () => 'Saved', category: 'common' };
+	const defaultBlockType = { name: 'core/test-block', save: () => 'Saved', category: 'common' };
 
 	beforeEach( () => jest.resetAllMocks() );
 
 	describe( '.MERGE_BLOCKS', () => {
 		const handler = effects.MERGE_BLOCKS;
 
-		afterEach( () => {
-			getBlockTypes().forEach( ( block ) => {
-				unregisterBlockType( block.name );
-			} );
-		} );
-
 		it( 'should only focus the blockA if the blockA has no merge function', () => {
-			registerBlockType( 'core/test-block', defaultBlockSettings );
 			const blockA = {
 				uid: 'chicken',
 				name: 'core/test-block',
@@ -49,15 +37,23 @@ describe( 'effects', () => {
 				uid: 'ribs',
 				name: 'core/test-block',
 			};
+			const state = {
+				editorSettings: {
+					blockTypes: [ defaultBlockType ],
+				},
+			};
 			const dispatch = jest.fn();
-			handler( mergeBlocks( blockA, blockB ), { dispatch } );
+			const getState = () => state;
+			selectors.getEditorSettings.mockReturnValue( state.editorSettings );
+			handler( mergeBlocks( blockA, blockB ), { dispatch, getState } );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( focusBlock( 'chicken' ) );
 		} );
 
 		it( 'should merge the blocks if blocks of the same type', () => {
-			registerBlockType( 'core/test-block', {
+			const testBlockType = {
+				name: 'core/test-block',
 				merge( attributes, attributesToMerge ) {
 					return {
 						content: attributes.content + ' ' + attributesToMerge.content,
@@ -65,7 +61,7 @@ describe( 'effects', () => {
 				},
 				save: noop,
 				category: 'common',
-			} );
+			};
 			const blockA = {
 				uid: 'chicken',
 				name: 'core/test-block',
@@ -77,7 +73,14 @@ describe( 'effects', () => {
 				attributes: { content: 'ribs' },
 			};
 			const dispatch = jest.fn();
-			handler( mergeBlocks( blockA, blockB ), { dispatch } );
+			const state = {
+				editorSettings: {
+					blockTypes: [ testBlockType ],
+				},
+			};
+			const getState = () => state;
+			selectors.getEditorSettings.mockReturnValue( state.editorSettings );
+			handler( mergeBlocks( blockA, blockB ), { dispatch, getState } );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 2 );
 			expect( dispatch ).toHaveBeenCalledWith( focusBlock( 'chicken', { offset: -1 } ) );
@@ -89,7 +92,8 @@ describe( 'effects', () => {
 		} );
 
 		it( 'should not merge the blocks have different types without transformation', () => {
-			registerBlockType( 'core/test-block', {
+			const testBlockType = {
+				name: 'core/test-block',
 				merge( attributes, attributesToMerge ) {
 					return {
 						content: attributes.content + ' ' + attributesToMerge.content,
@@ -97,8 +101,11 @@ describe( 'effects', () => {
 				},
 				save: noop,
 				category: 'common',
-			} );
-			registerBlockType( 'core/test-block-2', defaultBlockSettings );
+			};
+			const testBlockType2 = {
+				...defaultBlockType,
+				name: 'core/test-block-2',
+			};
 			const blockA = {
 				uid: 'chicken',
 				name: 'core/test-block',
@@ -110,13 +117,21 @@ describe( 'effects', () => {
 				attributes: { content: 'ribs' },
 			};
 			const dispatch = jest.fn();
-			handler( mergeBlocks( blockA, blockB ), { dispatch } );
+			const state = {
+				editorSettings: {
+					blockTypes: [ testBlockType, testBlockType2 ],
+				},
+			};
+			const getState = () => state;
+			selectors.getEditorSettings.mockReturnValue( state.editorSettings );
+			handler( mergeBlocks( blockA, blockB ), { dispatch, getState } );
 
 			expect( dispatch ).not.toHaveBeenCalled();
 		} );
 
 		it( 'should transform and merge the blocks', () => {
-			registerBlockType( 'core/test-block', {
+			const testBlockType = {
+				name: 'core/test-block',
 				attributes: {
 					content: {
 						type: 'string',
@@ -129,8 +144,9 @@ describe( 'effects', () => {
 				},
 				save: noop,
 				category: 'common',
-			} );
-			registerBlockType( 'core/test-block-2', {
+			};
+			const testBlockType2 = {
+				name: 'core/test-block-2',
 				attributes: {
 					content: {
 						type: 'string',
@@ -141,15 +157,18 @@ describe( 'effects', () => {
 						type: 'blocks',
 						blocks: [ 'core/test-block' ],
 						transform: ( { content2 } ) => {
-							return createBlock( 'core/test-block', {
-								content: content2,
-							} );
+							return {
+								name: 'core/test-block',
+								attributes: {
+									content: content2,
+								},
+							};
 						},
 					} ],
 				},
 				save: noop,
 				category: 'common',
-			} );
+			};
 			const blockA = {
 				uid: 'chicken',
 				name: 'core/test-block',
@@ -161,7 +180,14 @@ describe( 'effects', () => {
 				attributes: { content2: 'ribs' },
 			};
 			const dispatch = jest.fn();
-			handler( mergeBlocks( blockA, blockB ), { dispatch } );
+			const state = {
+				editorSettings: {
+					blockTypes: [ testBlockType, testBlockType2 ],
+				},
+			};
+			const getState = () => state;
+			selectors.getEditorSettings.mockReturnValue( state.editorSettings );
+			handler( mergeBlocks( blockA, blockB ), { dispatch, getState } );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 2 );
 			expect( dispatch ).toHaveBeenCalledWith( focusBlock( 'chicken', { offset: -1 } ) );
@@ -247,8 +273,14 @@ describe( 'effects', () => {
 
 	describe( '.SET_INITIAL_POST', () => {
 		const handler = effects.SET_INITIAL_POST;
+		const getState = () => ( {
+			editorSettings: {
+				blockTypes: [ defaultBlockType ],
+			},
+		} );
 
 		it( 'should return post reset action', () => {
+			selectors.getEditorSettings.mockReturnValue( getState().editorSettings );
 			const post = {
 				id: 1,
 				title: {
@@ -260,7 +292,7 @@ describe( 'effects', () => {
 				status: 'draft',
 			};
 
-			const result = handler( { post } );
+			const result = handler( { post }, { getState } );
 
 			expect( result ).toEqual( [
 				resetPost( post ),
@@ -268,7 +300,7 @@ describe( 'effects', () => {
 		} );
 
 		it( 'should return block reset with non-empty content', () => {
-			registerBlockType( 'core/test-block', defaultBlockSettings );
+			selectors.getEditorSettings.mockReturnValue( getState().editorSettings );
 			const post = {
 				id: 1,
 				title: {
@@ -280,7 +312,7 @@ describe( 'effects', () => {
 				status: 'draft',
 			};
 
-			const result = handler( { post } );
+			const result = handler( { post }, { getState } );
 
 			expect( result ).toHaveLength( 2 );
 			expect( result ).toContainEqual( resetPost( post ) );
@@ -290,6 +322,7 @@ describe( 'effects', () => {
 		} );
 
 		it( 'should return post setup action only if auto-draft', () => {
+			selectors.getEditorSettings.mockReturnValue( getState().editorSettings );
 			const post = {
 				id: 1,
 				title: {
@@ -301,7 +334,7 @@ describe( 'effects', () => {
 				status: 'auto-draft',
 			};
 
-			const result = handler( { post } );
+			const result = handler( { post }, { getState } );
 
 			expect( result ).toEqual( [
 				resetPost( post ),

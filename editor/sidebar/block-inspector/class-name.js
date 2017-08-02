@@ -7,7 +7,8 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { getBlockType, InspectorControls } from '@wordpress/blocks';
+import { getBlockType } from '@wordpress/block-api';
+import { InspectorControls, withEditorSettings } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -29,8 +30,7 @@ class BlockInspectorClassName extends Component {
 	}
 
 	render() {
-		const { selectedBlock } = this.props;
-		const blockType = getBlockType( selectedBlock.name );
+		const { selectedBlock, blockType } = this.props;
 		if ( false === blockType.className ) {
 			return null;
 		}
@@ -47,7 +47,7 @@ class BlockInspectorClassName extends Component {
 	}
 }
 
-export default connect(
+const connectComponent = connect(
 	( state ) => {
 		return {
 			selectedBlock: getSelectedBlock( state ),
@@ -56,4 +56,12 @@ export default connect(
 	{
 		setAttributes: updateBlockAttributes,
 	}
-)( BlockInspectorClassName );
+);
+
+const getEditorSettings = withEditorSettings( ( settings, ownProps ) => {
+	return {
+		blockType: getBlockType( ownProps.selectedBlock.name, settings ),
+	};
+} );
+
+export default connectComponent( getEditorSettings( BlockInspectorClassName ) );

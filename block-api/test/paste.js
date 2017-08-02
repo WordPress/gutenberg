@@ -7,7 +7,6 @@ import { equal, deepEqual } from 'assert';
  * Internal dependencies
  */
 import paste, { normaliseToBlockLevelNodes } from '../paste';
-import { registerBlockType, unregisterBlockType, setUnknownTypeHandlerName } from '../registration';
 import { createBlock } from '../factory';
 import { children, prop } from '../source';
 
@@ -49,56 +48,53 @@ describe( 'normaliseToBlockLevelNodes', () => {
 } );
 
 describe( 'paste', () => {
-	beforeAll( () => {
-		registerBlockType( 'test/small', {
-			category: 'common',
-			attributes: {
-				content: {
-					type: 'array',
-					source: children( 'small' ),
+	const smallBlockType = {
+		name: 'text/small',
+		category: 'common',
+		attributes: {
+			content: {
+				type: 'array',
+				source: children( 'small' ),
+			},
+		},
+		transforms: {
+			from: [
+				{
+					type: 'raw',
+					isMatch: ( node ) => node.nodeName === 'SMALL',
 				},
-			},
-			transforms: {
-				from: [
-					{
-						type: 'raw',
-						isMatch: ( node ) => node.nodeName === 'SMALL',
-					},
-				],
-			},
-			save: () => {},
-		} );
+			],
+		},
+		save: () => {},
+	};
 
-		registerBlockType( 'test/unknown', {
-			category: 'common',
-			attributes: {
-				content: {
-					type: 'string',
-					source: prop( 'innerHTML' ),
-				},
+	const unknownBlockType = {
+		name: 'test/unknown',
+		category: 'common',
+		attributes: {
+			content: {
+				type: 'string',
+				source: prop( 'innerHTML' ),
 			},
-			save: () => {},
-		} );
+		},
+		save: () => {},
+	};
 
-		setUnknownTypeHandlerName( 'test/unknown' );
-	} );
-
-	afterAll( () => {
-		unregisterBlockType( 'test/small' );
-		unregisterBlockType( 'test/unknown' );
-		setUnknownTypeHandlerName( undefined );
-	} );
+	const editorConfig = {
+		blockTypes: [ smallBlockType, unknownBlockType ],
+		fallbackBlockName: 'test/unknown',
+	};
 
 	it( 'should convert recognised pasted content', () => {
-		const pastedBlock = paste( createNodes( '<small>test</small>' ) )[ 0 ];
-		const block = createBlock( 'test/small', { content: [ 'test' ] } );
+		const pastedBlock = paste( createNodes( '<small>test</small>' ), editorConfig )[ 0 ];
+		const block = createBlock( smallBlockType, { content: [ 'test' ] } );
 
 		equal( pastedBlock.name, block.name );
 		deepEqual( pastedBlock.attributes, block.attributes );
 	} );
 
 	it( 'should handle unknown pasted content', () => {
-		const pastedBlock = paste( createNodes( '<big>test</big>' ) )[ 0 ];
+		const pastedBlock = paste( createNodes( '<big>test</big>' ), editorConfig )[ 0 ];
 
 		equal( pastedBlock.name, 'test/unknown' );
 		equal( pastedBlock.attributes.content, '<big>test</big>' );

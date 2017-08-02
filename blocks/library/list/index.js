@@ -8,16 +8,19 @@ import { find } from 'lodash';
  */
 import { Component, createElement, Children, concatChildren } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { source, getBlockType, createBlock } from '@wordpress/block-api';
 
 /**
  * Internal dependencies
  */
 import './editor.scss';
-import { registerBlockType, source, createBlock } from '../../api';
+import { registerBlockType } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
+import withEditorSettings from '../../with-editor-settings';
 
 const { children, prop } = source;
+const createTransformationBlock = ( name, attributes ) => ( { name, attributes } );
 
 const fromBrDelimitedContent = ( content ) => {
 	if ( undefined === content ) {
@@ -100,7 +103,7 @@ registerBlockType( 'core/list', {
 				type: 'block',
 				blocks: [ 'core/paragraph' ],
 				transform: ( { content } ) => {
-					return createBlock( 'core/list', {
+					return createTransformationBlock( 'core/list', {
 						nodeName: 'UL',
 						values: fromBrDelimitedContent( content ),
 					} );
@@ -114,7 +117,7 @@ registerBlockType( 'core/list', {
 					const values = citation
 						? concatChildren( listItems, <li>{ citation }</li> )
 						: listItems;
-					return createBlock( 'core/list', {
+					return createTransformationBlock( 'core/list', {
 						nodeName: 'UL',
 						values,
 					} );
@@ -128,7 +131,7 @@ registerBlockType( 'core/list', {
 				type: 'pattern',
 				regExp: /^[*-]\s/,
 				transform: ( { content } ) => {
-					return createBlock( 'core/list', {
+					return createTransformationBlock( 'core/list', {
 						nodeName: 'UL',
 						values: fromBrDelimitedContent( content ),
 					} );
@@ -138,7 +141,7 @@ registerBlockType( 'core/list', {
 				type: 'pattern',
 				regExp: /^1[.)]\s/,
 				transform: ( { content } ) => {
-					return createBlock( 'core/list', {
+					return createTransformationBlock( 'core/list', {
 						nodeName: 'OL',
 						values: fromBrDelimitedContent( content ),
 					} );
@@ -150,7 +153,7 @@ registerBlockType( 'core/list', {
 				type: 'block',
 				blocks: [ 'core/paragraph' ],
 				transform: ( { values } ) => {
-					return createBlock( 'core/paragraph', {
+					return createTransformationBlock( 'core/paragraph', {
 						content: toBrDelimitedContent( values ),
 					} );
 				},
@@ -159,7 +162,7 @@ registerBlockType( 'core/list', {
 				type: 'block',
 				blocks: [ 'core/quote' ],
 				transform: ( { values } ) => {
-					return createBlock( 'core/quote', {
+					return createTransformationBlock( 'core/quote', {
 						value: [ <p key="list">{ toBrDelimitedContent( values ) }</p> ],
 					} );
 				},
@@ -184,7 +187,7 @@ registerBlockType( 'core/list', {
 		};
 	},
 
-	edit: class extends Component {
+	edit: withEditorSettings()( class extends Component {
 		constructor() {
 			super( ...arguments );
 
@@ -275,6 +278,7 @@ registerBlockType( 'core/list', {
 				insertBlocksAfter,
 				setAttributes,
 				mergeBlocks,
+				settings,
 			} = this.props;
 			const { nodeName, values } = attributes;
 
@@ -323,11 +327,11 @@ registerBlockType( 'core/list', {
 					onMerge={ mergeBlocks }
 					onSplit={ ( before, after, ...blocks ) => {
 						if ( ! blocks.length ) {
-							blocks.push( createBlock( 'core/paragraph' ) );
+							blocks.push( createBlock( getBlockType( 'core/paragraph', settings ) ) );
 						}
 
 						if ( after.length ) {
-							blocks.push( createBlock( 'core/list', {
+							blocks.push( createBlock( getBlockType( 'core/list', settings ), {
 								nodeName,
 								values: after,
 							} ) );
@@ -339,7 +343,7 @@ registerBlockType( 'core/list', {
 				/>,
 			];
 		}
-	},
+	} ),
 
 	save( { attributes } ) {
 		const { nodeName, values } = attributes;

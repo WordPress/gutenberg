@@ -10,7 +10,8 @@ import { throttle, reduce, noop } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { serialize, getDefaultBlock, createBlock } from '@wordpress/blocks';
+import { serialize, createBlock, getBlockType } from '@wordpress/block-api';
+import { withEditorSettings } from '@wordpress/blocks';
 import { IconButton } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
 
@@ -108,10 +109,10 @@ class VisualEditorBlockList extends Component {
 	}
 
 	onCopy( event ) {
-		const { multiSelectedBlocks } = this.props;
+		const { multiSelectedBlocks, settings } = this.props;
 
 		if ( multiSelectedBlocks.length ) {
-			const serialized = serialize( multiSelectedBlocks );
+			const serialized = serialize( multiSelectedBlocks, settings );
 
 			event.clipboardData.setData( 'text/plain', serialized );
 			event.clipboardData.setData( 'text/html', serialized );
@@ -194,12 +195,16 @@ class VisualEditorBlockList extends Component {
 	}
 
 	appendDefaultBlock() {
-		const newBlock = createBlock( getDefaultBlock() );
+		const { settings } = this.props;
+		const defaultBlockType = getBlockType( settings.defaultBlockName, settings );
+		const newBlock = createBlock( defaultBlockType );
 		this.props.onInsertBlock( newBlock );
 	}
 
 	insertBlock( name ) {
-		const newBlock = createBlock( name );
+		const { settings } = this.props;
+		const blockType = getBlockType( name, settings );
+		const newBlock = createBlock( blockType );
 		this.props.onInsertBlock( newBlock );
 	}
 
@@ -308,4 +313,4 @@ export default connect(
 			dispatch( { type: 'REMOVE_BLOCKS', uids } );
 		},
 	} )
-)( VisualEditorBlockList );
+)( withEditorSettings()( VisualEditorBlockList ) );
