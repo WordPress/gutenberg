@@ -12,6 +12,7 @@ export default class Dashicon extends wp.element.Component {
 	shouldComponentUpdate( nextProps ) {
 		return (
 			this.props.icon !== nextProps.icon ||
+			this.props.size !== nextProps.size ||
 			this.props.className !== nextProps.className
 		);
 	}
