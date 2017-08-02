@@ -1,6 +1,7 @@
 import './text';
 import './image';
 import './gallery';
+import './title';
 import './heading';
 import './quote';
 import './embed';

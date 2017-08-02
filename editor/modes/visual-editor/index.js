@@ -16,7 +16,6 @@ import { KeyboardShortcuts } from 'components';
  */
 import './style.scss';
 import VisualEditorBlockList from './block-list';
-import PostTitle from '../../post-title';
 import { getBlockUids } from '../../selectors';
 import { clearSelectedBlock, multiSelect, redo, undo } from '../../actions';
 
@@ -87,7 +86,6 @@ class VisualEditor extends Component {
 					'mod+z': this.undoOrRedo,
 					'mod+shift+z': this.undoOrRedo,
 				} } />
-				<PostTitle />
 				<VisualEditorBlockList ref={ this.bindBlocksContainer } />
 			</div>
 		);

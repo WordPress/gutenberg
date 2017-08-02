@@ -14,7 +14,6 @@ import { serialize, parse } from 'blocks';
  * Internal dependencies
  */
 import './style.scss';
-import PostTitle from '../../post-title';
 import { getBlocks } from '../../selectors';
 
 class TextEditor extends Component {
@@ -83,7 +82,6 @@ class TextEditor extends Component {
 					</div>
 				</header>
 				<div className="editor-text-editor__body">
-					<PostTitle />
 					<Textarea
 						autoComplete="off"
 						value={ value }
