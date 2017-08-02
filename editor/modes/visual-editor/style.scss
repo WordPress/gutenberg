@@ -30,8 +30,8 @@
 	margin-bottom: 5px;
 	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );
 	position: relative;
-
 	padding: $block-padding;
+	transition: 0.2s border;
 
 	@include break-small {
 		// The block mover needs to stay inside the block to allow clicks when hovering the block
@@ -42,8 +42,8 @@
 		z-index: z-index( '.editor-visual-editor__block:before' );
 		content: '';
 		position: absolute;
-		outline: 1px solid transparent;
-		transition: 0.2s outline;
+		border: 2px solid transparent;
+		transition: 0.2s border;
 		top: 0;
 		bottom: 0;
 
@@ -74,13 +74,11 @@
 	}
 
 	&.is-hovered:before {
-		outline: 1px solid $light-gray-500;
-		transition: 0.2s outline;
+		border-left: 2px solid $light-gray-500;
 	}
 
 	&.is-selected:before {
-		outline: 2px solid $light-gray-500;
-		transition: 0.2s outline;
+		border: 2px solid $light-gray-500;
 	}
 
 	&.is-showing-mobile-controls {
