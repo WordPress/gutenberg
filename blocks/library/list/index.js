@@ -74,6 +74,11 @@ registerBlockType( 'core/list', {
 		values: children( 'ol,ul' ),
 	},
 
+	defaultAttributes: {
+		nodeName: 'UL',
+		values: [],
+	},
+
 	className: false,
 
 	transforms: {
@@ -83,7 +88,7 @@ registerBlockType( 'core/list', {
 				blocks: [ 'core/text' ],
 				transform: ( { content } ) => {
 					return createBlock( 'core/list', {
-						nodeName: 'ul',
+						nodeName: 'UL',
 						values: fromBrDelimitedContent( content ),
 					} );
 				},
@@ -97,7 +102,7 @@ registerBlockType( 'core/list', {
 						? concatChildren( listItems, <li>{ citation }</li> )
 						: listItems;
 					return createBlock( 'core/list', {
-						nodeName: 'ul',
+						nodeName: 'UL',
 						values,
 					} );
 				},
@@ -115,7 +120,7 @@ registerBlockType( 'core/list', {
 				regExp: /^[*-]\s/,
 				transform: ( { content } ) => {
 					return createBlock( 'core/list', {
-						nodeName: 'ul',
+						nodeName: 'UL',
 						values: fromBrDelimitedContent( content ),
 					} );
 				},
@@ -125,7 +130,7 @@ registerBlockType( 'core/list', {
 				regExp: /^1[.)]\s/,
 				transform: ( { content } ) => {
 					return createBlock( 'core/list', {
-						nodeName: 'ol',
+						nodeName: 'OL',
 						values: fromBrDelimitedContent( content ),
 					} );
 				},
@@ -168,7 +173,7 @@ registerBlockType( 'core/list', {
 
 		isListActive( listType ) {
 			const { internalListType } = this.state;
-			const { nodeName = 'OL' } = this.props.attributes;
+			const { nodeName } = this.props.attributes;
 
 			return listType === ( internalListType ? internalListType : nodeName );
 		}
@@ -238,7 +243,7 @@ registerBlockType( 'core/list', {
 
 		render() {
 			const { attributes, focus, setFocus } = this.props;
-			const { nodeName = 'OL', values = [] } = attributes;
+			const { nodeName, values } = attributes;
 
 			return [
 				focus && (
@@ -288,7 +293,7 @@ registerBlockType( 'core/list', {
 	},
 
 	save( { attributes } ) {
-		const { nodeName = 'OL', values = [] } = attributes;
+		const { nodeName, values } = attributes;
 
 		return createElement(
 			nodeName.toLowerCase(),
