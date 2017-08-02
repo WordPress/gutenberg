@@ -279,13 +279,44 @@ export default class Editable extends Component {
 
 		// If we click shift+Enter on inline Editables, we avoid creating two contenteditables
 		// We also split the content and call the onSplit prop if provided.
-		if ( event.keyCode === ENTER && ! this.props.multiline ) {
-			event.preventDefault();
+		if ( event.keyCode === ENTER ) {
+			if ( this.props.multiline ) {
+				if ( ! this.props.onSplit ) {
+					return;
+				}
 
-			if ( event.shiftKey || ! this.props.onSplit ) {
-				this.editor.execCommand( 'InsertLineBreak', false, event );
+				const rootNode = this.editor.getBody();
+				const selectedNode = this.editor.selection.getNode();
+
+				if ( selectedNode.parentNode !== rootNode ) {
+					return;
+				}
+
+				const dom = this.editor.dom;
+
+				if ( ! dom.isEmpty( selectedNode ) ) {
+					return;
+				}
+
+				event.preventDefault();
+
+				const childNodes = Array.from( rootNode.childNodes );
+				const index = dom.nodeIndex( selectedNode );
+				const beforeNodes = childNodes.slice( 0, index );
+				const afterNodes = childNodes.slice( index + 1 );
+				const beforeElement = nodeListToReact( beforeNodes, createTinyMCEElement );
+				const afterElement = nodeListToReact( afterNodes, createTinyMCEElement );
+
+				this.setContent( beforeElement );
+				this.props.onSplit( beforeElement, afterElement );
 			} else {
-				this.splitContent();
+				event.preventDefault();
+
+				if ( event.shiftKey || ! this.props.onSplit ) {
+					this.editor.execCommand( 'InsertLineBreak', false, event );
+				} else {
+					this.splitContent();
+				}
 			}
 		}
 	}

@@ -246,7 +246,7 @@ registerBlockType( 'core/list', {
 		}
 
 		render() {
-			const { attributes, focus, setFocus } = this.props;
+			const { attributes, focus, setFocus, insertBlocksAfter, setAttributes } = this.props;
 			const { nodeName, values } = attributes;
 
 			return [
@@ -291,6 +291,22 @@ registerBlockType( 'core/list', {
 					onFocus={ setFocus }
 					className="blocks-list"
 					placeholder={ __( 'Write list…' ) }
+					onSplit={ ( before, after, ...blocks ) => {
+						if ( ! blocks.length ) {
+							blocks = [
+								createBlock( 'core/text' ),
+							];
+						}
+
+						setAttributes( { values: before } );
+						insertBlocksAfter( [
+							...blocks,
+							createBlock( 'core/list', {
+								nodeName,
+								values: after,
+							} ),
+						] );
+					} }
 				/>,
 			];
 		}
