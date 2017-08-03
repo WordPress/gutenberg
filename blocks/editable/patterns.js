@@ -49,6 +49,10 @@ export default function( editor ) {
 		canUndo = null;
 	} );
 
+	editor.on( 'pastepostprocess', () => {
+		setTimeout( space );
+	} );
+
 	editor.on( 'keydown', function( event ) {
 		const { keyCode } = event;
 
