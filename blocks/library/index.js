@@ -1,4 +1,4 @@
-import './text';
+import './paragraph';
 import './image';
 import './gallery';
 import './heading';

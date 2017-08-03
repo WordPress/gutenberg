@@ -18,7 +18,7 @@ import BlockDescription from '../../block-description';
 
 const { children, query } = hpq;
 
-registerBlockType( 'core/text', {
+registerBlockType( 'core/paragraph', {
 	title: __( 'Text' ),
 
 	icon: 'text',
@@ -99,7 +99,7 @@ registerBlockType( 'core/text', {
 					setAttributes( { content: before } );
 					insertBlocksAfter( [
 						...blocks,
-						createBlock( 'core/text', { content: after } ),
+						createBlock( 'core/paragraph', { content: after } ),
 					] );
 				} }
 				onMerge={ mergeBlocks }
@@ -123,4 +123,4 @@ registerBlockType( 'core/text', {
 	},
 } );
 
-setDefaultBlock( 'core/text' );
+setDefaultBlock( 'core/paragraph' );

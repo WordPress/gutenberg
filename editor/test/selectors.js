@@ -661,7 +661,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					blocksByUid: {
-						123: { uid: 123, name: 'core/text' },
+						123: { uid: 123, name: 'core/paragraph' },
 					},
 					blockOrder: [ 123 ],
 					edits: {},
@@ -720,12 +720,12 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					blocksByUid: {
-						123: { uid: 123, name: 'core/text' },
+						123: { uid: 123, name: 'core/paragraph' },
 					},
 				},
 			};
 
-			expect( getBlock( state, 123 ) ).toEqual( { uid: 123, name: 'core/text' } );
+			expect( getBlock( state, 123 ) ).toEqual( { uid: 123, name: 'core/paragraph' } );
 		} );
 	} );
 
@@ -735,14 +735,14 @@ describe( 'selectors', () => {
 				editor: {
 					blocksByUid: {
 						23: { uid: 23, name: 'core/heading' },
-						123: { uid: 123, name: 'core/text' },
+						123: { uid: 123, name: 'core/paragraph' },
 					},
 					blockOrder: [ 123, 23 ],
 				},
 			};
 
 			expect( getBlocks( state ) ).toEqual( [
-				{ uid: 123, name: 'core/text' },
+				{ uid: 123, name: 'core/paragraph' },
 				{ uid: 23, name: 'core/heading' },
 			] );
 		} );
@@ -754,7 +754,7 @@ describe( 'selectors', () => {
 				editor: {
 					blocksByUid: {
 						23: { uid: 23, name: 'core/heading' },
-						123: { uid: 123, name: 'core/text' },
+						123: { uid: 123, name: 'core/paragraph' },
 					},
 					blockOrder: [ 123, 23 ],
 				},
@@ -770,7 +770,7 @@ describe( 'selectors', () => {
 				editor: {
 					blocksByUid: {
 						23: { uid: 23, name: 'core/heading' },
-						123: { uid: 123, name: 'core/text' },
+						123: { uid: 123, name: 'core/paragraph' },
 					},
 				},
 				selectedBlock: { uid: null },
@@ -785,7 +785,7 @@ describe( 'selectors', () => {
 				editor: {
 					blocksByUid: {
 						23: { uid: 23, name: 'core/heading' },
-						123: { uid: 123, name: 'core/text' },
+						123: { uid: 123, name: 'core/paragraph' },
 					},
 				},
 				selectedBlock: { uid: 23 },
@@ -800,7 +800,7 @@ describe( 'selectors', () => {
 				editor: {
 					blocksByUid: {
 						23: { uid: 23, name: 'core/heading' },
-						123: { uid: 123, name: 'core/text' },
+						123: { uid: 123, name: 'core/paragraph' },
 					},
 				},
 				selectedBlock: { uid: 23 },
@@ -957,13 +957,13 @@ describe( 'selectors', () => {
 				editor: {
 					blocksByUid: {
 						23: { uid: 23, name: 'core/heading' },
-						123: { uid: 123, name: 'core/text' },
+						123: { uid: 123, name: 'core/paragraph' },
 					},
 					blockOrder: [ 123, 23 ],
 				},
 			};
 
-			expect( getPreviousBlock( state, 23 ) ).toEqual( { uid: 123, name: 'core/text' } );
+			expect( getPreviousBlock( state, 23 ) ).toEqual( { uid: 123, name: 'core/paragraph' } );
 		} );
 
 		it( 'should return null for the first block', () => {
@@ -971,7 +971,7 @@ describe( 'selectors', () => {
 				editor: {
 					blocksByUid: {
 						23: { uid: 23, name: 'core/heading' },
-						123: { uid: 123, name: 'core/text' },
+						123: { uid: 123, name: 'core/paragraph' },
 					},
 					blockOrder: [ 123, 23 ],
 				},
@@ -987,7 +987,7 @@ describe( 'selectors', () => {
 				editor: {
 					blocksByUid: {
 						23: { uid: 23, name: 'core/heading' },
-						123: { uid: 123, name: 'core/text' },
+						123: { uid: 123, name: 'core/paragraph' },
 					},
 					blockOrder: [ 123, 23 ],
 				},
@@ -1001,7 +1001,7 @@ describe( 'selectors', () => {
 				editor: {
 					blocksByUid: {
 						23: { uid: 23, name: 'core/heading' },
-						123: { uid: 123, name: 'core/text' },
+						123: { uid: 123, name: 'core/paragraph' },
 					},
 					blockOrder: [ 123, 23 ],
 				},
