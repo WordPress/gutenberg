@@ -4,7 +4,7 @@
 import { Component } from '@wordpress/element';
 import { Placeholder, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { unescape } from 'lodash';
+import { times, unescape } from 'lodash';
 
 /**
  * Internal dependencies
@@ -159,7 +159,7 @@ registerBlockType( 'core/categories', {
 
 			return [
 				<option key={ category.id }>
-					{ new Array( level * 3 ).fill( '\xa0' ) }
+					{ times( level * 3, () => '\xa0' ) }
 					{ this.renderCategoryName( category ) }
 					{
 						!! showPostCounts
