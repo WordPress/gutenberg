@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { CirclePicker } from 'react-color';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -17,29 +12,13 @@ import { registerBlockType, query as hpq } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
+import ColorPalette from '../../color-palette';
 import Editable from '../../editable';
 import InspectorControls from '../../inspector-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
 import BlockDescription from '../../block-description';
 
 const { children, query } = hpq;
-
-function palette() {
-	return [
-		'#f78da7',
-		'#eb144c',
-		'#ff6900',
-		'#fcb900',
-		'#7bdcb5',
-		'#00d084',
-		'#8ed1fc',
-		'#0693e3',
-		'#eee',
-		'#abb8c3',
-		'#444',
-		'#111',
-	];
-}
 
 registerBlockType( 'core/cover-text', {
 	title: __( 'Cover Text' ),
@@ -68,6 +47,7 @@ registerBlockType( 'core/cover-text', {
 	edit( { attributes, setAttributes, className, focus, setFocus, mergeBlocks } ) {
 		const { align, width, content, dropCap, placeholder, textColor, backgroundColor } = attributes;
 		const toggleDropCap = () => setAttributes( { dropCap: ! dropCap } );
+
 		return [
 			focus && (
 				<BlockControls key="controls">
@@ -94,17 +74,14 @@ registerBlockType( 'core/cover-text', {
 						onChange={ toggleDropCap }
 					/>
 					<h3>{ __( 'Background Color' ) }</h3>
-					<CirclePicker
+					<ColorPalette
 						color={ backgroundColor }
-						colors={ palette() }
-						onChangeComplete={ ( colorValue ) => setAttributes( { backgroundColor: colorValue.hex } ) }
-						style={ { marginBottom: '20px' } }
+						onChange={ ( colorValue ) => setAttributes( { backgroundColor: colorValue.hex } ) }
 					/>
 					<h3>{ __( 'Text Color' ) }</h3>
-					<CirclePicker
+					<ColorPalette
 						color={ textColor }
-						colors={ palette() }
-						onChangeComplete={ ( colorValue ) => setAttributes( { textColor: colorValue.hex } ) }
+						onChange={ ( colorValue ) => setAttributes( { textColor: colorValue.hex } ) }
 					/>
 				</InspectorControls>
 			),
