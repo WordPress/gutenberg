@@ -15,3 +15,20 @@ add_theme_support( 'gutenberg', array(
    'wide-images' => true,
 ) );
 ```
+
+### Colors:
+
+Different blocks have the possibility of customizing colors. Gutenberg provides a default palette, but a theme can overwrite it and provide its own:
+
+```php
+add_theme_support( 'gutenberg', array(
+   'colors' => array(
+		'#a156b4',
+		'#d0a5db',
+		'#eee',
+		'#444',
+	),
+) );
+```
+
+The colors will be shown in order on the palette, and there's no limit to how many can be specified.
