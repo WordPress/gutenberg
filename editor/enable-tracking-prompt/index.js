@@ -15,6 +15,8 @@ import { Button } from '@wordpress/components';
 import './style.scss';
 import { removeNotice } from '../actions';
 
+export const TRACKING_PROMPT_NOTICE_ID = 'notice:enable-tracking-prompt';
+
 function EnableTrackingPrompt( props ) {
 	function dismissTrackingPrompt( result ) {
 		window.setUserSetting( 'gutenberg_tracking', result );

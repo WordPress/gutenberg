@@ -21,7 +21,7 @@ import './assets/stylesheets/main.scss';
 import Layout from './layout';
 import { createReduxStore } from './state';
 import { undo, createInfoNotice } from './actions';
-import EnableTrackingPrompt from './enable-tracking-prompt';
+import EnableTrackingPrompt, { TRACKING_PROMPT_NOTICE_ID } from './enable-tracking-prompt';
 import EditorSettingsProvider from './settings/provider';
 
 /**
@@ -102,7 +102,7 @@ export function createEditorInstance( id, post, editorSettings = DEFAULT_SETTING
 	if ( window.getUserSetting( 'gutenberg_tracking' ) === '' ) {
 		store.dispatch( createInfoNotice(
 			<EnableTrackingPrompt />,
-			'notice:enable-tracking-prompt'
+			TRACKING_PROMPT_NOTICE_ID
 		) );
 	}
 
