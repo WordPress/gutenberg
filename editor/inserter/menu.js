@@ -21,7 +21,7 @@ import { getBlocks, getRecentlyUsedBlocks } from '../selectors';
 import { showInsertionPoint, hideInsertionPoint } from '../actions';
 
 export const searchBlocks = ( blocks, searchTerm ) => {
-	const normalizedSearchTerm = searchTerm.toLowerCase();
+	const normalizedSearchTerm = searchTerm.toLowerCase().trim();
 	const matchSearch = ( string ) => string.toLowerCase().indexOf( normalizedSearchTerm ) !== -1;
 
 	return blocks.filter( ( block ) =>
