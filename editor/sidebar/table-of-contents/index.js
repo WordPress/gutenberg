@@ -85,7 +85,7 @@ const TableOfContents = ( { blocks } ) => {
 	} );
 
 	return (
-		<PanelBody title={ __( 'Table of Contents (experimental)' ) } initialOpen={ false }>
+		<PanelBody title={ __( 'Table of Contents' ) } initialOpen={ false }>
 			<div className="table-of-contents__items">
 				{ headings.length > 1 && <p><strong>{ sprintf( '%d Headings', headings.length ) }</strong></p> }
 				{ tocItems }
