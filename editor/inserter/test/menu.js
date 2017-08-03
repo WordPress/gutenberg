@@ -52,7 +52,7 @@ const youtubeBlock = {
 	title: 'YouTube',
 	save: noop,
 	edit: noop,
-	category: 'embed',
+	category: 'embed-common',
 	keywords: [ 'google' ],
 };
 
@@ -61,7 +61,7 @@ const textEmbedBlock = {
 	title: 'A Text Embed',
 	save: noop,
 	edit: noop,
-	category: 'embed',
+	category: 'embed-docs',
 };
 
 describe( 'InserterMenu', () => {
@@ -116,7 +116,7 @@ describe( 'InserterMenu', () => {
 		expect( visibleBlocks.at( 0 ).childAt( 1 ).text() ).toBe( 'Advanced Text' );
 	} );
 
-	it( 'should show blocks from the embed category in the embed tab', () => {
+	it( 'should show blocks from the embed categories in the embed tab', () => {
 		const wrapper = shallow(
 			<InserterMenu
 				instanceId={ 1 }
