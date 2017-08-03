@@ -317,7 +317,7 @@ class WP_Test_REST_Revisions_Controller extends WP_Test_REST_Controller_Testcase
 		$rendered_excerpt = apply_filters( 'the_excerpt', apply_filters( 'get_the_excerpt', $revision->post_excerpt, $revision ) );
 		$this->assertEquals( $rendered_excerpt, $response['excerpt']['rendered'] );
 
-		$rendered_guid = apply_filters( 'get_the_guid', $revision->guid );
+		$rendered_guid = apply_filters( 'get_the_guid', $revision->guid, $revision->ID );
 		$this->assertEquals( $rendered_guid, $response['guid']['rendered'] );
 
 		$this->assertEquals( $revision->ID, $response['id'] );
