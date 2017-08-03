@@ -102,6 +102,8 @@ describe( 'full post content fixture', () => {
 				);
 			}
 
+			const blocksActual = parse( content );
+
 			const parserOutputActual = grammarParse( content );
 			let parserOutputExpectedString = readFixtureFile( f + '.parsed.json' );
 
@@ -133,16 +135,6 @@ describe( 'full post content fixture', () => {
 				) );
 			}
 
-			let blocksActual;
-			try {
-				blocksActual = parse( content );
-			} catch ( err ) {
-				throw new Error( format(
-					'Parse failed on content from \'%s.html\':\n\n%s',
-					f,
-					err.message
-				) );
-			}
 			const blocksActualNormalized = normalizeParsedBlocks( blocksActual );
 			let blocksExpectedString = readFixtureFile( f + '.json' );
 
@@ -159,6 +151,24 @@ describe( 'full post content fixture', () => {
 						'Missing fixture file: ' + f + '.json'
 					);
 				}
+			}
+
+			// If file is suffixed as invalid, we expect a parse should fail.
+			const isExpectedValid = ! /(__|-)invalid$/.test( f );
+			const [ block ] = blocksActual;
+			if ( isExpectedValid !== block.isValid ) {
+				throw new Error( format(
+					isExpectedValid
+						? 'Parse failed on content from \'%s.html\':\n\n%s'
+						: 'Expected parse failure on content from \'%s.html\'',
+					f,
+					block.error || ''
+				) );
+			}
+			// Don't bother continuing with verifying or generating JSON and
+			// serialized HTML if we did not expect parse to succeed.
+			if ( ! isExpectedValid ) {
+				return;
 			}
 
 			const blocksExpected = JSON.parse( blocksExpectedString );

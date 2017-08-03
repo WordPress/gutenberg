@@ -100,8 +100,11 @@ export function createBlockWithFallback( name, rawContent, attributes ) {
 		// Validate that the parsed block is valid, meaning that if we were to
 		// reserialize it given the assumed attributes, the markup matches the
 		// original value. Otherwise, preserve original to avoid destruction.
-		block.isValid = isValidBlock( rawContent, blockType, block.attributes );
-		if ( ! block.isValid ) {
+		try {
+			block.isValid = isValidBlock( rawContent, blockType, block.attributes );
+		} catch ( error ) {
+			block.isValid = false;
+			block.error = error;
 			block.originalContent = rawContent;
 		}
 
@@ -163,8 +166,7 @@ export function isValidBlock( rawContent, blockType, attributes ) {
 				return result + value;
 			}, '' );
 
-			// eslint-disable-next-line no-console
-			console.error( message );
+			throw new Error( message );
 		}
 	}
 

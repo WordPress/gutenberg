@@ -96,19 +96,13 @@ describe( 'block parser', () => {
 
 	describe( 'isValidBlock()', () => {
 		it( 'returns false is block is not valid', () => {
-			/* eslint-disable no-console */
-			const consoleError = console.error;
-			console.error = jest.fn();
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
-			expect( isValidBlock(
+			expect( () => isValidBlock(
 				'Apples',
 				getBlockType( 'core/test-block' ),
 				{ fruit: 'Bananas' }
-			) ).toBe( false );
-			expect( console.error ).toHaveBeenCalled();
-			console.error = consoleError;
-			/* eslint-enable no-console */
+			) ).toThrow();
 		} );
 
 		it( 'returns true is block is valid', () => {
