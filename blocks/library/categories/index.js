@@ -57,22 +57,22 @@ registerBlockType( 'core/categories', {
 		}
 
 		toggleDisplayAsDropdown() {
-			const { displayAsDropdown } = this.props.attributes;
-			const { setAttributes } = this.props;
+			const { attributes, setAttributes } = this.props;
+			const { displayAsDropdown } = attributes;
 
 			setAttributes( { displayAsDropdown: ! displayAsDropdown } );
 		}
 
 		toggleShowPostCounts() {
-			const { showPostCounts } = this.props.attributes;
-			const { setAttributes } = this.props;
+			const { attributes, setAttributes } = this.props;
+			const { showPostCounts } = attributes;
 
 			setAttributes( { showPostCounts: ! showPostCounts } );
 		}
 
 		toggleShowHierarchy() {
-			const { showHierarchy } = this.props.attributes;
-			const { setAttributes } = this.props;
+			const { attributes, setAttributes } = this.props;
+			const { showHierarchy } = attributes;
 
 			setAttributes( { showHierarchy: ! showHierarchy } );
 		}
