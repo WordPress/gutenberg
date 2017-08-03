@@ -8,6 +8,7 @@ import './list';
 import './separator';
 import './more';
 import './button';
+import './paragraph';
 import './pullquote';
 import './table';
 import './preformatted';
