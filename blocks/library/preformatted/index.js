@@ -27,7 +27,7 @@ registerBlockType( 'core/preformatted', {
 		from: [
 			{
 				type: 'block',
-				blocks: [ 'core/text' ],
+				blocks: [ 'core/paragraph' ],
 				transform: ( attributes ) =>
 					createBlock( 'core/preformatted', attributes ),
 			},
@@ -35,9 +35,9 @@ registerBlockType( 'core/preformatted', {
 		to: [
 			{
 				type: 'block',
-				blocks: [ 'core/text' ],
+				blocks: [ 'core/paragraph' ],
 				transform: ( attributes ) =>
-					createBlock( 'core/text', attributes ),
+					createBlock( 'core/paragraph', attributes ),
 			},
 		],
 	},

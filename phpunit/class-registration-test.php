@@ -19,7 +19,7 @@ class Registration_Test extends WP_UnitTestCase {
 	}
 
 	function test_register_affects_main_registry() {
-		$name     = 'core/text';
+		$name     = 'core/paragraph';
 		$settings = array(
 			'icon' => 'text',
 		);
@@ -30,7 +30,7 @@ class Registration_Test extends WP_UnitTestCase {
 	}
 
 	function test_unregister_affects_main_registry() {
-		$name     = 'core/text';
+		$name     = 'core/paragraph';
 		$settings = array(
 			'icon' => 'text',
 		);

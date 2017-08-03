@@ -269,12 +269,12 @@ class VisualEditorBlockList extends Component {
 				>
 					<Inserter position="top right" />
 					<IconButton
-						icon="text"
+						icon="editor-paragraph"
 						className="editor-inserter__block"
-						onClick={ () => this.insertBlock( 'core/text' ) }
-						label={ __( 'Insert text block' ) }
+						onClick={ () => this.insertBlock( 'core/paragraph' ) }
+						label={ __( 'Insert paragraph block' ) }
 					>
-						{ __( 'Text' ) }
+						{ __( 'Paragraph' ) }
 					</IconButton>
 					<IconButton
 						icon="format-image"

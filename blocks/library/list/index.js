@@ -89,7 +89,7 @@ registerBlockType( 'core/list', {
 		from: [
 			{
 				type: 'block',
-				blocks: [ 'core/text' ],
+				blocks: [ 'core/paragraph' ],
 				transform: ( { content } ) => {
 					return createBlock( 'core/list', {
 						nodeName: 'UL',
@@ -143,9 +143,9 @@ registerBlockType( 'core/list', {
 		to: [
 			{
 				type: 'block',
-				blocks: [ 'core/text' ],
+				blocks: [ 'core/paragraph' ],
 				transform: ( { values } ) => {
-					return createBlock( 'core/text', {
+					return createBlock( 'core/paragraph', {
 						content: toBrDelimitedContent( values ),
 					} );
 				},
