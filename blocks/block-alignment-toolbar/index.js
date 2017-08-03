@@ -7,7 +7,7 @@ import { Toolbar } from 'components';
 /**
  * Internal dependencies
  */
-import withEditorSettings from '../settings/with-editor-settings';
+import withEditorSettings from '../with-editor-settings';
 
 const BLOCK_ALIGNMENTS_CONTROLS = {
 	left: {
