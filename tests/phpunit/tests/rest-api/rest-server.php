@@ -162,6 +162,23 @@ class Tests_REST_Server extends WP_Test_REST_TestCase {
 		$this->assertEquals( 200, $response->get_status() );
 	}
 
+	public function test_url_params_no_numeric_keys() {
+
+		$this->server->register_route( 'test', '/test/(?P<data>.*)', array(
+			array(
+				'methods'  => WP_REST_Server::READABLE,
+				'callback' => '__return_false',
+				'args'     => array(
+					'data' => array(),
+				),
+			),
+		) );
+
+		$request = new WP_REST_Request( 'GET', '/test/some-value' );
+		$this->server->dispatch( $request );
+		$this->assertEquals( array( 'data' => 'some-value' ), $request->get_params() );
+	}
+
 	/**
 	 * Pass a capability which the user does not have, this should
 	 * result in a 403 error.
