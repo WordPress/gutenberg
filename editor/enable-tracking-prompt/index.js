@@ -32,24 +32,24 @@ export function EnableTrackingPrompt( props ) {
 
 	return (
 		<div className="enable-tracking-prompt">
+			<div className="enable-tracking-prompt__buttons">
+				<Button
+					isPrimary
+					isSmall
+					onClick={ () => dismissTrackingPrompt( true ) }
+				>
+					{ __( 'Yes' ) }
+				</Button>
+				<Button
+					isSecondary
+					isSmall
+					onClick={ () => dismissTrackingPrompt( false ) }
+				>
+					{ __( 'No' ) }
+				</Button>
+			</div>
 			<div className="enable-tracking-prompt__message">
 				{ __( 'Can Gutenberg collect data about your usage of the editor?' ) }
-				<div className="enable-tracking-prompt__buttons">
-					<Button
-						isPrimary
-						isSmall
-						onClick={ () => dismissTrackingPrompt( true ) }
-					>
-						{ __( 'Yes' ) }
-					</Button>
-					<Button
-						isSecondary
-						isSmall
-						onClick={ () => dismissTrackingPrompt( false ) }
-					>
-						{ __( 'No' ) }
-					</Button>
-				</div>
 			</div>
 			<div className="enable-tracking-prompt__clarification">
 				{ __( 'Usage data is completely anonymous, does not include your post content, and will only be used to improve the editor.' ) }

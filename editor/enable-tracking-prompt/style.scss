@@ -2,14 +2,6 @@
 	.enable-tracking-prompt__message {
 		font-weight: bold;
 		margin-top: 8px;
-
-		.enable-tracking-prompt__buttons {
-			float: right;
-
-			.button {
-				margin-left: 6px;
-			}
-		}
 	}
 
 	.enable-tracking-prompt__clarification {
@@ -17,5 +9,13 @@
 		margin-bottom: 8px;
 		font-size: 90%;
 		font-style: italic;
+	}
+
+	.enable-tracking-prompt__buttons {
+		float: right;
+
+		.button {
+			margin-left: 6px;
+		}
 	}
 }
