@@ -26,11 +26,24 @@ class Button extends Component {
 	}
 
 	render() {
-		const { href, target, isPrimary, isLarge, isToggled, className, disabled, ...additionalProps } = this.props;
+		const {
+			href,
+			target,
+			isPrimary,
+			isSecondary,
+			isLarge,
+			isSmall,
+			isToggled,
+			className,
+			disabled,
+			...additionalProps, // eslint-disable-line comma-dangle
+		} = this.props;
 		const classes = classnames( 'components-button', className, {
-			button: ( isPrimary || isLarge ),
+			button: ( isPrimary || isSecondary || isLarge ),
 			'button-primary': isPrimary,
+			'button-secondary': isSecondary,
 			'button-large': isLarge,
+			'button-small': isSmall,
 			'is-toggled': isToggled,
 		} );
 
