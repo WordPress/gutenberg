@@ -39,8 +39,8 @@ const extractConfig = {
 const entryPointNames = [
 	'element',
 	'i18n',
-	'components',
 	'utils',
+	'components',
 	'blocks',
 	'date',
 	'editor',

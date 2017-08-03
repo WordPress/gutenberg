@@ -12,20 +12,17 @@ import {
 } from '../';
 
 describe( 'EnableTrackingPrompt', () => {
-	const tracking = require( '../../utils/tracking' ); // no default export
 	const originalSetUserSetting = window.setUserSetting;
-	const originalBumpStat = tracking.bumpStat;
-	let removeNotice;
+	let removeNotice, bumpStat;
 
 	beforeEach( () => {
 		window.setUserSetting = jest.fn();
-		tracking.bumpStat = jest.fn();
 		removeNotice = jest.fn();
+		bumpStat = jest.fn();
 	} );
 
 	afterEach( () => {
 		window.setUserSetting = originalSetUserSetting;
-		tracking.bumpStat = originalBumpStat;
 	} );
 
 	it( 'should render a prompt with Yes and No buttons', () => {
@@ -39,7 +36,7 @@ describe( 'EnableTrackingPrompt', () => {
 
 		expect( window.setUserSetting )
 			.not.toHaveBeenCalled();
-		expect( tracking.bumpStat )
+		expect( bumpStat )
 			.not.toHaveBeenCalled();
 		expect( removeNotice )
 			.not.toHaveBeenCalled();
@@ -47,7 +44,10 @@ describe( 'EnableTrackingPrompt', () => {
 
 	it( 'should enable tracking when clicking Yes', () => {
 		const prompt = mount(
-			<EnableTrackingPrompt removeNotice={ removeNotice } />
+			<EnableTrackingPrompt
+				removeNotice={ removeNotice }
+				bumpStat={ bumpStat }
+			/>
 		);
 		const buttonYes = prompt.find( '.button' )
 			.filterWhere( node => node.text() === 'Yes' );
@@ -55,7 +55,7 @@ describe( 'EnableTrackingPrompt', () => {
 
 		expect( window.setUserSetting )
 			.toHaveBeenCalledWith( 'gutenberg_tracking', 'on' );
-		expect( tracking.bumpStat )
+		expect( bumpStat )
 			.toHaveBeenCalledWith( 'tracking', 'opt-in' );
 		expect( removeNotice )
 			.toHaveBeenCalledWith( TRACKING_PROMPT_NOTICE_ID );
@@ -71,7 +71,7 @@ describe( 'EnableTrackingPrompt', () => {
 
 		expect( window.setUserSetting )
 			.toHaveBeenCalledWith( 'gutenberg_tracking', 'off' );
-		expect( tracking.bumpStat )
+		expect( bumpStat )
 			.not.toHaveBeenCalled();
 		expect( removeNotice )
 			.toHaveBeenCalledWith( TRACKING_PROMPT_NOTICE_ID );
