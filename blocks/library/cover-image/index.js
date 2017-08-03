@@ -45,7 +45,7 @@ registerBlockType( 'core/cover-image', {
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, className, settings } ) {
+	edit( { attributes, setAttributes, focus, setFocus, className } ) {
 		const { url, title, align, id, hasParallax, hasBackgroundDim } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		const onSelectImage = ( media ) => setAttributes( { url: media.url, id: media.id } );
@@ -56,7 +56,6 @@ registerBlockType( 'core/cover-image', {
 					<BlockAlignmentToolbar
 						value={ align }
 						onChange={ updateAlignment }
-						wideControlsEnabled={ settings.wideImages }
 					/>
 
 					<Toolbar>

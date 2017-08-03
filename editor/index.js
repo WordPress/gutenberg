@@ -21,6 +21,7 @@ import './assets/stylesheets/main.scss';
 import Layout from './layout';
 import { createReduxStore } from './state';
 import { undo } from './actions';
+import EditorSettingsProvider from './settings/provider';
 
 /**
  * The default editor settings
@@ -107,7 +108,9 @@ export function createEditorInstance( id, post, editorSettings = DEFAULT_SETTING
 						onUndo: undo,
 					}, store.dispatch ) }
 				>
-					<Layout settings={ editorSettings } />
+					<EditorSettingsProvider settings={ editorSettings }>
+						<Layout />
+					</EditorSettingsProvider>
 				</EditableProvider>
 			</SlotFillProvider>
 		</ReduxProvider>,

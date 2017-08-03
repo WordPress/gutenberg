@@ -4,6 +4,11 @@
 import { __ } from 'i18n';
 import { Toolbar } from 'components';
 
+/**
+ * Internal dependencies
+ */
+import withEditorSettings from '../with-editor-settings';
+
 const BLOCK_ALIGNMENTS_CONTROLS = {
 	left: {
 		icon: 'align-left',
@@ -30,7 +35,7 @@ const BLOCK_ALIGNMENTS_CONTROLS = {
 const DEFAULT_CONTROLS = [ 'left', 'center', 'right', 'wide', 'full' ];
 const WIDE_CONTROLS = [ 'wide', 'full' ];
 
-export default function BlockAlignmentToolbar( { value, onChange, controls = DEFAULT_CONTROLS, wideControlsEnabled = false } ) {
+function BlockAlignmentToolbar( { value, onChange, controls = DEFAULT_CONTROLS, wideControlsEnabled = false } ) {
 	function applyOrUnset( align ) {
 		return () => onChange( value === align ? undefined : align );
 	}
@@ -53,3 +58,9 @@ export default function BlockAlignmentToolbar( { value, onChange, controls = DEF
 		/>
 	);
 }
+
+export default withEditorSettings(
+	( settings ) => ( {
+		wideControlsEnabled: settings.wideImages,
+	} )
+)( BlockAlignmentToolbar );
