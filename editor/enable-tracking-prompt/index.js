@@ -13,14 +13,21 @@ import { Button } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
+import { bumpStat } from '../utils/tracking';
 import { removeNotice } from '../actions';
 
 export const TRACKING_PROMPT_NOTICE_ID = 'notice:enable-tracking-prompt';
 
-function EnableTrackingPrompt( props ) {
-	function dismissTrackingPrompt( result ) {
-		window.setUserSetting( 'gutenberg_tracking', result );
-		props.removeNotice( 'notice:enable-tracking-prompt' );
+export function EnableTrackingPrompt( props ) {
+	function dismissTrackingPrompt( enableTracking ) {
+		window.setUserSetting(
+			'gutenberg_tracking',
+			enableTracking ? 'on' : 'off'
+		);
+		if ( enableTracking ) {
+			bumpStat( 'tracking', 'opt-in' );
+		}
+		props.removeNotice( TRACKING_PROMPT_NOTICE_ID );
 	}
 
 	return (
@@ -31,14 +38,14 @@ function EnableTrackingPrompt( props ) {
 					<Button
 						isPrimary
 						isSmall
-						onClick={ () => dismissTrackingPrompt( 'on' ) }
+						onClick={ () => dismissTrackingPrompt( true ) }
 					>
 						{ __( 'Yes' ) }
 					</Button>
 					<Button
 						isSecondary
 						isSmall
-						onClick={ () => dismissTrackingPrompt( 'off' ) }
+						onClick={ () => dismissTrackingPrompt( false ) }
 					>
 						{ __( 'No' ) }
 					</Button>

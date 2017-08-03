@@ -56,7 +56,7 @@ describe( 'EnableTrackingPrompt', () => {
 		expect( window.setUserSetting )
 			.toHaveBeenCalledWith( 'gutenberg_tracking', 'on' );
 		expect( tracking.bumpStat )
-			.not.toHaveBeenCalled();
+			.toHaveBeenCalledWith( 'tracking', 'opt-in' );
 		expect( removeNotice )
 			.toHaveBeenCalledWith( TRACKING_PROMPT_NOTICE_ID );
 	} );
