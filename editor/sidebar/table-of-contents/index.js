@@ -1,24 +1,24 @@
 /**
- * External Dependencies
+ * External dependencies
  */
 import { connect } from 'react-redux';
 import { filter } from 'lodash';
 
 /**
- * WordPress Dependencies
+ * WordPress dependencies
  */
 import { __, sprintf } from 'i18n';
 import { PanelBody } from 'components';
 
 /**
- * Internal Dependencies
+ * Internal dependencies
  */
 import './style.scss';
 import TableOfContentsItem from './item';
 import { getBlocks } from '../../selectors';
 
 /**
- * Module Constants
+ * Module constants
  */
 const emptyHeadingContent = <em>{ __( '(Empty heading)' ) }</em>;
 const incorrectLevelContent = [
@@ -54,6 +54,10 @@ const isEmptyHeading = heading => ! heading.attributes.content || heading.attrib
 const TableOfContents = ( { blocks } ) => {
 	const headings = filter( blocks, ( block ) => block.name === 'core/heading' );
 
+	if ( headings.length <= 1 ) {
+		return null;
+	}
+
 	let prevHeadingLevel = 1;
 
 	const tocItems = headings.map( ( heading, index ) => {
@@ -87,8 +91,8 @@ const TableOfContents = ( { blocks } ) => {
 	return (
 		<PanelBody title={ __( 'Table of Contents' ) } initialOpen={ false }>
 			<div className="table-of-contents__items">
-				{ headings.length > 1 && <p><strong>{ sprintf( '%d Headings', headings.length ) }</strong></p> }
-				{ tocItems }
+				<p><strong>{ sprintf( '%d Headings', headings.length ) }</strong></p>
+				<ul>{ tocItems }</ul>
 			</div>
 		</PanelBody>
 	);

@@ -4,36 +4,36 @@
 
 .table-of-contents-item {
 	display: flex;
+	align-items: flex-start;
 	margin: 4px 0;
 
-	&::before {
+	.table-of-contents-item__emdash::before {
 		color: $light-gray-500;
 		margin-right: 4px;
 	}
 
-	&.is-h2::before {
+	&.is-h2 .table-of-contents-item__emdash::before {
 		content: '—';
 	}
 
-	&.is-h3::before {
+	&.is-h3 .table-of-contents-item__emdash::before {
 		content: '——';
 	}
 
-	&.is-h4::before {
+	&.is-h4 .table-of-contents-item__emdash::before {
 		content: '———';
 	}
 
-	&.is-h5::before {
+	&.is-h5 .table-of-contents-item__emdash::before {
 		content: '————';
 	}
 
-	&.is-h6::before {
+	&.is-h6 .table-of-contents-item__emdash::before {
 		content: '—————';
 	}
 }
 
 .table-of-contents-item__level {
-	align-self: start;
 	background: $light-gray-500;
 	color: $dark-gray-800;
 	border-radius: 3px;

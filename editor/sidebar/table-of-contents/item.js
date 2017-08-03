@@ -8,7 +8,7 @@ const TableOfContentsItem = ( {
 	isValid,
 	level,
 } ) => (
-	<div
+	<li
 		className={ classnames(
 			'table-of-contents-item',
 			`is-h${ level }`,
@@ -17,13 +17,14 @@ const TableOfContentsItem = ( {
 			}
 		) }
 	>
+		<span className="table-of-contents-item__emdash" aria-hidden="true"></span>
 		<strong className="table-of-contents-item__level">
 			H{ level }
 		</strong>
-		<div className="table-of-contents-item__content">
+		<span className="table-of-contents-item__content">
 			{ children }
-		</div>
-	</div>
+		</span>
+	</li>
 );
 
 export default TableOfContentsItem;
