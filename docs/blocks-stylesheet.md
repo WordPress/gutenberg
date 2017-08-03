@@ -82,7 +82,7 @@ function gutenberg_boilerplate_enqueue_block_editor_assets() {
 add_action( 'enqueue_block_editor_assets', 'gutenberg_boilerplate_enqueue_block_editor_assets' );
 ```
 
-## Enqueueing Editor + Front end Assets
+## Enqueueing Editor and Front end Assets
 
 While a block's scripts are only necessary to load in the editor, you'll want to load styles both on the front of your site and in the editor. You may even want distinct styles in each context.
 
@@ -104,4 +104,4 @@ add_action( 'enqueue_block_assets', 'gutenberg_boilerplate_es5_enqueue_common_as
 
 The `enqueue_block_assets` action is triggered both in the editor and on the front of the site. Since your block is likely to share some styles in both contexts, you can consider `style.css` as the base stylesheet, placing editor-specific styles in `editor.css`.
 
-> If you'd like the scripts to be limited to your site's front end only, you can use `enqueue_block_assets` along with a call like `if ( ! is_admin() ) {}` etc.
+If you'd like the scripts to be limited to your site's front end only, you can use `enqueue_block_assets` and enqueue your scripts only if [`! is_admin()`](https://developer.wordpress.org/reference/functions/is_admin/) applies.
