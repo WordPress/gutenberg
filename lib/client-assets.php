@@ -458,6 +458,13 @@ function gutenberg_common_scripts_and_styles() {
 add_action( 'wp_enqueue_scripts', 'gutenberg_common_scripts_and_styles' );
 add_action( 'admin_enqueue_scripts', 'gutenberg_common_scripts_and_styles' );
 
+/**
+ * Returns a default color palette.
+ *
+ * @return array Color strings in hex format.
+ *
+ * @since 0.7.0
+ */
 function gutenberg_color_palette() {
 	return array(
 		'#f78da7',
