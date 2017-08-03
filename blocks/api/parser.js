@@ -142,40 +142,29 @@ export function isValidBlock( rawContent, blockType, attributes ) {
 			// colored error message for invalid parse.
 			//
 			// TODO: Teach browsers to ANSI
-			if ( chalk.enabled ) {
-				const { diffLines } = require( 'diff' );
-				const diff = diffLines( actual, expected );
-				message += chalk.bold( blockType.name ) + ':\n\n';
-				message += chalk.bgGreen( 'Expected' ) + ' ' + chalk.bgRed( 'Actual' ) + '\n\n';
+			const { diffLines } = require( 'diff' );
+			const diff = diffLines( actual, expected );
+			message += chalk.bold( blockType.name ) + ':\n\n';
+			message += chalk.bgGreen( '- Expected' ) + '\n' + chalk.bgRed( '+ Actual' ) + '\n\n';
+			message += diff.reduce( ( result, part ) => {
+				let { value } = part;
+				if ( part.removed ) {
+					value = value.replace( /\n$/, '' );
+					value = value.replace( /^/gm, '- ' );
+					value = chalk.red( value );
+				} else if ( part.added ) {
+					value = value.replace( /\n$/, '' );
+					value = value.replace( /^/gm, '+ ' );
+					value = '\n' + value;
+					value = chalk.green( value );
+					value += '\n';
+				}
 
-				message += diff.reduce( ( result, part ) => {
-					let { value } = part;
-					if ( part.removed ) {
-						value = value.replace( /\n$/, '' );
-						value = value.replace( /^/gm, '- ' );
-						value = chalk.red( value );
-					} else if ( part.added ) {
-						value = value.replace( /\n$/, '' );
-						value = value.replace( /^/gm, '+ ' );
-						value = '\n' + value;
-						value = chalk.green( value );
-						value += '\n';
-					}
+				return result + value;
+			}, '' );
 
-					return result + value;
-				}, '' );
-			} else {
-				message += blockType.name + ':\n\n' +
-					'Expected:\n\n' + expected + '\n\n' +
-					'Actual:\n\n' + actual;
-			}
-
-			if ( 'test' === process.env.NODE_ENV ) {
-				throw new Error( message );
-			} else {
-				// eslint-disable-next-line no-console
-				console.warn( message );
-			}
+			// eslint-disable-next-line no-console
+			console.error( message );
 		}
 	}
 

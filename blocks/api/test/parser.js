@@ -97,8 +97,8 @@ describe( 'block parser', () => {
 	describe( 'isValidBlock()', () => {
 		it( 'returns false is block is not valid', () => {
 			/* eslint-disable no-console */
-			const env = process.env.NODE_ENV;
-			process.env.NODE_ENV = 'production';
+			const consoleError = console.error;
+			console.error = jest.fn();
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
 			expect( isValidBlock(
@@ -106,8 +106,8 @@ describe( 'block parser', () => {
 				getBlockType( 'core/test-block' ),
 				{ fruit: 'Bananas' }
 			) ).toBe( false );
-
-			process.env.NODE_ENV = env;
+			expect( console.error ).toHaveBeenCalled();
+			console.error = consoleError;
 			/* eslint-enable no-console */
 		} );
 
