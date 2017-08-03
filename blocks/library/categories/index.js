@@ -57,6 +57,12 @@ registerBlockType( 'core/categories', {
 			this.toggleShowHierarchy = this.toggleShowHierarchy.bind( this );
 		}
 
+		componentWillUnmount() {
+			if ( this.categoriesRequest.state() === 'pending' ) {
+				this.categoriesRequest.abort();
+			}
+		}
+
 		toggleDisplayAsDropdown() {
 			const { attributes, setAttributes } = this.props;
 			const { displayAsDropdown } = attributes;
@@ -235,12 +241,6 @@ registerBlockType( 'core/categories', {
 					}
 				</div>,
 			];
-		}
-
-		componentWillUnmount() {
-			if ( this.categoriesRequest.state() === 'pending' ) {
-				this.categoriesRequest.abort();
-			}
 		}
 	},
 
