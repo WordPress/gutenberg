@@ -13,6 +13,9 @@
  * @return string Returns the categories list/dropdown markup.
  */
 function gutenberg_render_block_core_categories( $attributes ) {
+	static $block_id = 0;
+	$block_id++;
+
 	$align = 'center';
 	if ( isset( $attributes['align'] ) && in_array( $attributes['align'], array( 'left', 'right', 'full' ), true ) ) {
 		$align = $attributes['align'];
@@ -27,7 +30,7 @@ function gutenberg_render_block_core_categories( $attributes ) {
 	);
 
 	if ( ! empty( $attributes['displayAsDropdown'] ) ) {
-		$id = 'wp-block-categories-' . wp_rand();
+		$id = 'wp-block-categories-' . $block_id;
 		$args['id'] = $id;
 		$args['show_option_none'] = __( 'Select Category', 'gutenberg' );
 		$wrapper_markup = '<div class="%1$s">%2$s</div>';
