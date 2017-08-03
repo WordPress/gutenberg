@@ -1593,6 +1593,68 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 		$this->assertErrorResponse( 'rest_user_invalid_id', $response, 404 );
 	}
 
+	/**
+	 * @ticket 40263
+	 */
+	public function test_update_item_only_roles_as_editor() {
+		$user_id = $this->factory->user->create( array(
+			'role' => 'author',
+		) );
+
+		wp_set_current_user( self::$editor );
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/users/%d', $user_id ) );
+		$request->set_param( 'roles', array( 'editor' ) );
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_cannot_edit_roles', $response, 403 );
+	}
+
+	/**
+	 * @ticket 40263
+	 */
+	public function test_update_item_only_roles_as_site_administrator() {
+		$user_id = $this->factory->user->create( array(
+			'role' => 'author',
+		) );
+
+		wp_set_current_user( self::$user );
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/users/%d', $user_id ) );
+		$request->set_param( 'roles', array( 'editor' ) );
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+
+		$new_data = $response->get_data();
+		$this->assertEquals( 'editor', $new_data['roles'][0] );
+	}
+
+	/**
+	 * @ticket 40263
+	 */
+	public function test_update_item_including_roles_and_other_params() {
+		$user_id = $this->factory->user->create( array(
+			'role' => 'author',
+		) );
+
+		wp_set_current_user( self::$user );
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/users/%d', $user_id ) );
+		$request->set_param( 'roles', array( 'editor' ) );
+		$request->set_param( 'name', 'Short-Lived User' );
+		$response = $this->server->dispatch( $request );
+
+		if ( is_multisite() ) {
+			// Site administrators can promote users, as verified by the
+			// previous test, but they cannot perform other user-editing
+			// operations.  This also tests the branch of logic that verifies
+			// that no parameters other than 'id' and 'roles' are specified for
+			// a roles update.
+			$this->assertErrorResponse( 'rest_cannot_edit', $response, 403 );
+		} else {
+			$this->assertEquals( 200, $response->get_status() );
+
+			$new_data = $response->get_data();
+			$this->assertEquals( 'editor', $new_data['roles'][0] );
+		}
+	}
+
 	public function test_update_item_invalid_password() {
 		$this->allow_user_to_manage_multisite();
 		wp_set_current_user( self::$user );
