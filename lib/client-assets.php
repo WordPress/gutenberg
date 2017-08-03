@@ -459,6 +459,30 @@ add_action( 'wp_enqueue_scripts', 'gutenberg_common_scripts_and_styles' );
 add_action( 'admin_enqueue_scripts', 'gutenberg_common_scripts_and_styles' );
 
 /**
+ * Returns a default color palette.
+ *
+ * @return array Color strings in hex format.
+ *
+ * @since 0.7.0
+ */
+function gutenberg_color_palette() {
+	return array(
+		'#f78da7',
+		'#eb144c',
+		'#ff6900',
+		'#fcb900',
+		'#7bdcb5',
+		'#00d084',
+		'#8ed1fc',
+		'#0693e3',
+		'#eee',
+		'#abb8c3',
+		'#444',
+		'#111',
+	);
+}
+
+/**
  * Scripts & Styles.
  *
  * Enqueues the needed scripts and styles when visiting the top-level page of
@@ -625,9 +649,17 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 	// Initialize the editor.
 	$gutenberg_theme_support = get_theme_support( 'gutenberg' );
+	$color_palette = gutenberg_color_palette();
+
+	if ( $gutenberg_theme_support && $gutenberg_theme_support[0]['colors'] ) {
+		$color_palette = $gutenberg_theme_support[0]['colors'];
+	}
+
 	$editor_settings = array(
 		'wideImages' => $gutenberg_theme_support ? $gutenberg_theme_support[0]['wide-images'] : false,
+		'colors' => $color_palette,
 	);
+
 	wp_add_inline_script( 'wp-editor', 'wp.api.init().done( function() {'
 		. 'wp.editor.createEditorInstance( \'editor\', window._wpGutenbergPost, ' . json_encode( $editor_settings ) . ' ); '
 		. '} );'

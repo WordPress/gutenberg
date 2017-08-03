@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { CirclePicker } from 'react-color';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -19,6 +14,7 @@ import Editable from '../../editable';
 import UrlInput from '../../url-input';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
+import ColorPalette from '../../color-palette';
 import InspectorControls from '../../inspector-controls';
 
 const { attr, children } = query;
@@ -76,9 +72,9 @@ registerBlockType( 'core/button', {
 				}
 				{ focus &&
 					<InspectorControls key="inspector">
-						<CirclePicker
+						<ColorPalette
 							color={ color }
-							onChangeComplete={ ( colorValue ) => setAttributes( { color: colorValue.hex } ) }
+							onChange={ ( colorValue ) => setAttributes( { color: colorValue.hex } ) }
 						/>
 						<InspectorControls.TextControl
 							label={ __( 'Hex Color' ) }
