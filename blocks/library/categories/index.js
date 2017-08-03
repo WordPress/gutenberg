@@ -163,7 +163,7 @@ registerBlockType( 'core/categories', {
 					{ this.renderCategoryName( category ) }
 					{
 						!! showPostCounts
-							? ` ( ${ category.count } )`
+							? ` (${ category.count })`
 							: ''
 					}
 				</option>,
