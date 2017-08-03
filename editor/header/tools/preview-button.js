@@ -20,7 +20,6 @@ function PreviewButton( { link, postId } ) {
 			href={ link }
 			target={ `wp-preview-${ postId }` }
 			icon="visibility"
-			disabled={ ! link }
 		>
 			{ _x( 'Preview', 'imperative verb' ) }
 		</IconButton>
