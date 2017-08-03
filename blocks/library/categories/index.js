@@ -4,6 +4,7 @@
 import { Component } from '@wordpress/element';
 import { Placeholder, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { unescape } from 'lodash';
 
 /**
  * Internal dependencies
@@ -95,6 +96,14 @@ registerBlockType( 'core/categories', {
 			return `${ className }__list ${ className }__list-level-${ level }`;
 		}
 
+		renderCategoryName( category ) {
+			if ( ! category.name ) {
+				return __( '(Untitled)' );
+			}
+
+			return unescape( category.name ).trim();
+		}
+
 		renderCategoryList() {
 			const { showHierarchy } = this.props.attributes;
 			const parentId = showHierarchy ? 0 : null;
@@ -113,7 +122,7 @@ registerBlockType( 'core/categories', {
 
 			return (
 				<li key={ category.id }>
-					<a href={ category.link } target="_blank">{ category.name.trim() || __( '(Untitled)' ) }</a>
+					<a href={ category.link } target="_blank">{ this.renderCategoryName( category ) }</a>
 					{ showPostCounts &&
 						<span className={ `${ this.props.className }__post-count` }>
 							{ ' ' }({ category.count })
@@ -151,7 +160,7 @@ registerBlockType( 'core/categories', {
 			return [
 				<option key={ category.id }>
 					{ new Array( level * 3 ).fill( '\xa0' ) }
-					{ category.name.trim() || __( '(Untitled)' ) }
+					{ this.renderCategoryName( category ) }
 					{
 						!! showPostCounts
 							? ` ( ${ category.count } )`
