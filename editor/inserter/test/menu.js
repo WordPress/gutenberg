@@ -91,6 +91,7 @@ describe( 'InserterMenu', () => {
 				instanceId={ 1 }
 				blocks={ [] }
 				recentlyUsedBlocks={ [] }
+				debouncedSpeak={ noop }
 			/>
 		);
 
@@ -208,6 +209,7 @@ describe( 'InserterMenu', () => {
 				instanceId={ 1 }
 				blocks={ [] }
 				recentlyUsedBlocks={ [] }
+				debouncedSpeak={ noop }
 			/>
 		);
 		wrapper.setState( { filterValue: ' text' } );
