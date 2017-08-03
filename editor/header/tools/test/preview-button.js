@@ -33,8 +33,7 @@ describe( 'PreviewButton', () => {
 				<PreviewButton
 					postId={ 1 }
 					link="https://wordpress.org/?p=1"
-					modified="2017-08-03T15:05:50" />,
-				{ lifecycleExperimental: true }
+					modified="2017-08-03T15:05:50" />
 			);
 			wrapper.instance().previewWindow = {};
 			wrapper.setState( { isAwaitingSave: true } );
@@ -44,6 +43,7 @@ describe( 'PreviewButton', () => {
 			expect(
 				wrapper.instance().previewWindow.location
 			).toBe( 'https://wordpress.org/?p=1' );
+			expect( wrapper.state( 'isAwaitingSave' ) ).toBe( false );
 		} );
 	} );
 

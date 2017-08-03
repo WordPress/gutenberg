@@ -30,16 +30,17 @@ export class PreviewButton extends Component {
 		};
 	}
 
-	componentDidUpdate( prevProps ) {
-		const { modified, link } = this.props;
+	componentWillReceiveProps( nextProps ) {
+		const { modified, link } = nextProps;
 		const { isAwaitingSave } = this.state;
 		const hasFinishedSaving = (
 			isAwaitingSave &&
-			modified !== prevProps.modified
+			modified !== this.props.modified
 		);
 
 		if ( hasFinishedSaving && this.previewWindow ) {
 			this.previewWindow.location = link;
+			this.setState( { isAwaitingSave: false } );
 		}
 	}
 
