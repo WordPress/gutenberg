@@ -17,6 +17,7 @@ import { registerBlockType, createBlock, query as hpq } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
 import Editable from '../../editable';
+import InspectorControls from '../../inspector-controls';
 
 const { children, node, query } = hpq;
 
@@ -129,6 +130,16 @@ registerBlockType( 'core/quote', {
 		return [
 			focus && (
 				<BlockControls key="controls">
+					<Toolbar
+						controls={ [ {
+							icon: 'editor-aligncenter',
+							title: __( 'Align center' ),
+							isActive: align === 'center',
+							onClick: () => setAttributes( {
+								align: align === 'center' ? null : 'center',
+							} ),
+						} ] }
+					/>
 					<Toolbar controls={ [ 1, 2 ].map( ( variation ) => ( {
 						icon: 1 === variation ? 'format-quote' : 'testimonial',
 						title: sprintf( __( 'Quote style %d' ), variation ),
@@ -137,13 +148,18 @@ registerBlockType( 'core/quote', {
 							setAttributes( { style: variation } );
 						},
 					} ) ) } />
+				</BlockControls>
+			),
+			focus && (
+				<InspectorControls key="inspector">
+					<h3>{ __( 'Text Alignment' ) }</h3>
 					<AlignmentToolbar
 						value={ align }
 						onChange={ ( nextAlign ) => {
 							setAttributes( { align: nextAlign } );
 						} }
 					/>
-				</BlockControls>
+				</InspectorControls>
 			),
 			<blockquote
 				key="quote"

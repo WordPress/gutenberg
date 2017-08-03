@@ -118,18 +118,29 @@ registerBlockType( 'core/heading', {
 
 		return [
 			focus && (
-				<BlockControls
-					key="controls"
-					controls={
-						'234'.split( '' ).map( ( level ) => ( {
-							icon: 'heading',
-							title: sprintf( __( 'Heading %s' ), level ),
-							isActive: 'H' + level === nodeName,
-							onClick: () => setAttributes( { nodeName: 'H' + level } ),
-							subscript: level,
-						} ) )
-					}
-				/>
+				<BlockControls key="controls">
+					<Toolbar
+						controls={ [ {
+							icon: 'editor-aligncenter',
+							title: __( 'Align center' ),
+							isActive: align === 'center',
+							onClick: () => setAttributes( {
+								align: align === 'center' ? null : 'center',
+							} ),
+						} ] }
+					/>
+					<Toolbar
+						controls={
+							'234'.split( '' ).map( ( level ) => ( {
+								icon: 'heading',
+								title: sprintf( __( 'Heading %s' ), level ),
+								isActive: 'H' + level === nodeName,
+								onClick: () => setAttributes( { nodeName: 'H' + level } ),
+								subscript: level,
+							} ) )
+						}
+					/>
+				</BlockControls>
 			),
 			focus && (
 				<InspectorControls key="inspector">
