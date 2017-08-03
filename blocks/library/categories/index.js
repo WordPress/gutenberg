@@ -80,7 +80,7 @@ registerBlockType( 'core/categories', {
 		getCategories( parentId = null ) {
 			const { categories } = this.state;
 			if ( ! categories.length ) {
-				return [];
+				return categories;
 			}
 
 			if ( parentId === null ) {
