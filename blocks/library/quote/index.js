@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isString, isObject } from 'lodash';
+import { isString, isObject, findIndex, flattenDeep } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -39,9 +39,26 @@ registerBlockType( 'core/quote', {
 			{
 				type: 'block',
 				blocks: [ 'core/text' ],
-				transform: ( { content } ) => {
+				transform: ( { content, ...attrs } ) => {
+					let value, citation = null;
+					if ( content && content.length > 0 ) {
+						content = flattenDeep( content );
+						const citationBreakPosition = findIndex( content, function( child ) {
+							return isObject( child ) && child.type === 'br' && child.props.className === 'citation-break';
+						} );
+
+						if ( citationBreakPosition !== -1 ) {
+							value = content.slice( 0, citationBreakPosition );
+							citation = content.slice( citationBreakPosition + 1 );
+						} else {
+							value = content;
+						}
+					}
+
 					return createBlock( 'core/quote', {
-						value: content,
+						value,
+						citation,
+						...attrs,
 					} );
 				},
 			},
@@ -69,27 +86,21 @@ registerBlockType( 'core/quote', {
 				type: 'block',
 				blocks: [ 'core/text' ],
 				transform: ( { value, citation, ...attrs } ) => {
-					const textElement = value[ 0 ];
-					if ( ! textElement ) {
+					// If quote value then the citation becomes the text content.
+					if ( ! value || value.length === 0 ) {
 						return createBlock( 'core/text', {
 							content: citation,
 						} );
 					}
-					const textContent = isString( textElement ) ? textElement : textElement.props.children;
-					if ( Array.isArray( value ) || citation ) {
-						const text = createBlock( 'core/text', {
-							content: textContent,
-						} );
-						const quote = createBlock( 'core/quote', {
-							...attrs,
-							citation,
-							value: Array.isArray( value ) ? value.slice( 1 ) : '',
-						} );
 
-						return [ text, quote ];
+					const content = value;
+					if ( citation && citation.length > 0 ) {
+						content.push( <br className="citation-break" key="citationBreak" /> );
+						content.push( ...citation );
 					}
 					return createBlock( 'core/text', {
-						content: textContent,
+						content,
+						...attrs,
 					} );
 				},
 			},
