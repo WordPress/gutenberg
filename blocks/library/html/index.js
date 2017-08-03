@@ -8,6 +8,7 @@ import TextareaAutosize from 'react-autosize-textarea';
  */
 import { __ } from 'i18n';
 import { Component } from 'element';
+import { SandBox } from 'components';
 
 /**
  * Internal dependencies
@@ -15,6 +16,8 @@ import { Component } from 'element';
 import './style.scss';
 import { registerBlockType, query } from '../../api';
 import BlockControls from '../../block-controls';
+import InspectorControls from '../../inspector-controls';
+import BlockDescription from '../../block-description';
 
 const { html } = query;
 
@@ -39,6 +42,9 @@ registerBlockType( 'core/html', {
 			this.state = {
 				preview: false,
 			};
+			const allowedHtmlTags = new Set( Object.keys( wp.editor.allowedPostHtml ) );
+			const unsafeHtmlTags = [ 'script', 'iframe', 'form', 'input', 'style' ];
+			this.disallowedHtmlTags = unsafeHtmlTags.filter( tag => ! allowedHtmlTags.has( tag ) );
 		}
 
 		preview() {
@@ -71,8 +77,26 @@ registerBlockType( 'core/html', {
 							</ul>
 						</BlockControls>
 					}
+					{ focus &&
+						<InspectorControls key="inspector">
+							<BlockDescription>
+								<p>{ __( 'Arbitrary HTML code.' ) }</p>
+								{ ! wp.editor.canUnfilteredHtml && this.disallowedHtmlTags.length > 0 &&
+									<p>
+										<span>{ __( 'Some HTML tags are not permitted, including:' ) }</span>
+										{ ' ' }
+										{ this.disallowedHtmlTags.map( ( tag, i ) => <span key={ i }>
+											{ 0 !== i && ', ' }
+											<code>{ tag }</code>
+										</span> ) }
+										{ '.' }
+									</p>
+								}
+							</BlockDescription>
+						</InspectorControls>
+					}
 					{ preview
-						? <div dangerouslySetInnerHTML={ { __html: attributes.content } } />
+						? <SandBox html={ attributes.content } title={ __( 'Preview of custom HTML' ) } />
 						: <TextareaAutosize
 							value={ attributes.content }
 							onChange={ ( event ) => setAttributes( { content: event.target.value } ) }

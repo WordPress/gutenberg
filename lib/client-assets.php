@@ -623,6 +623,10 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'before'
 	);
 
+	// Export data required by the Custom HTML block.
+	wp_add_inline_script( 'wp-editor', sprintf( 'wp.editor.canUnfilteredHtml = %s;', wp_json_encode( current_user_can( 'unfiltered_html' ) ) ) );
+	wp_add_inline_script( 'wp-editor', sprintf( 'wp.editor.allowedPostHtml = %s;', wp_json_encode( wp_kses_allowed_html( 'post' ) ) ) );
+
 	// Initialize the editor.
 	$gutenberg_theme_support = get_theme_support( 'gutenberg' );
 	$editor_settings = array(
