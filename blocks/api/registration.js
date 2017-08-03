@@ -17,7 +17,7 @@ const blocks = {};
  *
  * @type {?string}
  */
-let unknownTypeHandler;
+let unknownTypeHandlerName;
 
 /**
  * Name of the default block.
@@ -102,8 +102,8 @@ export function unregisterBlockType( name ) {
  *
  * @param {string} name Block name
  */
-export function setUnknownTypeHandler( name ) {
-	unknownTypeHandler = name;
+export function setUnknownTypeHandlerName( name ) {
+	unknownTypeHandlerName = name;
 }
 
 /**
@@ -112,8 +112,8 @@ export function setUnknownTypeHandler( name ) {
  *
  * @return {?string} Blog name
  */
-export function getUnknownTypeHandler() {
-	return unknownTypeHandler;
+export function getUnknownTypeHandlerName() {
+	return unknownTypeHandlerName;
 }
 
 /**

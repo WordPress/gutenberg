@@ -7,13 +7,13 @@ import { noop } from 'lodash';
  * Internal dependencies
  */
 import { createBlock, switchToBlockType } from '../factory';
-import { getBlockTypes, unregisterBlockType, setUnknownTypeHandler, registerBlockType } from '../registration';
+import { getBlockTypes, unregisterBlockType, setUnknownTypeHandlerName, registerBlockType } from '../registration';
 
 describe( 'block factory', () => {
 	const defaultBlockSettings = { save: noop };
 
 	afterEach( () => {
-		setUnknownTypeHandler( undefined );
+		setUnknownTypeHandlerName( undefined );
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );

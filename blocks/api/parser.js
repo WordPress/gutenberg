@@ -13,7 +13,7 @@ import { bumpStat } from '@wordpress/utils';
  * Internal dependencies
  */
 import { parse as grammarParse } from './post.pegjs';
-import { getBlockType, getUnknownTypeHandler } from './registration';
+import { getBlockType, getUnknownTypeHandlerName } from './registration';
 import { createBlock } from './factory';
 import { isValidBlock } from './validation';
 
@@ -75,7 +75,7 @@ export function getBlockAttributes( blockType, rawContent, attributes ) {
  */
 export function createBlockWithFallback( name, rawContent, attributes ) {
 	// Use type from block content, otherwise find unknown handler.
-	name = name || getUnknownTypeHandler();
+	name = name || getUnknownTypeHandlerName();
 
 	// Convert 'core/text' blocks in existing content to the new
 	// 'core/paragraph'.
@@ -86,7 +86,7 @@ export function createBlockWithFallback( name, rawContent, attributes ) {
 
 	// Try finding type for known block name, else fall back again.
 	let blockType = getBlockType( name );
-	const fallbackBlock = getUnknownTypeHandler();
+	const fallbackBlock = getUnknownTypeHandlerName();
 	if ( ! blockType ) {
 		name = fallbackBlock;
 		blockType = getBlockType( name );

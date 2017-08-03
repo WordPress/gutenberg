@@ -12,8 +12,8 @@ export { getCategories } from './categories';
 export {
 	registerBlockType,
 	unregisterBlockType,
-	setUnknownTypeHandler,
-	getUnknownTypeHandler,
+	setUnknownTypeHandlerName,
+	getUnknownTypeHandlerName,
 	setDefaultBlock,
 	getDefaultBlock,
 	getBlockType,
