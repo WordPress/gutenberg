@@ -194,7 +194,7 @@ function gutenberg_register_vendor_scripts() {
 	);
 	gutenberg_register_vendor_script(
 		'react-dom-server',
-		'https://unpkg.com/react-dom@next/umd/react-dom-server' . $react_suffix . '.js',
+		'https://unpkg.com/react-dom@next/umd/react-dom-server.browser' . $react_suffix . '.js',
 		array( 'react' )
 	);
 	$moment_script = SCRIPT_DEBUG ? 'moment.js' : 'min/moment.min.js';
