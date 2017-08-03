@@ -43,7 +43,7 @@ function EnableTrackingPrompt( props ) {
 				</div>
 			</div>
 			<div className="enable-tracking-prompt__clarification">
-				{ __( 'Usage data is completely anonymous and will only be used to improve the editor.' ) }
+				{ __( 'Usage data is completely anonymous, does not include your post content, and will only be used to improve the editor.' ) }
 			</div>
 		</div>
 	);
