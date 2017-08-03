@@ -1021,6 +1021,30 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
+	 * @ticket 41101
+	 * @group ms-required
+	 */
+	public function test_create_new_network_user_with_add_user_to_blog_failure() {
+		$this->allow_user_to_manage_multisite();
+
+		$params = array(
+			'username' => 'testuser123',
+			'password' => 'testpassword',
+			'email'    => 'test@example.com',
+			'name'     => 'Test User 123',
+			'roles'    => array( 'editor' ),
+		);
+
+		add_filter( 'can_add_user_to_blog', '__return_false' );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/users' );
+		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
+		$request->set_body_params( $params );
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'user_cannot_be_added', $response );
+	}
+
+	/**
 	 * @group ms-required
 	 */
 	public function test_create_new_network_user_on_sub_site_adds_user_to_site() {
