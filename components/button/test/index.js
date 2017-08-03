@@ -17,7 +17,6 @@ describe( 'Button', () => {
 			expect( button.hasClass( 'button-large' ) ).toBe( false );
 			expect( button.hasClass( 'button-primary' ) ).toBe( false );
 			expect( button.hasClass( 'is-toggled' ) ).toBe( false );
-			expect( button.hasClass( 'is-borderless' ) ).toBe( false );
 			expect( button.prop( 'disabled' ) ).toBeUndefined();
 			expect( button.prop( 'type' ) ).toBe( 'button' );
 			expect( button.type() ).toBe( 'button' );
@@ -30,10 +29,25 @@ describe( 'Button', () => {
 			expect( button.hasClass( 'button-primary' ) ).toBe( true );
 		} );
 
+		it( 'should render a button element with button-secondary class', () => {
+			const button = shallow( <Button isSecondary /> );
+			expect( button.hasClass( 'button' ) ).toBe( true );
+			expect( button.hasClass( 'button-large' ) ).toBe( false );
+			expect( button.hasClass( 'button-secondary' ) ).toBe( true );
+		} );
+
 		it( 'should render a button element with button-large class', () => {
 			const button = shallow( <Button isLarge /> );
 			expect( button.hasClass( 'button' ) ).toBe( true );
 			expect( button.hasClass( 'button-large' ) ).toBe( true );
+			expect( button.hasClass( 'button-primary' ) ).toBe( false );
+		} );
+
+		it( 'should render a button element with button-small class', () => {
+			const button = shallow( <Button isSmall /> );
+			expect( button.hasClass( 'button' ) ).toBe( false );
+			expect( button.hasClass( 'button-large' ) ).toBe( false );
+			expect( button.hasClass( 'button-small' ) ).toBe( true );
 			expect( button.hasClass( 'button-primary' ) ).toBe( false );
 		} );
 
