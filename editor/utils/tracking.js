@@ -48,7 +48,7 @@ export function bumpStat( group, name ) {
 
 	if ( process.env.NODE_ENV === 'development' ) {
 		console.log(
-			'Skipping stats collection for non-production build:',
+			'Skipping stats collection for development build:',
 			src
 		);
 	}
