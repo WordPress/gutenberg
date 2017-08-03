@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import Dashicon from 'components/dashicon';
-import { createElement, Component } from 'element';
+import { Dashicon } from '@wordpress/components';
+import { createElement, Component } from '@wordpress/element';
 
 export default function BlockIcon( { icon } ) {
 	if ( 'string' === typeof icon ) {

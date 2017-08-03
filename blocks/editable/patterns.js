@@ -7,7 +7,7 @@ import { endsWith, find, get, escapeRegExp, partition, drop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { ESCAPE, ENTER, SPACE, BACKSPACE } from 'utils/keycodes';
+import { keycodes } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -18,6 +18,8 @@ import { getBlockTypes } from '../api/registration';
  * Browser dependencies
  */
 const { setTimeout } = window;
+
+const { ESCAPE, ENTER, SPACE, BACKSPACE } = keycodes;
 
 export default function( editor ) {
 	const getContent = this.getContent.bind( this );

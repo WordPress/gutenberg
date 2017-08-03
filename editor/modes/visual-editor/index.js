@@ -7,9 +7,9 @@ import { first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { Component, findDOMNode } from 'element';
-import { KeyboardShortcuts } from 'components';
+import { __ } from '@wordpress/i18n';
+import { Component, findDOMNode } from '@wordpress/element';
+import { KeyboardShortcuts } from '@wordpress/components';
 
 /**
  * Internal dependencies

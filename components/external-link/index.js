@@ -7,7 +7,7 @@ import { compact, uniq } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies

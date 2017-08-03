@@ -1,4 +1,4 @@
-import { renderToString } from 'element';
+import { renderToString } from '@wordpress/element';
 
 export default class Sandbox extends wp.element.Component {
 

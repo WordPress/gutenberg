@@ -7,11 +7,11 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
-import { __, _n, sprintf } from 'i18n';
-import { Component } from 'element';
-import { Popover, withFocusReturn, withInstanceId } from 'components';
-import { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } from 'utils/keycodes';
-import { getCategories, getBlockTypes, BlockIcon } from 'blocks';
+import { __, _n, sprintf } from '@wordpress/i18n';
+import { Component } from '@wordpress/element';
+import { Popover, withFocusReturn, withInstanceId } from '@wordpress/components';
+import { keycodes } from '@wordpress/utils';
+import { getCategories, getBlockTypes, BlockIcon } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -19,6 +19,8 @@ import { getCategories, getBlockTypes, BlockIcon } from 'blocks';
 import './style.scss';
 import { getBlocks, getRecentlyUsedBlocks } from '../selectors';
 import { showInsertionPoint, hideInsertionPoint } from '../actions';
+
+const { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } = keycodes;
 
 export const searchBlocks = ( blocks, searchTerm ) => {
 	const normalizedSearchTerm = searchTerm.toLowerCase().trim();

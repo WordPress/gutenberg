@@ -6,9 +6,9 @@ import { isObject } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from 'i18n';
-import { concatChildren } from 'element';
-import { Toolbar } from 'components';
+import { __, sprintf } from '@wordpress/i18n';
+import { concatChildren } from '@wordpress/element';
+import { Toolbar } from '@wordpress/components';
 
 /**
  * Internal dependencies

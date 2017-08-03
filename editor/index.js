@@ -10,9 +10,9 @@ import 'moment-timezone/moment-timezone-utils';
 /**
  * WordPress dependencies
  */
-import { EditableProvider, parse } from 'blocks';
-import { render } from 'element';
-import { settings } from 'date';
+import { EditableProvider, parse } from '@wordpress/blocks';
+import { render } from '@wordpress/element';
+import { settings } from '@wordpress/date';
 
 /**
  * Internal dependencies

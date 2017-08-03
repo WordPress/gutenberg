@@ -6,9 +6,9 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
-import { Component } from 'element';
-import { __ } from 'i18n';
-import { Dashicon, ClipboardButton, Button } from 'components';
+import { Component } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { Dashicon, ClipboardButton, Button } from '@wordpress/components';
 
 /**
  * Internal Dependencies

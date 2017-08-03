@@ -6,8 +6,8 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { PanelBody, PanelRow, FormToggle, withInstanceId } from 'components';
+import { __ } from '@wordpress/i18n';
+import { PanelBody, PanelRow, FormToggle, withInstanceId } from '@wordpress/components';
 
 /**
  * Internal Dependencies

@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { Placeholder, Toolbar, Dashicon } from 'components';
-import { __ } from 'i18n';
+import { Placeholder, Toolbar, Dashicon } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 import classnames from 'classnames';
 
 /**

@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { Button } from 'components';
+import { __ } from '@wordpress/i18n';
+import { Button } from '@wordpress/components';
 
 function PostScheduleClock( { is12Hour, selected, onChange } ) {
 	const minutes = selected.format( 'mm' );

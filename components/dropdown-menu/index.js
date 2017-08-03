@@ -7,15 +7,17 @@ import clickOutside from 'react-click-outside';
 /**
  * WordPress dependencies
  */
-import IconButton from 'components/icon-button';
-import Dashicon from 'components/dashicon';
-import { Component, findDOMNode } from 'element';
-import { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } from 'utils/keycodes';
+import { Component, findDOMNode } from '@wordpress/element';
+import { keycodes } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
+import IconButton from '../icon-button';
+import Dashicon from '../dashicon';
+
+const { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } = keycodes;
 
 export class DropdownMenu extends Component {
 	constructor() {

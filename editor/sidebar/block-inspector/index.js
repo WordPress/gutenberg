@@ -7,8 +7,8 @@ import { Slot } from 'react-slot-fill';
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { Panel, PanelBody } from 'components';
+import { __ } from '@wordpress/i18n';
+import { Panel, PanelBody } from '@wordpress/components';
 
 /**
  * Internal Dependencies

@@ -4,6 +4,11 @@
 import moment from 'moment';
 
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import {
@@ -54,11 +59,6 @@ import {
 	getSuggestedPostFormat,
 	getNotices,
 } from '../selectors';
-
-/**
- * WordPress dependencies
- */
-import { __ } from 'i18n';
 
 describe( 'selectors', () => {
 	describe( 'getEditorMode', () => {

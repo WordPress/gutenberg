@@ -9,7 +9,7 @@ import { reduce, keyBy, first, last, omit, without, flowRight, forOwn } from 'lo
 /**
  * WordPress dependencies
  */
-import { getBlockTypes } from 'blocks';
+import { getBlockTypes } from '@wordpress/blocks';
 
 /**
  * Internal dependencies

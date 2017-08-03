@@ -9,10 +9,10 @@ import moment from 'moment';
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { Component } from 'element';
-import { dateI18n, settings } from 'date';
-import { PanelRow } from 'components';
+import { __ } from '@wordpress/i18n';
+import { Component } from '@wordpress/element';
+import { dateI18n, settings } from '@wordpress/date';
+import { PanelRow } from '@wordpress/components';
 
 /**
  * Internal dependencies

@@ -6,12 +6,14 @@ import { shallow, mount } from 'enzyme';
 /**
  * WordPress dependencies
  */
-import { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } from 'utils/keycodes';
+import { keycodes } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
 import { DropdownMenu } from '../';
+
+const { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } = keycodes;
 
 describe( 'DropdownMenu', () => {
 	let controls;

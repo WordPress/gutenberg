@@ -7,7 +7,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { registerBlockType, unregisterBlockType, getBlockTypes } from 'blocks';
+import { registerBlockType, unregisterBlockType, getBlockTypes } from '@wordpress/blocks';
 
 /**
  * Internal dependencies

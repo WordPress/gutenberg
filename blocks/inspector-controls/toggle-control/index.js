@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { withInstanceId, FormToggle } from 'components';
+import { withInstanceId, FormToggle } from '@wordpress/components';
 
 /**
  * Internal dependencies

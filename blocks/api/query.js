@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createElement } from 'element';
+import { createElement } from '@wordpress/element';
 
 /**
  * External dependencies

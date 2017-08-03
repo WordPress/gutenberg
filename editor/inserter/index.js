@@ -7,10 +7,10 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { Component } from 'element';
-import { IconButton } from 'components';
-import { createBlock } from 'blocks';
+import { __ } from '@wordpress/i18n';
+import { Component } from '@wordpress/element';
+import { IconButton } from '@wordpress/components';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies

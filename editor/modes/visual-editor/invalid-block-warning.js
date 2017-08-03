@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { Dashicon } from 'components';
-import { __ } from 'i18n';
+import { Dashicon } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 const warning = (
 	<div className="editor-visual-editor__invalid-block-warning">

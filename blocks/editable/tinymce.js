@@ -8,7 +8,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Component, Children, createElement } from 'element';
+import { Component, Children, createElement } from '@wordpress/element';
 
 export default class TinyMCE extends Component {
 	componentDidMount() {

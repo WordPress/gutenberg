@@ -6,8 +6,8 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
-import { sprintf, _n, __ } from 'i18n';
-import { IconButton } from 'components';
+import { sprintf, _n, __ } from '@wordpress/i18n';
+import { IconButton } from '@wordpress/components';
 
 /**
  * Internal dependencies

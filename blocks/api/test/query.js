@@ -6,7 +6,7 @@ import { parse } from 'hpq';
 /**
  * WordPress dependencies
  */
-import { renderToString } from 'element';
+import { renderToString } from '@wordpress/element';
 
 /**
  * Internal dependencies

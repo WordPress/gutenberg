@@ -6,8 +6,8 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { Placeholder, Dashicon, Toolbar, DropZone } from 'components';
+import { __ } from '@wordpress/i18n';
+import { Placeholder, Dashicon, Toolbar, DropZone } from '@wordpress/components';
 
 /**
  * Internal dependencies

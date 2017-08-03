@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { Toolbar, Placeholder } from 'components';
+import { __ } from '@wordpress/i18n';
+import { Toolbar, Placeholder } from '@wordpress/components';
 import { pick } from 'lodash';
 
 /**
