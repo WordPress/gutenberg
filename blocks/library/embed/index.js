@@ -223,6 +223,73 @@ registerBlockType(
 		icon: 'video-alt3',
 	} )
 );
+
+// Common
+registerBlockType(
+	'core-embed/twitter',
+	getEmbedBlockSettings( {
+		title: 'Twitter',
+		icon: 'twitter',
+	} )
+);
+registerBlockType(
+	'core-embed/youtube',
+	getEmbedBlockSettings( {
+		title: 'YouTube',
+		icon: 'video-alt3',
+	} )
+);
+registerBlockType(
+	'core-embed/facebook',
+	getEmbedBlockSettings( {
+		title: 'Facebook',
+		icon: 'facebook',
+	} )
+);
+registerBlockType(
+	'core-embed/instagram',
+	getEmbedBlockSettings( {
+		title: 'Instagram',
+		icon: 'camera',
+	} )
+);
+registerBlockType(
+	'core-embed/wordpress',
+	getEmbedBlockSettings( {
+		title: 'WordPress',
+		icon: 'wordpress',
+	} )
+);
+registerBlockType(
+	'core-embed/soundcloud',
+	getEmbedBlockSettings( {
+		title: 'SoundCloud',
+		icon: 'format-audio',
+	} )
+);
+registerBlockType(
+	'core-embed/spotify',
+	getEmbedBlockSettings( {
+		title: 'Spotify',
+		icon: 'format-audio',
+	} )
+);
+registerBlockType(
+	'core-embed/flickr',
+	getEmbedBlockSettings( {
+		title: 'Flickr',
+		icon: 'format-image',
+	} )
+);
+registerBlockType(
+	'core-embed/vimeo',
+	getEmbedBlockSettings( {
+		title: 'Vimeo',
+		icon: 'video-alt3',
+	} )
+);
+
+// Others
 registerBlockType(
 	'core-embed/animoto',
 	getEmbedBlockSettings( {
@@ -252,20 +319,6 @@ registerBlockType(
 	} )
 );
 registerBlockType(
-	'core-embed/facebook',
-	getEmbedBlockSettings( {
-		title: 'Facebook',
-		icon: 'facebook',
-	} )
-);
-registerBlockType(
-	'core-embed/flickr',
-	getEmbedBlockSettings( {
-		title: 'Flickr',
-		icon: 'format-image',
-	} )
-);
-registerBlockType(
 	'core-embed/funnyordie',
 	getEmbedBlockSettings( {
 		title: 'Funny or Die',
@@ -283,13 +336,6 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Imgur',
 		icon: 'format-image',
-	} )
-);
-registerBlockType(
-	'core-embed/instagram',
-	getEmbedBlockSettings( {
-		title: 'Instagram',
-		icon: 'camera',
 	} )
 );
 registerBlockType(
@@ -377,23 +423,9 @@ registerBlockType(
 	} )
 );
 registerBlockType(
-	'core-embed/soundcloud',
-	getEmbedBlockSettings( {
-		title: 'SoundCloud',
-		icon: 'format-audio',
-	} )
-);
-registerBlockType(
 	'core-embed/speaker',
 	getEmbedBlockSettings( {
 		title: 'Speaker',
-		icon: 'format-audio',
-	} )
-);
-registerBlockType(
-	'core-embed/spotify',
-	getEmbedBlockSettings( {
-		title: 'Spotify',
 		icon: 'format-audio',
 	} )
 );
@@ -412,23 +444,9 @@ registerBlockType(
 	} )
 );
 registerBlockType(
-	'core-embed/twitter',
-	getEmbedBlockSettings( {
-		title: 'Twitter',
-		icon: 'twitter',
-	} )
-);
-registerBlockType(
 	'core-embed/videopress',
 	getEmbedBlockSettings( {
 		title: 'VideoPress',
-		icon: 'video-alt3',
-	} )
-);
-registerBlockType(
-	'core-embed/vimeo',
-	getEmbedBlockSettings( {
-		title: 'Vimeo',
 		icon: 'video-alt3',
 	} )
 );
@@ -440,23 +458,9 @@ registerBlockType(
 	} )
 );
 registerBlockType(
-	'core-embed/wordpress',
-	getEmbedBlockSettings( {
-		title: 'WordPress',
-		icon: 'wordpress',
-	} )
-);
-registerBlockType(
 	'core-embed/wordpress-tv',
 	getEmbedBlockSettings( {
 		title: 'WordPress.tv',
-		icon: 'video-alt3',
-	} )
-);
-registerBlockType(
-	'core-embed/youtube',
-	getEmbedBlockSettings( {
-		title: 'YouTube',
 		icon: 'video-alt3',
 	} )
 );
