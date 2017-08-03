@@ -8,10 +8,12 @@ import scrollIntoView from 'dom-scroll-into-view';
 /**
  * WordPress dependencies
  */
-import { __, sprintf, _n } from 'i18n';
-import { Component } from 'element';
-import { UP, DOWN, ENTER } from 'utils/keycodes';
-import { Spinner, withInstanceId } from 'components';
+import { __, sprintf, _n } from '@wordpress/i18n';
+import { Component } from '@wordpress/element';
+import { keycodes } from '@wordpress/utils';
+import { Spinner, withInstanceId } from '@wordpress/components';
+
+const { UP, DOWN, ENTER } = keycodes;
 
 class UrlInput extends Component {
 	constructor() {

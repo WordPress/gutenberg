@@ -6,12 +6,12 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
-import { IconButton } from 'components';
+import { IconButton } from '@wordpress/components';
+import { _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { _x } from 'i18n';
 import { getEditedPostPreviewLink } from '../../selectors';
 
 function PreviewButton( { link, postId } ) {

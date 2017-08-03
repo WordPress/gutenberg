@@ -6,7 +6,7 @@ import { pick, noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from 'element';
+import { Component } from '@wordpress/element';
 
 /**
  * The Editable Provider allows a rendering context to define global behaviors

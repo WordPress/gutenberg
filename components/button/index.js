@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Component, createElement } from 'element';
+import { Component, createElement } from '@wordpress/element';
 
 class Button extends Component {
 	constructor( props ) {

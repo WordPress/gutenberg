@@ -6,8 +6,8 @@ import { isString, isObject } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from 'i18n';
-import { Toolbar } from 'components';
+import { __, sprintf } from '@wordpress/i18n';
+import { Toolbar } from '@wordpress/components';
 
 /**
  * Internal dependencies

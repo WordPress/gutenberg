@@ -6,7 +6,7 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import { Placeholder } from 'components';
+import Placeholder from '../';
 
 describe( 'Placeholder', () => {
 	describe( 'basic rendering', () => {

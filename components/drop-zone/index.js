@@ -7,14 +7,14 @@ import { includes, without } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { Component } from 'element';
-import Dashicon from 'components/dashicon';
+import { __ } from '@wordpress/i18n';
+import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
+import Dashicon from '../dashicon';
 
 class DropZone extends Component {
 	constructor() {

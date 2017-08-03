@@ -7,8 +7,8 @@ import { get, uniqueId, debounce } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { serialize, getBlockType, switchToBlockType } from 'blocks';
-import { __ } from 'i18n';
+import { serialize, getBlockType, switchToBlockType } from '@wordpress/blocks';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies

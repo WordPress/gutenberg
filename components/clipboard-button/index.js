@@ -8,7 +8,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { findDOMNode, Component } from 'element';
+import { findDOMNode, Component } from '@wordpress/element';
 
 /**
  * Internal dependencies

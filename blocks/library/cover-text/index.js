@@ -6,8 +6,8 @@ import { CirclePicker } from 'react-color';
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { concatChildren } from 'element';
+import { __ } from '@wordpress/i18n';
+import { concatChildren } from '@wordpress/element';
 
 /**
  * Internal dependencies

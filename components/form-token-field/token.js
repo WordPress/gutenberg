@@ -7,8 +7,12 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { sprintf } from 'i18n';
-import IconButton from 'components/icon-button';
+import { sprintf } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import IconButton from '../icon-button';
 
 function Token( {
 	value,

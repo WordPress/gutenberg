@@ -6,16 +6,18 @@ import { isUndefined } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { Component } from 'element';
-import { IconButton, Toolbar } from 'components';
-import { ESCAPE } from 'utils/keycodes';
+import { __ } from '@wordpress/i18n';
+import { Component } from '@wordpress/element';
+import { IconButton, Toolbar } from '@wordpress/components';
+import { keycodes } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import UrlInput from '../../url-input';
+
+const { ESCAPE } = keycodes;
 
 const FORMATTING_CONTROLS = [
 	{

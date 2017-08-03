@@ -8,9 +8,9 @@ import { find } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { Component } from 'element';
-import { PanelRow, Popover, withInstanceId } from 'components';
+import { __ } from '@wordpress/i18n';
+import { Component } from '@wordpress/element';
+import { PanelRow, Popover, withInstanceId } from '@wordpress/components';
 
 /**
  * Internal Dependencies

@@ -7,7 +7,7 @@ import { forEach } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from 'element';
+import { Component } from '@wordpress/element';
 
 class KeyboardShortcuts extends Component {
 	componentWillMount() {

@@ -8,11 +8,11 @@ import { throttle, reduce, noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { Component } from 'element';
-import { serialize, getDefaultBlock, createBlock } from 'blocks';
-import { IconButton } from 'components';
-import { ENTER } from 'utils/keycodes';
+import { __ } from '@wordpress/i18n';
+import { Component } from '@wordpress/element';
+import { serialize, getDefaultBlock, createBlock } from '@wordpress/blocks';
+import { IconButton } from '@wordpress/components';
+import { keycodes } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -31,6 +31,7 @@ import {
 import { insertBlock, multiSelect } from '../../actions';
 
 const INSERTION_POINT_PLACEHOLDER = '[[insertion-point]]';
+const { ENTER } = keycodes;
 
 class VisualEditorBlockList extends Component {
 	constructor( props ) {

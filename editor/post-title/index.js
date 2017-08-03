@@ -9,9 +9,9 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { Component } from 'element';
-import { ENTER } from 'utils/keycodes';
+import { __ } from '@wordpress/i18n';
+import { Component } from '@wordpress/element';
+import { keycodes } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -25,6 +25,7 @@ import PostPermalink from '../post-permalink';
  * Constants
  */
 const REGEXP_NEWLINES = /[\r\n]+/g;
+const { ENTER } = keycodes;
 
 class PostTitle extends Component {
 	constructor() {

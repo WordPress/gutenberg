@@ -6,9 +6,9 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
-import { Component } from 'element';
-import { getBlockType, InspectorControls } from 'blocks';
-import { __ } from 'i18n';
+import { Component } from '@wordpress/element';
+import { getBlockType, InspectorControls } from '@wordpress/blocks';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal Dependencies

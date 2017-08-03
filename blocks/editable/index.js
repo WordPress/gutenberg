@@ -21,17 +21,19 @@ import 'element-closest';
 /**
  * WordPress dependencies
  */
-import { createElement, Component, renderToString } from 'element';
-import { parse, pasteHandler } from '../api';
-import { BACKSPACE, DELETE, ENTER } from 'utils/keycodes';
+import { createElement, Component, renderToString } from '@wordpress/element';
+import { keycodes } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
+import { parse, pasteHandler } from '../api';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
 import patterns from './patterns';
+
+const { BACKSPACE, DELETE, ENTER } = keycodes;
 
 function createTinyMCEElement( type, props, ...children ) {
 	if ( props[ 'data-mce-bogus' ] === 'all' ) {

@@ -1,9 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { Component } from 'element';
-import { Placeholder, Toolbar, Spinner } from 'components';
-import { __ } from 'i18n';
+import { Component } from '@wordpress/element';
+import { Placeholder, Toolbar, Spinner } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 import moment from 'moment';
 import classnames from 'classnames';
 

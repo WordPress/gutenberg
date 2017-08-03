@@ -6,14 +6,14 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { IconButton } from 'components';
+import { __ } from '@wordpress/i18n';
+import { IconButton } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { isEditorSidebarOpened } from 'editor/selectors';
+import { isEditorSidebarOpened } from '../selectors';
 
 function BlockSettingsMenu( { onDelete, selectBlock, isSidebarOpened, toggleSidebar, setActivePanel } ) {
 	const toggleInspector = () => {

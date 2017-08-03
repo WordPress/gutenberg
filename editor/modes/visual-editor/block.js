@@ -10,11 +10,11 @@ import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
 /**
  * WordPress dependencies
  */
-import { Children, Component } from 'element';
-import { IconButton, Toolbar } from 'components';
-import { BACKSPACE, ESCAPE, DELETE, UP, DOWN, LEFT, RIGHT } from 'utils/keycodes';
-import { getBlockType, getBlockDefaultClassname } from 'blocks';
-import { __, sprintf } from 'i18n';
+import { Children, Component } from '@wordpress/element';
+import { IconButton, Toolbar } from '@wordpress/components';
+import { keycodes } from '@wordpress/utils';
+import { getBlockType, getBlockDefaultClassname } from '@wordpress/blocks';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -47,6 +47,8 @@ import {
 	isTyping,
 	getMultiSelectedBlockUids,
 } from '../../selectors';
+
+const { BACKSPACE, ESCAPE, DELETE, UP, DOWN, LEFT, RIGHT } = keycodes;
 
 function FirstChild( { children } ) {
 	const childrenArray = Children.toArray( children );

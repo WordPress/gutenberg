@@ -8,8 +8,8 @@ import classnames from 'classnames';
 /**
  * WordPress Dependencies
  */
-import { __, sprintf } from 'i18n';
-import { PanelBody } from 'components';
+import { __, sprintf } from '@wordpress/i18n';
+import { PanelBody } from '@wordpress/components';
 
 /**
  * Internal Dependencies

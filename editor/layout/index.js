@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { NoticeList } from 'components';
+import { NoticeList } from '@wordpress/components';
 
 /**
  * Internal dependencies

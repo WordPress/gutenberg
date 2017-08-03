@@ -1,9 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { Component } from 'element';
-import { __ } from 'i18n';
-import { Button } from 'components';
+import { Component } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { Button } from '@wordpress/components';
 import { pick } from 'lodash';
 
 // Getter for the sake of unit tests.

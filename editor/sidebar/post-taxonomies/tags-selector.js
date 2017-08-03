@@ -7,9 +7,9 @@ import { unescape, find, throttle } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { Component } from 'element';
-import { FormTokenField } from 'components';
+import { __ } from '@wordpress/i18n';
+import { Component } from '@wordpress/element';
+import { FormTokenField } from '@wordpress/components';
 
 /**
  * Internal dependencies
