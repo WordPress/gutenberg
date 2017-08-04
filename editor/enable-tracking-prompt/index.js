@@ -67,7 +67,7 @@ export class EnableTrackingPrompt extends Component {
 				<p className="enable-tracking-prompt__message">
 					{ __( 'Can Gutenberg collect data about your usage of the editor?' ) }
 				</p>
-				<p className="enable-tracking-prompt__buttons">
+				<div className="enable-tracking-prompt__buttons">
 					<Button
 						isPrimary
 						isSmall
@@ -95,7 +95,7 @@ export class EnableTrackingPrompt extends Component {
 							</Popover>
 						) }
 					</span>
-				</p>
+				</div>
 			</div>
 		);
 	}

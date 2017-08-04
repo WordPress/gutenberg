@@ -1,10 +1,10 @@
 .enable-tracking-prompt {
 	.enable-tracking-prompt__message {
 		font-weight: bold;
-		margin-top: 8px;
 	}
 
 	.enable-tracking-prompt__buttons {
+		margin: 0.5em 0; // matches `.notice p` from core
 		.button {
 			margin-right: 6px;
 		}
@@ -12,6 +12,11 @@
 		.enable-tracking-prompt__more-info {
 			position: relative; // for popover
 			.components-button {
+				// Match selected `.button-small` styles from core
+				display: inline-block;
+				height: 24px;
+				line-height: 22px;
+
 				cursor: pointer;
 				&:hover {
 					color: $blue-wordpress-700;
