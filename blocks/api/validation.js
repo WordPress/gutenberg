@@ -114,7 +114,7 @@ export function getStyleProperties( text ) {
  * @type {Object}
  */
 export const isEqualAttributesOfName = {
-	'class': ( a, b ) => {
+	class: ( a, b ) => {
 		// Class matches if members are the same, even if out of order or
 		// superfluous whitespace between.
 		return ! xor( ...[ a, b ].map( getTextPiecesSplitOnWhitespace ) ).length;
