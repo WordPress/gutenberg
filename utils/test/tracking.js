@@ -16,7 +16,6 @@ describe( 'bumpStat', () => {
 
 	beforeEach( () => {
 		console.error = jest.fn();
-		window.getUserSetting = () => 'off';
 	} );
 
 	afterEach( () => {
@@ -67,12 +66,12 @@ describe( 'bumpStat', () => {
 	} );
 
 	it( 'should do nothing if the user has not opted in', () => {
+		window.getUserSetting = () => 'off';
 		expect( bumpStat( 'valid_group', 'valid-name' ) ).toBeUndefined();
 		expect( console.error ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should bump valid stats', () => {
-		window.getUserSetting = () => 'on';
 		// Testing the URL protocol and the randomized `?t=` cache-buster is
 		// difficult, so only test the pieces we're actually interested in.
 		const statUrlPieces = url.parse(
