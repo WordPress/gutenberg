@@ -37,7 +37,7 @@ export class EnableTrackingPrompt extends Component {
 			enableTracking ? 'on' : 'off'
 		);
 		if ( enableTracking ) {
-			this.props.bumpStat( 'tracking', 'opt-in' );
+			bumpStat( 'tracking', 'opt-in' );
 		}
 		this.props.removeNotice( TRACKING_PROMPT_NOTICE_ID );
 	}
@@ -105,10 +105,6 @@ export class EnableTrackingPrompt extends Component {
 }
 
 export default connect(
-	( state ) => { // eslint-disable-line no-unused-vars
-		return {
-			bumpStat,
-		};
-	},
+	undefined,
 	{ removeNotice }
 )( clickOutside( EnableTrackingPrompt ) );
