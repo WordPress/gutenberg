@@ -665,6 +665,53 @@ VIDEO;
 	}
 
 	/**
+	 * Test [video] shortcode processing
+	 *
+	 */
+	function test_video_shortcode_body() {
+		$width = 720;
+		$height = 480;
+
+		$w = empty( $GLOBALS['content_width'] ) ? 640 : $GLOBALS['content_width'];
+		if ( $width > $w ) {
+			$width = $w;
+		}
+
+		$post_id = get_post() ? get_the_ID() : 0;
+
+		$video =<<<VIDEO
+[video width="$width" height="480" mp4="http://domain.tld/wp-content/uploads/2013/12/xyz.mp4"]
+<!-- WebM/VP8 for Firefox4, Opera, and Chrome -->
+<source type="video/webm" src="myvideo.webm" />
+<!-- Ogg/Vorbis for older Firefox and Opera versions -->
+<source type="video/ogg" src="myvideo.ogv" />
+<!-- Optional: Add subtitles for each language -->
+<track kind="subtitles" src="subtitles.srt" srclang="en" />
+<!-- Optional: Add chapters -->
+<track kind="chapters" src="chapters.srt" srclang="en" />
+[/video]
+VIDEO;
+
+
+		$h = ceil( ( $height * $width ) / $width );
+
+		$content = apply_filters( 'the_content', $video );
+
+		$expected = '<div style="width: ' . $width . 'px;" class="wp-video">' .
+			"<!--[if lt IE 9]><script>document.createElement('video');</script><![endif]-->\n" .
+			'<video class="wp-video-shortcode" id="video-' . $post_id . '-1" width="' . $width . '" height="' . $h . '" preload="metadata" controls="controls">' .
+			'<source type="video/mp4" src="http://domain.tld/wp-content/uploads/2013/12/xyz.mp4?_=1" />' .
+			'<!-- WebM/VP8 for Firefox4, Opera, and Chrome --><source type="video/webm" src="myvideo.webm" />' .
+			'<!-- Ogg/Vorbis for older Firefox and Opera versions --><source type="video/ogg" src="myvideo.ogv" />' .
+			'<!-- Optional: Add subtitles for each language --><track kind="subtitles" src="subtitles.srt" srclang="en" />' .
+			'<!-- Optional: Add chapters --><track kind="chapters" src="chapters.srt" srclang="en" />' .
+			'<a href="http://domain.tld/wp-content/uploads/2013/12/xyz.mp4">' .
+			"http://domain.tld/wp-content/uploads/2013/12/xyz.mp4</a></video></div>\n";
+
+		$this->assertEquals( $expected, $content );
+	}
+
+	/**
 	 * @ticket  35367
 	 * @depends test_video_shortcode_body
 	 */
@@ -783,53 +830,6 @@ VIDEO;
 		) );
 
 		$this->assertContains( 'src="https://vimeo.com/190372437?loop=1', $actual );
-	}
-
-	/**
-	 * Test [video] shortcode processing
-	 *
-	 */
-	function test_video_shortcode_body() {
-		$width = 720;
-		$height = 480;
-
-		$w = empty( $GLOBALS['content_width'] ) ? 640 : $GLOBALS['content_width'];
-		if ( $width > $w ) {
-			$width = $w;
-		}
-
-		$post_id = get_post() ? get_the_ID() : 0;
-
-		$video =<<<VIDEO
-[video width="$width" height="480" mp4="http://domain.tld/wp-content/uploads/2013/12/xyz.mp4"]
-<!-- WebM/VP8 for Firefox4, Opera, and Chrome -->
-<source type="video/webm" src="myvideo.webm" />
-<!-- Ogg/Vorbis for older Firefox and Opera versions -->
-<source type="video/ogg" src="myvideo.ogv" />
-<!-- Optional: Add subtitles for each language -->
-<track kind="subtitles" src="subtitles.srt" srclang="en" />
-<!-- Optional: Add chapters -->
-<track kind="chapters" src="chapters.srt" srclang="en" />
-[/video]
-VIDEO;
-
-
-		$h = ceil( ( $height * $width ) / $width );
-
-		$content = apply_filters( 'the_content', $video );
-
-		$expected = '<div style="width: ' . $width . 'px;" class="wp-video">' .
-			"<!--[if lt IE 9]><script>document.createElement('video');</script><![endif]-->\n" .
-			'<video class="wp-video-shortcode" id="video-' . $post_id . '-1" width="' . $width . '" height="' . $h . '" preload="metadata" controls="controls">' .
-			'<source type="video/mp4" src="http://domain.tld/wp-content/uploads/2013/12/xyz.mp4?_=1" />' .
-			'<!-- WebM/VP8 for Firefox4, Opera, and Chrome --><source type="video/webm" src="myvideo.webm" />' .
-			'<!-- Ogg/Vorbis for older Firefox and Opera versions --><source type="video/ogg" src="myvideo.ogv" />' .
-			'<!-- Optional: Add subtitles for each language --><track kind="subtitles" src="subtitles.srt" srclang="en" />' .
-			'<!-- Optional: Add chapters --><track kind="chapters" src="chapters.srt" srclang="en" />' .
-			'<a href="http://domain.tld/wp-content/uploads/2013/12/xyz.mp4">' .
-			"http://domain.tld/wp-content/uploads/2013/12/xyz.mp4</a></video></div>\n";
-
-		$this->assertEquals( $expected, $content );
 	}
 
 	/**
