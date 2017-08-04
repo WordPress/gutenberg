@@ -83,7 +83,10 @@ export class EnableTrackingPrompt extends Component {
 						{ __( 'No' ) }
 					</Button>
 					<span className="enable-tracking-prompt__more-info">
-						<Button onClick={ this.toggleInfoPopover }>
+						<Button
+							onClick={ this.toggleInfoPopover }
+							aria-expanded={ this.state.showInfoPopover }
+						>
 							{ __( 'More info' ) }
 						</Button>
 						{ this.state.showInfoPopover && (
