@@ -35,7 +35,11 @@ class WP_Test_REST_Pages_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_register_routes() {
-
+		$routes = $this->server->get_routes();
+		$this->assertArrayHasKey( '/wp/v2/pages', $routes );
+		$this->assertCount( 2, $routes['/wp/v2/pages'] );
+		$this->assertArrayHasKey( '/wp/v2/pages/(?P<id>[\d]+)', $routes );
+		$this->assertCount( 3, $routes['/wp/v2/pages/(?P<id>[\d]+)'] );
 	}
 
 	public function test_context_param() {
@@ -83,7 +87,13 @@ class WP_Test_REST_Pages_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_get_items() {
-
+		$id1 = $this->factory->post->create( array( 'post_status' => 'publish', 'post_type' => 'page' ) );
+		$id2 = $this->factory->post->create( array( 'post_status' => 'draft', 'post_type' => 'page' ) );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/pages' );
+		$response = $this->server->dispatch( $request );
+		$data = $response->get_data();
+		$this->assertEquals( 1, count( $data ) );
+		$this->assertEquals( $id1, $data[0]['id'] );
 	}
 
 	public function test_get_items_parent_query() {
@@ -305,7 +315,20 @@ class WP_Test_REST_Pages_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_delete_item() {
+		$page_id = $this->factory->post->create( array(
+			'post_type'  => 'page',
+			'post_title' => 'Deleted page',
+		) );
+		wp_set_current_user( self::$editor_id );
 
+		$request = new WP_REST_Request( 'DELETE', sprintf( '/wp/v2/pages/%d', $page_id ) );
+		$request->set_param( 'force', 'false' );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertEquals( 200, $response->get_status() );
+		$data = $response->get_data();
+		$this->assertEquals( 'Deleted page', $data['title']['raw'] );
+		$this->assertEquals( 'trash', $data['status'] );
 	}
 
 	public function test_prepare_item() {

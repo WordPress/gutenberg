@@ -32,7 +32,12 @@ class WP_Test_REST_Settings_Controller extends WP_Test_REST_Controller_Testcase 
 		$this->assertArrayHasKey( '/wp/v2/settings', $routes );
 	}
 
-	public function test_get_items() {
+	public function test_get_item() {
+		/** Individual settings can't be gotten **/
+		wp_set_current_user( self::$administrator );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/settings/title' );
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 404, $response->get_status() );
 	}
 
 	public function test_context_param() {
@@ -44,7 +49,7 @@ class WP_Test_REST_Settings_Controller extends WP_Test_REST_Controller_Testcase 
 		$this->assertEquals( 403, $response->get_status() );
 	}
 
-	public function test_get_item() {
+	public function test_get_items() {
 		wp_set_current_user( self::$administrator );
 		$request = new WP_REST_Request( 'GET', '/wp/v2/settings' );
 		$response = $this->server->dispatch( $request );
@@ -336,6 +341,10 @@ class WP_Test_REST_Settings_Controller extends WP_Test_REST_Controller_Testcase 
 	}
 
 	public function test_delete_item() {
+		/** Settings can't be deleted **/
+		$request = new WP_REST_Request( 'DELETE', '/wp/v2/settings/title' );
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 404, $response->get_status() );
 	}
 
 	public function test_prepare_item() {
