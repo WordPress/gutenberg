@@ -77,4 +77,29 @@ describe( 'EnableTrackingPrompt', () => {
 		expect( removeNotice )
 			.toHaveBeenCalledWith( TRACKING_PROMPT_NOTICE_ID );
 	} );
+
+	it( 'should show and hide a popover when clicking More info', () => {
+		const prompt = mount(
+			<EnableTrackingPrompt removeNotice={ removeNotice } />
+		);
+
+		expect( prompt.find( 'Popover' ).length ).toBe( 0 );
+
+		const buttonMoreInfo = prompt.find( 'Button' )
+			.filterWhere( node => node.text() === 'More info' );
+		buttonMoreInfo.simulate( 'click' );
+
+		expect( prompt.find( 'Popover' ).length ).toBe( 1 );
+
+		buttonMoreInfo.simulate( 'click' );
+
+		expect( prompt.find( 'Popover' ).length ).toBe( 0 );
+
+		expect( window.setUserSetting )
+			.not.toHaveBeenCalled();
+		expect( bumpStat )
+			.not.toHaveBeenCalled();
+		expect( removeNotice )
+			.not.toHaveBeenCalled();
+	} );
 } );
