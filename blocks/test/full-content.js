@@ -95,7 +95,7 @@ describe( 'full post content fixture', () => {
 
 	fileBasenames.forEach( f => {
 		it( f, () => {
-			/**
+			/*
 			 * Read the input content (HTML + block delimiters).
 			 */
 
@@ -106,7 +106,7 @@ describe( 'full post content fixture', () => {
 				);
 			}
 
-			/**
+			/*
 			 * Parse the content using the PEG.js grammar parser and verify the
 			 * raw parser output (a list of blocks with comment attributes and
 			 * `rawContent` as a string).
@@ -143,7 +143,7 @@ describe( 'full post content fixture', () => {
 				) );
 			}
 
-			/**
+			/*
 			 * Run the post content through the block parser API and verify the
 			 * output (a list of initialized block objects serialized to JSON).
 			 */
@@ -198,7 +198,7 @@ describe( 'full post content fixture', () => {
 				) );
 			}
 
-			/**
+			/*
 			 * Serialize the parsed block objects and verify the output (HTML +
 			 * block delimiters).
 			 */
