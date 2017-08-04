@@ -50,7 +50,7 @@ export class InserterMenu extends Component {
 		const speakAssertive = ( message ) => wp.a11y.speak( message, 'assertive' );
 		this.debouncedSpeakAssertive = debounce( speakAssertive, 500 );
 
-		this.tabScrollTop = {'recent': 0, 'blocks': 0, 'embeds': 0};
+		this.tabScrollTop = { recent: 0, blocks: 0, embeds: 0 };
 		this.didSwitchTab = false;
 	}
 
@@ -76,8 +76,8 @@ export class InserterMenu extends Component {
 			this.debouncedSpeakAssertive( __( 'No results.' ) );
 		}
 
-		if(this.didSwitchTab) {
-			this._tabContainer.scrollTop = this.tabScrollTop[this.state.tab];
+		if ( this.didSwitchTab ) {
+			this._tabContainer.scrollTop = this.tabScrollTop[ this.state.tab ];
 			this.didSwitchTab = false;
 		}
 	}
@@ -314,9 +314,9 @@ export class InserterMenu extends Component {
 
 	switchTab( tab ) {
 		// store the scrollTop of the tab switched from
-		this.tabScrollTop[this.state.tab] = this._tabContainer.scrollTop; 
+		this.tabScrollTop[ this.state.tab ] = this._tabContainer.scrollTop;
 		this.didSwitchTab = true;
-		this.setState( { tab: tab } );		
+		this.setState( { tab: tab } );
 	}
 
 	render() {
@@ -341,7 +341,7 @@ export class InserterMenu extends Component {
 					ref={ this.bindReferenceNode( 'search' ) }
 					tabIndex="-1"
 				/>
-				<div ref={(r) => this._tabContainer = r} role="menu" className="editor-inserter__content">
+				<div ref={ ( r ) => this._tabContainer = r } role="menu" className="editor-inserter__content">
 					{ this.state.tab === 'recent' && ! isSearching &&
 						<div className="editor-inserter__recent">
 							<div
