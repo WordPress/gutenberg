@@ -16,7 +16,7 @@ describe( 'EnableTrackingPrompt', () => {
 	const originalSetUserSetting = window.setUserSetting;
 	const originalDocumentAddEventListener = document.addEventListener;
 	let eventMap = {};
-	let removeNotice, bumpStat;
+	let removeNotice;
 
 	beforeEach( () => {
 		window.setUserSetting = jest.fn();
@@ -24,7 +24,6 @@ describe( 'EnableTrackingPrompt', () => {
 			eventMap[ event ] = cb;
 		} );
 		removeNotice = jest.fn();
-		bumpStat = jest.fn();
 	} );
 
 	afterEach( () => {
@@ -45,18 +44,13 @@ describe( 'EnableTrackingPrompt', () => {
 
 		expect( window.setUserSetting )
 			.not.toHaveBeenCalled();
-		expect( bumpStat )
-			.not.toHaveBeenCalled();
 		expect( removeNotice )
 			.not.toHaveBeenCalled();
 	} );
 
 	it( 'should enable tracking when clicking Yes', () => {
 		const prompt = mount(
-			<EnableTrackingPrompt
-				removeNotice={ removeNotice }
-				bumpStat={ bumpStat }
-			/>
+			<EnableTrackingPrompt removeNotice={ removeNotice } />
 		);
 		const buttonYes = prompt.find( 'Button' )
 			.filterWhere( node => node.text() === 'Yes' );
@@ -64,8 +58,6 @@ describe( 'EnableTrackingPrompt', () => {
 
 		expect( window.setUserSetting )
 			.toHaveBeenCalledWith( 'gutenberg_tracking', 'on' );
-		expect( bumpStat )
-			.toHaveBeenCalledWith( 'tracking', 'opt-in' );
 		expect( removeNotice )
 			.toHaveBeenCalledWith( TRACKING_PROMPT_NOTICE_ID );
 	} );
@@ -80,8 +72,6 @@ describe( 'EnableTrackingPrompt', () => {
 
 		expect( window.setUserSetting )
 			.toHaveBeenCalledWith( 'gutenberg_tracking', 'off' );
-		expect( bumpStat )
-			.not.toHaveBeenCalled();
 		expect( removeNotice )
 			.toHaveBeenCalledWith( TRACKING_PROMPT_NOTICE_ID );
 	} );
@@ -122,8 +112,6 @@ describe( 'EnableTrackingPrompt', () => {
 		expect( prompt.find( 'Popover' ).length ).toBe( 0 );
 
 		expect( window.setUserSetting )
-			.not.toHaveBeenCalled();
-		expect( bumpStat )
 			.not.toHaveBeenCalled();
 		expect( removeNotice )
 			.not.toHaveBeenCalled();
