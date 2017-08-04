@@ -48,50 +48,55 @@ describe( 'PreviewButton', () => {
 	} );
 
 	describe( 'saveForPreview()', () => {
-		it( 'should do nothing if not dirty', () => {
+		function assertForSave( props, isExpectingSave ) {
 			const autosave = jest.fn();
 			const preventDefault = jest.fn();
 			const windowOpen = window.open;
 			window.open = jest.fn();
 
 			const wrapper = shallow(
-				<PreviewButton
-					postId={ 1 }
-					isDirty={ false }
-					autosave={ autosave } />
+				<PreviewButton { ...props } autosave={ autosave } />
 			);
 
 			wrapper.simulate( 'click', { preventDefault } );
 
-			expect( autosave ).not.toHaveBeenCalled();
-			expect( preventDefault ).not.toHaveBeenCalled();
-			expect( wrapper.state( 'isAwaitingSave' ) ).not.toBe( true );
-			expect( window.open ).not.toHaveBeenCalled();
+			if ( isExpectingSave ) {
+				expect( autosave ).toHaveBeenCalled();
+				expect( preventDefault ).toHaveBeenCalled();
+				expect( wrapper.state( 'isAwaitingSave' ) ).toBe( true );
+				expect( window.open ).toHaveBeenCalled();
+			} else {
+				expect( autosave ).not.toHaveBeenCalled();
+				expect( preventDefault ).not.toHaveBeenCalled();
+				expect( wrapper.state( 'isAwaitingSave' ) ).not.toBe( true );
+				expect( window.open ).not.toHaveBeenCalled();
+			}
 
 			window.open = windowOpen;
+		}
+
+		it( 'should do nothing if not dirty for saved post', () => {
+			assertForSave( {
+				postId: 1,
+				isNew: false,
+				isDirty: false,
+			}, false );
+		} );
+
+		it( 'should save if not dirty for new post', () => {
+			assertForSave( {
+				postId: 1,
+				isNew: true,
+				isDirty: false,
+			}, true );
 		} );
 
 		it( 'should open a popup window', () => {
-			const autosave = jest.fn();
-			const preventDefault = jest.fn();
-			const windowOpen = window.open;
-			window.open = jest.fn();
-
-			const wrapper = shallow(
-				<PreviewButton
-					postId={ 1 }
-					isDirty
-					autosave={ autosave } />
-			);
-
-			wrapper.simulate( 'click', { preventDefault } );
-
-			expect( autosave ).toHaveBeenCalled();
-			expect( preventDefault ).toHaveBeenCalled();
-			expect( wrapper.state( 'isAwaitingSave' ) ).toBe( true );
-			expect( window.open ).toHaveBeenCalledWith( 'about:blank', 'wp-preview-1' );
-
-			window.open = windowOpen;
+			assertForSave( {
+				postId: 1,
+				isNew: false,
+				isDirty: true,
+			}, true );
 		} );
 	} );
 

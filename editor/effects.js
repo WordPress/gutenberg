@@ -223,7 +223,11 @@ export default {
 	AUTOSAVE( action, store ) {
 		const { getState, dispatch } = store;
 		const state = getState();
-		if ( ! isEditedPostSaveable( state ) || ! isEditedPostDirty( state ) ) {
+		if ( ! isEditedPostSaveable( state ) ) {
+			return;
+		}
+
+		if ( ! isEditedPostNew( state ) && ! isEditedPostDirty( state ) ) {
 			return;
 		}
 

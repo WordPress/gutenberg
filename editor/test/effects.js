@@ -169,9 +169,22 @@ describe( 'effects', () => {
 			selectors.isEditedPostSaveable.mockReturnValue( true );
 			selectors.isEditedPostDirty.mockReturnValue( false );
 			selectors.isCurrentPostPublished.mockReturnValue( false );
-			selectors.isEditedPostNew.mockReturnValue( true );
+			selectors.isEditedPostNew.mockReturnValue( false );
 
 			expect( dispatch ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should return autosave action for clean, new, saveable post', () => {
+			selectors.isEditedPostSaveable.mockReturnValue( true );
+			selectors.isEditedPostDirty.mockReturnValue( false );
+			selectors.isCurrentPostPublished.mockReturnValue( false );
+			selectors.isEditedPostNew.mockReturnValue( true );
+
+			handler( {}, store );
+
+			expect( dispatch ).toHaveBeenCalledTimes( 2 );
+			expect( dispatch ).toHaveBeenCalledWith( editPost( { status: 'draft' } ) );
+			expect( dispatch ).toHaveBeenCalledWith( savePost() );
 		} );
 
 		it( 'should return autosave action for saveable, dirty, published post', () => {
