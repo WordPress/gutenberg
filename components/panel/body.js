@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { Component } from 'element';
-import { __, sprintf } from 'i18n';
+import { Component } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies

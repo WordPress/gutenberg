@@ -7,8 +7,8 @@ import { first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { IconButton } from 'components';
-import { getBlockType } from 'blocks';
+import { IconButton } from '@wordpress/components';
+import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies

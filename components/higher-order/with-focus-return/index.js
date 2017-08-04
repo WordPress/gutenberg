@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Component, findDOMNode } from 'element';
+import { Component, findDOMNode } from '@wordpress/element';
 
 /**
  * Higher Order Component used to be used to wrap disposable elements like Sidebars, modals, dropdowns.

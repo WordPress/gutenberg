@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { concatChildren } from 'element';
+import { __ } from '@wordpress/i18n';
+import { concatChildren } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -18,10 +18,10 @@ import BlockDescription from '../../block-description';
 
 const { children, query } = hpq;
 
-registerBlockType( 'core/text', {
-	title: __( 'Text' ),
+registerBlockType( 'core/paragraph', {
+	title: __( 'Paragraph' ),
 
-	icon: 'text',
+	icon: 'editor-paragraph',
 
 	category: 'common',
 
@@ -99,7 +99,7 @@ registerBlockType( 'core/text', {
 					setAttributes( { content: before } );
 					insertBlocksAfter( [
 						...blocks,
-						createBlock( 'core/text', { content: after } ),
+						createBlock( 'core/paragraph', { content: after } ),
 					] );
 				} }
 				onMerge={ mergeBlocks }
@@ -123,4 +123,4 @@ registerBlockType( 'core/text', {
 	},
 } );
 
-setDefaultBlock( 'core/text' );
+setDefaultBlock( 'core/paragraph' );

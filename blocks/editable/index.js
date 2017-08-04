@@ -21,17 +21,19 @@ import 'element-closest';
 /**
  * WordPress dependencies
  */
-import { createElement, Component, renderToString } from 'element';
-import { parse, pasteHandler } from '../api';
-import { BACKSPACE, DELETE, ENTER } from 'utils/keycodes';
+import { createElement, Component, renderToString } from '@wordpress/element';
+import { keycodes } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
+import { parse, pasteHandler } from '../api';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
 import patterns from './patterns';
+
+const { BACKSPACE, DELETE, ENTER } = keycodes;
 
 function createTinyMCEElement( type, props, ...children ) {
 	if ( props[ 'data-mce-bogus' ] === 'all' ) {
@@ -497,7 +499,7 @@ export default class Editable extends Component {
 		// changes, we unmount and destroy the previous TinyMCE element, then
 		// mount and initialize a new child element in its place.
 		const key = [ 'editor', Tagname ].join();
-		const isPlaceholderVisible = placeholder && this.state.empty;
+		const isPlaceholderVisible = placeholder && ! focus && this.state.empty;
 		const classes = classnames( className, 'blocks-editable' );
 
 		const formatToolbar = (

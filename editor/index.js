@@ -10,9 +10,9 @@ import 'moment-timezone/moment-timezone-utils';
 /**
  * WordPress dependencies
  */
-import { EditableProvider, parse } from 'blocks';
-import { render } from 'element';
-import { settings } from 'date';
+import { EditableProvider, parse } from '@wordpress/blocks';
+import { render } from '@wordpress/element';
+import { settings } from '@wordpress/date';
 
 /**
  * Internal dependencies
@@ -20,7 +20,9 @@ import { settings } from 'date';
 import './assets/stylesheets/main.scss';
 import Layout from './layout';
 import { createReduxStore } from './state';
-import { undo } from './actions';
+import { undo, createInfoNotice } from './actions';
+import EnableTrackingPrompt, { TRACKING_PROMPT_NOTICE_ID } from './enable-tracking-prompt';
+import EditorSettingsProvider from './settings/provider';
 
 /**
  * The default editor settings
@@ -97,6 +99,13 @@ export function createEditorInstance( id, post, editorSettings = DEFAULT_SETTING
 		settings: editorSettings,
 	} );
 
+	if ( window.getUserSetting( 'gutenberg_tracking' ) === '' ) {
+		store.dispatch( createInfoNotice(
+			<EnableTrackingPrompt />,
+			TRACKING_PROMPT_NOTICE_ID
+		) );
+	}
+
 	preparePostState( store, post );
 
 	render(
@@ -107,7 +116,9 @@ export function createEditorInstance( id, post, editorSettings = DEFAULT_SETTING
 						onUndo: undo,
 					}, store.dispatch ) }
 				>
-					<Layout settings={ editorSettings } />
+					<EditorSettingsProvider settings={ editorSettings }>
+						<Layout />
+					</EditorSettingsProvider>
 				</EditableProvider>
 			</SlotFillProvider>
 		</ReduxProvider>,

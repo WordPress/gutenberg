@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { Component } from 'element';
-import { __ } from 'i18n';
+import { Component } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 export default class OldEditor extends Component {
 	constructor( props ) {

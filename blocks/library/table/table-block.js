@@ -1,7 +1,7 @@
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
-import { Toolbar, DropdownMenu } from 'components';
-import { __ } from 'i18n';
+import { Toolbar, DropdownMenu } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 function isTableSelected( editor ) {
 	return editor.dom.getParent(

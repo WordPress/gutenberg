@@ -1,9 +1,13 @@
 /**
+ * External dependencies
+ */
+import { find } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-import { Component, createElement, Children, concatChildren } from 'element';
-import { find } from 'lodash';
-import { __ } from 'i18n';
+import { Component, createElement, Children, concatChildren } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -85,7 +89,7 @@ registerBlockType( 'core/list', {
 		from: [
 			{
 				type: 'block',
-				blocks: [ 'core/text' ],
+				blocks: [ 'core/paragraph' ],
 				transform: ( { content } ) => {
 					return createBlock( 'core/list', {
 						nodeName: 'UL',
@@ -139,9 +143,9 @@ registerBlockType( 'core/list', {
 		to: [
 			{
 				type: 'block',
-				blocks: [ 'core/text' ],
+				blocks: [ 'core/paragraph' ],
 				transform: ( { values } ) => {
-					return createBlock( 'core/text', {
+					return createBlock( 'core/paragraph', {
 						content: toBrDelimitedContent( values ),
 					} );
 				},

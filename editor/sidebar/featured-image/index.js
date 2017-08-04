@@ -6,10 +6,10 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
-import { Component } from 'element';
-import { __ } from 'i18n';
-import { Button, PanelBody, Spinner, ResponsiveWrapper } from 'components';
-import { MediaUploadButton } from 'blocks';
+import { Component } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { Button, PanelBody, Spinner, ResponsiveWrapper } from '@wordpress/components';
+import { MediaUploadButton } from '@wordpress/blocks';
 
 /**
  * Internal dependencies

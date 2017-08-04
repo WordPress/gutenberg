@@ -8,17 +8,13 @@ import createSelector from 'rememo';
 /**
  * WordPress dependencies
  */
-import { getBlockType } from 'blocks';
+import { getBlockType } from '@wordpress/blocks';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { addQueryArgs } from './utils/url';
-
-/**
- * WordPress dependencies
- */
-import { __ } from 'i18n';
 
 /**
  * Returns the current editing mode.
@@ -714,14 +710,4 @@ export function getNotices( state ) {
 export function getRecentlyUsedBlocks( state ) {
 	// resolves the block names in the state to the block type settings
 	return state.userData.recentlyUsedBlocks.map( blockType => getBlockType( blockType ) );
-}
-
-/**
- * Get the editor settings.
- *
- * @param {Object} state Global application state
- * @return {Object}      The editor settings
- */
-export function getEditorSettings( state ) {
-	return state.settings;
 }

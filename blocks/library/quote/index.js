@@ -6,8 +6,8 @@ import { isString, isObject } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from 'i18n';
-import { Toolbar } from 'components';
+import { __, sprintf } from '@wordpress/i18n';
+import { Toolbar } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -38,7 +38,7 @@ registerBlockType( 'core/quote', {
 		from: [
 			{
 				type: 'block',
-				blocks: [ 'core/text' ],
+				blocks: [ 'core/paragraph' ],
 				transform: ( { content } ) => {
 					return createBlock( 'core/quote', {
 						value: content,
@@ -67,17 +67,17 @@ registerBlockType( 'core/quote', {
 		to: [
 			{
 				type: 'block',
-				blocks: [ 'core/text' ],
+				blocks: [ 'core/paragraph' ],
 				transform: ( { value, citation, ...attrs } ) => {
 					const textElement = value[ 0 ];
 					if ( ! textElement ) {
-						return createBlock( 'core/text', {
+						return createBlock( 'core/paragraph', {
 							content: citation,
 						} );
 					}
 					const textContent = isString( textElement ) ? textElement : textElement.props.children;
 					if ( Array.isArray( value ) || citation ) {
-						const text = createBlock( 'core/text', {
+						const text = createBlock( 'core/paragraph', {
 							content: textContent,
 						} );
 						const quote = createBlock( 'core/quote', {
@@ -88,7 +88,7 @@ registerBlockType( 'core/quote', {
 
 						return [ text, quote ];
 					}
-					return createBlock( 'core/text', {
+					return createBlock( 'core/paragraph', {
 						content: textContent,
 					} );
 				},

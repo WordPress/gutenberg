@@ -6,8 +6,8 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { Placeholder, Dashicon, Toolbar, DropZone } from 'components';
+import { __ } from '@wordpress/i18n';
+import { Placeholder, Dashicon, Toolbar, DropZone } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -63,7 +63,7 @@ registerBlockType( 'core/image', {
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, className, settings } ) {
+	edit( { attributes, setAttributes, focus, setFocus, className } ) {
 		const { url, alt, caption, align, id, href } = attributes;
 		const updateAlt = ( newAlt ) => setAttributes( { alt: newAlt } );
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
@@ -79,7 +79,6 @@ registerBlockType( 'core/image', {
 					<BlockAlignmentToolbar
 						value={ align }
 						onChange={ updateAlignment }
-						wideControlsEnabled={ settings.wideImages }
 					/>
 
 					<Toolbar>

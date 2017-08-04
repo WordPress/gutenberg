@@ -10,11 +10,11 @@ import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
 /**
  * WordPress dependencies
  */
-import { Children, Component } from 'element';
-import { IconButton, Toolbar } from 'components';
-import { BACKSPACE, ESCAPE, DELETE, UP, DOWN, LEFT, RIGHT } from 'utils/keycodes';
-import { getBlockType, getBlockDefaultClassname } from 'blocks';
-import { __, sprintf } from 'i18n';
+import { Children, Component } from '@wordpress/element';
+import { IconButton, Toolbar } from '@wordpress/components';
+import { keycodes } from '@wordpress/utils';
+import { getBlockType, getBlockDefaultClassname } from '@wordpress/blocks';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -45,8 +45,10 @@ import {
 	isBlockMultiSelected,
 	isFirstMultiSelectedBlock,
 	isTyping,
-	getEditorSettings,
+	getMultiSelectedBlockUids,
 } from '../../selectors';
+
+const { BACKSPACE, ESCAPE, DELETE, UP, DOWN, LEFT, RIGHT } = keycodes;
 
 function FirstChild( { children } ) {
 	const childrenArray = Children.toArray( children );
@@ -180,7 +182,6 @@ class VisualEditorBlock extends Component {
 		const { keyCode, target } = event;
 		const {
 			uid,
-			multiSelectedBlockUids,
 			previousBlock,
 			onRemove,
 			onFocus,
@@ -188,19 +189,15 @@ class VisualEditorBlock extends Component {
 		} = this.props;
 
 		// Remove block on backspace.
-		if ( BACKSPACE === keyCode || DELETE === keyCode ) {
-			if ( target === this.node ) {
-				event.preventDefault();
-				onRemove( [ uid ] );
+		if (
+			target === this.node &&
+			( BACKSPACE === keyCode || DELETE === keyCode )
+		) {
+			event.preventDefault();
+			onRemove( [ uid ] );
 
-				if ( previousBlock ) {
-					onFocus( previousBlock.uid, { offset: -1 } );
-				}
-			}
-
-			if ( multiSelectedBlockUids.length ) {
-				event.preventDefault();
-				onRemove( multiSelectedBlockUids );
+			if ( previousBlock ) {
+				onFocus( previousBlock.uid, { offset: -1 } );
 			}
 		}
 
@@ -309,7 +306,7 @@ class VisualEditorBlock extends Component {
 	}
 
 	render() {
-		const { block, multiSelectedBlockUids, settings } = this.props;
+		const { block, multiSelectedBlockUids } = this.props;
 		const { name: blockName, isValid } = block;
 		const blockType = getBlockType( blockName );
 		// translators: %s: Type of block (i.e. Text, Image etc)
@@ -419,7 +416,6 @@ class VisualEditorBlock extends Component {
 							setFocus={ partial( onFocus, block.uid ) }
 							mergeBlocks={ this.mergeBlocks }
 							className={ className }
-							settings={ settings }
 							id={ block.uid }
 						/>
 					) }
@@ -450,7 +446,7 @@ export default connect(
 			focus: getBlockFocus( state, ownProps.uid ),
 			isTyping: isTyping( state ),
 			order: getBlockIndex( state, ownProps.uid ),
-			settings: getEditorSettings( state ),
+			multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
 		};
 	},
 	( dispatch, ownProps ) => ( {

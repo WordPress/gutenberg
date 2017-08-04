@@ -3,29 +3,29 @@
  */
 import classnames from 'classnames';
 import clickOutside from 'react-click-outside';
-import { findIndex } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import IconButton from 'components/icon-button';
-import Dashicon from 'components/dashicon';
-import { Component, findDOMNode } from 'element';
-import { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } from 'utils/keycodes';
+import { Component, findDOMNode } from '@wordpress/element';
+import { keycodes } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
+import IconButton from '../icon-button';
+import Dashicon from '../dashicon';
 
-class DropdownMenu extends Component {
+const { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } = keycodes;
+
+export class DropdownMenu extends Component {
 	constructor() {
 		super( ...arguments );
 
 		this.bindReferenceNode = this.bindReferenceNode.bind( this );
 		this.closeMenu = this.closeMenu.bind( this );
 		this.toggleMenu = this.toggleMenu.bind( this );
-		this.findActiveIndex = this.findActiveIndex.bind( this );
 		this.focusIndex = this.focusIndex.bind( this );
 		this.focusPrevious = this.focusPrevious.bind( this );
 		this.focusNext = this.focusNext.bind( this );
@@ -35,6 +35,7 @@ class DropdownMenu extends Component {
 		this.nodes = {};
 
 		this.state = {
+			activeIndex: null,
 			open: false,
 		};
 	}
@@ -65,34 +66,31 @@ class DropdownMenu extends Component {
 		} );
 	}
 
-	findActiveIndex() {
-		if ( this.nodes.menu ) {
-			const menuItem = document.activeElement;
-			if ( menuItem.parentNode === this.nodes.menu ) {
-				return findIndex( this.nodes.menu.children, ( child ) => child === menuItem );
-			}
-			return -1;
-		}
-	}
-
-	focusIndex( index ) {
-		if ( this.nodes.menu ) {
-			this.nodes.menu.children[ index ].focus();
-		}
+	focusIndex( activeIndex ) {
+		this.setState( { activeIndex } );
 	}
 
 	focusPrevious() {
-		const i = this.findActiveIndex();
-		const maxI = this.props.controls.length - 1;
-		const prevI = i <= 0 ? maxI : i - 1;
-		this.focusIndex( prevI );
+		const { activeIndex } = this.state;
+		const { controls } = this.props;
+		if ( ! controls ) {
+			return;
+		}
+
+		const maxIndex = controls.length - 1;
+		const prevIndex = activeIndex <= 0 ? maxIndex : activeIndex - 1;
+		this.focusIndex( prevIndex );
 	}
 
 	focusNext() {
-		const i = this.findActiveIndex();
-		const maxI = this.props.controls.length - 1;
-		const nextI = i >= maxI ? 0 : i + 1;
-		this.focusIndex( nextI );
+		const { activeIndex } = this.state;
+		const { controls } = this.props;
+		if ( ! controls ) {
+			return;
+		}
+
+		const nextIndex = ( activeIndex + 1 ) % controls.length;
+		this.focusIndex( nextIndex );
 	}
 
 	handleKeyUp( event ) {
@@ -109,9 +107,6 @@ class DropdownMenu extends Component {
 			// eslint-disable-next-line react/no-find-dom-node
 			findDOMNode( this.nodes.toggle ).focus();
 			this.closeMenu();
-			if ( this.props.onSelect ) {
-				this.props.onSelect( null );
-			}
 		}
 	}
 
@@ -155,9 +150,19 @@ class DropdownMenu extends Component {
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
+		const { open, activeIndex } = this.state;
+
 		// Focus the first item when the menu opens.
-		if ( ! prevState.open && this.state.open ) {
+		if ( ! prevState.open && open ) {
 			this.focusIndex( 0 );
+		}
+
+		// Change focus to active index
+		const { menu } = this.nodes;
+		if ( prevState.activeIndex !== activeIndex &&
+				Number.isInteger( activeIndex ) &&
+				menu && menu.children[ activeIndex ] ) {
+			menu.children[ activeIndex ].focus();
 		}
 	}
 
@@ -167,7 +172,6 @@ class DropdownMenu extends Component {
 			label,
 			menuLabel,
 			controls,
-			onSelect,
 		} = this.props;
 
 		if ( ! controls || ! controls.length ) {
@@ -211,9 +215,6 @@ class DropdownMenu extends Component {
 									this.closeMenu();
 									if ( control.onClick ) {
 										control.onClick();
-									}
-									if ( onSelect ) {
-										onSelect( index );
 									}
 								} }
 								className="components-dropdown-menu__menu-item"

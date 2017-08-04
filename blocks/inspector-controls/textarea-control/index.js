@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { withInstanceId } from 'components';
+import { withInstanceId } from '@wordpress/components';
 
 /**
  * Internal dependencies

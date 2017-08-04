@@ -1,4 +1,9 @@
-import { ELEMENT_NODE } from 'utils/nodetypes';
+/**
+ * WordPress dependencies
+ */
+import { nodetypes } from '@wordpress/utils';
+
+const { ELEMENT_NODE } = nodetypes;
 
 /**
  *

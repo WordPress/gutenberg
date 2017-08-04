@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Panel } from 'components';
+import { Panel } from '@wordpress/components';
 
 /**
  * Internal Dependencies

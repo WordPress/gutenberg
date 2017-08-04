@@ -7,7 +7,7 @@ import deepFreeze from 'deep-freeze';
 /**
  * WordPress dependencies
  */
-import { registerBlockType, unregisterBlockType } from 'blocks';
+import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -26,7 +26,6 @@ import {
 	showInsertionPoint,
 	createReduxStore,
 	userData,
-	settings,
 } from '../state';
 
 describe( 'state', () => {
@@ -1085,18 +1084,7 @@ describe( 'state', () => {
 				type: 'SETUP_EDITOR',
 			} );
 
-			expect( initial.recentlyUsedBlocks ).toEqual( expect.arrayContaining( [ 'core/test-block', 'core/text' ] ) );
-		} );
-	} );
-
-	describe( 'settings', () => {
-		it( 'should populate the editor settings', () => {
-			const state = settings( {}, {
-				type: 'SETUP_EDITOR',
-				settings: { wideImages: true },
-			} );
-
-			expect( state ).toEqual( { wideImages: true } );
+			expect( initial.recentlyUsedBlocks ).toEqual( expect.arrayContaining( [ 'core/test-block', 'core/paragraph' ] ) );
 		} );
 	} );
 } );

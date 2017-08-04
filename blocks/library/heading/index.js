@@ -6,9 +6,9 @@ import { isObject } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from 'i18n';
-import { concatChildren } from 'element';
-import { Toolbar } from 'components';
+import { __, sprintf } from '@wordpress/i18n';
+import { concatChildren } from '@wordpress/element';
+import { Toolbar } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -45,7 +45,7 @@ registerBlockType( 'core/heading', {
 		from: [
 			{
 				type: 'block',
-				blocks: [ 'core/text' ],
+				blocks: [ 'core/paragraph' ],
 				transform: ( { content, ...attrs } ) => {
 					const isMultiParagraph = Array.isArray( content ) && isObject( content[ 0 ] ) && content[ 0 ].type === 'p';
 					if ( isMultiParagraph ) {
@@ -59,7 +59,7 @@ registerBlockType( 'core/heading', {
 
 						const remainingContent = content.slice( 1 );
 						if ( remainingContent.length ) {
-							const text = createBlock( 'core/text', {
+							const text = createBlock( 'core/paragraph', {
 								...attrs,
 								content: remainingContent,
 							} );
@@ -97,9 +97,9 @@ registerBlockType( 'core/heading', {
 		to: [
 			{
 				type: 'block',
-				blocks: [ 'core/text' ],
+				blocks: [ 'core/paragraph' ],
 				transform: ( { content } ) => {
-					return createBlock( 'core/text', {
+					return createBlock( 'core/paragraph', {
 						content,
 					} );
 				},
@@ -170,7 +170,7 @@ registerBlockType( 'core/heading', {
 					setAttributes( { content: before } );
 					insertBlocksAfter( [
 						...blocks,
-						createBlock( 'core/text', { content: after } ),
+						createBlock( 'core/paragraph', { content: after } ),
 					] );
 				} }
 				style={ { textAlign: align } }

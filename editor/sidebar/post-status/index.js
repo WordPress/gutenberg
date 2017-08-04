@@ -6,9 +6,9 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { Component } from 'element';
-import { PanelBody, PanelRow, FormToggle, withInstanceId } from 'components';
+import { __ } from '@wordpress/i18n';
+import { Component } from '@wordpress/element';
+import { PanelBody, PanelRow, FormToggle, withInstanceId } from '@wordpress/components';
 
 /**
  * Internal Dependencies
@@ -17,6 +17,7 @@ import PostVisibility from '../post-visibility';
 import PostTrash from '../post-trash';
 import PostSchedule from '../post-schedule';
 import PostSticky from '../post-sticky';
+import PostAuthor from '../post-author';
 import {
 	getEditedPostAttribute,
 	getSuggestedPostFormat,
@@ -64,6 +65,7 @@ class PostStatus extends Component {
 					<span>{ format }</span>
 				</PanelRow>
 				<PostSticky />
+				<PostAuthor />
 				<PostTrash />
 			</PanelBody>
 		);

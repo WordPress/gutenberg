@@ -6,7 +6,7 @@ import { isString } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -40,7 +40,7 @@ registerBlockType( 'core/pullquote', {
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, className, settings } ) {
+	edit( { attributes, setAttributes, focus, setFocus, className } ) {
 		const { value, citation, align } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 
@@ -50,7 +50,6 @@ registerBlockType( 'core/pullquote', {
 					<BlockAlignmentToolbar
 						value={ align }
 						onChange={ updateAlignment }
-						wideControlsEnabled={ settings.wideImages }
 					/>
 				</BlockControls>
 			),

@@ -8,10 +8,10 @@ import clickOutside from 'react-click-outside';
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { Component } from 'element';
-import { Dashicon, IconButton } from 'components';
-import { getBlockType, getBlockTypes, switchToBlockType } from 'blocks';
+import { __ } from '@wordpress/i18n';
+import { Component } from '@wordpress/element';
+import { Dashicon, IconButton } from '@wordpress/components';
+import { getBlockType, getBlockTypes, switchToBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies

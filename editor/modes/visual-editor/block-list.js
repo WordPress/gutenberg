@@ -8,11 +8,11 @@ import { throttle, reduce, noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { Component } from 'element';
-import { serialize, getDefaultBlock, createBlock } from 'blocks';
-import { IconButton } from 'components';
-import { ENTER } from 'utils/keycodes';
+import { __ } from '@wordpress/i18n';
+import { Component } from '@wordpress/element';
+import { serialize, getDefaultBlock, createBlock } from '@wordpress/blocks';
+import { IconButton } from '@wordpress/components';
+import { keycodes } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -29,8 +29,10 @@ import {
 	getMultiSelectedBlockUids,
 } from '../../selectors';
 import { insertBlock, multiSelect } from '../../actions';
+import { bumpStat } from '../../utils/tracking';
 
 const INSERTION_POINT_PLACEHOLDER = '[[insertion-point]]';
+const { ENTER } = keycodes;
 
 class VisualEditorBlockList extends Component {
 	constructor( props ) {
@@ -200,6 +202,8 @@ class VisualEditorBlockList extends Component {
 	insertBlock( name ) {
 		const newBlock = createBlock( name );
 		this.props.onInsertBlock( newBlock );
+		bumpStat( 'add_block_quick', name.replace( /\//g, '__' ) );
+		bumpStat( 'add_block_total', name.replace( /\//g, '__' ) );
 	}
 
 	toggleContinueWritingControls( showContinueWritingControls ) {
@@ -211,7 +215,6 @@ class VisualEditorBlockList extends Component {
 			blocks,
 			showInsertionPoint,
 			insertionPoint,
-			multiSelectedBlockUids,
 		} = this.props;
 
 		const insertionPointIndex = blocks.indexOf( insertionPoint );
@@ -244,7 +247,6 @@ class VisualEditorBlockList extends Component {
 							uid={ uid }
 							blockRef={ ( ref ) => this.setBlockRef( ref, uid ) }
 							onSelectionStart={ () => this.onSelectionStart( uid ) }
-							multiSelectedBlockUids={ multiSelectedBlockUids }
 						/>
 					);
 				} ) }
@@ -267,12 +269,12 @@ class VisualEditorBlockList extends Component {
 				>
 					<Inserter position="top right" />
 					<IconButton
-						icon="text"
+						icon="editor-paragraph"
 						className="editor-inserter__block"
-						onClick={ () => this.insertBlock( 'core/text' ) }
-						label={ __( 'Insert text block' ) }
+						onClick={ () => this.insertBlock( 'core/paragraph' ) }
+						label={ __( 'Insert paragraph block' ) }
 					>
-						{ __( 'Text' ) }
+						{ __( 'Paragraph' ) }
 					</IconButton>
 					<IconButton
 						icon="format-image"

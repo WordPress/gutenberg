@@ -1,9 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { Component } from 'element';
-import { Placeholder, Toolbar, Spinner } from 'components';
-import { __ } from 'i18n';
+import { Component } from '@wordpress/element';
+import { Placeholder, Toolbar, Spinner } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 import moment from 'moment';
 import classnames from 'classnames';
 
@@ -118,7 +118,7 @@ registerBlockType( 'core/latest-posts', {
 				latestPosts.splice( this.props.attributes.postsToShow, postsDifference );
 			}
 
-			const { focus, settings } = this.props;
+			const { focus } = this.props;
 			const { displayPostDate, align, layout, columns } = this.props.attributes;
 			const layoutControls = [
 				{
@@ -144,7 +144,6 @@ registerBlockType( 'core/latest-posts', {
 								setAttributes( { align: nextAlign } );
 							} }
 							controls={ [ 'center', 'wide', 'full' ] }
-							wideControlsEnabled={ settings.wideImages }
 						/>
 						<Toolbar controls={ layoutControls } />
 					</BlockControls>

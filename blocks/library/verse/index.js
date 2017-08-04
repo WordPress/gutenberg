@@ -1,7 +1,7 @@
 /**
  * WordPress
  */
-import { __ } from 'i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -31,7 +31,7 @@ registerBlockType( 'core/verse', {
 		from: [
 			{
 				type: 'block',
-				blocks: [ 'core/text' ],
+				blocks: [ 'core/paragraph' ],
 				transform: ( attributes ) =>
 					createBlock( 'core/verse', attributes ),
 			},
@@ -39,9 +39,9 @@ registerBlockType( 'core/verse', {
 		to: [
 			{
 				type: 'block',
-				blocks: [ 'core/text' ],
+				blocks: [ 'core/paragraph' ],
 				transform: ( attributes ) =>
-					createBlock( 'core/text', attributes ),
+					createBlock( 'core/paragraph', attributes ),
 			},
 		],
 	},

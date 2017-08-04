@@ -4,15 +4,21 @@
 import { find, get, flowRight as compose } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { nodetypes } from '@wordpress/utils';
+
+/**
  * Internal dependencies
  */
 import { createBlock } from './factory';
 import { getBlockTypes, getUnknownTypeHandler } from './registration';
 import { parseBlockAttributes } from './parser';
-import { ELEMENT_NODE, TEXT_NODE } from 'utils/nodetypes';
 import convertTables from './paste/convert-tables';
 import stripAttributes from './paste/strip-attributes';
 import removeSpans from './paste/remove-spans';
+
+const { ELEMENT_NODE, TEXT_NODE } = nodetypes;
 
 /**
  * Normalises array nodes of any node type to an array of block level nodes.

@@ -100,7 +100,8 @@
     ],
     "coverageDirectory": "coverage",
     "moduleNameMapper": {
-      "\\.scss$": "<rootDir>/test/style-mock.js"
+      "\\.scss$": "<rootDir>/test/style-mock.js",
+      "@wordpress\\/(blocks|components|date|editor|element|i18n|utils)": "$1"
     },
     "modulePaths": [
       "<rootDir>"

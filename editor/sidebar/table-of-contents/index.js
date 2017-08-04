@@ -3,41 +3,96 @@
  */
 import { connect } from 'react-redux';
 import { filter } from 'lodash';
-import classnames from 'classnames';
 
 /**
- * WordPress Dependencies
+ * WordPress dependencies
  */
-import { __, sprintf } from 'i18n';
-import { PanelBody } from 'components';
+import { __, sprintf } from '@wordpress/i18n';
+import { PanelBody } from '@wordpress/components';
 
 /**
- * Internal Dependencies
+ * Internal dependencies
  */
 import './style.scss';
+import TableOfContentsItem from './item';
 import { getBlocks } from '../../selectors';
+
+/**
+ * Module constants
+ */
+const emptyHeadingContent = <em>{ __( '(Empty heading)' ) }</em>;
+const incorrectLevelContent = [
+	<br key="incorrect-break" />,
+	<em key="incorrect-message">{ __( '(Incorrect heading level)' ) }</em>,
+];
+
+const getHeadingLevel = heading => {
+	switch ( heading.attributes.nodeName ) {
+		case 'h1':
+		case 'H1':
+			return 1;
+		case 'h2':
+		case 'H2':
+			return 2;
+		case 'h3':
+		case 'H3':
+			return 3;
+		case 'h4':
+		case 'H4':
+			return 4;
+		case 'h5':
+		case 'H5':
+			return 5;
+		case 'h6':
+		case 'H6':
+			return 6;
+	}
+};
+
+const isEmptyHeading = heading => ! heading.attributes.content || heading.attributes.content.length === 0;
 
 const TableOfContents = ( { blocks } ) => {
 	const headings = filter( blocks, ( block ) => block.name === 'core/heading' );
 
+	if ( headings.length <= 1 ) {
+		return null;
+	}
+
+	let prevHeadingLevel = 1;
+
+	const tocItems = headings.map( ( heading, index ) => {
+		const headingLevel = getHeadingLevel( heading );
+		const isEmpty = isEmptyHeading( heading );
+
+		// Headings remain the same, go up by one, or down by any amount.
+		// Otherwise there are missing levels.
+		const isIncorrectLevel = headingLevel > prevHeadingLevel + 1;
+
+		const isValid = (
+			! isEmpty &&
+			! isIncorrectLevel &&
+			headingLevel
+		);
+
+		prevHeadingLevel = headingLevel;
+
+		return (
+			<TableOfContentsItem
+				key={ index }
+				level={ headingLevel }
+				isValid={ isValid }
+			>
+				{ isEmpty ? emptyHeadingContent : heading.attributes.content }
+				{ isIncorrectLevel && incorrectLevelContent }
+			</TableOfContentsItem>
+		);
+	} );
+
 	return (
-		<PanelBody title={ __( 'Table of Contents (experimental)' ) } initialOpen={ false }>
+		<PanelBody title={ __( 'Table of Contents' ) } initialOpen={ false }>
 			<div className="table-of-contents__items">
-				{ headings.length > 1 && <p><strong>{ sprintf( '%d Headings', headings.length ) }</strong></p> }
-				{ headings.map( ( heading, index ) =>
-					<div
-						key={ `heading-${ index }` }
-						className={ classnames( 'table-of-contents__item', `is-${ heading.attributes.nodeName }`, {
-							'is-invalid': ! heading.attributes.content || heading.attributes.content.length === 0,
-						} ) }
-					>
-						<strong>{ heading.attributes.nodeName }</strong>
-						{ heading.attributes.content && heading.attributes.content.length > 0
-							? heading.attributes.content
-							: <em>{ __( '(Missing header text)' ) }</em>
-						}
-					</div>
-				) }
+				<p><strong>{ sprintf( '%d Headings', headings.length ) }</strong></p>
+				<ul>{ tocItems }</ul>
 			</div>
 		</PanelBody>
 	);

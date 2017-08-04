@@ -8,7 +8,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Component, createElement, renderToString, cloneElement, Children } from 'element';
+import { Component, createElement, renderToString, cloneElement, Children } from '@wordpress/element';
 
 /**
  * Internal dependencies
