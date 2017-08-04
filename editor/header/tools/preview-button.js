@@ -16,6 +16,7 @@ import { _x } from '@wordpress/i18n';
 import {
 	getEditedPostPreviewLink,
 	getEditedPostAttribute,
+	isEditedPostDirty,
 } from '../../selectors';
 import { autosave } from '../../actions';
 
@@ -50,6 +51,11 @@ export class PreviewButton extends Component {
 	}
 
 	saveForPreview( event ) {
+		// Let default link behavior occur if no changes to be saved
+		if ( ! this.props.isDirty ) {
+			return;
+		}
+
 		// Save post prior to opening window
 		this.props.autosave();
 		this.setState( {
@@ -86,6 +92,7 @@ export default connect(
 	( state ) => ( {
 		postId: state.currentPost.id,
 		link: getEditedPostPreviewLink( state ),
+		isDirty: isEditedPostDirty( state ),
 		modified: getEditedPostAttribute( state, 'modified' ),
 	} ),
 	{ autosave }
