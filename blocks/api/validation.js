@@ -208,23 +208,16 @@ export function getNextNonWhitespaceToken( tokens ) {
 }
 
 /**
- * Returns true if the parsed block is valid given the input content. A block
- * is considered valid if, when serialized with assumed attributes, the content
- * matches the original value.
+ * Returns true if there is given HTML strings are effectively equivalent, or
+ * false otherwise.
  *
- * Logs to console in development environments when invalid.
- *
- * @param  {String}  rawContent Original block content
- * @param  {String}  blockType  Block type
- * @param  {Object}  attributes Parsed block attributes
- * @return {Boolean}            Whether block is valid
+ * @param  {String}  a First HTML string
+ * @param  {String}  b Second HTML string
+ * @return {Boolean}   Whether HTML strings are equivalent
  */
-export function isValidBlock( rawContent, blockType, attributes ) {
+export function isEquivalentHTML( a, b ) {
 	// Tokenize input content and reserialized save content
-	const [ actualTokens, expectedTokens ] = [
-		rawContent,
-		getSaveContent( blockType, attributes ),
-	].map( tokenize );
+	const [ actualTokens, expectedTokens ] = [ a, b ].map( tokenize );
 
 	let actualToken, expectedToken;
 	while ( ( actualToken = getNextNonWhitespaceToken( actualTokens ) ) ) {
@@ -255,4 +248,23 @@ export function isValidBlock( rawContent, blockType, attributes ) {
 	}
 
 	return true;
+}
+
+/**
+ * Returns true if the parsed block is valid given the input content. A block
+ * is considered valid if, when serialized with assumed attributes, the content
+ * matches the original value.
+ *
+ * Logs to console in development environments when invalid.
+ *
+ * @param  {String}  rawContent Original block content
+ * @param  {String}  blockType  Block type
+ * @param  {Object}  attributes Parsed block attributes
+ * @return {Boolean}            Whether block is valid
+ */
+export function isValidBlock( rawContent, blockType, attributes ) {
+	return isEquivalentHTML(
+		rawContent,
+		getSaveContent( blockType, attributes )
+	);
 }
