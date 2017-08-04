@@ -4,17 +4,26 @@
 		margin-top: 8px;
 	}
 
-	.enable-tracking-prompt__clarification {
-		margin-bottom: 8px;
-		font-size: 90%;
-		font-style: italic;
+	.enable-tracking-prompt__buttons {
+		.button {
+			margin-right: 6px;
+		}
+
+		.enable-tracking-prompt__more-info {
+			span {
+				cursor: pointer;
+			}
+			&:hover span {
+				color: $blue-wordpress-700;
+			}
+			position: relative; // for popover
+		}
 	}
 
-	.enable-tracking-prompt__buttons {
-		float: right;
-
-		.button {
-			margin-left: 6px;
+	.enable-tracking-prompt__clarification {
+		text-align: left;
+		.components-popover__content {
+			padding: 6px;
 		}
 	}
 }
