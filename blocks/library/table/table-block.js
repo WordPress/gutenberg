@@ -6,7 +6,8 @@ import { __ } from '@wordpress/i18n';
 function isTableSelected( editor ) {
 	return editor.dom.getParent(
 		editor.selection.getStart( true ),
-		'table'
+		'table',
+		editor.getBody().parentNode
 	);
 }
 
