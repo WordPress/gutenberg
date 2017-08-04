@@ -43,7 +43,7 @@ class ImageSize extends Component {
 	}
 
 	fetchImageSize() {
-		this.image = new Image();
+		this.image = new window.Image();
 		this.image.onload = () => {
 			const maxWidth = this.container.clientWidth;
 			const ratio = this.image.height / this.image.width;
