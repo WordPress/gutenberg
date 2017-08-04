@@ -33,12 +33,28 @@ registerBlockType( 'core/image', {
 	category: 'common',
 
 	attributes: {
-		url: attr( 'img', 'src' ),
-		alt: attr( 'img', 'alt' ),
-		caption: children( 'figcaption' ),
-		href: attr( 'a', 'href' ),
-		id: Number,
-		align: String,
+		url: {
+			type: 'string',
+			source: attr( 'img', 'src' ),
+		},
+		alt: {
+			type: 'string',
+			source: attr( 'img', 'alt' ),
+		},
+		caption: {
+			type: 'array',
+			source: children( 'figcaption' ),
+		},
+		href: {
+			type: 'string',
+			source: attr( 'a', 'href' ),
+		},
+		id: {
+			type: 'number',
+		},
+		align: {
+			type: 'string',
+		},
 	},
 
 	transforms: {

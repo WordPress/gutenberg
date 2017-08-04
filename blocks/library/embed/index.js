@@ -37,9 +37,16 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms } 
 		category,
 
 		attributes: {
-			url: String,
-			caption: children( 'figcaption' ),
-			align: String,
+			url: {
+				type: 'string',
+			},
+			caption: {
+				type: 'array',
+				source: children( 'figcaption' ),
+			},
+			align: {
+				type: 'string',
+			},
 		},
 
 		transforms,

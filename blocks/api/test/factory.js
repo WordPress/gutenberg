@@ -12,7 +12,9 @@ import { getBlockTypes, unregisterBlockType, setUnknownTypeHandlerName, register
 describe( 'block factory', () => {
 	const defaultBlockSettings = {
 		attributes: {
-			value: String,
+			value: {
+				type: 'string',
+			},
 		},
 		save: noop,
 	};
@@ -28,9 +30,12 @@ describe( 'block factory', () => {
 		it( 'should create a block given its blockType and attributes', () => {
 			registerBlockType( 'core/test-block', {
 				attributes: {
-					align: String,
+					align: {
+						type: 'string',
+					},
 					includesDefault: {
-						defaultValue: true,
+						type: 'boolean',
+						default: true,
 					},
 				},
 				save: noop,
@@ -53,7 +58,9 @@ describe( 'block factory', () => {
 		it( 'should switch the blockType of a block using the "transform form"', () => {
 			registerBlockType( 'core/updated-text-block', {
 				attributes: {
-					value: String,
+					value: {
+						type: 'string',
+					},
 				},
 				transforms: {
 					from: [ {
@@ -88,7 +95,9 @@ describe( 'block factory', () => {
 			registerBlockType( 'core/updated-text-block', defaultBlockSettings );
 			registerBlockType( 'core/text-block', {
 				attributes: {
-					value: String,
+					value: {
+						type: 'string',
+					},
 				},
 				transforms: {
 					to: [ {
@@ -134,7 +143,9 @@ describe( 'block factory', () => {
 		it( 'should reject transformations that return null', () => {
 			registerBlockType( 'core/updated-text-block', {
 				attributes: {
-					value: String,
+					value: {
+						type: 'string',
+					},
 				},
 				transforms: {
 					from: [ {
@@ -158,7 +169,9 @@ describe( 'block factory', () => {
 		it( 'should reject transformations that return an empty array', () => {
 			registerBlockType( 'core/updated-text-block', {
 				attributes: {
-					value: String,
+					value: {
+						type: 'string',
+					},
 				},
 				transforms: {
 					from: [ {
@@ -182,7 +195,9 @@ describe( 'block factory', () => {
 		it( 'should reject single transformations that do not include block types', () => {
 			registerBlockType( 'core/updated-text-block', {
 				attributes: {
-					value: String,
+					value: {
+						type: 'string',
+					},
 				},
 				transforms: {
 					from: [ {
@@ -212,7 +227,9 @@ describe( 'block factory', () => {
 		it( 'should reject array transformations that do not include block types', () => {
 			registerBlockType( 'core/updated-text-block', {
 				attributes: {
-					value: String,
+					value: {
+						type: 'string',
+					},
 				},
 				transforms: {
 					from: [ {
@@ -248,7 +265,9 @@ describe( 'block factory', () => {
 			registerBlockType( 'core/updated-text-block', defaultBlockSettings );
 			registerBlockType( 'core/text-block', {
 				attributes: {
-					value: String,
+					value: {
+						type: 'string',
+					},
 				},
 				transforms: {
 					to: [ {
@@ -276,7 +295,9 @@ describe( 'block factory', () => {
 			registerBlockType( 'core/updated-text-block', defaultBlockSettings );
 			registerBlockType( 'core/text-block', {
 				attributes: {
-					value: String,
+					value: {
+						type: 'string',
+					},
 				},
 				transforms: {
 					to: [ {
@@ -309,7 +330,9 @@ describe( 'block factory', () => {
 			registerBlockType( 'core/updated-text-block', defaultBlockSettings );
 			registerBlockType( 'core/text-block', {
 				attributes: {
-					value: String,
+					value: {
+						type: 'string',
+					},
 				},
 				transforms: {
 					to: [ {

@@ -35,22 +35,24 @@ registerBlockType( 'core/latest-posts', {
 
 	attributes: {
 		postsToShow: {
-			type: Number,
-			defaultValue: 5,
+			type: 'number',
+			default: 5,
 		},
 		displayPostDate: {
-			type: Boolean,
-			defaultValue: false,
+			type: 'boolean',
+			default: false,
 		},
 		layout: {
-			type: String,
-			defaultValue: 'list',
+			type: 'string',
+			default: 'list',
 		},
 		columns: {
-			type: Number,
-			defaultValue: 3,
+			type: 'number',
+			default: 3,
 		},
-		align: String,
+		align: {
+			type: 'string',
+		},
 	},
 
 	getEditWrapperProps( attributes ) {

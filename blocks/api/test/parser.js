@@ -8,9 +8,9 @@ import { noop } from 'lodash';
  */
 import { text, attr, html } from '../query';
 import {
-	isValidMatcher,
+	isValidSource,
 	getBlockAttributes,
-	getMatcherAttributes,
+	getSourcedAttributes,
 	createBlockWithFallback,
 	default as parse,
 } from '../parser';
@@ -24,7 +24,9 @@ import {
 describe( 'block parser', () => {
 	const defaultBlockSettings = {
 		attributes: {
-			fruit: String,
+			fruit: {
+				type: 'string',
+			},
 		},
 		save: ( { attributes } ) => attributes.fruit,
 	};
@@ -36,32 +38,35 @@ describe( 'block parser', () => {
 		} );
 	} );
 
-	describe( 'isValidMatcher()', () => {
+	describe( 'isValidSource()', () => {
 		it( 'returns false if falsey argument', () => {
-			expect( isValidMatcher() ).toBe( false );
+			expect( isValidSource() ).toBe( false );
 		} );
 
-		it( 'returns true if valid matcher argument', () => {
-			expect( isValidMatcher( text() ) ).toBe( true );
+		it( 'returns true if valid source argument', () => {
+			expect( isValidSource( text() ) ).toBe( true );
 		} );
 
-		it( 'returns false if invalid matcher argument', () => {
-			expect( isValidMatcher( () => {} ) ).toBe( false );
+		it( 'returns false if invalid source argument', () => {
+			expect( isValidSource( () => {} ) ).toBe( false );
 		} );
 	} );
 
-	describe( 'getMatcherAttributes()', () => {
-		it( 'should return matched attributes from valid matchers', () => {
+	describe( 'getSourcedAttributes()', () => {
+		it( 'should return matched attributes from valid sources', () => {
 			const sources = {
-				number: Number,
+				number: {
+					type: 'number',
+				},
 				emphasis: {
-					matcher: text( 'strong' ),
+					type: 'string',
+					source: text( 'strong' ),
 				},
 			};
 
 			const rawContent = '<span>Ribs <strong>& Chicken</strong></span>';
 
-			expect( getMatcherAttributes( rawContent, sources ) ).toEqual( {
+			expect( getSourcedAttributes( rawContent, sources ) ).toEqual( {
 				emphasis: '& Chicken',
 			} );
 		} );
@@ -70,7 +75,7 @@ describe( 'block parser', () => {
 			const sources = {};
 			const rawContent = '<span>Ribs <strong>& Chicken</strong></span>';
 
-			expect( getMatcherAttributes( rawContent, sources ) ).toEqual( {} );
+			expect( getSourcedAttributes( rawContent, sources ) ).toEqual( {} );
 		} );
 	} );
 
@@ -78,18 +83,24 @@ describe( 'block parser', () => {
 		it( 'should merge attributes with the parsed and default attributes', () => {
 			const blockType = {
 				attributes: {
-					content: text( 'div' ),
+					content: {
+						type: 'string',
+						source: text( 'div' ),
+					},
 					number: {
-						type: Number,
-						matcher: attr( 'div', 'data-number' ),
+						type: 'number',
+						source: attr( 'div', 'data-number' ),
 					},
-					align: String,
+					align: {
+						type: 'string',
+					},
 					topic: {
-						type: String,
-						defaultValue: 'none',
+						type: 'string',
+						default: 'none',
 					},
-					ignoredDomMatcher: {
-						matcher: ( node ) => node.innerHTML,
+					ignoredDomSource: {
+						type: 'string',
+						source: ( node ) => node.innerHTML,
 					},
 				},
 			};
@@ -159,10 +170,13 @@ describe( 'block parser', () => {
 		it( 'should parse the post content, including block attributes', () => {
 			registerBlockType( 'core/test-block', {
 				attributes: {
-					content: text(),
-					smoked: String,
-					url: String,
-					chicken: String,
+					content: {
+						type: 'string',
+						source: text(),
+					},
+					smoked: { type: 'string' },
+					url: { type: 'string' },
+					chicken: { type: 'string' },
 				},
 				save: noop,
 			} );
@@ -193,7 +207,10 @@ describe( 'block parser', () => {
 		it( 'should parse the post content, ignoring unknown blocks', () => {
 			registerBlockType( 'core/test-block', {
 				attributes: {
-					content: text(),
+					content: {
+						type: 'string',
+						source: text(),
+					},
 				},
 				save: noop,
 			} );
@@ -236,7 +253,10 @@ describe( 'block parser', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 			registerBlockType( 'core/unknown-block', {
 				attributes: {
-					content: html(),
+					content: {
+						type: 'string',
+						source: html(),
+					},
 				},
 				save: noop,
 			} );

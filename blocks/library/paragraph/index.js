@@ -30,13 +30,20 @@ registerBlockType( 'core/paragraph', {
 	className: false,
 
 	attributes: {
-		content: children( 'p' ),
-		align: String,
-		dropCap: {
-			type: Boolean,
-			defaultValue: false,
+		content: {
+			type: 'array',
+			source: children( 'p' ),
 		},
-		placeholder: String,
+		align: {
+			type: 'string',
+		},
+		dropCap: {
+			type: 'boolean',
+			default: false,
+		},
+		placeholder: {
+			type: 'string',
+		},
 	},
 
 	transforms: {

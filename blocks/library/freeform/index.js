@@ -20,7 +20,10 @@ registerBlockType( 'core/freeform', {
 	category: 'formatting',
 
 	attributes: {
-		content: prop( 'innerHTML' ),
+		content: {
+			type: 'string',
+			source: prop( 'innerHTML' ),
+		},
 	},
 
 	edit: OldEditor,

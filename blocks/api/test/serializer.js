@@ -146,9 +146,16 @@ describe( 'block serializer', () => {
 				category: 'food',
 				ripeness: 'ripe',
 			}, {
-				fruit: text(),
-				category: String,
-				ripeness: String,
+				fruit: {
+					type: 'string',
+					source: text(),
+				},
+				category: {
+					type: 'string',
+				},
+				ripeness: {
+					type: 'string',
+				},
 			} );
 
 			expect( attributes ).toEqual( {
@@ -162,8 +169,12 @@ describe( 'block serializer', () => {
 				fruit: 'bananas',
 				ripeness: undefined,
 			}, {
-				fruit: String,
-				ripeness: String,
+				fruit: {
+					type: 'string',
+				},
+				ripeness: {
+					type: 'string',
+				},
 			} );
 
 			expect( attributes ).toEqual( { fruit: 'bananas' } );
@@ -190,15 +201,20 @@ describe( 'block serializer', () => {
 			const blockType = {
 				attributes: {
 					foo: {
-						type: String,
-						defaultValue: true,
+						type: 'string',
+						default: true,
 					},
 					bar: {
-						type: String,
-						defaultValue: false,
+						type: 'string',
+						default: false,
 					},
-					content: text(),
-					stuff: String,
+					content: {
+						type: 'string',
+						source: text(),
+					},
+					stuff: {
+						type: 'string',
+					},
 				},
 				save( { attributes } ) {
 					return <p dangerouslySetInnerHTML={ { __html: attributes.content } } />;

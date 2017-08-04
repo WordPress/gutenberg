@@ -28,18 +28,20 @@ registerBlockType( 'core/categories', {
 
 	attributes: {
 		showPostCounts: {
-			type: Boolean,
-			defaultValue: false,
+			type: 'boolean',
+			default: false,
 		},
 		displayAsDropdown: {
-			type: Boolean,
-			defaultValue: false,
+			type: 'boolean',
+			default: false,
 		},
 		showHierarchy: {
-			type: Boolean,
-			defaultValue: false,
+			type: 'boolean',
+			default: false,
 		},
-		align: String,
+		align: {
+			type: 'string',
+		},
 	},
 
 	getEditWrapperProps( attributes ) {

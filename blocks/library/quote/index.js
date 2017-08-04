@@ -26,12 +26,20 @@ registerBlockType( 'core/quote', {
 	category: 'common',
 
 	attributes: {
-		value: query( 'blockquote > p', node() ),
-		citation: children( 'footer' ),
-		align: String,
+		value: {
+			type: 'array',
+			source: query( 'blockquote > p', node() ),
+		},
+		citation: {
+			type: 'array',
+			source: children( 'footer' ),
+		},
+		align: {
+			type: 'string',
+		},
 		style: {
-			type: Number,
-			defaultValue: 1,
+			type: 'number',
+			default: 1,
 		},
 	},
 

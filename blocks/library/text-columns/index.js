@@ -32,15 +32,17 @@ registerBlockType( 'core/text-columns', {
 
 	attributes: {
 		content: {
-			type: Object, // Array
-			matcher: query( 'p', children() ),
-			defaultValue: [ [], [] ],
+			type: 'array',
+			source: query( 'p', children() ),
+			default: [ [], [] ],
 		},
 		columns: {
-			type: Number,
-			defaultValue: 2,
+			type: 'number',
+			default: 2,
 		},
-		width: String,
+		width: {
+			type: 'string',
+		},
 	},
 
 	getEditWrapperProps( attributes ) {

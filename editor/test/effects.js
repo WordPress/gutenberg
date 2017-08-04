@@ -108,7 +108,9 @@ describe( 'effects', () => {
 		it( 'should transform and merge the blocks', () => {
 			registerBlockType( 'core/test-block', {
 				attributes: {
-					content: String,
+					content: {
+						type: 'string',
+					},
 				},
 				merge( attributes, attributesToMerge ) {
 					return {
@@ -119,7 +121,9 @@ describe( 'effects', () => {
 			} );
 			registerBlockType( 'core/test-block-2', {
 				attributes: {
-					content: String,
+					content: {
+						type: 'string',
+					},
 				},
 				transforms: {
 					to: [ {

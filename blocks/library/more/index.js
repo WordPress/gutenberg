@@ -24,10 +24,12 @@ registerBlockType( 'core/more', {
 	className: false,
 
 	attributes: {
-		text: String,
+		text: {
+			type: 'string',
+		},
 		noTeaser: {
-			type: Boolean,
-			defaultValue: false,
+			type: 'boolean',
+			default: false,
 		},
 	},
 

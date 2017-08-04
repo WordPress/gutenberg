@@ -14,7 +14,6 @@ import {
 /**
  * Internal dependencies
  */
-import { getNormalizedAttributeSource } from './parser';
 import { getBlockType } from './registration';
 
 /**
@@ -34,11 +33,8 @@ export function createBlock( name, attributes = {} ) {
 		const value = attributes[ key ];
 		if ( undefined !== value ) {
 			result[ key ] = value;
-		} else {
-			source = getNormalizedAttributeSource( source );
-			if ( source.defaultValue ) {
-				result[ key ] = source.defaultValue;
-			}
+		} else if ( source.default ) {
+			result[ key ] = source.default;
 		}
 
 		return result;

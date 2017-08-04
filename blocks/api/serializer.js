@@ -14,7 +14,6 @@ import { Component, createElement, renderToString, cloneElement, Children } from
  * Internal dependencies
  */
 import { getBlockType } from './registration';
-import { getNormalizedAttributeSource } from './parser';
 
 /**
  * Returns the block's default classname from its name
@@ -82,11 +81,11 @@ export function getSaveContent( blockType, attributes ) {
  * which cannot be matched from the block content.
  *
  * @param   {Object<String,*>} allAttributes Attributes from in-memory block data
- * @param   {Object<String,*>} sources       Block type attributes definition
+ * @param   {Object<String,*>} schema        Block type schema
  * @returns {Object<String,*>}               Subset of attributes for comment serialization
  */
-export function getCommentAttributes( allAttributes, sources ) {
-	return reduce( sources, ( result, source, key ) => {
+export function getCommentAttributes( allAttributes, schema ) {
+	return reduce( schema, ( result, attributeSchema, key ) => {
 		const value = allAttributes[ key ];
 
 		// Ignore undefined values
@@ -95,13 +94,12 @@ export function getCommentAttributes( allAttributes, sources ) {
 		}
 
 		// Ignore values sources from content
-		source = getNormalizedAttributeSource( source );
-		if ( source.matcher ) {
+		if ( attributeSchema.source ) {
 			return result;
 		}
 
 		// Ignore default value
-		if ( 'defaultValue' in source && source.defaultValue === value ) {
+		if ( 'default' in attributeSchema && attributeSchema.default === value ) {
 			return result;
 		}
 

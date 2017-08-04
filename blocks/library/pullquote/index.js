@@ -24,11 +24,17 @@ registerBlockType( 'core/pullquote', {
 	category: 'formatting',
 
 	attributes: {
-		value: query( 'blockquote > p', node() ),
-		citation: children( 'footer' ),
+		value: {
+			type: 'array',
+			source: query( 'blockquote > p', node() ),
+		},
+		citation: {
+			type: 'array',
+			source: children( 'footer' ),
+		},
 		align: {
-			type: String,
-			defaultValue: 'none',
+			type: 'string',
+			default: 'none',
 		},
 	},
 

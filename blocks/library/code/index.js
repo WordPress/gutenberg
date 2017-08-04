@@ -24,7 +24,10 @@ registerBlockType( 'core/code', {
 	category: 'formatting',
 
 	attributes: {
-		content: prop( 'code', 'textContent' ),
+		content: {
+			type: 'string',
+			source: prop( 'code', 'textContent' ),
+		},
 	},
 
 	transforms: {

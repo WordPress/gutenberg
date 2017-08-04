@@ -27,15 +27,24 @@ registerBlockType( 'core/button', {
 	category: 'layout',
 
 	attributes: {
-		url: attr( 'a', 'href' ),
-		title: attr( 'a', 'title' ),
-		text: children( 'a' ),
+		url: {
+			type: 'string',
+			source: attr( 'a', 'href' ),
+		},
+		title: {
+			type: 'string',
+			source: attr( 'a', 'title' ),
+		},
+		text: {
+			type: 'array',
+			source: children( 'a' ),
+		},
 		align: {
-			type: String,
-			defaultValue: 'none',
+			type: 'string',
+			default: 'none',
 		},
 		color: {
-			type: String,
+			type: 'string',
 		},
 	},
 
