@@ -74,6 +74,13 @@
 		"no-negated-in-lhs": "error",
 		"no-nested-ternary": "error",
 		"no-redeclare": "error",
+		"no-restricted-syntax": [
+			"error",
+			{
+				"selector": "ImportDeclaration[source.value=/^@wordpress\\u002F.+\\u002F/]",
+				"message": "Path access on WordPress dependencies is not allowed."
+			}
+		],
 		"no-shadow": "error",
 		"no-undef-init": "error",
 		"no-unreachable": "error",
