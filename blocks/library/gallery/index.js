@@ -70,6 +70,12 @@ registerBlockType( 'core/gallery', {
 	icon: 'format-gallery',
 	category: 'common',
 
+	defaultAttributes: {
+		images: [],
+		align: 'none',
+		imageCrop: true,
+	},
+
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
 		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
@@ -78,10 +84,9 @@ registerBlockType( 'core/gallery', {
 	},
 
 	edit( { attributes, setAttributes, focus, className } ) {
-		const { images = [], columns = defaultColumnsNumber( attributes ), align = 'none' } = attributes;
+		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop } = attributes;
 		const setColumnsNumber = ( event ) => setAttributes( { columns: event.target.value } );
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
-		const { imageCrop = true } = attributes;
 		const toggleImageCrop = () => setAttributes( { imageCrop: ! imageCrop } );
 
 		const controls = (
@@ -158,7 +163,7 @@ registerBlockType( 'core/gallery', {
 	},
 
 	save( { attributes } ) {
-		const { images, columns = defaultColumnsNumber( attributes ), align = 'none', imageCrop = true } = attributes;
+		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop } = attributes;
 		return (
 			<div className={ `align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` } >
 				{ images.map( ( img ) => (

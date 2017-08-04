@@ -100,8 +100,11 @@ export function createBlockWithFallback( name, rawContent, attributes ) {
 		// Validate that the parsed block is valid, meaning that if we were to
 		// reserialize it given the assumed attributes, the markup matches the
 		// original value. Otherwise, preserve original to avoid destruction.
-		block.isValid = isValidBlock( rawContent, blockType, block.attributes );
-		if ( ! block.isValid ) {
+		try {
+			block.isValid = isValidBlock( rawContent, blockType, block.attributes );
+		} catch ( error ) {
+			block.isValid = false;
+			block.error = error;
 			block.originalContent = rawContent;
 		}
 
@@ -129,13 +132,42 @@ export function isValidBlock( rawContent, blockType, attributes ) {
 
 	const isValid = ( actual === expected );
 
-	if ( ! isValid && 'development' === process.env.NODE_ENV ) {
-		// eslint-disable-next-line no-console
-		console.error(
-			'Invalid block parse\n' +
-				'\tExpected: ' + expected + '\n' +
-				'\tActual:   ' + actual
-		);
+	if ( ! isValid ) {
+		// NOTE: DO NOT COLLAPSE THESE CONDITIONS OR CONVERT COMMONJS TO ES2015
+		// IMPORTS. They are intentionally written as such because minification
+		// will drop this unreachable block in production environments.
+		if ( 'production' !== process.env.NODE_ENV ) {
+			const chalk = require( 'chalk' );
+			let message = 'Invalid block parse for ';
+
+			// Chalk automatically detects its environment to determine whether
+			// ANSI codes are supported. In these environments we provide a nicely
+			// colored error message for invalid parse.
+			//
+			// TODO: Teach browsers to ANSI
+			const { diffLines } = require( 'diff' );
+			const diff = diffLines( actual, expected );
+			message += chalk.bold( blockType.name ) + ':\n\n';
+			message += chalk.bgGreen( '- Expected' ) + '\n' + chalk.bgRed( '+ Actual' ) + '\n\n';
+			message += diff.reduce( ( result, part ) => {
+				let { value } = part;
+				if ( part.removed ) {
+					value = value.replace( /\n$/, '' );
+					value = value.replace( /^/gm, '- ' );
+					value = chalk.red( value );
+				} else if ( part.added ) {
+					value = value.replace( /\n$/, '' );
+					value = value.replace( /^/gm, '+ ' );
+					value = '\n' + value;
+					value = chalk.green( value );
+					value += '\n';
+				}
+
+				return result + value;
+			}, '' );
+
+			throw new Error( message );
+		}
 	}
 
 	return isValid;

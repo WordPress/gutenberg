@@ -95,12 +95,22 @@ describe( 'full post content fixture', () => {
 
 	fileBasenames.forEach( f => {
 		it( f, () => {
+			/*
+			 * Read the input content (HTML + block delimiters).
+			 */
+
 			const content = readFixtureFile( f + '.html' );
 			if ( content === null ) {
 				throw new Error(
 					'Missing fixture file: ' + f + '.html'
 				);
 			}
+
+			/*
+			 * Parse the content using the PEG.js grammar parser and verify the
+			 * raw parser output (a list of blocks with comment attributes and
+			 * `rawContent` as a string).
+			 */
 
 			const parserOutputActual = grammarParse( content );
 			let parserOutputExpectedString = readFixtureFile( f + '.parsed.json' );
@@ -133,6 +143,11 @@ describe( 'full post content fixture', () => {
 				) );
 			}
 
+			/*
+			 * Run the post content through the block parser API and verify the
+			 * output (a list of initialized block objects serialized to JSON).
+			 */
+
 			const blocksActual = parse( content );
 			const blocksActualNormalized = normalizeParsedBlocks( blocksActual );
 			let blocksExpectedString = readFixtureFile( f + '.json' );
@@ -152,6 +167,24 @@ describe( 'full post content fixture', () => {
 				}
 			}
 
+			// If file is suffixed as invalid, we expect a parse should fail.
+			const isExpectedValid = ! /(__|-)invalid$/.test( f );
+			const [ block ] = blocksActual;
+			if ( isExpectedValid !== block.isValid ) {
+				throw new Error( format(
+					isExpectedValid
+						? 'Parse failed on content from \'%s.html\':\n\n%s'
+						: 'Expected parse failure on content from \'%s.html\'',
+					f,
+					block.error || ''
+				) );
+			}
+			// Don't bother continuing with verifying or generating JSON and
+			// serialized HTML if we did not expect parse to succeed.
+			if ( ! isExpectedValid ) {
+				return;
+			}
+
 			const blocksExpected = JSON.parse( blocksExpectedString );
 			try {
 				expect(
@@ -164,6 +197,11 @@ describe( 'full post content fixture', () => {
 					err.message
 				) );
 			}
+
+			/*
+			 * Serialize the parsed block objects and verify the output (HTML +
+			 * block delimiters).
+			 */
 
 			// `serialize` doesn't have a trailing newline, but the fixture
 			// files should.

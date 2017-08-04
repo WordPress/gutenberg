@@ -37,7 +37,7 @@
                 }
             ]
         },
-        "rawContent": "\n<div class=\"wp-block-gallery\">\n\t<figure class=\"blocks-gallery-image\">\n\t\t<img src=\"https://cldup.com/uuUqE_dXzy.jpg\" alt=\"title\" />\n\t</figure>\n\t<figure class=\"blocks-gallery-image\">\n\t\t<img src=\"http://google.com/hi.png\" alt=\"title\" />\n\t</figure>\n</div>\n"
+        "rawContent": "\n<div class=\"wp-block-gallery alignnone columns-2 is-cropped\">\n    <figure class=\"blocks-gallery-image\"><img src=\"https://cldup.com/uuUqE_dXzy.jpg\" alt=\"title\" /></figure>\n    <figure class=\"blocks-gallery-image\"><img src=\"http://google.com/hi.png\" alt=\"title\" /></figure>\n</div>\n"
     },
     {
         "attrs": {},
