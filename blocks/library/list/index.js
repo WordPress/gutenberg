@@ -318,7 +318,7 @@ registerBlockType( 'core/list', {
 					onMerge={ mergeBlocks }
 					onSplit={ ( before, after, ...blocks ) => {
 						if ( ! blocks.length ) {
-							blocks.push( createBlock( 'core/text' ) );
+							blocks.push( createBlock( 'core/paragraph' ) );
 						}
 
 						if ( after.length ) {
