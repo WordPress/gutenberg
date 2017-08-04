@@ -86,10 +86,16 @@ registerBlockType( 'core/image', {
 	edit( { attributes, setAttributes, focus, setFocus, className } ) {
 		const { url, alt, caption, align, id, href, width, height } = attributes;
 		const updateAlt = ( newAlt ) => setAttributes( { alt: newAlt } );
-		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
+		const updateAlignment = ( nextAlign ) => {
+			const extraUpdatedAttributes = [ 'wide', 'full' ].indexOf( nextAlign ) !== -1
+				? { width: undefined, height: undefined }
+				: {};
+			setAttributes( { ...extraUpdatedAttributes, align: nextAlign } );
+		};
 		const onSelectImage = ( media ) => {
 			setAttributes( { url: media.url, alt: media.alt, caption: media.caption, id: media.id } );
 		};
+		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1;
 		const uploadButtonProps = { isLarge: true };
 		const onSetHref = ( value ) => setAttributes( { href: value } );
 		const uploadFromFiles = ( files ) => {
@@ -207,7 +213,7 @@ registerBlockType( 'core/image', {
 				<ImageSize src={ url }>
 					{ ( originalWidth = width, originalHeight = height ) => {
 						const img = <img src={ url } alt={ alt } onClick={ setFocus } />;
-						if ( ! originalHeight || ! originalWidth ) {
+						if ( ! isResizable || ! originalHeight || ! originalWidth ) {
 							return img;
 						}
 						return (
