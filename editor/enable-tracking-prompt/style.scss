@@ -16,10 +16,16 @@
 				display: inline-block;
 				height: 24px;
 				line-height: 22px;
+				border-radius: 2px;
+				border: 1px solid transparent;
 
 				cursor: pointer;
-				&:hover {
+				&:hover, &:focus {
 					color: $blue-wordpress-700;
+				}
+				&:focus {
+					border-color: #5b9dd9;
+					box-shadow: 0 0 3px rgba( 0, 115, 170, .8 );
 				}
 			}
 		}
