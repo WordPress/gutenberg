@@ -25,14 +25,15 @@ describe( 'EnableTrackingPrompt', () => {
 		window.setUserSetting = originalSetUserSetting;
 	} );
 
-	it( 'should render a prompt with Yes and No buttons', () => {
+	it( 'should render a prompt with Yes, No, and More info buttons', () => {
 		const prompt = mount(
 			<EnableTrackingPrompt />
 		);
 		const buttons = prompt.find( 'Button' );
-		expect( buttons.length ).toBe( 2 );
+		expect( buttons.length ).toBe( 3 );
 		expect( buttons.at( 0 ).text() ).toBe( 'Yes' );
 		expect( buttons.at( 1 ).text() ).toBe( 'No' );
+		expect( buttons.at( 2 ).text() ).toBe( 'More info' );
 
 		expect( window.setUserSetting )
 			.not.toHaveBeenCalled();

@@ -37,7 +37,7 @@ export class EnableTrackingPrompt extends Component {
 			enableTracking ? 'on' : 'off'
 		);
 		if ( enableTracking ) {
-			props.bumpStat( 'tracking', 'opt-in' );
+			this.props.bumpStat( 'tracking', 'opt-in' );
 		}
 		this.props.removeNotice( TRACKING_PROMPT_NOTICE_ID );
 	}
