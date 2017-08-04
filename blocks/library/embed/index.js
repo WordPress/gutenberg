@@ -229,7 +229,7 @@ registerBlockType(
 				{
 					type: 'pattern',
 					trigger: 'paste',
-					regExp: /^\s*(https:\/\/\S+)\s*/i,
+					regExp: /^\s*(https?:\/\/\S+)\s*/i,
 					transform: ( { match } ) => {
 						return createBlock( 'core/embed', {
 							url: match[ 1 ],
