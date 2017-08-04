@@ -150,7 +150,7 @@ registerBlockType( 'core/gallery', {
 					<SelectControl
 						label={ __( 'Link to' ) }
 						selected={ linkto }
-						onChange={ setLinkto }
+						onBlur={ setLinkto }
 						options={ linkOptions }
 					/>
 				</InspectorControls>
