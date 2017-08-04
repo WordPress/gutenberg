@@ -13,6 +13,8 @@ import {
 } from '../';
 
 describe( 'EnableTrackingPrompt', () => {
+	jest.mock( '@wordpress/utils/tracking' );
+
 	const originalSetUserSetting = window.setUserSetting;
 	const originalDocumentAddEventListener = document.addEventListener;
 	let eventMap = {};
