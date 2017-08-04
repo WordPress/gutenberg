@@ -48,6 +48,29 @@ describe( 'PreviewButton', () => {
 	} );
 
 	describe( 'saveForPreview()', () => {
+		it( 'should do nothing if not dirty', () => {
+			const autosave = jest.fn();
+			const preventDefault = jest.fn();
+			const windowOpen = window.open;
+			window.open = jest.fn();
+
+			const wrapper = shallow(
+				<PreviewButton
+					postId={ 1 }
+					isDirty={ false }
+					autosave={ autosave } />
+			);
+
+			wrapper.simulate( 'click', { preventDefault } );
+
+			expect( autosave ).not.toHaveBeenCalled();
+			expect( preventDefault ).not.toHaveBeenCalled();
+			expect( wrapper.state( 'isAwaitingSave' ) ).not.toBe( true );
+			expect( window.open ).not.toHaveBeenCalled();
+
+			window.open = windowOpen;
+		} );
+
 		it( 'should open a popup window', () => {
 			const autosave = jest.fn();
 			const preventDefault = jest.fn();
@@ -57,6 +80,7 @@ describe( 'PreviewButton', () => {
 			const wrapper = shallow(
 				<PreviewButton
 					postId={ 1 }
+					isDirty
 					autosave={ autosave } />
 			);
 
