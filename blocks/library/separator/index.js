@@ -20,6 +20,7 @@ registerBlockType( 'core/separator', {
 		from: [
 			{
 				type: 'pattern',
+				trigger: 'enter',
 				regExp: /^-{3,}$/,
 				transform: () => createBlock( 'core/separator' ),
 			},
