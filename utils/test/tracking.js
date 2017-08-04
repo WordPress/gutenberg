@@ -1,6 +1,11 @@
 /* eslint-disable no-console */
 
 /**
+ * External dependencies
+ */
+import url from 'url';
+
+/**
  * Internal dependencies
  */
 import { bumpStat } from '../tracking';
@@ -68,16 +73,15 @@ describe( 'bumpStat', () => {
 
 	it( 'should bump valid stats', () => {
 		window.getUserSetting = () => 'on';
-		const url = bumpStat( 'valid_group', 'valid-name' );
-		// There are a couple of pieces of the URL where we don't care about
-		// testing the specific value.  Replace them with placeholders.
-		const urlMatch = url
-			.replace( /^[a-z]+:/, 'PROTOCOL:' )
-			.replace( /t=[0-9.]+$/, 't=NUMBER' );
-		expect( urlMatch ).toBe(
-			'PROTOCOL://pixel.wp.com/g.gif?v=wpcom-no-pv'
-			+ '&x_gutenberg_valid_group=valid-name'
-			+ '&t=NUMBER'
+		// Testing the URL protocol and the randomized `?t=` cache-buster is
+		// difficult, so only test the pieces we're actually interested in.
+		const statUrlPieces = url.parse(
+			bumpStat( 'valid_group', 'valid-name' ),
+			true
 		);
+		expect( statUrlPieces.hostname ).toBe( 'pixel.wp.com' );
+		expect( statUrlPieces.pathname ).toBe( '/g.gif' );
+		expect( statUrlPieces.query.v ).toBe( 'wpcom-no-pv' );
+		expect( statUrlPieces.query.x_gutenberg_valid_group ).toBe( 'valid-name' );
 	} );
 } );
