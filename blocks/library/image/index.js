@@ -77,9 +77,9 @@ registerBlockType( 'core/image', {
 	},
 
 	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
+		const { align, width } = attributes;
 		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
-			return { 'data-align': align };
+			return { 'data-align': align, 'data-resized': !! width };
 		}
 	},
 
@@ -186,6 +186,7 @@ registerBlockType( 'core/image', {
 		const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
 		const classes = classnames( className, {
 			'is-transient': 0 === url.indexOf( 'blob:' ),
+			'is-resized': !! width,
 		} );
 
 		// Disable reason: Each block can be selected by clicking on it
