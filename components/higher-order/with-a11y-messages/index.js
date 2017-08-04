@@ -22,7 +22,7 @@ function withA11yMessages( WrappedComponent ) {
 			this.debouncedSpeak = debounce( this.speak.bind( this ), 500 );
 		}
 
-		speak( message, type = 'assertive' ) {
+		speak( message, type = 'polite' ) {
 			wp.a11y.speak( message, type );
 		}
 

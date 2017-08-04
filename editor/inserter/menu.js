@@ -65,9 +65,9 @@ export class InserterMenu extends Component {
 				'%d result found',
 				'%d results found',
 				searchResults.length
-			), searchResults.length ) );
+			), searchResults.length ), 'assertive' );
 		} else {
-			this.props.debouncedSpeak( __( 'No results.' ) );
+			this.props.debouncedSpeak( __( 'No results.' ), 'assertive' );
 		}
 	}
 

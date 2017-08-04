@@ -129,7 +129,7 @@ class FormatToolbar extends Component {
 			this.props.formats.link.value === '' &&
 			!! this.state.linkValue.length
 		) {
-			this.props.speak( __( 'Link inserted.' ) );
+			this.props.speak( __( 'Link inserted.' ), 'assertive' );
 		}
 	}
 

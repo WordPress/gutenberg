@@ -80,9 +80,9 @@ class UrlInput extends Component {
 							'%d result found, use up and down arrow keys to navigate.',
 							'%d results found, use up and down arrow keys to navigate.',
 							posts.length
-						), posts.length ) );
+						), posts.length ), 'assertive' );
 					} else {
-						this.props.debouncedSpeak( __( 'No results.' ) );
+						this.props.debouncedSpeak( __( 'No results.' ), 'assertive' );
 					}
 				},
 				( xhr ) => {
