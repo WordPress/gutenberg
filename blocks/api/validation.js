@@ -37,7 +37,7 @@ const REGEXP_STYLE_URL_TYPE = /^url\s*\(['"\s]*(.*?)['"\s]*\)$/;
  * @param  {String}   text Original text
  * @return {String[]}      Text pieces split on whitespace
  */
-function getTextPiecesSplitOnWhitespace( text ) {
+export function getTextPiecesSplitOnWhitespace( text ) {
 	return text.trim().split( REGEXP_WHITESPACE );
 }
 
@@ -48,7 +48,7 @@ function getTextPiecesSplitOnWhitespace( text ) {
  * @param  {String} text Original text
  * @return {String}      Trimmed text with consecutive whitespace collapsed
  */
-function getTextWithCollapsedWhitespace( text ) {
+export function getTextWithCollapsedWhitespace( text ) {
 	return getTextPiecesSplitOnWhitespace( text ).join( ' ' );
 }
 
@@ -60,7 +60,7 @@ function getTextWithCollapsedWhitespace( text ) {
  * @param  {Object}  b Second token
  * @return {Boolean}   Whether two text tokens are equivalent
  */
-function isEqualTextTokensWithCollapsedWhitespace( a, b ) {
+export function isEqualTextTokensWithCollapsedWhitespace( a, b ) {
 	// This is an overly simplified whitespace comparison. The specification is
 	// more prescriptive of whitespace behavior in inline and block contexts.
 	//
@@ -75,20 +75,20 @@ function isEqualTextTokensWithCollapsedWhitespace( a, b ) {
  * @param  {String} value Style value
  * @return {String}       Normalized style value
  */
-function getNormalizedStyleValue( value ) {
+export function getNormalizedStyleValue( value ) {
 	return value
 		// Normalize URL type to omit whitespace or quotes
 		.replace( REGEXP_STYLE_URL_TYPE, 'url($1)' );
 }
 
 /**
- * Given a style attribute string, returns an array of property-value pairs.
+ * Given a style attribute string, returns an object of style properties.
  *
- * @param  {String}  text Style attribute
- * @return {Array[]}      Style property-value pairs
+ * @param  {String} text Style attribute
+ * @return {Object}      Style properties
  */
-function getStylePropertyPairs( text ) {
-	return text
+export function getStyleProperties( text ) {
+	const pairs = text
 		// Trim ending semicolon (avoid including in split)
 		.replace( /;?\s*$/, '' )
 		// Split on property assignment
@@ -104,6 +104,8 @@ function getStylePropertyPairs( text ) {
 				getNormalizedStyleValue( value.trim() ),
 			];
 		} );
+
+	return fromPairs( pairs );
 }
 
 /**
@@ -111,14 +113,14 @@ function getStylePropertyPairs( text ) {
  *
  * @type {Object}
  */
-const isEqualAttributesOfName = {
+export const isEqualAttributesOfName = {
 	'class': ( a, b ) => {
 		// Class matches if members are the same, even if out of order or
 		// superfluous whitespace between.
 		return ! xor( ...[ a, b ].map( getTextPiecesSplitOnWhitespace ) ).length;
 	},
 	style: ( a, b ) => {
-		return isEqual( ...[ a, b ].map( getStylePropertyPairs ) );
+		return isEqual( ...[ a, b ].map( getStyleProperties ) );
 	},
 };
 
@@ -130,7 +132,7 @@ const isEqualAttributesOfName = {
  * @param  {Array[]} b Second attributes tuples
  * @return {Boolean}   Whether attributes are equivalent
  */
-function isEqualTagAttributePairs( a, b ) {
+export function isEqualTagAttributePairs( a, b ) {
 	// Attributes is tokenized as tuples. Their lengths should match. This also
 	// avoids us needing to check both attributes sets, since if A has any keys
 	// which do not exist in B, we know the sets to be different.
