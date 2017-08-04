@@ -5,7 +5,7 @@ export default function GalleryImage( props ) {
 		case 'media':
 			href = props.img.url;
 			break;
-		case 'attacment':
+		case 'attachment':
 			href = props.img.link;
 			break;
 	}
