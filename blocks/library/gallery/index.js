@@ -135,12 +135,6 @@ registerBlockType( 'core/gallery', {
 						<p>{ __( 'Image galleries are a great way to share groups of pictures on your site.' ) }</p>
 					</BlockDescription>
 					<h3>{ __( 'Gallery Settings' ) }</h3>
-					<SelectControl
-						label={ __( 'Link to' ) }
-						selected={ linkto }
-						onChange={ setLinkto }
-						options={ linkOptions }
-					/>
 					<RangeControl
 						label={ __( 'Columns' ) }
 						value={ columns }
@@ -152,6 +146,12 @@ registerBlockType( 'core/gallery', {
 						label={ __( 'Crop Images' ) }
 						checked={ !! imageCrop }
 						onChange={ toggleImageCrop }
+					/>
+					<SelectControl
+						label={ __( 'Link to' ) }
+						selected={ linkto }
+						onChange={ setLinkto }
+						options={ linkOptions }
 					/>
 				</InspectorControls>
 			),
