@@ -95,6 +95,10 @@ describe( 'full post content fixture', () => {
 
 	fileBasenames.forEach( f => {
 		it( f, () => {
+			/**
+			 * Read the input content (HTML + block delimiters).
+			 */
+
 			const content = readFixtureFile( f + '.html' );
 			if ( content === null ) {
 				throw new Error(
@@ -102,7 +106,11 @@ describe( 'full post content fixture', () => {
 				);
 			}
 
-			const blocksActual = parse( content );
+			/**
+			 * Parse the content using the PEG.js grammar parser and verify the
+			 * raw parser output (a list of blocks with comment attributes and
+			 * `rawContent` as a string).
+			 */
 
 			const parserOutputActual = grammarParse( content );
 			let parserOutputExpectedString = readFixtureFile( f + '.parsed.json' );
@@ -135,6 +143,12 @@ describe( 'full post content fixture', () => {
 				) );
 			}
 
+			/**
+			 * Run the post content through the block parser API and verify the
+			 * output (a list of initialized block objects serialized to JSON).
+			 */
+
+			const blocksActual = parse( content );
 			const blocksActualNormalized = normalizeParsedBlocks( blocksActual );
 			let blocksExpectedString = readFixtureFile( f + '.json' );
 
@@ -183,6 +197,11 @@ describe( 'full post content fixture', () => {
 					err.message
 				) );
 			}
+
+			/**
+			 * Serialize the parsed block objects and verify the output (HTML +
+			 * block delimiters).
+			 */
 
 			// `serialize` doesn't have a trailing newline, but the fixture
 			// files should.
