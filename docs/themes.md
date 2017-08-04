@@ -7,13 +7,13 @@ Some advanced block features require opt-in support in the theme itself as it's 
 To opt-in for one of these features, we should call `add_theme_support( 'gutenberg', $features )` in the `functions.php` file of the theme for example:
 
 ```php
-function setup_theme_supported_features() {
+function mytheme_setup_theme_supported_features() {
 	add_theme_support( 'gutenberg', array(
 		'wide-images' => true,
 	) );
 }
 
-add_action( 'after_setup_theme', 'setup_theme_supported_features' );
+add_action( 'after_setup_theme', 'mytheme_setup_theme_supported_features' );
 ```
 
 ## Opt-in features
