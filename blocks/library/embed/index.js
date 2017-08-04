@@ -28,7 +28,7 @@ const { attr, children } = query;
 // These embeds do not work in sandboxes
 const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
 
-function getEmbedBlockSettings( { title, icon, category = 'embed', matchers = [], name } ) {
+function getEmbedBlockSettings( { title, icon, category = 'embed', transforms } ) {
 	return {
 		title: __( title ),
 
@@ -41,17 +41,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', matchers = []
 			caption: children( 'figcaption' ),
 		},
 
-		transforms: {
-			from: matchers.map( ( regExp ) => ( {
-				type: 'pattern',
-				regExp,
-				transform: ( { match } ) => {
-					return createBlock( name, {
-						url: match[ 1 ],
-					} );
-				},
-			} ) ),
-		},
+		transforms,
 
 		getEditWrapperProps( attributes ) {
 			const { align } = attributes;
@@ -234,6 +224,20 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Embed',
 		icon: 'video-alt3',
+		transforms: {
+			from: [
+				{
+					type: 'pattern',
+					trigger: 'paste',
+					regExp: /^\s*(https:\/\/\S+)\s*/i,
+					transform: ( { match } ) => {
+						return createBlock( 'core/embed', {
+							url: match[ 1 ],
+						} );
+					},
+				},
+			],
+		},
 	} )
 );
 
@@ -250,12 +254,6 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'YouTube',
 		icon: 'video-alt3',
-		name: 'core-embed/youtube',
-		matchers: [
-			/^\s*(https?:\/\/(?:m\.|www\.)?youtube\.com\/watch\S+)\s*/i,
-			/^\s*(https?:\/\/(?:m\.|www\.)?youtube\.com\/playlist\S+)\s*/i,
-			/^\s*(https?:\/\/youtu\.be\/\S+)\s*/i,
-		],
 	} )
 );
 registerBlockType(
