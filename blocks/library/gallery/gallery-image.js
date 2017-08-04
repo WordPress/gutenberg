@@ -1,28 +1,20 @@
 
 export default function GalleryImage( props ) {
-	if ( props.linkto === 'media' ) {
-		return (
-			<figure className="blocks-gallery-image">
-				<a href={ props.img.url }>
-					<img src={ props.img.url } alt={ props.img.alt } />
-				</a>
-			</figure>
-		);
+	let href = null;
+	switch ( props.linkto ) {
+		case 'media':
+			href = props.img.url;
+			break;
+		case 'attacment':
+			href = props.img.link;
+			break;
 	}
 
-	if ( props.linkto === 'attachment' && !! props.img.link ) {
-		return (
-			<figure className="blocks-gallery-image">
-				<a href={ props.img.link }>
-					<img src={ props.img.url } alt={ props.img.alt } />
-				</a>
-			</figure>
-		);
-	}
+	const image = <img src={ props.img.url } alt={ props.img.alt } />;
 
 	return (
 		<figure className="blocks-gallery-image">
-			<img src={ props.img.url } alt={ props.img.alt } />
+			{ href ? <a href={ href }>{ image }</a> : image }
 		</figure>
 	);
 }
