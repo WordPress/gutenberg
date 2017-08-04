@@ -7,13 +7,13 @@ import { isFunction } from 'lodash';
 /**
  * Internal dependencies
  */
-import withA11yMessages from '../';
+import withSpokenMessages from '../';
 
-describe( 'withA11yMessages', () => {
+describe( 'withSpokenMessages', () => {
 	it( 'should generate speak and debouncedSpeak props', () => {
 		const testSpeak = jest.fn();
 		const testDebouncedSpeak = jest.fn();
-		const DumpComponent = withA11yMessages( ( { speak, debouncedSpeak } ) => {
+		const DumpComponent = withSpokenMessages( ( { speak, debouncedSpeak } ) => {
 			testSpeak( isFunction( speak ) );
 			testDebouncedSpeak( isFunction( debouncedSpeak ) );
 			return <div />;

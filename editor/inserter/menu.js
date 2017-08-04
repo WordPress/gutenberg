@@ -9,7 +9,7 @@ import { connect } from 'react-redux';
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { Popover, withFocusReturn, withInstanceId, withA11yMessages } from '@wordpress/components';
+import { Popover, withFocusReturn, withInstanceId, withSpokenMessages } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
 import { getCategories, getBlockTypes, BlockIcon } from '@wordpress/blocks';
 
@@ -440,7 +440,7 @@ const connectComponent = connect(
 
 export default flow(
 	withInstanceId,
-	withA11yMessages,
+	withSpokenMessages,
 	withFocusReturn,
 	connectComponent
 )( InserterMenu );
