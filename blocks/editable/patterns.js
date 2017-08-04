@@ -2,7 +2,7 @@
  * External dependencies
  */
 import tinymce from 'tinymce';
-import { endsWith, find, get, escapeRegExp, partition, drop } from 'lodash';
+import { find, get, escapeRegExp, groupBy, drop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -28,16 +28,15 @@ export default function( editor ) {
 	const VK = tinymce.util.VK;
 	const settings = editor.settings.wptextpattern || {};
 
-	const patterns = getBlockTypes().reduce( ( acc, blockType ) => {
+	const {
+		paste: pastePatterns,
+		enter: enterPatterns,
+		undefined: spacePatterns,
+	} = groupBy( getBlockTypes().reduce( ( acc, blockType ) => {
 		const transformsFrom = get( blockType, 'transforms.from', [] );
 		const transforms = transformsFrom.filter( ( { type } ) => type === 'pattern' );
 		return [ ...acc, ...transforms ];
-	}, [] );
-
-	const [ enterPatterns, spacePatterns ] = partition(
-		patterns,
-		( { regExp } ) => endsWith( regExp.source, '$' ),
-	);
+	}, [] ), 'trigger' );
 
 	const inlinePatterns = settings.inline || [
 		{ delimiter: '`', format: 'code' },
@@ -50,7 +49,7 @@ export default function( editor ) {
 	} );
 
 	editor.on( 'pastepostprocess', () => {
-		setTimeout( space );
+		setTimeout( () => searchFirstText( pastePatterns ) );
 	} );
 
 	editor.on( 'keydown', function( event ) {
@@ -70,7 +69,7 @@ export default function( editor ) {
 			enter();
 		// Wait for the browser to insert the character.
 		} else if ( keyCode === SPACE ) {
-			setTimeout( space );
+			setTimeout( () => searchFirstText( spacePatterns ) );
 		} else if ( keyCode > 47 && ! ( keyCode >= 91 && keyCode <= 93 ) ) {
 			setTimeout( inline );
 		}
@@ -176,7 +175,7 @@ export default function( editor ) {
 		} );
 	}
 
-	function space() {
+	function searchFirstText( patterns ) {
 		if ( ! onReplace ) {
 			return;
 		}
@@ -192,7 +191,7 @@ export default function( editor ) {
 
 		const firstText = content[ 0 ];
 
-		const { result, pattern } = spacePatterns.reduce( ( acc, item ) => {
+		const { result, pattern } = patterns.reduce( ( acc, item ) => {
 			return acc.result ? acc : {
 				result: item.regExp.exec( firstText ),
 				pattern: item,

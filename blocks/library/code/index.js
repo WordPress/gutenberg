@@ -31,6 +31,7 @@ registerBlockType( 'core/code', {
 		from: [
 			{
 				type: 'pattern',
+				trigger: 'enter',
 				regExp: /^```$/,
 				transform: () => createBlock( 'core/code' ),
 			},
