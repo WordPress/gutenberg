@@ -77,11 +77,11 @@ registerBlockType( 'core/gallery', {
 
 	edit( { attributes, setAttributes, focus, className } ) {
 		const { images = [], columns = defaultColumnsNumber( attributes ), align = 'none' } = attributes;
-		const setLinkto = ( value ) => setAttributes( { linkto: value } );
+		const setLinkTo = ( value ) => setAttributes( { linkTo: value } );
 		const setColumnsNumber = ( event ) => setAttributes( { columns: event.target.value } );
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		const { imageCrop = true } = attributes;
-		const { linkto = 'none' } = attributes;
+		const { linkTo = 'none' } = attributes;
 		const toggleImageCrop = () => setAttributes( { imageCrop: ! imageCrop } );
 
 		const controls = (
@@ -149,8 +149,8 @@ registerBlockType( 'core/gallery', {
 					/>
 					<SelectControl
 						label={ __( 'Link to' ) }
-						selected={ linkto }
-						onBlur={ setLinkto }
+						selected={ linkTo }
+						onBlur={ setLinkTo }
 						options={ linkOptions }
 					/>
 				</InspectorControls>
@@ -164,11 +164,11 @@ registerBlockType( 'core/gallery', {
 	},
 
 	save( { attributes } ) {
-		const { images, columns = defaultColumnsNumber( attributes ), align = 'none', imageCrop = true, linkto = 'none' } = attributes;
+		const { images, columns = defaultColumnsNumber( attributes ), align = 'none', imageCrop = true, linkTo = 'none' } = attributes;
 		return (
 			<div className={ `align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` } >
 				{ images.map( ( img ) => (
-					<GalleryImage key={ img.url } img={ img } linkto={ linkto } />
+					<GalleryImage key={ img.url } img={ img } linkTo={ linkTo } />
 				) ) }
 			</div>
 		);

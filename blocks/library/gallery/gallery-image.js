@@ -1,7 +1,7 @@
 
 export default function GalleryImage( props ) {
 	let href = null;
-	switch ( props.linkto ) {
+	switch ( props.linkTo ) {
 		case 'media':
 			href = props.img.url;
 			break;
