@@ -10,13 +10,13 @@
 		}
 
 		.enable-tracking-prompt__more-info {
-			span {
-				cursor: pointer;
-			}
-			&:hover span {
-				color: $blue-wordpress-700;
-			}
 			position: relative; // for popover
+			.components-button {
+				cursor: pointer;
+				&:hover {
+					color: $blue-wordpress-700;
+				}
+			}
 		}
 	}
 

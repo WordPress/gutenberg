@@ -82,11 +82,10 @@ export class EnableTrackingPrompt extends Component {
 					>
 						{ __( 'No' ) }
 					</Button>
-					<Button
-						className="enable-tracking-prompt__more-info"
-						onClick={ this.toggleInfoPopover }
-					>
-						<span>{ __( 'More info' ) }</span>
+					<span className="enable-tracking-prompt__more-info">
+						<Button onClick={ this.toggleInfoPopover }>
+							{ __( 'More info' ) }
+						</Button>
 						{ this.state.showInfoPopover && (
 							<Popover
 								position="bottom right"
@@ -95,7 +94,7 @@ export class EnableTrackingPrompt extends Component {
 								{ __( 'Usage data is completely anonymous, does not include your post content, and will only be used to improve the editor.' ) }
 							</Popover>
 						) }
-					</Button>
+					</span>
 				</p>
 			</div>
 		);
