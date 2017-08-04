@@ -37,13 +37,13 @@ const extractConfig = {
 };
 
 const entryPointNames = [
+	'blocks',
+	'components',
+	'date',
+	'editor',
 	'element',
 	'i18n',
 	'utils',
-	'components',
-	'blocks',
-	'date',
-	'editor',
 ];
 
 const externals = {
