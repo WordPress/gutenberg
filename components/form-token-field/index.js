@@ -197,9 +197,9 @@ class FormTokenField extends Component {
 					'%d result found, use up and down arrow keys to navigate.',
 					'%d results found, use up and down arrow keys to navigate.',
 					matchingSuggestions.length
-				), matchingSuggestions.length ) );
+				), matchingSuggestions.length ), 'assertive' );
 			} else {
-				this.props.debouncedSpeak( __( 'No results.' ) );
+				this.props.debouncedSpeak( __( 'No results.' ), 'assertive' );
 			}
 		}
 	}
@@ -340,7 +340,7 @@ class FormTokenField extends Component {
 
 	addNewToken( token ) {
 		this.addNewTokens( [ token ] );
-		this.props.speak( this.props.messages.added );
+		this.props.speak( this.props.messages.added, 'assertive' );
 
 		this.setState( {
 			incompleteTokenValue: '',
@@ -358,7 +358,7 @@ class FormTokenField extends Component {
 			return this.getTokenValue( item ) !== this.getTokenValue( token );
 		} );
 		this.props.onChange( newTokens );
-		this.props.speak( this.props.messages.removed );
+		this.props.speak( this.props.messages.removed, 'assertive' );
 	}
 
 	getTokenValue( token ) {
