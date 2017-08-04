@@ -24,6 +24,13 @@ const REGEXP_WHITESPACE = /[\t\n\r\v\f ]+/g;
 const REGEXP_ONLY_WHITESPACE = /^[\t\n\r\v\f ]*$/;
 
 /**
+ * Matches a CSS URL type value
+ *
+ * @type {RegExp}
+ */
+const REGEXP_STYLE_URL_TYPE = /^url\s*\(['"\s]*(.*?)['"\s]*\)$/;
+
+/**
  * Given a specified string, returns an array of strings split by consecutive
  * whitespace, ignoring leading or trailing whitespace.
  *
@@ -62,6 +69,44 @@ function isEqualTextTokensWithCollapsedWhitespace( a, b ) {
 }
 
 /**
+ * Given a style value, returns a normalized style value for strict equality
+ * comparison.
+ *
+ * @param  {String} value Style value
+ * @return {String}       Normalized style value
+ */
+function getNormalizedStyleValue( value ) {
+	return value
+		// Normalize URL type to omit whitespace or quotes
+		.replace( REGEXP_STYLE_URL_TYPE, 'url($1)' );
+}
+
+/**
+ * Given a style attribute string, returns an array of property-value pairs.
+ *
+ * @param  {String}  text Style attribute
+ * @return {Array[]}      Style property-value pairs
+ */
+function getStylePropertyPairs( text ) {
+	return text
+		// Trim ending semicolon (avoid including in split)
+		.replace( /;?\s*$/, '' )
+		// Split on property assignment
+		.split( ';' )
+		// For each property assignment...
+		.map( ( style ) => {
+			// ...split further into key-value pairs
+			const [ key, ...valueParts ] = style.split( ':' );
+			const value = valueParts.join( ':' );
+
+			return [
+				key.trim(),
+				getNormalizedStyleValue( value.trim() ),
+			];
+		} );
+}
+
+/**
  * Attribute-specific equality handlers
  *
  * @type {Object}
@@ -71,6 +116,9 @@ const isEqualAttributesOfName = {
 		// Class matches if members are the same, even if out of order or
 		// superfluous whitespace between.
 		return ! xor( ...[ a, b ].map( getTextPiecesSplitOnWhitespace ) ).length;
+	},
+	style: ( a, b ) => {
+		return isEqual( ...[ a, b ].map( getStylePropertyPairs ) );
 	},
 };
 
@@ -82,7 +130,7 @@ const isEqualAttributesOfName = {
  * @param  {Array[]} b Second attributes tuples
  * @return {Boolean}   Whether attributes are equivalent
  */
-function isEqualTagAttributes( a, b ) {
+function isEqualTagAttributePairs( a, b ) {
 	// Attributes is tokenized as tuples. Their lengths should match. This also
 	// avoids us needing to check both attributes sets, since if A has any keys
 	// which do not exist in B, we know the sets to be different.
@@ -128,7 +176,7 @@ export const isEqualTokensOfType = {
 			return false;
 		}
 
-		return isEqualTagAttributes(
+		return isEqualTagAttributePairs(
 			a.attributes,
 			b.attributes,
 		);
