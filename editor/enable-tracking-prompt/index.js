@@ -10,12 +10,12 @@ import clickOutside from 'react-click-outside';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button, Popover } from '@wordpress/components';
+import { bumpStat } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { bumpStat } from '../utils/tracking';
 import { removeNotice } from '../actions';
 
 export const TRACKING_PROMPT_NOTICE_ID = 'notice:enable-tracking-prompt';

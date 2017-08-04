@@ -36,7 +36,7 @@ class Button extends Component {
 			isToggled,
 			className,
 			disabled,
-			...additionalProps, // eslint-disable-line comma-dangle
+			...additionalProps
 		} = this.props;
 		const classes = classnames( 'components-button', className, {
 			button: ( isPrimary || isSecondary || isLarge ),
