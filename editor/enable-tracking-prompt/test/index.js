@@ -29,7 +29,7 @@ describe( 'EnableTrackingPrompt', () => {
 		const prompt = mount(
 			<EnableTrackingPrompt />
 		);
-		const buttons = prompt.find( '.button' );
+		const buttons = prompt.find( 'Button' );
 		expect( buttons.length ).toBe( 2 );
 		expect( buttons.at( 0 ).text() ).toBe( 'Yes' );
 		expect( buttons.at( 1 ).text() ).toBe( 'No' );
@@ -49,7 +49,7 @@ describe( 'EnableTrackingPrompt', () => {
 				bumpStat={ bumpStat }
 			/>
 		);
-		const buttonYes = prompt.find( '.button' )
+		const buttonYes = prompt.find( 'Button' )
 			.filterWhere( node => node.text() === 'Yes' );
 		buttonYes.simulate( 'click' );
 
@@ -65,7 +65,7 @@ describe( 'EnableTrackingPrompt', () => {
 		const prompt = mount(
 			<EnableTrackingPrompt removeNotice={ removeNotice } />
 		);
-		const buttonNo = prompt.find( '.button' )
+		const buttonNo = prompt.find( 'Button' )
 			.filterWhere( node => node.text() === 'No' );
 		buttonNo.simulate( 'click' );
 
