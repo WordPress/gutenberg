@@ -36,9 +36,9 @@ class ImageSize extends Component {
 		this.fetchImageSize();
 	}
 
-	componentWillUnmout() {
+	componentWillUnmount() {
 		if ( this.image ) {
-			this.image.src = noop;
+			this.image.onload = noop;
 		}
 	}
 
@@ -46,9 +46,10 @@ class ImageSize extends Component {
 		this.image = new window.Image();
 		this.image.onload = () => {
 			const maxWidth = this.container.clientWidth;
+			const exceedMaxWidth = this.image.width > maxWidth;
 			const ratio = this.image.height / this.image.width;
-			const width = this.image.width < maxWidth ? this.image.width : maxWidth;
-			const height = this.image.width < maxWidth ? this.image.height : maxWidth * ratio;
+			const width = exceedMaxWidth ? maxWidth : this.image.width;
+			const height = exceedMaxWidth ? maxWidth * ratio : this.image.height;
 			this.setState( { width, height } );
 		};
 		this.image.src = this.props.src;

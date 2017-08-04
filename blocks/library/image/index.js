@@ -205,8 +205,9 @@ registerBlockType( 'core/image', {
 			<figure key="image" className={ classes }>
 				<ImageSize src={ url }>
 					{ ( originalWidth = width, originalHeight = height ) => {
+						const img = <img src={ url } alt={ alt } onClick={ setFocus } />;
 						if ( ! originalHeight || ! originalWidth ) {
-							return <img src={ url } alt={ alt } onClick={ setFocus } />;
+							return img;
 						}
 						return (
 							<ResizableBox
@@ -215,7 +216,7 @@ registerBlockType( 'core/image', {
 								lockAspectRatio
 								onResize={ ( event, { size } ) => setAttributes( size ) }
 							>
-								<img src={ url } alt={ alt } onClick={ setFocus } />
+								{ img }
 							</ResizableBox>
 						);
 					} }
