@@ -18,7 +18,7 @@ import Token from './token';
 import TokenInput from './token-input';
 import SuggestionsList from './suggestions-list';
 import withInstanceId from '../higher-order/with-instance-id';
-import withA11yMessages from '../higher-order/with-a11y-messages';
+import withSpokenMessages from '../higher-order/with-spoken-messages';
 
 const initialState = {
 	incompleteTokenValue: '',
@@ -564,4 +564,4 @@ FormTokenField.defaultProps = {
 	},
 };
 
-export default withA11yMessages( withInstanceId( FormTokenField ) );
+export default withSpokenMessages( withInstanceId( FormTokenField ) );
