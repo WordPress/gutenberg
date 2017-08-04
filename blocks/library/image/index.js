@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { ResizableBox } from 'react-resizable';
 
 /**
  * WordPress dependencies
@@ -22,6 +23,7 @@ import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import BlockDescription from '../../block-description';
 import UrlInputButton from '../../url-input/button';
+import ImageSize from './image-size';
 
 const { attr, children } = source;
 
@@ -82,7 +84,7 @@ registerBlockType( 'core/image', {
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus, className } ) {
-		const { url, alt, caption, align, id, href } = attributes;
+		const { url, alt, caption, align, id, href, width, height } = attributes;
 		const updateAlt = ( newAlt ) => setAttributes( { alt: newAlt } );
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		const onSelectImage = ( media ) => {
@@ -201,7 +203,23 @@ registerBlockType( 'core/image', {
 				</InspectorControls>
 			),
 			<figure key="image" className={ classes }>
-				<img src={ url } alt={ alt } onClick={ setFocus } />
+				<ImageSize src={ url }>
+					{ ( originalWidth = width, originalHeight = height ) => {
+						if ( ! originalHeight || ! originalWidth ) {
+							return <img src={ url } alt={ alt } onClick={ setFocus } />;
+						}
+						return (
+							<ResizableBox
+								width={ originalWidth }
+								height={ originalHeight }
+								lockAspectRatio
+								onResize={ ( event, { size } ) => setAttributes( size ) }
+							>
+								<img src={ url } alt={ alt } onClick={ setFocus } />
+							</ResizableBox>
+						);
+					} }
+				</ImageSize>
 				{ ( caption && caption.length > 0 ) || !! focus ? (
 					<Editable
 						tagName="figcaption"
@@ -219,8 +237,9 @@ registerBlockType( 'core/image', {
 	},
 
 	save( { attributes } ) {
-		const { url, alt, caption, align, href } = attributes;
-		const image = <img src={ url } alt={ alt } />;
+		const { url, alt, caption, align, href, width, height } = attributes;
+		const extraImageProps = width || height ? { width, height } : {};
+		const image = <img src={ url } alt={ alt } { ...extraImageProps } />;
 
 		return (
 			<figure className={ align && `align${ align }` }>

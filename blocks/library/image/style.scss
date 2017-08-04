@@ -10,6 +10,25 @@
 	&.is-transient img {
 		@include loading_fade;
 	}
+
+	.react-resizable {
+		position: relative;
+	}
+
+	.react-resizable-handle {
+		border-radius: 50%;
+		border: 2px solid white;
+		width: 15px;
+		height: 15px;
+		position: absolute;
+		right: -6px;
+		bottom: -6px;
+		background: $blue-medium-500;
+		padding: 0 3px 3px 0;
+		box-sizing: border-box;
+		cursor: se-resize;
+	}
+
 }
 
 .editor-visual-editor__block[data-type="core/image"] {

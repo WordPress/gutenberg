@@ -24,7 +24,8 @@
 		"wp": true,
 		"wpApiSettings": true,
 		"window": true,
-		"document": true
+		"document": true,
+		"Image": true
 	},
 	"plugins": [
 		"react",
