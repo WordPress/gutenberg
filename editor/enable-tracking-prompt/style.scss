@@ -1,20 +1,40 @@
 .enable-tracking-prompt {
 	.enable-tracking-prompt__message {
 		font-weight: bold;
-		margin-top: 8px;
-	}
-
-	.enable-tracking-prompt__clarification {
-		margin-bottom: 8px;
-		font-size: 90%;
-		font-style: italic;
 	}
 
 	.enable-tracking-prompt__buttons {
-		float: right;
-
+		margin: 0.5em 0; // matches `.notice p` from core
 		.button {
-			margin-left: 6px;
+			margin-right: 6px;
+		}
+
+		.enable-tracking-prompt__more-info {
+			position: relative; // for popover
+			.components-button {
+				// Match selected `.button-small` styles from core
+				display: inline-block;
+				height: 24px;
+				line-height: 22px;
+				border-radius: 2px;
+				border: 1px solid transparent;
+
+				cursor: pointer;
+				&:hover, &:focus {
+					color: $blue-wordpress-700;
+				}
+				&:focus {
+					border-color: #5b9dd9;
+					box-shadow: 0 0 3px rgba( 0, 115, 170, .8 );
+				}
+			}
+		}
+	}
+
+	.enable-tracking-prompt__clarification {
+		text-align: left;
+		.components-popover__content {
+			padding: 6px;
 		}
 	}
 }
