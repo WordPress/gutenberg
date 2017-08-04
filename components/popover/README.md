@@ -13,8 +13,14 @@ import { Popover } from '@wordpress/components';
 function ToggleButton( { isVisible, toggleVisible } ) {
 	return (
 		<button onClick={ toggleVisible }>
-			Toggle Me!
-			{ isVisible && <Popover>I am toggled!</Popover> }
+			Toggle Popover!
+			<Popover
+				isOpen={ isVisible }
+				onClose={ toggleVisible }
+				onClick={ ( event ) => event.stopPropagation() }
+			>
+				Popover is toggled!
+			</Popover>
 		</button>
 	);
 }

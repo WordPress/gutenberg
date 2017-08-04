@@ -314,13 +314,17 @@ export class InserterMenu extends Component {
 	}
 
 	render() {
-		const { position, instanceId } = this.props;
+		const { position, onClose, instanceId } = this.props;
 		const isSearching = this.state.filterValue;
 		const visibleBlocksByCategory = this.getVisibleBlocksByCategory( this.getBlocksForCurrentTab() );
 
 		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
-			<Popover position={ position } className="editor-inserter__menu">
+			<Popover
+				position={ position }
+				isOpen
+				onClose={ onClose }
+				className="editor-inserter__menu">
 				<label htmlFor={ `editor-inserter__search-${ instanceId }` } className="screen-reader-text">
 					{ __( 'Search blocks' ) }
 				</label>

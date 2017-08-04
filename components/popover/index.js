@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isEqual } from 'lodash';
+import { isEqual, pickBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -13,6 +13,14 @@ import { createPortal, Component } from '@wordpress/element';
  * Internal dependencies
  */
 import './style.scss';
+import PopoverDetectOutside from './detect-outside';
+
+/**
+ * Matches an event handler prop key
+ *
+ * @type {RegExp}
+ */
+const REGEXP_EVENT_PROP = /^on[A-Z]/;
 
 export class Popover extends Component {
 	constructor() {
@@ -31,11 +39,11 @@ export class Popover extends Component {
 	}
 
 	componentDidMount() {
-		this.setOffset();
-		this.setForcedPositions();
-
-		window.addEventListener( 'resize', this.throttledSetOffset );
-		window.addEventListener( 'scroll', this.throttledSetOffset );
+		if ( this.props.isOpen ) {
+			this.setOffset();
+			this.setForcedPositions();
+			this.toggleWindowEvents( true );
+		}
 	}
 
 	componentWillReceiveProps( nextProps ) {
@@ -48,7 +56,17 @@ export class Popover extends Component {
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
-		if ( this.props.position !== prevProps.position ) {
+		const { isOpen, position } = this.props;
+		const { isOpen: prevIsOpen, position: prevPosition } = prevProps;
+		if ( isOpen !== prevIsOpen ) {
+			this.toggleWindowEvents( isOpen );
+		}
+
+		if ( ! isOpen ) {
+			return;
+		}
+
+		if ( isOpen !== prevIsOpen || position !== prevPosition ) {
 			this.setOffset();
 			this.setForcedPositions();
 		} else if ( ! isEqual( this.state, prevState ) ) {
@@ -58,9 +76,15 @@ export class Popover extends Component {
 	}
 
 	componentWillUnmount() {
+		this.toggleWindowEvents( false );
+	}
+
+	toggleWindowEvents( isListening ) {
+		const handler = isListening ? 'addEventListener' : 'removeEventListener';
+
 		window.cancelAnimationFrame( this.rafHandle );
-		window.removeEventListener( 'resize', this.throttledSetOffset );
-		window.removeEventListener( 'scroll', this.throttledSetOffset );
+		window[ handler ]( 'resize', this.throttledSetOffset );
+		window[ handler ]( 'scroll', this.throttledSetOffset );
 	}
 
 	throttledSetOffset() {
@@ -118,8 +142,16 @@ export class Popover extends Component {
 	}
 
 	render() {
-		const { children, className } = this.props;
+		const { isOpen, onClose, children, className } = this.props;
 		const [ yAxis, xAxis ] = this.getPositions();
+
+		if ( ! isOpen ) {
+			return null;
+		}
+
+		const eventHandlers = pickBy( this.props, ( value, key ) => (
+			'onClose' !== key && REGEXP_EVENT_PROP.test( key )
+		) );
 
 		const classes = classnames(
 			'components-popover',
@@ -131,18 +163,21 @@ export class Popover extends Component {
 		return (
 			<span ref={ this.bindNode( 'anchor' ) }>
 				{ createPortal(
-					<div
-						ref={ this.bindNode( 'popover' ) }
-						className={ classes }
-						tabIndex="0"
-					>
+					<PopoverDetectOutside onClickOutside={ onClose }>
 						<div
-							ref={ this.bindNode( 'content' ) }
-							className="components-popover__content"
+							ref={ this.bindNode( 'popover' ) }
+							className={ classes }
+							tabIndex="0"
+							{ ...eventHandlers }
 						>
-							{ children }
+							<div
+								ref={ this.bindNode( 'content' ) }
+								className="components-popover__content"
+							>
+								{ children }
+							</div>
 						</div>
-					</div>,
+					</PopoverDetectOutside>,
 					document.body
 				) }
 			</span>
