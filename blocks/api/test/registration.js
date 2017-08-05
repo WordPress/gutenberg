@@ -17,6 +17,7 @@ import {
 	getDefaultBlock,
 	getBlockType,
 	getBlockTypes,
+	registrationFlags,
 } from '../registration';
 
 describe( 'blocks', () => {
@@ -26,6 +27,7 @@ describe( 'blocks', () => {
 	// Reset block state before each test.
 	beforeEach( () => {
 		console.error = jest.fn();
+		registrationFlags.ALLOW_CORE_NAMESPACES = false;
 	} );
 
 	afterEach( () => {
@@ -60,6 +62,37 @@ describe( 'blocks', () => {
 			const block = registerBlockType( 'still/_doing_it_wrong' );
 			expect( console.error ).toHaveBeenCalledWith( 'Block names must contain a namespace prefix. Example: my-plugin/my-custom-block' );
 			expect( block ).toBeUndefined();
+		} );
+
+		it( 'should prohibit registering blocks in the "core" namespace', () => {
+			const block = registerBlockType( 'core/some-plugin-block' );
+			expect( console.error ).toHaveBeenCalledWith(
+				'Plugins may not register blocks in the "core" or "core-*" namespaces.'
+			);
+			expect( block ).toBeUndefined();
+		} );
+
+		it( 'should prohibit registering blocks in other "core-*" namespaces', () => {
+			const block = registerBlockType( 'core-but-not-really/some-plugin-block' );
+			expect( console.error ).toHaveBeenCalledWith(
+				'Plugins may not register blocks in the "core" or "core-*" namespaces.'
+			);
+			expect( block ).toBeUndefined();
+		} );
+
+		it( 'should allow registering blocks in namespaces that start with "core" but not "core-"', () => {
+			const block = registerBlockType( 'corepress/some-block', defaultBlockSettings );
+			expect( console.error ).not.toHaveBeenCalled();
+			expect( block ).toEqual( { name: 'corepress/some-block', save: noop } );
+		} );
+
+		it( 'should allow registering core blocks if the ALLOW_CORE_NAMESPACES flag is set', () => {
+			registrationFlags.ALLOW_CORE_NAMESPACES = true;
+			const block1 = registerBlockType( 'core/test-block', defaultBlockSettings );
+			const block2 = registerBlockType( 'core-embed/test-embed', defaultBlockSettings );
+			expect( console.error ).not.toHaveBeenCalled();
+			expect( block1 ).toEqual( { name: 'core/test-block', save: noop } );
+			expect( block2 ).toEqual( { name: 'core-embed/test-embed', save: noop } );
 		} );
 
 		it( 'should accept valid block names', () => {
