@@ -195,14 +195,14 @@ describe( 'block serializer', () => {
 					return <p dangerouslySetInnerHTML={ { __html: attributes.content } } />;
 				},
 			};
-			registerBlockType( 'core/test-block', blockType );
+			registerBlockType( 'not-core/test-block', blockType );
 
-			const block = createBlock( 'core/test-block', {
+			const block = createBlock( 'not-core/test-block', {
 				foo: false,
 				content: 'Ribs & Chicken',
 				stuff: 'left & right -- but <not>',
 			} );
-			const expectedPostContent = '<!-- wp:core/test-block {"foo":false,"stuff":"left \\u0026 right \\u002d\\u002d but \\u003cnot\\u003e"} -->\n<p class="wp-block-test-block">Ribs & Chicken</p>\n<!-- /wp:core/test-block -->';
+			const expectedPostContent = '<!-- wp:not-core/test-block {"foo":false,"stuff":"left \\u0026 right \\u002d\\u002d but \\u003cnot\\u003e"} -->\n<p class="wp-block-not-core-test-block">Ribs & Chicken</p>\n<!-- /wp:not-core/test-block -->';
 
 			expect( serialize( [ block ] ) ).toEqual( expectedPostContent );
 		} );

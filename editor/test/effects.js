@@ -32,14 +32,14 @@ describe( 'effects', () => {
 		} );
 
 		it( 'should only focus the blockA if the blockA has no merge function', () => {
-			registerBlockType( 'core/test-block', defaultBlockSettings );
+			registerBlockType( 'not-core/test-block', defaultBlockSettings );
 			const blockA = {
 				uid: 'chicken',
-				name: 'core/test-block',
+				name: 'not-core/test-block',
 			};
 			const blockB = {
 				uid: 'ribs',
-				name: 'core/test-block',
+				name: 'not-core/test-block',
 			};
 			const dispatch = jest.fn();
 			handler( mergeBlocks( blockA, blockB ), { dispatch } );
@@ -49,7 +49,7 @@ describe( 'effects', () => {
 		} );
 
 		it( 'should merge the blocks if blocks of the same type', () => {
-			registerBlockType( 'core/test-block', {
+			registerBlockType( 'not-core/test-block', {
 				merge( attributes, attributesToMerge ) {
 					return {
 						content: attributes.content + ' ' + attributesToMerge.content,
@@ -59,12 +59,12 @@ describe( 'effects', () => {
 			} );
 			const blockA = {
 				uid: 'chicken',
-				name: 'core/test-block',
+				name: 'not-core/test-block',
 				attributes: { content: 'chicken' },
 			};
 			const blockB = {
 				uid: 'ribs',
-				name: 'core/test-block',
+				name: 'not-core/test-block',
 				attributes: { content: 'ribs' },
 			};
 			const dispatch = jest.fn();
@@ -74,13 +74,13 @@ describe( 'effects', () => {
 			expect( dispatch ).toHaveBeenCalledWith( focusBlock( 'chicken', { offset: -1 } ) );
 			expect( dispatch ).toHaveBeenCalledWith( replaceBlocks( [ 'chicken', 'ribs' ], [ {
 				uid: 'chicken',
-				name: 'core/test-block',
+				name: 'not-core/test-block',
 				attributes: { content: 'chicken ribs' },
 			} ] ) );
 		} );
 
 		it( 'should not merge the blocks have different types without transformation', () => {
-			registerBlockType( 'core/test-block', {
+			registerBlockType( 'not-core/test-block', {
 				merge( attributes, attributesToMerge ) {
 					return {
 						content: attributes.content + ' ' + attributesToMerge.content,
@@ -88,15 +88,15 @@ describe( 'effects', () => {
 				},
 				save: noop,
 			} );
-			registerBlockType( 'core/test-block-2', defaultBlockSettings );
+			registerBlockType( 'not-core/test-block-2', defaultBlockSettings );
 			const blockA = {
 				uid: 'chicken',
-				name: 'core/test-block',
+				name: 'not-core/test-block',
 				attributes: { content: 'chicken' },
 			};
 			const blockB = {
 				uid: 'ribs',
-				name: 'core/test-block2',
+				name: 'not-core/test-block2',
 				attributes: { content: 'ribs' },
 			};
 			const dispatch = jest.fn();
@@ -106,7 +106,7 @@ describe( 'effects', () => {
 		} );
 
 		it( 'should transform and merge the blocks', () => {
-			registerBlockType( 'core/test-block', {
+			registerBlockType( 'not-core/test-block', {
 				merge( attributes, attributesToMerge ) {
 					return {
 						content: attributes.content + ' ' + attributesToMerge.content,
@@ -114,13 +114,13 @@ describe( 'effects', () => {
 				},
 				save: noop,
 			} );
-			registerBlockType( 'core/test-block-2', {
+			registerBlockType( 'not-core/test-block-2', {
 				transforms: {
 					to: [ {
 						type: 'blocks',
-						blocks: [ 'core/test-block' ],
+						blocks: [ 'not-core/test-block' ],
 						transform: ( { content2 } ) => {
-							return createBlock( 'core/test-block', {
+							return createBlock( 'not-core/test-block', {
 								content: content2,
 							} );
 						},
@@ -130,12 +130,12 @@ describe( 'effects', () => {
 			} );
 			const blockA = {
 				uid: 'chicken',
-				name: 'core/test-block',
+				name: 'not-core/test-block',
 				attributes: { content: 'chicken' },
 			};
 			const blockB = {
 				uid: 'ribs',
-				name: 'core/test-block-2',
+				name: 'not-core/test-block-2',
 				attributes: { content2: 'ribs' },
 			};
 			const dispatch = jest.fn();
@@ -145,7 +145,7 @@ describe( 'effects', () => {
 			expect( dispatch ).toHaveBeenCalledWith( focusBlock( 'chicken', { offset: -1 } ) );
 			expect( dispatch ).toHaveBeenCalledWith( replaceBlocks( [ 'chicken', 'ribs' ], [ {
 				uid: 'chicken',
-				name: 'core/test-block',
+				name: 'not-core/test-block',
 				attributes: { content: 'chicken ribs' },
 			} ] ) );
 		} );

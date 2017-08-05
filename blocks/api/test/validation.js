@@ -312,21 +312,21 @@ describe( 'validation', () => {
 
 	describe( 'isValidBlock()', () => {
 		it( 'returns false if block is not valid', () => {
-			registerBlockType( 'core/test-block', defaultBlockSettings );
+			registerBlockType( 'not-core/test-block', defaultBlockSettings );
 
 			expect( isValidBlock(
 				'Apples',
-				getBlockType( 'core/test-block' ),
+				getBlockType( 'not-core/test-block' ),
 				{ fruit: 'Bananas' }
 			) ).toBe( false );
 		} );
 
 		it( 'returns true if block is valid', () => {
-			registerBlockType( 'core/test-block', defaultBlockSettings );
+			registerBlockType( 'not-core/test-block', defaultBlockSettings );
 
 			expect( isValidBlock(
 				'Bananas',
-				getBlockType( 'core/test-block' ),
+				getBlockType( 'not-core/test-block' ),
 				{ fruit: 'Bananas' }
 			) ).toBe( true );
 		} );

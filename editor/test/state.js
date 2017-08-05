@@ -31,7 +31,7 @@ import {
 describe( 'state', () => {
 	describe( 'editor()', () => {
 		beforeAll( () => {
-			registerBlockType( 'core/test-block', {
+			registerBlockType( 'not-core/test-block', {
 				save: noop,
 				edit: noop,
 				category: 'common',
@@ -39,7 +39,7 @@ describe( 'state', () => {
 		} );
 
 		afterAll( () => {
-			unregisterBlockType( 'core/test-block' );
+			unregisterBlockType( 'not-core/test-block' );
 		} );
 
 		it( 'should return empty blocksByUid, blockOrder, history by default', () => {
@@ -67,7 +67,7 @@ describe( 'state', () => {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
 					uid: 'chicken',
-					name: 'core/test-block',
+					name: 'not-core/test-block',
 					attributes: {},
 				} ],
 			} );
@@ -89,7 +89,7 @@ describe( 'state', () => {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
 					uid: 'chicken',
-					name: 'core/test-block',
+					name: 'not-core/test-block',
 					attributes: {},
 				} ],
 			} );
@@ -113,11 +113,11 @@ describe( 'state', () => {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
 					uid: 'chicken',
-					name: 'core/test-block',
+					name: 'not-core/test-block',
 					attributes: {},
 				}, {
 					uid: 'ribs',
-					name: 'core/test-block',
+					name: 'not-core/test-block',
 					attributes: {},
 				} ],
 			} );
@@ -134,15 +134,15 @@ describe( 'state', () => {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
 					uid: 'chicken',
-					name: 'core/test-block',
+					name: 'not-core/test-block',
 					attributes: {},
 				}, {
 					uid: 'ribs',
-					name: 'core/test-block',
+					name: 'not-core/test-block',
 					attributes: {},
 				}, {
 					uid: 'veggies',
-					name: 'core/test-block',
+					name: 'not-core/test-block',
 					attributes: {},
 				} ],
 			} );
@@ -159,11 +159,11 @@ describe( 'state', () => {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
 					uid: 'chicken',
-					name: 'core/test-block',
+					name: 'not-core/test-block',
 					attributes: {},
 				}, {
 					uid: 'ribs',
-					name: 'core/test-block',
+					name: 'not-core/test-block',
 					attributes: {},
 				} ],
 			} );
@@ -180,11 +180,11 @@ describe( 'state', () => {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
 					uid: 'chicken',
-					name: 'core/test-block',
+					name: 'not-core/test-block',
 					attributes: {},
 				}, {
 					uid: 'ribs',
-					name: 'core/test-block',
+					name: 'not-core/test-block',
 					attributes: {},
 				} ],
 			} );
@@ -201,15 +201,15 @@ describe( 'state', () => {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
 					uid: 'chicken',
-					name: 'core/test-block',
+					name: 'not-core/test-block',
 					attributes: {},
 				}, {
 					uid: 'ribs',
-					name: 'core/test-block',
+					name: 'not-core/test-block',
 					attributes: {},
 				}, {
 					uid: 'veggies',
-					name: 'core/test-block',
+					name: 'not-core/test-block',
 					attributes: {},
 				} ],
 			} );
@@ -226,11 +226,11 @@ describe( 'state', () => {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
 					uid: 'chicken',
-					name: 'core/test-block',
+					name: 'not-core/test-block',
 					attributes: {},
 				}, {
 					uid: 'ribs',
-					name: 'core/test-block',
+					name: 'not-core/test-block',
 					attributes: {},
 				} ],
 			} );
@@ -247,11 +247,11 @@ describe( 'state', () => {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
 					uid: 'chicken',
-					name: 'core/test-block',
+					name: 'not-core/test-block',
 					attributes: {},
 				}, {
 					uid: 'ribs',
-					name: 'core/test-block',
+					name: 'not-core/test-block',
 					attributes: {},
 				} ],
 			} );
@@ -264,7 +264,7 @@ describe( 'state', () => {
 			expect( state.blocksByUid ).toEqual( {
 				ribs: {
 					uid: 'ribs',
-					name: 'core/test-block',
+					name: 'not-core/test-block',
 					attributes: {},
 				},
 			} );
@@ -275,15 +275,15 @@ describe( 'state', () => {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
 					uid: 'chicken',
-					name: 'core/test-block',
+					name: 'not-core/test-block',
 					attributes: {},
 				}, {
 					uid: 'ribs',
-					name: 'core/test-block',
+					name: 'not-core/test-block',
 					attributes: {},
 				}, {
 					uid: 'veggies',
-					name: 'core/test-block',
+					name: 'not-core/test-block',
 					attributes: {},
 				} ],
 			} );
@@ -296,7 +296,7 @@ describe( 'state', () => {
 			expect( state.blocksByUid ).toEqual( {
 				ribs: {
 					uid: 'ribs',
-					name: 'core/test-block',
+					name: 'not-core/test-block',
 					attributes: {},
 				},
 			} );
@@ -307,11 +307,11 @@ describe( 'state', () => {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
 					uid: 'kumquat',
-					name: 'core/test-block',
+					name: 'not-core/test-block',
 					attributes: {},
 				}, {
 					uid: 'loquat',
-					name: 'core/test-block',
+					name: 'not-core/test-block',
 					attributes: {},
 				} ],
 			} );
@@ -1044,7 +1044,7 @@ describe( 'state', () => {
 
 	describe( 'userData()', () => {
 		beforeAll( () => {
-			registerBlockType( 'core/test-block', {
+			registerBlockType( 'not-core/test-block', {
 				save: noop,
 				edit: noop,
 				category: 'common',
@@ -1052,7 +1052,7 @@ describe( 'state', () => {
 		} );
 
 		afterAll( () => {
-			unregisterBlockType( 'core/test-block' );
+			unregisterBlockType( 'not-core/test-block' );
 		} );
 
 		it( 'should record recently used blocks', () => {
@@ -1084,7 +1084,7 @@ describe( 'state', () => {
 				type: 'SETUP_EDITOR',
 			} );
 
-			expect( initial.recentlyUsedBlocks ).toEqual( expect.arrayContaining( [ 'core/test-block', 'core/paragraph' ] ) );
+			expect( initial.recentlyUsedBlocks ).toEqual( expect.arrayContaining( [ 'not-core/test-block', 'core/paragraph' ] ) );
 		} );
 	} );
 } );
