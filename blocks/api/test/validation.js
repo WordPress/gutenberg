@@ -311,7 +311,7 @@ describe( 'validation', () => {
 	} );
 
 	describe( 'isValidBlock()', () => {
-		it( 'returns false is block is not valid', () => {
+		it( 'returns false if block is not valid', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
 			expect( isValidBlock(
@@ -321,7 +321,7 @@ describe( 'validation', () => {
 			) ).toBe( false );
 		} );
 
-		it( 'returns true is block is valid', () => {
+		it( 'returns true if block is valid', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
 			expect( isValidBlock(
