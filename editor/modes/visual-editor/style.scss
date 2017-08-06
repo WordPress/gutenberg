@@ -30,8 +30,8 @@
 	margin-bottom: 5px;
 	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );
 	position: relative;
-
 	padding: $block-padding;
+	transition: 0.2s border;
 
 	@include break-small {
 		// The block mover needs to stay inside the block to allow clicks when hovering the block
@@ -42,11 +42,10 @@
 		z-index: z-index( '.editor-visual-editor__block:before' );
 		content: '';
 		position: absolute;
-		outline: 1px solid transparent;
-		transition: 0.2s outline;
+		border: 2px solid transparent;
+		transition: 0.2s border;
 		top: 0;
 		bottom: 0;
-
 		left: 0;
 		right: 0;
 
@@ -73,13 +72,19 @@
 		background-color: rgba( $white, 0.6 );
 	}
 
-	&.is-hovered:before {
-		outline: 1px solid $light-gray-500;
+	&.is-hovered:before,
+	&.is-selected:before {
+		border-left: 2px solid $light-gray-500;
 		transition: 0.2s outline;
 	}
 
-	&.is-selected:before {
-		outline: 2px solid $light-gray-500;
+	&.show-ui:before {
+		border: 2px solid $light-gray-500;
+		transition: 0.2s outline;
+	}
+
+	&.during-input:before {
+		border: 2px solid transparent;
 		transition: 0.2s outline;
 	}
 
@@ -284,6 +289,16 @@
 			margin-left: auto;
 			margin-right: auto;
 		}
+	}
+}
+
+ul.editor-visual-editor__toolbar-toggle {
+	height: 20px;
+	margin-top: 18px;
+	vertical-align: bottom;
+
+	button {
+		padding: 0 5px;
 	}
 }
 
