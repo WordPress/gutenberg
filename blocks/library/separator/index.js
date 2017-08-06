@@ -8,6 +8,8 @@ import { __ } from '@wordpress/i18n';
  */
 import './style.scss';
 import { registerBlockType, createBlock } from '../../api';
+import InspectorControls from '../../inspector-controls';
+import BlockDescription from '../../block-description';
 
 registerBlockType( 'core/separator', {
 	title: __( 'Separator' ),
@@ -33,8 +35,17 @@ registerBlockType( 'core/separator', {
 		],
 	},
 
-	edit( { className } ) {
-		return <hr className={ className } />;
+	edit( { className, focus } ) {
+		return [
+			focus && (
+				<InspectorControls key="inspector">
+					<BlockDescription>
+						<p>{ __( 'The horizontal rule represents a paragraph-level thematic break, e.g. a scene change in a story, or a transition to another topic within an article.' ) }</p>
+					</BlockDescription>
+				</InspectorControls>
+			),
+			<hr key="hr" className={ className } />,
+		];
 	},
 
 	save() {
