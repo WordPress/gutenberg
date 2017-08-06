@@ -3,7 +3,6 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Toolbar, Placeholder } from '@wordpress/components';
-import { pick } from 'lodash';
 
 /**
  * Internal dependencies
@@ -53,13 +52,6 @@ const editMediaLibrary = ( attributes, setAttributes ) => {
 	editFrame.open( 'gutenberg-gallery' );
 };
 
-// the media library image object contains numerous attributes
-// we only need this set to display the image in the library
-const slimImageObjects = ( imgs ) => {
-	const attrSet = [ 'sizes', 'mime', 'type', 'subtype', 'id', 'url', 'alt' ];
-	return imgs.map( ( img ) => pick( img, attrSet ) );
-};
-
 function defaultColumnsNumber( attributes ) {
 	attributes.images = attributes.images || [];
 	return Math.min( 3, attributes.images.length );
@@ -103,7 +95,7 @@ registerBlockType( 'core/gallery', {
 		);
 
 		if ( images.length === 0 ) {
-			const setMediaUrl = ( imgs ) => setAttributes( { images: slimImageObjects( imgs ) } );
+			const setMediaUrl = ( imgs ) => setAttributes( { images: imgs } );
 			const uploadButtonProps = { isLarge: true };
 
 			return [

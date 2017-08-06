@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { isString, noop } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -13,14 +14,18 @@ import { __ } from '@wordpress/i18n';
  */
 import './style.scss';
 
-function Notice( { status, content, onRemove = noop } ) {
-	const className = `notice notice-alt is-dismissible notice-${ status }`;
+function Notice( { status, content, onRemove = noop, isDismissible = true } ) {
+	const className = classnames( 'notice notice-alt notice-' + status, {
+		'is-dismissible': isDismissible,
+	} );
 	return (
 		<div className={ className }>
 			{ isString( content ) ? <p>{ content }</p> : content }
-			<button className="notice-dismiss" type="button" onClick={ onRemove }>
-				<span className="screen-reader-text">{ __( 'Dismiss this notice' ) }</span>
-			</button>
+			{ isDismissible && (
+				<button className="notice-dismiss" type="button" onClick={ onRemove }>
+					<span className="screen-reader-text">{ __( 'Dismiss this notice' ) }</span>
+				</button>
+			) }
 		</div>
 	);
 }

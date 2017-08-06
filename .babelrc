@@ -13,13 +13,12 @@
 					"last 1 Android version",
 					"last 1 ChromeAndroid version",
 					"ie 11",
-					"> 1%"				
+					"> 1%"
 				]
 			}
 		} ]
 	],
 	"plugins": [
-		"lodash",
 		"transform-object-rest-spread",
 		[ "transform-react-jsx", {
 			"pragma": "wp.element.createElement"
@@ -28,6 +27,7 @@
 	"env": {
 		"default": {
 			"plugins": [
+				"lodash",
 				"transform-runtime"
 			]
 		},

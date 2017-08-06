@@ -514,6 +514,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		true // enqueue in the footer.
 	);
 
+	gutenberg_fix_jetpack_freeform_block_conflict();
 	wp_localize_script( 'wp-editor', 'wpEditorL10n', array(
 		'tinymce' => array(
 			'baseURL' => includes_url( 'js/tinymce' ),

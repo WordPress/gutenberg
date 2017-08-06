@@ -204,17 +204,24 @@ export function stopTyping() {
  *
  * @param {String}     status   The notice status
  * @param {WPElement}  content  The notice content
- * @param {String}     id       The notice id
+ * @param {?Object}    options  The notice options.  Available options:
+ *                              `id` (string; default auto-generated)
+ *                              `isDismissible` (boolean; default `true`)
  *
  * @return {Object}             Action object
  */
-export function createNotice( status, content, id = uuid() ) {
+export function createNotice( status, content, options = {} ) {
+	const {
+		id = uuid(),
+		isDismissible = true,
+	} = options;
 	return {
 		type: 'CREATE_NOTICE',
 		notice: {
 			id,
 			status,
 			content,
+			isDismissible,
 		},
 	};
 }

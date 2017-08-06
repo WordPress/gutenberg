@@ -22,12 +22,8 @@
 }
 
 .wp-block-table {
-	table {
-		border-collapse: collapse;
-		width: 100%;
-	}
-
-	td, th {
+	td,
+	th {
 		padding: 0.5em;
 		border: 1px solid currentColor;
 	}

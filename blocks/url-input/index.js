@@ -11,7 +11,7 @@ import scrollIntoView from 'dom-scroll-into-view';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
-import { Spinner, withInstanceId, withA11yMessages } from '@wordpress/components';
+import { Spinner, withInstanceId, withSpokenMessages } from '@wordpress/components';
 
 const { UP, DOWN, ENTER } = keycodes;
 
@@ -214,4 +214,4 @@ class UrlInput extends Component {
 	}
 }
 
-export default withA11yMessages( withInstanceId( UrlInput ) );
+export default withSpokenMessages( withInstanceId( UrlInput ) );

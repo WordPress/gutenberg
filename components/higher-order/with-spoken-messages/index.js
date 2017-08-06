@@ -15,7 +15,7 @@ import { Component } from 'element';
  *
  * @return {Component}                   Component with an instanceId prop.
  */
-function withA11yMessages( WrappedComponent ) {
+function withSpokenMessages( WrappedComponent ) {
 	return class extends Component {
 		constructor() {
 			super( ...arguments );
@@ -41,4 +41,4 @@ function withA11yMessages( WrappedComponent ) {
 	};
 }
 
-export default withA11yMessages;
+export default withSpokenMessages;

@@ -18,7 +18,7 @@ import { addQueryArgs } from '../../../editor/utils/url';
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, query } from '../../api';
+import { registerBlockType, query, createBlock } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
@@ -28,7 +28,7 @@ const { attr, children } = query;
 // These embeds do not work in sandboxes
 const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
 
-function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
+function getEmbedBlockSettings( { title, icon, category = 'embed', transforms } ) {
 	return {
 		title: __( title ),
 
@@ -40,6 +40,8 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 			title: attr( 'iframe', 'title' ),
 			caption: children( 'figcaption' ),
 		},
+
+		transforms,
 
 		getEditWrapperProps( attributes ) {
 			const { align } = attributes;
@@ -222,6 +224,20 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Embed',
 		icon: 'video-alt3',
+		transforms: {
+			from: [
+				{
+					type: 'pattern',
+					trigger: 'paste',
+					regExp: /^\s*(https?:\/\/\S+)\s*/i,
+					transform: ( { match } ) => {
+						return createBlock( 'core/embed', {
+							url: match[ 1 ],
+						} );
+					},
+				},
+			],
+		},
 	} )
 );
 

@@ -51,3 +51,14 @@ global.wp = global.wp || {};
 global.wp.a11y = {
 	speak: () => {},
 };
+
+global.window.getUserSetting = settingName => {
+	switch ( settingName ) {
+		case 'gutenberg_tracking':
+			return 'on';
+		default:
+			throw new Error(
+				'Unrecognized user setting requested: ' + settingName
+			);
+	}
+};

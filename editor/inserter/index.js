@@ -11,6 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { IconButton } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
+import { bumpStat } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -18,7 +19,6 @@ import { createBlock } from '@wordpress/blocks';
 import InserterMenu from './menu';
 import { getBlockInsertionPoint, getEditorMode } from '../selectors';
 import { insertBlock, hideInsertionPoint } from '../actions';
-import { bumpStat } from '../utils/tracking';
 
 class Inserter extends Component {
 	constructor() {

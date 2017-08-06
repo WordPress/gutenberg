@@ -8,7 +8,7 @@ import { isUndefined } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { IconButton, Toolbar, withA11yMessages } from '@wordpress/components';
+import { IconButton, Toolbar, withSpokenMessages } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
 
 /**
@@ -193,4 +193,4 @@ class FormatToolbar extends Component {
 	}
 }
 
-export default withA11yMessages( FormatToolbar );
+export default withSpokenMessages( FormatToolbar );
