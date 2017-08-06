@@ -83,7 +83,6 @@ registerBlockType( 'core/button', {
 						/>
 					</InspectorControls>
 				}
-			),
 			</span>,
 		];
 	},
