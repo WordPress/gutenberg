@@ -25,10 +25,12 @@ function the_gutenberg_project() {
 	<?php
 }
 
-// Plugins that add metaboxes along with their timing:
-//
-//  - advanced-custom-fields : admin_enqueue_scripts (priority 10) adds an
-//                             'admin_head' action which calls add_meta_box()
+/*
+ * Plugins that add metaboxes along with their timing:
+ *
+ *  - advanced-custom-fields : admin_enqueue_scripts (priority 10) adds an
+ *                             'admin_head' action which calls add_meta_box()
+ */
 
 /**
  * Set up global variables so that plugins will add metaboxes as if we were
@@ -59,13 +61,15 @@ add_action(
 function gutenberg_collect_metabox_data() {
 	global $_gutenberg_post_id, $_gutenberg_restore_globals_after_metaboxes;
 
-	// WIP: Collect and send information needed to render metaboxes.
-	// From wp-admin/edit-form-advanced.php
-	// Relevant code there:
-	// do_action( 'do_meta_boxes', $post_type, {'normal','advanced','side'}, $post );
-	// do_meta_boxes( $post_type, 'side', $post );
-	// do_meta_boxes( null, 'normal', $post );
-	// do_meta_boxes( null, 'advanced', $post );
+	/*
+	 * WIP: Collect and send information needed to render metaboxes.
+	 * From wp-admin/edit-form-advanced.php
+	 * Relevant code there:
+	 * do_action( 'do_meta_boxes', $post_type, {'normal','advanced','side'}, $post );
+	 * do_meta_boxes( $post_type, 'side', $post );
+	 * do_meta_boxes( null, 'normal', $post );
+	 * do_meta_boxes( null, 'advanced', $post );
+	 */
 	$meta_boxes_output = array();
 
 	$post = get_post( $_gutenberg_post_id );

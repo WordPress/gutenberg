@@ -109,6 +109,8 @@ function prepareMetaboxesState( store, metaboxes ) {
  * @param {String} id              Unique identifier for editor instance
  * @param {Object} post            API entity for post to edit  (type required)
  * @param {Object} editorSettings  Editor settings object
+ * @return {Object}                Object containing functions that can be
+ *                                 called to manipulate the editor instance.
  */
 export function createEditorInstance( id, post, editorSettings = DEFAULT_SETTINGS ) {
 	const store = createReduxStore();
