@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flow, groupBy, sortBy, findIndex, filter, debounce, find, some } from 'lodash';
+import { flow, groupBy, sortBy, findIndex, filter, find, some } from 'lodash';
 import { connect } from 'react-redux';
 
 /**
@@ -9,7 +9,7 @@ import { connect } from 'react-redux';
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { Popover, withFocusReturn, withInstanceId } from '@wordpress/components';
+import { Popover, withFocusReturn, withInstanceId, withA11yMessages } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
 import { getCategories, getBlockTypes, BlockIcon } from '@wordpress/blocks';
 
@@ -47,8 +47,6 @@ export class InserterMenu extends Component {
 		this.getBlocksForCurrentTab = this.getBlocksForCurrentTab.bind( this );
 		this.sortBlocks = this.sortBlocks.bind( this );
 		this.addRecentBlocks = this.addRecentBlocks.bind( this );
-		const speakAssertive = ( message ) => wp.a11y.speak( message, 'assertive' );
-		this.debouncedSpeakAssertive = debounce( speakAssertive, 500 );
 	}
 
 	componentDidMount() {
@@ -57,20 +55,19 @@ export class InserterMenu extends Component {
 
 	componentWillUnmount() {
 		document.removeEventListener( 'keydown', this.onKeyDown );
-		this.debouncedSpeakAssertive.cancel();
 	}
 
 	componentDidUpdate() {
 		const searchResults = this.searchBlocks( getBlockTypes() );
 		// Announce the blocks search results to screen readers.
 		if ( !! searchResults.length ) {
-			this.debouncedSpeakAssertive( sprintf( _n(
+			this.props.debouncedSpeak( sprintf( _n(
 				'%d result found',
 				'%d results found',
 				searchResults.length
-			), searchResults.length ) );
+			), searchResults.length ), 'assertive' );
 		} else {
-			this.debouncedSpeakAssertive( __( 'No results.' ) );
+			this.props.debouncedSpeak( __( 'No results.' ), 'assertive' );
 		}
 	}
 
@@ -443,6 +440,7 @@ const connectComponent = connect(
 
 export default flow(
 	withInstanceId,
+	withA11yMessages,
 	withFocusReturn,
 	connectComponent
 )( InserterMenu );

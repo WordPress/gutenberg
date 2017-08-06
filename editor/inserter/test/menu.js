@@ -91,6 +91,7 @@ describe( 'InserterMenu', () => {
 				instanceId={ 1 }
 				blocks={ [] }
 				recentlyUsedBlocks={ [] }
+				debouncedSpeak={ noop }
 			/>
 		);
 
@@ -107,6 +108,7 @@ describe( 'InserterMenu', () => {
 				instanceId={ 1 }
 				blocks={ [] }
 				recentlyUsedBlocks={ [ advancedTextBlock ] }
+				debouncedSpeak={ noop }
 			/>
 		);
 
@@ -122,6 +124,7 @@ describe( 'InserterMenu', () => {
 				instanceId={ 1 }
 				blocks={ [] }
 				recentlyUsedBlocks={ [] }
+				debouncedSpeak={ noop }
 			/>
 		);
 		const embedTab = wrapper.find( '.editor-inserter__tab' )
@@ -143,6 +146,7 @@ describe( 'InserterMenu', () => {
 				instanceId={ 1 }
 				blocks={ [] }
 				recentlyUsedBlocks={ [] }
+				debouncedSpeak={ noop }
 			/>
 		);
 		const blocksTab = wrapper.find( '.editor-inserter__tab' )
@@ -166,6 +170,7 @@ describe( 'InserterMenu', () => {
 				instanceId={ 1 }
 				blocks={ [ { name: moreBlock.name } ] }
 				recentlyUsedBlocks={ [] }
+				debouncedSpeak={ noop }
 			/>
 		);
 		const blocksTab = wrapper.find( '.editor-inserter__tab' )
@@ -183,6 +188,7 @@ describe( 'InserterMenu', () => {
 				instanceId={ 1 }
 				blocks={ [] }
 				recentlyUsedBlocks={ [] }
+				debouncedSpeak={ noop }
 			/>
 		);
 		wrapper.setState( { filterValue: 'text' } );
@@ -203,6 +209,7 @@ describe( 'InserterMenu', () => {
 				instanceId={ 1 }
 				blocks={ [] }
 				recentlyUsedBlocks={ [] }
+				debouncedSpeak={ noop }
 			/>
 		);
 		wrapper.setState( { filterValue: ' text' } );

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { throttle, debounce } from 'lodash';
+import { throttle } from 'lodash';
 import classnames from 'classnames';
 import scrollIntoView from 'dom-scroll-into-view';
 
@@ -11,7 +11,7 @@ import scrollIntoView from 'dom-scroll-into-view';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
-import { Spinner, withInstanceId } from '@wordpress/components';
+import { Spinner, withInstanceId, withA11yMessages } from '@wordpress/components';
 
 const { UP, DOWN, ENTER } = keycodes;
 
@@ -22,7 +22,6 @@ class UrlInput extends Component {
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.bindListNode = this.bindListNode.bind( this );
 		this.updateSuggestions = throttle( this.updateSuggestions.bind( this ), 200 );
-		this.debouncedSpeakAssertive = debounce( this.speakAssertive.bind( this ), 500 );
 		this.suggestionNodes = [];
 		this.state = {
 			posts: [],
@@ -77,13 +76,13 @@ class UrlInput extends Component {
 					} );
 
 					if ( !! posts.length ) {
-						this.debouncedSpeakAssertive( sprintf( _n(
+						this.props.debouncedSpeak( sprintf( _n(
 							'%d result found, use up and down arrow keys to navigate.',
 							'%d results found, use up and down arrow keys to navigate.',
 							posts.length
-						), posts.length ) );
+						), posts.length ), 'assertive' );
 					} else {
-						this.debouncedSpeakAssertive( __( 'No results.' ) );
+						this.props.debouncedSpeak( __( 'No results.' ), 'assertive' );
 					}
 				},
 				( xhr ) => {
@@ -137,15 +136,10 @@ class UrlInput extends Component {
 		}
 	}
 
-	speakAssertive( message ) {
-		wp.a11y.speak( message, 'assertive' );
-	}
-
 	componentWillUnmount() {
 		if ( this.suggestionsRequest ) {
 			this.suggestionsRequest.abort();
 		}
-		this.debouncedSpeakAssertive.cancel();
 	}
 
 	componentDidUpdate() {
@@ -220,4 +214,4 @@ class UrlInput extends Component {
 	}
 }
 
-export default withInstanceId( UrlInput );
+export default withA11yMessages( withInstanceId( UrlInput ) );

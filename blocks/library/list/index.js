@@ -162,6 +162,23 @@ registerBlockType( 'core/list', {
 		],
 	},
 
+	merge( attributes, attributesToMerge ) {
+		const valuesToMerge = attributesToMerge.values || [];
+
+		// Standard text-like block attribute.
+		if ( attributesToMerge.content ) {
+			valuesToMerge.push( attributesToMerge.content );
+		}
+
+		return {
+			...attributes,
+			values: [
+				...attributes.values,
+				...valuesToMerge,
+			],
+		};
+	},
+
 	edit: class extends Component {
 		constructor() {
 			super( ...arguments );
@@ -246,7 +263,14 @@ registerBlockType( 'core/list', {
 		}
 
 		render() {
-			const { attributes, focus, setFocus } = this.props;
+			const {
+				attributes,
+				focus,
+				setFocus,
+				insertBlocksAfter,
+				setAttributes,
+				mergeBlocks,
+			} = this.props;
 			const { nodeName, values } = attributes;
 
 			return [
@@ -291,6 +315,22 @@ registerBlockType( 'core/list', {
 					onFocus={ setFocus }
 					className="blocks-list"
 					placeholder={ __( 'Write list…' ) }
+					onMerge={ mergeBlocks }
+					onSplit={ ( before, after, ...blocks ) => {
+						if ( ! blocks.length ) {
+							blocks.push( createBlock( 'core/text' ) );
+						}
+
+						if ( after.length ) {
+							blocks.push( createBlock( 'core/list', {
+								nodeName,
+								values: after,
+							} ) );
+						}
+
+						setAttributes( { values: before } );
+						insertBlocksAfter( blocks );
+					} }
 				/>,
 			];
 		}

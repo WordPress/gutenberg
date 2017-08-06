@@ -1,3 +1,5 @@
+import { ELEMENT_NODE } from 'utils/nodetypes';
+
 export default function( nodes ) {
 	// MUTATION!
 	nodes.forEach( deepAttributeStrip );
@@ -5,8 +7,10 @@ export default function( nodes ) {
 }
 
 function deepAttributeStrip( node ) {
-	node.removeAttribute( 'style' );
-	node.removeAttribute( 'class' );
-	node.removeAttribute( 'id' );
-	Array.from( node.children ).forEach( deepAttributeStrip );
+	if ( ELEMENT_NODE === node.nodeType ) {
+		node.removeAttribute( 'style' );
+		node.removeAttribute( 'class' );
+		node.removeAttribute( 'id' );
+		Array.from( node.children ).forEach( deepAttributeStrip );
+	}
 }

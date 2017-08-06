@@ -8,7 +8,7 @@ import { isUndefined } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { IconButton, Toolbar } from '@wordpress/components';
+import { IconButton, Toolbar, withA11yMessages } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
 
 /**
@@ -125,6 +125,12 @@ class FormatToolbar extends Component {
 		this.setState( {
 			isEditingLink: false,
 		} );
+		if (
+			this.props.formats.link.value === '' &&
+			!! this.state.linkValue.length
+		) {
+			this.props.speak( __( 'Link inserted.' ), 'assertive' );
+		}
 	}
 
 	updateLinkValue( linkValue ) {
@@ -187,4 +193,4 @@ class FormatToolbar extends Component {
 	}
 }
 
-export default FormatToolbar;
+export default withA11yMessages( FormatToolbar );
