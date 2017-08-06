@@ -19,6 +19,7 @@ import TextEditor from '../modes/text-editor';
 import VisualEditor from '../modes/visual-editor';
 import UnsavedChangesWarning from '../unsaved-changes-warning';
 import DocumentTitle from '../document-title';
+import NormalMetaboxes from '../metaboxes/normal';
 import { removeNotice } from '../actions';
 import {
 	getEditorMode,
@@ -40,6 +41,7 @@ function Layout( { mode, isSidebarOpened, notices, ...props } ) {
 			<div className="editor-layout__content">
 				{ mode === 'text' && <TextEditor /> }
 				{ mode === 'visual' && <VisualEditor /> }
+				<NormalMetaboxes />
 			</div>
 			{ isSidebarOpened && <Sidebar /> }
 		</div>

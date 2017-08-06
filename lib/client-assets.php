@@ -615,6 +615,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	if ( is_wp_error( $post_to_edit ) ) {
 		wp_die( $post_to_edit->get_error_message() );
 	}
+	$GLOBALS['_gutenberg_post_id'] = $post_id; // TODO something other than this.
 
 	// Set initial title to empty string for auto draft for duration of edit.
 	$is_new_post = 'auto-draft' === $post_to_edit['status'];
@@ -661,10 +662,17 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'colors' => $color_palette,
 	);
 
-	wp_add_inline_script( 'wp-editor', 'wp.api.init().done( function() {'
-		. 'wp.editor.createEditorInstance( \'editor\', window._wpGutenbergPost, ' . json_encode( $editor_settings ) . ' ); '
-		. '} );'
+	$editor_settings_encoded = json_encode( $editor_settings );
+	$create_editor_instance_script = <<<JS
+wp.api.init().done( function() {
+	window._wpGutenbergInstance = wp.editor.createEditorInstance(
+		'editor',
+		window._wpGutenbergPost,
+		$editor_settings_encoded
 	);
+} );
+JS;
+	wp_add_inline_script( 'wp-editor', $create_editor_instance_script );
 
 	/**
 	 * Scripts

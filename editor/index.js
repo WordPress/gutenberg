@@ -6,6 +6,7 @@ import { Provider as ReduxProvider } from 'react-redux';
 import { Provider as SlotFillProvider } from 'react-slot-fill';
 import moment from 'moment-timezone';
 import 'moment-timezone/moment-timezone-utils';
+import { partial } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -85,6 +86,24 @@ function preparePostState( store, post ) {
 }
 
 /**
+ * Initializes Redux state with metaboxes for the current post.
+ *
+ * @param {Redux.Store} store Redux store instance
+ * @param {Object}     metaboxes  Metabox data for the current post.
+ */
+function prepareMetaboxesState( store, metaboxes ) {
+	if ( ! metaboxes ) {
+		// eslint-disable-next-line no-console
+		console.error( 'No data about post metaboxes!' );
+		return;
+	}
+	store.dispatch( {
+		type: 'RESET_METABOXES',
+		metaboxes,
+	} );
+}
+
+/**
  * Initializes and returns an instance of Editor.
  *
  * @param {String} id              Unique identifier for editor instance
@@ -124,4 +143,8 @@ export function createEditorInstance( id, post, editorSettings = DEFAULT_SETTING
 		</ReduxProvider>,
 		document.getElementById( id )
 	);
+
+	return {
+		setPostMetaboxes: partial( prepareMetaboxesState, store ),
+	};
 }
