@@ -773,8 +773,7 @@ describe( 'selectors', () => {
 						123: { uid: 123, name: 'core/paragraph' },
 					},
 				},
-				selectedBlock: { uid: null },
-				multiSelectedBlocks: {},
+				blockSelection: { start: null, end: null },
 			};
 
 			expect( getSelectedBlock( state ) ).toBe( null );
@@ -788,8 +787,7 @@ describe( 'selectors', () => {
 						123: { uid: 123, name: 'core/paragraph' },
 					},
 				},
-				selectedBlock: { uid: 23 },
-				multiSelectedBlocks: { start: 23, end: 123 },
+				blockSelection: { start: 23, end: 123 },
 			};
 
 			expect( getSelectedBlock( state ) ).toBe( null );
@@ -803,8 +801,7 @@ describe( 'selectors', () => {
 						123: { uid: 123, name: 'core/paragraph' },
 					},
 				},
-				selectedBlock: { uid: 23 },
-				multiSelectedBlocks: {},
+				blockSelection: { start: 23, end: 23 },
 			};
 
 			expect( getSelectedBlock( state ) ).toBe( state.editor.blocksByUid[ 23 ] );
@@ -817,7 +814,7 @@ describe( 'selectors', () => {
 				editor: {
 					blockOrder: [ 123, 23 ],
 				},
-				multiSelectedBlocks: { start: null, end: null },
+				blockSelection: { start: null, end: null },
 			};
 
 			expect( getMultiSelectedBlockUids( state ) ).toEqual( [] );
@@ -828,7 +825,7 @@ describe( 'selectors', () => {
 				editor: {
 					blockOrder: [ 5, 4, 3, 2, 1 ],
 				},
-				multiSelectedBlocks: { start: 2, end: 4 },
+				blockSelection: { start: 2, end: 4 },
 			};
 
 			expect( getMultiSelectedBlockUids( state ) ).toEqual( [ 4, 3, 2 ] );
@@ -841,7 +838,7 @@ describe( 'selectors', () => {
 				editor: {
 					blockOrder: [ 123, 23 ],
 				},
-				multiSelectedBlocks: { start: null, end: null },
+				blockSelection: { start: null, end: null },
 			};
 
 			expect( getMultiSelectedBlocksStartUid( state ) ).toBeNull();
@@ -852,7 +849,7 @@ describe( 'selectors', () => {
 				editor: {
 					blockOrder: [ 5, 4, 3, 2, 1 ],
 				},
-				multiSelectedBlocks: { start: 2, end: 4 },
+				blockSelection: { start: 2, end: 4 },
 			};
 
 			expect( getMultiSelectedBlocksStartUid( state ) ).toBe( 2 );
@@ -865,7 +862,7 @@ describe( 'selectors', () => {
 				editor: {
 					blockOrder: [ 123, 23 ],
 				},
-				multiSelectedBlocks: { start: null, end: null },
+				blockSelection: { start: null, end: null },
 			};
 
 			expect( getMultiSelectedBlocksEndUid( state ) ).toBeNull();
@@ -876,7 +873,7 @@ describe( 'selectors', () => {
 				editor: {
 					blockOrder: [ 5, 4, 3, 2, 1 ],
 				},
-				multiSelectedBlocks: { start: 2, end: 4 },
+				blockSelection: { start: 2, end: 4 },
 			};
 
 			expect( getMultiSelectedBlocksEndUid( state ) ).toBe( 4 );
@@ -1014,8 +1011,7 @@ describe( 'selectors', () => {
 	describe( 'isBlockSelected', () => {
 		it( 'should return true if the block is selected', () => {
 			const state = {
-				selectedBlock: { uid: 123 },
-				multiSelectedBlocks: {},
+				blockSelection: { start: 123, end: 123 },
 			};
 
 			expect( isBlockSelected( state, 123 ) ).toBe( true );
@@ -1023,8 +1019,7 @@ describe( 'selectors', () => {
 
 		it( 'should return false if the block is not selected', () => {
 			const state = {
-				selectedBlock: { uid: 123 },
-				multiSelectedBlocks: {},
+				blockSelection: { start: null, end: null },
 			};
 
 			expect( isBlockSelected( state, 23 ) ).toBe( false );
@@ -1036,7 +1031,7 @@ describe( 'selectors', () => {
 			editor: {
 				blockOrder: [ 5, 4, 3, 2, 1 ],
 			},
-			multiSelectedBlocks: { start: 2, end: 4 },
+			blockSelection: { start: 2, end: 4 },
 		};
 
 		it( 'should return true if the block is multi selected', () => {
@@ -1053,7 +1048,7 @@ describe( 'selectors', () => {
 			editor: {
 				blockOrder: [ 5, 4, 3, 2, 1 ],
 			},
-			multiSelectedBlocks: { start: 2, end: 4 },
+			blockSelection: { start: 2, end: 4 },
 		};
 
 		it( 'should return true if the block is first in multi selection', () => {
@@ -1086,11 +1081,11 @@ describe( 'selectors', () => {
 	describe( 'getBlockFocus', () => {
 		it( 'should return the block focus if the block is selected', () => {
 			const state = {
-				selectedBlock: {
-					uid: 123,
+				blockSelection: {
+					start: 123,
+					end: 123,
 					focus: { editable: 'cite' },
 				},
-				multiSelectedBlocks: {},
 			};
 
 			expect( getBlockFocus( state, 123 ) ).toEqual( { editable: 'cite' } );
@@ -1098,11 +1093,11 @@ describe( 'selectors', () => {
 
 		it( 'should return null if the block is not selected', () => {
 			const state = {
-				selectedBlock: {
-					uid: 123,
+				blockSelection: {
+					start: 123,
+					end: 123,
 					focus: { editable: 'cite' },
 				},
-				multiSelectedBlocks: {},
 			};
 
 			expect( getBlockFocus( state, 23 ) ).toEqual( null );
@@ -1131,10 +1126,10 @@ describe( 'selectors', () => {
 		it( 'should return the uid of the selected block', () => {
 			const state = {
 				mode: 'visual',
-				selectedBlock: {
-					uid: 2,
+				blockSelection: {
+					start: 2,
+					end: 2,
 				},
-				multiSelectedBlocks: {},
 				editor: {
 					blocksByUid: {
 						2: { uid: 2 },
@@ -1149,8 +1144,7 @@ describe( 'selectors', () => {
 		it( 'should return the last multi selected uid', () => {
 			const state = {
 				mode: 'visual',
-				selectedBlock: {},
-				multiSelectedBlocks: {
+				blockSelection: {
 					start: 1,
 					end: 2,
 				},
@@ -1165,8 +1159,7 @@ describe( 'selectors', () => {
 		it( 'should return the last block if no selection', () => {
 			const state = {
 				mode: 'visual',
-				selectedBlock: {},
-				multiSelectedBlocks: {},
+				blockSelection: { start: null, end: null },
 				editor: {
 					blockOrder: [ 1, 2, 3 ],
 				},
@@ -1178,10 +1171,7 @@ describe( 'selectors', () => {
 		it( 'should return the last block for the text mode', () => {
 			const state = {
 				mode: 'text',
-				selectedBlock: {
-					uid: 2,
-				},
-				multiSelectedBlocks: {},
+				blockSelection: { start: 2, end: 2 },
 				editor: {
 					blockOrder: [ 1, 2, 3 ],
 				},

@@ -290,63 +290,6 @@ export function currentPost( state = {}, action ) {
 }
 
 /**
- * Reducer returning selected block state.
- *
- * @param  {Object} state  Current state
- * @param  {Object} action Dispatched action
- * @return {Object}        Updated state
- */
-export function selectedBlock( state = {}, action ) {
-	switch ( action.type ) {
-		case 'TOGGLE_BLOCK_SELECTED':
-			if ( ! action.selected ) {
-				return state.uid === action.uid ? {} : state;
-			}
-			return action.uid === state.uid && ! state.typing
-				? state
-				: {
-					uid: action.uid,
-					focus: action.uid === state.uid ? state.focus : {},
-				};
-
-		case 'CLEAR_SELECTED_BLOCK':
-			return {};
-
-		case 'MOVE_BLOCKS_UP':
-		case 'MOVE_BLOCKS_DOWN': {
-			const firstUid = first( action.uids );
-			return firstUid === state.uid
-				? state
-				: { uid: firstUid, focus: {} };
-		}
-
-		case 'INSERT_BLOCKS':
-			return {
-				uid: action.blocks[ 0 ].uid,
-				focus: {},
-			};
-
-		case 'UPDATE_FOCUS':
-			return {
-				uid: action.uid,
-				focus: action.config || {},
-			};
-
-		case 'REPLACE_BLOCKS':
-			if ( ! action.blocks || ! action.blocks.length || action.uids.indexOf( state.uid ) === -1 ) {
-				return state;
-			}
-
-			return {
-				uid: action.blocks[ 0 ].uid,
-				focus: {},
-			};
-	}
-
-	return state;
-}
-
-/**
  * Reducer returning typing state.
  *
  * @param  {Boolean} state  Current state
@@ -366,17 +309,15 @@ export function isTyping( state = false, action ) {
 }
 
 /**
- * Reducer returning multi selected block state.
+ * Reducer returning the block selection's state.
  *
  * @param  {Object} state  Current state
  * @param  {Object} action Dispatched action
  * @return {Object}        Updated state
  */
-export function multiSelectedBlocks( state = { start: null, end: null }, action ) {
+export function blockSelection( state = { start: null, end: null }, action ) {
 	switch ( action.type ) {
 		case 'CLEAR_SELECTED_BLOCK':
-		case 'TOGGLE_BLOCK_SELECTED':
-		case 'INSERT_BLOCKS':
 			return {
 				start: null,
 				end: null,
@@ -386,6 +327,44 @@ export function multiSelectedBlocks( state = { start: null, end: null }, action 
 				start: action.start,
 				end: action.end,
 			};
+		case 'SELECT_BLOCK':
+			return {
+				start: action.uid,
+				end: action.uid,
+				focus: action.focus || {},
+			};
+		case 'UPDATE_FOCUS':
+			return {
+				start: action.uid,
+				end: action.uid,
+				focus: action.config || {},
+			};
+		case 'INSERT_BLOCKS':
+			return {
+				start: action.blocks[ 0 ].uid,
+				end: action.blocks[ 0 ].uid,
+				focus: {},
+			};
+		case 'REPLACE_BLOCKS':
+			if ( ! action.blocks || ! action.blocks.length || action.uids.indexOf( state.start ) === -1 ) {
+				return state;
+			}
+			return {
+				start: action.blocks[ 0 ].uid,
+				end: action.blocks[ 0 ].uid,
+				focus: {},
+			};
+		case 'MOVE_BLOCKS_UP':
+		case 'MOVE_BLOCKS_DOWN': {
+			const firstUid = first( action.uids );
+			return firstUid === state.start
+				? state
+				: {
+					start: firstUid,
+					end: firstUid,
+					focus: {},
+				};
+		}
 	}
 
 	return state;
@@ -402,17 +381,10 @@ export function hoveredBlock( state = null, action ) {
 	switch ( action.type ) {
 		case 'TOGGLE_BLOCK_HOVERED':
 			return action.hovered ? action.uid : null;
-
-		case 'TOGGLE_BLOCK_SELECTED':
-			if ( action.selected ) {
-				return null;
-			}
-			break;
-
+		case 'SELECT_BLOCK':
 		case 'START_TYPING':
 		case 'MULTI_SELECT':
 			return null;
-
 		case 'REPLACE_BLOCKS':
 			if ( ! action.blocks || ! action.blocks.length || action.uids.indexOf( state ) === -1 ) {
 				return state;
@@ -538,9 +510,8 @@ export function createReduxStore() {
 	const reducer = optimist( combineReducers( {
 		editor,
 		currentPost,
-		selectedBlock,
 		isTyping,
-		multiSelectedBlocks,
+		blockSelection,
 		hoveredBlock,
 		showInsertionPoint,
 		mode,
