@@ -1,0 +1,14 @@
+[
+    {
+        "blockName": "core/latest-comments",
+        "attrs": {
+            "commentsToShow": 6,
+            "displayExcerpt": false
+        },
+        "rawContent": ""
+    },
+    {
+        "attrs": {},
+        "rawContent": "\n"
+    }
+]

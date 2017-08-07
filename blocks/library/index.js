@@ -15,6 +15,7 @@ import './code';
 import './html';
 import './freeform';
 import './latest-posts';
+import './latest-comments';
 import './cover-image';
 import './cover-text';
 import './verse';
