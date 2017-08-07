@@ -9,8 +9,7 @@ import { __ } from '@wordpress/i18n';
 import createBlockWarning from './create-block-warning';
 
 const warning = createBlockWarning( __(
-	'This block has been modified externally and has been locked to protect ' +
-	'against content loss.'
+	'This block has suffered from an unhandled error and cannot be previewed.'
 ) );
 
 export default () => warning;

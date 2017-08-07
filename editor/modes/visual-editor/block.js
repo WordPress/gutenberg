@@ -20,6 +20,7 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import InvalidBlockWarning from './invalid-block-warning';
+import BlockCrashWarning from './block-crash-warning';
 import BlockMover from '../../block-mover';
 import BlockRightMenu from '../../block-settings-menu';
 import BlockSwitcher from '../../block-switcher';
@@ -58,9 +59,7 @@ function FirstChild( { children } ) {
 class VisualEditorBlock extends Component {
 	constructor() {
 		super( ...arguments );
-		this.state = {
-			showMobileControls: false,
-		};
+
 		this.bindBlockNode = this.bindBlockNode.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
 		this.maybeHover = this.maybeHover.bind( this );
@@ -74,7 +73,13 @@ class VisualEditorBlock extends Component {
 		this.onKeyUp = this.onKeyUp.bind( this );
 		this.handleArrowKey = this.handleArrowKey.bind( this );
 		this.toggleMobileControls = this.toggleMobileControls.bind( this );
+
 		this.previousOffset = null;
+
+		this.state = {
+			showMobileControls: false,
+			error: null,
+		};
 	}
 
 	componentDidMount() {
@@ -120,6 +125,10 @@ class VisualEditorBlock extends Component {
 				this.removeStopTypingListener();
 			}
 		}
+	}
+
+	componentDidCatch( error ) {
+		this.setState( { error } );
 	}
 
 	componentWillUnmount() {
@@ -330,9 +339,9 @@ class VisualEditorBlock extends Component {
 		// Generate the wrapper class names handling the different states of the block.
 		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected, focus } = this.props;
 		const showUI = isSelected && ( ! this.props.isTyping || focus.collapsed === false );
-		const { showMobileControls } = this.state;
+		const { error, showMobileControls } = this.state;
 		const wrapperClassname = classnames( 'editor-visual-editor__block', {
-			'is-invalid': ! isValid,
+			'has-warning': ! isValid || !! error,
 			'is-selected': showUI,
 			'is-multi-selected': isMultiSelected,
 			'is-hovered': isHovered,
@@ -406,7 +415,7 @@ class VisualEditorBlock extends Component {
 					onTouchStart={ this.onPointerDown }
 					className="editor-visual-editor__block-edit"
 				>
-					{ isValid && (
+					{ isValid && ! error && (
 						<BlockEdit
 							focus={ focus }
 							attributes={ block.attributes }
@@ -426,6 +435,7 @@ class VisualEditorBlock extends Component {
 						} )
 					) }
 				</div>
+				{ !! error && <BlockCrashWarning /> }
 				{ ! isValid && <InvalidBlockWarning /> }
 			</div>
 		);
