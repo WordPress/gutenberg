@@ -52,7 +52,7 @@ function gutenberg_render_block_core_latest_posts( $attributes ) {
 			esc_html( $title )
 		);
 
-		if ( $attributes['displayPostDate'] ) {
+		if ( isset( $attributes['displayPostDate'] ) && $attributes['displayPostDate'] ) {
 			$list_items_markup .= sprintf(
 				'<time datetime="%1$s" class="wp-block-latest-posts__post-date">%2$s</time>',
 				esc_attr( get_the_date( 'c', $post_id ) ),
