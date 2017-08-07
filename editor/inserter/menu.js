@@ -49,7 +49,6 @@ export class InserterMenu extends Component {
 		this.addRecentBlocks = this.addRecentBlocks.bind( this );
 
 		this.tabScrollTop = { recent: 0, blocks: 0, embeds: 0 };
-		this.didSwitchTab = false;
 	}
 
 	componentDidMount() {
