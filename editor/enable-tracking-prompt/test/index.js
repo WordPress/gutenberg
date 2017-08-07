@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { mount } from 'enzyme';
 import clickOutside from 'react-click-outside';
 
 /**
@@ -17,22 +17,6 @@ describe( 'EnableTrackingPrompt', () => {
 	const originalDocumentAddEventListener = document.addEventListener;
 	let eventMap = {};
 	let removeNotice;
-	let prompt;
-
-	function getAllButtonsText() {
-		return prompt.find( 'Button' )
-			.map( node => node.children().at( 0 ).text() );
-	}
-
-	function getButtonWithText( text ) {
-		return prompt.find( 'Button' ).filterWhere( node => {
-			if ( node.children().at( 0 ).text() === text ) {
-				// This works for Yes and No buttons...
-				return true;
-			}
-			return false;
-		} );
-	}
 
 	beforeEach( () => {
 		window.setUserSetting = jest.fn();
@@ -49,14 +33,14 @@ describe( 'EnableTrackingPrompt', () => {
 	} );
 
 	it( 'should render a prompt with Yes, No, and More info buttons', () => {
-		prompt = shallow(
+		const prompt = mount(
 			<EnableTrackingPrompt />
 		);
-		expect( getAllButtonsText() ).toEqual( [
-			'Yes',
-			'No',
-			'More info',
-		] );
+		const buttons = prompt.find( 'Button' );
+		expect( buttons.length ).toBe( 3 );
+		expect( buttons.at( 0 ).text() ).toBe( 'Yes' );
+		expect( buttons.at( 1 ).text() ).toBe( 'No' );
+		expect( buttons.at( 2 ).text() ).toBe( 'More info' );
 
 		expect( window.setUserSetting )
 			.not.toHaveBeenCalled();
@@ -65,10 +49,11 @@ describe( 'EnableTrackingPrompt', () => {
 	} );
 
 	it( 'should enable tracking when clicking Yes', () => {
-		prompt = shallow(
+		const prompt = mount(
 			<EnableTrackingPrompt removeNotice={ removeNotice } />
 		);
-		const buttonYes = getButtonWithText( 'Yes' );
+		const buttonYes = prompt.find( 'Button' )
+			.filterWhere( node => node.text() === 'Yes' );
 		buttonYes.simulate( 'click' );
 
 		expect( window.setUserSetting )
@@ -78,10 +63,11 @@ describe( 'EnableTrackingPrompt', () => {
 	} );
 
 	it( 'should disable tracking when clicking No', () => {
-		prompt = shallow(
+		const prompt = mount(
 			<EnableTrackingPrompt removeNotice={ removeNotice } />
 		);
-		const buttonNo = getButtonWithText( 'No' );
+		const buttonNo = prompt.find( 'Button' )
+			.filterWhere( node => node.text() === 'No' );
 		buttonNo.simulate( 'click' );
 
 		expect( window.setUserSetting )
@@ -92,19 +78,14 @@ describe( 'EnableTrackingPrompt', () => {
 
 	it( 'should show and hide a popover when clicking More info', () => {
 		const EnableTrackingPromptWrapped = clickOutside( EnableTrackingPrompt );
-		prompt = shallow(
+		const prompt = mount(
 			<EnableTrackingPromptWrapped removeNotice={ removeNotice } />
 		);
 
 		expect( prompt.find( 'Popover' ).length ).toBe( 0 );
 
-		const buttonMoreInfo = getButtonWithText( 'More info' );
-		// eslint-disable-next-line console
-		console.log( {
-			buttons_length: prompt.find( 'Button' ).length, // always 0!
-			buttonMoreInfo_length: buttonMoreInfo.length, // always 0!
-		} );
-		expect( prompt.find( 'Button' ).length ).toBe( 3 );
+		const buttonMoreInfo = prompt.find( 'Button' )
+			.filterWhere( node => node.text() === 'More info' );
 
 		// Click the "More info" button to show the info popover
 		buttonMoreInfo.simulate( 'click' );
