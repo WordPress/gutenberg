@@ -279,13 +279,44 @@ export default class Editable extends Component {
 
 		// If we click shift+Enter on inline Editables, we avoid creating two contenteditables
 		// We also split the content and call the onSplit prop if provided.
-		if ( event.keyCode === ENTER && ! this.props.multiline ) {
-			event.preventDefault();
+		if ( event.keyCode === ENTER ) {
+			if ( this.props.multiline ) {
+				if ( ! this.props.onSplit ) {
+					return;
+				}
 
-			if ( event.shiftKey || ! this.props.onSplit ) {
-				this.editor.execCommand( 'InsertLineBreak', false, event );
+				const rootNode = this.editor.getBody();
+				const selectedNode = this.editor.selection.getNode();
+
+				if ( selectedNode.parentNode !== rootNode ) {
+					return;
+				}
+
+				const dom = this.editor.dom;
+
+				if ( ! dom.isEmpty( selectedNode ) ) {
+					return;
+				}
+
+				event.preventDefault();
+
+				const childNodes = Array.from( rootNode.childNodes );
+				const index = dom.nodeIndex( selectedNode );
+				const beforeNodes = childNodes.slice( 0, index );
+				const afterNodes = childNodes.slice( index + 1 );
+				const beforeElement = nodeListToReact( beforeNodes, createTinyMCEElement );
+				const afterElement = nodeListToReact( afterNodes, createTinyMCEElement );
+
+				this.setContent( beforeElement );
+				this.props.onSplit( beforeElement, afterElement );
 			} else {
-				this.splitContent();
+				event.preventDefault();
+
+				if ( event.shiftKey || ! this.props.onSplit ) {
+					this.editor.execCommand( 'InsertLineBreak', false, event );
+				} else {
+					this.splitContent();
+				}
 			}
 		}
 	}
@@ -303,20 +334,25 @@ export default class Editable extends Component {
 		const afterRange = dom.createRng();
 		const selectionRange = this.editor.selection.getRng();
 
-		beforeRange.setStart( rootNode, 0 );
-		beforeRange.setEnd( selectionRange.startContainer, selectionRange.startOffset );
+		if ( rootNode.childNodes.length ) {
+			beforeRange.setStart( rootNode, 0 );
+			beforeRange.setEnd( selectionRange.startContainer, selectionRange.startOffset );
 
-		afterRange.setStart( selectionRange.endContainer, selectionRange.endOffset );
-		afterRange.setEnd( rootNode, dom.nodeIndex( rootNode.lastChild ) + 1 );
+			afterRange.setStart( selectionRange.endContainer, selectionRange.endOffset );
+			afterRange.setEnd( rootNode, dom.nodeIndex( rootNode.lastChild ) + 1 );
 
-		const beforeFragment = beforeRange.extractContents();
-		const afterFragment = afterRange.extractContents();
+			const beforeFragment = beforeRange.extractContents();
+			const afterFragment = afterRange.extractContents();
 
-		const beforeElement = nodeListToReact( beforeFragment.childNodes, createTinyMCEElement );
-		const afterElement = nodeListToReact( afterFragment.childNodes, createTinyMCEElement );
+			const beforeElement = nodeListToReact( beforeFragment.childNodes, createTinyMCEElement );
+			const afterElement = nodeListToReact( afterFragment.childNodes, createTinyMCEElement );
 
-		this.setContent( beforeElement );
-		this.props.onSplit( beforeElement, afterElement, ...blocks );
+			this.setContent( beforeElement );
+			this.props.onSplit( beforeElement, afterElement, ...blocks );
+		} else {
+			this.setContent( [] );
+			this.props.onSplit( [], [], ...blocks );
+		}
 	}
 
 	onNewBlock() {

@@ -100,10 +100,10 @@ export function createEditorInstance( id, post, editorSettings = DEFAULT_SETTING
 	} );
 
 	if ( window.getUserSetting( 'gutenberg_tracking' ) === '' ) {
-		store.dispatch( createInfoNotice(
-			<EnableTrackingPrompt />,
-			TRACKING_PROMPT_NOTICE_ID
-		) );
+		store.dispatch( createInfoNotice( <EnableTrackingPrompt />, {
+			id: TRACKING_PROMPT_NOTICE_ID,
+			isDismissible: false, // This notice has its own dismiss logic.
+		} ) );
 	}
 
 	preparePostState( store, post );

@@ -1,6 +1,6 @@
 {
   "name": "gutenberg",
-  "version": "0.6.0",
+  "version": "0.7.1",
   "description": "A new WordPress editor experience",
   "main": "build/app.js",
   "repository": "git+https://github.com/WordPress/gutenberg.git",
@@ -37,6 +37,7 @@
     "redux-optimist": "0.0.2",
     "refx": "^2.0.0",
     "rememo": "^1.1.1",
+    "simple-html-tokenizer": "^0.4.1",
     "uuid": "^3.0.1"
   },
   "devDependencies": {

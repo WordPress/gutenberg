@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { serialize, getDefaultBlock, createBlock } from '@wordpress/blocks';
 import { IconButton } from '@wordpress/components';
-import { keycodes } from '@wordpress/utils';
+import { keycodes, bumpStat } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -29,7 +29,6 @@ import {
 	getMultiSelectedBlockUids,
 } from '../../selectors';
 import { insertBlock, multiSelect } from '../../actions';
-import { bumpStat } from '../../utils/tracking';
 
 const INSERTION_POINT_PLACEHOLDER = '[[insertion-point]]';
 const { ENTER } = keycodes;

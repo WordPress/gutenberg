@@ -5,12 +5,17 @@ import { parse as hpqParse } from 'hpq';
 import { pickBy } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { bumpStat } from '@wordpress/utils';
+
+/**
  * Internal dependencies
  */
 import { parse as grammarParse } from './post.pegjs';
 import { getBlockType, getUnknownTypeHandler } from './registration';
 import { createBlock } from './factory';
-import { getBeautifulContent, getSaveContent } from './serializer';
+import { isValidBlock } from './validation';
 
 /**
  * Returns the block attributes parsed from raw content.
@@ -75,6 +80,7 @@ export function createBlockWithFallback( name, rawContent, attributes ) {
 	// Convert 'core/text' blocks in existing content to the new
 	// 'core/paragraph'.
 	if ( name === 'core/text' ) {
+		bumpStat( 'block_auto_convert', 'core-text-to-paragraph' );
 		name = 'core/paragraph';
 	}
 
@@ -107,38 +113,6 @@ export function createBlockWithFallback( name, rawContent, attributes ) {
 
 		return block;
 	}
-}
-
-/**
- * Returns true if the parsed block is valid given the input content. A block
- * is considered valid if, when serialized with assumed attributes, the content
- * matches the original value.
- *
- * Logs to console in development environments when invalid.
- *
- * @param  {String}  rawContent Original block content
- * @param  {String}  blockType  Block type
- * @param  {Object}  attributes Parsed block attributes
- * @return {Boolean}            Whether block is valid
- */
-export function isValidBlock( rawContent, blockType, attributes ) {
-	const [ actual, expected ] = [
-		rawContent,
-		getSaveContent( blockType, attributes ),
-	].map( getBeautifulContent );
-
-	const isValid = ( actual === expected );
-
-	if ( ! isValid && 'development' === process.env.NODE_ENV ) {
-		// eslint-disable-next-line no-console
-		console.error(
-			'Invalid block parse\n' +
-				'\tExpected: ' + expected + '\n' +
-				'\tActual:   ' + actual
-		);
-	}
-
-	return isValid;
 }
 
 /**

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isString } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -90,12 +85,7 @@ registerBlockType( 'core/pullquote', {
 
 		return (
 			<blockquote className={ `align${ align }` }>
-				{ value && value.map( ( paragraph, i ) => (
-					<p key={ i }>
-						{ isString( paragraph ) ? paragraph : paragraph.props.children }
-					</p>
-				) ) }
-
+				{ value.map( ( paragraph, i ) => <p key={ i }>{ paragraph.props.children }</p> ) }
 				{ citation && citation.length > 0 && (
 					<footer>{ citation }</footer>
 				) }

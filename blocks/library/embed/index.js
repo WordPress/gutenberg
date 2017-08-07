@@ -18,7 +18,7 @@ import { addQueryArgs } from '../../../editor/utils/url';
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, query } from '../../api';
+import { registerBlockType, query, createBlock } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
@@ -28,7 +28,7 @@ const { attr, children } = query;
 // These embeds do not work in sandboxes
 const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
 
-function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
+function getEmbedBlockSettings( { title, icon, category = 'embed', transforms } ) {
 	return {
 		title: __( title ),
 
@@ -40,6 +40,8 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 			title: attr( 'iframe', 'title' ),
 			caption: children( 'figcaption' ),
 		},
+
+		transforms,
 
 		getEditWrapperProps( attributes ) {
 			const { align } = attributes;
@@ -222,8 +224,89 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Embed',
 		icon: 'video-alt3',
+		transforms: {
+			from: [
+				{
+					type: 'pattern',
+					trigger: 'paste',
+					regExp: /^\s*(https?:\/\/\S+)\s*/i,
+					transform: ( { match } ) => {
+						return createBlock( 'core/embed', {
+							url: match[ 1 ],
+						} );
+					},
+				},
+			],
+		},
 	} )
 );
+
+// Common
+registerBlockType(
+	'core-embed/twitter',
+	getEmbedBlockSettings( {
+		title: 'Twitter',
+		icon: 'twitter',
+	} )
+);
+registerBlockType(
+	'core-embed/youtube',
+	getEmbedBlockSettings( {
+		title: 'YouTube',
+		icon: 'video-alt3',
+	} )
+);
+registerBlockType(
+	'core-embed/facebook',
+	getEmbedBlockSettings( {
+		title: 'Facebook',
+		icon: 'facebook',
+	} )
+);
+registerBlockType(
+	'core-embed/instagram',
+	getEmbedBlockSettings( {
+		title: 'Instagram',
+		icon: 'camera',
+	} )
+);
+registerBlockType(
+	'core-embed/wordpress',
+	getEmbedBlockSettings( {
+		title: 'WordPress',
+		icon: 'wordpress',
+	} )
+);
+registerBlockType(
+	'core-embed/soundcloud',
+	getEmbedBlockSettings( {
+		title: 'SoundCloud',
+		icon: 'format-audio',
+	} )
+);
+registerBlockType(
+	'core-embed/spotify',
+	getEmbedBlockSettings( {
+		title: 'Spotify',
+		icon: 'format-audio',
+	} )
+);
+registerBlockType(
+	'core-embed/flickr',
+	getEmbedBlockSettings( {
+		title: 'Flickr',
+		icon: 'format-image',
+	} )
+);
+registerBlockType(
+	'core-embed/vimeo',
+	getEmbedBlockSettings( {
+		title: 'Vimeo',
+		icon: 'video-alt3',
+	} )
+);
+
+// Others
 registerBlockType(
 	'core-embed/animoto',
 	getEmbedBlockSettings( {
@@ -253,20 +336,6 @@ registerBlockType(
 	} )
 );
 registerBlockType(
-	'core-embed/facebook',
-	getEmbedBlockSettings( {
-		title: 'Facebook',
-		icon: 'facebook',
-	} )
-);
-registerBlockType(
-	'core-embed/flickr',
-	getEmbedBlockSettings( {
-		title: 'Flickr',
-		icon: 'format-image',
-	} )
-);
-registerBlockType(
 	'core-embed/funnyordie',
 	getEmbedBlockSettings( {
 		title: 'Funny or Die',
@@ -284,13 +353,6 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Imgur',
 		icon: 'format-image',
-	} )
-);
-registerBlockType(
-	'core-embed/instagram',
-	getEmbedBlockSettings( {
-		title: 'Instagram',
-		icon: 'camera',
 	} )
 );
 registerBlockType(
@@ -378,23 +440,9 @@ registerBlockType(
 	} )
 );
 registerBlockType(
-	'core-embed/soundcloud',
-	getEmbedBlockSettings( {
-		title: 'SoundCloud',
-		icon: 'format-audio',
-	} )
-);
-registerBlockType(
 	'core-embed/speaker',
 	getEmbedBlockSettings( {
 		title: 'Speaker',
-		icon: 'format-audio',
-	} )
-);
-registerBlockType(
-	'core-embed/spotify',
-	getEmbedBlockSettings( {
-		title: 'Spotify',
 		icon: 'format-audio',
 	} )
 );
@@ -413,23 +461,9 @@ registerBlockType(
 	} )
 );
 registerBlockType(
-	'core-embed/twitter',
-	getEmbedBlockSettings( {
-		title: 'Twitter',
-		icon: 'twitter',
-	} )
-);
-registerBlockType(
 	'core-embed/videopress',
 	getEmbedBlockSettings( {
 		title: 'VideoPress',
-		icon: 'video-alt3',
-	} )
-);
-registerBlockType(
-	'core-embed/vimeo',
-	getEmbedBlockSettings( {
-		title: 'Vimeo',
 		icon: 'video-alt3',
 	} )
 );
@@ -441,23 +475,9 @@ registerBlockType(
 	} )
 );
 registerBlockType(
-	'core-embed/wordpress',
-	getEmbedBlockSettings( {
-		title: 'WordPress',
-		icon: 'wordpress',
-	} )
-);
-registerBlockType(
 	'core-embed/wordpress-tv',
 	getEmbedBlockSettings( {
 		title: 'WordPress.tv',
-		icon: 'video-alt3',
-	} )
-);
-registerBlockType(
-	'core-embed/youtube',
-	getEmbedBlockSettings( {
-		title: 'YouTube',
 		icon: 'video-alt3',
 	} )
 );
