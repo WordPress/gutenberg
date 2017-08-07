@@ -60,7 +60,7 @@ export class InserterMenu extends Component {
 		document.removeEventListener( 'keydown', this.onKeyDown );
 	}
 
-	componentDidUpdate() {
+	componentDidUpdate( prevProps, prevState ) {
 		const searchResults = this.searchBlocks( getBlockTypes() );
 		// Announce the blocks search results to screen readers.
 		if ( !! searchResults.length ) {
@@ -73,9 +73,8 @@ export class InserterMenu extends Component {
 			this.props.debouncedSpeak( __( 'No results.' ), 'assertive' );
 		}
 
-		if ( this.didSwitchTab ) {
-			this._tabContainer.scrollTop = this.tabScrollTop[ this.state.tab ];
-			this.didSwitchTab = false;
+		if ( this.state.tab !== prevState.tab ) {
+			this.tabContainer.scrollTop = this.tabScrollTop[ this.state.tab ];
 		}
 	}
 
@@ -311,8 +310,7 @@ export class InserterMenu extends Component {
 
 	switchTab( tab ) {
 		// store the scrollTop of the tab switched from
-		this.tabScrollTop[ this.state.tab ] = this._tabContainer.scrollTop;
-		this.didSwitchTab = true;
+		this.tabScrollTop[ this.state.tab ] = this.tabContainer.scrollTop;
 		this.setState( { tab: tab } );
 	}
 
@@ -338,7 +336,8 @@ export class InserterMenu extends Component {
 					ref={ this.bindReferenceNode( 'search' ) }
 					tabIndex="-1"
 				/>
-				<div ref={ ( r ) => this._tabContainer = r } role="menu" className="editor-inserter__content">
+				<div role="menu" className="editor-inserter__content"
+					ref={ ( ref ) => this.tabContainer = ref }>
 					{ this.state.tab === 'recent' && ! isSearching &&
 						<div className="editor-inserter__recent">
 							<div
