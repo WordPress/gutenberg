@@ -77,9 +77,12 @@ export function registerCategory( cat ) {
 }
 
 /**
+ *
  * Sort categories by key
  *
  * @param {String} key The key to sort by
+ *
+ * @returns {Array} Block categories
  */
 export function sortCategoriesBy( key ) {
 	if ( ! key ) {
@@ -95,6 +98,7 @@ export function sortCategoriesBy( key ) {
 		return;
 	}
 	categories = sortBy( categories, key );
+	return categories;
 }
 
 /**
@@ -102,6 +106,8 @@ export function sortCategoriesBy( key ) {
  *
  * @param {String}    slug    The slug for the category
  * @param {Number}    order   The order for the category
+ *
+ * @returns {Array} Block categories
  */
 export function setCategoryOrder( slug, order ) {
 	const pos = findIndex( categories, ( category ) => category.slug === slug );
@@ -124,4 +130,5 @@ export function setCategoryOrder( slug, order ) {
 		return;
 	}
 	categories[ pos ].order = order;
+	return categories;
 }
