@@ -15,7 +15,7 @@ import { createBlock } from './factory';
 import { getBlockTypes, getUnknownTypeHandlerName } from './registration';
 import { getSourcedAttributes } from './parser';
 import stripAttributes from './paste/strip-attributes';
-import removeSpans from './paste/remove-spans';
+import removeUnsupportedEls from './paste/remove-unsupported-els';
 
 const { ELEMENT_NODE, TEXT_NODE } = nodetypes;
 
@@ -79,7 +79,12 @@ export function normaliseToBlockLevelNodes( nodes ) {
 }
 
 export default function( nodes ) {
-	const prepare = compose( [ normaliseToBlockLevelNodes, removeSpans, stripAttributes ] );
+	const log = ( nodes ) => {
+		console.log( nodes );
+		return nodes;
+	};
+
+	const prepare = compose( [ normaliseToBlockLevelNodes, log, removeUnsupportedEls, stripAttributes, log ] );
 
 	return prepare( nodes ).map( ( node ) => {
 		const block = getBlockTypes().reduce( ( acc, blockType ) => {
