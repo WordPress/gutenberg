@@ -26,4 +26,9 @@
 		vertical-align: middle;
 		margin-bottom: 3px;
 	}
+
+
+	&:hover {
+		color: $dark-gray-800;
+	}
 }
