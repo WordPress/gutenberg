@@ -210,16 +210,18 @@ registerBlockType( 'core/image', {
 				</InspectorControls>
 			),
 			<figure key="image" className={ classes }>
-				<ImageSize src={ url }>
-					{ ( originalWidth = width, originalHeight = height ) => {
+				<ImageSize src={ url } dirtynessTrigger={ align }>
+					{ ( originalWidth, originalHeight ) => {
+						const currentWidth = width || originalWidth;
+						const currentHeight = height || originalHeight;
 						const img = <img src={ url } alt={ alt } onClick={ setFocus } />;
 						if ( ! isResizable || ! originalHeight || ! originalWidth ) {
 							return img;
 						}
 						return (
 							<ResizableBox
-								width={ originalWidth }
-								height={ originalHeight }
+								width={ currentWidth }
+								height={ currentHeight }
 								lockAspectRatio
 								onResize={ ( event, { size } ) => setAttributes( size ) }
 							>

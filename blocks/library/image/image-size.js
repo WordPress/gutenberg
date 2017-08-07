@@ -16,6 +16,7 @@ class ImageSize extends Component {
 			height: undefined,
 		};
 		this.bindContainer = this.bindContainer.bind( this );
+		this.calculateSize = this.calculateSize.bind( this );
 	}
 
 	bindContainer( ref ) {
@@ -29,6 +30,10 @@ class ImageSize extends Component {
 				height: undefined,
 			} );
 			this.fetchImageSize();
+		}
+
+		if ( this.props.dirtynessTrigger !== prevProps.dirtynessTrigger ) {
+			this.calculateSize();
 		}
 	}
 
@@ -44,15 +49,17 @@ class ImageSize extends Component {
 
 	fetchImageSize() {
 		this.image = new window.Image();
-		this.image.onload = () => {
-			const maxWidth = this.container.clientWidth;
-			const exceedMaxWidth = this.image.width > maxWidth;
-			const ratio = this.image.height / this.image.width;
-			const width = exceedMaxWidth ? maxWidth : this.image.width;
-			const height = exceedMaxWidth ? maxWidth * ratio : this.image.height;
-			this.setState( { width, height } );
-		};
+		this.image.onload = this.calculateSize;
 		this.image.src = this.props.src;
+	}
+
+	calculateSize() {
+		const maxWidth = this.container.clientWidth;
+		const exceedMaxWidth = this.image.width > maxWidth;
+		const ratio = this.image.height / this.image.width;
+		const width = exceedMaxWidth ? maxWidth : this.image.width;
+		const height = exceedMaxWidth ? maxWidth * ratio : this.image.height;
+		this.setState( { width, height } );
 	}
 
 	render() {
