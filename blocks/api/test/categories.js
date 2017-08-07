@@ -68,19 +68,6 @@ describe( 'categories', () => {
 			expect( categories ).toBeUndefined();
 		} );
 	} );
-	describe( 'sortCategoriesBy()', () => {
-		it( 'should reject empty key', () => {
-			const categories = sortCategoriesBy();
-			expect( console.error ).toHaveBeenCalledWith( 'The key must be defined' );
-			expect( categories ).toBeUndefined();
-		} );
-
-		it( 'should reject key if it is not a valid string', () => {
-			const categories = sortCategoriesBy( 12345 );
-			expect( console.error ).toHaveBeenCalledWith( 'The key must be a string' );
-			expect( categories ).toBeUndefined();
-		} );
-	} );
 	describe( 'setCategoryOrder()', () => {
 		it( 'should reject slug not defined', () => {
 			const categories = setCategoryOrder();
@@ -110,6 +97,27 @@ describe( 'categories', () => {
 			const categories = setCategoryOrder( 'custom-blocks', '2' );
 			expect( console.error ).toHaveBeenCalledWith( 'The order must be an integer' );
 			expect( categories ).toBeUndefined();
+		} );
+
+		it( 'should set the category order and return an array', () => {
+			const categories = setCategoryOrder( 'custom-blocks', 1 );
+			expect( categories ).toEqual( jasmine.arrayContaining( [ { slug: 'custom-blocks', title: 'Custom Blocks', order: 1 } ] ) );
+		} );
+	} );
+	describe( 'sortCategoriesBy()', () => {
+		it( 'should reject empty key', () => {
+			const categories = sortCategoriesBy();
+			expect( console.error ).toHaveBeenCalledWith( 'The key must be defined' );
+			expect( categories ).toBeUndefined();
+		} );
+		it( 'should reject key if it is not a valid string', () => {
+			const categories = sortCategoriesBy( 12345 );
+			expect( console.error ).toHaveBeenCalledWith( 'The key must be a string' );
+			expect( categories ).toBeUndefined();
+		} );
+		it( 'should return the first element for the array', () => {
+			const categories = sortCategoriesBy( 'order' );
+			expect( categories[ 0 ] ).toEqual( { slug: 'custom-blocks', title: 'Custom Blocks', order: 1 } );
 		} );
 	} );
 } );
