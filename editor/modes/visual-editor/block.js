@@ -242,7 +242,7 @@ class VisualEditorBlock extends Component {
 	}
 
 	onKeyDown( event ) {
-		const { keyCode } = event;
+		const { keyCode, target } = event;
 
 		this.handleArrowKey( event );
 
@@ -251,7 +251,7 @@ class VisualEditorBlock extends Component {
 			this.lastRange = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
 		}
 
-		if ( ENTER === keyCode ) {
+		if ( ENTER === keyCode && target === this.node ) {
 			event.preventDefault();
 
 			this.props.onInsertBlocksAfter( [
