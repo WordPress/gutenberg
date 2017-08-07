@@ -13,7 +13,7 @@ import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
 import { Children, Component } from '@wordpress/element';
 import { IconButton, Toolbar } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
-import { getBlockType, getBlockDefaultClassname } from '@wordpress/blocks';
+import { getBlockType, getBlockDefaultClassname, createBlock } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -50,7 +50,7 @@ import {
 	getMultiSelectedBlockUids,
 } from '../../selectors';
 
-const { BACKSPACE, ESCAPE, DELETE, UP, DOWN, LEFT, RIGHT } = keycodes;
+const { BACKSPACE, ESCAPE, DELETE, UP, DOWN, LEFT, RIGHT, ENTER } = keycodes;
 
 function FirstChild( { children } ) {
 	const childrenArray = Children.toArray( children );
@@ -256,6 +256,14 @@ class VisualEditorBlock extends Component {
 		if ( keyCode === UP || keyCode === LEFT || keyCode === DOWN || keyCode === RIGHT ) {
 			const selection = window.getSelection();
 			this.lastRange = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+		}
+
+		if ( ENTER === keyCode ) {
+			event.preventDefault();
+
+			this.props.onInsertBlocksAfter( [
+				createBlock( 'core/paragraph' ),
+			] );
 		}
 	}
 
