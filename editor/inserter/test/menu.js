@@ -15,7 +15,7 @@ import { registerBlockType, unregisterBlockType, getBlockTypes } from '@wordpres
 import { InserterMenu, searchBlocks } from '../menu';
 
 const textBlock = {
-	name: 'core/text-block',
+	name: 'not-core/text-block',
 	title: 'Text',
 	save: noop,
 	edit: noop,
@@ -23,7 +23,7 @@ const textBlock = {
 };
 
 const advancedTextBlock = {
-	name: 'core/advanced-text-block',
+	name: 'not-core/advanced-text-block',
 	title: 'Advanced Text',
 	save: noop,
 	edit: noop,
@@ -31,7 +31,7 @@ const advancedTextBlock = {
 };
 
 const someOtherBlock = {
-	name: 'core/some-other-block',
+	name: 'not-core/some-other-block',
 	title: 'Some Other Block',
 	save: noop,
 	edit: noop,
@@ -39,7 +39,7 @@ const someOtherBlock = {
 };
 
 const moreBlock = {
-	name: 'core/more-block',
+	name: 'not-core/more-block',
 	title: 'More',
 	save: noop,
 	edit: noop,
@@ -48,7 +48,7 @@ const moreBlock = {
 };
 
 const youtubeBlock = {
-	name: 'core-embed/youtube',
+	name: 'not-core-embed/youtube',
 	title: 'YouTube',
 	save: noop,
 	edit: noop,
@@ -57,7 +57,7 @@ const youtubeBlock = {
 };
 
 const textEmbedBlock = {
-	name: 'core-embed/a-text-embed',
+	name: 'not-core-embed/a-text-embed',
 	title: 'A Text Embed',
 	save: noop,
 	edit: noop,

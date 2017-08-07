@@ -27,6 +27,13 @@ let unknownTypeHandler;
 let defaultBlockName;
 
 /**
+ * Flags that control the internal behavior of the block registration API.
+ */
+export const registrationFlags = {
+	ALLOW_CORE_NAMESPACES: false,
+};
+
+/**
  * Registers a new block provided a unique name and an object defining its
  * behavior. Once registered, the block is made available as an option to any
  * editor interface where blocks are implemented.
@@ -46,6 +53,12 @@ export function registerBlockType( name, settings ) {
 	if ( ! /^[a-z0-9-]+\/[a-z0-9-]+$/.test( name ) ) {
 		console.error(
 			'Block names must contain a namespace prefix. Example: my-plugin/my-custom-block'
+		);
+		return;
+	}
+	if ( ! registrationFlags.ALLOW_CORE_NAMESPACES && /^core[\/-]/.test( name ) ) {
+		console.error(
+			'Plugins may not register blocks in the "core" or "core-*" namespaces.'
 		);
 		return;
 	}

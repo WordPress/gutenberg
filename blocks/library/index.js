@@ -1,20 +1,29 @@
-import './paragraph';
-import './image';
-import './gallery';
-import './heading';
-import './quote';
-import './embed';
-import './list';
-import './separator';
-import './more';
-import './button';
-import './pullquote';
-import './table';
-import './preformatted';
-import './code';
-import './html';
-import './freeform';
-import './latest-posts';
-import './cover-image';
-import './cover-text';
-import './verse';
+/**
+ * Internal dependencies
+ */
+import { registrationFlags } from '../api/registration';
+
+// Note - not using import statements here because they would be hoisted to the
+// top of the file, which would cause setting this flag to do nothing.
+registrationFlags.ALLOW_CORE_NAMESPACES = true;
+require( './paragraph' );
+require( './image' );
+require( './gallery' );
+require( './heading' );
+require( './quote' );
+require( './embed' );
+require( './list' );
+require( './separator' );
+require( './more' );
+require( './button' );
+require( './pullquote' );
+require( './table' );
+require( './preformatted' );
+require( './code' );
+require( './html' );
+require( './freeform' );
+require( './latest-posts' );
+require( './cover-image' );
+require( './cover-text' );
+require( './verse' );
+registrationFlags.ALLOW_CORE_NAMESPACES = false;

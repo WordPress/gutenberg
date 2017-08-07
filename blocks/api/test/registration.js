@@ -17,6 +17,7 @@ import {
 	getDefaultBlock,
 	getBlockType,
 	getBlockTypes,
+	registrationFlags,
 } from '../registration';
 
 describe( 'blocks', () => {
@@ -26,6 +27,7 @@ describe( 'blocks', () => {
 	// Reset block state before each test.
 	beforeEach( () => {
 		console.error = jest.fn();
+		registrationFlags.ALLOW_CORE_NAMESPACES = false;
 	} );
 
 	afterEach( () => {
@@ -62,6 +64,37 @@ describe( 'blocks', () => {
 			expect( block ).toBeUndefined();
 		} );
 
+		it( 'should prohibit registering blocks in the "core" namespace', () => {
+			const block = registerBlockType( 'core/some-plugin-block' );
+			expect( console.error ).toHaveBeenCalledWith(
+				'Plugins may not register blocks in the "core" or "core-*" namespaces.'
+			);
+			expect( block ).toBeUndefined();
+		} );
+
+		it( 'should prohibit registering blocks in other "core-*" namespaces', () => {
+			const block = registerBlockType( 'core-but-not-really/some-plugin-block' );
+			expect( console.error ).toHaveBeenCalledWith(
+				'Plugins may not register blocks in the "core" or "core-*" namespaces.'
+			);
+			expect( block ).toBeUndefined();
+		} );
+
+		it( 'should allow registering blocks in namespaces that start with "core" but not "core-"', () => {
+			const block = registerBlockType( 'corepress/some-block', defaultBlockSettings );
+			expect( console.error ).not.toHaveBeenCalled();
+			expect( block ).toEqual( { name: 'corepress/some-block', save: noop } );
+		} );
+
+		it( 'should allow registering core blocks if the ALLOW_CORE_NAMESPACES flag is set', () => {
+			registrationFlags.ALLOW_CORE_NAMESPACES = true;
+			const block1 = registerBlockType( 'core/test-block', defaultBlockSettings );
+			const block2 = registerBlockType( 'core-embed/test-embed', defaultBlockSettings );
+			expect( console.error ).not.toHaveBeenCalled();
+			expect( block1 ).toEqual( { name: 'core/test-block', save: noop } );
+			expect( block2 ).toEqual( { name: 'core-embed/test-embed', save: noop } );
+		} );
+
 		it( 'should accept valid block names', () => {
 			const block = registerBlockType( 'my-plugin/fancy-block-4', defaultBlockSettings );
 			expect( console.error ).not.toHaveBeenCalled();
@@ -69,9 +102,9 @@ describe( 'blocks', () => {
 		} );
 
 		it( 'should prohibit registering the same block twice', () => {
-			registerBlockType( 'core/test-block', defaultBlockSettings );
-			const block = registerBlockType( 'core/test-block', defaultBlockSettings );
-			expect( console.error ).toHaveBeenCalledWith( 'Block "core/test-block" is already registered.' );
+			registerBlockType( 'not-core/test-block', defaultBlockSettings );
+			const block = registerBlockType( 'not-core/test-block', defaultBlockSettings );
+			expect( console.error ).toHaveBeenCalledWith( 'Block "not-core/test-block" is already registered.' );
 			expect( block ).toBeUndefined();
 		} );
 
@@ -97,10 +130,10 @@ describe( 'blocks', () => {
 
 		it( 'should store a copy of block type', () => {
 			const blockType = { settingName: 'settingValue', save: noop };
-			registerBlockType( 'core/test-block-with-settings', blockType );
+			registerBlockType( 'not-core/test-block-with-settings', blockType );
 			blockType.mutated = true;
-			expect( getBlockType( 'core/test-block-with-settings' ) ).toEqual( {
-				name: 'core/test-block-with-settings',
+			expect( getBlockType( 'not-core/test-block-with-settings' ) ).toEqual( {
+				name: 'not-core/test-block-with-settings',
 				settingName: 'settingValue',
 				save: noop,
 			} );
@@ -109,28 +142,28 @@ describe( 'blocks', () => {
 
 	describe( 'unregisterBlockType()', () => {
 		it( 'should fail if a block is not registered', () => {
-			const oldBlock = unregisterBlockType( 'core/test-block' );
-			expect( console.error ).toHaveBeenCalledWith( 'Block "core/test-block" is not registered.' );
+			const oldBlock = unregisterBlockType( 'not-core/test-block' );
+			expect( console.error ).toHaveBeenCalledWith( 'Block "not-core/test-block" is not registered.' );
 			expect( oldBlock ).toBeUndefined();
 		} );
 
 		it( 'should unregister existing blocks', () => {
-			registerBlockType( 'core/test-block', defaultBlockSettings );
+			registerBlockType( 'not-core/test-block', defaultBlockSettings );
 			expect( getBlockTypes() ).toEqual( [
-				{ name: 'core/test-block', save: noop },
+				{ name: 'not-core/test-block', save: noop },
 			] );
-			const oldBlock = unregisterBlockType( 'core/test-block' );
+			const oldBlock = unregisterBlockType( 'not-core/test-block' );
 			expect( console.error ).not.toHaveBeenCalled();
-			expect( oldBlock ).toEqual( { name: 'core/test-block', save: noop } );
+			expect( oldBlock ).toEqual( { name: 'not-core/test-block', save: noop } );
 			expect( getBlockTypes() ).toEqual( [] );
 		} );
 	} );
 
 	describe( 'setUnknownTypeHandler()', () => {
 		it( 'assigns unknown type handler', () => {
-			setUnknownTypeHandler( 'core/test-block' );
+			setUnknownTypeHandler( 'not-core/test-block' );
 
-			expect( getUnknownTypeHandler() ).toBe( 'core/test-block' );
+			expect( getUnknownTypeHandler() ).toBe( 'not-core/test-block' );
 		} );
 	} );
 
@@ -142,9 +175,9 @@ describe( 'blocks', () => {
 
 	describe( 'setDefaultBlock()', () => {
 		it( 'assigns default block name', () => {
-			setDefaultBlock( 'core/test-block' );
+			setDefaultBlock( 'not-core/test-block' );
 
-			expect( getDefaultBlock() ).toBe( 'core/test-block' );
+			expect( getDefaultBlock() ).toBe( 'not-core/test-block' );
 		} );
 	} );
 
@@ -156,18 +189,18 @@ describe( 'blocks', () => {
 
 	describe( 'getBlockType()', () => {
 		it( 'should return { name, save } for blocks with minimum settings', () => {
-			registerBlockType( 'core/test-block', defaultBlockSettings );
-			expect( getBlockType( 'core/test-block' ) ).toEqual( {
-				name: 'core/test-block',
+			registerBlockType( 'not-core/test-block', defaultBlockSettings );
+			expect( getBlockType( 'not-core/test-block' ) ).toEqual( {
+				name: 'not-core/test-block',
 				save: noop,
 			} );
 		} );
 
 		it( 'should return all block type elements', () => {
 			const blockType = { settingName: 'settingValue', save: noop };
-			registerBlockType( 'core/test-block-with-settings', blockType );
-			expect( getBlockType( 'core/test-block-with-settings' ) ).toEqual( {
-				name: 'core/test-block-with-settings',
+			registerBlockType( 'not-core/test-block-with-settings', blockType );
+			expect( getBlockType( 'not-core/test-block-with-settings' ) ).toEqual( {
+				name: 'not-core/test-block-with-settings',
 				settingName: 'settingValue',
 				save: noop,
 			} );
@@ -180,13 +213,13 @@ describe( 'blocks', () => {
 		} );
 
 		it( 'should return all registered blocks', () => {
-			registerBlockType( 'core/test-block', defaultBlockSettings );
+			registerBlockType( 'not-core/test-block', defaultBlockSettings );
 			const blockType = { settingName: 'settingValue', save: noop };
-			registerBlockType( 'core/test-block-with-settings', blockType );
+			registerBlockType( 'not-core/test-block-with-settings', blockType );
 			expect( getBlockTypes() ).toEqual( [
-				{ name: 'core/test-block', save: noop },
+				{ name: 'not-core/test-block', save: noop },
 				{
-					name: 'core/test-block-with-settings',
+					name: 'not-core/test-block-with-settings',
 					settingName: 'settingValue',
 					save: noop,
 				},
