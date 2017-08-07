@@ -14,12 +14,18 @@ import MediaUploadButton from '../../media-upload-button';
 import InspectorControls from '../../inspector-controls';
 import RangeControl from '../../inspector-controls/range-control';
 import ToggleControl from '../../inspector-controls/toggle-control';
+import SelectControl from '../../inspector-controls/select-control';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import GalleryImage from './gallery-image';
 import BlockDescription from '../../block-description';
 
 const MAX_COLUMNS = 8;
+const linkOptions = [
+	{ value: 'attachment', label: __( 'Attachment Page' ) },
+	{ value: 'media', label: __( 'Media File' ) },
+	{ value: 'none', label: __( 'None' ) },
+];
 
 const editMediaLibrary = ( attributes, setAttributes ) => {
 	const frameConfig = {
@@ -71,9 +77,11 @@ registerBlockType( 'core/gallery', {
 
 	edit( { attributes, setAttributes, focus, className } ) {
 		const { images = [], columns = defaultColumnsNumber( attributes ), align = 'none' } = attributes;
+		const setLinkTo = ( value ) => setAttributes( { linkTo: value } );
 		const setColumnsNumber = ( event ) => setAttributes( { columns: event.target.value } );
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		const { imageCrop = true } = attributes;
+		const { linkTo = 'none' } = attributes;
 		const toggleImageCrop = () => setAttributes( { imageCrop: ! imageCrop } );
 
 		const controls = (
@@ -139,6 +147,12 @@ registerBlockType( 'core/gallery', {
 						checked={ !! imageCrop }
 						onChange={ toggleImageCrop }
 					/>
+					<SelectControl
+						label={ __( 'Link to' ) }
+						selected={ linkTo }
+						onBlur={ setLinkTo }
+						options={ linkOptions }
+					/>
 				</InspectorControls>
 			),
 			<div key="gallery" className={ `${ className } align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` }>
@@ -150,11 +164,11 @@ registerBlockType( 'core/gallery', {
 	},
 
 	save( { attributes } ) {
-		const { images, columns = defaultColumnsNumber( attributes ), align = 'none', imageCrop = true } = attributes;
+		const { images, columns = defaultColumnsNumber( attributes ), align = 'none', imageCrop = true, linkTo = 'none' } = attributes;
 		return (
 			<div className={ `align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` } >
 				{ images.map( ( img ) => (
-					<GalleryImage key={ img.url } img={ img } />
+					<GalleryImage key={ img.url } img={ img } linkTo={ linkTo } />
 				) ) }
 			</div>
 		);
