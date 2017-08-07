@@ -8,7 +8,7 @@ import { Component } from 'element';
  */
 import IconButton from '../icon-button';
 
-class FormFileButton extends Component {
+class FormFileUpload extends Component {
 	constructor() {
 		super( ...arguments );
 		this.openFileDialog = this.openFileDialog.bind( this );
@@ -48,4 +48,4 @@ class FormFileButton extends Component {
 	}
 }
 
-export default FormFileButton;
+export default FormFileUpload;
