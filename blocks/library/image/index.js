@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Placeholder, Dashicon, Toolbar, DropZone, FormFileButton } from '@wordpress/components';
+import { Placeholder, Dashicon, Toolbar, DropZone, FormFileUpload } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -144,14 +144,14 @@ registerBlockType( 'core/image', {
 					<DropZone
 						onFilesDrop={ uploadFromFiles }
 					/>
-					<FormFileButton
+					<FormFileUpload
 						isLarge
 						className="wp-block-image__upload-button"
 						onChange={ ( event ) => uploadFromFiles( event.target.files ) }
 						accept="image/*"
 					>
 						{ __( 'Upload' ) }
-					</FormFileButton>
+					</FormFileUpload>
 					<MediaUploadButton
 						buttonProps={ uploadButtonProps }
 						onSelect={ onSelectImage }

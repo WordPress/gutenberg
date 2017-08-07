@@ -7,19 +7,19 @@ import { noop } from 'lodash';
 /**
  * Internal dependencies
  */
-import FormFileButton from '../';
+import FormFileUpload from '../';
 
 describe( 'InserterMenu', () => {
 	it( 'should show an Icon Button and a hidden input', () => {
 		const wrapper = shallow(
-			<FormFileButton
+			<FormFileUpload
 				instanceId={ 1 }
 				blocks={ [] }
 				recentlyUsedBlocks={ [] }
 				debouncedSpeak={ noop }
 			>
 				My Upload Button
-			</FormFileButton>
+			</FormFileUpload>
 		);
 
 		const iconButton = wrapper.find( 'IconButton' );
