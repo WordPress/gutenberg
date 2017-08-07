@@ -33,7 +33,7 @@
 }
 
 .editor-inserter__content {
-	height: calc( 100vh - #{ $admin-bar-height-big + $header-height + $icon-button-size + $inserter-tabs-height } );
+	height: calc( 100vh - #{ $admin-bar-height-big + $header-height + 34 + $inserter-tabs-height } ); // 34 = search input height
 
 	@include break-medium {
 		height: 240px;
