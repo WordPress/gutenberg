@@ -10,14 +10,13 @@ import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { IconButton } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
-import { bumpStat } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
 import InserterMenu from './menu';
 import { getBlockInsertionPoint, getEditorMode } from '../selectors';
-import { insertBlock, hideInsertionPoint } from '../actions';
+import { insertBlock, hideInsertionPoint, bumpStat } from '../actions';
 
 class Inserter extends Component {
 	constructor() {
@@ -58,13 +57,17 @@ class Inserter extends Component {
 
 	insertBlock( name ) {
 		if ( name ) {
-			const { insertionPoint, onInsertBlock } = this.props;
+			const {
+				insertionPoint,
+				onInsertBlock,
+				onBumpStat,
+			} = this.props;
 			onInsertBlock(
 				name,
 				insertionPoint
 			);
-			bumpStat( 'add_block_inserter', name.replace( /\//g, '__' ) );
-			bumpStat( 'add_block_total', name.replace( /\//g, '__' ) );
+			onBumpStat( 'add_block_inserter', name.replace( /\//g, '__' ) );
+			onBumpStat( 'add_block_total', name.replace( /\//g, '__' ) );
 		}
 
 		this.close();
@@ -112,6 +115,9 @@ export default connect(
 				createBlock( name ),
 				after
 			) );
+		},
+		onBumpStat( group, name ) {
+			dispatch( bumpStat( group, name ) );
 		},
 	} )
 )( Inserter );

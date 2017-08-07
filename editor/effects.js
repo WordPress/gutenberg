@@ -9,6 +9,7 @@ import { get, uniqueId } from 'lodash';
  */
 import { parse, getBlockType, switchToBlockType } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
+import { bumpStat } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -247,5 +248,9 @@ export default {
 		if ( post.content ) {
 			return resetBlocks( parse( post.content.raw ) );
 		}
+	},
+
+	BUMP_STAT( action ) {
+		bumpStat( action.group, action.name );
 	},
 };

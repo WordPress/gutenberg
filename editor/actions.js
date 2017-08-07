@@ -214,6 +214,21 @@ export function stopTyping() {
 }
 
 /**
+ * Returns an action object used to track a user action.
+ *
+ * @param  {String} group Stat group name
+ * @param  {String} name  Stat name
+ * @return {Object}       Action object
+ */
+export function bumpStat( group, name ) {
+	return {
+		type: 'BUMP_STAT',
+		group,
+		name,
+	};
+}
+
+/**
  * Returns an action object used to create a notice
  *
  * @param {String}     status   The notice status

@@ -16,14 +16,17 @@ describe( 'EnableTrackingPrompt', () => {
 	const originalSetUserSetting = window.setUserSetting;
 	const originalDocumentAddEventListener = document.addEventListener;
 	let eventMap = {};
-	let removeNotice;
+	let props = {};
 
 	beforeEach( () => {
 		window.setUserSetting = jest.fn();
 		document.addEventListener = jest.fn( ( event, cb ) => {
 			eventMap[ event ] = cb;
 		} );
-		removeNotice = jest.fn();
+		props = {
+			bumpStat: jest.fn(),
+			removeNotice: jest.fn(),
+		};
 	} );
 
 	afterEach( () => {
@@ -34,7 +37,7 @@ describe( 'EnableTrackingPrompt', () => {
 
 	it( 'should render a prompt with Yes, No, and More info buttons', () => {
 		const prompt = mount(
-			<EnableTrackingPrompt />
+			<EnableTrackingPrompt { ...props } />
 		);
 		const buttons = prompt.find( 'Button' );
 		expect( buttons.length ).toBe( 3 );
@@ -44,13 +47,15 @@ describe( 'EnableTrackingPrompt', () => {
 
 		expect( window.setUserSetting )
 			.not.toHaveBeenCalled();
-		expect( removeNotice )
+		expect( props.bumpStat )
+			.not.toHaveBeenCalled();
+		expect( props.removeNotice )
 			.not.toHaveBeenCalled();
 	} );
 
 	it( 'should enable tracking when clicking Yes', () => {
 		const prompt = mount(
-			<EnableTrackingPrompt removeNotice={ removeNotice } />
+			<EnableTrackingPrompt { ...props } />
 		);
 		const buttonYes = prompt.find( 'Button' )
 			.filterWhere( node => node.text() === 'Yes' );
@@ -58,13 +63,15 @@ describe( 'EnableTrackingPrompt', () => {
 
 		expect( window.setUserSetting )
 			.toHaveBeenCalledWith( 'gutenberg_tracking', 'on' );
-		expect( removeNotice )
+		expect( props.bumpStat )
+			.toHaveBeenCalledWith( 'tracking', 'opt-in' );
+		expect( props.removeNotice )
 			.toHaveBeenCalledWith( TRACKING_PROMPT_NOTICE_ID );
 	} );
 
 	it( 'should disable tracking when clicking No', () => {
 		const prompt = mount(
-			<EnableTrackingPrompt removeNotice={ removeNotice } />
+			<EnableTrackingPrompt { ...props } />
 		);
 		const buttonNo = prompt.find( 'Button' )
 			.filterWhere( node => node.text() === 'No' );
@@ -72,14 +79,16 @@ describe( 'EnableTrackingPrompt', () => {
 
 		expect( window.setUserSetting )
 			.toHaveBeenCalledWith( 'gutenberg_tracking', 'off' );
-		expect( removeNotice )
+		expect( props.bumpStat )
+			.not.toHaveBeenCalled();
+		expect( props.removeNotice )
 			.toHaveBeenCalledWith( TRACKING_PROMPT_NOTICE_ID );
 	} );
 
 	it( 'should show and hide a popover when clicking More info', () => {
 		const EnableTrackingPromptWrapped = clickOutside( EnableTrackingPrompt );
 		const prompt = mount(
-			<EnableTrackingPromptWrapped removeNotice={ removeNotice } />
+			<EnableTrackingPromptWrapped { ...props } />
 		);
 
 		expect( prompt.find( 'Popover' ).length ).toBe( 0 );
@@ -113,7 +122,9 @@ describe( 'EnableTrackingPrompt', () => {
 
 		expect( window.setUserSetting )
 			.not.toHaveBeenCalled();
-		expect( removeNotice )
+		expect( props.bumpStat )
+			.not.toHaveBeenCalled();
+		expect( props.removeNotice )
 			.not.toHaveBeenCalled();
 	} );
 } );

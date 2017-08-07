@@ -10,13 +10,12 @@ import clickOutside from 'react-click-outside';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button, Popover } from '@wordpress/components';
-import { bumpStat } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { removeNotice } from '../actions';
+import { bumpStat, removeNotice } from '../actions';
 
 export const TRACKING_PROMPT_NOTICE_ID = 'notice:enable-tracking-prompt';
 
@@ -37,7 +36,7 @@ export class EnableTrackingPrompt extends Component {
 			enableTracking ? 'on' : 'off'
 		);
 		if ( enableTracking ) {
-			bumpStat( 'tracking', 'opt-in' );
+			this.props.bumpStat( 'tracking', 'opt-in' );
 		}
 		this.props.removeNotice( TRACKING_PROMPT_NOTICE_ID );
 	}
@@ -106,5 +105,5 @@ export class EnableTrackingPrompt extends Component {
 
 export default connect(
 	undefined,
-	{ removeNotice }
+	{ bumpStat, removeNotice }
 )( clickOutside( EnableTrackingPrompt ) );
