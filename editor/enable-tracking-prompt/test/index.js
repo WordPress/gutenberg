@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { mount } from 'enzyme';
-import clickOutside from 'react-click-outside';
 
 /**
  * Internal dependencies
@@ -86,9 +85,8 @@ describe( 'EnableTrackingPrompt', () => {
 	} );
 
 	it( 'should show and hide a popover when clicking More info', () => {
-		const EnableTrackingPromptWrapped = clickOutside( EnableTrackingPrompt );
 		const prompt = mount(
-			<EnableTrackingPromptWrapped { ...props } />
+			<EnableTrackingPrompt { ...props } />
 		);
 
 		expect( prompt.find( 'Popover' ).length ).toBe( 0 );
@@ -108,15 +106,7 @@ describe( 'EnableTrackingPrompt', () => {
 		buttonMoreInfo.simulate( 'click' );
 		expect( prompt.find( 'Popover' ).length ).toBe( 1 );
 
-		// Click inside the prompt to hide the info popover
-		prompt.simulate( 'click' );
-		expect( prompt.find( 'Popover' ).length ).toBe( 0 );
-
-		// Click the "More info" button to show the info popover
-		buttonMoreInfo.simulate( 'click' );
-		expect( prompt.find( 'Popover' ).length ).toBe( 1 );
-
-		// Click outside the prompt to hide the info popover
+		// Click outside the "More info" button to hide the info popover
 		eventMap.click( { target: document.body } );
 		expect( prompt.find( 'Popover' ).length ).toBe( 0 );
 
