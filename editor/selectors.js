@@ -341,14 +341,12 @@ export function getBlockCount( state ) {
  * @return {?Object}       Selected block
  */
 export function getSelectedBlock( state ) {
-	const { uid } = state.selectedBlock;
-	const { start, end } = state.multiSelectedBlocks;
-
-	if ( start || end || ! uid ) {
+	const { start, end } = state.blockSelection;
+	if ( start !== end || ! start ) {
 		return null;
 	}
 
-	return getBlock( state, uid );
+	return getBlock( state, start );
 }
 
 /**
@@ -360,9 +358,8 @@ export function getSelectedBlock( state ) {
  */
 export function getMultiSelectedBlockUids( state ) {
 	const { blockOrder } = state.editor;
-	const { start, end } = state.multiSelectedBlocks;
-
-	if ( ! start || ! end ) {
+	const { start, end } = state.blockSelection;
+	if ( start === end ) {
 		return [];
 	}
 
@@ -445,7 +442,11 @@ export function isBlockMultiSelected( state, uid ) {
  * @return {?String}       Unique ID of block beginning multi-selection
  */
 export function getMultiSelectedBlocksStartUid( state ) {
-	return state.multiSelectedBlocks.start || null;
+	const { start, end } = state.blockSelection;
+	if ( start === end ) {
+		return null;
+	}
+	return start || null;
 }
 
 /**
@@ -459,7 +460,11 @@ export function getMultiSelectedBlocksStartUid( state ) {
  * @return {?String}       Unique ID of block ending multi-selection
  */
 export function getMultiSelectedBlocksEndUid( state ) {
-	return state.multiSelectedBlocks.end || null;
+	const { start, end } = state.blockSelection;
+	if ( start === end ) {
+		return null;
+	}
+	return end || null;
 }
 
 /**
@@ -546,13 +551,13 @@ export function getNextBlock( state, uid ) {
  * @return {Boolean}      Whether block is selected and multi-selection exists
  */
 export function isBlockSelected( state, uid ) {
-	const { start, end } = state.multiSelectedBlocks;
+	const { start, end } = state.blockSelection;
 
-	if ( start || end ) {
+	if ( start !== end ) {
 		return null;
 	}
 
-	return state.selectedBlock.uid === uid;
+	return start === uid;
 }
 
 /**
@@ -581,7 +586,7 @@ export function getBlockFocus( state, uid ) {
 		return null;
 	}
 
-	return state.selectedBlock.focus;
+	return state.blockSelection.focus;
 }
 
 /**

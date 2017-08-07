@@ -35,6 +35,7 @@ import {
 	startTyping,
 	stopTyping,
 	replaceBlocks,
+	selectBlock,
 } from '../../actions';
 import {
 	getPreviousBlock,
@@ -477,11 +478,7 @@ export default connect(
 		},
 
 		onSelect() {
-			dispatch( {
-				type: 'TOGGLE_BLOCK_SELECTED',
-				selected: true,
-				uid: ownProps.uid,
-			} );
+			dispatch( selectBlock( ownProps.uid ) );
 		},
 		onDeselect() {
 			dispatch( clearSelectedBlock() );

@@ -28,10 +28,9 @@ export function focusBlock( uid, config ) {
 	};
 }
 
-export function deselectBlock( uid ) {
+export function selectBlock( uid ) {
 	return {
-		type: 'TOGGLE_BLOCK_SELECTED',
-		selected: false,
+		type: 'SELECT_BLOCK',
 		uid,
 	};
 }
