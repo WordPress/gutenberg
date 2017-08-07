@@ -21,6 +21,7 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import InvalidBlockWarning from './invalid-block-warning';
 import BlockCrashWarning from './block-crash-warning';
+import BlockCrashBoundary from './block-crash-boundary';
 import BlockMover from '../../block-mover';
 import BlockRightMenu from '../../block-settings-menu';
 import BlockSwitcher from '../../block-switcher';
@@ -73,6 +74,7 @@ class VisualEditorBlock extends Component {
 		this.onKeyUp = this.onKeyUp.bind( this );
 		this.handleArrowKey = this.handleArrowKey.bind( this );
 		this.toggleMobileControls = this.toggleMobileControls.bind( this );
+		this.onBlockError = this.onBlockError.bind( this );
 
 		this.previousOffset = null;
 
@@ -83,7 +85,7 @@ class VisualEditorBlock extends Component {
 	}
 
 	componentDidMount() {
-		if ( this.props.focus && this.node ) {
+		if ( this.props.focus ) {
 			this.node.focus();
 		}
 
@@ -125,10 +127,6 @@ class VisualEditorBlock extends Component {
 				this.removeStopTypingListener();
 			}
 		}
-	}
-
-	componentDidCatch( error ) {
-		this.setState( { error } );
 	}
 
 	componentWillUnmount() {
@@ -314,6 +312,10 @@ class VisualEditorBlock extends Component {
 		} );
 	}
 
+	onBlockError( error ) {
+		this.setState( { error } );
+	}
+
 	render() {
 		const { block, multiSelectedBlockUids } = this.props;
 		const { name: blockName, isValid } = block;
@@ -416,17 +418,19 @@ class VisualEditorBlock extends Component {
 					className="editor-visual-editor__block-edit"
 				>
 					{ isValid && ! error && (
-						<BlockEdit
-							focus={ focus }
-							attributes={ block.attributes }
-							setAttributes={ this.setAttributes }
-							insertBlocksAfter={ onInsertBlocksAfter }
-							onReplace={ onReplace }
-							setFocus={ partial( onFocus, block.uid ) }
-							mergeBlocks={ this.mergeBlocks }
-							className={ className }
-							id={ block.uid }
-						/>
+						<BlockCrashBoundary onError={ this.onBlockError }>
+							<BlockEdit
+								focus={ focus }
+								attributes={ block.attributes }
+								setAttributes={ this.setAttributes }
+								insertBlocksAfter={ onInsertBlocksAfter }
+								onReplace={ onReplace }
+								setFocus={ partial( onFocus, block.uid ) }
+								mergeBlocks={ this.mergeBlocks }
+								className={ className }
+								id={ block.uid }
+							/>
+						</BlockCrashBoundary>
 					) }
 					{ ! isValid && (
 						blockType.save( {
