@@ -83,7 +83,7 @@ class VisualEditorBlock extends Component {
 	}
 
 	componentDidMount() {
-		if ( this.props.focus ) {
+		if ( this.props.focus && this.node ) {
 			this.node.focus();
 		}
 
