@@ -29,7 +29,6 @@ import {
 	mergeBlocks,
 	insertBlocks,
 	removeBlocks,
-	clearSelectedBlock,
 	startTyping,
 	stopTyping,
 	replaceBlocks,
@@ -74,6 +73,7 @@ class VisualEditorBlock extends Component {
 		this.onKeyUp = this.onKeyUp.bind( this );
 		this.handleArrowKey = this.handleArrowKey.bind( this );
 		this.toggleMobileControls = this.toggleMobileControls.bind( this );
+		this.toggleToolbar = this.toggleToolbar.bind( this );
 		this.previousOffset = null;
 	}
 
@@ -94,6 +94,10 @@ class VisualEditorBlock extends Component {
 			( this.props.isFirstMultiSelected && newProps.isFirstMultiSelected ) )
 		) {
 			this.previousOffset = this.node.getBoundingClientRect().top;
+		}
+
+		if ( ! newProps.isSelected || newProps.isTyping ) {
+			this.setState( { showToolbar: false } );
 		}
 	}
 
@@ -185,7 +189,6 @@ class VisualEditorBlock extends Component {
 			previousBlock,
 			onRemove,
 			onFocus,
-			onDeselect,
 		} = this.props;
 
 		// Remove block on backspace.
@@ -203,7 +206,7 @@ class VisualEditorBlock extends Component {
 
 		// Deselect on escape.
 		if ( ESCAPE === keyCode ) {
-			onDeselect();
+			this.setState( { showToolbar: false } );
 		}
 	}
 
@@ -305,6 +308,16 @@ class VisualEditorBlock extends Component {
 		} );
 	}
 
+	toggleToolbar() {
+		if ( ! this.props.isSelected ) {
+			this.props.onSelect();
+		}
+
+		this.setState( {
+			showToolbar: ! this.state.showToolbar,
+		} );
+	}
+
 	render() {
 		const { block, multiSelectedBlockUids } = this.props;
 		const { name: blockName, isValid } = block;
@@ -329,14 +342,17 @@ class VisualEditorBlock extends Component {
 
 		// Generate the wrapper class names handling the different states of the block.
 		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected, focus } = this.props;
-		const showUI = isSelected && ( ! this.props.isTyping || focus.collapsed === false );
+		const showUI = isSelected && ( this.state.showToolbar || focus.collapsed === false );
+		const duringInput = this.props.isTyping && ( ! focus || focus.collapsed !== false );
 		const { showMobileControls } = this.state;
 		const wrapperClassname = classnames( 'editor-visual-editor__block', {
 			'is-invalid': ! isValid,
-			'is-selected': showUI,
+			'is-selected': isSelected,
 			'is-multi-selected': isMultiSelected,
 			'is-hovered': isHovered,
 			'is-showing-mobile-controls': showMobileControls,
+			'show-ui': showUI,
+			'during-input': duringInput,
 		} );
 
 		const { onMouseLeave, onFocus, onInsertBlocksAfter, onReplace } = this.props;
@@ -368,9 +384,9 @@ class VisualEditorBlock extends Component {
 				aria-label={ blockLabel }
 				{ ...wrapperProps }
 			>
-				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
-				{ ( showUI || isHovered ) && <BlockRightMenu uid={ block.uid } /> }
-				{ showUI && isValid &&
+				{ ! duringInput && ( isHovered || isSelected ) && <BlockMover uids={ [ block.uid ] } /> }
+				{ ( showUI ) && <BlockRightMenu uid={ block.uid } /> }
+				{ isValid && ! duringInput && ( isHovered || isSelected ) &&
 					<CSSTransitionGroup
 						transitionName={ { appear: 'is-appearing', appearActive: 'is-appearing-active' } }
 						transitionAppear={ true }
@@ -380,11 +396,19 @@ class VisualEditorBlock extends Component {
 						component={ FirstChild }
 					>
 						<div className="editor-visual-editor__block-controls">
-							<BlockSwitcher uid={ block.uid } />
-							<Slot name="Formatting.Toolbar" />
-							<Toolbar className="editor-visual-editor__mobile-tools">
-								{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
-								{ ( showUI || isHovered ) && <BlockRightMenu uid={ block.uid } /> }
+							{ ! showUI && (
+								<Toolbar className="editor-visual-editor__toolbar-toggle">
+									<IconButton
+										icon="ellipsis"
+										onClick={ this.toggleToolbar }
+									/>
+								</Toolbar>
+							) }
+							{ showUI && <BlockSwitcher uid={ block.uid } /> }
+							{ showUI && <Slot name="Formatting.Toolbar" /> }
+							{ showUI && <Toolbar className="editor-visual-editor__mobile-tools">
+								<BlockMover uids={ [ block.uid ] } />
+								<BlockRightMenu uid={ block.uid } />
 								<IconButton
 									className="editor-visual-editor__mobile-toggle"
 									onClick={ this.toggleMobileControls }
@@ -392,7 +416,7 @@ class VisualEditorBlock extends Component {
 									label={ __( 'Toggle extra controls' ) }
 									icon="ellipsis"
 								/>
-							</Toolbar>
+							</Toolbar> }
 						</div>
 					</CSSTransitionGroup>
 				}
@@ -460,9 +484,6 @@ export default connect(
 				selected: true,
 				uid: ownProps.uid,
 			} );
-		},
-		onDeselect() {
-			dispatch( clearSelectedBlock() );
 		},
 
 		onStartTyping() {
