@@ -8,7 +8,7 @@ import { includes } from 'lodash';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, renderToString } from '@wordpress/element';
 import { Button, Placeholder, Spinner, SandBox } from '@wordpress/components';
 // TODO: This is a circular dependency between editor and blocks. This must be
 // updated, eventually to depend on published `@wordpress/url`
@@ -81,7 +81,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms } 
 				// 100% width for the preview so it fits nicely into the document, some "thumbnails" are
 				// acually the full size photo.
 				const photoPreview = <p><img src={ photo.thumbnail_url } alt={ photo.title } width="100%" /></p>;
-				return wp.element.renderToString( photoPreview );
+				return renderToString( photoPreview );
 			}
 
 			doServerSideRender( event ) {
