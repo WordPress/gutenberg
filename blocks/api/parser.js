@@ -54,6 +54,44 @@ export function getSourcedAttributes( rawContent, schema ) {
 }
 
 /**
+ * Returns value coerced to the specified JSON schema type string
+ *
+ * @see http://json-schema.org/latest/json-schema-validation.html#rfc.section.6.25
+ *
+ * @param  {*}      value Original value
+ * @param  {String} type  Type to coerce
+ * @return {*}            Coerced value
+ */
+export function asType( value, type ) {
+	switch ( type ) {
+		case 'string':
+			return String( value );
+
+		case 'boolean':
+			return Boolean( value );
+
+		case 'object':
+			return Object( value );
+
+		case 'null':
+			return null;
+
+		case 'array':
+			if ( Array.isArray( value ) ) {
+				return value;
+			}
+
+			return Array.from( value );
+
+		case 'integer':
+		case 'number':
+			return Number( value );
+	}
+
+	return value;
+}
+
+/**
  * Returns the block attributes of a registered block node given its type.
  *
  * @param  {?Object} blockType     Block type
@@ -62,14 +100,19 @@ export function getSourcedAttributes( rawContent, schema ) {
  * @return {Object}                All block attributes
  */
 export function getBlockAttributes( blockType, rawContent, attributes ) {
-	// Merge source values into attributes parsed from comment delimiters
-	attributes = {
-		...attributes,
-		...getSourcedAttributes( rawContent, blockType.attributes ),
-	};
+	// Retrieve additional attributes sourced from content
+	const sourcedAttributes = getSourcedAttributes(
+		rawContent,
+		blockType.attributes
+	);
 
 	return reduce( blockType.attributes, ( result, source, key ) => {
-		let value = attributes[ key ];
+		let value;
+		if ( sourcedAttributes.hasOwnProperty( key ) ) {
+			value = sourcedAttributes[ key ];
+		} else if ( attributes ) {
+			value = attributes[ key ];
+		}
 
 		// Return default if attribute value not assigned
 		if ( undefined === value ) {
@@ -82,35 +125,30 @@ export function getBlockAttributes( blockType, rawContent, attributes ) {
 			}
 		}
 
-		// Coerce to constructor value if source type
-		switch ( source.type ) {
-			case 'string':
-				value = String( value );
-				break;
+		// Coerce value to specified type
+		const coercedValue = asType( value, source.type );
 
-			case 'boolean':
-				value = Boolean( value );
-				break;
+		if ( 'development' === process.env.NODE_ENV &&
+				! sourcedAttributes.hasOwnProperty( key ) &&
+				value !== coercedValue ) {
+			// Only in case of sourcing attribute from content do we want to
+			// allow coercion, as comment attributes are serialized respecting
+			// original data type. In development environments, log if value
+			// coerced to specified type is not strictly equal. We still allow
+			// coerced value to be assigned into attributes to avoid errors.
+			//
+			// Example:
+			//   Number( 5 ) === 5
+			//   Number( '5' ) !== '5'
 
-			case 'object':
-				value = Object( value );
-				break;
-
-			case 'null':
-				value = null;
-				break;
-
-			case 'array':
-				value = Array.from( value );
-				break;
-
-			case 'integer':
-			case 'number':
-				value = Number( value );
-				break;
+			// eslint-disable-next-line no-console
+			console.error(
+				`Expected attribute "${ key }" of type ${ source.type } for ` +
+				`block type "${ blockType.name }" but received ${ typeof value }.`
+			);
 		}
 
-		result[ key ] = value;
+		result[ key ] = coercedValue;
 		return result;
 	}, {} );
 }

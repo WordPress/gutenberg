@@ -10,6 +10,7 @@ import { text, attr, html } from '../query';
 import {
 	isValidSource,
 	getBlockAttributes,
+	asType,
 	getSourcedAttributes,
 	createBlockWithFallback,
 	default as parse,
@@ -76,6 +77,44 @@ describe( 'block parser', () => {
 			const rawContent = '<span>Ribs <strong>& Chicken</strong></span>';
 
 			expect( getSourcedAttributes( rawContent, sources ) ).toEqual( {} );
+		} );
+	} );
+
+	describe( 'asType()', () => {
+		it( 'gracefully handles undefined type', () => {
+			expect( asType( 5 ) ).toBe( 5 );
+		} );
+
+		it( 'gracefully handles unhandled type', () => {
+			expect( asType( 5, '__UNHANDLED__' ) ).toBe( 5 );
+		} );
+
+		it( 'returns expected coerced values', () => {
+			const arr = [];
+			const obj = {};
+
+			expect( asType( '5', 'string' ) ).toBe( '5' );
+			expect( asType( 5, 'string' ) ).toBe( '5' );
+
+			expect( asType( 5, 'integer' ) ).toBe( 5 );
+			expect( asType( '5', 'integer' ) ).toBe( 5 );
+
+			expect( asType( 5, 'number' ) ).toBe( 5 );
+			expect( asType( '5', 'number' ) ).toBe( 5 );
+
+			expect( asType( true, 'boolean' ) ).toBe( true );
+			expect( asType( false, 'boolean' ) ).toBe( false );
+			expect( asType( '5', 'boolean' ) ).toBe( true );
+			expect( asType( 0, 'boolean' ) ).toBe( false );
+
+			expect( asType( null, 'null' ) ).toBe( null );
+			expect( asType( 0, 'null' ) ).toBe( null );
+
+			expect( asType( arr, 'array' ) ).toBe( arr );
+			expect( asType( new Set( [ 1, 2, 3 ] ), 'array' ) ).toEqual( [ 1, 2, 3 ] );
+
+			expect( asType( obj, 'object' ) ).toBe( obj );
+			expect( asType( {}, 'object' ) ).toEqual( {} );
 		} );
 	} );
 
