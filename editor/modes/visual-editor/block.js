@@ -87,6 +87,11 @@ class VisualEditorBlock extends Component {
 
 	componentDidMount() {
 		if ( this.props.focus ) {
+			// Already handled.
+			if ( this.node.contains( document.activeElement ) ) {
+				return;
+			}
+
 			this.node.focus();
 		}
 

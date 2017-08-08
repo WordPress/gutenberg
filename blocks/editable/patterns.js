@@ -31,6 +31,7 @@ export default function( editor ) {
 	const {
 		paste: pastePatterns,
 		enter: enterPatterns,
+		character: characterPatterns,
 		undefined: spacePatterns,
 	} = groupBy( getBlockTypes().reduce( ( acc, blockType ) => {
 		const transformsFrom = get( blockType, 'transforms.from', [] );
@@ -72,6 +73,7 @@ export default function( editor ) {
 			setTimeout( () => searchFirstText( spacePatterns ) );
 		} else if ( keyCode > 47 && ! ( keyCode >= 91 && keyCode <= 93 ) ) {
 			setTimeout( inline );
+			setTimeout( character );
 		}
 	}, true );
 
@@ -215,6 +217,37 @@ export default function( editor ) {
 			content: [ remainingText, ...drop( content ) ],
 			match: result,
 		} );
+
+		onReplace( [ block ] );
+	}
+
+	function character() {
+		if ( ! onReplace ) {
+			return;
+		}
+
+		// Merge text nodes.
+		editor.getBody().normalize();
+
+		const content = getContent();
+
+		if ( content.length !== 1 ) {
+			return;
+		}
+
+		const firstText = content[ 0 ];
+
+		if ( firstText.length !== 1 ) {
+			return;
+		}
+
+		const pattern = find( characterPatterns, { character: firstText } );
+
+		if ( ! pattern ) {
+			return;
+		}
+
+		const block = pattern.transform();
 
 		onReplace( [ block ] );
 	}

@@ -11,7 +11,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { Popover, withFocusReturn, withInstanceId, withSpokenMessages } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
-import { getCategories, getBlockTypes, BlockIcon } from '@wordpress/blocks';
+import { getCategories, getBlockTypes, BlockIcon } from '../../blocks';
 
 /**
  * Internal dependencies
@@ -29,6 +29,14 @@ export const searchBlocks = ( blocks, searchTerm ) => {
 	return blocks.filter( ( block ) =>
 		matchSearch( block.title ) || some( block.keywords, matchSearch )
 	);
+};
+
+const Wrapper = ( { position, children, ...props } ) => {
+	if ( ! position ) {
+		return <div { ...props }>{ children }</div>;
+	}
+
+	return <Popover position={ position } { ...props }>{ children }</Popover>;
 };
 
 export class InserterMenu extends Component {
@@ -297,8 +305,8 @@ export class InserterMenu extends Component {
 				onClick={ this.selectBlock( block.name ) }
 				ref={ this.bindReferenceNode( block.name ) }
 				tabIndex="-1"
-				onMouseEnter={ ! disabled && this.props.showInsertionPoint }
-				onMouseLeave={ ! disabled && this.props.hideInsertionPoint }
+				onMouseEnter={ !! this.props.position && ! disabled && this.props.showInsertionPoint }
+				onMouseLeave={ !! this.props.position && ! disabled && this.props.hideInsertionPoint }
 				disabled={ disabled }
 			>
 				<BlockIcon icon={ block.icon } />
@@ -314,13 +322,13 @@ export class InserterMenu extends Component {
 	}
 
 	render() {
-		const { position, instanceId } = this.props;
+		const { instanceId, position } = this.props;
 		const isSearching = this.state.filterValue;
 		const visibleBlocksByCategory = this.getVisibleBlocksByCategory( this.getBlocksForCurrentTab() );
 
 		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
-			<Popover position={ position } className="editor-inserter__menu">
+			<Wrapper position={ position } className="editor-inserter__menu">
 				<label htmlFor={ `editor-inserter__search-${ instanceId }` } className="screen-reader-text">
 					{ __( 'Search blocks' ) }
 				</label>
@@ -431,7 +439,7 @@ export class InserterMenu extends Component {
 						</button>
 					</div>
 				}
-			</Popover>
+			</Wrapper>
 		);
 		/* eslint-enable jsx-a11y/no-autofocus */
 	}
