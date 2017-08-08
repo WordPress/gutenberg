@@ -58,9 +58,7 @@ describe( 'InlineHelpPopover', () => {
 		expect( popover.length ).toBe( 1 );
 
 		expect( popover.prop( 'position' ) ).toBe( 'top left' );
-		expect( popover.find( '.components-popover__content' ).text() ).toBe(
-			'Test popover text'
-		);
+		expect( popover.prop( 'children' ) ).toBe( 'Test popover text' );
 
 		button.simulate( 'click' );
 		expect( inlineHelp.find( 'Popover' ).length ).toBe( 0 );
