@@ -6,7 +6,7 @@ import { times } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -28,7 +28,7 @@ registerBlockType( 'core/text-columns', {
 
 	icon: 'columns',
 
-	category: 'formatting',
+	category: 'layout',
 
 	attributes: {
 		content: query( 'p', children() ),
@@ -46,7 +46,7 @@ registerBlockType( 'core/text-columns', {
 		}
 	},
 
-	edit( { attributes, setAttributes, className, focus, setFocus, settings } ) {
+	edit( { attributes, setAttributes, className, focus, setFocus } ) {
 		const { width, content, columns } = attributes;
 
 		return [
@@ -55,7 +55,7 @@ registerBlockType( 'core/text-columns', {
 					<BlockAlignmentToolbar
 						value={ width }
 						onChange={ ( nextWidth ) => setAttributes( { width: nextWidth } ) }
-						wideControlsEnabled={ settings.wideImages }
+						controls={ [ 'center', 'wide', 'full' ] }
 					/>
 				</BlockControls>
 			),
@@ -75,7 +75,7 @@ registerBlockType( 'core/text-columns', {
 			),
 			<div className={ `${ className } align${ width } columns-${ columns }` } key="block">
 				{ times( columns, ( index ) =>
-					<div className="wp-block-text-columns__column">
+					<div className="wp-block-text-columns__column" key={ `column-${ index }` }>
 						<Editable
 							key={ `editable-${ index }` }
 							tagName="p"
