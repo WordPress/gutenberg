@@ -1,5 +1,9 @@
 .components-popover {
-	position: absolute;
+	&, * {
+		box-sizing: border-box;
+	}
+
+	position: fixed;
 	z-index: z-index( ".components-popover" );
 	left: 50%;
 
@@ -75,10 +79,6 @@
 
 	.components-popover.is-top & {
 		bottom: 100%;
-	}
-
-	.components-popover.is-bottom & {
-		top: 100%;
 	}
 
 	.components-popover.is-center & {
