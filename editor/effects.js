@@ -2,12 +2,12 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, uniqueId, debounce } from 'lodash';
+import { get, uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { serialize, getBlockType, switchToBlockType } from '@wordpress/blocks';
+import { parse, getBlockType, switchToBlockType } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -15,19 +15,18 @@ import { __ } from '@wordpress/i18n';
  */
 import { getGutenbergURL, getWPAdminURL } from './utils/url';
 import {
+	resetBlocks,
 	focusBlock,
 	replaceBlocks,
 	createSuccessNotice,
 	createErrorNotice,
-	autosave,
-	queueAutosave,
 	savePost,
 	editPost,
 } from './actions';
 import {
 	getCurrentPost,
 	getCurrentPostType,
-	getBlocks,
+	getEditedPostContent,
 	getPostEdits,
 	isCurrentPostPublished,
 	isEditedPostDirty,
@@ -43,19 +42,15 @@ export default {
 		const edits = getPostEdits( state );
 		const toSend = {
 			...edits,
-			content: serialize( getBlocks( state ) ),
+			content: getEditedPostContent( state ),
 			id: post.id,
 		};
 		const transactionId = uniqueId();
 
 		dispatch( {
-			type: 'CLEAR_POST_EDITS',
-			optimist: { type: BEGIN, id: transactionId },
-		} );
-		dispatch( {
 			type: 'UPDATE_POST',
 			edits: toSend,
-			optimist: { id: transactionId },
+			optimist: { type: BEGIN, id: transactionId },
 		} );
 		const Model = wp.api.getPostTypeModel( getCurrentPostType( state ) );
 		new Model( toSend ).save().done( ( newPost ) => {
@@ -247,15 +242,10 @@ export default {
 
 		dispatch( savePost() );
 	},
-	QUEUE_AUTOSAVE: debounce( ( action, store ) => {
-		store.dispatch( autosave() );
-	}, 10000 ),
-	UPDATE_BLOCK_ATTRIBUTES: () => queueAutosave(),
-	INSERT_BLOCKS: () => queueAutosave(),
-	MOVE_BLOCKS_DOWN: () => queueAutosave(),
-	MOVE_BLOCKS_UP: () => queueAutosave(),
-	REPLACE_BLOCKS: () => queueAutosave(),
-	REMOVE_BLOCKS: () => queueAutosave(),
-	EDIT_POST: () => queueAutosave(),
-	MARK_DIRTY: () => queueAutosave(),
+	RESET_POST( action ) {
+		const { post } = action;
+		if ( post.content ) {
+			return resetBlocks( parse( post.content.raw ) );
+		}
+	},
 };
