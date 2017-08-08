@@ -2,7 +2,7 @@
  * External Dependencies
  */
 import uuid from 'uuid/v4';
-import { partial } from 'lodash';
+import { partial, castArray } from 'lodash';
 
 /**
  * Returns an action object used in signalling that blocks state should be
@@ -70,6 +70,18 @@ export function replaceBlocks( uids, blocks ) {
 		uids,
 		blocks,
 	};
+}
+
+/**
+ * Returns an action object signalling that a single block should be replaced
+ * with one or more replacement blocks.
+ *
+ * @param  {String}            uid   Block UID to replace
+ * @param  {(Object|Object[])} block Replacement block(s)
+ * @return {Object}                  Action object
+ */
+export function replaceBlock( uid, block ) {
+	return replaceBlocks( [ uid ], castArray( block ) );
 }
 
 export function insertBlock( block, after ) {
