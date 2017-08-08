@@ -19,3 +19,4 @@ import './categories';
 import './cover-image';
 import './cover-text';
 import './verse';
+import './inserter';
