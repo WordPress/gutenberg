@@ -174,6 +174,7 @@ export class DropdownMenu extends Component {
 			label,
 			menuLabel,
 			controls,
+			tabIndex,
 		} = this.props;
 
 		if ( ! controls || ! controls.length ) {
@@ -198,6 +199,7 @@ export class DropdownMenu extends Component {
 					aria-haspopup="true"
 					aria-expanded={ this.state.open }
 					label={ label }
+					tabIndex={ tabIndex }
 					ref={ this.bindReferenceNode( 'toggle' ) }
 				>
 					<Dashicon icon="arrow-down" />
