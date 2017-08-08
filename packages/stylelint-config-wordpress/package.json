@@ -37,8 +37,8 @@
   },
   "devDependencies": {
     "eslint": "^4.1.0",
-    "eslint-plugin-wordpress": "git://github.com/WordPress-Coding-Standards/eslint-plugin-wordpress.git#b65ae0cea1199c9714641ed3be7ea98fcb27dd6c",
     "eslint-plugin-jest": "^20.0.0",
+    "eslint-plugin-wordpress": "git://github.com/WordPress-Coding-Standards/eslint-plugin-wordpress.git#b65ae0cea1199c9714641ed3be7ea98fcb27dd6c",
     "jest": "^20.0.0",
     "lodash": "^4.17.4",
     "npm-run-all": "^4.0.0",
@@ -47,7 +47,8 @@
     "remark-preset-lint-consistent": "^2.0.0",
     "remark-preset-lint-recommended": "^3.0.0",
     "strip-ansi": "^4.0.0",
-    "stylelint": "^8.0.0"
+    "stylelint": "^8.0.0",
+    "stylelint-find-rules": "^0.8.0"
   },
   "peerDependencies": {
     "stylelint": "^7.10.1"
@@ -60,6 +61,7 @@
     "lint": "npm-run-all --parallel lint:*",
     "pretest": "npm run lint",
     "release": "npmpub --verbose",
+    "stylelint-find-unused-rules": "stylelint-find-rules --config index.js",
     "test": "jest",
     "watch": "jest --watch"
   },
