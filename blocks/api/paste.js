@@ -79,12 +79,7 @@ export function normaliseToBlockLevelNodes( nodes ) {
 }
 
 export default function( nodes ) {
-	const log = ( nodes ) => {
-		console.log( nodes );
-		return nodes;
-	};
-
-	const prepare = compose( [ normaliseToBlockLevelNodes, log, removeUnsupportedEls, stripAttributes, log ] );
+	const prepare = compose( [ normaliseToBlockLevelNodes, removeUnsupportedEls, stripAttributes ] );
 
 	return prepare( nodes ).map( ( node ) => {
 		const block = getBlockTypes().reduce( ( acc, blockType ) => {
