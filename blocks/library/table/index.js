@@ -61,9 +61,9 @@ registerBlockType( 'core/table', {
 	},
 
 	save( { attributes } ) {
-		const { content } = attributes;
+		const { content, align } = attributes;
 		return (
-			<table>
+			<table className={ align && `align${ align }` }>
 				{ content }
 			</table>
 		);
