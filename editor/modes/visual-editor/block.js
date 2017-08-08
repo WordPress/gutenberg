@@ -6,6 +6,7 @@ import classnames from 'classnames';
 import { Slot } from 'react-slot-fill';
 import { partial } from 'lodash';
 import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
+import tinymce from 'tinymce';
 
 /**
  * WordPress dependencies
@@ -73,7 +74,6 @@ class VisualEditorBlock extends Component {
 		this.onPointerDown = this.onPointerDown.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onKeyUp = this.onKeyUp.bind( this );
-		this.handleArrowKey = this.handleArrowKey.bind( this );
 		this.toggleMobileControls = this.toggleMobileControls.bind( this );
 		this.onBlockError = this.onBlockError.bind( this );
 
@@ -252,11 +252,78 @@ class VisualEditorBlock extends Component {
 	onKeyDown( event ) {
 		const { keyCode, target } = event;
 
-		this.handleArrowKey( event );
+		if ( keyCode === UP || keyCode === DOWN || keyCode === LEFT || keyCode === RIGHT ) {
+			const direction = keyCode === UP || keyCode === LEFT ? 'previous' : 'next';
+			const nextBlock = this.node[ `${ direction }Sibling` ];
 
-		if ( keyCode === UP || keyCode === LEFT || keyCode === DOWN || keyCode === RIGHT ) {
-			const selection = window.getSelection();
-			this.lastRange = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+			if ( target === this.node ) {
+				nextBlock.focus();
+			} else if ( keyCode === UP || keyCode === DOWN ) {
+				const selection = window.getSelection();
+				const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+
+				if ( ! range ) {
+					return;
+				}
+
+				const rects = range.getClientRects();
+
+				if ( ! rects.length ) {
+					return;
+				}
+
+				const rangeRect = rects[ 0 ];
+				const buffer = rangeRect.height / 2;
+				const editableRect = target.getBoundingClientRect();
+
+				// Too low.
+				if ( keyCode === UP && rangeRect.top - buffer > editableRect.top ) {
+					return;
+				}
+
+				// Too high.
+				if ( keyCode === DOWN && rangeRect.bottom + buffer < editableRect.bottom ) {
+					return;
+				}
+
+				const selector = '.editor-visual-editor [contenteditable="true"]';
+				const editableNodes = Array.from( document.querySelectorAll( selector ) );
+
+				if ( keyCode === UP ) {
+					editableNodes.reverse();
+				}
+
+				const index = editableNodes.indexOf( target );
+				const nextEditableNode = editableNodes[ index + 1 ];
+
+				if ( ! nextBlock ) {
+					return;
+				}
+
+				event.preventDefault();
+
+				if ( ! nextEditableNode ) {
+					nextBlock.focus();
+					return;
+				}
+
+				if ( ! nextBlock.contains( nextEditableNode ) ) {
+					nextBlock.focus();
+					return;
+				}
+
+				const editor = tinymce.get( nextEditableNode.id );
+
+				editor.focus();
+
+				window.setTimeout( () => {
+					const nextEditableRect = nextEditableNode.getBoundingClientRect();
+					const x = rangeRect.left;
+					const y = keyCode === UP ? nextEditableRect.bottom - buffer : nextEditableRect.top + buffer;
+
+					editor.selection.placeCaretAt( x, y );
+				} );
+			}
 		}
 
 		if ( ENTER === keyCode && target === this.node ) {
@@ -270,49 +337,6 @@ class VisualEditorBlock extends Component {
 
 	onKeyUp( event ) {
 		this.removeOrDeselect( event );
-		this.handleArrowKey( event );
-	}
-
-	handleArrowKey( event ) {
-		const { keyCode, target } = event;
-		const moveUp = ( keyCode === UP || keyCode === LEFT );
-		const moveDown = ( keyCode === DOWN || keyCode === RIGHT );
-		const wrapperClassname = '.editor-visual-editor';
-		const selectors = [
-			'*[contenteditable="true"]',
-			'*[tabindex]',
-			'textarea',
-			'input',
-		].map( ( selector ) => `${ wrapperClassname } ${ selector }` ).join( ',' );
-
-		if ( moveUp || moveDown ) {
-			const selection = window.getSelection();
-			const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
-
-			// If there's no movement, so we're either at the end of start, or
-			// no text input at all.
-			if ( range !== this.lastRange ) {
-				return;
-			}
-
-			const focusableNodes = Array.from( document.querySelectorAll( selectors ) );
-
-			if ( moveUp ) {
-				focusableNodes.reverse();
-			}
-
-			const targetNode = focusableNodes
-				.slice( focusableNodes.indexOf( target ) )
-				.reduce( ( result, node ) => {
-					return result || ( node.contains( target ) ? null : node );
-				}, null );
-
-			if ( targetNode ) {
-				targetNode.focus();
-			}
-		}
-
-		delete this.lastRange;
 	}
 
 	toggleMobileControls() {
