@@ -57,12 +57,14 @@ export class DropdownMenu extends Component {
 	closeMenu() {
 		this.setState( {
 			open: false,
+			activeIndex: null,
 		} );
 	}
 
 	toggleMenu() {
 		this.setState( {
 			open: ! this.state.open,
+			activeIndex: this.state.open ? null : 0,
 		} );
 	}
 
@@ -150,12 +152,7 @@ export class DropdownMenu extends Component {
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
-		const { open, activeIndex } = this.state;
-
-		// Focus the first item when the menu opens.
-		if ( ! prevState.open && open ) {
-			this.focusIndex( 0 );
-		}
+		const { activeIndex } = this.state;
 
 		// Change focus to active index
 		const { menu } = this.nodes;
