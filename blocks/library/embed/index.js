@@ -10,9 +10,7 @@ import { includes } from 'lodash';
 import { __, sprintf } from '@wordpress/i18n';
 import { Component, renderToString } from '@wordpress/element';
 import { Button, Placeholder, Spinner, SandBox } from '@wordpress/components';
-// TODO: This is a circular dependency between editor and blocks. This must be
-// updated, eventually to depend on published `@wordpress/url`
-import { addQueryArgs } from '../../../editor/utils/url';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
