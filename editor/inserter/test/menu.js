@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { mount } from 'enzyme';
 import { noop } from 'lodash';
 
 /**
@@ -86,8 +86,9 @@ describe( 'InserterMenu', () => {
 	} );
 
 	it( 'should show the recent tab by default', () => {
-		const wrapper = shallow(
+		const wrapper = mount(
 			<InserterMenu
+				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [] }
 				recentlyUsedBlocks={ [] }
@@ -103,8 +104,9 @@ describe( 'InserterMenu', () => {
 	} );
 
 	it( 'should show the recently used blocks in the recent tab', () => {
-		const wrapper = shallow(
+		const wrapper = mount(
 			<InserterMenu
+				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [] }
 				recentlyUsedBlocks={ [ advancedTextBlock ] }
@@ -115,12 +117,13 @@ describe( 'InserterMenu', () => {
 		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
 		expect( visibleBlocks.length ).toBe( 1 );
 		expect( visibleBlocks.at( 0 ).childAt( 0 ).name() ).toBe( 'BlockIcon' );
-		expect( visibleBlocks.at( 0 ).childAt( 1 ).text() ).toBe( 'Advanced Text' );
+		expect( visibleBlocks.at( 0 ).text() ).toBe( 'Advanced Text' );
 	} );
 
 	it( 'should show blocks from the embed category in the embed tab', () => {
-		const wrapper = shallow(
+		const wrapper = mount(
 			<InserterMenu
+				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [] }
 				recentlyUsedBlocks={ [] }
@@ -136,13 +139,14 @@ describe( 'InserterMenu', () => {
 
 		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
 		expect( visibleBlocks.length ).toBe( 2 );
-		expect( visibleBlocks.at( 0 ).childAt( 1 ).text() ).toBe( 'YouTube' );
-		expect( visibleBlocks.at( 1 ).childAt( 1 ).text() ).toBe( 'A Text Embed' );
+		expect( visibleBlocks.at( 0 ).text() ).toBe( 'YouTube' );
+		expect( visibleBlocks.at( 1 ).text() ).toBe( 'A Text Embed' );
 	} );
 
 	it( 'should show all blocks except embeds in the blocks tab', () => {
-		const wrapper = shallow(
+		const wrapper = mount(
 			<InserterMenu
+				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [] }
 				recentlyUsedBlocks={ [] }
@@ -158,15 +162,16 @@ describe( 'InserterMenu', () => {
 
 		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
 		expect( visibleBlocks.length ).toBe( 4 );
-		expect( visibleBlocks.at( 0 ).childAt( 1 ).text() ).toBe( 'Text' );
-		expect( visibleBlocks.at( 1 ).childAt( 1 ).text() ).toBe( 'Advanced Text' );
-		expect( visibleBlocks.at( 2 ).childAt( 1 ).text() ).toBe( 'Some Other Block' );
-		expect( visibleBlocks.at( 3 ).childAt( 1 ).text() ).toBe( 'More' );
+		expect( visibleBlocks.at( 0 ).text() ).toBe( 'Text' );
+		expect( visibleBlocks.at( 1 ).text() ).toBe( 'Advanced Text' );
+		expect( visibleBlocks.at( 2 ).text() ).toBe( 'Some Other Block' );
+		expect( visibleBlocks.at( 3 ).text() ).toBe( 'More' );
 	} );
 
 	it( 'should disable already used blocks with `usedOnce`', () => {
-		const wrapper = shallow(
+		const wrapper = mount(
 			<InserterMenu
+				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [ { name: moreBlock.name } ] }
 				recentlyUsedBlocks={ [] }
@@ -179,12 +184,13 @@ describe( 'InserterMenu', () => {
 
 		const disabledBlocks = wrapper.find( '.editor-inserter__block[disabled]' );
 		expect( disabledBlocks.length ).toBe( 1 );
-		expect( disabledBlocks.at( 0 ).childAt( 1 ).text() ).toBe( 'More' );
+		expect( disabledBlocks.at( 0 ).text() ).toBe( 'More' );
 	} );
 
 	it( 'should allow searching for blocks', () => {
-		const wrapper = shallow(
+		const wrapper = mount(
 			<InserterMenu
+				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [] }
 				recentlyUsedBlocks={ [] }
@@ -198,14 +204,15 @@ describe( 'InserterMenu', () => {
 
 		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
 		expect( visibleBlocks.length ).toBe( 3 );
-		expect( visibleBlocks.at( 0 ).childAt( 1 ).text() ).toBe( 'Text' );
-		expect( visibleBlocks.at( 1 ).childAt( 1 ).text() ).toBe( 'Advanced Text' );
-		expect( visibleBlocks.at( 2 ).childAt( 1 ).text() ).toBe( 'A Text Embed' );
+		expect( visibleBlocks.at( 0 ).text() ).toBe( 'Text' );
+		expect( visibleBlocks.at( 1 ).text() ).toBe( 'Advanced Text' );
+		expect( visibleBlocks.at( 2 ).text() ).toBe( 'A Text Embed' );
 	} );
 
 	it( 'should trim whitespace of search terms', () => {
-		const wrapper = shallow(
+		const wrapper = mount(
 			<InserterMenu
+				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [] }
 				recentlyUsedBlocks={ [] }
@@ -219,9 +226,9 @@ describe( 'InserterMenu', () => {
 
 		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
 		expect( visibleBlocks.length ).toBe( 3 );
-		expect( visibleBlocks.at( 0 ).childAt( 1 ).text() ).toBe( 'Text' );
-		expect( visibleBlocks.at( 1 ).childAt( 1 ).text() ).toBe( 'Advanced Text' );
-		expect( visibleBlocks.at( 2 ).childAt( 1 ).text() ).toBe( 'A Text Embed' );
+		expect( visibleBlocks.at( 0 ).text() ).toBe( 'Text' );
+		expect( visibleBlocks.at( 1 ).text() ).toBe( 'Advanced Text' );
+		expect( visibleBlocks.at( 2 ).text() ).toBe( 'A Text Embed' );
 	} );
 } );
 
