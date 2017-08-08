@@ -13,15 +13,10 @@ import {
 
 describe( 'EnableTrackingPrompt', () => {
 	const originalSetUserSetting = window.setUserSetting;
-	const originalDocumentAddEventListener = document.addEventListener;
-	let eventMap = {};
 	let props = {};
 
 	beforeEach( () => {
 		window.setUserSetting = jest.fn();
-		document.addEventListener = jest.fn( ( event, cb ) => {
-			eventMap[ event ] = cb;
-		} );
 		props = {
 			bumpStat: jest.fn(),
 			removeNotice: jest.fn(),
@@ -30,8 +25,6 @@ describe( 'EnableTrackingPrompt', () => {
 
 	afterEach( () => {
 		window.setUserSetting = originalSetUserSetting;
-		document.addEventListener = originalDocumentAddEventListener;
-		eventMap = {};
 	} );
 
 	it( 'should render a prompt with Yes, No, and More info buttons', () => {
@@ -82,39 +75,5 @@ describe( 'EnableTrackingPrompt', () => {
 			.not.toHaveBeenCalled();
 		expect( props.removeNotice )
 			.toHaveBeenCalledWith( TRACKING_PROMPT_NOTICE_ID );
-	} );
-
-	it( 'should show and hide a popover when clicking More info', () => {
-		const prompt = mount(
-			<EnableTrackingPrompt { ...props } />
-		);
-
-		expect( prompt.find( 'Popover' ).length ).toBe( 0 );
-
-		const buttonMoreInfo = prompt.find( 'Button' )
-			.filterWhere( node => node.text() === 'More info' );
-
-		// Click the "More info" button to show the info popover
-		buttonMoreInfo.simulate( 'click' );
-		expect( prompt.find( 'Popover' ).length ).toBe( 1 );
-
-		// Click the "More info" button to hide the info popover
-		buttonMoreInfo.simulate( 'click' );
-		expect( prompt.find( 'Popover' ).length ).toBe( 0 );
-
-		// Click the "More info" button to show the info popover
-		buttonMoreInfo.simulate( 'click' );
-		expect( prompt.find( 'Popover' ).length ).toBe( 1 );
-
-		// Click outside the "More info" button to hide the info popover
-		eventMap.click( { target: document.body } );
-		expect( prompt.find( 'Popover' ).length ).toBe( 0 );
-
-		expect( window.setUserSetting )
-			.not.toHaveBeenCalled();
-		expect( props.bumpStat )
-			.not.toHaveBeenCalled();
-		expect( props.removeNotice )
-			.not.toHaveBeenCalled();
 	} );
 } );
