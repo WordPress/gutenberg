@@ -71,45 +71,54 @@ WP_Block_Void
   }
 
 WP_Block_Balanced
-  = s:WP_Block_Start ts:(!WP_Block_End c:Any {
-    /** <?php return $c; ?> **/
-    return c;
-  })* e:WP_Block_End & {
-    /** <?php return $s['blockName'] === $e['blockName']; ?> **/
-    return s.blockName === e.blockName;
-  }
+  = s:WP_Block_Start
+    html:(ts:(!WP_Block_End t:HTML_Token {
+      /** <?php return $t; ?> **/
+      return t
+    })* {
+      /** <?php return array($ts, text()); ?> **/
+      return [ts, text()]
+    })
+    e:WP_Block_End & {
+      /** <?php return $s['blockName'] === $e['blockName']; ?> **/
+      return s.blockName === e.blockName;
+    }
   {
     /** <?php
     return array(
       'blockName'  => $s['blockName'],
       'attrs'      => $s['attrs'],
-      'rawContent' => implode( '', $ts ),
+      'children'   => $html[0],
+      'rawContent' => $html[1],
     );
     ?> **/
 
     return {
       blockName: s.blockName,
       attrs: s.attrs,
-      rawContent: ts.join( '' )
+      children: html[0],
+      rawContent: html[1]
     };
   }
 
 WP_Block_Html
-  = ts:(!WP_Block_Balanced !WP_Block_Void !WP_Tag_More c:Any {
-    /** <?php return $c; ?> **/
-    return c;
-  })+
+  = html:(t:(!WP_Block_Start html:HTML_Token { /** <?php return $html; ?> **/ return html } ) {
+      /** <?php return array( $t, text() ); ?> **/
+      return [ t, text() ]
+    })
   {
     /** <?php
     return array(
       'attrs'      => array(),
-      'rawContent' => implode( '', $ts ),
+      'children'   => $html[0],
+      'rawContent' => $html[1],
     );
     ?> **/
 
     return {
       attrs: {},
-      rawContent: ts.join( '' )
+      children: html[0],
+      rawContent: html[1]
     }
   }
 
@@ -155,6 +164,163 @@ WP_Block_Attributes
     /** <?php return json_decode( $attrs, true ); ?> **/
     return maybeJSON( attrs );
   }
+ 
+HTML_Token
+  = HTML_Comment
+  / HTML_Tag_Void
+  / HTML_Tag_Balanced
+  / $([^<]+)
+
+HTML_Comment
+  = "<!--" innerText:$((!"-->" .)*) "-->"
+  { /**
+    <?php return array(
+      'type'      => 'HTML_Comment',
+      'innerText' => $innerText,
+    ); ?>
+    **/
+  
+    return {
+      type: "HTML_Comment",
+      innerText
+    }
+  }
+
+HTML_Tag_Void
+  = t:HTML_Tag_Open
+  & {
+      /** <?php
+        return in_array( strtolower( $t->name ), array(
+          'br',
+          'col',
+          'embed',
+          'hr',
+          'img',
+          'input',
+        ) ) && $t->isVoid;
+      ?> **/
+      
+      return undefined !== {
+        'br': true,
+        'col': true,
+        'embed': true,
+        'hr': true,
+        'img': true,
+        'input': true
+      }[ t.name.toLowerCase() ] && t.isVoid
+    }
+  {
+    /** <?php
+    return array(
+      'type'  => 'HTML_Void_Tag',
+      'name'  => $t->name,
+      'attrs' => $t->attrs,
+    );
+    ?> **/
+  
+    return {
+      type: 'HTML_Void_Tag',
+      name: t.name,
+      attrs: t.attrs,
+    }
+  }
+
+HTML_Tag_Balanced
+  = s:HTML_Tag_Open
+    children:HTML_Token*
+    e:HTML_Tag_Close & { /** <?php return $s->name === $e->name; ?> **/ return s.name === e.name }
+  {
+    /** <?php
+    return array(
+      'type'     => 'HTML_Tag',
+      'name'     => $s->name,
+      'attrs'    => $s->attrs,
+      'children' => $children,
+    );
+    ?> **/
+    
+    return {
+      type: 'HTML_Tag',
+      name: s.name,
+      attrs: s.attrs,
+      children
+    }
+  }
+  
+HTML_Tag_Open
+  = "<" name:HTML_Tag_Name attrs:HTML_Attribute_List _* isVoid:"/"? ">"
+  { /** <?php
+    return array(
+      'type'   => 'HTML_Tag_Open',
+      'isVoid' => (bool) $isVoid,
+      'name'   => $name,
+      'attrs'  => $attrs,
+    );
+    ?> **/
+  
+    return {
+      type: 'HTML_Tag_Open',
+      isVoid,
+      name,
+      attrs
+    }
+  }
+
+HTML_Tag_Close
+  = "</" name:HTML_Tag_Name _* ">"
+  { /** <?php
+    return array(
+      'type' => 'HTML_Tag_Close',
+      'name' => $name,
+    );
+    ?> **/
+    
+    return {
+      type: 'HTML_Tag_Close',
+      name
+    }
+  }
+  
+HTML_Tag_Name
+  = $(ASCII_Letter ASCII_AlphaNumeric*)
+  
+HTML_Attribute_List
+  = as:(_+ a:HTML_Attribute_Item { /** <?php return $a; ?> **/ return a })*
+  { /** <?php
+    $attrs = array();
+    foreach ( $as as $attr ) {
+      $attrs[ $attr[0] ] = $attr[1];
+    }
+    return $attrs;
+    ?> **/
+  
+    return as.reduce( ( attrs, [ name, value ] ) => Object.assign(
+      attrs,
+      { [ name ]: value }
+    ), {} )
+  }
+  
+HTML_Attribute_Item
+  = HTML_Attribute_Quoted
+  / HTML_Attribute_Unquoted
+  / HTML_Attribute_Empty
+  
+HTML_Attribute_Empty
+  = name:HTML_Attribute_Name
+  { /** <?php return array( $name, true ); ?> **/ return [ name, true ] }
+  
+HTML_Attribute_Unquoted
+  = name:HTML_Attribute_Name _* "=" _* value:$([a-zA-Z0-9]+)
+  { /** <?php return array( $name, $value ); ?> **/ return [ name, value ] }
+  
+HTML_Attribute_Quoted
+  = name:HTML_Attribute_Name _* "=" _* '"' value:$((!'"' .)*) '"'
+  { /** <?php return array( $name, $value ); ?> **/ return [ name, value ] }
+  / name:HTML_Attribute_Name _* "=" _* "'" value:$((!"'" .)*) "'"
+  { /** <?php return array( $name, $value ); ?> **/ return [ name, value ] }
+  
+HTML_Attribute_Name
+  = $([a-zA-Z0-9:.]+)
 
 ASCII_AlphaNumeric
   = ASCII_Letter
