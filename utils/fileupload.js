@@ -1,7 +1,5 @@
 
 export default function fileUpload( files, setAttributes ) {
-	console.log("Here!", files, setAttributes);
-
 	const media = files[ 0 ];
 
 	// Only allow image uploads
