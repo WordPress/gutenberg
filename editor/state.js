@@ -315,17 +315,19 @@ export function isTyping( state = false, action ) {
  * @param  {Object} action Dispatched action
  * @return {Object}        Updated state
  */
-export function blockSelection( state = { start: null, end: null }, action ) {
+export function blockSelection( state = { start: null, end: null, focus: null }, action ) {
 	switch ( action.type ) {
 		case 'CLEAR_SELECTED_BLOCK':
 			return {
 				start: null,
 				end: null,
+				focus: null,
 			};
 		case 'MULTI_SELECT':
 			return {
 				start: action.start,
 				end: action.end,
+				focus: null,
 			};
 		case 'SELECT_BLOCK':
 			return {
