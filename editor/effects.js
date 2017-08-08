@@ -20,6 +20,7 @@ import {
 	replaceBlocks,
 	createSuccessNotice,
 	createErrorNotice,
+	removeNotice,
 	savePost,
 	editPost,
 } from './actions';
@@ -33,6 +34,9 @@ import {
 	isEditedPostNew,
 	isEditedPostSaveable,
 } from './selectors';
+
+const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
+const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
 
 export default {
 	REQUEST_POST_UPDATE( action, store ) {
@@ -52,6 +56,7 @@ export default {
 			edits: toSend,
 			optimist: { type: BEGIN, id: transactionId },
 		} );
+		dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
 		const Model = wp.api.getPostTypeModel( getCurrentPostType( state ) );
 		new Model( toSend ).save().done( ( newPost ) => {
 			dispatch( {
@@ -101,7 +106,8 @@ export default {
 					<span>{ noticeMessage }</span>
 					{ ' ' }
 					<a href={ post.link } target="_blank">{ __( 'View post' ) }</a>
-				</p>
+				</p>,
+				{ id: SAVE_POST_NOTICE_ID }
 			) );
 		}
 
@@ -131,12 +137,13 @@ export default {
 		const noticeMessage = ! isPublished && publishStatus.indexOf( edits.status ) !== -1
 			? messages[ edits.status ]
 			: __( 'Updating failed' );
-		dispatch( createErrorNotice( noticeMessage ) );
+		dispatch( createErrorNotice( noticeMessage, { id: SAVE_POST_NOTICE_ID } ) );
 	},
 	TRASH_POST( action, store ) {
 		const { dispatch, getState } = store;
 		const { postId } = action;
 		const Model = wp.api.getPostTypeModel( getCurrentPostType( getState() ) );
+		dispatch( removeNotice( TRASH_POST_NOTICE_ID ) );
 		new Model( { id: postId } ).destroy().then(
 			() => {
 				dispatch( {
@@ -170,7 +177,7 @@ export default {
 	},
 	TRASH_POST_FAILURE( action, store ) {
 		const message = action.error.message && action.error.code !== 'unknown_error' ? action.error.message : __( 'Trashing failed' );
-		store.dispatch( createErrorNotice( message ) );
+		store.dispatch( createErrorNotice( message, { id: TRASH_POST_NOTICE_ID } ) );
 	},
 	MERGE_BLOCKS( action, store ) {
 		const { dispatch } = store;
