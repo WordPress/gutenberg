@@ -307,7 +307,7 @@ class VisualEditorBlock extends Component {
 					return;
 				}
 
-				if ( ! nextBlock.contains( nextEditableNode ) ) {
+				if ( ! this.node.contains( nextEditableNode ) && ! nextBlock.contains( nextEditableNode ) ) {
 					nextBlock.focus();
 					return;
 				}
