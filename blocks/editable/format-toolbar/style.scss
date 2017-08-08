@@ -13,6 +13,7 @@
 	font-family: $default-font;
 	font-size: $default-font-size;
 	line-height: $default-line-height;
+	z-index: z-index( '.blocks-format-toolbar__link-modal' );
 }
 
 .blocks-format-toolbar__link-value {
