@@ -26,6 +26,8 @@
     "test": "jest",
     "test:coverage": "jest --coverage",
     "test:coverage-ci": "jest --coverage && codecov",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "publish:dev": "npm run build-clean && npm run build && lerna publish --npm-tag next",
+    "publish:prod": "npm run build-clean && npm run build && lerna publish"
   }
 }
