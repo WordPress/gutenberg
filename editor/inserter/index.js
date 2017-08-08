@@ -16,7 +16,7 @@ import { createBlock } from '@wordpress/blocks';
  */
 import InserterMenu from './menu';
 import { getBlockInsertionPoint, getEditorMode } from '../selectors';
-import { insertBlock, hideInsertionPoint, bumpStat } from '../actions';
+import { insertBlock, hideInsertionPoint } from '../actions';
 
 class Inserter extends Component {
 	constructor() {
@@ -60,14 +60,11 @@ class Inserter extends Component {
 			const {
 				insertionPoint,
 				onInsertBlock,
-				onBumpStat,
 			} = this.props;
 			onInsertBlock(
 				name,
 				insertionPoint
 			);
-			onBumpStat( 'add_block_inserter', name.replace( /\//g, '__' ) );
-			onBumpStat( 'add_block_total', name.replace( /\//g, '__' ) );
 		}
 
 		this.close();
@@ -115,9 +112,6 @@ export default connect(
 				createBlock( name ),
 				after
 			) );
-		},
-		onBumpStat( group, name ) {
-			dispatch( bumpStat( group, name ) );
 		},
 	} )
 )( Inserter );
