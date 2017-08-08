@@ -77,7 +77,6 @@ registerBlockType( 'core/text-columns', {
 				{ times( columns, ( index ) =>
 					<div className="wp-block-text-columns__column" key={ `column-${ index }` }>
 						<Editable
-							key={ `editable-${ index }` }
 							tagName="p"
 							value={ content && content[ index ] }
 							onChange={ ( nextContent ) => {
@@ -104,7 +103,7 @@ registerBlockType( 'core/text-columns', {
 		return (
 			<div className={ `align${ width } columns-${ columns }` }>
 				{ times( columns, ( index ) =>
-					<div className="wp-block-text-columns__column">
+					<div className="wp-block-text-columns__column" key={ `column-${ index }` }>
 						<p>{ content && content[ index ] }</p>
 					</div>
 				) }
