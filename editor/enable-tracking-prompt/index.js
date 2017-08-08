@@ -60,9 +60,10 @@ export class EnableTrackingPrompt extends Component {
 						className="enable-tracking-prompt__more-info"
 						text={ __( 'More info' ) }
 						popoverPosition="bottom right"
-						popoverText={ __( 'Usage data is completely anonymous, does not include your post content, and will only be used to improve the editor.' ) }
 						popoverClassName="enable-tracking-prompt__clarification"
-					/>
+					>
+						{ __( 'Usage data is completely anonymous, does not include your post content, and will only be used to improve the editor.' ) }
+					</InlineHelpPopover>
 				</div>
 			</div>
 		);

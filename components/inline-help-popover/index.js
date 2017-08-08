@@ -43,8 +43,8 @@ export class InlineHelpPopover extends Component {
 			className,
 			text,
 			popoverPosition = 'bottom right',
-			popoverText,
 			popoverClassName,
+			children,
 		} = this.props;
 
 		const rootClasses = classnames(
@@ -69,7 +69,7 @@ export class InlineHelpPopover extends Component {
 						className={ popoverClasses }
 						position={ popoverPosition }
 					>
-						{ popoverText }
+						{ children }
 					</Popover>
 				) }
 			</span>
