@@ -58,7 +58,7 @@ export class EnableTrackingPrompt extends Component {
 					</Button>
 					<InlineHelpPopover
 						className="enable-tracking-prompt__more-info"
-						text={ __( 'More info' ) }
+						buttonText={ __( 'More info' ) }
 						popoverPosition="bottom right"
 						popoverClassName="enable-tracking-prompt__clarification"
 					>

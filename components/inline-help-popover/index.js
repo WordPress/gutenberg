@@ -41,7 +41,7 @@ export class InlineHelpPopover extends Component {
 	render() {
 		const {
 			className,
-			text,
+			buttonText,
 			popoverPosition = 'bottom right',
 			popoverClassName,
 			children,
@@ -62,7 +62,7 @@ export class InlineHelpPopover extends Component {
 					onClick={ this.togglePopover }
 					aria-expanded={ this.state.showPopover }
 				>
-					{ text }
+					{ buttonText }
 				</Button>
 				{ this.state.showPopover && (
 					<Popover
