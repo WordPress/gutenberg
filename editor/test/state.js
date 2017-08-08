@@ -722,7 +722,7 @@ describe( 'state', () => {
 				end: 'chicken',
 			} );
 
-			expect( state ).toEqual( { start: 'ribs', end: 'chicken' } );
+			expect( state ).toEqual( { start: 'ribs', end: 'chicken', focus: null } );
 		} );
 
 		it( 'should unset multi selection and select inserted block', () => {
@@ -732,7 +732,7 @@ describe( 'state', () => {
 				type: 'CLEAR_SELECTED_BLOCK',
 			} );
 
-			expect( state1 ).toEqual( { start: null, end: null } );
+			expect( state1 ).toEqual( { start: null, end: null, focus: null } );
 
 			const state3 = blockSelection( original, {
 				type: 'INSERT_BLOCKS',
