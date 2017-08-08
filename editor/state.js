@@ -290,6 +290,22 @@ export function currentPost( state = {}, action ) {
 }
 
 /**
+ * Reducer returning information about the metaboxes for the current post.
+ *
+ * @param  {Object} state  Current state
+ * @param  {Object} action Dispatched action
+ * @return {Object}        Updated state
+ */
+export function currentPostMetaboxes( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RESET_METABOXES':
+			return action.metaboxes;
+	}
+
+	return state;
+}
+
+/**
  * Reducer returning selected block state.
  *
  * @param  {Object} state  Current state
@@ -538,6 +554,7 @@ export function createReduxStore() {
 	const reducer = optimist( combineReducers( {
 		editor,
 		currentPost,
+		currentPostMetaboxes,
 		selectedBlock,
 		isTyping,
 		multiSelectedBlocks,
