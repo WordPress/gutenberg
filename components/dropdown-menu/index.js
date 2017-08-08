@@ -116,8 +116,13 @@ export class DropdownMenu extends Component {
 		if ( this.state.open ) {
 			switch ( keydown.keyCode ) {
 				case TAB:
+					keydown.preventDefault();
 					keydown.stopPropagation();
-					this.closeMenu();
+					if ( keydown.shiftKey ) {
+						this.focusPrevious();
+					} else {
+						this.focusNext();
+					}
 					break;
 
 				case LEFT:
