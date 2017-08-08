@@ -1,13 +1,18 @@
 /**
  * External dependencies
  */
-import './style.scss';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { Component, createElement } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import Tooltip from '../tooltip';
+import './style.scss';
 
 class Button extends Component {
 	constructor( props ) {
@@ -36,6 +41,7 @@ class Button extends Component {
 			isToggled,
 			className,
 			disabled,
+			'aria-label': label,
 			...additionalProps
 		} = this.props;
 		const classes = classnames( 'components-button', className, {
@@ -52,12 +58,18 @@ class Button extends Component {
 
 		delete additionalProps.focus;
 
-		return createElement( tag, {
+		let element = createElement( tag, {
 			...tagProps,
 			...additionalProps,
 			className: classes,
 			ref: this.setRef,
 		} );
+
+		if ( label ) {
+			element = <Tooltip text={ label }>{ element }</Tooltip>;
+		}
+
+		return element;
 	}
 }
 
