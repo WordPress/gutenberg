@@ -50,7 +50,7 @@ describe( 'query', () => {
 			const html = '<blockquote><p>A delicious sundae dessert</p></blockquote>';
 			const match = parse( html, query.node() );
 
-			expect( wp.element.renderToString( match ) ).toBe( `<body>${ html }</body>` );
+			expect( renderToString( match ) ).toBe( `<body>${ html }</body>` );
 		} );
 	} );
 } );
