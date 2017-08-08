@@ -3,14 +3,13 @@
  */
 import { connect } from 'react-redux';
 import { uniq, get, reduce, find } from 'lodash';
-import clickOutside from 'react-click-outside';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { Dashicon, IconButton } from '@wordpress/components';
+import { Toolbar, DropdownMenu } from '@wordpress/components';
 import { getBlockType, getBlockTypes, switchToBlockType } from '@wordpress/blocks';
 
 /**
@@ -21,33 +20,9 @@ import { replaceBlocks } from '../actions';
 import { getBlock } from '../selectors';
 
 class BlockSwitcher extends Component {
-	constructor() {
-		super( ...arguments );
-		this.toggleMenu = this.toggleMenu.bind( this );
-		this.state = {
-			open: false,
-		};
-	}
-
-	handleClickOutside() {
-		if ( ! this.state.open ) {
-			return;
-		}
-
-		this.toggleMenu();
-	}
-
-	toggleMenu() {
-		this.setState( ( state ) => ( {
-			open: ! state.open,
-		} ) );
-	}
 
 	switchBlockType( name ) {
 		return () => {
-			this.setState( {
-				open: false,
-			} );
 			this.props.onTransform( this.props.block, name );
 		};
 	}
@@ -72,38 +47,21 @@ class BlockSwitcher extends Component {
 		}
 
 		return (
-			<div className="editor-block-switcher">
-				<IconButton
-					className="editor-block-switcher__toggle"
-					icon={ blockType.icon }
-					onClick={ this.toggleMenu }
-					aria-haspopup="true"
-					aria-expanded={ this.state.open }
-					label={ __( 'Change block type' ) }
-				>
-					<Dashicon icon="arrow-down" />
-				</IconButton>
-				{ this.state.open &&
-					<div
-						className="editor-block-switcher__menu"
-						role="menu"
-						tabIndex="0"
-						aria-label={ __( 'Block types' ) }
-					>
-						{ allowedBlocks.map( ( { name, title, icon } ) => (
-							<IconButton
-								key={ name }
-								onClick={ this.switchBlockType( name ) }
-								className="editor-block-switcher__menu-item"
-								icon={ icon }
-								role="menuitem"
-							>
-								{ title }
-							</IconButton>
-						) ) }
-					</div>
-				}
-			</div>
+			<Toolbar>
+				<li>
+					<DropdownMenu
+						icon={ blockType.icon }
+						label={ __( 'Change block type' ) }
+						controls={
+						allowedBlocks.map( ( { name, title, icon } ) => ( {
+							icon,
+							title,
+							onClick: this.switchBlockType( name ),
+						} ) )	}
+						tabIndex="-1"
+					/>
+				</li>
+			</Toolbar>
 		);
 	}
 }
@@ -120,4 +78,4 @@ export default connect(
 			) );
 		},
 	} )
-)( clickOutside( BlockSwitcher ) );
+)( BlockSwitcher );
