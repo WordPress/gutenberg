@@ -59,7 +59,6 @@ const editMediaLibrary = ( attributes, setAttributes ) => {
 };
 
 function defaultColumnsNumber( attributes ) {
-	attributes.images = attributes.images || [];
 	return Math.min( 3, attributes.images.length );
 }
 
@@ -67,6 +66,10 @@ registerBlockType( 'core/gallery', {
 	title: __( 'Gallery' ),
 	icon: 'format-gallery',
 	category: 'common',
+
+	defaultAttributes: {
+		images: [],
+	},
 
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
@@ -76,7 +79,7 @@ registerBlockType( 'core/gallery', {
 	},
 
 	edit( { attributes, setAttributes, focus, className } ) {
-		const { images = [], columns = defaultColumnsNumber( attributes ), align = 'none' } = attributes;
+		const { images, columns = defaultColumnsNumber( attributes ), align = 'none' } = attributes;
 		const setLinkTo = ( value ) => setAttributes( { linkTo: value } );
 		const setColumnsNumber = ( event ) => setAttributes( { columns: event.target.value } );
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
