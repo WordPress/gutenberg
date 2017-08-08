@@ -34,6 +34,7 @@
 	border: 1px solid $light-gray-500;
 	background: $white;
 	padding: 3px 3px 0 3px;
+	z-index: z-index( '.editor-block-switcher__menu' );
 
 	input {
 		font-size: $default-font-size;
