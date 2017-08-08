@@ -19,7 +19,7 @@ function createRunHook( hooks, returnFirstArg ) {
 	 * @return {*}               Return value of runner, if applicable.
 	 */
 	return function runHooks( hookName, ...args ) {
-		if ( typeof hookName !== 'string' ) {
+		if ( 'string' !== typeof hookName ) {
 			console.error( 'The hook name must be a string.' );
 			return;
 		}
