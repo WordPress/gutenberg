@@ -33,6 +33,7 @@ describe( 'PreviewButton', () => {
 				<PreviewButton
 					postId={ 1 }
 					link="https://wordpress.org/?p=1"
+					isSaveable
 					modified="2017-08-03T15:05:50" />
 			);
 			wrapper.instance().previewWindow = {};
@@ -80,6 +81,7 @@ describe( 'PreviewButton', () => {
 				postId: 1,
 				isNew: false,
 				isDirty: false,
+				isSaveable: true,
 			}, false );
 		} );
 
@@ -88,14 +90,16 @@ describe( 'PreviewButton', () => {
 				postId: 1,
 				isNew: true,
 				isDirty: false,
+				isSaveable: true,
 			}, true );
 		} );
 
 		it( 'should open a popup window', () => {
 			assertForSave( {
 				postId: 1,
-				isNew: false,
+				isNew: true,
 				isDirty: true,
+				isSaveable: true,
 			}, true );
 		} );
 	} );
@@ -105,11 +109,23 @@ describe( 'PreviewButton', () => {
 			const wrapper = shallow(
 				<PreviewButton
 					postId={ 1 }
+					isSaveable
 					link="https://wordpress.org/?p=1" />
 			);
 
 			expect( wrapper.prop( 'href' ) ).toBe( 'https://wordpress.org/?p=1' );
+			expect( wrapper.prop( 'disabled' ) ).toBe( false );
 			expect( wrapper.prop( 'target' ) ).toBe( 'wp-preview-1' );
+		} );
+
+		it( 'should be disabled if post is not saveable', () => {
+			const wrapper = shallow(
+				<PreviewButton
+					postId={ 1 }
+					link="https://wordpress.org/?p=1" />
+			);
+
+			expect( wrapper.prop( 'disabled' ) ).toBe( true );
 		} );
 	} );
 } );

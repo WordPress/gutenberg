@@ -18,6 +18,7 @@ import {
 	getEditedPostAttribute,
 	isEditedPostDirty,
 	isEditedPostNew,
+	isEditedPostSaveable,
 } from '../../selectors';
 import { autosave } from '../../actions';
 
@@ -75,7 +76,7 @@ export class PreviewButton extends Component {
 	}
 
 	render() {
-		const { link } = this.props;
+		const { link, isSaveable } = this.props;
 
 		return (
 			<IconButton
@@ -83,6 +84,7 @@ export class PreviewButton extends Component {
 				onClick={ this.saveForPreview }
 				target={ this.getWindowTarget() }
 				icon="visibility"
+				disabled={ ! isSaveable }
 			>
 				{ _x( 'Preview', 'imperative verb' ) }
 			</IconButton>
@@ -96,6 +98,7 @@ export default connect(
 		link: getEditedPostPreviewLink( state ),
 		isDirty: isEditedPostDirty( state ),
 		isNew: isEditedPostNew( state ),
+		isSaveable: isEditedPostSaveable( state ),
 		modified: getEditedPostAttribute( state, 'modified' ),
 	} ),
 	{ autosave }
