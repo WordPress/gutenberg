@@ -27,6 +27,8 @@ registerBlockType( 'core/separator', {
 		],
 	},
 
+	focusable: false,
+
 	edit( { className } ) {
 		return <hr className={ className } />;
 	},

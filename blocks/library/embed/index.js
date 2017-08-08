@@ -50,6 +50,8 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms } 
 			}
 		},
 
+		focusable: false,
+
 		edit: class extends Component {
 			constructor() {
 				super( ...arguments );

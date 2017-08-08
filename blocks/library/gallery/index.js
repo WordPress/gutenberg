@@ -75,6 +75,11 @@ registerBlockType( 'core/gallery', {
 		}
 	},
 
+	focusable( attributes ) {
+		const { images = [] } = attributes;
+		return images.length === 0;
+	},
+
 	edit( { attributes, setAttributes, focus, className } ) {
 		const { images = [], columns = defaultColumnsNumber( attributes ), align = 'none' } = attributes;
 		const setLinkTo = ( value ) => setAttributes( { linkTo: value } );

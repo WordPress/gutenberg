@@ -63,6 +63,10 @@ registerBlockType( 'core/image', {
 		}
 	},
 
+	focusable( { url, caption } ) {
+		return ! url || ( caption && caption.length > 0 );
+	},
+
 	edit( { attributes, setAttributes, focus, setFocus, className } ) {
 		const { url, alt, caption, align, id, href } = attributes;
 		const updateAlt = ( newAlt ) => setAttributes( { alt: newAlt } );
@@ -87,6 +91,7 @@ registerBlockType( 'core/image', {
 								buttonProps={ {
 									className: 'components-icon-button components-toolbar__control',
 									'aria-label': __( 'Edit image' ),
+									tabIndex: '-1',
 								} }
 								onSelect={ onSelectImage }
 								type="image"
@@ -95,7 +100,7 @@ registerBlockType( 'core/image', {
 								<Dashicon icon="edit" />
 							</MediaUploadButton>
 						</li>
-						<UrlInputButton onChange={ onSetHref } url={ href } />
+						<UrlInputButton onChange={ onSetHref } url={ href } tabIndex="-1" />
 					</Toolbar>
 				</BlockControls>
 			)

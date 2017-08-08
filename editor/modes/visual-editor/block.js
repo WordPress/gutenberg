@@ -4,7 +4,7 @@
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 import { Slot } from 'react-slot-fill';
-import { partial } from 'lodash';
+import { isFunction, isUndefined, partial } from 'lodash';
 import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
 
 /**
@@ -370,6 +370,10 @@ class VisualEditorBlock extends Component {
 		let { className = getBlockDefaultClassname( block.name ) } = blockType;
 		className = classnames( className, block.attributes.className );
 
+		// determine if a block can be focused without help - if not then we must
+		// make the surrounding div focusable so the toolbar can be displayed
+		const focusable = blockType.focusable( block.attributes );
+
 		// Disable reason: Each block can be selected by clicking on it
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
@@ -383,7 +387,7 @@ class VisualEditorBlock extends Component {
 				onMouseLeave={ onMouseLeave }
 				className={ wrapperClassname }
 				data-type={ block.name }
-				tabIndex="0"
+				tabIndex={ ! focusable ? 0 : null }
 				aria-label={ blockLabel }
 				{ ...wrapperProps }
 			>

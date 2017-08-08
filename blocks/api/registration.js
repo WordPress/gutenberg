@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { isFunction } from 'lodash';
+import { constant, isBoolean, isFunction } from 'lodash';
 
 /**
  * Block settings keyed by block name.
@@ -61,6 +61,12 @@ export function registerBlockType( name, settings ) {
 		);
 		return;
 	}
+	if ( 'focusable' in settings && ! ( isFunction( settings.focusable ) || isBoolean( settings.focusable ) ) ) {
+		console.error(
+			'The "focusable" property must be a valid function or a boolean.'
+		);
+		return;
+	}
 	if ( blocks[ name ] ) {
 		console.error(
 			'Block "' + name + '" is already registered.'
@@ -73,7 +79,15 @@ export function registerBlockType( name, settings ) {
 		);
 		return;
 	}
-	const block = Object.assign( { name }, settings );
+	const focusable = ( () => {
+		if ( isFunction( settings.focusable ) ) {
+			return settings.focusable;
+		} else if ( isBoolean( settings.focusable ) ) {
+			return constant( settings.focusable );
+		}
+		return constant( true );
+	} )();
+	const block = { name, ...settings, focusable };
 	blocks[ name ] = block;
 	return block;
 }

@@ -36,7 +36,7 @@ class UrlInputButton extends Component {
 	}
 
 	render() {
-		const { url, onChange } = this.props;
+		const { url, onChange, tabIndex } = this.props;
 		const { expanded } = this.state;
 
 		return (
@@ -48,6 +48,7 @@ class UrlInputButton extends Component {
 					className={ classnames( 'components-toolbar__control', {
 						'is-active': url,
 					} ) }
+					tabIndex={ tabIndex }
 				/>
 				{ expanded &&
 					<form

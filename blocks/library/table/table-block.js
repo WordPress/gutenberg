@@ -114,6 +114,7 @@ export default class TableBlock extends wp.element.Component {
 										...control,
 										onClick: () => control.onClick( this.state.editor ),
 									} ) ) }
+								tabIndex="-1"
 							/>
 						</li>
 					</Toolbar>
