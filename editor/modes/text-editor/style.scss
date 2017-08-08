@@ -96,9 +96,9 @@
 
 .editor-text-editor__textarea {
 	display: block;
-	padding-top: 20px;
+	padding-top: 0;
 	padding-bottom: 0;
-	margin: 0;
+	margin: 20px 0 0 0;
 	width: 100%;
 	border: none;
 	outline: none;
@@ -112,7 +112,18 @@
 
 	&:focus {
 		box-shadow: none;
+		outline: 2px solid $dark-gray-500;
 	}
+
+	&:hover {
+		box-shadow: none;
+		outline: 1px solid $light-gray-500;
+	}
+
+	&.is-selected {
+		outline: 2px solid $dark-gray-500;
+    }
+
 }
 
 /* Use padding to center text in the textarea, this allows you to click anywhere to focus it */

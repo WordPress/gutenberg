@@ -3,6 +3,7 @@
  */
 import { connect } from 'react-redux';
 import Textarea from 'react-autosize-textarea';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -25,9 +26,11 @@ class TextEditor extends Component {
 			blocks,
 			persistedValue: value,
 			value,
+			isSelected: false,
 		};
 		this.onChange = this.onChange.bind( this );
 		this.onBlur = this.onBlur.bind( this );
+		this.onSelect = this.onSelect.bind( this );
 	}
 
 	onChange( event ) {
@@ -37,7 +40,12 @@ class TextEditor extends Component {
 		this.props.markDirty();
 	}
 
+	onSelect() {
+		this.setState( { isSelected: true } );
+	}
+
 	onBlur() {
+		this.setState( { isSelected: false } );
 		if ( this.state.value === this.state.persistedValue ) {
 			return;
 		}
@@ -62,6 +70,8 @@ class TextEditor extends Component {
 
 	render() {
 		const { value } = this.state;
+		const { isSelected } = this.state;
+		const className = classnames( 'editor-text-editor__textarea', { 'is-selected': isSelected } );
 
 		return (
 			<div className="editor-text-editor">
@@ -89,7 +99,8 @@ class TextEditor extends Component {
 						value={ value }
 						onChange={ this.onChange }
 						onBlur={ this.onBlur }
-						className="editor-text-editor__textarea"
+						onFocus={ this.onSelect }
+						className={ className }
 					/>
 				</div>
 			</div>
