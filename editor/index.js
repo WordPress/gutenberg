@@ -10,7 +10,7 @@ import 'moment-timezone/moment-timezone-utils';
 /**
  * WordPress dependencies
  */
-import { EditableProvider, parse } from '@wordpress/blocks';
+import { EditableProvider } from '@wordpress/blocks';
 import { render } from '@wordpress/element';
 import { settings } from '@wordpress/date';
 
@@ -64,14 +64,6 @@ function preparePostState( store, post ) {
 		type: 'RESET_POST',
 		post,
 	} );
-
-	// Parse content as blocks
-	if ( post.content.raw ) {
-		store.dispatch( {
-			type: 'RESET_BLOCKS',
-			blocks: parse( post.content.raw ),
-		} );
-	}
 
 	// Include auto draft title in edits while not flagging post as dirty
 	if ( post.status === 'auto-draft' ) {

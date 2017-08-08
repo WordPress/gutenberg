@@ -106,13 +106,22 @@ registerBlockType( 'core/cover-text', {
 	},
 
 	save( { attributes } ) {
-		const { align, content, dropCap, backgroundColor, textColor } = attributes;
+		const { width, align, content, dropCap, backgroundColor, textColor } = attributes;
 		const className = dropCap && 'has-drop-cap';
+		const wrapperClassName = width && `align${ width }`;
 
 		if ( ! align ) {
-			return <div style={ { backgroundColor: backgroundColor, color: textColor } }><p className={ className }>{ content }</p></div>;
+			return (
+				<div className={ wrapperClassName } style={ { backgroundColor: backgroundColor, color: textColor } }>
+					<p className={ className }>{ content }</p>
+				</div>
+			);
 		}
 
-		return <div style={ { backgroundColor: backgroundColor, color: textColor } }><p style={ { textAlign: align } } className={ className }>{ content }</p></div>;
+		return (
+			<div className={ wrapperClassName } style={ { backgroundColor: backgroundColor, color: textColor } }>
+				<p style={ { textAlign: align } } className={ className }>{ content }</p>
+			</div>
+		);
 	},
 } );

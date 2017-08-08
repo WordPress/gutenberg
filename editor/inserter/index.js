@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import clickOutside from 'react-click-outside';
 import { connect } from 'react-redux';
 
 /**
@@ -23,9 +22,13 @@ import { insertBlock, hideInsertionPoint } from '../actions';
 class Inserter extends Component {
 	constructor() {
 		super( ...arguments );
+
 		this.toggle = this.toggle.bind( this );
 		this.close = this.close.bind( this );
+		this.closeOnClickOutside = this.closeOnClickOutside.bind( this );
+		this.bindNode = this.bindNode.bind( this );
 		this.insertBlock = this.insertBlock.bind( this );
+
 		this.state = {
 			opened: false,
 		};
@@ -43,6 +46,16 @@ class Inserter extends Component {
 		} );
 	}
 
+	closeOnClickOutside( event ) {
+		if ( ! this.node.contains( event.target ) ) {
+			this.close();
+		}
+	}
+
+	bindNode( node ) {
+		this.node = node;
+	}
+
 	insertBlock( name ) {
 		if ( name ) {
 			const { insertionPoint, onInsertBlock } = this.props;
@@ -57,20 +70,12 @@ class Inserter extends Component {
 		this.close();
 	}
 
-	handleClickOutside() {
-		if ( ! this.state.opened ) {
-			return;
-		}
-
-		this.close();
-	}
-
 	render() {
 		const { opened } = this.state;
 		const { position, children } = this.props;
 
 		return (
-			<div className="editor-inserter">
+			<div ref={ this.bindNode } className="editor-inserter">
 				<IconButton
 					icon="insert"
 					label={ __( 'Insert block' ) }
@@ -85,6 +90,7 @@ class Inserter extends Component {
 					<InserterMenu
 						position={ position }
 						onSelect={ this.insertBlock }
+						onClose={ this.closeOnClickOutside }
 					/>
 				) }
 			</div>
@@ -108,4 +114,4 @@ export default connect(
 			) );
 		},
 	} )
-)( clickOutside( Inserter ) );
+)( Inserter );

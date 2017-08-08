@@ -35,6 +35,7 @@ import {
 	startTyping,
 	stopTyping,
 	replaceBlocks,
+	selectBlock,
 } from '../../actions';
 import {
 	getPreviousBlock,
@@ -452,7 +453,7 @@ class VisualEditorBlock extends Component {
 					) }
 				</div>
 				{ !! error && <BlockCrashWarning /> }
-				{ ! isValid && <InvalidBlockWarning /> }
+				{ ! isValid && <InvalidBlockWarning block={ block } /> }
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
@@ -481,11 +482,7 @@ export default connect(
 		},
 
 		onSelect() {
-			dispatch( {
-				type: 'TOGGLE_BLOCK_SELECTED',
-				selected: true,
-				uid: ownProps.uid,
-			} );
+			dispatch( selectBlock( ownProps.uid ) );
 		},
 		onDeselect() {
 			dispatch( clearSelectedBlock() );

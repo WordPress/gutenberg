@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, query, setUnknownTypeHandler } from '../../api';
+import { registerBlockType, query, setUnknownTypeHandlerName } from '../../api';
 import OldEditor from './old-editor';
 
 const { prop } = query;
@@ -31,4 +31,4 @@ registerBlockType( 'core/freeform', {
 	},
 } );
 
-setUnknownTypeHandler( 'core/freeform' );
+setUnknownTypeHandlerName( 'core/freeform' );

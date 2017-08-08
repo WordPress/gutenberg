@@ -11,8 +11,8 @@ import { noop } from 'lodash';
 import {
 	registerBlockType,
 	unregisterBlockType,
-	setUnknownTypeHandler,
-	getUnknownTypeHandler,
+	setUnknownTypeHandlerName,
+	getUnknownTypeHandlerName,
 	setDefaultBlock,
 	getDefaultBlock,
 	getBlockType,
@@ -32,7 +32,7 @@ describe( 'blocks', () => {
 		getBlockTypes().forEach( block => {
 			unregisterBlockType( block.name );
 		} );
-		setUnknownTypeHandler( undefined );
+		setUnknownTypeHandlerName( undefined );
 		setDefaultBlock( undefined );
 		console.error = error;
 	} );
@@ -126,17 +126,17 @@ describe( 'blocks', () => {
 		} );
 	} );
 
-	describe( 'setUnknownTypeHandler()', () => {
+	describe( 'setUnknownTypeHandlerName()', () => {
 		it( 'assigns unknown type handler', () => {
-			setUnknownTypeHandler( 'core/test-block' );
+			setUnknownTypeHandlerName( 'core/test-block' );
 
-			expect( getUnknownTypeHandler() ).toBe( 'core/test-block' );
+			expect( getUnknownTypeHandlerName() ).toBe( 'core/test-block' );
 		} );
 	} );
 
-	describe( 'getUnknownTypeHandler()', () => {
+	describe( 'getUnknownTypeHandlerName()', () => {
 		it( 'defaults to undefined', () => {
-			expect( getUnknownTypeHandler() ).toBeUndefined();
+			expect( getUnknownTypeHandlerName() ).toBeUndefined();
 		} );
 	} );
 

@@ -1,7 +1,15 @@
-import Editable from '../../editable';
-import BlockControls from '../../block-controls';
+/**
+ * WordPress dependencies
+ */
+import { Component } from '@wordpress/element';
 import { Toolbar, DropdownMenu } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import Editable from '../../editable';
+import BlockControls from '../../block-controls';
 
 function isTableSelected( editor ) {
 	return editor.dom.getParent(
@@ -64,7 +72,7 @@ const TABLE_CONTROLS = [
 	},
 ];
 
-export default class TableBlock extends wp.element.Component {
+export default class TableBlock extends Component {
 	constructor() {
 		super();
 		this.handleSetup = this.handleSetup.bind( this );

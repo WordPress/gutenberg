@@ -17,6 +17,8 @@ global.window.tinyMCEPreInit = {
 	// <script> tag where it was loaded from, which of course fails here.
 	baseURL: 'about:blank',
 };
+window.requestAnimationFrame = setTimeout;
+window.cancelAnimationFrame = clearTimeout;
 
 global.window._wpDateSettings = {
 	formats: {

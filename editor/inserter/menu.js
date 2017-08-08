@@ -47,6 +47,8 @@ export class InserterMenu extends Component {
 		this.getBlocksForCurrentTab = this.getBlocksForCurrentTab.bind( this );
 		this.sortBlocks = this.sortBlocks.bind( this );
 		this.addRecentBlocks = this.addRecentBlocks.bind( this );
+
+		this.tabScrollTop = { recent: 0, blocks: 0, embeds: 0 };
 	}
 
 	componentDidMount() {
@@ -57,7 +59,7 @@ export class InserterMenu extends Component {
 		document.removeEventListener( 'keydown', this.onKeyDown );
 	}
 
-	componentDidUpdate() {
+	componentDidUpdate( prevProps, prevState ) {
 		const searchResults = this.searchBlocks( getBlockTypes() );
 		// Announce the blocks search results to screen readers.
 		if ( !! searchResults.length ) {
@@ -68,6 +70,10 @@ export class InserterMenu extends Component {
 			), searchResults.length ), 'assertive' );
 		} else {
 			this.props.debouncedSpeak( __( 'No results.' ), 'assertive' );
+		}
+
+		if ( this.state.tab !== prevState.tab ) {
+			this.tabContainer.scrollTop = this.tabScrollTop[ this.state.tab ];
 		}
 	}
 
@@ -302,17 +308,23 @@ export class InserterMenu extends Component {
 	}
 
 	switchTab( tab ) {
+		// store the scrollTop of the tab switched from
+		this.tabScrollTop[ this.state.tab ] = this.tabContainer.scrollTop;
 		this.setState( { tab: tab } );
 	}
 
 	render() {
-		const { position, instanceId } = this.props;
+		const { position, onClose, instanceId } = this.props;
 		const isSearching = this.state.filterValue;
 		const visibleBlocksByCategory = this.getVisibleBlocksByCategory( this.getBlocksForCurrentTab() );
 
 		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
-			<Popover position={ position } className="editor-inserter__menu">
+			<Popover
+				position={ position }
+				isOpen
+				onClose={ onClose }
+				className="editor-inserter__menu">
 				<label htmlFor={ `editor-inserter__search-${ instanceId }` } className="screen-reader-text">
 					{ __( 'Search blocks' ) }
 				</label>
@@ -327,7 +339,8 @@ export class InserterMenu extends Component {
 					ref={ this.bindReferenceNode( 'search' ) }
 					tabIndex="-1"
 				/>
-				<div role="menu" className="editor-inserter__content">
+				<div role="menu" className="editor-inserter__content"
+					ref={ ( ref ) => this.tabContainer = ref }>
 					{ this.state.tab === 'recent' && ! isSearching &&
 						<div className="editor-inserter__recent">
 							<div

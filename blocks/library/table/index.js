@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
@@ -11,7 +16,7 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 const { children } = hpq;
 
 registerBlockType( 'core/table', {
-	title: wp.i18n.__( 'Table' ),
+	title: __( 'Table' ),
 	icon: 'editor-table',
 	category: 'formatting',
 
@@ -61,9 +66,9 @@ registerBlockType( 'core/table', {
 	},
 
 	save( { attributes } ) {
-		const { content } = attributes;
+		const { content, align } = attributes;
 		return (
-			<table>
+			<table className={ align && `align${ align }` }>
 				{ content }
 			</table>
 		);

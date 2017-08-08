@@ -6,10 +6,14 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import createBlockWarning from './create-block-warning';
+import BlockWarning from './block-warning';
 
-const warning = createBlockWarning( __(
-	'This block has suffered from an unhandled error and cannot be previewed.'
-) );
+const warning = (
+	<BlockWarning>
+		{ __(
+			'This block has suffered from an unhandled error and cannot be previewed.'
+		) }
+	</BlockWarning>
+);
 
 export default () => warning;

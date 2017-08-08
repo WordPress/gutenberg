@@ -25,6 +25,8 @@ registerBlockType( 'core/paragraph', {
 
 	category: 'common',
 
+	keywords: [ __( 'text' ) ],
+
 	defaultAttributes: {
 		dropCap: false,
 	},

@@ -4,6 +4,7 @@ export { default as ClipboardButton } from './clipboard-button';
 export { default as Dashicon } from './dashicon';
 export { default as DropZone } from './drop-zone';
 export { default as ExternalLink } from './external-link';
+export { default as FormFileUpload } from './form-file-upload';
 export { default as FormToggle } from './form-toggle';
 export { default as FormTokenField } from './form-token-field';
 export { default as IconButton } from './icon-button';
