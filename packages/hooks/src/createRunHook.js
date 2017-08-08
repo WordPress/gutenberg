@@ -29,6 +29,11 @@ function createRunHook( hooks, returnFirstArg ) {
 			return;
 		}
 
+		if ( ! /^[a-z][a-z0-9_]*$/.test( hookName ) ) {
+			console.error( 'The hook name can only contain numbers, letters and underscores.' );
+			return;
+		}
+
 		if ( ! hooks.hasOwnProperty( hookName ) ) {
 			hooks[ hookName ] = {
 				runs: 0,
