@@ -22,6 +22,7 @@ export { default as ResponsiveWrapper } from './responsive-wrapper';
 export { default as SandBox } from './sandbox';
 export { default as Spinner } from './spinner';
 export { default as Toolbar } from './toolbar';
+export { default as Tooltip } from './tooltip';
 
 // Higher-Order Components
 export { default as withFocusReturn } from './higher-order/with-focus-return';
