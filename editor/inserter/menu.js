@@ -356,7 +356,6 @@ export class InserterMenu extends Component {
 					{ __( 'Search blocks' ) }
 				</label>
 				<input
-					autoFocus
 					id={ `editor-inserter__search-${ instanceId }` }
 					type="search"
 					placeholder={ __( 'Search…' ) }
@@ -364,7 +363,6 @@ export class InserterMenu extends Component {
 					onChange={ this.filter }
 					onClick={ this.setSearchFocus }
 					ref={ this.bindReferenceNode( 'search' ) }
-					tabIndex="-1"
 				/>
 				<div role="menu" className="editor-inserter__content"
 					ref={ ( ref ) => this.tabContainer = ref }>
