@@ -719,9 +719,9 @@ export function getSuggestedPostFormat( state ) {
 	// We only convert to default post formats in core.
 	switch ( name ) {
 		case 'core/image':
-			return 'Image';
+			return 'image';
 		case 'core/quote':
-			return 'Quote';
+			return 'quote';
 	}
 
 	return null;
