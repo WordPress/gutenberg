@@ -7,17 +7,19 @@ import { equal } from 'assert';
  * Internal dependencies
  */
 import { normaliseToBlockLevelNodes } from '../paste';
+import stripAttributes from '../paste/strip-attributes';
+import removeUnsupportedEls from '../paste/remove-unsupported-els';
+
+function createNodes( HTML ) {
+	document.body.innerHTML = HTML;
+	return Array.from( document.body.childNodes );
+}
+
+function outerHTML( nodes ) {
+	return nodes.map( node => node.outerHTML ).join( '' );
+}
 
 describe( 'normaliseToBlockLevelNodes', () => {
-	function createNodes( HTML ) {
-		document.body.innerHTML = HTML;
-		return Array.from( document.body.childNodes );
-	}
-
-	function outerHTML( nodes ) {
-		return nodes.map( node => node.outerHTML ).join( '' );
-	}
-
 	function transform( HTML ) {
 		return outerHTML( normaliseToBlockLevelNodes( createNodes( HTML ) ) );
 	}
@@ -45,3 +47,18 @@ describe( 'normaliseToBlockLevelNodes', () => {
 	} );
 } );
 
+describe( 'stripAttributes ', () => {
+	it( 'should remove ids and classes', () => {
+		equal( outerHTML( stripAttributes( createNodes( '<p id="foo" class="bar">test</p>' ) ) ), '<p>test</p>' );
+	} );
+} );
+
+describe( 'removeUnsupportedEls ', () => {
+	it( 'should remove <span>s', () => {
+		equal( outerHTML( removeUnsupportedEls( createNodes( '<p><span>test</span></p>' ) ) ), '<p>test</p>' );
+	} );
+
+	it( 'should remove <meta>s', () => {
+		equal( outerHTML( removeUnsupportedEls( createNodes( '<div><meta name="foo" /><p>test</p></div>' ) ) ), '<div><p>test</p></div>' );
+	} );
+} );

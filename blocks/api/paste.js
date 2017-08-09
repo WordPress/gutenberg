@@ -19,6 +19,8 @@ import removeUnsupportedEls from './paste/remove-unsupported-els';
 
 const { ELEMENT_NODE, TEXT_NODE } = nodetypes;
 
+const prepare = compose( [ normaliseToBlockLevelNodes, removeUnsupportedEls, stripAttributes ] );
+
 /**
  * Normalises array nodes of any node type to an array of block level nodes.
  * @param  {Array} nodes Array of Nodes.
@@ -79,8 +81,6 @@ export function normaliseToBlockLevelNodes( nodes ) {
 }
 
 export default function( nodes ) {
-	const prepare = compose( [ normaliseToBlockLevelNodes, removeUnsupportedEls, stripAttributes ] );
-
 	return prepare( nodes ).map( ( node ) => {
 		const block = getBlockTypes().reduce( ( acc, blockType ) => {
 			if ( acc ) {
