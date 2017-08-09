@@ -22,3 +22,4 @@ import './shortcode';
 import './text-columns';
 import './verse';
 import './video';
+import './audio';
