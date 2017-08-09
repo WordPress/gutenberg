@@ -68,11 +68,19 @@ export default class Editable extends Component {
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.maybePropagateUndo = this.maybePropagateUndo.bind( this );
 		this.onPastePostProcess = this.onPastePostProcess.bind( this );
+		this.onToolbarAddLink = this.onToolbarAddLink.bind( this );
+		this.onToolbarEditLink = this.onToolbarEditLink.bind( this );
+		this.onToolbarChangeLinkValue = this.onToolbarChangeLinkValue.bind( this );
 
 		this.state = {
 			formats: {},
 			bookmark: null,
 			empty: ! props.value || ! props.value.length,
+			toolbar: {
+				isAddingLink: false,
+				isEditingLink: false,
+				newLinkValue: '',
+			},
 		};
 	}
 
@@ -202,8 +210,9 @@ export default class Editable extends Component {
 		this.props.onChange( this.savedContent );
 	}
 
-	getRelativePosition( node ) {
-		const position = node.getBoundingClientRect();
+	getFocusPosition() {
+		const range = this.editor.selection.getRng();
+		const position = range.getBoundingClientRect();
 
 		// Find the parent "relative" positioned container
 		const container = this.props.inlineToolbar
@@ -403,7 +412,19 @@ export default class Editable extends Component {
 		);
 	}
 
-	onNodeChange( { element, parents } ) {
+	onToolbarAddLink() {
+		this.setState( { toolbar: { isEditingLink: false, isAddingLink: true, newLinkValue: '' } } );
+	}
+
+	onToolbarEditLink() {
+		this.setState( { toolbar: { isEditingLink: false, isAddingLink: true, newLinkValue: this.state.formats.link.value } } );
+	}
+
+	onToolbarChangeLinkValue( value ) {
+		this.setState( { toolbar: { ...this.state.toolbar, newLinkValue: value } } );
+	}
+
+	onNodeChange( { parents } ) {
 		const formats = {};
 		const link = find( parents, ( node ) => node.nodeName.toLowerCase() === 'a' );
 		if ( link ) {
@@ -412,9 +433,9 @@ export default class Editable extends Component {
 		const activeFormats = this.editor.formatter.matchAll( [	'bold', 'italic', 'strikethrough' ] );
 		activeFormats.forEach( ( activeFormat ) => formats[ activeFormat ] = true );
 
-		const focusPosition = this.getRelativePosition( element );
+		const focusPosition = this.getFocusPosition();
 		const bookmark = this.editor.selection.getBookmark( 2, true );
-		this.setState( { bookmark, formats, focusPosition } );
+		this.setState( { bookmark, formats, focusPosition, toolbar: { isAddingLink: false, isEditingLink: false, newLinkValue: '' } } );
 	}
 
 	updateContent() {
@@ -501,6 +522,8 @@ export default class Editable extends Component {
 				} else {
 					this.editor.execCommand( 'Unlink' );
 				}
+
+				this.setState( { toolbar: { isEditingLink: false, isAddingLink: false, newLinkValue: '' } } );
 			} else {
 				const isActive = this.isFormatActive( format );
 				if ( isActive && ! formatValue ) {
@@ -544,6 +567,10 @@ export default class Editable extends Component {
 				formats={ this.state.formats }
 				onChange={ this.changeFormats }
 				enabledControls={ formattingControls }
+				onChangeLinkValue={ this.onToolbarChangeLinkValue }
+				onAddLink={ this.onToolbarAddLink }
+				onEditLink={ this.onToolbarEditLink }
+				{ ...this.state.toolbar }
 			/>
 		);
 
