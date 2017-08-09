@@ -18,9 +18,9 @@ import PostTrash from '../post-trash';
 import PostSchedule from '../post-schedule';
 import PostSticky from '../post-sticky';
 import PostAuthor from '../post-author';
+import PostFormat from '../post-format';
 import {
 	getEditedPostAttribute,
-	getSuggestedPostFormat,
 	isCurrentPostPublished,
 } from '../../selectors';
 import { editPost } from '../../actions';
@@ -38,11 +38,7 @@ class PostStatus extends Component {
 	}
 
 	render() {
-		const { status, suggestedFormat, isPublished, instanceId } = this.props;
-
-		// Use the suggested post format based on the blocks content of the post
-		// or the default post format setting for the site.
-		const format = suggestedFormat || __( 'Standard' );
+		const { status, isPublished, instanceId } = this.props;
 		const pendingId = 'pending-toggle-' + instanceId;
 
 		return (
@@ -60,10 +56,7 @@ class PostStatus extends Component {
 				}
 				<PostVisibility />
 				<PostSchedule />
-				<PanelRow>
-					<span>{ __( 'Post Format' ) }</span>
-					<span>{ format }</span>
-				</PanelRow>
+				<PostFormat />
 				<PostSticky />
 				<PostAuthor />
 				<PostTrash />
@@ -75,7 +68,6 @@ class PostStatus extends Component {
 export default connect(
 	( state ) => ( {
 		status: getEditedPostAttribute( state, 'status' ),
-		suggestedFormat: getSuggestedPostFormat( state ),
 		isPublished: isCurrentPostPublished( state ),
 	} ),
 	( dispatch ) => {

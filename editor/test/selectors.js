@@ -1571,7 +1571,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getSuggestedPostFormat( state ) ).toBe( 'Image' );
+			expect( getSuggestedPostFormat( state ) ).toBe( 'image' );
 		} );
 
 		it( 'returns Quote if the first block is of type `core/quote`', () => {
@@ -1584,7 +1584,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getSuggestedPostFormat( state ) ).toBe( 'Quote' );
+			expect( getSuggestedPostFormat( state ) ).toBe( 'quote' );
 		} );
 	} );
 
