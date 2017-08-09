@@ -13,6 +13,7 @@ import 'moment-timezone/moment-timezone-utils';
  */
 import { EditableProvider } from '@wordpress/blocks';
 import { createElement, render } from '@wordpress/element';
+import { PopoverProvider } from '@wordpress/components';
 import { settings as dateSettings } from '@wordpress/date';
 
 /**
@@ -65,6 +66,7 @@ if ( dateSettings.timezone.string ) {
  */
 export function createEditorInstance( id, post, settings ) {
 	const store = createReduxStore();
+	const target = document.getElementById( id );
 
 	settings = {
 		...DEFAULT_SETTINGS,
@@ -109,6 +111,14 @@ export function createEditorInstance( id, post, settings ) {
 			EditorSettingsProvider,
 			{ settings },
 		],
+
+		// Popover provider:
+		//
+		//  - context.popoverTarget
+		[
+			PopoverProvider,
+			{ target },
+		],
 	];
 
 	const createEditorElement = flow(
@@ -117,8 +127,5 @@ export function createEditorInstance( id, post, settings ) {
 		) )
 	);
 
-	render(
-		createEditorElement( <Layout /> ),
-		document.getElementById( id )
-	);
+	render( createEditorElement( <Layout /> ), target );
 }

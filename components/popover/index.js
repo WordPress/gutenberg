@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isEqual } from 'lodash';
+import { isEqual, noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -146,6 +146,7 @@ export class Popover extends Component {
 			return null;
 		}
 
+		const { popoverTarget = document.body } = this.context;
 		const classes = classnames(
 			'components-popover',
 			className,
@@ -171,11 +172,15 @@ export class Popover extends Component {
 							</div>
 						</div>
 					</PopoverDetectOutside>,
-					document.body
+					popoverTarget
 				) }
 			</span>
 		);
 	}
 }
+
+Popover.contextTypes = {
+	popoverTarget: noop,
+};
 
 export default Popover;
