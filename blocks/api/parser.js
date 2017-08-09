@@ -31,7 +31,7 @@ import { isValidBlock } from './validation';
  * @return {Boolean}         Whether function is an attribute source
  */
 export function isValidSource( source ) {
-	return !! source && '_wpBlocksKnownMatcher' in source;
+	return !! source && '_wpBlocksKnownSource' in source;
 }
 
 /**

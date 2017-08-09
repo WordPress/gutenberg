@@ -13,7 +13,7 @@ import { Placeholder, Dashicon, Toolbar, DropZone, FormFileUpload } from '@wordp
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, query } from '../../api';
+import { registerBlockType, source } from '../../api';
 import Editable from '../../editable';
 import MediaUploadButton from '../../media-upload-button';
 import InspectorControls from '../../inspector-controls';
@@ -23,7 +23,7 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import BlockDescription from '../../block-description';
 import UrlInputButton from '../../url-input/button';
 
-const { attr, children } = query;
+const { attr, children } = source;
 
 registerBlockType( 'core/image', {
 	title: __( 'Image' ),
@@ -61,7 +61,7 @@ registerBlockType( 'core/image', {
 		from: [
 			{
 				type: 'raw',
-				matcher: ( node ) => (
+				source: ( node ) => (
 					node.nodeName === 'IMG' ||
 					( ! node.textContent && node.querySelector( 'img' ) )
 				),

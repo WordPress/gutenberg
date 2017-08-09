@@ -8,7 +8,7 @@ import { concatChildren } from '@wordpress/element';
  * Internal dependencies
  */
 import './block.scss';
-import { registerBlockType, query as hpq } from '../../api';
+import { registerBlockType, source } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
@@ -18,7 +18,7 @@ import InspectorControls from '../../inspector-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
 import BlockDescription from '../../block-description';
 
-const { children, query } = hpq;
+const { children, query } = source;
 
 registerBlockType( 'core/cover-text', {
 	title: __( 'Cover Text' ),

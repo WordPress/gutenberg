@@ -7,12 +7,12 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, createBlock, query } from '../../api';
+import { registerBlockType, createBlock, source } from '../../api';
 import Editable from '../../editable';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
 
-const { children } = query;
+const { children } = source;
 
 registerBlockType( 'core/verse', {
 	title: __( 'Verse' ),

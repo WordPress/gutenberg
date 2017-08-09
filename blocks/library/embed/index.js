@@ -16,12 +16,12 @@ import { addQueryArgs } from '@wordpress/url';
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, query, createBlock } from '../../api';
+import { registerBlockType, source, createBlock } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
-const { children } = query;
+const { children } = source;
 
 // These embeds do not work in sandboxes
 const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];

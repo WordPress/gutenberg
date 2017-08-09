@@ -10,7 +10,7 @@ import classnames from 'classnames';
  */
 import './style.scss';
 import './block.scss';
-import { registerBlockType, query } from '../../api';
+import { registerBlockType, source } from '../../api';
 import Editable from '../../editable';
 import MediaUploadButton from '../../media-upload-button';
 import BlockControls from '../../block-controls';
@@ -19,7 +19,7 @@ import InspectorControls from '../../inspector-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
 import BlockDescription from '../../block-description';
 
-const { text } = query;
+const { text } = source;
 
 const validAlignments = [ 'left', 'center', 'right', 'wide', 'full' ];
 

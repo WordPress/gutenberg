@@ -8,7 +8,7 @@ import { concatChildren } from '@wordpress/element';
  * Internal dependencies
  */
 import './block.scss';
-import { registerBlockType, createBlock, query as hpq, setDefaultBlock } from '../../api';
+import { registerBlockType, createBlock, source, setDefaultBlock } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
 import Editable from '../../editable';
@@ -16,7 +16,7 @@ import InspectorControls from '../../inspector-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
 import BlockDescription from '../../block-description';
 
-const { children } = hpq;
+const { children } = source;
 
 registerBlockType( 'core/paragraph', {
 	title: __( 'Paragraph' ),
@@ -50,7 +50,7 @@ registerBlockType( 'core/paragraph', {
 		from: [
 			{
 				type: 'raw',
-				matcher: ( node ) => (
+				source: ( node ) => (
 					node.nodeName === 'P' &&
 					// Do not allow embedded content.
 					! node.querySelector( 'audio, canvas, embed, iframe, img, math, object, svg, video' )

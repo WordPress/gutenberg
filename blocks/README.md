@@ -117,7 +117,7 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 // block.js
 ( function( blocks, element ) {
 	var el = element.createElement,
-		query = blocks.query;
+		source = blocks.source;
 
 	function RandomImage( props ) {
 		var src = 'http://lorempixel.com/400/200/' + props.category;
@@ -138,7 +138,7 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 		attributes: {
 			category: {
 				type: 'string',
-				source: query.attr( 'img', 'alt' )
+				source: source.attr( 'img', 'alt' )
 			}
 		},
 
@@ -207,7 +207,7 @@ encoding the values into the published post's markup, and then retrieving them
 the next time the post is edited. This is the motivation for the block's
 `attributes` property. The shape of this object matches that of the attributes
 object we'd like to receive, where each value is a
-[__matcher__](http://github.com/aduth/hpq)
+[__source__](http://github.com/aduth/hpq)
 which tries to find the desired value from the markup of the block.
 
 In the random image block above, we've given the `alt` attribute of the image a
@@ -237,7 +237,7 @@ editor interface where blocks are implemented.
 - `attributes: Object | Function` - An object of attribute schemas, where the
   keys of the object define the shape of attributes, and each value an object
   schema describing the `type`, `default` (optional), and
-  [`source`](http://gutenberg-devdoc.surge.sh/reference/attribute-matchers/)
+  [`source`](http://gutenberg-devdoc.surge.sh/reference/attribute-sources/)
   (optional) of the attribute. If `source` is omitted, the attribute is 
   serialized into the block's comment delimiters. Alternatively, define 
   `attributes` as a function which returns the attributes object.

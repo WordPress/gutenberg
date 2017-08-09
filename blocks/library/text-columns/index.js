@@ -13,7 +13,7 @@ import { __ } from '@wordpress/i18n';
  */
 import './block.scss';
 import './style.scss';
-import { registerBlockType, query as hpq } from '../../api';
+import { registerBlockType, source } from '../../api';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import RangeControl from '../../inspector-controls/range-control';
@@ -21,7 +21,7 @@ import Editable from '../../editable';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
 
-const { children, query } = hpq;
+const { children, query } = source;
 
 registerBlockType( 'core/text-columns', {
 	title: __( 'Text Columns' ),
