@@ -13,8 +13,9 @@ import { Placeholder } from '@wordpress/components';
  */
 import { registerBlockType, query } from '../../api';
 import MediaUploadButton from '../../media-upload-button';
+import Editable from '../../editable';
 
-const { attr } = query;
+const { attr, children } = query;
 
 registerBlockType( 'core/video', {
 	title: __( 'Video' ),
@@ -25,10 +26,11 @@ registerBlockType( 'core/video', {
 
 	attributes: {
 		src: attr( 'video', 'src' ),
+		caption: children( 'figcaption' ),
 	},
 
-	edit( { attributes, setAttributes, className } ) {
-		const { src } = attributes;
+	edit( { attributes, setAttributes, className, focus, setFocus } ) {
+		const { src, caption } = attributes;
 		const onSelectVideo = ( media ) => {
 			if ( media && media.url ) {
 				setAttributes( {
@@ -36,6 +38,7 @@ registerBlockType( 'core/video', {
 				} );
 			}
 		};
+		const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
 
 		if ( ! src ) {
 			return [
@@ -58,17 +61,32 @@ registerBlockType( 'core/video', {
 
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return [
-			<div key="video">
-				<video controls src={ src } />
-			</div>,
+			<figure key="video" className={ className }>
+				<video controls src={ src } onClick={ setFocus } />
+				{ ( caption && caption.length > 0 ) || !! focus ? (
+					<Editable
+						tagName="figcaption"
+						placeholder={ __( 'Write caption…' ) }
+						value={ caption }
+						focus={ focus && focus.editable === 'caption' ? focus : undefined }
+						onFocus={ focusCaption }
+						onChange={ ( value ) => setAttributes( { caption: value } ) }
+						inlineToolbar
+					/>
+				) : null }
+			</figure>,
 		];
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 	},
 
 	save( { attributes } ) {
-		const { src } = attributes;
+		const { src, caption } = attributes;
 		return (
-			<video controls src={ src } />
+
+			<figure>
+				{ src && <video controls src={ src } /> }
+				{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
+			</figure>
 		);
 	},
 } );
