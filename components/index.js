@@ -9,7 +9,6 @@ export { default as FormFileUpload } from './form-file-upload';
 export { default as FormToggle } from './form-toggle';
 export { default as FormTokenField } from './form-token-field';
 export { default as IconButton } from './icon-button';
-export { default as InlineHelpPopover } from './inline-help-popover';
 export { default as KeyboardShortcuts } from './keyboard-shortcuts';
 export { default as Notice } from './notice';
 export { default as NoticeList } from './notice/list';
