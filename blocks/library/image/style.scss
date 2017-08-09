@@ -22,6 +22,7 @@
 	}
 
 	.react-resizable-handle {
+		display: none;
 		border-radius: 50%;
 		border: 2px solid white;
 		width: 15px;
@@ -33,6 +34,10 @@
 		padding: 0 3px 3px 0;
 		box-sizing: border-box;
 		cursor: se-resize;
+	}
+
+	&.is-focused .react-resizable-handle {
+		display: block;
 	}
 }
 

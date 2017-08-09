@@ -193,6 +193,7 @@ registerBlockType( 'core/image', {
 		const classes = classnames( className, {
 			'is-transient': 0 === url.indexOf( 'blob:' ),
 			'is-resized': !! width,
+			'is-focused': !! focus,
 		} );
 
 		// Disable reason: Each block can be selected by clicking on it
