@@ -15,6 +15,8 @@ import { __ } from '@wordpress/i18n';
  */
 import { getGutenbergURL, getWPAdminURL } from './utils/url';
 import {
+	resetPost,
+	setupNewPost,
 	resetBlocks,
 	focusBlock,
 	replaceBlocks,
@@ -254,5 +256,18 @@ export default {
 		if ( post.content ) {
 			return resetBlocks( parse( post.content.raw ) );
 		}
+	},
+	SET_INITIAL_POST( action ) {
+		const { post } = action;
+		const effects = [ resetPost( post ) ];
+
+		// Include auto draft title in edits while not flagging post as dirty
+		if ( post.status === 'auto-draft' ) {
+			effects.push( setupNewPost( {
+				title: post.title.raw,
+			} ) );
+		}
+
+		return effects;
 	},
 };

@@ -5,6 +5,48 @@ import uuid from 'uuid/v4';
 import { partial, castArray } from 'lodash';
 
 /**
+ * Returns an action object used in signalling that editor has initialized with
+ * the specified post object.
+ *
+ * @param  {Object} post Post object
+ * @return {Object}      Action object
+ */
+export function setInitialPost( post ) {
+	return {
+		type: 'SET_INITIAL_POST',
+		post,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the latest version of the
+ * post has been received, either by initialization or save.
+ *
+ * @param  {Object} post Post object
+ * @return {Object}      Action object
+ */
+export function resetPost( post ) {
+	return {
+		type: 'RESET_POST',
+		post,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that editor has initialized as a
+ * new post with specified edits which should be considered non-dirtying.
+ *
+ * @param  {Object} edits Edited attributes object
+ * @return {Object}       Action object
+ */
+export function setupNewPost( edits ) {
+	return {
+		type: 'SETUP_NEW_POST',
+		edits,
+	};
+}
+
+/**
  * Returns an action object used in signalling that blocks state should be
  * reset to the specified array of blocks, taking precedence over any other
  * content reflected as an edit in state.

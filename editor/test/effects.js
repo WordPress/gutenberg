@@ -11,7 +11,15 @@ import { getBlockTypes, unregisterBlockType, registerBlockType, createBlock } fr
 /**
  * Internal dependencies
  */
-import { mergeBlocks, focusBlock, replaceBlocks, editPost, savePost } from '../actions';
+import {
+	resetPost,
+	setupNewPost,
+	mergeBlocks,
+	focusBlock,
+	replaceBlocks,
+	editPost,
+	savePost,
+} from '../actions';
 import effects from '../effects';
 import * as selectors from '../selectors';
 
@@ -234,6 +242,31 @@ describe( 'effects', () => {
 
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( savePost() );
+		} );
+	} );
+
+	describe( '.SET_INITIAL_POST', () => {
+		const handler = effects.SET_INITIAL_POST;
+
+		it( 'should return reset action', () => {
+			const post = { id: 1, title: { raw: 'A History Of Pork' }, status: 'draft' };
+
+			const result = handler( { post } );
+
+			expect( result ).toEqual( [
+				resetPost( post ),
+			] );
+		} );
+
+		it( 'should return post setup action only if auto-draft', () => {
+			const post = { id: 2, title: { raw: 'A History of Pork' }, status: 'auto-draft' };
+
+			const result = handler( { post } );
+
+			expect( result ).toEqual( [
+				resetPost( post ),
+				setupNewPost( { title: 'A History of Pork' } ),
+			] );
 		} );
 	} );
 } );

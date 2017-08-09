@@ -4,6 +4,7 @@
 import optimist from 'redux-optimist';
 import { combineReducers, applyMiddleware, createStore } from 'redux';
 import refx from 'refx';
+import multi from 'redux-multi';
 import { reduce, keyBy, first, last, omit, without, flowRight, mapValues } from 'lodash';
 
 /**
@@ -532,7 +533,7 @@ export function createReduxStore() {
 		userData,
 	} ) );
 
-	const enhancers = [ applyMiddleware( refx( effects ) ) ];
+	const enhancers = [ applyMiddleware( multi, refx( effects ) ) ];
 	if ( window.__REDUX_DEVTOOLS_EXTENSION__ ) {
 		enhancers.push( window.__REDUX_DEVTOOLS_EXTENSION__() );
 	}

@@ -20,7 +20,7 @@ import { settings } from '@wordpress/date';
 import './assets/stylesheets/main.scss';
 import Layout from './layout';
 import { createReduxStore } from './state';
-import { undo } from './actions';
+import { setInitialPost, undo } from './actions';
 import EditorSettingsProvider from './settings/provider';
 
 /**
@@ -56,30 +56,6 @@ if ( settings.timezone.string ) {
 }
 
 /**
- * Initializes Redux state with bootstrapped post, if provided.
- *
- * @param {Redux.Store} store Redux store instance
- * @param {Object}     post  Bootstrapped post object
- */
-function preparePostState( store, post ) {
-	// Set current post into state
-	store.dispatch( {
-		type: 'RESET_POST',
-		post,
-	} );
-
-	// Include auto draft title in edits while not flagging post as dirty
-	if ( post.status === 'auto-draft' ) {
-		store.dispatch( {
-			type: 'SETUP_NEW_POST',
-			edits: {
-				title: post.title.raw,
-			},
-		} );
-	}
-}
-
-/**
  * Initializes and returns an instance of Editor.
  *
  * @param {String} id              Unique identifier for editor instance
@@ -95,7 +71,7 @@ export function createEditorInstance( id, post, userSettings ) {
 		settings: editorSettings,
 	} );
 
-	preparePostState( store, post );
+	store.dispatch( setInitialPost( post ) );
 
 	render(
 		<ReduxProvider store={ store }>
