@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { ResizableBox } from 'react-resizable';
+import ResizableBox from 'react-resizable-box';
 
 /**
  * WordPress dependencies
@@ -232,11 +232,24 @@ registerBlockType( 'core/image', {
 							<ResizableBox
 								width={ currentWidth }
 								height={ currentHeight }
-								minConstraints={ [ minWidth, minHeight ] }
-								maxConstraints={ [ imageWidth, imageHeight ] }
-								handleSize={ [ 15, 15 ] }
+								minWidth={ minWidth }
+								maxWidth={ imageWidth }
+								minHeight={ minHeight }
+								maxHeight={ imageHeight }
 								lockAspectRatio
-								onResize={ ( event, { size } ) => setAttributes( size ) }
+								handlerClasses={ {
+									topRight: 'wp-block-image__resize-handler-top-right',
+									bottomRight: 'wp-block-image__resize-handler-bottom-right',
+									topLeft: 'wp-block-image__resize-handler-top-left',
+									bottomLeft: 'wp-block-image__resize-handler-bottom-left',
+								} }
+								enable={ { top: false, right: true, bottom: false, left: false, topRight: true, bottomRight: true, bottomLeft: true, topLeft: true } }
+								onResize={ ( event, direction, elt ) => {
+									setAttributes( {
+										width: elt.clientWidth,
+										height: elt.clientHeight,
+									} );
+								} }
 							>
 								{ img }
 							</ResizableBox>

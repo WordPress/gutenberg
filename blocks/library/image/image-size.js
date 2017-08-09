@@ -66,8 +66,8 @@ class ImageSize extends Component {
 		const sizes = {
 			imageWidth: this.image && this.image.width,
 			imageHeight: this.image && this.image.height,
-			containerWidth: this.container && this.container.width,
-			containerHeight: this.container && this.container.height,
+			containerWidth: this.container && this.container.clientWidth,
+			containerHeight: this.container && this.container.clientHeight,
 			imageWidthWithinContainer: this.state.width,
 			imageHeightWithinContainer: this.state.height,
 		};
