@@ -14,6 +14,18 @@ Key take-aways from parsing that paragraph:
 
 Gutenberg is being developed on <a href="https://github.com/WordPress/gutenberg">Github</a>, and you can try <a href="https://wordpress.org/plugins/gutenberg/">an early beta version today from the plugin repository</a>. Though keep in mind it's not fully functional, feature complete, or production ready.
 
+## When will Gutenberg be merged into WordPress?
+We are hoping that Gutenberg will be sufficiently polished, tested, iterated and proven, that it can be <a href="https://ma.tt/2017/06/4-8-and-whats-coming/">merged into WordPress 5.0</a>.
+
+The editor focus so far has taken 6 months. The first 3 months were spent designing, planning, prototyping and testing prototypes, to help us inform how to approach this. The actual plugin you can test in the repository right now has come together in the other 3 months (at the time of writing).
+
+We are far from done yet, but we are moving fast. Please help us by giving feedback, surfacing issues, testing, or even contributing, so hopefully we can be ready in time for WordPress 5.0.
+
+## Is Gutenberg built on top of TinyMCE?
+No.
+
+TinyMCE is one of the best tools for enabling rich text on the web. In Gutenberg, TinyMCE does exactly that. Nearly every textfield you'll find is augmented with TinyMCE for rich text. Whether it be text, lists, or even just a single caption, TinyMCE can be invoked on blocks for rich text enhancements.
+
 ## What browsers will Gutenberg support?
 
 Gutenberg will work in modern browsers, and Internet Explorer 11.
@@ -62,18 +74,6 @@ See also https://github.com/WordPress/gutenberg/issues/963
 
 ## How will editor styles work?
 We are still exploring how to apply theme styles on the editor, but the overall goal is that by virtue of styling individual blocks we can compose a full stylesheet that gives the look of the theme to the editor.
-
-## When will Gutenberg be merged into WordPress?
-We are hoping that Gutenberg will be sufficiently polished, tested, iterated and proven, that it can be <a href="https://ma.tt/2017/06/4-8-and-whats-coming/">merged into WordPress 5.0</a>.
-
-The editor focus so far has taken 6 months. The first 3 months were spent designing, planning, prototyping and testing prototypes, to help us inform how to approach this. The actual plugin you can test in the repository right now has come together in the other 3 months (at the time of writing).
-
-We are far from done yet, but we are moving fast. Please help us by giving feedback, surfacing issues, testing, or even contributing, so hopefully we can be ready in time for WordPress 5.0.
-
-## Is Gutenberg built on top of TinyMCE?
-No.
-
-TinyMCE is one of the best tools for enabling rich text on the web. In Gutenberg, TinyMCE does exactly that. Nearly every textfield you'll find is augmented with TinyMCE for rich text. Whether it be text, lists, or even just a single caption, TinyMCE can be invoked on blocks for rich text enhancements.
 
 ## Should I be concerned that Gutenberg will make my plugin obsolete?
 The goal of Gutenberg is not to put anyone out of business. It is to evolve WordPress so there's more business to be had in the future.
