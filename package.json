@@ -32,6 +32,7 @@
     "react-datepicker": "^0.46.0",
     "react-dom": "^15.5.4",
     "react-redux": "^5.0.4",
+    "react-resizable-box": "^2.0.6",
     "react-slot-fill": "^1.0.0-alpha.11",
     "react-transition-group": "^1.1.3",
     "redux": "^3.6.0",
@@ -102,7 +103,7 @@
     ],
     "coverageDirectory": "coverage",
     "moduleNameMapper": {
-      "\\.scss$": "<rootDir>/test/style-mock.js",
+      "\\.(scss|css)$": "<rootDir>/test/style-mock.js",
       "@wordpress\\/(blocks|components|date|editor|element|i18n|utils)": "$1"
     },
     "modulePaths": [

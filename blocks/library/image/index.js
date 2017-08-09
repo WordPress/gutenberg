@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import ResizableBox from 'react-resizable-box';
 
 /**
  * WordPress dependencies
@@ -14,6 +15,7 @@ import { Placeholder, Dashicon, Toolbar, DropZone, FormFileUpload } from '@wordp
  */
 import './style.scss';
 import { registerBlockType, source } from '../../api';
+import withEditorSettings from '../../with-editor-settings';
 import Editable from '../../editable';
 import MediaUploadButton from '../../media-upload-button';
 import InspectorControls from '../../inspector-controls';
@@ -22,6 +24,7 @@ import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import BlockDescription from '../../block-description';
 import UrlInputButton from '../../url-input/button';
+import ImageSize from './image-size';
 
 const { attr, children } = source;
 
@@ -75,19 +78,25 @@ registerBlockType( 'core/image', {
 	},
 
 	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
+		const { align, width } = attributes;
 		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
-			return { 'data-align': align };
+			return { 'data-align': align, 'data-resized': !! width };
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, className } ) {
-		const { url, alt, caption, align, id, href } = attributes;
+	edit: withEditorSettings()( ( { attributes, setAttributes, focus, setFocus, className, settings } ) => {
+		const { url, alt, caption, align, id, href, width, height } = attributes;
 		const updateAlt = ( newAlt ) => setAttributes( { alt: newAlt } );
-		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
+		const updateAlignment = ( nextAlign ) => {
+			const extraUpdatedAttributes = [ 'wide', 'full' ].indexOf( nextAlign ) !== -1
+				? { width: undefined, height: undefined }
+				: {};
+			setAttributes( { ...extraUpdatedAttributes, align: nextAlign } );
+		};
 		const onSelectImage = ( media ) => {
 			setAttributes( { url: media.url, alt: media.alt, caption: media.caption, id: media.id } );
 		};
+		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1;
 		const uploadButtonProps = { isLarge: true };
 		const onSetHref = ( value ) => setAttributes( { href: value } );
 		const uploadFromFiles = ( files ) => {
@@ -184,6 +193,8 @@ registerBlockType( 'core/image', {
 		const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
 		const classes = classnames( className, {
 			'is-transient': 0 === url.indexOf( 'blob:' ),
+			'is-resized': !! width,
+			'is-focused': !! focus,
 		} );
 
 		// Disable reason: Each block can be selected by clicking on it
@@ -201,7 +212,51 @@ registerBlockType( 'core/image', {
 				</InspectorControls>
 			),
 			<figure key="image" className={ classes }>
-				<img src={ url } alt={ alt } onClick={ setFocus } />
+				<ImageSize src={ url } dirtynessTrigger={ align }>
+					{ ( sizes ) => {
+						const {
+							imageWidthWithinContainer,
+							imageHeightWithinContainer,
+							imageWidth,
+							imageHeight,
+						} = sizes;
+						const currentWidth = width || imageWidthWithinContainer;
+						const currentHeight = height || imageHeightWithinContainer;
+						const img = <img src={ url } alt={ alt } onClick={ setFocus } />;
+						if ( ! isResizable || ! imageWidthWithinContainer ) {
+							return img;
+						}
+						const ratio = imageWidth / imageHeight;
+						const minWidth = imageWidth < imageHeight ? 10 : 10 * ratio;
+						const minHeight = imageHeight < imageWidth ? 10 : 10 / ratio;
+						return (
+							<ResizableBox
+								width={ currentWidth }
+								height={ currentHeight }
+								minWidth={ minWidth }
+								maxWidth={ settings.maxWidth }
+								minHeight={ minHeight }
+								maxHeight={ settings.maxWidth / ratio }
+								lockAspectRatio
+								handlerClasses={ {
+									topRight: 'wp-block-image__resize-handler-top-right',
+									bottomRight: 'wp-block-image__resize-handler-bottom-right',
+									topLeft: 'wp-block-image__resize-handler-top-left',
+									bottomLeft: 'wp-block-image__resize-handler-bottom-left',
+								} }
+								enable={ { top: false, right: true, bottom: false, left: false, topRight: true, bottomRight: true, bottomLeft: true, topLeft: true } }
+								onResize={ ( event, direction, elt ) => {
+									setAttributes( {
+										width: elt.clientWidth,
+										height: elt.clientHeight,
+									} );
+								} }
+							>
+								{ img }
+							</ResizableBox>
+						);
+					} }
+				</ImageSize>
 				{ ( caption && caption.length > 0 ) || !! focus ? (
 					<Editable
 						tagName="figcaption"
@@ -216,16 +271,17 @@ registerBlockType( 'core/image', {
 			</figure>,
 		];
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
-	},
+	} ),
 
 	save( { attributes } ) {
-		const { url, alt, caption, align, href } = attributes;
-		const image = <img src={ url } alt={ alt } />;
+		const { url, alt, caption, align, href, width, height } = attributes;
+		const extraImageProps = width || height ? { width, height } : {};
+		const image = <img src={ url } alt={ alt } { ...extraImageProps } />;
 
 		return (
 			<figure className={ align && `align${ align }` }>
 				{ href ? <a href={ href }>{ image }</a> : image }
-				{ caption.length > 0 && <figcaption>{ caption }</figcaption> }
+				{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
 			</figure>
 		);
 	},
