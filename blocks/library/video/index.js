@@ -11,11 +11,11 @@ import { Placeholder } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { registerBlockType, query } from '../../api';
+import { registerBlockType, source } from '../../api';
 import MediaUploadButton from '../../media-upload-button';
 import Editable from '../../editable';
 
-const { attr, children } = query;
+const { attr, children } = source;
 
 registerBlockType( 'core/video', {
 	title: __( 'Video' ),
@@ -25,8 +25,14 @@ registerBlockType( 'core/video', {
 	category: 'common',
 
 	attributes: {
-		src: attr( 'video', 'src' ),
-		caption: children( 'figcaption' ),
+		src: {
+			type: 'string',
+			source: attr( 'video', 'src' ),
+		},
+		caption: {
+			type: 'array',
+			source: children( 'figcaption' ),
+		},
 	},
 
 	edit( { attributes, setAttributes, className, focus, setFocus } ) {

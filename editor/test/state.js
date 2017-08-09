@@ -969,7 +969,7 @@ describe( 'state', () => {
 				type: 'SETUP_EDITOR',
 			} );
 
-			expect( initial.recentlyUsedBlocks ).toEqual( expect.arrayContaining( [ 'core/test-block', 'core/paragraph' ] ) );
+			expect( initial.recentlyUsedBlocks ).toEqual( expect.arrayContaining( [ 'core/paragraph' ] ) );
 		} );
 	} );
 } );
