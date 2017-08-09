@@ -3,14 +3,14 @@
  */
 import { __ } from '@wordpress/i18n';
 import { filesUpload } from '@wordpress/utils';
-import { Toolbar, Placeholder, FormFileUpload } from '@wordpress/components';
+import { Dashicon, Toolbar, Placeholder, FormFileUpload } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './editor.scss';
 import './style.scss';
-import { registerBlockType } from '../../api';
+import { registerBlockType, source } from '../../api';
 import MediaUploadButton from '../../media-upload-button';
 import InspectorControls from '../../inspector-controls';
 import RangeControl from '../../inspector-controls/range-control';
@@ -21,43 +21,13 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import GalleryImage from './gallery-image';
 import BlockDescription from '../../block-description';
 
+const { query, attr } = source;
 const MAX_COLUMNS = 8;
 const linkOptions = [
 	{ value: 'attachment', label: __( 'Attachment Page' ) },
 	{ value: 'media', label: __( 'Media File' ) },
 	{ value: 'none', label: __( 'None' ) },
 ];
-
-const editMediaLibrary = ( attributes, setAttributes ) => {
-	const frameConfig = {
-		frame: 'post',
-		title: __( 'Update Gallery media' ),
-		button: {
-			text: __( 'Select' ),
-		},
-		multiple: true,
-		state: 'gallery-edit',
-		selection: new wp.media.model.Selection( attributes.images, { multiple: true } ),
-	};
-
-	const editFrame = wp.media( frameConfig );
-
-	// the frameConfig settings dont carry to other state modals
-	// so requires setting this attribute directory to not show settings
-	editFrame.state( 'gallery-edit' ).attributes.displaySettings = false;
-
-	function updateFn() {
-		setAttributes( {
-			images: this.frame.state().attributes.library.models.map( ( a ) => {
-				return a.attributes;
-			} ),
-		} );
-	}
-
-	editFrame.on( 'insert', updateFn );
-	editFrame.state( 'gallery-edit' ).on( 'update', updateFn );
-	editFrame.open( 'gutenberg-gallery' );
-};
 
 function defaultColumnsNumber( attributes ) {
 	return Math.min( 3, attributes.images.length );
@@ -77,6 +47,11 @@ registerBlockType( 'core/gallery', {
 		images: {
 			type: 'array',
 			default: [],
+			source: query( 'div.wp-block-gallery figure.blocks-gallery-image img', {
+				url: attr( 'src' ),
+				alt: attr( 'alt' ),
+				id: attr( 'data-id' ),
+			} )
 		},
 		columns: {
 			type: 'number',
@@ -105,6 +80,8 @@ registerBlockType( 'core/gallery', {
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		const toggleImageCrop = () => setAttributes( { imageCrop: ! imageCrop } );
 
+		const onSelectImages = ( imgs ) => setAttributes( { images: imgs } );
+
 		const uploadFromFiles = ( event ) => {
 			filesUpload( event.target.files, setAttributes );
 		};
@@ -117,18 +94,29 @@ registerBlockType( 'core/gallery', {
 						onChange={ updateAlignment }
 					/>
 					{ !! images.length && (
-						<Toolbar controls={ [ {
-							icon: 'edit',
-							title: __( 'Edit Gallery' ),
-							onClick: () => editMediaLibrary( attributes, setAttributes ),
-						} ] } />
+						<Toolbar>
+							<li>
+								<MediaUploadButton
+									buttonProps={ {
+										className: 'components-icon-button components-toolbar__control',
+										'aria-label': __( 'Edit Gallery' ),
+									} }
+									onSelect={ onSelectImages }
+									type="image"
+									multiple="true"
+									gallery="true"
+									value={ images }
+								>
+									<Dashicon icon="edit" />
+								</MediaUploadButton>
+							</li>
+						</Toolbar>
 					) }
 				</BlockControls>
 			)
 		);
 
 		if ( images.length === 0 ) {
-			const setMediaUrl = ( imgs ) => setAttributes( { images: imgs } );
 			const uploadButtonProps = { isLarge: true };
 
 			return [
@@ -150,7 +138,7 @@ registerBlockType( 'core/gallery', {
 					</FormFileUpload>
 					<MediaUploadButton
 						buttonProps={ uploadButtonProps }
-						onSelect={ setMediaUrl }
+						onSelect={ onSelectImages }
 						type="image"
 						multiple="true"
 						gallery="true"
