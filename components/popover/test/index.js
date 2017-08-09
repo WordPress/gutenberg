@@ -232,5 +232,11 @@ describe( 'Popover', () => {
 
 			expect( wrapper.type() ).not.toBeNull();
 		} );
+
+		it( 'should pass additional to portaled element', () => {
+			const wrapper = shallow( <Popover isOpen role="tooltip">Hello</Popover> );
+
+			expect( wrapper.find( '.components-popover' ).prop( 'role' ) ).toBe( 'tooltip' );
+		} );
 	} );
 } );

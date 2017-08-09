@@ -71,6 +71,7 @@ class Tooltip extends Component {
 					isOpen={ isOver }
 					position={ position }
 					className="components-tooltip"
+					role="tooltip"
 				>
 					{ text }
 				</Popover>,
