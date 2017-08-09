@@ -44,7 +44,6 @@ class FormatToolbar extends Component {
 		this.dropLink = this.dropLink.bind( this );
 		this.submitLink = this.submitLink.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
-		this.onLinkValueChange = this.onLinkValueChange.bind( this );
 	}
 
 	componentDidMount() {
