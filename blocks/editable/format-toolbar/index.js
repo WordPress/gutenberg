@@ -83,8 +83,6 @@ class FormatToolbar extends Component {
 	editLink( event ) {
 		event.preventDefault();
 		this.props.onEditLink();
-
-		this.setState( { linkValue: this.props.formats.link.value } );
 	}
 
 	submitLink( event ) {
@@ -93,10 +91,6 @@ class FormatToolbar extends Component {
 		if ( this.props.isAddingLink ) {
 			this.props.speak( __( 'Link inserted.' ), 'assertive' );
 		}
-	}
-
-	onLinkValueChange( event ) {
-		this.setState( { linkValue: event } );
 	}
 
 	render() {
