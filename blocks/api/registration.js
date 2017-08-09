@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { isFunction } from 'lodash';
+import { isFunction, findIndex } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -92,7 +92,7 @@ export function registerBlockType( name, settings ) {
 		);
 		return;
 	}
-	if ( 'category' in settings && ! ( categories.find( x => x.slug === settings.category ) ) ) {
+	if ( 'category' in settings && findIndex( categories, ( result ) => result.slug === settings.category ) === -1 ) {
 		console.error(
 			'The block "' + name + '" must have a registered category.'
 		);
