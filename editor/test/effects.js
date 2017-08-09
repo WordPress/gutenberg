@@ -26,7 +26,7 @@ import * as selectors from '../selectors';
 jest.mock( '../selectors' );
 
 describe( 'effects', () => {
-	const defaultBlockSettings = { save: noop, category: 'common' };
+	const defaultBlockSettings = { save: () => 'Saved', category: 'common' };
 
 	beforeEach( () => jest.resetAllMocks() );
 
@@ -248,8 +248,17 @@ describe( 'effects', () => {
 	describe( '.SET_INITIAL_POST', () => {
 		const handler = effects.SET_INITIAL_POST;
 
-		it( 'should return reset action', () => {
-			const post = { id: 1, title: { raw: 'A History Of Pork' }, status: 'draft' };
+		it( 'should return post reset action', () => {
+			const post = {
+				id: 1,
+				title: {
+					raw: 'A History of Pork',
+				},
+				content: {
+					raw: '',
+				},
+				status: 'draft',
+			};
 
 			const result = handler( { post } );
 
@@ -258,8 +267,39 @@ describe( 'effects', () => {
 			] );
 		} );
 
+		it( 'should return block reset with non-empty content', () => {
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+			const post = {
+				id: 1,
+				title: {
+					raw: 'A History of Pork',
+				},
+				content: {
+					raw: '<!-- wp:core/test-block -->Saved<!-- /wp:core/test-block -->',
+				},
+				status: 'draft',
+			};
+
+			const result = handler( { post } );
+
+			expect( result ).toHaveLength( 2 );
+			expect( result ).toContainEqual( resetPost( post ) );
+			expect( result.some( ( { blocks } ) => {
+				return blocks && blocks[ 0 ].name === 'core/test-block';
+			} ) ).toBe( true );
+		} );
+
 		it( 'should return post setup action only if auto-draft', () => {
-			const post = { id: 2, title: { raw: 'A History of Pork' }, status: 'auto-draft' };
+			const post = {
+				id: 1,
+				title: {
+					raw: 'A History of Pork',
+				},
+				content: {
+					raw: '',
+				},
+				status: 'auto-draft',
+			};
 
 			const result = handler( { post } );
 

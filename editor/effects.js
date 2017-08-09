@@ -251,15 +251,18 @@ export default {
 
 		dispatch( savePost() );
 	},
-	RESET_POST( action ) {
-		const { post } = action;
-		if ( post.content ) {
-			return resetBlocks( parse( post.content.raw ) );
-		}
-	},
 	SET_INITIAL_POST( action ) {
 		const { post } = action;
-		const effects = [ resetPost( post ) ];
+		const effects = [];
+
+		// Parse content as blocks
+		if ( post.content.raw ) {
+			effects.push( resetBlocks( parse( post.content.raw ) ) );
+		}
+
+		// Resetting post should occur after blocks have been reset, since it's
+		// the post reset that restarts history (used in dirty detection).
+		effects.push( resetPost( post ) );
 
 		// Include auto draft title in edits while not flagging post as dirty
 		if ( post.status === 'auto-draft' ) {
