@@ -13,7 +13,7 @@ import { nodetypes } from '@wordpress/utils';
  */
 import { createBlock } from './factory';
 import { getBlockTypes, getUnknownTypeHandlerName } from './registration';
-import { parseBlockAttributes } from './parser';
+import { getSourcedAttributes } from './parser';
 import stripAttributes from './paste/strip-attributes';
 import removeSpans from './paste/remove-spans';
 
@@ -90,14 +90,16 @@ export default function( nodes ) {
 			const transformsFrom = get( blockType, 'transforms.from', [] );
 			const transform = find( transformsFrom, ( { type } ) => type === 'raw' );
 
-			if ( ! transform || ! transform.matcher( node ) ) {
+			if ( ! transform || ! transform.source( node ) ) {
 				return acc;
 			}
 
-			const { name, defaultAttributes = [] } = blockType;
-			const attributes = parseBlockAttributes( node.outerHTML, transform.attributes );
+			const attributes = getSourcedAttributes(
+				node.outerHTML,
+				transform.attributes,
+			);
 
-			return createBlock( name, { ...defaultAttributes, ...attributes } );
+			return createBlock( blockType.name, attributes );
 		}, null );
 
 		if ( block ) {

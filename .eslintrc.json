@@ -94,7 +94,7 @@
 		"one-var": "off",
 		"padded-blocks": [ "error", "never" ],
 		"prefer-const": "error",
-		"quote-props": [ "error", "as-needed", { "keywords": true } ],
+		"quote-props": [ "error", "as-needed" ],
 		"react/display-name": "off",
 		"react/jsx-curly-spacing": [ "error", "always" ],
 		"react/jsx-equals-spacing": "error",

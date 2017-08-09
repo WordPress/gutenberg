@@ -25,6 +25,7 @@ import {
 describe( 'validation', () => {
 	const defaultBlockSettings = {
 		save: ( { attributes } ) => attributes.fruit,
+		category: 'common',
 	};
 
 	afterEach( () => {

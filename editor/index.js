@@ -34,6 +34,10 @@ import EditorSettingsProvider from './settings/provider';
  */
 const DEFAULT_SETTINGS = {
 	wideImages: false,
+
+	// This is current max width of the block inner area
+	// It's used to constraint image resizing and this value could be overriden later by themes
+	maxWidth: 608,
 };
 
 // Configure moment globally
@@ -81,9 +85,10 @@ function preparePostState( store, post ) {
  *
  * @param {String} id              Unique identifier for editor instance
  * @param {Object} post            API entity for post to edit  (type required)
- * @param {Object} editorSettings  Editor settings object
+ * @param {Object} userSettings  Editor settings object
  */
-export function createEditorInstance( id, post, editorSettings = DEFAULT_SETTINGS ) {
+export function createEditorInstance( id, post, userSettings ) {
+	const editorSettings = Object.assign( {}, DEFAULT_SETTINGS, userSettings );
 	const store = createReduxStore();
 
 	store.dispatch( {

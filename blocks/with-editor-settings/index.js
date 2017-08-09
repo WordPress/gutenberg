@@ -13,7 +13,7 @@ const withEditorSettings = ( mapSettingsToProps ) => ( OriginalComponent ) => {
 		render() {
 			const extraProps = mapSettingsToProps
 				? mapSettingsToProps( this.context.editor, this.props )
-				: this.context.editor;
+				: { settings: this.context.editor };
 
 			return (
 				<OriginalComponent

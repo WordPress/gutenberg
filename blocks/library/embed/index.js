@@ -10,20 +10,18 @@ import { includes } from 'lodash';
 import { __, sprintf } from '@wordpress/i18n';
 import { Component, renderToString } from '@wordpress/element';
 import { Button, Placeholder, Spinner, SandBox } from '@wordpress/components';
-// TODO: This is a circular dependency between editor and blocks. This must be
-// updated, eventually to depend on published `@wordpress/url`
-import { addQueryArgs } from '../../../editor/utils/url';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, query, createBlock } from '../../api';
+import { registerBlockType, source, createBlock } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
-const { attr, children } = query;
+const { children } = source;
 
 // These embeds do not work in sandboxes
 const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
@@ -37,8 +35,16 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms } 
 		category,
 
 		attributes: {
-			title: attr( 'iframe', 'title' ),
-			caption: children( 'figcaption' ),
+			url: {
+				type: 'string',
+			},
+			caption: {
+				type: 'array',
+				source: children( 'figcaption' ),
+			},
+			align: {
+				type: 'string',
+			},
 		},
 
 		transforms,
@@ -209,7 +215,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms } 
 		},
 
 		save( { attributes } ) {
-			const { url, caption = [], align } = attributes;
+			const { url, caption, align } = attributes;
 
 			return (
 				<figure className={ align && `align${ align }` }>
