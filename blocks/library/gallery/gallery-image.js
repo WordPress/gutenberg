@@ -10,7 +10,7 @@ export default function GalleryImage( props ) {
 			break;
 	}
 
-	const image = <img src={ props.img.url } alt={ props.img.alt } />;
+	const image = <img src={ props.img.url } alt={ props.img.alt } data-id={ props.img.id } />;
 
 	return (
 		<figure className="blocks-gallery-image">
