@@ -4,10 +4,34 @@
         "attrs": {
             "url": "https://wordpress.tv/"
         },
+        "children": [
+            "\n",
+            {
+                "type": "HTML_Tag",
+                "name": "figure",
+                "attrs": {
+                    "class": "wp-block-embed-wordpress-tv"
+                },
+                "children": [
+                    "\n    https://wordpress.tv/\n    ",
+                    {
+                        "type": "HTML_Tag",
+                        "name": "figcaption",
+                        "attrs": {},
+                        "children": [
+                            "Embedded content from wordpress-tv"
+                        ]
+                    },
+                    "\n"
+                ]
+            },
+            "\n"
+        ],
         "rawContent": "\n<figure class=\"wp-block-embed-wordpress-tv\">\n    https://wordpress.tv/\n    <figcaption>Embedded content from wordpress-tv</figcaption>\n</figure>\n"
     },
     {
         "attrs": {},
+        "children": "\n",
         "rawContent": "\n"
     }
 ]

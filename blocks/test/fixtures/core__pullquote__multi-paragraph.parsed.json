@@ -2,10 +2,60 @@
     {
         "blockName": "core/pullquote",
         "attrs": null,
+        "children": [
+            "\n",
+            {
+                "type": "HTML_Tag",
+                "name": "blockquote",
+                "attrs": {
+                    "class": "wp-block-pullquote alignnone"
+                },
+                "children": [
+                    "\n    ",
+                    {
+                        "type": "HTML_Tag",
+                        "name": "p",
+                        "attrs": {},
+                        "children": [
+                            "Paragraph ",
+                            {
+                                "type": "HTML_Tag",
+                                "name": "strong",
+                                "attrs": {},
+                                "children": [
+                                    "one"
+                                ]
+                            }
+                        ]
+                    },
+                    "\n    ",
+                    {
+                        "type": "HTML_Tag",
+                        "name": "p",
+                        "attrs": {},
+                        "children": [
+                            "Paragraph two"
+                        ]
+                    },
+                    "\n    ",
+                    {
+                        "type": "HTML_Tag",
+                        "name": "footer",
+                        "attrs": {},
+                        "children": [
+                            "by whomever"
+                        ]
+                    },
+                    "\n"
+                ]
+            },
+            "\n"
+        ],
         "rawContent": "\n<blockquote class=\"wp-block-pullquote alignnone\">\n    <p>Paragraph <strong>one</strong></p>\n    <p>Paragraph two</p>\n    <footer>by whomever</footer>\n</blockquote>\n"
     },
     {
         "attrs": {},
+        "children": "\n",
         "rawContent": "\n"
     }
 ]

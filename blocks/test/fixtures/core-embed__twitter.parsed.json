@@ -4,10 +4,34 @@
         "attrs": {
             "url": "https://twitter.com/automattic"
         },
+        "children": [
+            "\n",
+            {
+                "type": "HTML_Tag",
+                "name": "figure",
+                "attrs": {
+                    "class": "wp-block-embed-twitter"
+                },
+                "children": [
+                    "\n    https://twitter.com/automattic\n    ",
+                    {
+                        "type": "HTML_Tag",
+                        "name": "figcaption",
+                        "attrs": {},
+                        "children": [
+                            "We are Automattic"
+                        ]
+                    },
+                    "\n"
+                ]
+            },
+            "\n"
+        ],
         "rawContent": "\n<figure class=\"wp-block-embed-twitter\">\n    https://twitter.com/automattic\n    <figcaption>We are Automattic</figcaption>\n</figure>\n"
     },
     {
         "attrs": {},
+        "children": "\n",
         "rawContent": "\n"
     }
 ]

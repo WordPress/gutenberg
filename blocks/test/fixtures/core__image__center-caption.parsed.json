@@ -4,10 +4,40 @@
         "attrs": {
             "align": "center"
         },
+        "children": [
+            "\n",
+            {
+                "type": "HTML_Tag",
+                "name": "figure",
+                "attrs": {
+                    "class": "wp-block-image"
+                },
+                "children": [
+                    {
+                        "type": "HTML_Void_Tag",
+                        "name": "img",
+                        "attrs": {
+                            "src": "https://cldup.com/YLYhpou2oq.jpg",
+                            "class": "aligncenter"
+                        }
+                    },
+                    {
+                        "type": "HTML_Tag",
+                        "name": "figcaption",
+                        "attrs": {},
+                        "children": [
+                            "Give it a try. Press the &quot;really wide&quot; button on the image toolbar."
+                        ]
+                    }
+                ]
+            },
+            "\n"
+        ],
         "rawContent": "\n<figure class=\"wp-block-image\"><img src=\"https://cldup.com/YLYhpou2oq.jpg\" class=\"aligncenter\"/><figcaption>Give it a try. Press the &quot;really wide&quot; button on the image toolbar.</figcaption></figure>\n"
     },
     {
         "attrs": {},
+        "children": "\n",
         "rawContent": "\n"
     }
 ]

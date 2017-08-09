@@ -4,10 +4,32 @@
         "attrs": {
             "backgroundColor": "#fcb900"
         },
+        "children": [
+            "\n",
+            {
+                "type": "HTML_Tag",
+                "name": "div",
+                "attrs": {
+                    "style": "background-color:#fcb900"
+                },
+                "children": [
+                    {
+                        "type": "HTML_Tag",
+                        "name": "p",
+                        "attrs": {},
+                        "children": [
+                            "Text with color."
+                        ]
+                    }
+                ]
+            },
+            "\n"
+        ],
         "rawContent": "\n<div style=\"background-color:#fcb900\"><p>Text with color.</p></div>\n"
     },
     {
         "attrs": {},
+        "children": "\n",
         "rawContent": "\n"
     }
 ]

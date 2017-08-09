@@ -2,10 +2,40 @@
     {
         "blockName": "core/preformatted",
         "attrs": null,
+        "children": [
+            "\n",
+            {
+                "type": "HTML_Tag",
+                "name": "pre",
+                "attrs": {
+                    "class": "wp-block-preformatted"
+                },
+                "children": [
+                    "Some ",
+                    {
+                        "type": "HTML_Tag",
+                        "name": "em",
+                        "attrs": {},
+                        "children": [
+                            "preformatted"
+                        ]
+                    },
+                    " text...",
+                    {
+                        "type": "HTML_Void_Tag",
+                        "name": "br",
+                        "attrs": {}
+                    },
+                    "And more!"
+                ]
+            },
+            "\n"
+        ],
         "rawContent": "\n<pre class=\"wp-block-preformatted\">Some <em>preformatted</em> text...<br>And more!</pre>\n"
     },
     {
         "attrs": {},
+        "children": "\n",
         "rawContent": "\n"
     }
 ]

@@ -2,10 +2,23 @@
     {
         "blockName": "core/heading",
         "attrs": null,
+        "children": [
+            "\n",
+            {
+                "type": "HTML_Tag",
+                "name": "h2",
+                "attrs": {},
+                "children": [
+                    "A picture is worth a thousand words, or so the saying goes"
+                ]
+            },
+            "\n"
+        ],
         "rawContent": "\n<h2>A picture is worth a thousand words, or so the saying goes</h2>\n"
     },
     {
         "attrs": {},
+        "children": "\n",
         "rawContent": "\n"
     }
 ]

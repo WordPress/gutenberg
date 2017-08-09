@@ -37,10 +37,65 @@
                 }
             ]
         },
+        "children": [
+            "\n",
+            {
+                "type": "HTML_Tag",
+                "name": "div",
+                "attrs": {
+                    "class": "wp-block-gallery"
+                },
+                "children": [
+                    "\n\t",
+                    {
+                        "type": "HTML_Tag",
+                        "name": "figure",
+                        "attrs": {
+                            "class": "blocks-gallery-image"
+                        },
+                        "children": [
+                            "\n\t\t",
+                            {
+                                "type": "HTML_Void_Tag",
+                                "name": "img",
+                                "attrs": {
+                                    "src": "https://cldup.com/uuUqE_dXzy.jpg",
+                                    "alt": "title"
+                                }
+                            },
+                            "\n\t"
+                        ]
+                    },
+                    "\n\t",
+                    {
+                        "type": "HTML_Tag",
+                        "name": "figure",
+                        "attrs": {
+                            "class": "blocks-gallery-image"
+                        },
+                        "children": [
+                            "\n\t\t",
+                            {
+                                "type": "HTML_Void_Tag",
+                                "name": "img",
+                                "attrs": {
+                                    "src": "http://google.com/hi.png",
+                                    "alt": "title"
+                                }
+                            },
+                            "\n\t"
+                        ]
+                    },
+                    "\n"
+                ]
+            },
+            "\n"
+        ],
         "rawContent": "\n<div class=\"wp-block-gallery\">\n\t<figure class=\"blocks-gallery-image\">\n\t\t<img src=\"https://cldup.com/uuUqE_dXzy.jpg\" alt=\"title\" />\n\t</figure>\n\t<figure class=\"blocks-gallery-image\">\n\t\t<img src=\"http://google.com/hi.png\" alt=\"title\" />\n\t</figure>\n</div>\n"
     },
     {
         "attrs": {},
+        "children": "\n",
         "rawContent": "\n"
     }
 ]
