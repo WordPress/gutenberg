@@ -280,7 +280,7 @@ registerBlockType( 'core/image', {
 		return (
 			<figure className={ align && `align${ align }` }>
 				{ href ? <a href={ href }>{ image }</a> : image }
-				{ caption.length > 0 && <figcaption>{ caption }</figcaption> }
+				{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
 			</figure>
 		);
 	},
