@@ -4,13 +4,13 @@
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 import { Slot } from 'react-slot-fill';
-import { isFunction, isUndefined, partial } from 'lodash';
+import { filter, findIndex, partial } from 'lodash';
 import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
 
 /**
  * WordPress dependencies
  */
-import { Children, Component } from '@wordpress/element';
+import { Children, Component, findDOMNode } from '@wordpress/element';
 import { IconButton, Toolbar } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
 import { getBlockType, getBlockDefaultClassname, createBlock } from '@wordpress/blocks';
@@ -51,7 +51,7 @@ import {
 	getMultiSelectedBlockUids,
 } from '../../selectors';
 
-const { BACKSPACE, ESCAPE, DELETE, UP, DOWN, LEFT, RIGHT, ENTER } = keycodes;
+const { BACKSPACE, ESCAPE, DELETE, UP, DOWN, LEFT, RIGHT, ENTER, TAB } = keycodes;
 
 function FirstChild( { children } ) {
 	const childrenArray = Children.toArray( children );
@@ -252,7 +252,8 @@ class VisualEditorBlock extends Component {
 	onKeyDown( event ) {
 		const { keyCode, target } = event;
 
-		this.handleArrowKey( event );
+		//this.handleArrowKey( event );
+		this.handleToolbarCycle( event );
 
 		if ( keyCode === UP || keyCode === LEFT || keyCode === DOWN || keyCode === RIGHT ) {
 			const selection = window.getSelection();
@@ -270,7 +271,41 @@ class VisualEditorBlock extends Component {
 
 	onKeyUp( event ) {
 		this.removeOrDeselect( event );
-		this.handleArrowKey( event );
+		//this.handleArrowKey( event );
+	}
+
+	handleToolbarCycle( event ) {
+		const { keyCode, shiftKey, target } = event;
+		if ( keyCode !== TAB || ! this.node ) {
+			return;
+		}
+		const block = findDOMNode( this.node );
+		const isVisible = ( elem ) => ! ( elem.offsetWidth <= 0 || elem.offsetHeight <= 0 );
+		const allToolbars = filter( Array.from( block.querySelectorAll( '.components-toolbar' ) ), isVisible );
+
+		if ( shiftKey ) {
+			allToolbars.reverse();
+		}
+
+		const targetIndex = findIndex( allToolbars, ( toolbarNode ) => toolbarNode.contains( target ) );
+
+		if ( targetIndex === -1 ) {
+			return;
+		}
+
+		// we have a toolbar selected so we should be tabbing between toolbars
+		event.preventDefault();
+		event.stopPropagation();
+
+		if ( allToolbars.length > 1 ) {
+			const nextToolbar = ( targetIndex + 1 >= allToolbars.length ) ? allToolbars[ 0 ] : allToolbars[ targetIndex + 1 ];
+
+			const firstFocusableItem = nextToolbar.querySelector( 'button, *[tabindex]' );
+
+			if ( firstFocusableItem ) {
+				firstFocusableItem.focus();
+			}
+		}
 	}
 
 	handleArrowKey( event ) {
