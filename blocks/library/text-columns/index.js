@@ -31,12 +31,18 @@ registerBlockType( 'core/text-columns', {
 	category: 'layout',
 
 	attributes: {
-		content: query( 'p', children() ),
-	},
-
-	defaultAttributes: {
-		columns: 2,
-		content: [ [], [] ],
+		content: {
+			type: 'array',
+			source: query( 'p', children() ),
+			default: [ [], [] ],
+		},
+		columns: {
+			type: 'number',
+			default: 2,
+		},
+		width: {
+			type: 'string',
+		},
 	},
 
 	getEditWrapperProps( attributes ) {

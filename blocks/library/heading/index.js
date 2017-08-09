@@ -28,12 +28,21 @@ registerBlockType( 'core/heading', {
 	className: false,
 
 	attributes: {
-		content: children( 'h1,h2,h3,h4,h5,h6' ),
-		nodeName: prop( 'h1,h2,h3,h4,h5,h6', 'nodeName' ),
-	},
-
-	defaultAttributes: {
-		nodeName: 'H2',
+		content: {
+			type: 'array',
+			source: children( 'h1,h2,h3,h4,h5,h6' ),
+		},
+		nodeName: {
+			type: 'string',
+			source: prop( 'h1,h2,h3,h4,h5,h6', 'nodeName' ),
+			default: 'H2',
+		},
+		align: {
+			type: 'string',
+		},
+		placeholder: {
+			type: 'string',
+		},
 	},
 
 	transforms: {

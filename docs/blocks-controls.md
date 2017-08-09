@@ -28,7 +28,10 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 	category: 'layout',
 
 	attributes: {
-		content: children( 'p' ),
+		content: {
+			type: 'array',
+			source: children( 'p' )
+		}
 	},
 
 	edit: function( props ) {
@@ -98,7 +101,10 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 	category: 'layout',
 
 	attributes: {
-		content: children( 'p' ),
+		content: {
+			type: 'array',
+			source: children( 'p' ),
+		},
 	},
 
 	edit( { attributes, setAttributes, focus } ) {

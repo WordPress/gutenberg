@@ -6,6 +6,7 @@ import { createElement, Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import { text } from '../query';
 import serialize, {
 	getCommentAttributes,
 	getBeautifulContent,
@@ -139,13 +140,22 @@ describe( 'block serializer', () => {
 			expect( attributes ).toEqual( {} );
 		} );
 
-		it( 'should only return attributes which cannot be inferred from the content', () => {
+		it( 'should only return attributes which are not matched from content', () => {
 			const attributes = getCommentAttributes( {
 				fruit: 'bananas',
 				category: 'food',
 				ripeness: 'ripe',
 			}, {
-				fruit: 'bananas',
+				fruit: {
+					type: 'string',
+					source: text(),
+				},
+				category: {
+					type: 'string',
+				},
+				ripeness: {
+					type: 'string',
+				},
 			} );
 
 			expect( attributes ).toEqual( {
@@ -158,7 +168,14 @@ describe( 'block serializer', () => {
 			const attributes = getCommentAttributes( {
 				fruit: 'bananas',
 				ripeness: undefined,
-			}, {} );
+			}, {
+				fruit: {
+					type: 'string',
+				},
+				ripeness: {
+					type: 'string',
+				},
+			} );
 
 			expect( attributes ).toEqual( { fruit: 'bananas' } );
 		} );
@@ -182,14 +199,22 @@ describe( 'block serializer', () => {
 	describe( 'serialize()', () => {
 		it( 'should serialize the post content properly', () => {
 			const blockType = {
-				defaultAttributes: {
-					foo: true,
-					bar: false,
-				},
-				attributes: ( rawContent ) => {
-					return {
-						content: rawContent,
-					};
+				attributes: {
+					foo: {
+						type: 'string',
+						default: true,
+					},
+					bar: {
+						type: 'string',
+						default: false,
+					},
+					content: {
+						type: 'string',
+						source: text(),
+					},
+					stuff: {
+						type: 'string',
+					},
 				},
 				save( { attributes } ) {
 					return <p dangerouslySetInnerHTML={ { __html: attributes.content } } />;

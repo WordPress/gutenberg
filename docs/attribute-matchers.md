@@ -16,7 +16,9 @@ _Example_: Extract the `src` attribute from an image found in the block's markup
 
 ```js
 {
-	url: attr( 'img', 'src' )
+	url: {
+		source: attr( 'img', 'src' )
+	}
 }
 // { "url": "https://lorempixel.com/1200/800/" }
 ```
@@ -29,7 +31,9 @@ _Example_: Extract child nodes from a paragraph of rich text.
 
 ```js
 {
-	content: children( 'p' )	
+	content: {
+		source: children( 'p' )
+	}
 }
 // {
 //   "content": [
@@ -48,10 +52,12 @@ _Example_: Extract `src` and `alt` from each image element in the block's markup
 
 ```js
 {
-	images: query( 'img', {
-		url: attr( 'src' )
-		alt: attr( 'alt' )
-	} )
+	images: {
+		source: query( 'img', {
+			url: attr( 'src' )
+			alt: attr( 'alt' )
+		} )
+	}
 }
 // {
 //   "images": [ 

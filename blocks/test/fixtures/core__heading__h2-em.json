@@ -4,7 +4,6 @@
         "name": "core/heading",
         "isValid": true,
         "attributes": {
-            "nodeName": "H2",
             "content": [
                 "The ",
                 {
@@ -12,7 +11,8 @@
                     "children": "Inserter"
                 },
                 " Tool"
-            ]
+            ],
+            "nodeName": "H2"
         }
     }
 ]

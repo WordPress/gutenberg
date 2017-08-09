@@ -24,7 +24,10 @@ registerBlockType( 'core/verse', {
 	keywords: [ __( 'poetry' ) ],
 
 	attributes: {
-		content: children( 'pre' ),
+		content: {
+			type: 'array',
+			source: children( 'pre' ),
+		},
 	},
 
 	transforms: {

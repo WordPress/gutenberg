@@ -31,11 +31,27 @@ registerBlockType( 'core/cover-image', {
 	category: 'common',
 
 	attributes: {
-		title: text( 'h2' ),
-	},
-
-	defaultAttributes: {
-		hasBackgroundDim: true,
+		title: {
+			type: 'string',
+			source: text( 'h2' ),
+		},
+		url: {
+			type: 'string',
+		},
+		align: {
+			type: 'string',
+		},
+		id: {
+			type: 'number',
+		},
+		hasParallax: {
+			type: 'boolean',
+			default: false,
+		},
+		hasBackgroundDim: {
+			type: 'boolean',
+			default: true,
+		},
 	},
 
 	getEditWrapperProps( attributes ) {

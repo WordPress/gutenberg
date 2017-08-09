@@ -10,7 +10,14 @@ import { createBlock, switchToBlockType } from '../factory';
 import { getBlockTypes, unregisterBlockType, setUnknownTypeHandlerName, registerBlockType } from '../registration';
 
 describe( 'block factory', () => {
-	const defaultBlockSettings = { save: noop };
+	const defaultBlockSettings = {
+		attributes: {
+			value: {
+				type: 'string',
+			},
+		},
+		save: noop,
+	};
 
 	afterEach( () => {
 		setUnknownTypeHandlerName( undefined );
@@ -22,8 +29,14 @@ describe( 'block factory', () => {
 	describe( 'createBlock()', () => {
 		it( 'should create a block given its blockType and attributes', () => {
 			registerBlockType( 'core/test-block', {
-				defaultAttributes: {
-					includesDefault: true,
+				attributes: {
+					align: {
+						type: 'string',
+					},
+					includesDefault: {
+						type: 'boolean',
+						default: true,
+					},
 				},
 				save: noop,
 			} );
@@ -44,6 +57,11 @@ describe( 'block factory', () => {
 	describe( 'switchToBlockType()', () => {
 		it( 'should switch the blockType of a block using the "transform form"', () => {
 			registerBlockType( 'core/updated-text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
 				transforms: {
 					from: [ {
 						blocks: [ 'core/text-block' ],
@@ -76,6 +94,11 @@ describe( 'block factory', () => {
 		it( 'should switch the blockType of a block using the "transform to"', () => {
 			registerBlockType( 'core/updated-text-block', defaultBlockSettings );
 			registerBlockType( 'core/text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
 				transforms: {
 					to: [ {
 						blocks: [ 'core/updated-text-block' ],
@@ -119,6 +142,11 @@ describe( 'block factory', () => {
 
 		it( 'should reject transformations that return null', () => {
 			registerBlockType( 'core/updated-text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
 				transforms: {
 					from: [ {
 						blocks: [ 'core/text-block' ],
@@ -140,6 +168,11 @@ describe( 'block factory', () => {
 
 		it( 'should reject transformations that return an empty array', () => {
 			registerBlockType( 'core/updated-text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
 				transforms: {
 					from: [ {
 						blocks: [ 'core/text-block' ],
@@ -161,6 +194,11 @@ describe( 'block factory', () => {
 
 		it( 'should reject single transformations that do not include block types', () => {
 			registerBlockType( 'core/updated-text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
 				transforms: {
 					from: [ {
 						blocks: [ 'core/text-block' ],
@@ -188,6 +226,11 @@ describe( 'block factory', () => {
 
 		it( 'should reject array transformations that do not include block types', () => {
 			registerBlockType( 'core/updated-text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
 				transforms: {
 					from: [ {
 						blocks: [ 'core/text-block' ],
@@ -221,6 +264,11 @@ describe( 'block factory', () => {
 		it( 'should reject single transformations with unexpected block types', () => {
 			registerBlockType( 'core/updated-text-block', defaultBlockSettings );
 			registerBlockType( 'core/text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
 				transforms: {
 					to: [ {
 						blocks: [ 'core/updated-text-block' ],
@@ -246,6 +294,11 @@ describe( 'block factory', () => {
 		it( 'should reject array transformations with unexpected block types', () => {
 			registerBlockType( 'core/updated-text-block', defaultBlockSettings );
 			registerBlockType( 'core/text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
 				transforms: {
 					to: [ {
 						blocks: [ 'core/updated-text-block' ],
@@ -276,6 +329,11 @@ describe( 'block factory', () => {
 		it( 'should accept valid array transformations', () => {
 			registerBlockType( 'core/updated-text-block', defaultBlockSettings );
 			registerBlockType( 'core/text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
 				transforms: {
 					to: [ {
 						blocks: [ 'core/updated-text-block' ],

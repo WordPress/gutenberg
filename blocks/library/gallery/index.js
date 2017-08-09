@@ -67,8 +67,26 @@ registerBlockType( 'core/gallery', {
 	icon: 'format-gallery',
 	category: 'common',
 
-	defaultAttributes: {
-		images: [],
+	attributes: {
+		align: {
+			type: 'string',
+			default: 'none',
+		},
+		images: {
+			type: 'array',
+			default: [],
+		},
+		columns: {
+			type: 'number',
+		},
+		imageCrop: {
+			type: 'boolean',
+			default: true,
+		},
+		linkTo: {
+			type: 'string',
+			default: 'none',
+		},
 	},
 
 	getEditWrapperProps( attributes ) {
@@ -79,12 +97,10 @@ registerBlockType( 'core/gallery', {
 	},
 
 	edit( { attributes, setAttributes, focus, className } ) {
-		const { images, columns = defaultColumnsNumber( attributes ), align = 'none' } = attributes;
+		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
 		const setLinkTo = ( value ) => setAttributes( { linkTo: value } );
 		const setColumnsNumber = ( event ) => setAttributes( { columns: event.target.value } );
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
-		const { imageCrop = true } = attributes;
-		const { linkTo = 'none' } = attributes;
 		const toggleImageCrop = () => setAttributes( { imageCrop: ! imageCrop } );
 
 		const controls = (
@@ -167,7 +183,7 @@ registerBlockType( 'core/gallery', {
 	},
 
 	save( { attributes } ) {
-		const { images, columns = defaultColumnsNumber( attributes ), align = 'none', imageCrop = true, linkTo = 'none' } = attributes;
+		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
 		return (
 			<div className={ `align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` } >
 				{ images.map( ( img ) => (

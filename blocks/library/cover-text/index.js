@@ -28,7 +28,29 @@ registerBlockType( 'core/cover-text', {
 	category: 'formatting',
 
 	attributes: {
-		content: query( 'p', children() ),
+		align: {
+			type: 'string',
+		},
+		width: {
+			type: 'string',
+		},
+		content: {
+			type: 'array',
+			source: query( 'p', children() ),
+		},
+		dropCap: {
+			type: 'boolean',
+			default: false,
+		},
+		placeholder: {
+			type: 'string',
+		},
+		textColor: {
+			type: 'string',
+		},
+		backgroundColor: {
+			type: 'string',
+		},
 	},
 
 	getEditWrapperProps( attributes ) {

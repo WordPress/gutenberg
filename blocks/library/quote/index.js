@@ -26,12 +26,21 @@ registerBlockType( 'core/quote', {
 	category: 'common',
 
 	attributes: {
-		value: query( 'blockquote > p', node() ),
-		citation: children( 'footer' ),
-	},
-
-	defaultAttributes: {
-		value: [],
+		value: {
+			type: 'array',
+			source: query( 'blockquote > p', node() ),
+		},
+		citation: {
+			type: 'array',
+			source: children( 'footer' ),
+		},
+		align: {
+			type: 'string',
+		},
+		style: {
+			type: 'number',
+			default: 1,
+		},
 	},
 
 	transforms: {
@@ -129,7 +138,7 @@ registerBlockType( 'core/quote', {
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, className } ) {
-		const { align, value, citation, style = 1 } = attributes;
+		const { align, value, citation, style } = attributes;
 		const focusedEditable = focus ? focus.editable || 'value' : null;
 
 		return [
@@ -188,7 +197,7 @@ registerBlockType( 'core/quote', {
 	},
 
 	save( { attributes } ) {
-		const { align, value, citation, style = 1 } = attributes;
+		const { align, value, citation, style } = attributes;
 
 		return (
 			<blockquote

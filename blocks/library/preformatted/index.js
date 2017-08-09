@@ -20,7 +20,10 @@ registerBlockType( 'core/preformatted', {
 	category: 'formatting',
 
 	attributes: {
-		content: children( 'pre' ),
+		content: {
+			type: 'array',
+			source: children( 'pre' ),
+		},
 	},
 
 	transforms: {

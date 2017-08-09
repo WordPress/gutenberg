@@ -28,7 +28,10 @@ registerBlockType( 'core/html', {
 	className: false,
 
 	attributes: {
-		content: html(),
+		content: {
+			type: 'string',
+			source: html(),
+		},
 	},
 
 	edit: class extends Component {

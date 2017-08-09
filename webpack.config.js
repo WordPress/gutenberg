@@ -56,7 +56,7 @@ const externals = {
 
 entryPointNames.forEach( entryPointName => {
 	externals[ '@wordpress/' + entryPointName ] = {
-		'this': [ 'wp', entryPointName ],
+		this: [ 'wp', entryPointName ],
 	};
 } );
 

@@ -27,14 +27,23 @@ registerBlockType( 'core/paragraph', {
 
 	keywords: [ __( 'text' ) ],
 
-	defaultAttributes: {
-		dropCap: false,
-	},
-
 	className: false,
 
 	attributes: {
-		content: children( 'p' ),
+		content: {
+			type: 'array',
+			source: children( 'p' ),
+		},
+		align: {
+			type: 'string',
+		},
+		dropCap: {
+			type: 'boolean',
+			default: false,
+		},
+		placeholder: {
+			type: 'string',
+		},
 	},
 
 	transforms: {
