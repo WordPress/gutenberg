@@ -10,9 +10,9 @@ import BlockWarning from './block-warning';
 
 const warning = (
 	<BlockWarning>
-		{ __(
+		<p>{ __(
 			'This block has suffered from an unhandled error and cannot be previewed.'
-		) }
+		) }</p>
 	</BlockWarning>
 );
 
