@@ -62,6 +62,10 @@ describe( 'focus', () => {
 	} );
 
 	describe( 'findFocusable()', () => {
+		it( 'returns undefined if falsey argument passed', () => {
+			expect( findFocusable() ).toBe( undefined );
+		} );
+
 		it( 'returns undefined if no children', () => {
 			const node = document.createElement( 'div' );
 

@@ -46,6 +46,10 @@ export function isFocusable( node ) {
  * @return {HTMLElement}      First focusable element
  */
 export function findFocusable( node ) {
+	if ( ! node ) {
+		return;
+	}
+
 	return findFirstFocusable( node.firstChild, node );
 }
 
