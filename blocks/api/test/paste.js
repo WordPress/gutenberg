@@ -19,46 +19,49 @@ function outerHTML( nodes ) {
 	return nodes.map( node => node.outerHTML ).join( '' );
 }
 
-describe( 'normaliseToBlockLevelNodes', () => {
-	function transform( HTML ) {
-		return outerHTML( normaliseToBlockLevelNodes( createNodes( HTML ) ) );
-	}
+function createTransform( transformFunc ) {
+	return HTML => outerHTML( transformFunc( createNodes( HTML ) ) );
+}
+const htmlNormaliseToBlockLevelNodes = createTransform( normaliseToBlockLevelNodes );
+const htmlStripAttributes = createTransform( stripAttributes );
+const htmlRemoveUnsupportedEls = createTransform( removeUnsupportedEls );
 
+describe( 'normaliseToBlockLevelNodes', () => {
 	it( 'should convert double line breaks to paragraphs', () => {
-		equal( transform( 'test<br><br>test' ), '<p>test</p><p>test</p>' );
+		equal( htmlNormaliseToBlockLevelNodes( 'test<br><br>test' ), '<p>test</p><p>test</p>' );
 	} );
 
 	it( 'should not convert single line break to paragraphs', () => {
-		equal( transform( 'test<br>test' ), '<p>test<br>test</p>' );
+		equal( htmlNormaliseToBlockLevelNodes( 'test<br>test' ), '<p>test<br>test</p>' );
 	} );
 
 	it( 'should not add extra line at the start', () => {
-		equal( transform( 'test<br><br><br>test' ), '<p>test</p><p>test</p>' );
-		equal( transform( '<br>test<br><br>test' ), '<p>test</p><p>test</p>' );
+		equal( htmlNormaliseToBlockLevelNodes( 'test<br><br><br>test' ), '<p>test</p><p>test</p>' );
+		equal( htmlNormaliseToBlockLevelNodes( '<br>test<br><br>test' ), '<p>test</p><p>test</p>' );
 	} );
 
 	it( 'should preserve non-inline content', () => {
 		const HTML = '<p>test</p><div>test<br>test</div>';
-		equal( transform( HTML ), HTML );
+		equal( htmlNormaliseToBlockLevelNodes( HTML ), HTML );
 	} );
 
 	it( 'should remove empty paragraphs', () => {
-		equal( transform( '<p>&nbsp;</p>' ), '' );
+		equal( htmlNormaliseToBlockLevelNodes( '<p>&nbsp;</p>' ), '' );
 	} );
 } );
 
 describe( 'stripAttributes ', () => {
 	it( 'should remove ids and classes', () => {
-		equal( outerHTML( stripAttributes( createNodes( '<p id="foo" class="bar">test</p>' ) ) ), '<p>test</p>' );
+		equal( htmlStripAttributes( '<p id="foo" class="bar">test</p>' ), '<p>test</p>' );
 	} );
 } );
 
 describe( 'removeUnsupportedEls ', () => {
 	it( 'should remove <span>s', () => {
-		equal( outerHTML( removeUnsupportedEls( createNodes( '<p><span>test</span></p>' ) ) ), '<p>test</p>' );
+		equal( htmlRemoveUnsupportedEls( '<p><span>test</span></p>' ), '<p>test</p>' );
 	} );
 
 	it( 'should remove <meta>s', () => {
-		equal( outerHTML( removeUnsupportedEls( createNodes( '<div><meta name="foo" /><p>test</p></div>' ) ) ), '<div><p>test</p></div>' );
+		equal( htmlRemoveUnsupportedEls( '<div><meta name="foo" /><p>test</p></div>' ), '<div><p>test</p></div>' );
 	} );
 } );
