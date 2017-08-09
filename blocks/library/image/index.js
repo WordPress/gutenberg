@@ -15,6 +15,7 @@ import { Placeholder, Dashicon, Toolbar, DropZone, FormFileUpload } from '@wordp
  */
 import './style.scss';
 import { registerBlockType, source } from '../../api';
+import withEditorSettings from '../../with-editor-settings';
 import Editable from '../../editable';
 import MediaUploadButton from '../../media-upload-button';
 import InspectorControls from '../../inspector-controls';
@@ -83,7 +84,7 @@ registerBlockType( 'core/image', {
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, className } ) {
+	edit: withEditorSettings()( ( { attributes, setAttributes, focus, setFocus, className, settings } ) => {
 		const { url, alt, caption, align, id, href, width, height } = attributes;
 		const updateAlt = ( newAlt ) => setAttributes( { alt: newAlt } );
 		const updateAlignment = ( nextAlign ) => {
@@ -233,9 +234,9 @@ registerBlockType( 'core/image', {
 								width={ currentWidth }
 								height={ currentHeight }
 								minWidth={ minWidth }
-								maxWidth={ imageWidth }
+								maxWidth={ settings.maxWidth }
 								minHeight={ minHeight }
-								maxHeight={ imageHeight }
+								maxHeight={ settings.maxWidth / ratio }
 								lockAspectRatio
 								handlerClasses={ {
 									topRight: 'wp-block-image__resize-handler-top-right',
@@ -270,7 +271,7 @@ registerBlockType( 'core/image', {
 			</figure>,
 		];
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
-	},
+	} ),
 
 	save( { attributes } ) {
 		const { url, alt, caption, align, href, width, height } = attributes;
