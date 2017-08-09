@@ -75,6 +75,7 @@ describe( 'selectors', () => {
 	beforeAll( () => {
 		registerBlockType( 'core/test-block', {
 			save: ( props ) => props.attributes.text,
+			category: 'common',
 		} );
 	} );
 

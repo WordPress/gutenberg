@@ -17,6 +17,7 @@ describe( 'block factory', () => {
 			},
 		},
 		save: noop,
+		category: 'common',
 	};
 
 	afterEach( () => {
@@ -39,6 +40,7 @@ describe( 'block factory', () => {
 					},
 				},
 				save: noop,
+				category: 'common',
 			} );
 			const block = createBlock( 'core/test-block', {
 				align: 'left',
@@ -73,6 +75,7 @@ describe( 'block factory', () => {
 					} ],
 				},
 				save: noop,
+				category: 'common',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
 
@@ -110,6 +113,7 @@ describe( 'block factory', () => {
 					} ],
 				},
 				save: noop,
+				category: 'common',
 			} );
 
 			const block = createBlock( 'core/text-block', {
@@ -154,6 +158,7 @@ describe( 'block factory', () => {
 					} ],
 				},
 				save: noop,
+				category: 'common',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
 
@@ -180,6 +185,7 @@ describe( 'block factory', () => {
 					} ],
 				},
 				save: noop,
+				category: 'common',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
 
@@ -212,6 +218,7 @@ describe( 'block factory', () => {
 					} ],
 				},
 				save: noop,
+				category: 'common',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
 
@@ -249,6 +256,7 @@ describe( 'block factory', () => {
 					} ],
 				},
 				save: noop,
+				category: 'common',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
 
@@ -280,6 +288,7 @@ describe( 'block factory', () => {
 					} ],
 				},
 				save: noop,
+				category: 'common',
 			} );
 
 			const block = createBlock( 'core/text-block', {
@@ -315,6 +324,7 @@ describe( 'block factory', () => {
 					} ],
 				},
 				save: noop,
+				category: 'common',
 			} );
 
 			const block = createBlock( 'core/text-block', {
@@ -350,6 +360,7 @@ describe( 'block factory', () => {
 					} ],
 				},
 				save: noop,
+				category: 'common',
 			} );
 
 			const block = createBlock( 'core/text-block', {
