@@ -2,10 +2,79 @@
     {
         "blockName": "core/list",
         "attrs": null,
+        "children": [
+            "\n",
+            {
+                "type": "HTML_Tag",
+                "name": "ul",
+                "attrs": {},
+                "children": [
+                    {
+                        "type": "HTML_Tag",
+                        "name": "li",
+                        "attrs": {},
+                        "children": [
+                            "Text & Headings"
+                        ]
+                    },
+                    {
+                        "type": "HTML_Tag",
+                        "name": "li",
+                        "attrs": {},
+                        "children": [
+                            "Images & Videos"
+                        ]
+                    },
+                    {
+                        "type": "HTML_Tag",
+                        "name": "li",
+                        "attrs": {},
+                        "children": [
+                            "Galleries"
+                        ]
+                    },
+                    {
+                        "type": "HTML_Tag",
+                        "name": "li",
+                        "attrs": {},
+                        "children": [
+                            "Embeds, like YouTube, Tweets, or other WordPress posts."
+                        ]
+                    },
+                    {
+                        "type": "HTML_Tag",
+                        "name": "li",
+                        "attrs": {},
+                        "children": [
+                            "Layout blocks, like Buttons, Hero Images, Separators, etc."
+                        ]
+                    },
+                    {
+                        "type": "HTML_Tag",
+                        "name": "li",
+                        "attrs": {},
+                        "children": [
+                            "And ",
+                            {
+                                "type": "HTML_Tag",
+                                "name": "em",
+                                "attrs": {},
+                                "children": [
+                                    "Lists"
+                                ]
+                            },
+                            " like this one of course :)"
+                        ]
+                    }
+                ]
+            },
+            "\n"
+        ],
         "rawContent": "\n<ul><li>Text & Headings</li><li>Images & Videos</li><li>Galleries</li><li>Embeds, like YouTube, Tweets, or other WordPress posts.</li><li>Layout blocks, like Buttons, Hero Images, Separators, etc.</li><li>And <em>Lists</em> like this one of course :)</li></ul>\n"
     },
     {
         "attrs": {},
+        "children": "\n",
         "rawContent": "\n"
     }
 ]

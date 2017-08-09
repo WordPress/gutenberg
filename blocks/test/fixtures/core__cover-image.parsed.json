@@ -5,10 +5,35 @@
             "url": "https://cldup.com/uuUqE_dXzy.jpg",
             "hasBackgroundDim": true
         },
+        "children": [
+            "\n",
+            {
+                "type": "HTML_Tag",
+                "name": "section",
+                "attrs": {
+                    "class": "wp-block-cover-image has-background-dim",
+                    "style": "background-image:url(https://cldup.com/uuUqE_dXzy.jpg);"
+                },
+                "children": [
+                    "\n    ",
+                    {
+                        "type": "HTML_Tag",
+                        "name": "h2",
+                        "attrs": {},
+                        "children": [
+                            "Guten Berg!"
+                        ]
+                    },
+                    "\n"
+                ]
+            },
+            "\n"
+        ],
         "rawContent": "\n<section class=\"wp-block-cover-image has-background-dim\" style=\"background-image:url(https://cldup.com/uuUqE_dXzy.jpg);\">\n    <h2>Guten Berg!</h2>\n</section>\n"
     },
     {
         "attrs": {},
+        "children": "\n",
         "rawContent": "\n"
     }
 ]

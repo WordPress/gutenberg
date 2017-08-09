@@ -4,10 +4,34 @@
         "attrs": {
             "url": "https://wordpress.com/"
         },
+        "children": [
+            "\n",
+            {
+                "type": "HTML_Tag",
+                "name": "figure",
+                "attrs": {
+                    "class": "wp-block-embed-wordpress"
+                },
+                "children": [
+                    "\n    https://wordpress.com/\n    ",
+                    {
+                        "type": "HTML_Tag",
+                        "name": "figcaption",
+                        "attrs": {},
+                        "children": [
+                            "Embedded content from WordPress"
+                        ]
+                    },
+                    "\n"
+                ]
+            },
+            "\n"
+        ],
         "rawContent": "\n<figure class=\"wp-block-embed-wordpress\">\n    https://wordpress.com/\n    <figcaption>Embedded content from WordPress</figcaption>\n</figure>\n"
     },
     {
         "attrs": {},
+        "children": "\n",
         "rawContent": "\n"
     }
 ]

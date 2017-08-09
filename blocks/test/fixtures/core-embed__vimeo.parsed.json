@@ -4,10 +4,34 @@
         "attrs": {
             "url": "https://vimeo.com/"
         },
+        "children": [
+            "\n",
+            {
+                "type": "HTML_Tag",
+                "name": "figure",
+                "attrs": {
+                    "class": "wp-block-embed-vimeo"
+                },
+                "children": [
+                    "\n    https://vimeo.com/\n    ",
+                    {
+                        "type": "HTML_Tag",
+                        "name": "figcaption",
+                        "attrs": {},
+                        "children": [
+                            "Embedded content from vimeo"
+                        ]
+                    },
+                    "\n"
+                ]
+            },
+            "\n"
+        ],
         "rawContent": "\n<figure class=\"wp-block-embed-vimeo\">\n    https://vimeo.com/\n    <figcaption>Embedded content from vimeo</figcaption>\n</figure>\n"
     },
     {
         "attrs": {},
+        "children": "\n",
         "rawContent": "\n"
     }
 ]

@@ -2,10 +2,31 @@
     {
         "blockName": "core/image",
         "attrs": null,
+        "children": [
+            "\n",
+            {
+                "type": "HTML_Tag",
+                "name": "figure",
+                "attrs": {
+                    "class": "wp-block-image"
+                },
+                "children": [
+                    {
+                        "type": "HTML_Void_Tag",
+                        "name": "img",
+                        "attrs": {
+                            "src": "https://cldup.com/uuUqE_dXzy.jpg"
+                        }
+                    }
+                ]
+            },
+            "\n"
+        ],
         "rawContent": "\n<figure class=\"wp-block-image\"><img src=\"https://cldup.com/uuUqE_dXzy.jpg\" /></figure>\n"
     },
     {
         "attrs": {},
+        "children": "\n",
         "rawContent": "\n"
     }
 ]

@@ -4,10 +4,34 @@
         "attrs": {
             "url": "https://speaker.com/"
         },
+        "children": [
+            "\n",
+            {
+                "type": "HTML_Tag",
+                "name": "figure",
+                "attrs": {
+                    "class": "wp-block-embed-speaker"
+                },
+                "children": [
+                    "\n    https://speaker.com/\n    ",
+                    {
+                        "type": "HTML_Tag",
+                        "name": "figcaption",
+                        "attrs": {},
+                        "children": [
+                            "Embedded content from speaker"
+                        ]
+                    },
+                    "\n"
+                ]
+            },
+            "\n"
+        ],
         "rawContent": "\n<figure class=\"wp-block-embed-speaker\">\n    https://speaker.com/\n    <figcaption>Embedded content from speaker</figcaption>\n</figure>\n"
     },
     {
         "attrs": {},
+        "children": "\n",
         "rawContent": "\n"
     }
 ]

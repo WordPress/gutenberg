@@ -2,10 +2,32 @@
     {
         "blockName": "core/heading",
         "attrs": null,
+        "children": [
+            "\n",
+            {
+                "type": "HTML_Tag",
+                "name": "h2",
+                "attrs": {},
+                "children": [
+                    "The ",
+                    {
+                        "type": "HTML_Tag",
+                        "name": "em",
+                        "attrs": {},
+                        "children": [
+                            "Inserter"
+                        ]
+                    },
+                    " Tool"
+                ]
+            },
+            "\n"
+        ],
         "rawContent": "\n<h2>The <em>Inserter</em> Tool</h2>\n"
     },
     {
         "attrs": {},
+        "children": "\n",
         "rawContent": "\n"
     }
 ]

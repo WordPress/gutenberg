@@ -4,10 +4,34 @@
         "attrs": {
             "url": "https://meetup.com/"
         },
+        "children": [
+            "\n",
+            {
+                "type": "HTML_Tag",
+                "name": "figure",
+                "attrs": {
+                    "class": "wp-block-embed-meetup-com"
+                },
+                "children": [
+                    "\n    https://meetup.com/\n    ",
+                    {
+                        "type": "HTML_Tag",
+                        "name": "figcaption",
+                        "attrs": {},
+                        "children": [
+                            "Embedded content from meetup-com"
+                        ]
+                    },
+                    "\n"
+                ]
+            },
+            "\n"
+        ],
         "rawContent": "\n<figure class=\"wp-block-embed-meetup-com\">\n    https://meetup.com/\n    <figcaption>Embedded content from meetup-com</figcaption>\n</figure>\n"
     },
     {
         "attrs": {},
+        "children": "\n",
         "rawContent": "\n"
     }
 ]

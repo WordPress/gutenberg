@@ -4,10 +4,34 @@
         "attrs": {
             "url": "https://photobucket.com/"
         },
+        "children": [
+            "\n",
+            {
+                "type": "HTML_Tag",
+                "name": "figure",
+                "attrs": {
+                    "class": "wp-block-embed-photobucket"
+                },
+                "children": [
+                    "\n    https://photobucket.com/\n    ",
+                    {
+                        "type": "HTML_Tag",
+                        "name": "figcaption",
+                        "attrs": {},
+                        "children": [
+                            "Embedded content from photobucket"
+                        ]
+                    },
+                    "\n"
+                ]
+            },
+            "\n"
+        ],
         "rawContent": "\n<figure class=\"wp-block-embed-photobucket\">\n    https://photobucket.com/\n    <figcaption>Embedded content from photobucket</figcaption>\n</figure>\n"
     },
     {
         "attrs": {},
+        "children": "\n",
         "rawContent": "\n"
     }
 ]

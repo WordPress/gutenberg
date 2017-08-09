@@ -2,10 +2,32 @@
     {
         "blockName": "core/code",
         "attrs": null,
+        "children": [
+            "\n",
+            {
+                "type": "HTML_Tag",
+                "name": "pre",
+                "attrs": {
+                    "class": "wp-block-code"
+                },
+                "children": [
+                    {
+                        "type": "HTML_Tag",
+                        "name": "code",
+                        "attrs": {},
+                        "children": [
+                            "export default function MyButton() {\n\treturn &lt;Button&gt;Click Me!&lt;/Button&gt;;\n}"
+                        ]
+                    }
+                ]
+            },
+            "\n"
+        ],
         "rawContent": "\n<pre class=\"wp-block-code\"><code>export default function MyButton() {\n\treturn &lt;Button&gt;Click Me!&lt;/Button&gt;;\n}</code></pre>\n"
     },
     {
         "attrs": {},
+        "children": "\n",
         "rawContent": "\n"
     }
 ]

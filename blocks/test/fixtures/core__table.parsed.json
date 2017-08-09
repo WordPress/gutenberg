@@ -2,10 +2,348 @@
     {
         "blockName": "core/table",
         "attrs": null,
+        "children": [
+            "\n",
+            {
+                "type": "HTML_Tag",
+                "name": "table",
+                "attrs": {},
+                "children": [
+                    {
+                        "type": "HTML_Tag",
+                        "name": "thead",
+                        "attrs": {},
+                        "children": [
+                            {
+                                "type": "HTML_Tag",
+                                "name": "tr",
+                                "attrs": {},
+                                "children": [
+                                    {
+                                        "type": "HTML_Tag",
+                                        "name": "th",
+                                        "attrs": {},
+                                        "children": [
+                                            "Version"
+                                        ]
+                                    },
+                                    {
+                                        "type": "HTML_Tag",
+                                        "name": "th",
+                                        "attrs": {},
+                                        "children": [
+                                            "Musician"
+                                        ]
+                                    },
+                                    {
+                                        "type": "HTML_Tag",
+                                        "name": "th",
+                                        "attrs": {},
+                                        "children": [
+                                            "Date"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "type": "HTML_Tag",
+                        "name": "tbody",
+                        "attrs": {},
+                        "children": [
+                            {
+                                "type": "HTML_Tag",
+                                "name": "tr",
+                                "attrs": {},
+                                "children": [
+                                    {
+                                        "type": "HTML_Tag",
+                                        "name": "td",
+                                        "attrs": {},
+                                        "children": [
+                                            {
+                                                "type": "HTML_Tag",
+                                                "name": "a",
+                                                "attrs": {
+                                                    "href": "https://wordpress.org/news/2003/05/wordpress-now-available/"
+                                                },
+                                                "children": [
+                                                    ".70"
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "type": "HTML_Tag",
+                                        "name": "td",
+                                        "attrs": {},
+                                        "children": [
+                                            "No musician chosen."
+                                        ]
+                                    },
+                                    {
+                                        "type": "HTML_Tag",
+                                        "name": "td",
+                                        "attrs": {},
+                                        "children": [
+                                            "May 27, 2003"
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "HTML_Tag",
+                                "name": "tr",
+                                "attrs": {},
+                                "children": [
+                                    {
+                                        "type": "HTML_Tag",
+                                        "name": "td",
+                                        "attrs": {},
+                                        "children": [
+                                            {
+                                                "type": "HTML_Tag",
+                                                "name": "a",
+                                                "attrs": {
+                                                    "href": "https://wordpress.org/news/2004/01/wordpress-10/"
+                                                },
+                                                "children": [
+                                                    "1.0"
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "type": "HTML_Tag",
+                                        "name": "td",
+                                        "attrs": {},
+                                        "children": [
+                                            "Miles Davis"
+                                        ]
+                                    },
+                                    {
+                                        "type": "HTML_Tag",
+                                        "name": "td",
+                                        "attrs": {},
+                                        "children": [
+                                            "January 3, 2004"
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "HTML_Tag",
+                                "name": "tr",
+                                "attrs": {},
+                                "children": [
+                                    {
+                                        "type": "HTML_Tag",
+                                        "name": "td",
+                                        "attrs": {},
+                                        "children": [
+                                            "Lots of versions skipped, see ",
+                                            {
+                                                "type": "HTML_Tag",
+                                                "name": "a",
+                                                "attrs": {
+                                                    "href": "https://codex.wordpress.org/WordPress_Versions"
+                                                },
+                                                "children": [
+                                                    "the full list"
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "type": "HTML_Tag",
+                                        "name": "td",
+                                        "attrs": {},
+                                        "children": [
+                                            "&hellip;"
+                                        ]
+                                    },
+                                    {
+                                        "type": "HTML_Tag",
+                                        "name": "td",
+                                        "attrs": {},
+                                        "children": [
+                                            "&hellip;"
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "HTML_Tag",
+                                "name": "tr",
+                                "attrs": {},
+                                "children": [
+                                    {
+                                        "type": "HTML_Tag",
+                                        "name": "td",
+                                        "attrs": {},
+                                        "children": [
+                                            {
+                                                "type": "HTML_Tag",
+                                                "name": "a",
+                                                "attrs": {
+                                                    "href": "https://wordpress.org/news/2015/12/clifford/"
+                                                },
+                                                "children": [
+                                                    "4.4"
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "type": "HTML_Tag",
+                                        "name": "td",
+                                        "attrs": {},
+                                        "children": [
+                                            "Clifford Brown"
+                                        ]
+                                    },
+                                    {
+                                        "type": "HTML_Tag",
+                                        "name": "td",
+                                        "attrs": {},
+                                        "children": [
+                                            "December 8, 2015"
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "HTML_Tag",
+                                "name": "tr",
+                                "attrs": {},
+                                "children": [
+                                    {
+                                        "type": "HTML_Tag",
+                                        "name": "td",
+                                        "attrs": {},
+                                        "children": [
+                                            {
+                                                "type": "HTML_Tag",
+                                                "name": "a",
+                                                "attrs": {
+                                                    "href": "https://wordpress.org/news/2016/04/coleman/"
+                                                },
+                                                "children": [
+                                                    "4.5"
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "type": "HTML_Tag",
+                                        "name": "td",
+                                        "attrs": {},
+                                        "children": [
+                                            "Coleman Hawkins"
+                                        ]
+                                    },
+                                    {
+                                        "type": "HTML_Tag",
+                                        "name": "td",
+                                        "attrs": {},
+                                        "children": [
+                                            "April 12, 2016"
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "HTML_Tag",
+                                "name": "tr",
+                                "attrs": {},
+                                "children": [
+                                    {
+                                        "type": "HTML_Tag",
+                                        "name": "td",
+                                        "attrs": {},
+                                        "children": [
+                                            {
+                                                "type": "HTML_Tag",
+                                                "name": "a",
+                                                "attrs": {
+                                                    "href": "https://wordpress.org/news/2016/08/pepper/"
+                                                },
+                                                "children": [
+                                                    "4.6"
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "type": "HTML_Tag",
+                                        "name": "td",
+                                        "attrs": {},
+                                        "children": [
+                                            "Pepper Adams"
+                                        ]
+                                    },
+                                    {
+                                        "type": "HTML_Tag",
+                                        "name": "td",
+                                        "attrs": {},
+                                        "children": [
+                                            "August 16, 2016"
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "HTML_Tag",
+                                "name": "tr",
+                                "attrs": {},
+                                "children": [
+                                    {
+                                        "type": "HTML_Tag",
+                                        "name": "td",
+                                        "attrs": {},
+                                        "children": [
+                                            {
+                                                "type": "HTML_Tag",
+                                                "name": "a",
+                                                "attrs": {
+                                                    "href": "https://wordpress.org/news/2016/12/vaughan/"
+                                                },
+                                                "children": [
+                                                    "4.7"
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "type": "HTML_Tag",
+                                        "name": "td",
+                                        "attrs": {},
+                                        "children": [
+                                            "Sarah Vaughan"
+                                        ]
+                                    },
+                                    {
+                                        "type": "HTML_Tag",
+                                        "name": "td",
+                                        "attrs": {},
+                                        "children": [
+                                            "December 6, 2016"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "\n"
+        ],
         "rawContent": "\n<table><thead><tr><th>Version</th><th>Musician</th><th>Date</th></tr></thead><tbody><tr><td><a href=\"https://wordpress.org/news/2003/05/wordpress-now-available/\">.70</a></td><td>No musician chosen.</td><td>May 27, 2003</td></tr><tr><td><a href=\"https://wordpress.org/news/2004/01/wordpress-10/\">1.0</a></td><td>Miles Davis</td><td>January 3, 2004</td></tr><tr><td>Lots of versions skipped, see <a href=\"https://codex.wordpress.org/WordPress_Versions\">the full list</a></td><td>&hellip;</td><td>&hellip;</td></tr><tr><td><a href=\"https://wordpress.org/news/2015/12/clifford/\">4.4</a></td><td>Clifford Brown</td><td>December 8, 2015</td></tr><tr><td><a href=\"https://wordpress.org/news/2016/04/coleman/\">4.5</a></td><td>Coleman Hawkins</td><td>April 12, 2016</td></tr><tr><td><a href=\"https://wordpress.org/news/2016/08/pepper/\">4.6</a></td><td>Pepper Adams</td><td>August 16, 2016</td></tr><tr><td><a href=\"https://wordpress.org/news/2016/12/vaughan/\">4.7</a></td><td>Sarah Vaughan</td><td>December 6, 2016</td></tr></tbody></table>\n"
     },
     {
         "attrs": {},
+        "children": "\n\n",
         "rawContent": "\n\n"
     }
 ]

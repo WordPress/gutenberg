@@ -2,10 +2,22 @@
     {
         "blockName": "core/separator",
         "attrs": null,
+        "children": [
+            "\n",
+            {
+                "type": "HTML_Void_Tag",
+                "name": "hr",
+                "attrs": {
+                    "class": "wp-block-separator"
+                }
+            },
+            "\n"
+        ],
         "rawContent": "\n<hr class=\"wp-block-separator\" />\n"
     },
     {
         "attrs": {},
+        "children": "\n",
         "rawContent": "\n"
     }
 ]

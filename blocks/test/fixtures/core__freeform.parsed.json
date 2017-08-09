@@ -2,10 +2,36 @@
     {
         "blockName": "core/freeform",
         "attrs": null,
+        "children": [
+            "\nTesting freeform block with some\n",
+            {
+                "type": "HTML_Tag",
+                "name": "div",
+                "attrs": {
+                    "class": "wp-some-class"
+                },
+                "children": [
+                    "\n\tHTML ",
+                    {
+                        "type": "HTML_Tag",
+                        "name": "span",
+                        "attrs": {
+                            "style": "color: red;"
+                        },
+                        "children": [
+                            "content"
+                        ]
+                    },
+                    "\n"
+                ]
+            },
+            "\n"
+        ],
         "rawContent": "\nTesting freeform block with some\n<div class=\"wp-some-class\">\n\tHTML <span style=\"color: red;\">content</span>\n</div>\n"
     },
     {
         "attrs": {},
+        "children": "\n",
         "rawContent": "\n"
     }
 ]

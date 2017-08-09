@@ -76,7 +76,7 @@ WP_Block_Balanced
       /** <?php return $t; ?> **/
       return t
     })* {
-      /** <?php return array($ts, text()); ?> **/
+      /** <?php return array($ts, $this->text()); ?> **/
       return [ts, text()]
     })
     e:WP_Block_End & {
@@ -103,7 +103,7 @@ WP_Block_Balanced
 
 WP_Block_Html
   = html:(t:(!WP_Block_Start html:HTML_Token { /** <?php return $html; ?> **/ return html } ) {
-      /** <?php return array( $t, text() ); ?> **/
+      /** <?php return array( $t, $this->text() ); ?> **/
       return [ t, text() ]
     })
   {
@@ -197,7 +197,7 @@ HTML_Tag_Void
           'hr',
           'img',
           'input',
-        ) ) && $t->isVoid;
+        ) );
       ?> **/
       
       return undefined !== {
@@ -207,7 +207,7 @@ HTML_Tag_Void
         'hr': true,
         'img': true,
         'input': true
-      }[ t.name.toLowerCase() ] && t.isVoid
+      }[ t.name.toLowerCase() ]
     }
   {
     /** <?php

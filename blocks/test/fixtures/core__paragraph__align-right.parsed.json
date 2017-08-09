@@ -4,10 +4,25 @@
         "attrs": {
             "align": "right"
         },
+        "children": [
+            "\n",
+            {
+                "type": "HTML_Tag",
+                "name": "p",
+                "attrs": {
+                    "style": "text-align:right;"
+                },
+                "children": [
+                    "... like this one, which is separate from the above and right aligned."
+                ]
+            },
+            "\n"
+        ],
         "rawContent": "\n<p style=\"text-align:right;\">... like this one, which is separate from the above and right aligned.</p>\n"
     },
     {
         "attrs": {},
+        "children": "\n",
         "rawContent": "\n"
     }
 ]

@@ -4,10 +4,34 @@
         "attrs": {
             "align": "center"
         },
+        "children": [
+            "\n",
+            {
+                "type": "HTML_Tag",
+                "name": "div",
+                "attrs": {
+                    "class": "wp-block-button aligncenter"
+                },
+                "children": [
+                    {
+                        "type": "HTML_Tag",
+                        "name": "a",
+                        "attrs": {
+                            "href": "https://github.com/WordPress/gutenberg"
+                        },
+                        "children": [
+                            "Help build Gutenberg"
+                        ]
+                    }
+                ]
+            },
+            "\n"
+        ],
         "rawContent": "\n<div class=\"wp-block-button aligncenter\"><a href=\"https://github.com/WordPress/gutenberg\">Help build Gutenberg</a></div>\n"
     },
     {
         "attrs": {},
+        "children": "\n",
         "rawContent": "\n"
     }
 ]
