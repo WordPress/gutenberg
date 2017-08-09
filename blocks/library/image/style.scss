@@ -14,6 +14,11 @@
 	.react-resizable {
 		position: relative;
 		margin: 0 auto;
+
+		img {
+			width: 100%;
+			height: 100%;
+		}
 	}
 
 	.react-resizable-handle {
@@ -29,7 +34,6 @@
 		box-sizing: border-box;
 		cursor: se-resize;
 	}
-
 }
 
 .editor-visual-editor__block[data-type="core/image"] {

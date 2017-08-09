@@ -211,17 +211,29 @@ registerBlockType( 'core/image', {
 			),
 			<figure key="image" className={ classes }>
 				<ImageSize src={ url } dirtynessTrigger={ align }>
-					{ ( originalWidth, originalHeight ) => {
-						const currentWidth = width || originalWidth;
-						const currentHeight = height || originalHeight;
+					{ ( sizes ) => {
+						const {
+							imageWidthWithinContainer,
+							imageHeightWithinContainer,
+							imageWidth,
+							imageHeight,
+						} = sizes;
+						const currentWidth = width || imageWidthWithinContainer;
+						const currentHeight = height || imageHeightWithinContainer;
 						const img = <img src={ url } alt={ alt } onClick={ setFocus } />;
-						if ( ! isResizable || ! originalHeight || ! originalWidth ) {
+						if ( ! isResizable || ! imageWidthWithinContainer ) {
 							return img;
 						}
+						const ratio = imageWidth / imageHeight;
+						const minWidth = imageWidth < imageHeight ? 10 : 10 * ratio;
+						const minHeight = imageHeight < imageWidth ? 10 : 10 / ratio;
 						return (
 							<ResizableBox
 								width={ currentWidth }
 								height={ currentHeight }
+								minConstraints={ [ minWidth, minHeight ] }
+								maxConstraints={ [ imageWidth, imageHeight ] }
+								handleSize={ [ 15, 15 ] }
 								lockAspectRatio
 								onResize={ ( event, { size } ) => setAttributes( size ) }
 							>

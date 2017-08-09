@@ -63,9 +63,17 @@ class ImageSize extends Component {
 	}
 
 	render() {
+		const sizes = {
+			imageWidth: this.image && this.image.width,
+			imageHeight: this.image && this.image.height,
+			containerWidth: this.container && this.container.width,
+			containerHeight: this.container && this.container.height,
+			imageWidthWithinContainer: this.state.width,
+			imageHeightWithinContainer: this.state.height,
+		};
 		return (
 			<div ref={ this.bindContainer }>
-				{ this.props.children( this.state.width, this.state.height ) }
+				{ this.props.children( sizes ) }
 			</div>
 		);
 	}
