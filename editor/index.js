@@ -66,10 +66,7 @@ export function createEditorInstance( id, post, userSettings ) {
 	const editorSettings = Object.assign( {}, DEFAULT_SETTINGS, userSettings );
 	const store = createReduxStore();
 
-	store.dispatch( {
-		type: 'SETUP_EDITOR',
-		settings: editorSettings,
-	} );
+	store.dispatch( { type: 'SETUP_EDITOR' } );
 
 	store.dispatch( setInitialPost( post ) );
 
