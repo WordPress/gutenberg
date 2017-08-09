@@ -30,6 +30,7 @@ describe( 'block parser', () => {
 			},
 		},
 		save: ( { attributes } ) => attributes.fruit,
+		category: 'common',
 	};
 
 	afterEach( () => {
@@ -218,6 +219,7 @@ describe( 'block parser', () => {
 					chicken: { type: 'string' },
 				},
 				save: noop,
+				category: 'common',
 			} );
 
 			const parsed = parse(
@@ -252,6 +254,7 @@ describe( 'block parser', () => {
 					},
 				},
 				save: noop,
+				category: 'common',
 			} );
 
 			const parsed = parse(
@@ -298,6 +301,7 @@ describe( 'block parser', () => {
 					},
 				},
 				save: noop,
+				category: 'common',
 			} );
 
 			setUnknownTypeHandlerName( 'core/unknown-block' );

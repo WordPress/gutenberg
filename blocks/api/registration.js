@@ -6,11 +6,18 @@
 import { isFunction } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { getCategories } from './categories';
+
+/**
  * Block settings keyed by block name.
  *
  * @type {Object}
  */
 const blocks = {};
+
+const categories = getCategories();
 
 /**
  * Name of block handling unknown types.
@@ -70,6 +77,24 @@ export function registerBlockType( name, settings ) {
 	if ( 'keywords' in settings && settings.keywords.length > 3 ) {
 		console.error(
 			'The block "' + name + '" can have a maximum of 3 keywords.'
+		);
+		return;
+	}
+	if ( ! ( 'category' in settings ) ) {
+		console.error(
+			'The block "' + name + '" must have a category.'
+		);
+		return;
+	}
+	if ( 'category' in settings && typeof settings.category !== 'string' ) {
+		console.error(
+			'The category slug for block "' + name + '" must be a string.'
+		);
+		return;
+	}
+	if ( 'category' in settings && ! ( categories.find( x => x.slug === settings.category ) ) ) {
+		console.error(
+			'The block "' + name + '" must have a registered category.'
 		);
 		return;
 	}

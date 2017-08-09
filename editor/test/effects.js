@@ -18,7 +18,7 @@ import * as selectors from '../selectors';
 jest.mock( '../selectors' );
 
 describe( 'effects', () => {
-	const defaultBlockSettings = { save: noop };
+	const defaultBlockSettings = { save: noop, category: 'common' };
 
 	beforeEach( () => jest.resetAllMocks() );
 
@@ -56,6 +56,7 @@ describe( 'effects', () => {
 					};
 				},
 				save: noop,
+				category: 'common',
 			} );
 			const blockA = {
 				uid: 'chicken',
@@ -87,6 +88,7 @@ describe( 'effects', () => {
 					};
 				},
 				save: noop,
+				category: 'common',
 			} );
 			registerBlockType( 'core/test-block-2', defaultBlockSettings );
 			const blockA = {
@@ -118,6 +120,7 @@ describe( 'effects', () => {
 					};
 				},
 				save: noop,
+				category: 'common',
 			} );
 			registerBlockType( 'core/test-block-2', {
 				attributes: {
@@ -137,6 +140,7 @@ describe( 'effects', () => {
 					} ],
 				},
 				save: noop,
+				category: 'common',
 			} );
 			const blockA = {
 				uid: 'chicken',

@@ -219,6 +219,7 @@ describe( 'block serializer', () => {
 				save( { attributes } ) {
 					return <p dangerouslySetInnerHTML={ { __html: attributes.content } } />;
 				},
+				category: 'common',
 			};
 			registerBlockType( 'core/test-block', blockType );
 
