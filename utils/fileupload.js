@@ -62,6 +62,8 @@ export function filesUpload( filesList, setAttributes ) {
 			data: data,
 			contentType: false,
 		} ).done( ( savedMedia ) => {
+			img.id = savedMedia.id;
+			img.link = savedMedia.link;
 			img.url = savedMedia.source_url;
 			setAttributes( { images: [
 				...imgs.slice( 0, idx ),
