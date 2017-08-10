@@ -163,7 +163,7 @@ registerBlockType( 'core/list', {
 				blocks: [ 'core/quote' ],
 				transform: ( { values } ) => {
 					return createBlock( 'core/quote', {
-						value: toBrDelimitedContent( values ),
+						value: [ <p key="list">{ toBrDelimitedContent( values ) }</p> ],
 					} );
 				},
 			},
