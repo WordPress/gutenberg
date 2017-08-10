@@ -1,11 +1,7 @@
-.wp-block-gallery {
+.wp-block-gallery,
+.wp-block-gallery.aligncenter {
 	display: flex;
 	flex-wrap: wrap;
-
-	&:not( .components-placeholder ) {
-		margin-right: -16px;
-		margin-bottom: -16px;
-	}
 
 	.blocks-gallery-image {
 		flex-grow: 1;
