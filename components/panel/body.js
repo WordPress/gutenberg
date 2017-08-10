@@ -14,15 +14,22 @@ class PanelBody extends Component {
 		super( ...arguments );
 		this.state = {
 			opened: props.initialOpen === undefined ? true : props.initialOpen,
+			ariaExpanded: props.initialOpen === undefined ? true : props.initialOpen,
 		};
 		this.toggle = this.toggle.bind( this );
 	}
 
-	toggle( event ) {
-		event.preventDefault();
+	toggle() {
 		this.setState( ( state ) => ( {
 			opened: ! state.opened,
 		} ) );
+
+		// Workaround for Firefox+NVDA bug see issue 1556.
+		setTimeout( () => {
+			this.setState( ( state ) => ( {
+				ariaExpanded: ! state.ariaExpanded,
+			} ) );
+		}, 100 );
 	}
 
 	render() {
@@ -32,10 +39,11 @@ class PanelBody extends Component {
 				{ !! title && (
 					<h3 className="components-panel__body-title">
 						<IconButton
+							type="button"
 							className="components-panel__body-toggle"
 							onClick={ this.toggle }
 							icon={ this.state.opened ? 'arrow-down' : 'arrow-right' }
-							aria-expanded={ this.state.opened }
+							aria-expanded={ this.state.ariaExpanded }
 							label={ sprintf( __( 'Open section: %s' ), title ) }
 						>
 							{ title }
