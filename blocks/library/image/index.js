@@ -35,6 +35,8 @@ registerBlockType( 'core/image', {
 
 	category: 'common',
 
+	keywords: [ __( 'photo' ) ],
+
 	attributes: {
 		url: {
 			type: 'string',
