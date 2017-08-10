@@ -375,27 +375,27 @@ function gutenberg_extend_wp_api_backbone_client() {
 	$script .= <<<JS
 		wp.api.getPostTypeModel = function( postType ) {
 			var route = '/' + wpApiSettings.versionString + this.postTypeRestBaseMapping[ postType ] + '/(?P<id>[\\\\d]+)';
-			return _.first( _.filter( wp.api.models, function( model ) {
+			return _.find( wp.api.models, function( model ) {
 				return model.prototype.route && route === model.prototype.route.index;
-			} ) );
+			} );
 		};
 		wp.api.getPostTypeRevisionsCollection = function( postType ) {
 			var route = '/' + wpApiSettings.versionString + this.postTypeRestBaseMapping[ postType ] + '/(?P<parent>[\\\\d]+)/revisions';
-			return _.first( _.filter( wp.api.collections, function( model ) {
+			return _.find( wp.api.collections, function( model ) {
 				return model.prototype.route && route === model.prototype.route.index;
-			} ) );
+			} );
 		};
 		wp.api.getTaxonomyModel = function( taxonomy ) {
 			var route = '/' + wpApiSettings.versionString + this.taxonomyRestBaseMapping[ taxonomy ] + '/(?P<id>[\\\\d]+)';
-			return _.first( _.filter( wp.api.models, function( model ) {
+			return _.find( wp.api.models, function( model ) {
 				return model.prototype.route && route === model.prototype.route.index;
-			} ) );
+			} );
 		};
 		wp.api.getTaxonomyCollection = function( taxonomy ) {
 			var route = '/' + wpApiSettings.versionString + this.taxonomyRestBaseMapping[ taxonomy ];
-			return _.first( _.filter( wp.api.collections, function( model ) {
+			return _.find( wp.api.collections, function( model ) {
 				return model.prototype.route && route === model.prototype.route.index;
-			} ) );
+			} );
 		};
 JS;
 	wp_add_inline_script( 'wp-api', $script );
