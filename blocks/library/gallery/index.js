@@ -99,7 +99,7 @@ registerBlockType( 'core/gallery', {
 	edit( { attributes, setAttributes, focus, className } ) {
 		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
 		const setLinkTo = ( value ) => setAttributes( { linkTo: value } );
-		const setColumnsNumber = ( event ) => setAttributes( { columns: event.target.value } );
+		const setColumnsNumber = ( value ) => setAttributes( { columns: value } );
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		const toggleImageCrop = () => setAttributes( { imageCrop: ! imageCrop } );
 
