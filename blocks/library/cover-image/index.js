@@ -101,7 +101,7 @@ registerBlockType( 'core/cover-image', {
 					key="placeholder"
 					instructions={ __( 'Drag image here or insert from media library' ) }
 					icon="format-image"
-					label={ __( 'Image' ) }
+					label={ __( 'Cover Image' ) }
 					className={ className }>
 					<MediaUploadButton
 						buttonProps={ uploadButtonProps }
