@@ -17,8 +17,6 @@ import {
 	getBlockType,
 	getUnknownTypeHandlerName,
 	createBlock,
-	serialize,
-	parse,
 } from '@wordpress/blocks';
 
 /**
@@ -65,9 +63,9 @@ export default connect(
 		return {
 			ignoreInvalid() {
 				const { block } = ownProps;
-				const serializedBlock = serialize( { ...block, isValid: true } );
-				const parsedBlocks = parse( serializedBlock );
-				dispatch( replaceBlock( block.uid, parsedBlocks ) );
+				const { name, attributes } = block;
+				const nextBlock = createBlock( name, attributes );
+				dispatch( replaceBlock( block.uid, nextBlock ) );
 			},
 			switchToDefaultType() {
 				const defaultBlockName = getUnknownTypeHandlerName();
