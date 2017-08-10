@@ -14,8 +14,8 @@ import { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import './style.scss';
-import HierarchicalTaxonomy from './hierarchical-taxonomy';
-import FlatTaxonomy from './flat-taxonomy';
+import HierarchicalTermSelector from './hierarchical-term-selector';
+import FlatTermSelector from './flat-term-selector';
 import { getCurrentPostType } from '../../selectors';
 
 class PostTaxonomies extends Component {
@@ -49,7 +49,7 @@ class PostTaxonomies extends Component {
 		return (
 			<PanelBody title={ __( 'Categories & Tags' ) } initialOpen={ false }>
 				{ availableTaxonomies.map( ( taxonomy ) => {
-					const TaxonomyComponent = taxonomy.hierarchical ? HierarchicalTaxonomy : FlatTaxonomy;
+					const TaxonomyComponent = taxonomy.hierarchical ? HierarchicalTermSelector : FlatTermSelector;
 					return (
 						<TaxonomyComponent
 							key={ taxonomy.name }
