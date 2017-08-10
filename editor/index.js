@@ -20,8 +20,7 @@ import { settings } from '@wordpress/date';
 import './assets/stylesheets/main.scss';
 import Layout from './layout';
 import { createReduxStore } from './state';
-import { undo, createInfoNotice } from './actions';
-import EnableTrackingPrompt, { TRACKING_PROMPT_NOTICE_ID } from './enable-tracking-prompt';
+import { undo } from './actions';
 import EditorSettingsProvider from './settings/provider';
 
 /**
@@ -95,13 +94,6 @@ export function createEditorInstance( id, post, userSettings ) {
 		type: 'SETUP_EDITOR',
 		settings: editorSettings,
 	} );
-
-	if ( window.getUserSetting( 'gutenberg_tracking' ) === '' ) {
-		store.dispatch( createInfoNotice( <EnableTrackingPrompt />, {
-			id: TRACKING_PROMPT_NOTICE_ID,
-			isDismissible: false, // This notice has its own dismiss logic.
-		} ) );
-	}
 
 	preparePostState( store, post );
 

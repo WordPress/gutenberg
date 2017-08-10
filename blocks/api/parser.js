@@ -5,11 +5,6 @@ import { parse as hpqParse } from 'hpq';
 import { mapValues, reduce, pickBy } from 'lodash';
 
 /**
- * WordPress dependencies
- */
-import { bumpStat } from '@wordpress/utils';
-
-/**
  * Internal dependencies
  */
 import { parse as grammarParse } from './post.pegjs';
@@ -168,7 +163,6 @@ export function createBlockWithFallback( name, rawContent, attributes ) {
 	// Convert 'core/text' blocks in existing content to the new
 	// 'core/paragraph'.
 	if ( name === 'core/text' ) {
-		bumpStat( 'block_auto_convert', 'core-text-to-paragraph' );
 		name = 'core/paragraph';
 	}
 

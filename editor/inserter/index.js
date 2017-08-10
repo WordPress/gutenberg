@@ -10,7 +10,6 @@ import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { IconButton } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
-import { bumpStat } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -58,13 +57,14 @@ class Inserter extends Component {
 
 	insertBlock( name ) {
 		if ( name ) {
-			const { insertionPoint, onInsertBlock } = this.props;
+			const {
+				insertionPoint,
+				onInsertBlock,
+			} = this.props;
 			onInsertBlock(
 				name,
 				insertionPoint
 			);
-			bumpStat( 'add_block_inserter', name.replace( /\//g, '__' ) );
-			bumpStat( 'add_block_total', name.replace( /\//g, '__' ) );
 		}
 
 		this.close();
