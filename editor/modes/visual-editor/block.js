@@ -251,78 +251,147 @@ class VisualEditorBlock extends Component {
 
 	onKeyDown( event ) {
 		const { keyCode, target } = event;
+		const { previousBlock, nextBlock, onFocus } = this.props;
+		const up = keyCode === UP;
+		const down = keyCode === DOWN;
+		const left = keyCode === LEFT;
+		const right = keyCode === RIGHT;
 
-		if ( keyCode === UP || keyCode === DOWN || keyCode === LEFT || keyCode === RIGHT ) {
-			const direction = keyCode === UP || keyCode === LEFT ? 'previous' : 'next';
-			const nextBlock = this.node[ `${ direction }Sibling` ];
+		const isVerticalEdge = ( { editor, reverse } ) => {
+			const rangeRect = editor.selection.getBoundingClientRect();
+			const buffer = rangeRect.height / 2;
+			const editableRect = editor.getBody().getBoundingClientRect();
+
+			// Too low.
+			if ( reverse && rangeRect.top - buffer > editableRect.top ) {
+				return false;
+			}
+
+			// Too high.
+			if ( ! reverse && rangeRect.bottom + buffer < editableRect.bottom ) {
+				return false;
+			}
+
+			return rangeRect;
+		};
+
+		const isHorizontalEdge = ( { editor, reverse } ) => {
+			const position = reverse ? 'start' : 'end';
+			const order = reverse ? 'first' : 'last';
+			const range = editor.selection.getRng();
+			const offset = range[ `${ position }Offset` ];
+			const rootNode = editor.getBody();
+			let node = range.startContainer;
+
+			if ( ! range.collapsed ) {
+				return false;
+			}
+
+			if ( reverse && offset !== 0 ) {
+				return false;
+			}
+
+			if ( ! reverse && offset !== node.data.length ) {
+				return false;
+			}
+
+			while ( node !== rootNode ) {
+				const parentNode = node.parentNode;
+
+				if ( parentNode[ `${ order }Child` ] !== node ) {
+					return false;
+				}
+
+				node = parentNode;
+			}
+
+			return true;
+		};
+
+		const getNextEditor = ( { node, reverse } ) => {
+			const selector = '.editor-visual-editor [contenteditable="true"]';
+			const editableNodes = Array.from( document.querySelectorAll( selector ) );
+
+			if ( reverse ) {
+				editableNodes.reverse();
+			}
+
+			const index = editableNodes.indexOf( target );
+			const nextEditableNode = editableNodes[ index + 1 ];
+			const direction = reverse ? 'previous' : 'next';
+			const nextBlockNode = node[ `${ direction }Sibling` ];
+
+			if ( ! nextBlockNode || ! nextEditableNode ) {
+				return;
+			}
+
+			const editor = tinymce.get( nextEditableNode.id );
+
+			if ( ! editor ) {
+				return;
+			}
+
+			if ( ! node.contains( nextEditableNode ) && ! nextBlockNode.contains( nextEditableNode ) ) {
+				return;
+			}
+
+			return editor;
+		};
+
+		if ( up || down || left || right ) {
+			const editor = target.id && tinymce.get( target.id );
 
 			if ( target === this.node ) {
-				nextBlock.focus();
-			} else if ( keyCode === UP || keyCode === DOWN ) {
-				const selection = window.getSelection();
-				const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+				const reverse = up || left;
+				const followingBlock = reverse ? previousBlock : nextBlock;
 
-				if ( ! range ) {
-					return;
+				if ( followingBlock ) {
+					event.preventDefault();
+					onFocus( followingBlock.uid, { offset: reverse ? -1 : 0 } );
 				}
+			}
 
-				const rects = range.getClientRects();
+			if ( editor ) {
+				const reverse = up || left;
+				const horizontal = left || right;
+				const followingBlock = reverse ? previousBlock : nextBlock;
 
-				if ( ! rects.length ) {
-					return;
-				}
+				const rect = horizontal ?
+					isHorizontalEdge( { editor, reverse } ) :
+					isVerticalEdge( { editor, reverse } );
 
-				const rangeRect = rects[ 0 ];
-				const buffer = rangeRect.height / 2;
-				const editableRect = target.getBoundingClientRect();
-
-				// Too low.
-				if ( keyCode === UP && rangeRect.top - buffer > editableRect.top ) {
-					return;
-				}
-
-				// Too high.
-				if ( keyCode === DOWN && rangeRect.bottom + buffer < editableRect.bottom ) {
-					return;
-				}
-
-				const selector = '.editor-visual-editor [contenteditable="true"]';
-				const editableNodes = Array.from( document.querySelectorAll( selector ) );
-
-				if ( keyCode === UP ) {
-					editableNodes.reverse();
-				}
-
-				const index = editableNodes.indexOf( target );
-				const nextEditableNode = editableNodes[ index + 1 ];
-
-				if ( ! nextBlock ) {
+				if ( ! rect ) {
 					return;
 				}
 
 				event.preventDefault();
 
-				if ( ! nextEditableNode ) {
-					nextBlock.focus();
+				const followingEditor = getNextEditor( { node: this.node, reverse } );
+
+				if ( ! followingEditor ) {
+					if ( followingBlock ) {
+						onFocus( followingBlock.uid, { offset: reverse ? -1 : 0 } );
+					}
+
 					return;
 				}
 
-				if ( ! this.node.contains( nextEditableNode ) && ! nextBlock.contains( nextEditableNode ) ) {
-					nextBlock.focus();
-					return;
+				followingEditor.focus();
+
+				if ( horizontal ) {
+					if ( reverse ) {
+						followingEditor.selection.select( followingEditor.getBody(), true );
+						followingEditor.selection.collapse( false );
+					}
+				} else {
+					window.setTimeout( () => {
+						const buffer = rect.height / 2;
+						const editorRect = followingEditor.getBody().getBoundingClientRect();
+						const y = reverse ? editorRect.bottom - buffer : editorRect.top + buffer;
+
+						followingEditor.selection.placeCaretAt( rect.left, y );
+					} );
 				}
-
-				const editor = tinymce.get( nextEditableNode.id );
-
-				editor.focus();
-
-				window.setTimeout( () => {
-					const nextEditableRect = nextEditableNode.getBoundingClientRect();
-					const x = rangeRect.left;
-					const y = keyCode === UP ? nextEditableRect.bottom - buffer : nextEditableRect.top + buffer;
-
-					editor.selection.placeCaretAt( x, y );
-				} );
 			}
 		}
 
