@@ -1,4 +1,4 @@
-# WordPress URL Package
+# @wordpress/url
 
 A collection of utilities to manipulate URLs
 
