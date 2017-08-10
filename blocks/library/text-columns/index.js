@@ -79,9 +79,9 @@ registerBlockType( 'core/text-columns', {
 					/>
 				</InspectorControls>
 			),
-			<div className={ `${ className } align${ width } columns-${ columns }` } key="block">
+			<section className={ `${ className } align${ width } columns-${ columns }` } key="block">
 				{ times( columns, ( index ) =>
-					<div className="wp-block-text-columns__column" key={ `column-${ index }` }>
+					<div className="wp-block-column" key={ `column-${ index }` }>
 						<Editable
 							tagName="p"
 							value={ content && content[ index ] }
@@ -100,20 +100,20 @@ registerBlockType( 'core/text-columns', {
 						/>
 					</div>
 				) }
-			</div>,
+			</section>,
 		];
 	},
 
 	save( { attributes } ) {
 		const { width, content, columns } = attributes;
 		return (
-			<div className={ `align${ width } columns-${ columns }` }>
+			<section className={ `align${ width } columns-${ columns }` }>
 				{ times( columns, ( index ) =>
-					<div className="wp-block-text-columns__column" key={ `column-${ index }` }>
+					<div className="wp-block-column" key={ `column-${ index }` }>
 						<p>{ content && content[ index ] }</p>
 					</div>
 				) }
-			</div>
+			</section>
 		);
 	},
 } );
