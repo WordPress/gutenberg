@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { mediasUpload } from '@wordpress/utils';
+import { mediaUpload } from '@wordpress/utils';
 import { Dashicon, Toolbar, Placeholder, FormFileUpload } from '@wordpress/components';
 
 /**
@@ -22,6 +22,7 @@ import GalleryImage from './gallery-image';
 import BlockDescription from '../../block-description';
 
 const { query, attr } = source;
+const isGallery = true;
 const MAX_COLUMNS = 8;
 const linkOptions = [
 	{ value: 'attachment', label: __( 'Attachment Page' ) },
@@ -83,7 +84,7 @@ registerBlockType( 'core/gallery', {
 		const onSelectImages = ( imgs ) => setAttributes( { images: imgs } );
 
 		const uploadFromFiles = ( event ) => {
-			mediasUpload( event.target.files, setAttributes );
+			mediaUpload( event.target.files, setAttributes, isGallery );
 		};
 
 		const controls = (
