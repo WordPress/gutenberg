@@ -16,7 +16,12 @@ class Tests_REST_API extends WP_UnitTestCase {
 	public function setUp() {
 		// Override the normal server with our spying server.
 		$GLOBALS['wp_rest_server'] = new Spy_REST_Server();
-		parent::setup();
+		parent::setUp();
+	}
+
+	public function tearDown() {
+		remove_filter( 'wp_rest_server_class', array( $this, 'filter_wp_rest_server_class' ) );
+		parent::tearDown();
 	}
 
 	/**
@@ -445,5 +450,22 @@ class Tests_REST_API extends WP_UnitTestCase {
 	 */
 	public function test_rest_parse_date_force_utc( $string, $value ) {
 		$this->assertEquals( $value, rest_parse_date( $string, true ) );
+	}
+
+	public function filter_wp_rest_server_class( $class_name ) {
+		return 'Spy_REST_Server';
+	}
+
+	public function test_register_rest_route_without_server() {
+		$GLOBALS['wp_rest_server'] = null;
+		add_filter( 'wp_rest_server_class', array( $this, 'filter_wp_rest_server_class' ) );
+
+		register_rest_route( 'test-ns', '/test', array(
+			'methods'  => array( 'GET' ),
+			'callback' => '__return_null',
+		) );
+
+		$routes = $GLOBALS['wp_rest_server']->get_routes();
+		$this->assertEquals( $routes['/test-ns/test'][0]['methods'], array( 'GET' => true ) );
 	}
 }
