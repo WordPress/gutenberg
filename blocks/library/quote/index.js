@@ -204,7 +204,7 @@ registerBlockType( 'core/quote', {
 				className={ `blocks-quote-style-${ style }` }
 				style={ { textAlign: align ? align : null } }
 			>
-				{ value.map( ( paragraph, i ) => <p key={ i }>{ paragraph.props.children }</p> ) }
+				{ value }
 				{ citation && citation.length > 0 && (
 					<footer>{ citation }</footer>
 				) }
