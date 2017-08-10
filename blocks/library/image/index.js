@@ -8,7 +8,7 @@ import ResizableBox from 'react-resizable-box';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { fileUpload } from '@wordpress/utils';
+import { mediaUpload } from '@wordpress/utils';
 import { Placeholder, Dashicon, Toolbar, DropZone, FormFileUpload } from '@wordpress/components';
 
 /**
@@ -109,7 +109,7 @@ registerBlockType( 'core/image', {
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1;
 		const uploadButtonProps = { isLarge: true };
 		const onSetHref = ( value ) => setAttributes( { href: value } );
-		const uploadFromFiles = ( event ) => fileUpload( event.target.files, setAttributes );
+		const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setAttributes );
 
 		const controls = (
 			focus && (

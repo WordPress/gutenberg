@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { filesUpload } from '@wordpress/utils';
+import { mediasUpload } from '@wordpress/utils';
 import { Dashicon, Toolbar, Placeholder, FormFileUpload } from '@wordpress/components';
 
 /**
@@ -83,7 +83,7 @@ registerBlockType( 'core/gallery', {
 		const onSelectImages = ( imgs ) => setAttributes( { images: imgs } );
 
 		const uploadFromFiles = ( event ) => {
-			filesUpload( event.target.files, setAttributes );
+			mediasUpload( event.target.files, setAttributes );
 		};
 
 		const controls = (

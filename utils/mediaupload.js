@@ -1,5 +1,5 @@
 
-export function fileUpload( files, setAttributes ) {
+export function mediaUpload( files, setAttributes ) {
 	if ( files.length < 1 ) {
 		return;
 	}
@@ -35,7 +35,7 @@ export function fileUpload( files, setAttributes ) {
 	} );
 }
 
-export function filesUpload( filesList, setAttributes ) {
+export function mediasUpload( filesList, setAttributes ) {
 	const files = [ ...filesList ];
 	if ( files.length < 1 ) {
 		return;

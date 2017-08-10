@@ -6,4 +6,4 @@ export { nodetypes };
 
 export * from './tracking';
 
-export * from './fileupload';
+export * from './mediaupload';
