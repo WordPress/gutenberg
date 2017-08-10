@@ -66,6 +66,7 @@ registerBlockType( 'core/gallery', {
 	title: __( 'Gallery' ),
 	icon: 'format-gallery',
 	category: 'common',
+	keywords: [ __( 'images' ), __( 'photos' ) ],
 
 	attributes: {
 		align: {

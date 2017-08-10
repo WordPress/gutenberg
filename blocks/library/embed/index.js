@@ -26,13 +26,15 @@ const { children } = source;
 // These embeds do not work in sandboxes
 const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
 
-function getEmbedBlockSettings( { title, icon, category = 'embed', transforms } ) {
+function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, keywords = [] } ) {
 	return {
 		title: __( title ),
 
 		icon,
 
 		category,
+
+		keywords,
 
 		attributes: {
 			url: {
@@ -253,6 +255,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Twitter',
 		icon: 'twitter',
+		keywords: [ __( 'tweet' ) ],
 	} )
 );
 registerBlockType(
@@ -260,6 +263,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'YouTube',
 		icon: 'video-alt3',
+		keywords: [ __( 'music' ), __( 'video' ) ],
 	} )
 );
 registerBlockType(
@@ -274,6 +278,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Instagram',
 		icon: 'camera',
+		keywords: [ __( 'image' ) ],
 	} )
 );
 registerBlockType(
@@ -281,6 +286,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'WordPress',
 		icon: 'wordpress',
+		keywords: [ __( 'post' ), __( 'blog' ) ],
 	} )
 );
 registerBlockType(
@@ -288,6 +294,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'SoundCloud',
 		icon: 'format-audio',
+		keywords: [ __( 'music' ), __( 'audio' ) ],
 	} )
 );
 registerBlockType(
@@ -295,6 +302,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Spotify',
 		icon: 'format-audio',
+		keywords: [ __( 'music' ), __( 'audio' ) ],
 	} )
 );
 registerBlockType(
@@ -302,6 +310,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Flickr',
 		icon: 'format-image',
+		keywords: [ __( 'image' ) ],
 	} )
 );
 registerBlockType(
@@ -309,6 +318,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Vimeo',
 		icon: 'video-alt3',
+		keywords: [ __( 'video' ) ],
 	} )
 );
 
@@ -387,6 +397,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Mixcloud',
 		icon: 'format-audio',
+		keywords: [ __( 'music' ), __( 'audio' ) ],
 	} )
 );
 registerBlockType(
@@ -471,6 +482,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'VideoPress',
 		icon: 'video-alt3',
+		keywords: [ __( 'video' ) ],
 	} )
 );
 registerBlockType(
