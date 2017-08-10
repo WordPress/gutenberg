@@ -105,7 +105,7 @@ registerBlockType( 'core/gallery', {
 									type="image"
 									multiple="true"
 									gallery="true"
-									value={ images }
+									value={ images.map( ( img ) => img.id ) }
 								>
 									<Dashicon icon="edit" />
 								</MediaUploadButton>
