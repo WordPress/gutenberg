@@ -1,3 +1,6 @@
+codecov:
+  allow_coverage_offsets: false
+
 coverage:
   status:
     project:
