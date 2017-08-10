@@ -107,8 +107,8 @@ addStory( {
 
 addStory( {
 	parents: [ 'outreach' ],
-	name: 'talks',
-	title: 'Talks',
+	name: 'meetups',
+	title: 'Meetups',
 	markdown: require( './talks.md' ),
 } );
 
