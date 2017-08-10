@@ -4,7 +4,7 @@
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 import { Slot } from 'react-slot-fill';
-import { filter, findIndex, partial } from 'lodash';
+import { filter, findIndex, flatMap, partial } from 'lodash';
 import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
 
 /**
@@ -52,6 +52,7 @@ import {
 } from '../../selectors';
 
 const { BACKSPACE, ESCAPE, DELETE, UP, DOWN, LEFT, RIGHT, ENTER, TAB } = keycodes;
+const F10 = 18;
 
 function FirstChild( { children } ) {
 	const childrenArray = Children.toArray( children );
@@ -250,10 +251,21 @@ class VisualEditorBlock extends Component {
 	}
 
 	onKeyDown( event ) {
-		const { keyCode, target } = event;
+		const { keyCode, altKey, target } = event;
 
 		//this.handleArrowKey( event );
-		this.handleToolbarCycle( event );
+		this.handleToolbarTabCycle( event );
+		this.handleToolbarArrowCycle( event );
+
+		if ( keyCode === F10 && altKey ) {
+			event.preventDefault();
+			event.stopPropagation();
+			const block = findDOMNode( this.node );
+			const item = block.querySelector( '.components-toolbar button, .components-toolbar *[tabindex]' );
+			if ( item ) {
+				item.focus();
+			}
+		}
 
 		if ( keyCode === UP || keyCode === LEFT || keyCode === DOWN || keyCode === RIGHT ) {
 			const selection = window.getSelection();
@@ -274,20 +286,22 @@ class VisualEditorBlock extends Component {
 		//this.handleArrowKey( event );
 	}
 
-	handleToolbarCycle( event ) {
+	handleToolbarTabCycle( event ) {
 		const { keyCode, shiftKey, target } = event;
 		if ( keyCode !== TAB || ! this.node ) {
 			return;
 		}
 		const block = findDOMNode( this.node );
-		const isVisible = ( elem ) => ! ( elem.offsetWidth <= 0 || elem.offsetHeight <= 0 );
+		const isVisible = ( elem ) => elem && ! ( elem.offsetWidth <= 0 || elem.offsetHeight <= 0 );
 		const allToolbars = filter( Array.from( block.querySelectorAll( '.components-toolbar' ) ), isVisible );
+		const settingsMenu = filter( [ block.querySelector( '.editor-block-settings-menu' ) ], isVisible );
+		const allCycle = [ ...allToolbars, ...settingsMenu ];
 
 		if ( shiftKey ) {
-			allToolbars.reverse();
+			allCycle.reverse();
 		}
 
-		const targetIndex = findIndex( allToolbars, ( toolbarNode ) => toolbarNode.contains( target ) );
+		const targetIndex = findIndex( allCycle, ( node ) => node.contains( target ) );
 
 		if ( targetIndex === -1 ) {
 			return;
@@ -297,13 +311,49 @@ class VisualEditorBlock extends Component {
 		event.preventDefault();
 		event.stopPropagation();
 
-		if ( allToolbars.length > 1 ) {
-			const nextToolbar = ( targetIndex + 1 >= allToolbars.length ) ? allToolbars[ 0 ] : allToolbars[ targetIndex + 1 ];
+		if ( allCycle.length > 1 ) {
+			const nextToolbar = ( targetIndex + 1 >= allCycle.length ) ? allCycle[ 0 ] : allCycle[ targetIndex + 1 ];
 
 			const firstFocusableItem = nextToolbar.querySelector( 'button, *[tabindex]' );
 
 			if ( firstFocusableItem ) {
 				firstFocusableItem.focus();
+			}
+		}
+	}
+
+	handleToolbarArrowCycle( event ) {
+		const { keyCode, target } = event;
+		if ( ! ( keyCode === UP || keyCode === LEFT || keyCode === DOWN || keyCode === RIGHT ) || ! this.node ) {
+			return;
+		}
+		const forward = keyCode === DOWN || keyCode === RIGHT;
+		const block = findDOMNode( this.node );
+		const isVisible = ( elem ) => elem && ! ( elem.offsetWidth <= 0 || elem.offsetHeight <= 0 );
+		const allToolbars = filter( Array.from( block.querySelectorAll( '.components-toolbar' ) ), isVisible );
+		const settingsMenu = filter( [ block.querySelector( '.editor-block-settings-menu' ) ], isVisible );
+		const allCycle = flatMap( [ ...allToolbars, ...settingsMenu ], ( toolbar ) => {
+			return filter( Array.from( toolbar.querySelectorAll( 'button, *[tabindex]' ) ) );
+		} );
+
+		if ( ! forward ) {
+			allCycle.reverse();
+		}
+
+		const targetIndex = allCycle.indexOf( target );
+
+		if ( targetIndex === -1 ) {
+			return;
+		}
+
+		// we have a toolbar selected so we should be moving between toolbars
+		event.preventDefault();
+		event.stopPropagation();
+
+		if ( allCycle.length > 1 ) {
+			const nextItem = ( targetIndex + 1 >= allCycle.length ) ? allCycle[ 0 ] : allCycle[ targetIndex + 1 ];
+			if ( nextItem ) {
+				nextItem.focus();
 			}
 		}
 	}
