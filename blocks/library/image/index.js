@@ -13,6 +13,7 @@ import { Placeholder, Dashicon, Toolbar, DropZone, FormFileUpload } from '@wordp
 /**
  * Internal dependencies
  */
+import './block.scss';
 import './style.scss';
 import { registerBlockType, source } from '../../api';
 import withEditorSettings from '../../with-editor-settings';
