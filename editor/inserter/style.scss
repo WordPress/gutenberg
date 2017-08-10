@@ -36,7 +36,7 @@
 	height: calc( 100vh - #{ $admin-bar-height-big + $header-height + 34 + $inserter-tabs-height } ); // 34 = search input height
 
 	@include break-medium {
-		height: 280px;
+		height: 46vh;
 	}
 
 	overflow: auto;
@@ -131,14 +131,13 @@ input[type="search"].editor-inserter__search {
 .editor-inserter__separator {
 	display: block;
 	margin: -1px 0 0;
-	padding: 12px 14px;
+	padding: 4px 14px;
 	font-size: $default-font-size;
 	font-weight: 600;
 	text-align: center;
 	position: sticky;
 	top: 0;
-	background: rgba( 255, 255, 255, 0.9 );
-	box-shadow: inset 0 -1px 0 0 $light-gray-500, 0 -1px 0 0 $light-gray-500;
+	background: $light-gray-200;
 }
 
 .editor-inserter__tabs {
