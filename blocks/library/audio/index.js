@@ -12,10 +12,10 @@ import { Placeholder } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, query } from '../../api';
+import { registerBlockType, source } from '../../api';
 import MediaUploadButton from '../../media-upload-button';
 
-const { attr } = query;
+const { attr } = source;
 
 registerBlockType( 'core/audio', {
 	title: __( 'Audio' ),
@@ -25,19 +25,17 @@ registerBlockType( 'core/audio', {
 	category: 'common',
 
 	attributes: {
-		src: attr( 'audio', 'src' ),
-		loop: attr( 'audio', 'loop' ),
-		mime: attr( 'audio', 'type' ),
+		src: {
+			type: 'string',
+			source: attr( 'audio', 'src' ),
+		},
 	},
 
 	edit( { attributes, setAttributes, className } ) {
 		const { src } = attributes;
 		const onSelectAudio = ( media ) => {
 			if ( media && media.url ) {
-				setAttributes( {
-					src: media.url,
-					mime: media.mime,
-				} );
+				setAttributes( { src: media.url } );
 			}
 		};
 
@@ -76,9 +74,9 @@ registerBlockType( 'core/audio', {
 	},
 
 	save( { attributes } ) {
-		const { src, loop, mime } = attributes;
+		const { src } = attributes;
 		return (
-			<audio controls="controls" src={ src } loop={ loop } type={ mime } />
+			<audio controls="controls" src={ src } />
 		);
 	},
 } );
