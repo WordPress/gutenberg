@@ -21,7 +21,7 @@ const DEFAULT_QUERY = {
 	order: 'desc',
 };
 
-class HierarchicalTaxonomy extends Component {
+class HierarchicalTermSelector extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onChange = this.onChange.bind( this );
@@ -133,5 +133,5 @@ export default connect(
 			return editPost( { [ restBase ]: terms } );
 		},
 	}
-)( HierarchicalTaxonomy );
+)( HierarchicalTermSelector );
 

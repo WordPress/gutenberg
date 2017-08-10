@@ -24,7 +24,7 @@ const DEFAULT_QUERY = {
 };
 const MAX_TERMS_SUGGESTIONS = 20;
 
-class FlatTaxonomy extends Component {
+class FlatTermSelector extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onChange = this.onChange.bind( this );
@@ -185,5 +185,5 @@ export default connect(
 			},
 		};
 	}
-)( FlatTaxonomy );
+)( FlatTermSelector );
 
