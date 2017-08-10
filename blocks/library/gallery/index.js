@@ -103,8 +103,8 @@ registerBlockType( 'core/gallery', {
 									} }
 									onSelect={ onSelectImages }
 									type="image"
-									multiple="true"
-									gallery="true"
+									multiple
+									gallery
 									value={ images.map( ( img ) => img.id ) }
 								>
 									<Dashicon icon="edit" />
@@ -140,8 +140,8 @@ registerBlockType( 'core/gallery', {
 						buttonProps={ uploadButtonProps }
 						onSelect={ onSelectImages }
 						type="image"
-						multiple="true"
-						gallery="true"
+						multiple
+						gallery
 					>
 						{ __( 'Insert from Media Library' ) }
 					</MediaUploadButton>
