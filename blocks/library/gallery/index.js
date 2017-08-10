@@ -51,7 +51,7 @@ registerBlockType( 'core/gallery', {
 				url: attr( 'src' ),
 				alt: attr( 'alt' ),
 				id: attr( 'data-id' ),
-			} )
+			} ),
 		},
 		columns: {
 			type: 'number',
