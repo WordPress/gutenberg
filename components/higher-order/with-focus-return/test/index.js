@@ -49,7 +49,7 @@ describe( 'withFocusReturn()', () => {
 
 		it( 'should not switch focus back to the bound focus element', () => {
 			const mountedComposite = mount( <Composite /> );
-			expect( mountedComposite.instance().activeElement ).toBe( activeElement );
+			expect( mountedComposite.instance().activeElementOnMount ).toBe( activeElement );
 
 			// Change activeElement.
 			switchFocusTo.focus();
@@ -62,7 +62,7 @@ describe( 'withFocusReturn()', () => {
 
 		it( 'should return focus to element associated with HOC', () => {
 			const mountedComposite = mount( <Composite /> );
-			expect( mountedComposite.instance().activeElement ).toBe( activeElement );
+			expect( mountedComposite.instance().activeElementOnMount ).toBe( activeElement );
 
 			// Change activeElement.
 			document.activeElement.blur();
