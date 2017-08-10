@@ -15,6 +15,7 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
+import './block.scss';
 import './style.scss';
 import { registerBlockType, source, createBlock } from '../../api';
 import Editable from '../../editable';
