@@ -19,7 +19,7 @@ import InspectorControls from '../../inspector-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
 import BlockDescription from '../../block-description';
 
-const { text } = source;
+const { children } = source;
 
 const validAlignments = [ 'left', 'center', 'right', 'wide', 'full' ];
 
@@ -32,8 +32,8 @@ registerBlockType( 'core/cover-image', {
 
 	attributes: {
 		title: {
-			type: 'string',
-			source: text( 'h2' ),
+			type: 'array',
+			source: children( 'h2' ),
 		},
 		url: {
 			type: 'string',
