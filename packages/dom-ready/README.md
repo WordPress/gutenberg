@@ -1,4 +1,4 @@
-# @wordpress/domReady
+# @wordpress/dom-ready
 
 Executes a function after the DOM has loaded.
 
@@ -7,13 +7,13 @@ Executes a function after the DOM has loaded.
 Install the module
 
 ```bash
-npm install @wordpress/domReady --save
+npm install @wordpress/dom-ready --save
 ```
 
 ### Usage
 
 ```JS
-import domReady from '@wordpress/domReady';
+import domReady from '@wordpress/dom-ready';
 
 domReady( function() {
 	//do something after DOM loads.
