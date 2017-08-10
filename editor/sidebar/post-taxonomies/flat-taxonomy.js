@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { unescape, find, throttle } from 'lodash';
+import { unescape as unescapeString, find, throttle } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -154,7 +154,7 @@ class FlatTaxonomy extends Component {
 				<h4 className="editor-post-taxonomies__flat-terms-selector-title">{ label }</h4>
 				<FormTokenField
 					value={ selectedTerms }
-					displayTransform={ unescape }
+					displayTransform={ unescapeString }
 					suggestions={ termNames }
 					onChange={ this.onChange }
 					onInputChange={ this.searchTerms }
