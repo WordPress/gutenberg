@@ -58,6 +58,12 @@ registerBlockType( 'core/image', {
 		align: {
 			type: 'string',
 		},
+		width: {
+			type: 'number',
+		},
+		height: {
+			type: 'number',
+		},
 	},
 
 	transforms: {
