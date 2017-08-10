@@ -582,6 +582,19 @@ export default class Editable extends Component {
 	}
 }
 
+Editable.propTypes = {
+	value( props ) {
+		if ( undefined !== props.value && ! Array.isArray( props.value ) ) {
+			return new Error(
+				`Invalid value of type ${ typeof props.value } passed to Editable (expected ` +
+				'array). Attribute values should be sourced using the `children` source when ' +
+				'used with Editable.\n\n' +
+				'See: http://gutenberg-devdoc.surge.sh/reference/attribute-sources/#children'
+			);
+		}
+	},
+};
+
 Editable.contextTypes = {
 	onUndo: noop,
 };
