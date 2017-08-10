@@ -91,3 +91,30 @@ addStory( {
 	title: 'Frequently Asked Questions',
 	markdown: require( './faq.md' ),
 } );
+
+addStory( {
+	name: 'outreach',
+	title: 'Outreach',
+	markdown: require( './outreach.md' ),
+} );
+
+addStory( {
+	parents: [ 'outreach' ],
+	name: 'articles',
+	title: 'Articles',
+	markdown: require( './articles.md' ),
+} );
+
+addStory( {
+	parents: [ 'outreach' ],
+	name: 'talks',
+	title: 'Talks',
+	markdown: require( './talks.md' ),
+} );
+
+addStory( {
+	parents: [ 'outreach' ],
+	name: 'talks',
+	title: 'Talks',
+	markdown: require( './talks.md' ),
+} );
