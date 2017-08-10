@@ -33,7 +33,7 @@ registerBlockType( 'core/latest-posts', {
 
 	category: 'widgets',
 
-	keywords: [ __( 'recent-posts' ) ],
+	keywords: [ __( 'recent posts' ) ],
 
 	attributes: {
 		postsToShow: {
