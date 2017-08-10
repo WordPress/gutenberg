@@ -379,7 +379,7 @@ class VisualEditorBlock extends Component {
 						transitionLeave={ false }
 						component={ FirstChild }
 					>
-						<div className="editor-visual-editor__block-controls">
+						<div className="editor-visual-editor__block-controls tinymce-custom-ui">
 							<BlockSwitcher uid={ block.uid } />
 							<Slot name="Formatting.Toolbar" />
 							<Toolbar className="editor-visual-editor__mobile-tools">

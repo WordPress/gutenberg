@@ -74,7 +74,6 @@ export default class Editable extends Component {
 
 		this.state = {
 			formats: {},
-			bookmark: null,
 			empty: ! props.value || ! props.value.length,
 			toolbar: {
 				isAddingLink: false,
@@ -88,6 +87,7 @@ export default class Editable extends Component {
 		return ( this.props.getSettings || identity )( {
 			...settings,
 			forced_root_block: this.props.multiline || false,
+			custom_ui_selector: '.tinymce-custom-ui *',
 		} );
 	}
 
@@ -434,8 +434,7 @@ export default class Editable extends Component {
 		activeFormats.forEach( ( activeFormat ) => formats[ activeFormat ] = true );
 
 		const focusPosition = this.getFocusPosition();
-		const bookmark = this.editor.selection.getBookmark( 2, true );
-		this.setState( { bookmark, formats, focusPosition, toolbar: { isAddingLink: false, isEditingLink: false, newLinkValue: '' } } );
+		this.setState( { formats, focusPosition, toolbar: { isAddingLink: false, isEditingLink: false, newLinkValue: '' } } );
 	}
 
 	updateContent() {
@@ -506,19 +505,24 @@ export default class Editable extends Component {
 		return !! this.state.formats[ format ];
 	}
 
+	removeFormat( format ) {
+		this.editor.focus();
+		this.editor.formatter.remove( format );
+	}
+	applyFormat( format, args, node ) {
+		this.editor.focus();
+		this.editor.formatter.apply( format, args, node );
+	}
+
 	changeFormats( formats ) {
 		forEach( formats, ( formatValue, format ) => {
 			if ( format === 'link' ) {
-				if ( this.state.bookmark ) {
-					this.editor.selection.moveToBookmark( this.state.bookmark );
-				}
-
 				if ( formatValue !== undefined ) {
 					const anchor = this.editor.dom.getParent( this.editor.selection.getNode(), 'a' );
 					if ( ! anchor ) {
-						this.editor.formatter.remove( 'link' );
+						this.removeFormat( 'link' );
 					}
-					this.editor.formatter.apply( 'link', { href: formatValue.value }, anchor );
+					this.applyFormat( 'link', { href: formatValue.value }, anchor );
 				} else {
 					this.editor.execCommand( 'Unlink' );
 				}
@@ -527,9 +531,9 @@ export default class Editable extends Component {
 			} else {
 				const isActive = this.isFormatActive( format );
 				if ( isActive && ! formatValue ) {
-					this.editor.formatter.remove( format );
+					this.removeFormat( format );
 				} else if ( ! isActive && formatValue ) {
-					this.editor.formatter.apply( format );
+					this.applyFormat( format );
 				}
 			}
 		} );
