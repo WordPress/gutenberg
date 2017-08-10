@@ -17,7 +17,7 @@ describe( 'RangeControl', () => {
 
 			wrapper.find( 'input' ).simulate( 'change', { target: { value: '5' } } );
 
-			expect( onChange ).toHaveBeenCalledWith( '5' );
+			expect( onChange ).toHaveBeenCalledWith( 5 );
 		} );
 	} );
 } );

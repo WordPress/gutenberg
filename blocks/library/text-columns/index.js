@@ -73,9 +73,9 @@ registerBlockType( 'core/text-columns', {
 					<RangeControl
 						label={ __( 'Columns' ) }
 						value={ columns }
-						min="2"
-						max="4"
 						onChange={ ( value ) => setAttributes( { columns: value } ) }
+						min={ 2 }
+						max={ 4 }
 					/>
 				</InspectorControls>
 			),

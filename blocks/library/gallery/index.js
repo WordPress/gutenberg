@@ -158,7 +158,7 @@ registerBlockType( 'core/gallery', {
 						label={ __( 'Columns' ) }
 						value={ columns }
 						onChange={ setColumnsNumber }
-						min="1"
+						min={ 1 }
 						max={ Math.min( MAX_COLUMNS, images.length ) }
 					/>
 					<ToggleControl

@@ -11,7 +11,7 @@ import './style.scss';
 
 function RangeControl( { label, value, instanceId, onChange, ...props } ) {
 	const id = 'inspector-range-control-' + instanceId;
-	const onChangeValue = ( event ) => onChange( event.target.value );
+	const onChangeValue = ( event ) => onChange( Number( event.target.value ) );
 
 	return (
 		<BaseControl label={ label } id={ id } className="blocks-range-control">

@@ -178,8 +178,8 @@ registerBlockType( 'core/latest-posts', {
 							<RangeControl
 								label={ __( 'Columns' ) }
 								value={ columns }
-								min="2"
 								onChange={ ( value ) => setAttributes( { columns: value } ) }
+								min={ 2 }
 								max={ Math.min( MAX_POSTS_COLUMNS, latestPosts.length ) }
 							/>
 						}
