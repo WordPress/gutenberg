@@ -52,7 +52,7 @@ class PostTaxonomies extends Component {
 					const TaxonomyComponent = taxonomy.hierarchical ? HierarchicalTermSelector : FlatTermSelector;
 					return (
 						<TaxonomyComponent
-							key={ taxonomy.name }
+							key={ taxonomy.slug }
 							label={ taxonomy.name }
 							restBase={ taxonomy.rest_base }
 							slug={ taxonomy.slug }
