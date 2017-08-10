@@ -356,12 +356,22 @@ function gutenberg_register_vendor_script( $handle, $src, $deps = array() ) {
  * @link https://core.trac.wordpress.org/ticket/41111
  */
 function gutenberg_extend_wp_api_backbone_client() {
+	// Post Types Mapping.
 	$post_type_rest_base_mapping = array();
 	foreach ( get_post_types( array(), 'objects' ) as $post_type_object ) {
 		$rest_base = ! empty( $post_type_object->rest_base ) ? $post_type_object->rest_base : $post_type_object->name;
 		$post_type_rest_base_mapping[ $post_type_object->name ] = $rest_base;
 	}
+
+	// Taxonomies Mapping.
+	$taxonomy_rest_base_mapping = array();
+	foreach ( get_taxonomies( array(), 'objects' ) as $taxonomy_object ) {
+		$rest_base = ! empty( $taxonomy_object->rest_base ) ? $taxonomy_object->rest_base : $taxonomy_object->name;
+		$taxonomy_rest_base_mapping[ $taxonomy_object->name ] = $rest_base;
+	}
+
 	$script = sprintf( 'wp.api.postTypeRestBaseMapping = %s;', wp_json_encode( $post_type_rest_base_mapping ) );
+	$script .= sprintf( 'wp.api.taxonomyRestBaseMapping = %s;', wp_json_encode( $taxonomy_rest_base_mapping ) );
 	$script .= <<<JS
 		wp.api.getPostTypeModel = function( postType ) {
 			var route = '/' + wpApiSettings.versionString + this.postTypeRestBaseMapping[ postType ] + '/(?P<id>[\\\\d]+)';
@@ -371,6 +381,18 @@ function gutenberg_extend_wp_api_backbone_client() {
 		};
 		wp.api.getPostTypeRevisionsCollection = function( postType ) {
 			var route = '/' + wpApiSettings.versionString + this.postTypeRestBaseMapping[ postType ] + '/(?P<parent>[\\\\d]+)/revisions';
+			return _.first( _.filter( wp.api.collections, function( model ) {
+				return model.prototype.route && route === model.prototype.route.index;
+			} ) );
+		};
+		wp.api.getTaxonomyModel = function( taxonomy ) {
+			var route = '/' + wpApiSettings.versionString + this.taxonomyRestBaseMapping[ taxonomy ] + '/(?P<id>[\\\\d]+)';
+			return _.first( _.filter( wp.api.models, function( model ) {
+				return model.prototype.route && route === model.prototype.route.index;
+			} ) );
+		};
+		wp.api.getTaxonomyCollection = function( taxonomy ) {
+			var route = '/' + wpApiSettings.versionString + this.taxonomyRestBaseMapping[ taxonomy ];
 			return _.first( _.filter( wp.api.collections, function( model ) {
 				return model.prototype.route && route === model.prototype.route.index;
 			} ) );
