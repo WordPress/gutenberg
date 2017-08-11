@@ -30,6 +30,16 @@ function createAddHook( hooks ) {
 			return;
 		}
 
+		if ( 'string' !== typeof namespace ) {
+			console.error( 'The namespace must be a string.' );
+			return;
+		}
+
+		if ( ! /^.*\/.*$/.test( namespace ) ) {
+			console.error( 'The namespace must take the form `my-plugin-slug/functionDescription' );
+			return;
+		}
+
 		if ( 'function' !== typeof callback ) {
 			console.error( 'The hook callback must be a function.' );
 			return;
