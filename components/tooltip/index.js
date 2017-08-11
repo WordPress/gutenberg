@@ -71,7 +71,7 @@ class Tooltip extends Component {
 					isOpen={ isOver }
 					position={ position }
 					className="components-tooltip"
-					role="tooltip"
+					aria-hidden="true"
 				>
 					{ text }
 				</Popover>,
