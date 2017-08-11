@@ -80,7 +80,7 @@ describe( 'selectors', () => {
 	} );
 
 	beforeEach( () => {
-		isEditedPostDirty.memoizedSelector.clear();
+		isEditedPostDirty.clear();
 	} );
 
 	afterAll( () => {
