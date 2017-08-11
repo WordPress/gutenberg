@@ -7,7 +7,7 @@ import deepFreeze from 'deep-freeze';
 /**
  * WordPress dependencies
  */
-import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+import { registerBlockType, unregisterBlockType, getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -964,12 +964,15 @@ describe( 'state', () => {
 			expect( twoRecentBlocks.recentlyUsedBlocks[ 1 ] ).toEqual( 'core-embed/twitter' );
 		} );
 
-		it( 'should populate recently used blocks with the common category', () => {
+		it( 'should populate recently used blocks with blocks from the common category', () => {
 			const initial = userData( undefined, {
 				type: 'SETUP_EDITOR',
 			} );
 
-			expect( initial.recentlyUsedBlocks ).toEqual( expect.arrayContaining( [ 'core/paragraph' ] ) );
+			initial.recentlyUsedBlocks.forEach(
+				block => expect( getBlockType( block ).category ).toEqual( 'common' )
+			);
+			expect( initial.recentlyUsedBlocks ).toHaveLength( 8 );
 		} );
 	} );
 } );
