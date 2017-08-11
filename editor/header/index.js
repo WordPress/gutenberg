@@ -24,7 +24,11 @@ function Header( { multiSelectedBlockUids, onRemove, onDeselect } ) {
 
 	if ( count ) {
 		return (
-			<header className="editor-header editor-header-multi-select">
+			<div
+				role="region"
+				aria-label={ __( 'Editor toolbar' ) }
+				className="editor-header editor-header-multi-select"
+			>
 				<div className="editor-selected-count">
 					{ sprintf( _n( '%d block selected', '%d blocks selected', count ), count ) }
 				</div>
@@ -45,16 +49,20 @@ function Header( { multiSelectedBlockUids, onRemove, onDeselect } ) {
 						onClick={ () => onDeselect() }
 					/>
 				</div>
-			</header>
+			</div>
 		);
 	}
 
 	return (
-		<header className="editor-header">
+		<div
+			role="region"
+			aria-label={ __( 'Editor toolbar' ) }
+			className="editor-header"
+		>
 			<ModeSwitcher />
 			<SavedState />
 			<Tools />
-		</header>
+		</div>
 	);
 }
 

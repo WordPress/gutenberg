@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 function the_gutenberg_project() {
 	?>
 	<div class="gutenberg">
-		<section id="editor" class="gutenberg__editor"></section>
+		<div id="editor" class="gutenberg__editor"></div>
 	</div>
 	<?php
 }
