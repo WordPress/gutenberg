@@ -20,7 +20,7 @@ const { attr, children } = source;
 registerBlockType( 'core/video', {
 	title: __( 'Video' ),
 
-	icon: 'media-video',
+	icon: 'format-video',
 
 	category: 'common',
 
