@@ -400,19 +400,21 @@ class VisualEditorBlock extends Component {
 						component={ FirstChild }
 					>
 						<div className="editor-visual-editor__block-controls">
-							<BlockSwitcher uid={ block.uid } />
-							<Slot name="Formatting.Toolbar" />
-							<Toolbar className="editor-visual-editor__mobile-tools">
-								{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
-								{ ( showUI || isHovered ) && <BlockRightMenu uid={ block.uid } /> }
-								<IconButton
-									className="editor-visual-editor__mobile-toggle"
-									onClick={ this.toggleMobileControls }
-									aria-expanded={ showMobileControls }
-									label={ __( 'Toggle extra controls' ) }
-									icon="ellipsis"
-								/>
-							</Toolbar>
+							<div className="editor-visual-editor__group">
+								<BlockSwitcher uid={ block.uid } />
+								<Slot name="Formatting.Toolbar" />
+								<Toolbar className="editor-visual-editor__mobile-tools">
+									{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
+									{ ( showUI || isHovered ) && <BlockRightMenu uid={ block.uid } /> }
+									<IconButton
+										className="editor-visual-editor__mobile-toggle"
+										onClick={ this.toggleMobileControls }
+										aria-expanded={ showMobileControls }
+										label={ __( 'Toggle extra controls' ) }
+										icon="ellipsis"
+									/>
+								</Toolbar>
+							</div>
 						</div>
 					</CSSTransitionGroup>
 				}

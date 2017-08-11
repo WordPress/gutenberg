@@ -84,7 +84,7 @@
 	}
 
 	&.is-showing-mobile-controls {
-		.editor-visual-editor__block-controls > :not( .editor-visual-editor__mobile-tools ) {
+		.editor-visual-editor__group > :not( .editor-visual-editor__mobile-tools ) {
 			display: none;
 		}
 		.editor-visual-editor__mobile-tools {
@@ -315,6 +315,24 @@
 	}
 }
 
+.editor-visual-editor__group {
+	display: inline-flex;
+	box-shadow: $shadow-toolbar;
+	width: 100%;
+	background: $white;
+	border-top: 1px solid $light-gray-500;
+	border-bottom: 1px solid $light-gray-500;
+
+	> * {
+		margin-top: -1px;
+		margin-bottom: -1px;
+	}
+
+	@include break-small() {
+		width: auto;
+	}
+}
+
 $sticky-bottom-offset: 20px;
 .editor-visual-editor__block-controls + div {
 	// prevent collapsing margins between block and toolbar, matches the 20px bottom offset
@@ -327,11 +345,8 @@ $sticky-bottom-offset: 20px;
 
 	&.editor-visual-editor__mobile-tools {
 		margin-left: auto;
-	}
-
-	// Larger viewports
-	@include break-small() {
-		margin-right: $item-spacing;
+		margin-top: -1px;
+		margin-bottom: -1px;
 	}
 }
 
