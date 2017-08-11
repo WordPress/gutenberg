@@ -26,6 +26,7 @@
   "scripts": {
     "build-clean": "rimraf ./packages/*/build ./packages/*/build-browser ./packages/*/build-module",
     "build": "node ./scripts/build.js",
+    "build-modules": "webpack --progress -p",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "test:coverage-ci": "jest --coverage && coveralls < coverage/lcov.info",
