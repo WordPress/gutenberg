@@ -36,8 +36,8 @@ const FORMATTING_CONTROLS = [
 const DEFAULT_CONTROLS = [ 'bold', 'italic', 'strikethrough', 'link' ];
 
 class FormatToolbar extends Component {
-	constructor( props ) {
-		super( props );
+	constructor() {
+		super( ...arguments );
 
 		this.addLink = this.addLink.bind( this );
 		this.editLink = this.editLink.bind( this );
