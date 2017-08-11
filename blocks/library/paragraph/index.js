@@ -116,7 +116,7 @@ registerBlockType( 'core/paragraph', {
 				onMerge={ mergeBlocks }
 				onReplace={ onReplace }
 				style={ { textAlign: align } }
-				className={ dropCap && 'has-drop-cap' }
+				className={ dropCap ? 'has-drop-cap' : null }
 				placeholder={ placeholder || __( 'New Paragraph' ) }
 			/>,
 		];
