@@ -131,7 +131,7 @@ registerBlockType( 'core/cover-text', {
 
 	save( { attributes } ) {
 		const { width, align, content, dropCap, backgroundColor, textColor } = attributes;
-		const className = dropCap && 'has-drop-cap';
+		const className = dropCap ? 'has-drop-cap' : null;
 		const wrapperClassName = width && `align${ width }`;
 
 		if ( ! align ) {
