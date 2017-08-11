@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -109,7 +114,16 @@ registerBlockType( 'core/cover-text', {
 					/>
 				</InspectorControls>
 			),
-			<div className={ `${ className } align${ width }` } style={ { backgroundColor: backgroundColor, color: textColor } } key="block">
+			<div
+				key="block"
+				className={ classnames( className, {
+					[ `align${ width }` ]: width,
+				} ) }
+				style={ {
+					backgroundColor: backgroundColor,
+					color: textColor,
+				} }
+			>
 				<Editable
 					tagName="p"
 					value={ content }
@@ -122,7 +136,7 @@ registerBlockType( 'core/cover-text', {
 					onFocus={ setFocus }
 					onMerge={ mergeBlocks }
 					style={ { textAlign: align } }
-					className={ dropCap && 'has-drop-cap' }
+					className={ dropCap ? 'has-drop-cap' : null }
 					placeholder={ placeholder || __( 'New Paragraph' ) }
 				/>
 			</div>,
@@ -132,7 +146,7 @@ registerBlockType( 'core/cover-text', {
 	save( { attributes } ) {
 		const { width, align, content, dropCap, backgroundColor, textColor } = attributes;
 		const className = dropCap ? 'has-drop-cap' : null;
-		const wrapperClassName = width && `align${ width }`;
+		const wrapperClassName = width ? `align${ width }` : null;
 
 		if ( ! align ) {
 			return (

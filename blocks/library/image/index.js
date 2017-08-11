@@ -288,7 +288,7 @@ registerBlockType( 'core/image', {
 		const image = <img src={ url } alt={ alt } { ...extraImageProps } />;
 
 		return (
-			<figure className={ align && `align${ align }` }>
+			<figure className={ align ? `align${ align }` : null }>
 				{ href ? <a href={ href }>{ image }</a> : image }
 				{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
 			</figure>
