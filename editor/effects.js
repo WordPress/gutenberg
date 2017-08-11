@@ -107,7 +107,7 @@ export default {
 				<p>
 					<span>{ noticeMessage }</span>
 					{ ' ' }
-					<a href={ post.link } target="_blank">{ __( 'View post' ) }</a>
+					<a href={ post.link }>{ __( 'View post' ) }</a>
 				</p>,
 				{ id: SAVE_POST_NOTICE_ID }
 			) );
