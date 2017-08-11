@@ -20,3 +20,4 @@ import './cover-image';
 import './cover-text';
 import './text-columns';
 import './verse';
+import './video';

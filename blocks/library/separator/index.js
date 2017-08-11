@@ -16,6 +16,8 @@ registerBlockType( 'core/separator', {
 
 	category: 'layout',
 
+	keywords: [ __( 'horizontal-line' ), 'hr', __( 'divider' ) ],
+
 	transforms: {
 		from: [
 			{

@@ -25,6 +25,8 @@ registerBlockType( 'core/heading', {
 
 	category: 'common',
 
+	keywords: [ __( 'title' ), __( 'subtitle' ) ],
+
 	className: false,
 
 	attributes: {

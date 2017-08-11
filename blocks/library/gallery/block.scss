@@ -1,11 +1,7 @@
-.wp-block-gallery {
+.wp-block-gallery,
+.wp-block-gallery.aligncenter {
 	display: flex;
 	flex-wrap: wrap;
-
-	&:not( .components-placeholder ) {
-		margin-right: -16px;
-		margin-bottom: -16px;
-	}
 
 	.blocks-gallery-image {
 		flex-grow: 1;
@@ -37,22 +33,35 @@
 	&.columns-2 figure {
 		width: calc(100% / 2 - 3 * 8px);
 	}
-	&.columns-3 figure {
-		width: calc(100% / 3 - 4 * 8px);
-	}
-	&.columns-4 figure {
-		width: calc(100% / 4 - 5 * 8px);
-	}
-	&.columns-5 figure {
-		width: calc(100% / 5 - 6 * 8px);
-	}
-	&.columns-6 figure {
-		width: calc(100% / 6 - 7 * 8px);
-	}
-	&.columns-7 figure {
-		width: calc(100% / 7 - 8 * 8px);
-	}
+
+	// Responsive fallback value, 2 columns
+	&.columns-3 figure,
+	&.columns-4 figure,
+	&.columns-5 figure,
+	&.columns-6 figure,
+	&.columns-7 figure,
 	&.columns-8 figure {
-		width: calc(100% / 8 - 9 * 8px);
+		width: calc(100% / 2 - 3 * 8px);
+	}
+
+	@include break-small {
+		&.columns-3 figure {
+			width: calc(100% / 3 - 4 * 8px);
+		}
+		&.columns-4 figure {
+			width: calc(100% / 4 - 5 * 8px);
+		}
+		&.columns-5 figure {
+			width: calc(100% / 5 - 6 * 8px);
+		}
+		&.columns-6 figure {
+			width: calc(100% / 6 - 7 * 8px);
+		}
+		&.columns-7 figure {
+			width: calc(100% / 7 - 8 * 8px);
+		}
+		&.columns-8 figure {
+			width: calc(100% / 8 - 9 * 8px);
+		}
 	}
 }

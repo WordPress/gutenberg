@@ -72,6 +72,7 @@ registerBlockType( 'core/list', {
 	title: __( 'List' ),
 	icon: 'editor-ul',
 	category: 'common',
+	keywords: [ __( 'bullet list' ), __( 'ordered list' ), __( 'numbered list' ) ],
 
 	attributes: {
 		nodeName: {

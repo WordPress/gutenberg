@@ -27,6 +27,8 @@ registerBlockType( 'core/cover-text', {
 
 	category: 'formatting',
 
+	keywords: [ __( 'colors' ) ],
+
 	attributes: {
 		align: {
 			type: 'string',
