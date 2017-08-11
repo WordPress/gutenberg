@@ -12,18 +12,12 @@ function createRemoveHook( hooks, removeAll ) {
 	 * Removes the specified callback (or all callbacks) from the hook with a
 	 * given name.
 	 *
-	 * @param {string}    hookName The name of the hook to modify.
-	 * @param {?Function} callback The specific callback to be removed.  If
-	 *                             omitted (and `removeAll` is truthy), clears
-	 *                             all callbacks.
+	 * @param {string}    hookName  The name of the hook to modify.
+	 * @param {string}    namespace The unique namespace identifying the callback in the form `my-plugin-slug/functionDescription`.
 	 *
-	 * @return {number}            The number of callbacks removed.
+	 * @return {number}             The number of callbacks removed.
 	 */
-	return function removeHook( hookName, callback ) {
-		if ( ! removeAll && typeof callback !== 'function' ) {
-			console.error( 'The hook callback to remove must be a function.' );
-			return;
-		}
+	return function removeHook( hookName, namespace ) {
 
 		// Bail if no hooks exist by this name
 		if ( ! hooks.hasOwnProperty( hookName ) ) {
@@ -42,7 +36,9 @@ function createRemoveHook( hooks, removeAll ) {
 			// Try to find the specified callback to remove.
 			const handlers = hooks[ hookName ].handlers;
 			for ( let i = handlers.length - 1; i >= 0; i-- ) {
-				if ( handlers[ i ].callback === callback ) {
+				if (
+					handlers[ i ].namespace === namespace
+				) {
 					handlers.splice( i, 1 );
 					handlersRemoved++;
 					// This callback may also be part of a hook that is
