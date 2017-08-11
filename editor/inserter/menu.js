@@ -9,7 +9,7 @@ import { connect } from 'react-redux';
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { Popover, withFocusReturn, withInstanceId, withSpokenMessages } from '@wordpress/components';
+import { withFocusReturn, withInstanceId, withSpokenMessages } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
 import { getCategories, getBlockTypes, BlockIcon } from '@wordpress/blocks';
 
@@ -314,17 +314,13 @@ export class InserterMenu extends Component {
 	}
 
 	render() {
-		const { position, onClose, instanceId } = this.props;
+		const { instanceId } = this.props;
 		const isSearching = this.state.filterValue;
 		const visibleBlocksByCategory = this.getVisibleBlocksByCategory( this.getBlocksForCurrentTab() );
 
 		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
-			<Popover
-				position={ position }
-				isOpen
-				onClose={ onClose }
-				className="editor-inserter__menu">
+			<div className="editor-inserter__menu">
 				<label htmlFor={ `editor-inserter__search-${ instanceId }` } className="screen-reader-text">
 					{ __( 'Search blocks' ) }
 				</label>
@@ -435,7 +431,7 @@ export class InserterMenu extends Component {
 						</button>
 					</div>
 				}
-			</Popover>
+			</div>
 		);
 		/* eslint-enable jsx-a11y/no-autofocus */
 	}
