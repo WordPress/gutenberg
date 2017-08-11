@@ -9,12 +9,13 @@ function createAddHook( hooks ) {
 	/**
 	 * Adds the hook to the appropriate hooks container.
 	 *
-	 * @param {string}   hookName Name of hook to add
-	 * @param {Function} callback Function to call when the hook is run
-	 * @param {?number}  priority Priority of this hook (default=10)
+	 * @param {string}   hookName  Name of hook to add
+	 * @param {string}   namespace The unique namespace identifying the callback in the form `my-plugin-slug/functionDescription`.
+	 * @param {Function} callback  Function to call when the hook is run
+	 * @param {?number}  priority  Priority of this hook (default=10)
 	 */
-	return function addHook( hookName, callback, priority = 10 ) {
-		if ( typeof hookName !== 'string' ) {
+	return function addHook( hookName, namespace, callback, priority = 10 ) {
+		if ( 'string' !== typeof hookName ) {
 			console.error( 'The hook name must be a string.' );
 			return;
 		}
@@ -40,7 +41,7 @@ function createAddHook( hooks ) {
 			return;
 		}
 
-		const handler = { callback, priority };
+		const handler = { callback, priority, namespace };
 
 		if ( hooks.hasOwnProperty( hookName ) ) {
 			// Find the correct insert index of the new hook.
