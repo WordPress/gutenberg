@@ -149,7 +149,8 @@ export function getTextWithCollapsedWhitespace( text ) {
 
 /**
  * Returns attribute pairs of the given StartTag token, including only pairs
- * where the value is non-empty or the attribute is a boolean attribute.
+ * where the value is non-empty or the attribute is a boolean attribute, an
+ * enumerated attribute, or a custom data- attribute.
  *
  * @see MEANINGFUL_ATTRIBUTES
  *
@@ -159,7 +160,11 @@ export function getTextWithCollapsedWhitespace( text ) {
 export function getMeaningfulAttributePairs( token ) {
 	return token.attributes.filter( ( pair ) => {
 		const [ key, value ] = pair;
-		return value || includes( MEANINGFUL_ATTRIBUTES, key );
+		return (
+			value ||
+			key.indexOf( 'data-' ) === 0 ||
+			includes( MEANINGFUL_ATTRIBUTES, key )
+		);
 	} );
 }
 

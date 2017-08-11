@@ -84,6 +84,14 @@ describe( 'validation', () => {
 
 			expect( pairs ).toEqual( [ [ 'contenteditable', '' ] ] );
 		} );
+
+		it( 'returns with empty data- attributes', () => {
+			const pairs = getMeaningfulAttributePairs( {
+				attributes: [ [ 'data-foo', '' ] ],
+			} );
+
+			expect( pairs ).toEqual( [ [ 'data-foo', '' ] ] );
+		} );
 	} );
 
 	describe( 'isEqualTextTokensWithCollapsedWhitespace()', () => {
@@ -366,6 +374,15 @@ describe( 'validation', () => {
 		it( 'should return false when difference of empty enumerated attribute', () => {
 			const isEquivalent = isEquivalentHTML(
 				'<div contenteditable>',
+				'<div>'
+			);
+
+			expect( isEquivalent ).toBe( false );
+		} );
+
+		it( 'should return false when difference of data- attribute', () => {
+			const isEquivalent = isEquivalentHTML(
+				'<div data-foo>',
 				'<div>'
 			);
 
