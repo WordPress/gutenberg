@@ -30,13 +30,13 @@ function createAddHook( hooks ) {
 			return;
 		}
 
-		if ( typeof callback !== 'function' ) {
+		if ( 'function' !== typeof callback ) {
 			console.error( 'The hook callback must be a function.' );
 			return;
 		}
 
 		// Validate numeric priority
-		if ( typeof priority !== 'number' ) {
+		if ( 'number' !== typeof priority ) {
 			console.error( 'If specified, the hook priority must be a number.' );
 			return;
 		}
