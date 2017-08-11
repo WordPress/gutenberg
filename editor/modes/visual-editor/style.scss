@@ -323,7 +323,8 @@
 	border-top: 1px solid $light-gray-500;
 	border-bottom: 1px solid $light-gray-500;
 
-	> * {
+	> div,
+	> ul {
 		margin-top: -1px;
 		margin-bottom: -1px;
 	}
