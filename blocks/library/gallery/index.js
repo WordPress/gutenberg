@@ -100,7 +100,7 @@ registerBlockType( 'core/gallery', {
 	edit( { attributes, setAttributes, focus, className } ) {
 		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
 		const setLinkTo = ( value ) => setAttributes( { linkTo: value } );
-		const setColumnsNumber = ( event ) => setAttributes( { columns: event.target.value } );
+		const setColumnsNumber = ( value ) => setAttributes( { columns: value } );
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		const toggleImageCrop = () => setAttributes( { imageCrop: ! imageCrop } );
 
@@ -159,7 +159,7 @@ registerBlockType( 'core/gallery', {
 						label={ __( 'Columns' ) }
 						value={ columns }
 						onChange={ setColumnsNumber }
-						min="1"
+						min={ 1 }
 						max={ Math.min( MAX_COLUMNS, images.length ) }
 					/>
 					<ToggleControl
