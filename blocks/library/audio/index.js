@@ -20,7 +20,7 @@ const { attr } = source;
 registerBlockType( 'core/audio', {
 	title: __( 'Audio' ),
 
-	icon: 'media-audio',
+	icon: 'format-audio',
 
 	category: 'common',
 
