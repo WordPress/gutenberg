@@ -4,7 +4,7 @@
         "attrs": {
             "width": "center"
         },
-        "rawContent": "\n<div class=\"wp-block-text-columns aligncenter columns-2\">\n    <div class=\"wp-block-text-columns__column\">\n        <p>One</p>\n    </div>\n    <div class=\"wp-block-text-columns__column\">\n        <p>Two</p>\n    </div>\n</div>\n"
+        "rawContent": "\n<section class=\"wp-block-text-columns aligncenter columns-2\">\n    <div class=\"wp-block-column\">\n        <p>One</p>\n    </div>\n    <div class=\"wp-block-column\">\n        <p>Two</p>\n    </div>\n</section>\n"
     },
     {
         "attrs": {},

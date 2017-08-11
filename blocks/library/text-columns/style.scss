@@ -5,7 +5,7 @@
 		display: flex;
 	}
 
-	.wp-block-text-columns__column {
+	.wp-block-column {
 		box-sizing: border-box;
 		margin: 0 16px;
 		padding: 0;
@@ -19,13 +19,13 @@
 		}
 	}
 
-	&.columns-2 .wp-block-text-columns__column {
+	&.columns-2 .wp-block-column {
 		width: calc( 100% / 2 );
 	}
-	&.columns-3 .wp-block-text-columns__column {
+	&.columns-3 .wp-block-column {
 		width: calc( 100% / 3 );
 	}
-	&.columns-4 .wp-block-text-columns__column {
+	&.columns-4 .wp-block-column {
 		width: calc( 100% / 4 );
 	}
 }
