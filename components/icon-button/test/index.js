@@ -48,5 +48,18 @@ describe( 'IconButton', () => {
 			const iconButton = shallow( <IconButton test="test" /> );
 			expect( iconButton.props().test ).toBe( 'test' );
 		} );
+
+		it( 'should allow custom tooltip text', () => {
+			const iconButton = shallow( <IconButton label="WordPress" tooltip="Custom" /> );
+			expect( iconButton.name() ).toBe( 'Tooltip' );
+			expect( iconButton.prop( 'text' ) ).toBe( 'Custom' );
+			expect( iconButton.find( 'Button' ).prop( 'aria-label' ) ).toBe( 'WordPress' );
+		} );
+
+		it( 'should allow tooltip disable', () => {
+			const iconButton = shallow( <IconButton label="WordPress" tooltip={ false } /> );
+			expect( iconButton.name() ).toBe( 'Button' );
+			expect( iconButton.prop( 'aria-label' ) ).toBe( 'WordPress' );
+		} );
 	} );
 } );

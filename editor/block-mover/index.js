@@ -7,6 +7,7 @@ import { first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 
@@ -28,6 +29,7 @@ function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, f
 				className="editor-block-mover__control"
 				onClick={ isFirst ? null : onMoveUp }
 				icon="arrow-up-alt2"
+				tooltip={ __( 'Move Up' ) }
 				label={ getBlockMoverLabel(
 					uids.length,
 					blockType && blockType.title,
@@ -42,6 +44,7 @@ function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, f
 				className="editor-block-mover__control"
 				onClick={ isLast ? null : onMoveDown }
 				icon="arrow-down-alt2"
+				tooltip={ __( 'Move Down' ) }
 				label={ getBlockMoverLabel(
 					uids.length,
 					blockType && blockType.title,

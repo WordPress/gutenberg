@@ -172,6 +172,19 @@ describe( 'Popover', () => {
 	} );
 
 	describe( '#setOffset()', () => {
+		let getComputedStyle;
+		beforeEach( () => {
+			getComputedStyle = window.getComputedStyle;
+			window.getComputedStyle = jest.fn().mockReturnValue( {
+				paddingTop: 10,
+				paddingBottom: 5,
+			} );
+		} );
+
+		afterEach( () => {
+			window.getComputedStyle = getComputedStyle;
+		} );
+
 		function getInstanceWithParentNode() {
 			const instance = new Popover( {} );
 
@@ -204,7 +217,7 @@ describe( 'Popover', () => {
 
 			expect( instance.nodes.popover.style ).toEqual( {
 				left: '225px',
-				top: '200px',
+				top: '210px',
 			} );
 		} );
 
@@ -216,7 +229,7 @@ describe( 'Popover', () => {
 
 			expect( instance.nodes.popover.style ).toEqual( {
 				left: '225px',
-				top: '400px',
+				top: '395px',
 			} );
 		} );
 	} );

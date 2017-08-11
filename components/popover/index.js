@@ -92,13 +92,21 @@ export class Popover extends Component {
 		}
 
 		const rect = parentNode.getBoundingClientRect();
+		const [ yAxis ] = this.getPositions();
+		const isTop = 'top' === yAxis;
+
+		// Offset top positioning by padding
+		const { paddingTop, paddingBottom } = window.getComputedStyle( parentNode );
+		let topOffset = parseInt( isTop ? paddingTop : paddingBottom, 10 );
+		if ( ! isTop ) {
+			topOffset *= -1;
+		}
 
 		// Set popover at parent node center
 		popover.style.left = Math.round( rect.left + ( rect.width / 2 ) ) + 'px';
 
 		// Set at top or bottom of parent node based on popover position
-		const [ yAxis ] = this.getPositions();
-		popover.style.top = rect[ yAxis ] + 'px';
+		popover.style.top = ( rect[ yAxis ] + topOffset ) + 'px';
 	}
 
 	setForcedPositions() {
