@@ -16,21 +16,23 @@ describe( 'PanelBody', () => {
 			expect( panelBody.type() ).toBe( 'div' );
 		} );
 
-		it( 'should render an IconButton matching the following props and state', () => {
+		it( 'should render an Button matching the following props and state', () => {
 			const panelBody = shallow( <PanelBody title="Some Text" /> );
-			const iconButton = panelBody.find( 'IconButton' );
-			expect( iconButton.shallow().hasClass( 'components-panel__body-toggle' ) ).toBe( true );
+			const button = panelBody.find( 'Button' );
+			const icon = panelBody.find( 'Dashicon' );
+			expect( button.shallow().hasClass( 'components-panel__body-toggle' ) ).toBe( true );
 			expect( panelBody.state( 'opened' ) ).toBe( true );
-			expect( iconButton.prop( 'onClick' ) ).toBe( panelBody.instance().toggle );
-			expect( iconButton.prop( 'icon' ) ).toBe( 'arrow-down' );
-			expect( iconButton.prop( 'children' ) ).toBe( 'Some Text' );
+			expect( button.prop( 'onClick' ) ).toBe( panelBody.instance().toggle );
+			expect( icon.prop( 'icon' ) ).toBe( 'arrow-down' );
+			expect( button.childAt( 0 ).name() ).toBe( 'Dashicon' );
+			expect( button.childAt( 1 ).text() ).toBe( 'Some Text' );
 		} );
 
 		it( 'should change state and props when sidebar is closed', () => {
 			const panelBody = shallow( <PanelBody title="Some Text" initialOpen={ false } /> );
 			expect( panelBody.state( 'opened' ) ).toBe( false );
-			const iconButton = panelBody.find( 'IconButton' );
-			expect( iconButton.prop( 'icon' ) ).toBe( 'arrow-right' );
+			const icon = panelBody.find( 'Dashicon' );
+			expect( icon.prop( 'icon' ) ).toBe( 'arrow-right' );
 		} );
 
 		it( 'should render child elements within PanelBody element', () => {

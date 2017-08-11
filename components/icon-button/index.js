@@ -12,6 +12,7 @@ import { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import './style.scss';
+import Tooltip from '../tooltip';
 import Button from '../button';
 import Dashicon from '../dashicon';
 
@@ -22,12 +23,18 @@ class IconButton extends Component {
 		const { icon, children, label, className, focus, ...additionalProps } = this.props;
 		const classes = classnames( 'components-icon-button', className );
 
-		return (
+		let element = (
 			<Button { ...additionalProps } aria-label={ label } className={ classes } focus={ focus }>
 				<Dashicon icon={ icon } />
 				{ children }
 			</Button>
 		);
+
+		if ( label && ! children ) {
+			element = <Tooltip text={ label }>{ element }</Tooltip>;
+		}
+
+		return element;
 	}
 }
 

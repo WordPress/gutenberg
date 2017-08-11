@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isEqual, pickBy } from 'lodash';
+import { isEqual } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -14,13 +14,6 @@ import { createPortal, Component } from '@wordpress/element';
  */
 import './style.scss';
 import PopoverDetectOutside from './detect-outside';
-
-/**
- * Matches an event handler prop key
- *
- * @type {RegExp}
- */
-const REGEXP_EVENT_PROP = /^on[A-Z]/;
 
 export class Popover extends Component {
 	constructor() {
@@ -142,16 +135,16 @@ export class Popover extends Component {
 	}
 
 	render() {
-		const { isOpen, onClose, children, className } = this.props;
+		// Disable reason: We generate the `...contentProps` rest as remainder
+		// of props which aren't explicitly handled by this component.
+		//
+		// eslint-disable-next-line no-unused-vars
+		const { isOpen, onClose, position, children, className, ...contentProps } = this.props;
 		const [ yAxis, xAxis ] = this.getPositions();
 
 		if ( ! isOpen ) {
 			return null;
 		}
-
-		const eventHandlers = pickBy( this.props, ( value, key ) => (
-			'onClose' !== key && REGEXP_EVENT_PROP.test( key )
-		) );
 
 		const classes = classnames(
 			'components-popover',
@@ -168,7 +161,7 @@ export class Popover extends Component {
 							ref={ this.bindNode( 'popover' ) }
 							className={ classes }
 							tabIndex="0"
-							{ ...eventHandlers }
+							{ ...contentProps }
 						>
 							<div
 								ref={ this.bindNode( 'content' ) }

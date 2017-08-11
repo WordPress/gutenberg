@@ -58,12 +58,13 @@
 	font-size: inherit;
 }
 
-.components-panel__body-toggle.components-icon-button {
+.components-panel__body-toggle.components-button {
 	position: relative;
 	padding: 15px;
 	outline: none;
 	width: 100%;
 	font-weight: 600;
+	text-align: left;
 
 	.dashicon {
 		position: absolute;
