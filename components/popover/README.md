@@ -26,6 +26,23 @@ function ToggleButton( { isVisible, toggleVisible } ) {
 }
 ```
 
+If you want Popover elementss to render to a specific location on the page to allow style cascade to take effect, you must render a `PopoverProvider` further up the element tree, specifying a target:
+
+```
+import { render } from '@wordpress/element';
+import { PopoverContext } from '@wordpress/components';
+import App from './app';
+
+const app = document.getElementById( 'app' );
+
+render(
+	<PopoverContext target={ app }>
+		<App />
+	</PopoverContext>,
+	app
+);
+```
+
 ## Props
 
 The component accepts the following props:

@@ -1,8 +1,4 @@
 .components-popover {
-	&, * {
-		box-sizing: border-box;
-	}
-
 	position: fixed;
 	z-index: z-index( ".components-popover" );
 	left: 50%;
