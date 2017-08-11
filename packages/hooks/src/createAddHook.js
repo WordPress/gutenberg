@@ -24,6 +24,11 @@ function createAddHook( hooks ) {
 			return;
 		}
 
+		if ( ! /^[a-z][a-z0-9_]*$/.test( hookName ) ) {
+			console.error( 'The hook name can only contain numbers, letters and underscores.' );
+			return;
+		}
+
 		if ( typeof callback !== 'function' ) {
 			console.error( 'The hook callback must be a function.' );
 			return;
