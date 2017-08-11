@@ -1,0 +1,8 @@
+.wp-block-gallery:not( .components-placeholder ) {
+	margin-right: -16px;
+	margin-bottom: -16px;
+}
+
+.editor-visual-editor__block[data-type="core/gallery"] .editor-visual-editor__block-edit {
+	overflow: hidden;
+}

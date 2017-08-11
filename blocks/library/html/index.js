@@ -12,7 +12,7 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import './style.scss';
+import './editor.scss';
 import { registerBlockType, source } from '../../api';
 import BlockControls from '../../block-controls';
 
