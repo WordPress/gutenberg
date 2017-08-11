@@ -7,7 +7,7 @@ import { withInstanceId, Dashicon } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import './style.scss';
+import './editor.scss';
 import { registerBlockType, source } from '../../api';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';

@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import './style.scss';
+import './editor.scss';
 import { registerBlockType, source, setUnknownTypeHandlerName } from '../../api';
 import OldEditor from './old-editor';
 

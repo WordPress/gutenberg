@@ -9,8 +9,8 @@ import { times, unescape } from 'lodash';
 /**
  * Internal dependencies
  */
+import './editor.scss';
 import './style.scss';
-import './block.scss';
 import { registerBlockType } from '../../api';
 import { getCategories } from './data.js';
 import InspectorControls from '../../inspector-controls';
