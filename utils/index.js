@@ -3,3 +3,5 @@ import * as nodetypes from './nodetypes';
 
 export { keycodes };
 export { nodetypes };
+
+export * from './mediaupload';

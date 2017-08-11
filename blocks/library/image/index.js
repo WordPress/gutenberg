@@ -8,6 +8,7 @@ import ResizableBox from 'react-resizable-box';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { mediaUpload } from '@wordpress/utils';
 import { Placeholder, Dashicon, Toolbar, DropZone, FormFileUpload } from '@wordpress/components';
 
 /**
@@ -108,37 +109,7 @@ registerBlockType( 'core/image', {
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1;
 		const uploadButtonProps = { isLarge: true };
 		const onSetHref = ( value ) => setAttributes( { href: value } );
-		const uploadFromFiles = ( files ) => {
-			const media = files[ 0 ];
-
-			// Only allow image uploads
-			if ( ! /^image\//.test( media.type ) ) {
-				return;
-			}
-
-			// Use File API to assign temporary URL from upload
-			setAttributes( {
-				url: window.URL.createObjectURL( media ),
-			} );
-
-			// Create upload payload
-			const data = new window.FormData();
-			data.append( 'file', media );
-
-			new wp.api.models.Media().save( null, {
-				data: data,
-				contentType: false,
-			} ).done( ( savedMedia ) => {
-				setAttributes( {
-					id: savedMedia.id,
-					url: savedMedia.source_url,
-				} );
-			} ).fail( () => {
-				// Reset to empty on failure.
-				// TODO: Better failure messaging
-				setAttributes( { url: null } );
-			} );
-		};
+		const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setAttributes );
 
 		const controls = (
 			focus && (
@@ -183,7 +154,7 @@ registerBlockType( 'core/image', {
 					<FormFileUpload
 						isLarge
 						className="wp-block-image__upload-button"
-						onChange={ ( event ) => uploadFromFiles( event.target.files ) }
+						onChange={ uploadFromFiles }
 						accept="image/*"
 					>
 						{ __( 'Upload' ) }
