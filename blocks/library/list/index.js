@@ -45,6 +45,11 @@ const toBrDelimitedContent = ( values ) => {
 	}
 	const content = [];
 	values.forEach( function( li, liIndex, listItems ) {
+		if ( typeof li === 'string' ) {
+			content.push( li );
+			return;
+		}
+
 		Children.toArray( li.props.children ).forEach( function( element, elementIndex, liChildren ) {
 			if ( 'ul' === element.type || 'ol' === element.type ) { // lists within lists
 				// we know we've just finished processing a list item, so break the text
@@ -159,7 +164,7 @@ registerBlockType( 'core/list', {
 				blocks: [ 'core/quote' ],
 				transform: ( { values } ) => {
 					return createBlock( 'core/quote', {
-						value: toBrDelimitedContent( values ),
+						value: [ <p key="list">{ toBrDelimitedContent( values ) }</p> ],
 					} );
 				},
 			},
