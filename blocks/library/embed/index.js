@@ -44,6 +44,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 			caption: {
 				type: 'array',
 				source: children( 'figcaption' ),
+				default: [],
 			},
 			align: {
 				type: 'string',
