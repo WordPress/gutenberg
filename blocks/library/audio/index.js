@@ -45,7 +45,7 @@ registerBlockType( 'core/audio', {
 					key="placeholder"
 					icon="media-audio"
 					label={ __( 'Audio' ) }
-					instructions={ __( 'Select an audio file from your library, or paste a URL below:' ) }
+					instructions={ __( 'Select an audio file from your library, or upload a new one:' ) }
 					className={ className }>
 					<MediaUploadButton
 						buttonProps={ { isLarge: true } }
@@ -54,12 +54,6 @@ registerBlockType( 'core/audio', {
 					>
 						{ __( 'Insert from Media Library' ) }
 					</MediaUploadButton>
-					<input
-						type="url"
-						value={ src || '' }
-						className="components-placeholder__input"
-						placeholder={ __( 'Enter URL to audio file here…' ) }
-						onChange={ ( event ) => setAttributes( { src: event.target.value } ) } />
 				</Placeholder>,
 			];
 		}
