@@ -24,17 +24,24 @@ import {
  */
 import { replaceBlock } from '../../actions';
 
-function InvalidBlockWarning( { switchToDefaultType } ) {
+function InvalidBlockWarning( { ignoreInvalid, switchToDefaultType } ) {
 	const defaultBlockType = getBlockType( getUnknownTypeHandlerName() );
 
 	return (
 		<BlockWarning>
-			<p>{ __(
-				'This block has been modified externally and has been locked to ' +
-				'protect against content loss.'
-			) }</p>
-			{ defaultBlockType && (
-				<p>
+			<p>{ sprintf( __(
+				'This block appears to have been modified externally. ' +
+				'Overwrite the external changes or Convert to %s to keep ' +
+				'your changes.'
+			), defaultBlockType.title ) }</p>
+			<p>
+				<Button
+					onClick={ ignoreInvalid }
+					isLarge
+				>
+					{ sprintf( __( 'Overwrite' ) ) }
+				</Button>
+				{ defaultBlockType && (
 					<Button
 						onClick={ switchToDefaultType }
 						isLarge
@@ -44,8 +51,8 @@ function InvalidBlockWarning( { switchToDefaultType } ) {
 							sprintf( __( 'Convert to %s' ), defaultBlockType.title )
 						}
 					</Button>
-				</p>
-			) }
+				) }
+			</p>
 		</BlockWarning>
 	);
 }
@@ -54,6 +61,12 @@ export default connect(
 	null,
 	( dispatch, ownProps ) => {
 		return {
+			ignoreInvalid() {
+				const { block } = ownProps;
+				const { name, attributes } = block;
+				const nextBlock = createBlock( name, attributes );
+				dispatch( replaceBlock( block.uid, nextBlock ) );
+			},
 			switchToDefaultType() {
 				const defaultBlockName = getUnknownTypeHandlerName();
 				const { block } = ownProps;

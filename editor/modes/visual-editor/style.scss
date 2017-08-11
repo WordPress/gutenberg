@@ -464,7 +464,7 @@ $sticky-bottom-offset: 20px;
 	justify-content: space-around;
 	align-items: center;
 	width: 96%;
-	max-width: 360px;
+	max-width: 380px;
 	padding: 20px 20px 10px 20px;
 	background-color: $white;
 	border: 1px solid $light-gray-500;
@@ -476,5 +476,9 @@ $sticky-bottom-offset: 20px;
 		width: 100%;
 		font-family: $default-font;
 		font-size: $default-font-size;
+	}
+
+	.button + .button {
+		margin-left: $item-spacing;
 	}
 }

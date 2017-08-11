@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, reduce, isObject } from 'lodash';
+import { isEmpty, reduce, isObject, castArray } from 'lodash';
 import { html as beautifyHtml } from 'js-beautify';
 import classnames from 'classnames';
 
@@ -166,11 +166,11 @@ export function serializeBlock( block ) {
 }
 
 /**
- * Takes a block list and returns the serialized post content.
+ * Takes a block or set of blocks and returns the serialized post content.
  *
- * @param  {Array}  blocks Block list
+ * @param  {Array}  blocks Block(s) to serialize
  * @return {String}        The post content
  */
 export default function serialize( blocks ) {
-	return blocks.map( serializeBlock ).join( '\n\n' );
+	return castArray( blocks ).map( serializeBlock ).join( '\n\n' );
 }
