@@ -1,16 +1,19 @@
+import validateNamespace from './validateNamespace.js';
+import validateHookName from './validateHookName.js';
+
 /**
  * Returns a function which, when invoked, will remove a specified hook or all
  * hooks by the given name.
  *
  * @param  {Object}   hooks      Stored hooks, keyed by hook name.
- * @param  {bool}     removeAll  Whether to remove all hooked callbacks.
+ * @param  {bool}     removeAll  Whether to remove all callbacks for a hookName, without regard to namespace. Used to create `removeAll*` functions.
  *
  * @return {Function}            Function that removes hooks.
  */
 function createRemoveHook( hooks, removeAll ) {
 	/**
 	 * Removes the specified callback (or all callbacks) from the hook with a
-	 * given name.
+	 * given hookName and namespace.
 	 *
 	 * @param {string}    hookName  The name of the hook to modify.
 	 * @param {string}    namespace The unique namespace identifying the callback in the form `my-plugin-slug/functionDescription`.
@@ -18,6 +21,14 @@ function createRemoveHook( hooks, removeAll ) {
 	 * @return {number}             The number of callbacks removed.
 	 */
 	return function removeHook( hookName, namespace ) {
+
+		if ( ! validateHookName( hookName ) ) {
+			return;
+		}
+
+		if ( ! removeAll && ! validateNamespace( namespace ) ) {
+			return;
+		}
 
 		// Bail if no hooks exist by this name
 		if ( ! hooks.hasOwnProperty( hookName ) ) {

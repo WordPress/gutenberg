@@ -1,3 +1,5 @@
+import validateHookName from './validateHookName.js';
+
 /**
  * Returns a function which, when invoked, will return the number of times a
  * hook has been called.
@@ -15,6 +17,11 @@ function createDidHook( hooks ) {
 	 * @return {number}          The number of times the hook has run.
 	 */
 	return function didHook( hookName ) {
+
+		if ( ! validateHookName( hookName ) ) {
+			return;
+		}
+
 		return hooks.hasOwnProperty( hookName ) && hooks[ hookName ].runs
 			? hooks[ hookName ].runs
 			: 0;

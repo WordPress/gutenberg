@@ -1,3 +1,5 @@
+import validateHookName from './validateHookName.js';
+
 /**
  * Returns a function which, when invoked, will execute all callbacks
  * registered to a hook of the specified type, optionally returning the final
@@ -19,18 +21,8 @@ function createRunHook( hooks, returnFirstArg ) {
 	 * @return {*}               Return value of runner, if applicable.
 	 */
 	return function runHooks( hookName, ...args ) {
-		if ( 'string' !== typeof hookName ) {
-			console.error( 'The hook name must be a string.' );
-			return;
-		}
 
-		if ( /^__/.test( hookName ) ) {
-			console.error( 'The hook name cannot begin with `__`.' );
-			return;
-		}
-
-		if ( ! /^[a-z][a-z0-9_]*$/.test( hookName ) ) {
-			console.error( 'The hook name can only contain numbers, letters and underscores.' );
+		if ( ! validateHookName( hookName ) ) {
 			return;
 		}
 

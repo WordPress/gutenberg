@@ -1,3 +1,6 @@
+import validateNamespace from './validateNamespace.js';
+import validateHookName from './validateHookName.js';
+
 /**
  * Returns a function which, when invoked, will add a hook.
  *
@@ -15,28 +18,12 @@ function createAddHook( hooks ) {
 	 * @param {?number}  priority  Priority of this hook (default=10)
 	 */
 	return function addHook( hookName, namespace, callback, priority = 10 ) {
-		if ( 'string' !== typeof hookName ) {
-			console.error( 'The hook name must be a string.' );
+
+		if ( ! validateHookName( hookName ) ) {
 			return;
 		}
 
-		if ( /^__/.test( hookName ) ) {
-			console.error( 'The hook name cannot begin with `__`.' );
-			return;
-		}
-
-		if ( ! /^[a-z][a-z0-9_]*$/.test( hookName ) ) {
-			console.error( 'The hook name can only contain numbers, letters and underscores.' );
-			return;
-		}
-
-		if ( 'string' !== typeof namespace ) {
-			console.error( 'The namespace must be a string.' );
-			return;
-		}
-
-		if ( ! /^.*\/.*$/.test( namespace ) ) {
-			console.error( 'The namespace must take the form `my-plugin-slug/functionDescription' );
+		if ( ! validateNamespace( namespace ) ) {
 			return;
 		}
 
