@@ -14,7 +14,11 @@ import { PanelRow, withInstanceId } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import { getEditedPostAttribute, getSuggestedPostFormat } from '../../selectors';
+import {
+	getEditedPostAttribute,
+	getSuggestedPostFormat,
+	getCurrentPostType,
+} from '../../selectors';
 import { editPost } from '../../actions';
 
 const POST_FORMATS = [
@@ -30,7 +34,11 @@ const POST_FORMATS = [
 	{ id: 'chat', caption: __( 'Chat' ) },
 ];
 
-function PostFormat( { onUpdatePostFormat, postFormat = 'standard', suggestedFormat, instanceId } ) {
+function PostFormat( { postType, onUpdatePostFormat, postFormat = 'standard', suggestedFormat, instanceId } ) {
+	if ( postType !== 'post' ) {
+		return null;
+	}
+
 	const postFormatSelectorId = 'post-format-selector-' + instanceId;
 	const suggestion = find( POST_FORMATS, ( format ) => format.id === suggestedFormat );
 
@@ -70,6 +78,7 @@ export default connect(
 		return {
 			postFormat: getEditedPostAttribute( state, 'format' ),
 			suggestedFormat: getSuggestedPostFormat( state ),
+			postType: getCurrentPostType( state ),
 		};
 	},
 	{
