@@ -8,8 +8,8 @@
  */
 function validateNamespace( namespace ) {
 
-	if ( 'string' !== typeof namespace ) {
-		console.error( 'The namespace must be a string.' );
+	if ( 'string' !== typeof namespace || '' === namespace ) {
+		console.error( 'The namespace must be a non-empty string.' );
 		return false;
 	}
 

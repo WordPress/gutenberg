@@ -9,8 +9,8 @@
  */
 function validateHookName( hookName ) {
 
-	if ( 'string' !== typeof hookName ) {
-		console.error( 'The hook name must be a string.' );
+	if ( 'string' !== typeof hookName || '' === hookName ) {
+		console.error( 'The hook name must be a non-empty string.' );
 		return false;
 	}
 
