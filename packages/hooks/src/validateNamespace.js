@@ -1,7 +1,8 @@
 /**
- * Validate a namespace.
+ * Validate a namespace string.
  *
- * @param  {string} namespace The namespace to validate.
+ * @param  {string} namespace The namespace to validate - should take the form
+ *                            `my-plugin-slug/functionDescription`.
  *
  * @return {bool}             Whether the namespace is valid.
  */
