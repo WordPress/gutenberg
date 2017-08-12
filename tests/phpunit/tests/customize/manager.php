@@ -1246,6 +1246,38 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test passing `null` for a setting ID to remove it from the changeset.
+	 *
+	 * @ticket 41621
+	 * @covers WP_Customize_Manager::save_changeset_post()
+	 */
+	function test_remove_setting_from_changeset_post() {
+		$uuid = wp_generate_uuid4();
+
+		$manager = $this->create_test_manager( $uuid );
+		$manager->save_changeset_post( array(
+			'data' => array(
+				'scratchpad' => array(
+					'value' => 'foo',
+				),
+			),
+		) );
+
+		// Create a new manager so post values are unset.
+		$manager = $this->create_test_manager( $uuid );
+
+		$this->assertArrayHasKey( 'scratchpad', $manager->changeset_data() );
+
+		$manager->save_changeset_post( array(
+			'data' => array(
+				'scratchpad' => null,
+			),
+		) );
+
+		$this->assertArrayNotHasKey( 'scratchpad', $manager->changeset_data() );
+	}
+
+	/**
 	 * Test writing changesets and publishing with users who can unfiltered_html and those who cannot.
 	 *
 	 * @ticket 38705
