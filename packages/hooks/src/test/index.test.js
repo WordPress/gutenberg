@@ -115,10 +115,65 @@ test( 'remove an invalid namespace from a filter', () => {
 	);
 } );
 
-test( 'cannot add filters with non-string names', () => {
+test( 'cannot add filters with non-string hook names', () => {
 	addFilter( 42, 'my_plugin/my_callback', () => null );
 	expect( console.error ).toHaveBeenCalledWith(
 		'The hook name must be a non-empty string.'
+	);
+} );
+
+test( 'cannot add filters with empty-string hook names', () => {
+	addFilter( '', 'my_plugin/my_callback', () => null );
+	expect( console.error ).toHaveBeenCalledWith(
+		'The hook name must be a non-empty string.'
+	);
+} );
+
+test( 'cannot add filters with empty-string namespaces', () => {
+	addFilter( 'hook_name', '', () => null );
+	expect( console.error ).toHaveBeenCalledWith(
+		'The namespace must be a non-empty string.'
+	);
+} );
+
+test( 'cannot add filters with invalid namespaces', () => {
+	addFilter( 'hook_name', 'invalid_name', () => null );
+	expect( console.error ).toHaveBeenCalledWith(
+		'The namespace must take the form `my-plugin-slug/functionDescription`.'
+	);
+} );
+
+test( 'cannot add filters with namespaces missing a functionDescription', () => {
+	addFilter( 'hook_name', 'invalid_name/', () => null );
+	expect( console.error ).toHaveBeenCalledWith(
+		'The namespace must take the form `my-plugin-slug/functionDescription`.'
+	);
+} );
+
+test( 'Can add filters with capitals in namespaces', () => {
+	addFilter( 'hook_name', 'OhNo/action', () => null );
+	expect( console.error ).toHaveBeenCalledTimes( 0 );
+} );
+
+test( 'Can add filters with capitals in hookName', () => {
+	addFilter( 'hookName', 'plugin/action', () => null );
+	expect( console.error ).toHaveBeenCalledTimes( 0 );
+} );
+
+test( 'Can add filters with periods in namespaces', () => {
+	addFilter( 'hook_name', 'plugin.name/ok.action', () => null );
+	expect( console.error ).toHaveBeenCalledTimes( 0 );
+} );
+
+test( 'Can add filters with periods in hookName', () => {
+	addFilter( 'hook.name', 'plugin/action', () => null );
+	expect( console.error ).toHaveBeenCalledTimes( 0 );
+} );
+
+test( 'cannot add filters with invalid namespaces', () => {
+	addFilter( 'hook_name', '/invalid_name', () => null );
+	expect( console.error ).toHaveBeenCalledWith(
+		'The namespace can only contain numbers, letters, dashes, periods and underscores, plus the forward slash dividing slug and description in the namespace.'
 	);
 } );
 
