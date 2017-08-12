@@ -111,14 +111,14 @@ test( 'remove a non-existent filter', () => {
 test( 'remove an invalid namespace from a filter', () => {
 	expect( removeFilter( 'test.filter', 42 ) ).toEqual( undefined );
 	expect( console.error ).toHaveBeenCalledWith(
-		'The namespace must be a string.'
+		'The namespace must be a non-empty string.'
 	);
 } );
 
 test( 'cannot add filters with non-string names', () => {
 	addFilter( 42, 'my_plugin/my_callback', () => null );
 	expect( console.error ).toHaveBeenCalledWith(
-		'The hook name must be a string.'
+		'The hook name must be a non-empty string.'
 	);
 } );
 
@@ -146,7 +146,7 @@ test( 'cannot add filters with non-numeric priorities', () => {
 test( 'cannot run filters with non-string names', () => {
 	expect( applyFilters( () => {}, 42 ) ).toBe( undefined );
 	expect( console.error ).toHaveBeenCalledWith(
-		'The hook name must be a string.'
+		'The hook name must be a non-empty string.'
 	);
 } );
 
