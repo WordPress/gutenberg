@@ -13,8 +13,13 @@ function validateNamespace( namespace ) {
 		return false;
 	}
 
-	if ( ! /^.*\/.*$/.test( namespace ) ) {
-		console.error( 'The namespace must take the form `my-plugin-slug/functionDescription' );
+	if ( ! /^[a-zA-Z][a-zA-Z0-9_.-/]*$/.test( namespace ) ) {
+		console.error( 'The namespace can only contain numbers, letters, dashes, periods and underscores, plus the forward slash dividing slug and description in the namespace.' );
+		return false;
+	}
+
+	if ( ! /^[a-zA-Z][a-zA-Z0-9_.-]*\/[a-zA-Z][a-zA-Z0-9_.-]*$/.test( namespace ) ) {
+		console.error( 'The namespace must take the form `my-plugin-slug/functionDescription`.' );
 		return false;
 	}
 

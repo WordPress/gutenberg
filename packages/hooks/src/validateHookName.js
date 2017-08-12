@@ -19,7 +19,7 @@ function validateHookName( hookName ) {
 		return false;
 	}
 
-	if ( ! /^[a-z][a-z0-9_.-]*$/.test( hookName ) ) {
+	if ( ! /^[a-zA-Z][a-zA-Z0-9_.-]*$/.test( hookName ) ) {
 		console.error( 'The hook name can only contain numbers, letters, dashes, periods and underscores.' );
 		return false;
 	}
