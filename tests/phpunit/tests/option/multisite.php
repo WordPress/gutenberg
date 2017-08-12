@@ -148,8 +148,8 @@ class Tests_Multisite_Option extends WP_UnitTestCase {
 	 * @group multisite
 	 */
 	function test_site_notoptions() {
-		global $wpdb;
-		$notoptions_key = "{$wpdb->siteid}:notoptions";
+		$network_id = get_current_network_id();
+		$notoptions_key = "{$network_id}:notoptions";
 
 		$_notoptions = wp_cache_get( 'notoptions', 'site-options' );
 		$this->assertEmpty( $_notoptions );
