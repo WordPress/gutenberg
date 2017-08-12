@@ -46,7 +46,11 @@ class PanelBody extends Component {
 						</Button>
 					</h3>
 				) }
-				{ this.state.opened && children }
+				{ this.state.opened && (
+					<div className="components-panel__body-content">
+						{ children }
+					</div>
+				) }
 			</div>
 		);
 	}
