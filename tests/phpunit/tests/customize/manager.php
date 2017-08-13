@@ -170,15 +170,39 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$this->assertInstanceOf( 'WPDieException', $exception );
 		$this->assertContains( 'Invalid changeset UUID', $exception->getMessage() );
 
-		update_option( 'fresh_site', 0 );
+		update_option( 'fresh_site', '0' );
 		$wp_customize = new WP_Customize_Manager();
 		$wp_customize->setup_theme();
 		$this->assertFalse( has_action( 'after_setup_theme', array( $wp_customize, 'import_theme_starter_content' ) ) );
 
 		// Make sure that starter content import gets queued on a fresh site.
-		update_option( 'fresh_site', 1 );
+		update_option( 'fresh_site', '1' );
 		$wp_customize->setup_theme();
 		$this->assertEquals( 100, has_action( 'after_setup_theme', array( $wp_customize, 'import_theme_starter_content' ) ) );
+	}
+
+	/**
+	 * Test that clearing a fresh site is a no-op if the site is already fresh.
+	 *
+	 * @see _delete_option_fresh_site()
+	 * @ticket 41039
+	 */
+	function test_fresh_site_flag_clearing() {
+		global $wp_customize, $wpdb;
+
+		// Make sure fresh site flag is cleared when publishing a changeset.
+		update_option( 'fresh_site', '1' );
+		do_action( 'customize_save_after', $wp_customize );
+		$this->assertEquals( '0', get_option( 'fresh_site' ) );
+
+		// Simulate a new, uncached request.
+		wp_cache_delete( 'alloptions', 'options' );
+		wp_load_alloptions();
+
+		// Make sure no DB write is done when publishing and a site is already non-fresh.
+		$query_count = $wpdb->num_queries;
+		do_action( 'customize_save_after', $wp_customize );
+		$this->assertSame( $query_count, $wpdb->num_queries );
 	}
 
 	/**
