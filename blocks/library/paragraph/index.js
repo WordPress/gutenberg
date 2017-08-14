@@ -7,7 +7,7 @@ import { concatChildren } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import './block.scss';
+import './style.scss';
 import { registerBlockType, createBlock, source, setDefaultBlock } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
@@ -116,7 +116,7 @@ registerBlockType( 'core/paragraph', {
 				onMerge={ mergeBlocks }
 				onReplace={ onReplace }
 				style={ { textAlign: align } }
-				className={ dropCap && 'has-drop-cap' }
+				className={ dropCap ? 'has-drop-cap' : null }
 				placeholder={ placeholder || __( 'New Paragraph' ) }
 			/>,
 		];

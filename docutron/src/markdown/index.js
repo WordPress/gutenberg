@@ -8,6 +8,7 @@ import { compact } from 'lodash';
 
 const parser = new MarkdownIt( {
 	html: true,
+	linkify: true,
 } );
 parser
 	.use( markdownItTOCAndAnchorPlugin )

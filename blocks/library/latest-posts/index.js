@@ -10,8 +10,8 @@ import classnames from 'classnames';
 /**
  * Internal dependencies
  */
+import './editor.scss';
 import './style.scss';
-import './block.scss';
 import { registerBlockType } from '../../api';
 import { getLatestPosts } from './data.js';
 import InspectorControls from '../../inspector-controls';
@@ -180,8 +180,8 @@ registerBlockType( 'core/latest-posts', {
 							<RangeControl
 								label={ __( 'Columns' ) }
 								value={ columns }
-								onChange={ ( event ) => setAttributes( { columns: event.target.value } ) }
-								min="2"
+								onChange={ ( value ) => setAttributes( { columns: value } ) }
+								min={ 2 }
 								max={ Math.min( MAX_POSTS_COLUMNS, latestPosts.length ) }
 							/>
 						}

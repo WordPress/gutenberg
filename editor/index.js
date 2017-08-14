@@ -4,6 +4,7 @@
 import { bindActionCreators } from 'redux';
 import { Provider as ReduxProvider } from 'react-redux';
 import { Provider as SlotFillProvider } from 'react-slot-fill';
+import { flow } from 'lodash';
 import moment from 'moment-timezone';
 import 'moment-timezone/moment-timezone-utils';
 
@@ -11,8 +12,9 @@ import 'moment-timezone/moment-timezone-utils';
  * WordPress dependencies
  */
 import { EditableProvider } from '@wordpress/blocks';
-import { render } from '@wordpress/element';
-import { settings } from '@wordpress/date';
+import { createElement, render } from '@wordpress/element';
+import { PopoverProvider } from '@wordpress/components';
+import { settings as dateSettings } from '@wordpress/date';
 
 /**
  * Internal dependencies
@@ -20,7 +22,7 @@ import { settings } from '@wordpress/date';
 import './assets/stylesheets/main.scss';
 import Layout from './layout';
 import { createReduxStore } from './state';
-import { undo } from './actions';
+import { setInitialPost, undo } from './actions';
 import EditorSettingsProvider from './settings/provider';
 
 /**
@@ -40,15 +42,15 @@ const DEFAULT_SETTINGS = {
 };
 
 // Configure moment globally
-moment.locale( settings.l10n.locale );
-if ( settings.timezone.string ) {
-	moment.tz.setDefault( settings.timezone.string );
+moment.locale( dateSettings.l10n.locale );
+if ( dateSettings.timezone.string ) {
+	moment.tz.setDefault( dateSettings.timezone.string );
 } else {
 	const momentTimezone = {
 		name: 'WP',
 		abbrs: [ 'WP' ],
 		untils: [ null ],
-		offsets: [ -settings.timezone.offset * 60 ],
+		offsets: [ -dateSettings.timezone.offset * 60 ],
 	};
 	const unpackedTimezone = moment.tz.pack( momentTimezone );
 	moment.tz.add( unpackedTimezone );
@@ -56,61 +58,74 @@ if ( settings.timezone.string ) {
 }
 
 /**
- * Initializes Redux state with bootstrapped post, if provided.
- *
- * @param {Redux.Store} store Redux store instance
- * @param {Object}     post  Bootstrapped post object
- */
-function preparePostState( store, post ) {
-	// Set current post into state
-	store.dispatch( {
-		type: 'RESET_POST',
-		post,
-	} );
-
-	// Include auto draft title in edits while not flagging post as dirty
-	if ( post.status === 'auto-draft' ) {
-		store.dispatch( {
-			type: 'SETUP_NEW_POST',
-			edits: {
-				title: post.title.raw,
-			},
-		} );
-	}
-}
-
-/**
  * Initializes and returns an instance of Editor.
  *
- * @param {String} id              Unique identifier for editor instance
- * @param {Object} post            API entity for post to edit  (type required)
- * @param {Object} userSettings  Editor settings object
+ * @param {String}  id       Unique identifier for editor instance
+ * @param {Object}  post     API entity for post to edit
+ * @param {?Object} settings Editor settings object
  */
-export function createEditorInstance( id, post, userSettings ) {
-	const editorSettings = Object.assign( {}, DEFAULT_SETTINGS, userSettings );
+export function createEditorInstance( id, post, settings ) {
 	const store = createReduxStore();
+	const target = document.getElementById( id );
 
-	store.dispatch( {
-		type: 'SETUP_EDITOR',
-		settings: editorSettings,
-	} );
+	settings = {
+		...DEFAULT_SETTINGS,
+		...settings,
+	};
 
-	preparePostState( store, post );
+	store.dispatch( { type: 'SETUP_EDITOR' } );
 
-	render(
-		<ReduxProvider store={ store }>
-			<SlotFillProvider>
-				<EditableProvider {
-					...bindActionCreators( {
-						onUndo: undo,
-					}, store.dispatch ) }
-				>
-					<EditorSettingsProvider settings={ editorSettings }>
-						<Layout />
-					</EditorSettingsProvider>
-				</EditableProvider>
-			</SlotFillProvider>
-		</ReduxProvider>,
-		document.getElementById( id )
+	store.dispatch( setInitialPost( post ) );
+
+	const providers = [
+		// Redux provider:
+		//
+		//  - context.store
+		[
+			ReduxProvider,
+			{ store },
+		],
+
+		// Slot / Fill provider:
+		//
+		//  - context.slots
+		//  - context.fills
+		[
+			SlotFillProvider,
+		],
+
+		// Editable provider:
+		//
+		//  - context.onUndo
+		[
+			EditableProvider,
+			bindActionCreators( {
+				onUndo: undo,
+			}, store.dispatch ),
+		],
+
+		// Editor settings provider:
+		//
+		//  - context.editor
+		[
+			EditorSettingsProvider,
+			{ settings },
+		],
+
+		// Popover provider:
+		//
+		//  - context.popoverTarget
+		[
+			PopoverProvider,
+			{ target },
+		],
+	];
+
+	const createEditorElement = flow(
+		providers.map( ( [ Component, props ] ) => (
+			( children ) => createElement( Component, props, children )
+		) )
 	);
+
+	render( createEditorElement( <Layout /> ), target );
 }

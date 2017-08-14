@@ -15,6 +15,8 @@ import { __ } from '@wordpress/i18n';
  */
 import { getGutenbergURL, getWPAdminURL } from './utils/url';
 import {
+	resetPost,
+	setupNewPost,
 	resetBlocks,
 	focusBlock,
 	replaceBlocks,
@@ -105,7 +107,7 @@ export default {
 				<p>
 					<span>{ noticeMessage }</span>
 					{ ' ' }
-					<a href={ post.link } target="_blank">{ __( 'View post' ) }</a>
+					<a href={ post.link }>{ __( 'View post' ) }</a>
 				</p>,
 				{ id: SAVE_POST_NOTICE_ID }
 			) );
@@ -249,10 +251,26 @@ export default {
 
 		dispatch( savePost() );
 	},
-	RESET_POST( action ) {
+	SET_INITIAL_POST( action ) {
 		const { post } = action;
-		if ( post.content ) {
-			return resetBlocks( parse( post.content.raw ) );
+		const effects = [];
+
+		// Parse content as blocks
+		if ( post.content.raw ) {
+			effects.push( resetBlocks( parse( post.content.raw ) ) );
 		}
+
+		// Resetting post should occur after blocks have been reset, since it's
+		// the post reset that restarts history (used in dirty detection).
+		effects.push( resetPost( post ) );
+
+		// Include auto draft title in edits while not flagging post as dirty
+		if ( post.status === 'auto-draft' ) {
+			effects.push( setupNewPost( {
+				title: post.title.raw,
+			} ) );
+		}
+
+		return effects;
 	},
 };

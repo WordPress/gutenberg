@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { IconButton } from '@wordpress/components';
+import { Popover, IconButton } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
 
 /**
@@ -86,13 +86,13 @@ class Inserter extends Component {
 				>
 					{ children }
 				</IconButton>
-				{ opened && (
-					<InserterMenu
-						position={ position }
-						onSelect={ this.insertBlock }
-						onClose={ this.closeOnClickOutside }
-					/>
-				) }
+				<Popover
+					isOpen={ opened }
+					position={ position }
+					onClose={ this.closeOnClickOutside }
+				>
+					<InserterMenu onSelect={ this.insertBlock } />
+				</Popover>
 			</div>
 		);
 	}

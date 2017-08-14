@@ -1,21 +1,39 @@
-.editor-visual-editor__block[data-type="core/cover-image"] {
-	.blocks-editable__tinymce[data-is-empty="true"]:before {
-		position: inherit;
-	}
+.wp-block-cover-image {
+	position: relative;
+	background-size: cover;
+	height: 430px;
+	width: 100%;
+	margin: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 
-	.blocks-editable__tinymce a {
+	h2 {
 		color: white;
+		font-size: 24pt;
+		line-height: 1em;
+		z-index: 1;
+		max-width: $visual-editor-max-width;
+		padding: $block-padding;
+		text-align: center;
 	}
 
-	.blocks-editable__tinymce:focus a[data-mce-selected] {
-		padding: 0 2px;
-		margin: 0 -2px;
-		border-radius: 2px;
-		box-shadow: none;
-		background: rgba( 255, 255, 255, 0.3 );
+	&.has-parallax {
+		background-attachment: fixed;
 	}
 
-	.blocks-editable strong {
-		font-weight: 300;
+	&.has-background-dim:before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		right: 0;
+		background: rgba( 0,0,0,.5 );
 	}
+
+	&.components-placeholder {
+		height: inherit;
+	}
+
 }

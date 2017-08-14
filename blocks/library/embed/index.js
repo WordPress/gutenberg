@@ -15,8 +15,8 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import './block.scss';
 import './style.scss';
+import './editor.scss';
 import { registerBlockType, source, createBlock } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
@@ -44,6 +44,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 			caption: {
 				type: 'array',
 				source: children( 'figcaption' ),
+				default: [],
 			},
 			align: {
 				type: 'string',
@@ -221,9 +222,9 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 			const { url, caption, align } = attributes;
 
 			return (
-				<figure className={ align && `align${ align }` }>
+				<figure className={ align ? `align${ align }` : null }>
 					{ `\n${ url }\n` /* URL needs to be on its own line. */ }
-					{ caption.length > 0 && <figcaption>{ caption }</figcaption> }
+					{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
 				</figure>
 			);
 		},

@@ -12,6 +12,7 @@ import { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import './style.scss';
+import Tooltip from '../tooltip';
 import Button from '../button';
 import Dashicon from '../dashicon';
 
@@ -19,15 +20,21 @@ import Dashicon from '../dashicon';
 // is common to apply a ref to the button element (only supported in class)
 class IconButton extends Component {
 	render() {
-		const { icon, children, label, className, focus, ...additionalProps } = this.props;
+		const { icon, children, label, className, tooltip, focus, ...additionalProps } = this.props;
 		const classes = classnames( 'components-icon-button', className );
 
-		return (
+		let element = (
 			<Button { ...additionalProps } aria-label={ label } className={ classes } focus={ focus }>
 				<Dashicon icon={ icon } />
 				{ children }
 			</Button>
 		);
+
+		if ( label && ! children && false !== tooltip ) {
+			element = <Tooltip text={ tooltip || label }>{ element }</Tooltip>;
+		}
+
+		return element;
 	}
 }
 

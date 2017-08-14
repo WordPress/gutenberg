@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -7,7 +12,7 @@ import { concatChildren } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import './block.scss';
+import './style.scss';
 import { registerBlockType, source } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
@@ -99,17 +104,26 @@ registerBlockType( 'core/cover-text', {
 					/>
 					<h3>{ __( 'Background Color' ) }</h3>
 					<ColorPalette
-						color={ backgroundColor }
+						value={ backgroundColor }
 						onChange={ ( colorValue ) => setAttributes( { backgroundColor: colorValue.hex } ) }
 					/>
 					<h3>{ __( 'Text Color' ) }</h3>
 					<ColorPalette
-						color={ textColor }
+						value={ textColor }
 						onChange={ ( colorValue ) => setAttributes( { textColor: colorValue.hex } ) }
 					/>
 				</InspectorControls>
 			),
-			<div className={ `${ className } align${ width }` } style={ { backgroundColor: backgroundColor, color: textColor } } key="block">
+			<div
+				key="block"
+				className={ classnames( className, {
+					[ `align${ width }` ]: width,
+				} ) }
+				style={ {
+					backgroundColor: backgroundColor,
+					color: textColor,
+				} }
+			>
 				<Editable
 					tagName="p"
 					value={ content }
@@ -122,7 +136,7 @@ registerBlockType( 'core/cover-text', {
 					onFocus={ setFocus }
 					onMerge={ mergeBlocks }
 					style={ { textAlign: align } }
-					className={ dropCap && 'has-drop-cap' }
+					className={ dropCap ? 'has-drop-cap' : null }
 					placeholder={ placeholder || __( 'New Paragraph' ) }
 				/>
 			</div>,
@@ -131,8 +145,8 @@ registerBlockType( 'core/cover-text', {
 
 	save( { attributes } ) {
 		const { width, align, content, dropCap, backgroundColor, textColor } = attributes;
-		const className = dropCap && 'has-drop-cap';
-		const wrapperClassName = width && `align${ width }`;
+		const className = dropCap ? 'has-drop-cap' : null;
+		const wrapperClassName = width ? `align${ width }` : null;
 
 		if ( ! align ) {
 			return (

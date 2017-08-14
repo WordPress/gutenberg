@@ -18,10 +18,12 @@ export { default as PanelHeader } from './panel/header';
 export { default as PanelRow } from './panel/row';
 export { default as Placeholder } from './placeholder';
 export { default as Popover } from './popover';
+export { default as PopoverProvider } from './popover/provider';
 export { default as ResponsiveWrapper } from './responsive-wrapper';
 export { default as SandBox } from './sandbox';
 export { default as Spinner } from './spinner';
 export { default as Toolbar } from './toolbar';
+export { default as Tooltip } from './tooltip';
 
 // Higher-Order Components
 export { default as withFocusReturn } from './higher-order/with-focus-return';

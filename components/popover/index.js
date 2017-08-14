@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isEqual, pickBy } from 'lodash';
+import { isEqual, noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -14,13 +14,6 @@ import { createPortal, Component } from '@wordpress/element';
  */
 import './style.scss';
 import PopoverDetectOutside from './detect-outside';
-
-/**
- * Matches an event handler prop key
- *
- * @type {RegExp}
- */
-const REGEXP_EVENT_PROP = /^on[A-Z]/;
 
 export class Popover extends Component {
 	constructor() {
@@ -99,13 +92,21 @@ export class Popover extends Component {
 		}
 
 		const rect = parentNode.getBoundingClientRect();
+		const [ yAxis ] = this.getPositions();
+		const isTop = 'top' === yAxis;
+
+		// Offset top positioning by padding
+		const { paddingTop, paddingBottom } = window.getComputedStyle( parentNode );
+		let topOffset = parseInt( isTop ? paddingTop : paddingBottom, 10 );
+		if ( ! isTop ) {
+			topOffset *= -1;
+		}
 
 		// Set popover at parent node center
 		popover.style.left = Math.round( rect.left + ( rect.width / 2 ) ) + 'px';
 
 		// Set at top or bottom of parent node based on popover position
-		const [ yAxis ] = this.getPositions();
-		popover.style.top = rect[ yAxis ] + 'px';
+		popover.style.top = ( rect[ yAxis ] + topOffset ) + 'px';
 	}
 
 	setForcedPositions() {
@@ -142,17 +143,18 @@ export class Popover extends Component {
 	}
 
 	render() {
-		const { isOpen, onClose, children, className } = this.props;
+		// Disable reason: We generate the `...contentProps` rest as remainder
+		// of props which aren't explicitly handled by this component.
+		//
+		// eslint-disable-next-line no-unused-vars
+		const { isOpen, onClose, position, children, className, ...contentProps } = this.props;
 		const [ yAxis, xAxis ] = this.getPositions();
 
 		if ( ! isOpen ) {
 			return null;
 		}
 
-		const eventHandlers = pickBy( this.props, ( value, key ) => (
-			'onClose' !== key && REGEXP_EVENT_PROP.test( key )
-		) );
-
+		const { popoverTarget = document.body } = this.context;
 		const classes = classnames(
 			'components-popover',
 			className,
@@ -168,7 +170,7 @@ export class Popover extends Component {
 							ref={ this.bindNode( 'popover' ) }
 							className={ classes }
 							tabIndex="0"
-							{ ...eventHandlers }
+							{ ...contentProps }
 						>
 							<div
 								ref={ this.bindNode( 'content' ) }
@@ -178,11 +180,15 @@ export class Popover extends Component {
 							</div>
 						</div>
 					</PopoverDetectOutside>,
-					document.body
+					popoverTarget
 				) }
 			</span>
 		);
 	}
 }
+
+Popover.contextTypes = {
+	popoverTarget: noop,
+};
 
 export default Popover;

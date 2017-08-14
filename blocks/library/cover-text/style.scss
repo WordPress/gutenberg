@@ -1,0 +1,8 @@
+.wp-block-cover-text {
+	padding: 20px 30px;
+
+	p {
+		max-width: $visual-editor-max-width - ( $block-mover-padding-visible );
+		margin: 0 auto;
+	}
+}

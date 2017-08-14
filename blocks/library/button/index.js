@@ -7,8 +7,8 @@ import { IconButton } from '@wordpress/components';
 /**
  * Internal dependencies
  */
+import './editor.scss';
 import './style.scss';
-import './block.scss';
 import { registerBlockType, source } from '../../api';
 import Editable from '../../editable';
 import UrlInput from '../../url-input';
@@ -89,12 +89,12 @@ registerBlockType( 'core/button', {
 				{ focus &&
 					<InspectorControls key="inspector">
 						<ColorPalette
-							color={ color }
+							value={ color }
 							onChange={ ( colorValue ) => setAttributes( { color: colorValue.hex } ) }
 						/>
 						<InspectorControls.TextControl
 							label={ __( 'Hex Color' ) }
-							value={ color }
+							value={ color || '' }
 							onChange={ ( value ) => setAttributes( { color: value } ) }
 						/>
 					</InspectorControls>

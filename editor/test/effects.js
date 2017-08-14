@@ -11,14 +11,22 @@ import { getBlockTypes, unregisterBlockType, registerBlockType, createBlock } fr
 /**
  * Internal dependencies
  */
-import { mergeBlocks, focusBlock, replaceBlocks, editPost, savePost } from '../actions';
+import {
+	resetPost,
+	setupNewPost,
+	mergeBlocks,
+	focusBlock,
+	replaceBlocks,
+	editPost,
+	savePost,
+} from '../actions';
 import effects from '../effects';
 import * as selectors from '../selectors';
 
 jest.mock( '../selectors' );
 
 describe( 'effects', () => {
-	const defaultBlockSettings = { save: noop, category: 'common' };
+	const defaultBlockSettings = { save: () => 'Saved', category: 'common' };
 
 	beforeEach( () => jest.resetAllMocks() );
 
@@ -234,6 +242,71 @@ describe( 'effects', () => {
 
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( savePost() );
+		} );
+	} );
+
+	describe( '.SET_INITIAL_POST', () => {
+		const handler = effects.SET_INITIAL_POST;
+
+		it( 'should return post reset action', () => {
+			const post = {
+				id: 1,
+				title: {
+					raw: 'A History of Pork',
+				},
+				content: {
+					raw: '',
+				},
+				status: 'draft',
+			};
+
+			const result = handler( { post } );
+
+			expect( result ).toEqual( [
+				resetPost( post ),
+			] );
+		} );
+
+		it( 'should return block reset with non-empty content', () => {
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+			const post = {
+				id: 1,
+				title: {
+					raw: 'A History of Pork',
+				},
+				content: {
+					raw: '<!-- wp:core/test-block -->Saved<!-- /wp:core/test-block -->',
+				},
+				status: 'draft',
+			};
+
+			const result = handler( { post } );
+
+			expect( result ).toHaveLength( 2 );
+			expect( result ).toContainEqual( resetPost( post ) );
+			expect( result.some( ( { blocks } ) => {
+				return blocks && blocks[ 0 ].name === 'core/test-block';
+			} ) ).toBe( true );
+		} );
+
+		it( 'should return post setup action only if auto-draft', () => {
+			const post = {
+				id: 1,
+				title: {
+					raw: 'A History of Pork',
+				},
+				content: {
+					raw: '',
+				},
+				status: 'auto-draft',
+			};
+
+			const result = handler( { post } );
+
+			expect( result ).toEqual( [
+				resetPost( post ),
+				setupNewPost( { title: 'A History of Pork' } ),
+			] );
 		} );
 	} );
 } );

@@ -12,7 +12,7 @@ import { Toolbar } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import './block.scss';
+import './style.scss';
 import { registerBlockType, createBlock, source } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
@@ -29,6 +29,7 @@ registerBlockType( 'core/quote', {
 		value: {
 			type: 'array',
 			source: query( 'blockquote > p', node() ),
+			default: [],
 		},
 		citation: {
 			type: 'array',
@@ -204,7 +205,9 @@ registerBlockType( 'core/quote', {
 				className={ `blocks-quote-style-${ style }` }
 				style={ { textAlign: align ? align : null } }
 			>
-				{ value.map( ( paragraph, i ) => <p key={ i }>{ paragraph.props.children }</p> ) }
+				{ value.map( ( paragraph, i ) => (
+					<p key={ i }>{ paragraph.props.children }</p>
+				) ) }
 				{ citation && citation.length > 0 && (
 					<footer>{ citation }</footer>
 				) }

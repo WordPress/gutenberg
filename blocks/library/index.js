@@ -18,6 +18,8 @@ import './latest-posts';
 import './categories';
 import './cover-image';
 import './cover-text';
+import './shortcode';
 import './text-columns';
 import './verse';
 import './video';
+import './audio';

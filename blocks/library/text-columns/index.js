@@ -11,8 +11,8 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import './block.scss';
 import './style.scss';
+import './editor.scss';
 import { registerBlockType, source } from '../../api';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
@@ -73,15 +73,15 @@ registerBlockType( 'core/text-columns', {
 					<RangeControl
 						label={ __( 'Columns' ) }
 						value={ columns }
-						onChange={ ( event ) => setAttributes( { columns: event.target.value } ) }
-						min="2"
-						max="4"
+						onChange={ ( value ) => setAttributes( { columns: value } ) }
+						min={ 2 }
+						max={ 4 }
 					/>
 				</InspectorControls>
 			),
-			<div className={ `${ className } align${ width } columns-${ columns }` } key="block">
+			<section className={ `${ className } align${ width } columns-${ columns }` } key="block">
 				{ times( columns, ( index ) =>
-					<div className="wp-block-text-columns__column" key={ `column-${ index }` }>
+					<div className="wp-block-column" key={ `column-${ index }` }>
 						<Editable
 							tagName="p"
 							value={ content && content[ index ] }
@@ -100,20 +100,20 @@ registerBlockType( 'core/text-columns', {
 						/>
 					</div>
 				) }
-			</div>,
+			</section>,
 		];
 	},
 
 	save( { attributes } ) {
 		const { width, content, columns } = attributes;
 		return (
-			<div className={ `align${ width } columns-${ columns }` }>
+			<section className={ `align${ width } columns-${ columns }` }>
 				{ times( columns, ( index ) =>
-					<div className="wp-block-text-columns__column" key={ `column-${ index }` }>
+					<div className="wp-block-column" key={ `column-${ index }` }>
 						<p>{ content && content[ index ] }</p>
 					</div>
 				) }
-			</div>
+			</section>
 		);
 	},
 } );

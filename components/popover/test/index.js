@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { shallow, mount } from 'enzyme';
 
 /**
  * Internal dependencies
  */
 import { Popover } from '../';
+import PopoverProvider from '../provider';
 
 describe( 'Popover', () => {
 	describe( '#componentDidUpdate()', () => {
@@ -171,6 +172,19 @@ describe( 'Popover', () => {
 	} );
 
 	describe( '#setOffset()', () => {
+		let getComputedStyle;
+		beforeEach( () => {
+			getComputedStyle = window.getComputedStyle;
+			window.getComputedStyle = jest.fn().mockReturnValue( {
+				paddingTop: 10,
+				paddingBottom: 5,
+			} );
+		} );
+
+		afterEach( () => {
+			window.getComputedStyle = getComputedStyle;
+		} );
+
 		function getInstanceWithParentNode() {
 			const instance = new Popover( {} );
 
@@ -203,7 +217,7 @@ describe( 'Popover', () => {
 
 			expect( instance.nodes.popover.style ).toEqual( {
 				left: '225px',
-				top: '200px',
+				top: '210px',
 			} );
 		} );
 
@@ -215,7 +229,7 @@ describe( 'Popover', () => {
 
 			expect( instance.nodes.popover.style ).toEqual( {
 				left: '225px',
-				top: '400px',
+				top: '395px',
 			} );
 		} );
 	} );
@@ -231,6 +245,26 @@ describe( 'Popover', () => {
 			const wrapper = shallow( <Popover isOpen>Hello</Popover> );
 
 			expect( wrapper.type() ).not.toBeNull();
+		} );
+
+		it( 'should pass additional to portaled element', () => {
+			const wrapper = shallow( <Popover isOpen role="tooltip">Hello</Popover> );
+
+			expect( wrapper.find( '.components-popover' ).prop( 'role' ) ).toBe( 'tooltip' );
+		} );
+
+		it( 'should render into provider context', () => {
+			const element = require( '@wordpress/element' );
+			jest.spyOn( element, 'createPortal' );
+			const target = document.createElement( 'div' );
+
+			mount(
+				<PopoverProvider target={ target }>
+					<Popover isOpen>Hello</Popover>
+				</PopoverProvider>
+			);
+
+			expect( element.createPortal.mock.calls[ 0 ][ 1 ] ).toBe( target );
 		} );
 	} );
 } );

@@ -1,13 +1,17 @@
 /**
  * External dependencies
  */
-import './style.scss';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { Component, createElement } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import './style.scss';
 
 class Button extends Component {
 	constructor( props ) {
