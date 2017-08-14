@@ -123,17 +123,6 @@ registerBlockType( 'core/list', {
 			{
 				type: 'raw',
 				source: ( node ) => node.nodeName === 'OL' || node.nodeName === 'UL',
-				attributes: {
-					nodeName: {
-						type: 'string',
-						source: prop( 'ol,ul', 'nodeName' ),
-					},
-					values: {
-						type: 'array',
-						source: children( 'ol,ul' ),
-						default: [],
-					},
-				},
 			},
 			{
 				type: 'pattern',
