@@ -90,4 +90,8 @@
 	left: 0;
 	right: 0;
 	z-index: 1;
+
+	ul.components-toolbar {
+		box-shadow: $shadow-toolbar;
+	}
 }
