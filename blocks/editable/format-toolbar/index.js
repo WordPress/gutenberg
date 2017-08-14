@@ -53,16 +53,6 @@ class FormatToolbar extends Component {
 		this.onChangeLinkValue = this.onChangeLinkValue.bind( this );
 	}
 
-	componentWillReceiveProps( nextProps ) {
-		if ( this.props.selectedNodeId !== nextProps.selectedNodeId ) {
-			this.setState( {
-				isAddingLink: false,
-				isEditingLink: false,
-				newLinkValue: '',
-			} );
-		}
-	}
-
 	componentDidMount() {
 		document.addEventListener( 'keydown', this.onKeyDown );
 	}
@@ -73,10 +63,20 @@ class FormatToolbar extends Component {
 
 	onKeyDown( event ) {
 		if ( event.keyCode === ESCAPE ) {
-			if ( this.props.isEditingLink ) {
+			if ( this.state.isEditingLink ) {
 				event.stopPropagation();
 				this.dropLink();
 			}
+		}
+	}
+
+	componentWillReceiveProps( nextProps ) {
+		if ( this.props.selectedNodeId !== nextProps.selectedNodeId ) {
+			this.setState( {
+				isAddingLink: false,
+				isEditingLink: false,
+				newLinkValue: '',
+			} );
 		}
 	}
 
