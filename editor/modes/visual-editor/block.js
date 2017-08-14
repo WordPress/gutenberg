@@ -70,7 +70,7 @@ function selectAncestor( node, selector ) {
 }
 
 function isToolbar( target ) {
-	return selectAncestor( target, '.components-toolbar' ) !== null;
+	return selectAncestor( target, '.components-toolbar, .editor-block-settings-menu, .editor-block-mover' ) !== null;
 }
 
 class VisualEditorBlock extends Component {
@@ -325,7 +325,8 @@ class VisualEditorBlock extends Component {
 		const isVisible = ( elem ) => elem && ! ( elem.offsetWidth <= 0 || elem.offsetHeight <= 0 );
 		const allToolbars = filter( Array.from( block.querySelectorAll( '.components-toolbar' ) ), isVisible );
 		const settingsMenu = filter( [ block.querySelector( '.editor-block-settings-menu' ) ], isVisible );
-		const allCycle = [ ...allToolbars, ...settingsMenu ];
+		const moverMenu = filter( [ block.querySelector( '.editor-block-mover' ) ], isVisible );
+		const allCycle = [ ...allToolbars, ...settingsMenu, ...moverMenu ];
 
 		if ( shiftKey ) {
 			allCycle.reverse();
@@ -362,7 +363,8 @@ class VisualEditorBlock extends Component {
 		const isVisible = ( elem ) => elem && ! ( elem.offsetWidth <= 0 || elem.offsetHeight <= 0 );
 		const allToolbars = filter( Array.from( block.querySelectorAll( '.components-toolbar' ) ), isVisible );
 		const settingsMenu = filter( [ block.querySelector( '.editor-block-settings-menu' ) ], isVisible );
-		const allCycle = flatMap( [ ...allToolbars, ...settingsMenu ], ( toolbar ) => {
+		const moverMenu = filter( [ block.querySelector( '.editor-block-mover' ) ], isVisible );
+		const allCycle = flatMap( [ ...allToolbars, ...settingsMenu, ...moverMenu ], ( toolbar ) => {
 			return filter( Array.from( toolbar.querySelectorAll( 'button, *[tabindex]' ) ) );
 		} );
 
