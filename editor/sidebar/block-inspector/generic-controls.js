@@ -57,7 +57,8 @@ class BlockInspectorGenericControls extends Component {
 				}
 				{ blockType.supportAnchor &&
 					<InspectorControls.TextControl
-						label={ __( 'Anchor' ) }
+						label={ __( 'HTML Anchor' ) }
+						help={ __( 'Anchors lets you link directly to a section on a page.' ) }
 						value={ selectedBlock.attributes.anchor || '' }
 						onChange={ this.setAnchor } />
 				}
