@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { includes } from 'lodash';
+import { debounce, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -14,13 +14,29 @@ import { Component, Children, cloneElement, concatChildren } from '@wordpress/el
 import './style.scss';
 import Popover from '../popover';
 
+/**
+ * Time over children to wait before showing tooltip
+ *
+ * @type {Number}
+ */
+const TOOLTIP_DELAY = 700;
+
 class Tooltip extends Component {
 	constructor() {
 		super( ...arguments );
 
+		this.delayedSetIsOver = debounce(
+			( isOver ) => this.setState( { isOver } ),
+			TOOLTIP_DELAY
+		);
+
 		this.state = {
 			isOver: false,
 		};
+	}
+
+	componentWillUnmount() {
+		this.delayedSetIsOver.cancel();
 	}
 
 	emitToChild( eventName, event ) {
@@ -35,14 +51,23 @@ class Tooltip extends Component {
 		}
 	}
 
-	createToggleIsOver( eventName ) {
+	createToggleIsOver( eventName, isDelayed ) {
 		return ( event ) => {
+			// Needed in case unsetting is over while delayed set pending, i.e.
+			// quickly blur/mouseout before delayedSetIsOver is called
+			this.delayedSetIsOver.cancel();
+
 			const isOver = includes( [ 'focus', 'mouseover' ], event.type );
 			if ( isOver === this.state.isOver ) {
 				return;
 			}
 
-			this.setState( { isOver } );
+			if ( isDelayed ) {
+				this.delayedSetIsOver( isOver );
+			} else {
+				this.setState( { isOver } );
+			}
+
 			this.emitToChild( eventName, event );
 		};
 	}
@@ -61,7 +86,7 @@ class Tooltip extends Component {
 		const child = Children.only( children );
 		const { isOver } = this.state;
 		return cloneElement( child, {
-			onMouseOver: this.createToggleIsOver( 'onMouseOver' ),
+			onMouseOver: this.createToggleIsOver( 'onMouseOver', true ),
 			onMouseOut: this.createToggleIsOver( 'onMouseOut' ),
 			onFocus: this.createToggleIsOver( 'onFocus' ),
 			onBlur: this.createToggleIsOver( 'onBlur' ),
