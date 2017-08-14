@@ -1,15 +1,7 @@
 .editor-visual-editor__block[data-type="core/pullquote"] {
 	&[data-align="left"],
 	&[data-align="right"] {
-		max-width: 450px !important;
-	}
-
-	&[data-align="left"] {
-		margin-left: calc( 50% - 500px) !important;
-	}
-
-	&[data-align="right"] {
-		margin-right: calc( 50% - 500px) !important;
+		max-width: 450px;
 	}
 }
 
