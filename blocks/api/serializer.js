@@ -50,20 +50,28 @@ export function getSaveContent( blockType, attributes ) {
 	}
 
 	// Adding a generic classname
-	const addClassnameToElement = ( element ) => {
-		if ( ! element || ! isObject( element ) || ! className ) {
+	const addGenericAttributes = ( element ) => {
+		if ( ! element || ! isObject( element ) ) {
 			return element;
 		}
 
-		const updatedClassName = classnames(
-			className,
-			element.props.className,
-			attributes.className
-		);
+		const extraProps = {};
+		if ( !! className ) {
+			const updatedClassName = classnames(
+				className,
+				element.props.className,
+				attributes.className
+			);
+			extraProps.className = updatedClassName;
+		}
 
-		return cloneElement( element, { className: updatedClassName } );
+		if ( blockType.supportAnchor && attributes.anchor ) {
+			extraProps.id = attributes.anchor;
+		}
+
+		return cloneElement( element, extraProps );
 	};
-	const contentWithClassname = Children.map( rawContent, addClassnameToElement );
+	const contentWithClassname = Children.map( rawContent, addGenericAttributes );
 
 	// Otherwise, infer as element
 	return renderToString( contentWithClassname );

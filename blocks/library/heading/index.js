@@ -29,6 +29,8 @@ registerBlockType( 'core/heading', {
 
 	className: false,
 
+	supportAnchor: true,
+
 	attributes: {
 		content: {
 			type: 'array',
