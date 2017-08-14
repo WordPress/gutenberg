@@ -59,6 +59,89 @@ function FirstChild( { children } ) {
 	return childrenArray[ 0 ] || null;
 }
 
+function isVerticalEdge( { editor, reverse } ) {
+	const rangeRect = editor.selection.getBoundingClientRect();
+	const buffer = rangeRect.height / 2;
+	const editableRect = editor.getBody().getBoundingClientRect();
+
+	isVerticalEdge.firstRect = isVerticalEdge.firstRect || rangeRect;
+
+	// Too low.
+	if ( reverse && rangeRect.top - buffer > editableRect.top ) {
+		return false;
+	}
+
+	// Too high.
+	if ( ! reverse && rangeRect.bottom + buffer < editableRect.bottom ) {
+		return false;
+	}
+
+	return true;
+}
+
+function isHorizontalEdge( { editor, reverse } ) {
+	const position = reverse ? 'start' : 'end';
+	const order = reverse ? 'first' : 'last';
+	const range = editor.selection.getRng();
+	const offset = range[ `${ position }Offset` ];
+	const rootNode = editor.getBody();
+	let node = range.startContainer;
+
+	if ( ! range.collapsed ) {
+		return false;
+	}
+
+	if ( reverse && offset !== 0 ) {
+		return false;
+	}
+
+	if ( ! reverse && offset !== node.data.length ) {
+		return false;
+	}
+
+	while ( node !== rootNode ) {
+		const parentNode = node.parentNode;
+
+		if ( parentNode[ `${ order }Child` ] !== node ) {
+			return false;
+		}
+
+		node = parentNode;
+	}
+
+	return true;
+}
+
+function getNextEditor( { node, target, reverse } ) {
+	const selector = '.editor-visual-editor [contenteditable="true"]';
+	const editableNodes = Array.from( document.querySelectorAll( selector ) );
+
+	if ( reverse ) {
+		editableNodes.reverse();
+	}
+
+	const index = editableNodes.indexOf( target );
+	const nextEditableNode = editableNodes[ index + 1 ];
+	const direction = reverse ? 'previous' : 'next';
+	const nextBlockNode = node[ `${ direction }Sibling` ];
+
+	if ( ! nextBlockNode || ! nextEditableNode ) {
+		return;
+	}
+
+	const editor = tinymce.get( nextEditableNode.id );
+
+	if ( ! editor ) {
+		return;
+	}
+
+	if ( ! node.contains( nextEditableNode ) && ! nextBlockNode.contains( nextEditableNode ) ) {
+		return;
+	}
+
+	return editor;
+}
+
 class VisualEditorBlock extends Component {
 	constructor() {
 		super( ...arguments );
@@ -240,6 +323,9 @@ class VisualEditorBlock extends Component {
 	}
 
 	onPointerDown( event ) {
+		// Discard the arrow key position.
+		delete isVerticalEdge.firstRect;
+
 		// Not the main button (usually the left button on pointer device).
 		if ( event.buttons !== 1 ) {
 			return;
@@ -256,87 +342,6 @@ class VisualEditorBlock extends Component {
 		const down = keyCode === DOWN;
 		const left = keyCode === LEFT;
 		const right = keyCode === RIGHT;
-
-		const isVerticalEdge = ( { editor, reverse } ) => {
-			const rangeRect = editor.selection.getBoundingClientRect();
-			const buffer = rangeRect.height / 2;
-			const editableRect = editor.getBody().getBoundingClientRect();
-
-			// Too low.
-			if ( reverse && rangeRect.top - buffer > editableRect.top ) {
-				return false;
-			}
-
-			// Too high.
-			if ( ! reverse && rangeRect.bottom + buffer < editableRect.bottom ) {
-				return false;
-			}
-
-			return rangeRect;
-		};
-
-		const isHorizontalEdge = ( { editor, reverse } ) => {
-			const position = reverse ? 'start' : 'end';
-			const order = reverse ? 'first' : 'last';
-			const range = editor.selection.getRng();
-			const offset = range[ `${ position }Offset` ];
-			const rootNode = editor.getBody();
-			let node = range.startContainer;
-
-			if ( ! range.collapsed ) {
-				return false;
-			}
-
-			if ( reverse && offset !== 0 ) {
-				return false;
-			}
-
-			if ( ! reverse && offset !== node.data.length ) {
-				return false;
-			}
-
-			while ( node !== rootNode ) {
-				const parentNode = node.parentNode;
-
-				if ( parentNode[ `${ order }Child` ] !== node ) {
-					return false;
-				}
-
-				node = parentNode;
-			}
-
-			return true;
-		};
-
-		const getNextEditor = ( { node, reverse } ) => {
-			const selector = '.editor-visual-editor [contenteditable="true"]';
-			const editableNodes = Array.from( document.querySelectorAll( selector ) );
-
-			if ( reverse ) {
-				editableNodes.reverse();
-			}
-
-			const index = editableNodes.indexOf( target );
-			const nextEditableNode = editableNodes[ index + 1 ];
-			const direction = reverse ? 'previous' : 'next';
-			const nextBlockNode = node[ `${ direction }Sibling` ];
-
-			if ( ! nextBlockNode || ! nextEditableNode ) {
-				return;
-			}
-
-			const editor = tinymce.get( nextEditableNode.id );
-
-			if ( ! editor ) {
-				return;
-			}
-
-			if ( ! node.contains( nextEditableNode ) && ! nextBlockNode.contains( nextEditableNode ) ) {
-				return;
-			}
-
-			return editor;
-		};
 
 		if ( up || down || left || right ) {
 			const editor = target.id && tinymce.get( target.id );
@@ -355,18 +360,15 @@ class VisualEditorBlock extends Component {
 				const reverse = up || left;
 				const horizontal = left || right;
 				const followingBlock = reverse ? previousBlock : nextBlock;
+				const isEdge = horizontal ? isHorizontalEdge : isVerticalEdge;
 
-				const rect = horizontal ?
-					isHorizontalEdge( { editor, reverse } ) :
-					isVerticalEdge( { editor, reverse } );
-
-				if ( ! rect ) {
+				if ( ! isEdge( { editor, reverse } ) ) {
 					return;
 				}
 
 				event.preventDefault();
 
-				const followingEditor = getNextEditor( { node: this.node, reverse } );
+				const followingEditor = getNextEditor( { node: this.node, target, reverse } );
 
 				if ( ! followingEditor ) {
 					if ( followingBlock ) {
@@ -384,6 +386,8 @@ class VisualEditorBlock extends Component {
 						followingEditor.selection.collapse( false );
 					}
 				} else {
+					const rect = isVerticalEdge.firstRect;
+
 					window.setTimeout( () => {
 						const buffer = rect.height / 2;
 						const editorRect = followingEditor.getBody().getBoundingClientRect();
@@ -393,6 +397,11 @@ class VisualEditorBlock extends Component {
 					} );
 				}
 			}
+		}
+
+		if ( ! up && ! down ) {
+			// Discard the arrow key position if any other key is pressed.
+			delete isVerticalEdge.firstRect;
 		}
 
 		if ( ENTER === keyCode && target === this.node ) {
