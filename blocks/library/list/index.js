@@ -122,7 +122,7 @@ registerBlockType( 'core/list', {
 			},
 			{
 				type: 'raw',
-				source: ( node ) => node.nodeName === 'OL' || node.nodeName === 'UL',
+				isMatch: ( node ) => node.nodeName === 'OL' || node.nodeName === 'UL',
 			},
 			{
 				type: 'pattern',

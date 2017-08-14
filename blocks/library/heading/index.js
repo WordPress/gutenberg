@@ -60,7 +60,7 @@ registerBlockType( 'core/heading', {
 			},
 			{
 				type: 'raw',
-				source: ( node ) => /H\d/.test( node.nodeName ),
+				isMatch: ( node ) => /H\d/.test( node.nodeName ),
 			},
 			{
 				type: 'pattern',

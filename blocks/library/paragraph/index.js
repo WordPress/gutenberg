@@ -50,7 +50,7 @@ registerBlockType( 'core/paragraph', {
 		from: [
 			{
 				type: 'raw',
-				source: ( node ) => (
+				isMatch: ( node ) => (
 					node.nodeName === 'P' &&
 					// Do not allow embedded content.
 					! node.querySelector( 'audio, canvas, embed, iframe, img, math, object, svg, video' )
