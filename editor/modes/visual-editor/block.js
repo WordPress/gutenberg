@@ -52,11 +52,25 @@ import {
 } from '../../selectors';
 
 const { BACKSPACE, ESCAPE, DELETE, UP, DOWN, LEFT, RIGHT, ENTER, TAB } = keycodes;
-const F10 = 18;
+const F10 = 121;
 
 function FirstChild( { children } ) {
 	const childrenArray = Children.toArray( children );
 	return childrenArray[ 0 ] || null;
+}
+
+function selectAncestor( node, selector ) {
+	while ( node !== null ) {
+		if ( node.querySelector( selector ) !== null ) {
+			return node;
+		}
+		node = node.parentNode;
+	}
+	return null;
+}
+
+function isToolbar( target ) {
+	return selectAncestor( target, '.components-toolbar' ) !== null;
 }
 
 class VisualEditorBlock extends Component {
@@ -117,8 +131,19 @@ class VisualEditorBlock extends Component {
 		}
 
 		// Focus node when focus state is programmatically transferred.
-		if ( this.props.focus && ! prevProps.focus ) {
-			this.node.focus();
+		if ( this.props.focus ) {
+			const prevFocusToolbar = prevProps.focus && prevProps.focus.toolbar;
+			if ( this.props.focus.toolbar ) {
+				if ( ! prevFocusToolbar ) {
+					const block = findDOMNode( this.node );
+					const item = block.querySelector( '.components-toolbar button, .components-toolbar *[tabindex]' );
+					if ( item ) {
+						item.focus();
+					}
+				}
+			} else if ( ! prevProps.focus || prevFocusToolbar ) {
+				this.node.focus();
+			}
 		}
 
 		// Bind or unbind mousemove from page when user starts or stops typing
@@ -195,6 +220,7 @@ class VisualEditorBlock extends Component {
 			onRemove,
 			onFocus,
 			onDeselect,
+			onStartTyping,
 		} = this.props;
 
 		// Remove block on backspace.
@@ -212,7 +238,12 @@ class VisualEditorBlock extends Component {
 
 		// Deselect on escape.
 		if ( ESCAPE === keyCode ) {
-			onDeselect();
+			if ( isToolbar( target ) ) {
+				onFocus( uid, {} );
+				onStartTyping();
+			} else {
+				onDeselect();
+			}
 		}
 	}
 
@@ -251,20 +282,19 @@ class VisualEditorBlock extends Component {
 	}
 
 	onKeyDown( event ) {
-		const { keyCode, altKey, target } = event;
+		const { keyCode, target } = event;
 
 		//this.handleArrowKey( event );
 		this.handleToolbarTabCycle( event );
 		this.handleToolbarArrowCycle( event );
 
-		if ( keyCode === F10 && altKey ) {
+		if ( keyCode === F10 && ! ( event.altKey || event.ctrlKey || event.shiftKey || event.metaKey ) ) {
 			event.preventDefault();
 			event.stopPropagation();
-			const block = findDOMNode( this.node );
-			const item = block.querySelector( '.components-toolbar button, .components-toolbar *[tabindex]' );
-			if ( item ) {
-				item.focus();
+			if ( this.props.isTyping ) {
+				this.props.onStopTyping();
 			}
+			this.props.onFocus( this.props.uid, { toolbar: true } );
 		}
 
 		if ( keyCode === UP || keyCode === LEFT || keyCode === DOWN || keyCode === RIGHT ) {
