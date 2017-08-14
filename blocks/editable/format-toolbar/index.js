@@ -39,11 +39,28 @@ class FormatToolbar extends Component {
 	constructor() {
 		super( ...arguments );
 
+		this.state = {
+			isAddingLink: false,
+			isEditingLink: false,
+			newLinkValue: '',
+		};
+
 		this.addLink = this.addLink.bind( this );
 		this.editLink = this.editLink.bind( this );
 		this.dropLink = this.dropLink.bind( this );
 		this.submitLink = this.submitLink.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
+		this.onChangeLinkValue = this.onChangeLinkValue.bind( this );
+	}
+
+	componentWillReceiveProps( nextProps ) {
+		if ( this.props.selectedNodeId !== nextProps.selectedNodeId ) {
+			this.setState( {
+				isAddingLink: false,
+				isEditingLink: false,
+				newLinkValue: '',
+			} );
+		}
 	}
 
 	componentDidMount() {
@@ -63,6 +80,10 @@ class FormatToolbar extends Component {
 		}
 	}
 
+	onChangeLinkValue( value ) {
+		this.setState( { newLinkValue: value } );
+	}
+
 	toggleFormat( format ) {
 		return () => {
 			this.props.onChange( {
@@ -72,28 +93,30 @@ class FormatToolbar extends Component {
 	}
 
 	addLink() {
-		this.props.onAddLink();
+		this.setState( { isEditingLink: false, isAddingLink: true, newLinkValue: '' } );
 	}
 
 	dropLink() {
 		this.props.onChange( { link: undefined } );
+		this.setState( { isEditingLink: false, isAddingLink: false, newLinkValue: '' } );
 	}
 
 	editLink( event ) {
 		event.preventDefault();
-		this.props.onEditLink();
+		this.setState( { isEditingLink: false, isAddingLink: true, newLinkValue: this.props.formats.link.value } );
 	}
 
 	submitLink( event ) {
 		event.preventDefault();
-		this.props.onChange( { link: { value: this.props.newLinkValue } } );
-		if ( this.props.isAddingLink ) {
+		this.props.onChange( { link: { value: this.state.newLinkValue } } );
+		if ( this.state.isAddingLink ) {
 			this.props.speak( __( 'Link inserted.' ), 'assertive' );
 		}
 	}
 
 	render() {
-		const { formats, focusPosition, isAddingLink, isEditingLink, newLinkValue, enabledControls = DEFAULT_CONTROLS } = this.props;
+		const { formats, focusPosition, enabledControls = DEFAULT_CONTROLS } = this.props;
+		const { isAddingLink, isEditingLink, newLinkValue } = this.state;
 		const linkStyle = focusPosition
 			? { position: 'absolute', ...focusPosition }
 			: null;
@@ -124,7 +147,7 @@ class FormatToolbar extends Component {
 						className="blocks-format-toolbar__link-modal"
 						style={ linkStyle }
 						onSubmit={ this.submitLink }>
-						<UrlInput value={ newLinkValue } onChange={ this.props.onChangeLinkValue } />
+						<UrlInput value={ newLinkValue } onChange={ this.onChangeLinkValue } />
 						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
 						<IconButton icon="editor-unlink" label={ __( 'Remove link' ) } onClick={ this.dropLink } />
 					</form>

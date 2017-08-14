@@ -68,18 +68,11 @@ export default class Editable extends Component {
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.maybePropagateUndo = this.maybePropagateUndo.bind( this );
 		this.onPastePostProcess = this.onPastePostProcess.bind( this );
-		this.onToolbarAddLink = this.onToolbarAddLink.bind( this );
-		this.onToolbarEditLink = this.onToolbarEditLink.bind( this );
-		this.onToolbarChangeLinkValue = this.onToolbarChangeLinkValue.bind( this );
 
 		this.state = {
 			formats: {},
 			empty: ! props.value || ! props.value.length,
-			toolbar: {
-				isAddingLink: false,
-				isEditingLink: false,
-				newLinkValue: '',
-			},
+			selectedNodeId: 0,
 		};
 	}
 
@@ -87,7 +80,6 @@ export default class Editable extends Component {
 		return ( this.props.getSettings || identity )( {
 			...settings,
 			forced_root_block: this.props.multiline || false,
-			custom_ui_selector: '.tinymce-custom-ui *',
 		} );
 	}
 
@@ -412,18 +404,6 @@ export default class Editable extends Component {
 		);
 	}
 
-	onToolbarAddLink() {
-		this.setState( { toolbar: { isEditingLink: false, isAddingLink: true, newLinkValue: '' } } );
-	}
-
-	onToolbarEditLink() {
-		this.setState( { toolbar: { isEditingLink: false, isAddingLink: true, newLinkValue: this.state.formats.link.value } } );
-	}
-
-	onToolbarChangeLinkValue( value ) {
-		this.setState( { toolbar: { ...this.state.toolbar, newLinkValue: value } } );
-	}
-
 	onNodeChange( { parents } ) {
 		const formats = {};
 		const link = find( parents, ( node ) => node.nodeName.toLowerCase() === 'a' );
@@ -434,7 +414,7 @@ export default class Editable extends Component {
 		activeFormats.forEach( ( activeFormat ) => formats[ activeFormat ] = true );
 
 		const focusPosition = this.getFocusPosition();
-		this.setState( { formats, focusPosition, toolbar: { isAddingLink: false, isEditingLink: false, newLinkValue: '' } } );
+		this.setState( { formats, focusPosition, selectedNodeId: this.state.selectedNodeId + 1 } );
 	}
 
 	updateContent() {
@@ -567,14 +547,11 @@ export default class Editable extends Component {
 
 		const formatToolbar = (
 			<FormatToolbar
+				selectedNodeId={ this.state.selectedNodeId }
 				focusPosition={ this.state.focusPosition }
 				formats={ this.state.formats }
 				onChange={ this.changeFormats }
 				enabledControls={ formattingControls }
-				onChangeLinkValue={ this.onToolbarChangeLinkValue }
-				onAddLink={ this.onToolbarAddLink }
-				onEditLink={ this.onToolbarEditLink }
-				{ ...this.state.toolbar }
 			/>
 		);
 
