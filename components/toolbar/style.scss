@@ -35,6 +35,10 @@ ul.components-toolbar {
 			height: $icon-button-size - 16px;
 		}
 	}
+
+	.block-editable__inline-toolbar & {
+		box-shadow: $shadow-toolbar;
+	}
 }
 
 .components-toolbar__control.components-button {
