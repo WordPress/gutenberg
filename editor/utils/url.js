@@ -35,7 +35,7 @@ export function getWPAdminURL( page, query ) {
  */
 export function filterURLForDisplay( url ) {
 	// remove protocol and www prefixes
-	const filteredURL =	url.replace( new RegExp( '^https?://(www\.)?' ), '' );
+	const filteredURL = url.replace( new RegExp( '^https?://(www\.)?' ), '' );
 
 	// ends with / and only has that single slash, strip it
 	if ( filteredURL.match( '^[^/]+/$' ) ) {
