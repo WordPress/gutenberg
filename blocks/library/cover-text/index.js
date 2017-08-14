@@ -106,6 +106,7 @@ registerBlockType( 'core/cover-text', {
 					<ColorPalette
 						value={ backgroundColor }
 						onChange={ ( colorValue ) => setAttributes( { backgroundColor: colorValue.hex } ) }
+						withTransparentOption
 					/>
 					<h3>{ __( 'Text Color' ) }</h3>
 					<ColorPalette
