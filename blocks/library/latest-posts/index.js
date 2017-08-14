@@ -203,7 +203,7 @@ registerBlockType( 'core/latest-posts', {
 				>
 					{ latestPosts.map( ( post, i ) =>
 						<li key={ i }>
-							<a href={ post.link } target="_blank">{ post.title.rendered.trim() || __( '(Untitled)' ) }</a>
+							<a href={ post.link } target="_blank" dangerouslySetInnerHTML={ { __html: post.title.rendered.trim() || __( '(Untitled)' ) } } />
 							{ displayPostDate && post.date_gmt &&
 								<time dateTime={ moment( post.date_gmt ).utc().format() } className={ `${ this.props.className }__post-date` }>
 									{ moment( post.date_gmt ).local().format( 'MMMM DD, Y' ) }
