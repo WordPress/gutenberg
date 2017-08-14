@@ -110,6 +110,7 @@ registerBlockType( 'core/image', {
 		const uploadButtonProps = { isLarge: true };
 		const onSetHref = ( value ) => setAttributes( { href: value } );
 		const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setAttributes );
+		const dropFiles = ( files ) => mediaUpload( files, setAttributes );
 
 		const controls = (
 			focus && (
@@ -149,7 +150,7 @@ registerBlockType( 'core/image', {
 					label={ __( 'Image' ) }
 					className={ className }>
 					<DropZone
-						onFilesDrop={ uploadFromFiles }
+						onFilesDrop={ dropFiles }
 					/>
 					<FormFileUpload
 						isLarge
