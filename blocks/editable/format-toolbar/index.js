@@ -16,6 +16,7 @@ import { keycodes } from '@wordpress/utils';
  */
 import './style.scss';
 import UrlInput from '../../url-input';
+import { filterURLForDisplay } from '../../../editor/utils/url';
 
 const { ESCAPE } = keycodes;
 
@@ -39,6 +40,19 @@ const FORMATTING_CONTROLS = [
 
 // Default controls shown if no `enabledControls` prop provided
 const DEFAULT_CONTROLS = [ 'bold', 'italic', 'strikethrough', 'link' ];
+
+// TODO: rename and move up one level, write tests
+export const filterURIForDisplay = ( uri ) => {
+	// remove protocol and www prefixes
+	const filteredURI =	uri.replace( new RegExp( '^https?://(www\.)?' ), '' );
+
+	// ends with / and only has that single slash, strip it
+	if ( filteredURI.match( '^[^/]+/$' ) ) {
+		return filteredURI.replace( '/', '' );
+	}
+
+	return filteredURI;
+}
 
 class FormatToolbar extends Component {
 	constructor( props ) {
@@ -182,7 +196,7 @@ class FormatToolbar extends Component {
 							href={ this.state.linkValue }
 							target="_blank"
 						>
-							{ this.state.linkValue && decodeURI( this.state.linkValue ) }
+							{ this.state.linkValue && filterURLForDisplay( decodeURI( this.state.linkValue ) ) }
 						</a>
 						<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ this.editLink } />
 						<IconButton icon="editor-unlink" label={ __( 'Remove link' ) } onClick={ this.dropLink } />
