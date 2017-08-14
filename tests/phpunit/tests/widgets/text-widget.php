@@ -397,6 +397,7 @@ class Test_WP_Widget_Text extends WP_UnitTestCase {
 		// Check text examples that will not migrate to TinyMCE.
 		$legacy_text_examples = array(
 			'<span class="hello"></span>',
+			'<blockquote>Quote <footer>Citation</footer></blockquote>',
 			'<span></span>',
 			"<ul>\n<li><a href=\"#\" class=\"location\"></a>List Item 1</li>\n<li><a href=\"#\" class=\"location\"></a>List Item 2</li>\n</ul>",
 			'<a href="#" class="map"></a>',
