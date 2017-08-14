@@ -13,7 +13,7 @@
 		width: 100%;
 	}
 
-	.blocks-range-control__input {
+	.blocks-range-control__slider {
 		margin-left: 0;
 		flex: 1;
 	}
@@ -114,7 +114,7 @@
 	}
 }
 
-.blocks-range-control__hint {
+.blocks-range-control__number {
 	display: inline-block;
 	margin-left: $item-spacing;
 	font-weight: 500;

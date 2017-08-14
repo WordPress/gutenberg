@@ -17,7 +17,7 @@ function RangeControl( { label, value, instanceId, onChange, beforeIcon, afterIc
 		<BaseControl label={ label } id={ id } className="blocks-range-control">
 			{ beforeIcon && <Dashicon icon={ beforeIcon } size={ 20 } /> }
 			<input
-				className="blocks-range-control__input"
+				className="blocks-range-control__slider"
 				id={ id }
 				type="range"
 				value={ value }
@@ -25,10 +25,11 @@ function RangeControl( { label, value, instanceId, onChange, beforeIcon, afterIc
 				{ ...props } />
 			{ afterIcon && <Dashicon icon={ afterIcon } /> }
 			<input
-				className="blocks-range-control__hint"
+				className="blocks-range-control__number"
 				type="number"
 				onChange={ onChangeValue }
 				value={ value }
+				{ ...props }
 			/>
 		</BaseControl>
 	);

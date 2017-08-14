@@ -1,7 +1,11 @@
 .wp-block-cover-text {
-	padding: 20px 30px;
+
+	&.has-background {
+		padding: 20px 30px;
+	}
 
 	p {
+		font-size: inherit !important;
 		max-width: $visual-editor-max-width - ( $block-mover-padding-visible );
 		margin: 0 auto;
 	}

@@ -15,7 +15,7 @@ describe( 'RangeControl', () => {
 			const onChange = jest.fn();
 			const wrapper = mount( <RangeControl onChange={ onChange } /> );
 
-			wrapper.find( 'input' ).simulate( 'change', { target: { value: '5' } } );
+			wrapper.find( 'input.blocks-range-control__slider' ).simulate( 'change', { target: { value: '5' } } );
 
 			expect( onChange ).toHaveBeenCalledWith( 5 );
 		} );
