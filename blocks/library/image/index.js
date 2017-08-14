@@ -78,20 +78,6 @@ registerBlockType( 'core/image', {
 					node.nodeName === 'IMG' ||
 					( ! node.textContent && node.querySelector( 'img' ) )
 				),
-				attributes: {
-					url: {
-						type: 'string',
-						source: attr( 'img', 'src' ),
-					},
-					alt: {
-						type: 'string',
-						source: attr( 'img', 'alt' ),
-					},
-					caption: {
-						type: 'array',
-						source: children( 'figcaption' ),
-					},
-				},
 			},
 		],
 	},

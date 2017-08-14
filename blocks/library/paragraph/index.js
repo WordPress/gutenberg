@@ -55,12 +55,6 @@ registerBlockType( 'core/paragraph', {
 					// Do not allow embedded content.
 					! node.querySelector( 'audio, canvas, embed, iframe, img, math, object, svg, video' )
 				),
-				attributes: {
-					content: {
-						type: 'array',
-						source: children( 'p' ),
-					},
-				},
 			},
 		],
 	},

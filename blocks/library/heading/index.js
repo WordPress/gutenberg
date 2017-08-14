@@ -61,16 +61,6 @@ registerBlockType( 'core/heading', {
 			{
 				type: 'raw',
 				source: ( node ) => /H\d/.test( node.nodeName ),
-				attributes: {
-					content: {
-						type: 'array',
-						source: children( 'h1,h2,h3,h4,h5,h6' ),
-					},
-					nodeName: {
-						type: 'string',
-						source: prop( 'h1,h2,h3,h4,h5,h6', 'nodeName' ),
-					},
-				},
 			},
 			{
 				type: 'pattern',
