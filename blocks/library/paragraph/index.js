@@ -56,7 +56,10 @@ registerBlockType( 'core/paragraph', {
 					! node.querySelector( 'audio, canvas, embed, iframe, img, math, object, svg, video' )
 				),
 				attributes: {
-					content: children( 'p' ),
+					content: {
+						type: 'array',
+						source: children( 'p' ),
+					},
 				},
 			},
 		],
