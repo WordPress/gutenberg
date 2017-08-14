@@ -41,19 +41,6 @@ const FORMATTING_CONTROLS = [
 // Default controls shown if no `enabledControls` prop provided
 const DEFAULT_CONTROLS = [ 'bold', 'italic', 'strikethrough', 'link' ];
 
-// TODO: rename and move up one level, write tests
-export const filterURIForDisplay = ( uri ) => {
-	// remove protocol and www prefixes
-	const filteredURI =	uri.replace( new RegExp( '^https?://(www\.)?' ), '' );
-
-	// ends with / and only has that single slash, strip it
-	if ( filteredURI.match( '^[^/]+/$' ) ) {
-		return filteredURI.replace( '/', '' );
-	}
-
-	return filteredURI;
-}
-
 class FormatToolbar extends Component {
 	constructor( props ) {
 		super( ...arguments );
