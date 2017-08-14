@@ -12,4 +12,4 @@ This includes a list of historical articles and influences on Gutenberg.
 ## Blog posts by the team
 
 - https://make.wordpress.org/core/2017/08/11/revised-suggested-roadmap-for-gutenberg-and-customization/
--
+- https://make.wordpress.org/core/2017/08/08/discovering-gutenberg-and-next-steps/
