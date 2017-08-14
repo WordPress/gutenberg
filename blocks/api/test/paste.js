@@ -62,7 +62,7 @@ describe( 'paste', () => {
 				from: [
 					{
 						type: 'raw',
-						source: ( node ) => node.nodeName === 'SMALL',
+						isMatch: ( node ) => node.nodeName === 'SMALL',
 					},
 				],
 			},
