@@ -506,8 +506,6 @@ export default class Editable extends Component {
 				} else {
 					this.editor.execCommand( 'Unlink' );
 				}
-
-				this.setState( { toolbar: { isEditingLink: false, isAddingLink: false, newLinkValue: '' } } );
 			} else {
 				const isActive = this.isFormatActive( format );
 				if ( isActive && ! formatValue ) {
