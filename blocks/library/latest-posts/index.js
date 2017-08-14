@@ -10,8 +10,8 @@ import classnames from 'classnames';
 /**
  * Internal dependencies
  */
+import './editor.scss';
 import './style.scss';
-import './block.scss';
 import { registerBlockType } from '../../api';
 import { getLatestPosts } from './data.js';
 import InspectorControls from '../../inspector-controls';
@@ -33,11 +33,28 @@ registerBlockType( 'core/latest-posts', {
 
 	category: 'widgets',
 
-	defaultAttributes: {
-		postsToShow: 5,
-		displayPostDate: false,
-		layout: 'list',
-		columns: 3,
+	keywords: [ __( 'recent posts' ) ],
+
+	attributes: {
+		postsToShow: {
+			type: 'number',
+			default: 5,
+		},
+		displayPostDate: {
+			type: 'boolean',
+			default: false,
+		},
+		layout: {
+			type: 'string',
+			default: 'list',
+		},
+		columns: {
+			type: 'number',
+			default: 3,
+		},
+		align: {
+			type: 'string',
+		},
 	},
 
 	getEditWrapperProps( attributes ) {
@@ -163,8 +180,8 @@ registerBlockType( 'core/latest-posts', {
 							<RangeControl
 								label={ __( 'Columns' ) }
 								value={ columns }
-								onChange={ ( event ) => setAttributes( { columns: event.target.value } ) }
-								min="2"
+								onChange={ ( value ) => setAttributes( { columns: value } ) }
+								min={ 2 }
 								max={ Math.min( MAX_POSTS_COLUMNS, latestPosts.length ) }
 							/>
 						}

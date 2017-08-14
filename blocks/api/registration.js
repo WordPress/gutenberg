@@ -3,7 +3,12 @@
 /**
  * External dependencies
  */
-import { isFunction } from 'lodash';
+import { isFunction, findIndex } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { getCategories } from './categories';
 
 /**
  * Block settings keyed by block name.
@@ -12,12 +17,14 @@ import { isFunction } from 'lodash';
  */
 const blocks = {};
 
+const categories = getCategories();
+
 /**
  * Name of block handling unknown types.
  *
  * @type {?string}
  */
-let unknownTypeHandler;
+let unknownTypeHandlerName;
 
 /**
  * Name of the default block.
@@ -73,6 +80,24 @@ export function registerBlockType( name, settings ) {
 		);
 		return;
 	}
+	if ( ! ( 'category' in settings ) ) {
+		console.error(
+			'The block "' + name + '" must have a category.'
+		);
+		return;
+	}
+	if ( 'category' in settings && typeof settings.category !== 'string' ) {
+		console.error(
+			'The category slug for block "' + name + '" must be a string.'
+		);
+		return;
+	}
+	if ( 'category' in settings && findIndex( categories, ( result ) => result.slug === settings.category ) === -1 ) {
+		console.error(
+			'The block "' + name + '" must have a registered category.'
+		);
+		return;
+	}
 	const block = Object.assign( { name }, settings );
 	blocks[ name ] = block;
 	return block;
@@ -102,8 +127,8 @@ export function unregisterBlockType( name ) {
  *
  * @param {string} name Block name
  */
-export function setUnknownTypeHandler( name ) {
-	unknownTypeHandler = name;
+export function setUnknownTypeHandlerName( name ) {
+	unknownTypeHandlerName = name;
 }
 
 /**
@@ -112,8 +137,8 @@ export function setUnknownTypeHandler( name ) {
  *
  * @return {?string} Blog name
  */
-export function getUnknownTypeHandler() {
-	return unknownTypeHandler;
+export function getUnknownTypeHandlerName() {
+	return unknownTypeHandlerName;
 }
 
 /**

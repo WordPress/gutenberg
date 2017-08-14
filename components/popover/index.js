@@ -2,22 +2,28 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { isEqual, noop } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { createPortal, Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
+import PopoverDetectOutside from './detect-outside';
 
-class Popover extends Component {
+export class Popover extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.bindContent = this.bindContent.bind( this );
+		this.bindNode = this.bindNode.bind( this );
+		this.setOffset = this.setOffset.bind( this );
+		this.throttledSetOffset = this.throttledSetOffset.bind( this );
+
+		this.nodes = {};
 
 		this.state = {
 			forcedYAxis: null,
@@ -26,7 +32,11 @@ class Popover extends Component {
 	}
 
 	componentDidMount() {
-		this.setForcedPositions();
+		if ( this.props.isOpen ) {
+			this.setOffset();
+			this.setForcedPositions();
+			this.toggleWindowEvents( true );
+		}
 	}
 
 	componentWillReceiveProps( nextProps ) {
@@ -38,14 +48,69 @@ class Popover extends Component {
 		}
 	}
 
-	componentDidUpdate( prevProps ) {
-		if ( this.props.position !== prevProps.position ) {
+	componentDidUpdate( prevProps, prevState ) {
+		const { isOpen, position } = this.props;
+		const { isOpen: prevIsOpen, position: prevPosition } = prevProps;
+		if ( isOpen !== prevIsOpen ) {
+			this.toggleWindowEvents( isOpen );
+		}
+
+		if ( ! isOpen ) {
+			return;
+		}
+
+		if ( isOpen !== prevIsOpen || position !== prevPosition ) {
+			this.setOffset();
 			this.setForcedPositions();
+		} else if ( ! isEqual( this.state, prevState ) ) {
+			// Need to update offset if forced positioning applied
+			this.setOffset();
 		}
 	}
 
+	componentWillUnmount() {
+		this.toggleWindowEvents( false );
+	}
+
+	toggleWindowEvents( isListening ) {
+		const handler = isListening ? 'addEventListener' : 'removeEventListener';
+
+		window.cancelAnimationFrame( this.rafHandle );
+		window[ handler ]( 'resize', this.throttledSetOffset );
+		window[ handler ]( 'scroll', this.throttledSetOffset );
+	}
+
+	throttledSetOffset() {
+		this.rafHandle = window.requestAnimationFrame( this.setOffset );
+	}
+
+	setOffset() {
+		const { anchor, popover } = this.nodes;
+		const { parentNode } = anchor;
+		if ( ! parentNode ) {
+			return;
+		}
+
+		const rect = parentNode.getBoundingClientRect();
+		const [ yAxis ] = this.getPositions();
+		const isTop = 'top' === yAxis;
+
+		// Offset top positioning by padding
+		const { paddingTop, paddingBottom } = window.getComputedStyle( parentNode );
+		let topOffset = parseInt( isTop ? paddingTop : paddingBottom, 10 );
+		if ( ! isTop ) {
+			topOffset *= -1;
+		}
+
+		// Set popover at parent node center
+		popover.style.left = Math.round( rect.left + ( rect.width / 2 ) ) + 'px';
+
+		// Set at top or bottom of parent node based on popover position
+		popover.style.top = ( rect[ yAxis ] + topOffset ) + 'px';
+	}
+
 	setForcedPositions() {
-		const rect = this.content.getBoundingClientRect();
+		const rect = this.nodes.content.getBoundingClientRect();
 
 		// Check exceeding top or bottom of viewport
 		if ( rect.top < 0 ) {
@@ -62,30 +127,68 @@ class Popover extends Component {
 		}
 	}
 
-	bindContent( node ) {
-		this.content = node;
+	getPositions() {
+		const { position = 'top' } = this.props;
+		const [ yAxis, xAxis = 'center' ] = position.split( ' ' );
+		const { forcedYAxis, forcedXAxis } = this.state;
+
+		return [
+			forcedYAxis || yAxis,
+			forcedXAxis || xAxis,
+		];
+	}
+
+	bindNode( name ) {
+		return ( node ) => this.nodes[ name ] = node;
 	}
 
 	render() {
-		const { position, children, className } = this.props;
-		const { forcedYAxis, forcedXAxis } = this.state;
-		const [ yAxis = 'top', xAxis = 'center' ] = position.split( ' ' );
+		// Disable reason: We generate the `...contentProps` rest as remainder
+		// of props which aren't explicitly handled by this component.
+		//
+		// eslint-disable-next-line no-unused-vars
+		const { isOpen, onClose, position, children, className, ...contentProps } = this.props;
+		const [ yAxis, xAxis ] = this.getPositions();
 
+		if ( ! isOpen ) {
+			return null;
+		}
+
+		const { popoverTarget = document.body } = this.context;
 		const classes = classnames(
 			'components-popover',
 			className,
-			'is-' + ( forcedYAxis || yAxis ),
-			'is-' + ( forcedXAxis || xAxis )
+			'is-' + yAxis,
+			'is-' + xAxis,
 		);
 
 		return (
-			<div className={ classes } tabIndex="0">
-				<div ref={ this.bindContent } className="components-popover__content">
-					{ children }
-				</div>
-			</div>
+			<span ref={ this.bindNode( 'anchor' ) }>
+				{ createPortal(
+					<PopoverDetectOutside onClickOutside={ onClose }>
+						<div
+							ref={ this.bindNode( 'popover' ) }
+							className={ classes }
+							tabIndex="0"
+							{ ...contentProps }
+						>
+							<div
+								ref={ this.bindNode( 'content' ) }
+								className="components-popover__content"
+							>
+								{ children }
+							</div>
+						</div>
+					</PopoverDetectOutside>,
+					popoverTarget
+				) }
+			</span>
 		);
 	}
 }
+
+Popover.contextTypes = {
+	popoverTarget: noop,
+};
 
 export default Popover;

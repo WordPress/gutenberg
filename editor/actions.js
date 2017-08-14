@@ -2,7 +2,64 @@
  * External Dependencies
  */
 import uuid from 'uuid/v4';
-import { partial } from 'lodash';
+import { partial, castArray } from 'lodash';
+
+/**
+ * Returns an action object used in signalling that editor has initialized with
+ * the specified post object.
+ *
+ * @param  {Object} post Post object
+ * @return {Object}      Action object
+ */
+export function setInitialPost( post ) {
+	return {
+		type: 'SET_INITIAL_POST',
+		post,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the latest version of the
+ * post has been received, either by initialization or save.
+ *
+ * @param  {Object} post Post object
+ * @return {Object}      Action object
+ */
+export function resetPost( post ) {
+	return {
+		type: 'RESET_POST',
+		post,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that editor has initialized as a
+ * new post with specified edits which should be considered non-dirtying.
+ *
+ * @param  {Object} edits Edited attributes object
+ * @return {Object}       Action object
+ */
+export function setupNewPost( edits ) {
+	return {
+		type: 'SETUP_NEW_POST',
+		edits,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that blocks state should be
+ * reset to the specified array of blocks, taking precedence over any other
+ * content reflected as an edit in state.
+ *
+ * @param  {Array}  blocks Array of blocks
+ * @return {Object}        Action object
+ */
+export function resetBlocks( blocks ) {
+	return {
+		type: 'RESET_BLOCKS',
+		blocks,
+	};
+}
 
 /**
  * Returns an action object used in signalling that the block with the
@@ -28,10 +85,9 @@ export function focusBlock( uid, config ) {
 	};
 }
 
-export function deselectBlock( uid ) {
+export function selectBlock( uid ) {
 	return {
-		type: 'TOGGLE_BLOCK_SELECTED',
-		selected: false,
+		type: 'SELECT_BLOCK',
 		uid,
 	};
 }
@@ -56,6 +112,18 @@ export function replaceBlocks( uids, blocks ) {
 		uids,
 		blocks,
 	};
+}
+
+/**
+ * Returns an action object signalling that a single block should be replaced
+ * with one or more replacement blocks.
+ *
+ * @param  {String}            uid   Block UID to replace
+ * @param  {(Object|Object[])} block Replacement block(s)
+ * @return {Object}                  Action object
+ */
+export function replaceBlock( uid, block ) {
+	return replaceBlocks( [ uid ], castArray( block ) );
 }
 
 export function insertBlock( block, after ) {
@@ -118,18 +186,6 @@ export function mergeBlocks( blockA, blockB ) {
 export function autosave() {
 	return {
 		type: 'AUTOSAVE',
-	};
-}
-
-/**
- * Returns an action object used in signalling that the post should be queued
- * for autosave after a delay.
- *
- * @return {Object} Action object
- */
-export function queueAutosave() {
-	return {
-		type: 'QUEUE_AUTOSAVE',
 	};
 }
 

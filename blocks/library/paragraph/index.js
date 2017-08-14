@@ -7,8 +7,8 @@ import { concatChildren } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import './block.scss';
-import { registerBlockType, createBlock, query as hpq, setDefaultBlock } from '../../api';
+import './style.scss';
+import { registerBlockType, createBlock, source, setDefaultBlock } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
 import Editable from '../../editable';
@@ -16,7 +16,7 @@ import InspectorControls from '../../inspector-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
 import BlockDescription from '../../block-description';
 
-const { children } = hpq;
+const { children } = source;
 
 registerBlockType( 'core/paragraph', {
 	title: __( 'Paragraph' ),
@@ -25,21 +25,32 @@ registerBlockType( 'core/paragraph', {
 
 	category: 'common',
 
-	defaultAttributes: {
-		dropCap: false,
-	},
+	keywords: [ __( 'text' ) ],
 
 	className: false,
 
 	attributes: {
-		content: children( 'p' ),
+		content: {
+			type: 'array',
+			source: children( 'p' ),
+		},
+		align: {
+			type: 'string',
+		},
+		dropCap: {
+			type: 'boolean',
+			default: false,
+		},
+		placeholder: {
+			type: 'string',
+		},
 	},
 
 	transforms: {
 		from: [
 			{
 				type: 'raw',
-				matcher: ( node ) => (
+				source: ( node ) => (
 					node.nodeName === 'P' &&
 					// Do not allow embedded content.
 					! node.querySelector( 'audio, canvas, embed, iframe, img, math, object, svg, video' )
@@ -105,7 +116,7 @@ registerBlockType( 'core/paragraph', {
 				onMerge={ mergeBlocks }
 				onReplace={ onReplace }
 				style={ { textAlign: align } }
-				className={ dropCap && 'has-drop-cap' }
+				className={ dropCap ? 'has-drop-cap' : null }
 				placeholder={ placeholder || __( 'New Paragraph' ) }
 			/>,
 		];

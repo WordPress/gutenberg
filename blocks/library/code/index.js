@@ -11,10 +11,10 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import './style.scss';
-import { registerBlockType, query, createBlock } from '../../api';
+import './editor.scss';
+import { registerBlockType, source, createBlock } from '../../api';
 
-const { prop } = query;
+const { prop } = source;
 
 registerBlockType( 'core/code', {
 	title: __( 'Code' ),
@@ -24,7 +24,10 @@ registerBlockType( 'core/code', {
 	category: 'formatting',
 
 	attributes: {
-		content: prop( 'code', 'textContent' ),
+		content: {
+			type: 'string',
+			source: prop( 'code', 'textContent' ),
+		},
 	},
 
 	transforms: {

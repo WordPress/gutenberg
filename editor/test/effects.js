@@ -11,14 +11,22 @@ import { getBlockTypes, unregisterBlockType, registerBlockType, createBlock } fr
 /**
  * Internal dependencies
  */
-import { mergeBlocks, focusBlock, replaceBlocks, editPost, savePost } from '../actions';
+import {
+	resetPost,
+	setupNewPost,
+	mergeBlocks,
+	focusBlock,
+	replaceBlocks,
+	editPost,
+	savePost,
+} from '../actions';
 import effects from '../effects';
 import * as selectors from '../selectors';
 
 jest.mock( '../selectors' );
 
 describe( 'effects', () => {
-	const defaultBlockSettings = { save: noop };
+	const defaultBlockSettings = { save: () => 'Saved', category: 'common' };
 
 	beforeEach( () => jest.resetAllMocks() );
 
@@ -56,6 +64,7 @@ describe( 'effects', () => {
 					};
 				},
 				save: noop,
+				category: 'common',
 			} );
 			const blockA = {
 				uid: 'chicken',
@@ -87,6 +96,7 @@ describe( 'effects', () => {
 					};
 				},
 				save: noop,
+				category: 'common',
 			} );
 			registerBlockType( 'core/test-block-2', defaultBlockSettings );
 			const blockA = {
@@ -107,14 +117,25 @@ describe( 'effects', () => {
 
 		it( 'should transform and merge the blocks', () => {
 			registerBlockType( 'core/test-block', {
+				attributes: {
+					content: {
+						type: 'string',
+					},
+				},
 				merge( attributes, attributesToMerge ) {
 					return {
 						content: attributes.content + ' ' + attributesToMerge.content,
 					};
 				},
 				save: noop,
+				category: 'common',
 			} );
 			registerBlockType( 'core/test-block-2', {
+				attributes: {
+					content: {
+						type: 'string',
+					},
+				},
 				transforms: {
 					to: [ {
 						type: 'blocks',
@@ -127,6 +148,7 @@ describe( 'effects', () => {
 					} ],
 				},
 				save: noop,
+				category: 'common',
 			} );
 			const blockA = {
 				uid: 'chicken',
@@ -169,9 +191,22 @@ describe( 'effects', () => {
 			selectors.isEditedPostSaveable.mockReturnValue( true );
 			selectors.isEditedPostDirty.mockReturnValue( false );
 			selectors.isCurrentPostPublished.mockReturnValue( false );
-			selectors.isEditedPostNew.mockReturnValue( true );
+			selectors.isEditedPostNew.mockReturnValue( false );
 
 			expect( dispatch ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should return autosave action for clean, new, saveable post', () => {
+			selectors.isEditedPostSaveable.mockReturnValue( true );
+			selectors.isEditedPostDirty.mockReturnValue( false );
+			selectors.isCurrentPostPublished.mockReturnValue( false );
+			selectors.isEditedPostNew.mockReturnValue( true );
+
+			handler( {}, store );
+
+			expect( dispatch ).toHaveBeenCalledTimes( 2 );
+			expect( dispatch ).toHaveBeenCalledWith( editPost( { status: 'draft' } ) );
+			expect( dispatch ).toHaveBeenCalledWith( savePost() );
 		} );
 
 		it( 'should return autosave action for saveable, dirty, published post', () => {
@@ -207,6 +242,71 @@ describe( 'effects', () => {
 
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( savePost() );
+		} );
+	} );
+
+	describe( '.SET_INITIAL_POST', () => {
+		const handler = effects.SET_INITIAL_POST;
+
+		it( 'should return post reset action', () => {
+			const post = {
+				id: 1,
+				title: {
+					raw: 'A History of Pork',
+				},
+				content: {
+					raw: '',
+				},
+				status: 'draft',
+			};
+
+			const result = handler( { post } );
+
+			expect( result ).toEqual( [
+				resetPost( post ),
+			] );
+		} );
+
+		it( 'should return block reset with non-empty content', () => {
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+			const post = {
+				id: 1,
+				title: {
+					raw: 'A History of Pork',
+				},
+				content: {
+					raw: '<!-- wp:core/test-block -->Saved<!-- /wp:core/test-block -->',
+				},
+				status: 'draft',
+			};
+
+			const result = handler( { post } );
+
+			expect( result ).toHaveLength( 2 );
+			expect( result ).toContainEqual( resetPost( post ) );
+			expect( result.some( ( { blocks } ) => {
+				return blocks && blocks[ 0 ].name === 'core/test-block';
+			} ) ).toBe( true );
+		} );
+
+		it( 'should return post setup action only if auto-draft', () => {
+			const post = {
+				id: 1,
+				title: {
+					raw: 'A History of Pork',
+				},
+				content: {
+					raw: '',
+				},
+				status: 'auto-draft',
+			};
+
+			const result = handler( { post } );
+
+			expect( result ).toEqual( [
+				resetPost( post ),
+				setupNewPost( { title: 'A History of Pork' } ),
+			] );
 		} );
 	} );
 } );

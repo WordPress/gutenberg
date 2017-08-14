@@ -19,16 +19,17 @@ import {
 	unregisterBlockType,
 	getBlockTypes,
 	getBlockType,
-	setUnknownTypeHandler,
+	setUnknownTypeHandlerName,
 } from '../registration';
 
 describe( 'validation', () => {
 	const defaultBlockSettings = {
 		save: ( { attributes } ) => attributes.fruit,
+		category: 'common',
 	};
 
 	afterEach( () => {
-		setUnknownTypeHandler( undefined );
+		setUnknownTypeHandlerName( undefined );
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );

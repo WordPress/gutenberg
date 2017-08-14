@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import clickOutside from 'react-click-outside';
 import { connect } from 'react-redux';
 
 /**
@@ -9,9 +8,8 @@ import { connect } from 'react-redux';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { IconButton } from '@wordpress/components';
+import { Popover, IconButton } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
-import { bumpStat } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -23,9 +21,13 @@ import { insertBlock, hideInsertionPoint } from '../actions';
 class Inserter extends Component {
 	constructor() {
 		super( ...arguments );
+
 		this.toggle = this.toggle.bind( this );
 		this.close = this.close.bind( this );
+		this.closeOnClickOutside = this.closeOnClickOutside.bind( this );
+		this.bindNode = this.bindNode.bind( this );
 		this.insertBlock = this.insertBlock.bind( this );
+
 		this.state = {
 			opened: false,
 		};
@@ -43,23 +45,26 @@ class Inserter extends Component {
 		} );
 	}
 
+	closeOnClickOutside( event ) {
+		if ( ! this.node.contains( event.target ) ) {
+			this.close();
+		}
+	}
+
+	bindNode( node ) {
+		this.node = node;
+	}
+
 	insertBlock( name ) {
 		if ( name ) {
-			const { insertionPoint, onInsertBlock } = this.props;
+			const {
+				insertionPoint,
+				onInsertBlock,
+			} = this.props;
 			onInsertBlock(
 				name,
 				insertionPoint
 			);
-			bumpStat( 'add_block_inserter', name.replace( /\//g, '__' ) );
-			bumpStat( 'add_block_total', name.replace( /\//g, '__' ) );
-		}
-
-		this.close();
-	}
-
-	handleClickOutside() {
-		if ( ! this.state.opened ) {
-			return;
 		}
 
 		this.close();
@@ -70,7 +75,7 @@ class Inserter extends Component {
 		const { position, children } = this.props;
 
 		return (
-			<div className="editor-inserter">
+			<div ref={ this.bindNode } className="editor-inserter">
 				<IconButton
 					icon="insert"
 					label={ __( 'Insert block' ) }
@@ -81,12 +86,13 @@ class Inserter extends Component {
 				>
 					{ children }
 				</IconButton>
-				{ opened && (
-					<InserterMenu
-						position={ position }
-						onSelect={ this.insertBlock }
-					/>
-				) }
+				<Popover
+					isOpen={ opened }
+					position={ position }
+					onClose={ this.closeOnClickOutside }
+				>
+					<InserterMenu onSelect={ this.insertBlock } />
+				</Popover>
 			</div>
 		);
 	}
@@ -108,4 +114,4 @@ export default connect(
 			) );
 		},
 	} )
-)( clickOutside( Inserter ) );
+)( Inserter );

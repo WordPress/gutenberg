@@ -18,20 +18,7 @@
 		width: auto;
 	}
 
-	&:not( :disabled ) {
-		cursor: pointer;
-
-		&:hover {
-			color: $blue-medium-500;
-		}
-	}
-
-	&:focus {
-		box-shadow: $button-focus-style;
-		outline: none;
-	}
-
-	&:active:focus {
-		box-shadow: none;
+	&:not( :disabled ):hover {
+		color: $blue-medium-500;
 	}
 }

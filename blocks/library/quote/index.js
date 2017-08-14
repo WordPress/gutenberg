@@ -12,13 +12,13 @@ import { Toolbar } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import './block.scss';
-import { registerBlockType, createBlock, query as hpq } from '../../api';
+import './style.scss';
+import { registerBlockType, createBlock, source } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
 import Editable from '../../editable';
 
-const { children, node, query } = hpq;
+const { children, node, query } = source;
 
 registerBlockType( 'core/quote', {
 	title: __( 'Quote' ),
@@ -26,12 +26,22 @@ registerBlockType( 'core/quote', {
 	category: 'common',
 
 	attributes: {
-		value: query( 'blockquote > p', node() ),
-		citation: children( 'footer' ),
-	},
-
-	defaultAttributes: {
-		value: [],
+		value: {
+			type: 'array',
+			source: query( 'blockquote > p', node() ),
+			default: [],
+		},
+		citation: {
+			type: 'array',
+			source: children( 'footer' ),
+		},
+		align: {
+			type: 'string',
+		},
+		style: {
+			type: 'number',
+			default: 1,
+		},
 	},
 
 	transforms: {
@@ -129,7 +139,7 @@ registerBlockType( 'core/quote', {
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, className } ) {
-		const { align, value, citation, style = 1 } = attributes;
+		const { align, value, citation, style } = attributes;
 		const focusedEditable = focus ? focus.editable || 'value' : null;
 
 		return [
@@ -188,14 +198,16 @@ registerBlockType( 'core/quote', {
 	},
 
 	save( { attributes } ) {
-		const { align, value, citation, style = 1 } = attributes;
+		const { align, value, citation, style } = attributes;
 
 		return (
 			<blockquote
 				className={ `blocks-quote-style-${ style }` }
 				style={ { textAlign: align ? align : null } }
 			>
-				{ value.map( ( paragraph, i ) => <p key={ i }>{ paragraph.props.children }</p> ) }
+				{ value.map( ( paragraph, i ) => (
+					<p key={ i }>{ paragraph.props.children }</p>
+				) ) }
 				{ citation && citation.length > 0 && (
 					<footer>{ citation }</footer>
 				) }

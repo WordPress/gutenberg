@@ -7,7 +7,8 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import IconButton from '../icon-button';
+import Button from '../button';
+import Dashicon from '../dashicon';
 
 class PanelBody extends Component {
 	constructor( props ) {
@@ -27,19 +28,22 @@ class PanelBody extends Component {
 
 	render() {
 		const { title, children } = this.props;
+		const { opened } = this.state;
+		const icon = `arrow-${ opened ? 'down' : 'right' }`;
+
 		return (
 			<div className="components-panel__body">
 				{ !! title && (
 					<h3 className="components-panel__body-title">
-						<IconButton
+						<Button
 							className="components-panel__body-toggle"
 							onClick={ this.toggle }
-							icon={ this.state.opened ? 'arrow-down' : 'arrow-right' }
-							aria-expanded={ this.state.opened }
+							aria-expanded={ opened }
 							label={ sprintf( __( 'Open section: %s' ), title ) }
 						>
+							<Dashicon icon={ icon } />
 							{ title }
-						</IconButton>
+						</Button>
 					</h3>
 				) }
 				{ this.state.opened && children }

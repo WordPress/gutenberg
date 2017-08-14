@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import './style.scss';
+import './editor.scss';
 import { registerBlockType } from '../../api';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
@@ -22,6 +22,16 @@ registerBlockType( 'core/more', {
 	useOnce: true,
 
 	className: false,
+
+	attributes: {
+		text: {
+			type: 'string',
+		},
+		noTeaser: {
+			type: 'boolean',
+			default: false,
+		},
+	},
 
 	edit( { attributes, setAttributes, focus, setFocus } ) {
 		const { text, noTeaser } = attributes;

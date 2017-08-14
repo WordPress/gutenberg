@@ -11,8 +11,8 @@ import { noop } from 'lodash';
 import {
 	registerBlockType,
 	unregisterBlockType,
-	setUnknownTypeHandler,
-	getUnknownTypeHandler,
+	setUnknownTypeHandlerName,
+	getUnknownTypeHandlerName,
 	setDefaultBlock,
 	getDefaultBlock,
 	getBlockType,
@@ -21,7 +21,7 @@ import {
 
 describe( 'blocks', () => {
 	const error = console.error;
-	const defaultBlockSettings = { save: noop };
+	const defaultBlockSettings = { save: noop, category: 'common' };
 
 	// Reset block state before each test.
 	beforeEach( () => {
@@ -32,7 +32,7 @@ describe( 'blocks', () => {
 		getBlockTypes().forEach( block => {
 			unregisterBlockType( block.name );
 		} );
-		setUnknownTypeHandler( undefined );
+		setUnknownTypeHandlerName( undefined );
 		setDefaultBlock( undefined );
 		console.error = error;
 	} );
@@ -65,7 +65,7 @@ describe( 'blocks', () => {
 		it( 'should accept valid block names', () => {
 			const block = registerBlockType( 'my-plugin/fancy-block-4', defaultBlockSettings );
 			expect( console.error ).not.toHaveBeenCalled();
-			expect( block ).toEqual( { name: 'my-plugin/fancy-block-4', save: noop } );
+			expect( block ).toEqual( { name: 'my-plugin/fancy-block-4', save: noop, category: 'common' } );
 		} );
 
 		it( 'should prohibit registering the same block twice', () => {
@@ -82,27 +82,49 @@ describe( 'blocks', () => {
 		} );
 
 		it( 'should reject blocks with an invalid edit function', () => {
-			const blockType = { save: noop, edit: 'not-a-function' },
+			const blockType = { save: noop, edit: 'not-a-function', category: 'common' },
 				block = registerBlockType( 'my-plugin/fancy-block-6', blockType );
 			expect( console.error ).toHaveBeenCalledWith( 'The "edit" property must be a valid function.' );
 			expect( block ).toBeUndefined();
 		} );
 
 		it( 'should reject blocks with more than 3 keywords', () => {
-			const blockType = { save: noop, keywords: [ 'apple', 'orange', 'lemon', 'pineapple' ] },
+			const blockType = { save: noop, keywords: [ 'apple', 'orange', 'lemon', 'pineapple' ], category: 'common' },
 				block = registerBlockType( 'my-plugin/fancy-block-7', blockType );
 			expect( console.error ).toHaveBeenCalledWith( 'The block "my-plugin/fancy-block-7" can have a maximum of 3 keywords.' );
 			expect( block ).toBeUndefined();
 		} );
 
+		it( 'should reject blocks without category', () => {
+			const blockType = { settingName: 'settingValue', save: noop },
+				block = registerBlockType( 'my-plugin/fancy-block-8', blockType );
+			expect( console.error ).toHaveBeenCalledWith( 'The block "my-plugin/fancy-block-8" must have a category.' );
+			expect( block ).toBeUndefined();
+		} );
+
+		it( 'should reject blocks with invalid category slug', () => {
+			const blockType = { settingName: 'settingValue', save: noop, category: 123456 },
+				block = registerBlockType( 'my-plugin/fancy-block-9', blockType );
+			expect( console.error ).toHaveBeenCalledWith( 'The category slug for block "my-plugin/fancy-block-9" must be a string.' );
+			expect( block ).toBeUndefined();
+		} );
+
+		it( 'should reject blocks with non registered category.', () => {
+			const blockType = { save: noop, category: 'custom-category-slug' },
+				block = registerBlockType( 'my-plugin/fancy-block-10', blockType );
+			expect( console.error ).toHaveBeenCalledWith( 'The block "my-plugin/fancy-block-10" must have a registered category.' );
+			expect( block ).toBeUndefined();
+		} );
+
 		it( 'should store a copy of block type', () => {
-			const blockType = { settingName: 'settingValue', save: noop };
+			const blockType = { settingName: 'settingValue', save: noop, category: 'common' };
 			registerBlockType( 'core/test-block-with-settings', blockType );
 			blockType.mutated = true;
 			expect( getBlockType( 'core/test-block-with-settings' ) ).toEqual( {
 				name: 'core/test-block-with-settings',
 				settingName: 'settingValue',
 				save: noop,
+				category: 'common',
 			} );
 		} );
 	} );
@@ -117,26 +139,26 @@ describe( 'blocks', () => {
 		it( 'should unregister existing blocks', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 			expect( getBlockTypes() ).toEqual( [
-				{ name: 'core/test-block', save: noop },
+				{ name: 'core/test-block', save: noop, category: 'common' },
 			] );
 			const oldBlock = unregisterBlockType( 'core/test-block' );
 			expect( console.error ).not.toHaveBeenCalled();
-			expect( oldBlock ).toEqual( { name: 'core/test-block', save: noop } );
+			expect( oldBlock ).toEqual( { name: 'core/test-block', save: noop, category: 'common' } );
 			expect( getBlockTypes() ).toEqual( [] );
 		} );
 	} );
 
-	describe( 'setUnknownTypeHandler()', () => {
+	describe( 'setUnknownTypeHandlerName()', () => {
 		it( 'assigns unknown type handler', () => {
-			setUnknownTypeHandler( 'core/test-block' );
+			setUnknownTypeHandlerName( 'core/test-block' );
 
-			expect( getUnknownTypeHandler() ).toBe( 'core/test-block' );
+			expect( getUnknownTypeHandlerName() ).toBe( 'core/test-block' );
 		} );
 	} );
 
-	describe( 'getUnknownTypeHandler()', () => {
+	describe( 'getUnknownTypeHandlerName()', () => {
 		it( 'defaults to undefined', () => {
-			expect( getUnknownTypeHandler() ).toBeUndefined();
+			expect( getUnknownTypeHandlerName() ).toBeUndefined();
 		} );
 	} );
 
@@ -160,16 +182,18 @@ describe( 'blocks', () => {
 			expect( getBlockType( 'core/test-block' ) ).toEqual( {
 				name: 'core/test-block',
 				save: noop,
+				category: 'common',
 			} );
 		} );
 
 		it( 'should return all block type elements', () => {
-			const blockType = { settingName: 'settingValue', save: noop };
+			const blockType = { settingName: 'settingValue', save: noop, category: 'common' };
 			registerBlockType( 'core/test-block-with-settings', blockType );
 			expect( getBlockType( 'core/test-block-with-settings' ) ).toEqual( {
 				name: 'core/test-block-with-settings',
 				settingName: 'settingValue',
 				save: noop,
+				category: 'common',
 			} );
 		} );
 	} );
@@ -181,14 +205,15 @@ describe( 'blocks', () => {
 
 		it( 'should return all registered blocks', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
-			const blockType = { settingName: 'settingValue', save: noop };
+			const blockType = { settingName: 'settingValue', save: noop, category: 'common' };
 			registerBlockType( 'core/test-block-with-settings', blockType );
 			expect( getBlockTypes() ).toEqual( [
-				{ name: 'core/test-block', save: noop },
+				{ name: 'core/test-block', save: noop, category: 'common' },
 				{
 					name: 'core/test-block-with-settings',
 					settingName: 'settingValue',
 					save: noop,
+					category: 'common',
 				},
 			] );
 		} );

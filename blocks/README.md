@@ -117,7 +117,7 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 // block.js
 ( function( blocks, element ) {
 	var el = element.createElement,
-		query = blocks.query;
+		source = blocks.source;
 
 	function RandomImage( props ) {
 		var src = 'http://lorempixel.com/400/200/' + props.category;
@@ -136,7 +136,10 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 		category: 'media',
 
 		attributes: {
-			category: query.attr( 'img', 'alt' )
+			category: {
+				type: 'string',
+				source: source.attr( 'img', 'alt' )
+			}
 		},
 
 		edit: function( props ) {
@@ -204,7 +207,7 @@ encoding the values into the published post's markup, and then retrieving them
 the next time the post is edited. This is the motivation for the block's
 `attributes` property. The shape of this object matches that of the attributes
 object we'd like to receive, where each value is a
-[__matcher__](http://github.com/aduth/hpq)
+[__source__](http://github.com/aduth/hpq)
 which tries to find the desired value from the markup of the block.
 
 In the random image block above, we've given the `alt` attribute of the image a
@@ -231,11 +234,13 @@ editor interface where blocks are implemented.
   [Dashicon](https://developer.wordpress.org/resource/dashicons/#awards)
   to be shown in the control's button, or an element (or function returning an
   element) if you choose to render your own SVG.
-- `attributes: Object | Function` - An object of
-  [matchers](http://github.com/aduth/hpq) or a function which, when passed the
-  raw content of the block, returns block attributes as an object. When defined
-  as an object of matchers, the attributes object is generated with values
-  corresponding to the shape of the matcher object keys.
+- `attributes: Object | Function` - An object of attribute schemas, where the
+  keys of the object define the shape of attributes, and each value an object
+  schema describing the `type`, `default` (optional), and
+  [`source`](http://gutenberg-devdoc.surge.sh/reference/attribute-sources/)
+  (optional) of the attribute. If `source` is omitted, the attribute is 
+  serialized into the block's comment delimiters. Alternatively, define 
+  `attributes` as a function which returns the attributes object.
 - `category: string` - Slug of the block's category. The category is used to
   organize the blocks in the block inserter.
 - `edit( { attributes: Object, setAttributes: Function } ): WPElement` -

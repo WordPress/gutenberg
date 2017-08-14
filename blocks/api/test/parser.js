@@ -6,10 +6,12 @@ import { noop } from 'lodash';
 /**
  * Internal dependencies
  */
-import { text } from '../query';
+import { text, attr, html } from '../source';
 import {
+	isValidSource,
 	getBlockAttributes,
-	parseBlockAttributes,
+	asType,
+	getSourcedAttributes,
 	createBlockWithFallback,
 	default as parse,
 } from '../parser';
@@ -17,76 +19,140 @@ import {
 	registerBlockType,
 	unregisterBlockType,
 	getBlockTypes,
-	setUnknownTypeHandler,
+	setUnknownTypeHandlerName,
 } from '../registration';
 
 describe( 'block parser', () => {
 	const defaultBlockSettings = {
+		attributes: {
+			fruit: {
+				type: 'string',
+			},
+		},
 		save: ( { attributes } ) => attributes.fruit,
+		category: 'common',
 	};
 
 	afterEach( () => {
-		setUnknownTypeHandler( undefined );
+		setUnknownTypeHandlerName( undefined );
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
 	} );
 
-	describe( 'parseBlockAttributes()', () => {
-		it( 'should use the function implementation', () => {
-			const attributes = function( rawContent ) {
-				return {
-					content: rawContent + ' & Chicken',
-				};
-			};
-
-			expect( parseBlockAttributes( 'Ribs', attributes ) ).toEqual( {
-				content: 'Ribs & Chicken',
-			} );
+	describe( 'isValidSource()', () => {
+		it( 'returns false if falsey argument', () => {
+			expect( isValidSource() ).toBe( false );
 		} );
 
-		it( 'should use the query object implementation', () => {
-			const attributes = {
-				emphasis: text( 'strong' ),
-				ignoredDomMatcher: ( node ) => node.innerHTML,
+		it( 'returns true if valid source argument', () => {
+			expect( isValidSource( text() ) ).toBe( true );
+		} );
+
+		it( 'returns false if invalid source argument', () => {
+			expect( isValidSource( () => {} ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'getSourcedAttributes()', () => {
+		it( 'should return matched attributes from valid sources', () => {
+			const sources = {
+				number: {
+					type: 'number',
+				},
+				emphasis: {
+					type: 'string',
+					source: text( 'strong' ),
+				},
 			};
 
 			const rawContent = '<span>Ribs <strong>& Chicken</strong></span>';
 
-			expect( parseBlockAttributes( rawContent, attributes ) ).toEqual( {
+			expect( getSourcedAttributes( rawContent, sources ) ).toEqual( {
 				emphasis: '& Chicken',
 			} );
 		} );
 
-		it( 'should return an empty object if no attributes defined', () => {
-			const attributes = {};
+		it( 'should return an empty object if no sources defined', () => {
+			const sources = {};
 			const rawContent = '<span>Ribs <strong>& Chicken</strong></span>';
 
-			expect( parseBlockAttributes( rawContent, attributes ) ).toEqual( {} );
+			expect( getSourcedAttributes( rawContent, sources ) ).toEqual( {} );
+		} );
+	} );
+
+	describe( 'asType()', () => {
+		it( 'gracefully handles undefined type', () => {
+			expect( asType( 5 ) ).toBe( 5 );
+		} );
+
+		it( 'gracefully handles unhandled type', () => {
+			expect( asType( 5, '__UNHANDLED__' ) ).toBe( 5 );
+		} );
+
+		it( 'returns expected coerced values', () => {
+			const arr = [];
+			const obj = {};
+
+			expect( asType( '5', 'string' ) ).toBe( '5' );
+			expect( asType( 5, 'string' ) ).toBe( '5' );
+
+			expect( asType( 5, 'integer' ) ).toBe( 5 );
+			expect( asType( '5', 'integer' ) ).toBe( 5 );
+
+			expect( asType( 5, 'number' ) ).toBe( 5 );
+			expect( asType( '5', 'number' ) ).toBe( 5 );
+
+			expect( asType( true, 'boolean' ) ).toBe( true );
+			expect( asType( false, 'boolean' ) ).toBe( false );
+			expect( asType( '5', 'boolean' ) ).toBe( true );
+			expect( asType( 0, 'boolean' ) ).toBe( false );
+
+			expect( asType( null, 'null' ) ).toBe( null );
+			expect( asType( 0, 'null' ) ).toBe( null );
+
+			expect( asType( arr, 'array' ) ).toBe( arr );
+			expect( asType( new Set( [ 1, 2, 3 ] ), 'array' ) ).toEqual( [ 1, 2, 3 ] );
+
+			expect( asType( obj, 'object' ) ).toBe( obj );
+			expect( asType( {}, 'object' ) ).toEqual( {} );
 		} );
 	} );
 
 	describe( 'getBlockAttributes()', () => {
 		it( 'should merge attributes with the parsed and default attributes', () => {
 			const blockType = {
-				attributes: function( rawContent ) {
-					return {
-						content: rawContent + ' & Chicken',
-					};
-				},
-				defaultAttributes: {
-					content: '',
-					topic: 'none',
+				attributes: {
+					content: {
+						type: 'string',
+						source: text( 'div' ),
+					},
+					number: {
+						type: 'number',
+						source: attr( 'div', 'data-number' ),
+					},
+					align: {
+						type: 'string',
+					},
+					topic: {
+						type: 'string',
+						default: 'none',
+					},
+					ignoredDomSource: {
+						type: 'string',
+						source: ( node ) => node.innerHTML,
+					},
 				},
 			};
 
-			const rawContent = 'Ribs';
-			const attrs = { align: 'left' };
+			const rawContent = '<div data-number="10">Ribs</div>';
+			const attrs = { align: 'left', invalid: true };
 
 			expect( getBlockAttributes( blockType, rawContent, attrs ) ).toEqual( {
+				content: 'Ribs',
+				number: 10,
 				align: 'left',
 				topic: 'none',
-				content: 'Ribs & Chicken',
 			} );
 		} );
 	} );
@@ -98,10 +164,10 @@ describe( 'block parser', () => {
 			const block = createBlockWithFallback(
 				'core/test-block',
 				'content',
-				{ attr: 'value' }
+				{ fruit: 'Bananas' }
 			);
 			expect( block.name ).toEqual( 'core/test-block' );
-			expect( block.attributes ).toEqual( { attr: 'value' } );
+			expect( block.attributes ).toEqual( { fruit: 'Bananas' } );
 		} );
 
 		it( 'should create the requested block with no attributes if it exists', () => {
@@ -114,20 +180,20 @@ describe( 'block parser', () => {
 
 		it( 'should fall back to the unknown type handler for unknown blocks if present', () => {
 			registerBlockType( 'core/unknown-block', defaultBlockSettings );
-			setUnknownTypeHandler( 'core/unknown-block' );
+			setUnknownTypeHandlerName( 'core/unknown-block' );
 
 			const block = createBlockWithFallback(
 				'core/test-block',
 				'content',
-				{ attr: 'value' }
+				{ fruit: 'Bananas' }
 			);
 			expect( block.name ).toEqual( 'core/unknown-block' );
-			expect( block.attributes ).toEqual( { attr: 'value' } );
+			expect( block.attributes ).toEqual( { fruit: 'Bananas' } );
 		} );
 
 		it( 'should fall back to the unknown type handler if block type not specified', () => {
 			registerBlockType( 'core/unknown-block', defaultBlockSettings );
-			setUnknownTypeHandler( 'core/unknown-block' );
+			setUnknownTypeHandlerName( 'core/unknown-block' );
 
 			const block = createBlockWithFallback( null, 'content' );
 			expect( block.name ).toEqual( 'core/unknown-block' );
@@ -143,13 +209,17 @@ describe( 'block parser', () => {
 	describe( 'parse()', () => {
 		it( 'should parse the post content, including block attributes', () => {
 			registerBlockType( 'core/test-block', {
-				// Currently this is the only way to test block content parsing?
-				attributes: function( rawContent ) {
-					return {
-						content: rawContent,
-					};
+				attributes: {
+					content: {
+						type: 'string',
+						source: text(),
+					},
+					smoked: { type: 'string' },
+					url: { type: 'string' },
+					chicken: { type: 'string' },
 				},
 				save: noop,
+				category: 'common',
 			} );
 
 			const parsed = parse(
@@ -177,12 +247,14 @@ describe( 'block parser', () => {
 
 		it( 'should parse the post content, ignoring unknown blocks', () => {
 			registerBlockType( 'core/test-block', {
-				attributes: function( rawContent ) {
-					return {
-						content: rawContent + ' & Chicken',
-					};
+				attributes: {
+					content: {
+						type: 'string',
+						source: text(),
+					},
 				},
 				save: noop,
+				category: 'common',
 			} );
 
 			const parsed = parse(
@@ -194,7 +266,7 @@ describe( 'block parser', () => {
 			expect( parsed ).toHaveLength( 1 );
 			expect( parsed[ 0 ].name ).toBe( 'core/test-block' );
 			expect( parsed[ 0 ].attributes ).toEqual( {
-				content: 'Ribs & Chicken',
+				content: 'Ribs',
 			} );
 			expect( typeof parsed[ 0 ].uid ).toBe( 'string' );
 		} );
@@ -203,7 +275,7 @@ describe( 'block parser', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 			registerBlockType( 'core/unknown-block', defaultBlockSettings );
 
-			setUnknownTypeHandler( 'core/unknown-block' );
+			setUnknownTypeHandlerName( 'core/unknown-block' );
 
 			const parsed = parse(
 				'<!-- wp:core/test-block -->Ribs<!-- /wp:core/test-block -->' +
@@ -222,16 +294,17 @@ describe( 'block parser', () => {
 		it( 'should parse the post content, including raw HTML at each end', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 			registerBlockType( 'core/unknown-block', {
-				// Currently this is the only way to test block content parsing?
-				attributes: function( rawContent ) {
-					return {
-						content: rawContent,
-					};
+				attributes: {
+					content: {
+						type: 'string',
+						source: html(),
+					},
 				},
 				save: noop,
+				category: 'common',
 			} );
 
-			setUnknownTypeHandler( 'core/unknown-block' );
+			setUnknownTypeHandlerName( 'core/unknown-block' );
 
 			const parsed = parse(
 				'<p>Cauliflower</p>' +

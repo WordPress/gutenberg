@@ -56,7 +56,7 @@ const externals = {
 
 entryPointNames.forEach( entryPointName => {
 	externals[ '@wordpress/' + entryPointName ] = {
-		'this': [ 'wp', entryPointName ],
+		this: [ 'wp', entryPointName ],
 	};
 } );
 
@@ -95,19 +95,16 @@ const config = {
 				use: 'babel-loader',
 			},
 			{
-				test: /block\.s?css$/,
+				test: /style\.s?css$/,
 				include: [
 					/blocks/,
 				],
 				use: blocksCSSPlugin.extract( extractConfig ),
 			},
 			{
-				test: /\.s?css$/,
+				test: /editor\.s?css$/,
 				include: [
 					/blocks/,
-				],
-				exclude: [
-					/block\.s?css$/,
 				],
 				use: editBlocksCSSPlugin.extract( extractConfig ),
 			},

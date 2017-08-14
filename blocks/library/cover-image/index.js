@@ -8,9 +8,9 @@ import classnames from 'classnames';
 /**
  * Internal dependencies
  */
+import './editor.scss';
 import './style.scss';
-import './block.scss';
-import { registerBlockType, query } from '../../api';
+import { registerBlockType, source } from '../../api';
 import Editable from '../../editable';
 import MediaUploadButton from '../../media-upload-button';
 import BlockControls from '../../block-controls';
@@ -19,7 +19,7 @@ import InspectorControls from '../../inspector-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
 import BlockDescription from '../../block-description';
 
-const { text } = query;
+const { children } = source;
 
 const validAlignments = [ 'left', 'center', 'right', 'wide', 'full' ];
 
@@ -31,11 +31,27 @@ registerBlockType( 'core/cover-image', {
 	category: 'common',
 
 	attributes: {
-		title: text( 'h2' ),
-	},
-
-	defaultAttributes: {
-		hasBackgroundDim: true,
+		title: {
+			type: 'array',
+			source: children( 'h2' ),
+		},
+		url: {
+			type: 'string',
+		},
+		align: {
+			type: 'string',
+		},
+		id: {
+			type: 'number',
+		},
+		hasParallax: {
+			type: 'boolean',
+			default: false,
+		},
+		hasBackgroundDim: {
+			type: 'boolean',
+			default: true,
+		},
 	},
 
 	getEditWrapperProps( attributes ) {
@@ -85,7 +101,7 @@ registerBlockType( 'core/cover-image', {
 					key="placeholder"
 					instructions={ __( 'Drag image here or insert from media library' ) }
 					icon="format-image"
-					label={ __( 'Image' ) }
+					label={ __( 'Cover Image' ) }
 					className={ className }>
 					<MediaUploadButton
 						buttonProps={ uploadButtonProps }

@@ -1,6 +1,9 @@
-import { renderToString } from '@wordpress/element';
+/**
+ * WordPress dependencies
+ */
+import { Component, renderToString } from '@wordpress/element';
 
-export default class Sandbox extends wp.element.Component {
+export default class Sandbox extends Component {
 
 	constructor() {
 		super( ...arguments );

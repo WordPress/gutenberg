@@ -1,0 +1,13 @@
+[
+    {
+        "blockName": "core/gallery",
+        "attrs": {
+            "columns": "1"
+        },
+        "rawContent": "\n<div class=\"wp-block-gallery columns-1 \">\n\t<figure class=\"blocks-gallery-image\">\n\t\t<img src=\"https://cldup.com/uuUqE_dXzy.jpg\" alt=\"title\" />\n\t</figure>\n\t<figure class=\"blocks-gallery-image\">\n\t\t<img src=\"http://google.com/hi.png\" alt=\"title\" />\n\t</figure>\n</div>\n"
+    },
+    {
+        "attrs": {},
+        "rawContent": "\n"
+    }
+]

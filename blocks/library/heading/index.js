@@ -8,15 +8,15 @@ import { Toolbar } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import './style.scss';
-import { registerBlockType, createBlock, query } from '../../api';
+import './editor.scss';
+import { registerBlockType, createBlock, source } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import InspectorControls from '../../inspector-controls';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockDescription from '../../block-description';
 
-const { children, prop } = query;
+const { children, prop } = source;
 
 registerBlockType( 'core/heading', {
 	title: __( 'Heading' ),
@@ -25,15 +25,26 @@ registerBlockType( 'core/heading', {
 
 	category: 'common',
 
+	keywords: [ __( 'title' ), __( 'subtitle' ) ],
+
 	className: false,
 
 	attributes: {
-		content: children( 'h1,h2,h3,h4,h5,h6' ),
-		nodeName: prop( 'h1,h2,h3,h4,h5,h6', 'nodeName' ),
-	},
-
-	defaultAttributes: {
-		nodeName: 'H2',
+		content: {
+			type: 'array',
+			source: children( 'h1,h2,h3,h4,h5,h6' ),
+		},
+		nodeName: {
+			type: 'string',
+			source: prop( 'h1,h2,h3,h4,h5,h6', 'nodeName' ),
+			default: 'H2',
+		},
+		align: {
+			type: 'string',
+		},
+		placeholder: {
+			type: 'string',
+		},
 	},
 
 	transforms: {
@@ -49,7 +60,7 @@ registerBlockType( 'core/heading', {
 			},
 			{
 				type: 'raw',
-				matcher: ( node ) => /H\d/.test( node.nodeName ),
+				source: ( node ) => /H\d/.test( node.nodeName ),
 				attributes: {
 					content: children( 'h1,h2,h3,h4,h5,h6' ),
 					nodeName: prop( 'h1,h2,h3,h4,h5,h6', 'nodeName' ),

@@ -6,14 +6,14 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import './editor.scss';
 import './style.scss';
-import './block.scss';
-import { registerBlockType, query as hpq } from '../../api';
+import { registerBlockType, source } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
-const { children, query, node } = hpq;
+const { children, query, node } = source;
 
 registerBlockType( 'core/pullquote', {
 
@@ -24,8 +24,18 @@ registerBlockType( 'core/pullquote', {
 	category: 'formatting',
 
 	attributes: {
-		value: query( 'blockquote > p', node() ),
-		citation: children( 'footer' ),
+		value: {
+			type: 'array',
+			source: query( 'blockquote > p', node() ),
+		},
+		citation: {
+			type: 'array',
+			source: children( 'footer' ),
+		},
+		align: {
+			type: 'string',
+			default: 'none',
+		},
 	},
 
 	getEditWrapperProps( attributes ) {
@@ -81,7 +91,7 @@ registerBlockType( 'core/pullquote', {
 	},
 
 	save( { attributes } ) {
-		const { value, citation, align = 'none' } = attributes;
+		const { value, citation, align } = attributes;
 
 		return (
 			<blockquote className={ `align${ align }` }>

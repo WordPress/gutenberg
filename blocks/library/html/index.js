@@ -12,11 +12,11 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import './style.scss';
-import { registerBlockType, query } from '../../api';
+import './editor.scss';
+import { registerBlockType, source } from '../../api';
 import BlockControls from '../../block-controls';
 
-const { html } = query;
+const { html } = source;
 
 registerBlockType( 'core/html', {
 	title: __( 'Custom HTML' ),
@@ -28,7 +28,10 @@ registerBlockType( 'core/html', {
 	className: false,
 
 	attributes: {
-		content: html(),
+		content: {
+			type: 'string',
+			source: html(),
+		},
 	},
 
 	edit: class extends Component {

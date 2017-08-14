@@ -8,12 +8,14 @@ $z-layers: (
 	'.editor-visual-editor__block .wp-block-more:before': -1,
 	'.editor-visual-editor__block {core/image aligned left or right}': 10,
 	'.editor-visual-editor__block-controls': 1,
-	'.editor-visual-editor__invalid-block-warning': 1,
+	'.editor-visual-editor__block-warning': 1,
 	'.components-form-toggle__input': 1,
 	'.editor-format-list__menu': 1,
 	'.editor-inserter__tabs': 1,
 	'.editor-inserter__tab.is-active': 1,
 	'.components-panel__header': 1,
+	'.blocks-format-toolbar__link-modal': 1,
+	'.editor-block-switcher__menu': 2,
 	'.editor-block-mover': 10,
 	'.editor-header': 20,
 	'.editor-post-schedule__dialog': 30,
@@ -30,9 +32,9 @@ $z-layers: (
 	// #adminmenuwrap { z-index: 9990 }
 	'.components-notice-list': 9989,
 
-	// Show popovers above wp-admin menus and submenus:
+	// Show popovers above wp-admin menus and submenus and sidebar:
 	// #adminmenuwrap { z-index: 9990 }
-	'.components-popover': 9999,
+	'.components-popover': 1000000,
 	'.blocks-url-input__suggestions': 9999,
 );
 

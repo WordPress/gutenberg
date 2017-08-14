@@ -8,27 +8,26 @@ import { includes } from 'lodash';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, renderToString } from '@wordpress/element';
 import { Button, Placeholder, Spinner, SandBox } from '@wordpress/components';
-// TODO: This is a circular dependency between editor and blocks. This must be
-// updated, eventually to depend on published `@wordpress/url`
-import { addQueryArgs } from '../../../editor/utils/url';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, query, createBlock } from '../../api';
+import './editor.scss';
+import { registerBlockType, source, createBlock } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
-const { attr, children } = query;
+const { children } = source;
 
 // These embeds do not work in sandboxes
 const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
 
-function getEmbedBlockSettings( { title, icon, category = 'embed', transforms } ) {
+function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, keywords = [] } ) {
 	return {
 		title: __( title ),
 
@@ -36,9 +35,20 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms } 
 
 		category,
 
+		keywords,
+
 		attributes: {
-			title: attr( 'iframe', 'title' ),
-			caption: children( 'figcaption' ),
+			url: {
+				type: 'string',
+			},
+			caption: {
+				type: 'array',
+				source: children( 'figcaption' ),
+				default: [],
+			},
+			align: {
+				type: 'string',
+			},
 		},
 
 		transforms,
@@ -81,7 +91,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms } 
 				// 100% width for the preview so it fits nicely into the document, some "thumbnails" are
 				// acually the full size photo.
 				const photoPreview = <p><img src={ photo.thumbnail_url } alt={ photo.title } width="100%" /></p>;
-				return wp.element.renderToString( photoPreview );
+				return renderToString( photoPreview );
 			}
 
 			doServerSideRender( event ) {
@@ -207,12 +217,12 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms } 
 		},
 
 		save( { attributes } ) {
-			const { url, caption = [], align } = attributes;
+			const { url, caption, align } = attributes;
 
 			return (
-				<figure className={ align && `align${ align }` }>
+				<figure className={ align ? `align${ align }` : null }>
 					{ `\n${ url }\n` /* URL needs to be on its own line. */ }
-					{ caption.length > 0 && <figcaption>{ caption }</figcaption> }
+					{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
 				</figure>
 			);
 		},
@@ -247,6 +257,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Twitter',
 		icon: 'twitter',
+		keywords: [ __( 'tweet' ) ],
 	} )
 );
 registerBlockType(
@@ -254,6 +265,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'YouTube',
 		icon: 'video-alt3',
+		keywords: [ __( 'music' ), __( 'video' ) ],
 	} )
 );
 registerBlockType(
@@ -268,6 +280,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Instagram',
 		icon: 'camera',
+		keywords: [ __( 'image' ) ],
 	} )
 );
 registerBlockType(
@@ -275,6 +288,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'WordPress',
 		icon: 'wordpress',
+		keywords: [ __( 'post' ), __( 'blog' ) ],
 	} )
 );
 registerBlockType(
@@ -282,6 +296,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'SoundCloud',
 		icon: 'format-audio',
+		keywords: [ __( 'music' ), __( 'audio' ) ],
 	} )
 );
 registerBlockType(
@@ -289,6 +304,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Spotify',
 		icon: 'format-audio',
+		keywords: [ __( 'music' ), __( 'audio' ) ],
 	} )
 );
 registerBlockType(
@@ -296,6 +312,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Flickr',
 		icon: 'format-image',
+		keywords: [ __( 'image' ) ],
 	} )
 );
 registerBlockType(
@@ -303,6 +320,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Vimeo',
 		icon: 'video-alt3',
+		keywords: [ __( 'video' ) ],
 	} )
 );
 
@@ -381,6 +399,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'Mixcloud',
 		icon: 'format-audio',
+		keywords: [ __( 'music' ), __( 'audio' ) ],
 	} )
 );
 registerBlockType(
@@ -465,6 +484,7 @@ registerBlockType(
 	getEmbedBlockSettings( {
 		title: 'VideoPress',
 		icon: 'video-alt3',
+		keywords: [ __( 'video' ) ],
 	} )
 );
 registerBlockType(

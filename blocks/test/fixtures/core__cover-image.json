@@ -4,9 +4,12 @@
         "name": "core/cover-image",
         "isValid": true,
         "attributes": {
-            "hasBackgroundDim": true,
+            "title": [
+                "Guten Berg!"
+            ],
             "url": "https://cldup.com/uuUqE_dXzy.jpg",
-            "title": "Guten Berg!"
+            "hasParallax": false,
+            "hasBackgroundDim": true
         }
     }
 ]

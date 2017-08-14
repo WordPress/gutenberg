@@ -54,7 +54,7 @@ const getGalleryDetailsMediaFrame = () => {
 // the media library image object contains numerous attributes
 // we only need this set to display the image in the library
 const slimImageObject = ( img ) => {
-	const attrSet = [ 'sizes', 'mime', 'type', 'subtype', 'id', 'url', 'alt' ];
+	const attrSet = [ 'sizes', 'mime', 'type', 'subtype', 'id', 'url', 'alt', 'link' ];
 	return pick( img, attrSet );
 };
 

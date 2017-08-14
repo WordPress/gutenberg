@@ -17,6 +17,8 @@ global.window.tinyMCEPreInit = {
 	// <script> tag where it was loaded from, which of course fails here.
 	baseURL: 'about:blank',
 };
+window.requestAnimationFrame = setTimeout;
+window.cancelAnimationFrame = clearTimeout;
 
 global.window._wpDateSettings = {
 	formats: {
@@ -50,15 +52,4 @@ global.window._wpDateSettings = {
 global.wp = global.wp || {};
 global.wp.a11y = {
 	speak: () => {},
-};
-
-global.window.getUserSetting = settingName => {
-	switch ( settingName ) {
-		case 'gutenberg_tracking':
-			return 'on';
-		default:
-			throw new Error(
-				'Unrecognized user setting requested: ' + settingName
-			);
-	}
 };

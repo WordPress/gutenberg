@@ -1,4 +1,31 @@
-.wp-block-quote.blocks-quote-style-2 > .blocks-editable p {
-	font-size: 24px;
-	font-style: italic;
+.wp-block-quote {
+	margin: 0 0 16px;
+	box-shadow: inset 0px 0px 0px 0px $light-gray-500;
+
+	footer {
+		color: $dark-gray-100;
+		margin-top: 1em;
+		position: relative;
+		font-size: $default-font-size;
+		font-style: normal;
+	}
+
+
+	&.blocks-quote-style-1 {
+		border-left: 4px solid $black;
+		padding-left: 1em;
+	}
+
+	&.blocks-quote-style-2 {
+		padding: 0 1em;
+		p {
+			font-size: 24px;
+			font-style: italic;
+			line-height: 1.6;
+		}
+		footer {
+			font-size: 19px;
+			text-align: right;
+		}
+	}
 }

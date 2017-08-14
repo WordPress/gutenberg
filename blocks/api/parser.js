@@ -2,44 +2,88 @@
  * External dependencies
  */
 import { parse as hpqParse } from 'hpq';
-import { pickBy } from 'lodash';
-
-/**
- * WordPress dependencies
- */
-import { bumpStat } from '@wordpress/utils';
+import { mapValues, reduce, pickBy } from 'lodash';
 
 /**
  * Internal dependencies
  */
 import { parse as grammarParse } from './post.pegjs';
-import { getBlockType, getUnknownTypeHandler } from './registration';
+import { getBlockType, getUnknownTypeHandlerName } from './registration';
 import { createBlock } from './factory';
 import { isValidBlock } from './validation';
 
 /**
+ * Returns true if the provided function is a valid attribute source, or false
+ * otherwise.
+ *
+ * Sources are implemented as functions receiving a DOM node to select data
+ * from. Using the DOM is incidental and we shouldn't guarantee a contract that
+ * this be provided, else block implementers may feel inclined to use the node.
+ * Instead, sources are intended as a generic interface to query data from any
+ * tree shape. Here we pick only sources which include an internal flag.
+ *
+ * @param  {Function} source Function to test
+ * @return {Boolean}         Whether function is an attribute source
+ */
+export function isValidSource( source ) {
+	return !! source && '_wpBlocksKnownSource' in source;
+}
+
+/**
  * Returns the block attributes parsed from raw content.
  *
- * @param  {String} rawContent    Raw block content
- * @param  {Object} attributes    Block attribute matchers
- * @return {Object}               Block attributes
+ * @param  {String} rawContent Raw block content
+ * @param  {Object} schema     Block attribute schema
+ * @return {Object}            Block attribute values
  */
-export function parseBlockAttributes( rawContent, attributes ) {
-	if ( 'function' === typeof attributes ) {
-		return attributes( rawContent );
-	} else if ( attributes ) {
-		// Matchers are implemented as functions that receive a DOM node from
-		// which to select data. Use of the DOM is incidental and we shouldn't
-		// guarantee a contract that this be provided, else block implementers
-		// may feel compelled to use the node. Instead, matchers are intended
-		// as a generic interface to query data from any tree shape. Here we
-		// pick only matchers which include an internal flag.
-		const knownMatchers = pickBy( attributes, '_wpBlocksKnownMatcher' );
+export function getSourcedAttributes( rawContent, schema ) {
+	const sources = mapValues(
+		// Parse only sources with source defined
+		pickBy( schema, ( attributeSchema ) => isValidSource( attributeSchema.source ) ),
 
-		return hpqParse( rawContent, knownMatchers );
+		// Transform to object where source is value
+		( attributeSchema ) => attributeSchema.source
+	);
+
+	return hpqParse( rawContent, sources );
+}
+
+/**
+ * Returns value coerced to the specified JSON schema type string
+ *
+ * @see http://json-schema.org/latest/json-schema-validation.html#rfc.section.6.25
+ *
+ * @param  {*}      value Original value
+ * @param  {String} type  Type to coerce
+ * @return {*}            Coerced value
+ */
+export function asType( value, type ) {
+	switch ( type ) {
+		case 'string':
+			return String( value );
+
+		case 'boolean':
+			return Boolean( value );
+
+		case 'object':
+			return Object( value );
+
+		case 'null':
+			return null;
+
+		case 'array':
+			if ( Array.isArray( value ) ) {
+				return value;
+			}
+
+			return Array.from( value );
+
+		case 'integer':
+		case 'number':
+			return Number( value );
 	}
 
-	return {};
+	return value;
 }
 
 /**
@@ -51,18 +95,57 @@ export function parseBlockAttributes( rawContent, attributes ) {
  * @return {Object}                All block attributes
  */
 export function getBlockAttributes( blockType, rawContent, attributes ) {
-	// Merge any attributes present in comment delimiters with those
-	// that are specified in the block implementation.
-	attributes = attributes || {};
-	if ( blockType ) {
-		attributes = {
-			...blockType.defaultAttributes,
-			...attributes,
-			...parseBlockAttributes( rawContent, blockType.attributes ),
-		};
-	}
+	// Retrieve additional attributes sourced from content
+	const sourcedAttributes = getSourcedAttributes(
+		rawContent,
+		blockType.attributes
+	);
 
-	return attributes;
+	return reduce( blockType.attributes, ( result, source, key ) => {
+		let value;
+		if ( sourcedAttributes.hasOwnProperty( key ) ) {
+			value = sourcedAttributes[ key ];
+		} else if ( attributes ) {
+			value = attributes[ key ];
+		}
+
+		// Return default if attribute value not assigned
+		if ( undefined === value ) {
+			// Nest the condition so that constructor coercion never occurs if
+			// value is undefined and block type doesn't specify default value
+			if ( 'default' in source ) {
+				value = source.default;
+			} else {
+				return result;
+			}
+		}
+
+		// Coerce value to specified type
+		const coercedValue = asType( value, source.type );
+
+		if ( 'development' === process.env.NODE_ENV &&
+				! sourcedAttributes.hasOwnProperty( key ) &&
+				value !== coercedValue ) {
+			// Only in case of sourcing attribute from content do we want to
+			// allow coercion, as comment attributes are serialized respecting
+			// original data type. In development environments, log if value
+			// coerced to specified type is not strictly equal. We still allow
+			// coerced value to be assigned into attributes to avoid errors.
+			//
+			// Example:
+			//   Number( 5 ) === 5
+			//   Number( '5' ) !== '5'
+
+			// eslint-disable-next-line no-console
+			console.error(
+				`Expected attribute "${ key }" of type ${ source.type } for ` +
+				`block type "${ blockType.name }" but received ${ typeof value }.`
+			);
+		}
+
+		result[ key ] = coercedValue;
+		return result;
+	}, {} );
 }
 
 /**
@@ -75,18 +158,17 @@ export function getBlockAttributes( blockType, rawContent, attributes ) {
  */
 export function createBlockWithFallback( name, rawContent, attributes ) {
 	// Use type from block content, otherwise find unknown handler.
-	name = name || getUnknownTypeHandler();
+	name = name || getUnknownTypeHandlerName();
 
 	// Convert 'core/text' blocks in existing content to the new
 	// 'core/paragraph'.
 	if ( name === 'core/text' ) {
-		bumpStat( 'block_auto_convert', 'core-text-to-paragraph' );
 		name = 'core/paragraph';
 	}
 
 	// Try finding type for known block name, else fall back again.
 	let blockType = getBlockType( name );
-	const fallbackBlock = getUnknownTypeHandler();
+	const fallbackBlock = getUnknownTypeHandlerName();
 	if ( ! blockType ) {
 		name = fallbackBlock;
 		blockType = getBlockType( name );

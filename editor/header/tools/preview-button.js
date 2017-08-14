@@ -17,6 +17,8 @@ import {
 	getEditedPostPreviewLink,
 	getEditedPostAttribute,
 	isEditedPostDirty,
+	isEditedPostNew,
+	isEditedPostSaveable,
 } from '../../selectors';
 import { autosave } from '../../actions';
 
@@ -51,8 +53,9 @@ export class PreviewButton extends Component {
 	}
 
 	saveForPreview( event ) {
-		// Let default link behavior occur if no changes to be saved
-		if ( ! this.props.isDirty ) {
+		const { isDirty, isNew } = this.props;
+		// Let default link behavior occur if no changes to saved post
+		if ( ! isDirty && ! isNew ) {
 			return;
 		}
 
@@ -73,7 +76,7 @@ export class PreviewButton extends Component {
 	}
 
 	render() {
-		const { link } = this.props;
+		const { link, isSaveable } = this.props;
 
 		return (
 			<IconButton
@@ -81,6 +84,7 @@ export class PreviewButton extends Component {
 				onClick={ this.saveForPreview }
 				target={ this.getWindowTarget() }
 				icon="visibility"
+				disabled={ ! isSaveable }
 			>
 				{ _x( 'Preview', 'imperative verb' ) }
 			</IconButton>
@@ -93,6 +97,8 @@ export default connect(
 		postId: state.currentPost.id,
 		link: getEditedPostPreviewLink( state ),
 		isDirty: isEditedPostDirty( state ),
+		isNew: isEditedPostNew( state ),
+		isSaveable: isEditedPostSaveable( state ),
 		modified: getEditedPostAttribute( state, 'modified' ),
 	} ),
 	{ autosave }

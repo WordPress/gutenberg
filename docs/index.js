@@ -52,9 +52,9 @@ addStory( {
 
 addStory( {
 	parents: [ 'reference' ],
-	name: 'attribute-matchers',
-	title: 'Attribute Matchers',
-	markdown: require( './attribute-matchers.md' ),
+	name: 'attribute-sources',
+	title: 'Attribute Sources',
+	markdown: require( './attribute-sources.md' ),
 } );
 
 addStory( {
@@ -90,4 +90,31 @@ addStory( {
 	name: 'faq',
 	title: 'Frequently Asked Questions',
 	markdown: require( './faq.md' ),
+} );
+
+addStory( {
+	name: 'outreach',
+	title: 'Outreach',
+	markdown: require( './outreach.md' ),
+} );
+
+addStory( {
+	parents: [ 'outreach' ],
+	name: 'articles',
+	title: 'Articles',
+	markdown: require( './articles.md' ),
+} );
+
+addStory( {
+	parents: [ 'outreach' ],
+	name: 'meetups',
+	title: 'Meetups',
+	markdown: require( './talks.md' ),
+} );
+
+addStory( {
+	parents: [ 'outreach' ],
+	name: 'talks',
+	title: 'Talks',
+	markdown: require( './talks.md' ),
 } );

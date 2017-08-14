@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import './block.scss';
+import './style.scss';
 import { registerBlockType, createBlock } from '../../api';
 
 registerBlockType( 'core/separator', {
@@ -15,6 +15,8 @@ registerBlockType( 'core/separator', {
 	icon: 'minus',
 
 	category: 'layout',
+
+	keywords: [ __( 'horizontal-line' ), 'hr', __( 'divider' ) ],
 
 	transforms: {
 		from: [

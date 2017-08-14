@@ -13,15 +13,15 @@ body.gutenberg_page_gutenberg-demo {
 	#wpfooter {
 		display: none;
 	}
+
+	svg {
+		fill: currentColor;
+	}
 }
 
 .gutenberg {
 	* {
 		box-sizing: border-box;
-	}
-
-	svg {
-		fill: currentColor;
 	}
 
 	ul {

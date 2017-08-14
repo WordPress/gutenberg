@@ -1,31 +1,39 @@
 /**
+ * External dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
+import './editor.scss';
 import './style.scss';
-import './block.scss';
-import { registerBlockType, query as hpq } from '../../api';
+import { registerBlockType, source } from '../../api';
 import TableBlock from './table-block';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
-const { children } = hpq;
+const { children } = source;
 
 registerBlockType( 'core/table', {
-	title: wp.i18n.__( 'Table' ),
+	title: __( 'Table' ),
 	icon: 'editor-table',
 	category: 'formatting',
 
 	attributes: {
-		content: children( 'table' ),
-	},
-
-	defaultAttributes: {
-		content: [
-			<tbody key="1">
-				<tr><td><br /></td><td><br /></td></tr>
-				<tr><td><br /></td><td><br /></td></tr>
-			</tbody>,
-		],
+		content: {
+			type: 'array',
+			source: children( 'table' ),
+			default: [
+				<tbody key="1">
+					<tr><td><br /></td><td><br /></td></tr>
+					<tr><td><br /></td><td><br /></td></tr>
+				</tbody>,
+			],
+		},
+		align: {
+			type: 'string',
+		},
 	},
 
 	getEditWrapperProps( attributes ) {
@@ -61,9 +69,9 @@ registerBlockType( 'core/table', {
 	},
 
 	save( { attributes } ) {
-		const { content } = attributes;
+		const { content, align } = attributes;
 		return (
-			<table>
+			<table className={ align ? `align${ align }` : null }>
 				{ content }
 			</table>
 		);

@@ -56,14 +56,14 @@
 		}
 	}
 
-	&.is-invalid .editor-visual-editor__block-edit {
+	&.has-warning .editor-visual-editor__block-edit {
 		position: relative;
 		min-height: 250px;
 		pointer-events: none;
 		user-select: none;
 	}
 
-	&.is-invalid .editor-visual-editor__block-edit::after {
+	&.has-warning .editor-visual-editor__block-edit::after {
 		content: '';
 		position: absolute;
 		top: 0;
@@ -84,7 +84,7 @@
 	}
 
 	&.is-showing-mobile-controls {
-		.editor-visual-editor__block-controls > :not( .editor-visual-editor__mobile-tools ) {
+		.editor-visual-editor__group > :not( .editor-visual-editor__mobile-tools ) {
 			display: none;
 		}
 		.editor-visual-editor__mobile-tools {
@@ -315,6 +315,25 @@
 	}
 }
 
+.editor-visual-editor__group {
+	display: inline-flex;
+	box-shadow: $shadow-toolbar;
+	width: 100%;
+	background: $white;
+	border-top: 1px solid $light-gray-500;
+	border-bottom: 1px solid $light-gray-500;
+
+	> div,
+	> ul {
+		margin-top: -1px;
+		margin-bottom: -1px;
+	}
+
+	@include break-small() {
+		width: auto;
+	}
+}
+
 $sticky-bottom-offset: 20px;
 .editor-visual-editor__block-controls + div {
 	// prevent collapsing margins between block and toolbar, matches the 20px bottom offset
@@ -327,11 +346,8 @@ $sticky-bottom-offset: 20px;
 
 	&.editor-visual-editor__mobile-tools {
 		margin-left: auto;
-	}
-
-	// Larger viewports
-	@include break-small() {
-		margin-right: $item-spacing;
+		margin-top: -1px;
+		margin-bottom: -1px;
 	}
 }
 
@@ -453,8 +469,8 @@ $sticky-bottom-offset: 20px;
 	}
 }
 
-.editor-visual-editor__invalid-block-warning {
-	z-index: z-index( '.editor-visual-editor__invalid-block-warning' );
+.editor-visual-editor__block-warning {
+	z-index: z-index( '.editor-visual-editor__block-warning' );
 	position: absolute;
 	top: 50%;
 	left: 50%;
@@ -464,7 +480,7 @@ $sticky-bottom-offset: 20px;
 	justify-content: space-around;
 	align-items: center;
 	width: 96%;
-	max-width: 360px;
+	max-width: 380px;
 	padding: 20px 20px 10px 20px;
 	background-color: $white;
 	border: 1px solid $light-gray-500;
@@ -476,5 +492,9 @@ $sticky-bottom-offset: 20px;
 		width: 100%;
 		font-family: $default-font;
 		font-size: $default-font-size;
+	}
+
+	.button + .button {
+		margin-left: $item-spacing;
 	}
 }

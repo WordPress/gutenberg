@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -7,8 +12,8 @@ import { concatChildren } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import './block.scss';
-import { registerBlockType, query as hpq } from '../../api';
+import './style.scss';
+import { registerBlockType, source } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
@@ -18,7 +23,7 @@ import InspectorControls from '../../inspector-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
 import BlockDescription from '../../block-description';
 
-const { children, query } = hpq;
+const { children, query } = source;
 
 registerBlockType( 'core/cover-text', {
 	title: __( 'Cover Text' ),
@@ -27,8 +32,32 @@ registerBlockType( 'core/cover-text', {
 
 	category: 'formatting',
 
+	keywords: [ __( 'colors' ) ],
+
 	attributes: {
-		content: query( 'p', children() ),
+		align: {
+			type: 'string',
+		},
+		width: {
+			type: 'string',
+		},
+		content: {
+			type: 'array',
+			source: query( 'p', children() ),
+		},
+		dropCap: {
+			type: 'boolean',
+			default: false,
+		},
+		placeholder: {
+			type: 'string',
+		},
+		textColor: {
+			type: 'string',
+		},
+		backgroundColor: {
+			type: 'string',
+		},
 	},
 
 	getEditWrapperProps( attributes ) {
@@ -75,17 +104,26 @@ registerBlockType( 'core/cover-text', {
 					/>
 					<h3>{ __( 'Background Color' ) }</h3>
 					<ColorPalette
-						color={ backgroundColor }
+						value={ backgroundColor }
 						onChange={ ( colorValue ) => setAttributes( { backgroundColor: colorValue.hex } ) }
 					/>
 					<h3>{ __( 'Text Color' ) }</h3>
 					<ColorPalette
-						color={ textColor }
+						value={ textColor }
 						onChange={ ( colorValue ) => setAttributes( { textColor: colorValue.hex } ) }
 					/>
 				</InspectorControls>
 			),
-			<div className={ `${ className } align${ width }` } style={ { backgroundColor: backgroundColor, color: textColor } } key="block">
+			<div
+				key="block"
+				className={ classnames( className, {
+					[ `align${ width }` ]: width,
+				} ) }
+				style={ {
+					backgroundColor: backgroundColor,
+					color: textColor,
+				} }
+			>
 				<Editable
 					tagName="p"
 					value={ content }
@@ -98,7 +136,7 @@ registerBlockType( 'core/cover-text', {
 					onFocus={ setFocus }
 					onMerge={ mergeBlocks }
 					style={ { textAlign: align } }
-					className={ dropCap && 'has-drop-cap' }
+					className={ dropCap ? 'has-drop-cap' : null }
 					placeholder={ placeholder || __( 'New Paragraph' ) }
 				/>
 			</div>,
@@ -106,13 +144,22 @@ registerBlockType( 'core/cover-text', {
 	},
 
 	save( { attributes } ) {
-		const { align, content, dropCap, backgroundColor, textColor } = attributes;
-		const className = dropCap && 'has-drop-cap';
+		const { width, align, content, dropCap, backgroundColor, textColor } = attributes;
+		const className = dropCap ? 'has-drop-cap' : null;
+		const wrapperClassName = width ? `align${ width }` : null;
 
 		if ( ! align ) {
-			return <div style={ { backgroundColor: backgroundColor, color: textColor } }><p className={ className }>{ content }</p></div>;
+			return (
+				<div className={ wrapperClassName } style={ { backgroundColor: backgroundColor, color: textColor } }>
+					<p className={ className }>{ content }</p>
+				</div>
+			);
 		}
 
-		return <div style={ { backgroundColor: backgroundColor, color: textColor } }><p style={ { textAlign: align } } className={ className }>{ content }</p></div>;
+		return (
+			<div className={ wrapperClassName } style={ { backgroundColor: backgroundColor, color: textColor } }>
+				<p style={ { textAlign: align } } className={ className }>{ content }</p>
+			</div>
+		);
 	},
 } );

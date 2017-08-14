@@ -55,6 +55,18 @@ export default class Editable extends Component {
 	constructor( props ) {
 		super( ...arguments );
 
+		const { value } = props;
+		if ( 'production' !== process.env.NODE_ENV && undefined !== value &&
+					! Array.isArray( value ) ) {
+			// eslint-disable-next-line no-console
+			console.error(
+				`Invalid value of type ${ typeof value } passed to Editable ` +
+				'(expected array). Attribute values should be sourced using ' +
+				'the `children` source when used with Editable.\n\n' +
+				'See: http://gutenberg-devdoc.surge.sh/reference/attribute-sources/#children'
+			);
+		}
+
 		this.onInit = this.onInit.bind( this );
 		this.getSettings = this.getSettings.bind( this );
 		this.onSetup = this.onSetup.bind( this );
@@ -71,7 +83,7 @@ export default class Editable extends Component {
 
 		this.state = {
 			formats: {},
-			empty: ! props.value || ! props.value.length,
+			empty: ! value || ! value.length,
 			selectedNodeId: 0,
 		};
 	}

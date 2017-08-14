@@ -35,9 +35,7 @@ You may observe that these conventions adhere closely to the [BEM (Blocks, Eleme
 
 The build process will split SCSS from within the blocks library directory into two separate CSS files when Webpack runs.
 
-Styles placed in a block.scss file will be built into `blocks/build/style.css`, to load on the front end theme as well as in the editor.
-
-All other SCSS files will be built into `blocks/build/edit-blocks.css`, to load **only in the editor**.
+Styles placed in a `style.scss` file will be built into `blocks/build/style.css`, to load on the front end theme as well as in the editor. If you need additional styles specific to the block's display in the editor, add them to an `editor.scss`.
 
 Examples of styles that appear in both the theme and the editor include gallery columns and drop caps.
 

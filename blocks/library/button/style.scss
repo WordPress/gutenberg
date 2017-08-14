@@ -1,24 +1,34 @@
 $blocks-button__height: 46px;
 
-.editor-visual-editor__block[data-type="core/button"] {
-	&[data-align="center"] {
-		text-align: center;
-	}
-
-	&[data-align="right"] {
-		text-align: right;
-	}
-}
-
 .wp-block-button {
-	.blocks-format-toolbar__link-modal {
-		z-index: 2;
-		top: $blocks-button__height + 2px;
-		left: 50%;
-		transform: translateX( -50% );
+	font-family: $default-font;
+	display: inline-block;
+	text-decoration: none;
+	font-size: $big-font-size;
+	margin: 0;
+	padding: 0 24px;
+	height: $blocks-button__height;
+	line-height: $blocks-button__height;
+	cursor: default;
+	border-radius: $blocks-button__height / 2;
+	white-space: nowrap;
+	background: $blue-medium-400;
+	color: $white;
+	vertical-align: top;
+	position: relative;
+
+	a {
+		box-shadow: none !important;
+		color: $white;
+		cursor: pointer;
+		text-decoration: none !important;
 	}
 
-	.blocks-link-url__suggestions {
-		right: -35px;
+	&:hover {
+		color: $white;
+	}
+
+	&.aligncenter {
+		display: inline-block;
 	}
 }

@@ -13,13 +13,15 @@ import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
 import { Children, Component } from '@wordpress/element';
 import { IconButton, Toolbar } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
-import { getBlockType, getBlockDefaultClassname } from '@wordpress/blocks';
+import { getBlockType, getBlockDefaultClassname, createBlock } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import InvalidBlockWarning from './invalid-block-warning';
+import BlockCrashWarning from './block-crash-warning';
+import BlockCrashBoundary from './block-crash-boundary';
 import BlockMover from '../../block-mover';
 import BlockRightMenu from '../../block-settings-menu';
 import BlockSwitcher from '../../block-switcher';
@@ -33,6 +35,7 @@ import {
 	startTyping,
 	stopTyping,
 	replaceBlocks,
+	selectBlock,
 } from '../../actions';
 import {
 	getPreviousBlock,
@@ -48,7 +51,7 @@ import {
 	getMultiSelectedBlockUids,
 } from '../../selectors';
 
-const { BACKSPACE, ESCAPE, DELETE, UP, DOWN, LEFT, RIGHT } = keycodes;
+const { BACKSPACE, ESCAPE, DELETE, UP, DOWN, LEFT, RIGHT, ENTER } = keycodes;
 
 function FirstChild( { children } ) {
 	const childrenArray = Children.toArray( children );
@@ -58,9 +61,7 @@ function FirstChild( { children } ) {
 class VisualEditorBlock extends Component {
 	constructor() {
 		super( ...arguments );
-		this.state = {
-			showMobileControls: false,
-		};
+
 		this.bindBlockNode = this.bindBlockNode.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
 		this.maybeHover = this.maybeHover.bind( this );
@@ -74,7 +75,14 @@ class VisualEditorBlock extends Component {
 		this.onKeyUp = this.onKeyUp.bind( this );
 		this.handleArrowKey = this.handleArrowKey.bind( this );
 		this.toggleMobileControls = this.toggleMobileControls.bind( this );
+		this.onBlockError = this.onBlockError.bind( this );
+
 		this.previousOffset = null;
+
+		this.state = {
+			showMobileControls: false,
+			error: null,
+		};
 	}
 
 	componentDidMount() {
@@ -242,13 +250,21 @@ class VisualEditorBlock extends Component {
 	}
 
 	onKeyDown( event ) {
-		const { keyCode } = event;
+		const { keyCode, target } = event;
 
 		this.handleArrowKey( event );
 
 		if ( keyCode === UP || keyCode === LEFT || keyCode === DOWN || keyCode === RIGHT ) {
 			const selection = window.getSelection();
 			this.lastRange = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+		}
+
+		if ( ENTER === keyCode && target === this.node ) {
+			event.preventDefault();
+
+			this.props.onInsertBlocksAfter( [
+				createBlock( 'core/paragraph' ),
+			] );
 		}
 	}
 
@@ -305,6 +321,10 @@ class VisualEditorBlock extends Component {
 		} );
 	}
 
+	onBlockError( error ) {
+		this.setState( { error } );
+	}
+
 	render() {
 		const { block, multiSelectedBlockUids } = this.props;
 		const { name: blockName, isValid } = block;
@@ -330,9 +350,9 @@ class VisualEditorBlock extends Component {
 		// Generate the wrapper class names handling the different states of the block.
 		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected, focus } = this.props;
 		const showUI = isSelected && ( ! this.props.isTyping || focus.collapsed === false );
-		const { showMobileControls } = this.state;
+		const { error, showMobileControls } = this.state;
 		const wrapperClassname = classnames( 'editor-visual-editor__block', {
-			'is-invalid': ! isValid,
+			'has-warning': ! isValid || !! error,
 			'is-selected': showUI,
 			'is-multi-selected': isMultiSelected,
 			'is-hovered': isHovered,
@@ -380,19 +400,21 @@ class VisualEditorBlock extends Component {
 						component={ FirstChild }
 					>
 						<div className="editor-visual-editor__block-controls">
-							<BlockSwitcher uid={ block.uid } />
-							<Slot name="Formatting.Toolbar" />
-							<Toolbar className="editor-visual-editor__mobile-tools">
-								{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
-								{ ( showUI || isHovered ) && <BlockRightMenu uid={ block.uid } /> }
-								<IconButton
-									className="editor-visual-editor__mobile-toggle"
-									onClick={ this.toggleMobileControls }
-									aria-expanded={ showMobileControls }
-									label={ __( 'Toggle extra controls' ) }
-									icon="ellipsis"
-								/>
-							</Toolbar>
+							<div className="editor-visual-editor__group">
+								<BlockSwitcher uid={ block.uid } />
+								<Slot name="Formatting.Toolbar" />
+								<Toolbar className="editor-visual-editor__mobile-tools">
+									{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
+									{ ( showUI || isHovered ) && <BlockRightMenu uid={ block.uid } /> }
+									<IconButton
+										className="editor-visual-editor__mobile-toggle"
+										onClick={ this.toggleMobileControls }
+										aria-expanded={ showMobileControls }
+										label={ __( 'Toggle extra controls' ) }
+										icon="ellipsis"
+									/>
+								</Toolbar>
+							</div>
 						</div>
 					</CSSTransitionGroup>
 				}
@@ -406,18 +428,20 @@ class VisualEditorBlock extends Component {
 					onTouchStart={ this.onPointerDown }
 					className="editor-visual-editor__block-edit"
 				>
-					{ isValid && (
-						<BlockEdit
-							focus={ focus }
-							attributes={ block.attributes }
-							setAttributes={ this.setAttributes }
-							insertBlocksAfter={ onInsertBlocksAfter }
-							onReplace={ onReplace }
-							setFocus={ partial( onFocus, block.uid ) }
-							mergeBlocks={ this.mergeBlocks }
-							className={ className }
-							id={ block.uid }
-						/>
+					{ isValid && ! error && (
+						<BlockCrashBoundary onError={ this.onBlockError }>
+							<BlockEdit
+								focus={ focus }
+								attributes={ block.attributes }
+								setAttributes={ this.setAttributes }
+								insertBlocksAfter={ onInsertBlocksAfter }
+								onReplace={ onReplace }
+								setFocus={ partial( onFocus, block.uid ) }
+								mergeBlocks={ this.mergeBlocks }
+								className={ className }
+								id={ block.uid }
+							/>
+						</BlockCrashBoundary>
 					) }
 					{ ! isValid && (
 						blockType.save( {
@@ -426,7 +450,8 @@ class VisualEditorBlock extends Component {
 						} )
 					) }
 				</div>
-				{ ! isValid && <InvalidBlockWarning /> }
+				{ !! error && <BlockCrashWarning /> }
+				{ ! isValid && <InvalidBlockWarning block={ block } /> }
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
@@ -455,11 +480,7 @@ export default connect(
 		},
 
 		onSelect() {
-			dispatch( {
-				type: 'TOGGLE_BLOCK_SELECTED',
-				selected: true,
-				uid: ownProps.uid,
-			} );
+			dispatch( selectBlock( ownProps.uid ) );
 		},
 		onDeselect() {
 			dispatch( clearSelectedBlock() );

@@ -1,0 +1,19 @@
+[
+    {
+        "uid": "_uid_0",
+        "name": "core/text-columns",
+        "isValid": true,
+        "attributes": {
+            "content": [
+                [
+                    "One"
+                ],
+                [
+                    "Two"
+                ]
+            ],
+            "columns": 2,
+            "width": "center"
+        }
+    }
+]

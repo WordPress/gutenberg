@@ -12,12 +12,12 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import './style.scss';
-import { registerBlockType, query as hpq, createBlock } from '../../api';
+import './editor.scss';
+import { registerBlockType, source, createBlock } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 
-const { children, prop } = hpq;
+const { children, prop } = source;
 
 const fromBrDelimitedContent = ( content ) => {
 	if ( undefined === content ) {
@@ -45,6 +45,11 @@ const toBrDelimitedContent = ( values ) => {
 	}
 	const content = [];
 	values.forEach( function( li, liIndex, listItems ) {
+		if ( typeof li === 'string' ) {
+			content.push( li );
+			return;
+		}
+
 		Children.toArray( li.props.children ).forEach( function( element, elementIndex, liChildren ) {
 			if ( 'ul' === element.type || 'ol' === element.type ) { // lists within lists
 				// we know we've just finished processing a list item, so break the text
@@ -72,15 +77,19 @@ registerBlockType( 'core/list', {
 	title: __( 'List' ),
 	icon: 'editor-ul',
 	category: 'common',
+	keywords: [ __( 'bullet list' ), __( 'ordered list' ), __( 'numbered list' ) ],
 
 	attributes: {
-		nodeName: prop( 'ol,ul', 'nodeName' ),
-		values: children( 'ol,ul' ),
-	},
-
-	defaultAttributes: {
-		nodeName: 'UL',
-		values: [],
+		nodeName: {
+			type: 'string',
+			source: prop( 'ol,ul', 'nodeName' ),
+			default: 'UL',
+		},
+		values: {
+			type: 'array',
+			source: children( 'ol,ul' ),
+			default: [],
+		},
 	},
 
 	className: false,
@@ -113,7 +122,7 @@ registerBlockType( 'core/list', {
 			},
 			{
 				type: 'raw',
-				matcher: ( node ) => node.nodeName === 'OL' || node.nodeName === 'UL',
+				source: ( node ) => node.nodeName === 'OL' || node.nodeName === 'UL',
 				attributes: {
 					nodeName: prop( 'ol,ul', 'nodeName' ),
 					values: children( 'ol,ul' ),
@@ -155,7 +164,7 @@ registerBlockType( 'core/list', {
 				blocks: [ 'core/quote' ],
 				transform: ( { values } ) => {
 					return createBlock( 'core/quote', {
-						value: toBrDelimitedContent( values ),
+						value: [ <p key="list">{ toBrDelimitedContent( values ) }</p> ],
 					} );
 				},
 			},

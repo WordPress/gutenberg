@@ -2,12 +2,12 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, uniqueId, debounce } from 'lodash';
+import { get, uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { serialize, getBlockType, switchToBlockType } from '@wordpress/blocks';
+import { parse, getBlockType, switchToBlockType } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -15,25 +15,30 @@ import { __ } from '@wordpress/i18n';
  */
 import { getGutenbergURL, getWPAdminURL } from './utils/url';
 import {
+	resetPost,
+	setupNewPost,
+	resetBlocks,
 	focusBlock,
 	replaceBlocks,
 	createSuccessNotice,
 	createErrorNotice,
-	autosave,
-	queueAutosave,
+	removeNotice,
 	savePost,
 	editPost,
 } from './actions';
 import {
 	getCurrentPost,
 	getCurrentPostType,
-	getBlocks,
+	getEditedPostContent,
 	getPostEdits,
 	isCurrentPostPublished,
 	isEditedPostDirty,
 	isEditedPostNew,
 	isEditedPostSaveable,
 } from './selectors';
+
+const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
+const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
 
 export default {
 	REQUEST_POST_UPDATE( action, store ) {
@@ -43,20 +48,17 @@ export default {
 		const edits = getPostEdits( state );
 		const toSend = {
 			...edits,
-			content: serialize( getBlocks( state ) ),
+			content: getEditedPostContent( state ),
 			id: post.id,
 		};
 		const transactionId = uniqueId();
 
 		dispatch( {
-			type: 'CLEAR_POST_EDITS',
-			optimist: { type: BEGIN, id: transactionId },
-		} );
-		dispatch( {
 			type: 'UPDATE_POST',
 			edits: toSend,
-			optimist: { id: transactionId },
+			optimist: { type: BEGIN, id: transactionId },
 		} );
+		dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
 		const Model = wp.api.getPostTypeModel( getCurrentPostType( state ) );
 		new Model( toSend ).save().done( ( newPost ) => {
 			dispatch( {
@@ -90,7 +92,7 @@ export default {
 		const isPublished = publishStatus.indexOf( previousPost.status ) !== -1;
 		const messages = {
 			publish: __( 'Post published!' ),
-			'private': __( 'Post published privately!' ),
+			private: __( 'Post published privately!' ),
 			future: __( 'Post scheduled!' ),
 		};
 
@@ -105,8 +107,9 @@ export default {
 				<p>
 					<span>{ noticeMessage }</span>
 					{ ' ' }
-					<a href={ post.link } target="_blank">{ __( 'View post' ) }</a>
-				</p>
+					<a href={ post.link }>{ __( 'View post' ) }</a>
+				</p>,
+				{ id: SAVE_POST_NOTICE_ID }
 			) );
 		}
 
@@ -130,18 +133,19 @@ export default {
 		// Unless we publish an "updating failed" message
 		const messages = {
 			publish: __( 'Publishing failed' ),
-			'private': __( 'Publishing failed' ),
+			private: __( 'Publishing failed' ),
 			future: __( 'Scheduling failed' ),
 		};
 		const noticeMessage = ! isPublished && publishStatus.indexOf( edits.status ) !== -1
 			? messages[ edits.status ]
 			: __( 'Updating failed' );
-		dispatch( createErrorNotice( noticeMessage ) );
+		dispatch( createErrorNotice( noticeMessage, { id: SAVE_POST_NOTICE_ID } ) );
 	},
 	TRASH_POST( action, store ) {
 		const { dispatch, getState } = store;
 		const { postId } = action;
 		const Model = wp.api.getPostTypeModel( getCurrentPostType( getState() ) );
+		dispatch( removeNotice( TRASH_POST_NOTICE_ID ) );
 		new Model( { id: postId } ).destroy().then(
 			() => {
 				dispatch( {
@@ -175,7 +179,7 @@ export default {
 	},
 	TRASH_POST_FAILURE( action, store ) {
 		const message = action.error.message && action.error.code !== 'unknown_error' ? action.error.message : __( 'Trashing failed' );
-		store.dispatch( createErrorNotice( message ) );
+		store.dispatch( createErrorNotice( message, { id: TRASH_POST_NOTICE_ID } ) );
 	},
 	MERGE_BLOCKS( action, store ) {
 		const { dispatch } = store;
@@ -223,7 +227,11 @@ export default {
 	AUTOSAVE( action, store ) {
 		const { getState, dispatch } = store;
 		const state = getState();
-		if ( ! isEditedPostSaveable( state ) || ! isEditedPostDirty( state ) ) {
+		if ( ! isEditedPostSaveable( state ) ) {
+			return;
+		}
+
+		if ( ! isEditedPostNew( state ) && ! isEditedPostDirty( state ) ) {
 			return;
 		}
 
@@ -243,15 +251,26 @@ export default {
 
 		dispatch( savePost() );
 	},
-	QUEUE_AUTOSAVE: debounce( ( action, store ) => {
-		store.dispatch( autosave() );
-	}, 10000 ),
-	UPDATE_BLOCK_ATTRIBUTES: () => queueAutosave(),
-	INSERT_BLOCKS: () => queueAutosave(),
-	MOVE_BLOCKS_DOWN: () => queueAutosave(),
-	MOVE_BLOCKS_UP: () => queueAutosave(),
-	REPLACE_BLOCKS: () => queueAutosave(),
-	REMOVE_BLOCKS: () => queueAutosave(),
-	EDIT_POST: () => queueAutosave(),
-	MARK_DIRTY: () => queueAutosave(),
+	SET_INITIAL_POST( action ) {
+		const { post } = action;
+		const effects = [];
+
+		// Parse content as blocks
+		if ( post.content.raw ) {
+			effects.push( resetBlocks( parse( post.content.raw ) ) );
+		}
+
+		// Resetting post should occur after blocks have been reset, since it's
+		// the post reset that restarts history (used in dirty detection).
+		effects.push( resetPost( post ) );
+
+		// Include auto draft title in edits while not flagging post as dirty
+		if ( post.status === 'auto-draft' ) {
+			effects.push( setupNewPost( {
+				title: post.title.raw,
+			} ) );
+		}
+
+		return effects;
+	},
 };
