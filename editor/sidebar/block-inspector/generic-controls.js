@@ -16,11 +16,17 @@ import { __ } from '@wordpress/i18n';
 import { updateBlockAttributes } from '../../actions';
 import { getSelectedBlock } from '../../selectors';
 
-class BlockInspectorClassName extends Component {
+/**
+ * Internal constants
+ */
+const ANCHOR_REGEX = /[^\w:.-]/g;
+
+class BlockInspectorGenericControls extends Component {
 	constructor() {
 		super( ...arguments );
 
 		this.setClassName = this.setClassName.bind( this );
+		this.setAnchor = this.setAnchor.bind( this );
 	}
 
 	setClassName( className ) {
@@ -28,20 +34,33 @@ class BlockInspectorClassName extends Component {
 		setAttributes( selectedBlock.uid, { className } );
 	}
 
+	setAnchor( anchor ) {
+		const { selectedBlock, setAttributes } = this.props;
+		setAttributes( selectedBlock.uid, { anchor: anchor.replace( ANCHOR_REGEX, '-' ) } );
+	}
+
 	render() {
 		const { selectedBlock } = this.props;
 		const blockType = getBlockType( selectedBlock.name );
-		if ( false === blockType.className ) {
+		if ( false === blockType.className && ! blockType.supportAnchor ) {
 			return null;
 		}
 
 		return (
 			<div>
 				<h3>{ __( 'Block Settings' ) }</h3>
-				<InspectorControls.TextControl
-					label={ __( 'Additional CSS Class' ) }
-					value={ selectedBlock.attributes.className }
-					onChange={ this.setClassName } />
+				{ blockType.className &&
+					<InspectorControls.TextControl
+						label={ __( 'Additional CSS Class' ) }
+						value={ selectedBlock.attributes.className || '' }
+						onChange={ this.setClassName } />
+				}
+				{ blockType.supportAnchor &&
+					<InspectorControls.TextControl
+						label={ __( 'Anchor' ) }
+						value={ selectedBlock.attributes.anchor || '' }
+						onChange={ this.setAnchor } />
+				}
 			</div>
 		);
 	}
@@ -56,4 +75,4 @@ export default connect(
 	{
 		setAttributes: updateBlockAttributes,
 	}
-)( BlockInspectorClassName );
+)( BlockInspectorGenericControls );
