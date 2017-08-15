@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isUndefined } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -41,28 +36,28 @@ const FORMATTING_CONTROLS = [
 const DEFAULT_CONTROLS = [ 'bold', 'italic', 'strikethrough', 'link' ];
 
 class FormatToolbar extends Component {
-	constructor( props ) {
+	constructor() {
 		super( ...arguments );
+
 		this.state = {
-			linkValue: props.formats.link ? props.formats.link.value : '',
+			isAddingLink: false,
 			isEditingLink: false,
+			newLinkValue: '',
 		};
+
 		this.addLink = this.addLink.bind( this );
 		this.editLink = this.editLink.bind( this );
 		this.dropLink = this.dropLink.bind( this );
 		this.submitLink = this.submitLink.bind( this );
-		this.updateLinkValue = this.updateLinkValue.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
+		this.onChangeLinkValue = this.onChangeLinkValue.bind( this );
 	}
 
 	componentDidMount() {
 		document.addEventListener( 'keydown', this.onKeyDown );
 	}
 
-	componentWillUnmout() {
-		if ( this.editTimeout ) {
-			clearTimeout( this.editTimeout );
-		}
+	componentWillUnmount() {
 		document.removeEventListener( 'keydown', this.onKeyDown );
 	}
 
@@ -76,19 +71,17 @@ class FormatToolbar extends Component {
 	}
 
 	componentWillReceiveProps( nextProps ) {
-		// Update the link value if the focused link node changes
-		if (
-			isUndefined( nextProps.formats.link ) !== isUndefined( this.props.formats.link ) ||
-			(
-				nextProps.formats.link && this.props.formats.link &&
-				nextProps.formats.link.node !== this.props.formats.link.node
-			)
-		) {
+		if ( this.props.selectedNodeId !== nextProps.selectedNodeId ) {
 			this.setState( {
-				linkValue: nextProps.formats.link ? nextProps.formats.link.value : '',
+				isAddingLink: false,
 				isEditingLink: false,
+				newLinkValue: '',
 			} );
 		}
+	}
+
+	onChangeLinkValue( value ) {
+		this.setState( { newLinkValue: value } );
 	}
 
 	toggleFormat( format ) {
@@ -100,45 +93,30 @@ class FormatToolbar extends Component {
 	}
 
 	addLink() {
-		if ( ! this.props.formats.link ) {
-			this.props.onChange( { link: { value: '' } } );
-
-			// Debounce the call to avoid the reset in willReceiveProps
-			this.editTimeout = setTimeout( () => this.setState( { isEditingLink: true } ) );
-		}
+		this.setState( { isEditingLink: false, isAddingLink: true, newLinkValue: '' } );
 	}
 
 	dropLink() {
 		this.props.onChange( { link: undefined } );
+		this.setState( { isEditingLink: false, isAddingLink: false, newLinkValue: '' } );
 	}
 
 	editLink( event ) {
 		event.preventDefault();
-		this.setState( {
-			isEditingLink: true,
-		} );
+		this.setState( { isEditingLink: false, isAddingLink: true, newLinkValue: this.props.formats.link.value } );
 	}
 
 	submitLink( event ) {
 		event.preventDefault();
-		this.props.onChange( { link: { value: this.state.linkValue } } );
-		this.setState( {
-			isEditingLink: false,
-		} );
-		if (
-			this.props.formats.link.value === '' &&
-			!! this.state.linkValue.length
-		) {
+		this.props.onChange( { link: { value: this.state.newLinkValue } } );
+		if ( this.state.isAddingLink ) {
 			this.props.speak( __( 'Link inserted.' ), 'assertive' );
 		}
 	}
 
-	updateLinkValue( linkValue ) {
-		this.setState( { linkValue } );
-	}
-
 	render() {
 		const { formats, focusPosition, enabledControls = DEFAULT_CONTROLS } = this.props;
+		const { isAddingLink, isEditingLink, newLinkValue } = this.state;
 		const linkStyle = focusPosition
 			? { position: 'absolute', ...focusPosition }
 			: null;
@@ -156,7 +134,7 @@ class FormatToolbar extends Component {
 				icon: 'admin-links',
 				title: __( 'Link' ),
 				onClick: this.addLink,
-				isActive: !! formats.link,
+				isActive: isAddingLink || !! formats.link,
 			} );
 		}
 
@@ -164,25 +142,25 @@ class FormatToolbar extends Component {
 			<div className="blocks-format-toolbar">
 				<Toolbar controls={ toolbarControls } />
 
-				{ !! formats.link && this.state.isEditingLink &&
+				{ ( isAddingLink || isEditingLink ) &&
 					<form
 						className="blocks-format-toolbar__link-modal"
 						style={ linkStyle }
 						onSubmit={ this.submitLink }>
-						<UrlInput value={ this.state.linkValue } onChange={ this.updateLinkValue } />
+						<UrlInput value={ newLinkValue } onChange={ this.onChangeLinkValue } />
 						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
 						<IconButton icon="editor-unlink" label={ __( 'Remove link' ) } onClick={ this.dropLink } />
 					</form>
 				}
 
-				{ !! formats.link && ! this.state.isEditingLink &&
+				{ !! formats.link && ! isAddingLink && ! isEditingLink &&
 					<div className="blocks-format-toolbar__link-modal" style={ linkStyle }>
 						<a
 							className="blocks-format-toolbar__link-value"
-							href={ this.state.linkValue }
+							href={ formats.link.value }
 							target="_blank"
 						>
-							{ this.state.linkValue && decodeURI( this.state.linkValue ) }
+							{ formats.link.value && decodeURI( formats.link.value ) }
 						</a>
 						<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ this.editLink } />
 						<IconButton icon="editor-unlink" label={ __( 'Remove link' ) } onClick={ this.dropLink } />
