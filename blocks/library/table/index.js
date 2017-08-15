@@ -12,6 +12,8 @@ import { registerBlockType, source } from '../../api';
 import TableBlock from './table-block';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
+import InspectorControls from '../../inspector-controls';
+import BlockDescription from '../../block-description';
 
 const { children } = source;
 
@@ -63,6 +65,13 @@ registerBlockType( 'core/table', {
 						onChange={ updateAlignment }
 					/>
 				</BlockControls>
+			),
+			focus && (
+				<InspectorControls key="inspector">
+					<BlockDescription>
+						<p>{ __( 'Tables. Best used for tabular data.' ) }</p>
+					</BlockDescription>
+				</InspectorControls>
 			),
 			<TableBlock
 				key="editor"
