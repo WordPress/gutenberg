@@ -19,7 +19,7 @@ import { getSelectedBlock } from '../../selectors';
 /**
  * Internal constants
  */
-const ANCHOR_REGEX = /[^\w:.-]/g;
+const ANCHOR_REGEX = /[\s#]/g;
 
 class BlockInspectorGenericControls extends Component {
 	constructor() {
