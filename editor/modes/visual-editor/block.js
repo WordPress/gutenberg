@@ -134,8 +134,9 @@ class VisualEditorBlock extends Component {
 			const prevFocusToolbar = prevProps.focus && prevProps.focus.toolbar;
 			if ( this.props.focus.toolbar ) {
 				if ( ! prevFocusToolbar ) {
+					// we want the first toolbar item that is focusable but not in the default tab cycle
 					const block = findDOMNode( this.node );
-					const item = block.querySelector( '.components-toolbar button, .components-toolbar *[tabindex]' );
+					const item = block.querySelector( '.components-toolbar *[tabindex="-1"]:not(:disabled)' );
 					if ( item ) {
 						item.focus();
 					}
@@ -341,13 +342,15 @@ class VisualEditorBlock extends Component {
 		event.preventDefault();
 		event.stopPropagation();
 
-		if ( allCycle.length > 1 ) {
-			const nextToolbar = ( targetIndex + 1 >= allCycle.length ) ? allCycle[ 0 ] : allCycle[ targetIndex + 1 ];
+		// try all toolbars after this one to find the first with a focusable item
+		for ( let i = 1; i < allCycle.length; i++ ) {
+			const nextToolbar = allCycle[ ( targetIndex + i ) % allCycle.length ];
 
-			const firstFocusableItem = nextToolbar.querySelector( 'button, *[tabindex]' );
+			const firstFocusableItem = nextToolbar.querySelector( '*[tabindex="-1"]:not(:disabled)' );
 
 			if ( firstFocusableItem ) {
 				firstFocusableItem.focus();
+				break;
 			}
 		}
 	}
@@ -364,7 +367,7 @@ class VisualEditorBlock extends Component {
 		const settingsMenu = filter( [ block.querySelector( '.editor-block-settings-menu' ) ], isVisible );
 		const moverMenu = filter( [ block.querySelector( '.editor-block-mover' ) ], isVisible );
 		const allCycle = flatMap( [ ...allToolbars, ...settingsMenu, ...moverMenu ], ( toolbar ) => {
-			return filter( Array.from( toolbar.querySelectorAll( 'button, *[tabindex]' ) ) );
+			return filter( Array.from( toolbar.querySelectorAll( '*[tabindex="-1"]:not(:disabled)' ) ) );
 		} );
 
 		if ( ! forward ) {
