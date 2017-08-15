@@ -24,10 +24,10 @@
 		}
 
 		// Alas, IE11+ doesn't support object-fit
-		/*_:-ms-lang(x), img {
+		_:-ms-lang(x), img {
 			height: auto;
 			width: auto;
-		}*/
+		}
 	}
 
 	&.columns-1 figure {
