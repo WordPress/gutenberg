@@ -13,6 +13,7 @@ import {
 	find,
 	defer,
 	noop,
+	throttle,
 } from 'lodash';
 import { nodeListToReact } from 'dom-react';
 import { Fill } from 'react-slot-fill';
@@ -80,6 +81,7 @@ export default class Editable extends Component {
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.maybePropagateUndo = this.maybePropagateUndo.bind( this );
 		this.onPastePostProcess = this.onPastePostProcess.bind( this );
+		this.onChangeThrottled = throttle( this.onChange, 500, { leading: true } );
 
 		this.state = {
 			formats: {},
@@ -107,6 +109,7 @@ export default class Editable extends Component {
 		editor.on( 'selectionChange', this.onSelectionChange );
 		editor.on( 'BeforeExecCommand', this.maybePropagateUndo );
 		editor.on( 'PastePostProcess', this.onPastePostProcess );
+		editor.on( 'Change', this.onChangeThrottled );
 
 		patterns.apply( this, [ editor ] );
 
