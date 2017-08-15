@@ -13,7 +13,7 @@ function BaseControl( { id, label, help, className, children } ) {
 		<div className={ classnames( 'blocks-base-control', className ) }>
 			{ label && <label className="blocks-base-control__label" htmlFor={ id }>{ label }</label> }
 			{ children }
-			{ !! help && <p className="blocks-base-control__help">{ help }</p> }
+			{ !! help && <p id={ id + '__help' } className="blocks-base-control__help">{ help }</p> }
 		</div>
 	);
 }

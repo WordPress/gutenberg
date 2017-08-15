@@ -14,7 +14,7 @@ import { __ } from '@wordpress/i18n';
  */
 import './style.scss';
 
-function FormToggle( { className, checked, id, onChange = noop, showHint = true } ) {
+function FormToggle( { className, checked, id, onChange = noop, showHint = true, ...props } ) {
 	const wrapperClasses = classnames(
 		'components-form-toggle',
 		className,
@@ -29,6 +29,7 @@ function FormToggle( { className, checked, id, onChange = noop, showHint = true 
 				type="checkbox"
 				checked={ checked }
 				onChange={ onChange }
+				{ ...props }
 			/>
 			<span className="components-form-toggle__track"></span>
 			<span className="components-form-toggle__thumb"></span>
