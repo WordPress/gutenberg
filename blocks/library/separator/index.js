@@ -35,12 +35,12 @@ registerBlockType( 'core/separator', {
 		],
 	},
 
-	edit( { className, focus } ) {
+	edit( { focus, className } ) {
 		return [
 			focus && (
 				<InspectorControls key="inspector">
 					<BlockDescription>
-						<p>{ __( 'The separator represents a paragraph-level thematic break, e.g. a scene change in a story, or a transition to another topic within an article.' ) }</p>
+						<p>{ __( 'Use the separator to indicate a thematic change in the content.' ) }</p>
 					</BlockDescription>
 				</InspectorControls>
 			),
