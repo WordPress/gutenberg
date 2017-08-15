@@ -16,6 +16,7 @@ import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import ColorPalette from '../../color-palette';
 import InspectorControls from '../../inspector-controls';
+import BlockDescription from '../../block-description';
 
 const { attr, children } = source;
 
@@ -89,6 +90,9 @@ registerBlockType( 'core/button', {
 				}
 				{ focus &&
 					<InspectorControls key="inspector">
+						<BlockDescription>
+							<p>{ __( 'A nice little button. Call something out with it.' ) }</p>
+						</BlockDescription>
 						<ColorPalette
 							value={ color }
 							onChange={ ( colorValue ) => setAttributes( { color: colorValue } ) }
