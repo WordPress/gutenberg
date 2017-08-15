@@ -59,27 +59,7 @@ function FirstChild( { children } ) {
 	return childrenArray[ 0 ] || null;
 }
 
-function isVerticalEdge( { editor, reverse } ) {
-	const rangeRect = editor.selection.getBoundingClientRect();
-	const buffer = rangeRect.height / 2;
-	const editableRect = editor.getBody().getBoundingClientRect();
-
-	isVerticalEdge.firstRect = isVerticalEdge.firstRect || rangeRect;
-
-	// Too low.
-	if ( reverse && rangeRect.top - buffer > editableRect.top ) {
-		return false;
-	}
-
-	// Too high.
-	if ( ! reverse && rangeRect.bottom + buffer < editableRect.bottom ) {
-		return false;
-	}
-
-	return true;
-}
-
-function isHorizontalEdge( { editor, reverse } ) {
+function isEdge( { editor, reverse } ) {
 	const position = reverse ? 'start' : 'end';
 	const order = reverse ? 'first' : 'last';
 	const range = editor.selection.getRng();
@@ -323,9 +303,6 @@ class VisualEditorBlock extends Component {
 	}
 
 	onPointerDown( event ) {
-		// Discard the arrow key position.
-		delete isVerticalEdge.firstRect;
-
 		// Not the main button (usually the left button on pointer device).
 		if ( event.buttons !== 1 ) {
 			return;
@@ -358,9 +335,7 @@ class VisualEditorBlock extends Component {
 
 			if ( editor ) {
 				const reverse = up || left;
-				const horizontal = left || right;
 				const followingBlock = reverse ? previousBlock : nextBlock;
-				const isEdge = horizontal ? isHorizontalEdge : isVerticalEdge;
 
 				if ( ! isEdge( { editor, reverse } ) ) {
 					return;
@@ -380,28 +355,13 @@ class VisualEditorBlock extends Component {
 
 				followingEditor.focus();
 
-				if ( horizontal ) {
-					if ( reverse ) {
-						followingEditor.selection.select( followingEditor.getBody(), true );
-						followingEditor.selection.collapse( false );
-					}
+				if ( reverse ) {
+					followingEditor.selection.select( followingEditor.getBody(), true );
+					followingEditor.selection.collapse( false );
 				} else {
-					const rect = isVerticalEdge.firstRect;
-
-					window.setTimeout( () => {
-						const buffer = rect.height / 2;
-						const editorRect = followingEditor.getBody().getBoundingClientRect();
-						const y = reverse ? editorRect.bottom - buffer : editorRect.top + buffer;
-
-						followingEditor.selection.placeCaretAt( rect.left, y );
-					} );
+					followingEditor.selection.setCursorLocation();
 				}
 			}
-		}
-
-		if ( ! up && ! down ) {
-			// Discard the arrow key position if any other key is pressed.
-			delete isVerticalEdge.firstRect;
 		}
 
 		if ( ENTER === keyCode && target === this.node ) {
