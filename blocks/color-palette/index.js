@@ -68,8 +68,9 @@ class ColorPalette extends Component {
 				</div>
 
 				<div className="blocks-color-palette__item-wrapper blocks-color-palette__clear-color">
-					<div className="blocks-color-palette__clear-color-line" />
-					<button className="blocks-color-palette__item" onClick={ () => onChange( undefined ) } />
+					<button className="blocks-color-palette__item" onClick={ () => onChange( undefined ) }>
+						<div className="blocks-color-palette__clear-color-line" />
+					</button>
 				</div>
 			</div>
 		);
