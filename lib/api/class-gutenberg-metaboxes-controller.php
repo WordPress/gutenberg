@@ -9,18 +9,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );
 }
 
-__local_log( 'load gutenberg', substr( __FILE__, strlen( ABSPATH ) ) );
-
-add_action( 'init', function() {
-	__local_log( 'init' );
-} );
-add_action( 'plugins_loaded', function() {
-	__local_log( 'plugins_loaded' );
-} );
-add_action( 'rest_api_init', function() {
-	__local_log( 'rest_api_init' );
-} );
-
 /**
  * Controller class for metaboxes API endpoint.
  */
