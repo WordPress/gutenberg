@@ -81,6 +81,28 @@ registerBlockType( 'core/latest-posts', {
 				.then( latestPosts => this.setState( { latestPosts } ) );
 
 			this.toggleDisplayPostDate = this.toggleDisplayPostDate.bind( this );
+
+			this.decodeEntities = this.decodeEntities.bind( this );
+		}
+
+		decodeEntities( html ) {
+			// not a string, or no entities to decode
+			if ( 'string' !== typeof html || -1 === html.indexOf( '&' ) ) {
+				return html;
+			}
+			// create a textarea for decoding entities, and that we can reuse
+			if ( undefined === this._decodeTextArea ) {
+				if ( document.implementation && document.implementation.createHTMLDocument ) {
+					this._decodeTextArea = document.implementation.createHTMLDocument( '' ).createElement( 'textarea' );
+				} else {
+					this._decodeTextArea = document.createElement( 'textarea' );
+				}
+			}
+
+			this._decodeTextArea.innerHTML = html;
+			const decoded = this._decodeTextArea.textContent;
+			this._decodeTextArea.innerHTML = '';
+			return decoded;
 		}
 
 		toggleDisplayPostDate() {
@@ -203,7 +225,7 @@ registerBlockType( 'core/latest-posts', {
 				>
 					{ latestPosts.map( ( post, i ) =>
 						<li key={ i }>
-							<a href={ post.link } target="_blank" dangerouslySetInnerHTML={ { __html: post.title.rendered.trim() || __( '(Untitled)' ) } } />
+							<a href={ post.link } target="_blank">{ this.decodeEntities( post.title.rendered.trim() ) || __( '(Untitled)' ) }</a>
 							{ displayPostDate && post.date_gmt &&
 								<time dateTime={ moment( post.date_gmt ).utc().format() } className={ `${ this.props.className }__post-date` }>
 									{ moment( post.date_gmt ).local().format( 'MMMM DD, Y' ) }
