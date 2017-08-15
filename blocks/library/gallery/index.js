@@ -74,11 +74,6 @@ registerBlockType( 'core/gallery', {
 		}
 	},
 
-	focusable( attributes ) {
-		const { images = [] } = attributes;
-		return images.length === 0;
-	},
-
 	edit( { attributes, setAttributes, focus, className } ) {
 		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
 		const setLinkTo = ( value ) => setAttributes( { linkTo: value } );
@@ -106,6 +101,7 @@ registerBlockType( 'core/gallery', {
 									buttonProps={ {
 										className: 'components-icon-button components-toolbar__control',
 										'aria-label': __( 'Edit Gallery' ),
+										tabIndex: -1,
 									} }
 									onSelect={ onSelectImages }
 									type="image"

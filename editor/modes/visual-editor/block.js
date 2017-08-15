@@ -15,6 +15,7 @@ import { IconButton, Toolbar } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
 import { getBlockType, getBlockDefaultClassname, createBlock } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
+import queryFirstTabbable from 'ally.js/esm/query/first-tabbable';
 
 /**
  * Internal dependencies
@@ -68,6 +69,17 @@ function selectAncestor( node, selector ) {
 	return null;
 }
 
+function queryFirstTabbableChild( elem ) {
+	let i = 0;
+	for ( i = 0; i < elem.childNodes.length; i++ ) {
+		const tabbableNode = queryFirstTabbable( { context: elem.childNodes[ i ] } );
+		if ( tabbableNode ) {
+			return tabbableNode;
+		}
+	}
+	return null;
+}
+
 function isToolbar( target ) {
 	return selectAncestor( target, '.components-toolbar, .editor-block-settings-menu, .editor-block-mover' ) !== null;
 }
@@ -94,9 +106,22 @@ class VisualEditorBlock extends Component {
 		this.previousOffset = null;
 
 		this.state = {
+			focusableBorder: true,
 			showMobileControls: false,
 			error: null,
 		};
+	}
+
+	updateBlockBorderInFocusCycle() {
+		if ( ! this.node ) {
+			return;
+		}
+		const block = findDOMNode( this.node );
+		const nextTabItem = queryFirstTabbableChild( block );
+		const needsFocusableBorder = nextTabItem === null;
+		if ( this.state.focusableBorder !== needsFocusableBorder ) {
+			this.setState( { focusableBorder: needsFocusableBorder } );
+		}
 	}
 
 	componentDidMount() {
@@ -107,6 +132,7 @@ class VisualEditorBlock extends Component {
 		if ( this.props.isTyping ) {
 			document.addEventListener( 'mousemove', this.stopTypingOnMouseMove );
 		}
+		this.updateBlockBorderInFocusCycle();
 	}
 
 	componentWillReceiveProps( newProps ) {
@@ -154,6 +180,7 @@ class VisualEditorBlock extends Component {
 				this.removeStopTypingListener();
 			}
 		}
+		this.updateBlockBorderInFocusCycle();
 	}
 
 	componentWillUnmount() {
@@ -469,7 +496,7 @@ class VisualEditorBlock extends Component {
 		// Generate the wrapper class names handling the different states of the block.
 		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected, focus } = this.props;
 		const showUI = isSelected && ( ! this.props.isTyping || focus.collapsed === false );
-		const { error, showMobileControls } = this.state;
+		const { error, showMobileControls, focusableBorder } = this.state;
 		const wrapperClassname = classnames( 'editor-visual-editor__block', {
 			'has-warning': ! isValid || !! error,
 			'is-selected': showUI,
@@ -490,10 +517,6 @@ class VisualEditorBlock extends Component {
 		let { className = getBlockDefaultClassname( block.name ) } = blockType;
 		className = classnames( className, block.attributes.className );
 
-		// determine if a block can be focused without help - if not then we must
-		// make the surrounding div focusable so the toolbar can be displayed
-		const focusable = blockType.focusable( block.attributes );
-
 		// Disable reason: Each block can be selected by clicking on it
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
@@ -507,7 +530,7 @@ class VisualEditorBlock extends Component {
 				onMouseLeave={ onMouseLeave }
 				className={ wrapperClassname }
 				data-type={ block.name }
-				tabIndex={ ! focusable ? 0 : null }
+				tabIndex={ focusableBorder ? 0 : null }
 				aria-label={ blockLabel }
 				{ ...wrapperProps }
 			>

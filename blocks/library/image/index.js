@@ -94,10 +94,6 @@ registerBlockType( 'core/image', {
 		}
 	},
 
-	focusable( { url, caption } ) {
-		return ! url || ( caption && caption.length > 0 );
-	},
-
 	edit: withEditorSettings()( ( { attributes, setAttributes, focus, setFocus, className, settings } ) => {
 		const { url, alt, caption, align, id, href, width, height } = attributes;
 		const updateAlt = ( newAlt ) => setAttributes( { alt: newAlt } );
