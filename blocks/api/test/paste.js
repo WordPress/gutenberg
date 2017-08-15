@@ -83,6 +83,12 @@ describe( 'paste', () => {
 		setUnknownTypeHandlerName( 'test/unknown' );
 	} );
 
+	afterAll( () => {
+		unregisterBlockType( 'test/small' );
+		unregisterBlockType( 'test/unknown' );
+		setUnknownTypeHandlerName( undefined );
+	} );
+
 	it( 'should convert recognised pasted content', () => {
 		const pastedBlock = paste( createNodes( '<small>test</small>' ) )[ 0 ];
 		const block = createBlock( 'test/small', { content: [ 'test' ] } );
@@ -96,11 +102,5 @@ describe( 'paste', () => {
 
 		equal( pastedBlock.name, 'test/unknown' );
 		equal( pastedBlock.attributes.content, '<big>test</big>' );
-	} );
-
-	afterAll( () => {
-		unregisterBlockType( 'test/small' );
-		unregisterBlockType( 'test/unknown' );
-		setUnknownTypeHandlerName( undefined );
 	} );
 } );
