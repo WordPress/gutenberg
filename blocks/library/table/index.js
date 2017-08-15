@@ -59,19 +59,19 @@ registerBlockType( 'core/table', {
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		return [
 			focus && (
+				<InspectorControls key="inspector">
+					<BlockDescription>
+						<p>{ __( 'Tables. Best used for tabular data.' ) }</p>
+					</BlockDescription>
+				</InspectorControls>
+			),
+			focus && (
 				<BlockControls key="toolbar">
 					<BlockAlignmentToolbar
 						value={ attributes.align }
 						onChange={ updateAlignment }
 					/>
 				</BlockControls>
-			),
-			focus && (
-				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'Tables. Best used for tabular data.' ) }</p>
-					</BlockDescription>
-				</InspectorControls>
 			),
 			<TableBlock
 				key="editor"
