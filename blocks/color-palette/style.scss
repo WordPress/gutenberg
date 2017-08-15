@@ -30,12 +30,21 @@ $color-palette-circle-spacing: 14px;
 	cursor: pointer;
 
 	&.is-active {
-		box-shadow: inset 0 0 0 3px;
+		box-shadow: inset 0 0 0 4px;
 	}
 
 	&:focus {
-		border: 2px solid #222;
 		outline: none;
+		&::after {
+			content: '';
+			border: 1px solid #444;
+			width: 30px;
+			height: 30px;
+			position: absolute;
+			top: -2px;
+			left: -2px;
+			border-radius: 50%;
+		}
 	}
 }
 
