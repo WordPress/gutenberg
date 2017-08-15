@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
@@ -30,9 +35,10 @@ class PanelBody extends Component {
 		const { title, children } = this.props;
 		const { opened } = this.state;
 		const icon = `arrow-${ opened ? 'down' : 'right' }`;
+		const className = classnames( 'components-panel__body', { 'is-opened': opened } );
 
 		return (
-			<div className="components-panel__body">
+			<div className={ className }>
 				{ !! title && (
 					<h3 className="components-panel__body-title">
 						<Button
