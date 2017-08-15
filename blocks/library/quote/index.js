@@ -18,7 +18,7 @@ import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
 import Editable from '../../editable';
 
-const { children, node, query } = source;
+const { children, node: element, query } = source;
 
 registerBlockType( 'core/quote', {
 	title: __( 'Quote' ),
@@ -28,7 +28,7 @@ registerBlockType( 'core/quote', {
 	attributes: {
 		value: {
 			type: 'array',
-			source: query( 'blockquote > p', node() ),
+			source: query( 'blockquote > p', element() ),
 			default: [],
 		},
 		citation: {
@@ -78,6 +78,10 @@ registerBlockType( 'core/quote', {
 						],
 					} );
 				},
+			},
+			{
+				type: 'raw',
+				isMatch: ( node ) => node.nodeName === 'BLOCKQUOTE',
 			},
 		],
 		to: [

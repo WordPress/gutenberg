@@ -34,6 +34,16 @@ registerBlockType( 'core/preformatted', {
 				transform: ( attributes ) =>
 					createBlock( 'core/preformatted', attributes ),
 			},
+			{
+				type: 'raw',
+				isMatch: ( node ) => (
+					node.nodeName === 'PRE' &&
+					! (
+						node.children === 1 &&
+						node.firstChild.nodeName === 'CODE'
+					)
+				),
+			},
 		],
 		to: [
 			{
