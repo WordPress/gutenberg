@@ -17,4 +17,11 @@ describe( 'addQueryArgs', () => {
 
 		expect( addQueryArgs( url, args ) ).toBe( 'https://andalouses.com/beach?night=false&sun=true&sand=false' );
 	} );
+
+	test( 'should update args to an URL with conflicting query string', () => {
+		const url = 'https://andalouses.com/beach?night=false&sun=false&sand=true';
+		const args = { sun: 'true', sand: 'false' };
+
+		expect( addQueryArgs( url, args ) ).toBe( 'https://andalouses.com/beach?night=false&sun=true&sand=false' );
+	} );
 } );
