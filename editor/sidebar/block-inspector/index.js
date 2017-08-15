@@ -14,7 +14,7 @@ import { Panel, PanelBody } from '@wordpress/components';
  * Internal Dependencies
  */
 import './style.scss';
-import BlockInspectorGenericControls from './generic-controls';
+import BlockInspectorAdvancedControls from './advanced-controls';
 import { getSelectedBlock } from '../../selectors';
 
 const BlockInspector = ( { selectedBlock } ) => {
@@ -26,7 +26,7 @@ const BlockInspector = ( { selectedBlock } ) => {
 		<Panel>
 			<PanelBody>
 				<Slot name="Inspector.Controls" />
-				<BlockInspectorGenericControls />
+				<BlockInspectorAdvancedControls />
 			</PanelBody>
 		</Panel>
 	);

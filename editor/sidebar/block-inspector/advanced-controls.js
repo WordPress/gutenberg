@@ -21,7 +21,7 @@ import { getSelectedBlock } from '../../selectors';
  */
 const ANCHOR_REGEX = /[\s#]/g;
 
-class BlockInspectorGenericControls extends Component {
+class BlockInspectorAdvancedControls extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -76,4 +76,4 @@ export default connect(
 	{
 		setAttributes: updateBlockAttributes,
 	}
-)( BlockInspectorGenericControls );
+)( BlockInspectorAdvancedControls );

@@ -50,7 +50,7 @@ export function getSaveContent( blockType, attributes ) {
 	}
 
 	// Adding a generic classname
-	const addGenericAttributes = ( element ) => {
+	const addAdvancedAttributes = ( element ) => {
 		if ( ! element || ! isObject( element ) ) {
 			return element;
 		}
@@ -71,7 +71,7 @@ export function getSaveContent( blockType, attributes ) {
 
 		return cloneElement( element, extraProps );
 	};
-	const contentWithClassname = Children.map( rawContent, addGenericAttributes );
+	const contentWithClassname = Children.map( rawContent, addAdvancedAttributes );
 
 	// Otherwise, infer as element
 	return renderToString( contentWithClassname );
