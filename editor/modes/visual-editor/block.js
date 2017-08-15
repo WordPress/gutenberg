@@ -75,7 +75,7 @@ function isEdge( { editor, reverse } ) {
 		return false;
 	}
 
-	if ( ! reverse && offset !== node.data.length ) {
+	if ( ! reverse && offset !== node.textContent.length ) {
 		return false;
 	}
 
