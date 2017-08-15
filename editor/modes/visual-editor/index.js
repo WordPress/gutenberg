@@ -17,6 +17,7 @@ import { KeyboardShortcuts } from '@wordpress/components';
 import './style.scss';
 import VisualEditorBlockList from './block-list';
 import PostTitle from '../../post-title';
+import WritingFlow from '../../writing-flow';
 import { getBlockUids, getMultiSelectedBlockUids } from '../../selectors';
 import { clearSelectedBlock, multiSelect, redo, undo, removeBlocks } from '../../actions';
 
@@ -98,8 +99,10 @@ class VisualEditor extends Component {
 					backspace: this.deleteSelectedBlocks,
 					del: this.deleteSelectedBlocks,
 				} } />
-				<PostTitle />
-				<VisualEditorBlockList ref={ this.bindBlocksContainer } />
+				<WritingFlow>
+					<PostTitle />
+					<VisualEditorBlockList ref={ this.bindBlocksContainer } />
+				</WritingFlow>
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */

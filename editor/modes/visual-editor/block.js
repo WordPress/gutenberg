@@ -256,7 +256,6 @@ class VisualEditorBlock extends Component {
 
 	onKeyDown( event ) {
 		const { keyCode, target } = event;
-
 		if ( ENTER === keyCode && target === this.node ) {
 			event.preventDefault();
 
