@@ -37,12 +37,12 @@ $color-palette-circle-spacing: 14px;
 		outline: none;
 		&::after {
 			content: '';
-			border: 1px solid #444;
-			width: 30px;
-			height: 30px;
+			border: 1px solid $dark-gray-400;
+			width: 32px;
+			height: 32px;
 			position: absolute;
-			top: -2px;
-			left: -2px;
+			top: -3px;
+			left: -3px;
 			border-radius: 50%;
 		}
 	}
