@@ -1,16 +1,20 @@
 $color-palette-circle-size: 28px;
 $color-palette-circle-spacing: 14px;
 
+.blocks-color-palette {
+	margin-right: -14px;
+}
+
 .blocks-color-palette__item-wrapper {
 	display: inline-block;
 	height: $color-palette-circle-size;
 	width: $color-palette-circle-size;
 	margin-right: $color-palette-circle-spacing;
 	margin-bottom: $color-palette-circle-spacing;
-	transform: scale(1);
+	transform: scale( 1 );
 	transition: 100ms transform ease;
 	&:hover {
-		transform: scale(1.2);
+		transform: scale( 1.2 );
 	}
 }
 
@@ -21,7 +25,7 @@ $color-palette-circle-spacing: 14px;
 	border: none;
 	border-radius: 50%;
 	background: transparent;
-	box-shadow: inset 0 0 0 ($color-palette-circle-size / 2);
+	box-shadow: inset 0 0 0 ( $color-palette-circle-size / 2 );
 	transition: 100ms box-shadow ease;
 	cursor: pointer;
 
