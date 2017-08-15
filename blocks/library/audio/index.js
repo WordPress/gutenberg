@@ -17,6 +17,8 @@ import { registerBlockType, source } from '../../api';
 import MediaUploadButton from '../../media-upload-button';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
+import InspectorControls from '../../inspector-controls';
+import BlockDescription from '../../block-description';
 
 const { attr } = source;
 
@@ -80,33 +82,40 @@ registerBlockType( 'core/audio', {
 				}
 				return false;
 			};
-			const controls = (
-				focus && (
-					<BlockControls key="controls">
-						<BlockAlignmentToolbar
-							value={ align }
-							onChange={ updateAlignment }
-						/>
-						<Toolbar>
-							<li>
-								<Button
-									buttonProps={ {
-										className: 'components-icon-button components-toolbar__control',
-										'aria-label': __( 'Edit audio' ),
-									} }
-									type="audio"
-									onClick={ switchToEditing }
-								>
-									<Dashicon icon="edit" />
-								</Button>
-							</li>
-						</Toolbar>
-					</BlockControls>
-				)
+			const controls = focus && (
+				<BlockControls key="controls">
+					<BlockAlignmentToolbar
+						value={ align }
+						onChange={ updateAlignment }
+					/>
+					<Toolbar>
+						<li>
+							<Button
+								buttonProps={ {
+									className: 'components-icon-button components-toolbar__control',
+									'aria-label': __( 'Edit audio' ),
+								} }
+								type="audio"
+								onClick={ switchToEditing }
+							>
+								<Dashicon icon="edit" />
+							</Button>
+						</li>
+					</Toolbar>
+				</BlockControls>
+			);
+
+			const inspectorControls = focus && (
+				<InspectorControls key="inspector">
+					<BlockDescription>
+						<p>{ __( 'Audio, locally hosted, locally sourced.' ) }</p>
+					</BlockDescription>
+				</InspectorControls>
 			);
 
 			if ( editing ) {
 				return [
+					inspectorControls,
 					<Placeholder
 						key="placeholder"
 						icon="media-audio"
@@ -140,6 +149,7 @@ registerBlockType( 'core/audio', {
 			/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 			return [
 				controls,
+				inspectorControls,
 				<div key="audio">
 					<audio controls="controls" src={ src } />
 				</div>,
