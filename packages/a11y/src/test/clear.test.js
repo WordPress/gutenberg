@@ -15,5 +15,5 @@ describe( 'clear', () => {
 		clear();
 		expect( container1.textContent ).toBe( '' );
 		expect( container2.textContent ).toBe( '' );
-	});
-});
+	} );
+} );

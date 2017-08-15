@@ -12,8 +12,8 @@ describe( 'addContainer', () => {
 			expect( container.getAttribute( 'aria-live' ) ).toBe( 'polite' );
 			expect( container.getAttribute( 'aria-relevant' ) ).toBe( 'additions text' );
 			expect( container.getAttribute( 'aria-atomic' ) ).toBe( 'true' );
-		});
-	});
+		} );
+	} );
 
 	describe( 'with assertive param', () => {
 		it( 'should create an aria-live element with aria-live attr set to assertive', () => {
@@ -26,8 +26,8 @@ describe( 'addContainer', () => {
 			expect( container.getAttribute( 'aria-live' ) ).toBe( 'assertive' );
 			expect( container.getAttribute( 'aria-relevant' ) ).toBe( 'additions text' );
 			expect( container.getAttribute( 'aria-atomic' ) ).toBe( 'true' );
-		});
-	});
+		} );
+	} );
 
 	describe( 'without param', () => {
 		it( 'should default to creating an aria-live element with aria-live attr set to polite', () => {
@@ -40,6 +40,6 @@ describe( 'addContainer', () => {
 			expect( container.getAttribute( 'aria-live' ) ).toBe( 'polite' );
 			expect( container.getAttribute( 'aria-relevant' ) ).toBe( 'additions text' );
 			expect( container.getAttribute( 'aria-atomic' ) ).toBe( 'true' );
-		});
-	});
-});
+		} );
+	} );
+} );
