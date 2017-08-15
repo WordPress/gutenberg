@@ -1,7 +1,12 @@
 .editor-visual-editor__block[data-type="core/pullquote"] {
 	&[data-align="left"],
 	&[data-align="right"] {
-		max-width: 450px;
+		max-width: 400px;
+
+		& .blocks-pullquote__content .blocks-editable__tinymce[data-is-empty="true"]:before,
+		& .blocks-editable p {
+			font-size: 20px;
+		}
 	}
 }
 
