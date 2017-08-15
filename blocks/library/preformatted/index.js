@@ -9,6 +9,8 @@ import { __ } from '@wordpress/i18n';
 import './editor.scss';
 import { registerBlockType, createBlock, source } from '../../api';
 import Editable from '../../editable';
+import InspectorControls from '../../inspector-controls';
+import BlockDescription from '../../block-description';
 
 const { children } = source;
 
@@ -58,8 +60,16 @@ registerBlockType( 'core/preformatted', {
 	edit( { attributes, setAttributes, focus, setFocus, className } ) {
 		const { content } = attributes;
 
-		return (
+		return [
+			focus && (
+				<InspectorControls key="inspector">
+					<BlockDescription>
+						<p>{ __( 'Preformatted text keeps your spaces, tabs and linebreaks as they are.' ) }</p>
+					</BlockDescription>
+				</InspectorControls>
+			),
 			<Editable
+				key="block"
 				tagName="pre"
 				value={ content }
 				onChange={ ( nextContent ) => {
@@ -71,8 +81,8 @@ registerBlockType( 'core/preformatted', {
 				onFocus={ setFocus }
 				placeholder={ __( 'Write preformatted text…' ) }
 				wrapperClassname={ className }
-			/>
-		);
+			/>,
+		];
 	},
 
 	save( { attributes } ) {
