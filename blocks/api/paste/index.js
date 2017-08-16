@@ -11,12 +11,12 @@ import { getBlockTypes, getUnknownTypeHandlerName } from '../registration';
 import { getBlockAttributes } from '../parser';
 import normaliseBlocks from './normalise-blocks';
 import stripAttributes from './strip-attributes';
-import removeSpans from './remove-spans';
+import stripWrappers from './strip-wrappers';
 
 export default function( nodes ) {
 	const prepare = compose( [
+		stripWrappers,
 		normaliseBlocks,
-		removeSpans,
 		stripAttributes,
 	] );
 
