@@ -47,6 +47,7 @@ const getGalleryDetailsMediaFrame = () => {
 					editing: this.options.editing,
 					menu: 'gallery',
 					displaySettings: false,
+					multiple: true,
 				} ),
 
 				new wp.media.controller.GalleryAdd(),
@@ -62,13 +63,26 @@ const slimImageObject = ( img ) => {
 	return pick( img, attrSet );
 };
 
+const getAttachmentsCollection = ( ids ) => {
+	const attachments = wp.media.query( {
+		order: 'ASC',
+		orderby: 'post__in',
+		perPage: -1,
+		post__in: ids,
+		query: true,
+		type: 'image',
+	} );
+
+	attachments.more();
+	return attachments;
+};
+
 class MediaUpload extends Component {
 	constructor( { multiple = false, type, gallery = false, title = __( 'Select or Upload Media' ), modalClass } ) {
 		super( ...arguments );
 		this.openModal = this.openModal.bind( this );
 		this.onSelect = this.onSelect.bind( this );
 		this.onUpdate = this.onUpdate.bind( this );
-		this.onOpen = this.onOpen.bind( this );
 		this.processMediaCaption = this.processMediaCaption.bind( this );
 		const frameConfig = {
 			title,
@@ -83,11 +97,19 @@ class MediaUpload extends Component {
 		}
 
 		if ( gallery ) {
+			const ids = this.props.value || [];
+			const attachments = getAttachmentsCollection( ids );
+			const currentState = ( this.props.value ) ? 'gallery-edit' : 'gallery';
 			const GalleryDetailsMediaFrame = getGalleryDetailsMediaFrame();
 			this.frame = new GalleryDetailsMediaFrame( {
-				frame: 'select',
 				mimeType: type,
-				state: 'gallery',
+				state: currentState,
+				multiple,
+				selection: new wp.media.model.Selection( attachments.models, {
+					props: attachments.props.toJSON(),
+					multiple: true,
+				} ),
+				editing: ( this.props.value ) ? true : false,
 			} );
 			wp.media.frame = this.frame;
 		} else {
@@ -101,7 +123,6 @@ class MediaUpload extends Component {
 		// When an image is selected in the media frame...
 		this.frame.on( 'select', this.onSelect );
 		this.frame.on( 'update', this.onUpdate );
-		this.frame.on( 'open', this.onOpen );
 	}
 
 	componentWillUnmount() {
@@ -133,25 +154,6 @@ class MediaUpload extends Component {
 				attachment.map( this.processMediaCaption ) :
 				this.processMediaCaption( attachment[ 0 ] )
 		);
-	}
-
-	onOpen() {
-		const selection = this.frame.state().get( 'selection' );
-		const addMedia = ( id ) => {
-			const attachment = wp.media.attachment( id );
-			attachment.fetch();
-			selection.add( attachment );
-		};
-
-		if ( ! this.props.value ) {
-			return;
-		}
-
-		if ( this.props.multiple ) {
-			this.props.value.map( addMedia );
-		} else {
-			addMedia( this.props.value );
-		}
 	}
 
 	openModal() {
