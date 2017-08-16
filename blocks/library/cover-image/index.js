@@ -1,16 +1,21 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { Placeholder, Toolbar, Dashicon } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import classnames from 'classnames';
+import { source } from '@wordpress/block-api';
 
 /**
  * Internal dependencies
  */
 import './editor.scss';
 import './style.scss';
-import { registerBlockType, source } from '../../api';
+import { registerBlockType } from '../../api';
 import Editable from '../../editable';
 import MediaUploadButton from '../../media-upload-button';
 import BlockControls from '../../block-controls';

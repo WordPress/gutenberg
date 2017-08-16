@@ -8,7 +8,8 @@ import Textarea from 'react-autosize-textarea';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { parse } from '@wordpress/blocks';
+import { parse } from '@wordpress/block-api';
+import { withEditorSettings } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -37,7 +38,7 @@ class TextEditor extends Component {
 	onPersist( event ) {
 		const { value } = event.target;
 		if ( value !== this.state.initialValue ) {
-			this.props.onPersist( value );
+			this.props.onPersist( value, this.props.settings );
 
 			this.setState( {
 				initialValue: value,
@@ -90,8 +91,8 @@ export default connect(
 		onChange( content ) {
 			return editPost( { content } );
 		},
-		onPersist( content ) {
-			return resetBlocks( parse( content ) );
+		onPersist( content, settings ) {
+			return resetBlocks( parse( content, settings ) );
 		},
 	}
-)( TextEditor );
+)( withEditorSettings()( TextEditor ) );

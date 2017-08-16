@@ -11,7 +11,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { withFocusReturn, withInstanceId, withSpokenMessages } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
-import { getCategories, getBlockTypes, BlockIcon } from '@wordpress/blocks';
+import { withEditorSettings, BlockIcon } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -60,7 +60,7 @@ export class InserterMenu extends Component {
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
-		const searchResults = this.searchBlocks( getBlockTypes() );
+		const searchResults = this.searchBlocks( this.props.settings.blockTypes );
 		// Announce the blocks search results to screen readers.
 		if ( !! searchResults.length ) {
 			this.props.debouncedSpeak( sprintf( _n(
@@ -108,15 +108,15 @@ export class InserterMenu extends Component {
 	getBlocksForCurrentTab() {
 		// if we're searching, use everything, otherwise just get the blocks visible in this tab
 		if ( this.state.filterValue ) {
-			return getBlockTypes();
+			return this.props.settings.blockTypes;
 		}
 		switch ( this.state.tab ) {
 			case 'recent':
 				return this.props.recentlyUsedBlocks;
 			case 'blocks':
-				return filter( getBlockTypes(), ( block ) => block.category !== 'embed' );
+				return filter( this.props.settings.blockTypes, ( block ) => block.category !== 'embed' );
 			case 'embeds':
-				return filter( getBlockTypes(), ( block ) => block.category === 'embed' );
+				return filter( this.props.settings.blockTypes, ( block ) => block.category === 'embed' );
 		}
 	}
 
@@ -126,7 +126,7 @@ export class InserterMenu extends Component {
 		}
 
 		const getCategoryIndex = ( item ) => {
-			return findIndex( getCategories(), ( category ) => category.slug === item.category );
+			return findIndex( this.props.settings.categories, ( category ) => category.slug === item.category );
 		};
 
 		return sortBy( blockTypes, getCategoryIndex );
@@ -351,7 +351,7 @@ export class InserterMenu extends Component {
 						</div>
 					}
 					{ this.state.tab === 'blocks' && ! isSearching &&
-						getCategories()
+						this.props.settings.categories
 							.map( ( category ) => !! visibleBlocksByCategory[ category.slug ] && (
 								<div key={ category.slug }>
 									<div
@@ -373,7 +373,7 @@ export class InserterMenu extends Component {
 							) )
 					}
 					{ this.state.tab === 'embeds' && ! isSearching &&
-						getCategories()
+						this.props.settings.categories
 							.map( ( category ) => !! visibleBlocksByCategory[ category.slug ] && (
 								<div
 									className="editor-inserter__category-blocks"
@@ -387,7 +387,7 @@ export class InserterMenu extends Component {
 							) )
 					}
 					{ isSearching &&
-						getCategories()
+						this.props.settings.categories
 							.map( ( category ) => !! visibleBlocksByCategory[ category.slug ] && (
 								<div key={ category.slug }>
 									<div
@@ -451,5 +451,6 @@ export default flow(
 	withInstanceId,
 	withSpokenMessages,
 	withFocusReturn,
+	withEditorSettings(),
 	connectComponent
 )( InserterMenu );

@@ -10,6 +10,7 @@ import { includes } from 'lodash';
 import { __, sprintf } from '@wordpress/i18n';
 import { Component, renderToString } from '@wordpress/element';
 import { Button, Placeholder, Spinner, SandBox } from '@wordpress/components';
+import { source, createBlock } from '@wordpress/block-api';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -17,7 +18,7 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import './style.scss';
 import './editor.scss';
-import { registerBlockType, source, createBlock } from '../../api';
+import { registerBlockType } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
@@ -229,7 +230,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 	};
 }
 
-registerBlockType(
+const embedBlockType = registerBlockType(
 	'core/embed',
 	getEmbedBlockSettings( {
 		title: 'Embed',
@@ -241,7 +242,7 @@ registerBlockType(
 					trigger: 'paste',
 					regExp: /^\s*(https?:\/\/\S+)\s*/i,
 					transform: ( { match } ) => {
-						return createBlock( 'core/embed', {
+						return createBlock( embedBlockType, {
 							url: match[ 1 ],
 						} );
 					},

@@ -7,13 +7,14 @@ import { times } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { source } from '@wordpress/block-api';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import './editor.scss';
-import { registerBlockType, source } from '../../api';
+import { registerBlockType } from '../../api';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import RangeControl from '../../inspector-controls/range-control';

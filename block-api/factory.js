@@ -14,19 +14,16 @@ import {
 /**
  * Internal dependencies
  */
-import { getBlockType } from './registration';
+import { getBlockType } from './config';
 
 /**
  * Returns a block object given its type and attributes.
  *
- * @param  {String} name        Block name
+ * @param  {String} blockType   Block type
  * @param  {Object} attributes  Block attributes
  * @return {Object}             Block object
  */
-export function createBlock( name, attributes = {} ) {
-	// Get the type definition associated with a registered block.
-	const blockType = getBlockType( name );
-
+export function createBlock( blockType, attributes = {} ) {
 	// Ensure attributes contains only values defined by block type, and merge
 	// default values for missing attributes.
 	attributes = reduce( blockType.attributes, ( result, source, key ) => {
@@ -44,7 +41,7 @@ export function createBlock( name, attributes = {} ) {
 	// and the block attributes.
 	return {
 		uid: uuid(),
-		name,
+		name: blockType.name,
 		isValid: true,
 		attributes,
 	};
@@ -54,14 +51,15 @@ export function createBlock( name, attributes = {} ) {
  * Switch a block into one or more blocks of the new block type.
  *
  * @param  {Object} block      Block object
- * @param  {string} name       Block name
+ * @param  {String} name       Block name
+ * @param  {Object} config     Block Types config
  * @return {Array}             Block object
  */
-export function switchToBlockType( block, name ) {
+export function switchToBlockType( block, name, config ) {
 	// Find the right transformation by giving priority to the "to"
 	// transformation.
-	const destinationType = getBlockType( name );
-	const sourceType = getBlockType( block.name );
+	const destinationType = getBlockType( name, config );
+	const sourceType = getBlockType( block.name, config );
 	const transformationsFrom = get( destinationType, 'transforms.from', [] );
 	const transformationsTo = get( sourceType, 'transforms.to', [] );
 	const transformation =
@@ -87,9 +85,15 @@ export function switchToBlockType( block, name ) {
 
 	// Ensure that every block object returned by the transformation has a
 	// valid block type.
-	if ( transformationResults.some( ( result ) => ! getBlockType( result.name ) ) ) {
+	if ( transformationResults.some( ( result ) => ! getBlockType( result.name, config ) ) ) {
 		return null;
 	}
+
+	// Pass the results through the createBlockHelper
+	transformationResults = transformationResults.map( ( result ) => {
+		const blockType = getBlockType( result.name, config );
+		return createBlock( blockType, result.attributes );
+	} );
 
 	const firstSwitchedBlock = findIndex( transformationResults, ( result ) => result.name === name );
 

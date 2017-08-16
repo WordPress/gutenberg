@@ -7,7 +7,7 @@ import { get, uniqueId } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { parse, getBlockType, switchToBlockType } from '@wordpress/blocks';
+import { parse, switchToBlockType, getBlockType } from '@wordpress/block-api';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -35,6 +35,7 @@ import {
 	isEditedPostDirty,
 	isEditedPostNew,
 	isEditedPostSaveable,
+	getEditorSettings,
 } from './selectors';
 
 const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
@@ -182,9 +183,11 @@ export default {
 		store.dispatch( createErrorNotice( message, { id: TRASH_POST_NOTICE_ID } ) );
 	},
 	MERGE_BLOCKS( action, store ) {
-		const { dispatch } = store;
+		const { dispatch, getState } = store;
+		const state = getState();
+		const editorSettings = getEditorSettings( state );
 		const [ blockA, blockB ] = action.blocks;
-		const blockType = getBlockType( blockA.name );
+		const blockType = getBlockType( blockA.name, editorSettings );
 
 		// Only focus the previous block if it's not mergeable
 		if ( ! blockType.merge ) {
@@ -196,7 +199,7 @@ export default {
 		// thus, we transform the block to merge first
 		const blocksWithTheSameType = blockA.name === blockB.name
 			? [ blockB ]
-			: switchToBlockType( blockB, blockA.name );
+			: switchToBlockType( blockB, blockA.name, editorSettings );
 
 		// If the block types can not match, do nothing
 		if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
@@ -251,13 +254,14 @@ export default {
 
 		dispatch( savePost() );
 	},
-	SET_INITIAL_POST( action ) {
+	SET_INITIAL_POST( action, { getState } ) {
 		const { post } = action;
 		const effects = [];
 
 		// Parse content as blocks
 		if ( post.content.raw ) {
-			effects.push( resetBlocks( parse( post.content.raw ) ) );
+			const editorSettings = getEditorSettings( getState() );
+			effects.push( resetBlocks( parse( post.content.raw, editorSettings ) ) );
 		}
 
 		// Resetting post should occur after blocks have been reset, since it's

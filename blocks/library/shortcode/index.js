@@ -3,12 +3,13 @@
  */
 import { __ } from '@wordpress/i18n';
 import { withInstanceId, Dashicon } from '@wordpress/components';
+import { source } from '@wordpress/block-api';
 
 /**
  * Internal dependencies
  */
 import './editor.scss';
-import { registerBlockType, source } from '../../api';
+import { registerBlockType } from '../../api';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
 

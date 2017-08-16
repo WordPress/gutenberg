@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import { flow } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -9,7 +10,8 @@ import { connect } from 'react-redux';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { Popover, IconButton } from '@wordpress/components';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getBlockType } from '@wordpress/block-api';
+import { withEditorSettings } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -60,9 +62,10 @@ class Inserter extends Component {
 			const {
 				insertionPoint,
 				onInsertBlock,
+				settings,
 			} = this.props;
 			onInsertBlock(
-				name,
+				getBlockType( name, settings ),
 				insertionPoint
 			);
 		}
@@ -98,7 +101,7 @@ class Inserter extends Component {
 	}
 }
 
-export default connect(
+const connectComponent = connect(
 	( state ) => {
 		return {
 			insertionPoint: getBlockInsertionPoint( state ),
@@ -106,12 +109,17 @@ export default connect(
 		};
 	},
 	( dispatch ) => ( {
-		onInsertBlock( name, after ) {
+		onInsertBlock( blockType, after ) {
 			dispatch( hideInsertionPoint() );
 			dispatch( insertBlock(
-				createBlock( name ),
+				createBlock( blockType ),
 				after
 			) );
 		},
 	} )
+);
+
+export default flow(
+	withEditorSettings(),
+	connectComponent,
 )( Inserter );

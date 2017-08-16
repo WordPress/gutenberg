@@ -22,3 +22,4 @@ export { default as Editable } from './editable';
 export { default as EditableProvider } from './editable/provider';
 export { default as InspectorControls } from './inspector-controls';
 export { default as MediaUploadButton } from './media-upload-button';
+export { default as withEditorSettings } from './with-editor-settings';

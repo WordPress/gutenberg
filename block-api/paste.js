@@ -12,8 +12,8 @@ import { nodetypes } from '@wordpress/utils';
  * Internal dependencies
  */
 import { createBlock } from './factory';
-import { getBlockTypes, getUnknownTypeHandlerName } from './registration';
 import { getBlockAttributes } from './parser';
+import { getBlockType } from './config';
 import stripAttributes from './paste/strip-attributes';
 import removeSpans from './paste/remove-spans';
 
@@ -78,11 +78,11 @@ export function normaliseToBlockLevelNodes( nodes ) {
 	return Array.from( accu.childNodes );
 }
 
-export default function( nodes ) {
+export default function( nodes, config ) {
 	const prepare = compose( [ normaliseToBlockLevelNodes, removeSpans, stripAttributes ] );
 
 	return prepare( nodes ).map( ( node ) => {
-		const block = getBlockTypes().reduce( ( acc, blockType ) => {
+		const block = config.blockTypes.reduce( ( acc, blockType ) => {
 			if ( acc ) {
 				return acc;
 			}
@@ -95,7 +95,7 @@ export default function( nodes ) {
 			}
 
 			return createBlock(
-				blockType.name,
+				blockType,
 				getBlockAttributes(
 					blockType,
 					node.outerHTML
@@ -107,7 +107,8 @@ export default function( nodes ) {
 			return block;
 		}
 
-		return createBlock( getUnknownTypeHandlerName(), {
+		const fallbackBlockType = getBlockType( config.fallbackBlockName, config );
+		return createBlock( fallbackBlockType, {
 			content: node.outerHTML,
 		} );
 	} );

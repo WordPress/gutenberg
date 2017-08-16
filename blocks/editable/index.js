@@ -22,16 +22,17 @@ import 'element-closest';
  * WordPress dependencies
  */
 import { createElement, Component, renderToString } from '@wordpress/element';
+import { parse, pasteHandler } from '@wordpress/block-api';
 import { keycodes } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { parse, pasteHandler } from '../api';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
 import patterns from './patterns';
+import withEditorSettings from '../with-editor-settings';
 
 const { BACKSPACE, DELETE, ENTER } = keycodes;
 
@@ -51,7 +52,7 @@ function createTinyMCEElement( type, props, ...children ) {
 	);
 }
 
-export default class Editable extends Component {
+export class Editable extends Component {
 	constructor( props ) {
 		super( ...arguments );
 
@@ -108,7 +109,7 @@ export default class Editable extends Component {
 		editor.on( 'BeforeExecCommand', this.maybePropagateUndo );
 		editor.on( 'PastePostProcess', this.onPastePostProcess );
 
-		patterns.apply( this, [ editor ] );
+		patterns.apply( this, [ editor, this.props.settings ] );
 
 		if ( this.props.onSetup ) {
 			this.props.onSetup( editor );
@@ -188,11 +189,11 @@ export default class Editable extends Component {
 
 			// Internal paste, so parse.
 			if ( childNodes.some( isBlockDelimiter ) ) {
-				blocks = parse( event.node.innerHTML.replace( /<meta[^>]+>/, '' ) );
+				blocks = parse( event.node.innerHTML.replace( /<meta[^>]+>/, '' ), this.props.settings );
 			// External paste with block level content, so attempt to assign
 			// blocks.
 			} else if ( childNodes.some( isBlockPart ) ) {
-				blocks = pasteHandler( childNodes );
+				blocks = pasteHandler( childNodes, this.props.settings );
 			}
 
 			if ( blocks.length ) {
@@ -603,3 +604,5 @@ export default class Editable extends Component {
 Editable.contextTypes = {
 	onUndo: noop,
 };
+
+export default withEditorSettings()( Editable );

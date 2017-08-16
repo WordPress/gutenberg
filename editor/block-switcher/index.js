@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { uniq, get, reduce, find } from 'lodash';
+import { uniq, get, reduce, find, flow } from 'lodash';
 import clickOutside from 'react-click-outside';
 
 /**
@@ -11,7 +11,8 @@ import clickOutside from 'react-click-outside';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { Dashicon, IconButton } from '@wordpress/components';
-import { getBlockType, getBlockTypes, switchToBlockType } from '@wordpress/blocks';
+import { withEditorSettings } from '@wordpress/blocks';
+import { switchToBlockType, getBlockType } from '@wordpress/block-api';
 
 /**
  * Internal dependencies
@@ -48,13 +49,13 @@ class BlockSwitcher extends Component {
 			this.setState( {
 				open: false,
 			} );
-			this.props.onTransform( this.props.block, name );
+			this.props.onTransform( this.props.block, name, this.props.settings );
 		};
 	}
 
 	render() {
-		const blockType = getBlockType( this.props.block.name );
-		const blocksToBeTransformedFrom = reduce( getBlockTypes(), ( memo, block ) => {
+		const blockType = getBlockType( this.props.block.name, this.props.settings );
+		const blocksToBeTransformedFrom = reduce( this.props.settings.blockTypes, ( memo, block ) => {
 			const transformFrom = get( block, 'transforms.from', [] );
 			const transformation = find( transformFrom, t => t.type === 'block' && t.blocks.indexOf( this.props.block.name ) !== -1 );
 			return transformation ? memo.concat( [ block.name ] ) : memo;
@@ -63,7 +64,7 @@ class BlockSwitcher extends Component {
 			.reduce( ( memo, transformation ) => memo.concat( transformation.blocks ), [] );
 		const allowedBlocks = uniq( blocksToBeTransformedFrom.concat( blocksToBeTransformedTo ) )
 			.reduce( ( memo, name ) => {
-				const block = getBlockType( name );
+				const block = getBlockType( name, this.props.settings );
 				return !! block ? memo.concat( block ) : memo;
 			}, [] );
 
@@ -108,16 +109,22 @@ class BlockSwitcher extends Component {
 	}
 }
 
-export default connect(
+const connectComponent = connect(
 	( state, ownProps ) => ( {
 		block: getBlock( state, ownProps.uid ),
 	} ),
 	( dispatch, ownProps ) => ( {
-		onTransform( block, name ) {
+		onTransform( block, name, settings ) {
 			dispatch( replaceBlocks(
 				[ ownProps.uid ],
-				switchToBlockType( block, name )
+				switchToBlockType( block, name, settings )
 			) );
 		},
 	} )
-)( clickOutside( BlockSwitcher ) );
+);
+
+export default flow(
+	clickOutside,
+	withEditorSettings(),
+	connectComponent,
+)( BlockSwitcher );

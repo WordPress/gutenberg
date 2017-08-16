@@ -7,7 +7,7 @@ import deepFreeze from 'deep-freeze';
 /**
  * WordPress dependencies
  */
-import { registerBlockType, unregisterBlockType, getBlockType } from '@wordpress/blocks';
+import { registerBlockType, unregisterBlockType, getBlockTypes, getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -967,10 +967,15 @@ describe( 'state', () => {
 		it( 'should populate recently used blocks with blocks from the common category', () => {
 			const initial = userData( undefined, {
 				type: 'SETUP_EDITOR',
+				settings: {
+					blockTypes: getBlockTypes(),
+				},
 			} );
 
 			initial.recentlyUsedBlocks.forEach(
-				block => expect( getBlockType( block ).category ).toEqual( 'common' )
+				block => expect( getBlockType( block, {
+					blockTypes: getBlockTypes(),
+				} ).category ).toEqual( 'common' )
 			);
 			expect( initial.recentlyUsedBlocks ).toHaveLength( 8 );
 		} );

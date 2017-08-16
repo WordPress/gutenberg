@@ -10,14 +10,15 @@ import ResizableBox from 'react-resizable-box';
 import { __ } from '@wordpress/i18n';
 import { mediaUpload } from '@wordpress/utils';
 import { Placeholder, Dashicon, Toolbar, DropZone, FormFileUpload } from '@wordpress/components';
+import { source } from '@wordpress/block-api';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import './editor.scss';
-import { registerBlockType, source } from '../../api';
 import withEditorSettings from '../../with-editor-settings';
+import { registerBlockType } from '../../api';
 import Editable from '../../editable';
 import MediaUploadButton from '../../media-upload-button';
 import InspectorControls from '../../inspector-controls';

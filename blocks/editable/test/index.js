@@ -6,7 +6,7 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import Editable from '../';
+import { Editable } from '../';
 
 describe( 'Editable', () => {
 	describe( '.propTypes', () => {

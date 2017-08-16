@@ -10,18 +10,13 @@ import { find, get, escapeRegExp, groupBy, drop } from 'lodash';
 import { keycodes } from '@wordpress/utils';
 
 /**
- * Internal dependencies
- */
-import { getBlockTypes } from '../api/registration';
-
-/**
  * Browser dependencies
  */
 const { setTimeout } = window;
 
 const { ESCAPE, ENTER, SPACE, BACKSPACE } = keycodes;
 
-export default function( editor ) {
+export default function( editor, editorSettings ) {
 	const getContent = this.getContent.bind( this );
 	const { onReplace } = this.props;
 
@@ -32,7 +27,7 @@ export default function( editor ) {
 		paste: pastePatterns,
 		enter: enterPatterns,
 		undefined: spacePatterns,
-	} = groupBy( getBlockTypes().reduce( ( acc, blockType ) => {
+	} = groupBy( editorSettings.blockTypes.reduce( ( acc, blockType ) => {
 		const transformsFrom = get( blockType, 'transforms.from', [] );
 		const transforms = transformsFrom.filter( ( { type } ) => type === 'pattern' );
 		return [ ...acc, ...transforms ];

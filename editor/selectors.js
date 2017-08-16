@@ -8,7 +8,7 @@ import createSelector from 'rememo';
 /**
  * WordPress dependencies
  */
-import { serialize, getBlockType } from '@wordpress/blocks';
+import { serialize, getBlockType } from '@wordpress/block-api';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -736,17 +736,19 @@ export function getSuggestedPostFormat( state ) {
  */
 export const getEditedPostContent = createSelector(
 	( state ) => {
+		const editorSettings = getEditorSettings( state );
 		const edits = getPostEdits( state );
 		if ( 'content' in edits ) {
 			return edits.content;
 		}
 
-		return serialize( getBlocks( state ) );
+		return serialize( getBlocks( state ), editorSettings );
 	},
 	( state ) => [
 		state.editor.edits.content,
 		state.editor.blocksByUid,
 		state.editor.blockOrder,
+		state.editorSettings,
 	],
 );
 
@@ -761,6 +763,17 @@ export function getNotices( state ) {
 }
 
 /**
+ *
+ * Returns the editor settings
+ *
+ * @param {Object} state Global application state
+ * @return {Object}      The editor settings
+ */
+export function getEditorSettings( state ) {
+	return state.editorSettings;
+}
+
+/**
  * Resolves the list of recently used block names into a list of block type settings.
  *
  * @param {Object} state Global application state
@@ -768,5 +781,6 @@ export function getNotices( state ) {
  */
 export function getRecentlyUsedBlocks( state ) {
 	// resolves the block names in the state to the block type settings
-	return state.userData.recentlyUsedBlocks.map( blockType => getBlockType( blockType ) );
+	return state.userData.recentlyUsedBlocks
+		.map( blockName => getBlockType( blockName, getEditorSettings( state ) ) );
 }

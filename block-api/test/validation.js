@@ -14,26 +14,13 @@ import {
 	isEquivalentHTML,
 	isValidBlock,
 } from '../validation';
-import {
-	registerBlockType,
-	unregisterBlockType,
-	getBlockTypes,
-	getBlockType,
-	setUnknownTypeHandlerName,
-} from '../registration';
 
 describe( 'validation', () => {
-	const defaultBlockSettings = {
+	const defaultBlockType = {
+		name: 'core/test-block',
 		save: ( { attributes } ) => attributes.fruit,
 		category: 'common',
 	};
-
-	afterEach( () => {
-		setUnknownTypeHandlerName( undefined );
-		getBlockTypes().forEach( ( block ) => {
-			unregisterBlockType( block.name );
-		} );
-	} );
 
 	describe( 'getTextPiecesSplitOnWhitespace()', () => {
 		it( 'returns text pieces spilt on whitespace', () => {
@@ -313,21 +300,17 @@ describe( 'validation', () => {
 
 	describe( 'isValidBlock()', () => {
 		it( 'returns false is block is not valid', () => {
-			registerBlockType( 'core/test-block', defaultBlockSettings );
-
 			expect( isValidBlock(
 				'Apples',
-				getBlockType( 'core/test-block' ),
+				defaultBlockType,
 				{ fruit: 'Bananas' }
 			) ).toBe( false );
 		} );
 
 		it( 'returns true is block is valid', () => {
-			registerBlockType( 'core/test-block', defaultBlockSettings );
-
 			expect( isValidBlock(
 				'Bananas',
-				getBlockType( 'core/test-block' ),
+				defaultBlockType,
 				{ fruit: 'Bananas' }
 			) ).toBe( true );
 		} );

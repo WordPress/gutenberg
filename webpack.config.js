@@ -39,6 +39,7 @@ const extractConfig = {
 const entryPointNames = [
 	'blocks',
 	'components',
+	'block-api',
 	'date',
 	'editor',
 	'element',
