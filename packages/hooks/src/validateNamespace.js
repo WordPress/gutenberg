@@ -18,8 +18,8 @@ function validateNamespace( namespace ) {
 		return false;
 	}
 
-	if ( ! /^[a-zA-Z][a-zA-Z0-9_.-]*\/[a-zA-Z][a-zA-Z0-9_.-]*$/.test( namespace ) ) {
-		console.error( 'The namespace must take the form `my-plugin-slug/functionDescription`.' );
+	if ( ! /^[a-zA-Z][a-zA-Z0-9_.-]*\/[a-zA-Z][a-zA-Z0-9_.-]*\/[a-zA-Z][a-zA-Z0-9_.-]*$/.test( namespace ) ) {
+		console.error( 'The namespace must take the form `vendorName/pluginName/functionName`.' );
 		return false;
 	}
 
