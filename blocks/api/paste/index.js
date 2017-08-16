@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, get, flowRight as compose } from 'lodash';
+import { find, get, flow } from 'lodash';
 
 /**
  * Internal dependencies
@@ -14,7 +14,7 @@ import stripAttributes from './strip-attributes';
 import stripWrappers from './strip-wrappers';
 
 export default function( nodes ) {
-	const prepare = compose( [
+	const prepare = flow( [
 		stripWrappers,
 		normaliseBlocks,
 		stripAttributes,
