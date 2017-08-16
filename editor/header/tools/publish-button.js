@@ -50,13 +50,8 @@ function PublishButton( {
 	}
 	const className = classnames( 'editor-tools__publish-button', { 'is-saving': isSaving } );
 	const onClick = () => {
-		const doSave = isPublished ||
-			! process.env.NODE_ENV === 'production' ||
-			window.confirm( __( 'Keep in mind this plugin is a beta version and will not display correctly on your theme.' ) ); // eslint-disable-line no-alert
-		if ( doSave ) {
-			onStatusChange( publishStatus );
-			onSave();
-		}
+		onStatusChange( publishStatus );
+		onSave();
 	};
 
 	return (
