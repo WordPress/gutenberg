@@ -22,7 +22,23 @@ function transform( HTML ) {
 }
 
 describe( 'stripAttributes', () => {
-	it( 'should remove id, class, and style', () => {
-		equal( transform( '<p class="test" style="display:none;">test</p><p id="test">test <a href="#keep">test</a></p>' ), '<p>test</p><p>test <a href="#keep">test</a></p>' );
+	it( 'should remove attributes', () => {
+		equal( transform( '<p class="test">test</p>' ), '<p>test</p>' );
+	} );
+
+	it( 'should remove multiple attributes', () => {
+		equal( transform( '<p class="test" id="test">test</p>' ), '<p>test</p>' );
+	} );
+
+	it( 'should deep remove attributes', () => {
+		equal( transform( '<p class="test">test <em id="test">test</em></p>' ), '<p>test <em>test</em></p>' );
+	} );
+
+	it( 'should remove data-* attributes', () => {
+		equal( transform( '<p data-reactid="1">test</p>' ), '<p>test</p>' );
+	} );
+
+	it( 'should keep some attributes', () => {
+		equal( transform( '<a href="#keep">test</a>' ), '<a href="#keep">test</a>' );
 	} );
 } );
