@@ -172,8 +172,8 @@ registerBlockType( 'core/gallery', {
 					/>
 					<SelectControl
 						label={ __( 'Link to' ) }
-						selected={ linkTo }
-						onBlur={ setLinkTo }
+						value={ linkTo }
+						onChange={ setLinkTo }
 						options={ linkOptions }
 					/>
 				</InspectorControls>
