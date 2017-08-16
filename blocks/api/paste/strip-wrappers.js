@@ -1,3 +1,15 @@
+const tags = [
+	'span',
+	'div',
+	'article',
+	'header',
+	'footer',
+	'section',
+	'nav',
+	'hgroup',
+	'main',
+].join( ',' );
+
 function unwrap( node ) {
 	const parent = node.parentNode;
 
@@ -17,7 +29,7 @@ export default function( nodes ) {
 
 	nodes.forEach( node => fragment.appendChild( node.cloneNode( true ) ) );
 
-	const wrappers = fragment.querySelectorAll( 'span,div' );
+	const wrappers = fragment.querySelectorAll( tags );
 
 	Array.from( wrappers ).forEach( ( wrapper ) => unwrap( wrapper ) );
 
