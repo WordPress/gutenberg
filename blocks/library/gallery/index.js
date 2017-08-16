@@ -61,6 +61,10 @@ registerBlockType( 'core/gallery', {
 			type: 'boolean',
 			default: true,
 		},
+		cropToWidth: {
+			type: 'boolean',
+			default: false,
+		},
 		linkTo: {
 			type: 'string',
 			default: 'none',
@@ -75,11 +79,12 @@ registerBlockType( 'core/gallery', {
 	},
 
 	edit( { attributes, setAttributes, focus, className } ) {
-		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
+		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo, cropToWidth } = attributes;
 		const setLinkTo = ( value ) => setAttributes( { linkTo: value } );
 		const setColumnsNumber = ( value ) => setAttributes( { columns: value } );
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		const toggleImageCrop = () => setAttributes( { imageCrop: ! imageCrop } );
+		const toggleCropToWidth = () => setAttributes( { cropToWidth: ! cropToWidth } );
 
 		const onSelectImages = ( imgs ) => setAttributes( { images: imgs } );
 
@@ -170,15 +175,20 @@ registerBlockType( 'core/gallery', {
 						checked={ !! imageCrop }
 						onChange={ toggleImageCrop }
 					/>
+					<ToggleControl
+						label={ __( 'Crop according to width' ) }
+						checked={ !! cropToWidth }
+						onChange={ toggleCropToWidth }
+					/>
 					<SelectControl
-						label={ __( 'Link to' ) }
+						label={ __( 'Link images to' ) }
 						selected={ linkTo }
 						onBlur={ setLinkTo }
 						options={ linkOptions }
 					/>
 				</InspectorControls>
 			),
-			<div key="gallery" className={ `${ className } align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` }>
+			<div key="gallery" className={ `${ className } align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' } ${ cropToWidth ? 'is-cropped-width' : '' }` }>
 				{ images.map( ( img ) => (
 					<GalleryImage key={ img.url } img={ img } />
 				) ) }
@@ -187,9 +197,9 @@ registerBlockType( 'core/gallery', {
 	},
 
 	save( { attributes } ) {
-		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
+		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo, cropToWidth } = attributes;
 		return (
-			<div className={ `align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` } >
+			<div className={ `align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' } ${ cropToWidth ? 'is-cropped-width' : '' }` } >
 				{ images.map( ( img ) => (
 					<GalleryImage key={ img.url } img={ img } linkTo={ linkTo } />
 				) ) }
