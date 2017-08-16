@@ -3,7 +3,7 @@ import domReady from '../';
 describe( 'domReady', () => {
 	describe( 'when document readystate is complete', () => {
 		it( 'should call the callback.', () => {
-			let callback = jest.fn( () => {});
+			let callback = jest.fn( () => {} );
 
 			domReady( callback );
 			expect( callback ).toHaveBeenCalled();

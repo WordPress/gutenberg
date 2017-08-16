@@ -66,7 +66,7 @@ function getAllPackages() {
  * @param  {String} file File name
  * @return {String}      Package name
  */
-function getPackageName(file) {
+function getPackageName( file ) {
 	return path.relative( PACKAGES_DIR, file ).split( path.sep )[ 0 ];
 }
 
@@ -110,13 +110,13 @@ function buildFileFor( file, silent, environment ) {
 
 	mkdirp.sync( path.dirname( destPath ) );
 	const transformed = babel.transformFileSync( file, babelOptions ).code;
-	fs.writeFileSync(destPath, transformed);
+	fs.writeFileSync( destPath, transformed );
 	if ( ! silent ) {
 		process.stdout.write(
-			chalk.green('  \u2022 ') +
-				path.relative(PACKAGES_DIR, file) +
-				chalk.green(' \u21D2 ') +
-				path.relative(PACKAGES_DIR, destPath) +
+			chalk.green( '  \u2022 ' ) +
+				path.relative( PACKAGES_DIR, file ) +
+				chalk.green( ' \u21D2 ' ) +
+				path.relative( PACKAGES_DIR, destPath ) +
 				'\n'
 		);
 	}
@@ -141,4 +141,4 @@ function buildPackage( packagePath ) {
 process.stdout.write( chalk.inverse( '>> Building packages \n' ) );
 getAllPackages()
 	.forEach( buildPackage );
-process.stdout.write('\n');
+process.stdout.write( '\n' );
