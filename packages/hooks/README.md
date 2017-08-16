@@ -6,10 +6,10 @@ A lightweight & efficient EventManager for JavaScript in WordPress.
 ### API Usage
 API functions can be called via the global `wp.hooks` like this `wp.hooks.addAction()`, etc.
 
-* `addAction( 'hook_name', 'my_plugin/my_callback', callback, priority )`
-* `addFilter( 'hook_name', 'my_plugin/my_callback', callback, priority )`
-* `removeAction( 'hook_name', 'my_plugin/my_callback' )`
-* `removeFilter( 'hook_name',  'my_plugin/my_callback' )`
+* `addAction( 'hook_name', 'vendorName/pluginName/functionName', callback, priority )`
+* `addFilter( 'hook_name', 'vendorName/pluginName/functionName', callback, priority )`
+* `removeAction( 'hook_name', 'vendorName/pluginName/functionName' )`
+* `removeFilter( 'hook_name',  'vendorName/pluginName/functionName' )`
 * `removeAllActions( 'hook_name' )`
 * `removeAllFilters( 'hook_name' )`
 * `doAction( 'hook_name', arg1, arg2, moreArgs, finalArg )`
