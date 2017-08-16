@@ -13,6 +13,7 @@ import { concatChildren } from '@wordpress/element';
  * Internal dependencies
  */
 import './style.scss';
+import './editor.scss';
 import { registerBlockType, source } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
@@ -20,6 +21,7 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import ColorPalette from '../../color-palette';
 import Editable from '../../editable';
 import InspectorControls from '../../inspector-controls';
+import RangeControl from '../../inspector-controls/range-control';
 import ToggleControl from '../../inspector-controls/toggle-control';
 import BlockDescription from '../../block-description';
 
@@ -58,6 +60,9 @@ registerBlockType( 'core/cover-text', {
 		backgroundColor: {
 			type: 'string',
 		},
+		fontSize: {
+			type: 'number',
+		},
 	},
 
 	getEditWrapperProps( attributes ) {
@@ -74,7 +79,17 @@ registerBlockType( 'core/cover-text', {
 	},
 
 	edit( { attributes, setAttributes, className, focus, setFocus, mergeBlocks } ) {
-		const { align, width, content, dropCap, placeholder, textColor, backgroundColor } = attributes;
+		const {
+			align,
+			width,
+			content,
+			dropCap,
+			placeholder,
+			textColor,
+			backgroundColor,
+			fontSize,
+		} = attributes;
+
 		const toggleDropCap = () => setAttributes( { dropCap: ! dropCap } );
 
 		return [
@@ -102,6 +117,14 @@ registerBlockType( 'core/cover-text', {
 						checked={ !! dropCap }
 						onChange={ toggleDropCap }
 					/>
+					<RangeControl
+						label={ __( 'Font Size' ) }
+						value={ fontSize }
+						onChange={ ( value ) => setAttributes( { fontSize: value } ) }
+						min={ 10 }
+						max={ 200 }
+						beforeIcon="editor-textcolor"
+					/>
 					<h3>{ __( 'Background Color' ) }</h3>
 					<ColorPalette
 						value={ backgroundColor }
@@ -119,10 +142,12 @@ registerBlockType( 'core/cover-text', {
 				key="block"
 				className={ classnames( className, {
 					[ `align${ width }` ]: width,
+					'has-background': backgroundColor,
 				} ) }
 				style={ {
 					backgroundColor: backgroundColor,
 					color: textColor,
+					fontSize: fontSize,
 				} }
 			>
 				<Editable
@@ -145,20 +170,34 @@ registerBlockType( 'core/cover-text', {
 	},
 
 	save( { attributes } ) {
-		const { width, align, content, dropCap, backgroundColor, textColor } = attributes;
+		const { width, align, content, dropCap, backgroundColor, textColor, fontSize } = attributes;
 		const className = dropCap ? 'has-drop-cap' : null;
-		const wrapperClassName = width ? `align${ width }` : null;
+		const wrapperClassName = classnames( className, {
+			[ `align${ width }` ]: width,
+			'has-background': backgroundColor,
+		} );
+		const styles = {
+			backgroundColor: backgroundColor,
+			color: textColor,
+			fontSize: fontSize,
+		};
 
 		if ( ! align ) {
 			return (
-				<div className={ wrapperClassName } style={ { backgroundColor: backgroundColor, color: textColor } }>
+				<div
+					className={ wrapperClassName }
+					style={ styles }
+				>
 					<p className={ className }>{ content }</p>
 				</div>
 			);
 		}
 
 		return (
-			<div className={ wrapperClassName } style={ { backgroundColor: backgroundColor, color: textColor } }>
+			<div
+				className={ wrapperClassName }
+				style={ styles }
+			>
 				<p style={ { textAlign: align } } className={ className }>{ content }</p>
 			</div>
 		);
