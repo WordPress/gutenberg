@@ -3,7 +3,11 @@ language: node_js
 node_js:
   - '8'
   - '6'
-script: true
+
+script:
+  - lerna bootstrap && npm run build
+  - npm run test:coverage-ci
+
 notifications:
   slack:
     rooms:
@@ -11,3 +15,4 @@ notifications:
     on_start: never
     on_success: change
     on_failure: always
+    on_pull_requests: false

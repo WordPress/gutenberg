@@ -23,9 +23,8 @@ const SRC_DIR = 'src';
 const BUILD_DIR = {
 	main: 'build',
 	module: 'build-module',
-	browser: 'build-browser',
 };
-const OK = chalk.reset.inverse.bold.green( ' DONE ' );
+const DONE = chalk.reset.inverse.bold.green( ' DONE ' );
 
 /**
  * Babel Configuration
@@ -47,11 +46,6 @@ const babelConfigs = {
 			) ],
 		] }
 	),
-	browser: Object.assign(
-		{},
-		babelDefaultConfig,
-		{ plugins: [ ...babelDefaultConfig.plugins, 'transform-runtime' ] }
-	)
 };
 
 /**
@@ -72,7 +66,7 @@ function getAllPackages() {
  * @param  {String} file File name
  * @return {String}      Package name
  */
-function getPackageName(file) {
+function getPackageName( file ) {
 	return path.relative( PACKAGES_DIR, file ).split( path.sep )[ 0 ];
 }
 
@@ -100,7 +94,6 @@ function getBuildPath( file, buildFolder ) {
 function buildFile( file, silent ) {
 	buildFileFor( file, silent, 'main' );
 	buildFileFor( file, silent, 'module' );
-	buildFileFor( file, silent, 'browser' );
 }
 
 /**
@@ -117,13 +110,13 @@ function buildFileFor( file, silent, environment ) {
 
 	mkdirp.sync( path.dirname( destPath ) );
 	const transformed = babel.transformFileSync( file, babelOptions ).code;
-	fs.writeFileSync(destPath, transformed);
+	fs.writeFileSync( destPath, transformed );
 	if ( ! silent ) {
 		process.stdout.write(
-			chalk.green('  \u2022 ') +
-				path.relative(PACKAGES_DIR, file) +
-				chalk.green(' \u21D2 ') +
-				path.relative(PACKAGES_DIR, destPath) +
+			chalk.green( '  \u2022 ' ) +
+				path.relative( PACKAGES_DIR, file ) +
+				chalk.green( ' \u21D2 ' ) +
+				path.relative( PACKAGES_DIR, destPath ) +
 				'\n'
 		);
 	}
@@ -136,16 +129,16 @@ function buildFileFor( file, silent, environment ) {
  */
 function buildPackage( packagePath ) {
 	const srcDir = path.resolve( packagePath, SRC_DIR );
-	const pattern = path.resolve( srcDir, '**/*' );
-	const files = glob.sync( pattern, { nodir: true } );
+	const files = glob.sync( srcDir + '/**/*.js', { nodir: true } )
+		.filter( file => ! /\.test\.js/.test( file ) );
 
 	process.stdout.write( `${ path.basename( packagePath ) }\n` );
 
 	files.forEach( file => buildFile( file, true ) );
-	process.stdout.write( `${ OK }\n` );
+	process.stdout.write( `${ DONE }\n` );
 }
 
 process.stdout.write( chalk.inverse( '>> Building packages \n' ) );
 getAllPackages()
 	.forEach( buildPackage );
-process.stdout.write('\n');
+process.stdout.write( '\n' );
