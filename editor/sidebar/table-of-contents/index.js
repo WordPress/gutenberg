@@ -63,9 +63,7 @@ const TableOfContents = ( { blocks, onSelect } ) => {
 
 	// Select the corresponding block in the main editor
 	// when clicking on a heading item from the list.
-	const onSelectHeading = ( uid ) => {
-		onSelect( uid );
-	};
+	const onSelectHeading = ( uid ) => onSelect( uid );
 
 	const tocItems = headings.map( ( heading, index ) => {
 		const headingLevel = getHeadingLevel( heading );
