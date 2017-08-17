@@ -43,4 +43,8 @@ describe( 'normaliseBlocks', () => {
 	it( 'should remove empty paragraphs', () => {
 		equal( transform( '<p>&nbsp;</p>' ), '' );
 	} );
+
+	it( 'should wrap lose inline elements', () => {
+		equal( transform( '<a href="#">test</a>' ), '<p><a href="#">test</a></p>' );
+	} );
 } );
