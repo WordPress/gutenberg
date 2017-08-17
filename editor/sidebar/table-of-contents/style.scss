@@ -4,7 +4,6 @@
 
 .table-of-contents-item {
 	display: flex;
-	align-items: flex-start;
 	margin: 4px 0;
 
 	.table-of-contents-item__emdash::before {
@@ -31,6 +30,16 @@
 	&.is-h6 .table-of-contents-item__emdash::before {
 		content: '—————';
 	}
+}
+
+.table-of-contents__button {
+	cursor: pointer;
+	background: none;
+	border: none;
+	display: flex;
+	align-items: flex-start;
+	color: $dark-gray-800;
+	text-align: left;
 }
 
 .table-of-contents-item__level {
