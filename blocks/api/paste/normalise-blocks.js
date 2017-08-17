@@ -5,6 +5,25 @@ import { nodetypes } from '@wordpress/utils';
 
 const { ELEMENT_NODE, TEXT_NODE } = nodetypes;
 
+const inlineTags = [
+	'strong',
+	'em',
+	'b',
+	'i',
+	'del',
+	'ins',
+	'a',
+	'code',
+	'abbr',
+	'time',
+	'sub',
+	'sup',
+];
+
+function isInline( node ) {
+	return inlineTags.indexOf( node.nodeName.toLowerCase() ) !== -1;
+}
+
 /**
  * Normalises array nodes of any node type to an array of block level nodes.
  *
@@ -54,6 +73,9 @@ export default function( nodes ) {
 				} else {
 					accu.appendChild( node );
 				}
+			} else if ( isInline( node ) ) {
+				accu.appendChild( document.createElement( 'P' ) );
+				accu.lastChild.appendChild( node );
 			} else {
 				accu.appendChild( node );
 			}
