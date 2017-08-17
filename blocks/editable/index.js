@@ -508,7 +508,6 @@ export default class Editable extends Component {
 	removeFormat( format ) {
 		this.editor.focus();
 		this.editor.formatter.remove( format );
-		this.onChange();
 		this.saveEditorContent();
 	}
 
