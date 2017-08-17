@@ -70,7 +70,7 @@ class BlockInspectorAdvancedControls extends Component {
 		return (
 			<div>
 				<h3>{ __( 'Block Settings' ) }</h3>
-				{ blockType.className &&
+				{ false !== blockType.className &&
 					<InspectorControls.TextControl
 						label={ __( 'Additional CSS Class' ) }
 						value={ selectedBlock.attributes.className || '' }
