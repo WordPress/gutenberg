@@ -9,6 +9,7 @@ import { ChromePicker } from 'react-color';
  */
 import { Component } from '@wordpress/element';
 import { Popover } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -43,7 +44,13 @@ class ColorPalette extends Component {
 					const className = classnames( 'blocks-color-palette__item', { 'is-active': value === color } );
 					return (
 						<div key={ color } className="blocks-color-palette__item-wrapper">
-							<button className={ className } style={ style } onClick={ () => onChange( value === color ? undefined : color ) } />
+							<button
+								className={ className }
+								style={ style }
+								onClick={ () => onChange( value === color ? undefined : color ) }
+								aria-label={ __( 'Color: ' ) + color }
+								aria-current={ value === color && __( 'Selected color' ) }
+							/>
 						</div>
 					);
 				} ) }
