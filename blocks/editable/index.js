@@ -558,6 +558,7 @@ export default class Editable extends Component {
 			style,
 			value,
 			focus,
+			wrapperClassname,
 			className,
 			inlineToolbar = false,
 			formattingControls,
@@ -570,7 +571,7 @@ export default class Editable extends Component {
 		// mount and initialize a new child element in its place.
 		const key = [ 'editor', Tagname ].join();
 		const isPlaceholderVisible = placeholder && ! focus && this.state.empty;
-		const classes = classnames( className, 'blocks-editable' );
+		const classes = classnames( wrapperClassname, 'blocks-editable' );
 
 		const formatToolbar = (
 			<FormatToolbar
@@ -602,6 +603,7 @@ export default class Editable extends Component {
 					defaultValue={ value }
 					isPlaceholderVisible={ isPlaceholderVisible }
 					label={ placeholder }
+					className={ className }
 					key={ key }
 				/>
 				{ isPlaceholderVisible &&

@@ -70,7 +70,7 @@ registerBlockType( 'core/preformatted', {
 				focus={ focus }
 				onFocus={ setFocus }
 				placeholder={ __( 'Write preformatted text…' ) }
-				className={ className }
+				wrapperClassname={ className }
 			/>
 		);
 	},

@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { concatChildren } from '@wordpress/element';
+import classnames from 'classnames';
 
 /**
  * Internal dependencies
@@ -10,10 +11,13 @@ import { concatChildren } from '@wordpress/element';
 import './style.scss';
 import { registerBlockType, createBlock, source, setDefaultBlock } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
+import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import BlockControls from '../../block-controls';
 import Editable from '../../editable';
 import InspectorControls from '../../inspector-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
+import RangeControl from '../../inspector-controls/range-control';
+import ColorPalette from '../../color-palette';
 import BlockDescription from '../../block-description';
 
 const { children } = source;
@@ -44,6 +48,18 @@ registerBlockType( 'core/paragraph', {
 		placeholder: {
 			type: 'string',
 		},
+		width: {
+			type: 'string',
+		},
+		textColor: {
+			type: 'string',
+		},
+		backgroundColor: {
+			type: 'string',
+		},
+		fontSize: {
+			type: 'number',
+		},
 	},
 
 	transforms: {
@@ -65,12 +81,26 @@ registerBlockType( 'core/paragraph', {
 		};
 	},
 
+	getEditWrapperProps( attributes ) {
+		const { width } = attributes;
+		if ( 'wide' === width || 'full' === width ) {
+			return { 'data-align': width };
+		}
+	},
+
 	edit( { attributes, setAttributes, insertBlocksAfter, focus, setFocus, mergeBlocks, onReplace } ) {
-		const { align, content, dropCap, placeholder } = attributes;
+		const { align, content, dropCap, placeholder, fontSize, backgroundColor, textColor, width } = attributes;
 		const toggleDropCap = () => setAttributes( { dropCap: ! dropCap } );
+		const className = dropCap ? 'has-drop-cap' : null;
+
 		return [
 			focus && (
 				<BlockControls key="controls">
+					<BlockAlignmentToolbar
+						value={ width }
+						onChange={ ( nextWidth ) => setAttributes( { width: nextWidth } ) }
+						controls={ [ 'wide', 'full' ] }
+					/>
 					<AlignmentToolbar
 						value={ align }
 						onChange={ ( nextAlign ) => {
@@ -90,10 +120,40 @@ registerBlockType( 'core/paragraph', {
 						checked={ !! dropCap }
 						onChange={ toggleDropCap }
 					/>
+					<RangeControl
+						label={ __( 'Font Size' ) }
+						value={ fontSize || '' }
+						onChange={ ( value ) => setAttributes( { fontSize: value } ) }
+						min={ 10 }
+						max={ 200 }
+						beforeIcon="editor-textcolor"
+						allowReset
+					/>
+					<h3>{ __( 'Background Color' ) }</h3>
+					<ColorPalette
+						value={ backgroundColor }
+						onChange={ ( colorValue ) => setAttributes( { backgroundColor: colorValue.hex } ) }
+						withTransparentOption
+					/>
+					<h3>{ __( 'Text Color' ) }</h3>
+					<ColorPalette
+						value={ textColor }
+						onChange={ ( colorValue ) => setAttributes( { textColor: colorValue.hex } ) }
+					/>
 				</InspectorControls>
 			),
 			<Editable
 				tagName="p"
+				className={ classnames( 'wp-block-paragraph', className, {
+					[ `align${ width }` ]: width,
+					'has-background': backgroundColor,
+				} ) }
+				style={ {
+					backgroundColor: backgroundColor,
+					color: textColor,
+					fontSize: fontSize ? fontSize + 'px' : undefined,
+					textAlign: align,
+				} }
 				key="editable"
 				value={ content }
 				onChange={ ( nextContent ) => {
@@ -112,22 +172,26 @@ registerBlockType( 'core/paragraph', {
 				} }
 				onMerge={ mergeBlocks }
 				onReplace={ onReplace }
-				style={ { textAlign: align } }
-				className={ dropCap ? 'has-drop-cap' : null }
 				placeholder={ placeholder || __( 'New Paragraph' ) }
 			/>,
 		];
 	},
 
 	save( { attributes } ) {
-		const { align, content, dropCap } = attributes;
-		const className = dropCap ? 'has-drop-cap' : null;
+		const { width, align, content, dropCap, backgroundColor, textColor, fontSize } = attributes;
+		const className = classnames( {
+			[ `align${ width }` ]: width,
+			'has-background': backgroundColor,
+			'has-drop-cap': dropCap,
+		} );
+		const styles = {
+			backgroundColor: backgroundColor,
+			color: textColor,
+			fontSize: fontSize,
+			textAlign: align,
+		};
 
-		if ( ! align ) {
-			return <p className={ className }>{ content }</p>;
-		}
-
-		return <p style={ { textAlign: align } } className={ className }>{ content }</p>;
+		return <p style={ styles } className={ className ? className : undefined }>{ content }</p>;
 	},
 } );
 
