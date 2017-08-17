@@ -51,7 +51,7 @@ import {
 	getMultiSelectedBlockUids,
 } from '../../selectors';
 
-const { BACKSPACE, ESCAPE, DELETE, UP, DOWN, LEFT, RIGHT, ENTER } = keycodes;
+const { BACKSPACE, ESCAPE, DELETE, ENTER } = keycodes;
 
 function FirstChild( { children } ) {
 	const childrenArray = Children.toArray( children );
@@ -73,7 +73,6 @@ class VisualEditorBlock extends Component {
 		this.onPointerDown = this.onPointerDown.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onKeyUp = this.onKeyUp.bind( this );
-		this.handleArrowKey = this.handleArrowKey.bind( this );
 		this.toggleMobileControls = this.toggleMobileControls.bind( this );
 		this.onBlockError = this.onBlockError.bind( this );
 
@@ -252,13 +251,6 @@ class VisualEditorBlock extends Component {
 	onKeyDown( event ) {
 		const { keyCode, target } = event;
 
-		this.handleArrowKey( event );
-
-		if ( keyCode === UP || keyCode === LEFT || keyCode === DOWN || keyCode === RIGHT ) {
-			const selection = window.getSelection();
-			this.lastRange = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
-		}
-
 		if ( ENTER === keyCode && target === this.node ) {
 			event.preventDefault();
 
@@ -270,49 +262,6 @@ class VisualEditorBlock extends Component {
 
 	onKeyUp( event ) {
 		this.removeOrDeselect( event );
-		this.handleArrowKey( event );
-	}
-
-	handleArrowKey( event ) {
-		const { keyCode, target } = event;
-		const moveUp = ( keyCode === UP || keyCode === LEFT );
-		const moveDown = ( keyCode === DOWN || keyCode === RIGHT );
-		const wrapperClassname = '.editor-visual-editor';
-		const selectors = [
-			'*[contenteditable="true"]',
-			'*[tabindex]',
-			'textarea',
-			'input',
-		].map( ( selector ) => `${ wrapperClassname } ${ selector }` ).join( ',' );
-
-		if ( moveUp || moveDown ) {
-			const selection = window.getSelection();
-			const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
-
-			// If there's no movement, so we're either at the end of start, or
-			// no text input at all.
-			if ( range !== this.lastRange ) {
-				return;
-			}
-
-			const focusableNodes = Array.from( document.querySelectorAll( selectors ) );
-
-			if ( moveUp ) {
-				focusableNodes.reverse();
-			}
-
-			const targetNode = focusableNodes
-				.slice( focusableNodes.indexOf( target ) )
-				.reduce( ( result, node ) => {
-					return result || ( node.contains( target ) ? null : node );
-				}, null );
-
-			if ( targetNode ) {
-				targetNode.focus();
-			}
-		}
-
-		delete this.lastRange;
 	}
 
 	toggleMobileControls() {
