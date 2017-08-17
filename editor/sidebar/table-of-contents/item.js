@@ -7,6 +7,7 @@ const TableOfContentsItem = ( {
 	children,
 	isValid,
 	level,
+	onClick,
 } ) => (
 	<li
 		className={ classnames(
@@ -16,6 +17,7 @@ const TableOfContentsItem = ( {
 				'is-invalid': ! isValid,
 			}
 		) }
+		onClick={ onClick }
 	>
 		<span className="table-of-contents-item__emdash" aria-hidden="true"></span>
 		<strong className="table-of-contents-item__level">
