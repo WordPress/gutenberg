@@ -79,6 +79,7 @@ export default class Editable extends Component {
 		this.changeFormats = this.changeFormats.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.maybePropagateUndo = this.maybePropagateUndo.bind( this );
+		this.onBeforePastePreProcess = this.onBeforePastePreProcess.bind( this );
 		this.onPastePostProcess = this.onPastePostProcess.bind( this );
 
 		this.state = {
@@ -106,6 +107,7 @@ export default class Editable extends Component {
 		editor.on( 'keyup', this.onKeyUp );
 		editor.on( 'selectionChange', this.onSelectionChange );
 		editor.on( 'BeforeExecCommand', this.maybePropagateUndo );
+		editor.on( 'BeforePastePreProcess', this.onBeforePastePreProcess );
 		editor.on( 'PastePostProcess', this.onPastePostProcess );
 
 		patterns.apply( this, [ editor ] );
@@ -172,7 +174,15 @@ export default class Editable extends Component {
 		}
 	}
 
+	onBeforePastePreProcess( event ) {
+		// Allows us to ask for this information when we get a report.
+		window.console.log( 'Received HTML:\n\n', event.content );
+	}
+
 	onPastePostProcess( event ) {
+		// Allows us to ask for this information when we get a report.
+		window.console.log( 'MCE processed HTML:\n\n', event.node.innerHTML );
+
 		const childNodes = Array.from( event.node.childNodes );
 		const isBlockDelimiter = ( node ) =>
 			node.nodeType === 8 && /^ wp:/.test( node.nodeValue );
