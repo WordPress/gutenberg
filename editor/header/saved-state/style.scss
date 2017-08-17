@@ -21,3 +21,16 @@
 		}
 	}
 }
+
+.editor-saved-state__mobile {
+	@include break-small {
+		display: none;
+	}
+}
+
+.editor-saved-state__desktop {
+	display: none;
+	@include break-small {
+		display: inline;
+	}
+}
