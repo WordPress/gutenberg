@@ -16,6 +16,7 @@ import { ClipboardButton } from '@wordpress/components';
  */
 import { updateBlockAttributes } from '../../actions';
 import { getSelectedBlock, getCurrentPost } from '../../selectors';
+import { filterURLForDisplay } from '../../utils/url';
 
 /**
  * Internal constants
@@ -85,7 +86,9 @@ class BlockInspectorAdvancedControls extends Component {
 							onChange={ this.setAnchor } />
 						{ !! post.link && !! selectedBlock.attributes.anchor &&
 							<div className="editor-advanced-controls__anchor">
-								<span className="editor-advanced-controls__anchor-link">{ post.link }#{ selectedBlock.attributes.anchor }</span>
+								<span className="editor-advanced-controls__anchor-link">
+									{ filterURLForDisplay( `${ post.link }#${ selectedBlock.attributes.anchor }` ) }
+								</span>
 								<ClipboardButton className="button" text={ `${ post.link }#${ selectedBlock.attributes.anchor }` } onCopy={ this.onCopy }>
 									{ this.state.showCopyConfirmation ? __( 'Copied!' ) : __( 'Copy' ) }
 								</ClipboardButton>
