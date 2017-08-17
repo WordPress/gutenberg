@@ -20,7 +20,12 @@ export default function( nodes ) {
 		stripAttributes,
 	] );
 
-	return prepare( nodes ).map( ( node ) => {
+	const prepared = prepare( nodes );
+
+	// Allows us to ask for this information when we get a report.
+	window.console.log( 'Processed HTML:\n\n', prepared.map( ( node ) => node.outerHTML ) );
+
+	return prepared.map( ( node ) => {
 		const block = getBlockTypes().reduce( ( acc, blockType ) => {
 			if ( acc ) {
 				return acc;

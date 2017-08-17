@@ -8,6 +8,7 @@ const tags = [
 	'nav',
 	'hgroup',
 	'main',
+	'aside',
 ].join( ',' );
 
 function unwrap( node ) {
