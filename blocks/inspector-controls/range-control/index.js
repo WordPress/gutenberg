@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { Dashicon, withInstanceId } from '@wordpress/components';
+import { Dashicon, withInstanceId, Button } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -9,7 +10,7 @@ import { Dashicon, withInstanceId } from '@wordpress/components';
 import BaseControl from './../base-control';
 import './style.scss';
 
-function RangeControl( { label, value, instanceId, onChange, beforeIcon, afterIcon, help, ...props } ) {
+function RangeControl( { label, value, instanceId, onChange, beforeIcon, afterIcon, help, allowReset, ...props } ) {
 	const id = 'inspector-range-control-' + instanceId;
 	const onChangeValue = ( event ) => onChange( Number( event.target.value ) );
 
@@ -32,6 +33,11 @@ function RangeControl( { label, value, instanceId, onChange, beforeIcon, afterIc
 				value={ value }
 				{ ...props }
 			/>
+			{ allowReset &&
+				<Button onClick={ () => onChange() } disabled={ value === undefined }>
+					{ __( 'Reset' ) }
+				</Button>
+			}
 		</BaseControl>
 	);
 }
