@@ -67,27 +67,7 @@ export { unstable_createPortal as createPortal }; // eslint-disable-line camelca
  * @param  {WPElement} element Element to render
  * @return {String}            HTML
  */
-export function renderToString( element ) {
-	if ( ! element ) {
-		return '';
-	}
-
-	if ( 'string' === typeof element ) {
-		return element;
-	}
-
-	if ( Array.isArray( element ) ) {
-		// React 16 supports rendering array children of an element, but not as
-		// an argument to the render methods directly. To support this, we pass
-		// the array as children of a dummy wrapper, then remove the wrapper's
-		// opening and closing tags.
-		return renderToStaticMarkup(
-			createElement( 'div', null, ...element )
-		).slice( 5 /* <div> */, -6 /* </div> */ );
-	}
-
-	return renderToStaticMarkup( element );
-}
+export { renderToStaticMarkup as renderToString };
 
 /**
  * Concatenate two or more React children objects
