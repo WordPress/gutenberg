@@ -19,18 +19,18 @@ import { getBlockType } from './registration';
 /**
  * Returns a block object given its type and attributes.
  *
- * @param  {String} name        Block name
- * @param  {Object} attributes  Block attributes
- * @return {Object}             Block object
+ * @param  {String} name             Block name
+ * @param  {Object} blockAttributes  Block attributes
+ * @return {Object}                  Block object
  */
-export function createBlock( name, attributes = {} ) {
+export function createBlock( name, blockAttributes = {} ) {
 	// Get the type definition associated with a registered block.
 	const blockType = getBlockType( name );
 
 	// Ensure attributes contains only values defined by block type, and merge
 	// default values for missing attributes.
-	attributes = reduce( blockType.attributes, ( result, source, key ) => {
-		const value = attributes[ key ];
+	const attributes = reduce( blockType.attributes, ( result, source, key ) => {
+		const value = blockAttributes[ key ];
 		if ( undefined !== value ) {
 			result[ key ] = value;
 		} else if ( source.default ) {
@@ -39,6 +39,9 @@ export function createBlock( name, attributes = {} ) {
 
 		return result;
 	}, {} );
+	if ( blockType.supportAnchor && blockAttributes.anchor ) {
+		attributes.anchor = blockAttributes.anchor;
+	}
 
 	// Blocks are stored with a unique ID, the assigned type name,
 	// and the block attributes.
