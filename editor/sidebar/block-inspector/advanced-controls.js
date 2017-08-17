@@ -9,7 +9,7 @@ import { connect } from 'react-redux';
 import { Component } from '@wordpress/element';
 import { getBlockType, InspectorControls } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
-import { ClipboardButton } from '@wordpress/components';
+import { ClipboardButton, Tooltip } from '@wordpress/components';
 
 /**
  * Internal Dependencies
@@ -86,11 +86,10 @@ class BlockInspectorAdvancedControls extends Component {
 							onChange={ this.setAnchor } />
 						{ !! post.link && !! selectedBlock.attributes.anchor &&
 							<div className="editor-advanced-controls__anchor">
-								<span className="editor-advanced-controls__anchor-link">
-									{ filterURLForDisplay( `${ post.link }#${ selectedBlock.attributes.anchor }` ) }
-								</span>
 								<ClipboardButton className="button" text={ `${ post.link }#${ selectedBlock.attributes.anchor }` } onCopy={ this.onCopy }>
-									{ this.state.showCopyConfirmation ? __( 'Copied!' ) : __( 'Copy' ) }
+									<Tooltip text={ filterURLForDisplay( `${ post.link }#${ selectedBlock.attributes.anchor }` ) }>
+										<div>{ this.state.showCopyConfirmation ? __( 'Copied!' ) : __( 'Copy Link' ) }</div>
+									</Tooltip>
 								</ClipboardButton>
 							</div>
 						}
