@@ -9,12 +9,13 @@ import { connect } from 'react-redux';
 import { Component } from '@wordpress/element';
 import { getBlockType, InspectorControls } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
+import { ClipboardButton } from '@wordpress/components';
 
 /**
  * Internal Dependencies
  */
 import { updateBlockAttributes } from '../../actions';
-import { getSelectedBlock } from '../../selectors';
+import { getSelectedBlock, getCurrentPost } from '../../selectors';
 
 /**
  * Internal constants
@@ -24,7 +25,10 @@ const ANCHOR_REGEX = /[\s#]/g;
 class BlockInspectorAdvancedControls extends Component {
 	constructor() {
 		super( ...arguments );
-
+		this.state = {
+			showCopyConfirmation: false,
+		};
+		this.onCopy = this.onCopy.bind( this );
 		this.setClassName = this.setClassName.bind( this );
 		this.setAnchor = this.setAnchor.bind( this );
 	}
@@ -39,8 +43,25 @@ class BlockInspectorAdvancedControls extends Component {
 		setAttributes( selectedBlock.uid, { anchor: anchor.replace( ANCHOR_REGEX, '-' ) } );
 	}
 
+	componentWillUnmout() {
+		clearTimeout( this.dismissCopyConfirmation );
+	}
+
+	onCopy() {
+		this.setState( {
+			showCopyConfirmation: true,
+		} );
+
+		clearTimeout( this.dismissCopyConfirmation );
+		this.dismissCopyConfirmation = setTimeout( () => {
+			this.setState( {
+				showCopyConfirmation: false,
+			} );
+		}, 4000 );
+	}
+
 	render() {
-		const { selectedBlock } = this.props;
+		const { selectedBlock, post } = this.props;
 		const blockType = getBlockType( selectedBlock.name );
 		if ( false === blockType.className && ! blockType.supportAnchor ) {
 			return null;
@@ -56,11 +77,21 @@ class BlockInspectorAdvancedControls extends Component {
 						onChange={ this.setClassName } />
 				}
 				{ blockType.supportAnchor &&
-					<InspectorControls.TextControl
-						label={ __( 'HTML Anchor' ) }
-						help={ __( 'Anchors lets you link directly to a section on a page.' ) }
-						value={ selectedBlock.attributes.anchor || '' }
-						onChange={ this.setAnchor } />
+					<div>
+						<InspectorControls.TextControl
+							label={ __( 'HTML Anchor' ) }
+							help={ __( 'Anchors lets you link directly to a section on a page.' ) }
+							value={ selectedBlock.attributes.anchor || '' }
+							onChange={ this.setAnchor } />
+						{ !! post.link && !! selectedBlock.attributes.anchor &&
+							<div className="editor-advanced-controls__anchor">
+								<span className="editor-advanced-controls__anchor-link">{ post.link }#{ selectedBlock.attributes.anchor }</span>
+								<ClipboardButton className="button" text={ `${ post.link }#${ selectedBlock.attributes.anchor }` } onCopy={ this.onCopy }>
+									{ this.state.showCopyConfirmation ? __( 'Copied!' ) : __( 'Copy' ) }
+								</ClipboardButton>
+							</div>
+						}
+					</div>
 				}
 			</div>
 		);
@@ -71,6 +102,7 @@ export default connect(
 	( state ) => {
 		return {
 			selectedBlock: getSelectedBlock( state ),
+			post: getCurrentPost( state ),
 		};
 	},
 	{
