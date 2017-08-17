@@ -82,6 +82,7 @@ export default class Editable extends Component {
 		this.maybePropagateUndo = this.maybePropagateUndo.bind( this );
 		this.onPastePostProcess = this.onPastePostProcess.bind( this );
 		this.onChangeThrottled = throttle( this.onChange, 500, { leading: true } );
+		this.saveEditorContent = this.saveEditorContent.bind( this );
 
 		this.state = {
 			formats: {},
@@ -212,6 +213,10 @@ export default class Editable extends Component {
 			return;
 		}
 
+		this.saveEditorContent();
+	}
+
+	saveEditorContent() {
 		this.savedContent = this.getContent();
 		this.editor.save();
 		this.props.onChange( this.savedContent );
@@ -503,10 +508,14 @@ export default class Editable extends Component {
 	removeFormat( format ) {
 		this.editor.focus();
 		this.editor.formatter.remove( format );
+		this.onChange();
+		this.saveEditorContent();
 	}
+
 	applyFormat( format, args, node ) {
 		this.editor.focus();
 		this.editor.formatter.apply( format, args, node );
+		this.saveEditorContent();
 	}
 
 	changeFormats( formats ) {
