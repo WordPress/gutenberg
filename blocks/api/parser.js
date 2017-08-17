@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { parse as hpqParse } from 'hpq';
+import { parse as hpqParse, attr } from 'hpq';
 import { mapValues, reduce, pickBy } from 'lodash';
 
 /**
@@ -101,7 +101,7 @@ export function getBlockAttributes( blockType, rawContent, attributes ) {
 		blockType.attributes
 	);
 
-	return reduce( blockType.attributes, ( result, source, key ) => {
+	const blockAttributes = reduce( blockType.attributes, ( result, source, key ) => {
 		let value;
 		if ( sourcedAttributes.hasOwnProperty( key ) ) {
 			value = sourcedAttributes[ key ];
@@ -146,6 +146,13 @@ export function getBlockAttributes( blockType, rawContent, attributes ) {
 		result[ key ] = coercedValue;
 		return result;
 	}, {} );
+
+	// If the block supports anchor, parse the id
+	if ( blockType.supportAnchor ) {
+		blockAttributes.anchor = hpqParse( rawContent, attr( '*', 'id' ) );
+	}
+
+	return blockAttributes;
 }
 
 /**
