@@ -81,4 +81,4 @@ This list is manually curated to include valuable contributions by volunteers th
 | @ameeker | |
 | @StaggerLeee | |
 | @jblz | |
-| | @nic.bertino |
+| | @nicbertino |
