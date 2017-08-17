@@ -133,7 +133,7 @@ export function insertBlock( block, after ) {
 export function insertBlocks( blocks, after ) {
 	return {
 		type: 'INSERT_BLOCKS',
-		blocks,
+		blocks: castArray( blocks ),
 		after,
 	};
 }

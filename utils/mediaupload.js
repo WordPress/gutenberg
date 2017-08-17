@@ -31,37 +31,48 @@ export function mediaUpload( filesList, setAttributes, gallery = false ) {
 			setAttributes( media );
 		}
 
-		// Create upload payload
-		const data = new window.FormData();
-		data.append( 'file', mediaFile );
+		return createMediaFromFile( mediaFile ).then(
+			( savedMedia ) => {
+				media.id = savedMedia.id;
+				media.url = savedMedia.source_url;
+				if ( gallery ) {
+					setAttributes( { images: [
+						...gallerySet.slice( 0, idx ),
+						media,
+						...gallerySet.slice( idx + 1 ),
+					] } );
+				} else {
+					setAttributes( media );
+				}
+			},
+			() => {
+				// Reset to empty on failure.
+				// TODO: Better failure messaging
+				media.url = null;
+				if ( gallery ) {
+					setAttributes( { images: [
+						...gallerySet.slice( 0, idx ),
+						...gallerySet.slice( idx + 1 ),
+					] } );
+				} else {
+					setAttributes( media );
+				}
+			}
+		);
+	} );
+}
 
-		new wp.api.models.Media().save( null, {
-			data: data,
-			contentType: false,
-		} ).done( ( savedMedia ) => {
-			media.id = savedMedia.id;
-			media.url = savedMedia.source_url;
-			if ( gallery ) {
-				setAttributes( { images: [
-					...gallerySet.slice( 0, idx ),
-					media,
-					...gallerySet.slice( idx + 1 ),
-				] } );
-			} else {
-				setAttributes( media );
-			}
-		} ).fail( () => {
-			// Reset to empty on failure.
-			// TODO: Better failure messaging
-			media.url = null;
-			if ( gallery ) {
-				setAttributes( { images: [
-					...gallerySet.slice( 0, idx ),
-					...gallerySet.slice( idx + 1 ),
-				] } );
-			} else {
-				setAttributes( media );
-			}
-		} );
+/**
+ * @param  {File}    file Media File to Save
+ * @return {Promise}      Media Object Promise
+ */
+export function createMediaFromFile( file ) {
+	// Create upload payload
+	const data = new window.FormData();
+	data.append( 'file', file );
+
+	return new wp.api.models.Media().save( null, {
+		data: data,
+		contentType: false,
 	} );
 }

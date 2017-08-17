@@ -2,14 +2,15 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { first, last } from 'lodash';
+import { first, last, reduce, get, find } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { Component, findDOMNode } from '@wordpress/element';
-import { KeyboardShortcuts } from '@wordpress/components';
+import { KeyboardShortcuts, DropZone } from '@wordpress/components';
+import { getBlockTypes } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -18,7 +19,7 @@ import './style.scss';
 import VisualEditorBlockList from './block-list';
 import PostTitle from '../../post-title';
 import { getBlockUids, getMultiSelectedBlockUids } from '../../selectors';
-import { clearSelectedBlock, multiSelect, redo, undo, removeBlocks } from '../../actions';
+import { clearSelectedBlock, multiSelect, redo, undo, removeBlocks, insertBlocks } from '../../actions';
 
 class VisualEditor extends Component {
 	constructor() {
@@ -29,6 +30,7 @@ class VisualEditor extends Component {
 		this.selectAll = this.selectAll.bind( this );
 		this.undoOrRedo = this.undoOrRedo.bind( this );
 		this.deleteSelectedBlocks = this.deleteSelectedBlocks.bind( this );
+		this.dropFiles = this.dropFiles.bind( this );
 	}
 
 	componentDidMount() {
@@ -78,6 +80,24 @@ class VisualEditor extends Component {
 		}
 	}
 
+	dropFiles( files ) {
+		const transformation = reduce( getBlockTypes(), ( ret, blockType ) => {
+			if ( ret ) {
+				return ret;
+			}
+
+			return find( get( blockType, 'transforms.from', [] ), ( transform ) => (
+				transform.type === 'files' && transform.isMatch( files )
+			) );
+		}, false );
+
+		if ( transformation ) {
+			transformation.transform( files ).then( ( blocks ) => {
+				this.props.insertBlocks( blocks );
+			} );
+		}
+	}
+
 	render() {
 		// Disable reason: Clicking the canvas should clear the selection
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
@@ -91,6 +111,9 @@ class VisualEditor extends Component {
 				onKeyDown={ this.onKeyDown }
 				ref={ this.bindContainer }
 			>
+				<DropZone
+					onFilesDrop={ this.dropFiles }
+				/>
 				<KeyboardShortcuts shortcuts={ {
 					'mod+a': this.selectAll,
 					'mod+z': this.undoOrRedo,
@@ -119,5 +142,6 @@ export default connect(
 		onRedo: redo,
 		onUndo: undo,
 		onRemove: removeBlocks,
+		insertBlocks,
 	}
 )( VisualEditor );
