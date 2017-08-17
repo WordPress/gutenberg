@@ -102,17 +102,10 @@ describe( 'blocks', () => {
 			expect( block ).toBeUndefined();
 		} );
 
-		it( 'should reject blocks with invalid category slug', () => {
-			const blockType = { settingName: 'settingValue', save: noop, category: 123456 },
-				block = registerBlockType( 'my-plugin/fancy-block-9', blockType );
-			expect( console.error ).toHaveBeenCalledWith( 'The category slug for block "my-plugin/fancy-block-9" must be a string.' );
-			expect( block ).toBeUndefined();
-		} );
-
 		it( 'should reject blocks with non registered category.', () => {
 			const blockType = { save: noop, category: 'custom-category-slug' },
-				block = registerBlockType( 'my-plugin/fancy-block-10', blockType );
-			expect( console.error ).toHaveBeenCalledWith( 'The block "my-plugin/fancy-block-10" must have a registered category.' );
+				block = registerBlockType( 'my-plugin/fancy-block-9', blockType );
+			expect( console.error ).toHaveBeenCalledWith( 'The block "my-plugin/fancy-block-9" must have a registered category.' );
 			expect( block ).toBeUndefined();
 		} );
 

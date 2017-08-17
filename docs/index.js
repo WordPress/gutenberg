@@ -80,6 +80,13 @@ addStory( {
 
 addStory( {
 	parents: [ 'reference' ],
+	name: 'history',
+	title: 'History',
+	markdown: require( './history.md' ),
+} );
+
+addStory( {
+	parents: [ 'reference' ],
 	name: 'coding-guidelines',
 	title: 'Coding Guidelines',
 	markdown: require( './coding-guidelines.md' ),
@@ -117,4 +124,11 @@ addStory( {
 	name: 'talks',
 	title: 'Talks',
 	markdown: require( './talks.md' ),
+} );
+
+addStory( {
+	parents: [ 'outreach' ],
+	name: 'resources',
+	title: 'Resources',
+	markdown: require( './resources.md' ),
 } );

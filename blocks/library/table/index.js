@@ -36,6 +36,15 @@ registerBlockType( 'core/table', {
 		},
 	},
 
+	transforms: {
+		from: [
+			{
+				type: 'raw',
+				isMatch: ( node ) => node.nodeName === 'TABLE',
+			},
+		],
+	},
+
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
 		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {

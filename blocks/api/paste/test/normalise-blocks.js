@@ -6,22 +6,22 @@ import { equal } from 'assert';
 /**
  * Internal dependencies
  */
-import { normaliseToBlockLevelNodes } from '../paste';
+import normaliseBlocks from '../normalise-blocks';
 
-describe( 'normaliseToBlockLevelNodes', () => {
-	function createNodes( HTML ) {
-		document.body.innerHTML = HTML;
-		return Array.from( document.body.childNodes );
-	}
+function createNodes( HTML ) {
+	document.body.innerHTML = HTML;
+	return Array.from( document.body.childNodes );
+}
 
-	function outerHTML( nodes ) {
-		return nodes.map( node => node.outerHTML ).join( '' );
-	}
+function outerHTML( nodes ) {
+	return nodes.map( node => node.outerHTML ).join( '' );
+}
 
-	function transform( HTML ) {
-		return outerHTML( normaliseToBlockLevelNodes( createNodes( HTML ) ) );
-	}
+function transform( HTML ) {
+	return outerHTML( normaliseBlocks( createNodes( HTML ) ) );
+}
 
+describe( 'normaliseBlocks', () => {
 	it( 'should convert double line breaks to paragraphs', () => {
 		equal( transform( 'test<br><br>test' ), '<p>test</p><p>test</p>' );
 	} );
@@ -44,4 +44,3 @@ describe( 'normaliseToBlockLevelNodes', () => {
 		equal( transform( '<p>&nbsp;</p>' ), '' );
 	} );
 } );
-

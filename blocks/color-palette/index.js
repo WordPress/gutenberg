@@ -8,7 +8,11 @@ import { CirclePicker } from 'react-color';
  */
 import withEditorSettings from '../with-editor-settings';
 
-function ColorPalette( { colors, onChange, value } ) {
+function ColorPalette( { colors, onChange, value, withTransparentOption } ) {
+	if ( withTransparentOption ) {
+		colors = [ ...colors, 'transparent' ];
+	}
+
 	return (
 		<CirclePicker
 			color={ value }

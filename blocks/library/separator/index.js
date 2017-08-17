@@ -26,6 +26,10 @@ registerBlockType( 'core/separator', {
 				regExp: /^-{3,}$/,
 				transform: () => createBlock( 'core/separator' ),
 			},
+			{
+				type: 'raw',
+				isMatch: ( node ) => node.nodeName === 'HR',
+			},
 		],
 	},
 
