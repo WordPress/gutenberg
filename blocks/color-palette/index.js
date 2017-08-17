@@ -42,6 +42,8 @@ class ColorPalette extends Component {
 				{ colors.map( ( color ) => {
 					const style = { color: color };
 					const className = classnames( 'blocks-color-palette__item', { 'is-active': value === color } );
+					/* Disable reason: aria-current seems like a valid aria-prop and well-suited for this */
+					/* eslint-disable jsx-a11y/aria-props */
 					return (
 						<div key={ color } className="blocks-color-palette__item-wrapper">
 							<button
@@ -53,10 +55,15 @@ class ColorPalette extends Component {
 							/>
 						</div>
 					);
+					/* eslint-enable jsx-a11y/aria-props */
 				} ) }
 
 				<div className="blocks-color-palette__item-wrapper blocks-color-palette__custom-color">
-					<button className="blocks-color-palette__item" onClick={ this.openPicker } />
+					<button
+						className="blocks-color-palette__item"
+						onClick={ this.openPicker }
+						aria-label={ __( 'Open custom color picker' ) }
+					/>
 					<Popover
 						isOpen={ this.state.opened }
 						onClose={ this.closePicker }
