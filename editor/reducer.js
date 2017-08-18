@@ -161,7 +161,7 @@ export const editor = combineUndoableReducers( {
 				return action.blocks.map( ( { uid } ) => uid );
 
 			case 'INSERT_BLOCKS': {
-				const position = action.after ? state.indexOf( action.after ) + 1 : state.length;
+				const position = action.position !== undefined ? action.position : state.length;
 				return [
 					...state.slice( 0, position ),
 					...action.blocks.map( block => block.uid ),

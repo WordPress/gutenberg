@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { includes, without } from 'lodash';
+import { includes, without, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -25,23 +25,22 @@ class DropZone extends Component {
 		this.disconnectMutationObserver = this.disconnectMutationObserver.bind( this );
 		this.detectNodeRemoval = this.detectNodeRemoval.bind( this );
 		this.toggleDraggingOverDocument = this.toggleDraggingOverDocument.bind( this );
-		this.preventDefault = this.preventDefault.bind( this );
 		this.isWithinZoneBounds = this.isWithinZoneBounds.bind( this );
 		this.setZoneNode = this.setZoneNode.bind( this );
 		this.onDrop = this.onDrop.bind( this );
-		this.resetDragState = this.resetDragState.bind( this );
 		this.resetDragState = this.resetDragState.bind( this );
 
 		this.state = {
 			isDraggingOverDocument: false,
 			isDraggingOverElement: false,
+			position: null,
 		};
 	}
 
 	componentDidMount() {
 		this.dragEnterNodes = [];
 
-		window.addEventListener( 'dragover', this.preventDefault );
+		window.addEventListener( 'dragover', this.toggleDraggingOverDocument );
 		window.addEventListener( 'drop', this.onDrop );
 		window.addEventListener( 'dragenter', this.toggleDraggingOverDocument );
 		window.addEventListener( 'dragleave', this.toggleDraggingOverDocument );
@@ -55,7 +54,7 @@ class DropZone extends Component {
 	}
 
 	componentWillUnmount() {
-		window.removeEventListener( 'dragover', this.preventDefault );
+		window.removeEventListener( 'dragover', this.toggleDraggingOverDocument );
 		window.removeEventListener( 'drop', this.onDrop );
 		window.removeEventListener( 'dragenter', this.toggleDraggingOverDocument );
 		window.removeEventListener( 'dragleave', this.toggleDraggingOverDocument );
@@ -73,6 +72,7 @@ class DropZone extends Component {
 		this.setState( {
 			isDraggingOverDocument: false,
 			isDraggingOverElement: false,
+			position: null,
 		} );
 	}
 
@@ -108,6 +108,8 @@ class DropZone extends Component {
 	}
 
 	toggleDraggingOverDocument( event ) {
+		event.preventDefault();
+
 		// Track nodes that have received a drag event. So long as nodes exist
 		// in the set, we can assume that an item is being dragged on the page.
 		if ( 'dragenter' === event.type && ! includes( this.dragEnterNodes, event.target ) ) {
@@ -127,10 +129,20 @@ class DropZone extends Component {
 		const { onVerifyValidTransfer } = this.props;
 		const isValidDrag = ! onVerifyValidTransfer || onVerifyValidTransfer( detail.dataTransfer );
 		const isDraggingOverDocument = isValidDrag && this.dragEnterNodes.length;
+		const isDraggingOverElement = isDraggingOverDocument && this.isWithinZoneBounds( detail.clientX, detail.clientY );
+		let position = null;
+		if ( isDraggingOverElement ) {
+			const rect = this.zone.getBoundingClientRect();
+			position = {
+				x: detail.clientX - rect.left < rect.right - detail.clientX ? 'left' : 'right',
+				y: detail.clientY - rect.top < rect.bottom - detail.clientY ? 'top' : 'bottom',
+			};
+		}
 
 		this.setState( {
-			isDraggingOverDocument: isDraggingOverDocument,
-			isDraggingOverElement: isDraggingOverDocument && this.isWithinZoneBounds( detail.clientX, detail.clientY ),
+			isDraggingOverDocument,
+			isDraggingOverElement,
+			position,
 		} );
 
 		if ( window.CustomEvent && event instanceof window.CustomEvent ) {
@@ -140,26 +152,26 @@ class DropZone extends Component {
 		}
 	}
 
-	preventDefault( event ) {
-		event.preventDefault();
-	}
-
 	isWithinZoneBounds( x, y ) {
 		if ( ! this.zone ) {
 			return false;
 		}
 
-		const rect = this.zone.getBoundingClientRect();
+		const isWithinElement = ( element ) => {
+			const rect = element.getBoundingClientRect();
+			/// make sure the rect is a valid rect
+			if ( rect.bottom === rect.top || rect.left === rect.right ) {
+				return false;
+			}
 
-		/// make sure the rect is a valid rect
-		if ( rect.bottom === rect.top || rect.left === rect.right ) {
-			return false;
-		}
+			return (
+				x >= rect.left && x <= rect.right &&
+				y >= rect.top && y <= rect.bottom
+			);
+		};
 
-		return (
-			x >= rect.left && x <= rect.right &&
-			y >= rect.top && y <= rect.bottom
-		);
+		const childZones = without( this.zone.parentElement.querySelectorAll( '.components-drop-zone' ), this.zone );
+		return ! some( childZones, isWithinElement ) && isWithinElement( this.zone );
 	}
 
 	setZoneNode( node ) {
@@ -170,15 +182,16 @@ class DropZone extends Component {
 		// This seemingly useless line has been shown to resolve a Safari issue
 		// where files dragged directly from the dock are not recognized
 		event.dataTransfer && event.dataTransfer.files.length; // eslint-disable-line no-unused-expressions
+		const { position, isDraggingOverElement } = this.state;
 
 		this.resetDragState();
 
-		if ( ! this.zone.contains( event.target ) ) {
+		if ( ! this.zone.contains( event.target ) || ! isDraggingOverElement ) {
 			return;
 		}
 
 		if ( this.props.onDrop ) {
-			this.props.onDrop( event );
+			this.props.onDrop( event, position );
 		}
 
 		const { onVerifyValidTransfer } = this.props;
@@ -187,7 +200,7 @@ class DropZone extends Component {
 		}
 
 		if ( event.dataTransfer ) {
-			this.props.onFilesDrop( Array.prototype.slice.call( event.dataTransfer.files ) );
+			this.props.onFilesDrop( Array.prototype.slice.call( event.dataTransfer.files ), position );
 		}
 
 		event.stopPropagation();
@@ -196,11 +209,15 @@ class DropZone extends Component {
 
 	render() {
 		const { className, children, label } = this.props;
-		const { isDraggingOverDocument, isDraggingOverElement } = this.state;
+		const { isDraggingOverDocument, isDraggingOverElement, position } = this.state;
 		const classes = classnames( 'components-drop-zone', className, {
 			'is-active': isDraggingOverDocument || isDraggingOverElement,
 			'is-dragging-over-document': isDraggingOverDocument,
 			'is-dragging-over-element': isDraggingOverElement,
+			'is-close-to-top': position && position.y === 'top',
+			'is-close-to-bottom': position && position.y === 'bottom',
+			'is-close-to-left': position && position.x === 'left',
+			'is-close-to-right': position && position.x === 'right',
 		} );
 
 		return (

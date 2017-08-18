@@ -315,7 +315,7 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should insert after the specified block uid', () => {
+		it( 'should insert at the specified position', () => {
 			const original = editor( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
@@ -331,7 +331,7 @@ describe( 'state', () => {
 
 			const state = editor( original, {
 				type: 'INSERT_BLOCKS',
-				after: 'kumquat',
+				position: 1,
 				blocks: [ {
 					uid: 'persimmon',
 					name: 'core/freeform',
