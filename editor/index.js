@@ -21,7 +21,7 @@ import { settings as dateSettings } from '@wordpress/date';
  */
 import './assets/stylesheets/main.scss';
 import Layout from './layout';
-import { createReduxStore } from './state';
+import createReduxStore from './store';
 import { setInitialPost, undo } from './actions';
 import EditorSettingsProvider from './settings/provider';
 
