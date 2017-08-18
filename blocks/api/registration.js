@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { constant, isBoolean, isFunction, findIndex } from 'lodash';
+import { isFunction, findIndex } from 'lodash';
 
 /**
  * WordPress dependencies
