@@ -322,6 +322,7 @@
 	background: $white;
 	border-top: 1px solid $light-gray-500;
 	border-bottom: 1px solid $light-gray-500;
+	overflow: auto;	// allow horizontal scrolling on mobile
 
 	> div,
 	> ul {
@@ -331,6 +332,7 @@
 
 	@include break-small() {
 		width: auto;
+		overflow: hidden;
 	}
 }
 
