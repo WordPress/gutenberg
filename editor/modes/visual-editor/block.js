@@ -22,6 +22,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import InvalidBlockWarning from './invalid-block-warning';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
+import BlockRenderContext from './block-render-context';
 import BlockMover from '../../block-mover';
 import BlockRightMenu from '../../block-settings-menu';
 import BlockSwitcher from '../../block-switcher';
@@ -430,7 +431,8 @@ class VisualEditorBlock extends Component {
 				>
 					{ isValid && ! error && (
 						<BlockCrashBoundary onError={ this.onBlockError }>
-							<BlockEdit
+							<BlockRenderContext
+								render={ BlockEdit }
 								focus={ focus }
 								attributes={ block.attributes }
 								setAttributes={ this.setAttributes }
@@ -443,12 +445,12 @@ class VisualEditorBlock extends Component {
 							/>
 						</BlockCrashBoundary>
 					) }
-					{ ! isValid && (
+					{ /* TODO: Re-enable */ /* ! isValid && (
 						blockType.save( {
 							attributes: block.attributes,
 							className,
 						} )
-					) }
+					) */ }
 				</div>
 				{ !! error && <BlockCrashWarning /> }
 				{ ! isValid && <InvalidBlockWarning block={ block } /> }
