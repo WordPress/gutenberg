@@ -233,6 +233,8 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			'upload_themes'          => array( 'administrator' ),
 			'customize'              => array( 'administrator' ),
 			'add_users'              => array( 'administrator' ),
+			'install_languages'      => array( 'administrator' ),
+			'update_languages'       => array( 'administrator' ),
 
 			'edit_categories'        => array( 'administrator', 'editor' ),
 			'delete_categories'      => array( 'administrator', 'editor' ),
@@ -261,6 +263,8 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			'upload_themes'          => array(),
 			'edit_css'               => array(),
 			'upgrade_network'        => array(),
+			'install_languages'      => array(),
+			'update_languages'       => array(),
 
 			'customize'              => array( 'administrator' ),
 			'delete_site'            => array( 'administrator' ),
