@@ -6,10 +6,16 @@
  */
 class Tests_Post_Thumbnail_Template extends WP_UnitTestCase {
 	protected static $post;
+	protected static $different_post;
 	protected static $attachment_id;
 
+	protected $current_size_filter_data = null;
+	protected $current_size_filter_result = null;
+
 	public static function wpSetUpBeforeClass( $factory ) {
-		self::$post = $factory->post->create_and_get();
+		self::$post           = $factory->post->create_and_get();
+		self::$different_post = $factory->post->create_and_get();
+
 		$file = DIR_TESTDATA . '/images/canola.jpg';
 		self::$attachment_id = $factory->attachment->create_upload_object( $file, self::$post->ID, array(
 			'post_mime_type' => 'image/jpeg',
@@ -334,5 +340,76 @@ class Tests_Post_Thumbnail_Template extends WP_UnitTestCase {
 
 		$thumbnail_id = get_post_thumbnail_id( $post_id );
 		$this->assertEmpty( $thumbnail_id );
+	}
+
+	/**
+	 * @ticket 39030
+	 */
+	function test_post_thumbnail_size_filter_simple() {
+		$this->current_size_filter_data = 'medium';
+
+		add_filter( 'post_thumbnail_size', array( $this, 'filter_post_thumbnail_size' ), 10, 2 );
+
+		// This filter is used to capture the $size result.
+		add_filter( 'post_thumbnail_html', array( $this, 'filter_set_post_thumbnail_size_result' ), 10, 4 );
+		get_the_post_thumbnail( self::$post );
+
+		$result = $this->current_size_filter_result;
+
+		$this->current_size_filter_data   = null;
+		$this->current_size_filter_result = null;
+
+		$this->assertSame( 'medium', $result );
+	}
+
+	/**
+	 * @ticket 39030
+	 * @dataProvider data_post_thumbnail_size_filter_complex
+	 */
+	function test_post_thumbnail_size_filter_complex( $which_post, $expected ) {
+		$this->current_size_filter_data = array(
+			self::$post->ID           => 'medium',
+			self::$different_post->ID => 'thumbnail',
+		);
+
+		$post = $which_post === 1 ? self::$different_post : self::$post;
+
+		add_filter( 'post_thumbnail_size', array( $this, 'filter_post_thumbnail_size' ), 10, 2 );
+
+		// This filter is used to capture the $size result.
+		add_filter( 'post_thumbnail_html', array( $this, 'filter_set_post_thumbnail_size_result' ), 10, 4 );
+		get_the_post_thumbnail( $post );
+
+		$result = $this->current_size_filter_result;
+
+		$this->current_size_filter_data   = null;
+		$this->current_size_filter_result = null;
+
+		$this->assertSame( $expected, $result );
+	}
+
+	function data_post_thumbnail_size_filter_complex() {
+		return array(
+			array( 0, 'medium' ),
+			array( 1, 'thumbnail' ),
+		);
+	}
+
+	function filter_post_thumbnail_size( $size, $post_id ) {
+		if ( is_array( $this->current_size_filter_data ) && isset( $this->current_size_filter_data[ $post_id ] ) ) {
+			return $this->current_size_filter_data[ $post_id ];
+		}
+
+		if ( is_string( $this->current_size_filter_data ) ) {
+			return $this->current_size_filter_data;
+		}
+
+		return $size;
+	}
+
+	function filter_set_post_thumbnail_size_result( $html, $post_id, $post_thumbnail_id, $size ) {
+		$this->current_size_filter_result = $size;
+
+		return $html;
 	}
 }
