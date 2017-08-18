@@ -6,6 +6,7 @@ import classnames from 'classnames';
 import { Slot } from 'react-slot-fill';
 import { partial } from 'lodash';
 import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
+import tinymce from 'tinymce';
 
 /**
  * WordPress dependencies
@@ -58,6 +59,69 @@ function FirstChild( { children } ) {
 	return childrenArray[ 0 ] || null;
 }
 
+function isEdge( { editor, reverse } ) {
+	const position = reverse ? 'start' : 'end';
+	const order = reverse ? 'first' : 'last';
+	const range = editor.selection.getRng();
+	const offset = range[ `${ position }Offset` ];
+	const rootNode = editor.getBody();
+	let node = range.startContainer;
+
+	if ( ! range.collapsed ) {
+		return false;
+	}
+
+	if ( reverse && offset !== 0 ) {
+		return false;
+	}
+
+	if ( ! reverse && offset !== node.textContent.length ) {
+		return false;
+	}
+
+	while ( node !== rootNode ) {
+		const parentNode = node.parentNode;
+
+		if ( parentNode[ `${ order }Child` ] !== node ) {
+			return false;
+		}
+
+		node = parentNode;
+	}
+
+	return true;
+}
+
+function getNextEditor( { node, target, reverse } ) {
+	const selector = '.editor-visual-editor [contenteditable="true"]';
+	const editableNodes = Array.from( document.querySelectorAll( selector ) );
+
+	if ( reverse ) {
+		editableNodes.reverse();
+	}
+
+	const index = editableNodes.indexOf( target );
+	const nextEditableNode = editableNodes[ index + 1 ];
+	const direction = reverse ? 'previous' : 'next';
+	const nextBlockNode = node[ `${ direction }Sibling` ];
+
+	if ( ! nextBlockNode || ! nextEditableNode ) {
+		return;
+	}
+
+	const editor = tinymce.get( nextEditableNode.id );
+
+	if ( ! editor ) {
+		return;
+	}
+
+	if ( ! node.contains( nextEditableNode ) && ! nextBlockNode.contains( nextEditableNode ) ) {
+		return;
+	}
+
+	return editor;
+}
+
 class VisualEditorBlock extends Component {
 	constructor() {
 		super( ...arguments );
@@ -73,7 +137,6 @@ class VisualEditorBlock extends Component {
 		this.onPointerDown = this.onPointerDown.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onKeyUp = this.onKeyUp.bind( this );
-		this.handleArrowKey = this.handleArrowKey.bind( this );
 		this.toggleMobileControls = this.toggleMobileControls.bind( this );
 		this.onBlockError = this.onBlockError.bind( this );
 
@@ -251,12 +314,54 @@ class VisualEditorBlock extends Component {
 
 	onKeyDown( event ) {
 		const { keyCode, target } = event;
+		const { previousBlock, nextBlock, onFocus } = this.props;
+		const up = keyCode === UP;
+		const down = keyCode === DOWN;
+		const left = keyCode === LEFT;
+		const right = keyCode === RIGHT;
 
-		this.handleArrowKey( event );
+		if ( up || down || left || right ) {
+			const editor = target.id && tinymce.get( target.id );
 
-		if ( keyCode === UP || keyCode === LEFT || keyCode === DOWN || keyCode === RIGHT ) {
-			const selection = window.getSelection();
-			this.lastRange = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+			if ( target === this.node ) {
+				const reverse = up || left;
+				const followingBlock = reverse ? previousBlock : nextBlock;
+
+				if ( followingBlock ) {
+					event.preventDefault();
+					onFocus( followingBlock.uid, { offset: reverse ? -1 : 0 } );
+				}
+			}
+
+			if ( editor ) {
+				const reverse = up || left;
+				const followingBlock = reverse ? previousBlock : nextBlock;
+
+				if ( ! isEdge( { editor, reverse } ) ) {
+					return;
+				}
+
+				event.preventDefault();
+
+				const followingEditor = getNextEditor( { node: this.node, target, reverse } );
+
+				if ( ! followingEditor ) {
+					if ( followingBlock ) {
+						onFocus( followingBlock.uid, { offset: reverse ? -1 : 0 } );
+					}
+
+					return;
+				}
+
+				followingEditor.focus();
+
+				if ( reverse ) {
+					followingEditor.selection.select( followingEditor.getBody(), true );
+					followingEditor.selection.collapse( false );
+				} else {
+					followingEditor.selection.setCursorLocation();
+				}
+			}
 		}
 
 		if ( ENTER === keyCode && target === this.node ) {
@@ -270,49 +375,6 @@ class VisualEditorBlock extends Component {
 
 	onKeyUp( event ) {
 		this.removeOrDeselect( event );
-		this.handleArrowKey( event );
-	}
-
-	handleArrowKey( event ) {
-		const { keyCode, target } = event;
-		const moveUp = ( keyCode === UP || keyCode === LEFT );
-		const moveDown = ( keyCode === DOWN || keyCode === RIGHT );
-		const wrapperClassname = '.editor-visual-editor';
-		const selectors = [
-			'*[contenteditable="true"]',
-			'*[tabindex]',
-			'textarea',
-			'input',
-		].map( ( selector ) => `${ wrapperClassname } ${ selector }` ).join( ',' );
-
-		if ( moveUp || moveDown ) {
-			const selection = window.getSelection();
-			const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
-
-			// If there's no movement, so we're either at the end of start, or
-			// no text input at all.
-			if ( range !== this.lastRange ) {
-				return;
-			}
-
-			const focusableNodes = Array.from( document.querySelectorAll( selectors ) );
-
-			if ( moveUp ) {
-				focusableNodes.reverse();
-			}
-
-			const targetNode = focusableNodes
-				.slice( focusableNodes.indexOf( target ) )
-				.reduce( ( result, node ) => {
-					return result || ( node.contains( target ) ? null : node );
-				}, null );
-
-			if ( targetNode ) {
-				targetNode.focus();
-			}
-		}
-
-		delete this.lastRange;
 	}
 
 	toggleMobileControls() {
