@@ -2,10 +2,8 @@
  * External dependencies
  */
 import optimist from 'redux-optimist';
-import { combineReducers, applyMiddleware, createStore } from 'redux';
-import refx from 'refx';
-import multi from 'redux-multi';
-import { reduce, keyBy, first, last, omit, without, flowRight, mapValues } from 'lodash';
+import { combineReducers } from 'redux';
+import { reduce, keyBy, first, last, omit, without, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,7 +14,6 @@ import { getBlockTypes } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { combineUndoableReducers } from './utils/undoable-reducer';
-import effects from './effects';
 
 const isMobile = window.innerWidth < 782;
 
@@ -444,10 +441,15 @@ export function mode( state = 'visual', action ) {
 	return state;
 }
 
-export function isSidebarOpened( state = ! isMobile, action ) {
+export function preferences( state = { isSidebarOpened: ! isMobile }, action ) {
 	switch ( action.type ) {
 		case 'TOGGLE_SIDEBAR':
-			return ! state;
+			return {
+				... state,
+				isSidebarOpened: ! state.isSidebarOpened,
+			};
+		case 'UPDATE_PREFERENCES':
+			return action.preferences;
 	}
 
 	return state;
@@ -515,33 +517,17 @@ export function notices( state = {}, action ) {
 	return state;
 }
 
-/**
- * Creates a new instance of a Redux store.
- *
- * @return {Redux.Store} Redux store
- */
-export function createReduxStore() {
-	const reducer = optimist( combineReducers( {
-		editor,
-		currentPost,
-		isTyping,
-		blockSelection,
-		hoveredBlock,
-		showInsertionPoint,
-		mode,
-		isSidebarOpened,
-		panel,
-		saving,
-		notices,
-		userData,
-	} ) );
-
-	const enhancers = [ applyMiddleware( multi, refx( effects ) ) ];
-	if ( window.__REDUX_DEVTOOLS_EXTENSION__ ) {
-		enhancers.push( window.__REDUX_DEVTOOLS_EXTENSION__() );
-	}
-
-	return createStore( reducer, flowRight( enhancers ) );
-}
-
-export default createReduxStore;
+export default optimist( combineReducers( {
+	editor,
+	currentPost,
+	isTyping,
+	blockSelection,
+	hoveredBlock,
+	showInsertionPoint,
+	mode,
+	preferences,
+	panel,
+	saving,
+	notices,
+	userData,
+} ) );

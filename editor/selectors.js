@@ -33,13 +33,23 @@ export function getActivePanel( state ) {
 }
 
 /**
+ * Returns the preferences (these preferences are persisted locally)
+ *
+ * @param  {Object}  state Global application state
+ * @return {Object}        Preferences Object
+ */
+export function getPreferences( state ) {
+	return state.preferences;
+}
+
+/**
  * Returns true if the editor sidebar panel is open, or false otherwise.
  *
  * @param  {Object}  state Global application state
  * @return {Boolean}       Whether sidebar is open
  */
 export function isEditorSidebarOpened( state ) {
-	return state.isSidebarOpened;
+	return state.preferences.isSidebarOpened;
 }
 
 /**

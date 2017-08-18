@@ -53,3 +53,10 @@ global.wp = global.wp || {};
 global.wp.a11y = {
 	speak: () => {},
 };
+
+// Setup fake localStorage
+const storage = {};
+global.window.localStorage = {
+	getItem: ( key ) => key in storage ? storage[ key ] : null,
+	setItem: ( key, value ) => storage[ key ] = value,
+};

@@ -100,7 +100,7 @@ describe( 'selectors', () => {
 	describe( 'isEditorSidebarOpened', () => {
 		it( 'should return true when the sidebar is opened', () => {
 			const state = {
-				isSidebarOpened: true,
+				preferences: { isSidebarOpened: true },
 			};
 
 			expect( isEditorSidebarOpened( state ) ).toBe( true );
@@ -108,7 +108,7 @@ describe( 'selectors', () => {
 
 		it( 'should return false when the sidebar is opened', () => {
 			const state = {
-				isSidebarOpened: false,
+				preferences: { isSidebarOpened: false },
 			};
 
 			expect( isEditorSidebarOpened( state ) ).toBe( false );

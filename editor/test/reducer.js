@@ -20,13 +20,12 @@ import {
 	isTyping,
 	blockSelection,
 	mode,
-	isSidebarOpened,
+	preferences,
 	saving,
 	notices,
 	showInsertionPoint,
-	createReduxStore,
 	userData,
-} from '../state';
+} from '../reducer';
 
 describe( 'state', () => {
 	describe( 'getPostRawValue', () => {
@@ -802,19 +801,29 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'isSidebarOpened()', () => {
+	describe( 'preferences()', () => {
 		it( 'should be opened by default', () => {
-			const state = isSidebarOpened( undefined, {} );
+			const state = preferences( undefined, {} );
 
-			expect( state ).toBe( true );
+			expect( state ).toEqual( { isSidebarOpened: true } );
 		} );
 
 		it( 'should toggle the sidebar open flag', () => {
-			const state = isSidebarOpened( false, {
+			const state = preferences( { isSidebarOpened: false }, {
 				type: 'TOGGLE_SIDEBAR',
 			} );
 
-			expect( state ).toBe( true );
+			expect( state ).toEqual( { isSidebarOpened: true } );
+		} );
+
+		it( 'should update preferences', () => {
+			const prefs = { awesome: true };
+			const state = preferences( { isSidebarOpened: false }, {
+				type: 'UPDATE_PREFERENCES',
+				preferences: prefs,
+			} );
+
+			expect( state ).toBe( prefs );
 		} );
 	} );
 
@@ -907,34 +916,6 @@ describe( 'state', () => {
 			expect( state ).toEqual( {
 				b: originalState.b,
 			} );
-		} );
-	} );
-
-	describe( 'createReduxStore()', () => {
-		it( 'should return a redux store', () => {
-			const store = createReduxStore();
-
-			expect( typeof store.dispatch ).toBe( 'function' );
-			expect( typeof store.getState ).toBe( 'function' );
-		} );
-
-		it( 'should have expected reducer keys', () => {
-			const store = createReduxStore();
-			const state = store.getState();
-
-			expect( Object.keys( state ) ).toEqual( expect.arrayContaining( [
-				'optimist',
-				'editor',
-				'currentPost',
-				'isTyping',
-				'blockSelection',
-				'hoveredBlock',
-				'mode',
-				'isSidebarOpened',
-				'saving',
-				'showInsertionPoint',
-				'notices',
-			] ) );
 		} );
 	} );
 
