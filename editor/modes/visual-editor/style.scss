@@ -285,6 +285,25 @@
 			margin-right: auto;
 		}
 	}
+
+	& > .components-drop-zone {
+		border: none;
+		top: -7px;
+
+		.components-drop-zone__content {
+			display: none;
+		}
+
+		&.is-close-to-top {
+			background: none;
+			border-top: 2px solid $blue-wordpress;
+		}
+
+		&.is-close-to-bottom {
+			background: none;
+			border-bottom: 2px solid $blue-wordpress;
+		}
+	}
 }
 
 .editor-visual-editor__block-controls {
