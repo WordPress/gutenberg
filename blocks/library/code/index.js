@@ -38,6 +38,14 @@ registerBlockType( 'core/code', {
 				regExp: /^```$/,
 				transform: () => createBlock( 'core/code' ),
 			},
+			{
+				type: 'raw',
+				isMatch: ( node ) => (
+					node.nodeName === 'PRE' &&
+					node.children === 1 &&
+					node.firstChild.nodeName === 'CODE'
+				),
+			},
 		],
 	},
 

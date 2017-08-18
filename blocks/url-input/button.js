@@ -43,7 +43,7 @@ class UrlInputButton extends Component {
 			<li className="blocks-url-input__button">
 				<IconButton
 					icon="admin-links"
-					label={ __( 'Edit Image Link' ) }
+					label={ __( 'Edit Link' ) }
 					onClick={ this.toggle }
 					className={ classnames( 'components-toolbar__control', {
 						'is-active': url,

@@ -74,15 +74,10 @@ registerBlockType( 'core/image', {
 		from: [
 			{
 				type: 'raw',
-				source: ( node ) => (
+				isMatch: ( node ) => (
 					node.nodeName === 'IMG' ||
 					( ! node.textContent && node.querySelector( 'img' ) )
 				),
-				attributes: {
-					url: attr( 'img', 'src' ),
-					alt: attr( 'img', 'alt' ),
-					caption: children( 'figcaption' ),
-				},
 			},
 		],
 	},

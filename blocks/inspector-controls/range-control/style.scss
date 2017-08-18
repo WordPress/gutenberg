@@ -1,6 +1,22 @@
 .blocks-range-control {
 	display: flex;
 	justify-content: center;
+	flex-wrap: wrap;
+	align-items: center;
+
+	.dashicon {
+		flex-shrink: 0;
+		margin-right: 10px;
+	}
+
+	.blocks-base-control__label {
+		width: 100%;
+	}
+
+	.blocks-range-control__slider {
+		margin-left: 0;
+		flex: 1;
+	}
 }
 
 // creating mixin because we can't do multiline variables, and we can't comma-group the selectors for styling the range slider
@@ -22,7 +38,7 @@
 	border-radius: 1.5px;
 }
 
-.blocks-range-control__input {
+.blocks-range-control__slider {
 	width: 100%;
 	margin-left: $item-spacing;
 	padding: 0;
@@ -98,8 +114,10 @@
 	}
 }
 
-.blocks-range-control__hint {
+.blocks-range-control__number {
 	display: inline-block;
 	margin-left: $item-spacing;
 	font-weight: 500;
+	width: 50px;
+	padding: 3px 5px !important;
 }

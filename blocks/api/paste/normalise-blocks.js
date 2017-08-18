@@ -1,30 +1,36 @@
 /**
- * External dependencies
- */
-import { find, get, flowRight as compose } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { nodetypes } from '@wordpress/utils';
 
-/**
- * Internal dependencies
- */
-import { createBlock } from './factory';
-import { getBlockTypes, getUnknownTypeHandlerName } from './registration';
-import { getSourcedAttributes } from './parser';
-import stripAttributes from './paste/strip-attributes';
-import removeSpans from './paste/remove-spans';
-
 const { ELEMENT_NODE, TEXT_NODE } = nodetypes;
+
+const inlineTags = [
+	'strong',
+	'em',
+	'b',
+	'i',
+	'del',
+	'ins',
+	'a',
+	'code',
+	'abbr',
+	'time',
+	'sub',
+	'sup',
+];
+
+function isInline( node ) {
+	return inlineTags.indexOf( node.nodeName.toLowerCase() ) !== -1;
+}
 
 /**
  * Normalises array nodes of any node type to an array of block level nodes.
+ *
  * @param  {Array} nodes Array of Nodes.
  * @return {Array}       Array of block level HTMLElements
  */
-export function normaliseToBlockLevelNodes( nodes ) {
+export default function( nodes ) {
 	const decu = document.createDocumentFragment();
 	const accu = document.createDocumentFragment();
 
@@ -67,6 +73,9 @@ export function normaliseToBlockLevelNodes( nodes ) {
 				} else {
 					accu.appendChild( node );
 				}
+			} else if ( isInline( node ) ) {
+				accu.appendChild( document.createElement( 'P' ) );
+				accu.lastChild.appendChild( node );
 			} else {
 				accu.appendChild( node );
 			}
@@ -76,38 +85,4 @@ export function normaliseToBlockLevelNodes( nodes ) {
 	}
 
 	return Array.from( accu.childNodes );
-}
-
-export default function( nodes ) {
-	const prepare = compose( [ normaliseToBlockLevelNodes, removeSpans, stripAttributes ] );
-
-	return prepare( nodes ).map( ( node ) => {
-		const block = getBlockTypes().reduce( ( acc, blockType ) => {
-			if ( acc ) {
-				return acc;
-			}
-
-			const transformsFrom = get( blockType, 'transforms.from', [] );
-			const transform = find( transformsFrom, ( { type } ) => type === 'raw' );
-
-			if ( ! transform || ! transform.source( node ) ) {
-				return acc;
-			}
-
-			const attributes = getSourcedAttributes(
-				node.outerHTML,
-				transform.attributes,
-			);
-
-			return createBlock( blockType.name, attributes );
-		}, null );
-
-		if ( block ) {
-			return block;
-		}
-
-		return createBlock( getUnknownTypeHandlerName(), {
-			content: node.outerHTML,
-		} );
-	} );
 }
