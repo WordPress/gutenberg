@@ -59,7 +59,8 @@ export function SavedState( { isNew, isPublished, isDirty, isSaving, isSaveable,
 
 	return (
 		<Button className={ classnames( className, 'button-link' ) } onClick={ onClick }>
-			{ __( 'Save Draft' ) }
+			<span className="editor-saved-state__mobile">{ __( 'Save' ) }</span>
+			<span className="editor-saved-state__desktop">{ __( 'Save Draft' ) }</span>
 		</Button>
 	);
 }
