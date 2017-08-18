@@ -25,6 +25,7 @@ class DropZone extends Component {
 		this.disconnectMutationObserver = this.disconnectMutationObserver.bind( this );
 		this.detectNodeRemoval = this.detectNodeRemoval.bind( this );
 		this.toggleDraggingOverDocument = this.toggleDraggingOverDocument.bind( this );
+		this.onDragOver = this.onDragOver.bind( this );
 		this.isWithinZoneBounds = this.isWithinZoneBounds.bind( this );
 		this.setZoneNode = this.setZoneNode.bind( this );
 		this.onDrop = this.onDrop.bind( this );
@@ -40,7 +41,7 @@ class DropZone extends Component {
 	componentDidMount() {
 		this.dragEnterNodes = [];
 
-		window.addEventListener( 'dragover', this.toggleDraggingOverDocument );
+		window.addEventListener( 'dragover', this.onDragOver );
 		window.addEventListener( 'drop', this.onDrop );
 		window.addEventListener( 'dragenter', this.toggleDraggingOverDocument );
 		window.addEventListener( 'dragleave', this.toggleDraggingOverDocument );
@@ -54,7 +55,7 @@ class DropZone extends Component {
 	}
 
 	componentWillUnmount() {
-		window.removeEventListener( 'dragover', this.toggleDraggingOverDocument );
+		window.removeEventListener( 'dragover', this.onDragOver );
 		window.removeEventListener( 'drop', this.onDrop );
 		window.removeEventListener( 'dragenter', this.toggleDraggingOverDocument );
 		window.removeEventListener( 'dragleave', this.toggleDraggingOverDocument );
@@ -107,9 +108,11 @@ class DropZone extends Component {
 		} );
 	}
 
-	toggleDraggingOverDocument( event ) {
+	onDragOver( event ) {
 		event.preventDefault();
+	}
 
+	toggleDraggingOverDocument( event ) {
 		// Track nodes that have received a drag event. So long as nodes exist
 		// in the set, we can assume that an item is being dragged on the page.
 		if ( 'dragenter' === event.type && ! includes( this.dragEnterNodes, event.target ) ) {
@@ -139,16 +142,22 @@ class DropZone extends Component {
 			};
 		}
 
-		this.setState( {
-			isDraggingOverDocument,
-			isDraggingOverElement,
-			position,
-		} );
-
 		if ( window.CustomEvent && event instanceof window.CustomEvent ) {
 			// For redirected CustomEvent instances, immediately remove window
 			// from tracked nodes since another "real" event will be triggered.
 			this.dragEnterNodes = without( this.dragEnterNodes, window );
+		}
+
+		if (
+			position !== this.state.position ||
+			isDraggingOverDocument !== this.state.isDraggingOverDocument ||
+			isDraggingOverElement !== this.state.isDraggingOverElement
+		) {
+			this.setState( {
+				isDraggingOverDocument,
+				isDraggingOverElement,
+				position,
+			} );
 		}
 	}
 
