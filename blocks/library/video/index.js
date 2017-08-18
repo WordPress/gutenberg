@@ -109,7 +109,7 @@ registerBlockType( 'core/video', {
 		return [
 			controls,
 			<figure key="video" className={ className }>
-				<video controls src={ src } onClick={ setFocus } className={ align ? `align${ align }` : null } />
+				<video controls src={ src } onClick={ setFocus } />
 				{ ( caption && caption.length > 0 ) || !! focus ? (
 					<Editable
 						tagName="figcaption"
