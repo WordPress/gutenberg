@@ -4,6 +4,7 @@ module.exports = function(grunt) {
 		fs = require( 'fs' ),
 		SOURCE_DIR = 'src/',
 		BUILD_DIR = 'build/',
+ 		BANNER_TEXT = '/*! This file is auto-generated */',
 		autoprefixer = require('autoprefixer'),
 		mediaConfig = {},
 		mediaBuilds = ['audiovideo', 'grid', 'models', 'views'];
@@ -56,6 +57,20 @@ module.exports = function(grunt) {
 				dest: BUILD_DIR,
 				src: [
 					'wp-admin/css/colors/*/colors.css'
+				]
+			}
+		},
+ 		usebanner: {
+			options: {
+				position: 'top',
+				banner: BANNER_TEXT,
+				linebreak: true,
+			},
+			files: {
+				src: [
+					BUILD_DIR + 'wp-admin/css/*.min.css',
+					BUILD_DIR + 'wp-includes/css/*.min.css',
+					BUILD_DIR + 'wp-admin/css/colors/*/*.css',
 				]
 			}
 		},
@@ -919,6 +934,7 @@ module.exports = function(grunt) {
 		'concat:emoji',
 		'includes:emoji',
 		'includes:embed',
+		'usebanner',
 		'jsvalidate:build'
 	] );
 
