@@ -8,7 +8,7 @@ import { flowRight, last } from 'lodash';
  * WordPress dependencies
  */
 import { sprintf, _n } from '@wordpress/i18n';
-import { IconButton, PanelBody, withApiData } from '@wordpress/components';
+import { IconButton, PanelBody, withAPIData } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -57,7 +57,7 @@ export default flowRight(
 			};
 		}
 	),
-	withApiData( ( props, { type } ) => {
+	withAPIData( ( props, { type } ) => {
 		const { postType, postId } = props;
 		return {
 			revisions: `/wp/v2/${ type( postType ) }/${ postId }/revisions`,

@@ -1,95 +1,33 @@
 /**
  * External dependencies
  */
-import balanced from 'balanced-match';
-import { mapValues, noop } from 'lodash';
+import { mapValues, reduce, forEach, noop } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { Component } from 'element';
 
-export function createEndpointTag( schema ) {
-	return function( fragments, ...args ) {
-		// Assign candidates as pairing from route paths, where first entry is
-		// a working candidate to match fragments against, and the second entry
-		// the original path value (to reference matched schema route)
-		let candidates = [];
-		for ( const path in schema.routes ) {
-			if ( schema.routes.hasOwnProperty( path ) ) {
-				candidates.push( [ path, path ] );
-			}
-		}
-
-		let path = '';
-		for ( let i = 0; i < fragments.length; i++ ) {
-			const fragment = fragments[ i ];
-			const arg = args[ i ];
-
-			// Append to working path
-			path += fragment;
-			if ( undefined !== arg ) {
-				path += arg;
-			}
-
-			candidates = candidates.filter( ( candidate ) => {
-				let [ working ] = candidate;
-
-				// Reject if does not start with fragment
-				if ( working.indexOf( fragment ) !== 0 ) {
-					return false;
-				}
-
-				working = working.substr( fragment.length );
-
-				// Test argument for this fragment
-				if ( undefined !== arg && null !== arg ) {
-					if ( working[ 0 ] === '(' ) {
-						// Check if route parameter exists
-						const param = balanced( '(', ')', working );
-						if ( ! param || param.start !== 0 ) {
-							return false;
-						}
-
-						working = working.substr( param.end + 1 );
-					} else {
-						// Reject if simple argument and not immediately
-						// following fragment
-						if ( working.indexOf( arg ) !== 0 ) {
-							return false;
-						}
-
-						working = working.substr( arg.length );
-					}
-				}
-
-				// Update working candidate
-				candidate[ 0 ] = working;
-
-				return true;
-			} );
-
-			if ( ! candidates.length ) {
-				return;
-			}
-		}
-
-		// Return first candidate for which there is no remaining working text
-		for ( let i = 0; i < candidates.length; i++ ) {
-			const [ working, original ] = candidates[ i ];
-			if ( ! working ) {
-				return [ path, schema.routes[ original ] ];
-			}
-		}
-	};
-}
+/**
+ * Internal dependencies
+ */
+import request from './request';
+import { getRoute } from './routes';
 
 export default ( mapPropsToData ) => ( WrappedComponent ) => {
-	class ApiDataComponent extends Component {
-		constructor() {
+	class APIDataComponent extends Component {
+		constructor( props, context ) {
 			super( ...arguments );
 
-			this.state = {};
+			this.state = {
+				dataProps: {},
+			};
+
+			this.schema = context.getAPISchema();
+			this.routeHelpers = mapValues( {
+				type: context.getAPIPostTypeRestBaseMapping(),
+				taxonomy: context.getAPITaxonomyRestBaseMapping(),
+			}, ( mapping ) => ( key ) => mapping[ key ] );
 		}
 
 		componentWillMount() {
@@ -97,86 +35,178 @@ export default ( mapPropsToData ) => ( WrappedComponent ) => {
 			this.applyMapping( this.props );
 		}
 
+		componentDidMount() {
+			this.initializeFetchable( {} );
+		}
+
 		componentWillReceiveProps( nextProps ) {
 			this.applyMapping( nextProps );
+		}
+
+		componentDidUpdate( prevProps, prevState ) {
+			this.initializeFetchable( prevState.dataProps );
 		}
 
 		componentWillUnmount() {
 			this.isStillMounted = false;
 		}
 
-		setIntoDataProp( propName, values ) {
-			this.setState( {
-				...this.state,
-				[ propName ]: {
-					...this.state[ propName ],
-					...values,
-				},
+		initializeFetchable( prevDataProps ) {
+			const { dataProps } = this.state;
+
+			// Trigger first fetch on initial entries into state. Assumes GET
+			// request by presence of isLoading flag.
+			forEach( dataProps, ( dataProp, propName ) => {
+				if ( prevDataProps.hasOwnProperty( propName ) ) {
+					return;
+				}
+
+				if ( this.getPendingKey( 'GET' ) in dataProp ) {
+					dataProp[ this.getRequestKey( 'GET' ) ]();
+				}
 			} );
 		}
 
-		fetchData( propName, path ) {
-			const url = this.context.getApiRoot() + path.replace( /^\//, '' );
+		setIntoDataProp( propName, values ) {
+			if ( ! this.isStillMounted ) {
+				return;
+			}
 
-			this.setIntoDataProp( propName, { isLoading: true } );
+			this.setState( ( prevState ) => {
+				const { dataProps } = prevState;
+				return {
+					dataProps: {
+						...dataProps,
+						[ propName ]: {
+							...dataProps[ propName ],
+							...values,
+						},
+					},
+				};
+			} );
+		}
 
-			window.fetch( url, {
-				credentials: 'include',
-				// TODO: Nonce management
-				headers: new window.Headers( {
-					'X-WP-Nonce': this.context.getApiNonce(),
-				} ),
-			} ).then( ( response ) => response.json() ).then( ( value ) => {
-				// Don't set state if component unmounted since request started
-				if ( this.isStillMounted ) {
-					this.setIntoDataProp( propName, {
-						isLoading: false,
-						value,
-					} );
-				}
+		getRequestKey( method ) {
+			switch ( method ) {
+				case 'GET': return 'get';
+				case 'POST': return 'create';
+				case 'PUT': return 'save';
+				case 'PATCH': return 'patch';
+				case 'DELETE': return 'delete';
+			}
+		}
+
+		getPendingKey( method ) {
+			switch ( method ) {
+				case 'GET': return 'isLoading';
+				case 'POST': return 'isCreating';
+				case 'PUT': return 'isSaving';
+				case 'PATCH': return 'isPatching';
+				case 'DELETE': return 'isDeleting';
+			}
+		}
+
+		getResponseDataKey( method ) {
+			switch ( method ) {
+				case 'GET': return 'data';
+				case 'POST': return 'createdData';
+				case 'PUT': return 'savedData';
+				case 'PATCH': return 'patchedData';
+				case 'DELETE': return 'deletedData';
+			}
+		}
+
+		getErrorResponseKey( method ) {
+			switch ( method ) {
+				case 'GET': return 'error';
+				case 'POST': return 'createError';
+				case 'PUT': return 'saveError';
+				case 'PATCH': return 'patchError';
+				case 'DELETE': return 'deleteError';
+			}
+		}
+
+		request( propName, method, path ) {
+			this.setIntoDataProp( propName, {
+				[ this.getPendingKey( method ) ]: true,
+			} );
+
+			request( { path, method } ).then( ( data ) => {
+				this.setIntoDataProp( propName, {
+					[ this.getPendingKey( method ) ]: false,
+					[ this.getResponseDataKey( method ) ]: data,
+				} );
+			} ).catch( ( error ) => {
+				this.setIntoDataProp( propName, {
+					[ this.getErrorResponseKey( method ) ]: error,
+				} );
 			} );
 		}
 
 		applyMapping( props ) {
-			const schema = this.context.getApiSchema();
-			const endpoint = createEndpointTag( schema );
-			const mapping = mapPropsToData( props, endpoint );
-			const nextState = mapValues( mapping, ( result, propName ) => {
-				if ( ! result ) {
-					return;
+			const { dataProps } = this.state;
+
+			const mapping = mapPropsToData( props, this.routeHelpers );
+			const nextDataProps = reduce( mapping, ( result, path, propName ) => {
+				// Skip if mapping already assigned into state data props
+				// Exmaple: Component updates with one new prop and other
+				// previously existing; previously existing should not be
+				// clobbered or re-trigger fetch
+				const dataProp = dataProps[ propName ];
+				if ( dataProp && dataProp.path === path ) {
+					result[ propName ] = dataProp;
+					return result;
 				}
 
-				const [ path, route ] = result;
+				const route = getRoute( this.schema, path );
+				if ( ! route ) {
+					return result;
+				}
 
-				return route.methods.reduce( ( stateValue, method ) => {
-					switch ( method ) {
-						case 'GET':
-							stateValue.get = this.fetchData.bind( this, propName, path );
-							stateValue.get();
-							break;
-					}
+				result[ propName ] = route.methods.reduce( ( stateValue, method ) => {
+					// Add request initiater into data props
+					const requestKey = this.getRequestKey( method );
+					stateValue[ requestKey ] = this.request.bind(
+						this,
+						propName,
+						method,
+						path
+					);
+
+					// Initialize pending flags as explicitly false
+					const pendingKey = this.getPendingKey( method );
+					stateValue[ pendingKey ] = false;
+
+					// Track path for future map skipping
+					stateValue.path = path;
 
 					return stateValue;
 				}, {} );
-			} );
 
-			this.setState( nextState );
+				return result;
+			}, {} );
+
+			this.setState( () => ( { dataProps: nextDataProps } ) );
 		}
 
 		render() {
-			return <WrappedComponent { ...this.props } { ...this.state } />;
+			return (
+				<WrappedComponent
+					{ ...this.props }
+					{ ...this.state.dataProps } />
+			);
 		}
 	}
 
 	// Derive display name from original component
 	const { displayName = WrappedComponent.name || 'Component' } = WrappedComponent;
-	ApiDataComponent.displayName = `api(${ displayName })`;
+	APIDataComponent.displayName = `apiData(${ displayName })`;
 
-	ApiDataComponent.contextTypes = {
-		getApiSchema: noop,
-		getApiRoot: noop,
-		getApiNonce: noop,
+	APIDataComponent.contextTypes = {
+		getAPISchema: noop,
+		getAPIPostTypeRestBaseMapping: noop,
+		getAPITaxonomyRestBaseMapping: noop,
 	};
 
-	return ApiDataComponent;
+	return APIDataComponent;
 };

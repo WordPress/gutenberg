@@ -1,20 +1,20 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
+import { mapValues, noop } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { Component } from 'element';
 
-export default class ApiProvider extends Component {
+export default class APIProvider extends Component {
 	getChildContext() {
-		return {
-			getApiSchema: () => this.props.schema,
-			getApiRoot: () => this.props.root,
-			getApiNonce: () => this.props.nonce,
-		};
+		return mapValues( {
+			getAPISchema: 'schema',
+			getAPIPostTypeRestBaseMapping: 'postTypeRestBaseMapping',
+			getAPITaxonomyRestBaseMapping: 'taxonomyRestBaseMapping',
+		}, ( key ) => () => this.props[ key ] );
 	}
 
 	render() {
@@ -22,8 +22,8 @@ export default class ApiProvider extends Component {
 	}
 }
 
-ApiProvider.childContextTypes = {
-	getApiSchema: noop,
-	getApiRoot: noop,
-	getApiNonce: noop,
+APIProvider.childContextTypes = {
+	getAPISchema: noop,
+	getAPIPostTypeRestBaseMapping: noop,
+	getAPITaxonomyRestBaseMapping: noop,
 };
