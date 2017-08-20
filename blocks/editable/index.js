@@ -180,9 +180,7 @@ export default class Editable extends Component {
 	}
 
 	onPastePostProcess( event ) {
-		// Allows us to ask for this information when we get a report.
-		window.console.log( 'MCE processed HTML:\n\n', event.node.innerHTML );
-
+		const HTML = event.node.innerHTML;
 		const childNodes = Array.from( event.node.childNodes );
 		const isBlockDelimiter = ( node ) =>
 			node.nodeType === 8 && /^ wp:/.test( node.nodeValue );
@@ -191,6 +189,9 @@ export default class Editable extends Component {
 		const isBlockPart = ( node ) =>
 			isDoubleBR( node ) || this.editor.dom.isBlock( node );
 
+		// Allows us to ask for this information when we get a report.
+		window.console.log( 'MCE processed HTML:\n\n', HTML );
+
 		// If there's no `onSplit` prop, content will later be converted to
 		// inline content.
 		if ( this.props.onSplit ) {
@@ -198,11 +199,11 @@ export default class Editable extends Component {
 
 			// Internal paste, so parse.
 			if ( childNodes.some( isBlockDelimiter ) ) {
-				blocks = parse( event.node.innerHTML.replace( /<meta[^>]+>/, '' ) );
+				blocks = parse( HTML.replace( /<meta[^>]+>/, '' ) );
 			// External paste with block level content, so attempt to assign
 			// blocks.
 			} else if ( childNodes.some( isBlockPart ) ) {
-				blocks = pasteHandler( childNodes );
+				blocks = pasteHandler( HTML.replace( /<meta[^>]+>/, '' ) );
 			}
 
 			if ( blocks.length ) {
