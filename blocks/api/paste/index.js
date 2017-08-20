@@ -13,19 +13,23 @@ import normaliseBlocks from './normalise-blocks';
 import stripAttributes from './strip-attributes';
 import stripWrappers from './strip-wrappers';
 
-export default function( nodes ) {
+export default function( HTML ) {
 	const prepare = flow( [
 		stripWrappers,
 		normaliseBlocks,
 		stripAttributes,
 	] );
 
-	const prepared = prepare( nodes );
+	const preparedHTML = prepare( HTML );
 
 	// Allows us to ask for this information when we get a report.
-	window.console.log( 'Processed HTML:\n\n', prepared.map( ( node ) => node.outerHTML ) );
+	window.console.log( 'Processed HTML piece:\n\n', HTML );
 
-	return prepared.map( ( node ) => {
+	const doc = document.implementation.createHTMLDocument( '' );
+
+	doc.body.innerHTML = preparedHTML;
+
+	return Array.from( doc.body.children ).map( ( node ) => {
 		const block = getBlockTypes().reduce( ( acc, blockType ) => {
 			if ( acc ) {
 				return acc;

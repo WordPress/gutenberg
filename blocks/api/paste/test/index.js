@@ -11,11 +11,6 @@ import { registerBlockType, unregisterBlockType, setUnknownTypeHandlerName } fro
 import { createBlock } from '../../factory';
 import { children, prop } from '../../source';
 
-function createNodes( HTML ) {
-	document.body.innerHTML = HTML;
-	return Array.from( document.body.childNodes );
-}
-
 describe( 'paste', () => {
 	beforeAll( () => {
 		registerBlockType( 'test/small', {
@@ -58,7 +53,7 @@ describe( 'paste', () => {
 	} );
 
 	it( 'should convert recognised pasted content', () => {
-		const pastedBlock = paste( createNodes( '<small>test</small>' ) )[ 0 ];
+		const pastedBlock = paste( '<small>test</small>' )[ 0 ];
 		const block = createBlock( 'test/small', { content: [ 'test' ] } );
 
 		equal( pastedBlock.name, block.name );
@@ -66,7 +61,7 @@ describe( 'paste', () => {
 	} );
 
 	it( 'should handle unknown pasted content', () => {
-		const pastedBlock = paste( createNodes( '<big>test</big>' ) )[ 0 ];
+		const pastedBlock = paste( '<big>test</big>' )[ 0 ];
 
 		equal( pastedBlock.name, 'test/unknown' );
 		equal( pastedBlock.attributes.content, '<big>test</big>' );
