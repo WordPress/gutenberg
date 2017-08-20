@@ -8,26 +8,44 @@ import { find, get, flow } from 'lodash';
  */
 import { createBlock } from '../factory';
 import { getBlockTypes, getUnknownTypeHandlerName } from '../registration';
-import { getBlockAttributes } from '../parser';
+import { getBlockAttributes, parseWithGrammar } from '../parser';
 import normaliseBlocks from './normalise-blocks';
 import stripAttributes from './strip-attributes';
 import stripWrappers from './strip-wrappers';
+import isInlineContent from './is-inline-content';
 
-export default function( HTML ) {
+export default function( { content: HTML, inline } ) {
+	HTML = HTML.replace( /<meta[^>]+>/, '' );
+
+	// Block delimiters detected.
+	if ( ! inline && HTML.indexOf( '<!-- wp:' ) !== -1 ) {
+		return parseWithGrammar( HTML );
+	}
+
+	HTML = stripAttributes( HTML );
+
+	// Only keep text and inline formatting.
+	if ( inline ) {
+		// To do.
+	}
+
+	if ( inline || isInlineContent( HTML ) ) {
+		return HTML;
+	}
+
 	const prepare = flow( [
 		stripWrappers,
 		normaliseBlocks,
-		stripAttributes,
 	] );
 
-	const preparedHTML = prepare( HTML );
+	HTML = prepare( HTML );
 
 	// Allows us to ask for this information when we get a report.
 	window.console.log( 'Processed HTML piece:\n\n', HTML );
 
 	const doc = document.implementation.createHTMLDocument( '' );
 
-	doc.body.innerHTML = preparedHTML;
+	doc.body.innerHTML = HTML;
 
 	return Array.from( doc.body.children ).map( ( node ) => {
 		const block = getBlockTypes().reduce( ( acc, blockType ) => {

@@ -28,7 +28,7 @@ import { keycodes } from '@wordpress/utils';
  * Internal dependencies
  */
 import './style.scss';
-import { parse, pasteHandler } from '../api';
+import { pasteHandler } from '../api';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
 import patterns from './patterns';
@@ -86,7 +86,7 @@ export default class Editable extends Component {
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.maybePropagateUndo = this.maybePropagateUndo.bind( this );
 		this.onBeforePastePreProcess = this.onBeforePastePreProcess.bind( this );
-		this.onPastePostProcess = this.onPastePostProcess.bind( this );
+		this.onPastePreProcess = this.onPastePreProcess.bind( this );
 
 		this.state = {
 			formats: {},
@@ -114,7 +114,7 @@ export default class Editable extends Component {
 		editor.on( 'selectionChange', this.onSelectionChange );
 		editor.on( 'BeforeExecCommand', this.maybePropagateUndo );
 		editor.on( 'BeforePastePreProcess', this.onBeforePastePreProcess );
-		editor.on( 'PastePostProcess', this.onPastePostProcess );
+		editor.on( 'PastePreProcess', this.onPastePreProcess );
 
 		patterns.apply( this, [ editor ] );
 
@@ -185,39 +185,27 @@ export default class Editable extends Component {
 		window.console.log( 'Received HTML:\n\n', event.content );
 	}
 
-	onPastePostProcess( event ) {
-		const HTML = event.node.innerHTML;
-		const childNodes = Array.from( event.node.childNodes );
-		const isBlockDelimiter = ( node ) =>
-			node.nodeType === 8 && /^ wp:/.test( node.nodeValue );
-		const isDoubleBR = ( node ) =>
-			node.nodeName === 'BR' && node.previousSibling && node.previousSibling.nodeName === 'BR';
-		const isBlockPart = ( node ) =>
-			isDoubleBR( node ) || this.editor.dom.isBlock( node );
-
+	onPastePreProcess( event ) {
 		// Allows us to ask for this information when we get a report.
-		window.console.log( 'MCE processed HTML:\n\n', HTML );
+		window.console.log( 'MCE processed HTML:\n\n', event.content );
 
-		// If there's no `onSplit` prop, content will later be converted to
-		// inline content.
-		if ( this.props.onSplit ) {
-			let blocks = [];
+		const content = pasteHandler( {
+			content: event.content,
+			inline: ! this.props.onSplit,
+		} );
 
-			// Internal paste, so parse.
-			if ( childNodes.some( isBlockDelimiter ) ) {
-				blocks = parse( HTML.replace( /<meta[^>]+>/, '' ) );
-			// External paste with block level content, so attempt to assign
-			// blocks.
-			} else if ( childNodes.some( isBlockPart ) ) {
-				blocks = pasteHandler( HTML.replace( /<meta[^>]+>/, '' ) );
+		if ( typeof content === 'string' ) {
+			// Let MCE process further with the given content.
+			event.content = content;
+		} else if ( this.props.onSplit ) {
+			// Abort pasting to split the content
+			event.preventDefault();
+
+			if ( ! content.length ) {
+				return;
 			}
 
-			if ( blocks.length ) {
-				// We must wait for TinyMCE to clean up paste containers after this
-				// event.
-				window.setTimeout( () => this.splitContent( blocks ), 0 );
-				event.preventDefault();
-			}
+			this.splitContent( content );
 		}
 	}
 

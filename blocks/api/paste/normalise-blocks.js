@@ -3,26 +3,12 @@
  */
 import { nodetypes } from '@wordpress/utils';
 
+/**
+ * Internal dependencies
+ */
+import { isInline } from './utils';
+
 const { ELEMENT_NODE, TEXT_NODE } = nodetypes;
-
-const inlineTags = [
-	'strong',
-	'em',
-	'b',
-	'i',
-	'del',
-	'ins',
-	'a',
-	'code',
-	'abbr',
-	'time',
-	'sub',
-	'sup',
-];
-
-function isInline( node ) {
-	return inlineTags.indexOf( node.nodeName.toLowerCase() ) !== -1;
-}
 
 export default function( HTML ) {
 	const decuDoc = document.implementation.createHTMLDocument( '' );
