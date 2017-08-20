@@ -7,7 +7,7 @@
 class Tests_HTTP_Functions extends WP_UnitTestCase {
 	public function setUp() {
 		if ( ! extension_loaded( 'openssl' ) ) {
-			$this->fail( 'Tests_HTTP_Functions requires openssl.' );
+			$this->markTestSkipped( 'Tests_HTTP_Functions requires openssl.' );
 		}
 
 		parent::setUp();
