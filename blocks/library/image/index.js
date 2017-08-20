@@ -28,7 +28,7 @@ import BlockDescription from '../../block-description';
 import UrlInputButton from '../../url-input/button';
 import ImageSize from './image-size';
 
-const { attr, children } = source;
+const { attr, children, text } = source;
 
 registerBlockType( 'core/image', {
 	title: __( 'Image' ),
@@ -78,6 +78,31 @@ registerBlockType( 'core/image', {
 					node.nodeName === 'IMG' ||
 					( ! node.textContent && node.querySelector( 'img' ) )
 				),
+			},
+			{
+				type: 'shortcode',
+				tag: 'caption',
+				content: {
+					url: {
+						type: 'string',
+						source: attr( 'img', 'src' ),
+					},
+					alt: {
+						type: 'string',
+						source: attr( 'img', 'alt' ),
+					},
+					caption: {
+						type: 'array',
+						source: text(),
+					},
+					href: {
+						type: 'string',
+						source: attr( 'a', 'href' ),
+					},
+				},
+				attributes: ( { named } ) => ( {
+					id: window.parseInt( named.id.replace( 'attachment_', '' ), 10 ),
+				} ),
 			},
 		],
 	},
