@@ -21,18 +21,14 @@ function unwrap( node ) {
 	parent.removeChild( node );
 }
 
-/**
- * @param  {Array} nodes Array of nodes.
- * @return {Array}       Array of nodes without any SPANs or DIVs.
- */
-export default function( nodes ) {
-	const fragment = document.createDocumentFragment();
+export default function( HTML ) {
+	const doc = document.implementation.createHTMLDocument( '' );
 
-	nodes.forEach( node => fragment.appendChild( node.cloneNode( true ) ) );
+	doc.body.innerHTML = HTML;
 
-	const wrappers = fragment.querySelectorAll( tags );
+	const wrappers = doc.body.querySelectorAll( tags );
 
 	Array.from( wrappers ).forEach( ( wrapper ) => unwrap( wrapper ) );
 
-	return Array.from( fragment.childNodes );
+	return doc.body.innerHTML;
 }

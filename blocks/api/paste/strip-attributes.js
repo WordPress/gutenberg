@@ -4,18 +4,18 @@ const attributes = [
 	'id',
 ];
 
-export default function( nodes ) {
-	const fragment = document.createDocumentFragment();
+export default function( HTML ) {
+	const doc = document.implementation.createHTMLDocument( '' );
 
-	nodes.forEach( node => fragment.appendChild( node.cloneNode( true ) ) );
+	doc.body.innerHTML = HTML;
 
-	deepAttributeStrip( fragment.children );
+	deepAttributeStrip( doc.body.children );
 
-	return Array.from( fragment.childNodes );
+	return doc.body.innerHTML;
 }
 
-function deepAttributeStrip( nodes ) {
-	Array.from( nodes ).forEach( ( node ) => {
+function deepAttributeStrip( nodeList ) {
+	Array.from( nodeList ).forEach( ( node ) => {
 		if ( node.hasAttributes() ) {
 			Array.from( node.attributes ).forEach( ( { name } ) => {
 				if ( attributes.indexOf( name ) !== -1 ) {
