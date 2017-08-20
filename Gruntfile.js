@@ -64,13 +64,13 @@ module.exports = function(grunt) {
 			options: {
 				position: 'top',
 				banner: BANNER_TEXT,
-				linebreak: true,
+				linebreak: true
 			},
 			files: {
 				src: [
 					BUILD_DIR + 'wp-admin/css/*.min.css',
 					BUILD_DIR + 'wp-includes/css/*.min.css',
-					BUILD_DIR + 'wp-admin/css/colors/*/*.css',
+					BUILD_DIR + 'wp-admin/css/colors/*/*.css'
 				]
 			}
 		},
