@@ -3,6 +3,9 @@
  */
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { keycodes } from '@wordpress/utils';
+
+const { BACKSPACE, DELETE } = keycodes;
 
 export default class OldEditor extends Component {
 	constructor( props ) {
@@ -65,6 +68,16 @@ export default class OldEditor extends Component {
 			setAttributes( {
 				content: editor.getContent(),
 			} );
+		} );
+
+		editor.on( 'keydown', ( event ) => {
+			if ( ( event.keyCode === BACKSPACE || event.keyCode === DELETE ) &&
+					/^\n?$/.test( editor.getContent( { format: 'text' } ) ) ) {
+				// delete the block
+				this.props.onReplace( [] );
+				event.preventDefault();
+				event.stopImmediatePropagation();
+			}
 		} );
 
 		editor.addButton( 'kitchensink', {
