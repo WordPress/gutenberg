@@ -809,7 +809,7 @@ describe( 'state', () => {
 		} );
 
 		it( 'should toggle the sidebar open flag', () => {
-			const state = preferences( { isSidebarOpened: false }, {
+			const state = preferences( deepFreeze( { isSidebarOpened: false } ), {
 				type: 'TOGGLE_SIDEBAR',
 			} );
 
@@ -818,7 +818,7 @@ describe( 'state', () => {
 
 		it( 'should update preferences', () => {
 			const prefs = { awesome: true };
-			const state = preferences( { isSidebarOpened: false }, {
+			const state = preferences( deepFreeze( { isSidebarOpened: false } ), {
 				type: 'UPDATE_PREFERENCES',
 				preferences: prefs,
 			} );
