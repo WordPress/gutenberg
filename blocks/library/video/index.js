@@ -43,6 +43,13 @@ registerBlockType( 'core/video', {
 		},
 	},
 
+	getEditWrapperProps( attributes ) {
+		const { align } = attributes;
+		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
+			return { 'data-align': align };
+		}
+	},
+
 	edit( { attributes, setAttributes, className, focus, setFocus } ) {
 		const { src, caption, align, id } = attributes;
 		const onSelectVideo = ( media ) => {
