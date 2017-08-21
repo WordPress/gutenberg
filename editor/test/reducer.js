@@ -815,16 +815,6 @@ describe( 'state', () => {
 
 			expect( state ).toEqual( { isSidebarOpened: true } );
 		} );
-
-		it( 'should update preferences', () => {
-			const prefs = { awesome: true };
-			const state = preferences( deepFreeze( { isSidebarOpened: false } ), {
-				type: 'UPDATE_PREFERENCES',
-				preferences: prefs,
-			} );
-
-			expect( state ).toBe( prefs );
-		} );
 	} );
 
 	describe( 'saving()', () => {

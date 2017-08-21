@@ -448,8 +448,6 @@ export function preferences( state = { isSidebarOpened: ! isMobile }, action ) {
 				... state,
 				isSidebarOpened: ! state.isSidebarOpened,
 			};
-		case 'UPDATE_PREFERENCES':
-			return action.preferences;
 	}
 
 	return state;
