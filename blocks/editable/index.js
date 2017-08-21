@@ -51,6 +51,12 @@ function createTinyMCEElement( type, props, ...children ) {
 	);
 }
 
+function isLinkBoundary( fragment ) {
+	return fragment.childNodes && fragment.childNodes.length === 1 &&
+		fragment.childNodes[ 0 ].nodeName === 'A' && fragment.childNodes[ 0 ].text.length === 1 &&
+		fragment.childNodes[ 0 ].text[ 0 ] === '\uFEFF';
+}
+
 export default class Editable extends Component {
 	constructor( props ) {
 		super( ...arguments );
@@ -369,7 +375,7 @@ export default class Editable extends Component {
 			const afterFragment = afterRange.extractContents();
 
 			const beforeElement = nodeListToReact( beforeFragment.childNodes, createTinyMCEElement );
-			const afterElement = nodeListToReact( afterFragment.childNodes, createTinyMCEElement );
+			const afterElement = isLinkBoundary( afterFragment ) ? [] : nodeListToReact( afterFragment.childNodes, createTinyMCEElement );
 
 			this.setContent( beforeElement );
 			this.props.onSplit( beforeElement, afterElement, ...blocks );
