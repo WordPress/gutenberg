@@ -87,3 +87,31 @@ function gutenberg_fix_jetpack_freeform_block_conflict() {
 		);
 	}
 }
+
+/**
+ * Shims wp-api-request for WordPress installations not running 4.9-alpha or
+ * newer.
+ *
+ * @see https://core.trac.wordpress.org/ticket/40919
+ *
+ * @since 0.10.0
+ */
+function gutenberg_ensure_wp_api_request() {
+	if ( wp_script_is( 'wp-api-request', 'registered' ) ) {
+		return;
+	}
+
+	gutenberg_register_vendor_script(
+		'wp-api-request',
+		'https://rawgit.com/WordPress/wordpress-develop/master/src/wp-includes/js/api-request.js'
+	);
+
+	// Localize wp-api-request using wp-api handle data (swapped in 4.9-alpha).
+	global $wp_scripts;
+	$wp_api_localized_data = $wp_scripts->get_data( 'wp-api', 'data' );
+	if ( false !== $wp_api_localized_data ) {
+		wp_add_inline_script( 'wp-api-request', $wp_api_localized_data, 'before' );
+	}
+}
+add_action( 'wp_enqueue_scripts', 'gutenberg_ensure_wp_api_request' );
+add_action( 'admin_enqueue_scripts', 'gutenberg_ensure_wp_api_request' );
