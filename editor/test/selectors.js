@@ -14,6 +14,7 @@ import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
  */
 import {
 	getEditorMode,
+	getPreference,
 	isEditorSidebarOpened,
 	hasEditorUndo,
 	hasEditorRedo,
@@ -94,6 +95,24 @@ describe( 'selectors', () => {
 			};
 
 			expect( getEditorMode( state ) ).toEqual( 'visual' );
+		} );
+	} );
+
+	describe( 'getPreference', () => {
+		it( 'should return the preference value if set', () => {
+			const state = {
+				preferences: { chicken: true },
+			};
+
+			expect( getPreference( state, 'chicken' ) ).toBe( true );
+		} );
+
+		it( 'should return undefined if the preference is unset', () => {
+			const state = {
+				preferences: { chicken: true },
+			};
+
+			expect( getPreference( state, 'ribs' ) ).toBeUndefined();
 		} );
 	} );
 

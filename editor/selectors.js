@@ -43,13 +43,24 @@ export function getPreferences( state ) {
 }
 
 /**
+ *
+ * @param  {Object}  state          Global application state
+ * @param  {String}  preferenceKey  Preference Key
+ * @return {Mixed}                  Preference Value
+ */
+export function getPreference( state, preferenceKey ) {
+	const preferences = getPreferences( state );
+	return preferences[ preferenceKey ];
+}
+
+/**
  * Returns true if the editor sidebar panel is open, or false otherwise.
  *
  * @param  {Object}  state Global application state
  * @return {Boolean}       Whether sidebar is open
  */
 export function isEditorSidebarOpened( state ) {
-	return state.preferences.isSidebarOpened;
+	return getPreference( state, 'isSidebarOpened' );
 }
 
 /**
