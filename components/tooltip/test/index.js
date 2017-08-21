@@ -44,11 +44,11 @@ describe( 'Tooltip', () => {
 
 		it( 'should show popover on focus', () => {
 			const originalFocus = jest.fn();
-			const event = { type: 'focus' };
+			const event = { type: 'focus', target: {} };
 			const wrapper = shallow(
 				<Tooltip text="Help Text">
 					<button
-						onMouseOver={ originalFocus }
+						onMouseEnter={ originalFocus }
 						onFocus={ originalFocus }
 					>
 						Hover Me!
@@ -65,15 +65,15 @@ describe( 'Tooltip', () => {
 			expect( popover.prop( 'isOpen' ) ).toBe( true );
 		} );
 
-		it( 'should show popover on delayed mouseover', () => {
+		it( 'should show popover on delayed mouseenter', () => {
 			// Mount: Issues with using `setState` asynchronously with shallow-
 			// rendered components: https://github.com/airbnb/enzyme/issues/450
-			const originalMouseOver = jest.fn();
+			const originalMouseEnter = jest.fn();
 			const wrapper = mount(
 				<Tooltip text="Help Text">
 					<button
-						onMouseOver={ originalMouseOver }
-						onFocus={ originalMouseOver }
+						onMouseEnter={ originalMouseEnter }
+						onFocus={ originalMouseEnter }
 					>
 						Hover Me!
 					</button>
@@ -81,9 +81,9 @@ describe( 'Tooltip', () => {
 			);
 
 			const button = wrapper.find( 'button' );
-			button.simulate( 'mouseover' );
+			button.simulate( 'mouseenter' );
 
-			expect( originalMouseOver ).toHaveBeenCalled();
+			expect( originalMouseEnter ).toHaveBeenCalled();
 
 			const popover = wrapper.find( 'Popover' );
 			expect( wrapper.state( 'isOver' ) ).toBe( false );
@@ -95,15 +95,16 @@ describe( 'Tooltip', () => {
 			expect( popover.prop( 'isOpen' ) ).toBe( true );
 		} );
 
-		it( 'should cancel pending setIsOver on mouseout', () => {
+		it( 'should ignore mouseenter on disabled elements', () => {
 			// Mount: Issues with using `setState` asynchronously with shallow-
 			// rendered components: https://github.com/airbnb/enzyme/issues/450
-			const originalMouseOver = jest.fn();
+			const originalMouseEnter = jest.fn();
 			const wrapper = mount(
 				<Tooltip text="Help Text">
 					<button
-						onMouseOver={ originalMouseOver }
-						onFocus={ originalMouseOver }
+						onMouseEnter={ originalMouseEnter }
+						onFocus={ originalMouseEnter }
+						disabled
 					>
 						Hover Me!
 					</button>
@@ -111,8 +112,32 @@ describe( 'Tooltip', () => {
 			);
 
 			const button = wrapper.find( 'button' );
-			button.simulate( 'mouseover' );
-			button.simulate( 'mouseout' );
+			button.simulate( 'mouseenter' );
+
+			const popover = wrapper.find( 'Popover' );
+			wrapper.instance().delayedSetIsOver.flush();
+			expect( wrapper.state( 'isOver' ) ).toBe( false );
+			expect( popover.prop( 'isOpen' ) ).toBe( false );
+		} );
+
+		it( 'should cancel pending setIsOver on mouseleave', () => {
+			// Mount: Issues with using `setState` asynchronously with shallow-
+			// rendered components: https://github.com/airbnb/enzyme/issues/450
+			const originalMouseEnter = jest.fn();
+			const wrapper = mount(
+				<Tooltip text="Help Text">
+					<button
+						onMouseEnter={ originalMouseEnter }
+						onFocus={ originalMouseEnter }
+					>
+						Hover Me!
+					</button>
+				</Tooltip>
+			);
+
+			const button = wrapper.find( 'button' );
+			button.simulate( 'mouseenter' );
+			button.simulate( 'mouseleave' );
 
 			wrapper.instance().delayedSetIsOver.flush();
 

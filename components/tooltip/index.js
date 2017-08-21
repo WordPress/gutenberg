@@ -53,11 +53,21 @@ class Tooltip extends Component {
 
 	createToggleIsOver( eventName, isDelayed ) {
 		return ( event ) => {
+			// Mouse events behave unreliably in React for disabled elements,
+			// firing on mouseenter but not mouseleave.  Further, the default
+			// behavior for disabled elements in some browsers is to ignore
+			// mouse events. Don't bother trying to to handle them.
+			//
+			// See: https://github.com/facebook/react/issues/4251
+			if ( event.target.disabled ) {
+				return;
+			}
+
 			// Needed in case unsetting is over while delayed set pending, i.e.
-			// quickly blur/mouseout before delayedSetIsOver is called
+			// quickly blur/mouseleave before delayedSetIsOver is called
 			this.delayedSetIsOver.cancel();
 
-			const isOver = includes( [ 'focus', 'mouseover' ], event.type );
+			const isOver = includes( [ 'focus', 'mouseenter' ], event.type );
 			if ( isOver === this.state.isOver ) {
 				return;
 			}
@@ -86,8 +96,8 @@ class Tooltip extends Component {
 		const child = Children.only( children );
 		const { isOver } = this.state;
 		return cloneElement( child, {
-			onMouseOver: this.createToggleIsOver( 'onMouseOver', true ),
-			onMouseOut: this.createToggleIsOver( 'onMouseOut' ),
+			onMouseEnter: this.createToggleIsOver( 'onMouseEnter', true ),
+			onMouseLeave: this.createToggleIsOver( 'onMouseLeave' ),
 			onFocus: this.createToggleIsOver( 'onFocus' ),
 			onBlur: this.createToggleIsOver( 'onBlur' ),
 			children: concatChildren(
