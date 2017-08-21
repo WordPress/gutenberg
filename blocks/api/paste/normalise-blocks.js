@@ -24,18 +24,14 @@ function isInline( node ) {
 	return inlineTags.indexOf( node.nodeName.toLowerCase() ) !== -1;
 }
 
-/**
- * Normalises array nodes of any node type to an array of block level nodes.
- *
- * @param  {Array} nodes Array of Nodes.
- * @return {Array}       Array of block level HTMLElements
- */
-export default function( nodes ) {
-	const decu = document.createDocumentFragment();
-	const accu = document.createDocumentFragment();
+export default function( HTML ) {
+	const decuDoc = document.implementation.createHTMLDocument( '' );
+	const accuDoc = document.implementation.createHTMLDocument( '' );
 
-	// A fragment is easier to work with.
-	nodes.forEach( node => decu.appendChild( node.cloneNode( true ) ) );
+	const decu = decuDoc.body;
+	const accu = accuDoc.body;
+
+	decu.innerHTML = HTML;
 
 	while ( decu.firstChild ) {
 		const node = decu.firstChild;
@@ -84,5 +80,5 @@ export default function( nodes ) {
 		}
 	}
 
-	return Array.from( accu.childNodes );
+	return accu.innerHTML;
 }

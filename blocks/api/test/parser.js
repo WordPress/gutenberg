@@ -155,6 +155,26 @@ describe( 'block parser', () => {
 				topic: 'none',
 			} );
 		} );
+
+		it( 'should parse the anchor if the block supports it', () => {
+			const blockType = {
+				attributes: {
+					content: {
+						type: 'string',
+						source: text( 'div' ),
+					},
+				},
+				supportAnchor: true,
+			};
+
+			const rawContent = '<div id="chicken">Ribs</div>';
+			const attrs = {};
+
+			expect( getBlockAttributes( blockType, rawContent, attrs ) ).toEqual( {
+				content: 'Ribs',
+				anchor: 'chicken',
+			} );
+		} );
 	} );
 
 	describe( 'createBlockWithFallback', () => {

@@ -52,7 +52,7 @@ import {
 	getMultiSelectedBlockUids,
 } from '../../selectors';
 
-const { BACKSPACE, ESCAPE, DELETE, UP, DOWN, LEFT, RIGHT, ENTER, TAB, F10 } = keycodes;
+const { BACKSPACE, ESCAPE, DELETE, ENTER, TAB, F10 } = keycodes;
 
 function FirstChild( { children } ) {
 	const childrenArray = Children.toArray( children );

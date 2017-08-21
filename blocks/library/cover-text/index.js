@@ -128,13 +128,12 @@ registerBlockType( 'core/cover-text', {
 					<h3>{ __( 'Background Color' ) }</h3>
 					<ColorPalette
 						value={ backgroundColor }
-						onChange={ ( colorValue ) => setAttributes( { backgroundColor: colorValue.hex } ) }
-						withTransparentOption
+						onChange={ ( colorValue ) => setAttributes( { backgroundColor: colorValue } ) }
 					/>
 					<h3>{ __( 'Text Color' ) }</h3>
 					<ColorPalette
 						value={ textColor }
-						onChange={ ( colorValue ) => setAttributes( { textColor: colorValue.hex } ) }
+						onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
 					/>
 				</InspectorControls>
 			),

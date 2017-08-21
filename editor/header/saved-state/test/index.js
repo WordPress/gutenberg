@@ -67,7 +67,7 @@ describe( 'SavedState', () => {
 		);
 
 		expect( wrapper.name() ).toBe( 'Button' );
-		expect( wrapper.childAt( 0 ).text() ).toBe( 'Save Draft' );
+		expect( wrapper.childAt( 0 ).text() ).toBe( 'Save' );
 		wrapper.simulate( 'click' );
 		expect( statusSpy ).toHaveBeenCalledWith( 'draft' );
 		expect( saveSpy ).toHaveBeenCalled();
@@ -87,7 +87,7 @@ describe( 'SavedState', () => {
 		);
 
 		expect( wrapper.name() ).toBe( 'Button' );
-		expect( wrapper.childAt( 0 ).text() ).toBe( 'Save Draft' );
+		expect( wrapper.childAt( 0 ).text() ).toBe( 'Save' );
 		wrapper.simulate( 'click' );
 		expect( statusSpy ).not.toHaveBeenCalled();
 		expect( saveSpy ).toHaveBeenCalled();

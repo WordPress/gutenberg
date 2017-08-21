@@ -491,7 +491,7 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_common_scripts_and_styles' );
 function gutenberg_color_palette() {
 	return array(
 		'#f78da7',
-		'#eb144c',
+		'#cf2e2e',
 		'#ff6900',
 		'#fcb900',
 		'#7bdcb5',
@@ -500,8 +500,7 @@ function gutenberg_color_palette() {
 		'#0693e3',
 		'#eee',
 		'#abb8c3',
-		'#444',
-		'#111',
+		'#313131',
 	);
 }
 

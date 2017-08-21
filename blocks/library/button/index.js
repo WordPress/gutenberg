@@ -90,7 +90,7 @@ registerBlockType( 'core/button', {
 					<InspectorControls key="inspector">
 						<ColorPalette
 							value={ color }
-							onChange={ ( colorValue ) => setAttributes( { color: colorValue.hex } ) }
+							onChange={ ( colorValue ) => setAttributes( { color: colorValue } ) }
 						/>
 						<InspectorControls.TextControl
 							label={ __( 'Hex Color' ) }
