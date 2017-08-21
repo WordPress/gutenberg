@@ -6,7 +6,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Placeholder } from '@wordpress/components';
+import { Dashicon, Placeholder, Toolbar } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -58,6 +58,21 @@ registerBlockType( 'core/audio', {
 						value={ align }
 						onChange={ updateAlignment }
 					/>
+					<Toolbar>
+						<li>
+							<MediaUploadButton
+								buttonProps={ {
+									className: 'components-icon-button components-toolbar__control',
+									'aria-label': __( 'Edit audio' ),
+								} }
+								onSelect={ onSelectAudio }
+								type="audio"
+								value={ src }
+							>
+								<Dashicon icon="edit" />
+							</MediaUploadButton>
+						</li>
+					</Toolbar>
 				</BlockControls>
 			)
 		);
