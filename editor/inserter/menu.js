@@ -300,9 +300,9 @@ export class InserterMenu extends Component {
 		);
 	}
 
-	renderBlocks( separatorSlug, blocks ) {
+	renderBlocks( blocks, separatorSlug ) {
 		const { instanceId } = this.props;
-		const labelledBy = 'recent' === separatorSlug ? undefined : `editor-inserter__separator-${ separatorSlug }-${ instanceId }`;
+		const labelledBy = separatorSlug === undefined ? null : `editor-inserter__separator-${ separatorSlug }-${ instanceId }`;
 		return (
 			<div
 				className="editor-inserter__category-blocks"
@@ -325,7 +325,7 @@ export class InserterMenu extends Component {
 				>
 					{ category.title }
 				</div>
-				{ this.renderBlocks( category.slug, blocks ) }
+				{ this.renderBlocks( blocks, category.slug ) }
 			</div>
 		);
 	}
@@ -368,8 +368,8 @@ export class InserterMenu extends Component {
 				/>
 				<div role="menu" className="editor-inserter__content"
 					ref={ ( ref ) => this.tabContainer = ref }>
-					{ isShowingRecent && this.renderBlocks( 'recent', this.props.recentlyUsedBlocks ) }
-					{ isShowingEmbeds && this.renderBlocks( 'embed', visibleBlocksByCategory.embed ) }
+					{ isShowingRecent && this.renderBlocks( this.props.recentlyUsedBlocks ) }
+					{ isShowingEmbeds && this.renderBlocks( visibleBlocksByCategory.embed ) }
 					{ ! isShowingRecent && ! isShowingEmbeds && this.renderCategories( visibleBlocksByCategory ) }
 				</div>
 				{ ! isSearching &&
