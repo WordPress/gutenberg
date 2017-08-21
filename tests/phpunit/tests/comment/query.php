@@ -1561,6 +1561,80 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 		$this->assertEquals( 2, $found );
 	}
 
+	/**
+	 * @ticket 38268
+	 */
+	public function test_paged() {
+		$now = time();
+
+		$c1 = self::factory()->comment->create( array(
+			'comment_post_ID' => self::$post_id,
+			'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 50 ),
+		) );
+		$c2 = self::factory()->comment->create( array(
+			'comment_post_ID' => self::$post_id,
+			'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 40 ),
+		) );
+		$c3 = self::factory()->comment->create( array(
+			'comment_post_ID' => self::$post_id,
+			'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 30 ),
+		) );
+		$c4 = self::factory()->comment->create( array(
+			'comment_post_ID' => self::$post_id,
+			'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 20 ),
+		) );
+
+		$query = new WP_Comment_Query();
+		$found = $query->query( array(
+			'paged' => 2,
+			'number' => 2,
+			'orderby' => 'comment_date_gmt',
+			'order' => 'DESC',
+			'fields' => 'ids',
+		) );
+
+		$expected = array( $c2, $c1 );
+		$this->assertSame( $expected, $found );
+	}
+
+	/**
+	 * @ticket 38268
+	 */
+	public function test_offset_should_take_precedence_over_paged() {
+		$now = time();
+
+		$c1 = self::factory()->comment->create( array(
+			'comment_post_ID' => self::$post_id,
+			'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 50 ),
+		) );
+		$c2 = self::factory()->comment->create( array(
+			'comment_post_ID' => self::$post_id,
+			'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 40 ),
+		) );
+		$c3 = self::factory()->comment->create( array(
+			'comment_post_ID' => self::$post_id,
+			'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 30 ),
+		) );
+		$c4 = self::factory()->comment->create( array(
+			'comment_post_ID' => self::$post_id,
+			'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 20 ),
+		) );
+
+		$query = new WP_Comment_Query();
+		$found = $query->query( array(
+			'paged' => 2,
+			'offset' => 1,
+			'number' => 2,
+			'orderby' => 'comment_date_gmt',
+			'order' => 'DESC',
+			'fields' => 'ids',
+		) );
+
+		$expected = array( $c3, $c2 );
+
+		$this->assertSame( $expected, $found );
+	}
+
 	public function test_post_type_single_value() {
 		register_post_type( 'post-type-1' );
 		register_post_type( 'post-type-2' );
