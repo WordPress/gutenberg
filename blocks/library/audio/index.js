@@ -14,6 +14,8 @@ import { Placeholder } from '@wordpress/components';
 import './style.scss';
 import { registerBlockType, source } from '../../api';
 import MediaUploadButton from '../../media-upload-button';
+import BlockControls from '../../block-controls';
+import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
 const { attr } = source;
 
@@ -29,15 +31,36 @@ registerBlockType( 'core/audio', {
 			type: 'string',
 			source: attr( 'audio', 'src' ),
 		},
+		align: {
+			type: 'string',
+		},
 	},
 
-	edit( { attributes, setAttributes, className } ) {
-		const { src } = attributes;
+	getEditWrapperProps( attributes ) {
+		const { align, width } = attributes;
+		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
+			return { 'data-align': align, 'data-resized': !! width };
+		}
+	},
+
+	edit( { attributes, setAttributes, className, focus } ) {
+		const { align, src } = attributes;
+		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		const onSelectAudio = ( media ) => {
 			if ( media && media.url ) {
 				setAttributes( { src: media.url } );
 			}
 		};
+		const controls = (
+			focus && (
+				<BlockControls key="controls">
+					<BlockAlignmentToolbar
+						value={ align }
+						onChange={ updateAlignment }
+					/>
+				</BlockControls>
+			)
+		);
 
 		if ( ! src ) {
 			return [
@@ -60,6 +83,7 @@ registerBlockType( 'core/audio', {
 
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return [
+			controls,
 			<div key="audio">
 				<audio controls="controls" src={ src } />
 			</div>,
@@ -68,9 +92,11 @@ registerBlockType( 'core/audio', {
 	},
 
 	save( { attributes } ) {
-		const { src } = attributes;
+		const { align, src } = attributes;
 		return (
-			<audio controls="controls" src={ src } />
+			<div className={ align ? `align${ align }` : null }>
+				<audio controls="controls" src={ src } />
+			</div>
 		);
 	},
 } );
