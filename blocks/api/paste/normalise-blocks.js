@@ -1,14 +1,12 @@
 /**
- * WordPress dependencies
- */
-import { nodetypes } from '@wordpress/utils';
-
-/**
  * Internal dependencies
  */
 import { isInline } from './utils';
 
-const { ELEMENT_NODE, TEXT_NODE } = nodetypes;
+/**
+ * Browser dependencies
+ */
+const { ELEMENT_NODE, TEXT_NODE } = window.Node;
 
 export default function( HTML ) {
 	const decuDoc = document.implementation.createHTMLDocument( '' );
