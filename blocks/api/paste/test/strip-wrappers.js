@@ -6,26 +6,29 @@ import { equal } from 'assert';
 /**
  * Internal dependencies
  */
-import stripWrappers from '../strip-wrappers';
+import createUnwrapper from '../strip-wrappers';
+import { deepFilter, isSpan } from '../utils';
+
+const unwrapper = createUnwrapper( ( node ) => isSpan( node ) );
 
 describe( 'stripWrappers', () => {
 	it( 'should remove spans', () => {
-		equal( stripWrappers( '<span>test</span>' ), 'test' );
+		equal( deepFilter( '<span>test</span>', [ unwrapper ] ), 'test' );
 	} );
 
 	it( 'should remove wrapped spans', () => {
-		equal( stripWrappers( '<p><span>test</span></p>' ), '<p>test</p>' );
+		equal( deepFilter( '<p><span>test</span></p>', [ unwrapper ] ), '<p>test</p>' );
 	} );
 
 	it( 'should remove spans with attributes', () => {
-		equal( stripWrappers( '<p><span id="test">test</span></p>' ), '<p>test</p>' );
+		equal( deepFilter( '<p><span id="test">test</span></p>', [ unwrapper ] ), '<p>test</p>' );
 	} );
 
 	it( 'should remove nested spans', () => {
-		equal( stripWrappers( '<p><span><span>test</span></span></p>' ), '<p>test</p>' );
+		equal( deepFilter( '<p><span><span>test</span></span></p>', [ unwrapper ] ), '<p>test</p>' );
 	} );
 
 	it( 'should remove spans, but preserve nested structure', () => {
-		equal( stripWrappers( '<p><span><em>test</em> <em>test</em></span></p>' ), '<p><em>test</em> <em>test</em></p>' );
+		equal( deepFilter( '<p><span><em>test</em> <em>test</em></span></p>', [ unwrapper ] ), '<p><em>test</em> <em>test</em></p>' );
 	} );
 } );

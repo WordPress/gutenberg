@@ -1,29 +1,28 @@
 /**
- * Internal dependencies
+ * Browser dependencies
  */
-import { unwrap } from './utils';
+const { ELEMENT_NODE } = window.Node;
 
-const tags = [
-	'span',
-	'div',
-	'article',
-	'header',
-	'footer',
-	'section',
-	'nav',
-	'hgroup',
-	'main',
-	'aside',
-].join( ',' );
+function unwrap( node ) {
+	const parent = node.parentNode;
 
-export default function( HTML ) {
-	const doc = document.implementation.createHTMLDocument( '' );
+	while ( node.firstChild ) {
+		parent.insertBefore( node.firstChild, node );
+	}
 
-	doc.body.innerHTML = HTML;
+	parent.removeChild( node );
+}
 
-	const wrappers = doc.body.querySelectorAll( tags );
+export default function( predicate ) {
+	return ( node ) => {
+		if ( node.nodeType !== ELEMENT_NODE ) {
+			return;
+		}
 
-	Array.from( wrappers ).forEach( ( wrapper ) => unwrap( wrapper ) );
+		if ( ! predicate( node ) ) {
+			return;
+		}
 
-	return doc.body.innerHTML;
+		unwrap( node );
+	};
 }
