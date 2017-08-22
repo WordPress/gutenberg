@@ -72,9 +72,21 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function get_item( $request ) {
-		return rest_ensure_response( array(
-			'id' => $request['id'],
-		) );
+		$uuid = $request['id'];
+		if ( ! $this->is_valid_uuid4( $uuid ) ) {
+			return new WP_Error( 'gutenberg_reusable_block_invalid_id', __( 'Invalid ID.', 'gutenberg' ), array(
+				'status' => 404,
+			) );
+		}
+
+		$reusable_block = $this->get_reusable_block( $uuid );
+		if ( ! $reusable_block ) {
+			return new WP_Error( 'gutenberg_reusable_block_not_found', __( 'No reusable block with that ID found.', 'gutenberg' ), array(
+				'status' => 404,
+			) );
+		}
+
+		return $this->prepare_item_for_response( $reusable_block, $request );
 	}
 
 	/**
@@ -101,12 +113,98 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function update_item( $request ) {
-		return rest_ensure_response( array(
-			'id' => $request['id'],
-			'type' => $request['type'],
-			'attributes' => $request['attributes'],
-			'content' => $request['content'],
-		) );
+		$uuid = $request['id'];
+		if ( ! $this->is_valid_uuid4( $uuid ) ) {
+			return new WP_Error( 'gutenberg_reusable_block_invalid_id', __( 'Invalid ID.', 'gutenberg' ), array(
+				'status' => 404,
+			) );
+		}
+
+		$reusable_block = $this->prepare_item_for_database( $request );
+
+		// wp_insert_post will unslash its input, so we have to slash it first.
+		$post_id = wp_insert_post( wp_slash( (array) $reusable_block ), true );
+		if ( is_wp_error( $post_id ) ) {
+			return $post_id;
+		}
+
+		$reusable_block = get_post( $post_id );
+
+		return $this->prepare_item_for_response( $reusable_block, $request );
+	}
+
+	/**
+	 * Prepares a single reusable block for update.
+	 *
+	 * @since 0.10.0
+	 * @access protected
+	 *
+	 * @param WP_REST_Request $request Request object.
+	 * @return stdClass|WP_Error Object suitable for passing to wp_insert_post, or WP_Error.
+	 */
+	protected function prepare_item_for_database( $request ) {
+		$prepared_reusable_block = new stdClass();
+
+		$existing_reusable_block = $this->get_reusable_block( $request['id'] );
+		if ( $existing_reusable_block ) {
+			$prepared_reusable_block->ID = $existing_reusable_block->ID;
+		}
+
+		$prepared_reusable_block->post_type = 'gb_reusable_block';
+		$prepared_reusable_block->post_status = 'publish';
+
+		// ID. We already validated this in self::update_item().
+		$prepared_reusable_block->post_name = $request['id'];
+
+		// Type. TODO: Validate this somehow.
+		if ( isset( $request['type'] ) && is_string( $request['type'] ) ) {
+			$prepared_reusable_block->meta_input['_gb_type'] = $request['type'];
+		} else {
+			return new WP_Error( 'gutenberg_reusable_block_invalid_field', __( 'Invalid type.', 'gutenberg' ), array(
+				'status' => 400,
+			) );
+		}
+
+		// Atttributes. TODO: Validate these further, and maybe against any PHP block definitions we have.
+		if ( isset( $request['attributes'] ) && is_array( $request['attributes'] ) ) {
+			$prepared_reusable_block->meta_input['_gb_attributes'] = $request['attributes'];
+		} else {
+			return new WP_Error( 'gutenberg_reusable_block_invalid_field', __( 'Invalid attributes.', 'gutenberg' ), array(
+				'status' => 400,
+			) );
+		}
+
+		// Content.
+		if ( isset( $request['content'] ) && is_string( $request['content'] ) ) {
+			$prepared_reusable_block->post_content = $request['content'];
+		} else {
+			return new WP_Error( 'gutenberg_reusable_block_invalid_field', __( 'Invalid content.', 'gutenberg' ), array(
+				'status' => 400,
+			) );
+		}
+
+		return $prepared_reusable_block;
+	}
+
+	/**
+	 * Prepares a single reusable block output for response.
+	 *
+	 * @since 0.10.0
+	 * @access protected
+	 *
+	 * @param WP_Post         $reusable_block The reusable block.
+	 * @param WP_REST_Request $request Request object.
+	 * @return WP_REST_Response Response object.
+	 */
+	public function prepare_item_for_response( $reusable_block, $request ) {
+		$data = array(
+			'id' => $reusable_block->post_name,
+			'type' => get_post_meta( $reusable_block->ID, '_gb_type', true ),
+			'attributes' => get_post_meta( $reusable_block->ID, '_gb_attributes', true ),
+			'content' => $reusable_block->post_content,
+		);
+
+		return rest_ensure_response( $data );
 	}
 
 	/**
@@ -149,5 +247,41 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 				),
 			),
 		);
+	}
+
+	/**
+	 * Fetches a reusable block by its UUID ID. Reusable blocks are stored as posts with a custom post type.
+	 *
+	 * @since 0.10.0
+	 * @access private
+	 *
+	 * @param string $uuid A UUID string that uniquely identifies the reusable block.
+	 *
+	 * @return WP_Post|null The block (a WP_Post), or null if none was found.
+	 */
+	private function get_reusable_block( $uuid ) {
+		$posts = get_posts( array(
+			'post_type' => 'gb_reusable_block',
+			'post_name' => $uuid,
+		) );
+
+		return array_shift( $posts );
+	}
+
+	/**
+	 * Checks if the given value is a valid UUID v4 string.
+	 *
+	 * @since 0.10.0
+	 * @access private
+	 *
+	 * @param mixed $uuid The value to validate.
+	 * @return bool Whether or not the string is a valid UUID v4 string.
+	 */
+	private function is_valid_uuid4( $uuid ) {
+		if ( ! is_string( $uuid ) ) {
+			return false;
+		}
+
+		return (bool) preg_match( '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $uuid );
 	}
 }
