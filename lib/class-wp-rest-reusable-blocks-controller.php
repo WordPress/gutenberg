@@ -131,6 +131,9 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 		}
 
 		$reusable_block = $this->prepare_item_for_database( $request );
+		if ( is_wp_error( $reusable_block ) ) {
+			return $reusable_block;
+		}
 
 		// wp_insert_post will unslash its input, so we have to slash it first.
 		$post_id = wp_insert_post( wp_slash( (array) $reusable_block ), true );
@@ -166,7 +169,7 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 		// ID. We already validated this in self::update_item().
 		$prepared_reusable_block->post_name = $request['id'];
 
-		// Type. TODO: Validate this somehow.
+		// Type.
 		if ( isset( $request['type'] ) && is_string( $request['type'] ) ) {
 			$prepared_reusable_block->meta_input['_gutenberg_type'] = $request['type'];
 		} else {
@@ -175,22 +178,16 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 			) );
 		}
 
-		// Atttributes. TODO: Validate these further, and maybe against any PHP block definitions we have.
+		// Atttributes.
 		if ( isset( $request['attributes'] ) && is_array( $request['attributes'] ) ) {
 			$prepared_reusable_block->meta_input['_gutenberg_attributes'] = $request['attributes'];
 		} else {
-			return new WP_Error( 'gutenberg_reusable_block_invalid_field', __( 'Invalid block attributes.', 'gutenberg' ), array(
-				'status' => 400,
-			) );
+			$prepared_reusable_block->meta_input['_gutenberg_attributes'] = array();
 		}
 
 		// Content.
 		if ( isset( $request['content'] ) && is_string( $request['content'] ) ) {
 			$prepared_reusable_block->post_content = $request['content'];
-		} else {
-			return new WP_Error( 'gutenberg_reusable_block_invalid_field', __( 'Invalid block content.', 'gutenberg' ), array(
-				'status' => 400,
-			) );
 		}
 
 		return $prepared_reusable_block;
