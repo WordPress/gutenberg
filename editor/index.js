@@ -13,7 +13,7 @@ import 'moment-timezone/moment-timezone-utils';
  */
 import { EditableProvider } from '@wordpress/blocks';
 import { createElement, render } from '@wordpress/element';
-import { APIProvider, PopoverProvider } from '@wordpress/components';
+import { APIProvider, PopoverProvider, DropZoneProvider } from '@wordpress/components';
 import { settings as dateSettings } from '@wordpress/date';
 
 /**
@@ -134,6 +134,12 @@ export function createEditorInstance( id, post, settings ) {
 					'taxonomyRestBaseMapping',
 				] ),
 			},
+		],
+
+		// DropZone provider:
+		[
+			DropZoneProvider,
+			{},
 		],
 	];
 
