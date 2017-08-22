@@ -44,12 +44,13 @@ export function isWrapper( node ) {
 	return wrapperTags.indexOf( node.nodeName.toLowerCase() ) !== -1;
 }
 
-function deepFilterHelper( nodeList, filters ) {
+function deepFilterHelper( nodeList, filters, doc ) {
 	Array.from( nodeList ).forEach( ( node ) => {
-		deepFilterHelper( node.childNodes, filters );
+		deepFilterHelper( node.childNodes, filters, doc );
 
 		filters.forEach( ( filter ) => {
-			if ( ! node ) {
+			// Make sure the node is still attached to the document.
+			if ( ! doc.contains( node ) ) {
 				return;
 			}
 
@@ -63,7 +64,7 @@ export function deepFilter( HTML, filters = [] ) {
 
 	doc.body.innerHTML = HTML;
 
-	deepFilterHelper( doc.body.childNodes, filters );
+	deepFilterHelper( doc.body.childNodes, filters, doc );
 
 	return doc.body.innerHTML;
 }
