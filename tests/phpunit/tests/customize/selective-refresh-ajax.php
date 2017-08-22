@@ -37,10 +37,8 @@ class Test_WP_Customize_Selective_Refresh_Ajax extends WP_UnitTestCase {
 	function setUp() {
 		parent::setUp();
 
-		// Define DOING_AJAX so that wp_die() will be used instead of die().
-		if ( ! defined( 'DOING_AJAX' ) ) {
-			define( 'DOING_AJAX', true );
-		}
+		// Define wp_doing_ajax so that wp_die() will be used instead of die().
+		add_filter( 'wp_doing_ajax', '__return_true' );
 		add_filter( 'wp_die_ajax_handler', array( $this, 'get_wp_die_handler' ), 1, 1 );
 
 		require_once( ABSPATH . WPINC . '/class-wp-customize-manager.php' );

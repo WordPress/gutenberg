@@ -59,9 +59,7 @@ abstract class WP_Ajax_UnitTestCase extends WP_UnitTestCase {
 	);
 
 	public static function setUpBeforeClass() {
-		if ( ! defined( 'DOING_AJAX' ) ) {
-			define( 'DOING_AJAX', true );
-		}
+		add_filter( 'wp_doing_ajax', '__return_true' );		
 
 		remove_action( 'admin_init', '_maybe_update_core' );
 		remove_action( 'admin_init', '_maybe_update_plugins' );
