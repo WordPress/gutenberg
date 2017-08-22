@@ -6,6 +6,7 @@ import classnames from 'classnames';
 import { Slot } from 'react-slot-fill';
 import { filter, findIndex, flatMap, partial } from 'lodash';
 import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
+import 'element-closest';
 
 /**
  * WordPress dependencies
@@ -59,16 +60,6 @@ function FirstChild( { children } ) {
 	return childrenArray[ 0 ] || null;
 }
 
-function selectAncestor( node, selector ) {
-	while ( node !== null ) {
-		if ( node.querySelector( selector ) !== null ) {
-			return node;
-		}
-		node = node.parentNode;
-	}
-	return null;
-}
-
 function queryFirstTabbableChild( elem ) {
 	let i = 0;
 	for ( i = 0; i < elem.childNodes.length; i++ ) {
@@ -81,7 +72,7 @@ function queryFirstTabbableChild( elem ) {
 }
 
 function isToolbar( target ) {
-	return selectAncestor( target, '.components-toolbar, .editor-block-settings-menu, .editor-block-mover' ) !== null;
+	return target.closest( '.components-toolbar, .editor-block-settings-menu, .editor-block-mover' ) !== null;
 }
 
 class VisualEditorBlock extends Component {
