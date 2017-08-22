@@ -37,6 +37,7 @@ export class DropdownMenu extends Component {
 		this.state = {
 			activeIndex: null,
 			open: false,
+			menuLeft: 0,
 		};
 	}
 
@@ -149,8 +150,24 @@ export class DropdownMenu extends Component {
 		}
 	}
 
+	calculateMenuPosition() {
+		const { toggle } = this.nodes;
+		const node = findDOMNode( toggle );
+		const menuLeft = node.offsetLeft - 4;
+		// TODO take into account scrolling
+		if ( this.state.menuLeft !== menuLeft ) {
+			this.setState( { menuLeft } );
+		}
+	}
+
+	componentDidMount() {
+		this.calculateMenuPosition();
+	}
+
 	componentDidUpdate( prevProps, prevState ) {
 		const { open, activeIndex } = this.state;
+
+		this.calculateMenuPosition();
 
 		// Focus the first item when the menu opens.
 		if ( ! prevState.open && open ) {
@@ -205,6 +222,7 @@ export class DropdownMenu extends Component {
 						className="components-dropdown-menu__menu"
 						role="menu"
 						aria-label={ menuLabel }
+						style={ { left: this.state.menuLeft } }
 						ref={ this.bindReferenceNode( 'menu' ) }
 					>
 						{ controls.map( ( control, index ) => (
