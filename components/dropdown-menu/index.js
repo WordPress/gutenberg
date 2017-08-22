@@ -31,6 +31,7 @@ export class DropdownMenu extends Component {
 		this.focusNext = this.focusNext.bind( this );
 		this.handleKeyDown = this.handleKeyDown.bind( this );
 		this.handleKeyUp = this.handleKeyUp.bind( this );
+		this.calculateMenuPosition = this.calculateMenuPosition.bind( this );
 
 		this.nodes = {};
 
@@ -154,8 +155,13 @@ export class DropdownMenu extends Component {
 		const { toggle } = this.nodes;
 		if ( toggle ) {
 			const node = findDOMNode( toggle );
-			const menuLeft = node.offsetLeft - 4;
-			// TODO take into account scrolling
+			let n = node;
+			let scrollLeft = 0;
+			while ( n !== null && n !== node.offsetParent ) {
+				scrollLeft += n.scrollLeft;
+				n = n.parentNode;
+			}
+			const menuLeft = node.offsetLeft - scrollLeft - 4;
 			if ( this.state.menuLeft !== menuLeft ) {
 				this.setState( { menuLeft } );
 			}
@@ -164,6 +170,7 @@ export class DropdownMenu extends Component {
 
 	componentDidMount() {
 		this.calculateMenuPosition();
+		window.addEventListener( 'resize', this.calculateMenuPosition );
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
@@ -183,6 +190,10 @@ export class DropdownMenu extends Component {
 				menu && menu.children[ activeIndex ] ) {
 			menu.children[ activeIndex ].focus();
 		}
+	}
+
+	componentWillUnmount() {
+		window.removeEventListener( 'resize', this.calculateMenuPosition );
 	}
 
 	render() {
