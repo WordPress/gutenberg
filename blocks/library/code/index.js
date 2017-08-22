@@ -49,12 +49,13 @@ registerBlockType( 'core/code', {
 		],
 	},
 
-	edit( { attributes, setAttributes, className } ) {
+	edit( { attributes, setAttributes, className, setFocus } ) {
 		return (
 			<TextareaAutosize
 				className={ className }
 				value={ attributes.content }
 				onChange={ ( event ) => setAttributes( { content: event.target.value } ) }
+				onFocus={ ( ) => setFocus() }
 				placeholder={ __( 'Write code…' ) }
 			/>
 		);
