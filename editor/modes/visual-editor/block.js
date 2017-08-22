@@ -160,11 +160,7 @@ class VisualEditorBlock extends Component {
 			if ( this.props.focus.toolbar ) {
 				if ( ! prevFocusToolbar ) {
 					// we want the first toolbar item that is focusable but not in the default tab cycle
-					const block = findDOMNode( this.node );
-					const item = block.querySelector( '.components-toolbar *[tabindex="-1"]:not(:disabled)' );
-					if ( item ) {
-						item.focus();
-					}
+					this.focusToolbarItem();
 				}
 			} else if ( ! prevProps.focus || prevFocusToolbar ) {
 				this.node.focus();
@@ -335,11 +331,7 @@ class VisualEditorBlock extends Component {
 		this.removeOrDeselect( event );
 	}
 
-	handleToolbarTabCycle( event ) {
-		const { keyCode, shiftKey, target } = event;
-		if ( keyCode !== TAB || ! this.node ) {
-			return;
-		}
+	focusToolbarItem( after, reverseOrder ) {
 		const block = findDOMNode( this.node );
 		const isVisible = ( elem ) => elem && ! ( elem.offsetWidth <= 0 || elem.offsetHeight <= 0 );
 		const allToolbars = filter( Array.from( block.querySelectorAll( '.components-toolbar' ) ), isVisible );
@@ -347,30 +339,44 @@ class VisualEditorBlock extends Component {
 		const moverMenu = filter( [ block.querySelector( '.editor-block-mover' ) ], isVisible );
 		const allCycle = [ ...allToolbars, ...settingsMenu, ...moverMenu ];
 
-		if ( shiftKey ) {
+		if ( reverseOrder ) {
 			allCycle.reverse();
 		}
 
-		const targetIndex = findIndex( allCycle, ( node ) => node.contains( target ) );
-
-		if ( targetIndex === -1 ) {
-			return;
+		let startIndex = 0;
+		if ( after ) {
+			const currIndex = findIndex( allCycle, ( node ) => node.contains( after ) );
+			if ( currIndex === -1 ) {
+				return false;
+			}
+			startIndex = currIndex + 1;
 		}
 
-		// we have a toolbar selected so we should be tabbing between toolbars
-		event.preventDefault();
-		event.stopPropagation();
-
 		// try all toolbars after this one to find the first with a focusable item
-		for ( let i = 1; i < allCycle.length; i++ ) {
-			const nextToolbar = allCycle[ ( targetIndex + i ) % allCycle.length ];
+		for ( let i = 0; i < allCycle.length; i++ ) {
+			const nextToolbar = allCycle[ ( startIndex + i ) % allCycle.length ];
 
 			const firstFocusableItem = nextToolbar.querySelector( '*[tabindex="-1"]:not(:disabled)' );
 
-			if ( firstFocusableItem ) {
+			if ( firstFocusableItem && isVisible( firstFocusableItem ) ) {
 				firstFocusableItem.focus();
-				break;
+				return true;
 			}
+		}
+		// nothing focusable
+		return false;
+	}
+
+	handleToolbarTabCycle( event ) {
+		const { keyCode, shiftKey, target } = event;
+		if ( keyCode !== TAB || ! this.node ) {
+			return;
+		}
+
+		if ( this.focusToolbarItem( target, shiftKey ) ) {
+			// we have a toolbar selected so we should be tabbing between toolbars
+			event.preventDefault();
+			event.stopPropagation();
 		}
 	}
 
