@@ -221,6 +221,15 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 		// ID. We already validated this in self::update_item().
 		$prepared_reusable_block->post_name = $request['id'];
 
+		// Name.
+		if ( isset( $request['name'] ) && is_string( $request['name'] ) ) {
+			$prepared_reusable_block->post_title = $request['name'];
+		} else {
+			return new WP_Error( 'gutenberg_reusable_block_invalid_field', __( 'Invalid reusable block name.', 'gutenberg' ), array(
+				'status' => 400,
+			) );
+		}
+
 		// Type.
 		if ( isset( $request['type'] ) && is_string( $request['type'] ) ) {
 			$prepared_reusable_block->meta_input['_gutenberg_type'] = $request['type'];
@@ -258,6 +267,7 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 	public function prepare_item_for_response( $reusable_block, $request ) {
 		$data = array(
 			'id' => $reusable_block->post_name,
+			'name' => $reusable_block->post_title,
 			'type' => get_post_meta( $reusable_block->ID, '_gutenberg_type', true ),
 			'attributes' => get_post_meta( $reusable_block->ID, '_gutenberg_attributes', true ),
 			'content' => $reusable_block->post_content,
@@ -299,6 +309,12 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 					'context'      => array( 'view', 'edit' ),
 					'readonly'     => true,
 				),
+				'name'             => array(
+					'description'  => __( 'Name that identifies this reusable block', 'gutenberg' ),
+					'type'         => 'string',
+					'context'      => array( 'view', 'edit' ),
+					'required'     => true,
+				),
 				'type'             => array(
 					'description'  => __( 'The block\'s type, e.g. core/text', 'gutenberg' ),
 					'type'         => 'string',
@@ -309,13 +325,11 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 					'description'  => __( 'The block\'s attributes, e.g. { "dropCap": true }', 'gutenberg' ),
 					'type'         => 'object',
 					'context'      => array( 'view', 'edit' ),
-					'required'     => true,
 				),
 				'content'          => array(
 					'description'  => __( 'The block\'s HTML content.', 'gutenberg' ),
 					'type'         => 'object',
 					'context'      => array( 'view', 'edit' ),
-					'required'     => true,
 				),
 			),
 		);
