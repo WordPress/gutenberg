@@ -13,6 +13,7 @@ import normaliseBlocks from './normalise-blocks';
 import stripAttributes from './strip-attributes';
 import stripWrappers from './strip-wrappers';
 import isInlineContent from './is-inline-content';
+import prepareInline from './prepare-inline';
 
 export default function( { content: HTML, inline } ) {
 	HTML = HTML.replace( /<meta[^>]+>/, '' );
@@ -26,7 +27,7 @@ export default function( { content: HTML, inline } ) {
 
 	// Only keep text and inline formatting.
 	if ( inline ) {
-		// To do.
+		HTML = prepareInline( HTML );
 	}
 
 	if ( inline || isInlineContent( HTML ) ) {
