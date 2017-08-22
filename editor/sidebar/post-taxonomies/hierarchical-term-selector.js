@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { unescape as unescapeString, without, groupBy } from 'lodash';
+import { unescape as unescapeString, without, groupBy, map, repeat } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -181,6 +181,15 @@ class HierarchicalTermSelector extends Component {
 		} );
 	}
 
+	renderParentSelectorOptions( terms, level = 0 ) {
+		return map( terms, ( term ) => ( [
+			<option key={ term.id } value={ term.id }>
+				{ repeat( '\u00A0', level * 3 ) + unescapeString( term.name ) }
+			</option>,
+			...this.renderParentSelectorOptions( term.children, level + 1 ),
+		] ) );
+	}
+
 	render() {
 		const { availableTermsTree, availableTerms, formName, formParent, loading, adding, showForm } = this.state;
 		const { label, slug } = this.props;
@@ -214,9 +223,7 @@ class HierarchicalTermSelector extends Component {
 								onChange={ this.onChangeFormParent }
 							>
 								<option value="">{ defaultParentLabel }</option>
-								{ availableTerms.map( ( term ) => (
-									<option key={ term.id } value={ term.id }>{ unescapeString( term.name ) }</option>
-								) ) }
+								{ this.renderParentSelectorOptions( availableTermsTree ) }
 							</select>
 						}
 						<button
