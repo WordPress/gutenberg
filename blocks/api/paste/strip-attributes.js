@@ -1,3 +1,8 @@
+/**
+ * Browser dependencies
+ */
+const { ELEMENT_NODE } = window.Node;
+
 const attributes = [
 	'style',
 	'class',
@@ -5,7 +10,7 @@ const attributes = [
 ];
 
 export default function( node ) {
-	if ( node.nodeType !== 1 ) {
+	if ( node.nodeType !== ELEMENT_NODE ) {
 		return;
 	}
 
