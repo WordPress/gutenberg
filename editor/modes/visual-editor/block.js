@@ -253,6 +253,7 @@ class VisualEditorBlock extends Component {
 		if ( ESCAPE === keyCode ) {
 			if ( isToolbar( target ) ) {
 				onFocus( uid, {} );
+			} else if ( ! this.props.isTyping ) {
 				onStartTyping();
 			} else {
 				onDeselect();
