@@ -18,7 +18,7 @@ import './style.scss';
 import VisualEditorBlockList from './block-list';
 import PostTitle from '../../post-title';
 import { getBlockUids, getMultiSelectedBlockUids } from '../../selectors';
-import { clearSelectedBlock, multiSelect, redo, undo, removeBlocks, insertBlocks } from '../../actions';
+import { clearSelectedBlock, multiSelect, redo, undo, removeBlocks } from '../../actions';
 
 class VisualEditor extends Component {
 	constructor() {
@@ -119,6 +119,5 @@ export default connect(
 		onRedo: redo,
 		onUndo: undo,
 		onRemove: removeBlocks,
-		insertBlocks,
 	}
 )( VisualEditor );
