@@ -289,7 +289,9 @@
 	& > .components-drop-zone {
 		border: none;
 		top: -4px;
-		bottom: -3px;
+		bottom: -4px;
+		margin: 0 $block-mover-padding-visible;
+		border-radius: 0;
 
 		.components-drop-zone__content {
 			display: none;
@@ -297,12 +299,12 @@
 
 		&.is-close-to-top {
 			background: none;
-			border-top: 2px solid $blue-wordpress;
+			border-top: 3px solid $blue-medium-500;
 		}
 
 		&.is-close-to-bottom {
 			background: none;
-			border-bottom: 2px solid $blue-wordpress;
+			border-bottom: 3px solid $blue-medium-500;
 		}
 	}
 }
