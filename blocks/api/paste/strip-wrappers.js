@@ -1,3 +1,8 @@
+/**
+ * Internal dependencies
+ */
+import { unwrap } from './utils';
+
 const tags = [
 	'span',
 	'div',
@@ -10,16 +15,6 @@ const tags = [
 	'main',
 	'aside',
 ].join( ',' );
-
-function unwrap( node ) {
-	const parent = node.parentNode;
-
-	while ( node.firstChild ) {
-		parent.insertBefore( node.firstChild, node );
-	}
-
-	parent.removeChild( node );
-}
 
 export default function( HTML ) {
 	const doc = document.implementation.createHTMLDocument( '' );

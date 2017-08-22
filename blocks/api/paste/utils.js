@@ -22,3 +22,13 @@ export function isInline( node ) {
 export function isDoubleBR( node ) {
 	return node.nodeName === 'BR' && node.previousSibling && node.previousSibling.nodeName === 'BR';
 }
+
+export function unwrap( node ) {
+	const parent = node.parentNode;
+
+	while ( node.firstChild ) {
+		parent.insertBefore( node.firstChild, node );
+	}
+
+	parent.removeChild( node );
+}
