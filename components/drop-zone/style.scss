@@ -8,7 +8,7 @@
 	visibility: hidden;
 	opacity: 0;
 	transition: 0.3s opacity, 0.3s background-color, 0s visibility 0.3s;
-	border: 2px solid $blue-wordpress;
+	border: 2px solid $blue-medium-500;
 	border-radius: 2px;
 
 	&.is-active {
