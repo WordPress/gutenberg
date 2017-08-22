@@ -11,7 +11,7 @@ import { getBlockTypes, getUnknownTypeHandlerName } from '../registration';
 import { getBlockAttributes, parseWithGrammar } from '../parser';
 import normaliseBlocks from './normalise-blocks';
 import stripAttributes from './strip-attributes';
-import createUnwrapper from './strip-wrappers';
+import createUnwrapper from './create-unwrapper';
 import isInlineContent from './is-inline-content';
 import { deepFilter, isInline, isSpan, isWrapper } from './utils';
 
