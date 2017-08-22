@@ -16,7 +16,7 @@ import storePersist from './store-persist';
 /**
  * Module constants
  */
-const GUTENBERG_PREFERENCES_KEY = 'GUTENBERG_PREFERENCES';
+const GUTENBERG_PREFERENCES_KEY = `GUTENBERG_PREFERENCES_${ window.userSettings.uid }`;
 
 /**
  * Creates a new instance of a Redux store.
