@@ -31,6 +31,9 @@ export default function( { content: HTML, inline } ) {
 	}
 
 	if ( inline || isInlineContent( HTML ) ) {
+		// Allows us to ask for this information when we get a report.
+		window.console.log( 'Processed inline HTML:\n\n', HTML );
+
 		return HTML;
 	}
 
