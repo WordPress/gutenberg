@@ -129,7 +129,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-components',
 		gutenberg_url( 'components/build/index.js' ),
-		array( 'wp-element', 'wp-a11y', 'wp-i18n', 'wp-utils' ),
+		array( 'wp-element', 'wp-a11y', 'wp-i18n', 'wp-utils', 'wp-api-request' ),
 		filemtime( gutenberg_dir_path() . 'components/build/index.js' )
 	);
 	wp_register_script(
@@ -229,6 +229,15 @@ function gutenberg_register_vendor_scripts() {
 	gutenberg_register_vendor_script(
 		'promise',
 		'https://unpkg.com/promise-polyfill/promise' . $suffix . '.js'
+	);
+
+	// TODO: This is only necessary so long as WordPress 4.9 is not yet stable,
+	// since we depend on the newly-introduced wp-api-request script handle.
+	//
+	// See: gutenberg_ensure_wp_api_request (compat.php).
+	gutenberg_register_vendor_script(
+		'wp-api-request-shim',
+		'https://rawgit.com/WordPress/wordpress-develop/master/src/wp-includes/js/api-request.js'
 	);
 }
 
