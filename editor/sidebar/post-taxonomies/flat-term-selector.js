@@ -146,8 +146,13 @@ class FlatTermSelector extends Component {
 
 	render() {
 		const { loading, availableTerms, selectedTerms } = this.state;
-		const { label } = this.props;
+		const { label, slug } = this.props;
 		const termNames = availableTerms.map( ( term ) => term.name );
+
+		const newTermPlaceholderLabel = slug === 'post_tag' ? __( 'Add New Tag' ) : __( 'Add New Term' );
+		const termAddedLabel = slug === 'post_tag' ? __( 'Tag added.' ) : __( 'Term added.' );
+		const termRemovedLabel = slug === 'post_tag' ? __( 'Tag removed.' ) : __( 'Term removed.' );
+		const removeTermLabel = slug === 'post_tag' ? __( 'Remove Tag: %s.' ) : __( 'Remove Term: %s.' );
 
 		return (
 			<div className="editor-post-taxonomies__flat-terms-selector">
@@ -160,11 +165,11 @@ class FlatTermSelector extends Component {
 					onInputChange={ this.searchTerms }
 					maxSuggestions={ MAX_TERMS_SUGGESTIONS }
 					disabled={ loading }
-					placeholder={ __( 'Add New Term' ) }
+					placeholder={ newTermPlaceholderLabel }
 					messages={ {
-						added: __( 'Term added.' ),
-						removed: __( 'Term removed.' ),
-						remove: __( 'Remove term: %s.' ),
+						added: termAddedLabel,
+						removed: termRemovedLabel,
+						remove: removeTermLabel,
 					} }
 				/>
 			</div>
