@@ -28,10 +28,10 @@ export default function storePersist( reducerKey, storageKey = DEFAULT_STORAGE_K
 		// Load initially persisted value
 		const persistedString = window.localStorage.getItem( storageKey );
 		if ( persistedString ) {
-			const persitedState = JSON.parse( persistedString );
+			const persistedState = JSON.parse( persistedString );
 			store.dispatch( {
 				type: 'REDUX_REHYDRATE',
-				payload: persitedState,
+				payload: persistedState,
 			} );
 		}
 
