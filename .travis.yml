@@ -65,12 +65,12 @@ before_script:
   if [[ "$WP_TRAVISCI" == "travis:phpunit" ]]; then
     case "$TRAVIS_PHP_VERSION" in
       7.2|7.1|7.0|nightly)
-        echo "Using PHPUnit 6.1"
-        composer global require "phpunit/phpunit=6.1.*"
+        echo "Using PHPUnit 6.x"
+        composer global require "phpunit/phpunit:^6"
         ;;
       5.6|5.5|5.4|5.3)
-        echo "Using PHPUnit 4.8"
-        composer global require "phpunit/phpunit=4.8.*"
+        echo "Using PHPUnit 4.x"
+        composer global require "phpunit/phpunit:^4"
         ;;
       5.2)
         # Do nothing, use default PHPUnit 3.6.x
