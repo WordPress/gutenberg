@@ -586,7 +586,7 @@ export default class Editable extends Component {
 		return (
 			<div className={ classes }>
 				{ focus &&
-					<Fill name="Formatting.Toolbar">
+					<Fill name="Block.Toolbar">
 						{ ! inlineToolbar && formatToolbar }
 					</Fill>
 				}

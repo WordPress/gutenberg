@@ -3,6 +3,7 @@
  */
 import { connect } from 'react-redux';
 import { first, last } from 'lodash';
+import { Slot } from 'react-slot-fill';
 
 /**
  * WordPress dependencies
@@ -91,6 +92,9 @@ class VisualEditor extends Component {
 				onKeyDown={ this.onKeyDown }
 				ref={ this.bindContainer }
 			>
+				<div className="editor-visual-editor__block-toolbar">
+					<Slot name="Block.Toolbar" />
+				</div>
 				<KeyboardShortcuts shortcuts={ {
 					'mod+a': this.selectAll,
 					'mod+z': this.undoOrRedo,

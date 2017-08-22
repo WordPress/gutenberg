@@ -10,7 +10,7 @@ import { Toolbar } from '@wordpress/components';
 
 export default function BlockControls( { controls, children } ) {
 	return (
-		<Fill name="Formatting.Toolbar">
+		<Fill name="Block.Toolbar">
 			<Toolbar controls={ controls } />
 			{ children }
 		</Fill>

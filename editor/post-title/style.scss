@@ -24,13 +24,13 @@
 		}
 	}
 
-	&:hover h1 {
-		outline: 1px solid $light-gray-500;
+	&.is-selected h1 {
+		outline: 1px solid $light-gray-200;
 		transition: 0.2s outline;
 	}
 
-	&.is-selected h1 {
-		outline: 2px solid $light-gray-500;
+	&:hover h1 {
+		outline: 1px solid $light-gray-500;
 		transition: 0.2s outline;
 	}
 
