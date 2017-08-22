@@ -18,6 +18,7 @@ if ( gutenberg_can_init() ) {
 	// Load API functions, register scripts and actions, etc.
 	require_once dirname( __FILE__ ) . '/lib/class-wp-block-type.php';
 	require_once dirname( __FILE__ ) . '/lib/class-wp-block-type-registry.php';
+	require_once dirname( __FILE__ ) . '/lib/class-wp-rest-reusable-blocks-controller.php';
 	require_once dirname( __FILE__ ) . '/lib/blocks.php';
 	require_once dirname( __FILE__ ) . '/lib/client-assets.php';
 	require_once dirname( __FILE__ ) . '/lib/compat.php';
