@@ -2,7 +2,7 @@
 
 class TracTickets {
 	/**
-	 * When open tickets for a Trac install is requested, the results are stored here.
+	 * When open tickets for a Trac installation is requested, the results are stored here.
 	 *
 	 * @var array
 	 */

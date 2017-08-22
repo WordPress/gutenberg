@@ -7,7 +7,7 @@ define( 'ABSPATH', dirname( __FILE__ ) . '/src/' );
  * Path to the theme to test with.
  *
  * The 'default' theme is symlinked from test/phpunit/data/themedir1/default into
- * the themes directory of the WordPress install defined above.
+ * the themes directory of the WordPress installation defined above.
  */
 define( 'WP_DEFAULT_THEME', 'default' );
 

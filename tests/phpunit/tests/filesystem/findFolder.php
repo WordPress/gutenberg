@@ -48,7 +48,7 @@ class WP_Filesystem_find_folder_UnitTestCases extends WP_Filesystem_UnitTestCase
 	}
 
 	/**
-	 * Two WordPress installs, with one contained within the other
+	 * Two WordPress installations, with one contained within the other
 	 * FTP / = /var/www/example.com/ on Disk
 	 * example.com at /
 	 * wp.example.com at /wp.example.com/wordpress/

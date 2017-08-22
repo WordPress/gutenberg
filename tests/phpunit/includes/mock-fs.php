@@ -25,7 +25,7 @@ class WP_Filesystem_MockFS extends WP_Filesystem_Base {
 			$path = ABSPATH;
 		$folder = $this->find_folder( $path );
 
-		// Perhaps the FTP folder is rooted at the WordPress install, Check for wp-includes folder in root, Could have some false positives, but rare.
+		// Perhaps the FTP folder is rooted at the WordPress installation, Check for wp-includes folder in root, Could have some false positives, but rare.
 		if ( ! $folder && $this->is_dir('/wp-includes') )
 			$folder = '/';
 		return $folder;

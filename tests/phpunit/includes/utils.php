@@ -139,7 +139,7 @@ if ($this->debug) dmp(__FUNCTION__, $this->current_filter());
 }
 
 // convert valid xml to an array tree structure
-// kinda lame but it works with a default php 4 install
+// kinda lame but it works with a default php 4 installation
 class testXMLParser {
 	var $xml;
 	var $data = array();
