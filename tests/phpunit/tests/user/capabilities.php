@@ -235,6 +235,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			'add_users'              => array( 'administrator' ),
 			'install_languages'      => array( 'administrator' ),
 			'update_languages'       => array( 'administrator' ),
+			'deactivate_plugins'     => array( 'administrator' ),
 
 			'edit_categories'        => array( 'administrator', 'editor' ),
 			'delete_categories'      => array( 'administrator', 'editor' ),
@@ -265,6 +266,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			'upgrade_network'        => array(),
 			'install_languages'      => array(),
 			'update_languages'       => array(),
+			'deactivate_plugins'     => array(),
 
 			'customize'              => array( 'administrator' ),
 			'delete_site'            => array( 'administrator' ),
@@ -425,6 +427,8 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			$expected['create_users'],
 			$expected['manage_links'],
 			// Singular object meta capabilities (where an object ID is passed) are not tested:
+			$expected['activate_plugin'],
+			$expected['deactivate_plugin'],
 			$expected['remove_user'],
 			$expected['promote_user'],
 			$expected['edit_user'],
