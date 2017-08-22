@@ -676,6 +676,17 @@ describe( 'state', () => {
 			expect( state ).toEqual( { start: 'ribs', end: 'chicken', focus: null } );
 		} );
 
+		it( 'should not update the state if the block is already selected', () => {
+			const original = deepFreeze( { start: 'ribs', end: 'ribs' } );
+
+			const state1 = blockSelection( original, {
+				type: 'SELECT_BLOCK',
+				uid: 'ribs',
+			} );
+
+			expect( state1 ).toBe( original );
+		} );
+
 		it( 'should unset multi selection and select inserted block', () => {
 			const original = deepFreeze( { start: 'ribs', end: 'chicken' } );
 
