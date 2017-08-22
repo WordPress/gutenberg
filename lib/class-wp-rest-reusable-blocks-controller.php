@@ -32,6 +32,15 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 	 * @access public
 	 */
 	public function register_routes() {
+		register_rest_route( $this->namespace, '/' . $this->rest_base, array(
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'get_items' ),
+				'permission_callback' => array( $this, 'get_items_permissions_check' ),
+			),
+			'schema' => array( $this, 'get_public_item_schema' ),
+		) );
+
 		register_rest_route( $this->namespace, '/' . $this->rest_base . '/(?P<id>[\w-]+)', array(
 			array(
 				'methods'             => WP_REST_Server::READABLE,
@@ -46,6 +55,49 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 			),
 			'schema' => array( $this, 'get_public_item_schema' ),
 		) );
+	}
+
+	/**
+	 * Checks if a given request has access to read reusable blocks.
+	 *
+	 * @since 0.10.0
+	 * @access public
+	 *
+	 * @param  WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
+	 */
+	public function get_items_permissions_check( $request ) {
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			return new WP_Error( 'gutenberg_reusable_block_cannot_read', __( 'Sorry, you are not allowed to read reusable blocks as this user.', 'gutenberg' ), array(
+				'status' => rest_authorization_required_code(),
+			) );
+		}
+
+		return true;
+	}
+
+	/**
+	 * Retrieves a collection of reusable blocks.
+	 *
+	 * @since 0.10.0
+	 * @access public
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
+	public function get_items( $request ) {
+		$reusable_blocks = get_posts( array(
+			'post_type' => 'gb_reusable_block',
+		) );
+
+		$collection = array();
+
+		foreach ( $reusable_blocks as $reusable_block ) {
+			$response = $this->prepare_item_for_response( $reusable_block, $request );
+			$collection[] = $this->prepare_response_for_collection( $response );
+		}
+
+		return rest_ensure_response( $collection );
 	}
 
 	/**
@@ -215,6 +267,19 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 	}
 
 	/**
+	 * Prepares a response for insertion into a collection.
+	 *
+	 * @since 0.10.0
+	 * @access public
+	 *
+	 * @param WP_REST_Response $response Response object.
+	 * @return array|mixed Response data, ready for insertion into collection data.
+	 */
+	public function prepare_response_for_collection( $response ) {
+		return (array) $response->get_data();
+	}
+
+	/**
 	 * Retrieves a reusable block's schema, conforming to JSON Schema.
 	 *
 	 * @since 0.10.0
@@ -267,12 +332,12 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 	 * @return WP_Post|null The block (a WP_Post), or null if none was found.
 	 */
 	private function get_reusable_block( $uuid ) {
-		$posts = get_posts( array(
+		$reusable_blocks = get_posts( array(
 			'post_type' => 'gb_reusable_block',
-			'post_name' => $uuid,
+			'name' => $uuid,
 		) );
 
-		return array_shift( $posts );
+		return array_shift( $reusable_blocks );
 	}
 
 	/**
