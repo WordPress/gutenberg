@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { unescape as unescapeString, without, groupBy, map, repeat } from 'lodash';
+import { unescape as unescapeString, without, groupBy, map, repeat, find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -107,7 +107,8 @@ class HierarchicalTermSelector extends Component {
 		} );
 		findOrCreatePromise
 			.then( ( term ) => {
-				const newAvailableTerms = [ ...this.state.availableTerms, term ];
+				const hasTerm = !! find( this.state.availableTerms, ( availableTerm ) => availableTerm.id !== term.id );
+				const newAvailableTerms = hasTerm ? this.state.availableTerms : [ ...this.state.availableTerms, term ];
 				const { onUpdateTerms, restBase, terms } = this.props;
 				this.setState( {
 					adding: false,
