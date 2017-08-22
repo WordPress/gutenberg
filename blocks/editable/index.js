@@ -205,7 +205,13 @@ export default class Editable extends Component {
 				return;
 			}
 
-			this.splitContent( content );
+			const rootNode = this.editor.getBody();
+
+			if ( this.editor.dom.isEmpty( rootNode ) && this.props.onReplace ) {
+				this.props.onReplace( content );
+			} else {
+				this.splitContent( content );
+			}
 		}
 	}
 
