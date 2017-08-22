@@ -79,7 +79,7 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 	public function get_item( $request ) {
 		$uuid = $request['id'];
 		if ( ! $this->is_valid_uuid4( $uuid ) ) {
-			return new WP_Error( 'gutenberg_reusable_block_invalid_id', __( 'Invalid ID.', 'gutenberg' ), array(
+			return new WP_Error( 'gutenberg_reusable_block_invalid_id', __( 'ID is not a valid UUID v4.', 'gutenberg' ), array(
 				'status' => 404,
 			) );
 		}
@@ -125,7 +125,7 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 	public function update_item( $request ) {
 		$uuid = $request['id'];
 		if ( ! $this->is_valid_uuid4( $uuid ) ) {
-			return new WP_Error( 'gutenberg_reusable_block_invalid_id', __( 'Invalid ID.', 'gutenberg' ), array(
+			return new WP_Error( 'gutenberg_reusable_block_invalid_id', __( 'ID is not a valid UUID v4.', 'gutenberg' ), array(
 				'status' => 404,
 			) );
 		}
@@ -168,18 +168,18 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 
 		// Type. TODO: Validate this somehow.
 		if ( isset( $request['type'] ) && is_string( $request['type'] ) ) {
-			$prepared_reusable_block->meta_input['_gb_type'] = $request['type'];
+			$prepared_reusable_block->meta_input['_gutenberg_type'] = $request['type'];
 		} else {
-			return new WP_Error( 'gutenberg_reusable_block_invalid_field', __( 'Invalid type.', 'gutenberg' ), array(
+			return new WP_Error( 'gutenberg_reusable_block_invalid_field', __( 'Invalid block type.', 'gutenberg' ), array(
 				'status' => 400,
 			) );
 		}
 
 		// Atttributes. TODO: Validate these further, and maybe against any PHP block definitions we have.
 		if ( isset( $request['attributes'] ) && is_array( $request['attributes'] ) ) {
-			$prepared_reusable_block->meta_input['_gb_attributes'] = $request['attributes'];
+			$prepared_reusable_block->meta_input['_gutenberg_attributes'] = $request['attributes'];
 		} else {
-			return new WP_Error( 'gutenberg_reusable_block_invalid_field', __( 'Invalid attributes.', 'gutenberg' ), array(
+			return new WP_Error( 'gutenberg_reusable_block_invalid_field', __( 'Invalid block attributes.', 'gutenberg' ), array(
 				'status' => 400,
 			) );
 		}
@@ -188,7 +188,7 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 		if ( isset( $request['content'] ) && is_string( $request['content'] ) ) {
 			$prepared_reusable_block->post_content = $request['content'];
 		} else {
-			return new WP_Error( 'gutenberg_reusable_block_invalid_field', __( 'Invalid content.', 'gutenberg' ), array(
+			return new WP_Error( 'gutenberg_reusable_block_invalid_field', __( 'Invalid block content.', 'gutenberg' ), array(
 				'status' => 400,
 			) );
 		}
@@ -209,8 +209,8 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 	public function prepare_item_for_response( $reusable_block, $request ) {
 		$data = array(
 			'id' => $reusable_block->post_name,
-			'type' => get_post_meta( $reusable_block->ID, '_gb_type', true ),
-			'attributes' => get_post_meta( $reusable_block->ID, '_gb_attributes', true ),
+			'type' => get_post_meta( $reusable_block->ID, '_gutenberg_type', true ),
+			'attributes' => get_post_meta( $reusable_block->ID, '_gutenberg_attributes', true ),
 			'content' => $reusable_block->post_content,
 		);
 
