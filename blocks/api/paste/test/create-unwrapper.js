@@ -6,7 +6,7 @@ import { equal } from 'assert';
 /**
  * Internal dependencies
  */
-import createUnwrapper from '../strip-wrappers';
+import createUnwrapper from '../create-unwrapper';
 import { deepFilter, isSpan } from '../utils';
 
 const unwrapper = createUnwrapper( ( node ) => isSpan( node ) );
