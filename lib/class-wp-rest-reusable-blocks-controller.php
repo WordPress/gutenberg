@@ -51,7 +51,6 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 				'methods'             => WP_REST_Server::EDITABLE,
 				'callback'            => array( $this, 'update_item' ),
 				'permission_callback' => array( $this, 'update_item_permissions_check' ),
-				'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE ),
 			),
 			'schema' => array( $this, 'get_public_item_schema' ),
 		) );
