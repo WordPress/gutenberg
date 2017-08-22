@@ -95,7 +95,7 @@ class ImageBlock extends Component {
 		const { attributes, setAttributes, focus, setFocus, className, settings } = this.props;
 		const { url, alt, caption, align, id, href, width, height } = attributes;
 
-		const availableSizes = Object.keys( this.state.availableSizes );
+		const availableSizes = Object.keys( this.state.availableSizes ).sort();
 		const selectedSize = findKey( this.state.availableSizes, ( size ) => size.source_url === url );
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1;
 		const uploadButtonProps = { isLarge: true };
