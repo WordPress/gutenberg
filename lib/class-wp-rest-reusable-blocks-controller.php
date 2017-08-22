@@ -58,7 +58,12 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
 	public function get_item_permissions_check( $request ) {
-		// TODO: Implement this.
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			return new WP_Error( 'gutenberg_reusable_block_cannot_read', __( 'Sorry, you are not allowed to read reusable blocks as this user.', 'gutenberg' ), array(
+				'status' => rest_authorization_required_code(),
+			) );
+		}
+
 		return true;
 	}
 
@@ -99,7 +104,12 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 	 * @return true|WP_Error True if the request has access to update the item, WP_Error object otherwise.
 	 */
 	public function update_item_permissions_check( $request ) {
-		// TODO: Implement this.
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			return new WP_Error( 'gutenberg_reusable_block_cannot_edit', __( 'Sorry, you are not allowed to edit reusable blocks as this user.', 'gutenberg' ), array(
+				'status' => rest_authorization_required_code(),
+			) );
+		}
+
 		return true;
 	}
 
