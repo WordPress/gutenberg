@@ -135,7 +135,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-blocks',
 		gutenberg_url( 'blocks/build/index.js' ),
-		array( 'wp-element', 'wp-components', 'wp-utils', 'wp-i18n', 'tinymce-nightly', 'tinymce-nightly-lists', 'tinymce-nightly-paste', 'tinymce-nightly-table', 'media-views', 'media-models' ),
+		array( 'wp-element', 'wp-components', 'wp-utils', 'wp-i18n', 'tinymce-latest', 'tinymce-latest-lists', 'tinymce-latest-paste', 'tinymce-latest-table', 'media-views', 'media-models' ),
 		filemtime( gutenberg_dir_path() . 'blocks/build/index.js' )
 	);
 	wp_add_inline_script(
@@ -204,23 +204,23 @@ function gutenberg_register_vendor_scripts() {
 		array( 'react' )
 	);
 	gutenberg_register_vendor_script(
-		'tinymce-nightly',
-		'https://fiddle.azurewebsites.net/tinymce/nightly/tinymce' . $suffix . '.js'
+		'tinymce-latest',
+		'https://fiddle.azurewebsites.net/tinymce/4.6.5/tinymce' . $suffix . '.js'
 	);
 	gutenberg_register_vendor_script(
-		'tinymce-nightly-lists',
-		'https://fiddle.azurewebsites.net/tinymce/nightly/plugins/lists/plugin' . $suffix . '.js',
-		array( 'tinymce-nightly' )
+		'tinymce-latest-lists',
+		'https://fiddle.azurewebsites.net/tinymce/4.6.5/plugins/lists/plugin' . $suffix . '.js',
+		array( 'tinymce-latest' )
 	);
 	gutenberg_register_vendor_script(
-		'tinymce-nightly-paste',
-		'https://fiddle.azurewebsites.net/tinymce/nightly/plugins/paste/plugin' . $suffix . '.js',
-		array( 'tinymce-nightly' )
+		'tinymce-latest-paste',
+		'https://fiddle.azurewebsites.net/tinymce/4.6.5/plugins/paste/plugin' . $suffix . '.js',
+		array( 'tinymce-latest' )
 	);
 	gutenberg_register_vendor_script(
-		'tinymce-nightly-table',
-		'https://fiddle.azurewebsites.net/tinymce/nightly/plugins/table/plugin' . $suffix . '.js',
-		array( 'tinymce-nightly' )
+		'tinymce-latest-table',
+		'https://fiddle.azurewebsites.net/tinymce/4.6.5/plugins/table/plugin' . $suffix . '.js',
+		array( 'tinymce-latest' )
 	);
 	gutenberg_register_vendor_script(
 		'fetch',
