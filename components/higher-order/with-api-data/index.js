@@ -134,10 +134,10 @@ export default ( mapPropsToData ) => ( WrappedComponent ) => {
 				[ this.getPendingKey( method ) ]: true,
 			} );
 
-			request( { path, method } ).then( ( data ) => {
+			request( { path, method } ).then( ( response ) => {
 				this.setIntoDataProp( propName, {
 					[ this.getPendingKey( method ) ]: false,
-					[ this.getResponseDataKey( method ) ]: data,
+					[ this.getResponseDataKey( method ) ]: response.body,
 				} );
 			} ).catch( ( error ) => {
 				this.setIntoDataProp( propName, {
