@@ -4,30 +4,22 @@ const attributes = [
 	'id',
 ];
 
-export default function( HTML ) {
-	const doc = document.implementation.createHTMLDocument( '' );
+export default function( node ) {
+	if ( node.nodeType !== 1 ) {
+		return;
+	}
 
-	doc.body.innerHTML = HTML;
+	if ( ! node.hasAttributes() ) {
+		return;
+	}
 
-	deepAttributeStrip( doc.body.children );
-
-	return doc.body.innerHTML;
-}
-
-function deepAttributeStrip( nodeList ) {
-	Array.from( nodeList ).forEach( ( node ) => {
-		if ( node.hasAttributes() ) {
-			Array.from( node.attributes ).forEach( ( { name } ) => {
-				if ( attributes.indexOf( name ) !== -1 ) {
-					node.removeAttribute( name );
-				}
-
-				if ( name.indexOf( 'data-' ) === 0 ) {
-					node.removeAttribute( name );
-				}
-			} );
+	Array.from( node.attributes ).forEach( ( { name } ) => {
+		if ( attributes.indexOf( name ) !== -1 ) {
+			node.removeAttribute( name );
 		}
 
-		deepAttributeStrip( node.children );
+		if ( name.indexOf( 'data-' ) === 0 ) {
+			node.removeAttribute( name );
+		}
 	} );
 }
