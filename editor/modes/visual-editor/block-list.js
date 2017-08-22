@@ -18,6 +18,7 @@ import { keycodes } from '@wordpress/utils';
  * Internal dependencies
  */
 import VisualEditorBlock from './block';
+import BlockDropZone from './block-drop-zone';
 import Inserter from '../../inserter';
 import {
 	getBlockUids,
@@ -249,6 +250,7 @@ class VisualEditorBlockList extends Component {
 				} ) }
 				{ ! blocks.length &&
 					<div className="editor-visual-editor__placeholder">
+						<BlockDropZone />
 						<input
 							type="text"
 							readOnly

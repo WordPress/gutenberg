@@ -139,7 +139,6 @@ export function createEditorInstance( id, post, settings ) {
 		// DropZone provider:
 		[
 			DropZoneProvider,
-			{},
 		],
 	];
 
