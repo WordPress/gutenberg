@@ -83,7 +83,7 @@ registerBlockType( 'core/paragraph', {
 
 	getEditWrapperProps( attributes ) {
 		const { width } = attributes;
-		if ( 'wide' === width || 'full' === width ) {
+		if ( [ 'wide', 'full', 'left', 'right' ].indexOf( width ) !== -1 ) {
 			return { 'data-align': width };
 		}
 	},
@@ -96,11 +96,6 @@ registerBlockType( 'core/paragraph', {
 		return [
 			focus && (
 				<BlockControls key="controls">
-					<BlockAlignmentToolbar
-						value={ width }
-						onChange={ ( nextWidth ) => setAttributes( { width: nextWidth } ) }
-						controls={ [ 'wide', 'full' ] }
-					/>
 					<AlignmentToolbar
 						value={ align }
 						onChange={ ( nextAlign ) => {
@@ -139,6 +134,11 @@ registerBlockType( 'core/paragraph', {
 					<ColorPalette
 						value={ textColor }
 						onChange={ ( colorValue ) => setAttributes( { textColor: colorValue.hex } ) }
+					/>
+					<h3>{ __( 'Block Alignment' ) }</h3>
+					<BlockAlignmentToolbar
+						value={ width }
+						onChange={ ( nextWidth ) => setAttributes( { width: nextWidth } ) }
 					/>
 				</InspectorControls>
 			),
