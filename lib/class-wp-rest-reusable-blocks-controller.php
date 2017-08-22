@@ -7,7 +7,8 @@
  */
 
 /**
- * Controller which allows Gutenberg reusable blocks to be read, created and edited via a REST API.
+ * Controller which provides a REST endpoint for Gutenberg to read, create and edit reusable blocks. Reusable blocks are
+ * stored as posts with a custom post type.
  *
  * @since 0.10.0
  *
