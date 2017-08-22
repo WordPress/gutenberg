@@ -183,7 +183,11 @@ class HierarchicalTermSelector extends Component {
 
 	render() {
 		const { availableTermsTree, availableTerms, formName, formParent, loading, adding, showForm } = this.state;
-		const { label } = this.props;
+		const { label, slug } = this.props;
+
+		const newTermLinkLabel = slug === 'category' ? __( '+ Add New Category' ) : __( '+ Add New Term' );
+		const newTermLabel = slug === 'category' ? __( 'Add New Category' ) : __( 'Add New Term' );
+		const defaultParentLabel = slug === 'category' ? __( '-- Parent Category --' ) : __( '-- Parent Term --' );
 
 		/* eslint-disable jsx-a11y/no-onchange */
 		return (
@@ -192,14 +196,14 @@ class HierarchicalTermSelector extends Component {
 				{ this.renderTerms( availableTermsTree ) }
 				{ ! loading &&
 					<button onClick={ this.onToggleForm } className="button-link">
-						{ __( '+ Add new Term' ) }
+						{ newTermLinkLabel }
 					</button>
 				}
 				{ showForm &&
 					<form onSubmit={ this.onAddTerm }>
 						<input
 							className="editor-post-taxonomies__hierarchical-terms-input"
-							placeholder={ __( 'Add new term' ) }
+							placeholder={ newTermLabel }
 							value={ formName }
 							onChange={ this.onChangeFormName }
 						/>
@@ -209,7 +213,7 @@ class HierarchicalTermSelector extends Component {
 								value={ formParent }
 								onChange={ this.onChangeFormParent }
 							>
-								<option value="">{ __( '-- Parent Term --' ) }</option>
+								<option value="">{ defaultParentLabel }</option>
 								{ availableTerms.map( ( term ) => (
 									<option key={ term.id } value={ term.id }>{ unescapeString( term.name ) }</option>
 								) ) }
@@ -220,7 +224,7 @@ class HierarchicalTermSelector extends Component {
 							className="editor-post-taxonomies__hierarchical-terms-submit"
 							disabled={ adding }
 						>
-							{ __( 'Add New Term' ) }
+							{ newTermLabel }
 						</button>
 					</form>
 				}
