@@ -13,7 +13,7 @@ import { Component, createElement, renderToString, cloneElement, Children } from
 /**
  * Internal dependencies
  */
-import { getBlockType } from './registration';
+import { getBlockType, getUnknownTypeHandlerName } from './registration';
 
 /**
  * Returns the block's default classname from its name
@@ -163,6 +163,13 @@ export function getCommentDelimitedContent( blockName, attributes, content ) {
 	);
 }
 
+/**
+ * Returns the content of a block, including comment delimiters, determining
+ * serialized attributes and content form from the current state of the block.
+ *
+ * @param  {Object} block Block instance
+ * @return {String}       Serialized block
+ */
 export function serializeBlock( block ) {
 	const blockName = block.name;
 	const blockType = getBlockType( blockName );
@@ -178,11 +185,17 @@ export function serializeBlock( block ) {
 
 	const saveAttributes = getCommentAttributes( block.attributes, blockType.attributes );
 
-	if ( 'core/more' === blockName ) {
-		return `<!--more${ saveAttributes.text ? ` ${ saveAttributes.text }` : '' }-->${ saveAttributes.noTeaser ? '\n<!--noteaser-->' : '' }`;
-	}
+	switch ( blockName ) {
+		case 'core/more':
+			const { text, noTeaser } = saveAttributes;
+			return `<!--more${ text ? ` ${ text }` : '' }-->${ noTeaser ? '\n<!--noteaser-->' : '' }`;
 
-	return getCommentDelimitedContent( blockName, saveAttributes, saveContent );
+		case getUnknownTypeHandlerName():
+			return saveContent;
+
+		default:
+			return getCommentDelimitedContent( blockName, saveAttributes, saveContent );
+	}
 }
 
 /**
