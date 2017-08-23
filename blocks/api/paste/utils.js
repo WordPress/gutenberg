@@ -1,3 +1,8 @@
+/**
+ * Browser dependencies
+ */
+const { ELEMENT_NODE, TEXT_NODE } = window.Node;
+
 const inlineTags = [
 	'strong',
 	'em',
@@ -42,6 +47,30 @@ export function isSpan( node ) {
 
 export function isWrapper( node ) {
 	return wrapperTags.indexOf( node.nodeName.toLowerCase() ) !== -1;
+}
+
+export function isEmpty( element ) {
+	if ( ! element.hasChildNodes() ) {
+		return true;
+	}
+
+	return Array.from( element.childNodes ).every( ( node ) => {
+		if ( node.nodeType === TEXT_NODE ) {
+			return ! node.nodeValue.trim();
+		}
+
+		if ( node.nodeType === ELEMENT_NODE ) {
+			if ( node.nodeName === 'BR' ) {
+				return true;
+			} else if ( node.hasAttributes() ) {
+				return false;
+			}
+
+			return isEmpty( node );
+		}
+
+		return true;
+	} );
 }
 
 function deepFilterHelper( nodeList, filters, doc ) {
