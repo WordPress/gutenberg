@@ -138,7 +138,7 @@ describe( 'effects', () => {
 				},
 				transforms: {
 					to: [ {
-						type: 'blocks',
+						type: 'block',
 						blocks: [ 'core/test-block' ],
 						transform: ( { content2 } ) => {
 							return createBlock( 'core/test-block', {
