@@ -37,6 +37,28 @@ export function isInline( node ) {
 	return inlineTags.indexOf( node.nodeName.toLowerCase() ) !== -1;
 }
 
+export function isInvalidInline( element ) {
+	if ( ! isInline( element ) ) {
+		return false;
+	}
+
+	if ( ! element.hasChildNodes() ) {
+		return false;
+	}
+
+	return Array.from( element.childNodes ).some( ( node ) => {
+		if ( node.nodeType === ELEMENT_NODE ) {
+			if ( ! isInline( node ) ) {
+				return true;
+			}
+
+			return isInvalidInline( node );
+		}
+
+		return false;
+	} );
+}
+
 export function isDoubleBR( node ) {
 	return node.nodeName === 'BR' && node.previousSibling && node.previousSibling.nodeName === 'BR';
 }

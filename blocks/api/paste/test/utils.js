@@ -7,7 +7,7 @@ import { equal } from 'assert';
  * Internal dependencies
  */
 import createUnwrapper from '../create-unwrapper';
-import { deepFilter, isSpan, isInline, isEmpty } from '../utils';
+import { deepFilter, isSpan, isInline, isEmpty, isInvalidInline } from '../utils';
 
 const spanUnwrapper = createUnwrapper( ( node ) => isSpan( node ) );
 const inlineUnwrapper = createUnwrapper( ( node ) => isInline( node ) );
@@ -54,5 +54,27 @@ describe( 'isEmpty', () => {
 
 	it( 'should return true for element with mixed empty pieces', () => {
 		equal( isEmptyHTML( ' <br><br><em>&nbsp; </em>' ), true );
+	} );
+} );
+
+describe( 'isInvalidInline', () => {
+	function isInvalidInlineHTML( HTML ) {
+		const doc = document.implementation.createHTMLDocument( '' );
+
+		doc.body.innerHTML = HTML;
+
+		return isInvalidInline( doc.body.firstChild );
+	}
+
+	it( 'should return true for div element', () => {
+		equal( isInvalidInlineHTML( '<em><div>test</div></em>' ), true );
+	} );
+
+	it( 'should return true for deep div element', () => {
+		equal( isInvalidInlineHTML( '<em><strong><div>test</div><strong></em>' ), true );
+	} );
+
+	it( 'should return false for valid structure', () => {
+		equal( isInvalidInlineHTML( '<em>test</em>' ), false );
 	} );
 } );

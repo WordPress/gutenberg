@@ -14,7 +14,7 @@ import stripAttributes from './strip-attributes';
 import commentRemover from './comment-remover';
 import createUnwrapper from './create-unwrapper';
 import isInlineContent from './is-inline-content';
-import { deepFilter, isInline, isSpan, isWrapper } from './utils';
+import { deepFilter, isInline, isSpan, isWrapper, isInvalidInline } from './utils';
 
 export default function( { content: HTML, inline } ) {
 	HTML = HTML.replace( /<meta[^>]+>/, '' );
@@ -23,6 +23,10 @@ export default function( { content: HTML, inline } ) {
 	if ( ! inline && HTML.indexOf( '<!-- wp:' ) !== -1 ) {
 		return parseWithGrammar( HTML );
 	}
+
+	HTML = deepFilter( HTML, [
+		createUnwrapper( ( node ) => isInvalidInline( node ) ),
+	] );
 
 	// Inline paste.
 	if ( inline || isInlineContent( HTML ) ) {

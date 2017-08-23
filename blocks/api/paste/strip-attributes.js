@@ -7,6 +7,8 @@ const attributes = [
 	'style',
 	'class',
 	'id',
+	// To do: keep rtl value?
+	'dir',
 ];
 
 export default function( node ) {
