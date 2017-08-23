@@ -22,3 +22,5 @@ import './text-columns';
 import './verse';
 import './video';
 import './audio';
+import './vanilla-banner';
+import './vue-banner';

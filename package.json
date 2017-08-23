@@ -42,7 +42,8 @@
     "refx": "^2.0.0",
     "rememo": "^2.3.0",
     "simple-html-tokenizer": "^0.4.1",
-    "uuid": "^3.0.1"
+    "uuid": "^3.0.1",
+    "vue": "^2.4.2"
   },
   "devDependencies": {
     "autoprefixer": "^6.7.7",

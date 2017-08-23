@@ -8,7 +8,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Component, createElement, renderToString, cloneElement, Children } from '@wordpress/element';
+import { Component, createElement, buildVTree, renderToString, cloneElement, Children } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -41,13 +41,20 @@ export function getSaveContent( blockType, attributes ) {
 	if ( save.prototype instanceof Component ) {
 		rawContent = createElement( save, { attributes } );
 	} else {
-		rawContent = save( { attributes } );
+		const target = document.createElement( 'div' );
+		rawContent = save( { attributes, target } );
 
-		// Special-case function render implementation to allow raw HTML return
-		if ( 'string' === typeof rawContent ) {
-			return rawContent;
+		switch ( typeof rawContent ) {
+			// Special-case function render implementation for raw HTML return
+			case 'string':
+				return rawContent;
+
+			case 'undefined':
+				return target.innerHTML;
 		}
 	}
+
+	rawContent = buildVTree( rawContent );
 
 	// Adding a generic classname
 	const addAdvancedAttributes = ( element ) => {
