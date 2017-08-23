@@ -17,7 +17,14 @@ export default function( node ) {
 		return;
 	}
 
-	const msoList = node.style.msoList;
+	const style = node.getAttribute( 'style' );
+	const matches = /mso-list\s*:([^;]+)/.exec( style );
+
+	if ( ! matches ) {
+		return;
+	}
+
+	const msoList = matches[ 1 ];
 
 	if ( ! msoList ) {
 		return;
