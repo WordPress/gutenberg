@@ -15,6 +15,7 @@ import commentRemover from './comment-remover';
 import createUnwrapper from './create-unwrapper';
 import isInlineContent from './is-inline-content';
 import formattingTransformer from './formatting-transformer';
+import msListConverter from './ms-list-converter';
 import { deepFilter, isInline, isSpan, isWrapper, isInvalidInline } from './utils';
 
 export default function( { content: HTML, inline } ) {
@@ -37,6 +38,7 @@ export default function( { content: HTML, inline } ) {
 			commentRemover,
 			createUnwrapper( ( node ) => ! isInline( node ) ),
 			createUnwrapper( ( node ) => isSpan( node ) ),
+			createUnwrapper( ( node ) => node.nodeName === 'O:P' ),
 		] );
 
 		// Allows us to ask for this information when we get a report.
@@ -46,11 +48,16 @@ export default function( { content: HTML, inline } ) {
 	}
 
 	HTML = deepFilter( HTML, [
+		msListConverter,
+	] );
+
+	HTML = deepFilter( HTML, [
 		formattingTransformer,
 		stripAttributes,
 		commentRemover,
 		createUnwrapper( ( node ) => isWrapper( node ) ),
 		createUnwrapper( ( node ) => isSpan( node ) ),
+		createUnwrapper( ( node ) => node.nodeName === 'O:P' ),
 	] );
 
 	HTML = normaliseBlocks( HTML );
