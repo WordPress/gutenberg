@@ -11,6 +11,8 @@ import { registerBlockType, unregisterBlockType, setUnknownTypeHandlerName } fro
 import { createBlock } from '../../factory';
 import { children, prop } from '../../source';
 
+import './integration';
+
 describe( 'paste', () => {
 	beforeAll( () => {
 		registerBlockType( 'test/small', {

@@ -34,4 +34,8 @@ describe( 'normaliseBlocks', () => {
 	it( 'should wrap lose inline elements', () => {
 		equal( normaliseBlocks( '<a href="#">test</a>' ), '<p><a href="#">test</a></p>' );
 	} );
+
+	it( 'should not append empty text nodes', () => {
+		equal( normaliseBlocks( '<p>test</p>\n' ), '<p>test</p>' );
+	} );
 } );
