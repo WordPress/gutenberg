@@ -15,6 +15,7 @@ import serialize from '../../../serializer';
 const types = [
 	'plain',
 	'apple-notes',
+	'google-docs',
 ];
 
 describe( 'paste: integration', () => {
