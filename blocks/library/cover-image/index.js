@@ -65,6 +65,13 @@ registerBlockType( 'core/cover-image', {
 		const { url, title, align, id, hasParallax, hasBackgroundDim } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		const onSelectImage = ( media ) => setAttributes( { url: media.url, id: media.id } );
+		const toggleParallax = () => setAttributes( { hasParallax: ! hasParallax } );
+		const toggleBackgroundDim = () => setAttributes( { hasBackgroundDim: ! hasBackgroundDim } );
+		const style = { backgroundImage: `url(${ url })` };
+		const classes = classnames( className, {
+			'has-parallax': hasParallax,
+			'has-background-dim': hasBackgroundDim,
+		} );
 
 		const controls = (
 			focus && (
@@ -93,10 +100,30 @@ registerBlockType( 'core/cover-image', {
 			)
 		);
 
+		const inspectorControls = focus && (
+			<InspectorControls key="inspector">
+				<BlockDescription>
+					<p>{ __( 'Cover Image is a bold image block with an optional title.' ) }</p>
+				</BlockDescription>
+				<h3>{ __( 'Cover Image Settings' ) }</h3>
+				<ToggleControl
+					label={ __( 'Fixed Background' ) }
+					checked={ !! hasParallax }
+					onChange={ toggleParallax }
+				/>
+				<ToggleControl
+					label={ __( 'Dim Background' ) }
+					checked={ !! hasBackgroundDim }
+					onChange={ toggleBackgroundDim }
+				/>
+			</InspectorControls>
+		);
+
 		if ( ! url ) {
 			const uploadButtonProps = { isLarge: true };
 			return [
 				controls,
+				inspectorControls,
 				<Placeholder
 					key="placeholder"
 					instructions={ __( 'Drag image here or insert from media library' ) }
@@ -114,34 +141,9 @@ registerBlockType( 'core/cover-image', {
 			];
 		}
 
-		const style = { backgroundImage: `url(${ url })` };
-		const classes = classnames( className, {
-			'has-parallax': hasParallax,
-			'has-background-dim': hasBackgroundDim,
-		} );
-		const toggleParallax = () => setAttributes( { hasParallax: ! hasParallax } );
-		const toggleBackgroundDim = () => setAttributes( { hasBackgroundDim: ! hasBackgroundDim } );
-
 		return [
 			controls,
-			focus && (
-				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'Cover Image is a bold image block with an optional title.' ) }</p>
-					</BlockDescription>
-					<h3>{ __( 'Cover Image Settings' ) }</h3>
-					<ToggleControl
-						label={ __( 'Fixed Background' ) }
-						checked={ !! hasParallax }
-						onChange={ toggleParallax }
-					/>
-					<ToggleControl
-						label={ __( 'Dim Background' ) }
-						checked={ !! hasBackgroundDim }
-						onChange={ toggleBackgroundDim }
-					/>
-				</InspectorControls>
-			),
+			inspectorControls,
 			<section
 				key="preview"
 				data-url={ url }
