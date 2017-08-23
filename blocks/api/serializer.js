@@ -139,6 +139,30 @@ export function getBeautifulContent( content ) {
 	} );
 }
 
+/**
+ * Returns the content of a block, including comment delimiters.
+ *
+ * @param  {String} blockName  Block name
+ * @param  {Object} attributes Block attributes
+ * @param  {String} content    Block save content
+ * @return {String}            Comment-delimited block content
+ */
+export function getCommentDelimitedContent( blockName, attributes, content ) {
+	const serializedAttributes = ! isEmpty( attributes )
+		? serializeAttributes( attributes ) + ' '
+		: '';
+
+	if ( ! content ) {
+		return `<!-- wp:${ blockName } ${ serializedAttributes }/-->`;
+	}
+
+	return (
+		`<!-- wp:${ blockName } ${ serializedAttributes }-->\n` +
+		getBeautifulContent( content ) +
+		`\n<!-- /wp:${ blockName } -->`
+	);
+}
+
 export function serializeBlock( block ) {
 	const blockName = block.name;
 	const blockType = getBlockType( blockName );
@@ -158,19 +182,7 @@ export function serializeBlock( block ) {
 		return `<!--more${ saveAttributes.text ? ` ${ saveAttributes.text }` : '' }-->${ saveAttributes.noTeaser ? '\n<!--noteaser-->' : '' }`;
 	}
 
-	const serializedAttributes = ! isEmpty( saveAttributes )
-		? serializeAttributes( saveAttributes ) + ' '
-		: '';
-
-	if ( ! saveContent ) {
-		return `<!-- wp:${ blockName } ${ serializedAttributes }/-->`;
-	}
-
-	return (
-		`<!-- wp:${ blockName } ${ serializedAttributes }-->\n` +
-		getBeautifulContent( saveContent ) +
-		`\n<!-- /wp:${ blockName } -->`
-	);
+	return getCommentDelimitedContent( blockName, saveAttributes, saveContent );
 }
 
 /**

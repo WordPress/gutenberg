@@ -12,6 +12,7 @@ import serialize, {
 	getBeautifulContent,
 	getSaveContent,
 	serializeAttributes,
+	getCommentDelimitedContent,
 } from '../serializer';
 import { getBlockTypes, registerBlockType, unregisterBlockType } from '../registration';
 import { createBlock } from '../';
@@ -207,6 +208,52 @@ describe( 'block serializer', () => {
 		} );
 		it( 'should not break standard-non-compliant tools for "&"', () => {
 			expect( serializeAttributes( { a: '& and &' } ) ).toBe( '{"a":"\\u0026 and \\u0026"}' );
+		} );
+	} );
+
+	describe( 'getCommentDelimitedContent()', () => {
+		it( 'should generate empty attributes void', () => {
+			const content = getCommentDelimitedContent(
+				'core/test-block',
+				{},
+				''
+			);
+
+			expect( content ).toBe( '<!-- wp:core/test-block /-->' );
+		} );
+
+		it( 'should generate empty attributes non-void', () => {
+			const content = getCommentDelimitedContent(
+				'core/test-block',
+				{},
+				'Delicious'
+			);
+
+			expect( content ).toBe( '<!-- wp:core/test-block -->\nDelicious\n<!-- /wp:core/test-block -->' );
+		} );
+
+		it( 'should generate non-empty attributes void', () => {
+			const content = getCommentDelimitedContent(
+				'core/test-block',
+				{ fruit: 'Banana' },
+				''
+			);
+
+			expect( content ).toBe(
+				'<!-- wp:core/test-block {"fruit":"Banana"} /-->'
+			);
+		} );
+
+		it( 'should generate non-empty attributes non-void', () => {
+			const content = getCommentDelimitedContent(
+				'core/test-block',
+				{ fruit: 'Banana' },
+				'Delicious'
+			);
+
+			expect( content ).toBe(
+				'<!-- wp:core/test-block {"fruit":"Banana"} -->\nDelicious\n<!-- /wp:core/test-block -->'
+			);
 		} );
 	} );
 
