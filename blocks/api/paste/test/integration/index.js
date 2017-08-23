@@ -16,6 +16,7 @@ const types = [
 	'plain',
 	'apple',
 	'google-docs',
+	'ms-word',
 	'ms-word-online',
 ];
 

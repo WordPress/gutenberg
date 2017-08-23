@@ -6,6 +6,7 @@ const { ELEMENT_NODE } = window.Node;
 const attributes = {
 	img: [ 'src', 'alt' ],
 	a: [ 'href' ],
+	ol: [ 'type' ],
 };
 
 export default function( node ) {
