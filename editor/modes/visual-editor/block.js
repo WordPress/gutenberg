@@ -318,12 +318,12 @@ class VisualEditorBlock extends Component {
 
 		// Generate a class name for the block's editable form
 		let className;
-		const supportGeneratedClassname = isUndefined( get( blockType.support, 'generatedClassname' ) ) || blockType.support.generatedClassname;
-		const supportCustomClassname = ( isUndefined( get( blockType.support, 'className' ) ) || blockType.support.className ) && block.attributes.className;
+		const supportGeneratedClassname = isUndefined( get( blockType.supports, 'generatedClassName' ) ) || blockType.supports.generatedClassName;
+		const supportCustomClassname = ( isUndefined( get( blockType.supports, 'className' ) ) || blockType.supports.className ) && block.attributes.className;
 		if ( supportGeneratedClassname || supportCustomClassname ) {
-			const generatedClassname = supportGeneratedClassname ? getBlockDefaultClassname( blockType.name ) : undefined;
+			const generatedClassName = supportGeneratedClassname ? getBlockDefaultClassname( blockType.name ) : undefined;
 			className = classnames(
-				generatedClassname,
+				generatedClassName,
 				block.attributes.className
 			);
 		}

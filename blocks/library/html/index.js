@@ -25,8 +25,8 @@ registerBlockType( 'core/html', {
 
 	category: 'formatting',
 
-	support: {
-		generatedClassname: false,
+	supports: {
+		generatedClassName: false,
 		className: false,
 	},
 

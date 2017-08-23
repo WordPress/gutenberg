@@ -64,7 +64,7 @@ describe( 'block factory', () => {
 				},
 				save: noop,
 				category: 'common',
-				support: {
+				supports: {
 					anchor: true,
 				},
 			} );

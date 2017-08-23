@@ -27,8 +27,8 @@ registerBlockType( 'core/heading', {
 
 	keywords: [ __( 'title' ), __( 'subtitle' ) ],
 
-	support: {
-		generatedClassname: false,
+	supports: {
+		generatedClassName: false,
 		anchor: true,
 	},
 

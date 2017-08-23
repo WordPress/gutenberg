@@ -31,8 +31,8 @@ registerBlockType( 'core/paragraph', {
 
 	keywords: [ __( 'text' ) ],
 
-	support: {
-		generatedClassname: false,
+	supports: {
+		generatedClassName: false,
 	},
 
 	attributes: {

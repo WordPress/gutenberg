@@ -65,8 +65,8 @@ class BlockInspectorAdvancedControls extends Component {
 	render() {
 		const { selectedBlock, post } = this.props;
 		const blockType = getBlockType( selectedBlock.name );
-		const supportAnchor = blockType.support && !! blockType.support.anchor;
-		const supportCustomClassname = isUndefined( get( blockType, 'support.className' ) ) || blockType.support.className;
+		const supportAnchor = blockType.support && !! blockType.supports.anchor;
+		const supportCustomClassname = isUndefined( get( blockType, 'supports.className' ) ) || blockType.supports.className;
 		if ( ! supportAnchor && ! supportCustomClassname ) {
 			return null;
 		}

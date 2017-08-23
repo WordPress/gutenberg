@@ -164,7 +164,7 @@ describe( 'block parser', () => {
 						source: text( 'div' ),
 					},
 				},
-				support: {
+				supports: {
 					anchor: true,
 				},
 			};

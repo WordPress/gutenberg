@@ -35,7 +35,7 @@ export function getBlockDefaultClassname( blockName ) {
  * @return {string}                          Save content
  */
 export function getSaveContent( blockType, attributes ) {
-	const { save, support } = blockType;
+	const { save, supports } = blockType;
 	let rawContent;
 
 	if ( save.prototype instanceof Component ) {
@@ -56,19 +56,19 @@ export function getSaveContent( blockType, attributes ) {
 		}
 
 		const extraProps = {};
-		const supportGeneratedClassname = isUndefined( get( support, 'generatedClassname' ) ) || support.generatedClassname;
-		const supportCustomClassname = ( isUndefined( get( support, 'className' ) ) || support.className ) && attributes.className;
+		const supportGeneratedClassname = isUndefined( get( supports, 'generatedClassName' ) ) || supports.generatedClassName;
+		const supportCustomClassname = ( isUndefined( get( supports, 'className' ) ) || supports.className ) && attributes.className;
 		if ( supportGeneratedClassname || supportCustomClassname ) {
-			const generatedClassname = supportGeneratedClassname ? getBlockDefaultClassname( blockType.name ) : undefined;
+			const generatedClassName = supportGeneratedClassname ? getBlockDefaultClassname( blockType.name ) : undefined;
 			const updatedClassName = classnames(
-				generatedClassname,
+				generatedClassName,
 				element.props.className,
 				attributes.className
 			);
 			extraProps.className = updatedClassName;
 		}
 
-		if ( support && !! support.anchor ) {
+		if ( supports && !! supports.anchor ) {
 			extraProps.id = attributes.anchor;
 		}
 

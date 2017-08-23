@@ -28,8 +28,8 @@ registerBlockType( 'core/shortcode', {
 		},
 	},
 
-	support: {
-		generatedClassname: false,
+	supports: {
+		generatedClassName: false,
 		className: false,
 	},
 
