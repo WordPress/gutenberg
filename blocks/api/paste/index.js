@@ -14,6 +14,7 @@ import stripAttributes from './strip-attributes';
 import commentRemover from './comment-remover';
 import createUnwrapper from './create-unwrapper';
 import isInlineContent from './is-inline-content';
+import formattingTransformer from './formatting-transformer';
 import { deepFilter, isInline, isSpan, isWrapper, isInvalidInline } from './utils';
 
 export default function( { content: HTML, inline } ) {
@@ -31,6 +32,7 @@ export default function( { content: HTML, inline } ) {
 	// Inline paste.
 	if ( inline || isInlineContent( HTML ) ) {
 		HTML = deepFilter( HTML, [
+			formattingTransformer,
 			stripAttributes,
 			commentRemover,
 			createUnwrapper( ( node ) => ! isInline( node ) ),
@@ -44,6 +46,7 @@ export default function( { content: HTML, inline } ) {
 	}
 
 	HTML = deepFilter( HTML, [
+		formattingTransformer,
 		stripAttributes,
 		commentRemover,
 		createUnwrapper( ( node ) => isWrapper( node ) ),
