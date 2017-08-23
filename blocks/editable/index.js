@@ -86,7 +86,6 @@ export default class Editable extends Component {
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.maybePropagateUndo = this.maybePropagateUndo.bind( this );
 		this.onBeforePastePreProcess = this.onBeforePastePreProcess.bind( this );
-		this.onPastePreProcess = this.onPastePreProcess.bind( this );
 
 		this.state = {
 			formats: {},
@@ -114,7 +113,6 @@ export default class Editable extends Component {
 		editor.on( 'selectionChange', this.onSelectionChange );
 		editor.on( 'BeforeExecCommand', this.maybePropagateUndo );
 		editor.on( 'BeforePastePreProcess', this.onBeforePastePreProcess );
-		editor.on( 'PastePreProcess', this.onPastePreProcess );
 
 		patterns.apply( this, [ editor ] );
 
@@ -183,11 +181,6 @@ export default class Editable extends Component {
 	onBeforePastePreProcess( event ) {
 		// Allows us to ask for this information when we get a report.
 		window.console.log( 'Received HTML:\n\n', event.content );
-	}
-
-	onPastePreProcess( event ) {
-		// Allows us to ask for this information when we get a report.
-		window.console.log( 'MCE processed HTML:\n\n', event.content );
 
 		const content = pasteHandler( {
 			content: event.content,
