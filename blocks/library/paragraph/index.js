@@ -127,13 +127,13 @@ registerBlockType( 'core/paragraph', {
 					<h3>{ __( 'Background Color' ) }</h3>
 					<ColorPalette
 						value={ backgroundColor }
-						onChange={ ( colorValue ) => setAttributes( { backgroundColor: colorValue.hex } ) }
+						onChange={ ( colorValue ) => setAttributes( { backgroundColor: colorValue } ) }
 						withTransparentOption
 					/>
 					<h3>{ __( 'Text Color' ) }</h3>
 					<ColorPalette
 						value={ textColor }
-						onChange={ ( colorValue ) => setAttributes( { textColor: colorValue.hex } ) }
+						onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
 					/>
 					<h3>{ __( 'Block Alignment' ) }</h3>
 					<BlockAlignmentToolbar
