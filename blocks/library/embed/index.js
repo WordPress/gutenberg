@@ -229,6 +229,8 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 	};
 }
 
+export default getEmbedBlockSettings;
+
 registerBlockType(
 	'core/embed',
 	getEmbedBlockSettings( {
