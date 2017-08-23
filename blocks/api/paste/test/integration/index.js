@@ -16,6 +16,7 @@ const types = [
 	'plain',
 	'apple-notes',
 	'google-docs',
+	'ms-word-online',
 ];
 
 describe( 'paste: integration', () => {

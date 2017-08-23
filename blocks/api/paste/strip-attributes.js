@@ -3,13 +3,10 @@
  */
 const { ELEMENT_NODE } = window.Node;
 
-const attributes = [
-	'style',
-	'class',
-	'id',
-	// To do: keep rtl value?
-	'dir',
-];
+const attributes = {
+	img: [ 'src', 'alt' ],
+	a: [ 'href' ],
+};
 
 export default function( node ) {
 	if ( node.nodeType !== ELEMENT_NODE ) {
@@ -20,13 +17,13 @@ export default function( node ) {
 		return;
 	}
 
+	const tag = node.nodeName.toLowerCase();
+
 	Array.from( node.attributes ).forEach( ( { name } ) => {
-		if ( attributes.indexOf( name ) !== -1 ) {
-			node.removeAttribute( name );
+		if ( attributes[ tag ] && attributes[ tag ].indexOf( name ) !== -1 ) {
+			return;
 		}
 
-		if ( name.indexOf( 'data-' ) === 0 ) {
-			node.removeAttribute( name );
-		}
+		node.removeAttribute( name );
 	} );
 }
