@@ -1,28 +1,12 @@
 /**
- * WordPress dependencies
+ * Internal dependencies
  */
-import { nodetypes } from '@wordpress/utils';
+import { isInline } from './utils';
 
-const { ELEMENT_NODE, TEXT_NODE } = nodetypes;
-
-const inlineTags = [
-	'strong',
-	'em',
-	'b',
-	'i',
-	'del',
-	'ins',
-	'a',
-	'code',
-	'abbr',
-	'time',
-	'sub',
-	'sup',
-];
-
-function isInline( node ) {
-	return inlineTags.indexOf( node.nodeName.toLowerCase() ) !== -1;
-}
+/**
+ * Browser dependencies
+ */
+const { ELEMENT_NODE, TEXT_NODE } = window.Node;
 
 export default function( HTML ) {
 	const decuDoc = document.implementation.createHTMLDocument( '' );

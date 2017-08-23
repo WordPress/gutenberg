@@ -169,7 +169,7 @@ export function createBlockWithFallback( name, rawContent, attributes ) {
 
 	// Convert 'core/text' blocks in existing content to the new
 	// 'core/paragraph'.
-	if ( name === 'core/text' ) {
+	if ( name === 'core/text' || name === 'core/cover-text' ) {
 		name = 'core/paragraph';
 	}
 
