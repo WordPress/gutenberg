@@ -14,7 +14,7 @@ import serialize from '../../../serializer';
 
 const types = [
 	'plain',
-	'apple-notes',
+	'apple',
 	'google-docs',
 	'ms-word-online',
 ];
