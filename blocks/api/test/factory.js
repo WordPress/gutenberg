@@ -64,7 +64,9 @@ describe( 'block factory', () => {
 				},
 				save: noop,
 				category: 'common',
-				supportAnchor: true,
+				support: {
+					anchor: true,
+				},
 			} );
 			const block = createBlock( 'core/test-block', {
 				align: 'left',

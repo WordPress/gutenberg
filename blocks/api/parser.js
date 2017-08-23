@@ -148,7 +148,7 @@ export function getBlockAttributes( blockType, rawContent, attributes ) {
 	}, {} );
 
 	// If the block supports anchor, parse the id
-	if ( blockType.supportAnchor ) {
+	if ( blockType.support && !! blockType.support.anchor ) {
 		blockAttributes.anchor = hpqParse( rawContent, attr( '*', 'id' ) );
 	}
 

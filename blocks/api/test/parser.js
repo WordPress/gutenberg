@@ -164,7 +164,9 @@ describe( 'block parser', () => {
 						source: text( 'div' ),
 					},
 				},
-				supportAnchor: true,
+				support: {
+					anchor: true,
+				},
 			};
 
 			const rawContent = '<div id="chicken">Ribs</div>';

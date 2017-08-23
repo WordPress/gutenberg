@@ -21,7 +21,10 @@ registerBlockType( 'core/more', {
 
 	useOnce: true,
 
-	className: false,
+	support: {
+		generatedClassname: false,
+		className: false,
+	},
 
 	attributes: {
 		text: {

@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import { isUndefined, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -64,20 +65,22 @@ class BlockInspectorAdvancedControls extends Component {
 	render() {
 		const { selectedBlock, post } = this.props;
 		const blockType = getBlockType( selectedBlock.name );
-		if ( false === blockType.className && ! blockType.supportAnchor ) {
+		const supportAnchor = blockType.support && !! blockType.support.anchor;
+		const supportCustomClassname = isUndefined( get( blockType, 'support.className' ) ) || blockType.support.className;
+		if ( ! supportAnchor && ! supportCustomClassname ) {
 			return null;
 		}
 
 		return (
 			<div>
 				<h3>{ __( 'Block Settings' ) }</h3>
-				{ false !== blockType.className &&
+				{ supportCustomClassname &&
 					<InspectorControls.TextControl
 						label={ __( 'Additional CSS Class' ) }
 						value={ selectedBlock.attributes.className || '' }
 						onChange={ this.setClassName } />
 				}
-				{ blockType.supportAnchor &&
+				{ supportAnchor &&
 					<div>
 						<InspectorControls.TextControl
 							label={ __( 'HTML Anchor' ) }

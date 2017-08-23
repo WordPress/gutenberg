@@ -4,7 +4,7 @@
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 import { Slot } from 'react-slot-fill';
-import { partial } from 'lodash';
+import { partial, isUndefined, get } from 'lodash';
 import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
 
 /**
@@ -317,8 +317,16 @@ class VisualEditorBlock extends Component {
 		}
 
 		// Generate a class name for the block's editable form
-		let { className = getBlockDefaultClassname( block.name ) } = blockType;
-		className = classnames( className, block.attributes.className );
+		let className;
+		const supportGeneratedClassname = isUndefined( get( blockType.support, 'generatedClassname' ) ) || blockType.support.generatedClassname;
+		const supportCustomClassname = ( isUndefined( get( blockType.support, 'className' ) ) || blockType.support.className ) && block.attributes.className;
+		if ( supportGeneratedClassname || supportCustomClassname ) {
+			const generatedClassname = supportGeneratedClassname ? getBlockDefaultClassname( blockType.name ) : undefined;
+			className = classnames(
+				generatedClassname,
+				block.attributes.className
+			);
+		}
 
 		// Disable reason: Each block can be selected by clicking on it
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */

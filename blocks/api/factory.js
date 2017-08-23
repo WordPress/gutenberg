@@ -39,7 +39,8 @@ export function createBlock( name, blockAttributes = {} ) {
 
 		return result;
 	}, {} );
-	if ( blockType.supportAnchor && blockAttributes.anchor ) {
+
+	if ( blockType.support && !! blockType.support.anchor && blockAttributes.anchor ) {
 		attributes.anchor = blockAttributes.anchor;
 	}
 

@@ -69,27 +69,13 @@ describe( 'block serializer', () => {
 				expect( saved ).toBe( '<div class="wp-block-myplugin-fruit">Bananas</div>' );
 			} );
 
-			it( 'should allow overriding the className', () => {
-				const saved = getSaveContent(
-					{
-						save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),
-						name: 'myplugin/fruit',
-						className: 'apples',
-					},
-					{ fruit: 'Bananas' }
-				);
-
-				expect( saved ).toBe( '<div class="apples">Bananas</div>' );
-			} );
-
-			it( 'should include additional classes in block attributes', () => {
+			it( 'should include generated class in block attributes', () => {
 				const saved = getSaveContent(
 					{
 						save: ( { attributes } ) => createElement( 'div', {
 							className: 'fruit',
 						}, attributes.fruit ),
 						name: 'myplugin/fruit',
-						className: 'apples',
 					},
 					{
 						fruit: 'Bananas',
@@ -97,7 +83,7 @@ describe( 'block serializer', () => {
 					}
 				);
 
-				expect( saved ).toBe( '<div class="apples fruit fresh">Bananas</div>' );
+				expect( saved ).toBe( '<div class="wp-block-myplugin-fruit fruit fresh">Bananas</div>' );
 			} );
 
 			it( 'should not add a className if falsy', () => {
@@ -105,7 +91,9 @@ describe( 'block serializer', () => {
 					{
 						save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),
 						name: 'myplugin/fruit',
-						className: false,
+						support: {
+							generatedClassname: false,
+						},
 					},
 					{ fruit: 'Bananas' }
 				);
@@ -117,9 +105,11 @@ describe( 'block serializer', () => {
 				const saved = getSaveContent(
 					{
 						save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),
-						supportAnchor: true,
 						name: 'myplugin/fruit',
-						className: false,
+						support: {
+							generatedClassname: false,
+							anchor: true,
+						},
 					},
 					{ fruit: 'Bananas', anchor: 'my-fruit' }
 				);
