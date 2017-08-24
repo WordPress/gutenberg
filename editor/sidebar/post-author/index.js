@@ -2,12 +2,13 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import { flowRight } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelRow, withInstanceId } from '@wordpress/components';
+import { PanelRow, withAPIData, withInstanceId } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 
 /**
@@ -18,38 +19,13 @@ import { getEditedPostAttribute } from '../../selectors';
 import { editPost } from '../../actions';
 
 class PostAuthor extends Component {
-	constructor() {
-		super( ...arguments );
-		this.state = {
-			authors: [],
-		};
-	}
-
-	fetchAuthors() {
-		this.fetchAuthorsRequest = new wp.api.collections.Users().fetch( { data: {
-			per_page: 100,
-		} } );
-		this.fetchAuthorsRequest.then( ( authors ) => {
-			this.setState( { authors } );
-		} );
-	}
-
-	componentDidMount() {
-		this.fetchAuthors();
-	}
-
-	componentWillUnmount() {
-		this.fetchAuthorsRequest.abort();
-	}
-
 	render() {
-		const { onUpdateAuthor, postAuthor, instanceId } = this.props;
-		const { authors } = this.state;
-		const selectId = 'post-author-selector-' + instanceId;
-
-		if ( authors.length < 2 ) {
+		const { users, onUpdateAuthor, postAuthor, instanceId } = this.props;
+		if ( ! users.data || users.data.length < 2 ) {
 			return null;
 		}
+
+		const selectId = 'post-author-selector-' + instanceId;
 
 		// Disable reason: A select with an onchange throws a warning
 
@@ -63,7 +39,7 @@ class PostAuthor extends Component {
 					onChange={ ( event ) => onUpdateAuthor( event.target.value ) }
 					className="editor-post-author__select"
 				>
-					{ authors.map( ( author ) => (
+					{ users.data.map( ( author ) => (
 						<option key={ author.id } value={ author.id }>{ author.name }</option>
 					) ) }
 				</select>
@@ -73,7 +49,7 @@ class PostAuthor extends Component {
 	}
 }
 
-export default connect(
+const applyConnect = connect(
 	( state ) => {
 		return {
 			postAuthor: getEditedPostAttribute( state, 'author' ),
@@ -84,4 +60,16 @@ export default connect(
 			return editPost( { author } );
 		},
 	},
-)( withInstanceId( PostAuthor ) );
+);
+
+const applyWithAPIData = withAPIData( () => {
+	return {
+		users: '/wp/v2/users?context=edit&per_page=100',
+	};
+} );
+
+export default flowRight( [
+	applyConnect,
+	applyWithAPIData,
+	withInstanceId,
+] )( PostAuthor );
