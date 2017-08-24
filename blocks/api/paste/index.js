@@ -16,6 +16,7 @@ import createUnwrapper from './create-unwrapper';
 import isInlineContent from './is-inline-content';
 import formattingTransformer from './formatting-transformer';
 import msListConverter from './ms-list-converter';
+import imageCorrector from './image-corrector';
 import { deepFilter, isInline, isSpan, isWrapper, isInvalidInline } from './utils';
 
 export default function( { content: HTML, inline } ) {
@@ -47,6 +48,7 @@ export default function( { content: HTML, inline } ) {
 		return HTML;
 	}
 
+	// Context dependent filters. Needs to run before we remove tags.
 	HTML = deepFilter( HTML, [
 		msListConverter,
 	] );
@@ -55,6 +57,7 @@ export default function( { content: HTML, inline } ) {
 		formattingTransformer,
 		stripAttributes,
 		commentRemover,
+		imageCorrector,
 		createUnwrapper( ( node ) => isWrapper( node ) ),
 		createUnwrapper( ( node ) => isSpan( node ) ),
 		createUnwrapper( ( node ) => node.nodeName === 'O:P' ),
