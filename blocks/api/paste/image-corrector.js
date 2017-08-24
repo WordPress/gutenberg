@@ -12,9 +12,12 @@ export default function( node ) {
 		return;
 	}
 
-	if ( node.src.indexOf( 'file:' ) !== 0 ) {
-		return;
+	if ( node.src.indexOf( 'file:' ) === 0 ) {
+		node.src = '';
 	}
 
-	node.src = '';
+	// Remove trackers and hardly visible images.
+	if ( node.height === 1 || node.width === 1 ) {
+		node.parentNode.removeChild( node );
+	}
 }

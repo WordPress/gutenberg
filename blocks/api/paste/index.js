@@ -35,11 +35,11 @@ export default function( { content: HTML, inline } ) {
 
 	HTML = deepFilter( HTML, [
 		listMerger,
+		imageCorrector,
 		// Add semantic formatting before attributes are stripped.
 		formattingTransformer,
 		stripAttributes,
 		commentRemover,
-		imageCorrector,
 		createUnwrapper( isNotWhitelisted ),
 	] );
 

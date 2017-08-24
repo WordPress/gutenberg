@@ -15,4 +15,10 @@ describe( 'imageCorrector', () => {
 		const output = '<img src="">';
 		equal( deepFilter( input, [ imageCorrector ] ), output );
 	} );
+
+	it( 'should remove trackers', () => {
+		const input = '<img src="" height="1" width="1">';
+		const output = '';
+		equal( deepFilter( input, [ imageCorrector ] ), output );
+	} );
 } );
