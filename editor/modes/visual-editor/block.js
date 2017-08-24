@@ -317,7 +317,7 @@ class VisualEditorBlock extends Component {
 	focusToolbarItem( after, reverseOrder ) {
 		const block = findDOMNode( this.node );
 		const isVisible = ( elem ) => elem && ! ( elem.offsetWidth <= 0 || elem.offsetHeight <= 0 );
-		const allToolbars = filter( Array.from( block.querySelectorAll( '.components-toolbar' ) ), isVisible );
+		const allToolbars = filter( block.querySelectorAll( '.components-toolbar' ), isVisible );
 		const settingsMenu = filter( [ block.querySelector( '.editor-block-settings-menu' ) ], isVisible );
 		const moverMenu = filter( [ block.querySelector( '.editor-block-mover' ) ], isVisible );
 		const allCycle = [ ...allToolbars, ...settingsMenu, ...moverMenu ];
@@ -371,11 +371,11 @@ class VisualEditorBlock extends Component {
 		const forward = keyCode === DOWN || keyCode === RIGHT;
 		const block = findDOMNode( this.node );
 		const isVisible = ( elem ) => elem && ! ( elem.offsetWidth <= 0 || elem.offsetHeight <= 0 );
-		const allToolbars = filter( Array.from( block.querySelectorAll( '.components-toolbar' ) ), isVisible );
+		const allToolbars = filter( block.querySelectorAll( '.components-toolbar' ), isVisible );
 		const settingsMenu = filter( [ block.querySelector( '.editor-block-settings-menu' ) ], isVisible );
 		const moverMenu = filter( [ block.querySelector( '.editor-block-mover' ) ], isVisible );
 		const allCycle = flatMap( [ ...allToolbars, ...settingsMenu, ...moverMenu ], ( toolbar ) => {
-			return filter( Array.from( toolbar.querySelectorAll( '*[tabindex="-1"]:not(:disabled)' ) ) );
+			return filter( toolbar.querySelectorAll( '*[tabindex="-1"]:not(:disabled)' ), isVisible );
 		} );
 
 		if ( ! forward ) {
