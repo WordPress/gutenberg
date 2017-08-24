@@ -2,13 +2,14 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import { get, flowRight } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { PanelBody, PanelRow, withInstanceId } from '@wordpress/components';
+import { PanelBody, PanelRow, withAPIData, withInstanceId } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -27,29 +28,6 @@ export class PageAttributes extends Component {
 		};
 	}
 
-	componentDidMount() {
-		this.fetchSupports();
-	}
-
-	fetchSupports() {
-		const { postTypeSlug } = this.props;
-		this.fetchSupportsRequest = new wp.api.models.Type( { id: postTypeSlug } )
-			.fetch( { data: { context: 'edit' } } )
-			.done( ( postType ) => {
-				const {
-					'page-attributes': supportsPageAttributes = false,
-				} = postType.supports;
-
-				this.setState( { supportsPageAttributes } );
-			} );
-	}
-
-	componentWillUnmount() {
-		if ( this.fetchSupportsRequest ) {
-			this.fetchSupportsRequest.abort();
-		}
-	}
-
 	setUpdatedOrder( event ) {
 		const order = Number( event.target.value );
 		if ( order >= 0 ) {
@@ -58,8 +36,11 @@ export class PageAttributes extends Component {
 	}
 
 	render() {
-		const { instanceId, order } = this.props;
-		const { supportsPageAttributes } = this.state;
+		const { instanceId, order, postType } = this.props;
+		const supportsPageAttributes = get( postType.data, [
+			'supports',
+			'page-attributes',
+		], false );
 
 		// Only render fields if post type supports page attributes
 		if ( ! supportsPageAttributes ) {
@@ -90,7 +71,7 @@ export class PageAttributes extends Component {
 	}
 }
 
-export default connect(
+const applyConnect = connect(
 	( state ) => {
 		return {
 			postTypeSlug: getCurrentPostType( state ),
@@ -106,4 +87,18 @@ export default connect(
 			},
 		};
 	}
-)( withInstanceId( PageAttributes ) );
+);
+
+const applyWithAPIData = withAPIData( ( props ) => {
+	const { postTypeSlug } = props;
+
+	return {
+		postType: `/wp/v2/types/${ postTypeSlug }?context=edit`,
+	};
+} );
+
+export default flowRight( [
+	applyConnect,
+	applyWithAPIData,
+	withInstanceId,
+] )( PageAttributes );
