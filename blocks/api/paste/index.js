@@ -18,6 +18,7 @@ import formattingTransformer from './formatting-transformer';
 import msListConverter from './ms-list-converter';
 import listMerger from './list-merger';
 import imageCorrector from './image-corrector';
+import blockquoteNormaliser from './blockquote-normaliser';
 import { deepFilter, isInvalidInline, isNotWhitelisted } from './utils';
 
 export default function( { content: HTML, inline } ) {
@@ -41,6 +42,7 @@ export default function( { content: HTML, inline } ) {
 		stripAttributes,
 		commentRemover,
 		createUnwrapper( isNotWhitelisted ),
+		blockquoteNormaliser,
 	] );
 
 	// Inline paste.
