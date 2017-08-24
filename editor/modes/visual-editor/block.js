@@ -11,7 +11,7 @@ import 'element-closest';
 /**
  * WordPress dependencies
  */
-import { Children, Component, findDOMNode } from '@wordpress/element';
+import { Children, Component } from '@wordpress/element';
 import { IconButton, Toolbar } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
 import { getBlockType, getBlockDefaultClassname, createBlock } from '@wordpress/blocks';
@@ -105,8 +105,7 @@ class VisualEditorBlock extends Component {
 		if ( ! this.node ) {
 			return;
 		}
-		const block = findDOMNode( this.node );
-		const nextTabItem = queryFirstTabbableChild( block );
+		const nextTabItem = queryFirstTabbableChild( this.node );
 		const needsFocusableBorder = nextTabItem === null;
 		if ( this.state.focusableBorder !== needsFocusableBorder ) {
 			this.setState( { focusableBorder: needsFocusableBorder } );
@@ -315,7 +314,7 @@ class VisualEditorBlock extends Component {
 	}
 
 	focusToolbarItem( after, reverseOrder ) {
-		const block = findDOMNode( this.node );
+		const block = this.node;
 		const isVisible = ( elem ) => elem && ! ( elem.offsetWidth <= 0 || elem.offsetHeight <= 0 );
 		const allToolbars = filter( block.querySelectorAll( '.components-toolbar' ), isVisible );
 		const settingsMenu = filter( [ block.querySelector( '.editor-block-settings-menu' ) ], isVisible );
@@ -369,7 +368,7 @@ class VisualEditorBlock extends Component {
 			return;
 		}
 		const forward = keyCode === DOWN || keyCode === RIGHT;
-		const block = findDOMNode( this.node );
+		const block = this.node;
 		const isVisible = ( elem ) => elem && ! ( elem.offsetWidth <= 0 || elem.offsetHeight <= 0 );
 		const allToolbars = filter( block.querySelectorAll( '.components-toolbar' ), isVisible );
 		const settingsMenu = filter( [ block.querySelector( '.editor-block-settings-menu' ) ], isVisible );
