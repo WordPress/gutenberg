@@ -27,7 +27,9 @@ class WritingFlow extends Component {
 			'input',
 		].join( ',' );
 
-		const focusableNodes = Array.from( this.container.querySelectorAll( selectors ) );
+		const isVisible = ( elem ) => elem.offsetWidth > 0 || elem.offsetHeight > 0 || elem.getClientRects().length > 0;
+
+		const focusableNodes = Array.from( this.container.querySelectorAll( selectors ) ).filter( isVisible );
 		if ( direction === 'UP' ) {
 			focusableNodes.reverse();
 		}
@@ -41,6 +43,17 @@ class WritingFlow extends Component {
 		if ( targetNode ) {
 			targetNode.focus();
 		}
+	}
+
+	isSameRanges( range1, range2 ) {
+		return ( ! range1 && ! range2 ) || (
+			!! range1 &&
+			!! range2 &&
+			range1.startContainer === range2.startContainer &&
+			range1.startOffset === range2.startOffset &&
+			range1.endContainer === range2.endContainer &&
+			range1.endOffset === range2.endOffset
+		);
 	}
 
 	onKeyDown( event ) {
@@ -62,7 +75,7 @@ class WritingFlow extends Component {
 
 			// If there's no movement, so we're either at the end of start, or
 			// no text input at all.
-			if ( range !== this.lastRange ) {
+			if ( ! this.isSameRanges( range, this.lastRange ) ) {
 				return;
 			}
 
