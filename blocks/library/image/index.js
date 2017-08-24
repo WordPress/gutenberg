@@ -60,7 +60,7 @@ registerBlockType( 'core/image', {
 				type: 'raw',
 				isMatch: ( node ) => {
 					const tag = node.nodeName.toLowerCase();
-					const hasText = !! node.textContent;
+					const hasText = !! node.textContent.trim();
 					const hasImage = node.querySelector( 'img' );
 
 					return tag === 'img' || ( hasImage && ! hasText ) || ( hasImage && tag === 'figure' );
