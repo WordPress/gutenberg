@@ -7,7 +7,8 @@
             "postsToShow": 5,
             "displayPostDate": true,
             "layout": "list",
-            "columns": 3
+            "columns": 3,
+            "align": "center"
         }
     }
 ]

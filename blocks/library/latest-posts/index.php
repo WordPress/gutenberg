@@ -13,27 +13,8 @@
  * @return string Returns the post content with latest posts added.
  */
 function gutenberg_render_block_core_latest_posts( $attributes ) {
-	$posts_to_show = 5;
-
-	if ( array_key_exists( 'postsToShow', $attributes ) ) {
-
-		// Basic attribute validation.
-		if (
-			is_numeric( $attributes['postsToShow'] ) &&
-			$attributes['postsToShow'] > 0 &&
-			$attributes['postsToShow'] < 100
-		) {
-			$posts_to_show = intval( $attributes['postsToShow'] );
-		}
-	}
-
-	$align = 'center';
-	if ( isset( $attributes['align'] ) && in_array( $attributes['align'], array( 'left', 'right', 'wide', 'full' ), true ) ) {
-		$align = $attributes['align'];
-	}
-
 	$recent_posts = wp_get_recent_posts( array(
-		'numberposts' => $posts_to_show,
+		'numberposts' => $attributes['postsToShow'],
 		'post_status' => 'publish',
 	) );
 
@@ -63,7 +44,7 @@ function gutenberg_render_block_core_latest_posts( $attributes ) {
 		$list_items_markup .= "</li>\n";
 	}
 
-	$class = "wp-block-latest-posts align{$align}";
+	$class = "wp-block-latest-posts align{$attributes['align']}";
 	if ( isset( $attributes['layout'] ) && 'grid' === $attributes['layout'] ) {
 		$class .= ' is-grid';
 	}
@@ -82,5 +63,28 @@ function gutenberg_render_block_core_latest_posts( $attributes ) {
 }
 
 register_block_type( 'core/latest-posts', array(
+	'attributes' => array(
+		'postsToShow' => array(
+			'type' => 'number',
+			'default' => 5,
+		),
+		'displayPostDate' => array(
+			'type' => 'boolean',
+			'default' => false,
+		),
+		'layout' => array(
+			'type' => 'string',
+			'default' => 'list',
+		),
+		'columns' => array(
+			'type' => 'number',
+			'default' => 3,
+		),
+		'align' => array(
+			'type' => 'string',
+			'default' => 'center',
+		),
+	),
+
 	'render_callback' => 'gutenberg_render_block_core_latest_posts',
 ) );
