@@ -16,6 +16,7 @@ import createUnwrapper from './create-unwrapper';
 import isInlineContent from './is-inline-content';
 import formattingTransformer from './formatting-transformer';
 import msListConverter from './ms-list-converter';
+import listMerger from './list-merger';
 import imageCorrector from './image-corrector';
 import { deepFilter, isInvalidInline, isNotWhitelisted } from './utils';
 
@@ -33,6 +34,7 @@ export default function( { content: HTML, inline } ) {
 	] );
 
 	HTML = deepFilter( HTML, [
+		listMerger,
 		// Add semantic formatting before attributes are stripped.
 		formattingTransformer,
 		stripAttributes,
