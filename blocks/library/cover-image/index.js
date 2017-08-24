@@ -73,34 +73,29 @@ registerBlockType( 'core/cover-image', {
 			'has-background-dim': hasBackgroundDim,
 		} );
 
-		const controls = (
-			focus && (
-				<BlockControls key="controls">
-					<BlockAlignmentToolbar
-						value={ align }
-						onChange={ updateAlignment }
-					/>
+		const controls = focus && [
+			<BlockControls key="controls">
+				<BlockAlignmentToolbar
+					value={ align }
+					onChange={ updateAlignment }
+				/>
 
-					<Toolbar>
-						<li>
-							<MediaUploadButton
-								buttonProps={ {
-									className: 'components-icon-button components-toolbar__control',
-									'aria-label': __( 'Edit image' ),
-								} }
-								onSelect={ onSelectImage }
-								type="image"
-								value={ id }
-							>
-								<Dashicon icon="edit" />
-							</MediaUploadButton>
-						</li>
-					</Toolbar>
-				</BlockControls>
-			)
-		);
-
-		const inspectorControls = focus && (
+				<Toolbar>
+					<li>
+						<MediaUploadButton
+							buttonProps={ {
+								className: 'components-icon-button components-toolbar__control',
+								'aria-label': __( 'Edit image' ),
+							} }
+							onSelect={ onSelectImage }
+							type="image"
+							value={ id }
+						>
+							<Dashicon icon="edit" />
+						</MediaUploadButton>
+					</li>
+				</Toolbar>
+			</BlockControls>,
 			<InspectorControls key="inspector">
 				<BlockDescription>
 					<p>{ __( 'Cover Image is a bold image block with an optional title.' ) }</p>
@@ -116,14 +111,13 @@ registerBlockType( 'core/cover-image', {
 					checked={ !! hasBackgroundDim }
 					onChange={ toggleBackgroundDim }
 				/>
-			</InspectorControls>
-		);
+			</InspectorControls>,
+		];
 
 		if ( ! url ) {
 			const uploadButtonProps = { isLarge: true };
 			return [
 				controls,
-				inspectorControls,
 				<Placeholder
 					key="placeholder"
 					instructions={ __( 'Drag image here or insert from media library' ) }
@@ -143,7 +137,6 @@ registerBlockType( 'core/cover-image', {
 
 		return [
 			controls,
-			inspectorControls,
 			<section
 				key="preview"
 				data-url={ url }
