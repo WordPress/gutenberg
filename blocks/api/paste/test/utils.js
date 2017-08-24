@@ -7,10 +7,10 @@ import { equal } from 'assert';
  * Internal dependencies
  */
 import createUnwrapper from '../create-unwrapper';
-import { deepFilter, isSpan, isInline, isEmpty, isInvalidInline } from '../utils';
+import { deepFilter, isEmpty, isInvalidInline } from '../utils';
 
-const spanUnwrapper = createUnwrapper( ( node ) => isSpan( node ) );
-const inlineUnwrapper = createUnwrapper( ( node ) => isInline( node ) );
+const spanUnwrapper = createUnwrapper( ( node ) => node.nodeName === 'SPAN' );
+const inlineUnwrapper = createUnwrapper( ( node ) => node.nodeName === 'EM' );
 
 describe( 'deepFilter', () => {
 	it( 'should not error', () => {

@@ -3,11 +3,10 @@
  */
 const { ELEMENT_NODE } = window.Node;
 
-const attributes = {
-	img: [ 'src', 'alt' ],
-	a: [ 'href' ],
-	ol: [ 'type' ],
-};
+/**
+ * Internal dependencies
+ */
+import { isAttributeWhitelisted } from './utils';
 
 export default function( node ) {
 	if ( node.nodeType !== ELEMENT_NODE ) {
@@ -21,7 +20,7 @@ export default function( node ) {
 	const tag = node.nodeName.toLowerCase();
 
 	Array.from( node.attributes ).forEach( ( { name } ) => {
-		if ( attributes[ tag ] && attributes[ tag ].indexOf( name ) !== -1 ) {
+		if ( isAttributeWhitelisted( tag, name ) ) {
 			return;
 		}
 

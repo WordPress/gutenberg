@@ -18,17 +18,22 @@ export default function( node ) {
 		return;
 	}
 
-	if ( node.nodeName !== 'SPAN' ) {
-		return;
+	if ( node.nodeName === 'SPAN' ) {
+		const fontWeight = node.style.fontWeight;
+		const fontStyle = node.style.fontStyle;
+
+		if ( fontWeight === 'bold' || fontWeight === '700' ) {
+			replace( node, 'strong' );
+		} else if ( fontStyle === 'italic' ) {
+			replace( node, 'em' );
+		}
 	}
 
-	const fontWeight = node.style.fontWeight;
-
-	const fontStyle = node.style.fontStyle;
-
-	if ( fontWeight === 'bold' || fontWeight === '700' ) {
+	if ( node.nodeName === 'B' ) {
 		replace( node, 'strong' );
-	} else if ( fontStyle === 'italic' ) {
+	}
+
+	if ( node.nodeName === 'I' ) {
 		replace( node, 'em' );
 	}
 }

@@ -3,38 +3,60 @@
  */
 const { ELEMENT_NODE, TEXT_NODE } = window.Node;
 
-const inlineTags = [
-	'strong',
-	'em',
-	'b',
-	'i',
-	'del',
-	'ins',
-	'a',
-	'code',
-	'abbr',
-	'time',
-	'sub',
-	'sup',
-	'br',
-	'span',
-];
+const inlineWhitelist = {
+	strong: [],
+	em: [],
+	del: [],
+	ins: [],
+	a: [ 'href' ],
+	code: [],
+	abbr: [ 'title' ],
+	sub: [],
+	sup: [],
+	br: [],
+};
 
-const wrapperTags = [
-	'span',
-	'div',
-	'article',
-	'header',
-	'footer',
-	'section',
-	'nav',
-	'hgroup',
-	'main',
-	'aside',
-];
+const whitelist = {
+	...inlineWhitelist,
+	img: [ 'src', 'alt' ],
+	figure: [],
+	figcaption: [],
+	h1: [],
+	h2: [],
+	h3: [],
+	h4: [],
+	h5: [],
+	h6: [],
+	p: [],
+	blockquote: [],
+	hr: [],
+	ul: [],
+	ol: [ 'type' ],
+	li: [],
+	pre: [],
+	table: [],
+	thead: [],
+	tfoot: [],
+	tbody: [],
+	th: [],
+	tr: [],
+	td: [],
+};
+
+export function isWhitelisted( element ) {
+	return !! whitelist[ element.nodeName.toLowerCase() ];
+}
+
+export function isNotWhitelisted( element ) {
+	return ! isWhitelisted( element );
+}
+
+export function isAttributeWhitelisted( tag, attribute ) {
+	return whitelist[ tag ] && whitelist[ tag ].indexOf( attribute ) !== -1;
+}
 
 export function isInline( node ) {
-	return inlineTags.indexOf( node.nodeName.toLowerCase() ) !== -1;
+	return !! inlineWhitelist[ node.nodeName.toLowerCase() ];
 }
 
 export function isInvalidInline( element ) {
@@ -61,14 +83,6 @@ export function isInvalidInline( element ) {
 
 export function isDoubleBR( node ) {
 	return node.nodeName === 'BR' && node.previousSibling && node.previousSibling.nodeName === 'BR';
-}
-
-export function isSpan( node ) {
-	return node.nodeName === 'SPAN';
-}
-
-export function isWrapper( node ) {
-	return wrapperTags.indexOf( node.nodeName.toLowerCase() ) !== -1;
 }
 
 export function isEmpty( element ) {
