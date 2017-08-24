@@ -4,6 +4,14 @@
 import { Component } from 'element';
 import { keycodes } from '@wordpress/utils';
 
+/**
+ * Internal dependencies
+ */
+import { isEdge, placeCaretAtEdge } from '../utils/dom';
+
+/**
+ * Module Constants
+ */
 const { UP, DOWN, LEFT, RIGHT } = keycodes;
 
 class WritingFlow extends Component {
@@ -11,7 +19,6 @@ class WritingFlow extends Component {
 		super( ...arguments );
 		this.zones = [];
 		this.onKeyDown = this.onKeyDown.bind( this );
-		this.onKeyUp = this.onKeyUp.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
 	}
 
@@ -19,17 +26,19 @@ class WritingFlow extends Component {
 		this.container = ref;
 	}
 
-	moveFocusInContainer( target, direction = 'UP' ) {
-		const selectors = [
+	getVisibleTabbables() {
+		const tabblablesSelector = [
 			'*[contenteditable="true"]',
 			'*[tabindex]',
 			'textarea',
 			'input',
-		].join( ',' );
-
+		].join( ', ' );
 		const isVisible = ( elem ) => elem.offsetWidth > 0 || elem.offsetHeight > 0 || elem.getClientRects().length > 0;
+		return Array.from( this.container.querySelectorAll( tabblablesSelector ) ).filter( isVisible );
+	}
 
-		const focusableNodes = Array.from( this.container.querySelectorAll( selectors ) ).filter( isVisible );
+	moveFocusInContainer( target, direction = 'UP' ) {
+		const focusableNodes = this.getVisibleTabbables();
 		if ( direction === 'UP' ) {
 			focusableNodes.reverse();
 		}
@@ -41,48 +50,18 @@ class WritingFlow extends Component {
 			}, null );
 
 		if ( targetNode ) {
-			targetNode.focus();
+			placeCaretAtEdge( targetNode, direction === 'DOWN' );
 		}
-	}
-
-	isSameRanges( range1, range2 ) {
-		return ( ! range1 && ! range2 ) || (
-			!! range1 &&
-			!! range2 &&
-			range1.startContainer === range2.startContainer &&
-			range1.startOffset === range2.startOffset &&
-			range1.endContainer === range2.endContainer &&
-			range1.endOffset === range2.endOffset
-		);
 	}
 
 	onKeyDown( event ) {
-		const { keyCode } = event;
-		if ( [ UP, LEFT, DOWN, RIGHT ].indexOf( keyCode ) !== -1 ) {
-			const selection = window.getSelection();
-			this.lastRange = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
-		}
-	}
-
-	onKeyUp( event ) {
 		const { keyCode, target } = event;
 		const moveUp = ( keyCode === UP || keyCode === LEFT );
 		const moveDown = ( keyCode === DOWN || keyCode === RIGHT );
 
-		if ( moveUp || moveDown ) {
-			const selection = window.getSelection();
-			const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
-
-			// If there's no movement, so we're either at the end of start, or
-			// no text input at all.
-			if ( ! this.isSameRanges( range, this.lastRange ) ) {
-				return;
-			}
-
+		if ( ( moveUp || moveDown ) && isEdge( target, moveUp ) ) {
 			this.moveFocusInContainer( target, moveUp ? 'UP' : 'DOWN' );
 		}
-
-		delete this.lastRange;
 	}
 
 	render() {
@@ -92,7 +71,6 @@ class WritingFlow extends Component {
 			<div
 				ref={ this.bindContainer }
 				onKeyDown={ this.onKeyDown }
-				onKeyUp={ this.onKeyUp }
 			>
 				{ children }
 			</div>
