@@ -61,8 +61,7 @@ function FirstChild( { children } ) {
 }
 
 function queryFirstTabbableChild( elem ) {
-	let i = 0;
-	for ( i = 0; i < elem.childNodes.length; i++ ) {
+	for ( let i = 0; i < elem.childNodes.length; i++ ) {
 		const tabbableNode = queryFirstTabbable( { context: elem.childNodes[ i ] } );
 		if ( tabbableNode ) {
 			return tabbableNode;
