@@ -18,7 +18,7 @@ import './style.scss';
 import { getEditedPostAttribute } from '../../selectors';
 import { editPost } from '../../actions';
 
-class PostAuthor extends Component {
+export class PostAuthor extends Component {
 	constructor() {
 		super( ...arguments );
 
