@@ -19,8 +19,20 @@ import { getEditedPostAttribute } from '../../selectors';
 import { editPost } from '../../actions';
 
 class PostAuthor extends Component {
+	constructor() {
+		super( ...arguments );
+
+		this.setAuthorId = this.setAuthorId.bind( this );
+	}
+
+	setAuthorId( event ) {
+		const { onUpdateAuthor } = this.props;
+		const { value } = event.target;
+		onUpdateAuthor( Number( value ) );
+	}
+
 	render() {
-		const { users, onUpdateAuthor, postAuthor, instanceId } = this.props;
+		const { users, postAuthor, instanceId } = this.props;
 		if ( ! users.data || users.data.length < 2 ) {
 			return null;
 		}
@@ -36,7 +48,7 @@ class PostAuthor extends Component {
 				<select
 					id={ selectId }
 					value={ postAuthor }
-					onChange={ ( event ) => onUpdateAuthor( event.target.value ) }
+					onChange={ this.setAuthorId }
 					className="editor-post-author__select"
 				>
 					{ users.data.map( ( author ) => (
