@@ -104,6 +104,10 @@ class UrlInput extends Component {
 
 	onKeyDown( event ) {
 		const { selectedSuggestion, posts } = this.state;
+		if ( ! this.state.showSuggestions || ! this.state.posts.length ) {
+			return false;
+		}
+
 		switch ( event.keyCode ) {
 			case UP: {
 				event.stopPropagation();
