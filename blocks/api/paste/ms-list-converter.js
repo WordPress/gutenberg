@@ -18,17 +18,23 @@ export default function( node ) {
 	}
 
 	const style = node.getAttribute( 'style' );
-	const matches = /mso-list\s*:([^;]+)/.exec( style );
+
+	if ( ! style ) {
+		return;
+	}
+
+	// Quick check.
+	if ( style.indexOf( 'mso-list' ) === -1 ) {
+		return;
+	}
+
+	const matches = /mso-list\s*:[^;]+level([0-9]+)/i.exec( style );
 
 	if ( ! matches ) {
 		return;
 	}
 
-	const msoList = matches[ 1 ];
-
-	if ( ! msoList ) {
-		return;
-	}
+	let level = parseInt( matches[ 1 ], 10 ) - 1 || 0;
 
 	const prevNode = node.previousElementSibling;
 
@@ -49,8 +55,7 @@ export default function( node ) {
 	const listNode = node.previousElementSibling;
 	const listType = listNode.nodeName;
 	const listItem = document.createElement( 'li' );
-	const levelMatches = /level([0-9]+)/i.exec( msoList );
-	let level = parseInt( levelMatches[ 1 ], 10 ) - 1 || 0;
+
 	let receivingNode = listNode;
 
 	// Remove the first span with list info.
