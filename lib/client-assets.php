@@ -769,6 +769,16 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'before'
 	);
 
+	// Preload server-registered block schemas.
+	$block_registry = WP_Block_Type_Registry::get_instance();
+	$schemas = array();
+	foreach ( $block_registry->get_all_registered() as $block_name => $block_type ) {
+		if ( isset( $block_type->attributes ) ) {
+			$schemas[ $block_name ] = $block_type->attributes;
+		}
+	}
+	wp_localize_script( 'wp-blocks', '_wpBlocksAttributes', $schemas );
+
 	// Initialize the editor.
 	$gutenberg_theme_support = get_theme_support( 'gutenberg' );
 	$color_palette = gutenberg_color_palette();

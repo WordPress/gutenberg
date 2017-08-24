@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { isFunction, some } from 'lodash';
+import { get, isFunction, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -92,8 +92,13 @@ export function registerBlockType( name, settings ) {
 		);
 		return;
 	}
-	const block = Object.assign( { name }, settings );
-	blocks[ name ] = block;
+
+	const block = blocks[ name ] = {
+		name,
+		attributes: get( window._wpBlocksAttributes, name ),
+		...settings,
+	};
+
 	return block;
 }
 
