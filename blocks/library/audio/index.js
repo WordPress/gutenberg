@@ -52,8 +52,8 @@ registerBlockType( 'core/audio', {
 			this.state = {
 				editing: ! this.props.attributes.src,
 				src: this.props.attributes.src,
-				className
-			}
+				className,
+			};
 		}
 		render() {
 			const { align } = this.props.attributes;
@@ -62,7 +62,7 @@ registerBlockType( 'core/audio', {
 			const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 			const switchToEditing = () => {
 				this.setState( { editing: true } );
-			}
+			};
 			const onSelectAudio = ( media ) => {
 				if ( media && media.url ) {
 					// sets the block's attribure and updates the edit component from the
@@ -79,7 +79,7 @@ registerBlockType( 'core/audio', {
 					this.setState( { editing: false } );
 				}
 				return false;
-			}
+			};
 			const controls = (
 				focus && (
 					<BlockControls key="controls">
