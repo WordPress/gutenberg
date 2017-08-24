@@ -17,7 +17,7 @@ import isInlineContent from './is-inline-content';
 import formattingTransformer from './formatting-transformer';
 import msListConverter from './ms-list-converter';
 import imageCorrector from './image-corrector';
-import { deepFilter, isInline, isSpan, isWrapper, isInvalidInline } from './utils';
+import { deepFilter, isInvalidInline, isNotWhitelisted } from './utils';
 
 export default function( { content: HTML, inline } ) {
 	HTML = HTML.replace( /<meta[^>]+>/, '' );
@@ -27,40 +27,30 @@ export default function( { content: HTML, inline } ) {
 		return parseWithGrammar( HTML );
 	}
 
+	// Context dependent filters. Needs to run before we remove nodes.
 	HTML = deepFilter( HTML, [
-		createUnwrapper( ( node ) => isInvalidInline( node ) ),
+		msListConverter,
+	] );
+
+	HTML = deepFilter( HTML, [
+		// Add semantic formatting before attributes are stripped.
+		formattingTransformer,
+		stripAttributes,
+		commentRemover,
+		imageCorrector,
+		createUnwrapper( isNotWhitelisted ),
 	] );
 
 	// Inline paste.
 	if ( inline || isInlineContent( HTML ) ) {
-		HTML = deepFilter( HTML, [
-			formattingTransformer,
-			stripAttributes,
-			commentRemover,
-			createUnwrapper( ( node ) => ! isInline( node ) ),
-			createUnwrapper( ( node ) => isSpan( node ) ),
-			createUnwrapper( ( node ) => node.nodeName === 'O:P' ),
-		] );
-
 		// Allows us to ask for this information when we get a report.
 		window.console.log( 'Processed inline HTML:\n\n', HTML );
 
 		return HTML;
 	}
 
-	// Context dependent filters. Needs to run before we remove tags.
 	HTML = deepFilter( HTML, [
-		msListConverter,
-	] );
-
-	HTML = deepFilter( HTML, [
-		formattingTransformer,
-		stripAttributes,
-		commentRemover,
-		imageCorrector,
-		createUnwrapper( ( node ) => isWrapper( node ) ),
-		createUnwrapper( ( node ) => isSpan( node ) ),
-		createUnwrapper( ( node ) => node.nodeName === 'O:P' ),
+		createUnwrapper( isInvalidInline ),
 	] );
 
 	HTML = normaliseBlocks( HTML );

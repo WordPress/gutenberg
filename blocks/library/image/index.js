@@ -58,10 +58,13 @@ registerBlockType( 'core/image', {
 		from: [
 			{
 				type: 'raw',
-				isMatch: ( node ) => (
-					node.nodeName === 'IMG' ||
-					( ! node.textContent && node.querySelector( 'img' ) )
-				),
+				isMatch: ( node ) => {
+					const tag = node.nodeName.toLowerCase();
+					const hasText = !! node.textContent;
+					const hasImage = node.querySelector( 'img' );
+
+					return tag === 'img' || ( hasImage && ! hasText ) || ( hasImage && tag === 'figure' );
+				},
 			},
 			{
 				type: 'files',

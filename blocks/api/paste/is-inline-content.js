@@ -10,5 +10,11 @@ export default function( HTML ) {
 
 	const nodes = Array.from( doc.body.children );
 
-	return nodes.every( isInline ) && ! nodes.some( isDoubleBR );
+	return ! nodes.some( isDoubleBR ) && deepCheck( nodes );
+}
+
+function deepCheck( nodes ) {
+	return nodes.every( ( node ) => {
+		return isInline( node ) && deepCheck( Array.from( node.children ) );
+	} );
 }

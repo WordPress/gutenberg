@@ -7,9 +7,9 @@ import { equal } from 'assert';
  * Internal dependencies
  */
 import createUnwrapper from '../create-unwrapper';
-import { deepFilter, isSpan } from '../utils';
+import { deepFilter } from '../utils';
 
-const unwrapper = createUnwrapper( ( node ) => isSpan( node ) );
+const unwrapper = createUnwrapper( ( node ) => node.nodeName === 'SPAN' );
 
 describe( 'stripWrappers', () => {
 	it( 'should remove spans', () => {
