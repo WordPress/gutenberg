@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { flowRight } from 'lodash';
+import { filter, flowRight } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -31,12 +31,25 @@ class PostAuthor extends Component {
 		onUpdateAuthor( Number( value ) );
 	}
 
+	getAuthors() {
+		// While User Levels are officially deprecated, the behavior of the
+		// existing users dropdown on `who=authors` tests `user_level != 0`
+		//
+		// See: https://github.com/WordPress/WordPress/blob/a193916/wp-includes/class-wp-user-query.php#L322-L327
+		// See: https://codex.wordpress.org/Roles_and_Capabilities#User_Levels
+		const { users } = this.props;
+		return filter( users.data, ( user ) => {
+			return user.capabilities.level_1;
+		} );
+	}
+
 	render() {
-		const { users, postAuthor, instanceId } = this.props;
-		if ( ! users.data || users.data.length < 2 ) {
+		const authors = this.getAuthors();
+		if ( authors.length < 2 ) {
 			return null;
 		}
 
+		const { postAuthor, instanceId } = this.props;
 		const selectId = 'post-author-selector-' + instanceId;
 
 		// Disable reason: A select with an onchange throws a warning
@@ -51,7 +64,7 @@ class PostAuthor extends Component {
 					onChange={ this.setAuthorId }
 					className="editor-post-author__select"
 				>
-					{ users.data.map( ( author ) => (
+					{ authors.map( ( author ) => (
 						<option key={ author.id } value={ author.id }>{ author.name }</option>
 					) ) }
 				</select>
