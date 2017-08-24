@@ -300,15 +300,7 @@ class VisualEditorBlock extends Component {
 
 		this.handleToolbarTabCycle( event );
 		this.handleToolbarArrowCycle( event );
-
-		if ( keyCode === F10 && ! ( event.altKey || event.ctrlKey || event.shiftKey || event.metaKey ) ) {
-			event.preventDefault();
-			event.stopPropagation();
-			if ( this.props.isTyping ) {
-				this.props.onStopTyping();
-			}
-			this.props.onFocus( this.props.uid, { toolbar: true } );
-		}
+		this.handleToolbarF10Selection( event );
 
 		if ( ENTER === keyCode && target === this.node ) {
 			event.preventDefault();
@@ -406,6 +398,18 @@ class VisualEditorBlock extends Component {
 			if ( nextItem ) {
 				nextItem.focus();
 			}
+		}
+	}
+
+	handleToolbarF10Selection( event ) {
+		const { keyCode } = event;
+		if ( keyCode === F10 && ! ( event.altKey || event.ctrlKey || event.shiftKey || event.metaKey ) ) {
+			event.preventDefault();
+			event.stopPropagation();
+			if ( this.props.isTyping ) {
+				this.props.onStopTyping();
+			}
+			this.props.onFocus( this.props.uid, { toolbar: true } );
 		}
 	}
 
