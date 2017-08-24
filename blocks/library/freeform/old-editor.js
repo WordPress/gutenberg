@@ -7,6 +7,22 @@ import { keycodes } from '@wordpress/utils';
 
 const { BACKSPACE, DELETE } = keycodes;
 
+function isTmceEmpty( editor ) {
+	// When tinyMce is empty the content seems to be:
+	// <p><br data-mce-bogus="1"></p>
+	// avoid expensive checks for large documents
+	const body = editor.getBody();
+	if ( body.childNodes > 1 ) {
+		return false;
+	} else if ( body.childNodes === 0 ) {
+		return true;
+	}
+	if ( body.childNodes[ 0 ].childNodes > 1 ) {
+		return false;
+	}
+	return /^\n?$/.test( body.innerText || body.textContent );
+}
+
 export default class OldEditor extends Component {
 	constructor( props ) {
 		super( props );
@@ -71,8 +87,7 @@ export default class OldEditor extends Component {
 		} );
 
 		editor.on( 'keydown', ( event ) => {
-			if ( ( event.keyCode === BACKSPACE || event.keyCode === DELETE ) &&
-					/^\n?$/.test( editor.getContent( { format: 'text' } ) ) ) {
+			if ( ( event.keyCode === BACKSPACE || event.keyCode === DELETE ) && isTmceEmpty( editor ) ) {
 				// delete the block
 				this.props.onReplace( [] );
 				event.preventDefault();
