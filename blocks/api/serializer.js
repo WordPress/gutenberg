@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, reduce, isObject, castArray } from 'lodash';
+import { isEmpty, reduce, isObject, castArray, isUndefined, get } from 'lodash';
 import { html as beautifyHtml } from 'js-beautify';
 import classnames from 'classnames';
 
@@ -35,7 +35,7 @@ export function getBlockDefaultClassname( blockName ) {
  * @return {string}                          Save content
  */
 export function getSaveContent( blockType, attributes ) {
-	const { save, className = getBlockDefaultClassname( blockType.name ) } = blockType;
+	const { save, supports } = blockType;
 	let rawContent;
 
 	if ( save.prototype instanceof Component ) {
@@ -56,16 +56,19 @@ export function getSaveContent( blockType, attributes ) {
 		}
 
 		const extraProps = {};
-		if ( !! className ) {
+		const supportGeneratedClassname = isUndefined( get( supports, 'generatedClassName' ) ) || supports.generatedClassName;
+		const supportCustomClassname = ( isUndefined( get( supports, 'className' ) ) || supports.className ) && attributes.className;
+		if ( supportGeneratedClassname || supportCustomClassname ) {
+			const generatedClassName = supportGeneratedClassname ? getBlockDefaultClassname( blockType.name ) : undefined;
 			const updatedClassName = classnames(
-				className,
+				generatedClassName,
 				element.props.className,
 				attributes.className
 			);
 			extraProps.className = updatedClassName;
 		}
 
-		if ( blockType.supportAnchor && attributes.anchor ) {
+		if ( supports && !! supports.anchor ) {
 			extraProps.id = attributes.anchor;
 		}
 

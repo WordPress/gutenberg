@@ -28,7 +28,10 @@ registerBlockType( 'core/shortcode', {
 		},
 	},
 
-	className: false,
+	supports: {
+		generatedClassName: false,
+		className: false,
+	},
 
 	edit: withInstanceId(
 		( { attributes, setAttributes, instanceId, focus } ) => {

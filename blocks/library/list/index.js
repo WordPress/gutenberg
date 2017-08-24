@@ -92,7 +92,9 @@ registerBlockType( 'core/list', {
 		},
 	},
 
-	className: false,
+	supports: {
+		generatedClassName: false,
+	},
 
 	transforms: {
 		from: [
