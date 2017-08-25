@@ -68,7 +68,7 @@ registerBlockType( 'core/cover-image', {
 		const toggleParallax = () => setAttributes( { hasParallax: ! hasParallax } );
 		const toggleBackgroundDim = () => setAttributes( { hasBackgroundDim: ! hasBackgroundDim } );
 		const style = url
-			? { background: `url(${ url })` }
+			? { backgroundImage: `url(${ url })` }
 			: undefined;
 		const classes = classnames( className, {
 			'has-parallax': hasParallax,
@@ -163,7 +163,7 @@ registerBlockType( 'core/cover-image', {
 	save( { attributes, className } ) {
 		const { url, title, hasParallax, hasBackgroundDim } = attributes;
 		const style = url
-			? { background: `url(${ url })` }
+			? { backgroundImage: `url(${ url })` }
 			: undefined;
 		const classes = classnames( className, {
 			'has-parallax': hasParallax,
