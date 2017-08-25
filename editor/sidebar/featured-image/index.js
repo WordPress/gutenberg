@@ -15,12 +15,19 @@ import { MediaUploadButton } from '@wordpress/blocks';
  * Internal dependencies
  */
 import './style.scss';
-import { getEditedPostAttribute } from '../../selectors';
-import { editPost } from '../../actions';
+import { getEditedPostAttribute, isEditorSidebarPanelOpened } from '../../selectors';
+import { editPost, toggleSidebarPanel } from '../../actions';
 
-function FeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, media } ) {
+/**
+ * Module Constants
+ */
+const PANEL_NAME = 'featured-image';
+
+function FeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, media, isOpened, ...props } ) {
+	const onToggle = () => props.toggleSidebarPanel( PANEL_NAME );
+
 	return (
-		<PanelBody title={ __( 'Featured image' ) } initialOpen={ false }>
+		<PanelBody title={ __( 'Featured image' ) } opened={ isOpened } onToggle={ onToggle }>
 			<div className="editor-featured-image__content">
 				{ !! featuredImageId &&
 					<MediaUploadButton
@@ -67,17 +74,17 @@ const applyConnect = connect(
 	( state ) => {
 		return {
 			featuredImageId: getEditedPostAttribute( state, 'featured_media' ),
+			isOpened: isEditorSidebarPanelOpened( state, PANEL_NAME ),
 		};
 	},
-	( dispatch ) => {
-		return {
-			onUpdateImage( image ) {
-				dispatch( editPost( { featured_media: image.id } ) );
-			},
-			onRemoveImage() {
-				dispatch( editPost( { featured_media: null } ) );
-			},
-		};
+	{
+		onUpdateImage( image ) {
+			return editPost( { featured_media: image.id } );
+		},
+		onRemoveImage() {
+			return editPost( { featured_media: null } );
+		},
+		toggleSidebarPanel,
 	}
 );
 

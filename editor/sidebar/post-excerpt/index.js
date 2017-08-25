@@ -13,14 +13,20 @@ import { ExternalLink, PanelBody } from '@wordpress/components';
  * Internal Dependencies
  */
 import './style.scss';
-import { getEditedPostExcerpt } from '../../selectors';
-import { editPost } from '../../actions';
+import { getEditedPostExcerpt, isEditorSidebarPanelOpened } from '../../selectors';
+import { editPost, toggleSidebarPanel } from '../../actions';
 
-function PostExcerpt( { excerpt, onUpdateExcerpt } ) {
+/**
+ * Module Constants
+ */
+const PANEL_NAME = 'post-excerpt';
+
+function PostExcerpt( { excerpt, onUpdateExcerpt, isOpened, ...props } ) {
 	const onChange = ( event ) => onUpdateExcerpt( event.target.value );
+	const onTogglePanel = () => props.toggleSidebarPanel( PANEL_NAME );
 
 	return (
-		<PanelBody title={ __( 'Excerpt' ) } initialOpen={ false }>
+		<PanelBody title={ __( 'Excerpt' ) } opened={ isOpened } onToggle={ onTogglePanel }>
 			<textarea
 				className="editor-post-excerpt__textarea"
 				onChange={ onChange }
@@ -39,14 +45,14 @@ export default connect(
 	( state ) => {
 		return {
 			excerpt: getEditedPostExcerpt( state ),
+			isOpened: isEditorSidebarPanelOpened( state, PANEL_NAME ),
 		};
 	},
-	( dispatch ) => {
-		return {
-			onUpdateExcerpt( excerpt ) {
-				dispatch( editPost( { excerpt } ) );
-			},
-		};
+	{
+		onUpdateExcerpt( excerpt ) {
+			return editPost( { excerpt } );
+		},
+		toggleSidebarPanel,
 	}
 )( PostExcerpt );
 
