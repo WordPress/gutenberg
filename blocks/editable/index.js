@@ -87,8 +87,8 @@ export default class Editable extends Component {
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.maybePropagateUndo = this.maybePropagateUndo.bind( this );
 		this.onBeforePastePreProcess = this.onBeforePastePreProcess.bind( this );
-		this.onChangeThrottled = throttle( this.onChange, 500, { leading: true } );
 		this.saveEditorContent = this.saveEditorContent.bind( this );
+		this.saveEditorContentThrottled = throttle( this.saveEditorContent, 500, { leading: true } );
 
 		this.state = {
 			formats: {},
@@ -116,7 +116,6 @@ export default class Editable extends Component {
 		editor.on( 'selectionChange', this.onSelectionChange );
 		editor.on( 'BeforeExecCommand', this.maybePropagateUndo );
 		editor.on( 'BeforePastePreProcess', this.onBeforePastePreProcess );
-		editor.on( 'Change', this.onChangeThrottled );
 
 		patterns.apply( this, [ editor ] );
 
@@ -350,6 +349,8 @@ export default class Editable extends Component {
 		if ( keyCode === BACKSPACE ) {
 			this.onSelectionChange();
 		}
+
+		this.saveEditorContentThrottled();
 	}
 
 	splitContent( blocks = [] ) {
