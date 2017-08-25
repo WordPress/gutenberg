@@ -109,6 +109,17 @@ class Tests_Formatting_SanitizeTitleWithDashes extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 10792
+	 */
+	function test_replaces_forward_slash() {
+		$this->assertEquals("songs-by-lennon-mccartney", sanitize_title_with_dashes("songs by Lennon/McCartney", '', 'save'));
+		$this->assertEquals("songs-by-lennon-mccartney", sanitize_title_with_dashes("songs by Lennon//McCartney", '', 'save'));
+		$this->assertEquals("songs-by-lennon-mccartney", sanitize_title_with_dashes("songs by Lennon///McCartney", '', 'save'));
+		$this->assertEquals("songs-by-lennon-mccartney", sanitize_title_with_dashes("songs by Lennon/-McCartney", '', 'save'));
+		$this->assertEquals("songs-by-lennon-mccartney", sanitize_title_with_dashes("//songs by Lennon/McCartney", '', 'save'));
+	}
+
+	/**
 	 * @ticket 19820
 	 */
 	function test_replaces_multiply_sign() {
