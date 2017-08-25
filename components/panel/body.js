@@ -26,16 +26,22 @@ class PanelBody extends Component {
 
 	toggle( event ) {
 		event.preventDefault();
-		this.setState( ( state ) => ( {
-			opened: ! state.opened,
-		} ) );
+		if ( this.props.opened === undefined ) {
+			this.setState( ( state ) => ( {
+				opened: ! state.opened,
+			} ) );
+		}
+
+		if ( this.props.onToggle ) {
+			this.props.onToggle();
+		}
 	}
 
 	render() {
-		const { title, children } = this.props;
-		const { opened } = this.state;
-		const icon = `arrow-${ opened ? 'down' : 'right' }`;
-		const className = classnames( 'components-panel__body', { 'is-opened': opened } );
+		const { title, children, opened } = this.props;
+		const isOpened = opened === undefined ? this.state.opened : opened;
+		const icon = `arrow-${ isOpened ? 'down' : 'right' }`;
+		const className = classnames( 'components-panel__body', { 'is-opened': isOpened } );
 
 		return (
 			<div className={ className }>
@@ -44,7 +50,7 @@ class PanelBody extends Component {
 						<Button
 							className="components-panel__body-toggle"
 							onClick={ this.toggle }
-							aria-expanded={ opened }
+							aria-expanded={ isOpened }
 							label={ sprintf( __( 'Open section: %s' ), title ) }
 						>
 							<Dashicon icon={ icon } />
@@ -52,7 +58,7 @@ class PanelBody extends Component {
 						</Button>
 					</h3>
 				) }
-				{ this.state.opened && children }
+				{ isOpened && children }
 			</div>
 		);
 	}

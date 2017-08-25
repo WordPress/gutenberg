@@ -802,10 +802,10 @@ describe( 'state', () => {
 	} );
 
 	describe( 'preferences()', () => {
-		it( 'should be opened by default', () => {
+		it( 'should be opened by default and show the post-status panel', () => {
 			const state = preferences( undefined, {} );
 
-			expect( state ).toEqual( { isSidebarOpened: true } );
+			expect( state ).toEqual( { isSidebarOpened: true, panels: { 'post-status': true } } );
 		} );
 
 		it( 'should toggle the sidebar open flag', () => {
@@ -814,6 +814,24 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( { isSidebarOpened: true } );
+		} );
+
+		it( 'should set the sidebar panel open flag to true if unset', () => {
+			const state = preferences( deepFreeze( { isSidebarOpened: false } ), {
+				type: 'TOGGLE_SIDEBAR_PANEL',
+				panel: 'post-taxonomies',
+			} );
+
+			expect( state ).toEqual( { isSidebarOpened: false, panels: { 'post-taxonomies': true } } );
+		} );
+
+		it( 'should toggle the sidebar panel open flag', () => {
+			const state = preferences( deepFreeze( { isSidebarOpened: false, panels: { 'post-taxonomies': true } } ), {
+				type: 'TOGGLE_SIDEBAR_PANEL',
+				panel: 'post-taxonomies',
+			} );
+
+			expect( state ).toEqual( { isSidebarOpened: false, panels: { 'post-taxonomies': false } } );
 		} );
 	} );
 

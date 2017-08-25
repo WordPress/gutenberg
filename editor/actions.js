@@ -256,6 +256,19 @@ export function stopTyping() {
 }
 
 /**
+ * Returns an action object used in signalling that the user toggled a sidebar panel
+ *
+ * @param  {String} panel   The panel name
+ * @return {Object}         Action object
+ */
+export function toggleSidebarPanel( panel ) {
+	return {
+		type: 'TOGGLE_SIDEBAR_PANEL',
+		panel,
+	};
+}
+
+/**
  * Returns an action object used to create a notice
  *
  * @param {String}     status   The notice status

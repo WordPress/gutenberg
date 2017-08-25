@@ -35,6 +35,13 @@ describe( 'PanelBody', () => {
 			expect( icon.prop( 'icon' ) ).toBe( 'arrow-right' );
 		} );
 
+		it( 'should use the "opened" prop instead of state if provided', () => {
+			const panelBody = shallow( <PanelBody title="Some Text" opened={ true } initialOpen={ false } /> );
+			expect( panelBody.state( 'opened' ) ).toBe( false );
+			const icon = panelBody.find( 'Dashicon' );
+			expect( icon.prop( 'icon' ) ).toBe( 'arrow-down' );
+		} );
+
 		it( 'should render child elements within PanelBody element', () => {
 			const panelBody = shallow( <PanelBody children="Some Text" /> );
 			expect( panelBody.instance().props.children ).toBe( 'Some Text' );
