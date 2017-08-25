@@ -6,55 +6,53 @@
  * @return {Boolean}           Is Edge or not
  */
 export function isEdge( container, reverse = false ) {
-	const isInputOrTextarea = [ 'INPUT', 'TEXTAREA' ].indexOf( container.tagName ) !== -1;
+	if ( [ 'INPUT', 'TEXTAREA' ].indexOf( container.tagName ) !== -1 ) {
+		if ( container.selectionStart !== container.selectionEnd ) {
+			return false;
+		}
+
+		if ( reverse ) {
+			return container.selectionStart === 0;
+		}
+
+		return container.value.length === container.selectionStart;
+	}
+
+	if ( ! container.isContentEditable ) {
+		return true;
+	}
+
 	const selection = window.getSelection();
 	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+	const position = reverse ? 'start' : 'end';
+	const order = reverse ? 'first' : 'last';
+	const offset = range[ `${ position }Offset` ];
 
-	function isStartOfContainer() {
-		if ( isInputOrTextarea ) {
-			return container.selectionStart === 0 && container.selectionStart === container.selectionEnd;
-		}
-		if ( ! container.isContentEditable ) {
-			return true;
-		}
-		if ( range.startOffset !== 0 || ! range.collapsed ) {
-			return false;
-		}
-		const start = range.startContainer;
-		let element = start;
-		while ( element !== container ) {
-			const child = element;
-			element = element.parentNode;
-			if ( element.firstChild !== child ) {
-				return false;
-			}
-		}
-		return true;
+	let node = range.startContainer;
+
+	if ( ! range || ! range.collapsed ) {
+		return false;
 	}
 
-	function isEndOfContainer() {
-		if ( isInputOrTextarea ) {
-			return container.value.length === container.selectionStart && container.selectionStart === container.selectionEnd;
-		}
-		if ( ! container.isContentEditable ) {
-			return true;
-		}
-		if ( range.endOffset !== range.endContainer.textContent.length || ! range.collapsed ) {
-			return false;
-		}
-		const start = range.endContainer;
-		let element = start;
-		while ( element !== container ) {
-			const child = element;
-			element = element.parentNode;
-			if ( element.lastChild !== child ) {
-				return false;
-			}
-		}
-		return true;
+	if ( reverse && offset !== 0 ) {
+		return false;
 	}
 
-	return reverse ? isStartOfContainer() : isEndOfContainer();
+	if ( ! reverse && offset !== node.textContent.length ) {
+		return false;
+	}
+
+	while ( node !== container ) {
+		const parentNode = node.parentNode;
+
+		if ( parentNode[ `${ order }Child` ] !== node ) {
+			return false;
+		}
+
+		node = parentNode;
+	}
+
+	return true;
 }
 
 /**
