@@ -20,13 +20,12 @@ import {
 	isTyping,
 	blockSelection,
 	mode,
-	isSidebarOpened,
+	preferences,
 	saving,
 	notices,
 	showInsertionPoint,
-	createReduxStore,
 	userData,
-} from '../state';
+} from '../reducer';
 
 describe( 'state', () => {
 	describe( 'getPostRawValue', () => {
@@ -316,7 +315,7 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should insert after the specified block uid', () => {
+		it( 'should insert at the specified position', () => {
 			const original = editor( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
@@ -332,7 +331,7 @@ describe( 'state', () => {
 
 			const state = editor( original, {
 				type: 'INSERT_BLOCKS',
-				after: 'kumquat',
+				position: 1,
 				blocks: [ {
 					uid: 'persimmon',
 					name: 'core/freeform',
@@ -676,6 +675,17 @@ describe( 'state', () => {
 			expect( state ).toEqual( { start: 'ribs', end: 'chicken', focus: null } );
 		} );
 
+		it( 'should not update the state if the block is already selected', () => {
+			const original = deepFreeze( { start: 'ribs', end: 'ribs' } );
+
+			const state1 = blockSelection( original, {
+				type: 'SELECT_BLOCK',
+				uid: 'ribs',
+			} );
+
+			expect( state1 ).toBe( original );
+		} );
+
 		it( 'should unset multi selection and select inserted block', () => {
 			const original = deepFreeze( { start: 'ribs', end: 'chicken' } );
 
@@ -791,19 +801,19 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'isSidebarOpened()', () => {
+	describe( 'preferences()', () => {
 		it( 'should be opened by default', () => {
-			const state = isSidebarOpened( undefined, {} );
+			const state = preferences( undefined, {} );
 
-			expect( state ).toBe( true );
+			expect( state ).toEqual( { isSidebarOpened: true } );
 		} );
 
 		it( 'should toggle the sidebar open flag', () => {
-			const state = isSidebarOpened( false, {
+			const state = preferences( deepFreeze( { isSidebarOpened: false } ), {
 				type: 'TOGGLE_SIDEBAR',
 			} );
 
-			expect( state ).toBe( true );
+			expect( state ).toEqual( { isSidebarOpened: true } );
 		} );
 	} );
 
@@ -896,34 +906,6 @@ describe( 'state', () => {
 			expect( state ).toEqual( {
 				b: originalState.b,
 			} );
-		} );
-	} );
-
-	describe( 'createReduxStore()', () => {
-		it( 'should return a redux store', () => {
-			const store = createReduxStore();
-
-			expect( typeof store.dispatch ).toBe( 'function' );
-			expect( typeof store.getState ).toBe( 'function' );
-		} );
-
-		it( 'should have expected reducer keys', () => {
-			const store = createReduxStore();
-			const state = store.getState();
-
-			expect( Object.keys( state ) ).toEqual( expect.arrayContaining( [
-				'optimist',
-				'editor',
-				'currentPost',
-				'isTyping',
-				'blockSelection',
-				'hoveredBlock',
-				'mode',
-				'isSidebarOpened',
-				'saving',
-				'showInsertionPoint',
-				'notices',
-			] ) );
 		} );
 	} );
 

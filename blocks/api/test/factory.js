@@ -54,6 +54,29 @@ describe( 'block factory', () => {
 			expect( block.isValid ).toBe( true );
 			expect( typeof block.uid ).toBe( 'string' );
 		} );
+
+		it( 'should keep the anchor if the block supports it', () => {
+			registerBlockType( 'core/test-block', {
+				attributes: {
+					align: {
+						type: 'string',
+					},
+				},
+				save: noop,
+				category: 'common',
+				supportAnchor: true,
+			} );
+			const block = createBlock( 'core/test-block', {
+				align: 'left',
+				anchor: 'chicken',
+			} );
+
+			expect( block.attributes ).toEqual( {
+				anchor: 'chicken',
+				align: 'left',
+			} );
+			expect( block.isValid ).toBe( true );
+		} );
 	} );
 
 	describe( 'switchToBlockType()', () => {
@@ -66,6 +89,7 @@ describe( 'block factory', () => {
 				},
 				transforms: {
 					from: [ {
+						type: 'block',
 						blocks: [ 'core/text-block' ],
 						transform: ( { value } ) => {
 							return createBlock( 'core/updated-text-block', {
@@ -104,6 +128,7 @@ describe( 'block factory', () => {
 				},
 				transforms: {
 					to: [ {
+						type: 'block',
 						blocks: [ 'core/updated-text-block' ],
 						transform: ( { value } ) => {
 							return createBlock( 'core/updated-text-block', {
@@ -346,6 +371,7 @@ describe( 'block factory', () => {
 				},
 				transforms: {
 					to: [ {
+						type: 'block',
 						blocks: [ 'core/updated-text-block' ],
 						transform: ( { value } ) => {
 							return [

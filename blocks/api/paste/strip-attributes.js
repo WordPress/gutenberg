@@ -1,16 +1,29 @@
-import { ELEMENT_NODE } from 'utils/nodetypes';
+/**
+ * Browser dependencies
+ */
+const { ELEMENT_NODE } = window.Node;
 
-export default function( nodes ) {
-	// MUTATION!
-	nodes.forEach( deepAttributeStrip );
-	return nodes;
-}
+/**
+ * Internal dependencies
+ */
+import { isAttributeWhitelisted } from './utils';
 
-function deepAttributeStrip( node ) {
-	if ( ELEMENT_NODE === node.nodeType ) {
-		node.removeAttribute( 'style' );
-		node.removeAttribute( 'class' );
-		node.removeAttribute( 'id' );
-		Array.from( node.children ).forEach( deepAttributeStrip );
+export default function( node ) {
+	if ( node.nodeType !== ELEMENT_NODE ) {
+		return;
 	}
+
+	if ( ! node.hasAttributes() ) {
+		return;
+	}
+
+	const tag = node.nodeName.toLowerCase();
+
+	Array.from( node.attributes ).forEach( ( { name } ) => {
+		if ( isAttributeWhitelisted( tag, name ) ) {
+			return;
+		}
+
+		node.removeAttribute( name );
+	} );
 }

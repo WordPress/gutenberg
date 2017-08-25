@@ -1,8 +1,10 @@
 // Components
+export { default as APIProvider } from './higher-order/with-api-data/provider';
 export { default as Button } from './button';
 export { default as ClipboardButton } from './clipboard-button';
 export { default as Dashicon } from './dashicon';
 export { default as DropZone } from './drop-zone';
+export { default as DropZoneProvider } from './drop-zone/provider';
 export { default as DropdownMenu } from './dropdown-menu';
 export { default as ExternalLink } from './external-link';
 export { default as FormFileUpload } from './form-file-upload';
@@ -26,6 +28,7 @@ export { default as Toolbar } from './toolbar';
 export { default as Tooltip } from './tooltip';
 
 // Higher-Order Components
+export { default as withAPIData } from './higher-order/with-api-data';
 export { default as withFocusReturn } from './higher-order/with-focus-return';
 export { default as withInstanceId } from './higher-order/with-instance-id';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';

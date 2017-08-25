@@ -25,3 +25,22 @@ export function getGutenbergURL( query = {} ) {
 export function getWPAdminURL( page, query ) {
 	return addQueryArgs( page, query );
 }
+
+/**
+ * Returns a url for display
+ *
+ * @param  {String} url    Original url
+ *
+ * @return {String}        Displayed URL
+ */
+export function filterURLForDisplay( url ) {
+	// remove protocol and www prefixes
+	const filteredURL = url.replace( new RegExp( '^https?://(www\.)?' ), '' );
+
+	// ends with / and only has that single slash, strip it
+	if ( filteredURL.match( '^[^/]+/$' ) ) {
+		return filteredURL.replace( '/', '' );
+	}
+
+	return filteredURL;
+}

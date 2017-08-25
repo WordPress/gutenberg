@@ -11,6 +11,7 @@ import { keycodes } from '@wordpress/utils';
  */
 import './style.scss';
 import UrlInput from '../../url-input';
+import { filterURLForDisplay } from '../../../editor/utils/url';
 
 const { ESCAPE } = keycodes;
 
@@ -160,7 +161,7 @@ class FormatToolbar extends Component {
 							href={ formats.link.value }
 							target="_blank"
 						>
-							{ formats.link.value && decodeURI( formats.link.value ) }
+							{ formats.link.value && filterURLForDisplay( decodeURI( formats.link.value ) ) }
 						</a>
 						<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ this.editLink } />
 						<IconButton icon="editor-unlink" label={ __( 'Remove link' ) } onClick={ this.dropLink } />

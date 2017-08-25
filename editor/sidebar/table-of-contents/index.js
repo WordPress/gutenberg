@@ -16,6 +16,7 @@ import { PanelBody } from '@wordpress/components';
 import './style.scss';
 import TableOfContentsItem from './item';
 import { getBlocks } from '../../selectors';
+import { selectBlock } from '../../actions';
 
 /**
  * Module constants
@@ -51,7 +52,7 @@ const getHeadingLevel = heading => {
 
 const isEmptyHeading = heading => ! heading.attributes.content || heading.attributes.content.length === 0;
 
-const TableOfContents = ( { blocks } ) => {
+const TableOfContents = ( { blocks, onSelect } ) => {
 	const headings = filter( blocks, ( block ) => block.name === 'core/heading' );
 
 	if ( headings.length <= 1 ) {
@@ -59,6 +60,10 @@ const TableOfContents = ( { blocks } ) => {
 	}
 
 	let prevHeadingLevel = 1;
+
+	// Select the corresponding block in the main editor
+	// when clicking on a heading item from the list.
+	const onSelectHeading = ( uid ) => onSelect( uid );
 
 	const tocItems = headings.map( ( heading, index ) => {
 		const headingLevel = getHeadingLevel( heading );
@@ -81,6 +86,7 @@ const TableOfContents = ( { blocks } ) => {
 				key={ index }
 				level={ headingLevel }
 				isValid={ isValid }
+				onClick={ () => onSelectHeading( heading.uid ) }
 			>
 				{ isEmpty ? emptyHeadingContent : heading.attributes.content }
 				{ isIncorrectLevel && incorrectLevelContent }
@@ -103,5 +109,10 @@ export default connect(
 		return {
 			blocks: getBlocks( state ),
 		};
-	}
+	},
+	( dispatch ) => ( {
+		onSelect( uid ) {
+			dispatch( selectBlock( uid ) );
+		},
+	} )
 )( TableOfContents );

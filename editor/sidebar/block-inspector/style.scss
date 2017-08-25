@@ -16,3 +16,20 @@
 	border-bottom: 1px solid $light-gray-500;
 	text-align: center;
 }
+
+.editor-advanced-controls__anchor {
+	display: inline-flex;
+	max-width: 100%;
+	align-items: center;
+}
+
+.editor-advanced-controls__anchor-link {
+	flex-grow: 1;
+	white-space: nowrap;
+	overflow: hidden;
+	position: relative;
+
+	&:after {
+		@include long-content-fade( $size: 20% );
+	}
+}

@@ -34,6 +34,16 @@ registerBlockType( 'core/preformatted', {
 				transform: ( attributes ) =>
 					createBlock( 'core/preformatted', attributes ),
 			},
+			{
+				type: 'raw',
+				isMatch: ( node ) => (
+					node.nodeName === 'PRE' &&
+					! (
+						node.children === 1 &&
+						node.firstChild.nodeName === 'CODE'
+					)
+				),
+			},
 		],
 		to: [
 			{
@@ -60,7 +70,7 @@ registerBlockType( 'core/preformatted', {
 				focus={ focus }
 				onFocus={ setFocus }
 				placeholder={ __( 'Write preformatted text…' ) }
-				className={ className }
+				wrapperClassname={ className }
 			/>
 		);
 	},

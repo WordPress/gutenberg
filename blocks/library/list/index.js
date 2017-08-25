@@ -122,11 +122,7 @@ registerBlockType( 'core/list', {
 			},
 			{
 				type: 'raw',
-				source: ( node ) => node.nodeName === 'OL' || node.nodeName === 'UL',
-				attributes: {
-					nodeName: prop( 'ol,ul', 'nodeName' ),
-					values: children( 'ol,ul' ),
-				},
+				isMatch: ( node ) => node.nodeName === 'OL' || node.nodeName === 'UL',
 			},
 			{
 				type: 'pattern',
@@ -322,7 +318,7 @@ registerBlockType( 'core/list', {
 					value={ values }
 					focus={ focus }
 					onFocus={ setFocus }
-					className="blocks-list"
+					wrapperClassname="blocks-list"
 					placeholder={ __( 'Write list…' ) }
 					onMerge={ mergeBlocks }
 					onSplit={ ( before, after, ...blocks ) => {

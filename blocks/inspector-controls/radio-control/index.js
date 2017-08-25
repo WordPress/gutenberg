@@ -14,12 +14,12 @@ import { withInstanceId } from '@wordpress/components';
 import BaseControl from './../base-control';
 import './style.scss';
 
-function RadioControl( { label, selected, instanceId, onChange, options = [] } ) {
+function RadioControl( { label, selected, help, instanceId, onChange, options = [] } ) {
 	const id = 'inspector-radio-control-' + instanceId;
 	const onChangeValue = ( event ) => onChange( event.target.value );
 
 	return ! isEmpty( options ) && (
-		<BaseControl label={ label } id={ id } className="blocks-radio-control">
+		<BaseControl label={ label } id={ id } help={ help } className="blocks-radio-control">
 			{ options.map( ( option, index ) =>
 				<div
 					key={ ( id + '-' + index ) }
@@ -33,6 +33,7 @@ function RadioControl( { label, selected, instanceId, onChange, options = [] } )
 						value={ option.value }
 						onChange={ onChangeValue }
 						selected={ option.value === selected }
+						aria-describedby={ !! help ? id + '__help' : undefined }
 					/>
 					<label key={ option.value } htmlFor={ ( id + '-' + index ) }>
 						{ option.label }

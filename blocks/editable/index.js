@@ -29,7 +29,7 @@ import { keycodes } from '@wordpress/utils';
  * Internal dependencies
  */
 import './style.scss';
-import { parse, pasteHandler } from '../api';
+import { pasteHandler } from '../api';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
 import patterns from './patterns';
@@ -50,6 +50,12 @@ function createTinyMCEElement( type, props, ...children ) {
 		omitBy( props, ( value, key ) => key.indexOf( 'data-mce-' ) === 0 ),
 		...children
 	);
+}
+
+function isLinkBoundary( fragment ) {
+	return fragment.childNodes && fragment.childNodes.length === 1 &&
+		fragment.childNodes[ 0 ].nodeName === 'A' && fragment.childNodes[ 0 ].text.length === 1 &&
+		fragment.childNodes[ 0 ].text[ 0 ] === '\uFEFF';
 }
 
 export default class Editable extends Component {
@@ -80,7 +86,7 @@ export default class Editable extends Component {
 		this.changeFormats = this.changeFormats.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.maybePropagateUndo = this.maybePropagateUndo.bind( this );
-		this.onPastePostProcess = this.onPastePostProcess.bind( this );
+		this.onBeforePastePreProcess = this.onBeforePastePreProcess.bind( this );
 		this.onChangeThrottled = throttle( this.onChange, 500, { leading: true } );
 		this.saveEditorContent = this.saveEditorContent.bind( this );
 
@@ -109,7 +115,7 @@ export default class Editable extends Component {
 		editor.on( 'keyup', this.onKeyUp );
 		editor.on( 'selectionChange', this.onSelectionChange );
 		editor.on( 'BeforeExecCommand', this.maybePropagateUndo );
-		editor.on( 'PastePostProcess', this.onPastePostProcess );
+		editor.on( 'BeforePastePreProcess', this.onBeforePastePreProcess );
 		editor.on( 'Change', this.onChangeThrottled );
 
 		patterns.apply( this, [ editor ] );
@@ -176,34 +182,32 @@ export default class Editable extends Component {
 		}
 	}
 
-	onPastePostProcess( event ) {
-		const childNodes = Array.from( event.node.childNodes );
-		const isBlockDelimiter = ( node ) =>
-			node.nodeType === 8 && /^ wp:/.test( node.nodeValue );
-		const isDoubleBR = ( node ) =>
-			node.nodeName === 'BR' && node.previousSibling && node.previousSibling.nodeName === 'BR';
-		const isBlockPart = ( node ) =>
-			isDoubleBR( node ) || this.editor.dom.isBlock( node );
+	onBeforePastePreProcess( event ) {
+		// Allows us to ask for this information when we get a report.
+		window.console.log( 'Received HTML:\n\n', event.content );
 
-		// If there's no `onSplit` prop, content will later be converted to
-		// inline content.
-		if ( this.props.onSplit ) {
-			let blocks = [];
+		const content = pasteHandler( {
+			content: event.content,
+			inline: ! this.props.onSplit,
+		} );
 
-			// Internal paste, so parse.
-			if ( childNodes.some( isBlockDelimiter ) ) {
-				blocks = parse( event.node.innerHTML.replace( /<meta[^>]+>/, '' ) );
-			// External paste with block level content, so attempt to assign
-			// blocks.
-			} else if ( childNodes.some( isBlockPart ) ) {
-				blocks = pasteHandler( childNodes );
+		if ( typeof content === 'string' ) {
+			// Let MCE process further with the given content.
+			event.content = content;
+		} else if ( this.props.onSplit ) {
+			// Abort pasting to split the content
+			event.preventDefault();
+
+			if ( ! content.length ) {
+				return;
 			}
 
-			if ( blocks.length ) {
-				// We must wait for TinyMCE to clean up paste containers after this
-				// event.
-				window.setTimeout( () => this.splitContent( blocks ), 0 );
-				event.preventDefault();
+			const rootNode = this.editor.getBody();
+
+			if ( this.editor.dom.isEmpty( rootNode ) && this.props.onReplace ) {
+				this.props.onReplace( content );
+			} else {
+				this.splitContent( content );
 			}
 		}
 	}
@@ -366,7 +370,7 @@ export default class Editable extends Component {
 			const afterFragment = afterRange.extractContents();
 
 			const beforeElement = nodeListToReact( beforeFragment.childNodes, createTinyMCEElement );
-			const afterElement = nodeListToReact( afterFragment.childNodes, createTinyMCEElement );
+			const afterElement = isLinkBoundary( afterFragment ) ? [] : nodeListToReact( afterFragment.childNodes, createTinyMCEElement );
 
 			this.setContent( beforeElement );
 			this.props.onSplit( beforeElement, afterElement, ...blocks );
@@ -552,6 +556,7 @@ export default class Editable extends Component {
 			style,
 			value,
 			focus,
+			wrapperClassname,
 			className,
 			inlineToolbar = false,
 			formattingControls,
@@ -564,7 +569,7 @@ export default class Editable extends Component {
 		// mount and initialize a new child element in its place.
 		const key = [ 'editor', Tagname ].join();
 		const isPlaceholderVisible = placeholder && ! focus && this.state.empty;
-		const classes = classnames( className, 'blocks-editable' );
+		const classes = classnames( wrapperClassname, 'blocks-editable' );
 
 		const formatToolbar = (
 			<FormatToolbar
@@ -596,6 +601,7 @@ export default class Editable extends Component {
 					defaultValue={ value }
 					isPlaceholderVisible={ isPlaceholderVisible }
 					label={ placeholder }
+					className={ className }
 					key={ key }
 				/>
 				{ isPlaceholderVisible &&

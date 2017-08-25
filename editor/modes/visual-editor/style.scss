@@ -285,6 +285,28 @@
 			margin-right: auto;
 		}
 	}
+
+	& > .components-drop-zone {
+		border: none;
+		top: -4px;
+		bottom: -4px;
+		margin: 0 $block-mover-padding-visible;
+		border-radius: 0;
+
+		.components-drop-zone__content {
+			display: none;
+		}
+
+		&.is-close-to-top {
+			background: none;
+			border-top: 3px solid $blue-medium-500;
+		}
+
+		&.is-close-to-bottom {
+			background: none;
+			border-bottom: 3px solid $blue-medium-500;
+		}
+	}
 }
 
 .editor-visual-editor__block-controls {
@@ -322,6 +344,7 @@
 	background: $white;
 	border-top: 1px solid $light-gray-500;
 	border-bottom: 1px solid $light-gray-500;
+	overflow: auto;	// allow horizontal scrolling on mobile
 
 	> div,
 	> ul {
@@ -331,6 +354,7 @@
 
 	@include break-small() {
 		width: auto;
+		overflow: hidden;
 	}
 }
 

@@ -29,6 +29,8 @@ registerBlockType( 'core/heading', {
 
 	className: false,
 
+	supportAnchor: true,
+
 	attributes: {
 		content: {
 			type: 'array',
@@ -60,11 +62,7 @@ registerBlockType( 'core/heading', {
 			},
 			{
 				type: 'raw',
-				source: ( node ) => /H\d/.test( node.nodeName ),
-				attributes: {
-					content: children( 'h1,h2,h3,h4,h5,h6' ),
-					nodeName: prop( 'h1,h2,h3,h4,h5,h6', 'nodeName' ),
-				},
+				isMatch: ( node ) => /H\d/.test( node.nodeName ),
 			},
 			{
 				type: 'pattern',
