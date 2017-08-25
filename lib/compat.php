@@ -89,6 +89,35 @@ function gutenberg_fix_jetpack_freeform_block_conflict() {
 }
 
 /**
+ * Includes additional safe CSS style attributes, specifically those already
+ * allowable by existing safe attributes through equivalent shorthands.
+ *
+ * @since 0.10.0
+ *
+ * @param  array $attributes Original safe CSS attributes.
+ * @return array             Filtered safe CSS attributes.
+ */
+function gutenberg_allowed_css_attributes( $attributes ) {
+	/*
+	 * The 'background' shorthand is already defined, meaning specific
+	 * properties are already available.
+	 *
+	 * See: https://github.com/WordPress/WordPress/blob/4.8.1/wp-includes/kses.php#L1711
+	 * See: https://developer.mozilla.org/en-US/docs/Web/CSS/background
+	 */
+	$attributes[] = 'background-image';
+	$attributes[] = 'background-position';
+	$attributes[] = 'background-size';
+	$attributes[] = 'background-repeat';
+	$attributes[] = 'background-origin';
+	$attributes[] = 'background-clip';
+	$attributes[] = 'background-attachment';
+
+	return $attributes;
+}
+add_filter( 'safe_style_css', 'gutenberg_allowed_css_attributes' );
+
+/**
  * Shims wp-api-request for WordPress installations not running 4.9-alpha or
  * newer.
  *
