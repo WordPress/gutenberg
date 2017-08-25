@@ -2,13 +2,13 @@
  * External Dependencies
  */
 import { connect } from 'react-redux';
+import { flowRight } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody } from '@wordpress/components';
-import { Component } from '@wordpress/element';
+import { PanelBody, withAPIData } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -24,58 +24,37 @@ import { toggleSidebarPanel } from '../../actions';
  */
 const PANEL_NAME = 'post-taxonomies';
 
-class PostTaxonomies extends Component {
-	constructor() {
-		super( ...arguments );
+function PostTaxonomies( { postType, taxonomies, isOpened, onTogglePanel } ) {
+	const availableTaxonomies = !! taxonomies.data
+		? Object.values( taxonomies.data ).filter( ( taxonomy ) => taxonomy.types.indexOf( postType ) !== -1 )
+		: [];
 
-		this.state = {
-			taxonomies: [],
-		};
+	if ( ! availableTaxonomies.length ) {
+		return null;
 	}
 
-	componentDidMount() {
-		this.fetchTaxonomies = new wp.api.collections.Taxonomies()
-			.fetch()
-			.done( ( taxonomies ) => {
-				this.setState( { taxonomies: Object.values( taxonomies ) } );
-			} );
-	}
-
-	componentWillUnmout() {
-		this.fetchTaxonomies.abort();
-	}
-
-	render() {
-		const availableTaxonomies = this.state.taxonomies
-			.filter( ( taxonomy ) => taxonomy.types.indexOf( this.props.postType ) !== -1 );
-
-		if ( ! availableTaxonomies.length ) {
-			return null;
-		}
-
-		return (
-			<PanelBody
-				title={ __( 'Categories & Tags' ) }
-				opened={ this.props.isOpened }
-				onToggle={ this.props.onTogglePanel }
-			>
-				{ availableTaxonomies.map( ( taxonomy ) => {
-					const TaxonomyComponent = taxonomy.hierarchical ? HierarchicalTermSelector : FlatTermSelector;
-					return (
-						<TaxonomyComponent
-							key={ taxonomy.slug }
-							label={ taxonomy.name }
-							restBase={ taxonomy.rest_base }
-							slug={ taxonomy.slug }
-						/>
-					);
-				} ) }
-			</PanelBody>
-		);
-	}
+	return (
+		<PanelBody
+			title={ __( 'Categories & Tags' ) }
+			opened={ isOpened }
+			onToggle={ onTogglePanel }
+		>
+			{ availableTaxonomies.map( ( taxonomy ) => {
+				const TaxonomyComponent = taxonomy.hierarchical ? HierarchicalTermSelector : FlatTermSelector;
+				return (
+					<TaxonomyComponent
+						key={ taxonomy.slug }
+						label={ taxonomy.name }
+						restBase={ taxonomy.rest_base }
+						slug={ taxonomy.slug }
+					/>
+				);
+			} ) }
+		</PanelBody>
+	);
 }
 
-export default connect(
+const applyConnect = connect(
 	( state ) => {
 		return {
 			postType: getCurrentPostType( state ),
@@ -87,5 +66,14 @@ export default connect(
 			return toggleSidebarPanel( PANEL_NAME );
 		},
 	}
-)( PostTaxonomies );
+);
+
+const applyWithAPIData = withAPIData( () => ( {
+	taxonomies: '/wp/v2/taxonomies?context=edit',
+} ) );
+
+export default flowRight( [
+	applyConnect,
+	applyWithAPIData,
+] )( PostTaxonomies );
 
