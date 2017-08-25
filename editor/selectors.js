@@ -12,6 +12,9 @@ import { serialize, getBlockType } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 
+const REGEXP_EMPTY_CONTENT = /^<!--(.)*>(\s)*<p[^>]*>(&nbsp|\s|<br[^>]*>)*<\/p>(\s)(.)*-->$/mg;
+const CONTENT_LENGTH_ASSUME_SET = 63;
+
 /**
  * Returns the current editing mode.
  *
@@ -243,10 +246,21 @@ export function isEditedPostPublishable( state ) {
  */
 export function isEditedPostSaveable( state ) {
 	return (
-		!! getEditedPostContent( state ) ||
+		( ( !! getEditedPostContent( state ) ) && ( ! isEmptyContent( state ) ) ) ||
 		!! getEditedPostTitle( state ) ||
 		!! getEditedPostExcerpt( state )
 	);
+}
+
+/**
+ * Check if the content is empty (ignoring empty tags)
+ *
+ * @param  {Object}  state Global application state
+ * @return {Boolean}         Whether it's considered empty
+ */
+export function isEmptyContent( state ) {
+	const content = getEditedPostContent( state );
+	return ( ! content || ( content.length < CONTENT_LENGTH_ASSUME_SET && REGEXP_EMPTY_CONTENT.test( content ) ) );
 }
 
 /**
