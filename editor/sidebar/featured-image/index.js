@@ -63,7 +63,7 @@ function FeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, media }
 	);
 }
 
-const connectComponent = connect(
+const applyConnect = connect(
 	( state ) => {
 		return {
 			featuredImageId: getEditedPostAttribute( state, 'featured_media' ),
@@ -81,7 +81,7 @@ const connectComponent = connect(
 	}
 );
 
-const fetchAPIData = withAPIData( ( { featuredImageId } ) => {
+const applyWithAPIData = withAPIData( ( { featuredImageId } ) => {
 	if ( ! featuredImageId ) {
 		return {};
 	}
@@ -92,6 +92,6 @@ const fetchAPIData = withAPIData( ( { featuredImageId } ) => {
 } );
 
 export default flowRight(
-	connectComponent,
-	fetchAPIData,
+	applyConnect,
+	applyWithAPIData,
 )( FeaturedImage );
