@@ -230,25 +230,13 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 			) );
 		}
 
-		// Type.
-		if ( isset( $request['type'] ) && is_string( $request['type'] ) ) {
-			$prepared_reusable_block->meta_input['_gutenberg_type'] = $request['type'];
-		} else {
-			return new WP_Error( 'gutenberg_reusable_block_invalid_field', __( 'Invalid block type.', 'gutenberg' ), array(
-				'status' => 400,
-			) );
-		}
-
-		// Atttributes.
-		if ( isset( $request['attributes'] ) && is_array( $request['attributes'] ) ) {
-			$prepared_reusable_block->meta_input['_gutenberg_attributes'] = $request['attributes'];
-		} else {
-			$prepared_reusable_block->meta_input['_gutenberg_attributes'] = array();
-		}
-
 		// Content.
 		if ( isset( $request['content'] ) && is_string( $request['content'] ) ) {
 			$prepared_reusable_block->post_content = $request['content'];
+		} else {
+			return new WP_Error( 'gutenberg_reusable_block_invalid_field', __( 'Invalid reusable block content.', 'gutenberg' ), array(
+				'status' => 400,
+			) );
 		}
 
 		return $prepared_reusable_block;
@@ -268,8 +256,6 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 		$data = array(
 			'id' => $reusable_block->post_name,
 			'name' => $reusable_block->post_title,
-			'type' => get_post_meta( $reusable_block->ID, '_gutenberg_type', true ),
-			'attributes' => get_post_meta( $reusable_block->ID, '_gutenberg_attributes', true ),
 			'content' => $reusable_block->post_content,
 		);
 
@@ -315,21 +301,11 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 					'context'      => array( 'view', 'edit' ),
 					'required'     => true,
 				),
-				'type'             => array(
-					'description'  => __( 'The block\'s type, e.g. core/text', 'gutenberg' ),
-					'type'         => 'string',
-					'context'      => array( 'view', 'edit' ),
-					'required'     => true,
-				),
-				'attributes'       => array(
-					'description'  => __( 'The block\'s attributes, e.g. { "dropCap": true }', 'gutenberg' ),
-					'type'         => 'object',
-					'context'      => array( 'view', 'edit' ),
-				),
 				'content'          => array(
 					'description'  => __( 'The block\'s HTML content.', 'gutenberg' ),
 					'type'         => 'object',
 					'context'      => array( 'view', 'edit' ),
+					'required'     => true,
 				),
 			),
 		);

@@ -42,12 +42,6 @@ class REST_Reusable_Blocks_Controller_Test extends WP_Test_REST_Controller_Testc
 			'post_status' => 'publish',
 			'post_name' => '2d66a5c5-776c-43b1-98c7-49521cef8ea6',
 			'post_title' => 'My cool block',
-			'meta_input' => array(
-				'_gutenberg_type' => 'core/paragraph',
-				'_gutenberg_attributes' => array(
-					'dropCap' => true,
-				),
-			),
 			'post_content' => '<p class="has-drop-cap">Hello!</p>',
 		) );
 
@@ -95,10 +89,6 @@ class REST_Reusable_Blocks_Controller_Test extends WP_Test_REST_Controller_Testc
 			array(
 				'id' => '2d66a5c5-776c-43b1-98c7-49521cef8ea6',
 				'name' => 'My cool block',
-				'type' => 'core/paragraph',
-				'attributes' => array(
-					'dropCap' => true,
-				),
 				'content' => '<p class="has-drop-cap">Hello!</p>',
 			),
 		), $response->get_data() );
@@ -131,10 +121,6 @@ class REST_Reusable_Blocks_Controller_Test extends WP_Test_REST_Controller_Testc
 		$this->assertEquals( array(
 			'id' => '2d66a5c5-776c-43b1-98c7-49521cef8ea6',
 			'name' => 'My cool block',
-			'type' => 'core/paragraph',
-			'attributes' => array(
-				'dropCap' => true,
-			),
 			'content' => '<p class="has-drop-cap">Hello!</p>',
 		), $response->get_data() );
 	}
@@ -190,10 +176,6 @@ class REST_Reusable_Blocks_Controller_Test extends WP_Test_REST_Controller_Testc
 		$request = new WP_REST_Request( 'PUT', '/gutenberg/v1/reusable-blocks/75236553-f4ba-4f12-aa25-4ba402044bd5' );
 		$request->set_body_params( array(
 			'name' => 'Another cool block',
-			'type' => 'core/image',
-			'attributes' => array(
-				'id' => 42,
-			),
 			'content' => '<figure class="wp-block-image"><img src="/image.jpg" alt="An image" /></figure>',
 		) );
 
@@ -203,10 +185,6 @@ class REST_Reusable_Blocks_Controller_Test extends WP_Test_REST_Controller_Testc
 		$this->assertEquals( array(
 			'id' => '75236553-f4ba-4f12-aa25-4ba402044bd5',
 			'name' => 'Another cool block',
-			'type' => 'core/image',
-			'attributes' => array(
-				'id' => 42,
-			),
 			'content' => '<figure class="wp-block-image"><img src="/image.jpg" alt="An image" /></figure>',
 		), $response->get_data() );
 	}
@@ -223,30 +201,6 @@ class REST_Reusable_Blocks_Controller_Test extends WP_Test_REST_Controller_Testc
 
 		$this->assertEquals( 403, $response->get_status() );
 		$this->assertEquals( 'gutenberg_reusable_block_cannot_edit', $data['code'] );
-	}
-
-	/**
-	 * Check that we can PUT a single reusable block without specifying optional attributes.
-	 */
-	public function test_update_item_with_optional_attributes_not_specified() {
-		wp_set_current_user( self::$editor_id );
-
-		$request = new WP_REST_Request( 'PUT', '/gutenberg/v1/reusable-blocks/75236553-f4ba-4f12-aa25-4ba402044bd5' );
-		$request->set_body_params( array(
-			'name' => 'Another cool block',
-			'type' => 'core/image',
-		) );
-
-		$response = $this->server->dispatch( $request );
-
-		$this->assertEquals( 200, $response->get_status() );
-		$this->assertEquals( array(
-			'id' => '75236553-f4ba-4f12-aa25-4ba402044bd5',
-			'name' => 'Another cool block',
-			'type' => 'core/image',
-			'attributes' => array(),
-			'content' => '',
-		), $response->get_data() );
 	}
 
 	/**
@@ -268,16 +222,16 @@ class REST_Reusable_Blocks_Controller_Test extends WP_Test_REST_Controller_Testc
 			),
 			array(
 				array(
-					'name' => 'Another cool block',
+					'name' => 'My cool block',
 				),
-				'Invalid block type.',
+				'Invalid reusable block content.',
 			),
 			array(
 				array(
-					'name' => 'Another cool block',
-					'type' => 42,
+					'name' => 'My cool block',
+					'content' => 42,
 				),
-				'Invalid block type.',
+				'Invalid reusable block content.',
 			),
 		);
 	}
@@ -310,11 +264,9 @@ class REST_Reusable_Blocks_Controller_Test extends WP_Test_REST_Controller_Testc
 		$data = $response->get_data();
 		$properties = $data['schema']['properties'];
 
-		$this->assertEquals( 5, count( $properties ) );
+		$this->assertEquals( 3, count( $properties ) );
 		$this->assertArrayHasKey( 'id', $properties );
 		$this->assertArrayHasKey( 'name', $properties );
-		$this->assertArrayHasKey( 'type', $properties );
-		$this->assertArrayHasKey( 'attributes', $properties );
 		$this->assertArrayHasKey( 'content', $properties );
 	}
 
