@@ -154,8 +154,13 @@ class HierarchicalTermSelector extends Component {
 	}
 
 	componentWillUnmount() {
-		this.fetchRequest.abort();
-		this.addRequest.abort();
+		if ( this.fetchRequest ) {
+			this.fetchRequest.abort();
+		}
+
+		if ( this.addRequest ) {
+			this.addRequest.abort();
+		}
 	}
 
 	renderTerms( renderedTerms ) {
