@@ -77,33 +77,15 @@ export function placeCaretAtEdge( container, start = false ) {
 		return;
 	}
 
-	function createCaretPlacer( atStart ) {
-		return ( el ) => {
-			el.focus();
-			if (
-				typeof window.getSelection !== 'undefined' &&
-				typeof document.createRange !== 'undefined'
-			) {
-				const range = document.createRange();
-				range.selectNodeContents( el );
-				range.collapse( atStart );
-				const sel = window.getSelection();
-				sel.removeAllRanges();
-				sel.addRange( range );
-			} else if ( typeof document.body.createTextRange !== 'undefined' ) {
-				const textRange = document.body.createTextRange();
-				textRange.moveToElementText( el );
-				textRange.collapse( atStart );
-				textRange.select();
-			}
-		};
+	function placeCaretInContentEditable( element, atStart ) {
+		const range = document.createRange();
+		range.selectNodeContents( element );
+		range.collapse( atStart );
+		const sel = window.getSelection();
+		sel.removeAllRanges();
+		sel.addRange( range );
+		element.focus();
 	}
-	const placeCaretAtStart = createCaretPlacer( true );
-	const placeCaretAtEnd = createCaretPlacer( false );
 
-	if ( start ) {
-		placeCaretAtStart( container );
-	} else {
-		placeCaretAtEnd( container );
-	}
+	placeCaretInContentEditable( container, start );
 }

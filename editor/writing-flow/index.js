@@ -61,6 +61,7 @@ class WritingFlow extends Component {
 
 		if ( ( moveUp || moveDown ) && isEdge( target, moveUp ) ) {
 			this.moveFocusInContainer( target, moveUp ? 'UP' : 'DOWN' );
+			event.preventDefault();
 		}
 	}
 

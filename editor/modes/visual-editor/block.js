@@ -117,7 +117,7 @@ class VisualEditorBlock extends Component {
 		}
 
 		// Focus node when focus state is programmatically transferred.
-		if ( this.props.focus && ! prevProps.focus ) {
+		if ( this.props.focus && ! prevProps.focus && ! this.node.contains( document.activeElement ) ) {
 			this.node.focus();
 		}
 
