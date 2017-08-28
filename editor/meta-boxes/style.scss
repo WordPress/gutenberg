@@ -1,3 +1,7 @@
+/**
+ * These are the styles that are not loaded from within the iframe.
+ */
+
 .editor-meta-boxes {
 	border-right-width: 0;
 	border-left-width: 0;
@@ -6,27 +10,61 @@
 		background-color: $light-gray-300;
 	}
 
+	.components-panel__body {
+		padding: 0;
+
+		.components-panel__body-title {
+			margin: 0;
+
+			.components-panel__body-toggle {
+				z-index: 1;
+			}
+		}
+	}
+
 	.components-panel__body.is-opened .components-panel__body-toggle {
 		border-bottom: 1px solid $light-gray-500;
 	}
 }
 
-.editor-meta-boxes__coming-soon {
-	width: 300px;
-	padding: #{ $panel-padding * 2 } 0 $panel-padding;
-	margin: 0 auto;
-	text-align: center;
+.editor-meta-boxes__iframe {
+	width: 100%;
+	position: relative;
 
-	&,
-	h3 {
-		color: $dark-gray-200;
+	&.is-closed {
+		display: none;
 	}
 
-	h3 {
-		margin: 0.6em 0;
+	.editor-meta-boxes__loading-overlay {
+		background-color: rgba( 0, 0, 0, 0.6 );
+		display: none;
+		position: absolute;
+		height: 100%;
+		top: 0;
+		left: 0;
+		width: 100%;
+		z-index: 1;
+
+		&.is-visible {
+			align-items: center;
+			display: flex;
+			justify-content: center;
+		}
+
+		.loading-overlay__text {
+			color: $white;
+			font-weight: 700;
+		}
 	}
 
-	p {
-		margin-bottom: 0;
+	.is-updating {
+		filter: blur( 5px );
+	}
+
+	.is-hidden {
+		visibility: hidden;
+		position: absolute;
+		top: 0;
+		left: 0;
 	}
 }
