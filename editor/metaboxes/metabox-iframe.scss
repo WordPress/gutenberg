@@ -1,0 +1,142 @@
+/* Hides scrollbar to make iframe content seem as though it is part of the page. */
+.gutenberg-metabox-html {
+	overflow: hidden;
+	width: 100%;
+
+	body {
+		background-color: $white;
+	}
+
+	/* Match width and positioning of the metaboxes. Override default styles. */
+	#poststuff {
+		margin: 0 auto;
+		padding-top: 0;
+	}
+
+	/* Override Default metabox stylings */
+
+	#poststuff h3.hndle,
+	#poststuff .stuffbox > h3,
+	#poststuff h2 { /* WordPress selectors yolo */
+		box-sizing: border-box;
+		color: $dark-gray-500;
+		position: relative;
+		padding: 15px;
+		outline: none;
+		width: 100%;
+		font-weight: 600;
+		border-bottom: 1px solid $light-gray-500;
+	}
+
+	.gutenberg-metaboxes__header {
+		background-color: #edeff0;
+		border-bottom: 0;
+		border-top: 1px solid $light-gray-500;
+	}
+
+	.postbox {
+		border: 0;
+		color: $dark-gray-500;
+		margin-bottom: 0;
+	}
+
+	.postbox > .inside {
+		border-bottom: 1px solid $light-gray-500;
+		color: $dark-gray-500;
+		padding: 15px;
+		margin: 0;
+	}
+
+	input[type="text"],
+	input[type="password"],
+	input[type="checkbox"],
+	input[type="color"],
+	input[type="date"],
+	input[type="datetime"],
+	input[type="datetime-local"],
+	input[type="email"],
+	input[type="month"],
+	input[type="number"],
+	input[type="search"],
+	input[type="radio"],
+	input[type="tel"],
+	input[type="text"],
+	input[type="time"],
+	input[type="url"],
+	input[type="week"],
+	select,
+	textarea {
+		display: inline-block;
+		width: auto;
+		max-width: 100%;
+		padding: 0;
+		line-height: 24px;
+		background: inherit;
+		border: 0;
+		outline: none;
+		font-family: inherit;
+		font-size: 13px;
+		color: #23282d;
+		box-shadow: none;
+		padding: 4px;
+		border: 1px solid $light-gray-500;
+	}
+
+	input[type="text"]:hover,
+	input[type="password"]:hover,
+	input[type="checkbox"]:hover,
+	input[type="color"]:hover,
+	input[type="date"]:hover,
+	input[type="datetime"]:hover,
+	input[type="datetime-local"]:hover,
+	input[type="email"]:hover,
+	input[type="month"]:hover,
+	input[type="number"]:hover,
+	input[type="search"]:hover,
+	input[type="radio"]:hover,
+	input[type="tel"]:hover,
+	input[type="text"]:hover,
+	input[type="time"]:hover,
+	input[type="url"]:hover,
+	input[type="week"]:hover,
+	select:hover,
+	textarea:hover {
+		border: 1px solid $light-gray-700;
+	}
+
+	input[type="text"],
+	input[type="password"],
+	input[type="checkbox"],
+	input[type="color"],
+	input[type="date"],
+	input[type="datetime"],
+	input[type="datetime-local"],
+	input[type="email"],
+	input[type="month"],
+	input[type="number"],
+	input[type="search"],
+	input[type="tel"],
+	input[type="text"],
+	input[type="time"],
+	input[type="url"],
+	input[type="week"],
+	select,
+	textarea {
+		border-radius: 4px;
+	}
+
+	.postbox .handlediv {
+		height: 44px;
+		width: 44px;
+	}
+
+	/* @TODO REMOVE THIS STYLE WHEN READY TO PUSH LIVE */
+	.acf_postbox .inside,
+	.acf_postbox .inside {
+		padding: 15px !important;
+	}
+
+	#post {
+		margin: 0;
+	}
+}

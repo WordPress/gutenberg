@@ -41,6 +41,15 @@ const DEFAULT_SETTINGS = {
 	maxWidth: 608,
 };
 
+/**
+ * Sadly we probably can not add this data directly into editor settings.
+ *
+ * ACF and other metaboxes need admin_head to fire for metabox registry.
+ * admin_head fires after admin_enqueue_scripts which is where we create our
+ * editor instance. If a cleaner solution can be imagined, please change
+ * this, and try to get this data to load directly into the editor settings.
+ */
+
 // Configure moment globally
 moment.locale( dateSettings.l10n.locale );
 if ( dateSettings.timezone.string ) {
@@ -63,6 +72,7 @@ if ( dateSettings.timezone.string ) {
  * @param {String}  id       Unique identifier for editor instance
  * @param {Object}  post     API entity for post to edit
  * @param {?Object} settings Editor settings object
+ * @return {Object} The Redux store of the editor.
  */
 export function createEditorInstance( id, post, settings ) {
 	const store = createReduxStore();
@@ -149,4 +159,6 @@ export function createEditorInstance( id, post, settings ) {
 	);
 
 	render( createEditorElement( <Layout /> ), target );
+
+	return store;
 }

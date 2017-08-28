@@ -529,6 +529,45 @@ export function notices( state = {}, action ) {
 	return state;
 }
 
+const defaultMetaboxState = {
+	advanced: {
+		isActive: false,
+		isDirty: false,
+		isUpdating: false,
+	},
+	normal: {
+		isActive: false,
+		isDirty: false,
+		isUpdating: false,
+	},
+	side: {
+		isActive: false,
+		isDirty: false,
+		isUpdating: false,
+	},
+};
+
+export function legacyMetaboxes( state = defaultMetaboxState, action ) {
+	switch ( action.type ) {
+		case 'INITIALIZE_METABOX_STATE':
+			const newState = {};
+
+			for ( const location in action.metaboxes ) {
+				newState[ location ] = { ...state[ location ], isActive: action.metaboxes[ location ] };
+			}
+
+			return newState;
+		case 'HANDLE_METABOX_RELOAD':
+			return { ...state, [ action.location ]: { ...state[ action.location ], isUpdating: false, isDirty: false } };
+		case 'REQUEST_METABOX_UPDATE':
+			return { ...state, [ action.location ]: { ...state[ action.location ], isUpdating: true, isDirty: false } };
+		case 'METABOX_STATE_CHANGED':
+			return { ...state, [ action.location ]: { ...state[ action.location ], isDirty: action.hasChanged } };
+		default:
+			return state;
+	}
+}
+
 export default optimist( combineReducers( {
 	editor,
 	currentPost,
@@ -541,4 +580,5 @@ export default optimist( combineReducers( {
 	saving,
 	notices,
 	userData,
+	legacyMetaboxes,
 } ) );
