@@ -426,22 +426,16 @@ export function showInsertionPoint( state = false, action ) {
 }
 
 /**
- * Reducer returning current editor mode, either "visual" or "text".
+ * Reducer returning the user preferences:
+ *   - current editor mode, either "visual" or "text".
+ *   - whether the sidebar is opened or closed
+ *   - The state of the different sidebar panels
  *
  * @param  {string} state  Current state
  * @param  {Object} action Dispatched action
  * @return {string}        Updated state
  */
-export function mode( state = 'visual', action ) {
-	switch ( action.type ) {
-		case 'SWITCH_MODE':
-			return action.mode;
-	}
-
-	return state;
-}
-
-export function preferences( state = { isSidebarOpened: ! isMobile, panels: { 'post-status': true } }, action ) {
+export function preferences( state = { mode: 'visual', isSidebarOpened: ! isMobile, panels: { 'post-status': true } }, action ) {
 	switch ( action.type ) {
 		case 'TOGGLE_SIDEBAR':
 			return {
@@ -455,6 +449,11 @@ export function preferences( state = { isSidebarOpened: ! isMobile, panels: { 'p
 					...state.panels,
 					[ action.panel ]: ! get( state, [ 'panels', action.panel ], false ),
 				},
+			};
+		case 'SWITCH_MODE':
+			return {
+				...state,
+				mode: action.mode,
 			};
 	}
 
@@ -530,7 +529,6 @@ export default optimist( combineReducers( {
 	blockSelection,
 	hoveredBlock,
 	showInsertionPoint,
-	mode,
 	preferences,
 	panel,
 	saving,

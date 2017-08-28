@@ -19,7 +19,7 @@ import { addQueryArgs } from '@wordpress/url';
  * @return {String}       Editing mode
  */
 export function getEditorMode( state ) {
-	return state.mode;
+	return state.preferences.mode || 'visual';
 }
 
 /**

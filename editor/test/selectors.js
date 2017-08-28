@@ -92,7 +92,15 @@ describe( 'selectors', () => {
 	describe( 'getEditorMode', () => {
 		it( 'should return the selected editor mode', () => {
 			const state = {
-				mode: 'visual',
+				preferences: { mode: 'text' },
+			};
+
+			expect( getEditorMode( state ) ).toEqual( 'text' );
+		} );
+
+		it( 'should fallback to visual if not set', () => {
+			const state = {
+				preferences: {},
 			};
 
 			expect( getEditorMode( state ) ).toEqual( 'visual' );
@@ -1450,7 +1458,7 @@ describe( 'selectors', () => {
 	describe( 'getBlockInsertionPoint', () => {
 		it( 'should return the uid of the selected block', () => {
 			const state = {
-				mode: 'visual',
+				preferences: { mode: 'visual' },
 				blockSelection: {
 					start: 2,
 					end: 2,
@@ -1468,7 +1476,7 @@ describe( 'selectors', () => {
 
 		it( 'should return the last multi selected uid', () => {
 			const state = {
-				mode: 'visual',
+				preferences: { mode: 'visual' },
 				blockSelection: {
 					start: 1,
 					end: 2,
@@ -1483,7 +1491,7 @@ describe( 'selectors', () => {
 
 		it( 'should return the last block if no selection', () => {
 			const state = {
-				mode: 'visual',
+				preferences: { mode: 'visual' },
 				blockSelection: { start: null, end: null },
 				editor: {
 					blockOrder: [ 1, 2, 3 ],
@@ -1495,7 +1503,7 @@ describe( 'selectors', () => {
 
 		it( 'should return the last block for the text mode', () => {
 			const state = {
-				mode: 'text',
+				preferences: { mode: 'text' },
 				blockSelection: { start: 2, end: 2 },
 				editor: {
 					blockOrder: [ 1, 2, 3 ],

@@ -23,7 +23,6 @@ describe( 'store', () => {
 				'isTyping',
 				'blockSelection',
 				'hoveredBlock',
-				'mode',
 				'preferences',
 				'saving',
 				'showInsertionPoint',
