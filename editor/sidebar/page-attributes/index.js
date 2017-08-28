@@ -27,7 +27,6 @@ export class PageAttributes extends Component {
 		super( ...arguments );
 
 		this.setUpdatedOrder = this.setUpdatedOrder.bind( this );
-		this.onToggle = this.onToggle.bind( this );
 
 		this.state = {
 			supportsPageAttributes: false,
@@ -41,12 +40,8 @@ export class PageAttributes extends Component {
 		}
 	}
 
-	onToggle() {
-		this.props.toggleSidebarPanel( PANEL_NAME );
-	}
-
 	render() {
-		const { instanceId, order, postType, isOpened } = this.props;
+		const { instanceId, order, postType, isOpened, onTogglePanel } = this.props;
 		const supportsPageAttributes = get( postType.data, [
 			'supports',
 			'page-attributes',
@@ -64,7 +59,7 @@ export class PageAttributes extends Component {
 			<PanelBody
 				title={ __( 'Page Attributes' ) }
 				opened={ isOpened }
-				onToggle={ this.onToggle }
+				onToggle={ onTogglePanel }
 			>
 				<PanelRow>
 					<label htmlFor={ inputId }>
@@ -96,7 +91,9 @@ const applyConnect = connect(
 				menu_order: order,
 			} );
 		},
-		toggleSidebarPanel,
+		onTogglePanel() {
+			return toggleSidebarPanel( PANEL_NAME );
+		},
 	}
 );
 

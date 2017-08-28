@@ -53,9 +53,8 @@ const getHeadingLevel = heading => {
 
 const isEmptyHeading = heading => ! heading.attributes.content || heading.attributes.content.length === 0;
 
-const TableOfContents = ( { blocks, onSelect, isOpened, ...props } ) => {
+const TableOfContents = ( { blocks, onSelect, isOpened, onTogglePanel } ) => {
 	const headings = filter( blocks, ( block ) => block.name === 'core/heading' );
-	const onTogglePanel = () => props.toggleSidebarPanel( PANEL_NAME );
 
 	if ( headings.length <= 1 ) {
 		return null;
@@ -117,6 +116,8 @@ export default connect(
 		onSelect( uid ) {
 			return selectBlock( uid );
 		},
-		toggleSidebarPanel,
+		onTogglePanel() {
+			return toggleSidebarPanel( PANEL_NAME );
+		},
 	}
 )( TableOfContents );
