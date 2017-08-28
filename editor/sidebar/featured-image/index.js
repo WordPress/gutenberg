@@ -23,11 +23,9 @@ import { editPost, toggleSidebarPanel } from '../../actions';
  */
 const PANEL_NAME = 'featured-image';
 
-function FeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, media, isOpened, ...props } ) {
-	const onToggle = () => props.toggleSidebarPanel( PANEL_NAME );
-
+function FeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, media, isOpened, onTogglePanel } ) {
 	return (
-		<PanelBody title={ __( 'Featured image' ) } opened={ isOpened } onToggle={ onToggle }>
+		<PanelBody title={ __( 'Featured image' ) } opened={ isOpened } onToggle={ onTogglePanel }>
 			<div className="editor-featured-image__content">
 				{ !! featuredImageId &&
 					<MediaUploadButton
@@ -84,7 +82,9 @@ const applyConnect = connect(
 		onRemoveImage() {
 			return editPost( { featured_media: null } );
 		},
-		toggleSidebarPanel,
+		onTogglePanel() {
+			return toggleSidebarPanel( PANEL_NAME );
+		},
 	}
 );
 

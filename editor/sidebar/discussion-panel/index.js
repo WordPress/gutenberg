@@ -20,10 +20,9 @@ import { editPost, toggleSidebarPanel } from '../../actions';
  */
 const PANEL_NAME = 'discussion-panel';
 
-function DiscussionPanel( { pingStatus = 'open', commentStatus = 'open', instanceId, isOpened, ...props } ) {
+function DiscussionPanel( { pingStatus = 'open', commentStatus = 'open', instanceId, isOpened, onTogglePanel, ...props } ) {
 	const onTogglePingback = () => props.editPost( { ping_status: pingStatus === 'open' ? 'closed' : 'open' } );
 	const onToggleComments = () => props.editPost( { comment_status: commentStatus === 'open' ? 'closed' : 'open' } );
-	const onTogglePanel = () => props.toggleSidebarPanel( PANEL_NAME );
 
 	const commentsToggleId = 'allow-comments-toggle-' + instanceId;
 	const pingbacksToggleId = 'allow-pingbacks-toggle-' + instanceId;
@@ -60,6 +59,11 @@ export default connect(
 			isOpened: isEditorSidebarPanelOpened( state, PANEL_NAME ),
 		};
 	},
-	{ editPost, toggleSidebarPanel }
+	{
+		editPost,
+		onTogglePanel() {
+			return toggleSidebarPanel( PANEL_NAME );
+		},
+	}
 )( withInstanceId( DiscussionPanel ) );
 

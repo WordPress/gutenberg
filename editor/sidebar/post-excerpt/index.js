@@ -21,9 +21,8 @@ import { editPost, toggleSidebarPanel } from '../../actions';
  */
 const PANEL_NAME = 'post-excerpt';
 
-function PostExcerpt( { excerpt, onUpdateExcerpt, isOpened, ...props } ) {
+function PostExcerpt( { excerpt, onUpdateExcerpt, isOpened, onTogglePanel } ) {
 	const onChange = ( event ) => onUpdateExcerpt( event.target.value );
-	const onTogglePanel = () => props.toggleSidebarPanel( PANEL_NAME );
 
 	return (
 		<PanelBody title={ __( 'Excerpt' ) } opened={ isOpened } onToggle={ onTogglePanel }>
@@ -52,7 +51,9 @@ export default connect(
 		onUpdateExcerpt( excerpt ) {
 			return editPost( { excerpt } );
 		},
-		toggleSidebarPanel,
+		onTogglePanel() {
+			return toggleSidebarPanel( PANEL_NAME );
+		},
 	}
 )( PostExcerpt );
 
