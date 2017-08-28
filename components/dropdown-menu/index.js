@@ -153,18 +153,19 @@ export class DropdownMenu extends Component {
 
 	calculateMenuPosition() {
 		const { toggle } = this.nodes;
-		if ( toggle ) {
-			const node = findDOMNode( toggle );
-			let n = node;
-			let scrollLeft = 0;
-			while ( n !== null && n !== node.offsetParent ) {
-				scrollLeft += n.scrollLeft;
-				n = n.parentNode;
-			}
-			const menuLeft = node.offsetLeft - scrollLeft - 4;
-			if ( this.state.menuLeft !== menuLeft ) {
-				this.setState( { menuLeft } );
-			}
+		if ( ! toggle ) {
+			return;
+		}
+		const node = findDOMNode( toggle );
+		let n = node;
+		let scrollLeft = 0;
+		while ( n !== null && n !== node.offsetParent ) {
+			scrollLeft += n.scrollLeft;
+			n = n.parentNode;
+		}
+		const menuLeft = node.offsetLeft - scrollLeft - 4;
+		if ( this.state.menuLeft !== menuLeft ) {
+			this.setState( { menuLeft } );
 		}
 	}
 
