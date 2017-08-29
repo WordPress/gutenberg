@@ -221,6 +221,7 @@ export default class Editable extends Component {
 	getFocusPosition() {
 		let range = this.editor.selection.getRng();
 
+		// use range of startContainer when collapsed as Safari returns invalid bounding rect
 		if ( range.collapsed ) {
 			const { startContainer } = range;
 			range = document.createRange();
@@ -427,12 +428,7 @@ export default class Editable extends Component {
 		);
 	}
 
-	canAddLink( parents, element ) {
-		const range = this.editor.selection.getRng();
-		console.log(range.startContainer.nodeValue);
-	}
-
-	onNodeChange( { parents, element } ) {
+	onNodeChange( { parents } ) {
 		const formats = {};
 		const link = find( parents, ( node ) => node.nodeName.toLowerCase() === 'a' );
 		if ( link ) {
@@ -440,7 +436,7 @@ export default class Editable extends Component {
 		}
 		const activeFormats = this.editor.formatter.matchAll( [	'bold', 'italic', 'strikethrough' ] );
 		activeFormats.forEach( ( activeFormat ) => formats[ activeFormat ] = true );
-		// this.canAddLink( parents, element );
+
 		const focusPosition = this.getFocusPosition();
 		this.setState( { formats, focusPosition, selectedNodeId: this.state.selectedNodeId + 1 } );
 	}
