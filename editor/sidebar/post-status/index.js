@@ -35,7 +35,6 @@ class PostStatus extends Component {
 	constructor() {
 		super( ...arguments );
 		this.togglePendingStatus = this.togglePendingStatus.bind( this );
-		this.togglePanel = this.togglePanel.bind( this );
 	}
 
 	togglePendingStatus() {
@@ -44,16 +43,12 @@ class PostStatus extends Component {
 		onUpdateStatus( updatedStatus );
 	}
 
-	togglePanel() {
-		this.props.toggleSidebarPanel( PANEL_NAME );
-	}
-
 	render() {
-		const { status, isPublished, isOpened, instanceId } = this.props;
+		const { status, isPublished, isOpened, instanceId, onTogglePanel } = this.props;
 		const pendingId = 'pending-toggle-' + instanceId;
 
 		return (
-			<PanelBody title={ __( 'Status & Visibility' ) } opened={ isOpened } onToggle={ this.togglePanel }>
+			<PanelBody title={ __( 'Status & Visibility' ) } opened={ isOpened } onToggle={ onTogglePanel }>
 				{ ! isPublished &&
 					<PanelRow>
 						<label htmlFor={ pendingId }>{ __( 'Pending review' ) }</label>
@@ -86,7 +81,9 @@ export default connect(
 		onUpdateStatus( status ) {
 			return editPost( { status } );
 		},
-		toggleSidebarPanel,
+		onTogglePanel() {
+			return toggleSidebarPanel( PANEL_NAME );
+		},
 	}
 )( withInstanceId( PostStatus ) );
 

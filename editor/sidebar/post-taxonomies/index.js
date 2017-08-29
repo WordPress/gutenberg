@@ -28,8 +28,6 @@ class PostTaxonomies extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.onToggle = this.onToggle.bind( this );
-
 		this.state = {
 			taxonomies: [],
 		};
@@ -47,10 +45,6 @@ class PostTaxonomies extends Component {
 		this.fetchTaxonomies.abort();
 	}
 
-	onToggle() {
-		this.props.toggleSidebarPanel( PANEL_NAME );
-	}
-
 	render() {
 		const availableTaxonomies = this.state.taxonomies
 			.filter( ( taxonomy ) => taxonomy.types.indexOf( this.props.postType ) !== -1 );
@@ -60,7 +54,11 @@ class PostTaxonomies extends Component {
 		}
 
 		return (
-			<PanelBody title={ __( 'Categories & Tags' ) } opened={ this.props.isOpened } onToggle={ this.onToggle }>
+			<PanelBody
+				title={ __( 'Categories & Tags' ) }
+				opened={ this.props.isOpened }
+				onToggle={ this.props.onTogglePanel }
+			>
 				{ availableTaxonomies.map( ( taxonomy ) => {
 					const TaxonomyComponent = taxonomy.hierarchical ? HierarchicalTermSelector : FlatTermSelector;
 					return (
@@ -84,6 +82,10 @@ export default connect(
 			isOpened: isEditorSidebarPanelOpened( state, PANEL_NAME ),
 		};
 	},
-	{ toggleSidebarPanel }
+	{
+		onTogglePanel() {
+			return toggleSidebarPanel( PANEL_NAME );
+		},
+	}
 )( PostTaxonomies );
 

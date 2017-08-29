@@ -19,7 +19,6 @@ import {
 	hoveredBlock,
 	isTyping,
 	blockSelection,
-	mode,
 	preferences,
 	saving,
 	notices,
@@ -784,28 +783,11 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'mode()', () => {
-		it( 'should return "visual" by default', () => {
-			const state = mode( undefined, {} );
-
-			expect( state ).toBe( 'visual' );
-		} );
-
-		it( 'should return switched mode', () => {
-			const state = mode( null, {
-				type: 'SWITCH_MODE',
-				mode: 'text',
-			} );
-
-			expect( state ).toBe( 'text' );
-		} );
-	} );
-
 	describe( 'preferences()', () => {
 		it( 'should be opened by default and show the post-status panel', () => {
 			const state = preferences( undefined, {} );
 
-			expect( state ).toEqual( { isSidebarOpened: true, panels: { 'post-status': true } } );
+			expect( state ).toEqual( { mode: 'visual', isSidebarOpened: true, panels: { 'post-status': true } } );
 		} );
 
 		it( 'should toggle the sidebar open flag', () => {
@@ -832,6 +814,15 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( { isSidebarOpened: false, panels: { 'post-taxonomies': false } } );
+		} );
+
+		it( 'should return switched mode', () => {
+			const state = preferences( deepFreeze( { isSidebarOpened: false } ), {
+				type: 'SWITCH_MODE',
+				mode: 'text',
+			} );
+
+			expect( state ).toEqual( { isSidebarOpened: false, mode: 'text' } );
 		} );
 	} );
 

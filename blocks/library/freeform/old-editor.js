@@ -12,12 +12,12 @@ function isTmceEmpty( editor ) {
 	// <p><br data-mce-bogus="1"></p>
 	// avoid expensive checks for large documents
 	const body = editor.getBody();
-	if ( body.childNodes > 1 ) {
+	if ( body.childNodes.length > 1 ) {
 		return false;
-	} else if ( body.childNodes === 0 ) {
+	} else if ( body.childNodes.length === 0 ) {
 		return true;
 	}
-	if ( body.childNodes[ 0 ].childNodes > 1 ) {
+	if ( body.childNodes[ 0 ].childNodes.length > 1 ) {
 		return false;
 	}
 	return /^\n?$/.test( body.innerText || body.textContent );

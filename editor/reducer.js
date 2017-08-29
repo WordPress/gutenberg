@@ -15,7 +15,14 @@ import { getBlockTypes } from '@wordpress/blocks';
  */
 import { combineUndoableReducers } from './utils/undoable-reducer';
 
-const isMobile = window.innerWidth < 782;
+/**
+ * Module constants
+ */
+const DEFAULT_PREFERENCES = {
+	mode: 'visual',
+	isSidebarOpened: window.innerWidth >= 782,
+	panels: { 'post-status': true },
+};
 
 /**
  * Returns a post attribute value, flattening nested rendered content using its
@@ -426,22 +433,16 @@ export function showInsertionPoint( state = false, action ) {
 }
 
 /**
- * Reducer returning current editor mode, either "visual" or "text".
+ * Reducer returning the user preferences:
  *
- * @param  {string} state  Current state
- * @param  {Object} action Dispatched action
- * @return {string}        Updated state
+ * @param  {Object}  state                 Current state
+ * @param  {string}  state.mode            Current editor mode, either "visual" or "text".
+ * @param  {Boolean} state.isSidebarOpened Whether the sidebar is opened or closed
+ * @param  {Object}  state.panels          The state of the different sidebar panels
+ * @param  {Object}  action                Dispatched action
+ * @return {string}                        Updated state
  */
-export function mode( state = 'visual', action ) {
-	switch ( action.type ) {
-		case 'SWITCH_MODE':
-			return action.mode;
-	}
-
-	return state;
-}
-
-export function preferences( state = { isSidebarOpened: ! isMobile, panels: { 'post-status': true } }, action ) {
+export function preferences( state = DEFAULT_PREFERENCES, action ) {
 	switch ( action.type ) {
 		case 'TOGGLE_SIDEBAR':
 			return {
@@ -455,6 +456,11 @@ export function preferences( state = { isSidebarOpened: ! isMobile, panels: { 'p
 					...state.panels,
 					[ action.panel ]: ! get( state, [ 'panels', action.panel ], false ),
 				},
+			};
+		case 'SWITCH_MODE':
+			return {
+				...state,
+				mode: action.mode,
 			};
 	}
 
@@ -530,7 +536,6 @@ export default optimist( combineReducers( {
 	blockSelection,
 	hoveredBlock,
 	showInsertionPoint,
-	mode,
 	preferences,
 	panel,
 	saving,

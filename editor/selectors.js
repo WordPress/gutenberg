@@ -19,7 +19,7 @@ import { addQueryArgs } from '@wordpress/url';
  * @return {String}       Editing mode
  */
 export function getEditorMode( state ) {
-	return state.mode;
+	return getPreference( state, 'mode', 'visual' );
 }
 
 /**
@@ -46,11 +46,13 @@ export function getPreferences( state ) {
  *
  * @param  {Object}  state          Global application state
  * @param  {String}  preferenceKey  Preference Key
+ * @param  {Mixed}   defaultValue   Default Value
  * @return {Mixed}                  Preference Value
  */
-export function getPreference( state, preferenceKey ) {
+export function getPreference( state, preferenceKey, defaultValue ) {
 	const preferences = getPreferences( state );
-	return preferences[ preferenceKey ];
+	const value = preferences[ preferenceKey ];
+	return value === undefined ? defaultValue : value;
 }
 
 /**

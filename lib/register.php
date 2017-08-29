@@ -90,8 +90,9 @@ add_action( 'admin_init', 'gutenberg_add_edit_links_filters' );
 function gutenberg_add_edit_links( $actions, $post ) {
 	$can_edit_post = current_user_can( 'edit_post', $post->ID );
 	$title = _draft_or_post_title( $post->ID );
+	$post_type = get_post_type( $post );
 
-	if ( $can_edit_post && 'trash' !== $post->post_status ) {
+	if ( $can_edit_post && 'trash' !== $post->post_status && apply_filters( 'gutenberg_add_edit_link_for_post_type', true, $post_type, $post ) ) {
 		// Build the Gutenberg edit action. See also: WP_Posts_List_Table::handle_row_actions().
 		$gutenberg_url = menu_page_url( 'gutenberg', false );
 		$gutenberg_action = sprintf(
