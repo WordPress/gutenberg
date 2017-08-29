@@ -107,7 +107,7 @@ class UrlInput extends Component {
 		// If the suggestions are not shown, we shouldn't handle the arrow keys
 		// We shouldn't preventDefault to allow block arrow keys navigation
 		if ( ! this.state.showSuggestions || ! this.state.posts.length ) {
-			return false;
+			return;
 		}
 
 		switch ( event.keyCode ) {
