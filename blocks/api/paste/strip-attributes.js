@@ -3,11 +3,10 @@
  */
 const { ELEMENT_NODE } = window.Node;
 
-const attributes = [
-	'style',
-	'class',
-	'id',
-];
+/**
+ * Internal dependencies
+ */
+import { isAttributeWhitelisted } from './utils';
 
 export default function( node ) {
 	if ( node.nodeType !== ELEMENT_NODE ) {
@@ -18,13 +17,13 @@ export default function( node ) {
 		return;
 	}
 
+	const tag = node.nodeName.toLowerCase();
+
 	Array.from( node.attributes ).forEach( ( { name } ) => {
-		if ( attributes.indexOf( name ) !== -1 ) {
-			node.removeAttribute( name );
+		if ( isAttributeWhitelisted( tag, name ) ) {
+			return;
 		}
 
-		if ( name.indexOf( 'data-' ) === 0 ) {
-			node.removeAttribute( name );
-		}
+		node.removeAttribute( name );
 	} );
 }

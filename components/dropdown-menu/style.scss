@@ -1,6 +1,5 @@
 .components-dropdown-menu {
 	padding: 3px;
-	position: relative;
 	display: flex;
 
 	.components-dropdown-menu__toggle {
@@ -45,7 +44,7 @@
 .components-dropdown-menu__menu {
 	position: absolute;
 	top: $block-controls-height - 1px;
-	left: -1px;
+	// note that left is set by react in a style attribute
 	box-shadow: $shadow-popover;
 	border: 1px solid $light-gray-500;
 	background: $white;

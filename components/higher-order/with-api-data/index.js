@@ -57,7 +57,10 @@ export default ( mapPropsToData ) => ( WrappedComponent ) => {
 			// Trigger first fetch on initial entries into state. Assumes GET
 			// request by presence of isLoading flag.
 			forEach( dataProps, ( dataProp, propName ) => {
-				if ( prevDataProps.hasOwnProperty( propName ) ) {
+				if (
+					prevDataProps.hasOwnProperty( propName ) &&
+					prevDataProps[ propName ].path === dataProp.path
+				) {
 					return;
 				}
 

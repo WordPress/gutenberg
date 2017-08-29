@@ -9,7 +9,7 @@ import { ChromePicker } from 'react-color';
  */
 import { Component } from '@wordpress/element';
 import { Popover } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -50,7 +50,7 @@ class ColorPalette extends Component {
 								className={ className }
 								style={ style }
 								onClick={ () => onChange( value === color ? undefined : color ) }
-								aria-label={ __( 'Color: ' ) + color }
+								aria-label={ sprintf( __( 'Color: %s' ), color ) }
 								aria-current={ value === color && __( 'Selected color' ) }
 							/>
 						</div>

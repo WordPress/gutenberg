@@ -3,7 +3,7 @@
  */
 import optimist from 'redux-optimist';
 import { combineReducers } from 'redux';
-import { reduce, keyBy, first, last, omit, without, mapValues } from 'lodash';
+import { get, reduce, keyBy, first, last, omit, without, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -161,7 +161,7 @@ export const editor = combineUndoableReducers( {
 				return action.blocks.map( ( { uid } ) => uid );
 
 			case 'INSERT_BLOCKS': {
-				const position = action.after ? state.indexOf( action.after ) + 1 : state.length;
+				const position = action.position !== undefined ? action.position : state.length;
 				return [
 					...state.slice( 0, position ),
 					...action.blocks.map( block => block.uid ),
@@ -441,12 +441,20 @@ export function mode( state = 'visual', action ) {
 	return state;
 }
 
-export function preferences( state = { isSidebarOpened: ! isMobile }, action ) {
+export function preferences( state = { isSidebarOpened: ! isMobile, panels: { 'post-status': true } }, action ) {
 	switch ( action.type ) {
 		case 'TOGGLE_SIDEBAR':
 			return {
-				... state,
+				...state,
 				isSidebarOpened: ! state.isSidebarOpened,
+			};
+		case 'TOGGLE_SIDEBAR_PANEL':
+			return {
+				...state,
+				panels: {
+					...state.panels,
+					[ action.panel ]: ! get( state, [ 'panels', action.panel ], false ),
+				},
 			};
 	}
 

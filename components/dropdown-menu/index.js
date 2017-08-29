@@ -31,12 +31,15 @@ export class DropdownMenu extends Component {
 		this.focusNext = this.focusNext.bind( this );
 		this.handleKeyDown = this.handleKeyDown.bind( this );
 		this.handleKeyUp = this.handleKeyUp.bind( this );
+		this.calculateMenuPosition = this.calculateMenuPosition.bind( this );
 
 		this.nodes = {};
+		this.timer = null;
 
 		this.state = {
 			activeIndex: null,
 			open: false,
+			menuLeft: 0,
 		};
 	}
 
@@ -61,11 +64,31 @@ export class DropdownMenu extends Component {
 		} );
 	}
 
+	calculateMenuPosition() {
+		const { toggle } = this.nodes;
+		if ( ! toggle ) {
+			return;
+		}
+		const node = findDOMNode( toggle );
+		let n = node;
+		let scrollLeft = 0;
+		while ( n !== null && n !== node.offsetParent ) {
+			scrollLeft += n.scrollLeft;
+			n = n.parentNode;
+		}
+		const menuLeft = node.offsetLeft - scrollLeft - 4;
+		if ( this.state.menuLeft !== menuLeft ) {
+			this.setState( { menuLeft } );
+		}
+	}
+
 	toggleMenu() {
-		this.setState( {
-			open: ! this.state.open,
-			activeIndex: this.state.open ? null : 0,
-		} );
+		const open = ! this.state.open;
+		const activeIndex = open ? 0 : null;
+		if ( open ) {
+			this.calculateMenuPosition();
+		}
+		this.setState( { open, activeIndex } );
 	}
 
 	focusIndex( activeIndex ) {
@@ -176,11 +199,23 @@ export class DropdownMenu extends Component {
 			controls,
 			tabIndex,
 		} = this.props;
+		const {
+			open,
+			menuLeft,
+		} = this.state;
 
 		if ( ! controls || ! controls.length ) {
 			return null;
 		}
-
+		// monitor the menu position when open
+		if ( open ) {
+			if ( this.timer === null ) {
+				this.timer = setInterval( this.calculateMenuPosition, 100 );
+			}
+		} else if ( this.timer !== null ) {
+			clearInterval( this.timer );
+			this.timer = null;
+		}
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
 			<div
@@ -191,24 +226,25 @@ export class DropdownMenu extends Component {
 				<IconButton
 					className={
 						classnames( 'components-dropdown-menu__toggle', {
-							'is-active': this.state.open,
+							'is-active': open,
 						} )
 					}
 					icon={ icon }
 					onClick={ this.toggleMenu }
 					aria-haspopup="true"
-					aria-expanded={ this.state.open }
+					aria-expanded={ open }
 					label={ label }
 					tabIndex={ tabIndex }
 					ref={ this.bindReferenceNode( 'toggle' ) }
 				>
 					<Dashicon icon="arrow-down" />
 				</IconButton>
-				{ this.state.open &&
+				{ open &&
 					<div
 						className="components-dropdown-menu__menu"
 						role="menu"
 						aria-label={ menuLabel }
+						style={ { left: menuLeft } }
 						ref={ this.bindReferenceNode( 'menu' ) }
 					>
 						{ controls.map( ( control, index ) => (

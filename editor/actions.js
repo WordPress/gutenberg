@@ -126,15 +126,15 @@ export function replaceBlock( uid, block ) {
 	return replaceBlocks( [ uid ], castArray( block ) );
 }
 
-export function insertBlock( block, after ) {
-	return insertBlocks( [ block ], after );
+export function insertBlock( block, position ) {
+	return insertBlocks( [ block ], position );
 }
 
-export function insertBlocks( blocks, after ) {
+export function insertBlocks( blocks, position ) {
 	return {
 		type: 'INSERT_BLOCKS',
-		blocks,
-		after,
+		blocks: castArray( blocks ),
+		position,
 	};
 }
 
@@ -252,6 +252,19 @@ export function startTyping() {
 export function stopTyping() {
 	return {
 		type: 'STOP_TYPING',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user toggled a sidebar panel
+ *
+ * @param  {String} panel   The panel name
+ * @return {Object}         Action object
+ */
+export function toggleSidebarPanel( panel ) {
+	return {
+		type: 'TOGGLE_SIDEBAR_PANEL',
+		panel,
 	};
 }
 

@@ -143,4 +143,21 @@ describe( 'withAPIData()', () => {
 			done();
 		} );
 	} );
+
+	it( 'should refetch on changed path', ( done ) => {
+		const wrapper = getWrapper(
+			( { pageId } ) => ( {
+				page: `/wp/v2/pages/${ pageId }`,
+			} ),
+			{ pageId: 5 }
+		);
+
+		process.nextTick( () => {
+			expect( wrapper.state( 'dataProps' ).page.isLoading ).toBe( false );
+			wrapper.setProps( { pageId: 7 } );
+			expect( wrapper.state( 'dataProps' ).page.isLoading ).toBe( true );
+
+			done();
+		} );
+	} );
 } );

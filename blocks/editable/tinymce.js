@@ -32,6 +32,7 @@ export default class TinyMCE extends Component {
 		}
 
 		if ( ! isEqual( this.props.style, nextProps.style ) ) {
+			this.editorNode.style = {};
 			Object.assign( this.editorNode.style, nextProps.style );
 		}
 

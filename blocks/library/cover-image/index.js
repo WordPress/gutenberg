@@ -65,33 +65,56 @@ registerBlockType( 'core/cover-image', {
 		const { url, title, align, id, hasParallax, hasBackgroundDim } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		const onSelectImage = ( media ) => setAttributes( { url: media.url, id: media.id } );
+		const toggleParallax = () => setAttributes( { hasParallax: ! hasParallax } );
+		const toggleBackgroundDim = () => setAttributes( { hasBackgroundDim: ! hasBackgroundDim } );
+		const style = url
+			? { backgroundImage: `url(${ url })` }
+			: undefined;
+		const classes = classnames( className, {
+			'has-parallax': hasParallax,
+			'has-background-dim': hasBackgroundDim,
+		} );
 
-		const controls = (
-			focus && (
-				<BlockControls key="controls">
-					<BlockAlignmentToolbar
-						value={ align }
-						onChange={ updateAlignment }
-					/>
+		const controls = focus && [
+			<BlockControls key="controls">
+				<BlockAlignmentToolbar
+					value={ align }
+					onChange={ updateAlignment }
+				/>
 
-					<Toolbar>
-						<li>
-							<MediaUploadButton
-								buttonProps={ {
-									className: 'components-icon-button components-toolbar__control',
-									'aria-label': __( 'Edit image' ),
-								} }
-								onSelect={ onSelectImage }
-								type="image"
-								value={ id }
-							>
-								<Dashicon icon="edit" />
-							</MediaUploadButton>
-						</li>
-					</Toolbar>
-				</BlockControls>
-			)
-		);
+				<Toolbar>
+					<li>
+						<MediaUploadButton
+							buttonProps={ {
+								className: 'components-icon-button components-toolbar__control',
+								'aria-label': __( 'Edit image' ),
+							} }
+							onSelect={ onSelectImage }
+							type="image"
+							value={ id }
+						>
+							<Dashicon icon="edit" />
+						</MediaUploadButton>
+					</li>
+				</Toolbar>
+			</BlockControls>,
+			<InspectorControls key="inspector">
+				<BlockDescription>
+					<p>{ __( 'Cover Image is a bold image block with an optional title.' ) }</p>
+				</BlockDescription>
+				<h3>{ __( 'Cover Image Settings' ) }</h3>
+				<ToggleControl
+					label={ __( 'Fixed Background' ) }
+					checked={ !! hasParallax }
+					onChange={ toggleParallax }
+				/>
+				<ToggleControl
+					label={ __( 'Dim Background' ) }
+					checked={ !! hasBackgroundDim }
+					onChange={ toggleBackgroundDim }
+				/>
+			</InspectorControls>,
+		];
 
 		if ( ! url ) {
 			const uploadButtonProps = { isLarge: true };
@@ -114,34 +137,8 @@ registerBlockType( 'core/cover-image', {
 			];
 		}
 
-		const style = { backgroundImage: `url(${ url })` };
-		const classes = classnames( className, {
-			'has-parallax': hasParallax,
-			'has-background-dim': hasBackgroundDim,
-		} );
-		const toggleParallax = () => setAttributes( { hasParallax: ! hasParallax } );
-		const toggleBackgroundDim = () => setAttributes( { hasBackgroundDim: ! hasBackgroundDim } );
-
 		return [
 			controls,
-			focus && (
-				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'Cover Image is a bold image block with an optional title.' ) }</p>
-					</BlockDescription>
-					<h3>{ __( 'Cover Image Settings' ) }</h3>
-					<ToggleControl
-						label={ __( 'Fixed Background' ) }
-						checked={ !! hasParallax }
-						onChange={ toggleParallax }
-					/>
-					<ToggleControl
-						label={ __( 'Dim Background' ) }
-						checked={ !! hasBackgroundDim }
-						onChange={ toggleBackgroundDim }
-					/>
-				</InspectorControls>
-			),
 			<section
 				key="preview"
 				data-url={ url }
@@ -165,9 +162,9 @@ registerBlockType( 'core/cover-image', {
 
 	save( { attributes, className } ) {
 		const { url, title, hasParallax, hasBackgroundDim } = attributes;
-		const style = {
-			backgroundImage: `url(${ url })`,
-		};
+		const style = url
+			? { backgroundImage: `url(${ url })` }
+			: undefined;
 		const classes = classnames( className, {
 			'has-parallax': hasParallax,
 			'has-background-dim': hasBackgroundDim,

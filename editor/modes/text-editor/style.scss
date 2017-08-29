@@ -43,6 +43,7 @@
 		margin-left: 0;
 		margin-right: 0;
 		position: fixed;
+		z-index: z-index( '.editor-text-editor__formatting' );
 	}
 
 	.auto-fold.sticky-menu &,

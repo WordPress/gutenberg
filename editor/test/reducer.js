@@ -315,7 +315,7 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should insert after the specified block uid', () => {
+		it( 'should insert at the specified position', () => {
 			const original = editor( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
@@ -331,7 +331,7 @@ describe( 'state', () => {
 
 			const state = editor( original, {
 				type: 'INSERT_BLOCKS',
-				after: 'kumquat',
+				position: 1,
 				blocks: [ {
 					uid: 'persimmon',
 					name: 'core/freeform',
@@ -802,10 +802,10 @@ describe( 'state', () => {
 	} );
 
 	describe( 'preferences()', () => {
-		it( 'should be opened by default', () => {
+		it( 'should be opened by default and show the post-status panel', () => {
 			const state = preferences( undefined, {} );
 
-			expect( state ).toEqual( { isSidebarOpened: true } );
+			expect( state ).toEqual( { isSidebarOpened: true, panels: { 'post-status': true } } );
 		} );
 
 		it( 'should toggle the sidebar open flag', () => {
@@ -814,6 +814,24 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( { isSidebarOpened: true } );
+		} );
+
+		it( 'should set the sidebar panel open flag to true if unset', () => {
+			const state = preferences( deepFreeze( { isSidebarOpened: false } ), {
+				type: 'TOGGLE_SIDEBAR_PANEL',
+				panel: 'post-taxonomies',
+			} );
+
+			expect( state ).toEqual( { isSidebarOpened: false, panels: { 'post-taxonomies': true } } );
+		} );
+
+		it( 'should toggle the sidebar panel open flag', () => {
+			const state = preferences( deepFreeze( { isSidebarOpened: false, panels: { 'post-taxonomies': true } } ), {
+				type: 'TOGGLE_SIDEBAR_PANEL',
+				panel: 'post-taxonomies',
+			} );
+
+			expect( state ).toEqual( { isSidebarOpened: false, panels: { 'post-taxonomies': false } } );
 		} );
 	} );
 

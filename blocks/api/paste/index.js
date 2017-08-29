@@ -14,7 +14,12 @@ import stripAttributes from './strip-attributes';
 import commentRemover from './comment-remover';
 import createUnwrapper from './create-unwrapper';
 import isInlineContent from './is-inline-content';
-import { deepFilter, isInline, isSpan, isWrapper } from './utils';
+import formattingTransformer from './formatting-transformer';
+import msListConverter from './ms-list-converter';
+import listMerger from './list-merger';
+import imageCorrector from './image-corrector';
+import blockquoteNormaliser from './blockquote-normaliser';
+import { deepFilter, isInvalidInline, isNotWhitelisted } from './utils';
 
 export default function( { content: HTML, inline } ) {
 	HTML = HTML.replace( /<meta[^>]+>/, '' );
@@ -24,15 +29,24 @@ export default function( { content: HTML, inline } ) {
 		return parseWithGrammar( HTML );
 	}
 
+	// Context dependent filters. Needs to run before we remove nodes.
+	HTML = deepFilter( HTML, [
+		msListConverter,
+	] );
+
+	HTML = deepFilter( HTML, [
+		listMerger,
+		imageCorrector,
+		// Add semantic formatting before attributes are stripped.
+		formattingTransformer,
+		stripAttributes,
+		commentRemover,
+		createUnwrapper( isNotWhitelisted ),
+		blockquoteNormaliser,
+	] );
+
 	// Inline paste.
 	if ( inline || isInlineContent( HTML ) ) {
-		HTML = deepFilter( HTML, [
-			stripAttributes,
-			commentRemover,
-			createUnwrapper( ( node ) => ! isInline( node ) ),
-			createUnwrapper( ( node ) => isSpan( node ) ),
-		] );
-
 		// Allows us to ask for this information when we get a report.
 		window.console.log( 'Processed inline HTML:\n\n', HTML );
 
@@ -40,10 +54,7 @@ export default function( { content: HTML, inline } ) {
 	}
 
 	HTML = deepFilter( HTML, [
-		stripAttributes,
-		commentRemover,
-		createUnwrapper( ( node ) => isWrapper( node ) ),
-		createUnwrapper( ( node ) => isSpan( node ) ),
+		createUnwrapper( isInvalidInline ),
 	] );
 
 	HTML = normaliseBlocks( HTML );

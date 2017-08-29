@@ -2,13 +2,14 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { createMediaFromFile } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import './editor.scss';
-import { registerBlockType, source } from '../../api';
+import { registerBlockType, source, createBlock } from '../../api';
 import ImageBlock from './block';
 
 const { attr, children } = source;
@@ -57,10 +58,26 @@ registerBlockType( 'core/image', {
 		from: [
 			{
 				type: 'raw',
-				isMatch: ( node ) => (
-					node.nodeName === 'IMG' ||
-					( ! node.textContent && node.querySelector( 'img' ) )
-				),
+				isMatch: ( node ) => {
+					const tag = node.nodeName.toLowerCase();
+					const hasText = !! node.textContent.trim();
+					const hasImage = node.querySelector( 'img' );
+
+					return tag === 'img' || ( hasImage && ! hasText ) || ( hasImage && tag === 'figure' );
+				},
+			},
+			{
+				type: 'files',
+				isMatch( files ) {
+					return files.length === 1 && files[ 0 ].type.indexOf( 'image/' ) === 0;
+				},
+				transform( files ) {
+					return createMediaFromFile( files[ 0 ] )
+						.then( ( media ) => createBlock( 'core/image', {
+							id: media.id,
+							url: media.source_url,
+						} ) );
+				},
 			},
 		],
 	},
