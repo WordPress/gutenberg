@@ -3,12 +3,12 @@
  */
 import classnames from 'classnames';
 import { isEqual, noop } from 'lodash';
-import queryFirstTabbable from 'ally.js/esm/query/first-tabbable';
 
 /**
  * WordPress dependencies
  */
 import { createPortal, Component } from '@wordpress/element';
+import { focus } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -92,8 +92,12 @@ export class Popover extends Component {
 	}
 
 	focus() {
-		const context = this.nodes.content;
-		const firstTabbable = queryFirstTabbable( { context } );
+		const { content } = this.nodes;
+		if ( ! content ) {
+			return;
+		}
+
+		const firstTabbable = focus.tabbable.find( content )[ 0 ];
 		if ( firstTabbable ) {
 			firstTabbable.focus();
 		}
