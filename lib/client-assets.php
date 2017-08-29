@@ -729,12 +729,15 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	}
 
 	// Preload common data.
+	$preload_paths = array(
+		'/wp/v2/users/me?context=edit',
+		gutenberg_get_rest_link( $post_to_edit, 'about', 'edit' ),
+	);
+	if ( ! $is_new_post ) {
+		$preload_paths[] = gutenberg_get_rest_link( $post_to_edit, 'version-history' );
+	}
 	$preload_data = array_reduce(
-		array(
-			'/wp/v2/users/me?context=edit',
-			gutenberg_get_rest_link( $post_to_edit, 'about', 'edit' ),
-			gutenberg_get_rest_link( $post_to_edit, 'version-history' ),
-		),
+		$preload_paths,
 		'gutenberg_preload_api_request',
 		array()
 	);
