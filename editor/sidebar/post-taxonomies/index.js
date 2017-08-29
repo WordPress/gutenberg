@@ -54,7 +54,11 @@ class PostTaxonomies extends Component {
 		}
 
 		return (
-			<PanelBody title={ __( 'Categories & Tags' ) } opened={ this.props.isOpened } onToggle={ this.props.onTogglePanel }>
+			<PanelBody
+				title={ __( 'Categories & Tags' ) }
+				opened={ this.props.isOpened }
+				onToggle={ this.props.onTogglePanel }
+			>
 				{ availableTaxonomies.map( ( taxonomy ) => {
 					const TaxonomyComponent = taxonomy.hierarchical ? HierarchicalTermSelector : FlatTermSelector;
 					return (

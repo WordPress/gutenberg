@@ -817,7 +817,7 @@ describe( 'state', () => {
 		} );
 
 		it( 'should return switched mode', () => {
-			const state = preferences( { isSidebarOpened: false }, {
+			const state = preferences( deepFreeze( { isSidebarOpened: false } ), {
 				type: 'SWITCH_MODE',
 				mode: 'text',
 			} );
