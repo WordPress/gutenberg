@@ -222,6 +222,7 @@ class HierarchicalTermSelector extends Component {
 					<form onSubmit={ this.onAddTerm }>
 						<label htmlFor={ inputId }>{ newTermLabel }</label>
 						<input
+							type="text"
 							id={ inputId }
 							className="editor-post-taxonomies__hierarchical-terms-input"
 							value={ formName }
@@ -243,7 +244,7 @@ class HierarchicalTermSelector extends Component {
 						}
 						<button
 							type="submit"
-							className="editor-post-taxonomies__hierarchical-terms-submit"
+							className="button editor-post-taxonomies__hierarchical-terms-submit"
 							disabled={ adding }
 						>
 							{ newTermSubmitLabel }
