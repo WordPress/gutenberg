@@ -303,6 +303,9 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$wp_customize = new WP_Customize_Manager();
 		$this->assertNull( $wp_customize->find_changeset_post_id( wp_generate_uuid4() ) );
 		$this->assertEquals( $post_id, $wp_customize->find_changeset_post_id( $uuid ) );
+
+		// Verify that the found post ID was cached under the given UUID, not the manager's UUID.
+		$this->assertNotEquals( $post_id, $wp_customize->find_changeset_post_id( $wp_customize->changeset_uuid() ) );
 	}
 
 	/**
