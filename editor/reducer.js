@@ -434,13 +434,13 @@ export function showInsertionPoint( state = false, action ) {
 
 /**
  * Reducer returning the user preferences:
- *   - current editor mode, either "visual" or "text".
- *   - whether the sidebar is opened or closed
- *   - The state of the different sidebar panels
  *
- * @param  {string} state  Current state
- * @param  {Object} action Dispatched action
- * @return {string}        Updated state
+ * @param  {Object}  state                 Current state
+ * @param  {string}  state.mode            Current editor mode, either "visual" or "text".
+ * @param  {Boolean} state.isSidebarOpened Whether the sidebar is opened or closed
+ * @param  {Object}  state.panels          The state of the different sidebar panels
+ * @param  {Object}  action                Dispatched action
+ * @return {string}                        Updated state
  */
 export function preferences( state = DEFAULT_PREFERENCES, action ) {
 	switch ( action.type ) {
