@@ -123,6 +123,14 @@ describe( 'selectors', () => {
 
 			expect( getPreference( state, 'ribs' ) ).toBeUndefined();
 		} );
+
+		it( 'should return the default value if provided', () => {
+			const state = {
+				preferences: {},
+			};
+
+			expect( getPreference( state, 'ribs', 'chicken' ) ).toEqual( 'chicken' );
+		} );
 	} );
 
 	describe( 'isEditorSidebarOpened', () => {
