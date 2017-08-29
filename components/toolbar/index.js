@@ -33,6 +33,7 @@ function Toolbar( { controls = [], children, className } ) {
 						className={ setIndex > 0 && controlIndex === 0 ? 'has-left-divider' : null }
 					>
 						<IconButton
+							tabIndex="-1"
 							icon={ control.icon }
 							label={ control.title }
 							data-subscript={ control.subscript }

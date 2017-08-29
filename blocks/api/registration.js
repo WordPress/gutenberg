@@ -92,7 +92,7 @@ export function registerBlockType( name, settings ) {
 		);
 		return;
 	}
-	const block = Object.assign( { name }, settings );
+	const block = { name, ...settings };
 	blocks[ name ] = block;
 	return block;
 }

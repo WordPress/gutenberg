@@ -4,8 +4,9 @@
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 import { Slot } from 'react-slot-fill';
-import { partial } from 'lodash';
+import { filter, findIndex, flatMap, partial } from 'lodash';
 import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
+import 'element-closest';
 
 /**
  * WordPress dependencies
@@ -15,6 +16,7 @@ import { IconButton, Toolbar } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
 import { getBlockType, getBlockDefaultClassname, createBlock } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
+import queryFirstTabbable from 'ally.js/esm/query/first-tabbable';
 
 /**
  * Internal dependencies
@@ -52,11 +54,25 @@ import {
 	getMultiSelectedBlockUids,
 } from '../../selectors';
 
-const { BACKSPACE, ESCAPE, DELETE, ENTER } = keycodes;
+const { BACKSPACE, ESCAPE, DELETE, ENTER, TAB, F10, UP, LEFT, DOWN, RIGHT } = keycodes;
 
 function FirstChild( { children } ) {
 	const childrenArray = Children.toArray( children );
 	return childrenArray[ 0 ] || null;
+}
+
+function queryFirstTabbableChild( elem ) {
+	for ( let i = 0; i < elem.childNodes.length; i++ ) {
+		const tabbableNode = queryFirstTabbable( { context: elem.childNodes[ i ] } );
+		if ( tabbableNode ) {
+			return tabbableNode;
+		}
+	}
+	return null;
+}
+
+function isToolbar( target ) {
+	return target.closest( '.components-toolbar, .editor-block-settings-menu, .editor-block-mover' ) !== null;
 }
 
 class VisualEditorBlock extends Component {
@@ -81,9 +97,21 @@ class VisualEditorBlock extends Component {
 		this.previousOffset = null;
 
 		this.state = {
+			focusableBorder: true,
 			showMobileControls: false,
 			error: null,
 		};
+	}
+
+	updateBlockBorderInFocusCycle() {
+		if ( ! this.node ) {
+			return;
+		}
+		const nextTabItem = queryFirstTabbableChild( this.node );
+		const needsFocusableBorder = nextTabItem === null;
+		if ( this.state.focusableBorder !== needsFocusableBorder ) {
+			this.setState( { focusableBorder: needsFocusableBorder } );
+		}
 	}
 
 	componentDidMount() {
@@ -94,6 +122,7 @@ class VisualEditorBlock extends Component {
 		if ( this.props.isTyping ) {
 			document.addEventListener( 'mousemove', this.stopTypingOnMouseMove );
 		}
+		this.updateBlockBorderInFocusCycle();
 	}
 
 	componentWillReceiveProps( newProps ) {
@@ -117,8 +146,18 @@ class VisualEditorBlock extends Component {
 		}
 
 		// Focus node when focus state is programmatically transferred.
-		if ( this.props.focus && ! prevProps.focus && ! this.node.contains( document.activeElement ) ) {
-			this.node.focus();
+		if ( this.props.focus ) {
+			const prevFocusToolbar = prevProps.focus && prevProps.focus.toolbar;
+			if ( this.props.focus.toolbar ) {
+				if ( ! prevFocusToolbar ) {
+					// we want the first toolbar item that is focusable but not in the default tab cycle
+					this.focusToolbarItem();
+				}
+			} else if ( ! prevProps.focus && ! this.node.contains( document.activeElement ) ) {
+				this.node.focus();
+			} else if ( prevFocusToolbar ) {
+				this.node.focus();
+			}
 		}
 
 		// Bind or unbind mousemove from page when user starts or stops typing
@@ -129,6 +168,7 @@ class VisualEditorBlock extends Component {
 				this.removeStopTypingListener();
 			}
 		}
+		this.updateBlockBorderInFocusCycle();
 	}
 
 	componentWillUnmount() {
@@ -195,6 +235,7 @@ class VisualEditorBlock extends Component {
 			onRemove,
 			onFocus,
 			onDeselect,
+			onStartTyping,
 		} = this.props;
 
 		// Remove block on backspace.
@@ -212,7 +253,13 @@ class VisualEditorBlock extends Component {
 
 		// Deselect on escape.
 		if ( ESCAPE === keyCode ) {
-			onDeselect();
+			if ( isToolbar( target ) ) {
+				onFocus( uid, {} );
+			} else if ( ! this.props.isTyping ) {
+				onStartTyping();
+			} else {
+				onDeselect();
+			}
 		}
 	}
 
@@ -257,6 +304,10 @@ class VisualEditorBlock extends Component {
 	onKeyDown( event ) {
 		const { keyCode, target } = event;
 
+		this.handleToolbarTabCycle( event );
+		this.handleToolbarArrowCycle( event );
+		this.handleToolbarF10Selection( event );
+
 		if ( ENTER === keyCode && target === this.node ) {
 			event.preventDefault();
 
@@ -268,6 +319,104 @@ class VisualEditorBlock extends Component {
 
 	onKeyUp( event ) {
 		this.removeOrDeselect( event );
+	}
+
+	focusToolbarItem( after, reverseOrder ) {
+		const block = this.node;
+		const isVisible = ( elem ) => elem && ! ( elem.offsetWidth <= 0 || elem.offsetHeight <= 0 );
+		const allToolbars = filter( block.querySelectorAll( '.components-toolbar' ), isVisible );
+		const settingsMenu = filter( [ block.querySelector( '.editor-block-settings-menu' ) ], isVisible );
+		const moverMenu = filter( [ block.querySelector( '.editor-block-mover' ) ], isVisible );
+		const allCycle = [ ...allToolbars, ...settingsMenu, ...moverMenu ];
+
+		if ( reverseOrder ) {
+			allCycle.reverse();
+		}
+
+		let startIndex = 0;
+		if ( after ) {
+			const currIndex = findIndex( allCycle, ( node ) => node.contains( after ) );
+			if ( currIndex === -1 ) {
+				return false;
+			}
+			startIndex = currIndex + 1;
+		}
+
+		// try all toolbars after this one to find the first with a focusable item
+		for ( let i = 0; i < allCycle.length; i++ ) {
+			const nextToolbar = allCycle[ ( startIndex + i ) % allCycle.length ];
+
+			const firstFocusableItem = nextToolbar.querySelector( '*[tabindex="-1"]:not(:disabled)' );
+
+			if ( firstFocusableItem && isVisible( firstFocusableItem ) ) {
+				firstFocusableItem.focus();
+				return true;
+			}
+		}
+		// nothing focusable
+		return false;
+	}
+
+	handleToolbarTabCycle( event ) {
+		const { keyCode, shiftKey, target } = event;
+		if ( keyCode !== TAB || ! this.node ) {
+			return;
+		}
+
+		if ( this.focusToolbarItem( target, shiftKey ) ) {
+			// we have a toolbar selected so we should be tabbing between toolbars
+			event.preventDefault();
+			event.stopPropagation();
+		}
+	}
+
+	handleToolbarArrowCycle( event ) {
+		const { keyCode, target } = event;
+		if ( ! ( keyCode === UP || keyCode === LEFT || keyCode === DOWN || keyCode === RIGHT ) || ! this.node ) {
+			return;
+		}
+		const forward = keyCode === DOWN || keyCode === RIGHT;
+		const block = this.node;
+		const isVisible = ( elem ) => elem && ! ( elem.offsetWidth <= 0 || elem.offsetHeight <= 0 );
+		const allToolbars = filter( block.querySelectorAll( '.components-toolbar' ), isVisible );
+		const settingsMenu = filter( [ block.querySelector( '.editor-block-settings-menu' ) ], isVisible );
+		const moverMenu = filter( [ block.querySelector( '.editor-block-mover' ) ], isVisible );
+		const allCycle = flatMap( [ ...allToolbars, ...settingsMenu, ...moverMenu ], ( toolbar ) => {
+			return filter( toolbar.querySelectorAll( '*[tabindex="-1"]:not(:disabled)' ), isVisible );
+		} );
+
+		if ( ! forward ) {
+			allCycle.reverse();
+		}
+
+		const targetIndex = allCycle.indexOf( target );
+
+		if ( targetIndex === -1 ) {
+			return;
+		}
+
+		// we have a toolbar selected so we should be moving between toolbars
+		event.preventDefault();
+		event.stopPropagation();
+
+		if ( allCycle.length > 1 ) {
+			const nextItem = ( targetIndex + 1 >= allCycle.length ) ? allCycle[ 0 ] : allCycle[ targetIndex + 1 ];
+			if ( nextItem ) {
+				nextItem.focus();
+			}
+		}
+	}
+
+	handleToolbarF10Selection( event ) {
+		const { keyCode } = event;
+		if ( keyCode === F10 && ! ( event.altKey || event.ctrlKey || event.shiftKey || event.metaKey ) ) {
+			event.preventDefault();
+			event.stopPropagation();
+			if ( this.props.isTyping ) {
+				this.props.onStopTyping();
+			}
+			this.props.onFocus( this.props.uid, { toolbar: true } );
+		}
 	}
 
 	toggleMobileControls() {
@@ -305,7 +454,7 @@ class VisualEditorBlock extends Component {
 		// Generate the wrapper class names handling the different states of the block.
 		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected, focus } = this.props;
 		const showUI = isSelected && ( ! this.props.isTyping || focus.collapsed === false );
-		const { error, showMobileControls } = this.state;
+		const { error, showMobileControls, focusableBorder } = this.state;
 		const wrapperClassname = classnames( 'editor-visual-editor__block', {
 			'has-warning': ! isValid || !! error,
 			'is-selected': showUI,
@@ -339,7 +488,7 @@ class VisualEditorBlock extends Component {
 				onMouseLeave={ onMouseLeave }
 				className={ wrapperClassname }
 				data-type={ block.name }
-				tabIndex="0"
+				tabIndex={ focusableBorder ? 0 : null }
 				aria-label={ blockLabel }
 				{ ...wrapperProps }
 			>

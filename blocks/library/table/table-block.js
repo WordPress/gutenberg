@@ -122,6 +122,7 @@ export default class TableBlock extends Component {
 										...control,
 										onClick: () => control.onClick( this.state.editor ),
 									} ) ) }
+								tabIndex="-1"
 							/>
 						</li>
 					</Toolbar>

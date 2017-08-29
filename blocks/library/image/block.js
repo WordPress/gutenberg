@@ -116,6 +116,7 @@ class ImageBlock extends Component {
 								buttonProps={ {
 									className: 'components-icon-button components-toolbar__control',
 									'aria-label': __( 'Edit image' ),
+									tabIndex: '-1',
 								} }
 								onSelect={ this.onSelectImage }
 								type="image"
@@ -124,7 +125,7 @@ class ImageBlock extends Component {
 								<Dashicon icon="edit" />
 							</MediaUploadButton>
 						</li>
-						<UrlInputButton onChange={ this.onSetHref } url={ href } />
+						<UrlInputButton onChange={ this.onSetHref } url={ href } tabIndex="-1" />
 					</Toolbar>
 				</BlockControls>
 			)

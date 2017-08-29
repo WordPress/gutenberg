@@ -60,6 +60,7 @@ export class DropdownMenu extends Component {
 	closeMenu() {
 		this.setState( {
 			open: false,
+			activeIndex: null,
 		} );
 	}
 
@@ -83,10 +84,11 @@ export class DropdownMenu extends Component {
 
 	toggleMenu() {
 		const open = ! this.state.open;
+		const activeIndex = open ? 0 : null;
 		if ( open ) {
 			this.calculateMenuPosition();
 		}
-		this.setState( { open } );
+		this.setState( { open, activeIndex } );
 	}
 
 	focusIndex( activeIndex ) {
@@ -137,8 +139,13 @@ export class DropdownMenu extends Component {
 		if ( this.state.open ) {
 			switch ( keydown.keyCode ) {
 				case TAB:
+					keydown.preventDefault();
 					keydown.stopPropagation();
-					this.closeMenu();
+					if ( keydown.shiftKey ) {
+						this.focusPrevious();
+					} else {
+						this.focusNext();
+					}
 					break;
 
 				case LEFT:
@@ -173,12 +180,7 @@ export class DropdownMenu extends Component {
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
-		const { open, activeIndex } = this.state;
-
-		// Focus the first item when the menu opens.
-		if ( ! prevState.open && open ) {
-			this.focusIndex( 0 );
-		}
+		const { activeIndex } = this.state;
 
 		// Change focus to active index
 		const { menu } = this.nodes;
@@ -195,6 +197,7 @@ export class DropdownMenu extends Component {
 			label,
 			menuLabel,
 			controls,
+			tabIndex,
 		} = this.props;
 		const {
 			open,
@@ -231,6 +234,7 @@ export class DropdownMenu extends Component {
 					aria-haspopup="true"
 					aria-expanded={ open }
 					label={ label }
+					tabIndex={ tabIndex }
 					ref={ this.bindReferenceNode( 'toggle' ) }
 				>
 					<Dashicon icon="arrow-down" />

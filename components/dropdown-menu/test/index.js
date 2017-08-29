@@ -131,11 +131,12 @@ describe( 'DropdownMenu', () => {
 
 			assertKeyDown( RIGHT, 1 );
 			assertKeyDown( DOWN, 2 );
-			assertKeyDown( DOWN, 3 );
+			assertKeyDown( TAB, 3 );
 			assertKeyDown( DOWN, 0 ); // Reset to beginning
 			assertKeyDown( DOWN, 1 );
 			assertKeyDown( LEFT, 0 );
 			assertKeyDown( UP, 3 ); // Reset to end
+			assertKeyDown( TAB, 0 );
 		} );
 
 		it( 'should close menu on escape', () => {
@@ -163,22 +164,6 @@ describe( 'DropdownMenu', () => {
 
 			// Close menu by click outside
 			wrapper.instance().handleClickOutside();
-
-			expect( wrapper.state( 'open' ) ).toBe( false );
-		} );
-
-		it( 'should close menu on tab', () => {
-			const wrapper = shallow( <DropdownMenu controls={ controls } /> );
-
-			// Open menu
-			wrapper.find( '> IconButton' ).simulate( 'click' );
-
-			// Close menu by tab
-			wrapper.simulate( 'keydown', {
-				stopPropagation: () => {},
-				preventDefault: () => {},
-				keyCode: TAB,
-			} );
 
 			expect( wrapper.state( 'open' ) ).toBe( false );
 		} );

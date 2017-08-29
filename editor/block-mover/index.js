@@ -39,6 +39,7 @@ function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, f
 					-1,
 				) }
 				aria-disabled={ isFirst }
+				tabIndex="-1"
 			/>
 			<IconButton
 				className="editor-block-mover__control"
@@ -54,6 +55,7 @@ function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, f
 					1,
 				) }
 				aria-disabled={ isLast }
+				tabIndex="-1"
 			/>
 		</div>
 	);

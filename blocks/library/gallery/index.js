@@ -101,6 +101,7 @@ registerBlockType( 'core/gallery', {
 									buttonProps={ {
 										className: 'components-icon-button components-toolbar__control',
 										'aria-label': __( 'Edit Gallery' ),
+										tabIndex: -1,
 									} }
 									onSelect={ onSelectImages }
 									type="image"
