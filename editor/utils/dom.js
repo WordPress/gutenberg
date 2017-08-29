@@ -63,29 +63,26 @@ export function isEdge( container, start = false ) {
  */
 export function placeCaretAtEdge( container, start = false ) {
 	const isInputOrTextarea = [ 'INPUT', 'TEXTAREA' ].indexOf( container.tagName ) !== -1;
+
+	// Inputs and Textareas
 	if ( isInputOrTextarea ) {
 		container.focus();
-		setTimeout( () => {
-			if ( start ) {
-				container.selectionStart = 0;
-				container.selectionEnd = 0;
-			} else {
-				container.selectionStart = container.value.length;
-				container.selectionEnd = container.value.length;
-			}
-		} );
+		if ( start ) {
+			container.selectionStart = 0;
+			container.selectionEnd = 0;
+		} else {
+			container.selectionStart = container.value.length;
+			container.selectionEnd = container.value.length;
+		}
 		return;
 	}
 
-	function placeCaretInContentEditable( element, atStart ) {
-		const range = document.createRange();
-		range.selectNodeContents( element );
-		range.collapse( atStart );
-		const sel = window.getSelection();
-		sel.removeAllRanges();
-		sel.addRange( range );
-		element.focus();
-	}
-
-	placeCaretInContentEditable( container, start );
+	// Content editables
+	const range = document.createRange();
+	range.selectNodeContents( container );
+	range.collapse( start );
+	const sel = window.getSelection();
+	sel.removeAllRanges();
+	sel.addRange( range );
+	container.focus();
 }
