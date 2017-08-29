@@ -19,7 +19,11 @@ class WritingFlow extends Component {
 		super( ...arguments );
 		this.zones = [];
 		this.onKeyDown = this.onKeyDown.bind( this );
+		this.onKeyUp = this.onKeyUp.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
+		this.state = {
+			shouldMove: false,
+		};
 	}
 
 	bindContainer( ref ) {
@@ -60,8 +64,18 @@ class WritingFlow extends Component {
 		const moveDown = ( keyCode === DOWN || keyCode === RIGHT );
 
 		if ( ( moveUp || moveDown ) && isEdge( target, moveUp ) ) {
-			this.moveFocusInContainer( target, moveUp ? 'UP' : 'DOWN' );
 			event.preventDefault();
+			this.setState( { shouldMove: true } );
+		}
+	}
+
+	onKeyUp( event ) {
+		const { keyCode, target } = event;
+		const moveUp = ( keyCode === UP || keyCode === LEFT );
+		if ( this.state.shouldMove ) {
+			event.preventDefault();
+			this.moveFocusInContainer( target, moveUp ? 'UP' : 'DOWN' );
+			this.setState( { shouldMove: false } );
 		}
 	}
 
@@ -72,6 +86,7 @@ class WritingFlow extends Component {
 			<div
 				ref={ this.bindContainer }
 				onKeyDown={ this.onKeyDown }
+				onKeyUp={ this.onKeyUp }
 			>
 				{ children }
 			</div>
