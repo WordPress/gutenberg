@@ -219,7 +219,14 @@ export default class Editable extends Component {
 	}
 
 	getFocusPosition() {
-		const range = this.editor.selection.getRng();
+		let range = this.editor.selection.getRng();
+
+		if ( range.collapsed ) {
+			const { startContainer } = range;
+			range = document.createRange();
+			range.selectNode( startContainer );
+		}
+
 		const position = range.getBoundingClientRect();
 
 		// Find the parent "relative" positioned container
@@ -420,7 +427,12 @@ export default class Editable extends Component {
 		);
 	}
 
-	onNodeChange( { parents } ) {
+	canAddLink( parents, element ) {
+		const range = this.editor.selection.getRng();
+		console.log(range.startContainer.nodeValue);
+	}
+
+	onNodeChange( { parents, element } ) {
 		const formats = {};
 		const link = find( parents, ( node ) => node.nodeName.toLowerCase() === 'a' );
 		if ( link ) {
@@ -428,7 +440,7 @@ export default class Editable extends Component {
 		}
 		const activeFormats = this.editor.formatter.matchAll( [	'bold', 'italic', 'strikethrough' ] );
 		activeFormats.forEach( ( activeFormat ) => formats[ activeFormat ] = true );
-
+		// this.canAddLink( parents, element );
 		const focusPosition = this.getFocusPosition();
 		this.setState( { formats, focusPosition, selectedNodeId: this.state.selectedNodeId + 1 } );
 	}
