@@ -9,7 +9,9 @@ import { identity, fromPairs } from 'lodash';
  */
 import withAPIData from '../';
 
-jest.mock( '../request', () => jest.fn( () => Promise.resolve( {} ) ) );
+jest.mock( '../request', () => jest.fn( () => Promise.resolve( {
+	body: {},
+} ) ) );
 
 describe( 'withAPIData()', () => {
 	const schema = {
