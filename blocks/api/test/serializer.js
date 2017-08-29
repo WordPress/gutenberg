@@ -12,12 +12,20 @@ import serialize, {
 	getBeautifulContent,
 	getSaveContent,
 	serializeAttributes,
+	getCommentDelimitedContent,
+	serializeBlock,
 } from '../serializer';
-import { getBlockTypes, registerBlockType, unregisterBlockType } from '../registration';
+import {
+	getBlockTypes,
+	registerBlockType,
+	unregisterBlockType,
+	setUnknownTypeHandlerName,
+} from '../registration';
 import { createBlock } from '../';
 
 describe( 'block serializer', () => {
 	afterEach( () => {
+		setUnknownTypeHandlerName( undefined );
 		getBlockTypes().forEach( block => {
 			unregisterBlockType( block.name );
 		} );
@@ -207,6 +215,120 @@ describe( 'block serializer', () => {
 		} );
 		it( 'should not break standard-non-compliant tools for "&"', () => {
 			expect( serializeAttributes( { a: '& and &' } ) ).toBe( '{"a":"\\u0026 and \\u0026"}' );
+		} );
+	} );
+
+	describe( 'getCommentDelimitedContent()', () => {
+		it( 'should generate empty attributes void', () => {
+			const content = getCommentDelimitedContent(
+				'core/test-block',
+				{},
+				''
+			);
+
+			expect( content ).toBe( '<!-- wp:core/test-block /-->' );
+		} );
+
+		it( 'should generate empty attributes non-void', () => {
+			const content = getCommentDelimitedContent(
+				'core/test-block',
+				{},
+				'Delicious'
+			);
+
+			expect( content ).toBe( '<!-- wp:core/test-block -->\nDelicious\n<!-- /wp:core/test-block -->' );
+		} );
+
+		it( 'should generate non-empty attributes void', () => {
+			const content = getCommentDelimitedContent(
+				'core/test-block',
+				{ fruit: 'Banana' },
+				''
+			);
+
+			expect( content ).toBe(
+				'<!-- wp:core/test-block {"fruit":"Banana"} /-->'
+			);
+		} );
+
+		it( 'should generate non-empty attributes non-void', () => {
+			const content = getCommentDelimitedContent(
+				'core/test-block',
+				{ fruit: 'Banana' },
+				'Delicious'
+			);
+
+			expect( content ).toBe(
+				'<!-- wp:core/test-block {"fruit":"Banana"} -->\nDelicious\n<!-- /wp:core/test-block -->'
+			);
+		} );
+	} );
+
+	describe( 'serializeBlock()', () => {
+		describe( '"more" block', () => {
+			beforeEach( () => {
+				registerBlockType( 'core/more', {
+					category: 'layout',
+
+					attributes: {
+						text: {
+							type: 'string',
+						},
+						noTeaser: {
+							type: 'boolean',
+							default: false,
+						},
+					},
+
+					save: ( { attributes } ) => attributes.text,
+				} );
+			} );
+
+			it( 'serializes without text', () => {
+				const block = createBlock( 'core/more', {} );
+
+				const content = serializeBlock( block );
+
+				expect( content ).toBe( '<!--more-->' );
+			} );
+
+			it( 'serializes with text', () => {
+				const block = createBlock( 'core/more', {
+					text: 'Read more!',
+				} );
+
+				const content = serializeBlock( block );
+
+				expect( content ).toBe( '<!--more Read more!-->' );
+			} );
+
+			it( 'serializes with no teaser', () => {
+				const block = createBlock( 'core/more', {
+					noTeaser: true,
+				} );
+
+				const content = serializeBlock( block );
+
+				expect( content ).toBe( '<!--more-->\n<!--noteaser-->' );
+			} );
+		} );
+
+		it( 'serializes the fallback block without comment delimiters', () => {
+			registerBlockType( 'core/unknown-block', {
+				category: 'common',
+				attributes: {
+					fruit: {
+						type: 'string',
+					},
+				},
+				save: ( { attributes } ) => attributes.fruit,
+			} );
+			setUnknownTypeHandlerName( 'core/unknown-block' );
+			const block = createBlock( 'core/unknown-block', { fruit: 'Bananas' } );
+
+			const content = serializeBlock( block );
+
+			expect( content ).toBe( 'Bananas' );
 		} );
 	} );
 
