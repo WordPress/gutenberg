@@ -666,29 +666,28 @@ export function isTyping( state ) {
 }
 
 /**
- * Returns the unique ID of the block after which a new block insertion would
- * be placed, or null if the insertion point is not shown. Defaults to the
- * unique ID of the last block occurring in the post if not otherwise assigned.
+ * Returns the insertion point, the index at which the new inserted block would
+ * be placed. Defaults to the last position
  *
  * @param  {Object}  state Global application state
  * @return {?String}       Unique ID after which insertion will occur
  */
 export function getBlockInsertionPoint( state ) {
 	if ( getEditorMode( state ) !== 'visual' ) {
-		return last( state.editor.blockOrder );
+		return state.editor.blockOrder.length;
 	}
 
 	const lastMultiSelectedBlock = getLastMultiSelectedBlockUid( state );
 	if ( lastMultiSelectedBlock ) {
-		return lastMultiSelectedBlock;
+		return getBlockIndex( state, lastMultiSelectedBlock ) + 1;
 	}
 
 	const selectedBlock = getSelectedBlock( state );
 	if ( selectedBlock ) {
-		return selectedBlock.uid;
+		return getBlockIndex( state, selectedBlock.uid ) + 1;
 	}
 
-	return last( state.editor.blockOrder );
+	return state.editor.blockOrder.length;
 }
 
 /**

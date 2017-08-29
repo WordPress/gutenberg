@@ -106,11 +106,11 @@ export default connect(
 		};
 	},
 	( dispatch ) => ( {
-		onInsertBlock( name, after ) {
+		onInsertBlock( name, position ) {
 			dispatch( hideInsertionPoint() );
 			dispatch( insertBlock(
 				createBlock( name ),
-				after
+				position
 			) );
 		},
 	} )

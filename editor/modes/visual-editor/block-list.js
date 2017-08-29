@@ -215,12 +215,11 @@ class VisualEditorBlockList extends Component {
 			insertionPoint,
 		} = this.props;
 
-		const insertionPointIndex = blocks.indexOf( insertionPoint );
 		const blocksWithInsertionPoint = showInsertionPoint
 			? [
-				...blocks.slice( 0, insertionPointIndex + 1 ),
+				...blocks.slice( 0, insertionPoint ),
 				INSERTION_POINT_PLACEHOLDER,
-				...blocks.slice( insertionPointIndex + 1 ),
+				...blocks.slice( insertionPoint ),
 			]
 			: blocks;
 		const continueWritingClassname = classnames( 'editor-visual-editor__continue-writing', {
