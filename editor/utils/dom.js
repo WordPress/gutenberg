@@ -2,16 +2,16 @@
  * Check whether the selection touches an edge of the container
  *
  * @param  {Element} container DOM Element
- * @param  {Boolean} reverse   Reverse means check if it touches the start of the container
+ * @param  {Boolean} start     Reverse means check if it touches the start of the container
  * @return {Boolean}           Is Edge or not
  */
-export function isEdge( container, reverse = false ) {
+export function isEdge( container, start = false ) {
 	if ( [ 'INPUT', 'TEXTAREA' ].indexOf( container.tagName ) !== -1 ) {
 		if ( container.selectionStart !== container.selectionEnd ) {
 			return false;
 		}
 
-		if ( reverse ) {
+		if ( start ) {
 			return container.selectionStart === 0;
 		}
 
@@ -24,8 +24,8 @@ export function isEdge( container, reverse = false ) {
 
 	const selection = window.getSelection();
 	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
-	const position = reverse ? 'start' : 'end';
-	const order = reverse ? 'first' : 'last';
+	const position = start ? 'start' : 'end';
+	const order = start ? 'first' : 'last';
 	const offset = range[ `${ position }Offset` ];
 
 	let node = range.startContainer;
@@ -34,11 +34,11 @@ export function isEdge( container, reverse = false ) {
 		return false;
 	}
 
-	if ( reverse && offset !== 0 ) {
+	if ( start && offset !== 0 ) {
 		return false;
 	}
 
-	if ( ! reverse && offset !== node.textContent.length ) {
+	if ( ! start && offset !== node.textContent.length ) {
 		return false;
 	}
 
