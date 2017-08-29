@@ -7,7 +7,6 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -51,7 +50,6 @@ class PanelBody extends Component {
 							className="components-panel__body-toggle"
 							onClick={ this.toggle }
 							aria-expanded={ isOpened }
-							label={ sprintf( __( 'Open section: %s' ), title ) }
 						>
 							<Dashicon icon={ icon } />
 							{ title }
