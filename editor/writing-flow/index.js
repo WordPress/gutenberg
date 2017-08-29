@@ -38,7 +38,7 @@ class WritingFlow extends Component {
 			'input',
 		].join( ', ' );
 		const isVisible = ( elem ) => elem.offsetWidth > 0 || elem.offsetHeight > 0 || elem.getClientRects().length > 0;
-		return Array.from( this.container.querySelectorAll( tabbablesSelector ) ).filter( isVisible );
+		return [ ...this.container.querySelectorAll( tabbablesSelector ) ].filter( isVisible );
 	}
 
 	moveFocusInContainer( target, direction = 'UP' ) {
