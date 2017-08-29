@@ -33,7 +33,7 @@ class WritingFlow extends Component {
 	getVisibleTabbables() {
 		const tabblablesSelector = [
 			'*[contenteditable="true"]',
-			'*[tabindex]',
+			'*[tabindex]:not([tabindex="-1"])',
 			'textarea',
 			'input',
 		].join( ', ' );
