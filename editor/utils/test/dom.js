@@ -3,8 +3,6 @@
  */
 import { isEdge, placeCaretAtEdge } from '../dom';
 
-jest.useFakeTimers();
-
 describe( 'DOM', () => {
 	let parent;
 
@@ -83,7 +81,6 @@ describe( 'DOM', () => {
 			const input = document.createElement( 'input' );
 			input.value = 'value';
 			placeCaretAtEdge( input, true );
-			jest.runAllTimers();
 			expect( isEdge( input, true ) ).toBe( true );
 		} );
 
@@ -91,7 +88,6 @@ describe( 'DOM', () => {
 			const input = document.createElement( 'input' );
 			input.value = 'value';
 			placeCaretAtEdge( input, false );
-			jest.runAllTimers();
 			expect( isEdge( input, false ) ).toBe( true );
 		} );
 	} );
