@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import clickOutside from 'react-click-outside';
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
+import { flowRight } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,7 +13,7 @@ import moment from 'moment';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { dateI18n, settings } from '@wordpress/date';
-import { PanelRow } from '@wordpress/components';
+import { PanelRow, withAPIData } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -22,7 +23,7 @@ import PostScheduleClock from './clock';
 import { getEditedPostAttribute } from '../../selectors';
 import { editPost } from '../../actions';
 
-class PostSchedule extends Component {
+export class PostSchedule extends Component {
 	constructor() {
 		super( ...arguments );
 		this.state = {
@@ -40,7 +41,12 @@ class PostSchedule extends Component {
 	}
 
 	render() {
-		const { date, onUpdateDate } = this.props;
+		const { date, onUpdateDate, user } = this.props;
+
+		if ( ! user.data || ! user.data.capabilities.publish_posts ) {
+			return null;
+		}
+
 		const momentDate = date ? moment( date ) : moment();
 		const label = date
 			? dateI18n( settings.formats.datetime, date )
@@ -91,7 +97,7 @@ class PostSchedule extends Component {
 	}
 }
 
-export default connect(
+const applyConnect = connect(
 	( state ) => {
 		return {
 			date: getEditedPostAttribute( state, 'date' ),
@@ -104,4 +110,16 @@ export default connect(
 			},
 		};
 	}
-)( clickOutside( PostSchedule ) );
+);
+
+const applyWithAPIData = withAPIData( () => {
+	return {
+		user: '/wp/v2/users/me?context=edit',
+	};
+} );
+
+export default flowRight(
+	applyConnect,
+	applyWithAPIData,
+	clickOutside
+)( PostSchedule );

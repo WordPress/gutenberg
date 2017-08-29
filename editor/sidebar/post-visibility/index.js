@@ -2,14 +2,14 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { find } from 'lodash';
+import { find, flowRight } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { PanelRow, Popover, withInstanceId } from '@wordpress/components';
+import { PanelRow, Popover, withInstanceId, withAPIData } from '@wordpress/components';
 
 /**
  * Internal Dependencies
@@ -21,7 +21,7 @@ import {
 } from '../../selectors';
 import { editPost, savePost } from '../../actions';
 
-class PostVisibility extends Component {
+export class PostVisibility extends Component {
 	constructor( props ) {
 		super( ...arguments );
 
@@ -85,7 +85,8 @@ class PostVisibility extends Component {
 	}
 
 	render() {
-		const { status, visibility, password, onUpdateVisibility, instanceId } = this.props;
+		const { status, visibility, password, onUpdateVisibility, instanceId, user } = this.props;
+		const canEdit = user.data && user.data.capabilities.publish_posts;
 
 		const updatePassword = ( event ) => onUpdateVisibility( status, event.target.value );
 
@@ -119,74 +120,77 @@ class PostVisibility extends Component {
 		return (
 			<PanelRow className="editor-post-visibility">
 				<span>{ __( 'Visibility' ) }</span>
-				<button
-					type="button"
-					aria-expanded={ this.state.opened }
-					className="editor-post-visibility__toggle button-link"
-					onClick={ this.toggleDialog }
-					ref={ this.bindButtonNode }
-				>
-					{ getVisibilityLabel( visibility ) }
-					<Popover
-						position="bottom left"
-						isOpen={ this.state.opened }
-						onClose={ this.closeOnClickOutside }
-						onClick={ this.stopPropagation }
-						className="editor-post-visibility__dialog"
+				{ ! canEdit && <span>{ getVisibilityLabel( visibility ) }</span> }
+				{ canEdit && (
+					<button
+						type="button"
+						aria-expanded={ this.state.opened }
+						className="editor-post-visibility__toggle button-link"
+						onClick={ this.toggleDialog }
+						ref={ this.bindButtonNode }
 					>
-						<fieldset>
-							<legend className="editor-post-visibility__dialog-legend">
-								{ __( 'Post Visibility' ) }
-							</legend>
-							{ visibilityOptions.map( ( { value, label, info, onSelect, checked } ) => (
-								<div key={ value } className="editor-post-visibility__choice">
-									<input
-										type="radio"
-										name={ `editor-post-visibility__setting-${ instanceId }` }
-										value={ value }
-										onChange={ onSelect }
-										checked={ checked }
-										id={ `editor-post-${ value }-${ instanceId }` }
-										aria-describedby={ `editor-post-${ value }-${ instanceId }-description` }
-										className="editor-post-visibility__dialog-radio"
-									/>
+						{ getVisibilityLabel( visibility ) }
+						<Popover
+							position="bottom left"
+							isOpen={ this.state.opened }
+							onClose={ this.closeOnClickOutside }
+							onClick={ this.stopPropagation }
+							className="editor-post-visibility__dialog"
+						>
+							<fieldset>
+								<legend className="editor-post-visibility__dialog-legend">
+									{ __( 'Post Visibility' ) }
+								</legend>
+								{ visibilityOptions.map( ( { value, label, info, onSelect, checked } ) => (
+									<div key={ value } className="editor-post-visibility__choice">
+										<input
+											type="radio"
+											name={ `editor-post-visibility__setting-${ instanceId }` }
+											value={ value }
+											onChange={ onSelect }
+											checked={ checked }
+											id={ `editor-post-${ value }-${ instanceId }` }
+											aria-describedby={ `editor-post-${ value }-${ instanceId }-description` }
+											className="editor-post-visibility__dialog-radio"
+										/>
+										<label
+											htmlFor={ `editor-post-${ value }-${ instanceId }` }
+											className="editor-post-visibility__dialog-label"
+										>
+											{ label }
+										</label>
+										{ <p id={ `editor-post-${ value }-${ instanceId }-description` } className="editor-post-visibility__dialog-info">{ info }</p> }
+									</div>
+								) ) }
+							</fieldset>
+							{ this.state.hasPassword &&
+								<div className="editor-post-visibility__dialog-password">
 									<label
-										htmlFor={ `editor-post-${ value }-${ instanceId }` }
-										className="editor-post-visibility__dialog-label"
+										htmlFor={ `editor-post-visibility__dialog-password-input-${ instanceId }` }
+										className="screen-reader-text"
 									>
-										{ label }
+										{ __( 'Create password' ) }
 									</label>
-									{ <p id={ `editor-post-${ value }-${ instanceId }-description` } className="editor-post-visibility__dialog-info">{ info }</p> }
+									<input
+										className="editor-post-visibility__dialog-password-input"
+										id={ `editor-post-visibility__dialog-password-input-${ instanceId }` }
+										type="text"
+										onChange={ updatePassword }
+										value={ password }
+										placeholder={ __( 'Use a secure password' ) }
+									/>
 								</div>
-							) ) }
-						</fieldset>
-						{ this.state.hasPassword &&
-							<div className="editor-post-visibility__dialog-password">
-								<label
-									htmlFor={ `editor-post-visibility__dialog-password-input-${ instanceId }` }
-									className="screen-reader-text"
-								>
-									{ __( 'Create password' ) }
-								</label>
-								<input
-									className="editor-post-visibility__dialog-password-input"
-									id={ `editor-post-visibility__dialog-password-input-${ instanceId }` }
-									type="text"
-									onChange={ updatePassword }
-									value={ password }
-									placeholder={ __( 'Use a secure password' ) }
-								/>
-							</div>
-						}
-					</Popover>
-				</button>
+							}
+						</Popover>
+					</button>
+				) }
 			</PanelRow>
 		);
 		/* eslint-enable jsx-a11y/label-has-for */
 	}
 }
 
-export default connect(
+const applyConnect = connect(
 	( state ) => ( {
 		status: getEditedPostAttribute( state, 'status' ),
 		visibility: getEditedPostVisibility( state ),
@@ -198,4 +202,16 @@ export default connect(
 			return editPost( { status, password } );
 		},
 	}
-)( withInstanceId( PostVisibility ) );
+);
+
+const applyWithAPIData = withAPIData( () => {
+	return {
+		user: '/wp/v2/users/me?context=edit',
+	};
+} );
+
+export default flowRight(
+	applyConnect,
+	applyWithAPIData,
+	withInstanceId
+)( PostVisibility );
