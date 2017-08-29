@@ -2,52 +2,36 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import { get, flowRight } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { PanelBody, PanelRow, withInstanceId } from '@wordpress/components';
+import { PanelBody, PanelRow, withAPIData, withInstanceId } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import { editPost } from '../../actions';
-import { getCurrentPostType, getEditedPostAttribute } from '../../selectors';
+import { editPost, toggleSidebarPanel } from '../../actions';
+import { getCurrentPostType, getEditedPostAttribute, isEditorSidebarPanelOpened } from '../../selectors';
+
+/**
+ * Module Constants
+ */
+const PANEL_NAME = 'page-attributes';
 
 export class PageAttributes extends Component {
 	constructor() {
 		super( ...arguments );
 
 		this.setUpdatedOrder = this.setUpdatedOrder.bind( this );
+		this.onToggle = this.onToggle.bind( this );
 
 		this.state = {
 			supportsPageAttributes: false,
 		};
-	}
-
-	componentDidMount() {
-		this.fetchSupports();
-	}
-
-	fetchSupports() {
-		const { postTypeSlug } = this.props;
-		this.fetchSupportsRequest = new wp.api.models.Type( { id: postTypeSlug } )
-			.fetch( { data: { context: 'edit' } } )
-			.done( ( postType ) => {
-				const {
-					'page-attributes': supportsPageAttributes = false,
-				} = postType.supports;
-
-				this.setState( { supportsPageAttributes } );
-			} );
-	}
-
-	componentWillUnmount() {
-		if ( this.fetchSupportsRequest ) {
-			this.fetchSupportsRequest.abort();
-		}
 	}
 
 	setUpdatedOrder( event ) {
@@ -57,9 +41,16 @@ export class PageAttributes extends Component {
 		}
 	}
 
+	onToggle() {
+		this.props.toggleSidebarPanel( PANEL_NAME );
+	}
+
 	render() {
-		const { instanceId, order } = this.props;
-		const { supportsPageAttributes } = this.state;
+		const { instanceId, order, postType, isOpened } = this.props;
+		const supportsPageAttributes = get( postType.data, [
+			'supports',
+			'page-attributes',
+		], false );
 
 		// Only render fields if post type supports page attributes
 		if ( ! supportsPageAttributes ) {
@@ -72,7 +63,8 @@ export class PageAttributes extends Component {
 		return (
 			<PanelBody
 				title={ __( 'Page Attributes' ) }
-				initialOpen={ false }
+				opened={ isOpened }
+				onToggle={ this.onToggle }
 			>
 				<PanelRow>
 					<label htmlFor={ inputId }>
@@ -90,20 +82,34 @@ export class PageAttributes extends Component {
 	}
 }
 
-export default connect(
+const applyConnect = connect(
 	( state ) => {
 		return {
 			postTypeSlug: getCurrentPostType( state ),
 			order: getEditedPostAttribute( state, 'menu_order' ),
+			isOpened: isEditorSidebarPanelOpened( state, PANEL_NAME ),
 		};
 	},
-	( dispatch ) => {
-		return {
-			onUpdateOrder( order ) {
-				dispatch( editPost( {
-					menu_order: order,
-				} ) );
-			},
-		};
+	{
+		onUpdateOrder( order ) {
+			return editPost( {
+				menu_order: order,
+			} );
+		},
+		toggleSidebarPanel,
 	}
-)( withInstanceId( PageAttributes ) );
+);
+
+const applyWithAPIData = withAPIData( ( props ) => {
+	const { postTypeSlug } = props;
+
+	return {
+		postType: `/wp/v2/types/${ postTypeSlug }?context=edit`,
+	};
+} );
+
+export default flowRight( [
+	applyConnect,
+	applyWithAPIData,
+	withInstanceId,
+] )( PageAttributes );

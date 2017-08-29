@@ -3,12 +3,13 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
+import { flowRight } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Button } from '@wordpress/components';
+import { Button, withAPIData } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -23,7 +24,7 @@ import {
 	isEditedPostPublishable,
 } from '../../selectors';
 
-function PublishButton( {
+export function PublishButton( {
 	isSaving,
 	isPublished,
 	onStatusChange,
@@ -32,23 +33,37 @@ function PublishButton( {
 	visibility,
 	isPublishable,
 	isSaveable,
+	user,
 } ) {
-	const buttonEnabled = ! isSaving && isPublishable && isSaveable;
+	const isButtonEnabled = user.data && ! isSaving && isPublishable && isSaveable;
+	const isContributor = user.data && ! user.data.capabilities.publish_posts;
+
 	let buttonText;
-	if ( isPublished ) {
+	if ( isContributor ) {
+		buttonText = __( 'Submit for Review' );
+	} else if ( isPublished ) {
 		buttonText = __( 'Update' );
 	} else if ( isBeingScheduled ) {
 		buttonText = __( 'Schedule' );
 	} else {
 		buttonText = __( 'Publish' );
 	}
-	let publishStatus = 'publish';
-	if ( isBeingScheduled ) {
+
+	let publishStatus;
+	if ( isContributor ) {
+		publishStatus = 'pending';
+	} else if ( isBeingScheduled ) {
 		publishStatus = 'future';
 	} else if ( visibility === 'private' ) {
 		publishStatus = 'private';
+	} else {
+		publishStatus = 'publish';
 	}
-	const className = classnames( 'editor-tools__publish-button', { 'is-saving': isSaving } );
+
+	const className = classnames( 'editor-tools__publish-button', {
+		'is-saving': isSaving,
+	} );
+
 	const onClick = () => {
 		onStatusChange( publishStatus );
 		onSave();
@@ -59,7 +74,7 @@ function PublishButton( {
 			isPrimary
 			isLarge
 			onClick={ onClick }
-			disabled={ ! buttonEnabled }
+			disabled={ ! isButtonEnabled }
 			className={ className }
 		>
 			{ buttonText }
@@ -67,7 +82,7 @@ function PublishButton( {
 	);
 }
 
-export default connect(
+const applyConnect = connect(
 	( state ) => ( {
 		isSaving: isSavingPost( state ),
 		isPublished: isCurrentPostPublished( state ),
@@ -80,4 +95,15 @@ export default connect(
 		onStatusChange: ( status ) => editPost( { status } ),
 		onSave: savePost,
 	}
-)( PublishButton );
+);
+
+const applyWithAPIData = withAPIData( () => {
+	return {
+		user: '/wp/v2/users/me?context=edit',
+	};
+} );
+
+export default flowRight( [
+	applyConnect,
+	applyWithAPIData,
+] )( PublishButton );

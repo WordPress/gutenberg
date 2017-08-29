@@ -32,7 +32,12 @@ export default class TinyMCE extends Component {
 		}
 
 		if ( ! isEqual( this.props.style, nextProps.style ) ) {
+			this.editorNode.style = {};
 			Object.assign( this.editorNode.style, nextProps.style );
+		}
+
+		if ( ! isEqual( this.props.className, nextProps.className ) ) {
+			this.editorNode.className = classnames( nextProps.className, 'blocks-editable__tinymce' );
 		}
 	}
 

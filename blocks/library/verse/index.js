@@ -72,7 +72,7 @@ registerBlockType( 'core/verse', {
 				focus={ focus }
 				onFocus={ setFocus }
 				placeholder={ __( 'Write…' ) }
-				className={ className }
+				wrapperClassname={ className }
 				formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
 			/>,
 		];

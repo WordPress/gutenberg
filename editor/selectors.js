@@ -33,13 +33,46 @@ export function getActivePanel( state ) {
 }
 
 /**
- * Returns true if the editor sidebar panel is open, or false otherwise.
+ * Returns the preferences (these preferences are persisted locally)
+ *
+ * @param  {Object}  state Global application state
+ * @return {Object}        Preferences Object
+ */
+export function getPreferences( state ) {
+	return state.preferences;
+}
+
+/**
+ *
+ * @param  {Object}  state          Global application state
+ * @param  {String}  preferenceKey  Preference Key
+ * @return {Mixed}                  Preference Value
+ */
+export function getPreference( state, preferenceKey ) {
+	const preferences = getPreferences( state );
+	return preferences[ preferenceKey ];
+}
+
+/**
+ * Returns true if the editor sidebar is open, or false otherwise.
  *
  * @param  {Object}  state Global application state
  * @return {Boolean}       Whether sidebar is open
  */
 export function isEditorSidebarOpened( state ) {
-	return state.isSidebarOpened;
+	return getPreference( state, 'isSidebarOpened' );
+}
+
+/**
+ * Returns true if the editor sidebar panel is open, or false otherwise.
+ *
+ * @param  {Object}  state Global application state
+ * @param  {STring}  panel Sidebar panel name
+ * @return {Boolean}       Whether sidebar is open
+ */
+export function isEditorSidebarPanelOpened( state, panel ) {
+	const panels = getPreference( state, 'panels' );
+	return panels ? !! panels[ panel ] : false;
 }
 
 /**

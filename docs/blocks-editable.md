@@ -73,7 +73,7 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-03', {
 	attributes: {
 		content: {
 			type: 'array',
-			children( 'p' ),
+			source: children( 'p' ),
 		},
 	},
 

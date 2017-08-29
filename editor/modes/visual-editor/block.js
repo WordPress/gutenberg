@@ -22,6 +22,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import InvalidBlockWarning from './invalid-block-warning';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
+import BlockDropZone from './block-drop-zone';
 import BlockMover from '../../block-mover';
 import BlockRightMenu from '../../block-settings-menu';
 import BlockSwitcher from '../../block-switcher';
@@ -75,6 +76,7 @@ class VisualEditorBlock extends Component {
 		this.onKeyUp = this.onKeyUp.bind( this );
 		this.toggleMobileControls = this.toggleMobileControls.bind( this );
 		this.onBlockError = this.onBlockError.bind( this );
+		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
 
 		this.previousOffset = null;
 
@@ -115,7 +117,7 @@ class VisualEditorBlock extends Component {
 		}
 
 		// Focus node when focus state is programmatically transferred.
-		if ( this.props.focus && ! prevProps.focus ) {
+		if ( this.props.focus && ! prevProps.focus && ! this.node.contains( document.activeElement ) ) {
 			this.node.focus();
 		}
 
@@ -232,6 +234,10 @@ class VisualEditorBlock extends Component {
 		}
 	}
 
+	insertBlocksAfter( blocks ) {
+		this.props.onInsertBlocks( blocks, this.props.order + 1 );
+	}
+
 	onFocus( event ) {
 		if ( event.target === this.node ) {
 			this.props.onSelect();
@@ -254,9 +260,9 @@ class VisualEditorBlock extends Component {
 		if ( ENTER === keyCode && target === this.node ) {
 			event.preventDefault();
 
-			this.props.onInsertBlocksAfter( [
+			this.props.onInsertBlocks( [
 				createBlock( 'core/paragraph' ),
-			] );
+			], this.props.order );
 		}
 	}
 
@@ -275,7 +281,7 @@ class VisualEditorBlock extends Component {
 	}
 
 	render() {
-		const { block, multiSelectedBlockUids } = this.props;
+		const { block, multiSelectedBlockUids, order } = this.props;
 		const { name: blockName, isValid } = block;
 		const blockType = getBlockType( blockName );
 		// translators: %s: Type of block (i.e. Text, Image etc)
@@ -308,7 +314,7 @@ class VisualEditorBlock extends Component {
 			'is-showing-mobile-controls': showMobileControls,
 		} );
 
-		const { onMouseLeave, onFocus, onInsertBlocksAfter, onReplace } = this.props;
+		const { onMouseLeave, onFocus, onReplace } = this.props;
 
 		// Determine whether the block has props to apply to the wrapper.
 		let wrapperProps;
@@ -337,6 +343,7 @@ class VisualEditorBlock extends Component {
 				aria-label={ blockLabel }
 				{ ...wrapperProps }
 			>
+				<BlockDropZone index={ order } />
 				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
 				{ ( showUI || isHovered ) && <BlockRightMenu uid={ block.uid } /> }
 				{ showUI && isValid &&
@@ -383,7 +390,7 @@ class VisualEditorBlock extends Component {
 								focus={ focus }
 								attributes={ block.attributes }
 								setAttributes={ this.setAttributes }
-								insertBlocksAfter={ onInsertBlocksAfter }
+								insertBlocksAfter={ this.insertBlocksAfter }
 								onReplace={ onReplace }
 								setFocus={ partial( onFocus, block.uid ) }
 								mergeBlocks={ this.mergeBlocks }
@@ -458,8 +465,8 @@ export default connect(
 			} );
 		},
 
-		onInsertBlocksAfter( blocks ) {
-			dispatch( insertBlocks( blocks, ownProps.uid ) );
+		onInsertBlocks( blocks, position ) {
+			dispatch( insertBlocks( blocks, position ) );
 		},
 
 		onFocus( ...args ) {

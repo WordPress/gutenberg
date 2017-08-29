@@ -129,13 +129,13 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-components',
 		gutenberg_url( 'components/build/index.js' ),
-		array( 'wp-element', 'wp-a11y', 'wp-i18n', 'wp-utils' ),
+		array( 'wp-element', 'wp-i18n', 'wp-utils', 'wp-api-request' ),
 		filemtime( gutenberg_dir_path() . 'components/build/index.js' )
 	);
 	wp_register_script(
 		'wp-blocks',
 		gutenberg_url( 'blocks/build/index.js' ),
-		array( 'wp-element', 'wp-components', 'wp-utils', 'wp-i18n', 'tinymce-nightly', 'tinymce-nightly-lists', 'tinymce-nightly-paste', 'tinymce-nightly-table', 'media-views', 'media-models' ),
+		array( 'wp-element', 'wp-components', 'wp-utils', 'wp-i18n', 'tinymce-latest', 'tinymce-latest-lists', 'tinymce-latest-paste', 'tinymce-latest-table', 'media-views', 'media-models' ),
 		filemtime( gutenberg_dir_path() . 'blocks/build/index.js' )
 	);
 	wp_add_inline_script(
@@ -203,24 +203,25 @@ function gutenberg_register_vendor_scripts() {
 		'https://unpkg.com/moment@2.18.1/' . $moment_script,
 		array( 'react' )
 	);
+	$tinymce_version = '4.6.5';
 	gutenberg_register_vendor_script(
-		'tinymce-nightly',
-		'https://fiddle.azurewebsites.net/tinymce/nightly/tinymce' . $suffix . '.js'
+		'tinymce-latest',
+		'https://fiddle.azurewebsites.net/tinymce/' . $tinymce_version . '/tinymce' . $suffix . '.js'
 	);
 	gutenberg_register_vendor_script(
-		'tinymce-nightly-lists',
-		'https://fiddle.azurewebsites.net/tinymce/nightly/plugins/lists/plugin' . $suffix . '.js',
-		array( 'tinymce-nightly' )
+		'tinymce-latest-lists',
+		'https://fiddle.azurewebsites.net/tinymce/' . $tinymce_version . '/plugins/lists/plugin' . $suffix . '.js',
+		array( 'tinymce-latest' )
 	);
 	gutenberg_register_vendor_script(
-		'tinymce-nightly-paste',
-		'https://fiddle.azurewebsites.net/tinymce/nightly/plugins/paste/plugin' . $suffix . '.js',
-		array( 'tinymce-nightly' )
+		'tinymce-latest-paste',
+		'https://fiddle.azurewebsites.net/tinymce/' . $tinymce_version . '/plugins/paste/plugin' . $suffix . '.js',
+		array( 'tinymce-latest' )
 	);
 	gutenberg_register_vendor_script(
-		'tinymce-nightly-table',
-		'https://fiddle.azurewebsites.net/tinymce/nightly/plugins/table/plugin' . $suffix . '.js',
-		array( 'tinymce-nightly' )
+		'tinymce-latest-table',
+		'https://fiddle.azurewebsites.net/tinymce/' . $tinymce_version . '/plugins/table/plugin' . $suffix . '.js',
+		array( 'tinymce-latest' )
 	);
 	gutenberg_register_vendor_script(
 		'fetch',
@@ -229,6 +230,15 @@ function gutenberg_register_vendor_scripts() {
 	gutenberg_register_vendor_script(
 		'promise',
 		'https://unpkg.com/promise-polyfill/promise' . $suffix . '.js'
+	);
+
+	// TODO: This is only necessary so long as WordPress 4.9 is not yet stable,
+	// since we depend on the newly-introduced wp-api-request script handle.
+	//
+	// See: gutenberg_ensure_wp_api_request (compat.php).
+	gutenberg_register_vendor_script(
+		'wp-api-request-shim',
+		'https://rawgit.com/WordPress/wordpress-develop/master/src/wp-includes/js/api-request.js'
 	);
 }
 

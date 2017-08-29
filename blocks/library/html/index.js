@@ -25,6 +25,8 @@ registerBlockType( 'core/html', {
 
 	category: 'formatting',
 
+	keywords: [ __( 'embed' ) ],
+
 	className: false,
 
 	attributes: {

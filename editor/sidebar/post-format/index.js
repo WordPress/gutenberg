@@ -2,13 +2,13 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { find } from 'lodash';
+import { get, find, flowRight } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelRow, withInstanceId } from '@wordpress/components';
+import { PanelRow, withAPIData, withInstanceId } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -35,7 +35,7 @@ const POST_FORMATS = [
 ];
 
 function PostFormat( { postType, onUpdatePostFormat, postFormat = 'standard', suggestedFormat, instanceId } ) {
-	if ( postType !== 'post' ) {
+	if ( ! get( postType.data, [ 'supports', 'post-formats' ] ) ) {
 		return null;
 	}
 
@@ -73,17 +73,27 @@ function PostFormat( { postType, onUpdatePostFormat, postFormat = 'standard', su
 	/* eslint-enable jsx-a11y/no-onchange */
 }
 
-export default connect(
-	( state ) => {
-		return {
-			postFormat: getEditedPostAttribute( state, 'format' ),
-			suggestedFormat: getSuggestedPostFormat( state ),
-			postType: getCurrentPostType( state ),
-		};
-	},
-	{
-		onUpdatePostFormat( postFormat ) {
-			return editPost( { format: postFormat } );
+export default flowRight( [
+	connect(
+		( state ) => {
+			return {
+				postFormat: getEditedPostAttribute( state, 'format' ),
+				suggestedFormat: getSuggestedPostFormat( state ),
+				postTypeSlug: getCurrentPostType( state ),
+			};
 		},
-	},
-)( withInstanceId( PostFormat ) );
+		{
+			onUpdatePostFormat( postFormat ) {
+				return editPost( { format: postFormat } );
+			},
+		},
+	),
+	withAPIData( ( props ) => {
+		const { postTypeSlug } = props;
+
+		return {
+			postType: `/wp/v2/types/${ postTypeSlug }?context=edit`,
+		};
+	} ),
+	withInstanceId,
+] )( PostFormat );

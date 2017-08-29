@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { tokenize } from 'simple-html-tokenizer';
-import { xor, fromPairs, isEqual } from 'lodash';
+import { xor, fromPairs, isEqual, includes } from 'lodash';
 
 /**
  * Internal dependencies
@@ -31,6 +31,101 @@ const REGEXP_ONLY_WHITESPACE = /^[\t\n\r\v\f ]*$/;
 const REGEXP_STYLE_URL_TYPE = /^url\s*\(['"\s]*(.*?)['"\s]*\)$/;
 
 /**
+ * Boolean attributes are attributes whose presence as being assigned is
+ * meaningful, even if only empty.
+ *
+ * See: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#boolean-attributes
+ * Extracted from: https://html.spec.whatwg.org/multipage/indices.html#attributes-3
+ *
+ * [ ...document.querySelectorAll( '#attributes-1 > tbody > tr' ) ]
+ *     .filter( ( tr ) => tr.lastChild.textContent.indexOf( 'Boolean attribute' ) !== -1 )
+ *     .map( ( tr ) => tr.firstChild.textContent.trim() )
+ *
+ * @type {Array}
+ */
+const BOOLEAN_ATTRIBUTES = [
+	'allowfullscreen',
+	'allowpaymentrequest',
+	'allowusermedia',
+	'async',
+	'autofocus',
+	'autoplay',
+	'checked',
+	'controls',
+	'default',
+	'defer',
+	'disabled',
+	'formnovalidate',
+	'hidden',
+	'ismap',
+	'itemscope',
+	'loop',
+	'multiple',
+	'muted',
+	'nomodule',
+	'novalidate',
+	'open',
+	'open',
+	'playsinline',
+	'readonly',
+	'required',
+	'reversed',
+	'selected',
+	'typemustmatch',
+];
+
+/**
+ * Enumerated attributes are attributes which must be of a specific value form.
+ * Like boolean attributes, these are meaningful if specified, even if not of a
+ * valid enumerated value.
+ *
+ * See: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#enumerated-attribute
+ * Extracted from: https://html.spec.whatwg.org/multipage/indices.html#attributes-3
+ *
+ * [ ...document.querySelectorAll( '#attributes-1 > tbody > tr' ) ]
+ *     filter( ( tr ) => /("(.+?)";?\s*)+/.test( tr.lastChild.textContent ) )
+ *     .map( ( tr ) => tr.firstChild.textContent.trim() )
+ *
+ * @type {Array}
+ */
+const ENUMERATED_ATTRIBUTES = [
+	'autocomplete',
+	'contenteditable',
+	'crossorigin',
+	'dir',
+	'dir',
+	'draggable',
+	'enctype',
+	'formenctype',
+	'formmethod',
+	'inputmode',
+	'kind',
+	'method',
+	'preload',
+	'sandbox',
+	'scope',
+	'shape',
+	'spellcheck',
+	'step',
+	'translate',
+	'type',
+	'type',
+	'workertype',
+	'wrap',
+];
+
+/**
+ * Meaningful attributes are those who cannot be safely ignored when omitted in
+ * one HTML markup string and not another.
+ *
+ * @type {Array}
+ */
+const MEANINGFUL_ATTRIBUTES = [
+	...BOOLEAN_ATTRIBUTES,
+	...ENUMERATED_ATTRIBUTES,
+];
+
+/**
  * Given a specified string, returns an array of strings split by consecutive
  * whitespace, ignoring leading or trailing whitespace.
  *
@@ -50,6 +145,27 @@ export function getTextPiecesSplitOnWhitespace( text ) {
  */
 export function getTextWithCollapsedWhitespace( text ) {
 	return getTextPiecesSplitOnWhitespace( text ).join( ' ' );
+}
+
+/**
+ * Returns attribute pairs of the given StartTag token, including only pairs
+ * where the value is non-empty or the attribute is a boolean attribute, an
+ * enumerated attribute, or a custom data- attribute.
+ *
+ * @see MEANINGFUL_ATTRIBUTES
+ *
+ * @param  {Object}  token StartTag token
+ * @return {Array[]}       Attribute pairs
+ */
+export function getMeaningfulAttributePairs( token ) {
+	return token.attributes.filter( ( pair ) => {
+		const [ key, value ] = pair;
+		return (
+			value ||
+			key.indexOf( 'data-' ) === 0 ||
+			includes( MEANINGFUL_ATTRIBUTES, key )
+		);
+	} );
 }
 
 /**
@@ -179,8 +295,7 @@ export const isEqualTokensOfType = {
 		}
 
 		return isEqualTagAttributePairs(
-			a.attributes,
-			b.attributes,
+			...[ a, b ].map( getMeaningfulAttributePairs )
 		);
 	},
 	Chars: isEqualTextTokensWithCollapsedWhitespace,

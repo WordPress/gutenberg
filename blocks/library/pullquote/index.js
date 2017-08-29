@@ -70,7 +70,7 @@ registerBlockType( 'core/pullquote', {
 					placeholder={ __( 'Write quote…' ) }
 					focus={ focus && focus.editable === 'value' ? focus : null }
 					onFocus={ ( props ) => setFocus( { ...props, editable: 'value' } ) }
-					className="blocks-pullquote__content"
+					wrapperClassname="blocks-pullquote__content"
 				/>
 				{ ( citation || !! focus ) && (
 					<Editable

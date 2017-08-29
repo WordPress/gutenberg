@@ -14,7 +14,9 @@ import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
  */
 import {
 	getEditorMode,
+	getPreference,
 	isEditorSidebarOpened,
+	isEditorSidebarPanelOpened,
 	hasEditorUndo,
 	hasEditorRedo,
 	isEditedPostNew,
@@ -97,10 +99,28 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'getPreference', () => {
+		it( 'should return the preference value if set', () => {
+			const state = {
+				preferences: { chicken: true },
+			};
+
+			expect( getPreference( state, 'chicken' ) ).toBe( true );
+		} );
+
+		it( 'should return undefined if the preference is unset', () => {
+			const state = {
+				preferences: { chicken: true },
+			};
+
+			expect( getPreference( state, 'ribs' ) ).toBeUndefined();
+		} );
+	} );
+
 	describe( 'isEditorSidebarOpened', () => {
 		it( 'should return true when the sidebar is opened', () => {
 			const state = {
-				isSidebarOpened: true,
+				preferences: { isSidebarOpened: true },
 			};
 
 			expect( isEditorSidebarOpened( state ) ).toBe( true );
@@ -108,10 +128,36 @@ describe( 'selectors', () => {
 
 		it( 'should return false when the sidebar is opened', () => {
 			const state = {
-				isSidebarOpened: false,
+				preferences: { isSidebarOpened: false },
 			};
 
 			expect( isEditorSidebarOpened( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isEditorSidebarPanelOpened', () => {
+		it( 'should return false if no panels preference', () => {
+			const state = {
+				preferences: { isSidebarOpened: true },
+			};
+
+			expect( isEditorSidebarPanelOpened( state, 'post-taxonomies' ) ).toBe( false );
+		} );
+
+		it( 'should return false if the panel value is not set', () => {
+			const state = {
+				preferences: { panels: {} },
+			};
+
+			expect( isEditorSidebarPanelOpened( state, 'post-taxonomies' ) ).toBe( false );
+		} );
+
+		it( 'should return the panel value', () => {
+			const state = {
+				preferences: { panels: { 'post-taxonomies': true } },
+			};
+
+			expect( isEditorSidebarPanelOpened( state, 'post-taxonomies' ) ).toBe( true );
 		} );
 	} );
 
