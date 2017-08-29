@@ -49,6 +49,10 @@ class PostStatus extends Component {
 
 		return (
 			<PanelBody title={ __( 'Status & Visibility' ) } opened={ isOpened } onToggle={ onTogglePanel }>
+				<PostVisibility />
+				<PostSchedule />
+				<PostFormat />
+				<PostSticky />
 				{ ! isPublished &&
 					<PanelRow>
 						<label htmlFor={ pendingId }>{ __( 'Pending review' ) }</label>
@@ -60,10 +64,6 @@ class PostStatus extends Component {
 						/>
 					</PanelRow>
 				}
-				<PostVisibility />
-				<PostSchedule />
-				<PostFormat />
-				<PostSticky />
 				<PostAuthor />
 				<PostTrash />
 			</PanelBody>
