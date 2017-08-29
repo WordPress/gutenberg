@@ -31,14 +31,14 @@ class WritingFlow extends Component {
 	}
 
 	getVisibleTabbables() {
-		const tabblablesSelector = [
+		const tabbablesSelector = [
 			'*[contenteditable="true"]',
 			'*[tabindex]:not([tabindex="-1"])',
 			'textarea',
 			'input',
 		].join( ', ' );
 		const isVisible = ( elem ) => elem.offsetWidth > 0 || elem.offsetHeight > 0 || elem.getClientRects().length > 0;
-		return Array.from( this.container.querySelectorAll( tabblablesSelector ) ).filter( isVisible );
+		return Array.from( this.container.querySelectorAll( tabbablesSelector ) ).filter( isVisible );
 	}
 
 	moveFocusInContainer( target, direction = 'UP' ) {
