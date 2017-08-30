@@ -10,7 +10,7 @@
 		</properties>
 	</rule>
 
-	<arg value="s"/>
+	<arg value="ps"/>
 	<arg name="extensions" value="php"/>
 
 	<file>gutenberg.php</file>
