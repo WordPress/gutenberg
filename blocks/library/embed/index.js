@@ -219,6 +219,10 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 		save( { attributes } ) {
 			const { url, caption, align } = attributes;
 
+			if ( ! url ) {
+				return;
+			}
+
 			return (
 				<figure className={ align ? `align${ align }` : null }>
 					{ `\n${ url }\n` /* URL needs to be on its own line. */ }
