@@ -107,8 +107,8 @@ class HierarchicalTermSelector extends Component {
 		} );
 		findOrCreatePromise
 			.then( ( term ) => {
-				const hasTerm = !! find( this.state.availableTerms, ( availableTerm ) => availableTerm.id !== term.id );
-				const newAvailableTerms = hasTerm ? this.state.availableTerms : [ ...this.state.availableTerms, term ];
+				const hasTerm = !! find( this.state.availableTerms, ( availableTerm ) => availableTerm.id === term.id );
+				const newAvailableTerms = hasTerm ? this.state.availableTerms : [ term, ...this.state.availableTerms ];
 				const { onUpdateTerms, restBase, terms } = this.props;
 				this.setState( {
 					adding: false,
