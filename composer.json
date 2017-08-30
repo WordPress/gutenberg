@@ -1,6 +1,5 @@
 {
 	"require-dev": {
-		"squizlabs/php_codesniffer": "2.9.x",
 		"dealerdirect/phpcodesniffer-composer-installer": "^0.4",
 		"wp-coding-standards/wpcs": "dev-develop"
 	},
