@@ -218,9 +218,33 @@ export default class Editable extends Component {
 		this.props.onChange( this.savedContent );
 	}
 
+	getEditorSelectionRect() {
+		let range = this.editor.selection.getRng();
+
+		// getBoundingClientRect doesn't work in Safari when range is collapsed
+		if ( range.collapsed ) {
+			const { startContainer, startOffset } = range;
+			range = document.createRange();
+
+			if ( ( ! startContainer.nodeValue ) || startContainer.nodeValue.length === 0 ) {
+				// container has no text content, select node (empty block)
+				range.selectNode( startContainer );
+			} else if ( startOffset === startContainer.nodeValue.length ) {
+				// at end of text content, select last character
+				range.setStart( startContainer, startContainer.nodeValue.length - 1 );
+				range.setEnd( startContainer, startContainer.nodeValue.length );
+			} else {
+				// select 1 character from current position
+				range.setStart( startContainer, startOffset );
+				range.setEnd( startContainer, startOffset + 1 );
+			}
+		}
+
+		return range.getBoundingClientRect();
+	}
+
 	getFocusPosition() {
-		const range = this.editor.selection.getRng();
-		const position = range.getBoundingClientRect();
+		const position = this.getEditorSelectionRect();
 
 		// Find the parent "relative" positioned container
 		const container = this.props.inlineToolbar
