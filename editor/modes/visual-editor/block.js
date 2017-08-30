@@ -73,7 +73,6 @@ class VisualEditorBlock extends Component {
 		this.onFocus = this.onFocus.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
-		this.onKeyUp = this.onKeyUp.bind( this );
 		this.toggleMobileControls = this.toggleMobileControls.bind( this );
 		this.onBlockError = this.onBlockError.bind( this );
 		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
@@ -263,9 +262,6 @@ class VisualEditorBlock extends Component {
 				createBlock( 'core/paragraph' ),
 			], this.props.order );
 		}
-	}
-
-	onKeyUp( event ) {
 		this.removeOrDeselect( event );
 	}
 
@@ -331,7 +327,6 @@ class VisualEditorBlock extends Component {
 			<div
 				ref={ this.bindBlockNode }
 				onKeyDown={ this.onKeyDown }
-				onKeyUp={ this.onKeyUp }
 				onFocus={ this.onFocus }
 				onMouseMove={ this.maybeHover }
 				onMouseEnter={ this.maybeHover }

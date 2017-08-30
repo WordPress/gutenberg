@@ -30,7 +30,6 @@ export class DropdownMenu extends Component {
 		this.focusPrevious = this.focusPrevious.bind( this );
 		this.focusNext = this.focusNext.bind( this );
 		this.handleKeyDown = this.handleKeyDown.bind( this );
-		this.handleKeyUp = this.handleKeyUp.bind( this );
 		this.calculateMenuPosition = this.calculateMenuPosition.bind( this );
 
 		this.nodes = {};
@@ -116,23 +115,6 @@ export class DropdownMenu extends Component {
 		this.focusIndex( nextIndex );
 	}
 
-	handleKeyUp( event ) {
-		// TODO: find a better way to isolate events on nested components see GH issue #1973.
-		/*
-		 * VisualEditorBlock uses a keyup event to deselect the block. When the
-		 * menu is open we need to stop propagation after Escape has been pressed
-		 * so we use a keyup event instead of keydown, otherwise the whole block
-		 * toolbar will disappear.
-		 */
-		if ( event.keyCode === ESCAPE && this.state.open ) {
-			event.preventDefault();
-			event.stopPropagation();
-			// eslint-disable-next-line react/no-find-dom-node
-			findDOMNode( this.nodes.toggle ).focus();
-			this.closeMenu();
-		}
-	}
-
 	handleKeyDown( keydown ) {
 		if ( this.state.open ) {
 			switch ( keydown.keyCode ) {
@@ -154,7 +136,13 @@ export class DropdownMenu extends Component {
 					keydown.stopPropagation();
 					this.focusNext();
 					break;
-
+				case ESCAPE:
+					keydown.preventDefault();
+					keydown.stopPropagation();
+					// eslint-disable-next-line react/no-find-dom-node
+					findDOMNode( this.nodes.toggle ).focus();
+					this.closeMenu();
+					break;
 				default:
 					break;
 			}
@@ -218,7 +206,6 @@ export class DropdownMenu extends Component {
 			<div
 				className="components-dropdown-menu"
 				onKeyDown={ this.handleKeyDown }
-				onKeyUp={ this.handleKeyUp }
 			>
 				<IconButton
 					className={

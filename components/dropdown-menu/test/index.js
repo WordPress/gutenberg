@@ -146,7 +146,7 @@ describe( 'DropdownMenu', () => {
 			wrapper.find( '> IconButton' ).simulate( 'click' );
 
 			// Close menu by escape
-			wrapper.simulate( 'keyup', {
+			wrapper.simulate( 'keydown', {
 				stopPropagation: () => {},
 				preventDefault: () => {},
 				keyCode: ESCAPE,
