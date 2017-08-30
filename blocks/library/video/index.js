@@ -11,6 +11,7 @@ import { Placeholder, Toolbar, Dashicon } from '@wordpress/components';
 /**
  * Internal dependencies
  */
+import './style.scss';
 import { registerBlockType, source } from '../../api';
 import MediaUploadButton from '../../media-upload-button';
 import Editable from '../../editable';
