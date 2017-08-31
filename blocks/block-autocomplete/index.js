@@ -29,14 +29,14 @@ class BlockAutocomplete extends Component {
 		const { children } = this.props;
 
 		const options = getBlockTypes().map( ( blockType ) => {
-			const { name, title, icon, keywords } = blockType;
+			const { name, title, icon, keywords = [] } = blockType;
 			return {
 				value: name,
 				label: [
 					<BlockIcon key="icon" icon={ icon } />,
 					title,
 				],
-				keywords,
+				keywords: [ ...keywords, title ],
 			};
 		} );
 
