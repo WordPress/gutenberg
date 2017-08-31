@@ -74,6 +74,7 @@ registerBlockType( 'core/button', {
 					onFocus={ setFocus }
 					onChange={ ( value ) => setAttributes( { text: value } ) }
 					formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
+					keepPlaceholderOnFocus
 				/>
 				{ focus &&
 					<form

@@ -575,13 +575,14 @@ export default class Editable extends Component {
 			formattingControls,
 			placeholder,
 			multiline: MultilineTag,
+			keepPlaceholderOnFocus = false,
 		} = this.props;
 
 		// Generating a key that includes `tagName` ensures that if the tag
 		// changes, we unmount and destroy the previous TinyMCE element, then
 		// mount and initialize a new child element in its place.
 		const key = [ 'editor', Tagname ].join();
-		const isPlaceholderVisible = placeholder && ! focus && this.state.empty;
+		const isPlaceholderVisible = placeholder && ( ! focus || keepPlaceholderOnFocus ) && this.state.empty;
 		const classes = classnames( wrapperClassname, 'blocks-editable' );
 
 		const formatToolbar = (
