@@ -32,6 +32,7 @@ import { pasteHandler } from '../api';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
 import patterns from './patterns';
+import { EVENTS } from './constants';
 
 const { BACKSPACE, DELETE, ENTER } = keycodes;
 
@@ -103,6 +104,11 @@ export default class Editable extends Component {
 
 	onSetup( editor ) {
 		this.editor = editor;
+
+		EVENTS.forEach( ( name ) => {
+			editor.on( name, this.proxyPropHandler( name ) );
+		} );
+
 		editor.on( 'init', this.onInit );
 		editor.on( 'focusout', this.onChange );
 		editor.on( 'NewBlock', this.onNewBlock );
@@ -119,6 +125,14 @@ export default class Editable extends Component {
 		if ( this.props.onSetup ) {
 			this.props.onSetup( editor );
 		}
+	}
+
+	proxyPropHandler( name ) {
+		return ( event ) => {
+			if ( 'function' === typeof this.props[ 'on' + name ] ) {
+				this.props[ 'on' + name ]( event );
+			}
+		};
 	}
 
 	onInit() {
