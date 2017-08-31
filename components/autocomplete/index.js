@@ -162,7 +162,9 @@ class Autocomplete extends Component {
 
 			// Merge label into keywords
 			let { keywords = [] } = option;
-			keywords = [ ...keywords, option.label ];
+			if ( 'string' === typeof option.label ) {
+				keywords = [ ...keywords, option.label ];
+			}
 
 			const isMatch = keywords.some( ( keyword ) => search.test( keyword ) );
 			if ( ! isMatch ) {
