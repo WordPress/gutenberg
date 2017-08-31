@@ -66,14 +66,14 @@ function PostScheduleClock( { is12Hour, selected, onChange } ) {
 			/>
 			{ is12Hour && <div>
 				<Button
-					className="button-secondary editor-post-schedule__clock-am-button"
+					className="button editor-post-schedule__clock-am-button"
 					isToggled={ am === 'AM' }
 					onClick={ setAM }
 				>
 					{ __( 'AM' ) }
 				</Button>
 				<Button
-					className="button-secondary editor-post-schedule__clock-pm-button"
+					className="button editor-post-schedule__clock-pm-button"
 					isToggled={ am === 'PM' }
 					onClick={ setPM }
 				>

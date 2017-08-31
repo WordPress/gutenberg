@@ -34,7 +34,6 @@ class Button extends Component {
 			href,
 			target,
 			isPrimary,
-			isSecondary,
 			isLarge,
 			isSmall,
 			isToggled,
@@ -43,9 +42,8 @@ class Button extends Component {
 			...additionalProps
 		} = this.props;
 		const classes = classnames( 'components-button', className, {
-			button: ( isPrimary || isSecondary || isLarge ),
+			button: ( isPrimary || isLarge ),
 			'button-primary': isPrimary,
-			'button-secondary': isSecondary,
 			'button-large': isLarge,
 			'button-small': isSmall,
 			'is-toggled': isToggled,
