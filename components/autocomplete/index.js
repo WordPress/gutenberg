@@ -241,12 +241,14 @@ class Autocomplete extends Component {
 				} ) }
 				{ isOpen && (
 					<ul
+						role="menu"
 						style={ { ...position } }
 						className="components-autocomplete__results"
 					>
 						{ this.getFilteredOptions().map( ( option, index ) => (
 							<li
 								key={ option.value }
+								role="menuitem"
 								className={ classnames( 'components-autocomplete__result', {
 									'is-selected': index === selectedIndex,
 								} ) }
