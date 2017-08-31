@@ -13,7 +13,7 @@ import { flowRight } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { dateI18n, settings } from '@wordpress/date';
-import { PanelRow, withAPIData } from '@wordpress/components';
+import { PanelRow, Popover, withAPIData } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -27,7 +27,7 @@ export class PostSchedule extends Component {
 	constructor() {
 		super( ...arguments );
 		this.state = {
-			open: false,
+			opened: false,
 		};
 		this.toggleDialog = this.toggleDialog.bind( this );
 	}
@@ -74,11 +74,11 @@ export class PostSchedule extends Component {
 					aria-expanded={ this.state.opened }
 				>
 					{ label }
-				</button>
-
-				{ this.state.opened &&
-					<div className="editor-post-schedule__dialog">
-						<div className="editor-post-schedule__dialog-arrow" />
+					<Popover
+						position="bottom left"
+						isOpen={ this.state.opened }
+						className="editor-post-schedule__dialog"
+					>
 						<DatePicker
 							inline
 							selected={ momentDate }
@@ -90,8 +90,8 @@ export class PostSchedule extends Component {
 							onChange={ handleChange }
 							is12Hour={ is12HourTime }
 						/>
-					</div>
-				}
+					</Popover>
+				</button>
 			</PanelRow>
 		);
 	}
