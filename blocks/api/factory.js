@@ -18,7 +18,6 @@ import {
  */
 import { getBlockType, getBlockTypes, getUnknownTypeHandlerName } from './registration';
 import { getBlockAttributes } from './parser';
-import normalize from './paste/normalise-blocks';
 
 /**
  * Returns a block object given its type and attributes.
@@ -74,7 +73,7 @@ const getBlockTypeTransforms = createSelector( ( blockTypes, type ) => {
 export function createBlocksFromMarkup( html ) {
 	// Assign markup as body of sandboxed document
 	const doc = document.implementation.createHTMLDocument( '' );
-	doc.body.innerHTML = normalize( html );
+	doc.body.innerHTML = html;
 
 	const rawTransforms = getBlockTypeTransforms( getBlockTypes(), 'raw' );
 
