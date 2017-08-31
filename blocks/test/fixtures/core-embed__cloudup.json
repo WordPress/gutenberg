@@ -8,6 +8,7 @@
             "caption": [
                 "Embedded content from cloudup"
             ]
-        }
+        },
+        "originalContent": "<figure class=\"wp-block-embed-cloudup\">\n    https://cloudup.com/\n    <figcaption>Embedded content from cloudup</figcaption>\n</figure>"
     }
 ]

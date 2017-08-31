@@ -8,6 +8,7 @@
             "caption": [
                 "Embedded content from an example URL"
             ]
-        }
+        },
+        "originalContent": "<figure class=\"wp-block-embed\">\n    https://example.com/\n    <figcaption>Embedded content from an example URL</figcaption>\n</figure>"
     }
 ]

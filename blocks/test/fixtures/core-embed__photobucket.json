@@ -8,6 +8,7 @@
             "caption": [
                 "Embedded content from photobucket"
             ]
-        }
+        },
+        "originalContent": "<figure class=\"wp-block-embed-photobucket\">\n    https://photobucket.com/\n    <figcaption>Embedded content from photobucket</figcaption>\n</figure>"
     }
 ]

@@ -10,7 +10,7 @@ import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
 /**
  * WordPress dependencies
  */
-import { Children, Component } from '@wordpress/element';
+import { Children, Component, createElement } from '@wordpress/element';
 import { IconButton, Toolbar } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
 import { getBlockType, getBlockDefaultClassname, createBlock } from '@wordpress/blocks';
@@ -378,30 +378,36 @@ class VisualEditorBlock extends Component {
 					onTouchStart={ this.onPointerDown }
 					className="editor-visual-editor__block-edit"
 				>
-					{ isValid && ! error && (
-						<BlockCrashBoundary onError={ this.onBlockError }>
-							<BlockEdit
-								focus={ focus }
-								attributes={ block.attributes }
-								setAttributes={ this.setAttributes }
-								insertBlocksAfter={ this.insertBlocksAfter }
-								onReplace={ onReplace }
-								setFocus={ partial( onFocus, block.uid ) }
-								mergeBlocks={ this.mergeBlocks }
-								className={ className }
-								id={ block.uid }
-							/>
-						</BlockCrashBoundary>
-					) }
-					{ ! isValid && (
-						blockType.save( {
-							attributes: block.attributes,
-							className,
-						} )
-					) }
+					<BlockCrashBoundary onError={ this.onBlockError }>
+						{ isValid
+							? (
+								<BlockEdit
+									focus={ focus }
+									attributes={ block.attributes }
+									setAttributes={ this.setAttributes }
+									insertBlocksAfter={ this.insertBlocksAfter }
+									onReplace={ onReplace }
+									setFocus={ partial( onFocus, block.uid ) }
+									mergeBlocks={ this.mergeBlocks }
+									className={ className }
+									id={ block.uid }
+								/>
+							)
+							: [
+								createElement( blockType.save, {
+									key: 'invalid-preview',
+									attributes: block.attributes,
+									className,
+								} ),
+								<InvalidBlockWarning
+									key="invalid-warning"
+									block={ block }
+								/>,
+							]
+						}
+					</BlockCrashBoundary>
 				</div>
 				{ !! error && <BlockCrashWarning /> }
-				{ ! isValid && <InvalidBlockWarning block={ block } /> }
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */

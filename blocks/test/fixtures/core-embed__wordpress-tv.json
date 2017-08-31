@@ -8,6 +8,7 @@
             "caption": [
                 "Embedded content from wordpress-tv"
             ]
-        }
+        },
+        "originalContent": "<figure class=\"wp-block-embed-wordpress-tv\">\n    https://wordpress.tv/\n    <figcaption>Embedded content from wordpress-tv</figcaption>\n</figure>"
     }
 ]

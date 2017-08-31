@@ -24,6 +24,7 @@
                 "by whomever"
             ],
             "align": "none"
-        }
+        },
+        "originalContent": "<blockquote class=\"wp-block-pullquote alignnone\">\n    <p>Paragraph <strong>one</strong></p>\n    <p>Paragraph two</p>\n    <footer>by whomever</footer>\n</blockquote>"
     }
 ]

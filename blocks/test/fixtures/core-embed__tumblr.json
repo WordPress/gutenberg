@@ -8,6 +8,7 @@
             "caption": [
                 "Embedded content from tumblr"
             ]
-        }
+        },
+        "originalContent": "<figure class=\"wp-block-embed-tumblr\">\n    https://tumblr.com/\n    <figcaption>Embedded content from tumblr</figcaption>\n</figure>"
     }
 ]

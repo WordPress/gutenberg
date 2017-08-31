@@ -8,6 +8,7 @@
             "caption": [
                 "We are Automattic"
             ]
-        }
+        },
+        "originalContent": "<figure class=\"wp-block-embed-twitter\">\n    https://twitter.com/automattic\n    <figcaption>We are Automattic</figcaption>\n</figure>"
     }
 ]
