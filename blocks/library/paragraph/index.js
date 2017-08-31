@@ -63,16 +63,16 @@ registerBlockType( 'core/paragraph', {
 	},
 
 	transforms: {
-		from: [
-			{
-				type: 'raw',
-				isMatch: ( node ) => (
-					node.nodeName === 'P' &&
-					// Do not allow embedded content.
-					! node.querySelector( 'audio, canvas, embed, iframe, img, math, object, svg, video' )
-				),
-			},
-		],
+		// from: [
+		// 	{
+		// 		type: 'raw',
+		// 		isMatch: ( node ) => (
+		// 			node.nodeName === 'P' &&
+		// 			// Do not allow embedded content.
+		// 			! node.querySelector( 'audio, canvas, embed, iframe, img, math, object, svg, video' )
+		// 		),
+		// 	},
+		// ],
 	},
 
 	merge( attributes, attributesToMerge ) {

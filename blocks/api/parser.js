@@ -9,7 +9,7 @@ import { mapValues, reduce, pickBy } from 'lodash';
  */
 import { parse as grammarParse } from './post.pegjs';
 import { getBlockType, getUnknownTypeHandlerName } from './registration';
-import { createBlock } from './factory';
+import { createBlocksFromMarkup, createBlock } from './factory';
 import { isValidBlock } from './validation';
 import { getCommentDelimitedContent } from './serializer';
 
@@ -164,9 +164,10 @@ export function getBlockAttributes( blockType, rawContent, attributes ) {
  * @param  {?Object} attributes Attributes obtained from block delimiters
  * @return {?Object}            An initialized block object (if possible)
  */
-export function createBlockWithFallback( name, rawContent, attributes ) {
+export function createBlocksWithFallback( name, rawContent, attributes ) {
 	// Use type from block content, otherwise find unknown handler.
-	name = name || getUnknownTypeHandlerName();
+	const fallbackBlockName = getUnknownTypeHandlerName();
+	name = name || fallbackBlockName;
 
 	// Convert 'core/text' blocks in existing content to the new
 	// 'core/paragraph'.
@@ -176,7 +177,6 @@ export function createBlockWithFallback( name, rawContent, attributes ) {
 
 	// Try finding type for known block name, else fall back again.
 	let blockType = getBlockType( name );
-	const fallbackBlock = getUnknownTypeHandlerName();
 	if ( ! blockType ) {
 		// If detected as a block which is not registered, preserve comment
 		// delimiters in content of unknown type handler.
@@ -184,31 +184,39 @@ export function createBlockWithFallback( name, rawContent, attributes ) {
 			rawContent = getCommentDelimitedContent( name, attributes, rawContent );
 		}
 
-		name = fallbackBlock;
+		name = fallbackBlockName;
 		blockType = getBlockType( name );
+	} else if ( blockType.name === fallbackBlockName ) {
+		// Here we can assume that fallback block is inferred by lack of block
+		// demarcations, meaning we should apply legacy editor formatting
+		rawContent = window.wp.oldEditor.autop( rawContent );
 	}
 
 	// Include in set only if type were determined.
-	// TODO do we ever expect there to not be an unknown type handler?
-	if ( blockType && ( rawContent || name !== fallbackBlock ) ) {
-		// TODO allow blocks to opt-in to receiving a tree instead of a string.
-		// Gradually convert all blocks to this new format, then remove the
-		// string serialization.
-		const block = createBlock(
-			name,
-			getBlockAttributes( blockType, rawContent, attributes )
-		);
-
-		// Validate that the parsed block is valid, meaning that if we were to
-		// reserialize it given the assumed attributes, the markup matches the
-		// original value. Otherwise, preserve original to avoid destruction.
-		block.isValid = isValidBlock( rawContent, blockType, block.attributes );
-		if ( ! block.isValid ) {
-			block.originalContent = rawContent;
-		}
-
-		return block;
+	if ( ! blockType ) {
+		return [];
 	}
+
+	if ( blockType.name === fallbackBlockName ) {
+		return createBlocksFromMarkup( rawContent );
+	}
+
+	// Gradually convert all blocks to this new format, then remove the
+	// string serialization.
+	const block = createBlock(
+		name,
+		getBlockAttributes( blockType, rawContent, attributes )
+	);
+
+	// Validate that the parsed block is valid, meaning that if we were to
+	// reserialize it given the assumed attributes, the markup matches the
+	// original value. Otherwise, preserve original to avoid destruction.
+	block.isValid = isValidBlock( rawContent, blockType, block.attributes );
+	if ( ! block.isValid ) {
+		block.originalContent = rawContent;
+	}
+
+	return [ block ];
 }
 
 /**
@@ -220,11 +228,8 @@ export function createBlockWithFallback( name, rawContent, attributes ) {
 export function parseWithGrammar( content ) {
 	return grammarParse( content ).reduce( ( memo, blockNode ) => {
 		const { blockName, rawContent, attrs } = blockNode;
-		const block = createBlockWithFallback( blockName, rawContent.trim(), attrs );
-		if ( block ) {
-			memo.push( block );
-		}
-		return memo;
+		const blocks = createBlocksWithFallback( blockName, rawContent.trim(), attrs );
+		return memo.concat( blocks );
 	}, [] );
 }
 

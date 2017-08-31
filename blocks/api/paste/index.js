@@ -1,14 +1,8 @@
 /**
- * External dependencies
- */
-import { find, get } from 'lodash';
-
-/**
  * Internal dependencies
  */
-import { createBlock } from '../factory';
-import { getBlockTypes, getUnknownTypeHandlerName } from '../registration';
-import { getBlockAttributes, parseWithGrammar } from '../parser';
+import { createBlocksFromMarkup } from '../factory';
+import { parseWithGrammar } from '../parser';
 import normaliseBlocks from './normalise-blocks';
 import stripAttributes from './strip-attributes';
 import commentRemover from './comment-remover';
@@ -62,38 +56,5 @@ export default function( { content: HTML, inline } ) {
 	// Allows us to ask for this information when we get a report.
 	window.console.log( 'Processed HTML piece:\n\n', HTML );
 
-	const doc = document.implementation.createHTMLDocument( '' );
-
-	doc.body.innerHTML = HTML;
-
-	return Array.from( doc.body.children ).map( ( node ) => {
-		const block = getBlockTypes().reduce( ( acc, blockType ) => {
-			if ( acc ) {
-				return acc;
-			}
-
-			const transformsFrom = get( blockType, 'transforms.from', [] );
-			const transform = find( transformsFrom, ( { type } ) => type === 'raw' );
-
-			if ( ! transform || ! transform.isMatch( node ) ) {
-				return acc;
-			}
-
-			return createBlock(
-				blockType.name,
-				getBlockAttributes(
-					blockType,
-					node.outerHTML
-				)
-			);
-		}, null );
-
-		if ( block ) {
-			return block;
-		}
-
-		return createBlock( getUnknownTypeHandlerName(), {
-			content: node.outerHTML,
-		} );
-	} );
+	return createBlocksFromMarkup( HTML );
 }
