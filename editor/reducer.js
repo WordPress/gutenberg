@@ -550,6 +550,56 @@ export function notices( state = {}, action ) {
 	return state;
 }
 
+export function reusableBlocks( state = {}, action ) {
+	switch ( action.type ) {
+		case 'FETCH_REUSABLE_BLOCK_SUCCESS': {
+			const { id, name, type, attributes } = action.reusableBlock;
+
+			return {
+				...state,
+				[ id ]: { name, type, attributes },
+			};
+		}
+
+		case 'SET_REUSABLE_BLOCK_NAME': {
+			const reusableBlock = state[ action.ref ];
+			if ( ! reusableBlock ) {
+				return state;
+			}
+
+			// TODO: Optimise this. We can `return state` if we determine that nothing is changing
+			return {
+				...state,
+				[ action.ref ]: {
+					...reusableBlock,
+					name: action.name,
+				},
+			};
+		}
+
+		case 'UPDATE_REUSABLE_BLOCK_ATTRIBUTES': {
+			const reusableBlock = state[ action.ref ];
+			if ( ! reusableBlock ) {
+				return state;
+			}
+
+			// TODO: Optimise this. We can `return state` if we determine that nothing is changing
+			return {
+				...state,
+				[ action.ref ]: {
+					...reusableBlock,
+					attributes: {
+						...reusableBlock.attributes,
+						...action.attributes,
+					},
+				},
+			};
+		}
+	}
+
+	return state;
+}
+
 export default optimist( combineReducers( {
 	editor,
 	currentPost,
@@ -562,4 +612,5 @@ export default optimist( combineReducers( {
 	panel,
 	saving,
 	notices,
+	reusableBlocks,
 } ) );

@@ -8,6 +8,7 @@ import { get, uniqueId } from 'lodash';
  * WordPress dependencies
  */
 import { parse, getBlockType, switchToBlockType } from '@wordpress/blocks';
+import { addQueryArgs } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -272,5 +273,43 @@ export default {
 		}
 
 		return effects;
+	},
+	FETCH_REUSABLE_BLOCK( action, store ) {
+		const { ref } = action;
+		const { dispatch } = store;
+
+		/**
+		 * TODO:
+		 * Encapsulate this network request somewhere. It certainly doesn't belong in effects.js.
+		 * It'd be really nice if we could make it all a wp.api.ReusableBlock sort of thing.
+		 */
+
+		const baseUrl = `${ wpApiSettings.root }gutenberg/v1/reusable-blocks/${ ref }`;
+		const url = addQueryArgs( baseUrl, { _wpnonce: wpApiSettings.nonce } );
+
+		const request = new window.Request( url, { credentials: 'include' } );
+
+		function throwIfNotOk( response ) {
+			if ( ! response.ok ) {
+				throw new Error( response.statusText );
+			}
+			return response;
+		}
+
+		window.fetch( request ).then( throwIfNotOk ).then( response => response.json() ).then(
+			( data ) => {
+				// TOD: Encalpsulate this somewhere
+				const { id, name, content } = data;
+				const [ { name: type, attributes } ] = parse( content );
+				dispatch( {
+					type: 'FETCH_REUSABLE_BLOCK_SUCCESS',
+					reusableBlock: { id, name, type, attributes },
+				} );
+			},
+			() => {
+				// TODO: Do something with this error
+				dispatch( { type: 'FETCH_REUSABLE_BLOCK_FAILURE' } );
+			},
+		);
 	},
 };
