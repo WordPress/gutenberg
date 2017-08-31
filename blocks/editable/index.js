@@ -619,7 +619,7 @@ export default class Editable extends Component {
 				/>
 				{ isPlaceholderVisible &&
 					<Tagname
-						className="blocks-editable__tinymce"
+						className={ classnames( 'blocks-editable__tinymce', className ) }
 						style={ style }
 					>
 						{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }
