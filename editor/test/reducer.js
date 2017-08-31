@@ -19,14 +19,12 @@ import {
 	hoveredBlock,
 	isTyping,
 	blockSelection,
-	mode,
-	isSidebarOpened,
+	preferences,
 	saving,
 	notices,
 	showInsertionPoint,
-	createReduxStore,
 	userData,
-} from '../state';
+} from '../reducer';
 
 describe( 'state', () => {
 	describe( 'getPostRawValue', () => {
@@ -316,7 +314,7 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should insert after the specified block uid', () => {
+		it( 'should insert at the specified position', () => {
 			const original = editor( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
@@ -332,7 +330,7 @@ describe( 'state', () => {
 
 			const state = editor( original, {
 				type: 'INSERT_BLOCKS',
-				after: 'kumquat',
+				position: 1,
 				blocks: [ {
 					uid: 'persimmon',
 					name: 'core/freeform',
@@ -785,36 +783,46 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'mode()', () => {
-		it( 'should return "visual" by default', () => {
-			const state = mode( undefined, {} );
+	describe( 'preferences()', () => {
+		it( 'should be opened by default and show the post-status panel', () => {
+			const state = preferences( undefined, {} );
 
-			expect( state ).toBe( 'visual' );
+			expect( state ).toEqual( { mode: 'visual', isSidebarOpened: true, panels: { 'post-status': true } } );
+		} );
+
+		it( 'should toggle the sidebar open flag', () => {
+			const state = preferences( deepFreeze( { isSidebarOpened: false } ), {
+				type: 'TOGGLE_SIDEBAR',
+			} );
+
+			expect( state ).toEqual( { isSidebarOpened: true } );
+		} );
+
+		it( 'should set the sidebar panel open flag to true if unset', () => {
+			const state = preferences( deepFreeze( { isSidebarOpened: false } ), {
+				type: 'TOGGLE_SIDEBAR_PANEL',
+				panel: 'post-taxonomies',
+			} );
+
+			expect( state ).toEqual( { isSidebarOpened: false, panels: { 'post-taxonomies': true } } );
+		} );
+
+		it( 'should toggle the sidebar panel open flag', () => {
+			const state = preferences( deepFreeze( { isSidebarOpened: false, panels: { 'post-taxonomies': true } } ), {
+				type: 'TOGGLE_SIDEBAR_PANEL',
+				panel: 'post-taxonomies',
+			} );
+
+			expect( state ).toEqual( { isSidebarOpened: false, panels: { 'post-taxonomies': false } } );
 		} );
 
 		it( 'should return switched mode', () => {
-			const state = mode( null, {
+			const state = preferences( deepFreeze( { isSidebarOpened: false } ), {
 				type: 'SWITCH_MODE',
 				mode: 'text',
 			} );
 
-			expect( state ).toBe( 'text' );
-		} );
-	} );
-
-	describe( 'isSidebarOpened()', () => {
-		it( 'should be opened by default', () => {
-			const state = isSidebarOpened( undefined, {} );
-
-			expect( state ).toBe( true );
-		} );
-
-		it( 'should toggle the sidebar open flag', () => {
-			const state = isSidebarOpened( false, {
-				type: 'TOGGLE_SIDEBAR',
-			} );
-
-			expect( state ).toBe( true );
+			expect( state ).toEqual( { isSidebarOpened: false, mode: 'text' } );
 		} );
 	} );
 
@@ -907,34 +915,6 @@ describe( 'state', () => {
 			expect( state ).toEqual( {
 				b: originalState.b,
 			} );
-		} );
-	} );
-
-	describe( 'createReduxStore()', () => {
-		it( 'should return a redux store', () => {
-			const store = createReduxStore();
-
-			expect( typeof store.dispatch ).toBe( 'function' );
-			expect( typeof store.getState ).toBe( 'function' );
-		} );
-
-		it( 'should have expected reducer keys', () => {
-			const store = createReduxStore();
-			const state = store.getState();
-
-			expect( Object.keys( state ) ).toEqual( expect.arrayContaining( [
-				'optimist',
-				'editor',
-				'currentPost',
-				'isTyping',
-				'blockSelection',
-				'hoveredBlock',
-				'mode',
-				'isSidebarOpened',
-				'saving',
-				'showInsertionPoint',
-				'notices',
-			] ) );
 		} );
 	} );
 

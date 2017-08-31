@@ -19,7 +19,7 @@ import { addQueryArgs } from '@wordpress/url';
  * @return {String}       Editing mode
  */
 export function getEditorMode( state ) {
-	return state.mode;
+	return getPreference( state, 'mode', 'visual' );
 }
 
 /**
@@ -33,13 +33,48 @@ export function getActivePanel( state ) {
 }
 
 /**
- * Returns true if the editor sidebar panel is open, or false otherwise.
+ * Returns the preferences (these preferences are persisted locally)
+ *
+ * @param  {Object}  state Global application state
+ * @return {Object}        Preferences Object
+ */
+export function getPreferences( state ) {
+	return state.preferences;
+}
+
+/**
+ *
+ * @param  {Object}  state          Global application state
+ * @param  {String}  preferenceKey  Preference Key
+ * @param  {Mixed}   defaultValue   Default Value
+ * @return {Mixed}                  Preference Value
+ */
+export function getPreference( state, preferenceKey, defaultValue ) {
+	const preferences = getPreferences( state );
+	const value = preferences[ preferenceKey ];
+	return value === undefined ? defaultValue : value;
+}
+
+/**
+ * Returns true if the editor sidebar is open, or false otherwise.
  *
  * @param  {Object}  state Global application state
  * @return {Boolean}       Whether sidebar is open
  */
 export function isEditorSidebarOpened( state ) {
-	return state.isSidebarOpened;
+	return getPreference( state, 'isSidebarOpened' );
+}
+
+/**
+ * Returns true if the editor sidebar panel is open, or false otherwise.
+ *
+ * @param  {Object}  state Global application state
+ * @param  {STring}  panel Sidebar panel name
+ * @return {Boolean}       Whether sidebar is open
+ */
+export function isEditorSidebarPanelOpened( state, panel ) {
+	const panels = getPreference( state, 'panels' );
+	return panels ? !! panels[ panel ] : false;
 }
 
 /**
@@ -631,29 +666,28 @@ export function isTyping( state ) {
 }
 
 /**
- * Returns the unique ID of the block after which a new block insertion would
- * be placed, or null if the insertion point is not shown. Defaults to the
- * unique ID of the last block occurring in the post if not otherwise assigned.
+ * Returns the insertion point, the index at which the new inserted block would
+ * be placed. Defaults to the last position
  *
  * @param  {Object}  state Global application state
  * @return {?String}       Unique ID after which insertion will occur
  */
 export function getBlockInsertionPoint( state ) {
 	if ( getEditorMode( state ) !== 'visual' ) {
-		return last( state.editor.blockOrder );
+		return state.editor.blockOrder.length;
 	}
 
 	const lastMultiSelectedBlock = getLastMultiSelectedBlockUid( state );
 	if ( lastMultiSelectedBlock ) {
-		return lastMultiSelectedBlock;
+		return getBlockIndex( state, lastMultiSelectedBlock ) + 1;
 	}
 
 	const selectedBlock = getSelectedBlock( state );
 	if ( selectedBlock ) {
-		return selectedBlock.uid;
+		return getBlockIndex( state, selectedBlock.uid ) + 1;
 	}
 
-	return last( state.editor.blockOrder );
+	return state.editor.blockOrder.length;
 }
 
 /**

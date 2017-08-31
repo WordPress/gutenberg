@@ -1,8 +1,10 @@
 [
     {
         "blockName": "core/audio",
-        "attrs": null,
-        "rawContent": "\n<audio controls=\"\" src=\"https://media.simplecast.com/episodes/audio/80564/draft-podcast-51-livePublish2.mp3\" class=\"wp-block-audio\"></audio>\n"
+        "attrs": {
+            "align": "right"
+        },
+        "rawContent": "\n<div class=\"wp-block-audio alignright\">\n    <audio controls=\"\" src=\"https://media.simplecast.com/episodes/audio/80564/draft-podcast-51-livePublish2.mp3\"></audio>\n</div>\n"
     },
     {
         "attrs": {},

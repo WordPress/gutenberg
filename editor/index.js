@@ -4,7 +4,7 @@
 import { bindActionCreators } from 'redux';
 import { Provider as ReduxProvider } from 'react-redux';
 import { Provider as SlotFillProvider } from 'react-slot-fill';
-import { flow } from 'lodash';
+import { flow, pick } from 'lodash';
 import moment from 'moment-timezone';
 import 'moment-timezone/moment-timezone-utils';
 
@@ -13,7 +13,7 @@ import 'moment-timezone/moment-timezone-utils';
  */
 import { EditableProvider } from '@wordpress/blocks';
 import { createElement, render } from '@wordpress/element';
-import { PopoverProvider } from '@wordpress/components';
+import { APIProvider, PopoverProvider, DropZoneProvider } from '@wordpress/components';
 import { settings as dateSettings } from '@wordpress/date';
 
 /**
@@ -21,7 +21,7 @@ import { settings as dateSettings } from '@wordpress/date';
  */
 import './assets/stylesheets/main.scss';
 import Layout from './layout';
-import { createReduxStore } from './state';
+import createReduxStore from './store';
 import { setInitialPost, undo } from './actions';
 import EditorSettingsProvider from './settings/provider';
 
@@ -118,6 +118,27 @@ export function createEditorInstance( id, post, settings ) {
 		[
 			PopoverProvider,
 			{ target },
+		],
+
+		// APIProvider
+		//
+		//  - context.getAPISchema
+		//  - context.getAPIPostTypeRestBaseMapping
+		//  - context.getAPITaxonomyRestBaseMapping
+		[
+			APIProvider,
+			{
+				...wpApiSettings,
+				...pick( wp.api, [
+					'postTypeRestBaseMapping',
+					'taxonomyRestBaseMapping',
+				] ),
+			},
+		],
+
+		// DropZone provider:
+		[
+			DropZoneProvider,
 		],
 	];
 

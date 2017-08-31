@@ -20,19 +20,21 @@ const SidebarHeader = ( { panel, onSetPanel, toggleSidebar } ) => {
 			<button
 				onClick={ () => onSetPanel( 'document' ) }
 				className={ `editor-sidebar__panel-tab ${ panel === 'document' ? 'is-active' : '' }` }
+				aria-label={ __( 'Document settings' ) }
 			>
 				{ __( 'Document' ) }
 			</button>
 			<button
 				onClick={ () => onSetPanel( 'block' ) }
 				className={ `editor-sidebar__panel-tab ${ panel === 'block' ? 'is-active' : '' }` }
+				aria-label={ __( 'Block settings' ) }
 			>
 				{ __( 'Block' ) }
 			</button>
 			<IconButton
 				onClick={ toggleSidebar }
 				icon="no-alt"
-				label={ __( 'Close post settings sidebar' ) }
+				label={ __( 'Close settings' ) }
 			/>
 		</div>
 	);

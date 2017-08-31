@@ -4,6 +4,7 @@
 import {
 	getTextPiecesSplitOnWhitespace,
 	getTextWithCollapsedWhitespace,
+	getMeaningfulAttributePairs,
 	isEqualTextTokensWithCollapsedWhitespace,
 	getNormalizedStyleValue,
 	getStyleProperties,
@@ -48,6 +49,48 @@ describe( 'validation', () => {
 			const pieces = getTextWithCollapsedWhitespace( '  a \t  b \n c' );
 
 			expect( pieces ).toBe( 'a b c' );
+		} );
+	} );
+
+	describe( 'getMeaningfulAttributePairs()', () => {
+		it( 'returns with non-empty attributes', () => {
+			const pairs = getMeaningfulAttributePairs( {
+				attributes: [ [ 'class', 'a' ] ],
+			} );
+
+			expect( pairs ).toEqual( [ [ 'class', 'a' ] ] );
+		} );
+
+		it( 'returns without empty non-boolean, non-enumerated attributes', () => {
+			const pairs = getMeaningfulAttributePairs( {
+				attributes: [ [ 'class', '' ] ],
+			} );
+
+			expect( pairs ).toEqual( [] );
+		} );
+
+		it( 'returns with empty boolean attributes', () => {
+			const pairs = getMeaningfulAttributePairs( {
+				attributes: [ [ 'disabled', '' ] ],
+			} );
+
+			expect( pairs ).toEqual( [ [ 'disabled', '' ] ] );
+		} );
+
+		it( 'returns with empty enumerated attributes', () => {
+			const pairs = getMeaningfulAttributePairs( {
+				attributes: [ [ 'contenteditable', '' ] ],
+			} );
+
+			expect( pairs ).toEqual( [ [ 'contenteditable', '' ] ] );
+		} );
+
+		it( 'returns with empty data- attributes', () => {
+			const pairs = getMeaningfulAttributePairs( {
+				attributes: [ [ 'data-foo', '' ] ],
+			} );
+
+			expect( pairs ).toEqual( [ [ 'data-foo', '' ] ] );
 		} );
 	} );
 
@@ -308,6 +351,42 @@ describe( 'validation', () => {
 			);
 
 			expect( isEquivalent ).toBe( true );
+		} );
+
+		it( 'should return true when difference of empty non-boolean, non-enumerated attribute', () => {
+			const isEquivalent = isEquivalentHTML(
+				'<div class="">Hello</div>',
+				'<div>Hello</div>'
+			);
+
+			expect( isEquivalent ).toBe( true );
+		} );
+
+		it( 'should return false when difference of empty boolean attribute', () => {
+			const isEquivalent = isEquivalentHTML(
+				'<input disabled>',
+				'<input>'
+			);
+
+			expect( isEquivalent ).toBe( false );
+		} );
+
+		it( 'should return false when difference of empty enumerated attribute', () => {
+			const isEquivalent = isEquivalentHTML(
+				'<div contenteditable>',
+				'<div>'
+			);
+
+			expect( isEquivalent ).toBe( false );
+		} );
+
+		it( 'should return false when difference of data- attribute', () => {
+			const isEquivalent = isEquivalentHTML(
+				'<div data-foo>',
+				'<div>'
+			);
+
+			expect( isEquivalent ).toBe( false );
 		} );
 	} );
 

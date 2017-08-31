@@ -1,33 +1,29 @@
-const attributes = [
-	'style',
-	'class',
-	'id',
-];
+/**
+ * Browser dependencies
+ */
+const { ELEMENT_NODE } = window.Node;
 
-export default function( HTML ) {
-	const doc = document.implementation.createHTMLDocument( '' );
+/**
+ * Internal dependencies
+ */
+import { isAttributeWhitelisted } from './utils';
 
-	doc.body.innerHTML = HTML;
+export default function( node ) {
+	if ( node.nodeType !== ELEMENT_NODE ) {
+		return;
+	}
 
-	deepAttributeStrip( doc.body.children );
+	if ( ! node.hasAttributes() ) {
+		return;
+	}
 
-	return doc.body.innerHTML;
-}
+	const tag = node.nodeName.toLowerCase();
 
-function deepAttributeStrip( nodeList ) {
-	Array.from( nodeList ).forEach( ( node ) => {
-		if ( node.hasAttributes() ) {
-			Array.from( node.attributes ).forEach( ( { name } ) => {
-				if ( attributes.indexOf( name ) !== -1 ) {
-					node.removeAttribute( name );
-				}
-
-				if ( name.indexOf( 'data-' ) === 0 ) {
-					node.removeAttribute( name );
-				}
-			} );
+	Array.from( node.attributes ).forEach( ( { name } ) => {
+		if ( isAttributeWhitelisted( tag, name ) ) {
+			return;
 		}
 
-		deepAttributeStrip( node.children );
+		node.removeAttribute( name );
 	} );
 }

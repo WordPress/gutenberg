@@ -129,13 +129,13 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-components',
 		gutenberg_url( 'components/build/index.js' ),
-		array( 'wp-element', 'wp-a11y', 'wp-i18n', 'wp-utils' ),
+		array( 'wp-element', 'wp-i18n', 'wp-utils', 'wp-api-request' ),
 		filemtime( gutenberg_dir_path() . 'components/build/index.js' )
 	);
 	wp_register_script(
 		'wp-blocks',
 		gutenberg_url( 'blocks/build/index.js' ),
-		array( 'wp-element', 'wp-components', 'wp-utils', 'wp-i18n', 'tinymce-nightly', 'tinymce-nightly-lists', 'tinymce-nightly-paste', 'tinymce-nightly-table', 'media-views', 'media-models' ),
+		array( 'wp-element', 'wp-components', 'wp-utils', 'wp-i18n', 'tinymce-latest', 'tinymce-latest-lists', 'tinymce-latest-paste', 'tinymce-latest-table', 'media-views', 'media-models' ),
 		filemtime( gutenberg_dir_path() . 'blocks/build/index.js' )
 	);
 	wp_add_inline_script(
@@ -168,6 +168,42 @@ function gutenberg_register_scripts_and_styles() {
 	);
 }
 add_action( 'init', 'gutenberg_register_scripts_and_styles' );
+
+/**
+ * Append result of internal request to REST API for purpose of preloading
+ * data to be attached to the page. Expected to be called in the context of
+ * `array_reduce`.
+ *
+ * @param  array  $memo Reduce accumulator.
+ * @param  string $path REST API path to preload.
+ * @return array        Modified reduce accumulator.
+ */
+function gutenberg_preload_api_request( $memo, $path ) {
+	if ( empty( $path ) ) {
+		return $memo;
+	}
+
+	$path_parts = parse_url( $path );
+	if ( false === $path_parts ) {
+		return $memo;
+	}
+
+	$request = new WP_REST_Request( 'GET', $path_parts['path'] );
+	if ( ! empty( $path_parts['query'] ) ) {
+		parse_str( $path_parts['query'], $query_params );
+		$request->set_query_params( $query_params );
+	}
+
+	$response = rest_do_request( $request );
+	if ( 200 === $response->status ) {
+		$memo[ $path ] = array(
+			'body'    => $response->data,
+			'headers' => $response->headers,
+		);
+	}
+
+	return $memo;
+}
 
 /**
  * Registers vendor JavaScript files to be used as dependencies of the editor
@@ -203,24 +239,25 @@ function gutenberg_register_vendor_scripts() {
 		'https://unpkg.com/moment@2.18.1/' . $moment_script,
 		array( 'react' )
 	);
+	$tinymce_version = '4.6.5';
 	gutenberg_register_vendor_script(
-		'tinymce-nightly',
-		'https://fiddle.azurewebsites.net/tinymce/nightly/tinymce' . $suffix . '.js'
+		'tinymce-latest',
+		'https://fiddle.azurewebsites.net/tinymce/' . $tinymce_version . '/tinymce' . $suffix . '.js'
 	);
 	gutenberg_register_vendor_script(
-		'tinymce-nightly-lists',
-		'https://fiddle.azurewebsites.net/tinymce/nightly/plugins/lists/plugin' . $suffix . '.js',
-		array( 'tinymce-nightly' )
+		'tinymce-latest-lists',
+		'https://fiddle.azurewebsites.net/tinymce/' . $tinymce_version . '/plugins/lists/plugin' . $suffix . '.js',
+		array( 'tinymce-latest' )
 	);
 	gutenberg_register_vendor_script(
-		'tinymce-nightly-paste',
-		'https://fiddle.azurewebsites.net/tinymce/nightly/plugins/paste/plugin' . $suffix . '.js',
-		array( 'tinymce-nightly' )
+		'tinymce-latest-paste',
+		'https://fiddle.azurewebsites.net/tinymce/' . $tinymce_version . '/plugins/paste/plugin' . $suffix . '.js',
+		array( 'tinymce-latest' )
 	);
 	gutenberg_register_vendor_script(
-		'tinymce-nightly-table',
-		'https://fiddle.azurewebsites.net/tinymce/nightly/plugins/table/plugin' . $suffix . '.js',
-		array( 'tinymce-nightly' )
+		'tinymce-latest-table',
+		'https://fiddle.azurewebsites.net/tinymce/' . $tinymce_version . '/plugins/table/plugin' . $suffix . '.js',
+		array( 'tinymce-latest' )
 	);
 	gutenberg_register_vendor_script(
 		'fetch',
@@ -229,6 +266,15 @@ function gutenberg_register_vendor_scripts() {
 	gutenberg_register_vendor_script(
 		'promise',
 		'https://unpkg.com/promise-polyfill/promise' . $suffix . '.js'
+	);
+
+	// TODO: This is only necessary so long as WordPress 4.9 is not yet stable,
+	// since we depend on the newly-introduced wp-api-request script handle.
+	//
+	// See: gutenberg_ensure_wp_api_request (compat.php).
+	gutenberg_register_vendor_script(
+		'wp-api-request-shim',
+		'https://rawgit.com/WordPress/wordpress-develop/master/src/wp-includes/js/api-request.js'
 	);
 }
 
@@ -274,6 +320,40 @@ function gutenberg_vendor_script_filename( $src ) {
 	return $filename_pieces['prefix'] . $filename_pieces['suffix']
 		. '.' . $hash
 		. $filename_pieces['extension'];
+}
+
+/**
+ * Given a REST data response with links, returns the href value of a specified
+ * link relation with optional context.
+ *
+ * @since 0.10.0
+ *
+ * @param  array  $data    REST response data.
+ * @param  string $link    Link relation.
+ * @param  string $context Optional context to append.
+ * @return string          Link relation URI.
+ */
+function gutenberg_get_rest_link( $data, $link, $context = null ) {
+	// Check whether a link entry with href exists.
+	if ( empty( $data['_links'] ) || empty( $data['_links'][ $link ] ) ||
+			! isset( $data['_links'][ $link ][0]['href'] ) ) {
+		return;
+	}
+
+	$href = $data['_links'][ $link ][0]['href'];
+
+	// Strip API root prefix.
+	$api_root = untrailingslashit( get_rest_url() );
+	if ( 0 === strpos( $href, $api_root ) ) {
+		$href = substr( $href, strlen( $api_root ) );
+	}
+
+	// Add optional context.
+	if ( ! is_null( $context ) ) {
+		$href = add_query_arg( 'context', $context, $href );
+	}
+
+	return $href;
 }
 
 /**
@@ -441,7 +521,7 @@ function gutenberg_get_post_to_edit( $post_id ) {
 	if ( $response->is_error() ) {
 		return $response->as_error();
 	}
-	return $response->get_data();
+	return rest_get_server()->response_to_data( $response, false );
 }
 
 /**
@@ -647,6 +727,25 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 			'rendered' => apply_filters( 'the_title', $default_title, $post_id ),
 		);
 	}
+
+	// Preload common data.
+	$preload_paths = array(
+		'/wp/v2/users/me?context=edit',
+		gutenberg_get_rest_link( $post_to_edit, 'about', 'edit' ),
+	);
+	if ( ! $is_new_post ) {
+		$preload_paths[] = gutenberg_get_rest_link( $post_to_edit, 'version-history' );
+	}
+	$preload_data = array_reduce(
+		$preload_paths,
+		'gutenberg_preload_api_request',
+		array()
+	);
+	wp_add_inline_script(
+		'wp-components',
+		sprintf( 'window._wpAPIDataPreload = %s', wp_json_encode( $preload_data ) ),
+		'before'
+	);
 
 	// Initialize the post data.
 	wp_add_inline_script(

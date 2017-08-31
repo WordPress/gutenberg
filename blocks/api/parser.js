@@ -11,6 +11,7 @@ import { parse as grammarParse } from './post.pegjs';
 import { getBlockType, getUnknownTypeHandlerName } from './registration';
 import { createBlock } from './factory';
 import { isValidBlock } from './validation';
+import { getCommentDelimitedContent } from './serializer';
 
 /**
  * Returns true if the provided function is a valid attribute source, or false
@@ -169,7 +170,7 @@ export function createBlockWithFallback( name, rawContent, attributes ) {
 
 	// Convert 'core/text' blocks in existing content to the new
 	// 'core/paragraph'.
-	if ( name === 'core/text' ) {
+	if ( name === 'core/text' || name === 'core/cover-text' ) {
 		name = 'core/paragraph';
 	}
 
@@ -177,6 +178,12 @@ export function createBlockWithFallback( name, rawContent, attributes ) {
 	let blockType = getBlockType( name );
 	const fallbackBlock = getUnknownTypeHandlerName();
 	if ( ! blockType ) {
+		// If detected as a block which is not registered, preserve comment
+		// delimiters in content of unknown type handler.
+		if ( name ) {
+			rawContent = getCommentDelimitedContent( name, attributes, rawContent );
+		}
+
 		name = fallbackBlock;
 		blockType = getBlockType( name );
 	}

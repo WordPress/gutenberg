@@ -98,7 +98,7 @@ export default class TableBlock extends Component {
 			<Editable
 				key="editor"
 				tagName="table"
-				className={ className }
+				wrapperClassname={ className }
 				getSettings={ ( settings ) => ( {
 					...settings,
 					plugins: ( settings.plugins || [] ).concat( 'table' ),

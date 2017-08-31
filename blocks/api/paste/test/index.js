@@ -13,19 +13,19 @@ import { children, prop } from '../../source';
 
 describe( 'paste', () => {
 	beforeAll( () => {
-		registerBlockType( 'test/small', {
+		registerBlockType( 'test/figure', {
 			category: 'common',
 			attributes: {
 				content: {
 					type: 'array',
-					source: children( 'small' ),
+					source: children( 'figure' ),
 				},
 			},
 			transforms: {
 				from: [
 					{
 						type: 'raw',
-						isMatch: ( node ) => node.nodeName === 'SMALL',
+						isMatch: ( node ) => node.nodeName === 'FIGURE',
 					},
 				],
 			},
@@ -47,23 +47,25 @@ describe( 'paste', () => {
 	} );
 
 	afterAll( () => {
-		unregisterBlockType( 'test/small' );
+		unregisterBlockType( 'test/figure' );
 		unregisterBlockType( 'test/unknown' );
 		setUnknownTypeHandlerName( undefined );
 	} );
 
 	it( 'should convert recognised pasted content', () => {
-		const pastedBlock = paste( '<small>test</small>' )[ 0 ];
-		const block = createBlock( 'test/small', { content: [ 'test' ] } );
+		const pastedBlock = paste( { content: '<figure>test</figure>' } )[ 0 ];
+		const block = createBlock( 'test/figure', { content: [ 'test' ] } );
 
 		equal( pastedBlock.name, block.name );
 		deepEqual( pastedBlock.attributes, block.attributes );
 	} );
 
 	it( 'should handle unknown pasted content', () => {
-		const pastedBlock = paste( '<big>test</big>' )[ 0 ];
+		const pastedBlock = paste( { content: '<figcaption>test</figcaption>' } )[ 0 ];
 
 		equal( pastedBlock.name, 'test/unknown' );
-		equal( pastedBlock.attributes.content, '<big>test</big>' );
+		equal( pastedBlock.attributes.content, '<figcaption>test</figcaption>' );
 	} );
 } );
+
+import './integration';

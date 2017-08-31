@@ -22,8 +22,14 @@ import PostFormat from '../post-format';
 import {
 	getEditedPostAttribute,
 	isCurrentPostPublished,
+	isEditorSidebarPanelOpened,
 } from '../../selectors';
-import { editPost } from '../../actions';
+import { editPost, toggleSidebarPanel } from '../../actions';
+
+/**
+ * Module Constants
+ */
+const PANEL_NAME = 'post-status';
 
 class PostStatus extends Component {
 	constructor() {
@@ -38,11 +44,15 @@ class PostStatus extends Component {
 	}
 
 	render() {
-		const { status, isPublished, instanceId } = this.props;
+		const { status, isPublished, isOpened, instanceId, onTogglePanel } = this.props;
 		const pendingId = 'pending-toggle-' + instanceId;
 
 		return (
-			<PanelBody title={ __( 'Status & Visibility' ) }>
+			<PanelBody title={ __( 'Status & Visibility' ) } opened={ isOpened } onToggle={ onTogglePanel }>
+				<PostVisibility />
+				<PostSchedule />
+				<PostFormat />
+				<PostSticky />
 				{ ! isPublished &&
 					<PanelRow>
 						<label htmlFor={ pendingId }>{ __( 'Pending review' ) }</label>
@@ -54,10 +64,6 @@ class PostStatus extends Component {
 						/>
 					</PanelRow>
 				}
-				<PostVisibility />
-				<PostSchedule />
-				<PostFormat />
-				<PostSticky />
 				<PostAuthor />
 				<PostTrash />
 			</PanelBody>
@@ -69,13 +75,15 @@ export default connect(
 	( state ) => ( {
 		status: getEditedPostAttribute( state, 'status' ),
 		isPublished: isCurrentPostPublished( state ),
+		isOpened: isEditorSidebarPanelOpened( state, PANEL_NAME ),
 	} ),
-	( dispatch ) => {
-		return {
-			onUpdateStatus( status ) {
-				dispatch( editPost( { status } ) );
-			},
-		};
+	{
+		onUpdateStatus( status ) {
+			return editPost( { status } );
+		},
+		onTogglePanel() {
+			return toggleSidebarPanel( PANEL_NAME );
+		},
 	}
 )( withInstanceId( PostStatus ) );
 

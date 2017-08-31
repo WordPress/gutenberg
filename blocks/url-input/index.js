@@ -104,6 +104,12 @@ class UrlInput extends Component {
 
 	onKeyDown( event ) {
 		const { selectedSuggestion, posts } = this.state;
+		// If the suggestions are not shown, we shouldn't handle the arrow keys
+		// We shouldn't preventDefault to allow block arrow keys navigation
+		if ( ! this.state.showSuggestions || ! this.state.posts.length ) {
+			return;
+		}
+
 		switch ( event.keyCode ) {
 			case UP: {
 				event.stopPropagation();

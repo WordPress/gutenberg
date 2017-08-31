@@ -1,28 +1,12 @@
 /**
- * WordPress dependencies
+ * Internal dependencies
  */
-import { nodetypes } from '@wordpress/utils';
+import { isInline, isEmpty } from './utils';
 
-const { ELEMENT_NODE, TEXT_NODE } = nodetypes;
-
-const inlineTags = [
-	'strong',
-	'em',
-	'b',
-	'i',
-	'del',
-	'ins',
-	'a',
-	'code',
-	'abbr',
-	'time',
-	'sub',
-	'sup',
-];
-
-function isInline( node ) {
-	return inlineTags.indexOf( node.nodeName.toLowerCase() ) !== -1;
-}
+/**
+ * Browser dependencies
+ */
+const { ELEMENT_NODE, TEXT_NODE } = window.Node;
 
 export default function( HTML ) {
 	const decuDoc = document.implementation.createHTMLDocument( '' );
@@ -38,11 +22,15 @@ export default function( HTML ) {
 
 		// Text nodes: wrap in a paragraph, or append to previous.
 		if ( node.nodeType === TEXT_NODE ) {
-			if ( ! accu.lastChild || accu.lastChild.nodeName !== 'P' ) {
-				accu.appendChild( document.createElement( 'P' ) );
-			}
+			if ( ! node.nodeValue.trim() ) {
+				decu.removeChild( node );
+			} else {
+				if ( ! accu.lastChild || accu.lastChild.nodeName !== 'P' ) {
+					accu.appendChild( document.createElement( 'P' ) );
+				}
 
-			accu.lastChild.appendChild( node );
+				accu.lastChild.appendChild( node );
+			}
 		// Element nodes.
 		} else if ( node.nodeType === ELEMENT_NODE ) {
 			// BR nodes: create a new paragraph on double, or append to previous.
@@ -64,7 +52,7 @@ export default function( HTML ) {
 				}
 			} else if ( node.nodeName === 'P' ) {
 				// Only append non-empty paragraph nodes.
-				if ( /^(\s|&nbsp;)*$/.test( node.innerHTML ) ) {
+				if ( isEmpty( node ) ) {
 					decu.removeChild( node );
 				} else {
 					accu.appendChild( node );

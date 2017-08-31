@@ -16,11 +16,18 @@ import { Component } from '@wordpress/element';
 import './style.scss';
 import HierarchicalTermSelector from './hierarchical-term-selector';
 import FlatTermSelector from './flat-term-selector';
-import { getCurrentPostType } from '../../selectors';
+import { getCurrentPostType, isEditorSidebarPanelOpened } from '../../selectors';
+import { toggleSidebarPanel } from '../../actions';
+
+/**
+ * Module Constants
+ */
+const PANEL_NAME = 'post-taxonomies';
 
 class PostTaxonomies extends Component {
 	constructor() {
 		super( ...arguments );
+
 		this.state = {
 			taxonomies: [],
 		};
@@ -47,7 +54,11 @@ class PostTaxonomies extends Component {
 		}
 
 		return (
-			<PanelBody title={ __( 'Categories & Tags' ) } initialOpen={ false }>
+			<PanelBody
+				title={ __( 'Categories & Tags' ) }
+				opened={ this.props.isOpened }
+				onToggle={ this.props.onTogglePanel }
+			>
 				{ availableTaxonomies.map( ( taxonomy ) => {
 					const TaxonomyComponent = taxonomy.hierarchical ? HierarchicalTermSelector : FlatTermSelector;
 					return (
@@ -68,7 +79,13 @@ export default connect(
 	( state ) => {
 		return {
 			postType: getCurrentPostType( state ),
+			isOpened: isEditorSidebarPanelOpened( state, PANEL_NAME ),
 		};
+	},
+	{
+		onTogglePanel() {
+			return toggleSidebarPanel( PANEL_NAME );
+		},
 	}
 )( PostTaxonomies );
 

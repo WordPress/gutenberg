@@ -28,7 +28,7 @@ import { keycodes } from '@wordpress/utils';
  * Internal dependencies
  */
 import './style.scss';
-import { parse, pasteHandler } from '../api';
+import { pasteHandler } from '../api';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
 import patterns from './patterns';
@@ -86,7 +86,6 @@ export default class Editable extends Component {
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.maybePropagateUndo = this.maybePropagateUndo.bind( this );
 		this.onBeforePastePreProcess = this.onBeforePastePreProcess.bind( this );
-		this.onPastePostProcess = this.onPastePostProcess.bind( this );
 
 		this.state = {
 			formats: {},
@@ -114,7 +113,6 @@ export default class Editable extends Component {
 		editor.on( 'selectionChange', this.onSelectionChange );
 		editor.on( 'BeforeExecCommand', this.maybePropagateUndo );
 		editor.on( 'BeforePastePreProcess', this.onBeforePastePreProcess );
-		editor.on( 'PastePostProcess', this.onPastePostProcess );
 
 		patterns.apply( this, [ editor ] );
 
@@ -183,40 +181,29 @@ export default class Editable extends Component {
 	onBeforePastePreProcess( event ) {
 		// Allows us to ask for this information when we get a report.
 		window.console.log( 'Received HTML:\n\n', event.content );
-	}
 
-	onPastePostProcess( event ) {
-		const HTML = event.node.innerHTML;
-		const childNodes = Array.from( event.node.childNodes );
-		const isBlockDelimiter = ( node ) =>
-			node.nodeType === 8 && /^ wp:/.test( node.nodeValue );
-		const isDoubleBR = ( node ) =>
-			node.nodeName === 'BR' && node.previousSibling && node.previousSibling.nodeName === 'BR';
-		const isBlockPart = ( node ) =>
-			isDoubleBR( node ) || this.editor.dom.isBlock( node );
+		const content = pasteHandler( {
+			content: event.content,
+			inline: ! this.props.onSplit,
+		} );
 
-		// Allows us to ask for this information when we get a report.
-		window.console.log( 'MCE processed HTML:\n\n', HTML );
+		if ( typeof content === 'string' ) {
+			// Let MCE process further with the given content.
+			event.content = content;
+		} else if ( this.props.onSplit ) {
+			// Abort pasting to split the content
+			event.preventDefault();
 
-		// If there's no `onSplit` prop, content will later be converted to
-		// inline content.
-		if ( this.props.onSplit ) {
-			let blocks = [];
-
-			// Internal paste, so parse.
-			if ( childNodes.some( isBlockDelimiter ) ) {
-				blocks = parse( HTML.replace( /<meta[^>]+>/, '' ) );
-			// External paste with block level content, so attempt to assign
-			// blocks.
-			} else if ( childNodes.some( isBlockPart ) ) {
-				blocks = pasteHandler( HTML.replace( /<meta[^>]+>/, '' ) );
+			if ( ! content.length ) {
+				return;
 			}
 
-			if ( blocks.length ) {
-				// We must wait for TinyMCE to clean up paste containers after this
-				// event.
-				window.setTimeout( () => this.splitContent( blocks ), 0 );
-				event.preventDefault();
+			const rootNode = this.editor.getBody();
+
+			if ( this.editor.dom.isEmpty( rootNode ) && this.props.onReplace ) {
+				this.props.onReplace( content );
+			} else {
+				this.splitContent( content );
 			}
 		}
 	}
@@ -231,9 +218,33 @@ export default class Editable extends Component {
 		this.props.onChange( this.savedContent );
 	}
 
+	getEditorSelectionRect() {
+		let range = this.editor.selection.getRng();
+
+		// getBoundingClientRect doesn't work in Safari when range is collapsed
+		if ( range.collapsed ) {
+			const { startContainer, startOffset } = range;
+			range = document.createRange();
+
+			if ( ( ! startContainer.nodeValue ) || startContainer.nodeValue.length === 0 ) {
+				// container has no text content, select node (empty block)
+				range.selectNode( startContainer );
+			} else if ( startOffset === startContainer.nodeValue.length ) {
+				// at end of text content, select last character
+				range.setStart( startContainer, startContainer.nodeValue.length - 1 );
+				range.setEnd( startContainer, startContainer.nodeValue.length );
+			} else {
+				// select 1 character from current position
+				range.setStart( startContainer, startOffset );
+				range.setEnd( startContainer, startOffset + 1 );
+			}
+		}
+
+		return range.getBoundingClientRect();
+	}
+
 	getFocusPosition() {
-		const range = this.editor.selection.getRng();
-		const position = range.getBoundingClientRect();
+		const position = this.getEditorSelectionRect();
 
 		// Find the parent "relative" positioned container
 		const container = this.props.inlineToolbar
@@ -562,6 +573,7 @@ export default class Editable extends Component {
 			style,
 			value,
 			focus,
+			wrapperClassname,
 			className,
 			inlineToolbar = false,
 			formattingControls,
@@ -574,7 +586,7 @@ export default class Editable extends Component {
 		// mount and initialize a new child element in its place.
 		const key = [ 'editor', Tagname ].join();
 		const isPlaceholderVisible = placeholder && ! focus && this.state.empty;
-		const classes = classnames( className, 'blocks-editable' );
+		const classes = classnames( wrapperClassname, 'blocks-editable' );
 
 		const formatToolbar = (
 			<FormatToolbar
@@ -606,6 +618,7 @@ export default class Editable extends Component {
 					defaultValue={ value }
 					isPlaceholderVisible={ isPlaceholderVisible }
 					label={ placeholder }
+					className={ className }
 					key={ key }
 				/>
 				{ isPlaceholderVisible &&

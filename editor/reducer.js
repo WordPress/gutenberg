@@ -2,10 +2,8 @@
  * External dependencies
  */
 import optimist from 'redux-optimist';
-import { combineReducers, applyMiddleware, createStore } from 'redux';
-import refx from 'refx';
-import multi from 'redux-multi';
-import { reduce, keyBy, first, last, omit, without, flowRight, mapValues } from 'lodash';
+import { combineReducers } from 'redux';
+import { get, reduce, keyBy, first, last, omit, without, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,9 +14,15 @@ import { getBlockTypes } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { combineUndoableReducers } from './utils/undoable-reducer';
-import effects from './effects';
 
-const isMobile = window.innerWidth < 782;
+/**
+ * Module constants
+ */
+const DEFAULT_PREFERENCES = {
+	mode: 'visual',
+	isSidebarOpened: window.innerWidth >= 782,
+	panels: { 'post-status': true },
+};
 
 /**
  * Returns a post attribute value, flattening nested rendered content using its
@@ -164,7 +168,7 @@ export const editor = combineUndoableReducers( {
 				return action.blocks.map( ( { uid } ) => uid );
 
 			case 'INSERT_BLOCKS': {
-				const position = action.after ? state.indexOf( action.after ) + 1 : state.length;
+				const position = action.position !== undefined ? action.position : state.length;
 				return [
 					...state.slice( 0, position ),
 					...action.blocks.map( block => block.uid ),
@@ -429,25 +433,35 @@ export function showInsertionPoint( state = false, action ) {
 }
 
 /**
- * Reducer returning current editor mode, either "visual" or "text".
+ * Reducer returning the user preferences:
  *
- * @param  {string} state  Current state
- * @param  {Object} action Dispatched action
- * @return {string}        Updated state
+ * @param  {Object}  state                 Current state
+ * @param  {string}  state.mode            Current editor mode, either "visual" or "text".
+ * @param  {Boolean} state.isSidebarOpened Whether the sidebar is opened or closed
+ * @param  {Object}  state.panels          The state of the different sidebar panels
+ * @param  {Object}  action                Dispatched action
+ * @return {string}                        Updated state
  */
-export function mode( state = 'visual', action ) {
-	switch ( action.type ) {
-		case 'SWITCH_MODE':
-			return action.mode;
-	}
-
-	return state;
-}
-
-export function isSidebarOpened( state = ! isMobile, action ) {
+export function preferences( state = DEFAULT_PREFERENCES, action ) {
 	switch ( action.type ) {
 		case 'TOGGLE_SIDEBAR':
-			return ! state;
+			return {
+				...state,
+				isSidebarOpened: ! state.isSidebarOpened,
+			};
+		case 'TOGGLE_SIDEBAR_PANEL':
+			return {
+				...state,
+				panels: {
+					...state.panels,
+					[ action.panel ]: ! get( state, [ 'panels', action.panel ], false ),
+				},
+			};
+		case 'SWITCH_MODE':
+			return {
+				...state,
+				mode: action.mode,
+			};
 	}
 
 	return state;
@@ -515,33 +529,16 @@ export function notices( state = {}, action ) {
 	return state;
 }
 
-/**
- * Creates a new instance of a Redux store.
- *
- * @return {Redux.Store} Redux store
- */
-export function createReduxStore() {
-	const reducer = optimist( combineReducers( {
-		editor,
-		currentPost,
-		isTyping,
-		blockSelection,
-		hoveredBlock,
-		showInsertionPoint,
-		mode,
-		isSidebarOpened,
-		panel,
-		saving,
-		notices,
-		userData,
-	} ) );
-
-	const enhancers = [ applyMiddleware( multi, refx( effects ) ) ];
-	if ( window.__REDUX_DEVTOOLS_EXTENSION__ ) {
-		enhancers.push( window.__REDUX_DEVTOOLS_EXTENSION__() );
-	}
-
-	return createStore( reducer, flowRight( enhancers ) );
-}
-
-export default createReduxStore;
+export default optimist( combineReducers( {
+	editor,
+	currentPost,
+	isTyping,
+	blockSelection,
+	hoveredBlock,
+	showInsertionPoint,
+	preferences,
+	panel,
+	saving,
+	notices,
+	userData,
+} ) );

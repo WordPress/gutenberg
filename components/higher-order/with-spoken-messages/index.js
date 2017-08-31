@@ -6,7 +6,8 @@ import { debounce } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from 'element';
+import { Component } from '@wordpress/element';
+import { speak } from '@wordpress/a11y';
 
 /**
  * A Higher Order Component used to be provide a unique instance ID by component
@@ -23,7 +24,7 @@ function withSpokenMessages( WrappedComponent ) {
 		}
 
 		speak( message, type = 'polite' ) {
-			wp.a11y.speak( message, type );
+			speak( message, type );
 		}
 
 		componentWillUnmount() {

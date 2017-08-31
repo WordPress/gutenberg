@@ -89,6 +89,7 @@ describe( 'block factory', () => {
 				},
 				transforms: {
 					from: [ {
+						type: 'block',
 						blocks: [ 'core/text-block' ],
 						transform: ( { value } ) => {
 							return createBlock( 'core/updated-text-block', {
@@ -127,6 +128,7 @@ describe( 'block factory', () => {
 				},
 				transforms: {
 					to: [ {
+						type: 'block',
 						blocks: [ 'core/updated-text-block' ],
 						transform: ( { value } ) => {
 							return createBlock( 'core/updated-text-block', {
@@ -369,6 +371,7 @@ describe( 'block factory', () => {
 				},
 				transforms: {
 					to: [ {
+						type: 'block',
 						blocks: [ 'core/updated-text-block' ],
 						transform: ( { value } ) => {
 							return [

@@ -3,6 +3,25 @@
  */
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { keycodes } from '@wordpress/utils';
+
+const { BACKSPACE, DELETE } = keycodes;
+
+function isTmceEmpty( editor ) {
+	// When tinyMce is empty the content seems to be:
+	// <p><br data-mce-bogus="1"></p>
+	// avoid expensive checks for large documents
+	const body = editor.getBody();
+	if ( body.childNodes.length > 1 ) {
+		return false;
+	} else if ( body.childNodes.length === 0 ) {
+		return true;
+	}
+	if ( body.childNodes[ 0 ].childNodes.length > 1 ) {
+		return false;
+	}
+	return /^\n?$/.test( body.innerText || body.textContent );
+}
 
 export default class OldEditor extends Component {
 	constructor( props ) {
@@ -65,6 +84,15 @@ export default class OldEditor extends Component {
 			setAttributes( {
 				content: editor.getContent(),
 			} );
+		} );
+
+		editor.on( 'keydown', ( event ) => {
+			if ( ( event.keyCode === BACKSPACE || event.keyCode === DELETE ) && isTmceEmpty( editor ) ) {
+				// delete the block
+				this.props.onReplace( [] );
+				event.preventDefault();
+				event.stopImmediatePropagation();
+			}
 		} );
 
 		editor.addButton( 'kitchensink', {

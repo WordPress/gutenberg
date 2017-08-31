@@ -6,14 +6,17 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Placeholder } from '@wordpress/components';
+import { Placeholder, Toolbar, Dashicon } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
+import './style.scss';
 import { registerBlockType, source } from '../../api';
 import MediaUploadButton from '../../media-upload-button';
 import Editable from '../../editable';
+import BlockControls from '../../block-controls';
+import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
 const { attr, children } = source;
 
@@ -25,6 +28,12 @@ registerBlockType( 'core/video', {
 	category: 'common',
 
 	attributes: {
+		align: {
+			type: 'string',
+		},
+		id: {
+			type: 'number',
+		},
 		src: {
 			type: 'string',
 			source: attr( 'video', 'src' ),
@@ -35,19 +44,58 @@ registerBlockType( 'core/video', {
 		},
 	},
 
+	getEditWrapperProps( attributes ) {
+		const { align } = attributes;
+		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
+			return { 'data-align': align };
+		}
+	},
+
 	edit( { attributes, setAttributes, className, focus, setFocus } ) {
-		const { src, caption } = attributes;
+		const { src, caption, align, id } = attributes;
 		const onSelectVideo = ( media ) => {
 			if ( media && media.url ) {
 				setAttributes( {
 					src: media.url,
+					id: media.id,
 				} );
 			}
 		};
 		const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
+		const updateAlignment = ( nextAlign ) => {
+			setAttributes( { align: nextAlign } );
+		};
+
+		const controls = (
+			focus && (
+				<BlockControls key="controls">
+					<BlockAlignmentToolbar
+						value={ align }
+						onChange={ updateAlignment }
+					/>
+
+					<Toolbar>
+						<li>
+							<MediaUploadButton
+								buttonProps={ {
+									className: 'components-icon-button components-toolbar__control',
+									'aria-label': __( 'Edit video' ),
+								} }
+								onSelect={ onSelectVideo }
+								type="video"
+								value={ id }
+							>
+								<Dashicon icon="edit" />
+							</MediaUploadButton>
+						</li>
+					</Toolbar>
+				</BlockControls>
+			)
+		);
 
 		if ( ! src ) {
 			return [
+				controls,
 				<Placeholder
 					key="placeholder"
 					icon="media-video"
@@ -67,6 +115,7 @@ registerBlockType( 'core/video', {
 
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return [
+			controls,
 			<figure key="video" className={ className }>
 				<video controls src={ src } onClick={ setFocus } />
 				{ ( caption && caption.length > 0 ) || !! focus ? (
@@ -86,10 +135,10 @@ registerBlockType( 'core/video', {
 	},
 
 	save( { attributes } ) {
-		const { src, caption } = attributes;
+		const { src, caption, align } = attributes;
 		return (
 
-			<figure>
+			<figure className={ align ? `align${ align }` : null }>
 				{ src && <video controls src={ src } /> }
 				{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
 			</figure>
