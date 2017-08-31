@@ -129,6 +129,10 @@ export default class Editable extends Component {
 
 	proxyPropHandler( name ) {
 		return ( event ) => {
+			// Allow props an opportunity to handle the event, before default
+			// Editable behavior takes effect. Should the event be handled by a
+			// prop, it should `stopImmediatePropagation` on the event to stop
+			// continued event handling.
 			if ( 'function' === typeof this.props[ 'on' + name ] ) {
 				this.props[ 'on' + name ]( event );
 			}
