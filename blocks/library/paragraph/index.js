@@ -13,6 +13,7 @@ import { registerBlockType, createBlock, source, setDefaultBlockName } from '../
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import BlockControls from '../../block-controls';
+import BlockAutocomplete from '../../block-autocomplete';
 import Editable from '../../editable';
 import InspectorControls from '../../inspector-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
@@ -142,38 +143,39 @@ registerBlockType( 'core/paragraph', {
 					/>
 				</InspectorControls>
 			),
-			<Editable
-				tagName="p"
-				className={ classnames( 'wp-block-paragraph', className, {
-					[ `align${ width }` ]: width,
-					'has-background': backgroundColor,
-				} ) }
-				style={ {
-					backgroundColor: backgroundColor,
-					color: textColor,
-					fontSize: fontSize ? fontSize + 'px' : undefined,
-					textAlign: align,
-				} }
-				key="editable"
-				value={ content }
-				onChange={ ( nextContent ) => {
-					setAttributes( {
-						content: nextContent,
-					} );
-				} }
-				focus={ focus }
-				onFocus={ setFocus }
-				onSplit={ ( before, after, ...blocks ) => {
-					setAttributes( { content: before } );
-					insertBlocksAfter( [
-						...blocks,
-						createBlock( 'core/paragraph', { content: after } ),
-					] );
-				} }
-				onMerge={ mergeBlocks }
-				onReplace={ onReplace }
-				placeholder={ placeholder || __( 'New Paragraph' ) }
-			/>,
+			<BlockAutocomplete key="editable" onReplace={ onReplace }>
+				<Editable
+					tagName="p"
+					className={ classnames( 'wp-block-paragraph', className, {
+						[ `align${ width }` ]: width,
+						'has-background': backgroundColor,
+					} ) }
+					style={ {
+						backgroundColor: backgroundColor,
+						color: textColor,
+						fontSize: fontSize ? fontSize + 'px' : undefined,
+						textAlign: align,
+					} }
+					value={ content }
+					onChange={ ( nextContent ) => {
+						setAttributes( {
+							content: nextContent,
+						} );
+					} }
+					focus={ focus }
+					onFocus={ setFocus }
+					onSplit={ ( before, after, ...blocks ) => {
+						setAttributes( { content: before } );
+						insertBlocksAfter( [
+							...blocks,
+							createBlock( 'core/paragraph', { content: after } ),
+						] );
+					} }
+					onMerge={ mergeBlocks }
+					onReplace={ onReplace }
+					placeholder={ placeholder || __( 'New Paragraph' ) }
+				/>
+			</BlockAutocomplete>,
 		];
 	},
 

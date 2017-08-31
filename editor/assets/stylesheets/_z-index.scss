@@ -37,6 +37,7 @@ $z-layers: (
 	// #adminmenuwrap { z-index: 9990 }
 	'.components-popover': 1000000,
 	'.blocks-gallery-image__inline-menu': 1000000,
+	'.components-autocomplete__results': 1000000,
 	'.blocks-url-input__suggestions': 9999,
 );
 
