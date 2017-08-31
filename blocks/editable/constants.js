@@ -1,3 +1,11 @@
+/**
+ * Set of native events supported by TinyMCE's event dispatcher, preserving
+ * original case used in suffix of a React event callback.
+ *
+ * @see https://github.com/tinymce/tinymce/blob/4.6.6/src/core/src/main/js/util/EventDispatcher.js#L28-L34
+ *
+ * @type {String[]}
+ */
 export const EVENTS = [
 	'Focus',
 	'Blur',
