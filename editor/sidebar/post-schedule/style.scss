@@ -18,43 +18,11 @@
 	}
 }
 
-.editor-post-schedule__dialog {
-	position: absolute;
-	top: 30px;
-	right: 0;
-	box-shadow: $shadow-popover;
-	border: 1px solid $light-gray-500;
-	background: $white;
+.editor-post-schedule__dialog .components-popover__content {
 	padding: 10px;
-	min-width: 265px;
-	z-index: z-index( '.editor-post-schedule__dialog' );
-}
 
-.editor-post-schedule__dialog-arrow {
-	position: absolute;
-	border: 10px dashed $light-gray-500;
-	height: 0;
-	width: 0;
-	line-height: 0;
-	top: -10px;
-	right: 5px;
-	margin-left: -10px;
-	border-bottom-style: solid;
-	border-top: none;
-	border-left-color: transparent;
-	border-right-color: transparent;
-
-	&:before {
-		top: 2px;
-		border: 10px solid $white;
-		content: " ";
-		position: absolute;
-		left: 50%;
-		margin-left: -10px;
-		border-bottom-style: solid;
-		border-top: none;
-		border-left-color: transparent;
-		border-right-color: transparent;
+	@include break-medium {
+		width: 270px;
 	}
 }
 
