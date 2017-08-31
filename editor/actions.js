@@ -106,11 +106,19 @@ export function clearSelectedBlock() {
 	};
 }
 
+/**
+ * Returns an action object signalling that a blocks should be replaced with
+ * one or more replacement blocks.
+ *
+ * @param  {(String|String[])} uids   Block UID(s) to replace
+ * @param  {(Object|Object[])} blocks Replacement block(s)
+ * @return {Object}                   Action object
+ */
 export function replaceBlocks( uids, blocks ) {
 	return {
 		type: 'REPLACE_BLOCKS',
-		uids,
-		blocks,
+		uids: castArray( uids ),
+		blocks: castArray( blocks ),
 	};
 }
 
@@ -118,12 +126,12 @@ export function replaceBlocks( uids, blocks ) {
  * Returns an action object signalling that a single block should be replaced
  * with one or more replacement blocks.
  *
- * @param  {String}            uid   Block UID to replace
+ * @param  {(String|String[])} uid   Block UID(s) to replace
  * @param  {(Object|Object[])} block Replacement block(s)
  * @return {Object}                  Action object
  */
 export function replaceBlock( uid, block ) {
-	return replaceBlocks( [ uid ], castArray( block ) );
+	return replaceBlocks( uid, block );
 }
 
 export function insertBlock( block, position ) {
