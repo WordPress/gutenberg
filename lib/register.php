@@ -85,7 +85,7 @@ function gutenberg_add_admin_bar_edit_link( $wp_admin_bar ) {
 		return;
 	}
 
-	$classic_text = __( 'Classic Editor', 'gutenberg' );
+	$classic_text = __( 'Edit in Classic Editor', 'gutenberg' );
 	remove_filter( 'get_edit_post_link', 'gutenberg_filter_edit_post_link', 10 );
 	$classic_url = get_edit_post_link( $post->ID, 'raw' );
 	add_filter( 'get_edit_post_link', 'gutenberg_filter_edit_post_link', 10, 3 );
@@ -99,15 +99,13 @@ function gutenberg_add_admin_bar_edit_link( $wp_admin_bar ) {
 
 	$is_gutenberg_default = gutenberg_post_has_blocks( $post->ID );
 
-	// Update title for edit link to indicate it will link to Gutenberg.
-	if ( $is_gutenberg_default ) {
-		$wp_admin_bar->add_node( array_merge(
-			(array) $edit_node,
-			array(
-				'title' => $gutenberg_text,
-			)
-		) );
-	}
+	// Update title for edit link to indicate default editor.
+	$wp_admin_bar->add_node( array_merge(
+		(array) $edit_node,
+		array(
+			'title' => $is_gutenberg_default ? $gutenberg_text : $classic_text,
+		)
+	) );
 
 	// Add submenu item under link to go to Gutenberg editor or classic editor.
 	$wp_admin_bar->add_node( array(
