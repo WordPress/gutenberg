@@ -14,8 +14,6 @@ $blocks-button__height: 46px;
 	.blocks-format-toolbar__link-modal {
 		z-index: 2;
 		top: $blocks-button__height + 2px;
-		left: 50%;
-		transform: translateX( -50% );
 	}
 
 	.blocks-link-url__suggestions {
