@@ -140,7 +140,7 @@ export function getUnknownTypeHandlerName() {
  *
  * @param {string} name Block name
  */
-export function setDefaultBlock( name ) {
+export function setDefaultBlockName( name ) {
 	defaultBlockName = name;
 }
 
@@ -149,7 +149,7 @@ export function setDefaultBlock( name ) {
  *
  * @return {?string} Blog name
  */
-export function getDefaultBlock() {
+export function getDefaultBlockName() {
 	return defaultBlockName;
 }
 

@@ -14,8 +14,8 @@ export {
 	unregisterBlockType,
 	setUnknownTypeHandlerName,
 	getUnknownTypeHandlerName,
-	setDefaultBlock,
-	getDefaultBlock,
+	setDefaultBlockName,
+	getDefaultBlockName,
 	getBlockType,
 	getBlockTypes,
 } from './registration';

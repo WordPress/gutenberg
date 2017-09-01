@@ -10,7 +10,7 @@ import { throttle, reduce, noop } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { serialize, getDefaultBlock, createBlock } from '@wordpress/blocks';
+import { serialize, getDefaultBlockName, createBlock } from '@wordpress/blocks';
 import { IconButton } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
 
@@ -195,7 +195,7 @@ class VisualEditorBlockList extends Component {
 	}
 
 	appendDefaultBlock() {
-		const newBlock = createBlock( getDefaultBlock() );
+		const newBlock = createBlock( getDefaultBlockName() );
 		this.props.onInsertBlock( newBlock );
 	}
 
