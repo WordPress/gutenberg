@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { IconButton, FormToggle, Popover, Toolbar, withSpokenMessages } from '@wordpress/components';
+import { IconButton, Toolbar, withSpokenMessages } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
 
 /**
@@ -12,6 +12,7 @@ import { keycodes } from '@wordpress/utils';
 import './style.scss';
 import UrlInput from '../../url-input';
 import { filterURLForDisplay } from '../../../editor/utils/url';
+import ToggleControl from '../../inspector-controls/toggle-control';
 
 const { ESCAPE } = keycodes;
 
@@ -147,20 +148,13 @@ class FormatToolbar extends Component {
 			} ) );
 
 		// TODO: make this not look hideous
-		const linkSettings = (
-			<IconButton icon="admin-generic" onClick={ this.toggleLinkSettingsVisibility } >
-				<Popover
-					isOpen={ settingsVisible }
-					onClick={ ( event ) => event.stopPropagation() } >
-					<fieldset>
-						<label htmlFor="link-settings-open-in-new-window">{ __( 'Open in new window' ) }</label>
-						<FormToggle
-							id="link-settings-open-in-new-window"
-							checked={ opensInNewWindow }
-							onChange={ this.setLinkTarget } />
-					</fieldset>
-				</Popover>
-			</IconButton>
+		const linkSettings = settingsVisible && (
+			<fieldset>
+				<ToggleControl
+					label={ __( 'Open in new window' ) }
+					checked={ opensInNewWindow }
+					onChange={ this.setLinkTarget } />
+			</fieldset>
 		);
 
 		if ( enabledControls.indexOf( 'link' ) !== -1 ) {
@@ -184,6 +178,7 @@ class FormatToolbar extends Component {
 						<UrlInput value={ newLinkValue } onChange={ this.onChangeLinkValue } />
 						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
 						<IconButton icon="editor-unlink" label={ __( 'Remove link' ) } onClick={ this.dropLink } />
+						<IconButton icon="admin-generic" onClick={ this.toggleLinkSettingsVisibility } />
 						{ linkSettings }
 					</form>
 				}
@@ -199,6 +194,7 @@ class FormatToolbar extends Component {
 						</a>
 						<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ this.editLink } />
 						<IconButton icon="editor-unlink" label={ __( 'Remove link' ) } onClick={ this.dropLink } />
+						<IconButton icon="admin-generic" onClick={ this.toggleLinkSettingsVisibility } />
 						{ linkSettings }
 					</div>
 				}
