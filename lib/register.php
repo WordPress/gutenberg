@@ -73,8 +73,16 @@ function gutenberg_add_edit_links_filters() {
 	add_filter( 'page_row_actions', 'gutenberg_add_edit_links', 10, 2 );
 	// For non-hierarchical post types.
 	add_filter( 'post_row_actions', 'gutenberg_add_edit_links', 10, 2 );
+
 }
-add_action( 'admin_init', 'gutenberg_add_edit_links_filters' );
+add_action( 'init', 'gutenberg_add_edit_links_filters' );
+
+function load_blocks_rest_api() {
+	error_log('load_blocks_rest_api');
+	$controller = new WP_Gutenberg_Block_Controller;
+	$controller->register_routes();
+}
+add_action( 'init', 'load_blocks_rest_api' );
 
 /**
  * Registers additional links in the post/page screens to edit any post/page in
