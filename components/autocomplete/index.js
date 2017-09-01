@@ -7,13 +7,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import './style.scss';
 import { Children, Component, cloneElement } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
+import './style.scss';
 import Button from '../button';
 
 const { ENTER, ESCAPE, UP, DOWN } = keycodes;
