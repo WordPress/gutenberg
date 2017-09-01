@@ -35,4 +35,4 @@ foreach ( glob( dirname( dirname( __FILE__ ) ) . '/blocks/library/*/index.php' )
 	require_once $block_logic;
 }
 
-echo json_encode( $attributes, JSON_PRETTY_PRINT );
+echo json_encode( $attributes );
