@@ -115,7 +115,6 @@ class HierarchicalTermSelector extends Component {
 					adding: false,
 					formName: '',
 					formParent: '',
-					showForm: true,
 					availableTerms: newAvailableTerms,
 					availableTermsTree: this.buildTermsTree( newAvailableTerms ),
 				} );
