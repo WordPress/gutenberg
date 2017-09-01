@@ -98,18 +98,13 @@ class Autocomplete extends Component {
 	}
 
 	search( event ) {
-		const { triggerPrefix, onlyEmpty } = this.props;
+		const { triggerPrefix } = this.props;
 		const { isOpen } = this.state;
 
 		const value = event.target.textContent;
 
-		// Allow pattern at word boundary if not testing only empty
-		let pattern = '';
-		if ( onlyEmpty ) {
-			pattern += '^';
-		} else {
-			pattern += '\\b';
-		}
+		// Currently search supports only if input's entire value is match
+		let pattern = '^';
 
 		if ( triggerPrefix ) {
 			// Trigger prefix may contain reserved characters of a regular
@@ -118,11 +113,7 @@ class Autocomplete extends Component {
 		}
 
 		// Create matching group for the search value
-		pattern += '([^\\b]*)';
-
-		if ( onlyEmpty ) {
-			pattern += '$';
-		}
+		pattern += '([^\\s]*)$';
 
 		pattern = new RegExp( pattern );
 
