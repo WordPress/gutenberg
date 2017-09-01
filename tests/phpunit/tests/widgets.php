@@ -679,6 +679,17 @@ class Tests_Widgets extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that no 'Undefined index' exception is thrown when trying to
+	 * display an unregistered widget.
+	 *
+	 * @see \the_widget()
+	 */
+	function test_the_widget_with_unregistered_widget() {
+		$this->setExpectedIncorrectUsage( 'the_widget' );
+		the_widget( 'Widget_Class' );
+	}
+
+	/**
 	 * Register nav menu sidebars.
 	 *
 	 * @param array $sidebars Sidebar slugs.
