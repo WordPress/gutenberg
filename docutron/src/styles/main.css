@@ -162,8 +162,11 @@ code[class*="language-"],pre[class*="language-"]{direction:ltr;text-align:left;w
 	border-radius: 0 30px 30px 0;
 }
 
-.components-code-tab:focus {
+.components-code-tab:focus,
+.components-code-tab.is-active:focus {
 	outline: none;
+	border: 1px solid #222;
+	box-shadow: none;
 }
 
 .components-code-tab.is-active {
