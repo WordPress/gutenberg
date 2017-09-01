@@ -22,7 +22,7 @@ class Autocomplete extends Component {
 	static getInitialState() {
 		return {
 			isOpen: false,
-			search: /.*/i,
+			search: /.*/,
 			selectedIndex: 0,
 			position: {},
 		};
