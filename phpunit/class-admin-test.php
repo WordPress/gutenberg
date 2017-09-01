@@ -176,4 +176,19 @@ class Admin_Test extends WP_UnitTestCase {
 		$this->assertTrue( gutenberg_post_has_blocks( self::$post_with_blocks ) );
 		$this->assertFalse( gutenberg_post_has_blocks( self::$post_without_blocks ) );
 	}
+
+	/**
+	 * Tests gutenberg_add_gutenberg_post_state().
+	 *
+	 * @covers gutenberg_add_gutenberg_post_state
+	 */
+	function test_add_gutenberg_post_state() {
+		// With blocks.
+		$post_states = apply_filters( 'display_post_states', array(), get_post( self::$post_with_blocks ) );
+		$this->assertEquals( array( 'Gutenberg' ), $post_states );
+
+		// Without blocks.
+		$post_states = apply_filters( 'display_post_states', array(), get_post( self::$post_without_blocks ) );
+		$this->assertEquals( array(), $post_states );
+	}
 }

@@ -265,3 +265,19 @@ function gutenberg_post_has_blocks( $post_id ) {
 	$post = get_post( $post_id );
 	return $post && strpos( $post->post_content, '<!-- wp:' ) !== false;
 }
+
+/**
+ * Adds a "Gutenberg" post state for post tables, if the post contains blocks.
+ *
+ * @param  array   $post_states An array of post display states.
+ * @param  WP_Post $post        The current post object.
+ * @return array                A filtered array of post display states.
+ */
+function gutenberg_add_gutenberg_post_state( $post_states, $post ) {
+	if ( gutenberg_post_has_blocks( $post->ID ) ) {
+		$post_states[] = 'Gutenberg';
+	}
+
+	return $post_states;
+}
+add_filter( 'display_post_states', 'gutenberg_add_gutenberg_post_state', 10, 2 );
