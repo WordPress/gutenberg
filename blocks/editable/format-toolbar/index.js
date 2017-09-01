@@ -149,7 +149,7 @@ class FormatToolbar extends Component {
 
 		// TODO: make this not look hideous
 		const linkSettings = settingsVisible && (
-			<fieldset>
+			<fieldset className="blocks-format-toolbar__link-settings">
 				<ToggleControl
 					label={ __( 'Open in new window' ) }
 					checked={ opensInNewWindow }
