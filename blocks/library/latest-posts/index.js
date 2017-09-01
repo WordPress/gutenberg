@@ -36,28 +36,6 @@ registerBlockType( 'core/latest-posts', {
 
 	keywords: [ __( 'recent posts' ) ],
 
-	attributes: {
-		postsToShow: {
-			type: 'number',
-			default: 5,
-		},
-		displayPostDate: {
-			type: 'boolean',
-			default: false,
-		},
-		layout: {
-			type: 'string',
-			default: 'list',
-		},
-		columns: {
-			type: 'number',
-			default: 3,
-		},
-		align: {
-			type: 'string',
-		},
-	},
-
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
 		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {

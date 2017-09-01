@@ -34,6 +34,7 @@ describe( 'blocks', () => {
 		} );
 		setUnknownTypeHandlerName( undefined );
 		setDefaultBlockName( undefined );
+		window._wpBlocksAttributes = {};
 		console.error = error;
 	} );
 
@@ -107,6 +108,23 @@ describe( 'blocks', () => {
 				block = registerBlockType( 'my-plugin/fancy-block-9', blockType );
 			expect( console.error ).toHaveBeenCalledWith( 'The block "my-plugin/fancy-block-9" must have a registered category.' );
 			expect( block ).toBeUndefined();
+		} );
+
+		it( 'should default to browser-initialized global attributes', () => {
+			const attributes = { ok: { type: 'boolean' } };
+			window._wpBlocksAttributes = {
+				'core/test-block-with-attributes': attributes,
+			};
+
+			const blockType = { settingName: 'settingValue', save: noop, category: 'common' };
+			registerBlockType( 'core/test-block-with-attributes', blockType );
+			expect( getBlockType( 'core/test-block-with-attributes' ) ).toEqual( {
+				name: 'core/test-block-with-attributes',
+				settingName: 'settingValue',
+				save: noop,
+				category: 'common',
+				attributes,
+			} );
 		} );
 
 		it( 'should store a copy of block type', () => {
