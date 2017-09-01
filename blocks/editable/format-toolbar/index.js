@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { IconButton, Toolbar, withSpokenMessages } from '@wordpress/components';
+import { IconButton, FormToggle, Popover, Toolbar, withSpokenMessages } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
 
 /**
@@ -106,7 +106,7 @@ class FormatToolbar extends Component {
 	setLinkTarget( event ) {
 		const opensInNewWindow = event.target.checked;
 		this.setState( { opensInNewWindow } );
-		this.props.onChange( { link: { value: this.props.formats.link.value, target: opensInNewWindow ? '_blank' : undefined } } );
+		this.props.onChange( { link: { value: this.props.formats.link.value, target: opensInNewWindow ? '_blank' : '' } } );
 	}
 
 	addLink() {
@@ -125,7 +125,8 @@ class FormatToolbar extends Component {
 
 	submitLink( event ) {
 		event.preventDefault();
-		this.props.onChange( { link: { value: this.state.newLinkValue, target: this.state.opensInNewWindow ? '_blank' : undefined } } );
+		console.log('submitting');
+		this.props.onChange( { link: { value: this.state.newLinkValue, target: this.state.opensInNewWindow ? '_blank' : '' } } );
 		if ( this.state.isAddingLink ) {
 			this.props.speak( __( 'Link inserted.' ), 'assertive' );
 		}
@@ -147,10 +148,20 @@ class FormatToolbar extends Component {
 			} ) );
 
 		// TODO: make this not look hideous
-		const linkSettings = settingsVisible && (
-			<div>
-				{ __( 'Open in new window' ) }: <input type="checkbox" checked={ opensInNewWindow } label={ __( 'Open in new window' ) } onChange={ this.setLinkTarget } />
-			</div>
+		const linkSettings = (
+			<IconButton icon="admin-generic" onClick={ this.toggleLinkSettingsVisibility } >
+				<Popover
+					isOpen={ settingsVisible }
+					onClick={ ( event ) => event.stopPropagation() } >
+					<fieldset>
+						<label htmlFor="link-settings-open-in-new-window">{ __( 'Open in new window' ) }</label>
+						<FormToggle
+							id="link-settings-open-in-new-window"
+							checked={ opensInNewWindow }
+							onChange={ this.setLinkTarget } />
+					</fieldset>
+				</Popover>
+			</IconButton>
 		);
 
 		if ( enabledControls.indexOf( 'link' ) !== -1 ) {
@@ -174,7 +185,6 @@ class FormatToolbar extends Component {
 						<UrlInput value={ newLinkValue } onChange={ this.onChangeLinkValue } />
 						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
 						<IconButton icon="editor-unlink" label={ __( 'Remove link' ) } onClick={ this.dropLink } />
-						<IconButton icon="admin-generic" onClick={ this.toggleLinkSettingsVisibility } />
 						{ linkSettings }
 					</form>
 				}
@@ -190,7 +200,6 @@ class FormatToolbar extends Component {
 						</a>
 						<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ this.editLink } />
 						<IconButton icon="editor-unlink" label={ __( 'Remove link' ) } onClick={ this.dropLink } />
-						<IconButton icon="admin-generic" onClick={ this.toggleLinkSettingsVisibility } />
 						{ linkSettings }
 					</div>
 				}
