@@ -74,11 +74,12 @@ code, pre {
 	font-size: 40px;
 	color: #444;
 	font-family: 'Noto Serif';
-	border-bottom: 2px solid #00B975;
+	border-bottom: 2px solid transparent;
 }
 
 .site-header .site-title a:hover {
 	color: #111;
+	border-color: #00B975;
 }
 
 .single-handbook #secondary {
