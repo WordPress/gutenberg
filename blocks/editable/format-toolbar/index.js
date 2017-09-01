@@ -125,7 +125,6 @@ class FormatToolbar extends Component {
 
 	submitLink( event ) {
 		event.preventDefault();
-		console.log('submitting');
 		this.props.onChange( { link: { value: this.state.newLinkValue, target: this.state.opensInNewWindow ? '_blank' : '' } } );
 		if ( this.state.isAddingLink ) {
 			this.props.speak( __( 'Link inserted.' ), 'assertive' );
