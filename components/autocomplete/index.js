@@ -108,7 +108,7 @@ class Autocomplete extends Component {
 		if ( onlyEmpty ) {
 			pattern += '^';
 		} else {
-			pattern += '\b';
+			pattern += '\\b';
 		}
 
 		if ( triggerPrefix ) {
@@ -118,7 +118,7 @@ class Autocomplete extends Component {
 		}
 
 		// Create matching group for the search value
-		pattern += '([^\b]*)';
+		pattern += '([^\\b]*)';
 
 		if ( onlyEmpty ) {
 			pattern += '$';
