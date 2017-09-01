@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import createSelector from 'rememo';
 import uuid from 'uuid/v4';
 import {
 	get,
@@ -9,12 +10,14 @@ import {
 	findIndex,
 	isObjectLike,
 	find,
+	filter,
 } from 'lodash';
 
 /**
  * Internal dependencies
  */
-import { getBlockType } from './registration';
+import { getBlockType, getBlockTypes, getUnknownTypeHandlerName } from './registration';
+import { getBlockAttributes } from './parser';
 
 /**
  * Returns a block object given its type and attributes.
@@ -51,6 +54,53 @@ export function createBlock( name, blockAttributes = {} ) {
 		isValid: true,
 		attributes,
 	};
+}
+
+const getBlockTypeTransforms = createSelector( ( blockTypes, type ) => {
+	return blockTypes.reduce( ( result, blockType ) => {
+		if ( blockType.transforms ) {
+			result = [
+				...result,
+				...filter( blockType.transforms.from, { type } )
+					.map( ( transform ) => [ blockType, transform ] ),
+			];
+		}
+
+		return result;
+	}, [] );
+} );
+
+export function createBlocksFromMarkup( html ) {
+	// Assign markup as body of sandboxed document
+	const doc = document.implementation.createHTMLDocument( '' );
+	doc.body.innerHTML = html;
+
+	const rawTransforms = getBlockTypeTransforms( getBlockTypes(), 'raw' );
+
+	// For each node in the document, check whether a block type with a raw
+	// transform matches the node
+	return [ ...doc.body.children ].map( ( node ) => {
+		for ( let i = 0; i < rawTransforms.length; i++ ) {
+			const [ blockType, transform ] = rawTransforms[ i ];
+			if ( ! transform.isMatch( node ) ) {
+				continue;
+			}
+
+			// Return with matched block, extracting attributes from the node
+			// as defined by the block attributes schema
+			return createBlock(
+				blockType.name,
+				transform.getAttributes
+					? transform.getAttributes( node )
+					: getBlockAttributes( blockType, node.outerHTML )
+			);
+		}
+
+		// Assuming no match, use fallback block handler
+		return createBlock( getUnknownTypeHandlerName(), {
+			content: node.outerHTML,
+		} );
+	} );
 }
 
 /**

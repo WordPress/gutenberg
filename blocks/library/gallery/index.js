@@ -30,6 +30,13 @@ const linkOptions = [
 	{ value: 'none', label: __( 'None' ) },
 ];
 
+/**
+ * Regular expression matching a gallery shortcode.
+ *
+ * @type {RegExp}
+ */
+const SHORTCODE_REGEXP = window.wp.shortcode.regexp( 'gallery' );
+
 function defaultColumnsNumber( attributes ) {
 	return Math.min( 3, attributes.images.length );
 }
@@ -65,6 +72,26 @@ registerBlockType( 'core/gallery', {
 			type: 'string',
 			default: 'none',
 		},
+	},
+
+	transforms: {
+		from: [
+			{
+				type: 'raw',
+				isMatch: ( node ) => SHORTCODE_REGEXP.test( node.textContent ),
+				getAttributes( node ) {
+					const { shortcode } = window.wp.shortcode.next( 'gallery', node.textContent );
+					let { ids } = shortcode.attrs.named;
+					if ( ! ids || ! ( ids = ids.trim() ) ) {
+						return {};
+					}
+
+					return {
+						images: ids.split( ',' ).map( ( id ) => ( { id } ) ),
+					};
+				},
+			},
+		],
 	},
 
 	getEditWrapperProps( attributes ) {

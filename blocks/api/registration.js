@@ -3,7 +3,8 @@
 /**
  * External dependencies
  */
-import { isFunction, some } from 'lodash';
+import { isFunction, some, omit } from 'lodash';
+import createSelector from 'rememo';
 
 /**
  * WordPress dependencies
@@ -15,7 +16,7 @@ import { getCategories } from './categories';
  *
  * @type {Object}
  */
-const blocks = {};
+let blocks = {};
 
 const categories = getCategories();
 
@@ -93,7 +94,7 @@ export function registerBlockType( name, settings ) {
 		return;
 	}
 	const block = Object.assign( { name }, settings );
-	blocks[ name ] = block;
+	blocks = { ...blocks, [ name ]: block };
 	return block;
 }
 
@@ -112,7 +113,7 @@ export function unregisterBlockType( name ) {
 		return;
 	}
 	const oldBlock = blocks[ name ];
-	delete blocks[ name ];
+	blocks = omit( blocks, name );
 	return oldBlock;
 }
 
@@ -163,11 +164,13 @@ export function getBlockType( name ) {
 	return blocks[ name ];
 }
 
+const _memoizedGetBlockTypes = createSelector( Object.values );
+
 /**
  * Returns all registered blocks.
  *
  * @return {Array} Block settings
  */
 export function getBlockTypes() {
-	return Object.values( blocks );
+	return _memoizedGetBlockTypes( blocks );
 }
