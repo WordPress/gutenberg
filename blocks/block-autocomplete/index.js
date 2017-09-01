@@ -43,7 +43,6 @@ class BlockAutocomplete extends Component {
 		return (
 			<Autocomplete
 				triggerPrefix="/"
-				onlyEmpty
 				options={ options }
 				onSelect={ this.onSelect }
 				className="blocks-block-autocomplete"
