@@ -13,11 +13,11 @@ edit() {
 }
 ```
 
-This function can return properties through an object argument.
+It receives the following properties through an object argument.
 
 ### attributes
 
-This property returns all the available attributes and their values, as described by the `attributes` property when the block type was registered. In this case, assuming we had defined an attribute of `content` during block registration, we would receive and use that value in our edit function:
+This property surfaces all the available attributes and their corresponding values, as described by the `attributes` property when the block type was registered. In this case, assuming we had defined an attribute of `content` during block registration, we would receive and use that value in our edit function:
 
 ```js
 // Defining the edit interface
@@ -67,7 +67,7 @@ This function allows you to update individual attributes for the block based on 
 // Defining the edit interface
 edit( { attributes, className, focus } ) {
 	// Simplify accessing attributes
-	{ content, mySetting } = attributes;
+	const { content, mySetting } = attributes;
 
 	// Toggle a setting when the user clicks the button
 	const toggleSetting = () => setAttributes( { mySetting: ! mySetting } );
