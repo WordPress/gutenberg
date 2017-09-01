@@ -891,3 +891,14 @@ export const getMostFrequentlyUsedBlocks = createSelector(
 	},
 	( state ) => state.preferences.blockUsage
 );
+
+/**
+ * Returns the reusable block with the given ID.
+ *
+ * @param {Object} state Global application state
+ * @param {String} ref   The reusable block's ID
+ * @return {Object}      The reusable block
+ */
+export function getReusableBlock( state, ref ) {
+	return state.reusableBlocks[ ref ];
+}

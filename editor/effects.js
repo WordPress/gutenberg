@@ -7,7 +7,7 @@ import { get, uniqueId } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { parse, getBlockType, switchToBlockType } from '@wordpress/blocks';
+import { parse, getBlockType, switchToBlockType, createBlock, serialize } from '@wordpress/blocks';
 import { addQueryArgs } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
 
@@ -36,6 +36,7 @@ import {
 	isEditedPostDirty,
 	isEditedPostNew,
 	isEditedPostSaveable,
+	getReusableBlock,
 } from './selectors';
 
 const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
@@ -309,6 +310,48 @@ export default {
 			() => {
 				// TODO: Do something with this error
 				dispatch( { type: 'FETCH_REUSABLE_BLOCK_FAILURE' } );
+			},
+		);
+	},
+	PERSIST_REUSABLE_BLOCK( action, store ) {
+		const { ref } = action;
+		const { getState, dispatch } = store;
+
+		/**
+		 * TODO:
+		 * Encapsulate this network request somewhere. It certainly doesn't belong in effects.js.
+		 * It'd be really nice if we could make it all a wp.api.ReusableBlock sort of thing.
+		 */
+
+		const { name, type, attributes } = getReusableBlock( getState(), ref );
+		const content = serialize( createBlock( type, attributes ) );
+
+		const baseUrl = `${ wpApiSettings.root }gutenberg/v1/reusable-blocks/${ ref }`;
+		const url = addQueryArgs( baseUrl, { _wpnonce: wpApiSettings.nonce } );
+
+		const request = new window.Request( url, {
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			credentials: 'include',
+			body: JSON.stringify( { name, content } ),
+		} );
+
+		function throwIfNotOk( response ) {
+			if ( ! response.ok ) {
+				throw new Error( response.statusText );
+			}
+			return response;
+		}
+
+		window.fetch( request ).then( throwIfNotOk ).then( response => response.json() ).then(
+			() => {
+				dispatch( { type: 'PERSIST_REUSABLE_BLOCK_SUCCESS' } );
+			},
+			() => {
+				// TODO: Do something with this error
+				dispatch( { type: 'PERSIST_REUSABLE_BLOCK_FAILURE' } );
 			},
 		);
 	},

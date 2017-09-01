@@ -14,6 +14,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { getBlockType, registerBlockType } from '../../api';
+import { NewReusableBlockDialog, PersistConfirmationDialog } from './dialogs';
 
 const PERSIST_CONFIRMATION_HIDE = 'hide';
 const PERSIST_CONFIRMATION_SHOW = 'show';
@@ -23,7 +24,9 @@ class ReusableBlockEdit extends Component {
 	constructor() {
 		super( ...arguments );
 
+		this.setName = this.setName.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
+		this.confirmPersist = this.confirmPersist.bind( this );
 
 		if ( this.props.reusableBlock ) {
 			this.state = { persistConfirmation: PERSIST_CONFIRMATION_DISABLE };
@@ -48,12 +51,12 @@ class ReusableBlockEdit extends Component {
 	}
 
 	confirmPersist() {
-		this.setState( { showPersistConfirmation: PERSIST_CONFIRMATION_DISABLE } );
+		this.setState( { persistConfirmation: PERSIST_CONFIRMATION_DISABLE } );
 		this.props.persistReusableBlock();
 	}
 
 	render() {
-		const { reusableBlock } = this.props;
+		const { reusableBlock, attachReusableBlock } = this.props;
 		const { persistConfirmation } = this.state;
 
 		if ( ! reusableBlock ) {
@@ -61,17 +64,11 @@ class ReusableBlockEdit extends Component {
 		}
 
 		if ( ! reusableBlock.name ) {
-			// return <CreateReusableBlockPrompt onCreate={ this.setName } onCancel={ this.attachReusableBlock } />
-			return <p>Please name this reusable block blah blah</p>;
+			return <NewReusableBlockDialog onCreate={ this.setName } onCancel={ attachReusableBlock } />;
 		}
 
 		if ( persistConfirmation === PERSIST_CONFIRMATION_SHOW ) {
-			// show prompt that asks for confirmation
-			// user can 'Edit across all instances' (persistReusableBlock)
-			// or 'Detach from Reusable Block' (detachReusableBlock)
-			// or 'Cancel' (idk actually...)
-			// return <PersistReusableBlockPrompt onPersist={ this.confirmPersist } onDetach={ this.detachReusableBlock } />
-			return <p>You are editing a reusable block blah blah</p>;
+			return <PersistConfirmationDialog onConfirm={ this.confirmPersist } onCancel={ attachReusableBlock } />;
 		}
 
 		const blockType = getBlockType( reusableBlock.type );
