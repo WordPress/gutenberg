@@ -123,13 +123,13 @@ const ConnectedReusableBlockEdit = connect(
 		attachReusableBlock() {
 			dispatch( {
 				type: 'ATTACH_REUSABLE_BLOCK',
-				ref: ownProps.attributes.ref,
+				uid: ownProps.id,
 			} );
 		},
 		detachReusableBlock() {
 			dispatch( {
 				type: 'DETACH_REUSABLE_BLOCK',
-				ref: ownProps.attributes.ref,
+				uid: ownProps.id,
 			} );
 		},
 	} )

@@ -36,6 +36,7 @@ import {
 	isEditedPostDirty,
 	isEditedPostNew,
 	isEditedPostSaveable,
+	getBlock,
 	getReusableBlock,
 } from './selectors';
 
@@ -354,5 +355,13 @@ export default {
 				dispatch( { type: 'PERSIST_REUSABLE_BLOCK_FAILURE' } );
 			},
 		);
+	},
+	ATTACH_REUSABLE_BLOCK( action, store ) {
+		const { getState, dispatch } = store;
+
+		const oldBlock = getBlock( getState(), action.uid );
+		const reusableBlock = getReusableBlock( getState(), oldBlock.attributes.ref );
+		const newBlock = createBlock( reusableBlock.type, reusableBlock.attributes );
+		dispatch( replaceBlocks( [ oldBlock.uid ], [ newBlock ] ) );
 	},
 };
