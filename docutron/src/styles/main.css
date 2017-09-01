@@ -24,6 +24,11 @@ a, a:visited, a:active, .entry-meta .entry-actions:hover a, .entry-meta .entry-a
 	padding: 6rem 0 6rem 6rem;
 }
 
+blockquote {
+	font-weight: 400;
+	padding: 0 1.5em 0;
+}
+
 code {
 	tab-size: 4;
 }
