@@ -105,5 +105,3 @@ save( { attributes } ) {
 	return <div>{ attributes.content }</div>;
 }
 ```
-
-Attributes that are not used in `save` are encoded within the comment delimiters used to recognize blocks.
