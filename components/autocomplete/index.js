@@ -32,11 +32,12 @@ class Autocomplete extends Component {
 		super( ...arguments );
 
 		this.bindNode = this.bindNode.bind( this );
-		this.search = this.search.bind( this );
-		this.reset = this.reset.bind( this );
-		this.setSelectedIndex = this.setSelectedIndex.bind( this );
-		this.onBlur = this.onBlur.bind( this );
 		this.reposition = this.reposition.bind( this );
+		this.select = this.select.bind( this );
+		this.reset = this.reset.bind( this );
+		this.onBlur = this.onBlur.bind( this );
+		this.search = this.search.bind( this );
+		this.setSelectedIndex = this.setSelectedIndex.bind( this );
 
 		this.state = this.constructor.getInitialState();
 	}
@@ -59,6 +60,10 @@ class Autocomplete extends Component {
 		window.cancelAnimationFrame( this.pendingReposition );
 	}
 
+	bindNode( node ) {
+		this.node = node;
+	}
+
 	reposition() {
 		this.pendingReposition = window.requestAnimationFrame( () => {
 			this.setState( {
@@ -67,8 +72,14 @@ class Autocomplete extends Component {
 		} );
 	}
 
-	bindNode( node ) {
-		this.node = node;
+	select( option ) {
+		const { onSelect } = this.props;
+
+		this.reset();
+
+		if ( onSelect ) {
+			onSelect( option );
+		}
 	}
 
 	reset() {
@@ -179,7 +190,6 @@ class Autocomplete extends Component {
 			return;
 		}
 
-		const { onSelect } = this.props;
 		const options = this.getFilteredOptions();
 
 		let nextSelectedIndex;
@@ -199,8 +209,7 @@ class Autocomplete extends Component {
 				break;
 
 			case ENTER:
-				this.reset();
-				onSelect( options[ selectedIndex ] );
+				this.select( options[ selectedIndex ] );
 				break;
 
 			default:
@@ -214,7 +223,7 @@ class Autocomplete extends Component {
 	}
 
 	render() {
-		const { children, onSelect, className } = this.props;
+		const { children, className } = this.props;
 		const { position, isOpen, selectedIndex } = this.state;
 		const classes = classnames( 'components-autocomplete', className );
 
@@ -244,7 +253,7 @@ class Autocomplete extends Component {
 									'is-selected': index === selectedIndex,
 								} ) }
 							>
-								<Button onClick={ () => onSelect( option ) }>
+								<Button onClick={ () => this.select( option ) }>
 									{ option.label }
 								</Button>
 							</li>
