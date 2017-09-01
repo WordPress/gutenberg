@@ -147,7 +147,6 @@ class FormatToolbar extends Component {
 				isActive: !! formats[ control.format ],
 			} ) );
 
-		// TODO: make this not look hideous
 		const linkSettings = settingsVisible && (
 			<fieldset className="blocks-format-toolbar__link-settings">
 				<ToggleControl
