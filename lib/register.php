@@ -146,52 +146,50 @@ add_action( 'admin_init', 'gutenberg_add_edit_links_filters' );
  * @return array          Updated post actions.
  */
 function gutenberg_add_edit_links( $actions, $post ) {
-	if ( ! gutenberg_can_edit_post( $post->ID ) || ! post_type_supports( $post->post_type, 'editor' ) ||
+	if ( ! gutenberg_can_edit_post( $post->ID ) ||
+			'trash' === $post->post_status ||
+			! post_type_supports( $post->post_type, 'editor' ) ||
 			! apply_filters( 'gutenberg_add_edit_link_for_post_type', true, $post->post_type, $post ) ) {
 		return $actions;
 	}
 
-	$title = _draft_or_post_title( $post->ID );
-	$post_type = get_post_type( $post );
-
 	if ( gutenberg_post_has_blocks( $post->ID ) ) {
-		$text = __( 'Classic Editor', 'gutenberg' );
-		/* translators: %s: post title */
-		$label = __( 'Edit &#8220;%s&#8221; in the classic editor', 'gutenberg' );
-
 		remove_filter( 'get_edit_post_link', 'gutenberg_filter_edit_post_link', 10 );
-		$edit_url = get_edit_post_link( $post->ID, 'raw' );
 		add_filter( 'get_edit_post_link', 'gutenberg_filter_edit_post_link', 10, 3 );
-		$link_class = 'gutenberg';
-	} else {
-		$text = __( 'Gutenberg', 'gutenberg' );
-		/* translators: %s: post title */
-		$label = __( 'Edit &#8220;%s&#8221; in the Gutenberg editor', 'gutenberg' );
-		$edit_url = gutenberg_get_edit_post_url( $post->ID );
-		$link_class = 'classic';
 	}
 
-	if ( 'trash' !== $post->post_status ) {
-		// Build the Gutenberg edit action. See also: WP_Posts_List_Table::handle_row_actions().
-		$gutenberg_action = sprintf(
+	// Build the new edit actions. See also: WP_Posts_List_Table::handle_row_actions().
+	$title = _draft_or_post_title( $post->ID );
+	$edit_actions = array(
+		'classic hide-if-no-js' => sprintf(
 			'<a href="%s" aria-label="%s">%s</a>',
-			esc_url( $edit_url ),
+			esc_url( get_edit_post_link( $post->ID, 'raw' ) ),
 			esc_attr( sprintf(
-				$label,
+				/* translators: %s: post title */
+				__( 'Edit &#8220;%s&#8221; in the classic editor', 'gutenberg' ),
 				$title
 			) ),
-			$text
-		);
-		// Insert the Gutenberg action immediately after the Edit action.
-		$edit_offset = array_search( 'edit', array_keys( $actions ), true );
-		$actions = array_merge(
-			array_slice( $actions, 0, $edit_offset + 1 ),
-			array(
-				"$link_class hide-if-no-js" => $gutenberg_action,
-			),
-			array_slice( $actions, $edit_offset + 1 )
-		);
-	}
+			__( 'Classic Editor', 'gutenberg' )
+		),
+		'gutenberg hide-if-no-js' => sprintf(
+			'<a href="%s" aria-label="%s">%s</a>',
+			esc_url( gutenberg_get_edit_post_url( $post->ID ) ),
+			esc_attr( sprintf(
+				/* translators: %s: post title */
+				__( 'Edit &#8220;%s&#8221; in the Gutenberg editor', 'gutenberg' ),
+				$title
+			) ),
+			__( 'Gutenberg', 'gutenberg' )
+		),
+	);
+
+	// Insert the new actions in place of the Edit action.
+	$edit_offset = array_search( 'edit', array_keys( $actions ), true );
+	$actions = array_merge(
+		array_slice( $actions, 0, $edit_offset ),
+		$edit_actions,
+		array_slice( $actions, $edit_offset + 1 )
+	);
 
 	return $actions;
 }
