@@ -19,6 +19,7 @@ if ( gutenberg_can_init() ) {
 	require_once dirname( __FILE__ ) . '/lib/class-wp-block-type.php';
 	require_once dirname( __FILE__ ) . '/lib/class-wp-block-type-registry.php';
 	require_once dirname( __FILE__ ) . '/lib/blocks.php';
+	require_once dirname( __FILE__ ) . '/lib/class-wp-rest-gutenberg-blocks.php';
 	require_once dirname( __FILE__ ) . '/lib/client-assets.php';
 	require_once dirname( __FILE__ ) . '/lib/compat.php';
 	require_once dirname( __FILE__ ) . '/lib/i18n.php';
