@@ -1,6 +1,6 @@
 # Block API
 
-Blocks are the fundamntal element of the Gutenberg editor. They are the primary way in which plugins and themes can register their own functionality and extend the capabilities of the editor. This document covers the main properties of block registration.
+Blocks are the fundamental element of the Gutenberg editor. They are the primary way in which plugins and themes can register their own functionality and extend the capabilities of the editor. This document covers the main properties of block registration.
 
 ## Register Block Type
 
@@ -39,7 +39,7 @@ category: 'widgets',
 
 #### Icon
 
-An icon property should be specififed to make it easier to identify a block. These can be any of [WordPress' Dashicons](https://developer.wordpress.org/resource/dashicons/), or a custom `svg` element.
+An icon property should be specified to make it easier to identify a block. These can be any of [WordPress' Dashicons](https://developer.wordpress.org/resource/dashicons/), or a custom `svg` element.
 
 ```js
 // Specifying a dashicon for the block
@@ -62,7 +62,6 @@ Attributes provide the structured data needs of a block. They can exist in diffe
 ```js
 // Specifying my block attributes
 attributes: {
-	// Cover image for the book, corresponds to the image src.
 	cover: {
 		type: 'string',
 		source: attr( 'img', 'src' ),
@@ -71,7 +70,6 @@ attributes: {
 		type: 'string',
 		source: children( '.book-author' ),
 	},
-	// This is encoded in the HTML comments of the block and is nto present
 	pages: {
 		type: 'number',
 	},
@@ -95,5 +93,5 @@ className: false,
 
 ## Edit and Save
 
-The `edit` and `save` functions define the editor interface with wich a user would interact, and the markup to be serialized back when a post is saved. They are the heart of how a block operates, so we'll cover them separately.
+The `edit` and `save` functions define the editor interface with which a user would interact, and the markup to be serialized back when a post is saved. They are the heart of how a block operates, so we'll cover them separately.
 
