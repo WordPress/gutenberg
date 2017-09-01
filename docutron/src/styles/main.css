@@ -1,5 +1,15 @@
 body {
 	margin: 0;
+	color: #454948;
+	line-height: 1.8;
+}
+
+p {
+	line-height: 1.8;
+}
+
+a, a:visited, a:active, .entry-meta .entry-actions:hover a, .entry-meta .entry-actions:hover a:visited, .comment-meta .comment-actions:hover a, .comment-meta .comment-actions:hover a:visited, #help dt, #media-buttons .button, .responsive-link, a:visited, #wporg-footer ul li a:visited {
+	color: #00B975;
 }
 
 #secondary {
@@ -12,11 +22,22 @@ code {
 
 :not(pre) > code[class*="language-"],
 pre[class*="language-"] {
-	background-color: #f7f7f7 !important;
+	background-color: #f8f8f8 !important;
+	font-size: 13px;
+	padding: 30px 30px;
+	margin: 10px 0 40px;
+}
+
+
+code[class*="language-"], pre[class*="language-"],
+code, pre {
+	font-size: 13px;
+	font-family: 'Roboto Mono';
+	text-shadow: none;
 }
 
 .components-code-tab {
-	border-radius: 0;
+	border-radius: 3px;
 }
 
 .components-code-tab.is-active {
@@ -26,4 +47,80 @@ pre[class*="language-"] {
 
 .widget_search {
 	background: transparent;
+}
+
+.site-header {
+	background: #fff;
+	padding: 140px 0;
+	text-align: center;
+	border-bottom: 1px solid #eee;
+}
+
+.site-header .site-title a {
+	font-size: 40px;
+	color: #444;
+	font-family: 'Noto Serif';
+	border-bottom: 2px solid #00B975;
+}
+
+.site-header .site-title a:hover {
+	color: #111;
+}
+
+.single-handbook #secondary {
+	background: #EDF3F1;
+}
+
+.single-handbook #page {
+	background: linear-gradient(to right, #EDF3F1 40%, #fff 40%);
+}
+
+.menu-table-of-contents-container {
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.menu-table-of-contents-container ul a {
+	color: #47504D;
+}
+
+.menu-table-of-contents-container ul ul a {
+	font-size: 12px;
+	font-weight: 400;
+	border-left: 2px solid transparent;
+}
+
+#secondary .menu-table-of-contents-container ul li {
+	border: none;
+}
+
+#secondary .menu-table-of-contents-container ul ul {
+	border-left: none;
+}
+
+.menu-table-of-contents-container ul a:hover {
+	background: transparent;
+	border-left-color: #00B975;
+	color: #00B975;
+}
+
+.markdownIt-Anchor {
+	opacity: 0.2;
+}
+
+.widget-title {
+	display: none;
+}
+
+.widget_search input[type="search"] {
+	border: none;
+	border-radius: 40px;
+	font-size: 13px !important;
+	padding: 8px 20px;
+	border: 1px solid transparent;
+}
+
+.widget_search input[type="search"]:focus {
+	outline: none;
+	border: 1px solid #00B975;
 }

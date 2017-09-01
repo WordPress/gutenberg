@@ -8,7 +8,7 @@ const header = (
 		<div className="site-branding">
 			<p className="site-title">
 				<a href="/" rel="home">
-					Gutenberg Editor
+					Gutenberg Docs
 				</a>
 			</p>
 		</div>
