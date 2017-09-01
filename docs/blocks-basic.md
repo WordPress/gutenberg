@@ -4,7 +4,7 @@ To keep things simple for our first example, let's create a new block type which
 
 Blocks containing static content are implemented entirely in JavaScript using the `registerBlockType` function. This function is responsible for specifying the blueprint of a block, describing the behaviors necessary for the editor to understand how it appears, changes when edited, and is ultimately saved in the post's content.
 
-## Enqueueing Block Scripts
+## Enqueuing Block Scripts
 
 While the block type itself is implemented in JavaScript, you'll need to use the `enqueue_block_editor_assets` [WordPress action](https://codex.wordpress.org/Glossary#Action) to have your scripts included in the editor. This is similar to the [`wp_enqueue_scripts` action](https://developer.wordpress.org/reference/hooks/wp_enqueue_scripts/), but specifically targeting editor scripts and styles.
 
