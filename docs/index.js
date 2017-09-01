@@ -17,6 +17,12 @@ addStory( {
 } );
 
 addStory( {
+	name: 'block-edit-save',
+	title: 'Edit and Save',
+	markdown: require( './block-edit-save.md' ),
+} );
+
+addStory( {
 	name: 'blocks',
 	title: 'Creating Block Types',
 	markdown: require( './blocks.md' ),
