@@ -84,7 +84,7 @@ class VisualEditor extends Component {
 		return (
 			<div
 				role="region"
-				aria-label={ __( 'Editor visual mode' ) }
+				aria-label={ __( 'Editor content' ) }
 				className="editor-visual-editor"
 				onMouseDown={ this.onClick }
 				onTouchStart={ this.onClick }

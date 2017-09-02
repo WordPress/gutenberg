@@ -52,7 +52,7 @@ class TextEditor extends Component {
 		return (
 			<div
 				role="region"
-				aria-label={ __( 'Editor text mode' ) }
+				aria-label={ __( 'Editor content' ) }
 				className="editor-text-editor"
 			>
 				<div className="editor-text-editor__formatting">

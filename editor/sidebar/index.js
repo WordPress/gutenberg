@@ -20,7 +20,7 @@ import { getActivePanel } from '../selectors';
 
 const Sidebar = ( { panel } ) => {
 	return (
-		<div className="editor-sidebar" role="region" aria-label={ __( 'Editor settings sidebar' ) }>
+		<div className="editor-sidebar" role="region" aria-label={ __( 'Editor settings' ) }>
 			<Header />
 			{ panel === 'document' && <PostSettings /> }
 			{ panel === 'block' && <BlockInspector /> }
