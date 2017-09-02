@@ -111,22 +111,8 @@ class WP_Gutenberg_Block_Controller extends WP_REST_Controller {
 			}
 
 			// Parse the blocks from post content.
-			$content = $post->post_content;
-			$blocks  = gutenberg_parse_blocks( $content );
+			$data = $this->get_block_data_from_content( $post->post_content );
 
-			$data = array();
-			foreach ( $blocks->data as $block ) {
-				$block_name  = isset( $block['blockName'] ) ? $block['blockName'] : null;
-				$attributes  = is_array( $block['attrs'] ) ? $block['attrs'] : array();
-				$raw_content = isset( $block['rawContent'] ) ? $block['rawContent'] : null;
-				if ( $block_name ) {
-					$block_type = $registry->get_registered( $block_name );
-					if ( null !== $block_type ) {
-						$block['renderedContent'] = $block_type->render( $attributes, $raw_content );
-					}
-				}
-				$data[] = $block;
-			}
 			$posts[] = $data;
 		}
 		$response = rest_ensure_response( $posts );
@@ -196,22 +182,7 @@ class WP_Gutenberg_Block_Controller extends WP_REST_Controller {
 			return $post;
 		}
 
-		$blocks   = $this->prepare_item_for_response( $post, $request );
-		$registry = WP_Block_Type_Registry::get_instance();
-
-		$data = array();
-		foreach ( $blocks->data as $block ) {
-			$block_name  = isset( $block['blockName'] ) ? $block['blockName'] : null;
-			$attributes  = is_array( $block['attrs'] ) ? $block['attrs'] : array();
-			$raw_content = isset( $block['rawContent'] ) ? $block['rawContent'] : null;
-			if ( $block_name ) {
-				$block_type = $registry->get_registered( $block_name );
-				if ( null !== $block_type ) {
-					$block['renderedContent'] = $block_type->render( $attributes, $raw_content );
-				}
-			}
-			$data[] = $block;
-		}
+		$data = $this->get_block_data_from_content( $post->post_content );
 
 		$response = rest_ensure_response( $data );
 
@@ -299,49 +270,6 @@ class WP_Gutenberg_Block_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Prepares a single post output for response.
-	 *
-	 * @since 1.1.0
-	 *
-	 * @param WP_Post         $post    Post object.
-	 * @param WP_REST_Request $request Request object.
-	 *
-	 * @return WP_REST_Response Response object.
-	 */
-	public function prepare_item_for_response( $post, $request ) {
-		$GLOBALS['post'] = $post;
-
-		setup_postdata( $post );
-
-		$schema = $this->get_item_schema();
-
-		// Base fields for every post.
-		$data = array();
-
-		if ( ! empty( $schema['properties']['id'] ) ) {
-			$data['id'] = $post->ID;
-		}
-
-		// Parse the blocks from post content.
-		$content = $post->post_content;
-		$data    = gutenberg_parse_blocks( $content );
-
-		// Wrap the data in a response object.
-		$response = rest_ensure_response( $data );
-
-		/**
-		 * Filters the post data for a response.
-		 *
-		 * @since 1.1.0
-		 *
-		 * @param WP_REST_Response $response The response object.
-		 * @param WP_Post          $post     Post object.
-		 * @param WP_REST_Request  $request  Request object.
-		 */
-		return apply_filters( "rest_prepare_blocks", $response, $post, $request );
-	}
-
-	/**
 	 * Retrieves the post's schema, conforming to JSON Schema.
 	 *
 	 * @since 1.1.0
@@ -412,5 +340,35 @@ class WP_Gutenberg_Block_Controller extends WP_REST_Controller {
 		 * @param WP_Post_Type $post_type    Post type object.
 		 */
 		return apply_filters( "rest_blocks_collection_params", $query_params, $post_type );
+	}
+
+	/**
+	 * Extract the blocks from post content.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string The post content.
+	 *
+	 * @return array Array of block data.
+	 */
+	public function get_block_data_from_content( $content ) {
+		$registry = WP_Block_Type_Registry::get_instance();
+		$blocks   = gutenberg_parse_blocks( $content );
+		$data     = array();
+
+		// Loop thru the blocks, adding rendered content when available.
+		foreach ( $blocks as $block ) {
+			$block_name  = isset( $block['blockName'] ) ? $block['blockName'] : null;
+			$attributes  = is_array( $block['attrs'] ) ? $block['attrs'] : array();
+			$raw_content = isset( $block['rawContent'] ) ? $block['rawContent'] : null;
+			if ( $block_name ) {
+				$block_type = $registry->get_registered( $block_name );
+				if ( null !== $block_type ) {
+					$block['renderedContent'] = $block_type->render( $attributes, $raw_content );
+				}
+			}
+			$data[] = $block;
+		}
+		return $data;
 	}
 }
