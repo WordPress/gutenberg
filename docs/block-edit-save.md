@@ -13,7 +13,9 @@ edit() {
 }
 ```
 
-It receives the following properties through an object argument.
+// Todo: for more advanced uses, `edit` can return a component with lifecycle.
+
+The function receives the following properties through an object argument.
 
 ### attributes
 
@@ -26,7 +28,7 @@ edit( { attributes } ) {
 }
 ```
 
-The value of `attributes.content` will be displayed inside the `div` when loading the editor.
+The value of `attributes.content` will be displayed inside the `div` when inserting the block in the editor.
 
 ### className
 
@@ -57,14 +59,14 @@ edit( { attributes, className, focus } ) {
 }
 ```
 
-### setAttribute
+### setAttributes
 
-This function allows you to update individual attributes for the block based on user interactions.
+This function allows the block to update individual attributes based on user interactions.
 
 ```js
 // Defining the edit interface
 edit( { attributes, className, focus } ) {
-	// Simplify accessing attributes
+	// Simplify access to attributes
 	const { content, mySetting } = attributes;
 
 	// Toggle a setting when the user clicks the button
@@ -101,7 +103,7 @@ This function can return a `null` value, in which case the block is considered t
 
 ### attributes
 
-It operates the same way as it does on `edit` and allows to save certain attributes directly to the markup, so they don't have to be computed on the server. This is how most static blocks are expected to work.
+It operates the same way as it does on `edit` and allows to save certain attributes directly to the markup, so they don't have to be computed on the server. This is how most _static_ blocks are expected to work.
 
 ```js
 // Defining the edit interface
