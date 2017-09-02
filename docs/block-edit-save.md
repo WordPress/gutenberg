@@ -57,8 +57,6 @@ edit( { attributes, className, focus } ) {
 }
 ```
 
-Expand on how to focus specific elements within the block...
-
 ### setAttribute
 
 This function allows you to update individual attributes for the block based on user interactions.
@@ -82,6 +80,10 @@ edit( { attributes, className, focus } ) {
 }
 ```
 
+### setFocus
+
+// Todo ...
+
 ## Save
 
 The `save` function defines the way in which the different attributes should be combined into the final markup, which is then serialized by Gutenberg into `post_content`.
@@ -93,7 +95,9 @@ save() {
 }
 ```
 
-This function also receives properties.
+This function can return a `null` value, in which case the block is considered to be _dynamic_—that means that only an HTML comment with attributes is serialized and the server has to provide the render function. (This is the equivalent to purely dynamic shortcodes, with the advantage that the grammar parsing it is assertive and they can remain invisible in contexts that are unable to compute them on the server, instead of showing gibberish as text.)
+
+`save` can also receive properties.
 
 ### attributes
 
