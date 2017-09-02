@@ -116,3 +116,19 @@ export function switchToBlockType( block, name ) {
 		uid: index === firstSwitchedBlock ? block.uid : result.uid,
 	} ) );
 }
+
+/**
+ * Creates a new reusable block.
+ *
+ * @param {String} type       The type of the block referenced by the reusable block
+ * @param {Object} attributes The attributes of the block referenced by the reusable block
+ * @return {Object}           A reusable block object
+ */
+export function createReusableBlock( type, attributes ) {
+	return {
+		id: uuid(),
+		name: '',
+		type,
+		attributes,
+	};
+}

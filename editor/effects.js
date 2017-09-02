@@ -7,7 +7,14 @@ import { get, uniqueId } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { parse, getBlockType, switchToBlockType, createBlock, serialize } from '@wordpress/blocks';
+import {
+	parse,
+	getBlockType,
+	switchToBlockType,
+	createBlock,
+	serialize,
+	createReusableBlock,
+} from '@wordpress/blocks';
 import { addQueryArgs } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
 
@@ -26,6 +33,8 @@ import {
 	removeNotice,
 	savePost,
 	editPost,
+	addReusableBlock,
+	persistReusableBlock,
 } from './actions';
 import {
 	getCurrentPost,
@@ -362,6 +371,16 @@ export default {
 		const oldBlock = getBlock( getState(), action.uid );
 		const reusableBlock = getReusableBlock( getState(), oldBlock.attributes.ref );
 		const newBlock = createBlock( reusableBlock.type, reusableBlock.attributes );
+		dispatch( replaceBlocks( [ oldBlock.uid ], [ newBlock ] ) );
+	},
+	DETACH_REUSABLE_BLOCK( action, store ) {
+		const { getState, dispatch } = store;
+
+		const oldBlock = getBlock( getState(), action.uid );
+		const reusableBlock = createReusableBlock( oldBlock.name, oldBlock.attributes );
+		const newBlock = createBlock( 'core/reusable-block', { ref: reusableBlock.id } );
+		dispatch( addReusableBlock( reusableBlock ) );
+		dispatch( persistReusableBlock( reusableBlock.id ) );
 		dispatch( replaceBlocks( [ oldBlock.uid ], [ newBlock ] ) );
 	},
 };

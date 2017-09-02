@@ -15,7 +15,7 @@ export class NewReusableBlockDialog extends Component {
 	}
 
 	setName( event ) {
-		this.setState( { name: event.value } );
+		this.setState( { name: event.target.value } );
 	}
 
 	render() {
@@ -23,7 +23,7 @@ export class NewReusableBlockDialog extends Component {
 			<div>
 				<p>What would you like to name this reusable block?</p>
 				<input type="text" value={ this.state.name } onChange={ this.setName } />
-				<button onClick={ this.props.onCreate( this.state.name ) }>Create</button>
+				<button onClick={ () => this.props.onCreate( this.state.name ) }>Create</button>
 				<button onClick={ this.props.onCancel }>Cancel</button>
 			</div>
 		);

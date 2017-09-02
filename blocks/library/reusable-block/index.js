@@ -38,6 +38,7 @@ class ReusableBlockEdit extends Component {
 
 	setName( name ) {
 		this.props.setReusableBlockName( name );
+		this.props.persistReusableBlock();
 	}
 
 	setAttributes( attributes ) {

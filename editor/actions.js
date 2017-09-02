@@ -374,3 +374,55 @@ export const createSuccessNotice = partial( createNotice, 'success' );
 export const createInfoNotice = partial( createNotice, 'info' );
 export const createErrorNotice = partial( createNotice, 'error' );
 export const createWarningNotice = partial( createNotice, 'warning' );
+
+/**
+ * Returns an action object used to add a reusable block to the store.
+ *
+ * @param {Object} reusableBlock The reusable block
+ * @return {Object}              Action object
+ */
+export function addReusableBlock( reusableBlock ) {
+	return {
+		type: 'ADD_REUSABLE_BLOCK',
+		reusableBlock,
+	};
+}
+
+/**
+ * Returns an action object used to persist a reusable block to the REST API.
+ *
+ * @param {Object} ref The ID of the reusable block
+ * @return {Object}    Action object
+ */
+export function persistReusableBlock( ref ) {
+	return {
+		type: 'PERSIST_REUSABLE_BLOCK',
+		ref,
+	};
+}
+
+/**
+ * Returns an action object used to convert a reusable block into a static block.
+ *
+ * @param {Object} uid The ID of the block to convert
+ * @return {Object}    Action object
+ */
+export function attachReusableBlock( uid ) {
+	return {
+		type: 'ATTACH_REUSABLE_BLOCK',
+		uid,
+	};
+}
+
+/**
+ * Returns an action object used to convert a static block into a reusable block.
+ *
+ * @param {Object} uid The ID of the block to convert
+ * @return {Object}    Action object
+ */
+export function detachReusableBlock( uid ) {
+	return {
+		type: 'DETACH_REUSABLE_BLOCK',
+		uid,
+	};
+}

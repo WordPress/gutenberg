@@ -552,6 +552,8 @@ export function notices( state = {}, action ) {
 
 export function reusableBlocks( state = {}, action ) {
 	switch ( action.type ) {
+		// TODO: Hm, maybe we don't need both these actions
+		case 'ADD_REUSABLE_BLOCK':
 		case 'FETCH_REUSABLE_BLOCK_SUCCESS': {
 			const { id, name, type, attributes } = action.reusableBlock;
 

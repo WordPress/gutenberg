@@ -14,7 +14,7 @@ import { ClipboardButton, Tooltip, PanelBody } from '@wordpress/components';
 /**
  * Internal Dependencies
  */
-import { updateBlockAttributes } from '../../actions';
+import { updateBlockAttributes, attachReusableBlock, detachReusableBlock } from '../../actions';
 import { getSelectedBlock, getCurrentPost } from '../../selectors';
 import { filterURLForDisplay } from '../../utils/url';
 
@@ -62,11 +62,8 @@ class BlockInspectorAdvancedControls extends Component {
 	}
 
 	render() {
-		const { selectedBlock, post } = this.props;
+		const { selectedBlock, post, attach, detach } = this.props;
 		const blockType = getBlockType( selectedBlock.name );
-		if ( false === blockType.className && ! blockType.supportAnchor ) {
-			return null;
-		}
 
 		return (
 			<PanelBody className="editor-advanced-controls" title={ __( 'Advanced' ) }>
@@ -94,6 +91,12 @@ class BlockInspectorAdvancedControls extends Component {
 						}
 					</div>
 				}
+				{ selectedBlock.name === 'core/reusable-block' &&
+					<button onClick={ () => attach( selectedBlock.uid ) }>Convert to regular block</button>
+				}
+				{ selectedBlock.name !== 'core/reusable-block' &&
+					<button onClick={ () => detach( selectedBlock.uid ) }>Convert to reusable block</button>
+				}
 			</PanelBody>
 		);
 	}
@@ -108,5 +111,7 @@ export default connect(
 	},
 	{
 		setAttributes: updateBlockAttributes,
+		attach: attachReusableBlock,
+		detach: detachReusableBlock,
 	}
 )( BlockInspectorAdvancedControls );
