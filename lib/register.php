@@ -78,7 +78,6 @@ function gutenberg_add_edit_links_filters() {
 add_action( 'init', 'gutenberg_add_edit_links_filters' );
 
 function load_blocks_rest_api() {
-	error_log('load_blocks_rest_api');
 	$controller = new WP_Gutenberg_Block_Controller;
 	$controller->register_routes();
 }
