@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { noop } from 'lodash';
+import uuid from 'uuid/v4';
 
 /**
  * WordPress dependencies
@@ -19,10 +20,15 @@ import {
 	replaceBlocks,
 	editPost,
 	savePost,
+	addReusableBlock,
+	saveReusableBlock,
+	attachBlock,
+	detachBlock,
 } from '../actions';
 import effects from '../effects';
 import * as selectors from '../selectors';
 
+jest.mock( 'uuid/v4' );
 jest.mock( '../selectors' );
 
 describe( 'effects', () => {
@@ -252,6 +258,12 @@ describe( 'effects', () => {
 	describe( '.SETUP_EDITOR', () => {
 		const handler = effects.SETUP_EDITOR;
 
+		afterEach( () => {
+			getBlockTypes().forEach( ( block ) => {
+				unregisterBlockType( block.name );
+			} );
+		} );
+
 		it( 'should return post reset action', () => {
 			const post = {
 				id: 1,
@@ -311,6 +323,117 @@ describe( 'effects', () => {
 				resetPost( post ),
 				setupNewPost( { title: 'A History of Pork' } ),
 			] );
+		} );
+	} );
+
+	describe( '.ATTACH_BLOCK', () => {
+		const handler = effects.ATTACH_BLOCK;
+
+		const state = {};
+		const dispatch = jest.fn();
+		const store = { getState: () => state, dispatch };
+
+		afterEach( () => {
+			getBlockTypes().forEach( ( block ) => {
+				unregisterBlockType( block.name );
+			} );
+		} );
+
+		it( 'should convert a reusable block into a static block', () => {
+			registerBlockType( 'core/test-block', {
+				title: 'Test block',
+				category: 'common',
+				save: () => null,
+				attributes: {
+					name: { type: 'string' },
+				},
+			} );
+
+			const oldBlock = {
+				uid: 'ddb5956d-0f08-4f67-bc79-6bfc2134895b',
+				name: 'core/reusable-block',
+				attributes: {
+					ref: 'cb2065b9-67a4-466c-8cd6-60de0526b02b',
+				},
+			};
+			const reusableBlock = {
+				id: 'cb2065b9-67a4-466c-8cd6-60de0526b02b',
+				name: 'Cool reusable block',
+				type: 'core/test-block',
+				attributes: {
+					name: 'Big Bird',
+				},
+			};
+
+			selectors.getBlock.mockReturnValue( oldBlock );
+			selectors.getReusableBlock.mockReturnValue( reusableBlock );
+			uuid.mockReturnValue( '4fbd3373-d4e0-454e-97a0-08bfeb8a1cea' );
+			handler( attachBlock( oldBlock.uid ), store );
+
+			expect( selectors.getBlock ).toHaveBeenCalledWith( state, oldBlock.uid );
+			expect( selectors.getReusableBlock ).toHaveBeenCalledWith( state, reusableBlock.id );
+			expect( dispatch ).toHaveBeenCalledWith(
+				replaceBlocks(
+					[ oldBlock.uid ],
+					[ createBlock( reusableBlock.type, reusableBlock.attributes ) ]
+				)
+			);
+		} );
+	} );
+
+	describe( '.DETACH_BLOCK', () => {
+		const handler = effects.DETACH_BLOCK;
+
+		const state = {};
+		const dispatch = jest.fn();
+		const store = { getState: () => state, dispatch };
+
+		afterEach( () => {
+			getBlockTypes().forEach( ( block ) => {
+				unregisterBlockType( block.name );
+			} );
+		} );
+
+		it( 'should convert a static block into a reusable block', () => {
+			registerBlockType( 'core/reusable-block', {
+				title: 'Reusable Block',
+				category: 'common',
+				save: () => null,
+				attributes: {
+					ref: { type: 'string' },
+				},
+			} );
+
+			const oldBlock = {
+				ref: 'cb2065b9-67a4-466c-8cd6-60de0526b02b',
+				name: 'core/test-block',
+				isValid: true,
+				attributes: {
+					name: 'Big Bird',
+				},
+			};
+			const reusableBlockId = '4fbd3373-d4e0-454e-97a0-08bfeb8a1cea';
+
+			selectors.getBlock.mockReturnValue( oldBlock );
+			uuid.mockReturnValue( reusableBlockId );
+			handler( detachBlock( oldBlock.uid ), store );
+
+			expect( selectors.getBlock ).toHaveBeenCalledWith( state, oldBlock.uid );
+			expect( dispatch ).toHaveBeenCalledWith(
+				addReusableBlock( {
+					id: reusableBlockId,
+					name: '',
+					type: oldBlock.name,
+					attributes: oldBlock.attributes,
+				} )
+			);
+			expect( dispatch ).toHaveBeenCalledWith( saveReusableBlock( reusableBlockId ) );
+			expect( dispatch ).toHaveBeenCalledWith(
+				replaceBlocks(
+					[ oldBlock.uid ],
+					[ createBlock( 'core/reusable-block', { ref: reusableBlockId } ) ]
+				)
+			);
 		} );
 	} );
 } );
