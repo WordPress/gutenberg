@@ -12,12 +12,12 @@ a, a:visited, a:active, .entry-meta .entry-actions:hover a, .entry-meta .entry-a
 	color: #00B975;
 }
 
-#secondary {
-	padding: 6rem 0 0;
+.content-area a:hover {
+	color: #3498db;
 }
 
-.content-area h1, .content-area h2 {
-	margin: 40px 0 20px;
+#secondary {
+	padding: 6rem 0 0;
 }
 
 .single-handbook #primary {
@@ -72,7 +72,7 @@ code, pre {
 	background: #fff;
 	padding: 140px 0;
 	text-align: center;
-	border-bottom: 1px solid #eee;
+	border-bottom: 1px solid #EDF3F1;
 }
 
 .site-header .site-title a {
@@ -85,6 +85,20 @@ code, pre {
 .site-header .site-title a:hover {
 	color: #111;
 	border-color: #00B975;
+}
+
+.gutenberg-links {
+	display: block;
+	margin: 30px 0 30px;
+}
+.gutenberg-links a {
+	color: #999;
+	font-size: 15px;
+	margin: 0 20px;
+}
+
+.gutenberg-links a:hover {
+	color: #444;
 }
 
 .single-handbook #secondary {
@@ -124,8 +138,33 @@ code, pre {
 	color: #00B975;
 }
 
+.content-area h1,
+.content-area h2,
+.content-area h3,
+.content-area h4,
+.content-area h5 {
+	position: relative;
+	margin: 40px 0 20px;
+}
 .markdownIt-Anchor {
-	opacity: 0.2;
+	position: absolute;
+	left: -20px;
+	display: none;
+	width: 20px;
+	font-weight: 300;
+}
+
+.content-area h1:hover .markdownIt-Anchor,
+.content-area h2:hover .markdownIt-Anchor,
+.content-area h3:hover .markdownIt-Anchor,
+.content-area h4:hover .markdownIt-Anchor,
+.content-area h5:hover .markdownIt-Anchor,
+.content-area h1:focus .markdownIt-Anchor,
+.content-area h2:focus .markdownIt-Anchor,
+.content-area h3:focus .markdownIt-Anchor,
+.content-area h4:focus .markdownIt-Anchor,
+.content-area h5:focus .markdownIt-Anchor {
+	display: block;
 }
 
 .widget-title {
