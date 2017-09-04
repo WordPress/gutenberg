@@ -111,7 +111,7 @@ function get_block_data_for_api_from_post_content( $content ) {
 	// Loop thru the blocks, adding rendered content when available.
 	foreach ( $blocks as $block ) {
 		$block_name  = isset( $block['blockName'] ) ? $block['blockName'] : null;
-		$attributes  = is_array( $block['attrs'] ) ? $block['attrs'] : array();
+		$attributes  = is_array( $block['attrs'] ) ? $block['attrs'] : null;
 		$raw_content = isset( $block['rawContent'] ) ? $block['rawContent'] : null;
 		if ( null !== $block_name ) {
 			$block_type = $registry->get_registered( $block_name );
@@ -119,13 +119,18 @@ function get_block_data_for_api_from_post_content( $content ) {
 				$block['renderedContent'] = $block_type->render( $attributes, $raw_content );
 			}
 
-			// Remap the block fields for the response.
-			$data[] = array(
-				'type'       => $block['blockName'],
-				'attributes' => $block['attrs'],
-				'content'    => $block['rawContent'],
-				'rendered'   => isset( $block['renderedContent'] ) ? $block['renderedContent'] : null,
-			);
+			// Set up the item data.
+			$item_data = array();
+			$item_data['type'] = $block['blockName'];
+			if ( null !== $attributes ) {
+				$item_data['attributes'] = $block['attrs'];
+			}
+			$item_data['content'] = $block['rawContent'];
+			if ( null !== $raw_content ) {
+				$item_data['rendered'] = $raw_content ;
+			}
+
+			$data[] = $item_data;
 		}
 	}
 
