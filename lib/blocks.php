@@ -107,7 +107,6 @@ function get_block_data_for_api_from_post_content( $content ) {
 	$registry = WP_Block_Type_Registry::get_instance();
 	$blocks   = gutenberg_parse_blocks( $content );
 	$data     = array();
-	$data_pre = array();
 
 	// Loop thru the blocks, adding rendered content when available.
 	foreach ( $blocks as $block ) {
@@ -119,18 +118,15 @@ function get_block_data_for_api_from_post_content( $content ) {
 			if ( null !== $block_type ) {
 				$block['renderedContent'] = $block_type->render( $attributes, $raw_content );
 			}
-			$data_pre[] = $block;
-		}
-	}
 
-	// Remap the block fields for the response.
-	foreach ( $data_pre as $block ) {
-		$data[] = array(
-			'type'       => $block['blockName'],
-			'attributes' => $block['attrs'],
-			'content'    => $block['rawContent'],
-			'rendered'   => isset( $block['renderedContent'] ) ? $block['renderedContent'] : null,
-		);
+			// Remap the block fields for the response.
+			$data[] = array(
+				'type'       => $block['blockName'],
+				'attributes' => $block['attrs'],
+				'content'    => $block['rawContent'],
+				'rendered'   => isset( $block['renderedContent'] ) ? $block['renderedContent'] : null,
+			);
+		}
 	}
 
 	return $data;
