@@ -76,13 +76,6 @@ function gutenberg_add_edit_links_filters() {
 }
 add_action( 'admin_init', 'gutenberg_add_edit_links_filters' );
 
-function load_blocks_rest_api() {
-	$controller = new WP_Gutenberg_Block_Controller;
-	$controller->register_routes();
-}
-add_action( 'init', 'load_blocks_rest_api' );
-
-
 /**
  * Registers additional links in the post/page screens to edit any post/page in
  * the Gutenberg editor.
