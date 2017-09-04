@@ -35,9 +35,17 @@ describe( 'PostAuthor', () => {
 		],
 	};
 
+	const user = {
+		data: {
+			capabilities: {
+				publish_posts: true,
+			},
+		},
+	};
+
 	describe( '#getAuthors()', () => {
 		it( 'returns empty array on unknown users', () => {
-			const wrapper = shallow( <PostAuthor users={ {} } /> );
+			const wrapper = shallow( <PostAuthor users={ {} } user={ user } /> );
 
 			const authors = wrapper.instance().getAuthors();
 
@@ -45,7 +53,7 @@ describe( 'PostAuthor', () => {
 		} );
 
 		it( 'filters users to authors', () => {
-			const wrapper = shallow( <PostAuthor users={ users } /> );
+			const wrapper = shallow( <PostAuthor users={ users } user={ user } /> );
 
 			const authors = wrapper.instance().getAuthors();
 
@@ -54,15 +62,24 @@ describe( 'PostAuthor', () => {
 	} );
 
 	describe( '#render()', () => {
+		it( 'should not render anything if the user doesn\'t have the right capabilities', () => {
+			let wrapper = shallow( <PostAuthor users={ users } user={ {} } /> );
+			expect( wrapper.type() ).toBe( null );
+			wrapper = shallow( <PostAuthor users={ users } user={
+				{ data: { capabilities: { publish_posts: false } } }
+			} /> );
+			expect( wrapper.type() ).toBe( null );
+		} );
+
 		it( 'should not render anything if users unknown', () => {
-			const wrapper = shallow( <PostAuthor users={ {} } /> );
+			const wrapper = shallow( <PostAuthor users={ {} } user={ user } /> );
 
 			expect( wrapper.type() ).toBe( null );
 		} );
 
 		it( 'should not render anything if single user', () => {
 			const wrapper = shallow(
-				<PostAuthor users={ { data: users.data.slice( 0, 1 ) } } />
+				<PostAuthor users={ { data: users.data.slice( 0, 1 ) } } user={ user } />
 			);
 
 			expect( wrapper.type() ).toBe( null );
@@ -70,14 +87,14 @@ describe( 'PostAuthor', () => {
 
 		it( 'should not render anything if single filtered user', () => {
 			const wrapper = shallow(
-				<PostAuthor users={ { data: users.data.slice( 0, 2 ) } } />
+				<PostAuthor users={ { data: users.data.slice( 0, 2 ) } } user={ user } />
 			);
 
 			expect( wrapper.type() ).toBe( null );
 		} );
 
 		it( 'should render select control', () => {
-			const wrapper = shallow( <PostAuthor users={ users } /> );
+			const wrapper = shallow( <PostAuthor users={ users } user={ user } /> );
 
 			expect( wrapper.find( 'select' ).length ).not.toBe( 0 );
 		} );
@@ -87,6 +104,7 @@ describe( 'PostAuthor', () => {
 			const wrapper = shallow(
 				<PostAuthor
 					users={ users }
+					user={ user }
 					onUpdateAuthor={ onUpdateAuthor } />
 			);
 
