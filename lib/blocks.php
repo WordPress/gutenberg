@@ -126,8 +126,8 @@ function get_block_data_for_api_from_post_content( $content ) {
 				$item_data['attributes'] = $block['attrs'];
 			}
 			$item_data['content'] = $block['rawContent'];
-			if ( null !== $raw_content ) {
-				$item_data['rendered'] = $raw_content ;
+			if ( null !== $block['renderedContent'] ) {
+				$item_data['rendered'] = $block['renderedContent'] ;
 			}
 
 			$data[] = $item_data;
