@@ -1,4 +1,9 @@
 /**
+ * External Dependencies
+ */
+import { filter } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -80,11 +85,12 @@ registerBlockType( 'core/gallery', {
 		const setColumnsNumber = ( value ) => setAttributes( { columns: value } );
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		const toggleImageCrop = () => setAttributes( { imageCrop: ! imageCrop } );
-
 		const onSelectImages = ( imgs ) => setAttributes( { images: imgs } );
-
 		const uploadFromFiles = ( event ) => {
 			mediaUpload( event.target.files, setAttributes, isGallery );
+		};
+		const removeImage = ( index ) => () => {
+			setAttributes( { images: filter( images, ( img, i ) => index !== i ) } );
 		};
 
 		const controls = (
@@ -179,8 +185,8 @@ registerBlockType( 'core/gallery', {
 				</InspectorControls>
 			),
 			<div key="gallery" className={ `${ className } align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` }>
-				{ images.map( ( img ) => (
-					<GalleryImage key={ img.url } img={ img } />
+				{ images.map( ( img, index ) => (
+					<GalleryImage key={ img.url } img={ img } edit onRemove={ removeImage( index ) } />
 				) ) }
 			</div>,
 		];
