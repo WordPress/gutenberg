@@ -15,6 +15,7 @@ import { keycodes } from '@wordpress/utils';
  */
 import './style.scss';
 import Button from '../button';
+import Popover from '../popover';
 
 const { ENTER, ESCAPE, UP, DOWN } = keycodes;
 
@@ -24,7 +25,6 @@ class Autocomplete extends Component {
 			isOpen: false,
 			search: /.*/,
 			selectedIndex: 0,
-			position: {},
 		};
 	}
 
@@ -32,7 +32,6 @@ class Autocomplete extends Component {
 		super( ...arguments );
 
 		this.bindNode = this.bindNode.bind( this );
-		this.reposition = this.reposition.bind( this );
 		this.select = this.select.bind( this );
 		this.reset = this.reset.bind( this );
 		this.onBlur = this.onBlur.bind( this );
@@ -42,34 +41,8 @@ class Autocomplete extends Component {
 		this.state = this.constructor.getInitialState();
 	}
 
-	componentDidUpdate( prevProps, prevState ) {
-		// Only monitor resizing and scroll events for duration of results open
-		const { isOpen } = this.state;
-		if ( isOpen === prevState.isOpen ) {
-			return;
-		}
-
-		const bindFn = isOpen ? 'addEventListener' : 'removeEventListener';
-		window[ bindFn ]( 'resize', this.reposition );
-		window[ bindFn ]( 'scroll', this.reposition );
-	}
-
-	componentWillUnmount() {
-		window.removeEventListener( 'resize', this.reposition );
-		window.removeEventListener( 'scroll', this.reposition );
-		window.cancelAnimationFrame( this.pendingReposition );
-	}
-
 	bindNode( node ) {
 		this.node = node;
-	}
-
-	reposition() {
-		this.pendingReposition = window.requestAnimationFrame( () => {
-			this.setState( {
-				position: this.getInputPosition(),
-			} );
-		} );
 	}
 
 	select( option ) {
@@ -91,20 +64,6 @@ class Autocomplete extends Component {
 		// selecting an option by button click
 		if ( ! this.node.contains( event.relatedTarget ) ) {
 			this.reset();
-		}
-	}
-
-	getInputPosition() {
-		// Get position of bottom of text caret. Currently this only supports
-		// contenteditable, but could be enhanced to support input and textarea
-		// with a library like `textarea-caret-position`
-		const range = window.getSelection().getRangeAt( 0 );
-		if ( range ) {
-			const { top, left, height } = range.getBoundingClientRect();
-			return {
-				top: top + height,
-				left,
-			};
 		}
 	}
 
@@ -137,7 +96,6 @@ class Autocomplete extends Component {
 			if ( match ) {
 				// Reset selection to initial when search changes
 				this.setState( {
-					position: this.getInputPosition(),
 					selectedIndex: 0,
 					search,
 				} );
@@ -148,7 +106,6 @@ class Autocomplete extends Component {
 		} else if ( match ) {
 			this.setState( {
 				isOpen: true,
-				position: this.getInputPosition(),
 				search,
 			} );
 		}
@@ -224,8 +181,8 @@ class Autocomplete extends Component {
 
 	render() {
 		const { children, className } = this.props;
-		const { position, isOpen, selectedIndex } = this.state;
-		const classes = classnames( 'components-autocomplete', className );
+		const { isOpen, selectedIndex } = this.state;
+		const classes = classnames( 'components-autocomplete__popover', className );
 
 		// Blur is applied to the wrapper node, since if the child is Editable,
 		// the event will not have `relatedTarget` assigned.
@@ -233,16 +190,19 @@ class Autocomplete extends Component {
 			<div
 				ref={ this.bindNode }
 				onBlur={ this.onBlur }
-				className={ classes }
+				className="components-autocomplete"
 			>
 				{ cloneElement( Children.only( children ), {
 					onInput: this.search,
 					onKeyDown: this.setSelectedIndex,
 				} ) }
-				{ isOpen && (
+				<Popover
+					isOpen={ isOpen }
+					position="top right"
+					className={ classes }
+				>
 					<ul
 						role="menu"
-						style={ { ...position } }
 						className="components-autocomplete__results"
 					>
 						{ this.getFilteredOptions().map( ( option, index ) => (
@@ -259,7 +219,7 @@ class Autocomplete extends Component {
 							</li>
 						) ) }
 					</ul>
-				) }
+				</Popover>
 			</div>
 		);
 	}

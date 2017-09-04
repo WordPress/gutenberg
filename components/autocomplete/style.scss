@@ -1,41 +1,13 @@
-.components-autocomplete .components-autocomplete__results {
-	list-style-type: none;
-	position: fixed;
-	z-index: z-index( '.components-autocomplete__results' );
+.components-autocomplete__popover .components-popover__content {
 	width: 200px;
+}
+
+.components-autocomplete__popover .components-autocomplete__results {
+	list-style-type: none;
 	padding: 3px;
-	box-shadow: $shadow-popover;
-	border: 1px solid $light-gray-500;
-	background: $white;
-	margin-top: 10px;
-	margin-left: -15px;
 
 	&:empty {
 		display: none;
-	}
-
-	&:before {
-		top: -10px;
-		border: 10px solid $light-gray-500;
-	}
-
-	&:after {
-		top: -8px;
-		border: 10px solid $white;
-	}
-
-	&:before,
-	&:after {
-		content: "";
-		position: absolute;
-		margin-left: 5px;
-		height: 0;
-		width: 0;
-		border-left-color: transparent;
-		border-right-color: transparent;
-		border-bottom-style: solid;
-		border-top: none;
-		line-height: 0;
 	}
 }
 
