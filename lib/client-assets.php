@@ -792,9 +792,13 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'colors'     => $color_palette,
 	);
 
-	wp_add_inline_script( 'wp-editor', 'wp.api.init().done( function() {'
-		. 'wp.editor.createEditorInstance( \'editor\', window._wpGutenbergPost, ' . json_encode( $editor_settings ) . ' ); '
-		. '} );'
+	wp_add_inline_script(
+		'wp-editor',
+		(
+			'jQuery.when( wp.api.init(), wp.api.init( { versionString: \'gutenberg/v1/\' } ) ).done( function() {'
+			. 'wp.editor.createEditorInstance( \'editor\', window._wpGutenbergPost, ' . json_encode( $editor_settings ) . ' ); '
+			. '} );'
+		)
 	);
 
 	/**

@@ -15,7 +15,6 @@ import {
 	serialize,
 	createReusableBlock,
 } from '@wordpress/blocks';
-import { addQueryArgs } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -289,80 +288,47 @@ export default {
 		const { ref } = action;
 		const { dispatch } = store;
 
-		/**
-		 * TODO:
-		 * Encapsulate this network request somewhere. It certainly doesn't belong in effects.js.
-		 * It'd be really nice if we could make it all a wp.api.ReusableBlock sort of thing.
-		 */
-
-		const baseUrl = `${ wpApiSettings.root }gutenberg/v1/reusable-blocks/${ ref }`;
-		const url = addQueryArgs( baseUrl, { _wpnonce: wpApiSettings.nonce } );
-
-		const request = new window.Request( url, { credentials: 'include' } );
-
-		function throwIfNotOk( response ) {
-			if ( ! response.ok ) {
-				throw new Error( response.statusText );
-			}
-			return response;
-		}
-
-		window.fetch( request ).then( throwIfNotOk ).then( response => response.json() ).then(
-			( data ) => {
-				// TOD: Encalpsulate this somewhere
-				const { id, name, content } = data;
+		new wp.api.models.ReusableBlocks( { id: ref } ).fetch().then(
+			( { id, name, content } ) => {
 				const [ { name: type, attributes } ] = parse( content );
 				dispatch( {
 					type: 'FETCH_REUSABLE_BLOCK_SUCCESS',
 					reusableBlock: { id, name, type, attributes },
 				} );
 			},
-			() => {
-				// TODO: Do something with this error
-				dispatch( { type: 'FETCH_REUSABLE_BLOCK_FAILURE' } );
-			},
+			( error ) => {
+				dispatch( {
+					type: 'FETCH_REUSABLE_BLOCK_FAILURE',
+					error: get( error, 'responseJSON', {
+						code: 'unknown_error',
+						message: __( 'An unknown error occurred.' ),
+					} ),
+				} );
+			}
 		);
 	},
 	PERSIST_REUSABLE_BLOCK( action, store ) {
 		const { ref } = action;
 		const { getState, dispatch } = store;
 
-		/**
-		 * TODO:
-		 * Encapsulate this network request somewhere. It certainly doesn't belong in effects.js.
-		 * It'd be really nice if we could make it all a wp.api.ReusableBlock sort of thing.
-		 */
-
 		const { name, type, attributes } = getReusableBlock( getState(), ref );
 		const content = serialize( createBlock( type, attributes ) );
 
-		const baseUrl = `${ wpApiSettings.root }gutenberg/v1/reusable-blocks/${ ref }`;
-		const url = addQueryArgs( baseUrl, { _wpnonce: wpApiSettings.nonce } );
-
-		const request = new window.Request( url, {
-			method: 'PUT',
-			headers: {
-				'Content-Type': 'application/json',
+		new wp.api.models.ReusableBlocks( { id: ref, name, content } ).save().then(
+			() => {
+				dispatch( {
+					type: 'PERSIST_REUSABLE_BLOCK_SUCCESS',
+				} );
 			},
-			credentials: 'include',
-			body: JSON.stringify( { name, content } ),
-		} );
-
-		function throwIfNotOk( response ) {
-			if ( ! response.ok ) {
-				throw new Error( response.statusText );
+			( error ) => {
+				dispatch( {
+					type: 'PERSIST_REUSABLE_BLOCK_FAILURE',
+					error: get( error, 'responseJSON', {
+						code: 'unknown_error',
+						message: __( 'An unknown error occurred.' ),
+					} ),
+				} );
 			}
-			return response;
-		}
-
-		window.fetch( request ).then( throwIfNotOk ).then( response => response.json() ).then(
-			() => {
-				dispatch( { type: 'PERSIST_REUSABLE_BLOCK_SUCCESS' } );
-			},
-			() => {
-				// TODO: Do something with this error
-				dispatch( { type: 'PERSIST_REUSABLE_BLOCK_FAILURE' } );
-			},
 		);
 	},
 	ATTACH_REUSABLE_BLOCK( action, store ) {
