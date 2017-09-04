@@ -2,7 +2,7 @@
  * External Dependencies
  */
 import { connect } from 'react-redux';
-import { flowRight } from 'lodash';
+import { flowRight, filter } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -25,13 +25,7 @@ import { toggleSidebarPanel } from '../../actions';
 const PANEL_NAME = 'post-taxonomies';
 
 function PostTaxonomies( { postType, taxonomies, isOpened, onTogglePanel } ) {
-	const availableTaxonomies = !! taxonomies.data
-		? Object.values( taxonomies.data ).filter( ( taxonomy ) => taxonomy.types.indexOf( postType ) !== -1 )
-		: [];
-
-	if ( ! availableTaxonomies.length ) {
-		return null;
-	}
+	const availableTaxonomies = filter( taxonomies.data, ( taxonomy ) => taxonomy.types.indexOf( postType ) !== -1 );
 
 	return (
 		<PanelBody
