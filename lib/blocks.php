@@ -93,3 +93,85 @@ function do_blocks( $content ) {
 	return $content_after_blocks;
 }
 add_filter( 'the_content', 'do_blocks', 9 ); // BEFORE do_shortcode() and wpautop().
+
+
+/**
+ * Extract the blocks from post content for the REST API post response.
+ *
+ * @since 1.1.0
+ *
+ * @param string The post content.
+ *
+ * @return array Array of block data.
+ */
+function get_block_data_for_api_from_post_content( $content ) {
+	$registry = WP_Block_Type_Registry::get_instance();
+	$blocks   = gutenberg_parse_blocks( $content );
+	$data     = array();
+	$data_pre = array();
+
+	// Loop thru the blocks, adding rendered content when available.
+	foreach ( $blocks as $block ) {
+		$block_name  = isset( $block['blockName'] ) ? $block['blockName'] : null;
+		$attributes  = is_array( $block['attrs'] ) ? $block['attrs'] : array();
+		$raw_content = isset( $block['rawContent'] ) ? $block['rawContent'] : null;
+		if ( null !== $block_name ) {
+			$block_type = $registry->get_registered( $block_name );
+			if ( null !== $block_type ) {
+				$block['renderedContent'] = $block_type->render( $attributes, $raw_content );
+			}
+			$data_pre[] = $block;
+		}
+	}
+
+	// Remap the block fields for the response.
+	foreach ( $data_pre as $block ) {
+		$data[] = array(
+			'type'       => $block['blockName'],
+			'attributes' => $block['attrs'],
+			'content'    => $block['rawContent'],
+			'rendered'   => isset( $block['renderedContent'] ) ? $block['renderedContent'] : null,
+		);
+	}
+
+	return $data;
+}
+
+/**
+ * Attach a post's block data callback to the REST API response.
+ *
+ * @since 1.1.0
+ *
+ * @param string | array $post_type Post type, or array of post types.
+ */
+function attach_block_response_callback( $post_type ) {
+	if ( empty( $post_type ) ) {
+		$post_type = 'post';
+	}
+	if ( is_array( $post_type ) ) {
+		foreach ( $post_type as $type ) {
+			add_filter( 'rest_prepare_' . $type, 'attach_block_data_to_post_response', 10, 3 );
+		}
+	} else {
+		add_filter( 'rest_prepare_' . $post_type, 'attach_block_data_to_post_response', 10, 3 );
+	}
+}
+attach_block_response_callback( 'post' );
+
+/**
+ * Attach a post's block data to the REST API response.
+ *
+ * @since 1.1.0
+ *
+ * @param string $post_type Post type.
+ */
+function attach_block_data_to_post_response( $response, $post, $request ) {
+	if ( ! $post ) {
+		return $response;
+	}
+	$blocks = get_block_data_for_api_from_post_content( $post->post_content );
+	if ( $blocks ) {
+		$response->data['content']['blocks'] = $blocks;
+	}
+	return $response;
+}
