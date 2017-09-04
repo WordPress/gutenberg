@@ -552,47 +552,31 @@ export function notices( state = {}, action ) {
 
 export function reusableBlocks( state = {}, action ) {
 	switch ( action.type ) {
-		// TODO: Hm, maybe we don't need both these actions
-		case 'ADD_REUSABLE_BLOCK':
-		case 'FETCH_REUSABLE_BLOCK_SUCCESS': {
-			const { id, name, type, attributes } = action.reusableBlock;
+		case 'ADD_REUSABLE_BLOCK': {
+			const { reusableBlock } = action;
 
 			return {
 				...state,
-				[ id ]: { name, type, attributes },
+				[ reusableBlock.id ]: reusableBlock,
 			};
 		}
 
-		case 'SET_REUSABLE_BLOCK_NAME': {
-			const reusableBlock = state[ action.ref ];
-			if ( ! reusableBlock ) {
+		case 'UPDATE_REUSABLE_BLOCK': {
+			const { ref, reusableBlock } = action;
+			const existingReusableBlock = state[ ref ];
+
+			if ( ! existingReusableBlock ) {
 				return state;
 			}
 
-			// TODO: Optimise this. We can `return state` if we determine that nothing is changing
 			return {
 				...state,
-				[ action.ref ]: {
-					...reusableBlock,
-					name: action.name,
-				},
-			};
-		}
-
-		case 'UPDATE_REUSABLE_BLOCK_ATTRIBUTES': {
-			const reusableBlock = state[ action.ref ];
-			if ( ! reusableBlock ) {
-				return state;
-			}
-
-			// TODO: Optimise this. We can `return state` if we determine that nothing is changing
-			return {
-				...state,
-				[ action.ref ]: {
+				[ ref ]: {
+					...existingReusableBlock,
 					...reusableBlock,
 					attributes: {
+						...existingReusableBlock.attributes,
 						...reusableBlock.attributes,
-						...action.attributes,
 					},
 				},
 			};

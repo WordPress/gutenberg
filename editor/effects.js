@@ -307,6 +307,12 @@ export default {
 			}
 		);
 	},
+	FETCH_REUSABLE_BLOCK_SUCCESS( action, store ) {
+		const { reusableBlock } = action;
+		const { dispatch } = store;
+
+		dispatch( addReusableBlock( reusableBlock ) );
+	},
 	PERSIST_REUSABLE_BLOCK( action, store ) {
 		const { ref } = action;
 		const { getState, dispatch } = store;

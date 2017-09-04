@@ -37,12 +37,12 @@ class ReusableBlockEdit extends Component {
 	}
 
 	setName( name ) {
-		this.props.setReusableBlockName( name );
+		this.props.updateReusableBlock( { name } );
 		this.props.persistReusableBlock();
 	}
 
 	setAttributes( attributes ) {
-		this.props.updateReusableBlockAttributes( attributes );
+		this.props.updateReusableBlock( { attributes } );
 
 		if ( this.state.persistConfirmation !== PERSIST_CONFIRMATION_DISABLE ) {
 			this.setState( { persistConfirmation: PERSIST_CONFIRMATION_SHOW } );
@@ -101,18 +101,11 @@ const ConnectedReusableBlockEdit = connect(
 				ref: ownProps.attributes.ref,
 			} );
 		},
-		setReusableBlockName( name ) {
+		updateReusableBlock( reusableBlock ) {
 			dispatch( {
-				type: 'SET_REUSABLE_BLOCK_NAME',
+				type: 'UPDATE_REUSABLE_BLOCK',
 				ref: ownProps.attributes.ref,
-				name,
-			} );
-		},
-		updateReusableBlockAttributes( attributes ) {
-			dispatch( {
-				type: 'UPDATE_REUSABLE_BLOCK_ATTRIBUTES',
-				ref: ownProps.attributes.ref,
-				attributes,
+				reusableBlock,
 			} );
 		},
 		persistReusableBlock() {
