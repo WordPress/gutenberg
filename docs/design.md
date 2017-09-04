@@ -185,7 +185,7 @@ Advanced block options:
 - Has options for making email address mandatory, checked by default.
 - Has options for changing the form ID/name, in case you have multiple forms on a page.
 
-_Note: this block doesn't exist in Gutenberg currently, but the above descripbes a "best practices" for designing such a block. Being one of the more complex blocks, it's still important that it is fully functional upon insertion, helped along by good defaults._
+_Note: this block doesn't exist in Gutenberg currently, but the above describes a "best practices" for designing such a block. Being one of the more complex blocks, it's still important that it is fully functional upon insertion, helped along by good defaults._
 
 ## Future Opportunities
 

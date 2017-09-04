@@ -3,7 +3,6 @@
  */
 import React from 'react';
 import { render } from 'react-snapshot';
-import 'prismjs/themes/prism.css';
 
 /**
  * User Dependencies

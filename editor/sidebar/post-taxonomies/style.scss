@@ -22,11 +22,17 @@
 	margin-left: $panel-padding;
 }
 
-.editor-post-taxonomies__hierarchical-terms-submit {
+.button.editor-post-taxonomies__hierarchical-terms-submit,
+.button-link.editor-post-taxonomies__hierarchical-terms-add {
+	margin-top: 10px;
+}
+
+.editor-post-taxonomies__hierarchical-terms-label {
+	display: inline-block;
 	margin-top: 10px;
 }
 
 .editor-post-taxonomies__hierarchical-terms-input {
-	margin-top: 10px;
+	margin-top: 5px;
 	width: 100%;
 }

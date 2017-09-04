@@ -2,6 +2,9 @@
 <ruleset name="WordPress Coding Standards for Gutenberg Plugin">
 	<description>Sniffs for WordPress plugins, with minor modifications for Gutenberg</description>
 
+	<rule ref="PHPCompatibility"/>
+	<config name="testVersion" value="5.2-"/>
+
 	<rule ref="WordPress-Core" />
 	<rule ref="WordPress-Docs" />
 	<rule ref="WordPress.WP.I18n">
@@ -10,7 +13,7 @@
 		</properties>
 	</rule>
 
-	<arg value="s"/>
+	<arg value="ps"/>
 	<arg name="extensions" value="php"/>
 
 	<file>gutenberg.php</file>

@@ -11,6 +11,18 @@ addStory( {
 } );
 
 addStory( {
+	name: 'block-api',
+	title: 'Block API',
+	markdown: require( './block-api.md' ),
+} );
+
+addStory( {
+	name: 'block-edit-save',
+	title: 'Edit and Save',
+	markdown: require( './block-edit-save.md' ),
+} );
+
+addStory( {
 	name: 'blocks',
 	title: 'Creating Block Types',
 	markdown: require( './blocks.md' ),

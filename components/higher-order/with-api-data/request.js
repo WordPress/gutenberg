@@ -2,8 +2,7 @@
  * External dependencies
  */
 import memoize from 'memize';
-
-export const cache = {};
+import { mapKeys } from 'lodash';
 
 export const getStablePath = memoize( ( path ) => {
 	const [ base, query ] = path.split( '?' );
@@ -30,17 +29,53 @@ export const getStablePath = memoize( ( path ) => {
 		// 'a=5&b=1&c=2'
 } );
 
+/**
+ * Response cache of path to response (object of data, headers arrays).
+ * Optionally populated from window global for preloading.
+ *
+ * @type {Object}
+ */
+export const cache = mapKeys(
+	window._wpAPIDataPreload,
+	( value, key ) => getStablePath( key )
+);
+
+/**
+ * Given an XMLHttpRequest object, returns an array of header tuples.
+ *
+ * @see https://xhr.spec.whatwg.org/#the-getallresponseheaders()-method
+ *
+ * @param  {XMLHttpRequest} xhr XMLHttpRequest object
+ * @return {Array[]}            Array of header tuples
+ */
+export function getResponseHeaders( xhr ) {
+	return xhr.getAllResponseHeaders().trim()
+		// 'date: Tue, 22 Aug 2017 18:45:28 GMT↵server: nginx'
+
+		.split( '\u000d\u000a' )
+		// [ 'date: Tue, 22 Aug 2017 18:45:28 GMT', 'server: nginx' ]
+
+		.map( ( entry ) => entry.split( '\u003a\u0020' ) );
+		// [ [ 'date', 'Tue, 22 Aug 2017 18:45:28 GMT' ], [ 'server', 'nginx' ] ]
+}
+
 export function getResponseFromCache( request ) {
 	const response = cache[ getStablePath( request.path ) ];
 	return Promise.resolve( response );
 }
 
 export function getResponseFromNetwork( request ) {
-	const promise = wp.apiRequest( request ).promise();
+	const promise = wp.apiRequest( request )
+		.then( ( body, status, xhr ) => {
+			return {
+				body,
+				headers: getResponseHeaders( xhr ),
+			};
+		} );
 
 	if ( isRequestMethod( request, 'GET' ) ) {
-		promise.then( ( data ) => {
-			cache[ getStablePath( request.path ) ] = data;
+		promise.then( ( response ) => {
+			cache[ getStablePath( request.path ) ] = response;
 		} );
 	}
 

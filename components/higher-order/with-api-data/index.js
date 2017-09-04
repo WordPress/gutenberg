@@ -57,7 +57,10 @@ export default ( mapPropsToData ) => ( WrappedComponent ) => {
 			// Trigger first fetch on initial entries into state. Assumes GET
 			// request by presence of isLoading flag.
 			forEach( dataProps, ( dataProp, propName ) => {
-				if ( prevDataProps.hasOwnProperty( propName ) ) {
+				if (
+					prevDataProps.hasOwnProperty( propName ) &&
+					prevDataProps[ propName ].path === dataProp.path
+				) {
 					return;
 				}
 
@@ -131,10 +134,10 @@ export default ( mapPropsToData ) => ( WrappedComponent ) => {
 				[ this.getPendingKey( method ) ]: true,
 			} );
 
-			request( { path, method } ).then( ( data ) => {
+			request( { path, method } ).then( ( response ) => {
 				this.setIntoDataProp( propName, {
 					[ this.getPendingKey( method ) ]: false,
-					[ this.getResponseDataKey( method ) ]: data,
+					[ this.getResponseDataKey( method ) ]: response.body,
 				} );
 			} ).catch( ( error ) => {
 				this.setIntoDataProp( propName, {

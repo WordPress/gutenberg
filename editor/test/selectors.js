@@ -16,6 +16,7 @@ import {
 	getEditorMode,
 	getPreference,
 	isEditorSidebarOpened,
+	isEditorSidebarPanelOpened,
 	hasEditorUndo,
 	hasEditorRedo,
 	isEditedPostNew,
@@ -91,7 +92,15 @@ describe( 'selectors', () => {
 	describe( 'getEditorMode', () => {
 		it( 'should return the selected editor mode', () => {
 			const state = {
-				mode: 'visual',
+				preferences: { mode: 'text' },
+			};
+
+			expect( getEditorMode( state ) ).toEqual( 'text' );
+		} );
+
+		it( 'should fallback to visual if not set', () => {
+			const state = {
+				preferences: {},
 			};
 
 			expect( getEditorMode( state ) ).toEqual( 'visual' );
@@ -114,6 +123,14 @@ describe( 'selectors', () => {
 
 			expect( getPreference( state, 'ribs' ) ).toBeUndefined();
 		} );
+
+		it( 'should return the default value if provided', () => {
+			const state = {
+				preferences: {},
+			};
+
+			expect( getPreference( state, 'ribs', 'chicken' ) ).toEqual( 'chicken' );
+		} );
 	} );
 
 	describe( 'isEditorSidebarOpened', () => {
@@ -131,6 +148,32 @@ describe( 'selectors', () => {
 			};
 
 			expect( isEditorSidebarOpened( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isEditorSidebarPanelOpened', () => {
+		it( 'should return false if no panels preference', () => {
+			const state = {
+				preferences: { isSidebarOpened: true },
+			};
+
+			expect( isEditorSidebarPanelOpened( state, 'post-taxonomies' ) ).toBe( false );
+		} );
+
+		it( 'should return false if the panel value is not set', () => {
+			const state = {
+				preferences: { panels: {} },
+			};
+
+			expect( isEditorSidebarPanelOpened( state, 'post-taxonomies' ) ).toBe( false );
+		} );
+
+		it( 'should return the panel value', () => {
+			const state = {
+				preferences: { panels: { 'post-taxonomies': true } },
+			};
+
+			expect( isEditorSidebarPanelOpened( state, 'post-taxonomies' ) ).toBe( true );
 		} );
 	} );
 
@@ -1423,7 +1466,7 @@ describe( 'selectors', () => {
 	describe( 'getBlockInsertionPoint', () => {
 		it( 'should return the uid of the selected block', () => {
 			const state = {
-				mode: 'visual',
+				preferences: { mode: 'visual' },
 				blockSelection: {
 					start: 2,
 					end: 2,
@@ -1441,7 +1484,7 @@ describe( 'selectors', () => {
 
 		it( 'should return the last multi selected uid', () => {
 			const state = {
-				mode: 'visual',
+				preferences: { mode: 'visual' },
 				blockSelection: {
 					start: 1,
 					end: 2,
@@ -1456,7 +1499,7 @@ describe( 'selectors', () => {
 
 		it( 'should return the last block if no selection', () => {
 			const state = {
-				mode: 'visual',
+				preferences: { mode: 'visual' },
 				blockSelection: { start: null, end: null },
 				editor: {
 					blockOrder: [ 1, 2, 3 ],
@@ -1468,7 +1511,7 @@ describe( 'selectors', () => {
 
 		it( 'should return the last block for the text mode', () => {
 			const state = {
-				mode: 'text',
+				preferences: { mode: 'text' },
 				blockSelection: { start: 2, end: 2 },
 				editor: {
 					blockOrder: [ 1, 2, 3 ],

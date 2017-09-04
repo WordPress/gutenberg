@@ -2,12 +2,13 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import { flowRight } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelRow, FormToggle, withInstanceId } from '@wordpress/components';
+import { PanelRow, FormToggle, withInstanceId, withAPIData } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -15,8 +16,13 @@ import { PanelRow, FormToggle, withInstanceId } from '@wordpress/components';
 import { getEditedPostAttribute, getCurrentPostType } from '../../selectors';
 import { editPost } from '../../actions';
 
-function PostSticky( { onUpdateSticky, postType, postSticky = false, instanceId } ) {
-	if ( postType !== 'post' ) {
+export function PostSticky( { onUpdateSticky, postType, postSticky = false, instanceId, user } ) {
+	if (
+		postType !== 'post' ||
+		! user.data ||
+		! user.data.capabilities.publish_posts ||
+		! user.data.capabilities.edit_others_posts
+	) {
 		return false;
 	}
 
@@ -35,7 +41,7 @@ function PostSticky( { onUpdateSticky, postType, postSticky = false, instanceId 
 	);
 }
 
-export default connect(
+const applyConnect = connect(
 	( state ) => {
 		return {
 			postType: getCurrentPostType( state ),
@@ -49,4 +55,16 @@ export default connect(
 			},
 		};
 	},
-)( withInstanceId( PostSticky ) );
+);
+
+const applyWithAPIData = withAPIData( () => {
+	return {
+		user: '/wp/v2/users/me?context=edit',
+	};
+} );
+
+export default flowRight( [
+	applyConnect,
+	applyWithAPIData,
+	withInstanceId,
+] )( PostSticky );

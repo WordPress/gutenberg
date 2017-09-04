@@ -9,24 +9,34 @@ import { shallow } from 'enzyme';
 import { PageAttributes } from '../';
 
 describe( 'PageAttributes', () => {
-	let fetchSupports;
-	beforeEach( () => {
-		fetchSupports = PageAttributes.prototype.fetchSupports;
-		PageAttributes.prototype.fetchSupports = jest.fn();
-	} );
+	const postType = {
+		data: {
+			supports: {
+				'page-attributes': true,
+			},
+		},
+	};
 
-	afterEach( () => {
-		PageAttributes.prototype.fetchSupports = fetchSupports;
+	it( 'should not render anything if unknown page attributes support', () => {
+		const wrapper = shallow( <PageAttributes postType={ {} } /> );
+
+		expect( wrapper.type() ).toBe( null );
 	} );
 
 	it( 'should not render anything if no page attributes support', () => {
-		const wrapper = shallow( <PageAttributes /> );
+		const wrapper = shallow( <PageAttributes postType={ {
+			data: {
+				supports: {
+					'page-attributes': false,
+				},
+			},
+		} } /> );
 
 		expect( wrapper.type() ).toBe( null );
 	} );
 
 	it( 'should render input if page attributes support', () => {
-		const wrapper = shallow( <PageAttributes /> );
+		const wrapper = shallow( <PageAttributes postType={ postType } /> );
 		wrapper.setState( { supportsPageAttributes: true } );
 
 		expect( wrapper.type() ).not.toBe( null );
@@ -34,7 +44,9 @@ describe( 'PageAttributes', () => {
 
 	it( 'should reject invalid input', () => {
 		const onUpdateOrder = jest.fn();
-		const wrapper = shallow( <PageAttributes onUpdateOrder={ onUpdateOrder } /> );
+		const wrapper = shallow(
+			<PageAttributes postType={ postType } onUpdateOrder={ onUpdateOrder } />
+		);
 		wrapper.setState( { supportsPageAttributes: true } );
 
 		wrapper.find( 'input' ).simulate( 'change', {
@@ -54,7 +66,9 @@ describe( 'PageAttributes', () => {
 
 	it( 'should update with valid input', () => {
 		const onUpdateOrder = jest.fn();
-		const wrapper = shallow( <PageAttributes onUpdateOrder={ onUpdateOrder } /> );
+		const wrapper = shallow(
+			<PageAttributes postType={ postType } onUpdateOrder={ onUpdateOrder } />
+		);
 		wrapper.setState( { supportsPageAttributes: true } );
 
 		wrapper.find( 'input' ).simulate( 'change', {

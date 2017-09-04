@@ -9,7 +9,7 @@ import classnames from 'classnames';
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, createBlock, source, setDefaultBlock } from '../../api';
+import { registerBlockType, createBlock, source, setDefaultBlockName } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import BlockControls from '../../block-controls';
@@ -195,4 +195,4 @@ registerBlockType( 'core/paragraph', {
 	},
 } );
 
-setDefaultBlock( 'core/paragraph' );
+setDefaultBlockName( 'core/paragraph' );

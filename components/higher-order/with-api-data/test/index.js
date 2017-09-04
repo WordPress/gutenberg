@@ -9,7 +9,9 @@ import { identity, fromPairs } from 'lodash';
  */
 import withAPIData from '../';
 
-jest.mock( '../request', () => jest.fn( () => Promise.resolve( {} ) ) );
+jest.mock( '../request', () => jest.fn( () => Promise.resolve( {
+	body: {},
+} ) ) );
 
 describe( 'withAPIData()', () => {
 	const schema = {
@@ -139,6 +141,23 @@ describe( 'withAPIData()', () => {
 			const dataProps = wrapper.state( 'dataProps' );
 			expect( dataProps ).not.toHaveProperty( 'page1' );
 			expect( dataProps ).toHaveProperty( 'page2' );
+
+			done();
+		} );
+	} );
+
+	it( 'should refetch on changed path', ( done ) => {
+		const wrapper = getWrapper(
+			( { pageId } ) => ( {
+				page: `/wp/v2/pages/${ pageId }`,
+			} ),
+			{ pageId: 5 }
+		);
+
+		process.nextTick( () => {
+			expect( wrapper.state( 'dataProps' ).page.isLoading ).toBe( false );
+			wrapper.setProps( { pageId: 7 } );
+			expect( wrapper.state( 'dataProps' ).page.isLoading ).toBe( true );
 
 			done();
 		} );

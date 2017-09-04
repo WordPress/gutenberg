@@ -13,8 +13,8 @@ import {
 	unregisterBlockType,
 	setUnknownTypeHandlerName,
 	getUnknownTypeHandlerName,
-	setDefaultBlock,
-	getDefaultBlock,
+	setDefaultBlockName,
+	getDefaultBlockName,
 	getBlockType,
 	getBlockTypes,
 } from '../registration';
@@ -33,7 +33,8 @@ describe( 'blocks', () => {
 			unregisterBlockType( block.name );
 		} );
 		setUnknownTypeHandlerName( undefined );
-		setDefaultBlock( undefined );
+		setDefaultBlockName( undefined );
+		window._wpBlocksAttributes = {};
 		console.error = error;
 	} );
 
@@ -109,6 +110,23 @@ describe( 'blocks', () => {
 			expect( block ).toBeUndefined();
 		} );
 
+		it( 'should default to browser-initialized global attributes', () => {
+			const attributes = { ok: { type: 'boolean' } };
+			window._wpBlocksAttributes = {
+				'core/test-block-with-attributes': attributes,
+			};
+
+			const blockType = { settingName: 'settingValue', save: noop, category: 'common' };
+			registerBlockType( 'core/test-block-with-attributes', blockType );
+			expect( getBlockType( 'core/test-block-with-attributes' ) ).toEqual( {
+				name: 'core/test-block-with-attributes',
+				settingName: 'settingValue',
+				save: noop,
+				category: 'common',
+				attributes,
+			} );
+		} );
+
 		it( 'should store a copy of block type', () => {
 			const blockType = { settingName: 'settingValue', save: noop, category: 'common' };
 			registerBlockType( 'core/test-block-with-settings', blockType );
@@ -155,17 +173,17 @@ describe( 'blocks', () => {
 		} );
 	} );
 
-	describe( 'setDefaultBlock()', () => {
+	describe( 'setDefaultBlockName()', () => {
 		it( 'assigns default block name', () => {
-			setDefaultBlock( 'core/test-block' );
+			setDefaultBlockName( 'core/test-block' );
 
-			expect( getDefaultBlock() ).toBe( 'core/test-block' );
+			expect( getDefaultBlockName() ).toBe( 'core/test-block' );
 		} );
 	} );
 
-	describe( 'getDefaultBlock()', () => {
+	describe( 'getDefaultBlockName()', () => {
 		it( 'defaults to undefined', () => {
-			expect( getDefaultBlock() ).toBeUndefined();
+			expect( getDefaultBlockName() ).toBeUndefined();
 		} );
 	} );
 

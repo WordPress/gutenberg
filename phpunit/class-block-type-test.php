@@ -63,6 +63,44 @@ class Block_Type_Test extends WP_UnitTestCase {
 		$this->assertSame( $content, $output );
 	}
 
+	function test_prepare_attributes() {
+		$attributes = array(
+			'correct'            => 'include',
+			'wrongType'          => 5,
+			'wrongTypeDefaulted' => 5,
+			/* missingDefaulted */
+			'undefined'          => 'omit',
+		);
+
+		$block_type = new WP_Block_Type( 'core/dummy', array(
+			'attributes' => array(
+				'correct' => array(
+					'type' => 'string',
+				),
+				'wrongType' => array(
+					'type' => 'string',
+				),
+				'wrongTypeDefaulted' => array(
+					'type'    => 'string',
+					'default' => 'defaulted',
+				),
+				'missingDefaulted' => array(
+					'type'    => 'string',
+					'default' => 'define',
+				),
+			),
+		) );
+
+		$prepared_attributes = $block_type->prepare_attributes_for_render( $attributes );
+
+		$this->assertEquals( array(
+			'correct'            => 'include',
+			'wrongType'          => null,
+			'wrongTypeDefaulted' => 'defaulted',
+			'missingDefaulted'   => 'define',
+		), $prepared_attributes );
+	}
+
 	function render_dummy_block( $attributes ) {
 		return json_encode( $attributes );
 	}

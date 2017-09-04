@@ -2,137 +2,103 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import { flowRight } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Button, PanelBody, Spinner, ResponsiveWrapper } from '@wordpress/components';
+import { Button, PanelBody, Spinner, ResponsiveWrapper, withAPIData } from '@wordpress/components';
 import { MediaUploadButton } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { getEditedPostAttribute } from '../../selectors';
-import { editPost } from '../../actions';
+import { getEditedPostAttribute, isEditorSidebarPanelOpened } from '../../selectors';
+import { editPost, toggleSidebarPanel } from '../../actions';
 
-class FeaturedImage extends Component {
-	constructor() {
-		super( ...arguments );
-		this.state = {
-			media: null,
-			loading: false,
-		};
-	}
+/**
+ * Module Constants
+ */
+const PANEL_NAME = 'featured-image';
 
-	componentDidMount() {
-		this.fetchMedia();
-	}
-
-	componentDidUpdate( prevProps ) {
-		if ( prevProps.featuredImageId !== this.props.featuredImageId ) {
-			this.fetchMedia();
-		}
-	}
-
-	componentWillUnmount() {
-		if ( this.fetchMediaRequest ) {
-			this.fetchMediaRequest.abort();
-		}
-	}
-
-	fetchMedia() {
-		this.setState( { media: null } );
-		if ( ! this.props.featuredImageId ) {
-			this.setState( { loading: false } );
-			return;
-		}
-		this.setState( { loading: true } );
-		if ( this.fetchMediaRequest ) {
-			this.fetchMediaRequest.abort();
-		}
-		this.fetchMediaRequest = new wp.api.models.Media( { id: this.props.featuredImageId } ).fetch()
-			.done( ( media ) => {
-				this.setState( {
-					loading: false,
-					media,
-				} );
-			} )
-			.fail( ( xhr ) => {
-				if ( xhr.statusText === 'abort' ) {
-					return;
+function FeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, media, isOpened, onTogglePanel } ) {
+	return (
+		<PanelBody title={ __( 'Featured image' ) } opened={ isOpened } onToggle={ onTogglePanel }>
+			<div className="editor-featured-image__content">
+				{ !! featuredImageId &&
+					<MediaUploadButton
+						buttonProps={ { className: 'button-link editor-featured-image__preview' } }
+						onSelect={ onUpdateImage }
+						type="image"
+					>
+						{ media && !! media.data &&
+							<ResponsiveWrapper
+								naturalWidth={ media.data.media_details.width }
+								naturalHeight={ media.data.media_details.height }
+							>
+								<img src={ media.data.source_url } alt={ __( 'Featured image' ) } />
+							</ResponsiveWrapper>
+						}
+						{ media && media.isLoading && <Spinner /> }
+					</MediaUploadButton>
 				}
-				this.setState( {
-					loading: false,
-				} );
-			} );
-	}
-
-	render() {
-		const { featuredImageId, onUpdateImage, onRemoveImage } = this.props;
-		const { media, loading } = this.state;
-
-		return (
-			<PanelBody title={ __( 'Featured image' ) } initialOpen={ false }>
-				<div className="editor-featured-image__content">
-					{ !! featuredImageId &&
-						<MediaUploadButton
-							buttonProps={ { className: 'button-link editor-featured-image__preview' } }
-							onSelect={ onUpdateImage }
-							type="image"
-						>
-							{ media &&
-								<ResponsiveWrapper
-									naturalWidth={ media.media_details.width }
-									naturalHeight={ media.media_details.height }
-								>
-									<img src={ media.source_url } alt={ __( 'Featured image' ) } />
-								</ResponsiveWrapper>
-							}
-							{ loading && <Spinner /> }
-						</MediaUploadButton>
-					}
-					{ !! featuredImageId && media &&
-						<p className="editor-featured-image__howto">
-							{ __( 'Click the image to edit or update' ) }
-						</p>
-					}
-					{ ! featuredImageId &&
-						<MediaUploadButton
-							buttonProps={ { className: 'editor-featured-image__toggle button-link' } }
-							onSelect={ onUpdateImage }
-							type="image"
-						>
-							{ __( 'Set featured image' ) }
-						</MediaUploadButton>
-					}
-					{ !! featuredImageId &&
-						<Button className="editor-featured-image__toggle button-link" onClick={ onRemoveImage }>
-							{ __( 'Remove featured image' ) }
-						</Button>
-					}
-				</div>
-			</PanelBody>
-		);
-	}
+				{ !! featuredImageId && media && ! media.isLoading &&
+					<p className="editor-featured-image__howto">
+						{ __( 'Click the image to edit or update' ) }
+					</p>
+				}
+				{ ! featuredImageId &&
+					<MediaUploadButton
+						buttonProps={ { className: 'editor-featured-image__toggle button-link' } }
+						onSelect={ onUpdateImage }
+						type="image"
+					>
+						{ __( 'Set featured image' ) }
+					</MediaUploadButton>
+				}
+				{ !! featuredImageId &&
+					<Button className="editor-featured-image__toggle button-link" onClick={ onRemoveImage }>
+						{ __( 'Remove featured image' ) }
+					</Button>
+				}
+			</div>
+		</PanelBody>
+	);
 }
 
-export default connect(
+const applyConnect = connect(
 	( state ) => {
 		return {
 			featuredImageId: getEditedPostAttribute( state, 'featured_media' ),
+			isOpened: isEditorSidebarPanelOpened( state, PANEL_NAME ),
 		};
 	},
-	( dispatch ) => {
-		return {
-			onUpdateImage( image ) {
-				dispatch( editPost( { featured_media: image.id } ) );
-			},
-			onRemoveImage() {
-				dispatch( editPost( { featured_media: null } ) );
-			},
-		};
+	{
+		onUpdateImage( image ) {
+			return editPost( { featured_media: image.id } );
+		},
+		onRemoveImage() {
+			return editPost( { featured_media: null } );
+		},
+		onTogglePanel() {
+			return toggleSidebarPanel( PANEL_NAME );
+		},
 	}
+);
+
+const applyWithAPIData = withAPIData( ( { featuredImageId } ) => {
+	if ( ! featuredImageId ) {
+		return {};
+	}
+
+	return {
+		media: `/wp/v2/media/${ featuredImageId }`,
+	};
+} );
+
+export default flowRight(
+	applyConnect,
+	applyWithAPIData,
 )( FeaturedImage );

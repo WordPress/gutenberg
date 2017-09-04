@@ -91,7 +91,7 @@ const {
 	AlignmentToolbar,
 	source
 } = wp.blocks;
-const { children } = children;
+const { children } = source;
 
 registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 	title: 'Hello World (Step 4)',

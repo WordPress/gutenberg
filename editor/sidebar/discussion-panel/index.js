@@ -12,10 +12,15 @@ import { PanelBody, PanelRow, FormToggle, withInstanceId } from '@wordpress/comp
 /**
  * Internal Dependencies
  */
-import { getEditedPostAttribute } from '../../selectors';
-import { editPost } from '../../actions';
+import { getEditedPostAttribute, isEditorSidebarPanelOpened } from '../../selectors';
+import { editPost, toggleSidebarPanel } from '../../actions';
 
-function DiscussionPanel( { pingStatus = 'open', commentStatus = 'open', instanceId, ...props } ) {
+/**
+ * Module Constants
+ */
+const PANEL_NAME = 'discussion-panel';
+
+function DiscussionPanel( { pingStatus = 'open', commentStatus = 'open', instanceId, isOpened, onTogglePanel, ...props } ) {
 	const onTogglePingback = () => props.editPost( { ping_status: pingStatus === 'open' ? 'closed' : 'open' } );
 	const onToggleComments = () => props.editPost( { comment_status: commentStatus === 'open' ? 'closed' : 'open' } );
 
@@ -23,7 +28,7 @@ function DiscussionPanel( { pingStatus = 'open', commentStatus = 'open', instanc
 	const pingbacksToggleId = 'allow-pingbacks-toggle-' + instanceId;
 
 	return (
-		<PanelBody title={ __( 'Discussion' ) } initialOpen={ false }>
+		<PanelBody title={ __( 'Discussion' ) } opened={ isOpened } onToggle={ onTogglePanel }>
 			<PanelRow>
 				<label htmlFor={ commentsToggleId }>{ __( 'Allow Comments' ) }</label>
 				<FormToggle
@@ -51,8 +56,14 @@ export default connect(
 		return {
 			pingStatus: getEditedPostAttribute( state, 'ping_status' ),
 			commentStatus: getEditedPostAttribute( state, 'comment_status' ),
+			isOpened: isEditorSidebarPanelOpened( state, PANEL_NAME ),
 		};
 	},
-	{ editPost }
+	{
+		editPost,
+		onTogglePanel() {
+			return toggleSidebarPanel( PANEL_NAME );
+		},
+	}
 )( withInstanceId( DiscussionPanel ) );
 

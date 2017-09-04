@@ -199,7 +199,19 @@ describe( 'block parser', () => {
 		} );
 
 		it( 'should fall back to the unknown type handler for unknown blocks if present', () => {
-			registerBlockType( 'core/unknown-block', defaultBlockSettings );
+			registerBlockType( 'core/unknown-block', {
+				category: 'common',
+				attributes: {
+					content: {
+						type: 'string',
+						source: html(),
+					},
+					fruit: {
+						type: 'string',
+					},
+				},
+				save: ( { attributes } ) => attributes.content,
+			} );
 			setUnknownTypeHandlerName( 'core/unknown-block' );
 
 			const block = createBlockWithFallback(
@@ -207,8 +219,9 @@ describe( 'block parser', () => {
 				'content',
 				{ fruit: 'Bananas' }
 			);
-			expect( block.name ).toEqual( 'core/unknown-block' );
-			expect( block.attributes ).toEqual( { fruit: 'Bananas' } );
+			expect( block.name ).toBe( 'core/unknown-block' );
+			expect( block.attributes.fruit ).toBe( 'Bananas' );
+			expect( block.attributes.content ).toContain( 'core/test-block' );
 		} );
 
 		it( 'should fall back to the unknown type handler if block type not specified', () => {

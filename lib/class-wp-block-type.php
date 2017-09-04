@@ -33,6 +33,15 @@ class WP_Block_Type {
 	public $render_callback;
 
 	/**
+	 * Block type attributes property schemas.
+	 *
+	 * @since 0.10.0
+	 * @access public
+	 * @var array
+	 */
+	public $attributes;
+
+	/**
 	 * Constructor.
 	 *
 	 * Will populate object properties from the provided arguments.
@@ -71,7 +80,43 @@ class WP_Block_Type {
 			return $content;
 		}
 
+		$attributes = $this->prepare_attributes_for_render( $attributes );
+
 		return call_user_func( $this->render_callback, $attributes, $content );
+	}
+
+	/**
+	 * Validates attributes against the current block schema, populating
+	 * defaulted and missing values, and omitting unknown attributes.
+	 *
+	 * @param  array $attributes Original block attributes.
+	 * @return array             Prepared block attributes.
+	 */
+	public function prepare_attributes_for_render( $attributes ) {
+		if ( ! isset( $this->attributes ) ) {
+			return $attributes;
+		}
+
+		$prepared_attributes = array();
+
+		foreach ( $this->attributes as $attribute_name => $schema ) {
+			$value = null;
+
+			if ( isset( $attributes[ $attribute_name ] ) ) {
+				$is_valid = rest_validate_value_from_schema( $attributes[ $attribute_name ], $schema );
+				if ( ! is_wp_error( $is_valid ) ) {
+					$value = $attributes[ $attribute_name ];
+				}
+			}
+
+			if ( is_null( $value ) && isset( $schema['default'] ) ) {
+				$value = $schema['default'];
+			}
+
+			$prepared_attributes[ $attribute_name ] = $value;
+		}
+
+		return $prepared_attributes;
 	}
 
 	/**

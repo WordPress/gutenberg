@@ -73,7 +73,6 @@ class VisualEditorBlock extends Component {
 		this.onFocus = this.onFocus.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
-		this.onKeyUp = this.onKeyUp.bind( this );
 		this.toggleMobileControls = this.toggleMobileControls.bind( this );
 		this.onBlockError = this.onBlockError.bind( this );
 		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
@@ -117,7 +116,7 @@ class VisualEditorBlock extends Component {
 		}
 
 		// Focus node when focus state is programmatically transferred.
-		if ( this.props.focus && ! prevProps.focus ) {
+		if ( this.props.focus && ! prevProps.focus && ! this.node.contains( document.activeElement ) ) {
 			this.node.focus();
 		}
 
@@ -256,7 +255,6 @@ class VisualEditorBlock extends Component {
 
 	onKeyDown( event ) {
 		const { keyCode, target } = event;
-
 		if ( ENTER === keyCode && target === this.node ) {
 			event.preventDefault();
 
@@ -264,9 +262,6 @@ class VisualEditorBlock extends Component {
 				createBlock( 'core/paragraph' ),
 			], this.props.order );
 		}
-	}
-
-	onKeyUp( event ) {
 		this.removeOrDeselect( event );
 	}
 
@@ -332,7 +327,6 @@ class VisualEditorBlock extends Component {
 			<div
 				ref={ this.bindBlockNode }
 				onKeyDown={ this.onKeyDown }
-				onKeyUp={ this.onKeyUp }
 				onFocus={ this.onFocus }
 				onMouseMove={ this.maybeHover }
 				onMouseEnter={ this.maybeHover }
