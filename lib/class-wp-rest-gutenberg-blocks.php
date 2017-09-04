@@ -355,20 +355,32 @@ class WP_Gutenberg_Block_Controller extends WP_REST_Controller {
 		$registry = WP_Block_Type_Registry::get_instance();
 		$blocks   = gutenberg_parse_blocks( $content );
 		$data     = array();
+		$data_pre = array();
 
 		// Loop thru the blocks, adding rendered content when available.
 		foreach ( $blocks as $block ) {
 			$block_name  = isset( $block['blockName'] ) ? $block['blockName'] : null;
 			$attributes  = is_array( $block['attrs'] ) ? $block['attrs'] : array();
 			$raw_content = isset( $block['rawContent'] ) ? $block['rawContent'] : null;
-			if ( $block_name ) {
+			if ( null !== $block_name ) {
 				$block_type = $registry->get_registered( $block_name );
 				if ( null !== $block_type ) {
 					$block['renderedContent'] = $block_type->render( $attributes, $raw_content );
 				}
+				$data_pre[] = $block;
 			}
-			$data[] = $block;
 		}
+
+		// Remap the block fields for the response.
+		foreach ( $data_pre as $block ) {
+			$data[] = array(
+				'type'       => $block['blockName'],
+				'attributes' => $block['attrs'],
+				'content'    => $block['rawContent'],
+				'rendered'   => isset( $block['renderedContent'] ) ? $block['renderedContent'] : null,
+			);
+		}
+
 		return $data;
 	}
 }
