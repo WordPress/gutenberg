@@ -6,3 +6,21 @@
 .editor-visual-editor__block[data-type="core/gallery"] .editor-visual-editor__block-edit {
 	overflow: hidden;
 }
+
+.blocks-gallery-image {
+	position: relative;
+}
+
+.blocks-gallery-image__remove {
+	position: absolute;
+	top: 5px;
+	right: 5px;
+	padding: 0;
+	border: 1px solid $light-gray-900;
+	background: $white;
+	opacity: 0.8;
+
+	&:hover {
+		opacity: 1;
+	}
+}
