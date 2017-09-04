@@ -25,7 +25,7 @@ import { toggleSidebarPanel } from '../../actions';
 const PANEL_NAME = 'post-taxonomies';
 
 function PostTaxonomies( { postType, taxonomies, isOpened, onTogglePanel } ) {
-	const availableTaxonomies = filter( taxonomies.data, ( taxonomy ) => taxonomy.types.indexOf( postType ) !== -1 );
+	const availableTaxonomies = filter( taxonomies.data, ( taxonomy ) => taxonomy.types.indexOf( postType ) !== -1 && taxonomy.public );
 
 	return (
 		<PanelBody
@@ -70,4 +70,3 @@ export default flowRight( [
 	applyConnect,
 	applyWithAPIData,
 ] )( PostTaxonomies );
-
