@@ -24,6 +24,7 @@ import {
 	notices,
 	showInsertionPoint,
 	blocksMode,
+	reusableBlocks,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -1037,6 +1038,90 @@ describe( 'state', () => {
 			const value = blocksMode( deepFreeze( { chicken: 'html' } ), action );
 
 			expect( value ).toEqual( { chicken: 'visual' } );
+		} );
+	} );
+
+	describe( 'reusableBlocks()', () => {
+		it( 'should start out empty', () => {
+			const state = reusableBlocks( undefined, {} );
+
+			expect( state ).toEqual( {} );
+		} );
+
+		it( 'should add a reusable block', () => {
+			const state = reusableBlocks( {}, {
+				type: 'ADD_REUSABLE_BLOCK',
+				reusableBlock: {
+					id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
+					name: 'My cool block',
+					type: 'core/paragraph',
+					attributes: {
+						content: 'Hello!',
+					},
+				},
+			} );
+
+			expect( state ).toEqual( {
+				'358b59ee-bab3-4d6f-8445-e8c6971a5605': {
+					id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
+					name: 'My cool block',
+					type: 'core/paragraph',
+					attributes: {
+						content: 'Hello!',
+					},
+				},
+			} );
+		} );
+
+		it( 'should update a reusable block', () => {
+			const initialState = {
+				'358b59ee-bab3-4d6f-8445-e8c6971a5605': {
+					id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
+					name: 'My cool block',
+					type: 'core/paragraph',
+					attributes: {
+						content: 'Hello!',
+						dropCap: true,
+					},
+				},
+			};
+			const state = reusableBlocks( initialState, {
+				type: 'UPDATE_REUSABLE_BLOCK',
+				id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
+				reusableBlock: {
+					name: 'My better block',
+					attributes: {
+						content: 'Yo!',
+					},
+				},
+			} );
+
+			expect( state ).toEqual( {
+				'358b59ee-bab3-4d6f-8445-e8c6971a5605': {
+					id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
+					name: 'My better block',
+					type: 'core/paragraph',
+					attributes: {
+						content: 'Yo!',
+						dropCap: true,
+					},
+				},
+			} );
+		} );
+
+		it( 'should do nothing when updating a non existent block', () => {
+			const state = reusableBlocks( {}, {
+				type: 'UPDATE_REUSABLE_BLOCK',
+				id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
+				reusableBlock: {
+					name: 'My better block',
+					attributes: {
+						content: 'Yo!',
+					},
+				},
+			} );
+
+			expect( state ).toEqual( {} );
 		} );
 	} );
 } );

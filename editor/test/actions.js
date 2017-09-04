@@ -6,6 +6,10 @@ import {
 	replaceBlocks,
 	startTyping,
 	stopTyping,
+	addReusableBlock,
+	saveReusableBlock,
+	attachBlock,
+	detachBlock,
 } from '../actions';
 
 describe( 'actions', () => {
@@ -50,6 +54,47 @@ describe( 'actions', () => {
 			expect( stopTyping() ).toEqual( {
 				type: 'STOP_TYPING',
 			} );
+		} );
+	} );
+
+	describe( 'addReusableBlock', () => {
+		it( 'should return the ADD_REUSABLE_BLOCK action', () => {
+			const reusableBlock = {
+				id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
+				name: 'My cool block',
+				type: 'core/paragraph',
+				attributes: {
+					content: 'Hello!',
+				},
+			};
+			expect( addReusableBlock( reusableBlock ) ).toEqual( {
+				type: 'ADD_REUSABLE_BLOCK',
+				reusableBlock,
+			} );
+		} );
+	} );
+
+	describe( 'saveReusableBlock', () => {
+		const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
+		expect( saveReusableBlock( id ) ).toEqual( {
+			type: 'SAVE_REUSABLE_BLOCK',
+			id,
+		} );
+	} );
+
+	describe( 'attachBlock', () => {
+		const uid = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
+		expect( attachBlock( uid ) ).toEqual( {
+			type: 'ATTACH_BLOCK',
+			uid,
+		} );
+	} );
+
+	describe( 'detachBlock', () => {
+		const uid = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
+		expect( detachBlock( uid ) ).toEqual( {
+			type: 'DETACH_BLOCK',
+			uid,
 		} );
 	} );
 } );

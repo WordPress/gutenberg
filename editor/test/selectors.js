@@ -64,6 +64,7 @@ import {
 	getSuggestedPostFormat,
 	getNotices,
 	getMostFrequentlyUsedBlocks,
+	getReusableBlock,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -1775,6 +1776,48 @@ describe( 'selectors', () => {
 
 			expect( getMostFrequentlyUsedBlocks( state ).map( ( block ) => block.name ) )
 				.toEqual( [ 'core/image', 'core/paragraph', 'core/quote' ] );
+		} );
+	} );
+
+	describe( 'getReusableBlock', () => {
+		it( 'should return a reusable block', () => {
+			const state = {
+				reusableBlocks: {
+					'358b59ee-bab3-4d6f-8445-e8c6971a5605': {
+						id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
+						name: 'My cool block',
+						type: 'core/paragraph',
+						attributes: {
+							content: 'Hello!',
+						},
+					},
+				},
+			};
+			const reusableBlock = getReusableBlock(
+				state,
+				'358b59ee-bab3-4d6f-8445-e8c6971a5605'
+			);
+
+			expect( reusableBlock ).toEqual( {
+				id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
+				name: 'My cool block',
+				type: 'core/paragraph',
+				attributes: {
+					content: 'Hello!',
+				},
+			} );
+		} );
+
+		it( 'should return null when no reusable block exists', () => {
+			const state = {
+				reusableBlocks: {},
+			};
+			const reusableBlock = getReusableBlock(
+				state,
+				'358b59ee-bab3-4d6f-8445-e8c6971a5605'
+			);
+
+			expect( reusableBlock ).toBeNull();
 		} );
 	} );
 } );
