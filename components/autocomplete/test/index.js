@@ -52,11 +52,13 @@ describe( 'Autocomplete', () => {
 					{ input }
 				</Autocomplete>
 			);
+			const popover = wrapper.find( 'Popover' );
 
-			expect( wrapper.hasClass( 'my-autocomplete' ) ).toBe( true );
+			expect( wrapper.state( 'isOpen' ) ).toBe( false );
+			expect( popover.hasClass( 'my-autocomplete' ) ).toBe( true );
+			expect( popover.hasClass( 'components-autocomplete__popover' ) ).toBe( true );
 			expect( wrapper.hasClass( 'components-autocomplete' ) ).toBe( true );
 			expect( wrapper.find( '[data-ok]' ) ).toHaveLength( 1 );
-			expect( wrapper.find( 'ul' ) ).toHaveLength( 0 );
 		} );
 
 		it( 'opens on absent trigger prefix search', () => {
