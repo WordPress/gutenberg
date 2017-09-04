@@ -212,6 +212,8 @@ export default class Editable extends Component {
 	}
 
 	onChange() {
+		this.saveEditorContentThrottled.cancel();
+
 		if ( ! this.editor.isDirty() ) {
 			return;
 		}
@@ -607,7 +609,7 @@ export default class Editable extends Component {
 		);
 
 		return (
-			<div className={ classes }>
+			<div className={ classes } >
 				{ focus &&
 					<Fill name="Formatting.Toolbar">
 						{ ! inlineToolbar && formatToolbar }
