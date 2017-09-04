@@ -15,6 +15,11 @@ import { createPortal, Component } from '@wordpress/element';
 import './style.scss';
 import PopoverDetectOutside from './detect-outside';
 
+/**
+ * module constants
+ */
+const ARROW_OFFSET = 20;
+
 export class Popover extends Component {
 	constructor() {
 		super( ...arguments );
@@ -92,8 +97,10 @@ export class Popover extends Component {
 		}
 
 		const rect = parentNode.getBoundingClientRect();
-		const [ yAxis ] = this.getPositions();
+		const [ yAxis, xAxis ] = this.getPositions();
 		const isTop = 'top' === yAxis;
+		const isLeft = 'left' === xAxis;
+		const isRight = 'right' === xAxis;
 
 		// Offset top positioning by padding
 		const { paddingTop, paddingBottom } = window.getComputedStyle( parentNode );
@@ -102,8 +109,14 @@ export class Popover extends Component {
 			topOffset *= -1;
 		}
 
-		// Set popover at parent node center
-		popover.style.left = Math.round( rect.left + ( rect.width / 2 ) ) + 'px';
+		if ( isRight ) {
+			popover.style.left = rect.left + ARROW_OFFSET + 'px';
+		} else if ( isLeft ) {
+			popover.style.left = ( rect.right - ARROW_OFFSET ) + 'px';
+		} else {
+			// Set popover at parent node center
+			popover.style.left = Math.round( rect.left + ( rect.width / 2 ) ) + 'px';
+		}
 
 		// Set at top or bottom of parent node based on popover position
 		popover.style.top = ( rect[ yAxis ] + topOffset ) + 'px';
