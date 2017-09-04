@@ -36,6 +36,7 @@ $z-layers: (
 	// Show popovers above wp-admin menus and submenus and sidebar:
 	// #adminmenuwrap { z-index: 9990 }
 	'.components-popover': 1000000,
+	'.blocks-gallery-image__inline-menu': 1000000,
 	'.blocks-url-input__suggestions': 9999,
 );
 
