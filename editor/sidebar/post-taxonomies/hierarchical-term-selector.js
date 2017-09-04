@@ -70,7 +70,8 @@ class HierarchicalTermSelector extends Component {
 	}
 
 	onChangeFormName( event ) {
-		this.setState( { formName: event.target.value } );
+		const newValue = event.target.value.trim() === '' ? '' : event.target.value;
+		this.setState( { formName: newValue } );
 	}
 
 	onChangeFormParent( event ) {
