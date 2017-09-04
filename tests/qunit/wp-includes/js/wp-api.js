@@ -194,6 +194,86 @@
 		} );
 	} );
 
+	// Find models by route.
+	var modelsToFetchByRoute = [
+		'Category',
+		'Comment',
+		'Media',
+		'Page',
+		'PageRevision',
+		'Post',
+		'PostRevision',
+		'Status',
+		'Tag',
+		'Taxonomy',
+		'Type',
+		'User'
+	];
+
+	_.each( modelsToFetchByRoute, function( model ) {
+		QUnit.test( 'Test fetching ' + model + ' by route.', function( assert ) {
+
+			var done = assert.async();
+
+			assert.expect( 1 );
+
+			wp.api.loadPromise.done( function() {
+
+				var theModel = wp.api.models[ model ];
+				var route = theModel.prototype.route.index;
+
+				assert.equal(
+					wp.api.getModelByRoute( route ),
+					theModel,
+					'wp.api.models.' + model + ' found at route ' + route
+				);
+
+				// Trigger Qunit async completion.
+				done();
+			} );
+		} );
+	} );
+
+	// Find collections by route.
+	var collectionsToFetchByRoute = [
+		'Categories',
+		'Comments',
+		'Media',
+		'PageRevisions',
+		'Pages',
+		'PostRevisions',
+		'Posts',
+		'Statuses',
+		'Tags',
+		'Taxonomies',
+		'Types',
+		'Users'
+	];
+
+	_.each( collectionsToFetchByRoute, function( collection ) {
+		QUnit.test( 'Test fetching ' + collection + ' by route.', function( assert ) {
+
+			var done = assert.async();
+
+			assert.expect( 1 );
+
+			wp.api.loadPromise.done( function() {
+
+				var theCollection = wp.api.collections[ collection ];
+				var route = theCollection.prototype.route.index;
+
+				assert.equal(
+					wp.api.getCollectionByRoute( route ),
+					theCollection,
+					'wp.api.collections.' + collection + ' found at ' + route
+				);
+
+				// Trigger Qunit async completion.
+				done();
+			} );
+		} );
+	} );
+
 	// Test the jswidget custom namespace and endpoints.
 	wp.api.init( {
 		'versionString': 'js-widgets/v1/'
