@@ -285,11 +285,11 @@ export default {
 		return effects;
 	},
 	FETCH_REUSABLE_BLOCK( action, store ) {
-		const { ref } = action;
+		const { id } = action;
 		const { dispatch } = store;
 
-		new wp.api.models.ReusableBlocks( { id: ref } ).fetch().then(
-			( { id, name, content } ) => {
+		new wp.api.models.ReusableBlocks( { id } ).fetch().then(
+			( { name, content } ) => {
 				const [ { name: type, attributes } ] = parse( content );
 				dispatch( {
 					type: 'FETCH_REUSABLE_BLOCK_SUCCESS',
@@ -314,13 +314,13 @@ export default {
 		dispatch( addReusableBlock( reusableBlock ) );
 	},
 	SAVE_REUSABLE_BLOCK( action, store ) {
-		const { ref } = action;
+		const { id } = action;
 		const { getState, dispatch } = store;
 
-		const { name, type, attributes } = getReusableBlock( getState(), ref );
+		const { name, type, attributes } = getReusableBlock( getState(), id );
 		const content = serialize( createBlock( type, attributes ) );
 
-		new wp.api.models.ReusableBlocks( { id: ref, name, content } ).save().then(
+		new wp.api.models.ReusableBlocks( { id, name, content } ).save().then(
 			() => {
 				dispatch( {
 					type: 'SAVE_REUSABLE_BLOCK_SUCCESS',

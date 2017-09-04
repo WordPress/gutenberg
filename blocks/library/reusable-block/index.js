@@ -98,20 +98,20 @@ const ConnectedReusableBlockEdit = connect(
 		fetchReusableBlock() {
 			dispatch( {
 				type: 'FETCH_REUSABLE_BLOCK',
-				ref: ownProps.attributes.ref,
+				id: ownProps.attributes.ref,
 			} );
 		},
 		updateReusableBlock( reusableBlock ) {
 			dispatch( {
 				type: 'UPDATE_REUSABLE_BLOCK',
-				ref: ownProps.attributes.ref,
+				id: ownProps.attributes.ref,
 				reusableBlock,
 			} );
 		},
 		saveReusableBlock() {
 			dispatch( {
 				type: 'SAVE_REUSABLE_BLOCK',
-				ref: ownProps.attributes.ref,
+				id: ownProps.attributes.ref,
 			} );
 		},
 		attachReusableBlock() {

@@ -562,8 +562,8 @@ export function reusableBlocks( state = {}, action ) {
 		}
 
 		case 'UPDATE_REUSABLE_BLOCK': {
-			const { ref, reusableBlock } = action;
-			const existingReusableBlock = state[ ref ];
+			const { id, reusableBlock } = action;
+			const existingReusableBlock = state[ id ];
 
 			if ( ! existingReusableBlock ) {
 				return state;
@@ -571,7 +571,7 @@ export function reusableBlocks( state = {}, action ) {
 
 			return {
 				...state,
-				[ ref ]: {
+				[ id ]: {
 					...existingReusableBlock,
 					...reusableBlock,
 					attributes: {
