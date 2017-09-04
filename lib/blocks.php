@@ -94,7 +94,6 @@ function do_blocks( $content ) {
 }
 add_filter( 'the_content', 'do_blocks', 9 ); // BEFORE do_shortcode() and wpautop().
 
-
 /**
  * Extract the blocks from post content for the REST API post response.
  *
