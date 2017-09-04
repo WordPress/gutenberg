@@ -88,7 +88,7 @@ export default class Editable extends Component {
 		this.maybePropagateUndo = this.maybePropagateUndo.bind( this );
 		this.onBeforePastePreProcess = this.onBeforePastePreProcess.bind( this );
 		this.saveEditorContent = this.saveEditorContent.bind( this );
-		this.saveEditorContentThrottled = throttle( this.saveEditorContent, 500, { leading: true } );
+		this.saveEditorContentThrottled = throttle( this.saveEditorContent, 10100, { leading: true } );
 
 		this.state = {
 			formats: {},
