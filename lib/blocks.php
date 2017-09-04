@@ -150,10 +150,10 @@ function attach_block_response_callback( $post_type ) {
 	}
 	if ( is_array( $post_type ) ) {
 		foreach ( $post_type as $type ) {
-			add_filter( 'rest_prepare_' . $type, 'attach_block_data_to_post_response', 10, 3 );
+			add_filter( 'rest_prepare_' . $type, 'attach_block_data_to_post_response', 10, 2 );
 		}
 	} else {
-		add_filter( 'rest_prepare_' . $post_type, 'attach_block_data_to_post_response', 10, 3 );
+		add_filter( 'rest_prepare_' . $post_type, 'attach_block_data_to_post_response', 10, 2 );
 	}
 }
 attach_block_response_callback( 'post' );
@@ -165,7 +165,7 @@ attach_block_response_callback( 'post' );
  *
  * @param string $post_type Post type.
  */
-function attach_block_data_to_post_response( $response, $post, $request ) {
+function attach_block_data_to_post_response( $response, $post ) {
 	if ( ! $post ) {
 		return $response;
 	}
