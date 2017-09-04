@@ -14,11 +14,11 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { getBlockType, registerBlockType } from '../../api';
-import { NewReusableBlockDialog, PersistConfirmationDialog } from './dialogs';
+import { NewReusableBlockDialog, SaveConfirmationDialog } from './dialogs';
 
-const PERSIST_CONFIRMATION_HIDE = 'hide';
-const PERSIST_CONFIRMATION_SHOW = 'show';
-const PERSIST_CONFIRMATION_DISABLE = 'disable';
+const SAVE_CONFIRMATION_HIDE = 'hide';
+const SAVE_CONFIRMATION_SHOW = 'show';
+const SAVE_CONFIRMATION_DISABLE = 'disable';
 
 class ReusableBlockEdit extends Component {
 	constructor() {
@@ -26,39 +26,39 @@ class ReusableBlockEdit extends Component {
 
 		this.setName = this.setName.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
-		this.confirmPersist = this.confirmPersist.bind( this );
+		this.confirmSave = this.confirmSave.bind( this );
 
 		if ( this.props.reusableBlock ) {
-			this.state = { persistConfirmation: PERSIST_CONFIRMATION_DISABLE };
+			this.state = { saveConfirmation: SAVE_CONFIRMATION_DISABLE };
 		} else {
-			this.state = { persistConfirmation: PERSIST_CONFIRMATION_HIDE };
+			this.state = { saveConfirmation: SAVE_CONFIRMATION_HIDE };
 			this.props.fetchReusableBlock();
 		}
 	}
 
 	setName( name ) {
 		this.props.updateReusableBlock( { name } );
-		this.props.persistReusableBlock();
+		this.props.saveReusableBlock();
 	}
 
 	setAttributes( attributes ) {
 		this.props.updateReusableBlock( { attributes } );
 
-		if ( this.state.persistConfirmation !== PERSIST_CONFIRMATION_DISABLE ) {
-			this.setState( { persistConfirmation: PERSIST_CONFIRMATION_SHOW } );
+		if ( this.state.saveConfirmation !== SAVE_CONFIRMATION_DISABLE ) {
+			this.setState( { saveConfirmation: SAVE_CONFIRMATION_SHOW } );
 		} else {
-			this.props.persistReusableBlock();
+			this.props.saveReusableBlock();
 		}
 	}
 
-	confirmPersist() {
-		this.setState( { persistConfirmation: PERSIST_CONFIRMATION_DISABLE } );
-		this.props.persistReusableBlock();
+	confirmSave() {
+		this.setState( { saveConfirmation: SAVE_CONFIRMATION_DISABLE } );
+		this.props.saveReusableBlock();
 	}
 
 	render() {
 		const { reusableBlock, attachReusableBlock } = this.props;
-		const { persistConfirmation } = this.state;
+		const { saveConfirmation } = this.state;
 
 		if ( ! reusableBlock ) {
 			return <Placeholder><Spinner /></Placeholder>;
@@ -68,8 +68,8 @@ class ReusableBlockEdit extends Component {
 			return <NewReusableBlockDialog onCreate={ this.setName } onCancel={ attachReusableBlock } />;
 		}
 
-		if ( persistConfirmation === PERSIST_CONFIRMATION_SHOW ) {
-			return <PersistConfirmationDialog onConfirm={ this.confirmPersist } onCancel={ attachReusableBlock } />;
+		if ( saveConfirmation === SAVE_CONFIRMATION_SHOW ) {
+			return <SaveConfirmationDialog onConfirm={ this.confirmSave } onCancel={ attachReusableBlock } />;
 		}
 
 		const blockType = getBlockType( reusableBlock.type );
@@ -108,9 +108,9 @@ const ConnectedReusableBlockEdit = connect(
 				reusableBlock,
 			} );
 		},
-		persistReusableBlock() {
+		saveReusableBlock() {
 			dispatch( {
-				type: 'PERSIST_REUSABLE_BLOCK',
+				type: 'SAVE_REUSABLE_BLOCK',
 				ref: ownProps.attributes.ref,
 			} );
 		},

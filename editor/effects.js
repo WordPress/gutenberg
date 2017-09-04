@@ -33,7 +33,7 @@ import {
 	savePost,
 	editPost,
 	addReusableBlock,
-	persistReusableBlock,
+	saveReusableBlock,
 } from './actions';
 import {
 	getCurrentPost,
@@ -313,7 +313,7 @@ export default {
 
 		dispatch( addReusableBlock( reusableBlock ) );
 	},
-	PERSIST_REUSABLE_BLOCK( action, store ) {
+	SAVE_REUSABLE_BLOCK( action, store ) {
 		const { ref } = action;
 		const { getState, dispatch } = store;
 
@@ -323,12 +323,12 @@ export default {
 		new wp.api.models.ReusableBlocks( { id: ref, name, content } ).save().then(
 			() => {
 				dispatch( {
-					type: 'PERSIST_REUSABLE_BLOCK_SUCCESS',
+					type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
 				} );
 			},
 			( error ) => {
 				dispatch( {
-					type: 'PERSIST_REUSABLE_BLOCK_FAILURE',
+					type: 'SAVE_REUSABLE_BLOCK_FAILURE',
 					error: get( error, 'responseJSON', {
 						code: 'unknown_error',
 						message: __( 'An unknown error occurred.' ),
@@ -352,7 +352,7 @@ export default {
 		const reusableBlock = createReusableBlock( oldBlock.name, oldBlock.attributes );
 		const newBlock = createBlock( 'core/reusable-block', { ref: reusableBlock.id } );
 		dispatch( addReusableBlock( reusableBlock ) );
-		dispatch( persistReusableBlock( reusableBlock.id ) );
+		dispatch( saveReusableBlock( reusableBlock.id ) );
 		dispatch( replaceBlocks( [ oldBlock.uid ], [ newBlock ] ) );
 	},
 };

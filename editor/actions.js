@@ -389,14 +389,14 @@ export function addReusableBlock( reusableBlock ) {
 }
 
 /**
- * Returns an action object used to persist a reusable block to the REST API.
+ * Returns an action object used to save a reusable block to the REST API.
  *
  * @param {Object} ref The ID of the reusable block
  * @return {Object}    Action object
  */
-export function persistReusableBlock( ref ) {
+export function saveReusableBlock( ref ) {
 	return {
-		type: 'PERSIST_REUSABLE_BLOCK',
+		type: 'SAVE_REUSABLE_BLOCK',
 		ref,
 	};
 }

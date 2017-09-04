@@ -30,7 +30,7 @@ export class NewReusableBlockDialog extends Component {
 	}
 }
 
-export function PersistConfirmationDialog( { onConfirm, onCancel } ) {
+export function SaveConfirmationDialog( { onConfirm, onCancel } ) {
 	return (
 		<div>
 			<p>These changes will appear everywhere. Is that OK?</p>
