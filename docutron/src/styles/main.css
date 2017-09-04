@@ -144,7 +144,6 @@ code, pre {
 .content-area h4,
 .content-area h5 {
 	position: relative;
-	border-bottom: 1px solid #EDF3F1;
 	margin: 40px 0 20px;
 }
 .markdownIt-Anchor {
