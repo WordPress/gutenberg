@@ -14,7 +14,7 @@ import { ClipboardButton, Tooltip, PanelBody } from '@wordpress/components';
 /**
  * Internal Dependencies
  */
-import { updateBlockAttributes, attachReusableBlock, detachReusableBlock } from '../../actions';
+import { updateBlockAttributes, attachBlock, detachBlock } from '../../actions';
 import { getSelectedBlock, getCurrentPost } from '../../selectors';
 import { filterURLForDisplay } from '../../utils/url';
 
@@ -62,7 +62,7 @@ class BlockInspectorAdvancedControls extends Component {
 	}
 
 	render() {
-		const { selectedBlock, post, attach, detach } = this.props;
+		const { selectedBlock, post, onAttachBlock, onDetachBlock } = this.props;
 		const blockType = getBlockType( selectedBlock.name );
 
 		return (
@@ -92,10 +92,10 @@ class BlockInspectorAdvancedControls extends Component {
 					</div>
 				}
 				{ selectedBlock.name === 'core/reusable-block' &&
-					<button onClick={ () => attach( selectedBlock.uid ) }>Convert to regular block</button>
+					<button onClick={ () => onAttachBlock( selectedBlock.uid ) }>Convert to regular block</button>
 				}
 				{ selectedBlock.name !== 'core/reusable-block' &&
-					<button onClick={ () => detach( selectedBlock.uid ) }>Convert to reusable block</button>
+					<button onClick={ () => onDetachBlock( selectedBlock.uid ) }>Convert to reusable block</button>
 				}
 			</PanelBody>
 		);
@@ -111,7 +111,7 @@ export default connect(
 	},
 	{
 		setAttributes: updateBlockAttributes,
-		attach: attachReusableBlock,
-		detach: detachReusableBlock,
+		onAttachBlock: attachBlock,
+		onDetachBlock: detachBlock,
 	}
 )( BlockInspectorAdvancedControls );

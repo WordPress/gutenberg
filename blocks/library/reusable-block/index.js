@@ -57,7 +57,7 @@ class ReusableBlockEdit extends Component {
 	}
 
 	render() {
-		const { reusableBlock, attachReusableBlock } = this.props;
+		const { reusableBlock, attachBlock } = this.props;
 		const { saveConfirmation } = this.state;
 
 		if ( ! reusableBlock ) {
@@ -65,11 +65,11 @@ class ReusableBlockEdit extends Component {
 		}
 
 		if ( ! reusableBlock.name ) {
-			return <NewReusableBlockDialog onCreate={ this.setName } onCancel={ attachReusableBlock } />;
+			return <NewReusableBlockDialog onCreate={ this.setName } onCancel={ attachBlock } />;
 		}
 
 		if ( saveConfirmation === SAVE_CONFIRMATION_SHOW ) {
-			return <SaveConfirmationDialog onConfirm={ this.confirmSave } onCancel={ attachReusableBlock } />;
+			return <SaveConfirmationDialog onConfirm={ this.confirmSave } onCancel={ attachBlock } />;
 		}
 
 		const blockType = getBlockType( reusableBlock.type );
@@ -114,15 +114,9 @@ const ConnectedReusableBlockEdit = connect(
 				id: ownProps.attributes.ref,
 			} );
 		},
-		attachReusableBlock() {
+		attachBlock() {
 			dispatch( {
-				type: 'ATTACH_REUSABLE_BLOCK',
-				uid: ownProps.id,
-			} );
-		},
-		detachReusableBlock() {
-			dispatch( {
-				type: 'DETACH_REUSABLE_BLOCK',
+				type: 'ATTACH_BLOCK',
 				uid: ownProps.id,
 			} );
 		},
