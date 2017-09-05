@@ -181,16 +181,17 @@ export default class Editable extends Component {
 	onBeforePastePreProcess( event ) {
 		// Allows us to ask for this information when we get a report.
 		window.console.log( 'Received HTML:\n\n', event.content );
+		const inlinePaste = ! this.props.onSplit || this.props.splitIfEmpty;
 
 		const content = pasteHandler( {
 			content: event.content,
-			inline: ! this.props.onSplit,
+			inline: inlinePaste,
 		} );
 
 		if ( typeof content === 'string' ) {
 			// Let MCE process further with the given content.
 			event.content = content;
-		} else if ( this.props.onSplit ) {
+		} else if ( ! inlinePaste ) {
 			// Abort pasting to split the content
 			event.preventDefault();
 
@@ -321,6 +322,15 @@ export default class Editable extends Component {
 		// If we click shift+Enter on inline Editables, we avoid creating two contenteditables
 		// We also split the content and call the onSplit prop if provided.
 		if ( event.keyCode === ENTER ) {
+			// If the editable is empty and splitIfEmpty equal true call onSplit
+			if ( this.props.onSplit && this.props.splitIfEmpty ) {
+				if ( this.state.empty ) {
+					event.preventDefault();
+					this.props.onSplit();
+				}
+				return;
+			}
+
 			if ( this.props.multiline ) {
 				if ( ! this.props.onSplit ) {
 					return;
@@ -397,7 +407,7 @@ export default class Editable extends Component {
 	}
 
 	onNewBlock() {
-		if ( this.props.multiline !== 'p' || ! this.props.onSplit ) {
+		if ( this.props.multiline !== 'p' || ! this.props.onSplit || this.splitIfEmpty ) {
 			return;
 		}
 

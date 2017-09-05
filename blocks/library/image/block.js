@@ -27,6 +27,7 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import BlockDescription from '../../block-description';
 import UrlInputButton from '../../url-input/button';
 import ImageSize from './image-size';
+import { createBlock } from '../../api';
 
 class ImageBlock extends Component {
 	constructor() {
@@ -35,6 +36,7 @@ class ImageBlock extends Component {
 		this.updateAlignment = this.updateAlignment.bind( this );
 		this.onSelectImage = this.onSelectImage.bind( this );
 		this.onSetHref = this.onSetHref.bind( this );
+		this.onSplitCaption = this.onSplitCaption.bind( this );
 		this.updateImageSize = this.updateImageSize.bind( this );
 		this.state = {
 			availableSizes: {},
@@ -60,6 +62,12 @@ class ImageBlock extends Component {
 
 	onSetHref( value ) {
 		this.props.setAttributes( { href: value } );
+	}
+
+	onSplitCaption() {
+		this.props.insertBlocksAfter(
+			createBlock( 'core/paragraph' ),
+		);
 	}
 
 	updateAlt( newAlt ) {
@@ -247,6 +255,8 @@ class ImageBlock extends Component {
 						focus={ focus && focus.editable === 'caption' ? focus : undefined }
 						onFocus={ focusCaption }
 						onChange={ ( value ) => setAttributes( { caption: value } ) }
+						onSplit={ this.onSplitCaption }
+						splitIfEmpty
 						inlineToolbar
 					/>
 				) : null }
