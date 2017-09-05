@@ -42,20 +42,19 @@ class ColorPalette extends Component {
 				{ colors.map( ( color ) => {
 					const style = { color: color };
 					const className = classnames( 'blocks-color-palette__item', { 'is-active': value === color } );
-					/* Disable reason: aria-current seems like a valid aria-prop and well-suited for this */
-					/* eslint-disable jsx-a11y/aria-props */
+
 					return (
 						<div key={ color } className="blocks-color-palette__item-wrapper">
 							<button
+								type="button"
 								className={ className }
 								style={ style }
 								onClick={ () => onChange( value === color ? undefined : color ) }
 								aria-label={ sprintf( __( 'Color: %s' ), color ) }
-								aria-current={ value === color && __( 'Selected color' ) }
+								aria-pressed={ value === color ? true : false }
 							/>
 						</div>
 					);
-					/* eslint-enable jsx-a11y/aria-props */
 				} ) }
 
 				<div className="blocks-color-palette__item-wrapper blocks-color-palette__custom-color">
@@ -82,8 +81,12 @@ class ColorPalette extends Component {
 				</div>
 
 				<div className="blocks-color-palette__item-wrapper blocks-color-palette__clear-color">
-					<button className="blocks-color-palette__item" onClick={ () => onChange( undefined ) }>
-						<div className="blocks-color-palette__clear-color-line" />
+					<button
+						className="blocks-color-palette__item"
+						onClick={ () => onChange( undefined ) }
+						aria-label={ __( 'Remove color' ) }
+					>
+						<span className="blocks-color-palette__clear-color-line" />
 					</button>
 				</div>
 			</div>

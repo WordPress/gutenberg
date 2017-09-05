@@ -55,7 +55,7 @@ $color-palette-circle-spacing: 14px;
 }
 
 .blocks-color-palette__clear-color-line {
-	cursor: pointer;
+	display: block;
 	position: absolute;
 	border: 2px solid $alert-red;
 	border-radius: 50%;
