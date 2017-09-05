@@ -23,16 +23,29 @@ class ColorPalette extends Component {
 		this.state = {
 			opened: false,
 		};
-		this.openPicker = this.openPicker.bind( this );
-		this.closePicker = this.closePicker.bind( this );
+		this.togglePicker = this.togglePicker.bind( this );
+		this.stopPropagation = this.stopPropagation.bind( this );
+		this.closeOnClickOutside = this.closeOnClickOutside.bind( this );
+		this.bindToggleNode = this.bindToggleNode.bind( this );
 	}
 
-	openPicker() {
-		this.setState( { opened: true } );
+	togglePicker() {
+		this.setState( ( state ) => ( { opened: ! state.opened } ) );
 	}
 
-	closePicker() {
-		this.setState( { opened: false } );
+	stopPropagation( event ) {
+		event.stopPropagation();
+	}
+
+	closeOnClickOutside( event ) {
+		const { opened } = this.state;
+		if ( opened && ! this.toggleNode.contains( event.target ) ) {
+			this.togglePicker();
+		}
+	}
+
+	bindToggleNode( node ) {
+		this.toggleNode = node;
 	}
 
 	render() {
@@ -59,13 +72,17 @@ class ColorPalette extends Component {
 
 				<div className="blocks-color-palette__item-wrapper blocks-color-palette__custom-color">
 					<button
+						type="button"
+						aria-expanded={ this.state.opened }
 						className="blocks-color-palette__item"
-						onClick={ this.openPicker }
-						aria-label={ __( 'Open custom color picker' ) }
+						onClick={ this.togglePicker }
+						ref={ this.bindToggleNode }
+						aria-label={ __( 'Custom color picker' ) }
 					/>
 					<Popover
 						isOpen={ this.state.opened }
-						onClose={ this.closePicker }
+						onClose={ this.closeOnClickOutside }
+						onClick={ this.stopPropagation }
 						className="blocks-color-palette__picker"
 					>
 						<ChromePicker
