@@ -100,8 +100,7 @@ class FormatToolbar extends Component {
 	}
 
 	toggleLinkSettingsVisibility() {
-		const settingsVisible = ! this.state.settingsVisible;
-		this.setState( { settingsVisible } );
+		this.setState( ( state ) => ( { settingsVisible: ! state.settingsVisible } ) );
 	}
 
 	setLinkTarget( event ) {
