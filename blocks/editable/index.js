@@ -466,7 +466,7 @@ export default class Editable extends Component {
 		const formats = {};
 		const link = find( parents, ( node ) => node.nodeName.toLowerCase() === 'a' );
 		if ( link ) {
-			formats.link = { value: link.getAttribute( 'href' ) || '', node: link };
+			formats.link = { value: link.getAttribute( 'href' ) || '', target: link.getAttribute( 'target' ) || '', node: link };
 		}
 		const activeFormats = this.editor.formatter.matchAll( [	'bold', 'italic', 'strikethrough' ] );
 		activeFormats.forEach( ( activeFormat ) => formats[ activeFormat ] = true );
@@ -560,7 +560,7 @@ export default class Editable extends Component {
 					if ( ! anchor ) {
 						this.removeFormat( 'link' );
 					}
-					this.applyFormat( 'link', { href: formatValue.value }, anchor );
+					this.applyFormat( 'link', { href: formatValue.value, target: formatValue.target }, anchor );
 				} else {
 					this.editor.execCommand( 'Unlink' );
 				}
