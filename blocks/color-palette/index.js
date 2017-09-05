@@ -78,7 +78,9 @@ class ColorPalette extends Component {
 						onClick={ this.togglePicker }
 						ref={ this.bindToggleNode }
 						aria-label={ __( 'Custom color picker' ) }
-					/>
+					>
+						<span className="blocks-color-palette__custom-color-gradient"></span>
+					</button>
 					<Popover
 						isOpen={ this.state.opened }
 						onClose={ this.closeOnClickOutside }
