@@ -23,6 +23,12 @@ addStory( {
 } );
 
 addStory( {
+	name: 'language',
+	title: 'The Language of Gutenberg',
+	markdown: require( './language.md' ),
+} );
+
+addStory( {
 	name: 'blocks',
 	title: 'Creating Block Types',
 	markdown: require( './blocks.md' ),
