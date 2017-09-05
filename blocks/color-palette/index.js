@@ -91,7 +91,7 @@ class ColorPalette extends Component {
 							color={ value }
 							onChangeComplete={ ( color ) => {
 								onChange( color.hex );
-								this.closePicker();
+								this.togglePicker();
 							} }
 							style={ { width: '100%' } }
 							disableAlpha
