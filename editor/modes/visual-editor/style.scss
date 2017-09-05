@@ -6,7 +6,7 @@
 	&,
 	& p {
 		font-family: $editor-font;
-		font-size: 1em;
+		font-size: $editor-font-size;
 		line-height: $editor-line-height;
 	}
 
