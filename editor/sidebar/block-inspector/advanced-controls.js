@@ -92,10 +92,18 @@ class BlockInspectorAdvancedControls extends Component {
 					</div>
 				}
 				{ selectedBlock.name === 'core/reusable-block' &&
-					<button onClick={ () => onAttachBlock( selectedBlock.uid ) }>Convert to regular block</button>
+					<InspectorControls.ButtonControl
+						label={ __( 'Reusable Blocks' ) }
+						value={ __( 'Detach from Reusable Block' ) }
+						help={ __( 'This releases the block from its connection to the reusable block.' ) }
+						onClick={ () => onAttachBlock( selectedBlock.uid ) } />
 				}
 				{ selectedBlock.name !== 'core/reusable-block' &&
-					<button onClick={ () => onDetachBlock( selectedBlock.uid ) }>Convert to reusable block</button>
+					<InspectorControls.ButtonControl
+						label={ __( 'Reusable Blocks' ) }
+						value={ __( 'Convert to a Reusable Block' ) }
+						help={ __( 'Reusable blocks can be used across posts and pages.' ) }
+						onClick={ () => onDetachBlock( selectedBlock.uid ) } />
 				}
 			</PanelBody>
 		);

@@ -7,6 +7,7 @@ import { Fill } from 'react-slot-fill';
  * Internal dependencies
  */
 import BaseControl from './base-control';
+import ButtonControl from './button-control';
 import CheckboxControl from './checkbox-control';
 import RadioControl from './radio-control';
 import RangeControl from './range-control';
@@ -24,6 +25,7 @@ export default function InspectorControls( { children } ) {
 }
 
 InspectorControls.BaseControl = BaseControl;
+InspectorControls.ButtonControl = ButtonControl;
 InspectorControls.CheckboxControl = CheckboxControl;
 InspectorControls.RadioControl = RadioControl;
 InspectorControls.RangeControl = RangeControl;
