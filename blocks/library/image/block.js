@@ -95,6 +95,7 @@ class ImageBlock extends Component {
 		const { attributes, setAttributes, focus, setFocus, className, settings } = this.props;
 		const { url, alt, caption, align, id, href, width, height } = attributes;
 
+		const figureStyle = width ? { width } : {};
 		const availableSizes = Object.keys( this.state.availableSizes ).sort();
 		const selectedSize = findKey( this.state.availableSizes, ( size ) => size.source_url === url );
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1;
@@ -193,7 +194,7 @@ class ImageBlock extends Component {
 					) }
 				</InspectorControls>
 			),
-			<figure key="image" className={ classes }>
+			<figure key="image" className={ classes } style={ figureStyle }>
 				<ImageSize src={ url } dirtynessTrigger={ align }>
 					{ ( sizes ) => {
 						const {
