@@ -151,17 +151,16 @@ function gutenberg_add_edit_links( $actions, $post ) {
 		return $actions;
 	}
 
-	if ( gutenberg_post_has_blocks( $post->ID ) ) {
-		remove_filter( 'get_edit_post_link', 'gutenberg_filter_edit_post_link', 10 );
-		add_filter( 'get_edit_post_link', 'gutenberg_filter_edit_post_link', 10, 3 );
-	}
+	remove_filter( 'get_edit_post_link', 'gutenberg_filter_edit_post_link', 10 );
+	$classic_url = get_edit_post_link( $post->ID, 'raw' );
+	add_filter( 'get_edit_post_link', 'gutenberg_filter_edit_post_link', 10, 3 );
 
 	// Build the new edit actions. See also: WP_Posts_List_Table::handle_row_actions().
 	$title = _draft_or_post_title( $post->ID );
 	$edit_actions = array(
 		'classic hide-if-no-js' => sprintf(
 			'<a href="%s" aria-label="%s">%s</a>',
-			esc_url( get_edit_post_link( $post->ID, 'raw' ) ),
+			esc_url( $classic_url ),
 			esc_attr( sprintf(
 				/* translators: %s: post title */
 				__( 'Edit &#8220;%s&#8221; in the classic editor', 'gutenberg' ),

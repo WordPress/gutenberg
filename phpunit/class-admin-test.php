@@ -80,10 +80,12 @@ class Admin_Test extends WP_UnitTestCase {
 		$actions = apply_filters( 'post_row_actions', $original_actions, get_post( self::$post_with_blocks ) );
 		$this->assertArrayHasKey( 'gutenberg hide-if-no-js', $actions );
 		$this->assertArrayHasKey( 'classic hide-if-no-js', $actions );
+		$this->assertContains( 'post.php', $actions['classic hide-if-no-js'] );
 
 		$actions = apply_filters( 'post_row_actions', $original_actions, get_post( self::$post_without_blocks ) );
 		$this->assertArrayHasKey( 'gutenberg hide-if-no-js', $actions );
 		$this->assertArrayHasKey( 'classic hide-if-no-js', $actions );
+		$this->assertContains( 'post.php', $actions['classic hide-if-no-js'] );
 
 		$trashed_post = $this->factory()->post->create( array(
 			'post_status' => 'trash',
