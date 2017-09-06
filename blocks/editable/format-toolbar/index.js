@@ -106,7 +106,10 @@ class FormatToolbar extends Component {
 	setLinkTarget( event ) {
 		const opensInNewWindow = event.target.checked;
 		this.setState( { opensInNewWindow } );
-		this.props.onChange( { link: { value: this.props.formats.link.value, target: opensInNewWindow ? '_blank' : '' } } );
+		this.props.onChange(
+			{ link: { value: this.props.formats.link.value, target: opensInNewWindow ? '_blank' : '' } },
+			true
+		);
 	}
 
 	addLink() {
@@ -176,7 +179,7 @@ class FormatToolbar extends Component {
 						<UrlInput value={ newLinkValue } onChange={ this.onChangeLinkValue } />
 						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
 						<IconButton icon="editor-unlink" label={ __( 'Remove link' ) } onClick={ this.dropLink } />
-						<IconButton icon="admin-generic" onClick={ this.toggleLinkSettingsVisibility } aria-expanded={ settingsVisible } />
+						<IconButton icon="admin-generic" label={ __( 'Link settings' ) } onClick={ this.toggleLinkSettingsVisibility } aria-expanded={ settingsVisible } />
 						{ linkSettings }
 					</form>
 				}
@@ -192,7 +195,7 @@ class FormatToolbar extends Component {
 						</a>
 						<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ this.editLink } />
 						<IconButton icon="editor-unlink" label={ __( 'Remove link' ) } onClick={ this.dropLink } />
-						<IconButton icon="admin-generic" onClick={ this.toggleLinkSettingsVisibility } aria-expanded={ settingsVisible } />
+						<IconButton icon="admin-generic" label={ __( 'Link settings' ) } onClick={ this.toggleLinkSettingsVisibility } aria-expanded={ settingsVisible } />
 						{ linkSettings }
 					</div>
 				}
