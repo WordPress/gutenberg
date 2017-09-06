@@ -7,8 +7,9 @@ import { filter } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
-import Dashicon from 'components/dashicon';
+import { __ } from '@wordpress/i18n';
+import { Dashicon, Popover } from '@wordpress/components';
+import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -53,62 +54,94 @@ const getHeadingLevel = heading => {
 
 const isEmptyHeading = heading => ! heading.attributes.content || heading.attributes.content.length === 0;
 
-const TableOfContents = ( { blocks, onSelect } ) => {
-	const headings = filter( blocks, ( block ) => block.name === 'core/heading' );
-
-	if ( headings.length <= 1 ) {
-		return null;
+class TableOfContents extends Component {
+	constructor() {
+		super( ...arguments );
+		this.state = {
+			showPopover: false,
+		};
 	}
 
-	let prevHeadingLevel = 1;
+	render() {
+		const { blocks, onSelect } = this.props;
+		const headings = filter( blocks, ( block ) => block.name === 'core/heading' );
 
-	// Select the corresponding block in the main editor
-	// when clicking on a heading item from the list.
-	const onSelectHeading = ( uid ) => onSelect( uid );
+		if ( headings.length <= 1 ) {
+			return null;
+		}
 
-	const tocItems = headings.map( ( heading, index ) => {
-		const headingLevel = getHeadingLevel( heading );
-		const isEmpty = isEmptyHeading( heading );
+		let prevHeadingLevel = 1;
 
-		// Headings remain the same, go up by one, or down by any amount.
-		// Otherwise there are missing levels.
-		const isIncorrectLevel = headingLevel > prevHeadingLevel + 1;
+		// Select the corresponding block in the main editor
+		// when clicking on a heading item from the list.
+		const onSelectHeading = ( uid ) => onSelect( uid );
 
-		const isValid = (
-			! isEmpty &&
-			! isIncorrectLevel &&
-			headingLevel
-		);
+		const tocItems = headings.map( ( heading, index ) => {
+			const headingLevel = getHeadingLevel( heading );
+			const isEmpty = isEmptyHeading( heading );
 
-		prevHeadingLevel = headingLevel;
+			// Headings remain the same, go up by one, or down by any amount.
+			// Otherwise there are missing levels.
+			const isIncorrectLevel = headingLevel > prevHeadingLevel + 1;
+
+			const isValid = (
+				! isEmpty &&
+				! isIncorrectLevel &&
+				headingLevel
+			);
+
+			prevHeadingLevel = headingLevel;
+
+			return (
+				<TableOfContentsItem
+					key={ index }
+					level={ headingLevel }
+					isValid={ isValid }
+					onClick={ () => onSelectHeading( heading.uid ) }
+				>
+					{ isEmpty ? emptyHeadingContent : heading.attributes.content }
+					{ isIncorrectLevel && incorrectLevelContent }
+				</TableOfContentsItem>
+			);
+		} );
 
 		return (
-			<TableOfContentsItem
-				key={ index }
-				level={ headingLevel }
-				isValid={ isValid }
-				onClick={ () => onSelectHeading( heading.uid ) }
-			>
-				{ isEmpty ? emptyHeadingContent : heading.attributes.content }
-				{ isIncorrectLevel && incorrectLevelContent }
-			</TableOfContentsItem>
-		);
-	} );
-
-	return (
-		<div className="table-of-contents">
-			<Dashicon icon="info" />
-			<div>
-				<WordCount />
-				{ __( 'Table of Contents' ) }>
-				<div className="table-of-contents__items">
-					<p><strong>{ sprintf( '%d Headings', headings.length ) }</strong></p>
-					<ul>{ tocItems }</ul>
-				</div>
+			<div className="table-of-contents">
+				<button
+					className="table-of-contents__toggle"
+					onClick={ () => this.setState( { showPopover: ! this.state.showPopover } ) }
+				>
+					<Dashicon icon="marker" /> { __( 'Info' ) }
+				</button>
+				<Popover
+					isOpen={ this.state.showPopover }
+					position="bottom"
+					className="table-of-contents__popover"
+				>
+					<div className="table-of-contents__counts">
+						<div className="table-of-contents__count">
+							<WordCount />
+							{ __( 'Word Count' ) }
+						</div>
+						<div className="table-of-contents__count">
+							<span className="table-of-contents__number">{ blocks.length }</span>
+							{ __( 'Blocks' ) }
+						</div>
+						<div className="table-of-contents__count">
+							<span className="table-of-contents__number">{ headings.length }</span>
+							{ __( 'Headings' ) }
+						</div>
+					</div>
+					<hr />
+					<span className="table-of-contents__title">{ __( 'Table of Contents' ) }</span>
+					<div className="table-of-contents__items">
+						<ul>{ tocItems }</ul>
+					</div>
+				</Popover>
 			</div>
-		</div>
-	);
-};
+		);
+	}
+}
 
 export default connect(
 	( state ) => {
