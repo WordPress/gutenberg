@@ -83,6 +83,29 @@ const VALID_TRANSLATION_KEYS = [ 'msgid', 'msgid_plural', 'msgctxt' ];
 const REGEXP_TRANSLATOR_COMMENT = /^\s*translators:\s*([\s\S]+)/im;
 
 /**
+ * Given an argument node (or recursed node), attempts to return a string
+ * represenation of that node's value.
+ *
+ * @param  {Object} node AST node
+ * @return {String}      String value
+ */
+function getNodeAsString( node ) {
+	switch ( node.type ) {
+		case 'BinaryExpression':
+			return (
+				getNodeAsString( node.left ) +
+				getNodeAsString( node.right )
+			);
+
+		case 'StringLiteral':
+			return node.value;
+
+		default:
+			return '';
+	}
+}
+
+/**
  * Returns translator comment for a given AST traversal path if one exists.
  *
  * @param  {Object}  path              Traversal path
@@ -185,7 +208,7 @@ module.exports = function() {
 				const translation = path.node.arguments.reduce( ( memo, arg, i ) => {
 					const key = functionKeys[ i ];
 					if ( isValidTranslationKey( key ) ) {
-						memo[ key ] = arg.value;
+						memo[ key ] = getNodeAsString( arg );
 					}
 
 					return memo;
@@ -312,6 +335,7 @@ module.exports = function() {
 	};
 };
 
+module.exports.getNodeAsString = getNodeAsString;
+module.exports.getTranslatorComment = getTranslatorComment;
 module.exports.isValidTranslationKey = isValidTranslationKey;
 module.exports.isSameTranslation = isSameTranslation;
-module.exports.getTranslatorComment = getTranslatorComment;
