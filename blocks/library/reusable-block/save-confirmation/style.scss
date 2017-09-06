@@ -1,0 +1,12 @@
+.blocks-save-confirmation {
+	color: $dark-gray-500;
+	padding: 20px;
+}
+
+.blocks-save-confirmation__buttons {
+	.blocks-save-confirmation__button {
+		display: block;
+		margin: 5px auto;
+		min-width: 250px;
+	}
+}

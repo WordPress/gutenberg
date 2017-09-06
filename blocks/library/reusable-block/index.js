@@ -7,14 +7,15 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { Placeholder, Spinner } from '@wordpress/components';
+import { Placeholder, Spinner, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { getBlockType, registerBlockType } from '../../api';
-import { NewReusableBlockDialog, SaveConfirmationDialog } from './dialogs';
+import NewReusableBlockDialog from './new-reusable-block';
+import SaveConfirmationDialog from './save-confirmation';
 
 const SAVE_CONFIRMATION_HIDE = 'hide';
 const SAVE_CONFIRMATION_SHOW = 'show';
@@ -64,23 +65,27 @@ class ReusableBlockEdit extends Component {
 			return <Placeholder><Spinner /></Placeholder>;
 		}
 
-		if ( ! reusableBlock.name ) {
-			return <NewReusableBlockDialog onCreate={ this.setName } onCancel={ attachBlock } />;
-		}
-
-		if ( saveConfirmation === SAVE_CONFIRMATION_SHOW ) {
-			return <SaveConfirmationDialog onConfirm={ this.confirmSave } onCancel={ attachBlock } />;
-		}
-
 		const blockType = getBlockType( reusableBlock.type );
 		const BlockEdit = blockType.edit || blockType.create;
 
 		return (
-			<BlockEdit
-				{ ...this.props }
-				attributes={ reusableBlock.attributes }
-				setAttributes={ this.setAttributes }
-			/>
+			<div>
+				{ ! reusableBlock.name &&
+					<Modal>
+						<NewReusableBlockDialog onCreate={ this.setName } onCancel={ attachBlock } />
+					</Modal>
+				}
+				{ saveConfirmation === SAVE_CONFIRMATION_SHOW &&
+					<Modal>
+						<SaveConfirmationDialog onConfirm={ this.confirmSave } onCancel={ attachBlock } />
+					</Modal>
+				}
+				<BlockEdit
+					{ ...this.props }
+					attributes={ reusableBlock.attributes }
+					setAttributes={ this.setAttributes }
+				/>
+			</div>
 		);
 	}
 }
