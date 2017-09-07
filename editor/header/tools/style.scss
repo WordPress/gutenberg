@@ -106,6 +106,13 @@
 	margin-bottom: 0;
 }
 
+@media ( max-width: $break-large ) {
+	.wp-core-ui .button.wp-block-image__upload-button.button.button-large {
+	  padding: 6px 21px 6px 6px;
+		width: 15px;
+	}
+}
+
 .editor-tools__publish-button.is-saving,
 .editor-tools__publish-button.is-saving:disabled {
 	position: relative;
