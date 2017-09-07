@@ -92,14 +92,14 @@ function do_blocks( $content ) {
 
 	return $content_after_blocks;
 }
-add_filter( 'the_content', 'do_blocks', 9 ); // BEFORE do_shortcode() and wpautop().
+add_filter( 'the_content', 'do_blocks', 9 ); // BEFORE do_shortcode and wpautop.
 
 /**
  * Extract the blocks from post content for the REST API post response.
  *
  * @since 1.1.0
  *
- * @param string The post content.
+ * @param string $content The post content.
  *
  * @return array Array of block data.
  */
@@ -179,7 +179,7 @@ function attach_block_data_to_post_response( $response, $post ) {
 	// Add block data to the response as part of 'content'.
 	$content           = $response->get_data( 'content' );
 	$content['blocks'] = $blocks;
-	$response->set_data( array( 'content'=> $content ) );
+	$response->set_data( array( 'content' => $content ) );
 
 	return $response;
 }
