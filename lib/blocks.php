@@ -113,25 +113,27 @@ function gutenberg_add_blocks_to_post_resource( $content ) {
 		$block_name  = isset( $block['blockName'] ) ? $block['blockName'] : null;
 		$attributes  = is_array( $block['attrs'] ) ? $block['attrs'] : null;
 		$raw_content = isset( $block['rawContent'] ) ? $block['rawContent'] : null;
-		if ( null !== $block_name ) {
-			$block_type = $registry->get_registered( $block_name );
-			if ( null !== $block_type ) {
-				$block['renderedContent'] = $block_type->render( $attributes, $raw_content );
-			}
 
-			// Set up the item data.
-			$item_data = array();
-			$item_data['type'] = $block['blockName'];
-			if ( null !== $attributes ) {
-				$item_data['attributes'] = $block['attrs'];
-			}
-			$item_data['content'] = $block['rawContent'];
-			if ( null !== $block['renderedContent'] ) {
-				$item_data['rendered'] = $block['renderedContent'] ;
-			}
-
-			$data[] = $item_data;
+		// Skip block if we didn’t get a valid block name.
+		if ( null === $block_name ) {
+			continue;
 		}
+		$block_type = $registry->get_registered( $block_name );
+		if ( null !== $block_type ) {
+			$block['renderedContent'] = $block_type->render( $attributes, $raw_content );
+		}
+
+		// Set up and add the item data.
+		$item_data = array();
+		$item_data['type'] = $block['blockName'];
+		if ( null !== $attributes ) {
+			$item_data['attributes'] = $block['attrs'];
+		}
+		$item_data['content'] = $block['rawContent'];
+		if ( null !== $block['renderedContent'] ) {
+			$item_data['rendered'] = $block['renderedContent'] ;
+		}
+		$data[] = $item_data;
 	}
 
 	return $data;
