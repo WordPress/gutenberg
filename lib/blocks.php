@@ -118,6 +118,9 @@ function gutenberg_add_blocks_to_post_resource( $content ) {
 		if ( null === $block_name ) {
 			continue;
 		}
+
+		// Set up rendered content, if available.
+		$block['renderedContent'] = null;
 		$block_type = $registry->get_registered( $block_name );
 		if ( null !== $block_type ) {
 			$block['renderedContent'] = $block_type->render( $attributes, $raw_content );
@@ -128,9 +131,7 @@ function gutenberg_add_blocks_to_post_resource( $content ) {
 		$item_data['type'] = $block_name;
 		$item_data['attributes'] = $attributes;
 		$item_data['content'] = $block['rawContent'];
-		if ( null !== $block['renderedContent'] ) {
-			$item_data['rendered'] = $block['renderedContent'] ;
-		}
+		$item_data['rendered'] = $block['renderedContent'] ;
 		$data[] = $item_data;
 	}
 
