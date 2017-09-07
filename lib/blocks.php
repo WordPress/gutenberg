@@ -103,7 +103,7 @@ add_filter( 'the_content', 'do_blocks', 9 ); // BEFORE do_shortcode() and wpauto
  *
  * @return array Array of block data.
  */
-function get_block_data_for_api_from_post_content( $content ) {
+function gutenberg_add_blocks_to_post_resource( $content ) {
 	$registry = WP_Block_Type_Registry::get_instance();
 	$blocks   = gutenberg_parse_blocks( $content );
 	$data     = array();
@@ -169,7 +169,7 @@ function attach_block_data_to_post_response( $response, $post ) {
 	if ( ! $post ) {
 		return $response;
 	}
-	$blocks = get_block_data_for_api_from_post_content( $post->post_content );
+	$blocks = gutenberg_add_blocks_to_post_resource( $post->post_content );
 	if ( $blocks ) {
 		$response->data['content']['blocks'] = $blocks;
 	}
