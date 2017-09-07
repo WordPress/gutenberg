@@ -170,8 +170,6 @@ function attach_block_data_to_post_response( $response, $post ) {
 		return $response;
 	}
 	$blocks = gutenberg_add_blocks_to_post_resource( $post->post_content );
-	if ( $blocks ) {
-		$response->data['content']['blocks'] = $blocks;
-	}
+	$response->data['content']['blocks'] = $blocks;
 	return $response;
 }
