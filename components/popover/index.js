@@ -92,14 +92,18 @@ export class Popover extends Component {
 	}
 
 	focus() {
-		const { content } = this.nodes;
+		const { content, popover } = this.nodes;
 		if ( ! content ) {
 			return;
 		}
 
+		// Find first tabbable node within content and shift focus, falling
+		// back to the popover panel itself.
 		const firstTabbable = focus.tabbable.find( content )[ 0 ];
 		if ( firstTabbable ) {
 			firstTabbable.focus();
+		} else if ( popover ) {
+			popover.focus();
 		}
 	}
 
