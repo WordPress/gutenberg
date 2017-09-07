@@ -125,7 +125,7 @@ function gutenberg_add_blocks_to_post_resource( $content ) {
 
 		// Set up and add the item data.
 		$item_data = array();
-		$item_data['type'] = $block['blockName'];
+		$item_data['type'] = $block_name;
 		if ( null !== $attributes ) {
 			$item_data['attributes'] = $block['attrs'];
 		}
