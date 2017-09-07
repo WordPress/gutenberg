@@ -178,11 +178,19 @@ export class Popover extends Component {
 	}
 
 	render() {
-		// Disable reason: We generate the `...contentProps` rest as remainder
-		// of props which aren't explicitly handled by this component.
-		//
-		// eslint-disable-next-line no-unused-vars
-		const { isOpen, onClose, position, children, className, ...contentProps } = this.props;
+		const {
+			isOpen,
+			onClose,
+			onClickOutside = onClose,
+			// Disable reason: We generate the `...contentProps` rest as remainder
+			// of props which aren't explicitly handled by this component.
+			//
+			// eslint-disable-next-line no-unused-vars
+			position,
+			children,
+			className,
+			...contentProps
+		} = this.props;
 		const [ yAxis, xAxis ] = this.getPositions();
 
 		if ( ! isOpen ) {
@@ -200,7 +208,7 @@ export class Popover extends Component {
 		return (
 			<span ref={ this.bindNode( 'anchor' ) }>
 				{ createPortal(
-					<PopoverDetectOutside onClickOutside={ onClose }>
+					<PopoverDetectOutside onClickOutside={ onClickOutside }>
 						<div
 							ref={ this.bindNode( 'popover' ) }
 							className={ classes }

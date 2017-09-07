@@ -89,7 +89,7 @@ class Inserter extends Component {
 				<Popover
 					isOpen={ opened }
 					position={ position }
-					onClose={ this.closeOnClickOutside }
+					onClickOutside={ this.closeOnClickOutside }
 				>
 					<InserterMenu onSelect={ this.insertBlock } />
 				</Popover>
