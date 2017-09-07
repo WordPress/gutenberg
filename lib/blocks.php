@@ -73,8 +73,8 @@ function do_blocks( $content ) {
 	$content_after_blocks = '';
 
 	foreach ( $blocks as $block ) {
-		$block_name = isset( $block['blockName'] ) ? $block['blockName'] : null;
-		$attributes = is_array( $block['attrs'] ) ? $block['attrs'] : array();
+		$block_name  = isset( $block['blockName'] ) ? $block['blockName'] : null;
+		$attributes  = is_array( $block['attrs'] ) ? $block['attrs'] : array();
 		$raw_content = isset( $block['rawContent'] ) ? $block['rawContent'] : null;
 
 		if ( $block_name ) {
@@ -127,12 +127,12 @@ function gutenberg_add_blocks_to_post_resource( $content ) {
 		}
 
 		// Set up and add the item data.
-		$item_data = array();
-		$item_data['type'] = $block_name;
+		$item_data               = array();
+		$item_data['type']       = $block_name;
 		$item_data['attributes'] = $attributes;
-		$item_data['content'] = $block['rawContent'];
-		$item_data['rendered'] = $block['renderedContent'] ;
-		$data[] = $item_data;
+		$item_data['content']    = $block['rawContent'];
+		$item_data['rendered']   = $block['renderedContent'] ;
+		$data[]                  = $item_data;
 	}
 
 	return $data;
@@ -163,15 +163,23 @@ attach_block_response_callback( 'post' );
  *
  * @since 1.1.0
  *
- * @param string $post_type Post type.
+ * @param WP_REST_Response $response The response object.
+ * @param WP_Post          $post     The Post object.
+ *
+ * @return WP_REST_Response $response The filtered response object.
  */
 function attach_block_data_to_post_response( $response, $post ) {
 	if ( ! $post ) {
 		return $response;
 	}
+
+	// Extract the block data from the post content.
 	$blocks = gutenberg_add_blocks_to_post_resource( $post->post_content );
-	$content = $response->get_data( 'content' );
+
+	// Add block data to the response as part of 'content'.
+	$content           = $response->get_data( 'content' );
 	$content['blocks'] = $blocks;
 	$response->set_data( array( 'content'=> $content ) );
+
 	return $response;
 }
