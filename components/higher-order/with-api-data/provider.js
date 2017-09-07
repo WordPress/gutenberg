@@ -6,7 +6,7 @@ import { mapValues, noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from 'element';
+import { Component, Children } from 'element';
 
 export default class APIProvider extends Component {
 	getChildContext() {
@@ -18,7 +18,7 @@ export default class APIProvider extends Component {
 	}
 
 	render() {
-		return this.props.children;
+		return Children.only( this.props.children );
 	}
 }
 

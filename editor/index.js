@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { bindActionCreators } from 'redux';
-import { Provider as ReduxProvider } from 'react-redux';
+import { Provider as ReduxProvider } from 'preact-redux';
 import { Provider as SlotFillProvider } from 'react-slot-fill';
 import { flow, pick } from 'lodash';
 import moment from 'moment-timezone';
@@ -78,12 +78,10 @@ export function createEditorInstance( id, post, settings ) {
 	store.dispatch( setInitialPost( post ) );
 
 	const providers = [
-		// Redux provider:
-		//
-		//  - context.store
+
+		// Popover provider:
 		[
-			ReduxProvider,
-			{ store },
+			PopoverProvider,
 		],
 
 		// Slot / Fill provider:
@@ -112,14 +110,6 @@ export function createEditorInstance( id, post, settings ) {
 			{ settings },
 		],
 
-		// Popover provider:
-		//
-		//  - context.popoverTarget
-		[
-			PopoverProvider,
-			{ target },
-		],
-
 		// APIProvider
 		//
 		//  - context.getAPISchema
@@ -139,6 +129,14 @@ export function createEditorInstance( id, post, settings ) {
 		// DropZone provider:
 		[
 			DropZoneProvider,
+		],
+
+		// Redux provider:
+		//
+		//  - context.store
+		[
+			ReduxProvider,
+			{ store },
 		],
 	];
 

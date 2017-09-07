@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, Children } from '@wordpress/element';
 
 class BlockCrashBoundary extends Component {
 	componentDidCatch( error ) {
@@ -9,7 +9,7 @@ class BlockCrashBoundary extends Component {
 	}
 
 	render() {
-		return this.props.children;
+		return Children.only( this.props.children );
 	}
 }
 

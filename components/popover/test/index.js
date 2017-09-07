@@ -252,19 +252,5 @@ describe( 'Popover', () => {
 
 			expect( wrapper.find( '.components-popover' ).prop( 'role' ) ).toBe( 'tooltip' );
 		} );
-
-		it( 'should render into provider context', () => {
-			const element = require( '@wordpress/element' );
-			jest.spyOn( element, 'createPortal' );
-			const target = document.createElement( 'div' );
-
-			mount(
-				<PopoverProvider target={ target }>
-					<Popover isOpen>Hello</Popover>
-				</PopoverProvider>
-			);
-
-			expect( element.createPortal.mock.calls[ 0 ][ 1 ] ).toBe( target );
-		} );
 	} );
 } );

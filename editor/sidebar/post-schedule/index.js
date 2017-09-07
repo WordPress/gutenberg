@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
+import { connect } from 'preact-redux';
 import clickOutside from 'react-click-outside';
 import DatePicker from 'react-datepicker';
 import moment from 'moment';

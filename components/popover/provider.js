@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
+import { Slot } from 'react-slot-fill';
 
 /**
  * WordPress dependencies
@@ -9,19 +9,14 @@ import { noop } from 'lodash';
 import { Component } from '@wordpress/element';
 
 class PopoverProvider extends Component {
-	getChildContext() {
-		return {
-			popoverTarget: this.props.target,
-		};
-	}
-
 	render() {
-		return this.props.children;
+		return (
+			<div>
+				<div><Slot name="Popover" /></div>
+				<div>{ this.props.children }</div>
+			</div>
+		);
 	}
 }
-
-PopoverProvider.childContextTypes = {
-	popoverTarget: noop,
-};
 
 export default PopoverProvider;

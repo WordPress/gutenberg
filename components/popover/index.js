@@ -2,12 +2,13 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isEqual, noop } from 'lodash';
+import { isEqual } from 'lodash';
+import { Fill } from 'react-slot-fill';
 
 /**
  * WordPress dependencies
  */
-import { createPortal, Component } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -92,7 +93,7 @@ export class Popover extends Component {
 	setOffset() {
 		const { anchor, popover } = this.nodes;
 		const { parentNode } = anchor;
-		if ( ! parentNode ) {
+		if ( ! parentNode || ! popover ) {
 			return;
 		}
 
@@ -123,6 +124,9 @@ export class Popover extends Component {
 	}
 
 	setForcedPositions() {
+		if ( ! this.nodes.content ) {
+			return;
+		}
 		const rect = this.nodes.content.getBoundingClientRect();
 
 		// Check exceeding top or bottom of viewport
@@ -167,7 +171,6 @@ export class Popover extends Component {
 			return null;
 		}
 
-		const { popoverTarget = document.body } = this.context;
 		const classes = classnames(
 			'components-popover',
 			className,
@@ -177,7 +180,7 @@ export class Popover extends Component {
 
 		return (
 			<span ref={ this.bindNode( 'anchor' ) }>
-				{ createPortal(
+				<Fill name="Popover">
 					<PopoverDetectOutside onClickOutside={ onClose }>
 						<div
 							ref={ this.bindNode( 'popover' ) }
@@ -192,16 +195,11 @@ export class Popover extends Component {
 								{ children }
 							</div>
 						</div>
-					</PopoverDetectOutside>,
-					popoverTarget
-				) }
+					</PopoverDetectOutside>
+				</Fill>
 			</span>
 		);
 	}
 }
-
-Popover.contextTypes = {
-	popoverTarget: noop,
-};
 
 export default Popover;

@@ -1,7 +1,7 @@
 /**
  * External Dependencies
  */
-import { connect } from 'react-redux';
+import { connect } from 'preact-redux';
 import { reduce, get, find } from 'lodash';
 
 /**

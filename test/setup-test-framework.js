@@ -8,7 +8,6 @@ require( 'core-js/modules/es7.object.values' );
 // See: https://github.com/airbnb/enzyme/issues/928
 jest.mock( '@wordpress/element', () => ( {
 	...require.requireActual( '@wordpress/element' ),
-	createPortal: ( x ) => x,
 	renderToString: ( element ) => {
 		const { createElement } = require( 'react' );
 		const { renderToStaticMarkup } = require( 'react-dom/server' );

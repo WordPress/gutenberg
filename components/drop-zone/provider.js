@@ -6,7 +6,7 @@ import { isEqual, without, some, filter, findIndex, noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, Children } from '@wordpress/element';
 
 class DropZoneProvider extends Component {
 	constructor() {
@@ -183,8 +183,7 @@ class DropZoneProvider extends Component {
 	}
 
 	render() {
-		const { children } = this.props;
-		return children;
+		return Children.only( this.props.children );
 	}
 }
 

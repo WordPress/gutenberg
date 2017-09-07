@@ -94,9 +94,9 @@ registerBlockType( 'core/paragraph', {
 		const toggleDropCap = () => setAttributes( { dropCap: ! dropCap } );
 		const className = dropCap ? 'has-drop-cap' : null;
 
-		return [
-			focus && (
-				<BlockControls key="controls">
+		return <div>
+			{ focus && (
+				<BlockControls>
 					<AlignmentToolbar
 						value={ align }
 						onChange={ ( nextAlign ) => {
@@ -104,9 +104,9 @@ registerBlockType( 'core/paragraph', {
 						} }
 					/>
 				</BlockControls>
-			),
-			focus && (
-				<InspectorControls key="inspector">
+			) }
+			{ focus && (
+				<InspectorControls>
 					<BlockDescription>
 						<p>{ __( 'Text. Great things start here.' ) }</p>
 					</BlockDescription>
@@ -142,8 +142,8 @@ registerBlockType( 'core/paragraph', {
 						onChange={ ( nextWidth ) => setAttributes( { width: nextWidth } ) }
 					/>
 				</InspectorControls>
-			),
-			<BlockAutocomplete key="editable" onReplace={ onReplace }>
+			) }
+			<BlockAutocomplete onReplace={ onReplace }>
 				<Editable
 					tagName="p"
 					className={ classnames( 'wp-block-paragraph', className, {
@@ -162,8 +162,6 @@ registerBlockType( 'core/paragraph', {
 							content: nextContent,
 						} );
 					} }
-					focus={ focus }
-					onFocus={ setFocus }
 					onSplit={ ( before, after, ...blocks ) => {
 						setAttributes( { content: before } );
 						insertBlocksAfter( [
@@ -171,12 +169,14 @@ registerBlockType( 'core/paragraph', {
 							createBlock( 'core/paragraph', { content: after } ),
 						] );
 					} }
+					focus={ focus }
+					onFocus={ setFocus }
 					onMerge={ mergeBlocks }
 					onReplace={ onReplace }
 					placeholder={ placeholder || __( 'New Paragraph' ) }
 				/>
-			</BlockAutocomplete>,
-		];
+			</BlockAutocomplete>
+		</div>;
 	},
 
 	save( { attributes } ) {

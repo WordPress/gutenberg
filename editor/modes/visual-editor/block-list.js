@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
+import { connect } from 'preact-redux';
 import classnames from 'classnames';
 import { throttle, reduce, noop } from 'lodash';
 
@@ -78,9 +78,7 @@ class VisualEditorBlockList extends Component {
 	}
 
 	setBlockRef( ref, uid ) {
-		if ( ref === null ) {
-			delete this.refs[ uid ];
-		} else {
+		if ( ref !== null ) {
 			this.refs = {
 				...this.refs,
 				[ uid ]: ref,

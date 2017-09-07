@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
+import { connect } from 'preact-redux';
 import { uniq, get, reduce, find } from 'lodash';
 import clickOutside from 'react-click-outside';
 

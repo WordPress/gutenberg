@@ -47,9 +47,6 @@ const entryPointNames = [
 ];
 
 const externals = {
-	react: 'React',
-	'react-dom': 'ReactDOM',
-	'react-dom/server': 'ReactDOMServer',
 	tinymce: 'tinymce',
 	moment: 'moment',
 };
@@ -81,6 +78,10 @@ const config = {
 			// There are currently resolution errors on RSF's "mitt" dependency
 			// when imported as native ES module
 			'react-slot-fill': 'react-slot-fill/lib/rsf.js',
+			react: 'preact-compat',
+			'react-dom': 'preact-compat',
+			// Not necessary unless you consume a module using `createClass`
+			'create-react-class': 'preact-compat/lib/create-react-class',
 		},
 	},
 	module: {

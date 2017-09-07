@@ -6,7 +6,7 @@ import { pick, noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, Children } from '@wordpress/element';
 
 /**
  * The Editable Provider allows a rendering context to define global behaviors
@@ -23,7 +23,7 @@ class EditableProvider extends Component {
 	}
 
 	render() {
-		return this.props.children;
+		return Children.only( this.props.children );
 	}
 }
 

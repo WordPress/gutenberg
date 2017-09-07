@@ -6,7 +6,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, Children } from '@wordpress/element';
 
 /**
  * The Editor Settings Provider allows any compoent to access the editor settings
@@ -19,7 +19,7 @@ class EditorSettingsProvider extends Component {
 	}
 
 	render() {
-		return this.props.children;
+		return Children.only( this.props.children );
 	}
 }
 

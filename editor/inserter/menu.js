@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { flow, groupBy, sortBy, findIndex, filter, find, some } from 'lodash';
-import { connect } from 'react-redux';
+import { connect } from 'preact-redux';
 
 /**
  * WordPress dependencies

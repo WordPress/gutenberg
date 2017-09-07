@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
+import { connect } from 'preact-redux';
 import { unescape as unescapeString, without, groupBy, map, repeat, find } from 'lodash';
 
 /**
