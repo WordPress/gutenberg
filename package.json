@@ -23,7 +23,7 @@
     "jed": "1.1.1",
     "js-beautify": "1.6.14",
     "lodash": "4.17.4",
-    "memize": "1.0.2",
+    "memize": "1.0.4",
     "moment": "2.18.1",
     "moment-timezone": "0.5.13",
     "mousetrap": "1.6.1",
@@ -42,7 +42,7 @@
     "redux-multi": "0.1.12",
     "redux-optimist": "0.0.2",
     "refx": "2.1.0",
-    "rememo": "2.3.1",
+    "rememo": "2.3.3",
     "simple-html-tokenizer": "0.4.1",
     "uuid": "3.1.0"
   },
