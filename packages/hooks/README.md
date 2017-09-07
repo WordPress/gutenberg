@@ -13,7 +13,7 @@ API functions can be called via the global `wp.hooks` like this `wp.hooks.addAct
 * `removeAllActions( 'hook_name' )`
 * `removeAllFilters( 'hook_name' )`
 * `doAction( 'hook_name', arg1, arg2, moreArgs, finalArg )`
-* `applyFilters( 'hook_name', content )`
+* `applyFilters( 'hook_name', content, arg1, arg2, moreArgs, finalArg )`
 * `doingAction( 'hook_name' )`
 * `doingFilter( 'hook_name' )`
 * `didAction( 'hook_name' )`
