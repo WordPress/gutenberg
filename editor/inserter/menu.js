@@ -359,7 +359,7 @@ export class InserterMenu extends Component {
 					autoFocus
 					id={ `editor-inserter__search-${ instanceId }` }
 					type="search"
-					placeholder={ __( 'Search…' ) }
+					placeholder={ __( 'Search blocks' ) }
 					className="editor-inserter__search"
 					onChange={ this.filter }
 					onClick={ this.setSearchFocus }
