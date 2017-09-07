@@ -8,7 +8,7 @@ import { isEqual, noop } from 'lodash';
  * WordPress dependencies
  */
 import { createPortal, Component } from '@wordpress/element';
-import { focus } from '@wordpress/utils';
+import { focus, keycodes } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -16,8 +16,12 @@ import { focus } from '@wordpress/utils';
 import './style.scss';
 import PopoverDetectOutside from './detect-outside';
 
+const { ESCAPE } = keycodes;
+
 /**
- * module constants
+ * Offset by which popover should adjust horizontally to account for tail.
+ *
+ * @type {Number}
  */
 const ARROW_OFFSET = 20;
 
@@ -29,6 +33,7 @@ export class Popover extends Component {
 		this.bindNode = this.bindNode.bind( this );
 		this.setOffset = this.setOffset.bind( this );
 		this.throttledSetOffset = this.throttledSetOffset.bind( this );
+		this.maybeClose = this.maybeClose.bind( this );
 
 		this.nodes = {};
 
@@ -173,6 +178,20 @@ export class Popover extends Component {
 		];
 	}
 
+	maybeClose( event ) {
+		const { onKeyDown, onClose } = this.props;
+
+		// Close on escape
+		if ( event.keyCode === ESCAPE && onClose ) {
+			onClose();
+		}
+
+		// Preserve original content prop behavior
+		if ( onKeyDown ) {
+			onKeyDown( event );
+		}
+	}
+
 	bindNode( name ) {
 		return ( node ) => this.nodes[ name ] = node;
 	}
@@ -205,6 +224,10 @@ export class Popover extends Component {
 			'is-' + xAxis,
 		);
 
+		// Disable reason: We care to capture the _bubbled_ events from inputs
+		// within popover as inferring close intent.
+
+		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
 			<span ref={ this.bindNode( 'anchor' ) }>
 				{ createPortal(
@@ -214,6 +237,7 @@ export class Popover extends Component {
 							className={ classes }
 							tabIndex="0"
 							{ ...contentProps }
+							onKeyDown={ this.maybeClose }
 						>
 							<div
 								ref={ this.bindNode( 'content' ) }
@@ -227,6 +251,7 @@ export class Popover extends Component {
 				) }
 			</span>
 		);
+		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
 }
 

@@ -20,7 +20,7 @@ import './style.scss';
 import { getBlocks, getRecentlyUsedBlocks } from '../selectors';
 import { showInsertionPoint, hideInsertionPoint } from '../actions';
 
-const { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } = keycodes;
+const { TAB, LEFT, UP, RIGHT, DOWN } = keycodes;
 
 export const searchBlocks = ( blocks, searchTerm ) => {
 	const normalizedSearchTerm = searchTerm.toLowerCase().trim();
@@ -233,11 +233,7 @@ export class InserterMenu extends Component {
 				keydown.preventDefault();
 				this.focusNext( this );
 				break;
-			case ESCAPE:
-				keydown.preventDefault();
-				this.props.onSelect( null );
 
-				break;
 			case LEFT:
 				if ( this.state.currentFocus === 'search' ) {
 					return;
