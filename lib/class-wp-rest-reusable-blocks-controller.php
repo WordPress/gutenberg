@@ -22,6 +22,7 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 	 * @access public
 	 */
 	public function __construct() {
+		// @codingStandardsIgnoreLine - PHPCS mistakes $this->namespace for the namespace keyword
 		$this->namespace = 'gutenberg/v1';
 		$this->rest_base = 'reusable-blocks';
 	}
@@ -33,7 +34,10 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 	 * @access public
 	 */
 	public function register_routes() {
-		register_rest_route( $this->namespace, '/' . $this->rest_base, array(
+		// @codingStandardsIgnoreLine - PHPCS mistakes $this->namespace for the namespace keyword
+		$namespace = $this->namespace;
+
+		register_rest_route( $namespace, '/' . $this->rest_base, array(
 			array(
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => array( $this, 'get_items' ),
@@ -42,7 +46,7 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 			'schema' => array( $this, 'get_public_item_schema' ),
 		) );
 
-		register_rest_route( $this->namespace, '/' . $this->rest_base . '/(?P<id>[\w-]+)', array(
+		register_rest_route( $namespace, '/' . $this->rest_base . '/(?P<id>[\w-]+)', array(
 			array(
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => array( $this, 'get_item' ),
