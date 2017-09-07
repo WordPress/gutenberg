@@ -30,7 +30,7 @@ export function PostSticky( { onUpdateSticky, postType, postSticky = false, inst
 
 	return (
 		<PanelRow>
-			<label htmlFor={ stickyToggleId }>{ __( 'Stick to the front page' ) }</label>
+			<label htmlFor={ stickyToggleId }>{ __( 'Stick to the Front Page' ) }</label>
 			<FormToggle
 				checked={ postSticky }
 				onChange={ () => onUpdateSticky( ! postSticky ) }
