@@ -6,6 +6,7 @@
         "attributes": {
             "src": "https://awesome-fake.video/file.mp4",
             "caption": []
-        }
+        },
+        "originalContent": "<figure class=\"wp-block-video\"><video src=\"https://awesome-fake.video/file.mp4\" controls=\"\"></video></figure>"
     }
 ]

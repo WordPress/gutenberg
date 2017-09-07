@@ -9,6 +9,7 @@
                 "Help build Gutenberg"
             ],
             "align": "center"
-        }
+        },
+        "originalContent": "<div class=\"wp-block-button aligncenter\"><a href=\"https://github.com/WordPress/gutenberg\">Help build Gutenberg</a></div>"
     }
 ]

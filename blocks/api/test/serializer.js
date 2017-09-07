@@ -333,15 +333,14 @@ describe( 'block serializer', () => {
 	} );
 
 	describe( 'serialize()', () => {
-		it( 'should serialize the post content properly', () => {
+		beforeEach( () => {
 			const blockType = {
 				attributes: {
-					foo: {
-						type: 'string',
-						default: true,
+					throw: {
+						type: 'boolean',
 					},
-					bar: {
-						type: 'string',
+					defaulted: {
+						type: 'boolean',
 						default: false,
 					},
 					content: {
@@ -353,21 +352,52 @@ describe( 'block serializer', () => {
 					},
 				},
 				save( { attributes } ) {
+					if ( attributes.throw ) {
+						throw new Error();
+					}
+
 					return <p dangerouslySetInnerHTML={ { __html: attributes.content } } />;
 				},
 				category: 'common',
 			};
 			registerBlockType( 'core/test-block', blockType );
+		} );
 
+		it( 'should serialize the post content properly', () => {
 			const block = createBlock( 'core/test-block', {
-				foo: false,
 				content: 'Ribs & Chicken',
 				stuff: 'left & right -- but <not>',
 			} );
-			const expectedPostContent = '<!-- wp:core/test-block {"foo":false,"stuff":"left \\u0026 right \\u002d\\u002d but \\u003cnot\\u003e"} -->\n<p class="wp-block-test-block">Ribs & Chicken</p>\n<!-- /wp:core/test-block -->';
+			const expectedPostContent = '<!-- wp:core/test-block {"stuff":"left \\u0026 right \\u002d\\u002d but \\u003cnot\\u003e"} -->\n<p class="wp-block-test-block">Ribs & Chicken</p>\n<!-- /wp:core/test-block -->';
 
 			expect( serialize( [ block ] ) ).toEqual( expectedPostContent );
 			expect( serialize( block ) ).toEqual( expectedPostContent );
+		} );
+
+		it( 'should preserve content for invalid block', () => {
+			const block = createBlock( 'core/test-block', {
+				content: 'Incorrect',
+			} );
+
+			block.isValid = false;
+			block.originalContent = 'Correct';
+
+			expect( serialize( block ) ).toEqual(
+				'<!-- wp:core/test-block -->\nCorrect\n<!-- /wp:core/test-block -->'
+			);
+		} );
+
+		it( 'should preserve content for crashing block', () => {
+			const block = createBlock( 'core/test-block', {
+				content: 'Incorrect',
+				throw: true,
+			} );
+
+			block.originalContent = 'Correct';
+
+			expect( serialize( block ) ).toEqual(
+				'<!-- wp:core/test-block {"throw":true} -->\nCorrect\n<!-- /wp:core/test-block -->'
+			);
 		} );
 	} );
 } );

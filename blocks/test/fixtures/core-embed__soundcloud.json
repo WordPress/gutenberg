@@ -8,6 +8,7 @@
             "caption": [
                 "Embedded content from soundcloud"
             ]
-        }
+        },
+        "originalContent": "<figure class=\"wp-block-embed-soundcloud\">\n    https://soundcloud.com/\n    <figcaption>Embedded content from soundcloud</figcaption>\n</figure>"
     }
 ]

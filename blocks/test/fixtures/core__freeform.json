@@ -5,6 +5,7 @@
         "isValid": true,
         "attributes": {
             "content": "Testing freeform block with some\n<div class=\"wp-some-class\">\n\tHTML <span style=\"color: red;\">content</span>\n</div>"
-        }
+        },
+        "originalContent": "Testing freeform block with some\n<div class=\"wp-some-class\">\n\tHTML <span style=\"color: red;\">content</span>\n</div>"
     }
 ]

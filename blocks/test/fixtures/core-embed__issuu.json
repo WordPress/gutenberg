@@ -8,6 +8,7 @@
             "caption": [
                 "Embedded content from issuu"
             ]
-        }
+        },
+        "originalContent": "<figure class=\"wp-block-embed-issuu\">\n    https://issuu.com/\n    <figcaption>Embedded content from issuu</figcaption>\n</figure>"
     }
 ]

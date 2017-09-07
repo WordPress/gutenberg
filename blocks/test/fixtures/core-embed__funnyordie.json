@@ -8,6 +8,7 @@
             "caption": [
                 "Embedded content from funnyordie"
             ]
-        }
+        },
+        "originalContent": "<figure class=\"wp-block-embed-funnyordie\">\n    https://funnyordie.com/\n    <figcaption>Embedded content from funnyordie</figcaption>\n</figure>"
     }
 ]

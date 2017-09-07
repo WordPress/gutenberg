@@ -174,13 +174,13 @@ export function serializeBlock( block ) {
 	const blockName = block.name;
 	const blockType = getBlockType( blockName );
 
-	let saveContent;
+	// If block was parsed as invalid or encounters an error while generating
+	// save content, use original content instead to avoid content loss.
+	let saveContent = block.originalContent;
 	if ( block.isValid ) {
-		saveContent = getSaveContent( blockType, block.attributes );
-	} else {
-		// If block was parsed as invalid, skip serialization behavior and opt
-		// to use original content instead so we don't destroy user content.
-		saveContent = block.originalContent;
+		try {
+			saveContent = getSaveContent( blockType, block.attributes );
+		} catch ( error ) {}
 	}
 
 	const saveAttributes = getCommentAttributes( block.attributes, blockType.attributes );

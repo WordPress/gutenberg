@@ -201,11 +201,12 @@ export function createBlockWithFallback( name, rawContent, attributes ) {
 
 		// Validate that the parsed block is valid, meaning that if we were to
 		// reserialize it given the assumed attributes, the markup matches the
-		// original value. Otherwise, preserve original to avoid destruction.
+		// original value.
 		block.isValid = isValidBlock( rawContent, blockType, block.attributes );
-		if ( ! block.isValid ) {
-			block.originalContent = rawContent;
-		}
+
+		// Preserve original content for future use in case the block is parsed
+		// as invalid, or future serialization attempt results in an error
+		block.originalContent = rawContent;
 
 		return block;
 	}

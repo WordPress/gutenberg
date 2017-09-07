@@ -8,6 +8,7 @@
             "caption": [
                 "Embedded content from kickstarter"
             ]
-        }
+        },
+        "originalContent": "<figure class=\"wp-block-embed-kickstarter\">\n    https://kickstarter.com/\n    <figcaption>Embedded content from kickstarter</figcaption>\n</figure>"
     }
 ]

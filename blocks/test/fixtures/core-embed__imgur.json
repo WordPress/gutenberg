@@ -8,6 +8,7 @@
             "caption": [
                 "Embedded content from imgur"
             ]
-        }
+        },
+        "originalContent": "<figure class=\"wp-block-embed-imgur\">\n    https://imgur.com/\n    <figcaption>Embedded content from imgur</figcaption>\n</figure>"
     }
 ]

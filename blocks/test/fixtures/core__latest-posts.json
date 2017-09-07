@@ -9,6 +9,7 @@
             "layout": "list",
             "columns": 3,
             "align": "center"
-        }
+        },
+        "originalContent": ""
     }
 ]

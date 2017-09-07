@@ -8,6 +8,7 @@
             "caption": [
                 "Embedded content from animoto"
             ]
-        }
+        },
+        "originalContent": "<figure class=\"wp-block-embed-animoto\">\n    https://animoto.com/\n    <figcaption>Embedded content from animoto</figcaption>\n</figure>"
     }
 ]

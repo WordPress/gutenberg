@@ -380,8 +380,12 @@ export function isEquivalentHTML( a, b ) {
  * @return {Boolean}            Whether block is valid
  */
 export function isValidBlock( rawContent, blockType, attributes ) {
-	return isEquivalentHTML(
-		rawContent,
-		getSaveContent( blockType, attributes )
-	);
+	let saveContent;
+	try {
+		saveContent = getSaveContent( blockType, attributes );
+	} catch ( error ) {
+		return false;
+	}
+
+	return isEquivalentHTML( rawContent, saveContent );
 }

@@ -401,6 +401,21 @@ describe( 'validation', () => {
 			) ).toBe( false );
 		} );
 
+		it( 'returns false is error occurs while generating block save', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				save() {
+					throw new Error();
+				},
+			} );
+
+			expect( isValidBlock(
+				'Bananas',
+				getBlockType( 'core/test-block' ),
+				{ fruit: 'Bananas' }
+			) ).toBe( false );
+		} );
+
 		it( 'returns true is block is valid', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 

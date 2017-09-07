@@ -6,6 +6,7 @@
         "attributes": {
             "src": "https://media.simplecast.com/episodes/audio/80564/draft-podcast-51-livePublish2.mp3",
             "align": "right"
-        }
+        },
+        "originalContent": "<div class=\"wp-block-audio alignright\">\n    <audio controls=\"\" src=\"https://media.simplecast.com/episodes/audio/80564/draft-podcast-51-livePublish2.mp3\"></audio>\n</div>"
     }
 ]
