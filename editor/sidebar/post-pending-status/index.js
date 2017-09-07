@@ -31,7 +31,7 @@ export function PostPendingStatus( { isPublished, instanceId, status, onUpdateSt
 
 	return (
 		<PanelRow>
-			<label htmlFor={ pendingId }>{ __( 'Pending review' ) }</label>
+			<label htmlFor={ pendingId }>{ __( 'Pending Review' ) }</label>
 			<FormToggle
 				id={ pendingId }
 				checked={ status === 'pending' }

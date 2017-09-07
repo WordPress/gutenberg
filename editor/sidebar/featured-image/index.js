@@ -25,7 +25,7 @@ const PANEL_NAME = 'featured-image';
 
 function FeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, media, isOpened, onTogglePanel } ) {
 	return (
-		<PanelBody title={ __( 'Featured image' ) } opened={ isOpened } onToggle={ onTogglePanel }>
+		<PanelBody title={ __( 'Featured Image' ) } opened={ isOpened } onToggle={ onTogglePanel }>
 			<div className="editor-featured-image__content">
 				{ !! featuredImageId &&
 					<MediaUploadButton
