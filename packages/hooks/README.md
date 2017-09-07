@@ -6,20 +6,20 @@ A lightweight & efficient EventManager for JavaScript in WordPress.
 ### API Usage
 API functions can be called via the global `wp.hooks` like this `wp.hooks.addAction()`, etc.
 
-* `addAction( 'hook_name', 'vendorName/pluginName/functionName', callback, priority )`
-* `addFilter( 'hook_name', 'vendorName/pluginName/functionName', callback, priority )`
-* `removeAction( 'hook_name', 'vendorName/pluginName/functionName' )`
-* `removeFilter( 'hook_name',  'vendorName/pluginName/functionName' )`
-* `removeAllActions( 'hook_name' )`
-* `removeAllFilters( 'hook_name' )`
-* `doAction( 'hook_name', arg1, arg2, moreArgs, finalArg )`
-* `applyFilters( 'hook_name', content, arg1, arg2, moreArgs, finalArg )`
-* `doingAction( 'hook_name' )`
-* `doingFilter( 'hook_name' )`
-* `didAction( 'hook_name' )`
-* `didFilter( 'hook_name' )`
-* `hasAction( 'hook_name' )`
-* `hasFilter( 'hook_name' )`
+* `addAction( 'hookName', 'vendorName/pluginName/functionName', callback, priority )`
+* `addFilter( 'hookName', 'vendorName/pluginName/functionName', callback, priority )`
+* `removeAction( 'hookName', 'vendorName/pluginName/functionName' )`
+* `removeFilter( 'hookName',  'vendorName/pluginName/functionName' )`
+* `removeAllActions( 'hookName' )`
+* `removeAllFilters( 'hookName' )`
+* `doAction( 'hookName', arg1, arg2, moreArgs, finalArg )`
+* `applyFilters( 'hookName', content, arg1, arg2, moreArgs, finalArg )`
+* `doingAction( 'hookName' )`
+* `doingFilter( 'hookName' )`
+* `didAction( 'hookName' )`
+* `didFilter( 'hookName' )`
+* `hasAction( 'hookName' )`
+* `hasFilter( 'hookName' )`
 
 
 ### Background
