@@ -1,5 +1,12 @@
+var MediaDetails = wp.media.view.MediaFrame.MediaDetails,
+	MediaLibrary = wp.media.controller.MediaLibrary,
+	l10n = wp.media.view.l10n,
+	VideoDetails;
+
 /**
  * wp.media.view.MediaFrame.VideoDetails
+ *
+ * @memberOf wp.media.view.MediaFrame
  *
  * @class
  * @augments wp.media.view.MediaFrame.MediaDetails
@@ -11,12 +18,7 @@
  * @augments Backbone.View
  * @mixes wp.media.controller.StateMachine
  */
-var MediaDetails = wp.media.view.MediaFrame.MediaDetails,
-	MediaLibrary = wp.media.controller.MediaLibrary,
-	l10n = wp.media.view.l10n,
-	VideoDetails;
-
-VideoDetails = MediaDetails.extend({
+VideoDetails = MediaDetails.extend(/** @lends wp.media.view.MediaFrame.VideoDetails.prototype */{
 	defaults: {
 		id:      'video',
 		url:     '',

@@ -1,5 +1,10 @@
+var Attachments = wp.media.view.Attachments,
+	Selection;
+
 /**
  * wp.media.view.Attachments.Selection
+ *
+ * @memberOf wp.media.view.Attachments
  *
  * @class
  * @augments wp.media.view.Attachments
@@ -7,10 +12,7 @@
  * @augments wp.Backbone.View
  * @augments Backbone.View
  */
-var Attachments = wp.media.view.Attachments,
-	Selection;
-
-Selection = Attachments.extend({
+Selection = Attachments.extend(/** @lends wp.media.view.Attachments.Selection.prototype */{
 	events: {},
 	initialize: function() {
 		_.defaults( this.options, {

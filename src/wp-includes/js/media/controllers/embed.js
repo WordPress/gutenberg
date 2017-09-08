@@ -1,7 +1,13 @@
+var l10n = wp.media.view.l10n,
+	$ = Backbone.$,
+	Embed;
+
 /**
  * wp.media.controller.Embed
  *
  * A state for embedding media from a URL.
+ *
+ * @memberOf wp.media.controller
  *
  * @class
  * @augments wp.media.controller.State
@@ -19,11 +25,7 @@
  * @param {string} [attributes.url]                   The embed URL.
  * @param {object} [attributes.metadata={}]           Properties of the embed, which will override attributes.url if set.
  */
-var l10n = wp.media.view.l10n,
-	$ = Backbone.$,
-	Embed;
-
-Embed = wp.media.controller.State.extend({
+Embed = wp.media.controller.State.extend(/** @lends wp.media.controller.Embed.prototype */{
 	defaults: {
 		id:       'embed',
 		title:    l10n.insertFromUrlTitle,

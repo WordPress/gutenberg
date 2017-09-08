@@ -7,6 +7,8 @@
  * 'options.props.query = true', which will mirror the collection
  * to an Attachments Query collection - @see wp.media.model.Attachments.mirror().
  *
+ * @memberOf wp.media.model
+ *
  * @class
  * @augments Backbone.Collection
  *
@@ -20,7 +22,7 @@
  * @param {string} [options.filters]
  *
  */
-var Attachments = Backbone.Collection.extend({
+var Attachments = Backbone.Collection.extend(/** @lends wp.media.model.Attachments.prototype */{
 	/**
 	 * @type {wp.media.model.Attachment}
 	 */
@@ -418,14 +420,12 @@ var Attachments = Backbone.Collection.extend({
 			attachments: attachments
 		});
 	}
-}, {
+},/** @lends wp.media.model.Attachments */{
 	/**
 	 * A function to compare two attachment models in an attachments collection.
 	 *
 	 * Used as the default comparator for instances of wp.media.model.Attachments
 	 * and its subclasses. @see wp.media.model.Attachments._changeOrderby().
-	 *
-	 * @static
 	 *
 	 * @param {Backbone.Model} a
 	 * @param {Backbone.Model} b
@@ -455,9 +455,7 @@ var Attachments = Backbone.Collection.extend({
 
 		return ( 'DESC' === order ) ? wp.media.compare( a, b, ac, bc ) : wp.media.compare( b, a, bc, ac );
 	},
-	/**
-	 * @namespace
-	 */
+	/** @namespace wp.media.model.Attachments.filters */
 	filters: {
 		/**
 		 * @static

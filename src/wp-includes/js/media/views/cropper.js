@@ -1,3 +1,9 @@
+var View = wp.media.View,
+	UploaderStatus = wp.media.view.UploaderStatus,
+	l10n = wp.media.view.l10n,
+	$ = jQuery,
+	Cropper;
+
 /**
  * wp.media.view.Cropper
  *
@@ -7,18 +13,14 @@
  * wp.customize.HeaderControl.calculateImageSelectOptions via
  * wp.customize.HeaderControl.openMM.
  *
+ * @memberOf wp.media.view
+ *
  * @class
  * @augments wp.media.View
  * @augments wp.Backbone.View
  * @augments Backbone.View
  */
-var View = wp.media.View,
-	UploaderStatus = wp.media.view.UploaderStatus,
-	l10n = wp.media.view.l10n,
-	$ = jQuery,
-	Cropper;
-
-Cropper = View.extend({
+Cropper = View.extend(/** @lends wp.media.view.Cropper.prototype */{
 	className: 'crop-content',
 	template: wp.template('crop-content'),
 	initialize: function() {

@@ -1,7 +1,13 @@
+var Library = wp.media.controller.Library,
+	l10n = wp.media.view.l10n,
+	ReplaceImage;
+
 /**
  * wp.media.controller.ReplaceImage
  *
  * A state for replacing an image.
+ *
+ * @memberOf wp.media.controller
  *
  * @class
  * @augments wp.media.controller.Library
@@ -29,11 +35,7 @@
  * @param {boolean}                    [attributes.contentUserSetting=true] Whether the content region's mode should be set and persisted per user.
  * @param {boolean}                    [attributes.syncSelection=true]      Whether the Attachments selection should be persisted from the last state.
  */
-var Library = wp.media.controller.Library,
-	l10n = wp.media.view.l10n,
-	ReplaceImage;
-
-ReplaceImage = Library.extend({
+ReplaceImage = Library.extend(/** @lends wp.media.controller.ReplaceImage.prototype */{
 	defaults: _.defaults({
 		id:            'replace-image',
 		title:         l10n.replaceImageTitle,

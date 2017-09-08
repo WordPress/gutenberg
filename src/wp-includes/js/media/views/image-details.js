@@ -1,5 +1,11 @@
+var AttachmentDisplay = wp.media.view.Settings.AttachmentDisplay,
+	$ = jQuery,
+	ImageDetails;
+
 /**
  * wp.media.view.ImageDetails
+ *
+ * @memberOf wp.media.view
  *
  * @class
  * @augments wp.media.view.Settings.AttachmentDisplay
@@ -8,11 +14,7 @@
  * @augments wp.Backbone.View
  * @augments Backbone.View
  */
-var AttachmentDisplay = wp.media.view.Settings.AttachmentDisplay,
-	$ = jQuery,
-	ImageDetails;
-
-ImageDetails = AttachmentDisplay.extend({
+ImageDetails = AttachmentDisplay.extend(/** @lends wp.media.view.ImageDetails.prototype */{
 	className: 'image-details',
 	template:  wp.template('image-details'),
 	events: _.defaults( AttachmentDisplay.prototype.events, {

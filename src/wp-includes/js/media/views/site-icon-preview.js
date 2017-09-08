@@ -1,18 +1,20 @@
+var View = wp.media.View,
+	$ = jQuery,
+	SiteIconPreview;
+
 /**
  * wp.media.view.SiteIconPreview
  *
  * Shows a preview of the Site Icon as a favicon and app icon while cropping.
+ *
+ * @memberOf wp.media.view
  *
  * @class
  * @augments wp.media.View
  * @augments wp.Backbone.View
  * @augments Backbone.View
  */
-var View = wp.media.View,
-	$ = jQuery,
-	SiteIconPreview;
-
-SiteIconPreview = View.extend({
+SiteIconPreview = View.extend(/** @lends wp.media.view.SiteIconPreview.prototype */{
 	className: 'site-icon-preview',
 	template: wp.template( 'site-icon-preview' ),
 

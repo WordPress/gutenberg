@@ -1,15 +1,17 @@
+var $ = jQuery,
+	MenuItem;
+
 /**
  * wp.media.view.MenuItem
+ *
+ * @memberOf wp.media.view
  *
  * @class
  * @augments wp.media.View
  * @augments wp.Backbone.View
  * @augments Backbone.View
  */
-var $ = jQuery,
-	MenuItem;
-
-MenuItem = wp.media.View.extend({
+MenuItem = wp.media.View.extend(/** @lends wp.media.view.MenuItem.prototype */{
 	tagName:   'a',
 	className: 'media-menu-item',
 

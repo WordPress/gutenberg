@@ -1,15 +1,17 @@
+var View = wp.media.View,
+	EditImage;
+
 /**
  * wp.media.view.EditImage
+ *
+ * @memberOf wp.media.view
  *
  * @class
  * @augments wp.media.View
  * @augments wp.Backbone.View
  * @augments Backbone.View
  */
-var View = wp.media.View,
-	EditImage;
-
-EditImage = View.extend({
+EditImage = View.extend(/** @lends wp.media.view.EditImage.prototype */{
 	className: 'image-editor',
 	template: wp.template('image-editor'),
 

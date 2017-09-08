@@ -1,7 +1,12 @@
 /* global MediaElementPlayer */
+var AttachmentDisplay = wp.media.view.Settings.AttachmentDisplay,
+	$ = jQuery,
+	MediaDetails;
 
 /**
  * wp.media.view.MediaDetails
+ *
+ * @memberOf wp.media.view
  *
  * @class
  * @augments wp.media.view.Settings.AttachmentDisplay
@@ -10,11 +15,7 @@
  * @augments wp.Backbone.View
  * @augments Backbone.View
  */
-var AttachmentDisplay = wp.media.view.Settings.AttachmentDisplay,
-	$ = jQuery,
-	MediaDetails;
-
-MediaDetails = AttachmentDisplay.extend({
+MediaDetails = AttachmentDisplay.extend(/** @lends wp.media.view.MediaDetails.prototype */{
 	initialize: function() {
 		_.bindAll(this, 'success');
 		this.players = [];
@@ -86,9 +87,6 @@ MediaDetails = AttachmentDisplay.extend({
 		this.scriptXhr = false;
 	},
 
-	/**
-	 * @global MediaElementPlayer
-	 */
 	setPlayer : function() {
 		var src;
 
@@ -144,7 +142,7 @@ MediaDetails = AttachmentDisplay.extend({
 	resetFocus: function() {
 		this.$( '.embed-media-settings' ).scrollTop( 0 );
 	}
-}, {
+},/** @lends wp.media.view.MediaDetails */{
 	instances : 0,
 	/**
 	 * When multiple players in the DOM contain the same src, things get weird.

@@ -1,3 +1,6 @@
+var Attachments = wp.media.model.Attachments,
+	Query;
+
 /**
  * wp.media.model.Query
  *
@@ -5,6 +8,8 @@
  *
  * Note: Do NOT change this.args after the query has been initialized.
  *       Things will break.
+ *
+ * @memberOf wp.media.model
  *
  * @class
  * @augments wp.media.model.Attachments
@@ -15,13 +20,8 @@
  * @param {object} [options.args]                Attachments query arguments.
  * @param {object} [options.args.posts_per_page]
  */
-var Attachments = wp.media.model.Attachments,
-	Query;
-
-Query = Attachments.extend({
+Query = Attachments.extend(/** @lends wp.media.model.Query.prototype */{
 	/**
-	 * @global wp.Uploader
-	 *
 	 * @param {array}  [models=[]]  Array of initial models to populate the collection.
 	 * @param {object} [options={}]
 	 */
@@ -153,7 +153,7 @@ Query = Attachments.extend({
 			return fallback.sync.apply( this, arguments );
 		}
 	}
-}, {
+}, /** @lends wp.media.model.Query */{
 	/**
 	 * @readonly
 	 */

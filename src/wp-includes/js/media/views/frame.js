@@ -4,6 +4,8 @@
  * A frame is a composite view consisting of one or more regions and one or more
  * states.
  *
+ * @memberOf wp.media.view
+ *
  * @see wp.media.controller.State
  * @see wp.media.controller.Region
  *
@@ -13,7 +15,7 @@
  * @augments Backbone.View
  * @mixes wp.media.controller.StateMachine
  */
-var Frame = wp.media.View.extend({
+var Frame = wp.media.View.extend(/** @lends wp.media.view.Frame.prototype */{
 	initialize: function() {
 		_.defaults( this.options, {
 			mode: [ 'select' ]
@@ -141,7 +143,7 @@ var Frame = wp.media.View.extend({
 		/**
 		 * Frame mode deactivation event.
 		 *
-		 * @event this#{mode}:deactivate
+		 * @event wp.media.view.Frame#{mode}:deactivate
 		 */
 		this.trigger( mode + ':deactivate' );
 

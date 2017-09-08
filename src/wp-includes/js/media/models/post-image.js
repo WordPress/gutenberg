@@ -5,13 +5,15 @@
  *
  * Used in the embedded image attachment display settings modal - @see wp.media.view.MediaFrame.ImageDetails.
  *
+ * @memberOf wp.media.model
+ *
  * @class
  * @augments Backbone.Model
  *
  * @param {int} [attributes]               Initial model attributes.
  * @param {int} [attributes.attachment_id] ID of the attachment.
  **/
-var PostImage = Backbone.Model.extend({
+var PostImage = Backbone.Model.extend(/** @lends wp.media.model.PostImage.prototype */{
 
 	initialize: function( attributes ) {
 		var Attachment = wp.media.model.Attachment;

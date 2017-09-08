@@ -1,15 +1,17 @@
+var $ = Backbone.$,
+	ButtonGroup;
+
 /**
  * wp.media.view.ButtonGroup
+ *
+ * @memberOf wp.media.view
  *
  * @class
  * @augments wp.media.View
  * @augments wp.Backbone.View
  * @augments Backbone.View
  */
-var $ = Backbone.$,
-	ButtonGroup;
-
-ButtonGroup = wp.media.View.extend({
+ButtonGroup = wp.media.View.extend(/** @lends wp.media.view.ButtonGroup.prototype */{
 	tagName:   'div',
 	className: 'button-group button-large media-button-group',
 

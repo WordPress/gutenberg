@@ -1,7 +1,14 @@
+var Attachment = wp.media.model.Attachment,
+	Library = wp.media.controller.Library,
+	l10n = wp.media.view.l10n,
+	FeaturedImage;
+
 /**
  * wp.media.controller.FeaturedImage
  *
  * A state for selecting a featured image for a post.
+ *
+ * @memberOf wp.media.controller
  *
  * @class
  * @augments wp.media.controller.Library
@@ -29,12 +36,7 @@
  * @param {boolean}                    [attributes.contentUserSetting=true]  Whether the content region's mode should be set and persisted per user.
  * @param {boolean}                    [attributes.syncSelection=true]       Whether the Attachments selection should be persisted from the last state.
  */
-var Attachment = wp.media.model.Attachment,
-	Library = wp.media.controller.Library,
-	l10n = wp.media.view.l10n,
-	FeaturedImage;
-
-FeaturedImage = Library.extend({
+FeaturedImage = Library.extend(/** @lends wp.media.controller.FeaturedImage.prototype */{
 	defaults: _.defaults({
 		id:            'featured-image',
 		title:         l10n.setFeaturedImageTitle,

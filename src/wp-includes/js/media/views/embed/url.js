@@ -1,16 +1,18 @@
+var View = wp.media.View,
+	$ = jQuery,
+	EmbedUrl;
+
 /**
  * wp.media.view.EmbedUrl
+ *
+ * @memberOf wp.media.view
  *
  * @class
  * @augments wp.media.View
  * @augments wp.Backbone.View
  * @augments Backbone.View
  */
-var View = wp.media.View,
-	$ = jQuery,
-	EmbedUrl;
-
-EmbedUrl = View.extend({
+EmbedUrl = View.extend(/** @lends wp.media.view.EmbedUrl.prototype */{
 	tagName:   'label',
 	className: 'embed-url',
 

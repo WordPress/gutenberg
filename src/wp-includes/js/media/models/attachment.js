@@ -1,13 +1,15 @@
+var $ = Backbone.$,
+	Attachment;
+
 /**
  * wp.media.model.Attachment
+ *
+ * @memberOf wp.media.model
  *
  * @class
  * @augments Backbone.Model
  */
-var $ = Backbone.$,
-	Attachment;
-
-Attachment = Backbone.Model.extend({
+Attachment = Backbone.Model.extend(/** @lends wp.media.model.Attachment.prototype */{
 	/**
 	 * Triggered when attachment details change
 	 * Overrides Backbone.Model.sync
@@ -134,11 +136,12 @@ Attachment = Backbone.Model.extend({
 			model.set( model.parse( resp, xhr ), options );
 		});
 	}
-}, {
+},/** @lends wp.media.model.Attachment */{
 	/**
 	 * Create a new model on the static 'all' attachments collection and return it.
 	 *
 	 * @static
+	 *
 	 * @param {Object} attrs
 	 * @returns {wp.media.model.Attachment}
 	 */

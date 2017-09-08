@@ -1,20 +1,22 @@
+var View = wp.media.View,
+	l10n = wp.media.view.l10n,
+	$ = jQuery,
+	EditorUploader;
+
 /**
  * Creates a dropzone on WP editor instances (elements with .wp-editor-wrap)
  * and relays drag'n'dropped files to a media workflow.
  *
  * wp.media.view.EditorUploader
  *
+ * @memberOf wp.media.view
+ *
  * @class
  * @augments wp.media.View
  * @augments wp.Backbone.View
  * @augments Backbone.View
  */
-var View = wp.media.View,
-	l10n = wp.media.view.l10n,
-	$ = jQuery,
-	EditorUploader;
-
-EditorUploader = View.extend({
+EditorUploader = View.extend(/** @lends wp.media.view.EditorUploader.prototype */{
 	tagName:   'div',
 	className: 'uploader-editor',
 	template:  wp.template( 'uploader-editor' ),

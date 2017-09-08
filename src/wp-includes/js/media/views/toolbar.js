@@ -1,18 +1,20 @@
+var View = wp.media.View,
+	Toolbar;
+
 /**
  * wp.media.view.Toolbar
  *
  * A toolbar which consists of a primary and a secondary section. Each sections
  * can be filled with views.
  *
+ * @memberOf wp.media.view
+ *
  * @class
  * @augments wp.media.View
  * @augments wp.Backbone.View
  * @augments Backbone.View
  */
-var View = wp.media.View,
-	Toolbar;
-
-Toolbar = View.extend({
+Toolbar = View.extend(/** @lends wp.media.view.Toolbar.prototype */{
 	tagName:   'div',
 	className: 'media-toolbar',
 

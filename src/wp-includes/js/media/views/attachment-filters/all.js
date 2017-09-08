@@ -1,5 +1,10 @@
+var l10n = wp.media.view.l10n,
+	All;
+
 /**
  * wp.media.view.AttachmentFilters.All
+ *
+ * @memberOf wp.media.view.AttachmentFilters
  *
  * @class
  * @augments wp.media.view.AttachmentFilters
@@ -7,10 +12,7 @@
  * @augments wp.Backbone.View
  * @augments Backbone.View
  */
-var l10n = wp.media.view.l10n,
-	All;
-
-All = wp.media.view.AttachmentFilters.extend({
+All = wp.media.view.AttachmentFilters.extend(/** @lends wp.media.view.AttachmentFilters.All.prototype */{
 	createFilters: function() {
 		var filters = {};
 

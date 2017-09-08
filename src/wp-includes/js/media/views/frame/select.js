@@ -1,7 +1,13 @@
+var MediaFrame = wp.media.view.MediaFrame,
+	l10n = wp.media.view.l10n,
+	Select;
+
 /**
  * wp.media.view.MediaFrame.Select
  *
  * A frame for selecting an item or items from the media library.
+ *
+ * @memberOf wp.media.view.MediaFrame
  *
  * @class
  * @augments wp.media.view.MediaFrame
@@ -11,12 +17,7 @@
  * @augments Backbone.View
  * @mixes wp.media.controller.StateMachine
  */
-
-var MediaFrame = wp.media.view.MediaFrame,
-	l10n = wp.media.view.l10n,
-	Select;
-
-Select = MediaFrame.extend({
+Select = MediaFrame.extend(/** @lends wp.media.view.MediaFrame.Select.prototype */{
 	initialize: function() {
 		// Call 'initialize' directly on the parent class.
 		MediaFrame.prototype.initialize.apply( this, arguments );

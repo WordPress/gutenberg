@@ -1,3 +1,9 @@
+var Frame = wp.media.view.Frame,
+	MediaFrame = wp.media.view.MediaFrame,
+
+	$ = jQuery,
+	EditAttachments;
+
 /**
  * wp.media.view.MediaFrame.EditAttachments
  *
@@ -7,6 +13,8 @@
  *
  * Requires an attachment model to be passed in the options hash under `model`.
  *
+ * @memberOf wp.media.view.MediaFrame
+ *
  * @class
  * @augments wp.media.view.Frame
  * @augments wp.media.View
@@ -14,13 +22,7 @@
  * @augments Backbone.View
  * @mixes wp.media.controller.StateMachine
  */
-var Frame = wp.media.view.Frame,
-	MediaFrame = wp.media.view.MediaFrame,
-
-	$ = jQuery,
-	EditAttachments;
-
-EditAttachments = MediaFrame.extend({
+EditAttachments = MediaFrame.extend(/** @lends wp.media.view.MediaFrame.EditAttachments.prototype */{
 
 	className: 'edit-attachment-frame',
 	template:  wp.template( 'edit-attachment-frame' ),

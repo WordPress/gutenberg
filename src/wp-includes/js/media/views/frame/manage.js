@@ -1,9 +1,17 @@
+var MediaFrame = wp.media.view.MediaFrame,
+	Library = wp.media.controller.Library,
+
+	$ = Backbone.$,
+	Manage;
+
 /**
  * wp.media.view.MediaFrame.Manage
  *
  * A generic management frame workflow.
  *
  * Used in the media grid view.
+ *
+ * @memberOf wp.media.view.MediaFrame
  *
  * @class
  * @augments wp.media.view.MediaFrame
@@ -13,15 +21,9 @@
  * @augments Backbone.View
  * @mixes wp.media.controller.StateMachine
  */
-var MediaFrame = wp.media.view.MediaFrame,
-	Library = wp.media.controller.Library,
-
-	$ = Backbone.$,
-	Manage;
-
-Manage = MediaFrame.extend({
+Manage = MediaFrame.extend(/** @lends wp.media.view.MediaFrame.Manage.prototype */{
 	/**
-	 * @global wp.Uploader
+	 * @constructs
 	 */
 	initialize: function() {
 		_.defaults( this.options, {

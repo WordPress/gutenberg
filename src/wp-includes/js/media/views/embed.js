@@ -1,12 +1,14 @@
 /**
  * wp.media.view.Embed
  *
+ * @memberOf wp.media.view
+ *
  * @class
  * @augments wp.media.View
  * @augments wp.Backbone.View
  * @augments Backbone.View
  */
-var Embed = wp.media.View.extend({
+var Embed = wp.media.View.extend(/** @lends wp.media.view.Ember.prototype */{
 	className: 'media-embed',
 
 	initialize: function() {

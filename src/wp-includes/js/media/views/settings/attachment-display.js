@@ -1,5 +1,10 @@
+var Settings = wp.media.view.Settings,
+	AttachmentDisplay;
+
 /**
  * wp.media.view.Settings.AttachmentDisplay
+ *
+ * @memberOf wp.media.view.Settings
  *
  * @class
  * @augments wp.media.view.Settings
@@ -7,10 +12,7 @@
  * @augments wp.Backbone.View
  * @augments Backbone.View
  */
-var Settings = wp.media.view.Settings,
-	AttachmentDisplay;
-
-AttachmentDisplay = Settings.extend({
+AttachmentDisplay = Settings.extend(/** @lends wp.media.view.Settings.AttachmentDisplay.prototype */{
 	className: 'attachment-display-settings',
 	template:  wp.template('attachment-display-settings'),
 

@@ -1,16 +1,18 @@
+var l10n = wp.media.view.l10n,
+	EditAttachmentMetadata;
+
 /**
  * wp.media.controller.EditAttachmentMetadata
  *
  * A state for editing an attachment's metadata.
  *
+ * @memberOf wp.media.controller
+ *
  * @class
  * @augments wp.media.controller.State
  * @augments Backbone.Model
  */
-var l10n = wp.media.view.l10n,
-	EditAttachmentMetadata;
-
-EditAttachmentMetadata = wp.media.controller.State.extend({
+EditAttachmentMetadata = wp.media.controller.State.extend(/** @lends wp.media.controller.EditAttachmentMetadata.prototype */{
 	defaults: {
 		id:      'edit-attachment',
 		// Title string passed to the frame's title region view.

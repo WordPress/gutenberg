@@ -1,15 +1,17 @@
+var l10n = wp.media.view.l10n,
+	Selection;
+
 /**
  * wp.media.view.Selection
+ *
+ * @memberOf wp.media.view
  *
  * @class
  * @augments wp.media.View
  * @augments wp.Backbone.View
  * @augments Backbone.View
  */
-var l10n = wp.media.view.l10n,
-	Selection;
-
-Selection = wp.media.View.extend({
+Selection = wp.media.View.extend(/** @lends wp.media.view.Selection.prototype */{
 	tagName:   'div',
 	className: 'media-selection',
 	template:  wp.template('media-selection'),

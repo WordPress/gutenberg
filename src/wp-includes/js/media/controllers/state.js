@@ -12,10 +12,12 @@
  *     'reset'      is not triggered automatically. It should be invoked by the
  *                  proper controller to reset the state to its default.
  *
+ * @memberOf wp.media.controller
+ *
  * @class
  * @augments Backbone.Model
  */
-var State = Backbone.Model.extend({
+var State = Backbone.Model.extend(/** @lends wp.media.controller.State.prototype */{
 	/**
 	 * Constructor.
 	 *

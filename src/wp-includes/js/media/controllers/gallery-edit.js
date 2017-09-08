@@ -1,7 +1,13 @@
+var Library = wp.media.controller.Library,
+	l10n = wp.media.view.l10n,
+	GalleryEdit;
+
 /**
  * wp.media.controller.GalleryEdit
  *
  * A state for editing a gallery's images and settings.
+ *
+ * @memberOf wp.media.controller
  *
  * @class
  * @augments wp.media.controller.Library
@@ -30,11 +36,7 @@
  * @param {view}                       [attributes.AttachmentView]        The single `Attachment` view to be used in the `Attachments`.
  *                                                                        If none supplied, defaults to wp.media.view.Attachment.EditLibrary.
  */
-var Library = wp.media.controller.Library,
-	l10n = wp.media.view.l10n,
-	GalleryEdit;
-
-GalleryEdit = Library.extend({
+GalleryEdit = Library.extend(/** @lends wp.media.controller.GalleryEdit.prototype */{
 	defaults: {
 		id:               'gallery-edit',
 		title:            l10n.editGalleryTitle,

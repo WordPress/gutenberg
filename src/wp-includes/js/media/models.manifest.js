@@ -1,12 +1,17 @@
 var $ = jQuery,
 	Attachment, Attachments, l10n, media;
 
+/** @namespace wp */
 window.wp = window.wp || {};
 
 /**
  * Create and return a media frame.
  *
  * Handles the default media experience.
+ *
+ * @alias wp.media
+ * @memberOf wp
+ * @namespace
  *
  * @param  {object} attributes The properties passed to the main media controller.
  * @return {wp.media.view.MediaFrame} A media workflow.
@@ -46,6 +51,10 @@ media = wp.media = function( attributes ) {
 	return frame;
 };
 
+/** @namespace wp.media.model */
+/** @namespace wp.media.view */
+/** @namespace wp.media.controller */
+/** @namespace wp.media.frames */
 _.extend( media, { model: {}, view: {}, controller: {}, frames: {} });
 
 // Link any localized strings.
@@ -89,7 +98,7 @@ media.compare = function( a, b, ac, bc ) {
 	}
 };
 
-_.extend( media, {
+_.extend( media, /** @lends wp.media */{
 	/**
 	 * media.template( id )
 	 *

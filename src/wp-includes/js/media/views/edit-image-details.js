@@ -1,5 +1,11 @@
+var View = wp.media.View,
+	EditImage = wp.media.view.EditImage,
+	Details;
+
 /**
  * wp.media.view.EditImage.Details
+ *
+ * @memberOf wp.media.view.EditImage
  *
  * @class
  * @augments wp.media.view.EditImage
@@ -7,11 +13,7 @@
  * @augments wp.Backbone.View
  * @augments Backbone.View
  */
-var View = wp.media.View,
-	EditImage = wp.media.view.EditImage,
-	Details;
-
-Details = EditImage.extend({
+Details = EditImage.extend(/** @lends wp.media.view.EditImage.Details.prototype */{
 	initialize: function( options ) {
 		this.editor = window.imageEdit;
 		this.frame = options.frame;

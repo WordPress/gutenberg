@@ -1,5 +1,10 @@
+var Controller = wp.media.controller,
+	CustomizeImageCropper;
+
 /**
  * wp.media.controller.CustomizeImageCropper
+ *
+ * @memberOf wp.media.controller
  *
  * A state for cropping an image.
  *
@@ -8,10 +13,7 @@
  * @augments wp.media.controller.State
  * @augments Backbone.Model
  */
-var Controller = wp.media.controller,
-	CustomizeImageCropper;
-
-CustomizeImageCropper = Controller.Cropper.extend({
+CustomizeImageCropper = Controller.Cropper.extend(/** @lends wp.media.controller.CustomizeImageCropper.prototype */{
 	doCrop: function( attachment ) {
 		var cropDetails = attachment.get( 'cropDetails' ),
 			control = this.get( 'control' ),

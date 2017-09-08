@@ -1,17 +1,19 @@
+var State = wp.media.controller.State,
+	l10n = wp.media.view.l10n,
+	AudioDetails;
+
 /**
  * wp.media.controller.AudioDetails
  *
  * The controller for the Audio Details state
  *
+ * @memberOf wp.media.controller
+ *
  * @class
  * @augments wp.media.controller.State
  * @augments Backbone.Model
  */
-var State = wp.media.controller.State,
-	l10n = wp.media.view.l10n,
-	AudioDetails;
-
-AudioDetails = State.extend({
+AudioDetails = State.extend(/** @lends wp.media.controller.AudioDetails.prototype */{
 	defaults: {
 		id: 'audio-details',
 		toolbar: 'audio-details',

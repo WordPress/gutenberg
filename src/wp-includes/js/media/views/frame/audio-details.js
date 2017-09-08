@@ -1,5 +1,13 @@
+var MediaDetails = wp.media.view.MediaFrame.MediaDetails,
+	MediaLibrary = wp.media.controller.MediaLibrary,
+
+	l10n = wp.media.view.l10n,
+	AudioDetails;
+
 /**
  * wp.media.view.MediaFrame.AudioDetails
+ *
+ * @memberOf wp.media.view.MediaFrame
  *
  * @class
  * @augments wp.media.view.MediaFrame.MediaDetails
@@ -11,13 +19,7 @@
  * @augments Backbone.View
  * @mixes wp.media.controller.StateMachine
  */
-var MediaDetails = wp.media.view.MediaFrame.MediaDetails,
-	MediaLibrary = wp.media.controller.MediaLibrary,
-
-	l10n = wp.media.view.l10n,
-	AudioDetails;
-
-AudioDetails = MediaDetails.extend({
+AudioDetails = MediaDetails.extend(/** @lends wp.media.view.MediaFrame.AudioDetails.prototype */{
 	defaults: {
 		id:      'audio',
 		url:     '',

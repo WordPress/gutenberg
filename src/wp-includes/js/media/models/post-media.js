@@ -4,10 +4,12 @@
  * Shared model class for audio and video. Updates the model after
  *   "Add Audio|Video Source" and "Replace Audio|Video" states return
  *
+ * @memberOf wp.media.model
+ *
  * @class
  * @augments Backbone.Model
  */
-var PostMedia = Backbone.Model.extend({
+var PostMedia = Backbone.Model.extend(/** @lends wp.media.model.PostMedia.prototype */{
 	initialize: function() {
 		this.attachment = false;
 	},

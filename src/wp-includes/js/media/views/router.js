@@ -1,5 +1,10 @@
+var Menu = wp.media.view.Menu,
+	Router;
+
 /**
  * wp.media.view.Router
+ *
+ * @memberOf wp.media.view
  *
  * @class
  * @augments wp.media.view.Menu
@@ -8,10 +13,7 @@
  * @augments wp.Backbone.View
  * @augments Backbone.View
  */
-var Menu = wp.media.view.Menu,
-	Router;
-
-Router = Menu.extend({
+Router = Menu.extend(/** @lends wp.media.view.Router.prototype */{
 	tagName:   'div',
 	className: 'media-router',
 	property:  'contentMode',

@@ -1,7 +1,14 @@
+var Selection = wp.media.model.Selection,
+	Library = wp.media.controller.Library,
+	l10n = wp.media.view.l10n,
+	GalleryAdd;
+
 /**
  * wp.media.controller.GalleryAdd
  *
  * A state for selecting more images to add to a gallery.
+ *
+ * @memberOf wp.media.controller
  *
  * @class
  * @augments wp.media.controller.Library
@@ -29,12 +36,7 @@
  * @param {boolean}                    [attributes.syncSelection=false]     Whether the Attachments selection should be persisted from the last state.
  *                                                                          Defaults to false because for this state, because the library of the Edit Gallery state is the selection.
  */
-var Selection = wp.media.model.Selection,
-	Library = wp.media.controller.Library,
-	l10n = wp.media.view.l10n,
-	GalleryAdd;
-
-GalleryAdd = Library.extend({
+GalleryAdd = Library.extend(/** @lends wp.media.controller.GalleryAdd.prototype */{
 	defaults: _.defaults({
 		id:            'gallery-library',
 		title:         l10n.addToGalleryTitle,

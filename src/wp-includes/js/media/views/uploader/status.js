@@ -1,17 +1,19 @@
+var View = wp.media.View,
+	UploaderStatus;
+
 /**
  * wp.media.view.UploaderStatus
  *
  * An uploader status for on-going uploads.
+ *
+ * @memberOf wp.media.view
  *
  * @class
  * @augments wp.media.View
  * @augments wp.Backbone.View
  * @augments Backbone.View
  */
-var View = wp.media.View,
-	UploaderStatus;
-
-UploaderStatus = View.extend({
+UploaderStatus = View.extend(/** @lends wp.media.view.UploaderStatus.prototype */{
 	className: 'media-uploader-status',
 	template:  wp.template('uploader-status'),
 
@@ -31,7 +33,6 @@ UploaderStatus = View.extend({
 		this.errors.on( 'add', this.error, this );
 	},
 	/**
-	 * @global wp.Uploader
 	 * @returns {wp.media.view.UploaderStatus}
 	 */
 	dispose: function() {
@@ -117,8 +118,6 @@ UploaderStatus = View.extend({
 	},
 
 	/**
-	 * @global wp.Uploader
-	 *
 	 * @param {Object} event
 	 */
 	dismiss: function( event ) {

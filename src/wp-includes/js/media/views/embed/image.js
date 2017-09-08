@@ -1,5 +1,10 @@
+var AttachmentDisplay = wp.media.view.Settings.AttachmentDisplay,
+	EmbedImage;
+
 /**
  * wp.media.view.EmbedImage
+ *
+ * @memberOf wp.media.view
  *
  * @class
  * @augments wp.media.view.Settings.AttachmentDisplay
@@ -8,10 +13,7 @@
  * @augments wp.Backbone.View
  * @augments Backbone.View
  */
-var AttachmentDisplay = wp.media.view.Settings.AttachmentDisplay,
-	EmbedImage;
-
-EmbedImage = AttachmentDisplay.extend({
+EmbedImage = AttachmentDisplay.extend(/** @lends wp.media.view.EmbedImage.prototype */{
 	className: 'embed-media-settings',
 	template:  wp.template('embed-image-settings'),
 

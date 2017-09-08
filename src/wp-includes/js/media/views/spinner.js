@@ -1,12 +1,14 @@
 /**
  * wp.media.view.Spinner
  *
+ * @memberOf wp.media.view
+ *
  * @class
  * @augments wp.media.View
  * @augments wp.Backbone.View
  * @augments Backbone.View
  */
-var Spinner = wp.media.View.extend({
+var Spinner = wp.media.View.extend(/** @lends wp.media.view.Spinner.prototype */{
 	tagName:   'span',
 	className: 'spinner',
 	spinnerTimeout: false,

@@ -1,12 +1,14 @@
 /**
  * wp.media.view.FocusManager
  *
+ * @memberOf wp.media.view
+ *
  * @class
  * @augments wp.media.View
  * @augments wp.Backbone.View
  * @augments Backbone.View
  */
-var FocusManager = wp.media.View.extend({
+var FocusManager = wp.media.View.extend(/** @lends wp.media.view.FocusManager.prototype */{
 
 	events: {
 		'keydown': 'constrainTabbing'

@@ -1,5 +1,11 @@
+var Attachment = wp.media.view.Attachment,
+	l10n = wp.media.view.l10n,
+	Details;
+
 /**
  * wp.media.view.Attachment.Details
+ *
+ * @memberOf wp.media.view.Attachment
  *
  * @class
  * @augments wp.media.view.Attachment
@@ -7,11 +13,7 @@
  * @augments wp.Backbone.View
  * @augments Backbone.View
  */
-var Attachment = wp.media.view.Attachment,
-	l10n = wp.media.view.l10n,
-	Details;
-
-Details = Attachment.extend({
+Details = Attachment.extend(/** @lends wp.media.view.Attachment.Details.prototype */{
 	tagName:   'div',
 	className: 'attachment-details',
 	template:  wp.template('attachment-details'),

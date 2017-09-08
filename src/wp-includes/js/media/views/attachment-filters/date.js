@@ -1,5 +1,10 @@
+var l10n = wp.media.view.l10n,
+	DateFilter;
+
 /**
  * A filter dropdown for month/dates.
+ *
+ * @memberOf wp.media.view.AttachmentFilters
  *
  * @class
  * @augments wp.media.view.AttachmentFilters
@@ -7,10 +12,7 @@
  * @augments wp.Backbone.View
  * @augments Backbone.View
  */
-var l10n = wp.media.view.l10n,
-	DateFilter;
-
-DateFilter = wp.media.view.AttachmentFilters.extend({
+DateFilter = wp.media.view.AttachmentFilters.extend(/** @lends wp.media.view.AttachmentFilters.Date.prototype */{
 	id: 'media-attachment-date-filters',
 
 	createFilters: function() {

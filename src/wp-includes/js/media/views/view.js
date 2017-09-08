@@ -10,11 +10,13 @@
  * This behavior has since been removed, and should not be used
  * outside of the media manager.
  *
+ * @memberOf wp.media
+ *
  * @class
  * @augments wp.Backbone.View
  * @augments Backbone.View
  */
-var View = wp.Backbone.View.extend({
+var View = wp.Backbone.View.extend(/** @lends wp.media.View.prototype */{
 	constructor: function( options ) {
 		if ( options && options.controller ) {
 			this.controller = options.controller;

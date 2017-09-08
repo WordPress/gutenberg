@@ -1,17 +1,19 @@
+var View = wp.media.View,
+	UploaderInline;
+
 /**
  * wp.media.view.UploaderInline
  *
  * The inline uploader that shows up in the 'Upload Files' tab.
+ *
+ * @memberOf wp.media.view
  *
  * @class
  * @augments wp.media.View
  * @augments wp.Backbone.View
  * @augments Backbone.View
  */
-var View = wp.media.View,
-	UploaderInline;
-
-UploaderInline = View.extend({
+UploaderInline = View.extend(/** @lends wp.media.view.UploaderInline.prototype */{
 	tagName:   'div',
 	className: 'uploader-inline',
 	template:  wp.template('uploader-inline'),

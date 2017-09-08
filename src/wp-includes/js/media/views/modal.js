@@ -1,17 +1,19 @@
+var $ = jQuery,
+	Modal;
+
 /**
  * wp.media.view.Modal
  *
  * A modal view, which the media modal uses as its default container.
+ *
+ * @memberOf wp.media.view
  *
  * @class
  * @augments wp.media.View
  * @augments wp.Backbone.View
  * @augments Backbone.View
  */
-var $ = jQuery,
-	Modal;
-
-Modal = wp.media.View.extend({
+Modal = wp.media.View.extend(/** @lends wp.media.view.Modal.prototype */{
 	tagName:  'div',
 	template: wp.template('media-modal'),
 

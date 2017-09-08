@@ -3,6 +3,8 @@
  *
  * The controller for the Video Details state
  *
+ * @memberOf wp.media.controller
+ *
  * @class
  * @augments wp.media.controller.State
  * @augments Backbone.Model
@@ -11,7 +13,7 @@ var State = wp.media.controller.State,
 	l10n = wp.media.view.l10n,
 	VideoDetails;
 
-VideoDetails = State.extend({
+VideoDetails = State.extend(/** @lends wp.media.controller.VideoDetails.prototype */{
 	defaults: {
 		id: 'video-details',
 		toolbar: 'video-details',

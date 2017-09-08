@@ -1,5 +1,11 @@
+var MenuItem = wp.media.view.MenuItem,
+	PriorityList = wp.media.view.PriorityList,
+	Menu;
+
 /**
  * wp.media.view.Menu
+ *
+ * @memberOf wp.media.view
  *
  * @class
  * @augments wp.media.view.PriorityList
@@ -7,11 +13,7 @@
  * @augments wp.Backbone.View
  * @augments Backbone.View
  */
-var MenuItem = wp.media.view.MenuItem,
-	PriorityList = wp.media.view.PriorityList,
-	Menu;
-
-Menu = PriorityList.extend({
+Menu = PriorityList.extend(/** @lends wp.media.view.Menu.prototype */{
 	tagName:   'div',
 	className: 'media-menu',
 	property:  'state',

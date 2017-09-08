@@ -6,6 +6,8 @@
  * Allows for selecting multiple images in the Insert Media workflow, and then
  * switching to the Insert Gallery workflow while preserving the attachments selection.
  *
+ * @memberOf wp.media
+ *
  * @mixin
  */
 var selectionSync = {

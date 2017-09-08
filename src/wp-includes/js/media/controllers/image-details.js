@@ -1,8 +1,15 @@
+var State = wp.media.controller.State,
+	Library = wp.media.controller.Library,
+	l10n = wp.media.view.l10n,
+	ImageDetails;
+
 /**
  * wp.media.controller.ImageDetails
  *
  * A state for editing the attachment display settings of an image that's been
  * inserted into the editor.
+ *
+ * @memberOf wp.media.controller
  *
  * @class
  * @augments wp.media.controller.State
@@ -22,12 +29,7 @@
  * @todo This state inherits some defaults from media.controller.Library.prototype.defaults,
  *       however this may not do anything.
  */
-var State = wp.media.controller.State,
-	Library = wp.media.controller.Library,
-	l10n = wp.media.view.l10n,
-	ImageDetails;
-
-ImageDetails = State.extend({
+ImageDetails = State.extend(/** @lends wp.media.controller.ImageDetails.prototype */{
 	defaults: _.defaults({
 		id:       'image-details',
 		title:    l10n.imageDetailsTitle,

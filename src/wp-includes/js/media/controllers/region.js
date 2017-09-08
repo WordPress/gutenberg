@@ -11,6 +11,8 @@
  * 'browse' mode t be activated on the 'content' view and then fills the region
  * with an AttachmentsBrowser view.
  *
+ * @memberOf wp.media.controller
+ *
  * @class
  *
  * @param {object}        options          Options hash for the region.
@@ -25,7 +27,7 @@ var Region = function( options ) {
 // Use Backbone's self-propagating `extend` inheritance method.
 Region.extend = Backbone.Model.extend;
 
-_.extend( Region.prototype, {
+_.extend( Region.prototype,/** @lends wp.media.controller.Region.prototype */{
 	/**
 	 * Activate a mode.
 	 *
@@ -33,10 +35,8 @@ _.extend( Region.prototype, {
 	 *
 	 * @param {string} mode
 	 *
-	 * @fires this.view#{this.id}:activate:{this._mode}
-	 * @fires this.view#{this.id}:activate
-	 * @fires this.view#{this.id}:deactivate:{this._mode}
-	 * @fires this.view#{this.id}:deactivate
+	 * @fires Region#activate
+	 * @fires Region#deactivate
 	 *
 	 * @returns {wp.media.controller.Region} Returns itself to allow chaining.
 	 */
@@ -52,8 +52,7 @@ _.extend( Region.prototype, {
 		/**
 		 * Region mode deactivation event.
 		 *
-		 * @event this.view#{this.id}:deactivate:{this._mode}
-		 * @event this.view#{this.id}:deactivate
+		 * @event wp.media.controller.Region#deactivate
 		 */
 		this.trigger('deactivate');
 
@@ -63,8 +62,7 @@ _.extend( Region.prototype, {
 		/**
 		 * Region mode activation event.
 		 *
-		 * @event this.view#{this.id}:activate:{this._mode}
-		 * @event this.view#{this.id}:activate
+		 * @event wp.media.controller.Region#activate
 		 */
 		this.trigger('activate');
 		return this;
@@ -76,10 +74,8 @@ _.extend( Region.prototype, {
 	 *
 	 * @param {string} mode
 	 *
-	 * @fires this.view#{this.id}:create:{this._mode}
-	 * @fires this.view#{this.id}:create
-	 * @fires this.view#{this.id}:render:{this._mode}
-	 * @fires this.view#{this.id}:render
+	 * @fires Region#create
+	 * @fires Region#render
 	 *
 	 * @returns {wp.media.controller.Region} Returns itself to allow chaining
 	 */
@@ -97,8 +93,9 @@ _.extend( Region.prototype, {
 		 *
 		 * Region view creation takes place in an event callback on the frame.
 		 *
-		 * @event this.view#{this.id}:create:{this._mode}
-		 * @event this.view#{this.id}:create
+		 * @event wp.media.controller.Region#create
+		 * @type {object}
+		 * @property {object} view
 		 */
 		this.trigger( 'create', set );
 		view = set.view;
@@ -108,8 +105,8 @@ _.extend( Region.prototype, {
 		 *
 		 * Region view creation takes place in an event callback on the frame.
 		 *
-		 * @event this.view#{this.id}:create:{this._mode}
-		 * @event this.view#{this.id}:create
+		 * @event wp.media.controller.Region#render
+		 * @type {object}
 		 */
 		this.trigger( 'render', view );
 		if ( view ) {

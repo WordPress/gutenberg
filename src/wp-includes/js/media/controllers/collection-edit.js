@@ -1,8 +1,15 @@
+var Library = wp.media.controller.Library,
+	l10n = wp.media.view.l10n,
+	$ = jQuery,
+	CollectionEdit;
+
 /**
  * wp.media.controller.CollectionEdit
  *
  * A state for editing a collection, which is used by audio and video playlists,
  * and can be used for other collections.
+ *
+ * @memberOf wp.media.controller
  *
  * @class
  * @augments wp.media.controller.Library
@@ -33,12 +40,7 @@
  * @param {string}                     attributes.type                   The collection's media type. (e.g. 'video').
  * @param {string}                     attributes.collectionType         The collection type. (e.g. 'playlist').
  */
-var Library = wp.media.controller.Library,
-	l10n = wp.media.view.l10n,
-	$ = jQuery,
-	CollectionEdit;
-
-CollectionEdit = Library.extend({
+CollectionEdit = Library.extend(/** @lends wp.media.controller.CollectionEdit.prototype */{
 	defaults: {
 		multiple:         false,
 		sortable:         true,

@@ -1,7 +1,14 @@
+var Select = wp.media.view.MediaFrame.Select,
+	Library = wp.media.controller.Library,
+	l10n = wp.media.view.l10n,
+	Post;
+
 /**
  * wp.media.view.MediaFrame.Post
  *
  * The frame for manipulating media on the Edit Post page.
+ *
+ * @memberOf wp.media.view.MediaFrame
  *
  * @class
  * @augments wp.media.view.MediaFrame.Select
@@ -12,12 +19,7 @@
  * @augments Backbone.View
  * @mixes wp.media.controller.StateMachine
  */
-var Select = wp.media.view.MediaFrame.Select,
-	Library = wp.media.controller.Library,
-	l10n = wp.media.view.l10n,
-	Post;
-
-Post = Select.extend({
+Post = Select.extend(/** @lends wp.media.view.MediaFrame.Post.prototype */{
 	initialize: function() {
 		this.counts = {
 			audio: {
@@ -443,6 +445,7 @@ Post = Select.extend({
 			requires: { selection: true },
 
 			/**
+			 * @callback
 			 * @fires wp.media.controller.State#insert
 			 */
 			click: function() {

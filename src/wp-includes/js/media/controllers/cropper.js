@@ -1,16 +1,18 @@
+var l10n = wp.media.view.l10n,
+	Cropper;
+
 /**
  * wp.media.controller.Cropper
  *
  * A state for cropping an image.
  *
+ * @memberOf wp.media.controller
+ *
  * @class
  * @augments wp.media.controller.State
  * @augments Backbone.Model
  */
-var l10n = wp.media.view.l10n,
-	Cropper;
-
-Cropper = wp.media.controller.State.extend({
+Cropper = wp.media.controller.State.extend(/** @lends wp.media.controller.Cropper.prototype */{
 	defaults: {
 		id:          'cropper',
 		title:       l10n.cropImage,

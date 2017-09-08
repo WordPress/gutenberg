@@ -1,17 +1,19 @@
+var View = wp.media.View,
+	AttachmentCompat;
+
 /**
  * wp.media.view.AttachmentCompat
  *
  * A view to display fields added via the `attachment_fields_to_edit` filter.
+ *
+ * @memberOf wp.media.view
  *
  * @class
  * @augments wp.media.View
  * @augments wp.Backbone.View
  * @augments Backbone.View
  */
-var View = wp.media.View,
-	AttachmentCompat;
-
-AttachmentCompat = View.extend({
+AttachmentCompat = View.extend(/** @lends wp.media.view.AttachmentCompat.prototype */{
 	tagName:   'form',
 	className: 'compat-item',
 

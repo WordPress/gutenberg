@@ -1,16 +1,18 @@
+var View = wp.media.View,
+	$ = jQuery,
+	Attachments;
+
 /**
  * wp.media.view.Attachments
+ *
+ * @memberOf wp.media.view
  *
  * @class
  * @augments wp.media.View
  * @augments wp.Backbone.View
  * @augments Backbone.View
  */
-var View = wp.media.View,
-	$ = jQuery,
-	Attachments;
-
-Attachments = View.extend({
+Attachments = View.extend(/** @lends wp.media.view.Attachments.prototype */{
 	tagName:   'ul',
 	className: 'attachments',
 

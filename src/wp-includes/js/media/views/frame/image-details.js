@@ -1,8 +1,14 @@
+var Select = wp.media.view.MediaFrame.Select,
+	l10n = wp.media.view.l10n,
+	ImageDetails;
+
 /**
  * wp.media.view.MediaFrame.ImageDetails
  *
  * A media frame for manipulating an image that's already been inserted
  * into a post.
+ *
+ * @memberOf wp.media.view.MediaFrame
  *
  * @class
  * @augments wp.media.view.MediaFrame.Select
@@ -13,11 +19,7 @@
  * @augments Backbone.View
  * @mixes wp.media.controller.StateMachine
  */
-var Select = wp.media.view.MediaFrame.Select,
-	l10n = wp.media.view.l10n,
-	ImageDetails;
-
-ImageDetails = Select.extend({
+ImageDetails = Select.extend(/** @lends wp.media.view.MediaFrame.ImageDetails.prototype */{
 	defaults: {
 		id:      'image',
 		url:     '',

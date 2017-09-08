@@ -1,7 +1,13 @@
+var Frame = wp.media.view.Frame,
+	$ = jQuery,
+	MediaFrame;
+
 /**
  * wp.media.view.MediaFrame
  *
  * The frame used to create the media modal.
+ *
+ * @memberOf wp.media.view
  *
  * @class
  * @augments wp.media.view.Frame
@@ -10,11 +16,7 @@
  * @augments Backbone.View
  * @mixes wp.media.controller.StateMachine
  */
-var Frame = wp.media.view.Frame,
-	$ = jQuery,
-	MediaFrame;
-
-MediaFrame = Frame.extend({
+MediaFrame = Frame.extend(/** @lends wp.media.view.MediaFrame.prototype */{
 	className: 'media-frame',
 	template:  wp.template('media-frame'),
 	regions:   ['menu','title','content','toolbar','router'],
@@ -24,7 +26,7 @@ MediaFrame = Frame.extend({
 	},
 
 	/**
-	 * @global wp.Uploader
+	 * @constructs
 	 */
 	initialize: function() {
 		Frame.prototype.initialize.apply( this, arguments );
@@ -232,6 +234,38 @@ MediaFrame = Frame.extend({
 // Map some of the modal's methods to the frame.
 _.each(['open','close','attach','detach','escape'], function( method ) {
 	/**
+	 * @function open
+	 * @memberOf wp.media.view.MediaFrame
+	 * @instance
+	 *
+	 * @returns {wp.media.view.MediaFrame} Returns itself to allow chaining
+	 */
+	/**
+	 * @function close
+	 * @memberOf wp.media.view.MediaFrame
+	 * @instance
+	 *
+	 * @returns {wp.media.view.MediaFrame} Returns itself to allow chaining
+	 */
+	/**
+	 * @function attach
+	 * @memberOf wp.media.view.MediaFrame
+	 * @instance
+	 *
+	 * @returns {wp.media.view.MediaFrame} Returns itself to allow chaining
+	 */
+	/**
+	 * @function detach
+	 * @memberOf wp.media.view.MediaFrame
+	 * @instance
+	 *
+	 * @returns {wp.media.view.MediaFrame} Returns itself to allow chaining
+	 */
+	/**
+	 * @function escape
+	 * @memberOf wp.media.view.MediaFrame
+	 * @instance
+	 *
 	 * @returns {wp.media.view.MediaFrame} Returns itself to allow chaining
 	 */
 	MediaFrame.prototype[ method ] = function() {

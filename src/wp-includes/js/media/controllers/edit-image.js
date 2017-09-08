@@ -1,7 +1,12 @@
+var l10n = wp.media.view.l10n,
+	EditImage;
+
 /**
  * wp.media.controller.EditImage
  *
  * A state for editing (cropping, etc.) an image.
+ *
+ * @memberOf wp.media.controller
  *
  * @class
  * @augments wp.media.controller.State
@@ -16,10 +21,7 @@
  * @param {string}                    [attributes.menu=false]         Initial mode for the menu region.
  * @param {string}                    [attributes.url]                Unused. @todo Consider removal.
  */
-var l10n = wp.media.view.l10n,
-	EditImage;
-
-EditImage = wp.media.controller.State.extend({
+EditImage = wp.media.controller.State.extend(/** @lends wp.media.controller.EditImage.prototype */{
 	defaults: {
 		id:      'edit-image',
 		title:   l10n.editImage,

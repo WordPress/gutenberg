@@ -1,16 +1,18 @@
+var Attachments = wp.media.model.Attachments,
+	Selection;
+
 /**
  * wp.media.model.Selection
  *
  * A selection of attachments.
  *
+ * @memberOf wp.media.model
+ *
  * @class
  * @augments wp.media.model.Attachments
  * @augments Backbone.Collection
  */
-var Attachments = wp.media.model.Attachments,
-	Selection;
-
-Selection = Attachments.extend({
+Selection = Attachments.extend(/** @lends wp.media.model.Selection.prototype */{
 	/**
 	 * Refresh the `single` model whenever the selection changes.
 	 * Binds `single` instead of using the context argument to ensure

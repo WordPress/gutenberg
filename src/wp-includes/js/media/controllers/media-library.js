@@ -1,6 +1,8 @@
 /**
  * wp.media.controller.MediaLibrary
  *
+ * @memberOf wp.media.controller
+ *
  * @class
  * @augments wp.media.controller.Library
  * @augments wp.media.controller.State
@@ -9,7 +11,7 @@
 var Library = wp.media.controller.Library,
 	MediaLibrary;
 
-MediaLibrary = Library.extend({
+MediaLibrary = Library.extend(/** @lends wp.media.controller.MediaLibrary.prototype */{
 	defaults: _.defaults({
 		// Attachments browser defaults. @see media.view.AttachmentsBrowser
 		filterable:      'uploaded',

@@ -1,12 +1,14 @@
 /**
  * wp.media.view.PriorityList
  *
+ * @memberOf wp.media.view
+ *
  * @class
  * @augments wp.media.View
  * @augments wp.Backbone.View
  * @augments Backbone.View
  */
-var PriorityList = wp.media.View.extend({
+var PriorityList = wp.media.View.extend(/** @lends wp.media.view.PriorityList.prototype */{
 	tagName:   'div',
 
 	initialize: function() {

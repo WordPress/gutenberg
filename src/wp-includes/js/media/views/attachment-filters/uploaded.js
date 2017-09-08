@@ -1,5 +1,10 @@
+var l10n = wp.media.view.l10n,
+	Uploaded;
+
 /**
  * wp.media.view.AttachmentFilters.Uploaded
+ *
+ * @memberOf wp.media.view.AttachmentFilters
  *
  * @class
  * @augments wp.media.view.AttachmentFilters
@@ -7,10 +12,7 @@
  * @augments wp.Backbone.View
  * @augments Backbone.View
  */
-var l10n = wp.media.view.l10n,
-	Uploaded;
-
-Uploaded = wp.media.view.AttachmentFilters.extend({
+Uploaded = wp.media.view.AttachmentFilters.extend(/** @lends wp.media.view.AttachmentFilters.Uploaded.prototype */{
 	createFilters: function() {
 		var type = this.model.get('type'),
 			types = wp.media.view.settings.mimeTypes,

@@ -1,5 +1,10 @@
+var $ = jQuery,
+	EmbedLink;
+
 /**
  * wp.media.view.EmbedLink
+ *
+ * @memberOf wp.media.view
  *
  * @class
  * @augments wp.media.view.Settings
@@ -7,10 +12,7 @@
  * @augments wp.Backbone.View
  * @augments Backbone.View
  */
-var $ = jQuery,
-	EmbedLink;
-
-EmbedLink = wp.media.view.Settings.extend({
+EmbedLink = wp.media.view.Settings.extend(/** @lends wp.media.view.EmbedLink.prototype */{
 	className: 'embed-link-settings',
 	template:  wp.template('embed-link-settings'),
 

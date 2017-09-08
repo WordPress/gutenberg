@@ -1,12 +1,14 @@
 /**
  * wp.media.view.Button
  *
+ * @memberOf wp.media.view
+ *
  * @class
  * @augments wp.media.View
  * @augments wp.Backbone.View
  * @augments Backbone.View
  */
-var Button = wp.media.View.extend({
+var Button = wp.media.View.extend(/** @lends wp.media.view.Button.prototype */{
 	tagName:    'button',
 	className:  'media-button',
 	attributes: { type: 'button' },

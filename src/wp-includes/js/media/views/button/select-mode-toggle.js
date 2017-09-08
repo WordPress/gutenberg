@@ -1,5 +1,12 @@
+
+var Button = wp.media.view.Button,
+	l10n = wp.media.view.l10n,
+	SelectModeToggle;
+
 /**
  * wp.media.view.SelectModeToggleButton
+ *
+ * @memberOf wp.media.view
  *
  * @class
  * @augments wp.media.view.Button
@@ -7,11 +14,7 @@
  * @augments wp.Backbone.View
  * @augments Backbone.View
  */
-var Button = wp.media.view.Button,
-	l10n = wp.media.view.l10n,
-	SelectModeToggle;
-
-SelectModeToggle = Button.extend({
+SelectModeToggle = Button.extend(/** @lends wp.media.view.SelectModeToggle.prototype */{
 	initialize: function() {
 		_.defaults( this.options, {
 			size : ''

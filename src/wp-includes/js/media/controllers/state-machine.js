@@ -6,6 +6,8 @@
  *
  * States are stored as models in a Backbone collection.
  *
+ * @memberOf wp.media.controller
+ *
  * @since 3.5.0
  *
  * @class
@@ -23,7 +25,7 @@ var StateMachine = function( states ) {
 // Use Backbone's self-propagating `extend` inheritance method.
 StateMachine.extend = Backbone.Model.extend;
 
-_.extend( StateMachine.prototype, Backbone.Events, {
+_.extend( StateMachine.prototype, Backbone.Events,/** @lends wp.media.controller.StateMachine.prototype */{
 	/**
 	 * Fetch a state.
 	 *
@@ -107,6 +109,21 @@ _.extend( StateMachine.prototype, Backbone.Events, {
 // Map all event binding and triggering on a StateMachine to its `states` collection.
 _.each([ 'on', 'off', 'trigger' ], function( method ) {
 	/**
+	 * @function on
+	 * @memberOf wp.media.controller.StateMachine
+	 * @instance
+	 * @returns {wp.media.controller.StateMachine} Returns itself to allow chaining.
+	 */
+	/**
+	 * @function off
+	 * @memberOf wp.media.controller.StateMachine
+	 * @instance
+	 * @returns {wp.media.controller.StateMachine} Returns itself to allow chaining.
+	 */
+	/**
+	 * @function trigger
+	 * @memberOf wp.media.controller.StateMachine
+	 * @instance
 	 * @returns {wp.media.controller.StateMachine} Returns itself to allow chaining.
 	 */
 	StateMachine.prototype[ method ] = function() {

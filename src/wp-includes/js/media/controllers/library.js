@@ -1,7 +1,14 @@
+var l10n = wp.media.view.l10n,
+	getUserSetting = window.getUserSetting,
+	setUserSetting = window.setUserSetting,
+	Library;
+
 /**
  * wp.media.controller.Library
  *
  * A state for choosing an attachment or group of attachments from the media library.
+ *
+ * @memberOf wp.media.controller
  *
  * @class
  * @augments wp.media.controller.State
@@ -32,12 +39,7 @@
  * @param {boolean}                         [attributes.contentUserSetting=true] Whether the content region's mode should be set and persisted per user.
  * @param {boolean}                         [attributes.syncSelection=true]      Whether the Attachments selection should be persisted from the last state.
  */
-var l10n = wp.media.view.l10n,
-	getUserSetting = window.getUserSetting,
-	setUserSetting = window.setUserSetting,
-	Library;
-
-Library = wp.media.controller.State.extend({
+Library = wp.media.controller.State.extend(/** @lends wp.media.controller.Library.prototype */{
 	defaults: {
 		id:                 'library',
 		title:              l10n.mediaLibraryTitle,

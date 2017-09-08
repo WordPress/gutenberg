@@ -1,5 +1,10 @@
+var MediaDetails = wp.media.view.MediaDetails,
+	VideoDetails;
+
 /**
  * wp.media.view.VideoDetails
+ *
+ * @memberOf wp.media.view
  *
  * @class
  * @augments wp.media.view.MediaDetails
@@ -9,10 +14,7 @@
  * @augments wp.Backbone.View
  * @augments Backbone.View
  */
-var MediaDetails = wp.media.view.MediaDetails,
-	VideoDetails;
-
-VideoDetails = MediaDetails.extend({
+VideoDetails = MediaDetails.extend(/** @lends wp.media.view.VideoDetails.prototype */{
 	className: 'video-details',
 	template:  wp.template('video-details'),
 

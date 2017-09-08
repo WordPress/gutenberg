@@ -1,7 +1,13 @@
+var Selection = wp.media.model.Selection,
+	Library = wp.media.controller.Library,
+	CollectionAdd;
+
 /**
  * wp.media.controller.CollectionAdd
  *
  * A state for adding attachments to a collection (e.g. video playlist).
+ *
+ * @memberOf wp.media.controller
  *
  * @class
  * @augments wp.media.controller.Library
@@ -31,11 +37,7 @@
  * @param {string}                     attributes.type                   The collection's media type. (e.g. 'video').
  * @param {string}                     attributes.collectionType         The collection type. (e.g. 'playlist').
  */
-var Selection = wp.media.model.Selection,
-	Library = wp.media.controller.Library,
-	CollectionAdd;
-
-CollectionAdd = Library.extend({
+CollectionAdd = Library.extend(/** @lends wp.media.controller.CollectionAdd.prototype */{
 	defaults: _.defaults( {
 		// Selection defaults. @see media.model.Selection
 		multiple:      'add',

@@ -3,10 +3,12 @@
  *
  * A router for handling the browser history and application state.
  *
+ * @memberOf wp.media.view.MediaFrame.Manage
+ *
  * @class
  * @augments Backbone.Router
  */
-var Router = Backbone.Router.extend({
+var Router = Backbone.Router.extend(/** @lends wp.media.view.MediaFrame.Manage.Router.prototype */{
 	routes: {
 		'upload.php?item=:slug&mode=edit': 'editItem',
 		'upload.php?item=:slug':           'showItem',

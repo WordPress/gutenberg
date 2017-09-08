@@ -1,17 +1,19 @@
+var Controller = wp.media.controller,
+	SiteIconCropper;
+
 /**
  * wp.media.controller.SiteIconCropper
  *
  * A state for cropping a Site Icon.
+ *
+ * @memberOf wp.media.controller
  *
  * @class
  * @augments wp.media.controller.Cropper
  * @augments wp.media.controller.State
  * @augments Backbone.Model
  */
-var Controller = wp.media.controller,
-	SiteIconCropper;
-
-SiteIconCropper = Controller.Cropper.extend({
+SiteIconCropper = Controller.Cropper.extend(/** @lends wp.media.controller.SiteIconCropper.prototype */{
 	activate: function() {
 		this.frame.on( 'content:create:crop', this.createCropContent, this );
 		this.frame.on( 'close', this.removeCropper, this );
