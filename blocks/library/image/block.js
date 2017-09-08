@@ -102,43 +102,40 @@ class ImageBlock extends Component {
 		const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setAttributes );
 		const dropFiles = ( files ) => mediaUpload( files, setAttributes );
 
-		const controls = (
-			focus && (
-				<BlockControls key="controls">
-					<BlockAlignmentToolbar
-						value={ align }
-						onChange={ this.updateAlignment }
-					/>
+		const controls = focus && (
+			<BlockControls>
+				<BlockAlignmentToolbar
+					value={ align }
+					onChange={ this.updateAlignment }
+				/>
 
-					<Toolbar>
-						<li>
-							<MediaUploadButton
-								buttonProps={ {
-									className: 'components-icon-button components-toolbar__control',
-									'aria-label': __( 'Edit image' ),
-								} }
-								onSelect={ this.onSelectImage }
-								type="image"
-								value={ id }
-							>
-								<Dashicon icon="edit" />
-							</MediaUploadButton>
-						</li>
-						<UrlInputButton onChange={ this.onSetHref } url={ href } />
-					</Toolbar>
-				</BlockControls>
-			)
+				<Toolbar>
+					<li>
+						<MediaUploadButton
+							buttonProps={ {
+								className: 'components-icon-button components-toolbar__control',
+								'aria-label': __( 'Edit image' ),
+							} }
+							onSelect={ this.onSelectImage }
+							type="image"
+							value={ id }
+						>
+							<Dashicon icon="edit" />
+						</MediaUploadButton>
+					</li>
+					<UrlInputButton onChange={ this.onSetHref } url={ href } />
+				</Toolbar>
+			</BlockControls>
 		);
 
 		if ( ! url ) {
-			return [
-				controls,
+			return (
 				<Placeholder
-					key="placeholder"
 					instructions={ __( 'Drag image here or insert from media library' ) }
 					icon="format-image"
 					label={ __( 'Image' ) }
 					className={ className }>
+					{ controls }
 					<DropZone
 						onFilesDrop={ dropFiles }
 					/>
@@ -157,8 +154,8 @@ class ImageBlock extends Component {
 					>
 						{ __( 'Insert from Media Library' ) }
 					</MediaUploadButton>
-				</Placeholder>,
-			];
+				</Placeholder>
+			);
 		}
 
 		const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
@@ -171,29 +168,29 @@ class ImageBlock extends Component {
 		// Disable reason: Each block can be selected by clicking on it
 
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
-		return [
-			controls,
-			focus && (
-				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'Worth a thousand words.' ) }</p>
-					</BlockDescription>
-					<h3>{ __( 'Image Settings' ) }</h3>
-					<TextControl label={ __( 'Alternate Text' ) } value={ alt } onChange={ this.updateAlt } />
-					{ !! availableSizes.length && (
-						<SelectControl
-							label={ __( 'Size' ) }
-							value={ selectedSize || '' }
-							options={ availableSizes.map( ( imageSize ) => ( {
-								value: imageSize,
-								label: startCase( imageSize ),
-							} ) ) }
-							onChange={ this.updateImageSize }
-						/>
-					) }
-				</InspectorControls>
-			),
+		return (
 			<figure key="image" className={ classes }>
+				{ controls }
+				{ focus && (
+					<InspectorControls>
+						<BlockDescription>
+							<p>{ __( 'Worth a thousand words.' ) }</p>
+						</BlockDescription>
+						<h3>{ __( 'Image Settings' ) }</h3>
+						<TextControl label={ __( 'Alternate Text' ) } value={ alt } onChange={ this.updateAlt } />
+						{ !! availableSizes.length && (
+							<SelectControl
+								label={ __( 'Size' ) }
+								value={ selectedSize || '' }
+								options={ availableSizes.map( ( imageSize ) => ( {
+									value: imageSize,
+									label: startCase( imageSize ),
+								} ) ) }
+								onChange={ this.updateImageSize }
+							/>
+						) }
+					</InspectorControls>
+				) }
 				<ImageSize src={ url } dirtynessTrigger={ align }>
 					{ ( sizes ) => {
 						const {
@@ -250,8 +247,8 @@ class ImageBlock extends Component {
 						inlineToolbar
 					/>
 				) : null }
-			</figure>,
-		];
+			</figure>
+		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 	}
 }

@@ -166,7 +166,7 @@ registerBlockType( 'core/categories', {
 
 			return (
 				<select className={ `${ this.props.className }__dropdown` }>
-					{ categories.map( category => this.renderCategoryDropdownItem( category, 0 ) ) }
+					{ categories.reduce( ( memo, category ) => memo.concat( this.renderCategoryDropdownItem( category, 0 ) ), [] ) }
 				</select>
 			);
 		}
@@ -185,9 +185,9 @@ registerBlockType( 'core/categories', {
 							: ''
 					}
 				</option>,
-				showHierarchy &&
-				!! childCategories.length && (
-					childCategories.map( childCategory => this.renderCategoryDropdownItem( childCategory, level + 1 ) )
+				...( showHierarchy && !! childCategories.length
+					? childCategories.map( childCategory => this.renderCategoryDropdownItem( childCategory, level + 1 ) )
+					: []
 				),
 			];
 		}
@@ -210,49 +210,49 @@ registerBlockType( 'core/categories', {
 			const { focus } = this.props;
 			const { align, displayAsDropdown, showHierarchy, showPostCounts } = this.props.attributes;
 
-			return [
-				focus && (
-					<BlockControls key="controls">
-						<BlockAlignmentToolbar
-							value={ align }
-							onChange={ ( nextAlign ) => {
-								setAttributes( { align: nextAlign } );
-							} }
-							controls={ [ 'left', 'center', 'right', 'full' ] }
-						/>
-					</BlockControls>
-				),
-				focus && (
-					<InspectorControls key="inspector">
-						<BlockDescription>
-							<p>{ __( 'Shows a list of your site\'s categories.' ) }</p>
-						</BlockDescription>
-						<h3>{ __( 'Categories Settings' ) }</h3>
-						<ToggleControl
-							label={ __( 'Display as dropdown' ) }
-							checked={ displayAsDropdown }
-							onChange={ this.toggleDisplayAsDropdown }
-						/>
-						<ToggleControl
-							label={ __( 'Show post counts' ) }
-							checked={ showPostCounts }
-							onChange={ this.toggleShowPostCounts }
-						/>
-						<ToggleControl
-							label={ __( 'Show hierarchy' ) }
-							checked={ showHierarchy }
-							onChange={ this.toggleShowHierarchy }
-						/>
-					</InspectorControls>
-				),
-				<div key="categories" className={ this.props.className }>
+			return (
+				<div className={ this.props.className }>
+					{ focus && (
+						<BlockControls>
+							<BlockAlignmentToolbar
+								value={ align }
+								onChange={ ( nextAlign ) => {
+									setAttributes( { align: nextAlign } );
+								} }
+								controls={ [ 'left', 'center', 'right', 'full' ] }
+							/>
+						</BlockControls>
+					) }
+					{ focus && (
+						<InspectorControls>
+							<BlockDescription>
+								<p>{ __( 'Shows a list of your site\'s categories.' ) }</p>
+							</BlockDescription>
+							<h3>{ __( 'Categories Settings' ) }</h3>
+							<ToggleControl
+								label={ __( 'Display as dropdown' ) }
+								checked={ displayAsDropdown }
+								onChange={ this.toggleDisplayAsDropdown }
+							/>
+							<ToggleControl
+								label={ __( 'Show post counts' ) }
+								checked={ showPostCounts }
+								onChange={ this.toggleShowPostCounts }
+							/>
+							<ToggleControl
+								label={ __( 'Show hierarchy' ) }
+								checked={ showHierarchy }
+								onChange={ this.toggleShowHierarchy }
+							/>
+						</InspectorControls>
+					) }
 					{
 						displayAsDropdown
 							? this.renderCategoryDropdown()
 							: this.renderCategoryList()
 					}
-				</div>,
-			];
+				</div>
+			);
 		}
 	},
 

@@ -41,20 +41,20 @@ registerBlockType( 'core/more', {
 		const value = text !== undefined ? text : defaultText;
 		const inputLength = value.length ? value.length + 1 : 1;
 
-		return [
-			focus && (
-				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( '"More" allows you to break your post into a part shown on index pages, and the subsequent after clicking a "Read More" link.' ) }</p>
-					</BlockDescription>
-					<ToggleControl
-						label={ __( 'Hide the teaser before the "More" tag' ) }
-						checked={ !! noTeaser }
-						onChange={ toggleNoTeaser }
-					/>
-				</InspectorControls>
-			),
-			<div key="more-tag" className="wp-block-more">
+		return (
+			<div className="wp-block-more">
+				{ focus && (
+					<InspectorControls>
+						<BlockDescription>
+							<p>{ __( '"More" allows you to break your post into a part shown on index pages, and the subsequent after clicking a "Read More" link.' ) }</p>
+						</BlockDescription>
+						<ToggleControl
+							label={ __( 'Hide the teaser before the "More" tag' ) }
+							checked={ !! noTeaser }
+							onChange={ toggleNoTeaser }
+						/>
+					</InspectorControls>
+				) }
 				<input
 					type="text"
 					value={ value }
@@ -62,8 +62,8 @@ registerBlockType( 'core/more', {
 					onChange={ ( event ) => setAttributes( { text: event.target.value } ) }
 					onFocus={ setFocus }
 				/>
-			</div>,
-		];
+			</div>
+		);
 	},
 
 	save( { attributes } ) {

@@ -94,39 +94,40 @@ export default class TableBlock extends Component {
 	render() {
 		const { content, focus, onFocus, onChange, className } = this.props;
 
-		return [
-			<Editable
-				key="editor"
-				tagName="table"
-				wrapperClassname={ className }
-				getSettings={ ( settings ) => ( {
-					...settings,
-					plugins: ( settings.plugins || [] ).concat( 'table' ),
-					table_tab_navigation: false,
-				} ) }
-				onSetup={ ( editor ) => this.handleSetup( editor, focus ) }
-				onChange={ onChange }
-				value={ content }
-				focus={ focus }
-				onFocus={ onFocus }
-			/>,
-			focus && (
-				<BlockControls key="menu">
-					<Toolbar>
-						<li>
-							<DropdownMenu
-								icon="editor-table"
-								label={ __( 'Edit Table' ) }
-								controls={
-									TABLE_CONTROLS.map( ( control ) => ( {
-										...control,
-										onClick: () => control.onClick( this.state.editor ),
-									} ) ) }
-							/>
-						</li>
-					</Toolbar>
-				</BlockControls>
-			),
-		];
+		return (
+			<div>
+				<Editable
+					tagName="table"
+					wrapperClassname={ className }
+					getSettings={ ( settings ) => ( {
+						...settings,
+						plugins: ( settings.plugins || [] ).concat( 'table' ),
+						table_tab_navigation: false,
+					} ) }
+					onSetup={ ( editor ) => this.handleSetup( editor, focus ) }
+					onChange={ onChange }
+					value={ content }
+					focus={ focus }
+					onFocus={ onFocus }
+				/>
+				{ focus && (
+					<BlockControls>
+						<Toolbar>
+							<li>
+								<DropdownMenu
+									icon="editor-table"
+									label={ __( 'Edit Table' ) }
+									controls={
+										TABLE_CONTROLS.map( ( control ) => ( {
+											...control,
+											onClick: () => control.onClick( this.state.editor ),
+										} ) ) }
+								/>
+							</li>
+						</Toolbar>
+					</BlockControls>
+				) }
+			</div>
+		);
 	}
 }

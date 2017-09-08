@@ -49,16 +49,16 @@ registerBlockType( 'core/pullquote', {
 		const { value, citation, align } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 
-		return [
-			focus && (
-				<BlockControls key="controls">
-					<BlockAlignmentToolbar
-						value={ align }
-						onChange={ updateAlignment }
-					/>
-				</BlockControls>
-			),
-			<blockquote key="quote" className={ className }>
+		return (
+			<blockquote className={ className }>
+				{ focus && (
+					<BlockControls>
+						<BlockAlignmentToolbar
+							value={ align }
+							onChange={ updateAlignment }
+						/>
+					</BlockControls>
+				) }
 				<Editable
 					multiline="p"
 					value={ value }
@@ -86,8 +86,8 @@ registerBlockType( 'core/pullquote', {
 						onFocus={ ( props ) => setFocus( { ...props, editable: 'citation' } ) }
 					/>
 				) }
-			</blockquote>,
-		];
+			</blockquote>
+		);
 	},
 
 	save( { attributes } ) {

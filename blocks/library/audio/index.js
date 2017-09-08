@@ -82,7 +82,7 @@ registerBlockType( 'core/audio', {
 			};
 			const controls = (
 				focus && (
-					<BlockControls key="controls">
+					<BlockControls>
 						<BlockAlignmentToolbar
 							value={ align }
 							onChange={ updateAlignment }
@@ -106,7 +106,7 @@ registerBlockType( 'core/audio', {
 			);
 
 			if ( editing ) {
-				return [
+				return (
 					<Placeholder
 						key="placeholder"
 						icon="media-audio"
@@ -133,17 +133,17 @@ registerBlockType( 'core/audio', {
 						>
 							{ __( 'Insert from Media Library' ) }
 						</MediaUploadButton>
-					</Placeholder>,
-				];
+					</Placeholder>
+				);
 			}
 
 			/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
-			return [
-				controls,
-				<div key="audio">
+			return (
+				<div>
+					{ controls }
 					<audio controls="controls" src={ src } />
-				</div>,
-			];
+				</div>
+			);
 			/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		}
 	},

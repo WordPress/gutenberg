@@ -159,18 +159,18 @@ export default class OldEditor extends Component {
 	render() {
 		const { id } = this.props;
 
-		return [
-			<div
-				key="toolbar"
-				id={ id + '-toolbar' }
-				ref={ ref => this.ref = ref }
-				className="freeform-toolbar"
-			/>,
-			<div
-				key="editor"
-				id={ id }
-				className="blocks-editable__tinymce"
-			/>,
-		];
+		return (
+			<div>
+				<div
+					id={ id + '-toolbar' }
+					ref={ ref => this.ref = ref }
+					className="freeform-toolbar"
+				/>,
+				<div
+					id={ id }
+					className="blocks-editable__tinymce"
+				/>
+			</div>
+		);
 	}
 }

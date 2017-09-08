@@ -52,30 +52,32 @@ registerBlockType( 'core/verse', {
 	edit( { attributes, setAttributes, focus, setFocus, className } ) {
 		const { content } = attributes;
 
-		return [
-			focus && (
-				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'Write poetry and other literary expressions honoring all spaces and line-breaks.' ) }</p>
-					</BlockDescription>
-				</InspectorControls>
-			),
-			<Editable
-				tagName="pre"
-				key="editable"
-				value={ content }
-				onChange={ ( nextContent ) => {
-					setAttributes( {
-						content: nextContent,
-					} );
-				} }
-				focus={ focus }
-				onFocus={ setFocus }
-				placeholder={ __( 'Write…' ) }
-				wrapperClassname={ className }
-				formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
-			/>,
-		];
+		return (
+			<div>
+				{ focus && (
+					<InspectorControls>
+						<BlockDescription>
+							<p>{ __( 'Write poetry and other literary expressions honoring all spaces and line-breaks.' ) }</p>
+						</BlockDescription>
+					</InspectorControls>
+				) }
+				<Editable
+					tagName="pre"
+					key="editable"
+					value={ content }
+					onChange={ ( nextContent ) => {
+						setAttributes( {
+							content: nextContent,
+						} );
+					} }
+					focus={ focus }
+					onFocus={ setFocus }
+					placeholder={ __( 'Write…' ) }
+					wrapperClassname={ className }
+					formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
+				/>
+			</div>
+		);
 	},
 
 	save( { attributes, className } ) {

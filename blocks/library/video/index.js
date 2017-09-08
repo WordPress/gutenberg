@@ -66,42 +66,40 @@ registerBlockType( 'core/video', {
 			setAttributes( { align: nextAlign } );
 		};
 
-		const controls = (
-			focus && (
-				<BlockControls key="controls">
-					<BlockAlignmentToolbar
-						value={ align }
-						onChange={ updateAlignment }
-					/>
+		const controls = focus && (
+			<BlockControls>
+				<BlockAlignmentToolbar
+					value={ align }
+					onChange={ updateAlignment }
+				/>
 
-					<Toolbar>
-						<li>
-							<MediaUploadButton
-								buttonProps={ {
-									className: 'components-icon-button components-toolbar__control',
-									'aria-label': __( 'Edit video' ),
-								} }
-								onSelect={ onSelectVideo }
-								type="video"
-								value={ id }
-							>
-								<Dashicon icon="edit" />
-							</MediaUploadButton>
-						</li>
-					</Toolbar>
-				</BlockControls>
-			)
+				<Toolbar>
+					<li>
+						<MediaUploadButton
+							buttonProps={ {
+								className: 'components-icon-button components-toolbar__control',
+								'aria-label': __( 'Edit video' ),
+							} }
+							onSelect={ onSelectVideo }
+							type="video"
+							value={ id }
+						>
+							<Dashicon icon="edit" />
+						</MediaUploadButton>
+					</li>
+				</Toolbar>
+			</BlockControls>
 		);
 
 		if ( ! src ) {
-			return [
-				controls,
+			return (
 				<Placeholder
-					key="placeholder"
 					icon="media-video"
 					label={ __( 'Video' ) }
 					instructions={ __( 'Select a video file from your library:' ) }
-					className={ className }>
+					className={ className }
+				>
+					{ controls }
 					<MediaUploadButton
 						buttonProps={ { isLarge: true } }
 						onSelect={ onSelectVideo }
@@ -109,14 +107,14 @@ registerBlockType( 'core/video', {
 					>
 						{ __( 'Insert from Media Library' ) }
 					</MediaUploadButton>
-				</Placeholder>,
-			];
+				</Placeholder>
+			);
 		}
 
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
-		return [
-			controls,
-			<figure key="video" className={ className }>
+		return (
+			<figure className={ className }>
+				{ controls }
 				<video controls src={ src } onClick={ setFocus } />
 				{ ( caption && caption.length > 0 ) || !! focus ? (
 					<Editable
@@ -129,8 +127,8 @@ registerBlockType( 'core/video', {
 						inlineToolbar
 					/>
 				) : null }
-			</figure>,
-		];
+			</figure>
+		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 	},
 

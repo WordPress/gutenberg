@@ -99,31 +99,12 @@ registerBlockType( 'core/heading', {
 	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, insertBlocksAfter } ) {
 		const { align, content, nodeName, placeholder } = attributes;
 
-		return [
-			focus && (
-				<BlockControls
-					key="controls"
-					controls={
-						'234'.split( '' ).map( ( level ) => ( {
-							icon: 'heading',
-							title: sprintf( __( 'Heading %s' ), level ),
-							isActive: 'H' + level === nodeName,
-							onClick: () => setAttributes( { nodeName: 'H' + level } ),
-							subscript: level,
-						} ) )
-					}
-				/>
-			),
-			focus && (
-				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'Search engines use the headings to index the structure and content of your web pages.' ) }</p>
-					</BlockDescription>
-					<h3>{ __( 'Heading Settings' ) }</h3>
-					<p>{ __( 'Size' ) }</p>
-					<Toolbar
+		return (
+			<div>
+				{ focus && (
+					<BlockControls
 						controls={
-							'123456'.split( '' ).map( ( level ) => ( {
+							'234'.split( '' ).map( ( level ) => ( {
 								icon: 'heading',
 								title: sprintf( __( 'Heading %s' ), level ),
 								isActive: 'H' + level === nodeName,
@@ -132,34 +113,53 @@ registerBlockType( 'core/heading', {
 							} ) )
 						}
 					/>
-					<p>{ __( 'Text Alignment' ) }</p>
-					<AlignmentToolbar
-						value={ align }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { align: nextAlign } );
-						} }
-					/>
-				</InspectorControls>
-			),
-			<Editable
-				key="editable"
-				tagName={ nodeName.toLowerCase() }
-				value={ content }
-				focus={ focus }
-				onFocus={ setFocus }
-				onChange={ ( value ) => setAttributes( { content: value } ) }
-				onMerge={ mergeBlocks }
-				onSplit={ ( before, after, ...blocks ) => {
-					setAttributes( { content: before } );
-					insertBlocksAfter( [
-						...blocks,
-						createBlock( 'core/paragraph', { content: after } ),
-					] );
-				} }
-				style={ { textAlign: align } }
-				placeholder={ placeholder || __( 'Write heading…' ) }
-			/>,
-		];
+				) }
+				{ focus && (
+					<InspectorControls>
+						<BlockDescription>
+							<p>{ __( 'Search engines use the headings to index the structure and content of your web pages.' ) }</p>
+						</BlockDescription>
+						<h3>{ __( 'Heading Settings' ) }</h3>
+						<p>{ __( 'Size' ) }</p>
+						<Toolbar
+							controls={
+								'123456'.split( '' ).map( ( level ) => ( {
+									icon: 'heading',
+									title: sprintf( __( 'Heading %s' ), level ),
+									isActive: 'H' + level === nodeName,
+									onClick: () => setAttributes( { nodeName: 'H' + level } ),
+									subscript: level,
+								} ) )
+							}
+						/>
+						<p>{ __( 'Text Alignment' ) }</p>
+						<AlignmentToolbar
+							value={ align }
+							onChange={ ( nextAlign ) => {
+								setAttributes( { align: nextAlign } );
+							} }
+						/>
+					</InspectorControls>
+				) }
+				<Editable
+					tagName={ nodeName.toLowerCase() }
+					value={ content }
+					focus={ focus }
+					onFocus={ setFocus }
+					onChange={ ( value ) => setAttributes( { content: value } ) }
+					onMerge={ mergeBlocks }
+					onSplit={ ( before, after, ...blocks ) => {
+						setAttributes( { content: before } );
+						insertBlocksAfter( [
+							...blocks,
+							createBlock( 'core/paragraph', { content: after } ),
+						] );
+					} }
+					style={ { textAlign: align } }
+					placeholder={ placeholder || __( 'Write heading…' ) }
+				/>
+			</div>
+		);
 	},
 
 	save( { attributes } ) {

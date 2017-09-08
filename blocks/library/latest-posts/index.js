@@ -131,55 +131,54 @@ registerBlockType( 'core/latest-posts', {
 				},
 			];
 
-			return [
-				focus && (
-					<BlockControls key="controls">
-						<BlockAlignmentToolbar
-							value={ align }
-							onChange={ ( nextAlign ) => {
-								setAttributes( { align: nextAlign } );
-							} }
-							controls={ [ 'center', 'wide', 'full' ] }
-						/>
-						<Toolbar controls={ layoutControls } />
-					</BlockControls>
-				),
-				focus && (
-					<InspectorControls key="inspector">
-						<BlockDescription>
-							<p>{ __( 'Shows a list of your site\'s most recent posts.' ) }</p>
-						</BlockDescription>
-						<h3>{ __( 'Latest Posts Settings' ) }</h3>
-						<ToggleControl
-							label={ __( 'Display post date' ) }
-							checked={ displayPostDate }
-							onChange={ this.toggleDisplayPostDate }
-						/>
-						{ layout === 'grid' &&
-							<RangeControl
-								label={ __( 'Columns' ) }
-								value={ columns }
-								onChange={ ( value ) => setAttributes( { columns: value } ) }
-								min={ 2 }
-								max={ Math.min( MAX_POSTS_COLUMNS, latestPosts.length ) }
-							/>
-						}
-						<TextControl
-							label={ __( 'Number of posts to show' ) }
-							type="number"
-							min={ MIN_POSTS }
-							max={ MAX_POSTS }
-							value={ this.props.attributes.postsToShow }
-							onChange={ ( value ) => this.changePostsToShow( value ) }
-						/>
-					</InspectorControls>
-				),
+			return (
 				<ul
 					className={ classnames( this.props.className, 'columns-' + columns, {
 						'is-grid': layout === 'grid',
 					} ) }
-					key="latest-posts"
 				>
+					{ focus && (
+						<BlockControls>
+							<BlockAlignmentToolbar
+								value={ align }
+								onChange={ ( nextAlign ) => {
+									setAttributes( { align: nextAlign } );
+								} }
+								controls={ [ 'center', 'wide', 'full' ] }
+							/>
+							<Toolbar controls={ layoutControls } />
+						</BlockControls>
+					) }
+					{ focus && (
+						<InspectorControls>
+							<BlockDescription>
+								<p>{ __( 'Shows a list of your site\'s most recent posts.' ) }</p>
+							</BlockDescription>
+							<h3>{ __( 'Latest Posts Settings' ) }</h3>
+							<ToggleControl
+								label={ __( 'Display post date' ) }
+								checked={ displayPostDate }
+								onChange={ this.toggleDisplayPostDate }
+							/>
+							{ layout === 'grid' &&
+								<RangeControl
+									label={ __( 'Columns' ) }
+									value={ columns }
+									onChange={ ( value ) => setAttributes( { columns: value } ) }
+									min={ 2 }
+									max={ Math.min( MAX_POSTS_COLUMNS, latestPosts.length ) }
+								/>
+							}
+							<TextControl
+								label={ __( 'Number of posts to show' ) }
+								type="number"
+								min={ MIN_POSTS }
+								max={ MAX_POSTS }
+								value={ this.props.attributes.postsToShow }
+								onChange={ ( value ) => this.changePostsToShow( value ) }
+							/>
+						</InspectorControls>
+					) }
 					{ latestPosts.map( ( post, i ) =>
 						<li key={ i }>
 							<a href={ post.link } target="_blank">{ decodeEntities( post.title.rendered.trim() ) || __( '(Untitled)' ) }</a>
@@ -190,8 +189,8 @@ registerBlockType( 'core/latest-posts', {
 							}
 						</li>
 					) }
-				</ul>,
-			];
+				</ul>
+			);
 		}
 
 		componentWillUnmount() {

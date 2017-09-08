@@ -133,33 +133,31 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 				const { setAttributes, focus, setFocus } = this.props;
 				const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 
-				const controls = (
-					focus && (
-						<BlockControls key="controls">
-							<BlockAlignmentToolbar
-								value={ align }
-								onChange={ updateAlignment }
-							/>
-						</BlockControls>
-					)
+				const controls = focus && (
+					<BlockControls>
+						<BlockAlignmentToolbar
+							value={ align }
+							onChange={ updateAlignment }
+						/>
+					</BlockControls>
 				);
 
 				if ( fetching ) {
-					return [
-						controls,
-						<div key="loading" className="wp-block-embed is-loading">
+					return (
+						<div className="wp-block-embed is-loading">
+							{ controls }
 							<Spinner />
 							<p>{ __( 'Embedding…' ) }</p>
-						</div>,
-					];
+						</div>
+					);
 				}
 
 				if ( ! html ) {
 					const label = sprintf( __( '%s URL' ), title );
 
-					return [
-						controls,
-						<Placeholder key="placeholder" icon={ icon } label={ label } className="wp-block-embed">
+					return (
+						<Placeholder icon={ icon } label={ label } className="wp-block-embed">
+							{ controls }
 							<form onSubmit={ this.doServerSideRender }>
 								<input
 									type="url"
@@ -175,8 +173,8 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 								</Button>
 								{ error && <p className="components-placeholder__error">{ __( 'Sorry, we could not embed that content.' ) }</p> }
 							</form>
-						</Placeholder>,
-					];
+						</Placeholder>
+					);
 				}
 
 				const parsedUrl = parse( url );
@@ -187,9 +185,9 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 					typeClassName += ' is-video';
 				}
 
-				return [
-					controls,
-					<figure key="embed" className={ typeClassName }>
+				return (
+					<figure className={ typeClassName }>
+						{ controls }
 						{ ( cannotPreview ) ? (
 							<Placeholder icon={ icon } label={ __( 'Embed URL' ) }>
 								<p className="components-placeholder__error"><a href={ url }>{ url }</a></p>
@@ -211,8 +209,8 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 								inlineToolbar
 							/>
 						) : null }
-					</figure>,
-				];
+					</figure>
+				);
 			}
 		},
 

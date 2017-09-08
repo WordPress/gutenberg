@@ -278,66 +278,66 @@ registerBlockType( 'core/list', {
 			} = this.props;
 			const { nodeName, values } = attributes;
 
-			return [
-				focus && (
-					<BlockControls
-						key="controls"
-						controls={ [
-							{
-								icon: 'editor-ul',
-								title: __( 'Convert to unordered list' ),
-								isActive: this.isListActive( 'UL' ),
-								onClick: this.createSetListType( 'UL', 'InsertUnorderedList' ),
-							},
-							{
-								icon: 'editor-ol',
-								title: __( 'Convert to ordered list' ),
-								isActive: this.isListActive( 'OL' ),
-								onClick: this.createSetListType( 'OL', 'InsertOrderedList' ),
-							},
-							{
-								icon: 'editor-outdent',
-								title: __( 'Outdent list item' ),
-								onClick: this.createExecCommand( 'Outdent' ),
-							},
-							{
-								icon: 'editor-indent',
-								title: __( 'Indent list item' ),
-								onClick: this.createExecCommand( 'Indent' ),
-							},
-						] }
+			return (
+				<div>
+					{ focus && (
+						<BlockControls
+							controls={ [
+								{
+									icon: 'editor-ul',
+									title: __( 'Convert to unordered list' ),
+									isActive: this.isListActive( 'UL' ),
+									onClick: this.createSetListType( 'UL', 'InsertUnorderedList' ),
+								},
+								{
+									icon: 'editor-ol',
+									title: __( 'Convert to ordered list' ),
+									isActive: this.isListActive( 'OL' ),
+									onClick: this.createSetListType( 'OL', 'InsertOrderedList' ),
+								},
+								{
+									icon: 'editor-outdent',
+									title: __( 'Outdent list item' ),
+									onClick: this.createExecCommand( 'Outdent' ),
+								},
+								{
+									icon: 'editor-indent',
+									title: __( 'Indent list item' ),
+									onClick: this.createExecCommand( 'Indent' ),
+								},
+							] }
+						/>
+					) }
+					<Editable
+						multiline="li"
+						tagName={ nodeName.toLowerCase() }
+						getSettings={ this.getEditorSettings }
+						onSetup={ this.setupEditor }
+						onChange={ this.setNextValues }
+						value={ values }
+						focus={ focus }
+						onFocus={ setFocus }
+						wrapperClassname="blocks-list"
+						placeholder={ __( 'Write list…' ) }
+						onMerge={ mergeBlocks }
+						onSplit={ ( before, after, ...blocks ) => {
+							if ( ! blocks.length ) {
+								blocks.push( createBlock( 'core/paragraph' ) );
+							}
+
+							if ( after.length ) {
+								blocks.push( createBlock( 'core/list', {
+									nodeName,
+									values: after,
+								} ) );
+							}
+
+							setAttributes( { values: before } );
+							insertBlocksAfter( blocks );
+						} }
 					/>
-				),
-				<Editable
-					multiline="li"
-					key="editable"
-					tagName={ nodeName.toLowerCase() }
-					getSettings={ this.getEditorSettings }
-					onSetup={ this.setupEditor }
-					onChange={ this.setNextValues }
-					value={ values }
-					focus={ focus }
-					onFocus={ setFocus }
-					wrapperClassname="blocks-list"
-					placeholder={ __( 'Write list…' ) }
-					onMerge={ mergeBlocks }
-					onSplit={ ( before, after, ...blocks ) => {
-						if ( ! blocks.length ) {
-							blocks.push( createBlock( 'core/paragraph' ) );
-						}
-
-						if ( after.length ) {
-							blocks.push( createBlock( 'core/list', {
-								nodeName,
-								values: after,
-							} ) );
-						}
-
-						setAttributes( { values: before } );
-						insertBlocksAfter( blocks );
-					} }
-				/>,
-			];
+				</div>
+			);
 		}
 	},
 

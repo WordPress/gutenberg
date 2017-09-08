@@ -118,14 +118,13 @@ registerBlockType( 'core/cover-image', {
 
 		if ( ! url ) {
 			const uploadButtonProps = { isLarge: true };
-			return [
-				controls,
+			return (
 				<Placeholder
-					key="placeholder"
 					instructions={ __( 'Drag image here or insert from media library' ) }
 					icon="format-image"
 					label={ __( 'Cover Image' ) }
 					className={ className }>
+					{ controls }
 					<MediaUploadButton
 						buttonProps={ uploadButtonProps }
 						onSelect={ onSelectImage }
@@ -133,18 +132,17 @@ registerBlockType( 'core/cover-image', {
 					>
 						{ __( 'Insert from Media Library' ) }
 					</MediaUploadButton>
-				</Placeholder>,
-			];
+				</Placeholder>
+			);
 		}
 
-		return [
-			controls,
+		return (
 			<section
-				key="preview"
 				data-url={ url }
 				style={ style }
 				className={ classes }
 			>
+				{ controls }
 				{ title || !! focus ? (
 					<Editable
 						tagName="h2"
@@ -156,8 +154,8 @@ registerBlockType( 'core/cover-image', {
 						inlineToolbar
 					/>
 				) : null }
-			</section>,
-		];
+			</section>
+		);
 	},
 
 	save( { attributes, className } ) {

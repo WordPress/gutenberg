@@ -55,31 +55,31 @@ registerBlockType( 'core/text-columns', {
 	edit( { attributes, setAttributes, className, focus, setFocus } ) {
 		const { width, content, columns } = attributes;
 
-		return [
-			focus && (
-				<BlockControls key="controls">
-					<BlockAlignmentToolbar
-						value={ width }
-						onChange={ ( nextWidth ) => setAttributes( { width: nextWidth } ) }
-						controls={ [ 'center', 'wide', 'full' ] }
-					/>
-				</BlockControls>
-			),
-			focus && (
-				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'Text. Great things start here.' ) }</p>
-					</BlockDescription>
-					<RangeControl
-						label={ __( 'Columns' ) }
-						value={ columns }
-						onChange={ ( value ) => setAttributes( { columns: value } ) }
-						min={ 2 }
-						max={ 4 }
-					/>
-				</InspectorControls>
-			),
-			<section className={ `${ className } align${ width } columns-${ columns }` } key="block">
+		return (
+			<section className={ `${ className } align${ width } columns-${ columns }` }>
+				{ focus && (
+					<BlockControls>
+						<BlockAlignmentToolbar
+							value={ width }
+							onChange={ ( nextWidth ) => setAttributes( { width: nextWidth } ) }
+							controls={ [ 'center', 'wide', 'full' ] }
+						/>
+					</BlockControls>
+				) }
+				{ focus && (
+					<InspectorControls>
+						<BlockDescription>
+							<p>{ __( 'Text. Great things start here.' ) }</p>
+						</BlockDescription>
+						<RangeControl
+							label={ __( 'Columns' ) }
+							value={ columns }
+							onChange={ ( value ) => setAttributes( { columns: value } ) }
+							min={ 2 }
+							max={ 4 }
+						/>
+					</InspectorControls>
+				) }
 				{ times( columns, ( index ) =>
 					<div className="wp-block-column" key={ `column-${ index }` }>
 						<Editable
@@ -100,8 +100,8 @@ registerBlockType( 'core/text-columns', {
 						/>
 					</div>
 				) }
-			</section>,
-		];
+			</section>
+		);
 	},
 
 	save( { attributes } ) {

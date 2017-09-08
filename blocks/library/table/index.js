@@ -55,26 +55,27 @@ registerBlockType( 'core/table', {
 	edit( { attributes, setAttributes, focus, setFocus, className } ) {
 		const { content } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
-		return [
-			focus && (
-				<BlockControls key="toolbar">
-					<BlockAlignmentToolbar
-						value={ attributes.align }
-						onChange={ updateAlignment }
-					/>
-				</BlockControls>
-			),
-			<TableBlock
-				key="editor"
-				onChange={ ( nextContent ) => {
-					setAttributes( { content: nextContent } );
-				} }
-				content={ content }
-				focus={ focus }
-				onFocus={ setFocus }
-				className={ className }
-			/>,
-		];
+		return (
+			<div>
+				{ focus && (
+					<BlockControls>
+						<BlockAlignmentToolbar
+							value={ attributes.align }
+							onChange={ updateAlignment }
+						/>
+					</BlockControls>
+				) }
+				<TableBlock
+					onChange={ ( nextContent ) => {
+						setAttributes( { content: nextContent } );
+					} }
+					content={ content }
+					focus={ focus }
+					onFocus={ setFocus }
+					className={ className }
+				/>
+			</div>
+		);
 	},
 
 	save( { attributes } ) {

@@ -146,29 +146,28 @@ registerBlockType( 'core/quote', {
 		const { align, value, citation, style } = attributes;
 		const focusedEditable = focus ? focus.editable || 'value' : null;
 
-		return [
-			focus && (
-				<BlockControls key="controls">
-					<Toolbar controls={ [ 1, 2 ].map( ( variation ) => ( {
-						icon: 1 === variation ? 'format-quote' : 'testimonial',
-						title: sprintf( __( 'Quote style %d' ), variation ),
-						isActive: Number( style ) === variation,
-						onClick() {
-							setAttributes( { style: variation } );
-						},
-					} ) ) } />
-					<AlignmentToolbar
-						value={ align }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { align: nextAlign } );
-						} }
-					/>
-				</BlockControls>
-			),
+		return (
 			<blockquote
-				key="quote"
 				className={ `${ className } blocks-quote-style-${ style }` }
 			>
+				{ focus && (
+					<BlockControls>
+						<Toolbar controls={ [ 1, 2 ].map( ( variation ) => ( {
+							icon: 1 === variation ? 'format-quote' : 'testimonial',
+							title: sprintf( __( 'Quote style %d' ), variation ),
+							isActive: Number( style ) === variation,
+							onClick() {
+								setAttributes( { style: variation } );
+							},
+						} ) ) } />
+						<AlignmentToolbar
+							value={ align }
+							onChange={ ( nextAlign ) => {
+								setAttributes( { align: nextAlign } );
+							} }
+						/>
+					</BlockControls>
+				) }
 				<Editable
 					multiline="p"
 					value={ value }
@@ -197,8 +196,8 @@ registerBlockType( 'core/quote', {
 						onFocus={ ( props ) => setFocus( { ...props, editable: 'citation' } ) }
 					/>
 				) }
-			</blockquote>,
-		];
+			</blockquote>
+		);
 	},
 
 	save( { attributes } ) {

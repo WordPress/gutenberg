@@ -59,13 +59,13 @@ registerBlockType( 'core/button', {
 		const { text, url, title, align, color } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 
-		return [
-			focus && (
-				<BlockControls key="controls">
-					<BlockAlignmentToolbar value={ align } onChange={ updateAlignment } />
-				</BlockControls>
-			),
-			<span key="button" className={ className } title={ title } style={ { backgroundColor: color } } >
+		return (
+			<span className={ className } title={ title } style={ { backgroundColor: color } } >
+				{ focus && (
+					<BlockControls>
+						<BlockAlignmentToolbar value={ align } onChange={ updateAlignment } />
+					</BlockControls>
+				) }
 				<Editable
 					tagName="span"
 					placeholder={ __( 'Write label…' ) }
@@ -100,8 +100,8 @@ registerBlockType( 'core/button', {
 						/>
 					</InspectorControls>
 				}
-			</span>,
-		];
+			</span>
+		);
 	},
 
 	save( { attributes } ) {
