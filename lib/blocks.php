@@ -126,13 +126,13 @@ function gutenberg_add_blocks_to_post_resource( $content ) {
 			$block['renderedContent'] = $block_type->render( $attributes, $raw_content );
 		}
 
-		// Set up and add the item data.
-		$item_data               = array();
-		$item_data['type']       = $block_name;
-		$item_data['attributes'] = $attributes;
-		$item_data['content']    = $block['rawContent'];
-		$item_data['rendered']   = $block['renderedContent'] ;
-		$data[]                  = $item_data;
+		// Add the item data.
+		$data[] = array(
+			'type'       => $block_name,
+			'attributes' => $attributes,
+			'content'    => $block['rawContent'],
+			'rendered'   => $block['renderedContent'],
+		);;
 	}
 
 	return $data;
