@@ -29,10 +29,11 @@ class ReusableBlockEdit extends Component {
 		this.setAttributes = this.setAttributes.bind( this );
 		this.confirmSave = this.confirmSave.bind( this );
 
-		if ( this.props.reusableBlock ) {
-			this.state = { saveConfirmation: SAVE_CONFIRMATION_DISABLE };
-		} else {
-			this.state = { saveConfirmation: SAVE_CONFIRMATION_HIDE };
+		this.state = { saveConfirmation: SAVE_CONFIRMATION_HIDE };
+	}
+
+	componentDidMount() {
+		if ( ! this.props.reusableBlock ) {
 			this.props.fetchReusableBlock();
 		}
 	}
