@@ -65,6 +65,7 @@ import {
 	getNotices,
 	getMostFrequentlyUsedBlocks,
 	getReusableBlock,
+	getReusableBlocks,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -1818,6 +1819,44 @@ describe( 'selectors', () => {
 			);
 
 			expect( reusableBlock ).toBeNull();
+		} );
+	} );
+
+	describe( 'getReusableBlocks', () => {
+		it( 'should return an array of reusable blocks', () => {
+			const state = {
+				reusableBlocks: {
+					'358b59ee-bab3-4d6f-8445-e8c6971a5605': {
+						id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
+						name: 'My cool block',
+						type: 'core/paragraph',
+						attributes: {
+							content: 'Hello!',
+						},
+					},
+				},
+			};
+			const reusableBlocks = getReusableBlocks( state );
+
+			expect( reusableBlocks ).toEqual( [
+				{
+					id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
+					name: 'My cool block',
+					type: 'core/paragraph',
+					attributes: {
+						content: 'Hello!',
+					},
+				},
+			] );
+		} );
+
+		it( 'should return an empty array when no reusable blocks exist', () => {
+			const state = {
+				reusableBlocks: {},
+			};
+			const reusableBlocks = getReusableBlocks( state );
+
+			expect( reusableBlocks ).toEqual( [] );
 		} );
 	} );
 } );

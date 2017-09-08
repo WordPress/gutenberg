@@ -902,3 +902,13 @@ export const getMostFrequentlyUsedBlocks = createSelector(
 export function getReusableBlock( state, ref ) {
 	return state.reusableBlocks[ ref ] || null;
 }
+
+/**
+ * Returns an array of all reusable blocks.
+ *
+ * @param {Object} state Global application state
+ * @return {Array}       An array of all reusable blocks.
+ */
+export function getReusableBlocks( state ) {
+	return Object.values( state.reusableBlocks );
+}

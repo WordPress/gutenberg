@@ -91,6 +91,7 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [] }
+				reusableBlocks={ [] }
 				recentlyUsedBlocks={ [] }
 				debouncedSpeak={ noop }
 			/>
@@ -109,6 +110,7 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [] }
+				reusableBlocks={ [] }
 				recentlyUsedBlocks={ [ advancedTextBlock ] }
 				debouncedSpeak={ noop }
 			/>
@@ -126,6 +128,7 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [] }
+				reusableBlocks={ [] }
 				recentlyUsedBlocks={ [] }
 				debouncedSpeak={ noop }
 			/>
@@ -149,6 +152,7 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [] }
+				reusableBlocks={ [] }
 				recentlyUsedBlocks={ [] }
 				debouncedSpeak={ noop }
 			/>
@@ -174,6 +178,7 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [ { name: moreBlock.name } ] }
+				reusableBlocks={ [] }
 				recentlyUsedBlocks={ [] }
 				debouncedSpeak={ noop }
 			/>
@@ -193,6 +198,7 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [] }
+				reusableBlocks={ [] }
 				recentlyUsedBlocks={ [] }
 				debouncedSpeak={ noop }
 			/>
@@ -215,6 +221,7 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [] }
+				reusableBlocks={ [] }
 				recentlyUsedBlocks={ [] }
 				debouncedSpeak={ noop }
 			/>
