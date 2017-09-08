@@ -29,7 +29,7 @@ const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
 
 function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, keywords = [] } ) {
 	return {
-		title: __( title ),
+		title,
 
 		icon,
 
@@ -236,7 +236,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 registerBlockType(
 	'core/embed',
 	getEmbedBlockSettings( {
-		title: 'Embed',
+		title: __( 'Embed' ),
 		icon: 'video-alt3',
 		transforms: {
 			from: [
