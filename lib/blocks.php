@@ -73,8 +73,8 @@ function do_blocks( $content ) {
 	$content_after_blocks = '';
 
 	foreach ( $blocks as $block ) {
-		$block_name  = isset( $block['blockName'] ) ? $block['blockName'] : null;
-		$attributes  = is_array( $block['attrs'] ) ? $block['attrs'] : array();
+		$block_name = isset( $block['blockName'] ) ? $block['blockName'] : null;
+		$attributes = is_array( $block['attrs'] ) ? $block['attrs'] : array();
 		$raw_content = isset( $block['rawContent'] ) ? $block['rawContent'] : null;
 
 		if ( $block_name ) {
@@ -92,7 +92,7 @@ function do_blocks( $content ) {
 
 	return $content_after_blocks;
 }
-add_filter( 'the_content', 'do_blocks', 9 ); // BEFORE do_shortcode and wpautop.
+add_filter( 'the_content', 'do_blocks', 9 ); // BEFORE do_shortcode() and wpautop().
 
 /**
  * Extract the blocks from post content for the REST API post response.
