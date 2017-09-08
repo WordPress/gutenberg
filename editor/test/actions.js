@@ -6,7 +6,8 @@ import {
 	replaceBlocks,
 	startTyping,
 	stopTyping,
-	addReusableBlock,
+	fetchReusableBlocks,
+	addReusableBlocks,
 	saveReusableBlock,
 	attachBlock,
 	detachBlock,
@@ -57,8 +58,16 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'addReusableBlock', () => {
-		it( 'should return the ADD_REUSABLE_BLOCK action', () => {
+	describe( 'fetchReusableBlocks', () => {
+		it( 'should return the FETCH_REUSABLE_BLOCKS action', () => {
+			expect( fetchReusableBlocks() ).toEqual( {
+				type: 'FETCH_REUSABLE_BLOCKS',
+			} );
+		} );
+	} );
+
+	describe( 'addReusableBlocks', () => {
+		it( 'should return the ADD_REUSABLE_BLOCKS action', () => {
 			const reusableBlock = {
 				id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
 				name: 'My cool block',
@@ -67,9 +76,9 @@ describe( 'actions', () => {
 					content: 'Hello!',
 				},
 			};
-			expect( addReusableBlock( reusableBlock ) ).toEqual( {
-				type: 'ADD_REUSABLE_BLOCK',
-				reusableBlock,
+			expect( addReusableBlocks( reusableBlock ) ).toEqual( {
+				type: 'ADD_REUSABLE_BLOCKS',
+				reusableBlocks: [ reusableBlock ],
 			} );
 		} );
 	} );

@@ -18,7 +18,7 @@ import { getCategories, getBlockTypes, BlockIcon } from '@wordpress/blocks';
  */
 import './style.scss';
 import { getBlocks, getRecentlyUsedBlocks, getReusableBlocks } from '../selectors';
-import { showInsertionPoint, hideInsertionPoint } from '../actions';
+import { showInsertionPoint, hideInsertionPoint, fetchReusableBlocks } from '../actions';
 
 const { TAB, LEFT, UP, RIGHT, DOWN } = keycodes;
 
@@ -52,6 +52,8 @@ export class InserterMenu extends Component {
 
 	componentDidMount() {
 		document.addEventListener( 'keydown', this.onKeyDown );
+
+		this.props.fetchReusableBlocks();
 	}
 
 	componentWillUnmount() {
@@ -421,7 +423,7 @@ const connectComponent = connect(
 			reusableBlocks: getReusableBlocks( state ),
 		};
 	},
-	{ showInsertionPoint, hideInsertionPoint }
+	{ showInsertionPoint, hideInsertionPoint, fetchReusableBlocks }
 );
 
 export default flow(

@@ -376,15 +376,27 @@ export const createErrorNotice = partial( createNotice, 'error' );
 export const createWarningNotice = partial( createNotice, 'warning' );
 
 /**
- * Returns an action object used to add a reusable block to the store.
+ * Returns an action object used to fetch all reusable blocks from the REST API.
  *
  * @param {Object} reusableBlock The reusable block
  * @return {Object}              Action object
  */
-export function addReusableBlock( reusableBlock ) {
+export function fetchReusableBlocks() {
 	return {
-		type: 'ADD_REUSABLE_BLOCK',
-		reusableBlock,
+		type: 'FETCH_REUSABLE_BLOCKS',
+	};
+}
+
+/**
+ * Returns an action object used to add a reusable block to the store.
+ *
+ * @param {Object|Array} reusableBlocks The reusable block(s)
+ * @return {Object}                     Action object
+ */
+export function addReusableBlocks( reusableBlocks ) {
+	return {
+		type: 'ADD_REUSABLE_BLOCKS',
+		reusableBlocks: castArray( reusableBlocks ),
 	};
 }
 

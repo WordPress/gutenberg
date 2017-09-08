@@ -32,7 +32,7 @@ import {
 	removeNotice,
 	savePost,
 	editPost,
-	addReusableBlock,
+	addReusableBlocks,
 	saveReusableBlock,
 } from './actions';
 import {
@@ -284,6 +284,37 @@ export default {
 
 		return effects;
 	},
+	// TODO: FETCH_REUSABLE_BLOCKS and FETCH_REUSABLE_BLOCK can probably be combined.
+	FETCH_REUSABLE_BLOCKS( action, store ) {
+		const { dispatch } = store;
+
+		new wp.api.collections.ReusableBlocks().fetch().then(
+			( reusableBlocks ) => {
+				dispatch( {
+					type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
+					reusableBlocks: reusableBlocks.map( ( { id, name, content } ) => {
+						const [ { name: type, attributes } ] = parse( content );
+						return { id, name, type, attributes };
+					} ),
+				} );
+			},
+			( error ) => {
+				dispatch( {
+					type: 'FETCH_REUSABLE_BLOCKS_FAILURE',
+					error: get( error, 'responseJSON', {
+						code: 'unknown_error',
+						message: __( 'An unknown error occurred.' ),
+					} ),
+				} );
+			}
+		);
+	},
+	FETCH_REUSABLE_BLOCKS_SUCCESS( action, store ) {
+		const { reusableBlocks } = action;
+		const { dispatch } = store;
+
+		dispatch( addReusableBlocks( reusableBlocks ) );
+	},
 	FETCH_REUSABLE_BLOCK( action, store ) {
 		const { id } = action;
 		const { dispatch } = store;
@@ -311,7 +342,7 @@ export default {
 		const { reusableBlock } = action;
 		const { dispatch } = store;
 
-		dispatch( addReusableBlock( reusableBlock ) );
+		dispatch( addReusableBlocks( reusableBlock ) );
 	},
 	SAVE_REUSABLE_BLOCK( action, store ) {
 		const { id } = action;
@@ -351,7 +382,7 @@ export default {
 		const oldBlock = getBlock( getState(), action.uid );
 		const reusableBlock = createReusableBlock( oldBlock.name, oldBlock.attributes );
 		const newBlock = createBlock( 'core/reusable-block', { ref: reusableBlock.id } );
-		dispatch( addReusableBlock( reusableBlock ) );
+		dispatch( addReusableBlocks( reusableBlock ) );
 		dispatch( saveReusableBlock( reusableBlock.id ) );
 		dispatch( replaceBlocks( [ oldBlock.uid ], [ newBlock ] ) );
 	},

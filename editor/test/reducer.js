@@ -1050,15 +1050,17 @@ describe( 'state', () => {
 
 		it( 'should add a reusable block', () => {
 			const state = reusableBlocks( {}, {
-				type: 'ADD_REUSABLE_BLOCK',
-				reusableBlock: {
-					id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
-					name: 'My cool block',
-					type: 'core/paragraph',
-					attributes: {
-						content: 'Hello!',
+				type: 'ADD_REUSABLE_BLOCKS',
+				reusableBlocks: [
+					{
+						id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
+						name: 'My cool block',
+						type: 'core/paragraph',
+						attributes: {
+							content: 'Hello!',
+						},
 					},
-				},
+				],
 			} );
 
 			expect( state ).toEqual( {

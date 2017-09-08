@@ -552,12 +552,10 @@ export function notices( state = {}, action ) {
 
 export function reusableBlocks( state = {}, action ) {
 	switch ( action.type ) {
-		case 'ADD_REUSABLE_BLOCK': {
-			const { reusableBlock } = action;
-
+		case 'ADD_REUSABLE_BLOCKS': {
 			return {
 				...state,
-				[ reusableBlock.id ]: reusableBlock,
+				...keyBy( action.reusableBlocks, 'id' ),
 			};
 		}
 
