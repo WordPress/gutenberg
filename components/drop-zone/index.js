@@ -76,20 +76,16 @@ class DropZone extends Component {
 		return (
 			<div ref={ this.setZoneNode } className={ classes }>
 				<div className="components-drop-zone__content">
-					{ [
-						<Dashicon
-							key="icon"
-							icon="upload"
-							size="40"
-							className="components-drop-zone__content-icon"
-						/>,
-						<span
-							key="text"
-							className="components-drop-zone__content-text"
-						>
-							{ label ? label : __( 'Drop files to upload' ) }
-						</span>,
-					] }
+					<Dashicon
+						icon="upload"
+						size="40"
+						className="components-drop-zone__content-icon"
+					/>
+					<span
+						className="components-drop-zone__content-text"
+					>
+						{ label ? label : __( 'Drop files to upload' ) }
+					</span>
 				</div>
 			</div>
 		);
