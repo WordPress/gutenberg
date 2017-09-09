@@ -127,8 +127,8 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_ensure_wp_api_request', 20 );
  * Disables wpautop behavior in classic editor when post contains blocks, to
  * prevent removep from invalidating paragraph blocks.
  *
- * @param  array $settings Original editor settings
- * @return array           Filtered settings
+ * @param  array $settings Original editor settings.
+ * @return array           Filtered settings.
  */
 function gutenberg_disable_editor_settings_wpautop( $settings ) {
 	if ( ! isset( $settings['wpautop'] ) ) {
