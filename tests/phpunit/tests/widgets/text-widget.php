@@ -222,7 +222,21 @@ class Test_WP_Widget_Text extends WP_UnitTestCase {
 	 *
 	 * @var string
 	 */
-	protected $example_shortcode_content = "<p>One\nTwo\n\nThree</p>\n<script>\ndocument.write('Test1');\n\ndocument.write('Test2');\n</script>";
+	protected $example_shortcode_content = "<p class='sortcodep'>One\nTwo\n\nThree\n\nThis is testing the <code>[example note='This will not get processed since it is part of shortcode output itself.']</code> shortcode.</p>\n<script>\ndocument.write('Test1');\n\ndocument.write('Test2');\n</script>";
+
+	/**
+	 * The captured global post during shortcode rendering.
+	 *
+	 * @var WP_Post|null
+	 */
+	protected $post_during_shortcode = null;
+
+	/**
+	 * Number of times the shortcode was rendered.
+	 *
+	 * @var int
+	 */
+	protected $shortcode_render_count = 0;
 
 	/**
 	 * Do example shortcode.
@@ -230,15 +244,21 @@ class Test_WP_Widget_Text extends WP_UnitTestCase {
 	 * @return string Shortcode content.
 	 */
 	function do_example_shortcode() {
+		$this->post_during_shortcode = get_post();
+		$this->shortcode_render_count++;
 		return $this->example_shortcode_content;
 	}
 
 	/**
-	 * Test widget method when a plugin has added shortcode support.
+	 * Test widget method with shortcodes.
 	 *
 	 * @covers WP_Widget_Text::widget
 	 */
 	function test_widget_shortcodes() {
+		global $post;
+		$post_id = $this->factory()->post->create();
+		$post = get_post( $post_id );
+
 		$args = array(
 			'before_title'  => '<h2>',
 			'after_title'   => "</h2>\n",
@@ -246,47 +266,100 @@ class Test_WP_Widget_Text extends WP_UnitTestCase {
 			'after_widget'  => "</section>\n",
 		);
 		$widget = new WP_Widget_Text();
-		add_filter( 'widget_text', 'do_shortcode' );
 		add_shortcode( 'example', array( $this, 'do_example_shortcode' ) );
 
 		$base_instance = array(
 			'title' => 'Example',
-			'text' => "This is an example:\n\n[example]",
+			'text' => "This is an example:\n\n[example]\n\nHello.",
 			'filter' => false,
 		);
 
-		// Legacy Text Widget.
+		// Legacy Text Widget without wpautop.
 		$instance = array_merge( $base_instance, array(
 			'filter' => false,
 		) );
+		$this->shortcode_render_count = 0;
 		ob_start();
 		$widget->widget( $args, $instance );
 		$output = ob_get_clean();
+		$this->assertEquals( 1, $this->shortcode_render_count );
+		$this->assertNotContains( '[example]', $output, 'Expected shortcode to be processed in legacy widget with plugin adding filter' );
 		$this->assertContains( $this->example_shortcode_content, $output, 'Shortcode was applied without wpautop corrupting it.' );
-		$this->assertEquals( 10, has_filter( 'widget_text', 'do_shortcode' ), 'Filter was restored.' );
+		$this->assertNotContains( '<p>' . $this->example_shortcode_content . '</p>', $output, 'Expected shortcode_unautop() to have run.' );
+		$this->assertNull( $this->post_during_shortcode );
 
-		// Visual Text Widget.
+		// Legacy Text Widget with wpautop.
 		$instance = array_merge( $base_instance, array(
-			'filter' => 'content',
+			'filter' => true,
+			'visual' => false,
 		) );
+		$this->shortcode_render_count = 0;
 		ob_start();
 		$widget->widget( $args, $instance );
 		$output = ob_get_clean();
+		$this->assertEquals( 1, $this->shortcode_render_count );
+		$this->assertNotContains( '[example]', $output, 'Expected shortcode to be processed in legacy widget with plugin adding filter' );
 		$this->assertContains( $this->example_shortcode_content, $output, 'Shortcode was applied without wpautop corrupting it.' );
-		$this->assertEquals( 10, has_filter( 'widget_text', 'do_shortcode' ), 'Filter was restored.' );
-		$this->assertFalse( has_filter( 'widget_text_content', 'do_shortcode' ), 'Filter was removed.' );
+		$this->assertNotContains( '<p>' . $this->example_shortcode_content . '</p>', $output, 'Expected shortcode_unautop() to have run.' );
+		$this->assertNull( $this->post_during_shortcode );
 
-		// Visual Text Widget with properly-used widget_text_content filter.
+		// Legacy text widget with plugin adding shortcode support as well.
+		add_filter( 'widget_text', 'do_shortcode' );
+		$this->shortcode_render_count = 0;
+		ob_start();
+		$widget->widget( $args, $instance );
+		$output = ob_get_clean();
+		$this->assertEquals( 1, $this->shortcode_render_count );
+		$this->assertNotContains( '[example]', $output, 'Expected shortcode to be processed in legacy widget with plugin adding filter' );
+		$this->assertContains( wpautop( $this->example_shortcode_content ), $output, 'Shortcode was applied *with* wpautop() applying to shortcode output since plugin used legacy filter.' );
+		$this->assertNull( $this->post_during_shortcode );
 		remove_filter( 'widget_text', 'do_shortcode' );
-		add_filter( 'widget_text_content', 'do_shortcode', 11 );
+
 		$instance = array_merge( $base_instance, array(
-			'filter' => 'content',
+			'filter' => true,
+			'visual' => true,
 		) );
+
+		// Visual Text Widget with only core-added widget_text_content filter for do_shortcode.
+		$this->assertFalse( has_filter( 'widget_text', 'do_shortcode' ) );
+		$this->assertEquals( 11, has_filter( 'widget_text_content', 'do_shortcode' ), 'Expected core to have set do_shortcode as widget_text_content filter.' );
+		$this->shortcode_render_count = 0;
 		ob_start();
 		$widget->widget( $args, $instance );
 		$output = ob_get_clean();
+		$this->assertEquals( 1, $this->shortcode_render_count );
 		$this->assertContains( $this->example_shortcode_content, $output, 'Shortcode was applied without wpautop corrupting it.' );
-		$this->assertFalse( has_filter( 'widget_text', 'do_shortcode' ), 'Filter was not erroneously restored.' );
+		$this->assertNotContains( '<p>' . $this->example_shortcode_content . '</p>', $output, 'Expected shortcode_unautop() to have run.' );
+		$this->assertFalse( has_filter( 'widget_text', 'do_shortcode' ), 'The widget_text filter still lacks do_shortcode handler.' );
+		$this->assertEquals( 11, has_filter( 'widget_text_content', 'do_shortcode' ), 'The widget_text_content filter still has do_shortcode handler.' );
+		$this->assertNull( $this->post_during_shortcode );
+
+		// Visual Text Widget with both filters applied added, one from core and another via plugin.
+		add_filter( 'widget_text', 'do_shortcode' );
+		$this->shortcode_render_count = 0;
+		ob_start();
+		$widget->widget( $args, $instance );
+		$output = ob_get_clean();
+		$this->assertEquals( 1, $this->shortcode_render_count );
+		$this->assertContains( $this->example_shortcode_content, $output, 'Shortcode was applied without wpautop corrupting it.' );
+		$this->assertNotContains( '<p>' . $this->example_shortcode_content . '</p>', $output, 'Expected shortcode_unautop() to have run.' );
+		$this->assertEquals( 10, has_filter( 'widget_text', 'do_shortcode' ), 'Expected do_shortcode to be restored to widget_text.' );
+		$this->assertNull( $this->post_during_shortcode );
+		$this->assertNull( $this->post_during_shortcode );
+		remove_filter( 'widget_text', 'do_shortcode' );
+
+		// Visual Text Widget with shortcode handling disabled via plugin removing filter.
+		remove_filter( 'widget_text_content', 'do_shortcode', 11 );
+		remove_filter( 'widget_text', 'do_shortcode' );
+		$this->shortcode_render_count = 0;
+		ob_start();
+		$widget->widget( $args, $instance );
+		$output = ob_get_clean();
+		$this->assertEquals( 0, $this->shortcode_render_count );
+		$this->assertContains( '[example]', $output );
+		$this->assertNotContains( $this->example_shortcode_content, $output );
+		$this->assertFalse( has_filter( 'widget_text', 'do_shortcode' ) );
+		$this->assertFalse( has_filter( 'widget_text_content', 'do_shortcode' ) );
 	}
 
 	/**
