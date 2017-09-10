@@ -132,7 +132,7 @@ function gutenberg_add_blocks_to_post_resource( $content ) {
 			'attributes' => $attributes,
 			'content'    => $block['rawContent'],
 			'rendered'   => $block['renderedContent'],
-		);;
+		);
 	}
 
 	return $data;
@@ -161,9 +161,8 @@ function gutenberg_attach_block_response_callback( $post_types ) {
 		 *
 		 * @param bool   $blocks_show_in_rest Whether to show blocks in the REST API response.
 		 * @param string $post_type           The post type.
-		 *
 		 */
-		if ( apply_filters( "gutenberg_add_blocks_to_rest_for_post_type", true, $post_type ) ) {
+		if ( apply_filters( 'gutenberg_add_blocks_to_rest_for_post_type', true, $post_type ) ) {
 			add_filter( 'rest_prepare_' . $post_type, 'gutenberg_extract_blocks_from_post_content', 10, 3 );
 		}
 	}

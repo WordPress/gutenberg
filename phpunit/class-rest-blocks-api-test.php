@@ -11,13 +11,6 @@
 class WP_REST_BlockAPI_Test extends WP_UnitTestCase {
 
 	/**
-	 * The WP Rest server.
-	 *
-	 * @var int
-	 */
-	protected static $server;
-
-	/**
 	 * Our fake reusable block's post ID.
 	 *
 	 * @var int
@@ -45,7 +38,7 @@ class WP_REST_BlockAPI_Test extends WP_UnitTestCase {
 	 */
 	public static function wpSetUpBeforeClass( $factory ) {
 		global $wp_rest_server;
-		self::$server = $wp_rest_server = new \WP_REST_Server;
+		$wp_rest_server = new WP_REST_Server;
 		do_action( 'rest_api_init' );
 
 		self::$demo_post_content = file_get_contents(
@@ -78,12 +71,13 @@ class WP_REST_BlockAPI_Test extends WP_UnitTestCase {
 	 * Check that we can GET blocks from a post request.
 	 */
 	public function test_get_items() {
+		global $wp_rest_server;
 		wp_set_current_user( self::$editor_id );
 
 		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . self::$test_block_post_id );
 		$this->assertNotEquals( null, $request );
 
-		$response = self::$server->dispatch( $request );
+		$response = $wp_rest_server->dispatch( $request );
 
 		$this->assertEquals( 200, $response->get_status() );
 		$response->get_data();
