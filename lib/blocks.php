@@ -145,9 +145,9 @@ function gutenberg_add_blocks_to_post_resource( $content ) {
  *
  * @param string | array $post_type Post type, or array of post types.
  */
-function attach_block_response_callback( $post_type ) {
 	if ( empty( $post_type ) ) {
 		$post_type = 'post';
+function gutenberg_attach_block_response_callback( $post_types ) {
 	}
 	if ( ! is_array( $post_type ) ) {
 		$post_type = array( $post_type );
@@ -156,7 +156,7 @@ function attach_block_response_callback( $post_type ) {
 		add_filter( 'rest_prepare_' . $type, 'attach_block_data_to_post_response', 10, 3 );
 	}
 }
-attach_block_response_callback( 'post' );
+gutenberg_attach_block_response_callback( array( 'post', 'page' ) );
 
 /**
  * Attach a post's block data to the REST API response.
