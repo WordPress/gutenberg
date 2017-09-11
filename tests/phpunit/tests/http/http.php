@@ -12,11 +12,6 @@ class Tests_HTTP_HTTP extends WP_UnitTestCase {
 	 * @dataProvider make_absolute_url_testcases
 	 */
 	function test_make_absolute_url( $relative_url, $absolute_url, $expected ) {
-		if ( ! is_callable( array( 'WP_Http', 'make_absolute_url' ) ) ) {
-			$this->markTestSkipped( "This version of WP_HTTP doesn't support WP_HTTP::make_absolute_url()" );
-			return;
-		}
-
 		$actual = WP_Http::make_absolute_url( $relative_url, $absolute_url );
 		$this->assertEquals( $expected, $actual );
 	}

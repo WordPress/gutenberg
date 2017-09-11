@@ -8,9 +8,10 @@
 class Tests_Image_Meta extends WP_UnitTestCase {
 	function setUp() {
 		if ( ! extension_loaded( 'gd' ) )
-			$this->markTestSkipped( 'The gd PHP extension is not loaded.' );
+			$this->fail( 'The gd PHP extension is not loaded.' );
 		if ( ! extension_loaded( 'exif' ) )
-			$this->markTestSkipped( 'The exif PHP extension is not loaded.' );
+			$this->fail( 'The exif PHP extension is not loaded.' );
+
 		parent::setUp();
 	}
 
