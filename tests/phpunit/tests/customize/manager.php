@@ -1413,6 +1413,24 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Ensure that saving a changeset with a publish status but future date will change the status to future, to align with behavior in wp_insert_post().
+	 *
+	 * @ticket 41336
+	 * @covers WP_Customize_Manager::save_changeset_post
+	 */
+	function test_publish_changeset_with_future_status_when_future_date() {
+		$wp_customize = $this->create_test_manager( wp_generate_uuid4() );
+
+		$wp_customize->save_changeset_post( array(
+			'date_gmt' => gmdate( 'Y-m-d H:i:s', strtotime( '+1 day' ) ),
+			'status' => 'publish',
+			'title' => 'Foo',
+		) );
+
+		$this->assertSame( 'future', get_post_status( $wp_customize->changeset_post_id() ) );
+	}
+
+	/**
 	 * Ensure that save_changeset_post method bails updating an underlying changeset which is invalid.
 	 *
 	 * @ticket 41252
