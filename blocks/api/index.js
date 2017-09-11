@@ -13,7 +13,7 @@ export { default as serialize, getBlockDefaultClassname } from './serializer';
 export {
 	getCategories,
 	registerCategory,
-	sortCategoriesBy,
+	getSortedCategories,
 	setCategoryOrder,
 } from './categories';
 export {

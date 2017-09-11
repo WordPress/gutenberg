@@ -4,7 +4,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { sortBy, findIndex } from 'lodash';
+import { sortBy, find } from 'lodash';
 
 /**
  * Block categories.
@@ -35,69 +35,70 @@ export function getCategories() {
 /**
  * Register a new block category
  *
- * @param {Array} cat e.g {slug: 'custom', title: __('Custom Blocks')}
+ * @param {Array} category e.g {slug: 'custom', title: __('Custom Blocks')}
  *
  * @return {Array} Block categories
  *
  */
-export function registerCategory( cat ) {
-	if ( ! cat ) {
+export function registerCategory( category ) {
+	if ( ! category ) {
 		console.error(
 			'The Block category must be defined'
 		);
 		return;
 	}
-	if ( ! cat.slug ) {
+	if ( ! category.slug ) {
 		console.error(
 			'The Block category slug must be defined'
 		);
 		return;
 	}
-	if ( ! /^[a-z0-9-]+$/.test( cat.slug ) ) {
+	if ( ! /^[a-z0-9-]+$/.test( category.slug ) ) {
 		console.error(
 			'Block category slug must not contain characters which are invalid for urls'
 		);
 		return;
 	}
-	if ( categories.find( x => x.slug === cat.slug ) ) {
+	if ( categories.find( x => x.slug === category.slug ) ) {
 		console.error(
-			'Block category "' + cat.slug + '" is already registered'
+			'Block category "' + category.slug + '" is already registered'
 		);
 		return;
 	}
-	if ( ! cat.title ) {
+	if ( ! category.title ) {
 		console.error(
 			'The Block category title must be defined'
 		);
 		return;
 	}
 
-	categories.push( cat );
+	categories.push( category );
 	return categories;
 }
 
 /**
  *
- * Sort categories by key
+ * Get sorted categories by property
  *
- * @param {String} key The key to sort by
+ * @param {String} sortProperty The key to sort by
  *
  * @returns {Array} Block categories
  */
-export function sortCategoriesBy( key ) {
-	if ( ! key ) {
+
+export function getSortedCategories( sortProperty ) {
+	if ( ! sortProperty ) {
 		console.error(
-			'The key must be defined'
+			'The sortProperty must be defined'
 		);
 		return;
 	}
-	if ( typeof key !== 'string' ) {
+	if ( typeof sortProperty !== 'string' ) {
 		console.error(
-			'The key must be a string'
+			'The sortProperty must be a string'
 		);
 		return;
 	}
-	categories = sortBy( categories, key );
+	categories = sortBy( categories, sortProperty );
 	return categories;
 }
 
@@ -110,7 +111,7 @@ export function sortCategoriesBy( key ) {
  * @returns {Array} Block categories
  */
 export function setCategoryOrder( slug, order ) {
-	const pos = findIndex( categories, ( category ) => category.slug === slug );
+	const category = find( categories, { slug: slug } );
 	if ( ! slug ) {
 		console.error(
 			'The slug must be defined'
@@ -129,6 +130,6 @@ export function setCategoryOrder( slug, order ) {
 		);
 		return;
 	}
-	categories[ pos ].order = order;
+	category.order = order;
 	return categories;
 }

@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
  */
 import {
 	registerCategory,
-	sortCategoriesBy,
+	getSortedCategories,
 	setCategoryOrder,
 } from '../categories';
 
@@ -104,19 +104,19 @@ describe( 'categories', () => {
 			expect( categories ).toEqual( jasmine.arrayContaining( [ { slug: 'custom-blocks', title: 'Custom Blocks', order: 1 } ] ) );
 		} );
 	} );
-	describe( 'sortCategoriesBy()', () => {
-		it( 'should reject empty key', () => {
-			const categories = sortCategoriesBy();
-			expect( console.error ).toHaveBeenCalledWith( 'The key must be defined' );
+	describe( 'getSortedCategories()', () => {
+		it( 'should reject empty sortProperty', () => {
+			const categories = getSortedCategories();
+			expect( console.error ).toHaveBeenCalledWith( 'The sortProperty must be defined' );
 			expect( categories ).toBeUndefined();
 		} );
-		it( 'should reject key if it is not a valid string', () => {
-			const categories = sortCategoriesBy( 12345 );
-			expect( console.error ).toHaveBeenCalledWith( 'The key must be a string' );
+		it( 'should reject sortProperty if it is not a valid string', () => {
+			const categories = getSortedCategories( 12345 );
+			expect( console.error ).toHaveBeenCalledWith( 'The sortProperty must be a string' );
 			expect( categories ).toBeUndefined();
 		} );
 		it( 'should return the first element for the array', () => {
-			const categories = sortCategoriesBy( 'order' );
+			const categories = getSortedCategories( 'order' );
 			expect( categories[ 0 ] ).toEqual( { slug: 'custom-blocks', title: 'Custom Blocks', order: 1 } );
 		} );
 	} );
