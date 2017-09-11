@@ -369,7 +369,8 @@ export function getEditedPostPreviewLink( state ) {
  * @return {Object}       Parsed block object
  */
 export function getBlock( state, uid ) {
-	return state.editor.blocksByUid[ uid ];
+	const block = state.editor.blocksByUid[ uid ];
+	return block.name === 'core/post-title' ? { ...block, attributes: { ...block.attributes, content: getEditedPostTitle( state ) } } : block;
 }
 
 /**
@@ -384,6 +385,14 @@ export const getBlocks = createSelector(
 	( state ) => {
 		return state.editor.blockOrder.map( ( uid ) => getBlock( state, uid ) );
 	},
+	( state ) => [
+		state.editor.blockOrder,
+		state.editor.blocksByUid,
+	]
+);
+
+export const getPostContentBlocks = createSelector(
+	state => getBlocks( state ).filter( b => b.name !== 'core/post-title' ),
 	( state ) => [
 		state.editor.blockOrder,
 		state.editor.blocksByUid,
@@ -566,6 +575,19 @@ export function getBlockIndex( state, uid ) {
  */
 export function isFirstBlock( state, uid ) {
 	return first( state.editor.blockOrder ) === uid;
+}
+
+/**
+ * Returns true if the block corresponding to the specified unique ID can be
+ * moved up.
+ *
+ * @param  {Object}  state Global application state
+ * @param  {String}  uid   Block unique ID
+ * @return {Boolean}       Whether block is first in post
+ */
+export function canMoveBlockUp( state, uid ) {
+	// PostTitle is always the first block
+	return state.editor.blockOrder.length > 2 && uid !== state.editor.blockOrder[ 1 ];
 }
 
 /**
@@ -775,7 +797,7 @@ export const getEditedPostContent = createSelector(
 			return edits.content;
 		}
 
-		return serialize( getBlocks( state ) );
+		return serialize( getPostContentBlocks( state ) );
 	},
 	( state ) => [
 		state.editor.edits.content,

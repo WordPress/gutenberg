@@ -73,7 +73,7 @@ export const editor = combineUndoableReducers( {
 					return result;
 				}, state );
 
-			case 'RESET_BLOCKS':
+			case 'ACTUALLY_RESET_BLOCKS':
 				if ( 'content' in state ) {
 					return omit( state, 'content' );
 				}
@@ -100,7 +100,7 @@ export const editor = combineUndoableReducers( {
 
 	blocksByUid( state = {}, action ) {
 		switch ( action.type ) {
-			case 'RESET_BLOCKS':
+			case 'ACTUALLY_RESET_BLOCKS':
 				return keyBy( action.blocks, 'uid' );
 
 			case 'UPDATE_BLOCK_ATTRIBUTES':
@@ -164,7 +164,7 @@ export const editor = combineUndoableReducers( {
 
 	blockOrder( state = [], action ) {
 		switch ( action.type ) {
-			case 'RESET_BLOCKS':
+			case 'ACTUALLY_RESET_BLOCKS':
 				return action.blocks.map( ( { uid } ) => uid );
 
 			case 'INSERT_BLOCKS': {

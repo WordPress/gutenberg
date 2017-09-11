@@ -10,25 +10,25 @@ import { __, sprintf } from '@wordpress/i18n';
  * @param  {string}  type          Block type - in the case of a single block, should
  *                                 define its 'type'. I.e. 'Text', 'Heading', 'Image' etc.
  * @param  {number}  firstIndex    The index (position - 1) of the first block selected.
- * @param  {boolean} isFirst       This is the first block.
- * @param  {boolean} isLast        This is the last block.
+ * @param  {boolean} canMoveUp     Indicates whether the first selected block can move up.
+ * @param  {boolean} canMoveDown   Indicates whether the last selected block can move down.
  * @param  {number}  dir           Direction of movement (> 0 is considered to be going
  *                                 down, < 0 is up).
  * @return {string}                Label for the block movement controls.
  */
-export function getBlockMoverLabel( selectedCount, type, firstIndex, isFirst, isLast, dir ) {
+export function getBlockMoverLabel( selectedCount, type, firstIndex, canMoveUp, canMoveDown, dir ) {
 	const position = ( firstIndex + 1 );
 
 	if ( selectedCount > 1 ) {
-		return getMultiBlockMoverLabel( selectedCount, firstIndex, isFirst, isLast, dir );
+		return getMultiBlockMoverLabel( selectedCount, firstIndex, canMoveUp, canMoveDown, dir );
 	}
 
-	if ( isFirst && isLast ) {
+	if ( ( ! canMoveUp ) && ( ! canMoveDown ) ) {
 		// translators: %s: Type of block (i.e. Text, Image etc)
-		return sprintf( __( 'Block "%s" is the only block, and cannot be moved' ), type );
+		return sprintf( __( 'Block "%s" is the only moveable block, and cannot be moved' ), type );
 	}
 
-	if ( dir > 0 && ! isLast ) {
+	if ( dir > 0 && canMoveDown ) {
 		// moving down
 		return sprintf(
 			__( 'Move "%(type)s" block from position %(position)d down to position %(newPosition)d' ),
@@ -40,13 +40,13 @@ export function getBlockMoverLabel( selectedCount, type, firstIndex, isFirst, is
 		);
 	}
 
-	if ( dir > 0 && isLast ) {
+	if ( dir > 0 && ! canMoveDown ) {
 		// moving down, and is the last item
 		// translators: %s: Type of block (i.e. Text, Image etc)
 		return sprintf( __( 'Block "%s" is at the end of the content and can’t be moved down' ), type );
 	}
 
-	if ( dir < 0 && ! isFirst ) {
+	if ( dir < 0 && canMoveUp ) {
 		// moving up
 		return sprintf(
 			__( 'Move "%(type)s" block from position %(position)d up to position %(newPosition)d' ),
@@ -58,10 +58,10 @@ export function getBlockMoverLabel( selectedCount, type, firstIndex, isFirst, is
 		);
 	}
 
-	if ( dir < 0 && isFirst ) {
+	if ( dir < 0 && ! canMoveUp ) {
 		// moving up, and is the first item
 		// translators: %s: Type of block (i.e. Text, Image etc)
-		return sprintf( __( 'Block "%s" is at the beginning of the content and can’t be moved up' ), type );
+		return sprintf( __( 'Block "%s" is at the beginning of moveable blocks and can’t be moved up' ), type );
 	}
 }
 
@@ -70,24 +70,24 @@ export function getBlockMoverLabel( selectedCount, type, firstIndex, isFirst, is
  *
  * @param  {number}  selectedCount Number of blocks selected.
  * @param  {number}  firstIndex    The index (position - 1) of the first block selected.
- * @param  {boolean} isFirst       This is the first block.
- * @param  {boolean} isLast        This is the last block.
+ * @param  {boolean} canMoveUp     Indicates whether the first selected block can move up.
+ * @param  {boolean} canMoveDown   Indicates whether the last selected block can move down.
  * @param  {number}  dir           Direction of movement (> 0 is considered to be going
  *                                 down, < 0 is up).
  * @return {string}                Label for the block movement controls.
  */
-export function getMultiBlockMoverLabel( selectedCount, firstIndex, isFirst, isLast, dir ) {
+export function getMultiBlockMoverLabel( selectedCount, firstIndex, canMoveUp, canMoveDown, dir ) {
 	const position = ( firstIndex + 1 );
 
-	if ( dir < 0 && isFirst ) {
+	if ( dir < 0 && ! canMoveUp ) {
 		return __( 'Blocks cannot be moved up as they are already at the top' );
 	}
 
-	if ( dir > 0 && isLast ) {
+	if ( dir > 0 && ! canMoveDown ) {
 		return __( 'Blocks cannot be moved down as they are already at the bottom' );
 	}
 
-	if ( dir < 0 && ! isFirst ) {
+	if ( dir < 0 && canMoveUp ) {
 		return sprintf(
 			__( 'Move %(selectedCount)d blocks from position %(position)d up by one place' ),
 			{
@@ -97,7 +97,7 @@ export function getMultiBlockMoverLabel( selectedCount, firstIndex, isFirst, isL
 		);
 	}
 
-	if ( dir > 0 && ! isLast ) {
+	if ( dir > 0 && canMoveDown ) {
 		return sprintf(
 			__( 'Move %(selectedCount)d blocks from position %(position)s down by one place' ),
 			{

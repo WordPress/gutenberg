@@ -16,7 +16,6 @@ import { KeyboardShortcuts } from '@wordpress/components';
  */
 import './style.scss';
 import VisualEditorBlockList from './block-list';
-import PostTitle from '../../post-title';
 import WritingFlow from '../../writing-flow';
 import { getBlockUids, getMultiSelectedBlockUids } from '../../selectors';
 import { clearSelectedBlock, multiSelect, redo, undo, removeBlocks } from '../../actions';
@@ -100,7 +99,6 @@ class VisualEditor extends Component {
 					del: this.deleteSelectedBlocks,
 				} } />
 				<WritingFlow>
-					<PostTitle />
 					<VisualEditorBlockList ref={ this.bindBlocksContainer } />
 				</WritingFlow>
 			</div>
