@@ -1,0 +1,40 @@
+{
+	"plugins": [],
+	"recurseDepth": 10,
+	"source": {
+		"include": ["src/wp-includes/js"],
+		"exclude": [
+			"src/wp-includes/js/tinymce",
+			"src/wp-includes/js/crop",
+			"src/wp-includes/js/imgareaselect",
+			"src/wp-includes/js/jcrop",
+			"src/wp-includes/js/jquery",
+			"src/wp-includes/js/mediaelement",
+			"src/wp-includes/js/swfupload",
+			"src/wp-includes/js/thickbox",
+			"src/wp-includes/js/media-audiovideo.js",
+			"src/wp-includes/js/media-grid.js",
+			"src/wp-includes/js/media-models.js",
+			"src/wp-includes/js/media-views.js"
+		],
+		"includePattern": ".+\\.js(doc|x)?$",
+		"excludePattern": "(^|\\/|\\\\)_"
+	},
+	"sourceType": "module",
+	"tags": {
+		"allowUnknownTags": true,
+		"dictionaries": ["jsdoc","closure"]
+	},
+	"templates": {
+		"cleverLinks": false,
+		"monospaceLinks": false,
+		"theme": "united",
+		"outputSourceFiles": true,
+		"outputSourcePath": true,
+		"linenums": true
+	},
+	"opts": {
+		"template": "./node_modules/ink-docstrap/template",
+		"recurse": true
+	}
+}
