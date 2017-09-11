@@ -16,7 +16,7 @@ class Tests_Paginate_Links extends WP_UnitTestCase {
 		$page50 = get_pagenum_link( 50 );
 
 		$expected =<<<EXPECTED
-<span class='page-numbers current'>1</span>
+<span aria-current='page' class='page-numbers current'>1</span>
 <a class='page-numbers' href='$page2'>2</a>
 <a class='page-numbers' href='$page3'>3</a>
 <span class="page-numbers dots">&hellip;</span>
@@ -34,7 +34,7 @@ EXPECTED;
 		$page50 = home_url( '/page/50/' );
 
 		$expected =<<<EXPECTED
-<span class='page-numbers current'>1</span>
+<span aria-current='page' class='page-numbers current'>1</span>
 <a class='page-numbers' href='$page2'>2</a>
 <a class='page-numbers' href='$page3'>3</a>
 <span class="page-numbers dots">&hellip;</span>
@@ -54,7 +54,7 @@ EXPECTED;
 
 		$expected =<<<EXPECTED
 <a class='page-numbers' href='$home'>1</a>
-<span class='page-numbers current'>2</span>
+<span aria-current='page' class='page-numbers current'>2</span>
 <a class='page-numbers' href='$page3'>3</a>
 <a class='page-numbers' href='$page4'>4</a>
 <span class="page-numbers dots">&hellip;</span>
@@ -74,7 +74,7 @@ EXPECTED;
 		$expected =<<<EXPECTED
 <a class="prev page-numbers" href="$home">&laquo; Previous</a>
 <a class='page-numbers' href='$home'>1</a>
-<span class='page-numbers current'>2</span>
+<span aria-current='page' class='page-numbers current'>2</span>
 <a class='page-numbers' href='$page3'>3</a>
 <a class='page-numbers' href='$page4'>4</a>
 <span class="page-numbers dots">&hellip;</span>
@@ -299,7 +299,7 @@ EXPECTED;
 			'type'    => 'array',
 		) );
 
-		$this->assertContains( "<span class='page-numbers current'>3</span>", $links );
+		$this->assertContains( "<span aria-current='page' class='page-numbers current'>3</span>", $links );
 	}
 
 	/**
