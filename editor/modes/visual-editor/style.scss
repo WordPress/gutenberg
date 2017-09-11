@@ -86,6 +86,11 @@
 		transition: 0.2s outline;
 	}
 
+	&.is-reusable.is-selected:before {
+		outline: 2px dashed $light-gray-500;
+		transition: 0.2s outline;
+	}
+
 	&.is-multi-selected *::selection {
 		background: transparent;
 	}
