@@ -369,7 +369,8 @@ module.exports = function(grunt) {
 					'!wp-includes/js/json2.js',
 					'!wp-includes/js/tw-sack.js',
 					'!wp-includes/js/twemoji.js',
-					'!**/*.min.js'
+					'!**/*.min.js',
+					'!wp-includes/js/wp-hooks.js'
 				],
 				// Remove once other JSHint errors are resolved
 				options: {
