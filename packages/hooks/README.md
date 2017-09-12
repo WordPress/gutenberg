@@ -6,20 +6,20 @@ A lightweight & efficient EventManager for JavaScript in WordPress.
 ### API Usage
 API functions can be called via the global `wp.hooks` like this `wp.hooks.addAction()`, etc.
 
-* `addAction( 'hookName', 'vendorName/pluginName/functionName', callback, priority )`
-* `addFilter( 'hookName', 'vendorName/pluginName/functionName', callback, priority )`
-* `removeAction( 'hookName', 'vendorName/pluginName/functionName' )`
-* `removeFilter( 'hookName',  'vendorName/pluginName/functionName' )`
-* `removeAllActions( 'hookName' )`
-* `removeAllFilters( 'hookName' )`
-* `doAction( 'hookName', arg1, arg2, moreArgs, finalArg )`
-* `applyFilters( 'hookName', content, arg1, arg2, moreArgs, finalArg )`
-* `doingAction( 'hookName' )`
-* `doingFilter( 'hookName' )`
-* `didAction( 'hookName' )`
-* `didFilter( 'hookName' )`
-* `hasAction( 'hookName' )`
-* `hasFilter( 'hookName' )`
+* `addAction( 'hook', 'vendor/plugin/function', callback, priority )`
+* `addFilter( 'hook', 'vendor/plugin/function', callback, priority )`
+* `removeAction( 'hook', 'vendor/plugin/function' )`
+* `removeFilter( 'hook',  'vendor/plugin/function' )`
+* `removeAllActions( 'hook' )`
+* `removeAllFilters( 'hook' )`
+* `doAction( 'hook', arg1, arg2, moreArgs, finalArg )`
+* `applyFilters( 'hook', content, arg1, arg2, moreArgs, finalArg )`
+* `doingAction( 'hook' )`
+* `doingFilter( 'hook' )`
+* `didAction( 'hook' )`
+* `didFilter( 'hook' )`
+* `hasAction( 'hook' )`
+* `hasFilter( 'hook' )`
 
 
 ### Background

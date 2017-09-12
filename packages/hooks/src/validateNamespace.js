@@ -19,7 +19,7 @@ function validateNamespace( namespace ) {
 	}
 
 	if ( ! /^[a-zA-Z][a-zA-Z0-9_.-]*\/[a-zA-Z][a-zA-Z0-9_.-]*\/[a-zA-Z][a-zA-Z0-9_.-]*$/.test( namespace ) ) {
-		console.error( 'The namespace must take the form `vendorName/pluginName/functionName`.' );
+		console.error( 'The namespace must take the form `vendor/plugin/function`.' );
 		return false;
 	}
 
