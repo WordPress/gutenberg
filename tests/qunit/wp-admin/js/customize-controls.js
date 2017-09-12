@@ -82,6 +82,47 @@ jQuery( window ).load( function (){
 
 	};
 
+	module( 'Customizer notifications collection' );
+	test( 'Notifications collection exists', function() {
+		ok( wp.customize.notifications );
+		equal( wp.customize.notifications.defaultConstructor, wp.customize.Notification );
+	} );
+
+	test( 'Notification objects are rendered as part of notifications collection', function() {
+		var container = jQuery( '#customize-notifications-test' ), items, collection;
+
+		collection = new wp.customize.Notifications({
+			container: container
+		});
+		collection.add( 'mycode-1', new wp.customize.Notification( 'mycode-1' ) );
+		collection.render();
+		items = collection.container.find( 'li' );
+		equal( items.length, 1 );
+		equal( items.first().data( 'code' ), 'mycode-1' );
+
+		collection.add( 'mycode-2', new wp.customize.Notification( 'mycode-2', {
+			dismissible: true
+		} ) );
+		collection.render();
+		items = collection.container.find( 'li' );
+		equal( items.length, 2 );
+		equal( items.first().data( 'code' ), 'mycode-2' );
+		equal( items.last().data( 'code' ), 'mycode-1' );
+
+		equal( items.first().find( '.notice-dismiss' ).length, 1 );
+		equal( items.last().find( '.notice-dismiss' ).length, 0 );
+
+		collection.remove( 'mycode-2' );
+		collection.render();
+		items = collection.container.find( 'li' );
+		equal( items.length, 1 );
+		equal( items.first().data( 'code' ), 'mycode-1' );
+
+		collection.remove( 'mycode-1' );
+		collection.render();
+		ok( collection.container.is( ':hidden' ), 'Notifications area is hidden.' );
+	} );
+
 	module( 'Customizer Previewed Device' );
 	test( 'Previewed device defaults to desktop.', function () {
 		equal( wp.customize.previewedDevice.get(), 'desktop' );
@@ -144,7 +185,7 @@ jQuery( window ).load( function (){
 			assert.equal( 1, notificationContainerElement.length );
 			assert.ok( notificationContainerElement.is( '.customize-control-notifications-container' ) );
 			assert.equal( 0, notificationContainerElement.find( '> ul > li' ).length );
-			assert.equal( 'none', notificationContainerElement.css( 'display' ) );
+			assert.equal( 0, notificationContainerElement.height() );
 
 			settingNotification = new wp.customize.Notification( 'setting_invalidity', 'Invalid setting' );
 			controlOnlyNotification = new wp.customize.Notification( 'control_invalidity', 'Invalid control' );
@@ -152,7 +193,7 @@ jQuery( window ).load( function (){
 			control.notifications.add( controlOnlyNotification.code, controlOnlyNotification );
 
 			// Note that renderNotifications is being called manually here since rendering normally happens asynchronously.
-			control.renderNotifications();
+			control.notifications.render();
 
 			assert.equal( 2, notificationContainerElement.find( '> ul > li' ).length );
 			assert.notEqual( 'none', notificationContainerElement.css( 'display' ) );
@@ -160,14 +201,13 @@ jQuery( window ).load( function (){
 			assert.equal( 1, _.size( control.settings['default'].notifications._value ) );
 
 			control.notifications.remove( controlOnlyNotification.code );
-			control.renderNotifications();
+			control.notifications.render();
 			assert.equal( 1, notificationContainerElement.find( '> ul > li' ).length );
 			assert.notEqual( 'none', notificationContainerElement.css( 'display' ) );
 
 			control.settings['default'].notifications.remove( settingNotification.code );
-			control.renderNotifications();
+			control.notifications.render();
 			assert.equal( 0, notificationContainerElement.find( '> ul > li' ).length );
-			assert.ok( notificationContainerElement.is( ':animated' ) ); // It is being slid down.
 			notificationContainerElement.stop().hide(); // Clean up.
 
 			doneEmbedded();

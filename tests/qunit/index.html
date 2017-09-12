@@ -210,6 +210,14 @@
 				<# } ); #>
 			</ul>
 		</script>
+		<script type="text/html" id="tmpl-customize-notification">
+			<li class="notice notice-{{ data.type || 'info' }} {{ data.altNotice ? 'notice-alt' : '' }} {{ data.dismissible ? 'is-dismissible' : '' }}" data-code="{{ data.code }}" data-type="{{ data.type }}">
+				{{{ data.message || data.code }}}
+				<# if ( data.dismissible ) { #>
+					<button type="button" class="notice-dismiss"><span class="screen-reader-text"><?php _e( 'Dismiss' ); ?></span></button>
+				<# } #>
+			</li>
+		</script>
 
 		<!-- Templates for Customizer Menus -->
 		<script type="text/html" id="tmpl-customize-control-nav_menu-content">
@@ -386,6 +394,7 @@
 
 		<div hidden>
 			<div id="customize-preview"></div>
+			<div id="customize-notifications-test"><ul></ul></div>
 		</div>
 
 		<div hidden>
