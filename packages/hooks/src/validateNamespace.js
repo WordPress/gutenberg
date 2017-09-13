@@ -2,7 +2,7 @@
  * Validate a namespace string.
  *
  * @param  {string} namespace The namespace to validate - should take the form
- *                            `vendorName/pluginName/functionName`.
+ *                            `vendor/plugin/function`.
  *
  * @return {bool}             Whether the namespace is valid.
  */

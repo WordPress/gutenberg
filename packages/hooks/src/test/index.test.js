@@ -139,14 +139,14 @@ test( 'cannot add filters with empty-string namespaces', () => {
 test( 'cannot add filters with invalid namespaces', () => {
 	addFilter( 'hook_name', 'invalid_name', () => null );
 	expect( console.error ).toHaveBeenCalledWith(
-		'The namespace must take the form `vendorName/pluginName/functionName`.'
+		'The namespace must take the form `vendor/plugin/function`.'
 	);
 } );
 
 test( 'cannot add filters with namespaces missing a functionDescription', () => {
 	addFilter( 'hook_name', 'invalid_name/', () => null );
 	expect( console.error ).toHaveBeenCalledWith(
-		'The namespace must take the form `vendorName/pluginName/functionName`.'
+		'The namespace must take the form `vendor/plugin/function`.'
 	);
 } );
 

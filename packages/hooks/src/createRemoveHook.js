@@ -16,7 +16,7 @@ function createRemoveHook( hooks, removeAll ) {
 	 * given hookName and namespace.
 	 *
 	 * @param {string}    hookName  The name of the hook to modify.
-	 * @param {string}    namespace The unique namespace identifying the callback in the form `vendorName/pluginName/functionName`.
+	 * @param {string}    namespace The unique namespace identifying the callback in the form `vendor/plugin/function`.
 	 *
 	 * @return {number}             The number of callbacks removed.
 	 */
