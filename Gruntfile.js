@@ -360,6 +360,7 @@ module.exports = function(grunt) {
 					'wp-includes/js/tinymce/plugins/wordpress/plugin.js',
 					'wp-includes/js/tinymce/plugins/wp*/plugin.js',
 					// Third party scripts
+					'!wp-includes/js/codemirror/*.js',
 					'!wp-admin/js/farbtastic.js',
 					'!wp-includes/js/backbone*.js',
 					'!wp-includes/js/swfobject.js',

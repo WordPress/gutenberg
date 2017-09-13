@@ -355,82 +355,9 @@ class Test_WP_Customize_Custom_CSS_Setting extends WP_UnitTestCase {
 		$result = $this->setting->validate( $basic_css );
 		$this->assertTrue( $result );
 
-		// Check for Unclosed Comment.
-		$unclosed_comment = $basic_css . ' /* This is a comment. ';
+		// Check for markup.
+		$unclosed_comment = $basic_css . '</style>';
 		$result = $this->setting->validate( $unclosed_comment );
-		$this->assertTrue( array_key_exists( 'unclosed_comment', $result->errors ) );
-
-		// Check for Unopened Comment.
-		$unclosed_comment = $basic_css . ' This is a comment.*/';
-		$result = $this->setting->validate( $unclosed_comment );
-		$this->assertTrue( array_key_exists( 'imbalanced_comments', $result->errors ) );
-
-		// Check for Unclosed Curly Brackets.
-		$unclosed_curly_bracket = $basic_css . '  a.link { text-decoration: none;';
-		$result = $this->setting->validate( $unclosed_curly_bracket );
-		$this->assertTrue( array_key_exists( 'imbalanced_curly_brackets', $result->errors ) );
-
-		// Check for Unopened Curly Brackets.
-		$unopened_curly_bracket = $basic_css . '  a.link text-decoration: none; }';
-		$result = $this->setting->validate( $unopened_curly_bracket );
-		$this->assertTrue( array_key_exists( 'imbalanced_curly_brackets', $result->errors ) );
-
-		// Check for Unclosed Braces.
-		$unclosed_brace = $basic_css . '  input[type="text" { color: #f00; } ';
-		$result = $this->setting->validate( $unclosed_brace );
-		$this->assertTrue( array_key_exists( 'imbalanced_braces', $result->errors ) );
-
-		// Check for Unopened Braces.
-		$unopened_brace = $basic_css . ' inputtype="text"] { color: #f00; } ';
-		$result = $this->setting->validate( $unopened_brace );
-		$this->assertTrue( array_key_exists( 'imbalanced_braces', $result->errors ) );
-
-		// Check for Imbalanced Double Quotes.
-		$imbalanced_double_quotes = $basic_css . ' div.background-image { background-image: url( "image.jpg ); } ';
-		$result = $this->setting->validate( $imbalanced_double_quotes );
-		$this->assertTrue( array_key_exists( 'unequal_double_quotes', $result->errors ) );
-
-		// Check for Unclosed Parentheses.
-		$unclosed_parentheses = $basic_css . ' div.background-image { background-image: url( "image.jpg" ; } ';
-		$result = $this->setting->validate( $unclosed_parentheses );
-		$this->assertTrue( array_key_exists( 'imbalanced_parentheses', $result->errors ) );
-
-		// Check for Unopened Parentheses.
-		$unopened_parentheses = $basic_css . ' div.background-image { background-image: url "image.jpg" ); } ';
-		$result = $this->setting->validate( $unopened_parentheses );
-		$this->assertTrue( array_key_exists( 'imbalanced_parentheses', $result->errors ) );
-
-		// A basic Content declaration with no other errors should not throw an error.
-		$content_declaration = $basic_css . ' a:before { content: ""; display: block; }';
-		$result = $this->setting->validate( $content_declaration );
-		$this->assertTrue( $result );
-
-		// An error, along with a Content declaration will throw two errors.
-		// In this case, we're using an extra opening brace.
-		$content_declaration = $basic_css . ' a:before { content: "["; display: block; }';
-		$result = $this->setting->validate( $content_declaration );
-		$this->assertTrue( array_key_exists( 'imbalanced_braces', $result->errors ) );
-		$this->assertTrue( array_key_exists( 'possible_false_positive', $result->errors ) );
-
-		$css = 'body { background: #f00; } h1.site-title { font-size: 36px; } a:hover { text-decoration: none; } input[type="text"] { padding: 1em; } /* This is a comment */';
-		$this->assertTrue( $this->setting->validate( $css ) );
-
-		$validity = $this->setting->validate( $css . ' /* This is another comment.' );
-		$this->assertInstanceOf( 'WP_Error', $validity );
-		$this->assertContains( 'unclosed code comment', join( ' ', $validity->get_error_messages() ) );
-
-		$css = '/* This is comment one. */  /* This is comment two. */';
-		$this->assertTrue( $this->setting->validate( $css ) );
-
-		$basic_css = 'body { background: #f00; } h1.site-title { font-size: 36px; } a:hover { text-decoration: none; } input[type="text"] { padding: 1em; }';
-		$this->assertTrue( $this->setting->validate( $basic_css ) );
-
-		$css = $basic_css . ' .link:before { content: "*"; display: block; }';
-		$this->assertTrue( $this->setting->validate( $css ) );
-
-		$css .= ' ( trailing';
-		$validity = $this->setting->validate( $css );
-		$this->assertWPError( $validity );
-		$this->assertNotEmpty( $result->get_error_message( 'possible_false_positive' ) );
+		$this->assertTrue( array_key_exists( 'illegal_markup', $result->errors ) );
 	}
 }
