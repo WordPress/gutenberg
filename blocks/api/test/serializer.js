@@ -269,7 +269,7 @@ describe( 'block serializer', () => {
 			beforeEach( () => {
 				registerBlockType( 'core/more', {
 					category: 'layout',
-
+					title: 'more',
 					attributes: {
 						text: {
 							type: 'string',
@@ -316,6 +316,7 @@ describe( 'block serializer', () => {
 		it( 'serializes the fallback block without comment delimiters', () => {
 			registerBlockType( 'core/unknown-block', {
 				category: 'common',
+				title: 'unknown block',
 				attributes: {
 					fruit: {
 						type: 'string',
@@ -359,6 +360,7 @@ describe( 'block serializer', () => {
 					return <p dangerouslySetInnerHTML={ { __html: attributes.content } } />;
 				},
 				category: 'common',
+				title: 'block title',
 			};
 			registerBlockType( 'core/test-block', blockType );
 		} );

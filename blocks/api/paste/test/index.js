@@ -15,6 +15,7 @@ describe( 'paste', () => {
 	beforeAll( () => {
 		registerBlockType( 'test/figure', {
 			category: 'common',
+			title: 'test figure',
 			attributes: {
 				content: {
 					type: 'array',
@@ -34,6 +35,7 @@ describe( 'paste', () => {
 
 		registerBlockType( 'test/unknown', {
 			category: 'common',
+			title: 'test unknown',
 			attributes: {
 				content: {
 					type: 'string',
