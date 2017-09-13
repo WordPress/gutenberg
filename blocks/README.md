@@ -52,7 +52,7 @@ to describe the behavior of your custom block.
 Note that all JavaScript code samples in this document are enclosed in a
 function that is evaluated immediately afterwards.  We recommend using either
 ES6 modules
-[as used in this project](docs/coding-guidelines.md#imports)
+[as used in this project](https://github.com/WordPress/gutenberg/blob/master/docs/coding-guidelines.md#imports)
 (documentation on setting up a plugin with Webpack + ES6 modules coming soon)
 or these
 ["immediately-invoked function expressions"](https://en.wikipedia.org/wiki/Immediately-invoked_function_expression)
