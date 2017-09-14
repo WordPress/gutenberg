@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import clickOutside from 'react-click-outside';
 
 /**
  * WordPress dependencies
@@ -16,6 +15,7 @@ import { keycodes } from '@wordpress/utils';
 import './style.scss';
 import IconButton from '../icon-button';
 import Dashicon from '../dashicon';
+import WithClickOutside from '../higher-order/with-click-outside';
 
 const { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } = keycodes;
 
@@ -256,4 +256,4 @@ export class DropdownMenu extends Component {
 	}
 }
 
-export default clickOutside( DropdownMenu );
+export default WithClickOutside( DropdownMenu );

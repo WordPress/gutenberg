@@ -3,7 +3,6 @@
  */
 import { connect } from 'preact-redux';
 import { uniq, get, reduce, find } from 'lodash';
-import clickOutside from 'react-click-outside';
 
 /**
  * WordPress dependencies
@@ -17,6 +16,7 @@ import { getBlockType, getBlockTypes, switchToBlockType } from '@wordpress/block
  * Internal dependencies
  */
 import './style.scss';
+import WithClickOutside from '../../components/higher-order/with-click-outside';
 import { replaceBlocks } from '../actions';
 import { getBlock } from '../selectors';
 
@@ -120,4 +120,4 @@ export default connect(
 			) );
 		},
 	} )
-)( clickOutside( BlockSwitcher ) );
+)( WithClickOutside( BlockSwitcher ) );

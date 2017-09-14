@@ -3,7 +3,6 @@
  */
 import { connect } from 'preact-redux';
 import Textarea from 'react-autosize-textarea';
-import clickOutside from 'react-click-outside';
 import classnames from 'classnames';
 
 /**
@@ -20,6 +19,7 @@ import './style.scss';
 import { getEditedPostTitle } from '../selectors';
 import { editPost, clearSelectedBlock } from '../actions';
 import PostPermalink from '../post-permalink';
+import WithClickOutside from '../../components/higher-order/with-click-outside';
 
 /**
  * Constants
@@ -126,4 +126,4 @@ export default connect(
 			},
 		};
 	}
-)( clickOutside( PostTitle ) );
+)( WithClickOutside( PostTitle ) );

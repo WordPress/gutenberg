@@ -1,12 +1,12 @@
 /**
- * External dependencies
- */
-import clickOutside from 'react-click-outside';
-
-/**
  * WordPress dependencies
  */
 import { Component, Children } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import WithClickOutside from '../higher-order/with-click-outside';
 
 class PopoverDetectOutside extends Component {
 	handleClickOutside( event ) {
@@ -21,4 +21,4 @@ class PopoverDetectOutside extends Component {
 	}
 }
 
-export default clickOutside( PopoverDetectOutside );
+export default WithClickOutside( PopoverDetectOutside );

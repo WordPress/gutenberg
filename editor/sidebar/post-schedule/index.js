@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { connect } from 'preact-redux';
-import clickOutside from 'react-click-outside';
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import { flowRight } from 'lodash';
@@ -20,6 +19,7 @@ import { PanelRow, Popover, withAPIData } from '@wordpress/components';
  */
 import './style.scss';
 import PostScheduleClock from './clock';
+import WithClickOutside from '../../../components/higher-order/with-click-outside';
 import { getEditedPostAttribute } from '../../selectors';
 import { editPost } from '../../actions';
 
@@ -121,5 +121,5 @@ const applyWithAPIData = withAPIData( () => {
 export default flowRight(
 	applyConnect,
 	applyWithAPIData,
-	clickOutside
+	WithClickOutside,
 )( PostSchedule );
