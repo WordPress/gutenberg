@@ -1,9 +1,18 @@
 import { first, last } from 'lodash';
 
+/**
+ * Returns the current editing mode.
+ *
+ * @param  {Object} state Global application state
+ * @return {String}       Editing mode
+ */
+export function getEditorMode(state) {
+  return state.mode;
+}
+
 export function isBlockSelected(state, uid) {
   return state.selectedBlock === uid;
 }
-
 
 /**
  * Returns a block given its unique ID. This is a parsed copy of the block,

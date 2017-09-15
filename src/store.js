@@ -5,11 +5,16 @@ Vue.use(Vuex);
 
 const store = new Vuex.Store({
   state: {
+    mode: 'visual',
     selectedBlock: null,
     blocksByUid: {},
     blockOrder: [],
   },
   mutations: {
+    switchMode(state, mode) {
+      state.mode = mode;
+    },
+
     selectBlock(state, uid) {
       state.selectedBlock = uid;
     },

@@ -14,6 +14,7 @@ registerBlockType('core/freeform', {
     content: '',
   },
   edit: Component,
+  save: ({ attributes }) => attributes.content,
 });
 
 setUnknownTypeHandler('core/freeform');

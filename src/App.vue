@@ -1,17 +1,30 @@
 <template>
   <div class="gutenberg gutenberg__editor">
-    <visual-editor />
+    <editor-mode-switcher />
+    <visual-editor v-if="mode === 'visual'" />
+    <text-editor v-if="mode === 'text'" />
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import VisualEditor from './editor/VisualEditor';
+import TextEditor from './editor/TextEditor';
+import EditorModeSwitcher from './editor/EditorModeSwitcher';
+import { getEditorMode } from './selectors';
 
 export default {
   name: 'app',
   props: ['blocks'],
+  computed: mapState({
+    mode(state) {
+      return getEditorMode(state);
+    },
+  }),
   components: {
     VisualEditor,
+    TextEditor,
+    EditorModeSwitcher,
   },
 };
 </script>
@@ -74,10 +87,6 @@ export default {
 
     iframe {
       width: 100%;
-    }
-
-    @include break-small() {
-      padding-top: $header-height;
     }
   }
 
