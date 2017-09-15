@@ -16,6 +16,7 @@ wp-tests-config.php
 /build
 /tests/phpunit/build
 /wp-cli.local.yml
+/jsdoc
 
 # Files and folders that get created in wp-content
 /src/wp-content/blogs.dir
