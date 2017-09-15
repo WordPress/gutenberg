@@ -11,6 +11,7 @@ if ( is_multisite() ) :
 class Tests_Multisite_Site extends WP_UnitTestCase {
 	protected $suppress = false;
 	protected static $network_ids;
+	protected static $site_ids;
 
 	function setUp() {
 		global $wpdb;
@@ -33,10 +34,24 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 			$id = $factory->network->create( $id );
 		}
 		unset( $id );
+
+		self::$site_ids = array(
+			'make.wordpress.org/'     => array( 'domain' => 'make.wordpress.org', 'path' => '/',         'site_id' => self::$network_ids['make.wordpress.org/'] ),
+			'make.wordpress.org/foo/' => array( 'domain' => 'make.wordpress.org', 'path' => '/foo/',     'site_id' => self::$network_ids['make.wordpress.org/'] ),
+		);
+
+		foreach ( self::$site_ids as &$id ) {
+			$id = $factory->blog->create( $id );
+		}
+		unset( $id );
 	}
 
 	public static function wpTearDownAfterClass() {
 		global $wpdb;
+
+		foreach( self::$site_ids as $id ) {
+			wpmu_delete_blog( $id, true );
+		}
 
 		foreach( self::$network_ids as $id ) {
 			$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->sitemeta} WHERE site_id = %d", $id ) );
@@ -1027,6 +1042,20 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 */
 	function filter_allow_unavailable_languages( $value, $option, $original_value ) {
 		return $original_value;
+	}
+
+	/**
+	 * @ticket 29684
+	 */
+	public function test_is_main_site_different_network() {
+		$this->assertTrue( is_main_site( self::$site_ids['make.wordpress.org/'], self::$network_ids['make.wordpress.org/'] ) );
+	}
+
+	/**
+	 * @ticket 29684
+	 */
+	public function test_is_main_site_different_network_random_site() {
+		$this->assertFalse( is_main_site( self::$site_ids['make.wordpress.org/foo/'], self::$network_ids['make.wordpress.org/'] ) );
 	}
 }
 

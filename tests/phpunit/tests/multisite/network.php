@@ -583,6 +583,15 @@ class Tests_Multisite_Network extends WP_UnitTestCase {
 
 		$this->assertEquals( $original_count + 1, $result );
 	}
+
+	/**
+	 * @ticket 29684
+	 */
+	public function test_network_blog_id_set() {
+		$network = get_network( self::$different_network_id );
+
+		$this->assertSame( (string) self::$different_site_ids[0], $network->blog_id );
+	}
 }
 
 endif;
