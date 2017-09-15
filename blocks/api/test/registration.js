@@ -244,14 +244,13 @@ describe( 'blocks', () => {
 			const blockType = { settingName: 'settingValue', save: noop, category: 'common', title: 'block title' };
 			registerBlockType( 'core/test-block-with-settings', blockType );
 			expect( getBlockTypes() ).toEqual( [
-				{ name: 'core/test-block', save: noop, category: 'common', title: 'block title', attributes: undefined },
+				{ name: 'core/test-block', save: noop, category: 'common', title: 'block title' },
 				{
 					name: 'core/test-block-with-settings',
 					settingName: 'settingValue',
 					save: noop,
 					category: 'common',
 					title: 'block title',
-					attributes: undefined,
 				},
 			] );
 		} );
