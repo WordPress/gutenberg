@@ -16,9 +16,6 @@ function maybeJSON( s ) {
 }
 
 Document
-  = WP_Block_List
-
-WP_Block_List
   = WP_Block*
 
 WP_Block
