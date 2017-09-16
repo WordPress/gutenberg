@@ -47,6 +47,7 @@ describe( 'state', () => {
 				save: noop,
 				edit: noop,
 				category: 'common',
+				title: 'test block',
 			} );
 		} );
 
@@ -924,6 +925,7 @@ describe( 'state', () => {
 				save: noop,
 				edit: noop,
 				category: 'common',
+				title: 'test block',
 			} );
 		} );
 
