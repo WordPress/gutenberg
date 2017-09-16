@@ -154,7 +154,7 @@ class VisualEditorBlock extends Component {
 			if ( 'meta' in type.attributes[ key ] ) {
 				this.props.onMetaChange( {
 					...this.props.meta,
-					[ key ]: [ attributes[ key ] ],
+					[ key ]: attributes[ key ],
 				} );
 			}
 		} );

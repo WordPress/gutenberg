@@ -21,7 +21,7 @@ registerBlockType( 'core/book', {
 
 	attributes: {
 		author: {
-			type: 'array',
+			type: 'string',
 			meta: 'author',
 		},
 	},
