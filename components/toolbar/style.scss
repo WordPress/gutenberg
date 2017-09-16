@@ -101,9 +101,9 @@ ul.components-toolbar {
 		font-family: $default-font;
 		font-size: $default-font-size;
 		font-weight: bold;
-		position: relative;
-		top: -5px;
-		left: -11px;
+		position: absolute;
+		right: 6px;
+		bottom: 8px;
 	}
 }
 
