@@ -2,7 +2,7 @@
  * External dependencies
  */
 import moment from 'moment';
-import { first, last, values, some, isEqual } from 'lodash';
+import { first, last, values, some, isEqual, filter, reduce } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -369,7 +369,31 @@ export function getEditedPostPreviewLink( state ) {
  * @return {Object}       Parsed block object
  */
 export function getBlock( state, uid ) {
-	return state.editor.blocksByUid[ uid ];
+	const block = state.editor.blocksByUid[ uid ];
+	const type = getBlockType( block.name );
+
+	const metaAttrs = filter( type.attributes, ( val ) =>
+		'meta' in val
+	);
+
+	return {
+		...block,
+		attributes: {
+			...block.attributes,
+			...reduce( metaAttrs, ( acc, val ) => {
+				acc[ val.meta ] = getPostMeta( state, val.meta );
+				return acc;
+			}, {} ),
+		},
+	};
+}
+
+function getPostMeta( state, key ) {
+	return ( state.editor.edits.meta === undefined ||
+			state.editor.edits.meta[ key ] === undefined
+		)
+		? state.currentPost.meta[ key ]
+		: state.editor.edits.meta[ key ];
 }
 
 /**
