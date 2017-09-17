@@ -27,8 +27,8 @@
 			} );
 		},
 
-		save: function( props ) {
-			return el( 'p', {}, props.attributes.author );
+		save: function( /* props */ ) {
+			return null;
 		},
 	} );
 } )();
