@@ -372,9 +372,16 @@ export function getBlock( state, uid ) {
 	const block = state.editor.blocksByUid[ uid ];
 	const type = getBlockType( block.name );
 
-	const metaAttrs = filter( type.attributes, ( val ) =>
-		'meta' in val
-	);
+	if ( ! block || ! type ) {
+		return block;
+	}
+
+	const metaAttrs = filter( type.attributes, ( val ) => 'meta' in val );
+
+	// Avoid injecting an empty `attributes: {}`
+	if ( ! block.attributes && ! metaAttrs.length ) {
+		return block;
+	}
 
 	return {
 		...block,
