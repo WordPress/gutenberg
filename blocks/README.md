@@ -237,7 +237,7 @@ editor interface where blocks are implemented.
 - `attributes: Object | Function` - An object of attribute schemas, where the
   keys of the object define the shape of attributes, and each value an object
   schema describing the `type`, `default` (optional), and
-  [`source`](http://gutenberg-devdoc.surge.sh/reference/attribute-sources/)
+  [`source`](http://gutenberg-devdoc.surge.sh/reference/attributes/)
   (optional) of the attribute. If `source` is omitted, the attribute is 
   serialized into the block's comment delimiters. Alternatively, define 
   `attributes` as a function which returns the attributes object.
