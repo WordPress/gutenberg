@@ -33,41 +33,40 @@ export function getCategories() {
 }
 
 /**
- * Register a new block category
+ * Register a new block Category.
  *
  * @param {Array} category e.g {slug: 'custom', title: __('Custom Blocks')}
  *
- * @return {Array} Block categories
- *
+ * @return {Array} categories
  */
 export function registerCategory( category ) {
 	if ( ! category ) {
 		console.error(
-			'The Block category must be defined'
+			'The block Category must be defined'
 		);
 		return;
 	}
 	if ( ! category.slug ) {
 		console.error(
-			'The Block category slug must be defined'
+			'The block Category slug must be defined'
 		);
 		return;
 	}
 	if ( ! /^[a-z0-9-]+$/.test( category.slug ) ) {
 		console.error(
-			'Block category slug must not contain characters which are invalid for urls'
+			'The block Category slug must not contain characters which are invalid for urls'
 		);
 		return;
 	}
 	if ( categories.find( x => x.slug === category.slug ) ) {
 		console.error(
-			'Block category "' + category.slug + '" is already registered'
+			'The block Category "' + category.slug + '" is already registered'
 		);
 		return;
 	}
 	if ( ! category.title ) {
 		console.error(
-			'The Block category title must be defined'
+			'The block Category title must be defined'
 		);
 		return;
 	}
@@ -78,11 +77,11 @@ export function registerCategory( category ) {
 
 /**
  *
- * Get sorted categories by property
+ * Get sorted categories by property.
  *
  * @param {String} sortProperty The key to sort by
  *
- * @returns {Array} Block categories
+ * @returns {Array} categories
  */
 
 export function getSortedCategories( sortProperty ) {
@@ -103,12 +102,12 @@ export function getSortedCategories( sortProperty ) {
 }
 
 /**
- * Set the property 'order' for a category
+ * Set the property 'order' for a category.
  *
  * @param {String}    slug    The slug for the category
  * @param {Number}    order   The order for the category
  *
- * @returns {Array} Block categories
+ * @returns {Array} categories
  */
 export function setCategoryOrder( slug, order ) {
 	const category = find( categories, { slug: slug } );

@@ -29,31 +29,31 @@ describe( 'categories', () => {
 	describe( 'registerCategory()', () => {
 		it( 'should reject empty categories', () => {
 			const categories = registerCategory();
-			expect( console.error ).toHaveBeenCalledWith( 'The Block category must be defined' );
+			expect( console.error ).toHaveBeenCalledWith( 'The block Category must be defined' );
 			expect( categories ).toBeUndefined();
 		} );
 
 		it( 'should reject categories with empty slug', () => {
 			const categories = registerCategory( { slug: '', title: __( 'Custom Blocks' ) } );
-			expect( console.error ).toHaveBeenCalledWith( 'The Block category slug must be defined' );
+			expect( console.error ).toHaveBeenCalledWith( 'The block Category slug must be defined' );
 			expect( categories ).toBeUndefined();
 		} );
 
 		it( 'should reject categories with slug not defined', () => {
 			const categories = registerCategory( { title: __( 'Custom Blocks' ) } );
-			expect( console.error ).toHaveBeenCalledWith( 'The Block category slug must be defined' );
+			expect( console.error ).toHaveBeenCalledWith( 'The block Category slug must be defined' );
 			expect( categories ).toBeUndefined();
 		} );
 
 		it( 'should reject categories with invalid slug', () => {
 			const categories = registerCategory( { slug: 'custom blocks', title: __( 'Custom Blocks' ) } );
-			expect( console.error ).toHaveBeenCalledWith( 'Block category slug must not contain characters which are invalid for urls' );
+			expect( console.error ).toHaveBeenCalledWith( 'The block Category slug must not contain characters which are invalid for urls' );
 			expect( categories ).toBeUndefined();
 		} );
 
 		it( 'should reject categories with empty title', () => {
 			const categories = registerCategory( { slug: 'custom-blocks', title: '' } );
-			expect( console.error ).toHaveBeenCalledWith( 'The Block category title must be defined' );
+			expect( console.error ).toHaveBeenCalledWith( 'The block Category title must be defined' );
 			expect( categories ).toBeUndefined();
 		} );
 
@@ -64,7 +64,7 @@ describe( 'categories', () => {
 
 		it( 'should reject categories already registered', () => {
 			const categories = registerCategory( { slug: 'custom-blocks', title: 'Custom Blocks' } );
-			expect( console.error ).toHaveBeenCalledWith( 'Block category "custom-blocks" is already registered' );
+			expect( console.error ).toHaveBeenCalledWith( 'The block Category "custom-blocks" is already registered' );
 			expect( categories ).toBeUndefined();
 		} );
 	} );
