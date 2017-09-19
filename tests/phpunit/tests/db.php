@@ -354,6 +354,46 @@ class Tests_DB extends WP_UnitTestCase {
 		$this->assertEquals( "SELECT * FROM $wpdb->users WHERE id = 0", $prepared );
 	}
 
+	function test_prepare_sprintf() {
+		global $wpdb;
+
+		$prepared = $wpdb->prepare( "SELECT * FROM $wpdb->users WHERE id = %d AND user_login = %s", 1, "admin" );
+		$this->assertEquals( "SELECT * FROM $wpdb->users WHERE id = 1 AND user_login = 'admin'", $prepared );
+	}
+
+	/**
+	 * @expectedIncorrectUsage wpdb::prepare
+	 */
+	function test_prepare_sprintf_invalid_args() {
+		global $wpdb;
+
+		$prepared = @$wpdb->prepare( "SELECT * FROM $wpdb->users WHERE id = %d AND user_login = %s", 1, array( "admin" ) );
+		$this->assertEquals( "SELECT * FROM $wpdb->users WHERE id = 1 AND user_login = ''", $prepared );
+
+		$prepared = @$wpdb->prepare( "SELECT * FROM $wpdb->users WHERE id = %d AND user_login = %s", array( 1 ), "admin" );
+		$this->assertEquals( "SELECT * FROM $wpdb->users WHERE id = 0 AND user_login = 'admin'", $prepared );
+	}
+
+        function test_prepare_vsprintf() {
+                global $wpdb;
+
+		$prepared = $wpdb->prepare( "SELECT * FROM $wpdb->users WHERE id = %d AND user_login = %s", array( 1, "admin" ) );
+		$this->assertEquals( "SELECT * FROM $wpdb->users WHERE id = 1 AND user_login = 'admin'", $prepared );
+	}
+
+	/**
+	 * @expectedIncorrectUsage wpdb::prepare
+	 */
+	function test_prepare_vsprintf_invalid_args() {
+		global $wpdb;
+
+		$prepared = @$wpdb->prepare( "SELECT * FROM $wpdb->users WHERE id = %d AND user_login = %s", array( 1, array( "admin" ) ) );
+		$this->assertEquals( "SELECT * FROM $wpdb->users WHERE id = 1 AND user_login = ''", $prepared );
+
+		$prepared = @$wpdb->prepare( "SELECT * FROM $wpdb->users WHERE id = %d AND user_login = %s", array( array( 1 ), "admin" ) );
+		$this->assertEquals( "SELECT * FROM $wpdb->users WHERE id = 0 AND user_login = 'admin'", $prepared );
+        }
+
 	function test_db_version() {
 		global $wpdb;
 
