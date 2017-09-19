@@ -2,7 +2,14 @@
  * External dependencies
  */
 import moment from 'moment';
-import { first, last, values, some, isEqual, filter, reduce } from 'lodash';
+import {
+	first,
+	isEqual,
+	last,
+	reduce,
+	some,
+	values,
+} from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -376,10 +383,16 @@ export function getBlock( state, uid ) {
 		return block;
 	}
 
-	const metaAttrs = filter( type.attributes, ( val ) => 'meta' in val );
+	const metaAttributes = reduce( type.attributes, ( result, value, key ) => {
+		if ( 'meta' in value ) {
+			result[ key ] = getPostMeta( state, value.meta );
+		}
+
+		return result;
+	}, {} );
 
 	// Avoid injecting an empty `attributes: {}`
-	if ( ! block.attributes && ! metaAttrs.length ) {
+	if ( ! block.attributes && ! metaAttributes.length ) {
 		return block;
 	}
 
@@ -387,10 +400,7 @@ export function getBlock( state, uid ) {
 		...block,
 		attributes: {
 			...block.attributes,
-			...reduce( metaAttrs, ( acc, val ) => {
-				acc[ val.meta ] = getPostMeta( state, val.meta );
-				return acc;
-			}, {} ),
+			...metaAttributes,
 		},
 	};
 }

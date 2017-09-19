@@ -4,7 +4,7 @@
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 import { Slot } from 'react-slot-fill';
-import { partial } from 'lodash';
+import { has, partial, reduce, size } from 'lodash';
 import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
 
 /**
@@ -150,14 +150,20 @@ class VisualEditorBlock extends Component {
 		const type = getBlockType( block.name );
 		onChange( block.uid, attributes );
 
-		Object.keys( attributes ).forEach( key => {
-			if ( 'meta' in type.attributes[ key ] ) {
-				this.props.onMetaChange( {
-					...this.props.meta,
-					[ key ]: attributes[ key ],
-				} );
+		const metaAttributes = reduce( attributes, ( result, value, key ) => {
+			if ( type && has( type, [ 'attributes', key, 'meta' ] ) ) {
+				result[ type.attributes[ key ].meta ] = value;
 			}
-		} );
+
+			return result;
+		}, {} );
+
+		if ( size( metaAttributes ) ) {
+			this.props.onMetaChange( {
+				...this.props.meta,
+				...metaAttributes,
+			} );
+		}
 	}
 
 	maybeHover() {
