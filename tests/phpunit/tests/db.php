@@ -273,6 +273,7 @@ class Tests_DB extends WP_UnitTestCase {
 		$this->assertEquals( "UPDATE test_table SET string_column = '%f is a float, %d is an int 3, %s is a string', field = '4'", $sql );
 	}
 
+
 	/**
 	 * Test that SQL modes are set correctly
 	 * @ticket 26847
@@ -1114,5 +1115,15 @@ class Tests_DB extends WP_UnitTestCase {
 
 		$this->assertSame( 'utf8', $result['charset'] );
 		$this->assertSame( 'utf8_general_ci', $result['collate'] );
+	}
+
+	/**
+	 *
+	 */
+	function test_prepare_with_unescaped_percents() {
+		global $wpdb;
+
+		$sql = $wpdb->prepare( '%d %1$d %%% %', 1 );
+		$this->assertEquals( '1 %1$d %% %', $sql );
 	}
 }
