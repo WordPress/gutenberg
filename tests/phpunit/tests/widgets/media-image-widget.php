@@ -393,12 +393,10 @@ class Test_WP_Widget_Media_Image extends WP_UnitTestCase {
 
 		$link = '<a href="' . wp_get_attachment_url( $attachment_id ) . '"';
 		$this->assertContains( $link, $output );
-		$link .= ' class=""';
-		$this->assertContains( $link, $output );
-		$link .= ' rel=""';
-		$this->assertContains( $link, $output );
-		$link .= ' target=""';
-		$this->assertContains( $link, $output );
+		$this->assertTrue( (bool) preg_match( '#<a href.*?>#', $output, $matches ) );
+		$this->assertNotContains( ' class="', $matches[0] );
+		$this->assertNotContains( ' rel="', $matches[0] );
+		$this->assertNotContains( ' target="', $matches[0] );
 
 		ob_start();
 		$widget->render_media( array(
@@ -413,7 +411,7 @@ class Test_WP_Widget_Media_Image extends WP_UnitTestCase {
 		$this->assertContains( '<a href="' . get_attachment_link( $attachment_id ) . '"', $output );
 		$this->assertContains( 'class="custom-link-class"', $output );
 		$this->assertContains( 'rel="attachment"', $output );
-		$this->assertContains( 'target=""', $output );
+		$this->assertNotContains( 'target=""', $output );
 
 		ob_start();
 		$widget->render_media( array(
