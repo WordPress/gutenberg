@@ -89,7 +89,7 @@ class VisualEditorBlockList extends Component {
 	}
 
 	onPointerMove( { clientY } ) {
-		const BUFFER = 60;
+		const BUFFER = 20;
 		const { multiSelectedBlocks } = this.props;
 		const y = clientY + window.pageYOffset;
 
