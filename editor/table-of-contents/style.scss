@@ -16,12 +16,18 @@
 	cursor: pointer;
 	font-family: $default-font;
 	font-size: 12px;
+	padding: 0 6px 4px;
 
 	.dashicon {
 		width: 20px;
 		height: 20px;
 		position: relative;
 		top: 5px;
+	}
+
+	&:focus {
+		box-shadow: $button-focus-style;
+		outline: none;
 	}
 }
 
