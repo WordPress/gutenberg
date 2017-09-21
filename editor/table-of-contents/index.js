@@ -44,6 +44,7 @@ class TableOfContents extends Component {
 					isOpen={ this.state.showPopover }
 					position="bottom"
 					className="table-of-contents__popover"
+					onClose={ () => this.setState( { showPopover: false } ) }
 				>
 					<div className="table-of-contents__counts">
 						<div className="table-of-contents__count">
