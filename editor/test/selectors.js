@@ -1060,10 +1060,12 @@ describe( 'selectors', () => {
 	describe( 'getBlock', () => {
 		it( 'should return the block', () => {
 			const state = {
+				currentPost: {},
 				editor: {
 					blocksByUid: {
 						123: { uid: 123, name: 'core/paragraph' },
 					},
+					edits: {},
 				},
 			};
 
@@ -1074,12 +1076,14 @@ describe( 'selectors', () => {
 	describe( 'getBlocks', () => {
 		it( 'should return the ordered blocks', () => {
 			const state = {
+				currentPost: {},
 				editor: {
 					blocksByUid: {
 						23: { uid: 23, name: 'core/heading' },
 						123: { uid: 123, name: 'core/paragraph' },
 					},
 					blockOrder: [ 123, 23 ],
+					edits: {},
 				},
 			};
 
@@ -1109,11 +1113,13 @@ describe( 'selectors', () => {
 	describe( 'getSelectedBlock', () => {
 		it( 'should return null if no block is selected', () => {
 			const state = {
+				currentPost: {},
 				editor: {
 					blocksByUid: {
 						23: { uid: 23, name: 'core/heading' },
 						123: { uid: 123, name: 'core/paragraph' },
 					},
+					edits: {},
 				},
 				blockSelection: { start: null, end: null },
 			};
@@ -1467,6 +1473,7 @@ describe( 'selectors', () => {
 	describe( 'getBlockInsertionPoint', () => {
 		it( 'should return the uid of the selected block', () => {
 			const state = {
+				currentPost: {},
 				preferences: { mode: 'visual' },
 				blockSelection: {
 					start: 2,
@@ -1477,6 +1484,7 @@ describe( 'selectors', () => {
 						2: { uid: 2 },
 					},
 					blockOrder: [ 1, 2, 3 ],
+					edits: {},
 				},
 			};
 
