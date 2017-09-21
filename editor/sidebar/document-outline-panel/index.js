@@ -30,7 +30,7 @@ const DocumentOutlinePanel = ( { blocks, isOpened, onTogglePanel } ) => {
 	}
 
 	return (
-		<PanelBody title={ __( 'Table of Contents' ) } opened={ isOpened } onToggle={ onTogglePanel }>
+		<PanelBody title={ __( 'Document Outline' ) } opened={ isOpened } onToggle={ onTogglePanel }>
 			<DocumentOutline />
 		</PanelBody>
 	);
