@@ -121,13 +121,19 @@ function gutenberg_my_block_init() {
 add_action( 'init', 'gutenberg_my_block_init' );
 ```
 
-Furthermore, be aware that WordPress defaults to not treating a meta datum as being unique, instead returning an array of values. If that behavior is not desired, the same `register_meta` call can be complemented with the `single` parameter as follows:
+Furthermore, be aware that WordPress defaults to:
+
+- not treating a meta datum as being unique, instead returning an array of values;
+- treating a datum as a string.
+
+If either behavior is not desired, the same `register_meta` call can be complemented with the `single` and/or `type` parameters as follows:
 
 ```php
 function gutenberg_my_block_init() {
 	register_meta( 'post', 'author', array(
 		'show_in_rest' => true,
 		'single' => true,
+		'type' => 'integer',
 	) );
 }
 add_action( 'init', 'gutenberg_my_block_init' );
