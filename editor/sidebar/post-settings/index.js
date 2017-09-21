@@ -14,6 +14,7 @@ import FeaturedImage from '../featured-image';
 import DiscussionPanel from '../discussion-panel';
 import LastRevision from '../last-revision';
 import PageAttributes from '../page-attributes';
+import DocumentOutlinePanel from '../document-outline-panel';
 
 const panel = (
 	<Panel>
@@ -24,6 +25,7 @@ const panel = (
 		<PostExcerpt />
 		<DiscussionPanel />
 		<PageAttributes />
+		<DocumentOutlinePanel />
 	</Panel>
 );
 
