@@ -38,7 +38,7 @@ class TableOfContents extends Component {
 					className="table-of-contents__toggle"
 					onClick={ () => this.setState( { showPopover: ! this.state.showPopover } ) }
 				>
-					<Dashicon icon="marker" /> { __( 'Info' ) }
+					<Dashicon icon="info" />
 				</button>
 				<Popover
 					isOpen={ this.state.showPopover }
