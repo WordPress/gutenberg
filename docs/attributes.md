@@ -124,17 +124,25 @@ add_action( 'init', 'gutenberg_my_block_init' );
 Furthermore, be aware that WordPress defaults to:
 
 - not treating a meta datum as being unique, instead returning an array of values;
-- treating a datum as a string.
+- treating that datum as a string.
 
 If either behavior is not desired, the same `register_meta` call can be complemented with the `single` and/or `type` parameters as follows:
 
 ```php
 function gutenberg_my_block_init() {
-	register_meta( 'post', 'author', array(
+	register_meta( 'post', 'author_count', array(
 		'show_in_rest' => true,
 		'single' => true,
 		'type' => 'integer',
 	) );
 }
 add_action( 'init', 'gutenberg_my_block_init' );
+```
+
+Lastly, make sure that you respect the data's type when setting attributes, as the framework does not automatically perform type casting of meta. Incorrect typing in block attributes will result in a post remaining dirty even after saving (_cf._ `isEditedPostDirty`, `hasEditedAttributes`). For instance, if `authorCount` is an integer, remember that event handlers may pass a different kind of data, thus the value should be cast explicitly:
+
+```js
+function onChange( event ) {
+	props.setAttributes( { authorCount: Number( event.target.value ) } );
+}
 ```
