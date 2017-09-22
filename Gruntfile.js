@@ -486,10 +486,9 @@ module.exports = function(grunt) {
 				src: [
 					'wp-admin/js/**/*.js',
 					'wp-includes/js/*.js',
+					'wp-includes/js/plupload/*.js',
 					'wp-includes/js/mediaelement/wp-mediaelement.js',
 					'wp-includes/js/mediaelement/wp-playlist.js',
-					'wp-includes/js/plupload/handlers.js',
-					'wp-includes/js/plupload/wp-plupload.js',
 					'wp-includes/js/tinymce/plugins/wordpress/plugin.js',
 					'wp-includes/js/tinymce/plugins/wp*/plugin.js',
 
