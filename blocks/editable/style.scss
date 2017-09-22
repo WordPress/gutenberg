@@ -26,6 +26,26 @@
 		color: $blue-medium-500;
 	}
 
+	&[data-mirror] {
+		display: none;
+	}
+
+	&[data-placeholder] {
+		opacity: 0.5;
+		pointer-events: none;
+
+		& + .blocks-editable__tinymce {
+			position: absolute;
+			top: 0;
+			width: 100%;
+			margin-top: 0;
+
+			& > p {
+				margin-top: 0;
+			}
+		}
+	}
+
 	&:focus a[data-mce-selected] {
 		padding: 0 2px;
 		margin: 0 -2px;
@@ -45,22 +65,6 @@
 
 	&:focus code[data-mce-selected] {
 		background: $light-gray-400;
-	}
-
-	&[data-is-placeholder-visible="true"] {
-		position: absolute;
-		top: 0;
-		width: 100%;
-		margin-top: 0;
-
-		& > p {
-			margin-top: 0;
-		}
-	}
-
-	& + .blocks-editable__tinymce {
-		opacity: 0.5;
-		pointer-events: none;
 	}
 }
 
