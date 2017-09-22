@@ -39,7 +39,7 @@ registerBlockType( 'core/preformatted', {
 				isMatch: ( node ) => (
 					node.nodeName === 'PRE' &&
 					! (
-						node.children === 1 &&
+						node.children.length === 1 &&
 						node.firstChild.nodeName === 'CODE'
 					)
 				),
