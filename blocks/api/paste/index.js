@@ -19,9 +19,10 @@ import msListConverter from './ms-list-converter';
 import listMerger from './list-merger';
 import imageCorrector from './image-corrector';
 import blockquoteNormaliser from './blockquote-normaliser';
-import { deepFilter, isInvalidInline, isNotWhitelisted } from './utils';
+import { deepFilter, isInvalidInline, isNotWhitelisted, isPlain } from './utils';
+import showdown from 'showdown';
 
-export default function( { content: HTML, inline } ) {
+export default function( { HTML, plainText, inline } ) {
 	HTML = HTML.replace( /<meta[^>]+>/, '' );
 
 	// Block delimiters detected.
@@ -29,10 +30,18 @@ export default function( { content: HTML, inline } ) {
 		return parseWithGrammar( HTML );
 	}
 
-	// Context dependent filters. Needs to run before we remove nodes.
-	HTML = deepFilter( HTML, [
-		msListConverter,
-	] );
+	if ( plainText && isPlain( HTML ) && plainText.indexOf( '\n\n' ) !== -1 ) {
+		const converter = new showdown.Converter();
+
+		converter.setOption( 'noHeaderId', true );
+
+		HTML = converter.makeHtml( plainText );
+	} else {
+		// Context dependent filters. Needs to run before we remove nodes.
+		HTML = deepFilter( HTML, [
+			msListConverter,
+		] );
+	}
 
 	HTML = deepFilter( HTML, [
 		listMerger,
