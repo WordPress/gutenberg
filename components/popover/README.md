@@ -45,7 +45,23 @@ render(
 
 ## Props
 
-The component accepts the following props:
+The component accepts the following props. Props not included in this set will be applied to the element wrapping Popover content.
+
+### isOpen
+
+As a controlled component, it is expected that you will pass `isOpen` to control whether the popover is visible. Refer to the `onClose` documentation for the complementary behavior for determining when this value should be toggled in your parent component state.
+
+- Type: `Boolean`
+- Required: No
+- Default: `false`
+
+### focusOnOpen
+
+By default, the popover will receive focus when it transitions from closed to open. To suppress this behavior, assign `focusOnOpen` to `true`. This should only be assigned when an appropriately accessible substitute behavior exists.
+
+- Type: `Boolean`
+- Required: No
+- Default: `true`
 
 ### position
 

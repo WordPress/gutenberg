@@ -198,6 +198,7 @@ class Autocomplete extends Component {
 				} ) }
 				<Popover
 					isOpen={ isOpen }
+					focusOnOpen={ false }
 					position="top right"
 					className={ classes }
 				>

@@ -55,6 +55,7 @@ describe( 'Autocomplete', () => {
 			const popover = wrapper.find( 'Popover' );
 
 			expect( wrapper.state( 'isOpen' ) ).toBe( false );
+			expect( popover.prop( 'focusOnOpen' ) ).toBe( false );
 			expect( popover.hasClass( 'my-autocomplete' ) ).toBe( true );
 			expect( popover.hasClass( 'components-autocomplete__popover' ) ).toBe( true );
 			expect( wrapper.hasClass( 'components-autocomplete' ) ).toBe( true );
