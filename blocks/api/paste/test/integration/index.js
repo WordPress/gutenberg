@@ -25,7 +25,7 @@ describe( 'paste: integration', () => {
 		it( type, () => {
 			const input = fs.readFileSync( path.join( __dirname, `${ type }-in.html` ), 'utf8' ).trim();
 			const output = fs.readFileSync( path.join( __dirname, `${ type }-out.html` ), 'utf8' ).trim();
-			const pasted = paste( { content: input } );
+			const pasted = paste( { HTML: input } );
 			const serialized = typeof pasted === 'string' ? pasted : serialize( pasted );
 
 			equal( output, serialized );
