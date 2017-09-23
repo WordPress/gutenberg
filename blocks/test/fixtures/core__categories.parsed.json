@@ -1,0 +1,15 @@
+[
+    {
+        "blockName": "core/categories",
+        "attrs": {
+            "showPostCounts": false,
+            "displayAsDropdown": false,
+            "showHierarchy": false
+        },
+        "rawContent": ""
+    },
+    {
+        "attrs": {},
+        "rawContent": "\n"
+    }
+]

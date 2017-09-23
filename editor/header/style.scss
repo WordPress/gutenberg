@@ -6,20 +6,32 @@
 	display: flex;
 	flex-direction: row;
 	align-items: center;
-	z-index: 1;
-	top: $admin-bar-height-big;
+	z-index: z-index( '.editor-header' );
 	left: 0;
 	right: 0;
 
+	top: 0;
+	position: sticky;
+
 	@include break-small() {
+		top: $admin-bar-height-big;
 		position: fixed;
+	}
+
+	@include break-medium() {
+		top: $admin-bar-height;
 	}
 }
 
-.auto-fold .editor-header {
+.sticky-menu .editor-header {	/* Sticky is when on smaller breakpoints, nav menu is manually opened */
+	@include break-medium() {
+		left: $admin-sidebar-width;
+	}
+}
+
+.auto-fold .editor-header {		/* Auto fold is when on smaller breakpoints, nav menu auto colllapses */
 	@include break-medium() {
 		left: $admin-sidebar-width-collapsed;
-		top: $admin-bar-height;
 	}
 
 	@include break-large() {
@@ -54,4 +66,19 @@
 .rtl.auto-fold .wp-responsive-open .editor-header {
 	left: -$admin-sidebar-width-big;
 	right: $admin-sidebar-width-big;
+}
+
+.editor-header-multi-select {
+	background: $blue-medium-100;
+	border-bottom: 1px solid $blue-medium-200;
+}
+
+.editor-selected-count {
+	padding-right: $item-spacing;
+	color: $dark-gray-500;
+	border-right: 1px solid $light-gray-500;
+}
+
+.editor-selected-clear {
+	margin: 0 0 0 auto;
 }

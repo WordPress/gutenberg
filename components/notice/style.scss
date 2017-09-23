@@ -1,0 +1,8 @@
+.components-notice-list {
+	position: fixed;
+	top: 40px;
+	right: 0;
+	min-width: 300px;
+	max-width: 550px;
+	z-index: z-index( ".components-notice-list" );
+}

@@ -2,8 +2,9 @@
  * External dependencies
  */
 import { createElement, Component, cloneElement, Children } from 'react';
-import { render } from 'react-dom';
+import { render, findDOMNode, unstable_createPortal } from 'react-dom'; // eslint-disable-line camelcase
 import { renderToStaticMarkup } from 'react-dom/server';
+import { isString } from 'lodash';
 
 /**
  * Returns a new element of given type. Type can be either a string tag name or
@@ -40,7 +41,25 @@ export { Component };
  */
 export { cloneElement };
 
+/**
+ * Finds the dom node of a React component
+ *
+ * @param {Component} component component's instance
+ * @param {Element}   target    DOM node into which element should be rendered
+ */
+export { findDOMNode };
+
 export { Children };
+
+/**
+ * Creates a portal into which a component can be rendered.
+ *
+ * @see https://github.com/facebook/react/issues/10309#issuecomment-318433235
+ *
+ * @param {Component} component Component
+ * @param {Element}   target    DOM node into which element should be rendered
+ */
+export { unstable_createPortal as createPortal }; // eslint-disable-line camelcase
 
 /**
  * Renders a given element into a string
@@ -48,40 +67,20 @@ export { Children };
  * @param  {WPElement} element Element to render
  * @return {String}            HTML
  */
-export function renderToString( element ) {
-	if ( ! element ) {
-		return '';
-	}
-
-	if ( 'string' === typeof element ) {
-		return element;
-	}
-
-	if ( Array.isArray( element ) ) {
-		// React 16 supports rendering array children of an element, but not as
-		// an argument to the render methods directly. To support this, we pass
-		// the array as children of a dummy wrapper, then remove the wrapper's
-		// opening and closing tags.
-		return renderToStaticMarkup(
-			createElement( 'div', null, ...element )
-		).slice( 5 /* <div> */, -6 /* </div> */ );
-	}
-
-	return renderToStaticMarkup( element );
-}
+export { renderToStaticMarkup as renderToString };
 
 /**
  * Concatenate two or more React children objects
  *
- * @param  {...?Object} childrens Set of children to concatenate
- * @return {Array}                The concatenated value
+ * @param  {...?Object} childrenArguments Array of children arguments (array of arrays/strings/objects) to concatenate
+ * @return {Array}                        The concatenated value
  */
-export function concatChildren( ...childrens ) {
-	return childrens.reduce( ( memo, children, i ) => {
+export function concatChildren( ...childrenArguments ) {
+	return childrenArguments.reduce( ( memo, children, i ) => {
 		Children.forEach( children, ( child, j ) => {
-			if ( 'string' !== typeof child ) {
+			if ( child && 'string' !== typeof child ) {
 				child = cloneElement( child, {
-					key: [ i, j ].join()
+					key: [ i, j ].join(),
 				} );
 			}
 
@@ -90,4 +89,21 @@ export function concatChildren( ...childrens ) {
 
 		return memo;
 	}, [] );
+}
+
+/**
+ * Switches the nodeName of all the elements in the children object
+ *
+ * @param  {?Object} children  Children object
+ * @param  {String}  nodeName  Node name
+ * @return {?Object}           The updated children object
+ */
+export function switchChildrenNodeName( children, nodeName ) {
+	return children && Children.map( children, ( elt, index ) => {
+		if ( isString( elt ) ) {
+			return createElement( nodeName, { key: index }, elt );
+		}
+		const { children: childrenProp, ...props } = elt.props;
+		return createElement( nodeName, { key: index, ...props }, childrenProp );
+	} );
 }

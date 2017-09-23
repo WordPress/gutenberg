@@ -1,10 +1,9 @@
-body.toplevel_page_gutenberg {
+body.toplevel_page_gutenberg,
+body.gutenberg_page_gutenberg-demo {
 	background: $white;
 
 	#update-nag, .update-nag {
-		position: absolute;
-		right: 0;
-		top: 50px;
+		display: none;
 	}
 
 	#wpcontent {
@@ -15,15 +14,14 @@ body.toplevel_page_gutenberg {
 		display: none;
 	}
 
+	svg {
+		fill: currentColor;
+	}
 }
 
 .gutenberg {
 	* {
 		box-sizing: border-box;
-	}
-
-	svg {
-		fill: currentColor;
 	}
 
 	ul {
@@ -34,8 +32,14 @@ body.toplevel_page_gutenberg {
 		list-style-type: decimal;
 	}
 
+	ul,
+	ol {
+		margin: 0;
+		padding: 0;
+	}
+
 	select {
-		font-size: 13px;
+		font-size: $default-font-size;
 		color: $dark-gray-500;
 	}
 }
@@ -47,7 +51,36 @@ body.toplevel_page_gutenberg {
 		max-width: 100%;
 	}
 
+	iframe {
+		width: 100%;
+	}
+
 	@include break-small() {
 		padding-top: $header-height;
+	}
+}
+
+.editor-post-title,
+.editor-visual-editor__block {
+	input,
+	textarea {
+		border-radius: 4px;
+		border-color: $light-gray-500;
+		font-family: $default-font;
+		font-size: $default-font-size;
+		padding: 6px 10px;
+
+		&::-webkit-input-placeholder {
+			color: $dark-gray-300;
+		}
+		&::-moz-placeholder {
+			color: $dark-gray-300;
+		}
+		&:-ms-input-placeholder {
+			color: $dark-gray-300;
+		}
+		&:-moz-placeholder {
+			color: $dark-gray-300;
+		}
 	}
 }

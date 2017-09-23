@@ -1,16 +1,82 @@
 /**
+ * External dependencies
+ */
+import { connect } from 'react-redux';
+import classnames from 'classnames';
+
+/**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+import { Dashicon, Button } from '@wordpress/components';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
-import Dashicon from '../../components/dashicon';
+import { editPost, savePost } from '../../actions';
+import {
+	isEditedPostNew,
+	isCurrentPostPublished,
+	isEditedPostDirty,
+	isSavingPost,
+	isEditedPostSaveable,
+	getCurrentPost,
+	getEditedPostAttribute,
+} from '../../selectors';
 
-function SavedState() {
+export function SavedState( { isNew, isPublished, isDirty, isSaving, isSaveable, status, onStatusChange, onSave } ) {
+	const className = 'editor-saved-state';
+
+	if ( isSaving ) {
+		return (
+			<span className={ className }>
+				{ __( 'Saving' ) }
+			</span>
+		);
+	}
+
+	if ( ! isSaveable || isPublished ) {
+		return null;
+	}
+
+	if ( ! isNew && ! isDirty ) {
+		return (
+			<span className={ className }>
+				<Dashicon icon="saved" />
+				{ __( 'Saved' ) }
+			</span>
+		);
+	}
+
+	const onClick = () => {
+		if ( 'auto-draft' === status ) {
+			onStatusChange( 'draft' );
+		}
+
+		onSave();
+	};
+
 	return (
-		<div className="editor-saved-state">
-			<Dashicon icon="saved" />
-			{ wp.i18n.__( 'Saved' ) }
-		</div>
+		<Button className={ classnames( className, 'button-link' ) } onClick={ onClick }>
+			<span className="editor-saved-state__mobile">{ __( 'Save' ) }</span>
+			<span className="editor-saved-state__desktop">{ __( 'Save Draft' ) }</span>
+		</Button>
 	);
 }
 
-export default SavedState;
+export default connect(
+	( state ) => ( {
+		post: getCurrentPost( state ),
+		isNew: isEditedPostNew( state ),
+		isPublished: isCurrentPostPublished( state ),
+		isDirty: isEditedPostDirty( state ),
+		isSaving: isSavingPost( state ),
+		isSaveable: isEditedPostSaveable( state ),
+		status: getEditedPostAttribute( state, 'status' ),
+	} ),
+	{
+		onStatusChange: ( status ) => editPost( { status } ),
+		onSave: savePost,
+	}
+)( SavedState );

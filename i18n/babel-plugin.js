@@ -34,7 +34,7 @@
 
 const { po } = require( 'gettext-parser' );
 const { pick, reduce, uniq, forEach, sortBy, isEqual, merge, isEmpty } = require( 'lodash' );
-const { relative } = require( 'path' );
+const { relative, sep } = require( 'path' );
 const { writeFileSync } = require( 'fs' );
 
 /**
@@ -44,7 +44,7 @@ const { writeFileSync } = require( 'fs' );
  */
 const DEFAULT_HEADERS = {
 	'content-type': 'text/plain; charset=UTF-8',
-	'x-generator': 'babel-plugin-wp-i18n'
+	'x-generator': 'babel-plugin-wp-i18n',
 };
 
 /**
@@ -58,7 +58,7 @@ const DEFAULT_FUNCTIONS = {
 	__: [ 'msgid' ],
 	_n: [ 'msgid', 'msgid_plural' ],
 	_x: [ 'msgid', 'msgctxt' ],
-	_nx: [ 'msgid', 'msgctxt', 'msgid_plural' ]
+	_nx: [ 'msgid', 'msgctxt', 'msgid_plural' ],
 };
 
 /**
@@ -76,27 +76,81 @@ const DEFAULT_OUTPUT = 'gettext.pot';
 const VALID_TRANSLATION_KEYS = [ 'msgid', 'msgid_plural', 'msgctxt' ];
 
 /**
- * Returns translator comment for a given AST node if one exists.
+ * Regular expression matching translator comment value.
  *
- * @param  {Object}  node AST node
- * @return {?string}      Translator comment
+ * @type {RegExp}
  */
-function getTranslatorComment( node ) {
-	if ( ! node.leadingComments ) {
+const REGEXP_TRANSLATOR_COMMENT = /^\s*translators:\s*([\s\S]+)/im;
+
+/**
+ * Given an argument node (or recursed node), attempts to return a string
+ * represenation of that node's value.
+ *
+ * @param  {Object} node AST node
+ * @return {String}      String value
+ */
+function getNodeAsString( node ) {
+	switch ( node.type ) {
+		case 'BinaryExpression':
+			return (
+				getNodeAsString( node.left ) +
+				getNodeAsString( node.right )
+			);
+
+		case 'StringLiteral':
+			return node.value;
+
+		default:
+			return '';
+	}
+}
+
+/**
+ * Returns translator comment for a given AST traversal path if one exists.
+ *
+ * @param  {Object}  path              Traversal path
+ * @param  {Number}  _originalNodeLine Private: In recursion, line number of
+ *                                     the original node passed
+ * @return {?string}                   Translator comment
+ */
+function getTranslatorComment( path, _originalNodeLine ) {
+	const { node, parent, parentPath } = path;
+
+	// Assign original node line so we can keep track in recursion whether a
+	// matched comment or parent occurs on the same or previous line
+	if ( ! _originalNodeLine ) {
+		_originalNodeLine = node.loc.start.line;
+	}
+
+	let comment;
+	forEach( node.leadingComments, ( commentNode ) => {
+		const { line } = commentNode.loc.end;
+		if ( line < _originalNodeLine - 1 || line > _originalNodeLine ) {
+			return;
+		}
+
+		const match = commentNode.value.match( REGEXP_TRANSLATOR_COMMENT );
+		if ( match ) {
+			// Extract text from matched translator prefix
+			comment = match[ 1 ].split( '\n' ).map( ( text ) => text.trim() ).join( ' ' );
+
+			// False return indicates to Lodash to break iteration
+			return false;
+		}
+	} );
+
+	if ( comment ) {
+		return comment;
+	}
+
+	if ( ! parent || ! parent.loc || ! parentPath ) {
 		return;
 	}
 
-	const comments = node.leadingComments.reduce( ( memo, comment ) => {
-		const match = comment.value.match( /^\s*translators:\s*(.*?)\s*$/im );
-		if ( match ) {
-			memo.push( match[ 1 ] );
-		}
-
-		return memo;
-	}, [] );
-
-	if ( comments.length > 0 ) {
-		return comments.join( '\n' );
+	// Only recurse as long as parent node is on the same or previous line
+	const { line } = parent.loc.start;
+	if ( line >= _originalNodeLine - 1 && line <= _originalNodeLine ) {
+		return getTranslatorComment( parentPath, _originalNodeLine );
 	}
 }
 
@@ -154,7 +208,7 @@ module.exports = function() {
 				const translation = path.node.arguments.reduce( ( memo, arg, i ) => {
 					const key = functionKeys[ i ];
 					if ( isValidTranslationKey( key ) ) {
-						memo[ key ] = arg.value;
+						memo[ key ] = getNodeAsString( arg );
 					}
 
 					return memo;
@@ -175,10 +229,10 @@ module.exports = function() {
 							'': {
 								'': {
 									msgid: '',
-									msgstr: []
-								}
-							}
-						}
+									msgstr: [],
+								},
+							},
+						},
 					};
 
 					for ( const key in baseData.headers ) {
@@ -199,14 +253,16 @@ module.exports = function() {
 					translation.msgstr = '';
 				}
 
-				// Assign file reference comment
+				// Assign file reference comment, ensuring consistent pathname
+				// reference between Win32 and POSIX
 				const { filename } = this.file.opts;
+				const pathname = relative( '.', filename ).split( sep ).join( '/' );
 				translation.comments = {
-					reference: relative( process.cwd(), filename ) + ':' + path.node.loc.start.line
+					reference: pathname + ':' + path.node.loc.start.line,
 				};
 
 				// If exists, also assign translator comment
-				const translator = getTranslatorComment( path.parent );
+				const translator = getTranslatorComment( path );
 				if ( translator ) {
 					translation.comments.translator = translator;
 				}
@@ -252,7 +308,7 @@ module.exports = function() {
 								if ( isSameTranslation( translation, memo[ msgctxt ][ msgid ] ) ) {
 									translation.comments.reference = uniq( [
 										memo[ msgctxt ][ msgid ].comments.reference,
-										translation.comments.reference
+										translation.comments.reference,
 									].join( '\n' ).split( '\n' ) ).join( '\n' );
 								}
 
@@ -273,11 +329,13 @@ module.exports = function() {
 					const compiled = po.compile( data );
 					writeFileSync( state.opts.output || DEFAULT_OUTPUT, compiled );
 					this.hasPendingWrite = false;
-				}
-			}
-		}
+				},
+			},
+		},
 	};
 };
 
+module.exports.getNodeAsString = getNodeAsString;
+module.exports.getTranslatorComment = getTranslatorComment;
 module.exports.isValidTranslationKey = isValidTranslationKey;
 module.exports.isSameTranslation = isSameTranslation;

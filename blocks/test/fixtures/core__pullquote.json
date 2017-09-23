@@ -1,0 +1,20 @@
+[
+    {
+        "uid": "_uid_0",
+        "name": "core/pullquote",
+        "isValid": false,
+        "attributes": {
+            "value": [
+                {
+                    "type": "p",
+                    "children": "Testing pullquote block..."
+                }
+            ],
+            "citation": [
+                "...with a caption"
+            ],
+            "align": "none"
+        },
+        "originalContent": "<blockquote class=\"wp-block-pullquote\">\n<p>Testing pullquote block...</p><footer>...with a caption</footer>\n</blockquote>"
+    }
+]

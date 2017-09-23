@@ -1,35 +1,37 @@
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
-import { registerBlock, query, setUnknownTypeHandler } from 'api';
+import './editor.scss';
+import { registerBlockType, source, setUnknownTypeHandlerName } from '../../api';
+import OldEditor from './old-editor';
 
-const { html } = query;
+const { prop } = source;
 
-registerBlock( 'core/freeform', {
-	title: wp.i18n.__( 'Freeform' ),
+registerBlockType( 'core/freeform', {
+	title: __( 'Classic Text' ),
 
-	icon: 'text',
+	icon: 'editor-kitchensink',
 
-	category: 'common',
+	category: 'formatting',
 
 	attributes: {
-		html: html()
+		content: {
+			type: 'string',
+			source: prop( 'innerHTML' ),
+		},
 	},
 
-	edit( { attributes } ) {
-		return (
-			<div
-				contentEditable
-				suppressContentEditableWarning
-			>
-				{ attributes.html }
-			</div>
-		);
-	},
+	edit: OldEditor,
 
 	save( { attributes } ) {
-		return attributes.html;
-	}
+		const { content } = attributes;
+		return content;
+	},
 } );
 
-setUnknownTypeHandler( 'core/freeform' );
+setUnknownTypeHandlerName( 'core/freeform' );

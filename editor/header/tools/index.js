@@ -4,13 +4,19 @@
 import { connect } from 'react-redux';
 
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+import { IconButton } from '@wordpress/components';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
-import Dashicon from '../../components/dashicon';
-import IconButton from '../../components/icon-button';
-import Inserter from '../../components/inserter';
-import Button from '../../components/button';
+import Inserter from '../../inserter';
+import PublishButton from './publish-button';
+import PreviewButton from './preview-button';
+import { isEditorSidebarOpened, hasEditorUndo, hasEditorRedo } from '../../selectors';
 
 function Tools( { undo, redo, hasUndo, hasRedo, isSidebarOpened, toggleSidebar } ) {
 	return (
@@ -18,42 +24,38 @@ function Tools( { undo, redo, hasUndo, hasRedo, isSidebarOpened, toggleSidebar }
 			<IconButton
 				className="editor-tools__undo"
 				icon="undo"
-				label={ wp.i18n.__( 'Undo' ) }
+				label={ __( 'Undo' ) }
 				disabled={ ! hasUndo }
 				onClick={ undo } />
 			<IconButton
 				className="editor-tools__redo"
 				icon="redo"
-				label={ wp.i18n.__( 'Redo' ) }
+				label={ __( 'Redo' ) }
 				disabled={ ! hasRedo }
 				onClick={ redo } />
-			<Inserter position="bottom" />
+			<Inserter position="bottom">
+				{ __( 'Insert' ) }
+			</Inserter>
+			<PreviewButton />
 			<div className="editor-tools__tabs">
-				<Button>
-					<Dashicon icon="visibility" />
-					{ wp.i18n._x( 'Preview', 'imperative verb' ) }
-				</Button>
-				<Button onClick={ toggleSidebar } isToggled={ isSidebarOpened }>
-					<Dashicon icon="admin-generic" />
-					{ wp.i18n.__( 'Post Settings' ) }
-				</Button>
+				<IconButton icon="admin-generic" onClick={ toggleSidebar } isToggled={ isSidebarOpened }>
+					{ __( 'Settings' ) }
+				</IconButton>
 			</div>
-			<Button isPrimary isLarge>
-				{ wp.i18n.__( 'Publish' ) }
-			</Button>
+			<PublishButton />
 		</div>
 	);
 }
 
 export default connect(
 	( state ) => ( {
-		hasUndo: state.blocks.history.past.length > 0,
-		hasRedo: state.blocks.history.future.length > 0,
-		isSidebarOpened: state.isSidebarOpened,
+		hasUndo: hasEditorUndo( state ),
+		hasRedo: hasEditorRedo( state ),
+		isSidebarOpened: isEditorSidebarOpened( state ),
 	} ),
 	( dispatch ) => ( {
 		undo: () => dispatch( { type: 'UNDO' } ),
 		redo: () => dispatch( { type: 'REDO' } ),
-		toggleSidebar: () => dispatch( { type: 'TOGGLE_SIDEBAR' } )
+		toggleSidebar: () => dispatch( { type: 'TOGGLE_SIDEBAR' } ),
 	} )
 )( Tools );

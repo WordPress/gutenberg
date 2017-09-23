@@ -1,0 +1,84 @@
+$toggle-width: 32px;
+$toggle-height: 18px;
+$toggle-border-width: 2px;
+
+.components-form-toggle {
+	position: relative;
+
+	.components-form-toggle__track {
+		content: '';
+		display: inline-block;
+		vertical-align: top;
+		box-sizing: border-box;
+		background-color: $white;
+		border: $toggle-border-width solid $dark-gray-500;
+		width: $toggle-width;
+		height: $toggle-height;
+		border-radius: $toggle-height / 2;
+		transition: 0.2s background ease;
+	}
+
+	&:hover .components-form-toggle__track {
+		background-color: $light-gray-500;
+	}
+
+	&.is-checked .components-form-toggle__track {
+		background-color: $blue-medium-400;
+		border: $toggle-border-width solid $blue-medium-400;
+	}
+
+	.components-form-toggle__thumb {
+		display: block;
+		position: absolute;
+		top: $toggle-border-width * 2;
+		left: $toggle-border-width * 2;
+		width: $toggle-height - ( $toggle-border-width * 4 );
+		height: $toggle-height - ( $toggle-border-width * 4 );
+		border-radius: 50%;
+		border: 2px solid $dark-gray-500;
+		background: $white;
+		transition: 0.1s transform ease;
+	}
+
+	&__input:focus {
+		& + .components-form-toggle__track {
+			box-shadow: 0 0 0 1px $white, 0 0 0 2px $blue-medium-400, 0 0 2px 2px $blue-medium-400;
+
+			 & + .components-form-toggle__thumb {
+				 border-width: 5px;
+			 }
+		}
+	}
+
+	&.is-checked {
+		.components-form-toggle__thumb {
+			border: 2px solid $white;
+			background-color: $blue-medium-500;
+			transform: translateX( $toggle-width - ( $toggle-border-width * 4 ) - ( $toggle-height - ( $toggle-border-width * 4 ) ) );
+		}
+
+		&:before {
+			background-color: $blue-medium-500;
+			border: $toggle-border-width solid $blue-medium-500;
+		}
+	}
+}
+
+.components-form-toggle__input[type=checkbox] {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	opacity: 0;
+	margin: 0;
+	padding: 0;
+	z-index: z-index( '.components-form-toggle__input' );
+}
+
+.components-form-toggle__hint {
+	display: inline-block;
+	min-width: 24px;	// This prevents a position jog when the control is right aligned, and the width of the label changes
+	margin-left: 10px;
+	font-weight: 500;
+}

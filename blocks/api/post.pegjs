@@ -1,3 +1,20 @@
+{
+
+/** <?php
+// The `maybeJSON` function is not needed in PHP because its return semantics
+// are the same as `json_decode`
+?> **/
+
+function maybeJSON( s ) {
+	try {
+		return JSON.parse( s );
+	} catch (e) {
+		return null;
+	}
+}
+
+}
+
 Document
   = WP_Block_List
 
@@ -5,20 +22,91 @@ WP_Block_List
   = WP_Block*
 
 WP_Block
-  = WP_Block_Balanced
+  = WP_Tag_More
+  / WP_Block_Void
+  / WP_Block_Balanced
   / WP_Block_Html
 
+WP_Tag_More
+  = "<!--" WS* "more" customText:(WS+ text:$((!(WS* "-->") .)+) { /** <?php return $text; ?> **/ return text })? WS* "-->" noTeaser:(WS* "<!--noteaser-->")?
+  { /** <?php
+    return array(
+       'blockName' => 'core/more',
+       'attrs' => array(
+         'customText' => $customText,
+         'noTeaser' => (bool) $noTeaser
+       ),
+       'rawContent' => ''
+    );
+    ?> **/
+    return {
+      blockName: 'core/more',
+      attrs: {
+        customText: customText,
+        noTeaser: !! noTeaser
+      },
+      rawContent: ''
+    }
+  }
+
+WP_Block_Void
+  = "<!--" WS+ "wp:" blockName:WP_Block_Name WS+ attrs:(a:WP_Block_Attributes WS+ {
+    /** <?php return $a; ?> **/
+    return a;
+  })? "/-->"
+  {
+    /** <?php
+    return array(
+      'blockName'  => $blockName,
+      'attrs'      => $attrs,
+      'rawContent' => '',
+    );
+    ?> **/
+
+    return {
+      blockName: blockName,
+      attrs: attrs,
+      rawContent: ''
+    };
+  }
+
 WP_Block_Balanced
-  = s:WP_Block_Start ts:(!WP_Block_End c:Any { return c })+ e:WP_Block_End & { return s.blockType === e.blockType }
-  { return {
-    blockType: s.blockType,
-    attrs: s.attrs,
-    rawContent: ts.join( '' ),
-  } }
+  = s:WP_Block_Start ts:(!WP_Block_End c:Any {
+    /** <?php return $c; ?> **/
+    return c;
+  })* e:WP_Block_End & {
+    /** <?php return $s['blockName'] === $e['blockName']; ?> **/
+    return s.blockName === e.blockName;
+  }
+  {
+    /** <?php
+    return array(
+      'blockName'  => $s['blockName'],
+      'attrs'      => $s['attrs'],
+      'rawContent' => implode( '', $ts ),
+    );
+    ?> **/
+
+    return {
+      blockName: s.blockName,
+      attrs: s.attrs,
+      rawContent: ts.join( '' )
+    };
+  }
 
 WP_Block_Html
-  = ts:(!WP_Block_Balanced c:Any { return c })+
+  = ts:(!WP_Block_Balanced !WP_Block_Void !WP_Tag_More c:Any {
+    /** <?php return $c; ?> **/
+    return c;
+  })+
   {
+    /** <?php
+    return array(
+      'attrs'      => array(),
+      'rawContent' => implode( '', $ts ),
+    );
+    ?> **/
+
     return {
       attrs: {},
       rawContent: ts.join( '' )
@@ -26,49 +114,52 @@ WP_Block_Html
   }
 
 WP_Block_Start
-  = "<!--" __ "wp:" blockType:WP_Block_Type attrs:WP_Block_Attribute_List _? "-->"
-  { return {
-    blockType: blockType,
-    attrs: attrs
-  } }
+  = "<!--" WS+ "wp:" blockName:WP_Block_Name WS+ attrs:(a:WP_Block_Attributes WS+ {
+    /** <?php return $a; ?> **/
+    return a;
+  })? "-->"
+  {
+    /** <?php
+    return array(
+      'blockName' => $blockName,
+      'attrs'     => $attrs,
+    );
+    ?> **/
+
+    return {
+      blockName: blockName,
+      attrs: attrs
+    };
+  }
 
 WP_Block_End
-  = "<!--" __ "/wp:" blockType:WP_Block_Type __ "-->"
-  { return {
-    blockType: blockType
-  } }
+  = "<!--" WS+ "/wp:" blockName:WP_Block_Name WS+ "-->"
+  {
+    /** <?php
+    return array(
+      'blockName' => $blockName,
+    );
+    ?> **/
 
-WP_Block_Type
-  = $(ASCII_Letter WP_Block_Type_Char*)
+    return {
+      blockName: blockName
+    };
+  }
 
-WP_Block_Attribute_List
-  = as:(_+ attr:WP_Block_Attribute { return attr })*
-  { return as.reduce( function( attrs, pair ) {
-    attrs[ pair.name ] = pair.value;
-    return attrs;
-  }, {} ) }
+WP_Block_Name
+  = $(ASCII_Letter (ASCII_AlphaNumeric / "/" ASCII_AlphaNumeric)*)
 
-WP_Block_Attribute
-  = name:WP_Block_Attribute_Name ":" value:WP_Block_Attribute_Value
-  { return { name: name, value: value }; }
-
-WP_Block_Attribute_Name
-  = $(ASCII_Letter ASCII_AlphaNumeric*)
-
-WP_Block_Attribute_Value
-  = $(ASCII_Letter WP_Block_Attribute_Value_Char*)
-
-WP_Block_Type_Char
- = ASCII_AlphaNumeric
- / [\/]
+WP_Block_Attributes
+  = attrs:$("{" (!("}" WS+ """/"? "-->") .)* "}")
+  {
+    /** <?php return json_decode( $attrs, true ); ?> **/
+    return maybeJSON( attrs );
+  }
 
 ASCII_AlphaNumeric
   = ASCII_Letter
   / ASCII_Digit
   / Special_Chars
-
-WP_Block_Attribute_Value_Char
-  = [^ \t\r\n]
 
 ASCII_Letter
   = [a-zA-Z]
@@ -78,6 +169,9 @@ ASCII_Digit
 
 Special_Chars
   = [\-\_]
+
+WS
+  = [ \t\r\n]
 
 Newline
   = [\r\n]

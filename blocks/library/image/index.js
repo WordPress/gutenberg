@@ -1,106 +1,107 @@
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+import { createMediaFromFile } from '@wordpress/utils';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlock, query } from 'api';
-import Editable from 'components/editable';
+import './editor.scss';
+import { registerBlockType, source, createBlock } from '../../api';
+import ImageBlock from './block';
 
-const { attr, children } = query;
+const { attr, children } = source;
 
-/**
- * Returns an attribute setter with behavior that if the target value is
- * already the assigned attribute value, it will be set to undefined.
- *
- * @param  {string}   align Alignment value
- * @return {Function}       Attribute setter
- */
-function applyOrUnset( align ) {
-	return ( attributes, setAttributes ) => {
-		const nextAlign = attributes.align === align ? undefined : align;
-		setAttributes( { align: nextAlign } );
-	};
-}
-
-registerBlock( 'core/image', {
-	title: wp.i18n.__( 'Image' ),
+registerBlockType( 'core/image', {
+	title: __( 'Image' ),
 
 	icon: 'format-image',
 
 	category: 'common',
 
+	keywords: [ __( 'photo' ) ],
+
 	attributes: {
-		url: attr( 'img', 'src' ),
-		alt: attr( 'img', 'alt' ),
-		caption: children( 'figcaption' ),
-		align: ( node ) => ( node.className.match( /\balign(\S+)/ ) || [] )[ 1 ]
+		url: {
+			type: 'string',
+			source: attr( 'img', 'src' ),
+		},
+		alt: {
+			type: 'string',
+			source: attr( 'img', 'alt' ),
+		},
+		caption: {
+			type: 'array',
+			source: children( 'figcaption' ),
+		},
+		href: {
+			type: 'string',
+			source: attr( 'a', 'href' ),
+		},
+		id: {
+			type: 'number',
+		},
+		align: {
+			type: 'string',
+		},
+		width: {
+			type: 'number',
+		},
+		height: {
+			type: 'number',
+		},
 	},
 
-	controls: [
-		{
-			icon: 'align-left',
-			title: wp.i18n.__( 'Align left' ),
-			isActive: ( { align } ) => 'left' === align,
-			onClick: applyOrUnset( 'left' )
-		},
-		{
-			icon: 'align-center',
-			title: wp.i18n.__( 'Align center' ),
-			isActive: ( { align } ) => 'center' === align,
-			onClick: applyOrUnset( 'center' )
-		},
-		{
-			icon: 'align-right',
-			title: wp.i18n.__( 'Align right' ),
-			isActive: ( { align } ) => 'right' === align,
-			onClick: applyOrUnset( 'right' )
-		},
-		{
-			icon: 'align-none',
-			title: wp.i18n.__( 'No alignment' ),
-			isActive: ( { align } ) => ! align || 'none' === align,
-			onClick: applyOrUnset( 'none' )
-		}
-	],
+	transforms: {
+		from: [
+			{
+				type: 'raw',
+				isMatch: ( node ) => {
+					const tag = node.nodeName.toLowerCase();
+					const hasText = !! node.textContent.trim();
+					const hasImage = node.querySelector( 'img' );
+
+					return tag === 'img' || ( hasImage && ! hasText ) || ( hasImage && tag === 'figure' );
+				},
+			},
+			{
+				type: 'files',
+				isMatch( files ) {
+					return files.length === 1 && files[ 0 ].type.indexOf( 'image/' ) === 0;
+				},
+				transform( files ) {
+					return createMediaFromFile( files[ 0 ] )
+						.then( ( media ) => createBlock( 'core/image', {
+							id: media.id,
+							url: media.source_url,
+						} ) );
+				},
+			},
+		],
+	},
 
 	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
-		if ( 'left' === align || 'right' === align ) {
-			return { 'data-align': align };
+		const { align, width } = attributes;
+		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
+			return { 'data-align': align, 'data-resized': !! width };
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus } ) {
-		const { url, alt, caption } = attributes;
-
-		return (
-			<figure className="blocks-image">
-				<img src={ url } alt={ alt } />
-				{ caption || !! focus ? (
-					<Editable
-						tagName="figcaption"
-						placeholder={ wp.i18n.__( 'Write caption…' ) }
-						value={ caption }
-						focus={ focus }
-						onFocus={ setFocus }
-						onChange={ ( value ) => setAttributes( { caption: value } ) } />
-				) : null }
-			</figure>
-		);
-	},
+	edit: ImageBlock,
 
 	save( { attributes } ) {
-		const { url, alt, caption, align = 'none' } = attributes;
-		const img = <img src={ url } alt={ alt } className={ `align${ align }` } />;
-
-		if ( ! caption ) {
-			return img;
-		}
+		const { url, alt, caption, align, href, width, height } = attributes;
+		const extraImageProps = width || height ? { width, height } : {};
+		const figureStyle = width ? { width } : {};
+		const image = <img src={ url } alt={ alt } { ...extraImageProps } />;
 
 		return (
-			<figure>
-				{ img }
-				<figcaption>{ caption }</figcaption>
+			<figure className={ align ? `align${ align }` : null } style={ figureStyle }>
+				{ href ? <a href={ href }>{ image }</a> : image }
+				{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
 			</figure>
 		);
-	}
+	},
 } );

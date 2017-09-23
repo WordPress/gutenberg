@@ -4,10 +4,16 @@
 import { connect } from 'react-redux';
 
 /**
+ * WordPress dependencies
+ */
+import { __, _x } from '@wordpress/i18n';
+import { Dashicon } from '@wordpress/components';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
-import Dashicon from 'components/dashicon';
+import { getEditorMode } from '../../selectors';
 
 /**
  * Set of available mode options.
@@ -17,12 +23,12 @@ import Dashicon from 'components/dashicon';
 const MODES = [
 	{
 		value: 'visual',
-		label: wp.i18n.__( 'Visual' )
+		label: __( 'Visual' ),
 	},
 	{
 		value: 'text',
-		label: wp.i18n._x( 'Text', 'Name for the Text editor tab (formerly HTML)' )
-	}
+		label: _x( 'Text', 'Name for the Text editor tab (formerly HTML)' ),
+	},
 ];
 
 function ModeSwitcher( { mode, onSwitch } ) {
@@ -34,10 +40,12 @@ function ModeSwitcher( { mode, onSwitch } ) {
 	/* eslint-disable jsx-a11y/no-onchange */
 	return (
 		<div className="editor-mode-switcher">
+			<label htmlFor="editor-mode-switcher__input" className="screen-reader-text">{ __( 'Change editor mode' ) }</label>
 			<select
 				value={ mode }
 				onChange={ ( event ) => onSwitch( event.target.value ) }
 				className="editor-mode-switcher__input"
+				id="editor-mode-switcher__input"
 			>
 				{ MODES.map( ( { value, label } ) =>
 					<option key={ value } value={ value }>
@@ -53,14 +61,14 @@ function ModeSwitcher( { mode, onSwitch } ) {
 
 export default connect(
 	( state ) => ( {
-		mode: state.mode
+		mode: getEditorMode( state ),
 	} ),
 	( dispatch ) => ( {
 		onSwitch( mode ) {
 			dispatch( {
 				type: 'SWITCH_MODE',
-				mode: mode
+				mode: mode,
 			} );
-		}
+		},
 	} )
 )( ModeSwitcher );

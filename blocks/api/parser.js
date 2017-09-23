@@ -1,207 +1,215 @@
 /**
  * External dependencies
  */
-import * as query from 'hpq';
-import { escape, unescape } from 'lodash';
+import { parse as hpqParse, attr } from 'hpq';
+import { mapValues, reduce, pickBy } from 'lodash';
 
 /**
  * Internal dependencies
  */
 import { parse as grammarParse } from './post.pegjs';
-import { getBlockSettings, getUnknownTypeHandler } from './registration';
+import { getBlockType, getUnknownTypeHandlerName } from './registration';
 import { createBlock } from './factory';
+import { isValidBlock } from './validation';
+import { getCommentDelimitedContent } from './serializer';
+
+/**
+ * Returns true if the provided function is a valid attribute source, or false
+ * otherwise.
+ *
+ * Sources are implemented as functions receiving a DOM node to select data
+ * from. Using the DOM is incidental and we shouldn't guarantee a contract that
+ * this be provided, else block implementers may feel inclined to use the node.
+ * Instead, sources are intended as a generic interface to query data from any
+ * tree shape. Here we pick only sources which include an internal flag.
+ *
+ * @param  {Function} source Function to test
+ * @return {Boolean}         Whether function is an attribute source
+ */
+export function isValidSource( source ) {
+	return !! source && '_wpBlocksKnownSource' in source;
+}
 
 /**
  * Returns the block attributes parsed from raw content.
  *
- * @param  {String} rawContent    Raw block content
- * @param  {Object} blockSettings Block settings
- * @return {Object}               Block attributes
+ * @param  {String} rawContent Raw block content
+ * @param  {Object} schema     Block attribute schema
+ * @return {Object}            Block attribute values
  */
-export function parseBlockAttributes( rawContent, blockSettings ) {
-	if ( 'function' === typeof blockSettings.attributes ) {
-		return blockSettings.attributes( rawContent );
-	} else if ( blockSettings.attributes ) {
-		return query.parse( rawContent, blockSettings.attributes );
-	}
+export function getSourcedAttributes( rawContent, schema ) {
+	const sources = mapValues(
+		// Parse only sources with source defined
+		pickBy( schema, ( attributeSchema ) => isValidSource( attributeSchema.source ) ),
 
-	return {};
+		// Transform to object where source is value
+		( attributeSchema ) => attributeSchema.source
+	);
+
+	return hpqParse( rawContent, sources );
 }
 
 /**
- * Returns the block attributes of a registered block node given its settings.
+ * Returns value coerced to the specified JSON schema type string
  *
- * @param  {?Object} blockSettings Block settings
+ * @see http://json-schema.org/latest/json-schema-validation.html#rfc.section.6.25
+ *
+ * @param  {*}      value Original value
+ * @param  {String} type  Type to coerce
+ * @return {*}            Coerced value
+ */
+export function asType( value, type ) {
+	switch ( type ) {
+		case 'string':
+			return String( value );
+
+		case 'boolean':
+			return Boolean( value );
+
+		case 'object':
+			return Object( value );
+
+		case 'null':
+			return null;
+
+		case 'array':
+			if ( Array.isArray( value ) ) {
+				return value;
+			}
+
+			return Array.from( value );
+
+		case 'integer':
+		case 'number':
+			return Number( value );
+	}
+
+	return value;
+}
+
+/**
+ * Returns the block attributes of a registered block node given its type.
+ *
+ * @param  {?Object} blockType     Block type
  * @param  {string}  rawContent    Raw block content
  * @param  {?Object} attributes    Known block attributes (from delimiters)
  * @return {Object}                All block attributes
  */
-export function getBlockAttributes( blockSettings, rawContent, attributes ) {
-	// Merge any attributes from comment delimiters with block implementation
-	attributes = attributes || {};
-	if ( blockSettings ) {
-		attributes = {
-			...attributes,
-			...blockSettings.defaultAttributes,
-			...parseBlockAttributes( rawContent, blockSettings ),
-		};
+export function getBlockAttributes( blockType, rawContent, attributes ) {
+	// Retrieve additional attributes sourced from content
+	const sourcedAttributes = getSourcedAttributes(
+		rawContent,
+		blockType.attributes
+	);
+
+	const blockAttributes = reduce( blockType.attributes, ( result, source, key ) => {
+		let value;
+		if ( sourcedAttributes.hasOwnProperty( key ) ) {
+			value = sourcedAttributes[ key ];
+		} else if ( attributes ) {
+			value = attributes[ key ];
+		}
+
+		// Return default if attribute value not assigned
+		if ( undefined === value ) {
+			// Nest the condition so that constructor coercion never occurs if
+			// value is undefined and block type doesn't specify default value
+			if ( 'default' in source ) {
+				value = source.default;
+			} else {
+				return result;
+			}
+		}
+
+		// Coerce value to specified type
+		const coercedValue = asType( value, source.type );
+
+		if ( 'development' === process.env.NODE_ENV &&
+				! sourcedAttributes.hasOwnProperty( key ) &&
+				value !== coercedValue ) {
+			// Only in case of sourcing attribute from content do we want to
+			// allow coercion, as comment attributes are serialized respecting
+			// original data type. In development environments, log if value
+			// coerced to specified type is not strictly equal. We still allow
+			// coerced value to be assigned into attributes to avoid errors.
+			//
+			// Example:
+			//   Number( 5 ) === 5
+			//   Number( '5' ) !== '5'
+
+			// eslint-disable-next-line no-console
+			console.error(
+				`Expected attribute "${ key }" of type ${ source.type } for ` +
+				`block type "${ blockType.name }" but received ${ typeof value }.`
+			);
+		}
+
+		result[ key ] = coercedValue;
+		return result;
+	}, {} );
+
+	// If the block supports anchor, parse the id
+	if ( blockType.supportAnchor ) {
+		blockAttributes.anchor = hpqParse( rawContent, attr( '*', 'id' ) );
 	}
 
-	return attributes;
+	return blockAttributes;
 }
 
 /**
  * Creates a block with fallback to the unknown type handler.
  *
- * @param  {?String} blockType  Block type slug
+ * @param  {?String} name       Block type name
  * @param  {String}  rawContent Raw block content
  * @param  {?Object} attributes Attributes obtained from block delimiters
  * @return {?Object}            An initialized block object (if possible)
  */
-export function createBlockWithFallback( blockType, rawContent, attributes ) {
-	// Use type from block content, otherwise find unknown handler
-	blockType = blockType || getUnknownTypeHandler();
+export function createBlockWithFallback( name, rawContent, attributes ) {
+	// Use type from block content, otherwise find unknown handler.
+	name = name || getUnknownTypeHandlerName();
 
-	// Try finding settings for known block type, else again fall back
-	let blockSettings = getBlockSettings( blockType );
-	if ( ! blockSettings ) {
-		blockType = getUnknownTypeHandler();
-		blockSettings = getBlockSettings( blockType );
+	// Convert 'core/text' blocks in existing content to the new
+	// 'core/paragraph'.
+	if ( name === 'core/text' || name === 'core/cover-text' ) {
+		name = 'core/paragraph';
 	}
 
-	// Include in set only if settings were determined
+	// Try finding type for known block name, else fall back again.
+	let blockType = getBlockType( name );
+	const fallbackBlock = getUnknownTypeHandlerName();
+	if ( ! blockType ) {
+		// If detected as a block which is not registered, preserve comment
+		// delimiters in content of unknown type handler.
+		if ( name ) {
+			rawContent = getCommentDelimitedContent( name, attributes, rawContent );
+		}
+
+		name = fallbackBlock;
+		blockType = getBlockType( name );
+	}
+
+	// Include in set only if type were determined.
 	// TODO do we ever expect there to not be an unknown type handler?
-	if ( blockSettings ) {
+	if ( blockType && ( rawContent || name !== fallbackBlock ) ) {
 		// TODO allow blocks to opt-in to receiving a tree instead of a string.
 		// Gradually convert all blocks to this new format, then remove the
 		// string serialization.
 		const block = createBlock(
-			blockType,
-			getBlockAttributes( blockSettings, rawContent, attributes )
+			name,
+			getBlockAttributes( blockType, rawContent, attributes )
 		);
+
+		// Validate that the parsed block is valid, meaning that if we were to
+		// reserialize it given the assumed attributes, the markup matches the
+		// original value.
+		block.isValid = isValidBlock( rawContent, blockType, block.attributes );
+
+		// Preserve original content for future use in case the block is parsed
+		// as invalid, or future serialization attempt results in an error
+		block.originalContent = rawContent;
+
 		return block;
 	}
-}
-
-/**
- * Parses the post content with TinyMCE and returns a list of blocks.
- *
- * @param  {String} content The post content
- * @return {Array}          Block list
- */
-export function parseWithTinyMCE( content ) {
-	// First, convert comment delimiters into temporary <wp-block> "tags" so
-	// that TinyMCE can parse them.  Examples:
-	//   In  : <!-- wp:core/text -->
-	//   Out : <wp-block slug="core/text">
-	//   In  : <!-- /wp:core/text -->
-	//   Out : </wp-block>
-	//   In  : <!-- wp:core/embed url:youtube.com/xxx& -->
-	//   Out : <wp-block slug="core/embed" attributes="url:youtube.com/xxx&amp;">
-	content = content.replace(
-		/<!--\s*(\/?)wp:([a-z0-9/-]+)((?:\s+[a-z0-9_-]+:[^\s]+)*)\s*-->/g,
-		function( match, closingSlash, slug, attributes ) {
-			if ( closingSlash ) {
-				return '</wp-block>';
-			}
-
-			if ( attributes ) {
-				attributes = ' attributes="' + escape( attributes.trim() ) + '"';
-			}
-			return '<wp-block slug="' + slug + '"' + attributes + '>';
-		}
-	);
-
-	// Create a custom HTML schema
-	const schema = new tinymce.html.Schema();
-	// Add <wp-block> "tags" to our schema
-	schema.addCustomElements( 'wp-block' );
-	// Add valid <wp-block> "attributes" also
-	schema.addValidElements( 'wp-block[slug|attributes]' );
-	// Initialize the parser with our custom schema
-	const parser = new tinymce.html.DomParser( { validate: true }, schema );
-
-	// Parse the content into an object tree
-	const tree = parser.parse( content );
-
-	// Create a serializer that we will use to pass strings to blocks.
-	// TODO: pass parse trees instead, and verify them against the markup
-	// shapes that each block can accept.
-	const serializer = new tinymce.html.Serializer( { validate: true }, schema );
-
-	// Walk the tree and initialize blocks
-	const blocks = [];
-
-	// Store markup we found in between blocks
-	let contentBetweenBlocks = null;
-	function flushContentBetweenBlocks() {
-		if ( contentBetweenBlocks && contentBetweenBlocks.firstChild ) {
-			const block = createBlockWithFallback(
-				null, // default: unknown type handler
-				serializer.serialize( contentBetweenBlocks ),
-				null  // no known attributes
-			);
-			if ( block ) {
-				blocks.push( block );
-			}
-		}
-		contentBetweenBlocks = new tinymce.html.Node( 'body', 11 );
-	}
-	flushContentBetweenBlocks();
-
-	let currentNode = tree.firstChild;
-	do {
-		if ( currentNode.name === 'wp-block' ) {
-			// Set node type to document fragment so that the TinyMCE
-			// serializer doesn't output its markup
-			currentNode.type = 11;
-
-			// Serialize the content
-			const rawContent = serializer.serialize( currentNode );
-
-			// Retrieve the attributes from the <wp-block> tag
-			const nodeAttributes = currentNode.attributes.reduce( ( memo, attr ) => {
-				memo[ attr.name ] = attr.value;
-				return memo;
-			}, {} );
-
-			// Retrieve the block attributes from the original delimiters
-			const blockAttributes = unescape( nodeAttributes.attributes || '' )
-				.split( /\s+/ )
-				.reduce( ( memo, attrString ) => {
-					const pieces = attrString.match( /^([a-z0-9_-]+):(.*)$/ );
-					if ( pieces ) {
-						memo[ pieces[ 1 ] ] = pieces[ 2 ];
-					}
-					return memo;
-				}, {} );
-
-			// Try to create the block
-			const block = createBlockWithFallback(
-				nodeAttributes.slug,
-				rawContent,
-				blockAttributes
-			);
-			if ( block ) {
-				flushContentBetweenBlocks();
-				blocks.push( block );
-			}
-
-			currentNode = currentNode.next;
-		} else {
-			// We have some HTML content outside of block delimiters.  Save it
-			// so that we can initialize it using `getUnknownTypeHandler`.
-			const toAppend = currentNode;
-			// Advance the DOM tree pointer before calling `append` because
-			// this is a destructive operation.
-			currentNode = currentNode.next;
-			contentBetweenBlocks.append( toAppend );
-		}
-	} while ( currentNode );
-
-	flushContentBetweenBlocks();
-
-	return blocks;
 }
 
 /**
@@ -212,8 +220,8 @@ export function parseWithTinyMCE( content ) {
  */
 export function parseWithGrammar( content ) {
 	return grammarParse( content ).reduce( ( memo, blockNode ) => {
-		const { blockType, rawContent, attrs } = blockNode;
-		const block = createBlockWithFallback( blockType, rawContent, attrs );
+		const { blockName, rawContent, attrs } = blockNode;
+		const block = createBlockWithFallback( blockName, rawContent.trim(), attrs );
 		if ( block ) {
 			memo.push( block );
 		}
@@ -221,4 +229,4 @@ export function parseWithGrammar( content ) {
 	}, [] );
 }
 
-export default parseWithTinyMCE;
+export default parseWithGrammar;

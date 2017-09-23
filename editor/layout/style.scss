@@ -1,3 +1,9 @@
-.editor-layout.is-sidebar-opened .editor-layout__content {
-	margin-right: $sidebar-width;
+.editor-layout {
+	position: relative;
+}
+
+.editor-layout .components-notice-list {
+	position: fixed;
+	top: 100px;
+	right: auto;
 }

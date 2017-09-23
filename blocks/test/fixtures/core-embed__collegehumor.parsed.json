@@ -1,0 +1,13 @@
+[
+    {
+        "blockName": "core-embed/collegehumor",
+        "attrs": {
+            "url": "https://collegehumor.com/"
+        },
+        "rawContent": "\n<figure class=\"wp-block-embed-collegehumor\">\n    https://collegehumor.com/\n    <figcaption>Embedded content from collegehumor</figcaption>\n</figure>\n"
+    },
+    {
+        "attrs": {},
+        "rawContent": "\n"
+    }
+]

@@ -1,0 +1,31 @@
+.editor-visual-editor__block[data-type="core/pullquote"] {
+	&[data-align="left"],
+	&[data-align="right"] {
+		max-width: 400px;
+
+		& .blocks-pullquote__content .blocks-editable__tinymce[data-is-empty="true"]:before,
+		& .blocks-editable p {
+			font-size: 20px;
+		}
+	}
+}
+
+.wp-block-pullquote {
+	footer .blocks-editable__tinymce[data-is-empty="true"]:before {
+		font-size: 14px;
+		font-family: $default-font;
+	}
+
+	.blocks-editable__tinymce[data-is-empty="true"]:before {
+		width: 100%;
+		left: 50%;
+		transform: translateX( -50% );
+	}
+
+	& > .blocks-pullquote__content .blocks-editable__tinymce[data-is-empty="true"]:before,
+	& > .blocks-editable p {
+		font-size: 24px;
+		font-weight: 900;
+		line-height: 1.6;
+	}
+}

@@ -4,12 +4,15 @@
 	"extends": [
 		"wordpress",
 		"plugin:react/recommended",
-		"plugin:jsx-a11y/recommended"
+		"plugin:jsx-a11y/recommended",
+		"plugin:jest/recommended"
 	],
 	"env": {
-		"browser": true,
+		"browser": false,
+		"es6": true,
 		"node": true,
-		"mocha": true
+		"mocha": true,
+		"jest/globals": true
 	},
 	"parserOptions": {
 		"sourceType": "module",
@@ -19,11 +22,14 @@
 	},
 	"globals": {
 		"wp": true,
-		"tinymce": true
+		"wpApiSettings": true,
+		"window": true,
+		"document": true
 	},
 	"plugins": [
 		"react",
-		"jsx-a11y"
+		"jsx-a11y",
+		"jest"
 	],
 	"settings": {
 		"react": {
@@ -33,6 +39,8 @@
 	"rules": {
 		"array-bracket-spacing": [ "error", "always" ],
 		"brace-style": [ "error", "1tbs" ],
+		"camelcase": [ "error", { "properties": "never" } ],
+		"comma-dangle": [ "error", "always-multiline" ],
 		"comma-spacing": "error",
 		"comma-style": "error",
 		"computed-property-spacing": [ "error", "always" ],
@@ -66,11 +74,29 @@
 		"no-negated-in-lhs": "error",
 		"no-nested-ternary": "error",
 		"no-redeclare": "error",
+		"no-restricted-syntax": [
+			"error",
+			{
+				"selector": "ImportDeclaration[source.value=/^@wordpress\\u002F.+\\u002F/]",
+				"message": "Path access on WordPress dependencies is not allowed."
+			},
+			{
+				"selector": "CallExpression[callee.name=/^__|_n|_x$/]:not([arguments.0.type=/^Literal|BinaryExpression$/])",
+				"message": "Translate function arguments must be string literals."
+			},
+			{
+				"selector": "CallExpression[callee.name=/^_n|_x$/]:not([arguments.1.type=/^Literal|BinaryExpression$/])",
+				"message": "Translate function arguments must be string literals."
+			},
+			{
+				"selector": "CallExpression[callee.name=_nx]:not([arguments.2.type=/^Literal|BinaryExpression$/])",
+				"message": "Translate function arguments must be string literals."
+			}
+		],
 		"no-shadow": "error",
 		"no-undef-init": "error",
 		"no-unreachable": "error",
 		"no-unsafe-negation": "error",
-		"no-use-before-define": [ "error", "nofunc" ],
 		"no-useless-computed-key": "error",
 		"no-useless-constructor": "error",
 		"no-useless-return": "error",
@@ -80,7 +106,7 @@
 		"one-var": "off",
 		"padded-blocks": [ "error", "never" ],
 		"prefer-const": "error",
-		"quote-props": [ "error", "as-needed", { "keywords": true } ],
+		"quote-props": [ "error", "as-needed" ],
 		"react/display-name": "off",
 		"react/jsx-curly-spacing": [ "error", "always" ],
 		"react/jsx-equals-spacing": "error",

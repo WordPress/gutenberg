@@ -3,8 +3,13 @@
 	border-bottom: 1px solid $light-gray-500;
 	min-height: $admin-sidebar-width-collapsed;
 	top: $admin-bar-height-big + $header-height;
-	left: 0;
-	right: 0;
+
+	@include break-medium() {
+		top: $admin-bar-height + $header-height;
+	}
+
+	margin-left: -20px;
+	margin-right: -20px;
 	display: flex;
 	flex-direction: row;
 	flex-wrap: wrap;
@@ -20,26 +25,44 @@
 		font-family: $editor-html-font;
 		color: $dark-gray-500;
 		border: 1px solid transparent;
-	}
 
-	button:first-child {
-		margin-left: 0;
-	}
+		&:first-child {
+			margin-left: 0;
+		}
 
-	button:hover {
-		border: 1px solid $dark-gray-500;
-	}
-
-	button:focus {
-		outline: none;
+		&:hover,
+		&:focus {
+			outline: none;
+			border: 1px solid $dark-gray-500;
+		}
 	}
 
 	@include break-small() {
+		left: 0px;
+		right: 0px;
+		margin-left: 0;
+		margin-right: 0;
 		position: fixed;
+		z-index: z-index( '.editor-text-editor__formatting' );
+	}
 
-		.editor-layout.is-sidebar-opened & {
-			margin-right: $sidebar-width;
+	.auto-fold.sticky-menu &,
+	.auto-fold & {
+		@include break-medium() {
+			left: $admin-sidebar-width-collapsed;
 		}
+
+		@include break-large() {
+			left: $admin-sidebar-width;
+		}
+	}
+
+	.folded & {
+		left: $admin-sidebar-width-collapsed;
+	}
+
+	.sticky-menu & {
+		left: $admin-sidebar-width;
 	}
 }
 
@@ -53,32 +76,28 @@
 
 .editor-text-editor__formatting .editor-text-editor__link {
 	text-decoration: underline;
-	color: $blue-medium;
+	color: $blue-medium-500;
 }
 
 .editor-text-editor__formatting .editor-text-editor__del {
 	text-decoration:line-through;
 }
 
-.auto-fold .editor-text-editor__formatting {
+.editor-text-editor__body {
+	padding-top: 40px;
+
+	@include break-small() {
+		padding-top: 40px + $admin-bar-height-big;
+	}
+
 	@include break-medium() {
-		left: $admin-sidebar-width-collapsed;
-		top: $admin-bar-height + $header-height;
-	}
-
-	@include break-large() {
-		left: $admin-sidebar-width;
+		padding-top: 40px + $admin-bar-height;
 	}
 }
 
-.folded .editor-text-editor__formatting {
-	left: $admin-sidebar-width-collapsed;
-}
-
-
-.editor-text-editor {
+.editor-text-editor__textarea {
 	display: block;
-	padding-top: 60px;
+	padding-top: 20px;
 	padding-bottom: 0;
 	margin: 0;
 	width: 100%;
@@ -88,16 +107,9 @@
 	resize: none;
 	overflow: hidden;
 	font-family: $editor-html-font;
+	font-size: $text-editor-font-size;
 	line-height: 150%;
 	transition: padding .2s linear;
-
-	@include break-small() {
-		padding-top: 60px + $admin-bar-height-big;
-	}
-
-	@include break-medium() {
-		padding-top: 60px + $admin-bar-height;
-	}
 
 	&:focus {
 		box-shadow: none;
@@ -105,8 +117,6 @@
 }
 
 /* Use padding to center text in the textarea, this allows you to click anywhere to focus it */
-$text-editor-max-width: 760px;
-
 .editor-text-editor {
 	padding-left: 20px;
 	padding-right: 20px;

@@ -1,18 +1,21 @@
 /**
  * External dependencies
  */
-import * as query from './query';
+import * as source from './source';
 
-export { query };
+export { source };
 export { createBlock, switchToBlockType } from './factory';
 export { default as parse } from './parser';
-export { default as serialize } from './serializer';
+export { default as pasteHandler } from './paste';
+export { default as serialize, getBlockDefaultClassname } from './serializer';
 export { getCategories } from './categories';
 export {
-	registerBlock,
-	unregisterBlock,
-	setUnknownTypeHandler,
-	getUnknownTypeHandler,
-	getBlockSettings,
-	getBlocks
+	registerBlockType,
+	unregisterBlockType,
+	setUnknownTypeHandlerName,
+	getUnknownTypeHandlerName,
+	setDefaultBlockName,
+	getDefaultBlockName,
+	getBlockType,
+	getBlockTypes,
 } from './registration';
