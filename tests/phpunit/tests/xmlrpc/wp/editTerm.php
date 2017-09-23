@@ -86,7 +86,7 @@ class Tests_XMLRPC_wp_editTerm extends WP_XMLRPC_UnitTestCase {
 		$result = $this->myxmlrpcserver->wp_editTerm( array( 1, 'editor', 'editor', self::$post_tag, array( 'taxonomy' => 'post_tag', 'parent' => self::$parent_term ) ) );
 		$this->assertIXRError( $result );
 		$this->assertEquals( 403, $result->code );
-		$this->assertEquals( __( "This taxonomy is not hierarchical so you can't set a parent." ), $result->message );
+		$this->assertEquals( __( 'Cannot set parent term, taxonomy is not hierarchical.' ), $result->message );
 	}
 
 	function test_parent_empty() {
