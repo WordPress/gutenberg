@@ -28,6 +28,7 @@ export class PostVisibility extends Component {
 		this.toggleDialog = this.toggleDialog.bind( this );
 		this.stopPropagation = this.stopPropagation.bind( this );
 		this.closeOnClickOutside = this.closeOnClickOutside.bind( this );
+		this.close = this.close.bind( this );
 		this.setPublic = this.setPublic.bind( this );
 		this.setPrivate = this.setPrivate.bind( this );
 		this.setPasswordProtected = this.setPasswordProtected.bind( this );
@@ -48,8 +49,14 @@ export class PostVisibility extends Component {
 	}
 
 	closeOnClickOutside( event ) {
+		if ( ! this.buttonNode.contains( event.target ) ) {
+			this.close();
+		}
+	}
+
+	close() {
 		const { opened } = this.state;
-		if ( opened && ! this.buttonNode.contains( event.target ) ) {
+		if ( opened ) {
 			this.toggleDialog();
 		}
 	}
@@ -133,7 +140,8 @@ export class PostVisibility extends Component {
 						<Popover
 							position="bottom left"
 							isOpen={ this.state.opened }
-							onClose={ this.closeOnClickOutside }
+							onClickOutside={ this.closeOnClickOutside }
+							onClose={ this.close }
 							onClick={ this.stopPropagation }
 							className="editor-post-visibility__dialog"
 						>

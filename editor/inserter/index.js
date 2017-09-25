@@ -56,16 +56,15 @@ class Inserter extends Component {
 	}
 
 	insertBlock( name ) {
-		if ( name ) {
-			const {
-				insertionPoint,
-				onInsertBlock,
-			} = this.props;
-			onInsertBlock(
-				name,
-				insertionPoint
-			);
-		}
+		const {
+			insertionPoint,
+			onInsertBlock,
+		} = this.props;
+
+		onInsertBlock(
+			name,
+			insertionPoint
+		);
 
 		this.close();
 	}
@@ -89,7 +88,8 @@ class Inserter extends Component {
 				<Popover
 					isOpen={ opened }
 					position={ position }
-					onClose={ this.closeOnClickOutside }
+					onClose={ this.close }
+					onClickOutside={ this.closeOnClickOutside }
 				>
 					<InserterMenu onSelect={ this.insertBlock } />
 				</Popover>

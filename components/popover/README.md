@@ -68,3 +68,17 @@ An optional additional class name to apply to the rendered popover.
 
 - Type: `String`
 - Required: No
+
+## onClose
+
+A callback invoked when the popover should be closed.
+
+- Type: `Function`
+- Required: No
+
+## onClickOutside
+
+A callback invoked when the user clicks outside the opened popover, passing the click event. The popover should be closed in response to this interaction. Defaults to `onClose`.
+
+- Type: `Function`
+- Required: No
