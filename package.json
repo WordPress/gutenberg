@@ -9,7 +9,8 @@
     "jest": "^20.0.4",
     "lerna": "^2.0.0",
     "mkdirp": "^0.5.1",
-    "rimraf": "^2.6.1"
+    "rimraf": "^2.6.1",
+    "babel-loader": "^7.1.1"
   },
   "jest": {
     "collectCoverageFrom": [

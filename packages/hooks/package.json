@@ -1,0 +1,14 @@
+{
+  "name": "@wordpress/hooks",
+  "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WordPress/packages.git"
+  },
+  "description": "WordPress Hooks library",
+  "main": "build/index.js",
+  "module": "build-module/index.js",
+  "browser": "build-browser/index.js",
+  "author": "WordPress",
+  "license": "GPL-2.0+"
+}
