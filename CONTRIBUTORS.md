@@ -83,3 +83,4 @@ This list is manually curated to include valuable contributions by volunteers th
 | @jblz | |
 | | @nicbertino |
 | @rahmon | |
+| @vladanost | |
