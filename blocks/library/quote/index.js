@@ -55,7 +55,7 @@ registerBlockType( 'core/quote', {
 				transform: ( { content } ) => {
 					return createBlock( 'core/quote', {
 						value: [
-							<p key="1">{ content }</p>,
+							`<p>${ content }</p>`,
 						],
 					} );
 				},
@@ -66,7 +66,7 @@ registerBlockType( 'core/quote', {
 				transform: ( { content } ) => {
 					return createBlock( 'core/quote', {
 						value: [
-							<p key="1">{ content }</p>,
+							`<p>${ content }</p>`,
 						],
 					} );
 				},
@@ -93,26 +93,25 @@ registerBlockType( 'core/quote', {
 				blocks: [ 'core/paragraph' ],
 				transform: ( { value, citation, ...attrs } ) => {
 					const textElement = value[ 0 ];
-					if ( ! textElement ) {
+					if ( ! textElement && value.length === 1 ) {
 						return createBlock( 'core/paragraph', {
 							content: citation,
 						} );
 					}
-					const textContent = isString( textElement ) ? textElement : textElement.props.children;
-					if ( Array.isArray( value ) || citation ) {
+					if ( value.length > 1 || citation ) {
 						const text = createBlock( 'core/paragraph', {
-							content: textContent,
+							content: value[ 0 ],
 						} );
 						const quote = createBlock( 'core/quote', {
 							...attrs,
 							citation,
-							value: Array.isArray( value ) ? value.slice( 1 ) : '',
+							value: value.slice( 1 ),
 						} );
 
 						return [ text, quote ];
 					}
 					return createBlock( 'core/paragraph', {
-						content: textContent,
+						content: value[ 0 ],
 					} );
 				},
 			},
@@ -120,25 +119,26 @@ registerBlockType( 'core/quote', {
 				type: 'block',
 				blocks: [ 'core/heading' ],
 				transform: ( { value, citation, ...attrs } ) => {
-					const isMultiParagraph = Array.isArray( value ) && isObject( value[ 0 ] ) && value[ 0 ].type === 'p';
-					const headingElement = isMultiParagraph ? value[ 0 ] : value;
-					const headingContent = isObject( headingElement ) && value[ 0 ].type === 'p'
-						? headingElement.props.children
-						: headingElement;
-					if ( isMultiParagraph || citation ) {
+					const textElement = value[ 0 ];
+					if ( ! textElement && value.length === 1 ) {
+						return createBlock( 'core/heading', {
+							content: citation,
+						} );
+					}
+					if ( value.length > 1 || citation ) {
 						const heading = createBlock( 'core/heading', {
-							content: headingContent,
+							content: value[ 0 ],
 						} );
 						const quote = createBlock( 'core/quote', {
 							...attrs,
 							citation,
-							value: Array.isArray( value ) ? value.slice( 1 ) : '',
+							value: value.slice( 1 ),
 						} );
 
 						return [ heading, quote ];
 					}
 					return createBlock( 'core/heading', {
-						content: headingContent,
+						content: value[ 0 ],
 					} );
 				},
 			},
