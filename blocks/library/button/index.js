@@ -74,7 +74,7 @@ registerBlockType( 'core/button', {
 					onChange={ ( value ) => setAttributes( { text: value } ) }
 					formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
 					keepPlaceholderOnFocus
-					extraToolbarButtons={ <UrlInputButton url={ url } onChange={ ( { newUrl } ) => setAttributes( { url: newUrl } ) } /> }
+					extraToolbarButtons={ <UrlInputButton showSettings={ false } url={ url } onChange={ ( { newUrl } ) => setAttributes( { url: newUrl } ) } /> }
 				/>
 				{ focus &&
 					<InspectorControls key="inspector">

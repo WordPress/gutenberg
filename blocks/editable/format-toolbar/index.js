@@ -72,7 +72,7 @@ class FormatToolbar extends Component {
 		if ( !! url ) {
 			this.props.onChange( { link: { value: url, target: opensInNewWindow ? '_blank' : '' } } );
 
-			if ( ! this.props.format.link ) {
+			if ( ! this.props.formats.link ) {
 				this.props.speak( __( 'Link inserted.' ), 'assertive' );
 			}
 		} else {

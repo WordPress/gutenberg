@@ -106,7 +106,7 @@ class UrlInputButton extends Component {
 			if ( step === DisplayStep ) {
 				return !! this.state.url && ! this.state.isDeleted;
 			} else if ( step === SettingsStep ) {
-				return ! this.state.isDeleted;
+				return this.props.showSettings && ! this.state.isDeleted;
 			}
 
 			return true;
@@ -189,5 +189,9 @@ class UrlInputButton extends Component {
 		);
 	}
 }
+
+UrlInputButton.defaultProps = {
+	showSettings: true,
+};
 
 export default UrlInputButton;

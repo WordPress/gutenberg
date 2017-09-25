@@ -108,7 +108,7 @@ ul.components-toolbar > li.blocks-url-input__button {
 	background: #fff;
 	width: 305px;
 	display: inline-flex;
-	flex-wrap: wrap;
+	flex-wrap: nowrap;
 	align-items: center;
 	font-family: $default-font;
 	font-size: $default-font-size;
