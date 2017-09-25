@@ -323,6 +323,14 @@
 	margin-left: -$block-padding;
 	margin-right: -$block-padding;
 
+	// Allow this invisible layer to be clicked through.
+	pointer-events: none;
+
+	// Reset pointer-events on children.
+	& > * {
+		pointer-events: auto;
+	}
+
 	// Larger viewports
 	@include break-small() {
 		margin-left: 0;
