@@ -338,8 +338,8 @@ class VisualEditorBlock extends Component {
 				{ ...wrapperProps }
 			>
 				<BlockDropZone index={ order } />
-				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
-				{ ( showUI || isHovered ) && <BlockRightMenu uid={ block.uid } /> }
+				{ ( showUI || isHovered ) && ( ! blockType.isFixed ) && <BlockMover uids={ [ block.uid ] } /> }
+				{ ( showUI || isHovered ) && ( ! blockType.isFixed ) && <BlockRightMenu uid={ block.uid } /> }
 				{ showUI && isValid &&
 					<CSSTransitionGroup
 						transitionName={ { appear: 'is-appearing', appearActive: 'is-appearing-active' } }

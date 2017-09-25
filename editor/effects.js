@@ -7,7 +7,7 @@ import { get, uniqueId } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { parse, getBlockType, switchToBlockType } from '@wordpress/blocks';
+import { parse, getBlockType, switchToBlockType, createBlock } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -254,11 +254,14 @@ export default {
 	SET_INITIAL_POST( action ) {
 		const { post } = action;
 		const effects = [];
+		let blocks = [];
 
 		// Parse content as blocks
 		if ( post.content.raw ) {
-			effects.push( resetBlocks( parse( post.content.raw ) ) );
+			blocks = blocks.concat( parse( post.content.raw ) );
 		}
+
+		effects.push( resetBlocks( blocks ) );
 
 		// Resetting post should occur after blocks have been reset, since it's
 		// the post reset that restarts history (used in dirty detection).
@@ -272,5 +275,9 @@ export default {
 		}
 
 		return effects;
+	},
+	RESET_BLOCKS( action, store ) {
+		const blocks = [ createBlock( 'core/post-title' ) ].concat( action.blocks );
+		store.dispatch( { type: 'ACTUALLY_RESET_BLOCKS', blocks } );
 	},
 };

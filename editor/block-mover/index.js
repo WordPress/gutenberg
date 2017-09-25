@@ -15,10 +15,10 @@ import { getBlockType } from '@wordpress/blocks';
  * Internal dependencies
  */
 import './style.scss';
-import { isFirstBlock, isLastBlock, getBlockIndex, getBlock } from '../selectors';
+import { canMoveBlockUp, isLastBlock, getBlockIndex, getBlock } from '../selectors';
 import { getBlockMoverLabel } from './mover-label';
 
-function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex } ) {
+function BlockMover( { onMoveUp, onMoveDown, canMoveUp, canMoveDown, uids, blockType, firstIndex } ) {
 	// We emulate a disabled state because forcefully applying the `disabled`
 	// attribute on the button while it has focus causes the screen to change
 	// to an unfocused state (body as active element) without firing blur on,
@@ -27,33 +27,33 @@ function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, f
 		<div className="editor-block-mover">
 			<IconButton
 				className="editor-block-mover__control"
-				onClick={ isFirst ? null : onMoveUp }
+				onClick={ ! canMoveUp ? null : onMoveUp }
 				icon="arrow-up-alt2"
 				tooltip={ __( 'Move Up' ) }
 				label={ getBlockMoverLabel(
 					uids.length,
 					blockType && blockType.title,
 					firstIndex,
-					isFirst,
-					isLast,
+					canMoveUp,
+					canMoveDown,
 					-1,
 				) }
-				aria-disabled={ isFirst }
+				aria-disabled={ ! canMoveUp }
 			/>
 			<IconButton
 				className="editor-block-mover__control"
-				onClick={ isLast ? null : onMoveDown }
+				onClick={ ! canMoveDown ? null : onMoveDown }
 				icon="arrow-down-alt2"
 				tooltip={ __( 'Move Down' ) }
 				label={ getBlockMoverLabel(
 					uids.length,
 					blockType && blockType.title,
 					firstIndex,
-					isFirst,
-					isLast,
+					canMoveUp,
+					canMoveDown,
 					1,
 				) }
-				aria-disabled={ isLast }
+				aria-disabled={ ! canMoveDown }
 			/>
 		</div>
 	);
@@ -61,8 +61,8 @@ function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, f
 
 export default connect(
 	( state, ownProps ) => ( {
-		isFirst: isFirstBlock( state, first( ownProps.uids ) ),
-		isLast: isLastBlock( state, last( ownProps.uids ) ),
+		canMoveUp: canMoveBlockUp( state, first( ownProps.uids ) ),
+		canMoveDown: ! isLastBlock( state, last( ownProps.uids ) ),
 		firstIndex: getBlockIndex( state, first( ownProps.uids ) ),
 		blockType: getBlockType( getBlock( state, first( ownProps.uids ) ).name ),
 	} ),
