@@ -14,6 +14,7 @@ import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
+import Editable from '../../editable';
 
 registerBlockType( 'core/table', {
 	title: __( 'Table' ),
@@ -89,7 +90,7 @@ registerBlockType( 'core/table', {
 		const { content, align } = attributes;
 		return (
 			<table className={ align ? `align${ align }` : null }>
-				{ content }
+				<Editable.Value value={ content } />
 			</table>
 		);
 	},

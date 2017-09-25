@@ -142,10 +142,9 @@ registerBlockType( 'core/video', {
 	save( { attributes } ) {
 		const { src, caption, align } = attributes;
 		return (
-
 			<figure className={ align ? `align${ align }` : null }>
 				{ src && <video controls src={ src } /> }
-				{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
+				{ caption && caption.length > 0 && <figcaption><Editable.Value value={ caption } /></figcaption> }
 			</figure>
 		);
 	},

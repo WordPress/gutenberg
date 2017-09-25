@@ -280,7 +280,11 @@ registerBlockType( 'core/paragraph', {
 			textAlign: align,
 		};
 
-		return <p style={ styles } className={ className ? className : undefined }>{ content }</p>;
+		return (
+			<p style={ styles } className={ className ? className : undefined }>
+				<Editable.Value value={ content } />
+			</p>
+		);
 	},
 } );
 

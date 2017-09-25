@@ -174,7 +174,7 @@ registerBlockType( 'core/heading', {
 
 		return (
 			<Tag style={ { textAlign: align } } >
-				{ content }
+				<Editable.Value value={ content } />
 			</Tag>
 		);
 	},

@@ -37,7 +37,7 @@ import { EVENTS } from './constants';
 
 const { BACKSPACE, DELETE, ENTER } = keycodes;
 
-function createTinyMCEElement( type, props, ...children ) {
+function toArray( type, props, ...children ) {
 	if ( props[ 'data-mce-bogus' ] === 'all' ) {
 		return null;
 	}
@@ -46,11 +46,11 @@ function createTinyMCEElement( type, props, ...children ) {
 		return children;
 	}
 
-	return createElement(
+	return [ [
 		type,
-		omitBy( props, ( value, key ) => key.indexOf( 'data-mce-' ) === 0 ),
-		...children
-	);
+		omitBy( props, ( value, key ) => key.indexOf( 'data-mce-' ) === 0 || key === 'key' ),
+		...children,
+	] ];
 }
 
 function isLinkBoundary( fragment ) {
@@ -547,8 +547,8 @@ export default class Editable extends Component {
 				const index = dom.nodeIndex( selectedNode );
 				const beforeNodes = childNodes.slice( 0, index );
 				const afterNodes = childNodes.slice( index + 1 );
-				const beforeElement = nodeListToReact( beforeNodes, createTinyMCEElement );
-				const afterElement = nodeListToReact( afterNodes, createTinyMCEElement );
+				const beforeElement = nodeListToReact( beforeNodes, toArray );
+				const afterElement = nodeListToReact( afterNodes, toArray );
 
 				this.setContent( beforeElement );
 				this.props.onSplit( beforeElement, afterElement );
@@ -602,8 +602,8 @@ export default class Editable extends Component {
 			const beforeFragment = beforeRange.extractContents();
 			const afterFragment = afterRange.extractContents();
 
-			const beforeElement = nodeListToReact( beforeFragment.childNodes, createTinyMCEElement );
-			const afterElement = isLinkBoundary( afterFragment ) ? [] : nodeListToReact( afterFragment.childNodes, createTinyMCEElement );
+			const beforeElement = nodeListToReact( beforeFragment.childNodes, toArray );
+			const afterElement = isLinkBoundary( afterFragment ) ? [] : nodeListToReact( afterFragment.childNodes, toArray );
 
 			this.setContent( beforeElement );
 			this.props.onSplit( beforeElement, afterElement, ...blocks );
@@ -656,8 +656,8 @@ export default class Editable extends Component {
 		this.setContent( this.props.value );
 
 		this.props.onSplit(
-			nodeListToReact( before, createTinyMCEElement ),
-			nodeListToReact( after, createTinyMCEElement )
+			nodeListToReact( before, toArray ),
+			nodeListToReact( after, toArray )
 		);
 	}
 
@@ -692,12 +692,12 @@ export default class Editable extends Component {
 			content = '';
 		}
 
-		content = renderToString( content );
+		content = renderToString( valueToReact( content ) );
 		this.editor.setContent( content, { format: 'raw' } );
 	}
 
 	getContent() {
-		return nodeListToReact( this.editor.getBody().childNodes || [], createTinyMCEElement );
+		return nodeListToReact( this.editor.getBody().childNodes || [], toArray );
 	}
 
 	updateFocus() {
@@ -850,7 +850,7 @@ export default class Editable extends Component {
 					getSettings={ this.getSettings }
 					onSetup={ this.onSetup }
 					style={ style }
-					defaultValue={ value }
+					defaultValue={ valueToReact( value ) }
 					isPlaceholderVisible={ isPlaceholderVisible }
 					aria-label={ placeholder }
 					{ ...ariaProps }
@@ -879,3 +879,17 @@ Editable.defaultProps = {
 	formattingControls: DEFAULT_FORMATS,
 	formatters: [],
 };
+
+Editable.Value = ( { value } ) => valueToReact( value );
+
+function valueToReact( value ) {
+	return value.map( ( element, i ) => {
+		if ( typeof element === 'string' ) {
+			return element;
+		}
+
+		const [ type, props, ...children ] = element;
+
+		return createElement( type, { ...props, key: i }, ...valueToReact( children ) );
+	} );
+}
