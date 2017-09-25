@@ -78,7 +78,27 @@ describe( 'Autocomplete', () => {
 			expect( wrapper.state( 'isOpen' ) ).toBe( true );
 			expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
 			expect( wrapper.state( 'search' ) ).toEqual( /b/i );
+			expect( wrapper.find( 'Popover' ).prop( 'isOpen' ) ).toBe( true );
 			expect( wrapper.find( '.components-autocomplete__result' ) ).toHaveLength( 1 );
+		} );
+
+		it( 'does not render popover as open if no results', () => {
+			const wrapper = shallow(
+				<Autocomplete options={ options }>
+					<div contentEditable />
+				</Autocomplete>
+			);
+			const clone = wrapper.find( '[contentEditable]' );
+
+			clone.simulate( 'input', {
+				target: {
+					textContent: 'zzz',
+				},
+			} );
+
+			expect( wrapper.state( 'isOpen' ) ).toBe( true );
+			expect( wrapper.find( 'Popover' ).prop( 'isOpen' ) ).toBe( false );
+			expect( wrapper.find( '.components-autocomplete__result' ) ).toHaveLength( 0 );
 		} );
 
 		it( 'opens on trigger prefix search', () => {
@@ -215,8 +235,7 @@ describe( 'Autocomplete', () => {
 			const preventDefault = jest.fn();
 			const stopImmediatePropagation = jest.fn();
 			const wrapper = shallow(
-				<Autocomplete options={ options } triggerPrefix="/"
-				>
+				<Autocomplete options={ options } triggerPrefix="/">
 					<div contentEditable />
 				</Autocomplete>
 			);
