@@ -139,6 +139,7 @@ function gutenberg_disable_editor_settings_wpautop( $settings ) {
 	return $settings;
 }
 add_filter( 'wp_editor_settings', 'gutenberg_disable_editor_settings_wpautop' );
+
 /**
  * Add rest nonce to the heartbeat response.
  *
