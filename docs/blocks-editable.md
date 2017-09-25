@@ -14,7 +14,7 @@ One challenge of maintaining the representation of a block as a JavaScript objec
 var el = wp.element.createElement,
 	registerBlockType = wp.blocks.registerBlockType,
 	Editable = wp.blocks.Editable,
-	children = wp.blocks.source.children;
+	html = wp.blocks.source.html;
 
 registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-03', {
 	title: 'Hello World (Step 3)',
@@ -25,8 +25,8 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-03', {
 
 	attributes: {
 		content: {
-			type: 'array',
-			source: children( 'p' )
+			type: 'string',
+			source: html( 'p' )
 		}
 	},
 
@@ -54,14 +54,14 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-03', {
 	save: function( props ) {
 		var content = props.attributes.content;
 
-		return el( 'p', { className: props.className }, content );
+		return el( Editable.Value, { tagName: 'p', className: props.className }, content );
 	},
 } );
 ```
 {% ESNext %}
 ```js
 const { registerBlockType, Editable, source } = wp.blocks;
-const { children } = source;
+const { html } = source;
 
 registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-03', {
 	title: 'Hello World (Step 3)',
@@ -72,8 +72,8 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-03', {
 
 	attributes: {
 		content: {
-			type: 'array',
-			source: children( 'p' ),
+			type: 'string',
+			source: html( 'p' ),
 		},
 	},
 
@@ -99,7 +99,7 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-03', {
 	save( { attributes, className } ) {
 		const { content } = attributes;
 
-		return <p className={ className }>{ content }</p>;
+		return <Editable.Value tagName="p" className={ className }>{ content }</Editable.Value>;
 	},
 } );
 ```
@@ -107,7 +107,7 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-03', {
 
 When registering a new block type, the `attributes` property describes the shape of the attributes object you'd like to receive in the `edit` and `save` functions. Each value is a [source function](attributes.md) to find the desired value from the markup of the block.
 
-In the code snippet above, when loading the editor, we will extract the `content` value as the children of the paragraph element in the saved post's markup.
+In the code snippet above, when loading the editor, we will extract the `content` value as the inner HTML of the paragraph element in the saved post's markup.
 
 ## Components and the `Editable` Component
 
@@ -117,4 +117,4 @@ The `Editable` component can be considered as a super-powered `textarea` element
 
 Implementing this behavior as a component enables you as the block implementer to be much more granular about editable fields. Your block may not need `Editable` at all, or it may need many independent `Editable` elements, each operating on a subset of the overall block state.
 
-Because `Editable` allows for nested nodes, you'll most often use it in conjunction with the `children` attribute source when extracting the value from saved content.
+Because `Editable` allows for nested HTML, you'll most often use it in conjunction with the `Ediable.Value` in the `save` function to output the HTML properly.

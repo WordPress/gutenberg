@@ -18,7 +18,7 @@ var el = wp.element.createElement,
 	Editable = wp.blocks.Editable,
 	BlockControls = wp.blocks.BlockControls,
 	AlignmentToolbar = wp.blocks.AlignmentToolbar,
-	children = wp.blocks.source.children;
+	html = wp.blocks.source.html;
 
 registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 	title: 'Hello World (Step 4)',
@@ -29,8 +29,8 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 
 	attributes: {
 		content: {
-			type: 'array',
-			source: children( 'p' )
+			type: 'string',
+			source: html( 'p' )
 		}
 	},
 
@@ -78,7 +78,7 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 	save: function( props ) {
 		var content = props.attributes.content;
 
-		return el( 'p', { className: props.className }, content );
+		return el( Editable.Value, { tagName: 'p', className: props.className }, content );
 	},
 } );
 ```
@@ -91,7 +91,7 @@ const {
 	AlignmentToolbar,
 	source
 } = wp.blocks;
-const { children } = source;
+const { html } = source;
 
 registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 	title: 'Hello World (Step 4)',
@@ -102,8 +102,8 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 
 	attributes: {
 		content: {
-			type: 'array',
-			source: children( 'p' ),
+			type: 'string',
+			source: html( 'p' ),
 		},
 	},
 
@@ -143,7 +143,7 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 	save( { attributes, className } ) {
 		const { content } = attributes;
 
-		return <p className={ className }>{ content }</p>;
+		return <Editable.Value tagName="p" className={ className }>{ content }</Editable.Value>;
 	},
 } );
 ```
