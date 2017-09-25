@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import clickOutside from 'react-click-outside';
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import { flowRight } from 'lodash';
@@ -26,17 +25,20 @@ import { editPost } from '../../actions';
 export class PostSchedule extends Component {
 	constructor() {
 		super( ...arguments );
+
+		this.toggleDialog = this.toggleDialog.bind( this );
+		this.closeDialog = this.closeDialog.bind( this );
+
 		this.state = {
 			opened: false,
 		};
-		this.toggleDialog = this.toggleDialog.bind( this );
 	}
 
 	toggleDialog() {
 		this.setState( ( state ) => ( { opened: ! state.opened } ) );
 	}
 
-	handleClickOutside() {
+	closeDialog() {
 		this.setState( { opened: false } );
 	}
 
@@ -77,6 +79,7 @@ export class PostSchedule extends Component {
 					<Popover
 						position="bottom left"
 						isOpen={ this.state.opened }
+						onClose={ this.closeDialog }
 						className="editor-post-schedule__dialog"
 					>
 						<DatePicker
@@ -120,6 +123,5 @@ const applyWithAPIData = withAPIData( () => {
 
 export default flowRight(
 	applyConnect,
-	applyWithAPIData,
-	clickOutside
+	applyWithAPIData
 )( PostSchedule );

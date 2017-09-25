@@ -323,6 +323,14 @@
 	margin-left: -$block-padding;
 	margin-right: -$block-padding;
 
+	// Allow this invisible layer to be clicked through.
+	pointer-events: none;
+
+	// Reset pointer-events on children.
+	& > * {
+		pointer-events: auto;
+	}
+
 	// Larger viewports
 	@include break-small() {
 		margin-left: 0;
@@ -451,7 +459,7 @@ $sticky-bottom-offset: 20px;
 	}
 }
 
-.editor-visual-editor__continue-writing {
+.editor-visual-editor__inserter {
 	display: flex;
 	align-items: baseline;
 	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );

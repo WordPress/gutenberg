@@ -2,7 +2,16 @@
  * External dependencies
  */
 import moment from 'moment';
-import { first, last, values, some, isEqual } from 'lodash';
+import {
+	first,
+	get,
+	has,
+	isEqual,
+	last,
+	reduce,
+	some,
+	values,
+} from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -368,8 +377,47 @@ export function getEditedPostPreviewLink( state ) {
  * @param  {String} uid   Block unique ID
  * @return {Object}       Parsed block object
  */
-export function getBlock( state, uid ) {
-	return state.editor.blocksByUid[ uid ];
+export const getBlock = createSelector(
+	( state, uid ) => {
+		const block = state.editor.blocksByUid[ uid ];
+		const type = getBlockType( block.name );
+
+		if ( ! block || ! type || ! type.attributes ) {
+			return block;
+		}
+
+		const metaAttributes = reduce( type.attributes, ( result, value, key ) => {
+			if ( value && 'meta' in value ) {
+				result[ key ] = getPostMeta( state, value.meta );
+			}
+
+			return result;
+		}, {} );
+
+		// Avoid injecting an empty `attributes: {}`
+		if ( ! block.attributes && ! metaAttributes.length ) {
+			return block;
+		}
+
+		return {
+			...block,
+			attributes: {
+				...block.attributes,
+				...metaAttributes,
+			},
+		};
+	},
+	( state, uid ) => [
+		get( state, [ 'editor', 'blocksByUid', uid ] ),
+		get( state, 'editor.edits.meta' ),
+		get( state, 'currentPost.meta' ),
+	]
+);
+
+function getPostMeta( state, key ) {
+	return has( state, [ 'editor', 'edits', 'meta', key ] )
+		? get( state, [ 'editor', 'edits', 'meta', key ] )
+		: get( state, [ 'currentPost', 'meta', key ] );
 }
 
 /**

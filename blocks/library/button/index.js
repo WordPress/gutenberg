@@ -68,7 +68,7 @@ registerBlockType( 'core/button', {
 			<span key="button" className={ className } title={ title } style={ { backgroundColor: color } } >
 				<Editable
 					tagName="span"
-					placeholder={ __( 'Write label…' ) }
+					placeholder={ __( 'Add text…' ) }
 					value={ text }
 					focus={ focus }
 					onFocus={ setFocus }
