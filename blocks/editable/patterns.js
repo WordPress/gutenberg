@@ -212,7 +212,7 @@ export default function( editor ) {
 		}
 
 		const block = pattern.transform( {
-			content: [ remainingText, ...drop( content ) ],
+			content: remainingText,
 			match: result,
 		} );
 

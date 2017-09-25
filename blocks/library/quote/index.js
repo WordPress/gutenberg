@@ -77,7 +77,7 @@ registerBlockType( 'core/quote', {
 				transform: ( { content } ) => {
 					return createBlock( 'core/quote', {
 						value: [
-							<p key="1">{ content }</p>,
+							`<p>${ content }</p>`,
 						],
 					} );
 				},
