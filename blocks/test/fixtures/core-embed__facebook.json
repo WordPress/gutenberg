@@ -5,9 +5,7 @@
         "isValid": true,
         "attributes": {
             "url": "https://facebook.com/",
-            "caption": [
-                "Embedded content from facebook"
-            ]
+            "caption": "Embedded content from facebook"
         },
         "originalContent": "<figure class=\"wp-block-embed-facebook\">\n    https://facebook.com/\n    <figcaption>Embedded content from facebook</figcaption>\n</figure>"
     }

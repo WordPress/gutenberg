@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { isString, isObject } from 'lodash';
 import { parse } from 'hpq';
 
 /**

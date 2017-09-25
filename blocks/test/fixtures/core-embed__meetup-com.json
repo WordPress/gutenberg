@@ -5,9 +5,7 @@
         "isValid": true,
         "attributes": {
             "url": "https://meetup.com/",
-            "caption": [
-                "Embedded content from meetup-com"
-            ]
+            "caption": "Embedded content from meetup-com"
         },
         "originalContent": "<figure class=\"wp-block-embed-meetup-com\">\n    https://meetup.com/\n    <figcaption>Embedded content from meetup-com</figcaption>\n</figure>"
     }

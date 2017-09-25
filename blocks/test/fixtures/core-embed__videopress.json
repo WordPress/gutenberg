@@ -5,9 +5,7 @@
         "isValid": true,
         "attributes": {
             "url": "https://videopress.com/",
-            "caption": [
-                "Embedded content from videopress"
-            ]
+            "caption": "Embedded content from videopress"
         },
         "originalContent": "<figure class=\"wp-block-embed-videopress\">\n    https://videopress.com/\n    <figcaption>Embedded content from videopress</figcaption>\n</figure>"
     }

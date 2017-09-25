@@ -9,7 +9,7 @@ import { equal, deepEqual } from 'assert';
 import paste from '../index';
 import { registerBlockType, unregisterBlockType, setUnknownTypeHandlerName } from '../../registration';
 import { createBlock } from '../../factory';
-import { children, prop } from '../../source';
+import { html, prop } from '../../source';
 
 describe( 'paste', () => {
 	beforeAll( () => {
@@ -18,8 +18,8 @@ describe( 'paste', () => {
 			title: 'test figure',
 			attributes: {
 				content: {
-					type: 'array',
-					source: children( 'figure' ),
+					type: 'string',
+					source: html( 'figure' ),
 				},
 			},
 			transforms: {
@@ -56,7 +56,7 @@ describe( 'paste', () => {
 
 	it( 'should convert recognised pasted content', () => {
 		const pastedBlock = paste( { HTML: '<figure>test</figure>' } )[ 0 ];
-		const block = createBlock( 'test/figure', { content: [ 'test' ] } );
+		const block = createBlock( 'test/figure', { content: 'test' } );
 
 		equal( pastedBlock.name, block.name );
 		deepEqual( pastedBlock.attributes, block.attributes );

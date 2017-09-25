@@ -21,10 +21,10 @@ describe( 'Editable', () => {
 			console.error = consoleError;
 		} );
 
-		it( 'should warn when rendered with string value', () => {
+		it( 'should not warn when rendered with string value', () => {
 			shallow( <Editable value="Uh oh!" /> );
 
-			expect( console.error ).toHaveBeenCalled();
+			expect( console.error ).not.toHaveBeenCalled();
 		} );
 
 		it( 'should not warn when rendered with undefined value', () => {
@@ -33,10 +33,10 @@ describe( 'Editable', () => {
 			expect( console.error ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should not warn when rendered with array value', () => {
-			shallow( <Editable value={ [ 'Oh, good' ] } /> );
+		it( 'should warn when rendered with array value', () => {
+			shallow( <Editable value={ [ 'Oh, no' ] } /> );
 
-			expect( console.error ).not.toHaveBeenCalled();
+			expect( console.error ).toHaveBeenCalled();
 		} );
 		/* eslint-enable no-console */
 	} );
