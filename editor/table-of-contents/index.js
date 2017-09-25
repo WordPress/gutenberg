@@ -60,9 +60,13 @@ class TableOfContents extends Component {
 							{ __( 'Headings' ) }
 						</div>
 					</div>
-					<hr />
-					<span className="table-of-contents__title">{ __( 'Table of Contents' ) }</span>
-					<DocumentOutline />
+					{ headings.length > 0 &&
+						<div>
+							<hr />
+							<span className="table-of-contents__title">{ __( 'Table of Contents' ) }</span>
+							<DocumentOutline />
+						</div>
+					}
 				</Popover>
 			</div>
 		);

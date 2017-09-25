@@ -26,7 +26,6 @@ const TableOfContentsItem = ( {
 		<button
 			className="document-outline__button"
 			onClick={ onClick }
-			title={ __( 'Click to focus this heading' ) }
 		>
 			<span className="document-outline__emdash" aria-hidden="true"></span>
 			<strong className="document-outline__level">
@@ -35,6 +34,7 @@ const TableOfContentsItem = ( {
 			<span className="document-outline__item-content">
 				{ children }
 			</span>
+			<span className="screen-reader-text">{ __( '(Click to focus this heading)' ) }</span>
 		</button>
 	</li>
 );
