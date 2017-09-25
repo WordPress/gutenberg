@@ -16,6 +16,7 @@ import { KeyboardShortcuts } from '@wordpress/components';
  */
 import './style.scss';
 import VisualEditorBlockList from './block-list';
+import VisualEditorInserter from './inserter';
 import PostTitle from '../../post-title';
 import WritingFlow from '../../writing-flow';
 import TableOfContents from '../../table-of-contents';
@@ -104,6 +105,7 @@ class VisualEditor extends Component {
 					<PostTitle />
 					<VisualEditorBlockList ref={ this.bindBlocksContainer } />
 				</WritingFlow>
+				<VisualEditorInserter />
 				<TableOfContents />
 			</div>
 		);

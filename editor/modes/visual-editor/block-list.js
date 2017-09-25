@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import classnames from 'classnames';
 import { throttle, reduce, noop } from 'lodash';
 
 /**
@@ -11,7 +10,6 @@ import { throttle, reduce, noop } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { serialize, getDefaultBlockName, createBlock } from '@wordpress/blocks';
-import { IconButton } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
 
 /**
@@ -19,7 +17,6 @@ import { keycodes } from '@wordpress/utils';
  */
 import VisualEditorBlock from './block';
 import BlockDropZone from './block-drop-zone';
-import Inserter from '../../inserter';
 import {
 	getBlockUids,
 	getBlockInsertionPoint,
@@ -37,9 +34,7 @@ const { ENTER } = keycodes;
 class VisualEditorBlockList extends Component {
 	constructor( props ) {
 		super( props );
-		this.state = {
-			showContinueWritingControls: false,
-		};
+
 		this.onSelectionStart = this.onSelectionStart.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.onSelectionEnd = this.onSelectionEnd.bind( this );
@@ -50,7 +45,6 @@ class VisualEditorBlockList extends Component {
 		this.setLastClientY = this.setLastClientY.bind( this );
 		this.onPointerMove = throttle( this.onPointerMove.bind( this ), 250 );
 		this.onPlaceholderKeyDown = this.onPlaceholderKeyDown.bind( this );
-		this.toggleContinueWritingControls = this.toggleContinueWritingControls.bind( this );
 		// Browser does not fire `*move` event when the pointer position changes
 		// relative to the document, so fire it with the last known position.
 		this.onScroll = () => this.onPointerMove( { clientY: this.lastClientY } );
@@ -199,15 +193,6 @@ class VisualEditorBlockList extends Component {
 		this.props.onInsertBlock( newBlock );
 	}
 
-	insertBlock( name ) {
-		const newBlock = createBlock( name );
-		this.props.onInsertBlock( newBlock );
-	}
-
-	toggleContinueWritingControls( showContinueWritingControls ) {
-		return () => this.setState( { showContinueWritingControls } );
-	}
-
 	render() {
 		const {
 			blocks,
@@ -222,9 +207,6 @@ class VisualEditorBlockList extends Component {
 				...blocks.slice( insertionPoint ),
 			]
 			: blocks;
-		const continueWritingClassname = classnames( 'editor-visual-editor__continue-writing', {
-			'is-showing-controls': this.state.showContinueWritingControls,
-		} );
 
 		return (
 			<div>
@@ -260,29 +242,6 @@ class VisualEditorBlockList extends Component {
 						/>
 					</div>
 				}
-				<div
-					className={ continueWritingClassname }
-					onFocus={ this.toggleContinueWritingControls( true ) }
-					onBlur={ this.toggleContinueWritingControls( false ) }
-				>
-					<Inserter position="top right" />
-					<IconButton
-						icon="editor-paragraph"
-						className="editor-inserter__block"
-						onClick={ () => this.insertBlock( 'core/paragraph' ) }
-						label={ __( 'Insert paragraph block' ) }
-					>
-						{ __( 'Paragraph' ) }
-					</IconButton>
-					<IconButton
-						icon="format-image"
-						className="editor-inserter__block"
-						onClick={ () => this.insertBlock( 'core/image' ) }
-						label={ __( 'Insert image block' ) }
-					>
-						{ __( 'Image' ) }
-					</IconButton>
-				</div>
 			</div>
 		);
 	}
