@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -11,7 +10,7 @@ import './editor.scss';
 import './style.scss';
 import { registerBlockType, source } from '../../api';
 import Editable from '../../editable';
-import UrlInput from '../../url-input';
+import UrlInputButton from '../../url-input/button';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import ColorPalette from '../../color-palette';
@@ -75,18 +74,8 @@ registerBlockType( 'core/button', {
 					onChange={ ( value ) => setAttributes( { text: value } ) }
 					formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
 					keepPlaceholderOnFocus
+					extraToolbarButtons={ <UrlInputButton url={ url } onChange={ ( { newUrl } ) => setAttributes( { url: newUrl } ) } /> }
 				/>
-				{ focus &&
-					<form
-						className="blocks-format-toolbar__link-modal"
-						onSubmit={ ( event ) => event.preventDefault() }>
-						<UrlInput
-							value={ url }
-							onChange={ ( value ) => setAttributes( { url: value } ) }
-						/>
-						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
-					</form>
-				}
 				{ focus &&
 					<InspectorControls key="inspector">
 						<ColorPalette

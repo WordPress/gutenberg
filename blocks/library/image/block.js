@@ -58,8 +58,8 @@ class ImageBlock extends Component {
 		this.fetchMedia( media.id );
 	}
 
-	onSetHref( value ) {
-		this.props.setAttributes( { href: value } );
+	onSetHref( { url } ) {
+		this.props.setAttributes( { href: url } );
 	}
 
 	updateAlt( newAlt ) {
