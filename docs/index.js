@@ -64,9 +64,9 @@ addStory( {
 
 addStory( {
 	parents: [ 'reference' ],
-	name: 'attribute-sources',
-	title: 'Attribute Sources',
-	markdown: require( './attribute-sources.md' ),
+	name: 'attributes',
+	title: 'Attributes',
+	markdown: require( './attributes.md' ),
 } );
 
 addStory( {

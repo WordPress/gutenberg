@@ -4,7 +4,7 @@
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 import { Slot } from 'react-slot-fill';
-import { partial } from 'lodash';
+import { has, partial, reduce, size } from 'lodash';
 import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
 
 /**
@@ -27,29 +27,31 @@ import BlockMover from '../../block-mover';
 import BlockRightMenu from '../../block-settings-menu';
 import BlockSwitcher from '../../block-switcher';
 import {
-	updateBlockAttributes,
-	focusBlock,
-	mergeBlocks,
-	insertBlocks,
-	removeBlocks,
 	clearSelectedBlock,
-	startTyping,
-	stopTyping,
+	editPost,
+	focusBlock,
+	insertBlocks,
+	mergeBlocks,
+	removeBlocks,
 	replaceBlocks,
 	selectBlock,
+	startTyping,
+	stopTyping,
+	updateBlockAttributes,
 } from '../../actions';
 import {
-	getPreviousBlock,
-	getNextBlock,
 	getBlock,
 	getBlockFocus,
 	getBlockIndex,
+	getEditedPostAttribute,
+	getMultiSelectedBlockUids,
+	getNextBlock,
+	getPreviousBlock,
 	isBlockHovered,
-	isBlockSelected,
 	isBlockMultiSelected,
+	isBlockSelected,
 	isFirstMultiSelectedBlock,
 	isTyping,
-	getMultiSelectedBlockUids,
 } from '../../selectors';
 
 const { BACKSPACE, ESCAPE, DELETE, ENTER } = keycodes;
@@ -145,7 +147,23 @@ class VisualEditorBlock extends Component {
 
 	setAttributes( attributes ) {
 		const { block, onChange } = this.props;
+		const type = getBlockType( block.name );
 		onChange( block.uid, attributes );
+
+		const metaAttributes = reduce( attributes, ( result, value, key ) => {
+			if ( type && has( type, [ 'attributes', key, 'meta' ] ) ) {
+				result[ type.attributes[ key ].meta ] = value;
+			}
+
+			return result;
+		}, {} );
+
+		if ( size( metaAttributes ) ) {
+			this.props.onMetaChange( {
+				...this.props.meta,
+				...metaAttributes,
+			} );
+		}
 	}
 
 	maybeHover() {
@@ -428,6 +446,7 @@ export default connect(
 			isTyping: isTyping( state ),
 			order: getBlockIndex( state, ownProps.uid ),
 			multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
+			meta: getEditedPostAttribute( state, 'meta' ),
 		};
 	},
 	( dispatch, ownProps ) => ( {
@@ -483,6 +502,10 @@ export default connect(
 
 		onReplace( blocks ) {
 			dispatch( replaceBlocks( [ ownProps.uid ], blocks ) );
+		},
+
+		onMetaChange( meta ) {
+			dispatch( editPost( { meta } ) );
 		},
 	} )
 )( VisualEditorBlock );
