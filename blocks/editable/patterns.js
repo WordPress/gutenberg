@@ -189,7 +189,7 @@ export default function( editor ) {
 			return;
 		}
 
-		const firstText = content[ 0 ];
+		const firstText = editor.getBody().textContent;
 
 		const { result, pattern } = patterns.reduce( ( acc, item ) => {
 			return acc.result ? acc : {
@@ -204,7 +204,7 @@ export default function( editor ) {
 
 		const range = editor.selection.getRng();
 		const matchLength = result[ 0 ].length;
-		const remainingText = firstText.slice( matchLength );
+		const remainingText = content.slice( matchLength );
 
 		// The caret position must be at the end of the match.
 		if ( range.startOffset !== matchLength ) {
