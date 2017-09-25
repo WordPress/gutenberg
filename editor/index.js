@@ -58,6 +58,15 @@ if ( dateSettings.timezone.string ) {
 }
 
 /**
+ * Configure heartbeat to refresh the wp-api nonce, keeping the editor authorization intact.
+ */
+jQuery( document ).on( 'heartbeat-tick',  function( e, response ) {
+	if ( response['rest-nonce'] && response['rest-nonce'] !== wp.api.endpoints.at(0).get( 'nonce' ) ) {
+		wp.api.endpoints.at(0).set( 'nonce', response['rest-nonce'] );
+	}
+});
+
+/**
  * Initializes and returns an instance of Editor.
  *
  * @param {String}  id       Unique identifier for editor instance
