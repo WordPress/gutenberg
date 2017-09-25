@@ -10,5 +10,8 @@
   "module": "build-module/index.js",
   "browser": "build-browser/index.js",
   "author": "WordPress",
-  "license": "GPL-2.0+"
+  "license": "GPL-2.0+",
+  "publishConfig": {
+    "access": "public"
+  }
 }
