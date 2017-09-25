@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { concatChildren } from '@wordpress/element';
 import classnames from 'classnames';
 
 /**
@@ -21,7 +20,7 @@ import RangeControl from '../../inspector-controls/range-control';
 import ColorPalette from '../../color-palette';
 import BlockDescription from '../../block-description';
 
-const { children } = source;
+const { html } = source;
 
 registerBlockType( 'core/paragraph', {
 	title: __( 'Paragraph' ),
@@ -36,8 +35,8 @@ registerBlockType( 'core/paragraph', {
 
 	attributes: {
 		content: {
-			type: 'array',
-			source: children( 'p' ),
+			type: 'string',
+			source: html( 'p' ),
 		},
 		align: {
 			type: 'string',
@@ -78,7 +77,7 @@ registerBlockType( 'core/paragraph', {
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: concatChildren( attributes.content, attributesToMerge.content ),
+			content: attributes.content + attributesToMerge.content,
 		};
 	},
 
@@ -193,7 +192,11 @@ registerBlockType( 'core/paragraph', {
 			textAlign: align,
 		};
 
-		return <p style={ styles } className={ className ? className : undefined }>{ content }</p>;
+		return (
+			<Editable.Value tagName="p" style={ styles } className={ className ? className : undefined }>
+				{ content }
+			</Editable.Value>
+		);
 	},
 } );
 

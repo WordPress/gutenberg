@@ -22,8 +22,6 @@ import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
-const { children } = source;
-
 // These embeds do not work in sandboxes
 const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
 
@@ -42,9 +40,9 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 				type: 'string',
 			},
 			caption: {
-				type: 'array',
-				source: children( 'figcaption' ),
-				default: [],
+				type: 'string',
+				source: source.html( 'figcaption' ),
+				default: '',
 			},
 			align: {
 				type: 'string',
@@ -226,7 +224,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 			return (
 				<figure className={ align ? `align${ align }` : null }>
 					{ `\n${ url }\n` /* URL needs to be on its own line. */ }
-					{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
+					{ caption && caption.length > 0 && <Editable.Value tagName="figcaption">{ caption }</Editable.Value> }
 				</figure>
 			);
 		},
