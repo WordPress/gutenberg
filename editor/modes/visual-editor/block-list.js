@@ -57,14 +57,12 @@ class VisualEditorBlockList extends Component {
 		document.addEventListener( 'copy', this.onCopy );
 		document.addEventListener( 'cut', this.onCut );
 		window.addEventListener( 'mousemove', this.setLastClientY );
-		window.addEventListener( 'touchmove', this.setLastClientY );
 	}
 
 	componentWillUnmount() {
 		document.removeEventListener( 'copy', this.onCopy );
 		document.removeEventListener( 'cut', this.onCut );
 		window.removeEventListener( 'mousemove', this.setLastClientY );
-		window.removeEventListener( 'touchmove', this.setLastClientY );
 	}
 
 	setLastClientY( { clientY } ) {
@@ -141,10 +139,8 @@ class VisualEditorBlockList extends Component {
 		this.startLowerBoundary = pageYOffset + boundaries.bottom;
 
 		window.addEventListener( 'mousemove', this.onPointerMove );
-		window.addEventListener( 'touchmove', this.onPointerMove );
 		window.addEventListener( 'scroll', this.onScroll );
 		window.addEventListener( 'mouseup', this.onSelectionEnd );
-		window.addEventListener( 'touchend', this.onSelectionEnd );
 	}
 
 	onSelectionChange( uid ) {
@@ -176,10 +172,8 @@ class VisualEditorBlockList extends Component {
 		delete this.startLowerBoundary;
 
 		window.removeEventListener( 'mousemove', this.onPointerMove );
-		window.removeEventListener( 'touchmove', this.onPointerMove );
 		window.removeEventListener( 'scroll', this.onScroll );
 		window.removeEventListener( 'mouseup', this.onSelectionEnd );
-		window.removeEventListener( 'touchend', this.onSelectionEnd );
 	}
 
 	onPlaceholderKeyDown( event ) {

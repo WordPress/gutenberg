@@ -393,7 +393,6 @@ class VisualEditorBlock extends Component {
 					onKeyPress={ this.maybeStartTyping }
 					onDragStart={ ( event ) => event.preventDefault() }
 					onMouseDown={ this.onPointerDown }
-					onTouchStart={ this.onPointerDown }
 					className="editor-visual-editor__block-edit"
 				>
 					<BlockCrashBoundary onError={ this.onBlockError }>
