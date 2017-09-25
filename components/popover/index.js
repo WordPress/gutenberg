@@ -97,6 +97,11 @@ export class Popover extends Component {
 	}
 
 	focus() {
+		const { focusOnOpen = true } = this.props;
+		if ( ! focusOnOpen ) {
+			return;
+		}
+
 		const { content, popover } = this.nodes;
 		if ( ! content ) {
 			return;
@@ -200,14 +205,15 @@ export class Popover extends Component {
 		const {
 			isOpen,
 			onClose,
+			children,
+			className,
 			onClickOutside = onClose,
 			// Disable reason: We generate the `...contentProps` rest as remainder
 			// of props which aren't explicitly handled by this component.
-			//
-			// eslint-disable-next-line no-unused-vars
+			/* eslint-disable no-unused-vars */
 			position,
-			children,
-			className,
+			focusOnOpen,
+			/* eslint-enable no-unused-vars */
 			...contentProps
 		} = this.props;
 		const [ yAxis, xAxis ] = this.getPositions();

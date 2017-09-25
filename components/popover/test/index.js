@@ -67,6 +67,27 @@ describe( 'Popover', () => {
 			expect( mocks.setOffset ).toHaveBeenCalled();
 			expect( mocks.setForcedPositions ).not.toHaveBeenCalled();
 		} );
+
+		it( 'should focus when opening', () => {
+			// An ideal test here would mount with an input child and focus the
+			// child, but in context of JSDOM the inputs are not visible and
+			// are therefore skipped as tabbable, defaulting to popover.
+			wrapper = mount( <Popover /> );
+			wrapper.setProps( { isOpen: true } );
+
+			const popover = wrapper.find( '.components-popover' ).getDOMNode();
+
+			expect( document.activeElement ).toBe( popover );
+		} );
+
+		it( 'should allow focus-on-open behavior to be disabled', () => {
+			const activeElement = document.activeElement;
+
+			wrapper = mount( <Popover focusOnOpen={ false } /> );
+			wrapper.setProps( { isOpen: true } );
+
+			expect( document.activeElement ).toBe( activeElement );
+		} );
 	} );
 
 	describe( '#getPositions()', () => {
