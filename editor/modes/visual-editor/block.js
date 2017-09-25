@@ -26,6 +26,7 @@ import BlockDropZone from './block-drop-zone';
 import BlockMover from '../../block-mover';
 import BlockRightMenu from '../../block-settings-menu';
 import BlockSwitcher from '../../block-switcher';
+import ComponentInterop from '../../component-interop';
 import {
 	updateBlockAttributes,
 	focusBlock,
@@ -381,7 +382,8 @@ class VisualEditorBlock extends Component {
 					<BlockCrashBoundary onError={ this.onBlockError }>
 						{ isValid
 							? (
-								<BlockEdit
+								<ComponentInterop
+									tagName={ BlockEdit }
 									focus={ focus }
 									attributes={ block.attributes }
 									setAttributes={ this.setAttributes }

@@ -62,9 +62,9 @@ export function registerBlockType( name, settings ) {
 		);
 		return;
 	}
-	if ( 'edit' in settings && ! isFunction( settings.edit ) ) {
+	if ( 'edit' in settings && ! isFunction( settings.edit ) && 'string' !== typeof settings.edit ) {
 		console.error(
-			'The "edit" property must be a valid function.'
+			'The "edit" property must be a valid component or tag name.'
 		);
 		return;
 	}
