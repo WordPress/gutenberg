@@ -119,6 +119,13 @@
 			wp.mediaWidgets.controlConstructors[ "media_audio" ].prototype.mime_type = "audio";
 			_.extend( wp.mediaWidgets.controlConstructors[ "media_audio" ].prototype.l10n, {"no_media_selected":"No audio selected","select_media":"Select File","change_media":"Change Audio","edit_media":"Edit Audio","add_to_widget":"Add to Widget","missing_attachment":"We can&#8217;t find that audio file. Check your <a href=\"http:\/\/src.wordpress-develop.dev\/wp-admin\/upload.php\">media library<\/a> and make sure it wasn&#8217;t deleted.","media_library_state_multi":{"0":"Audio Widget (%d)","1":"Audio Widget (%d)","singular":"Audio Widget (%d)","plural":"Audio Widget (%d)","context":null,"domain":null},"media_library_state_single":"Audio Widget"} );
 		</script>
+		<script type='text/javascript' src='../../src/wp-admin/js/widgets/media-gallery-widget.js'></script>
+		<script type='text/javascript'>
+			wp.mediaWidgets.modelConstructors[ "media_gallery" ].prototype.schema = {"title":{"type":"string","default":"","should_preview_update":false},"ids":{"type":"string","default":""},"columns":{"type":"integer","default":3},"size":{"type":"string","default":"thumbnail","enum":["thumbnail","medium","medium_large","large","post-thumbnail","full","custom"]},"link_type":{"type":"string","default":"none","enum":["none","file","post"],"media_prop":"link","should_preview_update":false},"orderby_random":{"type":"boolean","default":false,"media_prop":"_orderbyRandom","should_preview_update":false},"attachments":{"type":"string","default":""}};
+			wp.mediaWidgets.controlConstructors[ "media_gallery" ].prototype.mime_type = "image";
+
+			_.extend( wp.mediaWidgets.controlConstructors[ "media_gallery" ].prototype.l10n, {"no_media_selected":"No images selected","add_media":"Add Media","replace_media":"Replace Media","edit_media":"Edit Gallery","add_to_widget":"Add to Widget","missing_attachment":"We can&#8217;t find that gallery. Check your <a href=\"http:\/\/src.wordpress-develop.dev\/wp-admin\/upload.php\">media library<\/a> and make sure it wasn&#8217;t deleted.","media_library_state_multi":"","media_library_state_single":"","unsupported_file_type":"Looks like this isn&#8217;t the correct kind of file. Please link to an appropriate file instead.","select_media":"Select Images","change_media":"Add Image"} );
+		</script>
 
 		<!-- Unit tests -->
 		<script src="wp-admin/js/password-strength-meter.js"></script>
@@ -136,6 +143,7 @@
 		<script src="wp-admin/js/nav-menu.js"></script>
 		<script src="wp-admin/js/widgets/test-media-widgets.js"></script>
 		<script src="wp-admin/js/widgets/test-media-image-widget.js"></script>
+		<script src="wp-admin/js/widgets/test-media-gallery-widget.js"></script>
 		<script src="wp-admin/js/widgets/test-media-video-widget.js"></script>
 
 		<!-- Customizer templates for sections -->
@@ -569,7 +577,7 @@
 					</div><!-- #available-widgets-list -->
 				</div><!-- #available-widgets -->
 			</div><!-- #widgets-left -->
-			
+
 			<script type="text/html" id="tmpl-widget-media-media_image-control">
 			<# var elementIdPrefix = 'el' + String( Math.random() ) + '_' #>
 			<p>
@@ -810,6 +818,60 @@
 		<div class="media-frame-toolbar"></div>
 		<div class="media-frame-uploader"></div>
 	</script>
+
+	<script type="text/html" id="tmpl-widget-media-media_gallery-control">
+		<# var elementIdPrefix = 'el' + String( Math.random() ) + '_' #>
+		<p>
+			<label for="{{ elementIdPrefix }}title">Title:</label>
+			<input id="{{ elementIdPrefix }}title" type="text" class="widefat title">
+		</p>
+		<div class="media-widget-preview">
+			<div class="attachment-media-view">
+				<div class="placeholder">No images selected</div>
+			</div>
+			</div>
+			<p class="media-widget-buttons">
+				<button type="button" class="button edit-media selected">
+					Edit Gallery				</button>
+				<button type="button" class="button change-media select-media selected">
+					Replace Media				</button>
+				<button type="button" class="button select-media not-selected">
+					Add Media				</button>
+			</p>
+		<div class="media-widget-fields">
+		</div>
+	</script>
+				<script type="text/html" id="tmpl-wp-media-widget-gallery-preview">
+			<# var describedById = 'describedBy-' + String( Math.random() ); #>
+			<# data.attachments = data.attachments ? JSON.parse(data.attachments) : ''; #>
+			<# if ( Array.isArray( data.attachments ) && data.attachments.length ) { #>
+				<div class="gallery gallery-columns-{{ data.columns }}">
+					<# _.each( data.attachments, function( attachment, index ) { #>
+						<dl class="gallery-item">
+							<dt class="gallery-icon">
+							<# if ( attachment.sizes.thumbnail ) { #>
+								<img src="{{ attachment.sizes.thumbnail.url }}" width="{{ attachment.sizes.thumbnail.width }}" height="{{ attachment.sizes.thumbnail.height }}" alt="" />
+							<# } else { #>
+								<img src="{{ attachment.url }}" alt="" />
+							<# } #>
+							</dt>
+							<# if ( attachment.caption ) { #>
+								<dd class="wp-caption-text gallery-caption">
+									{{{ data.verifyHTML( attachment.caption ) }}}
+								</dd>
+							<# } #>
+						</dl>
+						<# if ( index % data.columns === data.columns - 1 ) { #>
+							<br style="clear: both;">
+						<# } #>
+					<# } ); #>
+				</div>
+			<# } else { #>
+				<div class="attachment-media-view">
+					<p class="placeholder">No images selected</p>
+				</div>
+			<# } #>
+		</script>
 
 	<script type="text/html" id="tmpl-media-modal">
 		<div class="media-modal wp-core-ui">
