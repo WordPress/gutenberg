@@ -962,6 +962,41 @@ class Tests_Widgets extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests for orphaned widgets being moved into inactive widgets.
+	 *
+	 * @covers retrieve_widgets()
+	 */
+	function test_retrieve_widgets_move_orphaned_widgets_to_inactive() {
+		global $sidebars_widgets;
+
+		wp_widgets_init();
+		$this->register_sidebars( array( 'sidebar-1', 'sidebar-2', 'sidebar-3', 'wp_inactive_widgets' ) );
+
+		$sidebars_widgets = array(
+			'sidebar-1' => array( 'tag_cloud-1' ),
+			'sidebar-2' => array( 'text-1' ),
+			'wp_inactive_widgets' => array( 'search-2', 'archives-2' ),
+			'orphaned_widgets_1'  => array( 'calendar-1' ),
+		);
+
+		retrieve_widgets();
+
+		$this->assertInternalType( 'array', $sidebars_widgets );
+
+		foreach ( $sidebars_widgets as $widgets ) {
+			$this->assertInternalType( 'array', $widgets );
+		}
+
+		// 6 default widgets + 1 orphaned calendar widget = 7.
+		$this->assertCount( 7, $sidebars_widgets['wp_inactive_widgets'] );
+		$this->assertContains( 'calendar-1', $sidebars_widgets['wp_inactive_widgets'] );
+		$this->assertArrayNotHasKey( 'orphaned_widgets_1', $sidebars_widgets );
+
+		// Sidebar_widgets option was updated.
+		$this->assertEquals( $sidebars_widgets, wp_get_sidebars_widgets() );
+	}
+
+	/**
 	 * Test _wp_remove_unregistered_widgets.
 	 *
 	 * @covers _wp_remove_unregistered_widgets()
