@@ -83,15 +83,7 @@ export default class TinyMCE extends Component {
 	}
 
 	render() {
-		const { tagName = 'div', style, defaultValue, label, className } = this.props;
-
-		// If a default value is provided, render it into the DOM even before
-		// TinyMCE finishes initializing. This avoids a short delay by allowing
-		// us to show and focus the content before it's truly ready to edit.
-		let children;
-		if ( defaultValue ) {
-			children = Children.toArray( defaultValue );
-		}
+		const { tagName = 'div', style, label, className } = this.props;
 
 		return createElement( tagName, {
 			ref: ( node ) => this.editorNode = node,
@@ -100,6 +92,6 @@ export default class TinyMCE extends Component {
 			className: classnames( className, 'blocks-editable__tinymce' ),
 			style,
 			'aria-label': label,
-		}, children );
+		} );
 	}
 }
