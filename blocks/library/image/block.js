@@ -110,23 +110,24 @@ class ImageBlock extends Component {
 						value={ align }
 						onChange={ this.updateAlignment }
 					/>
-
-					<Toolbar>
-						<li>
-							<MediaUploadButton
-								buttonProps={ {
-									className: 'components-icon-button components-toolbar__control',
-									'aria-label': __( 'Edit image' ),
-								} }
-								onSelect={ this.onSelectImage }
-								type="image"
-								value={ id }
-							>
-								<Dashicon icon="edit" />
-							</MediaUploadButton>
-						</li>
-						<UrlInputButton onChange={ this.onSetHref } url={ href } />
-					</Toolbar>
+					{focus.editable !== 'caption' &&
+						<Toolbar>
+							<li>
+								<MediaUploadButton
+									buttonProps={ {
+										className: 'components-icon-button components-toolbar__control',
+										'aria-label': __( 'Edit image' ),
+									} }
+									onSelect={ this.onSelectImage }
+									type="image"
+									value={ id }
+								>
+									<Dashicon icon="edit" />
+								</MediaUploadButton>
+							</li>
+							<UrlInputButton onChange={ this.onSetHref } url={ href } />
+						</Toolbar>
+					}
 				</BlockControls>
 			)
 		);
@@ -248,7 +249,6 @@ class ImageBlock extends Component {
 						focus={ focus && focus.editable === 'caption' ? focus : undefined }
 						onFocus={ focusCaption }
 						onChange={ ( value ) => setAttributes( { caption: value } ) }
-						inlineToolbar
 					/>
 				) : null }
 			</figure>,

@@ -165,8 +165,8 @@ class UrlInputButton extends Component {
 						enterActive: 'is-entering-active',
 						leave: 'is-leaving',
 						leaveActive: 'is-leaving-active' } }
-					transitionEnterTimeout={ 300 }
-					transitionLeaveTimeout={ 300 } >
+					transitionEnterTimeout={ 250 }
+					transitionLeaveTimeout={ 250 } >
 					{ expanded &&
 					<form
 						className="blocks-format-toolbar__link-modal"

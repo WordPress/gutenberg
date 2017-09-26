@@ -129,12 +129,12 @@ ul.components-toolbar > li.blocks-url-input__button {
 	&.is-entering-active {
 		opacity: 1;
 		transform: translate(0);
-		transition: opacity 300ms ease-in, transform 300ms ease-in;
+		transition: opacity 250ms ease-in, transform 250ms ease-in;
 	}
 
 	&.is-leaving {
 		opacity: 1;
-		transition: opacity 300ms ease-out, transform 300ms ease-out;
+		transition: opacity 250ms ease-out, transform 250ms ease-out;
 	}
 
 	&.is-leaving-active {
