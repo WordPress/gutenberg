@@ -14,6 +14,11 @@ body.gutenberg_page_gutenberg-demo {
 		display: none;
 	}
 
+	.a11y-speak-region {
+		left: -1px;
+		top: -1px;
+	}
+
 	svg {
 		fill: currentColor;
 	}
