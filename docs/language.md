@@ -18,6 +18,14 @@ The problem an editor like Gutenberg faces is that once things have been transfo
 
 Additionally, how do we even know this came from our editor? Maybe someone snuck it in by hand when trying to quickly jump in and change the page. The structure of the higher-level meaning is implicit and indistinguishable from the same markup when entered manually. When Gutenberg operates on a block, it knows its type and attributes without inspecting the HTML source.
 
+## The post dichotomy
+
+A Gutenberg post is the proper block-aware representation of a post, a collection of semantically consistent descriptions of what each block is and what its essential data is. This representation only ever exists in memory. It is the [FIXME] working plate [/FIXME] in the typesetter's workshop, ever-shifting as types are attached and repositioned.
+
+A Gutenberg post is not the artefact it produces, namely the `post_content`. The latter is the printed page, optimized for the reader, but retaining its invisible markings for later editing.
+
+Later sections of this document will refer to _Gutenberg post_ and to _blocks_. These are to be assumed to not be the `post_content` or the invisible markings.
+
 ## A Tree of Blocks
 
 During runtime, blocks are kept in memory, Thus, a Gutenberg post isn't HTML, but a tree of objects and associated attributes. Gutenberg relies on a structure-preserving data model so that the editors and views for specific block types can remain independent from the final rendered HTML. It's a tree similar to how HTML is a tree, though at the top-level it's just a list of nodes—it needs no "root node".
