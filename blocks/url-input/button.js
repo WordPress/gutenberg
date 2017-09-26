@@ -119,7 +119,7 @@ class UrlInputButton extends Component {
 		if ( steps[ currentStep ] === EditStep ) {
 			return [
 				<UrlInput key="urlinput" value={ url || '' } onChange={ this.changeLink } required={ ! isDeleted } />,
-				<IconButton key="iconbutton" icon="dismiss" label={ __( 'Un-link' ) } disabled={ ! url } onClick={ this.deleteLink } />,
+				<IconButton key="iconbutton" className="blocks-url-input__unlink" icon="dismiss" label={ __( 'Un-link' ) } disabled={ ! url } onClick={ this.deleteLink } />,
 			];
 		} else if ( steps[ currentStep ] === DisplayStep ) {
 			return [
