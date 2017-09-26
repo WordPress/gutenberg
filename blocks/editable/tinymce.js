@@ -2,7 +2,6 @@
  * External dependencies
  */
 import tinymce from 'tinymce';
-import { isEqual } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -13,32 +12,6 @@ import { Component, createElement } from '@wordpress/element';
 export default class TinyMCE extends Component {
 	componentDidMount() {
 		this.initialize();
-	}
-
-	shouldComponentUpdate() {
-		// We must prevent rerenders because TinyMCE will modify the DOM, thus
-		// breaking React's ability to reconcile changes.
-		//
-		// See: https://github.com/facebook/react/issues/6802
-		return false;
-	}
-
-	componentWillReceiveProps( nextProps ) {
-		const name = 'data-is-placeholder-visible';
-		const isPlaceholderVisible = String( !! nextProps.isPlaceholderVisible );
-
-		if ( this.editorNode.getAttribute( name ) !== isPlaceholderVisible ) {
-			this.editorNode.setAttribute( name, isPlaceholderVisible );
-		}
-
-		if ( ! isEqual( this.props.style, nextProps.style ) ) {
-			this.editorNode.setAttribute( 'style', '' );
-			Object.assign( this.editorNode.style, nextProps.style );
-		}
-
-		if ( ! isEqual( this.props.className, nextProps.className ) ) {
-			this.editorNode.className = classnames( nextProps.className, 'blocks-editable__tinymce' );
-		}
 	}
 
 	componentWillUnmount() {
@@ -83,7 +56,7 @@ export default class TinyMCE extends Component {
 	}
 
 	render() {
-		const { tagName = 'div', style, label, className } = this.props;
+		const { tagName = 'div', style, label, className, isPlaceholderVisible } = this.props;
 
 		return createElement( tagName, {
 			ref: ( node ) => this.editorNode = node,
@@ -92,6 +65,7 @@ export default class TinyMCE extends Component {
 			className: classnames( className, 'blocks-editable__tinymce' ),
 			style,
 			'aria-label': label,
+			'data-is-placeholder-visible': isPlaceholderVisible,
 		} );
 	}
 }
