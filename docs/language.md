@@ -20,7 +20,7 @@ Additionally, how do we even know this came from our editor? Maybe someone snuck
 
 ## The post dichotomy
 
-A Gutenberg post is the proper block-aware representation of a post, a collection of semantically consistent descriptions of what each block is and what its essential data is. This representation only ever exists in memory. It is the [FIXME] working plate [/FIXME] in the typesetter's workshop, ever-shifting as types are attached and repositioned.
+A Gutenberg post is the proper block-aware representation of a post, a collection of semantically consistent descriptions of what each block is and what its essential data is. This representation only ever exists in memory. It is the [forme](https://en.wikipedia.org/wiki/Forme_(printing)) in the typesetter's workshop, ever-shifting as type elements are attached and repositioned.
 
 A Gutenberg post is not the artefact it produces, namely the `post_content`. The latter is the printed page, optimized for the reader, but retaining its invisible markings for later editing.
 
