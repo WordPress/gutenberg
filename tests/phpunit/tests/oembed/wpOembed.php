@@ -69,4 +69,106 @@ class Tests_WP_oEmbed extends WP_UnitTestCase {
 		$this->assertNotFalse( $this->pre_oembed_result_filtered );
 		$this->assertFalse( $actual );
 	}
+
+	/**
+	 * @ticket 40673
+	 * @group multisite
+	 * @group ms-required
+	 */
+	public function test_wp_filter_pre_oembed_result_multisite_root_root() {
+		$post_id   = self::factory()->post->create();
+		$permalink = get_permalink( $post_id );
+
+		add_filter( 'pre_oembed_result', array( $this, '_filter_pre_oembed_result' ) );
+		$actual = $this->oembed->get_html( $permalink );
+		remove_filter( 'pre_oembed_result', array( $this, '_filter_pre_oembed_result' ) );
+
+		$this->assertNotNull( $this->pre_oembed_result_filtered );
+		$this->assertEquals( $this->pre_oembed_result_filtered, $actual );
+	}
+
+	/**
+	 * @ticket 40673
+	 * @group multisite
+	 * @group ms-required
+	 */
+	public function test_wp_filter_pre_oembed_result_multisite_sub_samesub() {
+		$user_id = self::factory()->user->create();
+
+		$blog_id = self::factory()->blog->create( array(
+			'user_id' => $user_id,
+		) );
+
+		switch_to_blog( $blog_id );
+
+		$post_id   = self::factory()->post->create();
+		$permalink = get_permalink( $post_id );
+
+		add_filter( 'pre_oembed_result', array( $this, '_filter_pre_oembed_result' ) );
+		$actual = $this->oembed->get_html( $permalink );
+		remove_filter( 'pre_oembed_result', array( $this, '_filter_pre_oembed_result' ) );
+
+		restore_current_blog();
+
+		$this->assertNotNull( $this->pre_oembed_result_filtered );
+		$this->assertEquals( $this->pre_oembed_result_filtered, $actual );
+	}
+
+	/**
+	 * @ticket 40673
+	 * @group multisite
+	 * @group ms-required
+	 */
+	public function test_wp_filter_pre_oembed_result_multisite_sub_othersub() {
+		$user_id = self::factory()->user->create();
+
+		$blog_id = self::factory()->blog->create( array(
+			'user_id' => $user_id,
+		) );
+
+		switch_to_blog( $blog_id );
+
+		$post_id   = self::factory()->post->create();
+		$permalink = get_permalink( $post_id );
+
+		$blog_id = self::factory()->blog->create( array(
+			'user_id' => $user_id,
+		) );
+
+		switch_to_blog( $blog_id );
+
+		add_filter( 'pre_oembed_result', array( $this, '_filter_pre_oembed_result' ) );
+		$actual = $this->oembed->get_html( $permalink );
+		remove_filter( 'pre_oembed_result', array( $this, '_filter_pre_oembed_result' ) );
+
+		restore_current_blog();
+
+		$this->assertNotNull( $this->pre_oembed_result_filtered );
+		$this->assertEquals( $this->pre_oembed_result_filtered, $actual );
+	}
+
+	/**
+	 * @ticket 40673
+	 * @group multisite
+	 * @group ms-required
+	 */
+	public function test_wp_filter_pre_oembed_result_multisite_sub_main() {
+		$post_id   = self::factory()->post->create();
+		$permalink = get_permalink( $post_id );
+		$user_id   = self::factory()->user->create();
+		$blog_id   = self::factory()->blog->create( array(
+			'user_id' => $user_id,
+		) );
+
+		switch_to_blog( $blog_id );
+
+		add_filter( 'pre_oembed_result', array( $this, '_filter_pre_oembed_result' ) );
+		$actual = $this->oembed->get_html( $permalink );
+		remove_filter( 'pre_oembed_result', array( $this, '_filter_pre_oembed_result' ) );
+
+		restore_current_blog();
+
+		$this->assertNotNull( $this->pre_oembed_result_filtered );
+		$this->assertEquals( $this->pre_oembed_result_filtered, $actual );
+	}
 }
