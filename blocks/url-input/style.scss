@@ -75,6 +75,7 @@ ul.components-toolbar > li.blocks-url-input__button {
 		height: 24px;
 		right: -1px;
 		background: $light-gray-500;
+		z-index: -1;
 	}
 }
 
@@ -90,6 +91,7 @@ ul.components-toolbar > li.blocks-url-input__button {
 		height: 24px;
 		left: -1px;
 		background: $light-gray-500;
+		z-index: -1;
 	}
 }
 
