@@ -12,7 +12,6 @@ import {
 	find,
 	defer,
 	noop,
-	isString,
 } from 'lodash';
 import { Fill } from 'react-slot-fill';
 import 'element-closest';
@@ -50,15 +49,7 @@ function nodeListToString( nodeList ) {
 export default class Editable extends Component {
 	constructor( props ) {
 		super( ...arguments );
-
 		const { value } = props;
-		if ( 'production' !== process.env.NODE_ENV && undefined !== value &&
-					! isString( value ) ) {
-			// eslint-disable-next-line no-console
-			console.error(
-				`Invalid value of type ${ typeof value } passed to Editable (expected string).`
-			);
-		}
 
 		this.onInit = this.onInit.bind( this );
 		this.getSettings = this.getSettings.bind( this );
