@@ -242,6 +242,19 @@ export function removeBlock( uid ) {
 }
 
 /**
+ * Returns an action object used to toggle the block editing mode (visual/html)
+ *
+ * @param  {String} uid Block UID
+ * @return {Object}     Action object
+ */
+export function toggleBlockMode( uid ) {
+	return {
+		type: 'TOGGLE_BLOCK_MODE',
+		uid,
+	};
+}
+
+/**
  * Returns an action object used in signalling that the user has begun to type.
  *
  * @return {Object}     Action object

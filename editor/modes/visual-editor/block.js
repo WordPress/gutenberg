@@ -20,6 +20,7 @@ import InvalidBlockWarning from './invalid-block-warning';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockDropZone from './block-drop-zone';
+import BlockHtml from './block-html';
 import BlockMover from '../../block-mover';
 import BlockRightMenu from '../../block-settings-menu';
 import BlockToolbar from '../../block-toolbar';
@@ -49,6 +50,7 @@ import {
 	isBlockSelected,
 	isFirstMultiSelectedBlock,
 	isTyping,
+	getBlockMode,
 } from '../../selectors';
 
 const { BACKSPACE, ESCAPE, DELETE, ENTER } = keycodes;
@@ -278,7 +280,7 @@ class VisualEditorBlock extends Component {
 	}
 
 	render() {
-		const { block, multiSelectedBlockUids, order } = this.props;
+		const { block, multiSelectedBlockUids, order, mode } = this.props;
 		const { name: blockName, isValid } = block;
 		const blockType = getBlockType( blockName );
 		// translators: %s: Type of block (i.e. Text, Image etc)
@@ -341,7 +343,7 @@ class VisualEditorBlock extends Component {
 				<BlockDropZone index={ order } />
 				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
 				{ ( showUI || isHovered ) && <BlockRightMenu uid={ block.uid } /> }
-				{ showUI && isValid && <BlockToolbar uid={ block.uid } /> }
+				{ showUI && isValid && mode === 'visual' && <BlockToolbar uid={ block.uid } /> }
 
 				{ isFirstMultiSelected && (
 					<BlockMover uids={ multiSelectedBlockUids } />
@@ -353,32 +355,33 @@ class VisualEditorBlock extends Component {
 					className="editor-visual-editor__block-edit"
 				>
 					<BlockCrashBoundary onError={ this.onBlockError }>
-						{ isValid
-							? (
-								<BlockEdit
-									focus={ focus }
-									attributes={ block.attributes }
-									setAttributes={ this.setAttributes }
-									insertBlocksAfter={ this.insertBlocksAfter }
-									onReplace={ onReplace }
-									setFocus={ partial( onFocus, block.uid ) }
-									mergeBlocks={ this.mergeBlocks }
-									className={ className }
-									id={ block.uid }
-								/>
-							)
-							: [
-								createElement( blockType.save, {
-									key: 'invalid-preview',
-									attributes: block.attributes,
-									className,
-								} ),
-								<InvalidBlockWarning
-									key="invalid-warning"
-									block={ block }
-								/>,
-							]
-						}
+						{ isValid && mode === 'visual' && (
+							<BlockEdit
+								focus={ focus }
+								attributes={ block.attributes }
+								setAttributes={ this.setAttributes }
+								insertBlocksAfter={ this.insertBlocksAfter }
+								onReplace={ onReplace }
+								setFocus={ partial( onFocus, block.uid ) }
+								mergeBlocks={ this.mergeBlocks }
+								className={ className }
+								id={ block.uid }
+							/>
+						) }
+						{ isValid && mode === 'html' && (
+							<BlockHtml uid={ block.uid } />
+						) }
+						{ ! isValid && [
+							createElement( blockType.save, {
+								key: 'invalid-preview',
+								attributes: block.attributes,
+								className,
+							} ),
+							<InvalidBlockWarning
+								key="invalid-warning"
+								block={ block }
+							/>,
+						] }
 					</BlockCrashBoundary>
 				</div>
 				{ !! error && <BlockCrashWarning /> }
@@ -403,6 +406,7 @@ export default connect(
 			order: getBlockIndex( state, ownProps.uid ),
 			multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
 			meta: getEditedPostAttribute( state, 'meta' ),
+			mode: getBlockMode( state, ownProps.uid ),
 		};
 	},
 	( dispatch, ownProps ) => ( {
