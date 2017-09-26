@@ -11,12 +11,13 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { withInstanceId, withSpokenMessages } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
-import { getCategories, getBlockTypes, BlockIcon } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
+import { getCategories, getBlockTypes } from '../api';
+import BlockIcon from '../block-icon';
 import { getBlocks, getRecentlyUsedBlocks } from '../selectors';
 import { showInsertionPoint, hideInsertionPoint } from '../actions';
 

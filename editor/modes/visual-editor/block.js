@@ -13,12 +13,12 @@ import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
 import { Children, Component, createElement } from '@wordpress/element';
 import { IconButton, Toolbar } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
-import { getBlockType, getBlockDefaultClassname, createBlock } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
+import { getBlockType, getBlockDefaultClassname, createBlock } from '../../api';
 import InvalidBlockWarning from './invalid-block-warning';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';

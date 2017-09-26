@@ -9,12 +9,12 @@ import { flowRight } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Button, PanelBody, Spinner, ResponsiveWrapper, withAPIData } from '@wordpress/components';
-import { MediaUploadButton } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
+import MediaUploadButton from '../../media-upload-button';
 import { getEditedPostAttribute, isEditorSidebarPanelOpened } from '../../selectors';
 import { editPost, toggleSidebarPanel } from '../../actions';
 

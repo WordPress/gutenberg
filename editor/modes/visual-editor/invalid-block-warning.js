@@ -13,15 +13,15 @@ import { Button } from '@wordpress/components';
  * Internal dependencies
  */
 import BlockWarning from './block-warning';
-import {
-	getBlockType,
-	getUnknownTypeHandlerName,
-	createBlock,
-} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
+import {
+	getBlockType,
+	getUnknownTypeHandlerName,
+	createBlock,
+} from '../../api';
 import { replaceBlock } from '../../actions';
 
 function InvalidBlockWarning( { ignoreInvalid, switchToBlockType } ) {

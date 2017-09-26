@@ -22,7 +22,7 @@ Let's render a customized greeting into an empty element:
 <div id="greeting"></div>
 <script>
 function Greeting( props ) {
-	return wp.element.createElement( 'span', null, 
+	return wp.element.createElement( 'span', null,
 		'Hello ' + props.toWhom + '!'
 	);
 }
@@ -38,9 +38,9 @@ Refer to the [official React Quick Start guide](https://facebook.github.io/react
 
 ## Why React?
 
-At the risk of igniting debate surrounding any single "best" front-end framework, the choice to use any tool should be motivated specifically to serve the requirements of the system. In modeling the concept of a [block](../blocks/README.md), we observe the following technical requirements:
+At the risk of igniting debate surrounding any single "best" front-end framework, the choice to use any tool should be motivated specifically to serve the requirements of the system. In modeling the concept of a [block](../editor/README.md), we observe the following technical requirements:
 
-- An understanding of a block in terms of its underlying values (in the [random image example](../blocks/README.md#example), a category)
+- An understanding of a block in terms of its underlying values (in the [random image example](../editor/README.md#example), a category)
 - A means to describe the UI of a block given these values
 
 At its most basic, React provides a simple input / output mechanism. __Given a set of inputs ("props"), a developer describes the output to be shown on the page.__ This is most elegantly observed in its [function components](https://facebook.github.io/react/docs/components-and-props.html#functional-and-class-components). React serves the role of reconciling the desired output with the current state of the page.

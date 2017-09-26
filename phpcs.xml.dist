@@ -18,7 +18,7 @@
 
 	<file>gutenberg.php</file>
 	<file>./lib</file>
-	<file>./blocks/library</file>
+	<file>./editor/library</file>
 	<exclude-pattern>./lib/parser.php</exclude-pattern>
 	<file>./phpunit</file>
 	<file>./bin</file>

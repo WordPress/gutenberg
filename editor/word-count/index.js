@@ -4,10 +4,10 @@
 import { connect } from 'react-redux';
 
 /**
- * WordPress dependencies
+ * Internal dependencies
  */
 import { getBlocks } from '../selectors';
-import { serialize } from 'blocks';
+import { serialize } from '../api';
 
 function WordCount( { content } ) {
 	const wordCount = wp.utils.WordCounter.prototype.count( content );

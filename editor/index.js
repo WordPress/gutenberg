@@ -1,152 +1,31 @@
 /**
- * External dependencies
- */
-import { bindActionCreators } from 'redux';
-import { Provider as ReduxProvider } from 'react-redux';
-import { Provider as SlotFillProvider } from 'react-slot-fill';
-import { flow, pick } from 'lodash';
-import moment from 'moment-timezone';
-import 'moment-timezone/moment-timezone-utils';
-
-/**
- * WordPress dependencies
- */
-import { EditableProvider } from '@wordpress/blocks';
-import { createElement, render } from '@wordpress/element';
-import { APIProvider, PopoverProvider, DropZoneProvider } from '@wordpress/components';
-import { settings as dateSettings } from '@wordpress/date';
-
-/**
  * Internal dependencies
  */
-import './assets/stylesheets/main.scss';
-import Layout from './layout';
-import createReduxStore from './store';
-import { setInitialPost, undo } from './actions';
-import EditorSettingsProvider from './settings/provider';
+import './library';
 
-/**
- * The default editor settings
- * You can override any default settings when calling createEditorInstance
- *
- *  wideImages   boolean   Enable/Disable Wide/Full Alignments
- *
- * @var {Object} DEFAULT_SETTINGS
- */
-const DEFAULT_SETTINGS = {
-	wideImages: false,
+// A "block" is the abstract term used to describe units of markup that,
+// when composed together, form the content or layout of a page.
+// The API for blocks is exposed via `wp.editor`.
+//
+// Supported blocks are registered by calling `registerBlockType`. Once registered,
+// the block is made available as an option to the editor interface.
+//
+// Blocks are inferred from the HTML source of a post through a parsing mechanism
+// and then stored as objects in state, from which it is then rendered for editing.
+export * from './api';
 
-	// This is current max width of the block inner area
-	// It's used to constraint image resizing and this value could be overriden later by themes
-	maxWidth: 608,
-};
+// Reusable Editor Components
+export { default as AlignmentToolbar } from './alignment-toolbar';
+export { default as BlockAlignmentToolbar } from './block-alignment-toolbar';
+export { default as BlockControls } from './block-controls';
+export { default as BlockDescription } from './block-description';
+export { default as BlockIcon } from './block-icon';
+export { default as ColorPalette } from './color-palette';
+export { default as Editable } from './editable';
+export { default as InspectorControls } from './inspector-controls';
+export { default as MediaUploadButton } from './media-upload-button';
+export { default as UrlInput } from './url-input';
+export { default as UrlInputButton } from './url-input/button';
 
-// Configure moment globally
-moment.locale( dateSettings.l10n.locale );
-if ( dateSettings.timezone.string ) {
-	moment.tz.setDefault( dateSettings.timezone.string );
-} else {
-	const momentTimezone = {
-		name: 'WP',
-		abbrs: [ 'WP' ],
-		untils: [ null ],
-		offsets: [ -dateSettings.timezone.offset * 60 ],
-	};
-	const unpackedTimezone = moment.tz.pack( momentTimezone );
-	moment.tz.add( unpackedTimezone );
-	moment.tz.setDefault( 'WP' );
-}
-
-/**
- * Initializes and returns an instance of Editor.
- *
- * @param {String}  id       Unique identifier for editor instance
- * @param {Object}  post     API entity for post to edit
- * @param {?Object} settings Editor settings object
- */
-export function createEditorInstance( id, post, settings ) {
-	const store = createReduxStore();
-	const target = document.getElementById( id );
-
-	settings = {
-		...DEFAULT_SETTINGS,
-		...settings,
-	};
-
-	store.dispatch( { type: 'SETUP_EDITOR' } );
-
-	store.dispatch( setInitialPost( post ) );
-
-	const providers = [
-		// Redux provider:
-		//
-		//  - context.store
-		[
-			ReduxProvider,
-			{ store },
-		],
-
-		// Slot / Fill provider:
-		//
-		//  - context.slots
-		//  - context.fills
-		[
-			SlotFillProvider,
-		],
-
-		// Editable provider:
-		//
-		//  - context.onUndo
-		[
-			EditableProvider,
-			bindActionCreators( {
-				onUndo: undo,
-			}, store.dispatch ),
-		],
-
-		// Editor settings provider:
-		//
-		//  - context.editor
-		[
-			EditorSettingsProvider,
-			{ settings },
-		],
-
-		// Popover provider:
-		//
-		//  - context.popoverTarget
-		[
-			PopoverProvider,
-			{ target },
-		],
-
-		// APIProvider
-		//
-		//  - context.getAPISchema
-		//  - context.getAPIPostTypeRestBaseMapping
-		//  - context.getAPITaxonomyRestBaseMapping
-		[
-			APIProvider,
-			{
-				...wpApiSettings,
-				...pick( wp.api, [
-					'postTypeRestBaseMapping',
-					'taxonomyRestBaseMapping',
-				] ),
-			},
-		],
-
-		// DropZone provider:
-		[
-			DropZoneProvider,
-		],
-	];
-
-	const createEditorElement = flow(
-		providers.map( ( [ Component, props ] ) => (
-			( children ) => createElement( Component, props, children )
-		) )
-	);
-
-	render( createEditorElement( <Layout /> ), target );
-}
+// Editor API
+export { default as createEditorInstance } from './editor';

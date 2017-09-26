@@ -10,11 +10,11 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/components';
 import { Component } from '@wordpress/element';
-import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
+import { createBlock } from '../../api';
 import Inserter from '../../inserter';
 import { insertBlock } from '../../actions';
 

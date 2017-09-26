@@ -9,12 +9,12 @@ import { first, last } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/components';
-import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
+import { getBlockType } from '../api';
 import { isFirstBlock, isLastBlock, getBlockIndex, getBlock } from '../selectors';
 import { getBlockMoverLabel } from './mover-label';
 

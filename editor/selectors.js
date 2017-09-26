@@ -17,9 +17,13 @@ import createSelector from 'rememo';
 /**
  * WordPress dependencies
  */
-import { serialize, getBlockType } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
+
+/**
+ * Internal dependencies
+ */
+import { serialize, getBlockType } from './api';
 
 /**
  * Returns the current editing mode.

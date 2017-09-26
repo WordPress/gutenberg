@@ -26,7 +26,7 @@ if ( gutenberg_can_init() ) {
 	require_once dirname( __FILE__ ) . '/lib/register.php';
 
 	// Register server-side code for individual blocks.
-	foreach ( glob( dirname( __FILE__ ) . '/blocks/library/*/index.php' ) as $block_logic ) {
+	foreach ( glob( dirname( __FILE__ ) . '/editor/library/*/index.php' ) as $block_logic ) {
 		require_once $block_logic;
 	}
 }

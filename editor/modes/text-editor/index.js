@@ -9,12 +9,12 @@ import Textarea from 'react-autosize-textarea';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { parse } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
+import { parse } from '../../api';
 import PostTitle from '../../post-title';
 import { getEditedPostContent } from '../../selectors';
 import { editPost, resetBlocks } from '../../actions';

@@ -7,12 +7,12 @@ import { get, uniqueId } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { parse, getBlockType, switchToBlockType } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
+import { parse, getBlockType, switchToBlockType } from './api';
 import { getGutenbergURL, getWPAdminURL } from './utils/url';
 import {
 	resetPost,

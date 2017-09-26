@@ -7,13 +7,14 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { getBlockType, InspectorControls } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { ClipboardButton, Tooltip, PanelBody } from '@wordpress/components';
 
 /**
  * Internal Dependencies
  */
+import { getBlockType } from '../../api';
+import InspectorControls from '../../inspector-controls';
 import { updateBlockAttributes } from '../../actions';
 import { getSelectedBlock, getCurrentPost } from '../../selectors';
 import { filterURLForDisplay } from '../../utils/url';

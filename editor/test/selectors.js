@@ -7,11 +7,11 @@ import moment from 'moment';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
+import { registerBlockType, unregisterBlockType } from '../api';
 import {
 	getEditorMode,
 	getPreference,

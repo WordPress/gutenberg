@@ -31,7 +31,7 @@ function register_block_type( $name, $args = array() ) {
 }
 
 // Register server-side code for individual blocks.
-foreach ( glob( dirname( dirname( __FILE__ ) ) . '/blocks/library/*/index.php' ) as $block_logic ) {
+foreach ( glob( dirname( dirname( __FILE__ ) ) . '/editor/library/*/index.php' ) as $block_logic ) {
 	require_once $block_logic;
 }
 

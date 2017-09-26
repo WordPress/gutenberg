@@ -9,12 +9,12 @@ import { connect } from 'react-redux';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { Popover, IconButton } from '@wordpress/components';
-import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import InserterMenu from './menu';
+import { createBlock } from '../api';
 import { getBlockInsertionPoint, getEditorMode } from '../selectors';
 import { insertBlock, hideInsertionPoint } from '../actions';
 

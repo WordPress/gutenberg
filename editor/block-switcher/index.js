@@ -11,12 +11,12 @@ import clickOutside from 'react-click-outside';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { Dashicon, IconButton } from '@wordpress/components';
-import { getBlockType, getBlockTypes, switchToBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
+import { getBlockType, getBlockTypes, switchToBlockType } from '../api';
 import { replaceBlocks } from '../actions';
 import { getBlock } from '../selectors';
 

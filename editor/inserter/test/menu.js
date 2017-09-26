@@ -5,13 +5,9 @@ import { mount } from 'enzyme';
 import { noop } from 'lodash';
 
 /**
- * WordPress dependencies
- */
-import { registerBlockType, unregisterBlockType, getBlockTypes } from '@wordpress/blocks';
-
-/**
  * Internal dependencies
  */
+import { registerBlockType, unregisterBlockType, getBlockTypes } from '../../api';
 import { InserterMenu, searchBlocks } from '../menu';
 
 const textBlock = {

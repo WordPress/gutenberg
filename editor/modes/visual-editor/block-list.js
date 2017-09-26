@@ -9,11 +9,11 @@ import { throttle, mapValues, noop, invert } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { serialize, getDefaultBlockName, createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
+import { serialize, getDefaultBlockName, createBlock } from '../../api';
 import VisualEditorBlock from './block';
 import BlockDropZone from './block-drop-zone';
 import {

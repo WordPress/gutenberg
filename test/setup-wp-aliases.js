@@ -4,7 +4,6 @@
 	'i18n',
 	'components',
 	'utils',
-	'blocks',
 	'date',
 	'editor',
 ].forEach( entryPointName => {

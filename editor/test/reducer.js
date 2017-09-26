@@ -5,13 +5,9 @@ import { values, noop } from 'lodash';
 import deepFreeze from 'deep-freeze';
 
 /**
- * WordPress dependencies
- */
-import { registerBlockType, unregisterBlockType, getBlockType } from '@wordpress/blocks';
-
-/**
  * Internal dependencies
  */
+import { registerBlockType, unregisterBlockType, getBlockType } from '../api';
 import {
 	getPostRawValue,
 	editor,
@@ -784,6 +780,10 @@ describe( 'state', () => {
 	} );
 
 	describe( 'preferences()', () => {
+		beforeEach( () => {
+			require( '../blocks' );
+		} );
+
 		it( 'should apply all defaults', () => {
 			const state = preferences( undefined, {} );
 

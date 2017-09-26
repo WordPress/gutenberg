@@ -4,13 +4,9 @@
 import { noop } from 'lodash';
 
 /**
- * WordPress dependencies
- */
-import { getBlockTypes, unregisterBlockType, registerBlockType, createBlock } from '@wordpress/blocks';
-
-/**
  * Internal dependencies
  */
+import { getBlockTypes, unregisterBlockType, registerBlockType, createBlock } from '../api';
 import {
 	resetPost,
 	setupNewPost,

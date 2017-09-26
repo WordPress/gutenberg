@@ -8,11 +8,11 @@ import { reduce, get, find } from 'lodash';
  * WordPress dependencies
  */
 import { DropZone } from '@wordpress/components';
-import { getBlockTypes } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
+import { getBlockTypes } from '../../api';
 import { insertBlocks } from '../../actions';
 
 function BlockDropZone( { index, ...props } ) {

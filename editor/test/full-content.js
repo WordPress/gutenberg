@@ -92,7 +92,7 @@ describe( 'full post content fixture', () => {
 		window._wpBlocksAttributes = require( './server-attributes.json' );
 
 		// Register all blocks.
-		require( 'blocks' );
+		require( '../library' );
 	} );
 
 	fileBasenames.forEach( f => {

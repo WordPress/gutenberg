@@ -9,6 +9,10 @@ import { shallow } from 'enzyme';
 import { VisualEditorInserter } from '../inserter';
 
 describe( 'VisualEditorInserter', () => {
+	beforeAll( () => {
+		require( '../../../library' );
+	} );
+
 	it( 'should show controls when receiving focus', () => {
 		const wrapper = shallow( <VisualEditorInserter /> );
 
