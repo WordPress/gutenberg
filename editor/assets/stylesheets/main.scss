@@ -10,6 +10,10 @@ body.gutenberg_page_gutenberg-demo {
 		padding-left: 0;
 	}
 
+	#wpbody-content {
+		padding-bottom: 0;
+	}
+
 	#wpfooter {
 		display: none;
 	}
@@ -51,6 +55,11 @@ body.gutenberg_page_gutenberg-demo {
 
 .gutenberg__editor {
 	position: relative;
+	height: calc( 100vh - #{ $admin-bar-height-big } );
+
+	@include break-medium {
+		height: calc( 100vh - #{ $admin-bar-height } );
+	}
 
 	img {
 		max-width: 100%;

@@ -1,5 +1,18 @@
+.editor-layout,
+.editor-layout__content {
+	height: 100%;
+}
+
 .editor-layout {
 	position: relative;
+}
+
+.editor-layout__content {
+	margin-top: #{ -1 * $header-height };
+
+	@include break-medium {
+		margin-top: 0;
+	}
 }
 
 .editor-layout .components-notice-list {
