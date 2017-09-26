@@ -140,6 +140,16 @@ class Tests_Theme_WPTheme extends WP_UnitTestCase {
 		$this->assertFalse( $theme->display( 'Tags' ) );
 	}
 
+	/**
+	 * @ticket 40820
+	 */
+	function test_child_theme_with_itself_as_parent_should_appear_as_broken() {
+		$theme = new WP_Theme( 'child-parent-itself', $this->theme_root );
+		$errors = $theme->errors();
+		$this->assertWPError( $errors );
+		$this->assertEquals( 'theme_child_invalid', $errors->get_error_code() );
+	}
+
 
 	/**
 	 * Enable a single theme on a network.

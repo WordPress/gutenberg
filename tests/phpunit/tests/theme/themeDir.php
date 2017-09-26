@@ -175,8 +175,20 @@ class Tests_Theme_ThemeDir extends WP_UnitTestCase {
 	 * @expectedDeprecated get_broken_themes
 	 */
 	function test_broken_themes() {
-		$themes = get_themes();
-		$expected = array('broken-theme' => array('Name' => 'broken-theme', 'Title' => 'broken-theme', 'Description' => __('Stylesheet is missing.')));
+		$themes   = get_themes();
+
+		$expected = array(
+			'broken-theme'           => array(
+				'Name'        => 'broken-theme',
+				'Title'       => 'broken-theme',
+				'Description' => __( 'Stylesheet is missing.' ),
+			),
+			'Child and Parent Theme' => array(
+				'Name'        => 'Child and Parent Theme',
+				'Title'       => 'Child and Parent Theme',
+				'Description' => sprintf( __( 'The theme defines itself as its parent theme. Please check the "%s" header.' ), 'Template' ),
+			),
+		);
 
 		$this->assertEquals($expected, get_broken_themes() );
 	}
