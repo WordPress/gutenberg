@@ -45,7 +45,7 @@ class BlockAutocomplete extends Component {
 				triggerPrefix="/"
 				options={ options }
 				onSelect={ this.onSelect }
-				className="blocks-block-autocomplete"
+				className="editor-block-autocomplete"
 			>
 				{ children }
 			</Autocomplete>

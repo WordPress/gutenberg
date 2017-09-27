@@ -169,7 +169,7 @@ export default class OldEditor extends Component {
 			<div
 				key="editor"
 				id={ id }
-				className="blocks-editable__tinymce"
+				className="editor-editable__tinymce"
 			/>,
 		];
 	}

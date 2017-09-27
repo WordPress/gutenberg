@@ -1,5 +1,5 @@
 // Link input
-.blocks-url-input {
+.editor-url-input {
 	width: 100%;
 	flex-grow: 1;
 	position: relative;
@@ -27,7 +27,7 @@
 	}
 }
 
-.blocks-url-input__suggestions {
+.editor-url-input__suggestions {
 	position: absolute;
 	top: 100%;
 	left: 0;
@@ -39,10 +39,10 @@
 	list-style: none;
 	margin: 0;
 	box-shadow: 0px 3px 20px rgba( 18, 24, 30, .1 ), 0px 1px 3px rgba( 18, 24, 30, .1 );
-	z-index: z-index( '.blocks-url-input__suggestions' )
+	z-index: z-index( '.editor-url-input__suggestions' )
 }
 
-.blocks-url-input__suggestion {
+.editor-url-input__suggestion {
 	color: $dark-gray-500;
 	display: block;
 	font-size: $default-font-size;
@@ -60,11 +60,11 @@
 }
 
 // Toolbar button
-ul.components-toolbar > li.blocks-url-input__button {
+ul.components-toolbar > li.editor-url-input__button {
 	position: inherit;	// let the dialog position according to parent
 }
 
-.blocks-url-input__button .blocks-url-input__back {
+.editor-url-input__button .editor-url-input__back {
 	margin-right: 4px;
 	overflow: visible;
 
@@ -79,7 +79,7 @@ ul.components-toolbar > li.blocks-url-input__button {
 	}
 }
 
-.blocks-url-input__button .blocks-url-input__suggestions {
+.editor-url-input__button .editor-url-input__suggestions {
 	left: -40px;
 	right: -32px;
 }

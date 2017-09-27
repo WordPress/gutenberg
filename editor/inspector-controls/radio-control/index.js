@@ -19,15 +19,15 @@ function RadioControl( { label, selected, help, instanceId, onChange, options = 
 	const onChangeValue = ( event ) => onChange( event.target.value );
 
 	return ! isEmpty( options ) && (
-		<BaseControl label={ label } id={ id } help={ help } className="blocks-radio-control">
+		<BaseControl label={ label } id={ id } help={ help } className="editor-radio-control">
 			{ options.map( ( option, index ) =>
 				<div
 					key={ ( id + '-' + index ) }
-					className="blocks-radio-control__option"
+					className="editor-radio-control__option"
 				>
 					<input
 						id={ ( id + '-' + index ) }
-						className="blocks-radio-control__input"
+						className="editor-radio-control__input"
 						type="radio"
 						name={ id }
 						value={ option.value }

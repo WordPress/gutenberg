@@ -1,11 +1,11 @@
 $color-palette-circle-size: 28px;
 $color-palette-circle-spacing: 14px;
 
-.blocks-color-palette {
+.editor-color-palette {
 	margin-right: -14px;
 }
 
-.blocks-color-palette__item-wrapper {
+.editor-color-palette__item-wrapper {
 	display: inline-block;
 	height: $color-palette-circle-size;
 	width: $color-palette-circle-size;
@@ -19,7 +19,7 @@ $color-palette-circle-spacing: 14px;
 	}
 }
 
-.blocks-color-palette__item {
+.editor-color-palette__item {
 	display: inline-block;
 	vertical-align: top;
 	height: 100%;
@@ -50,12 +50,12 @@ $color-palette-circle-spacing: 14px;
 	}
 }
 
-.blocks-color-palette__clear-color .blocks-color-palette__item {
+.editor-color-palette__clear-color .editor-color-palette__item {
 	color: $white;
 	background: $white;
 }
 
-.blocks-color-palette__clear-color-line {
+.editor-color-palette__clear-color-line {
 	display: block;
 	position: absolute;
 	border: 2px solid $alert-red;
@@ -79,7 +79,7 @@ $color-palette-circle-spacing: 14px;
 	}
 }
 
-.blocks-color-palette__custom-color .blocks-color-palette__item {
+.editor-color-palette__custom-color .editor-color-palette__item {
 	position: relative;
 	box-shadow: none;
 }
@@ -95,7 +95,7 @@ $color-palette-circle-spacing: 14px;
 	overflow: hidden;
 }
 
-.blocks-color-palette__custom-color .blocks-color-palette__custom-color-gradient:before {
+.editor-color-palette__custom-color .editor-color-palette__custom-color-gradient:before {
 	box-sizing: border-box;
 	content: '';
 	filter: blur( 6px ) saturate( 0.7 ) brightness( 1.1 );
@@ -123,6 +123,6 @@ $color-palette-circle-spacing: 14px;
 	background-clip: content-box, content-box, content-box, content-box, content-box, content-box, padding-box, padding-box, padding-box, padding-box, padding-box, padding-box;
 }
 
-.blocks-color-palette__picker .chrome-picker {
+.editor-color-palette__picker .chrome-picker {
 	width: 100% !important;
 }

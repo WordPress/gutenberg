@@ -13,7 +13,7 @@ function ToggleControl( { label, checked, help, instanceId, onChange } ) {
 	const id = 'inspector-toggle-control-' + instanceId;
 
 	return (
-		<BaseControl label={ label } id={ id } help={ help } className="blocks-toggle-control">
+		<BaseControl label={ label } id={ id } help={ help } className="editor-toggle-control">
 			<FormToggle
 				id={ id }
 				checked={ checked }

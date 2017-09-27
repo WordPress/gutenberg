@@ -37,7 +37,7 @@ export default class TinyMCE extends Component {
 		}
 
 		if ( ! isEqual( this.props.className, nextProps.className ) ) {
-			this.editorNode.className = classnames( nextProps.className, 'blocks-editable__tinymce' );
+			this.editorNode.className = classnames( nextProps.className, 'editor-editable__tinymce' );
 		}
 	}
 
@@ -97,7 +97,7 @@ export default class TinyMCE extends Component {
 			ref: ( node ) => this.editorNode = node,
 			contentEditable: true,
 			suppressContentEditableWarning: true,
-			className: classnames( className, 'blocks-editable__tinymce' ),
+			className: classnames( className, 'editor-editable__tinymce' ),
 			style,
 			'aria-label': label,
 		}, children );

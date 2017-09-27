@@ -46,13 +46,13 @@ class ColorPalette extends Component {
 	render() {
 		const { colors, value, onChange } = this.props;
 		return (
-			<div className="blocks-color-palette">
+			<div className="editor-color-palette">
 				{ colors.map( ( color ) => {
 					const style = { color: color };
-					const className = classnames( 'blocks-color-palette__item', { 'is-active': value === color } );
+					const className = classnames( 'editor-color-palette__item', { 'is-active': value === color } );
 
 					return (
-						<div key={ color } className="blocks-color-palette__item-wrapper">
+						<div key={ color } className="editor-color-palette__item-wrapper">
 							<button
 								type="button"
 								className={ className }
@@ -65,21 +65,21 @@ class ColorPalette extends Component {
 					);
 				} ) }
 
-				<div className="blocks-color-palette__item-wrapper blocks-color-palette__custom-color">
+				<div className="editor-color-palette__item-wrapper editor-color-palette__custom-color">
 					<button
 						type="button"
 						aria-expanded={ this.state.opened }
-						className="blocks-color-palette__item"
+						className="editor-color-palette__item"
 						onClick={ this.togglePicker }
 						ref={ this.bindToggleNode }
 						aria-label={ __( 'Custom color picker' ) }
 					>
-						<span className="blocks-color-palette__custom-color-gradient" />
+						<span className="editor-color-palette__custom-color-gradient" />
 					</button>
 					<Popover
 						isOpen={ this.state.opened }
 						onClickOutside={ this.closeOnClickOutside }
-						className="blocks-color-palette__picker"
+						className="editor-color-palette__picker"
 					>
 						<ChromePicker
 							color={ value }
@@ -93,13 +93,13 @@ class ColorPalette extends Component {
 					</Popover>
 				</div>
 
-				<div className="blocks-color-palette__item-wrapper blocks-color-palette__clear-color">
+				<div className="editor-color-palette__item-wrapper editor-color-palette__clear-color">
 					<button
-						className="blocks-color-palette__item"
+						className="editor-color-palette__item"
 						onClick={ () => onChange( undefined ) }
 						aria-label={ __( 'Remove color' ) }
 					>
-						<span className="blocks-color-palette__clear-color-line" />
+						<span className="editor-color-palette__clear-color-line" />
 					</button>
 				</div>
 			</div>

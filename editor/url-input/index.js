@@ -169,7 +169,7 @@ class UrlInput extends Component {
 		const { showSuggestions, posts, selectedSuggestion, loading } = this.state;
 		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
-			<div className="blocks-url-input">
+			<div className="editor-url-input">
 				<input
 					autoFocus
 					type="url"
@@ -182,17 +182,17 @@ class UrlInput extends Component {
 					role="combobox"
 					aria-expanded={ showSuggestions }
 					aria-autocomplete="list"
-					aria-owns={ `blocks-url-input-suggestions-${ instanceId }` }
-					aria-activedescendant={ selectedSuggestion !== null ? `blocks-url-input-suggestion-${ instanceId }-${ selectedSuggestion }` : undefined }
+					aria-owns={ `editor-url-input-suggestions-${ instanceId }` }
+					aria-activedescendant={ selectedSuggestion !== null ? `editor-url-input-suggestion-${ instanceId }-${ selectedSuggestion }` : undefined }
 				/>
 
 				{ ( loading ) && <Spinner /> }
 
 				{ showSuggestions && !! posts.length &&
 					<div
-						id={ `blocks-url-input-suggestions-${ instanceId }` }
+						id={ `editor-url-input-suggestions-${ instanceId }` }
 						tabIndex="-1"
-						className="blocks-url-input__suggestions"
+						className="editor-url-input__suggestions"
 						ref={ this.bindListNode }
 						role="listbox"
 					>
@@ -201,9 +201,9 @@ class UrlInput extends Component {
 								key={ post.id }
 								role="option"
 								tabIndex="-1"
-								id={ `blocks-url-input-suggestion-${ instanceId }-${ index }` }
+								id={ `editor-url-input-suggestion-${ instanceId }-${ index }` }
 								ref={ this.bindSuggestionNode( index ) }
-								className={ classnames( 'blocks-url-input__suggestion', {
+								className={ classnames( 'editor-url-input__suggestion', {
 									'is-selected': index === selectedSuggestion,
 								} ) }
 								onClick={ () => this.props.onChange( post.link ) }

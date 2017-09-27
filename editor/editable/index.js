@@ -276,7 +276,7 @@ export default class Editable extends Component {
 
 		// Find the parent "relative" positioned container
 		const container = this.props.inlineToolbar
-			? this.editor.getBody().closest( '.blocks-editable' )
+			? this.editor.getBody().closest( '.editor-editable' )
 			: this.editor.getBody().closest( '.editor-visual-editor__block' );
 		const containerPosition = container.getBoundingClientRect();
 		const blockPadding = 14;
@@ -611,7 +611,7 @@ export default class Editable extends Component {
 		// mount and initialize a new child element in its place.
 		const key = [ 'editor', Tagname ].join();
 		const isPlaceholderVisible = placeholder && ( ! focus || keepPlaceholderOnFocus ) && this.state.empty;
-		const classes = classnames( wrapperClassname, 'blocks-editable' );
+		const classes = classnames( wrapperClassname, 'editor-editable' );
 
 		const formatToolbar = (
 			<FormatToolbar
@@ -648,7 +648,7 @@ export default class Editable extends Component {
 				/>
 				{ isPlaceholderVisible &&
 					<Tagname
-						className={ classnames( 'blocks-editable__tinymce', className ) }
+						className={ classnames( 'editor-editable__tinymce', className ) }
 						style={ style }
 					>
 						{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }

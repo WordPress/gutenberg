@@ -17,7 +17,7 @@ function CheckboxControl( { label, heading, checked, help, instanceId, onChange,
 		<BaseControl label={ heading } id={ id } help={ help }>
 			<input
 				id={ id }
-				className="blocks-checkbox-control__input"
+				className="editor-checkbox-control__input"
 				type="checkbox"
 				value="1"
 				onChange={ onChangeValue }
@@ -25,7 +25,7 @@ function CheckboxControl( { label, heading, checked, help, instanceId, onChange,
 				aria-describedby={ !! help ? id + '__help' : undefined }
 				{ ...props }
 			/>
-			<label className="blocks-checkbox-control__label" htmlFor={ id }>
+			<label className="editor-checkbox-control__label" htmlFor={ id }>
 				{ label }
 			</label>
 		</BaseControl>

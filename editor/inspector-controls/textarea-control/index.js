@@ -16,7 +16,7 @@ function TextareaControl( { label, value, help, instanceId, onChange, rows = 4, 
 	return (
 		<BaseControl label={ label } id={ id } help={ help }>
 			<textarea
-				className="blocks-textarea-control__input"
+				className="editor-textarea-control__input"
 				id={ id }
 				rows={ rows }
 				onChange={ onChangeValue }

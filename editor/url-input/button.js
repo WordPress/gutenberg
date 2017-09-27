@@ -40,7 +40,7 @@ class UrlInputButton extends Component {
 		const { expanded } = this.state;
 
 		return (
-			<li className="blocks-url-input__button">
+			<li className="editor-url-input__button">
 				<IconButton
 					icon="admin-links"
 					label={ __( 'Edit Link' ) }
@@ -51,10 +51,10 @@ class UrlInputButton extends Component {
 				/>
 				{ expanded &&
 					<form
-						className="blocks-format-toolbar__link-modal"
+						className="editor-format-toolbar__link-modal"
 						onSubmit={ this.submitLink }>
 						<IconButton
-							className="blocks-url-input__back"
+							className="editor-url-input__back"
 							icon="arrow-left-alt"
 							label={ __( 'Close' ) }
 							onClick={ this.toggle }

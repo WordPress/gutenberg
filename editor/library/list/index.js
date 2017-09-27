@@ -328,7 +328,7 @@ registerBlockType( 'core/list', {
 					value={ values }
 					focus={ focus }
 					onFocus={ setFocus }
-					wrapperClassname="blocks-list"
+					wrapperclassName="editor-list"
 					placeholder={ __( 'Write list…' ) }
 					onMerge={ mergeBlocks }
 					onSplit={ ( before, after, ...blocks ) => {

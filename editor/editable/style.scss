@@ -1,8 +1,8 @@
-.blocks-editable {
+.editor-editable {
 	position: relative;
 }
 
-.blocks-editable__tinymce {
+.editor-editable__tinymce {
 	margin: 0;
 	position: relative;
 
@@ -58,13 +58,13 @@
 		}
 	}
 
-	& + .blocks-editable__tinymce {
+	& + .editor-editable__tinymce {
 		opacity: 0.5;
 		pointer-events: none;
 	}
 }
 
-.has-drop-cap .blocks-editable__tinymce:not( :focus )  {
+.has-drop-cap .editor-editable__tinymce:not( :focus )  {
 	&:first-letter {
 		float: left;
 		font-size: 4.1em;

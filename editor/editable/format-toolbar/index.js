@@ -147,7 +147,7 @@ class FormatToolbar extends Component {
 			} ) );
 
 		const linkSettings = settingsVisible && (
-			<fieldset className="blocks-format-toolbar__link-settings">
+			<fieldset className="editor-format-toolbar__link-settings">
 				<ToggleControl
 					label={ __( 'Open in new window' ) }
 					checked={ opensInNewWindow }
@@ -165,12 +165,12 @@ class FormatToolbar extends Component {
 		}
 
 		return (
-			<div className="blocks-format-toolbar">
+			<div className="editor-format-toolbar">
 				<Toolbar controls={ toolbarControls } />
 
 				{ ( isAddingLink || isEditingLink ) &&
 					<form
-						className="blocks-format-toolbar__link-modal"
+						className="editor-format-toolbar__link-modal"
 						style={ linkStyle }
 						onSubmit={ this.submitLink }>
 						<UrlInput value={ newLinkValue } onChange={ this.onChangeLinkValue } />
@@ -182,9 +182,9 @@ class FormatToolbar extends Component {
 				}
 
 				{ !! formats.link && ! isAddingLink && ! isEditingLink &&
-					<div className="blocks-format-toolbar__link-modal" style={ linkStyle }>
+					<div className="editor-format-toolbar__link-modal" style={ linkStyle }>
 						<a
-							className="blocks-format-toolbar__link-value"
+							className="editor-format-toolbar__link-value"
 							href={ formats.link.value }
 							target="_blank"
 						>

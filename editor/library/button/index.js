@@ -79,7 +79,7 @@ registerBlockType( 'core/button', {
 				/>
 				{ focus &&
 					<form
-						className="blocks-format-toolbar__link-modal"
+						className="editor-format-toolbar__link-modal"
 						onSubmit={ ( event ) => event.preventDefault() }>
 						<UrlInput
 							value={ url }

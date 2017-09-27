@@ -32,7 +32,7 @@ registerBlockType( 'core/shortcode', {
 
 	edit: withInstanceId(
 		( { attributes, setAttributes, instanceId, focus } ) => {
-			const inputId = `blocks-shortcode-input-${ instanceId }`;
+			const inputId = `editor-shortcode-input-${ instanceId }`;
 
 			return (
 				<div className="wp-block-shortcode">
