@@ -1939,4 +1939,75 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 
 		$this->assertSame( 333, $user->get_site_id() );
 	}
+
+	/**
+	 * @ticket 38645
+	 * @group ms-required
+	 */
+	function test_init_roles_for_different_site() {
+		global $wpdb;
+
+		$site_id = self::factory()->blog->create();
+
+		switch_to_blog( $site_id );
+
+		$role_name = 'uploader';
+		add_role( $role_name, 'Uploader', array(
+			'read'         => true,
+			'upload_files' => true,
+		) );
+
+		restore_current_blog();
+
+		$wp_roles = wp_roles();
+		$wp_roles->for_site( $site_id );
+
+		$this->assertTrue( isset( $wp_roles->role_objects[ $role_name ] ) );
+	}
+
+	/**
+	 * @ticket 38645
+	 */
+	function test_get_roles_data() {
+		global $wpdb;
+
+		$custom_roles = array(
+			'test_role' => array(
+				'name'         => 'Test Role',
+				'capabilities' => array(
+					'do_foo' => true,
+					'do_bar' => false,
+				),
+			),
+		);
+
+		// Test `WP_Roles::get_roles_data()` by manually setting the roles option.
+		update_option( $wpdb->get_blog_prefix( get_current_blog_id() ) . 'user_roles', $custom_roles );
+
+		$roles = new WP_Roles();
+		$this->assertSame( $custom_roles, $roles->roles );
+	}
+
+	/**
+	 * @ticket 38645
+	 */
+	function test_roles_get_site_id_default() {
+		$roles = new WP_Roles();
+		$this->assertSame( get_current_blog_id(), $roles->get_site_id() );
+	}
+
+	/**
+	 * @ticket 38645
+	 */
+	function test_roles_get_site_id() {
+		global $wpdb;
+
+		// Suppressing errors here allows to get around creating an actual site,
+		// which is unnecessary for this test.
+		$suppress = $wpdb->suppress_errors();
+		$roles = new WP_Roles( 333 );
+		$wpdb->suppress_errors( $suppress );
+
+		$this->assertSame( 333, $roles->get_site_id() );
+	}
 }
