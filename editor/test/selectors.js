@@ -1075,6 +1075,54 @@ describe( 'selectors', () => {
 
 			expect( getBlock( state, 123 ) ).toEqual( { uid: 123, name: 'core/paragraph' } );
 		} );
+
+		it( 'should return null if the block is not present in state', () => {
+			const state = {
+				currentPost: {},
+				editor: {
+					blocksByUid: {},
+					edits: {},
+				},
+			};
+
+			expect( getBlock( state, 123 ) ).toBe( null );
+		} );
+
+		it( 'should merge meta attributes for the block', () => {
+			registerBlockType( 'core/meta-block', {
+				save: ( props ) => props.attributes.text,
+				category: 'common',
+				title: 'test block',
+				attributes: {
+					foo: {
+						type: 'string',
+						meta: 'foo',
+					},
+				},
+			} );
+
+			const state = {
+				currentPost: {
+					meta: {
+						foo: 'bar',
+					},
+				},
+				editor: {
+					blocksByUid: {
+						123: { uid: 123, name: 'core/meta-block' },
+					},
+					edits: {},
+				},
+			};
+
+			expect( getBlock( state, 123 ) ).toEqual( {
+				uid: 123,
+				name: 'core/meta-block',
+				attributes: {
+					foo: 'bar',
+				},
+			} );
+		} );
 	} );
 
 	describe( 'getBlocks', () => {
