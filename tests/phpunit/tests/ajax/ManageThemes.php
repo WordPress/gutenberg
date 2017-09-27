@@ -93,6 +93,7 @@ class Tests_Ajax_Manage_Themes extends WP_Ajax_UnitTestCase {
 				'update'       => 'theme',
 				'slug'         => 'foo',
 				'errorMessage' => 'Sorry, you are not allowed to update themes for this site.',
+				'oldVersion'   => '',
 				'newVersion'   => '',
 			),
 		);
@@ -127,6 +128,7 @@ class Tests_Ajax_Manage_Themes extends WP_Ajax_UnitTestCase {
 				'update'       => 'theme',
 				'slug'         => 'twentyten',
 				'errorMessage' => 'The theme is at the latest version.',
+				'oldVersion'   => '2.3',
 				'newVersion'   => '',
 				'debug'        => array( 'The theme is at the latest version.' ),
 			),
@@ -156,6 +158,7 @@ class Tests_Ajax_Manage_Themes extends WP_Ajax_UnitTestCase {
 			'data'    => array(
 				'update'       => 'theme',
 				'slug'         => 'camelCase',
+				'oldVersion'   => '1.0',
 				'newVersion'   => '',
 				'errorMessage' => 'The theme is at the latest version.',
 				'debug'        => array( 'The theme is at the latest version.' ),
