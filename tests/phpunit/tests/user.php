@@ -180,7 +180,7 @@ class Tests_User extends WP_UnitTestCase {
 		$this->assertEquals( 'foo', $user->$key );
 		$this->assertEquals( 'foo', $user->data->$key );  // This will fail with WP < 3.3
 
-		foreach ( (array) $user as $key => $value ) {
+		foreach ( get_object_vars( $user ) as $key => $value ) {
 			$this->assertEquals( $value, $user->$key );
 		}
 	}
