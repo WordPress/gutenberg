@@ -189,11 +189,10 @@ export default function( editor ) {
 			return;
 		}
 
-		const firstText = editor.getBody().textContent;
-
+		const textContent = editor.getBody().textContent;
 		const { result, pattern } = patterns.reduce( ( acc, item ) => {
 			return acc.result ? acc : {
-				result: item.regExp.exec( firstText ),
+				result: item.regExp.exec( textContent ),
 				pattern: item,
 			};
 		}, {} );
