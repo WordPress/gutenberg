@@ -2,7 +2,13 @@
 	var editor,
 		count = 0;
 
-	if ( tinymce.Env.ie && tinymce.Env.ie < 9 ) {
+	// Temporarily disadle these tests in PhantomJS.
+	// Seems editor.selection.getRng() in mceType() fails there, but works properly in the browsers.
+	if ( /PhantomJS/.test( navigator.userAgent ) ) {
+		return;
+	}
+
+	if ( tinymce.Env.ie && tinymce.Env.ie < 11 ) {
 		return;
 	}
 
