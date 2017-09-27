@@ -38,3 +38,24 @@ export const doingFilter = createDoingHook( HOOKS.filters );
 // Did action/filter functions.
 export const didAction = createDidHook( HOOKS.actions );
 export const didFilter = createDidHook( HOOKS.filters );
+
+export const Hooks = () => {
+	( {
+		addAction,
+		addFilter,
+		removeAction,
+		removeFilter,
+		hasAction,
+		hasFilter,
+		removeAllActions,
+		removeAllFilters,
+		doAction,
+		applyFilters,
+		currentAction,
+		currentFilter,
+		doingAction,
+		doingFilter,
+		didAction,
+		didFilter
+	} )
+};
