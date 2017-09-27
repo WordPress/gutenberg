@@ -14,6 +14,9 @@ import applyMiddlewares from './middlewares';
 import { BREAK_MEDIUM } from './constants';
 import { getEditedPostTitle } from './selectors';
 
+// TODO: Remove temporary hack to make tests pass.
+import '../../coediting';
+
 /**
  * Module Constants
  */

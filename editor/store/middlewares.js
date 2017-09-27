@@ -10,7 +10,7 @@ import { flowRight } from 'lodash';
  */
 import { mobileMiddleware } from '../utils/mobile';
 import effects from './effects';
-import { grtcMiddleware } from './reducer';
+import coeditingMiddleware from 'coediting/store/middleware';
 
 /**
  * Applies the custom middlewares used specifically in the editor module
@@ -22,7 +22,7 @@ import { grtcMiddleware } from './reducer';
 function applyMiddlewares( store ) {
 	const middlewares = [
 		mobileMiddleware,
-		grtcMiddleware,
+		coeditingMiddleware,
 		refx( effects ),
 		multi,
 	];

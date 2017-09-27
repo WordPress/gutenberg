@@ -1,0 +1,80 @@
+$coediting-green: #46b450;
+$coediting-orange: #f56e28;
+$coediting-purple: #826eb4;
+$coediting-red: #dc3232;
+$coediting-yellow: #ffb900;
+
+.is-frozen-by-collaborator {
+	&.editor-block-list__block {
+		cursor: not-allowed;
+		pointer-events: none;
+		user-select: none;
+
+		&:before {
+			outline: 1px solid;
+		}
+
+		.coediting-legend {
+			color: $white;
+			font-size: $default-font-size;
+			padding: 2px 5px;
+			position: absolute;
+			right: 0;
+			top: 0;
+			z-index: 50;
+
+			@include break-small {
+				right: $block-mover-padding-visible
+			}
+		}
+
+		&.is-green {
+			&:before {
+				outline-color:$coediting-green;
+			}
+			.coediting-legend {
+				background-color: $coediting-green;
+			}
+		}
+
+		&.is-orange {
+			&:before {
+				outline-color:$coediting-orange;
+			}
+			.coediting-legend {
+				background-color: $coediting-orange;
+			}
+		}
+
+		&.is-purple {
+			&:before {
+				outline-color:$coediting-purple;
+			}
+			.coediting-legend {
+				background-color: $coediting-purple;
+			}
+		}
+
+		&.is-red {
+			&:before {
+				outline-color:$coediting-red;
+			}
+			.coediting-legend {
+				background-color: $coediting-red;
+			}
+		}
+
+		&.is-yellow {
+			&:before {
+				outline-color:$coediting-yellow;
+			}
+			.coediting-legend {
+				background-color: $coediting-yellow;
+			}
+		}
+	}
+
+	.editor-block-list__block-edit {
+		opacity: 0.8;
+	}
+}
