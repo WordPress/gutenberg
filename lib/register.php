@@ -221,10 +221,11 @@ function gutenberg_get_edit_post_url( $post_id ) {
  * @return string Edit post link.
  */
 function gutenberg_filter_edit_post_link( $url, $post_id, $context ) {
+	// Avoid redirect to Gutenberg after saving a block post in Classic editor.
 	$sendback = wp_get_referer();
 	if ( $sendback && (
-		 strpos( $sendback, 'post.php' ) !== false ||
-		 strpos( $sendback, 'post-new.php' ) !== false ) ) {
+			0 === strpos( $sendback, parse_url( admin_url( 'post.php' ), PHP_URL_PATH ) ) ||
+			0 === strpos( $sendback, parse_url( admin_url( 'post-new.php' ), PHP_URL_PATH ) ) ) ) {
 		return $url;
 	}
 
