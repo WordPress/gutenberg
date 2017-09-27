@@ -40,7 +40,7 @@ export const didAction = createDidHook( HOOKS.actions );
 export const didFilter = createDidHook( HOOKS.filters );
 
 export const Hooks = () => {
-	( {
+	return {
 		addAction,
 		addFilter,
 		removeAction,
@@ -57,5 +57,5 @@ export const Hooks = () => {
 		doingFilter,
 		didAction,
 		didFilter
-	} )
+	};
 };
