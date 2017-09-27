@@ -31,7 +31,6 @@ describe( 'Panel', () => {
 
 		it( 'should add additional child elements to be rendered in the panel', () => {
 			const panel = shallow( <Panel children="The Panel" /> );
-			expect( panel.instance().props.children ).toBe( 'The Panel' );
 			expect( panel.text() ).toBe( 'The Panel' );
 			expect( panel.find( 'div' ).shallow().children().length ).toBe( 1 );
 		} );

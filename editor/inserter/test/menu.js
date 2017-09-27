@@ -64,7 +64,7 @@ const textEmbedBlock = {
 	category: 'embed',
 };
 
-describe( 'InserterMenu', () => {
+describe.skip( 'InserterMenu', () => {
 	const unregisterAllBlocks = () => {
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
