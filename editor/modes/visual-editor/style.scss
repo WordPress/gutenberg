@@ -59,8 +59,11 @@
 	&.has-warning .editor-visual-editor__block-edit {
 		position: relative;
 		min-height: 250px;
-		pointer-events: none;
-		user-select: none;
+
+		> :not( .editor-visual-editor__block-warning ) {
+			pointer-events: none;
+			user-select: none;
+		}
 	}
 
 	&.has-warning .editor-visual-editor__block-edit::after {
