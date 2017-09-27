@@ -478,8 +478,36 @@ export default class Editable extends Component {
 	}
 
 	getContent() {
-		// TODO: Improve performance using childNodes
-		return this.editor.getContent();
+		function filter( nodeList = [] ) {
+			Array.from( nodeList ).forEach( ( node ) => {
+				filter( node.children );
+
+				if ( node.hasAttribute( 'data-mce-bogus' ) ) {
+					const parent = node.parentNode;
+
+					if ( node.getAttribute( 'data-mce-bogus' ) !== 'all' ) {
+						while ( node.firstChild ) {
+							parent.insertBefore( node.firstChild, node );
+						}
+					}
+
+					parent.removeChild( node );
+				} else if ( node.hasAttributes() ) {
+					Array.from( node.attributes ).forEach( ( { name } ) => {
+						if ( name.indexOf( 'data-mce-' ) === 0 ) {
+							node.removeAttribute( name );
+						}
+					} );
+				}
+			} );
+		}
+
+		const clone = this.editor.getBody().cloneNode( true );
+
+		// Only loop through element nodes.
+		filter( clone.children );
+
+		return clone.innerHTML;
 	}
 
 	updateFocus() {
