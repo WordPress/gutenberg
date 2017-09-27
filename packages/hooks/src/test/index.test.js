@@ -21,6 +21,7 @@ import {
 	doingFilter,
 	didAction,
 	didFilter,
+	Hooks,
 } from '../';
 
 function filter_a( str ) {
@@ -79,6 +80,12 @@ beforeEach( () => {
 
 afterEach( () => {
 	console.error = consoleErrorOriginal;
+} );
+
+const hooks = new Hooks();
+
+test( 'hooks can be instantiated', () => {
+	expect( typeof hooks ).toEqual( 'object' );
 } );
 
 test( 'run a filter with no callbacks', () => {
