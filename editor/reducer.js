@@ -135,6 +135,20 @@ export const editor = combineUndoableReducers( {
 					},
 				};
 
+			case 'UPDATE_BLOCK':
+			// Ignore updates if block isn't known
+				if ( ! state[ action.uid ] ) {
+					return state;
+				}
+
+				return {
+					...state,
+					[ action.uid ]: {
+						...state[ action.uid ],
+						...action.updates,
+					},
+				};
+
 			case 'INSERT_BLOCKS':
 				return {
 					...state,

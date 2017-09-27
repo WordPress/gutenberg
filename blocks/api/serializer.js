@@ -151,7 +151,7 @@ export function getBlockContent( block ) {
 		} catch ( error ) {}
 	}
 
-	return getUnknownTypeHandlerName() === block.name ? getBeautifulContent( saveContent ) : saveContent;
+	return getUnknownTypeHandlerName() === block.name || ! saveContent ? saveContent : getBeautifulContent( saveContent );
 }
 
 /**
