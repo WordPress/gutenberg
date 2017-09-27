@@ -221,6 +221,14 @@ function gutenberg_get_edit_post_url( $post_id ) {
  * @return string Edit post link.
  */
 function gutenberg_filter_edit_post_link( $url, $post_id, $context ) {
+	// Avoid redirect to Gutenberg after saving a block post in Classic editor.
+	$sendback = wp_get_referer();
+	if ( $sendback && (
+			0 === strpos( $sendback, parse_url( admin_url( 'post.php' ), PHP_URL_PATH ) ) ||
+			0 === strpos( $sendback, parse_url( admin_url( 'post-new.php' ), PHP_URL_PATH ) ) ) ) {
+		return $url;
+	}
+
 	$post = get_post( $post_id );
 	if ( gutenberg_can_edit_post( $post_id ) && gutenberg_post_has_blocks( $post_id ) && post_type_supports( get_post_type( $post_id ), 'editor' ) ) {
 		$gutenberg_url = gutenberg_get_edit_post_url( $post->ID );
