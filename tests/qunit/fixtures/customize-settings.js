@@ -106,6 +106,14 @@ window._wpCustomizeSettings = {
 			'title': 'Fixture section of custom type re-using default template',
 			'type': 'reusing-default-template'
 		},
+		'publish_settings': {
+			'active': true,
+			'description': '',
+			'instanceNumber': 6,
+			'priority': 20,
+			'title': 'Fixture section of custom type re-using default template',
+			'type': 'outer'
+		},
 		'fixture-section-without-params': {}
 	},
 	'settings': {
@@ -148,9 +156,18 @@ window._wpCustomizeSettings = {
 			'label': 'Enter mobile preview mode'
 		}
 	},
+	initialClientTimestamp: 1506510531595,
+	initialServerDate: '2017-09-27 16:38:49',
+	initialServerTimestamp: 1506510529913,
 	changeset: {
 		status: '',
-		uuid: '0c674ff4-c159-4e7a-beb4-cb830ae73979'
+		uuid: '0c674ff4-c159-4e7a-beb4-cb830ae73979',
+		autosaved: false,
+		branching: false,
+		currentUserCanPublish: false,
+		hasAutosaveRevision: false,
+		latestAutoDraftUuid: '341b06f6-3c1f-454f-96df-3cf197f3e347',
+		publishDate: ''
 	},
 	timeouts: {
 		windowRefresh: 250,

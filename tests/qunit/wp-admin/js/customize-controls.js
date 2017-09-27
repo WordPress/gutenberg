@@ -675,4 +675,256 @@ jQuery( window ).load( function (){
 			jQuery.ajaxSetup( { beforeSend: originalBeforeSetup } );
 		} );
 	} );
+
+	module( 'Customize Utils: wp.customize.utils.getRemainingTime()' );
+	test( 'utils.getRemainingTime calculates time correctly', function( assert ) {
+		var datetime = '2599-08-06 12:12:13', timeRemaining, timeRemainingWithDateInstance, timeRemaingingWithTimestamp;
+
+		timeRemaining = wp.customize.utils.getRemainingTime( datetime );
+		timeRemainingWithDateInstance = wp.customize.utils.getRemainingTime( new Date( datetime.replace( /-/g, '/' ) ) );
+		timeRemaingingWithTimestamp = wp.customize.utils.getRemainingTime( ( new Date( datetime.replace( /-/g, '/' ) ) ).getTime() );
+
+		assert.equal( typeof timeRemaining, 'number', timeRemaining );
+		assert.equal( typeof timeRemainingWithDateInstance, 'number', timeRemaining );
+		assert.equal( typeof timeRemaingingWithTimestamp, 'number', timeRemaining );
+		assert.deepEqual( timeRemaining, timeRemainingWithDateInstance );
+		assert.deepEqual( timeRemaining, timeRemaingingWithTimestamp );
+	});
+
+	module( 'Customize Utils: wp.customize.utils.getCurrentTimestamp()' );
+	test( 'utils.getCurrentTimestamp returns timestamp', function( assert ) {
+		var currentTimeStamp;
+		currentTimeStamp = wp.customize.utils.getCurrentTimestamp();
+		assert.equal( typeof currentTimeStamp, 'number' );
+	});
+
+	module( 'Customize Controls: wp.customize.DateTimeControl' );
+	test( 'Test DateTimeControl creation and its methods', function( assert ) {
+		var control, controlId = 'date_time', section, sectionId = 'fixture-section',
+			datetime = '2599-08-06 18:12:13', dateTimeArray, dateTimeArrayInampm, timeString,
+			day, year, month, minute, ampm, hour;
+
+		section = wp.customize.section( sectionId );
+
+		control = new wp.customize.DateTimeControl( controlId, {
+			params: {
+				section: section.id,
+				type: 'date_time',
+				content: '<li id="customize-control-' + controlId + '" class="customize-control"></li>',
+				defaultValue: datetime
+			}
+		} );
+
+		wp.customize.control.add( controlId, control );
+
+		// Test control creations.
+		assert.ok( control.templateSelector, '#customize-control-date_time-content' );
+		assert.ok( control.section(), sectionId );
+		assert.equal( _.size( control.inputElements ), control.elements.length );
+		assert.ok( control.setting(), datetime );
+
+		day = control.inputElements.day;
+		month = control.inputElements.month;
+		year = control.inputElements.year;
+		minute = control.inputElements.minute;
+		hour = control.inputElements.hour;
+		ampm = control.inputElements.ampm;
+
+		year( '23' );
+		assert.equal( typeof year(), 'number', 'Should always return integer' );
+
+		month( 'test' );
+		assert.notOk( month(), 'Should not accept text' );
+
+		// Test control.parseDateTime();
+		dateTimeArray = control.parseDateTime( datetime );
+		assert.deepEqual( dateTimeArray, {
+			year: '2599',
+			month: '08',
+			hour: '18',
+			minute: '12',
+			second: '13',
+			day: '06'
+		} );
+
+		dateTimeArrayInampm = control.parseDateTime( datetime, true );
+		assert.deepEqual( dateTimeArrayInampm, {
+			year: '2599',
+			month: '08',
+			hour: '6',
+			minute: '12',
+			ampm: 'pm',
+			day: '06'
+		} );
+
+		year( '2010' );
+		month( '12' );
+		day( '18' );
+		hour( '3' );
+		minute( '44' );
+		ampm( 'am' );
+
+		// Test control.convertInputDateToString().
+		timeString = control.convertInputDateToString();
+		assert.equal( timeString, '2010-12-18 03:44:00' );
+
+		ampm( 'pm' );
+		timeString = control.convertInputDateToString();
+		assert.equal( timeString, '2010-12-18 15:44:00' );
+
+		// Test control.updateDaysForMonth();.
+		year( 2017 );
+		month( 2 );
+		day( 31 );
+		control.updateDaysForMonth();
+		assert.deepEqual( day(), 28, 'Should update to the correct days' );
+
+		day( 20 );
+		assert.deepEqual( day(), 20, 'Should not update if its less the correct number of days' );
+
+		// Test control.convertHourToTwentyFourHourFormat().
+		assert.equal( control.convertHourToTwentyFourHourFormat( 11, 'pm' ), 23 );
+		assert.equal( control.convertHourToTwentyFourHourFormat( 12, 'pm' ), 12 );
+		assert.equal( control.convertHourToTwentyFourHourFormat( 12, 'am' ), 0 );
+		assert.equal( control.convertHourToTwentyFourHourFormat( 11, 'am' ), 11 );
+
+		// Test control.toggleFutureDateNotification().
+		assert.deepEqual( control.toggleFutureDateNotification(), control );
+		control.toggleFutureDateNotification( true );
+		assert.ok( control.notifications.has( 'not_future_date' ) );
+		control.toggleFutureDateNotification( false );
+		assert.notOk( control.notifications.has( 'not_future_date' ) );
+
+		// Test control.populateDateInputs();
+		control.populateDateInputs();
+		control.dateInputs.each( function() {
+			var node = jQuery( this );
+		    assert.equal( node.val(), control.inputElements[ node.data( 'component' ) ].get() );
+		} );
+
+		// Test control.validateInputs();
+		hour( 33 );
+		assert.ok( control.validateInputs() );
+		hour( 10 );
+		assert.notOk( control.validateInputs() );
+		minute( 123 );
+		assert.ok( control.validateInputs() );
+		minute( 20 );
+		assert.notOk( control.validateInputs() );
+
+		// Test control.populateSetting();
+		day( 2 );
+		month( 11 );
+		year( 2018 );
+		hour( 4 );
+		minute( 20 );
+		ampm( 'pm' );
+		control.populateSetting();
+		assert.equal( control.setting(), '2018-11-02 16:20:00' );
+
+		hour( 123 );
+		control.populateSetting();
+		assert.equal( control.setting(), '2018-11-02 16:20:00' ); // Should not update if invalid hour.
+
+		hour( 5 );
+		control.populateSetting();
+		assert.equal( control.setting(), '2018-11-02 17:20:00' );
+
+		// Test control.isFutureDate();
+		day( 2 );
+		month( 11 );
+		year( 2318 );
+		hour( 4 );
+		minute( 20 );
+		ampm( 'pm' );
+		assert.ok( control.isFutureDate() );
+
+		year( 2016 );
+		assert.notOk( control.isFutureDate() );
+
+		/**
+		 * Test control.updateMinutesForHour().
+		 * Run this at the end or else the above tests may fail.
+		 */
+		hour( 24 );
+		minute( 32 );
+		control.inputElements.ampm = false; // Because it works only when the time is twenty four hour format.
+		control.updateMinutesForHour();
+		assert.deepEqual( minute(), 0 );
+
+		// Tear Down.
+		wp.customize.control.remove( controlId );
+	});
+
+	module( 'Customize Sections: wp.customize.OuterSection' );
+	test( 'Test OuterSection', function( assert ) {
+		var section, sectionId = 'test_outer_section', body = jQuery( 'body' ),
+			defaultSection, defaultSectionId = 'fixture-section';
+
+		defaultSection = wp.customize.section( defaultSectionId );
+
+		section = new wp.customize.OuterSection( sectionId, {
+			params: {
+				content: defaultSection.params.content,
+				type: 'outer'
+			}
+		} );
+
+		wp.customize.section.add( sectionId, section );
+		wp.customize.section.add( defaultSectionId, section );
+
+		assert.equal( section.containerPaneParent, '.customize-outer-pane-parent' );
+		assert.equal( section.containerParent.selector, '#customize-outer-theme-controls' );
+
+		defaultSection.expand();
+		section.expand();
+		assert.ok( body.hasClass( 'outer-section-open' ) );
+		assert.ok( section.container.hasClass( 'open' ) );
+		assert.ok( defaultSection.expanded() ); // Ensure it does not affect other sections state.
+
+		section.collapse();
+		assert.notOk( body.hasClass( 'outer-section-open' ) );
+		assert.notOk( section.container.hasClass( 'open' ) ); // Ensure it does not affect other sections state.
+		assert.ok( defaultSection.expanded() );
+
+		// Tear down
+		wp.customize.section.remove( sectionId );
+	});
+
+	module( 'Customize Controls: PreviewLinkControl' );
+	test( 'Test PreviewLinkControl creation and its methods', function( assert ) {
+		var section, sectionId = 'publish_settings', newLink;
+
+		section = wp.customize.section( sectionId );
+		section.deferred.embedded.resolve();
+
+		assert.expect( 9 );
+		section.deferred.embedded.done( function() {
+			_.each( section.controls(), function( control ) {
+				if ( 'changeset_preview_link' === control.id ) {
+					assert.equal( control.templateSelector, 'customize-preview-link-control' );
+					assert.equal( _.size( control.previewElements ), control.elements.length );
+
+					// Test control.ready().
+					newLink = 'http://example.org?' + wp.customize.settings.changeset.uuid;
+					control.setting.set( newLink );
+
+					assert.equal( control.previewElements.input(), newLink );
+					assert.equal( control.previewElements.link(), newLink );
+					assert.equal( control.previewElements.link.element.attr( 'href' ), newLink );
+					assert.equal( control.previewElements.link.element.attr( 'target' ), wp.customize.settings.changeset.uuid );
+
+					// Test control.toggleSaveNotification().
+					control.toggleSaveNotification( true );
+					assert.ok( control.notifications.has( 'changes_not_saved' ) );
+					control.toggleSaveNotification( false );
+					assert.notOk( control.notifications.has( 'changes_not_saved' ) );
+
+					// Test control.updatePreviewLink().
+					control.updatePreviewLink();
+					assert.equal( control.setting.get(), wp.customize.previewer.getFrontendPreviewUrl() );
+				}
+			} );
+		} );
+	});
 });
