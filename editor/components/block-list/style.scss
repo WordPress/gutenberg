@@ -81,8 +81,12 @@
 		background: $blue-medium-highlight;
 	}
 
-	&.is-collaboration {
-		.collaboration-legend {
+	&.is-frozen-by-peer {
+		cursor: not-allowed;
+		pointer-events: none;
+		opacity: 0.8;
+
+		.coediting-legend {
 			float: right;
 			margin-top: -14px;
 			margin-right: -14px;
@@ -90,63 +94,53 @@
 			font-size: 12px;
 		}
 
-		&[class*="collab-"] {
-			pointer-events: none;
-			opacity: 0.8;
-		}
-
-		&.collab-null {
-			pointer-events: all;
-			opacity: 1;
-		}
-
-		&.collab-red {
+		&.is-green {
 			&:before {
-				outline: 2px solid $collab-red;
+				outline: 2px solid $coediting-green;
 				transition: 0.2s outline;
 			}
-			.collaboration-legend {
-				background: $collab-red;
+			.coediting-legend {
+				background: $coediting-green;
 			}
 		}
 
-		&.collab-orange {
+		&.is-orange {
 			&:before {
-				outline: 2px solid $collab-orange;
+				outline: 2px solid $coediting-orange;
 				transition: 0.2s outline;
 			}
-			.collaboration-legend {
-				background: $collab-orange;
+			.coediting-legend {
+				background: $coediting-orange;
 			}
 		}
 
-		&.collab-yellow {
+		&.is-purple {
 			&:before {
-				outline: 2px solid $collab-yellow;
+				outline: 2px solid $coediting-purple;
 				transition: 0.2s outline;
 			}
-			.collaboration-legend {
-				background: $collab-yellow;
+			.coediting-legend {
+				background: $coediting-purple;
 			}
 		}
 
-		&.collab-green {
+		&.is-red {
 			&:before {
-				outline: 2px solid $collab-green;
+				outline: 2px solid $coediting-red;
 				transition: 0.2s outline;
 			}
-			.collaboration-legend {
-				background: $collab-green;
+			.coediting-legend {
+				background: $coediting-red;
 			}
 		}
 
-		&.collab-purple {
+		&.is-yellow {
 			&:before {
-				outline: 2px solid $collab-purple;
+				outline: 2px solid $coediting-yellow;
 				transition: 0.2s outline;
 			}
-			.collaboration-legend {
-				background: $collab-purple;
+			.coediting-legend {
+				background: $coediting-yellow;
 			}
 		}
 	}

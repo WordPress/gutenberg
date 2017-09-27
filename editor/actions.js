@@ -503,35 +503,11 @@ export function toggleFeature( feature ) {
 	};
 }
 
-/**
- * Returns an action object and blockID where to show the UI.
- *
- * @param {Object}  grtcProps contains {peerName, peerID, peerColor}
- * @param {String}  blocksByUid string
- *
- * @return {Object}     Action object
- */
-export function collaborationState( grtcProps, blocksByUid ) {
-	return {
-		type: 'COLLABORATION_STATE',
-		blocksByUid,
-		...grtcProps,
-	};
-}
-
-/**
- * Returns an action object used to enable/disable a collaborative session
- *
- * @param {Boolean}  active true or false for collaboration
- *
- * @return {Object}     Action object
- */
-export function collaborationMode( active ) {
-	return {
-		type: 'COLLABORATION_MODE',
-		active,
-	};
-}
+export {
+	clearFrozenBlock,
+	freezeBlock,
+	toggleCoediting,
+} from './state/coediting';
 
 export const createSuccessNotice = partial( createNotice, 'success' );
 export const createInfoNotice = partial( createNotice, 'info' );

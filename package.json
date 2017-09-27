@@ -28,7 +28,6 @@
     "moment": "2.18.1",
     "moment-timezone": "0.5.13",
     "mousetrap": "1.6.1",
-    "node-forge": "0.7.1",
     "prop-types": "15.5.10",
     "re-resizable": "4.0.3",
     "react": "16.0.0",

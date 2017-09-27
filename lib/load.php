@@ -20,7 +20,7 @@ require dirname( __FILE__ ) . '/plugin-compat.php';
 require dirname( __FILE__ ) . '/i18n.php';
 require dirname( __FILE__ ) . '/parser.php';
 require dirname( __FILE__ ) . '/register.php';
-require dirname( __FILE__ ) . '/collaboration.php';
+require dirname( __FILE__ ) . '/coediting.php';
 
 // Register server-side code for individual blocks.
 foreach ( glob( dirname( __FILE__ ) . '/../blocks/library/*/index.php' ) as $block_logic ) {
