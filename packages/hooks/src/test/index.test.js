@@ -10,8 +10,6 @@ import {
 const testObject = {};
 testObject.hooks = new Hooks();
 
-console.log( testObject.hooks );
-
 function filter_a( str ) {
 	return str + 'a';
 }
