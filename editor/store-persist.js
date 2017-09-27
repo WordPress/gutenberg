@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { mapKeys } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import { STORE_DEFAULTS } from './store-defaults';
@@ -39,14 +34,10 @@ export default function storePersist( reducerKey, storageKey = DEFAULT_STORAGE_K
 		// Load initially persisted value
 		const persistedString = window.localStorage.getItem( storageKey );
 		if ( persistedString ) {
-			const persistedState = JSON.parse( persistedString );
-
-			// hydrate any missing properties with defaults
-			mapKeys( defaults[ reducerKey ] || {}, function( value, key ) {
-				if ( persistedState[ key ] === undefined ) {
-					persistedState[ key ] = value;
-				}
-			} );
+			const persistedState = {
+				...defaults[ reducerKey ],
+				...JSON.parse( persistedString ),
+			};
 
 			store.dispatch( {
 				type: 'REDUX_REHYDRATE',
