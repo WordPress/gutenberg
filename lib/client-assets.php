@@ -682,12 +682,19 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	}
 
 	// Set initial title to empty string for auto draft for duration of edit.
+	// Otherwise, title defaults to and displays as "Auto Draft".
 	$is_new_post = 'auto-draft' === $post_to_edit['status'];
 	if ( $is_new_post ) {
 		$post_to_edit['title'] = array(
 			'raw'      => '',
 			'rendered' => apply_filters( 'the_title', '', $post->ID ),
 		);
+	}
+
+	// Set initial content to apply autop on unknown blocks, preserving this
+	// behavior for classic content while otherwise disabling for blocks.
+	if ( ! $is_new_post && is_array( $post_to_edit['content'] ) ) {
+		$post_to_edit['content']['raw'] = gutenberg_wpautop_block_content( $post_to_edit['content']['raw'] );
 	}
 
 	// Preload common data.
