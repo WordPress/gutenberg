@@ -401,7 +401,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		$this->assertSame( 1, $matched );
 		$this->assertNotEmpty( $function );
 
-		$matched = preg_match_all( '/^[\t]case \'([^\']+)/m', $function[0], $cases );
+		$matched = preg_match_all( '/^[\t]{1,2}case \'([^\']+)/m', $function[0], $cases );
 		$this->assertNotEmpty( $matched );
 		$this->assertNotEmpty( $cases );
 

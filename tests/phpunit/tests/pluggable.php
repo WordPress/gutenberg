@@ -102,7 +102,7 @@ class Tests_Pluggable extends WP_UnitTestCase {
 		}
 
 		foreach ( $test_files as $file ) {
-			preg_match_all( '#^function (\w+)#m', file_get_contents( ABSPATH . '/' . $file ), $functions );
+			preg_match_all( '#^\t?function (\w+)#m', file_get_contents( ABSPATH . '/' . $file ), $functions );
 
 			foreach ( $functions[1] as $function ) {
 				$data[] = array(
