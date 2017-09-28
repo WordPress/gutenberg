@@ -108,7 +108,7 @@ registerBlockType( 'core/audio', {
 			const inspectorControls = focus && (
 				<InspectorControls key="inspector">
 					<BlockDescription>
-						<p>{ __( 'Audio, locally hosted, locally sourced.' ) }</p>
+						<p>{ __( 'The Audio block allows you to embed audio files and play them back using a simple player.' ) }</p>
 					</BlockDescription>
 				</InspectorControls>
 			);
