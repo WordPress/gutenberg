@@ -53,6 +53,7 @@ registerBlockType( 'core/shortcode', {
 							<BlockDescription>
 								<p>{ __( 'A shortcode is a WordPress-specific code snippet that is written between square brackets as [shortcode]. ' ) }</p>
 							</BlockDescription>
+							<p>{ __( 'No advanced options.' ) }</p>
 						</InspectorControls>
 					}
 				</div>

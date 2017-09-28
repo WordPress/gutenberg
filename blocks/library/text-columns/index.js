@@ -68,7 +68,7 @@ registerBlockType( 'core/text-columns', {
 			focus && (
 				<InspectorControls key="inspector">
 					<BlockDescription>
-						<p>{ __( 'Text. Great things start here.' ) }</p>
+						<p>{ __( 'Add text across columns.' ) }</p>
 					</BlockDescription>
 					<RangeControl
 						label={ __( 'Columns' ) }
