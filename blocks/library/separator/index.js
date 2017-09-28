@@ -40,7 +40,7 @@ registerBlockType( 'core/separator', {
 			focus && (
 				<InspectorControls key="inspector">
 					<BlockDescription>
-						<p>{ __( 'The horizontal rule represents a paragraph-level thematic break, e.g. a scene change in a story, or a transition to another topic within an article.' ) }</p>
+						<p>{ __( 'The separator represents a paragraph-level thematic break, e.g. a scene change in a story, or a transition to another topic within an article.' ) }</p>
 					</BlockDescription>
 				</InspectorControls>
 			),
