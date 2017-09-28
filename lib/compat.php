@@ -143,7 +143,7 @@ add_filter( 'wp_editor_settings', 'gutenberg_disable_editor_settings_wpautop' );
 /**
  * Add rest nonce to the heartbeat response.
  *
- * @param array  $response  The Heartbeat response.
+ * @param array $response The Heartbeat response.
  */
 function gutenberg_add_rest_nonce_to_heartbeat_response_headers( $response ) {
 	$response['rest-nonce'] = wp_create_nonce( 'wp_rest' );
