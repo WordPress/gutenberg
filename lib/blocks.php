@@ -186,11 +186,7 @@ function gutenberg_extract_blocks_from_post_content( $response, $post ) {
 
 	// Extract the block data from the post content.
 	$blocks = gutenberg_add_blocks_to_post_resource( $post->post_content );
-
-	// Add block data to the response as part of 'content'.
-	$content           = $response->get_data( 'content' );
-	$content['blocks'] = $blocks;
-	$response->set_data( array( 'content' => $content ) );
+	$response->data['content']['blocks'] = $blocks;
 
 	return $response;
 }
