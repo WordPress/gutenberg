@@ -26,7 +26,6 @@ describe( 'PanelHeader', () => {
 
 		it( 'should render child elements in the panel header body when provided', () => {
 			const panelHeader = shallow( <PanelHeader children="Some Text" /> );
-			expect( panelHeader.instance().props.children ).toBe( 'Some Text' );
 			expect( panelHeader.text() ).toBe( 'Some Text' );
 		} );
 

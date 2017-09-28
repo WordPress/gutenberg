@@ -65,8 +65,8 @@ describe( 'DropdownMenu', () => {
 
 			expect( wrapper.state( 'open' ) ).toBe( false );
 			expect( wrapper.state( 'activeIndex' ) ).toBeNull();
-			expect( wrapper.find( '> IconButton' ).prop( 'label' ) ).toBe( 'Select a direction' );
-			expect( wrapper.find( '> IconButton' ).prop( 'icon' ) ).toBe( 'menu' );
+			expect( wrapper.find( '.components-dropdown-menu > IconButton' ).prop( 'label' ) ).toBe( 'Select a direction' );
+			expect( wrapper.find( '.components-dropdown-menu > IconButton' ).prop( 'icon' ) ).toBe( 'menu' );
 			expect( wrapper.find( '.components-dropdown-menu__menu' ) ).toHaveLength( 0 );
 		} );
 
@@ -74,7 +74,12 @@ describe( 'DropdownMenu', () => {
 			const wrapper = shallow( <DropdownMenu controls={ controls } /> );
 
 			// Open menu
-			wrapper.find( '> IconButton' ).simulate( 'click' );
+			const prevProps = wrapper.instance().props;
+			const state = wrapper.state();
+			wrapper.find( '.components-dropdown-menu > IconButton' ).simulate( 'click' );
+
+			// We need to explicitely call did update when shallow rendering https://github.com/airbnb/enzyme/issues/1058
+			wrapper.instance().componentDidUpdate( prevProps, state );
 
 			const options = wrapper.find( '.components-dropdown-menu__menu > IconButton' );
 			expect( wrapper.state( 'open' ) ).toBe( true );
@@ -101,7 +106,7 @@ describe( 'DropdownMenu', () => {
 			const wrapper = shallow( <DropdownMenu controls={ controls } /> );
 
 			// Open menu
-			wrapper.find( '> IconButton' ).simulate( 'click' );
+			wrapper.find( '.components-dropdown-menu > IconButton' ).simulate( 'click' );
 
 			// Select option
 			const options = wrapper.find( '.components-dropdown-menu__menu > IconButton' );
@@ -115,7 +120,7 @@ describe( 'DropdownMenu', () => {
 			const wrapper = shallow( <DropdownMenu controls={ controls } /> );
 
 			// Open menu
-			wrapper.find( '> IconButton' ).simulate( 'click' );
+			wrapper.find( '.components-dropdown-menu > IconButton' ).simulate( 'click' );
 
 			// Navigate options
 			function assertKeyDown( keyCode, expectedActiveIndex ) {
@@ -143,7 +148,7 @@ describe( 'DropdownMenu', () => {
 			const wrapper = mount( <DropdownMenu controls={ controls } /> );
 
 			// Open menu
-			wrapper.find( '> IconButton' ).simulate( 'click' );
+			wrapper.find( '.components-dropdown-menu > IconButton' ).simulate( 'click' );
 
 			// Close menu by escape
 			wrapper.simulate( 'keydown', {
@@ -159,7 +164,7 @@ describe( 'DropdownMenu', () => {
 			const wrapper = shallow( <DropdownMenu controls={ controls } /> );
 
 			// Open menu
-			wrapper.find( '> IconButton' ).simulate( 'click' );
+			wrapper.find( '.components-dropdown-menu > IconButton' ).simulate( 'click' );
 
 			// Close menu by click outside
 			wrapper.instance().handleClickOutside();
@@ -171,7 +176,7 @@ describe( 'DropdownMenu', () => {
 			const wrapper = shallow( <DropdownMenu controls={ controls } /> );
 
 			// Open menu
-			wrapper.find( '> IconButton' ).simulate( 'click' );
+			wrapper.find( '.components-dropdown-menu > IconButton' ).simulate( 'click' );
 
 			// Close menu by tab
 			wrapper.simulate( 'keydown', {

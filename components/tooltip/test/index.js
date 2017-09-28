@@ -86,11 +86,13 @@ describe( 'Tooltip', () => {
 
 			expect( originalMouseEnter ).toHaveBeenCalled();
 
-			const popover = wrapper.find( 'Popover' );
+			let popover = wrapper.find( 'Popover' );
 			expect( wrapper.state( 'isOver' ) ).toBe( false );
 			expect( popover.prop( 'isOpen' ) ).toBe( false );
 
 			wrapper.instance().delayedSetIsOver.flush();
+			wrapper.update();
+			popover = wrapper.find( 'Popover' );
 
 			expect( wrapper.state( 'isOver' ) ).toBe( true );
 			expect( popover.prop( 'isOpen' ) ).toBe( true );

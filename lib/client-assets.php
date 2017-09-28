@@ -219,18 +219,19 @@ function gutenberg_register_vendor_scripts() {
 
 	// Vendor Scripts.
 	$react_suffix = ( SCRIPT_DEBUG ? '.development' : '.production' ) . $suffix;
+
 	gutenberg_register_vendor_script(
 		'react',
-		'https://unpkg.com/react@next/umd/react' . $react_suffix . '.js'
+		'https://unpkg.com/react@16.0.0/umd/react' . $react_suffix . '.js'
 	);
 	gutenberg_register_vendor_script(
 		'react-dom',
-		'https://unpkg.com/react-dom@next/umd/react-dom' . $react_suffix . '.js',
+		'https://unpkg.com/react-dom@16.0.0/umd/react-dom' . $react_suffix . '.js',
 		array( 'react' )
 	);
 	gutenberg_register_vendor_script(
 		'react-dom-server',
-		'https://unpkg.com/react-dom@next/umd/react-dom-server.browser' . $react_suffix . '.js',
+		'https://unpkg.com/react-dom@16.0.0/umd/react-dom-server.browser' . $react_suffix . '.js',
 		array( 'react' )
 	);
 	$moment_script = SCRIPT_DEBUG ? 'moment.js' : 'min/moment.min.js';
