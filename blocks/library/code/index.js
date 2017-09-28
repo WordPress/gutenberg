@@ -61,6 +61,7 @@ registerBlockType( 'core/code', {
 				</InspectorControls>
 			),
 			<TextareaAutosize
+				key="block"
 				className={ className }
 				value={ attributes.content }
 				onChange={ ( event ) => setAttributes( { content: event.target.value } ) }
