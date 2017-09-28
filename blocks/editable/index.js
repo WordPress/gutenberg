@@ -13,6 +13,7 @@ import {
 	find,
 	defer,
 	noop,
+	throttle,
 } from 'lodash';
 import { nodeListToReact } from 'dom-react';
 import { Fill } from 'react-slot-fill';
@@ -87,6 +88,8 @@ export default class Editable extends Component {
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.maybePropagateUndo = this.maybePropagateUndo.bind( this );
 		this.onBeforePastePreProcess = this.onBeforePastePreProcess.bind( this );
+		this.saveEditorContent = this.saveEditorContent.bind( this );
+		this.saveEditorContentThrottled = throttle( this.saveEditorContent, 10100, { leading: true } );
 
 		this.state = {
 			formats: {},
@@ -227,10 +230,16 @@ export default class Editable extends Component {
 	}
 
 	onChange() {
+		this.saveEditorContentThrottled.cancel();
+
 		if ( ! this.editor.isDirty() ) {
 			return;
 		}
 
+		this.saveEditorContent();
+	}
+
+	saveEditorContent() {
 		this.savedContent = this.getContent();
 		this.editor.save();
 		this.props.onChange( this.savedContent );
@@ -384,6 +393,8 @@ export default class Editable extends Component {
 		if ( keyCode === BACKSPACE ) {
 			this.onSelectionChange();
 		}
+
+		this.saveEditorContentThrottled();
 	}
 
 	splitContent( blocks = [] ) {
@@ -546,10 +557,13 @@ export default class Editable extends Component {
 	removeFormat( format ) {
 		this.editor.focus();
 		this.editor.formatter.remove( format );
+		this.saveEditorContent();
 	}
+
 	applyFormat( format, args, node ) {
 		this.editor.focus();
 		this.editor.formatter.apply( format, args, node );
+		this.saveEditorContent();
 	}
 
 	changeFormats( formats ) {
@@ -614,7 +628,7 @@ export default class Editable extends Component {
 		);
 
 		return (
-			<div className={ classes }>
+			<div className={ classes } >
 				{ focus &&
 					<Fill name="Formatting.Toolbar">
 						{ ! inlineToolbar && formatToolbar }
