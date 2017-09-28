@@ -380,9 +380,12 @@ export function getEditedPostPreviewLink( state ) {
 export const getBlock = createSelector(
 	( state, uid ) => {
 		const block = state.editor.blocksByUid[ uid ];
-		const type = getBlockType( block.name );
+		if ( ! block ) {
+			return null;
+		}
 
-		if ( ! block || ! type || ! type.attributes ) {
+		const type = getBlockType( block.name );
+		if ( ! type || ! type.attributes ) {
 			return block;
 		}
 
@@ -394,8 +397,7 @@ export const getBlock = createSelector(
 			return result;
 		}, {} );
 
-		// Avoid injecting an empty `attributes: {}`
-		if ( ! block.attributes && ! metaAttributes.length ) {
+		if ( ! Object.keys( metaAttributes ).length ) {
 			return block;
 		}
 

@@ -13,6 +13,8 @@ import { __ } from '@wordpress/i18n';
  */
 import './editor.scss';
 import { registerBlockType, source, createBlock } from '../../api';
+import InspectorControls from '../../inspector-controls';
+import BlockDescription from '../../block-description';
 
 const { prop } = source;
 
@@ -42,22 +44,30 @@ registerBlockType( 'core/code', {
 				type: 'raw',
 				isMatch: ( node ) => (
 					node.nodeName === 'PRE' &&
-					node.children === 1 &&
+					node.children.length === 1 &&
 					node.firstChild.nodeName === 'CODE'
 				),
 			},
 		],
 	},
 
-	edit( { attributes, setAttributes, className } ) {
-		return (
+	edit( { attributes, setAttributes, focus, className } ) {
+		return [
+			focus && (
+				<InspectorControls key="inspector">
+					<BlockDescription>
+						<p>{ __( 'The code block maintains spaces and tabs, great for showing code snippets.' ) }</p>
+					</BlockDescription>
+				</InspectorControls>
+			),
 			<TextareaAutosize
+				key="block"
 				className={ className }
 				value={ attributes.content }
 				onChange={ ( event ) => setAttributes( { content: event.target.value } ) }
 				placeholder={ __( 'Write code…' ) }
-			/>
-		);
+			/>,
+		];
 	},
 
 	save( { attributes } ) {

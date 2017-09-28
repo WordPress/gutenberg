@@ -17,6 +17,7 @@ import Header from '../header';
 import Sidebar from '../sidebar';
 import TextEditor from '../modes/text-editor';
 import VisualEditor from '../modes/visual-editor';
+import MetaBoxes from '../meta-boxes';
 import UnsavedChangesWarning from '../unsaved-changes-warning';
 import DocumentTitle from '../document-title';
 import AutosaveMonitor from '../autosave-monitor';
@@ -40,8 +41,11 @@ function Layout( { mode, isSidebarOpened, notices, ...props } ) {
 			<AutosaveMonitor />
 			<Header />
 			<div className="editor-layout__content">
-				{ mode === 'text' && <TextEditor /> }
-				{ mode === 'visual' && <VisualEditor /> }
+				<div className="editor-layout__editor">
+					{ mode === 'text' && <TextEditor /> }
+					{ mode === 'visual' && <VisualEditor /> }
+				</div>
+				<MetaBoxes />
 			</div>
 			{ isSidebarOpened && <Sidebar /> }
 		</div>

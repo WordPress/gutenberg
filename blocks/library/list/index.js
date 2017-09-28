@@ -16,6 +16,8 @@ import './editor.scss';
 import { registerBlockType, source, createBlock } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
+import InspectorControls from '../../inspector-controls';
+import BlockDescription from '../../block-description';
 
 const { children, prop } = source;
 
@@ -307,6 +309,14 @@ registerBlockType( 'core/list', {
 							},
 						] }
 					/>
+				),
+				focus && (
+					<InspectorControls key="inspector">
+						<BlockDescription>
+							<p>{ __( 'List. Numbered or bulleted.' ) }</p>
+						</BlockDescription>
+						<p>{ __( 'No advanced options.' ) }</p>
+					</InspectorControls>
 				),
 				<Editable
 					multiline="li"

@@ -3,6 +3,11 @@
 	border: none;
 	outline: none;
 	text-decoration: none;
+	margin: 0;
+
+	&:active {
+		color: currentColor;
+	}
 
 	&:disabled {
 		opacity: 0.6;

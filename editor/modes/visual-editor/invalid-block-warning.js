@@ -24,17 +24,20 @@ import {
  */
 import { replaceBlock } from '../../actions';
 
-function InvalidBlockWarning( { ignoreInvalid, switchToDefaultType } ) {
+function InvalidBlockWarning( { ignoreInvalid, switchToBlockType } ) {
+	const htmlBlockName = 'core/html';
 	const defaultBlockType = getBlockType( getUnknownTypeHandlerName() );
+	const htmlBlockType = getBlockType( htmlBlockName );
+	const switchTo = ( blockType ) => () => switchToBlockType( blockType );
 
 	return (
 		<BlockWarning>
-			<p>{ sprintf( __(
+			<p>{ defaultBlockType && htmlBlockType && sprintf( __(
 				'This block appears to have been modified externally. ' +
-				'Overwrite the external changes or Convert to %s to keep ' +
+				'Overwrite the external changes or Convert to %s or %s to keep ' +
 				'your changes.'
-			), defaultBlockType.title ) }</p>
-			<p>
+			), defaultBlockType.title, htmlBlockType.title ) }</p>
+			<p className="visual-editor__invalid-block-warning-buttons">
 				<Button
 					onClick={ ignoreInvalid }
 					isLarge
@@ -43,12 +46,23 @@ function InvalidBlockWarning( { ignoreInvalid, switchToDefaultType } ) {
 				</Button>
 				{ defaultBlockType && (
 					<Button
-						onClick={ switchToDefaultType }
+						onClick={ switchTo( defaultBlockType ) }
 						isLarge
 					>
 						{
-							/* translators: Revert invalid block to default */
+							/* translators: Revert invalid block to another block type */
 							sprintf( __( 'Convert to %s' ), defaultBlockType.title )
+						}
+					</Button>
+				) }
+
+				{ htmlBlockType && (
+					<Button
+						onClick={ switchTo( htmlBlockType ) }
+						isLarge
+					>
+						{
+							sprintf( __( 'Edit as HTML block' ) )
 						}
 					</Button>
 				) }
@@ -67,11 +81,10 @@ export default connect(
 				const nextBlock = createBlock( name, attributes );
 				dispatch( replaceBlock( block.uid, nextBlock ) );
 			},
-			switchToDefaultType() {
-				const defaultBlockName = getUnknownTypeHandlerName();
+			switchToBlockType( blockType ) {
 				const { block } = ownProps;
-				if ( defaultBlockName && block ) {
-					const nextBlock = createBlock( defaultBlockName, {
+				if ( blockType && block ) {
+					const nextBlock = createBlock( blockType.name, {
 						content: block.originalContent,
 					} );
 
