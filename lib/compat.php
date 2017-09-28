@@ -150,4 +150,4 @@ function gutenberg_add_rest_nonce_to_heartbeat_response_headers( $response ) {
 	return $response;
 }
 
-add_filter( 'heartbeat_send', 'gutenberg_add_rest_nonce_to_heartbeat_response_headers' );
+add_filter( 'wp_refresh_nonces', 'gutenberg_add_rest_nonce_to_heartbeat_response_headers' );
