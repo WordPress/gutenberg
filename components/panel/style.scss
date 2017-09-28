@@ -54,7 +54,7 @@
 .components-panel .components-panel__body-title {
 	display: block;
 	padding: 0;
-	margin: -15px;
+	margin: -1 * $panel-padding;
 	font-size: inherit;
 }
 .components-panel__body.is-opened .components-panel__body-title {

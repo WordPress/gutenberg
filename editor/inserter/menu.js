@@ -9,7 +9,7 @@ import { connect } from 'react-redux';
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { withFocusReturn, withInstanceId, withSpokenMessages } from '@wordpress/components';
+import { withInstanceId, withSpokenMessages } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
 import { getCategories, getBlockTypes, BlockIcon } from '@wordpress/blocks';
 
@@ -20,7 +20,7 @@ import './style.scss';
 import { getBlocks, getRecentlyUsedBlocks } from '../selectors';
 import { showInsertionPoint, hideInsertionPoint } from '../actions';
 
-const { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } = keycodes;
+const { TAB, LEFT, UP, RIGHT, DOWN } = keycodes;
 
 export const searchBlocks = ( blocks, searchTerm ) => {
 	const normalizedSearchTerm = searchTerm.toLowerCase().trim();
@@ -233,11 +233,7 @@ export class InserterMenu extends Component {
 				keydown.preventDefault();
 				this.focusNext( this );
 				break;
-			case ESCAPE:
-				keydown.preventDefault();
-				this.props.onSelect( null );
 
-				break;
 			case LEFT:
 				if ( this.state.currentFocus === 'search' ) {
 					return;
@@ -353,12 +349,12 @@ export class InserterMenu extends Component {
 		return (
 			<div className="editor-inserter__menu">
 				<label htmlFor={ `editor-inserter__search-${ instanceId }` } className="screen-reader-text">
-					{ __( 'Search blocks' ) }
+					{ __( 'Search for a block' ) }
 				</label>
 				<input
 					id={ `editor-inserter__search-${ instanceId }` }
 					type="search"
-					placeholder={ __( 'Search…' ) }
+					placeholder={ __( 'Search for a block' ) }
 					className="editor-inserter__search"
 					onChange={ this.filter }
 					onClick={ this.setSearchFocus }
@@ -411,6 +407,5 @@ const connectComponent = connect(
 export default flow(
 	withInstanceId,
 	withSpokenMessages,
-	withFocusReturn,
 	connectComponent
 )( InserterMenu );

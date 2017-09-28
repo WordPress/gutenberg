@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Component } from 'element';
-import { keycodes } from '@wordpress/utils';
+import { keycodes, focus } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -31,14 +31,14 @@ class WritingFlow extends Component {
 	}
 
 	getVisibleTabbables() {
-		const tabbablesSelector = [
-			'*[contenteditable="true"]',
-			'*[tabindex]:not([tabindex="-1"])',
-			'textarea',
-			'input',
-		].join( ', ' );
-		const isVisible = ( elem ) => elem.offsetWidth > 0 || elem.offsetHeight > 0 || elem.getClientRects().length > 0;
-		return [ ...this.container.querySelectorAll( tabbablesSelector ) ].filter( isVisible );
+		return focus.tabbable
+			.find( this.container )
+			.filter( ( node ) => (
+				node.nodeName === 'INPUT' ||
+				node.nodeName === 'TEXTAREA' ||
+				node.contentEditable === 'true' ||
+				node.classList.contains( 'editor-visual-editor__block' )
+			) );
 	}
 
 	moveFocusInContainer( target, direction = 'UP' ) {

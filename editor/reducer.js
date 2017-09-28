@@ -14,15 +14,7 @@ import { getBlockTypes } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { combineUndoableReducers } from './utils/undoable-reducer';
-
-/**
- * Module constants
- */
-const DEFAULT_PREFERENCES = {
-	mode: 'visual',
-	isSidebarOpened: window.innerWidth >= 782,
-	panels: { 'post-status': true },
-};
+import { STORE_DEFAULTS } from './store-defaults';
 
 /**
  * Returns a post attribute value, flattening nested rendered content using its
@@ -442,7 +434,7 @@ export function showInsertionPoint( state = false, action ) {
  * @param  {Object}  action                Dispatched action
  * @return {string}                        Updated state
  */
-export function preferences( state = DEFAULT_PREFERENCES, action ) {
+export function preferences( state = STORE_DEFAULTS.preferences, action ) {
 	switch ( action.type ) {
 		case 'TOGGLE_SIDEBAR':
 			return {

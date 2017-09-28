@@ -31,6 +31,7 @@ describe( 'block parser', () => {
 		},
 		save: ( { attributes } ) => attributes.fruit,
 		category: 'common',
+		title: 'block title',
 	};
 
 	afterEach( () => {
@@ -201,6 +202,7 @@ describe( 'block parser', () => {
 		it( 'should fall back to the unknown type handler for unknown blocks if present', () => {
 			registerBlockType( 'core/unknown-block', {
 				category: 'common',
+				title: 'unknown block',
 				attributes: {
 					content: {
 						type: 'string',
@@ -253,6 +255,7 @@ describe( 'block parser', () => {
 				},
 				save: noop,
 				category: 'common',
+				title: 'test block',
 			} );
 
 			const parsed = parse(
@@ -288,6 +291,7 @@ describe( 'block parser', () => {
 				},
 				save: noop,
 				category: 'common',
+				title: 'test block',
 			} );
 
 			const parsed = parse(
@@ -335,6 +339,7 @@ describe( 'block parser', () => {
 				},
 				save: noop,
 				category: 'common',
+				title: 'unknown block',
 			} );
 
 			setUnknownTypeHandlerName( 'core/unknown-block' );

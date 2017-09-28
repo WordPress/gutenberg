@@ -7,6 +7,7 @@ import Textarea from 'react-autosize-textarea';
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { parse } from '@wordpress/blocks';
 
@@ -49,8 +50,12 @@ class TextEditor extends Component {
 		const { value } = this.props;
 
 		return (
-			<div className="editor-text-editor">
-				<header className="editor-text-editor__formatting">
+			<div
+				role="region"
+				aria-label={ __( 'Editor content' ) }
+				className="editor-text-editor"
+			>
+				<div className="editor-text-editor__formatting">
 					<div className="editor-text-editor__formatting-group">
 						<button className="editor-text-editor__bold">b</button>
 						<button className="editor-text-editor__italic">i</button>
@@ -66,7 +71,7 @@ class TextEditor extends Component {
 						<button>more</button>
 						<button>close tags</button>
 					</div>
-				</header>
+				</div>
 				<div className="editor-text-editor__body">
 					<PostTitle />
 					<Textarea

@@ -183,6 +183,7 @@ class Autocomplete extends Component {
 		const { children, className } = this.props;
 		const { isOpen, selectedIndex } = this.state;
 		const classes = classnames( 'components-autocomplete__popover', className );
+		const filteredOptions = this.getFilteredOptions();
 
 		// Blur is applied to the wrapper node, since if the child is Editable,
 		// the event will not have `relatedTarget` assigned.
@@ -197,7 +198,8 @@ class Autocomplete extends Component {
 					onKeyDown: this.setSelectedIndex,
 				} ) }
 				<Popover
-					isOpen={ isOpen }
+					isOpen={ isOpen && filteredOptions.length > 0 }
+					focusOnOpen={ false }
 					position="top right"
 					className={ classes }
 				>
@@ -205,7 +207,7 @@ class Autocomplete extends Component {
 						role="menu"
 						className="components-autocomplete__results"
 					>
-						{ this.getFilteredOptions().map( ( option, index ) => (
+						{ filteredOptions.map( ( option, index ) => (
 							<li
 								key={ option.value }
 								role="menuitem"

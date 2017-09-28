@@ -70,7 +70,8 @@ class HierarchicalTermSelector extends Component {
 	}
 
 	onChangeFormName( event ) {
-		this.setState( { formName: event.target.value } );
+		const newValue = event.target.value.trim() === '' ? '' : event.target.value;
+		this.setState( { formName: newValue } );
 	}
 
 	onChangeFormParent( event ) {
@@ -86,6 +87,9 @@ class HierarchicalTermSelector extends Component {
 	onAddTerm( event ) {
 		event.preventDefault();
 		const { formName, formParent } = this.state;
+		if ( formName === '' ) {
+			return;
+		}
 		const findOrCreatePromise = new Promise( ( resolve, reject ) => {
 			this.setState( {
 				adding: true,
@@ -236,6 +240,7 @@ class HierarchicalTermSelector extends Component {
 							className="editor-post-taxonomies__hierarchical-terms-input"
 							value={ formName }
 							onChange={ this.onChangeFormName }
+							required
 						/>
 						{ !! availableTerms.length &&
 							<div>

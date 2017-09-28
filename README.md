@@ -16,7 +16,7 @@ Check out the <a href="https://github.com/WordPress/gutenberg/blob/master/docs/f
 
 ## Contributors
 
-Gutenberg is built by many contributors and volunteers. Please see the full list in <a href="CONTRIBUTORS.md">CONTRIBUTORS.md</a>.
+Gutenberg is built by many contributors and volunteers. Please see the full list in <a href="https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTORS.md">CONTRIBUTORS.md</a>.
 
 ## Further Reading
 
@@ -28,7 +28,7 @@ Gutenberg is built by many contributors and volunteers. Please see the full list
 
 ## How You Can Contribute
 
-Please see [CONTRIBUTING.md](CONTRIBUTING.md).
+Please see <a href="https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a>.
 
 ## Why
 

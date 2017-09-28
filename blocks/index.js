@@ -14,6 +14,7 @@ import './library';
 // and then stored as objects in state, from which it is then rendered for editing.
 export * from './api';
 export { default as AlignmentToolbar } from './alignment-toolbar';
+export { default as BlockAlignmentToolbar } from './block-alignment-toolbar';
 export { default as BlockControls } from './block-controls';
 export { default as BlockDescription } from './block-description';
 export { default as BlockIcon } from './block-icon';

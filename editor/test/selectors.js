@@ -39,6 +39,7 @@ import {
 	getBlocks,
 	getBlockCount,
 	getSelectedBlock,
+	getEditedPostContent,
 	getMultiSelectedBlockUids,
 	getMultiSelectedBlocksStartUid,
 	getMultiSelectedBlocksEndUid,
@@ -78,11 +79,15 @@ describe( 'selectors', () => {
 		registerBlockType( 'core/test-block', {
 			save: ( props ) => props.attributes.text,
 			category: 'common',
+			title: 'test block',
 		} );
 	} );
 
 	beforeEach( () => {
 		isEditedPostDirty.clear();
+		getBlock.clear();
+		getBlocks.clear();
+		getEditedPostContent.clear();
 	} );
 
 	afterAll( () => {
@@ -1059,26 +1064,78 @@ describe( 'selectors', () => {
 	describe( 'getBlock', () => {
 		it( 'should return the block', () => {
 			const state = {
+				currentPost: {},
 				editor: {
 					blocksByUid: {
 						123: { uid: 123, name: 'core/paragraph' },
 					},
+					edits: {},
 				},
 			};
 
 			expect( getBlock( state, 123 ) ).toEqual( { uid: 123, name: 'core/paragraph' } );
+		} );
+
+		it( 'should return null if the block is not present in state', () => {
+			const state = {
+				currentPost: {},
+				editor: {
+					blocksByUid: {},
+					edits: {},
+				},
+			};
+
+			expect( getBlock( state, 123 ) ).toBe( null );
+		} );
+
+		it( 'should merge meta attributes for the block', () => {
+			registerBlockType( 'core/meta-block', {
+				save: ( props ) => props.attributes.text,
+				category: 'common',
+				title: 'test block',
+				attributes: {
+					foo: {
+						type: 'string',
+						meta: 'foo',
+					},
+				},
+			} );
+
+			const state = {
+				currentPost: {
+					meta: {
+						foo: 'bar',
+					},
+				},
+				editor: {
+					blocksByUid: {
+						123: { uid: 123, name: 'core/meta-block' },
+					},
+					edits: {},
+				},
+			};
+
+			expect( getBlock( state, 123 ) ).toEqual( {
+				uid: 123,
+				name: 'core/meta-block',
+				attributes: {
+					foo: 'bar',
+				},
+			} );
 		} );
 	} );
 
 	describe( 'getBlocks', () => {
 		it( 'should return the ordered blocks', () => {
 			const state = {
+				currentPost: {},
 				editor: {
 					blocksByUid: {
 						23: { uid: 23, name: 'core/heading' },
 						123: { uid: 123, name: 'core/paragraph' },
 					},
 					blockOrder: [ 123, 23 ],
+					edits: {},
 				},
 			};
 
@@ -1108,11 +1165,13 @@ describe( 'selectors', () => {
 	describe( 'getSelectedBlock', () => {
 		it( 'should return null if no block is selected', () => {
 			const state = {
+				currentPost: {},
 				editor: {
 					blocksByUid: {
 						23: { uid: 23, name: 'core/heading' },
 						123: { uid: 123, name: 'core/paragraph' },
 					},
+					edits: {},
 				},
 				blockSelection: { start: null, end: null },
 			};
@@ -1466,6 +1525,7 @@ describe( 'selectors', () => {
 	describe( 'getBlockInsertionPoint', () => {
 		it( 'should return the uid of the selected block', () => {
 			const state = {
+				currentPost: {},
 				preferences: { mode: 'visual' },
 				blockSelection: {
 					start: 2,
@@ -1476,6 +1536,7 @@ describe( 'selectors', () => {
 						2: { uid: 2 },
 					},
 					blockOrder: [ 1, 2, 3 ],
+					edits: {},
 				},
 			};
 
