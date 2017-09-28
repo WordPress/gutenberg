@@ -164,6 +164,16 @@ function gutenberg_register_scripts_and_styles() {
 		'before'
 	);
 
+	wp_register_script(
+		'wp-blocks',
+		gutenberg_url( 'blocks/build/index.js' ),
+		array(
+			'wp-editor',
+		),
+		filemtime( gutenberg_dir_path() . 'blocks/build/index.js' ),
+		true // enqueue in the footer.
+	);
+
 	// Editor Styles.
 	wp_register_style(
 		'wp-components',
@@ -633,6 +643,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 	// The editor code itself.
 	wp_enqueue_script( 'wp-editor' );
+	wp_enqueue_script( 'wp-blocks' );
 
 	gutenberg_fix_jetpack_freeform_block_conflict();
 	wp_localize_script( 'wp-editor', 'wpEditorL10n', array(

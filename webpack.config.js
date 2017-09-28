@@ -50,6 +50,7 @@ const entryPointNames = [
 	'element',
 	'i18n',
 	'utils',
+	'blocks',
 ];
 
 const externals = {
