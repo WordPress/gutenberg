@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, reduce, isObject, castArray } from 'lodash';
+import { isEmpty, reduce, isObject, castArray, compact } from 'lodash';
 import { html as beautifyHtml } from 'js-beautify';
 import classnames from 'classnames';
 
@@ -187,8 +187,17 @@ export function serializeBlock( block ) {
 
 	switch ( blockName ) {
 		case 'core/more':
-			const { text, noTeaser } = saveAttributes;
-			return `<!--more${ text ? ` ${ text }` : '' }-->${ noTeaser ? '\n<!--noteaser-->' : '' }`;
+			const { customText, noTeaser } = saveAttributes;
+
+			const moreTag = customText
+				? `<!--more ${ customText }-->`
+				: '<!--more-->';
+
+			const noTeaserTag = noTeaser
+				? '<!--noteaser-->'
+				: '';
+
+			return compact( [ moreTag, noTeaserTag ] ).join( '\n' );
 
 		case getUnknownTypeHandlerName():
 			return saveContent;

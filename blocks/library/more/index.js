@@ -24,7 +24,7 @@ registerBlockType( 'core/more', {
 	className: false,
 
 	attributes: {
-		text: {
+		customText: {
 			type: 'string',
 		},
 		noTeaser: {
@@ -34,11 +34,11 @@ registerBlockType( 'core/more', {
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus } ) {
-		const { text, noTeaser } = attributes;
+		const { customText, noTeaser } = attributes;
 
 		const toggleNoTeaser = () => setAttributes( { noTeaser: ! noTeaser } );
 		const defaultText = __( 'Read more' );
-		const value = text !== undefined ? text : defaultText;
+		const value = customText !== undefined ? customText : defaultText;
 		const inputLength = value.length ? value.length + 1 : 1;
 
 		return [
@@ -59,16 +59,14 @@ registerBlockType( 'core/more', {
 					type="text"
 					value={ value }
 					size={ inputLength }
-					onChange={ ( event ) => setAttributes( { text: event.target.value } ) }
+					onChange={ ( event ) => setAttributes( { customText: event.target.value } ) }
 					onFocus={ setFocus }
 				/>
 			</div>,
 		];
 	},
 
-	save( { attributes } ) {
-		const { text } = attributes;
-
-		return text;
+	save() {
+		return null;
 	},
 } );

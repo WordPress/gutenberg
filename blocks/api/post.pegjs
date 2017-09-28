@@ -30,19 +30,20 @@ WP_Block
 WP_Tag_More
   = "<!--" WS* "more" customText:(WS+ text:$((!(WS* "-->") .)+) { /** <?php return $text; ?> **/ return text })? WS* "-->" noTeaser:(WS* "<!--noteaser-->")?
   { /** <?php
+    $attrs = array( 'noTeaser' => (bool) $noTeaser );
+    if ( ! empty( $customText ) ) {
+      $attrs['customText'] = $customText;
+    }
     return array(
        'blockName' => 'core/more',
-       'attrs' => array(
-         'customText' => $customText,
-         'noTeaser' => (bool) $noTeaser
-       ),
+       'attrs' => $attrs,
        'rawContent' => ''
     );
     ?> **/
     return {
       blockName: 'core/more',
       attrs: {
-        customText: customText,
+        customText: customText || undefined,
         noTeaser: !! noTeaser
       },
       rawContent: ''

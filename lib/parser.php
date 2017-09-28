@@ -265,12 +265,13 @@ class Gutenberg_PEG_Parser {
 
     private function peg_f0($text) { return $text; }
     private function peg_f1($customText, $noTeaser) {
+        $attrs = array( 'noTeaser' => (bool) $noTeaser );
+        if ( ! empty( $customText ) ) {
+          $attrs['customText'] = $customText;
+        }
         return array(
            'blockName' => 'core/more',
-           'attrs' => array(
-             'customText' => $customText,
-             'noTeaser' => (bool) $noTeaser
-           ),
+           'attrs' => $attrs,
            'rawContent' => ''
         );
         }
