@@ -1126,4 +1126,166 @@ class Tests_DB extends WP_UnitTestCase {
 		$sql = $wpdb->prepare( '%d %1$d %%% %', 1 );
 		$this->assertEquals( '1 %1$d %% %', $sql );
 	}
+
+	/**
+	 * @dataProvider parse_db_host_data_provider
+	 * @ticket 41722
+	 */
+	public function test_parse_db_host( $host_string, $expect_bail, $host, $port, $socket, $is_ipv6 ) {
+		global $wpdb;
+		$data = $wpdb->parse_db_host( $host_string );
+		if ( $expect_bail ) {
+			$this->assertFalse( $data );
+		} else {
+			$this->assertInternalType( 'array', $data );
+
+			list( $parsed_host, $parsed_port, $parsed_socket, $parsed_is_ipv6 ) = $data;
+
+			$this->assertEquals( $host, $parsed_host );
+			$this->assertEquals( $port, $parsed_port );
+			$this->assertEquals( $socket, $parsed_socket );
+			$this->assertEquals( $is_ipv6, $parsed_is_ipv6 );
+		}
+	}
+
+	public function parse_db_host_data_provider() {
+		return array(
+			array(
+				'',    // DB_HOST
+				false, // Expect parse_db_host to bail for this hostname
+				null,  // Parsed host
+				null,  // Parsed port
+				null,  // Parsed socket
+				false, // is_ipv6
+			),
+			array(
+				':3306',
+				false,
+				null,
+				'3306',
+				null,
+				false,
+			),
+			array(
+				':/tmp/mysql.sock',
+				false,
+				null,
+				null,
+				'/tmp/mysql.sock',
+				false,
+			),
+			array(
+				'127.0.0.1',
+				false,
+				'127.0.0.1',
+				null,
+				null,
+				false,
+			),
+			array(
+				'127.0.0.1:3306',
+				false,
+				'127.0.0.1',
+				'3306',
+				null,
+				false,
+			),
+			array(
+				'example.com',
+				false,
+				'example.com',
+				null,
+				null,
+				false,
+			),
+			array(
+				'example.com:3306',
+				false,
+				'example.com',
+				'3306',
+				null,
+				false,
+			),
+			array(
+				'localhost',
+				false,
+				'localhost',
+				null,
+				null,
+				false,
+			),
+			array(
+				'localhost:/tmp/mysql.sock',
+				false,
+				'localhost',
+				null,
+				'/tmp/mysql.sock',
+				false,
+			),
+			array(
+				'0000:0000:0000:0000:0000:0000:0000:0001',
+				false,
+				'0000:0000:0000:0000:0000:0000:0000:0001',
+				null,
+				null,
+				true,
+			),
+			array(
+				'::1',
+				false,
+				'::1',
+				null,
+				null,
+				true,
+			),
+			array(
+				'[::1]',
+				false,
+				'::1',
+				null,
+				null,
+				true,
+			),
+			array(
+				'[::1]:3306',
+				false,
+				'::1',
+				'3306',
+				null,
+				true,
+			),
+			array(
+				'2001:0db8:0000:0000:0000:ff00:0042:8329',
+				false,
+				'2001:0db8:0000:0000:0000:ff00:0042:8329',
+				null,
+				null,
+				true,
+			),
+			array(
+				'2001:db8:0:0:0:ff00:42:8329',
+				false,
+				'2001:db8:0:0:0:ff00:42:8329',
+				null,
+				null,
+				true,
+			),
+			array(
+				'2001:db8::ff00:42:8329',
+				false,
+				'2001:db8::ff00:42:8329',
+				null,
+				null,
+				true,
+			),
+			array(
+				'?::',
+				true,
+				null,
+				null,
+				null,
+				false,
+			),
+		);
+	}
 }
