@@ -17,6 +17,7 @@ import {
 import { nodeListToReact } from 'dom-react';
 import { Fill } from 'react-slot-fill';
 import 'element-closest';
+import uuid from 'uuid/v4';
 
 /**
  * WordPress dependencies
@@ -93,6 +94,8 @@ export default class Editable extends Component {
 			empty: ! value || ! value.length,
 			selectedNodeId: 0,
 		};
+
+		this.footnotes = props.footnotes || {};
 	}
 
 	getSettings( settings ) {
@@ -233,7 +236,7 @@ export default class Editable extends Component {
 
 		this.savedContent = this.getContent();
 		this.editor.save();
-		this.props.onChange( this.savedContent );
+		this.props.onChange( { content: this.savedContent, footnotes: this.footnotes } );
 	}
 
 	getEditorSelectionRect() {
@@ -564,6 +567,10 @@ export default class Editable extends Component {
 				} else {
 					this.editor.execCommand( 'Unlink' );
 				}
+			} else if ( format === 'footnote' ) {
+				const footnoteId = uuid();
+				this.footnotes[ footnoteId ] = formatValue.text;
+				this.editor.selection.setContent( `<a href="#footnote-${ footnoteId }" data-footnote-id="${ footnoteId }" contenteditable="false"><sup>[*]</sup></a>` );
 			} else {
 				const isActive = this.isFormatActive( format );
 				if ( isActive && ! formatValue ) {

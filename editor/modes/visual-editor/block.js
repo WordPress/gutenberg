@@ -158,6 +158,10 @@ class VisualEditorBlock extends Component {
 			return result;
 		}, {} );
 
+		if ( attributes.footnotes ) {
+			this.props.changeFootnotes( { footnotes: attributes.footnotes } );
+		}
+
 		if ( size( metaAttributes ) ) {
 			this.props.onMetaChange( {
 				...this.props.meta,
@@ -452,6 +456,10 @@ export default connect(
 	( dispatch, ownProps ) => ( {
 		onChange( uid, attributes ) {
 			dispatch( updateBlockAttributes( uid, attributes ) );
+		},
+
+		changeFootnotes( footnotes ) {
+			dispatch( updateBlockAttributes( '[[footnotes]]', footnotes ) );
 		},
 
 		onSelect() {

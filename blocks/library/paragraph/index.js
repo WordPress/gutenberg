@@ -61,6 +61,9 @@ registerBlockType( 'core/paragraph', {
 		fontSize: {
 			type: 'number',
 		},
+		footnotes: {
+			type: 'object',
+		},
 	},
 
 	transforms: {
@@ -158,8 +161,10 @@ registerBlockType( 'core/paragraph', {
 					} }
 					value={ content }
 					onChange={ ( nextContent ) => {
+
 						setAttributes( {
-							content: nextContent,
+							content: nextContent.content,
+							footnotes: nextContent.footnotes,
 						} );
 					} }
 					focus={ focus }

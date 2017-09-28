@@ -46,6 +46,8 @@ class FormatToolbar extends Component {
 			settingsVisible: false,
 			opensInNewWindow: false,
 			newLinkValue: '',
+			showFootnoteEntry: false,
+			footnote: '',
 		};
 
 		this.addLink = this.addLink.bind( this );
@@ -56,6 +58,10 @@ class FormatToolbar extends Component {
 		this.onChangeLinkValue = this.onChangeLinkValue.bind( this );
 		this.toggleLinkSettingsVisibility = this.toggleLinkSettingsVisibility.bind( this );
 		this.setLinkTarget = this.setLinkTarget.bind( this );
+
+		this.addFootnote = this.addFootnote.bind( this );
+		this.onFootnoteChange = this.onFootnoteChange.bind( this );
+		this.submitFootnote = this.submitFootnote.bind( this );
 	}
 
 	componentDidMount() {
@@ -83,6 +89,8 @@ class FormatToolbar extends Component {
 				settingsVisible: false,
 				opensInNewWindow: !! nextProps.formats.link && !! nextProps.formats.link.target,
 				newLinkValue: '',
+				showFootnoteEntry: false,
+				foonote: '',
 			} );
 		}
 	}
@@ -131,12 +139,28 @@ class FormatToolbar extends Component {
 		}
 	}
 
+	onFootnoteChange( event ) {
+		this.setState( { footnote: event.target.value } );
+	}
+
+	addFootnote() {
+		this.setState( { showFootnoteEntry: true } );
+	}
+
+	submitFootnote( event ) {
+		event.preventDefault();
+
+		this.props.onChange( { footnote: { text: this.state.footnote } } );
+	}
+
 	render() {
 		const { formats, focusPosition, enabledControls = DEFAULT_CONTROLS } = this.props;
-		const { isAddingLink, isEditingLink, newLinkValue, settingsVisible, opensInNewWindow } = this.state;
+		const { isAddingLink, isEditingLink, newLinkValue, settingsVisible, opensInNewWindow, showFootnoteEntry, footnote } = this.state;
 		const linkStyle = focusPosition
 			? { position: 'absolute', ...focusPosition }
 			: null;
+
+		const isNodeFootnote = formats.link && formats.link.node.getAttribute( 'data-footnote-id' );
 
 		const toolbarControls = FORMATTING_CONTROLS
 			.filter( control => enabledControls.indexOf( control.format ) !== -1 )
@@ -160,9 +184,16 @@ class FormatToolbar extends Component {
 				icon: 'admin-links',
 				title: __( 'Link' ),
 				onClick: this.addLink,
-				isActive: isAddingLink || !! formats.link,
+				isActive: ( isAddingLink || !! formats.link ) && ! isNodeFootnote,
 			} );
 		}
+
+		toolbarControls.push( {
+			icon: 'format-audio',
+			title: __( 'Footnote' ),
+			onClick: this.addFootnote,
+			isActive: isNodeFootnote,
+		} );
 
 		return (
 			<div className="blocks-format-toolbar">
@@ -181,7 +212,7 @@ class FormatToolbar extends Component {
 					</form>
 				}
 
-				{ !! formats.link && ! isAddingLink && ! isEditingLink &&
+				{ ! isNodeFootnote && !! formats.link && ! isAddingLink && ! isEditingLink &&
 					<div className="blocks-format-toolbar__link-modal" style={ linkStyle }>
 						<a
 							className="blocks-format-toolbar__link-value"
@@ -195,6 +226,16 @@ class FormatToolbar extends Component {
 						<IconButton icon="admin-generic" onClick={ this.toggleLinkSettingsVisibility } aria-expanded={ settingsVisible } />
 						{ linkSettings }
 					</div>
+				}
+
+				{ ( isNodeFootnote || showFootnoteEntry ) &&
+					<form
+						style={ linkStyle }
+						className="blocks-format-toolbar__footnote-modal"
+						onSubmit={ this.submitFootnote }>
+						<textarea value={ footnote } onChange={ this.onFootnoteChange } placeholder={ __( 'Footnote' ) } />
+						<IconButton icon="yes" type="submit" label={ __( 'Apply' ) } />
+					</form>
 				}
 			</div>
 		);
