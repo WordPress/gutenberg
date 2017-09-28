@@ -200,4 +200,28 @@ class Tests_WP_oEmbed extends WP_UnitTestCase {
 		$this->assertEquals( $this->pre_oembed_result_filtered, $actual );
 		$this->assertSame( $expected_stack, $actual_stack );
 	}
+
+	/**
+	 * @ticket 40673
+	 * @group multisite
+	 * @group ms-required
+	 */
+	public function test_wp_filter_pre_oembed_result_multisite_restores_state_if_no_post_is_found() {
+		$current_blog_id = get_current_blog_id();
+
+		$user_id = self::factory()->user->create();
+		$blog_id = self::factory()->blog->create( array(
+			'user_id' => $user_id,
+		) );
+
+		$permalink = get_home_url( $blog_id, '/foo/' );
+
+		add_filter( 'pre_oembed_result', array( $this, '_filter_pre_oembed_result' ) );
+		$actual = $this->oembed->get_html( $permalink );
+		remove_filter( 'pre_oembed_result', array( $this, '_filter_pre_oembed_result' ) );
+
+		$this->assertNull( $this->pre_oembed_result_filtered );
+		$this->assertFalse( $actual );
+		$this->assertSame( $current_blog_id, get_current_blog_id() );
+	}
 }
