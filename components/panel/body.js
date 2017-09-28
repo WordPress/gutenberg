@@ -37,13 +37,13 @@ class PanelBody extends Component {
 	}
 
 	render() {
-		const { title, children, opened } = this.props;
+		const { title, children, opened, className } = this.props;
 		const isOpened = opened === undefined ? this.state.opened : opened;
 		const icon = `arrow-${ isOpened ? 'down' : 'right' }`;
-		const className = classnames( 'components-panel__body', { 'is-opened': isOpened } );
+		const classes = classnames( 'components-panel__body', className, { 'is-opened': isOpened } );
 
 		return (
-			<div className={ className }>
+			<div className={ classes }>
 				{ !! title && (
 					<h3 className="components-panel__body-title">
 						<Button
