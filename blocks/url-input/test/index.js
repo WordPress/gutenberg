@@ -74,7 +74,6 @@ describe( 'UrlInputButton', () => {
 
 		wrapper.find( ToggleControl ).simulate( 'change' );
 
-
 		wrapper.find( 'form' ).simulate( 'submit', { preventDefault: () => {} } ); // settings
 		wrapper.find( 'form' ).simulate( 'submit', { preventDefault: () => {} } ); // display
 
