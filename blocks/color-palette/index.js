@@ -64,7 +64,7 @@ class ColorPalette extends Component {
 								style={ style }
 								onClick={ () => onChange( value === color ? undefined : color ) }
 								aria-label={ sprintf( __( 'Color: %s' ), color ) }
-								aria-pressed={ value === color ? true : false }
+								aria-pressed={ value === color }
 							/>
 						</div>
 					);
@@ -79,12 +79,11 @@ class ColorPalette extends Component {
 						ref={ this.bindToggleNode }
 						aria-label={ __( 'Custom color picker' ) }
 					>
-						<span className="blocks-color-palette__custom-color-gradient"></span>
+						<span className="blocks-color-palette__custom-color-gradient"/>
 					</button>
 					<Popover
 						isOpen={ this.state.opened }
-						onClose={ this.closeOnClickOutside }
-						onClick={ this.stopPropagation }
+						onClickOutside={ this.closeOnClickOutside }
 						className="blocks-color-palette__picker"
 					>
 						<ChromePicker
