@@ -136,7 +136,7 @@ export const editor = combineUndoableReducers( {
 				};
 
 			case 'UPDATE_BLOCK':
-			// Ignore updates if block isn't known
+				// Ignore updates if block isn't known
 				if ( ! state[ action.uid ] ) {
 					return state;
 				}
@@ -394,9 +394,10 @@ export function hoveredBlock( state = null, action ) {
 
 export function blocksMode( state = {}, action ) {
 	if ( action.type === 'TOGGLE_BLOCK_MODE' ) {
+		const { uid } = action;
 		return {
 			...state,
-			[ action.uid ]: state[ action.uid ] && state[ action.uid ] === 'html' ? 'visual' : 'html',
+			[ uid ]: state[ uid ] && state[ uid ] === 'html' ? 'visual' : 'html',
 		};
 	}
 
