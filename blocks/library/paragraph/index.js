@@ -1,10 +1,14 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { concatChildren } from '@wordpress/element';
-import classnames from 'classnames';
-import { PanelBody } from 'components';
+import { PanelBody } from '@wordpress/components';
 
 /**
  * Internal dependencies
