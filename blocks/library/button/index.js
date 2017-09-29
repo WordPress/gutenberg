@@ -57,6 +57,7 @@ registerBlockType( 'core/button', {
 	edit( { attributes, setAttributes, focus, setFocus, className } ) {
 		const { text, url, title, align, color } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
+		const updateUrl = ( urlSettings ) => setAttributes( { url: urlSettings.url } );
 
 		return [
 			focus && (
@@ -74,7 +75,7 @@ registerBlockType( 'core/button', {
 					onChange={ ( value ) => setAttributes( { text: value } ) }
 					formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
 					keepPlaceholderOnFocus
-					extraToolbarButtons={ <UrlInputButton showSettings={ false } url={ url } onChange={ ( { newUrl } ) => setAttributes( { url: newUrl } ) } /> }
+					extraToolbarButtons={ <UrlInputButton showSettings={ false } url={ url } onChange={ updateUrl } /> }
 				/>
 				{ focus &&
 					<InspectorControls key="inspector">

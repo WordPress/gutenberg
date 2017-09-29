@@ -41,7 +41,7 @@ class UrlInputButton extends Component {
 			opensInNewWindow: this.props.opensInNewWindow,
 		};
 
-		this.toggleExpanded = this.toggleExpanded.bind( this );
+		this.onLinkButtonClick = this.onLinkButtonClick.bind( this );
 		this.onSubmit = this.onSubmit.bind( this );
 		this.changeLink = this.changeLink.bind( this );
 		this.deleteLink = this.deleteLink.bind( this );
@@ -59,8 +59,8 @@ class UrlInputButton extends Component {
 		}
 	}
 
-	toggleExpanded() {
-		this.setState( { expanded: ! this.state.expanded } );
+	onLinkButtonClick() {
+		this.setState( { expanded: true, currentStep: 0, isDeleted: false } );
 	}
 
 	onSubmit( event ) {
@@ -154,7 +154,7 @@ class UrlInputButton extends Component {
 				<IconButton
 					icon="admin-links"
 					label={ __( 'Edit Link' ) }
-					onClick={ this.toggleExpanded }
+					onClick={ this.onLinkButtonClick }
 					className={ classnames( 'components-toolbar__control', {
 						'is-active': url,
 					} ) }
