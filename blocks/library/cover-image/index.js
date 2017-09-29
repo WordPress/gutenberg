@@ -51,7 +51,7 @@ registerBlockType( 'core/cover-image', {
 		},
 		dimRatio: {
 			type: 'number',
-			default: 0,
+			default: 50,
 		},
 	},
 
@@ -191,7 +191,7 @@ registerBlockType( 'core/cover-image', {
 } );
 
 function dimRatioToClass( ratio ) {
-	return ratio === 0
+	return ( ratio === 0 || ratio === 50 )
 		? null
 		: 'has-background-dim-' + Math.round( ratio / 10 );
 }
