@@ -3,7 +3,7 @@
  */
 import optimist from 'redux-optimist';
 import { combineReducers } from 'redux';
-import { get, reduce, keyBy, first, last, omit, without, mapValues } from 'lodash';
+import { difference, get, reduce, keyBy, keys, first, last, omit, without, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -232,39 +232,6 @@ export const editor = combineUndoableReducers( {
 }, { resetTypes: [ 'RESET_POST' ] } );
 
 /**
- * Reducer loading and saving user specific data, such as preferences and
- * block usage.
- *
- * @param  {Object} state  Current state
- * @param  {Object} action Dispatched action
- * @return {Object}        Updated state
- */
-export const userData = combineReducers( {
-	recentlyUsedBlocks( state = [], action ) {
-		const maxRecent = 8;
-		switch ( action.type ) {
-			case 'SETUP_EDITOR':
-				// This is where we initially populate the recently used blocks,
-				// for now this inserts blocks from the common category, but will
-				// load this from an API in the future.
-				return getBlockTypes()
-					.filter( ( blockType ) => 'common' === blockType.category )
-					.slice( 0, maxRecent )
-					.map( ( blockType ) => blockType.name );
-			case 'INSERT_BLOCKS':
-				// This is where we record the block usage so it can show up in
-				// the recent blocks.
-				let newState = [ ...state ];
-				action.blocks.forEach( ( block ) => {
-					newState = [ block.name, ...without( newState, block.name ) ];
-				} );
-				return newState.slice( 0, maxRecent );
-		}
-		return state;
-	},
-} );
-
-/**
  * Reducer returning the last-known state of the current post, in the format
  * returned by the WP REST API.
  *
@@ -435,6 +402,7 @@ export function showInsertionPoint( state = false, action ) {
  * @return {string}                        Updated state
  */
 export function preferences( state = STORE_DEFAULTS.preferences, action ) {
+	const maxRecent = 8;
 	switch ( action.type ) {
 		case 'TOGGLE_SIDEBAR':
 			return {
@@ -453,6 +421,33 @@ export function preferences( state = STORE_DEFAULTS.preferences, action ) {
 			return {
 				...state,
 				mode: action.mode,
+			};
+		case 'INSERT_BLOCKS':
+			// record the block usage and put the block in the recently used blocks
+			let blockUsage = state.blockUsage;
+			let recentlyUsedBlocks = [ ...state.recentlyUsedBlocks ];
+			action.blocks.forEach( ( block ) => {
+				const uses = ( blockUsage[ block.name ] || 0 ) + 1;
+				blockUsage = omit( blockUsage, block.name );
+				blockUsage[ block.name ] = uses;
+				recentlyUsedBlocks = [ block.name, ...without( recentlyUsedBlocks, block.name ) ].slice( 0, maxRecent );
+			} );
+			return {
+				...state,
+				blockUsage,
+				recentlyUsedBlocks,
+			};
+		case 'SETUP_EDITOR':
+			// initially populate the recently used blocks with blocks the user most frequently uses
+			const commonBlocks = getBlockTypes()
+				.filter( ( blockType ) => 'common' === blockType.category )
+				.map( ( blockType ) => blockType.name );
+			const frequentlyUsedBlocks = keys( state.blockUsage ).sort( ( a, b ) => state.blockUsage[ b ] - state.blockUsage[ a ] );
+			return {
+				...state,
+				recentlyUsedBlocks: frequentlyUsedBlocks
+					.concat( difference( commonBlocks, frequentlyUsedBlocks ) )
+					.slice( 0, maxRecent ),
 			};
 	}
 
@@ -532,5 +527,4 @@ export default optimist( combineReducers( {
 	panel,
 	saving,
 	notices,
-	userData,
 } ) );
