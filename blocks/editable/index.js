@@ -13,6 +13,7 @@ import {
 	find,
 	defer,
 	noop,
+	pick,
 } from 'lodash';
 import { nodeListToReact } from 'dom-react';
 import { Fill } from 'react-slot-fill';
@@ -236,7 +237,34 @@ export default class Editable extends Component {
 
 		this.savedContent = this.getContent();
 		this.editor.save();
+		this.footnotes = pick( this.footnotes, this.getFootnoteIds( this.savedContent ) );
 		this.props.onChange( { content: this.savedContent, footnotes: this.footnotes } );
+	}
+
+	getFootnoteIds( content ) {
+		const footnoteIds = [];
+		const nodesToVisit = [ ...content ];
+		let node = nodesToVisit.pop();
+
+		while ( node !== undefined ) {
+			if ( typeof node !== 'string' ) {
+				if ( node.type === 'a' && node.props[ 'data-footnote-id' ] ) {
+					footnoteIds.push( node.props[ 'data-footnote-id' ] );
+				}
+
+				if ( node.props.children ) {
+					if ( Array.isArray( node.props.children ) ) {
+						node.props.children.forEach( n => nodesToVisit.push( n ) );
+					} else {
+						nodesToVisit.push( node.props.children );
+					}
+				}
+			}
+
+			node = nodesToVisit.pop();
+		}
+
+		return footnoteIds;
 	}
 
 	getEditorSelectionRect() {
