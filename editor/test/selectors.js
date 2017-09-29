@@ -62,6 +62,10 @@ import {
 	didPostSaveRequestFail,
 	getSuggestedPostFormat,
 	getNotices,
+	getMetaboxes,
+	getDirtyMetaboxes,
+	getMetabox,
+	isMetaboxStateDirty,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -109,6 +113,177 @@ describe( 'selectors', () => {
 			};
 
 			expect( getEditorMode( state ) ).toEqual( 'visual' );
+		} );
+	} );
+
+	describe( 'getDirtyMetaboxes', () => {
+		it( 'should return array of just the side location', () => {
+			const state = {
+				legacyMetaboxes: {
+					normal: {
+						isActive: false,
+						isDirty: false,
+						isUpdating: false,
+					},
+					side: {
+						isActive: true,
+						isDirty: true,
+						isUpdating: false,
+					},
+				},
+			};
+
+			expect( getDirtyMetaboxes( state ) ).toEqual( [ 'side' ] );
+		} );
+	} );
+
+	describe( 'getMetaboxes', () => {
+		it( 'should return the state of all metaboxes', () => {
+			const state = {
+				legacyMetaboxes: {
+					normal: {
+						isDirty: false,
+						isUpdating: false,
+					},
+					side: {
+						isDirty: false,
+						isUpdating: false,
+					},
+				},
+			};
+
+			expect( getMetaboxes( state ) ).toEqual( {
+				normal: {
+					isDirty: false,
+					isUpdating: false,
+				},
+				side: {
+					isDirty: false,
+					isUpdating: false,
+				},
+			} );
+		} );
+	} );
+
+	describe( 'getMetabox', () => {
+		it( 'should return the state of selected metabox', () => {
+			const state = {
+				legacyMetaboxes: {
+					normal: {
+						isActive: false,
+						isDirty: false,
+						isUpdating: false,
+					},
+					side: {
+						isActive: true,
+						isDirty: false,
+						isUpdating: false,
+					},
+				},
+			};
+
+			expect( getMetabox( state, 'side' ) ).toEqual( {
+				isActive: true,
+				isDirty: false,
+				isUpdating: false,
+			} );
+		} );
+	} );
+
+	describe( 'isMetaboxStateDirty', () => {
+		it( 'should return false', () => {
+			const state = {
+				legacyMetaboxes: {
+					normal: {
+						isActive: false,
+						isDirty: false,
+						isUpdating: false,
+					},
+					side: {
+						isActive: false,
+						isDirty: false,
+						isUpdating: false,
+					},
+				},
+			};
+
+			expect( isMetaboxStateDirty( state ) ).toEqual( false );
+		} );
+
+		it( 'should return false when a dirty metabox is not active.', () => {
+			const state = {
+				legacyMetaboxes: {
+					normal: {
+						isActive: false,
+						isDirty: true,
+						isUpdating: false,
+					},
+					side: {
+						isActive: false,
+						isDirty: false,
+						isUpdating: false,
+					},
+				},
+			};
+
+			expect( isMetaboxStateDirty( state ) ).toEqual( false );
+		} );
+
+		it( 'should return false when both metaboxes are dirty but inactive.', () => {
+			const state = {
+				legacyMetaboxes: {
+					normal: {
+						isActive: false,
+						isDirty: true,
+						isUpdating: false,
+					},
+					side: {
+						isActive: false,
+						isDirty: true,
+						isUpdating: false,
+					},
+				},
+			};
+
+			expect( isMetaboxStateDirty( state ) ).toEqual( false );
+		} );
+
+		it( 'should return false when a dirty metabox is active.', () => {
+			const state = {
+				legacyMetaboxes: {
+					normal: {
+						isActive: true,
+						isDirty: true,
+						isUpdating: false,
+					},
+					side: {
+						isActive: false,
+						isDirty: false,
+						isUpdating: false,
+					},
+				},
+			};
+
+			expect( isMetaboxStateDirty( state ) ).toEqual( true );
+		} );
+
+		it( 'should return false when both metaboxes are dirty and active.', () => {
+			const state = {
+				legacyMetaboxes: {
+					normal: {
+						isActive: true,
+						isDirty: true,
+						isUpdating: false,
+					},
+					side: {
+						isActive: true,
+						isDirty: true,
+						isUpdating: false,
+					},
+				},
+			};
+
+			expect( isMetaboxStateDirty( state ) ).toEqual( true );
 		} );
 	} );
 
@@ -267,6 +442,32 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'isEditedPostDirty', () => {
+		const legacyMetaboxes = {
+			normal: {
+				isActive: false,
+				isDirty: false,
+				isUpdating: false,
+			},
+			side: {
+				isActive: false,
+				isDirty: false,
+				isUpdating: false,
+			},
+		};
+		// Those dirty dang metaboxes.
+		const dirtyMetaboxes = {
+			normal: {
+				isActive: true,
+				isDirty: true,
+				isUpdating: false,
+			},
+			side: {
+				isActive: false,
+				isDirty: false,
+				isUpdating: false,
+			},
+		};
+
 		it( 'should return true when the post has edited attributes', () => {
 			const state = {
 				currentPost: {
@@ -281,6 +482,7 @@ describe( 'selectors', () => {
 						blockOrder: [],
 					},
 				] ),
+				legacyMetaboxes,
 			};
 
 			expect( isEditedPostDirty( state ) ).toBe( true );
@@ -300,6 +502,7 @@ describe( 'selectors', () => {
 						blockOrder: [],
 					},
 				] ),
+				legacyMetaboxes,
 			};
 
 			expect( isEditedPostDirty( state ) ).toBe( false );
@@ -340,6 +543,7 @@ describe( 'selectors', () => {
 						blockOrder: [],
 					},
 				] ),
+				legacyMetaboxes,
 			};
 
 			expect( isEditedPostDirty( state ) ).toBe( false );
@@ -378,6 +582,7 @@ describe( 'selectors', () => {
 						],
 					},
 				] ),
+				legacyMetaboxes,
 			};
 
 			expect( isEditedPostDirty( state ) ).toBe( true );
@@ -422,6 +627,7 @@ describe( 'selectors', () => {
 						],
 					},
 				] ),
+				legacyMetaboxes,
 			};
 
 			expect( isEditedPostDirty( state ) ).toBe( true );
@@ -470,6 +676,7 @@ describe( 'selectors', () => {
 						],
 					},
 				] ),
+				legacyMetaboxes,
 			};
 
 			expect( isEditedPostDirty( state ) ).toBe( true );
@@ -518,13 +725,65 @@ describe( 'selectors', () => {
 						],
 					},
 				] ),
+				legacyMetaboxes,
 			};
 
 			expect( isEditedPostDirty( state ) ).toBe( false );
 		} );
+
+		it( 'should return true when no edits, no changed block attributes, no changed order, but metabox state has changed.', () => {
+			const state = {
+				currentPost: {
+					title: 'The Meat Eater\'s Guide to Delicious Meats',
+				},
+				editor: getEditorState( [
+					{
+						edits: {},
+						blocksByUid: {
+							123: {
+								name: 'core/food',
+								attributes: { name: 'Chicken', delicious: true },
+							},
+							456: {
+								name: 'core/food',
+								attributes: { name: 'Ribs', delicious: true },
+							},
+						},
+						blockOrder: [
+							456,
+							123,
+						],
+					},
+					{
+						edits: {
+							title: 'The Meat Eater\'s Guide to Delicious Meats',
+						},
+						blocksByUid: {
+							123: {
+								name: 'core/food',
+								attributes: { name: 'Chicken', delicious: true },
+							},
+							456: {
+								name: 'core/food',
+								attributes: { name: 'Ribs', delicious: true },
+							},
+						},
+						blockOrder: [
+							456,
+							123,
+						],
+					},
+				] ),
+				legacyMetaboxes: dirtyMetaboxes,
+			};
+
+			expect( isEditedPostDirty( state ) ).toBe( true );
+		} );
 	} );
 
 	describe( 'isCleanNewPost', () => {
+		const legacyMetaboxes = { isDirty: false, isUpdating: false };
+
 		it( 'should return true when the post is not dirty and has not been saved before', () => {
 			const state = {
 				editor: getEditorState( [
@@ -536,6 +795,7 @@ describe( 'selectors', () => {
 					id: 1,
 					status: 'auto-draft',
 				},
+				legacyMetaboxes,
 			};
 
 			expect( isCleanNewPost( state ) ).toBe( true );
@@ -552,6 +812,7 @@ describe( 'selectors', () => {
 					id: 1,
 					status: 'draft',
 				},
+				legacyMetaboxes,
 			};
 
 			expect( isCleanNewPost( state ) ).toBe( false );
@@ -571,6 +832,7 @@ describe( 'selectors', () => {
 					id: 1,
 					status: 'auto-draft',
 				},
+				legacyMetaboxes,
 			};
 
 			expect( isCleanNewPost( state ) ).toBe( false );
@@ -658,6 +920,7 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getDocumentTitle', () => {
+		const legacyMetaboxes = { isDirty: false, isUpdating: false };
 		it( 'should return current title unedited existing post', () => {
 			const state = {
 				currentPost: {
@@ -669,6 +932,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				] ),
+				legacyMetaboxes,
 			};
 
 			expect( getDocumentTitle( state ) ).toBe( 'The Title' );
@@ -688,6 +952,7 @@ describe( 'selectors', () => {
 						edits: { title: 'Modified Title' },
 					},
 				] ),
+				legacyMetaboxes,
 			};
 
 			expect( getDocumentTitle( state ) ).toBe( 'Modified Title' );
@@ -705,6 +970,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				] ),
+				legacyMetaboxes,
 			};
 
 			expect( getDocumentTitle( state ) ).toBe( __( 'New post' ) );
@@ -722,6 +988,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				] ),
+				legacyMetaboxes,
 			};
 
 			expect( getDocumentTitle( state ) ).toBe( __( '(Untitled)' ) );
@@ -859,6 +1126,8 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'isEditedPostPublishable', () => {
+		const legacyMetaboxes = { isDirty: false, isUpdating: false };
+
 		it( 'should return true for pending posts', () => {
 			const state = {
 				currentPost: {
@@ -869,6 +1138,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				] ),
+				legacyMetaboxes,
 			};
 
 			expect( isEditedPostPublishable( state ) ).toBe( true );
@@ -884,6 +1154,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				] ),
+				legacyMetaboxes,
 			};
 
 			expect( isEditedPostPublishable( state ) ).toBe( true );
@@ -899,6 +1170,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				] ),
+				legacyMetaboxes,
 			};
 
 			expect( isEditedPostPublishable( state ) ).toBe( false );
@@ -914,6 +1186,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				] ),
+				legacyMetaboxes,
 			};
 
 			expect( isEditedPostPublishable( state ) ).toBe( false );
@@ -929,6 +1202,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				] ),
+				legacyMetaboxes,
 			};
 
 			expect( isEditedPostPublishable( state ) ).toBe( false );
@@ -947,6 +1221,7 @@ describe( 'selectors', () => {
 						edits: { title: 'Dirty' },
 					},
 				] ),
+				legacyMetaboxes,
 			};
 
 			expect( isEditedPostPublishable( state ) ).toBe( true );

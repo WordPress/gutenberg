@@ -32,6 +32,66 @@ export function getEditorMode( state ) {
 }
 
 /**
+ * Returns the state of legacy metaboxes.
+ *
+ * @param  {Object}  state Global application state
+ * @return {Object}        State of metaboxes
+ */
+export function getMetaboxes( state ) {
+	return state.legacyMetaboxes;
+}
+
+/**
+ * Returns the state of legacy metaboxes.
+ *
+ * @param  {Object}  state    Global application state
+ * @param  {String}  location Location of the metabox.
+ * @return {Object}        State of metabox at specified location.
+ */
+export function getMetabox( state, location ) {
+	return getMetaboxes( state )[ location ];
+}
+
+/**
+ * Returns a list of dirty metabox locations.
+ *
+ * @param  {Object}  state Global application state
+ * @return {Array}        Array of locations for dirty metaboxes.
+ */
+export const getDirtyMetaboxes = createSelector(
+	( state ) => {
+		const dirtyMetaboxes = [];
+		const metaboxes = state.legacyMetaboxes;
+
+		for ( const location in metaboxes ) {
+			if ( metaboxes[ location ].isDirty === true && metaboxes[ location ].isActive === true ) {
+				dirtyMetaboxes.push( location );
+			}
+		}
+
+		return dirtyMetaboxes;
+	},
+	( state ) => state.legacyMetaboxes,
+);
+
+/**
+ * Returns the dirty state of legacy metaboxes.
+ *
+ * Checks whether the entire metabox state is dirty. So if a sidebar is dirty,
+ * but a normal area is not dirty, this will overall return dirty.
+ *
+ * @param  {Object}  state Global application state
+ * @return {Boolean}       Whether state is dirty. True if dirty, false if not.
+ */
+export const isMetaboxStateDirty = createSelector(
+	( state ) => {
+		// If there is more than one dirty metabox.
+		return getDirtyMetaboxes( state ).length > 0;
+	},
+	( state ) => state.legacyMetaboxes,
+);
+
+/**
  * Returns the current active panel for the sidebar.
  *
  * @param  {Object}  state Global application state
@@ -137,6 +197,10 @@ export const isEditedPostDirty = createSelector(
 			return true;
 		}
 
+		if ( isMetaboxStateDirty( state ) === true ) {
+			return true;
+		}
+
 		// This is a cheaper operation that still must occur after checking
 		// attributes, because a post initialized with attributes different
 		// from its saved copy should be considered dirty.
@@ -161,6 +225,7 @@ export const isEditedPostDirty = createSelector(
 	( state ) => [
 		state.editor,
 		state.currentPost,
+		state.legacyMetaboxes,
 	]
 );
 

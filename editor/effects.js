@@ -25,10 +25,12 @@ import {
 	removeNotice,
 	savePost,
 	editPost,
+	requestMetaboxUpdate,
 } from './actions';
 import {
 	getCurrentPost,
 	getCurrentPostType,
+	getDirtyMetaboxes,
 	getEditedPostContent,
 	getPostEdits,
 	isCurrentPostPublished,
@@ -86,7 +88,7 @@ export default {
 	},
 	REQUEST_POST_UPDATE_SUCCESS( action, store ) {
 		const { previousPost, post } = action;
-		const { dispatch } = store;
+		const { dispatch, getState } = store;
 
 		const publishStatus = [ 'publish', 'private', 'future' ];
 		const isPublished = publishStatus.indexOf( previousPost.status ) !== -1;
@@ -112,6 +114,10 @@ export default {
 				{ id: SAVE_POST_NOTICE_ID }
 			) );
 		}
+
+		// Update dirty metaboxes.
+		const metaboxes = getDirtyMetaboxes( getState() );
+		metaboxes.map( metabox => dispatch( requestMetaboxUpdate( metabox ) ) );
 
 		if ( get( window.history.state, 'id' ) !== post.id ) {
 			window.history.replaceState(
