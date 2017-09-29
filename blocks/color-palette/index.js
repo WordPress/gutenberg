@@ -24,17 +24,12 @@ class ColorPalette extends Component {
 			opened: false,
 		};
 		this.togglePicker = this.togglePicker.bind( this );
-		this.stopPropagation = this.stopPropagation.bind( this );
 		this.closeOnClickOutside = this.closeOnClickOutside.bind( this );
 		this.bindToggleNode = this.bindToggleNode.bind( this );
 	}
 
 	togglePicker() {
 		this.setState( ( state ) => ( { opened: ! state.opened } ) );
-	}
-
-	stopPropagation( event ) {
-		event.stopPropagation();
 	}
 
 	closeOnClickOutside( event ) {
