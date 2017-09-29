@@ -19,45 +19,46 @@ import BlockControls from '../../block-controls';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
 
-const { TEXT_NODE } = window.Node;
 const { html, prop } = source;
 
-const fromBrDelimitedContent = ( content ) => {
-	if ( undefined === content ) {
-		// converting an empty block to a list block
-		return content;
+const fromBrDelimitedContent = ( content = '' ) => {
+	const decu = document.implementation.createHTMLDocument( '' );
+	const accu = document.implementation.createHTMLDocument( '' );
+
+	decu.body.innerHTML = content;
+	accu.body.innerHTML = '<li></li>';
+
+	let node;
+
+	while ( ( node = decu.body.firstChild ) ) {
+		if ( node.nodeName === 'BR' && node.nextSibling ) {
+			accu.body.appendChild( document.createElement( 'LI' ) );
+			decu.body.removeChild( node );
+		} else {
+			accu.body.lastChild.appendChild( node );
+		}
 	}
 
-	return content.split( /<br\s*?\/?>/ ).reduce( ( memo, item ) => {
-		if ( item ) {
-			memo.push( `<li>${ item }</li>` );
-		}
-		return memo;
-	}, [] ).join();
+	return accu.body.innerHTML;
 };
 
-const toBrDelimitedContent = ( values ) => {
-	if ( undefined === values ) {
-		// converting an empty list
-		return values;
-	}
-	const list = document.createElement( 'ul' );
-	list.innerHTML = values;
-	const content = [];
-	const appendLiToContent = ( li ) => {
-		li.childNodes.forEach( ( element ) => {
-			if ( 'UL' === element.nodeName || 'OL' === element.nodeName ) { // lists within lists
-				element.childNodes.forEach( appendLiToContent );
-			} else if ( element.nodeType === TEXT_NODE ) {
-				content.push( element.nodeValue );
-			} else {
-				content.push( element.outerHTML );
-			}
-		} );
-		content.push( '<br>' );
-	};
-	list.childNodes.forEach( appendLiToContent );
-	return content.join( '' );
+const toBrDelimitedContent = ( values = '' ) => {
+	const decu = document.implementation.createHTMLDocument( '' );
+	const accu = document.implementation.createHTMLDocument( '' );
+
+	decu.body.innerHTML = `<ul>${ values }</ul>`;
+
+	Array.from( decu.querySelectorAll( 'li' ) ).forEach( ( node, i ) => {
+		if ( i !== 0 ) {
+			accu.body.appendChild( document.createElement( 'BR' ) );
+		}
+
+		while ( node.firstChild ) {
+			accu.body.appendChild( node.firstChild );
+		}
+	} );
+
+	return accu.body.innerHTML;
 };
 
 registerBlockType( 'core/list', {
