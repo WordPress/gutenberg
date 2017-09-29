@@ -92,7 +92,7 @@
 	position: sticky;
 
 	@include break-medium() {
-		top: $header-height + $admin-bar-height + $item-spacing;
+		top: $item-spacing;
 	}
 }
 
