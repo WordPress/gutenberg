@@ -146,6 +146,10 @@
 	display: block;
 }
 
+.freeform-toolbar.has-advanced-toolbar {
+	margin-top: -85px;	/* Pull upwards the classic text toolbar when enabled */
+}
+
 .freeform-toolbar div.mce-btn-group {
 	padding: 0;
 	margin: 0;
