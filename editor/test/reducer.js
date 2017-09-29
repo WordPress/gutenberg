@@ -23,6 +23,7 @@ import {
 	saving,
 	notices,
 	showInsertionPoint,
+	blocksMode,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -118,6 +119,33 @@ describe( 'state', () => {
 			expect( values( state.blocksByUid )[ 0 ].name ).toBe( 'core/freeform' );
 			expect( values( state.blocksByUid )[ 0 ].uid ).toBe( 'wings' );
 			expect( state.blockOrder ).toEqual( [ 'wings' ] );
+		} );
+
+		it( 'should update the block', () => {
+			const original = editor( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [ {
+					uid: 'chicken',
+					name: 'core/test-block',
+					attributes: {},
+					isValid: false,
+				} ],
+			} );
+			const state = editor( deepFreeze( original ), {
+				type: 'UPDATE_BLOCK',
+				uid: 'chicken',
+				updates: {
+					attributes: { content: 'ribs' },
+					isValid: true,
+				},
+			} );
+
+			expect( state.blocksByUid.chicken ).toEqual( {
+				uid: 'chicken',
+				name: 'core/test-block',
+				attributes: { content: 'ribs' },
+				isValid: true,
+			} );
 		} );
 
 		it( 'should move the block up', () => {
@@ -989,4 +1017,79 @@ describe( 'state', () => {
 			} );
 		} );
 	} );
+<<<<<<< HEAD
+=======
+
+	describe( 'userData()', () => {
+		beforeAll( () => {
+			registerBlockType( 'core/test-block', {
+				save: noop,
+				edit: noop,
+				category: 'common',
+				title: 'test block',
+			} );
+		} );
+
+		afterAll( () => {
+			unregisterBlockType( 'core/test-block' );
+		} );
+
+		it( 'should record recently used blocks', () => {
+			const original = userData( undefined, {} );
+			const state = userData( original, {
+				type: 'INSERT_BLOCKS',
+				blocks: [ {
+					uid: 'bacon',
+					name: 'core-embed/twitter',
+				} ],
+			} );
+
+			expect( state.recentlyUsedBlocks[ 0 ] ).toEqual( 'core-embed/twitter' );
+
+			const twoRecentBlocks = userData( state, {
+				type: 'INSERT_BLOCKS',
+				blocks: [ {
+					uid: 'eggs',
+					name: 'core-embed/youtube',
+				} ],
+			} );
+
+			expect( twoRecentBlocks.recentlyUsedBlocks[ 0 ] ).toEqual( 'core-embed/youtube' );
+			expect( twoRecentBlocks.recentlyUsedBlocks[ 1 ] ).toEqual( 'core-embed/twitter' );
+		} );
+
+		it( 'should populate recently used blocks with blocks from the common category', () => {
+			const initial = userData( undefined, {
+				type: 'SETUP_EDITOR',
+			} );
+
+			initial.recentlyUsedBlocks.forEach(
+				block => expect( getBlockType( block ).category ).toEqual( 'common' )
+			);
+			expect( initial.recentlyUsedBlocks ).toHaveLength( 8 );
+		} );
+	} );
+
+	describe( 'blocksMode', () => {
+		it( 'should set mode to html if not set', () => {
+			const action = {
+				type: 'TOGGLE_BLOCK_MODE',
+				uid: 'chicken',
+			};
+			const value = blocksMode( deepFreeze( {} ), action );
+
+			expect( value ).toEqual( { chicken: 'html' } );
+		} );
+
+		it( 'should toggle mode to visual if set as html', () => {
+			const action = {
+				type: 'TOGGLE_BLOCK_MODE',
+				uid: 'chicken',
+			};
+			const value = blocksMode( deepFreeze( { chicken: 'html' } ), action );
+
+			expect( value ).toEqual( { chicken: 'visual' } );
+		} );
+	} );
+>>>>>>> Block HTML Mode: Adding unit tests
 } );
