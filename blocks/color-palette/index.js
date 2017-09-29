@@ -23,16 +23,24 @@ class ColorPalette extends Component {
 		this.state = {
 			opened: false,
 		};
-		this.openPicker = this.openPicker.bind( this );
-		this.closePicker = this.closePicker.bind( this );
+		this.togglePicker = this.togglePicker.bind( this );
+		this.closeOnClickOutside = this.closeOnClickOutside.bind( this );
+		this.bindToggleNode = this.bindToggleNode.bind( this );
 	}
 
-	openPicker() {
-		this.setState( { opened: true } );
+	togglePicker() {
+		this.setState( ( state ) => ( { opened: ! state.opened } ) );
 	}
 
-	closePicker() {
-		this.setState( { opened: false } );
+	closeOnClickOutside( event ) {
+		const { opened } = this.state;
+		if ( opened && ! this.toggleNode.contains( event.target ) ) {
+			this.togglePicker();
+		}
+	}
+
+	bindToggleNode( node ) {
+		this.toggleNode = node;
 	}
 
 	render() {
@@ -42,38 +50,42 @@ class ColorPalette extends Component {
 				{ colors.map( ( color ) => {
 					const style = { color: color };
 					const className = classnames( 'blocks-color-palette__item', { 'is-active': value === color } );
-					/* Disable reason: aria-current seems like a valid aria-prop and well-suited for this */
-					/* eslint-disable jsx-a11y/aria-props */
+
 					return (
 						<div key={ color } className="blocks-color-palette__item-wrapper">
 							<button
+								type="button"
 								className={ className }
 								style={ style }
 								onClick={ () => onChange( value === color ? undefined : color ) }
 								aria-label={ sprintf( __( 'Color: %s' ), color ) }
-								aria-current={ value === color && __( 'Selected color' ) }
+								aria-pressed={ value === color }
 							/>
 						</div>
 					);
-					/* eslint-enable jsx-a11y/aria-props */
 				} ) }
 
 				<div className="blocks-color-palette__item-wrapper blocks-color-palette__custom-color">
 					<button
+						type="button"
+						aria-expanded={ this.state.opened }
 						className="blocks-color-palette__item"
-						onClick={ this.openPicker }
-						aria-label={ __( 'Open custom color picker' ) }
-					/>
+						onClick={ this.togglePicker }
+						ref={ this.bindToggleNode }
+						aria-label={ __( 'Custom color picker' ) }
+					>
+						<span className="blocks-color-palette__custom-color-gradient" />
+					</button>
 					<Popover
 						isOpen={ this.state.opened }
-						onClose={ this.closePicker }
+						onClickOutside={ this.closeOnClickOutside }
 						className="blocks-color-palette__picker"
 					>
 						<ChromePicker
 							color={ value }
 							onChangeComplete={ ( color ) => {
 								onChange( color.hex );
-								this.closePicker();
+								this.togglePicker();
 							} }
 							style={ { width: '100%' } }
 							disableAlpha
@@ -82,8 +94,12 @@ class ColorPalette extends Component {
 				</div>
 
 				<div className="blocks-color-palette__item-wrapper blocks-color-palette__clear-color">
-					<button className="blocks-color-palette__item" onClick={ () => onChange( undefined ) }>
-						<div className="blocks-color-palette__clear-color-line" />
+					<button
+						className="blocks-color-palette__item"
+						onClick={ () => onChange( undefined ) }
+						aria-label={ __( 'Remove color' ) }
+					>
+						<span className="blocks-color-palette__clear-color-line" />
 					</button>
 				</div>
 			</div>
