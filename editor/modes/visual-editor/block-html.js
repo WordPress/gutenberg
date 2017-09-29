@@ -1,7 +1,7 @@
 /**
  * WordPress Dependencies
  */
-import { isEqual } from 'lodash';
+import { isEqual, omit, keys } from 'lodash';
 import { Component } from '@wordpress/element';
 import { getBlockContent, getSourcedAttributes, getBlockType, isValidBlock } from '@wordpress/blocks';
 
@@ -32,14 +32,19 @@ class BlockHTML extends Component {
 		if ( ! isEqual( nextProps.block.attributes, this.state.attributes ) ) {
 			this.setState( {
 				html: getBlockContent( nextProps.block ),
+				attributes: nextProps.block.attributes,
 			} );
 		}
 	}
 
 	onBlur() {
 		const blockType = getBlockType( this.props.block.name );
-		const attributes = getSourcedAttributes( this.state.html, blockType.attributes );
-		const isValid = isValidBlock( this.state.html, blockType, { ...this.props.block.attributes, attributes } );
+		const sourcedAttributes = getSourcedAttributes( this.state.html, blockType.attributes );
+		const attributes = {
+			...( omit( this.props.block.attributes, keys( sourcedAttributes ) ) ),
+			...sourcedAttributes,
+		};
+		const isValid = isValidBlock( this.state.html, blockType, attributes );
 		this.setState( { attributes } );
 		this.props.onChange( this.props.uid, attributes, this.state.html, isValid );
 	}
