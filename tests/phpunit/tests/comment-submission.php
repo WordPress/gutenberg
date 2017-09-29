@@ -55,7 +55,7 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 		$this->assertSame( 0, did_action( $error ) );
 
 		$post = self::factory()->post->create_and_get();
-		wp_trash_post( $post );
+		wp_trash_post( $post->ID );
 		$data = array(
 			'comment_post_ID' => $post->ID,
 		);
