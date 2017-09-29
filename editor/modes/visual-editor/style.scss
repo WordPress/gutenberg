@@ -340,7 +340,7 @@
 	}
 
 	@include break-medium() {
-		top: $header-height + $admin-bar-height + $item-spacing;
+		top: $item-spacing;
 	}
 
 	&.is-appearing-active {
