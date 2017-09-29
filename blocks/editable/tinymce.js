@@ -24,7 +24,7 @@ export default class TinyMCE extends Component {
 	}
 
 	initialize() {
-		const { focus } = this.props;
+		const { focus, defaultValue } = this.props;
 
 		const settings = this.props.getSettings( {
 			theme: false,
@@ -40,6 +40,10 @@ export default class TinyMCE extends Component {
 		} );
 
 		settings.plugins.push( 'paste' );
+
+		if ( defaultValue ) {
+			this.editorNode.innerHTML = defaultValue;
+		}
 
 		tinymce.init( {
 			...settings,

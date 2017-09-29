@@ -120,9 +120,6 @@ export default class Editable extends Component {
 
 	onInit() {
 		this.updateFocus();
-		if ( this.props.value ) {
-			this.setContent( this.props.value );
-		}
 	}
 
 	onFocus() {
