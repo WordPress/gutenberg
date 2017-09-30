@@ -101,4 +101,24 @@ class Tests_User_GetUsersWithNoRole extends WP_UnitTestCase {
 		$this->assertEmpty( $users );
 	}
 
+	/**
+	 * @ticket 42015
+	 * @group multisite
+	 * @group ms-required
+	 */
+	public function test_get_users_with_no_role_matches_on_role_name_different_site() {
+		$site_id = (int) self::factory()->blog->create();
+
+		switch_to_blog( $site_id );
+		wp_roles()->add_role( 'somerole', 'Some role display name' );
+		$user_id = self::factory()->user->create( array(
+			'role' => 'somerole',
+		) );
+		restore_current_blog();
+
+		$users = wp_get_users_with_no_role( $site_id );
+
+		$this->assertEmpty( $users );
+	}
+
 }
