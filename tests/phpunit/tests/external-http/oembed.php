@@ -35,12 +35,12 @@ class Tests_External_HTTP_OEmbed extends WP_UnitTestCase {
 	function test_youtube_embed_url() {
 		global $wp_embed;
 		$out = $wp_embed->autoembed( 'https://www.youtube.com/embed/QcIy9NiNbmo' );
-		$this->assertContains( 'https://youtube.com/watch?v=QcIy9NiNbmo', $out );
+		$this->assertContains( 'https://www.youtube.com/embed/QcIy9NiNbmo?feature=oembed', $out );
 	}
 
 	function test_youtube_v_url() {
 		global $wp_embed;
 		$out = $wp_embed->autoembed( 'https://www.youtube.com/v/QcIy9NiNbmo' );
-		$this->assertContains( 'https://youtube.com/watch?v=QcIy9NiNbmo', $out );
+		$this->assertContains( 'https://www.youtube.com/embed/QcIy9NiNbmo?feature=oembed', $out );
 	}
 }

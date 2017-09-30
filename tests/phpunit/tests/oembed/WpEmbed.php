@@ -161,48 +161,115 @@ class Tests_WP_Embed extends WP_UnitTestCase {
 		$this->assertNotEmpty( get_post_meta( $post_id, $cachekey_time, true ) );
 	}
 
-	public function test_shortcode_should_cache_data_in_post_meta_for_known_post() {
-		$GLOBALS['post'] = $this->factory()->post->create_and_get();
+	public function test_shortcode_should_get_cached_data_from_post_meta_for_known_post() {
+		global $post;
+
+		$post = $this->factory()->post->create_and_get();
 		$url             = 'https://example.com/';
 		$expected        = '<b>Embedded content</b>';
 		$key_suffix      = md5( $url . serialize( wp_embed_defaults( $url ) ) );
 		$cachekey        = '_oembed_' . $key_suffix;
-		$cachekey_time   = '_oembed_time_' . $key_suffix;
+
+		add_post_meta( $post->ID, $cachekey, $expected );
 
 		add_filter( 'pre_oembed_result', array( $this, '_pre_oembed_result_callback' ) );
 		$actual = $this->wp_embed->shortcode( array(), $url );
 		remove_filter( 'pre_oembed_result', array( $this, '_pre_oembed_result_callback' ) );
 
-		$this->assertEquals( $expected, $actual );
+		$actual_2 = $this->wp_embed->shortcode( array(), $url );
 
-		$this->assertEquals( $expected, get_post_meta( $GLOBALS['post']->ID, $cachekey, true ) );
-		$this->assertNotEmpty( get_post_meta( $GLOBALS['post']->ID, $cachekey_time, true ) );
+		$cached = get_post_meta( $post->ID, $cachekey, true );
 
-		// Result should be cached.
-		$actual = $this->wp_embed->shortcode( array(), $url );
+		// Cleanup.
+		unset( $post );
+
 		$this->assertEquals( $expected, $actual );
+		$this->assertEquals( $expected, $actual_2 );
+		$this->assertEquals( $expected, $cached );
 	}
 
-	public function test_shortcode_should_cache_failure_in_post_meta_for_known_post() {
-		$GLOBALS['post'] = $this->factory()->post->create_and_get();
+	public function test_shortcode_should_get_cached_failure_from_post_meta_for_known_post() {
+		global $post;
+
+		$post = $this->factory()->post->create_and_get();
 		$url             = 'https://example.com/';
 		$expected        = '<a href="' . esc_url( $url ) . '">' . esc_html( $url ) . '</a>';
 		$key_suffix      = md5( $url . serialize( wp_embed_defaults( $url ) ) );
 		$cachekey        = '_oembed_' . $key_suffix;
 		$cachekey_time   = '_oembed_time_' . $key_suffix;
 
+		add_post_meta( $post->ID, $cachekey, '{{unknown}}' );
+		add_post_meta( $post->ID, $cachekey_time, 0 );
+
 		add_filter( 'pre_oembed_result', '__return_empty_string' );
 		$actual = $this->wp_embed->shortcode( array(), $url );
 		remove_filter( 'pre_oembed_result', '__return_empty_string' );
 
-		$this->assertEquals( $expected, $actual );
+		// Result should be cached.
+		$actual_2 = $this->wp_embed->shortcode( array(), $url );
 
-		$this->assertEquals( '{{unknown}}', get_post_meta( $GLOBALS['post']->ID, $cachekey, true ) );
-		$this->assertEmpty( get_post_meta( $GLOBALS['post']->ID, $cachekey_time, true ) );
+		$cached = get_post_meta( $post->ID, $cachekey, true );
+		$cached_time = get_post_meta( $post->ID, $cachekey_time, true );
+
+		// Cleanup.
+		unset( $post );
+
+		$this->assertEquals( $expected, $actual );
+		$this->assertEquals( '{{unknown}}', $cached );
+		$this->assertEmpty( $cached_time );
+		$this->assertEquals( $expected, $actual_2 );
+	}
+
+	/**
+	 * @ticket 34115
+	 */
+	public function test_shortcode_should_cache_data_in_custom_post() {
+		$url        = 'https://example.com/';
+		$expected   = '<b>Embedded content</b>';
+		$key_suffix = md5( $url . serialize( wp_embed_defaults( $url ) ) );
+
+		add_filter( 'pre_oembed_result', array( $this, '_pre_oembed_result_callback' ) );
+		$actual = $this->wp_embed->shortcode( array(), $url );
+		remove_filter( 'pre_oembed_result', array( $this, '_pre_oembed_result_callback' ) );
+
+		$oembed_post_id = $this->wp_embed->find_oembed_post_id( $key_suffix );
+		$post_content = get_post( $oembed_post_id )->post_content;
 
 		// Result should be cached.
-		$actual = $this->wp_embed->shortcode( array(), $url );
+		$actual_2 = $this->wp_embed->shortcode( array(), $url );
+
+		wp_delete_post( $oembed_post_id );
+
+		$this->assertNotNull( $oembed_post_id );
+		$this->assertEquals( $expected, $post_content );
 		$this->assertEquals( $expected, $actual );
+		$this->assertEquals( $expected, $actual_2 );
+	}
+
+	/**
+	 * @ticket 34115
+	 */
+	public function test_shortcode_should_cache_failure_in_custom_post() {
+		$url        = 'https://example.com/';
+		$expected   = '<a href="' . esc_url( $url ) . '">' . esc_html( $url ) . '</a>';
+		$key_suffix = md5( $url . serialize( wp_embed_defaults( $url ) ) );
+
+		add_filter( 'pre_oembed_result', '__return_empty_string' );
+		$actual = $this->wp_embed->shortcode( array(), $url );
+		remove_filter( 'pre_oembed_result', '__return_empty_string' );
+
+		$oembed_post_id = $this->wp_embed->find_oembed_post_id( $key_suffix );
+		$post_content = get_post( $oembed_post_id )->post_content;
+
+		// Result should be cached.
+		$actual_2 = $this->wp_embed->shortcode( array(), $url );
+
+		wp_delete_post( $oembed_post_id );
+
+		$this->assertEquals( $expected, $actual );
+		$this->assertEquals( $expected, $actual_2 );
+		$this->assertNotNull( $oembed_post_id );
+		$this->assertEquals( '{{unknown}}', $post_content );
 	}
 
 	public function test_shortcode_should_get_url_from_src_attribute() {
