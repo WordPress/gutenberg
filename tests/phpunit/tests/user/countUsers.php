@@ -134,6 +134,30 @@ class Tests_User_CountUsers extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 42014
+	 * @group multisite
+	 * @group ms-required
+	 *
+	 * @dataProvider data_count_users_strategies
+	 */
+	public function test_count_users_multisite_queries_correct_roles( $strategy ) {
+		$site_id = (int) self::factory()->blog->create();
+
+		switch_to_blog( $site_id );
+		wp_roles()->add_role( 'tester', 'Tester', array( 'test' => true ) );
+		$user_id = self::factory()->user->create( array(
+			'role' => 'tester',
+		) );
+		restore_current_blog();
+
+		$count = count_users( $strategy, $site_id );
+		$this->assertEqualSetsWithIndex( array(
+			'tester' => 1,
+			'none'   => 0,
+		), $count['avail_roles'] );
+	}
+
+	/**
 	 * @ticket 34495
 	 *
 	 * @dataProvider data_count_users_strategies
