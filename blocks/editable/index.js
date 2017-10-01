@@ -532,12 +532,12 @@ export default class Editable extends Component {
 		this.onChange();
 	}
 
-	componentWillReceiveProps( nextProps ) {
+	componentWillReceiveProps() {
 		this.updateFocus();
 	}
 
 	componentDidUpdate( prevProps ) {
-		if ( ! isEqual( this.props.focus, prevProps.focus )  ) {
+		if ( ! isEqual( this.props.focus, prevProps.focus ) ) {
 			this.updateFocus();
 		}
 
