@@ -343,4 +343,42 @@
 		} );
 	});
 
+	// Test that models have the correct requireForceForDelete setting.
+	var modelsThatNeedrequireForceForDelete = [
+		{ name: 'Category', expect: true },
+		{ name: 'Comment', expect: undefined },
+		{ name: 'Media', expect: undefined },
+		{ name: 'Page', expect: undefined },
+		{ name: 'PageRevision', expect: true },
+		{ name: 'Post', expect: undefined },
+		{ name: 'PostRevision', expect: true },
+		{ name: 'Status', expect: undefined },
+		{ name: 'Tag', expect: true },
+		{ name: 'Taxonomy', expect: undefined },
+		{ name: 'Type', expect: undefined },
+		{ name: 'User', expect: true }
+	];
+
+	_.each( modelsThatNeedrequireForceForDelete, function( model ) {
+		QUnit.test( 'Test requireForceForDelete is correct for ' + model.name, function( assert ) {
+			var done = assert.async();
+			assert.expect( 1 );
+			wp.api.loadPromise.done( function() {
+
+				// Instantiate the model.
+				var theModel = new wp.api.models[ model.name ]();
+
+				// Verify the model's requireForceForDelete is set as expected.
+				assert.equal(
+					theModel.requireForceForDelete,
+					model.expect,
+					'wp.api.models.' + model.name + '.requireForceForDelete should be ' + model.expect + '.'
+				);
+
+				// Trigger Qunit async completion.
+				done();
+			} );
+		} );
+	} );
+
 } )( window.QUnit );
