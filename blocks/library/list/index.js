@@ -13,13 +13,11 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './editor.scss';
-import { registerBlockType, source, createBlock } from '../../api';
+import { registerBlockType, createBlock } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
-
-const { children, prop } = source;
 
 const fromBrDelimitedContent = ( content ) => {
 	if ( undefined === content ) {
@@ -84,12 +82,19 @@ registerBlockType( 'core/list', {
 	attributes: {
 		nodeName: {
 			type: 'string',
-			source: prop( 'ol,ul', 'nodeName' ),
+			source: {
+				type: 'property',
+				selector: 'ol,ul',
+				property: 'nodeName',
+			},
 			default: 'UL',
 		},
 		values: {
 			type: 'array',
-			source: children( 'ol,ul' ),
+			source: {
+				type: 'children',
+				selector: 'ol,ul',
+			},
 			default: [],
 		},
 	},

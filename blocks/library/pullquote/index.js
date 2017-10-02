@@ -8,14 +8,12 @@ import { __ } from '@wordpress/i18n';
  */
 import './editor.scss';
 import './style.scss';
-import { registerBlockType, source } from '../../api';
+import { registerBlockType } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
-
-const { children, query, node } = source;
 
 registerBlockType( 'core/pullquote', {
 
@@ -28,11 +26,20 @@ registerBlockType( 'core/pullquote', {
 	attributes: {
 		value: {
 			type: 'array',
-			source: query( 'blockquote > p', node() ),
+			source: {
+				type: 'query',
+				selector: 'blockquote > p',
+				source: {
+					type: 'node',
+				},
+			},
 		},
 		citation: {
 			type: 'array',
-			source: children( 'footer' ),
+			source: {
+				type: 'children',
+				selector: 'footer',
+			},
 		},
 		align: {
 			type: 'string',

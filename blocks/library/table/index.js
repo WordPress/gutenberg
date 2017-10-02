@@ -8,14 +8,12 @@ import { __ } from '@wordpress/i18n';
  */
 import './editor.scss';
 import './style.scss';
-import { registerBlockType, source } from '../../api';
+import { registerBlockType } from '../../api';
 import TableBlock from './table-block';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
-
-const { children } = source;
 
 registerBlockType( 'core/table', {
 	title: __( 'Table' ),
@@ -25,7 +23,10 @@ registerBlockType( 'core/table', {
 	attributes: {
 		content: {
 			type: 'array',
-			source: children( 'table' ),
+			source: {
+				type: 'children',
+				selector: 'table',
+			},
 			default: [
 				<tbody key="1">
 					<tr><td><br /></td><td><br /></td></tr>

@@ -13,10 +13,8 @@ import { __ } from '@wordpress/i18n';
  */
 import './editor.scss';
 import './style.scss';
-import { registerBlockType, source, createBlock } from '../../api';
+import { registerBlockType, createBlock } from '../../api';
 import { default as GalleryBlock, defaultColumnsNumber } from './block';
-
-const { query, attr } = source;
 
 registerBlockType( 'core/gallery', {
 	title: __( 'Gallery' ),
@@ -32,11 +30,27 @@ registerBlockType( 'core/gallery', {
 		images: {
 			type: 'array',
 			default: [],
-			source: query( 'div.wp-block-gallery figure.blocks-gallery-image img', {
-				url: attr( 'src' ),
-				alt: attr( 'alt' ),
-				id: attr( 'data-id' ),
-			} ),
+			source: {
+				type: 'query',
+				selector: 'div.wp-block-gallery figure.blocks-gallery-image img',
+				source: {
+					type: 'object',
+					source: {
+						url: {
+							type: 'attribute',
+							attribute: 'src',
+						},
+						alt: {
+							type: 'attribute',
+							attribute: 'alt',
+						},
+						id: {
+							type: 'attribute',
+							attribute: 'data-id',
+						},
+					},
+				},
+			},
 		},
 		columns: {
 			type: 'number',

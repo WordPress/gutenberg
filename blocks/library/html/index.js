@@ -13,12 +13,10 @@ import { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import './editor.scss';
-import { registerBlockType, source } from '../../api';
+import { registerBlockType } from '../../api';
 import BlockControls from '../../block-controls';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
-
-const { html } = source;
 
 registerBlockType( 'core/html', {
 	title: __( 'Custom HTML' ),
@@ -36,7 +34,9 @@ registerBlockType( 'core/html', {
 	attributes: {
 		content: {
 			type: 'string',
-			source: html(),
+			source: {
+				type: 'html',
+			},
 		},
 	},
 

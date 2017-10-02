@@ -7,12 +7,10 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './editor.scss';
-import { registerBlockType, createBlock, source } from '../../api';
+import { registerBlockType, createBlock } from '../../api';
 import Editable from '../../editable';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
-
-const { children } = source;
 
 registerBlockType( 'core/verse', {
 	title: __( 'Verse' ),
@@ -26,7 +24,10 @@ registerBlockType( 'core/verse', {
 	attributes: {
 		content: {
 			type: 'array',
-			source: children( 'pre' ),
+			source: {
+				type: 'children',
+				selector: 'pre',
+			},
 		},
 	},
 
