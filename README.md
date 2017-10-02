@@ -28,7 +28,7 @@ Gutenberg is built by many contributors and volunteers. Please see the full list
 
 ## How You Can Contribute
 
-Please see <a href="https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a>.
+Please see <a href="https://github.com/WordPress/gutenberg/blob/master/.github/CONTRIBUTING.md">CONTRIBUTING.md</a>.
 
 ## Why
 
