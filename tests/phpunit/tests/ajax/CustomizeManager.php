@@ -443,23 +443,93 @@ class Tests_Ajax_CustomizeManager extends WP_Ajax_UnitTestCase {
 	}
 
 	/**
-	 * Test request for dismissing autosave changesets.
+	 * Test request for trashing a changeset.
 	 *
 	 * @ticket 39896
-	 * @covers WP_Customize_Manager::handle_dismiss_changeset_autosave_request()
-	 * @covers WP_Customize_Manager::dismiss_user_auto_draft_changesets()
+	 * @covers WP_Customize_Manager::handle_changeset_trash_request()
 	 */
-	public function test_handle_dismiss_changeset_autosave_request() {
+	public function test_handle_changeset_trash_request() {
 		$uuid = wp_generate_uuid4();
 		$wp_customize = $this->set_up_valid_state( $uuid );
 
-		$this->make_ajax_call( 'dismiss_customize_changeset_autosave' );
+		$this->make_ajax_call( 'customize_trash' );
+		$this->assertFalse( $this->_last_response_parsed['success'] );
+		$this->assertEquals( 'invalid_nonce', $this->_last_response_parsed['data']['code'] );
+
+		$nonce = wp_create_nonce( 'trash_customize_changeset' );
+		$_POST['nonce'] = $_GET['nonce'] = $_REQUEST['nonce'] = $nonce;
+		$this->make_ajax_call( 'customize_trash' );
+		$this->assertFalse( $this->_last_response_parsed['success'] );
+		$this->assertEquals( 'non_existent_changeset', $this->_last_response_parsed['data']['code'] );
+
+		$wp_customize->register_controls(); // And settings too.
+		$wp_customize->set_post_value( 'blogname', 'HELLO' );
+		$wp_customize->save_changeset_post( array(
+			'status' => 'save',
+		) );
+
+		add_filter( 'map_meta_cap', array( $this, 'return_do_not_allow' ) );
+		$this->make_ajax_call( 'customize_trash' );
+		$this->assertFalse( $this->_last_response_parsed['success'] );
+		$this->assertEquals( 'changeset_trash_unauthorized', $this->_last_response_parsed['data']['code'] );
+		remove_filter( 'map_meta_cap', array( $this, 'return_do_not_allow' ) );
+
+		wp_update_post( array(
+			'ID' => $wp_customize->changeset_post_id(),
+			'post_status' => 'trash',
+		) );
+		$this->make_ajax_call( 'customize_trash' );
+		$this->assertFalse( $this->_last_response_parsed['success'] );
+		$this->assertEquals( 'changeset_already_trashed', $this->_last_response_parsed['data']['code'] );
+
+		wp_update_post( array(
+			'ID' => $wp_customize->changeset_post_id(),
+			'post_status' => 'draft',
+		) );
+
+		$wp_trash_post_count = did_action( 'wp_trash_post' );
+		add_filter( 'pre_trash_post', '__return_false' );
+		$this->make_ajax_call( 'customize_trash' );
+		$this->assertFalse( $this->_last_response_parsed['success'] );
+		$this->assertEquals( 'changeset_trash_failure', $this->_last_response_parsed['data']['code'] );
+		remove_filter( 'pre_trash_post', '__return_false' );
+		$this->assertEquals( $wp_trash_post_count, did_action( 'wp_trash_post' ) );
+
+		$wp_trash_post_count = did_action( 'wp_trash_post' );
+		$this->assertEquals( 'draft', get_post_status( $wp_customize->changeset_post_id() ) );
+		$this->make_ajax_call( 'customize_trash' );
+		$this->assertTrue( $this->_last_response_parsed['success'] );
+		$this->assertEquals( 'trash', get_post_status( $wp_customize->changeset_post_id() ) );
+		$this->assertEquals( $wp_trash_post_count + 1, did_action( 'wp_trash_post' ) );
+	}
+
+	/**
+	 * Return caps array containing 'do_not_allow'.
+	 *
+	 * @return array Caps.
+	 */
+	public function return_do_not_allow() {
+		return array( 'do_not_allow' );
+	}
+
+	/**
+	 * Test request for dismissing autosave changesets.
+	 *
+	 * @ticket 39896
+	 * @covers WP_Customize_Manager::handle_dismiss_autosave_request()
+	 * @covers WP_Customize_Manager::dismiss_user_auto_draft_changesets()
+	 */
+	public function test_handle_dismiss_autosave_request() {
+		$uuid = wp_generate_uuid4();
+		$wp_customize = $this->set_up_valid_state( $uuid );
+
+		$this->make_ajax_call( 'customize_dismiss_autosave' );
 		$this->assertFalse( $this->_last_response_parsed['success'] );
 		$this->assertEquals( 'invalid_nonce', $this->_last_response_parsed['data'] );
 
-		$nonce = wp_create_nonce( 'dismiss_customize_changeset_autosave' );
+		$nonce = wp_create_nonce( 'customize_dismiss_autosave' );
 		$_POST['nonce'] = $_GET['nonce'] = $_REQUEST['nonce'] = $nonce;
-		$this->make_ajax_call( 'dismiss_customize_changeset_autosave' );
+		$this->make_ajax_call( 'customize_dismiss_autosave' );
 		$this->assertFalse( $this->_last_response_parsed['success'] );
 		$this->assertEquals( 'no_auto_draft_to_delete', $this->_last_response_parsed['data'] );
 
@@ -489,7 +559,7 @@ class Tests_Ajax_CustomizeManager extends WP_Ajax_UnitTestCase {
 		foreach ( array_merge( $user_auto_draft_ids, $other_user_auto_draft_ids ) as $post_id ) {
 			$this->assertFalse( (bool) get_post_meta( $post_id, '_customize_restore_dismissed', true ) );
 		}
-		$this->make_ajax_call( 'dismiss_customize_changeset_autosave' );
+		$this->make_ajax_call( 'customize_dismiss_autosave' );
 		$this->assertTrue( $this->_last_response_parsed['success'] );
 		$this->assertEquals( 'auto_draft_dismissed', $this->_last_response_parsed['data'] );
 		foreach ( $user_auto_draft_ids as $post_id ) {
@@ -502,7 +572,7 @@ class Tests_Ajax_CustomizeManager extends WP_Ajax_UnitTestCase {
 		}
 
 		// Subsequent test results in none dismissed.
-		$this->make_ajax_call( 'dismiss_customize_changeset_autosave' );
+		$this->make_ajax_call( 'customize_dismiss_autosave' );
 		$this->assertFalse( $this->_last_response_parsed['success'] );
 		$this->assertEquals( 'no_auto_draft_to_delete', $this->_last_response_parsed['data'] );
 
@@ -520,7 +590,7 @@ class Tests_Ajax_CustomizeManager extends WP_Ajax_UnitTestCase {
 		$this->assertContains( 'Foo', get_post( $wp_customize->changeset_post_id() )->post_content );
 
 		// Since no autosave yet, confirm no action.
-		$this->make_ajax_call( 'dismiss_customize_changeset_autosave' );
+		$this->make_ajax_call( 'customize_dismiss_autosave' );
 		$this->assertFalse( $this->_last_response_parsed['success'] );
 		$this->assertEquals( 'no_autosave_revision_to_delete', $this->_last_response_parsed['data'] );
 
@@ -540,13 +610,13 @@ class Tests_Ajax_CustomizeManager extends WP_Ajax_UnitTestCase {
 		$this->assertContains( 'Bar', $autosave_revision->post_content );
 
 		// Confirm autosave gets deleted.
-		$this->make_ajax_call( 'dismiss_customize_changeset_autosave' );
+		$this->make_ajax_call( 'customize_dismiss_autosave' );
 		$this->assertTrue( $this->_last_response_parsed['success'] );
 		$this->assertEquals( 'autosave_revision_deleted', $this->_last_response_parsed['data'] );
 		$this->assertFalse( wp_get_post_autosave( $wp_customize->changeset_post_id() ) );
 
 		// Since no autosave yet, confirm no action.
-		$this->make_ajax_call( 'dismiss_customize_changeset_autosave' );
+		$this->make_ajax_call( 'customize_dismiss_autosave' );
 		$this->assertFalse( $this->_last_response_parsed['success'] );
 		$this->assertEquals( 'no_autosave_revision_to_delete', $this->_last_response_parsed['data'] );
 	}
