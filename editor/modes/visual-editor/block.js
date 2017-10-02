@@ -278,7 +278,7 @@ class VisualEditorBlock extends Component {
 
 			this.props.onInsertBlocks( [
 				createBlock( 'core/paragraph' ),
-			], this.props.order );
+			], this.props.order + 1 );
 		}
 		this.removeOrDeselect( event );
 	}
