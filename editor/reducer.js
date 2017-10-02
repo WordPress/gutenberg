@@ -3,7 +3,7 @@
  */
 import optimist from 'redux-optimist';
 import { combineReducers } from 'redux';
-import { difference, get, reduce, keyBy, keys, first, last, omit, without, mapValues } from 'lodash';
+import { difference, get, reduce, keyBy, first, last, omit, without, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -442,11 +442,10 @@ export function preferences( state = STORE_DEFAULTS.preferences, action ) {
 			const commonBlocks = getBlockTypes()
 				.filter( ( blockType ) => 'common' === blockType.category )
 				.map( ( blockType ) => blockType.name );
-			const frequentlyUsedBlocks = keys( state.blockUsage ).sort( ( a, b ) => state.blockUsage[ b ] - state.blockUsage[ a ] );
 			return {
 				...state,
-				recentlyUsedBlocks: frequentlyUsedBlocks
-					.concat( difference( commonBlocks, frequentlyUsedBlocks ) )
+				recentlyUsedBlocks: [ ...state.recentlyUsedBlocks ]
+					.concat( difference( commonBlocks, state.recentlyUsedBlocks ) )
 					.slice( 0, maxRecent ),
 			};
 	}

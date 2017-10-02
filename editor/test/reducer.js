@@ -869,8 +869,8 @@ describe( 'state', () => {
 			expect( state.blockUsage ).toEqual( { 'core-embed/youtube': 2, 'core-embed/twitter': 1 } );
 		} );
 
-		it( 'should populate recentlyUsedBlocks with the most frequently used blocks, filling up with common blocks, on editor setup', () => {
-			const state = preferences( deepFreeze( { recentlyUsedBlocks: [], blockUsage: { 'core-embed/youtube': 2, 'core-embed/twitter': 3 } } ), {
+		it( 'should populate recentlyUsedBlocks, filling up with common blocks, on editor setup', () => {
+			const state = preferences( deepFreeze( { recentlyUsedBlocks: [ 'core-embed/twitter', 'core-embed/youtube' ] } ), {
 				type: 'SETUP_EDITOR',
 			} );
 
