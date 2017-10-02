@@ -468,7 +468,7 @@ describe( 'block factory', () => {
 
 			expect( createReusableBlock( type, attributes ) ).toMatchObject( {
 				id: expect.stringMatching( /\w{8}-\w{4}-\w{4}-\w{4}-\w{12}/ ),
-				name: '',
+				name: 'Untitled block',
 				type,
 				attributes,
 			} );

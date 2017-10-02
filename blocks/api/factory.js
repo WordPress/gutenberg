@@ -12,6 +12,11 @@ import {
 } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import { getBlockType } from './registration';
@@ -127,7 +132,7 @@ export function switchToBlockType( block, name ) {
 export function createReusableBlock( type, attributes ) {
 	return {
 		id: uuid(),
-		name: '',
+		name: __( 'Untitled block' ),
 		type,
 		attributes,
 	};

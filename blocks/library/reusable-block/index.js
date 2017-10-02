@@ -1,35 +1,36 @@
 /**
  * External dependencies
  */
+import { pickBy, noop } from 'lodash';
 import { connect } from 'react-redux';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { Placeholder, Spinner, Modal } from '@wordpress/components';
+import { Placeholder, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { getBlockType, registerBlockType } from '../../api';
-import NewReusableBlockDialog from './new-reusable-block';
-import SaveConfirmationDialog from './save-confirmation';
-
-const SAVE_CONFIRMATION_HIDE = 'hide';
-const SAVE_CONFIRMATION_SHOW = 'show';
-const SAVE_CONFIRMATION_DISABLE = 'disable';
+import ReusableBlockEditPanel from './edit-panel';
 
 class ReusableBlockEdit extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.setName = this.setName.bind( this );
+		this.toggleEditing = this.toggleEditing.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
-		this.confirmSave = this.confirmSave.bind( this );
+		this.setName = this.setName.bind( this );
+		this.updateReusableBlock = this.updateReusableBlock.bind( this );
 
-		this.state = { saveConfirmation: SAVE_CONFIRMATION_HIDE };
+		this.state = {
+			isEditing: false,
+			name: null,
+			attributes: null,
+		};
 	}
 
 	componentDidMount() {
@@ -38,29 +39,36 @@ class ReusableBlockEdit extends Component {
 		}
 	}
 
-	setName( name ) {
-		this.props.updateReusableBlock( { name } );
-		this.props.saveReusableBlock();
+	toggleEditing() {
+		this.setState( ( prevState ) => ( {
+			isEditing: ! prevState.isEditing,
+			name: null,
+			attributes: null,
+		} ) );
 	}
 
 	setAttributes( attributes ) {
-		this.props.updateReusableBlock( { attributes } );
-
-		if ( this.state.saveConfirmation !== SAVE_CONFIRMATION_DISABLE ) {
-			this.setState( { saveConfirmation: SAVE_CONFIRMATION_SHOW } );
-		} else {
-			this.props.saveReusableBlock();
-		}
+		this.setState( ( prevState ) => ( {
+			attributes: { ...prevState.attributes, ...attributes },
+		} ) );
 	}
 
-	confirmSave() {
-		this.setState( { saveConfirmation: SAVE_CONFIRMATION_DISABLE } );
+	setName( name ) {
+		this.setState( { name } );
+	}
+
+	updateReusableBlock() {
+		const { name, attributes } = this.state;
+		// TODO: Can these two actions be combined?
+		// TODO: Think about a loading indicator, success message, failure message, etc.
+		this.props.updateReusableBlock( pickBy( { name, attributes } ) );
 		this.props.saveReusableBlock();
+		this.toggleEditing();
 	}
 
 	render() {
-		const { reusableBlock, attachBlock } = this.props;
-		const { saveConfirmation } = this.state;
+		const { focus, reusableBlock, attachBlock } = this.props;
+		const { isEditing, name, attributes } = this.state;
 
 		if ( ! reusableBlock ) {
 			return <Placeholder><Spinner /></Placeholder>;
@@ -69,25 +77,27 @@ class ReusableBlockEdit extends Component {
 		const blockType = getBlockType( reusableBlock.type );
 		const BlockEdit = blockType.edit || blockType.create;
 
-		return (
-			<div>
-				{ ! reusableBlock.name &&
-					<Modal>
-						<NewReusableBlockDialog onCreate={ this.setName } onCancel={ attachBlock } />
-					</Modal>
-				}
-				{ saveConfirmation === SAVE_CONFIRMATION_SHOW &&
-					<Modal>
-						<SaveConfirmationDialog onConfirm={ this.confirmSave } onCancel={ attachBlock } />
-					</Modal>
-				}
+		return [
+			// We fake the block being read-only by wrapping it with an element that has pointer-events: none
+			<div key="edit" style={ { pointerEvents: isEditing ? 'auto' : 'none' } }>
 				<BlockEdit
 					{ ...this.props }
-					attributes={ reusableBlock.attributes }
-					setAttributes={ this.setAttributes }
-				/>
-			</div>
-		);
+					focus={ isEditing ? focus : null }
+					attributes={ { ...reusableBlock.attributes, ...attributes } }
+					setAttributes={ isEditing ? this.setAttributes : noop } />
+			</div>,
+			focus && (
+				<ReusableBlockEditPanel
+					key="panel"
+					isEditing={ isEditing }
+					name={ name !== null ? name : reusableBlock.name }
+					onEdit={ this.toggleEditing }
+					onAttach={ attachBlock }
+					onChangeName={ this.setName }
+					onSave={ this.updateReusableBlock }
+					onCancel={ this.toggleEditing } />
+			),
+		];
 	}
 }
 

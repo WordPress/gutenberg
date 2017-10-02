@@ -422,7 +422,7 @@ describe( 'effects', () => {
 			expect( dispatch ).toHaveBeenCalledWith(
 				addReusableBlocks( {
 					id: reusableBlockId,
-					name: '',
+					name: 'Untitled block',
 					type: oldBlock.name,
 					attributes: oldBlock.attributes,
 				} )
