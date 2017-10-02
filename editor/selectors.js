@@ -23,7 +23,7 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import { serialize, getBlockType } from './api';
+import { serialize, getBlockType } from './block-api';
 
 /**
  * Returns the current editing mode.

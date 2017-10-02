@@ -14,7 +14,7 @@ import { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import './style.scss';
-import { parse } from '../../api';
+import { parse } from '../../block-api';
 import PostTitle from '../../post-title';
 import { getEditedPostContent } from '../../selectors';
 import { editPost, resetBlocks } from '../../actions';

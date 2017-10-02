@@ -9,10 +9,10 @@ import { format } from 'util';
 /**
  * Internal dependencies
  */
-import parse from '../api/parser';
-import { parse as grammarParse } from '../api/post.pegjs';
-import serialize from '../api/serializer';
-import { getBlockTypes } from '../api/registration';
+import parse from '../block-api/parser';
+import { parse as grammarParse } from '../block-api/post.pegjs';
+import serialize from '../block-api/serializer';
+import { getBlockTypes } from '../block-api/registration';
 
 const fixturesDir = path.join( __dirname, 'fixtures' );
 
@@ -92,7 +92,7 @@ describe( 'full post content fixture', () => {
 		window._wpBlocksAttributes = require( './server-attributes.json' );
 
 		// Register all blocks.
-		require( '../library' );
+		require( '../blocks' );
 	} );
 
 	fileBasenames.forEach( f => {

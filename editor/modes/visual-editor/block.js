@@ -18,7 +18,7 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { getBlockType, getBlockDefaultClassname, createBlock } from '../../api';
+import { getBlockType, getBlockDefaultClassname, createBlock } from '../../block-api';
 import InvalidBlockWarning from './invalid-block-warning';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';

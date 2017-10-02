@@ -8,7 +8,7 @@ import { difference, get, reduce, keyBy, keys, first, last, omit, pick, without,
 /**
  * Internal dependencies
  */
-import { getBlockTypes, getBlockType } from './api';
+import { getBlockTypes, getBlockType } from './block-api';
 import { combineUndoableReducers } from './utils/undoable-reducer';
 import { STORE_DEFAULTS } from './store-defaults';
 

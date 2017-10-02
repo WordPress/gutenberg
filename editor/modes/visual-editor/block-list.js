@@ -13,7 +13,7 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { serialize, getDefaultBlockName, createBlock } from '../../api';
+import { serialize, getDefaultBlockName, createBlock } from '../../block-api';
 import VisualEditorBlock from './block';
 import BlockDropZone from './block-drop-zone';
 import {

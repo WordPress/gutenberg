@@ -16,7 +16,7 @@ import { keycodes } from '@wordpress/utils';
  * Internal dependencies
  */
 import './style.scss';
-import { getCategories, getBlockTypes } from '../api';
+import { getCategories, getBlockTypes } from '../block-api';
 import BlockIcon from '../block-icon';
 import { getBlocks, getRecentlyUsedBlocks } from '../selectors';
 import { showInsertionPoint, hideInsertionPoint } from '../actions';

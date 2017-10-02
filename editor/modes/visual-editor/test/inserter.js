@@ -10,7 +10,7 @@ import { VisualEditorInserter } from '../inserter';
 
 describe( 'VisualEditorInserter', () => {
 	beforeAll( () => {
-		require( '../../../library' );
+		require( '../../../blocks' );
 	} );
 
 	it( 'should show controls when receiving focus', () => {

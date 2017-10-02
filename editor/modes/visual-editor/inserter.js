@@ -14,7 +14,7 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { createBlock } from '../../api';
+import { createBlock } from '../../block-api';
 import Inserter from '../../inserter';
 import { insertBlock } from '../../actions';
 

@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import './library';
+import './blocks';
 
 // A "block" is the abstract term used to describe units of markup that,
 // when composed together, form the content or layout of a page.
@@ -12,7 +12,7 @@ import './library';
 //
 // Blocks are inferred from the HTML source of a post through a parsing mechanism
 // and then stored as objects in state, from which it is then rendered for editing.
-export * from './api';
+export * from './block-api';
 
 // Reusable Editor Components
 export { default as AlignmentToolbar } from './alignment-toolbar';

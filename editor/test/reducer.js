@@ -7,7 +7,7 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import { registerBlockType, unregisterBlockType, getBlockType } from '../api';
+import { registerBlockType, unregisterBlockType, getBlockType } from '../block-api';
 import {
 	getPostRawValue,
 	editor,

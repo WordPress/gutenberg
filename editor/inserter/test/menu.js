@@ -7,7 +7,7 @@ import { noop } from 'lodash';
 /**
  * Internal dependencies
  */
-import { registerBlockType, unregisterBlockType, getBlockTypes } from '../../api';
+import { registerBlockType, unregisterBlockType, getBlockTypes } from '../../block-api';
 import { InserterMenu, searchBlocks } from '../menu';
 
 const textBlock = {

@@ -12,7 +12,7 @@ import { keycodes } from '@wordpress/utils';
 /**
  * Internal dependencies
  */
-import { getBlockTypes } from '../api/registration';
+import { getBlockTypes } from '../block-api/registration';
 
 /**
  * Browser dependencies

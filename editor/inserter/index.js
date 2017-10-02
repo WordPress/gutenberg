@@ -14,7 +14,7 @@ import { Popover, IconButton } from '@wordpress/components';
  * Internal dependencies
  */
 import InserterMenu from './menu';
-import { createBlock } from '../api';
+import { createBlock } from '../block-api';
 import { getBlockInsertionPoint, getEditorMode } from '../selectors';
 import { insertBlock, hideInsertionPoint } from '../actions';
 

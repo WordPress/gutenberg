@@ -104,21 +104,21 @@ const config = {
 			{
 				test: /style\.s?css$/,
 				include: [
-					/editor\/library/,
+					/editor\/blocks/,
 				],
 				use: blocksCSSPlugin.extract( extractConfig ),
 			},
 			{
 				test: /editor\.s?css$/,
 				include: [
-					/editor\/library/,
+					/editor\/blocks/,
 				],
 				use: editBlocksCSSPlugin.extract( extractConfig ),
 			},
 			{
 				test: /\.s?css$/,
 				exclude: [
-					/editor\/library/,
+					/editor\/blocks/,
 				],
 				use: mainCSSExtractTextPlugin.extract( extractConfig ),
 			},

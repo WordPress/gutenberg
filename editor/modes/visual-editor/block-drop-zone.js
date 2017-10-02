@@ -12,7 +12,7 @@ import { DropZone } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { getBlockTypes } from '../../api';
+import { getBlockTypes } from '../../block-api';
 import { insertBlocks } from '../../actions';
 
 function BlockDropZone( { index, ...props } ) {

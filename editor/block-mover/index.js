@@ -14,7 +14,7 @@ import { IconButton } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import { getBlockType } from '../api';
+import { getBlockType } from '../block-api';
 import { isFirstBlock, isLastBlock, getBlockIndex, getBlock } from '../selectors';
 import { getBlockMoverLabel } from './mover-label';
 

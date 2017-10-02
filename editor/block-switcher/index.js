@@ -16,7 +16,7 @@ import { Dashicon, IconButton } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import { getBlockType, getBlockTypes, switchToBlockType } from '../api';
+import { getBlockType, getBlockTypes, switchToBlockType } from '../block-api';
 import { replaceBlocks } from '../actions';
 import { getBlock } from '../selectors';
 

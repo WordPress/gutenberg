@@ -8,7 +8,7 @@ import { Autocomplete } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import { createBlock, getBlockTypes } from '../api';
+import { createBlock, getBlockTypes } from '../block-api';
 import BlockIcon from '../block-icon';
 
 class BlockAutocomplete extends Component {

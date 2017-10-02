@@ -6,7 +6,7 @@ import { noop } from 'lodash';
 /**
  * Internal dependencies
  */
-import { getBlockTypes, unregisterBlockType, registerBlockType, createBlock } from '../api';
+import { getBlockTypes, unregisterBlockType, registerBlockType, createBlock } from '../block-api';
 import {
 	resetPost,
 	setupNewPost,

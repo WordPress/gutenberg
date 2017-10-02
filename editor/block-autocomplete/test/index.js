@@ -10,7 +10,7 @@ import BlockIcon from '../../block-icon';
 import {
 	registerBlockType,
 	unregisterBlockType,
-} from '../../api';
+} from '../../block-api';
 import BlockAutocomplete from '../';
 
 describe( 'BlockAutocomplete', () => {

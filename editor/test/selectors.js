@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { registerBlockType, unregisterBlockType } from '../api';
+import { registerBlockType, unregisterBlockType } from '../block-api';
 import {
 	getEditorMode,
 	getPreference,

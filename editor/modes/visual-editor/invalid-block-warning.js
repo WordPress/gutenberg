@@ -21,7 +21,7 @@ import {
 	getBlockType,
 	getUnknownTypeHandlerName,
 	createBlock,
-} from '../../api';
+} from '../../block-api';
 import { replaceBlock } from '../../actions';
 
 function InvalidBlockWarning( { ignoreInvalid, switchToBlockType } ) {

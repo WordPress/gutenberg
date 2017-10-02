@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { parse, getBlockType, switchToBlockType } from './api';
+import { parse, getBlockType, switchToBlockType } from './block-api';
 import { getGutenbergURL, getWPAdminURL } from './utils/url';
 import {
 	resetPost,
