@@ -53,9 +53,12 @@ class BlockHTML extends Component {
 	render() {
 		const { html } = this.state;
 		return (
-			<div className="blocks-visual-editor__block-html">
-				<TextareaAutosize value={ html } onBlur={ this.onBlur } onChange={ this.onChange } />
-			</div>
+			<TextareaAutosize
+				className="blocks-visual-editor__block-html-textarea"
+				value={ html }
+				onBlur={ this.onBlur }
+				onChange={ this.onChange }
+			/>
 		);
 	}
 }
