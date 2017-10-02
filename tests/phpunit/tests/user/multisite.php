@@ -120,7 +120,7 @@ class Tests_Multisite_User extends WP_UnitTestCase {
 		wp_set_current_user( $user1_id );
 
 		$this->assertTrue( is_blog_user() );
-		$this->assertTrue( is_blog_user( $wpdb->blogid ) );
+		$this->assertTrue( is_blog_user( get_current_blog_id() ) );
 
 		$blog_ids = array();
 
@@ -149,12 +149,13 @@ class Tests_Multisite_User extends WP_UnitTestCase {
 		$this->assertFalse( is_user_member_of_blog() );
 
 		wp_set_current_user( $user1_id );
+		$site_id = get_current_blog_id();
 
 		$this->assertTrue( is_user_member_of_blog() );
 		$this->assertTrue( is_user_member_of_blog( 0, 0 ) );
-		$this->assertTrue( is_user_member_of_blog( 0, $wpdb->blogid ) );
+		$this->assertTrue( is_user_member_of_blog( 0, $site_id ) );
 		$this->assertTrue( is_user_member_of_blog( $user1_id ) );
-		$this->assertTrue( is_user_member_of_blog( $user1_id, $wpdb->blogid ) );
+		$this->assertTrue( is_user_member_of_blog( $user1_id, $site_id ) );
 
 		$blog_ids = self::factory()->blog->create_many( 1 );
 		foreach ( $blog_ids as $blog_id ) {

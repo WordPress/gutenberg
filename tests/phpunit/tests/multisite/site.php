@@ -363,7 +363,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		wpmu_update_blogs_date();
 
 		// compare the update time with the current time, allow delta < 2
-		$blog = get_site( $wpdb->blogid );
+		$blog = get_site( get_current_blog_id() );
 		$current_time = time();
 		$time_difference = $current_time - strtotime( $blog->last_updated );
 		$this->assertLessThan( 2, $time_difference );
