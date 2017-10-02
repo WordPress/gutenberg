@@ -37,6 +37,8 @@ function the_gutenberg_project() {
  * @since 0.1.0
  */
 function gutenberg_menu() {
+	global $submenu;
+
 	add_menu_page(
 		'Gutenberg',
 		'Gutenberg',
@@ -62,6 +64,12 @@ function gutenberg_menu() {
 		'edit_posts',
 		'gutenberg-demo',
 		'the_gutenberg_project'
+	);
+
+	$submenu['gutenberg'][] = array(
+		__( 'Feedback', 'gutenberg' ),
+		'edit_posts',
+		'http://wordpressdotorg.polldaddy.com/s/gutenberg-support',
 	);
 }
 add_action( 'admin_menu', 'gutenberg_menu' );
