@@ -4,14 +4,7 @@
         "name": "core/text-columns",
         "isValid": true,
         "attributes": {
-            "content": [
-                [
-                    "One"
-                ],
-                [
-                    "Two"
-                ]
-            ],
+            "content": [ "One", "Two" ],
             "columns": 2,
             "width": "center"
         },

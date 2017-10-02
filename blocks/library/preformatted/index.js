@@ -12,7 +12,7 @@ import Editable from '../../editable';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
 
-const { children } = source;
+const { html } = source;
 
 registerBlockType( 'core/preformatted', {
 	title: __( 'Preformatted' ),
@@ -23,8 +23,8 @@ registerBlockType( 'core/preformatted', {
 
 	attributes: {
 		content: {
-			type: 'array',
-			source: children( 'pre' ),
+			type: 'string',
+			source: html( 'pre' ),
 		},
 	},
 
@@ -88,6 +88,6 @@ registerBlockType( 'core/preformatted', {
 	save( { attributes } ) {
 		const { content } = attributes;
 
-		return <pre>{ content }</pre>;
+		return <Editable.Value tagName="pre">{ content }</Editable.Value>;
 	},
 } );

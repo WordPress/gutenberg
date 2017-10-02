@@ -80,7 +80,7 @@ attributes: {
 	},
 	author: {
 		type: 'string',
-		source: children( '.book-author' ),
+		source: html( '.book-author' ),
 	},
 	pages: {
 		type: 'number',

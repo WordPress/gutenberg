@@ -6,7 +6,7 @@ import { find } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, createElement, Children, concatChildren } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -19,60 +19,46 @@ import BlockControls from '../../block-controls';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
 
-const { children, prop } = source;
+const { html, prop } = source;
 
-const fromBrDelimitedContent = ( content ) => {
-	if ( undefined === content ) {
-		// converting an empty block to a list block
-		return content;
-	}
-	const listItems = [];
-	listItems.push( createElement( 'li', [], [] ) );
-	content.forEach( function( element, elementIndex, elements ) {
-		// "split" the incoming content on 'br' elements
-		if ( 'br' === element.type && elementIndex < elements.length - 1 ) {
-			// if is br and there are more elements to come, push a new list item
-			listItems.push( createElement( 'li', [], [] ) );
+const fromBrDelimitedContent = ( content = '' ) => {
+	const decu = document.implementation.createHTMLDocument( '' );
+	const accu = document.implementation.createHTMLDocument( '' );
+
+	decu.body.innerHTML = content;
+	accu.body.innerHTML = '<li></li>';
+
+	let node;
+
+	while ( ( node = decu.body.firstChild ) ) {
+		if ( node.nodeName === 'BR' && node.nextSibling ) {
+			accu.body.appendChild( document.createElement( 'LI' ) );
+			decu.body.removeChild( node );
 		} else {
-			listItems[ listItems.length - 1 ].props.children.push( element );
+			accu.body.lastChild.appendChild( node );
 		}
-	} );
-	return listItems;
+	}
+
+	return accu.body.innerHTML;
 };
 
-const toBrDelimitedContent = ( values ) => {
-	if ( undefined === values ) {
-		// converting an empty list
-		return values;
-	}
-	const content = [];
-	values.forEach( function( li, liIndex, listItems ) {
-		if ( typeof li === 'string' ) {
-			content.push( li );
-			return;
+const toBrDelimitedContent = ( values = '' ) => {
+	const decu = document.implementation.createHTMLDocument( '' );
+	const accu = document.implementation.createHTMLDocument( '' );
+
+	decu.body.innerHTML = `<ul>${ values }</ul>`;
+
+	Array.from( decu.querySelectorAll( 'li' ) ).forEach( ( node, i ) => {
+		if ( i !== 0 ) {
+			accu.body.appendChild( document.createElement( 'BR' ) );
 		}
 
-		Children.toArray( li.props.children ).forEach( function( element, elementIndex, liChildren ) {
-			if ( 'ul' === element.type || 'ol' === element.type ) { // lists within lists
-				// we know we've just finished processing a list item, so break the text
-				content.push( createElement( 'br' ) );
-				// push each element from the child list's converted content
-				content.push.apply( content, toBrDelimitedContent( Children.toArray( element.props.children ) ) );
-				// add a break if there are more list items to come, because the recursive call won't
-				// have added it when it finished processing the child list because it thinks the content ended
-				if ( liIndex !== listItems.length - 1 ) {
-					content.push( createElement( 'br' ) );
-				}
-			} else {
-				content.push( element );
-				if ( elementIndex === liChildren.length - 1 && liIndex !== listItems.length - 1 ) {
-					// last element in this list item, but not last element overall
-					content.push( createElement( 'br' ) );
-				}
-			}
-		} );
+		while ( node.firstChild ) {
+			accu.body.appendChild( node.firstChild );
+		}
 	} );
-	return content;
+
+	return accu.body.innerHTML;
 };
 
 registerBlockType( 'core/list', {
@@ -88,9 +74,9 @@ registerBlockType( 'core/list', {
 			default: 'UL',
 		},
 		values: {
-			type: 'array',
-			source: children( 'ol,ul' ),
-			default: [],
+			type: 'string',
+			source: html( 'ol,ul' ),
+			default: '',
 		},
 	},
 
@@ -112,10 +98,9 @@ registerBlockType( 'core/list', {
 				type: 'block',
 				blocks: [ 'core/quote' ],
 				transform: ( { value, citation } ) => {
-					const listItems = fromBrDelimitedContent( value );
-					const values = citation
-						? concatChildren( listItems, <li>{ citation }</li> )
-						: listItems;
+					const values =
+						value.map( ( subValue ) => `<li>${ subValue }</li>` )
+						+ ( citation ? `<li>${ citation }</li>` : '' );
 					return createBlock( 'core/list', {
 						nodeName: 'UL',
 						values,
@@ -162,7 +147,7 @@ registerBlockType( 'core/list', {
 				blocks: [ 'core/quote' ],
 				transform: ( { values } ) => {
 					return createBlock( 'core/quote', {
-						value: [ <p key="list">{ toBrDelimitedContent( values ) }</p> ],
+						value: [ toBrDelimitedContent( values ) ],
 					} );
 				},
 			},
@@ -170,19 +155,16 @@ registerBlockType( 'core/list', {
 	},
 
 	merge( attributes, attributesToMerge ) {
-		const valuesToMerge = attributesToMerge.values || [];
+		let valuesToMerge = attributesToMerge.values || '';
 
 		// Standard text-like block attribute.
 		if ( attributesToMerge.content ) {
-			valuesToMerge.push( attributesToMerge.content );
+			valuesToMerge += attributesToMerge.content;
 		}
 
 		return {
 			...attributes,
-			values: [
-				...attributes.values,
-				...valuesToMerge,
-			],
+			values: attributes.values + valuesToMerge,
 		};
 	},
 
@@ -354,10 +336,6 @@ registerBlockType( 'core/list', {
 	save( { attributes } ) {
 		const { nodeName, values } = attributes;
 
-		return createElement(
-			nodeName.toLowerCase(),
-			null,
-			values
-		);
+		return <Editable.Value tagName={ nodeName.toLowerCase() }>{ values }</Editable.Value>;
 	},
 } );

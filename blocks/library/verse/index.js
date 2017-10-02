@@ -12,7 +12,7 @@ import Editable from '../../editable';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
 
-const { children } = source;
+const { html } = source;
 
 registerBlockType( 'core/verse', {
 	title: __( 'Verse' ),
@@ -25,8 +25,8 @@ registerBlockType( 'core/verse', {
 
 	attributes: {
 		content: {
-			type: 'array',
-			source: children( 'pre' ),
+			type: 'string',
+			source: html( 'pre' ),
 		},
 	},
 
@@ -79,6 +79,6 @@ registerBlockType( 'core/verse', {
 	},
 
 	save( { attributes, className } ) {
-		return <pre className={ className }>{ attributes.content }</pre>;
+		return <Editable.Value tagName="pre" className={ className }>{ attributes.content }</Editable.Value>;
 	},
 } );

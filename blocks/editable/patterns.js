@@ -2,7 +2,7 @@
  * External dependencies
  */
 import tinymce from 'tinymce';
-import { find, get, escapeRegExp, groupBy, drop } from 'lodash';
+import { find, get, escapeRegExp, groupBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -189,11 +189,10 @@ export default function( editor ) {
 			return;
 		}
 
-		const firstText = content[ 0 ];
-
+		const textContent = editor.getBody().textContent;
 		const { result, pattern } = patterns.reduce( ( acc, item ) => {
 			return acc.result ? acc : {
-				result: item.regExp.exec( firstText ),
+				result: item.regExp.exec( textContent ),
 				pattern: item,
 			};
 		}, {} );
@@ -204,7 +203,7 @@ export default function( editor ) {
 
 		const range = editor.selection.getRng();
 		const matchLength = result[ 0 ].length;
-		const remainingText = firstText.slice( matchLength );
+		const remainingText = content.slice( matchLength );
 
 		// The caret position must be at the end of the match.
 		if ( range.startOffset !== matchLength ) {
@@ -212,7 +211,7 @@ export default function( editor ) {
 		}
 
 		const block = pattern.transform( {
-			content: [ remainingText, ...drop( content ) ],
+			content: remainingText,
 			match: result,
 		} );
 

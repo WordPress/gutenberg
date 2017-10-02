@@ -5,9 +5,7 @@
         "isValid": true,
         "attributes": {
             "url": "https://ted.com/",
-            "caption": [
-                "Embedded content from ted"
-            ]
+            "caption": "Embedded content from ted"
         },
         "originalContent": "<figure class=\"wp-block-embed-ted\">\n    https://ted.com/\n    <figcaption>Embedded content from ted</figcaption>\n</figure>"
     }

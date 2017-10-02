@@ -5,24 +5,10 @@
         "isValid": true,
         "attributes": {
             "value": [
-                {
-                    "type": "p",
-                    "children": [
-                        "Paragraph ",
-                        {
-                            "type": "strong",
-                            "children": "one"
-                        }
-                    ]
-                },
-                {
-                    "type": "p",
-                    "children": "Paragraph two"
-                }
+                "Paragraph <strong>one</strong>",
+                "Paragraph two"
             ],
-            "citation": [
-                "by whomever"
-            ],
+            "citation": "by whomever",
             "align": "none"
         },
         "originalContent": "<blockquote class=\"wp-block-pullquote alignnone\">\n    <p>Paragraph <strong>one</strong></p>\n    <p>Paragraph two</p>\n    <footer>by whomever</footer>\n</blockquote>"

@@ -2,43 +2,16 @@
  * External dependencies
  */
 import tinymce from 'tinymce';
-import { isEqual } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { Component, Children, createElement } from '@wordpress/element';
+import { Component, createElement } from '@wordpress/element';
 
 export default class TinyMCE extends Component {
 	componentDidMount() {
 		this.initialize();
-	}
-
-	shouldComponentUpdate() {
-		// We must prevent rerenders because TinyMCE will modify the DOM, thus
-		// breaking React's ability to reconcile changes.
-		//
-		// See: https://github.com/facebook/react/issues/6802
-		return false;
-	}
-
-	componentWillReceiveProps( nextProps ) {
-		const name = 'data-is-placeholder-visible';
-		const isPlaceholderVisible = String( !! nextProps.isPlaceholderVisible );
-
-		if ( this.editorNode.getAttribute( name ) !== isPlaceholderVisible ) {
-			this.editorNode.setAttribute( name, isPlaceholderVisible );
-		}
-
-		if ( ! isEqual( this.props.style, nextProps.style ) ) {
-			this.editorNode.setAttribute( 'style', '' );
-			Object.assign( this.editorNode.style, nextProps.style );
-		}
-
-		if ( ! isEqual( this.props.className, nextProps.className ) ) {
-			this.editorNode.className = classnames( nextProps.className, 'blocks-editable__tinymce' );
-		}
 	}
 
 	componentWillUnmount() {
@@ -51,7 +24,7 @@ export default class TinyMCE extends Component {
 	}
 
 	initialize() {
-		const { focus } = this.props;
+		const { focus, defaultValue } = this.props;
 
 		const settings = this.props.getSettings( {
 			theme: false,
@@ -68,6 +41,10 @@ export default class TinyMCE extends Component {
 
 		settings.plugins.push( 'paste' );
 
+		if ( defaultValue ) {
+			this.editorNode.innerHTML = defaultValue;
+		}
+
 		tinymce.init( {
 			...settings,
 			target: this.editorNode,
@@ -83,15 +60,7 @@ export default class TinyMCE extends Component {
 	}
 
 	render() {
-		const { tagName = 'div', style, defaultValue, label, className } = this.props;
-
-		// If a default value is provided, render it into the DOM even before
-		// TinyMCE finishes initializing. This avoids a short delay by allowing
-		// us to show and focus the content before it's truly ready to edit.
-		let children;
-		if ( defaultValue ) {
-			children = Children.toArray( defaultValue );
-		}
+		const { tagName = 'div', style, label, className, isPlaceholderVisible } = this.props;
 
 		return createElement( tagName, {
 			ref: ( node ) => this.editorNode = node,
@@ -100,6 +69,7 @@ export default class TinyMCE extends Component {
 			className: classnames( className, 'blocks-editable__tinymce' ),
 			style,
 			'aria-label': label,
-		}, children );
+			'data-is-placeholder-visible': isPlaceholderVisible,
+		} );
 	}
 }

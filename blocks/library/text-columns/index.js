@@ -21,7 +21,7 @@ import Editable from '../../editable';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
 
-const { children, query } = source;
+const { html, query } = source;
 
 registerBlockType( 'core/text-columns', {
 	title: __( 'Text Columns' ),
@@ -33,8 +33,8 @@ registerBlockType( 'core/text-columns', {
 	attributes: {
 		content: {
 			type: 'array',
-			source: query( 'p', children() ),
-			default: [ [], [] ],
+			source: query( 'p', html() ),
+			default: [ '', '' ],
 		},
 		columns: {
 			type: 'number',
@@ -110,7 +110,7 @@ registerBlockType( 'core/text-columns', {
 			<section className={ `align${ width } columns-${ columns }` }>
 				{ times( columns, ( index ) =>
 					<div className="wp-block-column" key={ `column-${ index }` }>
-						<p>{ content && content[ index ] }</p>
+						<Editable.Value tagName="p">{ content && content[ index ] }</Editable.Value>
 					</div>
 				) }
 			</section>

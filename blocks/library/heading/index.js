@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { concatChildren } from '@wordpress/element';
 import { Toolbar } from '@wordpress/components';
 
 /**
@@ -16,7 +15,7 @@ import InspectorControls from '../../inspector-controls';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockDescription from '../../block-description';
 
-const { children, prop } = source;
+const { html, prop } = source;
 
 registerBlockType( 'core/heading', {
 	title: __( 'Heading' ),
@@ -33,8 +32,8 @@ registerBlockType( 'core/heading', {
 
 	attributes: {
 		content: {
-			type: 'array',
-			source: children( 'h1,h2,h3,h4,h5,h6' ),
+			type: 'string',
+			source: html( 'h1,h2,h3,h4,h5,h6' ),
 		},
 		nodeName: {
 			type: 'string',
@@ -92,7 +91,7 @@ registerBlockType( 'core/heading', {
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: concatChildren( attributes.content, attributesToMerge.content ),
+			content: attributes.content + attributesToMerge.content,
 		};
 	},
 
@@ -164,12 +163,11 @@ registerBlockType( 'core/heading', {
 
 	save( { attributes } ) {
 		const { align, nodeName, content } = attributes;
-		const Tag = nodeName.toLowerCase();
 
 		return (
-			<Tag style={ { textAlign: align } } >
+			<Editable.Value tagName={ nodeName.toLowerCase() } style={ { textAlign: align } } >
 				{ content }
-			</Tag>
+			</Editable.Value>
 		);
 	},
 } );

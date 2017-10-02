@@ -20,7 +20,7 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
 
-const { attr, children } = source;
+const { attr, html } = source;
 
 registerBlockType( 'core/video', {
 	title: __( 'Video' ),
@@ -41,8 +41,8 @@ registerBlockType( 'core/video', {
 			source: attr( 'video', 'src' ),
 		},
 		caption: {
-			type: 'array',
-			source: children( 'figcaption' ),
+			type: 'string',
+			source: html( 'figcaption' ),
 		},
 	},
 
@@ -146,7 +146,7 @@ registerBlockType( 'core/video', {
 
 			<figure className={ align ? `align${ align }` : null }>
 				{ src && <video controls src={ src } /> }
-				{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
+				{ caption && caption.length > 0 && <Editable.Value tagName="figcaption">{ caption }</Editable.Value> }
 			</figure>
 		);
 	},
