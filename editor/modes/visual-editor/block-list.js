@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { throttle, reduce, noop } from 'lodash';
+import { throttle, mapValues, noop, invert } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -80,14 +80,15 @@ class VisualEditorBlockList extends Component {
 	onPointerMove( { clientY } ) {
 		const BUFFER = 20;
 		const { multiSelectedBlocks } = this.props;
-		const y = clientY + window.pageYOffset;
+		const boundaries = this.refs[ this.selectionAtStart ].getBoundingClientRect();
+		const y = clientY - boundaries.top;
 
 		// If there is no selection yet, make the use move at least BUFFER px
 		// away from the block with the pointer.
 		if (
 			! multiSelectedBlocks.length &&
-			y - this.startLowerBoundary < BUFFER &&
-			this.startUpperBoundary - y < BUFFER
+			y + BUFFER > 0 &&
+			y - BUFFER < boundaries.height
 		) {
 			return;
 		}
@@ -120,20 +121,18 @@ class VisualEditorBlockList extends Component {
 	}
 
 	onSelectionStart( uid ) {
-		const { pageYOffset } = window;
 		const boundaries = this.refs[ uid ].getBoundingClientRect();
 
-		// Create a Y coödinate map to unique block IDs.
-		this.coordMap = reduce( this.refs, ( acc, node, blockUid ) => ( {
-			...acc,
-			[ pageYOffset + node.getBoundingClientRect().top ]: blockUid,
-		} ), {} );
-		// Cache an array of the Y coödrinates for use in `onPointerMove`.
-		this.coordMapKeys = Object.keys( this.coordMap );
-		this.selectionAtStart = uid;
+		// Create a uid to Y coödinate map.
+		const uidToCoordMap = mapValues( this.refs, ( node ) => {
+			return node.getBoundingClientRect().top - boundaries.top;
+		} );
 
-		this.startUpperBoundary = pageYOffset + boundaries.top;
-		this.startLowerBoundary = pageYOffset + boundaries.bottom;
+		// Cache a Y coödinate to uid map for use in `onPointerMove`.
+		this.coordMap = invert( uidToCoordMap );
+		// Cache an array of the Y coödrinates for use in `onPointerMove`.
+		this.coordMapKeys = Object.values( uidToCoordMap );
+		this.selectionAtStart = uid;
 
 		window.addEventListener( 'mousemove', this.onPointerMove );
 		window.addEventListener( 'scroll', this.onScroll );
@@ -165,8 +164,6 @@ class VisualEditorBlockList extends Component {
 		delete this.coordMap;
 		delete this.coordMapKeys;
 		delete this.selectionAtStart;
-		delete this.startUpperBoundary;
-		delete this.startLowerBoundary;
 
 		window.removeEventListener( 'mousemove', this.onPointerMove );
 		window.removeEventListener( 'scroll', this.onScroll );
