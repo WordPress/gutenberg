@@ -10,7 +10,6 @@ import { throttle, reduce, noop } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { serialize, getDefaultBlockName, createBlock } from '@wordpress/blocks';
-import { keycodes } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -29,7 +28,6 @@ import {
 import { insertBlock, multiSelect } from '../../actions';
 
 const INSERTION_POINT_PLACEHOLDER = '[[insertion-point]]';
-const { ENTER } = keycodes;
 
 class VisualEditorBlockList extends Component {
 	constructor( props ) {
@@ -44,7 +42,6 @@ class VisualEditorBlockList extends Component {
 		this.appendDefaultBlock = this.appendDefaultBlock.bind( this );
 		this.setLastClientY = this.setLastClientY.bind( this );
 		this.onPointerMove = throttle( this.onPointerMove.bind( this ), 250 );
-		this.onPlaceholderKeyDown = this.onPlaceholderKeyDown.bind( this );
 		// Browser does not fire `*move` event when the pointer position changes
 		// relative to the document, so fire it with the last known position.
 		this.onScroll = () => this.onPointerMove( { clientY: this.lastClientY } );
@@ -174,12 +171,6 @@ class VisualEditorBlockList extends Component {
 		window.removeEventListener( 'mousemove', this.onPointerMove );
 		window.removeEventListener( 'scroll', this.onScroll );
 		window.removeEventListener( 'mouseup', this.onSelectionEnd );
-	}
-
-	onPlaceholderKeyDown( event ) {
-		if ( event.keyCode === ENTER ) {
-			this.appendDefaultBlock();
-		}
 	}
 
 	appendDefaultBlock() {
