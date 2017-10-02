@@ -145,6 +145,7 @@ class WP_Test_REST_Schema_Initialization extends WP_Test_REST_TestCase {
 			'post_excerpt'   => 'REST API Client Fixture: Post',
 			'post_author'    => 0,
 		) );
+
 		wp_update_post( array(
 			'ID'           => $post_id,
 			'post_content' => 'Updated post content.',
@@ -195,6 +196,24 @@ class WP_Test_REST_Schema_Initialization extends WP_Test_REST_TestCase {
 			'comment_author_email' => 'lights@example.org',
 			'comment_author_url'   => 'http://lights.example.org/',
 		) );
+		$meta_args = array(
+			'sanitize_callback' => 'sanitize_my_meta_key',
+			'auth_callback'     => '__return_true',
+			'type'              => 'string',
+			'description'       => 'Test meta key',
+			'single'            => true,
+			'show_in_rest'      => true,
+		);
+
+		// Set up meta.
+		register_meta( 'user', 'meta_key', $meta_args );
+		update_user_meta( 1, 'meta_key', 'meta_value' ); // Always use the first user.
+		register_meta( 'post', 'meta_key', $meta_args );
+		update_post_meta( $post_id, 'meta_key', 'meta_value' );
+		register_meta( 'comment', 'meta_key', $meta_args );
+		update_comment_meta( $comment_id, 'meta_key', 'meta_value' );
+		register_meta( 'term', 'meta_key', $meta_args );
+		update_term_meta( $tag_id, 'meta_key', 'meta_value' );
 
 		// Generate route data for subsequent QUnit tests.
 		$routes_to_generate_data = array(
