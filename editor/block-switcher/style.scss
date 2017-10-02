@@ -34,6 +34,12 @@
 	input {
 		font-size: $default-font-size;
 	}
+
+	span {
+		display: block;
+		padding: 6px;
+		color: $light-gray-900;
+	}
 }
 
 .editor-block-switcher__menu-item {
