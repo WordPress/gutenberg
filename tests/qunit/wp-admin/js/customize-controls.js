@@ -702,7 +702,7 @@ jQuery( window ).load( function (){
 	test( 'Test DateTimeControl creation and its methods', function( assert ) {
 		var control, controlId = 'date_time', section, sectionId = 'fixture-section',
 			datetime = '2599-08-06 18:12:13', dateTimeArray, dateTimeArrayInampm, timeString,
-			day, year, month, minute, ampm, hour;
+			day, year, month, minute, meridian, hour;
 
 		section = wp.customize.section( sectionId );
 
@@ -710,6 +710,7 @@ jQuery( window ).load( function (){
 			params: {
 				section: section.id,
 				type: 'date_time',
+				includeTime: true,
 				content: '<li id="customize-control-' + controlId + '" class="customize-control"></li>',
 				defaultValue: datetime
 			}
@@ -728,15 +729,17 @@ jQuery( window ).load( function (){
 		year = control.inputElements.year;
 		minute = control.inputElements.minute;
 		hour = control.inputElements.hour;
-		ampm = control.inputElements.ampm;
+		meridian = control.inputElements.meridian;
 
 		year( '23' );
 		assert.equal( typeof year(), 'number', 'Should always return integer' );
 
+		month( '8' );
 		month( 'test' );
-		assert.notOk( month(), 'Should not accept text' );
+		assert.equal( 8, month(), 'Should not accept text' );
 
 		// Test control.parseDateTime();
+		control.params.twelveHourFormat = false;
 		dateTimeArray = control.parseDateTime( datetime );
 		assert.deepEqual( dateTimeArray, {
 			year: '2599',
@@ -747,13 +750,14 @@ jQuery( window ).load( function (){
 			day: '06'
 		} );
 
-		dateTimeArrayInampm = control.parseDateTime( datetime, true );
+		control.params.twelveHourFormat = true;
+		dateTimeArrayInampm = control.parseDateTime( datetime );
 		assert.deepEqual( dateTimeArrayInampm, {
 			year: '2599',
 			month: '08',
 			hour: '6',
 			minute: '12',
-			ampm: 'pm',
+			meridian: 'pm',
 			day: '06'
 		} );
 
@@ -762,15 +766,20 @@ jQuery( window ).load( function (){
 		day( '18' );
 		hour( '3' );
 		minute( '44' );
-		ampm( 'am' );
+		meridian( 'am' );
 
 		// Test control.convertInputDateToString().
 		timeString = control.convertInputDateToString();
 		assert.equal( timeString, '2010-12-18 03:44:00' );
 
-		ampm( 'pm' );
+		meridian( 'pm' );
 		timeString = control.convertInputDateToString();
 		assert.equal( timeString, '2010-12-18 15:44:00' );
+
+		control.params.includeTime = false;
+		timeString = control.convertInputDateToString();
+		assert.equal( timeString, '2010-12-18' );
+		control.params.includeTime = true;
 
 		// Test control.updateDaysForMonth();.
 		year( 2017 );
@@ -796,11 +805,14 @@ jQuery( window ).load( function (){
 		assert.notOk( control.notifications.has( 'not_future_date' ) );
 
 		// Test control.populateDateInputs();
+		control.setting._value = '2000-12-30 12:34:56';
 		control.populateDateInputs();
-		control.dateInputs.each( function() {
-			var node = jQuery( this );
-		    assert.equal( node.val(), control.inputElements[ node.data( 'component' ) ].get() );
-		} );
+		assert.equal( '2000', control.inputElements.year.get() );
+		assert.equal( '12', control.inputElements.month.get() );
+		assert.equal( '30', control.inputElements.day.get() );
+		assert.equal( '12', control.inputElements.hour.get() );
+		assert.equal( '34', control.inputElements.minute.get() );
+		assert.equal( 'pm', control.inputElements.meridian.get() );
 
 		// Test control.validateInputs();
 		hour( 33 );
@@ -818,7 +830,7 @@ jQuery( window ).load( function (){
 		year( 2018 );
 		hour( 4 );
 		minute( 20 );
-		ampm( 'pm' );
+		meridian( 'pm' );
 		control.populateSetting();
 		assert.equal( control.setting(), '2018-11-02 16:20:00' );
 
@@ -836,7 +848,7 @@ jQuery( window ).load( function (){
 		year( 2318 );
 		hour( 4 );
 		minute( 20 );
-		ampm( 'pm' );
+		meridian( 'pm' );
 		assert.ok( control.isFutureDate() );
 
 		year( 2016 );
@@ -848,7 +860,7 @@ jQuery( window ).load( function (){
 		 */
 		hour( 24 );
 		minute( 32 );
-		control.inputElements.ampm = false; // Because it works only when the time is twenty four hour format.
+		control.inputElements.meridian = false; // Because it works only when the time is twenty four hour format.
 		control.updateMinutesForHour();
 		assert.deepEqual( minute(), 0 );
 
@@ -910,9 +922,9 @@ jQuery( window ).load( function (){
 					control.setting.set( newLink );
 
 					assert.equal( control.previewElements.input(), newLink );
-					assert.equal( control.previewElements.link(), newLink );
-					assert.equal( control.previewElements.link.element.attr( 'href' ), newLink );
-					assert.equal( control.previewElements.link.element.attr( 'target' ), wp.customize.settings.changeset.uuid );
+					assert.equal( control.previewElements.url(), newLink );
+					assert.equal( control.previewElements.url.element.parent().attr( 'href' ), newLink );
+					assert.equal( control.previewElements.url.element.parent().attr( 'target' ), wp.customize.settings.changeset.uuid );
 
 					// Test control.toggleSaveNotification().
 					control.toggleSaveNotification( true );

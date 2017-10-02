@@ -872,86 +872,77 @@
 				</div>
 			<# } #>
 		</script>
-	<script type="text/html" id="tmpl-customize-control-date_time-content">
+		<script type="text/html" id="tmpl-customize-control-date_time-content">
 
-		<# _.defaults( data, {"settings":[],"type":"date_time","priority":10,"active":true,"section":"","content":"<li id=\"customize-control-temp\" class=\"customize-control customize-control-date_time\">\n\t\t\t\t\t<\/li>","label":"","description":"","instanceNumber":69,"maxYear":9999,"minYear":1000,"allowPastDate":true,"twelveHourFormat":true,"defaultValue":null,"month_choices":{"1":{"text":"1-Jan","value":1},"2":{"text":"2-Feb","value":2},"3":{"text":"3-Mar","value":3},"4":{"text":"4-Apr","value":4},"5":{"text":"5-May","value":5},"6":{"text":"6-Jun","value":6},"7":{"text":"7-Jul","value":7},"8":{"text":"8-Aug","value":8},"9":{"text":"9-Sep","value":9},"10":{"text":"10-Oct","value":10},"11":{"text":"11-Nov","value":11},"12":{"text":"12-Dec","value":12}}} ); #>
+		<# _.defaults( data, {"settings":[],"type":"date_time","priority":10,"active":true,"section":"","content":"<li id=\"customize-control-temp\" class=\"customize-control customize-control-date_time\">\n\t\t\t\t\t<\/li>","label":"","description":"","instanceNumber":73,"maxYear":9999,"minYear":1000,"allowPastDate":true,"twelveHourFormat":true,"includeTime":true,"defaultValue":null,"month_choices":{"1":{"text":"1-Jan","value":1},"2":{"text":"2-Feb","value":2},"3":{"text":"3-Mar","value":3},"4":{"text":"4-Apr","value":4},"5":{"text":"5-May","value":5},"6":{"text":"6-Jun","value":6},"7":{"text":"7-Jul","value":7},"8":{"text":"8-Aug","value":8},"9":{"text":"9-Sep","value":9},"10":{"text":"10-Oct","value":10},"11":{"text":"11-Nov","value":11},"12":{"text":"12-Dec","value":12}}} ); #>
+		<# var idPrefix = _.uniqueId( 'el' ) + '-'; #>
 
 		<span class="customize-control-title">
-			<label>{{ data.label }}</label>
+			{{ data.label }}
 		</span>
 		<div class="customize-control-notifications-container"></div>
 		<span class="description customize-control-description">{{ data.description }}</span>
 		<div class="date-time-fields">
-			<div class="day-row">
-				<span class="title-day">Day</span>
+			<fieldset class="day-row">
+				<legend class="title-day">Date</legend>
 				<div class="day-fields clear">
-					<label class="month-field">
-						<span class="screen-reader-text">Month</span>
-						<select class="date-input month" data-component="month">
-							<# _.each( data.month_choices, function( choice ) {
-									if ( _.isObject( choice ) && ! _.isUndefined( choice.text ) && ! _.isUndefined( choice.value ) ) {
-									text = choice.text;
-									value = choice.value;
-									}
-									#>
-								<option value="{{ value }}" >
-									{{ text }}
-								</option>
-								<# } ); #>
-						</select>
-					</label>
-					<label class="day-field">
-						<span class="screen-reader-text">Day</span>
-						<input type="number" size="2" maxlength="2" autocomplete="off" class="date-input day" data-component="day" min="1" max="31"" />
-					</label>
+					<label for="{{ idPrefix }}date-time-month" class="screen-reader-text">Month</label>
+					<select id="{{ idPrefix }}date-time-month" class="date-input month" data-component="month">
+						<# _.each( data.month_choices, function( choice ) {
+								if ( _.isObject( choice ) && ! _.isUndefined( choice.text ) && ! _.isUndefined( choice.value ) ) {
+								text = choice.text;
+								value = choice.value;
+								}
+								#>
+							<option value="{{ value }}" >
+								{{ text }}
+							</option>
+						<# } ); #>
+					</select>
+					<label for="{{ idPrefix }}date-time-day" class="screen-reader-text">Day</label>
+					<input id="{{ idPrefix }}date-time-day" type="number" size="2" autocomplete="off" class="date-input day" data-component="day" min="1" max="31" />
 					<span class="time-special-char date-time-separator">,</span>
-					<label class="year-field">
-						<span class="screen-reader-text">Year</span>
-						<# var maxYearLength = String( data.maxYear ).length; #>
-							<input type="number" size="4" maxlength="{{ maxYearLength }}" autocomplete="off" class="date-input year" data-component="year" min="{{ data.minYear }}" max="{{ data.maxYear }}" />
-					</label>
+					<label for="{{ idPrefix }}date-time-year" class="screen-reader-text">Year</label>
+					<input id="{{ idPrefix }}date-time-year" type="number" size="4" autocomplete="off" class="date-input year" data-component="year" min="{{ data.minYear }}" max="{{ data.maxYear }}">
 				</div>
-			</div>
-			<div class="time-row clear">
-				<span class="title-time">Time</span>
-				<div class="time-fields clear">
-					<label class="hour-field">
-						<span class="screen-reader-text">Hour</span>
+			</fieldset>
+			<# if ( data.includeTime ) { #>
+				<fieldset class="time-row clear">
+					<legend class="title-time">Time</legend>
+					<div class="time-fields clear">
+						<label for="{{ idPrefix }}date-time-hour" class="screen-reader-text">Hour</label>
 						<# var maxHour = data.twelveHourFormat ? 12 : 24; #>
-							<input type="number" size="2" maxlength="2" autocomplete="off" class="date-input hour" data-component="hour" min="1" max="{{ maxHour }}"" />
-					</label>
-					<span class="time-special-char date-time-separator">:</span>
-					<label class="minute-field">
-						<span class="screen-reader-text">Minute</span>
-						<input type="number" size="2" maxlength="2" autocomplete="off" class="date-input minute" data-component="minute" min="0" max="59" />
-					</label>
-					<# if ( data.twelveHourFormat ) { #>
-						<label class="am-pm-field">
-							<span class="screen-reader-text">AM / PM</span>
-							<select class="date-input" data-component="ampm">
+						<input id="{{ idPrefix }}date-time-hour" type="number" size="2" autocomplete="off" class="date-input hour" data-component="hour" min="1" max="{{ maxHour }}">
+						<span class="time-special-char date-time-separator">:</span>
+						<label for="{{ idPrefix }}date-time-minute" class="screen-reader-text">Minute</label>
+						<input id="{{ idPrefix }}date-time-minute" type="number" size="2" autocomplete="off" class="date-input minute" data-component="minute" min="0" max="59">
+						<# if ( data.twelveHourFormat ) { #>
+							<label for="{{ idPrefix }}date-time-meridian" class="screen-reader-text">Meridian</label>
+							<select id="{{ idPrefix }}date-time-meridian" class="date-input meridian" data-component="meridian">
 								<option value="am">AM</option>
 								<option value="pm">PM</option>
 							</select>
-						</label>
 						<# } #>
-					<abbr class="date-timezone" aria-label="Timezone" title="Timezone is Asia/Kolkata (IST), currently UTC+5:30.">IST</abbr>
-				</div>
-			</div>
+						<abbr class="date-timezone" aria-label="Timezone" title="Timezone is America/Los Angeles (PDT), currently UTC-7.">PDT</abbr>
+					</div>
+				</fieldset>
+			<# } #>
 		</div>
 	</script>
 	<script type="text/html" id="tmpl-customize-preview-link-control" >
-		<span class="customize-control-title">
-		<label>Share Preview Link</label>
-	</span>
-		<span class="description customize-control-description">See how changes would look live on your website, and share the preview with people who can&#039;t access the Customizer.</span>
+		<# var elementPrefix = _.uniqueId( 'el' ) + '-' #>
+		<p class="customize-control-title">
+			Share Preview Link			</p>
+		<p class="description customize-control-description">See how changes would look live on your website, and share the preview with people who can&#039;t access the Customizer.</p>
 		<div class="customize-control-notifications-container"></div>
 		<div class="preview-link-wrapper">
-			<label>
-				<span class="screen-reader-text">Preview Link</span>
-				<a class="preview-control-element" data-component="link" href="" target=""></a>
-				<input readonly class="preview-control-element" data-component="input" value="test" >
-				<button class="customize-copy-preview-link preview-control-element button button-secondary" data-component="button" data-copy-text="Copy" data-copied-text="Copied" >Copy</button>
-			</label>
+			<label for="{{ elementPrefix }}customize-preview-link-input" class="screen-reader-text">Preview Link</label>
+			<a href="" target="">
+				<span class="preview-control-element" data-component="url"></span>
+				<span class="screen-reader-text">(opens in a new window)</span>
+			</a>
+			<input id="{{ elementPrefix }}customize-preview-link-input" readonly class="preview-control-element" data-component="input">
+			<button class="customize-copy-preview-link preview-control-element button button-secondary" data-component="button" data-copy-text="Copy" data-copied-text="Copied" >Copy</button>
 		</div>
 	</script>
 	<script type="text/html" id="tmpl-media-modal">
