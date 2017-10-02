@@ -375,8 +375,8 @@ class Tests_DB extends WP_UnitTestCase {
 		$this->assertEquals( "SELECT * FROM $wpdb->users WHERE id = 0 AND user_login = 'admin'", $prepared );
 	}
 
-        function test_prepare_vsprintf() {
-                global $wpdb;
+	function test_prepare_vsprintf() {
+		global $wpdb;
 
 		$prepared = $wpdb->prepare( "SELECT * FROM $wpdb->users WHERE id = %d AND user_login = %s", array( 1, "admin" ) );
 		$this->assertEquals( "SELECT * FROM $wpdb->users WHERE id = 1 AND user_login = 'admin'", $prepared );
@@ -393,7 +393,74 @@ class Tests_DB extends WP_UnitTestCase {
 
 		$prepared = @$wpdb->prepare( "SELECT * FROM $wpdb->users WHERE id = %d AND user_login = %s", array( array( 1 ), "admin" ) );
 		$this->assertEquals( "SELECT * FROM $wpdb->users WHERE id = 0 AND user_login = 'admin'", $prepared );
-        }
+	}
+
+	/**
+	 * @ticket 42040
+	 * @dataProvider data_prepare_incorrect_arg_count
+	 * @expectedIncorrectUsage wpdb::prepare
+	 */
+	public function test_prepare_incorrect_arg_count( $query, $args, $expected ) {
+		global $wpdb;
+
+		// $query is the first argument to be passed to wpdb::prepare()
+		array_unshift( $args, $query );
+
+		$prepared = @call_user_func_array( array( $wpdb, 'prepare' ), $args );
+		$this->assertEquals( $expected, $prepared );
+	}
+
+	public function data_prepare_incorrect_arg_count() {
+		global $wpdb;
+
+		return array(
+			array(
+				"SELECT * FROM $wpdb->users WHERE id = %d AND user_login = %s",     // Query
+				array( 1, "admin", "extra-arg" ),                                   // ::prepare() args, to be passed via call_user_func_array
+				"SELECT * FROM $wpdb->users WHERE id = 1 AND user_login = 'admin'", // Expected output
+			),
+			array(
+				"SELECT * FROM $wpdb->users WHERE id = %%%d AND user_login = %s",
+				array( 1 ),
+				false,
+			),
+			array(
+				"SELECT * FROM $wpdb->users WHERE id = %d AND user_login = %s",
+				array( array( 1, "admin", "extra-arg" ) ),
+				"SELECT * FROM $wpdb->users WHERE id = 1 AND user_login = 'admin'",
+			),
+			array(
+				"SELECT * FROM $wpdb->users WHERE id = %d AND %% AND user_login = %s",
+				array( 1, "admin", "extra-arg" ),
+				"SELECT * FROM $wpdb->users WHERE id = 1 AND % AND user_login = 'admin'",
+			),
+			array(
+				"SELECT * FROM $wpdb->users WHERE id = %%%d AND %F AND %f AND user_login = %s",
+				array( 1, 2.3, "4.5", "admin", "extra-arg" ),
+				"SELECT * FROM $wpdb->users WHERE id = %1 AND 2.300000 AND 4.500000 AND user_login = 'admin'",
+			),
+			array(
+				"SELECT * FROM $wpdb->users WHERE id = %d AND user_login = %s",
+				array( array( 1 ), "admin", "extra-arg" ),
+				"SELECT * FROM $wpdb->users WHERE id = 0 AND user_login = 'admin'",
+			),
+			array(
+				"SELECT * FROM $wpdb->users WHERE id = %d and user_nicename = %s and user_status = %d and user_login = %s",
+				array( 1, "admin", 0 ),
+				'',
+			),
+			array(
+				"SELECT * FROM $wpdb->users WHERE id = %d and user_nicename = %s and user_status = %d and user_login = %s",
+				array( array( 1, "admin", 0 ) ),
+				'',
+			),
+			array(
+				"SELECT * FROM $wpdb->users WHERE id = %d and %% and user_login = %s and user_status = %d and user_login = %s",
+				array( 1, "admin", "extra-arg" ),
+				'',
+			),
+		);
+	}
 
 	function test_db_version() {
 		global $wpdb;

@@ -358,7 +358,7 @@ class Tests_Term_Meta extends WP_UnitTestCase {
 
 		register_taxonomy( 'wptests_tax', 'post' );
 		$t1 = wp_insert_term( 'Foo', 'wptests_tax' );
-		add_term_meta( $t1, 'foo', 'bar' );
+		add_term_meta( $t1['term_id'], 'foo', 'bar' );
 
 		register_taxonomy( 'wptests_tax_2', 'post' );
 		register_taxonomy( 'wptests_tax_3', 'post' );
