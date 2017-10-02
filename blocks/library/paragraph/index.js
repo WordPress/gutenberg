@@ -1,9 +1,14 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { concatChildren } from '@wordpress/element';
-import classnames from 'classnames';
+import { PanelBody } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -110,37 +115,41 @@ registerBlockType( 'core/paragraph', {
 					<BlockDescription>
 						<p>{ __( 'Text. Great things start here.' ) }</p>
 					</BlockDescription>
-					<h3>{ __( 'Text Settings' ) }</h3>
-					<ToggleControl
-						label={ __( 'Drop Cap' ) }
-						checked={ !! dropCap }
-						onChange={ toggleDropCap }
-					/>
-					<RangeControl
-						label={ __( 'Font Size' ) }
-						value={ fontSize || '' }
-						onChange={ ( value ) => setAttributes( { fontSize: value } ) }
-						min={ 10 }
-						max={ 200 }
-						beforeIcon="editor-textcolor"
-						allowReset
-					/>
-					<h3>{ __( 'Background Color' ) }</h3>
-					<ColorPalette
-						value={ backgroundColor }
-						onChange={ ( colorValue ) => setAttributes( { backgroundColor: colorValue } ) }
-						withTransparentOption
-					/>
-					<h3>{ __( 'Text Color' ) }</h3>
-					<ColorPalette
-						value={ textColor }
-						onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
-					/>
-					<h3>{ __( 'Block Alignment' ) }</h3>
-					<BlockAlignmentToolbar
-						value={ width }
-						onChange={ ( nextWidth ) => setAttributes( { width: nextWidth } ) }
-					/>
+					<PanelBody title={ __( 'Text Settings' ) }>
+						<ToggleControl
+							label={ __( 'Drop Cap' ) }
+							checked={ !! dropCap }
+							onChange={ toggleDropCap }
+						/>
+						<RangeControl
+							label={ __( 'Font Size' ) }
+							value={ fontSize || '' }
+							onChange={ ( value ) => setAttributes( { fontSize: value } ) }
+							min={ 10 }
+							max={ 200 }
+							beforeIcon="editor-textcolor"
+							allowReset
+						/>
+					</PanelBody>
+					<PanelBody title={ __( 'Background Color' ) }>
+						<ColorPalette
+							value={ backgroundColor }
+							onChange={ ( colorValue ) => setAttributes( { backgroundColor: colorValue } ) }
+							withTransparentOption
+						/>
+					</PanelBody>
+					<PanelBody title={ __( 'Text Color' ) }>
+						<ColorPalette
+							value={ textColor }
+							onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
+						/>
+					</PanelBody>
+					<PanelBody title={ __( 'Block Alignment' ) }>
+						<BlockAlignmentToolbar
+							value={ width }
+							onChange={ ( nextWidth ) => setAttributes( { width: nextWidth } ) }
+						/>
+					</PanelBody>
 				</InspectorControls>
 			),
 			<BlockAutocomplete key="editable" onReplace={ onReplace }>

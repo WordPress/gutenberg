@@ -24,7 +24,7 @@ const BlockInspector = ( { selectedBlock } ) => {
 
 	return (
 		<Panel>
-			<PanelBody>
+			<PanelBody className="editor-block-inspector__content">
 				<Slot name="Inspector.Controls" />
 				<BlockInspectorAdvancedControls />
 			</PanelBody>
