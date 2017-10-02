@@ -68,6 +68,15 @@ describe( 'paste', () => {
 		equal( pastedBlock.name, 'test/unknown' );
 		equal( pastedBlock.attributes.content, '<figcaption>test</figcaption>' );
 	} );
+
+	it( 'should filter inline content', () => {
+		const filtered = paste( {
+			HTML: '<h2><em>test</em></h2>',
+			inline: true,
+		} );
+
+		equal( filtered, '<em>test</em>' );
+	} );
 } );
 
 import './integration';

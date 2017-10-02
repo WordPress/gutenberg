@@ -19,7 +19,7 @@ import msListConverter from './ms-list-converter';
 import listMerger from './list-merger';
 import imageCorrector from './image-corrector';
 import blockquoteNormaliser from './blockquote-normaliser';
-import { deepFilter, isInvalidInline, isNotWhitelisted, isPlain } from './utils';
+import { deepFilter, isInvalidInline, isNotWhitelisted, isPlain, isInline } from './utils';
 import showdown from 'showdown';
 
 export default function( { HTML, plainText, inline } ) {
@@ -50,7 +50,7 @@ export default function( { HTML, plainText, inline } ) {
 		formattingTransformer,
 		stripAttributes,
 		commentRemover,
-		createUnwrapper( isNotWhitelisted ),
+		createUnwrapper( ( node ) => isNotWhitelisted( node ) || ( inline && ! isInline( node ) ) ),
 		blockquoteNormaliser,
 	] );
 
