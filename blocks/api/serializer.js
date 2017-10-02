@@ -139,6 +139,11 @@ export function getBeautifulContent( content ) {
 	} );
 }
 
+/**
+ * Given a block object, returns the Block's Inner HTML markup
+ * @param  {Object} block Block Object
+ * @return {String}       HTML
+ */
 export function getBlockContent( block ) {
 	const blockType = getBlockType( block.name );
 
