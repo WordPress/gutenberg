@@ -3,9 +3,9 @@
         "blockName": "core/cover-image",
         "attrs": {
             "url": "https://cldup.com/uuUqE_dXzy.jpg",
-            "hasBackgroundDim": true
+            "dimRatio": 40
         },
-        "rawContent": "\n<section class=\"wp-block-cover-image has-background-dim\" style=\"background-image:url(https://cldup.com/uuUqE_dXzy.jpg);\">\n    <h2>Guten Berg!</h2>\n</section>\n"
+        "rawContent": "\n<section class=\"wp-block-cover-image has-background-dim-40 has-background-dim\" style=\"background-image:url(https://cldup.com/uuUqE_dXzy.jpg);\">\n    <h2>Guten Berg!</h2>\n</section>\n"
     },
     {
         "attrs": {},

@@ -17,6 +17,7 @@ import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import InspectorControls from '../../inspector-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
+import RangeControl from '../../inspector-controls/range-control';
 import BlockDescription from '../../block-description';
 
 const { children } = source;
@@ -48,9 +49,9 @@ registerBlockType( 'core/cover-image', {
 			type: 'boolean',
 			default: false,
 		},
-		hasBackgroundDim: {
-			type: 'boolean',
-			default: true,
+		dimRatio: {
+			type: 'number',
+			default: 50,
 		},
 	},
 
@@ -62,18 +63,22 @@ registerBlockType( 'core/cover-image', {
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus, className } ) {
-		const { url, title, align, id, hasParallax, hasBackgroundDim } = attributes;
+		const { url, title, align, id, hasParallax, dimRatio } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		const onSelectImage = ( media ) => setAttributes( { url: media.url, id: media.id } );
 		const toggleParallax = () => setAttributes( { hasParallax: ! hasParallax } );
-		const toggleBackgroundDim = () => setAttributes( { hasBackgroundDim: ! hasBackgroundDim } );
+		const setDimRatio = ( ratio ) => setAttributes( { dimRatio: ratio } );
 		const style = url
 			? { backgroundImage: `url(${ url })` }
 			: undefined;
-		const classes = classnames( className, {
-			'has-parallax': hasParallax,
-			'has-background-dim': hasBackgroundDim,
-		} );
+		const classes = classnames(
+			className,
+			dimRatioToClass( dimRatio ),
+			{
+				'has-background-dim': dimRatio !== 0,
+				'has-parallax': hasParallax,
+			}
+		);
 
 		const controls = focus && [
 			<BlockControls key="controls">
@@ -108,10 +113,13 @@ registerBlockType( 'core/cover-image', {
 					checked={ !! hasParallax }
 					onChange={ toggleParallax }
 				/>
-				<ToggleControl
-					label={ __( 'Dim Background' ) }
-					checked={ !! hasBackgroundDim }
-					onChange={ toggleBackgroundDim }
+				<RangeControl
+					label={ __( 'Background Dimness' ) }
+					value={ dimRatio }
+					onChange={ setDimRatio }
+					min={ 0 }
+					max={ 100 }
+					step={ 10 }
 				/>
 			</InspectorControls>,
 		];
@@ -161,14 +169,18 @@ registerBlockType( 'core/cover-image', {
 	},
 
 	save( { attributes, className } ) {
-		const { url, title, hasParallax, hasBackgroundDim } = attributes;
+		const { url, title, hasParallax, dimRatio } = attributes;
 		const style = url
 			? { backgroundImage: `url(${ url })` }
 			: undefined;
-		const classes = classnames( className, {
-			'has-parallax': hasParallax,
-			'has-background-dim': hasBackgroundDim,
-		} );
+		const classes = classnames(
+			className,
+			dimRatioToClass( dimRatio ),
+			{
+				'has-background-dim': dimRatio !== 0,
+				'has-parallax': hasParallax,
+			}
+		);
 
 		return (
 			<section className={ classes } style={ style }>
@@ -177,3 +189,9 @@ registerBlockType( 'core/cover-image', {
 		);
 	},
 } );
+
+function dimRatioToClass( ratio ) {
+	return ( ratio === 0 || ratio === 50 )
+		? null
+		: 'has-background-dim-' + ( 10 * Math.round( ratio / 10 ) );
+}
