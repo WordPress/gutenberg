@@ -53,7 +53,7 @@ class Tests_XMLRPC_wp_getTerm extends WP_XMLRPC_UnitTestCase {
 		$result = $this->myxmlrpcserver->wp_getTerm( array( 1, 'editor', 'editor', 'category', '' ) );
 		$this->assertIXRError( $result );
 		$this->assertEquals( 500, $result->code );
-		$this->assertEquals( __('Empty Term'), $result->message );
+		$this->assertEquals( __('Empty Term.'), $result->message );
 	}
 
 	function test_invalid_term() {

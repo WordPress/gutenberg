@@ -51,7 +51,7 @@ class Tests_XMLRPC_wp_deleteTerm extends WP_XMLRPC_UnitTestCase {
 		$result = $this->myxmlrpcserver->wp_deleteTerm( array( 1, 'editor', 'editor', 'category', '' ) );
 		$this->assertIXRError( $result );
 		$this->assertEquals( 500, $result->code );
-		$this->assertEquals( __('Empty Term'), $result->message );
+		$this->assertEquals( __('Empty Term.'), $result->message );
 	}
 
 	function test_invalid_term() {
