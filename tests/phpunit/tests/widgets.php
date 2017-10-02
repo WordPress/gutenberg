@@ -713,10 +713,13 @@ class Tests_Widgets extends WP_UnitTestCase {
 
 		// Test restoring sidebars widgets when previously activated.
 		set_theme_mod( 'sidebars_widgets', array(
-			'sidebar-1' => array( 'tag_cloud-1' ),
-			'sidebar-2' => array(),
-			'sidebar-3' => array( 'unregistered_widget-1', 'text-1', 'media_image-1' ),
-			'orphaned_widgets_1' => array( 'media_video-2' ),
+			'time' => time(),
+			'data' => array(
+				'sidebar-1' => array( 'tag_cloud-1' ),
+				'sidebar-2' => array(),
+				'sidebar-3' => array( 'unregistered_widget-1', 'text-1', 'media_image-1' ),
+				'orphaned_widgets_1' => array( 'media_video-2' ),
+			),
 		) );
 
 		$sidebars_widgets = array(
