@@ -2,7 +2,7 @@
     {
         "blockName": "core/pullquote",
         "attrs": null,
-        "rawContent": "\n<blockquote class=\"wp-block-pullquote\">\n<p>Testing pullquote block...</p><footer>...with a caption</footer>\n</blockquote>\n"
+        "rawContent": "\n<blockquote class=\"wp-block-pullquote\">\n<p>Testing pullquote block...</p><cite>...with a caption</cite>\n</blockquote>\n"
     },
     {
         "attrs": {},
