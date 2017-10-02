@@ -31,6 +31,10 @@ if [ "$branch" != 'master' ]; then
 	sleep 2
 fi
 
+# Remove ignored files to reset repository to pristine condition. Previous test
+# ensures that changed files abort the plugin build.
+git clean -xdf
+
 # Download all vendor scripts
 vendor_scripts=""
 # Using `command | while read...` is more typical, but the inside of the while
