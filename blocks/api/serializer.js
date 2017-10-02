@@ -99,7 +99,7 @@ export function getCommentAttributes( allAttributes, blockType ) {
 		}
 
 		// Ignore values sources from content and post meta
-		if ( attributeSchema.source || attributeSchema.meta ) {
+		if ( attributeSchema.source.type !== 'comment' ) {
 			return result;
 		}
 

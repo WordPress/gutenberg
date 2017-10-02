@@ -13,15 +13,13 @@ import { __ } from '@wordpress/i18n';
  */
 import './style.scss';
 import './editor.scss';
-import { registerBlockType, source } from '../../api';
+import { registerBlockType } from '../../api';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import RangeControl from '../../inspector-controls/range-control';
 import Editable from '../../editable';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
-
-const { children, query } = source;
 
 registerBlockType( 'core/text-columns', {
 	title: __( 'Text Columns' ),
@@ -33,7 +31,13 @@ registerBlockType( 'core/text-columns', {
 	attributes: {
 		content: {
 			type: 'array',
-			source: query( 'p', children() ),
+			source: {
+				type: 'query',
+				selector: 'p',
+				source: {
+					type: 'children',
+				},
+			},
 			default: [ [], [] ],
 		},
 		columns: {

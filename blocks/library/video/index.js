@@ -12,15 +12,13 @@ import { Placeholder, Toolbar, Dashicon } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, source } from '../../api';
+import { registerBlockType } from '../../api';
 import MediaUploadButton from '../../media-upload-button';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
-
-const { attr, children } = source;
 
 registerBlockType( 'core/video', {
 	title: __( 'Video' ),
@@ -38,11 +36,18 @@ registerBlockType( 'core/video', {
 		},
 		src: {
 			type: 'string',
-			source: attr( 'video', 'src' ),
+			source: {
+				type: 'attribute',
+				selector: 'video',
+				attribute: 'src',
+			},
 		},
 		caption: {
 			type: 'array',
-			source: children( 'figcaption' ),
+			source: {
+				type: 'children',
+				selector: 'figcaption',
+			},
 		},
 	},
 

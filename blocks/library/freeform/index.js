@@ -7,10 +7,8 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './editor.scss';
-import { registerBlockType, source, setUnknownTypeHandlerName } from '../../api';
+import { registerBlockType, setUnknownTypeHandlerName } from '../../api';
 import OldEditor from './old-editor';
-
-const { prop } = source;
 
 registerBlockType( 'core/freeform', {
 	title: __( 'Classic Text' ),
@@ -22,7 +20,10 @@ registerBlockType( 'core/freeform', {
 	attributes: {
 		content: {
 			type: 'string',
-			source: prop( 'innerHTML' ),
+			source: {
+				type: 'property',
+				property: 'innerHTML',
+			},
 		},
 	},
 

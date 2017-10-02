@@ -3,7 +3,7 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
-import { has, partial, reduce, size } from 'lodash';
+import { get, partial, reduce, size } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -152,8 +152,8 @@ class VisualEditorBlock extends Component {
 		onChange( block.uid, attributes );
 
 		const metaAttributes = reduce( attributes, ( result, value, key ) => {
-			if ( type && has( type, [ 'attributes', key, 'meta' ] ) ) {
-				result[ type.attributes[ key ].meta ] = value;
+			if ( type && get( type, [ 'attributes', key, 'source', 'type' ] ) === 'meta' ) {
+				result[ type.attributes[ key ].source.meta ] = value;
 			}
 
 			return result;
