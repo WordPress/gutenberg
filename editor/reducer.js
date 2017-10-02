@@ -3,12 +3,12 @@
  */
 import optimist from 'redux-optimist';
 import { combineReducers } from 'redux';
-import { difference, get, reduce, keyBy, first, last, omit, without, mapValues } from 'lodash';
+import { difference, get, reduce, keyBy, keys, first, last, omit, without, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { getBlockTypes } from '@wordpress/blocks';
+import { getBlockTypes, getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -438,15 +438,19 @@ export function preferences( state = STORE_DEFAULTS.preferences, action ) {
 				recentlyUsedBlocks,
 			};
 		case 'SETUP_EDITOR':
-			// initially populate the recently used blocks with blocks the user most frequently uses
+			const filterInvalidBlocksFromList = list => list.filter( name => getBlockType( name ) !== undefined );
+			const filterInvalidBlocksFromObject = obj => omit( obj, keys( obj ).filter( name => getBlockType( name ) === undefined ) );
 			const commonBlocks = getBlockTypes()
 				.filter( ( blockType ) => 'common' === blockType.category )
 				.map( ( blockType ) => blockType.name );
+
 			return {
 				...state,
-				recentlyUsedBlocks: [ ...state.recentlyUsedBlocks ]
+				// recently used gets filled up to `maxRecent` with blocks from the common category
+				recentlyUsedBlocks: filterInvalidBlocksFromList( [ ...state.recentlyUsedBlocks ] )
 					.concat( difference( commonBlocks, state.recentlyUsedBlocks ) )
 					.slice( 0, maxRecent ),
+				blockUsage: filterInvalidBlocksFromObject( state.blockUsage ),
 			};
 	}
 

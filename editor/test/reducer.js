@@ -882,6 +882,20 @@ describe( 'state', () => {
 			);
 			expect( state.recentlyUsedBlocks ).toHaveLength( 8 );
 		} );
+
+		it( 'should remove unregistered blocks from persisted recent usage', () => {
+			const state = preferences( deepFreeze( { recentlyUsedBlocks: [ 'core-embed/i-do-not-exist', 'core-embed/youtube' ] } ), {
+				type: 'SETUP_EDITOR',
+			} );
+			expect( state.recentlyUsedBlocks[ 0 ] ).toEqual( 'core-embed/youtube' );
+		} );
+
+		it( 'should remove unregistered blocks from persisted block usage stats', () => {
+			const state = preferences( deepFreeze( { recentlyUsedBlocks: [], blockUsage: { 'core/i-do-not-exist': 42, 'core-embed/youtube': 88 } } ), {
+				type: 'SETUP_EDITOR',
+			} );
+			expect( state.blockUsage ).toEqual( { 'core-embed/youtube': 88 } );
+		} );
 	} );
 
 	describe( 'saving()', () => {
