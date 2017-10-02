@@ -140,14 +140,20 @@ function gutenberg_disable_editor_settings_wpautop( $settings ) {
 }
 add_filter( 'wp_editor_settings', 'gutenberg_disable_editor_settings_wpautop' );
 
+/* temporary function, waiting on PR #2806 */
+function content_has_blocks( $content ) {
+	return false !== strpos( $content, '<!-- wp:' );
+}
+
 /**
- * Jetpack Markdown support causes issues when saving a Gutenberg post
- * by stripping out the <p> tags - this is a bit heavy handed approach
- * but disabling does fix the issue
+ * wpcom markdown support (probably added by jetpack) causes issues when 
+ * saving a Gutenberg post by stripping out the <p> tags. This adds a filter 
+ * to the rest endpoint that inserts the post and disables markdown support
  */
-function gutenberg_remove_jetpack_markdown_support() {
-	if ( defined( 'JETPACK__VERSION' ) ) {
+function gutenberg_remove_wpcom_markdown_support( $post ) {
+	if ( content_has_blocks( $post->post_content ) ) {
 		remove_post_type_support( 'post', 'wpcom-markdown' );
 	}
+	return $post;
 }
-add_action( 'init', 'gutenberg_remove_jetpack_markdown_support', 99 );
+add_filter( 'rest_pre_insert_post', 'gutenberg_remove_wpcom_markdown_support' );
