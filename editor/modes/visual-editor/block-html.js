@@ -24,15 +24,13 @@ class BlockHTML extends Component {
 		this.onBlur = this.onBlur.bind( this );
 		this.state = {
 			html: props.block.isValid ? getBlockContent( props.block ) : props.block.originalContent,
-			attributes: props.block.attributes,
 		};
 	}
 
 	componentWillReceiveProps( nextProps ) {
-		if ( ! isEqual( nextProps.block.attributes, this.state.attributes ) ) {
+		if ( ! isEqual( nextProps.block.attributes, this.props.block.attributes ) ) {
 			this.setState( {
 				html: getBlockContent( nextProps.block ),
-				attributes: nextProps.block.attributes,
 			} );
 		}
 	}
@@ -45,7 +43,6 @@ class BlockHTML extends Component {
 			...sourcedAttributes,
 		};
 		const isValid = isValidBlock( this.state.html, blockType, attributes );
-		this.setState( { attributes } );
 		this.props.onChange( this.props.uid, attributes, this.state.html, isValid );
 	}
 
