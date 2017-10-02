@@ -141,23 +141,13 @@ function gutenberg_disable_editor_settings_wpautop( $settings ) {
 add_filter( 'wp_editor_settings', 'gutenberg_disable_editor_settings_wpautop' );
 
 /**
- * Determine whether a content string contains blocks.
- *
- * @since 1.3
- * @param string $content Content to test.
- * @return bool Whether the content contains blocks.
- */
-function content_has_blocks( $content ) {
-	return false !== strpos( $content, '<!-- wp:' );
-}
-
-/**
  * WPCOM markdown support causes issues when saving a Gutenberg post by
  * stripping out the <p> tags. This adds a filter prior to saving the post via
  * REST API to disable markdown support. Markdown support most typically
  * provided by Jetpack.
  *
- * @since 1.3
+ * @since 1.3.0
+ *
  * @param  array $post      Post object which contains content to check for block.
  * @return array $post      Post object.
  */

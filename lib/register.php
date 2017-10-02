@@ -286,6 +286,18 @@ function gutenberg_post_has_blocks( $post_id ) {
 }
 
 /**
+ * Determine whether a content string contains blocks.
+ *
+ * @since 1.3.0
+ *
+ * @param string $content Content to test.
+ * @return bool Whether the content contains blocks.
+ */
+function content_has_blocks( $content ) {
+	return false !== strpos( $content, '<!-- wp:' );
+}
+
+/**
  * Adds a "Gutenberg" post state for post tables, if the post contains blocks.
  *
  * @param  array   $post_states An array of post display states.
