@@ -57,3 +57,5 @@ wp-tests-config.php
 *.patch
 *.diff
 .svn
+
+vendor
