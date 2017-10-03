@@ -23,7 +23,6 @@ import {
 	saving,
 	notices,
 	showInsertionPoint,
-	userData,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -785,10 +784,10 @@ describe( 'state', () => {
 	} );
 
 	describe( 'preferences()', () => {
-		it( 'should be opened by default and show the post-status panel', () => {
+		it( 'should apply all defaults', () => {
 			const state = preferences( undefined, {} );
 
-			expect( state ).toEqual( { mode: 'visual', isSidebarOpened: true, panels: { 'post-status': true } } );
+			expect( state ).toEqual( { blockUsage: {}, recentlyUsedBlocks: [], mode: 'visual', isSidebarOpened: true, panels: { 'post-status': true } } );
 		} );
 
 		it( 'should toggle the sidebar open flag', () => {
@@ -824,6 +823,78 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( { isSidebarOpened: false, mode: 'text' } );
+		} );
+
+		it( 'should record recently used blocks', () => {
+			const state = preferences( deepFreeze( { recentlyUsedBlocks: [], blockUsage: {} } ), {
+				type: 'INSERT_BLOCKS',
+				blocks: [ {
+					uid: 'bacon',
+					name: 'core-embed/twitter',
+				} ],
+			} );
+
+			expect( state.recentlyUsedBlocks[ 0 ] ).toEqual( 'core-embed/twitter' );
+
+			const twoRecentBlocks = preferences( deepFreeze( { recentlyUsedBlocks: [], blockUsage: {} } ), {
+				type: 'INSERT_BLOCKS',
+				blocks: [ {
+					uid: 'eggs',
+					name: 'core-embed/twitter',
+				}, {
+					uid: 'bacon',
+					name: 'core-embed/youtube',
+				} ],
+			} );
+
+			expect( twoRecentBlocks.recentlyUsedBlocks[ 0 ] ).toEqual( 'core-embed/youtube' );
+			expect( twoRecentBlocks.recentlyUsedBlocks[ 1 ] ).toEqual( 'core-embed/twitter' );
+		} );
+
+		it( 'should record block usage', () => {
+			const state = preferences( deepFreeze( { recentlyUsedBlocks: [], blockUsage: {} } ), {
+				type: 'INSERT_BLOCKS',
+				blocks: [ {
+					uid: 'eggs',
+					name: 'core-embed/twitter',
+				}, {
+					uid: 'bacon',
+					name: 'core-embed/youtube',
+				}, {
+					uid: 'milk',
+					name: 'core-embed/youtube',
+				} ],
+			} );
+
+			expect( state.blockUsage ).toEqual( { 'core-embed/youtube': 2, 'core-embed/twitter': 1 } );
+		} );
+
+		it( 'should populate recentlyUsedBlocks, filling up with common blocks, on editor setup', () => {
+			const state = preferences( deepFreeze( { recentlyUsedBlocks: [ 'core-embed/twitter', 'core-embed/youtube' ] } ), {
+				type: 'SETUP_EDITOR',
+			} );
+
+			expect( state.recentlyUsedBlocks[ 0 ] ).toEqual( 'core-embed/twitter' );
+			expect( state.recentlyUsedBlocks[ 1 ] ).toEqual( 'core-embed/youtube' );
+
+			state.recentlyUsedBlocks.slice( 2 ).forEach(
+				block => expect( getBlockType( block ).category ).toEqual( 'common' )
+			);
+			expect( state.recentlyUsedBlocks ).toHaveLength( 8 );
+		} );
+
+		it( 'should remove unregistered blocks from persisted recent usage', () => {
+			const state = preferences( deepFreeze( { recentlyUsedBlocks: [ 'core-embed/i-do-not-exist', 'core-embed/youtube' ] } ), {
+				type: 'SETUP_EDITOR',
+			} );
+			expect( state.recentlyUsedBlocks[ 0 ] ).toEqual( 'core-embed/youtube' );
+		} );
+
+		it( 'should remove unregistered blocks from persisted block usage stats', () => {
+			const state = preferences( deepFreeze( { recentlyUsedBlocks: [], blockUsage: { 'core/i-do-not-exist': 42, 'core-embed/youtube': 88 } } ), {
+				type: 'SETUP_EDITOR',
+			} );
+			expect( state.blockUsage ).toEqual( { 'core-embed/youtube': 88 } );
 		} );
 	} );
 
@@ -916,56 +987,6 @@ describe( 'state', () => {
 			expect( state ).toEqual( {
 				b: originalState.b,
 			} );
-		} );
-	} );
-
-	describe( 'userData()', () => {
-		beforeAll( () => {
-			registerBlockType( 'core/test-block', {
-				save: noop,
-				edit: noop,
-				category: 'common',
-				title: 'test block',
-			} );
-		} );
-
-		afterAll( () => {
-			unregisterBlockType( 'core/test-block' );
-		} );
-
-		it( 'should record recently used blocks', () => {
-			const original = userData( undefined, {} );
-			const state = userData( original, {
-				type: 'INSERT_BLOCKS',
-				blocks: [ {
-					uid: 'bacon',
-					name: 'core-embed/twitter',
-				} ],
-			} );
-
-			expect( state.recentlyUsedBlocks[ 0 ] ).toEqual( 'core-embed/twitter' );
-
-			const twoRecentBlocks = userData( state, {
-				type: 'INSERT_BLOCKS',
-				blocks: [ {
-					uid: 'eggs',
-					name: 'core-embed/youtube',
-				} ],
-			} );
-
-			expect( twoRecentBlocks.recentlyUsedBlocks[ 0 ] ).toEqual( 'core-embed/youtube' );
-			expect( twoRecentBlocks.recentlyUsedBlocks[ 1 ] ).toEqual( 'core-embed/twitter' );
-		} );
-
-		it( 'should populate recently used blocks with blocks from the common category', () => {
-			const initial = userData( undefined, {
-				type: 'SETUP_EDITOR',
-			} );
-
-			initial.recentlyUsedBlocks.forEach(
-				block => expect( getBlockType( block ).category ).toEqual( 'common' )
-			);
-			expect( initial.recentlyUsedBlocks ).toHaveLength( 8 );
 		} );
 	} );
 } );

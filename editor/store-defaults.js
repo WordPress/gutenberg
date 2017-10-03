@@ -3,5 +3,7 @@ export const STORE_DEFAULTS = {
 		mode: 'visual',
 		isSidebarOpened: window.innerWidth >= 782,
 		panels: { 'post-status': true },
+		recentlyUsedBlocks: [],
+		blockUsage: {},
 	},
 };
