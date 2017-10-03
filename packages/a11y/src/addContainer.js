@@ -12,8 +12,17 @@ const addContainer = function( ariaLive ) {
 	container.id = 'a11y-speak-' + ariaLive;
 	container.className = 'a11y-speak-region';
 
-	let screenReaderTextStyle = 'clip: rect(1px, 1px, 1px, 1px); position: absolute; height: 1px; width: 1px; overflow: hidden; word-wrap: normal;';
-	container.setAttribute( 'style', screenReaderTextStyle );
+	container.setAttribute( 'style', (
+		'position: absolute;' +
+		'margin: -1px;' +
+		'padding: 0;' +
+		'height: 1px;' +
+		'width: 1px;' +
+		'overflow: hidden;' +
+		'clip: rect( 0 0 0 0 );' +
+		'border: 0;' +
+		'word-wrap: normal !important;'
+	) );
 	container.setAttribute( 'aria-live', ariaLive );
 	container.setAttribute( 'aria-relevant', 'additions text' );
 	container.setAttribute( 'aria-atomic', 'true' );
