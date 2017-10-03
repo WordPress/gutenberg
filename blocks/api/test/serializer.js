@@ -271,7 +271,7 @@ describe( 'block serializer', () => {
 					category: 'layout',
 					title: 'more',
 					attributes: {
-						text: {
+						customText: {
 							type: 'string',
 						},
 						noTeaser: {
@@ -280,7 +280,7 @@ describe( 'block serializer', () => {
 						},
 					},
 
-					save: ( { attributes } ) => attributes.text,
+					save: ( { attributes } ) => attributes.customText,
 				} );
 			} );
 
@@ -294,7 +294,7 @@ describe( 'block serializer', () => {
 
 			it( 'serializes with text', () => {
 				const block = createBlock( 'core/more', {
-					text: 'Read more!',
+					customText: 'Read more!',
 				} );
 
 				const content = serializeBlock( block );
