@@ -135,7 +135,8 @@ class VisualEditorBlockList extends Component {
 		this.selectionAtStart = uid;
 
 		window.addEventListener( 'mousemove', this.onPointerMove );
-		window.addEventListener( 'scroll', this.onScroll );
+		// Capture scroll on all elements.
+		window.addEventListener( 'scroll', this.onScroll, true );
 		window.addEventListener( 'mouseup', this.onSelectionEnd );
 	}
 
@@ -166,7 +167,7 @@ class VisualEditorBlockList extends Component {
 		delete this.selectionAtStart;
 
 		window.removeEventListener( 'mousemove', this.onPointerMove );
-		window.removeEventListener( 'scroll', this.onScroll );
+		window.removeEventListener( 'scroll', this.onScroll, true );
 		window.removeEventListener( 'mouseup', this.onSelectionEnd );
 	}
 
