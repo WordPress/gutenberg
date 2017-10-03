@@ -225,7 +225,7 @@ export function createBlockWithFallback( name, rawContent, attributes ) {
  */
 export function parseWithGrammar( content ) {
 	return grammarParse( content ).reduce( ( memo, blockNode ) => {
-		const { blockName, rawContent, attrs } = blockNode;
+		const { blockName, innerHTML: rawContent, attrs } = blockNode;
 		const block = createBlockWithFallback( blockName, rawContent.trim(), attrs );
 		if ( block ) {
 			memo.push( block );
