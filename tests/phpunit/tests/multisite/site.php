@@ -1086,6 +1086,32 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 40201
+	 * @dataProvider data_get_site_caches
+	 */
+	public function test_clean_blog_cache_with_id( $key, $group ) {
+		$site = get_site( self::$site_ids['make.wordpress.org/'] );
+
+		$replacements = array(
+			'%blog_id%'         => $site->blog_id,
+			'%domain%'          => $site->domain,
+			'%path%'            => $site->path,
+			'%domain_path_key%' => md5( $site->domain . $site->path ),
+		);
+
+		$key = str_replace( array_keys( $replacements ), array_values( $replacements ), $key );
+
+		if ( 'sites' === $group ) { // This needs to be actual data for get_site() lookups.
+			wp_cache_set( $key, (object) $site->to_array(), $group );
+		} else {
+			wp_cache_set( $key, 'something', $group );
+		}
+
+		clean_blog_cache( $site->blog_id );
+		$this->assertFalse( wp_cache_get( $key, $group ) );
+	}
+
+	/**
+	 * @ticket 40201
 	 */
 	public function test_clean_blog_cache_resets_last_changed() {
 		$site = get_site( self::$site_ids['make.wordpress.org/'] );
@@ -1120,6 +1146,38 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		clean_blog_cache( $site );
 		wp_suspend_cache_invalidation( $suspend );
 		$this->assertEquals( $old_count, did_action( 'clean_site_cache' ) );
+	}
+
+	/**
+	 * @ticket 40201
+	 */
+	public function test_clean_blog_cache_bails_on_empty_input() {
+		$old_count = did_action( 'clean_site_cache' );
+
+		clean_blog_cache( null );
+		$this->assertEquals( $old_count, did_action( 'clean_site_cache' ) );
+	}
+
+	/**
+	 * @ticket 40201
+	 */
+	public function test_clean_blog_cache_bails_on_non_numeric_input() {
+		$old_count = did_action( 'clean_site_cache' );
+
+		clean_blog_cache( 'something' );
+		$this->assertEquals( $old_count, did_action( 'clean_site_cache' ) );
+	}
+
+	/**
+	 * @ticket 40201
+	 */
+	public function test_clean_blog_cache_works_with_deleted_site() {
+		$site_id = 12345;
+
+		wp_cache_set( $site_id, 'something', 'site-details' );
+
+		clean_blog_cache( $site_id );
+		$this->assertFalse( wp_cache_get( $site_id, 'site-details' ) );
 	}
 
 	/**
