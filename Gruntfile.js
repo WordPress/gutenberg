@@ -839,8 +839,22 @@ module.exports = function(grunt) {
 					error ? find( set ) : run( path.basename( dir ).substr( 1 ) );
 				} );
 			} else {
-				grunt.fatal( 'This WordPress install is not under version control.' );
+				runAllTasks();
 			}
+		}
+
+		function runAllTasks() {
+			grunt.log.writeln( 'Cannot determine which files are modified as SVN and GIT are not available.' );
+			grunt.log.writeln( 'Running all tasks and all tests.' );
+			grunt.task.run([
+				'precommit:js',
+				'precommit:css',
+				'precommit:image',
+				'precommit:emoji',
+				'precommit:php'
+			]);
+
+			done();
 		}
 
 		function run( type ) {
@@ -851,10 +865,6 @@ module.exports = function(grunt) {
 				args: command
 			}, function( error, result, code ) {
 				var taskList = [];
-
-				if ( code !== 0 ) {
-					grunt.fatal( 'The `' +  map[ type ] + '` command returned a non-zero exit code.', code );
-				}
 
 				// Callback for finding modified paths.
 				function testPath( path ) {
@@ -868,31 +878,34 @@ module.exports = function(grunt) {
 					return regex.test( result.stdout );
 				}
 
-				if ( [ 'package.json', 'Gruntfile.js' ].some( testPath ) ) {
-					grunt.log.writeln( 'Configuration files modified. Running `prerelease`.' );
-					taskList.push( 'prerelease' );
-				} else {
-					if ( [ 'png', 'jpg', 'gif', 'jpeg' ].some( testExtension ) ) {
-						grunt.log.writeln( 'Image files modified. Minifying.' );
-						taskList.push( 'precommit:image' );
-					}
-
-					[ 'js', 'css', 'php' ].forEach( function( extension ) {
-						if ( testExtension( extension ) ) {
-							grunt.log.writeln( extension.toUpperCase() + ' files modified. ' + extension.toUpperCase() + ' tests will be run.' );
-							taskList.push( 'precommit:' + extension );
+				if ( code === 0 ) {
+					if ( [ 'package.json', 'Gruntfile.js' ].some( testPath ) ) {
+						grunt.log.writeln( 'Configuration files modified. Running `prerelease`.' );
+						taskList.push( 'prerelease' );
+					} else {
+						if ( [ 'png', 'jpg', 'gif', 'jpeg' ].some( testExtension ) ) {
+							grunt.log.writeln( 'Image files modified. Minifying.' );
+							taskList.push( 'precommit:image' );
 						}
-					} );
 
-					if ( [ 'twemoji.js' ].some( testPath ) ) {
-						grunt.log.writeln( 'twemoji.js has updated. Running `precommit:emoji.' );
-						taskList.push( 'precommit:emoji' );
+						[ 'js', 'css', 'php' ].forEach( function( extension ) {
+							if ( testExtension( extension ) ) {
+								grunt.log.writeln( extension.toUpperCase() + ' files modified. ' + extension.toUpperCase() + ' tests will be run.' );
+								taskList.push( 'precommit:' + extension );
+							}
+						} );
+
+						if ( [ 'twemoji.js' ].some( testPath ) ) {
+							grunt.log.writeln( 'twemoji.js has updated. Running `precommit:emoji.' );
+							taskList.push( 'precommit:emoji' );
+						}
 					}
+
+					grunt.task.run( taskList );
+					done();
+				} else {
+					runAllTasks();
 				}
-
-				grunt.task.run( taskList );
-
-				done();
 			} );
 		}
 	} );
