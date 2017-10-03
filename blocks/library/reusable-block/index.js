@@ -141,7 +141,8 @@ const ConnectedReusableBlockEdit = connect(
 
 registerBlockType( 'core/reusable-block', {
 	title: __( 'Reusable Block' ),
-	category: null,
+	category: 'reusable-blocks',
+	isPrivate: true,
 
 	attributes: {
 		ref: {

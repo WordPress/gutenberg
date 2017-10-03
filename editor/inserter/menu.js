@@ -103,8 +103,10 @@ export class InserterMenu extends Component {
 	}
 
 	getBlockTypes() {
-		const staticBlockTypes = getBlockTypes();
+		// Block types that are marked as private should not appear in the inserter
+		const staticBlockTypes = getBlockTypes().filter( ( block ) => ! block.isPrivate );
 
+		// Display reusable blocks that we've fetched in the inserter
 		const reusableBlockTypes = this.props.reusableBlocks.map( ( reusableBlock ) => ( {
 			name: 'core/reusable-block',
 			attributes: {

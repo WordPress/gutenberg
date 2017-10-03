@@ -86,7 +86,7 @@ export function registerBlockType( name, settings ) {
 		);
 		return;
 	}
-	if ( 'category' in settings && settings.category !== null && ! some( categories, { slug: settings.category } ) ) {
+	if ( 'category' in settings && ! some( categories, { slug: settings.category } ) ) {
 		console.error(
 			'The block "' + name + '" must have a registered category.'
 		);
