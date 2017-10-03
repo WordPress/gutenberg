@@ -7,6 +7,13 @@ set -e
 cd "$(dirname "$0")"
 cd ..
 
+# Enable nicer messaging for build status
+YELLOW_BOLD='\033[1;33m';
+COLOR_RESET='\033[0m';
+status () {
+	echo -e "\n${YELLOW_BOLD}$1${COLOR_RESET}\n"
+}
+
 # Make sure there are no changes in the working tree.  Release builds should be
 # traceable to a particular commit and reliably reproducible.  (This is not
 # totally true at the moment because we download nightly vendor scripts).
@@ -31,7 +38,13 @@ if [ "$branch" != 'master' ]; then
 	sleep 2
 fi
 
+# Remove ignored files to reset repository to pristine condition. Previous test
+# ensures that changed files abort the plugin build.
+status "Cleaning working directory..."
+git clean -xdf
+
 # Download all vendor scripts
+status "Downloading remote vendor scripts..."
 vendor_scripts=""
 # Using `command | while read...` is more typical, but the inside of the while
 # loop will run under a separate process this way, meaning that it cannot
@@ -62,7 +75,9 @@ while IFS='|' read -u 3 url filename; do
 done
 
 # Run the build
+status "Installing dependencies..."
 npm install
+status "Generating build..."
 npm run build
 
 # Remove any existing zip file
@@ -75,6 +90,7 @@ php bin/generate-gutenberg-php.php > gutenberg.tmp.php
 mv gutenberg.tmp.php gutenberg.php
 
 # Generate the plugin zip file
+status "Creating archive..."
 zip -r gutenberg.zip \
 	gutenberg.php \
 	lib/*.php \
@@ -95,3 +111,5 @@ zip -r gutenberg.zip \
 
 # Reset `gutenberg.php`
 git checkout gutenberg.php
+
+status "Done."
