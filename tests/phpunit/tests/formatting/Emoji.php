@@ -62,21 +62,21 @@ class Tests_Formatting_Emoji extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @ticket 35293
+	 * @ticket 41501
 	 */
-	public function test_wp_emoji_regex_returns_regexen() {
-		$default = wp_emoji_regex();
+	public function test_wp_emoji_list_returns_data() {
+		$default = _wp_emoji_list();
 		$this->assertNotEmpty( $default );
 
-		$codepoints = wp_emoji_regex( 'codepoints' );
-		$this->assertNotEmpty( $codepoints );
-
-		$this->assertSame( $default, $codepoints );
-
-		$entities = wp_emoji_regex( 'entities' );
+		$entities = _wp_emoji_list( 'entities' );
 		$this->assertNotEmpty( $entities );
 
-		$this->assertNotSame( $default, $entities );
+		$this->assertSame( $default, $entities );
+
+		$partials = _wp_emoji_list( 'partials' );
+		$this->assertNotEmpty( $partials );
+
+		$this->assertNotSame( $default, $partials );
 	}
 
 	public function data_wp_encode_emoji() {

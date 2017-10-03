@@ -1,7 +1,9 @@
 /* jshint node:true */
+/* globals Set */
 module.exports = function(grunt) {
 	var path = require('path'),
 		fs = require( 'fs' ),
+		spawn = require( 'child_process' ).spawnSync,
 		SOURCE_DIR = 'src/',
 		BUILD_DIR = 'build/',
  		BANNER_TEXT = '/*! This file is auto-generated */',
@@ -633,74 +635,57 @@ module.exports = function(grunt) {
 				options: {
 					patterns: [
 						{
-							match: /\/\/ START: emoji regex[\S\s]*\/\/ END: emoji regex/g,
+							match: /\/\/ START: emoji arrays[\S\s]*\/\/ END: emoji arrays/g,
 							replacement: function () {
-								var twemoji = grunt.file.read( SOURCE_DIR + 'wp-includes/js/twemoji.js' ),
-									found = twemoji.match( /re = \/(.*)\/g,/ ),
-									emojiRegex = found[1],
-									regex = '',
-									entities = '';
+								var regex, files,
+									partials, partialsSet,
+									entities, emojiArray;
 
-								/*
-								 * Twemoji does some nifty regex optimisations, splitting up surrogate pairs unit, searching by
-								 * ranges of individual units, and compressing sets of individual units. This is super useful for
-								 * reducing the size of the regex.
-								 *
-								 * Unfortunately, PCRE doesn't allow regexes to search for individual units, so we can't just
-								 * blindly copy the Twemoji regex.
-								 *
-								 * The good news is, we don't have to worry about size restrictions, so we can just unravel the
-								 * entire regex, and convert it to a PCRE-friendly format.
-								 */
+								grunt.log.writeln( 'Fetching list of Twemoji files...' );
 
-								// Convert ranges: "\udc68-\udc6a" becomes "\udc68\udc69\udc6a".
-								emojiRegex = emojiRegex.replace( /(\\u\w{4})\-(\\u\w{4})/g, function ( match, first, last ) {
-									var start = parseInt( first.substr( 2 ), 16 );
-									var end = parseInt( last.substr( 2 ), 16 );
+								// Fetch a list of the files that Twemoji supplies
+								files = spawn( 'svn', [ 'ls', 'https://github.com/twitter/twemoji.git/branches/gh-pages/2/assets' ] );
+								if ( 0 !== files.status ) {
+									grunt.fatal( 'Unable to fetch Twemoji file list' );
+								}
 
-									var replace = '';
+								entities = files.stdout.toString();
 
-									for( var counter = start; counter <= end; counter++ ) {
-										replace += '\\u' + counter.toString( 16 );
-									}
+								// Tidy up the file list
+								entities = entities.replace( /\.ai/g, '' );
+								entities = entities.replace( /^$/g, '' );
 
-									return replace;
+								// Convert the emoji entities to HTML entities
+								partials = entities = entities.replace( /([a-z0-9]+)/g, '&#x$1;' );
+
+								// Remove the hyphens between the HTML entities
+								entities = entities.replace( /-/g, '' );
+
+								// Sort the entities list by length, so the longest emoji will be found first
+								emojiArray = entities.split( '\n' ).sort( function ( a, b ) {
+									return b.length - a.length;
 								} );
 
-								// Convert sets: "\u200d[\u2640\u2642]\ufe0f" becomes "\u200d\u2640\ufe0f|\u200d\u2642\ufe0f".
-								emojiRegex = emojiRegex.replace( /((?:\\u\w{4})*)\[((?:\\u\w{4})+)\]((?:\\u\w{4})*)/g, function ( match, before, middle, after ) {
-									//return params[1].split( '\\u' ).join( '|' + params[0] + '\\u' ).substr( 1 );
-									if ( ! before && ! after ) {
-										return match;
-									}
-									var set = middle.match( /.{1,6}/g );
+								// Convert the entities list to PHP array syntax
+								entities = '\'' + emojiArray.filter( function( val ) {
+									return val.length >= 8 ? val : false ;
+								} ).join( '\',\'' ) + '\'';
 
-									return before + set.join( after + '|' + before ) + after;
-								} );
+								// Create a list of all characters used by the emoji list
+								partials = partials.replace( /-/g, '\n' );
 
-								// Convert surrogate pairs to their equivalent unicode scalar: "\ud83d\udc68" becomes "\u1f468".
-								emojiRegex = emojiRegex.replace( /(\\ud[89a-f][0-9a-f]{2})(\\ud[89a-f][0-9a-f]{2})/g, function ( match, first, second ) {
-									var high = parseInt( first.substr( 2 ), 16 );
-									var low = parseInt( second.substr( 2 ), 16 );
+								// Set automatically removes duplicates
+								partialsSet = new Set( partials.split( '\n' ) );
 
-									var scalar = ( ( high - 0xD800 ) * 0x400 ) + ( low - 0xDC00 ) + 0x10000;
+								// Convert the partials list to PHP array syntax
+								partials = '\'' + Array.from( partialsSet ).filter( function( val ) {
+									return val.length >= 8 ? val : false ;
+								} ).join( '\',\'' ) + '\'';
 
-									return '\\u' + scalar.toString( 16 );
-								} );
-
-								// Convert JavaScript-style code points to PHP-style: "\u1f468" becomes "\x{1f468}".
-								emojiRegex = emojiRegex.replace( /\\u(\w+)/g, '\\x{$1}' );
-
-								// Convert PHP-style code points to HTML entities: "\x{1f468}" becomes "&#x1f468;".
-								entities = emojiRegex.replace( /\\x{(\w+)}/g, '&#x$1;' );
-								entities = entities.replace( /\[([^\]]+)\]/g, function( match, codepoint ) {
-									return '(?:' + codepoint.replace( /;&/g, ';|&' ) + ')';
-								} );
-
-								regex += '// START: emoji regex\n';
-								regex += '\t$codepoints = \'/(' + emojiRegex + ')/u\';\n';
-								regex += '\t$entities = \'/(' + entities + ')/u\';\n';
-								regex += '\t// END: emoji regex';
+								regex = '// START: emoji arrays\n';
+								regex += '\t$entities = array(' + entities + ');\n';
+								regex += '\t$partials = array(' + partials + ');\n';
+								regex += '\t// END: emoji arrays';
 
 								return regex;
 							}
