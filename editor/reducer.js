@@ -3,7 +3,7 @@
  */
 import optimist from 'redux-optimist';
 import { combineReducers } from 'redux';
-import { difference, get, reduce, keyBy, keys, first, last, omit, without, mapValues } from 'lodash';
+import { difference, get, reduce, keyBy, keys, first, last, omit, pick, without, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -444,7 +444,7 @@ export function preferences( state = STORE_DEFAULTS.preferences, action ) {
 		case 'SETUP_EDITOR':
 			const isBlockDefined = name => getBlockType( name ) !== undefined;
 			const filterInvalidBlocksFromList = list => list.filter( isBlockDefined );
-			const filterInvalidBlocksFromObject = obj => omit( obj, keys( obj ).filter( name => ! isBlockDefined( name ) ) );
+			const filterInvalidBlocksFromObject = obj => pick( obj, keys( obj ).filter( isBlockDefined ) );
 			const commonBlocks = getBlockTypes()
 				.filter( ( blockType ) => 'common' === blockType.category )
 				.map( ( blockType ) => blockType.name );
