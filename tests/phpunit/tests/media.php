@@ -20,6 +20,11 @@ class Tests_Media extends WP_UnitTestCase {
 		$GLOBALS['_wp_additional_image_sizes'] = self::$_sizes;
 	}
 
+	public static function tearDownAfterClass() {
+		wp_delete_post( self::$large_id, true );
+		parent::tearDownAfterClass();
+	}
+
 	function setUp() {
 		parent::setUp();
 		$this->caption = 'A simple caption.';
