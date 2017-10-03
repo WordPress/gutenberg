@@ -472,6 +472,44 @@ class Test_WP_Customize_Nav_Menu_Item_Setting extends WP_UnitTestCase {
 		$this->assertNull( $setting->sanitize( 'not an array' ) );
 		$this->assertNull( $setting->sanitize( 123 ) );
 
+		$valid_urls = array(
+			'http://example.com/',
+			'https://foo.example.com/hello.html',
+			'mailto:nobody@example.com?subject=hi',
+			'ftp://example.com/',
+			'ftps://example.com/',
+			'news://news.server.example/example.group.this',
+			'irc://irc.freenode.net/wordpress',
+			'gopher://example.com',
+			'nntp://news.server.example/example.group.this',
+			'feed://example.com/',
+			'telnet://example.com',
+			'mms://example.com',
+			'rtsp://example.com/',
+			'svn://develop.svn.wordpress.org/trunk',
+			'tel:000-000-000',
+			'fax:000-000-000',
+			'xmpp:user@host?message',
+			'webcal://example.com',
+			'urn:org.wordpress',
+		);
+		foreach ( $valid_urls as $valid_url ) {
+			$url_setting = $setting->sanitize( array( 'url' => $valid_url ) );
+			$this->assertInternalType( 'array', $url_setting );
+			$this->assertEquals( $valid_url, $url_setting['url'] );
+		}
+
+		$invalid_urls = array(
+			'javascript:alert(1)',
+			'unknown://something.out-there',
+			'smtp://user:pass@mailserver.thing',
+		);
+		foreach ( $invalid_urls as $invalid_url ) {
+			$url_setting = $setting->sanitize( array( 'url' => $invalid_url ) );
+			$this->assertInstanceOf( 'WP_Error', $url_setting );
+			$this->assertEquals( 'invalid_url', $url_setting->get_error_code() );
+		}
+
 		$unsanitized = array(
 			'object_id' => 'bad',
 			'object' => '<b>hello</b>',
@@ -479,7 +517,7 @@ class Test_WP_Customize_Nav_Menu_Item_Setting extends WP_UnitTestCase {
 			'position' => -123,
 			'type' => 'custom<b>',
 			'title' => '\o/ o\'o Hi<script>unfilteredHtml()</script>',
-			'url' => 'javascript:alert(1)',
+			'url' => '', // Note the javascript: protocol is checked above and results in a hard validation error, beyond mere sanitization.
 			'target' => '" onclick="',
 			'attr_title' => '\o/ o\'o <b>bolded</b><script>unfilteredHtml()</script>',
 			'description' => '\o/ o\'o <b>Hello world</b><script>unfilteredHtml()</script>',
