@@ -16,6 +16,11 @@ import { getBlockTypes, getBlockType } from '@wordpress/blocks';
 import { combineUndoableReducers } from './utils/undoable-reducer';
 import { STORE_DEFAULTS } from './store-defaults';
 
+/***
+ * Module constants
+ */
+const MAX_RECENT_BLOCKS = 8;
+
 /**
  * Returns a post attribute value, flattening nested rendered content using its
  * raw value in place of its original object form.
@@ -402,7 +407,6 @@ export function showInsertionPoint( state = false, action ) {
  * @return {string}                        Updated state
  */
 export function preferences( state = STORE_DEFAULTS.preferences, action ) {
-	const maxRecent = 8;
 	switch ( action.type ) {
 		case 'TOGGLE_SIDEBAR':
 			return {
@@ -430,7 +434,7 @@ export function preferences( state = STORE_DEFAULTS.preferences, action ) {
 				const uses = ( blockUsage[ block.name ] || 0 ) + 1;
 				blockUsage = omit( blockUsage, block.name );
 				blockUsage[ block.name ] = uses;
-				recentlyUsedBlocks = [ block.name, ...without( recentlyUsedBlocks, block.name ) ].slice( 0, maxRecent );
+				recentlyUsedBlocks = [ block.name, ...without( recentlyUsedBlocks, block.name ) ].slice( 0, MAX_RECENT_BLOCKS );
 			} );
 			return {
 				...state,
@@ -438,18 +442,19 @@ export function preferences( state = STORE_DEFAULTS.preferences, action ) {
 				recentlyUsedBlocks,
 			};
 		case 'SETUP_EDITOR':
-			const filterInvalidBlocksFromList = list => list.filter( name => getBlockType( name ) !== undefined );
-			const filterInvalidBlocksFromObject = obj => omit( obj, keys( obj ).filter( name => getBlockType( name ) === undefined ) );
+			const isBlockDefined = name => getBlockType( name ) !== undefined;
+			const filterInvalidBlocksFromList = list => list.filter( isBlockDefined );
+			const filterInvalidBlocksFromObject = obj => omit( obj, keys( obj ).filter( name => ! isBlockDefined( name ) ) );
 			const commonBlocks = getBlockTypes()
 				.filter( ( blockType ) => 'common' === blockType.category )
 				.map( ( blockType ) => blockType.name );
 
 			return {
 				...state,
-				// recently used gets filled up to `maxRecent` with blocks from the common category
+				// recently used gets filled up to `MAX_RECENT_BLOCKS` with blocks from the common category
 				recentlyUsedBlocks: filterInvalidBlocksFromList( [ ...state.recentlyUsedBlocks ] )
 					.concat( difference( commonBlocks, state.recentlyUsedBlocks ) )
-					.slice( 0, maxRecent ),
+					.slice( 0, MAX_RECENT_BLOCKS ),
 				blockUsage: filterInvalidBlocksFromObject( state.blockUsage ),
 			};
 	}
