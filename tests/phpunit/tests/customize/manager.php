@@ -151,24 +151,52 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	 * @covers WP_Customize_Manager::__construct()
 	 */
 	public function test_constructor_deferred_changeset_uuid() {
+		wp_set_current_user( self::$admin_user_id );
+		$other_admin_user_id = $this->factory()->user->create( array( 'role' => 'admin' ) );
+
 		$data = array(
 			'blogname' => array(
 				'value' => 'Test',
 			),
 		);
-		$uuid = wp_generate_uuid4();
-		$post_id = $this->factory()->post->create( array(
+
+		$uuid1 = wp_generate_uuid4();
+		$this->factory()->post->create( array(
 			'post_type' => 'customize_changeset',
-			'post_name' => $uuid,
+			'post_name' => $uuid1,
 			'post_status' => 'draft',
 			'post_content' => wp_json_encode( $data ),
+			'post_author' => get_current_user_id(),
+			'post_date_gmt' => gmdate( 'Y-m-d H:i:s', strtotime( '-2 days' ) ),
 		) );
+
+		/*
+		 * Create a changeset for another user that is newer to ensure that it is the one that gets returned,
+		 * as in non-branching mode there should only be one pending changeset at a time.
+		 */
+		$uuid2 = wp_generate_uuid4();
+		$post_id = $this->factory()->post->create( array(
+			'post_type' => 'customize_changeset',
+			'post_name' => $uuid2,
+			'post_status' => 'draft',
+			'post_content' => wp_json_encode( $data ),
+			'post_author' => $other_admin_user_id,
+			'post_date_gmt' => gmdate( 'Y-m-d H:i:s', strtotime( '-1 day' ) ),
+		) );
+
 		$wp_customize = new WP_Customize_Manager( array(
 			'changeset_uuid' => false, // Cause UUID to be deferred.
 			'branching' => false, // To cause drafted changeset to be autoloaded.
 		) );
-		$this->assertEquals( $uuid, $wp_customize->changeset_uuid() );
+		$this->assertEquals( $uuid2, $wp_customize->changeset_uuid() );
 		$this->assertEquals( $post_id, $wp_customize->changeset_post_id() );
+
+		$wp_customize = new WP_Customize_Manager( array(
+			'changeset_uuid' => false, // Cause UUID to be deferred.
+			'branching' => true, // To cause no drafted changeset to be autoloaded.
+		) );
+		$this->assertNotContains( $wp_customize->changeset_uuid(), array( $uuid1, $uuid2 ) );
+		$this->assertEmpty( $wp_customize->changeset_post_id() );
 	}
 
 	/**
