@@ -30,7 +30,6 @@ matrix:
   - php: nightly
   allow_failures:
   - php: nightly
-  - php: 7.2
 before_install:
 - |
   if [[ "$WP_TRAVISCI" == "travis:phpunit" ]]; then
