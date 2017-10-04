@@ -574,6 +574,7 @@ $sticky-bottom-offset: 20px;
 	border-bottom: 1px solid $light-gray-500;
 
 	.editor-visual-editor__block-toolbar-content {
+		position: relative;
 		max-width: $visual-editor-max-width;
 		margin: 0 auto;
 	}
