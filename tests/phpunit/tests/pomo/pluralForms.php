@@ -5,20 +5,6 @@
  */
 class PluralFormsTest extends WP_UnitTestCase {
 	/**
-	 * Legacy plural form function.
-	 *
-	 * @param int $nplurals
-	 * @param string $expression
-	 */
-	protected static function make_plural_form_function($nplurals, $expression) {
-		$expression = str_replace('n', '$n', $expression);
-		$func_body = "
-			\$index = (int)($expression);
-			return (\$index < $nplurals)? \$index : $nplurals - 1;";
-		return create_function('$n', $func_body);
-	}
-
-	/**
 	 * Parenthesize plural expression.
 	 *
 	 * Legacy workaround for PHP's flipped precedence order for ternary.
@@ -51,11 +37,21 @@ class PluralFormsTest extends WP_UnitTestCase {
 		return rtrim($res, ';');
 	}
 
+	/**
+	 * @ticket 41562
+	 * @group external-http
+	 */
+	public function test_locales_provider() {
+		$locales = self::locales_provider();
+
+		$this->assertNotEmpty( $locales, 'Unable to retrieve GP_Locales file' );
+	}
+
 	public static function locales_provider() {
 		if ( ! class_exists( 'GP_Locales' ) ) {
 			$filename = download_url( 'https://raw.githubusercontent.com/GlotPress/GlotPress-WP/develop/locales/locales.php' );
 			if ( is_wp_error( $filename ) ) {
-				self::markTestSkipped( 'Unable to retrieve GP_Locales file' );
+				return array();
 			}
 			require_once $filename;			
 		}
@@ -73,12 +69,19 @@ class PluralFormsTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 41562
 	 * @dataProvider locales_provider
 	 * @group external-http
 	 */
 	public function test_regression( $lang, $nplurals, $expression ) {
+		if ( version_compare( phpversion(), '7.2', '>=' ) ) {
+			$this->markTestSkipped( 'Lambda functions are deprecated in PHP 7.2' );
+		}
+
+		require_once dirname( dirname( dirname( __FILE__ ) ) ) . '/includes/plural-form-function.php';
+
 		$parenthesized = self::parenthesize_plural_expression( $expression );
-		$old_style = self::make_plural_form_function( $nplurals, $parenthesized );
+		$old_style = tests_make_plural_form_function( $nplurals, $parenthesized );
 		$pluralForms = new Plural_Forms( $expression );
 
 		$generated_old = array();
@@ -144,6 +147,7 @@ class PluralFormsTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 41562
 	 * @dataProvider simple_provider
 	 */
 	public function test_simple( $expression, $expected ) {
@@ -197,6 +201,13 @@ class PluralFormsTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Ensures that an exception is thrown when an invalid plural form is encountered.
+	 *
+	 * The `@expectedException Exception` notation for PHPUnit cannot be used because expecting an
+	 * exception of type `Exception` is not supported before PHPUnit 3.7. The CI tests for PHP 5.2
+	 * run on PHPUnit 3.6.
+	 *
+	 * @ticket 41562
 	 * @dataProvider data_exceptions
 	 */
 	public function test_exceptions( $expression, $expected_exception, $call_get ) {
@@ -207,9 +218,15 @@ class PluralFormsTest extends WP_UnitTestCase {
 			}
 		} catch ( Exception $e ) {
 			$this->assertEquals( $expected_exception, $e->getMessage() );
+			return;
 		}
+
+		$this->fail( 'Expected exception was not thrown.' );
 	}
 
+	/**
+	 * @ticket 41562
+	 */
 	public function test_cache() {
 		$mock = $this->getMockBuilder( 'Plural_Forms' )
 			->setMethods(array('execute'))
