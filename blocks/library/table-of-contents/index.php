@@ -21,14 +21,14 @@ function gutenberg_render_block_core_table_of_contents( $attributes ) {
 
 	$blocks = gutenberg_parse_blocks( $post->post_content );
 	$headings = array_filter( $blocks, 'filter_block_array_for_headings' );
-	
+
 	if ( ! $headings ) {
 		return '<!-- There were no headings. -->';
 	}
 
 	$html = '';
 
-	$levelCounts = array(
+	$level_counts = array(
 		1 => 0,
 		2 => 0,
 		3 => 0,
@@ -48,14 +48,14 @@ function gutenberg_render_block_core_table_of_contents( $attributes ) {
 			continue;
 		}
 
-		$levelCounts[ $matches[1] ]++;
+		$level_counts[ $matches[1] ]++;
 
-		$levelString = '';
+		$level_string = '';
 		if ( $attributes['numbered'] ) {
-			$levelString = create_level_string( $levelCounts, $matches[1] ) . ' ';
+			$level_string = create_level_string( $level_counts, $matches[1] ) . ' ';
 		}
 
-		$html .= "<li class='level{$matches[1]}'>$levelString<a href='#$matches[2]'>" . wp_strip_all_tags( $content ) . '</a></li>';
+		$html .= "<li class='level{$matches[1]}'>$level_string<a href='#$matches[2]'>" . wp_strip_all_tags( $content ) . '</a></li>';
 
 	}
 
@@ -67,21 +67,36 @@ function gutenberg_render_block_core_table_of_contents( $attributes ) {
 	return '<!-- There were no valid headings -->';
 }
 
+/**
+ * Filter function for array_filter(), to remove all blocks except core/heading blocks.
+ *
+ * @param array $block The block to check.
+ *
+ * @return bool Whether the block is a core/heading block or not.
+ */
 function filter_block_array_for_headings( $block ) {
 	return 'core/heading' === $block['blockName'];
 }
 
-function create_level_string( $levelCounts, $level ) {
+/**
+ * Creates a TOC chapter string, based on where the parser is currently up to.
+ *
+ * @param array $level_counts The state of each chapter level.
+ * @param int   $level The currently chapter's level.
+ *
+ * @return string The chapter string.
+ */
+function create_level_string( $level_counts, $level ) {
 	$string = '';
 	for ( $ii = 2; $ii <= $level; $ii++ ) {
-		$string .= $levelCounts[ $ii ];
+		$string .= $level_counts[ $ii ];
 		if ( $ii != $level ) {
 			$string .= '.';
 		}
 	}
 
 	for ( ; $ii <= 6; $ii++ ) {
-		$levelCounts[ $ii ] = 0;
+		$level_counts[ $ii ] = 0;
 	}
 
 	return $string;

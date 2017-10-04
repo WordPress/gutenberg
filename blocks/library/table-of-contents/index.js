@@ -32,7 +32,7 @@ registerBlockType( 'core/table-of-contents', {
 		},
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, className } ) {
+	edit( { attributes, setAttributes, focus } ) {
 		const { title, numbered } = attributes;
 		return [
 			focus && (
@@ -69,7 +69,7 @@ registerBlockType( 'core/table-of-contents', {
 		];
 	},
 
-	save( { attributes } ) {
+	save() {
 		return null;
 	},
 } );
