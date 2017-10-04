@@ -7,7 +7,7 @@ import { merge } from 'lodash';
 /**
  * Internal dependencies
  */
-import { PublishButton } from '../publish-button';
+import { PublishButton } from '../';
 
 describe( 'PublishButton', () => {
 	const user = {

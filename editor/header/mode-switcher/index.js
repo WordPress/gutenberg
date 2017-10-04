@@ -6,8 +6,9 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
-import { Dashicon } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+import { IconButton, Popover } from '@wordpress/components';
+import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,40 +24,66 @@ import { getEditorMode } from '../../selectors';
 const MODES = [
 	{
 		value: 'visual',
-		label: __( 'Visual' ),
+		label: __( 'Switch To Visual Mode' ),
+		icon: 'screenoptions',
 	},
 	{
 		value: 'text',
-		label: _x( 'Text', 'Name for the Text editor tab (formerly HTML)' ),
+		label: __( 'Switch To Text Mode' ),
+		icon: 'editor-code',
 	},
 ];
 
-function ModeSwitcher( { mode, onSwitch } ) {
-	// Disable reason: Toggling between modes should take effect immediately,
-	// arguably even with keyboard navigation. `onBlur` only would require
-	// another action to remove focus from the select (tabbing or clicking
-	// outside the field), which is unexpected when submit button is omitted.
+class ModeSwitcher extends Component {
+	constructor() {
+		super( ...arguments );
+		this.toggleMenu = this.toggleMenu.bind( this );
+		this.switchTo = this.switchTo.bind( this );
+		this.state = {
+			opened: false,
+		};
+	}
 
-	/* eslint-disable jsx-a11y/no-onchange */
-	return (
-		<div className="editor-mode-switcher">
-			<label htmlFor="editor-mode-switcher__input" className="screen-reader-text">{ __( 'Change editor mode' ) }</label>
-			<select
-				value={ mode }
-				onChange={ ( event ) => onSwitch( event.target.value ) }
-				className="editor-mode-switcher__input"
-				id="editor-mode-switcher__input"
-			>
-				{ MODES.map( ( { value, label } ) =>
-					<option key={ value } value={ value }>
-						{ label }
-					</option>
-				) }
-			</select>
-			<Dashicon icon="arrow-down" />
-		</div>
-	);
-	/* eslint-enable jsx-a11y/no-onchange */
+	toggleMenu() {
+		this.setState( ( state ) => ( { opened: ! state.opened } ) );
+	}
+
+	switchTo( value ) {
+		return () => {
+			this.setState( { opened: false } );
+			this.props.onSwitch( value );
+		};
+	}
+
+	render() {
+		const { mode } = this.props;
+		const { opened } = this.state;
+
+		return (
+			<div className="editor-mode-switcher">
+				<IconButton
+					icon="ellipsis"
+					label={ __( 'More' ) }
+					onClick={ this.toggleMenu }
+				/>
+				<Popover isOpen={ opened } position="bottom left">
+					{ MODES
+						.filter( ( { value } ) => value !== mode )
+						.map( ( { value, label, icon } ) => (
+							<IconButton
+								className="editor-mode-switcher__button"
+								key={ value }
+								icon={ icon }
+								onClick={ this.switchTo( value ) }
+							>
+								{ label }
+							</IconButton>
+						) )
+					}
+				</Popover>
+			</div>
+		);
+	}
 }
 
 export default connect(

@@ -5,7 +5,8 @@
 	background: $white;
 	display: flex;
 	flex-direction: row;
-	align-items: center;
+	align-items: stretch;
+	justify-content: space-between;
 	z-index: z-index( '.editor-header' );
 	left: 0;
 	right: 0;
@@ -85,4 +86,11 @@
 
 .editor-selected-clear {
 	margin: 0 0 0 auto;
+}
+
+
+.editor-header__left,
+.editor-header__right {
+	display: inline-flex;
+	align-items: center;
 }

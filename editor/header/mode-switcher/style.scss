@@ -1,53 +1,8 @@
-#wpbody .editor-mode-switcher {		// #wpbody for extra specificity
-	position: relative;
-	margin-right: $item-spacing;
-	margin-left: -8px;	// use the full hit area of the select box, but maintain optical editor bar padding
-	padding-right: 2px;
-	color: $dark-gray-500;
-	align-items: center;
-	cursor: pointer;
-	border-right: 1px solid $light-gray-500;
-	outline: none;
-	display: flex;
-	align-items: center;
-
-	.editor-mode-switcher__input {
-		background: transparent;
-		line-height: 1;
-		border: 0;
-		border-radius: 4px;
-		appearance: none;
-		cursor: pointer;
-		box-shadow: none;
-		padding: 10px 8px;
-		font-size: $default-font-size;
-		line-height: 16px;
-		height: auto;
-
-		/* IE10+ */
-		&::-ms-expand {
-			display: none;
-		}
-
-		@include break-small {
-			padding-right: 26px;
-		}
-
-		&:focus {
-			outline: none;
-			box-shadow: 0 0 0 1px $blue-medium-400, 0 0 2px 1px $blue-medium-400;
-		}
-	}
+.editor-mode-switcher__button {
+	width: 100%;
+	padding: 15px;
 
 	.dashicon {
-		position: relative;
-		left: -26px;
-		margin-right: -20px;
-		pointer-events: none;
-		display: none;
-
-		@include break-small {
-			display: block;
-		}
+		margin-right: 20px;
 	}
 }
