@@ -113,7 +113,7 @@ const ConnectedReusableBlockEdit = connect(
 	( dispatch, ownProps ) => ( {
 		fetchReusableBlock() {
 			dispatch( {
-				type: 'FETCH_REUSABLE_BLOCK',
+				type: 'FETCH_REUSABLE_BLOCKS',
 				id: ownProps.attributes.ref,
 			} );
 		},

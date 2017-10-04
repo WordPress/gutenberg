@@ -62,6 +62,14 @@ describe( 'actions', () => {
 		it( 'should return the FETCH_REUSABLE_BLOCKS action', () => {
 			expect( fetchReusableBlocks() ).toEqual( {
 				type: 'FETCH_REUSABLE_BLOCKS',
+				id: null,
+			} );
+		} );
+
+		it( 'should take an optional id argument', () => {
+			expect( fetchReusableBlocks( '358b59ee-bab3-4d6f-8445-e8c6971a5605' ) ).toEqual( {
+				type: 'FETCH_REUSABLE_BLOCKS',
+				id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
 			} );
 		} );
 	} );

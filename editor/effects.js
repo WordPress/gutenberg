@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, uniqueId } from 'lodash';
+import { get, uniqueId, castArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -284,17 +284,24 @@ export default {
 
 		return effects;
 	},
-	// TODO: FETCH_REUSABLE_BLOCKS and FETCH_REUSABLE_BLOCK can probably be combined.
 	FETCH_REUSABLE_BLOCKS( action, store ) {
+		const { id } = action;
 		const { dispatch } = store;
 
-		new wp.api.collections.ReusableBlocks().fetch().then(
-			( reusableBlocks ) => {
+		let result;
+		if ( id ) {
+			result = new wp.api.models.ReusableBlocks( { id } ).fetch();
+		} else {
+			result = new wp.api.collections.ReusableBlocks().fetch();
+		}
+
+		result.then(
+			( reusableBlockOrBlocks ) => {
 				dispatch( {
 					type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
-					reusableBlocks: reusableBlocks.map( ( { id, name, content } ) => {
+					reusableBlocks: castArray( reusableBlockOrBlocks ).map( ( { id: itemId, name, content } ) => {
 						const [ { name: type, attributes } ] = parse( content );
-						return { id, name, type, attributes };
+						return { id: itemId, name, type, attributes };
 					} ),
 				} );
 			},
@@ -314,35 +321,6 @@ export default {
 		const { dispatch } = store;
 
 		dispatch( addReusableBlocks( reusableBlocks ) );
-	},
-	FETCH_REUSABLE_BLOCK( action, store ) {
-		const { id } = action;
-		const { dispatch } = store;
-
-		new wp.api.models.ReusableBlocks( { id } ).fetch().then(
-			( { name, content } ) => {
-				const [ { name: type, attributes } ] = parse( content );
-				dispatch( {
-					type: 'FETCH_REUSABLE_BLOCK_SUCCESS',
-					reusableBlock: { id, name, type, attributes },
-				} );
-			},
-			( error ) => {
-				dispatch( {
-					type: 'FETCH_REUSABLE_BLOCK_FAILURE',
-					error: get( error, 'responseJSON', {
-						code: 'unknown_error',
-						message: __( 'An unknown error occurred.' ),
-					} ),
-				} );
-			}
-		);
-	},
-	FETCH_REUSABLE_BLOCK_SUCCESS( action, store ) {
-		const { reusableBlock } = action;
-		const { dispatch } = store;
-
-		dispatch( addReusableBlocks( reusableBlock ) );
 	},
 	SAVE_REUSABLE_BLOCK( action, store ) {
 		const { id } = action;
