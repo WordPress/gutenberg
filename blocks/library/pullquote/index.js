@@ -32,7 +32,7 @@ registerBlockType( 'core/pullquote', {
 		},
 		citation: {
 			type: 'array',
-			source: children( 'cite' ),
+			source: children( 'cite,footer' ),
 		},
 		align: {
 			type: 'string',
