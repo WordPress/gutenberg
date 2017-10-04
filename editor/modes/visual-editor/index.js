@@ -22,7 +22,6 @@ import VisualEditorInserter from './inserter';
 import PostTitle from '../../post-title';
 import WritingFlow from '../../writing-flow';
 import TableOfContents from '../../table-of-contents';
-import FeatureToggle from '../../feature-toggle';
 import PostPermalink from '../../post-permalink';
 import { getBlockUids, getMultiSelectedBlockUids, isFeatureActive, getSelectedBlock } from '../../selectors';
 import { clearSelectedBlock, multiSelect, redo, undo, removeBlocks } from '../../actions';
@@ -113,7 +112,6 @@ class VisualEditor extends Component {
 						</div>
 					}
 					<div className="editor-visual-editor__subtoolbar">
-						<FeatureToggle feature="fixedToolbar" label="Fixed Toolbar" />
 						<TableOfContents />
 					</div>
 				</div>

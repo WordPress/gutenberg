@@ -15,6 +15,7 @@ import { withFocusReturn } from '@wordpress/components';
 import './style.scss';
 import PostSettings from './post-settings';
 import BlockInspector from './block-inspector';
+import FeatureToggle from '../feature-toggle';
 import Header from './header';
 import { getActivePanel } from '../selectors';
 
@@ -24,6 +25,9 @@ const Sidebar = ( { panel } ) => {
 			<Header />
 			{ panel === 'document' && <PostSettings /> }
 			{ panel === 'block' && <BlockInspector /> }
+			<div className="editor-sidebar__footer">
+				<FeatureToggle feature="fixedToolbar" label="Fixed Toolbar" />
+			</div>
 		</div>
 	);
 };

@@ -10,6 +10,7 @@
 	color: $dark-gray-500;
 	height: 100vh;
 	overflow: hidden;
+	padding-bottom: 30px;
 
 	@include break-small() {
 		top: $admin-bar-height-big + $header-height;
@@ -133,4 +134,15 @@
 		box-shadow: $button-focus-style;
 		outline: none;
 	}
+}
+
+.editor-sidebar__footer {
+	position: fixed;
+	bottom: 0;
+	right: 0;
+	width: $sidebar-width;
+	padding: 10px;
+	background: $light-gray-300;
+	border-left: 1px solid $light-gray-500;
+	text-align: right;
 }
