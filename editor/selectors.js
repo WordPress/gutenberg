@@ -854,3 +854,14 @@ export function getRecentlyUsedBlocks( state ) {
 	// resolves the block names in the state to the block type settings
 	return state.preferences.recentlyUsedBlocks.map( blockType => getBlockType( blockType ) );
 }
+
+/**
+ * Returns whether the given feature is enabled or not
+ *
+ * @param {Object}    state   Global application state
+ * @param {String}    feature Feature slug
+ * @return {Booleean}         Is active
+ */
+export function isFeatureActive( state, feature ) {
+	return !! state.features[ feature ];
+}

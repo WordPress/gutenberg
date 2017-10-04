@@ -17,7 +17,7 @@ import { keycodes } from '@wordpress/utils';
  * Internal dependencies
  */
 import './style.scss';
-import { getEditedPostTitle } from '../selectors';
+import { getEditedPostTitle, isFeatureActive } from '../selectors';
 import { editPost, clearSelectedBlock } from '../actions';
 import PostPermalink from '../post-permalink';
 
@@ -87,13 +87,13 @@ class PostTitle extends Component {
 	}
 
 	render() {
-		const { title } = this.props;
+		const { title, hasFixedToolbar } = this.props;
 		const { isSelected } = this.state;
 		const className = classnames( 'editor-post-title', { 'is-selected': isSelected } );
 
 		return (
 			<div className={ className }>
-				{ isSelected && <PostPermalink /> }
+				{ ! hasFixedToolbar && isSelected && <PostPermalink /> }
 				<h1>
 					<Textarea
 						ref={ this.bindTextarea }
@@ -115,6 +115,7 @@ class PostTitle extends Component {
 export default connect(
 	( state ) => ( {
 		title: getEditedPostTitle( state ),
+		hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
 	} ),
 	( dispatch ) => {
 		return {

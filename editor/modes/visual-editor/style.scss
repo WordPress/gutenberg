@@ -1,7 +1,7 @@
 .editor-visual-editor {
 	position: relative;
 	margin: 0 auto;
-	padding: 50px 0;	// Floating up/down arrows invisible
+	padding: ($block-controls-height + $header-height + 20px) 0 20px;
 
 	&,
 	& p {
@@ -10,18 +10,13 @@
 		line-height: $editor-line-height;
 	}
 
-	@include break-small() {
-		padding: 50px 0;
+	@include break-medium() {
+		padding: ($block-controls-height + 30px) 0 30px;
 	}
 
 	@include break-large() {
-		padding: 60px 0;
+		padding: ($block-controls-height + 30px) 0 30px;
 	}
-}
-
-.editor-visual-editor {
-	margin-left: auto;
-	margin-right: auto;
 }
 
 .editor-visual-editor__block {
@@ -84,39 +79,6 @@
 	&.is-selected:before {
 		outline: 2px solid $light-gray-500;
 		transition: 0.2s outline;
-	}
-
-	&.is-showing-mobile-controls {
-		.editor-visual-editor__group > :not( .editor-visual-editor__mobile-tools ) {
-			display: none;
-		}
-		.editor-visual-editor__mobile-tools {
-			align-items: baseline;
-			display: flex;
-			width: 100%;
-
-			@include break-small {
-				display: none;
-			}
-
-			.editor-block-mover,
-			.editor-block-settings-menu {
-				display: block;
-				display: flex;
-				position: static;
-				.components-button {
-					margin: 0 5px;
-				}
-			}
-
-			.editor-block-settings-menu {
-				left: 80px;
-				right: auto;
-			}
-			.editor-visual-editor__mobile-toggle {
-				margin-left: auto;
-			}
-		}
 	}
 
 	&.is-multi-selected *::selection {
@@ -312,6 +274,36 @@
 	}
 }
 
+.editor-visual-editor__mobile-toolbar {
+	@include break-small() {
+		display: none;
+	}
+}
+
+.editor-visual-editor__mobile-tools {
+	@include break-small() {
+		display: none;
+	}
+	align-items: baseline;
+	display: flex;
+	width: 100%;
+
+	.editor-block-mover,
+	.editor-block-settings-menu {
+		display: block;
+		display: flex;
+		position: static;
+		.components-button {
+			margin: 0 5px;
+		}
+	}
+
+	.editor-block-settings-menu {
+		left: 80px;
+		right: auto;
+	}
+}
+
 .editor-visual-editor__block-controls {
 	display: flex;
 	position: sticky;
@@ -386,7 +378,8 @@ $sticky-bottom-offset: 20px;
 	}
 }
 
-.editor-visual-editor__block-controls .editor-block-switcher {
+.editor-visual-editor__block-controls .editor-block-switcher,
+.editor-visual-editor__block-toolbar .editor-block-switcher {
 	display: inline-flex;
 }
 
@@ -494,16 +487,6 @@ $sticky-bottom-offset: 20px;
 	}
 }
 
-.editor-visual-editor__mobile-tools {
-	@include break-small {
-		display: none;
-	}
-	.editor-block-mover,
-	.editor-block-settings-menu {
-		display: none;
-	}
-}
-
 .editor-visual-editor__block-warning {
 	z-index: z-index( '.editor-visual-editor__block-warning' );
 	position: absolute;
@@ -536,4 +519,79 @@ $sticky-bottom-offset: 20px;
 
 .visual-editor__invalid-block-warning-buttons .components-button {
 	margin-bottom: 5px;
+}
+
+.editor-visual-editor__header {
+	position: fixed;
+	top: $header-height + $admin-bar-height-big;
+	left: 0;
+	right: 0;
+	z-index: z-index( '.editor-visual-editor__header' );
+
+	@include break-small() {
+		top: $admin-bar-height-big + $header-height;
+	}
+
+	@include break-medium() {
+		top: $admin-bar-height + $header-height;
+		left: $admin-sidebar-width;
+	}
+
+	.is-sidebar-opened & {
+		right: $sidebar-width;
+	}
+
+	.sticky-menu & {	/* Sticky is when on smaller breakpoints, nav menu is manually opened */
+		@include break-medium() {
+			left: $admin-sidebar-width;
+		}
+	}
+
+	.auto-fold & {		/* Auto fold is when on smaller breakpoints, nav menu auto colllapses */
+		@include break-medium() {
+			left: $admin-sidebar-width-collapsed;
+		}
+
+		@include break-large() {
+			left: $admin-sidebar-width;
+		}
+	}
+
+	/* Sidebar manually collapsed */
+	.folded & {
+		left: $admin-sidebar-width-collapsed;
+	}
+
+	/* Mobile menu opened */
+	.auto-fold .wp-responsive-open & {
+		left: $admin-sidebar-width-big;
+		right: -$admin-sidebar-width-big;
+	}
+}
+
+.editor-visual-editor__block-toolbar {
+	background: $white;
+	border-bottom: 1px solid $light-gray-500;
+
+	.editor-visual-editor__block-toolbar-content {
+		max-width: $visual-editor-max-width;
+		margin: 0 auto;
+	}
+
+	.components-toolbar {
+		border-top: 0;
+		border-bottom: 0;
+		margin-right: -1px;
+	}
+
+	.editor-block-switcher {
+		border-top: 0;
+		border-bottom: 0;
+	}
+}
+
+.editor-visual-editor__subtoolbar {
+	display: flex;
+	justify-content: space-between;
+	padding: 10px;
 }

@@ -11,9 +11,9 @@ import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
  * WordPress dependencies
  */
 import { Children, Component, createElement } from '@wordpress/element';
-import { IconButton, Toolbar } from '@wordpress/components';
+import { IconButton, Toolbar, Popover } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
-import { getBlockType, getBlockDefaultClassname, createBlock } from '@wordpress/blocks';
+import { getBlockType, getBlockDefaultClassname, createBlock, BlockControls } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -52,6 +52,7 @@ import {
 	isBlockSelected,
 	isFirstMultiSelectedBlock,
 	isTyping,
+	isFeatureActive,
 } from '../../selectors';
 
 const { BACKSPACE, ESCAPE, DELETE, ENTER } = keycodes;
@@ -294,7 +295,7 @@ class VisualEditorBlock extends Component {
 	}
 
 	render() {
-		const { block, multiSelectedBlockUids, order } = this.props;
+		const { block, multiSelectedBlockUids, order, hasFixedToolbar } = this.props;
 		const { name: blockName, isValid } = block;
 		const blockType = getBlockType( blockName );
 		// translators: %s: Type of block (i.e. Text, Image etc)
@@ -359,6 +360,24 @@ class VisualEditorBlock extends Component {
 				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
 				{ ( showUI || isHovered ) && <BlockRightMenu uid={ block.uid } /> }
 				{ showUI && isValid &&
+					<BlockControls>
+						<BlockSwitcher uid={ block.uid } />
+						<Popover className="editor-visual-editor__mobile-tools" isOpen={ showMobileControls } position="bottom left">
+							{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
+							{ ( showUI || isHovered ) && <BlockRightMenu uid={ block.uid } /> }
+						</Popover>
+						<Toolbar className="editor-visual-editor__mobile-toolbar">
+							<IconButton
+								className="editor-visual-editor__mobile-toggle"
+								onClick={ this.toggleMobileControls }
+								aria-expanded={ showMobileControls }
+								label={ __( 'Toggle extra controls' ) }
+								icon="ellipsis"
+							/>
+						</Toolbar>
+					</BlockControls>
+				}
+				{ showUI && isValid && ! hasFixedToolbar &&
 					<CSSTransitionGroup
 						transitionName={ { appear: 'is-appearing', appearActive: 'is-appearing-active' } }
 						transitionAppear={ true }
@@ -369,19 +388,7 @@ class VisualEditorBlock extends Component {
 					>
 						<div className="editor-visual-editor__block-controls">
 							<div className="editor-visual-editor__group">
-								<BlockSwitcher uid={ block.uid } />
-								<Slot name="Formatting.Toolbar" />
-								<Toolbar className="editor-visual-editor__mobile-tools">
-									{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
-									{ ( showUI || isHovered ) && <BlockRightMenu uid={ block.uid } /> }
-									<IconButton
-										className="editor-visual-editor__mobile-toggle"
-										onClick={ this.toggleMobileControls }
-										aria-expanded={ showMobileControls }
-										label={ __( 'Toggle extra controls' ) }
-										icon="ellipsis"
-									/>
-								</Toolbar>
+								<Slot name="Block.Toolbar" />
 							</div>
 						</div>
 					</CSSTransitionGroup>
@@ -446,6 +453,7 @@ export default connect(
 			order: getBlockIndex( state, ownProps.uid ),
 			multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
 			meta: getEditedPostAttribute( state, 'meta' ),
+			hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
 		};
 	},
 	( dispatch, ownProps ) => ( {

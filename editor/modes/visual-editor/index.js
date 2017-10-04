@@ -3,6 +3,7 @@
  */
 import { connect } from 'react-redux';
 import { first, last } from 'lodash';
+import { Slot } from 'react-slot-fill';
 
 /**
  * WordPress dependencies
@@ -10,6 +11,7 @@ import { first, last } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { Component, findDOMNode } from '@wordpress/element';
 import { KeyboardShortcuts } from '@wordpress/components';
+import { BlockControls } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -20,7 +22,9 @@ import VisualEditorInserter from './inserter';
 import PostTitle from '../../post-title';
 import WritingFlow from '../../writing-flow';
 import TableOfContents from '../../table-of-contents';
-import { getBlockUids, getMultiSelectedBlockUids } from '../../selectors';
+import FeatureToggle from '../../feature-toggle';
+import PostPermalink from '../../post-permalink';
+import { getBlockUids, getMultiSelectedBlockUids, isFeatureActive, getSelectedBlock } from '../../selectors';
 import { clearSelectedBlock, multiSelect, redo, undo, removeBlocks } from '../../actions';
 
 class VisualEditor extends Component {
@@ -82,6 +86,7 @@ class VisualEditor extends Component {
 	}
 
 	render() {
+		const { hasFixedToolbar, selectedBlock } = this.props;
 		// Disable reason: Clicking the canvas should clear the selection
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
@@ -94,6 +99,24 @@ class VisualEditor extends Component {
 				onKeyDown={ this.onKeyDown }
 				ref={ this.bindContainer }
 			>
+				{ ! selectedBlock && hasFixedToolbar &&
+					<BlockControls>
+						<PostPermalink />
+					</BlockControls>
+				}
+				<div className="editor-visual-editor__header">
+					{ hasFixedToolbar &&
+						<div className="editor-visual-editor__block-toolbar">
+							<div className="editor-visual-editor__block-toolbar-content">
+								<Slot name="Block.Toolbar" />
+							</div>
+						</div>
+					}
+					<div className="editor-visual-editor__subtoolbar">
+						<FeatureToggle feature="fixedToolbar" label="Fixed Toolbar" />
+						<TableOfContents />
+					</div>
+				</div>
 				<KeyboardShortcuts shortcuts={ {
 					'mod+a': this.selectAll,
 					'mod+z': this.undoOrRedo,
@@ -106,7 +129,6 @@ class VisualEditor extends Component {
 					<VisualEditorBlockList ref={ this.bindBlocksContainer } />
 				</WritingFlow>
 				<VisualEditorInserter />
-				<TableOfContents />
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
@@ -118,6 +140,8 @@ export default connect(
 		return {
 			uids: getBlockUids( state ),
 			multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
+			hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
+			selectedBlock: getSelectedBlock( state ),
 		};
 	},
 	{

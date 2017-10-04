@@ -71,3 +71,17 @@ textarea.editor-post-title__input {
 		padding: 0;
 	}
 }
+
+.editor-post-title .post-permalink {
+	position: absolute;
+	top: -34px;
+	left: 0;
+	right: 0;
+	box-shadow: $shadow-popover;
+	border: 1px solid $light-gray-500;
+
+	@include break-small() {
+		left: $block-padding + $block-mover-padding-visible - 2px;
+		right: $block-padding + $block-mover-padding-visible - 2px;
+	}
+}
