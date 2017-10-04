@@ -3,7 +3,6 @@
  */
 import { connect } from 'react-redux';
 import { first, last } from 'lodash';
-import { Slot } from 'react-slot-fill';
 
 /**
  * WordPress dependencies
@@ -19,6 +18,7 @@ import { BlockControls } from '@wordpress/blocks';
 import './style.scss';
 import VisualEditorBlockList from './block-list';
 import VisualEditorInserter from './inserter';
+import VisualEditorToolbar from './toolbar';
 import PostTitle from '../../post-title';
 import WritingFlow from '../../writing-flow';
 import TableOfContents from '../../table-of-contents';
@@ -35,14 +35,6 @@ class VisualEditor extends Component {
 		this.selectAll = this.selectAll.bind( this );
 		this.undoOrRedo = this.undoOrRedo.bind( this );
 		this.deleteSelectedBlocks = this.deleteSelectedBlocks.bind( this );
-	}
-
-	componentDidMount() {
-		document.addEventListener( 'keydown', this.onKeyDown );
-	}
-
-	componentWillUnmount() {
-		document.removeEventListener( 'keydown', this.onKeyDown );
 	}
 
 	bindContainer( ref ) {
@@ -95,7 +87,6 @@ class VisualEditor extends Component {
 				className="editor-visual-editor"
 				onMouseDown={ this.onClick }
 				onTouchStart={ this.onClick }
-				onKeyDown={ this.onKeyDown }
 				ref={ this.bindContainer }
 			>
 				{ ! selectedBlock && hasFixedToolbar &&
@@ -104,13 +95,7 @@ class VisualEditor extends Component {
 					</BlockControls>
 				}
 				<div className="editor-visual-editor__header">
-					{ hasFixedToolbar &&
-						<div className="editor-visual-editor__block-toolbar">
-							<div className="editor-visual-editor__block-toolbar-content">
-								<Slot name="Block.Toolbar" />
-							</div>
-						</div>
-					}
+					{ hasFixedToolbar && <VisualEditorToolbar /> }
 					<div className="editor-visual-editor__subtoolbar">
 						<TableOfContents />
 					</div>
