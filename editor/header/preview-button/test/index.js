@@ -6,7 +6,7 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import { PreviewButton } from '../preview-button';
+import { PreviewButton } from '../';
 
 describe( 'PreviewButton', () => {
 	describe( 'constructor()', () => {
