@@ -137,4 +137,37 @@ class Tests_Image_Header extends WP_UnitTestCase {
 		$this->assertGreaterThan( 0, $cropped_id );
 	}
 
+	/**
+	 * @ticket 21819
+	 */
+	function test_check_get_previous_crop() {
+		$id = wp_insert_attachment( array(
+			'post_status' => 'publish',
+			'post_title' => 'foo.png',
+			'post_type' => 'post',
+			'guid' => 'http://localhost/foo.png'
+		) );
+
+		// Create inital crop object.
+		$cropped_1 = 'foo-cropped-1.png';
+		$object = $this->custom_image_header->create_attachment_object( $cropped_1, $id );
+
+		// Ensure no previous crop exists.
+		$previous = $this->custom_image_header->get_previous_crop( $object );
+		$this->assertFalse( $previous );
+
+		// Create the inital crop attachment and set it as the header.
+		$cropped_1_id = $this->custom_image_header->insert_attachment( $object, $cropped_1 );
+		$key = '_wp_attachment_custom_header_last_used_' . get_stylesheet();
+		update_post_meta( $cropped_1_id, $key, time() );
+		update_post_meta( $cropped_1_id, '_wp_attachment_is_custom_header', get_stylesheet() );
+
+		// Create second crop.
+		$cropped_2 = 'foo-cropped-2.png';
+		$object = $this->custom_image_header->create_attachment_object( $cropped_2, $id );
+
+		// Test that a previous crop is found.
+		$previous = $this->custom_image_header->get_previous_crop( $object );
+		$this->assertSame( $previous, $cropped_1_id );
+	}
 }
