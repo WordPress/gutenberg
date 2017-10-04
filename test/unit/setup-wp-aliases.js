@@ -1,5 +1,10 @@
 // Set up `wp.*` aliases.  Handled by Webpack outside of the test build.
-global.wp = {};
+global.wp = {
+	shortcode: {
+		next: () => {},
+	},
+};
+
 [
 	'element',
 	'i18n',
