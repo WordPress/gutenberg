@@ -71,22 +71,20 @@ function Header( {
 			aria-label={ __( 'Editor toolbar' ) }
 			className="editor-header"
 		>
-			<div className="editor-header__left">
+			<div className="editor-header__content-tools">
 				<Inserter position="bottom right" />
 				<IconButton
-					className="editor-tools__undo"
 					icon="undo"
 					label={ __( 'Undo' ) }
 					disabled={ ! hasUndo }
 					onClick={ undo } />
 				<IconButton
-					className="editor-tools__redo"
 					icon="redo"
 					label={ __( 'Redo' ) }
 					disabled={ ! hasRedo }
 					onClick={ redo } />
 			</div>
-			<div className="editor-header__right">
+			<div className="editor-header__settings">
 				<SavedState />
 				<PreviewButton />
 				<PublishButton />
