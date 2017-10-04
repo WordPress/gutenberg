@@ -181,6 +181,59 @@ class WP_Test_REST_Schema_Validation extends WP_UnitTestCase {
 		$this->assertWPError( rest_validate_value_from_schema( array( 'first' => '1', 'second' => '2' ), $schema ) );
 	}
 
+	public function test_type_object() {
+		$schema = array(
+			'type'       => 'object',
+			'properties' => array(
+				'a' => array(
+					'type' => 'number'
+				),
+			),
+		);
+		$this->assertTrue( rest_validate_value_from_schema( array( 'a' => 1 ), $schema ) );
+		$this->assertWPError( rest_validate_value_from_schema( array( 'a' => 'invalid' ), $schema ) );
+	}
+
+	public function test_type_object_nested() {
+		$schema = array(
+			'type' => 'object',
+			'properties' => array(
+				'a' => array(
+					'type'  => 'object',
+					'properties' => array(
+						'b' => array( 'type' => 'number' ),
+						'c' => array( 'type' => 'number' ),
+					)
+				)
+			),
+		);
+		$this->assertTrue(
+			rest_validate_value_from_schema(
+				array(
+					'a' => array(
+						'b' => '1',
+						'c' => 3,
+					),
+				),
+				$schema
+			)
+		);
+		$this->assertWPError( rest_validate_value_from_schema( array( 'a' => array( 'b' => 1, 'c' => 'invalid' ) ), $schema ) );
+		$this->assertWPError( rest_validate_value_from_schema( array( 'a' => 1 ), $schema ) );
+	}
+
+	public function test_type_object_stdclass() {
+		$schema = array(
+			'type'       => 'object',
+			'properties' => array(
+				'a' => array(
+					'type' => 'number'
+				),
+			),
+		);
+		$this->assertTrue( rest_validate_value_from_schema( (object) array( 'a' => 1 ), $schema ) );
+	}
+
 	public function test_type_unknown() {
 		$schema = array(
 			'type'  => 'lalala',

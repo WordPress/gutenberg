@@ -146,6 +146,84 @@ class WP_Test_REST_Schema_Sanitization extends WP_UnitTestCase {
 		$this->assertEquals( array( '1', '2' ), rest_sanitize_value_from_schema( array( 'first' => '1', 'second' => '2' ), $schema ) );
 	}
 
+	public function test_type_object() {
+		$schema = array(
+			'type'       => 'object',
+			'properties' => array(
+				'a' => array(
+					'type' => 'number'
+				),
+			),
+		);
+		$this->assertEquals( array( 'a' => 1 ), rest_sanitize_value_from_schema( array( 'a' => 1 ), $schema ) );
+		$this->assertEquals( array( 'a' => 1 ), rest_sanitize_value_from_schema( array( 'a' => '1' ), $schema ) );
+	}
+
+	public function test_type_object_nested() {
+		$schema = array(
+			'type' => 'object',
+			'properties' => array(
+				'a' => array(
+					'type'  => 'object',
+					'properties' => array(
+						'b' => array( 'type' => 'number' ),
+						'c' => array( 'type' => 'number' ),
+					)
+				)
+			),
+		);
+
+		$this->assertEquals(
+			array(
+				'a' => array(
+					'b' => 1,
+					'c' => 3,
+				),
+			),
+			rest_sanitize_value_from_schema(
+				array(
+					'a' => array(
+						'b' => '1',
+						'c' => '3',
+					),
+				),
+				$schema
+			)
+		);
+		$this->assertEquals(
+			array(
+				'a' => array(
+					'b' => 1,
+					'c' => 3,
+				),
+			),
+			rest_sanitize_value_from_schema(
+				array(
+					'a' => array(
+						'b' => '1',
+						'c' => '3',
+						'd' => '1',
+					),
+					'b' => 1,
+				),
+				$schema
+			)
+		);
+		$this->assertEquals( array( 'a' => array() ), rest_sanitize_value_from_schema( array( 'a' => null ), $schema ) );
+	}
+
+	public function test_type_object_stdclass() {
+		$schema = array(
+			'type'       => 'object',
+			'properties' => array(
+				'a' => array(
+					'type' => 'number'
+				),
+			),
+		);
+		$this->assertEquals( array( 'a' => 1 ), rest_sanitize_value_from_schema( (object) array( 'a' => '1' ), $schema ) );
+	}
+
 	public function test_type_unknown() {
 		$schema = array(
 			'type' => 'lalala',
