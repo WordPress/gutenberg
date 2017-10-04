@@ -51,26 +51,32 @@ registerBlockType( 'core/gallery', {
 			{
 				type: 'shortcode',
 				tag: 'gallery',
-				content: {
+				attributes: {
 					images: {
 						type: 'array',
-						default: [],
+						shortcode: ( { named: { ids } } ) => {
+							if ( ! ids ) {
+								return [];
+							}
+
+							return ids.split( ',' ).map( ( id ) => ( {
+								id: parseInt( id, 10 ),
+							} ) );
+						},
 					},
 					columns: {
 						type: 'number',
+						shortcode: ( { named: { columns = '3' } } ) => {
+							return parseInt( columns, 10 );
+						},
 					},
 					linkTo: {
 						type: 'string',
-						default: 'attachment',
+						shortcode: ( { named: { link = 'attachment' } } ) => {
+							return link === 'file' ? 'media' : link;
+						},
 					},
 				},
-				attributes: ( { named } ) => ( {
-					linkTo: named.link === 'file' ? 'media' : named.link,
-					columns: parseInt( named.columns, 10 ) || 3,
-					images: named.ids.split( ',' ).map( ( id ) => ( {
-						id: parseInt( id, 10 ),
-					} ) ),
-				} ),
 			},
 		],
 	},
