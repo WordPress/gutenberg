@@ -208,3 +208,21 @@ function gutenberg_wpautop_block_content( $content ) {
 
 	return gutenberg_serialize_blocks( $blocks );
 }
+
+/**
+ * Filters saved post data to apply wpautop to freeform block content.
+ *
+ * @since 1.7.0
+ *
+ * @param  array $data An array of slashed post data.
+ * @return array       An array of post data with wpautop applied to freeform
+ *                     block content.
+ */
+function gutenberg_wpautop_insert_post_data( $data ) {
+	if ( ! empty( $data['post_content'] ) && gutenberg_content_has_blocks( $data['post_content'] ) ) {
+		$data['post_content'] = gutenberg_wpautop_block_content( $data['post_content'] );
+	}
+
+	return $data;
+}
+add_filter( 'wp_insert_post_data', 'gutenberg_wpautop_insert_post_data' );
