@@ -28,6 +28,7 @@ class Tests_Media extends WP_UnitTestCase {
 	function setUp() {
 		parent::setUp();
 		$this->caption = 'A simple caption.';
+		$this->alternate_caption = 'Alternate caption.';
 		$this->html_content = <<<CAP
 A <strong class='classy'>bolded</strong> <em>caption</em> with a <a href="#">link</a>.
 CAP;
@@ -51,9 +52,67 @@ CAP;
 		$this->assertNull( $result );
 	}
 
-	function test_img_caption_shortcode_with_bad_attr() {
-		$result = img_caption_shortcode( array(), 'content' );
-		$this->assertEquals( 'content', 'content' );
+	/**
+	 * @ticket 33981
+	 */
+	function test_img_caption_shortcode_with_empty_params_but_content() {
+		$result = img_caption_shortcode( array(), $this->caption );
+		$this->assertEquals( $this->caption, $result );
+	}
+
+	/**
+	 * @ticket 33981
+	 */
+	function test_img_caption_shortcode_short_circuit_filter() {
+		add_filter( 'img_caption_shortcode', array( $this, '_return_alt_caption' ) );
+
+		$result = img_caption_shortcode( array(), $this->caption );
+		$this->assertEquals( $this->alternate_caption, $result );
+	}
+
+	/**
+	 * Filter used in test_img_caption_shortcode_short_circuit_filter()
+	 */
+	function _return_alt_caption() {
+		return $this->alternate_caption;
+	}
+
+	/**
+	 * @ticket 33981
+	 */
+	function test_img_caption_shortcode_empty_width() {
+		$result = img_caption_shortcode(
+			array(
+				'width' => 0,
+			),
+			$this->caption
+		);
+		$this->assertEquals( $this->caption, $result );
+	}
+
+	/**
+	 * @ticket 33981
+	 */
+	function test_img_caption_shortcode_empty_caption() {
+		$result = img_caption_shortcode(
+			array(
+				'caption' => '',
+			)
+		);
+		$this->assertNull( $result );
+	}
+
+	/**
+	 * @ticket 33981
+	 */
+	function test_img_caption_shortcode_empty_caption_and_content() {
+		$result = img_caption_shortcode(
+			array(
+				'caption' => '',
+			),
+			$this->caption
+		);
+		$this->assertEquals( $this->caption, $result );
 	}
 
 	function test_img_caption_shortcode_with_old_format() {
@@ -66,9 +125,9 @@ CAP;
 		$this->assertEquals( 1, preg_match_all( "/{$this->caption}/", $result, $_r ) );
 
 		if ( current_theme_supports( 'html5', 'caption' ) ) {
-			$this->assertEquals( 1, preg_match_all( "/width: 20/", $result, $_r ) );
+			$this->assertEquals( 1, preg_match_all( "/max-width: 20/", $result, $_r ) );
 		} else {
-			$this->assertEquals( 1, preg_match_all( "/width: 30/", $result, $_r ) );
+			$this->assertEquals( 1, preg_match_all( "/max-width: 30/", $result, $_r ) );
 		}
 	}
 
@@ -84,6 +143,18 @@ CAP;
 		$this->assertEquals( 1, preg_match_all( '/wp-caption &amp;myAlignment/', $result, $_r ) );
 		$this->assertEquals( 1, preg_match_all( '/id="myId"/', $result, $_r ) );
 		$this->assertEquals( 1, preg_match_all( "/{$this->caption}/", $result, $_r ) );
+	}
+
+	function test_img_caption_shortcode_with_old_format_and_class() {
+		$result = img_caption_shortcode(
+			array(
+				'width' => 20,
+				'class' => 'some-class another-class',
+				'caption' => $this->caption,
+			)
+		);
+		$this->assertEquals( 1, preg_match_all( '/wp-caption alignnone some-class another-class/', $result, $_r ) );
+
 	}
 
 	function test_new_img_caption_shortcode_with_html_caption() {
