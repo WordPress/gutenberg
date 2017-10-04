@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @group pomo
+ */
 class Tests_POMO_TranslationEntry extends WP_UnitTestCase {
 
 	function test_create_entry() {

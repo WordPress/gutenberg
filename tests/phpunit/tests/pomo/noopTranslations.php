@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @group pomo
+ */
 class Tests_POMO_NOOPTranslations extends WP_UnitTestCase {
 	function setUp() {
 		parent::setUp();
