@@ -156,62 +156,58 @@ class PluralFormsTest extends WP_UnitTestCase {
 		$this->assertSame( $expected, $actual );
 	}
 
-	/**
-	 * @expectedException Exception
-	 * @expectedExceptionMessage Unknown symbol "#"
-	 */
-	public function test_invalid_operator() {
-		$pluralForms = new Plural_Forms( 'n # 2' );
+	public function data_exceptions() {
+		return array(
+			array(
+				'n # 2',              // Invalid expression to parse
+				'Unknown symbol "#"', // Expected exception message
+				false,                // Whether to call the get() method or not
+			),
+			array(
+				'n & 1',
+				'Unknown operator "&"',
+				false,
+			),
+			array(
+				'((n)',
+				'Mismatched parentheses',
+				false,
+			),
+			array(
+				'(n))',
+				'Mismatched parentheses',
+				false,
+			),
+			array(
+				'n : 2',
+				'Missing starting "?" ternary operator',
+				false,
+			),
+			array(
+				'n ? 1',
+				'Unknown operator "?"',
+				true,
+			),
+			array(
+				'n n',
+				'Too many values remaining on the stack',
+				true,
+			),
+		);
 	}
 
 	/**
-	 * @expectedException Exception
-	 * @expectedExceptionMessage Unknown operator "&"
+	 * @dataProvider data_exceptions
 	 */
-	public function test_partial_operator() {
-		$pluralForms = new Plural_Forms( 'n & 1' );
-	}
-
-	/**
-	 * @expectedException Exception
-	 * @expectedExceptionMessage Mismatched parentheses
-	 */
-	public function test_mismatched_open_paren() {
-		$pluralForms = new Plural_Forms( '((n)' );
-	}
-
-	/**
-	 * @expectedException Exception
-	 * @expectedExceptionMessage Mismatched parentheses
-	 */
-	public function test_mismatched_close_paren() {
-		$pluralForms = new Plural_Forms( '(n))' );
-	}
-
-	/**
-	 * @expectedException Exception
-	 * @expectedExceptionMessage Missing starting "?" ternary operator
-	 */
-	public function test_missing_ternary_operator() {
-		$pluralForms = new Plural_Forms( 'n : 2' );
-	}
-
-	/**
-	 * @expectedException Exception
-	 * @expectedExceptionMessage Unknown operator "?"
-	 */
-	public function test_missing_ternary_else() {
-		$pluralForms = new Plural_Forms( 'n ? 1' );
-		$pluralForms->get( 1 );
-	}
-
-	/**
-	 * @expectedException Exception
-	 * @expectedExceptionMessage Too many values remaining on the stack
-	 */
-	public function test_overflow_stack() {
-		$pluralForms = new Plural_Forms( 'n n' );
-		$pluralForms->get( 1 );
+	public function test_exceptions( $expression, $expected_exception, $call_get ) {
+		try {
+			$pluralForms = new Plural_Forms( $expression );
+			if( $call_get ) {
+				$pluralForms->get( 1 );
+			}
+		} catch ( Exception $e ) {
+			$this->assertEquals( $expected_exception, $e->getMessage() );
+		}
 	}
 
 	public function test_cache() {
@@ -223,7 +219,7 @@ class PluralFormsTest extends WP_UnitTestCase {
 		$mock->expects($this->once())
 			->method('execute')
 			->with($this->identicalTo(2))
-			->willReturn(1);
+			->will($this->returnValue(1));
 
 		$first = $mock->get( 2 );
 		$second = $mock->get( 2 );
