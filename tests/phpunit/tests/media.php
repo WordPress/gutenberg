@@ -2138,6 +2138,118 @@ EOF;
 		$attachment_id = wp_insert_attachment( $data, '', 0 );
 		$this->assertSame( 0, $attachment_id );
 	}
+
+	/**
+	 * @ticket 35218
+	 */
+	function test_wp_get_media_creation_timestamp_video_asf() {
+		$metadata = array(
+			'fileformat' => 'asf',
+			'asf'        => array(
+				'file_properties_object' => array(
+					'creation_date_unix' => 123,
+				),
+			),
+		);
+
+		$this->assertEquals( 123, wp_get_media_creation_timestamp( $metadata ) );
+	}
+
+	/**
+	 * @ticket 35218
+	 */
+	function test_wp_get_media_creation_timestamp_video_matroska() {
+		$metadata = array(
+			'fileformat' => 'matroska',
+			'matroska'   => array(
+				'comments' => array(
+					'creation_time' => array(
+						'2015-12-24T17:40:09Z'
+					),
+				),
+			),
+		);
+
+		$this->assertEquals( 1450978809, wp_get_media_creation_timestamp( $metadata ) );
+	}
+
+	/**
+	 * @ticket 35218
+	 */
+	function test_wp_get_media_creation_timestamp_video_quicktime() {
+		$metadata = array(
+			'fileformat' => 'quicktime',
+			'quicktime'  => array(
+				'moov' => array(
+					'subatoms' => array(
+						array(
+							'creation_time_unix' => 1450978805,
+						),
+					),
+				),
+			),
+		);
+
+		$this->assertEquals( 1450978805, wp_get_media_creation_timestamp( $metadata ) );
+	}
+
+	/**
+	 * @ticket 35218
+	 */
+	function test_wp_get_media_creation_timestamp_video_webm() {
+		$metadata = array(
+			'fileformat' => 'webm',
+			'matroska'   => array(
+				'info' => array(
+					array(
+						'DateUTC_unix' => 1265680539,
+					),
+				),
+			),
+		);
+
+		$this->assertEquals( 1265680539, wp_get_media_creation_timestamp( $metadata ) );
+	}
+
+	/**
+	 * @ticket 35218
+	 */
+	function test_wp_read_video_metadata_adds_creation_date_with_quicktime() {
+		$video    = DIR_TESTDATA . '/uploads/small-video.mov';
+		$metadata = wp_read_video_metadata( $video );
+
+		$this->assertEquals( 1269120551, $metadata['created_timestamp'] );
+	}
+
+	/**
+	 * @ticket 35218
+	 */
+	function test_wp_read_video_metadata_adds_creation_date_with_mp4() {
+		$video    = DIR_TESTDATA . '/uploads/small-video.mp4';
+		$metadata = wp_read_video_metadata( $video );
+
+		$this->assertEquals( 1269120551, $metadata['created_timestamp'] );
+	}
+
+	/**
+	 * @ticket 35218
+	 */
+	function test_wp_read_video_metadata_adds_creation_date_with_mkv() {
+		$video    = DIR_TESTDATA . '/uploads/small-video.mkv';
+		$metadata = wp_read_video_metadata( $video );
+
+		$this->assertEquals( 1269120551, $metadata['created_timestamp'] );
+	}
+
+	/**
+	 * @ticket 35218
+	 */
+	function test_wp_read_video_metadata_adds_creation_date_with_webm() {
+		$video    = DIR_TESTDATA . '/uploads/small-video.webm';
+		$metadata = wp_read_video_metadata( $video );
+
+		$this->assertEquals( 1269120551, $metadata['created_timestamp'] );
+	}
 }
 
 /**
