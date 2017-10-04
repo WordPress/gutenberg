@@ -82,7 +82,7 @@ registerBlockType( 'core/image', {
 			{
 				type: 'shortcode',
 				tag: 'caption',
-				content: {
+				attributes: {
 					url: {
 						type: 'string',
 						source: attr( 'img', 'src' ),
@@ -102,15 +102,21 @@ registerBlockType( 'core/image', {
 					},
 					id: {
 						type: 'number',
+						shortcode: ( { named: { id } } ) => {
+							if ( ! id ) {
+								return;
+							}
+
+							return parseInt( id.replace( 'attachment_', '' ), 10 );
+						},
 					},
 					align: {
 						type: 'string',
+						shortcode: ( { named: { align = 'alignnone' } } ) => {
+							return align.replace( 'align', '' );
+						},
 					},
 				},
-				attributes: ( { named } ) => ( {
-					id: parseInt( named.id.replace( 'attachment_', '' ), 10 ),
-					align: named.align.replace( 'align', '' ),
-				} ),
 			},
 		],
 	},

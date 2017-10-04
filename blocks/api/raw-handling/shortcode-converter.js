@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, get, dropRight, last } from 'lodash';
+import { find, get, dropRight, last, mapValues, pickBy } from 'lodash';
 
 /**
  * Internal dependencies
@@ -31,15 +31,20 @@ export default function( HTML ) {
 		while ( ( match = shortcode.next( transform.tag, HTML, lastIndex ) ) ) {
 			lastIndex = match.index + match.content.length;
 
+			const attributes = mapValues(
+				pickBy( transform.attributes, ( schema ) => schema.shortcode ),
+				( schema ) => schema.shortcode( match.shortcode.attrs ),
+			);
+
 			const block = createBlock(
 				blockType.name,
 				getBlockAttributes(
 					{
 						...blockType,
-						attributes: transform.content,
+						attributes: transform.attributes,
 					},
 					match.shortcode.content,
-					transform.attributes( match.shortcode.attrs ),
+					attributes,
 				)
 			);
 
