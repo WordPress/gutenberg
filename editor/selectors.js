@@ -11,6 +11,7 @@ import {
 	reduce,
 	some,
 	values,
+	keys,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -853,4 +854,17 @@ export function getNotices( state ) {
 export function getRecentlyUsedBlocks( state ) {
 	// resolves the block names in the state to the block type settings
 	return state.preferences.recentlyUsedBlocks.map( blockType => getBlockType( blockType ) );
+}
+
+/**
+ * Resolves the block usage stats into a list of the most frequently used blocks.
+ *
+ * @param {Object} state Global application state
+ * @return {Array}       List of block type settings
+ */
+export function getMostFrequentlyUsedBlocks( state ) {
+	const { blockUsage } = state.preferences;
+	return keys( blockUsage ).sort( ( a, b ) => blockUsage[ b ] - blockUsage[ a ] )
+		.slice( 0, 3 )
+		.map( blockType => getBlockType( blockType ) );
 }
