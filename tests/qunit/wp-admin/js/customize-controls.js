@@ -710,9 +710,9 @@ jQuery( window ).load( function (){
 			params: {
 				section: section.id,
 				type: 'date_time',
+				setting: new wp.customize.Value( datetime ),
 				includeTime: true,
-				content: '<li id="customize-control-' + controlId + '" class="customize-control"></li>',
-				defaultValue: datetime
+				content: '<li id="customize-control-' + controlId + '" class="customize-control"></li>'
 			}
 		} );
 

@@ -2581,7 +2581,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$data = json_decode( $json, true );
 		$this->assertNotEmpty( $data );
 
-		$this->assertEqualSets( array( 'theme', 'url', 'browser', 'panels', 'sections', 'nonce', 'autofocus', 'documentTitleTmpl', 'previewableDevices', 'changeset', 'timeouts', 'initialClientTimestamp', 'initialServerDate', 'initialServerTimestamp', 'l10n' ), array_keys( $data ) );
+		$this->assertEqualSets( array( 'theme', 'url', 'browser', 'panels', 'sections', 'nonce', 'autofocus', 'documentTitleTmpl', 'previewableDevices', 'changeset', 'timeouts', 'dateFormat', 'timeFormat', 'initialClientTimestamp', 'initialServerDate', 'initialServerTimestamp', 'l10n' ), array_keys( $data ) );
 		$this->assertEquals( $autofocus, $data['autofocus'] );
 		$this->assertArrayHasKey( 'save', $data['nonce'] );
 		$this->assertArrayHasKey( 'preview', $data['nonce'] );
@@ -2596,6 +2596,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 				'uuid',
 				'currentUserCanPublish',
 				'publishDate',
+				'statusChoices',
 			),
 			array_keys( $data['changeset'] )
 		);
