@@ -21,6 +21,10 @@
 	@include break-medium() {
 		top: $admin-bar-height;
 	}
+
+	@include break-large() {
+		left: $admin-sidebar-width;
+	}
 }
 
 .sticky-menu .editor-header {	/* Sticky is when on smaller breakpoints, nav menu is manually opened */
