@@ -69,6 +69,7 @@ registerBlockType( 'core/code', {
 				className={ className }
 				value={ attributes.content }
 				onChange={ ( event ) => setAttributes( { content: event.target.value } ) }
+				aria-label={ __( 'Code block' ) }
 				placeholder={ __( 'Write code…' ) }
 			/>,
 		];

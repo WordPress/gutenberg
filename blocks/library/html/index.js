@@ -67,6 +67,7 @@ registerBlockType( 'core/html', {
 				key="editor"
 				value={ attributes.content }
 				onChange={ ( event ) => setAttributes( { content: event.target.value } ) }
+				aria-label={ __( 'HTML' ) }
 			/>,
 		focus && (
 			<InspectorControls key="inspector">
