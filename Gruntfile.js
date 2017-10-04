@@ -1,5 +1,8 @@
 /* jshint node:true */
 /* globals Set */
+var webpackConfig = require( './webpack.config.prod' );
+var webpackDevConfig = require( './webpack.config.dev' );
+
 module.exports = function(grunt) {
 	var path = require('path'),
 		fs = require( 'fs' ),
@@ -7,20 +10,12 @@ module.exports = function(grunt) {
 		SOURCE_DIR = 'src/',
 		BUILD_DIR = 'build/',
  		BANNER_TEXT = '/*! This file is auto-generated */',
-		autoprefixer = require('autoprefixer'),
-		mediaConfig = {},
-		mediaBuilds = ['audiovideo', 'grid', 'models', 'views'];
+		autoprefixer = require( 'autoprefixer' );
 
 	// Load tasks.
 	require('matchdep').filterDev(['grunt-*', '!grunt-legacy-util']).forEach( grunt.loadNpmTasks );
 	// Load legacy utils
 	grunt.util = require('grunt-legacy-util');
-
-	mediaBuilds.forEach( function ( build ) {
-		var path = SOURCE_DIR + 'wp-includes/js/media';
-		mediaConfig[ build ] = { files : {} };
-		mediaConfig[ build ].files[ path + '-' + build + '.js' ] = [ path + '/' + build + '.manifest.js' ];
-	} );
 
 	// Project configuration.
 	grunt.initConfig({
@@ -177,7 +172,6 @@ module.exports = function(grunt) {
 				}
 			}
 		},
-		browserify: mediaConfig,
 		sass: {
 			colors: {
 				expand: true,
@@ -338,9 +332,6 @@ module.exports = function(grunt) {
 				]
 			},
 			media: {
-				options: {
-					browserify: true
-				},
 				src: [
 					SOURCE_DIR + 'wp-includes/js/media/**/*.js'
 				]
@@ -553,7 +544,10 @@ module.exports = function(grunt) {
 				dest: SOURCE_DIR + 'wp-includes/js/jquery/jquery.masonry.min.js'
 			}
 		},
-
+		webpack: {
+			prod: webpackConfig,
+			dev: webpackDevConfig
+		},
 		concat: {
 			tinymce: {
 				options: {
@@ -719,7 +713,11 @@ module.exports = function(grunt) {
 				}
 			},
 			config: {
-				files: 'Gruntfile.js'
+				files: [
+					'Gruntfile.js',
+					'webpack-dev.config.js',
+					'webpack.config.js'
+				]
 			},
 			colors: {
 				files: [SOURCE_DIR + 'wp-admin/css/colors/**'],
@@ -757,6 +755,9 @@ module.exports = function(grunt) {
 
 	// Register tasks.
 
+	// Webpack task.
+	grunt.loadNpmTasks( 'grunt-webpack' );
+
 	// RTL task.
 	grunt.registerTask('rtl', ['rtlcss:core', 'rtlcss:colors']);
 
@@ -780,15 +781,9 @@ module.exports = function(grunt) {
 	grunt.renameTask( 'watch', '_watch' );
 
 	grunt.registerTask( 'watch', function() {
-		if ( ! this.args.length || this.args.indexOf( 'browserify' ) > -1 ) {
-			grunt.config( 'browserify.options', {
-				browserifyOptions: {
-					debug: true
-				},
-				watch: true
-			} );
+		if ( ! this.args.length || this.args.indexOf( 'webpack' ) > -1 ) {
 
-			grunt.task.run( 'browserify' );
+			grunt.task.run( 'webpack:dev' );
 		}
 
 		grunt.task.run( '_' + this.nameArgs );
@@ -799,7 +794,7 @@ module.exports = function(grunt) {
 	] );
 
 	grunt.registerTask( 'precommit:js', [
-		'browserify',
+		'webpack:prod',
 		'jshint:corejs',
 		'uglify:masonry',
 		'qunit:compiled'
@@ -978,7 +973,7 @@ module.exports = function(grunt) {
 	grunt.event.on('watch', function( action, filepath, target ) {
 		var src;
 
-		if ( [ 'all', 'rtl', 'browserify' ].indexOf( target ) === -1 ) {
+		if ( [ 'all', 'rtl', 'webpack' ].indexOf( target ) === -1 ) {
 			return;
 		}
 

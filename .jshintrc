@@ -21,6 +21,9 @@
     "Backbone": false,
     "jQuery": false,
     "JSON": false,
-    "wp": false
+    "wp": false,
+    "export": false,
+    "module": false,
+    "require": false
   }
 }
