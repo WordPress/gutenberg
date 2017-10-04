@@ -15,7 +15,7 @@ function gutenberg_boilerplate_enqueue_block_editor_assets() {
 	wp_enqueue_script(
 		'gutenberg-boilerplate-es5-step01',
 		plugins_url( 'step-01/block.js', __FILE__ ),
-		array( 'wp-blocks', 'wp-element' )
+		array( 'wp-editor', 'wp-element' )
 	);
 }
 add_action( 'enqueue_block_editor_assets', 'gutenberg_boilerplate_enqueue_block_editor_assets' );
@@ -23,7 +23,7 @@ add_action( 'enqueue_block_editor_assets', 'gutenberg_boilerplate_enqueue_block_
 
 Note the two script dependencies:
 
-- __`wp-blocks`__ includes block type registration and related functions
+- __`wp-editor`__ includes block type registration and related functions
 - __`wp-element`__ includes the [WordPress Element abstraction](https://github.com/WordPress/gutenberg/tree/master/element) for describing the structure of your blocks
 
 ## Registering the Block
@@ -34,7 +34,7 @@ With the script enqueued, let's look at the implementation of the block itself:
 {% ES5 %}
 ```js
 var el = wp.element.createElement,
-	registerBlockType = wp.blocks.registerBlockType,
+	registerBlockType = wp.editor.registerBlockType,
 	blockStyle = { backgroundColor: '#900', color: '#fff', padding: '20px' };
 
 registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-01', {
@@ -55,7 +55,7 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-01', {
 ```
 {% ESNext %}
 ```js
-const { registerBlockType } = wp.blocks;
+const { registerBlockType } = wp.editor;
 const blockStyle = { backgroundColor: '#900', color: '#fff', padding: '20px' };
 
 registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-01', {

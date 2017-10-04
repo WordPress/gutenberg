@@ -14,7 +14,7 @@ $z-layers: (
 	'.editor-inserter__tabs': 1,
 	'.editor-inserter__tab.is-active': 1,
 	'.components-panel__header': 1,
-	'.blocks-format-toolbar__link-modal': 1,
+	'.editor-format-toolbar__link-modal': 1,
 	'.editor-block-switcher__menu': 2,
 	'.editor-block-mover': 10,
 	'.blocks-gallery-image__inline-menu': 10,
@@ -37,7 +37,7 @@ $z-layers: (
 	// #adminmenuwrap { z-index: 9990 }
 	'.components-popover': 1000000,
 	'.components-autocomplete__results': 1000000,
-	'.blocks-url-input__suggestions': 9999,
+	'.editor-url-input__suggestions': 9999,
 );
 
 @function z-index( $key ) {

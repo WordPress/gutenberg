@@ -1,6 +1,6 @@
 # Block Controls: Toolbars and Inspector
 
-To simplify block customization and ensure a consistent experience for users, there are a number of built-in UI patterns to help generate the editor preview. Like with the `Editable` component covered in the previous chapter, the `wp.blocks` global includes a few other common components to render editing interfaces. In this chapter, we'll explore toolbars and the block inspector.
+To simplify block customization and ensure a consistent experience for users, there are a number of built-in UI patterns to help generate the editor preview. Like with the `Editable` component covered in the previous chapter, the `wp.editor` global includes a few other common components to render editing interfaces. In this chapter, we'll explore toolbars and the block inspector.
 
 ## Toolbar
 
@@ -14,11 +14,11 @@ You can also customize the toolbar to include controls specific to your block ty
 {% ES5 %}
 ```js
 var el = wp.element.createElement,
-	registerBlockType = wp.blocks.registerBlockType,
-	Editable = wp.blocks.Editable,
-	BlockControls = wp.blocks.BlockControls,
-	AlignmentToolbar = wp.blocks.AlignmentToolbar,
-	children = wp.blocks.source.children;
+	registerBlockType = wp.editor.registerBlockType,
+	Editable = wp.editor.Editable,
+	BlockControls = wp.editor.BlockControls,
+	AlignmentToolbar = wp.editor.AlignmentToolbar,
+	children = wp.editor.source.children;
 
 registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 	title: 'Hello World (Step 4)',
@@ -90,7 +90,7 @@ const {
 	BlockControls,
 	AlignmentToolbar,
 	source
-} = wp.blocks;
+} = wp.editor;
 const { children } = source;
 
 registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {

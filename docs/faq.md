@@ -119,7 +119,7 @@ This also <a href="https://github.com/WordPress/gutenberg/issues/1516">gives us 
 In JS:
 
 ```js
-var blocks = wp.blocks.parse( postContent );
+var blocks = wp.editor.parse( postContent );
 ```
 
 In PHP:

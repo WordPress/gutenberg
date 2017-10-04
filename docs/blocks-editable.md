@@ -12,9 +12,9 @@ One challenge of maintaining the representation of a block as a JavaScript objec
 {% ES5 %}
 ```js
 var el = wp.element.createElement,
-	registerBlockType = wp.blocks.registerBlockType,
-	Editable = wp.blocks.Editable,
-	children = wp.blocks.source.children;
+	registerBlockType = wp.editor.registerBlockType,
+	Editable = wp.editor.Editable,
+	children = wp.editor.source.children;
 
 registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-03', {
 	title: 'Hello World (Step 3)',
@@ -60,7 +60,7 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-03', {
 ```
 {% ESNext %}
 ```js
-const { registerBlockType, Editable, source } = wp.blocks;
+const { registerBlockType, Editable, source } = wp.editor;
 const { children } = source;
 
 registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-03', {

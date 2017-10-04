@@ -1,0 +1,28 @@
+$blocks-button__height: 46px;
+
+.editor-visual-editor__block[data-type="core/button"] {
+	&[data-align="center"] {
+		text-align: center;
+	}
+
+	&[data-align="right"] {
+		text-align: right;
+	}
+}
+
+.wp-block-button {
+	.editor-format-toolbar__link-modal {
+		z-index: 2;
+		top: $blocks-button__height + 2px;
+		left: 50%;
+		transform: translateX( -50% );
+	}
+
+	.editor-link-url__suggestions {
+		right: -35px;
+	}
+
+	.editor-editable__tinymce {
+		cursor: text;
+	}
+}
