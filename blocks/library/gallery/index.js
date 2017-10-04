@@ -9,7 +9,6 @@ import { __ } from '@wordpress/i18n';
 import './editor.scss';
 import './style.scss';
 import { registerBlockType, source } from '../../api';
-import GalleryImage from './gallery-image';
 import { default as GalleryBlock, defaultColumnsNumber } from './block';
 
 const { query, attr } = source;
@@ -47,6 +46,35 @@ registerBlockType( 'core/gallery', {
 		},
 	},
 
+	transforms: {
+		from: [
+			{
+				type: 'shortcode',
+				tag: 'gallery',
+				content: {
+					images: {
+						type: 'array',
+						default: [],
+					},
+					columns: {
+						type: 'number',
+					},
+					linkTo: {
+						type: 'string',
+						default: 'attachment',
+					},
+				},
+				attributes: ( { named } ) => ( {
+					linkTo: named.link === 'file' ? 'media' : named.link,
+					columns: parseInt( named.columns, 10 ) || 3,
+					images: named.ids.split( ',' ).map( ( id ) => ( {
+						id: parseInt( id, 10 ),
+					} ) ),
+				} ),
+			},
+		],
+	},
+
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
 		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
@@ -60,9 +88,26 @@ registerBlockType( 'core/gallery', {
 		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
 		return (
 			<div className={ `align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` } >
-				{ images.map( ( img ) => (
-					<GalleryImage key={ img.url } img={ img } linkTo={ linkTo } />
-				) ) }
+				{ images.map( ( image ) => {
+					let href;
+
+					switch ( linkTo ) {
+						case 'media':
+							href = image.url;
+							break;
+						case 'attachment':
+							href = image.link;
+							break;
+					}
+
+					const img = <img src={ image.url } alt={ image.alt } data-id={ image.id } />;
+
+					return (
+						<figure key={ image.id || image.url } className="blocks-gallery-image">
+							{ href ? <a href={ href }>{ img }</a> : img }
+						</figure>
+					);
+				} ) }
 			</div>
 		);
 	},
