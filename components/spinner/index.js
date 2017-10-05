@@ -1,3 +1,10 @@
-const spinner = <span className="spinner is-active" />;
+/**
+ * External dependencies
+ */
+import classnames from 'classnames';
 
-export default () => spinner;
+function Spinner( { className } ) {
+	return <span className={ classnames( 'spinner', 'is-active', className ) } />;
+}
+
+export default Spinner;

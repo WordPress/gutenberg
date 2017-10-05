@@ -21,7 +21,8 @@ class ReusableBlockEdit extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.toggleEditing = this.toggleEditing.bind( this );
+		this.startEditing = this.startEditing.bind( this );
+		this.stopEditing = this.stopEditing.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
 		this.setName = this.setName.bind( this );
 		this.updateReusableBlock = this.updateReusableBlock.bind( this );
@@ -39,12 +40,16 @@ class ReusableBlockEdit extends Component {
 		}
 	}
 
-	toggleEditing() {
-		this.setState( ( prevState ) => ( {
-			isEditing: ! prevState.isEditing,
+	startEditing() {
+		this.setState( { isEditing: true } );
+	}
+
+	stopEditing() {
+		this.setState( {
+			isEditing: false,
 			name: null,
 			attributes: null,
-		} ) );
+		} );
 	}
 
 	setAttributes( attributes ) {
@@ -59,10 +64,9 @@ class ReusableBlockEdit extends Component {
 
 	updateReusableBlock() {
 		const { name, attributes } = this.state;
-		// TODO: Think about a loading indicator, success message, failure message, etc.
 		this.props.updateReusableBlock( pickBy( { name, attributes } ) );
 		this.props.saveReusableBlock();
-		this.toggleEditing();
+		this.stopEditing();
 	}
 
 	render() {
@@ -92,11 +96,11 @@ class ReusableBlockEdit extends Component {
 					name={ name !== null ? name : reusableBlock.name }
 					isSaving={ reusableBlock.isSaving }
 					saveError={ reusableBlock.saveError }
-					onEdit={ this.toggleEditing }
+					onEdit={ this.startEditing }
 					onAttach={ attachBlock }
 					onChangeName={ this.setName }
 					onSave={ this.updateReusableBlock }
-					onCancel={ this.toggleEditing } />
+					onCancel={ this.stopEditing } />
 			),
 		];
 	}

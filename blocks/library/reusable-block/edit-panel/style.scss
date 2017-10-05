@@ -9,12 +9,15 @@
 	margin: $block-padding (-$block-padding) (-$block-padding);
 	padding: 10px $block-padding;
 
-	.reusable-block-edit-panel__name-label {
-		font-weight: 600;
+	.reusable-block-edit-panel__spinner {
+		margin: 0 5px;
+	}
+
+	.reusable-block-edit-panel__info {
 		margin-right: auto;
 	}
 
-	.reusable-block-edit-panel__name-field {
+	.reusable-block-edit-panel__name {
 		flex-grow: 1;
 		font-size: 14px;
 		height: 30px;
