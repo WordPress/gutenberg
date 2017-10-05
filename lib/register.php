@@ -66,7 +66,7 @@ function gutenberg_menu() {
 		'the_gutenberg_project'
 	);
 
-	$submenu['gutenberg'][] = array(
+	$submenu['gutenberg.php'][] = array(
 		__( 'Feedback', 'gutenberg' ),
 		'edit_posts',
 		'http://wordpressdotorg.polldaddy.com/s/gutenberg-support',
