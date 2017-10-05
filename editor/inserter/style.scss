@@ -106,18 +106,21 @@ input[type="search"].editor-inserter__search {
 		cursor: default;
 	}
 
-	&:hover:not(:disabled),
-	&:focus:not(:disabled) {
-		color: $blue-medium-500;
-		outline: none;
-		position: relative;
-	}
+	&:not(:disabled) {
+		&:hover {
+			color: $blue-medium-500;
+		}
 
-	&:active,
-	&.is-active {
-		background: $dark-gray-500;
-		position: relative;
-		color: $white;
+		&:focus {
+			outline: 1px solid $dark-gray-500;
+		}
+
+		&:active,
+		&.is-active {
+			background: $dark-gray-500;
+			position: relative;
+			color: $white;
+		}
 	}
 
 	.dashicon {
