@@ -94,3 +94,37 @@
 	display: inline-flex;
 	align-items: center;
 }
+
+.editor-mode-switcher {
+	margin-left: $item-spacing;
+}
+
+.editor-header__left .components-button {
+	margin-right: $item-spacing;
+}
+
+.editor-header .components-button {
+	border-radius: 3px;
+
+	&.is-toggled {
+		color: $white;
+	}
+
+	// put the gray background on a separate layer, so as to match the size of the publish button (34px)
+	&.is-toggled::before {
+		content: "";
+		border-radius: 3px;
+		position: absolute;
+		z-index: -1;
+		background: $dark-gray-500;
+		top: 1px;
+		right: 1px;
+		bottom: 1px;
+		left: 1px;
+	}
+
+	&.editor-publish-button {
+		height: 33px;
+		line-height: 32px;
+	}
+}
