@@ -159,6 +159,25 @@ class Test_Nav_Menus extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 13910
+	 */
+	function test_wp_get_nav_menu_name() {
+		// Register a nav menu location.
+		register_nav_menu( 'primary', 'Primary Navigation' );
+
+		// Create a menu with a title.
+		$menu = wp_create_nav_menu( 'My Menu' );
+
+		// Assign the menu to the `primary` location.
+		$locations = get_nav_menu_locations();
+		$menu_obj = wp_get_nav_menu_object( $menu );
+		$locations['primary'] = $menu_obj->term_id;
+		set_theme_mod( 'nav_menu_locations', $locations );
+
+		$this->assertEquals( 'My Menu', wp_get_nav_menu_name( 'primary' ) );
+	}
+
+	/**
 	 * @ticket 29460
 	 */
 	function test_orderby_name_by_default() {
