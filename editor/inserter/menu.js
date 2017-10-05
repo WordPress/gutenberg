@@ -51,11 +51,11 @@ export class InserterMenu extends Component {
 	}
 
 	componentDidMount() {
-		document.addEventListener( 'keydown', this.onKeyDown );
+		document.addEventListener( 'keydown', this.onKeyDown, true );
 	}
 
 	componentWillUnmount() {
-		document.removeEventListener( 'keydown', this.onKeyDown );
+		document.removeEventListener( 'keydown', this.onKeyDown, true );
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
@@ -239,28 +239,32 @@ export class InserterMenu extends Component {
 					return;
 				}
 				this.focusPrevious( this );
-
 				break;
+
 			case UP:
 				keydown.preventDefault();
 				this.focusPrevious( this );
-
 				break;
+
 			case RIGHT:
 				if ( this.state.currentFocus === 'search' ) {
 					return;
 				}
 				this.focusNext( this );
-
 				break;
+
 			case DOWN:
 				keydown.preventDefault();
 				this.focusNext( this );
+				break;
 
-				break;
-			default :
-				break;
+			default:
+				return;
 		}
+
+		// Since unhandled key will return in the default case, we can assume
+		// having reached this point implies that the key is handled.
+		keydown.stopImmediatePropagation();
 	}
 
 	changeMenuSelection( refName ) {

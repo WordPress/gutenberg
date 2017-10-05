@@ -281,6 +281,26 @@
 			border-bottom: 3px solid $blue-medium-500;
 		}
 	}
+
+	.editor-visual-editor & .editor-inserter {
+		position: absolute;
+		left: $block-padding + $block-mover-padding-visible;
+		top: 100%;
+		transform: translate( -50%, -50% );
+		margin-top: 0;
+		margin-bottom: 0;
+		z-index: z-index( '.editor-visual-editor .editor-visual-editor__block .editor-inserter' );
+	}
+
+	.editor-visual-editor & .editor-inserter__toggle {
+		padding: 4px;
+		background-color: white;
+
+		&,
+		& .dashicon {
+			display: block;
+		}
+	}
 }
 
 .editor-visual-editor .editor-inserter {
