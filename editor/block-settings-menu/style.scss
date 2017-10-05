@@ -1,7 +1,7 @@
 .editor-block-settings-menu {
 	position: absolute;
 	top: 0;
-	right: 0;
+	right: 4px;
 	padding: 6px 0 6px 14px; // handles hover area
 
 	// Mobile
@@ -14,7 +14,7 @@
 }
 
 .editor-block-settings-menu__content {
-	margin-top: 10px;
+	margin-top: 8px;
 }
 
 .editor-block-settings-menu__toggle {
@@ -50,6 +50,6 @@
 	}
 
 	.editor-block-settings-menu__content &:first-child {
-		margin-bottom: 4px;
+		margin-bottom: 8px;
 	}
 }
