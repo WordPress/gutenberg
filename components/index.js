@@ -6,6 +6,7 @@ export { default as ClipboardButton } from './clipboard-button';
 export { default as Dashicon } from './dashicon';
 export { default as DropZone } from './drop-zone';
 export { default as DropZoneProvider } from './drop-zone/provider';
+export { default as Dropdown } from './dropdown';
 export { default as DropdownMenu } from './dropdown-menu';
 export { default as ExternalLink } from './external-link';
 export { default as FormFileUpload } from './form-file-upload';
