@@ -1,6 +1,7 @@
 import './paragraph';
 import './image';
 import './gallery';
+import './gutenvert';
 import './heading';
 import './quote';
 import './embed';
