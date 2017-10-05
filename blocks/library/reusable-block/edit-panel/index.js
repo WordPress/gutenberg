@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
 import './style.scss';
 
 function ReusableBlockEditPanel( props ) {
-	const { isEditing, name, isSaving, saveError, onEdit, onAttach, onChangeName, onSave, onCancel } = props;
+	const { isEditing, name, isSaving, saveError, onEdit, onDetach, onChangeName, onSave, onCancel } = props;
 
 	return (
 		<div className="reusable-block-edit-panel">
@@ -41,10 +41,10 @@ function ReusableBlockEditPanel( props ) {
 					{ __( 'Edit' ) }
 				</Button>,
 				<Button
-					key="attach"
+					key="detach"
 					isLarge
 					className="reusable-block-edit-panel__button"
-					onClick={ onAttach }>
+					onClick={ onDetach }>
 					{ __( 'Detach' ) }
 				</Button>,
 			] }

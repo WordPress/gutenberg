@@ -342,7 +342,7 @@ export default {
 			}
 		);
 	},
-	ATTACH_BLOCK( action, store ) {
+	MAKE_BLOCK_STATIC( action, store ) {
 		const { getState, dispatch } = store;
 
 		const oldBlock = getBlock( getState(), action.uid );
@@ -350,7 +350,7 @@ export default {
 		const newBlock = createBlock( reusableBlock.type, reusableBlock.attributes );
 		dispatch( replaceBlocks( [ oldBlock.uid ], [ newBlock ] ) );
 	},
-	DETACH_BLOCK( action, store ) {
+	MAKE_BLOCK_REUSABLE( action, store ) {
 		const { getState, dispatch } = store;
 
 		const oldBlock = getBlock( getState(), action.uid );

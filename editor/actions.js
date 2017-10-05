@@ -420,28 +420,28 @@ export function saveReusableBlock( id ) {
 
 /**
  * Returns an action object used to convert a reusable block into a static
- * block, thus 'attaching' the block to the post.
+ * block.
  *
  * @param {Object} uid The ID of the block to attach
  * @return {Object}    Action object
  */
-export function attachBlock( uid ) {
+export function makeBlockStatic( uid ) {
 	return {
-		type: 'ATTACH_BLOCK',
+		type: 'MAKE_BLOCK_STATIC',
 		uid,
 	};
 }
 
 /**
  * Returns an action object used to convert a static block into a reusable
- * block, thus 'detaching' the block from the page.
+ * block.
  *
  * @param {Object} uid The ID of the block to detach
  * @return {Object}    Action object
  */
-export function detachBlock( uid ) {
+export function makeBlockReusable( uid ) {
 	return {
-		type: 'DETACH_BLOCK',
+		type: 'MAKE_BLOCK_REUSABLE',
 		uid,
 	};
 }

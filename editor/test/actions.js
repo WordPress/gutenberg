@@ -9,8 +9,8 @@ import {
 	fetchReusableBlocks,
 	updateReusableBlock,
 	saveReusableBlock,
-	attachBlock,
-	detachBlock,
+	makeBlockStatic,
+	makeBlockReusable,
 } from '../actions';
 
 describe( 'actions', () => {
@@ -102,18 +102,18 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'attachBlock', () => {
+	describe( 'makeBlockStatic', () => {
 		const uid = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-		expect( attachBlock( uid ) ).toEqual( {
-			type: 'ATTACH_BLOCK',
+		expect( makeBlockStatic( uid ) ).toEqual( {
+			type: 'MAKE_BLOCK_STATIC',
 			uid,
 		} );
 	} );
 
-	describe( 'detachBlock', () => {
+	describe( 'makeBlockReusable', () => {
 		const uid = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-		expect( detachBlock( uid ) ).toEqual( {
-			type: 'DETACH_BLOCK',
+		expect( makeBlockReusable( uid ) ).toEqual( {
+			type: 'MAKE_BLOCK_REUSABLE',
 			uid,
 		} );
 	} );

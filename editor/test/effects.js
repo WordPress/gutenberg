@@ -22,8 +22,8 @@ import {
 	savePost,
 	updateReusableBlock,
 	saveReusableBlock,
-	attachBlock,
-	detachBlock,
+	makeBlockStatic,
+	makeBlockReusable,
 } from '../actions';
 import effects from '../effects';
 import * as selectors from '../selectors';
@@ -326,8 +326,8 @@ describe( 'effects', () => {
 		} );
 	} );
 
-	describe( '.ATTACH_BLOCK', () => {
-		const handler = effects.ATTACH_BLOCK;
+	describe( '.MAKE_BLOCK_STATIC', () => {
+		const handler = effects.MAKE_BLOCK_STATIC;
 
 		const state = {};
 		const dispatch = jest.fn();
@@ -368,7 +368,7 @@ describe( 'effects', () => {
 			selectors.getBlock.mockReturnValue( oldBlock );
 			selectors.getReusableBlock.mockReturnValue( reusableBlock );
 			uuid.mockReturnValue( '4fbd3373-d4e0-454e-97a0-08bfeb8a1cea' );
-			handler( attachBlock( oldBlock.uid ), store );
+			handler( makeBlockStatic( oldBlock.uid ), store );
 
 			expect( selectors.getBlock ).toHaveBeenCalledWith( state, oldBlock.uid );
 			expect( selectors.getReusableBlock ).toHaveBeenCalledWith( state, reusableBlock.id );
@@ -381,8 +381,8 @@ describe( 'effects', () => {
 		} );
 	} );
 
-	describe( '.DETACH_BLOCK', () => {
-		const handler = effects.DETACH_BLOCK;
+	describe( '.MAKE_BLOCK_REUSABLE', () => {
+		const handler = effects.MAKE_BLOCK_REUSABLE;
 
 		const state = {};
 		const dispatch = jest.fn();
@@ -416,7 +416,7 @@ describe( 'effects', () => {
 
 			selectors.getBlock.mockReturnValue( oldBlock );
 			uuid.mockReturnValue( reusableBlockId );
-			handler( detachBlock( oldBlock.uid ), store );
+			handler( makeBlockReusable( oldBlock.uid ), store );
 
 			expect( selectors.getBlock ).toHaveBeenCalledWith( state, oldBlock.uid );
 			expect( dispatch ).toHaveBeenCalledWith(
