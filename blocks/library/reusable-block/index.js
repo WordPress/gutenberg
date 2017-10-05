@@ -59,7 +59,6 @@ class ReusableBlockEdit extends Component {
 
 	updateReusableBlock() {
 		const { name, attributes } = this.state;
-		// TODO: Can these two actions be combined?
 		// TODO: Think about a loading indicator, success message, failure message, etc.
 		this.props.updateReusableBlock( pickBy( { name, attributes } ) );
 		this.props.saveReusableBlock();
@@ -91,6 +90,8 @@ class ReusableBlockEdit extends Component {
 					key="panel"
 					isEditing={ isEditing }
 					name={ name !== null ? name : reusableBlock.name }
+					isSaving={ reusableBlock.isSaving }
+					saveError={ reusableBlock.saveError }
 					onEdit={ this.toggleEditing }
 					onAttach={ attachBlock }
 					onChangeName={ this.setName }

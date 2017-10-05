@@ -20,7 +20,7 @@ import {
 	replaceBlocks,
 	editPost,
 	savePost,
-	addReusableBlocks,
+	updateReusableBlock,
 	saveReusableBlock,
 	attachBlock,
 	detachBlock,
@@ -420,7 +420,7 @@ describe( 'effects', () => {
 
 			expect( selectors.getBlock ).toHaveBeenCalledWith( state, oldBlock.uid );
 			expect( dispatch ).toHaveBeenCalledWith(
-				addReusableBlocks( {
+				updateReusableBlock( reusableBlockId, {
 					id: reusableBlockId,
 					name: 'Untitled block',
 					type: oldBlock.name,

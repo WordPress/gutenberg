@@ -1048,9 +1048,9 @@ describe( 'state', () => {
 			expect( state ).toEqual( {} );
 		} );
 
-		it( 'should add a reusable block', () => {
+		it( 'should add fetched reusable blocks', () => {
 			const state = reusableBlocks( {}, {
-				type: 'ADD_REUSABLE_BLOCKS',
+				type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
 				reusableBlocks: [
 					{
 						id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
@@ -1071,6 +1071,36 @@ describe( 'state', () => {
 					attributes: {
 						content: 'Hello!',
 					},
+					isSaving: false,
+					saveError: null,
+				},
+			} );
+		} );
+
+		it( 'should add a reusable block', () => {
+			const state = reusableBlocks( {}, {
+				type: 'UPDATE_REUSABLE_BLOCK',
+				id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
+				reusableBlock: {
+					id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
+					name: 'My cool block',
+					type: 'core/paragraph',
+					attributes: {
+						content: 'Hello!',
+					},
+				},
+			} );
+
+			expect( state ).toEqual( {
+				'358b59ee-bab3-4d6f-8445-e8c6971a5605': {
+					id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
+					name: 'My cool block',
+					type: 'core/paragraph',
+					attributes: {
+						content: 'Hello!',
+					},
+					isSaving: false,
+					saveError: null,
 				},
 			} );
 		} );
@@ -1085,6 +1115,8 @@ describe( 'state', () => {
 						content: 'Hello!',
 						dropCap: true,
 					},
+					isSaving: false,
+					saveError: null,
 				},
 			};
 			const state = reusableBlocks( initialState, {
@@ -1107,23 +1139,77 @@ describe( 'state', () => {
 						content: 'Yo!',
 						dropCap: true,
 					},
+					isSaving: false,
+					saveError: null,
 				},
 			} );
 		} );
 
-		it( 'should do nothing when updating a non existent block', () => {
-			const state = reusableBlocks( {}, {
-				type: 'UPDATE_REUSABLE_BLOCK',
-				id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
-				reusableBlock: {
-					name: 'My better block',
-					attributes: {
-						content: 'Yo!',
-					},
+		it( 'should indicate that a reusable block is saving', () => {
+			const initialState = {
+				'358b59ee-bab3-4d6f-8445-e8c6971a5605': {
+					id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
+					isSaving: false,
+					saveError: null,
 				},
+			};
+			const state = reusableBlocks( initialState, {
+				type: 'SAVE_REUSABLE_BLOCK',
+				id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
 			} );
 
-			expect( state ).toEqual( {} );
+			expect( state ).toEqual( {
+				'358b59ee-bab3-4d6f-8445-e8c6971a5605': {
+					id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
+					isSaving: true,
+					saveError: null,
+				},
+			} );
+		} );
+
+		it( 'should stop indicating that a reusable block is saving', () => {
+			const initialState = {
+				'358b59ee-bab3-4d6f-8445-e8c6971a5605': {
+					id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
+					isSaving: true,
+					saveError: null,
+				},
+			};
+			const state = reusableBlocks( initialState, {
+				type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
+				id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
+			} );
+
+			expect( state ).toEqual( {
+				'358b59ee-bab3-4d6f-8445-e8c6971a5605': {
+					id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
+					isSaving: false,
+					saveError: null,
+				},
+			} );
+		} );
+
+		it( 'should indicate that a reusable block had an error saving', () => {
+			const initialState = {
+				'358b59ee-bab3-4d6f-8445-e8c6971a5605': {
+					id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
+					isSaving: true,
+					saveError: null,
+				},
+			};
+			const state = reusableBlocks( initialState, {
+				type: 'SAVE_REUSABLE_BLOCK_FAILURE',
+				id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
+				error: { message: 'Save failed' },
+			} );
+
+			expect( state ).toEqual( {
+				'358b59ee-bab3-4d6f-8445-e8c6971a5605': {
+					id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
+					isSaving: false,
+					saveError: { message: 'Save failed' },
+				},
+			} );
 		} );
 	} );
 } );

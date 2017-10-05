@@ -32,7 +32,7 @@ import {
 	removeNotice,
 	savePost,
 	editPost,
-	addReusableBlocks,
+	updateReusableBlock,
 	saveReusableBlock,
 } from './actions';
 import {
@@ -308,19 +308,13 @@ export default {
 			( error ) => {
 				dispatch( {
 					type: 'FETCH_REUSABLE_BLOCKS_FAILURE',
-					error: get( error, 'responseJSON', {
+					error: error.responseJSON || {
 						code: 'unknown_error',
 						message: __( 'An unknown error occurred.' ),
-					} ),
+					},
 				} );
 			}
 		);
-	},
-	FETCH_REUSABLE_BLOCKS_SUCCESS( action, store ) {
-		const { reusableBlocks } = action;
-		const { dispatch } = store;
-
-		dispatch( addReusableBlocks( reusableBlocks ) );
 	},
 	SAVE_REUSABLE_BLOCK( action, store ) {
 		const { id } = action;
@@ -333,15 +327,17 @@ export default {
 			() => {
 				dispatch( {
 					type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
+					id,
 				} );
 			},
 			( error ) => {
 				dispatch( {
 					type: 'SAVE_REUSABLE_BLOCK_FAILURE',
-					error: get( error, 'responseJSON', {
+					id,
+					error: error.responseJSON || {
 						code: 'unknown_error',
 						message: __( 'An unknown error occurred.' ),
-					} ),
+					},
 				} );
 			}
 		);
@@ -360,7 +356,7 @@ export default {
 		const oldBlock = getBlock( getState(), action.uid );
 		const reusableBlock = createReusableBlock( oldBlock.name, oldBlock.attributes );
 		const newBlock = createBlock( 'core/reusable-block', { ref: reusableBlock.id } );
-		dispatch( addReusableBlocks( reusableBlock ) );
+		dispatch( updateReusableBlock( reusableBlock.id, reusableBlock ) );
 		dispatch( saveReusableBlock( reusableBlock.id ) );
 		dispatch( replaceBlocks( [ oldBlock.uid ], [ newBlock ] ) );
 	},

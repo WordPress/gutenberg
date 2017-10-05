@@ -552,20 +552,20 @@ export function notices( state = {}, action ) {
 
 export function reusableBlocks( state = {}, action ) {
 	switch ( action.type ) {
-		case 'ADD_REUSABLE_BLOCKS': {
-			return {
-				...state,
-				...keyBy( action.reusableBlocks, 'id' ),
-			};
+		case 'FETCH_REUSABLE_BLOCKS_SUCCESS': {
+			return reduce( action.reusableBlocks, ( newState, reusableBlock ) => ( {
+				...newState,
+				[ reusableBlock.id ]: {
+					...reusableBlock,
+					isSaving: false,
+					saveError: null,
+				},
+			} ), state );
 		}
 
 		case 'UPDATE_REUSABLE_BLOCK': {
 			const { id, reusableBlock } = action;
 			const existingReusableBlock = state[ id ];
-
-			if ( ! existingReusableBlock ) {
-				return state;
-			}
 
 			return {
 				...state,
@@ -573,9 +573,38 @@ export function reusableBlocks( state = {}, action ) {
 					...existingReusableBlock,
 					...reusableBlock,
 					attributes: {
-						...existingReusableBlock.attributes,
+						...( existingReusableBlock && existingReusableBlock.attributes ),
 						...reusableBlock.attributes,
 					},
+					isSaving: false,
+					saveError: null,
+				},
+			};
+		}
+
+		case 'SAVE_REUSABLE_BLOCK': {
+			const { id } = action;
+
+			return {
+				...state,
+				[ id ]: {
+					...state[ id ],
+					isSaving: true,
+					saveError: null,
+				},
+			};
+		}
+
+		case 'SAVE_REUSABLE_BLOCK_SUCCESS':
+		case 'SAVE_REUSABLE_BLOCK_FAILURE': {
+			const { id, error = null } = action;
+
+			return {
+				...state,
+				[ id ]: {
+					...state[ id ],
+					isSaving: false,
+					saveError: error,
 				},
 			};
 		}

@@ -7,7 +7,7 @@ import {
 	startTyping,
 	stopTyping,
 	fetchReusableBlocks,
-	addReusableBlocks,
+	updateReusableBlock,
 	saveReusableBlock,
 	attachBlock,
 	detachBlock,
@@ -67,26 +67,29 @@ describe( 'actions', () => {
 		} );
 
 		it( 'should take an optional id argument', () => {
-			expect( fetchReusableBlocks( '358b59ee-bab3-4d6f-8445-e8c6971a5605' ) ).toEqual( {
+			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
+			expect( fetchReusableBlocks( id ) ).toEqual( {
 				type: 'FETCH_REUSABLE_BLOCKS',
-				id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
+				id,
 			} );
 		} );
 	} );
 
-	describe( 'addReusableBlocks', () => {
-		it( 'should return the ADD_REUSABLE_BLOCKS action', () => {
+	describe( 'updateReusableBlock', () => {
+		it( 'should return the UPDATE_REUSABLE_BLOCK action', () => {
+			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
 			const reusableBlock = {
-				id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
+				id,
 				name: 'My cool block',
 				type: 'core/paragraph',
 				attributes: {
 					content: 'Hello!',
 				},
 			};
-			expect( addReusableBlocks( reusableBlock ) ).toEqual( {
-				type: 'ADD_REUSABLE_BLOCKS',
-				reusableBlocks: [ reusableBlock ],
+			expect( updateReusableBlock( id, reusableBlock ) ).toEqual( {
+				type: 'UPDATE_REUSABLE_BLOCK',
+				id,
+				reusableBlock,
 			} );
 		} );
 	} );

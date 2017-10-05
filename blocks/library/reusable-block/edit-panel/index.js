@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import { Spinner, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -9,9 +9,13 @@ import { __ } from '@wordpress/i18n';
  */
 import './style.scss';
 
-function ReusableBlockEditPanel( { isEditing, name, onEdit, onAttach, onChangeName, onSave, onCancel } ) {
+function ReusableBlockEditPanel( props ) {
+	const { isEditing, name, isSaving, saveError, onEdit, onAttach, onChangeName, onSave, onCancel } = props;
+
 	return (
 		<div className="reusable-block-edit-panel">
+			{ isSaving && <Spinner /> }
+			{ saveError && saveError.message }
 			{ ! isEditing && [
 				<span key="name" className="reusable-block-edit-panel__name-label">{ name }</span>,
 				<Button
