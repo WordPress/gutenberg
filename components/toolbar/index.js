@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-
+import { isFunction } from 'lodash';
 /**
  * Internal dependencies
  */
@@ -27,28 +27,30 @@ function Toolbar( { controls = [], children, className } ) {
 		<ul className={ classnames( 'components-toolbar', className ) }>
 			{ controlSets.reduce( ( result, controlSet, setIndex ) => [
 				...result,
-				...controlSet.map( ( control, controlIndex ) => (
-					<li
-						key={ [ setIndex, controlIndex ].join() }
-						className={ setIndex > 0 && controlIndex === 0 ? 'has-left-divider' : null }
-					>
-						<IconButton
-							icon={ control.icon }
-							label={ control.title }
-							data-subscript={ control.subscript }
-							onClick={ ( event ) => {
-								event.stopPropagation();
-								control.onClick();
-							} }
-							className={ classnames( 'components-toolbar__control', {
-								'is-active': control.isActive,
-							} ) }
-							aria-pressed={ control.isActive }
-							disabled={ control.isDisabled }
-						/>
-						{ control.children }
-					</li>
-				) ),
+				...controlSet.map( ( control, controlIndex ) => {
+					const isActive = isFunction( control.isActive ) ? control.isActive() : control.isActive;
+					return (
+						<li
+							key={ [ setIndex, controlIndex ].join() }
+							className={ setIndex > 0 && controlIndex === 0 ? 'has-left-divider' : null }
+						>
+							<IconButton
+								icon={ control.icon }
+								label={ control.title }
+								data-subscript={ control.subscript }
+								onClick={ ( event ) => {
+									event.stopPropagation();
+									control.onClick();
+								} }
+								className={ classnames( 'components-toolbar__control', {
+									'is-active': isActive,
+								} ) }
+								aria-pressed={ isActive }
+								disabled={ control.isDisabled }
+							/>
+							{ control.children }
+						</li> );
+				} ),
 			], [] ) }
 			{ children }
 		</ul>

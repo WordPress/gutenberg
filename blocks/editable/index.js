@@ -13,12 +13,11 @@ import {
 	find,
 	defer,
 	noop,
-	pick,
+	values,
 } from 'lodash';
 import { nodeListToReact } from 'dom-react';
 import { Fill } from 'react-slot-fill';
 import 'element-closest';
-import uuid from 'uuid/v4';
 
 /**
  * WordPress dependencies
@@ -95,8 +94,6 @@ export default class Editable extends Component {
 			empty: ! value || ! value.length,
 			selectedNodeId: 0,
 		};
-
-		this.footnotes = props.footnotes || {};
 	}
 
 	getSettings( settings ) {
@@ -129,6 +126,10 @@ export default class Editable extends Component {
 		if ( this.props.onSetup ) {
 			this.props.onSetup( editor );
 		}
+
+		this.editorFacade = {
+			setNodeContent: ( content ) => editor.selection.setContent( content ),
+		};
 	}
 
 	proxyPropHandler( name ) {
@@ -237,34 +238,7 @@ export default class Editable extends Component {
 
 		this.savedContent = this.getContent();
 		this.editor.save();
-		this.footnotes = pick( this.footnotes, this.getFootnoteIds( this.savedContent ) );
-		this.props.onChange( { content: this.savedContent, footnotes: this.footnotes } );
-	}
-
-	getFootnoteIds( content ) {
-		const footnoteIds = [];
-		const nodesToVisit = [ ...content ];
-		let node = nodesToVisit.pop();
-
-		while ( node !== undefined ) {
-			if ( typeof node !== 'string' ) {
-				if ( node.type === 'a' && node.props[ 'data-footnote-id' ] ) {
-					footnoteIds.push( node.props[ 'data-footnote-id' ] );
-				}
-
-				if ( node.props.children ) {
-					if ( Array.isArray( node.props.children ) ) {
-						node.props.children.forEach( n => nodesToVisit.push( n ) );
-					} else {
-						nodesToVisit.push( node.props.children );
-					}
-				}
-			}
-
-			node = nodesToVisit.pop();
-		}
-
-		return footnoteIds;
+		this.props.onChange( this.savedContent );
 	}
 
 	getEditorSelectionRect() {
@@ -502,8 +476,11 @@ export default class Editable extends Component {
 		const activeFormats = this.editor.formatter.matchAll( [	'bold', 'italic', 'strikethrough' ] );
 		activeFormats.forEach( ( activeFormat ) => formats[ activeFormat ] = true );
 
+		const selectedNodeId = this.state.selectedNodeId + 1;
+		forEach( this.props.formatters, formatter => formatter.onNodeChange( parents, selectedNodeId ) );
+
 		const focusPosition = this.getFocusPosition();
-		this.setState( { formats, focusPosition, selectedNodeId: this.state.selectedNodeId + 1 } );
+		this.setState( { parents, formats, focusPosition, selectedNodeId } );
 	}
 
 	updateContent() {
@@ -584,8 +561,12 @@ export default class Editable extends Component {
 	}
 
 	changeFormats( formats ) {
+		const { formatters } = this.props;
+
 		forEach( formats, ( formatValue, format ) => {
-			if ( format === 'link' ) {
+			if ( format in formatters ) {
+				formatters[ format ].applyFormat( this.editorFacade, formatValue );
+			} else if ( format === 'link' ) {
 				if ( formatValue !== undefined ) {
 					const anchor = this.editor.dom.getParent( this.editor.selection.getNode(), 'a' );
 					if ( ! anchor ) {
@@ -595,10 +576,6 @@ export default class Editable extends Component {
 				} else {
 					this.editor.execCommand( 'Unlink' );
 				}
-			} else if ( format === 'footnote' ) {
-				const footnoteId = uuid();
-				this.footnotes[ footnoteId ] = formatValue.text;
-				this.editor.selection.setContent( `<a href="#footnote-${ footnoteId }" data-footnote-id="${ footnoteId }" contenteditable="false"><sup>[*]</sup></a>` );
 			} else {
 				const isActive = this.isFormatActive( format );
 				if ( isActive && ! formatValue ) {
@@ -609,6 +586,7 @@ export default class Editable extends Component {
 			}
 		} );
 
+		// TODO: investigate whether formatter format needs to be in here
 		this.setState( ( state ) => ( {
 			formats: merge( {}, state.formats, formats ),
 		} ) );
@@ -629,6 +607,7 @@ export default class Editable extends Component {
 			placeholder,
 			multiline: MultilineTag,
 			keepPlaceholderOnFocus = false,
+			formatters,
 		} = this.props;
 
 		// Generating a key that includes `tagName` ensures that if the tag
@@ -645,6 +624,7 @@ export default class Editable extends Component {
 				formats={ this.state.formats }
 				onChange={ this.changeFormats }
 				enabledControls={ formattingControls }
+				formatters={ values( formatters ) }
 			/>
 		);
 
