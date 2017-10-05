@@ -284,6 +284,7 @@ mockedApiResponse.Schema = {
                                 "parent",
                                 "relevance",
                                 "slug",
+                                "include_slugs",
                                 "title"
                             ],
                             "description": "Sort collection by object attribute.",
@@ -905,6 +906,7 @@ mockedApiResponse.Schema = {
                                 "parent",
                                 "relevance",
                                 "slug",
+                                "include_slugs",
                                 "title",
                                 "menu_order"
                             ],
@@ -1443,6 +1445,7 @@ mockedApiResponse.Schema = {
                                 "parent",
                                 "relevance",
                                 "slug",
+                                "include_slugs",
                                 "title"
                             ],
                             "description": "Sort collection by object attribute.",
@@ -2023,6 +2026,7 @@ mockedApiResponse.Schema = {
                                 "include",
                                 "name",
                                 "slug",
+                                "include_slugs",
                                 "term_group",
                                 "description",
                                 "count"
@@ -2266,6 +2270,7 @@ mockedApiResponse.Schema = {
                                 "include",
                                 "name",
                                 "slug",
+                                "include_slugs",
                                 "term_group",
                                 "description",
                                 "count"
@@ -2495,6 +2500,7 @@ mockedApiResponse.Schema = {
                                 "name",
                                 "registered_date",
                                 "slug",
+                                "include_slugs",
                                 "email",
                                 "url"
                             ],

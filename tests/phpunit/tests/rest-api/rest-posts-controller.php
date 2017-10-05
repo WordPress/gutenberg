@@ -598,6 +598,24 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertPostsOrderedBy( '{posts}.post_name DESC' );
 	}
 
+	public function test_get_items_with_orderby_slugs() {
+		$slugs = array( 'burrito', 'taco', 'chalupa' );
+		foreach ( $slugs as $slug ) {
+			$this->factory->post->create( array( 'post_title' => $slug, 'post_name' => $slug, 'post_status' => 'publish' ) );
+		}
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
+		$request->set_param( 'orderby', 'include_slugs' );
+		$request->set_param( 'slug', array( 'taco', 'chalupa', 'burrito' ) );
+
+		$response = $this->server->dispatch( $request );
+		$data = $response->get_data();
+
+		$this->assertEquals( 'taco', $data[0]['slug'] );
+		$this->assertEquals( 'chalupa', $data[1]['slug'] );
+		$this->assertEquals( 'burrito', $data[2]['slug'] );
+	}
+
 	public function test_get_items_with_orderby_relevance() {
 		$id1 = $this->factory->post->create( array( 'post_title' => 'Title is more relevant', 'post_content' => 'Content is', 'post_status' => 'publish' ) );
 		$id2 = $this->factory->post->create( array( 'post_title' => 'Title is', 'post_content' => 'Content is less relevant', 'post_status' => 'publish' ) );

@@ -250,6 +250,22 @@ class WP_Test_REST_Tags_Controller extends WP_Test_REST_Controller_Testcase {
 		$this->assertEquals( 'Cantaloupe', $data[2]['name'] );
 	}
 
+	public function test_get_items_orderby_slugs() {
+		$this->factory->tag->create( array( 'name' => 'Burrito' ) );
+		$this->factory->tag->create( array( 'name' => 'Taco' ) );
+		$this->factory->tag->create( array( 'name' => 'Chalupa' ) );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/tags' );
+		$request->set_param( 'orderby', 'include_slugs' );
+		$request->set_param( 'slug', array( 'taco', 'burrito', 'chalupa' ) );
+		$response = $this->server->dispatch( $request );
+		$data = $response->get_data();
+		$this->assertEquals( 200, $response->get_status() );
+		$this->assertEquals( 'taco', $data[0]['slug'] );
+		$this->assertEquals( 'burrito', $data[1]['slug'] );
+		$this->assertEquals( 'chalupa', $data[2]['slug'] );
+	}
+
 	public function test_get_items_post_args() {
 		$post_id = $this->factory->post->create();
 		$tag1 = $this->factory->tag->create( array( 'name' => 'DC' ) );

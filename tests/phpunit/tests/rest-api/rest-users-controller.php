@@ -409,6 +409,24 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 		$this->assertEquals( $low_id, $data[0]['id'] );
 	}
 
+	public function test_get_items_orderby_slugs() {
+		wp_set_current_user( self::$user );
+
+		$this->factory->user->create( array( 'user_nicename' => 'burrito' ) );
+		$this->factory->user->create( array( 'user_nicename' => 'taco' ) );
+		$this->factory->user->create( array( 'user_nicename' => 'chalupa' ) );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/users' );
+		$request->set_param( 'orderby', 'include_slugs' );
+		$request->set_param( 'slug', array( 'taco', 'burrito', 'chalupa' ) );
+		$response = $this->server->dispatch( $request );
+		$data = $response->get_data();
+
+		$this->assertEquals( 'taco', $data[0]['slug'] );
+		$this->assertEquals( 'burrito', $data[1]['slug'] );
+		$this->assertEquals( 'chalupa', $data[2]['slug'] );
+	}
+
 	public function test_get_items_orderby_email() {
 		wp_set_current_user( self::$user );
 

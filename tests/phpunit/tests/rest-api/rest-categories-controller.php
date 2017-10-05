@@ -287,6 +287,22 @@ class WP_Test_REST_Categories_Controller extends WP_Test_REST_Controller_Testcas
 		$this->assertEquals( 'Cantaloupe', $data[2]['name'] );
 	}
 
+	public function test_get_items_orderby_slugs() {
+		$this->factory->category->create( array( 'name' => 'Burrito' ) );
+		$this->factory->category->create( array( 'name' => 'Taco' ) );
+		$this->factory->category->create( array( 'name' => 'Chalupa' ) );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/categories' );
+		$request->set_param( 'orderby', 'include_slugs' );
+		$request->set_param( 'slug', array( 'taco', 'burrito', 'chalupa' ) );
+		$response = $this->server->dispatch( $request );
+		$data = $response->get_data();
+		$this->assertEquals( 200, $response->get_status() );
+		$this->assertEquals( 'taco', $data[0]['slug'] );
+		$this->assertEquals( 'burrito', $data[1]['slug'] );
+		$this->assertEquals( 'chalupa', $data[2]['slug'] );
+	}
+
 	protected function post_with_categories() {
 		$post_id = $this->factory->post->create();
 		$category1 = $this->factory->category->create( array(
