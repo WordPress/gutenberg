@@ -247,7 +247,7 @@
 
 	&[data-align="full"],
 	&[data-align="wide"] {
-		.editor-visual-editor__block-controls {
+		.editor-block-toolbar {
 			@include break-small() {
 				width: $visual-editor-max-width - $block-padding - $block-padding;
 			}
