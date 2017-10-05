@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { connect } from 'react-redux';
 
 /**
  * WordPress dependencies
@@ -15,6 +16,7 @@ import { Component } from '@wordpress/element';
  */
 import './style.scss';
 import BlockSettingsMenuContent from './content';
+import { selectBlock } from '../actions';
 
 class BlockSettingsMenu extends Component {
 	constructor() {
@@ -26,6 +28,7 @@ class BlockSettingsMenu extends Component {
 	}
 
 	toggleMenu() {
+		this.props.onSelect();
 		this.setState( ( state ) => ( {
 			opened: ! state.opened,
 		} ) );
@@ -53,4 +56,11 @@ class BlockSettingsMenu extends Component {
 	}
 }
 
-export default BlockSettingsMenu;
+export default connect(
+	undefined,
+	( dispatch, ownProps ) => ( {
+		onSelect() {
+			dispatch( selectBlock( ownProps.uid ) );
+		},
+	} )
+)( BlockSettingsMenu );
