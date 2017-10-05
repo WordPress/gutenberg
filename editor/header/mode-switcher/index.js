@@ -7,8 +7,7 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton, Popover } from '@wordpress/components';
-import { Component } from '@wordpress/element';
+import { IconButton, Dropdown } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -34,56 +33,38 @@ const MODES = [
 	},
 ];
 
-class ModeSwitcher extends Component {
-	constructor() {
-		super( ...arguments );
-		this.toggleMenu = this.toggleMenu.bind( this );
-		this.switchTo = this.switchTo.bind( this );
-		this.state = {
-			opened: false,
-		};
-	}
-
-	toggleMenu() {
-		this.setState( ( state ) => ( { opened: ! state.opened } ) );
-	}
-
-	switchTo( value ) {
-		return () => {
-			this.setState( { opened: false } );
-			this.props.onSwitch( value );
-		};
-	}
-
-	render() {
-		const { mode } = this.props;
-		const { opened } = this.state;
-
-		return (
-			<div className="editor-mode-switcher">
+function ModeSwitcher( { onSwitch, mode } ) {
+	return (
+		<Dropdown
+			className="editor-mode-switcher"
+			position="bottom left"
+			renderToggle={ ( { isOpen, onToggle } ) => (
 				<IconButton
 					icon="ellipsis"
 					label={ __( 'More' ) }
-					onClick={ this.toggleMenu }
+					onClick={ onToggle }
+					aria-expanded={ isOpen }
 				/>
-				<Popover isOpen={ opened } position="bottom left">
-					{ MODES
-						.filter( ( { value } ) => value !== mode )
-						.map( ( { value, label, icon } ) => (
-							<IconButton
-								className="editor-mode-switcher__button"
-								key={ value }
-								icon={ icon }
-								onClick={ this.switchTo( value ) }
-							>
-								{ label }
-							</IconButton>
-						) )
-					}
-				</Popover>
-			</div>
-		);
-	}
+			) }
+			renderContent={ ( { onClose } ) => (
+				MODES
+					.filter( ( { value } ) => value !== mode )
+					.map( ( { value, label, icon } ) => (
+						<IconButton
+							className="editor-mode-switcher__button"
+							key={ value }
+							icon={ icon }
+							onClick={ () => {
+								onSwitch( value );
+								onClose();
+							} }
+						>
+							{ label }
+						</IconButton>
+					) )
+			) }
+		/>
+	);
 }
 
 export default connect(
