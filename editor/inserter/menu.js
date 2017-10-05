@@ -345,7 +345,6 @@ export class InserterMenu extends Component {
 		const isShowingEmbeds = ! isSearching && 'embeds' === this.state.tab;
 		const isShowingRecent = ! isSearching && 'recent' === this.state.tab;
 
-		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
 			<div className="editor-inserter__menu">
 				<label htmlFor={ `editor-inserter__search-${ instanceId }` } className="screen-reader-text">
@@ -390,7 +389,6 @@ export class InserterMenu extends Component {
 				}
 			</div>
 		);
-		/* eslint-enable jsx-a11y/no-autofocus */
 	}
 }
 
