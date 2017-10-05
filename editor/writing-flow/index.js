@@ -17,7 +17,7 @@ const { UP, DOWN, LEFT, RIGHT } = keycodes;
 class WritingFlow extends Component {
 	constructor() {
 		super( ...arguments );
-		this.zones = [];
+
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onKeyUp = this.onKeyUp.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
