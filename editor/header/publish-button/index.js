@@ -3,7 +3,7 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
-import { flowRight } from 'lodash';
+import { flowRight, noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -35,6 +35,7 @@ export function PublishButton( {
 	isPublishable,
 	isSaveable,
 	user,
+	onSubmit = noop,
 } ) {
 	const isButtonEnabled = user.data && ! isSaving && isPublishable && isSaveable;
 	const isContributor = user.data && ! user.data.capabilities.publish_posts;
@@ -66,6 +67,7 @@ export function PublishButton( {
 	} );
 
 	const onClick = () => {
+		onSubmit();
 		onStatusChange( publishStatus );
 		onSave();
 	};

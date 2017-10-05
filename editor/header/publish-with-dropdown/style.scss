@@ -1,0 +1,23 @@
+.wp-core-ui .editor-publish-with-dropdown {
+	position: relative;
+	margin: 0 10px;
+
+	.editor-publish-button.button.button-large {
+		padding-right: 40px;
+	}
+}
+
+.editor-publish-with-dropdown__arrow-container {
+	position: absolute;
+	right: 0;
+	top: 0;
+
+	.components-icon-button {
+		padding: 7px;
+		color: $white;
+
+		.components-icon-button:not(:disabled):hover {
+			color: $white;
+		}
+	}
+}
