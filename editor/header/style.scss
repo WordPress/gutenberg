@@ -107,10 +107,6 @@
 	margin-left: $item-spacing;
 }
 
-.editor-header__left .components-button {
-	margin-right: $item-spacing;
-}
-
 .editor-header .components-button {
 	border-radius: 3px;
 
@@ -132,7 +128,7 @@
 	}
 
 	@include break-medium() {
-		&.editor-publish-button {
+		&.editor-publish-button, &.editor-publish-with-dropdown__button {
 			height: 33px;
 			line-height: 32px;
 		}
