@@ -47,7 +47,7 @@ class BlockSettingsMenu extends Component {
 					className={ toggleClassname }
 					onClick={ this.toggleMenu }
 					icon="ellipsis"
-					aria-label={ __( 'Open Settings Menu' ) }
+					label={ __( 'Open Settings Menu' ) }
 				/>
 
 				{ opened && <BlockSettingsMenuContent uid={ uid } /> }
