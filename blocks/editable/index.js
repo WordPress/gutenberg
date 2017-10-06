@@ -591,6 +591,10 @@ export default class Editable extends Component {
 		this.editor.setDirty( true );
 	}
 
+	onWrapperBlur() {
+		window.getSelection().removeAllRanges();
+	}
+
 	render() {
 		const {
 			tagName: Tagname = 'div',
@@ -624,7 +628,7 @@ export default class Editable extends Component {
 		);
 
 		return (
-			<div className={ classes }>
+			<div className={ classes } onBlur={ this.onWrapperBlur }>
 				{ focus &&
 					<Fill name="Formatting.Toolbar">
 						{ ! inlineToolbar && formatToolbar }
