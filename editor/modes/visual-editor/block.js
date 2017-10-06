@@ -50,7 +50,6 @@ import {
 	isBlockSelected,
 	isFirstMultiSelectedBlock,
 	isTyping,
-	isInsertingSiblingBlock,
 } from '../../selectors';
 
 const { BACKSPACE, ESCAPE, DELETE, ENTER } = keycodes;
@@ -63,7 +62,6 @@ class VisualEditorBlock extends Component {
 		this.setAttributes = this.setAttributes.bind( this );
 		this.maybeHover = this.maybeHover.bind( this );
 		this.maybeStartTyping = this.maybeStartTyping.bind( this );
-		this.mouseLeaveUnlessInserting = this.mouseLeaveUnlessInserting.bind( this );
 		this.stopTypingOnMouseMove = this.stopTypingOnMouseMove.bind( this );
 		this.removeOrDeselect = this.removeOrDeselect.bind( this );
 		this.mergeBlocks = this.mergeBlocks.bind( this );
@@ -160,9 +158,9 @@ class VisualEditorBlock extends Component {
 	}
 
 	maybeHover() {
-		const { isHovered, isSelected, isMultiSelected, isInserterOpen, onHover } = this.props;
+		const { isHovered, isSelected, isMultiSelected, onHover } = this.props;
 
-		if ( isHovered || isSelected || isMultiSelected || isInserterOpen ) {
+		if ( isHovered || isSelected || isMultiSelected ) {
 			return;
 		}
 
@@ -177,12 +175,6 @@ class VisualEditorBlock extends Component {
 		//    shifted to the newly created block)
 		if ( ! this.props.isTyping && this.props.isSelected ) {
 			this.props.onStartTyping();
-		}
-	}
-
-	mouseLeaveUnlessInserting() {
-		if ( ! this.props.isInserterOpen ) {
-			this.props.onMouseLeave();
 		}
 	}
 
@@ -319,7 +311,7 @@ class VisualEditorBlock extends Component {
 			'is-hovered': isHovered,
 		} );
 
-		const { onFocus, onReplace } = this.props;
+		const { onMouseLeave, onSelect, onFocus, onReplace } = this.props;
 
 		// Determine whether the block has props to apply to the wrapper.
 		let wrapperProps;
@@ -340,7 +332,7 @@ class VisualEditorBlock extends Component {
 				onFocus={ this.onFocus }
 				onMouseMove={ this.maybeHover }
 				onMouseEnter={ this.maybeHover }
-				onMouseLeave={ this.mouseLeaveUnlessInserting }
+				onMouseLeave={ onMouseLeave }
 				className={ wrapperClassname }
 				data-type={ block.name }
 				tabIndex="0"
@@ -391,7 +383,9 @@ class VisualEditorBlock extends Component {
 					</BlockCrashBoundary>
 				</div>
 				{ ( showUI || isHovered ) && !! nextBlock && (
-					<Inserter insertIndex={ order + 1 } />
+					<Inserter
+						onToggle={ ( isOpen ) => isOpen ? onSelect() : null }
+						insertIndex={ order + 1 } />
 				) }
 				{ !! error && <BlockCrashWarning /> }
 			</div>
@@ -415,7 +409,6 @@ export default connect(
 			order: getBlockIndex( state, ownProps.uid ),
 			multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
 			meta: getEditedPostAttribute( state, 'meta' ),
-			isInserterOpen: isInsertingSiblingBlock( state ),
 		};
 	},
 	( dispatch, ownProps ) => ( {

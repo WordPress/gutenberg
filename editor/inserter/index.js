@@ -28,22 +28,30 @@ class Inserter extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.toggleInsertionPoint = this.toggleInsertionPoint.bind( this );
+		this.onToggle = this.onToggle.bind( this );
 	}
 
-	toggleInsertionPoint( isOpen ) {
+	onToggle( isOpen ) {
 		const {
 			insertIndex,
 			setInsertionPoint,
 			clearInsertionPoint,
+			onToggle,
 		} = this.props;
 
+		// When inserting at specific index, assign as insertion point when
+		// the inserter is opened, clearing on close.
 		if ( insertIndex !== undefined ) {
 			if ( isOpen ) {
 				setInsertionPoint( insertIndex );
 			} else {
 				clearInsertionPoint();
 			}
+		}
+
+		// Surface toggle callback to parent component
+		if ( onToggle ) {
+			onToggle( isOpen );
 		}
 	}
 
@@ -59,7 +67,7 @@ class Inserter extends Component {
 			<Dropdown
 				className="editor-inserter"
 				position={ position }
-				onToggle={ this.toggleInsertionPoint }
+				onToggle={ this.onToggle }
 				renderToggle={ ( { onToggle, isOpen } ) => (
 					<IconButton
 						icon="insert"

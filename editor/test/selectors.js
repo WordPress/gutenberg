@@ -56,7 +56,6 @@ import {
 	getBlockFocus,
 	isTyping,
 	getBlockInsertionPoint,
-	isInsertingSiblingBlock,
 	getBlockSiblingInserterPosition,
 	isBlockInsertionPointVisible,
 	isSavingPost,
@@ -1601,26 +1600,6 @@ describe( 'selectors', () => {
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toBe( 3 );
-		} );
-	} );
-
-	describe( 'isInsertingSiblingBlock', () => {
-		it( 'should return false if no sibling insertion point', () => {
-			const state = {
-				blockInsertionPoint: {},
-			};
-
-			expect( isInsertingSiblingBlock( state ) ).toBe( false );
-		} );
-
-		it( 'should return true if sibling insertion point', () => {
-			const state = {
-				blockInsertionPoint: {
-					position: 5,
-				},
-			};
-
-			expect( isInsertingSiblingBlock( state ) ).toBe( true );
 		} );
 	} );
 
