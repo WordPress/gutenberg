@@ -13,14 +13,14 @@ import { IconButton } from '@wordpress/components';
  * Internal dependencies
  */
 import { isEditorSidebarOpened } from '../selectors';
-import { selectBlock } from '../actions';
+import { selectBlock, removeBlock, toggleSidebar, setActivePanel } from '../actions';
 
-function BlockSettingsMenuContent( { onDelete, onSelect, isSidebarOpened, toggleSidebar, setActivePanel } ) {
+function BlockSettingsMenuContent( { onDelete, onSelect, isSidebarOpened, onToggleSidebar, onShowInspector } ) {
 	const toggleInspector = () => {
 		onSelect();
-		setActivePanel();
+		onShowInspector();
 		if ( ! isSidebarOpened ) {
-			toggleSidebar();
+			onToggleSidebar();
 		}
 	};
 
@@ -48,22 +48,16 @@ export default connect(
 	} ),
 	( dispatch, ownProps ) => ( {
 		onDelete() {
-			dispatch( {
-				type: 'REMOVE_BLOCKS',
-				uids: [ ownProps.uid ],
-			} );
+			dispatch( removeBlock( ownProps.uid ) );
 		},
 		onSelect() {
 			dispatch( selectBlock( ownProps.uid ) );
 		},
-		setActivePanel() {
-			dispatch( {
-				type: 'SET_ACTIVE_PANEL',
-				panel: 'block',
-			} );
+		onShowInspector() {
+			dispatch( setActivePanel( 'block' ) );
 		},
-		toggleSidebar() {
-			dispatch( { type: 'TOGGLE_SIDEBAR' } );
+		onToggleSidebar() {
+			dispatch( toggleSidebar() );
 		},
 	} )
 )( BlockSettingsMenuContent );
