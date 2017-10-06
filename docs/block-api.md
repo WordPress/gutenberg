@@ -38,7 +38,7 @@ title: 'Book'
 
 #### Category
 
-* **Type:** `String [ formatting | layout | widgets | embeds ]`
+* **Type:** `String [ common | formatting | layout | widgets | embeds ]`
 
 Blocks are grouped into categories to help users browse and discover them. The core provided categories are `common`, `formatting`, `layout`, `widgets`, and `embeds`.
 
@@ -47,7 +47,7 @@ Blocks are grouped into categories to help users browse and discover them. The c
 category: 'widgets',
 ```
 
-#### Icon
+#### Icon (optional)
 
 An icon property should be specified to make it easier to identify a block. These can be any of [WordPress' Dashicons](https://developer.wordpress.org/resource/dashicons/), or a custom `svg` element.
 
@@ -65,7 +65,7 @@ Sometimes a block could have aliases that help users discover it while searching
 keywords: [ __( 'read' ) ],
 ```
 
-#### Attributes
+#### Attributes (optional)
 
 * **Type:** `{ attr: {} }`
 
@@ -90,11 +90,11 @@ attributes: {
 
 * **See: [Attributes](/reference/attributes/).**
 
-### Transforms (optional)
+#### Transforms (optional)
 
 Work in progress...
 
-### className (optional)
+#### className (optional)
 
 * **Type:** `Bool`
 
@@ -105,7 +105,7 @@ By default, Gutenberg adds a class with the form `.wp-blocks-your-block-name` to
 className: false,
 ```
 
-### useOnce (optional)
+#### useOnce (optional)
 
 * **Type:** `Bool`
 * **Default:** `false`
@@ -117,7 +117,18 @@ Whether a block can only be used once per post.
 useOnce: true,
 ```
 
+#### supportAnchor (optional)
+
+* **Type:** `Bool`
+* **Default:** `false`
+
+Anchors let you link directly to a specific block on a page. This property adds a field to define an id for the block and a button to copy the direct link.
+
+```js
+// Add the support for an anchor link.
+supportAnchor: true,
+```
+
 ## Edit and Save
 
 The `edit` and `save` functions define the editor interface with which a user would interact, and the markup to be serialized back when a post is saved. They are the heart of how a block operates, so they are [covered separately](/block-edit-save/).
-
