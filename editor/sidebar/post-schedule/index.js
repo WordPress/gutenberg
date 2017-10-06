@@ -68,7 +68,7 @@ export class PostSchedule extends Component {
 
 		return (
 			<PanelRow className="editor-post-schedule">
-				<span>{ __( 'Publish' ) }</span>
+				<span>{ __( 'Publish on' ) }</span>
 				<button
 					type="button"
 					className="editor-post-schedule__toggle button-link"
