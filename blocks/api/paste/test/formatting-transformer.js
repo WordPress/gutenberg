@@ -7,18 +7,18 @@ import { equal } from 'assert';
  * Internal dependencies
  */
 import formattingTransformer from '../formatting-transformer';
-import { deepFilter } from '../utils';
+import { deepFilterHTML } from '../utils';
 
 describe( 'formattingTransformer', () => {
 	it( 'should transform font weight', () => {
-		equal( deepFilter( '<span style="font-weight:bold">test</span>', [ formattingTransformer ] ), '<strong>test</strong>' );
+		equal( deepFilterHTML( '<span style="font-weight:bold">test</span>', [ formattingTransformer ] ), '<strong>test</strong>' );
 	} );
 
 	it( 'should transform numeric font weight', () => {
-		equal( deepFilter( '<span style="font-weight:700">test</span>', [ formattingTransformer ] ), '<strong>test</strong>' );
+		equal( deepFilterHTML( '<span style="font-weight:700">test</span>', [ formattingTransformer ] ), '<strong>test</strong>' );
 	} );
 
 	it( 'should transform font style', () => {
-		equal( deepFilter( '<span style="font-style:italic">test</span>', [ formattingTransformer ] ), '<em>test</em>' );
+		equal( deepFilterHTML( '<span style="font-style:italic">test</span>', [ formattingTransformer ] ), '<em>test</em>' );
 	} );
 } );
