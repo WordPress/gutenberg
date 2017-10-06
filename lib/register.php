@@ -66,11 +66,13 @@ function gutenberg_menu() {
 		'the_gutenberg_project'
 	);
 
-	$submenu['gutenberg'][] = array(
-		__( 'Feedback', 'gutenberg' ),
-		'edit_posts',
-		'http://wordpressdotorg.polldaddy.com/s/gutenberg-support',
-	);
+	if ( current_user_can( 'edit_posts' ) ) {
+		$submenu['gutenberg'][] = array(
+			__( 'Feedback', 'gutenberg' ),
+			'edit_posts',
+			'http://wordpressdotorg.polldaddy.com/s/gutenberg-support',
+		);
+	}
 }
 add_action( 'admin_menu', 'gutenberg_menu' );
 
