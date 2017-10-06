@@ -105,6 +105,18 @@ By default, Gutenberg adds a class with the form `.wp-blocks-your-block-name` to
 className: false,
 ```
 
+### useOnce (optional)
+
+* **Type:** `Bool`
+* **Default:** `false`
+
+Whether a block can only be used once per post.
+
+```js
+// Use the block just once per post
+useOnce: true,
+```
+
 ## Edit and Save
 
 The `edit` and `save` functions define the editor interface with which a user would interact, and the markup to be serialized back when a post is saved. They are the heart of how a block operates, so they are [covered separately](/block-edit-save/).
