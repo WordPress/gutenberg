@@ -122,18 +122,28 @@ export class Popover extends Component {
 	}
 
 	setOffset() {
+		const { range } = this.props;
 		const { anchor, popover } = this.nodes;
 		const { parentNode } = anchor;
 		if ( ! parentNode ) {
 			return;
 		}
 
-		const rect = parentNode.getBoundingClientRect();
 		const [ yAxis, xAxis ] = this.getPositions();
 		const isTop = 'top' === yAxis;
 		const isLeft = 'left' === xAxis;
 		const isRight = 'right' === xAxis;
-
+		let rect = parentNode.getBoundingClientRect();
+		if ( range ) {
+			const rects = range.getClientRects();
+			if ( isLeft ) {
+				rect = rects[ 0 ];
+			} else if ( isRight ) {
+				rect = rects[ rects.length - 1 ];
+			} else {
+				rect = range.getBoundingClientRect();
+			}
+		}
 		// Offset top positioning by padding
 		const { paddingTop, paddingBottom } = window.getComputedStyle( parentNode );
 		let topOffset = parseInt( isTop ? paddingTop : paddingBottom, 10 );

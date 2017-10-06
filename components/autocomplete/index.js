@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Children, Component, cloneElement } from '@wordpress/element';
+import { Component, findDOMNode } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
 
 /**
@@ -19,12 +19,50 @@ import Popover from '../popover';
 
 const { ENTER, ESCAPE, UP, DOWN } = keycodes;
 
+function descendFirst( node ) {
+	let n = node;
+	while ( n.firstChild ) {
+		n = n.firstChild;
+	}
+	return n;
+}
+
+function descendLast( node ) {
+	let n = node;
+	while ( n.lastChild ) {
+		n = n.lastChild;
+	}
+	return n;
+}
+
+function isTextNode( node ) {
+	return node !== null && node.nodeType === 3;
+}
+
+function onlyTextNode( node ) {
+	return isTextNode( node ) ? node : null;
+}
+
+function lastIndexOfSpace( text, fromIndex ) {
+	const fromI = fromIndex === undefined ?
+			text.length - 1 :
+			Math.min( text.length - 1, fromIndex );
+	for ( let i = fromI; i >= 0; i-- ) {
+		if ( /\s/.test( text.charAt( i ) ) ) {
+			return i;
+		}
+	}
+	return -1;
+}
+
 class Autocomplete extends Component {
 	static getInitialState() {
 		return {
 			isOpen: false,
-			search: /.*/,
+			search: /./,
 			selectedIndex: 0,
+			lookup: null,
+			range: null,
 		};
 	}
 
@@ -34,7 +72,6 @@ class Autocomplete extends Component {
 		this.bindNode = this.bindNode.bind( this );
 		this.select = this.select.bind( this );
 		this.reset = this.reset.bind( this );
-		this.onBlur = this.onBlur.bind( this );
 		this.search = this.search.bind( this );
 		this.setSelectedIndex = this.setSelectedIndex.bind( this );
 
@@ -47,11 +84,12 @@ class Autocomplete extends Component {
 
 	select( option ) {
 		const { onSelect } = this.props;
+		const { range, lookup } = this.state;
 
 		this.reset();
 
 		if ( onSelect ) {
-			onSelect( option );
+			onSelect( option, range, lookup );
 		}
 	}
 
@@ -59,45 +97,81 @@ class Autocomplete extends Component {
 		this.setState( this.constructor.getInitialState() );
 	}
 
-	onBlur( event ) {
-		// Check if related target is not within, in the case that the user is
-		// selecting an option by button click
-		if ( ! this.node.contains( event.relatedTarget ) ) {
-			this.reset();
-		}
-	}
-
 	search( event ) {
-		const { triggerPrefix } = this.props;
+		const allowAnything = () => true;
+		const { triggerPrefix, allowNode = allowAnything, allowContext = allowAnything } = this.props;
 		const { isOpen } = this.state;
-
-		const value = event.target.textContent;
-
-		// Currently search supports only if input's entire value is match
-		let pattern = '^';
-
-		if ( triggerPrefix ) {
-			// Trigger prefix may contain reserved characters of a regular
-			// expression, so escape
-			pattern += escapeStringRegexp( triggerPrefix );
+		// ensure that the cursor location is unambiguous
+		const container = event.target;
+		const selection = window.getSelection();
+		if ( ! ( selection.isCollapsed && container.contains( selection.anchorNode ) ) ) {
+			return;
 		}
-
-		// Create matching group for the search value
-		pattern += '([^\\s]*)$';
-
-		pattern = new RegExp( pattern );
-
-		let match, search;
-		if ( ( match = value.match( pattern ) ) ) {
-			search = new RegExp( escapeStringRegexp( match[ 1 ] ), 'i' );
-		}
-
+		// look for the trigger prefix and search query just before the cursor location
+		const match = ( function() {
+			let endTextNode;
+			let endIndex;
+			// search backwards to find the first preceeding space or non-text node.
+			if ( isTextNode( selection.anchorNode ) ) { // TEXT node
+				endTextNode = selection.anchorNode;
+				endIndex = selection.anchorOffset;
+			} else if ( selection.anchorOffset === 0 ) {
+				endTextNode = onlyTextNode( descendFirst( selection.anchorNode ) );
+				endIndex = 0;
+			} else {
+				endTextNode = onlyTextNode( descendLast( selection.anchorNode.childNodes[ selection.anchorOffset - 1 ] ) );
+				endIndex = endTextNode ? endTextNode.nodeValue.length : 0;
+			}
+			if ( ! ( endTextNode && allowNode( endTextNode, container ) ) ) {
+				return null;
+			}
+			let startTextNode = endTextNode;
+			let text = endTextNode.nodeValue.substring( 0, endIndex );
+			let pos = lastIndexOfSpace( text );
+			while ( pos === -1 ) {
+				const prev = onlyTextNode( startTextNode.previousSibling );
+				if ( prev ) {
+					if ( allowNode( prev, container ) ) {
+						startTextNode = prev;
+						text = prev.nodeValue + text;
+						pos = lastIndexOfSpace( text, prev.nodeValue.length - 1 );
+					} else {
+						return null;
+					}
+				} else {
+					break;
+				}
+			}
+			// look for the trigger prefix after that last space
+			if ( text.substr( pos + 1, triggerPrefix.length ) === triggerPrefix ) {
+				const lookup = text.substr( pos + 1 + triggerPrefix.length );
+				const range = document.createRange();
+				range.setStart( startTextNode, pos + 1 );
+				range.setEnd( endTextNode, endIndex );
+				// ensure that the match is allowed in context
+				const before = document.createRange();
+				before.setStart( container, 0 );
+				before.setEnd( range.startContainer, range.startOffset );
+				const after = document.createRange();
+				after.setStart( range.endContainer, range.endOffset );
+				after.setEnd( container, container.childNodes.length );
+				if ( allowContext( before, range, after ) ) {
+					return { range, lookup };
+				}
+			}
+			return null;
+		} )();
+		// create a regular expression to filter the options
+		const search = match ? new RegExp( escapeStringRegexp( match.lookup ), 'i' ) : /./;
+		// update the state
 		if ( isOpen ) {
 			if ( match ) {
 				// Reset selection to initial when search changes
 				this.setState( {
 					selectedIndex: 0,
 					search,
+					lookup: match.lookup,
+					range: match.range,
 				} );
 			} else {
 				// This may occur when pressing space, for example
@@ -107,6 +181,8 @@ class Autocomplete extends Component {
 			this.setState( {
 				isOpen: true,
 				search,
+				lookup: match.lookup,
+				range: match.range,
 			} );
 		}
 	}
@@ -146,7 +222,6 @@ class Autocomplete extends Component {
 		if ( ! isOpen ) {
 			return;
 		}
-
 		const options = this.getFilteredOptions();
 
 		let nextSelectedIndex;
@@ -176,12 +251,33 @@ class Autocomplete extends Component {
 		// Any handled keycode should prevent original behavior. This relies on
 		// the early return in the default case.
 		event.preventDefault();
-		event.stopImmediatePropagation();
+		event.stopPropagation();
+	}
+
+	toggleKeyEvents( isListening ) {
+		if ( ! this.node ) {
+			return;
+		}
+		const realNode = findDOMNode( this.node );
+		const handler = isListening ? 'addEventListener' : 'removeEventListener';
+		realNode[ handler ]( 'keydown', this.setSelectedIndex, true );
+	}
+
+	componentDidUpdate( prevProps, prevState ) {
+		const { isOpen } = this.state;
+		const { isOpen: prevIsOpen } = prevState;
+		if ( isOpen !== prevIsOpen ) {
+			this.toggleKeyEvents( isOpen );
+		}
+	}
+
+	componentWillUnmount() {
+		this.toggleKeyEvents( false );
 	}
 
 	render() {
 		const { children, className } = this.props;
-		const { isOpen, selectedIndex } = this.state;
+		const { isOpen, selectedIndex, range } = this.state;
 		const classes = classnames( 'components-autocomplete__popover', className );
 		const filteredOptions = this.getFilteredOptions();
 
@@ -190,18 +286,17 @@ class Autocomplete extends Component {
 		return (
 			<div
 				ref={ this.bindNode }
-				onBlur={ this.onBlur }
+				onInput={ this.search }
 				className="components-autocomplete"
 			>
-				{ cloneElement( Children.only( children ), {
-					onInput: this.search,
-					onKeyDown: this.setSelectedIndex,
-				} ) }
+				{ children }
 				<Popover
 					isOpen={ isOpen && filteredOptions.length > 0 }
 					focusOnOpen={ false }
+					onClickOutside={ () => this.reset() }
 					position="top right"
 					className={ classes }
+					range={ range }
 				>
 					<ul
 						role="menu"

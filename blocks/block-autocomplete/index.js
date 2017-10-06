@@ -15,7 +15,12 @@ class BlockAutocomplete extends Component {
 	constructor() {
 		super( ...arguments );
 
+		this.checkNoSurroundingContent = this.checkNoSurroundingContent.bind( this );
 		this.onSelect = this.onSelect.bind( this );
+	}
+
+	checkNoSurroundingContent( before, range, after ) {
+		return ! ( /\S/.test( before.toString() ) || /\S/.test( after.toString() ) );
 	}
 
 	onSelect( option ) {
@@ -43,6 +48,7 @@ class BlockAutocomplete extends Component {
 		return (
 			<Autocomplete
 				triggerPrefix="/"
+				allowContext={ this.checkNoSurroundingContent }
 				options={ options }
 				onSelect={ this.onSelect }
 				className="blocks-block-autocomplete"
