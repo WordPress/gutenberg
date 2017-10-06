@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { reduce, noop } from 'lodash';
+import { noop, reduce, set } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -22,6 +22,7 @@ import {
 	savePost,
 	updateReusableBlock,
 	saveReusableBlock,
+	fetchReusableBlocks,
 	makeBlockStatic,
 	makeBlockReusable,
 } from '../actions';
@@ -349,7 +350,7 @@ describe( 'effects', () => {
 		} );
 	} );
 
-	describe( 'reusable block conversion', () => {
+	describe( 'reusable block effects', () => {
 		beforeAll( () => {
 			registerBlockType( 'core/test-block', {
 				title: 'Test block',
@@ -372,6 +373,208 @@ describe( 'effects', () => {
 		afterAll( () => {
 			unregisterBlockType( 'core/test-block' );
 			unregisterBlockType( 'core/reusable-block' );
+		} );
+
+		describe( '.FETCH_REUSABLE_BLOCKS', () => {
+			const handler = effects.FETCH_REUSABLE_BLOCKS;
+
+			it( 'should fetch multiple reusable blocks', () => {
+				const promise = Promise.resolve( [
+					{
+						id: 'a9691cf9-ecaa-42bd-a9ca-49587e817647',
+						name: 'My cool block',
+						content: '<!-- wp:core/test-block {"name":"Big Bird"} /-->',
+					},
+				] );
+
+				set( global, 'wp.api.collections.ReusableBlocks', class {
+					fetch() {
+						return promise;
+					}
+				} );
+
+				const dispatch = jest.fn();
+				const store = { getState: () => {}, dispatch };
+
+				handler( fetchReusableBlocks(), store );
+
+				expect.assertions( 1 );
+				promise.then( () => {
+					expect( dispatch ).toHaveBeenCalledWith( {
+						type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
+						reusableBlocks: [
+							{
+								id: 'a9691cf9-ecaa-42bd-a9ca-49587e817647',
+								name: 'My cool block',
+								type: 'core/test-block',
+								attributes: {
+									name: 'Big Bird',
+								},
+							},
+						],
+					} );
+				} );
+			} );
+
+			it( 'should fetch a single reusable block', () => {
+				const id = 'a9691cf9-ecaa-42bd-a9ca-49587e817647';
+
+				let modelAttributes;
+				const promise = Promise.resolve( {
+					id,
+					name: 'My cool block',
+					content: '<!-- wp:core/test-block {"name":"Big Bird"} /-->',
+				} );
+
+				set( global, 'wp.api.models.ReusableBlocks', class {
+					constructor( attributes ) {
+						modelAttributes = attributes;
+					}
+
+					fetch() {
+						return promise;
+					}
+				} );
+
+				const dispatch = jest.fn();
+				const store = { getState: () => {}, dispatch };
+
+				handler( fetchReusableBlocks( id ), store );
+
+				expect.assertions( 2 );
+				expect( modelAttributes ).toEqual( { id } );
+				promise.then( () => {
+					expect( dispatch ).toHaveBeenCalledWith( {
+						type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
+						reusableBlocks: [
+							{
+								id: 'a9691cf9-ecaa-42bd-a9ca-49587e817647',
+								name: 'My cool block',
+								type: 'core/test-block',
+								attributes: {
+									name: 'Big Bird',
+								},
+							},
+						],
+					} );
+				} );
+			} );
+
+			it( 'should handle an API error', () => {
+				const promise = Promise.reject( {} );
+
+				set( global, 'wp.api.collections.ReusableBlocks', class {
+					fetch() {
+						return promise;
+					}
+				} );
+
+				const dispatch = jest.fn();
+				const store = { getState: () => {}, dispatch };
+
+				handler( fetchReusableBlocks(), store );
+
+				expect.assertions( 1 );
+				promise.catch( () => {
+					expect( dispatch ).toHaveBeenCalledWith( {
+						type: 'FETCH_REUSABLE_BLOCKS_FAILURE',
+						error: {
+							code: 'unknown_error',
+							message: 'An unknown error occurred.',
+						},
+					} );
+				} );
+			} );
+		} );
+
+		describe( '.SAVE_REUSABLE_BLOCK', () => {
+			const handler = effects.SAVE_REUSABLE_BLOCK;
+
+			it( 'should save a reusable block', () => {
+				let modelAttributes;
+				const promise = Promise.resolve();
+
+				set( global, 'wp.api.models.ReusableBlocks', class {
+					constructor( attributes ) {
+						modelAttributes = attributes;
+					}
+
+					save() {
+						return promise;
+					}
+				} );
+
+				const reusableBlock = {
+					id: '69f00b2b-ea09-4d5c-a98f-0b1112d7d400',
+					name: 'My cool block',
+					type: 'core/test-block',
+					attributes: {
+						name: 'Big Bird',
+					},
+				};
+
+				const initialState = reducer( undefined, {} );
+				const action = updateReusableBlock( reusableBlock.id, reusableBlock );
+				const state = reducer( initialState, action );
+
+				const dispatch = jest.fn();
+				const store = { getState: () => state, dispatch };
+
+				handler( saveReusableBlock( reusableBlock.id ), store );
+
+				expect.assertions( 2 );
+				expect( modelAttributes ).toEqual( {
+					id: '69f00b2b-ea09-4d5c-a98f-0b1112d7d400',
+					name: 'My cool block',
+					content: '<!-- wp:core/test-block {\"name\":\"Big Bird\"} /-->',
+				} );
+				promise.then( () => {
+					expect( dispatch ).toHaveBeenCalledWith( {
+						type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
+						id: reusableBlock.id,
+					} );
+				} );
+			} );
+
+			it( 'should handle an API error', () => {
+				const promise = Promise.reject( {} );
+
+				set( global, 'wp.api.models.ReusableBlocks', class {
+					save() {
+						return promise;
+					}
+				} );
+
+				const reusableBlock = {
+					id: '69f00b2b-ea09-4d5c-a98f-0b1112d7d400',
+					name: 'My cool block',
+					type: 'core/test-block',
+					attributes: {
+						name: 'Big Bird',
+					},
+				};
+
+				const initialState = reducer( undefined, {} );
+				const action = updateReusableBlock( reusableBlock.id, reusableBlock );
+				const state = reducer( initialState, action );
+
+				const dispatch = jest.fn();
+				const store = { getState: () => state, dispatch };
+
+				handler( saveReusableBlock( reusableBlock.id ), store );
+
+				expect.assertions( 1 );
+				promise.catch( () => {
+					expect( dispatch ).toHaveBeenCalledWith( {
+						type: 'SAVE_REUSABLE_BLOCK_FAILURE',
+						id: reusableBlock.id,
+						error: {
+							code: 'unknown_error',
+							message: 'An unknown error occurred.',
+						},
+					} );
+				} );
+			} );
 		} );
 
 		describe( '.MAKE_BLOCK_STATIC', () => {
