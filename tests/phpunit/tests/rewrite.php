@@ -360,6 +360,20 @@ class Tests_Rewrite extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 39373
+	 */
+	public function test_url_to_postid_should_bail_when_host_does_not_match() {
+		$this->set_permalink_structure( '/%postname%/' );
+
+		$post_id = self::factory()->post->create( array( 'post_name' => 'foo-bar-baz' ) );
+		$permalink = get_permalink( $post_id );
+		$url = str_replace( home_url(), 'http://some-other-domain.com', get_permalink( $post_id ) );
+
+		$this->assertSame( $post_id, url_to_postid( $permalink ) );
+		$this->assertSame( 0, url_to_postid( $url ) );
+	}
+
+	/**
 	 * @ticket 21970
 	 */
 	function test_parse_request_with_post_slug_that_clashes_with_a_trashed_page() {
