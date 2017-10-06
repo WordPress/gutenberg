@@ -82,10 +82,10 @@ describe( 'blocks', () => {
 			expect( block ).toBeUndefined();
 		} );
 
-		it( 'should reject blocks with an invalid edit function', () => {
-			const blockType = { save: noop, edit: 'not-a-function', category: 'common', title: 'block title' },
+		it( 'should reject blocks with an invalid edit value, must be web component tag name or function', () => {
+			const blockType = { save: noop, edit: { not: 'valid' }, category: 'common', title: 'block title' },
 				block = registerBlockType( 'my-plugin/fancy-block-6', blockType );
-			expect( console.error ).toHaveBeenCalledWith( 'The "edit" property must be a valid function.' );
+			expect( console.error ).toHaveBeenCalledWith( 'The "edit" property must be a valid component or tag name.' );
 			expect( block ).toBeUndefined();
 		} );
 
