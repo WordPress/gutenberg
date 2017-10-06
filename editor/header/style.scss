@@ -88,6 +88,14 @@
 	margin: 0 0 0 auto;
 }
 
+// hide all action buttons except the inserter on mobile
+.editor-header__content-tools > .components-button {
+	display: none;
+
+	@include break-small() {
+		display: inline-flex;
+	}
+}
 
 .editor-header__content-tools,
 .editor-header__settings {
@@ -123,8 +131,10 @@
 		left: 1px;
 	}
 
-	&.editor-publish-button {
-		height: 33px;
-		line-height: 32px;
+	@include break-medium() {
+		&.editor-publish-button {
+			height: 33px;
+			line-height: 32px;
+		}
 	}
 }
