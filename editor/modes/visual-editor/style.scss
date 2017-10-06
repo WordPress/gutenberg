@@ -86,39 +86,6 @@
 		transition: 0.2s outline;
 	}
 
-	&.is-showing-mobile-controls {
-		.editor-visual-editor__group > :not( .editor-visual-editor__mobile-tools ) {
-			display: none;
-		}
-		.editor-visual-editor__mobile-tools {
-			align-items: baseline;
-			display: flex;
-			width: 100%;
-
-			@include break-small {
-				display: none;
-			}
-
-			.editor-block-mover,
-			.editor-block-settings-menu {
-				display: block;
-				display: flex;
-				position: static;
-				.components-button {
-					margin: 0 5px;
-				}
-			}
-
-			.editor-block-settings-menu {
-				left: 80px;
-				right: auto;
-			}
-			.editor-visual-editor__mobile-toggle {
-				margin-left: auto;
-			}
-		}
-	}
-
 	&.is-multi-selected *::selection {
 		background: transparent;
 	}
@@ -280,7 +247,7 @@
 
 	&[data-align="full"],
 	&[data-align="wide"] {
-		.editor-visual-editor__block-controls {
+		.editor-block-toolbar {
 			@include break-small() {
 				width: $visual-editor-max-width - $block-padding - $block-padding;
 			}
@@ -310,84 +277,6 @@
 			border-bottom: 3px solid $blue-medium-500;
 		}
 	}
-}
-
-.editor-visual-editor__block-controls {
-	display: flex;
-	position: sticky;
-	z-index: z-index( '.editor-visual-editor__block-controls' );
-	margin-top: -$block-controls-height - $item-spacing;
-	margin-bottom: $item-spacing + 20px;	// 20px is the offset from the bottom of the selected block where it stops sticking
-	white-space: nowrap;
-	height: $block-controls-height;
-
-	// Mobile viewport
-	top: $header-height - 1px;
-	margin-left: -$block-padding;
-	margin-right: -$block-padding;
-
-	// Allow this invisible layer to be clicked through.
-	pointer-events: none;
-
-	// Reset pointer-events on children.
-	& > * {
-		pointer-events: auto;
-	}
-
-	// Larger viewports
-	@include break-small() {
-		margin-left: 0;
-	}
-
-	@include break-medium() {
-		top: $item-spacing;
-	}
-
-	&.is-appearing-active {
-		@include animate_fade;
-	}
-}
-
-.editor-visual-editor__group {
-	display: inline-flex;
-	box-shadow: $shadow-toolbar;
-	width: 100%;
-	background: $white;
-	border-top: 1px solid $light-gray-500;
-	border-bottom: 1px solid $light-gray-500;
-	overflow: auto;	// allow horizontal scrolling on mobile
-
-	> div,
-	> ul {
-		margin-top: -1px;
-		margin-bottom: -1px;
-	}
-
-	@include break-small() {
-		width: auto;
-		overflow: hidden;
-	}
-}
-
-$sticky-bottom-offset: 20px;
-.editor-visual-editor__block-controls + div {
-	// prevent collapsing margins between block and toolbar, matches the 20px bottom offset
- 	margin-top: -$sticky-bottom-offset - 1px;
-	padding-top: 1px;
- }
-
-.editor-visual-editor__block-controls .components-toolbar {
-	margin-right: -1px;
-
-	&.editor-visual-editor__mobile-tools {
-		margin-left: auto;
-		margin-top: -1px;
-		margin-bottom: -1px;
-	}
-}
-
-.editor-visual-editor__block-controls .editor-block-switcher {
-	display: inline-flex;
 }
 
 .editor-visual-editor .editor-inserter {
@@ -491,16 +380,6 @@ $sticky-bottom-offset: 20px;
 	&:hover > .editor-inserter__block,
 	&.is-showing-controls > .editor-inserter__block {
 		opacity: 1;
-	}
-}
-
-.editor-visual-editor__mobile-tools {
-	@include break-small {
-		display: none;
-	}
-	.editor-block-mover,
-	.editor-block-settings-menu {
-		display: none;
 	}
 }
 
