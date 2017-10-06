@@ -36,7 +36,7 @@
 	height: calc( 100vh - #{ $admin-bar-height-big + $header-height + 34 + $inserter-tabs-height } ); // 34 = search input height
 
 	@include break-medium {
-		height: 240px;
+		height: 46vh;
 	}
 
 	overflow: auto;
@@ -89,12 +89,13 @@ input[type="search"].editor-inserter__search {
 
 .editor-inserter__block {
 	display: flex;
-	width: 50%;
+	width: 33%;
 	font-size: $default-font-size;
 	color: $dark-gray-500;
 	margin: 0;
-	padding: 12px 6px;
+	padding: 18px 6px;
 	align-items: center;
+	flex-direction: column;
 	cursor: pointer;
 	border: none;
 	background: none;
@@ -114,6 +115,8 @@ input[type="search"].editor-inserter__search {
 	}
 
 	&:active,
+	&:hover:active,
+	&:focus:active,
 	&.is-active {
 		background: $dark-gray-500;
 		position: relative;
@@ -121,16 +124,20 @@ input[type="search"].editor-inserter__search {
 	}
 
 	.dashicon {
-		margin-right: 8px;
+		margin-bottom: 4px;
 	}
 }
 
 .editor-inserter__separator {
 	display: block;
-	margin: 0;
-	padding: 12px 14px 0 14px;
+	margin: -1px 0 0;
+	padding: 4px 14px;
 	font-size: $default-font-size;
 	font-weight: 600;
+	text-align: center;
+	position: sticky;
+	top: 0;
+	background: $light-gray-200;
 }
 
 .editor-inserter__tabs {
