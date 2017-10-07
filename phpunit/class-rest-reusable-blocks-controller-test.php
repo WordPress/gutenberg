@@ -38,10 +38,10 @@ class REST_Reusable_Blocks_Controller_Test extends WP_Test_REST_Controller_Testc
 	 */
 	public static function wpSetUpBeforeClass( $factory ) {
 		self::$reusable_block_post_id = wp_insert_post( array(
-			'post_type' => 'gb_reusable_block',
-			'post_status' => 'publish',
-			'post_name' => '2d66a5c5-776c-43b1-98c7-49521cef8ea6',
-			'post_title' => 'My cool block',
+			'post_type'    => 'gb_reusable_block',
+			'post_status'  => 'publish',
+			'post_name'    => '2d66a5c5-776c-43b1-98c7-49521cef8ea6',
+			'post_title'   => 'My cool block',
 			'post_content' => '<p class="has-drop-cap">Hello!</p>',
 		) );
 
@@ -87,8 +87,8 @@ class REST_Reusable_Blocks_Controller_Test extends WP_Test_REST_Controller_Testc
 		$this->assertEquals( 200, $response->get_status() );
 		$this->assertEquals( array(
 			array(
-				'id' => '2d66a5c5-776c-43b1-98c7-49521cef8ea6',
-				'name' => 'My cool block',
+				'id'      => '2d66a5c5-776c-43b1-98c7-49521cef8ea6',
+				'name'    => 'My cool block',
 				'content' => '<p class="has-drop-cap">Hello!</p>',
 			),
 		), $response->get_data() );
@@ -119,8 +119,8 @@ class REST_Reusable_Blocks_Controller_Test extends WP_Test_REST_Controller_Testc
 
 		$this->assertEquals( 200, $response->get_status() );
 		$this->assertEquals( array(
-			'id' => '2d66a5c5-776c-43b1-98c7-49521cef8ea6',
-			'name' => 'My cool block',
+			'id'      => '2d66a5c5-776c-43b1-98c7-49521cef8ea6',
+			'name'    => 'My cool block',
 			'content' => '<p class="has-drop-cap">Hello!</p>',
 		), $response->get_data() );
 	}
@@ -175,7 +175,7 @@ class REST_Reusable_Blocks_Controller_Test extends WP_Test_REST_Controller_Testc
 
 		$request = new WP_REST_Request( 'PUT', '/gutenberg/v1/reusable-blocks/75236553-f4ba-4f12-aa25-4ba402044bd5' );
 		$request->set_body_params( array(
-			'name' => 'Another cool block',
+			'name'    => 'Another cool block',
 			'content' => '<figure class="wp-block-image"><img src="/image.jpg" alt="An image" /></figure>',
 		) );
 
@@ -183,8 +183,8 @@ class REST_Reusable_Blocks_Controller_Test extends WP_Test_REST_Controller_Testc
 
 		$this->assertEquals( 200, $response->get_status() );
 		$this->assertEquals( array(
-			'id' => '75236553-f4ba-4f12-aa25-4ba402044bd5',
-			'name' => 'Another cool block',
+			'id'      => '75236553-f4ba-4f12-aa25-4ba402044bd5',
+			'name'    => 'Another cool block',
 			'content' => '<figure class="wp-block-image"><img src="/image.jpg" alt="An image" /></figure>',
 		), $response->get_data() );
 	}
@@ -228,7 +228,7 @@ class REST_Reusable_Blocks_Controller_Test extends WP_Test_REST_Controller_Testc
 			),
 			array(
 				array(
-					'name' => 'My cool block',
+					'name'    => 'My cool block',
 					'content' => 42,
 				),
 				'Invalid reusable block content.',

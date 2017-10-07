@@ -74,17 +74,17 @@ class Block_Type_Test extends WP_UnitTestCase {
 
 		$block_type = new WP_Block_Type( 'core/dummy', array(
 			'attributes' => array(
-				'correct' => array(
+				'correct'            => array(
 					'type' => 'string',
 				),
-				'wrongType' => array(
+				'wrongType'          => array(
 					'type' => 'string',
 				),
 				'wrongTypeDefaulted' => array(
 					'type'    => 'string',
 					'default' => 'defaulted',
 				),
-				'missingDefaulted' => array(
+				'missingDefaulted'   => array(
 					'type'    => 'string',
 					'default' => 'define',
 				),

@@ -90,21 +90,21 @@ function gutenberg_register_scripts_and_styles() {
 	);
 	global $wp_locale;
 	wp_add_inline_script( 'wp-date', 'window._wpDateSettings = ' . wp_json_encode( array(
-		'l10n' => array(
+		'l10n'     => array(
 			'locale'        => get_locale(),
 			'months'        => array_values( $wp_locale->month ),
 			'monthsShort'   => array_values( $wp_locale->month_abbrev ),
 			'weekdays'      => array_values( $wp_locale->weekday ),
 			'weekdaysShort' => array_values( $wp_locale->weekday_abbrev ),
 			'meridiem'      => (object) $wp_locale->meridiem,
-			'relative' => array(
+			'relative'      => array(
 				/* translators: %s: duration */
 				'future' => __( '%s from now', 'default' ),
 				/* translators: %s: duration */
 				'past'   => __( '%s ago', 'default' ),
 			),
 		),
-		'formats' => array(
+		'formats'  => array(
 			'time'     => get_option( 'time_format', __( 'g:i a', 'default' ) ),
 			'date'     => get_option( 'date_format', __( 'F j, Y', 'default' ) ),
 			'datetime' => __( 'F j, Y g:i a', 'default' ),
@@ -620,11 +620,11 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	gutenberg_fix_jetpack_freeform_block_conflict();
 	wp_localize_script( 'wp-editor', 'wpEditorL10n', array(
 		'tinymce' => array(
-			'baseURL' => includes_url( 'js/tinymce' ),
-			'suffix' => SCRIPT_DEBUG ? '' : '.min',
+			'baseURL'  => includes_url( 'js/tinymce' ),
+			'suffix'   => SCRIPT_DEBUG ? '' : '.min',
 			'settings' => apply_filters( 'tiny_mce_before_init', array(
 				'external_plugins' => apply_filters( 'mce_external_plugins', array() ),
-				'plugins' => array_unique( apply_filters( 'tiny_mce_plugins', array(
+				'plugins'          => array_unique( apply_filters( 'tiny_mce_plugins', array(
 					'charmap',
 					'colorpicker',
 					'hr',
@@ -644,7 +644,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 					'wptextpattern',
 					'wpview',
 				) ) ),
-				'toolbar1' => implode( ',', array_merge( apply_filters( 'mce_buttons', array(
+				'toolbar1'         => implode( ',', array_merge( apply_filters( 'mce_buttons', array(
 					'formatselect',
 					'bold',
 					'italic',
@@ -659,7 +659,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 					'wp_more',
 					'spellchecker',
 				), 'editor' ), array( 'kitchensink' ) ) ),
-				'toolbar2' => implode( ',', apply_filters( 'mce_buttons_2', array(
+				'toolbar2'         => implode( ',', apply_filters( 'mce_buttons_2', array(
 					'strikethrough',
 					'hr',
 					'forecolor',
@@ -672,8 +672,8 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 					'redo',
 					'wp_help',
 				), 'editor' ) ),
-				'toolbar3' => implode( ',', apply_filters( 'mce_buttons_3', array(), 'editor' ) ),
-				'toolbar4' => implode( ',', apply_filters( 'mce_buttons_4', array(), 'editor' ) ),
+				'toolbar3'         => implode( ',', apply_filters( 'mce_buttons_3', array(), 'editor' ) ),
+				'toolbar4'         => implode( ',', apply_filters( 'mce_buttons_4', array(), 'editor' ) ),
 			), 'editor' ),
 		),
 	) );
@@ -789,7 +789,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 	$editor_settings = array(
 		'wideImages' => $gutenberg_theme_support ? $gutenberg_theme_support[0]['wide-images'] : false,
-		'colors' => $color_palette,
+		'colors'     => $color_palette,
 	);
 
 	wp_add_inline_script( 'wp-editor', 'wp.api.init().done( function() {'

@@ -40,11 +40,11 @@ class Admin_Test extends WP_UnitTestCase {
 			'role' => 'editor',
 		) );
 		self::$post_with_blocks = self::factory()->post->create( array(
-			'post_title' => 'Example',
+			'post_title'   => 'Example',
 			'post_content' => "<!-- wp:core/text {\"dropCap\":true} -->\n<p class=\"has-drop-cap\">Tester</p>\n<!-- /wp:core/text -->",
 		) );
 		self::$post_without_blocks = self::factory()->post->create( array(
-			'post_title' => 'Example',
+			'post_title'   => 'Example',
 			'post_content' => 'Tester',
 		) );
 		return parent::setUpBeforeClass();
@@ -95,7 +95,7 @@ class Admin_Test extends WP_UnitTestCase {
 		$this->assertArrayNotHasKey( 'classic hide-if-no-js', $actions );
 
 		register_post_type( 'not_shown_in_rest', array(
-			'supports' => array( 'title', 'editor' ),
+			'supports'     => array( 'title', 'editor' ),
 			'show_in_rest' => false,
 		) );
 		$post_id = $this->factory()->post->create( array(
@@ -107,7 +107,7 @@ class Admin_Test extends WP_UnitTestCase {
 
 		register_post_type( 'not_supports_editor', array(
 			'show_in_rest' => true,
-			'supports' => array( 'title' ),
+			'supports'     => array( 'title' ),
 		) );
 		$post_id = $this->factory()->post->create( array(
 			'post_type' => 'not_supports_editor',

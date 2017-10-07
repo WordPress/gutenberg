@@ -123,10 +123,10 @@ function gutenberg_add_admin_bar_edit_link( $wp_admin_bar ) {
 
 	// Add submenu item under link to go to Gutenberg editor or classic editor.
 	$wp_admin_bar->add_node( array(
-		'id' => 'edit_alt',
+		'id'     => 'edit_alt',
 		'parent' => 'edit',
-		'href' => $is_gutenberg_default ? $classic_url : $gutenberg_url,
-		'title' => $is_gutenberg_default ? $classic_text : $gutenberg_text,
+		'href'   => $is_gutenberg_default ? $classic_url : $gutenberg_url,
+		'title'  => $is_gutenberg_default ? $classic_text : $gutenberg_text,
 	) );
 
 }
@@ -172,7 +172,7 @@ function gutenberg_add_edit_links( $actions, $post ) {
 	// Build the new edit actions. See also: WP_Posts_List_Table::handle_row_actions().
 	$title = _draft_or_post_title( $post->ID );
 	$edit_actions = array(
-		'classic hide-if-no-js' => sprintf(
+		'classic hide-if-no-js'   => sprintf(
 			'<a href="%s" aria-label="%s">%s</a>',
 			esc_url( $classic_url ),
 			esc_attr( sprintf(
