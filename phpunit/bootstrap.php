@@ -8,6 +8,7 @@
 // Determine the tests directory (from a WP dev checkout).
 // Try the WP_TESTS_DIR environment variable first.
 $_tests_dir = getenv( 'WP_TESTS_DIR' );
+
 // See if we're installed inside an existing WP dev instance.
 if ( ! $_tests_dir ) {
 	$_try_tests_dir = dirname( __FILE__ ) . '/../../../../../tests/phpunit';
@@ -31,7 +32,7 @@ define( 'GUTENBERG_LOAD_VENDOR_SCRIPTS', false );
  * Manually load the plugin being tested.
  */
 function _manually_load_plugin() {
-	require dirname( dirname( __FILE__ ) ) . '/gutenberg.php';
+	require dirname( dirname( __FILE__ ) ) . '/lib/load.php';
 
 	// Require dummy block type class for testing.
 	require_once dirname( __FILE__ ) . '/class-wp-dummy-block-type.php';
