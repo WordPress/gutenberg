@@ -38,6 +38,10 @@ class Parsing_Test extends WP_UnitTestCase {
 		);
 	}
 
+	function strip_r( $input ) {
+		return str_replace( "\r", '', $input );
+	}
+
 	/**
 	 * @dataProvider parsing_test_filenames
 	 */
@@ -51,8 +55,8 @@ class Parsing_Test extends WP_UnitTestCase {
 			}
 		}
 
-		$html            = file_get_contents( $html_path );
-		$expected_parsed = json_decode( file_get_contents( $parsed_json_path ), true );
+		$html            = self::strip_r( file_get_contents( $html_path ) );
+		$expected_parsed = json_decode( self::strip_r( file_get_contents( $parsed_json_path ) ), true );
 
 		$result = gutenberg_parse_blocks( $html );
 
