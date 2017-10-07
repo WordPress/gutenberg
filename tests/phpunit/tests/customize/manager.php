@@ -197,6 +197,15 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		) );
 		$this->assertNotContains( $wp_customize->changeset_uuid(), array( $uuid1, $uuid2 ) );
 		$this->assertEmpty( $wp_customize->changeset_post_id() );
+
+		// Make sure existing changeset is not autoloaded in the case of previewing a theme switch.
+		switch_theme( 'twentyseventeen' );
+		$wp_customize = new WP_Customize_Manager( array(
+			'changeset_uuid' => false, // Cause UUID to be deferred.
+			'branching' => false,
+			'theme' => 'twentyfifteen',
+		) );
+		$this->assertEmpty( $wp_customize->changeset_post_id() );
 	}
 
 	/**
