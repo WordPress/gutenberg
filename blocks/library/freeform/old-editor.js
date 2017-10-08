@@ -165,7 +165,7 @@ export default class OldEditor extends Component {
 	render() {
 		const { id } = this.props;
 
-		const inspectorControls = focus && (
+		const inspectorControls = (
 			<InspectorControls key="inspector">
 				<BlockDescription>
 					<p>{ __( 'The Class Editor block allows you add content using a WYSIWYG editor.' ) }</p>
