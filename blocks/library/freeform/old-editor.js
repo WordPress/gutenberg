@@ -5,6 +5,12 @@ import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { keycodes } from '@wordpress/utils';
 
+/**
+ * Internal dependencies
+ */
+import InspectorControls from '../../inspector-controls';
+import BlockDescription from '../../block-description';
+
 const { BACKSPACE, DELETE } = keycodes;
 
 function isTmceEmpty( editor ) {
@@ -159,7 +165,16 @@ export default class OldEditor extends Component {
 	render() {
 		const { id } = this.props;
 
+		const inspectorControls = focus && (
+			<InspectorControls key="inspector">
+				<BlockDescription>
+					<p>{ __( 'The Class Editor block allows you add content using a WYSIWYG editor.' ) }</p>
+				</BlockDescription>
+			</InspectorControls>
+		);
+
 		return [
+			inspectorControls,
 			<div
 				key="toolbar"
 				id={ id + '-toolbar' }
