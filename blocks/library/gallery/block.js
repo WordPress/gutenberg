@@ -97,13 +97,13 @@ class GalleryBlock extends Component {
 	render() {
 		const { attributes, focus, className } = this.props;
 		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
-		
+
 		const blockDescription = (
 			<BlockDescription>
 				<p>
-					{__("Image galleries are a great way to share groups of pictures on your site.")}
+					{__( 'Image galleries are a great way to share groups of pictures on your site.' )}
 				</p>
-			</BlockDescription>	
+			</BlockDescription>
 		);
 
 		const inspectorControls = (
