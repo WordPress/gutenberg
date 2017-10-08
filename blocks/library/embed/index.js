@@ -55,7 +55,6 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 
 		transforms,
 
-
 		getEditWrapperProps( attributes ) {
 			const { align } = attributes;
 			if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
