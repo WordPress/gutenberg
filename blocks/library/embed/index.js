@@ -21,6 +21,8 @@ import { registerBlockType, source, createBlock } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
+import InspectorControls from '../../inspector-controls';
+import BlockDescription from '../../block-description';
 
 const { children } = source;
 
@@ -52,6 +54,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 		},
 
 		transforms,
+
 
 		getEditWrapperProps( attributes ) {
 			const { align } = attributes;
