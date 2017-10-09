@@ -159,7 +159,7 @@ registerBlockType( 'core/audio', {
 				inspectorControls,
 				<figure key="audio" className={ className }>
 					<audio controls="controls" src={ src } />
-					{ ( caption && caption.length > 0 ) || !! focus ? (
+					{ ( ( caption && caption.length ) || !! focus ) && (
 						<Editable
 							tagName="figcaption"
 							placeholder={ __( 'Write caption…' ) }
@@ -169,7 +169,7 @@ registerBlockType( 'core/audio', {
 							onChange={ ( value ) => setAttributes( { caption: value } ) }
 							inlineToolbar
 						/>
-					) : null }
+					) }
 				</figure>,
 			];
 			/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
