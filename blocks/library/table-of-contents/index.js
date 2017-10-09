@@ -9,8 +9,8 @@ import { __ } from '@wordpress/i18n';
 import './editor.scss';
 import './style.scss';
 import { registerBlockType } from '../../api';
+import Editable from '../../editable';
 import InspectorControls from '../../inspector-controls';
-import TextControl from '../../inspector-controls/text-control';
 import ToggleControl from '../../inspector-controls/toggle-control';
 import BlockDescription from '../../block-description';
 
@@ -32,7 +32,7 @@ registerBlockType( 'core/table-of-contents', {
 		},
 	},
 
-	edit( { attributes, setAttributes, focus } ) {
+	edit( { attributes, setAttributes, focus, setFocus } ) {
 		const { title, numbered } = attributes;
 		return [
 			focus && (
@@ -42,17 +42,6 @@ registerBlockType( 'core/table-of-contents', {
 					</BlockDescription>
 
 					<h3>{ __( 'Table of Contents Settings' ) }</h3>
-
-					<TextControl
-						label={ __( 'Title to display' ) }
-						type="text"
-						value={ title }
-						onChange={
-							( value ) => setAttributes( {
-								title: value,
-							} )
-						}
-					/>
 
 					<ToggleControl
 						label={ __( 'Display chapter numbering' ) }
@@ -65,6 +54,16 @@ registerBlockType( 'core/table-of-contents', {
 					/>
 				</InspectorControls>
 			),
+			<Editable
+				key="editable"
+				tagName="h2"
+				value={ [ title ] }
+				focus={ focus }
+				onFocus={ setFocus }
+				onChange={ ( value ) => setAttributes( { title: value[ 0 ] } ) }
+				formattingControls={ false }
+				multiline={ false }
+			/>,
 			__( 'Here shall render ye table of contents' ),
 		];
 	},

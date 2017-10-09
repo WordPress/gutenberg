@@ -613,7 +613,7 @@ export default class Editable extends Component {
 		const isPlaceholderVisible = placeholder && ( ! focus || keepPlaceholderOnFocus ) && this.state.empty;
 		const classes = classnames( wrapperClassname, 'blocks-editable' );
 
-		const formatToolbar = (
+		const formatToolbar = formattingControls && (
 			<FormatToolbar
 				selectedNodeId={ this.state.selectedNodeId }
 				focusPosition={ this.state.focusPosition }
@@ -625,12 +625,12 @@ export default class Editable extends Component {
 
 		return (
 			<div className={ classes }>
-				{ focus &&
+				{ focus && formatToolbar &&
 					<Fill name="Formatting.Toolbar">
 						{ ! inlineToolbar && formatToolbar }
 					</Fill>
 				}
-				{ focus && inlineToolbar &&
+				{ focus && inlineToolbar && formatToolbar &&
 					<div className="block-editable__inline-toolbar">
 						{ formatToolbar }
 					</div>
