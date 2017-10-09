@@ -12,6 +12,7 @@ import {
 	some,
 	values,
 	keys,
+	memoize,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -879,13 +880,15 @@ export function getRecentlyUsedBlocks( state ) {
 
 /**
  * Resolves the block usage stats into a list of the most frequently used blocks.
+ * Memoized so we're not generating block lists every time we render the list
+ * in the inserter.
  *
  * @param {Object} state Global application state
  * @return {Array}       List of block type settings
  */
-export function getMostFrequentlyUsedBlocks( state ) {
+export const getMostFrequentlyUsedBlocks = memoize( ( state ) => {
 	const { blockUsage } = state.preferences;
 	return keys( blockUsage ).sort( ( a, b ) => blockUsage[ b ] - blockUsage[ a ] )
 		.slice( 0, 3 )
 		.map( blockType => getBlockType( blockType ) );
-}
+}, ( state ) => state.preferences.blockUsage );
