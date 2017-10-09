@@ -40,7 +40,7 @@ class VisualEditorBlockList extends Component {
 		this.setBlockRef = this.setBlockRef.bind( this );
 		this.appendDefaultBlock = this.appendDefaultBlock.bind( this );
 		this.setLastClientY = this.setLastClientY.bind( this );
-		this.onPointerMove = throttle( this.onPointerMove.bind( this ), 250 );
+		this.onPointerMove = throttle( this.onPointerMove.bind( this ), 100 );
 		// Browser does not fire `*move` event when the pointer position changes
 		// relative to the document, so fire it with the last known position.
 		this.onScroll = () => this.onPointerMove( { clientY: this.lastClientY } );
@@ -77,21 +77,8 @@ class VisualEditorBlockList extends Component {
 	}
 
 	onPointerMove( { clientY } ) {
-		const BUFFER = 20;
-		const { multiSelectedBlocks } = this.props;
 		const boundaries = this.refs[ this.selectionAtStart ].getBoundingClientRect();
 		const y = clientY - boundaries.top;
-
-		// If there is no selection yet, make the use move at least BUFFER px
-		// away from the block with the pointer.
-		if (
-			! multiSelectedBlocks.length &&
-			y + BUFFER > 0 &&
-			y - BUFFER < boundaries.height
-		) {
-			return;
-		}
-
 		const key = this.coordMapKeys.reduce( ( acc, topY ) => y > topY ? topY : acc );
 
 		this.onSelectionChange( this.coordMap[ key ] );
