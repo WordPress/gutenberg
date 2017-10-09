@@ -63,6 +63,13 @@ export function undoable( reducer, options = {} ) {
 			return state;
 		}
 
+		if ( action.skipEditorSnapshot ) {
+			return {
+				...state,
+				present: nextPresent,
+			};
+		}
+
 		return {
 			past: [ ...past, present ],
 			present: nextPresent,

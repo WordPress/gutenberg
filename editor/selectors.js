@@ -457,7 +457,7 @@ export function getBlockCount( state ) {
  * @return {?Object}       Selected block
  */
 export function getSelectedBlock( state ) {
-	const { start, end } = state.blockSelection;
+	const { start, end } = state.editor.selection;
 	if ( start !== end || ! start ) {
 		return null;
 	}
@@ -474,7 +474,7 @@ export function getSelectedBlock( state ) {
  */
 export function getMultiSelectedBlockUids( state ) {
 	const { blockOrder } = state.editor;
-	const { start, end } = state.blockSelection;
+	const { start, end } = state.editor.selection;
 	if ( start === end ) {
 		return [];
 	}
@@ -558,7 +558,7 @@ export function isBlockMultiSelected( state, uid ) {
  * @return {?String}       Unique ID of block beginning multi-selection
  */
 export function getMultiSelectedBlocksStartUid( state ) {
-	const { start, end } = state.blockSelection;
+	const { start, end } = state.editor.selection;
 	if ( start === end ) {
 		return null;
 	}
@@ -576,7 +576,7 @@ export function getMultiSelectedBlocksStartUid( state ) {
  * @return {?String}       Unique ID of block ending multi-selection
  */
 export function getMultiSelectedBlocksEndUid( state ) {
-	const { start, end } = state.blockSelection;
+	const { start, end } = state.editor.selection;
 	if ( start === end ) {
 		return null;
 	}
@@ -667,7 +667,7 @@ export function getNextBlock( state, uid ) {
  * @return {Boolean}      Whether block is selected and multi-selection exists
  */
 export function isBlockSelected( state, uid ) {
-	const { start, end } = state.blockSelection;
+	const { start, end } = state.editor.selection;
 
 	if ( start !== end ) {
 		return null;
@@ -702,7 +702,7 @@ export function getBlockFocus( state, uid ) {
 		return null;
 	}
 
-	return state.blockSelection.focus;
+	return state.editor.selection.focus;
 }
 
 /**

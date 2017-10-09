@@ -234,6 +234,66 @@ export const editor = combineUndoableReducers( {
 
 		return state;
 	},
+
+	selection( state = { start: null, end: null, focus: null }, action ) {
+		switch ( action.type ) {
+			case 'CLEAR_SELECTED_BLOCK':
+				return {
+					start: null,
+					end: null,
+					focus: null,
+				};
+			case 'MULTI_SELECT':
+				return {
+					start: action.start,
+					end: action.end,
+					focus: null,
+				};
+			case 'SELECT_BLOCK':
+				if ( action.uid === state.start && action.uid === state.end ) {
+					return state;
+				}
+				return {
+					start: action.uid,
+					end: action.uid,
+					focus: action.focus || {},
+				};
+			case 'UPDATE_FOCUS':
+				return {
+					start: action.uid,
+					end: action.uid,
+					focus: action.config || {},
+				};
+			case 'INSERT_BLOCKS':
+				return {
+					start: action.blocks[ 0 ].uid,
+					end: action.blocks[ 0 ].uid,
+					focus: {},
+				};
+			case 'REPLACE_BLOCKS':
+				if ( ! action.blocks || ! action.blocks.length || action.uids.indexOf( state.start ) === -1 ) {
+					return state;
+				}
+				return {
+					start: action.blocks[ 0 ].uid,
+					end: action.blocks[ 0 ].uid,
+					focus: {},
+				};
+			case 'MOVE_BLOCKS_UP':
+			case 'MOVE_BLOCKS_DOWN': {
+				const firstUid = first( action.uids );
+				return firstUid === state.start
+					? state
+					: {
+						start: firstUid,
+						end: firstUid,
+						focus: {},
+					};
+			}
+		}
+
+		return state;
+	},
 }, { resetTypes: [ 'RESET_POST' ] } );
 
 /**
@@ -280,73 +340,6 @@ export function isTyping( state = false, action ) {
 
 		case 'STOP_TYPING':
 			return false;
-	}
-
-	return state;
-}
-
-/**
- * Reducer returning the block selection's state.
- *
- * @param  {Object} state  Current state
- * @param  {Object} action Dispatched action
- * @return {Object}        Updated state
- */
-export function blockSelection( state = { start: null, end: null, focus: null }, action ) {
-	switch ( action.type ) {
-		case 'CLEAR_SELECTED_BLOCK':
-			return {
-				start: null,
-				end: null,
-				focus: null,
-			};
-		case 'MULTI_SELECT':
-			return {
-				start: action.start,
-				end: action.end,
-				focus: null,
-			};
-		case 'SELECT_BLOCK':
-			if ( action.uid === state.start && action.uid === state.end ) {
-				return state;
-			}
-			return {
-				start: action.uid,
-				end: action.uid,
-				focus: action.focus || {},
-			};
-		case 'UPDATE_FOCUS':
-			return {
-				start: action.uid,
-				end: action.uid,
-				focus: action.config || {},
-			};
-		case 'INSERT_BLOCKS':
-			return {
-				start: action.blocks[ 0 ].uid,
-				end: action.blocks[ 0 ].uid,
-				focus: {},
-			};
-		case 'REPLACE_BLOCKS':
-			if ( ! action.blocks || ! action.blocks.length || action.uids.indexOf( state.start ) === -1 ) {
-				return state;
-			}
-			return {
-				start: action.blocks[ 0 ].uid,
-				end: action.blocks[ 0 ].uid,
-				focus: {},
-			};
-		case 'MOVE_BLOCKS_UP':
-		case 'MOVE_BLOCKS_DOWN': {
-			const firstUid = first( action.uids );
-			return firstUid === state.start
-				? state
-				: {
-					start: firstUid,
-					end: firstUid,
-					focus: {},
-				};
-		}
 	}
 
 	return state;
@@ -528,7 +521,6 @@ export default optimist( combineReducers( {
 	editor,
 	currentPost,
 	isTyping,
-	blockSelection,
 	hoveredBlock,
 	showInsertionPoint,
 	preferences,

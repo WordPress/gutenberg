@@ -166,10 +166,8 @@ registerBlockType( 'core/paragraph', {
 						textAlign: align,
 					} }
 					value={ content }
-					onChange={ ( nextContent ) => {
-						setAttributes( {
-							content: nextContent,
-						} );
+					onChange={ ( nextContent, settings ) => {
+						setAttributes( { content: nextContent }, settings );
 					} }
 					focus={ focus }
 					onFocus={ setFocus }

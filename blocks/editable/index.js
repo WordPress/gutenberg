@@ -85,9 +85,11 @@ export default class Editable extends Component {
 		this.onKeyUp = this.onKeyUp.bind( this );
 		this.changeFormats = this.changeFormats.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
-		this.maybePropagateUndo = this.maybePropagateUndo.bind( this );
+		this.propagateUndoRedo = this.propagateUndoRedo.bind( this );
 		this.onBeforePastePreProcess = this.onBeforePastePreProcess.bind( this );
 		this.onPaste = this.onPaste.bind( this );
+		this.onAddUndo = this.onAddUndo.bind( this );
+		this.onFocusIn = this.onFocusIn.bind( this );
 
 		this.state = {
 			formats: {},
@@ -111,16 +113,17 @@ export default class Editable extends Component {
 		} );
 
 		editor.on( 'init', this.onInit );
-		editor.on( 'focusout', this.onChange );
 		editor.on( 'NewBlock', this.onNewBlock );
-		editor.on( 'focusin', this.onFocus );
+		editor.on( 'focus', this.onFocusIn );
 		editor.on( 'nodechange', this.onNodeChange );
 		editor.on( 'keydown', this.onKeyDown );
 		editor.on( 'keyup', this.onKeyUp );
 		editor.on( 'selectionChange', this.onSelectionChange );
-		editor.on( 'BeforeExecCommand', this.maybePropagateUndo );
+		editor.on( 'BeforeExecCommand', this.propagateUndoRedo );
 		editor.on( 'BeforePastePreProcess', this.onBeforePastePreProcess );
 		editor.on( 'paste', this.onPaste );
+		editor.on( 'input', this.onChange );
+		editor.on( 'AddUndo', this.onAddUndo );
 
 		patterns.apply( this, [ editor ] );
 
@@ -145,13 +148,23 @@ export default class Editable extends Component {
 		this.updateFocus();
 	}
 
-	onFocus() {
+	onFocusIn() {
+		// defer( () => {
+		// 	// this.focusBookmark = this.editor.selection.getBookmark( 2, true );
+
+		// } );
+
+		this.onFocus( { bookmark: null } );
+	}
+
+	onFocus( { bookmark } ) {
 		if ( ! this.props.onFocus ) {
 			return;
 		}
 
-		// TODO: We need a way to save the focus position ( bookmark maybe )
-		this.props.onFocus();
+		const { collapsed } = this.props.focus || {};
+
+		this.props.onFocus( { bookmark, collapsed } );
 	}
 
 	isActive() {
@@ -181,20 +194,15 @@ export default class Editable extends Component {
 		}
 	}
 
-	maybePropagateUndo( event ) {
+	propagateUndoRedo( event ) {
 		const { onUndo } = this.context;
-		if ( onUndo && event.command === 'Undo' && ! this.editor.undoManager.hasUndo() ) {
-			// When user attempts Undo when empty Undo stack, propagate undo
-			// action to context handler. The compromise here is that: TinyMCE
-			// handles Undo until change, at which point `editor.save` resets
-			// history. If no history exists, let context handler have a turn.
-			// Defer in case an immediate undo causes TinyMCE to be destroyed,
-			// if other undo behaviors test presence of an input field.
+		const { command } = event;
+
+		if ( onUndo && ( command === 'Undo' || command === 'Redo' ) ) {
+			// Completely handle undo levels.
 			defer( onUndo );
 
-			// We could return false here to stop other TinyMCE event handlers
-			// from running, but we assume TinyMCE won't do anything on an
-			// empty undo stack anyways.
+			event.preventDefault();
 		}
 	}
 
@@ -236,14 +244,25 @@ export default class Editable extends Component {
 		}
 	}
 
-	onChange() {
-		if ( ! this.editor.isDirty() ) {
-			return;
+	onChange( { bookmark, undo } = {} ) {
+		// Store a bookmark before an undo level is created.
+		if ( undo ) {
+			this.onFocus( {
+				bookmark: bookmark || this.editor.selection.getBookmark( 2, true ),
+			} );
 		}
 
 		this.savedContent = this.getContent();
-		this.editor.save();
-		this.props.onChange( this.savedContent );
+		this.props.onChange( this.savedContent, { skipEditorSnapshot: ! undo } );
+	}
+
+	onAddUndo( { level, lastLevel } ) {
+		if ( ! lastLevel ) {
+			return;
+		}
+
+		// To do: should not store level on blur if part of undo action.
+		this.onChange( { undo: true, bookmark: level.bookmark } );
 	}
 
 	getEditorSelectionRect() {
@@ -340,7 +359,7 @@ export default class Editable extends Component {
 			)
 		) {
 			const forward = event.keyCode === DELETE;
-			this.onChange();
+			this.onChange( { undo: true } );
 			this.props.onMerge( forward );
 			event.preventDefault();
 			event.stopImmediatePropagation();
@@ -387,6 +406,8 @@ export default class Editable extends Component {
 					this.splitContent();
 				}
 			}
+
+			this.onChange( { undo: true } );
 		}
 	}
 
@@ -485,24 +506,8 @@ export default class Editable extends Component {
 		this.setState( { formats, focusPosition, selectedNodeId: this.state.selectedNodeId + 1 } );
 	}
 
-	updateContent() {
-		const bookmark = this.editor.selection.getBookmark( 2, true );
-		this.savedContent = this.props.value;
-		this.setContent( this.savedContent );
-		this.editor.selection.moveToBookmark( bookmark );
-
-		// Saving the editor on updates avoid unecessary onChanges calls
-		// These calls can make the focus jump
-		this.editor.save();
-	}
-
-	setContent( content ) {
-		if ( ! content ) {
-			content = '';
-		}
-
-		content = renderToString( content );
-		this.editor.setContent( content, { format: 'raw' } );
+	setContent( content = '' ) {
+		this.editor.setContent( renderToString( content ), { format: 'raw' } );
 	}
 
 	getContent() {
@@ -529,7 +534,8 @@ export default class Editable extends Component {
 	}
 
 	componentWillUnmount() {
-		this.onChange();
+		// To do: should not store level if part of undo action.
+		this.onChange( { undo: true } );
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -545,7 +551,12 @@ export default class Editable extends Component {
 			! isEqual( this.props.value, prevProps.value ) &&
 			! isEqual( this.props.value, this.savedContent )
 		) {
-			this.updateContent();
+			this.savedContent = this.props.value;
+			this.setContent( this.savedContent );
+
+			if ( this.props.focus && this.props.focus.bookmark ) {
+				this.editor.selection.moveToBookmark( this.props.focus.bookmark );
+			}
 		}
 	}
 
