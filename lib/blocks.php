@@ -88,7 +88,7 @@ function do_blocks( $content ) {
 		if ( $raw_content ) {
 			/**
 			 * Filters the raw HTML produced by an individual block.
-			 * 
+			 *
 			 * @param string $raw_content The raw HTML produced by the block.
 			 * @param string $block_name The block name.
 			 * @param array  $attributes The block's attributes.

@@ -62,12 +62,12 @@ class Block_Table_Of_Contents {
 	/**
 	 * Initialises an instance of the class.
 	 *
-	 * @return Gutenberg_Table_of_Contents Instance of the class.
+	 * @return Block_Table_Of_Contents Instance of the class.
 	 */
 	static public function init() {
 		static $instance;
 		if ( ! $instance ) {
-			$instance = new Gutenberg_Table_of_Contents();
+			$instance = new Block_Table_Of_Contents();
 		}
 		return $instance;
 	}
