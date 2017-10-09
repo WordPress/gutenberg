@@ -1017,58 +1017,6 @@ describe( 'state', () => {
 			} );
 		} );
 	} );
-<<<<<<< HEAD
-=======
-
-	describe( 'userData()', () => {
-		beforeAll( () => {
-			registerBlockType( 'core/test-block', {
-				save: noop,
-				edit: noop,
-				category: 'common',
-				title: 'test block',
-			} );
-		} );
-
-		afterAll( () => {
-			unregisterBlockType( 'core/test-block' );
-		} );
-
-		it( 'should record recently used blocks', () => {
-			const original = userData( undefined, {} );
-			const state = userData( original, {
-				type: 'INSERT_BLOCKS',
-				blocks: [ {
-					uid: 'bacon',
-					name: 'core-embed/twitter',
-				} ],
-			} );
-
-			expect( state.recentlyUsedBlocks[ 0 ] ).toEqual( 'core-embed/twitter' );
-
-			const twoRecentBlocks = userData( state, {
-				type: 'INSERT_BLOCKS',
-				blocks: [ {
-					uid: 'eggs',
-					name: 'core-embed/youtube',
-				} ],
-			} );
-
-			expect( twoRecentBlocks.recentlyUsedBlocks[ 0 ] ).toEqual( 'core-embed/youtube' );
-			expect( twoRecentBlocks.recentlyUsedBlocks[ 1 ] ).toEqual( 'core-embed/twitter' );
-		} );
-
-		it( 'should populate recently used blocks with blocks from the common category', () => {
-			const initial = userData( undefined, {
-				type: 'SETUP_EDITOR',
-			} );
-
-			initial.recentlyUsedBlocks.forEach(
-				block => expect( getBlockType( block ).category ).toEqual( 'common' )
-			);
-			expect( initial.recentlyUsedBlocks ).toHaveLength( 8 );
-		} );
-	} );
 
 	describe( 'blocksMode', () => {
 		it( 'should set mode to html if not set', () => {
@@ -1091,5 +1039,4 @@ describe( 'state', () => {
 			expect( value ).toEqual( { chicken: 'visual' } );
 		} );
 	} );
->>>>>>> Block HTML Mode: Adding unit tests
 } );
