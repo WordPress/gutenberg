@@ -167,7 +167,7 @@ registerBlockType( 'core/heading', {
 		const Tag = nodeName.toLowerCase();
 
 		return (
-			<Tag style={ { textAlign: align } } id={ 'heading-' + content[ 0 ].replace( /[^a-z0-9-_:.]/ig, '' ) }>
+			<Tag style={ { textAlign: align } } >
 				{ content }
 			</Tag>
 		);
