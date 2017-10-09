@@ -28,7 +28,11 @@ class BlockSettingsMenu extends Component {
 	}
 
 	toggleMenu() {
-		this.props.onSelect();
+		// Block could be hovered, not selected.
+		if ( this.props.uids.length === 1 ) {
+			this.props.onSelect( this.props.uids[ 0 ] );
+		}
+
 		this.setState( ( state ) => ( {
 			opened: ! state.opened,
 		} ) );
@@ -36,7 +40,7 @@ class BlockSettingsMenu extends Component {
 
 	render() {
 		const { opened } = this.state;
-		const { uid } = this.props;
+		const { uids } = this.props;
 		const toggleClassname = classnames( 'editor-block-settings-menu__toggle', 'editor-block-settings-menu__control', {
 			'is-opened': opened,
 		} );
@@ -50,7 +54,7 @@ class BlockSettingsMenu extends Component {
 					label={ opened ? __( 'Close Settings Menu' ) : __( 'Open Settings Menu' ) }
 				/>
 
-				{ opened && <BlockSettingsMenuContent uid={ uid } /> }
+				{ opened && <BlockSettingsMenuContent uids={ uids } /> }
 			</div>
 		);
 	}
@@ -58,9 +62,9 @@ class BlockSettingsMenu extends Component {
 
 export default connect(
 	undefined,
-	( dispatch, ownProps ) => ( {
-		onSelect() {
-			dispatch( selectBlock( ownProps.uid ) );
+	( dispatch ) => ( {
+		onSelect( uid ) {
+			dispatch( selectBlock( uid ) );
 		},
 	} )
 )( BlockSettingsMenu );

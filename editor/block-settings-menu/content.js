@@ -6,18 +6,18 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf, _n } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { isEditorSidebarOpened } from '../selectors';
-import { selectBlock, removeBlock, toggleSidebar, setActivePanel, toggleBlockMode } from '../actions';
+import { removeBlocks, toggleSidebar, setActivePanel, toggleBlockMode } from '../actions';
 
-function BlockSettingsMenuContent( { onDelete, onSelect, isSidebarOpened, onToggleSidebar, onShowInspector, onToggleMode } ) {
+function BlockSettingsMenuContent( { onDelete, isSidebarOpened, onToggleSidebar, onShowInspector, onToggleMode, uids } ) {
+	const count = uids.length;
 	const toggleInspector = () => {
-		onSelect();
 		onShowInspector();
 		if ( ! isSidebarOpened ) {
 			onToggleSidebar();
@@ -36,7 +36,7 @@ function BlockSettingsMenuContent( { onDelete, onSelect, isSidebarOpened, onTogg
 				className="editor-block-settings-menu__control"
 				onClick={ onDelete }
 				icon="trash"
-				label={ __( 'Delete the block' ) }
+				label={ sprintf( _n( 'Delete the block', 'Delete the %d blocks', count ), count ) }
 			/>
 			<IconButton
 				className="editor-block-settings-menu__control"
@@ -54,10 +54,7 @@ export default connect(
 	} ),
 	( dispatch, ownProps ) => ( {
 		onDelete() {
-			dispatch( removeBlock( ownProps.uid ) );
-		},
-		onSelect() {
-			dispatch( selectBlock( ownProps.uid ) );
+			dispatch( removeBlocks( ownProps.uids ) );
 		},
 		onShowInspector() {
 			dispatch( setActivePanel( 'block' ) );
