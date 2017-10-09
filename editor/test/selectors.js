@@ -1730,6 +1730,16 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getMostFrequentlyUsedBlocks', () => {
+		it( 'should have paragraph and image to bring frequently used blocks up to three blocks', () => {
+			const noUsage = { preferences: { blockUsage: {} } };
+			const someUsage = { preferences: { blockUsage: { 'core/paragraph': 1 } } };
+
+			expect( getMostFrequentlyUsedBlocks( noUsage ).map( ( block ) => block.name ) )
+				.toEqual( [ 'core/paragraph', 'core/image' ] );
+
+			expect( getMostFrequentlyUsedBlocks( someUsage ).map( ( block ) => block.name ) )
+				.toEqual( [ 'core/paragraph', 'core/image' ] );
+		} );
 		it( 'should return the top 3 most recently used blocks', () => {
 			const state = {
 				preferences: {

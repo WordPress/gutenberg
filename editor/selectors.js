@@ -12,6 +12,7 @@ import {
 	some,
 	values,
 	keys,
+	without,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -21,6 +22,11 @@ import createSelector from 'rememo';
 import { serialize, getBlockType } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
+
+/***
+ * Module constants
+ */
+const MAX_FREQUENT_BLOCKS = 3;
 
 /**
  * Returns the current editing mode.
@@ -867,8 +873,10 @@ export function getRecentlyUsedBlocks( state ) {
 export const getMostFrequentlyUsedBlocks = createSelector(
 	( state ) => {
 		const { blockUsage } = state.preferences;
-		return keys( blockUsage ).sort( ( a, b ) => blockUsage[ b ] - blockUsage[ a ] )
-			.slice( 0, 3 )
+		const orderedByUsage = keys( blockUsage ).sort( ( a, b ) => blockUsage[ b ] - blockUsage[ a ] );#
+		// add in paragraph and image blocks if they're not already in the usgae data
+		return [ ...orderedByUsage, ...without( [ 'core/paragraph', 'core/image' ], ...orderedByUsage ) ]
+			.slice( 0, MAX_FREQUENT_BLOCKS )
 			.map( blockType => getBlockType( blockType ) );
 	},
 	( state ) => state.preferences.blockUsage
