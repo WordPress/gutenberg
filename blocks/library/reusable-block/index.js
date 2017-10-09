@@ -85,7 +85,7 @@ class ReusableBlockEdit extends Component {
 		}
 
 		const blockType = getBlockType( reusableBlock.type );
-		const BlockEdit = blockType.edit || blockType.create;
+		const BlockEdit = blockType.edit || blockType.save;
 
 		return [
 			// We fake the block being read-only by wrapping it with an element that has pointer-events: none
