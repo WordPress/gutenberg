@@ -11,9 +11,9 @@ import { partial, castArray } from 'lodash';
  * @param  {Object} post Post object
  * @return {Object}      Action object
  */
-export function setInitialPost( post ) {
+export function setupEditor( post ) {
 	return {
-		type: 'SET_INITIAL_POST',
+		type: 'SETUP_EDITOR',
 		post,
 	};
 }
