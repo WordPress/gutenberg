@@ -64,7 +64,14 @@ class ReusableBlockEdit extends Component {
 
 	updateReusableBlock() {
 		const { name, attributes } = this.state;
-		this.props.updateReusableBlock( pickBy( { name, attributes } ) );
+
+		// Use pickBy to include only changed (assigned) values in payload
+		const payload = pickBy( {
+			name,
+			attributes,
+		} );
+
+		this.props.updateReusableBlock( payload );
 		this.props.saveReusableBlock();
 		this.stopEditing();
 	}
