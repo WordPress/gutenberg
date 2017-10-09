@@ -17,7 +17,7 @@ import { createBlock } from '@wordpress/blocks';
  */
 import Inserter from '../../inserter';
 import { insertBlock } from '../../actions';
-import { getMostFrequentlyUsedBlocks, getBlockCount } from '../../selectors';
+import { getMostFrequentlyUsedBlocks } from '../../selectors';
 
 export class VisualEditorInserter extends Component {
 	constructor() {
@@ -42,7 +42,6 @@ export class VisualEditorInserter extends Component {
 	}
 
 	render() {
-		const { blockCount } = this.props;
 		const { isShowingControls } = this.state;
 		const { mostFrequentlyUsedBlocks } = this.props;
 		const classes = classnames( 'editor-visual-editor__inserter', {
@@ -55,9 +54,7 @@ export class VisualEditorInserter extends Component {
 				onFocus={ this.showControls }
 				onBlur={ this.hideControls }
 			>
-				<Inserter
-					insertIndex={ blockCount }
-					position="top right" />
+				<Inserter position="top right" />
 				{ mostFrequentlyUsedBlocks && mostFrequentlyUsedBlocks.map(
 					( block ) =>
 						<IconButton
@@ -79,7 +76,6 @@ export default connect(
 	( state ) => {
 		return {
 			mostFrequentlyUsedBlocks: getMostFrequentlyUsedBlocks( state ),
-			blockCount: getBlockCount( state ),
 		};
 	},
 	{ onInsertBlock: insertBlock },

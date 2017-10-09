@@ -51,11 +51,11 @@ export class InserterMenu extends Component {
 	}
 
 	componentDidMount() {
-		document.addEventListener( 'keydown', this.onKeyDown, true );
+		document.addEventListener( 'keydown', this.onKeyDown );
 	}
 
 	componentWillUnmount() {
-		document.removeEventListener( 'keydown', this.onKeyDown, true );
+		document.removeEventListener( 'keydown', this.onKeyDown );
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
@@ -239,32 +239,28 @@ export class InserterMenu extends Component {
 					return;
 				}
 				this.focusPrevious( this );
-				break;
 
+				break;
 			case UP:
 				keydown.preventDefault();
 				this.focusPrevious( this );
-				break;
 
+				break;
 			case RIGHT:
 				if ( this.state.currentFocus === 'search' ) {
 					return;
 				}
 				this.focusNext( this );
-				break;
 
+				break;
 			case DOWN:
 				keydown.preventDefault();
 				this.focusNext( this );
+
 				break;
-
-			default:
-				return;
+			default :
+				break;
 		}
-
-		// Since unhandled key will return in the default case, we can assume
-		// having reached this point implies that the key is handled.
-		keydown.stopImmediatePropagation();
 	}
 
 	changeMenuSelection( refName ) {
@@ -349,6 +345,7 @@ export class InserterMenu extends Component {
 		const isShowingEmbeds = ! isSearching && 'embeds' === this.state.tab;
 		const isShowingRecent = ! isSearching && 'recent' === this.state.tab;
 
+		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
 			<div className="editor-inserter__menu">
 				<label htmlFor={ `editor-inserter__search-${ instanceId }` } className="screen-reader-text">
@@ -393,6 +390,7 @@ export class InserterMenu extends Component {
 				}
 			</div>
 		);
+		/* eslint-enable jsx-a11y/no-autofocus */
 	}
 }
 
