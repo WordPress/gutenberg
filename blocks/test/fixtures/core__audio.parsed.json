@@ -4,7 +4,7 @@
         "attrs": {
             "align": "right"
         },
-        "rawContent": "\n<div class=\"wp-block-audio alignright\">\n    <audio controls=\"\" src=\"https://media.simplecast.com/episodes/audio/80564/draft-podcast-51-livePublish2.mp3\"></audio>\n</div>\n"
+        "rawContent": "\n<figure class=\"wp-block-audio alignright\">\n    <audio controls=\"\" src=\"https://media.simplecast.com/episodes/audio/80564/draft-podcast-51-livePublish2.mp3\"></audio>\n</figure>\n"
     },
     {
         "attrs": {},

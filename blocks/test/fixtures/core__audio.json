@@ -5,8 +5,9 @@
         "isValid": true,
         "attributes": {
             "src": "https://media.simplecast.com/episodes/audio/80564/draft-podcast-51-livePublish2.mp3",
-            "align": "right"
+            "align": "right",
+            "caption": []
         },
-        "originalContent": "<div class=\"wp-block-audio alignright\">\n    <audio controls=\"\" src=\"https://media.simplecast.com/episodes/audio/80564/draft-podcast-51-livePublish2.mp3\"></audio>\n</div>"
+        "originalContent": "<figure class=\"wp-block-audio alignright\">\n    <audio controls=\"\" src=\"https://media.simplecast.com/episodes/audio/80564/draft-podcast-51-livePublish2.mp3\"></audio>\n</figure>"
     }
 ]

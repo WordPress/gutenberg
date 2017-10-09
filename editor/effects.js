@@ -251,7 +251,7 @@ export default {
 
 		dispatch( savePost() );
 	},
-	SET_INITIAL_POST( action ) {
+	SETUP_EDITOR( action ) {
 		const { post } = action;
 		const effects = [];
 

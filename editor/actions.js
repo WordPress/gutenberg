@@ -11,9 +11,9 @@ import { partial, castArray } from 'lodash';
  * @param  {Object} post Post object
  * @return {Object}      Action object
  */
-export function setInitialPost( post ) {
+export function setupEditor( post ) {
 	return {
-		type: 'SET_INITIAL_POST',
+		type: 'SETUP_EDITOR',
 		post,
 	};
 }
@@ -260,6 +260,30 @@ export function startTyping() {
 export function stopTyping() {
 	return {
 		type: 'STOP_TYPING',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user toggled the sidebar
+ *
+ * @return {Object}         Action object
+ */
+export function toggleSidebar() {
+	return {
+		type: 'TOGGLE_SIDEBAR',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user switched the active sidebar tab panel
+ *
+ * @param  {String} panel   The panel name
+ * @return {Object}         Action object
+ */
+export function setActivePanel( panel ) {
+	return {
+		type: 'SET_ACTIVE_PANEL',
+		panel,
 	};
 }
 

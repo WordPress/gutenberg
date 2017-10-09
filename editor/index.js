@@ -22,7 +22,7 @@ import { settings as dateSettings } from '@wordpress/date';
 import './assets/stylesheets/main.scss';
 import Layout from './layout';
 import createReduxStore from './store';
-import { setInitialPost, undo } from './actions';
+import { setupEditor, undo } from './actions';
 import EditorSettingsProvider from './settings/provider';
 
 /**
@@ -73,9 +73,7 @@ export function createEditorInstance( id, post, settings ) {
 		...settings,
 	};
 
-	store.dispatch( { type: 'SETUP_EDITOR' } );
-
-	store.dispatch( setInitialPost( post ) );
+	store.dispatch( setupEditor( post ) );
 
 	const providers = [
 		// Redux provider:
