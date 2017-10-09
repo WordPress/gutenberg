@@ -14,7 +14,7 @@ import { ClipboardButton, Tooltip, PanelBody } from '@wordpress/components';
 /**
  * Internal Dependencies
  */
-import { updateBlockAttributes, makeBlockStatic, makeBlockReusable } from '../../actions';
+import { updateBlockAttributes, convertBlockToStatic, convertBlockToReusable } from '../../actions';
 import { getSelectedBlock, getCurrentPost } from '../../selectors';
 import { filterURLForDisplay } from '../../utils/url';
 
@@ -62,7 +62,7 @@ class BlockInspectorAdvancedControls extends Component {
 	}
 
 	render() {
-		const { selectedBlock, post, onMakeBlockStatic, onMakeBlockReusable } = this.props;
+		const { selectedBlock, post, onConvertBlockToStatic, onConvertBlockToReusable } = this.props;
 		const blockType = getBlockType( selectedBlock.name );
 
 		return (
@@ -96,14 +96,14 @@ class BlockInspectorAdvancedControls extends Component {
 						label={ __( 'Reusable Blocks' ) }
 						value={ __( 'Detach from Reusable Block' ) }
 						help={ __( 'This releases the block from its connection to the reusable block.' ) }
-						onClick={ () => onMakeBlockStatic( selectedBlock.uid ) } />
+						onClick={ () => onConvertBlockToStatic( selectedBlock.uid ) } />
 				}
 				{ selectedBlock.name !== 'core/reusable-block' &&
 					<InspectorControls.ButtonControl
 						label={ __( 'Reusable Blocks' ) }
 						value={ __( 'Convert to a Reusable Block' ) }
 						help={ __( 'Reusable blocks can be used across posts and pages.' ) }
-						onClick={ () => onMakeBlockReusable( selectedBlock.uid ) } />
+						onClick={ () => onConvertBlockToReusable( selectedBlock.uid ) } />
 				}
 			</PanelBody>
 		);
@@ -119,7 +119,7 @@ export default connect(
 	},
 	{
 		setAttributes: updateBlockAttributes,
-		onMakeBlockStatic: makeBlockStatic,
-		onMakeBlockReusable: makeBlockReusable,
+		onConvertBlockToStatic: convertBlockToStatic,
+		onConvertBlockToReusable: convertBlockToReusable,
 	}
 )( BlockInspectorAdvancedControls );

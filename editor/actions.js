@@ -425,9 +425,9 @@ export function saveReusableBlock( id ) {
  * @param {Object} uid The ID of the block to attach
  * @return {Object}    Action object
  */
-export function makeBlockStatic( uid ) {
+export function convertBlockToStatic( uid ) {
 	return {
-		type: 'MAKE_BLOCK_STATIC',
+		type: 'CONVERT_BLOCK_TO_STATIC',
 		uid,
 	};
 }
@@ -439,9 +439,9 @@ export function makeBlockStatic( uid ) {
  * @param {Object} uid The ID of the block to detach
  * @return {Object}    Action object
  */
-export function makeBlockReusable( uid ) {
+export function convertBlockToReusable( uid ) {
 	return {
-		type: 'MAKE_BLOCK_REUSABLE',
+		type: 'CONVERT_BLOCK_TO_REUSABLE',
 		uid,
 	};
 }

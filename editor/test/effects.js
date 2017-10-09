@@ -23,8 +23,8 @@ import {
 	updateReusableBlock,
 	saveReusableBlock,
 	fetchReusableBlocks,
-	makeBlockStatic,
-	makeBlockReusable,
+	convertBlockToStatic,
+	convertBlockToReusable,
 } from '../actions';
 import reducer from '../reducer';
 import effects from '../effects';
@@ -577,8 +577,8 @@ describe( 'effects', () => {
 			} );
 		} );
 
-		describe( '.MAKE_BLOCK_STATIC', () => {
-			const handler = effects.MAKE_BLOCK_STATIC;
+		describe( '.CONVERT_BLOCK_TO_STATIC', () => {
+			const handler = effects.CONVERT_BLOCK_TO_STATIC;
 
 			it( 'should convert a reusable block into a static block', () => {
 				const reusableBlock = {
@@ -607,7 +607,7 @@ describe( 'effects', () => {
 				const dispatch = jest.fn();
 				const store = { getState: () => state, dispatch };
 
-				handler( makeBlockStatic( staticBlock.uid ), store );
+				handler( convertBlockToStatic( staticBlock.uid ), store );
 
 				expect( dispatch ).toHaveBeenCalledWith(
 					replaceBlocks(
@@ -618,8 +618,8 @@ describe( 'effects', () => {
 			} );
 		} );
 
-		describe( '.MAKE_BLOCK_REUSABLE', () => {
-			const handler = effects.MAKE_BLOCK_REUSABLE;
+		describe( '.CONVERT_BLOCK_TO_REUSABLE', () => {
+			const handler = effects.CONVERT_BLOCK_TO_REUSABLE;
 
 			it( 'should convert a static block into a reusable block', () => {
 				const staticBlock = {
@@ -636,7 +636,7 @@ describe( 'effects', () => {
 				const dispatch = jest.fn();
 				const store = { getState: () => state, dispatch };
 
-				handler( makeBlockReusable( staticBlock.uid ), store );
+				handler( convertBlockToReusable( staticBlock.uid ), store );
 
 				expect( dispatch ).toHaveBeenCalledWith(
 					updateReusableBlock( 'this-is-a-mock-uuid', {
