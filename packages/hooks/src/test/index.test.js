@@ -141,6 +141,11 @@ test( 'cannot add filters with namespaces missing a functionDescription', () => 
 	);
 } );
 
+test( 'Can add filters with dashes in namespaces', () => {
+	testObject.hooks.addFilter( 'hook_name', 'with-dashes', () => null );
+	expect( console.error ).toHaveBeenCalledTimes( 0 );
+} );
+
 test( 'Can add filters with capitals in namespaces', () => {
 	testObject.hooks.addFilter( 'hook_name', 'my_name-OhNoaction', () => null );
 	expect( console.error ).toHaveBeenCalledTimes( 0 );
@@ -556,3 +561,42 @@ test( 'adding and removing filters with recursion', () => {
 
 	expect( testObject.hooks.applyFilters( 'remove_and_add', '' ) ).toEqual( '1-134-234' );
 } );
+
+
+// Test adding via composition.
+test( 'adding hooks via composition', () => {
+
+	var testObject2 = {};
+	testObject2.hooks = new Hooks();
+
+	expect( typeof testObject2.hooks.applyFilters ).toEqual( 'function' );
+} );
+
+
+// Test adding as a mixin.
+test( 'adding hooks as a mixin', () => {
+
+	var testObject3 = {};
+	Object.assign( testObject3, new Hooks() );
+
+	expect( typeof testObject3.applyFilters ).toEqual( 'function' );
+} );
+
+// Test context.
+test( 'Test `this` context via composition and as a mixin', () => {
+
+	var testObject2 = {};
+	testObject2.hooks = new Hooks();
+	testObject.hooks.addAction( 'test.action', 'my_callback', function() {
+
+	window.actionValue += 'a';
+	console.log( this );
+		expect( this ).toEqual( testObject2 );
+} );
+	testObject.hooks.doAction( 'test.action' );
+
+	var testObject3 = {};
+	Object.assign( testObject3, new Hooks() );
+
+} );
+
