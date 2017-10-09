@@ -3,7 +3,6 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
-import { Slot } from 'react-slot-fill';
 
 /**
  * WordPress dependencies
@@ -49,7 +48,6 @@ function Layout( { mode, isSidebarOpened, notices, ...props } ) {
 				<MetaBoxes />
 			</div>
 			{ isSidebarOpened && <Sidebar /> }
-			<Slot name="Editor.Modal" fillChildProps={ { isSidebarOpened } } />
 		</div>
 	);
 }
