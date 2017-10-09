@@ -250,7 +250,10 @@ class VisualEditorBlock extends Component {
 	}
 
 	onFocus( event ) {
-		if ( event.target === this.node ) {
+		// Firefox retargets to parent with tabIndex.
+		const target = event.nativeEvent.explicitOriginalTarget || event.target;
+
+		if ( target === this.node ) {
 			this.props.onSelect();
 		}
 	}
