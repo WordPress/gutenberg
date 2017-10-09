@@ -139,22 +139,3 @@ function gutenberg_disable_editor_settings_wpautop( $settings ) {
 	return $settings;
 }
 add_filter( 'wp_editor_settings', 'gutenberg_disable_editor_settings_wpautop' );
-
-/**
- * WPCOM markdown support causes issues when saving a Gutenberg post by
- * stripping out the <p> tags. This adds a filter prior to saving the post via
- * REST API to disable markdown support. Markdown support most typically
- * provided by Jetpack.
- *
- * @since 1.3.0
- *
- * @param  array $post      Post object which contains content to check for block.
- * @return array $post      Post object.
- */
-function gutenberg_remove_wpcom_markdown_support( $post ) {
-	if ( content_has_blocks( $post->post_content ) ) {
-		remove_post_type_support( 'post', 'wpcom-markdown' );
-	}
-	return $post;
-}
-add_filter( 'rest_pre_insert_post', 'gutenberg_remove_wpcom_markdown_support' );
