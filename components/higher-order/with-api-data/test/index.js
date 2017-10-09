@@ -70,12 +70,15 @@ describe( 'withAPIData()', () => {
 		} );
 	} );
 
-	it( 'should ignore unmatched resources', () => {
+	it( 'should assign an empty prop object for unmatched resources', () => {
 		const wrapper = getWrapper( () => ( {
-			revision: '/wp/v2/pages/5/revisions/10',
+			unknown: '/wp/v2/unknown/route',
 		} ) );
 
-		expect( wrapper.state( 'dataProps' ) ).toEqual( {} );
+		const dataProps = wrapper.state( 'dataProps' );
+		expect( Object.keys( dataProps ) ).toEqual( [ 'unknown' ] );
+		expect( Object.keys( dataProps.unknown ) ).toEqual( [] );
+		expect( wrapper.prop( 'unknown' ) ).toEqual( {} );
 	} );
 
 	it( 'should include full gamut of method available properties', () => {
