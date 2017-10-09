@@ -93,7 +93,7 @@
 	&.is-multi-selected:before {
 		background: $blue-medium-100;
 		outline: 2px solid $blue-medium-200;
-		transition: 0.2s outline;
+		transition: 0s outline;
 	}
 
 	.iframe-overlay {
