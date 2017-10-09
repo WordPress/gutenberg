@@ -16,7 +16,7 @@ const TableOfContentsItem = ( {
 } ) => (
 	<li
 		className={ classnames(
-			'table-of-contents-item',
+			'document-outline__item',
 			`is-h${ level }`,
 			{
 				'is-invalid': ! isValid,
@@ -24,17 +24,17 @@ const TableOfContentsItem = ( {
 		) }
 	>
 		<button
-			className="table-of-contents__button"
+			className="document-outline__button"
 			onClick={ onClick }
-			aria-label={ __( 'Focus heading block' ) }
 		>
-			<span className="table-of-contents-item__emdash" aria-hidden="true"></span>
-			<strong className="table-of-contents-item__level">
+			<span className="document-outline__emdash" aria-hidden="true"></span>
+			<strong className="document-outline__level">
 				H{ level }
 			</strong>
-			<span className="table-of-contents-item__content">
+			<span className="document-outline__item-content">
 				{ children }
 			</span>
+			<span className="screen-reader-text">{ __( '(Click to focus this heading)' ) }</span>
 		</button>
 	</li>
 );

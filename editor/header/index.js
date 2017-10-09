@@ -13,13 +13,25 @@ import { IconButton } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import ModeSwitcher from './mode-switcher';
 import SavedState from './saved-state';
-import Tools from './tools';
-import { getMultiSelectedBlockUids } from '../selectors';
+import PublishButton from './publish-button';
+import PreviewButton from './preview-button';
+import ModeSwitcher from './mode-switcher';
+import Inserter from '../inserter';
+import { getMultiSelectedBlockUids, hasEditorUndo, hasEditorRedo, isEditorSidebarOpened } from '../selectors';
 import { clearSelectedBlock } from '../actions';
 
-function Header( { multiSelectedBlockUids, onRemove, onDeselect } ) {
+function Header( {
+	multiSelectedBlockUids,
+	onRemove,
+	onDeselect,
+	undo,
+	redo,
+	hasRedo,
+	hasUndo,
+	toggleSidebar,
+	isSidebarOpened,
+} ) {
 	const count = multiSelectedBlockUids.length;
 
 	if ( count ) {
@@ -59,9 +71,31 @@ function Header( { multiSelectedBlockUids, onRemove, onDeselect } ) {
 			aria-label={ __( 'Editor toolbar' ) }
 			className="editor-header"
 		>
-			<ModeSwitcher />
-			<SavedState />
-			<Tools />
+			<div className="editor-header__content-tools">
+				<Inserter position="bottom right" />
+				<IconButton
+					icon="undo"
+					label={ __( 'Undo' ) }
+					disabled={ ! hasUndo }
+					onClick={ undo } />
+				<IconButton
+					icon="redo"
+					label={ __( 'Redo' ) }
+					disabled={ ! hasRedo }
+					onClick={ redo } />
+			</div>
+			<div className="editor-header__settings">
+				<SavedState />
+				<PreviewButton />
+				<PublishButton />
+				<IconButton
+					icon="admin-generic"
+					onClick={ toggleSidebar }
+					isToggled={ isSidebarOpened }
+					label={ __( 'Settings' ) }
+				/>
+				<ModeSwitcher />
+			</div>
 		</div>
 	);
 }
@@ -69,6 +103,9 @@ function Header( { multiSelectedBlockUids, onRemove, onDeselect } ) {
 export default connect(
 	( state ) => ( {
 		multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
+		hasUndo: hasEditorUndo( state ),
+		hasRedo: hasEditorRedo( state ),
+		isSidebarOpened: isEditorSidebarOpened( state ),
 	} ),
 	( dispatch ) => ( {
 		onDeselect: () => dispatch( clearSelectedBlock() ),
@@ -76,5 +113,8 @@ export default connect(
 			type: 'REMOVE_BLOCKS',
 			uids,
 		} ),
+		undo: () => dispatch( { type: 'UNDO' } ),
+		redo: () => dispatch( { type: 'REDO' } ),
+		toggleSidebar: () => dispatch( { type: 'TOGGLE_SIDEBAR' } ),
 	} )
 )( Header );

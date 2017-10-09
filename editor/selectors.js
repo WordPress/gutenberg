@@ -2,7 +2,16 @@
  * External dependencies
  */
 import moment from 'moment';
-import { first, last, values, some, isEqual } from 'lodash';
+import {
+	first,
+	get,
+	has,
+	isEqual,
+	last,
+	reduce,
+	some,
+	values,
+} from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -368,8 +377,49 @@ export function getEditedPostPreviewLink( state ) {
  * @param  {String} uid   Block unique ID
  * @return {Object}       Parsed block object
  */
-export function getBlock( state, uid ) {
-	return state.editor.blocksByUid[ uid ];
+export const getBlock = createSelector(
+	( state, uid ) => {
+		const block = state.editor.blocksByUid[ uid ];
+		if ( ! block ) {
+			return null;
+		}
+
+		const type = getBlockType( block.name );
+		if ( ! type || ! type.attributes ) {
+			return block;
+		}
+
+		const metaAttributes = reduce( type.attributes, ( result, value, key ) => {
+			if ( value && 'meta' in value ) {
+				result[ key ] = getPostMeta( state, value.meta );
+			}
+
+			return result;
+		}, {} );
+
+		if ( ! Object.keys( metaAttributes ).length ) {
+			return block;
+		}
+
+		return {
+			...block,
+			attributes: {
+				...block.attributes,
+				...metaAttributes,
+			},
+		};
+	},
+	( state, uid ) => [
+		get( state, [ 'editor', 'blocksByUid', uid ] ),
+		get( state, 'editor.edits.meta' ),
+		get( state, 'currentPost.meta' ),
+	]
+);
+
+function getPostMeta( state, key ) {
+	return has( state, [ 'editor', 'edits', 'meta', key ] )
+		? get( state, [ 'editor', 'edits', 'meta', key ] )
+		: get( state, [ 'currentPost', 'meta', key ] );
 }
 
 /**
@@ -802,5 +852,5 @@ export function getNotices( state ) {
  */
 export function getRecentlyUsedBlocks( state ) {
 	// resolves the block names in the state to the block type settings
-	return state.userData.recentlyUsedBlocks.map( blockType => getBlockType( blockType ) );
+	return state.preferences.recentlyUsedBlocks.map( blockType => getBlockType( blockType ) );
 }

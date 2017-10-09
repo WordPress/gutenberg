@@ -132,7 +132,8 @@ code, pre {
 	border-left: none;
 }
 
-.menu-table-of-contents-container ul a:hover {
+.menu-table-of-contents-container ul a:hover,
+.menu-table-of-contents-container ul a:focus {
 	background: transparent;
 	border-left-color: #00B975;
 	color: #00B975;

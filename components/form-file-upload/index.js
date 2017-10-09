@@ -6,6 +6,7 @@ import { Component } from 'element';
 /**
  * Internal dependencies
  */
+import './style.scss';
 import IconButton from '../icon-button';
 
 class FormFileUpload extends Component {
@@ -27,7 +28,7 @@ class FormFileUpload extends Component {
 		const { children, multiple = false, accept, onChange, ...props } = this.props;
 
 		return (
-			<div>
+			<div className="components-form-file-upload">
 				<IconButton
 					icon="upload"
 					onClick={ this.openFileDialog }

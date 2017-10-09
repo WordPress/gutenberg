@@ -92,7 +92,18 @@ export function registerBlockType( name, settings ) {
 		);
 		return;
 	}
-
+	if ( ! ( 'title' in settings ) || settings.title === '' ) {
+		console.error(
+			'The block "' + name + '" must have a title.'
+		);
+		return;
+	}
+	if ( typeof settings.title !== 'string' ) {
+		console.error(
+			'Block titles must be strings.'
+		);
+		return;
+	}
 	const block = blocks[ name ] = {
 		name,
 		attributes: get( window._wpBlocksAttributes, name ),

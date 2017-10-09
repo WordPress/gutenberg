@@ -11,6 +11,12 @@ addStory( {
 } );
 
 addStory( {
+	name: 'language',
+	title: 'The Language of Gutenberg',
+	markdown: require( './language.md' ),
+} );
+
+addStory( {
 	name: 'block-api',
 	title: 'Block API',
 	markdown: require( './block-api.md' ),
@@ -64,9 +70,9 @@ addStory( {
 
 addStory( {
 	parents: [ 'reference' ],
-	name: 'attribute-sources',
-	title: 'Attribute Sources',
-	markdown: require( './attribute-sources.md' ),
+	name: 'attributes',
+	title: 'Attributes',
+	markdown: require( './attributes.md' ),
 } );
 
 addStory( {

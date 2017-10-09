@@ -8,7 +8,7 @@
 	visibility: hidden;
 	opacity: 0;
 	transition: 0.3s opacity, 0.3s background-color, 0s visibility 0.3s;
-	border: 2px solid $blue-medium-500;
+	border: 2px solid $blue-dark-900;
 	border-radius: 2px;
 
 	&.is-active {
@@ -18,7 +18,7 @@
 	}
 
 	&.is-dragging-over-element {
-		background-color: rgba( $blue-medium-300, 0.8 );
+		background-color: rgba( $blue-dark-900, 0.8 );
 
 		.components-drop-zone__content {
 			display: block;

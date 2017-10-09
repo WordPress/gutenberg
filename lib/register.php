@@ -37,6 +37,8 @@ function the_gutenberg_project() {
  * @since 0.1.0
  */
 function gutenberg_menu() {
+	global $submenu;
+
 	add_menu_page(
 		'Gutenberg',
 		'Gutenberg',
@@ -63,6 +65,14 @@ function gutenberg_menu() {
 		'gutenberg-demo',
 		'the_gutenberg_project'
 	);
+
+	if ( current_user_can( 'edit_posts' ) ) {
+		$submenu['gutenberg'][] = array(
+			__( 'Feedback', 'gutenberg' ),
+			'edit_posts',
+			'http://wordpressdotorg.polldaddy.com/s/gutenberg-support',
+		);
+	}
 }
 add_action( 'admin_menu', 'gutenberg_menu' );
 
@@ -221,6 +231,14 @@ function gutenberg_get_edit_post_url( $post_id ) {
  * @return string Edit post link.
  */
 function gutenberg_filter_edit_post_link( $url, $post_id, $context ) {
+	// Avoid redirect to Gutenberg after saving a block post in Classic editor.
+	$sendback = wp_get_referer();
+	if ( $sendback && (
+			0 === strpos( $sendback, parse_url( admin_url( 'post.php' ), PHP_URL_PATH ) ) ||
+			0 === strpos( $sendback, parse_url( admin_url( 'post-new.php' ), PHP_URL_PATH ) ) ) ) {
+		return $url;
+	}
+
 	$post = get_post( $post_id );
 	if ( gutenberg_can_edit_post( $post_id ) && gutenberg_post_has_blocks( $post_id ) && post_type_supports( get_post_type( $post_id ), 'editor' ) ) {
 		$gutenberg_url = gutenberg_get_edit_post_url( $post->ID );
@@ -284,3 +302,27 @@ function gutenberg_add_gutenberg_post_state( $post_states, $post ) {
 	return $post_states;
 }
 add_filter( 'display_post_states', 'gutenberg_add_gutenberg_post_state', 10, 2 );
+
+/**
+ * Registers custom post types required by the Gutenberg editor.
+ *
+ * @since 0.10.0
+ */
+function gutenberg_register_post_types() {
+	register_post_type( 'gb_reusable_block', array(
+		'public' => false,
+	) );
+}
+add_action( 'init', 'gutenberg_register_post_types' );
+
+/**
+ * Registers the REST API routes needed by the Gutenberg editor.
+ *
+ * @since 0.10.0
+ */
+function gutenberg_register_rest_routes() {
+	$controller = new WP_REST_Reusable_Blocks_Controller();
+	$controller->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_rest_routes' );
+

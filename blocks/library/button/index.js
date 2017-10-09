@@ -12,9 +12,11 @@ import { registerBlockType, source } from '../../api';
 import Editable from '../../editable';
 import UrlInputButton from '../../url-input/button';
 import BlockControls from '../../block-controls';
+import ToggleControl from '../../inspector-controls/toggle-control';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import ColorPalette from '../../color-palette';
 import InspectorControls from '../../inspector-controls';
+import BlockDescription from '../../block-description';
 
 const { attr, children } = source;
 
@@ -48,15 +50,24 @@ registerBlockType( 'core/button', {
 	},
 
 	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
+		const { align, clear } = attributes;
+		const props = {};
+
 		if ( 'left' === align || 'right' === align || 'center' === align ) {
-			return { 'data-align': align };
+			props[ 'data-align' ] = align;
 		}
+
+		if ( clear ) {
+			props[ 'data-clear' ] = 'true';
+		}
+
+		return props;
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus, className } ) {
-		const { text, url, title, align, color } = attributes;
+		const { text, url, title, align, color, clear } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
+		const toggleClear = () => setAttributes( { clear: ! clear } );
 		const updateUrl = ( urlSettings ) => setAttributes( { url: urlSettings.url } );
 
 		return [
@@ -68,7 +79,7 @@ registerBlockType( 'core/button', {
 			<span key="button" className={ className } title={ title } style={ { backgroundColor: color } } >
 				<Editable
 					tagName="span"
-					placeholder={ __( 'Write label…' ) }
+					placeholder={ __( 'Add text…' ) }
 					value={ text }
 					focus={ focus }
 					onFocus={ setFocus }
@@ -79,6 +90,16 @@ registerBlockType( 'core/button', {
 				/>
 				{ focus &&
 					<InspectorControls key="inspector">
+						<BlockDescription>
+							<p>{ __( 'A nice little button. Call something out with it.' ) }</p>
+						</BlockDescription>
+
+						<ToggleControl
+							label={ __( 'Stand on a line' ) }
+							checked={ !! clear }
+							onChange={ toggleClear }
+						/>
+
 						<ColorPalette
 							value={ color }
 							onChange={ ( colorValue ) => setAttributes( { color: colorValue } ) }

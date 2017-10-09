@@ -7,21 +7,19 @@ import { filter } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
-import { PanelBody } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import TableOfContentsItem from './item';
-import { getBlocks, isEditorSidebarPanelOpened } from '../../selectors';
-import { selectBlock, toggleSidebarPanel } from '../../actions';
+import DocumentOutlineItem from './item';
+import { getBlocks } from '../selectors';
+import { selectBlock } from '../actions';
 
 /**
  * Module constants
  */
-const PANEL_NAME = 'table-of-contents';
 const emptyHeadingContent = <em>{ __( '(Empty heading)' ) }</em>;
 const incorrectLevelContent = [
 	<br key="incorrect-break" />,
@@ -53,7 +51,7 @@ const getHeadingLevel = heading => {
 
 const isEmptyHeading = heading => ! heading.attributes.content || heading.attributes.content.length === 0;
 
-const TableOfContents = ( { blocks, onSelect, isOpened, onTogglePanel } ) => {
+const DocumentOutline = ( { blocks, onSelect } ) => {
 	const headings = filter( blocks, ( block ) => block.name === 'core/heading' );
 
 	if ( headings.length <= 1 ) {
@@ -66,7 +64,7 @@ const TableOfContents = ( { blocks, onSelect, isOpened, onTogglePanel } ) => {
 	// when clicking on a heading item from the list.
 	const onSelectHeading = ( uid ) => onSelect( uid );
 
-	const tocItems = headings.map( ( heading, index ) => {
+	const items = headings.map( ( heading, index ) => {
 		const headingLevel = getHeadingLevel( heading );
 		const isEmpty = isEmptyHeading( heading );
 
@@ -83,7 +81,7 @@ const TableOfContents = ( { blocks, onSelect, isOpened, onTogglePanel } ) => {
 		prevHeadingLevel = headingLevel;
 
 		return (
-			<TableOfContentsItem
+			<DocumentOutlineItem
 				key={ index }
 				level={ headingLevel }
 				isValid={ isValid }
@@ -91,17 +89,14 @@ const TableOfContents = ( { blocks, onSelect, isOpened, onTogglePanel } ) => {
 			>
 				{ isEmpty ? emptyHeadingContent : heading.attributes.content }
 				{ isIncorrectLevel && incorrectLevelContent }
-			</TableOfContentsItem>
+			</DocumentOutlineItem>
 		);
 	} );
 
 	return (
-		<PanelBody title={ __( 'Table of Contents' ) } opened={ isOpened } onToggle={ onTogglePanel }>
-			<div className="table-of-contents__items">
-				<p><strong>{ sprintf( '%d Headings', headings.length ) }</strong></p>
-				<ul>{ tocItems }</ul>
-			</div>
-		</PanelBody>
+		<div className="document-outline">
+			<ul>{ items }</ul>
+		</div>
 	);
 };
 
@@ -109,15 +104,11 @@ export default connect(
 	( state ) => {
 		return {
 			blocks: getBlocks( state ),
-			isOpened: isEditorSidebarPanelOpened( state, PANEL_NAME ),
 		};
 	},
 	{
 		onSelect( uid ) {
 			return selectBlock( uid );
 		},
-		onTogglePanel() {
-			return toggleSidebarPanel( PANEL_NAME );
-		},
 	}
-)( TableOfContents );
+)( DocumentOutline );

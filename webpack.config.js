@@ -23,7 +23,14 @@ const blocksCSSPlugin = new ExtractTextPlugin( {
 const extractConfig = {
 	use: [
 		{ loader: 'raw-loader' },
-		{ loader: 'postcss-loader' },
+		{
+			loader: 'postcss-loader',
+			options: {
+				plugins: [
+					require( 'autoprefixer' ),
+				],
+			},
+		},
 		{
 			loader: 'sass-loader',
 			query: {
@@ -127,11 +134,6 @@ const config = {
 		new webpack.LoaderOptionsPlugin( {
 			minimize: process.env.NODE_ENV === 'production',
 			debug: process.env.NODE_ENV !== 'production',
-			options: {
-				postcss: [
-					require( 'autoprefixer' ),
-				],
-			},
 		} ),
 	],
 	stats: {

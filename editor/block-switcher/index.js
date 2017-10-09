@@ -90,6 +90,11 @@ class BlockSwitcher extends Component {
 						tabIndex="0"
 						aria-label={ __( 'Block types' ) }
 					>
+						<span
+							className="editor-block-switcher__menu-title"
+						>
+							{ __( 'Transform into:' ) }
+						</span>
 						{ allowedBlocks.map( ( { name, title, icon } ) => (
 							<IconButton
 								key={ name }

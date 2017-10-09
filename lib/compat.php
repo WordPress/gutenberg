@@ -122,3 +122,20 @@ function gutenberg_ensure_wp_api_request() {
 }
 add_action( 'wp_enqueue_scripts', 'gutenberg_ensure_wp_api_request', 20 );
 add_action( 'admin_enqueue_scripts', 'gutenberg_ensure_wp_api_request', 20 );
+
+/**
+ * Disables wpautop behavior in classic editor when post contains blocks, to
+ * prevent removep from invalidating paragraph blocks.
+ *
+ * @param  array $settings Original editor settings.
+ * @return array           Filtered settings.
+ */
+function gutenberg_disable_editor_settings_wpautop( $settings ) {
+	$post = get_post();
+	if ( ! isset( $settings['wpautop'] ) ) {
+		$settings['wpautop'] = ! ( is_object( $post ) && gutenberg_post_has_blocks( $post->ID ) );
+	}
+
+	return $settings;
+}
+add_filter( 'wp_editor_settings', 'gutenberg_disable_editor_settings_wpautop' );

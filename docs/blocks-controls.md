@@ -107,7 +107,7 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 		},
 	},
 
-	edit( { attributes, setAttributes, focus } ) {
+	edit( { attributes, className, focus, setAttributes, setFocus } ) {
 		const { content, alignment } = attributes;
 
 		function onChangeContent( newContent ) {
@@ -130,12 +130,12 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 			<Editable
 				key="editable"
 				tagName="p"
-				className={ props.className }
+				className={ className }
 				style={ { textAlign: alignment } }
 				onChange={ onChangeContent }
 				value={ content }
 				focus={ focus }
-				onFocus={ props.setFocus }
+				onFocus={ setFocus }
 			/>
 		];
 	},

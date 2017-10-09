@@ -88,7 +88,7 @@ attributes: {
 },
 ```
 
-* **See: [Attribute Sources](/reference/attribute-sources/).**
+* **See: [Attributes](/reference/attributes/).**
 
 ### Transforms (optional)
 
@@ -103,6 +103,18 @@ By default, Gutenberg adds a class with the form `.wp-blocks-your-block-name` to
 ```js
 // Do not generate classes for this block
 className: false,
+```
+
+### useOnce (optional)
+
+* **Type:** `Bool`
+* **Default:** `false`
+
+Whether a block can only be used once per post.
+
+```js
+// Use the block just once per post
+useOnce: true,
 ```
 
 ## Edit and Save

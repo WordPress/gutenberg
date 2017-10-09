@@ -219,18 +219,19 @@ function gutenberg_register_vendor_scripts() {
 
 	// Vendor Scripts.
 	$react_suffix = ( SCRIPT_DEBUG ? '.development' : '.production' ) . $suffix;
+
 	gutenberg_register_vendor_script(
 		'react',
-		'https://unpkg.com/react@next/umd/react' . $react_suffix . '.js'
+		'https://unpkg.com/react@16.0.0/umd/react' . $react_suffix . '.js'
 	);
 	gutenberg_register_vendor_script(
 		'react-dom',
-		'https://unpkg.com/react-dom@next/umd/react-dom' . $react_suffix . '.js',
+		'https://unpkg.com/react-dom@16.0.0/umd/react-dom' . $react_suffix . '.js',
 		array( 'react' )
 	);
 	gutenberg_register_vendor_script(
 		'react-dom-server',
-		'https://unpkg.com/react-dom@next/umd/react-dom-server.browser' . $react_suffix . '.js',
+		'https://unpkg.com/react-dom@16.0.0/umd/react-dom-server.browser' . $react_suffix . '.js',
 		array( 'react' )
 	);
 	$moment_script = SCRIPT_DEBUG ? 'moment.js' : 'min/moment.min.js';
@@ -274,7 +275,7 @@ function gutenberg_register_vendor_scripts() {
 	// See: gutenberg_ensure_wp_api_request (compat.php).
 	gutenberg_register_vendor_script(
 		'wp-api-request-shim',
-		'https://rawgit.com/WordPress/wordpress-develop/master/src/wp-includes/js/api-request.js'
+		'https://raw.githubusercontent.com/WordPress/wordpress-develop/master/src/wp-includes/js/api-request.js'
 	);
 }
 
@@ -611,7 +612,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	wp_enqueue_script(
 		'wp-editor',
 		gutenberg_url( 'editor/build/index.js' ),
-		array( 'wp-api', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element', 'wp-components', 'wp-utils', 'editor' ),
+		array( 'wp-api', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element', 'wp-components', 'wp-utils', 'word-count', 'editor' ),
 		filemtime( gutenberg_dir_path() . 'editor/build/index.js' ),
 		true // enqueue in the footer.
 	);
@@ -681,8 +682,6 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	// `wp-utils` doesn't clobbber `word-count`.  See WordPress/gutenberg#1569.
 	$word_count_script = wp_scripts()->query( 'word-count' );
 	array_push( $word_count_script->deps, 'wp-utils' );
-	// Now load the `word-count` script from core.
-	wp_enqueue_script( 'word-count' );
 
 	// Parse post type from parameters.
 	$post_type = null;

@@ -21,7 +21,7 @@ import {
 
 describe( 'blocks', () => {
 	const error = console.error;
-	const defaultBlockSettings = { save: noop, category: 'common' };
+	const defaultBlockSettings = { save: noop, category: 'common', title: 'block title' };
 
 	// Reset block state before each test.
 	beforeEach( () => {
@@ -66,7 +66,7 @@ describe( 'blocks', () => {
 		it( 'should accept valid block names', () => {
 			const block = registerBlockType( 'my-plugin/fancy-block-4', defaultBlockSettings );
 			expect( console.error ).not.toHaveBeenCalled();
-			expect( block ).toEqual( { name: 'my-plugin/fancy-block-4', save: noop, category: 'common' } );
+			expect( block ).toEqual( { name: 'my-plugin/fancy-block-4', save: noop, category: 'common', title: 'block title' } );
 		} );
 
 		it( 'should prohibit registering the same block twice', () => {
@@ -83,30 +83,51 @@ describe( 'blocks', () => {
 		} );
 
 		it( 'should reject blocks with an invalid edit function', () => {
-			const blockType = { save: noop, edit: 'not-a-function', category: 'common' },
+			const blockType = { save: noop, edit: 'not-a-function', category: 'common', title: 'block title' },
 				block = registerBlockType( 'my-plugin/fancy-block-6', blockType );
 			expect( console.error ).toHaveBeenCalledWith( 'The "edit" property must be a valid function.' );
 			expect( block ).toBeUndefined();
 		} );
 
 		it( 'should reject blocks with more than 3 keywords', () => {
-			const blockType = { save: noop, keywords: [ 'apple', 'orange', 'lemon', 'pineapple' ], category: 'common' },
+			const blockType = { save: noop, keywords: [ 'apple', 'orange', 'lemon', 'pineapple' ], category: 'common', title: 'block title' },
 				block = registerBlockType( 'my-plugin/fancy-block-7', blockType );
 			expect( console.error ).toHaveBeenCalledWith( 'The block "my-plugin/fancy-block-7" can have a maximum of 3 keywords.' );
 			expect( block ).toBeUndefined();
 		} );
 
 		it( 'should reject blocks without category', () => {
-			const blockType = { settingName: 'settingValue', save: noop },
+			const blockType = { settingName: 'settingValue', save: noop, title: 'block title' },
 				block = registerBlockType( 'my-plugin/fancy-block-8', blockType );
 			expect( console.error ).toHaveBeenCalledWith( 'The block "my-plugin/fancy-block-8" must have a category.' );
 			expect( block ).toBeUndefined();
 		} );
 
 		it( 'should reject blocks with non registered category.', () => {
-			const blockType = { save: noop, category: 'custom-category-slug' },
+			const blockType = { save: noop, category: 'custom-category-slug', title: 'block title' },
 				block = registerBlockType( 'my-plugin/fancy-block-9', blockType );
 			expect( console.error ).toHaveBeenCalledWith( 'The block "my-plugin/fancy-block-9" must have a registered category.' );
+			expect( block ).toBeUndefined();
+		} );
+
+		it( 'should reject blocks without title', () => {
+			const blockType = { settingName: 'settingValue', save: noop, category: 'common' },
+				block = registerBlockType( 'my-plugin/fancy-block-9', blockType );
+			expect( console.error ).toHaveBeenCalledWith( 'The block "my-plugin/fancy-block-9" must have a title.' );
+			expect( block ).toBeUndefined();
+		} );
+
+		it( 'should reject blocks with empty titles', () => {
+			const blockType = { settingName: 'settingValue', save: noop, category: 'common', title: '' },
+				block = registerBlockType( 'my-plugin/fancy-block-10', blockType );
+			expect( console.error ).toHaveBeenCalledWith( 'The block "my-plugin/fancy-block-10" must have a title.' );
+			expect( block ).toBeUndefined();
+		} );
+
+		it( 'should reject titles which are not strings', () => {
+			const blockType = { settingName: 'settingValue', save: noop, category: 'common', title: 12345 },
+				block = registerBlockType( 'my-plugin/fancy-block-11', blockType );
+			expect( console.error ).toHaveBeenCalledWith( 'Block titles must be strings.' );
 			expect( block ).toBeUndefined();
 		} );
 
@@ -116,19 +137,20 @@ describe( 'blocks', () => {
 				'core/test-block-with-attributes': attributes,
 			};
 
-			const blockType = { settingName: 'settingValue', save: noop, category: 'common' };
+			const blockType = { settingName: 'settingValue', save: noop, category: 'common', title: 'block title' };
 			registerBlockType( 'core/test-block-with-attributes', blockType );
 			expect( getBlockType( 'core/test-block-with-attributes' ) ).toEqual( {
 				name: 'core/test-block-with-attributes',
 				settingName: 'settingValue',
 				save: noop,
 				category: 'common',
+				title: 'block title',
 				attributes,
 			} );
 		} );
 
 		it( 'should store a copy of block type', () => {
-			const blockType = { settingName: 'settingValue', save: noop, category: 'common' };
+			const blockType = { settingName: 'settingValue', save: noop, category: 'common', title: 'block title' };
 			registerBlockType( 'core/test-block-with-settings', blockType );
 			blockType.mutated = true;
 			expect( getBlockType( 'core/test-block-with-settings' ) ).toEqual( {
@@ -136,6 +158,7 @@ describe( 'blocks', () => {
 				settingName: 'settingValue',
 				save: noop,
 				category: 'common',
+				title: 'block title',
 			} );
 		} );
 	} );
@@ -150,11 +173,11 @@ describe( 'blocks', () => {
 		it( 'should unregister existing blocks', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 			expect( getBlockTypes() ).toEqual( [
-				{ name: 'core/test-block', save: noop, category: 'common' },
+				{ name: 'core/test-block', save: noop, category: 'common', title: 'block title' },
 			] );
 			const oldBlock = unregisterBlockType( 'core/test-block' );
 			expect( console.error ).not.toHaveBeenCalled();
-			expect( oldBlock ).toEqual( { name: 'core/test-block', save: noop, category: 'common' } );
+			expect( oldBlock ).toEqual( { name: 'core/test-block', save: noop, category: 'common', title: 'block title' } );
 			expect( getBlockTypes() ).toEqual( [] );
 		} );
 	} );
@@ -194,17 +217,19 @@ describe( 'blocks', () => {
 				name: 'core/test-block',
 				save: noop,
 				category: 'common',
+				title: 'block title',
 			} );
 		} );
 
 		it( 'should return all block type elements', () => {
-			const blockType = { settingName: 'settingValue', save: noop, category: 'common' };
+			const blockType = { settingName: 'settingValue', save: noop, category: 'common', title: 'block title' };
 			registerBlockType( 'core/test-block-with-settings', blockType );
 			expect( getBlockType( 'core/test-block-with-settings' ) ).toEqual( {
 				name: 'core/test-block-with-settings',
 				settingName: 'settingValue',
 				save: noop,
 				category: 'common',
+				title: 'block title',
 			} );
 		} );
 	} );
@@ -216,15 +241,16 @@ describe( 'blocks', () => {
 
 		it( 'should return all registered blocks', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
-			const blockType = { settingName: 'settingValue', save: noop, category: 'common' };
+			const blockType = { settingName: 'settingValue', save: noop, category: 'common', title: 'block title' };
 			registerBlockType( 'core/test-block-with-settings', blockType );
 			expect( getBlockTypes() ).toEqual( [
-				{ name: 'core/test-block', save: noop, category: 'common' },
+				{ name: 'core/test-block', save: noop, category: 'common', title: 'block title' },
 				{
 					name: 'core/test-block-with-settings',
 					settingName: 'settingValue',
 					save: noop,
 					category: 'common',
+					title: 'block title',
 				},
 			] );
 		} );

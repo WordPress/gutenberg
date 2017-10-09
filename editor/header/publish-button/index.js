@@ -14,6 +14,7 @@ import { Button, withAPIData } from '@wordpress/components';
 /**
  * Internal dependencies
  */
+import './style.scss';
 import { editPost, savePost } from '../../actions';
 import {
 	isSavingPost,
@@ -60,7 +61,7 @@ export function PublishButton( {
 		publishStatus = 'publish';
 	}
 
-	const className = classnames( 'editor-tools__publish-button', {
+	const className = classnames( 'editor-publish-button', {
 		'is-saving': isSaving,
 	} );
 

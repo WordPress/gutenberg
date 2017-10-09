@@ -1,5 +1,5 @@
 .components-block-description {
-	&:not(:last-child):after {
+	&:after {
 		content: '';
 		display: block;
 		border-bottom: 1px solid $light-gray-500;

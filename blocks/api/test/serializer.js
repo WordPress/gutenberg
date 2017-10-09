@@ -269,9 +269,9 @@ describe( 'block serializer', () => {
 			beforeEach( () => {
 				registerBlockType( 'core/more', {
 					category: 'layout',
-
+					title: 'more',
 					attributes: {
-						text: {
+						customText: {
 							type: 'string',
 						},
 						noTeaser: {
@@ -280,7 +280,7 @@ describe( 'block serializer', () => {
 						},
 					},
 
-					save: ( { attributes } ) => attributes.text,
+					save: ( { attributes } ) => attributes.customText,
 				} );
 			} );
 
@@ -294,7 +294,7 @@ describe( 'block serializer', () => {
 
 			it( 'serializes with text', () => {
 				const block = createBlock( 'core/more', {
-					text: 'Read more!',
+					customText: 'Read more!',
 				} );
 
 				const content = serializeBlock( block );
@@ -316,6 +316,7 @@ describe( 'block serializer', () => {
 		it( 'serializes the fallback block without comment delimiters', () => {
 			registerBlockType( 'core/unknown-block', {
 				category: 'common',
+				title: 'unknown block',
 				attributes: {
 					fruit: {
 						type: 'string',
@@ -359,6 +360,7 @@ describe( 'block serializer', () => {
 					return <p dangerouslySetInnerHTML={ { __html: attributes.content } } />;
 				},
 				category: 'common',
+				title: 'block title',
 			};
 			registerBlockType( 'core/test-block', blockType );
 		} );
