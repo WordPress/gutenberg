@@ -7,7 +7,7 @@ import createDoingHook from './createDoingHook';
 import createDidHook from './createDidHook';
 
 
-export const Hooks = () => {
+export const createHooks = () => {
 	const HOOKS = {
 		actions: {},
 		filters: {},

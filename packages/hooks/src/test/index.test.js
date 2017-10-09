@@ -4,11 +4,11 @@
  * Internal dependencies
  */
 import {
-	Hooks,
+	createHooks,
 } from '../';
 
 const testObject = {};
-testObject.hooks = new Hooks();
+testObject.hooks = createHooks();
 
 function filter_a( str ) {
 	return str + 'a';
@@ -567,7 +567,7 @@ test( 'adding and removing filters with recursion', () => {
 test( 'adding hooks via composition', () => {
 
 	var testObject2 = {};
-	testObject2.hooks = new Hooks();
+	testObject2.hooks = createHooks();
 
 	expect( typeof testObject2.hooks.applyFilters ).toEqual( 'function' );
 } );
@@ -577,26 +577,26 @@ test( 'adding hooks via composition', () => {
 test( 'adding hooks as a mixin', () => {
 
 	var testObject3 = {};
-	Object.assign( testObject3, new Hooks() );
+	Object.assign( testObject3, createHooks() );
 
 	expect( typeof testObject3.applyFilters ).toEqual( 'function' );
 } );
 
 // Test context.
-test( 'Test `this` context via composition and as a mixin', () => {
+test( 'Test `this` context via composition', () => {
 
-	var testObject2 = {};
-	testObject2.hooks = new Hooks();
-	testObject.hooks.addAction( 'test.action', 'my_callback', function() {
+	var testObject2 = { test: 'test this' };
 
-	window.actionValue += 'a';
-	console.log( this );
-		expect( this ).toEqual( testObject2 );
-} );
+	testObject2.hooks = createHooks();
+
+	var theCallback = function() {
+		expect( this.test ).toEqual( 'test this' );
+	};
+	testObject.hooks.addAction( 'test.action', 'my_callback', theCallback.apply( testObject2 ) );
 	testObject.hooks.doAction( 'test.action' );
 
 	var testObject3 = {};
-	Object.assign( testObject3, new Hooks() );
+	Object.assign( testObject3, createHooks() );
 
 } );
 
