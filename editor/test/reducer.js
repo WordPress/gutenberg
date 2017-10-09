@@ -22,7 +22,7 @@ import {
 	preferences,
 	saving,
 	notices,
-	blockInsertionPoint,
+	showInsertionPoint,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -618,69 +618,21 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'blockInsertionPoint', () => {
-		it( 'should default to an empty object', () => {
-			const state = blockInsertionPoint( undefined, {} );
-
-			expect( state ).toEqual( {} );
-		} );
-
-		it( 'should set insertion point position', () => {
-			const state = blockInsertionPoint( undefined, {
-				type: 'SET_BLOCK_INSERTION_POINT',
-				position: 5,
-			} );
-
-			expect( state ).toEqual( {
-				position: 5,
-			} );
-		} );
-
-		it( 'should clear insertion point position', () => {
-			const original = blockInsertionPoint( undefined, {
-				type: 'SET_BLOCK_INSERTION_POINT',
-				position: 5,
-			} );
-
-			const state = blockInsertionPoint( deepFreeze( original ), {
-				type: 'CLEAR_BLOCK_INSERTION_POINT',
-			} );
-
-			expect( state ).toEqual( {
-				position: null,
-			} );
-		} );
-
+	describe( 'showInsertionPoint', () => {
 		it( 'should show the insertion point', () => {
-			const state = blockInsertionPoint( undefined, {
+			const state = showInsertionPoint( undefined, {
 				type: 'SHOW_INSERTION_POINT',
 			} );
 
-			expect( state ).toEqual( { visible: true } );
+			expect( state ).toBe( true );
 		} );
 
 		it( 'should clear the insertion point', () => {
-			const state = blockInsertionPoint( deepFreeze( {} ), {
+			const state = showInsertionPoint( {}, {
 				type: 'HIDE_INSERTION_POINT',
 			} );
 
-			expect( state ).toEqual( { visible: false } );
-		} );
-
-		it( 'should merge position and visible', () => {
-			const original = blockInsertionPoint( undefined, {
-				type: 'SHOW_INSERTION_POINT',
-			} );
-
-			const state = blockInsertionPoint( deepFreeze( original ), {
-				type: 'SET_BLOCK_INSERTION_POINT',
-				position: 5,
-			} );
-
-			expect( state ).toEqual( {
-				visible: true,
-				position: 5,
-			} );
+			expect( state ).toBe( false );
 		} );
 	} );
 

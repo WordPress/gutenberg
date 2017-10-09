@@ -20,22 +20,6 @@ class Dropdown extends Component {
 		};
 	}
 
-	componentWillUnmount() {
-		const { isOpen } = this.state;
-		const { onToggle } = this.props;
-		if ( isOpen && onToggle ) {
-			onToggle( false );
-		}
-	}
-
-	componentWillUpdate( nextProps, nextState ) {
-		const { isOpen } = nextState;
-		const { onToggle } = nextProps;
-		if ( this.state.isOpen !== isOpen && onToggle ) {
-			onToggle( isOpen );
-		}
-	}
-
 	bindContainer( ref ) {
 		this.container = ref;
 	}

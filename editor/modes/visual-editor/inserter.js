@@ -17,7 +17,6 @@ import { createBlock } from '@wordpress/blocks';
  */
 import Inserter from '../../inserter';
 import { insertBlock } from '../../actions';
-import { getBlockCount } from '../../selectors';
 
 export class VisualEditorInserter extends Component {
 	constructor() {
@@ -43,7 +42,6 @@ export class VisualEditorInserter extends Component {
 	}
 
 	render() {
-		const { blockCount } = this.props;
 		const { isShowingControls } = this.state;
 		const classes = classnames( 'editor-visual-editor__inserter', {
 			'is-showing-controls': isShowingControls,
@@ -55,9 +53,7 @@ export class VisualEditorInserter extends Component {
 				onFocus={ this.showControls }
 				onBlur={ this.hideControls }
 			>
-				<Inserter
-					insertIndex={ blockCount }
-					position="top right" />
+				<Inserter position="top right" />
 				<IconButton
 					icon="editor-paragraph"
 					className="editor-inserter__block"
@@ -80,10 +76,6 @@ export class VisualEditorInserter extends Component {
 }
 
 export default connect(
-	( state ) => {
-		return {
-			blockCount: getBlockCount( state ),
-		};
-	},
+	null,
 	{ onInsertBlock: insertBlock },
 )( VisualEditorInserter );
