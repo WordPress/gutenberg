@@ -282,7 +282,7 @@ function gutenberg_can_edit_post( $post_id ) {
  */
 function gutenberg_post_has_blocks( $post_id ) {
 	$post = get_post( $post_id );
-	return $post && strpos( $post->post_content, '<!-- wp:' ) !== false;
+	return $post && content_has_blocks( $post->post_content );
 }
 
 /**
