@@ -85,9 +85,8 @@ export class PreviewButton extends Component {
 				target={ this.getWindowTarget() }
 				icon="visibility"
 				disabled={ ! isSaveable }
-			>
-				{ _x( 'Preview', 'imperative verb' ) }
-			</IconButton>
+				label={ _x( 'Preview', 'imperative verb' ) }
+			/>
 		);
 	}
 }

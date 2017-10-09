@@ -6,8 +6,8 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
-import { Dashicon } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+import { IconButton, Dropdown } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -23,40 +23,48 @@ import { getEditorMode } from '../../selectors';
 const MODES = [
 	{
 		value: 'visual',
-		label: __( 'Visual' ),
+		label: __( 'Switch To Visual Mode' ),
+		icon: 'screenoptions',
 	},
 	{
 		value: 'text',
-		label: _x( 'Text', 'Name for the Text editor tab (formerly HTML)' ),
+		label: __( 'Switch To Text Mode' ),
+		icon: 'editor-code',
 	},
 ];
 
-function ModeSwitcher( { mode, onSwitch } ) {
-	// Disable reason: Toggling between modes should take effect immediately,
-	// arguably even with keyboard navigation. `onBlur` only would require
-	// another action to remove focus from the select (tabbing or clicking
-	// outside the field), which is unexpected when submit button is omitted.
-
-	/* eslint-disable jsx-a11y/no-onchange */
+function ModeSwitcher( { onSwitch, mode } ) {
 	return (
-		<div className="editor-mode-switcher">
-			<label htmlFor="editor-mode-switcher__input" className="screen-reader-text">{ __( 'Change editor mode' ) }</label>
-			<select
-				value={ mode }
-				onChange={ ( event ) => onSwitch( event.target.value ) }
-				className="editor-mode-switcher__input"
-				id="editor-mode-switcher__input"
-			>
-				{ MODES.map( ( { value, label } ) =>
-					<option key={ value } value={ value }>
-						{ label }
-					</option>
-				) }
-			</select>
-			<Dashicon icon="arrow-down" />
-		</div>
+		<Dropdown
+			className="editor-mode-switcher"
+			position="bottom left"
+			renderToggle={ ( { isOpen, onToggle } ) => (
+				<IconButton
+					icon="ellipsis"
+					label={ __( 'More' ) }
+					onClick={ onToggle }
+					aria-expanded={ isOpen }
+				/>
+			) }
+			renderContent={ ( { onClose } ) => (
+				MODES
+					.filter( ( { value } ) => value !== mode )
+					.map( ( { value, label, icon } ) => (
+						<IconButton
+							className="editor-mode-switcher__button"
+							key={ value }
+							icon={ icon }
+							onClick={ () => {
+								onSwitch( value );
+								onClose();
+							} }
+						>
+							{ label }
+						</IconButton>
+					) )
+			) }
+		/>
 	);
-	/* eslint-enable jsx-a11y/no-onchange */
 }
 
 export default connect(

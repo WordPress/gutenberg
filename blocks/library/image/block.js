@@ -3,7 +3,13 @@
  */
 import classnames from 'classnames';
 import ResizableBox from 'react-resizable-box';
-import { startCase, findKey } from 'lodash';
+import {
+	startCase,
+	isEmpty,
+	map,
+	get,
+	flowRight,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,7 +17,14 @@ import { startCase, findKey } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { mediaUpload } from '@wordpress/utils';
-import { Placeholder, Dashicon, Toolbar, DropZone, FormFileUpload } from '@wordpress/components';
+import {
+	Placeholder,
+	Dashicon,
+	Toolbar,
+	DropZone,
+	FormFileUpload,
+	withAPIData,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -35,27 +48,11 @@ class ImageBlock extends Component {
 		this.updateAlignment = this.updateAlignment.bind( this );
 		this.onSelectImage = this.onSelectImage.bind( this );
 		this.onSetHref = this.onSetHref.bind( this );
-		this.updateImageSize = this.updateImageSize.bind( this );
-		this.state = {
-			availableSizes: {},
-		};
-	}
-
-	componentDidMount() {
-		if ( this.props.attributes.id ) {
-			this.fetchMedia( this.props.attributes.id );
-		}
-	}
-
-	componentWillUnmout() {
-		if ( this.fetchImageRequest ) {
-			this.fetchImageRequest.abort();
-		}
+		this.updateImageURL = this.updateImageURL.bind( this );
 	}
 
 	onSelectImage( media ) {
 		this.props.setAttributes( { url: media.url, alt: media.alt, caption: media.caption, id: media.id } );
-		this.fetchMedia( media.id );
 	}
 
 	onSetHref( value ) {
@@ -73,31 +70,20 @@ class ImageBlock extends Component {
 		this.props.setAttributes( { ...extraUpdatedAttributes, align: nextAlign } );
 	}
 
-	fetchMedia( id ) {
-		if ( this.fetchImageRequest ) {
-			this.fetchImageRequest.abort();
-		}
-		this.fetchImageRequest = new wp.api.models.Media( { id } ).fetch();
-		this.fetchImageRequest.then( ( image ) => {
-			this.setState( {
-				availableSizes: image.media_details.sizes,
-			} );
-		} );
+	updateImageURL( url ) {
+		this.props.setAttributes( { url } );
 	}
 
-	updateImageSize( selectedSize ) {
-		this.props.setAttributes( {
-			url: this.state.availableSizes[ selectedSize ].source_url,
-		} );
+	getAvailableSizes() {
+		return get( this.props.image, [ 'data', 'media_details', 'sizes' ], {} );
 	}
 
 	render() {
 		const { attributes, setAttributes, focus, setFocus, className, settings } = this.props;
 		const { url, alt, caption, align, id, href, width, height } = attributes;
 
+		const availableSizes = this.getAvailableSizes();
 		const figureStyle = width ? { width } : {};
-		const availableSizes = Object.keys( this.state.availableSizes ).sort();
-		const selectedSize = findKey( this.state.availableSizes, ( size ) => size.source_url === url );
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1;
 		const uploadButtonProps = { isLarge: true };
 		const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setAttributes );
@@ -181,15 +167,15 @@ class ImageBlock extends Component {
 					</BlockDescription>
 					<h3>{ __( 'Image Settings' ) }</h3>
 					<TextControl label={ __( 'Alternate Text' ) } value={ alt } onChange={ this.updateAlt } />
-					{ !! availableSizes.length && (
+					{ ! isEmpty( availableSizes ) && (
 						<SelectControl
 							label={ __( 'Size' ) }
-							value={ selectedSize || '' }
-							options={ availableSizes.map( ( imageSize ) => ( {
-								value: imageSize,
-								label: startCase( imageSize ),
+							value={ url }
+							options={ map( availableSizes, ( size, name ) => ( {
+								value: size.source_url,
+								label: startCase( name ),
 							} ) ) }
-							onChange={ this.updateImageSize }
+							onChange={ this.updateImageURL }
 						/>
 					) }
 				</InspectorControls>
@@ -257,4 +243,16 @@ class ImageBlock extends Component {
 	}
 }
 
-export default withEditorSettings()( ImageBlock );
+export default flowRight( [
+	withEditorSettings(),
+	withAPIData( ( props ) => {
+		const { id } = props.attributes;
+		if ( ! id ) {
+			return {};
+		}
+
+		return {
+			image: `/wp/v2/media/${ id }`,
+		};
+	} ),
+] )( ImageBlock );

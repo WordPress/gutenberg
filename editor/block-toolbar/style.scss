@@ -1,0 +1,94 @@
+
+.editor-block-toolbar {
+	display: flex;
+	position: sticky;
+	z-index: z-index( '.editor-block-toolbar' );
+	margin-top: -$block-controls-height - $item-spacing;
+	margin-bottom: $item-spacing + 20px;	// 20px is the offset from the bottom of the selected block where it stops sticking
+	white-space: nowrap;
+	height: $block-controls-height;
+
+	// Mobile viewport
+	top: $header-height - 1px;
+	margin-left: -$block-padding;
+	margin-right: -$block-padding;
+
+	// Allow this invisible layer to be clicked through.
+	pointer-events: none;
+
+	// Reset pointer-events on children.
+	& > * {
+		pointer-events: auto;
+	}
+
+	// Larger viewports
+	@include break-small() {
+		margin-left: 0;
+	}
+
+	@include break-medium() {
+		top: $item-spacing;
+	}
+
+	&.is-appearing-active {
+		@include animate_fade;
+	}
+}
+
+.editor-block-toolbar__group {
+	display: inline-flex;
+	box-shadow: $shadow-toolbar;
+	width: 100%;
+	background: $white;
+	overflow: auto;	// allow horizontal scrolling on mobile
+
+	@include break-small() {
+		width: auto;
+		overflow: hidden;
+	}
+}
+
+$sticky-bottom-offset: 20px;
+.editor-block-toolbar + div {
+	// prevent collapsing margins between block and toolbar, matches the 20px bottom offset
+ 	margin-top: -$sticky-bottom-offset - 1px;
+	padding-top: 1px;
+ }
+
+.editor-block-toolbar .components-toolbar {
+	margin-right: -1px;
+}
+
+.editor-block-toolbar .editor-block-switcher {
+	display: inline-flex;
+}
+
+.editor-block-toolbar__mobile-tools {
+	align-items: baseline;
+	display: flex;
+	justify-content: space-between;
+	flex-direction: row-reverse;
+	width: 100%;
+
+	&.components-toolbar {
+		margin-right: 0;
+	}
+
+	@include break-small {
+		display: none;
+	}
+
+	.editor-block-mover,
+	.editor-block-settings-menu {
+		display: inline-flex;
+		height: auto;
+		position: initial;
+		.components-button {
+			margin: 0 5px;
+		}
+	}
+}
+
+.editor-block-toolbar__mobile-tools-content {
+	overflow: hidden;
+}

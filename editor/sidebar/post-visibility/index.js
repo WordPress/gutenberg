@@ -9,7 +9,7 @@ import { find, flowRight } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { PanelRow, Popover, withInstanceId, withAPIData } from '@wordpress/components';
+import { PanelRow, Dropdown, withInstanceId, withAPIData } from '@wordpress/components';
 
 /**
  * Internal Dependencies
@@ -25,40 +25,13 @@ export class PostVisibility extends Component {
 	constructor( props ) {
 		super( ...arguments );
 
-		this.toggleDialog = this.toggleDialog.bind( this );
-		this.stopPropagation = this.stopPropagation.bind( this );
-		this.closeOnClickOutside = this.closeOnClickOutside.bind( this );
-		this.close = this.close.bind( this );
 		this.setPublic = this.setPublic.bind( this );
 		this.setPrivate = this.setPrivate.bind( this );
 		this.setPasswordProtected = this.setPasswordProtected.bind( this );
-		this.bindButtonNode = this.bindButtonNode.bind( this );
 
 		this.state = {
-			opened: false,
 			hasPassword: !! props.password,
 		};
-	}
-
-	toggleDialog() {
-		this.setState( ( state ) => ( { opened: ! state.opened } ) );
-	}
-
-	stopPropagation( event ) {
-		event.stopPropagation();
-	}
-
-	closeOnClickOutside( event ) {
-		if ( ! this.buttonNode.contains( event.target ) ) {
-			this.close();
-		}
-	}
-
-	close() {
-		const { opened } = this.state;
-		if ( opened ) {
-			this.toggleDialog();
-		}
 	}
 
 	setPublic() {
@@ -85,10 +58,6 @@ export class PostVisibility extends Component {
 
 		onUpdateVisibility( visibility === 'private' ? 'draft' : status, password || '' );
 		this.setState( { hasPassword: true } );
-	}
-
-	bindButtonNode( node ) {
-		this.buttonNode = node;
 	}
 
 	render() {
@@ -129,23 +98,21 @@ export class PostVisibility extends Component {
 				<span>{ __( 'Visibility' ) }</span>
 				{ ! canEdit && <span>{ getVisibilityLabel( visibility ) }</span> }
 				{ canEdit && (
-					<button
-						type="button"
-						aria-expanded={ this.state.opened }
-						className="editor-post-visibility__toggle button-link"
-						onClick={ this.toggleDialog }
-						ref={ this.bindButtonNode }
-					>
-						{ getVisibilityLabel( visibility ) }
-						<Popover
-							position="bottom left"
-							isOpen={ this.state.opened }
-							onClickOutside={ this.closeOnClickOutside }
-							onClose={ this.close }
-							onClick={ this.stopPropagation }
-							className="editor-post-visibility__dialog"
-						>
-							<fieldset>
+					<Dropdown
+						position="bottom left"
+						contentClassName="editor-post-visibility__dialog"
+						renderToggle={ ( { isOpen, onToggle } ) => (
+							<button
+								type="button"
+								aria-expanded={ isOpen }
+								className="editor-post-visibility__toggle button-link"
+								onClick={ onToggle }
+							>
+								{ getVisibilityLabel( visibility ) }
+							</button>
+						) }
+						renderContent={ () => ( [
+							<fieldset key="visibility-selector">
 								<legend className="editor-post-visibility__dialog-legend">
 									{ __( 'Post Visibility' ) }
 								</legend>
@@ -170,9 +137,9 @@ export class PostVisibility extends Component {
 										{ <p id={ `editor-post-${ value }-${ instanceId }-description` } className="editor-post-visibility__dialog-info">{ info }</p> }
 									</div>
 								) ) }
-							</fieldset>
-							{ this.state.hasPassword &&
-								<div className="editor-post-visibility__dialog-password">
+							</fieldset>,
+							this.state.hasPassword && (
+								<div className="editor-post-visibility__dialog-password" key="password-selector">
 									<label
 										htmlFor={ `editor-post-visibility__dialog-password-input-${ instanceId }` }
 										className="screen-reader-text"
@@ -188,9 +155,9 @@ export class PostVisibility extends Component {
 										placeholder={ __( 'Use a secure password' ) }
 									/>
 								</div>
-							}
-						</Popover>
-					</button>
+							),
+						] ) }
+					/>
 				) }
 			</PanelRow>
 		);
