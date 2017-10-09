@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { Toolbar } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -74,6 +75,9 @@ registerBlockType( 'core/button', {
 			focus && (
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar value={ align } onChange={ updateAlignment } />
+					<Toolbar>
+						<UrlInputButton showSettings={ false } url={ url } onChange={ updateUrl } />
+					</Toolbar>
 				</BlockControls>
 			),
 			<span key="button" className={ className } title={ title } style={ { backgroundColor: color } } >
@@ -86,7 +90,6 @@ registerBlockType( 'core/button', {
 					onChange={ ( value ) => setAttributes( { text: value } ) }
 					formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
 					keepPlaceholderOnFocus
-					extraToolbarButtons={ <UrlInputButton showSettings={ false } url={ url } onChange={ updateUrl } /> }
 				/>
 				{ focus &&
 					<InspectorControls key="inspector">

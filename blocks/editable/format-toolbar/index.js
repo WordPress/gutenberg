@@ -81,7 +81,7 @@ class FormatToolbar extends Component {
 	}
 
 	render() {
-		const { formats, enabledControls = DEFAULT_CONTROLS, extraButtons, selectedNodeId } = this.props;
+		const { formats, enabledControls = DEFAULT_CONTROLS, selectedNodeId } = this.props;
 		const toolbarControls = FORMATTING_CONTROLS
 			.filter( control => enabledControls.indexOf( control.format ) !== -1 )
 			.map( ( control ) => ( {
@@ -101,7 +101,6 @@ class FormatToolbar extends Component {
 							onChange={ this.onUrlChange }
 							url={ formats.link ? formats.link.value : '' } />
 					}
-					{ extraButtons }
 				</Toolbar>
 
 			</div>

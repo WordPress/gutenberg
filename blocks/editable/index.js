@@ -604,7 +604,6 @@ export default class Editable extends Component {
 			placeholder,
 			multiline: MultilineTag,
 			keepPlaceholderOnFocus = false,
-			extraToolbarButtons,
 		} = this.props;
 
 		// Generating a key that includes `tagName` ensures that if the tag
@@ -621,7 +620,6 @@ export default class Editable extends Component {
 				formats={ this.state.formats }
 				onChange={ this.changeFormats }
 				enabledControls={ formattingControls }
-				extraButtons={ extraToolbarButtons }
 			/>
 		);
 

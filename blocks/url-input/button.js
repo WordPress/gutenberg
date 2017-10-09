@@ -19,11 +19,11 @@ import UrlInput from './';
 import ToggleControl from '../inspector-controls/toggle-control';
 import { filterURLForDisplay } from '../../editor/utils/url';
 
-const DisplayStep = 'DISPLAY';
-const EditStep = 'EDIT';
-const SettingsStep = 'SETTINGS';
+const DISPLAY_STEP = 'DISPLAY';
+const EDIT_STEP = 'EDIT';
+const SETTINGS_STEP = 'SETTINGS';
 
-const AllSteps = [ EditStep, SettingsStep, DisplayStep ];
+const ALL_STEPS = [ EDIT_STEP, SETTINGS_STEP, DISPLAY_STEP ];
 
 const defaultState = {
 	expanded: false,
@@ -102,10 +102,10 @@ class UrlInputButton extends Component {
 	}
 
 	getSteps() {
-		return AllSteps.filter( step => {
-			if ( step === DisplayStep ) {
+		return ALL_STEPS.filter( step => {
+			if ( step === DISPLAY_STEP ) {
 				return !! this.state.url && ! this.state.isDeleted;
-			} else if ( step === SettingsStep ) {
+			} else if ( step === SETTINGS_STEP ) {
 				return this.props.showSettings && ! this.state.isDeleted;
 			}
 
@@ -116,31 +116,38 @@ class UrlInputButton extends Component {
 	renderStep( steps ) {
 		const { currentStep, url, isDeleted, opensInNewWindow } = this.state;
 
-		if ( steps[ currentStep ] === EditStep ) {
-			return [
-				<UrlInput key="urlinput" value={ url || '' } onChange={ this.changeLink } required={ ! isDeleted } />,
-				<IconButton key="iconbutton" className="blocks-url-input__unlink" icon="dismiss" label={ __( 'Un-link' ) } disabled={ ! url } onClick={ this.deleteLink } />,
-			];
-		} else if ( steps[ currentStep ] === DisplayStep ) {
-			return [
-				<a
-					key="a"
-					className="blocks-format-toolbar__link-value"
-					href={ url }
-					target="_blank">
-					{ url && filterURLForDisplay( decodeURI( url ) ) }
-				</a>,
-			];
-		} else if ( steps[ currentStep ] === SettingsStep ) {
-			return [
-				<fieldset key="fieldset" className="blocks-format-toolbar__link-settings">
-					<ToggleControl
-						label={ __( 'Open in new window' ) }
-						checked={ opensInNewWindow }
-						onChange={ this.toggleOpensInNewWindow } />
-				</fieldset>,
-			];
+		switch ( steps[ currentStep ] ) {
+			case EDIT_STEP:
+				return [
+					<UrlInput key="urlinput" value={ url || '' } onChange={ this.changeLink } required={ ! isDeleted } />,
+					<IconButton key="iconbutton"
+						className="blocks-url-input__unlink"
+						icon="dismiss" label={ __( 'Un-link' ) }
+						disabled={ ! url } onClick={ this.deleteLink } />,
+				];
+
+			case DISPLAY_STEP:
+				return [
+					<a
+						key="a"
+						className="blocks-format-toolbar__link-value"
+						href={ url }
+						target="_blank">
+						{ url && filterURLForDisplay( decodeURI( url ) ) }
+					</a>,
+				];
+
+			case SETTINGS_STEP:
+				return [
+					<fieldset key="fieldset" className="blocks-format-toolbar__link-settings">
+						<ToggleControl
+							label={ __( 'Open in new window' ) }
+							checked={ opensInNewWindow }
+							onChange={ this.toggleOpensInNewWindow } />
+					</fieldset>,
+				];
 		}
+
 		return [];
 	}
 
