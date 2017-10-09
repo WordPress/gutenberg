@@ -34,14 +34,6 @@ class VisualEditor extends Component {
 		this.deleteSelectedBlocks = this.deleteSelectedBlocks.bind( this );
 	}
 
-	componentDidMount() {
-		document.addEventListener( 'keydown', this.onKeyDown );
-	}
-
-	componentWillUnmount() {
-		document.removeEventListener( 'keydown', this.onKeyDown );
-	}
-
 	bindContainer( ref ) {
 		this.container = ref;
 	}
@@ -91,7 +83,6 @@ class VisualEditor extends Component {
 				className="editor-visual-editor"
 				onMouseDown={ this.onClick }
 				onTouchStart={ this.onClick }
-				onKeyDown={ this.onKeyDown }
 				ref={ this.bindContainer }
 			>
 				<KeyboardShortcuts shortcuts={ {
