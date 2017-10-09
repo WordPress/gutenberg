@@ -208,7 +208,6 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 								focus={ focus }
 								onFocus={ setFocus }
 								onChange={ ( value ) => setAttributes( { caption: value } ) }
-								inlineToolbar
 							/>
 						) : null }
 					</figure>,

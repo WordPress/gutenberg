@@ -132,7 +132,6 @@ registerBlockType( 'core/video', {
 						focus={ focus && focus.editable === 'caption' ? focus : undefined }
 						onFocus={ focusCaption }
 						onChange={ ( value ) => setAttributes( { caption: value } ) }
-						inlineToolbar
 					/>
 				) : null }
 			</figure>,
