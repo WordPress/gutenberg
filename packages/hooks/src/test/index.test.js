@@ -150,6 +150,11 @@ test( 'cannot add filters with namespaces missing a functionDescription', () => 
 	);
 } );
 
+test( 'Can add filters with dashes in namespaces', () => {
+	addFilter( 'hook_name', 'my_name/with-dashes/action', () => null );
+	expect( console.error ).toHaveBeenCalledTimes( 0 );
+} );
+
 test( 'Can add filters with capitals in namespaces', () => {
 	addFilter( 'hook_name', 'my_name/OhNo/action', () => null );
 	expect( console.error ).toHaveBeenCalledTimes( 0 );
