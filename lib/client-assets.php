@@ -779,6 +779,11 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	}
 	wp_localize_script( 'wp-blocks', '_wpBlocksAttributes', $schemas );
 
+	// Ensure that we've got jQuery.
+	if ( ! wp_script_is( 'jquery', 'done' ) ) {
+		wp_enqueue_script( 'jquery' );
+	}
+
 	// Initialize the editor.
 	$gutenberg_theme_support = get_theme_support( 'gutenberg' );
 	$color_palette           = gutenberg_color_palette();
