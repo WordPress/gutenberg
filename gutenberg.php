@@ -59,7 +59,7 @@ function gutenberg_can_init() {
 	// Strip '-src' from the version string. Messes up version_compare().
 	$version = str_replace( '-src', '', $wp_version );
 
-	if ( version_compare( $version, '4.9-beta1-41777', '>=' ) ) { // TODO: change the last bit with the release number when `replace_editor` is available
+	if ( version_compare( $version, '4.9-beta1-42000', '>=' ) ) { // TODO: change the last bit with the release number when `replace_editor` is available
 		add_filter( 'replace_editor', 'gutenberg_init', 10, 2 );
 	} elseif ( version_compare( $version, '4.8', '<' ) ) {
 		add_action( 'admin_notices', 'gutenberg_wordpress_version_notice' );
