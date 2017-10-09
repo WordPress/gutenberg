@@ -10,9 +10,8 @@ import { flowRight } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
 import { dateI18n, settings } from '@wordpress/date';
-import { PanelRow, Popover, withAPIData } from '@wordpress/components';
+import { PanelRow, Dropdown, withAPIData } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -22,82 +21,62 @@ import PostScheduleClock from './clock';
 import { getEditedPostAttribute } from '../../selectors';
 import { editPost } from '../../actions';
 
-export class PostSchedule extends Component {
-	constructor() {
-		super( ...arguments );
-
-		this.toggleDialog = this.toggleDialog.bind( this );
-		this.closeDialog = this.closeDialog.bind( this );
-
-		this.state = {
-			opened: false,
-		};
+export function PostSchedule( { date, onUpdateDate, user } ) {
+	if ( ! user.data || ! user.data.capabilities.publish_posts ) {
+		return null;
 	}
 
-	toggleDialog() {
-		this.setState( ( state ) => ( { opened: ! state.opened } ) );
-	}
-
-	closeDialog() {
-		this.setState( { opened: false } );
-	}
-
-	render() {
-		const { date, onUpdateDate, user } = this.props;
-
-		if ( ! user.data || ! user.data.capabilities.publish_posts ) {
-			return null;
-		}
-
-		const momentDate = date ? moment( date ) : moment();
-		const label = date
-			? dateI18n( settings.formats.datetime, date )
-			: __( 'Immediately' );
-		const handleChange = ( newDate ) => {
-			onUpdateDate( newDate.format( 'YYYY-MM-DDTHH:mm:ss' ) );
-		};
+	const momentDate = date ? moment( date ) : moment();
+	const label = date
+		? dateI18n( settings.formats.datetime, date )
+		: __( 'Immediately' );
+	const handleChange = ( newDate ) => {
+		onUpdateDate( newDate.format( 'YYYY-MM-DDTHH:mm:ss' ) );
+	};
 
 		// To know if the current timezone is a 12 hour time with look for "a" in the time format
 		// We also make sure this a is not escaped by a "/"
-		const is12HourTime = /a(?!\\)/i.test(
-			settings.formats.time
-				.toLowerCase() // Test only the lower case a
-				.replace( /\\\\/g, '' ) // Replace "//" with empty strings
-				.split( '' ).reverse().join( '' ) // Reverse the string and test for "a" not followed by a slash
-		);
+	const is12HourTime = /a(?!\\)/i.test(
+		settings.formats.time
+			.toLowerCase() // Test only the lower case a
+			.replace( /\\\\/g, '' ) // Replace "//" with empty strings
+			.split( '' ).reverse().join( '' ) // Reverse the string and test for "a" not followed by a slash
+	);
 
-		return (
-			<PanelRow className="editor-post-schedule">
-				<span>{ __( 'Publish' ) }</span>
-				<button
-					type="button"
-					className="editor-post-schedule__toggle button-link"
-					onClick={ this.toggleDialog }
-					aria-expanded={ this.state.opened }
-				>
-					{ label }
-					<Popover
-						position="bottom left"
-						isOpen={ this.state.opened }
-						onClose={ this.closeDialog }
-						className="editor-post-schedule__dialog"
+	return (
+		<PanelRow className="editor-post-schedule">
+			<span>{ __( 'Publish' ) }</span>
+			<Dropdown
+				position="bottom left"
+				contentClassName="editor-post-schedule__dialog"
+				renderToggle={ ( { onToggle, isOpen } ) => (
+					<button
+						type="button"
+						className="editor-post-schedule__toggle button-link"
+						onClick={ onToggle }
+						aria-expanded={ isOpen }
 					>
-						<DatePicker
-							inline
-							selected={ momentDate }
-							onChange={ handleChange }
-							locale={ settings.l10n.locale }
-						/>
-						<PostScheduleClock
-							selected={ momentDate }
-							onChange={ handleChange }
-							is12Hour={ is12HourTime }
-						/>
-					</Popover>
-				</button>
-			</PanelRow>
-		);
-	}
+						{ label }
+					</button>
+				) }
+				renderContent={ () => ( [
+					<DatePicker
+						key="date-picker"
+						inline
+						selected={ momentDate }
+						onChange={ handleChange }
+						locale={ settings.l10n.locale }
+					/>,
+					<PostScheduleClock
+						key="clock"
+						selected={ momentDate }
+						onChange={ handleChange }
+						is12Hour={ is12HourTime }
+					/>,
+				] ) }
+			/>
+		</PanelRow>
+	);
 }
 
 const applyConnect = connect(

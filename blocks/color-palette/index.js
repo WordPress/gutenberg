@@ -7,8 +7,7 @@ import { ChromePicker } from 'react-color';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-import { Popover } from '@wordpress/components';
+import { Dropdown } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -17,94 +16,62 @@ import { __, sprintf } from '@wordpress/i18n';
 import './style.scss';
 import withEditorSettings from '../with-editor-settings';
 
-class ColorPalette extends Component {
-	constructor() {
-		super( ...arguments );
-		this.state = {
-			opened: false,
-		};
-		this.togglePicker = this.togglePicker.bind( this );
-		this.closeOnClickOutside = this.closeOnClickOutside.bind( this );
-		this.bindToggleNode = this.bindToggleNode.bind( this );
-	}
+function ColorPalette( { colors, value, onChange } ) {
+	return (
+		<div className="blocks-color-palette">
+			{ colors.map( ( color ) => {
+				const style = { color: color };
+				const className = classnames( 'blocks-color-palette__item', { 'is-active': value === color } );
 
-	togglePicker() {
-		this.setState( ( state ) => ( { opened: ! state.opened } ) );
-	}
+				return (
+					<div key={ color } className="blocks-color-palette__item-wrapper">
+						<button
+							type="button"
+							className={ className }
+							style={ style }
+							onClick={ () => onChange( value === color ? undefined : color ) }
+							aria-label={ sprintf( __( 'Color: %s' ), color ) }
+							aria-pressed={ value === color }
+						/>
+					</div>
+				);
+			} ) }
 
-	closeOnClickOutside( event ) {
-		const { opened } = this.state;
-		if ( opened && ! this.toggleNode.contains( event.target ) ) {
-			this.togglePicker();
-		}
-	}
-
-	bindToggleNode( node ) {
-		this.toggleNode = node;
-	}
-
-	render() {
-		const { colors, value, onChange } = this.props;
-		return (
-			<div className="blocks-color-palette">
-				{ colors.map( ( color ) => {
-					const style = { color: color };
-					const className = classnames( 'blocks-color-palette__item', { 'is-active': value === color } );
-
-					return (
-						<div key={ color } className="blocks-color-palette__item-wrapper">
-							<button
-								type="button"
-								className={ className }
-								style={ style }
-								onClick={ () => onChange( value === color ? undefined : color ) }
-								aria-label={ sprintf( __( 'Color: %s' ), color ) }
-								aria-pressed={ value === color }
-							/>
-						</div>
-					);
-				} ) }
-
-				<div className="blocks-color-palette__item-wrapper blocks-color-palette__custom-color">
+			<Dropdown
+				className="blocks-color-palette__item-wrapper blocks-color-palette__custom-color"
+				contentClassName="blocks-color-palette__picker "
+				renderToggle={ ( { isOpen, onToggle } ) => (
 					<button
 						type="button"
-						aria-expanded={ this.state.opened }
+						aria-expanded={ isOpen }
 						className="blocks-color-palette__item"
-						onClick={ this.togglePicker }
-						ref={ this.bindToggleNode }
+						onClick={ onToggle }
 						aria-label={ __( 'Custom color picker' ) }
 					>
 						<span className="blocks-color-palette__custom-color-gradient" />
 					</button>
-					<Popover
-						isOpen={ this.state.opened }
-						onClickOutside={ this.closeOnClickOutside }
-						className="blocks-color-palette__picker"
-					>
-						<ChromePicker
-							color={ value }
-							onChangeComplete={ ( color ) => {
-								onChange( color.hex );
-								this.togglePicker();
-							} }
-							style={ { width: '100%' } }
-							disableAlpha
-						/>
-					</Popover>
-				</div>
+				) }
+				renderContent={ () => (
+					<ChromePicker
+						color={ value }
+						onChangeComplete={ ( color ) => onChange( color.hex ) }
+						style={ { width: '100%' } }
+						disableAlpha
+					/>
+				) }
+			/>
 
-				<div className="blocks-color-palette__item-wrapper blocks-color-palette__clear-color">
-					<button
-						className="blocks-color-palette__item"
-						onClick={ () => onChange( undefined ) }
-						aria-label={ __( 'Remove color' ) }
-					>
-						<span className="blocks-color-palette__clear-color-line" />
-					</button>
-				</div>
+			<div className="blocks-color-palette__item-wrapper blocks-color-palette__clear-color">
+				<button
+					className="blocks-color-palette__item"
+					onClick={ () => onChange( undefined ) }
+					aria-label={ __( 'Remove color' ) }
+				>
+					<span className="blocks-color-palette__clear-color-line" />
+				</button>
 			</div>
-		);
-	}
+		</div>
+	);
 }
 
 export default withEditorSettings(

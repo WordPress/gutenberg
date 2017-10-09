@@ -66,11 +66,13 @@ function gutenberg_menu() {
 		'the_gutenberg_project'
 	);
 
-	$submenu['gutenberg'][] = array(
-		__( 'Feedback', 'gutenberg' ),
-		'edit_posts',
-		'http://wordpressdotorg.polldaddy.com/s/gutenberg-support',
-	);
+	if ( current_user_can( 'edit_posts' ) ) {
+		$submenu['gutenberg'][] = array(
+			__( 'Feedback', 'gutenberg' ),
+			'edit_posts',
+			'http://wordpressdotorg.polldaddy.com/s/gutenberg-support',
+		);
+	}
 }
 add_action( 'admin_menu', 'gutenberg_menu' );
 
@@ -300,3 +302,27 @@ function gutenberg_add_gutenberg_post_state( $post_states, $post ) {
 	return $post_states;
 }
 add_filter( 'display_post_states', 'gutenberg_add_gutenberg_post_state', 10, 2 );
+
+/**
+ * Registers custom post types required by the Gutenberg editor.
+ *
+ * @since 0.10.0
+ */
+function gutenberg_register_post_types() {
+	register_post_type( 'gb_reusable_block', array(
+		'public' => false,
+	) );
+}
+add_action( 'init', 'gutenberg_register_post_types' );
+
+/**
+ * Registers the REST API routes needed by the Gutenberg editor.
+ *
+ * @since 0.10.0
+ */
+function gutenberg_register_rest_routes() {
+	$controller = new WP_REST_Reusable_Blocks_Controller();
+	$controller->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_rest_routes' );
+

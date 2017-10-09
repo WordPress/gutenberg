@@ -13,6 +13,7 @@ import { registerBlockType, source } from '../../api';
 import Editable from '../../editable';
 import UrlInput from '../../url-input';
 import BlockControls from '../../block-controls';
+import ToggleControl from '../../inspector-controls/toggle-control';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import ColorPalette from '../../color-palette';
 import InspectorControls from '../../inspector-controls';
@@ -50,15 +51,24 @@ registerBlockType( 'core/button', {
 	},
 
 	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
+		const { align, clear } = attributes;
+		const props = {};
+
 		if ( 'left' === align || 'right' === align || 'center' === align ) {
-			return { 'data-align': align };
+			props[ 'data-align' ] = align;
 		}
+
+		if ( clear ) {
+			props[ 'data-clear' ] = 'true';
+		}
+
+		return props;
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus, className } ) {
-		const { text, url, title, align, color } = attributes;
+		const { text, url, title, align, color, clear } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
+		const toggleClear = () => setAttributes( { clear: ! clear } );
 
 		return [
 			focus && (
@@ -93,6 +103,13 @@ registerBlockType( 'core/button', {
 						<BlockDescription>
 							<p>{ __( 'A nice little button. Call something out with it.' ) }</p>
 						</BlockDescription>
+
+						<ToggleControl
+							label={ __( 'Stand on a line' ) }
+							checked={ !! clear }
+							onChange={ toggleClear }
+						/>
+
 						<ColorPalette
 							value={ color }
 							onChange={ ( colorValue ) => setAttributes( { color: colorValue } ) }

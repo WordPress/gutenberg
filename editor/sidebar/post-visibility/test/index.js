@@ -23,11 +23,11 @@ describe( 'PostVisibility', () => {
 		wrapper = shallow( <PostVisibility visibility="public" postType="post" user={
 			{ data: { capabilities: { publish_posts: false } } }
 		} /> );
-		expect( wrapper.find( 'button' ) ).toHaveLength( 0 );
+		expect( wrapper.find( 'Dropdown' ) ).toHaveLength( 0 );
 	} );
 
 	it( 'should render if the user has the correct capability', () => {
 		const wrapper = shallow( <PostVisibility visibility="public" user={ user } /> );
-		expect( wrapper.find( 'button' ) ).not.toHaveLength( 0 );
+		expect( wrapper.find( 'Dropdown' ) ).not.toHaveLength( 0 );
 	} );
 } );
