@@ -691,8 +691,8 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$is_new_post = 'auto-draft' === $post_to_edit['status'];
 	if ( $is_new_post ) {
 		$post_to_edit['title'] = array(
-			'raw'      => $post->post_title,
-			'rendered' => apply_filters( 'the_title', $post->post_title, $post->ID ),
+			'raw'      => '',
+			'rendered' => apply_filters( 'the_title', '', $post->ID ),
 		);
 	}
 
