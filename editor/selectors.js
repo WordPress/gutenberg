@@ -451,10 +451,26 @@ export const getBlocks = createSelector(
  * Returns the number of blocks currently present in the post.
  *
  * @param  {Object} state Global application state
- * @return {Object}       Number of blocks in the post
+ * @return {Number}       Number of blocks in the post
  */
 export function getBlockCount( state ) {
 	return getBlockUids( state ).length;
+}
+
+/**
+ * Returns the number of blocks currently selected in the post.
+ *
+ * @param  {Object} state Global application state
+ * @return {Number}       Number of blocks selected in the post
+ */
+export function getSelectedBlockCount( state ) {
+	const multiSelectedBlockCount = getMultiSelectedBlockUids( state ).length;
+
+	if ( multiSelectedBlockCount ) {
+		return multiSelectedBlockCount;
+	}
+
+	return state.blockSelection.start ? 1 : 0;
 }
 
 /**

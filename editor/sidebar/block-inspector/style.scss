@@ -8,7 +8,8 @@
 	}
 }
 
-.editor-block-inspector__no-blocks {
+.editor-block-inspector__no-blocks,
+.editor-block-inspector__multi-blocks {
 	display: block;
 	font-size: $default-font-size;
 	background: $white;

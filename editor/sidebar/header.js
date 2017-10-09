@@ -6,16 +6,19 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/components';
 
 /**
  * Internal Dependencies
  */
-import { getActivePanel } from '../selectors';
+import { getActivePanel, getSelectedBlockCount } from '../selectors';
 import { toggleSidebar, setActivePanel } from '../actions';
 
-const SidebarHeader = ( { panel, onSetPanel, onToggleSidebar } ) => {
+const SidebarHeader = ( { panel, onSetPanel, onToggleSidebar, count } ) => {
+	// Do not display "0 Blocks".
+	count = count === 0 ? 1 : count;
+
 	return (
 		<div className="components-panel__header editor-sidebar__panel-tabs">
 			<button
@@ -30,7 +33,7 @@ const SidebarHeader = ( { panel, onSetPanel, onToggleSidebar } ) => {
 				className={ `editor-sidebar__panel-tab ${ panel === 'block' ? 'is-active' : '' }` }
 				aria-label={ __( 'Block settings' ) }
 			>
-				{ __( 'Block' ) }
+				{ sprintf( _n( 'Block', '%d Blocks', count ), count ) }
 			</button>
 			<IconButton
 				onClick={ onToggleSidebar }
@@ -44,6 +47,7 @@ const SidebarHeader = ( { panel, onSetPanel, onToggleSidebar } ) => {
 export default connect(
 	( state ) => ( {
 		panel: getActivePanel( state ),
+		count: getSelectedBlockCount( state ),
 	} ),
 	( dispatch ) => ( {
 		onSetPanel: ( panel ) => dispatch( setActivePanel( panel ) ),
