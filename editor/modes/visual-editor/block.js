@@ -23,7 +23,6 @@ import BlockDropZone from './block-drop-zone';
 import BlockMover from '../../block-mover';
 import BlockRightMenu from '../../block-settings-menu';
 import BlockToolbar from '../../block-toolbar';
-import Inserter from '../../inserter';
 import {
 	clearSelectedBlock,
 	editPost,
@@ -279,7 +278,7 @@ class VisualEditorBlock extends Component {
 	}
 
 	render() {
-		const { block, multiSelectedBlockUids, order, nextBlock } = this.props;
+		const { block, multiSelectedBlockUids, order } = this.props;
 		const { name: blockName, isValid } = block;
 		const blockType = getBlockType( blockName );
 		// translators: %s: Type of block (i.e. Text, Image etc)
@@ -311,7 +310,7 @@ class VisualEditorBlock extends Component {
 			'is-hovered': isHovered,
 		} );
 
-		const { onMouseLeave, onSelect, onFocus, onReplace } = this.props;
+		const { onMouseLeave, onFocus, onReplace } = this.props;
 
 		// Determine whether the block has props to apply to the wrapper.
 		let wrapperProps;
@@ -382,11 +381,6 @@ class VisualEditorBlock extends Component {
 						}
 					</BlockCrashBoundary>
 				</div>
-				{ ( showUI || isHovered ) && !! nextBlock && (
-					<Inserter
-						onToggle={ ( isOpen ) => isOpen ? onSelect() : null }
-						insertIndex={ order + 1 } />
-				) }
 				{ !! error && <BlockCrashWarning /> }
 			</div>
 		);

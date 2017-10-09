@@ -25,7 +25,7 @@ describe( 'store', () => {
 				'hoveredBlock',
 				'preferences',
 				'saving',
-				'blockInsertionPoint',
+				'showInsertionPoint',
 				'notices',
 			] ) );
 		} );
