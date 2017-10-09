@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/components';
 
 /**
@@ -14,7 +14,7 @@ import { IconButton } from '@wordpress/components';
  */
 import { getActivePanel } from '../selectors';
 
-const SidebarHeader = ( { panel, onSetPanel, toggleSidebar } ) => {
+const SidebarHeader = ( { panel, onSetPanel, toggleSidebar, count } ) => {
 	return (
 		<div className="components-panel__header editor-sidebar__panel-tabs">
 			<button
@@ -29,7 +29,7 @@ const SidebarHeader = ( { panel, onSetPanel, toggleSidebar } ) => {
 				className={ `editor-sidebar__panel-tab ${ panel === 'block' ? 'is-active' : '' }` }
 				aria-label={ __( 'Block settings' ) }
 			>
-				{ __( 'Block' ) }
+				{ sprintf( _n( 'Block', '%d Blocks', count ), count ) }
 			</button>
 			<IconButton
 				onClick={ toggleSidebar }

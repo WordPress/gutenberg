@@ -15,15 +15,17 @@ import { withFocusReturn } from '@wordpress/components';
 import './style.scss';
 import PostSettings from './post-settings';
 import BlockInspector from './block-inspector';
+import MultiBlockInspector from './multi-block-inspector';
 import Header from './header';
-import { getActivePanel } from '../selectors';
+import { getActivePanel, getSelectedBlockCount } from '../selectors';
 
-const Sidebar = ( { panel } ) => {
+const Sidebar = ( { panel, selectedBlockCount } ) => {
 	return (
 		<div className="editor-sidebar" role="region" aria-label={ __( 'Editor settings' ) }>
-			<Header />
+			<Header count={ selectedBlockCount || 1 } />
 			{ panel === 'document' && <PostSettings /> }
-			{ panel === 'block' && <BlockInspector /> }
+			{ panel === 'block' && selectedBlockCount === 1 && <BlockInspector /> }
+			{ panel === 'block' && selectedBlockCount > 1 && <MultiBlockInspector /> }
 		</div>
 	);
 };
@@ -32,6 +34,7 @@ export default connect(
 	( state ) => {
 		return {
 			panel: getActivePanel( state ),
+			selectedBlockCount: getSelectedBlockCount( state ),
 		};
 	}
 )( withFocusReturn( Sidebar ) );

@@ -51,11 +51,13 @@ export default connect(
 		onDelete() {
 			dispatch( {
 				type: 'REMOVE_BLOCKS',
-				uids: [ ownProps.uid ],
+				uids: ownProps.uids,
 			} );
 		},
 		onSelect() {
-			dispatch( selectBlock( ownProps.uid ) );
+			if ( ownProps.uids.length === 1 ) {
+				dispatch( selectBlock( ownProps.uids[ 0 ] ) );
+			}
 		},
 		setActivePanel() {
 			dispatch( {

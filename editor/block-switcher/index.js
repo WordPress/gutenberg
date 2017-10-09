@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { uniq, get, reduce, find } from 'lodash';
+import { uniq, get, reduce, find, first, last } from 'lodash';
 import clickOutside from 'react-click-outside';
 
 /**
@@ -17,8 +17,8 @@ import { getBlockType, getBlockTypes, switchToBlockType } from '@wordpress/block
  * Internal dependencies
  */
 import './style.scss';
-import { replaceBlocks } from '../actions';
-import { getBlock } from '../selectors';
+import { replaceBlocks, multiSelect } from '../actions';
+import { getBlocksByUid } from '../selectors';
 
 class BlockSwitcher extends Component {
 	constructor() {
@@ -48,15 +48,23 @@ class BlockSwitcher extends Component {
 			this.setState( {
 				open: false,
 			} );
-			this.props.onTransform( this.props.block, name );
+			this.props.onTransform( this.props.blocks, name );
 		};
 	}
 
 	render() {
-		const blockType = getBlockType( this.props.block.name );
+		const names = uniq( this.props.blocks.map( ( block ) => block.name ) );
+
+		// Blocks do not share the same name.
+		if ( names.length !== 1 ) {
+			return null;
+		}
+
+		const blockName = first( names );
+		const blockType = getBlockType( blockName );
 		const blocksToBeTransformedFrom = reduce( getBlockTypes(), ( memo, block ) => {
 			const transformFrom = get( block, 'transforms.from', [] );
-			const transformation = find( transformFrom, t => t.type === 'block' && t.blocks.indexOf( this.props.block.name ) !== -1 );
+			const transformation = find( transformFrom, t => t.type === 'block' && t.blocks.indexOf( blockName ) !== -1 );
 			return transformation ? memo.concat( [ block.name ] ) : memo;
 		}, [] );
 		const blocksToBeTransformedTo = get( blockType, 'transforms.to', [] )
@@ -115,14 +123,20 @@ class BlockSwitcher extends Component {
 
 export default connect(
 	( state, ownProps ) => ( {
-		block: getBlock( state, ownProps.uid ),
+		blocks: getBlocksByUid( state, ownProps.uids ),
 	} ),
 	( dispatch, ownProps ) => ( {
-		onTransform( block, name ) {
+		onTransform( blocks, name ) {
 			dispatch( replaceBlocks(
-				[ ownProps.uid ],
-				switchToBlockType( block, name )
+				ownProps.uids,
+				blocks.reduce( ( acc, block ) => {
+					return [ ...acc, ...switchToBlockType( block, name ) ];
+				}, [] ),
 			) );
+
+			if ( blocks.length > 1 ) {
+				dispatch( multiSelect( first( blocks ).uid, last( blocks ).uid ) );
+			}
 		},
 	} )
 )( clickOutside( BlockSwitcher ) );

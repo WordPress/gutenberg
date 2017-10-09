@@ -440,6 +440,15 @@ export const getBlocks = createSelector(
 	]
 );
 
+export const getBlocksByUid = createSelector(
+	( state, uids ) => {
+		return uids.map( ( uid ) => getBlock( state, uid ) );
+	},
+	( state ) => [
+		state.editor.blocksByUid,
+	]
+);
+
 /**
  * Returns the number of blocks currently present in the post.
  *
@@ -448,6 +457,22 @@ export const getBlocks = createSelector(
  */
 export function getBlockCount( state ) {
 	return getBlockUids( state ).length;
+}
+
+/**
+ * Returns the number of blocks currently selected in the post.
+ *
+ * @param  {Object} state Global application state
+ * @return {Object}       Number of blocks selected in the post
+ */
+export function getSelectedBlockCount( state ) {
+	const multiSelectedBlockCount = getMultiSelectedBlockUids( state ).length;
+
+	if ( multiSelectedBlockCount ) {
+		return multiSelectedBlockCount;
+	}
+
+	return state.blockSelection.start ? 1 : 0;
 }
 
 /**
