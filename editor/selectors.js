@@ -873,7 +873,7 @@ export function getRecentlyUsedBlocks( state ) {
 export const getMostFrequentlyUsedBlocks = createSelector(
 	( state ) => {
 		const { blockUsage } = state.preferences;
-		const orderedByUsage = keys( blockUsage ).sort( ( a, b ) => blockUsage[ b ] - blockUsage[ a ] );#
+		const orderedByUsage = keys( blockUsage ).sort( ( a, b ) => blockUsage[ b ] - blockUsage[ a ] );
 		// add in paragraph and image blocks if they're not already in the usgae data
 		return [ ...orderedByUsage, ...without( [ 'core/paragraph', 'core/image' ], ...orderedByUsage ) ]
 			.slice( 0, MAX_FREQUENT_BLOCKS )
