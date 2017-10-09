@@ -47,7 +47,7 @@ class BlockSettingsMenu extends Component {
 					className={ toggleClassname }
 					onClick={ this.toggleMenu }
 					icon="ellipsis"
-					label={ __( 'Open Settings Menu' ) }
+					label={ opened ? __( 'Close Settings Menu' ) : __( 'Open Settings Menu' ) }
 				/>
 
 				{ opened && <BlockSettingsMenuContent uid={ uid } /> }
