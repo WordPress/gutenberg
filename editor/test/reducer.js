@@ -734,24 +734,6 @@ describe( 'state', () => {
 			expect( state3 ).toEqual( { start: 'ribs', end: 'ribs', focus: {} } );
 		} );
 
-		it( 'should return with block moved up', () => {
-			const state = blockSelection( undefined, {
-				type: 'MOVE_BLOCKS_UP',
-				uids: [ 'ribs' ],
-			} );
-
-			expect( state ).toEqual( { start: 'ribs', end: 'ribs', focus: {} } );
-		} );
-
-		it( 'should return with block moved down', () => {
-			const state = blockSelection( undefined, {
-				type: 'MOVE_BLOCKS_DOWN',
-				uids: [ 'chicken' ],
-			} );
-
-			expect( state ).toEqual( { start: 'chicken', end: 'chicken', focus: {} } );
-		} );
-
 		it( 'should not update the state if the block moved is already selected', () => {
 			const original = deepFreeze( { start: 'ribs', end: 'ribs', focus: {} } );
 			const state = blockSelection( original, {

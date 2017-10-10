@@ -350,17 +350,6 @@ export function blockSelection( state = { start: null, end: null, focus: null },
 				end: action.blocks[ 0 ].uid,
 				focus: {},
 			};
-		case 'MOVE_BLOCKS_UP':
-		case 'MOVE_BLOCKS_DOWN': {
-			const firstUid = first( action.uids );
-			return firstUid === state.start
-				? state
-				: {
-					start: firstUid,
-					end: firstUid,
-					focus: {},
-				};
-		}
 	}
 
 	return state;
