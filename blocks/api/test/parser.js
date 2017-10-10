@@ -176,6 +176,31 @@ describe( 'block parser', () => {
 				anchor: 'chicken',
 			} );
 		} );
+
+		it( 'should parse the className if the block supports it', () => {
+			const blockType = {
+				attributes: {},
+			};
+
+			const rawContent = '<div class="chicken">Ribs</div>';
+			const attrs = { className: 'chicken' };
+
+			expect( getBlockAttributes( blockType, rawContent, attrs ) ).toEqual( {
+				className: 'chicken',
+			} );
+		} );
+
+		it( 'should not parse the className if the block supports it', () => {
+			const blockType = {
+				attributes: {},
+				className: false,
+			};
+
+			const rawContent = '<div class="chicken">Ribs</div>';
+			const attrs = { className: 'chicken' };
+
+			expect( getBlockAttributes( blockType, rawContent, attrs ) ).toEqual( {} );
+		} );
 	} );
 
 	describe( 'createBlockWithFallback', () => {

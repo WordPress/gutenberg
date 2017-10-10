@@ -89,11 +89,11 @@ export function getSaveContent( blockType, attributes ) {
  * which cannot be matched from the block content.
  *
  * @param   {Object<String,*>} allAttributes Attributes from in-memory block data
- * @param   {Object<String,*>} schema        Block type schema
+ * @param   {Object<String,*>} blockType     Block type
  * @returns {Object<String,*>}               Subset of attributes for comment serialization
  */
-export function getCommentAttributes( allAttributes, schema ) {
-	return reduce( schema, ( result, attributeSchema, key ) => {
+export function getCommentAttributes( allAttributes, blockType ) {
+	const attributes = reduce( blockType.attributes, ( result, attributeSchema, key ) => {
 		const value = allAttributes[ key ];
 
 		// Ignore undefined values
@@ -115,6 +115,12 @@ export function getCommentAttributes( allAttributes, schema ) {
 		result[ key ] = value;
 		return result;
 	}, {} );
+
+	if ( blockType.className !== false && allAttributes.className ) {
+		attributes.className = allAttributes.className;
+	}
+
+	return attributes;
 }
 
 export function serializeAttributes( attrs ) {
@@ -194,7 +200,7 @@ export function serializeBlock( block ) {
 	const blockName = block.name;
 	const blockType = getBlockType( blockName );
 	const saveContent = getBlockContent( block );
-	const saveAttributes = getCommentAttributes( block.attributes, blockType.attributes );
+	const saveAttributes = getCommentAttributes( block.attributes, blockType );
 
 	switch ( blockName ) {
 		case 'core/more':
