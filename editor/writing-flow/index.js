@@ -36,7 +36,7 @@ class WritingFlow extends Component {
 				node.nodeName === 'INPUT' ||
 				node.nodeName === 'TEXTAREA' ||
 				node.contentEditable === 'true' ||
-				node.classList.contains( 'editor-visual-editor__block' )
+				node.classList.contains( 'editor-visual-editor__block-edit' )
 			) );
 	}
 

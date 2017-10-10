@@ -136,7 +136,6 @@ class VisualEditorBlock extends Component {
 
 	bindBlockNode( node ) {
 		this.node = node;
-		this.props.blockRef( node );
 	}
 
 	setAttributes( attributes ) {
@@ -250,10 +249,7 @@ class VisualEditorBlock extends Component {
 	}
 
 	onFocus( event ) {
-		// Firefox retargets to parent with tabIndex.
-		const target = event.nativeEvent.explicitOriginalTarget || event.target;
-
-		if ( target === this.node ) {
+		if ( event.target === this.node ) {
 			this.props.onSelect();
 		}
 	}
@@ -334,16 +330,12 @@ class VisualEditorBlock extends Component {
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
 			<div
-				ref={ this.bindBlockNode }
-				onKeyDown={ this.onKeyDown }
-				onFocus={ this.onFocus }
+				ref={ this.props.blockRef }
 				onMouseMove={ this.maybeHover }
 				onMouseEnter={ this.maybeHover }
 				onMouseLeave={ onMouseLeave }
 				className={ wrapperClassname }
 				data-type={ block.name }
-				tabIndex="0"
-				aria-label={ blockLabel }
 				{ ...wrapperProps }
 			>
 				<BlockDropZone index={ order } />
@@ -353,10 +345,15 @@ class VisualEditorBlock extends Component {
 				{ isFirstMultiSelected && <BlockMover uids={ multiSelectedBlockUids } /> }
 				{ isFirstMultiSelected && <BlockRightMenu uids={ multiSelectedBlockUids } /> }
 				<div
+					ref={ this.bindBlockNode }
 					onKeyPress={ this.maybeStartTyping }
 					onDragStart={ ( event ) => event.preventDefault() }
 					onMouseDown={ this.onPointerDown }
+					onKeyDown={ this.onKeyDown }
+					onFocus={ this.onFocus }
 					className="editor-visual-editor__block-edit"
+					tabIndex="0"
+					aria-label={ blockLabel }
 				>
 					<BlockCrashBoundary onError={ this.onBlockError }>
 						{ isValid && mode === 'visual' && (
