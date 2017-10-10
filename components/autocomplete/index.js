@@ -20,6 +20,11 @@ import Popover from '../popover';
 
 const { ENTER, ESCAPE, UP, DOWN } = keycodes;
 
+/**
+ * Recursively select the firstChild until hitting a leaf node.
+ * @param {Node} node the node to find the recursive first child.
+ * @returns {Node} the first leaf-node >= node in the ordering.
+ */
 function descendFirst( node ) {
 	let n = node;
 	while ( n.firstChild ) {
@@ -28,6 +33,11 @@ function descendFirst( node ) {
 	return n;
 }
 
+/**
+ * Recursively select the lastChild until hitting a leaf node.
+ * @param {Node} node the node to find the recursive last child.
+ * @returns {Node} the first leaf-node <= node in the ordering.
+ */
 function descendLast( node ) {
 	let n = node;
 	while ( n.lastChild ) {
@@ -36,14 +46,30 @@ function descendLast( node ) {
 	return n;
 }
 
+/**
+ * Is the node a text node.
+ * @param {?Node} node the node to check.
+ * @returns {boolean} true if the node is a text node.
+ */
 function isTextNode( node ) {
 	return node !== null && node.nodeType === 3;
 }
 
+/**
+ * Return the node only if it is a text node, otherwise return null.
+ * @param {?Node} node the node to filter.
+ * @returns {?Node} the node or null if it is not a text node.
+ */
 function onlyTextNode( node ) {
 	return isTextNode( node ) ? node : null;
 }
 
+/**
+ * Find the index of the last charater in the text that is whitespace.
+ * @param {String} text the text to search.
+ * @param {Number} fromIndex the index to start from.
+ * @returns {Number} the last index of a white space character in the text or -1.
+ */
 function lastIndexOfSpace( text, fromIndex ) {
 	const fromI = fromIndex === undefined ?
 			text.length - 1 :
@@ -91,7 +117,7 @@ class Autocomplete extends Component {
 		this.reset();
 
 		if ( onSelect ) {
-			onSelect( option, range, lookup );
+			onSelect( option.value, range, lookup );
 		}
 	}
 
@@ -300,6 +326,11 @@ class Autocomplete extends Component {
 	}
 
 	toggleKeyEvents( isListening ) {
+		// This exists because we must capture ENTER key presses before Editable.
+		// It seems that react fires the simulated capturing events after the
+		// native browser event has already bubbled so we can't stopPropagation
+		//  and avoid Editable getting the event from TinyMCE, hence we must
+		// register a native event handler.
 		if ( ! this.node ) {
 			return;
 		}
@@ -310,9 +341,11 @@ class Autocomplete extends Component {
 
 	componentWillMount() {
 		const { completers } = this.props;
+		// Some completers must do asynchronous requests to get their options so
+		// we calculate that here.
 		completers.forEach( ( { getOptions }, idx ) => {
 			getOptions().then( ( options ) => {
-				this.allOptions[ idx ] = options;
+				this.allOptions[ idx ] = options.map( ( option, key ) => ( { ...option, key } ) );
 				this.forceUpdate();
 			} );
 		} );
@@ -337,8 +370,6 @@ class Autocomplete extends Component {
 		const classes = classnames( 'components-autocomplete__popover', className );
 		const filteredOptions = this.getFilteredOptions();
 
-		// Blur is applied to the wrapper node, since if the child is Editable,
-		// the event will not have `relatedTarget` assigned.
 		return (
 			<div
 				ref={ this.bindNode }
@@ -360,7 +391,7 @@ class Autocomplete extends Component {
 					>
 						{ filteredOptions.map( ( option, index ) => (
 							<li
-								key={ option.value }
+								key={ option.key.toString() }
 								role="menuitem"
 								className={ classnames( 'components-autocomplete__result', {
 									'is-selected': index === selectedIndex,
