@@ -361,12 +361,29 @@ class Tests_dbDelta extends WP_UnitTestCase {
 			$this->markTestSkipped( 'This test requires utf8mb4 support in MySQL.' );
 		}
 
-		$table_name = 'test_truncated_index';
+		// This table needs to be actually created
+		remove_filter( 'query', array( $this, '_create_temporary_tables' ) );
+		remove_filter( 'query', array( $this, '_drop_temporary_tables' ) );
 
-		$create = "CREATE TABLE $table_name (\n a varchar(255) COLLATE utf8mb4_unicode_ci,\n KEY a (a)\n)";
+		$table_name = "{$wpdb->prefix}test_truncated_index";
+
+		$create = "
+			CREATE TABLE $table_name (
+				a varchar(255) COLLATE utf8mb4_unicode_ci,
+				KEY a_key (a)
+			) ENGINE=InnoDB ROW_FORMAT=DYNAMIC";
+
 		$wpdb->query( $create );
 
+		$index = $wpdb->get_row( "SHOW INDEXES FROM $table_name WHERE Key_name='a_key';" );
+
 		$actual = dbDelta( $create, false );
+
+		$wpdb->query( "DROP TABLE IF EXISTS $table_name;" );
+
+		if ( 191 != $index->Sub_part ) {
+			$this->markTestSkipped( "This test requires the index to be truncated." );
+		}
 
 		$this->assertSame( array(), $actual );
 	}
