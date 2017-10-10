@@ -693,13 +693,14 @@ describe( 'state', () => {
 		} );
 
 		it( 'should set multi selection', () => {
-			const state = blockSelection( undefined, {
+			const original = deepFreeze( { focus: { editable: 'citation' } } );
+			const state = blockSelection( original, {
 				type: 'MULTI_SELECT',
 				start: 'ribs',
 				end: 'chicken',
 			} );
 
-			expect( state ).toEqual( { start: 'ribs', end: 'chicken', focus: null } );
+			expect( state ).toEqual( { start: 'ribs', end: 'chicken', focus: { editable: 'citation' } } );
 		} );
 
 		it( 'should not update the state if the block is already selected', () => {

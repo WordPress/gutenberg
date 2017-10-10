@@ -721,7 +721,8 @@ export function isBlockHovered( state, uid ) {
  * @return {Object}       Block focus state
  */
 export function getBlockFocus( state, uid ) {
-	if ( ! isBlockSelected( state, uid ) ) {
+	// If there is multi-selection, keep returning the focus object for the start block.
+	if ( ! isBlockSelected( state, uid ) && state.blockSelection.start !== uid ) {
 		return null;
 	}
 
