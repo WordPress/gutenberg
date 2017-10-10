@@ -20,5 +20,5 @@ export default function BlockIcon( { icon } ) {
 		return icon();
 	}
 
-	return icon || null;
+	return icon;
 }
