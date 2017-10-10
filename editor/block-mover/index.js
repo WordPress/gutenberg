@@ -17,6 +17,7 @@ import { getBlockType } from '@wordpress/blocks';
 import './style.scss';
 import { isFirstBlock, isLastBlock, getBlockIndex, getBlock } from '../selectors';
 import { getBlockMoverLabel } from './mover-label';
+import { selectBlock } from '../actions';
 
 function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex } ) {
 	// We emulate a disabled state because forcefully applying the `disabled`
@@ -68,12 +69,20 @@ export default connect(
 	} ),
 	( dispatch, ownProps ) => ( {
 		onMoveDown() {
+			if ( ownProps.uids.length === 1 ) {
+				dispatch( selectBlock( first( ownProps.uids ) ) );
+			}
+
 			dispatch( {
 				type: 'MOVE_BLOCKS_DOWN',
 				uids: ownProps.uids,
 			} );
 		},
 		onMoveUp() {
+			if ( ownProps.uids.length === 1 ) {
+				dispatch( selectBlock( first( ownProps.uids ) ) );
+			}
+
 			dispatch( {
 				type: 'MOVE_BLOCKS_UP',
 				uids: ownProps.uids,
