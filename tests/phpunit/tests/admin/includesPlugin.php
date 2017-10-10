@@ -94,6 +94,31 @@ class Tests_Admin_includesPlugin extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @covers ::get_plugin_files
+	 */
+	public function test_get_plugin_files_folder() {
+		$plugin_dir = WP_PLUGIN_DIR . '/list_files_test_plugin';
+		@mkdir( $plugin_dir );
+		$plugin = $this->_create_plugin(null, 'list_files_test_plugin.php', $plugin_dir );
+
+		$sub_dir = trailingslashit( dirname( $plugin[1] ) ) . 'subdir';
+		@mkdir( $sub_dir );
+		@file_put_contents( $sub_dir . '/subfile.php', '<?php // Silence.' );
+
+		$plugin_files = get_plugin_files( plugin_basename( $plugin[1] ) );
+		$expected = array(
+			'list_files_test_plugin/list_files_test_plugin.php',
+			'list_files_test_plugin/subdir/subfile.php',
+		);
+		$this->assertEquals( $expected, $plugin_files );
+
+		unlink( $sub_dir . '/subfile.php' );
+		unlink( $plugin[1] );
+		rmdir( $sub_dir );
+		rmdir( $plugin_dir );
+	}
+
+	/**
 	 * @covers ::get_mu_plugins
 	 */
 	public function test_get_mu_plugins_when_mu_plugins_exists_but_is_empty() {
