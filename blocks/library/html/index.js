@@ -86,11 +86,11 @@ registerBlockType( 'core/html', {
 						/>
 					}
 					{ focus &&
-					<InspectorControls key="inspector">
-						<BlockDescription>
-							<p>{ __( 'Add custom HTML code and preview it right here in the editor.' ) }</p>
-						</BlockDescription>
-					</InspectorControls>
+						<InspectorControls key="inspector">
+							<BlockDescription>
+								<p>{ __( 'Add custom HTML code and preview it right here in the editor.' ) }</p>
+							</BlockDescription>
+						</InspectorControls>
 					}
 				</div>
 			);
