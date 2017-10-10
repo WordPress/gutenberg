@@ -259,8 +259,9 @@ class VisualEditorBlock extends Component {
 	}
 
 	onPointerDown( event ) {
-		// Not the main button (usually the left button on pointer device).
-		if ( event.buttons !== 1 ) {
+		// Not the main button.
+		// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
+		if ( event.button !== 0 ) {
 			return;
 		}
 
