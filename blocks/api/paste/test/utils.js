@@ -7,15 +7,15 @@ import { equal } from 'assert';
  * Internal dependencies
  */
 import createUnwrapper from '../create-unwrapper';
-import { deepFilter, isEmpty, isInvalidInline } from '../utils';
+import { deepFilterHTML, isEmpty, isInvalidInline, isPlain } from '../utils';
 
 const spanUnwrapper = createUnwrapper( ( node ) => node.nodeName === 'SPAN' );
 const inlineUnwrapper = createUnwrapper( ( node ) => node.nodeName === 'EM' );
 
-describe( 'deepFilter', () => {
+describe( 'deepFilterHTML', () => {
 	it( 'should not error', () => {
-		equal( deepFilter( '<span><em>test</em></span>', [ spanUnwrapper, inlineUnwrapper ] ), 'test' );
-		equal( deepFilter( '<em><span>test</span></em>', [ spanUnwrapper, inlineUnwrapper ] ), 'test' );
+		equal( deepFilterHTML( '<span><em>test</em></span>', [ spanUnwrapper, inlineUnwrapper ] ), 'test' );
+		equal( deepFilterHTML( '<em><span>test</span></em>', [ spanUnwrapper, inlineUnwrapper ] ), 'test' );
 	} );
 } );
 
@@ -76,5 +76,19 @@ describe( 'isInvalidInline', () => {
 
 	it( 'should return false for valid structure', () => {
 		equal( isInvalidInlineHTML( '<em>test</em>' ), false );
+	} );
+} );
+
+describe( 'isPlain', () => {
+	it( 'should return true for plain text', () => {
+		equal( isPlain( 'test' ), true );
+	} );
+
+	it( 'should return true for only line breaks', () => {
+		equal( isPlain( 'test<br>test' ), true );
+	} );
+
+	it( 'should return false for formatted text', () => {
+		equal( isPlain( '<strong>test</strong>' ), false );
 	} );
 } );

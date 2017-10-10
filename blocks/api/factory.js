@@ -39,8 +39,15 @@ export function createBlock( name, blockAttributes = {} ) {
 
 		return result;
 	}, {} );
+
+	// Keep the anchor if the block supports it
 	if ( blockType.supportAnchor && blockAttributes.anchor ) {
 		attributes.anchor = blockAttributes.anchor;
+	}
+
+	// Keep the className if the block supports it
+	if ( blockType.className !== false && blockAttributes.className ) {
+		attributes.className = blockAttributes.className;
 	}
 
 	// Blocks are stored with a unique ID, the assigned type name,

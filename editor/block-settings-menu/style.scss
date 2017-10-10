@@ -15,12 +15,14 @@
 
 .editor-block-settings-menu__content {
 	margin-top: 8px;
+	z-index: z-index( '.editor-block-settings-menu__content' );
 }
 
 .editor-block-settings-menu__toggle {
 	transform: rotate( 90deg );
 	transition-duration: 0.3s;
 	transition-property: transform;
+	z-index: z-index( '.editor-block-settings-menu__toggle' );
 
 	&.is-opened {
 		transform: rotate(0);
@@ -49,7 +51,11 @@
 		display: block;
 	}
 
-	.editor-block-settings-menu__content &:first-child {
+	.editor-block-settings-menu__content & {
 		margin-bottom: 8px;
+	}
+
+	.editor-block-settings-menu__content &:last-child {
+		margin-bottom: 0;
 	}
 }
