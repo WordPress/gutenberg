@@ -178,6 +178,10 @@ export function getCommentDelimitedContent( blockName, attributes, content ) {
 		? serializeAttributes( attributes ) + ' '
 		: '';
 
+	if ( blockName.startsWith( 'core/' ) ) {
+		blockName = blockName.substr( 5 );
+	}
+
 	if ( ! content ) {
 		return `<!-- wp:${ blockName } ${ serializedAttributes }/-->`;
 	}

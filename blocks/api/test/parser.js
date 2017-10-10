@@ -248,7 +248,7 @@ describe( 'block parser', () => {
 			);
 			expect( block.name ).toBe( 'core/unknown-block' );
 			expect( block.attributes.fruit ).toBe( 'Bananas' );
-			expect( block.attributes.content ).toContain( 'core/test-block' );
+			expect( block.attributes.content ).toContain( 'wp:test-block' );
 		} );
 
 		it( 'should fall back to the unknown type handler if block type not specified', () => {

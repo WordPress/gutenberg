@@ -148,7 +148,20 @@ WP_Block_End
   }
 
 WP_Block_Name
-  = $(ASCII_Letter (ASCII_AlphaNumeric / "/" ASCII_AlphaNumeric)*)
+  = blockName:$(ASCII_Letter (ASCII_AlphaNumeric / "/" ASCII_AlphaNumeric)*)
+  {
+    /** <?php
+    if ( false === strpos( $blockName, '/' ) ) {
+      $blockName = "core/$blockName";
+    }
+    return $blockName;
+    ?> **/
+
+    if ( ! blockName.includes( '/' ) ) {
+      blockName = 'core/' + blockName;
+    }
+    return blockName;
+  }
 
 WP_Block_Attributes
   = attrs:$("{" (!("}" WS+ """/"? "-->") .)* "}")
