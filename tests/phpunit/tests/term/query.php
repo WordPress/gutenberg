@@ -429,6 +429,50 @@ class Tests_Term_Query extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 41293
+	 */
+	public function test_should_allow_same_args_with_the_get_terms() {
+		register_post_type( 'wptests_pt' );
+		register_taxonomy( 'wptests_tax', 'wptests_pt' );
+		$t1 = self::factory()->term->create( array(
+			'taxonomy' => 'wptests_tax',
+			'name' => 'foo',
+			'slug' => 'bar',
+		) );
+		$t2 = self::factory()->term->create( array(
+			'taxonomy' => 'wptests_tax',
+			'name' => 'bar',
+			'slug' => 'foo',
+		) );
+
+		$p = self::factory()->post->create( array(
+			'post_type' => 'wptests_pt',
+		) );
+
+		wp_set_object_terms( $p, array( $t1, $t2 ), 'wptests_tax' );
+
+		$expected = wp_get_post_terms( $p, 'wptests_tax', array(
+			'fields' => 'ids',
+		) );
+
+		$found1 = array_keys( wp_get_object_terms( $p, 'wptests_tax', array(
+			'fields' => 'id=>parent',
+		) ) );
+
+		$found2 = array_keys( wp_get_object_terms( $p, 'wptests_tax', array(
+			'fields' => 'id=>slug',
+		) ) );
+
+		$found3 = array_keys( wp_get_object_terms( $p, 'wptests_tax', array(
+			'fields' => 'id=>name',
+		) ) );
+
+		$this->assertSame( $expected, $found1 );
+		$this->assertSame( $expected, $found2 );
+		$this->assertSame( $expected, $found3 );
+	}
+
+	/**
 	 * @ticket 41796
 	 */
 	public function test_number_should_work_with_object_ids() {
