@@ -87,6 +87,9 @@ class VisualEditorBlock extends Component {
 		if ( this.props.isTyping ) {
 			document.addEventListener( 'mousemove', this.stopTypingOnMouseMove );
 		}
+
+		// Not Ideal, but it's the easiest way to get the scrollable container
+		this.editorLayout = document.querySelector( '.editor-layout__editor' );
 	}
 
 	componentWillReceiveProps( newProps ) {
@@ -102,10 +105,9 @@ class VisualEditorBlock extends Component {
 	componentDidUpdate( prevProps ) {
 		// Preserve scroll prosition when block rearranged
 		if ( this.previousOffset ) {
-			window.scrollTo(
-				window.scrollX,
-				window.scrollY + this.node.getBoundingClientRect().top - this.previousOffset
-			);
+			this.editorLayout.scrollTop = this.editorLayout.scrollTop
+				+ this.node.getBoundingClientRect().top
+				- this.previousOffset;
 			this.previousOffset = null;
 		}
 
