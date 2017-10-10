@@ -29,6 +29,7 @@ export { default as SandBox } from './sandbox';
 export { default as Spinner } from './spinner';
 export { default as Toolbar } from './toolbar';
 export { default as Tooltip } from './tooltip';
+export { Slot, Fill, Provider as SlotFillProvider } from './slot-fill';
 
 // Higher-Order Components
 export { default as withAPIData } from './higher-order/with-api-data';
