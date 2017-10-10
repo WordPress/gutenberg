@@ -51,7 +51,11 @@
 		display: block;
 	}
 
-	.editor-block-settings-menu__content &:first-child {
+	.editor-block-settings-menu__content & {
 		margin-bottom: 8px;
+	}
+
+	.editor-block-settings-menu__content &:last-child {
+		margin-bottom: 0;
 	}
 }
