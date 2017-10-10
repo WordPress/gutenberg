@@ -14,10 +14,11 @@ import { Component } from '@wordpress/element';
 import BlockIcon from '../';
 
 describe( 'BlockIcon', () => {
-	it( 'renders nothing when icon omitted', () => {
+	it( 'renders a default icon when icon omitted', () => {
 		const wrapper = shallow( <BlockIcon /> );
 
-		expect( wrapper.type() ).toBeNull();
+		expect( wrapper.name() ).toBe( 'Dashicon' );
+		expect( wrapper.prop( 'icon' ) ).toBe( 'wordpress' );
 	} );
 
 	it( 'renders a dashicon by slug', () => {
