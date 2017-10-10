@@ -5,3 +5,14 @@
 .wp-block-audio .button.button-large {
 	margin-top: 0.5em;
 }
+
+.wp-block-audio audio {
+	width: 100%;
+}
+
+.wp-block-audio figcaption {
+	margin-top: 0.5em;
+	color: $dark-gray-100;
+	text-align: center;
+	font-size: $default-font-size;
+}

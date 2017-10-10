@@ -1,7 +1,7 @@
 .editor-block-mover {
 	position: absolute;
 	top: 0;
-	left: 0;
+	left: 4px;
 	height: $text-editor-font-size * 4; // same height as an empty paragraph
 	padding: 6px 14px 6px 0; // handles hover area
 	z-index: z-index( '.editor-block-mover' );
