@@ -318,7 +318,7 @@ export function blockSelection( state = { start: null, end: null, focus: null },
 			return {
 				start: action.start,
 				end: action.end,
-				focus: null,
+				focus: state.focus,
 			};
 		case 'SELECT_BLOCK':
 			if ( action.uid === state.start && action.uid === state.end ) {
