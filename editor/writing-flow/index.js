@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Component } from 'element';
+import { Component } from '@wordpress/element';
 import { keycodes, focus } from '@wordpress/utils';
 
 /**
