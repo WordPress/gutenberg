@@ -34,6 +34,49 @@ function the_gutenberg_project() {
 }
 
 /**
+ * Gutenberg's Menu.
+ *
+ * Adds a new wp-admin menu page for the Gutenberg editor.
+ *
+ * @since 0.1.0
+ */
+function gutenberg_menu() {
+	global $menu, $submenu;
+
+	add_menu_page(
+		'Gutenberg',
+		'Gutenberg',
+		'edit_posts',
+		'gutenberg',
+		'the_gutenberg_project',
+		'dashicons-edit'
+	);
+
+	add_submenu_page(
+		'gutenberg',
+		__( 'Demo', 'gutenberg' ),
+		__( 'Demo', 'gutenberg' ),
+		'edit_posts',
+		'gutenberg'
+	);
+
+	if ( current_user_can( 'edit_posts' ) ) {
+		$submenu['gutenberg'][] = array(
+			__( 'Feedback', 'gutenberg' ),
+			'edit_posts',
+			'http://wordpressdotorg.polldaddy.com/s/gutenberg-support',
+		);
+
+		$submenu['gutenberg'][] = array(
+			__( 'Documentation', 'gutenberg' ),
+			'edit_posts',
+			'http://gutenberg-devdoc.surge.sh/',
+		);
+	}
+}
+add_action( 'admin_menu', 'gutenberg_menu' );
+
+/**
  * Display a notice and deactivate the Gutenberg plugin.
  *
  * @since 0.1.0
@@ -55,7 +98,7 @@ function gutenberg_wordpress_version_notice() {
 function gutenberg_can_init() {
 	// Get unmodified $wp_version.
 	include( ABSPATH . WPINC . '/version.php' );
-	
+
 	// Strip '-src' from the version string. Messes up version_compare().
 	$version = str_replace( '-src', '', $wp_version );
 
@@ -239,3 +282,15 @@ function gutenberg_intercept_post_new() {
 	}
 }
 
+/**
+ * Redirects the demo page to edit a new post.
+ */
+function gutenberg_redirect_demo() {
+	global $pagenow;
+
+	if ( 'admin.php' === $pagenow && isset( $_GET['page'] ) && 'gutenberg' === $_GET['page'] ) {
+		wp_safe_redirect( admin_url( 'post-new.php?gutenberg-demo' ) );
+		exit;
+	}
+}
+add_action( 'admin_init', 'gutenberg_redirect_demo' );

@@ -597,7 +597,7 @@ function gutenberg_color_palette() {
  * @param string $hook Screen name.
  */
 function gutenberg_editor_scripts_and_styles( $hook ) {
-	$is_demo = strpos( $hook, 'gutenberg-demo' );
+	$is_demo = isset( $_GET['gutenberg-demo'] );
 
 	wp_add_inline_script(
 		'editor', 'window.wp.oldEditor = window.wp.editor;', 'after'
