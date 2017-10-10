@@ -11,7 +11,11 @@ import { flow, pick, noop } from 'lodash';
  */
 import { createElement, Component } from '@wordpress/element';
 import { EditableProvider } from '@wordpress/blocks';
-import { APIProvider, PopoverProvider, DropZoneProvider } from '@wordpress/components';
+import {
+	APIProvider,
+	DropZoneProvider,
+	SlotFillProvider as WPSlotFillProvider,
+} from '@wordpress/components';
 
 /**
  * Internal Dependencies
@@ -47,7 +51,6 @@ class EditorProvider extends Component {
 			...DEFAULT_SETTINGS,
 			...props.settings,
 		};
-		this.target = props.target;
 	}
 
 	getChildContext() {
@@ -59,8 +62,7 @@ class EditorProvider extends Component {
 	componentWillReceiveProps( nextProps ) {
 		if (
 			nextProps.store !== this.props.store ||
-			nextProps.settings !== this.props.settings ||
-			nextProps.target !== this.props.target
+			nextProps.settings !== this.props.settings
 		) {
 			// eslint-disable-next-line no-console
 			console.error( 'The Editor Provider Props are immutable.' );
@@ -96,12 +98,13 @@ class EditorProvider extends Component {
 				}, this.store.dispatch ),
 			],
 
-			// Popover provider:
+			// Slot / Fill provider:
 			//
-			//  - context.popoverTarget
+			//  - context.getSlot
+			//  - context.registerSlot
+			//  - context.unregisterSlot
 			[
-				PopoverProvider,
-				{ target: this.target },
+				WPSlotFillProvider,
 			],
 
 			// APIProvider
