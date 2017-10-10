@@ -25,6 +25,7 @@ if ( gutenberg_can_init() ) {
 	require_once dirname( __FILE__ ) . '/lib/i18n.php';
 	require_once dirname( __FILE__ ) . '/lib/parser.php';
 	require_once dirname( __FILE__ ) . '/lib/register.php';
+	require_once dirname( __FILE__ ) . '/lib/plugin-compat.php';
 
 	// Register server-side code for individual blocks.
 	foreach ( glob( dirname( __FILE__ ) . '/blocks/library/*/index.php' ) as $block_logic ) {
