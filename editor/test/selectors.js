@@ -54,6 +54,7 @@ import {
 	isFirstMultiSelectedBlock,
 	isBlockHovered,
 	getBlockFocus,
+	getBlockMode,
 	isTyping,
 	getBlockInsertionPoint,
 	isBlockInsertionPointVisible,
@@ -1502,6 +1503,26 @@ describe( 'selectors', () => {
 			};
 
 			expect( getBlockFocus( state, 23 ) ).toEqual( null );
+		} );
+	} );
+
+	describe( 'geteBlockMode', () => {
+		it( 'should return "visual" if unset', () => {
+			const state = {
+				blocksMode: {},
+			};
+
+			expect( getBlockMode( state, 123 ) ).toEqual( 'visual' );
+		} );
+
+		it( 'should return the block mode', () => {
+			const state = {
+				blocksMode: {
+					123: 'html',
+				},
+			};
+
+			expect( getBlockMode( state, 123 ) ).toEqual( 'html' );
 		} );
 	} );
 

@@ -711,6 +711,16 @@ export function getBlockFocus( state, uid ) {
 
 	return state.blockSelection.focus;
 }
+/**
+ * Returns thee block's editing mode
+ *
+ * @param  {Object} state Global application state
+ * @param  {String} uid   Block unique ID
+ * @return {Object}       Block editing mode
+ */
+export function getBlockMode( state, uid ) {
+	return state.blocksMode[ uid ] || 'visual';
+}
 
 /**
  * Returns true if the user is typing, or false otherwise.

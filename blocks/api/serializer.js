@@ -140,6 +140,26 @@ export function getBeautifulContent( content ) {
 }
 
 /**
+ * Given a block object, returns the Block's Inner HTML markup
+ * @param  {Object} block Block Object
+ * @return {String}       HTML
+ */
+export function getBlockContent( block ) {
+	const blockType = getBlockType( block.name );
+
+	// If block was parsed as invalid or encounters an error while generating
+	// save content, use original content instead to avoid content loss.
+	let saveContent = block.originalContent;
+	if ( block.isValid ) {
+		try {
+			saveContent = getSaveContent( blockType, block.attributes );
+		} catch ( error ) {}
+	}
+
+	return getUnknownTypeHandlerName() === block.name || ! saveContent ? saveContent : getBeautifulContent( saveContent );
+}
+
+/**
  * Returns the content of a block, including comment delimiters.
  *
  * @param  {String} blockName  Block name
@@ -158,7 +178,7 @@ export function getCommentDelimitedContent( blockName, attributes, content ) {
 
 	return (
 		`<!-- wp:${ blockName } ${ serializedAttributes }-->\n` +
-		getBeautifulContent( content ) +
+		content +
 		`\n<!-- /wp:${ blockName } -->`
 	);
 }
@@ -173,16 +193,7 @@ export function getCommentDelimitedContent( blockName, attributes, content ) {
 export function serializeBlock( block ) {
 	const blockName = block.name;
 	const blockType = getBlockType( blockName );
-
-	// If block was parsed as invalid or encounters an error while generating
-	// save content, use original content instead to avoid content loss.
-	let saveContent = block.originalContent;
-	if ( block.isValid ) {
-		try {
-			saveContent = getSaveContent( blockType, block.attributes );
-		} catch ( error ) {}
-	}
-
+	const saveContent = getBlockContent( block );
 	const saveAttributes = getCommentAttributes( block.attributes, blockType.attributes );
 
 	switch ( blockName ) {

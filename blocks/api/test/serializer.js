@@ -14,6 +14,7 @@ import serialize, {
 	serializeAttributes,
 	getCommentDelimitedContent,
 	serializeBlock,
+	getBlockContent,
 } from '../serializer';
 import {
 	getBlockTypes,
@@ -400,6 +401,33 @@ describe( 'block serializer', () => {
 			expect( serialize( block ) ).toEqual(
 				'<!-- wp:core/test-block {"throw":true} -->\nCorrect\n<!-- /wp:core/test-block -->'
 			);
+		} );
+	} );
+
+	describe( 'getBlockContent', () => {
+		it( 'should return the block\'s serialized inner HTML', () => {
+			const blockType = {
+				attributes: {
+					content: {
+						type: 'string',
+						source: text(),
+					},
+				},
+				save( { attributes } ) {
+					return attributes.content;
+				},
+				category: 'common',
+				title: 'block title',
+			};
+			registerBlockType( 'core/chicken', blockType );
+			const block =	{
+				name: 'core/chicken',
+				attributes: {
+					content: '<p>chicken   </p>',
+				},
+				isValid: true,
+			};
+			expect( getBlockContent( block ) ).toBe( '<p>chicken </p>' );
 		} );
 	} );
 } );
