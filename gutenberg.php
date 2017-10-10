@@ -93,7 +93,6 @@ function gutenberg_wordpress_version_notice() {
  * Verify that we can initialize the Gutenberg editor plugin and add hooks.
  *
  * @since 0.1.0
- *
  */
 function gutenberg_can_init() {
 	// Get unmodified $wp_version.
@@ -102,7 +101,7 @@ function gutenberg_can_init() {
 	// Strip '-src' from the version string. Messes up version_compare().
 	$version = str_replace( '-src', '', $wp_version );
 
-	if ( version_compare( $version, '4.9-beta1-42000', '>=' ) ) { // TODO: change the last bit with the release number when `replace_editor` is available
+	if ( version_compare( $version, '4.9-beta1-42000', '>=' ) ) { // TODO: change the last bit with the release number when `replace_editor` is available.
 		add_filter( 'replace_editor', 'gutenberg_init', 10, 2 );
 	} elseif ( version_compare( $version, '4.8', '<' ) ) {
 		add_action( 'admin_notices', 'gutenberg_wordpress_version_notice' );
@@ -147,11 +146,12 @@ function gutenberg_intercept_edit_post() {
 		$typenow, $parent_file, $submenu_file, $post_new_file;
 
 	if ( isset( $_GET['post'] ) ) {
-		$post_id = $post_ID = (int) $_GET['post'];
+		$post_ID = (int) $_GET['post'];
+		$post_id = $post_ID;
 	}
 
 	if ( empty( $post_id ) ) {
-		wp_redirect( admin_url('post.php') );
+		wp_redirect( admin_url( 'post.php' ) );
 		exit();
 	}
 
@@ -192,15 +192,15 @@ function gutenberg_intercept_edit_post() {
 
 	$post_type = $post->post_type;
 	if ( 'post' == $post_type ) {
-		$parent_file = "edit.php";
-		$submenu_file = "edit.php";
-		$post_new_file = "post-new.php";
+		$parent_file = 'edit.php';
+		$submenu_file = 'edit.php';
+		$post_new_file = 'post-new.php';
 	} elseif ( 'attachment' == $post_type ) {
 		$parent_file = 'upload.php';
 		$submenu_file = 'upload.php';
 		$post_new_file = 'media-new.php';
 	} else {
-		if ( isset( $post_type_object ) && $post_type_object->show_in_menu && $post_type_object->show_in_menu !== true ) {
+		if ( isset( $post_type_object ) && $post_type_object->show_in_menu && true !== $post_type_object->show_in_menu ) {
 			$parent_file = $post_type_object->show_in_menu;
 		} else {
 			$parent_file = "edit.php?post_type=$post_type";
@@ -225,7 +225,7 @@ function gutenberg_intercept_post_new() {
 
 	if ( ! isset( $_GET['post_type'] ) ) {
 		$post_type = 'post';
-	} elseif ( in_array( $_GET['post_type'], get_post_types( array('show_ui' => true ) ) ) ) {
+	} elseif ( in_array( $_GET['post_type'], get_post_types( array( 'show_ui' => true ) ) ) ) {
 		$post_type = $_GET['post_type'];
 	} else {
 		wp_die( __( 'Invalid post type.' ) );
@@ -236,19 +236,20 @@ function gutenberg_intercept_post_new() {
 		$parent_file = 'edit.php';
 		$submenu_file = 'post-new.php';
 	} elseif ( 'attachment' == $post_type ) {
-		if ( wp_redirect( admin_url( 'media-new.php' ) ) )
+		if ( wp_redirect( admin_url( 'media-new.php' ) ) ) {
 			exit;
+		}
 	} else {
 		$submenu_file = "post-new.php?post_type=$post_type";
-		if ( isset( $post_type_object ) && $post_type_object->show_in_menu && $post_type_object->show_in_menu !== true ) {
+		if ( isset( $post_type_object ) && $post_type_object->show_in_menu && true !== $post_type_object->show_in_menu ) {
 			$parent_file = $post_type_object->show_in_menu;
 			// What if there isn't a post-new.php item for this post type?
 			if ( ! isset( $_registered_pages[ get_plugin_page_hookname( "post-new.php?post_type=$post_type", $post_type_object->show_in_menu ) ] ) ) {
-				if (	isset( $_registered_pages[ get_plugin_page_hookname( "edit.php?post_type=$post_type", $post_type_object->show_in_menu ) ] ) ) {
-					// Fall back to edit.php for that post type, if it exists
+				if ( isset( $_registered_pages[ get_plugin_page_hookname( "edit.php?post_type=$post_type", $post_type_object->show_in_menu ) ] ) ) {
+					// Fall back to edit.php for that post type, if it exists.
 					$submenu_file = "edit.php?post_type=$post_type";
 				} else {
-					// Otherwise, give up and highlight the parent
+					// Otherwise, give up and highlight the parent.
 					$submenu_file = $parent_file;
 				}
 			}
@@ -268,7 +269,7 @@ function gutenberg_intercept_post_new() {
 		);
 	}
 
-	// Schedule auto-draft cleanup
+	// Schedule auto-draft cleanup.
 	if ( ! wp_next_scheduled( 'wp_scheduled_auto_draft_delete' ) ) {
 		wp_schedule_event( time(), 'daily', 'wp_scheduled_auto_draft_delete' );
 	}
