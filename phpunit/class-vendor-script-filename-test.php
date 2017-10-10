@@ -70,8 +70,8 @@ class Vendor_Script_Filename_Test extends WP_UnitTestCase {
 	 * @dataProvider vendor_script_filename_cases
 	 */
 	function test_gutenberg_vendor_script_filename( $url, $expected_filename_pattern ) {
-		$hash = substr( md5( $url ), 0, 8 );
-		$actual_filename = gutenberg_vendor_script_filename( $url );
+		$hash                    = substr( md5( $url ), 0, 8 );
+		$actual_filename         = gutenberg_vendor_script_filename( $url );
 		$actual_filename_pattern = str_replace( $hash, 'HASH', $actual_filename );
 		$this->assertEquals(
 			$expected_filename_pattern,

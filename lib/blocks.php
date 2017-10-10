@@ -73,8 +73,8 @@ function do_blocks( $content ) {
 	$content_after_blocks = '';
 
 	foreach ( $blocks as $block ) {
-		$block_name = isset( $block['blockName'] ) ? $block['blockName'] : null;
-		$attributes = is_array( $block['attrs'] ) ? $block['attrs'] : array();
+		$block_name  = isset( $block['blockName'] ) ? $block['blockName'] : null;
+		$attributes  = is_array( $block['attrs'] ) ? $block['attrs'] : array();
 		$raw_content = isset( $block['rawContent'] ) ? $block['rawContent'] : null;
 
 		if ( $block_name ) {

@@ -36,10 +36,10 @@ class Admin_Test extends WP_UnitTestCase {
 	 */
 	public static function setUpBeforeClass() {
 
-		self::$editor_user_id = self::factory()->user->create( array(
+		self::$editor_user_id      = self::factory()->user->create( array(
 			'role' => 'editor',
 		) );
-		self::$post_with_blocks = self::factory()->post->create( array(
+		self::$post_with_blocks    = self::factory()->post->create( array(
 			'post_title'   => 'Example',
 			'post_content' => "<!-- wp:core/text {\"dropCap\":true} -->\n<p class=\"has-drop-cap\">Tester</p>\n<!-- /wp:core/text -->",
 		) );
@@ -90,7 +90,7 @@ class Admin_Test extends WP_UnitTestCase {
 		$trashed_post = $this->factory()->post->create( array(
 			'post_status' => 'trash',
 		) );
-		$actions = apply_filters( 'post_row_actions', $original_actions, get_post( $trashed_post ) );
+		$actions      = apply_filters( 'post_row_actions', $original_actions, get_post( $trashed_post ) );
 		$this->assertArrayNotHasKey( 'gutenberg hide-if-no-js', $actions );
 		$this->assertArrayNotHasKey( 'classic hide-if-no-js', $actions );
 

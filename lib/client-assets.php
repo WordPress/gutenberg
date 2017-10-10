@@ -291,7 +291,7 @@ function gutenberg_register_vendor_scripts() {
  */
 function gutenberg_vendor_script_filename( $src ) {
 	$filename = basename( $src );
-	$hash = substr( md5( $src ), 0, 8 );
+	$hash     = substr( md5( $src ), 0, 8 );
 
 	$match = preg_match(
 		'/^'
@@ -452,7 +452,7 @@ function gutenberg_extend_wp_api_backbone_client() {
 		$taxonomy_rest_base_mapping[ $taxonomy_object->name ] = $rest_base;
 	}
 
-	$script = sprintf( 'wp.api.postTypeRestBaseMapping = %s;', wp_json_encode( $post_type_rest_base_mapping ) );
+	$script  = sprintf( 'wp.api.postTypeRestBaseMapping = %s;', wp_json_encode( $post_type_rest_base_mapping ) );
 	$script .= sprintf( 'wp.api.taxonomyRestBaseMapping = %s;', wp_json_encode( $taxonomy_rest_base_mapping ) );
 	$script .= <<<JS
 		wp.api.getPostTypeModel = function( postType ) {
@@ -708,7 +708,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	// Create an auto-draft if new post.
 	if ( ! $post_id ) {
 		$default_post_to_edit = get_default_post_to_edit( $post_type, true );
-		$post_id = $default_post_to_edit->ID;
+		$post_id              = $default_post_to_edit->ID;
 	}
 
 	// Generate API-prepared post from post ID.
@@ -720,7 +720,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	// Set initial title to empty string for auto draft for duration of edit.
 	$is_new_post = 'auto-draft' === $post_to_edit['status'];
 	if ( $is_new_post ) {
-		$default_title = apply_filters( 'default_title', '' );
+		$default_title         = apply_filters( 'default_title', '' );
 		$post_to_edit['title'] = array(
 			'raw'      => $default_title,
 			'rendered' => apply_filters( 'the_title', $default_title, $post_id ),
@@ -771,7 +771,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 	// Preload server-registered block schemas.
 	$block_registry = WP_Block_Type_Registry::get_instance();
-	$schemas = array();
+	$schemas        = array();
 	foreach ( $block_registry->get_all_registered() as $block_name => $block_type ) {
 		if ( isset( $block_type->attributes ) ) {
 			$schemas[ $block_name ] = $block_type->attributes;
@@ -781,7 +781,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 	// Initialize the editor.
 	$gutenberg_theme_support = get_theme_support( 'gutenberg' );
-	$color_palette = gutenberg_color_palette();
+	$color_palette           = gutenberg_color_palette();
 
 	if ( $gutenberg_theme_support && $gutenberg_theme_support[0]['colors'] ) {
 		$color_palette = $gutenberg_theme_support[0]['colors'];
