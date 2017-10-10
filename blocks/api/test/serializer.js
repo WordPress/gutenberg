@@ -168,7 +168,7 @@ describe( 'block serializer', () => {
 				fruit: 'bananas',
 				category: 'food',
 				ripeness: 'ripe',
-			}, {
+			}, { attributes: {
 				fruit: {
 					type: 'string',
 					source: text(),
@@ -179,7 +179,7 @@ describe( 'block serializer', () => {
 				ripeness: {
 					type: 'string',
 				},
-			} );
+			} } );
 
 			expect( attributes ).toEqual( {
 				category: 'food',
@@ -191,16 +191,32 @@ describe( 'block serializer', () => {
 			const attributes = getCommentAttributes( {
 				fruit: 'bananas',
 				ripeness: undefined,
-			}, {
+			}, { attributes: {
 				fruit: {
 					type: 'string',
 				},
 				ripeness: {
 					type: 'string',
 				},
-			} );
+			} } );
 
 			expect( attributes ).toEqual( { fruit: 'bananas' } );
+		} );
+
+		it( 'should return the className attribute if allowed', () => {
+			const attributes = getCommentAttributes( {
+				className: 'chicken',
+			}, { attributes: {} } );
+
+			expect( attributes ).toEqual( { className: 'chicken' } );
+		} );
+
+		it( 'should not return the className attribute if not supported', () => {
+			const attributes = getCommentAttributes( {
+				className: 'chicken',
+			}, { attributes: {}, className: false } );
+
+			expect( attributes ).toEqual( {} );
 		} );
 	} );
 
