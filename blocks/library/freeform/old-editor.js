@@ -165,16 +165,12 @@ export default class OldEditor extends Component {
 	render() {
 		const { id } = this.props;
 
-		const inspectorControls = (
+		return [
 			<InspectorControls key="inspector">
 				<BlockDescription>
-					<p>{ __( 'The Class Editor block allows you add content using a WYSIWYG editor.' ) }</p>
+					<p>{ __( 'The Classic Text block gives you an editor that is similar to a word processor.' ) }</p>
 				</BlockDescription>
-			</InspectorControls>
-		);
-
-		return [
-			inspectorControls,
+			</InspectorControls>,
 			<div
 				key="toolbar"
 				id={ id + '-toolbar' }
