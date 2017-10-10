@@ -176,7 +176,7 @@
                 "phpcs",
                 "standards"
             ],
-            "time": "2017-08-07T19:44:46+00:00"
+            "time": "2017-08-07 19:44:46"
         },
         {
             "name": "wp-coding-standards/wpcs",
@@ -184,12 +184,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards.git",
-                "reference": "ebdf15e9ac5376785c881438ca7dca6df9926772"
+                "reference": "b19535707965e6f185f6fc678b044d8c7f0b1b50"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WordPress-Coding-Standards/WordPress-Coding-Standards/zipball/ebdf15e9ac5376785c881438ca7dca6df9926772",
-                "reference": "ebdf15e9ac5376785c881438ca7dca6df9926772",
+                "url": "https://api.github.com/repos/WordPress-Coding-Standards/WordPress-Coding-Standards/zipball/b19535707965e6f185f6fc678b044d8c7f0b1b50",
+                "reference": "b19535707965e6f185f6fc678b044d8c7f0b1b50",
                 "shasum": ""
             },
             "require": {
@@ -216,7 +216,7 @@
                 "standards",
                 "wordpress"
             ],
-            "time": "2017-10-07T12:49:15+00:00"
+            "time": "2017-10-09T13:04:35+00:00"
         }
     ],
     "aliases": [],
