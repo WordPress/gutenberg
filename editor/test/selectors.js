@@ -1570,6 +1570,18 @@ describe( 'selectors', () => {
 			expect( getBlockInsertionPoint( state ) ).toBe( 3 );
 		} );
 
+		it( 'should return 0 if no selection and default at end false', () => {
+			const state = {
+				preferences: { mode: 'visual' },
+				blockSelection: { start: null, end: null },
+				editor: {
+					blockOrder: [ 1, 2, 3 ],
+				},
+			};
+
+			expect( getBlockInsertionPoint( state, false ) ).toBe( 0 );
+		} );
+
 		it( 'should return the last block for the text mode', () => {
 			const state = {
 				preferences: { mode: 'text' },

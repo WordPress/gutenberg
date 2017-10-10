@@ -1,18 +1,26 @@
 /**
+ * External dependencies
+ */
+import { connect } from 'react-redux';
+
+/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { keycodes, focus } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
 import { isEdge, placeCaretAtEdge } from '../utils/dom';
+import { getBlockInsertionPoint } from '../selectors';
+import { insertBlock } from '../actions';
 
 /**
  * Module Constants
  */
-const { UP, DOWN, LEFT, RIGHT } = keycodes;
+const { UP, DOWN, LEFT, RIGHT, ENTER } = keycodes;
 
 class WritingFlow extends Component {
 	constructor() {
@@ -66,6 +74,12 @@ class WritingFlow extends Component {
 			event.preventDefault();
 			this.shouldMove = true;
 		}
+
+		if ( keyCode === ENTER ) {
+			const { onInsertDefaultBlock, insertionPoint } = this.props;
+			event.preventDefault();
+			onInsertDefaultBlock( insertionPoint );
+		}
 	}
 
 	onKeyUp( event ) {
@@ -94,4 +108,18 @@ class WritingFlow extends Component {
 	}
 }
 
-export default WritingFlow;
+export default connect(
+	( state ) => {
+		return {
+			insertionPoint: getBlockInsertionPoint( state, false ),
+		};
+	},
+	{
+		onInsertDefaultBlock( position ) {
+			return insertBlock(
+				createBlock( getDefaultBlockName() ),
+				position
+			);
+		},
+	},
+)( WritingFlow );

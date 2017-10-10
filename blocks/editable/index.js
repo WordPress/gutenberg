@@ -387,6 +387,8 @@ export default class Editable extends Component {
 					this.splitContent();
 				}
 			}
+
+			event.stopImmediatePropagation();
 		}
 	}
 
