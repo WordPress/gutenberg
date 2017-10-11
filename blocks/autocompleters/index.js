@@ -9,7 +9,6 @@ import BlockIcon from '../block-icon';
  * @typedef {Object} CompleterOption
  * @property {Array.<Component>} label list of react components to render.
  * @property {Array.<String>} keywords list of key words to search.
- * @property {String} key unique string to help react render efficiently.
  * @property {*} value the value that will be passed to onSelect.
  */
 
@@ -60,7 +59,6 @@ export function blockAutocompleter( { onReplace } ) {
 	const options = getBlockTypes().map( ( blockType ) => {
 		const { name, title, icon, keywords = [] } = blockType;
 		return {
-			key: name,
 			value: name,
 			label: [
 				<BlockIcon key="icon" icon={ icon } />,
@@ -99,7 +97,6 @@ export function userAutocompleter() {
 		return ( new wp.api.collections.Users() ).fetch().then( ( users ) => {
 			return users.map( ( user ) => {
 				return {
-					key: user.slug,
 					value: user,
 					label: [
 						<img key="avatar" alt="" src={ user.avatar_urls[ 24 ] } />,
