@@ -88,15 +88,17 @@ class BlockToolbar extends Component {
 	}
 
 	onKeyUp( event ) {
-		const isMeta = this.metaCount === 1;
+		const shouldFocusToolbar = this.metaCount === 1 || ( event.keyCode === F10 && event.altKey );
 		this.metaCount = 0;
 
-		// Is there a better way to focus the selected block
-		const selectedBlock = document.querySelector( '.editor-visual-editor__block.is-selected' );
+		if ( ! shouldFocusToolbar && [ ESCAPE, LEFT, RIGHT ].indexOf( event.keyCode ) === -1 ) {
+			return;
+		}
+
 		const tabbables = focus.tabbable.find( this.toolbar );
 		const indexOfTabbable = tabbables.indexOf( document.activeElement );
 
-		if ( isMeta || ( event.keyCode === F10 && event.altKey ) ) {
+		if ( shouldFocusToolbar ) {
 			if ( tabbables.length ) {
 				tabbables[ 0 ].focus();
 			}
@@ -104,11 +106,14 @@ class BlockToolbar extends Component {
 		}
 
 		switch ( event.keyCode ) {
-			case ESCAPE:
+			case ESCAPE: {
+				// Is there a better way to focus the selected block
+				const selectedBlock = document.querySelector( '.editor-visual-editor__block.is-selected' );
 				if ( indexOfTabbable !== -1 && selectedBlock ) {
 					selectedBlock.focus();
 				}
 				break;
+			}
 			case LEFT:
 				if ( indexOfTabbable > 0 ) {
 					tabbables[ indexOfTabbable - 1 ].focus();
