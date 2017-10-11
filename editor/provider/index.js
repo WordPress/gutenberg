@@ -4,7 +4,7 @@
 import { bindActionCreators } from 'redux';
 import { Provider as ReduxProvider } from 'react-redux';
 import { Provider as SlotFillProvider } from 'react-slot-fill';
-import { flow, pick } from 'lodash';
+import { flow, pick, noop } from 'lodash';
 
 /**
  * WordPress Dependencies
@@ -17,7 +17,6 @@ import { APIProvider, PopoverProvider, DropZoneProvider } from '@wordpress/compo
  * Internal Dependencies
  */
 import { setupEditor, undo } from '../actions';
-import EditorSettingsProvider from '../settings/provider';
 import createReduxStore from '../store';
 
 /**
@@ -49,6 +48,12 @@ class EditorProvider extends Component {
 			...props.settings,
 		};
 		this.target = props.target;
+	}
+
+	getChildContext() {
+		return {
+			editor: this.settings,
+		};
 	}
 
 	componentWillReceiveProps( nextProps ) {
@@ -91,14 +96,6 @@ class EditorProvider extends Component {
 				}, this.store.dispatch ),
 			],
 
-			// Editor settings provider:
-			//
-			//  - context.editor
-			[
-				EditorSettingsProvider,
-				{ settings: this.settings },
-			],
-
 			// Popover provider:
 			//
 			//  - context.popoverTarget
@@ -138,5 +135,9 @@ class EditorProvider extends Component {
 		return createEditorElement( children );
 	}
 }
+
+EditorProvider.childContextTypes = {
+	editor: noop,
+};
 
 export default EditorProvider;
