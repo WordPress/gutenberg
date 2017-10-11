@@ -24,11 +24,19 @@ import BlockRightMenu from '../block-settings-menu';
 /**
  * Module Constants
  */
-const { LEFT, RIGHT, ESCAPE, ALT } = keycodes;
+const { LEFT, RIGHT, ESCAPE, F10 } = keycodes;
 
 function FirstChild( { children } ) {
 	const childrenArray = Children.toArray( children );
 	return childrenArray[ 0 ] || null;
+}
+
+function isMac() {
+	return window.navigator.platform.toLowerCase().indexOf( 'mac' ) !== -1;
+}
+
+function metaKeyPressed( event ) {
+	return isMac() ? event.metaKey : ( event.ctrlKey && ! event.altKey );
 }
 
 class BlockToolbar extends Component {
@@ -38,17 +46,24 @@ class BlockToolbar extends Component {
 		this.bindNode = this.bindNode.bind( this );
 		this.onKeyUp = this.onKeyUp.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
+		this.stopPropagation = this.stopPropagation.bind( this );
 		this.state = {
 			showMobileControls: false,
 		};
+
+		// it's not easy to know if the user only clicked on a "meta" key without simultaneously clicking on another key
+		// We keep track of the key counts to ensure it's reliable
+		this.metaCount = 0;
 	}
 
 	componentDidMount() {
 		document.addEventListener( 'keyup', this.onKeyUp );
+		document.addEventListener( 'keydown', this.onKeyDown );
 	}
 
 	componentWillUnmout() {
 		document.removeEventListener( 'keyup', this.onKeyUp );
+		document.removeEventListener( 'keydown', this.onKeyDown );
 	}
 
 	bindNode( ref ) {
@@ -62,17 +77,26 @@ class BlockToolbar extends Component {
 	}
 
 	onKeyDown( event ) {
+		if ( metaKeyPressed( event ) ) {
+			this.metaCount++;
+		}
+	}
+
+	stopPropagation( event ) {
 		// This is required to avoid messing up with the WritingFlow navigation
 		event.stopPropagation();
 	}
 
 	onKeyUp( event ) {
+		const isMeta = this.metaCount === 1;
+		this.metaCount = 0;
+
 		// Is there a better way to focus the selected block
 		const selectedBlock = document.querySelector( '.editor-visual-editor__block.is-selected' );
 		const tabbables = focus.tabbable.find( this.toolbar );
 		const indexOfTabbable = tabbables.indexOf( document.activeElement );
 
-		if ( event.keyCode === ALT ) {
+		if ( isMeta || ( event.keyCode === F10 && event.altKey ) ) {
 			if ( tabbables.length ) {
 				tabbables[ 0 ].focus();
 			}
@@ -117,7 +141,7 @@ class BlockToolbar extends Component {
 				transitionLeave={ false }
 				component={ FirstChild }
 			>
-				<div className={ toolbarClassname } ref={ this.bindNode } onKeyDown={ this.onKeyDown }>
+				<div className={ toolbarClassname } ref={ this.bindNode } onKeyDown={ this.stopPropagation }>
 					<div className="editor-block-toolbar__group">
 						{ ! showMobileControls && [
 							<BlockSwitcher key="switcher" uid={ uid } />,
