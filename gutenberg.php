@@ -145,39 +145,46 @@ function gutenberg_intercept_edit_post() {
 	global $post_type, $post_type_object, $post, $post_id, $post_ID, $title, $editing,
 		$typenow, $parent_file, $submenu_file, $post_new_file;
 
+	wp_reset_vars( array( 'action' ) );
+
+	// Other actions are handled in post.php.
+	if ( $GLOBALS['action'] !== 'edit' ) {
+		return;
+	}
+
 	if ( isset( $_GET['post'] ) ) {
 		$post_ID = (int) $_GET['post'];
 		$post_id = $post_ID;
 	}
 
 	if ( empty( $post_id ) ) {
-		wp_redirect( admin_url( 'post.php' ) );
-		exit();
+		return;
 	}
 
 	$post = get_post( $post_id );
 
+	// Errors and invalid requests are handled in post.php, do not intercept.
 	if ( $post ) {
 		$post_type = $post->post_type;
 		$post_type_object = get_post_type_object( $post_type );
 	} else {
-		wp_die( __( 'You attempted to edit an item that doesn&#8217;t exist. Perhaps it was deleted?' ) );
+		return;
 	}
 
 	if ( ! $post_type_object ) {
-		wp_die( __( 'Invalid post type.' ) );
+		return;
 	}
 
 	if ( ! in_array( $typenow, get_post_types( array( 'show_ui' => true ) ) ) ) {
-		wp_die( __( 'Sorry, you are not allowed to edit posts in this post type.' ) );
+		return;
 	}
 
 	if ( ! current_user_can( 'edit_post', $post_id ) ) {
-		wp_die( __( 'Sorry, you are not allowed to edit this item.' ) );
+		return;
 	}
 
 	if ( 'trash' == $post->post_status ) {
-		wp_die( __( 'You can&#8217;t edit this item because it is in the Trash. Please restore it and try again.' ) );
+		return;
 	}
 
 	if ( ! empty( $_GET['get-post-lock'] ) ) {
@@ -228,7 +235,7 @@ function gutenberg_intercept_post_new() {
 	} elseif ( in_array( $_GET['post_type'], get_post_types( array( 'show_ui' => true ) ) ) ) {
 		$post_type = $_GET['post_type'];
 	} else {
-		wp_die( __( 'Invalid post type.' ) );
+		return;
 	}
 	$post_type_object = get_post_type_object( $post_type );
 
@@ -261,12 +268,9 @@ function gutenberg_intercept_post_new() {
 	$title = $post_type_object->labels->add_new_item;
 	$editing = true;
 
+	// Errors and invalid requests are handled in post-new.php, do not intercept.
 	if ( ! current_user_can( $post_type_object->cap->edit_posts ) || ! current_user_can( $post_type_object->cap->create_posts ) ) {
-		wp_die(
-			'<h1>' . __( 'Cheatin&#8217; uh?' ) . '</h1>' .
-			'<p>' . __( 'Sorry, you are not allowed to create posts as this user.' ) . '</p>',
-			403
-		);
+		return;
 	}
 
 	// Schedule auto-draft cleanup.
