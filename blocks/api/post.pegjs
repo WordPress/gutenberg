@@ -148,20 +148,26 @@ WP_Block_End
   }
 
 WP_Block_Name
-  = blockName:$(ASCII_Letter (ASCII_AlphaNumeric / "/" ASCII_AlphaNumeric)*)
+  = namespace:$(WP_Block_Namespace "/")? name:WP_Namespaced_Block_Name
   {
     /** <?php
-    if ( false === strpos( $blockName, '/' ) ) {
-      $blockName = "core/$blockName";
+    if ( ! $namespace ) {
+      $namespace = 'core/';
     }
-    return $blockName;
+    return $namespace . $name;
     ?> **/
 
-    if ( ! blockName.includes( '/' ) ) {
-      blockName = 'core/' + blockName;
+    if ( ! namespace ) {
+      namespace = 'core/';
     }
-    return blockName;
+    return namespace + name;
   }
+
+WP_Block_Namespace
+  = $(ASCII_Letter ASCII_AlphaNumeric*)
+
+WP_Namespaced_Block_Name
+  = $(ASCII_Letter ASCII_AlphaNumeric*)
 
 WP_Block_Attributes
   = attrs:$("{" (!("}" WS+ """/"? "-->") .)* "}")
