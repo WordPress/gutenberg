@@ -38,12 +38,12 @@ function BlockSettingsMenuContent( { onDelete, isSidebarOpened, onToggleSidebar,
 				icon="trash"
 				label={ sprintf( _n( 'Delete the block', 'Delete the %d blocks', count ), count ) }
 			/>
-			<IconButton
+			{ count === 1 && <IconButton
 				className="editor-block-settings-menu__control"
 				onClick={ onToggleMode }
 				icon="html"
 				label={ __( 'Switch between the visual/text mode' ) }
-			/>
+			/> }
 		</div>
 	);
 }
@@ -63,7 +63,7 @@ export default connect(
 			dispatch( toggleSidebar() );
 		},
 		onToggleMode() {
-			dispatch( toggleBlockMode( ownProps.uid ) );
+			dispatch( toggleBlockMode( ownProps.uids[ 0 ] ) );
 		},
 	} )
 )( BlockSettingsMenuContent );
