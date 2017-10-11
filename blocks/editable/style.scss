@@ -48,7 +48,7 @@
 	}
 
 	&:focus {
-		b, i, strong, em, del {
+		b, i, strong, em, del, ins, sup, sub {
 			&[data-mce-selected] {
 				padding: 0 2px;
 				margin: 0 -2px;
