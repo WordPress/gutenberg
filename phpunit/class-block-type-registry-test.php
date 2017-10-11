@@ -128,7 +128,7 @@ class Block_Type_Registry_Test extends WP_UnitTestCase {
 	}
 
 	function test_get_all_registered() {
-		$names = array( 'core/paragraph', 'core/image', 'core/blockquote' );
+		$names    = array( 'core/paragraph', 'core/image', 'core/blockquote' );
 		$settings = array(
 			'icon' => 'random',
 		);

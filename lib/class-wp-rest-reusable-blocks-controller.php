@@ -97,7 +97,7 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 		$collection = array();
 
 		foreach ( $reusable_blocks as $reusable_block ) {
-			$response = $this->prepare_item_for_response( $reusable_block, $request );
+			$response     = $this->prepare_item_for_response( $reusable_block, $request );
 			$collection[] = $this->prepare_response_for_collection( $response );
 		}
 
@@ -219,7 +219,7 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 			$prepared_reusable_block->ID = $existing_reusable_block->ID;
 		}
 
-		$prepared_reusable_block->post_type = 'gb_reusable_block';
+		$prepared_reusable_block->post_type   = 'gb_reusable_block';
 		$prepared_reusable_block->post_status = 'publish';
 
 		// ID. We already validated this in self::update_item().
@@ -258,8 +258,8 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 	 */
 	public function prepare_item_for_response( $reusable_block, $request ) {
 		$data = array(
-			'id' => $reusable_block->post_name,
-			'name' => $reusable_block->post_title,
+			'id'      => $reusable_block->post_name,
+			'name'    => $reusable_block->post_title,
 			'content' => $reusable_block->post_content,
 		);
 
@@ -289,27 +289,27 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 	 */
 	public function get_item_schema() {
 		return array(
-			'$schema'              => 'http://json-schema.org/schema#',
-			'title'                => 'reusable-block',
-			'type'                 => 'object',
-			'properties'           => array(
-				'id'               => array(
-					'description'  => __( 'UUID that identifies this reusable block.', 'gutenberg' ),
-					'type'         => 'string',
-					'context'      => array( 'view', 'edit' ),
-					'readonly'     => true,
+			'$schema'    => 'http://json-schema.org/schema#',
+			'title'      => 'reusable-block',
+			'type'       => 'object',
+			'properties' => array(
+				'id'      => array(
+					'description' => __( 'UUID that identifies this reusable block.', 'gutenberg' ),
+					'type'        => 'string',
+					'context'     => array( 'view', 'edit' ),
+					'readonly'    => true,
 				),
-				'name'             => array(
-					'description'  => __( 'Name that identifies this reusable block', 'gutenberg' ),
-					'type'         => 'string',
-					'context'      => array( 'view', 'edit' ),
-					'required'     => true,
+				'name'    => array(
+					'description' => __( 'Name that identifies this reusable block', 'gutenberg' ),
+					'type'        => 'string',
+					'context'     => array( 'view', 'edit' ),
+					'required'    => true,
 				),
-				'content'          => array(
-					'description'  => __( 'The block\'s HTML content.', 'gutenberg' ),
-					'type'         => 'object',
-					'context'      => array( 'view', 'edit' ),
-					'required'     => true,
+				'content' => array(
+					'description' => __( 'The block\'s HTML content.', 'gutenberg' ),
+					'type'        => 'object',
+					'context'     => array( 'view', 'edit' ),
+					'required'    => true,
 				),
 			),
 		);
@@ -328,7 +328,7 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 	private function get_reusable_block( $uuid ) {
 		$reusable_blocks = get_posts( array(
 			'post_type' => 'gb_reusable_block',
-			'name' => $uuid,
+			'name'      => $uuid,
 		) );
 
 		return array_shift( $reusable_blocks );

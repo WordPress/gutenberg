@@ -22,7 +22,7 @@ function gutenberg_get_jed_locale_data( $domain ) {
 	$translations = get_translations_for_domain( $domain );
 
 	$locale = array(
-		'domain' => $domain,
+		'domain'      => $domain,
 		'locale_data' => array(
 			$domain => array(
 				'' => array(

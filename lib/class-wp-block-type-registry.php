@@ -53,7 +53,7 @@ final class WP_Block_Type_Registry {
 		$block_type = null;
 		if ( is_a( $name, 'WP_Block_Type' ) ) {
 			$block_type = $name;
-			$name = $block_type->name;
+			$name       = $block_type->name;
 		}
 
 		if ( ! is_string( $name ) ) {
