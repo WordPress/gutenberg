@@ -9,7 +9,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, findDOMNode } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
 
 /**
@@ -36,14 +36,18 @@ class PostTitle extends Component {
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.onOuterBlur = this.onOuterBlur.bind( this );
 		this.onOuterFocus = this.onOuterFocus.bind( this );
+		this.setFocused = this.setFocused.bind( this );
 		this.state = {
 			isSelected: false,
+			hasFocusWithin: false,
 		};
 		this.blurTimer = null;
 	}
 
 	componentDidMount() {
 		document.addEventListener( 'selectionchange', this.onSelectionChange );
+		// eslint-disable-next-line react/no-find-dom-node
+		this.setFocused( findDOMNode( this ).contains( document.activeElement ) );
 	}
 
 	componentWillUnmount() {
@@ -79,17 +83,23 @@ class PostTitle extends Component {
 		this.setState( { isSelected: false } );
 	}
 
+	setFocused( focused ) {
+		this.setState( { hasFocusWithin: focused } );
+		if ( focused ) {
+			this.props.clearSelectedBlock();
+		}
+	}
+
 	onOuterFocus() {
 		clearTimeout( this.blurTimer );
+		this.setFocused( true );
 	}
 
 	onOuterBlur( e ) {
 		const target = e.currentTarget;
 		clearTimeout( this.blurTimer );
 		this.blurTimer = setTimeout( () => {
-			if ( ! target.contains( document.activeElement ) ) {
-				this.onUnselect();
-			}
+			this.setFocused( target.contains( document.activeElement ) );
 		}, 0 );
 	}
 
@@ -105,15 +115,15 @@ class PostTitle extends Component {
 
 	render() {
 		const { title } = this.props;
-		const { isSelected } = this.state;
-		const className = classnames( 'editor-post-title', { 'is-selected': isSelected } );
+		const { isSelected, hasFocusWithin } = this.state;
+		const className = classnames( 'editor-post-title', { 'is-selected': isSelected && hasFocusWithin } );
 
 		return (
 			<div
 				className={ className }
 				onBlur={ this.onOuterBlur }
 				onFocus={ this.onOuterFocus }>
-				{ isSelected && <PostPermalink /> }
+				{ isSelected && hasFocusWithin && <PostPermalink /> }
 				<h1>
 					<Textarea
 						ref={ this.bindTextarea }
