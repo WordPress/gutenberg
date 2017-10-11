@@ -125,16 +125,34 @@ class Autocomplete extends Component {
 		this.setState( this.constructor.getInitialState() );
 	}
 
+	// this method is separate so it can be overrided in tests
+	getCursor( container ) {
+		const selection = window.getSelection();
+		if ( selection.isCollapsed && container.contains( selection.anchorNode ) ) {
+			return {
+				node: selection.anchorNode,
+				offset: selection.anchorOffset,
+			};
+		}
+		return null;
+	}
+
+	// this method is separate so it can be overrided in tests
+	createRange( startNode, startOffset, endNode, endOffset ) {
+		const range = document.createRange();
+		range.setStart( startNode, startOffset );
+		range.setEnd( endNode, endOffset );
+		return range;
+	}
+
 	search( event ) {
+		const createRange = this.createRange;
 		const { completers: allCompleters } = this.props;
 		const allowAnything = () => true;
 		const { open } = this.state;
 		// ensure that the cursor location is unambiguous
 		const container = event.target;
-		const selection = window.getSelection();
-		if ( ! ( selection.isCollapsed && container.contains( selection.anchorNode ) ) ) {
-			return;
-		}
+		const cursor = this.getCursor( container );
 		// look for the trigger prefix and search query just before the cursor location
 		const match = ( function() {
 			let endTextNode;
@@ -148,14 +166,14 @@ class Autocomplete extends Component {
 				];
 			}
 			// search backwards to find the first preceeding space or non-text node.
-			if ( isTextNode( selection.anchorNode ) ) { // TEXT node
-				endTextNode = selection.anchorNode;
-				endIndex = selection.anchorOffset;
-			} else if ( selection.anchorOffset === 0 ) {
-				endTextNode = onlyTextNode( descendFirst( selection.anchorNode ) );
+			if ( isTextNode( cursor.node ) ) { // TEXT node
+				endTextNode = cursor.node;
+				endIndex = cursor.offset;
+			} else if ( cursor.offset === 0 ) {
+				endTextNode = onlyTextNode( descendFirst( cursor.node ) );
 				endIndex = 0;
 			} else {
-				endTextNode = onlyTextNode( descendLast( selection.anchorNode.childNodes[ selection.anchorOffset - 1 ] ) );
+				endTextNode = onlyTextNode( descendLast( cursor.node.childNodes[ cursor.offset - 1 ] ) );
 				endIndex = endTextNode ? endTextNode.nodeValue.length : 0;
 			}
 			if ( endTextNode === null ) {
@@ -191,25 +209,17 @@ class Autocomplete extends Component {
 				if ( text.substr( pos + 1, triggerPrefix.length ) !== triggerPrefix ) {
 					return false;
 				}
-				const range = document.createRange();
-				range.setStart( startTextNode, pos + 1 );
-				range.setEnd( endTextNode, endIndex );
-				const before = document.createRange();
-				before.setStart( container, 0 );
-				before.setEnd( range.startContainer, range.startOffset );
-				const after = document.createRange();
-				after.setStart( range.endContainer, range.endOffset );
-				after.setEnd( container, container.childNodes.length );
+				const range = createRange( startTextNode, pos + 1, endTextNode, endIndex );
+				const before = createRange( container, 0, startTextNode, pos + 1 );
+				const after = createRange( endTextNode, endIndex, container, container.childNodes.length );
 				if ( ! allowContext( before, range, after ) ) {
 					return false;
 				}
 				return true;
 			} );
 			if ( completer ) {
-				const { triggerPrefix } = completer;
-				const range = document.createRange();
-				range.setStart( startTextNode, pos + 1 );
-				range.setEnd( endTextNode, endIndex );
+				const { triggerPrefix = '' } = completer;
+				const range = createRange( startTextNode, pos + 1, endTextNode, endIndex );
 				const lookup = text.substr( pos + 1 + triggerPrefix.length );
 				return {
 					completer,

@@ -222,6 +222,7 @@ export class Popover extends Component {
 			// of props which aren't explicitly handled by this component.
 			/* eslint-disable no-unused-vars */
 			position,
+			range,
 			focusOnOpen,
 			/* eslint-enable no-unused-vars */
 			...contentProps
