@@ -333,6 +333,20 @@ describe( 'block parser', () => {
 			expect( typeof parsed[ 0 ].uid ).toBe( 'string' );
 		} );
 
+		it( 'should ignore blocks with a bad namespace', () => {
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+
+			setUnknownTypeHandlerName( 'core/unknown-block' );
+
+			const parsed = parse(
+				'<!-- wp:core/test-block -->Ribs<!-- /wp:core/test-block -->' +
+				'<p>Broccoli</p>' +
+				'<!-- wp:core/unknown/block -->Ribs<!-- /wp:core/unknown/block -->'
+			);
+			expect( parsed ).toHaveLength( 1 );
+			expect( parsed[ 0 ].name ).toBe( 'core/test-block' );
+		} );
+
 		it( 'should parse the post content, using unknown block handler', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 			registerBlockType( 'core/unknown-block', defaultBlockSettings );
