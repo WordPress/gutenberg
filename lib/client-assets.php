@@ -783,12 +783,12 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$gutenberg_theme_support = get_theme_support( 'gutenberg' );
 	$color_palette           = gutenberg_color_palette();
 
-	if ( $gutenberg_theme_support && $gutenberg_theme_support[0]['colors'] ) {
+	if ( ! empty( $gutenberg_theme_support[0]['colors'] ) ) {
 		$color_palette = $gutenberg_theme_support[0]['colors'];
 	}
 
 	$editor_settings = array(
-		'wideImages' => $gutenberg_theme_support ? $gutenberg_theme_support[0]['wide-images'] : false,
+		'wideImages' => ! empty( $gutenberg_theme_support[0]['wide-images'] ),
 		'colors'     => $color_palette,
 	);
 
