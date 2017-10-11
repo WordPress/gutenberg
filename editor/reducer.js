@@ -135,6 +135,20 @@ export const editor = combineUndoableReducers( {
 					},
 				};
 
+			case 'UPDATE_BLOCK':
+				// Ignore updates if block isn't known
+				if ( ! state[ action.uid ] ) {
+					return state;
+				}
+
+				return {
+					...state,
+					[ action.uid ]: {
+						...state[ action.uid ],
+						...action.updates,
+					},
+				};
+
 			case 'INSERT_BLOCKS':
 				return {
 					...state,
@@ -378,6 +392,18 @@ export function hoveredBlock( state = null, action ) {
 	return state;
 }
 
+export function blocksMode( state = {}, action ) {
+	if ( action.type === 'TOGGLE_BLOCK_MODE' ) {
+		const { uid } = action;
+		return {
+			...state,
+			[ uid ]: state[ uid ] && state[ uid ] === 'html' ? 'visual' : 'html',
+		};
+	}
+
+	return state;
+}
+
 /**
  * Reducer returning the block insertion point
  *
@@ -530,6 +556,7 @@ export default optimist( combineReducers( {
 	isTyping,
 	blockSelection,
 	hoveredBlock,
+	blocksMode,
 	showInsertionPoint,
 	preferences,
 	panel,

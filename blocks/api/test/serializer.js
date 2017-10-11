@@ -14,6 +14,7 @@ import serialize, {
 	serializeAttributes,
 	getCommentDelimitedContent,
 	serializeBlock,
+	getBlockContent,
 } from '../serializer';
 import {
 	getBlockTypes,
@@ -167,7 +168,7 @@ describe( 'block serializer', () => {
 				fruit: 'bananas',
 				category: 'food',
 				ripeness: 'ripe',
-			}, {
+			}, { attributes: {
 				fruit: {
 					type: 'string',
 					source: text(),
@@ -178,7 +179,7 @@ describe( 'block serializer', () => {
 				ripeness: {
 					type: 'string',
 				},
-			} );
+			} } );
 
 			expect( attributes ).toEqual( {
 				category: 'food',
@@ -190,16 +191,32 @@ describe( 'block serializer', () => {
 			const attributes = getCommentAttributes( {
 				fruit: 'bananas',
 				ripeness: undefined,
-			}, {
+			}, { attributes: {
 				fruit: {
 					type: 'string',
 				},
 				ripeness: {
 					type: 'string',
 				},
-			} );
+			} } );
 
 			expect( attributes ).toEqual( { fruit: 'bananas' } );
+		} );
+
+		it( 'should return the className attribute if allowed', () => {
+			const attributes = getCommentAttributes( {
+				className: 'chicken',
+			}, { attributes: {} } );
+
+			expect( attributes ).toEqual( { className: 'chicken' } );
+		} );
+
+		it( 'should not return the className attribute if not supported', () => {
+			const attributes = getCommentAttributes( {
+				className: 'chicken',
+			}, { attributes: {}, className: false } );
+
+			expect( attributes ).toEqual( {} );
 		} );
 	} );
 
@@ -400,6 +417,33 @@ describe( 'block serializer', () => {
 			expect( serialize( block ) ).toEqual(
 				'<!-- wp:core/test-block {"throw":true} -->\nCorrect\n<!-- /wp:core/test-block -->'
 			);
+		} );
+	} );
+
+	describe( 'getBlockContent', () => {
+		it( 'should return the block\'s serialized inner HTML', () => {
+			const blockType = {
+				attributes: {
+					content: {
+						type: 'string',
+						source: text(),
+					},
+				},
+				save( { attributes } ) {
+					return attributes.content;
+				},
+				category: 'common',
+				title: 'block title',
+			};
+			registerBlockType( 'core/chicken', blockType );
+			const block =	{
+				name: 'core/chicken',
+				attributes: {
+					content: '<p>chicken   </p>',
+				},
+				isValid: true,
+			};
+			expect( getBlockContent( block ) ).toBe( '<p>chicken </p>' );
 		} );
 	} );
 } );

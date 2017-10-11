@@ -13,7 +13,7 @@ function unwrap( node ) {
 	parent.removeChild( node );
 }
 
-export default function( predicate ) {
+export default function( predicate, after ) {
 	return ( node ) => {
 		if ( node.nodeType !== ELEMENT_NODE ) {
 			return;
@@ -21,6 +21,12 @@ export default function( predicate ) {
 
 		if ( ! predicate( node ) ) {
 			return;
+		}
+
+		const afterNode = after && after( node );
+
+		if ( afterNode ) {
+			node.appendChild( afterNode );
 		}
 
 		unwrap( node );
