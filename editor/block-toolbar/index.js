@@ -61,7 +61,7 @@ class BlockToolbar extends Component {
 		document.addEventListener( 'keydown', this.onKeyDown );
 	}
 
-	componentWillUnmout() {
+	componentWillUnmount() {
 		document.removeEventListener( 'keyup', this.onKeyUp );
 		document.removeEventListener( 'keydown', this.onKeyDown );
 	}
