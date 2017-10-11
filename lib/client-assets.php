@@ -743,7 +743,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 	// Preload server-registered block schemas.
 	$block_registry = WP_Block_Type_Registry::get_instance();
-	$schemas = array();
+	$schemas        = array();
 
 	foreach ( $block_registry->get_all_registered() as $block_name => $block_type ) {
 		if ( isset( $block_type->attributes ) ) {

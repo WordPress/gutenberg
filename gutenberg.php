@@ -148,7 +148,7 @@ function gutenberg_intercept_edit_post() {
 	wp_reset_vars( array( 'action' ) );
 
 	// Other actions are handled in post.php.
-	if ( $GLOBALS['action'] !== 'edit' ) {
+	if ( 'edit' !== $GLOBALS['action'] ) {
 		return;
 	}
 
@@ -165,7 +165,7 @@ function gutenberg_intercept_edit_post() {
 
 	// Errors and invalid requests are handled in post.php, do not intercept.
 	if ( $post ) {
-		$post_type = $post->post_type;
+		$post_type        = $post->post_type;
 		$post_type_object = get_post_type_object( $post_type );
 	} else {
 		return;
@@ -195,16 +195,16 @@ function gutenberg_intercept_edit_post() {
 	}
 
 	$editing = true;
-	$title = $post_type_object->labels->edit_item;
+	$title   = $post_type_object->labels->edit_item;
 
 	$post_type = $post->post_type;
 	if ( 'post' == $post_type ) {
-		$parent_file = 'edit.php';
-		$submenu_file = 'edit.php';
+		$parent_file   = 'edit.php';
+		$submenu_file  = 'edit.php';
 		$post_new_file = 'post-new.php';
 	} elseif ( 'attachment' == $post_type ) {
-		$parent_file = 'upload.php';
-		$submenu_file = 'upload.php';
+		$parent_file   = 'upload.php';
+		$submenu_file  = 'upload.php';
 		$post_new_file = 'media-new.php';
 	} else {
 		if ( isset( $post_type_object ) && $post_type_object->show_in_menu && true !== $post_type_object->show_in_menu ) {
@@ -213,7 +213,7 @@ function gutenberg_intercept_edit_post() {
 			$parent_file = "edit.php?post_type=$post_type";
 		}
 
-		$submenu_file = "edit.php?post_type=$post_type";
+		$submenu_file  = "edit.php?post_type=$post_type";
 		$post_new_file = "post-new.php?post_type=$post_type";
 	}
 
@@ -240,7 +240,7 @@ function gutenberg_intercept_post_new() {
 	$post_type_object = get_post_type_object( $post_type );
 
 	if ( 'post' == $post_type ) {
-		$parent_file = 'edit.php';
+		$parent_file  = 'edit.php';
 		$submenu_file = 'post-new.php';
 	} elseif ( 'attachment' == $post_type ) {
 		if ( wp_redirect( admin_url( 'media-new.php' ) ) ) {
@@ -265,7 +265,7 @@ function gutenberg_intercept_post_new() {
 		}
 	}
 
-	$title = $post_type_object->labels->add_new_item;
+	$title   = $post_type_object->labels->add_new_item;
 	$editing = true;
 
 	// Errors and invalid requests are handled in post-new.php, do not intercept.
@@ -278,7 +278,7 @@ function gutenberg_intercept_post_new() {
 		wp_schedule_event( time(), 'daily', 'wp_scheduled_auto_draft_delete' );
 	}
 
-	$post = get_default_post_to_edit( $post_type, true );
+	$post    = get_default_post_to_edit( $post_type, true );
 	$post_ID = $post->ID;
 
 	if ( gutenberg_init( false, $post ) ) {
