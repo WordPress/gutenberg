@@ -13,13 +13,19 @@
 	}
 }
 
-.editor-block-settings-menu__popover .components-popover__content {
-	width: 200px;
+.editor-block-settings-menu__popover {
+	&:before,
+	&:after {
+		margin-left: 2px;
+	}
+
+	.components-popover__content {
+		width: 182px;
+	}
 }
 
 .editor-block-settings-menu__content {
 	width: 100%;
-	padding: 5px;
 }
 
 .editor-block-settings-menu__toggle {
@@ -36,21 +42,20 @@
 .editor-block-settings-menu__control {
 	width: 100%;
 	justify-content: flex-start;
-	margin-bottom: 3px;
-	padding: 6px;
+	padding: 8px;
 	background: none;
-	border: 1px solid transparent;
 	outline: none;
 	border-radius: 0;
 	color: $dark-gray-500;
 	cursor: pointer;
+	border: 1px solid transparent;
 
 	&:hover,
 	&:focus,
 	&:not(:disabled):hover {
 		box-shadow: none;
 		color: $dark-gray-500;
-		border-color: $dark-gray-500;
+		border: 1px solid $dark-gray-500;
 	}
 
 	.dashicon {
