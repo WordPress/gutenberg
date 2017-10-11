@@ -10,7 +10,7 @@ import { has, partial, reduce, size } from 'lodash';
  */
 import { Component, createElement } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
-import { getBlockType, getBlockDefaultClassname, createBlock } from '@wordpress/blocks';
+import { getBlockType, getBlockDefaultClassname } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -53,7 +53,7 @@ import {
 	getBlockMode,
 } from '../../selectors';
 
-const { BACKSPACE, ESCAPE, DELETE, ENTER } = keycodes;
+const { BACKSPACE, ESCAPE, DELETE } = keycodes;
 
 class VisualEditorBlock extends Component {
 	constructor() {
@@ -68,7 +68,6 @@ class VisualEditorBlock extends Component {
 		this.mergeBlocks = this.mergeBlocks.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
-		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onBlockError = this.onBlockError.bind( this );
 		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
 
@@ -265,18 +264,6 @@ class VisualEditorBlock extends Component {
 		this.props.onSelect();
 	}
 
-	onKeyDown( event ) {
-		const { keyCode, target } = event;
-		if ( ENTER === keyCode && target === this.node ) {
-			event.preventDefault();
-
-			this.props.onInsertBlocks( [
-				createBlock( 'core/paragraph' ),
-			], this.props.order + 1 );
-		}
-		this.removeOrDeselect( event );
-	}
-
 	onBlockError( error ) {
 		this.setState( { error } );
 	}
@@ -331,7 +318,7 @@ class VisualEditorBlock extends Component {
 		return (
 			<div
 				ref={ this.bindBlockNode }
-				onKeyDown={ this.onKeyDown }
+				onKeyDown={ this.removeOrDeselect }
 				onFocus={ this.onFocus }
 				onMouseMove={ this.maybeHover }
 				onMouseEnter={ this.maybeHover }

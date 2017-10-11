@@ -736,10 +736,12 @@ export function isTyping( state ) {
  * Returns the insertion point, the index at which the new inserted block would
  * be placed. Defaults to the last position
  *
- * @param  {Object}  state Global application state
- * @return {?String}       Unique ID after which insertion will occur
+ * @param  {Object}   state        Global application state
+ * @param  {?Boolean} defaultAtEnd Whether block should be inserted at end if
+ *                                 no block is selected (default true)
+ * @return {?String}               Unique ID after which insertion will occur
  */
-export function getBlockInsertionPoint( state ) {
+export function getBlockInsertionPoint( state, defaultAtEnd = true ) {
 	if ( getEditorMode( state ) !== 'visual' ) {
 		return state.editor.blockOrder.length;
 	}
@@ -754,7 +756,11 @@ export function getBlockInsertionPoint( state ) {
 		return getBlockIndex( state, selectedBlock.uid ) + 1;
 	}
 
-	return state.editor.blockOrder.length;
+	if ( defaultAtEnd ) {
+		return state.editor.blockOrder.length;
+	}
+
+	return 0;
 }
 
 /**
