@@ -34,9 +34,12 @@ class PostTitle extends Component {
 		this.onSelect = this.onSelect.bind( this );
 		this.onUnselect = this.onUnselect.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
+		this.onOuterBlur = this.onOuterBlur.bind( this );
+		this.onOuterFocus = this.onOuterFocus.bind( this );
 		this.state = {
 			isSelected: false,
 		};
+		this.blurTimer = null;
 	}
 
 	componentDidMount() {
@@ -45,6 +48,7 @@ class PostTitle extends Component {
 
 	componentWillUnmount() {
 		document.removeEventListener( 'selectionchange', this.onSelectionChange );
+		clearTimeout( this.blurTimer );
 	}
 
 	bindTextarea( ref ) {
@@ -75,6 +79,20 @@ class PostTitle extends Component {
 		this.setState( { isSelected: false } );
 	}
 
+	onOuterFocus() {
+		clearTimeout( this.blurTimer );
+	}
+
+	onOuterBlur( e ) {
+		const target = e.currentTarget;
+		clearTimeout( this.blurTimer );
+		this.blurTimer = setTimeout( () => {
+			if ( ! target.contains( document.activeElement ) ) {
+				this.onUnselect();
+			}
+		}, 0 );
+	}
+
 	handleClickOutside() {
 		this.setState( { isSelected: false } );
 	}
@@ -91,7 +109,10 @@ class PostTitle extends Component {
 		const className = classnames( 'editor-post-title', { 'is-selected': isSelected } );
 
 		return (
-			<div className={ className }>
+			<div
+				className={ className }
+				onBlur={ this.onOuterBlur }
+				onFocus={ this.onOuterFocus }>
 				{ isSelected && <PostPermalink /> }
 				<h1>
 					<Textarea
@@ -101,7 +122,6 @@ class PostTitle extends Component {
 						onChange={ this.onChange }
 						placeholder={ __( 'Add title' ) }
 						onFocus={ this.onSelect }
-						onBlur={ this.onUnselect }
 						onClick={ this.onSelect }
 						onKeyDown={ this.onKeyDown }
 						onKeyPress={ this.onUnselect }
