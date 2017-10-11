@@ -246,6 +246,16 @@ describe( 'block serializer', () => {
 			expect( content ).toBe( '<!-- wp:test-block /-->' );
 		} );
 
+		it( 'should include the namespace for non-core blocks', () => {
+			const content = getCommentDelimitedContent(
+				'my-wonderful-namespace/test-block',
+				{},
+				''
+			);
+
+			expect( content ).toBe( '<!-- wp:my-wonderful-namespace/test-block /-->' );
+		} );
+
 		it( 'should generate empty attributes non-void', () => {
 			const content = getCommentDelimitedContent(
 				'core/test-block',
