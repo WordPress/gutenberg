@@ -1208,10 +1208,10 @@ class Tests_DB extends WP_UnitTestCase {
 
 			list( $parsed_host, $parsed_port, $parsed_socket, $parsed_is_ipv6 ) = $data;
 
-			$this->assertEquals( $host, $parsed_host );
-			$this->assertEquals( $port, $parsed_port );
-			$this->assertEquals( $socket, $parsed_socket );
-			$this->assertEquals( $is_ipv6, $parsed_is_ipv6 );
+			$this->assertSame( $host, $parsed_host );
+			$this->assertSame( $port, $parsed_port );
+			$this->assertSame( $socket, $parsed_socket );
+			$this->assertSame( $is_ipv6, $parsed_is_ipv6 );
 		}
 	}
 
@@ -1220,7 +1220,7 @@ class Tests_DB extends WP_UnitTestCase {
 			array(
 				'',    // DB_HOST
 				false, // Expect parse_db_host to bail for this hostname
-				null,  // Parsed host
+				'',    // Parsed host
 				null,  // Parsed port
 				null,  // Parsed socket
 				false, // is_ipv6
@@ -1228,7 +1228,7 @@ class Tests_DB extends WP_UnitTestCase {
 			array(
 				':3306',
 				false,
-				null,
+				'',
 				'3306',
 				null,
 				false,
@@ -1236,7 +1236,7 @@ class Tests_DB extends WP_UnitTestCase {
 			array(
 				':/tmp/mysql.sock',
 				false,
-				null,
+				'',
 				null,
 				'/tmp/mysql.sock',
 				false,
