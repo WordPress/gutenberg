@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { connect } from 'react-redux';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -9,33 +14,35 @@ import { Panel, PanelBody, Dashicon } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
+import { isExtendedSettingsOpened, isEditorSidebarOpened } from '../selectors';
+import { toggleExtendedSettings } from '../actions';
 
 class MetaBoxes extends Component {
 	constructor() {
 		super( ...arguments );
-
-		this.toggle = this.toggle.bind( this );
-
-		this.state = {
-			isOpen: false,
-		};
 	}
 
-	toggle() {
-		this.setState( {
-			isOpen: ! this.state.isOpen,
-		} );
-	}
+    componentWillReceiveProps( nextProps ) {
+        const { toggle } = this.props
 
-	render() {
-		const { isOpen } = this.state;
+        // if sidebar state changes
+        if( nextProps.isEditorSidebarOpened !== this.props.isEditorSidebarOpened ) {
+            // and sidebar state is set to closed and extended settings is open ensure extended settings is closed too
+            if( ! nextProps.isEditorSidebarOpened && this.props.isExtendedSettingsOpened ) {
+                toggle();
+            }
+        }
+    }
+
+    render() {
+        const { isExtendedSettingsOpened, toggle } = this.props;
 
 		return (
 			<Panel className="editor-meta-boxes">
 				<PanelBody
 					title={ __( 'Extended Settings' ) }
-					opened={ isOpen }
-					onToggle={ this.toggle }>
+					opened={ isExtendedSettingsOpened }
+					onToggle={ () => toggle() }>
 					<div className="editor-meta-boxes__coming-soon">
 						<Dashicon icon="flag" />
 						<h3>{ __( 'Coming Soon' ) }</h3>
@@ -47,4 +54,14 @@ class MetaBoxes extends Component {
 	}
 }
 
-export default MetaBoxes;
+export default connect(
+    ( state ) => ( {
+        isExtendedSettingsOpened: isExtendedSettingsOpened( state ),
+        isEditorSidebarOpened: isEditorSidebarOpened( state ),
+    } ),
+    ( dispatch ) => ( {
+        toggle: () => {
+            dispatch( toggleExtendedSettings() )
+        },
+    } )
+)( MetaBoxes );
