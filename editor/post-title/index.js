@@ -37,6 +37,8 @@ class PostTitle extends Component {
 		this.onOuterBlur = this.onOuterBlur.bind( this );
 		this.onOuterFocus = this.onOuterFocus.bind( this );
 		this.setFocused = this.setFocused.bind( this );
+		this.focusText = this.focusText.bind( this );
+
 		this.state = {
 			isSelected: false,
 			hasFocusWithin: false,
@@ -67,6 +69,10 @@ class PostTitle extends Component {
 		) {
 			this.onSelect();
 		}
+	}
+
+	focusText() {
+		this.textareaContainer.textarea.focus();
 	}
 
 	onChange( event ) {
@@ -123,7 +129,7 @@ class PostTitle extends Component {
 				className={ className }
 				onBlur={ this.onOuterBlur }
 				onFocus={ this.onOuterFocus }>
-				{ isSelected && hasFocusWithin && <PostPermalink /> }
+				{ isSelected && hasFocusWithin && <PostPermalink onLinkCopied={ this.focusText } /> }
 				<h1>
 					<Textarea
 						ref={ this.bindTextarea }
