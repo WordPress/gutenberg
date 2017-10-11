@@ -62,6 +62,12 @@ final class WP_Block_Type_Registry {
 			return false;
 		}
 
+		if ( preg_match( '/[A-Z]+/', $name ) ) {
+			$message = __( 'Block type names must not contain uppercase characters.', 'gutenberg' );
+			_doing_it_wrong( __METHOD__, $message, '1.5.0' );
+			return false;
+		}
+
 		$name_matcher = '/^[a-z0-9-]+\/[a-z0-9-]+$/';
 		if ( ! preg_match( $name_matcher, $name ) ) {
 			$message = __( 'Block type names must contain a namespace prefix. Example: my-plugin/my-custom-block-type', 'gutenberg' );
