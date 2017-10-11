@@ -42,7 +42,7 @@ function BlockSettingsMenuContent( { mode, uids, isSidebarOpened, onDelete, onTo
 				>
 					{ mode === 'visual'
 						? __( 'Edit as HTML' )
-						: __( 'Edit in the visual mode' )
+						: __( 'Edit visually' )
 					}
 				</IconButton>
 			}
