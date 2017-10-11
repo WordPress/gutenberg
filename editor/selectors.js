@@ -87,8 +87,8 @@ export function isEditorSidebarOpened( state ) {
  * @param  {Object}  state Global application state
  * @return {Boolean}       Whether this panel is open
  */
-export function isExtendedSettingsOpened(state ) {
-    return getPreference( state, 'isExtendedSettingsOpened' );
+export function isEditorExtendedSettingsOpened( state ) {
+	return getPreference( state, 'isExtendedSettingsOpened' );
 }
 
 /**

@@ -14,28 +14,25 @@ import { Panel, PanelBody, Dashicon } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import { isExtendedSettingsOpened, isEditorSidebarOpened } from '../selectors';
+import { isEditorExtendedSettingsOpened, isEditorSidebarOpened } from '../selectors';
 import { toggleExtendedSettings } from '../actions';
 
 class MetaBoxes extends Component {
-	constructor() {
-		super( ...arguments );
+
+	componentWillReceiveProps( nextProps ) {
+		const { toggle } = this.props;
+
+		// if sidebar state changes
+		if ( nextProps.isEditorSidebarOpened !== this.props.isEditorSidebarOpened ) {
+			// and sidebar state is set to closed and extended settings is open ensure extended settings is closed too
+			if ( ! nextProps.isEditorSidebarOpened && this.props.isExtendedSettingsOpened ) {
+				toggle();
+			}
+		}
 	}
 
-    componentWillReceiveProps( nextProps ) {
-        const { toggle } = this.props
-
-        // if sidebar state changes
-        if( nextProps.isEditorSidebarOpened !== this.props.isEditorSidebarOpened ) {
-            // and sidebar state is set to closed and extended settings is open ensure extended settings is closed too
-            if( ! nextProps.isEditorSidebarOpened && this.props.isExtendedSettingsOpened ) {
-                toggle();
-            }
-        }
-    }
-
-    render() {
-        const { isExtendedSettingsOpened, toggle } = this.props;
+	render() {
+		const { isExtendedSettingsOpened, toggle } = this.props;
 
 		return (
 			<Panel className="editor-meta-boxes">
@@ -55,13 +52,11 @@ class MetaBoxes extends Component {
 }
 
 export default connect(
-    ( state ) => ( {
-        isExtendedSettingsOpened: isExtendedSettingsOpened( state ),
-        isEditorSidebarOpened: isEditorSidebarOpened( state ),
-    } ),
-    ( dispatch ) => ( {
-        toggle: () => {
-            dispatch( toggleExtendedSettings() )
-        },
-    } )
+	( state ) => ( {
+		isExtendedSettingsOpened: isEditorExtendedSettingsOpened( state ),
+		isEditorSidebarOpened: isEditorSidebarOpened( state ),
+	} ),
+	( dispatch ) => ( {
+		toggle: () => dispatch( toggleExtendedSettings() ),
+	} )
 )( MetaBoxes );

@@ -321,9 +321,9 @@ export function toggleSidebar() {
  * @return {Object}         Action object
  */
 export function toggleExtendedSettings() {
-    return {
-        type: 'TOGGLE_EXTENDED_SETTINGS',
-    };
+	return {
+		type: 'TOGGLE_EXTENDED_SETTINGS',
+	};
 }
 
 /**

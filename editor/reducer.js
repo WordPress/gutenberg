@@ -443,11 +443,11 @@ export function preferences( state = STORE_DEFAULTS.preferences, action ) {
 					[ action.panel ]: ! get( state, [ 'panels', action.panel ], false ),
 				},
 			};
-        case 'TOGGLE_EXTENDED_SETTINGS':
-            return {
-                ...state,
-                isExtendedSettingsOpened: ! state.isExtendedSettingsOpened,
-            };
+		case 'TOGGLE_EXTENDED_SETTINGS':
+			return {
+				...state,
+				isExtendedSettingsOpened: ! state.isExtendedSettingsOpened,
+			};
 		case 'SWITCH_MODE':
 			return {
 				...state,
