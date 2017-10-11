@@ -1710,6 +1710,35 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test that trash_changeset_post() trashes a changeset post with its name and content preserved.
+	 *
+	 * @covers WP_Customize_Manager::trash_changeset_post
+	 */
+	public function test_trash_changeset_post_preserves_properties() {
+		$args = array(
+			'post_type' => 'customize_changeset',
+			'post_content' => wp_json_encode( array(
+				'blogname' => array(
+					'value' => 'Test',
+				),
+			) ),
+			'post_name' => wp_generate_uuid4(),
+			'post_status' => 'draft',
+		);
+
+		$post_id = wp_insert_post( $args );
+
+		$manager = $this->create_test_manager( $args['post_name'] );
+		$manager->trash_changeset_post( $post_id );
+
+		$post = get_post( $post_id );
+
+		$this->assertSame( 'trash', get_post_status( $post_id ) );
+		$this->assertSame( $args['post_name'], $post->post_name );
+		$this->assertSame( $args['post_content'], $post->post_content );
+	}
+
+	/**
 	 * Register scratchpad setting.
 	 *
 	 * @param WP_Customize_Manager $wp_customize Manager.
