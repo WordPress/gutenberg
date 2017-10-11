@@ -12,6 +12,7 @@ import {
 	identity,
 	find,
 	defer,
+	pickBy,
 	noop,
 } from 'lodash';
 import { nodeListToReact } from 'dom-react';
@@ -74,6 +75,8 @@ export default class Editable extends Component {
 			);
 		}
 
+		this.bindMirrorRef = this.bindNodeRef.bind( this, 'mirror' );
+		this.bindEditorRef = this.bindNodeRef.bind( this, 'editor' );
 		this.onInit = this.onInit.bind( this );
 		this.getSettings = this.getSettings.bind( this );
 		this.onSetup = this.onSetup.bind( this );
@@ -89,11 +92,17 @@ export default class Editable extends Component {
 		this.onBeforePastePreProcess = this.onBeforePastePreProcess.bind( this );
 		this.onPaste = this.onPaste.bind( this );
 
+		this.nodeRefs = {};
+
 		this.state = {
 			formats: {},
 			empty: ! value || ! value.length,
 			selectedNodeId: 0,
 		};
+	}
+
+	bindNodeRef( name, node ) {
+		this.nodeRefs[ name ] = node;
 	}
 
 	getSettings( settings ) {
@@ -143,6 +152,9 @@ export default class Editable extends Component {
 
 	onInit() {
 		this.updateFocus();
+
+		// Start mirroring attributes after editor initializes
+		this.nodeRefs.editor.mirrorNode( this.nodeRefs.mirror );
 	}
 
 	onFocus() {
@@ -594,7 +606,6 @@ export default class Editable extends Component {
 	render() {
 		const {
 			tagName: Tagname = 'div',
-			style,
 			value,
 			focus,
 			wrapperClassname,
@@ -605,6 +616,19 @@ export default class Editable extends Component {
 			multiline: MultilineTag,
 			keepPlaceholderOnFocus = false,
 		} = this.props;
+
+		// Assign as props to editor node those not explicitly handled by
+		// Editable. Since event handlers are proxied by TinyMCE, ignore any
+		// props prefixed by `on` (see: `proxyPropHandler`).
+		const editorProps = pickBy( this.props, ( propValue, propKey ) => (
+			! this.constructor.propTypes.hasOwnProperty( propKey ) &&
+			! /^on[A-Z]/.test( propKey )
+		) );
+
+		editorProps.className = classnames( 'blocks-editable__tinymce', className );
+		if ( ! editorProps[ 'aria-label' ] ) {
+			editorProps[ 'aria-label' ] = placeholder;
+		}
 
 		// Generating a key that includes `tagName` ensures that if the tag
 		// changes, we unmount and destroy the previous TinyMCE element, then
@@ -635,29 +659,48 @@ export default class Editable extends Component {
 						{ formatToolbar }
 					</div>
 				}
-				<TinyMCE
-					tagName={ Tagname }
-					getSettings={ this.getSettings }
-					onSetup={ this.onSetup }
-					style={ style }
-					defaultValue={ value }
-					isPlaceholderVisible={ isPlaceholderVisible }
-					label={ placeholder }
-					className={ className }
-					key={ key }
-				/>
+				<div
+					data-mirror
+					aria-hidden
+					ref={ this.bindMirrorRef }
+					{ ...editorProps } />
 				{ isPlaceholderVisible &&
-					<Tagname
-						className={ classnames( 'blocks-editable__tinymce', className ) }
-						style={ style }
-					>
+					<Tagname data-placeholder aria-hidden { ...editorProps }>
 						{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }
 					</Tagname>
 				}
+				<TinyMCE
+					ref={ this.bindEditorRef }
+					tagName={ Tagname }
+					getSettings={ this.getSettings }
+					onSetup={ this.onSetup }
+					defaultValue={ value }
+					key={ key }
+					additionalProps={ editorProps }
+				/>
 			</div>
 		);
 	}
 }
+
+Editable.propTypes = {
+	className: noop,
+	focus: noop,
+	formattingControls: noop,
+	getSettings: noop,
+	inlineToolbar: noop,
+	keepPlaceholderOnFocus: noop,
+	multiline: noop,
+	onChange: noop,
+	onFocus: noop,
+	onMerge: noop,
+	onReplace: noop,
+	onSetup: noop,
+	placeholder: noop,
+	tagName: noop,
+	value: noop,
+	wrapperClassname: noop,
+};
 
 Editable.contextTypes = {
 	onUndo: noop,

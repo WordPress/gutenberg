@@ -16,10 +16,11 @@ import { keycodes } from '@wordpress/utils';
 import './style.scss';
 import Button from '../button';
 import Popover from '../popover';
+import withInstanceId from '../higher-order/with-instance-id';
 
 const { ENTER, ESCAPE, UP, DOWN } = keycodes;
 
-class Autocomplete extends Component {
+export class Autocomplete extends Component {
 	static getInitialState() {
 		return {
 			isOpen: false,
@@ -180,10 +181,12 @@ class Autocomplete extends Component {
 	}
 
 	render() {
-		const { children, className } = this.props;
+		const { children, className, instanceId } = this.props;
 		const { isOpen, selectedIndex } = this.state;
 		const classes = classnames( 'components-autocomplete__popover', className );
 		const filteredOptions = this.getFilteredOptions();
+		const listBoxId = `components-autocomplete-listbox-${ instanceId }`;
+		const activeId = `components-autocomplete-item-${ instanceId }-${ selectedIndex }`;
 
 		// Blur is applied to the wrapper node, since if the child is Editable,
 		// the event will not have `relatedTarget` assigned.
@@ -196,6 +199,10 @@ class Autocomplete extends Component {
 				{ cloneElement( Children.only( children ), {
 					onInput: this.search,
 					onKeyDown: this.setSelectedIndex,
+					role: 'combobox',
+					'aria-expanded': isOpen,
+					'aria-activedescendant': isOpen ? activeId : null,
+					'aria-owns': isOpen ? listBoxId : null,
 				} ) }
 				<Popover
 					isOpen={ isOpen && filteredOptions.length > 0 }
@@ -204,13 +211,15 @@ class Autocomplete extends Component {
 					className={ classes }
 				>
 					<ul
-						role="menu"
+						id={ listBoxId }
+						role="listbox"
 						className="components-autocomplete__results"
 					>
 						{ filteredOptions.map( ( option, index ) => (
 							<li
 								key={ option.value }
-								role="menuitem"
+								id={ `components-autocomplete-item-${ instanceId }-${ index }` }
+								role="option"
 								className={ classnames( 'components-autocomplete__result', {
 									'is-selected': index === selectedIndex,
 								} ) }
@@ -227,4 +236,4 @@ class Autocomplete extends Component {
 	}
 }
 
-export default Autocomplete;
+export default withInstanceId( Autocomplete );

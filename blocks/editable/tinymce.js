@@ -2,8 +2,6 @@
  * External dependencies
  */
 import tinymce from 'tinymce';
-import { isEqual } from 'lodash';
-import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -15,6 +13,17 @@ export default class TinyMCE extends Component {
 		this.initialize();
 	}
 
+	componentWillUnmount() {
+		if ( this.observer ) {
+			this.observer.disconnect();
+		}
+
+		if ( this.editor ) {
+			this.editor.destroy();
+			delete this.editor;
+		}
+	}
+
 	shouldComponentUpdate() {
 		// We must prevent rerenders because TinyMCE will modify the DOM, thus
 		// breaking React's ability to reconcile changes.
@@ -23,31 +32,26 @@ export default class TinyMCE extends Component {
 		return false;
 	}
 
-	componentWillReceiveProps( nextProps ) {
-		const name = 'data-is-placeholder-visible';
-		const isPlaceholderVisible = String( !! nextProps.isPlaceholderVisible );
+	mirrorNode( node ) {
+		// Since React reconciliation is disabled for the TinyMCE node, we sync
+		// attribute changes using a mutation observer on a node within the
+		// parent Editable which receives reconciliation from Editable props.
+		this.observer = new window.MutationObserver( ( mutations ) => {
+			mutations.forEach( ( mutation ) => {
+				const { attributeName } = mutation;
+				const nextValue = node.getAttribute( attributeName );
 
-		if ( this.editorNode.getAttribute( name ) !== isPlaceholderVisible ) {
-			this.editorNode.setAttribute( name, isPlaceholderVisible );
-		}
+				if ( null === nextValue ) {
+					this.editorNode.removeAttribute( attributeName );
+				} else {
+					this.editorNode.setAttribute( attributeName, nextValue );
+				}
+			} );
+		} );
 
-		if ( ! isEqual( this.props.style, nextProps.style ) ) {
-			this.editorNode.setAttribute( 'style', '' );
-			Object.assign( this.editorNode.style, nextProps.style );
-		}
-
-		if ( ! isEqual( this.props.className, nextProps.className ) ) {
-			this.editorNode.className = classnames( nextProps.className, 'blocks-editable__tinymce' );
-		}
-	}
-
-	componentWillUnmount() {
-		if ( ! this.editor ) {
-			return;
-		}
-
-		this.editor.destroy();
-		delete this.editor;
+		this.observer.observe( node, {
+			attributes: true,
+		} );
 	}
 
 	initialize() {
@@ -83,7 +87,7 @@ export default class TinyMCE extends Component {
 	}
 
 	render() {
-		const { tagName = 'div', style, defaultValue, label, className } = this.props;
+		const { tagName = 'div', defaultValue, additionalProps } = this.props;
 
 		// If a default value is provided, render it into the DOM even before
 		// TinyMCE finishes initializing. This avoids a short delay by allowing
@@ -97,9 +101,7 @@ export default class TinyMCE extends Component {
 			ref: ( node ) => this.editorNode = node,
 			contentEditable: true,
 			suppressContentEditableWarning: true,
-			className: classnames( className, 'blocks-editable__tinymce' ),
-			style,
-			'aria-label': label,
+			...additionalProps,
 		}, children );
 	}
 }
