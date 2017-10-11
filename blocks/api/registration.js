@@ -49,6 +49,12 @@ let defaultBlockName;
  *                             registered; otherwise `undefined`.
  */
 export function registerBlockType( name, settings ) {
+	settings = {
+		name,
+		...get( window._wpBlocks, name ),
+		...settings,
+	};
+
 	if ( typeof name !== 'string' ) {
 		console.error(
 			'Block names must be strings.'
@@ -112,12 +118,6 @@ export function registerBlockType( name, settings ) {
 	if ( ! settings.icon ) {
 		settings.icon = 'block-default';
 	}
-
-	settings = {
-		name,
-		attributes: get( window._wpBlocksAttributes, name, {} ),
-		...settings,
-	};
 
 	settings = applyFilters( 'blocks.registerBlockType', settings, name );
 
@@ -223,7 +223,7 @@ export function hasBlockSupport( nameOrType, feature, defaultSupports ) {
  * Determines whether or not the given block is a reusable block. This is a
  * special block type that is used to point to a global block stored via the
  * API.
- * 
+ *
  * @param {Object} blockOrType Block or Block Type to test
  * @return {Boolean}           Whether the given block is a reusable block
  */
