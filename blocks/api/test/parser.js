@@ -333,6 +333,17 @@ describe( 'block parser', () => {
 			expect( typeof parsed[ 0 ].uid ).toBe( 'string' );
 		} );
 
+		it( 'should add the core namespace to un-namespaced blocks', () => {
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+
+			const parsed = parse(
+				'<!-- wp:test-block -->\nRibs\n<!-- /wp:test-block -->'
+			);
+
+			expect( parsed ).toHaveLength( 1 );
+			expect( parsed[ 0 ].name ).toBe( 'core/test-block' );
+		} );
+
 		it( 'should ignore blocks with a bad namespace', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
