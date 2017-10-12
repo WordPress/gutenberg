@@ -43,7 +43,6 @@ class PostTitle extends Component {
 			isSelected: false,
 			hasFocusWithin: false,
 		};
-		this.blurTimer = null;
 	}
 
 	componentDidMount() {
@@ -52,7 +51,6 @@ class PostTitle extends Component {
 
 	componentWillUnmount() {
 		document.removeEventListener( 'selectionchange', this.onSelectionChange );
-		clearTimeout( this.blurTimer );
 	}
 
 	bindTextarea( ref ) {
