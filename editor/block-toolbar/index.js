@@ -23,9 +23,6 @@ import './style.scss';
 import BlockSwitcher from '../block-switcher';
 import BlockMover from '../block-mover';
 import BlockRightMenu from '../block-settings-menu';
-import {
-	focusBlock,
-} from '../actions';
 
 /**
  * Module Constants
