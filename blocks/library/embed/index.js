@@ -150,7 +150,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 								<p>{ __( 'The Embed block allows you to easily add videos, images, tweets, audio, and other content to your post or page.' ) }</p>
 							</BlockDescription>
 						</InspectorControls>
-					)
+					),
 				];
 
 				if ( fetching ) {
