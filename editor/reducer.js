@@ -306,13 +306,14 @@ export function isTyping( state = false, action ) {
  * @param  {Object} action Dispatched action
  * @return {Object}        Updated state
  */
-export function blockSelection( state = { start: null, end: null, focus: null }, action ) {
+export function blockSelection( state = { start: null, end: null, focus: null, isMultiSelecting: false }, action ) {
 	switch ( action.type ) {
 		case 'CLEAR_SELECTED_BLOCK':
 			return {
 				start: null,
 				end: null,
 				focus: null,
+				isMultiSelecting: false,
 			};
 		case 'START_MULTI_SELECT':
 			return {
@@ -320,24 +321,29 @@ export function blockSelection( state = { start: null, end: null, focus: null },
 				isMultiSelecting: true,
 			};
 		case 'STOP_MULTI_SELECT':
-			return omit( state, 'isMultiSelecting' );
+			return {
+				...state,
+				isMultiSelecting: false,
+			};
 		case 'MULTI_SELECT':
 			return {
+				...state,
 				start: action.start,
 				end: action.end,
-				focus: state.focus,
 			};
 		case 'SELECT_BLOCK':
 			if ( action.uid === state.start && action.uid === state.end ) {
 				return state;
 			}
 			return {
+				...state,
 				start: action.uid,
 				end: action.uid,
 				focus: action.focus || {},
 			};
 		case 'UPDATE_FOCUS':
 			return {
+				...state,
 				start: action.uid,
 				end: action.uid,
 				focus: action.config || {},
@@ -347,6 +353,7 @@ export function blockSelection( state = { start: null, end: null, focus: null },
 				start: action.blocks[ 0 ].uid,
 				end: action.blocks[ 0 ].uid,
 				focus: {},
+				isMultiSelecting: false,
 			};
 		case 'REPLACE_BLOCKS':
 			if ( ! action.blocks || ! action.blocks.length || action.uids.indexOf( state.start ) === -1 ) {
@@ -356,6 +363,7 @@ export function blockSelection( state = { start: null, end: null, focus: null },
 				start: action.blocks[ 0 ].uid,
 				end: action.blocks[ 0 ].uid,
 				focus: {},
+				isMultiSelecting: false,
 			};
 	}
 
