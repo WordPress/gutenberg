@@ -9,7 +9,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component, findDOMNode } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
 import { withFocusOutside } from '@wordpress/components';
 
@@ -48,8 +48,6 @@ class PostTitle extends Component {
 
 	componentDidMount() {
 		document.addEventListener( 'selectionchange', this.onSelectionChange );
-		// eslint-disable-next-line react/no-find-dom-node
-		this.setFocused( findDOMNode( this ).contains( document.activeElement ) );
 	}
 
 	componentWillUnmount() {
