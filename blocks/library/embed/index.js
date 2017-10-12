@@ -21,6 +21,8 @@ import { registerBlockType, source, createBlock } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
+import InspectorControls from '../../inspector-controls';
+import BlockDescription from '../../block-description';
 
 const { children } = source;
 
@@ -133,7 +135,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 				const { setAttributes, focus, setFocus } = this.props;
 				const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 
-				const controls = (
+				const controls = [
 					focus && (
 						<BlockControls key="controls">
 							<BlockAlignmentToolbar
@@ -141,8 +143,15 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 								onChange={ updateAlignment }
 							/>
 						</BlockControls>
-					)
-				);
+					),
+					focus && (
+						<InspectorControls key="inspector">
+							<BlockDescription>
+								<p>{ __( 'The Embed block allows you to easily add videos, images, tweets, audio, and other content to your post or page.' ) }</p>
+							</BlockDescription>
+						</InspectorControls>
+					),
+				];
 
 				if ( fetching ) {
 					return [
