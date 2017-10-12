@@ -55,7 +55,7 @@ describe( 'paste', () => {
 	} );
 
 	it( 'should convert recognised pasted content', () => {
-		const pastedBlock = paste( { content: '<figure>test</figure>' } )[ 0 ];
+		const pastedBlock = paste( { HTML: '<figure>test</figure>' } )[ 0 ];
 		const block = createBlock( 'test/figure', { content: [ 'test' ] } );
 
 		equal( pastedBlock.name, block.name );
@@ -63,10 +63,19 @@ describe( 'paste', () => {
 	} );
 
 	it( 'should handle unknown pasted content', () => {
-		const pastedBlock = paste( { content: '<figcaption>test</figcaption>' } )[ 0 ];
+		const pastedBlock = paste( { HTML: '<figcaption>test</figcaption>' } )[ 0 ];
 
 		equal( pastedBlock.name, 'test/unknown' );
 		equal( pastedBlock.attributes.content, '<figcaption>test</figcaption>' );
+	} );
+
+	it( 'should filter inline content', () => {
+		const filtered = paste( {
+			HTML: '<h2><em>test</em></h2>',
+			inline: true,
+		} );
+
+		equal( filtered, '<em>test</em>' );
 	} );
 } );
 

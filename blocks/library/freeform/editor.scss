@@ -88,11 +88,11 @@
 .freeform-toolbar {
 	width: auto;
 	top: $header-height - 1px;
-	z-index: z-index( '.editor-visual-editor__block-controls' );
+	z-index: z-index( '.editor-block-toolbar' );
 	position: sticky;
 
 	@include break-medium() {
-		top: $header-height + $admin-bar-height + $item-spacing;
+		top: $item-spacing;
 	}
 }
 
@@ -144,6 +144,10 @@
 
 .freeform-toolbar.has-advanced-toolbar .mce-toolbar-grp .mce-toolbar {
 	display: block;
+}
+
+.freeform-toolbar.has-advanced-toolbar {
+	margin-top: -85px;	/* Pull upwards the classic text toolbar when enabled */
 }
 
 .freeform-toolbar div.mce-btn-group {

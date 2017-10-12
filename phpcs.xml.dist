@@ -5,28 +5,20 @@
 	<rule ref="PHPCompatibility"/>
 	<config name="testVersion" value="5.2-"/>
 
-	<rule ref="WordPress-Core" />
-	<rule ref="WordPress-Docs" />
-	<rule ref="WordPress.WP.I18n">
-		<properties>
-			<property name="text_domain" value="gutenberg,default" />
-		</properties>
-	</rule>
+	<rule ref="WordPress-Core"/>
+	<rule ref="WordPress-Docs"/>
+	<rule ref="WordPress.WP.I18n"/>
+	<config name="text_domain" value="gutenberg,default"/>
 
 	<arg value="ps"/>
 	<arg name="extensions" value="php"/>
 
-	<file>gutenberg.php</file>
-	<file>./lib</file>
+	<file>./bin</file>
 	<file>./blocks/library</file>
+	<file>./lib</file>
 	<exclude-pattern>./lib/parser.php</exclude-pattern>
 	<file>./phpunit</file>
-	<file>./bin</file>
-
-	<!-- The plugin entry point already has a file comment, I promise -->
-	<rule ref="Squiz.Commenting.FileComment.Missing">
-		<exclude-pattern>gutenberg.php</exclude-pattern>
-	</rule>
+	<file>gutenberg.php</file>
 
 	<!-- These special comments are markers for the build process -->
 	<rule ref="Squiz.Commenting.InlineComment.WrongStyle">

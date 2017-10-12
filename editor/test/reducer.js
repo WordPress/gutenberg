@@ -23,7 +23,7 @@ import {
 	saving,
 	notices,
 	showInsertionPoint,
-	userData,
+	blocksMode,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -119,6 +119,33 @@ describe( 'state', () => {
 			expect( values( state.blocksByUid )[ 0 ].name ).toBe( 'core/freeform' );
 			expect( values( state.blocksByUid )[ 0 ].uid ).toBe( 'wings' );
 			expect( state.blockOrder ).toEqual( [ 'wings' ] );
+		} );
+
+		it( 'should update the block', () => {
+			const original = editor( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [ {
+					uid: 'chicken',
+					name: 'core/test-block',
+					attributes: {},
+					isValid: false,
+				} ],
+			} );
+			const state = editor( deepFreeze( original ), {
+				type: 'UPDATE_BLOCK',
+				uid: 'chicken',
+				updates: {
+					attributes: { content: 'ribs' },
+					isValid: true,
+				},
+			} );
+
+			expect( state.blocksByUid.chicken ).toEqual( {
+				uid: 'chicken',
+				name: 'core/test-block',
+				attributes: { content: 'ribs' },
+				isValid: true,
+			} );
 		} );
 
 		it( 'should move the block up', () => {
@@ -785,10 +812,10 @@ describe( 'state', () => {
 	} );
 
 	describe( 'preferences()', () => {
-		it( 'should be opened by default and show the post-status panel', () => {
+		it( 'should apply all defaults', () => {
 			const state = preferences( undefined, {} );
 
-			expect( state ).toEqual( { mode: 'visual', isSidebarOpened: true, panels: { 'post-status': true } } );
+			expect( state ).toEqual( { blockUsage: {}, recentlyUsedBlocks: [], mode: 'visual', isSidebarOpened: true, panels: { 'post-status': true } } );
 		} );
 
 		it( 'should toggle the sidebar open flag', () => {
@@ -824,6 +851,78 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( { isSidebarOpened: false, mode: 'text' } );
+		} );
+
+		it( 'should record recently used blocks', () => {
+			const state = preferences( deepFreeze( { recentlyUsedBlocks: [], blockUsage: {} } ), {
+				type: 'INSERT_BLOCKS',
+				blocks: [ {
+					uid: 'bacon',
+					name: 'core-embed/twitter',
+				} ],
+			} );
+
+			expect( state.recentlyUsedBlocks[ 0 ] ).toEqual( 'core-embed/twitter' );
+
+			const twoRecentBlocks = preferences( deepFreeze( { recentlyUsedBlocks: [], blockUsage: {} } ), {
+				type: 'INSERT_BLOCKS',
+				blocks: [ {
+					uid: 'eggs',
+					name: 'core-embed/twitter',
+				}, {
+					uid: 'bacon',
+					name: 'core-embed/youtube',
+				} ],
+			} );
+
+			expect( twoRecentBlocks.recentlyUsedBlocks[ 0 ] ).toEqual( 'core-embed/youtube' );
+			expect( twoRecentBlocks.recentlyUsedBlocks[ 1 ] ).toEqual( 'core-embed/twitter' );
+		} );
+
+		it( 'should record block usage', () => {
+			const state = preferences( deepFreeze( { recentlyUsedBlocks: [], blockUsage: {} } ), {
+				type: 'INSERT_BLOCKS',
+				blocks: [ {
+					uid: 'eggs',
+					name: 'core-embed/twitter',
+				}, {
+					uid: 'bacon',
+					name: 'core-embed/youtube',
+				}, {
+					uid: 'milk',
+					name: 'core-embed/youtube',
+				} ],
+			} );
+
+			expect( state.blockUsage ).toEqual( { 'core-embed/youtube': 2, 'core-embed/twitter': 1 } );
+		} );
+
+		it( 'should populate recentlyUsedBlocks, filling up with common blocks, on editor setup', () => {
+			const state = preferences( deepFreeze( { recentlyUsedBlocks: [ 'core-embed/twitter', 'core-embed/youtube' ] } ), {
+				type: 'SETUP_EDITOR',
+			} );
+
+			expect( state.recentlyUsedBlocks[ 0 ] ).toEqual( 'core-embed/twitter' );
+			expect( state.recentlyUsedBlocks[ 1 ] ).toEqual( 'core-embed/youtube' );
+
+			state.recentlyUsedBlocks.slice( 2 ).forEach(
+				block => expect( getBlockType( block ).category ).toEqual( 'common' )
+			);
+			expect( state.recentlyUsedBlocks ).toHaveLength( 8 );
+		} );
+
+		it( 'should remove unregistered blocks from persisted recent usage', () => {
+			const state = preferences( deepFreeze( { recentlyUsedBlocks: [ 'core-embed/i-do-not-exist', 'core-embed/youtube' ] } ), {
+				type: 'SETUP_EDITOR',
+			} );
+			expect( state.recentlyUsedBlocks[ 0 ] ).toEqual( 'core-embed/youtube' );
+		} );
+
+		it( 'should remove unregistered blocks from persisted block usage stats', () => {
+			const state = preferences( deepFreeze( { recentlyUsedBlocks: [], blockUsage: { 'core/i-do-not-exist': 42, 'core-embed/youtube': 88 } } ), {
+				type: 'SETUP_EDITOR',
+			} );
+			expect( state.blockUsage ).toEqual( { 'core-embed/youtube': 88 } );
 		} );
 	} );
 
@@ -919,53 +1018,25 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'userData()', () => {
-		beforeAll( () => {
-			registerBlockType( 'core/test-block', {
-				save: noop,
-				edit: noop,
-				category: 'common',
-				title: 'test block',
-			} );
+	describe( 'blocksMode', () => {
+		it( 'should set mode to html if not set', () => {
+			const action = {
+				type: 'TOGGLE_BLOCK_MODE',
+				uid: 'chicken',
+			};
+			const value = blocksMode( deepFreeze( {} ), action );
+
+			expect( value ).toEqual( { chicken: 'html' } );
 		} );
 
-		afterAll( () => {
-			unregisterBlockType( 'core/test-block' );
-		} );
+		it( 'should toggle mode to visual if set as html', () => {
+			const action = {
+				type: 'TOGGLE_BLOCK_MODE',
+				uid: 'chicken',
+			};
+			const value = blocksMode( deepFreeze( { chicken: 'html' } ), action );
 
-		it( 'should record recently used blocks', () => {
-			const original = userData( undefined, {} );
-			const state = userData( original, {
-				type: 'INSERT_BLOCKS',
-				blocks: [ {
-					uid: 'bacon',
-					name: 'core-embed/twitter',
-				} ],
-			} );
-
-			expect( state.recentlyUsedBlocks[ 0 ] ).toEqual( 'core-embed/twitter' );
-
-			const twoRecentBlocks = userData( state, {
-				type: 'INSERT_BLOCKS',
-				blocks: [ {
-					uid: 'eggs',
-					name: 'core-embed/youtube',
-				} ],
-			} );
-
-			expect( twoRecentBlocks.recentlyUsedBlocks[ 0 ] ).toEqual( 'core-embed/youtube' );
-			expect( twoRecentBlocks.recentlyUsedBlocks[ 1 ] ).toEqual( 'core-embed/twitter' );
-		} );
-
-		it( 'should populate recently used blocks with blocks from the common category', () => {
-			const initial = userData( undefined, {
-				type: 'SETUP_EDITOR',
-			} );
-
-			initial.recentlyUsedBlocks.forEach(
-				block => expect( getBlockType( block ).category ).toEqual( 'common' )
-			);
-			expect( initial.recentlyUsedBlocks ).toHaveLength( 8 );
+			expect( value ).toEqual( { chicken: 'visual' } );
 		} );
 	} );
 } );

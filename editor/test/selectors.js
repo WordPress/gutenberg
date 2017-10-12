@@ -39,6 +39,7 @@ import {
 	getBlocks,
 	getBlockCount,
 	getSelectedBlock,
+	getEditedPostContent,
 	getMultiSelectedBlockUids,
 	getMultiSelectedBlocksStartUid,
 	getMultiSelectedBlocksEndUid,
@@ -53,6 +54,7 @@ import {
 	isFirstMultiSelectedBlock,
 	isBlockHovered,
 	getBlockFocus,
+	getBlockMode,
 	isTyping,
 	getBlockInsertionPoint,
 	isBlockInsertionPointVisible,
@@ -61,6 +63,7 @@ import {
 	didPostSaveRequestFail,
 	getSuggestedPostFormat,
 	getNotices,
+	getMostFrequentlyUsedBlocks,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -84,6 +87,9 @@ describe( 'selectors', () => {
 
 	beforeEach( () => {
 		isEditedPostDirty.clear();
+		getBlock.clear();
+		getBlocks.clear();
+		getEditedPostContent.clear();
 	} );
 
 	afterAll( () => {
@@ -1071,6 +1077,54 @@ describe( 'selectors', () => {
 
 			expect( getBlock( state, 123 ) ).toEqual( { uid: 123, name: 'core/paragraph' } );
 		} );
+
+		it( 'should return null if the block is not present in state', () => {
+			const state = {
+				currentPost: {},
+				editor: {
+					blocksByUid: {},
+					edits: {},
+				},
+			};
+
+			expect( getBlock( state, 123 ) ).toBe( null );
+		} );
+
+		it( 'should merge meta attributes for the block', () => {
+			registerBlockType( 'core/meta-block', {
+				save: ( props ) => props.attributes.text,
+				category: 'common',
+				title: 'test block',
+				attributes: {
+					foo: {
+						type: 'string',
+						meta: 'foo',
+					},
+				},
+			} );
+
+			const state = {
+				currentPost: {
+					meta: {
+						foo: 'bar',
+					},
+				},
+				editor: {
+					blocksByUid: {
+						123: { uid: 123, name: 'core/meta-block' },
+					},
+					edits: {},
+				},
+			};
+
+			expect( getBlock( state, 123 ) ).toEqual( {
+				uid: 123,
+				name: 'core/meta-block',
+				attributes: {
+					foo: 'bar',
+				},
+			} );
+		} );
 	} );
 
 	describe( 'getBlocks', () => {
@@ -1452,6 +1506,26 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'geteBlockMode', () => {
+		it( 'should return "visual" if unset', () => {
+			const state = {
+				blocksMode: {},
+			};
+
+			expect( getBlockMode( state, 123 ) ).toEqual( 'visual' );
+		} );
+
+		it( 'should return the block mode', () => {
+			const state = {
+				blocksMode: {
+					123: 'html',
+				},
+			};
+
+			expect( getBlockMode( state, 123 ) ).toEqual( 'html' );
+		} );
+	} );
+
 	describe( 'isTyping', () => {
 		it( 'should return the isTyping flag if the block is selected', () => {
 			const state = {
@@ -1673,6 +1747,34 @@ describe( 'selectors', () => {
 				state.notices.b,
 				state.notices.a,
 			] );
+		} );
+	} );
+
+	describe( 'getMostFrequentlyUsedBlocks', () => {
+		it( 'should have paragraph and image to bring frequently used blocks up to three blocks', () => {
+			const noUsage = { preferences: { blockUsage: {} } };
+			const someUsage = { preferences: { blockUsage: { 'core/paragraph': 1 } } };
+
+			expect( getMostFrequentlyUsedBlocks( noUsage ).map( ( block ) => block.name ) )
+				.toEqual( [ 'core/paragraph', 'core/image' ] );
+
+			expect( getMostFrequentlyUsedBlocks( someUsage ).map( ( block ) => block.name ) )
+				.toEqual( [ 'core/paragraph', 'core/image' ] );
+		} );
+		it( 'should return the top 3 most recently used blocks', () => {
+			const state = {
+				preferences: {
+					blockUsage: {
+						'core/paragraph': 4,
+						'core/image': 11,
+						'core/quote': 2,
+						'core/gallery': 1,
+					},
+				},
+			};
+
+			expect( getMostFrequentlyUsedBlocks( state ).map( ( block ) => block.name ) )
+				.toEqual( [ 'core/image', 'core/paragraph', 'core/quote' ] );
 		} );
 	} );
 } );

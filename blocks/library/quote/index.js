@@ -17,6 +17,8 @@ import { registerBlockType, createBlock, source } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
 import Editable from '../../editable';
+import InspectorControls from '../../inspector-controls';
+import BlockDescription from '../../block-description';
 
 const { children, node: element, query } = source;
 
@@ -164,6 +166,13 @@ registerBlockType( 'core/quote', {
 						} }
 					/>
 				</BlockControls>
+			),
+			focus && (
+				<InspectorControls key="inspector">
+					<BlockDescription>
+						<p>{ __( 'Quote. In quoting others, we cite ourselves. (Julio Cortázar)' ) }</p>
+					</BlockDescription>
+				</InspectorControls>
 			),
 			<blockquote
 				key="quote"

@@ -3,26 +3,23 @@
  */
 import optimist from 'redux-optimist';
 import { combineReducers } from 'redux';
-import { get, reduce, keyBy, first, last, omit, without, mapValues } from 'lodash';
+import { difference, get, reduce, keyBy, keys, first, last, omit, pick, without, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { getBlockTypes } from '@wordpress/blocks';
+import { getBlockTypes, getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { combineUndoableReducers } from './utils/undoable-reducer';
+import { STORE_DEFAULTS } from './store-defaults';
 
-/**
+/***
  * Module constants
  */
-const DEFAULT_PREFERENCES = {
-	mode: 'visual',
-	isSidebarOpened: window.innerWidth >= 782,
-	panels: { 'post-status': true },
-};
+const MAX_RECENT_BLOCKS = 8;
 
 /**
  * Returns a post attribute value, flattening nested rendered content using its
@@ -138,6 +135,20 @@ export const editor = combineUndoableReducers( {
 					},
 				};
 
+			case 'UPDATE_BLOCK':
+				// Ignore updates if block isn't known
+				if ( ! state[ action.uid ] ) {
+					return state;
+				}
+
+				return {
+					...state,
+					[ action.uid ]: {
+						...state[ action.uid ],
+						...action.updates,
+					},
+				};
+
 			case 'INSERT_BLOCKS':
 				return {
 					...state,
@@ -238,39 +249,6 @@ export const editor = combineUndoableReducers( {
 		return state;
 	},
 }, { resetTypes: [ 'RESET_POST' ] } );
-
-/**
- * Reducer loading and saving user specific data, such as preferences and
- * block usage.
- *
- * @param  {Object} state  Current state
- * @param  {Object} action Dispatched action
- * @return {Object}        Updated state
- */
-export const userData = combineReducers( {
-	recentlyUsedBlocks( state = [], action ) {
-		const maxRecent = 8;
-		switch ( action.type ) {
-			case 'SETUP_EDITOR':
-				// This is where we initially populate the recently used blocks,
-				// for now this inserts blocks from the common category, but will
-				// load this from an API in the future.
-				return getBlockTypes()
-					.filter( ( blockType ) => 'common' === blockType.category )
-					.slice( 0, maxRecent )
-					.map( ( blockType ) => blockType.name );
-			case 'INSERT_BLOCKS':
-				// This is where we record the block usage so it can show up in
-				// the recent blocks.
-				let newState = [ ...state ];
-				action.blocks.forEach( ( block ) => {
-					newState = [ block.name, ...without( newState, block.name ) ];
-				} );
-				return newState.slice( 0, maxRecent );
-		}
-		return state;
-	},
-} );
 
 /**
  * Reducer returning the last-known state of the current post, in the format
@@ -414,6 +392,18 @@ export function hoveredBlock( state = null, action ) {
 	return state;
 }
 
+export function blocksMode( state = {}, action ) {
+	if ( action.type === 'TOGGLE_BLOCK_MODE' ) {
+		const { uid } = action;
+		return {
+			...state,
+			[ uid ]: state[ uid ] && state[ uid ] === 'html' ? 'visual' : 'html',
+		};
+	}
+
+	return state;
+}
+
 /**
  * Reducer returning the block insertion point
  *
@@ -442,7 +432,7 @@ export function showInsertionPoint( state = false, action ) {
  * @param  {Object}  action                Dispatched action
  * @return {string}                        Updated state
  */
-export function preferences( state = DEFAULT_PREFERENCES, action ) {
+export function preferences( state = STORE_DEFAULTS.preferences, action ) {
 	switch ( action.type ) {
 		case 'TOGGLE_SIDEBAR':
 			return {
@@ -461,6 +451,37 @@ export function preferences( state = DEFAULT_PREFERENCES, action ) {
 			return {
 				...state,
 				mode: action.mode,
+			};
+		case 'INSERT_BLOCKS':
+			// record the block usage and put the block in the recently used blocks
+			let blockUsage = state.blockUsage;
+			let recentlyUsedBlocks = [ ...state.recentlyUsedBlocks ];
+			action.blocks.forEach( ( block ) => {
+				const uses = ( blockUsage[ block.name ] || 0 ) + 1;
+				blockUsage = omit( blockUsage, block.name );
+				blockUsage[ block.name ] = uses;
+				recentlyUsedBlocks = [ block.name, ...without( recentlyUsedBlocks, block.name ) ].slice( 0, MAX_RECENT_BLOCKS );
+			} );
+			return {
+				...state,
+				blockUsage,
+				recentlyUsedBlocks,
+			};
+		case 'SETUP_EDITOR':
+			const isBlockDefined = name => getBlockType( name ) !== undefined;
+			const filterInvalidBlocksFromList = list => list.filter( isBlockDefined );
+			const filterInvalidBlocksFromObject = obj => pick( obj, keys( obj ).filter( isBlockDefined ) );
+			const commonBlocks = getBlockTypes()
+				.filter( ( blockType ) => 'common' === blockType.category )
+				.map( ( blockType ) => blockType.name );
+
+			return {
+				...state,
+				// recently used gets filled up to `MAX_RECENT_BLOCKS` with blocks from the common category
+				recentlyUsedBlocks: filterInvalidBlocksFromList( [ ...state.recentlyUsedBlocks ] )
+					.concat( difference( commonBlocks, state.recentlyUsedBlocks ) )
+					.slice( 0, MAX_RECENT_BLOCKS ),
+				blockUsage: filterInvalidBlocksFromObject( state.blockUsage ),
 			};
 	}
 
@@ -535,10 +556,10 @@ export default optimist( combineReducers( {
 	isTyping,
 	blockSelection,
 	hoveredBlock,
+	blocksMode,
 	showInsertionPoint,
 	preferences,
 	panel,
 	saving,
 	notices,
-	userData,
 } ) );

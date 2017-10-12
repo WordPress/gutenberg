@@ -7,14 +7,14 @@ import { equal } from 'assert';
  * Internal dependencies
  */
 import commentRemover from '../comment-remover';
-import { deepFilter } from '../utils';
+import { deepFilterHTML } from '../utils';
 
-describe( 'stripWrappers', () => {
+describe( 'commentRemover', () => {
 	it( 'should remove comments', () => {
-		equal( deepFilter( '<!-- test -->', [ commentRemover ] ), '' );
+		equal( deepFilterHTML( '<!-- test -->', [ commentRemover ] ), '' );
 	} );
 
 	it( 'should deep remove comments', () => {
-		equal( deepFilter( '<p>test<!-- test --></p>', [ commentRemover ] ), '<p>test</p>' );
+		equal( deepFilterHTML( '<p>test<!-- test --></p>', [ commentRemover ] ), '<p>test</p>' );
 	} );
 } );

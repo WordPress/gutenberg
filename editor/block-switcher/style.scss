@@ -30,10 +30,12 @@
 	background: $white;
 	padding: 3px 3px 0 3px;
 	z-index: z-index( '.editor-block-switcher__menu' );
+}
 
-	input {
-		font-size: $default-font-size;
-	}
+.editor-block-switcher__menu-title {
+	display: block;
+	padding: 6px;
+	color: $dark-gray-300;
 }
 
 .editor-block-switcher__menu-item {

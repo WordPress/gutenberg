@@ -172,7 +172,7 @@ class UrlInput extends Component {
 			<div className="blocks-url-input">
 				<input
 					autoFocus
-					type="url"
+					type="text"
 					aria-label={ __( 'URL' ) }
 					required
 					value={ value }

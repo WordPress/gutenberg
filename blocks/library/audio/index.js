@@ -15,10 +15,13 @@ import { Component } from '@wordpress/element';
 import './style.scss';
 import { registerBlockType, source } from '../../api';
 import MediaUploadButton from '../../media-upload-button';
+import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
+import InspectorControls from '../../inspector-controls';
+import BlockDescription from '../../block-description';
 
-const { attr } = source;
+const { attr, children } = source;
 
 registerBlockType( 'core/audio', {
 	title: __( 'Audio' ),
@@ -34,6 +37,10 @@ registerBlockType( 'core/audio', {
 		},
 		align: {
 			type: 'string',
+		},
+		caption: {
+			type: 'array',
+			source: children( 'figcaption' ),
 		},
 	},
 
@@ -56,8 +63,8 @@ registerBlockType( 'core/audio', {
 			};
 		}
 		render() {
-			const { align } = this.props.attributes;
-			const { setAttributes, focus } = this.props;
+			const { align, caption } = this.props.attributes;
+			const { setAttributes, focus, setFocus } = this.props;
 			const { editing, className, src } = this.state;
 			const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 			const switchToEditing = () => {
@@ -80,33 +87,42 @@ registerBlockType( 'core/audio', {
 				}
 				return false;
 			};
-			const controls = (
-				focus && (
-					<BlockControls key="controls">
-						<BlockAlignmentToolbar
-							value={ align }
-							onChange={ updateAlignment }
-						/>
-						<Toolbar>
-							<li>
-								<Button
-									buttonProps={ {
-										className: 'components-icon-button components-toolbar__control',
-										'aria-label': __( 'Edit audio' ),
-									} }
-									type="audio"
-									onClick={ switchToEditing }
-								>
-									<Dashicon icon="edit" />
-								</Button>
-							</li>
-						</Toolbar>
-					</BlockControls>
-				)
+			const controls = focus && (
+				<BlockControls key="controls">
+					<BlockAlignmentToolbar
+						value={ align }
+						onChange={ updateAlignment }
+					/>
+					<Toolbar>
+						<li>
+							<Button
+								buttonProps={ {
+									className: 'components-icon-button components-toolbar__control',
+									'aria-label': __( 'Edit audio' ),
+								} }
+								type="audio"
+								onClick={ switchToEditing }
+							>
+								<Dashicon icon="edit" />
+							</Button>
+						</li>
+					</Toolbar>
+				</BlockControls>
 			);
+
+			const inspectorControls = focus && (
+				<InspectorControls key="inspector">
+					<BlockDescription>
+						<p>{ __( 'The Audio block allows you to embed audio files and play them back using a simple player.' ) }</p>
+					</BlockDescription>
+				</InspectorControls>
+			);
+
+			const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
 
 			if ( editing ) {
 				return [
+					inspectorControls,
 					<Placeholder
 						key="placeholder"
 						icon="media-audio"
@@ -140,20 +156,33 @@ registerBlockType( 'core/audio', {
 			/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 			return [
 				controls,
-				<div key="audio">
+				inspectorControls,
+				<figure key="audio" className={ className }>
 					<audio controls="controls" src={ src } />
-				</div>,
+					{ ( ( caption && caption.length ) || !! focus ) && (
+						<Editable
+							tagName="figcaption"
+							placeholder={ __( 'Write caption…' ) }
+							value={ caption }
+							focus={ focus && focus.editable === 'caption' ? focus : undefined }
+							onFocus={ focusCaption }
+							onChange={ ( value ) => setAttributes( { caption: value } ) }
+							inlineToolbar
+						/>
+					) }
+				</figure>,
 			];
 			/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		}
 	},
 
 	save( { attributes } ) {
-		const { align, src } = attributes;
+		const { align, src, caption } = attributes;
 		return (
-			<div className={ align ? `align${ align }` : null }>
+			<figure className={ align ? `align${ align }` : null }>
 				<audio controls="controls" src={ src } />
-			</div>
+				{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
+			</figure>
 		);
 	},
 } );

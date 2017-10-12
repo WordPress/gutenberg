@@ -14,13 +14,13 @@ if ( getenv( 'RUN_SLOW_TESTS' ) ) {
 				dirname( __FILE__ ) . '/fixtures/long-content.html'
 			);
 
-			$start = microtime( true );
+			$start     = microtime( true );
 			$start_mem = memory_get_usage();
 
 			$blocks = gutenberg_parse_blocks( $html );
 
 			$time = microtime( true ) - $start;
-			$mem = memory_get_usage() - $start_mem;
+			$mem  = memory_get_usage() - $start_mem;
 
 			if ( getenv( 'SHOW_PERFORMANCE_INFO' ) ) {
 				error_log( '' );

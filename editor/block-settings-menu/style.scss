@@ -1,15 +1,31 @@
 .editor-block-settings-menu {
 	position: absolute;
 	top: 0;
-	right: 0;
-	height: $text-editor-font-size * 4; // same height as an empty paragraph
+	right: 4px;
 	padding: 6px 0 6px 14px; // handles hover area
 
 	// Mobile
 	display: none;
 
 	@include break-small {
-		display: block;
+		display: flex;
+		flex-direction: column;
+	}
+}
+
+.editor-block-settings-menu__content {
+	margin-top: 8px;
+	z-index: z-index( '.editor-block-settings-menu__content' );
+}
+
+.editor-block-settings-menu__toggle {
+	transform: rotate( 90deg );
+	transition-duration: 0.3s;
+	transition-property: transform;
+	z-index: z-index( '.editor-block-settings-menu__toggle' );
+
+	&.is-opened {
+		transform: rotate( 0 );
 	}
 }
 
@@ -35,7 +51,11 @@
 		display: block;
 	}
 
-	&:first-child {
-		margin-bottom: 4px;
+	.editor-block-settings-menu__content & {
+		margin-bottom: 8px;
+	}
+
+	.editor-block-settings-menu__content &:last-child {
+		margin-bottom: 0;
 	}
 }

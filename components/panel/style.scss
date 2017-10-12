@@ -9,7 +9,7 @@
 
 	> .components-panel__header:last-child,
 	> .components-panel__body:last-child {
-		margin-bottom: -1px;
+		border-bottom-width: 0;
 	}
 }
 
@@ -18,12 +18,15 @@
 }
 
 .components-panel__body {
-	padding: $panel-padding;
 	border-top: 1px solid $light-gray-500;
 	border-bottom: 1px solid $light-gray-500;
 
 	h3 {
 		margin: 0 0 .5em 0;
+	}
+
+	&.is-opened {
+		padding: $panel-padding;
 	}
 }
 
@@ -51,13 +54,14 @@
 	margin-top: -1px;
 }
 
-.components-panel .components-panel__body-title {
+.components-panel__body > .components-panel__body-title {
 	display: block;
 	padding: 0;
-	margin: -1 * $panel-padding;
 	font-size: inherit;
+	margin-bottom: 0;
 }
-.components-panel__body.is-opened .components-panel__body-title {
+.components-panel__body.is-opened > .components-panel__body-title {
+	margin: -1 * $panel-padding;
 	margin-bottom: 0;
 }
 

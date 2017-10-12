@@ -4,6 +4,11 @@
 import { shallow } from 'enzyme';
 
 /**
+ * WordPress dependencies
+ */
+import { getBlockType } from '@wordpress/blocks';
+
+/**
  * Internal dependencies
  */
 import { VisualEditorInserter } from '../inserter';
@@ -26,11 +31,18 @@ describe( 'VisualEditorInserter', () => {
 		expect( wrapper.state( 'isShowingControls' ) ).toBe( false );
 	} );
 
-	it( 'should insert paragraph block', () => {
+	it( 'should insert frequently used blocks', () => {
 		const onInsertBlock = jest.fn();
+		const mostFrequentlyUsedBlocks = [ getBlockType( 'core/paragraph' ), getBlockType( 'core/image' ) ];
 		const wrapper = shallow(
-			<VisualEditorInserter onInsertBlock={ onInsertBlock } />
+			<VisualEditorInserter onInsertBlock={ onInsertBlock } mostFrequentlyUsedBlocks={ mostFrequentlyUsedBlocks } />
 		);
+		wrapper.state.preferences = {
+			blockUsage: {
+				'core/paragraph': 42,
+				'core/image': 34,
+			},
+		};
 
 		wrapper
 			.findWhere( ( node ) => node.prop( 'children' ) === 'Paragraph' )
@@ -38,19 +50,5 @@ describe( 'VisualEditorInserter', () => {
 
 		expect( onInsertBlock ).toHaveBeenCalled();
 		expect( onInsertBlock.mock.calls[ 0 ][ 0 ].name ).toBe( 'core/paragraph' );
-	} );
-
-	it( 'should insert image block', () => {
-		const onInsertBlock = jest.fn();
-		const wrapper = shallow(
-			<VisualEditorInserter onInsertBlock={ onInsertBlock } />
-		);
-
-		wrapper
-			.findWhere( ( node ) => node.prop( 'children' ) === 'Image' )
-			.simulate( 'click' );
-
-		expect( onInsertBlock ).toHaveBeenCalled();
-		expect( onInsertBlock.mock.calls[ 0 ][ 0 ].name ).toBe( 'core/image' );
 	} );
 } );

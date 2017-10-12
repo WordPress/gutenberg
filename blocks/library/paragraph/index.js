@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import classnames from 'classnames';
 import uuid from 'uuid/v4';
 import { find } from 'lodash';
 /**
@@ -8,8 +9,7 @@ import { find } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { concatChildren, Component } from '@wordpress/element';
-import { IconButton } from '@wordpress/components';
-import classnames from 'classnames';
+import { PanelBody, IconButton } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -161,7 +161,7 @@ registerBlockType( 'core/paragraph', {
 						<BlockDescription>
 							<p>{ __( 'Text. Great things start here.' ) }</p>
 						</BlockDescription>
-						<h3>{ __( 'Text Settings' ) }</h3>
+					<PanelBody title={ __( 'Text Settings' ) }>
 						<ToggleControl
 							label={ __( 'Drop Cap' ) }
 							checked={ !! dropCap }
@@ -176,22 +176,26 @@ registerBlockType( 'core/paragraph', {
 							beforeIcon="editor-textcolor"
 							allowReset
 						/>
-						<h3>{ __( 'Background Color' ) }</h3>
+					</PanelBody>
+					<PanelBody title={ __( 'Background Color' ) }>
 						<ColorPalette
 							value={ backgroundColor }
 							onChange={ ( colorValue ) => setAttributes( { backgroundColor: colorValue } ) }
 							withTransparentOption
 						/>
-						<h3>{ __( 'Text Color' ) }</h3>
+					</PanelBody>
+					<PanelBody title={ __( 'Text Color' ) }>
 						<ColorPalette
 							value={ textColor }
 							onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
 						/>
-						<h3>{ __( 'Block Alignment' ) }</h3>
+					</PanelBody>
+					<PanelBody title={ __( 'Block Alignment' ) }>
 						<BlockAlignmentToolbar
 							value={ width }
 							onChange={ ( nextWidth ) => setAttributes( { width: nextWidth } ) }
 						/>
+					</PanelBody>
 					</InspectorControls>
 				),
 				<BlockAutocomplete key="editable" onReplace={ onReplace }>

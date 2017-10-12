@@ -11,8 +11,7 @@ window._wpGutenbergPost.content = {
 		'<section class="wp-block-cover-image has-parallax has-background-dim" style="background-image:url(https://cldup.com/GCwahb3aOb.jpg)"><h2>Of mountains &amp; printing presses</h2></section>',
 		'<!-- /wp:core/cover-image -->',
 
-		'<!-- more Keep on reading! -->',
-		'<!-- noteaser -->',
+		'<!--more Keep on reading!-->\n<!--noteaser-->',
 
 		'<!-- wp:core/paragraph -->',
 		'<p>The goal of this new editor is to make adding rich content to WordPress simple and enjoyable. This whole post is composed of <em>pieces of content</em>—somewhat similar to LEGO bricks—that you can move around and interact with. Move your cursor around and you&#x27;ll notice the different blocks light up with outlines and arrows. Press the arrows to reposition blocks quickly, without fearing about losing things in the process of copying and pasting.</p>',

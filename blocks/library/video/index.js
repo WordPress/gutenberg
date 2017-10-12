@@ -17,6 +17,8 @@ import MediaUploadButton from '../../media-upload-button';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
+import InspectorControls from '../../inspector-controls';
+import BlockDescription from '../../block-description';
 
 const { attr, children } = source;
 
@@ -66,32 +68,36 @@ registerBlockType( 'core/video', {
 			setAttributes( { align: nextAlign } );
 		};
 
-		const controls = (
-			focus && (
-				<BlockControls key="controls">
-					<BlockAlignmentToolbar
-						value={ align }
-						onChange={ updateAlignment }
-					/>
+		const controls = focus && [
+			<BlockControls key="controls">
+				<BlockAlignmentToolbar
+					value={ align }
+					onChange={ updateAlignment }
+				/>
 
-					<Toolbar>
-						<li>
-							<MediaUploadButton
-								buttonProps={ {
-									className: 'components-icon-button components-toolbar__control',
-									'aria-label': __( 'Edit video' ),
-								} }
-								onSelect={ onSelectVideo }
-								type="video"
-								value={ id }
-							>
-								<Dashicon icon="edit" />
-							</MediaUploadButton>
-						</li>
-					</Toolbar>
-				</BlockControls>
-			)
-		);
+				<Toolbar>
+					<li>
+						<MediaUploadButton
+							buttonProps={ {
+								className: 'components-icon-button components-toolbar__control',
+								'aria-label': __( 'Edit video' ),
+							} }
+							onSelect={ onSelectVideo }
+							type="video"
+							value={ id }
+						>
+							<Dashicon icon="edit" />
+						</MediaUploadButton>
+					</li>
+				</Toolbar>
+			</BlockControls>,
+
+			<InspectorControls key="inspector">
+				<BlockDescription>
+					<p>{ __( 'Video, locally hosted, locally sourced.' ) }</p>
+				</BlockDescription>
+			</InspectorControls>,
+		];
 
 		if ( ! src ) {
 			return [

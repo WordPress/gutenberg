@@ -9,7 +9,7 @@ import { connect } from 'react-redux';
 import { Component } from '@wordpress/element';
 import { getBlockType, InspectorControls } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
-import { ClipboardButton, Tooltip } from '@wordpress/components';
+import { ClipboardButton, Tooltip, PanelBody } from '@wordpress/components';
 
 /**
  * Internal Dependencies
@@ -69,8 +69,7 @@ class BlockInspectorAdvancedControls extends Component {
 		}
 
 		return (
-			<div>
-				<h3>{ __( 'Block Settings' ) }</h3>
+			<PanelBody className="editor-advanced-controls" title={ __( 'Advanced' ) }>
 				{ false !== blockType.className &&
 					<InspectorControls.TextControl
 						label={ __( 'Additional CSS Class' ) }
@@ -95,7 +94,7 @@ class BlockInspectorAdvancedControls extends Component {
 						}
 					</div>
 				}
-			</div>
+			</PanelBody>
 		);
 	}
 }

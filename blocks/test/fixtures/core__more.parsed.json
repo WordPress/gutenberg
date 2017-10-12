@@ -2,7 +2,6 @@
     {
         "blockName": "core/more",
         "attrs": {
-            "customText": null,
             "noTeaser": false
         },
         "rawContent": ""

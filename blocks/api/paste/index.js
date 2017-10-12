@@ -19,9 +19,12 @@ import msListConverter from './ms-list-converter';
 import listMerger from './list-merger';
 import imageCorrector from './image-corrector';
 import blockquoteNormaliser from './blockquote-normaliser';
-import { deepFilter, isInvalidInline, isNotWhitelisted } from './utils';
+import tableNormaliser from './table-normaliser';
+import inlineContentConverter from './inline-content-converter';
+import { deepFilterHTML, isInvalidInline, isNotWhitelisted, isPlain, isInline } from './utils';
+import showdown from 'showdown';
 
-export default function( { content: HTML, inline } ) {
+export default function( { HTML, plainText, inline } ) {
 	HTML = HTML.replace( /<meta[^>]+>/, '' );
 
 	// Block delimiters detected.
@@ -29,20 +32,31 @@ export default function( { content: HTML, inline } ) {
 		return parseWithGrammar( HTML );
 	}
 
-	// Context dependent filters. Needs to run before we remove nodes.
-	HTML = deepFilter( HTML, [
-		msListConverter,
-	] );
+	if ( plainText && isPlain( HTML ) && plainText.indexOf( '\n\n' ) !== -1 ) {
+		const converter = new showdown.Converter();
 
-	HTML = deepFilter( HTML, [
+		converter.setOption( 'noHeaderId', true );
+		converter.setOption( 'tables', true );
+
+		HTML = converter.makeHtml( plainText );
+	} else {
+		// Context dependent filters. Needs to run before we remove nodes.
+		HTML = deepFilterHTML( HTML, [
+			msListConverter,
+		] );
+	}
+
+	HTML = deepFilterHTML( HTML, [
 		listMerger,
 		imageCorrector,
 		// Add semantic formatting before attributes are stripped.
 		formattingTransformer,
 		stripAttributes,
 		commentRemover,
-		createUnwrapper( isNotWhitelisted ),
+		createUnwrapper( ( node ) => isNotWhitelisted( node ) || ( inline && ! isInline( node ) ) ),
 		blockquoteNormaliser,
+		tableNormaliser,
+		inlineContentConverter,
 	] );
 
 	// Inline paste.
@@ -53,7 +67,7 @@ export default function( { content: HTML, inline } ) {
 		return HTML;
 	}
 
-	HTML = deepFilter( HTML, [
+	HTML = deepFilterHTML( HTML, [
 		createUnwrapper( isInvalidInline ),
 	] );
 

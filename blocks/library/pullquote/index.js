@@ -12,6 +12,8 @@ import { registerBlockType, source } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
+import InspectorControls from '../../inspector-controls';
+import BlockDescription from '../../block-description';
 
 const { children, query, node } = source;
 
@@ -50,6 +52,13 @@ registerBlockType( 'core/pullquote', {
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 
 		return [
+			focus && (
+				<InspectorControls key="inspector">
+					<BlockDescription>
+						<p>{ __( 'A pullquote is a brief, attention-catching quotation taken from the main text of an article and used as a subheading or graphic feature.' ) }</p>
+					</BlockDescription>
+				</InspectorControls>
+			),
 			focus && (
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar
