@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Spinner, Button } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -10,29 +10,14 @@ import { __ } from '@wordpress/i18n';
 import './style.scss';
 
 function ReusableBlockEditPanel( props ) {
-	const { isEditing, name, isSaving, saveError, onEdit, onDetach, onChangeName, onSave, onCancel } = props;
+	const { isEditing, name, isSaving, onEdit, onDetach, onChangeName, onSave, onCancel } = props;
 
 	return (
 		<div className="reusable-block-edit-panel">
-			{ ! isEditing && [
-				isSaving && <Spinner key="spinner" className="reusable-block-edit-panel__spinner" />,
-				isSaving && (
-					<span key="info" className="reusable-block-edit-panel__info">
-						{ __( 'Saving…' ) }
-					</span>
-				),
-				saveError && (
-					<span key="info" className="reusable-block-edit-panel__info">
-						{ saveError.message }
-						&nbsp;
-						<button className="button-link" onClick={ onSave }>{ __( 'Try again' ) }</button>
-					</span>
-				),
-				! isSaving && ! saveError && (
-					<span key="info" className="reusable-block-edit-panel__info">
-						<b>{ name }</b>
-					</span>
-				),
+			{ ! isEditing && ! isSaving && [
+				<span key="info" className="reusable-block-edit-panel__info">
+					<b>{ name }</b>
+				</span>,
 				<Button
 					key="edit"
 					isLarge
@@ -48,10 +33,11 @@ function ReusableBlockEditPanel( props ) {
 					{ __( 'Detach' ) }
 				</Button>,
 			] }
-			{ isEditing && [
+			{ ( isEditing || isSaving ) && [
 				<input
 					key="name"
 					type="text"
+					disabled={ isSaving }
 					className="reusable-block-edit-panel__name"
 					value={ name }
 					onChange={ ( event ) => onChangeName( event.target.value ) } />,
@@ -59,7 +45,8 @@ function ReusableBlockEditPanel( props ) {
 					key="save"
 					isPrimary
 					isLarge
-					disabled={ ! name }
+					isIndicatingProgress={ isSaving }
+					disabled={ ! name || isSaving }
 					className="reusable-block-edit-panel__button"
 					onClick={ onSave }>
 					{ __( 'Save' ) }
@@ -67,6 +54,7 @@ function ReusableBlockEditPanel( props ) {
 				<Button
 					key="cancel"
 					isLarge
+					disabled={ isSaving }
 					className="reusable-block-edit-panel__button"
 					onClick={ onCancel }>
 					{ __( 'Cancel' ) }

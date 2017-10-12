@@ -198,6 +198,6 @@ describe( 'PublishButton', () => {
 			<PublishButton user={ user } isSaving />
 		);
 
-		expect( wrapper.hasClass( 'is-saving' ) ).toBe( true );
+		expect( wrapper.prop( 'isIndicatingProgress' ) ).toBe( true );
 	} );
 } );

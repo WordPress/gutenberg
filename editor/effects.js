@@ -50,6 +50,7 @@ import {
 
 const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
 const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
+const SAVE_REUSABLE_BLOCK_NOTICE_ID = 'SAVE_REUSABLE_BLOCK_NOTICE_ID';
 
 export default {
 	REQUEST_POST_UPDATE( action, store ) {
@@ -325,20 +326,18 @@ export default {
 
 		new wp.api.models.ReusableBlocks( { id, name, content } ).save().then(
 			() => {
-				dispatch( {
-					type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
-					id,
-				} );
+				dispatch( { type: 'SAVE_REUSABLE_BLOCK_SUCCESS', id } );
+				dispatch( createSuccessNotice(
+					__( 'Reusable block updated' ),
+					{ id: SAVE_REUSABLE_BLOCK_NOTICE_ID }
+				) );
 			},
 			( error ) => {
-				dispatch( {
-					type: 'SAVE_REUSABLE_BLOCK_FAILURE',
-					id,
-					error: error.responseJSON || {
-						code: 'unknown_error',
-						message: __( 'An unknown error occurred.' ),
-					},
-				} );
+				dispatch( { type: 'SAVE_REUSABLE_BLOCK_FAILURE', id } );
+				dispatch( createErrorNotice(
+					get( error.responseJSON, 'message', __( 'An unknown error occured' ) ),
+					{ id: SAVE_REUSABLE_BLOCK_NOTICE_ID }
+				) );
 			}
 		);
 	},

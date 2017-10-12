@@ -558,7 +558,6 @@ export function reusableBlocks( state = {}, action ) {
 				[ reusableBlock.id ]: {
 					...reusableBlock,
 					isSaving: false,
-					saveError: null,
 				},
 			} ), state );
 		}
@@ -577,7 +576,6 @@ export function reusableBlocks( state = {}, action ) {
 						...reusableBlock.attributes,
 					},
 					isSaving: false,
-					saveError: null,
 				},
 			};
 		}
@@ -590,21 +588,19 @@ export function reusableBlocks( state = {}, action ) {
 				[ id ]: {
 					...state[ id ],
 					isSaving: true,
-					saveError: null,
 				},
 			};
 		}
 
 		case 'SAVE_REUSABLE_BLOCK_SUCCESS':
 		case 'SAVE_REUSABLE_BLOCK_FAILURE': {
-			const { id, error = null } = action;
+			const { id } = action;
 
 			return {
 				...state,
 				[ id ]: {
 					...state[ id ],
 					isSaving: false,
-					saveError: error,
 				},
 			};
 		}

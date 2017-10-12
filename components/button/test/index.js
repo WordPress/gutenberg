@@ -50,6 +50,11 @@ describe( 'Button', () => {
 			expect( button.hasClass( 'is-toggled' ) ).toBe( true );
 		} );
 
+		it( 'should render a button element with is-indicating-progress class', () => {
+			const button = shallow( <Button isIndicatingProgress /> );
+			expect( button.hasClass( 'is-indicating-progress' ) ).toBe( true );
+		} );
+
 		it( 'should add a disabled prop to the button', () => {
 			const button = shallow( <Button disabled /> );
 			expect( button.prop( 'disabled' ) ).toBe( true );

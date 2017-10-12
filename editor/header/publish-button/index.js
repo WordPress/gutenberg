@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import classnames from 'classnames';
 import { flowRight } from 'lodash';
 
 /**
@@ -61,10 +60,6 @@ export function PublishButton( {
 		publishStatus = 'publish';
 	}
 
-	const className = classnames( 'editor-publish-button', {
-		'is-saving': isSaving,
-	} );
-
 	const onClick = () => {
 		onStatusChange( publishStatus );
 		onSave();
@@ -74,9 +69,10 @@ export function PublishButton( {
 		<Button
 			isPrimary
 			isLarge
+			isIndicatingProgress={ isSaving }
 			onClick={ onClick }
 			disabled={ ! isButtonEnabled }
-			className={ className }
+			className="editor-publish-button"
 		>
 			{ buttonText }
 		</Button>

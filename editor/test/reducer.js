@@ -1066,7 +1066,6 @@ describe( 'state', () => {
 				[ reusableBlock.id ]: {
 					...reusableBlock,
 					isSaving: false,
-					saveError: null,
 				},
 			} );
 		} );
@@ -1091,7 +1090,6 @@ describe( 'state', () => {
 				[ reusableBlock.id ]: {
 					...reusableBlock,
 					isSaving: false,
-					saveError: null,
 				},
 			} );
 		} );
@@ -1108,7 +1106,6 @@ describe( 'state', () => {
 						dropCap: true,
 					},
 					isSaving: false,
-					saveError: null,
 				},
 			};
 
@@ -1133,7 +1130,6 @@ describe( 'state', () => {
 						dropCap: true,
 					},
 					isSaving: false,
-					saveError: null,
 				},
 			} );
 		} );
@@ -1144,7 +1140,6 @@ describe( 'state', () => {
 				[ id ]: {
 					id,
 					isSaving: false,
-					saveError: null,
 				},
 			};
 
@@ -1157,7 +1152,6 @@ describe( 'state', () => {
 				[ id ]: {
 					id,
 					isSaving: true,
-					saveError: null,
 				},
 			} );
 		} );
@@ -1168,7 +1162,6 @@ describe( 'state', () => {
 				[ id ]: {
 					id,
 					isSaving: true,
-					saveError: null,
 				},
 			};
 
@@ -1181,7 +1174,6 @@ describe( 'state', () => {
 				[ id ]: {
 					id,
 					isSaving: false,
-					saveError: null,
 				},
 			} );
 		} );
@@ -1192,21 +1184,18 @@ describe( 'state', () => {
 				[ id ]: {
 					id,
 					isSaving: true,
-					saveError: null,
 				},
 			};
 
 			const state = reusableBlocks( initialState, {
 				type: 'SAVE_REUSABLE_BLOCK_FAILURE',
 				id,
-				error: { message: 'Save failed' },
 			} );
 
 			expect( state ).toEqual( {
 				[ id ]: {
 					id,
 					isSaving: false,
-					saveError: { message: 'Save failed' },
 				},
 			} );
 		} );

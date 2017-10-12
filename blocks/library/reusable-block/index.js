@@ -102,7 +102,6 @@ class ReusableBlockEdit extends Component {
 					isEditing={ isEditing }
 					name={ name !== null ? name : reusableBlock.name }
 					isSaving={ reusableBlock.isSaving }
-					saveError={ reusableBlock.saveError }
 					onEdit={ this.startEditing }
 					onDetach={ convertBlockToStatic }
 					onChangeName={ this.setName }
