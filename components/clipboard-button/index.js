@@ -15,11 +15,15 @@ import { findDOMNode, Component } from '@wordpress/element';
  */
 import { Button } from '../';
 
+// This creates a container to put the textarea in which isn't removed by react
+// If react removes the textarea first, then the clipboard fails when trying to remove it
 class ClipboardContainer extends Component {
 	componentDidMount() {
 		const { text, buttonNode, onCopy = noop } = this.props;
 		this.clipboard = new Clipboard( buttonNode, {
 			text: () => text,
+			// If we put the textarea in a specific container, then the focus stays
+			// within this container (for use in whenFocusOutside)
 			container: this.container,
 		} );
 		this.clipboard.on( 'success', onCopy );
@@ -30,7 +34,7 @@ class ClipboardContainer extends Component {
 		delete this.clipboard;
 	}
 
-	componentShouldUpate() {
+	shouldComponentUpdate() {
 		return false;
 	}
 
@@ -48,6 +52,8 @@ class ClipboardButton extends Component {
 	bindButton( ref ) {
 		if ( ref ) {
 			this.button = ref;
+			// Need to pass the button node down to use as the trigger
+			// The first rendering of ClipboardContainer it's null
 			this.forceUpdate();
 		}
 	}
