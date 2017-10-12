@@ -2210,6 +2210,25 @@
 		<script src="wp-includes/js/tinymce/plugins/wptextpattern/plugin.js"></script>
 		<script src="wp-includes/js/tinymce/tinymce-obsolete.js"></script>
 
+		<!-- Changeset locked notice template -->
+		<script type="text/html" id="tmpl-customize-changeset-locked-notice">
+			<div id="customize-changeset-lock-dialog" class="notification-dialog-wrap hidden">
+				<div class="notification-dialog-background"></div>
+				<div class="notification-dialog">
+					<div class="customize-changeset-locked-message">
+						<div class="customize-changeset-locked-avatar"></div>
+						<p class="currently-editing wp-tab-first" tabindex="0">
+							<span class="customize-notice-user-name"></span> <span class="customize-take-over-message">is already customizing this site. Do you want to take over?</span></p>
+						<p>
+							<a class="button customize-notice-go-back-button" href="/wp-admin/post.php?post=505&#038;action=edit">Go back</a>
+							<a class="button customize-notice-preview-button" href="http://example.org/?customize_changeset_uuid=7a796f7a-255c-49f5-9d25-cef0c315a4ba">Preview</a>
+							<a class="button button-primary wp-tab-last customize-notice-take-over-button" href="http://example.org/wp-admin/customize.php?changeset_uuid=7a796f7a-255c-49f5-9d25-cef0c315a4ba&action=customize_take_over_changeset&nonce=e3a1df16d2&return=/wp-admin/post.php?post=505&action=edit">Take over</a>
+						</p>
+					</div>
+				</div>
+			</div>
+		</script>
+
 		<!-- Updates templates and HTML fixtures -->
 		<script id="tmpl-wp-updates-admin-notice" type="text/html">
 			<div <# if ( data.id ) { #>id="{{ data.id }}"<# } #> class="notice {{ data.className }}"><p>{{{ data.message }}}</p></div>

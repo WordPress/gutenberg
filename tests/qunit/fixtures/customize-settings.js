@@ -167,7 +167,8 @@ window._wpCustomizeSettings = {
 		currentUserCanPublish: false,
 		hasAutosaveRevision: false,
 		latestAutoDraftUuid: '341b06f6-3c1f-454f-96df-3cf197f3e347',
-		publishDate: ''
+		publishDate: '',
+		locked: false
 	},
 	timeouts: {
 		windowRefresh: 250,

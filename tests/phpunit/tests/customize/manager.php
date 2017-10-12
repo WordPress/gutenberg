@@ -1455,7 +1455,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 			),
 			'autosave' => true,
 		) );
-		$this->assertFalse( wp_get_post_autosave( $changeset_post_id ) );
+		$this->assertFalse( wp_get_post_autosave( $changeset_post_id, get_current_user_id() ) );
 		$this->assertContains( 'Autosaved Auto-draft Title', get_post( $changeset_post_id )->post_content );
 
 		// Update status to draft for subsequent tests.
@@ -1493,7 +1493,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$this->assertEquals( 'illegal_autosave_with_non_current_user', $r->get_error_code() );
 
 		// Try autosave.
-		$this->assertFalse( wp_get_post_autosave( $changeset_post_id ) );
+		$this->assertFalse( wp_get_post_autosave( $changeset_post_id, get_current_user_id() ) );
 		$r = $wp_customize->save_changeset_post( array(
 			'data' => array(
 				'blogname' => array(
@@ -1505,7 +1505,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$this->assertInternalType( 'array', $r );
 
 		// Verify that autosave happened.
-		$autosave_revision = wp_get_post_autosave( $changeset_post_id );
+		$autosave_revision = wp_get_post_autosave( $changeset_post_id, get_current_user_id() );
 		$this->assertInstanceOf( 'WP_Post', $autosave_revision );
 		$this->assertContains( 'Draft Title', get_post( $changeset_post_id )->post_content );
 		$this->assertContains( 'Autosave Title', $autosave_revision->post_content );
@@ -2635,6 +2635,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 				'currentUserCanPublish',
 				'publishDate',
 				'statusChoices',
+				'lockUser',
 			),
 			array_keys( $data['changeset'] )
 		);
