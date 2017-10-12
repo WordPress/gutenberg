@@ -76,19 +76,17 @@ registerBlockType( 'core/video', {
 				/>
 
 				<Toolbar>
-					<li>
-						<MediaUploadButton
-							buttonProps={ {
-								className: 'components-icon-button components-toolbar__control',
-								'aria-label': __( 'Edit video' ),
-							} }
-							onSelect={ onSelectVideo }
-							type="video"
-							value={ id }
-						>
-							<Dashicon icon="edit" />
-						</MediaUploadButton>
-					</li>
+					<MediaUploadButton
+						buttonProps={ {
+							className: 'components-icon-button components-toolbar__control',
+							'aria-label': __( 'Edit video' ),
+						} }
+						onSelect={ onSelectVideo }
+						type="video"
+						value={ id }
+					>
+						<Dashicon icon="edit" />
+					</MediaUploadButton>
 				</Toolbar>
 			</BlockControls>,
 

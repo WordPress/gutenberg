@@ -5,15 +5,13 @@
 	display: inline-flex;
 }
 
-ul.components-toolbar {
-	list-style-type: none;
-
-	&> li {
+div.components-toolbar {
+	&> div {
 		display: inline-flex;
 		margin: 0;
 	}
 
-	&> li + li {
+	&> div + div {
 		margin-left: -3px;
 
 		&.has-left-divider {

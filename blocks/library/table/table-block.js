@@ -113,17 +113,15 @@ export default class TableBlock extends Component {
 			focus && (
 				<BlockControls key="menu">
 					<Toolbar>
-						<li>
-							<DropdownMenu
-								icon="editor-table"
-								label={ __( 'Edit Table' ) }
-								controls={
-									TABLE_CONTROLS.map( ( control ) => ( {
-										...control,
-										onClick: () => control.onClick( this.state.editor ),
-									} ) ) }
-							/>
-						</li>
+						<DropdownMenu
+							icon="editor-table"
+							label={ __( 'Edit Table' ) }
+							controls={
+								TABLE_CONTROLS.map( ( control ) => ( {
+									...control,
+									onClick: () => control.onClick( this.state.editor ),
+								} ) ) }
+						/>
 					</Toolbar>
 				</BlockControls>
 			),

@@ -98,19 +98,17 @@ class ImageBlock extends Component {
 					/>
 
 					<Toolbar>
-						<li>
-							<MediaUploadButton
-								buttonProps={ {
-									className: 'components-icon-button components-toolbar__control',
-									'aria-label': __( 'Edit image' ),
-								} }
-								onSelect={ this.onSelectImage }
-								type="image"
-								value={ id }
-							>
-								<Dashicon icon="edit" />
-							</MediaUploadButton>
-						</li>
+						<MediaUploadButton
+							buttonProps={ {
+								className: 'components-icon-button components-toolbar__control',
+								'aria-label': __( 'Edit image' ),
+							} }
+							onSelect={ this.onSelectImage }
+							type="image"
+							value={ id }
+						>
+							<Dashicon icon="edit" />
+						</MediaUploadButton>
 						<UrlInputButton onChange={ this.onSetHref } url={ href } />
 					</Toolbar>
 				</BlockControls>
