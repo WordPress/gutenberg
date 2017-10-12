@@ -728,6 +728,17 @@ export function getBlockFocus( state, uid ) {
 
 	return state.blockSelection.focus;
 }
+
+/**
+ * Whether in the process of multi-selecting or not.
+ *
+ * @param  {Object} state Global application state
+ * @return {Boolean}      True if multi-selecting, false if not.
+ */
+export function isMultiSelecting( state ) {
+	return !! state.blockSelection.isMultiSelecting;
+}
+
 /**
  * Returns thee block's editing mode
  *

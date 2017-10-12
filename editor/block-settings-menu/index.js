@@ -40,7 +40,7 @@ class BlockSettingsMenu extends Component {
 
 	render() {
 		const { opened } = this.state;
-		const { uids } = this.props;
+		const { uids, focus } = this.props;
 		const toggleClassname = classnames( 'editor-block-settings-menu__toggle', 'editor-block-settings-menu__control', {
 			'is-opened': opened,
 		} );
@@ -52,6 +52,7 @@ class BlockSettingsMenu extends Component {
 					onClick={ this.toggleMenu }
 					icon="ellipsis"
 					label={ opened ? __( 'Close Settings Menu' ) : __( 'Open Settings Menu' ) }
+					focus={ focus }
 				/>
 
 				{ opened && <BlockSettingsMenuContent uids={ uids } /> }

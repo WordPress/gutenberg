@@ -25,7 +25,7 @@ import {
 	getMultiSelectedBlocks,
 	getMultiSelectedBlockUids,
 } from '../../selectors';
-import { insertBlock, multiSelect } from '../../actions';
+import { insertBlock, startMultiSelect, stopMultiSelect, multiSelect } from '../../actions';
 
 const INSERTION_POINT_PLACEHOLDER = '[[insertion-point]]';
 
@@ -138,6 +138,8 @@ class VisualEditorBlockList extends Component {
 		// Capture scroll on all elements.
 		window.addEventListener( 'scroll', this.onScroll, true );
 		window.addEventListener( 'mouseup', this.onSelectionEnd );
+
+		this.props.onStartMultiSelect();
 	}
 
 	onSelectionChange( uid ) {
@@ -169,6 +171,8 @@ class VisualEditorBlockList extends Component {
 		window.removeEventListener( 'mousemove', this.onPointerMove );
 		window.removeEventListener( 'scroll', this.onScroll, true );
 		window.removeEventListener( 'mouseup', this.onSelectionEnd );
+
+		this.props.onStopMultiSelect();
 	}
 
 	appendDefaultBlock() {
@@ -243,6 +247,12 @@ export default connect(
 	( dispatch ) => ( {
 		onInsertBlock( block ) {
 			dispatch( insertBlock( block ) );
+		},
+		onStartMultiSelect() {
+			dispatch( startMultiSelect() );
+		},
+		onStopMultiSelect() {
+			dispatch( stopMultiSelect() );
 		},
 		onMultiSelect( start, end ) {
 			dispatch( multiSelect( start, end ) );

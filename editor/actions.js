@@ -108,6 +108,18 @@ export function selectBlock( uid ) {
 	};
 }
 
+export function startMultiSelect() {
+	return {
+		type: 'START_MULTI_SELECT',
+	};
+}
+
+export function stopMultiSelect() {
+	return {
+		type: 'STOP_MULTI_SELECT',
+	};
+}
+
 export function multiSelect( start, end ) {
 	return {
 		type: 'MULTI_SELECT',

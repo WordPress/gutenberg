@@ -314,6 +314,13 @@ export function blockSelection( state = { start: null, end: null, focus: null },
 				end: null,
 				focus: null,
 			};
+		case 'START_MULTI_SELECT':
+			return {
+				...state,
+				isMultiSelecting: true,
+			};
+		case 'STOP_MULTI_SELECT':
+			return omit( state, 'isMultiSelecting' );
 		case 'MULTI_SELECT':
 			return {
 				start: action.start,

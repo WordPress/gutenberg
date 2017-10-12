@@ -40,6 +40,7 @@ import {
 import {
 	getBlock,
 	getBlockFocus,
+	isMultiSelecting,
 	getBlockIndex,
 	getEditedPostAttribute,
 	getMultiSelectedBlockUids,
@@ -306,12 +307,13 @@ class VisualEditorBlock extends Component {
 		// Generate the wrapper class names handling the different states of the block.
 		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected, focus } = this.props;
 		const showUI = isSelected && ( ! this.props.isTyping || focus.collapsed === false );
+		const isProperlyHovered = isHovered && ! this.props.isSelecting;
 		const { error } = this.state;
 		const wrapperClassname = classnames( 'editor-visual-editor__block', {
 			'has-warning': ! isValid || !! error,
 			'is-selected': showUI,
 			'is-multi-selected': isMultiSelected,
-			'is-hovered': isHovered,
+			'is-hovered': isProperlyHovered,
 		} );
 
 		const { onMouseLeave, onFocus, onReplace } = this.props;
@@ -339,11 +341,18 @@ class VisualEditorBlock extends Component {
 				{ ...wrapperProps }
 			>
 				<BlockDropZone index={ order } />
-				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
-				{ ( showUI || isHovered ) && <BlockRightMenu uids={ [ block.uid ] } /> }
+				{ ( showUI || isProperlyHovered ) && <BlockMover uids={ [ block.uid ] } /> }
+				{ ( showUI || isProperlyHovered ) && <BlockRightMenu uids={ [ block.uid ] } /> }
 				{ showUI && isValid && mode === 'visual' && <BlockToolbar uid={ block.uid } /> }
-				{ isFirstMultiSelected && <BlockMover uids={ multiSelectedBlockUids } /> }
-				{ isFirstMultiSelected && <BlockRightMenu uids={ multiSelectedBlockUids } /> }
+				{ isFirstMultiSelected && ! this.props.isSelecting &&
+					<BlockMover uids={ multiSelectedBlockUids } />
+				}
+				{ isFirstMultiSelected && ! this.props.isSelecting &&
+					<BlockRightMenu
+						uids={ multiSelectedBlockUids }
+						focus={ true }
+					/>
+				}
 				<div
 					ref={ this.bindBlockNode }
 					onKeyPress={ this.maybeStartTyping }
@@ -403,6 +412,7 @@ export default connect(
 			isFirstMultiSelected: isFirstMultiSelectedBlock( state, ownProps.uid ),
 			isHovered: isBlockHovered( state, ownProps.uid ),
 			focus: getBlockFocus( state, ownProps.uid ),
+			isSelecting: isMultiSelecting( state ),
 			isTyping: isTyping( state ),
 			order: getBlockIndex( state, ownProps.uid ),
 			multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
