@@ -36,6 +36,7 @@ function DropdownMenu( {
 			renderToggle={ ( { isOpen, onToggle } ) => {
 				const openOnArrowDown = ( event ) => {
 					if ( ! isOpen && event.keyCode === DOWN ) {
+						event.preventDefault();
 						event.stopPropagation();
 						onToggle();
 					}
@@ -61,6 +62,7 @@ function DropdownMenu( {
 			renderContent={ ( { onClose, onToggle } ) => {
 				const closeOnEscape = ( event ) => {
 					if ( event.keyCode === ESCAPE ) {
+						event.preventDefault();
 						event.stopPropagation();
 						onToggle();
 					}
