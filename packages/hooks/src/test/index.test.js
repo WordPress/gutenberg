@@ -54,9 +54,9 @@ const consoleErrorOriginal = console.error;
 beforeEach( () => {
 	window.actionValue = '';
 	// Reset state in between tests (clear all callbacks, `testObject.hooks.didAction` counts,
-	// etc.)  Just reseting HOOKS.actions and HOOKS.filters is not enough
+	// etc.)  Just reseting actions and filters is not enough
 	// because the internal functions have references to the original objects.
-	[ testObject.hooks.HOOKS.actions, testObject.hooks.HOOKS.filters ].forEach( hooks => {
+	[ testObject.hooks.actions, testObject.hooks.filters ].forEach( hooks => {
 		for ( const k in hooks ) {
 			delete hooks[ k ];
 		}
