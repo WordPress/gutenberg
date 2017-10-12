@@ -73,31 +73,32 @@ function BlockSwitcher( { block, onTransform } ) {
 				);
 			} }
 			renderContent={ ( { onClose } ) => (
-				<NavigableMenu
-					className="editor-block-switcher__menu"
-					role="menu"
-					aria-label={ __( 'Block types' ) }
-				>
+				<div>
 					<span
 						className="editor-block-switcher__menu-title"
 					>
 						{ __( 'Transform into:' ) }
 					</span>
-					{ allowedBlocks.map( ( { name, title, icon } ) => (
-						<IconButton
-							key={ name }
-							onClick={ () => {
-								onTransform( block, name );
-								onClose();
-							} }
-							className="editor-block-switcher__menu-item"
-							icon={ icon }
-							role="menuitem"
-						>
-							{ title }
-						</IconButton>
-					) ) }
-				</NavigableMenu>
+					<NavigableMenu
+						role="menu"
+						aria-label={ __( 'Block types' ) }
+					>
+						{ allowedBlocks.map( ( { name, title, icon } ) => (
+							<IconButton
+								key={ name }
+								onClick={ () => {
+									onTransform( block, name );
+									onClose();
+								} }
+								className="editor-block-switcher__menu-item"
+								icon={ icon }
+								role="menuitem"
+							>
+								{ title }
+							</IconButton>
+						) ) }
+					</NavigableMenu>
+				</div>
 			) }
 		/>
 	);
