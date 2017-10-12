@@ -168,15 +168,20 @@ export function getBlockContent( block ) {
 /**
  * Returns the content of a block, including comment delimiters.
  *
- * @param  {String} blockName  Block name
- * @param  {Object} attributes Block attributes
- * @param  {String} content    Block save content
- * @return {String}            Comment-delimited block content
+ * @param  {String} rawBlockName  Block name
+ * @param  {Object} attributes    Block attributes
+ * @param  {String} content       Block save content
+ * @return {String}               Comment-delimited block content
  */
-export function getCommentDelimitedContent( blockName, attributes, content ) {
+export function getCommentDelimitedContent( rawBlockName, attributes, content ) {
 	const serializedAttributes = ! isEmpty( attributes )
 		? serializeAttributes( attributes ) + ' '
 		: '';
+
+	// strip core blocks of their namespace prefix
+	const blockName = rawBlockName.startsWith( 'core/' )
+		? rawBlockName.slice( 5 )
+		: rawBlockName;
 
 	if ( ! content ) {
 		return `<!-- wp:${ blockName } ${ serializedAttributes }/-->`;
