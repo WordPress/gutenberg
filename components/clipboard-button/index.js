@@ -15,13 +15,12 @@ import { findDOMNode, Component } from '@wordpress/element';
  */
 import { Button } from '../';
 
-class ClipboardButton extends Component {
+class ClipboardContainer extends Component {
 	componentDidMount() {
-		const { text, onCopy = noop } = this.props;
-		const button = findDOMNode( this.button );
-		this.clipboard = new Clipboard( button, {
+		const { text, buttonNode, onCopy = noop } = this.props;
+		this.clipboard = new Clipboard( buttonNode, {
 			text: () => text,
-			// container: button,
+			container: this.container,
 		} );
 		this.clipboard.on( 'success', onCopy );
 	}
@@ -31,16 +30,38 @@ class ClipboardButton extends Component {
 		delete this.clipboard;
 	}
 
+	componentShouldUpate() {
+		return false;
+	}
+
 	render() {
-		const { className, children } = this.props;
+		return <div ref={ ref => this.container = ref } />;
+	}
+}
+
+class ClipboardButton extends Component {
+	constructor() {
+		super( ...arguments );
+		this.bindButton = this.bindButton.bind( this );
+	}
+
+	bindButton( ref ) {
+		if ( ref ) {
+			this.button = ref;
+			this.forceUpdate();
+		}
+	}
+	render() {
+		const { className, children, onCopy, text } = this.props;
 		const classes = classnames( 'components-clipboard-button', className );
 
 		return (
 			<Button
-				ref={ ref => this.button = ref }
+				ref={ this.bindButton }
 				className={ classes }
 			>
 				{ children }
+				{ this.button && <ClipboardContainer buttonNode={ findDOMNode( this.button ) } onCopy={ onCopy }  		text={ text } /> }
 			</Button>
 		);
 	}

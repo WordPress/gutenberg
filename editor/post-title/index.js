@@ -72,7 +72,9 @@ class PostTitle extends Component {
 	}
 
 	focusText() {
+		console.log('focusing');
 		this.textareaContainer.textarea.focus();
+		console.log('focusing.done');
 	}
 
 	onChange( event ) {
