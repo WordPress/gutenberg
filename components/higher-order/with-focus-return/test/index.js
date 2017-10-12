@@ -7,7 +7,7 @@ import { Component } from '../../../../element';
 /**
  * Internal dependencies
  */
-import withFocusReturn from '../';
+import withFocusReturn, { withFocusReturnWrapperProps } from '../';
 
 class Test extends Component {
 	render() {
@@ -72,5 +72,13 @@ describe( 'withFocusReturn()', () => {
 			mountedComposite.unmount();
 			expect( document.activeElement ).toBe( activeElement );
 		} );
+	} );
+} );
+
+describe( 'withFocusReturnWrapperProps()', () => {
+	it( 'adds props to wrapper div', () => {
+		const Composite = withFocusReturnWrapperProps( { className: 'foo' } )( Test );
+		const renderedComposite = shallow( <Composite /> );
+		expect( renderedComposite.find( '.foo' ).length ).toEqual( 1 );
 	} );
 } );

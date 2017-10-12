@@ -8,12 +8,14 @@ import { Component } from '@wordpress/element';
  * When mounting the wrapped component, we track a reference to the current active element
  * so we know where to restore focus when the component is unmounted
  *
- * @param {WPElement}  WrappedComponent  The disposable component
+ * @param {WPElement}  wrapperProps  props to apply to the wrapper div
+ *
+ * @param {WPElement}  OriginalComponent  The disposable component
  *
  * @return {Component}                   Component with the focus restauration behaviour
  */
-function withFocusReturn( WrappedComponent ) {
-	return class extends Component {
+export const withFocusReturnWrapperProps = ( wrapperProps ) => ( OriginalComponent ) =>
+	class extends Component {
 		constructor() {
 			super( ...arguments );
 
@@ -42,12 +44,12 @@ function withFocusReturn( WrappedComponent ) {
 				<div
 					onFocus={ this.setIsFocusedTrue }
 					onBlur={ this.setIsFocusedFalse }
+					{ ...wrapperProps }
 				>
-					<WrappedComponent { ...this.props } />
+					<OriginalComponent { ...this.props } />
 				</div>
 			);
 		}
 	};
-}
 
-export default withFocusReturn;
+export default withFocusReturnWrapperProps( {} );
