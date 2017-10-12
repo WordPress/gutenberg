@@ -6,10 +6,10 @@ import createCurrentHook from './createCurrentHook';
 import createDoingHook from './createDoingHook';
 import createDidHook from './createDidHook';
 
-
-export const createHooks = () => {
+function createHooks() {
 	const actions = {};
 	const filters = {};
+
 	return {
 		addAction:        createAddHook( actions ),
 		addFilter:        createAddHook( filters ),
@@ -31,3 +31,4 @@ export const createHooks = () => {
 		filters:          filters,
 	};
 };
+export default createHooks;

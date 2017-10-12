@@ -3,9 +3,7 @@
 /**
  * Internal dependencies
  */
-import {
-	createHooks,
-} from '../';
+import createHooks from '../';
 
 const testObject = {};
 testObject.hooks = createHooks();
