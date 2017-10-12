@@ -59,7 +59,6 @@ function BlockSwitcher( { block, onTransform } ) {
 				<NavigableMenu
 					className="editor-block-switcher__menu"
 					role="menu"
-					tabIndex="0"
 					aria-label={ __( 'Block types' ) }
 				>
 					<span

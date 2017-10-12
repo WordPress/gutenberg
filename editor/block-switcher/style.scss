@@ -22,6 +22,10 @@
 	}
 }
 
+.editor-block-switcher__popover .components-popover__content {
+	width: 200px;
+}
+
 .editor-block-switcher__menu {
 	box-shadow: $shadow-popover;
 	border: 1px solid $light-gray-500;
