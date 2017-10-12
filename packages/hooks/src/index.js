@@ -8,28 +8,26 @@ import createDidHook from './createDidHook';
 
 
 export const createHooks = () => {
-	const HOOKS = {
-		actions: {},
-		filters: {},
-	};
-
+	const actions = {};
+	const filters = {};
 	return {
-		addAction:        createAddHook( HOOKS.actions ),
-		addFilter:        createAddHook( HOOKS.filters ),
-		removeAction:     createRemoveHook( HOOKS.actions ),
-		removeFilter:     createRemoveHook( HOOKS.filters ),
-		hasAction:        createHasHook( HOOKS.actions ),
-		hasFilter:        createHasHook( HOOKS.filters ),
-		removeAllActions: createRemoveHook( HOOKS.actions, true ),
-		removeAllFilters: createRemoveHook( HOOKS.filters, true ),
-		doAction:         createRunHook( HOOKS.actions ),
-		applyFilters:     createRunHook( HOOKS.filters, true ),
-		currentAction:    createCurrentHook( HOOKS.actions ),
-		currentFilter:    createCurrentHook( HOOKS.filters ),
-		doingAction:      createDoingHook( HOOKS.actions ),
-		doingFilter:      createDoingHook( HOOKS.filters ),
-		didAction:        createDidHook( HOOKS.actions ),
-		didFilter:        createDidHook( HOOKS.filters ),
-		HOOKS:            HOOKS,
+		addAction:        createAddHook( actions ),
+		addFilter:        createAddHook( filters ),
+		removeAction:     createRemoveHook( actions ),
+		removeFilter:     createRemoveHook( filters ),
+		hasAction:        createHasHook( actions ),
+		hasFilter:        createHasHook( filters ),
+		removeAllActions: createRemoveHook( actions, true ),
+		removeAllFilters: createRemoveHook( filters, true ),
+		doAction:         createRunHook( actions ),
+		applyFilters:     createRunHook( filters, true ),
+		currentAction:    createCurrentHook( actions ),
+		currentFilter:    createCurrentHook( filters ),
+		doingAction:      createDoingHook( actions ),
+		doingFilter:      createDoingHook( filters ),
+		didAction:        createDidHook( actions ),
+		didFilter:        createDidHook( filters ),
+		actions:          actions,
+		filters:          filters,
 	};
 };
