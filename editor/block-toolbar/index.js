@@ -1,6 +1,3 @@
-import { connect } from 'react-redux';
-
-
 /**
  * External dependencies
  */
@@ -174,4 +171,4 @@ class BlockToolbar extends Component {
 	}
 }
 
-export default BlockToolbar
+export default BlockToolbar;
