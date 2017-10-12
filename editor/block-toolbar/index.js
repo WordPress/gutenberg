@@ -107,7 +107,7 @@ class BlockToolbar extends Component {
 
 		switch ( event.keyCode ) {
 			case ESCAPE: {
-			 	this.props.refocusBlock( this.props.uid );
+				this.props.refocusBlock( this.props.uid );
 				break;
 			}
 			case LEFT:
