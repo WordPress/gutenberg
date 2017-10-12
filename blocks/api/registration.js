@@ -50,6 +50,12 @@ export function registerBlockType( name, settings ) {
 		);
 		return;
 	}
+	if ( /[A-Z]+/.test( name ) ) {
+		console.error(
+			'Block names must not contain uppercase characters.'
+		);
+		return;
+	}
 	if ( ! /^[a-z0-9-]+\/[a-z0-9-]+$/.test( name ) ) {
 		console.error(
 			'Block names must contain a namespace prefix. Example: my-plugin/my-custom-block'

@@ -148,7 +148,18 @@ WP_Block_End
   }
 
 WP_Block_Name
-  = $(ASCII_Letter (ASCII_AlphaNumeric / "/" ASCII_AlphaNumeric)*)
+  = WP_Namespaced_Block_Name
+  / WP_Core_Block_Name
+
+WP_Namespaced_Block_Name
+  = $(ASCII_Letter ASCII_AlphaNumeric* "/" ASCII_Letter ASCII_AlphaNumeric*)
+
+WP_Core_Block_Name
+  = type:$(ASCII_Letter ASCII_AlphaNumeric*)
+  {
+    /** <?php return "core/$type"; ?> **/
+    return 'core/' + type;
+  }
 
 WP_Block_Attributes
   = attrs:$("{" (!("}" WS+ """/"? "-->") .)* "}")

@@ -11,6 +11,8 @@ import {
 	reduce,
 	some,
 	values,
+	keys,
+	without,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -20,6 +22,11 @@ import createSelector from 'rememo';
 import { serialize, getBlockType } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
+
+/***
+ * Module constants
+ */
+const MAX_FREQUENT_BLOCKS = 3;
 
 /**
  * Returns the current editing mode.
@@ -704,6 +711,16 @@ export function getBlockFocus( state, uid ) {
 
 	return state.blockSelection.focus;
 }
+/**
+ * Returns thee block's editing mode
+ *
+ * @param  {Object} state Global application state
+ * @param  {String} uid   Block unique ID
+ * @return {Object}       Block editing mode
+ */
+export function getBlockMode( state, uid ) {
+	return state.blocksMode[ uid ] || 'visual';
+}
 
 /**
  * Returns true if the user is typing, or false otherwise.
@@ -854,3 +871,23 @@ export function getRecentlyUsedBlocks( state ) {
 	// resolves the block names in the state to the block type settings
 	return state.preferences.recentlyUsedBlocks.map( blockType => getBlockType( blockType ) );
 }
+
+/**
+ * Resolves the block usage stats into a list of the most frequently used blocks.
+ * Memoized so we're not generating block lists every time we render the list
+ * in the inserter.
+ *
+ * @param {Object} state Global application state
+ * @return {Array}       List of block type settings
+ */
+export const getMostFrequentlyUsedBlocks = createSelector(
+	( state ) => {
+		const { blockUsage } = state.preferences;
+		const orderedByUsage = keys( blockUsage ).sort( ( a, b ) => blockUsage[ b ] - blockUsage[ a ] );
+		// add in paragraph and image blocks if they're not already in the usage data
+		return [ ...orderedByUsage, ...without( [ 'core/paragraph', 'core/image' ], ...orderedByUsage ) ]
+			.slice( 0, MAX_FREQUENT_BLOCKS )
+			.map( blockType => getBlockType( blockType ) );
+	},
+	( state ) => state.preferences.blockUsage
+);

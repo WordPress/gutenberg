@@ -47,6 +47,18 @@
 		background: $light-gray-400;
 	}
 
+	&:focus {
+		b, i, strong, em, del, ins, sup, sub {
+			&[data-mce-selected] {
+				padding: 0 2px;
+				margin: 0 -2px;
+				border-radius: 2px;
+				box-shadow: 0 0 0 1px $light-gray-400;
+				background: $light-gray-400;
+			}
+		}
+	}
+
 	&[data-is-placeholder-visible="true"] {
 		position: absolute;
 		top: 0;

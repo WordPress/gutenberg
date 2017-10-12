@@ -105,6 +105,10 @@
 
 .editor-mode-switcher {
 	margin-left: $item-spacing;
+
+	.components-button svg {
+		transform: rotate( 90deg );
+	}
 }
 
 .editor-header__left .components-button {

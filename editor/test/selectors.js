@@ -54,6 +54,7 @@ import {
 	isFirstMultiSelectedBlock,
 	isBlockHovered,
 	getBlockFocus,
+	getBlockMode,
 	isTyping,
 	getBlockInsertionPoint,
 	isBlockInsertionPointVisible,
@@ -62,6 +63,7 @@ import {
 	didPostSaveRequestFail,
 	getSuggestedPostFormat,
 	getNotices,
+	getMostFrequentlyUsedBlocks,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -1504,6 +1506,26 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'geteBlockMode', () => {
+		it( 'should return "visual" if unset', () => {
+			const state = {
+				blocksMode: {},
+			};
+
+			expect( getBlockMode( state, 123 ) ).toEqual( 'visual' );
+		} );
+
+		it( 'should return the block mode', () => {
+			const state = {
+				blocksMode: {
+					123: 'html',
+				},
+			};
+
+			expect( getBlockMode( state, 123 ) ).toEqual( 'html' );
+		} );
+	} );
+
 	describe( 'isTyping', () => {
 		it( 'should return the isTyping flag if the block is selected', () => {
 			const state = {
@@ -1725,6 +1747,34 @@ describe( 'selectors', () => {
 				state.notices.b,
 				state.notices.a,
 			] );
+		} );
+	} );
+
+	describe( 'getMostFrequentlyUsedBlocks', () => {
+		it( 'should have paragraph and image to bring frequently used blocks up to three blocks', () => {
+			const noUsage = { preferences: { blockUsage: {} } };
+			const someUsage = { preferences: { blockUsage: { 'core/paragraph': 1 } } };
+
+			expect( getMostFrequentlyUsedBlocks( noUsage ).map( ( block ) => block.name ) )
+				.toEqual( [ 'core/paragraph', 'core/image' ] );
+
+			expect( getMostFrequentlyUsedBlocks( someUsage ).map( ( block ) => block.name ) )
+				.toEqual( [ 'core/paragraph', 'core/image' ] );
+		} );
+		it( 'should return the top 3 most recently used blocks', () => {
+			const state = {
+				preferences: {
+					blockUsage: {
+						'core/paragraph': 4,
+						'core/image': 11,
+						'core/quote': 2,
+						'core/gallery': 1,
+					},
+				},
+			};
+
+			expect( getMostFrequentlyUsedBlocks( state ).map( ( block ) => block.name ) )
+				.toEqual( [ 'core/image', 'core/paragraph', 'core/quote' ] );
 		} );
 	} );
 } );
