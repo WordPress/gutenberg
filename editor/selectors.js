@@ -397,13 +397,23 @@ export const getBlock = createSelector(
 			return result;
 		}, {} );
 
-		if ( ! Object.keys( metaAttributes ).length ) {
+		const optionAttributes = reduce( type.attributes, ( result, value, key ) => {
+			if ( value && ( 'option' in value ) ) {
+				result[ key ] = getSiteOption( state, value.option );
+			}
+
+			return result;
+		}, {} );
+
+		if ( ! Object.keys( metaAttributes ).length &&
+				! Object.keys( optionAttributes ).length ) {
 			return block;
 		}
 
 		return {
 			...block,
 			attributes: {
+				...optionAttributes,
 				...block.attributes,
 				...metaAttributes,
 			},
@@ -413,6 +423,7 @@ export const getBlock = createSelector(
 		get( state, [ 'editor', 'blocksByUid', uid ] ),
 		get( state, 'editor.edits.meta' ),
 		get( state, 'currentPost.meta' ),
+		get( state, 'siteOptions' ),
 	]
 );
 
@@ -420,6 +431,10 @@ function getPostMeta( state, key ) {
 	return has( state, [ 'editor', 'edits', 'meta', key ] )
 		? get( state, [ 'editor', 'edits', 'meta', key ] )
 		: get( state, [ 'currentPost', 'meta', key ] );
+}
+
+function getSiteOption( state, key ) {
+	return get( state, [ 'siteOptions', key ] );
 }
 
 /**

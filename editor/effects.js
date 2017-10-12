@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, uniqueId } from 'lodash';
+import { get, noop, uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -36,6 +36,11 @@ import {
 	isEditedPostNew,
 	isEditedPostSaveable,
 } from './selectors';
+import {
+	fetchSiteOptions,
+	getOptionUpdatedMessage,
+	saveSiteOptions,
+} from './site-options';
 
 const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
 const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
@@ -86,7 +91,7 @@ export default {
 	},
 	REQUEST_POST_UPDATE_SUCCESS( action, store ) {
 		const { previousPost, post } = action;
-		const { dispatch } = store;
+		const { dispatch, getState } = store;
 
 		const publishStatus = [ 'publish', 'private', 'future' ];
 		const isPublished = publishStatus.indexOf( previousPost.status ) !== -1;
@@ -112,6 +117,19 @@ export default {
 				{ id: SAVE_POST_NOTICE_ID }
 			) );
 		}
+
+		const siteOptions = getState().siteOptions;
+		saveSiteOptions( siteOptions ).then( ( newOptions ) => {
+			Object.keys( newOptions )
+				.map( getOptionUpdatedMessage )
+				.filter( Boolean )
+				.map( ( label ) => createSuccessNotice(
+					<p>
+						<span>{ label }</span>
+					</p>
+				) )
+				.forEach( dispatch );
+		} );
 
 		if ( get( window.history.state, 'id' ) !== post.id ) {
 			window.history.replaceState(
@@ -272,5 +290,13 @@ export default {
 		}
 
 		return effects;
+	},
+	RESET_SITE_OPTIONS( _, { dispatch } ) {
+		fetchSiteOptions().then( ( siteOptions ) => {
+			dispatch( {
+				type: 'UPDATE_SITE_OPTIONS',
+				siteOptions,
+			} );
+		} ).catch( noop );
 	},
 };

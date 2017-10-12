@@ -102,7 +102,9 @@ export function getCommentAttributes( allAttributes, schema ) {
 		}
 
 		// Ignore values sources from content and post meta
-		if ( attributeSchema.source || attributeSchema.meta ) {
+		if ( attributeSchema.source ||
+				attributeSchema.meta ||
+				attributeSchema.option ) {
 			return result;
 		}
 

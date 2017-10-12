@@ -524,6 +524,15 @@ export function notices( state = {}, action ) {
 	return state;
 }
 
+export function siteOptions( state = {}, action ) {
+	switch ( action.type ) {
+		case 'UPDATE_SITE_OPTIONS':
+			return { ...state, ...action.siteOptions };
+	}
+
+	return state;
+}
+
 export default optimist( combineReducers( {
 	editor,
 	currentPost,
@@ -535,4 +544,5 @@ export default optimist( combineReducers( {
 	panel,
 	saving,
 	notices,
+	siteOptions,
 } ) );

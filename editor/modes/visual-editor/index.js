@@ -22,6 +22,7 @@ import WritingFlow from '../../writing-flow';
 import TableOfContents from '../../table-of-contents';
 import { getBlockUids, getMultiSelectedBlockUids } from '../../selectors';
 import { clearSelectedBlock, multiSelect, redo, undo, removeBlocks } from '../../actions';
+import { QuerySiteOptions } from '../../site-options';
 
 class VisualEditor extends Component {
 	constructor() {
@@ -101,6 +102,7 @@ class VisualEditor extends Component {
 					backspace: this.deleteSelectedBlocks,
 					del: this.deleteSelectedBlocks,
 				} } />
+				<QuerySiteOptions />
 				<WritingFlow>
 					<PostTitle />
 					<VisualEditorBlockList ref={ this.bindBlocksContainer } />

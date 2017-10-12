@@ -148,11 +148,23 @@ class VisualEditorBlock extends Component {
 			return result;
 		}, {} );
 
+		const optionAttributes = reduce( attributes, ( result, value, key ) => {
+			if ( type && has( type, [ 'attributes', key, 'option' ] ) ) {
+				result[ type.attributes[ key ].option ] = value;
+			}
+
+			return result;
+		}, {} );
+
 		if ( size( metaAttributes ) ) {
 			this.props.onMetaChange( {
 				...this.props.meta,
 				...metaAttributes,
 			} );
+		}
+
+		if ( size( optionAttributes ) ) {
+			this.props.onOptionsChange( optionAttributes );
 		}
 	}
 
@@ -462,6 +474,10 @@ export default connect(
 
 		onMetaChange( meta ) {
 			dispatch( editPost( { meta } ) );
+		},
+
+		onOptionsChange( siteOptions ) {
+			dispatch( { type: 'UPDATE_SITE_OPTIONS', siteOptions } );
 		},
 	} )
 )( VisualEditorBlock );
