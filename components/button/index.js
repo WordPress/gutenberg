@@ -37,6 +37,7 @@ class Button extends Component {
 			isLarge,
 			isSmall,
 			isToggled,
+			isIndicatingProgress,
 			className,
 			disabled,
 			...additionalProps
@@ -47,6 +48,7 @@ class Button extends Component {
 			'button-large': isLarge,
 			'button-small': isSmall,
 			'is-toggled': isToggled,
+			'is-indicating-progress': isIndicatingProgress,
 		} );
 
 		const tag = href !== undefined && ! disabled ? 'a' : 'button';

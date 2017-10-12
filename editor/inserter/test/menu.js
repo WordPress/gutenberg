@@ -91,8 +91,10 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [] }
+				reusableBlocks={ [] }
 				recentlyUsedBlocks={ [] }
 				debouncedSpeak={ noop }
+				fetchReusableBlocks={ noop }
 			/>
 		);
 
@@ -109,8 +111,10 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [] }
+				reusableBlocks={ [] }
 				recentlyUsedBlocks={ [ advancedTextBlock ] }
 				debouncedSpeak={ noop }
+				fetchReusableBlocks={ noop }
 			/>
 		);
 
@@ -126,8 +130,10 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [] }
+				reusableBlocks={ [] }
 				recentlyUsedBlocks={ [] }
 				debouncedSpeak={ noop }
+				fetchReusableBlocks={ noop }
 			/>
 		);
 		const embedTab = wrapper.find( '.editor-inserter__tab' )
@@ -149,8 +155,10 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [] }
+				reusableBlocks={ [] }
 				recentlyUsedBlocks={ [] }
 				debouncedSpeak={ noop }
+				fetchReusableBlocks={ noop }
 			/>
 		);
 		const blocksTab = wrapper.find( '.editor-inserter__tab' )
@@ -174,8 +182,10 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [ { name: moreBlock.name } ] }
+				reusableBlocks={ [] }
 				recentlyUsedBlocks={ [] }
 				debouncedSpeak={ noop }
+				fetchReusableBlocks={ noop }
 			/>
 		);
 		const blocksTab = wrapper.find( '.editor-inserter__tab' )
@@ -193,8 +203,10 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [] }
+				reusableBlocks={ [] }
 				recentlyUsedBlocks={ [] }
 				debouncedSpeak={ noop }
+				fetchReusableBlocks={ noop }
 			/>
 		);
 		wrapper.setState( { filterValue: 'text' } );
@@ -215,8 +227,10 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [] }
+				reusableBlocks={ [] }
 				recentlyUsedBlocks={ [] }
 				debouncedSpeak={ noop }
+				fetchReusableBlocks={ noop }
 			/>
 		);
 		wrapper.setState( { filterValue: ' text' } );

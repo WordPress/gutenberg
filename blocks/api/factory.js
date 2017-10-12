@@ -12,6 +12,11 @@ import {
 } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import { getBlockType } from './registration';
@@ -115,4 +120,20 @@ export function switchToBlockType( block, name ) {
 		// type gets to keep the existing block's UID.
 		uid: index === firstSwitchedBlock ? block.uid : result.uid,
 	} ) );
+}
+
+/**
+ * Creates a new reusable block.
+ *
+ * @param {String} type       The type of the block referenced by the reusable block
+ * @param {Object} attributes The attributes of the block referenced by the reusable block
+ * @return {Object}           A reusable block object
+ */
+export function createReusableBlock( type, attributes ) {
+	return {
+		id: uuid(),
+		name: __( 'Untitled block' ),
+		type,
+		attributes,
+	};
 }

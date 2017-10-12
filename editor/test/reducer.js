@@ -24,6 +24,7 @@ import {
 	notices,
 	showInsertionPoint,
 	blocksMode,
+	reusableBlocks,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -1037,6 +1038,166 @@ describe( 'state', () => {
 			const value = blocksMode( deepFreeze( { chicken: 'html' } ), action );
 
 			expect( value ).toEqual( { chicken: 'visual' } );
+		} );
+	} );
+
+	describe( 'reusableBlocks()', () => {
+		it( 'should start out empty', () => {
+			const state = reusableBlocks( undefined, {} );
+			expect( state ).toEqual( {} );
+		} );
+
+		it( 'should add fetched reusable blocks', () => {
+			const reusableBlock = {
+				id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
+				name: 'My cool block',
+				type: 'core/paragraph',
+				attributes: {
+					content: 'Hello!',
+				},
+			};
+
+			const state = reusableBlocks( {}, {
+				type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
+				reusableBlocks: [ reusableBlock ],
+			} );
+
+			expect( state ).toEqual( {
+				[ reusableBlock.id ]: {
+					...reusableBlock,
+					isSaving: false,
+				},
+			} );
+		} );
+
+		it( 'should add a reusable block', () => {
+			const reusableBlock = {
+				id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
+				name: 'My cool block',
+				type: 'core/paragraph',
+				attributes: {
+					content: 'Hello!',
+				},
+			};
+
+			const state = reusableBlocks( {}, {
+				type: 'UPDATE_REUSABLE_BLOCK',
+				id: reusableBlock.id,
+				reusableBlock,
+			} );
+
+			expect( state ).toEqual( {
+				[ reusableBlock.id ]: {
+					...reusableBlock,
+					isSaving: false,
+				},
+			} );
+		} );
+
+		it( 'should update a reusable block', () => {
+			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
+			const initialState = {
+				[ id ]: {
+					id,
+					name: 'My cool block',
+					type: 'core/paragraph',
+					attributes: {
+						content: 'Hello!',
+						dropCap: true,
+					},
+					isSaving: false,
+				},
+			};
+
+			const state = reusableBlocks( initialState, {
+				type: 'UPDATE_REUSABLE_BLOCK',
+				id,
+				reusableBlock: {
+					name: 'My better block',
+					attributes: {
+						content: 'Yo!',
+					},
+				},
+			} );
+
+			expect( state ).toEqual( {
+				[ id ]: {
+					id,
+					name: 'My better block',
+					type: 'core/paragraph',
+					attributes: {
+						content: 'Yo!',
+						dropCap: true,
+					},
+					isSaving: false,
+				},
+			} );
+		} );
+
+		it( 'should indicate that a reusable block is saving', () => {
+			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
+			const initialState = {
+				[ id ]: {
+					id,
+					isSaving: false,
+				},
+			};
+
+			const state = reusableBlocks( initialState, {
+				type: 'SAVE_REUSABLE_BLOCK',
+				id,
+			} );
+
+			expect( state ).toEqual( {
+				[ id ]: {
+					id,
+					isSaving: true,
+				},
+			} );
+		} );
+
+		it( 'should stop indicating that a reusable block is saving', () => {
+			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
+			const initialState = {
+				[ id ]: {
+					id,
+					isSaving: true,
+				},
+			};
+
+			const state = reusableBlocks( initialState, {
+				type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
+				id,
+			} );
+
+			expect( state ).toEqual( {
+				[ id ]: {
+					id,
+					isSaving: false,
+				},
+			} );
+		} );
+
+		it( 'should indicate that a reusable block had an error saving', () => {
+			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
+			const initialState = {
+				[ id ]: {
+					id,
+					isSaving: true,
+				},
+			};
+
+			const state = reusableBlocks( initialState, {
+				type: 'SAVE_REUSABLE_BLOCK_FAILURE',
+				id,
+			} );
+
+			expect( state ).toEqual( {
+				[ id ]: {
+					id,
+					isSaving: false,
+				},
+			} );
 		} );
 	} );
 } );

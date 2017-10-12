@@ -17,8 +17,8 @@ import { getCategories, getBlockTypes, BlockIcon } from '@wordpress/blocks';
  * Internal dependencies
  */
 import './style.scss';
-import { getBlocks, getRecentlyUsedBlocks } from '../selectors';
-import { showInsertionPoint, hideInsertionPoint } from '../actions';
+import { getBlocks, getRecentlyUsedBlocks, getReusableBlocks } from '../selectors';
+import { showInsertionPoint, hideInsertionPoint, fetchReusableBlocks } from '../actions';
 
 const { TAB, LEFT, UP, RIGHT, DOWN } = keycodes;
 
@@ -52,6 +52,8 @@ export class InserterMenu extends Component {
 
 	componentDidMount() {
 		document.addEventListener( 'keydown', this.onKeyDown );
+
+		this.props.fetchReusableBlocks();
 	}
 
 	componentWillUnmount() {
@@ -59,7 +61,7 @@ export class InserterMenu extends Component {
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
-		const searchResults = this.searchBlocks( getBlockTypes() );
+		const searchResults = this.searchBlocks( this.getBlockTypes() );
 		// Announce the blocks search results to screen readers.
 		if ( !! searchResults.length ) {
 			this.props.debouncedSpeak( sprintf( _n(
@@ -90,14 +92,35 @@ export class InserterMenu extends Component {
 		} );
 	}
 
-	selectBlock( name ) {
+	selectBlock( name, attributes ) {
 		return () => {
-			this.props.onSelect( name );
+			this.props.onSelect( name, attributes );
 			this.setState( {
 				filterValue: '',
 				currentFocus: null,
 			} );
 		};
+	}
+
+	getBlockTypes() {
+		// Block types that are marked as private should not appear in the inserter
+		const staticBlockTypes = getBlockTypes().filter( ( block ) => ! block.isPrivate );
+
+		// Display reusable blocks that we've fetched in the inserter
+		const reusableBlockTypes = this.props.reusableBlocks.map( ( reusableBlock ) => ( {
+			name: 'core/reusable-block',
+			attributes: {
+				ref: reusableBlock.id,
+			},
+			title: reusableBlock.name,
+			icon: 'layout',
+			category: 'reusable-blocks',
+		} ) );
+
+		return [
+			...staticBlockTypes,
+			...reusableBlockTypes,
+		];
 	}
 
 	searchBlocks( blockTypes ) {
@@ -107,15 +130,15 @@ export class InserterMenu extends Component {
 	getBlocksForCurrentTab() {
 		// if we're searching, use everything, otherwise just get the blocks visible in this tab
 		if ( this.state.filterValue ) {
-			return getBlockTypes();
+			return this.getBlockTypes();
 		}
 		switch ( this.state.tab ) {
 			case 'recent':
 				return this.props.recentlyUsedBlocks;
 			case 'blocks':
-				return filter( getBlockTypes(), ( block ) => block.category !== 'embed' );
+				return filter( this.getBlockTypes(), ( block ) => block.category !== 'embed' );
 			case 'embeds':
-				return filter( getBlockTypes(), ( block ) => block.category === 'embed' );
+				return filter( this.getBlockTypes(), ( block ) => block.category === 'embed' );
 		}
 	}
 
@@ -283,7 +306,7 @@ export class InserterMenu extends Component {
 				role="menuitem"
 				key={ block.name }
 				className="editor-inserter__block"
-				onClick={ this.selectBlock( block.name ) }
+				onClick={ this.selectBlock( block.name, block.attributes ) }
 				ref={ this.bindReferenceNode( block.name ) }
 				tabIndex="-1"
 				onMouseEnter={ ! disabled && this.props.showInsertionPoint }
@@ -399,9 +422,10 @@ const connectComponent = connect(
 		return {
 			recentlyUsedBlocks: getRecentlyUsedBlocks( state ),
 			blocks: getBlocks( state ),
+			reusableBlocks: getReusableBlocks( state ),
 		};
 	},
-	{ showInsertionPoint, hideInsertionPoint }
+	{ showInsertionPoint, hideInsertionPoint, fetchReusableBlocks }
 );
 
 export default flow(

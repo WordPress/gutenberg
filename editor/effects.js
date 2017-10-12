@@ -2,12 +2,19 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, uniqueId } from 'lodash';
+import { get, uniqueId, castArray } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { parse, getBlockType, switchToBlockType } from '@wordpress/blocks';
+import {
+	parse,
+	getBlockType,
+	switchToBlockType,
+	createBlock,
+	serialize,
+	createReusableBlock,
+} from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -25,6 +32,8 @@ import {
 	removeNotice,
 	savePost,
 	editPost,
+	updateReusableBlock,
+	saveReusableBlock,
 } from './actions';
 import {
 	getCurrentPost,
@@ -35,10 +44,13 @@ import {
 	isEditedPostDirty,
 	isEditedPostNew,
 	isEditedPostSaveable,
+	getBlock,
+	getReusableBlock,
 } from './selectors';
 
 const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
 const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
+const SAVE_REUSABLE_BLOCK_NOTICE_ID = 'SAVE_REUSABLE_BLOCK_NOTICE_ID';
 
 export default {
 	REQUEST_POST_UPDATE( action, store ) {
@@ -272,5 +284,79 @@ export default {
 		}
 
 		return effects;
+	},
+	FETCH_REUSABLE_BLOCKS( action, store ) {
+		const { id } = action;
+		const { dispatch } = store;
+
+		let result;
+		if ( id ) {
+			result = new wp.api.models.ReusableBlocks( { id } ).fetch();
+		} else {
+			result = new wp.api.collections.ReusableBlocks().fetch();
+		}
+
+		result.then(
+			( reusableBlockOrBlocks ) => {
+				dispatch( {
+					type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
+					reusableBlocks: castArray( reusableBlockOrBlocks ).map( ( { id: itemId, name, content } ) => {
+						const [ { name: type, attributes } ] = parse( content );
+						return { id: itemId, name, type, attributes };
+					} ),
+				} );
+			},
+			( error ) => {
+				dispatch( {
+					type: 'FETCH_REUSABLE_BLOCKS_FAILURE',
+					error: error.responseJSON || {
+						code: 'unknown_error',
+						message: __( 'An unknown error occurred.' ),
+					},
+				} );
+			}
+		);
+	},
+	SAVE_REUSABLE_BLOCK( action, store ) {
+		const { id } = action;
+		const { getState, dispatch } = store;
+
+		const { name, type, attributes } = getReusableBlock( getState(), id );
+		const content = serialize( createBlock( type, attributes ) );
+
+		new wp.api.models.ReusableBlocks( { id, name, content } ).save().then(
+			() => {
+				dispatch( { type: 'SAVE_REUSABLE_BLOCK_SUCCESS', id } );
+				dispatch( createSuccessNotice(
+					__( 'Reusable block updated' ),
+					{ id: SAVE_REUSABLE_BLOCK_NOTICE_ID }
+				) );
+			},
+			( error ) => {
+				dispatch( { type: 'SAVE_REUSABLE_BLOCK_FAILURE', id } );
+				dispatch( createErrorNotice(
+					get( error.responseJSON, 'message', __( 'An unknown error occured' ) ),
+					{ id: SAVE_REUSABLE_BLOCK_NOTICE_ID }
+				) );
+			}
+		);
+	},
+	CONVERT_BLOCK_TO_STATIC( action, store ) {
+		const { getState, dispatch } = store;
+
+		const oldBlock = getBlock( getState(), action.uid );
+		const reusableBlock = getReusableBlock( getState(), oldBlock.attributes.ref );
+		const newBlock = createBlock( reusableBlock.type, reusableBlock.attributes );
+		dispatch( replaceBlocks( [ oldBlock.uid ], [ newBlock ] ) );
+	},
+	CONVERT_BLOCK_TO_REUSABLE( action, store ) {
+		const { getState, dispatch } = store;
+
+		const oldBlock = getBlock( getState(), action.uid );
+		const reusableBlock = createReusableBlock( oldBlock.name, oldBlock.attributes );
+		const newBlock = createBlock( 'core/reusable-block', { ref: reusableBlock.id } );
+		dispatch( updateReusableBlock( reusableBlock.id, reusableBlock ) );
+		dispatch( saveReusableBlock( reusableBlock.id ) );
+		dispatch( replaceBlocks( [ oldBlock.uid ], [ newBlock ] ) );
 	},
 };
