@@ -11,6 +11,7 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import { Component, findDOMNode } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
+import { withFocusOutside } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -34,11 +35,10 @@ class PostTitle extends Component {
 		this.onSelect = this.onSelect.bind( this );
 		this.onUnselect = this.onUnselect.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
-		this.onOuterBlur = this.onOuterBlur.bind( this );
-		this.onOuterFocus = this.onOuterFocus.bind( this );
+		this.onContainerFocus = this.onContainerFocus.bind( this );
 		this.setFocused = this.setFocused.bind( this );
 		this.focusText = this.focusText.bind( this );
-
+		this.handleFocusOutside = this.handleFocusOutside.bind( this );
 		this.state = {
 			isSelected: false,
 			hasFocusWithin: false,
@@ -96,21 +96,12 @@ class PostTitle extends Component {
 		}
 	}
 
-	onOuterFocus() {
-		clearTimeout( this.blurTimer );
+	handleFocusOutside( ) {
+		this.setFocused( false );
+	}
+
+	onContainerFocus( ) {
 		this.setFocused( true );
-	}
-
-	onOuterBlur( e ) {
-		const target = e.currentTarget;
-		clearTimeout( this.blurTimer );
-		this.blurTimer = setTimeout( () => {
-			this.setFocused( target.contains( document.activeElement ) );
-		}, 0 );
-	}
-
-	handleClickOutside() {
-		this.setState( { isSelected: false } );
 	}
 
 	onKeyDown( event ) {
@@ -127,8 +118,7 @@ class PostTitle extends Component {
 		return (
 			<div
 				className={ className }
-				onBlur={ this.onOuterBlur }
-				onFocus={ this.onOuterFocus }>
+				onFocus={ this.onContainerFocus }>
 				{ isSelected && hasFocusWithin && <PostPermalink onLinkCopied={ this.focusText } /> }
 				<h1>
 					<Textarea
@@ -162,4 +152,4 @@ export default connect(
 			},
 		};
 	}
-)( PostTitle );
+)( withFocusOutside( PostTitle ) );

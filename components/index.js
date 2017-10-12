@@ -32,5 +32,6 @@ export { default as Tooltip } from './tooltip';
 // Higher-Order Components
 export { default as withAPIData } from './higher-order/with-api-data';
 export { default as withFocusReturn } from './higher-order/with-focus-return';
+export { default as withFocusOutside } from './higher-order/with-focus-outside';
 export { default as withInstanceId } from './higher-order/with-instance-id';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';

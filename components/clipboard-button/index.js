@@ -21,6 +21,7 @@ class ClipboardButton extends Component {
 		const button = findDOMNode( this.button );
 		this.clipboard = new Clipboard( button, {
 			text: () => text,
+			// container: button,
 		} );
 		this.clipboard.on( 'success', onCopy );
 	}
