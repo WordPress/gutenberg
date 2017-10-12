@@ -1,3 +1,6 @@
+import { connect } from 'react-redux';
+
+
 /**
  * External dependencies
  */
@@ -20,6 +23,9 @@ import './style.scss';
 import BlockSwitcher from '../block-switcher';
 import BlockMover from '../block-mover';
 import BlockRightMenu from '../block-settings-menu';
+import {
+	focusBlock,
+} from '../actions';
 
 /**
  * Module Constants
@@ -107,11 +113,13 @@ class BlockToolbar extends Component {
 
 		switch ( event.keyCode ) {
 			case ESCAPE: {
-				// Is there a better way to focus the selected block
-				const selectedBlock = document.querySelector( '.editor-visual-editor__block.is-selected' );
-				if ( indexOfTabbable !== -1 && selectedBlock ) {
-					selectedBlock.focus();
-				}
+			 // fire an action
+				this.props.onRefocusBlock();
+				// // Is there a better way to focus the selected block
+				// const selectedBlock = document.querySelector( '.editor-visual-editor__block.is-selected' );
+				// if ( indexOfTabbable !== -1 && selectedBlock ) {
+				// 	selectedBlock.focus();
+				// }
 				break;
 			}
 			case LEFT:
@@ -175,4 +183,13 @@ class BlockToolbar extends Component {
 	}
 }
 
-export default BlockToolbar;
+export default connect(
+	( ) => {
+		return { };
+	},
+	( dispatch, ownProps ) => ( {
+		onRefocusBlock() {
+			dispatch( focusBlock( ownProps.uid ) );
+		},
+	} )
+)( BlockToolbar );
