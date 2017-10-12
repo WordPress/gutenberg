@@ -96,6 +96,125 @@ class Tests_Post_getPages extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 40669
+	 */
+	public function test_cache_should_be_invalidated_by_add_post_meta() {
+		$posts = self::factory()->post->create_many( 2, array(
+			'post_type' => 'page',
+		) );
+
+		add_post_meta( $posts[0], 'foo', 'bar' );
+
+		$cached = get_pages( array(
+			'meta_key' => 'foo',
+			'meta_value' => 'bar',
+		) );
+
+		$cached_ids = wp_list_pluck( $cached, 'ID' );
+		$this->assertEqualSets( array( $posts[0] ), $cached_ids );
+
+		add_post_meta( $posts[1], 'foo', 'bar' );
+
+		$found = get_pages( array(
+			'meta_key' => 'foo',
+			'meta_value' => 'bar',
+		) );
+
+		$found_ids = wp_list_pluck( $found, 'ID' );
+		$this->assertEqualSets( $posts, $found_ids );
+	}
+
+	/**
+	 * @ticket 40669
+	 */
+	public function test_cache_should_be_invalidated_by_update_post_meta() {
+		$posts = self::factory()->post->create_many( 2, array(
+			'post_type' => 'page',
+		) );
+
+		add_post_meta( $posts[0], 'foo', 'bar' );
+		add_post_meta( $posts[1], 'foo', 'bar' );
+
+		$cached = get_pages( array(
+			'meta_key' => 'foo',
+			'meta_value' => 'bar',
+		) );
+
+		$cached_ids = wp_list_pluck( $cached, 'ID' );
+		$this->assertEqualSets( $posts, $cached_ids );
+
+		update_post_meta( $posts[1], 'foo', 'baz' );
+
+		$found = get_pages( array(
+			'meta_key' => 'foo',
+			'meta_value' => 'bar',
+		) );
+
+		$found_ids = wp_list_pluck( $found, 'ID' );
+		$this->assertEqualSets( array( $posts[0] ), $found_ids );
+	}
+
+	/**
+	 * @ticket 40669
+	 */
+	public function test_cache_should_be_invalidated_by_delete_post_meta() {
+		$posts = self::factory()->post->create_many( 2, array(
+			'post_type' => 'page',
+		) );
+
+		add_post_meta( $posts[0], 'foo', 'bar' );
+		add_post_meta( $posts[1], 'foo', 'bar' );
+
+		$cached = get_pages( array(
+			'meta_key' => 'foo',
+			'meta_value' => 'bar',
+		) );
+
+		$cached_ids = wp_list_pluck( $cached, 'ID' );
+		$this->assertEqualSets( $posts, $cached_ids );
+
+		delete_post_meta( $posts[1], 'foo' );
+
+		$found = get_pages( array(
+			'meta_key' => 'foo',
+			'meta_value' => 'bar',
+		) );
+
+		$found_ids = wp_list_pluck( $found, 'ID' );
+		$this->assertEqualSets( array( $posts[0] ), $found_ids );
+	}
+
+	/**
+	 * @ticket 40669
+	 */
+	public function test_cache_should_be_invalidated_by_delete_post_meta_by_key() {
+		$posts = self::factory()->post->create_many( 2, array(
+			'post_type' => 'page',
+		) );
+
+		add_post_meta( $posts[0], 'foo', 'bar' );
+		add_post_meta( $posts[1], 'foo', 'bar' );
+
+		$cached = get_pages( array(
+			'meta_key' => 'foo',
+			'meta_value' => 'bar',
+		) );
+
+		$cached_ids = wp_list_pluck( $cached, 'ID' );
+		$this->assertEqualSets( $posts, $cached_ids );
+
+		delete_post_meta_by_key( 'foo' );
+
+		$found = get_pages( array(
+			'meta_key' => 'foo',
+			'meta_value' => 'bar',
+		) );
+
+		$found_ids = wp_list_pluck( $found, 'ID' );
+		$this->assertEqualSets( array(), $found_ids );
+	}
+
+	/**
 	 * @ticket 20376
 	 */
 	function test_get_pages_meta() {
