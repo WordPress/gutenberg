@@ -8,7 +8,8 @@ import hoistNonReactStatic from 'hoist-non-react-statics';
  */
 import { Component, findDOMNode } from '@wordpress/element';
 
-/* Heavily based on react-click-outside (https://github.com/kentor/react-click-outside/blob/master/index.js), * this Higher Order Component wraps a component and fires any handleFocusOutside listeners it might have
+/* Heavily based on react-click-outside (https://github.com/kentor/react-click-outside/blob/master/index.js),
+ * this Higher Order Component wraps a component and fires any handleFocusOutside listeners it might have
  * if a focus is detected ouside that component
  *
  * @param {WPElement} OriginalComponent the original component
