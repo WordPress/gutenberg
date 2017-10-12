@@ -17,7 +17,7 @@ import Dashicon from '../dashicon';
 import Dropdown from '../dropdown';
 import NavigableMenu from '../navigable-menu';
 
-const { ESCAPE, DOWN } = keycodes;
+const { DOWN } = keycodes;
 
 function DropdownMenu( {
 	icon = 'menu',
@@ -59,21 +59,12 @@ function DropdownMenu( {
 					</IconButton>
 				);
 			} }
-			renderContent={ ( { onClose, onToggle } ) => {
-				const closeOnEscape = ( event ) => {
-					if ( event.keyCode === ESCAPE ) {
-						event.preventDefault();
-						event.stopPropagation();
-						onToggle();
-					}
-				};
-
+			renderContent={ ( { onClose } ) => {
 				return (
 					<NavigableMenu
 						className="components-dropdown-menu__menu"
 						role="menu"
 						aria-label={ menuLabel }
-						onKeyDown={ closeOnEscape }
 					>
 						{ controls.map( ( control, index ) => (
 							<IconButton

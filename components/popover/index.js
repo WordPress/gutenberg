@@ -187,6 +187,7 @@ export class Popover extends Component {
 
 		// Close on escape
 		if ( event.keyCode === ESCAPE && onClose ) {
+			event.stopPropagation();
 			onClose();
 		}
 
