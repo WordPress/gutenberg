@@ -168,7 +168,7 @@ export default class OldEditor extends Component {
 		return [
 			<InspectorControls key="inspector">
 				<BlockDescription>
-					<p>{ __( 'The Classic Text block gives you an editor that is similar to a word processor.' ) }</p>
+					<p>{ __( 'The classic editor, in block form.' ) }</p>
 				</BlockDescription>
 			</InspectorControls>,
 			<div
