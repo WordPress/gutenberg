@@ -9,24 +9,26 @@
     "packages-dev": [
         {
             "name": "dealerdirect/phpcodesniffer-composer-installer",
-            "version": "v0.4.2",
+            "version": "v0.4.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DealerDirect/phpcodesniffer-composer-installer.git",
-                "reference": "17130f536db62570bcfc5cce59464b36e82eb092"
+                "reference": "63c0ec0ac286d31651d3c70e5bf76ad87db3ba23"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DealerDirect/phpcodesniffer-composer-installer/zipball/17130f536db62570bcfc5cce59464b36e82eb092",
-                "reference": "17130f536db62570bcfc5cce59464b36e82eb092",
+                "url": "https://api.github.com/repos/DealerDirect/phpcodesniffer-composer-installer/zipball/63c0ec0ac286d31651d3c70e5bf76ad87db3ba23",
+                "reference": "63c0ec0ac286d31651d3c70e5bf76ad87db3ba23",
                 "shasum": ""
             },
             "require": {
                 "composer-plugin-api": "^1.0",
+                "php": "^5.3|^7",
                 "squizlabs/php_codesniffer": "*"
             },
             "require-dev": {
-                "composer/composer": "*"
+                "composer/composer": "*",
+                "wimg/php-compatibility": "^8.0"
             },
             "suggest": {
                 "dealerdirect/qa-tools": "All the PHP QA tools you'll need"
@@ -71,20 +73,20 @@
                 "stylecheck",
                 "tests"
             ],
-            "time": "2017-08-16T10:25:17+00:00"
+            "time": "2017-09-18T07:49:36+00:00"
         },
         {
             "name": "squizlabs/php_codesniffer",
-            "version": "3.0.2",
+            "version": "3.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
-                "reference": "c7594a88ae75401e8f8d0bd4deb8431b39045c51"
+                "reference": "3c2d0a0fe39684ba0c1eb842a6a775d0b938d699"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/c7594a88ae75401e8f8d0bd4deb8431b39045c51",
-                "reference": "c7594a88ae75401e8f8d0bd4deb8431b39045c51",
+                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/3c2d0a0fe39684ba0c1eb842a6a775d0b938d699",
+                "reference": "3c2d0a0fe39684ba0c1eb842a6a775d0b938d699",
                 "shasum": ""
             },
             "require": {
@@ -94,7 +96,7 @@
                 "php": ">=5.4.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "~4.0"
+                "phpunit/phpunit": "^4.0 || ^5.0 || ^6.0"
             },
             "bin": [
                 "bin/phpcs",
@@ -122,7 +124,7 @@
                 "phpcs",
                 "standards"
             ],
-            "time": "2017-07-18T01:12:32+00:00"
+            "time": "2017-09-19T22:47:14+00:00"
         },
         {
             "name": "wimg/php-compatibility",
@@ -174,7 +176,7 @@
                 "phpcs",
                 "standards"
             ],
-            "time": "2017-08-07T19:44:46+00:00"
+            "time": "2017-08-07 19:44:46"
         },
         {
             "name": "wp-coding-standards/wpcs",
@@ -182,12 +184,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards.git",
-                "reference": "7f208f3c6d740f7f4a9e2e3906dcc5e145dd771b"
+                "reference": "b19535707965e6f185f6fc678b044d8c7f0b1b50"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WordPress-Coding-Standards/WordPress-Coding-Standards/zipball/7f208f3c6d740f7f4a9e2e3906dcc5e145dd771b",
-                "reference": "7f208f3c6d740f7f4a9e2e3906dcc5e145dd771b",
+                "url": "https://api.github.com/repos/WordPress-Coding-Standards/WordPress-Coding-Standards/zipball/b19535707965e6f185f6fc678b044d8c7f0b1b50",
+                "reference": "b19535707965e6f185f6fc678b044d8c7f0b1b50",
                 "shasum": ""
             },
             "require": {
@@ -195,7 +197,7 @@
                 "squizlabs/php_codesniffer": "^2.9.0 || ^3.0.2"
             },
             "suggest": {
-                "dealerdirect/phpcodesniffer-composer-installer": "^0.4.1"
+                "dealerdirect/phpcodesniffer-composer-installer": "^0.4.3"
             },
             "type": "phpcodesniffer-standard",
             "notification-url": "https://packagist.org/downloads/",
@@ -214,7 +216,7 @@
                 "standards",
                 "wordpress"
             ],
-            "time": "2017-08-30T06:57:47+00:00"
+            "time": "2017-10-09T13:04:35+00:00"
         }
     ],
     "aliases": [],

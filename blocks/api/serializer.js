@@ -89,11 +89,11 @@ export function getSaveContent( blockType, attributes ) {
  * which cannot be matched from the block content.
  *
  * @param   {Object<String,*>} allAttributes Attributes from in-memory block data
- * @param   {Object<String,*>} schema        Block type schema
+ * @param   {Object<String,*>} blockType     Block type
  * @returns {Object<String,*>}               Subset of attributes for comment serialization
  */
-export function getCommentAttributes( allAttributes, schema ) {
-	return reduce( schema, ( result, attributeSchema, key ) => {
+export function getCommentAttributes( allAttributes, blockType ) {
+	const attributes = reduce( blockType.attributes, ( result, attributeSchema, key ) => {
 		const value = allAttributes[ key ];
 
 		// Ignore undefined values
@@ -115,6 +115,12 @@ export function getCommentAttributes( allAttributes, schema ) {
 		result[ key ] = value;
 		return result;
 	}, {} );
+
+	if ( blockType.className !== false && allAttributes.className ) {
+		attributes.className = allAttributes.className;
+	}
+
+	return attributes;
 }
 
 export function serializeAttributes( attrs ) {
@@ -140,17 +146,42 @@ export function getBeautifulContent( content ) {
 }
 
 /**
+ * Given a block object, returns the Block's Inner HTML markup
+ * @param  {Object} block Block Object
+ * @return {String}       HTML
+ */
+export function getBlockContent( block ) {
+	const blockType = getBlockType( block.name );
+
+	// If block was parsed as invalid or encounters an error while generating
+	// save content, use original content instead to avoid content loss.
+	let saveContent = block.originalContent;
+	if ( block.isValid ) {
+		try {
+			saveContent = getSaveContent( blockType, block.attributes );
+		} catch ( error ) {}
+	}
+
+	return getUnknownTypeHandlerName() === block.name || ! saveContent ? saveContent : getBeautifulContent( saveContent );
+}
+
+/**
  * Returns the content of a block, including comment delimiters.
  *
- * @param  {String} blockName  Block name
- * @param  {Object} attributes Block attributes
- * @param  {String} content    Block save content
- * @return {String}            Comment-delimited block content
+ * @param  {String} rawBlockName  Block name
+ * @param  {Object} attributes    Block attributes
+ * @param  {String} content       Block save content
+ * @return {String}               Comment-delimited block content
  */
-export function getCommentDelimitedContent( blockName, attributes, content ) {
+export function getCommentDelimitedContent( rawBlockName, attributes, content ) {
 	const serializedAttributes = ! isEmpty( attributes )
 		? serializeAttributes( attributes ) + ' '
 		: '';
+
+	// strip core blocks of their namespace prefix
+	const blockName = rawBlockName.startsWith( 'core/' )
+		? rawBlockName.slice( 5 )
+		: rawBlockName;
 
 	if ( ! content ) {
 		return `<!-- wp:${ blockName } ${ serializedAttributes }/-->`;
@@ -158,7 +189,7 @@ export function getCommentDelimitedContent( blockName, attributes, content ) {
 
 	return (
 		`<!-- wp:${ blockName } ${ serializedAttributes }-->\n` +
-		getBeautifulContent( content ) +
+		content +
 		`\n<!-- /wp:${ blockName } -->`
 	);
 }
@@ -173,17 +204,8 @@ export function getCommentDelimitedContent( blockName, attributes, content ) {
 export function serializeBlock( block ) {
 	const blockName = block.name;
 	const blockType = getBlockType( blockName );
-
-	// If block was parsed as invalid or encounters an error while generating
-	// save content, use original content instead to avoid content loss.
-	let saveContent = block.originalContent;
-	if ( block.isValid ) {
-		try {
-			saveContent = getSaveContent( blockType, block.attributes );
-		} catch ( error ) {}
-	}
-
-	const saveAttributes = getCommentAttributes( block.attributes, blockType.attributes );
+	const saveContent = getBlockContent( block );
+	const saveAttributes = getCommentAttributes( block.attributes, blockType );
 
 	switch ( blockName ) {
 		case 'core/more':

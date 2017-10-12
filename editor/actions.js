@@ -11,9 +11,9 @@ import { partial, castArray } from 'lodash';
  * @param  {Object} post Post object
  * @return {Object}      Action object
  */
-export function setInitialPost( post ) {
+export function setupEditor( post ) {
 	return {
-		type: 'SET_INITIAL_POST',
+		type: 'SETUP_EDITOR',
 		post,
 	};
 }
@@ -62,7 +62,7 @@ export function resetBlocks( blocks ) {
 }
 
 /**
- * Returns an action object used in signalling that the block with the
+ * Returns an action object used in signalling that the block attributes with the
  * specified UID has been updated.
  *
  * @param  {String} uid        Block UID
@@ -74,6 +74,22 @@ export function updateBlockAttributes( uid, attributes ) {
 		type: 'UPDATE_BLOCK_ATTRIBUTES',
 		uid,
 		attributes,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the block with the
+ * specified UID has been updated.
+ *
+ * @param  {String} uid        Block UID
+ * @param  {Object} updates    Block attributes to be merged
+ * @return {Object}            Action object
+ */
+export function updateBlock( uid, updates ) {
+	return {
+		type: 'UPDATE_BLOCK',
+		uid,
+		updates,
 	};
 }
 
@@ -242,6 +258,19 @@ export function removeBlock( uid ) {
 }
 
 /**
+ * Returns an action object used to toggle the block editing mode (visual/html)
+ *
+ * @param  {String} uid Block UID
+ * @return {Object}     Action object
+ */
+export function toggleBlockMode( uid ) {
+	return {
+		type: 'TOGGLE_BLOCK_MODE',
+		uid,
+	};
+}
+
+/**
  * Returns an action object used in signalling that the user has begun to type.
  *
  * @return {Object}     Action object
@@ -260,6 +289,30 @@ export function startTyping() {
 export function stopTyping() {
 	return {
 		type: 'STOP_TYPING',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user toggled the sidebar
+ *
+ * @return {Object}         Action object
+ */
+export function toggleSidebar() {
+	return {
+		type: 'TOGGLE_SIDEBAR',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user switched the active sidebar tab panel
+ *
+ * @param  {String} panel   The panel name
+ * @return {Object}         Action object
+ */
+export function setActivePanel( panel ) {
+	return {
+		type: 'SET_ACTIVE_PANEL',
+		panel,
 	};
 }
 

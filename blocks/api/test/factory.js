@@ -80,6 +80,39 @@ describe( 'block factory', () => {
 			} );
 			expect( block.isValid ).toBe( true );
 		} );
+
+		it( 'should keep the className if the block supports it', () => {
+			registerBlockType( 'core/test-block', {
+				attributes: {},
+				save: noop,
+				category: 'common',
+				title: 'test block',
+			} );
+			const block = createBlock( 'core/test-block', {
+				className: 'chicken',
+			} );
+
+			expect( block.attributes ).toEqual( {
+				className: 'chicken',
+			} );
+			expect( block.isValid ).toBe( true );
+		} );
+
+		it( 'should not keep the className if the block supports it', () => {
+			registerBlockType( 'core/test-block', {
+				attributes: {},
+				save: noop,
+				category: 'common',
+				title: 'test block',
+				className: false,
+			} );
+			const block = createBlock( 'core/test-block', {
+				className: 'chicken',
+			} );
+
+			expect( block.attributes ).toEqual( {} );
+			expect( block.isValid ).toBe( true );
+		} );
 	} );
 
 	describe( 'switchToBlockType()', () => {

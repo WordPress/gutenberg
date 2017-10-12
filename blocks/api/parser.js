@@ -153,6 +153,11 @@ export function getBlockAttributes( blockType, rawContent, attributes ) {
 		blockAttributes.anchor = hpqParse( rawContent, attr( '*', 'id' ) );
 	}
 
+	// If the block supports a custom className parse it
+	if ( blockType.className !== false && attributes && attributes.className ) {
+		blockAttributes.className = attributes.className;
+	}
+
 	return blockAttributes;
 }
 
