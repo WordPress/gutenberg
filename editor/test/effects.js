@@ -249,8 +249,8 @@ describe( 'effects', () => {
 		} );
 	} );
 
-	describe( '.SET_INITIAL_POST', () => {
-		const handler = effects.SET_INITIAL_POST;
+	describe( '.SETUP_EDITOR', () => {
+		const handler = effects.SETUP_EDITOR;
 
 		it( 'should return post reset action', () => {
 			const post = {

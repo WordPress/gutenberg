@@ -98,6 +98,22 @@ class GalleryBlock extends Component {
 		const { attributes, focus, className } = this.props;
 		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
 
+		const blockDescription = (
+			<BlockDescription>
+				<p>
+					{__( 'Image galleries are a great way to share groups of pictures on your site.' )}
+				</p>
+			</BlockDescription>
+		);
+
+		const inspectorControls = (
+			focus && (
+				<InspectorControls key="inspector">
+					{blockDescription}
+				</InspectorControls>
+			)
+		);
+
 		const controls = (
 			focus && (
 				<BlockControls key="controls">
@@ -133,6 +149,7 @@ class GalleryBlock extends Component {
 
 			return [
 				controls,
+				inspectorControls,
 				<Placeholder
 					key="placeholder"
 					instructions={ __( 'Drag images here or insert from media library' ) }
@@ -165,9 +182,7 @@ class GalleryBlock extends Component {
 			controls,
 			focus && images.length > 1 && (
 				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'Image galleries are a great way to share groups of pictures on your site.' ) }</p>
-					</BlockDescription>
+					{blockDescription}
 					<h3>{ __( 'Gallery Settings' ) }</h3>
 					<RangeControl
 						label={ __( 'Columns' ) }

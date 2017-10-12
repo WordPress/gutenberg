@@ -16,7 +16,7 @@ describe( 'Dropdown', () => {
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<button aria-expanded={ isOpen } onClick={ onToggle }>Toggleee</button>
 			) }
-			renderContent={ () => 'content' }
+			renderContent={ () => null }
 		/> );
 
 		const button = wrapper.find( 'button' );
@@ -38,7 +38,7 @@ describe( 'Dropdown', () => {
 				<button key="open" className="open" aria-expanded={ isOpen } onClick={ onToggle }>Toggleee</button>,
 				<button key="close" className="close" onClick={ onClose } >closee</button>,
 			] }
-			renderContent={ () => 'content' }
+			renderContent={ () => null }
 		/> );
 
 		const openButton = wrapper.find( '.open' );

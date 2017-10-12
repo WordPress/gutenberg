@@ -19,7 +19,9 @@ import msListConverter from './ms-list-converter';
 import listMerger from './list-merger';
 import imageCorrector from './image-corrector';
 import blockquoteNormaliser from './blockquote-normaliser';
-import { deepFilter, isInvalidInline, isNotWhitelisted, isPlain, isInline } from './utils';
+import tableNormaliser from './table-normaliser';
+import inlineContentConverter from './inline-content-converter';
+import { deepFilterHTML, isInvalidInline, isNotWhitelisted, isPlain, isInline } from './utils';
 import showdown from 'showdown';
 
 export default function( { HTML, plainText, inline } ) {
@@ -34,16 +36,17 @@ export default function( { HTML, plainText, inline } ) {
 		const converter = new showdown.Converter();
 
 		converter.setOption( 'noHeaderId', true );
+		converter.setOption( 'tables', true );
 
 		HTML = converter.makeHtml( plainText );
 	} else {
 		// Context dependent filters. Needs to run before we remove nodes.
-		HTML = deepFilter( HTML, [
+		HTML = deepFilterHTML( HTML, [
 			msListConverter,
 		] );
 	}
 
-	HTML = deepFilter( HTML, [
+	HTML = deepFilterHTML( HTML, [
 		listMerger,
 		imageCorrector,
 		// Add semantic formatting before attributes are stripped.
@@ -52,6 +55,8 @@ export default function( { HTML, plainText, inline } ) {
 		commentRemover,
 		createUnwrapper( ( node ) => isNotWhitelisted( node ) || ( inline && ! isInline( node ) ) ),
 		blockquoteNormaliser,
+		tableNormaliser,
+		inlineContentConverter,
 	] );
 
 	// Inline paste.
@@ -62,7 +67,7 @@ export default function( { HTML, plainText, inline } ) {
 		return HTML;
 	}
 
-	HTML = deepFilter( HTML, [
+	HTML = deepFilterHTML( HTML, [
 		createUnwrapper( isInvalidInline ),
 	] );
 

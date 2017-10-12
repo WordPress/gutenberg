@@ -132,10 +132,23 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_ensure_wp_api_request', 20 );
  */
 function gutenberg_disable_editor_settings_wpautop( $settings ) {
 	$post = get_post();
-	if ( ! isset( $settings['wpautop'] ) ) {
-		$settings['wpautop'] = ! ( is_object( $post ) && gutenberg_post_has_blocks( $post->ID ) );
+	if ( is_object( $post ) && gutenberg_post_has_blocks( $post->ID ) ) {
+		$settings['wpautop'] = false;
 	}
 
 	return $settings;
 }
 add_filter( 'wp_editor_settings', 'gutenberg_disable_editor_settings_wpautop' );
+
+/**
+ * Add rest nonce to the heartbeat response.
+ *
+ * @param  array $response Original heartbeat response.
+ * @return array           New heartbeat response.
+ */
+function gutenberg_add_rest_nonce_to_heartbeat_response_headers( $response ) {
+	$response['rest-nonce'] = wp_create_nonce( 'wp_rest' );
+	return $response;
+}
+
+add_filter( 'wp_refresh_nonces', 'gutenberg_add_rest_nonce_to_heartbeat_response_headers' );

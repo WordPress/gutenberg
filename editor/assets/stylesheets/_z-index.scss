@@ -21,6 +21,10 @@ $z-layers: (
 	'.editor-header': 20,
 	'.editor-text-editor__formatting': 20,
 
+	// Show Block SettingsToggle should under its content
+	'.editor-block-settings-menu__toggle': 1,
+	'.editor-block-settings-menu__content': 2,
+
 	// Show drop zone above most standard content, but below any overlays
 	'.components-drop-zone': 100,
 	'.components-drop-zone__content': 110,

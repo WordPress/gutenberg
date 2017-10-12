@@ -19,7 +19,7 @@ import PreviewButton from './preview-button';
 import ModeSwitcher from './mode-switcher';
 import Inserter from '../inserter';
 import { getMultiSelectedBlockUids, hasEditorUndo, hasEditorRedo, isEditorSidebarOpened } from '../selectors';
-import { clearSelectedBlock } from '../actions';
+import { clearSelectedBlock, toggleSidebar, removeBlocks } from '../actions';
 
 function Header( {
 	multiSelectedBlockUids,
@@ -29,7 +29,7 @@ function Header( {
 	redo,
 	hasRedo,
 	hasUndo,
-	toggleSidebar,
+	onToggleSidebar,
 	isSidebarOpened,
 } ) {
 	const count = multiSelectedBlockUids.length;
@@ -90,7 +90,7 @@ function Header( {
 				<PublishButton />
 				<IconButton
 					icon="admin-generic"
-					onClick={ toggleSidebar }
+					onClick={ onToggleSidebar }
 					isToggled={ isSidebarOpened }
 					label={ __( 'Settings' ) }
 				/>
@@ -109,12 +109,9 @@ export default connect(
 	} ),
 	( dispatch ) => ( {
 		onDeselect: () => dispatch( clearSelectedBlock() ),
-		onRemove: ( uids ) => dispatch( {
-			type: 'REMOVE_BLOCKS',
-			uids,
-		} ),
+		onRemove: ( uids ) => dispatch( removeBlocks( uids ) ),
 		undo: () => dispatch( { type: 'UNDO' } ),
 		redo: () => dispatch( { type: 'REDO' } ),
-		toggleSidebar: () => dispatch( { type: 'TOGGLE_SIDEBAR' } ),
+		onToggleSidebar: () => dispatch( toggleSidebar() ),
 	} )
 )( Header );

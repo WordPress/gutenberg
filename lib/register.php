@@ -109,7 +109,7 @@ function gutenberg_add_admin_bar_edit_link( $wp_admin_bar ) {
 	}
 
 	$gutenberg_text = __( 'Edit in Gutenberg', 'gutenberg' );
-	$gutenberg_url = gutenberg_get_edit_post_url( $post->ID );
+	$gutenberg_url  = gutenberg_get_edit_post_url( $post->ID );
 
 	$is_gutenberg_default = gutenberg_post_has_blocks( $post->ID );
 
@@ -123,10 +123,10 @@ function gutenberg_add_admin_bar_edit_link( $wp_admin_bar ) {
 
 	// Add submenu item under link to go to Gutenberg editor or classic editor.
 	$wp_admin_bar->add_node( array(
-		'id' => 'edit_alt',
+		'id'     => 'edit_alt',
 		'parent' => 'edit',
-		'href' => $is_gutenberg_default ? $classic_url : $gutenberg_url,
-		'title' => $is_gutenberg_default ? $classic_text : $gutenberg_text,
+		'href'   => $is_gutenberg_default ? $classic_url : $gutenberg_url,
+		'title'  => $is_gutenberg_default ? $classic_text : $gutenberg_text,
 	) );
 
 }
@@ -170,9 +170,9 @@ function gutenberg_add_edit_links( $actions, $post ) {
 	add_filter( 'get_edit_post_link', 'gutenberg_filter_edit_post_link', 10, 3 );
 
 	// Build the new edit actions. See also: WP_Posts_List_Table::handle_row_actions().
-	$title = _draft_or_post_title( $post->ID );
+	$title        = _draft_or_post_title( $post->ID );
 	$edit_actions = array(
-		'classic hide-if-no-js' => sprintf(
+		'classic hide-if-no-js'   => sprintf(
 			'<a href="%s" aria-label="%s">%s</a>',
 			esc_url( $classic_url ),
 			esc_attr( sprintf(
@@ -196,7 +196,7 @@ function gutenberg_add_edit_links( $actions, $post ) {
 
 	// Insert the new actions in place of the Edit action.
 	$edit_offset = array_search( 'edit', array_keys( $actions ), true );
-	$actions = array_merge(
+	$actions     = array_merge(
 		array_slice( $actions, 0, $edit_offset ),
 		$edit_actions,
 		array_slice( $actions, $edit_offset + 1 )
@@ -284,7 +284,19 @@ function gutenberg_can_edit_post( $post_id ) {
  */
 function gutenberg_post_has_blocks( $post_id ) {
 	$post = get_post( $post_id );
-	return $post && strpos( $post->post_content, '<!-- wp:' ) !== false;
+	return $post && content_has_blocks( $post->post_content );
+}
+
+/**
+ * Determine whether a content string contains blocks.
+ *
+ * @since 1.3.0
+ *
+ * @param string $content Content to test.
+ * @return bool Whether the content contains blocks.
+ */
+function content_has_blocks( $content ) {
+	return false !== strpos( $content, '<!-- wp:' );
 }
 
 /**

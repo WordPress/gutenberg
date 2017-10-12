@@ -176,6 +176,31 @@ describe( 'block parser', () => {
 				anchor: 'chicken',
 			} );
 		} );
+
+		it( 'should parse the className if the block supports it', () => {
+			const blockType = {
+				attributes: {},
+			};
+
+			const rawContent = '<div class="chicken">Ribs</div>';
+			const attrs = { className: 'chicken' };
+
+			expect( getBlockAttributes( blockType, rawContent, attrs ) ).toEqual( {
+				className: 'chicken',
+			} );
+		} );
+
+		it( 'should not parse the className if the block supports it', () => {
+			const blockType = {
+				attributes: {},
+				className: false,
+			};
+
+			const rawContent = '<div class="chicken">Ribs</div>';
+			const attrs = { className: 'chicken' };
+
+			expect( getBlockAttributes( blockType, rawContent, attrs ) ).toEqual( {} );
+		} );
 	} );
 
 	describe( 'createBlockWithFallback', () => {
@@ -223,7 +248,7 @@ describe( 'block parser', () => {
 			);
 			expect( block.name ).toBe( 'core/unknown-block' );
 			expect( block.attributes.fruit ).toBe( 'Bananas' );
-			expect( block.attributes.content ).toContain( 'core/test-block' );
+			expect( block.attributes.content ).toContain( 'wp:test-block' );
 		} );
 
 		it( 'should fall back to the unknown type handler if block type not specified', () => {
@@ -306,6 +331,31 @@ describe( 'block parser', () => {
 				content: 'Ribs',
 			} );
 			expect( typeof parsed[ 0 ].uid ).toBe( 'string' );
+		} );
+
+		it( 'should add the core namespace to un-namespaced blocks', () => {
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+
+			const parsed = parse(
+				'<!-- wp:test-block -->\nRibs\n<!-- /wp:test-block -->'
+			);
+
+			expect( parsed ).toHaveLength( 1 );
+			expect( parsed[ 0 ].name ).toBe( 'core/test-block' );
+		} );
+
+		it( 'should ignore blocks with a bad namespace', () => {
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+
+			setUnknownTypeHandlerName( 'core/unknown-block' );
+
+			const parsed = parse(
+				'<!-- wp:core/test-block -->Ribs<!-- /wp:core/test-block -->' +
+				'<p>Broccoli</p>' +
+				'<!-- wp:core/unknown/block -->Ribs<!-- /wp:core/unknown/block -->'
+			);
+			expect( parsed ).toHaveLength( 1 );
+			expect( parsed[ 0 ].name ).toBe( 'core/test-block' );
 		} );
 
 		it( 'should parse the post content, using unknown block handler', () => {

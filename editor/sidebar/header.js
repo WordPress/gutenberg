@@ -13,8 +13,9 @@ import { IconButton } from '@wordpress/components';
  * Internal Dependencies
  */
 import { getActivePanel } from '../selectors';
+import { toggleSidebar, setActivePanel } from '../actions';
 
-const SidebarHeader = ( { panel, onSetPanel, toggleSidebar } ) => {
+const SidebarHeader = ( { panel, onSetPanel, onToggleSidebar } ) => {
 	return (
 		<div className="components-panel__header editor-sidebar__panel-tabs">
 			<button
@@ -32,7 +33,7 @@ const SidebarHeader = ( { panel, onSetPanel, toggleSidebar } ) => {
 				{ __( 'Block' ) }
 			</button>
 			<IconButton
-				onClick={ toggleSidebar }
+				onClick={ onToggleSidebar }
 				icon="no-alt"
 				label={ __( 'Close settings' ) }
 			/>
@@ -45,12 +46,7 @@ export default connect(
 		panel: getActivePanel( state ),
 	} ),
 	( dispatch ) => ( {
-		onSetPanel( panel ) {
-			dispatch( {
-				type: 'SET_ACTIVE_PANEL',
-				panel: panel,
-			} );
-		},
-		toggleSidebar: () => dispatch( { type: 'TOGGLE_SIDEBAR' } ),
+		onSetPanel: ( panel ) => dispatch( setActivePanel( panel ) ),
+		onToggleSidebar: () => dispatch( toggleSidebar() ),
 	} )
 )( SidebarHeader );

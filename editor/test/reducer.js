@@ -23,6 +23,7 @@ import {
 	saving,
 	notices,
 	showInsertionPoint,
+	blocksMode,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -118,6 +119,33 @@ describe( 'state', () => {
 			expect( values( state.blocksByUid )[ 0 ].name ).toBe( 'core/freeform' );
 			expect( values( state.blocksByUid )[ 0 ].uid ).toBe( 'wings' );
 			expect( state.blockOrder ).toEqual( [ 'wings' ] );
+		} );
+
+		it( 'should update the block', () => {
+			const original = editor( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [ {
+					uid: 'chicken',
+					name: 'core/test-block',
+					attributes: {},
+					isValid: false,
+				} ],
+			} );
+			const state = editor( deepFreeze( original ), {
+				type: 'UPDATE_BLOCK',
+				uid: 'chicken',
+				updates: {
+					attributes: { content: 'ribs' },
+					isValid: true,
+				},
+			} );
+
+			expect( state.blocksByUid.chicken ).toEqual( {
+				uid: 'chicken',
+				name: 'core/test-block',
+				attributes: { content: 'ribs' },
+				isValid: true,
+			} );
 		} );
 
 		it( 'should move the block up', () => {
@@ -987,6 +1015,28 @@ describe( 'state', () => {
 			expect( state ).toEqual( {
 				b: originalState.b,
 			} );
+		} );
+	} );
+
+	describe( 'blocksMode', () => {
+		it( 'should set mode to html if not set', () => {
+			const action = {
+				type: 'TOGGLE_BLOCK_MODE',
+				uid: 'chicken',
+			};
+			const value = blocksMode( deepFreeze( {} ), action );
+
+			expect( value ).toEqual( { chicken: 'html' } );
+		} );
+
+		it( 'should toggle mode to visual if set as html', () => {
+			const action = {
+				type: 'TOGGLE_BLOCK_MODE',
+				uid: 'chicken',
+			};
+			const value = blocksMode( deepFreeze( { chicken: 'html' } ), action );
+
+			expect( value ).toEqual( { chicken: 'visual' } );
 		} );
 	} );
 } );

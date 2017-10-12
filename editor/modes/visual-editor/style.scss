@@ -93,7 +93,7 @@
 	&.is-multi-selected:before {
 		background: $blue-medium-100;
 		outline: 2px solid $blue-medium-200;
-		transition: 0.2s outline;
+		transition: 0s outline;
 	}
 
 	.iframe-overlay {
@@ -420,4 +420,23 @@
 
 .visual-editor__invalid-block-warning-buttons .components-button {
 	margin-bottom: 5px;
+}
+
+.editor-visual-editor__block .blocks-visual-editor__block-html-textarea {
+	display: block;
+	margin: 0;
+	width: 100%;
+	border: none;
+	outline: none;
+	box-shadow: none;
+	resize: none;
+	overflow: hidden;
+	font-family: $editor-html-font;
+	font-size: $text-editor-font-size;
+	line-height: 150%;
+	transition: padding .2s linear;
+
+	&:focus {
+		box-shadow: none;
+	}
 }

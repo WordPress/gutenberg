@@ -63,6 +63,12 @@ describe( 'blocks', () => {
 			expect( block ).toBeUndefined();
 		} );
 
+		it( 'should reject blocks with uppercase characters', () => {
+			const block = registerBlockType( 'Core/Paragraph' );
+			expect( console.error ).toHaveBeenCalledWith( 'Block names must not contain uppercase characters.' );
+			expect( block ).toBeUndefined();
+		} );
+
 		it( 'should accept valid block names', () => {
 			const block = registerBlockType( 'my-plugin/fancy-block-4', defaultBlockSettings );
 			expect( console.error ).not.toHaveBeenCalled();
