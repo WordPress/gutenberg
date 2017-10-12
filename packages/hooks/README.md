@@ -1,6 +1,6 @@
 # WP-JS-Hooks
 
-A lightweight & efficient event manager.
+A lightweight & efficient filter and action manager.
 
 ### API Usage
 
@@ -20,16 +20,8 @@ A lightweight & efficient event manager.
 * `hasFilter( 'hookName' )`
 
 Hooks can be added to an object via composition:
+`import createHooks from '../';`
 
-`myObject.hooks = new Hooks( myObject )`
+`myObject.hooks = createHooks();`
 
 API functions are then be called: `myObject.hooks.addAction()`...
-
-or as a Mixin:
-Object.assign( myObject, new Hooks() );
-
-API functions are then be called: `myObject.addAction()`...
-
-
-### Background
-See ticket [#21170](http://core.trac.wordpress.org/ticket/21170) for more information.
