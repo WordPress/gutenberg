@@ -137,6 +137,10 @@ function gutenberg_init( $return, $post ) {
 		return false;
 	}
 
+	if ( ! post_type_supports( $post_type, 'editor' ) ) {
+		return false;
+	}
+
 	require_once dirname( __FILE__ ) . '/lib/load.php';
 
 	require_once( ABSPATH . 'wp-admin/admin-header.php' );
