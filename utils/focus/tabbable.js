@@ -4,18 +4,19 @@
 import { find as findFocusable } from './focusable';
 
 /**
- * Returns the tab index of the specified element. Returns null if a tabindex
- * is not explicitly assigned as an attribute. Unlike the tabIndex property,
- * this doesn't assume any defaults which helps avoid browser inconsistencies.
+ * Returns the tab index of the given element. In contrast with the tabIndex
+ * property, this normalizes the default (0) to avoid browser inconsistencies,
+ * operating under the assumption that this function is only ever called with a
+ * focusable node.
  *
  * @see https://bugzilla.mozilla.org/show_bug.cgi?id=1190261
  *
  * @param  {Element} element Element from which to retrieve
- * @return {?Number}         Tab index of element, or null if not assigned
+ * @return {?Number}         Tab index of element (default 0)
  */
 function getTabIndex( element ) {
 	const tabIndex = element.getAttribute( 'tabindex' );
-	return tabIndex === null ? null : parseInt( tabIndex, 10 );
+	return tabIndex === null ? 0 : parseInt( tabIndex, 10 );
 }
 
 /**
@@ -63,8 +64,8 @@ function mapObjectTabbableToElement( object ) {
  * @return {Number}   Comparator result
  */
 function compareObjectTabbables( a, b ) {
-	const aTabIndex = getTabIndex( a.element ) || 0;
-	const bTabIndex = getTabIndex( b.element ) || 0;
+	const aTabIndex = getTabIndex( a.element );
+	const bTabIndex = getTabIndex( b.element );
 
 	if ( aTabIndex === bTabIndex ) {
 		return a.index - b.index;
