@@ -19,6 +19,8 @@ The name for a block is a unique string that identifies a block. Names have to b
 registerBlockType( 'my-plugin/book', {} );
 ```
 
+*Note:* this name is used on the comment delimiters as `<!-- wp:my-plugin/book -->`. Those blocks provided by core don't include a namespace when serialized.
+
 ### Block Configuration
 
 * **Type:** `{ key: value }`
