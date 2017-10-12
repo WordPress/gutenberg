@@ -40,14 +40,13 @@
 		}
 	}
 }
+.components-dropdown-menu__popover .components-popover__content {
+	width: 200px;
+}
 
 .components-dropdown-menu__menu {
-	position: absolute;
-	top: $block-controls-height - 1px;
 	// note that left is set by react in a style attribute
-	box-shadow: $shadow-popover;
-	border: 1px solid $light-gray-500;
-	background: $white;
+	width: 100%;
 	padding: 3px 3px 0 3px;
 	font-family: $default-font;
 	font-size: $default-font-size;

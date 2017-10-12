@@ -1,4 +1,5 @@
 .editor-block-switcher {
+	position: relative;
 	border: 1px solid $light-gray-500;
 	background-color: $white;
 	font-family: $default-font;
@@ -22,14 +23,10 @@
 }
 
 .editor-block-switcher__menu {
-	position: absolute;
-	top: $block-controls-height - 1px;
-	left: 0;
 	box-shadow: $shadow-popover;
 	border: 1px solid $light-gray-500;
 	background: $white;
 	padding: 3px 3px 0 3px;
-	z-index: z-index( '.editor-block-switcher__menu' );
 }
 
 .editor-block-switcher__menu-title {
