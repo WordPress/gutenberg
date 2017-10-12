@@ -110,6 +110,9 @@ export function registerBlockType( name, settings ) {
 		);
 		return;
 	}
+	if ( ! settings.icon ) {
+		settings.icon = 'star-filled';
+	}
 	const block = blocks[ name ] = {
 		name,
 		attributes: get( window._wpBlocksAttributes, name ),
