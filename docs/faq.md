@@ -2,7 +2,7 @@
 
 ## What is Gutenberg?
 
-"Gutenberg" is the name of the 2017 project to create a new editor experience for WordPress. The goal is to create a new post and page editing experience that makes it easy for anyone to create rich post layouts. This was the kickoff goal:
+"Gutenberg" is the name of the project to create a new editor experience for WordPress. The goal is to create a new post and page editing experience that makes it easy for anyone to create rich post layouts. This was the kickoff goal:
 
 > The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.
 
@@ -150,7 +150,7 @@ We are still adding more documentation.
 
 ## How is data stored? I've seen HTML comments, what is their purpose?
 
-Our approach — as outlined in <a href="https://make.wordpress.org/core/2017/01/17/editor-technical-overview/">the technical overview introduction</a> — is to augment the existing data format in a way that doesn’t break the decade-and-a-half-fabric of content WordPress provides. In other terms, this optimizes for a format that prioritizes human readability (the HTML document of the web) and easy-to-render-anywhere over a machine convenient file (JSON in post-meta) that benefits the editing context primarily.
+Our approach—as outlined in <a href="https://make.wordpress.org/core/2017/01/17/editor-technical-overview/">the technical overview introduction</a>—is to augment the existing data format in a way that doesn’t break the decade-and-a-half-fabric of content WordPress provides. In other terms, this optimizes for a format that prioritizes human readability (the HTML document of the web) and easy-to-render-anywhere over a machine convenient file (JSON in post-meta) that benefits the editing context primarily.
 
 This also <a href="https://github.com/WordPress/gutenberg/issues/1516">gives us the flexibility</a> to store those blocks that are inherently separate from the content stream (reusable pieces like widgets or small post type elements) elsewhere, and just keep token references for their placement.
 
@@ -168,6 +168,7 @@ In PHP:
 ```php
 $blocks = gutenberg_parse_blocks( $post_content );
 ```
+
 ## Why should I start using this once released?
 Blocks are likely to become the main way users interact with content. Users are going to be discovering functionality in the new universal inserter tool, with a richer block interface that provides more layout opportunities.
 
@@ -181,5 +182,4 @@ With the editor, we lay the foundation for bigger things when it comes to page b
 A lot of features are planned, too many to list. But a rough roadmap is: v1) post and page editor v2) page template editor, v3) site builder.
 
 ## WordPress is already the world's most popular publishing platform. Why change the editor at all?
-
-As an open-source project, we believe that it is critical for WordPress to continue to innovate and keep working to make the core experience intuitive and enjoyable for all users. As a community project, Gutenberg has the potential to do just that, and we’re excited to pursue this goal together. If you’d like to test, contribute, or offer feedback, <a href="http://wordpressdotorg.polldaddy.com/s/gutenberg-support">we welcome it here</a>.
+As an open-source project, we believe that it is critical for WordPress to continue to innovate and keep working to make the core experience intuitive and enjoyable for all users. As a community project, Gutenberg has the potential to do just that, and we're excited to pursue this goal together. If you'd like to test, contribute, or offer feedback, <a href="http://wordpressdotorg.polldaddy.com/s/gutenberg-support">we welcome it here</a>.
