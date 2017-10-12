@@ -154,7 +154,7 @@ Our approach — as outlined in <a href="https://make.wordpress.org/core/2017/01
 
 This also <a href="https://github.com/WordPress/gutenberg/issues/1516">gives us the flexibility</a> to store those blocks that are inherently separate from the content stream (reusable pieces like widgets or small post type elements) elsewhere, and just keep token references for their placement.
 
-We suggest you look at the language of Gutenberg to learn more about how this aspect of the project works.
+We suggest you look at the [language of Gutenberg](/language/) to learn more about how this aspect of the project works.
 
 ## How can I parse the post content back out into blocks in PHP or JS?
 In JS:
