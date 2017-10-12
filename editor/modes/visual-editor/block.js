@@ -139,10 +139,10 @@ class VisualEditorBlock extends Component {
 		this.props.blockRef( node );
 	}
 
-	setAttributes( attributes ) {
+	setAttributes( attributes, settings ) {
 		const { block, onChange } = this.props;
 		const type = getBlockType( block.name );
-		onChange( block.uid, attributes );
+		onChange( block.uid, attributes, settings );
 
 		const metaAttributes = reduce( attributes, ( result, value, key ) => {
 			if ( type && has( type, [ 'attributes', key, 'meta' ] ) ) {
@@ -412,8 +412,8 @@ export default connect(
 		};
 	},
 	( dispatch, ownProps ) => ( {
-		onChange( uid, attributes ) {
-			dispatch( updateBlockAttributes( uid, attributes ) );
+		onChange( uid, attributes, settings ) {
+			dispatch( updateBlockAttributes( uid, attributes, settings ) );
 		},
 
 		onSelect() {

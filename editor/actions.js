@@ -67,10 +67,12 @@ export function resetBlocks( blocks ) {
  *
  * @param  {String} uid        Block UID
  * @param  {Object} attributes Block attributes to be merged
+ * @param  {Object} settings   Settings
  * @return {Object}            Action object
  */
-export function updateBlockAttributes( uid, attributes ) {
+export function updateBlockAttributes( uid, attributes, settings ) {
 	return {
+		...settings,
 		type: 'UPDATE_BLOCK_ATTRIBUTES',
 		uid,
 		attributes,
@@ -96,6 +98,7 @@ export function updateBlock( uid, updates ) {
 export function focusBlock( uid, config ) {
 	return {
 		type: 'UPDATE_FOCUS',
+		skipEditorSnapshot: true,
 		uid,
 		config,
 	};
@@ -104,6 +107,7 @@ export function focusBlock( uid, config ) {
 export function selectBlock( uid ) {
 	return {
 		type: 'SELECT_BLOCK',
+		skipEditorSnapshot: true,
 		uid,
 	};
 }
@@ -111,6 +115,7 @@ export function selectBlock( uid ) {
 export function multiSelect( start, end ) {
 	return {
 		type: 'MULTI_SELECT',
+		skipEditorSnapshot: true,
 		start,
 		end,
 	};
@@ -119,6 +124,7 @@ export function multiSelect( start, end ) {
 export function clearSelectedBlock() {
 	return {
 		type: 'CLEAR_SELECTED_BLOCK',
+		skipEditorSnapshot: true,
 	};
 }
 
