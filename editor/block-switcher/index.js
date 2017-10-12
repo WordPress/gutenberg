@@ -10,6 +10,7 @@ import { uniq, get, reduce, find } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { Dropdown, Dashicon, IconButton, Toolbar, NavigableMenu } from '@wordpress/components';
 import { getBlockType, getBlockTypes, switchToBlockType } from '@wordpress/blocks';
+import { keycodes } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -17,6 +18,11 @@ import { getBlockType, getBlockTypes, switchToBlockType } from '@wordpress/block
 import './style.scss';
 import { replaceBlocks } from '../actions';
 import { getBlock } from '../selectors';
+
+/**
+ * Module Constants
+ */
+const { DOWN } = keycodes;
 
 function BlockSwitcher( { block, onTransform } ) {
 	const blockType = getBlockType( block.name );
@@ -41,20 +47,31 @@ function BlockSwitcher( { block, onTransform } ) {
 		<Dropdown
 			className="editor-block-switcher"
 			contentClassName="editor-block-switcher__popover"
-			renderToggle={ ( { onToggle, isOpen } ) => (
-				<Toolbar>
-					<IconButton
-						className="editor-block-switcher__toggle"
-						icon={ blockType.icon }
-						onClick={ onToggle }
-						aria-haspopup="true"
-						aria-expanded={ isOpen }
-						label={ __( 'Change block type' ) }
-					>
-						<Dashicon icon="arrow-down" />
-					</IconButton>
-				</Toolbar>
-			) }
+			renderToggle={ ( { onToggle, isOpen } ) => {
+				const openOnArrowDown = ( event ) => {
+					if ( ! isOpen && event.keyCode === DOWN ) {
+						event.preventDefault();
+						event.stopPropagation();
+						onToggle();
+					}
+				};
+
+				return (
+					<Toolbar>
+						<IconButton
+							className="editor-block-switcher__toggle"
+							icon={ blockType.icon }
+							onClick={ onToggle }
+							aria-haspopup="true"
+							aria-expanded={ isOpen }
+							label={ __( 'Change block type' ) }
+							onKeyDown={ openOnArrowDown }
+						>
+							<Dashicon icon="arrow-down" />
+						</IconButton>
+					</Toolbar>
+				);
+			} }
 			renderContent={ ( { onClose } ) => (
 				<NavigableMenu
 					className="editor-block-switcher__menu"
