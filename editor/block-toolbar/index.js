@@ -107,11 +107,7 @@ class BlockToolbar extends Component {
 
 		switch ( event.keyCode ) {
 			case ESCAPE: {
-				// Is there a better way to focus the selected block
-				const selectedBlock = document.querySelector( '.editor-visual-editor__block.is-selected' );
-				if ( indexOfTabbable !== -1 && selectedBlock ) {
-					selectedBlock.focus();
-				}
+				this.props.refocusBlock( this.props.uid );
 				break;
 			}
 			case LEFT:
