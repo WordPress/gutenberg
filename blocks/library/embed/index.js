@@ -135,7 +135,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 				const { setAttributes, focus, setFocus } = this.props;
 				const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 
-				const controls = (
+				const controls = [
 					focus && (
 						<BlockControls key="controls">
 							<BlockAlignmentToolbar
@@ -143,21 +143,19 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 								onChange={ updateAlignment }
 							/>
 						</BlockControls>
+					),
+					focus && (
+						<InspectorControls key="inspector">
+							<BlockDescription>
+								<p>{ __( 'The Embed block allows you to easily add videos, images, tweets, audio, and other content to your post or page.' ) }</p>
+							</BlockDescription>
+						</InspectorControls>
 					)
-				);
-
-				const inspectorControls = focus && (
-					<InspectorControls key="inspector">
-						<BlockDescription>
-							<p>{ __( 'The Embed block allows you to easily add videos, images, tweets, audio, and other content to your post or page.' ) }</p>
-						</BlockDescription>
-					</InspectorControls>
-				);
+				];
 
 				if ( fetching ) {
 					return [
 						controls,
-						inspectorControls,
 						<div key="loading" className="wp-block-embed is-loading">
 							<Spinner />
 							<p>{ __( 'Embedding…' ) }</p>
@@ -170,7 +168,6 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 
 					return [
 						controls,
-						inspectorControls,
 						<Placeholder key="placeholder" icon={ icon } label={ label } className="wp-block-embed">
 							<form onSubmit={ this.doServerSideRender }>
 								<input
@@ -201,7 +198,6 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 
 				return [
 					controls,
-					inspectorControls,
 					<figure key="embed" className={ typeClassName }>
 						{ ( cannotPreview ) ? (
 							<Placeholder icon={ icon } label={ __( 'Embed URL' ) }>
