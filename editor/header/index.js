@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import { Slot } from 'react-slot-fill';
 
 /**
  * WordPress dependencies
@@ -47,6 +48,7 @@ function Header( {
 					label={ __( 'Redo' ) }
 					disabled={ ! hasRedo }
 					onClick={ redo } />
+				<Slot name="Editor.Header" />
 			</div>
 			<div className="editor-header__settings">
 				<SavedState />
