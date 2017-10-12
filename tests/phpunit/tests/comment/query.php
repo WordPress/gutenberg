@@ -3025,4 +3025,139 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 
 		$this->assertEquals( $number_of_queries, $wpdb->num_queries );
 	}
+
+	/**
+	 * @ticket 40669
+	 */
+	public function test_add_comment_meta_should_invalidate_query_cache() {
+		global $wpdb;
+
+		$p = self::factory()->post->create( array( 'post_status' => 'publish' ) );
+		$c1 = self::factory()->comment->create_post_comments( $p, 1 );
+		$c2 = self::factory()->comment->create_post_comments( $p, 1 );
+
+		foreach ( $c1 as $cid ) {
+			add_comment_meta( $cid, 'sauce', 'fire' );
+		}
+
+		$cached = get_comments( array(
+			'post_id' => $p,
+			'fields' => 'ids',
+			'meta_query' => array(
+				array(
+					'key' => 'sauce',
+					'value' => 'fire',
+				),
+			)
+		) );
+
+		$this->assertEqualSets( $c1, $cached );
+
+		foreach ( $c2 as $cid ) {
+			add_comment_meta( $cid, 'sauce', 'fire' );
+		}
+
+		$found = get_comments( array(
+			'post_id' => $p,
+			'fields' => 'ids',
+			'meta_query' => array(
+				array(
+					'key' => 'sauce',
+					'value' => 'fire',
+				),
+			)
+		) );
+
+		$this->assertEqualSets( array_merge( $c1, $c2 ), $found );
+	}
+
+	/**
+	 * @ticket 40669
+	 */
+	public function test_update_comment_meta_should_invalidate_query_cache() {
+		global $wpdb;
+
+		$p = self::factory()->post->create( array( 'post_status' => 'publish' ) );
+		$c1 = self::factory()->comment->create_post_comments( $p, 1 );
+		$c2 = self::factory()->comment->create_post_comments( $p, 1 );
+
+		foreach ( array_merge( $c1, $c2 ) as $cid ) {
+			add_comment_meta( $cid, 'sauce', 'fire' );
+		}
+
+		$cached = get_comments( array(
+			'post_id' => $p,
+			'fields' => 'ids',
+			'meta_query' => array(
+				array(
+					'key' => 'sauce',
+					'value' => 'fire',
+				),
+			)
+		) );
+
+		$this->assertEqualSets( array_merge( $c1, $c2 ), $cached );
+
+		foreach ( $c2 as $cid ) {
+			update_comment_meta( $cid, 'sauce', 'foo' );
+		}
+
+		$found = get_comments( array(
+			'post_id' => $p,
+			'fields' => 'ids',
+			'meta_query' => array(
+				array(
+					'key' => 'sauce',
+					'value' => 'fire',
+				),
+			)
+		) );
+
+		$this->assertEqualSets( $c1, $found );
+	}
+
+	/**
+	 * @ticket 40669
+	 */
+	public function test_delete_comment_meta_should_invalidate_query_cache() {
+		global $wpdb;
+
+		$p = self::factory()->post->create( array( 'post_status' => 'publish' ) );
+		$c1 = self::factory()->comment->create_post_comments( $p, 1 );
+		$c2 = self::factory()->comment->create_post_comments( $p, 1 );
+
+		foreach ( array_merge( $c1, $c2 ) as $cid ) {
+			add_comment_meta( $cid, 'sauce', 'fire' );
+		}
+
+		$cached = get_comments( array(
+			'post_id' => $p,
+			'fields' => 'ids',
+			'meta_query' => array(
+				array(
+					'key' => 'sauce',
+					'value' => 'fire',
+				),
+			)
+		) );
+
+		$this->assertEqualSets( array_merge( $c1, $c2 ), $cached );
+
+		foreach ( $c2 as $cid ) {
+			delete_comment_meta( $cid, 'sauce' );
+		}
+
+		$found = get_comments( array(
+			'post_id' => $p,
+			'fields' => 'ids',
+			'meta_query' => array(
+				array(
+					'key' => 'sauce',
+					'value' => 'fire',
+				),
+			)
+		) );
+
+		$this->assertEqualSets( $c1, $found );
+	}
 }
