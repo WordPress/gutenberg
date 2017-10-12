@@ -38,14 +38,19 @@ class NavigableMenu extends Component {
 			.find( this.container )
 			.filter( ( node ) => node.parentElement === this.container );
 		const indexOfTabbable = tabbables.indexOf( document.activeElement );
+		if ( indexOfTabbable === -1 ) {
+			return;
+		}
 		const offset = [ UP, LEFT ].indexOf( event.keyCode ) === -1 ? 1 : -1;
-		const nextTabbable = tabbables[ indexOfTabbable + offset ];
-		if ( indexOfTabbable !== -1 ) {
-			event.stopPropagation();
-			if ( nextTabbable ) {
-				nextTabbable.focus();
-				onNavigate( indexOfTabbable + offset );
-			}
+		let nextIndex = indexOfTabbable + offset;
+		nextIndex = nextIndex === -1 ? tabbables.length - 1 : nextIndex;
+		nextIndex = nextIndex === tabbables.length ? 0 : nextIndex;
+		const nextTabbable = tabbables[ nextIndex ];
+		event.stopPropagation();
+		event.preventDefault();
+		if ( nextTabbable ) {
+			nextTabbable.focus();
+			onNavigate( nextIndex );
 		}
 	}
 
