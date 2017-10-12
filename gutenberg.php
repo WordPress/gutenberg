@@ -126,16 +126,23 @@ function gutenberg_init( $return, $post ) {
 		return $return;
 	}
 
-	if ( 'attachment' !== get_post_type( $post ) ) {
-		require_once dirname( __FILE__ ) . '/lib/load.php';
+	$post_type        = $post->post_type;
+	$post_type_object = get_post_type_object( $post_type );
 
-		require_once( ABSPATH . 'wp-admin/admin-header.php' );
-		the_gutenberg_project();
-
-		return true;
+	if ( 'attachment' === $post_type ) {
+		return false;
 	}
 
-	return false;
+	if ( ! $post_type_object->show_in_rest ) {
+		return false;
+	}
+
+	require_once dirname( __FILE__ ) . '/lib/load.php';
+
+	require_once( ABSPATH . 'wp-admin/admin-header.php' );
+	the_gutenberg_project();
+
+	return true;
 }
 
 /**
