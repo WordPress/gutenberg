@@ -23,6 +23,20 @@ function getCursorEnd( node ) {
 	return node.childNodes.length;
 }
 
+function isBr( node ) {
+	return node.nodeType === ELEMENT_NODE && node.nodeName.toLowerCase() === 'br';
+}
+
+function getFilteredCursorEnd( node ) {
+	const len = node.childNodes.length;
+	if ( len > 0 ) {
+		const hasBrLast = isBr( node.childNodes[ len - 1 ] );
+		return hasBrLast ? len - 1 : len;
+	}
+
+	return len;
+}
+
 /**
  * Check whether the offset is at the start of the node
  *
@@ -44,7 +58,7 @@ function isAtCursorStart( node, offset ) {
  */
 function isAtCursorEnd( node, offset ) {
 	const nodeEnd = getCursorEnd( node );
-	return nodeEnd === offset;
+	return nodeEnd === offset || offset === getFilteredCursorEnd( node );
 }
 
 /**
