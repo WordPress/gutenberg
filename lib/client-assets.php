@@ -620,7 +620,6 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 			'baseURL'  => includes_url( 'js/tinymce' ),
 			'suffix'   => SCRIPT_DEBUG ? '' : '.min',
 			'settings' => apply_filters( 'tiny_mce_before_init', array(
-				'external_plugins' => apply_filters( 'mce_external_plugins', array() ),
 				'plugins'          => array_unique( apply_filters( 'tiny_mce_plugins', array(
 					'charmap',
 					'colorpicker',
@@ -671,6 +670,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 				), 'editor' ) ),
 				'toolbar3'         => implode( ',', apply_filters( 'mce_buttons_3', array(), 'editor' ) ),
 				'toolbar4'         => implode( ',', apply_filters( 'mce_buttons_4', array(), 'editor' ) ),
+				'external_plugins' => apply_filters( 'mce_external_plugins', array() ),
 			), 'editor' ),
 		),
 	) );
