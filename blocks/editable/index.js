@@ -15,7 +15,6 @@ import {
 	noop,
 } from 'lodash';
 import { nodeListToReact } from 'dom-react';
-import { Fill } from 'react-slot-fill';
 import 'element-closest';
 
 /**
@@ -23,6 +22,7 @@ import 'element-closest';
  */
 import { createElement, Component, renderToString } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
+import { Fill } from '@wordpress/components';
 
 /**
  * Internal dependencies
