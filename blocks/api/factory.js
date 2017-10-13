@@ -16,6 +16,10 @@ import {
  */
 import { getBlockType } from './registration';
 
+const FixedBlockUids = {
+	'core/footnotes': '[[footnotes]]',
+};
+
 /**
  * Returns a block object given its type and attributes.
  *
@@ -53,7 +57,7 @@ export function createBlock( name, blockAttributes = {} ) {
 	// Blocks are stored with a unique ID, the assigned type name,
 	// and the block attributes.
 	return {
-		uid: uuid(),
+		uid: FixedBlockUids[ name ] || uuid(),
 		name,
 		isValid: true,
 		attributes,

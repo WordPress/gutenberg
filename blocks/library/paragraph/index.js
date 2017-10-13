@@ -2,13 +2,14 @@
  * External dependencies
  */
 import classnames from 'classnames';
-
+import uuid from 'uuid/v4';
+import { find } from 'lodash';
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { concatChildren } from '@wordpress/element';
-import { PanelBody } from '@wordpress/components';
+import { concatChildren, Component } from '@wordpress/element';
+import { PanelBody, IconButton } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -66,6 +67,9 @@ registerBlockType( 'core/paragraph', {
 		fontSize: {
 			type: 'number',
 		},
+		footnotes: {
+			type: 'object',
+		},
 	},
 
 	transforms: {
@@ -94,27 +98,69 @@ registerBlockType( 'core/paragraph', {
 		}
 	},
 
-	edit( { attributes, setAttributes, insertBlocksAfter, focus, setFocus, mergeBlocks, onReplace } ) {
-		const { align, content, dropCap, placeholder, fontSize, backgroundColor, textColor, width } = attributes;
-		const toggleDropCap = () => setAttributes( { dropCap: ! dropCap } );
-		const className = dropCap ? 'has-drop-cap' : null;
+	edit: class extends Component {
+		constructor() {
+			super( ...arguments );
 
-		return [
-			focus && (
-				<BlockControls key="controls">
-					<AlignmentToolbar
-						value={ align }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { align: nextAlign } );
-						} }
-					/>
-				</BlockControls>
-			),
-			focus && (
-				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'Text. Great things start here.' ) }</p>
-					</BlockDescription>
+			this.state = { activeFormats: { }, activeFormatSettings: null, footnoteId: null };
+
+			this.footnotes = this.props.attributes.footnotes || {};
+
+			this.footnoteFormatter = {
+				name: 'footnote',
+				icon: 'format-audio',
+				title: __( 'Footnote' ),
+				onClick: () => {
+					this.setState( { activeFormatSettings: 'footnote' } );
+				},
+				onNodeChange: ( parents ) => {
+					const link = find( parents, ( node ) => node.nodeName.toLowerCase() === 'a' );
+					const href = link && link.getAttribute( 'href' );
+					const isFootnote = link && href && href.indexOf( '#footnote-' ) === 0;
+					const footnoteId = isFootnote && href.substring( '#footnote-'.length );
+					const activeFormats = { ...this.state.activeFormats, footnote: isFootnote };
+					this.setState( { activeFormats, activeFormatSettings: isFootnote ? 'footnote' : ( this.state.activeFormatSettings === 'footnote' ? null : this.state.activeFormatSettings ), footnoteId } );
+				},
+				isActive: () => this.state.activeFormats.footnote,
+				applyFormat: ( { setNodeContent }, formatValue ) => {
+					const footnoteId = uuid();
+					this.footnotes[ footnoteId ] = formatValue;
+					setNodeContent( `<a href="#footnote-${ footnoteId }" contenteditable="false"><sup>[*]</sup></a>` );
+				},
+				getSettingsElement: () => this.state.activeFormatSettings === 'footnote' && <FootnoteSettings footnoteId={ this.state.footnoteId } footnote={ this.footnotes[ this.state.footnoteId ] } />,
+			};
+		}
+		componentWillReceiveProps( { focus } ) {
+			if ( ! focus ) {
+				this.setState( { activeFormatSettings: null } );
+			}
+		}
+		render() {
+			const { attributes, setAttributes, insertBlocksAfter, focus, setFocus, mergeBlocks, onReplace } = this.props;
+			const { align, content, dropCap, placeholder, fontSize, backgroundColor, textColor, width } = attributes;
+			const toggleDropCap = () => setAttributes( { dropCap: ! dropCap } );
+			const setContent = ( newContent ) => {
+				setAttributes( { content: newContent, footnotes: this.footnotes } );
+			};
+
+			const className = dropCap ? 'has-drop-cap' : null;
+
+			return [
+				focus && (
+					<BlockControls key="controls">
+						<AlignmentToolbar
+							value={ align }
+							onChange={ ( nextAlign ) => {
+								setAttributes( { align: nextAlign } );
+							} }
+						/>
+					</BlockControls>
+				),
+				focus && (
+					<InspectorControls key="inspector">
+						<BlockDescription>
+							<p>{ __( 'Text. Great things start here.' ) }</p>
+						</BlockDescription>
 					<PanelBody title={ __( 'Text Settings' ) }>
 						<ToggleControl
 							label={ __( 'Drop Cap' ) }
@@ -150,42 +196,40 @@ registerBlockType( 'core/paragraph', {
 							onChange={ ( nextWidth ) => setAttributes( { width: nextWidth } ) }
 						/>
 					</PanelBody>
-				</InspectorControls>
-			),
-			<BlockAutocomplete key="editable" onReplace={ onReplace }>
-				<Editable
-					tagName="p"
-					className={ classnames( 'wp-block-paragraph', className, {
-						[ `align${ width }` ]: width,
-						'has-background': backgroundColor,
-					} ) }
-					style={ {
-						backgroundColor: backgroundColor,
-						color: textColor,
-						fontSize: fontSize ? fontSize + 'px' : undefined,
-						textAlign: align,
-					} }
-					value={ content }
-					onChange={ ( nextContent ) => {
-						setAttributes( {
-							content: nextContent,
-						} );
-					} }
-					focus={ focus }
-					onFocus={ setFocus }
-					onSplit={ ( before, after, ...blocks ) => {
-						setAttributes( { content: before } );
-						insertBlocksAfter( [
-							...blocks,
-							createBlock( 'core/paragraph', { content: after } ),
-						] );
-					} }
-					onMerge={ mergeBlocks }
-					onReplace={ onReplace }
-					placeholder={ placeholder || __( 'New Paragraph' ) }
-				/>
-			</BlockAutocomplete>,
-		];
+					</InspectorControls>
+				),
+				<BlockAutocomplete key="editable" onReplace={ onReplace }>
+					<Editable
+						tagName="p"
+						className={ classnames( 'wp-block-paragraph', className, {
+							[ `align${ width }` ]: width,
+							'has-background': backgroundColor,
+						} ) }
+						style={ {
+							backgroundColor: backgroundColor,
+							color: textColor,
+							fontSize: fontSize ? fontSize + 'px' : undefined,
+							textAlign: align,
+						} }
+						value={ content }
+						onChange={ setContent }
+						focus={ focus }
+						onFocus={ setFocus }
+						onSplit={ ( before, after, ...blocks ) => {
+							setAttributes( { content: before } );
+							insertBlocksAfter( [
+								...blocks,
+								createBlock( 'core/paragraph', { content: after } ),
+							] );
+						} }
+						onMerge={ mergeBlocks }
+						onReplace={ onReplace }
+						placeholder={ placeholder || __( 'New Paragraph' ) }
+						formatters={ { footnote: this.footnoteFormatter } }
+					/>
+				</BlockAutocomplete>,
+			];
+		}
 	},
 
 	save( { attributes } ) {
@@ -207,3 +251,32 @@ registerBlockType( 'core/paragraph', {
 } );
 
 setDefaultBlockName( 'core/paragraph' );
+
+class FootnoteSettings extends Component {
+	constructor( props ) {
+		super( props );
+		this.addFootnote = this.addFootnote.bind( this );
+		this.onFootnoteChange = this.onFootnoteChange.bind( this );
+
+		this.state = {
+			footnote: props.footnote,
+		};
+	}
+	componentWillReceiveProps( nextProps ) {
+		if ( nextProps.footnoteId !== this.props.footnoteId ) {
+			this.setState( { footnote: nextProps.footnote } );
+		}
+	}
+	onFootnoteChange( e ) {
+		this.setState( { footnote: e.target.value } );
+	}
+	addFootnote() {
+		this.props.changeFormats( this.state.footnote );
+	}
+	render() {
+		return [
+			<textarea placeholder="Add a footnote" style={ { flexGrow: 1 } } value={ this.state.footnote } onChange={ this.onFootnoteChange } />,
+			<IconButton icon="yes" label={ __( 'Add footnote' ) } onClick={ this.addFootnote } />,
+		];
+	}
+}

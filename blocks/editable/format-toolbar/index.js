@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, cloneElement } from '@wordpress/element';
 import { IconButton, Toolbar, withSpokenMessages } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
 
@@ -56,6 +56,8 @@ class FormatToolbar extends Component {
 		this.onChangeLinkValue = this.onChangeLinkValue.bind( this );
 		this.toggleLinkSettingsVisibility = this.toggleLinkSettingsVisibility.bind( this );
 		this.setLinkTarget = this.setLinkTarget.bind( this );
+
+		this.getFormatterSettingsElement = this.getFormatterSettingsElement.bind( this );
 	}
 
 	componentDidMount() {
@@ -83,6 +85,7 @@ class FormatToolbar extends Component {
 				settingsVisible: false,
 				opensInNewWindow: !! nextProps.formats.link && !! nextProps.formats.link.target,
 				newLinkValue: '',
+				showFootnoteEntry: false,
 			} );
 		}
 	}
@@ -131,14 +134,30 @@ class FormatToolbar extends Component {
 		}
 	}
 
+	getFormatterSettingsElement( formatters ) {
+		let settingsElement = null;
+		let formatterName = null;
+
+		for ( let formatter of formatters ) {
+			settingsElement = formatter.getSettingsElement();
+
+			if ( !! settingsElement ) {
+				formatterName = formatter.name;
+				break;
+			}
+		}
+
+		return settingsElement && cloneElement( settingsElement, { changeFormats: ( formatSettings ) => this.props.onChange( { [ formatterName ]: formatSettings } ) } );
+	}
+
 	render() {
-		const { formats, focusPosition, enabledControls = DEFAULT_CONTROLS } = this.props;
+		const { formats, focusPosition, enabledControls = DEFAULT_CONTROLS, formatters = [] } = this.props;
 		const { isAddingLink, isEditingLink, newLinkValue, settingsVisible, opensInNewWindow } = this.state;
 		const linkStyle = focusPosition
 			? { position: 'absolute', ...focusPosition }
 			: null;
 
-		const toolbarControls = FORMATTING_CONTROLS
+		let toolbarControls = FORMATTING_CONTROLS
 			.filter( control => enabledControls.indexOf( control.format ) !== -1 )
 			.map( ( control ) => ( {
 				...control,
@@ -160,14 +179,29 @@ class FormatToolbar extends Component {
 				icon: 'admin-links',
 				title: __( 'Link' ),
 				onClick: this.addLink,
-				isActive: isAddingLink || !! formats.link,
+				isActive: ( isAddingLink || !! formats.link ),
 			} );
 		}
+
+		toolbarControls = toolbarControls.concat( formatters );
+		const formatterSettings = this.getFormatterSettingsElement( formatters );
 
 		return (
 			<div className="blocks-format-toolbar">
 				<Toolbar controls={ toolbarControls } />
+				{ formatterSettings &&
+					<div className="blocks-format-toolbar__link-modal" style={ linkStyle }>
+						{ formatterSettings }
+					</div>
+				}
+			</div>
+		);
+	}
+}
 
+export default withSpokenMessages( FormatToolbar );
+
+/*
 				{ ( isAddingLink || isEditingLink ) &&
 					<form
 						className="blocks-format-toolbar__link-modal"
@@ -196,9 +230,4 @@ class FormatToolbar extends Component {
 						{ linkSettings }
 					</div>
 				}
-			</div>
-		);
-	}
-}
-
-export default withSpokenMessages( FormatToolbar );
+*/
