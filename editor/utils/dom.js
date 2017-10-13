@@ -9,18 +9,7 @@ function getCursorStart( /* node */ ) {
 }
 
 function getCursorEnd( node ) {
-	// NOTE: In the future, this might be a place to ignore special characters that browsers ignore
-	if ( node.nodeType === TEXT_NODE ) {
-		return node.nodeValue.length;
-	}
-
-	// We may need exceptions for other empty tags as well (e.g. hr, br, input)
-	if ( node.nodeType === ELEMENT_NODE && node.nodeName.toLowerCase() === 'img' ) {
-		return 1;
-	}
-
-	// Non text nodes have a last cursor position of their number of children
-	return node.childNodes.length;
+	return node.nodeType === TEXT_NODE ? node.nodeValue.length : node.childNodes.length;
 }
 
 function isBr( node ) {
