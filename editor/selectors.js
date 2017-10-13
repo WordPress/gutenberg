@@ -1020,3 +1020,24 @@ export const getMostFrequentlyUsedBlocks = createSelector(
 export function isFeatureActive( state, feature ) {
 	return !! state.preferences.features[ feature ];
 }
+
+/**
+ * Returns the reusable block with the given ID.
+ *
+ * @param {Object} state Global application state
+ * @param {String} ref   The reusable block's ID
+ * @return {Object}      The reusable block, or null if none exists
+ */
+export function getReusableBlock( state, ref ) {
+	return state.reusableBlocks[ ref ] || null;
+}
+
+/**
+ * Returns an array of all reusable blocks.
+ *
+ * @param {Object} state Global application state
+ * @return {Array}       An array of all reusable blocks.
+ */
+export function getReusableBlocks( state ) {
+	return Object.values( state.reusableBlocks );
+}
