@@ -3,23 +3,12 @@
  */
 const { ELEMENT_NODE, TEXT_NODE } = window.Node;
 
-function getCursorStart( /* node */ ) {
-	// NOTE: In the future, we may want to skip some non-inhabitable positions in some nodes
-	return 0;
-}
-
-function getCursorEnd( node ) {
-	return node.nodeType === TEXT_NODE ? node.nodeValue.length : node.childNodes.length;
-}
-
-function isBr( node ) {
-	return node.nodeType === ELEMENT_NODE && node.nodeName.toLowerCase() === 'br';
-}
-
+// Returns an offset which ignores the last br if applicable
 function getFilteredCursorEnd( node ) {
 	const len = node.childNodes.length;
 	if ( len > 0 ) {
-		const hasBrLast = isBr( node.childNodes[ len - 1 ] );
+		const last = node.childNodes[ len - 1 ];
+		const hasBrLast = last.nodeType === ELEMENT_NODE && last.nodeName.toLowerCase() === 'br';
 		return hasBrLast ? len - 1 : len;
 	}
 
@@ -34,8 +23,8 @@ function getFilteredCursorEnd( node ) {
  * @return {Boolean}        whether or not the offset is at the first cursor position in node
  */
 function isAtCursorStart( node, offset ) {
-	const nodeStart = getCursorStart( node );
-	return nodeStart === offset;
+	// NOTE: In the future, we may want to skip some non-inhabitable positions in some nodes
+	return offset === 0;
 }
 
 /**
@@ -46,8 +35,8 @@ function isAtCursorStart( node, offset ) {
  * @return {Boolean}        whether or not the offset is at the last cursor position in node
  */
 function isAtCursorEnd( node, offset ) {
-	const nodeEnd = getCursorEnd( node );
-	return nodeEnd === offset || offset === getFilteredCursorEnd( node );
+	const nodeEnd = node.nodeType === TEXT_NODE ? node.nodeValue.length : node.childNodes.length;
+	return offset === nodeEnd || offset === getFilteredCursorEnd( node );
 }
 
 /**
