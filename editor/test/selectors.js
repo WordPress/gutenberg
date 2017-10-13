@@ -73,6 +73,8 @@ import {
 	getDirtyMetaBoxes,
 	getMetaBox,
 	isMetaBoxStateDirty,
+	getReusableBlock,
+	getReusableBlocks,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -2021,6 +2023,76 @@ describe( 'selectors', () => {
 
 			expect( getRecentlyUsedBlocks( state ).map( ( block ) => block.name ) )
 				.toEqual( [ 'core/paragraph', 'core/image' ] );
+		} );
+	} );
+
+	describe( 'getReusableBlock', () => {
+		it( 'should return a reusable block', () => {
+			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
+			const expectedReusableBlock = {
+				id,
+				name: 'My cool block',
+				type: 'core/paragraph',
+				attributes: {
+					content: 'Hello!',
+				},
+			};
+			const state = {
+				reusableBlocks: {
+					[ id ]: expectedReusableBlock,
+				},
+			};
+
+			const actualReusableBlock = getReusableBlock( state, id );
+			expect( actualReusableBlock ).toEqual( expectedReusableBlock );
+		} );
+
+		it( 'should return null when no reusable block exists', () => {
+			const state = {
+				reusableBlocks: {},
+			};
+
+			const reusableBlock = getReusableBlock( state, '358b59ee-bab3-4d6f-8445-e8c6971a5605' );
+			expect( reusableBlock ).toBeNull();
+		} );
+	} );
+
+	describe( 'getReusableBlocks', () => {
+		it( 'should return an array of reusable blocks', () => {
+			const reusableBlock1 = {
+				id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
+				name: 'My cool block',
+				type: 'core/paragraph',
+				attributes: {
+					content: 'Hello!',
+				},
+			};
+			const reusableBlock2 = {
+				id: '687e1a87-cca1-41f2-a782-197ddaea9abf',
+				name: 'My neat block',
+				type: 'core/paragraph',
+				attributes: {
+					content: 'Goodbye!',
+				},
+			};
+			const state = {
+				reusableBlocks: {
+					[ reusableBlock1.id ]: reusableBlock1,
+					[ reusableBlock2.id ]: reusableBlock2,
+				},
+			};
+
+			const reusableBlocks = getReusableBlocks( state );
+			expect( reusableBlocks ).toEqual( [ reusableBlock1, reusableBlock2 ] );
+		} );
+
+		it( 'should return an empty array when no reusable blocks exist', () => {
+			const state = {
+				reusableBlocks: {},
+			};
+
+			const reusableBlocks = getReusableBlocks( state );
+			expect( reusableBlocks ).toEqual( [] );
 		} );
 	} );
 } );
