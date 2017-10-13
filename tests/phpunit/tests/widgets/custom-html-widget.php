@@ -28,15 +28,46 @@ class Test_WP_Widget_Custom_HTML extends WP_UnitTestCase {
 	protected $widget_text_args;
 
 	/**
-	 * Test constructor.
+	 * Clean up global scope.
 	 *
-	 * @covers WP_Widget_Custom_HTML::__constructor
+	 * @global WP_Scripts $wp_scripts
+	 * @global WP_Styles  $wp_style
 	 */
-	function test_constructor() {
+	public function clean_up_global_scope() {
+		global $wp_scripts, $wp_styles;
+		parent::clean_up_global_scope();
+		$wp_scripts = null;
+		$wp_styles = null;
+	}
+
+	/**
+	 * Test construct.
+	 *
+	 * @covers WP_Widget_Custom_HTML::__construct
+	 */
+	public function test_construct() {
 		$widget = new WP_Widget_Custom_HTML();
 		$this->assertEquals( 'custom_html', $widget->id_base );
 		$this->assertEquals( 'widget_custom_html', $widget->widget_options['classname'] );
+		$this->assertEquals( 400, $widget->control_options['width'] );
+		$this->assertEquals( 350, $widget->control_options['height'] );
 		$this->assertTrue( $widget->widget_options['customize_selective_refresh'] );
+	}
+
+	/**
+	 * Test enqueue_admin_scripts method.
+	 *
+	 * @covers WP_Widget_Custom_HTML::_register
+	 */
+	public function test__register() {
+		set_current_screen( 'widgets.php' );
+		$widget = new WP_Widget_Custom_HTML();
+		$widget->_register();
+
+		$this->assertEquals( 10, has_action( 'admin_print_scripts-widgets.php', array( $widget, 'enqueue_admin_scripts' ) ) );
+		$this->assertEquals( 10, has_action( 'admin_footer-widgets.php', array( 'WP_Widget_Custom_HTML', 'render_control_template_scripts' ) ) );
+		$this->assertEquals( 10, has_action( 'admin_head-widgets.php', array( 'WP_Widget_Custom_HTML', 'add_help_text' ) ) );
+		$this->assertContains( 'wp.customHtmlWidgets.idBases.push( "custom_html" );', wp_scripts()->registered['custom-html-widgets']->extra['after'] );
 	}
 
 	/**
@@ -44,7 +75,7 @@ class Test_WP_Widget_Custom_HTML extends WP_UnitTestCase {
 	 *
 	 * @covers WP_Widget_Custom_HTML::widget
 	 */
-	function test_widget() {
+	public function test_widget() {
 		$widget = new WP_Widget_Custom_HTML();
 		$content = "<i>Custom HTML</i>\n\n<b>CODE</b>\nLast line.<u>unclosed";
 
@@ -105,7 +136,7 @@ class Test_WP_Widget_Custom_HTML extends WP_UnitTestCase {
 	 * @param WP_Widget_Custom_HTML $widget   Current widget instance.
 	 * @return string Widget content.
 	 */
-	function filter_widget_text( $text, $instance, $widget ) {
+	public function filter_widget_text( $text, $instance, $widget ) {
 		$this->widget_text_args = array( $text, $instance, $widget );
 		$text .= '[filter:widget_text]';
 		return $text;
@@ -119,7 +150,7 @@ class Test_WP_Widget_Custom_HTML extends WP_UnitTestCase {
 	 * @param WP_Widget_Custom_HTML $widget         Current Custom HTML widget instance.
 	 * @return string Widget content.
 	 */
-	function filter_widget_custom_html_content( $widget_content, $instance, $widget ) {
+	public function filter_widget_custom_html_content( $widget_content, $instance, $widget ) {
 		$this->widget_custom_html_content_args = array( $widget_content, $instance, $widget );
 		$widget_content .= '[filter:widget_custom_html_content]';
 		return $widget_content;
@@ -130,7 +161,7 @@ class Test_WP_Widget_Custom_HTML extends WP_UnitTestCase {
 	 *
 	 * @covers WP_Widget_Custom_HTML::update
 	 */
-	function test_update() {
+	public function test_update() {
 		$widget = new WP_Widget_Custom_HTML();
 		$instance = array(
 			'title'   => "The\n<b>Title</b>",
@@ -174,7 +205,7 @@ class Test_WP_Widget_Custom_HTML extends WP_UnitTestCase {
 	 * @param string $cap     Capability name.
 	 * @return array Caps.
 	 */
-	function grant_unfiltered_html_cap( $caps, $cap ) {
+	public function grant_unfiltered_html_cap( $caps, $cap ) {
 		if ( 'unfiltered_html' === $cap ) {
 			$caps = array_diff( $caps, array( 'do_not_allow' ) );
 			$caps[] = 'unfiltered_html';
@@ -189,11 +220,79 @@ class Test_WP_Widget_Custom_HTML extends WP_UnitTestCase {
 	 * @param string $cap     Capability name.
 	 * @return array Caps.
 	 */
-	function revoke_unfiltered_html_cap( $caps, $cap ) {
+	public function revoke_unfiltered_html_cap( $caps, $cap ) {
 		if ( 'unfiltered_html' === $cap ) {
 			$caps = array_diff( $caps, array( 'unfiltered_html' ) );
 			$caps[] = 'do_not_allow';
 		}
 		return $caps;
+	}
+
+	/**
+	 * Test enqueue_admin_scripts method. Condition: logged_in, syntax_highlighting is on.
+	 *
+	 * @covers WP_Widget_Custom_HTML::enqueue_admin_scripts
+	 */
+	public function test_enqueue_admin_scripts_when_logged_in_and_syntax_highlighting_on() {
+		$user = $this->factory()->user->create();
+		wp_set_current_user( $user );
+		wp_get_current_user()->syntax_highlighting = 'true';
+		set_current_screen( 'widgets.php' );
+		$widget = new WP_Widget_Custom_HTML();
+		$widget->enqueue_admin_scripts();
+
+		$this->assertTrue( wp_script_is( 'custom-html-widgets', 'enqueued' ) );
+		$this->assertTrue( wp_script_is( 'code-editor', 'enqueued' ) );
+		$this->assertTrue( wp_script_is( 'wp-codemirror', 'enqueued' ) );
+		$this->assertTrue( wp_script_is( 'csslint', 'enqueued' ) );
+		$this->assertTrue( wp_script_is( 'jshint', 'enqueued' ) );
+		$this->assertTrue( wp_script_is( 'htmlhint', 'enqueued' ) );
+	}
+
+	/**
+	 * Test enqueue_admin_scripts method. Condition: logged_in, syntax_highlighting is off.
+	 *
+	 * @covers WP_Widget_Custom_HTML::enqueue_admin_scripts
+	 */
+	public function test_enqueue_admin_scripts_when_logged_in_and_syntax_highlighting_off() {
+		$user = $this->factory()->user->create();
+		wp_set_current_user( $user );
+		update_user_meta( $user, 'syntax_highlighting', 'false' );
+		set_current_screen( 'widgets.php' );
+		$widget = new WP_Widget_Custom_HTML();
+		$widget->enqueue_admin_scripts();
+
+		$this->assertTrue( wp_script_is( 'custom-html-widgets', 'enqueued' ) );
+		$this->assertTrue( wp_script_is( 'code-editor', 'enqueued' ) );
+		$this->assertTrue( wp_script_is( 'wp-codemirror', 'enqueued' ) );
+		$this->assertFalse( wp_script_is( 'csslint', 'enqueued' ) );
+		$this->assertFalse( wp_script_is( 'jshint', 'enqueued' ) );
+		$this->assertFalse( wp_script_is( 'htmlhint', 'enqueued' ) );
+	}
+
+	/**
+	 * Test render_control_template_scripts method.
+	 *
+	 * @covers WP_Widget_Custom_HTML::render_control_template_scripts
+	 */
+	public function test_render_control_template_scripts() {
+		ob_start();
+		WP_Widget_Custom_HTML::render_control_template_scripts();
+		$output = ob_get_clean();
+
+		$this->assertContains( '<script type="text/html" id="tmpl-widget-custom-html-control-fields">', $output );
+	}
+
+	/**
+	 * Test add_help_text method.
+	 *
+	 * @covers WP_Widget_Custom_HTML::add_help_text
+	 */
+	public function test_add_help_text() {
+		set_current_screen( 'widgets.php' );
+		WP_Widget_Custom_HTML::add_help_text();
+		$content = get_current_screen()->get_help_tab( 'custom_html_widget' )['content'];
+
+		$this->assertContains( 'Use the Custom HTML widget to add arbitrary HTML code to your widget areas.', $content );
 	}
 }

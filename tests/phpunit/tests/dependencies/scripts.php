@@ -724,4 +724,360 @@ class Tests_Dependencies_Scripts extends WP_UnitTestCase {
 
 		$this->assertEquals( $expected, get_echo( 'wp_print_scripts' ) );
 	}
+
+	/**
+	 * Testing `wp_enqueue_code_editor` with file path.
+	 *
+	 * @ticket 41871
+	 * @covers wp_enqueue_code_editor()
+	 */
+	public function test_wp_enqueue_code_editor_when_php_file_will_be_passed() {
+		$real_file = WP_PLUGIN_DIR . '/hello.php';
+		$wp_enqueue_code_editor = wp_enqueue_code_editor( array( 'file' => $real_file ) );
+		$this->assertNonEmptyMultidimensionalArray( $wp_enqueue_code_editor );
+
+		$this->assertEqualSets( array( 'codemirror', 'csslint', 'jshint', 'htmlhint' ), array_keys( $wp_enqueue_code_editor ) );
+		$this->assertEqualSets(
+			array(
+				'autoCloseBrackets',
+				'autoCloseTags',
+				'continueComments',
+				'direction',
+				'extraKeys',
+				'indentUnit',
+				'indentWithTabs',
+				'inputStyle',
+				'lineNumbers',
+				'lineWrapping',
+				'matchBrackets',
+				'matchTags',
+				'mode',
+				'styleActiveLine',
+			),
+			array_keys( $wp_enqueue_code_editor['codemirror'] )
+		);
+
+		$this->assertEqualSets(
+			array(
+				'errors',
+				'box-model',
+				'display-property-grouping',
+				'duplicate-properties',
+				'known-properties',
+				'outline-none',
+			),
+			array_keys( $wp_enqueue_code_editor['csslint'] )
+		);
+
+		$this->assertEqualSets(
+			array(
+				'boss',
+				'curly',
+				'eqeqeq',
+				'eqnull',
+				'es3',
+				'expr',
+				'immed',
+				'noarg',
+				'nonbsp',
+				'onevar',
+				'quotmark',
+				'trailing',
+				'undef',
+				'unused',
+				'browser',
+				'globals',
+			),
+			array_keys( $wp_enqueue_code_editor['jshint'] )
+		);
+
+		$this->assertEqualSets(
+			array(
+				'tagname-lowercase',
+				'attr-lowercase',
+				'attr-value-double-quotes',
+				'doctype-first',
+				'tag-pair',
+				'spec-char-escape',
+				'id-unique',
+				'src-not-empty',
+				'attr-no-duplication',
+				'alt-require',
+				'space-tab-mixed-disabled',
+				'attr-unsafe-chars',
+			),
+			array_keys( $wp_enqueue_code_editor['htmlhint'] )
+		);
+	}
+
+	/**
+	 * Testing `wp_enqueue_code_editor` with `compact`.
+	 *
+	 * @ticket 41871
+	 * @covers wp_enqueue_code_editor()
+	 */
+	public function test_wp_enqueue_code_editor_when_generated_array_by_compact_will_be_passed() {
+		$wp_enqueue_code_editor = wp_enqueue_code_editor( compact( 'file' ) );
+		$this->assertNonEmptyMultidimensionalArray( $wp_enqueue_code_editor );
+
+		$this->assertEqualSets( array( 'codemirror', 'csslint', 'jshint', 'htmlhint' ), array_keys( $wp_enqueue_code_editor ) );
+		$this->assertEqualSets(
+			array(
+				'continueComments',
+				'direction',
+				'extraKeys',
+				'indentUnit',
+				'indentWithTabs',
+				'inputStyle',
+				'lineNumbers',
+				'lineWrapping',
+				'mode',
+				'styleActiveLine',
+			),
+			array_keys( $wp_enqueue_code_editor['codemirror'] )
+		);
+
+		$this->assertEqualSets(
+			array(
+				'errors',
+				'box-model',
+				'display-property-grouping',
+				'duplicate-properties',
+				'known-properties',
+				'outline-none',
+			),
+			array_keys( $wp_enqueue_code_editor['csslint'] )
+		);
+
+		$this->assertEqualSets(
+			array(
+				'boss',
+				'curly',
+				'eqeqeq',
+				'eqnull',
+				'es3',
+				'expr',
+				'immed',
+				'noarg',
+				'nonbsp',
+				'onevar',
+				'quotmark',
+				'trailing',
+				'undef',
+				'unused',
+				'browser',
+				'globals',
+			),
+			array_keys( $wp_enqueue_code_editor['jshint'] )
+		);
+
+		$this->assertEqualSets(
+			array(
+				'tagname-lowercase',
+				'attr-lowercase',
+				'attr-value-double-quotes',
+				'doctype-first',
+				'tag-pair',
+				'spec-char-escape',
+				'id-unique',
+				'src-not-empty',
+				'attr-no-duplication',
+				'alt-require',
+				'space-tab-mixed-disabled',
+				'attr-unsafe-chars',
+			),
+			array_keys( $wp_enqueue_code_editor['htmlhint'] )
+		);
+	}
+
+	/**
+	 * Testing `wp_enqueue_code_editor` with `array_merge`.
+	 *
+	 * @ticket 41871
+	 * @covers wp_enqueue_code_editor()
+	 */
+	public function test_wp_enqueue_code_editor_when_generated_array_by_array_merge_will_be_passed() {
+		$wp_enqueue_code_editor = wp_enqueue_code_editor(
+			array_merge(
+				array(
+					'type' => 'text/css',
+					'codemirror' => array(
+						'indentUnit' => 2,
+						'tabSize' => 2,
+					),
+				),
+				array()
+			)
+		);
+
+		$this->assertNonEmptyMultidimensionalArray( $wp_enqueue_code_editor );
+
+		$this->assertEqualSets( array( 'codemirror', 'csslint', 'jshint', 'htmlhint' ), array_keys( $wp_enqueue_code_editor ) );
+		$this->assertEqualSets(
+			array(
+				'autoCloseBrackets',
+				'continueComments',
+				'direction',
+				'extraKeys',
+				'gutters',
+				'indentUnit',
+				'indentWithTabs',
+				'inputStyle',
+				'lineNumbers',
+				'lineWrapping',
+				'lint',
+				'matchBrackets',
+				'mode',
+				'styleActiveLine',
+				'tabSize',
+			),
+			array_keys( $wp_enqueue_code_editor['codemirror'] )
+		);
+
+		$this->assertEqualSets(
+			array(
+				'errors',
+				'box-model',
+				'display-property-grouping',
+				'duplicate-properties',
+				'known-properties',
+				'outline-none',
+			),
+			array_keys( $wp_enqueue_code_editor['csslint'] )
+		);
+
+		$this->assertEqualSets(
+			array(
+				'boss',
+				'curly',
+				'eqeqeq',
+				'eqnull',
+				'es3',
+				'expr',
+				'immed',
+				'noarg',
+				'nonbsp',
+				'onevar',
+				'quotmark',
+				'trailing',
+				'undef',
+				'unused',
+				'browser',
+				'globals',
+			),
+			array_keys( $wp_enqueue_code_editor['jshint'] )
+		);
+
+		$this->assertEqualSets(
+			array(
+				'tagname-lowercase',
+				'attr-lowercase',
+				'attr-value-double-quotes',
+				'doctype-first',
+				'tag-pair',
+				'spec-char-escape',
+				'id-unique',
+				'src-not-empty',
+				'attr-no-duplication',
+				'alt-require',
+				'space-tab-mixed-disabled',
+				'attr-unsafe-chars',
+			),
+			array_keys( $wp_enqueue_code_editor['htmlhint'] )
+		);
+	}
+
+	/**
+	 * Testing `wp_enqueue_code_editor` with `array`.
+	 *
+	 * @ticket 41871
+	 * @covers wp_enqueue_code_editor()
+	 */
+	public function test_wp_enqueue_code_editor_when_simple_array_will_be_passed() {
+		$wp_enqueue_code_editor = wp_enqueue_code_editor(
+			array(
+				'type' => 'text/css',
+				'codemirror' => array(
+					'indentUnit' => 2,
+					'tabSize' => 2,
+				),
+			)
+		);
+
+		$this->assertNonEmptyMultidimensionalArray( $wp_enqueue_code_editor );
+
+		$this->assertEqualSets( array( 'codemirror', 'csslint', 'jshint', 'htmlhint' ), array_keys( $wp_enqueue_code_editor ) );
+		$this->assertEqualSets(
+			array(
+				'autoCloseBrackets',
+				'continueComments',
+				'direction',
+				'extraKeys',
+				'gutters',
+				'indentUnit',
+				'indentWithTabs',
+				'inputStyle',
+				'lineNumbers',
+				'lineWrapping',
+				'lint',
+				'matchBrackets',
+				'mode',
+				'styleActiveLine',
+				'tabSize',
+			),
+			array_keys( $wp_enqueue_code_editor['codemirror'] )
+		);
+
+		$this->assertEqualSets(
+			array(
+				'errors',
+				'box-model',
+				'display-property-grouping',
+				'duplicate-properties',
+				'known-properties',
+				'outline-none',
+			),
+			array_keys( $wp_enqueue_code_editor['csslint'] )
+		);
+
+		$this->assertEqualSets(
+			array(
+				'boss',
+				'curly',
+				'eqeqeq',
+				'eqnull',
+				'es3',
+				'expr',
+				'immed',
+				'noarg',
+				'nonbsp',
+				'onevar',
+				'quotmark',
+				'trailing',
+				'undef',
+				'unused',
+				'browser',
+				'globals',
+			),
+			array_keys( $wp_enqueue_code_editor['jshint'] )
+		);
+
+		$this->assertEqualSets(
+			array(
+				'tagname-lowercase',
+				'attr-lowercase',
+				'attr-value-double-quotes',
+				'doctype-first',
+				'tag-pair',
+				'spec-char-escape',
+				'id-unique',
+				'src-not-empty',
+				'attr-no-duplication',
+				'alt-require',
+				'space-tab-mixed-disabled',
+				'attr-unsafe-chars',
+			),
+			array_keys( $wp_enqueue_code_editor['htmlhint'] )
+		);
+	}
 }
