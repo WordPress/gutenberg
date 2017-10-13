@@ -87,9 +87,6 @@ class PostTitle extends Component {
 
 	setFocused( focused ) {
 		this.setState( { hasFocusWithin: focused } );
-		if ( focused ) {
-			this.props.clearSelectedBlock();
-		}
 	}
 
 	handleFocusOutside() {
