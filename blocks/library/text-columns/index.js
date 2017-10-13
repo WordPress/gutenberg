@@ -31,12 +31,10 @@ registerBlockType( 'core/text-columns', {
 	attributes: {
 		content: {
 			type: 'array',
-			source: {
-				type: 'query',
-				selector: 'p',
-				source: {
-					type: 'children',
-				},
+			source: 'query',
+			selector: 'p',
+			query: {
+				source: 'children',
 			},
 			default: [ [], [] ],
 		},

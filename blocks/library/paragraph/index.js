@@ -40,10 +40,8 @@ registerBlockType( 'core/paragraph', {
 	attributes: {
 		content: {
 			type: 'array',
-			source: {
-				type: 'children',
-				selector: 'p',
-			},
+			source: 'children',
+			selector: 'p',
 		},
 		align: {
 			type: 'string',

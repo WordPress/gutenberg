@@ -34,9 +34,7 @@ registerBlockType( 'core/html', {
 	attributes: {
 		content: {
 			type: 'string',
-			source: {
-				type: 'html',
-			},
+			source: 'html',
 		},
 	},
 

@@ -31,21 +31,17 @@ registerBlockType( 'core/audio', {
 	attributes: {
 		src: {
 			type: 'string',
-			source: {
-				type: 'attribute',
-				selector: 'audio',
-				attribute: 'src',
-			},
+			source: 'attribute',
+			selector: 'audio',
+			attribute: 'src',
 		},
 		align: {
 			type: 'string',
 		},
 		caption: {
 			type: 'array',
-			source: {
-				type: 'children',
-				selector: 'figcaption',
-			},
+			source: 'children',
+			selector: 'figcaption',
 		},
 	},
 
