@@ -27,9 +27,7 @@ registerBlockType( 'core/shortcode', {
 	attributes: {
 		text: {
 			type: 'string',
-			source: {
-				type: 'text',
-			},
+			source: 'text',
 		},
 	},
 

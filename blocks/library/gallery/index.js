@@ -30,24 +30,22 @@ registerBlockType( 'core/gallery', {
 		images: {
 			type: 'array',
 			default: [],
-			source: {
-				type: 'query',
-				selector: 'div.wp-block-gallery figure.blocks-gallery-image img',
-				source: {
-					type: 'object',
-					source: {
-						url: {
-							type: 'attribute',
-							attribute: 'src',
-						},
-						alt: {
-							type: 'attribute',
-							attribute: 'alt',
-						},
-						id: {
-							type: 'attribute',
-							attribute: 'data-id',
-						},
+			source: 'query',
+			selector: 'div.wp-block-gallery figure.blocks-gallery-image img',
+			query: {
+				source: 'object',
+				object: {
+					url: {
+						source: 'attribute',
+						attribute: 'src',
+					},
+					alt: {
+						source: 'attribute',
+						attribute: 'alt',
+					},
+					id: {
+						source: 'attribute',
+						attribute: 'data-id',
 					},
 				},
 			},

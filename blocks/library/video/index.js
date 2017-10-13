@@ -36,18 +36,14 @@ registerBlockType( 'core/video', {
 		},
 		src: {
 			type: 'string',
-			source: {
-				type: 'attribute',
-				selector: 'video',
-				attribute: 'src',
-			},
+			source: 'attribute',
+			selector: 'video',
+			attribute: 'src',
 		},
 		caption: {
 			type: 'array',
-			source: {
-				type: 'children',
-				selector: 'figcaption',
-			},
+			source: 'children',
+			selector: 'figcaption',
 		},
 	},
 

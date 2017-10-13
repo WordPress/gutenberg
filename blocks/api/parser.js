@@ -55,33 +55,33 @@ export function asType( value, type ) {
 /**
  * Returns an hpq matcher given a source object
  *
- * @param  {Object}   source Attribute Source object
- * @return {Function}        hpq Matcher
+ * @param  {Object}   sourceConfig Attribute Source object
+ * @return {Function}              hpq Matcher
  */
-export function matcherFromSource( source ) {
-	switch ( source.type ) {
+export function matcherFromSource( sourceConfig ) {
+	switch ( sourceConfig.source ) {
 		case 'attribute':
-			return attr( source.selector, source.attribute );
+			return attr( sourceConfig.selector, sourceConfig.attribute );
 		case 'property':
-			return prop( source.selector, source.property );
+			return prop( sourceConfig.selector, sourceConfig.property );
 		case 'html':
-			return html( source.selector );
+			return html( sourceConfig.selector );
 		case 'text':
-			return text( source.selector );
+			return text( sourceConfig.selector );
 		case 'children':
-			return children( source.selector );
+			return children( sourceConfig.selector );
 		case 'node':
-			return node( source.selector );
+			return node( sourceConfig.selector );
 		case 'query':
-			return query( source.selector, matcherFromSource( source.source ) );
+			return query( sourceConfig.selector, matcherFromSource( sourceConfig.query ) );
 		case 'object':
-			return keys( source.source ).reduce( ( memo, key ) => {
-				memo[ key ] = matcherFromSource( source.source[ key ] );
+			return keys( sourceConfig.object ).reduce( ( memo, key ) => {
+				memo[ key ] = matcherFromSource( sourceConfig.object[ key ] );
 				return memo;
 			}, {} );
 		default:
 			// eslint-disable-next-line no-console
-			console.error( `Unkown source type "${ source.type }"` );
+			console.error( `Unkown source type "${ sourceConfig.source }"` );
 	}
 }
 
@@ -97,7 +97,7 @@ export function matcherFromSource( source ) {
  */
 export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, commentAttributes ) {
 	let value;
-	switch ( attributeSchema.source.type ) {
+	switch ( attributeSchema.source ) {
 		case 'meta':
 			break;
 		case 'comment':
@@ -105,7 +105,7 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
 			break;
 		default: {
 			// Coerce value to specified type
-			const matcher = matcherFromSource( attributeSchema.source );
+			const matcher = matcherFromSource( attributeSchema );
 			const rawValue = hpqParse( innerHTML, matcher );
 			value = rawValue === undefined ? rawValue : asType( rawValue, attributeSchema.type );
 			break;

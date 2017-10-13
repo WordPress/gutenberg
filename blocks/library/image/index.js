@@ -24,34 +24,26 @@ registerBlockType( 'core/image', {
 	attributes: {
 		url: {
 			type: 'string',
-			source: {
-				type: 'attribute',
-				selector: 'img',
-				attribute: 'src',
-			},
+			source: 'attribute',
+			selector: 'img',
+			attribute: 'src',
 		},
 		alt: {
 			type: 'string',
-			source: {
-				type: 'attribute',
-				selector: 'img',
-				attribute: 'alt',
-			},
+			source: 'attribute',
+			selector: 'img',
+			attribute: 'alt',
 		},
 		caption: {
 			type: 'array',
-			source: {
-				type: 'children',
-				selector: 'figcaption',
-			},
+			source: 'children',
+			selector: 'figcaption',
 		},
 		href: {
 			type: 'string',
-			source: {
-				type: 'attribute',
-				selector: 'a',
-				attribute: 'href',
-			},
+			source: 'attribute',
+			selector: 'a',
+			attribute: 'href',
 		},
 		id: {
 			type: 'number',
@@ -98,34 +90,26 @@ registerBlockType( 'core/image', {
 				attributes: {
 					url: {
 						type: 'string',
-						source: {
-							type: 'attribute',
-							attribute: 'src',
-							selector: 'img',
-						},
+						source: 'attribute',
+						attribute: 'src',
+						selector: 'img',
 					},
 					alt: {
 						type: 'string',
-						source: {
-							type: 'attribute',
-							attribute: 'alt',
-							selector: 'img',
-						},
+						source: 'attribute',
+						attribute: 'alt',
+						selector: 'img',
 					},
 					caption: {
 						type: 'array',
 						// To do: needs to support HTML.
-						source: {
-							type: 'text',
-						},
+						source: 'text',
 					},
 					href: {
 						type: 'string',
-						source: {
-							type: 'attribute',
-							attribute: 'href',
-							selector: 'a',
-						},
+						source: 'attribute',
+						attribute: 'href',
+						selector: 'a',
 					},
 					id: {
 						type: 'number',

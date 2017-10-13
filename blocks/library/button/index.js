@@ -180,26 +180,20 @@ registerBlockType( 'core/button', {
 	attributes: {
 		url: {
 			type: 'string',
-			source: {
-				type: 'attribute',
-				selector: 'a',
-				attribute: 'href',
-			},
+			source: 'attribute',
+			selector: 'a',
+			attribute: 'href',
 		},
 		title: {
 			type: 'string',
-			source: {
-				type: 'attribute',
-				selector: 'a',
-				attribute: 'title',
-			},
+			source: 'attribute',
+			selector: 'a',
+			attribute: 'title',
 		},
 		text: {
 			type: 'array',
-			source: {
-				type: 'children',
-				selector: 'a',
-			},
+			source: 'children',
+			selector: 'a',
 		},
 		align: {
 			type: 'string',

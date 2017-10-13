@@ -24,10 +24,8 @@ registerBlockType( 'core/verse', {
 	attributes: {
 		content: {
 			type: 'array',
-			source: {
-				type: 'children',
-				selector: 'pre',
-			},
+			source: 'children',
+			selector: 'pre',
 		},
 	},
 

@@ -127,7 +127,7 @@ export function registerBlockType( name, settings ) {
 		...settings,
 		name,
 		attributes: mapValues( attributes, ( attribute ) => ( {
-			source: { type: 'comment' },
+			source: 'comment',
 			...attribute,
 		} ) ),
 	};

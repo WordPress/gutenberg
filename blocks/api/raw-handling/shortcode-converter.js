@@ -36,18 +36,13 @@ export default function( HTML ) {
 				( schema ) => schema.shortcode( match.shortcode.attrs ),
 			);
 
-			console.log( mapValues( transform.attributes, attribute => ( {
-				source: { type: 'comment' },
-				...attribute,
-			} ) ) );
-
 			const block = createBlock(
 				blockType.name,
 				getBlockAttributes(
 					{
 						...blockType,
 						attributes: mapValues( transform.attributes, attribute => ( {
-							source: { type: 'comment' },
+							source: 'comment',
 							...attribute,
 						} ) ),
 					},

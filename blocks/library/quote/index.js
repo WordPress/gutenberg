@@ -29,21 +29,17 @@ registerBlockType( 'core/quote', {
 	attributes: {
 		value: {
 			type: 'array',
-			source: {
-				type: 'query',
-				selector: 'blockquote > p',
-				source: {
-					type: 'node',
-				},
+			source: 'query',
+			selector: 'blockquote > p',
+			query: {
+				source: 'node',
 			},
 			default: [],
 		},
 		citation: {
 			type: 'array',
-			source: {
-				type: 'children',
-				selector: 'footer',
-			},
+			source: 'children',
+			selector: 'footer',
 		},
 		align: {
 			type: 'string',

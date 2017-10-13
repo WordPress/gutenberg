@@ -82,19 +82,15 @@ registerBlockType( 'core/list', {
 	attributes: {
 		nodeName: {
 			type: 'string',
-			source: {
-				type: 'property',
-				selector: 'ol,ul',
-				property: 'nodeName',
-			},
+			source: 'property',
+			selector: 'ol,ul',
+			property: 'nodeName',
 			default: 'UL',
 		},
 		values: {
 			type: 'array',
-			source: {
-				type: 'children',
-				selector: 'ol,ul',
-			},
+			source: 'children',
+			selector: 'ol,ul',
 			default: [],
 		},
 	},

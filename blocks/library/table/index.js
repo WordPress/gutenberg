@@ -23,10 +23,8 @@ registerBlockType( 'core/table', {
 	attributes: {
 		content: {
 			type: 'array',
-			source: {
-				type: 'children',
-				selector: 'table',
-			},
+			source: 'children',
+			selector: 'table',
 			default: [
 				<tbody key="1">
 					<tr><td><br /></td><td><br /></td></tr>

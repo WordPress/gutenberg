@@ -34,18 +34,14 @@ registerBlockType( 'core/heading', {
 	attributes: {
 		content: {
 			type: 'array',
-			source: {
-				type: 'children',
-				selector: 'h1,h2,h3,h4,h5,h6',
-			},
+			source: 'children',
+			selector: 'h1,h2,h3,h4,h5,h6',
 		},
 		nodeName: {
 			type: 'string',
-			source: {
-				type: 'property',
-				selector: 'h1,h2,h3,h4,h5,h6',
-				property: 'nodeName',
-			},
+			source: 'property',
+			selector: 'h1,h2,h3,h4,h5,h6',
+			property: 'nodeName',
 			default: 'H2',
 		},
 		align: {

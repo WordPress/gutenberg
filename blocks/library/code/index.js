@@ -26,11 +26,9 @@ registerBlockType( 'core/code', {
 	attributes: {
 		content: {
 			type: 'string',
-			source: {
-				type: 'property',
-				selector: 'code',
-				property: 'textContent',
-			},
+			source: 'property',
+			selector: 'code',
+			property: 'textContent',
 		},
 	},
 

@@ -32,10 +32,8 @@ registerBlockType( 'core/cover-image', {
 	attributes: {
 		title: {
 			type: 'array',
-			source: {
-				type: 'children',
-				selector: 'h2',
-			},
+			source: 'children',
+			selector: 'h2',
 		},
 		url: {
 			type: 'string',
