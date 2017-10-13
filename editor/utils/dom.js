@@ -1,5 +1,7 @@
-const NODE_TEXT_TYPE = 3;
-const NODE_ELEMENT_TYPE = 1;
+/**
+ * Browser dependencies
+ */
+const { ELEMENT_NODE, TEXT_NODE } = window.Node;
 
 function getCursorStart( /* node */ ) {
 	// NOTE: In the future, we may want to skip some non-inhabitable positions in some nodes
@@ -8,12 +10,12 @@ function getCursorStart( /* node */ ) {
 
 function getCursorEnd( node ) {
 	// NOTE: In the future, this might be a place to ignore special characters that browsers ignore
-	if ( node.nodeType === NODE_TEXT_TYPE ) {
+	if ( node.nodeType === TEXT_NODE ) {
 		return node.nodeValue.length;
 	}
 
 	// We may need exceptions for other empty tags as well (e.g. hr, br, input)
-	if ( node.nodeType === NODE_ELEMENT_TYPE && node.nodeName.toLowerCase() === 'img' ) {
+	if ( node.nodeType === ELEMENT_NODE && node.nodeName.toLowerCase() === 'img' ) {
 		return 1;
 	}
 
@@ -52,17 +54,14 @@ export function isAtCursorEnd( node, offset ) {
  * @param  {Boolean} start     Reverse means check if it touches the start of the container
  * @return {Boolean}           Is Edge or not
  */
-export function isEdge( container, start = false ) {
+export function isEdge( { container, start = false } ) {
 	if ( [ 'INPUT', 'TEXTAREA' ].indexOf( container.tagName ) !== -1 ) {
 		if ( container.selectionStart !== container.selectionEnd ) {
 			return false;
 		}
 
-		if ( start ) {
-			return container.selectionStart === 0;
-		}
-
-		return container.value.length === container.selectionStart;
+		const edge = start ? 0 : container.value.length;
+		return container.selectionStart === edge;
 	}
 
 	if ( ! container.isContentEditable ) {
@@ -108,19 +107,15 @@ export function isEdge( container, start = false ) {
  * @param  {Element} container DOM Element
  * @param  {Boolean} start     Position: Start or end of the element
  */
-export function placeCaretAtEdge( container, start = false ) {
+export function placeCaretAtEdge( { container, start = false } ) {
 	const isInputOrTextarea = [ 'INPUT', 'TEXTAREA' ].indexOf( container.tagName ) !== -1;
 
 	// Inputs and Textareas
 	if ( isInputOrTextarea ) {
 		container.focus();
-		if ( start ) {
-			container.selectionStart = 0;
-			container.selectionEnd = 0;
-		} else {
-			container.selectionStart = container.value.length;
-			container.selectionEnd = container.value.length;
-		}
+		const offset = start ? 0 : container.value.length;
+		container.selectionStart = offset;
+		container.selectionEnd = offset;
 		return;
 	}
 

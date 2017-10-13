@@ -50,7 +50,7 @@ class WritingFlow extends Component {
 			}, null );
 
 		if ( targetNode ) {
-			placeCaretAtEdge( targetNode, direction === 'DOWN' );
+			placeCaretAtEdge( { container: targetNode, start: direction === 'DOWN' } );
 		}
 	}
 
@@ -59,7 +59,7 @@ class WritingFlow extends Component {
 		const moveUp = ( keyCode === UP || keyCode === LEFT );
 		const moveDown = ( keyCode === DOWN || keyCode === RIGHT );
 
-		if ( ( moveUp || moveDown ) && isEdge( target, moveUp ) ) {
+		if ( ( moveUp || moveDown ) && isEdge( { container: target, start: moveUp } ) ) {
 			event.preventDefault();
 			this.moveFocusInContainer( target, moveUp ? 'UP' : 'DOWN' );
 		}

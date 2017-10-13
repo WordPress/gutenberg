@@ -23,7 +23,7 @@ import 'element-closest';
  */
 import { createElement, Component, renderToString } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
-import { isAtCursorStart, isAtCursorEnd } from '../../editor/utils/dom';
+import { isEdge } from '../../editor/utils/dom';
 
 /**
  * Internal dependencies
@@ -298,39 +298,11 @@ export default class Editable extends Component {
 	}
 
 	isStartOfEditor() {
-		const range = this.editor.selection.getRng();
-		if ( ! isAtCursorStart( range.startContainer, range.startOffset ) || ! range.collapsed ) {
-			return false;
-		}
-		const start = range.startContainer;
-		const body = this.editor.getBody();
-		let element = start;
-		while ( element !== body ) {
-			const child = element;
-			element = element.parentNode;
-			if ( element.firstChild !== child ) {
-				return false;
-			}
-		}
-		return true;
+		return isEdge( { container: this.editor.getBody(), start: true } );
 	}
 
 	isEndOfEditor() {
-		const range = this.editor.selection.getRng();
-		if ( ! isAtCursorEnd( range.endContainer, range.endOffset ) || ! range.collapsed ) {
-			return false;
-		}
-		const start = range.endContainer;
-		const body = this.editor.getBody();
-		let element = start;
-		while ( element !== body ) {
-			const child = element;
-			element = element.parentNode;
-			if ( element.lastChild !== child ) {
-				return false;
-			}
-		}
-		return true;
+		return isEdge( { container: this.editor.getBody(), start: false } );
 	}
 
 	onKeyDown( event ) {
