@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { isEdge, placeCaretAtEdge, isAtCursorStart, isAtCursorEnd } from '../dom';
+import { isEdge, placeCaretAtEdge } from '../dom';
 
 describe( 'DOM', () => {
 	let parent;
@@ -89,79 +89,6 @@ describe( 'DOM', () => {
 			input.value = 'value';
 			placeCaretAtEdge( { container: input, start: false } );
 			expect( isEdge( { container: input, start: false } ) ).toBe( true );
-		} );
-	} );
-
-	describe( 'isAtCursorStart', () => {
-		it( 'should consider 0 to be the start of an empty text node', () => {
-			const node = document.createTextNode( '' );
-			expect( isAtCursorStart( node, 0 ) ).toBe( true );
-			expect( isAtCursorStart( node, 1 ) ).toBe( false );
-		} );
-
-		it( 'should consider 0 to be the start of a non-empty text node', () => {
-			const node = document.createTextNode( 'not-empty' );
-			expect( isAtCursorStart( node, 0 ) ).toBe( true );
-			expect( isAtCursorStart( node, 1 ) ).toBe( false );
-		} );
-
-		it( 'should consider 0 to be the start of an empty div', () => {
-			const node = document.createElement( 'div' );
-			expect( isAtCursorStart( node, 0 ) ).toBe( true );
-			expect( isAtCursorStart( node, 1 ) ).toBe( false );
-		} );
-
-		it( 'should consider 0 to be the start of an non-empty div', () => {
-			const node = document.createElement( 'div' );
-			node.innerHTML = 'text';
-			expect( isAtCursorStart( node, 0 ) ).toBe( true );
-			expect( isAtCursorStart( node, 1 ) ).toBe( false );
-		} );
-
-		it( 'should consider 0 to be the start of a img', () => {
-			const node = document.createElement( 'img' );
-			expect( isAtCursorStart( node, 0 ) ).toBe( true );
-			expect( isAtCursorStart( node, 1 ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'isAtCursorEnd', () => {
-		it( 'should consider 0 to be the end of an empty text node', () => {
-			const node = document.createTextNode( '' );
-			expect( isAtCursorEnd( node, 0 ) ).toBe( true );
-			expect( isAtCursorEnd( node, 1 ) ).toBe( false );
-		} );
-
-		it( 'should consider "not-empty".length to be the end of a non-empty text node', () => {
-			const node = document.createTextNode( 'not-empty' );
-			expect( isAtCursorEnd( node, 'not-empty'.length ) ).toBe( true );
-			expect( isAtCursorEnd( node, 1 ) ).toBe( false );
-		} );
-
-		it( 'should consider 0 to be the end of an empty div', () => {
-			const node = document.createElement( 'div' );
-			expect( isAtCursorEnd( node, 0 ) ).toBe( true );
-			expect( isAtCursorEnd( node, 1 ) ).toBe( false );
-		} );
-
-		it( 'should consider 1 to be the end of an non-empty div with a single text node', () => {
-			const node = document.createElement( 'div' );
-			node.innerHTML = 'text';
-			expect( isAtCursorEnd( node, 1 ) ).toBe( true );
-			expect( isAtCursorEnd( node, 'text'.length ) ).toBe( false );
-		} );
-
-		it( 'should consider 3 to be the end of an non-empty div with a three spans', () => {
-			const node = document.createElement( 'div' );
-			node.innerHTML = '<span>one</span><span>two</span><span>three</span>';
-			expect( isAtCursorEnd( node, [ 'span', 'span', 'span' ].length ) ).toBe( true );
-			expect( isAtCursorEnd( node, 'onetwothree'.length ) ).toBe( false );
-		} );
-
-		it( 'should consider 1 to be the end of a img', () => {
-			const node = document.createElement( 'img' );
-			expect( isAtCursorEnd( node, 0 ) ).toBe( false );
-			expect( isAtCursorEnd( node, 1 ) ).toBe( true );
 		} );
 	} );
 } );

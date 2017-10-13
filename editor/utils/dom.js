@@ -30,7 +30,7 @@ function getCursorEnd( node ) {
  * @param {Integer} offset  the offset
  * @return {Boolean}        whether or not the offset is at the first cursor position in node
  */
-export function isAtCursorStart( node, offset ) {
+function isAtCursorStart( node, offset ) {
 	const nodeStart = getCursorStart( node );
 	return nodeStart === offset;
 }
@@ -42,7 +42,7 @@ export function isAtCursorStart( node, offset ) {
  * @param {Integer} offset  the offset
  * @return {Boolean}        whether or not the offset is at the last cursor position in node
  */
-export function isAtCursorEnd( node, offset ) {
+function isAtCursorEnd( node, offset ) {
 	const nodeEnd = getCursorEnd( node );
 	return nodeEnd === offset;
 }
