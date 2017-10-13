@@ -204,6 +204,10 @@ class Autocomplete extends Component {
 					break;
 				}
 			}
+			// exit early if nothing can handle it
+			if ( text.substr( pos + 1 ).length === 0 ) {
+				return null;
+			}
 			// find a completer that matches
 			const completer = find( completers, ( { triggerPrefix = '', allowContext = allowAnything } ) => {
 				if ( text.substr( pos + 1, triggerPrefix.length ) !== triggerPrefix ) {
