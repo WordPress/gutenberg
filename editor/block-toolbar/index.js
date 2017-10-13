@@ -20,6 +20,7 @@ import './style.scss';
 import BlockSwitcher from '../block-switcher';
 import BlockMover from '../block-mover';
 import BlockRightMenu from '../block-settings-menu';
+import { isMac } from '../utils/dom';
 
 /**
  * Module Constants
@@ -29,10 +30,6 @@ const { ESCAPE, F10 } = keycodes;
 function FirstChild( { children } ) {
 	const childrenArray = Children.toArray( children );
 	return childrenArray[ 0 ] || null;
-}
-
-function isMac() {
-	return window.navigator.platform.toLowerCase().indexOf( 'mac' ) !== -1;
 }
 
 function metaKeyPressed( event ) {
