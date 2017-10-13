@@ -1,8 +1,6 @@
 export const BACKSPACE = 8;
 export const TAB = 9;
 export const ENTER = 13;
-export const CTRL = 17;
-export const ALT = 18;
 export const ESCAPE = 27;
 export const SPACE = 32;
 export const LEFT = 37;
