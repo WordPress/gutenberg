@@ -126,6 +126,10 @@ function gutenberg_init( $return, $post ) {
 		return $return;
 	}
 
+	if ( isset( $_GET['classic-editor'] ) ) {
+		return false;
+	}
+
 	$post_type        = $post->post_type;
 	$post_type_object = get_post_type_object( $post_type );
 
@@ -310,3 +314,62 @@ function gutenberg_redirect_demo() {
 	}
 }
 add_action( 'admin_init', 'gutenberg_redirect_demo' );
+
+/**
+ * Adds the filters to register additional links for the Gutenberg editor in
+ * the post/page screens.
+ *
+ * @since 1.5.0
+ */
+function gutenberg_add_edit_link_filters() {
+	// For hierarchical post types.
+	add_filter( 'page_row_actions', 'gutenberg_add_edit_link', 10, 2 );
+	// For non-hierarchical post types.
+	add_filter( 'post_row_actions', 'gutenberg_add_edit_link', 10, 2 );
+}
+add_action( 'admin_init', 'gutenberg_add_edit_link_filters' );
+
+/**
+ * Registers an additional link in the post/page screens to edit any post/page in
+ * the Classic editor.
+ *
+ * @since 1.5.0
+ *
+ * @param  array   $actions Post actions.
+ * @param  WP_Post $post    Edited post.
+ *
+ * @return array          Updated post actions.
+ */
+function gutenberg_add_edit_link( $actions, $post ) {
+	if ( 'trash' === $post->post_status || ! post_type_supports( $post->post_type, 'editor' ) ) {
+		return $actions;
+	}
+
+	$edit_url = get_edit_post_link( $post->ID, 'raw' );
+	$edit_url = add_query_arg( 'classic-editor', '', $edit_url );
+
+	// Build the classic edit action. See also: WP_Posts_List_Table::handle_row_actions().
+	$title       = _draft_or_post_title( $post->ID );
+	$edit_action = array(
+		'classic' => sprintf(
+			'<a href="%s" aria-label="%s">%s</a>',
+			esc_url( $edit_url ),
+			esc_attr( sprintf(
+				/* translators: %s: post title */
+				__( 'Edit &#8220;%s&#8221; in the classic editor', 'gutenberg' ),
+				$title
+			) ),
+			__( 'Classic Editor', 'gutenberg' )
+		),
+	);
+
+	// Insert the Classic Edit action after the Edit action.
+	$edit_offset = array_search( 'edit', array_keys( $actions ), true );
+	$actions     = array_merge(
+		array_slice( $actions, 0, $edit_offset + 1 ),
+		$edit_action,
+		array_slice( $actions, $edit_offset + 1 )
+	);
+
+	return $actions;
+}
