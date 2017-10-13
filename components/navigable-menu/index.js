@@ -62,7 +62,7 @@ class NavigableMenu extends Component {
 		const { children, ...props } = this.props;
 
 		return (
-			<div ref={ this.bindContainer } { ...omit( props, [ 'orientation', 'onNavigate' ] ) } onKeyDown={ this.onKeyDown }>
+			<div ref={ this.bindContainer } { ...omit( props, [ 'orientation', 'onNavigate', 'deep' ] ) } onKeyDown={ this.onKeyDown }>
 				{ children }
 			</div>
 		);
