@@ -19,10 +19,7 @@ class WritingFlow extends Component {
 		super( ...arguments );
 
 		this.onKeyDown = this.onKeyDown.bind( this );
-		this.onKeyUp = this.onKeyUp.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
-
-		this.shouldMove = false;
 	}
 
 	bindContainer( ref ) {
@@ -36,7 +33,7 @@ class WritingFlow extends Component {
 				node.nodeName === 'INPUT' ||
 				node.nodeName === 'TEXTAREA' ||
 				node.contentEditable === 'true' ||
-				node.classList.contains( 'editor-visual-editor__block' )
+				node.classList.contains( 'editor-visual-editor__block-edit' )
 			) );
 	}
 
@@ -64,18 +61,7 @@ class WritingFlow extends Component {
 
 		if ( ( moveUp || moveDown ) && isEdge( target, moveUp ) ) {
 			event.preventDefault();
-			this.shouldMove = true;
-		}
-	}
-
-	onKeyUp( event ) {
-		const { keyCode, target } = event;
-		const moveUp = ( keyCode === UP || keyCode === LEFT );
-
-		if ( this.shouldMove ) {
-			event.preventDefault();
 			this.moveFocusInContainer( target, moveUp ? 'UP' : 'DOWN' );
-			this.shouldMove = false;
 		}
 	}
 
@@ -85,9 +71,7 @@ class WritingFlow extends Component {
 		return (
 			<div
 				ref={ this.bindContainer }
-				onKeyDown={ this.onKeyDown }
-				onKeyUp={ this.onKeyUp }
-			>
+				onKeyDown={ this.onKeyDown }>
 				{ children }
 			</div>
 		);

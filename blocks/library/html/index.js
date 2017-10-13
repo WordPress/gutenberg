@@ -15,6 +15,8 @@ import { Component } from '@wordpress/element';
 import './editor.scss';
 import { registerBlockType, source } from '../../api';
 import BlockControls from '../../block-controls';
+import InspectorControls from '../../inspector-controls';
+import BlockDescription from '../../block-description';
 
 const { html } = source;
 
@@ -82,6 +84,13 @@ registerBlockType( 'core/html', {
 							value={ attributes.content }
 							onChange={ ( event ) => setAttributes( { content: event.target.value } ) }
 						/>
+					}
+					{ focus &&
+						<InspectorControls key="inspector">
+							<BlockDescription>
+								<p>{ __( 'Add custom HTML code and preview it right here in the editor.' ) }</p>
+							</BlockDescription>
+						</InspectorControls>
 					}
 				</div>
 			);

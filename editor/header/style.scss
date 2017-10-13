@@ -73,21 +73,6 @@
 	right: $admin-sidebar-width-big;
 }
 
-.editor-header-multi-select {
-	background: $blue-medium-100;
-	border-bottom: 1px solid $blue-medium-200;
-}
-
-.editor-selected-count {
-	padding-right: $item-spacing;
-	color: $dark-gray-500;
-	border-right: 1px solid $light-gray-500;
-}
-
-.editor-selected-clear {
-	margin: 0 0 0 auto;
-}
-
 // hide all action buttons except the inserter on mobile
 .editor-header__content-tools > .components-button {
 	display: none;
@@ -105,6 +90,10 @@
 
 .editor-mode-switcher {
 	margin-left: $item-spacing;
+
+	.components-button svg {
+		transform: rotate( 90deg );
+	}
 }
 
 .editor-header__left .components-button {

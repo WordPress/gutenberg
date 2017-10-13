@@ -19,6 +19,11 @@ global.window.tinyMCEPreInit = {
 };
 window.requestAnimationFrame = setTimeout;
 window.cancelAnimationFrame = clearTimeout;
+window.matchMedia = () => ( {
+	matches: false,
+	addListener: () => {},
+	removeListener: () => {},
+} );
 
 global.window._wpDateSettings = {
 	formats: {

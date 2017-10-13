@@ -93,7 +93,7 @@ export class Popover extends Component {
 
 		window.cancelAnimationFrame( this.rafHandle );
 		window[ handler ]( 'resize', this.throttledSetOffset );
-		window[ handler ]( 'scroll', this.throttledSetOffset );
+		window[ handler ]( 'scroll', this.throttledSetOffset, true );
 	}
 
 	focus() {
@@ -124,16 +124,16 @@ export class Popover extends Component {
 	setOffset() {
 		const { range } = this.props;
 		const { anchor, popover } = this.nodes;
-		const { parentNode } = anchor;
-		if ( ! parentNode ) {
+		if ( ! anchor || ! anchor.parentNode ) {
 			return;
 		}
+
 
 		const [ yAxis, xAxis ] = this.getPositions();
 		const isTop = 'top' === yAxis;
 		const isLeft = 'left' === xAxis;
 		const isRight = 'right' === xAxis;
-		let rect = parentNode.getBoundingClientRect();
+		let rect = anchor.parentNode.getBoundingClientRect();
 		if ( range ) {
 			const rects = range.getClientRects();
 			if ( isLeft ) {
@@ -145,7 +145,7 @@ export class Popover extends Component {
 			}
 		}
 		// Offset top positioning by padding
-		const { paddingTop, paddingBottom } = window.getComputedStyle( parentNode );
+		const { paddingTop, paddingBottom } = window.getComputedStyle( anchor.parentNode );
 		let topOffset = parseInt( isTop ? paddingTop : paddingBottom, 10 );
 		if ( ! isTop ) {
 			topOffset *= -1;

@@ -63,28 +63,27 @@ function gutenberg_render_block_core_latest_posts( $attributes ) {
 }
 
 register_block_type( 'core/latest-posts', array(
-	'attributes' => array(
-		'postsToShow' => array(
-			'type' => 'number',
+	'attributes'      => array(
+		'postsToShow'     => array(
+			'type'    => 'number',
 			'default' => 5,
 		),
 		'displayPostDate' => array(
-			'type' => 'boolean',
+			'type'    => 'boolean',
 			'default' => false,
 		),
-		'layout' => array(
-			'type' => 'string',
+		'layout'          => array(
+			'type'    => 'string',
 			'default' => 'list',
 		),
-		'columns' => array(
-			'type' => 'number',
+		'columns'         => array(
+			'type'    => 'number',
 			'default' => 3,
 		),
-		'align' => array(
-			'type' => 'string',
+		'align'           => array(
+			'type'    => 'string',
 			'default' => 'center',
 		),
 	),
-
 	'render_callback' => 'gutenberg_render_block_core_latest_posts',
 ) );

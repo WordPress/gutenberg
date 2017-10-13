@@ -693,13 +693,14 @@ describe( 'state', () => {
 		} );
 
 		it( 'should set multi selection', () => {
-			const state = blockSelection( undefined, {
+			const original = deepFreeze( { focus: { editable: 'citation' } } );
+			const state = blockSelection( original, {
 				type: 'MULTI_SELECT',
 				start: 'ribs',
 				end: 'chicken',
 			} );
 
-			expect( state ).toEqual( { start: 'ribs', end: 'chicken', focus: null } );
+			expect( state ).toEqual( { start: 'ribs', end: 'chicken', focus: { editable: 'citation' } } );
 		} );
 
 		it( 'should not update the state if the block is already selected', () => {
@@ -731,24 +732,6 @@ describe( 'state', () => {
 			} );
 
 			expect( state3 ).toEqual( { start: 'ribs', end: 'ribs', focus: {} } );
-		} );
-
-		it( 'should return with block moved up', () => {
-			const state = blockSelection( undefined, {
-				type: 'MOVE_BLOCKS_UP',
-				uids: [ 'ribs' ],
-			} );
-
-			expect( state ).toEqual( { start: 'ribs', end: 'ribs', focus: {} } );
-		} );
-
-		it( 'should return with block moved down', () => {
-			const state = blockSelection( undefined, {
-				type: 'MOVE_BLOCKS_DOWN',
-				uids: [ 'chicken' ],
-			} );
-
-			expect( state ).toEqual( { start: 'chicken', end: 'chicken', focus: {} } );
 		} );
 
 		it( 'should not update the state if the block moved is already selected', () => {

@@ -314,11 +314,18 @@ export function blockSelection( state = { start: null, end: null, focus: null },
 				end: null,
 				focus: null,
 			};
+		case 'START_MULTI_SELECT':
+			return {
+				...state,
+				isMultiSelecting: true,
+			};
+		case 'STOP_MULTI_SELECT':
+			return omit( state, 'isMultiSelecting' );
 		case 'MULTI_SELECT':
 			return {
 				start: action.start,
 				end: action.end,
-				focus: null,
+				focus: state.focus,
 			};
 		case 'SELECT_BLOCK':
 			if ( action.uid === state.start && action.uid === state.end ) {
@@ -350,17 +357,6 @@ export function blockSelection( state = { start: null, end: null, focus: null },
 				end: action.blocks[ 0 ].uid,
 				focus: {},
 			};
-		case 'MOVE_BLOCKS_UP':
-		case 'MOVE_BLOCKS_DOWN': {
-			const firstUid = first( action.uids );
-			return firstUid === state.start
-				? state
-				: {
-					start: firstUid,
-					end: firstUid,
-					focus: {},
-				};
-		}
 	}
 
 	return state;

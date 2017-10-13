@@ -451,10 +451,26 @@ export const getBlocks = createSelector(
  * Returns the number of blocks currently present in the post.
  *
  * @param  {Object} state Global application state
- * @return {Object}       Number of blocks in the post
+ * @return {Number}       Number of blocks in the post
  */
 export function getBlockCount( state ) {
 	return getBlockUids( state ).length;
+}
+
+/**
+ * Returns the number of blocks currently selected in the post.
+ *
+ * @param  {Object} state Global application state
+ * @return {Number}       Number of blocks selected in the post
+ */
+export function getSelectedBlockCount( state ) {
+	const multiSelectedBlockCount = getMultiSelectedBlockUids( state ).length;
+
+	if ( multiSelectedBlockCount ) {
+		return multiSelectedBlockCount;
+	}
+
+	return state.blockSelection.start ? 1 : 0;
 }
 
 /**
@@ -705,12 +721,24 @@ export function isBlockHovered( state, uid ) {
  * @return {Object}       Block focus state
  */
 export function getBlockFocus( state, uid ) {
-	if ( ! isBlockSelected( state, uid ) ) {
+	// If there is multi-selection, keep returning the focus object for the start block.
+	if ( ! isBlockSelected( state, uid ) && state.blockSelection.start !== uid ) {
 		return null;
 	}
 
 	return state.blockSelection.focus;
 }
+
+/**
+ * Whether in the process of multi-selecting or not.
+ *
+ * @param  {Object} state Global application state
+ * @return {Boolean}      True if multi-selecting, false if not.
+ */
+export function isMultiSelecting( state ) {
+	return !! state.blockSelection.isMultiSelecting;
+}
+
 /**
  * Returns thee block's editing mode
  *

@@ -40,6 +40,7 @@ import {
 import {
 	getBlock,
 	getBlockFocus,
+	isMultiSelecting,
 	getBlockIndex,
 	getEditedPostAttribute,
 	getMultiSelectedBlockUids,
@@ -136,7 +137,6 @@ class VisualEditorBlock extends Component {
 
 	bindBlockNode( node ) {
 		this.node = node;
-		this.props.blockRef( node );
 	}
 
 	setAttributes( attributes ) {
@@ -256,8 +256,9 @@ class VisualEditorBlock extends Component {
 	}
 
 	onPointerDown( event ) {
-		// Not the main button (usually the left button on pointer device).
-		if ( event.buttons !== 1 ) {
+		// Not the main button.
+		// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
+		if ( event.button !== 0 ) {
 			return;
 		}
 
@@ -306,12 +307,13 @@ class VisualEditorBlock extends Component {
 		// Generate the wrapper class names handling the different states of the block.
 		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected, focus } = this.props;
 		const showUI = isSelected && ( ! this.props.isTyping || focus.collapsed === false );
+		const isProperlyHovered = isHovered && ! this.props.isSelecting;
 		const { error } = this.state;
 		const wrapperClassname = classnames( 'editor-visual-editor__block', {
 			'has-warning': ! isValid || !! error,
 			'is-selected': showUI,
 			'is-multi-selected': isMultiSelected,
-			'is-hovered': isHovered,
+			'is-hovered': isProperlyHovered,
 		} );
 
 		const { onMouseLeave, onFocus, onReplace } = this.props;
@@ -330,31 +332,37 @@ class VisualEditorBlock extends Component {
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
 			<div
-				ref={ this.bindBlockNode }
-				onKeyDown={ this.onKeyDown }
-				onFocus={ this.onFocus }
+				ref={ this.props.blockRef }
 				onMouseMove={ this.maybeHover }
 				onMouseEnter={ this.maybeHover }
 				onMouseLeave={ onMouseLeave }
 				className={ wrapperClassname }
 				data-type={ block.name }
-				tabIndex="0"
-				aria-label={ blockLabel }
 				{ ...wrapperProps }
 			>
 				<BlockDropZone index={ order } />
-				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
-				{ ( showUI || isHovered ) && <BlockRightMenu uid={ block.uid } /> }
+				{ ( showUI || isProperlyHovered ) && <BlockMover uids={ [ block.uid ] } /> }
+				{ ( showUI || isProperlyHovered ) && <BlockRightMenu uids={ [ block.uid ] } /> }
 				{ showUI && isValid && mode === 'visual' && <BlockToolbar uid={ block.uid } /> }
-
-				{ isFirstMultiSelected && (
+				{ isFirstMultiSelected && ! this.props.isSelecting &&
 					<BlockMover uids={ multiSelectedBlockUids } />
-				) }
+				}
+				{ isFirstMultiSelected && ! this.props.isSelecting &&
+					<BlockRightMenu
+						uids={ multiSelectedBlockUids }
+						focus={ true }
+					/>
+				}
 				<div
+					ref={ this.bindBlockNode }
 					onKeyPress={ this.maybeStartTyping }
 					onDragStart={ ( event ) => event.preventDefault() }
 					onMouseDown={ this.onPointerDown }
+					onKeyDown={ this.onKeyDown }
+					onFocus={ this.onFocus }
 					className="editor-visual-editor__block-edit"
+					tabIndex="0"
+					aria-label={ blockLabel }
 				>
 					<BlockCrashBoundary onError={ this.onBlockError }>
 						{ isValid && mode === 'visual' && (
@@ -404,6 +412,7 @@ export default connect(
 			isFirstMultiSelected: isFirstMultiSelectedBlock( state, ownProps.uid ),
 			isHovered: isBlockHovered( state, ownProps.uid ),
 			focus: getBlockFocus( state, ownProps.uid ),
+			isSelecting: isMultiSelecting( state ),
 			isTyping: isTyping( state ),
 			order: getBlockIndex( state, ownProps.uid ),
 			multiSelectedBlockUids: getMultiSelectedBlockUids( state ),

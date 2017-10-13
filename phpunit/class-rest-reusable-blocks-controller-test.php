@@ -38,14 +38,14 @@ class REST_Reusable_Blocks_Controller_Test extends WP_Test_REST_Controller_Testc
 	 */
 	public static function wpSetUpBeforeClass( $factory ) {
 		self::$reusable_block_post_id = wp_insert_post( array(
-			'post_type' => 'gb_reusable_block',
-			'post_status' => 'publish',
-			'post_name' => '2d66a5c5-776c-43b1-98c7-49521cef8ea6',
-			'post_title' => 'My cool block',
+			'post_type'    => 'gb_reusable_block',
+			'post_status'  => 'publish',
+			'post_name'    => '2d66a5c5-776c-43b1-98c7-49521cef8ea6',
+			'post_title'   => 'My cool block',
 			'post_content' => '<p class="has-drop-cap">Hello!</p>',
 		) );
 
-		self::$editor_id = $factory->user->create( array(
+		self::$editor_id     = $factory->user->create( array(
 			'role' => 'editor',
 		) );
 		self::$subscriber_id = $factory->user->create( array(
@@ -81,14 +81,14 @@ class REST_Reusable_Blocks_Controller_Test extends WP_Test_REST_Controller_Testc
 	public function test_get_items() {
 		wp_set_current_user( self::$editor_id );
 
-		$request = new WP_REST_Request( 'GET', '/gutenberg/v1/reusable-blocks' );
+		$request  = new WP_REST_Request( 'GET', '/gutenberg/v1/reusable-blocks' );
 		$response = $this->server->dispatch( $request );
 
 		$this->assertEquals( 200, $response->get_status() );
 		$this->assertEquals( array(
 			array(
-				'id' => '2d66a5c5-776c-43b1-98c7-49521cef8ea6',
-				'name' => 'My cool block',
+				'id'      => '2d66a5c5-776c-43b1-98c7-49521cef8ea6',
+				'name'    => 'My cool block',
 				'content' => '<p class="has-drop-cap">Hello!</p>',
 			),
 		), $response->get_data() );
@@ -100,9 +100,9 @@ class REST_Reusable_Blocks_Controller_Test extends WP_Test_REST_Controller_Testc
 	public function test_get_items_when_not_allowed() {
 		wp_set_current_user( self::$subscriber_id );
 
-		$request = new WP_REST_Request( 'GET', '/gutenberg/v1/reusable-blocks' );
+		$request  = new WP_REST_Request( 'GET', '/gutenberg/v1/reusable-blocks' );
 		$response = $this->server->dispatch( $request );
-		$data = $response->get_data();
+		$data     = $response->get_data();
 
 		$this->assertEquals( 403, $response->get_status() );
 		$this->assertEquals( 'gutenberg_reusable_block_cannot_read', $data['code'] );
@@ -114,13 +114,13 @@ class REST_Reusable_Blocks_Controller_Test extends WP_Test_REST_Controller_Testc
 	public function test_get_item() {
 		wp_set_current_user( self::$editor_id );
 
-		$request = new WP_REST_Request( 'GET', '/gutenberg/v1/reusable-blocks/2d66a5c5-776c-43b1-98c7-49521cef8ea6' );
+		$request  = new WP_REST_Request( 'GET', '/gutenberg/v1/reusable-blocks/2d66a5c5-776c-43b1-98c7-49521cef8ea6' );
 		$response = $this->server->dispatch( $request );
 
 		$this->assertEquals( 200, $response->get_status() );
 		$this->assertEquals( array(
-			'id' => '2d66a5c5-776c-43b1-98c7-49521cef8ea6',
-			'name' => 'My cool block',
+			'id'      => '2d66a5c5-776c-43b1-98c7-49521cef8ea6',
+			'name'    => 'My cool block',
 			'content' => '<p class="has-drop-cap">Hello!</p>',
 		), $response->get_data() );
 	}
@@ -131,9 +131,9 @@ class REST_Reusable_Blocks_Controller_Test extends WP_Test_REST_Controller_Testc
 	public function test_get_item_when_not_allowed() {
 		wp_set_current_user( self::$subscriber_id );
 
-		$request = new WP_REST_Request( 'GET', '/gutenberg/v1/reusable-blocks/2d66a5c5-776c-43b1-98c7-49521cef8ea6' );
+		$request  = new WP_REST_Request( 'GET', '/gutenberg/v1/reusable-blocks/2d66a5c5-776c-43b1-98c7-49521cef8ea6' );
 		$response = $this->server->dispatch( $request );
-		$data = $response->get_data();
+		$data     = $response->get_data();
 
 		$this->assertEquals( 403, $response->get_status() );
 		$this->assertEquals( 'gutenberg_reusable_block_cannot_read', $data['code'] );
@@ -145,9 +145,9 @@ class REST_Reusable_Blocks_Controller_Test extends WP_Test_REST_Controller_Testc
 	public function test_get_item_invalid_id() {
 		wp_set_current_user( self::$editor_id );
 
-		$request = new WP_REST_Request( 'GET', '/gutenberg/v1/reusable-blocks/invalid-uuid' );
+		$request  = new WP_REST_Request( 'GET', '/gutenberg/v1/reusable-blocks/invalid-uuid' );
 		$response = $this->server->dispatch( $request );
-		$data = $response->get_data();
+		$data     = $response->get_data();
 
 		$this->assertEquals( 404, $response->get_status() );
 		$this->assertEquals( 'gutenberg_reusable_block_invalid_id', $data['code'] );
@@ -159,9 +159,9 @@ class REST_Reusable_Blocks_Controller_Test extends WP_Test_REST_Controller_Testc
 	public function test_get_item_not_found() {
 		wp_set_current_user( self::$editor_id );
 
-		$request = new WP_REST_Request( 'GET', '/gutenberg/v1/reusable-blocks/6e614ced-e80d-4e10-bd04-1e890b5f7f83' );
+		$request  = new WP_REST_Request( 'GET', '/gutenberg/v1/reusable-blocks/6e614ced-e80d-4e10-bd04-1e890b5f7f83' );
 		$response = $this->server->dispatch( $request );
-		$data = $response->get_data();
+		$data     = $response->get_data();
 
 		$this->assertEquals( 404, $response->get_status() );
 		$this->assertEquals( 'gutenberg_reusable_block_not_found', $data['code'] );
@@ -175,7 +175,7 @@ class REST_Reusable_Blocks_Controller_Test extends WP_Test_REST_Controller_Testc
 
 		$request = new WP_REST_Request( 'PUT', '/gutenberg/v1/reusable-blocks/75236553-f4ba-4f12-aa25-4ba402044bd5' );
 		$request->set_body_params( array(
-			'name' => 'Another cool block',
+			'name'    => 'Another cool block',
 			'content' => '<figure class="wp-block-image"><img src="/image.jpg" alt="An image" /></figure>',
 		) );
 
@@ -183,8 +183,8 @@ class REST_Reusable_Blocks_Controller_Test extends WP_Test_REST_Controller_Testc
 
 		$this->assertEquals( 200, $response->get_status() );
 		$this->assertEquals( array(
-			'id' => '75236553-f4ba-4f12-aa25-4ba402044bd5',
-			'name' => 'Another cool block',
+			'id'      => '75236553-f4ba-4f12-aa25-4ba402044bd5',
+			'name'    => 'Another cool block',
 			'content' => '<figure class="wp-block-image"><img src="/image.jpg" alt="An image" /></figure>',
 		), $response->get_data() );
 	}
@@ -195,9 +195,9 @@ class REST_Reusable_Blocks_Controller_Test extends WP_Test_REST_Controller_Testc
 	public function test_update_item_when_not_allowed() {
 		wp_set_current_user( self::$subscriber_id );
 
-		$request = new WP_REST_Request( 'PUT', '/gutenberg/v1/reusable-blocks/2d66a5c5-776c-43b1-98c7-49521cef8ea6' );
+		$request  = new WP_REST_Request( 'PUT', '/gutenberg/v1/reusable-blocks/2d66a5c5-776c-43b1-98c7-49521cef8ea6' );
 		$response = $this->server->dispatch( $request );
-		$data = $response->get_data();
+		$data     = $response->get_data();
 
 		$this->assertEquals( 403, $response->get_status() );
 		$this->assertEquals( 'gutenberg_reusable_block_cannot_edit', $data['code'] );
@@ -228,7 +228,7 @@ class REST_Reusable_Blocks_Controller_Test extends WP_Test_REST_Controller_Testc
 			),
 			array(
 				array(
-					'name' => 'My cool block',
+					'name'    => 'My cool block',
 					'content' => 42,
 				),
 				'Invalid reusable block content.',
@@ -248,7 +248,7 @@ class REST_Reusable_Blocks_Controller_Test extends WP_Test_REST_Controller_Testc
 		$request->set_body_params( $body_params );
 
 		$response = $this->server->dispatch( $request );
-		$data = $response->get_data();
+		$data     = $response->get_data();
 
 		$this->assertEquals( 400, $response->get_status() );
 		$this->assertEquals( 'gutenberg_reusable_block_invalid_field', $data['code'] );
@@ -259,9 +259,9 @@ class REST_Reusable_Blocks_Controller_Test extends WP_Test_REST_Controller_Testc
 	 * Check that we have defined a JSON schema.
 	 */
 	public function test_get_item_schema() {
-		$request = new WP_REST_Request( 'OPTIONS', '/gutenberg/v1/reusable-blocks' );
-		$response = $this->server->dispatch( $request );
-		$data = $response->get_data();
+		$request    = new WP_REST_Request( 'OPTIONS', '/gutenberg/v1/reusable-blocks' );
+		$response   = $this->server->dispatch( $request );
+		$data       = $response->get_data();
 		$properties = $data['schema']['properties'];
 
 		$this->assertEquals( 3, count( $properties ) );
