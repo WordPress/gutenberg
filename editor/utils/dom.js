@@ -86,3 +86,12 @@ export function placeCaretAtEdge( container, start = false ) {
 	sel.addRange( range );
 	container.focus();
 }
+
+/**
+ * Checks whether the user is on MacOS or not
+ *
+ * @return {Boolean}           Is Mac or Not
+ */
+export function isMac() {
+	return window.navigator.platform.toLowerCase().indexOf( 'mac' ) !== -1;
+}

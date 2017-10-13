@@ -26,18 +26,18 @@ class NavigableMenu extends Component {
 	}
 
 	onKeyDown( event ) {
-		const { orientation = 'vertical', onNavigate = noop } = this.props;
+		const { orientation = 'vertical', onNavigate = noop, deep = false } = this.props;
 		if (
 			( orientation === 'vertical' && [ UP, DOWN, TAB ].indexOf( event.keyCode ) === -1 ) ||
 			( orientation === 'horizontal' && [ RIGHT, LEFT, TAB ].indexOf( event.keyCode ) === -1 )
 		) {
 			return;
 		}
-
 		const tabbables = focus.tabbable
 			.find( this.container )
-			.filter( ( node ) => node.parentElement === this.container );
+			.filter( ( node ) => deep || node.parentElement === this.container );
 		const indexOfTabbable = tabbables.indexOf( document.activeElement );
+
 		if ( indexOfTabbable === -1 ) {
 			return;
 		}

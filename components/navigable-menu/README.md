@@ -38,3 +38,11 @@ A callback invoked when the menu navigates to one of its children passing the in
 
 - Type: `Function`
 - Required: No
+
+## deep
+
+A boolean to look for navigable children in the direct children or any descendant.
+
+- Type: `Boolean`
+- Required: No
+- default: false
