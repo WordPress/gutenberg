@@ -809,6 +809,14 @@ describe( 'state', () => {
 			expect( state ).toEqual( { isSidebarOpened: true } );
 		} );
 
+		it( 'should toggle the extended settings open flag', () => {
+			const state = preferences( deepFreeze( { isExtendedSettingsOpened: false } ), {
+				type: 'TOGGLE_EXTENDED_SETTINGS',
+			} );
+
+			expect( state ).toEqual( { isExtendedSettingsOpened: true } );
+		} );
+
 		it( 'should set the sidebar panel open flag to true if unset', () => {
 			const state = preferences( deepFreeze( { isSidebarOpened: false } ), {
 				type: 'TOGGLE_SIDEBAR_PANEL',
