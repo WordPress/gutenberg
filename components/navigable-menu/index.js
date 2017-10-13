@@ -12,7 +12,7 @@ import { focus, keycodes } from '@wordpress/utils';
 /**
  * Module Constants
  */
-const { UP, DOWN, LEFT, RIGHT } = keycodes;
+const { UP, DOWN, LEFT, RIGHT, TAB } = keycodes;
 
 class NavigableMenu extends Component {
 	constructor() {
@@ -28,8 +28,8 @@ class NavigableMenu extends Component {
 	onKeyDown( event ) {
 		const { orientation = 'vertical', onNavigate = noop } = this.props;
 		if (
-			( orientation === 'vertical' && [ UP, DOWN ].indexOf( event.keyCode ) === -1 ) ||
-			( orientation === 'horizontal' && [ RIGHT, LEFT ].indexOf( event.keyCode ) === -1 )
+			( orientation === 'vertical' && [ UP, DOWN, TAB ].indexOf( event.keyCode ) === -1 ) ||
+			( orientation === 'horizontal' && [ RIGHT, LEFT, TAB ].indexOf( event.keyCode ) === -1 )
 		) {
 			return;
 		}
@@ -41,7 +41,11 @@ class NavigableMenu extends Component {
 		if ( indexOfTabbable === -1 ) {
 			return;
 		}
-		const offset = [ UP, LEFT ].indexOf( event.keyCode ) === -1 ? 1 : -1;
+
+		const offset = (
+			[ UP, LEFT ].indexOf( event.keyCode ) !== -1 ||
+			( event.keyCode === TAB && event.shiftKey )
+		) ? -1 : 1;
 		let nextIndex = indexOfTabbable + offset;
 		nextIndex = nextIndex === -1 ? tabbables.length - 1 : nextIndex;
 		nextIndex = nextIndex === tabbables.length ? 0 : nextIndex;
