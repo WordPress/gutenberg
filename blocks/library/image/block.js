@@ -55,8 +55,8 @@ class ImageBlock extends Component {
 		this.props.setAttributes( { url: media.url, alt: media.alt, caption: media.caption, id: media.id } );
 	}
 
-	onSetHref( value ) {
-		this.props.setAttributes( { href: value } );
+	onSetHref( { url } ) {
+		this.props.setAttributes( { href: url } );
 	}
 
 	updateAlt( newAlt ) {
@@ -96,23 +96,24 @@ class ImageBlock extends Component {
 						value={ align }
 						onChange={ this.updateAlignment }
 					/>
-
-					<Toolbar>
-						<li>
-							<MediaUploadButton
-								buttonProps={ {
-									className: 'components-icon-button components-toolbar__control',
-									'aria-label': __( 'Edit image' ),
-								} }
-								onSelect={ this.onSelectImage }
-								type="image"
-								value={ id }
-							>
-								<Dashicon icon="edit" />
-							</MediaUploadButton>
-						</li>
-						<UrlInputButton onChange={ this.onSetHref } url={ href } />
-					</Toolbar>
+					{focus.editable !== 'caption' &&
+						<Toolbar>
+							<li>
+								<MediaUploadButton
+									buttonProps={ {
+										className: 'components-icon-button components-toolbar__control',
+										'aria-label': __( 'Edit image' ),
+									} }
+									onSelect={ this.onSelectImage }
+									type="image"
+									value={ id }
+								>
+									<Dashicon icon="edit" />
+								</MediaUploadButton>
+							</li>
+							<UrlInputButton onChange={ this.onSetHref } url={ href } />
+						</Toolbar>
+					}
 				</BlockControls>
 			)
 		);
@@ -152,7 +153,7 @@ class ImageBlock extends Component {
 		const classes = classnames( className, {
 			'is-transient': 0 === url.indexOf( 'blob:' ),
 			'is-resized': !! width,
-			'is-focused': !! focus,
+			'is-focused': !! focus && focus.editable !== 'caption',
 		} );
 
 		// Disable reason: Each block can be selected by clicking on it
@@ -234,7 +235,6 @@ class ImageBlock extends Component {
 						focus={ focus && focus.editable === 'caption' ? focus : undefined }
 						onFocus={ focusCaption }
 						onChange={ ( value ) => setAttributes( { caption: value } ) }
-						inlineToolbar
 					/>
 				) : null }
 			</figure>,

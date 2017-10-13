@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton } from '@wordpress/components';
+import { Toolbar } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -11,7 +11,7 @@ import './editor.scss';
 import './style.scss';
 import { registerBlockType, source } from '../../api';
 import Editable from '../../editable';
-import UrlInput from '../../url-input';
+import UrlInputButton from '../../url-input/button';
 import BlockControls from '../../block-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
@@ -69,11 +69,15 @@ registerBlockType( 'core/button', {
 		const { text, url, title, align, color, clear } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		const toggleClear = () => setAttributes( { clear: ! clear } );
+		const updateUrl = ( urlSettings ) => setAttributes( { url: urlSettings.url } );
 
 		return [
 			focus && (
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar value={ align } onChange={ updateAlignment } />
+					<Toolbar>
+						<UrlInputButton showSettings={ false } url={ url } onChange={ updateUrl } />
+					</Toolbar>
 				</BlockControls>
 			),
 			<span key="button" className={ className } title={ title } style={ { backgroundColor: color } } >
@@ -87,17 +91,6 @@ registerBlockType( 'core/button', {
 					formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
 					keepPlaceholderOnFocus
 				/>
-				{ focus &&
-					<form
-						className="blocks-format-toolbar__link-modal"
-						onSubmit={ ( event ) => event.preventDefault() }>
-						<UrlInput
-							value={ url }
-							onChange={ ( value ) => setAttributes( { url: value } ) }
-						/>
-						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
-					</form>
-				}
 				{ focus &&
 					<InspectorControls key="inspector">
 						<BlockDescription>

@@ -106,4 +106,10 @@
 	ul.components-toolbar {
 		box-shadow: $shadow-toolbar;
 	}
+
+	.blocks-format-toolbar__link-modal {
+		position: absolute;
+		left: 50%;
+		transform: translateX(-50%);
+	}
 }

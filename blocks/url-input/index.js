@@ -165,7 +165,7 @@ class UrlInput extends Component {
 	}
 
 	render() {
-		const { value, instanceId } = this.props;
+		const { value, instanceId, required = true } = this.props;
 		const { showSuggestions, posts, selectedSuggestion, loading } = this.state;
 		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
@@ -174,7 +174,7 @@ class UrlInput extends Component {
 					autoFocus
 					type="text"
 					aria-label={ __( 'URL' ) }
-					required
+					required={ required }
 					value={ value }
 					onChange={ this.onChange }
 					placeholder={ __( 'Paste URL or type' ) }
