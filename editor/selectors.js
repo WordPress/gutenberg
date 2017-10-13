@@ -13,6 +13,7 @@ import {
 	values,
 	keys,
 	without,
+	compact,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -897,7 +898,7 @@ export function getNotices( state ) {
  */
 export function getRecentlyUsedBlocks( state ) {
 	// resolves the block names in the state to the block type settings
-	return state.preferences.recentlyUsedBlocks.map( blockType => getBlockType( blockType ) );
+	return compact( state.preferences.recentlyUsedBlocks.map( blockType => getBlockType( blockType ) ) );
 }
 
 /**
@@ -913,9 +914,10 @@ export const getMostFrequentlyUsedBlocks = createSelector(
 		const { blockUsage } = state.preferences;
 		const orderedByUsage = keys( blockUsage ).sort( ( a, b ) => blockUsage[ b ] - blockUsage[ a ] );
 		// add in paragraph and image blocks if they're not already in the usage data
-		return [ ...orderedByUsage, ...without( [ 'core/paragraph', 'core/image' ], ...orderedByUsage ) ]
-			.slice( 0, MAX_FREQUENT_BLOCKS )
-			.map( blockType => getBlockType( blockType ) );
+		return compact(
+				[ ...orderedByUsage, ...without( [ 'core/paragraph', 'core/image' ], ...orderedByUsage ) ]
+					.map( blockType => getBlockType( blockType ) )
+			).slice( 0, MAX_FREQUENT_BLOCKS );
 	},
 	( state ) => state.preferences.blockUsage
 );

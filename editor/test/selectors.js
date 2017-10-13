@@ -1789,6 +1789,7 @@ describe( 'selectors', () => {
 			const state = {
 				preferences: {
 					blockUsage: {
+						'core/deleted-block': 20,
 						'core/paragraph': 4,
 						'core/image': 11,
 						'core/quote': 2,
