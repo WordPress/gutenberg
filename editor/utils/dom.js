@@ -1,3 +1,50 @@
+const NODE_TEXT_TYPE = 3;
+const NODE_ELEMENT_TYPE = 1;
+
+function getCursorStart( /* node */ ) {
+	// NOTE: In the future, we may want to skip some non-inhabitable positions in some nodes
+	return 0;
+}
+
+function getCursorEnd( node ) {
+	// NOTE: In the future, this might be a place to ignore special characters that browsers ignore
+	if ( node.nodeType === NODE_TEXT_TYPE ) {
+		return node.nodeValue.length;
+	}
+
+	// We may need exceptions for other empty tags as well (e.g. hr, br, input)
+	if ( node.nodeType === NODE_ELEMENT_TYPE && node.nodeName.toLowerCase() === 'img' ) {
+		return 1;
+	}
+
+	// Non text nodes have a last cursor position of their number of children
+	return node.childNodes.length;
+}
+
+/**
+ * Check whether the offset is at the start of the node
+ *
+ * @param {Element} node    the DOM element
+ * @param {Integer} offset  the offset
+ * @return {Boolean}        whether or not the offset is at the first cursor position in node
+ */
+export function isAtCursorStart( node, offset ) {
+	const nodeStart = getCursorStart( node );
+	return nodeStart === offset;
+}
+
+/**
+ * Check whether the offset is at the end of the node
+ *
+ * @param {Element} node    the DOM element
+ * @param {Integer} offset  the offset
+ * @return {Boolean}        whether or not the offset is at the last cursor position in node
+ */
+export function isAtCursorEnd( node, offset ) {
+	const nodeEnd = getCursorEnd( node );
+	return nodeEnd === offset;
+}
+
 /**
  * Check whether the selection touches an edge of the container
  *
@@ -34,11 +81,11 @@ export function isEdge( container, start = false ) {
 		return false;
 	}
 
-	if ( start && offset !== 0 ) {
+	if ( start && ! isAtCursorStart( node, offset ) ) {
 		return false;
 	}
 
-	if ( ! start && offset !== node.textContent.length ) {
+	if ( ! start && ! isAtCursorEnd( node, offset ) ) {
 		return false;
 	}
 

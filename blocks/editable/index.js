@@ -23,6 +23,7 @@ import 'element-closest';
  */
 import { createElement, Component, renderToString } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
+import { isAtCursorStart, isAtCursorEnd } from '../../editor/utils/dom';
 
 /**
  * Internal dependencies
@@ -298,7 +299,7 @@ export default class Editable extends Component {
 
 	isStartOfEditor() {
 		const range = this.editor.selection.getRng();
-		if ( range.startOffset !== 0 || ! range.collapsed ) {
+		if ( ! isAtCursorStart( range.startContainer, range.startOffset ) || ! range.collapsed ) {
 			return false;
 		}
 		const start = range.startContainer;
@@ -316,7 +317,7 @@ export default class Editable extends Component {
 
 	isEndOfEditor() {
 		const range = this.editor.selection.getRng();
-		if ( range.endOffset !== range.endContainer.textContent.length || ! range.collapsed ) {
+		if ( ! isAtCursorEnd( range.endContainer, range.endOffset ) || ! range.collapsed ) {
 			return false;
 		}
 		const start = range.endContainer;
