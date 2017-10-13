@@ -24,8 +24,9 @@ import {
 	getMultiSelectedBlocksEndUid,
 	getMultiSelectedBlocks,
 	getMultiSelectedBlockUids,
+	getSelectedBlock,
 } from '../../selectors';
-import { insertBlock, startMultiSelect, stopMultiSelect, multiSelect } from '../../actions';
+import { insertBlock, startMultiSelect, stopMultiSelect, multiSelect, selectBlock } from '../../actions';
 
 const INSERTION_POINT_PLACEHOLDER = '[[insertion-point]]';
 
@@ -36,6 +37,7 @@ class VisualEditorBlockList extends Component {
 		this.onSelectionStart = this.onSelectionStart.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.onSelectionEnd = this.onSelectionEnd.bind( this );
+		this.onShiftSelection = this.onShiftSelection.bind( this );
 		this.onCopy = this.onCopy.bind( this );
 		this.onCut = this.onCut.bind( this );
 		this.setBlockRef = this.setBlockRef.bind( this );
@@ -175,6 +177,18 @@ class VisualEditorBlockList extends Component {
 		this.props.onStopMultiSelect();
 	}
 
+	onShiftSelection( uid ) {
+		const { selectedBlock, selectionStart, onMultiSelect, onSelect } = this.props;
+
+		if ( selectedBlock ) {
+			onMultiSelect( selectedBlock.uid, uid );
+		} else if ( selectionStart ) {
+			onMultiSelect( selectionStart, uid );
+		} else {
+			onSelect( uid );
+		}
+	}
+
 	appendDefaultBlock() {
 		const newBlock = createBlock( getDefaultBlockName() );
 		this.props.onInsertBlock( newBlock );
@@ -212,7 +226,8 @@ class VisualEditorBlockList extends Component {
 							key={ uid }
 							uid={ uid }
 							blockRef={ ( ref ) => this.setBlockRef( ref, uid ) }
-							onSelectionStart={ () => this.onSelectionStart( uid ) }
+							onSelectionStart={ this.onSelectionStart }
+							onShiftSelection={ this.onShiftSelection }
 						/>
 					);
 				} ) }
@@ -243,6 +258,7 @@ export default connect(
 		selectionEnd: getMultiSelectedBlocksEndUid( state ),
 		multiSelectedBlocks: getMultiSelectedBlocks( state ),
 		multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
+		selectedBlock: getSelectedBlock( state ),
 	} ),
 	( dispatch ) => ( {
 		onInsertBlock( block ) {
@@ -256,6 +272,9 @@ export default connect(
 		},
 		onMultiSelect( start, end ) {
 			dispatch( multiSelect( start, end ) );
+		},
+		onSelect( uid ) {
+			dispatch( selectBlock( uid ) );
 		},
 		onRemove( uids ) {
 			dispatch( { type: 'REMOVE_BLOCKS', uids } );
