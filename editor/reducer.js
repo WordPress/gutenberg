@@ -448,6 +448,14 @@ export function preferences( state = STORE_DEFAULTS.preferences, action ) {
 				...state,
 				isExtendedSettingsOpened: ! state.isExtendedSettingsOpened,
 			};
+		case 'TOGGLE_EXTENDED_SETTINGS_PANEL':
+			return {
+				...state,
+				panels: {
+					...state.panels,
+					[ action.panel ]: ! get( state, [ 'panels', action.panel ], false ),
+				},
+			};
 		case 'SWITCH_MODE':
 			return {
 				...state,

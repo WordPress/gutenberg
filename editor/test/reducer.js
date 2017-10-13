@@ -835,6 +835,24 @@ describe( 'state', () => {
 			expect( state ).toEqual( { isSidebarOpened: false, panels: { 'post-taxonomies': false } } );
 		} );
 
+		it( 'should set the extended settings panel open flag to true if unset', () => {
+			const state = preferences( deepFreeze( { isExtendedSettingsOpened: false } ), {
+				type: 'TOGGLE_EXTENDED_SETTINGS_PANEL',
+				panel: 'post-taxonomies',
+			} );
+
+			expect( state ).toEqual( { isExtendedSettingsOpened: false, panels: { 'post-taxonomies': true } } );
+		} );
+
+		it( 'should toggle the extended settings panel open flag', () => {
+			const state = preferences( deepFreeze( { isExtendedSettingsOpened: false, panels: { 'post-taxonomies': true } } ), {
+				type: 'TOGGLE_EXTENDED_SETTINGS_PANEL',
+				panel: 'post-taxonomies',
+			} );
+
+			expect( state ).toEqual( { isExtendedSettingsOpened: false, panels: { 'post-taxonomies': false } } );
+		} );
+
 		it( 'should return switched mode', () => {
 			const state = preferences( deepFreeze( { isSidebarOpened: false } ), {
 				type: 'SWITCH_MODE',
