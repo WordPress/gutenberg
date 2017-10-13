@@ -291,8 +291,8 @@ class Test_WP_Widget_Custom_HTML extends WP_UnitTestCase {
 	public function test_add_help_text() {
 		set_current_screen( 'widgets.php' );
 		WP_Widget_Custom_HTML::add_help_text();
-		$content = get_current_screen()->get_help_tab( 'custom_html_widget' )['content'];
+		$help_tab = get_current_screen()->get_help_tab( 'custom_html_widget' );
 
-		$this->assertContains( 'Use the Custom HTML widget to add arbitrary HTML code to your widget areas.', $content );
+		$this->assertContains( 'Use the Custom HTML widget to add arbitrary HTML code to your widget areas.', $help_tab['content'] );
 	}
 }
