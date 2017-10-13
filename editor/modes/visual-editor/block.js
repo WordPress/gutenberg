@@ -262,8 +262,15 @@ class VisualEditorBlock extends Component {
 			return;
 		}
 
-		this.props.onSelectionStart();
-		this.props.onSelect();
+		if ( event.shiftKey ) {
+			if ( ! this.props.isSelected ) {
+				this.props.onShiftSelection( this.props.uid );
+				event.preventDefault();
+			}
+		} else {
+			this.props.onSelectionStart( this.props.uid );
+			this.props.onSelect();
+		}
 	}
 
 	onKeyDown( event ) {
