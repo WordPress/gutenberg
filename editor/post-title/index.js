@@ -92,11 +92,11 @@ class PostTitle extends Component {
 		}
 	}
 
-	handleFocusOutside( ) {
+	handleFocusOutside() {
 		this.setFocused( false );
 	}
 
-	onContainerFocus( ) {
+	onContainerFocus() {
 		this.setFocused( true );
 	}
 

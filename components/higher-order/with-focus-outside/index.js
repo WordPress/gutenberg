@@ -24,6 +24,7 @@ function withFocusOutside( OriginalComponent ) {
 		constructor() {
 			super( ...arguments );
 			this.onFocusOutside = this.onFocusOutside.bind( this );
+			this.bindRef = this.bindRef.bind( this );
 		}
 
 		componentDidMount() {
@@ -44,21 +45,17 @@ function withFocusOutside( OriginalComponent ) {
 			}
 		}
 
-		bindRef( wrappedRefCallback, ref ) {
+		bindRef( ref ) {
 			this.__wrappedInstance = ref;
 			// eslint-disable-next-line react/no-find-dom-node
 			this.__domNode = findDOMNode( ref );
-			if ( wrappedRefCallback ) {
-				wrappedRefCallback( ref );
-			}
 		}
 
 		render() {
-			const { wrappedRef, ...rest } = this.props;
 			return (
 				<OriginalComponent
-					{ ...rest }
-					ref={ this.bindRef.bind( this, wrappedRef ) }
+					{ ...this.props }
+					ref={ this.bindRef }
 				/>
 			);
 		}
