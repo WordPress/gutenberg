@@ -8,8 +8,8 @@ import classnames from 'classnames';
 /**
  * WordPress Dependencies
  */
-import { IconButton, Toolbar } from '@wordpress/components';
-import { Component, Children } from '@wordpress/element';
+import { IconButton, Toolbar, NavigableMenu } from '@wordpress/components';
+import { Component, Children, findDOMNode } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { focus, keycodes } from '@wordpress/utils';
 
@@ -24,7 +24,7 @@ import BlockRightMenu from '../block-settings-menu';
 /**
  * Module Constants
  */
-const { LEFT, RIGHT, ESCAPE, F10 } = keycodes;
+const { ESCAPE, F10 } = keycodes;
 
 function FirstChild( { children } ) {
 	const childrenArray = Children.toArray( children );
@@ -46,7 +46,7 @@ class BlockToolbar extends Component {
 		this.bindNode = this.bindNode.bind( this );
 		this.onKeyUp = this.onKeyUp.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
-		this.stopPropagation = this.stopPropagation.bind( this );
+		this.onToolbarKeyDown = this.onToolbarKeyDown.bind( this );
 		this.state = {
 			showMobileControls: false,
 		};
@@ -67,7 +67,7 @@ class BlockToolbar extends Component {
 	}
 
 	bindNode( ref ) {
-		this.toolbar = ref;
+		this.toolbar = findDOMNode( ref );
 	}
 
 	toggleMobileControls() {
@@ -82,50 +82,29 @@ class BlockToolbar extends Component {
 		}
 	}
 
-	stopPropagation( event ) {
-		// This is required to avoid messing up with the WritingFlow navigation
-		event.stopPropagation();
-	}
-
 	onKeyUp( event ) {
 		const shouldFocusToolbar = this.metaCount === 1 || ( event.keyCode === F10 && event.altKey );
 		this.metaCount = 0;
 
-		if ( ! shouldFocusToolbar && [ ESCAPE, LEFT, RIGHT ].indexOf( event.keyCode ) === -1 ) {
-			return;
-		}
-
-		const tabbables = focus.tabbable.find( this.toolbar );
-		const indexOfTabbable = tabbables.indexOf( document.activeElement );
-
 		if ( shouldFocusToolbar ) {
+			const tabbables = focus.tabbable.find( this.toolbar );
 			if ( tabbables.length ) {
 				tabbables[ 0 ].focus();
 			}
+		}
+	}
+
+	onToolbarKeyDown( event ) {
+		if ( event.keyCode !== ESCAPE ) {
 			return;
 		}
 
-		switch ( event.keyCode ) {
-			case ESCAPE: {
-				// Is there a better way to focus the selected block
-				const selectedBlock = document.querySelector( '.editor-visual-editor__block.is-selected' );
-				if ( indexOfTabbable !== -1 && selectedBlock ) {
-					selectedBlock.focus();
-				}
-				break;
-			}
-			case LEFT:
-				if ( indexOfTabbable > 0 ) {
-					tabbables[ indexOfTabbable - 1 ].focus();
-				}
-				event.stopPropagation();
-				break;
-			case RIGHT:
-				if ( indexOfTabbable !== -1 && indexOfTabbable !== tabbables.length - 1 ) {
-					tabbables[ indexOfTabbable + 1 ].focus();
-				}
-				event.stopPropagation();
-				break;
+		// Is there a better way to focus the selected block
+		// TODO: separate focused/selected block state and use Redux actions instead
+		const selectedBlock = document.querySelector( '.editor-visual-editor__block.is-selected .editor-visual-editor__block-edit' );
+		if ( !! selectedBlock ) {
+			event.stopPropagation();
+			selectedBlock.focus();
 		}
 	}
 
@@ -146,8 +125,14 @@ class BlockToolbar extends Component {
 				transitionLeave={ false }
 				component={ FirstChild }
 			>
-				<div className={ toolbarClassname } ref={ this.bindNode } onKeyDown={ this.stopPropagation }>
-					<div className="editor-block-toolbar__group">
+				<NavigableMenu
+					className={ toolbarClassname }
+					ref={ this.bindNode }
+					orientation="horizontal"
+					role="toolbar"
+					deep
+				>
+					<div className="editor-block-toolbar__group" onKeyDown={ this.onToolbarKeyDown }>
 						{ ! showMobileControls && [
 							<BlockSwitcher key="switcher" uid={ uid } />,
 							<Slot key="slot" name="Formatting.Toolbar" />,
@@ -169,7 +154,7 @@ class BlockToolbar extends Component {
 							}
 						</Toolbar>
 					</div>
-				</div>
+				</NavigableMenu>
 			</CSSTransitionGroup>
 		);
 	}
