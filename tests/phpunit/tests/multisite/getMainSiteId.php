@@ -105,6 +105,39 @@ class Tests_Multisite_Get_Main_Site_ID extends WP_UnitTestCase {
 	public function filter_get_main_site_id() {
 		return 333;
 	}
+
+	/**
+	 * @ticket 41936
+	 */
+	public function test_get_main_site_id_with_property_value() {
+		global $current_site;
+
+		$original_main_site_id = $current_site->blog_id;
+		$current_site->blog_id = '123';
+
+		$result = get_main_site_id();
+
+		$current_site->blog_id = $original_main_site_id;
+
+		$this->assertSame( 123, $result );
+	}
+
+	/**
+	 * @ticket 41936
+	 */
+	public function test_get_main_site_id_filtered_with_property_value() {
+		global $current_site;
+
+		$original_main_site_id = $current_site->blog_id;
+		$current_site->blog_id = '123';
+
+		add_filter( 'pre_get_main_site_id', array( $this, 'filter_get_main_site_id' ) );
+		$result = get_main_site_id();
+
+		$current_site->blog_id = $original_main_site_id;
+
+		$this->assertSame( 333, $result );
+	}
 }
 
 endif;
