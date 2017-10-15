@@ -128,7 +128,6 @@ export class Popover extends Component {
 			return;
 		}
 
-
 		const [ yAxis, xAxis ] = this.getPositions();
 		const isTop = 'top' === yAxis;
 		const isLeft = 'left' === xAxis;
