@@ -7,6 +7,29 @@
 		border: none;
 		border-left: 1px solid $light-gray-500;
 	}
+
+	// this should probably have its own class
+	> div:not( .editor-block-toolbar__mobile-tools ) {
+		display: flex;
+	}
+
+	// stacked toolbar
+	position: absolute;
+	top: $header-height;
+	left: 0;
+	right: 0;
+	background: $white;
+	border-bottom: 1px solid $light-gray-500;
+
+	// merge toolbars after this breakpoint
+	@include break-large {	// we should try and lower this breakpoint through an ellipsis overflow feature
+		padding-left: $item-spacing;
+		position: static;
+		left: auto;
+		right: auto;
+		background: none;
+		border-bottom: none;
+	}
 }
 
 .editor-block-toolbar .editor-block-switcher {
