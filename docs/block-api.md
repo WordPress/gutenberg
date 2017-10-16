@@ -78,11 +78,14 @@ Attributes provide the structured data needs of a block. They can exist in diffe
 attributes: {
 	cover: {
 		type: 'string',
-		source: attr( 'img', 'src' ),
+		source: 'attribute',
+		selector: 'img',
+		attribute: 'src',
 	},
 	author: {
 		type: 'string',
-		source: children( '.book-author' ),
+		source: 'children',
+		selector: '.book-author',
 	},
 	pages: {
 		type: 'number',

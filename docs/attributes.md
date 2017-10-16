@@ -8,19 +8,83 @@ Each source accepts an optional selector as the first argument. If a selector is
 
 Under the hood, attribute sources are a superset of functionality provided by [hpq](https://github.com/aduth/hpq), a small library used to parse and query HTML markup into an object shape. In an object of attributes sources, you can name the keys as you see fit. The resulting object will assign as a value to each key the result of its attribute source.
 
-### `attr`
+### `attribute`
 
-Use `attr` to extract the value of an attribute from markup.
+Use `attribute` to extract the value of an attribute from markup.
 
 _Example_: Extract the `src` attribute from an image found in the block's markup.
 
 ```js
 {
 	url: {
-		source: attr( 'img', 'src' )
+		source: 'attribute',
+		selector: 'img',
+		attribute: 'src',
 	}
 }
 // { "url": "https://lorempixel.com/1200/800/" }
+```
+
+### `attribute`
+
+Use `attribute` to extract the value of an attribute from markup.
+
+_Example_: Extract the `src` attribute from an image found in the block's markup.
+
+```js
+{
+	url: {
+		source: 'attribute',
+		selector: 'img',
+		attribute: 'src',
+	}
+}
+// { "url": "https://lorempixel.com/1200/800/" }
+```
+
+### `property`
+
+Use `property` to extract the value of a property of a DOM Node from markup.
+
+_Example_: Extract the `nodeName` property from a heading's node.
+
+```js
+{
+	tagName: {
+		source: 'property',
+		selector: 'h1,h2,h3,h4,h5,h6',
+		property: 'nodeName',
+	}
+}
+// { "tagName": "h2" }
+```
+
+### `text`
+
+Use `text` to extract the inner text from markup.
+
+```js
+{
+	content: {
+		source: 'text',
+		selector: 'figcaption',
+	}
+}
+// { "content": "The inner text of the figcaption element" }
+```
+
+### `html`
+
+Use `html` to extract the inner HTML from markup.
+
+```js
+{
+	content: {
+		source: 'html',
+		selector: 'figcaption',
+	}
+}
+// { "content": "The inner text of the <strong>figcaption</strong> element" }
 ```
 
 ### `children`
@@ -32,13 +96,14 @@ _Example_: Extract child nodes from a paragraph of rich text.
 ```js
 {
 	content: {
-		source: children( 'p' )
+		source: 'children',
+		selector: 'p'
 	}
 }
 // {
 //   "content": [
 //     "Vestibulum eu ",
-//     { "type": "strong", "children": "tortor" }, 
+//     { "type": "strong", "children": "tortor" },
 //     " vel urna."
 //   ]
 // }
@@ -53,14 +118,19 @@ _Example_: Extract `src` and `alt` from each image element in the block's markup
 ```js
 {
 	images: {
-		source: query( 'img', {
-			url: attr( 'src' )
-			alt: attr( 'alt' )
-		} )
+		source: 'query'
+		selector: 'img',
+		query: {
+			source: 'object',
+			object: {
+				url: { source: 'attribute', attribute: 'src' },
+				alt: { source: 'attribute', attribute: 'alt' },
+			},
+		}
 	}
 }
 // {
-//   "images": [ 
+//   "images": [
 //     { "url": "https://lorempixel.com/1200/800/", "alt": "large image" },
 //     { "url": "https://lorempixel.com/50/50/", "alt": "small image" }
 //   ]
@@ -75,6 +145,7 @@ Attributes may be obtained from a post's meta rather than from the block's repre
 attributes: {
 	author: {
 		type: 'string',
+		source: 'meta',
 		meta: 'author'
 	},
 },
