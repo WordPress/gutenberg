@@ -64,6 +64,7 @@ import {
 	getSuggestedPostFormat,
 	getNotices,
 	getMostFrequentlyUsedBlocks,
+	getRecentlyUsedBlocks,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -1800,6 +1801,19 @@ describe( 'selectors', () => {
 
 			expect( getMostFrequentlyUsedBlocks( state ).map( ( block ) => block.name ) )
 				.toEqual( [ 'core/image', 'core/paragraph', 'core/quote' ] );
+		} );
+	} );
+
+	describe( 'getRecentlyUsedBlocks', () => {
+		it( 'should return the most recently used blocks', () => {
+			const state = {
+				preferences: {
+					recentlyUsedBlocks: [ 'core/deleted-block', 'core/paragraph', 'core/image' ],
+				},
+			};
+
+			expect( getRecentlyUsedBlocks( state ).map( ( block ) => block.name ) )
+				.toEqual( [ 'core/paragraph', 'core/image' ] );
 		} );
 	} );
 } );
