@@ -138,7 +138,9 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 		attributes: {
 			category: {
 				type: 'string',
-				source: source.attr( 'img', 'alt' )
+				source: 'attribute',
+				attribute: 'alt',
+				selector: 'img',
 			}
 		},
 
@@ -238,8 +240,8 @@ editor interface where blocks are implemented.
   keys of the object define the shape of attributes, and each value an object
   schema describing the `type`, `default` (optional), and
   [`source`](https://wordpress.org/gutenberg/handbook/reference/attributes/)
-  (optional) of the attribute. If `source` is omitted, the attribute is 
-  serialized into the block's comment delimiters. Alternatively, define 
+  (optional) of the attribute. If `source` is omitted, the attribute is
+  serialized into the block's comment delimiters. Alternatively, define
   `attributes` as a function which returns the attributes object.
 - `category: string` - Slug of the block's category. The category is used to
   organize the blocks in the block inserter.
