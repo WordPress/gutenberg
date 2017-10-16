@@ -118,21 +118,22 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		// $get_all = false, only retrieve details from the blogs table
 		$details = get_blog_details( $blog_id, false );
 
-		$cached_details = wp_cache_get( $blog_id, 'sites' );
-		$this->assertNotFalse( $cached_details );
-		$this->assertEqualSets( get_object_vars( $details ), get_object_vars( $cached_details ) );
+		// Combine domain and path for a site specific cache key.
+		$key = md5( $details->domain . $details->path );
+
+		$this->assertEquals( $details, wp_cache_get( $blog_id . 'short', 'blog-details' ) );
 
 		// get_blogaddress_by_name()
 		$this->assertEquals( 'http://' . $details->domain . $details->path, get_blogaddress_by_name( trim( $details->path, '/' ) ) );
 
-		// This is empty until get_blog_details() is called with $get_all = true
-		$this->assertEquals( false, wp_cache_get( $blog_id, 'site-details' ) );
+		// These are empty until get_blog_details() is called with $get_all = true
+		$this->assertEquals( false, wp_cache_get( $blog_id, 'blog-details' ) );
+		$this->assertEquals( false, wp_cache_get( $key, 'blog-lookup' ) );
 
 		// $get_all = true, populate the full blog-details cache and the blog slug lookup cache
 		$details = get_blog_details( $blog_id, true );
-		$cached_details = wp_cache_get( $blog_id, 'site-details' );
-		$this->assertNotFalse( $cached_details );
-		$this->assertEqualSets( get_object_vars( $details ), get_object_vars( $cached_details ) );
+		$this->assertEquals( $details, wp_cache_get( $blog_id, 'blog-details' ) );
+		$this->assertEquals( $details, wp_cache_get( $key, 'blog-lookup' ) );
 
 		// Check existence of each database table for the created site.
 		foreach ( $wpdb->tables( 'blog', false ) as $table ) {
@@ -195,8 +196,9 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		// Delete the site without forcing a table drop.
 		wpmu_delete_blog( $blog_id, false );
 
-		$this->assertEquals( false, wp_cache_get( $blog_id, 'sites' ) );
-		$this->assertEquals( false, wp_cache_get( $blog_id, 'site-details' ) );
+		$this->assertEquals( false, wp_cache_get( $blog_id, 'blog-details' ) );
+		$this->assertEquals( false, wp_cache_get( $blog_id . 'short', 'blog-details' ) );
+		$this->assertEquals( false, wp_cache_get( $key, 'blog-lookup' ) );
 		$this->assertEquals( false, wp_cache_get( $key, 'blog-id-cache' ) );
 	}
 
@@ -232,8 +234,9 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		// Delete the site and force a table drop.
 		wpmu_delete_blog( $blog_id, true );
 
-		$this->assertEquals( false, wp_cache_get( $blog_id, 'sites' ) );
-		$this->assertEquals( false, wp_cache_get( $blog_id, 'site-details' ) );
+		$this->assertEquals( false, wp_cache_get( $blog_id, 'blog-details' ) );
+		$this->assertEquals( false, wp_cache_get( $blog_id . 'short', 'blog-details' ) );
+		$this->assertEquals( false, wp_cache_get( $key, 'blog-lookup' ) );
 		$this->assertEquals( false, wp_cache_get( $key, 'blog-id-cache' ) );
 	}
 
@@ -269,8 +272,9 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		// Delete the site and force a table drop.
 		wpmu_delete_blog( $blog_id, true );
 
-		$this->assertEquals( false, wp_cache_get( $blog_id, 'sites' ) );
-		$this->assertEquals( false, wp_cache_get( $blog_id, 'site-details' ) );
+		$this->assertEquals( false, wp_cache_get( $blog_id, 'blog-details' ) );
+		$this->assertEquals( false, wp_cache_get( $blog_id . 'short', 'blog-details' ) );
+		$this->assertEquals( false, wp_cache_get( $key, 'blog-lookup' ) );
 		$this->assertEquals( false, wp_cache_get( $key, 'blog-id-cache' ) );
 	}
 
@@ -386,21 +390,19 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		// Prime the cache for an invalid site.
 		get_blog_details( $blog_id );
 
-		// When the cache is primed with an invalid site, the value is not set.
-		$this->assertFalse( wp_cache_get( $blog_id, 'site-details' ) );
+		// When the cache is primed with an invalid site, the value is set to -1.
+		$this->assertEquals( -1, wp_cache_get( $blog_id, 'blog-details' ) );
 
 		// Create a site in the invalid site's place.
 		self::factory()->blog->create();
 
 		// When a new site is created, its cache is cleared through refresh_blog_details.
-		$this->assertFalse( wp_cache_get( $blog_id, 'site-details' )  );
+		$this->assertFalse( wp_cache_get( $blog_id, 'blog-details' )  );
 
 		$blog = get_blog_details( $blog_id );
 
 		// When the cache is refreshed, it should now equal the site data.
-		$cached_blog = wp_cache_get( $blog_id, 'site-details' );
-		$this->assertNotFalse( $cached_blog );
-		$this->assertEqualSets( get_object_vars( $blog ), get_object_vars( $cached_blog ) );
+		$this->assertEquals( $blog, wp_cache_get( $blog_id, 'blog-details' ) );
 	}
 
 	/**
