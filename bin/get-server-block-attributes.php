@@ -30,6 +30,16 @@ function register_block_type( $name, $args = array() ) {
 	$attributes[ $name ] = $args['attributes'];
 }
 
+/**
+ * Mock for core `add_filter` function.
+ */
+function add_filter() {}
+
+/**
+ * Mock for core `add_action` function.
+ */
+function add_action() {}
+
 // Register server-side code for individual blocks.
 foreach ( glob( dirname( dirname( __FILE__ ) ) . '/blocks/library/*/index.php' ) as $block_logic ) {
 	require_once $block_logic;
