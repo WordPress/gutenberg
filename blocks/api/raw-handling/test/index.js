@@ -9,7 +9,6 @@ import { equal, deepEqual } from 'assert';
 import rawHandler from '../index';
 import { registerBlockType, unregisterBlockType, setUnknownTypeHandlerName } from '../../registration';
 import { createBlock } from '../../factory';
-import { children, prop } from '../../source';
 
 describe( 'rawHandler', () => {
 	beforeAll( () => {
@@ -19,7 +18,8 @@ describe( 'rawHandler', () => {
 			attributes: {
 				content: {
 					type: 'array',
-					source: children( 'figure' ),
+					source: 'children',
+					selector: 'figure',
 				},
 			},
 			transforms: {
@@ -39,7 +39,8 @@ describe( 'rawHandler', () => {
 			attributes: {
 				content: {
 					type: 'string',
-					source: prop( 'innerHTML' ),
+					source: 'property',
+					property: 'innerHTML',
 				},
 			},
 			save: () => {},
