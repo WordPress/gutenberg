@@ -346,6 +346,7 @@ module.exports = function(grunt) {
 					'!wp-includes/js/media-*',
 					// WordPress scripts inside directories
 					'wp-includes/js/jquery/jquery.table-hotkeys.js',
+					'wp-includes/js/mediaelement/mediaelement-migrate.js',
 					'wp-includes/js/mediaelement/wp-mediaelement.js',
 					'wp-includes/js/mediaelement/wp-playlist.js',
 					'wp-includes/js/plupload/handlers.js',
