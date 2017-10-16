@@ -68,7 +68,7 @@ class Tests_Ajax_TagSearch extends WP_Ajax_UnitTestCase {
 
 		// Make the request
 		// No output, so we get a stop exception
-		$this->setExpectedException( 'WPAjaxDieStopException', '0' );
+		$this->setExpectedException( 'WPAjaxDieStopException', '' );
 		$this->_handleAjax( 'ajax-tag-search' );
 	}
 

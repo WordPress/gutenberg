@@ -25,7 +25,7 @@ class Tests_Ajax_CompressionTest extends WP_Ajax_UnitTestCase {
 		$_GET['test'] = 1;
 
 		// Make the request
-		$this->setExpectedException( 'WPAjaxDieStopException', '0' );
+		$this->setExpectedException( 'WPAjaxDieStopException', '-1' );
 		$this->_handleAjax( 'wp-compression-test' );
 	}
 
