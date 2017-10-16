@@ -152,7 +152,7 @@ class VisualEditorBlock extends Component {
 		onChange( block.uid, attributes );
 
 		const metaAttributes = reduce( attributes, ( result, value, key ) => {
-			if ( type && get( type, [ 'attributes', key, 'source' ] ) === 'meta' ) {
+			if ( get( type, [ 'attributes', key, 'source' ] ) === 'meta' ) {
 				result[ type.attributes[ key ].meta ] = value;
 			}
 
