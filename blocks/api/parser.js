@@ -86,14 +86,15 @@ export function matcherFromSource( sourceConfig ) {
 }
 
 /**
- * Given a blocktype, a block's raw content and the commentAttributes returns the attribute value depending on its source definition
+ * Given an attribute key, an attributes schema, a block's raw content and the commentAttributes
+ * returns the attribute value depending on its source definition of the given attribute key
  *
  * @param  {string} attributeKey        Attribute key
  * @param  {Object} attributeSchema     Attribute's schema
  * @param  {string} innerHTML           Block's raw content
  * @param  {Object} commentAttributes   Block's comment attributes
  *
- * @return {mixed}                      Attribute value
+ * @return {*}                          Attribute value
  */
 export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, commentAttributes ) {
 	let value;
