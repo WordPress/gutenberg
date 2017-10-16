@@ -229,7 +229,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 			const { url, caption, align } = attributes;
 
 			if ( ! url ) {
-				return;
+				return null;
 			}
 
 			return (
