@@ -12,13 +12,14 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import { getEditedPostTitle } from '../selectors';
-import { editPost, clearSelectedBlock } from '../actions';
+import { insertBlock, editPost, clearSelectedBlock } from '../actions';
 import PostPermalink from '../post-permalink';
 
 /**
@@ -30,11 +31,14 @@ const { ENTER } = keycodes;
 class PostTitle extends Component {
 	constructor() {
 		super( ...arguments );
+
 		this.bindTextarea = this.bindTextarea.bind( this );
 		this.onChange = this.onChange.bind( this );
 		this.onSelect = this.onSelect.bind( this );
 		this.onUnselect = this.onUnselect.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
+		this.onKeyDown = this.onKeyDown.bind( this );
+
 		this.state = {
 			isSelected: false,
 		};
@@ -83,6 +87,7 @@ class PostTitle extends Component {
 	onKeyDown( event ) {
 		if ( event.keyCode === ENTER ) {
 			event.preventDefault();
+			this.props.onEnterPress();
 		}
 	}
 
@@ -116,14 +121,13 @@ export default connect(
 	( state ) => ( {
 		title: getEditedPostTitle( state ),
 	} ),
-	( dispatch ) => {
-		return {
-			onUpdate( title ) {
-				dispatch( editPost( { title } ) );
-			},
-			clearSelectedBlock() {
-				dispatch( clearSelectedBlock() );
-			},
-		};
+	{
+		onEnterPress() {
+			return insertBlock( createBlock( getDefaultBlockName() ), 0 );
+		},
+		onUpdate( title ) {
+			return editPost( { title } );
+		},
+		clearSelectedBlock,
 	}
 )( clickOutside( PostTitle ) );
