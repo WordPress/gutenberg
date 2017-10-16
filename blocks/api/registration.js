@@ -111,7 +111,7 @@ export function registerBlockType( name, settings ) {
 		return;
 	}
 	if ( ! settings.icon ) {
-		settings.icon = 'star-filled';
+		settings.icon = 'block-default';
 	}
 	const block = blocks[ name ] = {
 		name,
