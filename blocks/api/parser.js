@@ -86,7 +86,7 @@ export function matcherFromSource( sourceConfig ) {
 }
 
 /**
- * Given an attribute key, an attributes schema, a block's raw content and the commentAttributes
+ * Given an attribute key, an attribute's schema, a block's raw content and the commentAttributes
  * returns the attribute value depending on its source definition of the given attribute key
  *
  * @param  {string} attributeKey        Attribute key

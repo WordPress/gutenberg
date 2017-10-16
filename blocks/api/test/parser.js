@@ -7,6 +7,7 @@ import { noop } from 'lodash';
  * Internal dependencies
  */
 import {
+	getBlockAttribute,
 	getBlockAttributes,
 	asType,
 	createBlockWithFallback,
@@ -73,6 +74,50 @@ describe( 'block parser', () => {
 
 			expect( asType( obj, 'object' ) ).toBe( obj );
 			expect( asType( {}, 'object' ) ).toEqual( {} );
+		} );
+	} );
+
+	describe( 'getBlockAttribute', () => {
+		it( 'should return the comment attribute value', () => {
+			const value = getBlockAttribute(
+				'number',
+				{
+					type: 'number',
+					source: 'comment',
+				},
+				'',
+				{ number: 10 }
+			);
+
+			expect( value ).toBe( 10 );
+		} );
+
+		it( 'should return the matcher\'s attribute value', () => {
+			const value = getBlockAttribute(
+				'content',
+				{
+					type: 'string',
+					source: 'text',
+					selector: 'div',
+				},
+				'<div>chicken</div>',
+				{}
+			);
+			expect( value ).toBe( 'chicken' );
+		} );
+
+		it( 'should return undefined for meta attributes', () => {
+			const value = getBlockAttribute(
+				'content',
+				{
+					type: 'string',
+					source: 'meta',
+					meta: 'content',
+				},
+				'<div>chicken</div>',
+				{}
+			);
+			expect( value ).toBeUndefined();
 		} );
 	} );
 
