@@ -57,6 +57,7 @@ import {
 	getBlockMode,
 	isTyping,
 	getBlockInsertionPoint,
+	getBlockSiblingInserterPosition,
 	isBlockInsertionPointVisible,
 	isSavingPost,
 	didPostSaveRequestSucceed,
@@ -1585,6 +1586,22 @@ describe( 'selectors', () => {
 					blockOrder: [ 1, 2, 3 ],
 					edits: {},
 				},
+				blockInsertionPoint: {},
+			};
+
+			expect( getBlockInsertionPoint( state ) ).toBe( 2 );
+		} );
+
+		it( 'should return the assigned insertion point', () => {
+			const state = {
+				preferences: { mode: 'visual' },
+				blockSelection: {},
+				editor: {
+					blockOrder: [ 1, 2, 3 ],
+				},
+				blockInsertionPoint: {
+					position: 2,
+				},
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toBe( 2 );
@@ -1600,6 +1617,7 @@ describe( 'selectors', () => {
 				editor: {
 					blockOrder: [ 1, 2, 3 ],
 				},
+				blockInsertionPoint: {},
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toBe( 2 );
@@ -1612,6 +1630,7 @@ describe( 'selectors', () => {
 				editor: {
 					blockOrder: [ 1, 2, 3 ],
 				},
+				blockInsertionPoint: {},
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toBe( 3 );
@@ -1624,16 +1643,39 @@ describe( 'selectors', () => {
 				editor: {
 					blockOrder: [ 1, 2, 3 ],
 				},
+				blockInsertionPoint: {},
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toBe( 3 );
 		} );
 	} );
 
+	describe( 'getBlockSiblingInserterPosition', () => {
+		it( 'should return null if no sibling insertion point', () => {
+			const state = {
+				blockInsertionPoint: {},
+			};
+
+			expect( getBlockSiblingInserterPosition( state ) ).toBe( null );
+		} );
+
+		it( 'should return sibling insertion point', () => {
+			const state = {
+				blockInsertionPoint: {
+					position: 5,
+				},
+			};
+
+			expect( getBlockSiblingInserterPosition( state ) ).toBe( 5 );
+		} );
+	} );
+
 	describe( 'isBlockInsertionPointVisible', () => {
 		it( 'should return the value in state', () => {
 			const state = {
-				showInsertionPoint: true,
+				blockInsertionPoint: {
+					visible: true,
+				},
 			};
 
 			expect( isBlockInsertionPointVisible( state ) ).toBe( true );

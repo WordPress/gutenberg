@@ -15,11 +15,10 @@ import { serialize, getDefaultBlockName, createBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import VisualEditorBlock from './block';
+import VisualEditorSiblingInserter from './sibling-inserter';
 import BlockDropZone from './block-drop-zone';
 import {
 	getBlockUids,
-	getBlockInsertionPoint,
-	isBlockInsertionPointVisible,
 	getMultiSelectedBlocksStartUid,
 	getMultiSelectedBlocksEndUid,
 	getMultiSelectedBlocks,
@@ -27,8 +26,6 @@ import {
 	getSelectedBlock,
 } from '../../selectors';
 import { insertBlock, startMultiSelect, stopMultiSelect, multiSelect, selectBlock } from '../../actions';
-
-const INSERTION_POINT_PLACEHOLDER = '[[insertion-point]]';
 
 class VisualEditorBlockList extends Component {
 	constructor( props ) {
@@ -195,42 +192,24 @@ class VisualEditorBlockList extends Component {
 	}
 
 	render() {
-		const {
-			blocks,
-			showInsertionPoint,
-			insertionPoint,
-		} = this.props;
-
-		const blocksWithInsertionPoint = showInsertionPoint
-			? [
-				...blocks.slice( 0, insertionPoint ),
-				INSERTION_POINT_PLACEHOLDER,
-				...blocks.slice( insertionPoint ),
-			]
-			: blocks;
+		const { blocks } = this.props;
 
 		return (
 			<div>
-				{ !! blocks.length && blocksWithInsertionPoint.map( ( uid ) => {
-					if ( uid === INSERTION_POINT_PLACEHOLDER ) {
-						return (
-							<div
-								key={ INSERTION_POINT_PLACEHOLDER }
-								className="editor-visual-editor__insertion-point"
-							/>
-						);
-					}
-
-					return (
-						<VisualEditorBlock
-							key={ uid }
-							uid={ uid }
-							blockRef={ ( ref ) => this.setBlockRef( ref, uid ) }
-							onSelectionStart={ this.onSelectionStart }
-							onShiftSelection={ this.onShiftSelection }
-						/>
-					);
-				} ) }
+				{ !! blocks.length && <VisualEditorSiblingInserter insertIndex={ 0 } /> }
+				{ blocks.reduce( ( result, uid, index ) => result.concat(
+					<VisualEditorBlock
+						key={ 'block-' + uid }
+						uid={ uid }
+						blockRef={ ( ref ) => this.setBlockRef( ref, uid ) }
+						onSelectionStart={ this.onSelectionStart }
+						onShiftSelection={ this.onShiftSelection }
+					/>,
+					<VisualEditorSiblingInserter
+						key={ 'sibling-inserter-' + uid }
+						insertIndex={ index + 1 }
+					/>,
+				), [] ) }
 				{ ! blocks.length &&
 					<div className="editor-visual-editor__placeholder">
 						<BlockDropZone />
@@ -252,8 +231,6 @@ class VisualEditorBlockList extends Component {
 export default connect(
 	( state ) => ( {
 		blocks: getBlockUids( state ),
-		insertionPoint: getBlockInsertionPoint( state ),
-		showInsertionPoint: isBlockInsertionPointVisible( state ),
 		selectionStart: getMultiSelectedBlocksStartUid( state ),
 		selectionEnd: getMultiSelectedBlocksEndUid( state ),
 		multiSelectedBlocks: getMultiSelectedBlocks( state ),

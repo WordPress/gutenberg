@@ -407,12 +407,20 @@ export function blocksMode( state = {}, action ) {
  * @param  {Object} action Dispatched action
  * @return {Object}        Updated state
  */
-export function showInsertionPoint( state = false, action ) {
+export function blockInsertionPoint( state = {}, action ) {
 	switch ( action.type ) {
+		case 'SET_BLOCK_INSERTION_POINT':
+			const { position } = action;
+			return { ...state, position };
+
+		case 'CLEAR_BLOCK_INSERTION_POINT':
+			return { ...state, position: null };
+
 		case 'SHOW_INSERTION_POINT':
-			return true;
+			return { ...state, visible: true };
+
 		case 'HIDE_INSERTION_POINT':
-			return false;
+			return { ...state, visible: false };
 	}
 
 	return state;
@@ -553,7 +561,7 @@ export default optimist( combineReducers( {
 	blockSelection,
 	hoveredBlock,
 	blocksMode,
-	showInsertionPoint,
+	blockInsertionPoint,
 	preferences,
 	panel,
 	saving,
