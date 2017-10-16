@@ -7,7 +7,8 @@
             "url": "https://twitter.com/automattic",
             "caption": [
                 "We are Automattic"
-            ]
+            ],
+            "theme": "light"
         },
         "originalContent": "<figure class=\"wp-block-embed-twitter\">\n    https://twitter.com/automattic\n    <figcaption>We are Automattic</figcaption>\n</figure>"
     }
