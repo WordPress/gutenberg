@@ -36,8 +36,6 @@ class SelectAllDetection extends Component {
 }
 ```
 
-__Note:__ The value of each shortcut should be a consistent function reference, not an anonymous function. Otherwise, the callback will not be correctly unbound when the component unmounts.
-
 ## Props
 
 The component accepts the following props:
@@ -48,6 +46,10 @@ An object of shortcut bindings, where each key is a keyboard combination, the va
 
 - Type: `Object`
 - Required: No
+
+__Note:__ The value of each shortcut should be a consistent function reference, not an anonymous function. Otherwise, the callback will not be correctly unbound when the component unmounts.
+
+__Note:__ The `KeyboardShortcuts` component will not update to reflect a changed `shortcuts` prop. If you need to change shortcuts, mount a separate `KeyboardShortcuts` element, which can be achieved by assigning a unique `key` prop.
 
 ## bindGlobal
 
