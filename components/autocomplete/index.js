@@ -8,7 +8,7 @@ import { find } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, findDOMNode, isValidElement, renderToString } from '@wordpress/element';
+import { Component, findDOMNode, renderToString } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
 
 /**
