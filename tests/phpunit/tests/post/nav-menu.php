@@ -549,9 +549,21 @@ class Test_Nav_Menus extends WP_UnitTestCase {
 	 * @covers _wp_delete_customize_changeset_dependent_auto_drafts()
 	 */
 	function test_wp_delete_customize_changeset_dependent_auto_drafts() {
-		$nav_created_post_ids = $this->factory()->post->create_many(2, array(
+		$auto_draft_post_id = $this->factory()->post->create( array(
 			'post_status' => 'auto-draft',
 		) );
+		$draft_post_id = $this->factory()->post->create( array(
+			'post_status' => 'draft',
+		) );
+		$private_post_id = $this->factory()->post->create( array(
+			'post_status' => 'private',
+		) );
+
+		$nav_created_post_ids = array(
+			$auto_draft_post_id,
+			$draft_post_id,
+			$private_post_id,
+		);
 		$data = array(
 			'nav_menus_created_posts' => array(
 				'value' => $nav_created_post_ids,
@@ -566,11 +578,13 @@ class Test_Nav_Menus extends WP_UnitTestCase {
 		$wp_customize->save_changeset_post( array(
 			'data' => $data,
 		) );
-		$this->assertInstanceOf( 'WP_Post', get_post( $nav_created_post_ids[0] ) );
-		$this->assertInstanceOf( 'WP_Post', get_post( $nav_created_post_ids[1] ) );
+		$this->assertEquals( 'auto-draft', get_post_status( $auto_draft_post_id ) );
+		$this->assertEquals( 'draft', get_post_status( $draft_post_id ) );
+		$this->assertEquals( 'private', get_post_status( $private_post_id ) );
 		wp_delete_post( $wp_customize->changeset_post_id(), true );
-		$this->assertNotInstanceOf( 'WP_Post', get_post( $nav_created_post_ids[0] ) );
-		$this->assertNotInstanceOf( 'WP_Post', get_post( $nav_created_post_ids[1] ) );
+		$this->assertFalse( get_post_status( $auto_draft_post_id ) );
+		$this->assertEquals( 'trash', get_post_status( $draft_post_id ) );
+		$this->assertEquals( 'private', get_post_status( $private_post_id ) );
 	}
 
 	/**

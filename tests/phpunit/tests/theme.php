@@ -318,6 +318,7 @@ class Tests_Theme extends WP_UnitTestCase {
 	function test_wp_keep_alive_customize_changeset_dependent_auto_drafts() {
 		$nav_created_post_ids = $this->factory()->post->create_many(2, array(
 			'post_status' => 'auto-draft',
+			'post_date' => gmdate( 'Y-m-d H:i:s', strtotime( '-2 days' ) ),
 		) );
 		$data = array(
 			'nav_menus_created_posts' => array(
@@ -328,17 +329,41 @@ class Tests_Theme extends WP_UnitTestCase {
 		require_once ABSPATH . WPINC . '/class-wp-customize-manager.php';
 		$wp_customize = new WP_Customize_Manager();
 		do_action( 'customize_register', $wp_customize );
+
+		// The post_date for auto-drafts is bumped to match the changeset post_date whenever it is modified to keep them from from being garbage collected by wp_delete_auto_drafts().
 		$wp_customize->save_changeset_post( array(
 			'data' => $data,
 		) );
 		$this->assertEquals( get_post( $nav_created_post_ids[0] )->post_date, get_post( $wp_customize->changeset_post_id() )->post_date );
 		$this->assertEquals( get_post( $nav_created_post_ids[1] )->post_date, get_post( $wp_customize->changeset_post_id() )->post_date );
+		$this->assertEquals( 'auto-draft', get_post_status( $nav_created_post_ids[0] ) );
+		$this->assertEquals( 'auto-draft', get_post_status( $nav_created_post_ids[1] ) );
+
+		// Stubs transition to drafts when changeset is saved as a draft.
 		$wp_customize->save_changeset_post( array(
 			'status' => 'draft',
 			'data' => $data,
 		) );
-		$expected_year = date( 'Y' ) + 100;
-		$this->assertEquals( $expected_year, date( 'Y', strtotime( get_post( $nav_created_post_ids[0] )->post_date ) ) );
-		$this->assertEquals( $expected_year, date( 'Y', strtotime( get_post( $nav_created_post_ids[1] )->post_date ) ) );
+		$this->assertEquals( get_post( $nav_created_post_ids[0] )->post_date, get_post( $wp_customize->changeset_post_id() )->post_date );
+		$this->assertEquals( get_post( $nav_created_post_ids[1] )->post_date, get_post( $wp_customize->changeset_post_id() )->post_date );
+		$this->assertEquals( 'draft', get_post_status( $nav_created_post_ids[0] ) );
+		$this->assertEquals( 'draft', get_post_status( $nav_created_post_ids[1] ) );
+
+		// Status remains unchanged for stub that the user broke out of the changeset.
+		wp_update_post( array(
+			'ID' => $nav_created_post_ids[1],
+			'post_status' => 'private',
+		) );
+		$wp_customize->save_changeset_post( array(
+			'status' => 'draft',
+			'data' => $data,
+		) );
+		$this->assertEquals( 'draft', get_post_status( $nav_created_post_ids[0] ) );
+		$this->assertEquals( 'private', get_post_status( $nav_created_post_ids[1] ) );
+
+		// Draft stub is trashed when the changeset is trashed.
+		$wp_customize->trash_changeset_post( $wp_customize->changeset_post_id() );
+		$this->assertEquals( 'trash', get_post_status( $nav_created_post_ids[0] ) );
+		$this->assertEquals( 'private', get_post_status( $nav_created_post_ids[1] ) );
 	}
 }
