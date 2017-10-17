@@ -310,7 +310,10 @@ export function isEditedPostSaveable( state ) {
  */
 export function isEditedPostBeingScheduled( state ) {
 	const date = getEditedPostAttribute( state, 'date' );
-	return moment( date ).isAfter( moment() );
+	// Adding 1 minute as an error threshold between the server and the client dates.
+	const now = moment().add( 1, 'minute' );
+
+	return moment( date ).isAfter( now );
 }
 
 /**
