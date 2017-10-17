@@ -1,3 +1,4 @@
+$blocks-cover-image__button-height: 46px;
 .wp-block-cover-image {
 	position: relative;
 	background-size: cover;
@@ -7,6 +8,7 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	flex-direction: column;
 
 	h2 {
 		color: white;
@@ -42,4 +44,27 @@
 		height: inherit;
 	}
 
+	.wp-block-cover-image__button {
+		margin-top: 30px;
+		font-family: $default-font;
+		display: inline-block;
+		text-decoration: none;
+		font-size: $big-font-size;
+		padding: 0 24px;
+		height: $blocks-cover-image__button-height;
+		line-height: $blocks-cover-image__button-height;
+		border-radius: $blocks-cover-image__button-height / 2;
+		white-space: nowrap;
+		background: $blue-medium-400;
+		color: $white;
+		vertical-align: top;
+		position: relative;
+		cursor: pointer;
+		border: none;
+		box-shadow: none;
+
+		&:hover {
+			color: $white !important;
+		}
+	}
 }
