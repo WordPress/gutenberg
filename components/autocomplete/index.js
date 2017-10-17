@@ -8,7 +8,7 @@ import { find } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, findDOMNode } from '@wordpress/element';
+import { Component, findDOMNode, isValidElement, renderToString } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
 
 /**
@@ -110,6 +110,18 @@ class Autocomplete extends Component {
 		this.node = node;
 	}
 
+	replace( range, replacement ) {
+		const container = document.createElement( 'div' );
+		container.innerHTML = renderToString( replacement );
+		while ( container.firstChild ) {
+			const child = container.firstChild;
+			container.removeChild( child );
+			range.insertNode( child );
+			range.setStartAfter( child );
+		}
+		range.deleteContents();
+	}
+
 	select( option ) {
 		const { open, range, lookup } = this.state;
 		const { onSelect } = open;
@@ -117,7 +129,10 @@ class Autocomplete extends Component {
 		this.reset();
 
 		if ( onSelect ) {
-			onSelect( option.value, range, lookup );
+			const replacement = onSelect( option.value, range, lookup );
+			if ( replacement !== undefined ) {
+				this.replace( range, replacement );
+			}
 		}
 	}
 

@@ -36,6 +36,7 @@ import BlockIcon from '../block-icon';
  * @param {*} value the value of the completer option.
  * @param {Range} range the nodes included in the autocomplete trigger and query.
  * @param {String} query the text value of the autocomplete query.
+ * @returns {?Component} optional html to replace the range.
  */
 
 /**
@@ -113,13 +114,8 @@ export function userAutocompleter() {
 		return textNode.parentElement.closest( 'a' ) === null;
 	};
 
-	const onSelect = ( user, range ) => {
-		const mention = document.createElement( 'a' );
-		mention.href = user.link;
-		mention.textContent = '@' + user.name;
-		range.insertNode( mention );
-		range.setStartAfter( mention );
-		range.deleteContents();
+	const onSelect = ( user ) => {
+		return <a href={ user.link }>{ '@' + user.name }</a>;
 	};
 
 	return {
