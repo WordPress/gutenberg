@@ -496,10 +496,10 @@ export const createWarningNotice = partial( createNotice, 'warning' );
  * Returns an action object used to fetch a single reusable block or all
  * reusable blocks from the REST API into the store.
  *
- * @param {string} id If given, only a single reusable block with this ID will be fetched
+ * @param {?string} id If given, only a single reusable block with this ID will be fetched
  * @return {Object}   Action object
  */
-export function fetchReusableBlocks( id = null ) {
+export function fetchReusableBlocks( id ) {
 	return {
 		type: 'FETCH_REUSABLE_BLOCKS',
 		id,

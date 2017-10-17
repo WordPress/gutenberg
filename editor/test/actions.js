@@ -109,7 +109,6 @@ describe( 'actions', () => {
 		it( 'should return the FETCH_REUSABLE_BLOCKS action', () => {
 			expect( fetchReusableBlocks() ).toEqual( {
 				type: 'FETCH_REUSABLE_BLOCKS',
-				id: null,
 			} );
 		} );
 
