@@ -94,7 +94,7 @@ const applyWithAPIData = withAPIData( ( { featuredImageId } ) => {
 	}
 
 	return {
-		media: `/wp/v2/media/${ featuredImageId }`,
+		media: `/${ wpApiSettings.versionString }media/${ featuredImageId }`,
 	};
 } );
 
