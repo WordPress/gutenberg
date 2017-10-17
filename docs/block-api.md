@@ -129,6 +129,18 @@ Anchors let you link directly to a specific block on a page. This property adds 
 supportAnchor: true,
 ```
 
+#### supportHTML (optional)
+
+* **Type:** `Bool`
+* **Default:** `true`
+
+Whether a block can be edited in HTML mode.
+
+```js
+// Remove support for an HTML mode.
+supportHTML: false,
+```
+
 ## Edit and Save
 
 The `edit` and `save` functions define the editor interface with which a user would interact, and the markup to be serialized back when a post is saved. They are the heart of how a block operates, so they are [covered separately](/block-edit-save/).
