@@ -1238,7 +1238,10 @@ describe( 'state', () => {
 	describe( 'reusableBlocks()', () => {
 		it( 'should start out empty', () => {
 			const state = reusableBlocks( undefined, {} );
-			expect( state ).toEqual( {} );
+			expect( state ).toEqual( {
+				data: {},
+				isSaving: {},
+			} );
 		} );
 
 		it( 'should add fetched reusable blocks', () => {
@@ -1257,10 +1260,10 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( {
-				[ reusableBlock.id ]: {
-					...reusableBlock,
-					isSaving: false,
+				data: {
+					[ reusableBlock.id ]: reusableBlock,
 				},
+				isSaving: {},
 			} );
 		} );
 
@@ -1281,26 +1284,28 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( {
-				[ reusableBlock.id ]: {
-					...reusableBlock,
-					isSaving: false,
+				data: {
+					[ reusableBlock.id ]: reusableBlock,
 				},
+				isSaving: {},
 			} );
 		} );
 
 		it( 'should update a reusable block', () => {
 			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
 			const initialState = {
-				[ id ]: {
-					id,
-					name: 'My cool block',
-					type: 'core/paragraph',
-					attributes: {
-						content: 'Hello!',
-						dropCap: true,
+				data: {
+					[ id ]: {
+						id,
+						name: 'My cool block',
+						type: 'core/paragraph',
+						attributes: {
+							content: 'Hello!',
+							dropCap: true,
+						},
 					},
-					isSaving: false,
 				},
+				isSaving: {},
 			};
 
 			const state = reusableBlocks( initialState, {
@@ -1315,26 +1320,26 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( {
-				[ id ]: {
-					id,
-					name: 'My better block',
-					type: 'core/paragraph',
-					attributes: {
-						content: 'Yo!',
-						dropCap: true,
+				data: {
+					[ id ]: {
+						id,
+						name: 'My better block',
+						type: 'core/paragraph',
+						attributes: {
+							content: 'Yo!',
+							dropCap: true,
+						},
 					},
-					isSaving: false,
 				},
+				isSaving: {},
 			} );
 		} );
 
 		it( 'should indicate that a reusable block is saving', () => {
 			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
 			const initialState = {
-				[ id ]: {
-					id,
-					isSaving: false,
-				},
+				data: {},
+				isSaving: {},
 			};
 
 			const state = reusableBlocks( initialState, {
@@ -1343,19 +1348,19 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( {
-				[ id ]: {
-					id,
-					isSaving: true,
+				data: {},
+				isSaving: {
+					[ id ]: true,
 				},
 			} );
 		} );
 
-		it( 'should stop indicating that a reusable block is saving', () => {
+		it( 'should stop indicating that a reusable block is saving when the save succeeded', () => {
 			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
 			const initialState = {
-				[ id ]: {
-					id,
-					isSaving: true,
+				data: {},
+				isSaving: {
+					[ id ]: true,
 				},
 			};
 
@@ -1365,19 +1370,17 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( {
-				[ id ]: {
-					id,
-					isSaving: false,
-				},
+				data: {},
+				isSaving: {},
 			} );
 		} );
 
-		it( 'should indicate that a reusable block had an error saving', () => {
+		it( 'should stop indicating that a reusable block is saving when there is an error', () => {
 			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
 			const initialState = {
-				[ id ]: {
-					id,
-					isSaving: true,
+				data: {},
+				isSaving: {
+					[ id ]: true,
 				},
 			};
 
@@ -1387,10 +1390,8 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( {
-				[ id ]: {
-					id,
-					isSaving: false,
-				},
+				data: {},
+				isSaving: {},
 			} );
 		} );
 	} );

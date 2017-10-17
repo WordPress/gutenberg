@@ -1029,7 +1029,18 @@ export function isFeatureActive( state, feature ) {
  * @return {Object}      The reusable block, or null if none exists
  */
 export function getReusableBlock( state, ref ) {
-	return state.reusableBlocks[ ref ] || null;
+	return state.reusableBlocks.data[ ref ] || null;
+}
+
+/**
+ * Returns whether or not the reusable block with the given ID is being saved.
+ *
+ * @param {*} state  Global application state
+ * @param {*} ref    The reusable block's ID
+ * @return {Boolean} Whether or not the reusable block is being saved
+ */
+export function isSavingReusableBlock( state, ref ) {
+	return state.reusableBlocks.isSaving[ ref ] || false;
 }
 
 /**
@@ -1039,5 +1050,5 @@ export function getReusableBlock( state, ref ) {
  * @return {Array}       An array of all reusable blocks.
  */
 export function getReusableBlocks( state ) {
-	return Object.values( state.reusableBlocks );
+	return Object.values( state.reusableBlocks.data );
 }

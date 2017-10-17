@@ -657,64 +657,58 @@ export function metaBoxes( state = defaultMetaBoxState, action ) {
 	}
 }
 
-export function reusableBlocks( state = {}, action ) {
-	switch ( action.type ) {
-		case 'FETCH_REUSABLE_BLOCKS_SUCCESS': {
-			return reduce( action.reusableBlocks, ( newState, reusableBlock ) => ( {
-				...newState,
-				[ reusableBlock.id ]: {
-					...reusableBlock,
-					isSaving: false,
-				},
-			} ), state );
-		}
-
-		case 'UPDATE_REUSABLE_BLOCK': {
-			const { id, reusableBlock } = action;
-			const existingReusableBlock = state[ id ];
-
-			return {
-				...state,
-				[ id ]: {
-					...existingReusableBlock,
-					...reusableBlock,
-					attributes: {
-						...( existingReusableBlock && existingReusableBlock.attributes ),
-						...reusableBlock.attributes,
+export const reusableBlocks = combineReducers( {
+	data( state = {}, action ) {
+		switch ( action.type ) {
+			case 'FETCH_REUSABLE_BLOCKS_SUCCESS': {
+				return reduce( action.reusableBlocks, ( newState, reusableBlock ) => ( {
+					...newState,
+					[ reusableBlock.id ]: {
+						...reusableBlock,
 					},
-					isSaving: false,
-				},
-			};
+				} ), state );
+			}
+
+			case 'UPDATE_REUSABLE_BLOCK': {
+				const { id, reusableBlock } = action;
+				const existingReusableBlock = state[ id ];
+
+				return {
+					...state,
+					[ id ]: {
+						...existingReusableBlock,
+						...reusableBlock,
+						attributes: {
+							...( existingReusableBlock && existingReusableBlock.attributes ),
+							...reusableBlock.attributes,
+						},
+					},
+				};
+			}
 		}
 
-		case 'SAVE_REUSABLE_BLOCK': {
-			const { id } = action;
+		return state;
+	},
 
-			return {
-				...state,
-				[ id ]: {
-					...state[ id ],
-					isSaving: true,
-				},
-			};
+	isSaving( state = {}, action ) {
+		switch ( action.type ) {
+			case 'SAVE_REUSABLE_BLOCK': {
+				return {
+					...state,
+					[ action.id ]: true,
+				};
+			}
+
+			case 'SAVE_REUSABLE_BLOCK_SUCCESS':
+			case 'SAVE_REUSABLE_BLOCK_FAILURE': {
+				const { id } = action;
+				return omit( state, id );
+			}
 		}
 
-		case 'SAVE_REUSABLE_BLOCK_SUCCESS':
-		case 'SAVE_REUSABLE_BLOCK_FAILURE': {
-			const { id } = action;
-
-			return {
-				...state,
-				[ id ]: {
-					...state[ id ],
-					isSaving: false,
-				},
-			};
-		}
-	}
-
-	return state;
-}
+		return state;
+	},
+} );
 
 export default optimist( combineReducers( {
 	editor,
