@@ -9,14 +9,15 @@ import { flow } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/components';
+import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import { isEditorSidebarOpened, getBlockMode } from '../selectors';
+import { isEditorSidebarOpened, getBlockMode, getBlock } from '../selectors';
 import { removeBlocks, toggleSidebar, setActivePanel, toggleBlockMode } from '../actions';
 
-function BlockSettingsMenuContent( { mode, uids, isSidebarOpened, onDelete, onToggleSidebar, onShowInspector, onToggleMode, onClose } ) {
+export function BlockSettingsMenuContent( { blockType, mode, uids, isSidebarOpened, onDelete, onToggleSidebar, onShowInspector, onToggleMode, onClose } ) {
 	const count = uids.length;
 	const toggleInspector = () => {
 		onShowInspector();
@@ -34,7 +35,7 @@ function BlockSettingsMenuContent( { mode, uids, isSidebarOpened, onDelete, onTo
 			>
 				{ __( 'Settings' ) }
 			</IconButton>
-			{ count === 1 &&
+			{ count === 1 && blockType && blockType.supportHTML !== false &&
 				<IconButton
 					className="editor-block-settings-menu__control"
 					onClick={ flow( onToggleMode, onClose ) }
@@ -61,6 +62,7 @@ export default connect(
 	( state, { uids } ) => ( {
 		isSidebarOpened: isEditorSidebarOpened( state ),
 		mode: uids.length === 1 ? getBlockMode( state, uids[ 0 ] ) : null,
+		blockType: uids.length === 1 ? getBlockType( getBlock( state, uids[ 0 ] ).name ) : null,
 	} ),
 	( dispatch, ownProps ) => ( {
 		onDelete() {
