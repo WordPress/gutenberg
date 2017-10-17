@@ -186,6 +186,32 @@ export function hideInsertionPoint() {
 	};
 }
 
+/**
+ * Returns an action object used in signalling that block insertion should
+ * occur at the specified block index position.
+ *
+ * @param  {Number} position Position at which to insert
+ * @return {Object}          Action object
+ */
+export function setBlockInsertionPoint( position ) {
+	return {
+		type: 'SET_BLOCK_INSERTION_POINT',
+		position,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the block insertion point
+ * should be reset.
+ *
+ * @return {Object} Action object
+ */
+export function clearBlockInsertionPoint() {
+	return {
+		type: 'CLEAR_BLOCK_INSERTION_POINT',
+	};
+}
+
 export function editPost( edits ) {
 	return {
 		type: 'EDIT_POST',

@@ -84,11 +84,6 @@ const config = {
 			__dirname,
 			'node_modules',
 		],
-		alias: {
-			// There are currently resolution errors on RSF's "mitt" dependency
-			// when imported as native ES module
-			'react-slot-fill': 'react-slot-fill/lib/rsf.js',
-		},
 	},
 	module: {
 		rules: [

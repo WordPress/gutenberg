@@ -57,6 +57,7 @@ import {
 	getBlockMode,
 	isTyping,
 	getBlockInsertionPoint,
+	getBlockSiblingInserterPosition,
 	isBlockInsertionPointVisible,
 	isSavingPost,
 	didPostSaveRequestSucceed,
@@ -64,6 +65,7 @@ import {
 	getSuggestedPostFormat,
 	getNotices,
 	getMostFrequentlyUsedBlocks,
+	getRecentlyUsedBlocks,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -1584,6 +1586,22 @@ describe( 'selectors', () => {
 					blockOrder: [ 1, 2, 3 ],
 					edits: {},
 				},
+				blockInsertionPoint: {},
+			};
+
+			expect( getBlockInsertionPoint( state ) ).toBe( 2 );
+		} );
+
+		it( 'should return the assigned insertion point', () => {
+			const state = {
+				preferences: { mode: 'visual' },
+				blockSelection: {},
+				editor: {
+					blockOrder: [ 1, 2, 3 ],
+				},
+				blockInsertionPoint: {
+					position: 2,
+				},
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toBe( 2 );
@@ -1599,6 +1617,7 @@ describe( 'selectors', () => {
 				editor: {
 					blockOrder: [ 1, 2, 3 ],
 				},
+				blockInsertionPoint: {},
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toBe( 2 );
@@ -1611,6 +1630,7 @@ describe( 'selectors', () => {
 				editor: {
 					blockOrder: [ 1, 2, 3 ],
 				},
+				blockInsertionPoint: {},
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toBe( 3 );
@@ -1623,16 +1643,39 @@ describe( 'selectors', () => {
 				editor: {
 					blockOrder: [ 1, 2, 3 ],
 				},
+				blockInsertionPoint: {},
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toBe( 3 );
 		} );
 	} );
 
+	describe( 'getBlockSiblingInserterPosition', () => {
+		it( 'should return null if no sibling insertion point', () => {
+			const state = {
+				blockInsertionPoint: {},
+			};
+
+			expect( getBlockSiblingInserterPosition( state ) ).toBe( null );
+		} );
+
+		it( 'should return sibling insertion point', () => {
+			const state = {
+				blockInsertionPoint: {
+					position: 5,
+				},
+			};
+
+			expect( getBlockSiblingInserterPosition( state ) ).toBe( 5 );
+		} );
+	} );
+
 	describe( 'isBlockInsertionPointVisible', () => {
 		it( 'should return the value in state', () => {
 			const state = {
-				showInsertionPoint: true,
+				blockInsertionPoint: {
+					visible: true,
+				},
 			};
 
 			expect( isBlockInsertionPointVisible( state ) ).toBe( true );
@@ -1789,6 +1832,7 @@ describe( 'selectors', () => {
 			const state = {
 				preferences: {
 					blockUsage: {
+						'core/deleted-block': 20,
 						'core/paragraph': 4,
 						'core/image': 11,
 						'core/quote': 2,
@@ -1799,6 +1843,19 @@ describe( 'selectors', () => {
 
 			expect( getMostFrequentlyUsedBlocks( state ).map( ( block ) => block.name ) )
 				.toEqual( [ 'core/image', 'core/paragraph', 'core/quote' ] );
+		} );
+	} );
+
+	describe( 'getRecentlyUsedBlocks', () => {
+		it( 'should return the most recently used blocks', () => {
+			const state = {
+				preferences: {
+					recentlyUsedBlocks: [ 'core/deleted-block', 'core/paragraph', 'core/image' ],
+				},
+			};
+
+			expect( getRecentlyUsedBlocks( state ).map( ( block ) => block.name ) )
+				.toEqual( [ 'core/paragraph', 'core/image' ] );
 		} );
 	} );
 } );

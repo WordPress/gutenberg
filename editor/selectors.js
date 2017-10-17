@@ -13,6 +13,7 @@ import {
 	values,
 	keys,
 	without,
+	compact,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -772,6 +773,11 @@ export function getBlockInsertionPoint( state ) {
 		return state.editor.blockOrder.length;
 	}
 
+	const position = getBlockSiblingInserterPosition( state );
+	if ( null !== position ) {
+		return position;
+	}
+
 	const lastMultiSelectedBlock = getLastMultiSelectedBlockUid( state );
 	if ( lastMultiSelectedBlock ) {
 		return getBlockIndex( state, lastMultiSelectedBlock ) + 1;
@@ -786,13 +792,29 @@ export function getBlockInsertionPoint( state ) {
 }
 
 /**
+ * Returns the position at which the block inserter will insert a new adjacent
+ * sibling block, or null if the inserter is not actively visible.
+ *
+ * @param  {Object}  state Global application state
+ * @return {?Number}       Whether the inserter is currently visible
+ */
+export function getBlockSiblingInserterPosition( state ) {
+	const { position } = state.blockInsertionPoint;
+	if ( ! Number.isInteger( position ) ) {
+		return null;
+	}
+
+	return position;
+}
+
+/**
  * Returns true if we should show the block insertion point
  *
  * @param  {Object}  state Global application state
  * @return {?Boolean}      Whether the insertion point is visible or not
  */
 export function isBlockInsertionPointVisible( state ) {
-	return state.showInsertionPoint;
+	return !! state.blockInsertionPoint.visible;
 }
 
 /**
@@ -897,7 +919,7 @@ export function getNotices( state ) {
  */
 export function getRecentlyUsedBlocks( state ) {
 	// resolves the block names in the state to the block type settings
-	return state.preferences.recentlyUsedBlocks.map( blockType => getBlockType( blockType ) );
+	return compact( state.preferences.recentlyUsedBlocks.map( blockType => getBlockType( blockType ) ) );
 }
 
 /**
@@ -913,9 +935,10 @@ export const getMostFrequentlyUsedBlocks = createSelector(
 		const { blockUsage } = state.preferences;
 		const orderedByUsage = keys( blockUsage ).sort( ( a, b ) => blockUsage[ b ] - blockUsage[ a ] );
 		// add in paragraph and image blocks if they're not already in the usage data
-		return [ ...orderedByUsage, ...without( [ 'core/paragraph', 'core/image' ], ...orderedByUsage ) ]
-			.slice( 0, MAX_FREQUENT_BLOCKS )
-			.map( blockType => getBlockType( blockType ) );
+		return compact(
+				[ ...orderedByUsage, ...without( [ 'core/paragraph', 'core/image' ], ...orderedByUsage ) ]
+					.map( blockType => getBlockType( blockType ) )
+			).slice( 0, MAX_FREQUENT_BLOCKS );
 	},
 	( state ) => state.preferences.blockUsage
 );

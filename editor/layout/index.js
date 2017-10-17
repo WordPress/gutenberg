@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { NoticeList } from '@wordpress/components';
+import { NoticeList, Popover } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -48,6 +48,7 @@ function Layout( { mode, isSidebarOpened, notices, ...props } ) {
 				<MetaBoxes />
 			</div>
 			{ isSidebarOpened && <Sidebar /> }
+			<Popover.Slot />
 		</div>
 	);
 }

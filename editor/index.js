@@ -53,7 +53,7 @@ export function createEditorInstance( id, post, settings ) {
 	const target = document.getElementById( id );
 
 	render(
-		<EditorProvider settings={ settings } post={ post } target={ target }>
+		<EditorProvider settings={ settings } post={ post }>
 			<Layout />
 		</EditorProvider>,
 		target
