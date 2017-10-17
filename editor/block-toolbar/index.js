@@ -99,10 +99,14 @@ class BlockToolbar extends Component {
 					role="toolbar"
 					deep
 				>
-					<KeyboardShortcuts shortcuts={ {
-						mod: [ this.focusToolbar, true ],
-						'alt+f10': [ this.focusToolbar, true ],
-					} } />
+					<KeyboardShortcuts
+						bindGlobal
+						eventName="keyup"
+						shortcuts={ {
+							mod: this.focusToolbar,
+							'alt+f10': this.focusToolbar,
+						} }
+					/>
 					<div className="editor-block-toolbar__group" onKeyDown={ this.onToolbarKeyDown }>
 						{ ! showMobileControls && [
 							<BlockSwitcher key="switcher" uid={ uid } />,

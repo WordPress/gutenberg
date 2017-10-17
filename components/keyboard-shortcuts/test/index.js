@@ -46,8 +46,9 @@ describe( 'KeyboardShortcuts', () => {
 		const wrapper = mount(
 			<div>
 				<KeyboardShortcuts
+					bindGlobal
 					shortcuts={ {
-						d: [ spy, true ],
+						d: spy,
 					} } />
 				<textarea></textarea>
 			</div>,
@@ -57,5 +58,28 @@ describe( 'KeyboardShortcuts', () => {
 		keyPress( 68, wrapper.find( 'textarea' ).getDOMNode() );
 
 		expect( spy ).toHaveBeenCalled();
+	} );
+
+	it( 'should capture key events on specific event', () => {
+		const spy = jest.fn();
+		const attachNode = document.createElement( 'div' );
+		document.body.appendChild( attachNode );
+
+		const wrapper = mount(
+			<div>
+				<KeyboardShortcuts
+					eventName="keyup"
+					shortcuts={ {
+						d: spy,
+					} } />
+				<textarea></textarea>
+			</div>,
+			{ attachTo: attachNode }
+		);
+
+		keyPress( 68, wrapper.find( 'textarea' ).getDOMNode() );
+
+		expect( spy ).toHaveBeenCalled();
+		expect( spy.mock.calls[ 0 ][ 0 ].type ).toBe( 'keyup' );
 	} );
 } );
