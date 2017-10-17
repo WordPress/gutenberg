@@ -74,6 +74,7 @@ import {
 	getMetaBox,
 	isMetaBoxStateDirty,
 	getReusableBlock,
+	isSavingReusableBlock,
 	getReusableBlocks,
 } from '../selectors';
 
@@ -2039,7 +2040,9 @@ describe( 'selectors', () => {
 			};
 			const state = {
 				reusableBlocks: {
-					[ id ]: expectedReusableBlock,
+					data: {
+						[ id ]: expectedReusableBlock,
+					},
 				},
 			};
 
@@ -2049,11 +2052,40 @@ describe( 'selectors', () => {
 
 		it( 'should return null when no reusable block exists', () => {
 			const state = {
-				reusableBlocks: {},
+				reusableBlocks: {
+					data: {},
+				},
 			};
 
 			const reusableBlock = getReusableBlock( state, '358b59ee-bab3-4d6f-8445-e8c6971a5605' );
 			expect( reusableBlock ).toBeNull();
+		} );
+	} );
+
+	describe( 'isSavingReusableBlock', () => {
+		it( 'should return false when the block is not being saved', () => {
+			const state = {
+				reusableBlocks: {
+					isSaving: {},
+				},
+			};
+
+			const isSaving = isSavingReusableBlock( state, '358b59ee-bab3-4d6f-8445-e8c6971a5605' );
+			expect( isSaving ).toBe( false );
+		} );
+
+		it( 'should return true when the block is being saved', () => {
+			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
+			const state = {
+				reusableBlocks: {
+					isSaving: {
+						[ id ]: true,
+					},
+				},
+			};
+
+			const isSaving = isSavingReusableBlock( state, id );
+			expect( isSaving ).toBe( true );
 		} );
 	} );
 
@@ -2077,8 +2109,10 @@ describe( 'selectors', () => {
 			};
 			const state = {
 				reusableBlocks: {
-					[ reusableBlock1.id ]: reusableBlock1,
-					[ reusableBlock2.id ]: reusableBlock2,
+					data: {
+						[ reusableBlock1.id ]: reusableBlock1,
+						[ reusableBlock2.id ]: reusableBlock2,
+					},
 				},
 			};
 
@@ -2088,7 +2122,9 @@ describe( 'selectors', () => {
 
 		it( 'should return an empty array when no reusable blocks exist', () => {
 			const state = {
-				reusableBlocks: {},
+				reusableBlocks: {
+					data: {},
+				},
 			};
 
 			const reusableBlocks = getReusableBlocks( state );
