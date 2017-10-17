@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { parse as hpqParse } from 'hpq';
-import { keys } from 'lodash';
+import { keys, reduce } from 'lodash';
 
 /**
  * Internal dependencies
@@ -124,11 +124,10 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
  * @return {Object}             All block attributes
  */
 export function getBlockAttributes( blockType, innerHTML, attributes ) {
-	const blockAttributes = keys( blockType.attributes ).reduce( ( memo, attributeKey ) => {
-		const attributeSchema = blockType.attributes[ attributeKey ];
+	const blockAttributes = reduce( blockType.attributes, ( memo, attributeSchema, attributeKey ) => {
 		memo[ attributeKey ] = getBlockAttribute( attributeKey, attributeSchema, innerHTML, attributes );
 		return memo;
-	}, {} ) || {};
+	}, {} );
 
 	// If the block supports a custom className parse it
 	if ( blockType.className !== false && attributes && attributes.className ) {
