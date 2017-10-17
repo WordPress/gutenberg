@@ -132,3 +132,13 @@
 	max-width: $text-editor-max-width;
 	margin: 0 auto;
 }
+
+@media (max-width: 599px) {
+	.editor-layout__editor {
+		margin-top: 56px;
+		@include break-small {
+			margin-top: 0;
+		}
+	}
+}
+
