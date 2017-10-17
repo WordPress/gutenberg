@@ -9,15 +9,15 @@ import { flow } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/components';
-import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import { isEditorSidebarOpened, getBlockMode, getBlock } from '../selectors';
-import { removeBlocks, toggleSidebar, setActivePanel, toggleBlockMode } from '../actions';
+import BlockModeToggle from './block-mode-toggle';
+import { isEditorSidebarOpened } from '../selectors';
+import { removeBlocks, toggleSidebar, setActivePanel } from '../actions';
 
-export function BlockSettingsMenuContent( { blockType, mode, uids, isSidebarOpened, onDelete, onToggleSidebar, onShowInspector, onToggleMode, onClose } ) {
+export function BlockSettingsMenuContent( { uids, isSidebarOpened, onDelete, onToggleSidebar, onShowInspector, onClose } ) {
 	const count = uids.length;
 	const toggleInspector = () => {
 		onShowInspector();
@@ -35,18 +35,7 @@ export function BlockSettingsMenuContent( { blockType, mode, uids, isSidebarOpen
 			>
 				{ __( 'Settings' ) }
 			</IconButton>
-			{ count === 1 && blockType && blockType.supportHTML !== false &&
-				<IconButton
-					className="editor-block-settings-menu__control"
-					onClick={ flow( onToggleMode, onClose ) }
-					icon="html"
-				>
-					{ mode === 'visual'
-						? __( 'Edit as HTML' )
-						: __( 'Edit visually' )
-					}
-				</IconButton>
-			}
+			{ count === 1 && <BlockModeToggle uid={ uids[ 0 ] } onToggle={ onClose } /> }
 			<IconButton
 				className="editor-block-settings-menu__control"
 				onClick={ flow( onDelete ) }
@@ -59,10 +48,8 @@ export function BlockSettingsMenuContent( { blockType, mode, uids, isSidebarOpen
 }
 
 export default connect(
-	( state, { uids } ) => ( {
+	( state ) => ( {
 		isSidebarOpened: isEditorSidebarOpened( state ),
-		mode: uids.length === 1 ? getBlockMode( state, uids[ 0 ] ) : null,
-		blockType: uids.length === 1 ? getBlockType( getBlock( state, uids[ 0 ] ).name ) : null,
 	} ),
 	( dispatch, ownProps ) => ( {
 		onDelete() {
@@ -73,9 +60,6 @@ export default connect(
 		},
 		onToggleSidebar() {
 			dispatch( toggleSidebar() );
-		},
-		onToggleMode() {
-			dispatch( toggleBlockMode( ownProps.uids[ 0 ] ) );
 		},
 	} )
 )( BlockSettingsMenuContent );

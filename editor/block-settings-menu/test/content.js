@@ -11,50 +11,22 @@ import { BlockSettingsMenuContent } from '../content';
 
 describe( 'BlockSettingsMenuContent', () => {
 	const handlers = {
-		onDelete: noop, onToggleSidebar: noop, onShowInspector: noop, onToggleMode: noop, onClose: noop,
+		onDelete: noop, onToggleSidebar: noop, onShowInspector: noop, onClose: noop,
 	};
 
 	it( 'should not render the HTML mode button on multiselection', () => {
 		const wrapper = shallow( <BlockSettingsMenuContent uids={ [ 1, 2 ] } { ...handlers } /> );
-		const buttons = wrapper.find( 'IconButton' ).map( ( button ) => button.prop( 'children' ) );
+		const blockModeToggle = wrapper.find( 'Connect(BlockModeToggle)' );
 
-		expect( buttons ).toEqual( [ 'Settings', 'Delete' ] );
+		expect( blockModeToggle.length ).toBe( 0 );
 	} );
 
-	it( 'should not render the HTML mode button if the block doesn\'t support it', () => {
+	it( 'should render the HTML mode if not in a multiselection', () => {
 		const wrapper = shallow(
-			<BlockSettingsMenuContent uids={ [ 1 ] } blockType={ { supportHTML: false } } { ...handlers } />
+			<BlockSettingsMenuContent uids={ [ 1 ] } { ...handlers } />
 		);
-		const buttons = wrapper.find( 'IconButton' ).map( ( button ) => button.prop( 'children' ) );
+		const blockModeToggle = wrapper.find( 'Connect(BlockModeToggle)' );
 
-		expect( buttons ).toEqual( [ 'Settings', 'Delete' ] );
-	} );
-
-	it( 'should render the HTML mode button', () => {
-		const wrapper = shallow(
-			<BlockSettingsMenuContent
-				uids={ [ 1 ] }
-				blockType={ { supportHTML: true } }
-				mode="visual"
-				{ ...handlers }
-			/>
-		);
-		const buttons = wrapper.find( 'IconButton' ).map( ( button ) => button.prop( 'children' ) );
-
-		expect( buttons ).toEqual( [ 'Settings', 'Edit as HTML', 'Delete' ] );
-	} );
-
-	it( 'should render the Visual mode button', () => {
-		const wrapper = shallow(
-			<BlockSettingsMenuContent
-				uids={ [ 1 ] }
-				blockType={ { supportHTML: true } }
-				mode="html"
-				{ ...handlers }
-			/>
-		);
-		const buttons = wrapper.find( 'IconButton' ).map( ( button ) => button.prop( 'children' ) );
-
-		expect( buttons ).toEqual( [ 'Settings', 'Edit visually', 'Delete' ] );
+		expect( blockModeToggle.length ).toBe( 1 );
 	} );
 } );
