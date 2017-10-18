@@ -94,9 +94,9 @@ function simulateKeydown( wrapper, keyCode ) {
  * @param {*} wrapper the enzyme react wrapper.
  */
 function expectInitialState( wrapper ) {
-	expect( wrapper.state( 'open' ) ).toEqual( null );
+	expect( wrapper.state( 'open' ) ).toBeUndefined();
 	expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
-	expect( wrapper.state( 'lookup' ) ).toEqual( null );
+	expect( wrapper.state( 'query' ) ).toBeUndefined();
 	expect( wrapper.state( 'search' ) ).toEqual( /./ );
 	expect( wrapper.instance().getFilteredOptions() ).toEqual( [] );
 	expect( wrapper.find( 'Popover' ).prop( 'isOpen' ) ).toBe( false );
@@ -177,7 +177,7 @@ describe( 'Autocomplete', () => {
 				</Autocomplete>
 			);
 
-			expect( wrapper.state().open ).toBe( null );
+			expect( wrapper.state().open ).toBeUndefined();
 			expect( wrapper.find( 'Popover' ).props().focusOnOpen ).toBe( false );
 			expect( wrapper.hasClass( 'components-autocomplete' ) ).toBe( true );
 			expect( wrapper.find( '.fake-editor' ) ).toHaveLength( 1 );
@@ -189,18 +189,17 @@ describe( 'Autocomplete', () => {
 					<FakeEditor />
 				</Autocomplete>
 			);
+			expectInitialState( wrapper );
+			// simulate typing 'b'
+			simulateInput( wrapper, [ par( tx( 'b' ) ) ] );
 			// wait for getOptions promise
-			process.nextTick( () => {
-				expectInitialState( wrapper );
-				// simulate typing 'b'
-				simulateInput( wrapper, [ par( tx( 'b' ) ) ] );
-				// now check that we've opened the popup and filtered the options to just the banana
+			process.nextTick( function() {
 				expect( wrapper.state( 'open' ) ).toBeDefined();
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
-				expect( wrapper.state( 'lookup' ) ).toEqual( 'b' );
+				expect( wrapper.state( 'query' ) ).toEqual( 'b' );
 				expect( wrapper.state( 'search' ) ).toEqual( /b/i );
 				expect( wrapper.instance().getFilteredOptions() ).toEqual( [
-					{ key: 0, value: 1, label: 'Bananas', keywords: [ 'fruit' ] },
+					{ key: '0_0', value: 1, label: 'Bananas', keywords: [ 'fruit' ] },
 				] );
 				expect( wrapper.find( 'Popover' ).prop( 'isOpen' ) ).toBe( true );
 				expect( wrapper.find( '.components-autocomplete__result' ) ).toHaveLength( 1 );
@@ -214,14 +213,14 @@ describe( 'Autocomplete', () => {
 					<FakeEditor />
 				</Autocomplete>
 			);
+			expectInitialState( wrapper );
+			// simulate typing 'zzz'
+			simulateInput( wrapper, [ tx( 'zzz' ) ] );
 			// wait for getOptions promise
 			process.nextTick( () => {
-				expectInitialState( wrapper );
-				// simulate typing 'zzz'
-				simulateInput( wrapper, [ tx( 'zzz' ) ] );
 				// now check that we've opened the popup and filtered the options to empty
 				expect( wrapper.state( 'open' ) ).toBeDefined();
-				expect( wrapper.state( 'lookup' ) ).toEqual( 'zzz' );
+				expect( wrapper.state( 'query' ) ).toEqual( 'zzz' );
 				expect( wrapper.state( 'search' ) ).toEqual( /zzz/i );
 				expect( wrapper.instance().getFilteredOptions() ).toEqual( [] );
 				expect( wrapper.find( 'Popover' ).prop( 'isOpen' ) ).toBe( false );
@@ -236,11 +235,11 @@ describe( 'Autocomplete', () => {
 					<FakeEditor />
 				</Autocomplete>
 			);
+			expectInitialState( wrapper );
+			// simulate typing 'b'
+			simulateInput( wrapper, [ par( tx( 'b' ) ) ] );
 			// wait for getOptions promise
 			process.nextTick( () => {
-				expectInitialState( wrapper );
-				// simulate typing 'b'
-				simulateInput( wrapper, [ par( tx( 'b' ) ) ] );
 				// now check that the popup is not open
 				expectInitialState( wrapper );
 				done();
@@ -253,19 +252,19 @@ describe( 'Autocomplete', () => {
 					<FakeEditor />
 				</Autocomplete>
 			);
+			expectInitialState( wrapper );
+			// simulate typing '/'
+			simulateInput( wrapper, [ par( tx( '/' ) ) ] );
 			// wait for getOptions promise
 			process.nextTick( () => {
-				expectInitialState( wrapper );
-				// simulate typing '/'
-				simulateInput( wrapper, [ par( tx( '/' ) ) ] );
 				// now check that we've opened the popup and filtered the options
 				expect( wrapper.state( 'open' ) ).toBeDefined();
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
-				expect( wrapper.state( 'lookup' ) ).toEqual( '' );
+				expect( wrapper.state( 'query' ) ).toEqual( '' );
 				expect( wrapper.state( 'search' ) ).toEqual( new RegExp( '', 'i' ) );
 				expect( wrapper.instance().getFilteredOptions() ).toEqual( [
-					{ key: 0, value: 1, label: 'Bananas', keywords: [ 'fruit' ] },
-					{ key: 1, value: 2, label: 'Apple', keywords: [ 'fruit' ] },
+					{ key: '0_0', value: 1, label: 'Bananas', keywords: [ 'fruit' ] },
+					{ key: '0_1', value: 2, label: 'Apple', keywords: [ 'fruit' ] },
 				] );
 				expect( wrapper.find( 'Popover' ).prop( 'isOpen' ) ).toBe( true );
 				expect( wrapper.find( '.components-autocomplete__result' ) ).toHaveLength( 2 );
@@ -279,19 +278,19 @@ describe( 'Autocomplete', () => {
 					<FakeEditor />
 				</Autocomplete>
 			);
+			expectInitialState( wrapper );
+			// simulate typing fruit (split over 2 text nodes because these things happen)
+			simulateInput( wrapper, [ par( tx( 'fru' ), tx( 'it' ) ) ] );
 			// wait for getOptions promise
 			process.nextTick( () => {
-				expectInitialState( wrapper );
-				// simulate typing fruit (split over 2 text nodes because these things happen)
-				simulateInput( wrapper, [ par( tx( 'fru' ), tx( 'it' ) ) ] );
 				// now check that we've opened the popup and filtered the options
 				expect( wrapper.state( 'open' ) ).toBeDefined();
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
-				expect( wrapper.state( 'lookup' ) ).toEqual( 'fruit' );
+				expect( wrapper.state( 'query' ) ).toEqual( 'fruit' );
 				expect( wrapper.state( 'search' ) ).toEqual( /fruit/i );
 				expect( wrapper.instance().getFilteredOptions() ).toEqual( [
-					{ key: 0, value: 1, label: 'Bananas', keywords: [ 'fruit' ] },
-					{ key: 1, value: 2, label: 'Apple', keywords: [ 'fruit' ] },
+					{ key: '0_0', value: 1, label: 'Bananas', keywords: [ 'fruit' ] },
+					{ key: '0_1', value: 2, label: 'Apple', keywords: [ 'fruit' ] },
 				] );
 				expect( wrapper.find( 'Popover' ).prop( 'isOpen' ) ).toBe( true );
 				expect( wrapper.find( '.components-autocomplete__result' ) ).toHaveLength( 2 );
@@ -305,19 +304,19 @@ describe( 'Autocomplete', () => {
 					<FakeEditor />
 				</Autocomplete>
 			);
+			expectInitialState( wrapper );
+			// simulate typing 'a'
+			simulateInput( wrapper, [ tx( 'a' ) ] );
 			// wait for getOptions promise
 			process.nextTick( () => {
-				expectInitialState( wrapper );
-				// simulate typing 'a'
-				simulateInput( wrapper, [ tx( 'a' ) ] );
 				// now check that we've opened the popup and all options are displayed
 				expect( wrapper.state( 'open' ) ).toBeDefined();
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
-				expect( wrapper.state( 'lookup' ) ).toEqual( 'a' );
+				expect( wrapper.state( 'query' ) ).toEqual( 'a' );
 				expect( wrapper.state( 'search' ) ).toEqual( /a/i );
 				expect( wrapper.instance().getFilteredOptions() ).toEqual( [
-					{ key: 0, value: 1, label: 'Bananas', keywords: [ 'fruit' ] },
-					{ key: 1, value: 2, label: 'Apple', keywords: [ 'fruit' ] },
+					{ key: '0_0', value: 1, label: 'Bananas', keywords: [ 'fruit' ] },
+					{ key: '0_1', value: 2, label: 'Apple', keywords: [ 'fruit' ] },
 				] );
 				expect( wrapper.find( 'Popover' ).prop( 'isOpen' ) ).toBe( true );
 				expect( wrapper.find( '.components-autocomplete__result' ) ).toHaveLength( 2 );
@@ -326,10 +325,10 @@ describe( 'Autocomplete', () => {
 				// now check that the popup is still open and we've filtered the options to just the apple
 				expect( wrapper.state( 'open' ) ).toBeDefined();
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
-				expect( wrapper.state( 'lookup' ) ).toEqual( 'ap' );
+				expect( wrapper.state( 'query' ) ).toEqual( 'ap' );
 				expect( wrapper.state( 'search' ) ).toEqual( /ap/i );
 				expect( wrapper.instance().getFilteredOptions() ).toEqual( [
-					{ key: 1, value: 2, label: 'Apple', keywords: [ 'fruit' ] },
+					{ key: '0_1', value: 2, label: 'Apple', keywords: [ 'fruit' ] },
 				] );
 				expect( wrapper.find( 'Popover' ).prop( 'isOpen' ) ).toBe( true );
 				expect( wrapper.find( '.components-autocomplete__result' ) ).toHaveLength( 1 );
@@ -351,17 +350,17 @@ describe( 'Autocomplete', () => {
 			const editorKeydown = jest.fn();
 			const fakeEditor = wrapper.getDOMNode().querySelector( '.fake-editor' );
 			fakeEditor.addEventListener( 'keydown', editorKeydown, false );
+			expectInitialState( wrapper );
+			// the menu is not open so press an arrow and see if the editor gets it
+			expect( editorKeydown ).not.toHaveBeenCalled();
+			simulateKeydown( wrapper, DOWN );
+			expect( editorKeydown ).toHaveBeenCalledTimes( 1 );
+			// clear the call count
+			editorKeydown.mockClear();
+			// simulate typing '/', the menu is open so the editor should not get key down events
+			simulateInput( wrapper, [ par( tx( '/' ) ) ] );
 			// wait for getOptions promise
 			process.nextTick( () => {
-				expectInitialState( wrapper );
-				// the menu is not open so press an arrow and see if the editor gets it
-				expect( editorKeydown ).not.toHaveBeenCalled();
-				simulateKeydown( wrapper, DOWN );
-				expect( editorKeydown ).toHaveBeenCalledTimes( 1 );
-				// clear the call count
-				editorKeydown.mockClear();
-				// simulate typing '/', the menu is open so the editor should not get key down events
-				simulateInput( wrapper, [ par( tx( '/' ) ) ] );
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
 				simulateKeydown( wrapper, DOWN );
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 1 );
@@ -382,11 +381,11 @@ describe( 'Autocomplete', () => {
 					<FakeEditor />
 				</Autocomplete>
 			);
+			expectInitialState( wrapper );
+			// simulate typing '/'
+			simulateInput( wrapper, [ par( tx( '/' ) ) ] );
 			// wait for getOptions promise
 			process.nextTick( () => {
-				expectInitialState( wrapper );
-				// simulate typing '/'
-				simulateInput( wrapper, [ par( tx( '/' ) ) ] );
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
 				simulateKeydown( wrapper, DOWN );
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 1 );
@@ -407,25 +406,25 @@ describe( 'Autocomplete', () => {
 			const editorKeydown = jest.fn();
 			const fakeEditor = wrapper.getDOMNode().querySelector( '.fake-editor' );
 			fakeEditor.addEventListener( 'keydown', editorKeydown, false );
+			expectInitialState( wrapper );
+			// the menu is not open so press escape and see if the editor gets it
+			expect( editorKeydown ).not.toHaveBeenCalled();
+			simulateKeydown( wrapper, ESCAPE );
+			expect( editorKeydown ).toHaveBeenCalledTimes( 1 );
+			// clear the call count
+			editorKeydown.mockClear();
+			// simulate typing '/'
+			simulateInput( wrapper, [ par( tx( '/' ) ) ] );
 			// wait for getOptions promise
 			process.nextTick( () => {
-				expectInitialState( wrapper );
-				// the menu is not open so press escape and see if the editor gets it
-				expect( editorKeydown ).not.toHaveBeenCalled();
-				simulateKeydown( wrapper, ESCAPE );
-				expect( editorKeydown ).toHaveBeenCalledTimes( 1 );
-				// clear the call count
-				editorKeydown.mockClear();
-				// simulate typing '/'
-				simulateInput( wrapper, [ par( tx( '/' ) ) ] );
 				// menu should be open with all options
 				expect( wrapper.state( 'open' ) ).toBeDefined();
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
-				expect( wrapper.state( 'lookup' ) ).toEqual( '' );
+				expect( wrapper.state( 'query' ) ).toEqual( '' );
 				expect( wrapper.state( 'search' ) ).toEqual( new RegExp( '', 'i' ) );
 				expect( wrapper.instance().getFilteredOptions() ).toEqual( [
-					{ key: 0, value: 1, label: 'Bananas', keywords: [ 'fruit' ] },
-					{ key: 1, value: 2, label: 'Apple', keywords: [ 'fruit' ] },
+					{ key: '0_0', value: 1, label: 'Bananas', keywords: [ 'fruit' ] },
+					{ key: '0_1', value: 2, label: 'Apple', keywords: [ 'fruit' ] },
 				] );
 				// pressing escape should close everything
 				simulateKeydown( wrapper, ESCAPE );
@@ -447,25 +446,25 @@ describe( 'Autocomplete', () => {
 			const editorKeydown = jest.fn();
 			const fakeEditor = wrapper.getDOMNode().querySelector( '.fake-editor' );
 			fakeEditor.addEventListener( 'keydown', editorKeydown, false );
+			expectInitialState( wrapper );
+			// the menu is not open so press enter and see if the editor gets it
+			expect( editorKeydown ).not.toHaveBeenCalled();
+			simulateKeydown( wrapper, ENTER );
+			expect( editorKeydown ).toHaveBeenCalledTimes( 1 );
+			// clear the call count
+			editorKeydown.mockClear();
+			// simulate typing '/'
+			simulateInput( wrapper, [ par( tx( '/' ) ) ] );
 			// wait for getOptions promise
 			process.nextTick( () => {
-				expectInitialState( wrapper );
-				// the menu is not open so press enter and see if the editor gets it
-				expect( editorKeydown ).not.toHaveBeenCalled();
-				simulateKeydown( wrapper, ENTER );
-				expect( editorKeydown ).toHaveBeenCalledTimes( 1 );
-				// clear the call count
-				editorKeydown.mockClear();
-				// simulate typing '/'
-				simulateInput( wrapper, [ par( tx( '/' ) ) ] );
 				// menu should be open with all options
 				expect( wrapper.state( 'open' ) ).toBeDefined();
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
-				expect( wrapper.state( 'lookup' ) ).toEqual( '' );
+				expect( wrapper.state( 'query' ) ).toEqual( '' );
 				expect( wrapper.state( 'search' ) ).toEqual( new RegExp( '', 'i' ) );
 				expect( wrapper.instance().getFilteredOptions() ).toEqual( [
-					{ key: 0, value: 1, label: 'Bananas', keywords: [ 'fruit' ] },
-					{ key: 1, value: 2, label: 'Apple', keywords: [ 'fruit' ] },
+					{ key: '0_0', value: 1, label: 'Bananas', keywords: [ 'fruit' ] },
+					{ key: '0_1', value: 2, label: 'Apple', keywords: [ 'fruit' ] },
 				] );
 				// pressing enter should reset and call onSelect
 				simulateKeydown( wrapper, ENTER );
@@ -487,15 +486,12 @@ describe( 'Autocomplete', () => {
 			const editorKeydown = jest.fn();
 			const fakeEditor = wrapper.getDOMNode().querySelector( '.fake-editor' );
 			fakeEditor.addEventListener( 'keydown', editorKeydown, false );
-			// wait for getOptions promise
-			process.nextTick( () => {
-				expectInitialState( wrapper );
-				[ UP, DOWN, ENTER, ESCAPE, SPACE ].forEach( ( keyCode ) => {
-					simulateKeydown( wrapper, keyCode );
-				} );
-				expect( editorKeydown ).toHaveBeenCalledTimes( 5 );
-				done();
+			expectInitialState( wrapper );
+			[ UP, DOWN, ENTER, ESCAPE, SPACE ].forEach( ( keyCode ) => {
+				simulateKeydown( wrapper, keyCode );
 			} );
+			expect( editorKeydown ).toHaveBeenCalledTimes( 5 );
+			done();
 		} );
 
 		it( 'selects by click on result', ( done ) => {
@@ -505,19 +501,19 @@ describe( 'Autocomplete', () => {
 					<FakeEditor />
 				</Autocomplete>
 			);
+			expectInitialState( wrapper );
+			// simulate typing '/'
+			simulateInput( wrapper, [ par( tx( '/' ) ) ] );
 			// wait for getOptions promise
 			process.nextTick( () => {
-				expectInitialState( wrapper );
-				// simulate typing '/'
-				simulateInput( wrapper, [ par( tx( '/' ) ) ] );
 				// menu should be open with all options
 				expect( wrapper.state( 'open' ) ).toBeDefined();
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
-				expect( wrapper.state( 'lookup' ) ).toEqual( '' );
+				expect( wrapper.state( 'query' ) ).toEqual( '' );
 				expect( wrapper.state( 'search' ) ).toEqual( new RegExp( '', 'i' ) );
 				expect( wrapper.instance().getFilteredOptions() ).toEqual( [
-					{ key: 0, value: 1, label: 'Bananas', keywords: [ 'fruit' ] },
-					{ key: 1, value: 2, label: 'Apple', keywords: [ 'fruit' ] },
+					{ key: '0_0', value: 1, label: 'Bananas', keywords: [ 'fruit' ] },
+					{ key: '0_1', value: 2, label: 'Apple', keywords: [ 'fruit' ] },
 				] );
 				// clicking should reset and select the item
 				wrapper.find( '.components-autocomplete__result Button' ).at( 0 ).simulate( 'click' );

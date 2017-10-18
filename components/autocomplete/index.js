@@ -18,7 +18,7 @@ import './style.scss';
 import Button from '../button';
 import Popover from '../popover';
 
-const { ENTER, ESCAPE, UP, DOWN } = keycodes;
+const { ENTER, ESCAPE, UP, DOWN, TAB } = keycodes;
 
 /**
  * Recursively select the firstChild until hitting a leaf node.
@@ -67,14 +67,10 @@ function onlyTextNode( node ) {
 /**
  * Find the index of the last charater in the text that is whitespace.
  * @param {String} text the text to search.
- * @param {Number} fromIndex the index to start from.
  * @returns {Number} the last index of a white space character in the text or -1.
  */
-function lastIndexOfSpace( text, fromIndex ) {
-	const fromI = fromIndex === undefined ?
-			text.length - 1 :
-			Math.min( text.length - 1, fromIndex );
-	for ( let i = fromI; i >= 0; i-- ) {
+function lastIndexOfSpace( text ) {
+	for ( let i = text.length - 1; i >= 0; i-- ) {
 		if ( /\s/.test( text.charAt( i ) ) ) {
 			return i;
 		}
@@ -85,11 +81,11 @@ function lastIndexOfSpace( text, fromIndex ) {
 class Autocomplete extends Component {
 	static getInitialState() {
 		return {
-			open: null,
 			search: /./,
 			selectedIndex: 0,
-			lookup: null,
-			range: null,
+			open: undefined,
+			query: undefined,
+			range: undefined,
 		};
 	}
 
@@ -123,13 +119,13 @@ class Autocomplete extends Component {
 	}
 
 	select( option ) {
-		const { open, range, lookup } = this.state;
-		const { onSelect } = open;
+		const { open, range, query } = this.state;
+		const { onSelect } = open || {};
 
 		this.reset();
 
 		if ( onSelect ) {
-			const replacement = onSelect( option.value, range, lookup );
+			const replacement = onSelect( option.value, range, query );
 			if ( replacement !== undefined ) {
 				this.replace( range, replacement );
 			}
@@ -160,133 +156,124 @@ class Autocomplete extends Component {
 		return range;
 	}
 
-	search( event ) {
-		const createRange = this.createRange;
-		const { completers: allCompleters } = this.props;
+	loadOptions( index ) {
+		if ( this.allOptions[ index ] === undefined ) {
+			this.allOptions[ index ] = [];
+			this.props.completers[ index ].getOptions().then( ( options ) => {
+				this.allOptions[ index ] = options.map(
+					( option, i ) => ( { ...option, key: index + '_' + i } ) );
+				this.forceUpdate();
+			} );
+		}
+	}
+
+	findMatch( container, cursor, allCompleters, wasOpen ) {
 		const allowAnything = () => true;
-		const { open } = this.state;
+		let endTextNode;
+		let endIndex;
+		let completers = allCompleters.map( ( completer, idx ) => ( { ...completer, idx } ) );
+		if ( wasOpen ) {
+			// put the open completer at the start so it has priority
+			completers = [
+				wasOpen,
+				...completers.filter( ( completer ) => completer.idx !== wasOpen.idx ),
+			];
+		}
+		// search backwards to find the first preceeding space or non-text node.
+		if ( isTextNode( cursor.node ) ) { // TEXT node
+			endTextNode = cursor.node;
+			endIndex = cursor.offset;
+		} else if ( cursor.offset === 0 ) {
+			endTextNode = onlyTextNode( descendFirst( cursor.node ) );
+			endIndex = 0;
+		} else {
+			endTextNode = onlyTextNode( descendLast( cursor.node.childNodes[ cursor.offset - 1 ] ) );
+			endIndex = endTextNode ? endTextNode.nodeValue.length : 0;
+		}
+		if ( endTextNode === null ) {
+			return null;
+		}
+		// filter the completers to those that could handle this node
+		completers = completers.filter(
+			( { allowNode = allowAnything } ) => allowNode( endTextNode, container ) );
+		// exit early if nothing can handle it
+		if ( completers.length === 0 ) {
+			return null;
+		}
+		let startTextNode = endTextNode;
+		let text = endTextNode.nodeValue.substring( 0, endIndex );
+		let pos = lastIndexOfSpace( text );
+		while ( pos === -1 ) {
+			const prev = onlyTextNode( startTextNode.previousSibling );
+			if ( prev ) {
+				// filter the completers to those that could handle this node
+				completers = completers.filter(
+					( { allowNode = allowAnything } ) => allowNode( endTextNode, container ) );
+				// exit early if nothing can handle it
+				if ( completers.length === 0 ) {
+					return null;
+				}
+				startTextNode = prev;
+				text = prev.nodeValue + text;
+				pos = lastIndexOfSpace( prev.nodeValue );
+			} else {
+				break;
+			}
+		}
+		// exit early if nothing can handle it
+		if ( text.length <= pos + 1 ) {
+			return null;
+		}
+		// find a completer that matches
+		const open = find( completers, ( { triggerPrefix = '', allowContext = allowAnything } ) => {
+			if ( text.substr( pos + 1, triggerPrefix.length ) !== triggerPrefix ) {
+				return false;
+			}
+			const range = this.createRange( startTextNode, pos + 1, endTextNode, endIndex );
+			const before = this.createRange( container, 0, startTextNode, pos + 1 );
+			const after = this.createRange( endTextNode, endIndex, container, container.childNodes.length );
+			if ( ! allowContext( before, range, after ) ) {
+				return false;
+			}
+			return true;
+		} );
+		if ( open ) {
+			const { triggerPrefix = '' } = open;
+			const range = this.createRange( startTextNode, pos + 1, endTextNode, endIndex );
+			const query = text.substr( pos + 1 + triggerPrefix.length );
+			return { open, range, query };
+		}
+		return null;
+	}
+
+	search( event ) {
+		const { open: wasOpen } = this.state;
+		const { completers } = this.props;
 		// ensure that the cursor location is unambiguous
 		const container = event.target;
 		const cursor = this.getCursor( container );
 		// look for the trigger prefix and search query just before the cursor location
-		const match = ( function() {
-			let endTextNode;
-			let endIndex;
-			let completers = allCompleters.map( ( completer, idx ) => ( { ...completer, idx } ) );
-			if ( open !== null ) {
-				// put the open completer at the start so it has priority
-				completers = [
-					open,
-					...completers.filter( ( completer ) => completer.idx !== open.idx ),
-				];
-			}
-			// search backwards to find the first preceeding space or non-text node.
-			if ( isTextNode( cursor.node ) ) { // TEXT node
-				endTextNode = cursor.node;
-				endIndex = cursor.offset;
-			} else if ( cursor.offset === 0 ) {
-				endTextNode = onlyTextNode( descendFirst( cursor.node ) );
-				endIndex = 0;
-			} else {
-				endTextNode = onlyTextNode( descendLast( cursor.node.childNodes[ cursor.offset - 1 ] ) );
-				endIndex = endTextNode ? endTextNode.nodeValue.length : 0;
-			}
-			if ( endTextNode === null ) {
-				return null;
-			}
-			// filter the completers to those that could handle this node
-			completers = completers.filter( ( { allowNode = allowAnything } ) => allowNode( endTextNode, container ) );
-			// exit early if nothing can handle it
-			if ( completers.length === 0 ) {
-				return null;
-			}
-			let startTextNode = endTextNode;
-			let text = endTextNode.nodeValue.substring( 0, endIndex );
-			let pos = lastIndexOfSpace( text );
-			while ( pos === -1 ) {
-				const prev = onlyTextNode( startTextNode.previousSibling );
-				if ( prev ) {
-					// filter the completers to those that could handle this node
-					completers = completers.filter( ( { allowNode = allowAnything } ) => allowNode( endTextNode, container ) );
-					// exit early if nothing can handle it
-					if ( completers.length === 0 ) {
-						return null;
-					}
-					startTextNode = prev;
-					text = prev.nodeValue + text;
-					pos = lastIndexOfSpace( text, prev.nodeValue.length - 1 );
-				} else {
-					break;
-				}
-			}
-			// exit early if nothing can handle it
-			if ( text.substr( pos + 1 ).length === 0 ) {
-				return null;
-			}
-			// find a completer that matches
-			const completer = find( completers, ( { triggerPrefix = '', allowContext = allowAnything } ) => {
-				if ( text.substr( pos + 1, triggerPrefix.length ) !== triggerPrefix ) {
-					return false;
-				}
-				const range = createRange( startTextNode, pos + 1, endTextNode, endIndex );
-				const before = createRange( container, 0, startTextNode, pos + 1 );
-				const after = createRange( endTextNode, endIndex, container, container.childNodes.length );
-				if ( ! allowContext( before, range, after ) ) {
-					return false;
-				}
-				return true;
-			} );
-			if ( completer ) {
-				const { triggerPrefix = '' } = completer;
-				const range = createRange( startTextNode, pos + 1, endTextNode, endIndex );
-				const lookup = text.substr( pos + 1 + triggerPrefix.length );
-				return {
-					completer,
-					range,
-					lookup,
-				};
-			}
-			return null;
-		} )();
+		const match = this.findMatch( container, cursor, completers, wasOpen );
+		const { open, query, range } = match || {};
 		// create a regular expression to filter the options
-		const search = match ? new RegExp( escapeStringRegexp( match.lookup ), 'i' ) : /./;
-		// update the state
+		const search = open ? new RegExp( escapeStringRegexp( query ), 'i' ) : /./;
+		// asynchronously load the options for the open completer
 		if ( open ) {
-			if ( match ) {
-				// Reset selection to initial when search changes
-				this.setState( {
-					selectedIndex: 0,
-					search,
-					open: match.completer,
-					lookup: match.lookup,
-					range: match.range,
-				} );
-			} else {
-				// This may occur when pressing space, for example
-				this.reset();
-			}
-		} else if ( match ) {
-			this.setState( {
-				selectedIndex: 0,
-				search,
-				open: match.completer,
-				lookup: match.lookup,
-				range: match.range,
-			} );
+			this.loadOptions( open.idx );
+		}
+		// update the state
+		if ( wasOpen || open ) {
+			this.setState( { selectedIndex: 0, search, open, query, range } );
 		}
 	}
 
 	getFilteredOptions() {
 		const { maxResults = 10 } = this.props;
 		const { search, open } = this.state;
-		if ( open === null ) {
+		if ( ! open ) {
 			return [];
 		}
-		const { idx } = open;
-		const options = this.allOptions[ idx ];
-		if ( ! options ) {
-			return [];
-		}
+		const options = this.allOptions[ open.idx ];
 
 		const filtered = [];
 		for ( let i = 0; i < options.length; i++ ) {
@@ -344,6 +331,10 @@ class Autocomplete extends Component {
 				this.select( options[ selectedIndex ] );
 				break;
 
+			case TAB:
+				this.reset();
+				return;
+
 			default:
 				return;
 		}
@@ -368,23 +359,11 @@ class Autocomplete extends Component {
 		realNode[ handler ]( 'keydown', this.setSelectedIndex, true );
 	}
 
-	componentWillMount() {
-		const { completers } = this.props;
-		// Some completers must do asynchronous requests to get their options so
-		// we calculate that here.
-		completers.forEach( ( { getOptions }, idx ) => {
-			getOptions().then( ( options ) => {
-				this.allOptions[ idx ] = options.map( ( option, key ) => ( { ...option, key } ) );
-				this.forceUpdate();
-			} );
-		} );
-	}
-
 	componentDidUpdate( prevProps, prevState ) {
 		const { open } = this.state;
 		const { open: prevOpen } = prevState;
-		if ( ( open !== null ) !== ( prevOpen !== null ) ) {
-			this.toggleKeyEvents( open !== null );
+		if ( ( ! open ) !== ( ! prevOpen ) ) {
+			this.toggleKeyEvents( ! ! open );
 		}
 	}
 
@@ -420,7 +399,7 @@ class Autocomplete extends Component {
 					>
 						{ filteredOptions.map( ( option, index ) => (
 							<li
-								key={ option.key.toString() }
+								key={ option.key }
 								role="menuitem"
 								className={ classnames( 'components-autocomplete__result', {
 									'is-selected': index === selectedIndex,
