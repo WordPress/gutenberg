@@ -18,7 +18,7 @@ import './style.scss';
 import Button from '../button';
 import Popover from '../popover';
 
-const { ENTER, ESCAPE, UP, DOWN, TAB } = keycodes;
+const { ENTER, ESCAPE, UP, DOWN, LEFT, RIGHT, TAB } = keycodes;
 
 /**
  * Recursively select the firstChild until hitting a leaf node.
@@ -331,6 +331,8 @@ class Autocomplete extends Component {
 				this.select( options[ selectedIndex ] );
 				break;
 
+			case LEFT:
+			case RIGHT:
 			case TAB:
 				this.reset();
 				return;
