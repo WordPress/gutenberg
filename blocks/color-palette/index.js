@@ -61,15 +61,12 @@ function ColorPalette( { colors, value, onChange } ) {
 				) }
 			/>
 
-			<div className="blocks-color-palette__item-wrapper blocks-color-palette__clear-color">
-				<button
-					className="blocks-color-palette__item"
-					onClick={ () => onChange( undefined ) }
-					aria-label={ __( 'Remove color' ) }
-				>
-					<span className="blocks-color-palette__clear-color-line" />
-				</button>
-			</div>
+			<button className="button-link blocks-color-palette__clear"
+				onClick={ () => onChange( undefined ) }
+				aria-label={ __( 'Remove color' ) }
+			>
+				{ __( 'Clear' ) }
+			</button>
 		</div>
 	);
 }
