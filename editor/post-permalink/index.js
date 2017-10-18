@@ -40,6 +40,8 @@ class PostPermalink extends Component {
 				showCopyConfirmation: false,
 			} );
 		}, 4000 );
+
+		this.props.onLinkCopied();
 	}
 
 	render() {

@@ -3,7 +3,6 @@
  */
 import { connect } from 'react-redux';
 import Textarea from 'react-autosize-textarea';
-import clickOutside from 'react-click-outside';
 import classnames from 'classnames';
 
 /**
@@ -12,6 +11,7 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
+import { withFocusOutside } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -35,8 +35,13 @@ class PostTitle extends Component {
 		this.onSelect = this.onSelect.bind( this );
 		this.onUnselect = this.onUnselect.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
+		this.onContainerFocus = this.onContainerFocus.bind( this );
+		this.setFocused = this.setFocused.bind( this );
+		this.focusText = this.focusText.bind( this );
+		this.handleFocusOutside = this.handleFocusOutside.bind( this );
 		this.state = {
 			isSelected: false,
+			hasFocusWithin: false,
 		};
 	}
 
@@ -62,6 +67,10 @@ class PostTitle extends Component {
 		}
 	}
 
+	focusText() {
+		this.textareaContainer.textarea.focus();
+	}
+
 	onChange( event ) {
 		const newTitle = event.target.value.replace( REGEXP_NEWLINES, ' ' );
 		this.props.onUpdate( newTitle );
@@ -76,8 +85,16 @@ class PostTitle extends Component {
 		this.setState( { isSelected: false } );
 	}
 
-	handleClickOutside() {
-		this.setState( { isSelected: false } );
+	setFocused( focused ) {
+		this.setState( { hasFocusWithin: focused } );
+	}
+
+	handleFocusOutside() {
+		this.setFocused( false );
+	}
+
+	onContainerFocus() {
+		this.setFocused( true );
 	}
 
 	onKeyDown( event ) {
@@ -88,12 +105,14 @@ class PostTitle extends Component {
 
 	render() {
 		const { title } = this.props;
-		const { isSelected } = this.state;
-		const className = classnames( 'editor-post-title', { 'is-selected': isSelected } );
+		const { isSelected, hasFocusWithin } = this.state;
+		const className = classnames( 'editor-post-title', { 'is-selected': isSelected && hasFocusWithin } );
 
 		return (
-			<div className={ className }>
-				{ isSelected && <PostPermalink /> }
+			<div
+				className={ className }
+				onFocus={ this.onContainerFocus }>
+				{ isSelected && hasFocusWithin && <PostPermalink onLinkCopied={ this.focusText } /> }
 				<h1>
 					<Textarea
 						ref={ this.bindTextarea }
@@ -126,4 +145,4 @@ export default connect(
 			},
 		};
 	}
-)( clickOutside( PostTitle ) );
+)( withFocusOutside( PostTitle ) );
