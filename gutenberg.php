@@ -110,7 +110,7 @@ function gutenberg_pre_init() {
 
 	require_once dirname( __FILE__ ) . '/lib/load.php';
 
-	if ( version_compare( $version, '4.9-beta1-42000', '>=' ) ) { // TODO: change the last bit with the release number when `replace_editor` is available.
+	if ( version_compare( $version, '4.9-beta1-41829', '>=' ) ) {
 		add_filter( 'replace_editor', 'gutenberg_init', 10, 2 );
 	} else {
 		add_action( 'load-post.php', 'gutenberg_intercept_edit_post' );
