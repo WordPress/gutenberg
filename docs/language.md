@@ -81,6 +81,24 @@ This has dramatic implications for how simple and performant we can make our par
 
 _N.B.:_ The defining aspect of blocks are their semantics and the isolation mechanism they provide; in other words, their identity. On the other hand, where their data is stored is a more liberal aspect. Blocks support more than just static local data (via JSON literals inside the HTML comment or within the block's HTML), and more mechanisms (_e.g._, global blocks or otherwise resorting to storage in complementary `WP_Post` objects) are expected. See [attributes](../reference/attributes) for details.
 
+## The Anatomy of a Serialized Block
+
+When blocks are saved to the content, after the editing session, its attributes—depending on the nature of the block—are serialized to these explicit comment delimiters.
+
+```html
+<!-- wp:image -->
+<figure class="wp-block-image">
+	<img src="source.jpg" alt="" />
+</figure>
+<!-- /wp:image -->
+```
+
+A purely dynamic block that is to be server rendered before display could look like this:
+
+```html
+<!-- wp:latest-posts {"postsToShow":4,"displayPostDate":true} /-->
+```
+
 ## The Gutenberg Lifecycle
 
 In summary, the workflow for editing a Gutenberg post starts with taking the persisted version of the document and generating the in-memory tree, aided by the presence of token delimiters. It ends with the reverse: serialization of blocks into `post_content`. During editing, all manipulations happen within the block tree. In summary, a Gutenberg post is built upon an in-memory data structure which gets persisted somehow in an fully-isomorphic way. Right now that persistence is via a serialization/parser pair but could just as easily be replaced through a plugin to store the data structure as a JSON blob somewhere else.
