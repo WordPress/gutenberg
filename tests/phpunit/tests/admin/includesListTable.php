@@ -185,6 +185,10 @@ class Tests_Admin_includesListTable extends WP_UnitTestCase {
 		$this->table->display_rows( $pages->posts );
 		$output = ob_get_clean();
 
+		// Clean up.
+		unset( $_REQUEST['paged'] );
+		unset( $GLOBALS['per_page'] );
+
 		preg_match_all( '|<tr[^>]*>|', $output, $matches );
 
 		$this->assertCount( count( $expected_ids ), array_keys( $matches[0] ) );
