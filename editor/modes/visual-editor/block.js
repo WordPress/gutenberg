@@ -307,7 +307,7 @@ class VisualEditorBlock extends Component {
 		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected, focus } = this.props;
 		const showUI = isSelected && ( ! this.props.isTyping || focus.collapsed === false );
 		const { error } = this.state;
-		const wrapperClassname = classnames( 'editor-visual-editor__block', {
+		const wrapperClassName = classnames( 'editor-visual-editor__block', {
 			'has-warning': ! isValid || !! error,
 			'is-selected': showUI,
 			'is-multi-selected': isMultiSelected,
@@ -336,7 +336,7 @@ class VisualEditorBlock extends Component {
 				onMouseMove={ this.maybeHover }
 				onMouseEnter={ this.maybeHover }
 				onMouseLeave={ onMouseLeave }
-				className={ wrapperClassname }
+				className={ wrapperClassName }
 				data-type={ block.name }
 				tabIndex="0"
 				aria-label={ blockLabel }
