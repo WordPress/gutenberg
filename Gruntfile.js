@@ -486,6 +486,7 @@ module.exports = function(grunt) {
 					'wp-includes/js/plupload/*.js',
 					'wp-includes/js/mediaelement/wp-mediaelement.js',
 					'wp-includes/js/mediaelement/wp-playlist.js',
+					'wp-includes/js/mediaelement/mediaelement-migrate.js',
 					'wp-includes/js/tinymce/plugins/wordpress/plugin.js',
 					'wp-includes/js/tinymce/plugins/wp*/plugin.js',
 
