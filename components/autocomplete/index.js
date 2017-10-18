@@ -99,7 +99,6 @@ class Autocomplete extends Component {
 		this.setSelectedIndex = this.setSelectedIndex.bind( this );
 
 		this.state = this.constructor.getInitialState();
-		this.allOptions = {};
 	}
 
 	bindNode( node ) {
