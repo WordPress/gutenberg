@@ -5,7 +5,7 @@ import request, {
 	cache,
 	getStablePath,
 	getResponseHeaders,
-	getResponseFromCache,
+	getCachedResponse,
 	getResponseFromNetwork,
 	isRequestMethod,
 } from '../request';
@@ -59,14 +59,34 @@ describe( 'request', () => {
 		} );
 	} );
 
-	describe( 'getResponseFromCache()', () => {
-		it( 'returns response from cache', () => {
-			cache[ getStablePath( '/wp?c=5&a=5&b=5' ) ] = actualResponse;
-			const awaitResponse = getResponseFromCache( {
+	describe( 'getCachedResponse()', () => {
+		it( 'returns undefined for missing cache', () => {
+			const cachedResponse = getCachedResponse( {
 				path: '/wp?b=5&c=5&a=5',
+				method: 'GET',
 			} );
 
-			expect( awaitResponse ).resolves.toEqual( actualResponse );
+			expect( cachedResponse ).toBe( undefined );
+		} );
+
+		it( 'returns undefined for non-GET request', () => {
+			cache[ getStablePath( '/wp?c=5&a=5&b=5' ) ] = actualResponse;
+			const cachedResponse = getCachedResponse( {
+				path: '/wp?b=5&c=5&a=5',
+				method: 'post',
+			} );
+
+			expect( cachedResponse ).toBe( undefined );
+		} );
+
+		it( 'returns response from cache', () => {
+			cache[ getStablePath( '/wp?c=5&a=5&b=5' ) ] = actualResponse;
+			const cachedResponse = getCachedResponse( {
+				path: '/wp?b=5&c=5&a=5',
+				method: 'GET',
+			} );
+
+			expect( cachedResponse ).toEqual( actualResponse );
 		} );
 	} );
 
