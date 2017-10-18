@@ -167,7 +167,8 @@ function gutenberg_register_scripts_and_styles() {
 		filemtime( gutenberg_dir_path() . 'blocks/build/edit-blocks.css' )
 	);
 }
-add_action( 'init', 'gutenberg_register_scripts_and_styles' );
+add_action( 'wp_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 );
+add_action( 'admin_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 );
 
 /**
  * Append result of internal request to REST API for purpose of preloading
@@ -596,11 +597,7 @@ function gutenberg_color_palette() {
  * @param string $hook Screen name.
  */
 function gutenberg_editor_scripts_and_styles( $hook ) {
-	if ( ! preg_match( '/(toplevel|gutenberg)_page_gutenberg(-demo)?/', $hook, $page_match ) ) {
-		return;
-	}
-
-	$is_demo = isset( $page_match[2] );
+	$is_demo = isset( $_GET['gutenberg-demo'] );
 
 	wp_add_inline_script(
 		'editor', 'window.wp.oldEditor = window.wp.editor;', 'after'
@@ -683,36 +680,9 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$word_count_script = wp_scripts()->query( 'word-count' );
 	array_push( $word_count_script->deps, 'wp-utils' );
 
-	// Parse post type from parameters.
-	$post_type = null;
-	if ( ! isset( $_GET['post_type'] ) ) {
-		$post_type = 'post';
-	} else {
-		$post_types = get_post_types( array(
-			'show_ui' => true,
-		) );
-
-		if ( in_array( $_GET['post_type'], $post_types ) ) {
-			$post_type = $_GET['post_type'];
-		} else {
-			wp_die( __( 'Invalid post type.', 'gutenberg' ) );
-		}
-	}
-
-	// Parse post ID from parameters.
-	$post_id = null;
-	if ( isset( $_GET['post_id'] ) && (int) $_GET['post_id'] > 0 ) {
-		$post_id = (int) $_GET['post_id'];
-	}
-
-	// Create an auto-draft if new post.
-	if ( ! $post_id ) {
-		$default_post_to_edit = get_default_post_to_edit( $post_type, true );
-		$post_id              = $default_post_to_edit->ID;
-	}
-
-	// Generate API-prepared post from post ID.
-	$post_to_edit = gutenberg_get_post_to_edit( $post_id );
+	global $post;
+	// Generate API-prepared post.
+	$post_to_edit = gutenberg_get_post_to_edit( $post );
 	if ( is_wp_error( $post_to_edit ) ) {
 		wp_die( $post_to_edit->get_error_message() );
 	}
@@ -720,10 +690,9 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	// Set initial title to empty string for auto draft for duration of edit.
 	$is_new_post = 'auto-draft' === $post_to_edit['status'];
 	if ( $is_new_post ) {
-		$default_title         = apply_filters( 'default_title', '' );
 		$post_to_edit['title'] = array(
-			'raw'      => $default_title,
-			'rendered' => apply_filters( 'the_title', $default_title, $post_id ),
+			'raw'      => '',
+			'rendered' => apply_filters( 'the_title', '', $post->ID ),
 		);
 	}
 
@@ -733,14 +702,17 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'/wp/v2/taxonomies?context=edit',
 		gutenberg_get_rest_link( $post_to_edit, 'about', 'edit' ),
 	);
+
 	if ( ! $is_new_post ) {
 		$preload_paths[] = gutenberg_get_rest_link( $post_to_edit, 'version-history' );
 	}
+
 	$preload_data = array_reduce(
 		$preload_paths,
 		'gutenberg_preload_api_request',
 		array()
 	);
+
 	wp_add_inline_script(
 		'wp-components',
 		sprintf( 'window._wpAPIDataPreload = %s', wp_json_encode( $preload_data ) ),
@@ -772,11 +744,13 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	// Preload server-registered block schemas.
 	$block_registry = WP_Block_Type_Registry::get_instance();
 	$schemas        = array();
+
 	foreach ( $block_registry->get_all_registered() as $block_name => $block_type ) {
 		if ( isset( $block_type->attributes ) ) {
 			$schemas[ $block_name ] = $block_type->attributes;
 		}
 	}
+
 	wp_localize_script( 'wp-blocks', '_wpBlocksAttributes', $schemas );
 
 	// Initialize the editor.
