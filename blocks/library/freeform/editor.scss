@@ -1,6 +1,6 @@
 .editor-visual-editor__block[data-type="core/freeform"] .blocks-editable__tinymce {
 	p {
-		line-height: inherit;
+		line-height: $editor-line-height;
 	}
 
 	ul, ol {
