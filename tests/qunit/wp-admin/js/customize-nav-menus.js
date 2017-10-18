@@ -110,6 +110,7 @@ jQuery( window ).load( function (){
 
 	// @todo Add tests for api.Menus.NewMenuSection
 	// @todo Add tests for api.Menus.MenuLocationControl
+	// @todo Add tests for api.Menus.MenuLocationsControl
 	// @todo Add tests for api.Menus.MenuAutoAddControl
 	// @todo Add tests for api.Menus.MenuControl
 	// @todo Add tests for api.Menus.NewMenuControl
