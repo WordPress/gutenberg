@@ -39,7 +39,7 @@ As we thought about these uses and how to make them obvious and consistent, we b
 
 Our goal with Gutenberg is not just to create a seamless post- and page-building experience. We also want to ensure that it provides a seamless writing experience. Though individual paragraphs of text will become their own “blocks,” the creation and editing of these blocks are being designed in a way that could be just as simple—if not more so—than the current WordPress editor experience. Here is a brief animation illustrating the Gutenberg writing experience:
 
-https://make.wordpress.org/core/files/2017/08/typing.gif
+![Typing](https://make.wordpress.org/core/files/2017/08/typing.gif)
 
 ## Is Gutenberg built on top of TinyMCE?
 
@@ -51,7 +51,7 @@ Gutenberg will work in modern browsers, and Internet Explorer 11.
 
 ## How do I make my own block?
 
-The API for creating blocks is a crucial aspect of the project. We are working on improved documentation and tutorials. Current documentation lives here
+The API for creating blocks is a crucial aspect of the project. We are working on improved documentation and tutorials. Check out the [Creating Block Types](http://gutenberg-devdoc.surge.sh/blocks/) section to get started.
 
 ## Does Gutenberg involve editing posts/pages in the front-end?
 
@@ -59,7 +59,9 @@ No, we are designing Gutenberg primarily as a replacement for the post and page 
 
 ## Given Gutenberg is built in JavaScript, how will old metaboxes (PHP) work?
 
-We expect to have a dedicated "advanced" area at the bottom of the editor. It’s not yet implemented, and we are tracking development here: https://github.com/WordPress/gutenberg/issues/952
+We plan to continue supporting existing metaboxes while providing new ways to extend the interface.
+
+*See:* https://github.com/WordPress/gutenberg/pull/2804
 
 ## How can plugins extend the Gutenberg UI?
 
@@ -67,13 +69,13 @@ The main extension point we want to emphasize is creating new blocks. We are sti
 
 ## Will Custom Post Types be supported?
 
-Yes, for the most part. If a post type disables the content field, the "advanced" section at the bottom would fill the page.
+Indeed. There are multiple ways in which custom post types can leverage Gutenberg. The plan is to allow them to specify the blocks they support, as well as defining a default block for the post type. It's not currently the case, but if a post type disables the content field, the "advanced" section at the bottom would fill the page.
 
 ## Will there be columns?
 
 Our primary goal is on a solid block foundation before exploring column support.
 
-See also https://github.com/WordPress/gutenberg/issues/219
+*See:* https://github.com/WordPress/gutenberg/issues/219
 
 ## Will there be nested blocks?
 
@@ -129,16 +131,16 @@ Custom TinyMCE buttons will still work in the "Classic Text" block, which is a b
 (Gutenberg comes with a new universal inserter tool, which gives you access to every block available, searchable, sorted by recency and categories. This inserter tool levels the playing field for every plugin that adds content to the editor, and provides a single interface to learn how to use.)
 
 ## How will shortcodes work in Gutenberg?
-`Shortcodes` will continue to work as they do now.
+Shortcodes will continue to work as they do now.
 
-However we see the block as an evolution of the `shortcode`. Instead of having to type out code, you can use the universal inserter tray to pick a block and get a richer interface for both configuring the block and previewing it. We would recommend people eventually upgrade their `shortcodes` to be blocks.
+However we see the block as an evolution of the `[shortcode]`. Instead of having to type out code, you can use the universal inserter tray to pick a block and get a richer interface for both configuring the block and previewing it. We would recommend people eventually upgrade their shortcodes to be blocks.
 
 ## Should I move shortcodes to content blocks?
 We think so. Blocks are designed to be visually representative of the final look, and they will likely become the expected way in which users will discover and insert content in WordPress.
 
 ## Will Gutenberg be made properly accessible?
 
-Accessibility is not an afterthought. Not every aspect of Gutenberg is accessible at the moment, but we are tracking issues in https://github.com/WordPress/gutenberg/labels/Accessibility, and we are fixing them. We understand that WordPress is for everyone, and that accessibility is about inclusion. This is a key value for us.
+Accessibility is not an afterthought. Not every aspect of Gutenberg is accessible at the moment. You can check logged issues [here](https://github.com/WordPress/gutenberg/labels/Accessibility). We understand that WordPress is for everyone, and that accessibility is about inclusion. This is a key value for us.
 
 If you would like to contribute to the accessibility of Gutenberg, we can always use more people to test and contribute.
 
@@ -154,7 +156,7 @@ Our approach—as outlined in <a href="https://make.wordpress.org/core/2017/01/1
 
 This also <a href="https://github.com/WordPress/gutenberg/issues/1516">gives us the flexibility</a> to store those blocks that are inherently separate from the content stream (reusable pieces like widgets or small post type elements) elsewhere, and just keep token references for their placement.
 
-We suggest you look at the [language of Gutenberg](/language/) to learn more about how this aspect of the project works.
+We suggest you look at the [language of Gutenberg](../language/) to learn more about how this aspect of the project works.
 
 ## How can I parse the post content back out into blocks in PHP or JS?
 In JS:
