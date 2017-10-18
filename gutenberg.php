@@ -13,6 +13,8 @@
 define( 'GUTENBERG_DEVELOPMENT_MODE', true );
 ### END AUTO-GENERATED DEFINES
 
+gutenberg_pre_init();
+
 /**
  * Project.
  *
@@ -90,27 +92,31 @@ function gutenberg_wordpress_version_notice() {
 }
 
 /**
- * Verify that we can initialize the Gutenberg editor plugin and add hooks.
+ * Verify that we can initialize the Gutenberg editor , then load it.
  *
- * @since 0.1.0
+ * @since 1.5.0
  */
-function gutenberg_can_init() {
+function gutenberg_pre_init() {
 	// Get unmodified $wp_version.
 	include( ABSPATH . WPINC . '/version.php' );
 
 	// Strip '-src' from the version string. Messes up version_compare().
 	$version = str_replace( '-src', '', $wp_version );
 
+	if ( version_compare( $version, '4.8', '<' ) ) {
+		add_action( 'admin_notices', 'gutenberg_wordpress_version_notice' );
+		return;
+	}
+
+	require_once dirname( __FILE__ ) . '/lib/load.php';
+	
 	if ( version_compare( $version, '4.9-beta1-42000', '>=' ) ) { // TODO: change the last bit with the release number when `replace_editor` is available.
 		add_filter( 'replace_editor', 'gutenberg_init', 10, 2 );
-	} elseif ( version_compare( $version, '4.8', '<' ) ) {
-		add_action( 'admin_notices', 'gutenberg_wordpress_version_notice' );
 	} else {
 		add_action( 'load-post.php', 'gutenberg_intercept_edit_post' );
 		add_action( 'load-post-new.php', 'gutenberg_intercept_post_new' );
 	}
 }
-add_action( 'plugins_loaded', 'gutenberg_can_init' );
 
 /**
  * Initialize Gutenberg.
@@ -144,8 +150,6 @@ function gutenberg_init( $return, $post ) {
 	if ( ! post_type_supports( $post_type, 'editor' ) ) {
 		return false;
 	}
-
-	require_once dirname( __FILE__ ) . '/lib/load.php';
 
 	require_once( ABSPATH . 'wp-admin/admin-header.php' );
 	the_gutenberg_project();
