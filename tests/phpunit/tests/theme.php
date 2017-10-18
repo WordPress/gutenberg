@@ -189,7 +189,7 @@ class Tests_Theme extends WP_UnitTestCase {
 	function test_default_theme_in_default_theme_list() {
 		$latest_default_theme = WP_Theme::get_core_default_theme();
 		if ( ! $latest_default_theme->exists() || 'twenty' !== substr( $latest_default_theme->get_stylesheet(), 0, 6 ) ) {
-			$this->fail( 'No Twenty* series default themes are installed' ); 
+			$this->fail( 'No Twenty* series default themes are installed' );
 		}
 		$this->assertContains( $latest_default_theme->get_stylesheet(), $this->default_themes );
 	}
@@ -334,8 +334,8 @@ class Tests_Theme extends WP_UnitTestCase {
 		$wp_customize->save_changeset_post( array(
 			'data' => $data,
 		) );
-		$this->assertEquals( get_post( $nav_created_post_ids[0] )->post_date, get_post( $wp_customize->changeset_post_id() )->post_date );
-		$this->assertEquals( get_post( $nav_created_post_ids[1] )->post_date, get_post( $wp_customize->changeset_post_id() )->post_date );
+		$this->assertEquals( get_post( $wp_customize->changeset_post_id() )->post_date, get_post( $nav_created_post_ids[0] )->post_date );
+		$this->assertEquals( get_post( $wp_customize->changeset_post_id() )->post_date, get_post( $nav_created_post_ids[1] )->post_date );
 		$this->assertEquals( 'auto-draft', get_post_status( $nav_created_post_ids[0] ) );
 		$this->assertEquals( 'auto-draft', get_post_status( $nav_created_post_ids[1] ) );
 
@@ -344,8 +344,6 @@ class Tests_Theme extends WP_UnitTestCase {
 			'status' => 'draft',
 			'data' => $data,
 		) );
-		$this->assertEquals( get_post( $nav_created_post_ids[0] )->post_date, get_post( $wp_customize->changeset_post_id() )->post_date );
-		$this->assertEquals( get_post( $nav_created_post_ids[1] )->post_date, get_post( $wp_customize->changeset_post_id() )->post_date );
 		$this->assertEquals( 'draft', get_post_status( $nav_created_post_ids[0] ) );
 		$this->assertEquals( 'draft', get_post_status( $nav_created_post_ids[1] ) );
 
