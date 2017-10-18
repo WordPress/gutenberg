@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { Dashicon, IconButton, PanelBody } from '@wordpress/components';
+import { Dashicon, IconButton, PanelColor } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -135,18 +135,18 @@ class ButtonBlock extends Component {
 							checked={ !! clear }
 							onChange={ this.toggleClear }
 						/>
-						<PanelBody title={ __( 'Button Background Color' ) }>
+						<PanelColor title={ __( 'Button Background' ) } colorValue={ color }>
 							<ColorPalette
 								value={ color }
 								onChange={ ( colorValue ) => setAttributes( { color: colorValue } ) }
 							/>
-						</PanelBody>
-						<PanelBody title={ __( 'Button Text Color' ) }>
+						</PanelColor>
+						<PanelColor title={ __( 'Button Text' ) } colorValue={ textColor }>
 							<ColorPalette
 								value={ textColor }
 								onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
 							/>
-						</PanelBody>
+						</PanelColor>
 						<ContrastChecker
 							textColor={ textColor || fallbackTextColor }
 							backgroundColor={ color || fallbackBackgroundColor }

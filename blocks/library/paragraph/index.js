@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import { concatChildren } from '@wordpress/element';
-import { Autocomplete, PanelBody } from '@wordpress/components';
+import { Autocomplete, PanelBody, PanelColor } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -19,6 +19,7 @@ import { blockAutocompleter, userAutocompleter } from '../../autocompleters';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import BlockControls from '../../block-controls';
+import BlockAutocomplete from '../../block-autocomplete';
 import Editable from '../../editable';
 import InspectorControls from '../../inspector-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
@@ -131,18 +132,18 @@ registerBlockType( 'core/paragraph', {
 							allowReset
 						/>
 					</PanelBody>
-					<PanelBody title={ __( 'Background Color' ) }>
+					<PanelColor title={ __( 'Background' ) } colorValue={ backgroundColor }>
 						<ColorPalette
 							value={ backgroundColor }
 							onChange={ ( colorValue ) => setAttributes( { backgroundColor: colorValue } ) }
 						/>
-					</PanelBody>
-					<PanelBody title={ __( 'Text Color' ) }>
+					</PanelColor>
+					<PanelColor title={ __( 'Text' ) } colorValue={ textColor }>
 						<ColorPalette
 							value={ textColor }
 							onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
 						/>
-					</PanelBody>
+					</PanelColor>
 					<PanelBody title={ __( 'Block Alignment' ) }>
 						<BlockAlignmentToolbar
 							value={ width }
