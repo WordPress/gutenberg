@@ -151,7 +151,7 @@ function gutenberg_init( $return, $post ) {
 		return false;
 	}
 
-	gutenberg_is_running( true );
+	add_action( 'admin_enqueue_scripts', 'gutenberg_editor_scripts_and_styles' );
 
 	require_once( ABSPATH . 'wp-admin/admin-header.php' );
 	the_gutenberg_project();
@@ -378,21 +378,4 @@ function gutenberg_add_edit_link( $actions, $post ) {
 	);
 
 	return $actions;
-}
-
-/**
- * Returns whether Gutenberg is running, as determined during gutenberg_init().
- *
- * @since 1.5.0
- *
- * @param bool $running Optional. If passed, sets whether Gutenberg is flagged as running or not.
- *
- * @return bool True if Gutenberg is running, false if it isn't, or it hasn't been decided yet.
- */
-function gutenberg_is_running( $running = null ) {
-	static $is_running;
-	if ( null !== $running ) {
-		$is_running = (bool) $running;
-	}
-	return $is_running;
 }
