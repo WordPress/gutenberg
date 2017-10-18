@@ -97,6 +97,26 @@
 		left: 4px;
 	}
 
+	&.is-selected:before,
+	&.is-hovered:before {
+		content: '';
+		position: absolute;
+		border-left: 1px solid $light-gray-500;
+		height: 36px;
+		top: $block-padding;
+		left: $block-padding + $block-mover-padding-visible - $item-spacing;
+	}
+
+	&.is-selected:before,
+	&.is-hovered:before {
+		content: '';
+		position: absolute;
+		border-right: 1px solid $light-gray-500;
+		height: 36px;
+		top: $block-padding;
+		right: $block-padding + $block-mover-padding-visible - $item-spacing;
+	}
+
 	&.is-multi-selected *::selection {
 		background: transparent;
 	}
