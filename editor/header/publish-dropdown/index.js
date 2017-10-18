@@ -10,7 +10,8 @@ import { withAPIData, PanelBody } from '@wordpress/components';
 import './style.scss';
 import PostVisibilityLabel from '../../post-visibility/label';
 import PostVisibilityForm from '../../post-visibility';
-import PostSchedule from '../../sidebar/post-schedule';
+import PostScheduleLabel from '../../post-schedule/label';
+import PostScheduleForm from '../../post-schedule';
 import PublishButton from '../publish-button';
 
 function PublishDropdown( { user, onSubmit } ) {
@@ -33,7 +34,14 @@ function PublishDropdown( { user, onSubmit } ) {
 					<PostVisibilityForm />
 				</PanelBody>
 			}
-			<PostSchedule />
+			{ canPublish &&
+				<PanelBody initialOpen={ false } title={ [
+					__( 'Publish: ' ),
+					<PostScheduleLabel key="label" />,
+				] }>
+					<PostScheduleForm />
+				</PanelBody>
+			}
 			<div className="editor-publish-dropdown__publish-button-container">
 				<PublishButton onSubmit={ onSubmit } />
 			</div>
