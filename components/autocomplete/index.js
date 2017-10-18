@@ -157,14 +157,12 @@ class Autocomplete extends Component {
 	}
 
 	loadOptions( index ) {
-		if ( this.allOptions[ index ] === undefined ) {
-			this.allOptions[ index ] = [];
-			this.props.completers[ index ].getOptions().then( ( options ) => {
-				this.allOptions[ index ] = options.map(
-					( option, i ) => ( { ...option, key: index + '_' + i } ) );
-				this.forceUpdate();
+		this.props.completers[ index ].getOptions().then( ( options ) => {
+			this.setState( {
+				[ 'options_' + index ]: options.map(
+					( option, i ) => ( { ...option, key: index + '_' + i } ) ),
 			} );
-		}
+		} );
 	}
 
 	findMatch( container, cursor, allCompleters, wasOpen ) {
@@ -258,7 +256,7 @@ class Autocomplete extends Component {
 		// create a regular expression to filter the options
 		const search = open ? new RegExp( escapeStringRegexp( query ), 'i' ) : /./;
 		// asynchronously load the options for the open completer
-		if ( open ) {
+		if ( open && ( ! wasOpen || open.idx !== wasOpen.idx ) ) {
 			this.loadOptions( open.idx );
 		}
 		// update the state
@@ -273,7 +271,7 @@ class Autocomplete extends Component {
 		if ( ! open ) {
 			return [];
 		}
-		const options = this.allOptions[ open.idx ];
+		const options = this.state[ 'options_' + open.idx ] || [];
 
 		const filtered = [];
 		for ( let i = 0; i < options.length; i++ ) {
