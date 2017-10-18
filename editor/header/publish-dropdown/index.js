@@ -19,7 +19,7 @@ function PublishDropdown( { user, onSubmit } ) {
 
 	return (
 		<div className="editor-publish-dropdown">
-			<div><strong>{ __( 'All ready to go!' ) }</strong></div>
+			<div><strong>{ __( 'All ready to go?' ) }</strong></div>
 			{ ! canPublish &&
 				<div>
 					<span>{ __( 'Visibility' ) }</span>
