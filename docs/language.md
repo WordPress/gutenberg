@@ -83,7 +83,7 @@ _N.B.:_ The defining aspect of blocks are their semantics and the isolation mech
 
 ## The Anatomy of a Serialized Block
 
-When blocks are saved to the content after the editing session, the different attributes—depending on the nature of the block—are serialized to these explicit comment delimiters.
+When blocks are saved to the content, after the editing session, its attributes—depending on the nature of the block—are serialized to these explicit comment delimiters.
 
 ```html
 <!-- wp:image -->
