@@ -1,8 +1,29 @@
 .editor-publish-dropdown {
 	padding: 15px;
+
+	.components-panel__body {
+		margin-left: -16px;
+		margin-right: -16px;
+		margin-bottom: -16px;
+		margin-top: 10px;
+		border: none;
+
+		.components-panel__body-toggle {
+			font-weight: normal;
+		}
+	}
+
+	.editor-post-visibility__dialog-legend {
+		display: none;
+	}
 }
 
 .editor-publish-dropdown__publish-button-container {
 	margin-top: 20px;
 	text-align: right;
+
+	.editor-publish-button.is-saving {
+		position: relative;
+		z-index: 1;
+	}
 }

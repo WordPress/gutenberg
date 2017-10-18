@@ -19,6 +19,8 @@ The name for a block is a unique string that identifies a block. Names have to b
 registerBlockType( 'my-plugin/book', {} );
 ```
 
+*Note:* this name is used on the comment delimiters as `<!-- wp:my-plugin/book -->`. Those blocks provided by core don't include a namespace when serialized.
+
 ### Block Configuration
 
 * **Type:** `{ key: value }`
@@ -127,6 +129,18 @@ Anchors let you link directly to a specific block on a page. This property adds 
 ```js
 // Add the support for an anchor link.
 supportAnchor: true,
+```
+
+#### supportHTML (optional)
+
+* **Type:** `Bool`
+* **Default:** `true`
+
+Whether a block can be edited in HTML mode.
+
+```js
+// Remove support for an HTML mode.
+supportHTML: false,
 ```
 
 ## Edit and Save
