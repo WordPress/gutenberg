@@ -73,7 +73,7 @@ describe( 'request', () => {
 			cache[ getStablePath( '/wp?c=5&a=5&b=5' ) ] = actualResponse;
 			const cachedResponse = getCachedResponse( {
 				path: '/wp?b=5&c=5&a=5',
-				method: 'post',
+				method: 'POST',
 			} );
 
 			expect( cachedResponse ).toBe( undefined );
