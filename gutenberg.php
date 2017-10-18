@@ -151,6 +151,8 @@ function gutenberg_init( $return, $post ) {
 		return false;
 	}
 
+	add_action( 'admin_enqueue_scripts', 'gutenberg_editor_scripts_and_styles' );
+
 	require_once( ABSPATH . 'wp-admin/admin-header.php' );
 	the_gutenberg_project();
 
