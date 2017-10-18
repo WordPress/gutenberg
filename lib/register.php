@@ -50,9 +50,18 @@ function gutenberg_menu() {
 
 	add_submenu_page(
 		'gutenberg',
-		__( 'Gutenberg', 'gutenberg' ),
+		__( 'Gutenberg Post', 'gutenberg' ),
 		__( 'New Post', 'gutenberg' ),
 		'edit_posts',
+		'gutenberg',
+		'the_gutenberg_project'
+	);
+
+	add_submenu_page(
+		'gutenberg',
+		__( 'Gutenberg Page', 'gutenberg' ),
+		__( 'New Page', 'gutenberg' ),
+		'edit_pages',
 		'gutenberg',
 		'the_gutenberg_project'
 	);
