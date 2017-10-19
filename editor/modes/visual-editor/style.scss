@@ -449,7 +449,8 @@
 	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );
 	margin: 0 auto;
 	opacity: 0;
-	transition: 0.1s opacity;
+	transition: opacity 0.25s ease-in-out;
+	transition-delay: 0.3s;
 
 	&:not( [data-insert-index="0"] ) {
 		top: #{ -1 * ( $block-spacing / 2 ) };
@@ -463,7 +464,7 @@
 		content: '';
 		position: absolute;
 		width: 100%;
-		height: 10px;
+		height: 44px;
 		transition: 0.1s height;
 		transform: translateY( -50% );
 	}
@@ -498,4 +499,5 @@
 	margin-left: -40px;
 	border: none;
 	border-top: 2px solid $blue-medium-500;
+	display: none; /* todo: remove the whole element */
 }
