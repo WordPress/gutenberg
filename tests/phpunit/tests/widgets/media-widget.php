@@ -165,6 +165,29 @@ class Test_WP_Widget_Media extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Instance schema args.
+	 *
+	 * @var array
+	 */
+	protected $filter_instance_schema_args;
+
+	/**
+	 * Filter instance schema.
+	 *
+	 * @param array           $schema Schema.
+	 * @param WP_Widget_Media $widget Widget.
+	 *
+	 * @return array
+	 */
+	public function filter_instance_schema( $schema, $widget ) {
+		$this->filter_instance_schema_args = compact( 'schema', 'widget' );
+		$schema['injected'] = array(
+			'type' => 'boolean',
+		);
+		return $schema;
+	}
+
+	/**
 	 * Test get_instance_schema method.
 	 *
 	 * @covers WP_Widget_Media::get_instance_schema
@@ -178,6 +201,15 @@ class Test_WP_Widget_Media extends WP_UnitTestCase {
 			'title',
 			'url',
 		), array_keys( $schema ) );
+
+		// Check filter usage.
+		$this->filter_instance_schema_args = null;
+		add_filter( 'widget_mocked_instance_schema', array( $this, 'filter_instance_schema' ), 10, 2 );
+		$schema = $widget->get_instance_schema();
+		$this->assertInternalType( 'array', $this->filter_instance_schema_args );
+		$this->assertSame( $widget, $this->filter_instance_schema_args['widget'] );
+		$this->assertEqualSets( array( 'attachment_id', 'title', 'url' ), array_keys( $this->filter_instance_schema_args['schema'] ) );
+		$this->assertArrayHasKey( 'injected', $schema );
 	}
 
 	/**
