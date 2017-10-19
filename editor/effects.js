@@ -13,7 +13,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { getGutenbergURL, getWPAdminURL } from './utils/url';
+import { getPostEditUrl, getWPAdminURL } from './utils/url';
 import {
 	resetPost,
 	setupNewPost,
@@ -122,9 +122,7 @@ export default {
 			window.history.replaceState(
 				{ id: post.id },
 				'Post ' + post.id,
-				getGutenbergURL( {
-					post_id: post.id,
-				} )
+				getPostEditUrl( post.id )
 			);
 		}
 	},

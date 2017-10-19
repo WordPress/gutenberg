@@ -251,6 +251,13 @@ describe( 'effects', () => {
 	} );
 
 	describe( '.REQUEST_POST_UPDATE_SUCCESS', () => {
+		const historyOriginalSetState = window.history.replaceState;
+		beforeAll( () => {
+			window.history.replaceState = jest.fn();
+		} );
+		afterAll( () => {
+			window.history.replaceState = historyOriginalSetState;
+		} );
 		const handler = effects.REQUEST_POST_UPDATE_SUCCESS;
 		const dispatch = jest.fn();
 		const store = { getState: () => {}, dispatch };
