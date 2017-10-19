@@ -43,11 +43,8 @@
 		z-index: z-index( '.editor-visual-editor__block:before' );
 		content: '';
 		position: absolute;
-		/*outline: 1px solid transparent;
-		transition: 0.2s outline; */
 		top: 0;
 		bottom: 0;
-
 		left: 0;
 		right: 0;
 
@@ -77,24 +74,26 @@
 		background-color: rgba( $white, 0.6 );
 	}
 
-	&.is-selected:before,
-	&.is-hovered:before {
+	&.is-selected .editor-block-mover:before,
+	&.is-hovered .editor-block-mover:before,
+	&.is-selected .editor-block-settings-menu:before,
+	&.is-hovered .editor-block-settings-menu:before {
 		content: '';
 		position: absolute;
-		border-left: 1px solid $light-gray-500;
 		height: 36px;
-		top: $block-padding;
-		left: $block-padding + $block-mover-padding-visible - $item-spacing;
+		top: 10px;
 	}
 
-	&.is-selected:before,
-	&.is-hovered:before {
-		content: '';
-		position: absolute;
+	&.is-selected .editor-block-mover:before,
+	&.is-hovered .editor-block-mover:before {
 		border-right: 1px solid $light-gray-500;
-		height: 36px;
-		top: $block-padding;
-		right: $block-padding + $block-mover-padding-visible - $item-spacing;
+		right: 4px;
+	}
+
+	&.is-selected .editor-block-settings-menu:before,
+	&.is-hovered .editor-block-settings-menu:before {
+		border-left: 1px solid $light-gray-500;
+		left: 4px;
 	}
 
 	&.is-multi-selected *::selection {
@@ -102,7 +101,7 @@
 	}
 
 	&.is-multi-selected:before {
-		background: rgba( $blue-medium-200, .6 );
+		background: Highlight;	// This variable is a CSS 2.1 variable that selects the operating system select color
 	}
 
 	.iframe-overlay {
