@@ -20,6 +20,7 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import BlockControls from '../../block-controls';
 import BlockAutocomplete from '../../block-autocomplete';
 import Editable from '../../editable';
+import { createInlineStyleFormatter } from '../../editable/formatter';
 import InspectorControls from '../../inspector-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
 import RangeControl from '../../inspector-controls/range-control';
@@ -183,6 +184,10 @@ registerBlockType( 'core/paragraph', {
 					onMerge={ mergeBlocks }
 					onReplace={ onReplace }
 					placeholder={ placeholder || __( 'New Paragraph' ) }
+					formattingControls={ [ 'bold', 'italic', 'strikethrough', 'link', 'red' ] }
+					formatters={ [
+						createInlineStyleFormatter( 'red', 'hammer', 'Red', { color: 'red' } ),
+					] }
 				/>
 			</BlockAutocomplete>,
 		];

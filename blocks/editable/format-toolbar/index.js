@@ -32,6 +32,11 @@ const FORMATTING_CONTROLS = [
 		title: __( 'Strikethrough' ),
 		format: 'strikethrough',
 	},
+	{
+		icon: 'admin-links',
+		title: __( 'Link' ),
+		format: 'link',
+	},
 ];
 
 // Default controls shown if no `enabledControls` prop provided
@@ -131,8 +136,12 @@ class FormatToolbar extends Component {
 		}
 	}
 
+	isFormatActive( format ) {
+		return this.props.formats[ format ] && this.props.formats[ format ].isActive;
+	}
+
 	render() {
-		const { formats, focusPosition, enabledControls = DEFAULT_CONTROLS } = this.props;
+		const { formats, focusPosition, enabledControls = DEFAULT_CONTROLS, customControls = [] } = this.props;
 		const { isAddingLink, isEditingLink, newLinkValue, settingsVisible, opensInNewWindow } = this.state;
 		const linkStyle = focusPosition
 			? { position: 'absolute', ...focusPosition }
@@ -140,11 +149,15 @@ class FormatToolbar extends Component {
 
 		const toolbarControls = FORMATTING_CONTROLS
 			.filter( control => enabledControls.indexOf( control.format ) !== -1 )
-			.map( ( control ) => ( {
-				...control,
-				onClick: this.toggleFormat( control.format ),
-				isActive: !! formats[ control.format ],
-			} ) );
+			.concat( customControls )
+			.map( ( control ) => {
+				const isLink = control.format === 'link';
+				return {
+					...control,
+					onClick: isLink ? this.addLink : this.toggleFormat( control.format ),
+					isActive: this.isFormatActive( control.format ) || ( isLink && isAddingLink ),
+				};
+			} );
 
 		const linkSettings = settingsVisible && (
 			<fieldset className="blocks-format-toolbar__link-settings">
@@ -154,15 +167,6 @@ class FormatToolbar extends Component {
 					onChange={ this.setLinkTarget } />
 			</fieldset>
 		);
-
-		if ( enabledControls.indexOf( 'link' ) !== -1 ) {
-			toolbarControls.push( {
-				icon: 'admin-links',
-				title: __( 'Link' ),
-				onClick: this.addLink,
-				isActive: isAddingLink || !! formats.link,
-			} );
-		}
 
 		return (
 			<div className="blocks-format-toolbar">
