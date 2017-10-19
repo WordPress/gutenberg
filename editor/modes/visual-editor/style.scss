@@ -342,6 +342,7 @@
 		line-height: $editor-line-height;
 		cursor: text;
 		left: -1px;
+		max-width: none;	// fixes a bleed issue from the admin
 
 		&:hover {
 			outline: 1px solid $light-gray-500;
