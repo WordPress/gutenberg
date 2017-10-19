@@ -33,6 +33,11 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
  	    }
  	}
 
+	/**
+	 * Fetches the factory object for generating WordPress fixtures.
+	 *
+	 * @return WP_UnitTest_Factory The fixture factory.
+	 */
 	protected static function factory() {
 		static $factory = null;
 		if ( ! $factory ) {
