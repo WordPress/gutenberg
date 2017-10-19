@@ -15,7 +15,7 @@ import { Autocomplete, PanelBody } from '@wordpress/components';
  */
 import './style.scss';
 import { registerBlockType, createBlock, source, setDefaultBlockName } from '../../api';
-import { blockAutocompleter, userAutocompleter } from '../../autocompleters';
+import { blockAutocompleter, userAutocompleter, hashtagAutocompleter } from '../../autocompleters';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import BlockControls from '../../block-controls';
@@ -155,6 +155,7 @@ registerBlockType( 'core/paragraph', {
 			<Autocomplete key="editable" completers={ [
 				blockAutocompleter( { onReplace } ),
 				userAutocompleter(),
+				hashtagAutocompleter(),
 			] }>
 				<Editable
 					tagName="p"
