@@ -83,6 +83,16 @@ export function isEditorSidebarOpened( state ) {
 }
 
 /**
+ * Returns true if the editor extended settings panel is open, or false otherwise.
+ *
+ * @param  {Object}  state Global application state
+ * @return {Boolean}       Whether this panel is open
+ */
+export function isEditorExtendedSettingsOpened( state ) {
+	return getPreference( state, 'isExtendedSettingsOpened' );
+}
+
+/**
  * Returns true if the editor sidebar panel is open, or false otherwise.
  *
  * @param  {Object}  state Global application state

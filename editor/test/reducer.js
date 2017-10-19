@@ -864,7 +864,7 @@ describe( 'state', () => {
 		it( 'should apply all defaults', () => {
 			const state = preferences( undefined, {} );
 
-			expect( state ).toEqual( { blockUsage: {}, recentlyUsedBlocks: [], mode: 'visual', isSidebarOpened: true, panels: { 'post-status': true } } );
+			expect( state ).toEqual( { blockUsage: {}, recentlyUsedBlocks: [], mode: 'visual', isSidebarOpened: true, isExtendedSettingsOpened: true, panels: { 'post-status': true } } );
 		} );
 
 		it( 'should toggle the sidebar open flag', () => {
@@ -873,6 +873,14 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( { isSidebarOpened: true } );
+		} );
+
+		it( 'should toggle the extended settings open flag', () => {
+			const state = preferences( deepFreeze( { isExtendedSettingsOpened: false } ), {
+				type: 'TOGGLE_EXTENDED_SETTINGS',
+			} );
+
+			expect( state ).toEqual( { isExtendedSettingsOpened: true } );
 		} );
 
 		it( 'should set the sidebar panel open flag to true if unset', () => {
@@ -891,6 +899,24 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( { isSidebarOpened: false, panels: { 'post-taxonomies': false } } );
+		} );
+
+		it( 'should set the extended settings panel open flag to true if unset', () => {
+			const state = preferences( deepFreeze( { isExtendedSettingsOpened: false } ), {
+				type: 'TOGGLE_EXTENDED_SETTINGS_PANEL',
+				panel: 'post-taxonomies',
+			} );
+
+			expect( state ).toEqual( { isExtendedSettingsOpened: false, panels: { 'post-taxonomies': true } } );
+		} );
+
+		it( 'should toggle the extended settings panel open flag', () => {
+			const state = preferences( deepFreeze( { isExtendedSettingsOpened: false, panels: { 'post-taxonomies': true } } ), {
+				type: 'TOGGLE_EXTENDED_SETTINGS_PANEL',
+				panel: 'post-taxonomies',
+			} );
+
+			expect( state ).toEqual( { isExtendedSettingsOpened: false, panels: { 'post-taxonomies': false } } );
 		} );
 
 		it( 'should return switched mode', () => {

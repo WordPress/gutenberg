@@ -342,6 +342,17 @@ export function toggleSidebar() {
 }
 
 /**
+ * Returns an action object used in signalling that the user toggled the extended settings
+ *
+ * @return {Object}         Action object
+ */
+export function toggleExtendedSettings() {
+	return {
+		type: 'TOGGLE_EXTENDED_SETTINGS',
+	};
+}
+
+/**
  * Returns an action object used in signalling that the user switched the active sidebar tab panel
  *
  * @param  {String} panel   The panel name
