@@ -2,6 +2,8 @@
 build
 coverage
 cypress/videos
+cypress/screenshots
+cypress/fixtures
 node_modules
 gutenberg.zip
 
