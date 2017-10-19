@@ -11,6 +11,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Renders a partial page of meta boxes.
+ * 
+ * @since 1.5.0
  *
  * @param string $post_type Current post type.
  * @param string $meta_box_context  The context location of the meta box. Referred to as context in core.
@@ -134,6 +136,8 @@ add_action( 'do_meta_boxes', 'gutenberg_meta_box_partial_page', 1000, 2 );
  * The partial page needs to imitate aspects of admin-header.php.
  *
  * See wp-admin/admin-header.php at around line 70.
+ * 
+ * @since 1.5.0
  *
  * @param string    $hook_suffix    Page hook suffix.
  * @param WP_Screen $current_screen Current screen object.
@@ -328,6 +332,8 @@ function gutenberg_meta_box_partial_page_admin_header( $hook_suffix, $current_sc
  * This matches the portion of creating a form found in edit-form-advanced.php.
  *
  * Code starts roughly around line 500.
+ * 
+ * @since 1.5.0
  *
  * @param WP_Post $post     Current post object.
  * @param string  $location Metabox location: one of 'normal', 'advanced', 'side'.
@@ -418,6 +424,8 @@ function gutenberg_meta_box_partial_page_post_form( $post, $location ) {
 
 /**
  * This matches the portion of creating a form found in edit-form-advanced.php.
+ * 
+ * @since 1.5.0
  *
  * @param string $hook_suffix The hook suffix of the current page.
  */
@@ -487,6 +495,8 @@ function gutenberg_meta_box_partial_page_admin_footer( $hook_suffix ) {
 /**
  * Allows the meta box endpoint to correctly redirect to the meta box endpoint
  * when a post is saved.
+ * 
+ * @since 1.5.0
  *
  * @param string $location The location of the meta box, 'side', 'normal'.
  * @param int    $post_id  Post ID.
@@ -516,6 +526,8 @@ add_filter( 'redirect_post_location', 'gutenberg_meta_box_save_redirect', 10, 2 
 
 /**
  * Filter out core meta boxes as well as the post thumbnail.
+ * 
+ * @since 1.5.0
  *
  * @param array $meta_boxes Meta box data.
  */
@@ -568,6 +580,8 @@ function gutenberg_filter_meta_boxes( $meta_boxes ) {
 
 /**
  * Check whether a meta box is empty.
+ * 
+ * @since 1.5.0
  *
  * @param array  $meta_boxes Meta box data.
  * @param string $context    Location of meta box, one of side, advanced, normal.

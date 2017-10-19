@@ -12,6 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Set up global variables so that plugins will add meta boxes as if we were
  * using the main editor.
+ * 
+ * @since 1.5.0
  */
 function gutenberg_trick_plugins_into_registering_meta_boxes() {
 	global $pagenow;
@@ -32,6 +34,8 @@ add_action(
  *
  * This is used to tell React and Redux whether the meta box location has
  * meta boxes.
+ * 
+ * @since 1.5.0
  */
 function gutenberg_collect_meta_box_data() {
 	global $_gutenberg_restore_globals_after_meta_boxes, $current_screen, $wp_meta_boxes, $post, $typenow;
