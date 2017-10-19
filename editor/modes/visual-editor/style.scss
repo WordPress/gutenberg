@@ -74,6 +74,7 @@
 		background-color: rgba( $white, 0.6 );
 	}
 
+	// simpler style for a block that has cursor focus (but hasn't been selected)
 	&.is-selected .editor-block-mover:before,
 	&.is-hovered .editor-block-mover:before,
 	&.is-selected .editor-block-settings-menu:before,
@@ -227,12 +228,13 @@
 		@include break-wide() {
 			.editor-block-mover {
 				display: block;
-			}
-
-			.editor-block-mover {
 				top: -30px;
 				left: 10px;
 				height: auto;
+
+				&:before {
+					content: none;
+				}
 			}
 
 			.editor-block-mover__control {
@@ -250,6 +252,10 @@
 			top: -30px;
 			right: 10px;
 			height: auto;
+
+			&:before {
+				content: none;
+			}
 		}
 	}
 
@@ -288,6 +294,29 @@
 			background: none;
 			border-bottom: 3px solid $blue-medium-500;
 		}
+	}
+}
+
+// show a separate cursor/caret highlight style for when an item was selected by the mouse or keyboard (but isn't multi selected)
+// this is only for some blocks
+.editor-visual-editor__block.is-selected[data-type="core/more"],
+.editor-visual-editor__block.is-selected[data-type="core/separator"],
+.editor-visual-editor__block.is-selected[data-type="core/button"] {
+	&:after {
+		content: '';
+		position: absolute;
+		pointer-events: none;
+		top: $block-padding;
+		bottom: $block-padding;
+		left: $block-padding + $block-mover-padding-visible;
+		right: $block-padding + $block-mover-padding-visible;
+		background: Highlight;
+		opacity: .15;
+	}
+
+	&[data-align="full"]:after {
+		left: 0;
+		right: 0;
 	}
 }
 
