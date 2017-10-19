@@ -70,12 +70,12 @@
 		margin: 1.5em 0;
 	}
 
-	ul.components-toolbar {
+	div.components-toolbar {
 		box-shadow: none;
 		margin-bottom: 1.5em;
 	}
 
-	p + ul.components-toolbar {
+	p + div.components-toolbar {
 		margin-top: -1em;
 	}
 }

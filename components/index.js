@@ -14,6 +14,7 @@ export { default as FormToggle } from './form-toggle';
 export { default as FormTokenField } from './form-token-field';
 export { default as IconButton } from './icon-button';
 export { default as KeyboardShortcuts } from './keyboard-shortcuts';
+export { default as NavigableMenu } from './navigable-menu';
 export { default as Notice } from './notice';
 export { default as NoticeList } from './notice/list';
 export { default as Panel } from './panel';
@@ -22,12 +23,12 @@ export { default as PanelHeader } from './panel/header';
 export { default as PanelRow } from './panel/row';
 export { default as Placeholder } from './placeholder';
 export { default as Popover } from './popover';
-export { default as PopoverProvider } from './popover/provider';
 export { default as ResponsiveWrapper } from './responsive-wrapper';
 export { default as SandBox } from './sandbox';
 export { default as Spinner } from './spinner';
 export { default as Toolbar } from './toolbar';
 export { default as Tooltip } from './tooltip';
+export { Slot, Fill, Provider as SlotFillProvider } from './slot-fill';
 
 // Higher-Order Components
 export { default as withAPIData } from './higher-order/with-api-data';

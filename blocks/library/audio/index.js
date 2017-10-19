@@ -94,18 +94,16 @@ registerBlockType( 'core/audio', {
 						onChange={ updateAlignment }
 					/>
 					<Toolbar>
-						<li>
-							<Button
-								buttonProps={ {
-									className: 'components-icon-button components-toolbar__control',
-									'aria-label': __( 'Edit audio' ),
-								} }
-								type="audio"
-								onClick={ switchToEditing }
-							>
-								<Dashicon icon="edit" />
-							</Button>
-						</li>
+						<Button
+							buttonProps={ {
+								className: 'components-icon-button components-toolbar__control',
+								'aria-label': __( 'Edit audio' ),
+							} }
+							type="audio"
+							onClick={ switchToEditing }
+						>
+							<Dashicon icon="edit" />
+						</Button>
 					</Toolbar>
 				</BlockControls>
 			);

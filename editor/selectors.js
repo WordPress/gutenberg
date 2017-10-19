@@ -13,6 +13,7 @@ import {
 	values,
 	keys,
 	without,
+	compact,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -37,6 +38,55 @@ const MAX_FREQUENT_BLOCKS = 3;
 export function getEditorMode( state ) {
 	return getPreference( state, 'mode', 'visual' );
 }
+
+/**
+ * Returns the state of legacy meta boxes.
+ *
+ * @param  {Object}  state Global application state
+ * @return {Object}        State of meta boxes
+ */
+export function getMetaBoxes( state ) {
+	return state.metaBoxes;
+}
+
+/**
+ * Returns the state of legacy meta boxes.
+ *
+ * @param  {Object} state    Global application state
+ * @param  {String} location Location of the meta box.
+ * @return {Object}          State of meta box at specified location.
+ */
+export function getMetaBox( state, location ) {
+	return getMetaBoxes( state )[ location ];
+}
+
+/**
+ * Returns a list of dirty meta box locations.
+ *
+ * @param  {Object} state Global application state
+ * @return {Array}        Array of locations for dirty meta boxes.
+ */
+export const getDirtyMetaBoxes = createSelector(
+	( state ) => {
+		return reduce( getMetaBoxes( state ), ( result, metaBox, location ) => {
+			return metaBox.isDirty && metaBox.isActive
+				? [ ...result, location ]
+				: result;
+		}, [] );
+	},
+	( state ) => state.metaBoxes,
+);
+
+/**
+ * Returns the dirty state of legacy meta boxes.
+ *
+ * Checks whether the entire meta box state is dirty. So if a sidebar is dirty,
+ * but a normal area is not dirty, this will overall return dirty.
+ *
+ * @param  {Object}  state Global application state
+ * @return {Boolean}       Whether state is dirty. True if dirty, false if not.
+ */
+export const isMetaBoxStateDirty = ( state ) => getDirtyMetaBoxes( state ).length > 0;
 
 /**
  * Returns the current active panel for the sidebar.
@@ -144,6 +194,10 @@ export const isEditedPostDirty = createSelector(
 			return true;
 		}
 
+		if ( isMetaBoxStateDirty( state ) ) {
+			return true;
+		}
+
 		// This is a cheaper operation that still must occur after checking
 		// attributes, because a post initialized with attributes different
 		// from its saved copy should be considered dirty.
@@ -168,6 +222,7 @@ export const isEditedPostDirty = createSelector(
 	( state ) => [
 		state.editor,
 		state.currentPost,
+		state.metaBoxes,
 	]
 );
 
@@ -309,7 +364,10 @@ export function isEditedPostSaveable( state ) {
  */
 export function isEditedPostBeingScheduled( state ) {
 	const date = getEditedPostAttribute( state, 'date' );
-	return moment( date ).isAfter( moment() );
+	// Adding 1 minute as an error threshold between the server and the client dates.
+	const now = moment().add( 1, 'minute' );
+
+	return moment( date ).isAfter( now );
 }
 
 /**
@@ -736,7 +794,7 @@ export function getBlockFocus( state, uid ) {
  * @return {Boolean}      True if multi-selecting, false if not.
  */
 export function isMultiSelecting( state ) {
-	return !! state.blockSelection.isMultiSelecting;
+	return state.blockSelection.isMultiSelecting;
 }
 
 /**
@@ -772,6 +830,11 @@ export function getBlockInsertionPoint( state ) {
 		return state.editor.blockOrder.length;
 	}
 
+	const position = getBlockSiblingInserterPosition( state );
+	if ( null !== position ) {
+		return position;
+	}
+
 	const lastMultiSelectedBlock = getLastMultiSelectedBlockUid( state );
 	if ( lastMultiSelectedBlock ) {
 		return getBlockIndex( state, lastMultiSelectedBlock ) + 1;
@@ -786,13 +849,29 @@ export function getBlockInsertionPoint( state ) {
 }
 
 /**
+ * Returns the position at which the block inserter will insert a new adjacent
+ * sibling block, or null if the inserter is not actively visible.
+ *
+ * @param  {Object}  state Global application state
+ * @return {?Number}       Whether the inserter is currently visible
+ */
+export function getBlockSiblingInserterPosition( state ) {
+	const { position } = state.blockInsertionPoint;
+	if ( ! Number.isInteger( position ) ) {
+		return null;
+	}
+
+	return position;
+}
+
+/**
  * Returns true if we should show the block insertion point
  *
  * @param  {Object}  state Global application state
  * @return {?Boolean}      Whether the insertion point is visible or not
  */
 export function isBlockInsertionPointVisible( state ) {
-	return state.showInsertionPoint;
+	return !! state.blockInsertionPoint.visible;
 }
 
 /**
@@ -897,7 +976,7 @@ export function getNotices( state ) {
  */
 export function getRecentlyUsedBlocks( state ) {
 	// resolves the block names in the state to the block type settings
-	return state.preferences.recentlyUsedBlocks.map( blockType => getBlockType( blockType ) );
+	return compact( state.preferences.recentlyUsedBlocks.map( blockType => getBlockType( blockType ) ) );
 }
 
 /**
@@ -913,9 +992,10 @@ export const getMostFrequentlyUsedBlocks = createSelector(
 		const { blockUsage } = state.preferences;
 		const orderedByUsage = keys( blockUsage ).sort( ( a, b ) => blockUsage[ b ] - blockUsage[ a ] );
 		// add in paragraph and image blocks if they're not already in the usage data
-		return [ ...orderedByUsage, ...without( [ 'core/paragraph', 'core/image' ], ...orderedByUsage ) ]
-			.slice( 0, MAX_FREQUENT_BLOCKS )
-			.map( blockType => getBlockType( blockType ) );
+		return compact(
+				[ ...orderedByUsage, ...without( [ 'core/paragraph', 'core/image' ], ...orderedByUsage ) ]
+					.map( blockType => getBlockType( blockType ) )
+			).slice( 0, MAX_FREQUENT_BLOCKS );
 	},
 	( state ) => state.preferences.blockUsage
 );

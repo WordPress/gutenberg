@@ -14,7 +14,7 @@ import { IconButton } from '@wordpress/components';
  */
 import './style.scss';
 import SavedState from './saved-state';
-import PublishButton from './publish-button';
+import PublishWithDropdown from './publish-with-dropdown';
 import PreviewButton from './preview-button';
 import ModeSwitcher from './mode-switcher';
 import Inserter from '../inserter';
@@ -51,7 +51,7 @@ function Header( {
 			<div className="editor-header__settings">
 				<SavedState />
 				<PreviewButton />
-				<PublishButton />
+				<PublishWithDropdown />
 				<IconButton
 					icon="admin-generic"
 					onClick={ onToggleSidebar }

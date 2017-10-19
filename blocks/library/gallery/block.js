@@ -123,21 +123,19 @@ class GalleryBlock extends Component {
 					/>
 					{ !! images.length && (
 						<Toolbar>
-							<li>
-								<MediaUploadButton
-									buttonProps={ {
-										className: 'components-icon-button components-toolbar__control',
-										'aria-label': __( 'Edit Gallery' ),
-									} }
-									onSelect={ this.onSelectImages }
-									type="image"
-									multiple
-									gallery
-									value={ images.map( ( img ) => img.id ) }
-								>
-									<Dashicon icon="edit" />
-								</MediaUploadButton>
-							</li>
+							<MediaUploadButton
+								buttonProps={ {
+									className: 'components-icon-button components-toolbar__control',
+									'aria-label': __( 'Edit Gallery' ),
+								} }
+								onSelect={ this.onSelectImages }
+								type="image"
+								multiple
+								gallery
+								value={ images.map( ( img ) => img.id ) }
+							>
+								<Dashicon icon="edit" />
+							</MediaUploadButton>
 						</Toolbar>
 					) }
 				</BlockControls>

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton } from '@wordpress/components';
+import { IconButton, PanelBody } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -48,6 +48,9 @@ registerBlockType( 'core/button', {
 		color: {
 			type: 'string',
 		},
+		textColor: {
+			type: 'string',
+		},
 	},
 
 	getEditWrapperProps( attributes ) {
@@ -66,7 +69,7 @@ registerBlockType( 'core/button', {
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus, className } ) {
-		const { text, url, title, align, color, clear } = attributes;
+		const { text, url, title, align, color, textColor, clear } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		const toggleClear = () => setAttributes( { clear: ! clear } );
 
@@ -85,6 +88,9 @@ registerBlockType( 'core/button', {
 					onFocus={ setFocus }
 					onChange={ ( value ) => setAttributes( { text: value } ) }
 					formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
+					style={ {
+						color: textColor,
+					} }
 					keepPlaceholderOnFocus
 				/>
 				{ focus &&
@@ -109,16 +115,18 @@ registerBlockType( 'core/button', {
 							checked={ !! clear }
 							onChange={ toggleClear }
 						/>
-
-						<ColorPalette
-							value={ color }
-							onChange={ ( colorValue ) => setAttributes( { color: colorValue } ) }
-						/>
-						<InspectorControls.TextControl
-							label={ __( 'Hex Color' ) }
-							value={ color || '' }
-							onChange={ ( value ) => setAttributes( { color: value } ) }
-						/>
+						<PanelBody title={ __( 'Button Background Color' ) }>
+							<ColorPalette
+								value={ color }
+								onChange={ ( colorValue ) => setAttributes( { color: colorValue } ) }
+							/>
+						</PanelBody>
+						<PanelBody title={ __( 'Button Text Color' ) }>
+							<ColorPalette
+								value={ textColor }
+								onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
+							/>
+						</PanelBody>
 					</InspectorControls>
 				}
 			</span>,
@@ -126,11 +134,11 @@ registerBlockType( 'core/button', {
 	},
 
 	save( { attributes } ) {
-		const { url, text, title, align, color } = attributes;
+		const { url, text, title, align, color, textColor } = attributes;
 
 		return (
 			<div className={ `align${ align }` } style={ { backgroundColor: color } }>
-				<a href={ url } title={ title }>
+				<a href={ url } title={ title } style={ { color: textColor } }>
 					{ text }
 				</a>
 			</div>

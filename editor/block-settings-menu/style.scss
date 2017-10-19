@@ -13,16 +13,28 @@
 	}
 }
 
+.editor-block-settings-menu__popover {
+	z-index: z-index( '.editor-block-settings-menu__popover' );
+
+	&:before,
+	&:after {
+		margin-left: 2px;
+	}
+
+	.components-popover__content {
+		width: 182px;
+	}
+}
+
 .editor-block-settings-menu__content {
-	margin-top: 8px;
-	z-index: z-index( '.editor-block-settings-menu__content' );
+	width: 100%;
 }
 
 .editor-block-settings-menu__toggle {
+	padding: 0;
 	transform: rotate( 90deg );
 	transition-duration: 0.3s;
 	transition-property: transform;
-	z-index: z-index( '.editor-block-settings-menu__toggle' );
 
 	&.is-opened {
 		transform: rotate( 0 );
@@ -30,32 +42,25 @@
 }
 
 .editor-block-settings-menu__control {
-	display: block;
-	padding: 0;
-	border: none;
-	outline: none;
+	width: 100%;
+	justify-content: flex-start;
+	padding: 8px;
 	background: none;
-	color: $dark-gray-300;
+	outline: none;
+	border-radius: 0;
+	color: $dark-gray-500;
 	cursor: pointer;
-	width: 20px;
-	height: 20px;
-	border-radius: 50%;
+	border: 1px solid transparent;
 
-	&[aria-disabled="true"] {
-		cursor: default;
-		color: $light-gray-300;
-		pointer-events: none;
+	&:hover,
+	&:focus,
+	&:not(:disabled):hover {
+		box-shadow: none;
+		color: $dark-gray-500;
+		border: 1px solid $dark-gray-500;
 	}
 
 	.dashicon {
-		display: block;
-	}
-
-	.editor-block-settings-menu__content & {
-		margin-bottom: 8px;
-	}
-
-	.editor-block-settings-menu__content &:last-child {
-		margin-bottom: 0;
+		margin-right: 5px;
 	}
 }

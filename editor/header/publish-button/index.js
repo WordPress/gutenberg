@@ -3,22 +3,21 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
-import { flowRight } from 'lodash';
+import { flowRight, noop } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { Button, withAPIData } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
+import PublishButtonLabel from './label';
 import { editPost, savePost } from '../../actions';
 import {
 	isSavingPost,
-	isCurrentPostPublished,
 	isEditedPostBeingScheduled,
 	getEditedPostVisibility,
 	isEditedPostSaveable,
@@ -27,7 +26,6 @@ import {
 
 export function PublishButton( {
 	isSaving,
-	isPublished,
 	onStatusChange,
 	onSave,
 	isBeingScheduled,
@@ -35,20 +33,10 @@ export function PublishButton( {
 	isPublishable,
 	isSaveable,
 	user,
+	onSubmit = noop,
 } ) {
 	const isButtonEnabled = user.data && ! isSaving && isPublishable && isSaveable;
 	const isContributor = user.data && ! user.data.capabilities.publish_posts;
-
-	let buttonText;
-	if ( isContributor ) {
-		buttonText = __( 'Submit for Review' );
-	} else if ( isPublished ) {
-		buttonText = __( 'Update' );
-	} else if ( isBeingScheduled ) {
-		buttonText = __( 'Schedule' );
-	} else {
-		buttonText = __( 'Publish' );
-	}
 
 	let publishStatus;
 	if ( isContributor ) {
@@ -66,6 +54,7 @@ export function PublishButton( {
 	} );
 
 	const onClick = () => {
+		onSubmit();
 		onStatusChange( publishStatus );
 		onSave();
 	};
@@ -78,7 +67,7 @@ export function PublishButton( {
 			disabled={ ! isButtonEnabled }
 			className={ className }
 		>
-			{ buttonText }
+			<PublishButtonLabel />
 		</Button>
 	);
 }
@@ -86,7 +75,6 @@ export function PublishButton( {
 const applyConnect = connect(
 	( state ) => ( {
 		isSaving: isSavingPost( state ),
-		isPublished: isCurrentPostPublished( state ),
 		isBeingScheduled: isEditedPostBeingScheduled( state ),
 		visibility: getEditedPostVisibility( state ),
 		isSaveable: isEditedPostSaveable( state ),

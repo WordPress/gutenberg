@@ -36,7 +36,6 @@
     "react-dom": "15.6.1",
     "react-redux": "5.0.6",
     "react-resizable-box": "2.0.6",
-    "react-slot-fill": "1.0.1",
     "react-transition-group": "1.2.0",
     "redux": "3.7.2",
     "redux-multi": "0.1.12",
@@ -84,25 +83,14 @@
     "react-test-renderer": "15.6.1",
     "sass-loader": "6.0.6",
     "style-loader": "0.18.2",
-    "tinymce": "4.6.5",
+    "tinymce": "4.7.1",
     "webpack": "3.6.0"
   },
   "jest": {
     "collectCoverageFrom": [
-      "blocks/**/*.js",
-      "components/**/*.js",
-      "date/**/*.js",
-      "editor/**/*.js",
-      "element/**/*.js",
-      "i18n/**/*.js",
-      "utils/**/*.js"
+      "(blocks|components|date|editor|element|i18n|utils)/**/*.js"
     ],
     "coveragePathIgnorePatterns": [
-      "<rootDir>/components/clipboard-button/index.js",
-      "<rootDir>/components/notice/index.js",
-      "<rootDir>/components/notice/list.js",
-      "<rootDir>/components/form-toggle/index.js",
-      "<rootDir>/components/form-token-field/token.js",
       "<rootDir>/[^/]+/build/index.js",
       ".*/story/[^/]+.js"
     ],
@@ -115,6 +103,7 @@
       "<rootDir>"
     ],
     "setupFiles": [
+      "<rootDir>/test/setup-console.js",
       "<rootDir>/test/setup-globals.js",
       "<rootDir>/test/setup-wp-aliases.js"
     ],

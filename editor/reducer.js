@@ -306,13 +306,14 @@ export function isTyping( state = false, action ) {
  * @param  {Object} action Dispatched action
  * @return {Object}        Updated state
  */
-export function blockSelection( state = { start: null, end: null, focus: null }, action ) {
+export function blockSelection( state = { start: null, end: null, focus: null, isMultiSelecting: false }, action ) {
 	switch ( action.type ) {
 		case 'CLEAR_SELECTED_BLOCK':
 			return {
 				start: null,
 				end: null,
 				focus: null,
+				isMultiSelecting: false,
 			};
 		case 'START_MULTI_SELECT':
 			return {
@@ -320,24 +321,29 @@ export function blockSelection( state = { start: null, end: null, focus: null },
 				isMultiSelecting: true,
 			};
 		case 'STOP_MULTI_SELECT':
-			return omit( state, 'isMultiSelecting' );
+			return {
+				...state,
+				isMultiSelecting: false,
+			};
 		case 'MULTI_SELECT':
 			return {
+				...state,
 				start: action.start,
 				end: action.end,
-				focus: state.focus,
 			};
 		case 'SELECT_BLOCK':
 			if ( action.uid === state.start && action.uid === state.end ) {
 				return state;
 			}
 			return {
+				...state,
 				start: action.uid,
 				end: action.uid,
 				focus: action.focus || {},
 			};
 		case 'UPDATE_FOCUS':
 			return {
+				...state,
 				start: action.uid,
 				end: action.uid,
 				focus: action.config || {},
@@ -347,6 +353,7 @@ export function blockSelection( state = { start: null, end: null, focus: null },
 				start: action.blocks[ 0 ].uid,
 				end: action.blocks[ 0 ].uid,
 				focus: {},
+				isMultiSelecting: false,
 			};
 		case 'REPLACE_BLOCKS':
 			if ( ! action.blocks || ! action.blocks.length || action.uids.indexOf( state.start ) === -1 ) {
@@ -356,6 +363,7 @@ export function blockSelection( state = { start: null, end: null, focus: null },
 				start: action.blocks[ 0 ].uid,
 				end: action.blocks[ 0 ].uid,
 				focus: {},
+				isMultiSelecting: false,
 			};
 	}
 
@@ -407,12 +415,20 @@ export function blocksMode( state = {}, action ) {
  * @param  {Object} action Dispatched action
  * @return {Object}        Updated state
  */
-export function showInsertionPoint( state = false, action ) {
+export function blockInsertionPoint( state = {}, action ) {
 	switch ( action.type ) {
+		case 'SET_BLOCK_INSERTION_POINT':
+			const { position } = action;
+			return { ...state, position };
+
+		case 'CLEAR_BLOCK_INSERTION_POINT':
+			return { ...state, position: null };
+
 		case 'SHOW_INSERTION_POINT':
-			return true;
+			return { ...state, visible: true };
+
 		case 'HIDE_INSERTION_POINT':
-			return false;
+			return { ...state, visible: false };
 	}
 
 	return state;
@@ -546,6 +562,63 @@ export function notices( state = {}, action ) {
 	return state;
 }
 
+const locations = [
+	'advanced',
+	'normal',
+	'side',
+];
+
+const defaultMetaBoxState = locations.reduce( ( result, key ) => {
+	result[ key ] = {
+		isActive: false,
+		isDirty: false,
+		isUpdating: false,
+	};
+
+	return result;
+}, {} );
+
+export function metaBoxes( state = defaultMetaBoxState, action ) {
+	switch ( action.type ) {
+		case 'INITIALIZE_META_BOX_STATE':
+			return locations.reduce( ( newState, location ) => {
+				newState[ location ] = {
+					...state[ location ],
+					isActive: action.metaBoxes[ location ],
+				};
+				return newState;
+			}, { ...state } );
+		case 'HANDLE_META_BOX_RELOAD':
+			return {
+				...state,
+				[ action.location ]: {
+					...state[ action.location ],
+					isUpdating: false,
+					isDirty: false,
+				},
+			};
+		case 'REQUEST_META_BOX_UPDATES':
+			return action.locations.reduce( ( newState, location ) => {
+				newState[ location ] = {
+					...state[ location ],
+					isUpdating: true,
+					isDirty: false,
+				};
+				return newState;
+			}, { ...state } );
+		case 'META_BOX_STATE_CHANGED':
+			return {
+				...state,
+				[ action.location ]: {
+					...state[ action.location ],
+					isDirty: action.hasChanged,
+				},
+			};
+		default:
+			return state;
+	}
+}
+
 export default optimist( combineReducers( {
 	editor,
 	currentPost,
@@ -553,9 +626,10 @@ export default optimist( combineReducers( {
 	blockSelection,
 	hoveredBlock,
 	blocksMode,
-	showInsertionPoint,
+	blockInsertionPoint,
 	preferences,
 	panel,
 	saving,
 	notices,
+	metaBoxes,
 } ) );

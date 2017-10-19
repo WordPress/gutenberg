@@ -15,19 +15,17 @@ import { serialize, getDefaultBlockName, createBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import VisualEditorBlock from './block';
+import VisualEditorSiblingInserter from './sibling-inserter';
 import BlockDropZone from './block-drop-zone';
 import {
 	getBlockUids,
-	getBlockInsertionPoint,
-	isBlockInsertionPointVisible,
 	getMultiSelectedBlocksStartUid,
 	getMultiSelectedBlocksEndUid,
 	getMultiSelectedBlocks,
 	getMultiSelectedBlockUids,
+	getSelectedBlock,
 } from '../../selectors';
-import { insertBlock, startMultiSelect, stopMultiSelect, multiSelect } from '../../actions';
-
-const INSERTION_POINT_PLACEHOLDER = '[[insertion-point]]';
+import { insertBlock, startMultiSelect, stopMultiSelect, multiSelect, selectBlock } from '../../actions';
 
 class VisualEditorBlockList extends Component {
 	constructor( props ) {
@@ -36,6 +34,7 @@ class VisualEditorBlockList extends Component {
 		this.onSelectionStart = this.onSelectionStart.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.onSelectionEnd = this.onSelectionEnd.bind( this );
+		this.onShiftSelection = this.onShiftSelection.bind( this );
 		this.onCopy = this.onCopy.bind( this );
 		this.onCut = this.onCut.bind( this );
 		this.setBlockRef = this.setBlockRef.bind( this );
@@ -175,47 +174,42 @@ class VisualEditorBlockList extends Component {
 		this.props.onStopMultiSelect();
 	}
 
+	onShiftSelection( uid ) {
+		const { selectedBlock, selectionStart, onMultiSelect, onSelect } = this.props;
+
+		if ( selectedBlock ) {
+			onMultiSelect( selectedBlock.uid, uid );
+		} else if ( selectionStart ) {
+			onMultiSelect( selectionStart, uid );
+		} else {
+			onSelect( uid );
+		}
+	}
+
 	appendDefaultBlock() {
 		const newBlock = createBlock( getDefaultBlockName() );
 		this.props.onInsertBlock( newBlock );
 	}
 
 	render() {
-		const {
-			blocks,
-			showInsertionPoint,
-			insertionPoint,
-		} = this.props;
-
-		const blocksWithInsertionPoint = showInsertionPoint
-			? [
-				...blocks.slice( 0, insertionPoint ),
-				INSERTION_POINT_PLACEHOLDER,
-				...blocks.slice( insertionPoint ),
-			]
-			: blocks;
+		const { blocks } = this.props;
 
 		return (
 			<div>
-				{ !! blocks.length && blocksWithInsertionPoint.map( ( uid ) => {
-					if ( uid === INSERTION_POINT_PLACEHOLDER ) {
-						return (
-							<div
-								key={ INSERTION_POINT_PLACEHOLDER }
-								className="editor-visual-editor__insertion-point"
-							/>
-						);
-					}
-
-					return (
-						<VisualEditorBlock
-							key={ uid }
-							uid={ uid }
-							blockRef={ ( ref ) => this.setBlockRef( ref, uid ) }
-							onSelectionStart={ () => this.onSelectionStart( uid ) }
-						/>
-					);
-				} ) }
+				{ !! blocks.length && <VisualEditorSiblingInserter insertIndex={ 0 } /> }
+				{ blocks.reduce( ( result, uid, index ) => result.concat(
+					<VisualEditorBlock
+						key={ 'block-' + uid }
+						uid={ uid }
+						blockRef={ ( ref ) => this.setBlockRef( ref, uid ) }
+						onSelectionStart={ this.onSelectionStart }
+						onShiftSelection={ this.onShiftSelection }
+					/>,
+					<VisualEditorSiblingInserter
+						key={ 'sibling-inserter-' + uid }
+						insertIndex={ index + 1 }
+					/>,
+				), [] ) }
 				{ ! blocks.length &&
 					<div className="editor-visual-editor__placeholder">
 						<BlockDropZone />
@@ -237,12 +231,11 @@ class VisualEditorBlockList extends Component {
 export default connect(
 	( state ) => ( {
 		blocks: getBlockUids( state ),
-		insertionPoint: getBlockInsertionPoint( state ),
-		showInsertionPoint: isBlockInsertionPointVisible( state ),
 		selectionStart: getMultiSelectedBlocksStartUid( state ),
 		selectionEnd: getMultiSelectedBlocksEndUid( state ),
 		multiSelectedBlocks: getMultiSelectedBlocks( state ),
 		multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
+		selectedBlock: getSelectedBlock( state ),
 	} ),
 	( dispatch ) => ( {
 		onInsertBlock( block ) {
@@ -256,6 +249,9 @@ export default connect(
 		},
 		onMultiSelect( start, end ) {
 			dispatch( multiSelect( start, end ) );
+		},
+		onSelect( uid ) {
+			dispatch( selectBlock( uid ) );
 		},
 		onRemove( uids ) {
 			dispatch( { type: 'REMOVE_BLOCKS', uids } );

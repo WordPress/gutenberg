@@ -4,11 +4,11 @@
 	left: 50%;
 
 	&:before {
-		border: 10px solid $light-gray-500;
+		border: 8px solid $light-gray-500;
 	}
 
 	&:after {
-		border: 10px solid $white;
+		border: 8px solid $white;
 	}
 
 	&:before,
@@ -25,14 +25,14 @@
 
 	&.is-top {
 		bottom: 100%;
-		margin-top: -10px;
+		margin-top: -8px;
 
 		&:before {
-			bottom: -10px;
+			bottom: -8px;
 		}
 
 		&:after {
-			bottom: -8px;
+			bottom: -6px;
 		}
 
 		&:before,
@@ -44,14 +44,14 @@
 
 	&.is-bottom {
 		top: 100%;
-		margin-top: 10px;
+		margin-top: 8px;
 
 		&:before {
-			top: -10px;
+			top: -8px;
 		}
 
 		&:after {
-			top: -8px;
+			top: -6px;
 		}
 
 		&:before,

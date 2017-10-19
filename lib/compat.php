@@ -132,7 +132,7 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_ensure_wp_api_request', 20 );
  */
 function gutenberg_disable_editor_settings_wpautop( $settings ) {
 	$post = get_post();
-	if ( is_object( $post ) && gutenberg_post_has_blocks( $post->ID ) ) {
+	if ( is_object( $post ) && gutenberg_post_has_blocks( $post ) ) {
 		$settings['wpautop'] = false;
 	}
 

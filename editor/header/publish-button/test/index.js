@@ -69,48 +69,6 @@ describe( 'PublishButton', () => {
 		} );
 	} );
 
-	describe( 'button text', () => {
-		it( 'should show publish if user unknown', () => {
-			const wrapper = shallow(
-				<PublishButton user={ {} } />
-			);
-
-			expect( wrapper.children().text() ).toBe( 'Publish' );
-		} );
-
-		it( 'should show submit for review for contributor', () => {
-			const wrapper = shallow(
-				<PublishButton user={ contributor } />
-			);
-
-			expect( wrapper.children().text() ).toBe( 'Submit for Review' );
-		} );
-
-		it( 'should show update for already published', () => {
-			const wrapper = shallow(
-				<PublishButton user={ user } isPublished />
-			);
-
-			expect( wrapper.children().text() ).toBe( 'Update' );
-		} );
-
-		it( 'should show schedule for scheduled', () => {
-			const wrapper = shallow(
-				<PublishButton user={ user } isBeingScheduled />
-			);
-
-			expect( wrapper.children().text() ).toBe( 'Schedule' );
-		} );
-
-		it( 'should show publish otherwise', () => {
-			const wrapper = shallow(
-				<PublishButton user={ user } />
-			);
-
-			expect( wrapper.children().text() ).toBe( 'Publish' );
-		} );
-	} );
-
 	describe( 'publish status', () => {
 		it( 'should be pending for contributor', () => {
 			const onStatusChange = jest.fn();

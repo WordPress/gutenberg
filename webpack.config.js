@@ -19,6 +19,11 @@ const blocksCSSPlugin = new ExtractTextPlugin( {
 	filename: './blocks/build/style.css',
 } );
 
+// CSS loader for styles specific to loading inside meta box iframes.
+const metaBoxIframeCSSPlugin = new ExtractTextPlugin( {
+	filename: './editor/build/meta-box-iframe.css',
+} );
+
 // Configuration for the ExtractTextPlugin.
 const extractConfig = {
 	use: [
@@ -84,11 +89,6 @@ const config = {
 			__dirname,
 			'node_modules',
 		],
-		alias: {
-			// There are currently resolution errors on RSF's "mitt" dependency
-			// when imported as native ES module
-			'react-slot-fill': 'react-slot-fill/lib/rsf.js',
-		},
 	},
 	module: {
 		rules: [
@@ -116,9 +116,17 @@ const config = {
 				use: editBlocksCSSPlugin.extract( extractConfig ),
 			},
 			{
+				test: /meta-box-iframe\.scss$/,
+				include: [
+					/editor/,
+				],
+				use: metaBoxIframeCSSPlugin.extract( extractConfig ),
+			},
+			{
 				test: /\.s?css$/,
 				exclude: [
 					/blocks/,
+					/meta-box-iframe/,
 				],
 				use: mainCSSExtractTextPlugin.extract( extractConfig ),
 			},
@@ -130,6 +138,7 @@ const config = {
 		} ),
 		blocksCSSPlugin,
 		editBlocksCSSPlugin,
+		metaBoxIframeCSSPlugin,
 		mainCSSExtractTextPlugin,
 		new webpack.LoaderOptionsPlugin( {
 			minimize: process.env.NODE_ENV === 'production',

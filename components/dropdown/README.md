@@ -1,5 +1,5 @@
-Popover
-=======
+Dropdown
+========
 
 Dropdown is a React component to render a button that opens a floating content modal when clicked.
 This components takes care of updating the state of the dropdown menu (opened/closed), handles closing the menu when clicking outside

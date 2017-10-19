@@ -13,7 +13,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { getGutenbergURL, getWPAdminURL } from './utils/url';
+import { getPostEditUrl, getWPAdminURL } from './utils/url';
 import {
 	resetPost,
 	setupNewPost,
@@ -25,10 +25,12 @@ import {
 	removeNotice,
 	savePost,
 	editPost,
+	requestMetaBoxUpdates,
 } from './actions';
 import {
 	getCurrentPost,
 	getCurrentPostType,
+	getDirtyMetaBoxes,
 	getEditedPostContent,
 	getPostEdits,
 	isCurrentPostPublished,
@@ -86,7 +88,7 @@ export default {
 	},
 	REQUEST_POST_UPDATE_SUCCESS( action, store ) {
 		const { previousPost, post } = action;
-		const { dispatch } = store;
+		const { dispatch, getState } = store;
 
 		const publishStatus = [ 'publish', 'private', 'future' ];
 		const isPublished = publishStatus.indexOf( previousPost.status ) !== -1;
@@ -113,13 +115,14 @@ export default {
 			) );
 		}
 
+		// Update dirty meta boxes.
+		dispatch( requestMetaBoxUpdates( getDirtyMetaBoxes( getState() ) ) );
+
 		if ( get( window.history.state, 'id' ) !== post.id ) {
 			window.history.replaceState(
 				{ id: post.id },
 				'Post ' + post.id,
-				getGutenbergURL( {
-					post_id: post.id,
-				} )
+				getPostEditUrl( post.id )
 			);
 		}
 	},

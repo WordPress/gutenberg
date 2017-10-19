@@ -262,8 +262,15 @@ class VisualEditorBlock extends Component {
 			return;
 		}
 
-		this.props.onSelectionStart();
-		this.props.onSelect();
+		if ( event.shiftKey ) {
+			if ( ! this.props.isSelected ) {
+				this.props.onShiftSelection( this.props.uid );
+				event.preventDefault();
+			}
+		} else {
+			this.props.onSelectionStart( this.props.uid );
+			this.props.onSelect();
+		}
 	}
 
 	onKeyDown( event ) {
@@ -309,7 +316,7 @@ class VisualEditorBlock extends Component {
 		const showUI = isSelected && ( ! this.props.isTyping || focus.collapsed === false );
 		const isProperlyHovered = isHovered && ! this.props.isSelecting;
 		const { error } = this.state;
-		const wrapperClassname = classnames( 'editor-visual-editor__block', {
+		const wrapperClassName = classnames( 'editor-visual-editor__block', {
 			'has-warning': ! isValid || !! error,
 			'is-selected': showUI,
 			'is-multi-selected': isMultiSelected,
@@ -336,7 +343,7 @@ class VisualEditorBlock extends Component {
 				onMouseMove={ this.maybeHover }
 				onMouseEnter={ this.maybeHover }
 				onMouseLeave={ onMouseLeave }
-				className={ wrapperClassname }
+				className={ wrapperClassName }
 				data-type={ block.name }
 				{ ...wrapperProps }
 			>

@@ -32,7 +32,7 @@ Ideally name your branches with prefixes and descriptions, like this: `[type]/[c
 
 For example, `add/gallery-block` means you're working on adding a new gallery block.
 
-You can pick among all the <a href="https://github.com/WordPress/gutenberg/issues">tickets</a>, or some of the ones labelled <a href="https://github.com/WordPress/gutenberg/labels/Good%20First%20Task">Good First Task</a>.
+You can pick among all the <a href="https://github.com/WordPress/gutenberg/issues">tickets</a>, or some of the ones labelled <a href="https://github.com/WordPress/gutenberg/labels/Good%20First%20Issue">Good First Issue</a>.
 
 ## Testing
 

@@ -7,7 +7,7 @@ import { isEqual, noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createPortal, Component } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { focus, keycodes } from '@wordpress/utils';
 
 /**
@@ -15,6 +15,7 @@ import { focus, keycodes } from '@wordpress/utils';
  */
 import './style.scss';
 import PopoverDetectOutside from './detect-outside';
+import { Slot, Fill } from '../slot-fill';
 
 const { ESCAPE } = keycodes;
 
@@ -25,7 +26,14 @@ const { ESCAPE } = keycodes;
  */
 const ARROW_OFFSET = 20;
 
-export class Popover extends Component {
+/**
+ * Name of slot in which popover should fill.
+ *
+ * @type {String}
+ */
+const SLOT_NAME = 'Popover';
+
+class Popover extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -93,7 +101,7 @@ export class Popover extends Component {
 
 		window.cancelAnimationFrame( this.rafHandle );
 		window[ handler ]( 'resize', this.throttledSetOffset );
-		window[ handler ]( 'scroll', this.throttledSetOffset );
+		window[ handler ]( 'scroll', this.throttledSetOffset, true );
 	}
 
 	focus() {
@@ -123,19 +131,18 @@ export class Popover extends Component {
 
 	setOffset() {
 		const { anchor, popover } = this.nodes;
-		const { parentNode } = anchor;
-		if ( ! parentNode ) {
+		if ( ! anchor || ! anchor.parentNode ) {
 			return;
 		}
 
-		const rect = parentNode.getBoundingClientRect();
+		const rect = anchor.parentNode.getBoundingClientRect();
 		const [ yAxis, xAxis ] = this.getPositions();
 		const isTop = 'top' === yAxis;
 		const isLeft = 'left' === xAxis;
 		const isRight = 'right' === xAxis;
 
 		// Offset top positioning by padding
-		const { paddingTop, paddingBottom } = window.getComputedStyle( parentNode );
+		const { paddingTop, paddingBottom } = window.getComputedStyle( anchor.parentNode );
 		let topOffset = parseInt( isTop ? paddingTop : paddingBottom, 10 );
 		if ( ! isTop ) {
 			topOffset *= -1;
@@ -188,6 +195,7 @@ export class Popover extends Component {
 
 		// Close on escape
 		if ( event.keyCode === ESCAPE && onClose ) {
+			event.stopPropagation();
 			onClose();
 		}
 
@@ -222,7 +230,6 @@ export class Popover extends Component {
 			return null;
 		}
 
-		const { popoverTarget = document.body } = this.context;
 		const classes = classnames(
 			'components-popover',
 			className,
@@ -234,35 +241,41 @@ export class Popover extends Component {
 		// within popover as inferring close intent.
 
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
-		return (
-			<span ref={ this.bindNode( 'anchor' ) }>
-				{ createPortal(
-					<PopoverDetectOutside onClickOutside={ onClickOutside }>
-						<div
-							ref={ this.bindNode( 'popover' ) }
-							className={ classes }
-							tabIndex="0"
-							{ ...contentProps }
-							onKeyDown={ this.maybeClose }
-						>
-							<div
-								ref={ this.bindNode( 'content' ) }
-								className="components-popover__content"
-							>
-								{ children }
-							</div>
-						</div>
-					</PopoverDetectOutside>,
-					popoverTarget
-				) }
-			</span>
+		let content = (
+			<PopoverDetectOutside onClickOutside={ onClickOutside }>
+				<div
+					ref={ this.bindNode( 'popover' ) }
+					className={ classes }
+					tabIndex="0"
+					{ ...contentProps }
+					onKeyDown={ this.maybeClose }
+				>
+					<div
+						ref={ this.bindNode( 'content' ) }
+						className="components-popover__content"
+					>
+						{ children }
+					</div>
+				</div>
+			</PopoverDetectOutside>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
+
+		// In case there is no slot context in which to render, default to an
+		// in-place rendering.
+		const { getSlot } = this.context;
+		if ( getSlot && getSlot( SLOT_NAME ) ) {
+			content = <Fill name={ SLOT_NAME }>{ content }</Fill>;
+		}
+
+		return <span ref={ this.bindNode( 'anchor' ) }>{ content }</span>;
 	}
 }
 
 Popover.contextTypes = {
-	popoverTarget: noop,
+	getSlot: noop,
 };
+
+Popover.Slot = () => <Slot name={ SLOT_NAME } />;
 
 export default Popover;
