@@ -24,7 +24,9 @@
 		"wp": true,
 		"wpApiSettings": true,
 		"window": true,
-		"document": true
+		"document": true,
+		"cy": true,
+		"Cypress": true
 	},
 	"plugins": [
 		"react",
