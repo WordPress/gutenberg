@@ -427,7 +427,7 @@ function gutenberg_replace_default_add_new_button() {
 		.split-page-title-action a,
 		.split-page-title-action a:active,
 		.split-page-title-action .expander:after {
-			padding: 4px 8px;
+			padding: 6px 10px;
 			position: relative;
 			top: -3px;
 			text-decoration: none;
@@ -452,11 +452,7 @@ function gutenberg_replace_default_add_new_button() {
 		}
 
 		.split-page-title-action a:focus,
-		.split-page-title-action .expander:focus {
-			color: #124964;
-		}
-
-		.split-page-title-action a:focus {
+		.split-page-title-action .expander:focus:after {
 			border-color: #5b9dd9;
 			box-shadow: 0 0 2px rgba( 30, 140, 190, 0.8 );
 		}
@@ -472,7 +468,7 @@ function gutenberg_replace_default_add_new_button() {
 			-webkit-font-smoothing: antialiased;
 			-moz-osx-font-smoothing: grayscale;
 			text-decoration: none !important;
-			padding: 2px 4px;
+			padding: 4px 5px 4px 3px;
 		}
 
 		.split-page-title-action .dropdown {
@@ -482,13 +478,14 @@ function gutenberg_replace_default_add_new_button() {
 		.split-page-title-action .dropdown.visible {
 			display: block;
 			position: absolute;
+			margin-top: 3px;
 		}
 
 		.split-page-title-action .dropdown.visible a {
 			display: block;
 			top: 0;
 			margin: -1px 0;
-			padding-right: 7px;
+			padding-right: 9px;
 		}
 
 	</style>
