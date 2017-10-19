@@ -28,31 +28,6 @@ add_action(
 );
 
 /**
- * Imitates the global state of a post.
- */
-function gutenberg_set_post_state() {
-	exit();
-	global $current_screen, $wp_meta_boxes, $post, $typenow;
-
-	// Depending on whether we are creating a post or editing one this may need to be different.
-	$potential_hookname = 'post';
-
-	// Set original screen to return to.
-	$GLOBALS['_gutenberg_restore_globals_after_meta_boxes']['current_screen'] = $current_screen;
-
-	// Override screen as though we are on post.php.
-	WP_Screen::get( $potential_hookname )->set_current_screen();
-
-	// If we are working with an already predetermined post.
-	if ( isset( $_REQUEST['post'] ) ) {
-		$post    = get_post( absint( $_REQUEST['post'] ) );
-		$typenow = $post->post_type;
-	} else {
-		// Eventually add handling for creating new posts of different types in Gutenberg.
-	}
-}
-
-/**
  * Collect information about meta_boxes registered for the current post.
  *
  * This is used to tell React and Redux whether the meta box location has
