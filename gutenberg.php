@@ -505,7 +505,8 @@ function gutenberg_replace_default_add_new_button() {
 			var newUrl = url.replace( /&?classic-editor/, '' );
 
 			var newbutton = '<span id="split-page-title-action" class="split-page-title-action">';
-			newbutton += '<a href="' + newUrl + '">' + button.innerText + '</a><span class="expander"></span>';
+			newbutton += '<a href="' + newUrl + '">' + button.innerText + '</a>';
+			newbutton += '<span class="expander" tabindex="0" role="button"></span>';
 			newbutton += '<span class="dropdown"><a href="' + newUrl + '">Gutenberg</a>';
 			newbutton += '<a href="' + url + '"><?php echo esc_js( __( 'Classic Editor', 'gutenberg' ) ); ?></a></span></span>';
 
@@ -514,7 +515,14 @@ function gutenberg_replace_default_add_new_button() {
 
 			var expander = document.getElementById( 'split-page-title-action' ).getElementsByClassName( 'expander' ).item( 0 );
 			expander.addEventListener( 'click', function( e ) {
+				e.preventDefault();
 				e.target.parentNode.getElementsByClassName( 'dropdown' ).item( 0 ).classList.toggle( 'visible' );
+			} );
+			expander.addEventListener( 'keydown', function( e ) {
+				if ( 13 === e.which || 32 === e.which ) {
+					e.preventDefault();
+					e.target.parentNode.getElementsByClassName( 'dropdown' ).item( 0 ).classList.toggle( 'visible' );
+				}
 			} );
 		} );
 	</script>
