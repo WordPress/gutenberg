@@ -383,12 +383,12 @@ function gutenberg_add_edit_link( $actions, $post ) {
 /**
  * Sets the default behaviour for the "Add New" button to go to the classic editor.
  * If JavaScript is enabled, this will be replaced by a button that goes to Gutenberg.
- * 
+ *
  * @since 1.5.0
  *
  * @param string $url  The URL to modify.
  * @param string $path The path part of $url.
- * 
+ *
  * @return string The URL with the classic-editor parameter added.
  */
 function gutenberg_modify_add_new_button_url( $url, $path ) {
@@ -414,7 +414,7 @@ add_filter( 'admin_url', 'gutenberg_modify_add_new_button_url', 10, 2 );
 
 /**
  * Prints the JavaScript to replace the default "Add New" button.$_COOKIE
- * 
+ *
  * @since 1.5.0
  */
 function gutenberg_replace_default_add_new_button() {
