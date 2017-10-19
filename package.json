@@ -88,20 +88,9 @@
   },
   "jest": {
     "collectCoverageFrom": [
-      "blocks/**/*.js",
-      "components/**/*.js",
-      "date/**/*.js",
-      "editor/**/*.js",
-      "element/**/*.js",
-      "i18n/**/*.js",
-      "utils/**/*.js"
+      "(blocks|components|date|editor|element|i18n|utils)/**/*.js"
     ],
     "coveragePathIgnorePatterns": [
-      "<rootDir>/components/clipboard-button/index.js",
-      "<rootDir>/components/notice/index.js",
-      "<rootDir>/components/notice/list.js",
-      "<rootDir>/components/form-toggle/index.js",
-      "<rootDir>/components/form-token-field/token.js",
       "<rootDir>/[^/]+/build/index.js",
       ".*/story/[^/]+.js"
     ],
@@ -114,6 +103,7 @@
       "<rootDir>"
     ],
     "setupFiles": [
+      "<rootDir>/test/setup-console.js",
       "<rootDir>/test/setup-globals.js",
       "<rootDir>/test/setup-wp-aliases.js"
     ],

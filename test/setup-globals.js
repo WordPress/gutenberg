@@ -1,15 +1,3 @@
-// Turn various warnings into errors
-/* eslint-disable no-console */
-console._errorOriginal = console.error;
-console.error = ( ...args ) => {
-	const util = require( 'util' );
-	throw new Error(
-		'Warning caught via console.error: ' +
-		util.format.apply( util, args )
-	);
-};
-/* eslint-enable no-console */
-
 // These are necessary to load TinyMCE successfully
 global.URL = window.URL;
 global.window.tinyMCEPreInit = {
@@ -17,9 +5,9 @@ global.window.tinyMCEPreInit = {
 	// <script> tag where it was loaded from, which of course fails here.
 	baseURL: 'about:blank',
 };
-window.requestAnimationFrame = setTimeout;
-window.cancelAnimationFrame = clearTimeout;
-window.matchMedia = () => ( {
+global.window.requestAnimationFrame = setTimeout;
+global.window.cancelAnimationFrame = clearTimeout;
+global.window.matchMedia = () => ( {
 	matches: false,
 	addListener: () => {},
 	removeListener: () => {},
@@ -52,11 +40,6 @@ global.window._wpDateSettings = {
 		offset: '-5',
 		string: 'America/New_York',
 	},
-};
-
-global.wp = global.wp || {};
-global.wp.a11y = {
-	speak: () => {},
 };
 
 // Setup fake localStorage
