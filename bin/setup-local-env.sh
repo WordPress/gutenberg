@@ -4,8 +4,7 @@
 set -e
 
 # Change to the expected directory
-cd "$(dirname "$0")"
-cd ../docker
+cd "$(dirname "$0")/../docker"
 
 # Launch the WordPress docker
 docker-compose up -d
