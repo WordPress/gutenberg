@@ -387,7 +387,7 @@ class Autocomplete extends Component {
 				<Popover
 					isOpen={ filteredOptions.length > 0 }
 					focusOnOpen={ false }
-					onClickOutside={ () => this.reset() }
+					onClose={ () => this.reset() }
 					position="top right"
 					className={ classes }
 					range={ range }
