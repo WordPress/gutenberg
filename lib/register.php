@@ -16,17 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 function gutenberg_trick_plugins_into_registering_meta_boxes() {
 	global $pagenow;
 
-	if ( 'post.php' === $pagenow && ! isset( $_REQUEST['classic-editor'] ) ) {
-		global $hook_suffix;
-
-		$GLOBALS['_gutenberg_restore_globals_after_meta_boxes'] = array(
-			'pagenow'     => $pagenow,
-			'hook_suffix' => $hook_suffix,
-		);
-
-		$pagenow     = 'post.php';
-		$hook_suffix = 'post.php';
-
+	if ( in_array( $pagenow, array( 'post.php', 'post-new.php' ), true ) && ! isset( $_REQUEST['classic-editor'] ) ) {
 		// As early as possible, but after any plugins ( ACF ) that adds meta boxes.
 		add_action( 'admin_head', 'gutenberg_collect_meta_box_data', 99 );
 	}
