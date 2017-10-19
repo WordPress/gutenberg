@@ -883,6 +883,10 @@ Editable.defaultProps = {
 Editable.Value = ( { value } ) => valueToReact( value );
 
 function valueToReact( value ) {
+	if ( ! Array.isArray( value ) ) {
+		return value;
+	}
+
 	return value.map( ( element, i ) => {
 		if ( typeof element === 'string' ) {
 			return element;
