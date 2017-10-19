@@ -3,11 +3,16 @@
  */
 import { Component } from 'element';
 import { keycodes, focus } from '@wordpress/utils';
-
+import { find, reverse } from 'lodash';
 /**
  * Internal dependencies
  */
-import { isEdge, placeCaretAtEdge } from '../utils/dom';
+import {
+	isHorizontalEdge,
+	getVerticalEdge,
+	placeCaretAtHorizontalEdge,
+	placeCaretAtVerticalEdge,
+} from '../utils/dom';
 
 /**
  * Module Constants
@@ -20,6 +25,8 @@ class WritingFlow extends Component {
 
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
+
+		this.verticalRect = null;
 	}
 
 	bindContainer( ref ) {
@@ -37,31 +44,75 @@ class WritingFlow extends Component {
 			) );
 	}
 
-	moveFocusInContainer( target, direction = 'UP' ) {
-		const focusableNodes = this.getVisibleTabbables();
-		if ( direction === 'UP' ) {
-			focusableNodes.reverse();
+	getClosestTabbable( target, isReverse ) {
+		let focusableNodes = this.getVisibleTabbables();
+
+		if ( isReverse ) {
+			focusableNodes = reverse( focusableNodes );
 		}
 
-		const targetNode = focusableNodes
-			.slice( focusableNodes.indexOf( target ) )
-			.reduce( ( result, node ) => {
-				return result || ( node.contains( target ) ? null : node );
-			}, null );
+		focusableNodes = focusableNodes.slice( focusableNodes.indexOf( target ) );
 
-		if ( targetNode ) {
-			placeCaretAtEdge( targetNode, direction === 'DOWN' );
-		}
+		return find( focusableNodes, ( node, i, array ) => {
+			if ( node.contains( target ) ) {
+				return false;
+			}
+
+			const nextNode = array[ i + 1 ];
+
+			// Skip node if it contains a focusable node.
+			if ( nextNode && node.contains( nextNode ) ) {
+				return false;
+			}
+
+			return true;
+		} );
 	}
 
 	onKeyDown( event ) {
 		const { keyCode, target } = event;
-		const moveUp = ( keyCode === UP || keyCode === LEFT );
-		const moveDown = ( keyCode === DOWN || keyCode === RIGHT );
+		const isUp = keyCode === UP;
+		const isDown = keyCode === DOWN;
+		const isLeft = keyCode === LEFT;
+		const isRight = keyCode === RIGHT;
+		const isReverse = isUp || isLeft;
+		const isHorizontal = isLeft || isRight;
+		const isVertical = isUp || isDown;
 
-		if ( ( moveUp || moveDown ) && isEdge( target, moveUp ) ) {
+		if ( isVertical ) {
+			const { rect, isEdge } = getVerticalEdge( target, isReverse );
+
+			if ( rect && ! this.verticalRect ) {
+				this.verticalRect = rect;
+			}
+
+			if ( ! isEdge ) {
+				return;
+			}
+
+			const closestTabbable = this.getClosestTabbable( target, isReverse );
+
+			if ( ! closestTabbable ) {
+				return;
+			}
+
+			placeCaretAtVerticalEdge( closestTabbable, isReverse, this.verticalRect );
 			event.preventDefault();
-			this.moveFocusInContainer( target, moveUp ? 'UP' : 'DOWN' );
+		} else {
+			this.verticalRect = null;
+
+			if ( ! isHorizontal || ! isHorizontalEdge( target, isReverse ) ) {
+				return;
+			}
+
+			const closestTabbable = this.getClosestTabbable( target, isReverse );
+
+			if ( ! closestTabbable ) {
+				return;
+			}
+
+			placeCaretAtHorizontalEdge( closestTabbable, isReverse );
+			event.preventDefault();
 		}
 	}
 
@@ -71,7 +122,9 @@ class WritingFlow extends Component {
 		return (
 			<div
 				ref={ this.bindContainer }
-				onKeyDown={ this.onKeyDown }>
+				onKeyDown={ this.onKeyDown }
+				onMouseDown={ () => this.verticalRect = null }
+			>
 				{ children }
 			</div>
 		);
