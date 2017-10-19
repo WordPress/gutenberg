@@ -408,6 +408,71 @@ export function removeNotice( id ) {
 	};
 }
 
+/**
+ * Returns an action object used to check the state of meta boxes at a location.
+ *
+ * This should only be fired once to initialize meta box state. If a meta box
+ * area is empty, this will set the store state to indicate that React should
+ * not render the meta box area.
+ *
+ * Example: metaBoxes = { side: true, normal: false }
+ * This indicates that the sidebar has a meta box but the normal area does not.
+ *
+ * @param {Object} metaBoxes Whether meta box locations are active.
+ *
+ * @return {Object} Action object
+ */
+export function initializeMetaBoxState( metaBoxes ) {
+	return {
+		type: 'INITIALIZE_META_BOX_STATE',
+		metaBoxes,
+	};
+}
+
+/**
+ * Returns an action object used to signify that a meta box finished reloading.
+ *
+ * @param {String} location Location of meta box: 'normal', 'side'.
+ *
+ * @return {Object} Action object
+ */
+export function handleMetaBoxReload( location ) {
+	return {
+		type: 'HANDLE_META_BOX_RELOAD',
+		location,
+	};
+}
+
+/**
+ * Returns an action object used to request meta box update.
+ *
+ * @param {Array} locations Locations of meta boxes: ['normal', 'side' ].
+ *
+ * @return {Object}     Action object
+ */
+export function requestMetaBoxUpdates( locations ) {
+	return {
+		type: 'REQUEST_META_BOX_UPDATES',
+		locations,
+	};
+}
+
+/**
+ * Returns an action object used to set meta box state changed.
+ *
+ * @param {String}  location   Location of meta box: 'normal', 'side'.
+ * @param {Boolean} hasChanged Whether the meta box has changed.
+ *
+ * @return {Object} Action object
+ */
+export function metaBoxStateChanged( location, hasChanged ) {
+	return {
+		type: 'META_BOX_STATE_CHANGED',
+		location,
+		hasChanged,
+	};
+}
+
 export const createSuccessNotice = partial( createNotice, 'success' );
 export const createInfoNotice = partial( createNotice, 'info' );
 export const createErrorNotice = partial( createNotice, 'error' );

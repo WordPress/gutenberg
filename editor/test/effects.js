@@ -19,6 +19,7 @@ import {
 	replaceBlocks,
 	editPost,
 	savePost,
+	requestMetaBoxUpdates,
 } from '../actions';
 import effects from '../effects';
 import * as selectors from '../selectors';
@@ -246,6 +247,32 @@ describe( 'effects', () => {
 
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( savePost() );
+		} );
+	} );
+
+	describe( '.REQUEST_POST_UPDATE_SUCCESS', () => {
+		const handler = effects.REQUEST_POST_UPDATE_SUCCESS;
+		const dispatch = jest.fn();
+		const store = { getState: () => {}, dispatch };
+
+		it( 'should dispatch meta box updates on success for dirty meta boxes.', () => {
+			selectors.getDirtyMetaBoxes.mockReturnValue( [ 'normal', 'side' ] );
+
+			const post = {
+				id: 1,
+				title: {
+					raw: 'A History of Pork',
+				},
+				content: {
+					raw: '',
+				},
+				status: 'draft',
+			};
+
+			handler( { post: post, previousPost: post }, store );
+
+			expect( dispatch ).toHaveBeenCalledTimes( 1 );
+			expect( dispatch ).toHaveBeenCalledWith( requestMetaBoxUpdates( [ 'normal', 'side' ] ) );
 		} );
 	} );
 

@@ -1,50 +1,60 @@
 /**
- * WordPress dependencies
+ * External dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
-import { Panel, PanelBody, Dashicon } from '@wordpress/components';
+import { connect } from 'react-redux';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
+import './meta-box-iframe.scss';
+import MetaBoxIframe from './iframe.js';
+import { handleMetaBoxReload, metaBoxStateChanged } from '../actions';
+import { getMetaBox, isSavingPost } from '../selectors';
 
-class MetaBoxes extends Component {
-	constructor() {
-		super( ...arguments );
-
-		this.toggle = this.toggle.bind( this );
-
-		this.state = {
-			isOpen: false,
-		};
+function MetaBox( {
+	isActive,
+	isDirty,
+	isUpdating,
+	isPostSaving,
+	location,
+	metaBoxReloaded,
+	changedMetaBoxState,
+} ) {
+	if ( ! isActive ) {
+		return null;
 	}
 
-	toggle() {
-		this.setState( {
-			isOpen: ! this.state.isOpen,
-		} );
-	}
-
-	render() {
-		const { isOpen } = this.state;
-
-		return (
-			<Panel className="editor-meta-boxes">
-				<PanelBody
-					title={ __( 'Extended Settings' ) }
-					opened={ isOpen }
-					onToggle={ this.toggle }>
-					<div className="editor-meta-boxes__coming-soon">
-						<Dashicon icon="flag" />
-						<h3>{ __( 'Coming Soon' ) }</h3>
-						<p>{ __( 'Meta boxes are not yet supported, but are planned for a future release.' ) }</p>
-					</div>
-				</PanelBody>
-			</Panel>
-		);
-	}
+	return (
+		<MetaBoxIframe
+			isActive={ isActive }
+			isDirty={ isDirty }
+			isUpdating={ isUpdating }
+			isPostSaving={ isPostSaving }
+			location={ location }
+			metaBoxReloaded={ metaBoxReloaded }
+			changedMetaBoxState={ changedMetaBoxState } />
+	);
 }
 
-export default MetaBoxes;
+function mapStateToProps( state, ownProps ) {
+	const metaBox = getMetaBox( state, ownProps.location );
+	const { isActive, isDirty, isUpdating } = metaBox;
+
+	return {
+		isActive,
+		isDirty,
+		isUpdating,
+		isPostSaving: isSavingPost( state ) ? true : false,
+	};
+}
+
+function mapDispatchToProps( dispatch ) {
+	return {
+		// Used to set the reference to the MetaBox in redux, fired when the component mounts.
+		metaBoxReloaded: ( location ) => dispatch( handleMetaBoxReload( location ) ),
+		changedMetaBoxState: ( location, hasChanged ) => dispatch( metaBoxStateChanged( location, hasChanged ) ),
+	};
+}
+
+export default connect( mapStateToProps, mapDispatchToProps )( MetaBox );

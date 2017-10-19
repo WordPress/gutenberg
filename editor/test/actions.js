@@ -6,6 +6,10 @@ import {
 	replaceBlocks,
 	startTyping,
 	stopTyping,
+	requestMetaBoxUpdates,
+	handleMetaBoxReload,
+	metaBoxStateChanged,
+	initializeMetaBoxState,
 } from '../actions';
 
 describe( 'actions', () => {
@@ -49,6 +53,49 @@ describe( 'actions', () => {
 		it( 'should return the STOP_TYPING action', () => {
 			expect( stopTyping() ).toEqual( {
 				type: 'STOP_TYPING',
+			} );
+		} );
+	} );
+
+	describe( 'requestMetaBoxUpdates', () => {
+		it( 'should return the REQUEST_META_BOX_UPDATES action', () => {
+			expect( requestMetaBoxUpdates( [ 'normal' ] ) ).toEqual( {
+				type: 'REQUEST_META_BOX_UPDATES',
+				locations: [ 'normal' ],
+			} );
+		} );
+	} );
+
+	describe( 'handleMetaBoxReload', () => {
+		it( 'should return the HANDLE_META_BOX_RELOAD action with a location and node', () => {
+			expect( handleMetaBoxReload( 'normal' ) ).toEqual( {
+				type: 'HANDLE_META_BOX_RELOAD',
+				location: 'normal',
+			} );
+		} );
+	} );
+
+	describe( 'metaBoxStateChanged', () => {
+		it( 'should return the META_BOX_STATE_CHANGED action with a hasChanged flag', () => {
+			expect( metaBoxStateChanged( 'normal', true ) ).toEqual( {
+				type: 'META_BOX_STATE_CHANGED',
+				location: 'normal',
+				hasChanged: true,
+			} );
+		} );
+	} );
+
+	describe( 'initializeMetaBoxState', () => {
+		it( 'should return the META_BOX_STATE_CHANGED action with a hasChanged flag', () => {
+			const metaBoxes = {
+				side: true,
+				normal: true,
+				advanced: false,
+			};
+
+			expect( initializeMetaBoxState( metaBoxes ) ).toEqual( {
+				type: 'INITIALIZE_META_BOX_STATE',
+				metaBoxes,
 			} );
 		} );
 	} );
