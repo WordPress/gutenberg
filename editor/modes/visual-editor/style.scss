@@ -102,6 +102,7 @@
 	}
 
 	&.is-multi-selected:before {
+		background: $blue-medium-200;
 		background: Highlight;	// This variable is a CSS 2.1 variable that selects the operating system select color
 	}
 
@@ -310,6 +311,7 @@
 		bottom: $block-padding;
 		left: $block-padding + $block-mover-padding-visible;
 		right: $block-padding + $block-mover-padding-visible;
+		background: $blue-medium-300;
 		background: Highlight;
 		opacity: .15;
 	}
