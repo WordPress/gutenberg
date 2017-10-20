@@ -3,6 +3,7 @@
  */
 import { bindActionCreators } from 'redux';
 import { Provider as ReduxProvider } from 'react-redux';
+import { Provider as SlotFillProvider } from 'react-slot-fill';
 import { flow, pick, noop } from 'lodash';
 
 /**
@@ -13,7 +14,7 @@ import { EditableProvider } from '@wordpress/blocks';
 import {
 	APIProvider,
 	DropZoneProvider,
-	SlotFillProvider,
+	SlotFillProvider as WPSlotFillProvider,
 } from '@wordpress/components';
 
 /**
@@ -79,6 +80,14 @@ class EditorProvider extends Component {
 				{ store: this.store },
 			],
 
+			// Slot / Fill provider:
+			//
+			//  - context.slots
+			//  - context.fills
+			[
+				SlotFillProvider,
+			],
+
 			// Editable provider:
 			//
 			//  - context.onUndo
@@ -95,7 +104,7 @@ class EditorProvider extends Component {
 			//  - context.registerSlot
 			//  - context.unregisterSlot
 			[
-				SlotFillProvider,
+				WPSlotFillProvider,
 			],
 
 			// APIProvider
