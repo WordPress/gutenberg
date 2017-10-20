@@ -446,11 +446,15 @@
 .editor-visual-editor__sibling-inserter {
 	z-index: z-index( '.editor-visual-editor__sibling-inserter' );
 	position: relative;
-	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );
+	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible ) - ( 2 * $block-padding );
 	margin: 0 auto;
 	opacity: 0;
 	transition: opacity 0.25s ease-in-out;
 	transition-delay: 0.3s;
+
+	@include break-small {
+		max-width: $visual-editor-max-width - ( 2 * $block-padding );
+	}
 
 	&:not( [data-insert-index="0"] ) {
 		top: #{ -1 * ( $block-spacing / 2 ) };
