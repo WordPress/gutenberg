@@ -9,8 +9,12 @@ cd "$(dirname "$0")/../docker"
 # Launch the WordPress docker
 docker-compose up -d
 
-# Find a way to sleep until the docker containers are setup properely
-sleep 20
+# Wait until the docker containers are setup properely
+echo "Attempting to connect to wordpress"
+until $(curl -L http://localhost:8888 -so - | grep -q "WordPress"); do
+    printf '.'
+    sleep 5
+done
 
 # Install WordPress
 docker run -it --rm --volumes-from wordpress-dev --network container:wordpress-dev wordpress:cli core install --url=localhost:8888 --title=Gutenberg --admin_user=admin --admin_password=password --admin_email=test@test.com
