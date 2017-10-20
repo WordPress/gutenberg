@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress Dependencies
  */
-import { IconButton, Toolbar, NavigableMenu, Slot } from '@wordpress/components';
+import { IconButton, Toolbar, NavigableMenu, Slot, KeyboardShortcuts } from '@wordpress/components';
 import { Component, Children, findDOMNode } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { focus, keycodes } from '@wordpress/utils';
@@ -19,47 +19,29 @@ import './style.scss';
 import BlockSwitcher from '../block-switcher';
 import BlockMover from '../block-mover';
 import BlockRightMenu from '../block-settings-menu';
-import { isMac } from '../utils/dom';
 
 /**
  * Module Constants
  */
-const { ESCAPE, F10 } = keycodes;
+const { ESCAPE } = keycodes;
 
 function FirstChild( { children } ) {
 	const childrenArray = Children.toArray( children );
 	return childrenArray[ 0 ] || null;
 }
 
-function metaKeyPressed( event ) {
-	return isMac() ? event.metaKey : ( event.ctrlKey && ! event.altKey );
-}
-
 class BlockToolbar extends Component {
 	constructor() {
 		super( ...arguments );
+
 		this.toggleMobileControls = this.toggleMobileControls.bind( this );
 		this.bindNode = this.bindNode.bind( this );
-		this.onKeyUp = this.onKeyUp.bind( this );
-		this.onKeyDown = this.onKeyDown.bind( this );
+		this.focusToolbar = this.focusToolbar.bind( this );
 		this.onToolbarKeyDown = this.onToolbarKeyDown.bind( this );
+
 		this.state = {
 			showMobileControls: false,
 		};
-
-		// it's not easy to know if the user only clicked on a "meta" key without simultaneously clicking on another key
-		// We keep track of the key counts to ensure it's reliable
-		this.metaCount = 0;
-	}
-
-	componentDidMount() {
-		document.addEventListener( 'keyup', this.onKeyUp );
-		document.addEventListener( 'keydown', this.onKeyDown );
-	}
-
-	componentWillUnmount() {
-		document.removeEventListener( 'keyup', this.onKeyUp );
-		document.removeEventListener( 'keydown', this.onKeyDown );
 	}
 
 	bindNode( ref ) {
@@ -72,21 +54,10 @@ class BlockToolbar extends Component {
 		} ) );
 	}
 
-	onKeyDown( event ) {
-		if ( metaKeyPressed( event ) ) {
-			this.metaCount++;
-		}
-	}
-
-	onKeyUp( event ) {
-		const shouldFocusToolbar = this.metaCount === 1 || ( event.keyCode === F10 && event.altKey );
-		this.metaCount = 0;
-
-		if ( shouldFocusToolbar ) {
-			const tabbables = focus.tabbable.find( this.toolbar );
-			if ( tabbables.length ) {
-				tabbables[ 0 ].focus();
-			}
+	focusToolbar() {
+		const tabbables = focus.tabbable.find( this.toolbar );
+		if ( tabbables.length ) {
+			tabbables[ 0 ].focus();
 		}
 	}
 
@@ -128,6 +99,14 @@ class BlockToolbar extends Component {
 					role="toolbar"
 					deep
 				>
+					<KeyboardShortcuts
+						bindGlobal
+						eventName="keyup"
+						shortcuts={ {
+							mod: this.focusToolbar,
+							'alt+f10': this.focusToolbar,
+						} }
+					/>
 					<div className="editor-block-toolbar__group" onKeyDown={ this.onToolbarKeyDown }>
 						{ ! showMobileControls && [
 							<BlockSwitcher key="switcher" uid={ uid } />,
