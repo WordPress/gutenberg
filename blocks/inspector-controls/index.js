@@ -1,7 +1,7 @@
 /**
- * WordPress dependencies
+ * External dependencies
  */
-import { Fill } from '@wordpress/components';
+import { Fill } from 'react-slot-fill';
 
 /**
  * Internal dependencies
