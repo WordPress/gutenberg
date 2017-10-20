@@ -182,7 +182,7 @@ registerBlockType( 'core/paragraph', {
 					} }
 					onMerge={ mergeBlocks }
 					onReplace={ onReplace }
-					placeholder={ placeholder || __( 'New Paragraph' ) }
+					placeholder={ placeholder || __( 'Add text or type / to insert content' ) }
 				/>
 			</BlockAutocomplete>,
 		];
