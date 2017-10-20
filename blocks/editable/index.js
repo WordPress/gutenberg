@@ -13,8 +13,6 @@ import {
 	find,
 	defer,
 	noop,
-	map,
-	pick,
 } from 'lodash';
 import { nodeListToReact } from 'dom-react';
 import 'element-closest';
@@ -60,15 +58,17 @@ function isLinkBoundary( fragment ) {
 		fragment.childNodes[ 0 ].text[ 0 ] === '\uFEFF';
 }
 
-function getLinkProperties( element ) {
-	return { value: element.getAttribute( 'href' ) || '', target: element.getAttribute( 'target' ) || '', node: element };
-}
-
 function getFormatProperties( formatName, parents ) {
-	return formatName === 'link' ? getLinkProperties( find( parents, node => node.nodeName.toLowerCase() === 'a' ) ) : {};
+	switch ( formatName ) {
+		case 'link' :
+			const anchor = find( parents, node => node.nodeName.toLowerCase() === 'a' );
+			return !! anchor ? { value: anchor.getAttribute( 'href' ) || '', target: anchor.getAttribute( 'target' ) || '', node: anchor } : {};
+		default:
+			return {};
+	}
 }
 
-const FORMATS = [ 'bold', 'italic', 'strikethrough', 'link' ];
+const DEFAULT_FORMATS = [ 'bold', 'italic', 'strikethrough', 'link' ];
 
 export default class Editable extends Component {
 	constructor( props ) {
@@ -159,8 +159,8 @@ export default class Editable extends Component {
 	}
 
 	registerCustomFormatters() {
-		forEach( this.props.formatters, ( formatter ) => {
-			this.editor.formatter.register( formatter.format, formatter.formatter );
+		forEach( this.props.initialFormatters, ( formatter ) => {
+			this.editor.formatter.register( formatter.format, { ...formatter.formatter } );
 		} );
 	}
 
@@ -492,15 +492,15 @@ export default class Editable extends Component {
 	}
 
 	onNodeChange( { parents } ) {
-		const formats = {};
-		const formatNames = this.props.formattingControls || FORMATS;
-
-		forEach( this.editor.formatter.matchAll( formatNames ), ( activeFormat ) => {
-			formats[ activeFormat ] = {
+		const formatNames = this.props.formattingControls;
+		const formats = this.editor.formatter.matchAll( formatNames ).reduce( ( accFormats, activeFormat ) => {
+			accFormats[ activeFormat ] = {
 				isActive: true,
 				...getFormatProperties( activeFormat, parents ),
 			};
-		} );
+
+			return accFormats;
+		}, {} );
 
 		const focusPosition = this.getFocusPosition();
 		this.setState( { formats, focusPosition, selectedNodeId: this.state.selectedNodeId + 1 } );
@@ -570,6 +570,15 @@ export default class Editable extends Component {
 		}
 	}
 
+	componentWillReceiveProps( nextProps ) {
+		if ( 'development' === process.env.NODE_ENV ) {
+			if ( ! isEqual( this.props.initialFormatters, nextProps.initialFormatters ) ) {
+				// eslint-disable-next-line no-console
+				console.error( 'Formatters passed via `initialFormatters` will only be registered once. Formatters can be enabled/disabled via the `formattingControls` prop.' );
+			}
+		}
+	}
+
 	isFormatActive( format ) {
 		return this.state.formats[ format ] && this.state.formats[ format ].isActive;
 	}
@@ -612,6 +621,12 @@ export default class Editable extends Component {
 		this.editor.setDirty( true );
 	}
 
+	getToolbarCustomControls() {
+		const { initialFormatters, formattingControls } = this.props;
+		return initialFormatters
+			.filter( f => formattingControls.indexOf( f.format ) > -1 );
+	}
+
 	render() {
 		const {
 			tagName: Tagname = 'div',
@@ -641,7 +656,7 @@ export default class Editable extends Component {
 				formats={ this.state.formats }
 				onChange={ this.changeFormats }
 				enabledControls={ formattingControls }
-				customControls={ map( this.props.formatters, ( formatter ) => pick( formatter, [ 'format', 'title', 'icon' ] ) ) }
+				customControls={ this.getToolbarCustomControls() }
 			/>
 		);
 
@@ -683,4 +698,9 @@ export default class Editable extends Component {
 
 Editable.contextTypes = {
 	onUndo: noop,
+};
+
+Editable.defaultProps = {
+	formattingControls: DEFAULT_FORMATS,
+	initialFormatters: [],
 };

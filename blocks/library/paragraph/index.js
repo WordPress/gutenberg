@@ -185,7 +185,7 @@ registerBlockType( 'core/paragraph', {
 					onReplace={ onReplace }
 					placeholder={ placeholder || __( 'New Paragraph' ) }
 					formattingControls={ [ 'bold', 'italic', 'strikethrough', 'link', 'red' ] }
-					formatters={ [
+					initialFormatters={ [
 						createInlineStyleFormatter( 'red', 'hammer', 'Red', { color: 'red' } ),
 					] }
 				/>
