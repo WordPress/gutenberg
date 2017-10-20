@@ -57,6 +57,7 @@ input[type="search"].editor-inserter__search {
 	font-size: $default-font-size;
 	position: relative;
 	z-index: 1;
+	border-bottom: 1px solid $light-gray-500;
 
 	&:focus {
 		outline: none;
@@ -143,7 +144,6 @@ input[type="search"].editor-inserter__search {
 	justify-content: space-between;
 	position: relative;
 	background: $light-gray-300;
-	border-top: 1px solid $light-gray-500;
 	border-bottom: 1px solid $light-gray-500;
 }
 
