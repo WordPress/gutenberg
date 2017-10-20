@@ -70,7 +70,7 @@
 	width: calc( 100vw - 20px );
 
 	@include break-medium {
-		width: 300px;
+		width: 320px;
 	}
 
 	.components-popover.is-top & {

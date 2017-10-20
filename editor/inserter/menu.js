@@ -363,12 +363,6 @@ export class InserterMenu extends Component {
 					onClick={ this.setSearchFocus }
 					ref={ this.bindReferenceNode( 'search' ) }
 				/>
-				<div role="menu" className="editor-inserter__content"
-					ref={ ( ref ) => this.tabContainer = ref }>
-					{ isShowingRecent && this.renderBlocks( this.props.recentlyUsedBlocks ) }
-					{ isShowingEmbeds && this.renderBlocks( visibleBlocksByCategory.embed ) }
-					{ ! isShowingRecent && ! isShowingEmbeds && this.renderCategories( visibleBlocksByCategory ) }
-				</div>
 				{ ! isSearching &&
 					<div className="editor-inserter__tabs is-recent">
 						<button
@@ -391,6 +385,12 @@ export class InserterMenu extends Component {
 						</button>
 					</div>
 				}
+				<div role="menu" className="editor-inserter__content"
+					ref={ ( ref ) => this.tabContainer = ref }>
+					{ isShowingRecent && this.renderBlocks( this.props.recentlyUsedBlocks ) }
+					{ isShowingEmbeds && this.renderBlocks( visibleBlocksByCategory.embed ) }
+					{ ! isShowingRecent && ! isShowingEmbeds && this.renderCategories( visibleBlocksByCategory ) }
+				</div>
 			</div>
 		);
 	}
