@@ -254,7 +254,9 @@ export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScro
 	let range = hiddenCaretRangeFromPoint( document, x, y, container );
 
 	if ( ! range || ! container.contains( range.startContainer ) ) {
-		if ( mayUseScroll && ! range.startContainer.contains( container ) ) {
+		if ( mayUseScroll && (
+				( ! range || ! range.startContainer ) ||
+				! range.startContainer.contains( container ) ) ) {
 			// Might be out of view.
 			// Easier than attempting to calculate manually.
 			container.scrollIntoView( isReverse );
