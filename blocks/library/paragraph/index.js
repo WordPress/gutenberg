@@ -27,7 +27,7 @@ import ColorPalette from '../../color-palette';
 import BlockDescription from '../../block-description';
 
 const { children } = source;
-const MAX_FONT_SIZE = 8;
+const MAX_FONT_SIZE = 9;
 
 registerBlockType( 'core/paragraph', {
 	title: __( 'Paragraph' ),
@@ -101,7 +101,7 @@ registerBlockType( 'core/paragraph', {
 		const className = dropCap ? 'has-drop-cap' : null;
 		let { fontSize } = attributes;
 		// if the font size was previously set in pixels, divide by 16 to get em
-		if ( fontSize > 8 ) {
+		if ( fontSize > MAX_FONT_SIZE ) {
 			fontSize = Math.max( MAX_FONT_SIZE, fontSize / 16 );
 		}
 		return [
