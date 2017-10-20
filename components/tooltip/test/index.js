@@ -67,6 +67,8 @@ describe( 'Tooltip', () => {
 		} );
 
 		it( 'should show popover on delayed mouseenter', () => {
+			const expectPopoverOpened = ( wrapper, opened ) => expect( wrapper.find( 'Popover' ) ).toHaveProp( 'isOpen', opened );
+
 			// Mount: Issues with using `setState` asynchronously with shallow-
 			// rendered components: https://github.com/airbnb/enzyme/issues/450
 			const originalMouseEnter = jest.fn();
@@ -86,14 +88,13 @@ describe( 'Tooltip', () => {
 
 			expect( originalMouseEnter ).toHaveBeenCalled();
 
-			const popover = wrapper.find( 'Popover' );
 			expect( wrapper.state( 'isOver' ) ).toBe( false );
-			expect( popover.prop( 'isOpen' ) ).toBe( false );
-
+			expectPopoverOpened( wrapper, false );
 			wrapper.instance().delayedSetIsOver.flush();
+			wrapper.update();
 
 			expect( wrapper.state( 'isOver' ) ).toBe( true );
-			expect( popover.prop( 'isOpen' ) ).toBe( true );
+			expectPopoverOpened( wrapper, true );
 		} );
 
 		it( 'should ignore mouseenter on disabled elements', () => {
