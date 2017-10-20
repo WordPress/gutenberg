@@ -9,7 +9,8 @@ import { find, reverse } from 'lodash';
  */
 import {
 	isHorizontalEdge,
-	getVerticalEdge,
+	isVerticalEdge,
+	computeCaretRect,
 	placeCaretAtHorizontalEdge,
 	placeCaretAtVerticalEdge,
 } from '../utils/dom';
@@ -79,38 +80,18 @@ class WritingFlow extends Component {
 		const isHorizontal = isLeft || isRight;
 		const isVertical = isUp || isDown;
 
-		if ( isVertical ) {
-			const { rect, isEdge } = getVerticalEdge( target, isReverse );
+		if ( ! isVertical ) {
+			this.verticalRect = null;
+		} else if ( ! this.verticalRect ) {
+			this.verticalRect = computeCaretRect( target );
+		}
 
-			if ( rect && ! this.verticalRect ) {
-				this.verticalRect = rect;
-			}
-
-			if ( ! isEdge ) {
-				return;
-			}
-
+		if ( isVertical && isVerticalEdge( target, isReverse ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
-
-			if ( ! closestTabbable ) {
-				return;
-			}
-
 			placeCaretAtVerticalEdge( closestTabbable, isReverse, this.verticalRect );
 			event.preventDefault();
-		} else {
-			this.verticalRect = null;
-
-			if ( ! isHorizontal || ! isHorizontalEdge( target, isReverse ) ) {
-				return;
-			}
-
+		} else if ( isHorizontal && isHorizontalEdge( target, isReverse ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
-
-			if ( ! closestTabbable ) {
-				return;
-			}
-
 			placeCaretAtHorizontalEdge( closestTabbable, isReverse );
 			event.preventDefault();
 		}

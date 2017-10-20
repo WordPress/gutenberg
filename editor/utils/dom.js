@@ -68,30 +68,26 @@ export function isHorizontalEdge( container, isReverse ) {
 }
 
 /**
- * Gets vertical edge information:
- *   * isEdge: Whether the caret is at the vertical edge of the container.
- *   * rect: Dimensions of the caret when available.
+ * Check whether the caret is vertically at the edge of the container.
  *
  * @param  {Element} container Focusable element.
  * @param  {Boolean} isReverse Set to true to check top, false for bottom.
- * @return {Object}            Vertical edge information.
+ * @return {Boolean}           True if at the edge, false if not.
  */
-export function getVerticalEdge( container, isReverse ) {
+export function isVerticalEdge( container, isReverse ) {
 	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
-		return {
-			isEdge: isHorizontalEdge( container, isReverse ),
-		};
+		return isHorizontalEdge( container, isReverse );
 	}
 
 	if ( ! container.isContentEditable ) {
-		return { isEdge: true };
+		return true;
 	}
 
 	const selection = window.getSelection();
 	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
 
 	if ( ! range || ! range.collapsed ) {
-		return { isEdge: false };
+		return false;
 	}
 
 	// Adjust for empty containers.
@@ -101,7 +97,7 @@ export function getVerticalEdge( container, isReverse ) {
 		: range.getClientRects()[ 0 ];
 
 	if ( ! rangeRect ) {
-		return { isEdge: false };
+		return false;
 	}
 
 	const buffer = rangeRect.height / 2;
@@ -109,24 +105,36 @@ export function getVerticalEdge( container, isReverse ) {
 
 	// Too low.
 	if ( isReverse && rangeRect.top - buffer > editableRect.top ) {
-		return {
-			rect: rangeRect,
-			isEdge: false,
-		};
+		return false;
 	}
 
 	// Too high.
 	if ( ! isReverse && rangeRect.bottom + buffer < editableRect.bottom ) {
-		return {
-			rect: rangeRect,
-			isEdge: false,
-		};
+		return false;
 	}
 
-	return {
-		rect: rangeRect,
-		isEdge: true,
-	};
+	return true;
+}
+
+export function computeCaretRect( container ) {
+	if (
+		includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ||
+		! container.isContentEditable
+	) {
+		return;
+	}
+
+	const selection = window.getSelection();
+	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+
+	if ( ! range || ! range.collapsed ) {
+		return;
+	}
+
+	// Adjust for empty containers.
+	return range.startContainer.nodeType === window.Node.ELEMENT_NODE
+		? range.startContainer.getBoundingClientRect()
+		: range.getClientRects()[ 0 ];
 }
 
 /**
@@ -136,6 +144,10 @@ export function getVerticalEdge( container, isReverse ) {
  * @param {Boolean} isReverse True for end, false for start.
  */
 export function placeCaretAtHorizontalEdge( container, isReverse ) {
+	if ( ! container ) {
+		return;
+	}
+
 	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
 		container.focus();
 		if ( isReverse ) {
@@ -224,6 +236,10 @@ function hiddenCaretRangeFromPoint( doc, x, y, container ) {
  * @param {Boolean} [mayUseScroll=true] True to allow scrolling, false to disallow.
  */
 export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScroll = true ) {
+	if ( ! container ) {
+		return;
+	}
+
 	if ( ! rect || ! container.isContentEditable ) {
 		placeCaretAtHorizontalEdge( container, isReverse );
 		return;
