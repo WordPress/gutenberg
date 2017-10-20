@@ -486,18 +486,9 @@
 		margin: 0;
 		padding: 4px;
 		background-color: white;
-	}
-}
 
-.editor-visual-editor__sibling-inserter-rule {
-	position: absolute;
-	left: 50%;
-	top: 50%;
-	width: 80px;
-	margin: 0;
-	margin-top: -1px;
-	margin-left: -40px;
-	border: none;
-	border-top: 2px solid $blue-medium-500;
-	display: none; /* todo: remove the whole element */
+		.dashicon {
+			vertical-align: bottom;
+		}
+	}
 }
