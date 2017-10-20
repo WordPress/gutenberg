@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton, PanelBody } from '@wordpress/components';
+import { PanelBody } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -11,7 +11,7 @@ import './editor.scss';
 import './style.scss';
 import { registerBlockType, source } from '../../api';
 import Editable from '../../editable';
-import UrlInput from '../../url-input';
+import LinkEditor from '../../link-editor';
 import BlockControls from '../../block-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
@@ -51,6 +51,10 @@ registerBlockType( 'core/button', {
 		textColor: {
 			type: 'string',
 		},
+		opensInNewWindow: {
+			type: 'boolean',
+			default: false,
+		},
 	},
 
 	getEditWrapperProps( attributes ) {
@@ -69,9 +73,10 @@ registerBlockType( 'core/button', {
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus, className } ) {
-		const { text, url, title, align, color, textColor, clear } = attributes;
+		const { text, url, title, align, color, textColor, clear, opensInNewWindow } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		const toggleClear = () => setAttributes( { clear: ! clear } );
+		const toggleOpensInNewWindow = () => setAttributes( { opensInNewWindow: ! opensInNewWindow } );
 
 		return [
 			focus && (
@@ -94,15 +99,12 @@ registerBlockType( 'core/button', {
 					keepPlaceholderOnFocus
 				/>
 				{ focus &&
-					<form
-						className="blocks-format-toolbar__link-modal"
-						onSubmit={ ( event ) => event.preventDefault() }>
-						<UrlInput
-							value={ url }
-							onChange={ ( value ) => setAttributes( { url: value } ) }
-						/>
-						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
-					</form>
+					<LinkEditor
+						{ ...{ opensInNewWindow, toggleOpensInNewWindow } }
+						linkValue={ url }
+						onLinkChange={ ( value ) => setAttributes( { url: value } ) }
+						onDrop={ () => setAttributes( { url: null } ) }
+					/>
 				}
 				{ focus &&
 					<InspectorControls key="inspector">
@@ -114,6 +116,11 @@ registerBlockType( 'core/button', {
 							label={ __( 'Stand on a line' ) }
 							checked={ !! clear }
 							onChange={ toggleClear }
+						/>
+						<ToggleControl
+							label={ __( 'Open in new window' ) }
+							checked={ !! opensInNewWindow }
+							onChange={ toggleOpensInNewWindow }
 						/>
 						<PanelBody title={ __( 'Button Background Color' ) }>
 							<ColorPalette
@@ -134,11 +141,11 @@ registerBlockType( 'core/button', {
 	},
 
 	save( { attributes } ) {
-		const { url, text, title, align, color, textColor } = attributes;
+		const { url, text, title, align, color, textColor, opensInNewWindow } = attributes;
 
 		return (
 			<div className={ `align${ align }` } style={ { backgroundColor: color } }>
-				<a href={ url } title={ title } style={ { color: textColor } }>
+				<a href={ url } target={ opensInNewWindow ? '_blank' : null } title={ title } style={ { color: textColor } }>
 					{ text }
 				</a>
 			</div>
