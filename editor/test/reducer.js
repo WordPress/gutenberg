@@ -24,6 +24,7 @@ import {
 	notices,
 	blocksMode,
 	blockInsertionPoint,
+	metaBoxes,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -1086,6 +1087,112 @@ describe( 'state', () => {
 			const value = blocksMode( deepFreeze( { chicken: 'html' } ), action );
 
 			expect( value ).toEqual( { chicken: 'visual' } );
+		} );
+	} );
+
+	describe( 'metaBoxes()', () => {
+		it( 'should return default state', () => {
+			const actual = metaBoxes( undefined, {} );
+			const expected = {
+				advanced: {
+					isActive: false,
+					isDirty: false,
+					isUpdating: false,
+				},
+				normal: {
+					isActive: false,
+					isDirty: false,
+					isUpdating: false,
+				},
+				side: {
+					isActive: false,
+					isDirty: false,
+					isUpdating: false,
+				},
+			};
+
+			expect( actual ).toEqual( expected );
+		} );
+		it( 'should set the sidebar to active', () => {
+			const theMetaBoxes = {
+				normal: false,
+				advanced: false,
+				side: true,
+			};
+
+			const action = {
+				type: 'INITIALIZE_META_BOX_STATE',
+				metaBoxes: theMetaBoxes,
+			};
+
+			const actual = metaBoxes( undefined, action );
+			const expected = {
+				advanced: {
+					isActive: false,
+					isDirty: false,
+					isUpdating: false,
+				},
+				normal: {
+					isActive: false,
+					isDirty: false,
+					isUpdating: false,
+				},
+				side: {
+					isActive: true,
+					isDirty: false,
+					isUpdating: false,
+				},
+			};
+
+			expect( actual ).toEqual( expected );
+		} );
+		it( 'should switch updating to off', () => {
+			const action = {
+				type: 'HANDLE_META_BOX_RELOAD',
+				location: 'normal',
+			};
+
+			const theMetaBoxes = metaBoxes( { normal: { isUpdating: true, isActive: false, isDirty: true } }, action );
+			const actual = theMetaBoxes.normal;
+			const expected = {
+				isActive: false,
+				isUpdating: false,
+				isDirty: false,
+			};
+
+			expect( actual ).toEqual( expected );
+		} );
+		it( 'should switch updating to on', () => {
+			const action = {
+				type: 'REQUEST_META_BOX_UPDATES',
+				locations: [ 'normal' ],
+			};
+
+			const theMetaBoxes = metaBoxes( undefined, action );
+			const actual = theMetaBoxes.normal;
+			const expected = {
+				isActive: false,
+				isUpdating: true,
+				isDirty: false,
+			};
+
+			expect( actual ).toEqual( expected );
+		} );
+		it( 'should return with the isDirty flag as true', () => {
+			const action = {
+				type: 'META_BOX_STATE_CHANGED',
+				location: 'normal',
+				hasChanged: true,
+			};
+			const theMetaBoxes = metaBoxes( undefined, action );
+			const actual = theMetaBoxes.normal;
+			const expected = {
+				isActive: false,
+				isDirty: true,
+				isUpdating: false,
+			};
+
+			expect( actual ).toEqual( expected );
 		} );
 	} );
 } );

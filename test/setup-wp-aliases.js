@@ -1,4 +1,5 @@
 // Set up `wp.*` aliases.  Handled by Webpack outside of the test build.
+global.wp = {};
 [
 	'element',
 	'i18n',
