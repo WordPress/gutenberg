@@ -27,6 +27,7 @@ import ColorPalette from '../../color-palette';
 import BlockDescription from '../../block-description';
 
 const { children } = source;
+const MAX_FONT_SIZE = 8;
 
 registerBlockType( 'core/paragraph', {
 	title: __( 'Paragraph' ),
@@ -95,10 +96,14 @@ registerBlockType( 'core/paragraph', {
 	},
 
 	edit( { attributes, setAttributes, insertBlocksAfter, focus, setFocus, mergeBlocks, onReplace } ) {
-		const { align, content, dropCap, placeholder, fontSize, backgroundColor, textColor, width } = attributes;
+		const { align, content, dropCap, placeholder, backgroundColor, textColor, width } = attributes;
 		const toggleDropCap = () => setAttributes( { dropCap: ! dropCap } );
 		const className = dropCap ? 'has-drop-cap' : null;
-
+		let { fontSize } = attributes;
+		// if the font size was previously set in pixels, divide by 16 to get em
+		if ( fontSize > 8 ) {
+			fontSize = Math.max( MAX_FONT_SIZE, fontSize / 16 );
+		}
 		return [
 			focus && (
 				<BlockControls key="controls">
@@ -123,11 +128,13 @@ registerBlockType( 'core/paragraph', {
 						/>
 						<RangeControl
 							label={ __( 'Font Size' ) }
-							value={ fontSize || '' }
+							value={ fontSize || 1 }
 							onChange={ ( value ) => setAttributes( { fontSize: value } ) }
-							min={ 10 }
-							max={ 200 }
+							min={ 0.5 }
+							max={ MAX_FONT_SIZE }
+							step={ 0.1 }
 							beforeIcon="editor-textcolor"
+							units="em"
 							allowReset
 						/>
 					</PanelBody>
@@ -162,7 +169,7 @@ registerBlockType( 'core/paragraph', {
 					style={ {
 						backgroundColor: backgroundColor,
 						color: textColor,
-						fontSize: fontSize ? fontSize + 'px' : undefined,
+						fontSize: fontSize ? fontSize + 'em' : undefined,
 						textAlign: align,
 					} }
 					value={ content }
@@ -198,7 +205,7 @@ registerBlockType( 'core/paragraph', {
 		const styles = {
 			backgroundColor: backgroundColor,
 			color: textColor,
-			fontSize: fontSize,
+			fontSize: fontSize ? fontSize + 'em' : undefined,
 			textAlign: align,
 		};
 
