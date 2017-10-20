@@ -131,6 +131,13 @@ export default class Editable extends Component {
 
 	proxyPropHandler( name ) {
 		return ( event ) => {
+			// TODO: Reconcile with `onFocus` instance handler which does not
+			// pass the event object. Otherwise we have double focus handling
+			// and editor instance being stored into state.
+			if ( name === 'Focus' ) {
+				return;
+			}
+
 			// Allow props an opportunity to handle the event, before default
 			// Editable behavior takes effect. Should the event be handled by a
 			// prop, it should `stopImmediatePropagation` on the event to stop
