@@ -88,6 +88,7 @@ class VisualEditor extends Component {
 				onMouseDown={ this.onClick }
 				onTouchStart={ this.onClick }
 				ref={ this.bindContainer }
+				tabIndex="-1"
 			>
 				<KeyboardShortcuts shortcuts={ {
 					'mod+a': this.selectAll,

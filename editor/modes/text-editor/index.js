@@ -54,6 +54,7 @@ class TextEditor extends Component {
 				role="region"
 				aria-label={ __( 'Editor content' ) }
 				className="editor-text-editor"
+				tabIndex="-1"
 			>
 				<div className="editor-text-editor__formatting">
 					<div className="editor-text-editor__formatting-group">
