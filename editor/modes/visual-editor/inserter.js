@@ -25,7 +25,6 @@ export class VisualEditorInserter extends Component {
 
 		this.showControls = this.toggleControls.bind( this, true );
 		this.hideControls = this.toggleControls.bind( this, false );
-		this.insertFrequentBlock = this.insertBlock.bind( this );
 
 		this.state = {
 			isShowingControls: false,
