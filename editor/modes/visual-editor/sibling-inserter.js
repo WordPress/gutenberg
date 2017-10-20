@@ -107,18 +107,14 @@ class VisualEditorSiblingInserter extends Component {
 				{ showInsertionPoint && (
 					<div className="editor-visual-editor__insertion-point" />
 				) }
-				{ isVisible && [
-					<hr
-						key="rule"
-						className="editor-visual-editor__sibling-inserter-rule"
-					/>,
+				{ isVisible &&
 					<Inserter
 						key="inserter"
 						position="bottom"
 						insertIndex={ insertIndex }
 						onToggle={ this.suspendToggleVisible }
-					/>,
-				] }
+					/>
+				}
 			</div>
 		);
 	}
