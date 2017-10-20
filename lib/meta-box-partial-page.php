@@ -69,9 +69,12 @@ function gutenberg_meta_box_partial_page( $post_type, $meta_box_context ) {
 
 	global $post, $wp_meta_boxes, $hook_suffix, $current_screen, $wp_locale;
 
+	// This page should always match up with the edit action.
+	$action = 'edit';
+
 	gutenberg_meta_box_partial_page_admin_header( $hook_suffix, $current_screen, $wp_locale );
 
-	gutenberg_meta_box_partial_page_post_form( $post, $location );
+	gutenberg_meta_box_partial_page_post_form( $post, $location, $action );
 
 	// Handle meta box state.
 	$_original_meta_boxes = $wp_meta_boxes;
@@ -317,9 +320,6 @@ function gutenberg_meta_box_partial_page_admin_header( $hook_suffix, $current_sc
 	 */
 	$admin_body_classes = apply_filters( 'admin_body_class', '' );
 
-	// This page should always match up with the edit action.
-	$action = 'edit';
-
 	?>
 	<body class="wp-admin wp-core-ui no-js <?php echo $admin_body_classes . ' ' . $admin_body_class; ?>">
 	<script type="text/javascript">
@@ -337,8 +337,9 @@ function gutenberg_meta_box_partial_page_admin_header( $hook_suffix, $current_sc
  *
  * @param WP_Post $post     Current post object.
  * @param string  $location Metabox location: one of 'normal', 'advanced', 'side'.
+ * @param string  $action   The action taken for the post.php page.
  */
-function gutenberg_meta_box_partial_page_post_form( $post, $location ) {
+function gutenberg_meta_box_partial_page_post_form( $post, $location, $action ) {
 	$notice     = false;
 	$form_extra = '';
 	if ( 'auto-draft' === $post->post_status ) {
