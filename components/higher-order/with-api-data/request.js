@@ -2,7 +2,7 @@
  * External dependencies
  */
 import memoize from 'memize';
-import { mapKeys } from 'lodash';
+import { isEmpty, mapKeys, toPairs } from 'lodash';
 
 export const getStablePath = memoize( ( path ) => {
 	const [ base, query ] = path.split( '?' );
@@ -29,13 +29,20 @@ export const getStablePath = memoize( ( path ) => {
 		// 'a=5&b=1&c=2'
 } );
 
+export const encodeParams = ( data ) =>
+	isEmpty( data )
+		? ''
+		: '?' + toPairs( data )
+			.map( ( [ key, value ] ) => `${ key }=${ encodeURI( value ) }` )
+			.join( '& ' );
+
 /**
  * Response cache of path to response (object of data, headers arrays).
  * Optionally populated from window global for preloading.
  *
  * @type {Object}
  */
-export const cache = mapKeys(
+export const cache = window._wpAPICache = mapKeys(
 	window._wpAPIDataPreload,
 	( value, key ) => getStablePath( key )
 );

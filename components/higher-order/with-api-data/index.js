@@ -11,7 +11,7 @@ import { Component } from 'element';
 /**
  * Internal dependencies
  */
-import request from './request';
+import request, { encodeParams } from './request';
 import { getRoute } from './routes';
 
 export default ( mapPropsToData ) => ( WrappedComponent ) => {
@@ -166,6 +166,8 @@ export default ( mapPropsToData ) => ( WrappedComponent ) => {
 					return result;
 				}
 
+				console.log( 'route', path, route );
+
 				result[ propName ] = route.methods.reduce( ( stateValue, method ) => {
 					// Add request initiater into data props
 					const requestKey = this.getRequestKey( method );
@@ -182,6 +184,15 @@ export default ( mapPropsToData ) => ( WrappedComponent ) => {
 
 					// Track path for future map skipping
 					stateValue.path = path;
+
+					// TODO move this somewhere else and/or document
+					if ( method === 'PUT' ) {
+						stateValue.saveWith = ( data ) =>
+							this.request(
+									propName,
+									method,
+									path + encodeParams( data ) );
+					}
 
 					return stateValue;
 				}, {} );
