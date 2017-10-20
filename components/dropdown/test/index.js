@@ -9,7 +9,13 @@ import { mount } from 'enzyme';
 import Dropdown from '../';
 
 describe( 'Dropdown', () => {
+	const expectPopoverOpened = ( wrapper, opened ) => expect( wrapper.find( 'Popover' ) ).toHaveProp( 'isOpen', opened );
+
 	it( 'should toggle the dropdown properly', () => {
+		const expectButtonExpanded = ( wrapper, expanded ) => {
+			expect( wrapper.find( 'button' ) ).toHaveLength( 1 );
+			expect( wrapper.find( 'button' ) ).toHaveProp( 'aria-expanded', expanded );
+		};
 		const wrapper = mount( <Dropdown
 			className="container"
 			contentClassName="content"
@@ -19,15 +25,14 @@ describe( 'Dropdown', () => {
 			renderContent={ () => null }
 		/> );
 
-		const button = wrapper.find( 'button' );
-		const popover = wrapper.find( 'Popover' );
+		expectButtonExpanded( wrapper, false );
+		expectPopoverOpened( wrapper, false );
 
-		expect( button ).toHaveLength( 1 );
-		expect( popover.prop( 'isOpen' ) ).toBe( false );
-		expect( button.prop( 'aria-expanded' ) ).toBe( false );
-		button.simulate( 'click' );
-		expect( popover.prop( 'isOpen' ) ).toBe( true );
-		expect( button.prop( 'aria-expanded' ) ).toBe( true );
+		wrapper.find( 'button' ).simulate( 'click' );
+		wrapper.update();
+
+		expectButtonExpanded( wrapper, true );
+		expectPopoverOpened( wrapper, true );
 	} );
 
 	it( 'should close the dropdown when calling onClose', () => {
@@ -41,13 +46,16 @@ describe( 'Dropdown', () => {
 			renderContent={ () => null }
 		/> );
 
-		const openButton = wrapper.find( '.open' );
-		const closeButton = wrapper.find( '.close' );
-		const popover = wrapper.find( 'Popover' );
-		expect( popover.prop( 'isOpen' ) ).toBe( false );
-		openButton.simulate( 'click' );
-		expect( popover.prop( 'isOpen' ) ).toBe( true );
-		closeButton.simulate( 'click' );
-		expect( popover.prop( 'isOpen' ) ).toBe( false );
+		expectPopoverOpened( wrapper, false );
+
+		wrapper.find( '.open' ).simulate( 'click' );
+		wrapper.update();
+
+		expectPopoverOpened( wrapper, true );
+
+		wrapper.find( '.close' ).simulate( 'click' );
+		wrapper.update();
+
+		expectPopoverOpened( wrapper, false );
 	} );
 } );
