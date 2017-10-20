@@ -126,11 +126,20 @@ input[type="search"].editor-inserter__search {
 }
 
 .editor-inserter__separator {
+	border-top: 1px solid $light-gray-500;
+	background: rgba( $white, .8 );
+	position: sticky;
+	top: 0;
+	text-align: center;
 	display: block;
 	margin: 0;
 	padding: 12px 14px 0 14px;
 	font-size: $default-font-size;
 	font-weight: 600;
+
+	&:first-child {
+		border: none;
+	}
 }
 
 .editor-inserter__tabs {
