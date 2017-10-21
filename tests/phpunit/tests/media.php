@@ -2250,6 +2250,79 @@ EOF;
 
 		$this->assertEquals( 1269120551, $metadata['created_timestamp'] );
 	}
+
+	/**
+	 * @ticket 10752
+	 */
+	public function test_media_handle_upload_uses_post_parent_for_directory_date() {
+		$iptc_file = DIR_TESTDATA . '/images/test-image-iptc.jpg';
+
+		// Make a copy of this file as it gets moved during the file upload
+		$tmp_name = wp_tempnam( $iptc_file );
+
+		copy( $iptc_file, $tmp_name );
+
+		$_FILES['upload'] = array(
+			'tmp_name' => $tmp_name,
+			'name'     => 'test-image-iptc.jpg',
+			'type'     => 'image/jpeg',
+			'error'    => 0,
+			'size'     => filesize( $iptc_file )
+		);
+
+		$parent_id = self::factory()->post->create( array( 'post_date' => '2010-01-01' ) );
+
+		$post_id = media_handle_upload( 'upload', $parent_id, array(), array( 'action' => 'test_iptc_upload', 'test_form' => false ) );
+
+		unset( $_FILES['upload'] );
+
+		$url = wp_get_attachment_url( $post_id );
+
+		// Clean up.
+		wp_delete_attachment( $post_id );
+		wp_delete_post( $parent_id );
+
+		$this->assertSame( 'http://example.org/wp-content/uploads/2010/01/test-image-iptc.jpg', $url );
+	}
+
+	/**
+	 * @ticket 10752
+	 */
+	public function test_media_handle_upload_ignores_page_parent_for_directory_date() {
+		$iptc_file = DIR_TESTDATA . '/images/test-image-iptc.jpg';
+
+		// Make a copy of this file as it gets moved during the file upload
+		$tmp_name = wp_tempnam( $iptc_file );
+
+		copy( $iptc_file, $tmp_name );
+
+		$_FILES['upload'] = array(
+			'tmp_name' => $tmp_name,
+			'name'     => 'test-image-iptc.jpg',
+			'type'     => 'image/jpeg',
+			'error'    => 0,
+			'size'     => filesize( $iptc_file )
+		);
+
+		$parent_id = self::factory()->post->create( array( 'post_date' => '2010-01-01', 'post_type' => 'page' ) );
+		$parent = get_post( $parent_id );
+
+		$post_id = media_handle_upload( 'upload', $parent_id, array(), array( 'action' => 'test_iptc_upload', 'test_form' => false ) );
+
+		unset( $_FILES['upload'] );
+
+		$url = wp_get_attachment_url( $post_id );
+
+		$uploads_dir = wp_upload_dir( current_time( 'mysql' ) );
+
+		$expected = $uploads_dir['url'] . 'test-image-iptc.jpg';
+
+		// Clean up.
+		wp_delete_attachment( $post_id );
+		wp_delete_post( $parent_id );
+
+		$this->assertNotEquals( $expected, $url );
+	}
 }
 
 /**
