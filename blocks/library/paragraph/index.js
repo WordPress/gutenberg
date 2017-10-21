@@ -135,7 +135,6 @@ registerBlockType( 'core/paragraph', {
 						<ColorPalette
 							value={ backgroundColor }
 							onChange={ ( colorValue ) => setAttributes( { backgroundColor: colorValue } ) }
-							withTransparentOption
 						/>
 					</PanelBody>
 					<PanelBody title={ __( 'Text Color' ) }>
