@@ -22,6 +22,8 @@ tests_reset__SERVER();
 
 $PHP_SELF = $GLOBALS['PHP_SELF'] = $_SERVER['PHP_SELF'] = '/index.php';
 
+tests_add_filter( 'wp_die_handler', '_wp_die_handler_filter_exit' );
+
 require_once ABSPATH . '/wp-settings.php';
 
 require_once ABSPATH . '/wp-admin/includes/upgrade.php';
