@@ -71,6 +71,14 @@ input[type="search"].editor-inserter__search {
 	padding: 8px;
 }
 
+.editor-inserter__menu {
+	width: calc( 100vw - 20px );
+
+	@include break-medium {
+		width: 300px;
+	}
+}
+
 .editor-inserter__menu.components-popover.is-center .components-popover__content {
 	@media ( max-width: #{ $break-medium - 1 } ) {
 		border-width: 0;
