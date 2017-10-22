@@ -1,3 +1,7 @@
 node_modules/
 
+/packages/*/build/
+/packages/*/build-module/
+/packages/*/build-browser/
+
 coverage/
