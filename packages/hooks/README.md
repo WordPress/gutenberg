@@ -14,29 +14,28 @@ npm install @wordpress/hooks@next --save
 
 API functions can be called via the global `wp.hooks` like this `wp.hooks.addAction()`, etc.
 
-* `addAction( 'hook', 'vendor/plugin/function', callback, priority )`
-* `addFilter( 'hook', 'vendor/plugin/function', callback, priority )`
-* `removeAction( 'hook', 'vendor/plugin/function' )`
-* `removeFilter( 'hook',  'vendor/plugin/function' )`
-* `removeAllActions( 'hook' )`
-* `removeAllFilters( 'hook' )`
-* `doAction( 'hook', arg1, arg2, moreArgs, finalArg )`
-* `applyFilters( 'hook', content, arg1, arg2, moreArgs, finalArg )`
-* `doingAction( 'hook' )`
-* `doingFilter( 'hook' )`
-* `didAction( 'hook' )`
-* `didFilter( 'hook' )`
-* `hasAction( 'hook' )`
-* `hasFilter( 'hook' )`
+A lightweight & efficient filter and action manager.
 
+### API Usage
 
-### Background
-See ticket [#21170](http://core.trac.wordpress.org/ticket/21170) for more information.
+* `addAction( 'hookName', 'functionName', callback, priority )`
+* `addFilter( 'hookName', 'functionName', callback, priority )`
+* `removeAction( 'hookName', 'functionName' )`
+* `removeFilter( 'hookName',  'functionName' )`
+* `removeAllActions( 'hookName' )`
+* `removeAllFilters( 'hookName' )`
+* `doAction( 'hookName', arg1, arg2, moreArgs, finalArg )`
+* `applyFilters( 'hookName', content, arg1, arg2, moreArgs, finalArg )`
+* `doingAction( 'hookName' )`
+* `doingFilter( 'hookName' )`
+* `didAction( 'hookName' )`
+* `didFilter( 'hookName' )`
+* `hasAction( 'hookName' )`
+* `hasFilter( 'hookName' )`
 
+Hooks can be added to an object via composition:
+`import createHooks from '../';`
 
-### Features
+`myObject.hooks = createHooks();`
 
-* Fast and lightweight.
-* Priorities system ensures hooks with lower integer priority are fired first.
-* Uses native object hash lookup for finding hook callbacks.
-* Utilizes insertion sort for keeping priorities correct. Best Case: O(n), worst case: O(n^2)
+API functions are then be called: `myObject.hooks.addAction()`...
