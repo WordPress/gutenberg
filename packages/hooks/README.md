@@ -1,4 +1,18 @@
-# WP-JS-Hooks
+# @wordpress/hooks
+
+A lightweight & efficient EventManager for JavaScript in WordPress.
+
+## Installation
+
+Install the module
+
+```bash
+npm install @wordpress/hooks@next --save
+```
+
+### Usage
+
+API functions can be called via the global `wp.hooks` like this `wp.hooks.addAction()`, etc.
 
 A lightweight & efficient filter and action manager.
 

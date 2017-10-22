@@ -7,7 +7,7 @@ A collection of utilities to manipulate URLs
 Install the module
 
 ```bash
-npm install @wordpress/url --save
+npm install @wordpress/url@next --save
 ```
 
 ## Usage
