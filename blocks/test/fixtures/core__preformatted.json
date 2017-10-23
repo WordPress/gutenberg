@@ -6,14 +6,16 @@
         "attributes": {
             "content": [
                 "Some ",
-                {
-                    "type": "em",
-                    "children": "preformatted"
-                },
+                [
+                    "em",
+                    {},
+                    "preformatted"
+                ],
                 " text...",
-                {
-                    "type": "br"
-                },
+                [
+                    "br",
+                    {}
+                ],
                 "And more!"
             ]
         },

@@ -6,10 +6,11 @@
         "attributes": {
             "content": [
                 "This is an old-style text block.  Changed to ",
-                {
-                    "type": "code",
-                    "children": "paragraph"
-                },
+                [
+                    "code",
+                    {},
+                    "paragraph"
+                ],
                 " in #2135."
             ],
             "dropCap": false
