@@ -177,7 +177,7 @@ describe( 'Editable', () => {
 		it( 'should render value with deeply nested DOM nodes', () => {
 			const value = [
 				'This is a ',
-				[ 'strong', {}, 'paragraph', ],
+				[ 'strong', {}, 'paragraph' ],
 				' with a ',
 				[ 'a', { href: 'https://w.org/' }, 'link with ', [
 					'b',

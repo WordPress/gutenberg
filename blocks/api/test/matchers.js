@@ -12,6 +12,7 @@ import { renderToString } from '@wordpress/element';
  * Internal dependencies
  */
 import * as sources from '../matchers';
+import { valueToElement } from '../../editable';
 
 describe( 'matchers', () => {
 	describe( 'children()', () => {
@@ -24,10 +25,10 @@ describe( 'matchers', () => {
 		it( 'should return HTML equivalent WPElement of matched element', () => {
 			// Assumption here is that we can cleanly convert back and forth
 			// between a string and WPElement representation
-			const html = '<blockquote><p>A delicious sundae dessert</p></blockquote>';
+			const html = '<blockquote><p>A delicious <b>sundae</b> dessert.</p><p>I want it!</p></blockquote>';
 			const match = parse( html, sources.children() );
 
-			expect( renderToString( match ) ).toBe( html );
+			expect( renderToString( valueToElement( match ) ) ).toBe( html );
 		} );
 	} );
 
@@ -41,10 +42,10 @@ describe( 'matchers', () => {
 		it( 'should return HTML equivalent WPElement of matched element', () => {
 			// Assumption here is that we can cleanly convert back and forth
 			// between a string and WPElement representation
-			const html = '<blockquote><p>A delicious sundae dessert</p></blockquote>';
+			const html = '<blockquote><p>A delicious <b>sundae</b> dessert.</p></blockquote>';
 			const match = parse( html, sources.node() );
 
-			expect( renderToString( match ) ).toBe( `<body>${ html }</body>` );
+			expect( renderToString( valueToElement( [ match ] ) ) ).toBe( `<body>${ html }</body>` );
 		} );
 	} );
 } );
