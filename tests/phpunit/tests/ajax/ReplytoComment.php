@@ -222,4 +222,34 @@ class Tests_Ajax_ReplytoComment extends WP_Ajax_UnitTestCase {
 		}
 		return $sql;
 	}
+
+	/**
+	 * Raises WP_Error after Posted a new pre comment
+	 * @ticket 39730
+	 * @return void
+	 */
+	public function test_pre_comments_approved() {
+
+		// Become an administrator
+		$this->_setRole( 'administrator' );
+
+		// Set up a default request
+		$_POST['_ajax_nonce-replyto-comment'] = wp_create_nonce( 'replyto-comment' );
+		$_POST['content']                     = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+		$_POST['comment_post_ID']             = self::$comment_post->ID;
+
+		// Simulate filter check error
+		add_filter( 'pre_comment_approved', array( $this, '_pre_comment_approved_filter' ), 10, 2 );
+
+		// Make the request
+		$this->setExpectedException( 'WPAjaxDieStopException', 'pre_comment_approved filter fails for new comment' );
+		$this->_handleAjax( 'replyto-comment' );
+	}
+
+	/**
+	 *  Block comments from being saved 'pre_comment_approved', by returning WP_Error
+	 */
+	function _pre_comment_approved_filter( $approved, $commentdata ) {
+		return new WP_Error( 'comment_wrong', 'pre_comment_approved filter fails for new comment', 403 );
+	}
 }
