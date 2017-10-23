@@ -122,19 +122,54 @@ class Tests_Admin_includesTheme extends WP_UnitTestCase {
 		switch_theme( $theme['Template'], $theme['Stylesheet'] );
 
 		$this->assertEqualSetsWithIndex( array(
-			'Top Level' => 'template-top-level-post-types.php',
-			'Sub Dir'   => 'subdir/template-sub-dir-post-types.php',
+			'Top Level'                  => 'template-top-level-post-types.php',
+			'Sub Dir'                    => 'subdir/template-sub-dir-post-types.php',
+			'Top Level In A Child Theme' => 'template-top-level-post-types-child.php',
+			'Sub Dir In A Child Theme'   => 'subdir/template-sub-dir-post-types-child.php',
 		), get_page_templates( null, 'foo' ) );
+
 		$this->assertEqualSetsWithIndex( array(
 			'Top Level' => 'template-top-level-post-types.php',
 			'Sub Dir'   => 'subdir/template-sub-dir-post-types.php',
 		), get_page_templates( null, 'post' ) );
+
 		$this->assertEqualSetsWithIndex( array(
 			'Top Level'                           => 'template-top-level.php',
 			'Sub Dir'                             => 'subdir/template-sub-dir.php',
 			'This Template Header Is On One Line' => 'template-header.php',
 		), get_page_templates() );
+
 		$this->assertEquals( array(), get_page_templates( null, 'bar' ) );
+	}
+
+	/**
+	 * @ticket 41717
+	 */
+	public function test_get_post_templates_child_theme() {
+		$theme = wp_get_theme( 'page-templates-child' );
+		$this->assertNotEmpty( $theme );
+
+		switch_theme( $theme['Template'], $theme['Stylesheet'] );
+
+		$post_templates = $theme->get_post_templates();
+
+		$this->assertEqualSetsWithIndex( array(
+			'template-top-level-post-types.php'            => 'Top Level',
+			'subdir/template-sub-dir-post-types.php'       => 'Sub Dir',
+			'template-top-level-post-types-child.php'      => 'Top Level In A Child Theme',
+			'subdir/template-sub-dir-post-types-child.php' => 'Sub Dir In A Child Theme',
+		), $post_templates['foo'] );
+
+		$this->assertEqualSetsWithIndex( array(
+			'template-top-level-post-types.php'      => 'Top Level',
+			'subdir/template-sub-dir-post-types.php' => 'Sub Dir',
+		), $post_templates['post'] );
+
+		$this->assertEqualSetsWithIndex( array(
+			'template-top-level.php'      => 'Top Level',
+			'subdir/template-sub-dir.php' => 'Sub Dir',
+			'template-header.php'         => 'This Template Header Is On One Line',
+		), $post_templates['page'] );
 	}
 
 	/**
