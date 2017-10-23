@@ -609,6 +609,7 @@ export default class Editable extends Component {
 			inlineToolbar = false,
 			formattingControls,
 			placeholder,
+			aria,
 			multiline: MultilineTag,
 			keepPlaceholderOnFocus = false,
 		} = this.props;
@@ -649,7 +650,7 @@ export default class Editable extends Component {
 					style={ style }
 					defaultValue={ value }
 					isPlaceholderVisible={ isPlaceholderVisible }
-					label={ placeholder }
+					aria={ { label: placeholder, ...aria } }
 					className={ className }
 					key={ key }
 				/>

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import tinymce from 'tinymce';
-import { isEqual } from 'lodash';
+import { difference, filter, forEach, isEqual, keys, mapKeys } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -38,6 +38,15 @@ export default class TinyMCE extends Component {
 
 		if ( ! isEqual( this.props.className, nextProps.className ) ) {
 			this.editorNode.className = classnames( nextProps.className, 'blocks-editable__tinymce' );
+		}
+
+		if ( ! isEqual( this.props.aria, nextProps.aria ) ) {
+			const before = keys( this.props.aria );
+			const after = keys( nextProps.aria );
+			const removed = difference( before, after );
+			const updated = filter( after, ( key ) => ! isEqual( this.props.aria[ key ], nextProps.aria[ key ] ) );
+			forEach( removed, ( key ) => this.editorNode.removeAttribute( 'aria-' + key ) );
+			forEach( updated, ( key ) => this.editorNode.setAttribute( 'aria-' + key, nextProps.aria[ key ] ) );
 		}
 	}
 
@@ -84,7 +93,7 @@ export default class TinyMCE extends Component {
 	}
 
 	render() {
-		const { tagName = 'div', style, defaultValue, label, className } = this.props;
+		const { tagName = 'div', style, defaultValue, aria, className } = this.props;
 
 		// If a default value is provided, render it into the DOM even before
 		// TinyMCE finishes initializing. This avoids a short delay by allowing
@@ -100,7 +109,7 @@ export default class TinyMCE extends Component {
 			suppressContentEditableWarning: true,
 			className: classnames( className, 'blocks-editable__tinymce' ),
 			style,
-			'aria-label': label,
+			...( mapKeys( aria, ( value, key ) => 'aria-' + key ) ),
 		}, children );
 	}
 }
