@@ -103,7 +103,7 @@
 		content: '';
 		position: absolute;
 		height: 36px;
-		top: 0;
+		top: 8px;
 		outline: 1px solid transparent;
 	}
 
@@ -507,7 +507,7 @@
 		opacity: 1;
 	}
 
-	&::before {
+	&:before {
 		content: '';
 		position: absolute;
 		width: 100%;
@@ -516,7 +516,7 @@
 		transform: translateY( -50% );
 	}
 
-	&:hover::before {
+	&:hover:before {
 		height: 44px;
 	}
 
