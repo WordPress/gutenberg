@@ -33,20 +33,17 @@ registerBlockType( 'core/gallery', {
 			source: 'query',
 			selector: 'div.wp-block-gallery figure.blocks-gallery-image img',
 			query: {
-				source: 'object',
-				object: {
-					url: {
-						source: 'attribute',
-						attribute: 'src',
-					},
-					alt: {
-						source: 'attribute',
-						attribute: 'alt',
-					},
-					id: {
-						source: 'attribute',
-						attribute: 'data-id',
-					},
+				url: {
+					source: 'attribute',
+					attribute: 'src',
+				},
+				alt: {
+					source: 'attribute',
+					attribute: 'alt',
+				},
+				id: {
+					source: 'attribute',
+					attribute: 'data-id',
 				},
 			},
 		},

@@ -73,12 +73,12 @@ export function matcherFromSource( sourceConfig ) {
 		case 'node':
 			return node( sourceConfig.selector );
 		case 'query':
-			return query( sourceConfig.selector, matcherFromSource( sourceConfig.query ) );
-		case 'object':
-			return keys( sourceConfig.object ).reduce( ( memo, key ) => {
-				memo[ key ] = matcherFromSource( sourceConfig.object[ key ] );
+			const subMatchers = keys( sourceConfig.query ).reduce( ( memo, key ) => {
+				memo[ key ] = matcherFromSource( sourceConfig.query[ key ] );
 				return memo;
 			}, {} );
+
+			return query( sourceConfig.selector, subMatchers );
 		default:
 			// eslint-disable-next-line no-console
 			console.error( `Unkown source type "${ sourceConfig.source }"` );

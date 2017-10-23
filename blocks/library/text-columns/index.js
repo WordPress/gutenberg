@@ -34,7 +34,9 @@ registerBlockType( 'core/text-columns', {
 			source: 'query',
 			selector: 'p',
 			query: {
-				source: 'children',
+				children: {
+					source: 'children',
+				},
 			},
 			default: [ [], [] ],
 		},
@@ -86,12 +88,12 @@ registerBlockType( 'core/text-columns', {
 					<div className="wp-block-column" key={ `column-${ index }` }>
 						<Editable
 							tagName="p"
-							value={ content && content[ index ] }
+							value={ content && content[ index ].children }
 							onChange={ ( nextContent ) => {
 								setAttributes( {
 									content: [
 										...content.slice( 0, index ),
-										nextContent,
+										{ children: nextContent },
 										...content.slice( index + 1 ),
 									],
 								} );
@@ -112,7 +114,7 @@ registerBlockType( 'core/text-columns', {
 			<section className={ `align${ width } columns-${ columns }` }>
 				{ times( columns, ( index ) =>
 					<div className="wp-block-column" key={ `column-${ index }` }>
-						<p>{ content && content[ index ] }</p>
+						<p>{ content && content[ index ].children }</p>
 					</div>
 				) }
 			</section>

@@ -3,11 +3,7 @@
 /**
  * External dependencies
  */
-<<<<<<< HEAD
 import { get, isFunction, some, mapValues } from 'lodash';
-=======
-import { get, isFunction, some, reduce } from 'lodash';
->>>>>>> Blocks API: Simplify logic using lodash's reduce
 
 /**
  * WordPress dependencies

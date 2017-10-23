@@ -15,6 +15,11 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
 
+const toEditableValue = value => value.map( ( subValue => subValue.children ) );
+const fromEditableValue = value => value.map( ( subValue ) => ( {
+	children: subValue,
+} ) );
+
 registerBlockType( 'core/pullquote', {
 
 	title: __( 'Pullquote' ),
@@ -29,7 +34,9 @@ registerBlockType( 'core/pullquote', {
 			source: 'query',
 			selector: 'blockquote > p',
 			query: {
-				source: 'node',
+				children: {
+					source: 'node',
+				},
 			},
 		},
 		citation: {
@@ -73,10 +80,10 @@ registerBlockType( 'core/pullquote', {
 			<blockquote key="quote" className={ className }>
 				<Editable
 					multiline="p"
-					value={ value }
+					value={ toEditableValue( value ) }
 					onChange={
 						( nextValue ) => setAttributes( {
-							value: nextValue,
+							value: fromEditableValue( nextValue ),
 						} )
 					}
 					placeholder={ __( 'Write quote…' ) }
@@ -107,7 +114,9 @@ registerBlockType( 'core/pullquote', {
 
 		return (
 			<blockquote className={ `align${ align }` }>
-				{ value && value.map( ( paragraph, i ) => <p key={ i }>{ paragraph.props.children }</p> ) }
+				{ value && value.map( ( paragraph, i ) =>
+					<p key={ i }>{ paragraph.children && paragraph.children.props.children }</p>
+				) }
 				{ citation && citation.length > 0 && (
 					<footer>{ citation }</footer>
 				) }
