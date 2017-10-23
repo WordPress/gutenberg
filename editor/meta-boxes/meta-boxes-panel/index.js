@@ -11,11 +11,11 @@ import { Component } from '@wordpress/element';
 import { Button, Dashicon, Panel, PanelHeader } from '@wordpress/components';
 
 /**
- * Internal Dependencies
+ * Internal dependencies
  */
 import './style.scss';
 
-class MetaBoxPanel extends Component {
+class MetaBoxesPanel extends Component {
 	constructor( props ) {
 		super( ...arguments );
 		this.state = {
@@ -61,4 +61,4 @@ class MetaBoxPanel extends Component {
 	}
 }
 
-export default MetaBoxPanel;
+export default MetaBoxesPanel;

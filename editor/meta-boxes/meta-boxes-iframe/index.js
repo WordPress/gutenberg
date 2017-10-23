@@ -13,14 +13,14 @@ import { addQueryArgs } from '@wordpress/url';
 import { Component } from '@wordpress/element';
 
 /**
- * Internal Dependencies
+ * Internal dependencies
  */
 import './style.scss';
 import './meta-box-iframe.scss';
 import { handleMetaBoxReload, metaBoxStateChanged } from '../../actions';
 import { getMetaBox, isSavingPost } from '../../selectors';
 
-class MetaBoxIframe extends Component {
+class MetaBoxesIframe extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -262,4 +262,4 @@ function mapDispatchToProps( dispatch ) {
 	};
 }
 
-export default connect( mapStateToProps, mapDispatchToProps )( MetaBoxIframe );
+export default connect( mapStateToProps, mapDispatchToProps )( MetaBoxesIframe );
