@@ -6,8 +6,8 @@ import { connect } from 'react-redux';
 /**
  * Internal dependencies
  */
-import MetaBoxIframe from './iframe';
-import MetaBoxPanel from './panel';
+import MetaBoxesIframe from './meta-boxes-iframe';
+import MetaBoxesPanel from './meta-boxes-panel';
 import { getMetaBox } from '../selectors';
 
 function MetaBox( { location, isActive } ) {
@@ -16,9 +16,9 @@ function MetaBox( { location, isActive } ) {
 	}
 
 	return (
-		<MetaBoxPanel>
-			<MetaBoxIframe location={ location } />
-		</MetaBoxPanel>
+		<MetaBoxesPanel>
+			<MetaBoxesIframe location={ location } />
+		</MetaBoxesPanel>
 	);
 }
 
