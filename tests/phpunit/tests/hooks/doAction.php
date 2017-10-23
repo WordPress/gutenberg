@@ -77,7 +77,7 @@ class Tests_WP_Hook_Do_Action extends WP_UnitTestCase {
 		$arg = __FUNCTION__ . '_arg';
 
 		$hook->add_filter( $tag, $callback_one, $priority, $accepted_args );
-		$hook->add_filter( $tag, $callback_two, $priority, $accepted_args );
+		$hook->add_filter( $tag, $callback_two, $priority + 1, $accepted_args );
 		$hook->do_action( array( $arg ) );
 
 		$this->assertEquals( 1, $a->get_call_count() );
