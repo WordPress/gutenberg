@@ -6,8 +6,14 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { Button, Dashicon, Panel } from '@wordpress/components';
+import { Button, Dashicon, Panel, PanelHeader } from '@wordpress/components';
+
+/**
+ * Internal Dependencies
+ */
+import './style.scss';
 
 class MetaBoxPanel extends Component {
 	constructor( props ) {
@@ -32,28 +38,24 @@ class MetaBoxPanel extends Component {
 	}
 
 	render() {
-		const { title, children, opened } = this.props;
+		const { children, opened } = this.props;
 		const isOpened = opened === undefined ? this.state.opened : opened;
 		const icon = `arrow-${ isOpened ? 'down' : 'right' }`;
-		const className = classnames( 'components-panel__body', { 'is-opened': isOpened } );
+		const className = classnames( 'editor-meta-boxes-panel__body', { 'is-opened': isOpened } );
 
 		return (
-			<Panel className="editor-meta-boxes">
-				<div className={ className }>
-					{ !! title && (
-						<h3 className="components-panel__body-title">
-							<Button
-								className="components-panel__body-toggle"
-								onClick={ this.toggle }
-								aria-expanded={ isOpened }
-							>
-								<Dashicon icon={ icon } />
-								{ title }
-							</Button>
-						</h3>
-					) }
-					{ children }
-				</div>
+			<Panel className="editor-meta-boxes-panel">
+				<Button
+					onClick={ this.toggle }
+					aria-expanded={ isOpened }
+					className="editor-meta-boxes-panel__toggle"
+					>
+					<PanelHeader>
+						{ __( 'Extended Settings' ) }
+						<Dashicon icon={ icon } />
+					</PanelHeader>
+				</Button>
+				<div className={ className }>{ children }</div>
 			</Panel>
 		);
 	}

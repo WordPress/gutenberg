@@ -1,0 +1,37 @@
+.editor-meta-boxes-iframe {
+	width: 100%;
+	position: relative;
+
+	.is-updating {
+		filter: blur( 5px );
+	}
+
+	.is-hidden {
+		visibility: hidden;
+		position: absolute;
+		top: 0;
+		left: 0;
+	}
+}
+
+.editor-meta-boxes-iframe__loading-overlay {
+	background-color: rgba( 0, 0, 0, 0.6 );
+	display: none;
+	position: absolute;
+	height: 100%;
+	top: 0;
+	left: 0;
+	width: 100%;
+	z-index: 1;
+
+	&.is-visible {
+		align-items: center;
+		display: flex;
+		justify-content: center;
+	}
+}
+
+.editor-meta-boxes-iframe__loading-overlay-text {
+	color: $white;
+	font-weight: 700;
+}
