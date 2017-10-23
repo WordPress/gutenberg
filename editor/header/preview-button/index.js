@@ -6,8 +6,8 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-import { IconButton } from '@wordpress/components';
+import { Component, renderToString } from '@wordpress/element';
+import { IconButton, Spinner } from '@wordpress/components';
 import { _x } from '@wordpress/i18n';
 
 /**
@@ -73,6 +73,15 @@ export class PreviewButton extends Component {
 			'about:blank',
 			this.getWindowTarget()
 		);
+
+		const popupLoader = renderToString(
+			<div>
+				<Spinner />
+				<p>Please wait&hellip;</p>
+				<p>Generating preview.</p>
+			</div>
+		);
+		this.previewWindow.document.write( popupLoader );
 	}
 
 	render() {
