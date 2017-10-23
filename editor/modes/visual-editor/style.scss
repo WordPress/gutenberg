@@ -47,6 +47,7 @@
 		bottom: 0;
 		left: 0;
 		right: 0;
+		outline: 1px solid transparent;
 
 		@include break-small {
 			left: $block-mover-padding-visible;
@@ -102,21 +103,28 @@
 		content: '';
 		position: absolute;
 		height: 36px;
-		top: 10px;
+		top: 0;
+		outline: 1px solid transparent;
 	}
 
 	&.is-selected .editor-block-mover:before,
 	&.is-hovered .editor-block-mover:before {
 		border-right: 1px solid $light-gray-500;
-		right: 4px;
+		right: 6px;
 	}
 
 	&.is-selected .editor-block-settings-menu:before,
 	&.is-hovered .editor-block-settings-menu:before {
 		border-left: 1px solid $light-gray-500;
-		left: 4px;
+		left: 6px;
 	}
 
+	// focused block-style
+	&.is-selected:before {
+ 		outline: 1px solid $light-gray-500;
+	}
+
+	// selection style for multiple blocks
 	&.is-multi-selected *::selection {
 		background: transparent;
 	}
@@ -315,30 +323,6 @@
 			background: none;
 			border-bottom: 3px solid $blue-medium-500;
 		}
-	}
-}
-
-// show a separate cursor/caret highlight style for when an item was selected by the mouse or keyboard (but isn't multi selected)
-// this is only for some blocks
-.editor-visual-editor__block.is-selected[data-type="core/more"],
-.editor-visual-editor__block.is-selected[data-type="core/separator"],
-.editor-visual-editor__block.is-selected[data-type="core/button"] {
-	&:after {
-		content: '';
-		position: absolute;
-		pointer-events: none;
-		top: $block-padding;
-		bottom: $block-padding;
-		left: $block-padding + $block-mover-padding-visible;
-		right: $block-padding + $block-mover-padding-visible;
-		background: $blue-medium-300;
-		background: Highlight;
-		opacity: .15;
-	}
-
-	&[data-align="full"]:after {
-		left: 0;
-		right: 0;
 	}
 }
 
