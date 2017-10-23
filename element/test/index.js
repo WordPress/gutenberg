@@ -5,11 +5,19 @@ import { createElement, renderToString, concatChildren, switchChildrenNodeName }
 
 describe( 'element', () => {
 	describe( 'renderToString', () => {
-		it( 'should return an empty string for a falsey value', () => {
+		it( 'should return an empty string for booleans/null/undefined values', () => {
 			expect( renderToString() ).toBe( '' );
 			expect( renderToString( false ) ).toBe( '' );
+			expect( renderToString( true ) ).toBe( '' );
 			expect( renderToString( null ) ).toBe( '' );
-			expect( renderToString( 0 ) ).toBe( '' );
+		} );
+
+		it( 'should return a string 0', () => {
+			expect( renderToString( 0 ) ).toBe( '0' );
+		} );
+
+		it( 'should return a string 12345', () => {
+			expect( renderToString( 12345 ) ).toBe( '12345' );
 		} );
 
 		it( 'should return a string verbatim', () => {

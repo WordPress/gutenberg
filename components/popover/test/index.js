@@ -262,13 +262,13 @@ describe( 'Popover', () => {
 		} );
 
 		it( 'should render content if popover is open', () => {
-			const wrapper = shallow( <Popover isOpen>Hello</Popover> );
+			const wrapper = shallow( <Popover isOpen>Hello</Popover>, { disableLifecycleMethods: true } );
 
 			expect( wrapper.type() ).not.toBeNull();
 		} );
 
 		it( 'should pass additional to portaled element', () => {
-			const wrapper = shallow( <Popover isOpen role="tooltip">Hello</Popover> );
+			const wrapper = shallow( <Popover isOpen role="tooltip">Hello</Popover>, { disableLifecycleMethods: true } );
 
 			expect( wrapper.find( '.components-popover' ).prop( 'role' ) ).toBe( 'tooltip' );
 		} );

@@ -152,6 +152,8 @@ function gutenberg_init( $return, $post ) {
 	}
 
 	add_action( 'admin_enqueue_scripts', 'gutenberg_editor_scripts_and_styles' );
+	add_filter( 'screen_options_show_screen', '__return_false' );
+	add_filter( 'admin_body_class', 'gutenberg_add_admin_body_class' );
 
 	require_once( ABSPATH . 'wp-admin/admin-header.php' );
 	the_gutenberg_project();
@@ -526,3 +528,15 @@ function gutenberg_replace_default_add_new_button() {
 	<?php
 }
 add_action( 'admin_print_scripts-edit.php', 'gutenberg_replace_default_add_new_button' );
+
+/**
+ * Adds the gutenberg-editor-page class to the body tag on the Gutenberg page.
+ *
+ * @since 1.5.0
+ *
+ * @param string $classes Space seperated string of classes being added to the body tag.
+ * @return string The $classes string, with gutenberg-editor-page appended.
+ */
+function gutenberg_add_admin_body_class( $classes ) {
+	return "$classes gutenberg-editor-page";
+}
