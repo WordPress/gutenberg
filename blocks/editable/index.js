@@ -60,9 +60,10 @@ function isLinkBoundary( fragment ) {
 
 function getFormatProperties( formatName, parents ) {
 	switch ( formatName ) {
-		case 'link' :
+		case 'link' : {
 			const anchor = find( parents, node => node.nodeName.toLowerCase() === 'a' );
 			return !! anchor ? { value: anchor.getAttribute( 'href' ) || '', target: anchor.getAttribute( 'target' ) || '', node: anchor } : {};
+		}
 		default:
 			return {};
 	}
@@ -158,9 +159,20 @@ export default class Editable extends Component {
 		this.registerCustomFormatters();
 	}
 
+	adaptFormatter( options ) {
+		switch ( options.type ) {
+			case 'inline-style': {
+				return {
+					inline: 'span',
+					styles: { ...options.style },
+				};
+			}
+		}
+	}
+
 	registerCustomFormatters() {
-		forEach( this.props.initialFormatters, ( formatter ) => {
-			this.editor.formatter.register( formatter.format, { ...formatter.formatter } );
+		forEach( this.props.formatters, ( formatter ) => {
+			this.editor.formatter.register( formatter.format, this.adaptFormatter( formatter ) );
 		} );
 	}
 
@@ -572,9 +584,9 @@ export default class Editable extends Component {
 
 	componentWillReceiveProps( nextProps ) {
 		if ( 'development' === process.env.NODE_ENV ) {
-			if ( ! isEqual( this.props.initialFormatters, nextProps.initialFormatters ) ) {
+			if ( ! isEqual( this.props.formatters, nextProps.formatters ) ) {
 				// eslint-disable-next-line no-console
-				console.error( 'Formatters passed via `initialFormatters` will only be registered once. Formatters can be enabled/disabled via the `formattingControls` prop.' );
+				console.error( 'Formatters passed via `formatters` prop will only be registered once. Formatters can be enabled/disabled via the `formattingControls` prop.' );
 			}
 		}
 	}
@@ -621,12 +633,6 @@ export default class Editable extends Component {
 		this.editor.setDirty( true );
 	}
 
-	getToolbarCustomControls() {
-		const { initialFormatters, formattingControls } = this.props;
-		return initialFormatters
-			.filter( f => formattingControls.indexOf( f.format ) > -1 );
-	}
-
 	render() {
 		const {
 			tagName: Tagname = 'div',
@@ -640,6 +646,7 @@ export default class Editable extends Component {
 			placeholder,
 			multiline: MultilineTag,
 			keepPlaceholderOnFocus = false,
+			formatters,
 		} = this.props;
 
 		// Generating a key that includes `tagName` ensures that if the tag
@@ -656,7 +663,7 @@ export default class Editable extends Component {
 				formats={ this.state.formats }
 				onChange={ this.changeFormats }
 				enabledControls={ formattingControls }
-				customControls={ this.getToolbarCustomControls() }
+				customControls={ formatters }
 			/>
 		);
 
@@ -702,5 +709,5 @@ Editable.contextTypes = {
 
 Editable.defaultProps = {
 	formattingControls: DEFAULT_FORMATS,
-	initialFormatters: [],
+	formatters: [],
 };

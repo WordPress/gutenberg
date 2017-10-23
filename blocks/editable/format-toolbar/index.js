@@ -147,9 +147,8 @@ class FormatToolbar extends Component {
 			? { position: 'absolute', ...focusPosition }
 			: null;
 
-		const toolbarControls = FORMATTING_CONTROLS
+		const toolbarControls = FORMATTING_CONTROLS.concat( customControls )
 			.filter( control => enabledControls.indexOf( control.format ) !== -1 )
-			.concat( customControls )
 			.map( ( control ) => {
 				const isLink = control.format === 'link';
 				return {
