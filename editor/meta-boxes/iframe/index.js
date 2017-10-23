@@ -3,6 +3,7 @@
  */
 import { isEqual } from 'lodash';
 import classnames from 'classnames';
+import { connect } from 'react-redux';
 
 /**
  * WordPress dependencies
@@ -12,9 +13,12 @@ import { addQueryArgs } from '@wordpress/url';
 import { Component } from '@wordpress/element';
 
 /**
- * Internal dependencies.
+ * Internal Dependencies
  */
-import MetaBoxPanel from './panel.js';
+import './style.scss';
+import './meta-box-iframe.scss';
+import { handleMetaBoxReload, metaBoxStateChanged } from '../../actions';
+import { getMetaBox, isSavingPost } from '../../selectors';
 
 class MetaBoxIframe extends Component {
 	constructor() {
@@ -23,7 +27,6 @@ class MetaBoxIframe extends Component {
 		this.state = {
 			width: 0,
 			height: 0,
-			isOpen: false,
 		};
 
 		this.originalFormData = [];
@@ -38,13 +41,6 @@ class MetaBoxIframe extends Component {
 		this.observeChanges = this.observeChanges.bind( this );
 		this.bindNode = this.bindNode.bind( this );
 		this.isSaving = this.isSaving.bind( this );
-		this.toggle = this.toggle.bind( this );
-	}
-
-	toggle() {
-		this.setState( {
-			isOpen: ! this.state.isOpen,
-		} );
 	}
 
 	bindNode( node ) {
@@ -214,43 +210,56 @@ class MetaBoxIframe extends Component {
 
 	render() {
 		const { location } = this.props;
-		const { isOpen, width, height } = this.state;
+		const { width, height } = this.state;
 		const isSaving = this.isSaving();
 
 		const classes = classnames(
-			'editor-meta-boxes__iframe',
-			`is-${ location }`,
-			{ 'is-closed': ! isOpen }
+			'editor-meta-boxes-iframe',
+			`is-${ location }`
 		);
 
 		const overlayClasses = classnames(
-			'editor-meta-boxes__loading-overlay',
+			'editor-meta-boxes-iframe__loading-overlay',
 			{ 'is-visible': isSaving }
 		);
 
 		const iframeClasses = classnames( { 'is-updating': isSaving } );
 
 		return (
-			<MetaBoxPanel
-				title={ __( 'Extended Settings' ) }
-				opened={ isOpen }
-				onToggle={ this.toggle }>
-				<div className={ classes }>
-					<div className={ overlayClasses }>
-						<p className="loading-overlay__text">{ __( 'Updating Settings' ) }</p>
-					</div>
-					<iframe
-						className={ iframeClasses }
-						ref={ this.bindNode }
-						title={ __( 'Extended Settings' ) }
-						sandbox="allow-forms allow-same-origin allow-scripts"
-						src={ addQueryArgs( window._wpMetaBoxUrl, { meta_box: location } ) }
-						width={ Math.ceil( width ) }
-						height={ Math.ceil( height ) } />
+			<div className={ classes }>
+				<div className={ overlayClasses }>
+					<p className="editor-meta-boxes-iframe__loading-overlay-text">{ __( 'Updating Settings' ) }</p>
 				</div>
-			</MetaBoxPanel>
+				<iframe
+					className={ iframeClasses }
+					ref={ this.bindNode }
+					title={ __( 'Extended Settings' ) }
+					sandbox="allow-forms allow-same-origin allow-scripts"
+					src={ addQueryArgs( window._wpMetaBoxUrl, { meta_box: location } ) }
+					width={ Math.ceil( width ) }
+					height={ Math.ceil( height ) } />
+			</div>
 		);
 	}
 }
 
-export default MetaBoxIframe;
+function mapStateToProps( state, ownProps ) {
+	const metaBox = getMetaBox( state, ownProps.location );
+	const { isDirty, isUpdating } = metaBox;
+
+	return {
+		isDirty,
+		isUpdating,
+		isPostSaving: isSavingPost( state ) ? true : false,
+	};
+}
+
+function mapDispatchToProps( dispatch ) {
+	return {
+		// Used to set the reference to the MetaBox in redux, fired when the component mounts.
+		metaBoxReloaded: ( location ) => dispatch( handleMetaBoxReload( location ) ),
+		changedMetaBoxState: ( location, hasChanged ) => dispatch( metaBoxStateChanged( location, hasChanged ) ),
+	};
+}
+
+export default connect( mapStateToProps, mapDispatchToProps )( MetaBoxIframe );
