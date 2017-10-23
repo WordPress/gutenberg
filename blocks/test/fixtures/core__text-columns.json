@@ -5,12 +5,16 @@
         "isValid": true,
         "attributes": {
             "content": [
-                [
-                    "One"
-                ],
-                [
-                    "Two"
-                ]
+                {
+                    "children": [
+                        "One"
+                    ]
+                },
+                {
+                    "children": [
+                        "Two"
+                    ]
+                }
             ],
             "columns": 2,
             "width": "center"

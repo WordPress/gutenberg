@@ -121,11 +121,8 @@ _Example_: Extract `src` and `alt` from each image element in the block's markup
 		source: 'query'
 		selector: 'img',
 		query: {
-			source: 'object',
-			object: {
-				url: { source: 'attribute', attribute: 'src' },
-				alt: { source: 'attribute', attribute: 'alt' },
-			},
+			url: { source: 'attribute', attribute: 'src' },
+			alt: { source: 'attribute', attribute: 'alt' },
 		}
 	}
 }
