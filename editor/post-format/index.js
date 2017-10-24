@@ -38,7 +38,7 @@ function PostFormat( { postType, onUpdatePostFormat, postFormat = 'standard', su
 	const postFormatSelectorId = 'post-format-selector-' + instanceId;
 	const suggestion = find( POST_FORMATS, ( format ) => format.id === suggestedFormat );
 
-	// Disable reason: A select with an onchange throws a warning
+	// Disable reason: We need to change the value immiediately to show/hide the suggestion if needed
 
 	/* eslint-disable jsx-a11y/no-onchange */
 	return (
