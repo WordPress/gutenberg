@@ -80,7 +80,7 @@ const applyConnect = connect(
 			return editPost( { featured_media: image.id } );
 		},
 		onRemoveImage() {
-			return editPost( { featured_media: null } );
+			return editPost( { featured_media: 0 } );
 		},
 		onTogglePanel() {
 			return toggleSidebarPanel( PANEL_NAME );
