@@ -19,7 +19,7 @@ class MetaBoxesPanel extends Component {
 	constructor( props ) {
 		super( ...arguments );
 		this.state = {
-			opened: props.initialOpen === undefined ? true : props.initialOpen,
+			opened: props.initialOpen === undefined ? false : props.initialOpen,
 		};
 		this.toggle = this.toggle.bind( this );
 	}
