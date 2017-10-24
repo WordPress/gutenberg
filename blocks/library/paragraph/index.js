@@ -182,15 +182,6 @@ registerBlockType( 'core/paragraph', {
 					onMerge={ mergeBlocks }
 					onReplace={ onReplace }
 					placeholder={ placeholder || __( 'Add text or type / to insert content' ) }
-					formattingControls={ [ 'bold', 'italic', 'strikethrough', 'link', 'red' ] }
-					formatters={ [ {
-						type: 'inline-style',
-						format: 'red',
-						title: 'Red',
-						icon: 'hammer',
-						style: { color: 'red' },
-					} ]
-					}
 				/>
 			</BlockAutocomplete>,
 		];
