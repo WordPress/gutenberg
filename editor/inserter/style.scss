@@ -36,7 +36,7 @@
 	height: calc( 100vh - #{ $admin-bar-height-big + $header-height + 34 + $inserter-tabs-height } ); // 34 = search input height
 
 	@include break-medium {
-		height: 240px;
+		height: 260px;
 	}
 
 	overflow: auto;
@@ -53,11 +53,11 @@ input[type="search"].editor-inserter__search {
 	margin: 0;
 	box-shadow: none;
 	border: 1px solid transparent;
-	border-bottom: 1px solid $light-gray-500;
 	padding: 8px 11px;
 	font-size: $default-font-size;
 	position: relative;
 	z-index: 1;
+	border-bottom: 1px solid $light-gray-500;
 
 	&:focus {
 		outline: none;
@@ -69,6 +69,14 @@ input[type="search"].editor-inserter__search {
 	display: flex;
 	flex-flow: row wrap;
 	padding: 8px;
+}
+
+.editor-inserter__menu {
+	width: calc( 100vw - 20px );
+
+	@include break-medium {
+		width: 300px;
+	}
 }
 
 .editor-inserter__menu.components-popover.is-center .components-popover__content {
@@ -89,17 +97,19 @@ input[type="search"].editor-inserter__search {
 
 .editor-inserter__block {
 	display: flex;
-	width: 50%;
+	flex-direction: column;
+	width: calc( 50% - 16px );
+	border-radius: 4px;
 	font-size: $default-font-size;
 	color: $dark-gray-500;
-	margin: 0;
-	padding: 12px 6px;
+	margin: 8px;
+	padding: 12px 6px 6px 6px;
 	align-items: center;
 	cursor: pointer;
 	border: none;
-	background: none;
 	line-height: 20px;
-
+	background: transparent;
+	border: 1px solid transparent;
 
 	&:disabled {
 		opacity: 0.6;
@@ -111,29 +121,29 @@ input[type="search"].editor-inserter__search {
 			color: $blue-medium-500;
 		}
 
-		&:focus {
-			outline: 1px solid $dark-gray-500;
-		}
-
+		&:focus,
 		&:active,
 		&.is-active {
-			background: $dark-gray-500;
+			outline: none;
+			border: 1px solid $dark-gray-500;
+			box-shadow: inset 0 0 0 1px $white;
+			color: $dark-gray-900;
+			background: $light-gray-300;
 			position: relative;
-			color: $white;
 		}
-	}
-
-	.dashicon {
-		margin-right: 8px;
 	}
 }
 
 .editor-inserter__separator {
+	border-top: 1px solid $light-gray-500;
+	background: rgba( $white, .8 );
+	text-align: center;
 	display: block;
 	margin: 0;
 	padding: 12px 14px 0 14px;
 	font-size: $default-font-size;
 	font-weight: 600;
+	margin-top: -1px;	// hide the first top border
 }
 
 .editor-inserter__tabs {
@@ -141,15 +151,15 @@ input[type="search"].editor-inserter__search {
 	display: flex;
 	justify-content: space-between;
 	position: relative;
-	z-index: z-index( '.editor-inserter__tabs' );
+	background: $light-gray-300;
+	border-bottom: 1px solid $light-gray-500;
 }
 
 .editor-inserter__tab {
-	background: $light-gray-300;
 	border: none;
-	border-bottom: 2px solid transparent;
-	border-top: 2px solid transparent;
-	box-shadow: 0 0 0 1px $light-gray-500;
+	background: none;
+	border-bottom: 3px solid transparent;
+	border-top: 3px solid transparent;
 	font-size: $default-font;
 	padding: 8px 8px;
 	width: 100%;
@@ -158,13 +168,15 @@ input[type="search"].editor-inserter__search {
 	cursor: pointer;
 
 	&.is-active {
-		background: $white;
+		font-weight: 600;
 		border-bottom-color: $blue-medium-500;
 		position: relative;
 		z-index: z-index( '.editor-inserter__tab.is-active' );
 	}
 
+	&:active,
 	&:focus {
+		z-index: z-index( '.editor-inserter__tab.is-active' );
 		box-shadow: $button-focus-style;
 		outline: none;
 	}
