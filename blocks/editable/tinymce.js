@@ -55,6 +55,10 @@ export default class TinyMCE extends Component {
 			return;
 		}
 
+		// This hack prevents TinyMCE from trying to remove the container node
+		// while cleaning for destroy, since removal is handled by React. It
+		// does so by substituting the container to be removed.
+		this.editor.container = document.createDocumentFragment();
 		this.editor.destroy();
 		delete this.editor;
 	}
