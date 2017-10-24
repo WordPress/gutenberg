@@ -199,10 +199,10 @@ class ImageBlock extends Component {
 
 						return (
 							<ResizableBox
-								size={{
+								size={ {
 									width: currentWidth,
-									height: currentHeight
-								}}
+									height: currentHeight,
+								} }
 								minWidth={ minWidth }
 								maxWidth={ settings.maxWidth }
 								minHeight={ minHeight }
@@ -216,7 +216,6 @@ class ImageBlock extends Component {
 								} }
 								enable={ { top: false, right: true, bottom: false, left: false, topRight: true, bottomRight: true, bottomLeft: true, topLeft: true } }
 								onResize={ ( event, direction, elt, delta ) => {
-
 									setAttributes( {
 										width: width + delta.width,
 										height: height + delta.height,
