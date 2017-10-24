@@ -59,7 +59,7 @@ describe( 'DropdownMenu', () => {
 			const wrapper = mount( <DropdownMenu controls={ controls } /> );
 
 			// Close menu by keyup
-			wrapper.find( '.components-dropdown-menu__toggle' ).simulate( 'keydown', {
+			wrapper.find( 'button.components-dropdown-menu__toggle' ).simulate( 'keydown', {
 				stopPropagation: () => {},
 				preventDefault: () => {},
 				keyCode: DOWN,

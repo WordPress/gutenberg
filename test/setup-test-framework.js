@@ -1,34 +1,25 @@
 // `babel-jest` should be doing this instead, but apparently it's not working.
 require( 'core-js/modules/es7.object.values' );
 
-// TODO: These exist only to stub or monkey-patch differences between React 15
-// and 16, since the test environment runs an older version (while we wait for
-// test dependencies like Enzyme to support 16)
-//
-// See: https://github.com/airbnb/enzyme/issues/928
-jest.mock( '@wordpress/element', () => ( {
-	...require.requireActual( '@wordpress/element' ),
-	createPortal: ( x ) => x,
-	renderToString: ( element ) => {
-		const { createElement } = require( 'react' );
-		const { renderToStaticMarkup } = require( 'react-dom/server' );
+/**
+ * External dependencies
+ */
+import Adapter from 'enzyme-adapter-react-16';
+import Enzyme from 'enzyme';
+import 'jest-enzyme';
 
-		if ( ! element ) {
-			return '';
-		}
+Enzyme.configure( { adapter: new Adapter() } );
 
-		if ( 'string' === typeof element ) {
-			return element;
-		}
+// Sets spies on console object to make it possible to convert them into test failures.
+const spyError = jest.spyOn( console, 'error' );
+const spyWarn = jest.spyOn( console, 'warn' );
 
-		if ( Array.isArray( element ) ) {
-			// Pass the array as children of a dummy wrapper, then remove the
-			// wrapper's opening and closing tags.
-			return renderToStaticMarkup(
-				createElement( 'div', null, ...element )
-			).slice( 5 /* <div> */, -6 /* </div> */ );
-		}
+beforeEach( () => {
+	spyError.mockReset();
+	spyWarn.mockReset();
+} );
 
-		return renderToStaticMarkup( element );
-	},
-} ) );
+afterEach( () => {
+	expect( spyError ).not.toHaveBeenCalled();
+	expect( spyWarn ).not.toHaveBeenCalled();
+} );

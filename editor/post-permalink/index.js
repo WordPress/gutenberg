@@ -25,7 +25,7 @@ class PostPermalink extends Component {
 		this.onCopy = this.onCopy.bind( this );
 	}
 
-	componentWillUnmout() {
+	componentWillUnmount() {
 		clearTimeout( this.dismissCopyConfirmation );
 	}
 

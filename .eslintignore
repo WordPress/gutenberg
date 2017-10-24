@@ -2,3 +2,4 @@ build
 coverage
 vendor
 node_modules
+/assets/js

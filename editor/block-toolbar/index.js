@@ -1,13 +1,14 @@
 /**
  * External dependencies
  */
+import { Slot } from 'react-slot-fill';
 import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
 import classnames from 'classnames';
 
 /**
  * WordPress Dependencies
  */
-import { IconButton, Toolbar, NavigableMenu, Slot } from '@wordpress/components';
+import { IconButton, Toolbar, NavigableMenu } from '@wordpress/components';
 import { Component, Children, findDOMNode } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { focus, keycodes } from '@wordpress/utils';

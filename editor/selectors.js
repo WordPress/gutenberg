@@ -40,6 +40,55 @@ export function getEditorMode( state ) {
 }
 
 /**
+ * Returns the state of legacy meta boxes.
+ *
+ * @param  {Object}  state Global application state
+ * @return {Object}        State of meta boxes
+ */
+export function getMetaBoxes( state ) {
+	return state.metaBoxes;
+}
+
+/**
+ * Returns the state of legacy meta boxes.
+ *
+ * @param  {Object} state    Global application state
+ * @param  {String} location Location of the meta box.
+ * @return {Object}          State of meta box at specified location.
+ */
+export function getMetaBox( state, location ) {
+	return getMetaBoxes( state )[ location ];
+}
+
+/**
+ * Returns a list of dirty meta box locations.
+ *
+ * @param  {Object} state Global application state
+ * @return {Array}        Array of locations for dirty meta boxes.
+ */
+export const getDirtyMetaBoxes = createSelector(
+	( state ) => {
+		return reduce( getMetaBoxes( state ), ( result, metaBox, location ) => {
+			return metaBox.isDirty && metaBox.isActive
+				? [ ...result, location ]
+				: result;
+		}, [] );
+	},
+	( state ) => state.metaBoxes,
+);
+
+/**
+ * Returns the dirty state of legacy meta boxes.
+ *
+ * Checks whether the entire meta box state is dirty. So if a sidebar is dirty,
+ * but a normal area is not dirty, this will overall return dirty.
+ *
+ * @param  {Object}  state Global application state
+ * @return {Boolean}       Whether state is dirty. True if dirty, false if not.
+ */
+export const isMetaBoxStateDirty = ( state ) => getDirtyMetaBoxes( state ).length > 0;
+
+/**
  * Returns the current active panel for the sidebar.
  *
  * @param  {Object}  state Global application state
@@ -145,6 +194,10 @@ export const isEditedPostDirty = createSelector(
 			return true;
 		}
 
+		if ( isMetaBoxStateDirty( state ) ) {
+			return true;
+		}
+
 		// This is a cheaper operation that still must occur after checking
 		// attributes, because a post initialized with attributes different
 		// from its saved copy should be considered dirty.
@@ -169,6 +222,7 @@ export const isEditedPostDirty = createSelector(
 	( state ) => [
 		state.editor,
 		state.currentPost,
+		state.metaBoxes,
 	]
 );
 

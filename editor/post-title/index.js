@@ -3,7 +3,6 @@
  */
 import { connect } from 'react-redux';
 import Textarea from 'react-autosize-textarea';
-import clickOutside from 'react-click-outside';
 import classnames from 'classnames';
 
 /**
@@ -32,12 +31,16 @@ class PostTitle extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.bindTextarea = this.bindTextarea.bind( this );
+		this.bindContainer = this.bindNode.bind( this, 'container' );
+		this.bindTextarea = this.bindNode.bind( this, 'textarea' );
 		this.onChange = this.onChange.bind( this );
 		this.onSelect = this.onSelect.bind( this );
 		this.onUnselect = this.onUnselect.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
+		this.blurIfOutside = this.blurIfOutside.bind( this );
+
+		this.nodes = {};
 
 		this.state = {
 			isSelected: false,
@@ -52,12 +55,12 @@ class PostTitle extends Component {
 		document.removeEventListener( 'selectionchange', this.onSelectionChange );
 	}
 
-	bindTextarea( ref ) {
-		this.textareaContainer = ref;
+	bindNode( name, node ) {
+		this.nodes[ name ] = node;
 	}
 
 	onSelectionChange() {
-		const textarea = this.textareaContainer.textarea;
+		const textarea = this.nodes.textarea.textarea;
 		if (
 			document.activeElement === textarea &&
 			textarea.selectionStart !== textarea.selectionEnd
@@ -80,8 +83,10 @@ class PostTitle extends Component {
 		this.setState( { isSelected: false } );
 	}
 
-	handleClickOutside() {
-		this.setState( { isSelected: false } );
+	blurIfOutside( event ) {
+		if ( ! this.nodes.container.contains( event.relatedTarget ) ) {
+			this.onUnselect();
+		}
 	}
 
 	onKeyDown( event ) {
@@ -97,7 +102,13 @@ class PostTitle extends Component {
 		const className = classnames( 'editor-post-title', { 'is-selected': isSelected } );
 
 		return (
-			<div className={ className }>
+			<div
+				ref={ this.bindContainer }
+				onFocus={ this.onSelect }
+				onBlur={ this.blurIfOutside }
+				className={ className }
+				tabIndex={ -1 /* Necessary for Firefox to include relatedTarget in blur event */ }
+			>
 				{ isSelected && <PostPermalink /> }
 				<h1>
 					<Textarea
@@ -106,7 +117,6 @@ class PostTitle extends Component {
 						value={ title }
 						onChange={ this.onChange }
 						placeholder={ __( 'Add title' ) }
-						onFocus={ this.onSelect }
 						onClick={ this.onSelect }
 						onKeyDown={ this.onKeyDown }
 						onKeyPress={ this.onUnselect }
@@ -130,4 +140,4 @@ export default connect(
 		},
 		clearSelectedBlock,
 	}
-)( clickOutside( PostTitle ) );
+)( PostTitle );

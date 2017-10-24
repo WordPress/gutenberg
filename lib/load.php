@@ -9,6 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );
 }
 
+require dirname( __FILE__ ) . '/meta-box-partial-page.php';
 require dirname( __FILE__ ) . '/class-wp-block-type.php';
 require dirname( __FILE__ ) . '/class-wp-block-type-registry.php';
 require dirname( __FILE__ ) . '/class-wp-rest-reusable-blocks-controller.php';

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { createElement, Component, cloneElement, Children } from 'react';
-import { render, findDOMNode, unstable_createPortal } from 'react-dom'; // eslint-disable-line camelcase
+import { render, findDOMNode, createPortal } from 'react-dom';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { isString } from 'lodash';
 
@@ -59,7 +59,7 @@ export { Children };
  * @param {Component} component Component
  * @param {Element}   target    DOM node into which element should be rendered
  */
-export { unstable_createPortal as createPortal }; // eslint-disable-line camelcase
+export { createPortal };
 
 /**
  * Renders a given element into a string

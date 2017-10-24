@@ -152,6 +152,8 @@ function gutenberg_init( $return, $post ) {
 	}
 
 	add_action( 'admin_enqueue_scripts', 'gutenberg_editor_scripts_and_styles' );
+	add_filter( 'screen_options_show_screen', '__return_false' );
+	add_filter( 'admin_body_class', 'gutenberg_add_admin_body_class' );
 
 	require_once( ABSPATH . 'wp-admin/admin-header.php' );
 	the_gutenberg_project();
@@ -378,4 +380,163 @@ function gutenberg_add_edit_link( $actions, $post ) {
 	);
 
 	return $actions;
+}
+
+/**
+ * Sets the default behaviour for the "Add New" button to go to the classic editor.
+ * If JavaScript is enabled, this will be replaced by a button that goes to Gutenberg.
+ *
+ * @since 1.5.0
+ *
+ * @param string $url  The URL to modify.
+ * @param string $path The path part of $url.
+ *
+ * @return string The URL with the classic-editor parameter added.
+ */
+function gutenberg_modify_add_new_button_url( $url, $path ) {
+	global $pagenow;
+
+	if ( 'edit.php' !== $pagenow ) {
+		return $url;
+	}
+
+	if ( ! preg_match( '/^post-new.php(\?post_type=[^&]*)?$/', $path ) ) {
+		return $url;
+	}
+
+	// The Add New button should be the only thing calling admin_url() from global scope.
+	$stack = wp_debug_backtrace_summary( null, 0, false );
+	if ( 'admin_url' !== end( $stack ) ) {
+		return $url;
+	}
+
+	return add_query_arg( 'classic-editor', '', $url );
+}
+add_filter( 'admin_url', 'gutenberg_modify_add_new_button_url', 10, 2 );
+
+/**
+ * Prints the JavaScript to replace the default "Add New" button.$_COOKIE
+ *
+ * @since 1.5.0
+ */
+function gutenberg_replace_default_add_new_button() {
+	?>
+	<style type="text/css">
+		.split-page-title-action {
+			display: inline-block;
+		}
+
+		.split-page-title-action a,
+		.split-page-title-action a:active,
+		.split-page-title-action .expander:after {
+			padding: 6px 10px;
+			position: relative;
+			top: -3px;
+			text-decoration: none;
+			border: none;
+			border: 1px solid #ccc;
+			border-radius: 2px;
+			background: #f7f7f7;
+			text-shadow: none;
+			font-weight: 600;
+			font-size: 13px;
+			line-height: normal; /* IE8-IE11 need this for buttons */
+			color: #0073aa; /* some of these controls are button elements and don't inherit from links */
+			cursor: pointer;
+			outline: 0;
+		}
+
+		.split-page-title-action a:hover,
+		.split-page-title-action .expander:hover:after {
+			border-color: #008EC2;
+			background: #00a0d2;
+			color: #fff;
+		}
+
+		.split-page-title-action a:focus,
+		.split-page-title-action .expander:focus:after {
+			border-color: #5b9dd9;
+			box-shadow: 0 0 2px rgba( 30, 140, 190, 0.8 );
+		}
+
+		.split-page-title-action .expander:after {
+			content: "\f140";
+			font: 400 20px/.5 dashicons;
+			speak: none;
+			top: 1px;
+			left: -1px;
+			position: relative;
+			vertical-align: top;
+			-webkit-font-smoothing: antialiased;
+			-moz-osx-font-smoothing: grayscale;
+			text-decoration: none !important;
+			padding: 4px 5px 4px 3px;
+		}
+
+		.split-page-title-action .dropdown {
+			display: none;
+		}
+
+		.split-page-title-action .dropdown.visible {
+			display: block;
+			position: absolute;
+			margin-top: 3px;
+		}
+
+		.split-page-title-action .dropdown.visible a {
+			display: block;
+			top: 0;
+			margin: -1px 0;
+			padding-right: 9px;
+		}
+
+	</style>
+	<script type="text/javascript">
+		document.addEventListener( 'DOMContentLoaded', function() {
+			var buttons = document.getElementsByClassName( 'page-title-action' ),
+				button = buttons.item( 0 );
+
+			if ( ! button ) {
+				return;
+			}
+
+			var url = button.href;
+			var newUrl = url.replace( /&?classic-editor/, '' );
+
+			var newbutton = '<span id="split-page-title-action" class="split-page-title-action">';
+			newbutton += '<a href="' + newUrl + '">' + button.innerText + '</a>';
+			newbutton += '<span class="expander" tabindex="0" role="button" aria-haspopup="true" aria-label="<?php echo esc_js( __( 'Toggle editor selection menu', 'gutenberg' ) ); ?>"></span>';
+			newbutton += '<span class="dropdown"><a href="' + newUrl + '">Gutenberg</a>';
+			newbutton += '<a href="' + url + '"><?php echo esc_js( __( 'Classic Editor', 'gutenberg' ) ); ?></a></span></span>';
+
+			button.insertAdjacentHTML( 'afterend', newbutton );
+			button.remove();
+
+			var expander = document.getElementById( 'split-page-title-action' ).getElementsByClassName( 'expander' ).item( 0 );
+			expander.addEventListener( 'click', function( e ) {
+				e.preventDefault();
+				e.target.parentNode.getElementsByClassName( 'dropdown' ).item( 0 ).classList.toggle( 'visible' );
+			} );
+			expander.addEventListener( 'keydown', function( e ) {
+				if ( 13 === e.which || 32 === e.which ) {
+					e.preventDefault();
+					e.target.parentNode.getElementsByClassName( 'dropdown' ).item( 0 ).classList.toggle( 'visible' );
+				}
+			} );
+		} );
+	</script>
+	<?php
+}
+add_action( 'admin_print_scripts-edit.php', 'gutenberg_replace_default_add_new_button' );
+
+/**
+ * Adds the gutenberg-editor-page class to the body tag on the Gutenberg page.
+ *
+ * @since 1.5.0
+ *
+ * @param string $classes Space seperated string of classes being added to the body tag.
+ * @return string The $classes string, with gutenberg-editor-page appended.
+ */
+function gutenberg_add_admin_body_class( $classes ) {
+	return "$classes gutenberg-editor-page";
 }

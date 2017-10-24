@@ -181,6 +181,7 @@ describe( 'InserterMenu', () => {
 		const blocksTab = wrapper.find( '.editor-inserter__tab' )
 			.filterWhere( ( node ) => node.text() === 'Blocks' );
 		blocksTab.simulate( 'click' );
+		wrapper.update();
 
 		const disabledBlocks = wrapper.find( '.editor-inserter__block[disabled]' );
 		expect( disabledBlocks.length ).toBe( 1 );

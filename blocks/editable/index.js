@@ -15,6 +15,7 @@ import {
 	noop,
 } from 'lodash';
 import { nodeListToReact } from 'dom-react';
+import { Fill } from 'react-slot-fill';
 import 'element-closest';
 
 /**
@@ -22,7 +23,6 @@ import 'element-closest';
  */
 import { createElement, Component, renderToString } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
-import { Fill } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -144,6 +144,13 @@ export default class Editable extends Component {
 
 	proxyPropHandler( name ) {
 		return ( event ) => {
+			// TODO: Reconcile with `onFocus` instance handler which does not
+			// pass the event object. Otherwise we have double focus handling
+			// and editor instance being stored into state.
+			if ( name === 'Focus' ) {
+				return;
+			}
+
 			// Allow props an opportunity to handle the event, before default
 			// Editable behavior takes effect. Should the event be handled by a
 			// prop, it should `stopImmediatePropagation` on the event to stop
@@ -639,7 +646,7 @@ export default class Editable extends Component {
 			style,
 			value,
 			focus,
-			wrapperClassname,
+			wrapperClassName,
 			className,
 			inlineToolbar = false,
 			formattingControls,
@@ -654,7 +661,7 @@ export default class Editable extends Component {
 		// mount and initialize a new child element in its place.
 		const key = [ 'editor', Tagname ].join();
 		const isPlaceholderVisible = placeholder && ( ! focus || keepPlaceholderOnFocus ) && this.state.empty;
-		const classes = classnames( wrapperClassname, 'blocks-editable' );
+		const classes = classnames( wrapperClassName, 'blocks-editable' );
 
 		const formatToolbar = (
 			<FormatToolbar

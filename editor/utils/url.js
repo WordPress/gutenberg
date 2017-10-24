@@ -4,14 +4,14 @@
 import { addQueryArgs } from '@wordpress/url';
 
 /**
- * Returns the Gutenberg page URL with extra query strings
+ * Returns the Post's Edit URL
  *
- * @param  {Object} query  Query Args
+ * @param  {Number} postId  Post ID
  *
- * @return {String}        URL
+ * @return {String}         URL
  */
-export function getGutenbergURL( query = {} ) {
-	return addQueryArgs( window.location.href, query );
+export function getPostEditUrl( postId ) {
+	return getWPAdminURL( 'post.php', { post: postId, action: 'edit' } );
 }
 
 /**

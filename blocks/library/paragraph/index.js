@@ -135,7 +135,6 @@ registerBlockType( 'core/paragraph', {
 						<ColorPalette
 							value={ backgroundColor }
 							onChange={ ( colorValue ) => setAttributes( { backgroundColor: colorValue } ) }
-							withTransparentOption
 						/>
 					</PanelBody>
 					<PanelBody title={ __( 'Text Color' ) }>
@@ -182,7 +181,7 @@ registerBlockType( 'core/paragraph', {
 					} }
 					onMerge={ mergeBlocks }
 					onReplace={ onReplace }
-					placeholder={ placeholder || __( 'New Paragraph' ) }
+					placeholder={ placeholder || __( 'Add text or type / to insert content' ) }
 					formattingControls={ [ 'bold', 'italic', 'strikethrough', 'link', 'red' ] }
 					formatters={ [ {
 						type: 'inline-style',
