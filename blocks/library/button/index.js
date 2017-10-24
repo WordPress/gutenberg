@@ -16,6 +16,7 @@ import BlockControls from '../../block-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import ColorPalette from '../../color-palette';
+import ContrastChecker from '../../contrast-checker';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
 
@@ -108,6 +109,11 @@ registerBlockType( 'core/button', {
 							<ColorPalette
 								value={ color }
 								onChange={ ( colorValue ) => setAttributes( { color: colorValue } ) }
+							/>
+							<ContrastChecker
+								{ ...{ textColor } }
+								backgroundColor={ color }
+								isLargeText={ true }
 							/>
 						</PanelBody>
 						<PanelBody title={ __( 'Button Text Color' ) }>
