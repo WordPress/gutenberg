@@ -46,7 +46,11 @@
 
 /* Sidebar manually collapsed */
 .folded .editor-header {
-	left: $admin-sidebar-width-collapsed;
+	left: 0;
+
+	@include break-medium() {
+		left: $admin-sidebar-width-collapsed;
+	}
 }
 
 /* Mobile menu opened */

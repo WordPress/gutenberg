@@ -21,10 +21,9 @@ function TextareaControl( { label, value, help, instanceId, onChange, rows = 4, 
 				rows={ rows }
 				onChange={ onChangeValue }
 				aria-describedby={ !! help ? id + '__help' : undefined }
+				value={ value }
 				{ ...props }
-			>
-				{ value }
-			</textarea>
+			/>
 		</BaseControl>
 	);
 }
