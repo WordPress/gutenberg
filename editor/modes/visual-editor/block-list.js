@@ -6,10 +6,13 @@ import {
 	findLast,
 	flatMap,
 	invert,
+	isEqual,
 	mapValues,
 	noop,
 	throttle,
 } from 'lodash';
+import scrollIntoView from 'dom-scroll-into-view';
+import 'element-closest';
 
 /**
  * WordPress dependencies
@@ -66,6 +69,19 @@ class VisualEditorBlockList extends Component {
 		document.removeEventListener( 'copy', this.onCopy );
 		document.removeEventListener( 'cut', this.onCut );
 		window.removeEventListener( 'mousemove', this.setLastClientY );
+	}
+
+	componentWillReceiveProps( nextProps ) {
+		if ( isEqual( this.props.multiSelectedBlockUids, nextProps.multiSelectedBlockUids ) ) {
+			return;
+		}
+
+		if ( nextProps.multiSelectedBlockUids && nextProps.multiSelectedBlockUids.length > 0 ) {
+			const extent = this.refs[ nextProps.selectionEnd ];
+			scrollIntoView( extent, extent.closest( '.editor-layout__editor' ), {
+				onlyScrollIfNeeded: true,
+			} );
+		}
 	}
 
 	setLastClientY( { clientY } ) {
