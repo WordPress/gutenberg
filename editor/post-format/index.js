@@ -2,19 +2,19 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { find, flowRight } from 'lodash';
+import { get, find, flowRight } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { withInstanceId } from '@wordpress/components';
+import { withInstanceId, withAPIData } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { getEditedPostAttribute, getSuggestedPostFormat } from '../selectors';
+import { getEditedPostAttribute, getSuggestedPostFormat, getCurrentPostType } from '../selectors';
 import { editPost } from '../actions';
 
 const POST_FORMATS = [
@@ -30,7 +30,11 @@ const POST_FORMATS = [
 	{ id: 'chat', caption: __( 'Chat' ) },
 ];
 
-function PostFormat( { onUpdatePostFormat, postFormat = 'standard', suggestedFormat, instanceId } ) {
+function PostFormat( { postType, onUpdatePostFormat, postFormat = 'standard', suggestedFormat, instanceId } ) {
+	if ( ! get( postType.data, [ 'supports', 'post-formats' ] ) ) {
+		return null;
+	}
+
 	const postFormatSelectorId = 'post-format-selector-' + instanceId;
 	const suggestion = find( POST_FORMATS, ( format ) => format.id === suggestedFormat );
 
@@ -71,6 +75,7 @@ export default flowRight( [
 			return {
 				postFormat: getEditedPostAttribute( state, 'format' ),
 				suggestedFormat: getSuggestedPostFormat( state ),
+				postTypeSlug: getCurrentPostType( state ),
 			};
 		},
 		{
@@ -79,5 +84,12 @@ export default flowRight( [
 			},
 		},
 	),
+	withAPIData( ( props ) => {
+		const { postTypeSlug } = props;
+
+		return {
+			postType: `/wp/v2/types/${ postTypeSlug }?context=edit`,
+		};
+	} ),
 	withInstanceId,
 ] )( PostFormat );
