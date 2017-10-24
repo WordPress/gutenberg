@@ -76,6 +76,7 @@ function simulateInput( wrapper, nodeList, cursorPosition ) {
 	wrapper.find( '.fake-editor' ).simulate( 'input', {
 		target: fakeEditor,
 	} );
+	wrapper.update();
 }
 
 /**
@@ -87,6 +88,7 @@ function simulateKeydown( wrapper, keyCode ) {
 	const fakeEditor = wrapper.getDOMNode().querySelector( '.fake-editor' );
 	const event = new KeyboardEvent( 'keydown', { keyCode } ); // eslint-disable-line
 	fakeEditor.dispatchEvent( event );
+	wrapper.update();
 }
 
 /**
@@ -176,10 +178,9 @@ describe( 'Autocomplete', () => {
 					<FakeEditor />
 				</Autocomplete>
 			);
-
 			expect( wrapper.state().open ).toBeUndefined();
-			expect( wrapper.find( 'Popover' ).props().focusOnOpen ).toBe( false );
-			expect( wrapper.hasClass( 'components-autocomplete' ) ).toBe( true );
+			expect( wrapper.find( 'Popover' ).prop( 'focusOnOpen' ) ).toBe( false );
+			expect( wrapper.childAt( 0 ).hasClass( 'components-autocomplete' ) ).toBe( true );
 			expect( wrapper.find( '.fake-editor' ) ).toHaveLength( 1 );
 		} );
 
@@ -194,6 +195,7 @@ describe( 'Autocomplete', () => {
 			simulateInput( wrapper, [ par( tx( 'b' ) ) ] );
 			// wait for getOptions promise
 			process.nextTick( function() {
+				wrapper.update();
 				expect( wrapper.state( 'open' ) ).toBeDefined();
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
 				expect( wrapper.state( 'query' ) ).toEqual( 'b' );
@@ -218,6 +220,7 @@ describe( 'Autocomplete', () => {
 			simulateInput( wrapper, [ tx( 'zzz' ) ] );
 			// wait for getOptions promise
 			process.nextTick( () => {
+				wrapper.update();
 				// now check that we've opened the popup and filtered the options to empty
 				expect( wrapper.state( 'open' ) ).toBeDefined();
 				expect( wrapper.state( 'query' ) ).toEqual( 'zzz' );
@@ -240,6 +243,7 @@ describe( 'Autocomplete', () => {
 			simulateInput( wrapper, [ par( tx( 'b' ) ) ] );
 			// wait for getOptions promise
 			process.nextTick( () => {
+				wrapper.update();
 				// now check that the popup is not open
 				expectInitialState( wrapper );
 				done();
@@ -257,6 +261,7 @@ describe( 'Autocomplete', () => {
 			simulateInput( wrapper, [ par( tx( '/' ) ) ] );
 			// wait for getOptions promise
 			process.nextTick( () => {
+				wrapper.update();
 				// now check that we've opened the popup and filtered the options
 				expect( wrapper.state( 'open' ) ).toBeDefined();
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
@@ -283,6 +288,7 @@ describe( 'Autocomplete', () => {
 			simulateInput( wrapper, [ par( tx( 'fru' ), tx( 'it' ) ) ] );
 			// wait for getOptions promise
 			process.nextTick( () => {
+				wrapper.update();
 				// now check that we've opened the popup and filtered the options
 				expect( wrapper.state( 'open' ) ).toBeDefined();
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
@@ -309,6 +315,7 @@ describe( 'Autocomplete', () => {
 			simulateInput( wrapper, [ tx( 'a' ) ] );
 			// wait for getOptions promise
 			process.nextTick( () => {
+				wrapper.update();
 				// now check that we've opened the popup and all options are displayed
 				expect( wrapper.state( 'open' ) ).toBeDefined();
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
@@ -361,6 +368,7 @@ describe( 'Autocomplete', () => {
 			simulateInput( wrapper, [ par( tx( '/' ) ) ] );
 			// wait for getOptions promise
 			process.nextTick( () => {
+				wrapper.update();
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
 				simulateKeydown( wrapper, DOWN );
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 1 );
@@ -386,6 +394,7 @@ describe( 'Autocomplete', () => {
 			simulateInput( wrapper, [ par( tx( '/' ) ) ] );
 			// wait for getOptions promise
 			process.nextTick( () => {
+				wrapper.update();
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
 				simulateKeydown( wrapper, DOWN );
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 1 );
@@ -417,6 +426,7 @@ describe( 'Autocomplete', () => {
 			simulateInput( wrapper, [ par( tx( '/' ) ) ] );
 			// wait for getOptions promise
 			process.nextTick( () => {
+				wrapper.update();
 				// menu should be open with all options
 				expect( wrapper.state( 'open' ) ).toBeDefined();
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
@@ -457,6 +467,7 @@ describe( 'Autocomplete', () => {
 			simulateInput( wrapper, [ par( tx( '/' ) ) ] );
 			// wait for getOptions promise
 			process.nextTick( () => {
+				wrapper.update();
 				// menu should be open with all options
 				expect( wrapper.state( 'open' ) ).toBeDefined();
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
@@ -487,8 +498,9 @@ describe( 'Autocomplete', () => {
 			const fakeEditor = wrapper.getDOMNode().querySelector( '.fake-editor' );
 			fakeEditor.addEventListener( 'keydown', editorKeydown, false );
 			expectInitialState( wrapper );
-			[ UP, DOWN, ENTER, ESCAPE, SPACE ].forEach( ( keyCode ) => {
+			[ UP, DOWN, ENTER, ESCAPE, SPACE ].forEach( ( keyCode, i ) => {
 				simulateKeydown( wrapper, keyCode );
+				expect( editorKeydown ).toHaveBeenCalledTimes( i + 1 );
 			} );
 			expect( editorKeydown ).toHaveBeenCalledTimes( 5 );
 			done();
@@ -506,6 +518,7 @@ describe( 'Autocomplete', () => {
 			simulateInput( wrapper, [ par( tx( '/' ) ) ] );
 			// wait for getOptions promise
 			process.nextTick( () => {
+				wrapper.update();
 				// menu should be open with all options
 				expect( wrapper.state( 'open' ) ).toBeDefined();
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
@@ -517,6 +530,7 @@ describe( 'Autocomplete', () => {
 				] );
 				// clicking should reset and select the item
 				wrapper.find( '.components-autocomplete__result Button' ).at( 0 ).simulate( 'click' );
+				wrapper.update();
 				expectInitialState( wrapper );
 				expect( onSelect ).toHaveBeenCalled();
 				done();
