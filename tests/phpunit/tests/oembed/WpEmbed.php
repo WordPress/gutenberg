@@ -272,6 +272,40 @@ class Tests_WP_Embed extends WP_UnitTestCase {
 		$this->assertEquals( '{{unknown}}', $post_content );
 	}
 
+	/**
+	 * Test that parsing an embed shortcode should cause oembed_cache to be updated.
+	 *
+	 * @ticket 42310
+	 */
+	public function test_shortcode_should_update_custom_post() {
+		add_filter( 'oembed_ttl', '__return_zero' );
+
+		$url        = 'https://example.com/';
+		$embedded   = '<b>Embedded content</b>';
+		$key_suffix = md5( $url . serialize( wp_embed_defaults( $url ) ) );
+
+		add_filter( 'pre_oembed_result', '__return_empty_string' );
+		$this->wp_embed->shortcode( array(), $url );
+		remove_filter( 'pre_oembed_result', '__return_empty_string' );
+
+		$oembed_post_id = $this->wp_embed->find_oembed_post_id( $key_suffix );
+
+		$this->assertSame( '{{unknown}}', get_post( $oembed_post_id )->post_content );
+
+		$previous_usecache = $this->wp_embed->usecache;
+		$this->wp_embed->usecache = false;
+
+		// The update cannot be empty because empty responses won't overwrite the cache.
+		add_filter( 'pre_oembed_result', array( $this, '_pre_oembed_result_callback' ) );
+		$this->wp_embed->shortcode( array(), $url );
+		remove_filter( 'pre_oembed_result', array( $this, '_pre_oembed_result_callback' ) );
+
+		$this->assertSame( $embedded, get_post( $oembed_post_id )->post_content );
+
+		$this->wp_embed->usecache = $previous_usecache;
+		remove_filter( 'oembed_ttl', '__return_zero' );
+	}
+
 	public function test_shortcode_should_get_url_from_src_attribute() {
 		$url    = 'http://example.com/embed/foo';
 		$actual = $this->wp_embed->shortcode( array( 'src' => $url ) );
