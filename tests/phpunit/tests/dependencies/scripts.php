@@ -753,9 +753,11 @@ class Tests_Dependencies_Scripts extends WP_UnitTestCase {
 				'matchTags',
 				'mode',
 				'styleActiveLine',
+				'gutters',
 			),
 			array_keys( $wp_enqueue_code_editor['codemirror'] )
 		);
+		$this->assertEmpty( $wp_enqueue_code_editor['codemirror']['gutters'] );
 
 		$this->assertEqualSets(
 			array(
@@ -833,9 +835,11 @@ class Tests_Dependencies_Scripts extends WP_UnitTestCase {
 				'lineWrapping',
 				'mode',
 				'styleActiveLine',
+				'gutters',
 			),
 			array_keys( $wp_enqueue_code_editor['codemirror'] )
 		);
+		$this->assertEmpty( $wp_enqueue_code_editor['codemirror']['gutters'] );
 
 		$this->assertEqualSets(
 			array(
