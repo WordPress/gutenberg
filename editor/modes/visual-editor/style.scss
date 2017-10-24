@@ -98,15 +98,6 @@
 		left: 4px;
 	}
 
-	&.is-selected:before,
-	&.is-hovered:before {
-		content: '';
-		position: absolute;
-		height: 36px;
-		top: 8px;
-		outline: 1px solid transparent;
-	}
-
 	&.is-selected .editor-block-mover:before,
 	&.is-hovered .editor-block-mover:before {
 		border-right: 1px solid $light-gray-500;
