@@ -190,6 +190,10 @@ class WP_Test_REST_Settings_Controller extends WP_Test_REST_Controller_Testcase 
 			'type'         => 'object',
 		) );
 
+		// We have to re-register the route, as the args changes based off registered settings.
+		$this->server->override_by_default = true;
+		$this->endpoint->register_routes();
+
 		// Object is cast to correct types.
 		update_option( 'mycustomsetting', array( 'a' => '1' ) );
 		$request = new WP_REST_Request( 'GET', '/wp/v2/settings' );
@@ -209,7 +213,7 @@ class WP_Test_REST_Settings_Controller extends WP_Test_REST_Controller_Testcase 
 		$request = new WP_REST_Request( 'GET', '/wp/v2/settings' );
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
-		$this->assertEquals( array( 'a' => 1 ), $data['mycustomsetting'] );
+		$this->assertEquals( null, $data['mycustomsetting'] );
 
 		unregister_setting( 'somegroup', 'mycustomsetting' );
 	}
@@ -372,6 +376,37 @@ class WP_Test_REST_Settings_Controller extends WP_Test_REST_Controller_Testcase 
 		unregister_setting( 'somegroup', 'mycustomsetting' );
 	}
 
+	public function test_update_item_with_nested_object() {
+		register_setting( 'somegroup', 'mycustomsetting', array(
+			'show_in_rest' => array(
+				'schema' => array(
+					'type'       => 'object',
+					'properties' => array(
+						'a' => array(
+							'type' => 'object',
+							'properties' => array(
+								'b' => array(
+									'type' => 'number',
+								),
+							),
+						),
+					),
+				),
+			),
+			'type'         => 'object',
+		) );
+
+		// We have to re-register the route, as the args changes based off registered settings.
+		$this->server->override_by_default = true;
+		$this->endpoint->register_routes();
+		wp_set_current_user( self::$administrator );
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/settings' );
+		$request->set_param( 'mycustomsetting', array( 'a' => array( 'b' => 1, 'c' => 1 ) ) );
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+	}
+
 	public function test_update_item_with_object() {
 		register_setting( 'somegroup', 'mycustomsetting', array(
 			'show_in_rest' => array(
@@ -406,6 +441,13 @@ class WP_Test_REST_Settings_Controller extends WP_Test_REST_Controller_Testcase 
 		$data = $response->get_data();
 		$this->assertEquals( array(), $data['mycustomsetting'] );
 		$this->assertEquals( array(), get_option( 'mycustomsetting' ) );
+
+		// Provide more keys.
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/settings' );
+		$request->set_param( 'mycustomsetting', array( 'a' => 1, 'b' => 2 ) );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
 
 		// Setting an invalid object.
 		$request = new WP_REST_Request( 'PUT', '/wp/v2/settings' );

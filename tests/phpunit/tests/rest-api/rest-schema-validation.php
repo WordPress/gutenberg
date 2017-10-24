@@ -186,12 +186,27 @@ class WP_Test_REST_Schema_Validation extends WP_UnitTestCase {
 			'type'       => 'object',
 			'properties' => array(
 				'a' => array(
-					'type' => 'number'
+					'type' => 'number',
 				),
 			),
 		);
 		$this->assertTrue( rest_validate_value_from_schema( array( 'a' => 1 ), $schema ) );
+		$this->assertTrue( rest_validate_value_from_schema( array( 'a' => 1, 'b' => 2 ), $schema ) );
 		$this->assertWPError( rest_validate_value_from_schema( array( 'a' => 'invalid' ), $schema ) );
+	}
+
+	public function test_type_object_additional_properties_false() {
+		$schema = array(
+			'type'       => 'object',
+			'properties' => array(
+				'a' => array(
+					'type' => 'number',
+				),
+			),
+			'additionalProperties' => false,
+		);
+		$this->assertTrue( rest_validate_value_from_schema( array( 'a' => 1 ), $schema ) );
+		$this->assertWPError( rest_validate_value_from_schema( array( 'a' => 1, 'b' => 2 ), $schema ) );
 	}
 
 	public function test_type_object_nested() {

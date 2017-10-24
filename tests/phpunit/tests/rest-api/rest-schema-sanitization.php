@@ -157,6 +157,22 @@ class WP_Test_REST_Schema_Sanitization extends WP_UnitTestCase {
 		);
 		$this->assertEquals( array( 'a' => 1 ), rest_sanitize_value_from_schema( array( 'a' => 1 ), $schema ) );
 		$this->assertEquals( array( 'a' => 1 ), rest_sanitize_value_from_schema( array( 'a' => '1' ), $schema ) );
+		$this->assertEquals( array( 'a' => 1, 'b' => 1 ), rest_sanitize_value_from_schema( array( 'a' => '1', 'b' => 1 ), $schema ) );
+	}
+
+	public function test_type_object_strips_additional_properties() {
+		$schema = array(
+			'type'       => 'object',
+			'properties' => array(
+				'a' => array(
+					'type' => 'number',
+				),
+			),
+			'additionalProperties' => false,
+		);
+		$this->assertEquals( array( 'a' => 1 ), rest_sanitize_value_from_schema( array( 'a' => 1 ), $schema ) );
+		$this->assertEquals( array( 'a' => 1 ), rest_sanitize_value_from_schema( array( 'a' => '1' ), $schema ) );
+		$this->assertEquals( array( 'a' => 1 ), rest_sanitize_value_from_schema( array( 'a' => '1', 'b' => 1 ), $schema ) );
 	}
 
 	public function test_type_object_nested() {
@@ -195,7 +211,9 @@ class WP_Test_REST_Schema_Sanitization extends WP_UnitTestCase {
 				'a' => array(
 					'b' => 1,
 					'c' => 3,
+					'd' => '1',
 				),
+				'b' => 1,
 			),
 			rest_sanitize_value_from_schema(
 				array(
