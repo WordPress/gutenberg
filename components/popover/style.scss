@@ -67,6 +67,7 @@
 	box-shadow: $shadow-popover;
 	border: 1px solid $light-gray-500;
 	background: $white;
+	min-width: 240px;
 
 	.components-popover.is-top & {
 		bottom: 100%;
