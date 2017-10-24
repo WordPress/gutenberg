@@ -17,21 +17,23 @@ import { getBlockType } from '@wordpress/blocks';
 import { getBlockMode, getBlock } from '../selectors';
 import { toggleBlockMode } from '../actions';
 
-export function BlockModeToggle( { blockType, mode, onToggleMode } ) {
+export function BlockModeToggle( { blockType, mode, onToggleMode, small = false } ) {
 	if ( ! blockType || blockType.supportHTML === false ) {
 		return null;
 	}
+
+	const label = mode === 'visual'
+		? __( 'Edit as HTML' )
+		: __( 'Edit visually' );
 
 	return (
 		<IconButton
 			className="editor-block-settings-menu__control"
 			onClick={ onToggleMode }
 			icon="html"
+			label={ small ? label : undefined }
 		>
-			{ mode === 'visual'
-				? __( 'Edit as HTML' )
-				: __( 'Edit visually' )
-			}
+			{ ! small && label }
 		</IconButton>
 	);
 }
