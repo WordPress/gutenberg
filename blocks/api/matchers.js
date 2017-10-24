@@ -2,15 +2,11 @@
  * External dependencies
  */
 import { nodeListToReact, nodeToReact } from 'dom-react';
-import { omit } from 'lodash';
+import { flatten, omit } from 'lodash';
 export { attr, prop, html, text, query } from 'hpq';
 
-function toArray( ...args ) {
-	return [ toElement( ...args ) ];
-}
-
-function toElement( type, props, ...children ) {
-	return [ type, omit( props, 'key' ), ...children ];
+function toArray( type, props, ...children ) {
+	return [ [ type, omit( props, 'key' ), ...children ] ];
 }
 
 export const children = ( selector ) => {
@@ -37,6 +33,6 @@ export const node = ( selector ) => {
 			match = domNode.querySelector( selector );
 		}
 
-		return nodeToReact( match, toElement );
+		return flatten( nodeToReact( match, toArray ) );
 	};
 };

@@ -27,10 +27,29 @@ registerBlockType( 'core/table', {
 			source: 'children',
 			selector: 'table',
 			default: [
-				<tbody key="1">
-					<tr><td><br /></td><td><br /></td></tr>
-					<tr><td><br /></td><td><br /></td></tr>
-				</tbody>,
+				[
+					'tbody', {}, [
+						'tr', {}, [
+							'td', {}, [
+								'br', {},
+							],
+						], [
+							'td', {}, [
+								'br', {},
+							],
+						],
+					], [
+						'tr', {}, [
+							'td', {}, [
+								'br', {},
+							],
+						], [
+							'td', {}, [
+								'br', {},
+							],
+						],
+					],
+				],
 			],
 		},
 		align: {

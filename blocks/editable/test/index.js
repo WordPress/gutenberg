@@ -180,13 +180,8 @@ describe( 'Editable', () => {
 				[ 'strong', {}, 'paragraph' ],
 				' with a ',
 				[ 'a', { href: 'https://w.org/' }, 'link with ', [
-					'b',
-					{},
-					'bold ',
-					[
-						'i',
-						{},
-						'and italics',
+					'b', {}, 'bold ', [
+						'i', {}, 'and italics',
 					],
 				] ],
 				'.',

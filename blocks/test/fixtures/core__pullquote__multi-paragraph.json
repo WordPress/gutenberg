@@ -2,16 +2,18 @@
     {
         "uid": "_uid_0",
         "name": "core/pullquote",
-        "isValid": false,
+        "isValid": true,
         "attributes": {
             "value": [
                 [
                     "p",
                     {},
                     "Paragraph ",
-                    "strong",
-                    {},
-                    "one"
+                    [
+                        "strong",
+                        {},
+                        "one"
+                    ]
                 ],
                 [
                     "p",
