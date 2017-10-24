@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import ResizableBox from 'react-resizable-box';
+import ResizableBox from 're-resizable';
 import {
 	startCase,
 	isEmpty,
@@ -196,26 +196,30 @@ class ImageBlock extends Component {
 						const ratio = imageWidth / imageHeight;
 						const minWidth = imageWidth < imageHeight ? 10 : 10 * ratio;
 						const minHeight = imageHeight < imageWidth ? 10 : 10 / ratio;
+
 						return (
 							<ResizableBox
-								width={ currentWidth }
-								height={ currentHeight }
+								size={{
+									width: currentWidth,
+									height: currentHeight
+								}}
 								minWidth={ minWidth }
 								maxWidth={ settings.maxWidth }
 								minHeight={ minHeight }
 								maxHeight={ settings.maxWidth / ratio }
 								lockAspectRatio
-								handlerClasses={ {
+								handleClasses={ {
 									topRight: 'wp-block-image__resize-handler-top-right',
 									bottomRight: 'wp-block-image__resize-handler-bottom-right',
 									topLeft: 'wp-block-image__resize-handler-top-left',
 									bottomLeft: 'wp-block-image__resize-handler-bottom-left',
 								} }
 								enable={ { top: false, right: true, bottom: false, left: false, topRight: true, bottomRight: true, bottomLeft: true, topLeft: true } }
-								onResize={ ( event, direction, elt ) => {
+								onResize={ ( event, direction, elt, delta ) => {
+
 									setAttributes( {
-										width: elt.clientWidth,
-										height: elt.clientHeight,
+										width: width + delta.width,
+										height: height + delta.height,
 									} );
 								} }
 							>
