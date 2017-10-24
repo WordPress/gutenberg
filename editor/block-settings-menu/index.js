@@ -14,10 +14,14 @@ import { IconButton, Dropdown } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import BlockSettingsMenuContent from './content';
+import BlockInspectorButton from './block-inspector-button';
+import BlockModeToggle from './block-mode-toggle';
+import BlockDeleteButton from './block-delete-button';
 import { selectBlock } from '../actions';
 
 function BlockSettingsMenu( { uids, onSelect } ) {
+	const count = uids.length;
+
 	return (
 		<Dropdown
 			className="editor-block-settings-menu"
@@ -43,7 +47,11 @@ function BlockSettingsMenu( { uids, onSelect } ) {
 				);
 			} }
 			renderContent={ ( { onClose } ) => (
-				<BlockSettingsMenuContent uids={ uids } onClose={ onClose } />
+				<div className="editor-block-settings-menu__content">
+					<BlockInspectorButton onClick={ onClose } />
+					{ count === 1 && <BlockModeToggle uid={ uids[ 0 ] } onToggle={ onClose } /> }
+					<BlockDeleteButton uids={ uids } />
+				</div>
 			) }
 		/>
 	);

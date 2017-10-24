@@ -19,7 +19,9 @@ import { focus, keycodes } from '@wordpress/utils';
 import './style.scss';
 import BlockSwitcher from '../block-switcher';
 import BlockMover from '../block-mover';
-import BlockRightMenu from '../block-settings-menu';
+import BlockInspectorButton from '../block-settings-menu/block-inspector-button';
+import BlockModeToggle from '../block-settings-menu/block-mode-toggle';
+import BlockDeleteButton from '../block-settings-menu/block-delete-button';
 import { isMac } from '../utils/dom';
 
 /**
@@ -146,7 +148,9 @@ class BlockToolbar extends Component {
 							{ showMobileControls &&
 								<div className="editor-block-toolbar__mobile-tools-content">
 									<BlockMover uids={ [ uid ] } />
-									<BlockRightMenu uid={ uid } />
+									<BlockInspectorButton small />
+									<BlockModeToggle uid={ uid } small />
+									<BlockDeleteButton uids={ [ uid ] } small />
 								</div>
 							}
 						</Toolbar>
