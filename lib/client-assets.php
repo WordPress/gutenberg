@@ -791,11 +791,6 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	/**
 	 * Styles
 	 */
-
-	wp_enqueue_style(
-		'wp-editor-font',
-		'https://fonts.googleapis.com/css?family=Noto+Serif:400,400i,700,700i'
-	);
 	wp_enqueue_style(
 		'wp-editor',
 		gutenberg_url( 'editor/build/style.css' ),
