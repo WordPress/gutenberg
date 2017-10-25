@@ -564,12 +564,14 @@ export default class Editable extends Component {
 		this.editor.focus();
 		this.editor.formatter.remove( format );
 	}
-	applyFormat( format, args, node ) {
-		this.editor.focus();
+	applyFormat( format, args, node, controlKeepsFocus ) {
+		if ( ! controlKeepsFocus ) {
+			this.editor.focus();
+		}
 		this.editor.formatter.apply( format, args, node );
 	}
 
-	changeFormats( formats ) {
+	changeFormats( formats, controlKeepsFocus ) {
 		forEach( formats, ( formatValue, format ) => {
 			if ( format === 'link' ) {
 				if ( formatValue !== undefined ) {
@@ -577,7 +579,7 @@ export default class Editable extends Component {
 					if ( ! anchor ) {
 						this.removeFormat( 'link' );
 					}
-					this.applyFormat( 'link', { href: formatValue.value, target: formatValue.target }, anchor );
+					this.applyFormat( 'link', { href: formatValue.value, target: formatValue.target }, anchor, controlKeepsFocus );
 				} else {
 					this.editor.execCommand( 'Unlink' );
 				}
