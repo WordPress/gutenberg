@@ -962,7 +962,18 @@ export function getSuggestedPostFormat( state ) {
 		case 'core/image':
 			return 'image';
 		case 'core/quote':
+		case 'core/pullquote':
 			return 'quote';
+		case 'core/gallery':
+			return 'gallery';
+		case 'core/video':
+		case 'core-embed/youtube':
+		case 'core-embed/vimeo':
+			return 'video';
+		case 'core/audio':
+		case 'core-embed/spotify':
+		case 'core-embed/soundcloud':
+			return 'audio';
 	}
 
 	return null;
