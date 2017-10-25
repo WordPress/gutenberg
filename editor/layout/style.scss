@@ -22,6 +22,11 @@
 	overflow-y: auto;
 }
 
+.mobile .editor-layout__editor {
+	overflow-y: scroll;
+	-webkit-overflow-scrolling: touch;
+}
+
 .editor-layout .components-notice-list {
 	position: fixed;
 	top: 100px;
