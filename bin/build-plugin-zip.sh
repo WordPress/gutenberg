@@ -93,6 +93,7 @@ mv gutenberg.tmp.php gutenberg.php
 status "Creating archive..."
 zip -r gutenberg.zip \
 	gutenberg.php \
+	assets/js/*.js \
 	lib/*.php \
 	blocks/library/*/*.php \
 	post-content.js \

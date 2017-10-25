@@ -370,6 +370,7 @@
 	}
 
 	> .editor-inserter__block {
+		flex-direction: row;
 		opacity: 0;
 		transition: opacity 150ms;
 		margin: 0 10px;
@@ -377,10 +378,10 @@
 		font-family: $default-font;
 		font-size: $default-font-size;
 		box-shadow: none;
+		padding: 6px;
 
-		&:active {
-			background: none;
-			color: $blue-medium-500;
+		.dashicon {
+			margin-right: 8px;
 		}
 	}
 
@@ -401,7 +402,7 @@
 	justify-content: space-around;
 	align-items: center;
 	width: 96%;
-	max-width: 380px;
+	max-width: 780px;
 	padding: 20px 20px 10px 20px;
 	background-color: $white;
 	border: 1px solid $light-gray-500;

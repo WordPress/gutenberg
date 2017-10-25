@@ -163,14 +163,16 @@ export default class OldEditor extends Component {
 	}
 
 	render() {
-		const { id } = this.props;
+		const { focus, id } = this.props;
 
 		return [
-			<InspectorControls key="inspector">
-				<BlockDescription>
-					<p>{ __( 'The classic editor, in block form.' ) }</p>
-				</BlockDescription>
-			</InspectorControls>,
+			focus && (
+				<InspectorControls key="inspector">
+					<BlockDescription>
+						<p>{ __( 'The classic editor, in block form.' ) }</p>
+					</BlockDescription>
+				</InspectorControls>
+			),
 			<div
 				key="toolbar"
 				id={ id + '-toolbar' }

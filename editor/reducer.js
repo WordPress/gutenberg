@@ -29,7 +29,7 @@ const MAX_RECENT_BLOCKS = 8;
  * @return {*}       Raw value
  */
 export function getPostRawValue( value ) {
-	if ( 'object' === typeof value && 'raw' in value ) {
+	if ( value && 'object' === typeof value && 'raw' in value ) {
 		return value.raw;
 	}
 

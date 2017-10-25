@@ -78,17 +78,23 @@ $sticky-bottom-offset: 20px;
 		display: none;
 	}
 
-	.editor-block-mover,
-	.editor-block-settings-menu {
+	.editor-block-mover {
 		display: inline-flex;
 		height: auto;
 		position: initial;
-		.components-button {
-			margin: 0 5px;
-		}
 	}
 }
 
 .editor-block-toolbar__mobile-tools-content {
 	overflow: hidden;
+
+	.components-button {
+		margin: 0 5px 0 0;
+		padding: 0 5px;
+		width: auto;
+
+		.dashicon {
+			margin: 0;
+		}
+	}
 }
