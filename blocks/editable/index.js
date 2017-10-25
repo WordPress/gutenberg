@@ -31,6 +31,7 @@ import './style.scss';
 import { pasteHandler } from '../api';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
+import { pickAriaProps } from './aria';
 import patterns from './patterns';
 import { EVENTS } from './constants';
 
@@ -609,10 +610,11 @@ export default class Editable extends Component {
 			inlineToolbar = false,
 			formattingControls,
 			placeholder,
-			aria,
 			multiline: MultilineTag,
 			keepPlaceholderOnFocus = false,
 		} = this.props;
+
+		const ariaProps = pickAriaProps( this.props );
 
 		// Generating a key that includes `tagName` ensures that if the tag
 		// changes, we unmount and destroy the previous TinyMCE element, then
@@ -650,7 +652,8 @@ export default class Editable extends Component {
 					style={ style }
 					defaultValue={ value }
 					isPlaceholderVisible={ isPlaceholderVisible }
-					aria={ { label: placeholder, ...aria } }
+					aria-label={ placeholder }
+					{ ...ariaProps }
 					className={ className }
 					key={ key }
 				/>
