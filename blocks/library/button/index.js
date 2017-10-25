@@ -22,13 +22,26 @@ import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
 
 const { attr, children } = source;
+const { getComputedStyle } = window;
 
 class ButtonBlock extends Component {
 	constructor() {
 		super( ...arguments );
+
+		this.containers = {};
 		this.fallbackColors = {};
+
 		this.updateAlignment = this.updateAlignment.bind( this );
 		this.toggleClear = this.toggleClear.bind( this );
+		this.bindRef = this.bindRef.bind( this );
+	}
+
+	componentDidMount() {
+		this.grabColors();
+	}
+
+	componentDidUpdate() {
+		this.grabColors();
 	}
 
 	updateAlignment( nextAlign ) {
@@ -38,6 +51,29 @@ class ButtonBlock extends Component {
 	toggleClear() {
 		const { attributes, setAttributes } = this.props;
 		setAttributes( { clear: ! attributes.clear } );
+	}
+
+	bindRef( node ) {
+		if ( ! node ) {
+			return;
+		}
+
+		this.containers.background = node;
+		this.containers.text = node.querySelector( '[contenteditable="true"]' );
+	}
+
+	grabColors() {
+		const { background, text } = this.containers;
+
+		if ( background ) {
+			this.fallbackColors.backgroundColor =
+				getComputedStyle( background ).backgroundColor;
+		}
+
+		if ( text ) {
+			this.fallbackColors.textColor =
+				getComputedStyle( text ).color;
+		}
 	}
 
 	render() {
@@ -65,7 +101,7 @@ class ButtonBlock extends Component {
 					<BlockAlignmentToolbar value={ align } onChange={ this.updateAlignment } />
 				</BlockControls>
 			),
-			<span key="button" className={ className } title={ title } style={ { backgroundColor: color } } >
+			<span key="button" className={ className } title={ title } style={ { backgroundColor: color } } ref={ this.bindRef }>
 				<Editable
 					tagName="span"
 					placeholder={ __( 'Add text…' ) }
@@ -96,8 +132,8 @@ class ButtonBlock extends Component {
 								onChange={ ( colorValue ) => setAttributes( { color: colorValue } ) }
 							/>
 							<ContrastChecker
-								{ ...{ textColor } }
-								backgroundColor={ color }
+								textColor={ textColor || this.fallbackColors.textColor }
+								backgroundColor={ color || this.fallbackColors.backgroundColor }
 								isLargeText={ true }
 							/>
 						</PanelBody>
