@@ -191,6 +191,7 @@ registerBlockType( 'core/quote', {
 					onMerge={ mergeBlocks }
 					style={ { textAlign: align } }
 					placeholder={ __( 'Write quote…' ) }
+					formattingControls={ [ 'bold', 'italic', 'strikethrough', 'link', 'mark' ] }
 				/>
 				{ ( ( citation && citation.length > 0 ) || !! focus ) && (
 					<Editable

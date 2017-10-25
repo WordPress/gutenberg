@@ -32,6 +32,11 @@ const FORMATTING_CONTROLS = [
 		title: __( 'Strikethrough' ),
 		format: 'strikethrough',
 	},
+	{
+		icon: 'admin-customizer',
+		title: __( 'Mark' ),
+		format: 'mark',
+	},
 ];
 
 // Default controls shown if no `enabledControls` prop provided

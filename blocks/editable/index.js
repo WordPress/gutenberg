@@ -150,6 +150,11 @@ export default class Editable extends Component {
 
 	onInit() {
 		this.updateFocus();
+
+		this.editor.formatter.register( 'mark', {
+			inline: 'mark',
+			remove: 'all',
+		} );
 	}
 
 	onFocus() {
@@ -485,7 +490,7 @@ export default class Editable extends Component {
 		if ( link ) {
 			formats.link = { value: link.getAttribute( 'href' ) || '', target: link.getAttribute( 'target' ) || '', node: link };
 		}
-		const activeFormats = this.editor.formatter.matchAll( [	'bold', 'italic', 'strikethrough' ] );
+		const activeFormats = this.editor.formatter.matchAll( [	'bold', 'italic', 'strikethrough', 'mark' ] );
 		activeFormats.forEach( ( activeFormat ) => formats[ activeFormat ] = true );
 
 		const focusPosition = this.getFocusPosition();
