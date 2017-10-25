@@ -27,7 +27,7 @@ const panel = (
 		<DiscussionPanel />
 		<PageAttributes />
 		<DocumentOutlinePanel />
-		<MetaBoxes location="side" />
+		<MetaBoxes location="side" usePanel />
 	</Panel>
 );
 
