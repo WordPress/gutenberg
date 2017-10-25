@@ -62,6 +62,11 @@ jobs:
       php: 5.6
       script: composer install && ./vendor/bin/phpcs
 
+    - stage: lint
+      script:
+        - npm install || exit 1
+        - npm run lint || exit 1
+
     - stage: unit
       script:
         - npm install || exit 1
