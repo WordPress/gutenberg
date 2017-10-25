@@ -147,7 +147,7 @@ function gutenberg_init( $return, $post ) {
 		return false;
 	}
 
-	if ( ! post_type_supports( $post_type, 'editor' ) ) {
+	if ( ! post_type_supports( $post_type, 'editor' ) || ! apply_filters( 'gutenberg_add_edit_link_for_post_type', true, $post_type, $post ) ) {
 		return false;
 	}
 
@@ -349,7 +349,8 @@ add_action( 'admin_init', 'gutenberg_add_edit_link_filters' );
  * @return array          Updated post actions.
  */
 function gutenberg_add_edit_link( $actions, $post ) {
-	if ( 'trash' === $post->post_status || ! post_type_supports( $post->post_type, 'editor' ) ) {
+	$post_type_supported = post_type_supports( $post->post_type, 'editor' ) && apply_filters( 'gutenberg_add_edit_link_for_post_type', true, $post->post_type, $post );
+	if ( 'trash' === $post->post_status || ! $post_type_supported ) {
 		return $actions;
 	}
 
