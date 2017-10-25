@@ -348,3 +348,20 @@ function gutenberg_redirect_to_classic_editor_when_saving_posts( $url ) {
 	return $url;
 }
 add_filter( 'redirect_post_location', 'gutenberg_redirect_to_classic_editor_when_saving_posts', 10, 1 );
+
+/**
+ * Appends a query argument to the edit url to make sure it gets redirected to the classic editor.
+ *
+ * @since 1.5.2
+ *
+ * @param string $url Edit url.
+ * @return string Edit url.
+ */
+function gutenberg_link_revisions_to_classic_editor( $url ) {
+	global $pagenow;
+	if ( 'revision.php' === $pagenow ) {
+		$url = add_query_arg( 'classic-editor', '', $url );
+	}
+	return $url;
+}
+add_filter( 'get_edit_post_link', 'gutenberg_link_revisions_to_classic_editor' );
