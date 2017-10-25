@@ -24,7 +24,7 @@ Gutenberg is built by many contributors and volunteers. Please see the full list
 - <a href="https://make.wordpress.org/core/2017/05/05/editor-how-little-blocks-work/">How Blocks Work</a>
 - <a href="https://github.com/Automattic/wp-post-grammar">WP Post Grammar Parser</a>
 - <a href="https://make.wordpress.org/core/tag/gutenberg/">Development updates on make.wordpress.org</a>
-- <a href="http://gutenberg-devdoc.surge.sh/">Documentation: Creating Blocks, Reference and Guidelines</a>
+- <a href="http://gutenberg-devdoc.surge.sh/">Documentation: Creating Blocks, Reference, and Guidelines</a>
 
 ## How You Can Contribute
 
@@ -44,6 +44,6 @@ By showing critical UI in the body of the content, many can get their basic blog
 
 **Advanced Formatting**
 
-When the Post Settings sidebar is open — which it is by default — you are essentially in advanced layout mode. By default, you'll see all your metaboxes right there.
+When the Post Settings sidebar is open — which it is by default — you are essentially in advanced layout mode. By default, you'll see all your meta boxes right there.
 
-Every block can be _inspected_ by clicking it. And every block has advanced layout options available in the inspector; text might have drop-cap, image might have fixed position scrolling. As such, block attributes fall in two camps — the most important ones available right on the block, advanced ones living in the sidebar inspector.
+Every block can be _inspected_ by clicking it. And every block has advanced layout options available in the inspector; text might have drop-cap, image might have fixed position scrolling. As such, block attributes fall into two camps — the most important ones available right on the block, advanced ones living in the sidebar inspector.
