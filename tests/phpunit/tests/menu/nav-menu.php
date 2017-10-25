@@ -172,8 +172,8 @@ class Tests_Nav_Menu_Theme_Change extends WP_UnitTestCase {
 		$new_next_theme_nav_menu_locations = wp_map_nav_menu_locations( $old_next_theme_nav_menu_locations, $prev_theme_nav_menu_locations );
 
 		$expected_nav_menu_locations = array(
-			'main' => 1,
-			'primary' => 2,
+			'primary' => 1,
+			'main' => 2,
 		);
 		$this->assertEquals( $expected_nav_menu_locations, $new_next_theme_nav_menu_locations );
 	}
