@@ -4,6 +4,7 @@
 import { Slot } from 'react-slot-fill';
 import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
 import classnames from 'classnames';
+import { connect } from 'react-redux';
 
 /**
  * WordPress Dependencies
@@ -23,6 +24,7 @@ import BlockInspectorButton from '../block-settings-menu/block-inspector-button'
 import BlockModeToggle from '../block-settings-menu/block-mode-toggle';
 import BlockDeleteButton from '../block-settings-menu/block-delete-button';
 import { isMac } from '../utils/dom';
+import { getBlockMode } from '../selectors';
 
 /**
  * Module Constants
@@ -109,7 +111,7 @@ class BlockToolbar extends Component {
 
 	render() {
 		const { showMobileControls } = this.state;
-		const { uid } = this.props;
+		const { uid, mode } = this.props;
 
 		const toolbarClassname = classnames( 'editor-block-toolbar', {
 			'is-showing-mobile-controls': showMobileControls,
@@ -132,20 +134,24 @@ class BlockToolbar extends Component {
 					deep
 				>
 					<div className="editor-block-toolbar__group" onKeyDown={ this.onToolbarKeyDown }>
-						{ ! showMobileControls && [
+						{ ! showMobileControls && mode === 'visual' && [
 							<BlockSwitcher key="switcher" uid={ uid } />,
 							<Slot key="slot" name="Formatting.Toolbar" />,
 						] }
 						<Toolbar className="editor-block-toolbar__mobile-tools">
-							<IconButton
-								className="editor-block-toolbar__mobile-toggle"
-								onClick={ this.toggleMobileControls }
-								aria-expanded={ showMobileControls }
-								label={ __( 'Toggle extra controls' ) }
-								icon="ellipsis"
-							/>
+							<div>
+								{ mode === 'visual' &&
+									<IconButton
+										className="editor-block-toolbar__mobile-toggle"
+										onClick={ this.toggleMobileControls }
+										aria-expanded={ showMobileControls }
+										label={ __( 'Toggle extra controls' ) }
+										icon="ellipsis"
+									/>
+								}
+							</div>
 
-							{ showMobileControls &&
+							{ ( mode === 'html' || showMobileControls ) &&
 								<div className="editor-block-toolbar__mobile-tools-content">
 									<BlockMover uids={ [ uid ] } />
 									<BlockInspectorButton small />
@@ -161,4 +167,6 @@ class BlockToolbar extends Component {
 	}
 }
 
-export default BlockToolbar;
+export default connect( ( state, ownProps ) => ( {
+	mode: getBlockMode( state, ownProps.uid ),
+} ) )( BlockToolbar );
