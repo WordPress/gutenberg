@@ -41,6 +41,6 @@ export function PostVisibility( { user } ) {
 
 export default withAPIData( () => {
 	return {
-		user: '/wp/v2/users/me?context=edit',
+		user: `/${ wpApiSettings.versionString }users/me?context=edit`,
 	};
 } )( PostVisibility );

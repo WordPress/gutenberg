@@ -60,7 +60,7 @@ export default flowRight(
 	withAPIData( ( props, { type } ) => {
 		const { postType, postId } = props;
 		return {
-			revisions: `/wp/v2/${ type( postType ) }/${ postId }/revisions`,
+			revisions: `/${ wpApiSettings.versionString }${ type( postType ) }/${ postId }/revisions`,
 		};
 	} )
 )( LastRevision );
