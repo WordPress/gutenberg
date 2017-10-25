@@ -139,7 +139,7 @@ registerBlockType( 'core/cover-image', {
 					step={ 10 }
 				/>
 				<ToggleControl
-					label={ __( 'Show Button' ) }
+					label={ __( 'Call to action' ) }
 					checked={ buttonText !== undefined }
 					onChange={ toggleButton }
 				/>
