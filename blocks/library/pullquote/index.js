@@ -32,7 +32,7 @@ registerBlockType( 'core/pullquote', {
 		},
 		citation: {
 			type: 'array',
-			source: children( 'footer' ),
+			source: children( 'cite,footer' ),
 		},
 		align: {
 			type: 'string',
@@ -83,7 +83,7 @@ registerBlockType( 'core/pullquote', {
 				/>
 				{ ( citation || !! focus ) && (
 					<Editable
-						tagName="footer"
+						tagName="cite"
 						value={ citation }
 						placeholder={ __( 'Write caption…' ) }
 						onChange={
@@ -106,7 +106,7 @@ registerBlockType( 'core/pullquote', {
 			<blockquote className={ `align${ align }` }>
 				{ value && value.map( ( paragraph, i ) => <p key={ i }>{ paragraph.props.children }</p> ) }
 				{ citation && citation.length > 0 && (
-					<footer>{ citation }</footer>
+					<cite>{ citation }</cite>
 				) }
 			</blockquote>
 		);

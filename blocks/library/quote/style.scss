@@ -2,6 +2,7 @@
 	margin: 0 0 16px;
 	box-shadow: inset 0px 0px 0px 0px $light-gray-500;
 
+	cite,
 	footer {
 		color: $dark-gray-100;
 		margin-top: 1em;
@@ -9,7 +10,6 @@
 		font-size: $default-font-size;
 		font-style: normal;
 	}
-
 
 	&.blocks-quote-style-1 {
 		border-left: 4px solid $black;
@@ -23,6 +23,8 @@
 			font-style: italic;
 			line-height: 1.6;
 		}
+
+		cite,
 		footer {
 			font-size: 19px;
 			text-align: right;

@@ -80,7 +80,7 @@ window._wpGutenbergPost.content = {
 		'<!-- /wp:core/paragraph -->',
 
 		'<!-- wp:core/quote {"style":1} -->',
-		'<blockquote class="wp-block-quote blocks-quote-style-1"><p>The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.</p><footer>Matt Mullenweg, 2017</footer></blockquote>',
+		'<blockquote class="wp-block-quote blocks-quote-style-1"><p>The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.</p><cite>Matt Mullenweg, 2017</cite></blockquote>',
 		'<!-- /wp:core/quote -->',
 
 		'<!-- wp:core/paragraph -->',
@@ -92,7 +92,7 @@ window._wpGutenbergPost.content = {
 		'<!-- /wp:core/paragraph -->',
 
 		'<!-- wp:core/quote {"style":2} -->',
-		'<blockquote class="wp-block-quote blocks-quote-style-2"><p>There is no greater agony than bearing an untold story inside you.</p><footer>Maya Angelou</footer></blockquote>',
+		'<blockquote class="wp-block-quote blocks-quote-style-2"><p>There is no greater agony than bearing an untold story inside you.</p><cite>Maya Angelou</cite></blockquote>',
 		'<!-- /wp:core/quote -->',
 
 		'<!-- wp:core/separator -->',
@@ -150,7 +150,7 @@ return &lt;Button&gt;Click Me!&lt;/Button&gt;;\n\
 		'<!-- /wp:core/list -->',
 
 		'<!-- wp:core/pullquote -->',
-		'<blockquote class="wp-block-pullquote alignnone"><p>Code is Poetry</p><footer>The WordPress community</footer></blockquote>',
+		'<blockquote class="wp-block-pullquote alignnone"><p>Code is Poetry</p><cite>The WordPress community</cite></blockquote>',
 		'<!-- /wp:core/pullquote -->',
 
 		'<!-- wp:core/separator -->',

@@ -21,15 +21,12 @@
 		line-height: 1.6;
 	}
 
+	cite,
 	footer {
 		color: $dark-gray-600;
 		position: relative;
 		font-weight: 900;
 		text-transform: uppercase;
 		font-size: 13px;
-	}
-
-	footer p {
-		font-family: $default-font;
 	}
 }

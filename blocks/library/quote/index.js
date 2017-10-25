@@ -35,7 +35,7 @@ registerBlockType( 'core/quote', {
 		},
 		citation: {
 			type: 'array',
-			source: children( 'footer' ),
+			source: children( 'cite,footer' ),
 		},
 		align: {
 			type: 'string',
@@ -194,7 +194,7 @@ registerBlockType( 'core/quote', {
 				/>
 				{ ( ( citation && citation.length > 0 ) || !! focus ) && (
 					<Editable
-						tagName="footer"
+						tagName="cite"
 						value={ citation }
 						placeholder={ __( 'Write citation…' ) }
 						onChange={
@@ -222,7 +222,7 @@ registerBlockType( 'core/quote', {
 					<p key={ i }>{ paragraph.props.children }</p>
 				) ) }
 				{ citation && citation.length > 0 && (
-					<footer>{ citation }</footer>
+					<cite>{ citation }</cite>
 				) }
 			</blockquote>
 		);
