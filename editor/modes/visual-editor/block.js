@@ -283,6 +283,7 @@ class VisualEditorBlock extends Component {
 			], this.props.order + 1 );
 		}
 		this.removeOrDeselect( event );
+		this.maybeStartTyping( event );
 	}
 
 	onBlockError( error ) {
