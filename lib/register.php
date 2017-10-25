@@ -248,24 +248,54 @@ function gutenberg_collect_meta_box_data() {
 /**
  * Return whether the post can be edited in Gutenberg and by the current user.
  *
- * Gutenberg depends on the REST API, and if the post type is not shown in the
- * REST API, then the post cannot be edited in Gutenberg.
- *
  * @since 0.5.0
  *
- * @param int $post_id Post.
+ * @param int|WP_Post $post_id Post.
  * @return bool Whether the post can be edited with Gutenberg.
  */
 function gutenberg_can_edit_post( $post_id ) {
 	$post = get_post( $post_id );
-	if ( ! $post || ! post_type_exists( $post->post_type ) ) {
+	if ( ! $post ) {
 		return false;
 	}
-	$post_type_object = get_post_type_object( $post->post_type );
+
+	if ( 'trash' === $post->post_status ) {
+		return false;
+	}
+
+	if ( ! gutenberg_can_edit_post_type( $post->post_type ) ) {
+		return false;
+	}
+
+	return current_user_can( 'edit_post', $post_id );
+}
+
+/**
+ * Return whether the post type can be edited in Gutenberg.
+ *
+ * Gutenberg depends on the REST API, and if the post type is not shown in the
+ * REST API, then the post cannot be edited in Gutenberg.
+ *
+ * @since 1.5.2
+ *
+ * @param string $post_type The post type.
+ * @return bool Wehther the post type can be edited with Gutenberg.
+ */
+function gutenberg_can_edit_post_type( $post_type ) {
+	if ( ! post_type_exists( $post_type ) ) {
+		return false;
+	}
+
+	if ( ! post_type_supports( $post_type, 'editor' ) ) {
+		return false;
+	}
+
+	$post_type_object = get_post_type_object( $post_type );
 	if ( ! $post_type_object->show_in_rest ) {
 		return false;
 	}
-	return current_user_can( 'edit_post', $post_id );
+
+	return true;
 }
 
 /**
