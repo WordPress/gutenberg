@@ -319,3 +319,32 @@ function gutenberg_register_rest_routes() {
 	$controller->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_routes' );
+
+
+/**
+ * Injects a hidden input in the edit form to propagate the information that classic editor is selected.
+ *
+ * @since 1.5.0
+ */
+function gutenberg_remember_classic_editor_when_saving_posts() {
+	?>
+	<input type="hidden" name="classic-editor" />
+	<?php
+}
+add_action( 'edit_form_top', 'gutenberg_remember_classic_editor_when_saving_posts' );
+
+/**
+ * Appends a query argument to the redirect url to make sure it gets redirected to the classic editor.
+ *
+ * @since 1.5.0
+ *
+ * @param string $url Redirect url.
+ * @return string Redirect url.
+ */
+function gutenberg_redirect_to_classic_editor_when_saving_posts( $url ) {
+	if ( isset( $_REQUEST['classic-editor'] ) ) {
+		$url = add_query_arg( 'classic-editor', '', $url );
+	}
+	return $url;
+}
+add_filter( 'redirect_post_location', 'gutenberg_redirect_to_classic_editor_when_saving_posts', 10, 1 );
