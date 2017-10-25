@@ -324,7 +324,7 @@ add_action( 'rest_api_init', 'gutenberg_register_rest_routes' );
 /**
  * Injects a hidden input in the edit form to propagate the information that classic editor is selected.
  *
- * @since 1.5.0
+ * @since 1.5.2
  */
 function gutenberg_remember_classic_editor_when_saving_posts() {
 	?>
@@ -336,7 +336,7 @@ add_action( 'edit_form_top', 'gutenberg_remember_classic_editor_when_saving_post
 /**
  * Appends a query argument to the redirect url to make sure it gets redirected to the classic editor.
  *
- * @since 1.5.0
+ * @since 1.5.2
  *
  * @param string $url Redirect url.
  * @return string Redirect url.
