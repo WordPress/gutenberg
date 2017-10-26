@@ -31,7 +31,7 @@ class Autocomplete extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.bindNode = this.bindNode.bind( this );
+		this.bindMenuNode = this.bindMenuNode.bind( this );
 		this.select = this.select.bind( this );
 		this.reset = this.reset.bind( this );
 		this.onBlur = this.onBlur.bind( this );
@@ -41,8 +41,8 @@ class Autocomplete extends Component {
 		this.state = this.constructor.getInitialState();
 	}
 
-	bindNode( node ) {
-		this.node = node;
+	bindMenuNode( node ) {
+		this.menuNode = node;
 	}
 
 	select( option ) {
@@ -62,7 +62,7 @@ class Autocomplete extends Component {
 	onBlur( event ) {
 		// Check if related target is not within, in the case that the user is
 		// selecting an option by button click
-		if ( ! this.node.contains( event.relatedTarget ) ) {
+		if ( ! this.menuNode.contains( event.relatedTarget ) ) {
 			this.reset();
 		}
 	}
@@ -189,7 +189,6 @@ class Autocomplete extends Component {
 		// the event will not have `relatedTarget` assigned.
 		return (
 			<div
-				ref={ this.bindNode }
 				onBlur={ this.onBlur }
 				className="components-autocomplete"
 			>
@@ -206,6 +205,7 @@ class Autocomplete extends Component {
 					<ul
 						role="menu"
 						className="components-autocomplete__results"
+						ref={ this.bindMenuNode }
 					>
 						{ filteredOptions.map( ( option, index ) => (
 							<li
