@@ -136,18 +136,7 @@ function gutenberg_init( $return, $post ) {
 		return false;
 	}
 
-	$post_type        = $post->post_type;
-	$post_type_object = get_post_type_object( $post_type );
-
-	if ( 'attachment' === $post_type ) {
-		return false;
-	}
-
-	if ( ! $post_type_object->show_in_rest ) {
-		return false;
-	}
-
-	if ( ! post_type_supports( $post_type, 'editor' ) ) {
+	if ( ! gutenberg_can_edit_post( $post ) ) {
 		return false;
 	}
 
@@ -349,7 +338,7 @@ add_action( 'admin_init', 'gutenberg_add_edit_link_filters' );
  * @return array          Updated post actions.
  */
 function gutenberg_add_edit_link( $actions, $post ) {
-	if ( 'trash' === $post->post_status || ! post_type_supports( $post->post_type, 'editor' ) ) {
+	if ( ! gutenberg_can_edit_post( $post ) ) {
 		return $actions;
 	}
 
@@ -420,6 +409,10 @@ add_filter( 'admin_url', 'gutenberg_modify_add_new_button_url', 10, 2 );
  * @since 1.5.0
  */
 function gutenberg_replace_default_add_new_button() {
+	global $typenow;
+	if ( ! gutenberg_can_edit_post_type( $typenow ) ) {
+		return;
+	}
 	?>
 	<style type="text/css">
 		.split-page-title-action {
