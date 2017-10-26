@@ -481,6 +481,7 @@ function gutenberg_replace_default_add_new_button() {
 			display: block;
 			position: absolute;
 			margin-top: 3px;
+			z-index: 1;
 		}
 
 		.split-page-title-action .dropdown.visible a {
