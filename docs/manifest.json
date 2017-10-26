@@ -1,10 +1,10 @@
 {
 	"index": {
-		title: "Introduction",
-		name: "handbook",
-		markdown_source: "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/move-docs-to-w.org\/docs\/readme.md",
-		parent: null
-	}
+		"title": "Introduction",
+		"slug": "handbook",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/move-docs-to-w.org\/docs\/readme.md",
+		"parent": null
+	},
 	"language": {
 		"title": "The Language of Gutenberg",
 		"slug": "language",
