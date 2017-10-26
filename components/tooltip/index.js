@@ -6,7 +6,13 @@ import { debounce, includes } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, Children, cloneElement, concatChildren } from '@wordpress/element';
+import {
+	Component,
+	Children,
+	cloneElement,
+	findDOMNode,
+	concatChildren,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -25,6 +31,7 @@ class Tooltip extends Component {
 	constructor() {
 		super( ...arguments );
 
+		this.bindNode = this.bindNode.bind( this );
 		this.delayedSetIsOver = debounce(
 			( isOver ) => this.setState( { isOver } ),
 			TOOLTIP_DELAY
@@ -37,6 +44,65 @@ class Tooltip extends Component {
 
 	componentWillUnmount() {
 		this.delayedSetIsOver.cancel();
+		this.disconnectDisabledAttributeObserver();
+	}
+
+	componentDidUpdate( prevProps, prevState ) {
+		const { isOver } = this.state;
+		if ( isOver !== prevState.isOver ) {
+			if ( isOver ) {
+				this.observeDisabledAttribute();
+			} else {
+				this.disconnectDisabledAttributeObserver();
+			}
+		}
+	}
+
+	/**
+	 * Assigns DOM node of the rendered component as an instance property
+	 *
+	 * @param {Element} ref Rendered component reference
+	 */
+	bindNode( ref ) {
+		// Disable reason: Because render clones the child, we don't know what
+		// type of element we have, but if it's a DOM node, we want to observe
+		// the disabled attribute.
+		// eslint-disable-next-line react/no-find-dom-node
+		this.node = findDOMNode( ref );
+	}
+
+	/**
+	 * Disconnects any DOM observer attached to the rendered node
+	 */
+	disconnectDisabledAttributeObserver() {
+		if ( this.observer ) {
+			this.observer.disconnect();
+		}
+	}
+
+	/**
+	 * Adds a DOM observer to the rendered node, if supported and if the DOM
+	 * node exists, to monitor for application of a disabled attribute
+	 */
+	observeDisabledAttribute() {
+		if ( ! window.MutationObserver || ! this.node ) {
+			return;
+		}
+
+		this.observer = new window.MutationObserver( ( [ mutation ] ) => {
+			if ( mutation.target.disabled ) {
+				// We can assume here that isOver is true, because mutation
+				// observer is only attached for duration of isOver active
+				this.setState( { isOver: false } );
+			}
+		} );
+
+		// Monitor changes to the disable attribute on the DOM node
+		this.observer.observe( this.node, {
+			subtree: true,
+			attributes: true,
+			attributeFilter: [ 'disabled' ],
+		} );
 	}
 
 	emitToChild( eventName, event ) {
@@ -96,6 +162,7 @@ class Tooltip extends Component {
 		const child = Children.only( children );
 		const { isOver } = this.state;
 		return cloneElement( child, {
+			ref: this.bindNode,
 			onMouseEnter: this.createToggleIsOver( 'onMouseEnter', true ),
 			onMouseLeave: this.createToggleIsOver( 'onMouseLeave' ),
 			onFocus: this.createToggleIsOver( 'onFocus' ),
