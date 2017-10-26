@@ -6,6 +6,8 @@
 .editor-post-schedule__toggle.button-link {
 	text-decoration: underline;
 	color: $blue-wordpress;
+	text-align: right;
+	padding-left: 10px;
 
 	&:focus {
 		outline: none;
