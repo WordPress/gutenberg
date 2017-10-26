@@ -1,0 +1,134 @@
+{
+	"index": {
+		title: "Introduction",
+		name: "handbook",
+		markdown_source: "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/move-docs-to-w.org\/docs\/readme.md",
+		parent: null
+	}
+	"language": {
+		"title": "The Language of Gutenberg",
+		"slug": "language",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/move-docs-to-w.org\/docs\/language.md",
+		"parent": null
+	},
+	"block-api": {
+		"title": "Block API",
+		"slug": "block-api",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/move-docs-to-w.org\/docs\/block-api.md",
+		"parent": null
+	},
+	"block-edit-save": {
+		"title": "Edit and Save",
+		"slug": "block-edit-save",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/move-docs-to-w.org\/docs\/block-edit-save.md",
+		"parent": null
+	},
+	"blocks": {
+		"title": "Creating Block Types",
+		"slug": "blocks",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/move-docs-to-w.org\/docs\/blocks.md",
+		"parent": null
+	},
+	"writing-your-first-block-type": {
+		"title": "Writing Your First Block Type",
+		"slug": "writing-your-first-block-type",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/move-docs-to-w.org\/docs\/blocks-basic.md",
+		"parent": "blocks"
+	},
+	"applying-styles-with-stylesheets": {
+		"title": "Applying Styles With Stylesheets",
+		"slug": "applying-styles-with-stylesheets",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/move-docs-to-w.org\/docs\/blocks-stylesheet.md",
+		"parent": "blocks"
+	},
+	"introducing-attributes-and-editable-fields": {
+		"title": "Introducing Attributes and Editable Fields",
+		"slug": "introducing-attributes-and-editable-fields",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/move-docs-to-w.org\/docs\/blocks-editable.md",
+		"parent": "blocks"
+	},
+	"block-controls-toolbars-and-inspector": {
+		"title": "Block Controls: Toolbars and Inspector",
+		"slug": "block-controls-toolbars-and-inspector",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/move-docs-to-w.org\/docs\/blocks-controls.md",
+		"parent": "blocks"
+	},
+	"reference": {
+		"title": "Reference",
+		"slug": "reference",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/move-docs-to-w.org\/docs\/reference.md",
+		"parent": null
+	},
+	"attributes": {
+		"title": "Attributes",
+		"slug": "attributes",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/move-docs-to-w.org\/docs\/attributes.md",
+		"parent": "reference"
+	},
+	"theme-support": {
+		"title": "Theme Support",
+		"slug": "theme-support",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/move-docs-to-w.org\/docs\/themes.md",
+		"parent": "reference"
+	},
+	"glossary": {
+		"title": "Glossary",
+		"slug": "glossary",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/move-docs-to-w.org\/docs\/glossary.md",
+		"parent": "reference"
+	},
+	"design-principles": {
+		"title": "Design Principles",
+		"slug": "design-principles",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/move-docs-to-w.org\/docs\/design.md",
+		"parent": "reference"
+	},
+	"history": {
+		"title": "History",
+		"slug": "history",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/move-docs-to-w.org\/docs\/history.md",
+		"parent": "reference"
+	},
+	"coding-guidelines": {
+		"title": "Coding Guidelines",
+		"slug": "coding-guidelines",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/move-docs-to-w.org\/docs\/coding-guidelines.md",
+		"parent": "reference"
+	},
+	"faq": {
+		"title": "Frequently Asked Questions",
+		"slug": "faq",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/move-docs-to-w.org\/docs\/faq.md",
+		"parent": "reference"
+	},
+	"outreach": {
+		"title": "Outreach",
+		"slug": "outreach",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/move-docs-to-w.org\/docs\/outreach.md",
+		"parent": null
+	},
+	"articles": {
+		"title": "Articles",
+		"slug": "articles",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/move-docs-to-w.org\/docs\/articles.md",
+		"parent": "outreach"
+	},
+	"meetups": {
+		"title": "Meetups",
+		"slug": "meetups",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/move-docs-to-w.org\/docs\/talks.md",
+		"parent": "outreach"
+	},
+	"talks": {
+		"title": "Talks",
+		"slug": "talks",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/move-docs-to-w.org\/docs\/talks.md",
+		"parent": "outreach"
+	},
+	"resources": {
+		"title": "Resources",
+		"slug": "resources",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/move-docs-to-w.org\/docs\/resources.md",
+		"parent": "outreach"
+	}
+}
