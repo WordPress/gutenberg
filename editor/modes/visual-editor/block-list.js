@@ -15,7 +15,7 @@ import {
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, findDOMNode } from '@wordpress/element';
 import { serialize, getDefaultBlockName, createBlock } from '@wordpress/blocks';
 
 /**
@@ -53,7 +53,7 @@ class VisualEditorBlockList extends Component {
 		this.onScroll = () => this.onPointerMove( { clientY: this.lastClientY } );
 
 		this.lastClientY = 0;
-		this.refs = {};
+		this.nodes = {};
 	}
 
 	componentDidMount() {
@@ -72,19 +72,24 @@ class VisualEditorBlockList extends Component {
 		this.lastClientY = clientY;
 	}
 
-	setBlockRef( ref, uid ) {
+	setBlockRef( ref ) {
+		// To avoid dynamically creating function references for ref on every
+		// block element, instead reach into props of element directly.
+		const uid = ref.props.uid;
+		const node = findDOMNode( ref );
+
 		if ( ref === null ) {
-			delete this.refs[ uid ];
+			delete this.nodes[ uid ];
 		} else {
-			this.refs = {
-				...this.refs,
-				[ uid ]: ref,
+			this.nodes = {
+				...this.nodes,
+				[ uid ]: node,
 			};
 		}
 	}
 
 	onPointerMove( { clientY } ) {
-		const boundaries = this.refs[ this.selectionAtStart ].getBoundingClientRect();
+		const boundaries = this.nodes[ this.selectionAtStart ].getBoundingClientRect();
 		const y = clientY - boundaries.top;
 		const key = findLast( this.coordMapKeys, ( coordY ) => coordY < y );
 
@@ -114,10 +119,10 @@ class VisualEditorBlockList extends Component {
 	}
 
 	onSelectionStart( uid ) {
-		const boundaries = this.refs[ uid ].getBoundingClientRect();
+		const boundaries = this.nodes[ uid ].getBoundingClientRect();
 
 		// Create a uid to Y coördinate map.
-		const uidToCoordMap = mapValues( this.refs, ( node ) => {
+		const uidToCoordMap = mapValues( this.nodes, ( node ) => {
 			return node.getBoundingClientRect().top - boundaries.top;
 		} );
 
@@ -195,7 +200,7 @@ class VisualEditorBlockList extends Component {
 					<VisualEditorBlock
 						key={ 'block-' + uid }
 						uid={ uid }
-						blockRef={ ( ref ) => this.setBlockRef( ref, uid ) }
+						ref={ this.setBlockRef }
 						onSelectionStart={ this.onSelectionStart }
 						onShiftSelection={ this.onShiftSelection }
 					/>,
