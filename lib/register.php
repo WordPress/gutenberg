@@ -292,7 +292,7 @@ function gutenberg_can_edit_post_type( $post_type ) {
 	}
 
 	$post_type_object = get_post_type_object( $post_type );
-	if ( ! $post_type_object->show_in_rest ) {
+	if ( $post_type_object && ! $post_type_object->show_in_rest ) {
 		$can_edit = false;
 	}
 
