@@ -7,6 +7,6 @@
 		left: 0;
 		right: 0;
 		pointer-events: none;
-		border: 2px solid $blue-medium-400;
+		@include focus_flash;
 	}
 }
