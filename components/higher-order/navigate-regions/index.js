@@ -63,8 +63,8 @@ function navigateRegions( WrappedComponent ) {
 			return (
 				<div ref={ this.bindContainer } className={ className } onClick={ this.onClick }>
 					<KeyboardShortcuts shortcuts={ {
-						'ctrl+r': this.focusNextRegion,
-						'ctrl+shift+r': this.focusPreviousRegion,
+						'command+`': this.focusNextRegion,
+						'command+shift+`': this.focusPreviousRegion,
 					} } />
 					<WrappedComponent { ...this.props } />
 				</div>
