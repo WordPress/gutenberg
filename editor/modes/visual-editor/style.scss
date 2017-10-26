@@ -2,7 +2,7 @@
 	position: relative;
 	height: 100%;
 	margin: 0 auto;
-	padding: 50px 0;	// Floating up/down arrows invisible
+	padding: ( $stacked-toolbar-height + $admin-bar-height-big ) 0 0;
 
 	&,
 	& p {
@@ -12,7 +12,7 @@
 	}
 
 	@include break-small() {
-		padding: 50px 0;
+		padding: ( $stacked-toolbar-height + $admin-bar-height-big ) 0 0;
 	}
 
 	@include break-large() {

@@ -127,3 +127,26 @@
 		}
 	}
 }
+
+
+.editor-header__block-toolbar {
+	// stacked toolbar
+	position: absolute;
+	top: $header-height;
+	left: 0;
+	right: 0;
+	background: $white;
+	border-bottom: 1px solid $light-gray-500;
+	min-height: $stacked-toolbar-height;
+
+	// merge toolbars after this breakpoint
+	@include break-large {	// we should try and lower this breakpoint through an ellipsis overflow feature
+		padding-left: $item-spacing;
+		position: static;
+		left: auto;
+		right: auto;
+		background: none;
+		border-bottom: none;
+		min-height: auto;
+	}
+}
