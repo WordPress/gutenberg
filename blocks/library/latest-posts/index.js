@@ -15,16 +15,14 @@ import './editor.scss';
 import './style.scss';
 import { registerBlockType } from '../../api';
 import { getLatestPosts } from './data.js';
+import QueryPanel from '../../query-panel';
 import InspectorControls from '../../inspector-controls';
-import TextControl from '../../inspector-controls/text-control';
 import ToggleControl from '../../inspector-controls/toggle-control';
 import RangeControl from '../../inspector-controls/range-control';
 import BlockDescription from '../../block-description';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
-const MIN_POSTS = 1;
-const MAX_POSTS = 100;
 const MAX_POSTS_COLUMNS = 6;
 
 registerBlockType( 'core/latest-posts', {
@@ -48,15 +46,14 @@ registerBlockType( 'core/latest-posts', {
 	edit: class extends Component {
 		constructor() {
 			super( ...arguments );
-			this.changePostsToShow = this.changePostsToShow.bind( this );
-
-			const { postsToShow } = this.props.attributes;
 
 			this.state = {
 				latestPosts: null,
 			};
 
-			this.latestPostsRequest = getLatestPosts( postsToShow );
+			const { postsToShow, order, orderBy, categories } = this.props.attributes;
+
+			this.latestPostsRequest = getLatestPosts( postsToShow, order, orderBy, categories );
 
 			this.latestPostsRequest
 				.then( latestPosts => this.setState( { latestPosts } ) );
@@ -72,33 +69,25 @@ registerBlockType( 'core/latest-posts', {
 		}
 
 		componentWillReceiveProps( nextProps ) {
-			const { postsToShow: postToShowCurrent } = this.props.attributes;
-			const { postsToShow: postToShowNext } = nextProps.attributes;
-			const { setAttributes } = this.props;
-
-			if ( postToShowCurrent === postToShowNext ) {
+			const shouldRefetch = [ 'postsToShow', 'order', 'orderBy', 'categories' ].some(
+				( queryKey ) => this.props.attributes[ queryKey ] !== nextProps.attributes[ queryKey ]
+			);
+			if ( ! shouldRefetch ) {
 				return;
 			}
 
-			if ( postToShowNext >= MIN_POSTS && postToShowNext <= MAX_POSTS ) {
-				this.latestPostsRequest = getLatestPosts( postToShowNext );
+			const { postsToShow, order, orderBy, categories } = nextProps.attributes;
 
-				this.latestPostsRequest
-					.then( latestPosts => this.setState( { latestPosts } ) );
+			this.latestPostsRequest = getLatestPosts( postsToShow, order, orderBy, categories );
 
-				setAttributes( { postsToShow: postToShowNext } );
-			}
-		}
-
-		changePostsToShow( postsToShow ) {
-			const { setAttributes } = this.props;
-			setAttributes( { postsToShow: parseInt( postsToShow, 10 ) || 0 } );
+			this.latestPostsRequest
+				.then( latestPosts => this.setState( { latestPosts } ) );
 		}
 
 		render() {
 			const { latestPosts } = this.state;
 			const { attributes, focus, setAttributes } = this.props;
-			const { displayPostDate, align, layout, columns, postsToShow } = attributes;
+			const { displayPostDate, align, layout, columns, order, orderBy, categories, postsToShow } = attributes;
 
 			const inspectorControls = focus && (
 				<InspectorControls key="inspector">
@@ -106,6 +95,15 @@ registerBlockType( 'core/latest-posts', {
 						<p>{ __( 'Shows a list of your site\'s most recent posts.' ) }</p>
 					</BlockDescription>
 					<h3>{ __( 'Latest Posts Settings' ) }</h3>
+					<QueryPanel
+						{ ...{ order, orderBy } }
+						numberOfItems={ postsToShow }
+						category={ categories }
+						onOrderChange={ ( value ) => setAttributes( { order: value } ) }
+						onOrderByChange={ ( value ) => setAttributes( { orderBy: value } ) }
+						onCategoryChange={ ( value ) => setAttributes( { categories: '' !== value ? value : undefined } ) }
+						onNumberOfItemsChange={ ( value ) => setAttributes( { postsToShow: value } ) }
+					/>
 					<ToggleControl
 						label={ __( 'Display post date' ) }
 						checked={ displayPostDate }
@@ -120,14 +118,6 @@ registerBlockType( 'core/latest-posts', {
 							max={ Math.min( MAX_POSTS_COLUMNS, latestPosts.length ) }
 						/>
 					}
-					<TextControl
-						label={ __( 'Number of posts to show' ) }
-						type="number"
-						min={ MIN_POSTS }
-						max={ MAX_POSTS }
-						value={ postsToShow }
-						onChange={ ( value ) => this.changePostsToShow( value ) }
-					/>
 				</InspectorControls>
 			);
 
