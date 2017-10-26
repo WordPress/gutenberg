@@ -46,7 +46,6 @@ class TokenInput extends Component {
 				role="combobox"
 				aria-expanded={ isExpanded }
 				aria-autocomplete="list"
-				aria-controls={ `components-form-token-suggestions-${ instanceId }` }
 				aria-owns={ `components-form-token-suggestions-${ instanceId }` }
 				aria-activedescendant={ selectedSuggestionIndex !== -1 ? `components-form-token-suggestions-${ instanceId }-${ selectedSuggestionIndex }` : undefined }
 				aria-describedby={ `components-form-token-suggestions-howto-${ instanceId }` }
