@@ -1,7 +1,11 @@
-sudo: false
+sudo: required
+
 dist: trusty
 
 language: php
+
+services:
+  - docker
 
 notifications:
   email:
@@ -53,8 +57,15 @@ jobs:
       script:
         - ./bin/run-wp-unit-tests.sh
 
+    - stage: integration
+      script:
+        - npm install || exit 1
+        - npm run build || exit 1
+        - ./bin/run-e2e-tests.sh || exit 1
+
 stages:
   - unit
+  - integration
 
 before_deploy:
   - npm install
