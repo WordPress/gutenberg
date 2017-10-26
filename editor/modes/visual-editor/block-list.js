@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { throttle, mapValues, noop, invert } from 'lodash';
+import { throttle, mapValues, noop, invert, flatMap } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -197,7 +197,7 @@ class VisualEditorBlockList extends Component {
 		return (
 			<div>
 				{ !! blocks.length && <VisualEditorSiblingInserter insertIndex={ 0 } /> }
-				{ blocks.reduce( ( result, uid, index ) => result.concat(
+				{ flatMap( blocks, ( uid, index ) => [
 					<VisualEditorBlock
 						key={ 'block-' + uid }
 						uid={ uid }
@@ -209,7 +209,7 @@ class VisualEditorBlockList extends Component {
 						key={ 'sibling-inserter-' + uid }
 						insertIndex={ index + 1 }
 					/>,
-				), [] ) }
+				] ) }
 				{ ! blocks.length &&
 					<div className="editor-visual-editor__placeholder">
 						<BlockDropZone />
