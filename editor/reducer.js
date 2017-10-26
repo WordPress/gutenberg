@@ -3,7 +3,20 @@
  */
 import optimist from 'redux-optimist';
 import { combineReducers } from 'redux';
-import { difference, get, reduce, keyBy, keys, first, last, omit, pick, without, mapValues } from 'lodash';
+import {
+	difference,
+	get,
+	reduce,
+	keyBy,
+	keys,
+	first,
+	last,
+	omit,
+	pick,
+	without,
+	mapValues,
+	findIndex,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -544,19 +557,22 @@ export function saving( state = {}, action ) {
 	return state;
 }
 
-export function notices( state = {}, action ) {
+export function notices( state = [], action ) {
 	switch ( action.type ) {
 		case 'CREATE_NOTICE':
-			return {
-				...state,
-				[ action.notice.id ]: action.notice,
-			};
+			return [ ...state, action.notice ];
+
 		case 'REMOVE_NOTICE':
-			if ( ! state.hasOwnProperty( action.noticeId ) ) {
+			const { noticeId } = action;
+			const index = findIndex( state, { id: noticeId } );
+			if ( index === -1 ) {
 				return state;
 			}
 
-			return omit( state, action.noticeId );
+			return [
+				...state.slice( 0, index ),
+				...state.slice( index + 1 ),
+			];
 	}
 
 	return state;

@@ -10,7 +10,6 @@ import {
 	last,
 	reduce,
 	some,
-	values,
 	keys,
 	without,
 	compact,
@@ -965,7 +964,7 @@ export const getEditedPostContent = createSelector(
  * @return {Array}       List of notices
  */
 export function getNotices( state ) {
-	return values( state.notices );
+	return state.notices;
 }
 
 /**
