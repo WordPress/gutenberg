@@ -53,14 +53,13 @@ registerBlockType( 'core/latest-posts', {
 			const { postsToShow } = this.props.attributes;
 
 			this.state = {
-				latestPosts: [],
-				isLoading: true,
+				latestPosts: null,
 			};
 
 			this.latestPostsRequest = getLatestPosts( postsToShow );
 
 			this.latestPostsRequest
-				.then( latestPosts => this.setState( { latestPosts, isLoading: false } ) );
+				.then( latestPosts => this.setState( { latestPosts } ) );
 
 			this.toggleDisplayPostDate = this.toggleDisplayPostDate.bind( this );
 		}
@@ -97,12 +96,12 @@ registerBlockType( 'core/latest-posts', {
 		}
 
 		render() {
-			const { latestPosts, isLoading } = this.state;
+			const { latestPosts } = this.state;
 			const { setAttributes } = this.props;
 
-			const hasPosts = ! isLoading && latestPosts.length;
+			const hasPosts = Array.isArray( latestPosts ) && latestPosts.length;
 			if ( ! hasPosts ) {
-				const placeholderContent = isLoading ? <Spinner /> : __( 'No posts found.' );
+				const placeholderContent = ! Array.isArray( latestPosts ) ? <Spinner /> : __( 'No posts found.' );
 				return (
 					<Placeholder
 						icon="admin-post"
