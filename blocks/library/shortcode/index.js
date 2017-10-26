@@ -42,7 +42,6 @@ registerBlockType( 'core/shortcode', {
 					</label>
 					<textarea
 						id={ inputId }
-						type="text"
 						value={ attributes.text }
 						placeholder={ __( 'Write shortcode here…' ) }
 						onChange={ ( event ) => setAttributes( {
