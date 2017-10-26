@@ -11,9 +11,9 @@ import { Component } from '@wordpress/element';
 const withEditorSettings = ( mapSettingsToProps ) => ( OriginalComponent ) => {
 	class WrappedComponent extends Component {
 		render() {
-			const extraProps = mapSettingsToProps
-				? mapSettingsToProps( this.context.editor, this.props )
-				: { settings: this.context.editor };
+			const extraProps = mapSettingsToProps ?
+				mapSettingsToProps( this.context.editor, this.props ) :
+				{ settings: this.context.editor };
 
 			return (
 				<OriginalComponent

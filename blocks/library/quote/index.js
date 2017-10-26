@@ -121,9 +121,9 @@ registerBlockType( 'core/quote', {
 				transform: ( { value, citation, ...attrs } ) => {
 					const isMultiParagraph = Array.isArray( value ) && isObject( value[ 0 ] ) && value[ 0 ].type === 'p';
 					const headingElement = isMultiParagraph ? value[ 0 ] : value;
-					const headingContent = isObject( headingElement ) && value[ 0 ].type === 'p'
-						? headingElement.props.children
-						: headingElement;
+					const headingContent = isObject( headingElement ) && value[ 0 ].type === 'p' ?
+						headingElement.props.children :
+						headingElement;
 					if ( isMultiParagraph || citation ) {
 						const heading = createBlock( 'core/heading', {
 							content: headingContent,

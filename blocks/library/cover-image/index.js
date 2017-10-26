@@ -68,9 +68,9 @@ registerBlockType( 'core/cover-image', {
 		const onSelectImage = ( media ) => setAttributes( { url: media.url, id: media.id } );
 		const toggleParallax = () => setAttributes( { hasParallax: ! hasParallax } );
 		const setDimRatio = ( ratio ) => setAttributes( { dimRatio: ratio } );
-		const style = url
-			? { backgroundImage: `url(${ url })` }
-			: undefined;
+		const style = url ?
+			{ backgroundImage: `url(${ url })` } :
+			undefined;
 		const classes = classnames(
 			className,
 			dimRatioToClass( dimRatio ),
@@ -168,9 +168,9 @@ registerBlockType( 'core/cover-image', {
 
 	save( { attributes, className } ) {
 		const { url, title, hasParallax, dimRatio } = attributes;
-		const style = url
-			? { backgroundImage: `url(${ url })` }
-			: undefined;
+		const style = url ?
+			{ backgroundImage: `url(${ url })` } :
+			undefined;
 		const classes = classnames(
 			className,
 			dimRatioToClass( dimRatio ),
@@ -189,7 +189,7 @@ registerBlockType( 'core/cover-image', {
 } );
 
 function dimRatioToClass( ratio ) {
-	return ( ratio === 0 || ratio === 50 )
-		? null
-		: 'has-background-dim-' + ( 10 * Math.round( ratio / 10 ) );
+	return ( ratio === 0 || ratio === 50 ) ?
+		null :
+		'has-background-dim-' + ( 10 * Math.round( ratio / 10 ) );
 }

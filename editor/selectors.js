@@ -69,9 +69,9 @@ export function getMetaBox( state, location ) {
 export const getDirtyMetaBoxes = createSelector(
 	( state ) => {
 		return reduce( getMetaBoxes( state ), ( result, metaBox, location ) => {
-			return metaBox.isDirty && metaBox.isActive
-				? [ ...result, location ]
-				: result;
+			return metaBox.isDirty && metaBox.isActive ?
+				[ ...result, location ] :
+				result;
 		}, [] );
 	},
 	( state ) => state.metaBoxes,
@@ -291,9 +291,9 @@ export function getPostEdits( state ) {
  * @return {*}                    Post attribute value
  */
 export function getEditedPostAttribute( state, attributeName ) {
-	return state.editor.edits[ attributeName ] === undefined
-		? state.currentPost[ attributeName ]
-		: state.editor.edits[ attributeName ];
+	return state.editor.edits[ attributeName ] === undefined ?
+		state.currentPost[ attributeName ] :
+		state.editor.edits[ attributeName ];
 }
 
 /**
@@ -412,9 +412,9 @@ export function getDocumentTitle( state ) {
  * @return {String}       Raw post excerpt
  */
 export function getEditedPostExcerpt( state ) {
-	return state.editor.edits.excerpt === undefined
-		? state.currentPost.excerpt
-		: state.editor.edits.excerpt;
+	return state.editor.edits.excerpt === undefined ?
+		state.currentPost.excerpt :
+		state.editor.edits.excerpt;
 }
 
 /**
@@ -482,9 +482,9 @@ export const getBlock = createSelector(
 );
 
 function getPostMeta( state, key ) {
-	return has( state, [ 'editor', 'edits', 'meta', key ] )
-		? get( state, [ 'editor', 'edits', 'meta', key ] )
-		: get( state, [ 'currentPost', 'meta', key ] );
+	return has( state, [ 'editor', 'edits', 'meta', key ] ) ?
+		get( state, [ 'editor', 'edits', 'meta', key ] ) :
+		get( state, [ 'currentPost', 'meta', key ] );
 }
 
 /**
@@ -1003,9 +1003,9 @@ export const getMostFrequentlyUsedBlocks = createSelector(
 		const orderedByUsage = keys( blockUsage ).sort( ( a, b ) => blockUsage[ b ] - blockUsage[ a ] );
 		// add in paragraph and image blocks if they're not already in the usage data
 		return compact(
-				[ ...orderedByUsage, ...without( [ 'core/paragraph', 'core/image' ], ...orderedByUsage ) ]
-					.map( blockType => getBlockType( blockType ) )
-			).slice( 0, MAX_FREQUENT_BLOCKS );
+			[ ...orderedByUsage, ...without( [ 'core/paragraph', 'core/image' ], ...orderedByUsage ) ]
+				.map( blockType => getBlockType( blockType ) )
+		).slice( 0, MAX_FREQUENT_BLOCKS );
 	},
 	( state ) => state.preferences.blockUsage
 );

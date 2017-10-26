@@ -39,6 +39,10 @@ class VisualEditor extends Component {
 	}
 
 	bindBlocksContainer( ref ) {
+		// Disable reason: Need DOM node to determine if clicking on layout
+		// canvas when intending to clear block selection.
+		// TODO: Refactor block selection clearing using blur events on block.
+		// eslint-disable-next-line react/no-find-dom-node
 		this.blocksContainer = findDOMNode( ref );
 	}
 
@@ -75,7 +79,7 @@ class VisualEditor extends Component {
 
 	render() {
 		// Disable reason: Clicking the canvas should clear the selection
-		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
+		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
 			<div
 				role="region"
@@ -100,7 +104,7 @@ class VisualEditor extends Component {
 				<TableOfContents />
 			</div>
 		);
-		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
+		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 	}
 }
 

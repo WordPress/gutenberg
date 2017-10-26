@@ -92,9 +92,9 @@ export function isVerticalEdge( container, isReverse ) {
 
 	// Adjust for empty containers.
 	const rangeRect =
-		range.startContainer.nodeType === window.Node.ELEMENT_NODE
-		? range.startContainer.getBoundingClientRect()
-		: range.getClientRects()[ 0 ];
+		range.startContainer.nodeType === window.Node.ELEMENT_NODE ?
+			range.startContainer.getBoundingClientRect() :
+			range.getClientRects()[ 0 ];
 
 	if ( ! rangeRect ) {
 		return false;
@@ -132,9 +132,9 @@ export function computeCaretRect( container ) {
 	}
 
 	// Adjust for empty containers.
-	return range.startContainer.nodeType === window.Node.ELEMENT_NODE
-		? range.startContainer.getBoundingClientRect()
-		: range.getClientRects()[ 0 ];
+	return range.startContainer.nodeType === window.Node.ELEMENT_NODE ?
+		range.startContainer.getBoundingClientRect() :
+		range.getClientRects()[ 0 ];
 }
 
 /**
@@ -255,7 +255,7 @@ export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScro
 
 	if ( ! range || ! container.contains( range.startContainer ) ) {
 		if ( mayUseScroll && (
-				( ! range || ! range.startContainer ) ||
+			( ! range || ! range.startContainer ) ||
 				! range.startContainer.contains( container ) ) ) {
 			// Might be out of view.
 			// Easier than attempting to calculate manually.

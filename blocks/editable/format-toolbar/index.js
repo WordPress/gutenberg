@@ -143,9 +143,9 @@ class FormatToolbar extends Component {
 	render() {
 		const { formats, focusPosition, enabledControls = DEFAULT_CONTROLS, customControls = [] } = this.props;
 		const { isAddingLink, isEditingLink, newLinkValue, settingsVisible, opensInNewWindow } = this.state;
-		const linkStyle = focusPosition
-			? { position: 'absolute', ...focusPosition }
-			: null;
+		const linkStyle = focusPosition ?
+			{ position: 'absolute', ...focusPosition } :
+			null;
 
 		const toolbarControls = FORMATTING_CONTROLS.concat( customControls )
 			.filter( control => enabledControls.indexOf( control.format ) !== -1 )

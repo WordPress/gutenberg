@@ -182,6 +182,7 @@ class UrlInput extends Component {
 					role="combobox"
 					aria-expanded={ showSuggestions }
 					aria-autocomplete="list"
+					aria-controls={ `blocks-url-input-suggestions-${ instanceId }` }
 					aria-owns={ `blocks-url-input-suggestions-${ instanceId }` }
 					aria-activedescendant={ selectedSuggestion !== null ? `blocks-url-input-suggestion-${ instanceId }-${ selectedSuggestion }` : undefined }
 				/>

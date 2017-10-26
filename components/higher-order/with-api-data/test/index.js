@@ -15,9 +15,9 @@ jest.mock( '../request', () => {
 	} ) );
 
 	request.getCachedResponse = ( { method, path } ) => {
-		return method === 'GET' && '/wp/v2/pages/10' === path
-			? { body: { title: 'OK!' }, headers: [] }
-			: undefined;
+		return method === 'GET' && '/wp/v2/pages/10' === path ?
+			{ body: { title: 'OK!' }, headers: [] } :
+			undefined;
 	};
 
 	return request;
