@@ -38,3 +38,23 @@
 	50% { opacity: 1; }
 	100% { opacity: .5; }
 }
+
+
+@mixin focus_flash {
+  animation: focus_flash .4s;
+}
+
+@keyframes focus_flash {
+  0% {
+		border: 2px solid $blue-medium-400;
+  }
+  10% {
+		border: 4px solid $blue-medium-400;
+  }
+  90% {
+		border: 4px solid $blue-medium-400;
+  }
+  100% {
+		border: 2px solid $blue-medium-400;
+  }
+}
