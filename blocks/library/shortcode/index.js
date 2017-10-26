@@ -40,7 +40,7 @@ registerBlockType( 'core/shortcode', {
 						<Dashicon icon="editor-code" />
 						{ __( 'Shortcode' ) }
 					</label>
-					<input
+					<textarea
 						id={ inputId }
 						type="text"
 						value={ attributes.text }
