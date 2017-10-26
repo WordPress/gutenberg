@@ -951,10 +951,18 @@ export function getSuggestedPostFormat( state ) {
 	const blocks = state.editor.blockOrder;
 
 	let name;
-	// If there is only one block in the content of the post grab its name so
+	// If there is only one block in the content of the post grab its name
 	// so we can derive a suitable post format from it.
 	if ( blocks.length === 1 ) {
 		name = state.editor.blocksByUid[ blocks[ 0 ] ].name;
+	}
+
+	// If there are two blocks in the content and the last one is a text blocks
+	// grab the name of the first one to also suggest a post format from it.
+	if ( blocks.length === 2 ) {
+		if ( state.editor.blocksByUid[ blocks[ 1 ] ].name === 'core/paragraph' ) {
+			name = state.editor.blocksByUid[ blocks[ 0 ] ].name;
+		}
 	}
 
 	// We only convert to default post formats in core.
