@@ -10,11 +10,6 @@
 .editor-layout__content {
 	display: flex;
 	flex-direction: column;
-	margin-top: #{ -1 * $header-height };
-
-	@include break-medium {
-		margin-top: 0;
-	}
 }
 
 .editor-layout__editor {

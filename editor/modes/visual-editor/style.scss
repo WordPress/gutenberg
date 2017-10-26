@@ -2,21 +2,13 @@
 	position: relative;
 	height: 100%;
 	margin: 0 auto;
-	padding: ( $stacked-toolbar-height + $admin-bar-height-big ) 0 0;
+	padding: 50px 0 0;
 
 	&,
 	& p {
 		font-family: $editor-font;
 		font-size: $editor-font-size;
 		line-height: $editor-line-height;
-	}
-
-	@include break-small() {
-		padding: ( $stacked-toolbar-height + $admin-bar-height-big ) 0 0;
-	}
-
-	@include break-large() {
-		padding: 60px 0;
 	}
 }
 
