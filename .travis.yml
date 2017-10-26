@@ -20,14 +20,9 @@ before_install:
 
 jobs:
   include:
-    - stage: lint
+    - stage: unit
       php: 5.6
       script: composer install && ./vendor/bin/phpcs
-
-    - stage: lint
-      script:
-        - npm install || exit 1
-        - npm run lint || exit 1
 
     - stage: unit
       script:
@@ -59,7 +54,6 @@ jobs:
         - ./bin/run-wp-unit-tests.sh
 
 stages:
-  - lint
   - unit
 
 before_deploy:
