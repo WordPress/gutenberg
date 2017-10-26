@@ -187,12 +187,16 @@ class ImageBlock extends Component {
 							imageWidth,
 							imageHeight,
 						} = sizes;
-						const currentWidth = width || imageWidthWithinContainer;
-						const currentHeight = height || imageHeightWithinContainer;
+
 						const img = <img src={ url } alt={ alt } onClick={ setFocus } />;
+
 						if ( ! isResizable || ! imageWidthWithinContainer ) {
 							return img;
 						}
+
+						const currentWidth = width || imageWidthWithinContainer;
+						const currentHeight = height || imageHeightWithinContainer;
+
 						const ratio = imageWidth / imageHeight;
 						const minWidth = imageWidth < imageHeight ? 10 : 10 * ratio;
 						const minHeight = imageHeight < imageWidth ? 10 : 10 / ratio;
@@ -215,10 +219,10 @@ class ImageBlock extends Component {
 									bottomLeft: 'wp-block-image__resize-handler-bottom-left',
 								} }
 								enable={ { top: false, right: true, bottom: false, left: false, topRight: true, bottomRight: true, bottomLeft: true, topLeft: true } }
-								onResize={ ( event, direction, elt, delta ) => {
+								onResizeStop={ ( event, direction, elt, delta ) => {
 									setAttributes( {
-										width: width + delta.width,
-										height: height + delta.height,
+										width: currentWidth + delta.width,
+										height: currentHeight + delta.height,
 									} );
 								} }
 							>
