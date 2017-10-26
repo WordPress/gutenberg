@@ -282,20 +282,29 @@ function gutenberg_can_edit_post( $post_id ) {
  * @return bool Wehther the post type can be edited with Gutenberg.
  */
 function gutenberg_can_edit_post_type( $post_type ) {
+	$can_edit = true;
 	if ( ! post_type_exists( $post_type ) ) {
-		return false;
+		$can_edit = false;
 	}
 
 	if ( ! post_type_supports( $post_type, 'editor' ) ) {
-		return false;
+		$can_edit = false;
 	}
 
 	$post_type_object = get_post_type_object( $post_type );
 	if ( ! $post_type_object->show_in_rest ) {
-		return false;
+		$can_edit = false;
 	}
 
-	return true;
+	/**
+	 * Filter to allow plugins to enable/disable Gutenberg for particular post types.
+	 *
+	 * @since 1.5.2
+	 *
+	 * @param bool   $can_edit  Whether the post type can be edited or not.
+	 * @param string $post_type The post type being checked.
+	 */
+	return apply_filters( 'gutenberg_can_edit_post_type', $can_edit, $post_type );
 }
 
 /**
