@@ -189,9 +189,13 @@ export default {
 	},
 	DELETE_BLOCKS( action, store ) {
 		const { dispatch } = store;
-		const state = store.getState();
-
 		const blockUids = action.uids;
+
+		if ( blockUids.length === 0 ) {
+			return;
+		}
+
+		const state = store.getState();
 		const firstBlock = first( blockUids );
 		const lastBlock = last( blockUids );
 		const priorBlock = getPreviousBlock( state, firstBlock );
