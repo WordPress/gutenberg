@@ -75,9 +75,10 @@ export class PreviewButton extends Component {
 		);
 
 		const popupLoader = '<div><p>Please wait&hellip;</p><p>Generating preview.</p></div>';
-		const css = '<style type="text/css"> div { margin-top: 25%; } p { text-align: center; } </style>';
+		const css = '<style> div { margin-top: 25%; } p { text-align: center; } </style>';
 		this.previewWindow.document.write( css );
 		this.previewWindow.document.write( popupLoader );
+		this.previewWindow.document.close();
 	}
 
 	render() {
