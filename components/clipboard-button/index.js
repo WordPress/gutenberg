@@ -57,7 +57,12 @@ class ClipboardButton extends Component {
 	}
 
 	getText() {
-		return this.props.text;
+		let text = this.props.text;
+		if ( 'function' === typeof text ) {
+			text = text();
+		}
+
+		return text;
 	}
 
 	render() {
