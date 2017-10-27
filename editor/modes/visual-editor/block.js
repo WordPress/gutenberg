@@ -354,10 +354,7 @@ class VisualEditorBlock extends Component {
 					<BlockMover uids={ multiSelectedBlockUids } />
 				}
 				{ isFirstMultiSelected && ! this.props.isSelecting &&
-					<BlockSettingsMenu
-						uids={ multiSelectedBlockUids }
-						focus={ true }
-					/>
+					<BlockSettingsMenu uids={ multiSelectedBlockUids } />
 				}
 				<div
 					ref={ this.bindBlockNode }
