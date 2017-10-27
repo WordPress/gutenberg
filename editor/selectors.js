@@ -553,22 +553,25 @@ export function getSelectedBlock( state ) {
  * @param  {Object} state Global application state
  * @return {Array}        Multi-selected block unique UDs
  */
-export function getMultiSelectedBlockUids( state ) {
-	const { blockOrder } = state.editor;
-	const { start, end } = state.blockSelection;
-	if ( start === end ) {
-		return [];
-	}
+export const getMultiSelectedBlockUids = createSelector(
+	( state ) => {
+		const { blockOrder } = state.editor;
+		const { start, end } = state.blockSelection;
+		if ( start === end ) {
+			return [];
+		}
 
-	const startIndex = blockOrder.indexOf( start );
-	const endIndex = blockOrder.indexOf( end );
+		const startIndex = blockOrder.indexOf( start );
+		const endIndex = blockOrder.indexOf( end );
 
-	if ( startIndex > endIndex ) {
-		return blockOrder.slice( endIndex, startIndex + 1 );
-	}
+		if ( startIndex > endIndex ) {
+			return blockOrder.slice( endIndex, startIndex + 1 );
+		}
 
-	return blockOrder.slice( startIndex, endIndex + 1 );
-}
+		return blockOrder.slice( startIndex, endIndex + 1 );
+	},
+	( state ) => [ state.editor.blockOrder, state.blockSelection ],
+);
 
 /**
  * Returns the current multi-selection set of blocks, or an empty array if
@@ -577,9 +580,16 @@ export function getMultiSelectedBlockUids( state ) {
  * @param  {Object} state Global application state
  * @return {Array}        Multi-selected block objects
  */
-export function getMultiSelectedBlocks( state ) {
-	return getMultiSelectedBlockUids( state ).map( ( uid ) => getBlock( state, uid ) );
-}
+export const getMultiSelectedBlocks = createSelector(
+	( state ) => getMultiSelectedBlockUids( state ).map( ( uid ) => getBlock( state, uid ) ),
+	( state ) => [
+		state.editor.blockOrder,
+		state.blockSelection,
+		state.editor.blocksByUid,
+		state.editor.edits.meta,
+		state.currentPost.meta,
+	]
+);
 
 /**
  * Returns the unique ID of the first block in the multi-selection set, or null

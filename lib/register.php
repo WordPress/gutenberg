@@ -248,24 +248,63 @@ function gutenberg_collect_meta_box_data() {
 /**
  * Return whether the post can be edited in Gutenberg and by the current user.
  *
- * Gutenberg depends on the REST API, and if the post type is not shown in the
- * REST API, then the post cannot be edited in Gutenberg.
- *
  * @since 0.5.0
  *
- * @param int $post_id Post.
+ * @param int|WP_Post $post_id Post.
  * @return bool Whether the post can be edited with Gutenberg.
  */
 function gutenberg_can_edit_post( $post_id ) {
 	$post = get_post( $post_id );
-	if ( ! $post || ! post_type_exists( $post->post_type ) ) {
+	if ( ! $post ) {
 		return false;
 	}
-	$post_type_object = get_post_type_object( $post->post_type );
-	if ( ! $post_type_object->show_in_rest ) {
+
+	if ( 'trash' === $post->post_status ) {
 		return false;
 	}
+
+	if ( ! gutenberg_can_edit_post_type( $post->post_type ) ) {
+		return false;
+	}
+
 	return current_user_can( 'edit_post', $post_id );
+}
+
+/**
+ * Return whether the post type can be edited in Gutenberg.
+ *
+ * Gutenberg depends on the REST API, and if the post type is not shown in the
+ * REST API, then the post cannot be edited in Gutenberg.
+ *
+ * @since 1.5.2
+ *
+ * @param string $post_type The post type.
+ * @return bool Wehther the post type can be edited with Gutenberg.
+ */
+function gutenberg_can_edit_post_type( $post_type ) {
+	$can_edit = true;
+	if ( ! post_type_exists( $post_type ) ) {
+		$can_edit = false;
+	}
+
+	if ( ! post_type_supports( $post_type, 'editor' ) ) {
+		$can_edit = false;
+	}
+
+	$post_type_object = get_post_type_object( $post_type );
+	if ( $post_type_object && ! $post_type_object->show_in_rest ) {
+		$can_edit = false;
+	}
+
+	/**
+	 * Filter to allow plugins to enable/disable Gutenberg for particular post types.
+	 *
+	 * @since 1.5.2
+	 *
+	 * @param bool   $can_edit  Whether the post type can be edited or not.
+	 * @param string $post_type The post type being checked.
+	 */
+	return apply_filters( 'gutenberg_can_edit_post_type', $can_edit, $post_type );
 }
 
 /**
@@ -319,3 +358,49 @@ function gutenberg_register_rest_routes() {
 	$controller->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_routes' );
+
+
+/**
+ * Injects a hidden input in the edit form to propagate the information that classic editor is selected.
+ *
+ * @since 1.5.2
+ */
+function gutenberg_remember_classic_editor_when_saving_posts() {
+	?>
+	<input type="hidden" name="classic-editor" />
+	<?php
+}
+add_action( 'edit_form_top', 'gutenberg_remember_classic_editor_when_saving_posts' );
+
+/**
+ * Appends a query argument to the redirect url to make sure it gets redirected to the classic editor.
+ *
+ * @since 1.5.2
+ *
+ * @param string $url Redirect url.
+ * @return string Redirect url.
+ */
+function gutenberg_redirect_to_classic_editor_when_saving_posts( $url ) {
+	if ( isset( $_REQUEST['classic-editor'] ) ) {
+		$url = add_query_arg( 'classic-editor', '', $url );
+	}
+	return $url;
+}
+add_filter( 'redirect_post_location', 'gutenberg_redirect_to_classic_editor_when_saving_posts', 10, 1 );
+
+/**
+ * Appends a query argument to the edit url to make sure it gets redirected to the classic editor.
+ *
+ * @since 1.5.2
+ *
+ * @param string $url Edit url.
+ * @return string Edit url.
+ */
+function gutenberg_link_revisions_to_classic_editor( $url ) {
+	global $pagenow;
+	if ( 'revision.php' === $pagenow ) {
+		$url = add_query_arg( 'classic-editor', '', $url );
+	}
+	return $url;
+}
+add_filter( 'get_edit_post_link', 'gutenberg_link_revisions_to_classic_editor' );

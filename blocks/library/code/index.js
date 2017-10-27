@@ -32,6 +32,8 @@ registerBlockType( 'core/code', {
 		},
 	},
 
+	supportHTML: false,
+
 	transforms: {
 		from: [
 			{

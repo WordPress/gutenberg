@@ -1,6 +1,6 @@
 {
   "name": "gutenberg",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "A new WordPress editor experience",
   "main": "build/app.js",
   "repository": "git+https://github.com/WordPress/gutenberg.git",
@@ -28,6 +28,7 @@
     "moment-timezone": "0.5.13",
     "mousetrap": "1.6.1",
     "prop-types": "15.5.10",
+    "re-resizable": "4.0.2",
     "react": "16.0.0",
     "react-autosize-textarea": "0.4.8",
     "react-click-outside": "2.3.1",
@@ -35,7 +36,6 @@
     "react-datepicker": "0.46.0",
     "react-dom": "16.0.0",
     "react-redux": "5.0.6",
-    "react-resizable-box": "2.0.6",
     "react-slot-fill": "1.0.1",
     "react-transition-group": "1.2.0",
     "redux": "3.7.2",
@@ -87,7 +87,7 @@
     "sass-loader": "6.0.6",
     "style-loader": "0.18.2",
     "tinymce": "4.7.1",
-    "webpack": "3.6.0"
+    "webpack": "3.8.1"
   },
   "jest": {
     "collectCoverageFrom": [

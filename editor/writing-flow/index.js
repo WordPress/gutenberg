@@ -8,9 +8,9 @@ import { find, reverse } from 'lodash';
  * Internal dependencies
  */
 import {
+	computeCaretRect,
 	isHorizontalEdge,
 	isVerticalEdge,
-	computeCaretRect,
 	placeCaretAtHorizontalEdge,
 	placeCaretAtVerticalEdge,
 } from '../utils/dom';
@@ -26,12 +26,17 @@ class WritingFlow extends Component {
 
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
+		this.clearVerticalRect = this.clearVerticalRect.bind( this );
 
 		this.verticalRect = null;
 	}
 
 	bindContainer( ref ) {
 		this.container = ref;
+	}
+
+	clearVerticalRect() {
+		this.verticalRect = null;
 	}
 
 	getVisibleTabbables() {
@@ -104,7 +109,7 @@ class WritingFlow extends Component {
 			<div
 				ref={ this.bindContainer }
 				onKeyDown={ this.onKeyDown }
-				onMouseDown={ () => this.verticalRect = null }
+				onMouseDown={ this.clearVerticalRect }
 			>
 				{ children }
 			</div>

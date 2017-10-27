@@ -41,6 +41,7 @@ import {
 	getSelectedBlock,
 	getEditedPostContent,
 	getMultiSelectedBlockUids,
+	getMultiSelectedBlocks,
 	getMultiSelectedBlocksStartUid,
 	getMultiSelectedBlocksEndUid,
 	getBlockUids,
@@ -97,6 +98,8 @@ describe( 'selectors', () => {
 		getBlock.clear();
 		getBlocks.clear();
 		getEditedPostContent.clear();
+		getMultiSelectedBlockUids.clear();
+		getMultiSelectedBlocks.clear();
 	} );
 
 	afterAll( () => {
