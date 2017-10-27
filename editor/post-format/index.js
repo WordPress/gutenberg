@@ -2,19 +2,20 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { get, find, flowRight } from 'lodash';
+import { find, flowRight } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { withInstanceId, withAPIData } from '@wordpress/components';
+import { withInstanceId } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { getEditedPostAttribute, getSuggestedPostFormat, getCurrentPostType } from '../selectors';
+import PostFormatCheck from './check';
+import { getEditedPostAttribute, getSuggestedPostFormat } from '../selectors';
 import { editPost } from '../actions';
 
 const POST_FORMATS = [
@@ -30,11 +31,7 @@ const POST_FORMATS = [
 	{ id: 'chat', caption: __( 'Chat' ) },
 ];
 
-function PostFormat( { postType, onUpdatePostFormat, postFormat = 'standard', suggestedFormat, instanceId } ) {
-	if ( ! get( postType.data, [ 'supports', 'post-formats' ] ) ) {
-		return null;
-	}
-
+function PostFormat( { onUpdatePostFormat, postFormat = 'standard', suggestedFormat, instanceId } ) {
 	const postFormatSelectorId = 'post-format-selector-' + instanceId;
 	const suggestion = find( POST_FORMATS, ( format ) => format.id === suggestedFormat );
 
@@ -42,29 +39,31 @@ function PostFormat( { postType, onUpdatePostFormat, postFormat = 'standard', su
 
 	/* eslint-disable jsx-a11y/no-onchange */
 	return (
-		<div className="editor-post-format">
-			<div className="editor-post-format__content">
-				<label htmlFor={ postFormatSelectorId }>{ __( 'Post Format' ) }</label>
-				<select
-					value={ postFormat }
-					onChange={ ( event ) => onUpdatePostFormat( event.target.value ) }
-					id={ postFormatSelectorId }
-				>
-					{ POST_FORMATS.map( format => (
-						<option key={ format.id } value={ format.id }>{ format.caption }</option>
-					) ) }
-				</select>
-			</div>
-
-			{ suggestion && suggestion.id !== postFormat && (
-				<div className="editor-post-format__suggestion">
-					{ __( 'Suggestion:' ) }{ ' ' }
-					<button className="button-link" onClick={ () => onUpdatePostFormat( suggestion.id ) }>
-						{ suggestion.caption }
-					</button>
+		<PostFormatCheck>
+			<div className="editor-post-format">
+				<div className="editor-post-format__content">
+					<label htmlFor={ postFormatSelectorId }>{ __( 'Post Format' ) }</label>
+					<select
+						value={ postFormat }
+						onChange={ ( event ) => onUpdatePostFormat( event.target.value ) }
+						id={ postFormatSelectorId }
+					>
+						{ POST_FORMATS.map( format => (
+							<option key={ format.id } value={ format.id }>{ format.caption }</option>
+						) ) }
+					</select>
 				</div>
-			) }
-		</div>
+
+				{ suggestion && suggestion.id !== postFormat && (
+					<div className="editor-post-format__suggestion">
+						{ __( 'Suggestion:' ) }{ ' ' }
+						<button className="button-link" onClick={ () => onUpdatePostFormat( suggestion.id ) }>
+							{ suggestion.caption }
+						</button>
+					</div>
+				) }
+			</div>
+		</PostFormatCheck>
 	);
 	/* eslint-enable jsx-a11y/no-onchange */
 }
@@ -75,7 +74,6 @@ export default flowRight( [
 			return {
 				postFormat: getEditedPostAttribute( state, 'format' ),
 				suggestedFormat: getSuggestedPostFormat( state ),
-				postTypeSlug: getCurrentPostType( state ),
 			};
 		},
 		{
@@ -84,12 +82,5 @@ export default flowRight( [
 			},
 		},
 	),
-	withAPIData( ( props ) => {
-		const { postTypeSlug } = props;
-
-		return {
-			postType: `/wp/v2/types/${ postTypeSlug }?context=edit`,
-		};
-	} ),
 	withInstanceId,
 ] )( PostFormat );
