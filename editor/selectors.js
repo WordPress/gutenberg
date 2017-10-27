@@ -748,9 +748,7 @@ export function getNextBlock( state, uid ) {
 
 /**
  * Returns true if the block corresponding to the specified unique ID is
- * currently selected and a multi-selection exists, null if there is no
- * multi-selection active, or false if multi-selection exists, but the
- * specified unique ID is not the selected block.
+ * currently selected and no multi-selection exists, or false otherwise.
  *
  * @param  {Object} state Global application state
  * @param  {String} uid   Block unique ID
@@ -760,7 +758,7 @@ export function isBlockSelected( state, uid ) {
 	const { start, end } = state.blockSelection;
 
 	if ( start !== end ) {
-		return null;
+		return false;
 	}
 
 	return start === uid;
