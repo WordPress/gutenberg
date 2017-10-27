@@ -2,7 +2,14 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { throttle, mapValues, noop, invert, flatMap } from 'lodash';
+import {
+	findLast,
+	flatMap,
+	invert,
+	mapValues,
+	noop,
+	throttle,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -79,7 +86,7 @@ class VisualEditorBlockList extends Component {
 	onPointerMove( { clientY } ) {
 		const boundaries = this.refs[ this.selectionAtStart ].getBoundingClientRect();
 		const y = clientY - boundaries.top;
-		const key = this.coordMapKeys.reduce( ( acc, topY ) => y > topY ? topY : acc );
+		const key = findLast( this.coordMapKeys, ( coordY ) => coordY < y );
 
 		this.onSelectionChange( this.coordMap[ key ] );
 	}
@@ -109,14 +116,14 @@ class VisualEditorBlockList extends Component {
 	onSelectionStart( uid ) {
 		const boundaries = this.refs[ uid ].getBoundingClientRect();
 
-		// Create a uid to Y coödinate map.
+		// Create a uid to Y coördinate map.
 		const uidToCoordMap = mapValues( this.refs, ( node ) => {
 			return node.getBoundingClientRect().top - boundaries.top;
 		} );
 
-		// Cache a Y coödinate to uid map for use in `onPointerMove`.
+		// Cache a Y coördinate to uid map for use in `onPointerMove`.
 		this.coordMap = invert( uidToCoordMap );
-		// Cache an array of the Y coödrinates for use in `onPointerMove`.
+		// Cache an array of the Y coördinates for use in `onPointerMove`.
 		this.coordMapKeys = Object.values( uidToCoordMap );
 		this.selectionAtStart = uid;
 
