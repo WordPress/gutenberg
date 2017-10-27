@@ -1,6 +1,6 @@
 describe( 'Adding blocks', () => {
-	beforeEach( () => {
-		cy.login( Cypress.env( 'username' ), Cypress.env( 'password' ) );
+	before( () => {
+		cy.login();
 		cy.newPost();
 	} );
 

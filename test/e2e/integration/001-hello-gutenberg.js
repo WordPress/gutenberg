@@ -1,6 +1,6 @@
 describe( 'Hello Gutenberg', () => {
 	before( () => {
-		cy.login( Cypress.env( 'username' ), Cypress.env( 'password' ) );
+		cy.login();
 	} );
 
 	it( 'Should show the New Post Page in Gutenberg', () => {
