@@ -21,11 +21,10 @@ function ContrastChecker( { backgroundColor, textColor, isLargeText } ) {
 	const tinyBackgroundColor = tinycolor( backgroundColor );
 	const tinyTextColor = tinycolor( textColor );
 	if ( tinycolor.isReadable(
-			tinyBackgroundColor,
-			tinyTextColor,
-			{ level: 'AA', size: ( isLargeText ? 'large' : 'small' ) }
-		)
-	) {
+		tinyBackgroundColor,
+		tinyTextColor,
+		{ level: 'AA', size: ( isLargeText ? 'large' : 'small' ) }
+	) ) {
 		return null;
 	}
 	const msg = tinyBackgroundColor.getBrightness() < tinyTextColor.getBrightness() ?

@@ -31,6 +31,11 @@ class ButtonBlock extends Component {
 		this.containers = {};
 		this.fallbackColors = {};
 
+		this.state = {
+			fallbackBackgroundColor: undefined,
+			fallbackTextColor: undefined,
+		};
+
 		this.updateAlignment = this.updateAlignment.bind( this );
 		this.toggleClear = this.toggleClear.bind( this );
 		this.bindRef = this.bindRef.bind( this );
@@ -64,15 +69,15 @@ class ButtonBlock extends Component {
 
 	grabColors() {
 		const { background, text } = this.containers;
+		const { textColor, color } = this.props.attributes;
+		const { fallbackTextColor, fallbackBackgroundColor } = this.state;
 
-		if ( background ) {
-			this.fallbackColors.backgroundColor =
-				getComputedStyle( background ).backgroundColor;
+		if ( ! color && ! fallbackBackgroundColor && background ) {
+			this.setState( { fallbackBackgroundColor: getComputedStyle( background ).backgroundColor } );
 		}
 
-		if ( text ) {
-			this.fallbackColors.textColor =
-				getComputedStyle( text ).color;
+		if ( ! textColor && ! fallbackTextColor && text ) {
+			this.setState( { fallbackTextColor: getComputedStyle( text ).color } );
 		}
 	}
 
@@ -95,6 +100,10 @@ class ButtonBlock extends Component {
 			clear,
 		} = attributes;
 
+		const {
+			fallbackBackgroundColor,
+			fallbackTextColor,
+		} = this.state;
 		return [
 			focus && (
 				<BlockControls key="controls">
@@ -131,11 +140,6 @@ class ButtonBlock extends Component {
 								value={ color }
 								onChange={ ( colorValue ) => setAttributes( { color: colorValue } ) }
 							/>
-							<ContrastChecker
-								textColor={ textColor || this.fallbackColors.textColor }
-								backgroundColor={ color || this.fallbackColors.backgroundColor }
-								isLargeText={ true }
-							/>
 						</PanelBody>
 						<PanelBody title={ __( 'Button Text Color' ) }>
 							<ColorPalette
@@ -143,6 +147,11 @@ class ButtonBlock extends Component {
 								onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
 							/>
 						</PanelBody>
+						<ContrastChecker
+							textColor={ textColor || fallbackTextColor }
+							backgroundColor={ color || fallbackBackgroundColor }
+							isLargeText={ true }
+						/>
 					</InspectorControls>
 				}
 			</span>,
