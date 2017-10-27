@@ -7,7 +7,6 @@ import { first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { Component, findDOMNode } from '@wordpress/element';
 import { KeyboardShortcuts } from '@wordpress/components';
 
@@ -79,16 +78,13 @@ class VisualEditor extends Component {
 
 	render() {
 		// Disable reason: Clicking the canvas should clear the selection
-		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
+		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
 			<div
-				role="region"
-				aria-label={ __( 'Editor content' ) }
 				className="editor-visual-editor"
 				onMouseDown={ this.onClick }
 				onTouchStart={ this.onClick }
 				ref={ this.bindContainer }
-				tabIndex="-1"
 			>
 				<KeyboardShortcuts shortcuts={ {
 					'mod+a': this.selectAll,
@@ -105,7 +101,7 @@ class VisualEditor extends Component {
 				<TableOfContents />
 			</div>
 		);
-		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
+		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
 }
 
