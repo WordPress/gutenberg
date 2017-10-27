@@ -59,9 +59,17 @@ export function getResponseHeaders( xhr ) {
 		// [ [ 'date', 'Tue, 22 Aug 2017 18:45:28 GMT' ], [ 'server', 'nginx' ] ]
 }
 
-export function getResponseFromCache( request ) {
-	const response = cache[ getStablePath( request.path ) ];
-	return Promise.resolve( response );
+/**
+ * Returns a response payload if GET request and a cached result exists, or
+ * undefined otherwise.
+ *
+ * @param  {Object}  request Request object (path, method)
+ * @return {?Object}         Response object (body, headers)
+ */
+export function getCachedResponse( request ) {
+	if ( isRequestMethod( request, 'GET' ) ) {
+		return cache[ getStablePath( request.path ) ];
+	}
 }
 
 export function getResponseFromNetwork( request ) {
@@ -79,7 +87,8 @@ export function getResponseFromNetwork( request ) {
 		} );
 	}
 
-	return promise;
+	// Upgrade jQuery.Deferred to native promise
+	return Promise.resolve( promise );
 }
 
 export function isRequestMethod( request, method ) {
@@ -87,14 +96,10 @@ export function isRequestMethod( request, method ) {
 }
 
 export default function( request ) {
-	if ( ! isRequestMethod( request, 'GET' ) ) {
-		return getResponseFromNetwork( request );
+	const cachedResponse = getCachedResponse( request );
+	if ( cachedResponse ) {
+		return Promise.resolve( cachedResponse );
 	}
 
-	return getResponseFromCache( request )
-		.then( ( response ) => (
-			undefined === response
-				? getResponseFromNetwork( request )
-				: response
-		) );
+	return getResponseFromNetwork( request );
 }
