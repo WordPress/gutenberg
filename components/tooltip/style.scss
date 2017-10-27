@@ -15,7 +15,7 @@
 }
 
 .components-tooltip .components-popover__content {
-	width: auto;
+	min-width: 0;
 	padding: 4px 12px;
 	background: $dark-gray-400;
 	border-width: 0;

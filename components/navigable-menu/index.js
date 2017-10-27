@@ -26,6 +26,10 @@ class NavigableMenu extends Component {
 	}
 
 	onKeyDown( event ) {
+		if ( this.props.onKeyDown ) {
+			this.props.onKeyDown( event );
+		}
+
 		const { orientation = 'vertical', onNavigate = noop, deep = false } = this.props;
 		if (
 			( orientation === 'vertical' && [ UP, DOWN, TAB ].indexOf( event.keyCode ) === -1 ) ||

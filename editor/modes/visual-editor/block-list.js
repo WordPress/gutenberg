@@ -2,7 +2,14 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { throttle, mapValues, noop, invert } from 'lodash';
+import {
+	findLast,
+	flatMap,
+	invert,
+	mapValues,
+	noop,
+	throttle,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -40,7 +47,7 @@ class VisualEditorBlockList extends Component {
 		this.setBlockRef = this.setBlockRef.bind( this );
 		this.appendDefaultBlock = this.appendDefaultBlock.bind( this );
 		this.setLastClientY = this.setLastClientY.bind( this );
-		this.onPointerMove = throttle( this.onPointerMove.bind( this ), 250 );
+		this.onPointerMove = throttle( this.onPointerMove.bind( this ), 100 );
 		// Browser does not fire `*move` event when the pointer position changes
 		// relative to the document, so fire it with the last known position.
 		this.onScroll = () => this.onPointerMove( { clientY: this.lastClientY } );
@@ -77,22 +84,9 @@ class VisualEditorBlockList extends Component {
 	}
 
 	onPointerMove( { clientY } ) {
-		const BUFFER = 20;
-		const { multiSelectedBlocks } = this.props;
 		const boundaries = this.refs[ this.selectionAtStart ].getBoundingClientRect();
 		const y = clientY - boundaries.top;
-
-		// If there is no selection yet, make the use move at least BUFFER px
-		// away from the block with the pointer.
-		if (
-			! multiSelectedBlocks.length &&
-			y + BUFFER > 0 &&
-			y - BUFFER < boundaries.height
-		) {
-			return;
-		}
-
-		const key = this.coordMapKeys.reduce( ( acc, topY ) => y > topY ? topY : acc );
+		const key = findLast( this.coordMapKeys, ( coordY ) => coordY < y );
 
 		this.onSelectionChange( this.coordMap[ key ] );
 	}
@@ -122,14 +116,14 @@ class VisualEditorBlockList extends Component {
 	onSelectionStart( uid ) {
 		const boundaries = this.refs[ uid ].getBoundingClientRect();
 
-		// Create a uid to Y coödinate map.
+		// Create a uid to Y coördinate map.
 		const uidToCoordMap = mapValues( this.refs, ( node ) => {
 			return node.getBoundingClientRect().top - boundaries.top;
 		} );
 
-		// Cache a Y coödinate to uid map for use in `onPointerMove`.
+		// Cache a Y coördinate to uid map for use in `onPointerMove`.
 		this.coordMap = invert( uidToCoordMap );
-		// Cache an array of the Y coödrinates for use in `onPointerMove`.
+		// Cache an array of the Y coördinates for use in `onPointerMove`.
 		this.coordMapKeys = Object.values( uidToCoordMap );
 		this.selectionAtStart = uid;
 
@@ -197,7 +191,7 @@ class VisualEditorBlockList extends Component {
 		return (
 			<div>
 				{ !! blocks.length && <VisualEditorSiblingInserter insertIndex={ 0 } /> }
-				{ blocks.reduce( ( result, uid, index ) => result.concat(
+				{ flatMap( blocks, ( uid, index ) => [
 					<VisualEditorBlock
 						key={ 'block-' + uid }
 						uid={ uid }
@@ -209,7 +203,7 @@ class VisualEditorBlockList extends Component {
 						key={ 'sibling-inserter-' + uid }
 						insertIndex={ index + 1 }
 					/>,
-				), [] ) }
+				] ) }
 				{ ! blocks.length &&
 					<div className="editor-visual-editor__placeholder">
 						<BlockDropZone />

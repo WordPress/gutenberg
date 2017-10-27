@@ -67,11 +67,7 @@
 	box-shadow: $shadow-popover;
 	border: 1px solid $light-gray-500;
 	background: $white;
-	width: calc( 100vw - 20px );
-
-	@include break-medium {
-		width: 300px;
-	}
+	min-width: 240px;
 
 	.components-popover.is-top & {
 		bottom: 100%;

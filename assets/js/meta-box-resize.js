@@ -41,6 +41,7 @@
 	} );
 
 	window.addEventListener( 'load', sendResize, true );
+	window.addEventListener( 'resize', sendResize, true );
 
 	sendResize();
 } )();

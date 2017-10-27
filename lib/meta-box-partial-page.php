@@ -317,9 +317,6 @@ function gutenberg_meta_box_partial_page_admin_header( $hook_suffix, $current_sc
 	 */
 	$admin_body_classes = apply_filters( 'admin_body_class', '' );
 
-	// This page should always match up with the edit action.
-	$action = 'edit';
-
 	?>
 	<body class="wp-admin wp-core-ui no-js <?php echo $admin_body_classes . ' ' . $admin_body_class; ?>">
 	<script type="text/javascript">
@@ -342,11 +339,9 @@ function gutenberg_meta_box_partial_page_post_form( $post, $location ) {
 	$notice     = false;
 	$form_extra = '';
 	if ( 'auto-draft' === $post->post_status ) {
-		if ( 'edit' === $action ) {
-			$post->post_title = '';
-		}
-		$autosave    = false;
-		$form_extra .= "<input type='hidden' id='auto_draft' name='auto_draft' value='1' />";
+		$post->post_title = '';
+		$autosave         = false;
+		$form_extra      .= "<input type='hidden' id='auto_draft' name='auto_draft' value='1' />";
 	} else {
 		$autosave = wp_get_post_autosave( $post->id );
 	}
