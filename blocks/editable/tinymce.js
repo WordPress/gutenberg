@@ -2,7 +2,7 @@
  * External dependencies
  */
 import tinymce from 'tinymce';
-import { difference, isEqual } from 'lodash';
+import { isEqual } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -13,7 +13,7 @@ import { Component, Children, createElement } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { getAriaKeys, pickAriaProps } from './aria';
+import { diffAriaProps, pickAriaProps } from './aria';
 
 export default class TinyMCE extends Component {
 	componentDidMount() {
@@ -45,12 +45,7 @@ export default class TinyMCE extends Component {
 			this.editorNode.className = classnames( nextProps.className, 'blocks-editable__tinymce' );
 		}
 
-		const prevAriaKeys = getAriaKeys( this.props );
-		const nextAriaKeys = getAriaKeys( nextProps );
-		const removedKeys = difference( prevAriaKeys, nextAriaKeys );
-		const updatedKeys = nextAriaKeys.filter( ( key ) =>
-			! isEqual( this.props[ key ], nextProps[ key ] ) );
-
+		const { removedKeys, updatedKeys } = diffAriaProps( this.props, nextProps );
 		removedKeys.forEach( ( key ) =>
 				this.editorNode.removeAttribute( key ) );
 		updatedKeys.forEach( ( key ) =>
