@@ -113,9 +113,9 @@ const formatMap = {
 			hours = parseInt( timezoned.format( 'H' ), 10 );
 		return parseInt(
 			(
-				seconds
-				+ ( minutes * MINUTE_IN_SECONDS )
-				+ ( hours * HOUR_IN_SECONDS )
+				seconds +
+				( minutes * MINUTE_IN_SECONDS ) +
+				( hours * HOUR_IN_SECONDS )
 			) / 86.4,
 			10
 		);

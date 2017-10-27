@@ -49,9 +49,9 @@ class HierarchicalTermSelector extends Component {
 				const children = termsByParent[ term.id ];
 				return {
 					...term,
-					children: children && children.length
-						? fillWithChildren( children )
-						: [],
+					children: children && children.length ?
+						fillWithChildren( children ) :
+						[],
 				};
 			} );
 		};
@@ -63,9 +63,9 @@ class HierarchicalTermSelector extends Component {
 		const { onUpdateTerms, terms = [], restBase } = this.props;
 		const termId = parseInt( event.target.value, 10 );
 		const hasTerm = terms.indexOf( termId ) !== -1;
-		const newTerms = hasTerm
-			? without( terms, termId )
-			: [ ...terms, termId ];
+		const newTerms = hasTerm ?
+			without( terms, termId ) :
+			[ ...terms, termId ];
 		onUpdateTerms( newTerms, restBase );
 	}
 

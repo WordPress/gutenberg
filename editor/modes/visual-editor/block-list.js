@@ -76,6 +76,10 @@ class VisualEditorBlockList extends Component {
 		// To avoid dynamically creating function references for ref on every
 		// block element, instead reach into props of element directly.
 		const uid = ref.props.uid;
+
+		// Disable reason: We use DOM nodes of each rendered block in the list
+		// to determine multi-selection thresholds.
+		// eslint-disable-next-line react/no-find-dom-node
 		const node = findDOMNode( ref );
 
 		if ( ref === null ) {

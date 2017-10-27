@@ -62,6 +62,9 @@ class BlockToolbar extends Component {
 	}
 
 	bindNode( ref ) {
+		// Disable reason: Need DOM node for finding first focusable element
+		// on keyboard interaction to shift to toolbar.
+		// eslint-disable-next-line react/no-find-dom-node
 		this.toolbar = findDOMNode( ref );
 	}
 
@@ -111,6 +114,9 @@ class BlockToolbar extends Component {
 			'is-showing-mobile-controls': showMobileControls,
 		} );
 
+		// Disable reason: Toolbar itself is non-interactive, but must capture
+		// bubbling events from children to determine focus shift intents.
+		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
 			<Fill name="Editor.Header">
 				<NavigableMenu
@@ -151,6 +157,7 @@ class BlockToolbar extends Component {
 				</NavigableMenu>
 			</Fill>
 		);
+		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
 }
 

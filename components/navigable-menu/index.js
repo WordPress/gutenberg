@@ -65,11 +65,14 @@ class NavigableMenu extends Component {
 	render() {
 		const { children, ...props } = this.props;
 
+		// Disable reason: Assumed role is applied by parent via props spread.
+		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
 			<div ref={ this.bindContainer } { ...omit( props, [ 'orientation', 'onNavigate', 'deep' ] ) } onKeyDown={ this.onKeyDown }>
 				{ children }
 			</div>
 		);
+		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
 }
 

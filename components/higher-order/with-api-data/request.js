@@ -10,23 +10,23 @@ export const getStablePath = memoize( ( path ) => {
 		return base;
 	}
 
+	// 'b=1&c=2&a=5'
 	return base + '?' + query
-		// 'b=1&c=2&a=5'
 
-		.split( '&' )
 		// [ 'b=1', 'c=2', 'a=5' ]
+		.split( '&' )
 
-		.map( ( entry ) => entry.split( '=' ) )
 		// [ [ 'b, '1' ], [ 'c', '2' ], [ 'a', '5' ] ]
+		.map( ( entry ) => entry.split( '=' ) )
 
-		.sort( ( a, b ) => a[ 0 ].localeCompare( b[ 0 ] ) )
 		// [ [ 'a', '5' ], [ 'b, '1' ], [ 'c', '2' ] ]
+		.sort( ( a, b ) => a[ 0 ].localeCompare( b[ 0 ] ) )
 
-		.map( ( pair ) => pair.join( '=' ) )
 		// [ 'a=5', 'b=1', 'c=2' ]
+		.map( ( pair ) => pair.join( '=' ) )
 
-		.join( '&' );
 		// 'a=5&b=1&c=2'
+		.join( '&' );
 } );
 
 /**
@@ -49,14 +49,14 @@ export const cache = mapKeys(
  * @return {Array[]}            Array of header tuples
  */
 export function getResponseHeaders( xhr ) {
+	// 'date: Tue, 22 Aug 2017 18:45:28 GMT↵server: nginx'
 	return xhr.getAllResponseHeaders().trim()
-		// 'date: Tue, 22 Aug 2017 18:45:28 GMT↵server: nginx'
 
-		.split( '\u000d\u000a' )
 		// [ 'date: Tue, 22 Aug 2017 18:45:28 GMT', 'server: nginx' ]
+		.split( '\u000d\u000a' )
 
-		.map( ( entry ) => entry.split( '\u003a\u0020' ) );
 		// [ [ 'date', 'Tue, 22 Aug 2017 18:45:28 GMT' ], [ 'server', 'nginx' ] ]
+		.map( ( entry ) => entry.split( '\u003a\u0020' ) );
 }
 
 /**

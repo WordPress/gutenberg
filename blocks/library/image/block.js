@@ -64,9 +64,9 @@ class ImageBlock extends Component {
 	}
 
 	updateAlignment( nextAlign ) {
-		const extraUpdatedAttributes = [ 'wide', 'full' ].indexOf( nextAlign ) !== -1
-			? { width: undefined, height: undefined }
-			: {};
+		const extraUpdatedAttributes = [ 'wide', 'full' ].indexOf( nextAlign ) !== -1 ?
+			{ width: undefined, height: undefined } :
+			{};
 		this.props.setAttributes( { ...extraUpdatedAttributes, align: nextAlign } );
 	}
 
@@ -188,6 +188,9 @@ class ImageBlock extends Component {
 							imageHeight,
 						} = sizes;
 
+						// Disable reason: Image itself is not meant to be
+						// interactive, but should direct focus to block
+						// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
 						const img = <img src={ url } alt={ alt } onClick={ setFocus } />;
 
 						if ( ! isResizable || ! imageWidthWithinContainer ) {

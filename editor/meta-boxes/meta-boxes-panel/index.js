@@ -49,7 +49,7 @@ class MetaBoxesPanel extends Component {
 					onClick={ this.toggle }
 					aria-expanded={ isOpened }
 					className="editor-meta-boxes-panel__toggle"
-					>
+				>
 					<PanelHeader>
 						{ __( 'Extended Settings' ) }
 						<Dashicon icon={ icon } />

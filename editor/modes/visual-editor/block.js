@@ -106,9 +106,9 @@ class VisualEditorBlock extends Component {
 	componentDidUpdate( prevProps ) {
 		// Preserve scroll prosition when block rearranged
 		if ( this.previousOffset ) {
-			this.editorLayout.scrollTop = this.editorLayout.scrollTop
-				+ this.node.getBoundingClientRect().top
-				- this.previousOffset;
+			this.editorLayout.scrollTop = this.editorLayout.scrollTop +
+				this.node.getBoundingClientRect().top -
+				this.previousOffset;
 			this.previousOffset = null;
 		}
 

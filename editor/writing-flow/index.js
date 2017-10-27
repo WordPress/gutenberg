@@ -105,6 +105,9 @@ class WritingFlow extends Component {
 	render() {
 		const { children } = this.props;
 
+		// Disable reason: Wrapper itself is non-interactive, but must capture
+		// bubbling events from children to determine focus transition intents.
+		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
 			<div
 				ref={ this.bindContainer }
@@ -114,6 +117,7 @@ class WritingFlow extends Component {
 				{ children }
 			</div>
 		);
+		/* eslint-disable jsx-a11y/no-static-element-interactions */
 	}
 }
 

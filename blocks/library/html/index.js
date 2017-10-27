@@ -80,9 +80,9 @@ registerBlockType( 'core/html', {
 							</ul>
 						</BlockControls>
 					}
-					{ preview
-						? <div dangerouslySetInnerHTML={ { __html: attributes.content } } />
-						: <TextareaAutosize
+					{ preview ?
+						<div dangerouslySetInnerHTML={ { __html: attributes.content } } /> :
+						<TextareaAutosize
 							value={ attributes.content }
 							onChange={ ( event ) => setAttributes( { content: event.target.value } ) }
 						/>
