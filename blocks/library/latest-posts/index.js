@@ -101,13 +101,15 @@ registerBlockType( 'core/latest-posts', {
 
 			const hasPosts = Array.isArray( latestPosts ) && latestPosts.length;
 			if ( ! hasPosts ) {
-				const placeholderContent = ! Array.isArray( latestPosts ) ? <Spinner /> : __( 'No posts found.' );
 				return (
 					<Placeholder
 						icon="admin-post"
 						label={ __( 'Latest Posts' ) }
 					>
-						{ placeholderContent }
+						{ ! Array.isArray( latestPosts )
+							? <Spinner />
+							: __( 'No posts found.' )
+						}
 					</Placeholder>
 				);
 			}
