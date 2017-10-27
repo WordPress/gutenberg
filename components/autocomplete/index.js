@@ -62,7 +62,7 @@ class Autocomplete extends Component {
 	onBlur( event ) {
 		// Check if related target is not within, in the case that the user is
 		// selecting an option by button click
-		if ( ! this.menuNode.contains( event.relatedTarget ) ) {
+		if ( this.menuNode && ! this.menuNode.contains( event.relatedTarget ) ) {
 			this.reset();
 		}
 	}
