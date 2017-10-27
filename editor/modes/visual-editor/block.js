@@ -60,6 +60,7 @@ class VisualEditorBlock extends Component {
 	constructor() {
 		super( ...arguments );
 
+		this.setBlockListRef = this.setBlockListRef.bind( this );
 		this.bindBlockNode = this.bindBlockNode.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
 		this.maybeHover = this.maybeHover.bind( this );
@@ -133,6 +134,10 @@ class VisualEditorBlock extends Component {
 
 	removeStopTypingListener() {
 		document.removeEventListener( 'mousemove', this.stopTypingOnMouseMove );
+	}
+
+	setBlockListRef( node ) {
+		this.props.blockRef( node, this.props.uid );
 	}
 
 	bindBlockNode( node ) {
@@ -339,6 +344,7 @@ class VisualEditorBlock extends Component {
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
 			<div
+				ref={ this.setBlockListRef }
 				onMouseMove={ this.maybeHover }
 				onMouseEnter={ this.maybeHover }
 				onMouseLeave={ onMouseLeave }
