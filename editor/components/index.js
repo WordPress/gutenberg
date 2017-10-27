@@ -35,7 +35,9 @@ export { default as WordCount } from './word-count';
 
 // Content Related Components
 export { default as BlockInspector } from './block-inspector';
+export { default as ErrorBoundary } from './error-boundary';
 export { default as Inserter } from './inserter';
+export { default as Warning } from './warning';
 
 // State Related Components
 export { default as EditorProvider } from './provider';
