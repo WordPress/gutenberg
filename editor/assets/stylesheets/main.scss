@@ -53,13 +53,22 @@ body.gutenberg-editor-page {
 }
 
 .gutenberg__editor {
-	position: relative;
-	height: calc( 100vh - #{ $admin-bar-height-big} );
+	position: absolute;
+	top: $admin-bar-height-big;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	min-height: calc( 100vh - #{ $admin-bar-height-big } );
 	padding-top: $header-height + $stacked-toolbar-height;
+
+	@include break-small {
+		top: 0;
+		padding-top: $header-height;
+	}
 
 	// The WP header height changes at this breakpoint
 	@include break-medium {
-		height: calc( 100vh - #{ $admin-bar-height } );
+		min-height: calc( 100vh - #{ $admin-bar-height } );
 	}
 
 	// The block toolbar disappears at this breakpoint
