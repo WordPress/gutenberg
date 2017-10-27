@@ -110,7 +110,7 @@ class Popover extends Component {
 			return;
 		}
 
-		const { content, popover } = this.nodes;
+		const { content } = this.nodes;
 		if ( ! content ) {
 			return;
 		}
@@ -120,8 +120,8 @@ class Popover extends Component {
 		const firstTabbable = focus.tabbable.find( content )[ 0 ];
 		if ( firstTabbable ) {
 			firstTabbable.focus();
-		} else if ( popover ) {
-			popover.focus();
+		} else {
+			content.focus();
 		}
 	}
 
@@ -246,13 +246,13 @@ class Popover extends Component {
 				<div
 					ref={ this.bindNode( 'popover' ) }
 					className={ classes }
-					tabIndex="0"
 					{ ...contentProps }
 					onKeyDown={ this.maybeClose }
 				>
 					<div
 						ref={ this.bindNode( 'content' ) }
 						className="components-popover__content"
+						tabIndex="-1"
 					>
 						{ children }
 					</div>

@@ -69,6 +69,10 @@
 	background: $white;
 	min-width: 240px;
 
+	&:focus {
+		box-shadow: $button-focus-style;
+	}
+
 	.components-popover.is-top & {
 		bottom: 100%;
 	}
