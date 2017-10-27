@@ -26,8 +26,19 @@ import RangeControl from '../../inspector-controls/range-control';
 import ColorPalette from '../../color-palette';
 import BlockDescription from '../../block-description';
 
-const { children } = source;
-const MAX_FONT_SIZE = 9;
+const { childrenFirstMatch } = source;
+const MAX_FONT_SIZE = 10;
+
+const wrapFontSize = function( content, fontSize ) {
+	if ( fontSize && fontSize !== 1 ) {
+		const styles = {
+			fontSize: fontSize + 'em',
+		};
+		const wrappedContent = <span style={ styles }>{ content }</span>;
+		return [ wrappedContent ];
+	}
+	return content;
+};
 
 registerBlockType( 'core/paragraph', {
 	title: __( 'Paragraph' ),
@@ -43,7 +54,7 @@ registerBlockType( 'core/paragraph', {
 	attributes: {
 		content: {
 			type: 'array',
-			source: children( 'p' ),
+			source: childrenFirstMatch( [ 'p > span', 'p' ] ),
 		},
 		align: {
 			type: 'string',
@@ -99,11 +110,8 @@ registerBlockType( 'core/paragraph', {
 		const { align, content, dropCap, placeholder, backgroundColor, textColor, width } = attributes;
 		const toggleDropCap = () => setAttributes( { dropCap: ! dropCap } );
 		const className = dropCap ? 'has-drop-cap' : null;
-		let { fontSize } = attributes;
 		// if the font size was previously set in pixels, divide by 16 to get em
-		if ( fontSize > MAX_FONT_SIZE ) {
-			fontSize = Math.max( MAX_FONT_SIZE, fontSize / 16 );
-		}
+		const fontSize = attributes.fontSize >= MAX_FONT_SIZE ? Math.max( MAX_FONT_SIZE, attributes.fontSize / 16 ) : attributes.fontSize;
 		return [
 			focus && (
 				<BlockControls key="controls">
@@ -169,10 +177,9 @@ registerBlockType( 'core/paragraph', {
 					style={ {
 						backgroundColor: backgroundColor,
 						color: textColor,
-						fontSize: fontSize ? fontSize + 'em' : undefined,
 						textAlign: align,
 					} }
-					value={ content }
+					value={ wrapFontSize( content, fontSize ) }
 					onChange={ ( nextContent ) => {
 						setAttributes( {
 							content: nextContent,
@@ -205,11 +212,10 @@ registerBlockType( 'core/paragraph', {
 		const styles = {
 			backgroundColor: backgroundColor,
 			color: textColor,
-			fontSize: fontSize ? fontSize + 'em' : undefined,
 			textAlign: align,
 		};
 
-		return <p style={ styles } className={ className ? className : undefined }>{ content }</p>;
+		return <p style={ styles } className={ className ? className : undefined }>{ wrapFontSize( content, fontSize ) }</p>;
 	},
 } );
 

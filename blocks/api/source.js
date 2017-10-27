@@ -50,6 +50,19 @@ export const children = withKnownSourceFlag( ( selector ) => {
 		return [];
 	};
 } );
+export const childrenFirstMatch = withKnownSourceFlag( ( selectors ) => {
+	return ( domNode ) => {
+		let match = [];
+
+		selectors.forEach( ( selector ) => {
+			if ( match.length === 0 ) {
+				match = children( selector )( domNode );
+			}
+		} );
+
+		return match;
+	};
+} );
 export const node = withKnownSourceFlag( ( selector ) => {
 	return ( domNode ) => {
 		let match = domNode;
