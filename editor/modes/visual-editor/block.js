@@ -290,7 +290,7 @@ class VisualEditorBlock extends Component {
 	}
 
 	render() {
-		const { block, multiSelectedBlockUids, order, mode } = this.props;
+		const { block, multiSelectedBlockUids, order, mode, hasMultiSelection } = this.props;
 		const { name: blockName, isValid } = block;
 		const blockType = getBlockType( blockName );
 		// translators: %s: Type of block (i.e. Text, Image etc)
@@ -374,7 +374,7 @@ class VisualEditorBlock extends Component {
 					<BlockCrashBoundary onError={ this.onBlockError }>
 						{ isValid && mode === 'visual' && (
 							<BlockEdit
-								focus={ focus }
+								focus={ ! hasMultiSelection ? focus : null }
 								attributes={ block.attributes }
 								setAttributes={ this.setAttributes }
 								insertBlocksAfter={ this.insertBlocksAfter }
@@ -417,6 +417,7 @@ export default connect(
 			isSelected: isBlockSelected( state, ownProps.uid ),
 			isMultiSelected: isBlockMultiSelected( state, ownProps.uid ),
 			isFirstMultiSelected: isFirstMultiSelectedBlock( state, ownProps.uid ),
+			hasMultiSelection: getMultiSelectedBlockUids( state ).length > 1,
 			isHovered: isBlockHovered( state, ownProps.uid ),
 			focus: getBlockFocus( state, ownProps.uid ),
 			isSelecting: isMultiSelecting( state ),
