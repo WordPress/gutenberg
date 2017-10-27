@@ -57,6 +57,7 @@ describe( 'PreviewButton', () => {
 				return {
 					document: {
 						write: jest.fn(),
+						close: jest.fn(),
 					},
 				};
 			} );
