@@ -74,12 +74,11 @@ export class PreviewButton extends Component {
 			this.getWindowTarget()
 		);
 
-		const popupLoader = `
+		const markup = `
 			<div>
 				<p>Please wait&hellip;</p>
 				<p>Generating preview.</p>
-			</div>`;
-		const css = `
+			</div>
 			<style>
 				div {
 					display: flex;
@@ -94,8 +93,7 @@ export class PreviewButton extends Component {
 				}
 			</style>`;
 
-		this.previewWindow.document.write( css );
-		this.previewWindow.document.write( popupLoader );
+		this.previewWindow.document.write( markup );
 		this.previewWindow.document.close();
 	}
 
