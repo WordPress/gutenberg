@@ -425,28 +425,38 @@ class Test_WP_Widget_Media_Image extends WP_UnitTestCase {
 		$this->assertContains( '<a href="https://example.org"', $output );
 		$this->assertContains( 'target="_blank"', $output );
 
-		// Caption settings.
+		// Populate caption in attachment.
 		wp_update_post( array(
 			'ID' => $attachment_id,
 			'post_excerpt' => 'Default caption',
 		) );
 
+		// If no caption is supplied, then the default is '', and so the caption will not be displayed.
 		ob_start();
 		$widget->render_media( array(
 			'attachment_id' => $attachment_id,
 		) );
 		$output = ob_get_clean();
+		$this->assertNotContains( 'wp-caption', $output );
+		$this->assertNotContains( '<p class="wp-caption-text">', $output );
 
+		// If the caption is explicitly null, then the caption of the underlying attachment will be displayed.
+		ob_start();
+		$widget->render_media( array(
+			'attachment_id' => $attachment_id,
+			'caption' => null,
+		) );
+		$output = ob_get_clean();
 		$this->assertContains( 'class="wp-caption alignnone"', $output );
 		$this->assertContains( '<p class="wp-caption-text">Default caption</p>', $output );
 
+		// If caption is provided, then it will be displayed.
 		ob_start();
 		$widget->render_media( array(
 			'attachment_id' => $attachment_id,
 			'caption' => 'Custom caption',
 		) );
 		$output = ob_get_clean();
-
 		$this->assertContains( 'class="wp-caption alignnone"', $output );
 		$this->assertContains( '<p class="wp-caption-text">Custom caption</p>', $output );
 	}
