@@ -72,11 +72,11 @@ class ClipboardButton extends Component {
 		const classes = classnames( 'components-clipboard-button', className );
 
 		return (
-			<div ref={ this.bindContainer }>
+			<span ref={ this.bindContainer }>
 				<Button { ...buttonProps } className={ classes }>
 					{ children }
 				</Button>
-			</div>
+			</span>
 		);
 	}
 }
