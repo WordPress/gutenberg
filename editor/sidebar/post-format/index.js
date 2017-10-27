@@ -1,45 +1,22 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-import { get, flowRight } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { PanelRow, withAPIData } from '@wordpress/components';
+import { PanelRow } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import PostFormatSelector from '../../post-format';
-import { getCurrentPostType } from '../../selectors';
+import PostFormatCheck from '../../post-format/check';
+import PostFormatForm from '../../post-format';
 
-function PostFormat( { postType } ) {
-	if ( ! get( postType.data, [ 'supports', 'post-formats' ] ) ) {
-		return null;
-	}
-
+export function PostFormat() {
 	return (
-		<PanelRow>
-			<PostFormatSelector />
-		</PanelRow>
+		<PostFormatCheck>
+			<PanelRow>
+				<PostFormatForm />
+			</PanelRow>
+		</PostFormatCheck>
 	);
 }
 
-export default flowRight( [
-	connect(
-		( state ) => {
-			return {
-				postTypeSlug: getCurrentPostType( state ),
-			};
-		},
-	),
-	withAPIData( ( props ) => {
-		const { postTypeSlug } = props;
-
-		return {
-			postType: `/wp/v2/types/${ postTypeSlug }?context=edit`,
-		};
-	} ),
-] )( PostFormat );
+export default PostFormat;
