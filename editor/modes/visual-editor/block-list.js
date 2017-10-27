@@ -15,7 +15,7 @@ import {
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component, findDOMNode } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { serialize, getDefaultBlockName, createBlock } from '@wordpress/blocks';
 
 /**
