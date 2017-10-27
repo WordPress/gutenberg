@@ -54,7 +54,7 @@ import {
 	getBlockMode,
 } from '../../selectors';
 
-const { BACKSPACE, ESCAPE, DELETE, ENTER } = keycodes;
+const { BACKSPACE, ESCAPE, DELETE, ENTER, UP, RIGHT, DOWN, LEFT } = keycodes;
 
 class VisualEditorBlock extends Component {
 	constructor() {
@@ -65,7 +65,6 @@ class VisualEditorBlock extends Component {
 		this.maybeHover = this.maybeHover.bind( this );
 		this.maybeStartTyping = this.maybeStartTyping.bind( this );
 		this.stopTypingOnMouseMove = this.stopTypingOnMouseMove.bind( this );
-		this.removeOrDeselect = this.removeOrDeselect.bind( this );
 		this.mergeBlocks = this.mergeBlocks.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
@@ -198,35 +197,6 @@ class VisualEditorBlock extends Component {
 		this.lastClientY = clientY;
 	}
 
-	removeOrDeselect( event ) {
-		const { keyCode, target } = event;
-		const {
-			uid,
-			previousBlock,
-			onRemove,
-			onFocus,
-			onDeselect,
-		} = this.props;
-
-		// Remove block on backspace.
-		if (
-			target === this.node &&
-			( BACKSPACE === keyCode || DELETE === keyCode )
-		) {
-			event.preventDefault();
-			onRemove( [ uid ] );
-
-			if ( previousBlock ) {
-				onFocus( previousBlock.uid, { offset: -1 } );
-			}
-		}
-
-		// Deselect on escape.
-		if ( ESCAPE === keyCode ) {
-			onDeselect();
-		}
-	}
-
 	mergeBlocks( forward = false ) {
 		const { block, previousBlock, nextBlock, onMerge } = this.props;
 
@@ -275,14 +245,48 @@ class VisualEditorBlock extends Component {
 
 	onKeyDown( event ) {
 		const { keyCode, target } = event;
-		if ( ENTER === keyCode && target === this.node ) {
-			event.preventDefault();
 
-			this.props.onInsertBlocks( [
-				createBlock( 'core/paragraph' ),
-			], this.props.order + 1 );
+		switch ( keyCode ) {
+			case ENTER:
+				// Insert default block after current block if enter and event
+				// not already handled by descendant.
+				if ( target === this.node ) {
+					event.preventDefault();
+
+					this.props.onInsertBlocks( [
+						createBlock( 'core/paragraph' ),
+					], this.props.order + 1 );
+				}
+				break;
+
+			case UP:
+			case RIGHT:
+			case DOWN:
+			case LEFT:
+				// Arrow keys do not fire keypress event, but should still
+				// trigger typing mode.
+				this.maybeStartTyping();
+				break;
+
+			case BACKSPACE:
+			case DELETE:
+				// Remove block on backspace.
+				if ( target === this.node ) {
+					event.preventDefault();
+					const { uid, onRemove, previousBlock, onFocus } = this.props;
+					onRemove( uid );
+
+					if ( previousBlock ) {
+						onFocus( previousBlock.uid, { offset: -1 } );
+					}
+				}
+				break;
+
+			case ESCAPE:
+				// Deselect on escape.
+				this.props.onDeselect();
+				break;
 		}
-		this.removeOrDeselect( event );
 	}
 
 	onBlockError( error ) {

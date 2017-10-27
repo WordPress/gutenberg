@@ -35,13 +35,11 @@
 		z-index: z-index( '.editor-visual-editor__block:before' );
 		content: '';
 		position: absolute;
-		outline: 1px solid transparent;
-		transition: 0.2s outline;
 		top: 0;
 		bottom: 0;
-
 		left: 0;
 		right: 0;
+		outline: 1px solid transparent;
 
 		@include break-small {
 			left: $block-mover-padding-visible;
@@ -59,7 +57,7 @@
 		}
 	}
 
-	&.has-warning .editor-visual-editor__block-edit::after {
+	&.has-warning .editor-visual-editor__block-edit:after {
 		content: '';
 		position: absolute;
 		top: 0;
@@ -69,24 +67,54 @@
 		background-color: rgba( $white, 0.6 );
 	}
 
-	&.is-hovered:before {
-		outline: 1px solid $light-gray-500;
-		transition: 0.2s outline;
+	// simpler style for a block that has cursor focus (but hasn't been selected)
+	&.is-selected .editor-block-mover:before,
+	&.is-hovered .editor-block-mover:before,
+	&.is-selected .editor-block-settings-menu:before,
+	&.is-hovered .editor-block-settings-menu:before {
+		content: '';
+		position: absolute;
+		height: 36px;
+		top: 10px;
 	}
 
+	&.is-selected .editor-block-mover:before,
+	&.is-hovered .editor-block-mover:before {
+		border-right: 1px solid $light-gray-500;
+		right: 4px;
+	}
+
+	&.is-selected .editor-block-settings-menu:before,
+	&.is-hovered .editor-block-settings-menu:before {
+		border-left: 1px solid $light-gray-500;
+		left: 4px;
+	}
+
+	&.is-selected .editor-block-mover:before,
+	&.is-hovered .editor-block-mover:before {
+		border-right: 1px solid $light-gray-500;
+		right: 6px;
+	}
+
+	&.is-selected .editor-block-settings-menu:before,
+	&.is-hovered .editor-block-settings-menu:before {
+		border-left: 1px solid $light-gray-500;
+		left: 6px;
+	}
+
+	// focused block-style
 	&.is-selected:before {
-		outline: 2px solid $light-gray-500;
-		transition: 0.2s outline;
+ 		outline: 1px solid $light-gray-500;
 	}
 
+	// selection style for multiple blocks
 	&.is-multi-selected *::selection {
 		background: transparent;
 	}
 
 	&.is-multi-selected:before {
-		background: $blue-medium-100;
-		outline: 2px solid $blue-medium-200;
-		transition: 0s outline;
+		background: $blue-medium-200;
+		background: Highlight;	// This variable is a CSS 2.1 variable that selects the operating system select color
 	}
 
 	.iframe-overlay {
@@ -212,12 +240,13 @@
 		@include break-wide() {
 			.editor-block-mover {
 				display: block;
-			}
-
-			.editor-block-mover {
-				top: -30px;
+				top: -29px;
 				left: 10px;
 				height: auto;
+
+				&:before {
+					content: none;
+				}
 			}
 
 			.editor-block-mover__control {
@@ -232,9 +261,13 @@
 		}
 
 		.editor-block-settings-menu {
-			top: -30px;
+			top: -41px;
 			right: 10px;
 			height: auto;
+
+			&:before {
+				content: none;
+			}
 		}
 	}
 
@@ -320,7 +353,7 @@
 	input[type=text] {
 		height: $text-editor-font-size * 4; // same height as an empty paragraph
 		margin-top: 0px;
-		margin-bottom: 5px;
+		margin-bottom: 4px;
 		outline: 1px solid transparent;
 		border: none;
 		background: none;
@@ -457,7 +490,7 @@
 		opacity: 1;
 	}
 
-	&::before {
+	&:before {
 		content: '';
 		position: absolute;
 		width: 100%;
@@ -466,7 +499,7 @@
 		transform: translateY( -50% );
 	}
 
-	&:hover::before {
+	&:hover:before {
 		height: 44px;
 	}
 
