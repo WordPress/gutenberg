@@ -22,7 +22,7 @@ import BlockCrashBoundary from './block-crash-boundary';
 import BlockDropZone from './block-drop-zone';
 import BlockHtml from './block-html';
 import BlockMover from '../../block-mover';
-import BlockRightMenu from '../../block-settings-menu';
+import BlockSettingsMenu from '../../block-settings-menu';
 import BlockToolbar from '../../block-toolbar';
 import {
 	clearSelectedBlock,
@@ -348,13 +348,13 @@ class VisualEditorBlock extends Component {
 			>
 				<BlockDropZone index={ order } />
 				{ ( showUI || isProperlyHovered ) && <BlockMover uids={ [ block.uid ] } /> }
-				{ ( showUI || isProperlyHovered ) && <BlockRightMenu uids={ [ block.uid ] } /> }
+				{ ( showUI || isProperlyHovered ) && <BlockSettingsMenu uids={ [ block.uid ] } /> }
 				{ isSelected && isValid && <BlockToolbar uid={ block.uid } /> }
 				{ isFirstMultiSelected && ! this.props.isSelecting &&
 					<BlockMover uids={ multiSelectedBlockUids } />
 				}
 				{ isFirstMultiSelected && ! this.props.isSelecting &&
-					<BlockRightMenu
+					<BlockSettingsMenu
 						uids={ multiSelectedBlockUids }
 						focus={ true }
 					/>
