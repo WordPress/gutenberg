@@ -1,4 +1,4 @@
-Cypress.Commands.add( 'login', ( username, password ) => {
+Cypress.Commands.add( 'login', ( username = Cypress.env( 'username' ), password = Cypress.env( 'password' ) ) => {
 	// A best practice would be to avoid this in each test
 	// and fake it by calling an API and setting a cookie
 	// (not sure this is possible in WP)
