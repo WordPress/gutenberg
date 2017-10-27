@@ -285,6 +285,22 @@ export function removeBlocks( uids ) {
 }
 
 /**
+ * Returns an action object used in signalling that the blocks
+ * corresponding to the specified UID set are to be removed, and then
+ * another block given focus. It differs from removeBlocks in that it
+ * calls focus on a block afterwards
+ *
+ * @param  {String[]} uids Block UIDs
+ * @return {Object}        Action object
+ */
+export function deleteBlocks( uids ) {
+	return {
+		type: 'DELETE_BLOCKS',
+		uids,
+	};
+}
+
+/**
  * Returns an action object used in signalling that the block with the
  * specified UID is to be removed.
  *
