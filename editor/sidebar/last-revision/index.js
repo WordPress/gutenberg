@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { flowRight, last } from 'lodash';
+import { flowRight, first } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -23,7 +23,7 @@ import {
 import { getWPAdminURL } from '../../utils/url';
 
 function LastRevision( { revisions } ) {
-	const lastRevision = last( revisions.data );
+	const lastRevision = first( revisions.data );
 	if ( ! lastRevision ) {
 		return null;
 	}
