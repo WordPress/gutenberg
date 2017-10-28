@@ -97,59 +97,10 @@ registerBlockType( 'core/latest-posts', {
 
 		render() {
 			const { latestPosts } = this.state;
-			const { setAttributes } = this.props;
-
-			const hasPosts = Array.isArray( latestPosts ) && latestPosts.length;
-			if ( ! hasPosts ) {
-				return (
-					<Placeholder
-						icon="admin-post"
-						label={ __( 'Latest Posts' ) }
-					>
-						{ ! Array.isArray( latestPosts )
-							? <Spinner />
-							: __( 'No posts found.' )
-						}
-					</Placeholder>
-				);
-			}
-
-			// Removing posts from display should be instant.
-			const postsDifference = latestPosts.length - this.props.attributes.postsToShow;
-			if ( postsDifference > 0 ) {
-				latestPosts.splice( this.props.attributes.postsToShow, postsDifference );
-			}
-
-			const { focus } = this.props;
+			const { focus, setAttributes } = this.props;
 			const { displayPostDate, align, layout, columns } = this.props.attributes;
-			const layoutControls = [
-				{
-					icon: 'list-view',
-					title: __( 'List View' ),
-					onClick: () => setAttributes( { layout: 'list' } ),
-					isActive: layout === 'list',
-				},
-				{
-					icon: 'grid-view',
-					title: __( 'Grid View' ),
-					onClick: () => setAttributes( { layout: 'grid' } ),
-					isActive: layout === 'grid',
-				},
-			];
 
-			return [
-				focus && (
-					<BlockControls key="controls">
-						<BlockAlignmentToolbar
-							value={ align }
-							onChange={ ( nextAlign ) => {
-								setAttributes( { align: nextAlign } );
-							} }
-							controls={ [ 'center', 'wide', 'full' ] }
-						/>
-						<Toolbar controls={ layoutControls } />
-					</BlockControls>
-				),
+			const inspectorControls = (
 				focus && (
 					<InspectorControls key="inspector">
 						<BlockDescription>
@@ -179,6 +130,59 @@ registerBlockType( 'core/latest-posts', {
 							onChange={ ( value ) => this.changePostsToShow( value ) }
 						/>
 					</InspectorControls>
+				)
+			);
+
+			const hasPosts = Array.isArray( latestPosts ) && latestPosts.length;
+			if ( ! hasPosts ) {
+				return [
+					inspectorControls,
+					<Placeholder key="placeholder"
+						icon="admin-post"
+						label={ __( 'Latest Posts' ) }
+					>
+						{ ! Array.isArray( latestPosts ) ?
+							<Spinner /> :
+							__( 'No posts found.' )
+						}
+					</Placeholder>,
+				];
+			}
+
+			// Removing posts from display should be instant.
+			const postsDifference = latestPosts.length - this.props.attributes.postsToShow;
+			if ( postsDifference > 0 ) {
+				latestPosts.splice( this.props.attributes.postsToShow, postsDifference );
+			}
+
+			const layoutControls = [
+				{
+					icon: 'list-view',
+					title: __( 'List View' ),
+					onClick: () => setAttributes( { layout: 'list' } ),
+					isActive: layout === 'list',
+				},
+				{
+					icon: 'grid-view',
+					title: __( 'Grid View' ),
+					onClick: () => setAttributes( { layout: 'grid' } ),
+					isActive: layout === 'grid',
+				},
+			];
+
+			return [
+				inspectorControls,
+				focus && (
+					<BlockControls key="controls">
+						<BlockAlignmentToolbar
+							value={ align }
+							onChange={ ( nextAlign ) => {
+								setAttributes( { align: nextAlign } );
+							} }
+							controls={ [ 'center', 'wide', 'full' ] }
+						/>
+						<Toolbar controls={ layoutControls } />
+					</BlockControls>
 				),
 				<ul
 					className={ classnames( this.props.className, 'columns-' + columns, {
