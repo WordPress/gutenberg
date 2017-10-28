@@ -470,9 +470,6 @@ mockedApiResponse.Schema = {
                         },
                         "template": {
                             "required": false,
-                            "enum": [
-                                ""
-                            ],
                             "description": "The theme file to use to display the object.",
                             "type": "string"
                         },
@@ -653,9 +650,6 @@ mockedApiResponse.Schema = {
                         },
                         "template": {
                             "required": false,
-                            "enum": [
-                                ""
-                            ],
                             "description": "The theme file to use to display the object.",
                             "type": "string"
                         },
@@ -1058,9 +1052,6 @@ mockedApiResponse.Schema = {
                         },
                         "template": {
                             "required": false,
-                            "enum": [
-                                ""
-                            ],
                             "description": "The theme file to use to display the object.",
                             "type": "string"
                         }
@@ -1213,9 +1204,6 @@ mockedApiResponse.Schema = {
                         },
                         "template": {
                             "required": false,
-                            "enum": [
-                                ""
-                            ],
                             "description": "The theme file to use to display the object.",
                             "type": "string"
                         }
@@ -1577,9 +1565,6 @@ mockedApiResponse.Schema = {
                         },
                         "template": {
                             "required": false,
-                            "enum": [
-                                ""
-                            ],
                             "description": "The theme file to use to display the object.",
                             "type": "string"
                         },
@@ -1717,9 +1702,6 @@ mockedApiResponse.Schema = {
                         },
                         "template": {
                             "required": false,
-                            "enum": [
-                                ""
-                            ],
                             "description": "The theme file to use to display the object.",
                             "type": "string"
                         },
