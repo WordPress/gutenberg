@@ -290,6 +290,30 @@ describe( 'Autocomplete', () => {
 			expect( onSelect ).toHaveBeenCalledWith( options[ 0 ] );
 		} );
 
+		it( 'selects by click', () => {
+			const onSelect = jest.fn();
+			const wrapper = shallow(
+				<Autocomplete
+					options={ options }
+					triggerPrefix="/"
+					onSelect={ onSelect }
+				>
+					<div contentEditable />
+				</Autocomplete>
+			);
+
+			wrapper.find( '[contentEditable]' ).simulate( 'input', {
+				target: {
+					textContent: '/',
+				},
+			} );
+
+			wrapper.find( 'li' ).at( 0 ).find( 'Button' ).simulate( 'click' );
+
+			expect( wrapper.state() ).toEqual( Autocomplete.getInitialState() );
+			expect( onSelect ).toHaveBeenCalledWith( options[ 0 ] );
+		} );
+
 		it( 'doesn\'t otherwise interfere with keydown behavior', () => {
 			const preventDefault = jest.fn();
 			const stopImmediatePropagation = jest.fn();

@@ -9,9 +9,19 @@ import { identity, fromPairs } from 'lodash';
  */
 import withAPIData from '../';
 
-jest.mock( '../request', () => jest.fn( () => Promise.resolve( {
-	body: {},
-} ) ) );
+jest.mock( '../request', () => {
+	const request = jest.fn( () => Promise.resolve( {
+		body: {},
+	} ) );
+
+	request.getCachedResponse = ( { method, path } ) => {
+		return method === 'GET' && '/wp/v2/pages/10' === path ?
+			{ body: { title: 'OK!' }, headers: [] } :
+			undefined;
+	};
+
+	return request;
+} );
 
 describe( 'withAPIData()', () => {
 	const schema = {
@@ -65,6 +75,29 @@ describe( 'withAPIData()', () => {
 		process.nextTick( () => {
 			expect( wrapper.state( 'dataProps' ).revisions.isLoading ).toBe( false );
 			expect( wrapper.state( 'dataProps' ).revisions.data ).toEqual( {} );
+
+			done();
+		} );
+	} );
+
+	it( 'should preassign cached data', ( done ) => {
+		const wrapper = getWrapper( () => ( {
+			page: '/wp/v2/pages/10',
+		} ) );
+
+		const dataProps = wrapper.state( 'dataProps' );
+		expect( Object.keys( dataProps ) ).toEqual( [ 'page' ] );
+		expect( Object.keys( dataProps.page ) ).toEqual( expect.arrayContaining( [
+			'get',
+			'isLoading',
+			'path',
+			'data',
+		] ) );
+		expect( dataProps.page.isLoading ).toBe( false );
+		expect( wrapper.state( 'dataProps' ).page.data ).toEqual( { title: 'OK!' } );
+
+		process.nextTick( () => {
+			expect( wrapper.state( 'dataProps' ).page.isLoading ).toBe( false );
 
 			done();
 		} );

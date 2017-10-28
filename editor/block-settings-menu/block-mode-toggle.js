@@ -22,9 +22,9 @@ export function BlockModeToggle( { blockType, mode, onToggleMode, small = false 
 		return null;
 	}
 
-	const label = mode === 'visual'
-		? __( 'Edit as HTML' )
-		: __( 'Edit visually' );
+	const label = mode === 'visual' ?
+		__( 'Edit as HTML' ) :
+		__( 'Edit visually' );
 
 	return (
 		<IconButton
