@@ -20,7 +20,7 @@ import BlockDeleteButton from './block-delete-button';
 import { selectBlock } from '../actions';
 import UnknownConverter from './unknown-converter';
 
-function BlockSettingsMenu( { uids, onSelect } ) {
+function BlockSettingsMenu( { uids, onSelect, focus } ) {
 	const count = uids.length;
 
 	return (
@@ -32,6 +32,7 @@ function BlockSettingsMenu( { uids, onSelect } ) {
 				const toggleClassname = classnames( 'editor-block-settings-menu__toggle', {
 					'is-opened': isOpen,
 				} );
+
 				return (
 					<IconButton
 						className={ toggleClassname }
@@ -44,6 +45,7 @@ function BlockSettingsMenu( { uids, onSelect } ) {
 						icon="ellipsis"
 						label={ isOpen ? __( 'Close Settings Menu' ) : __( 'Open Settings Menu' ) }
 						aria-expanded={ isOpen }
+						focus={ focus }
 					/>
 				);
 			} }
