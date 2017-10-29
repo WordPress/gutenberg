@@ -10,6 +10,11 @@ import classnames from 'classnames';
  */
 import { Component, Children, createElement } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import { diffAriaProps, pickAriaProps } from './aria';
+
 export default class TinyMCE extends Component {
 	componentDidMount() {
 		this.initialize();
@@ -39,6 +44,12 @@ export default class TinyMCE extends Component {
 		if ( ! isEqual( this.props.className, nextProps.className ) ) {
 			this.editorNode.className = classnames( nextProps.className, 'blocks-editable__tinymce' );
 		}
+
+		const { removedKeys, updatedKeys } = diffAriaProps( this.props, nextProps );
+		removedKeys.forEach( ( key ) =>
+				this.editorNode.removeAttribute( key ) );
+		updatedKeys.forEach( ( key ) =>
+				this.editorNode.setAttribute( key, nextProps[ key ] ) );
 	}
 
 	componentWillUnmount() {
@@ -88,7 +99,8 @@ export default class TinyMCE extends Component {
 	}
 
 	render() {
-		const { tagName = 'div', style, defaultValue, label, className } = this.props;
+		const { tagName = 'div', style, defaultValue, className } = this.props;
+		const ariaProps = pickAriaProps( this.props );
 
 		// If a default value is provided, render it into the DOM even before
 		// TinyMCE finishes initializing. This avoids a short delay by allowing
@@ -104,7 +116,7 @@ export default class TinyMCE extends Component {
 			suppressContentEditableWarning: true,
 			className: classnames( className, 'blocks-editable__tinymce' ),
 			style,
-			'aria-label': label,
+			...ariaProps,
 		}, children );
 	}
 }

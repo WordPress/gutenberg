@@ -31,6 +31,7 @@ import './style.scss';
 import { pasteHandler } from '../api';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
+import { pickAriaProps } from './aria';
 import patterns from './patterns';
 import { EVENTS } from './constants';
 
@@ -656,6 +657,8 @@ export default class Editable extends Component {
 			formatters,
 		} = this.props;
 
+		const ariaProps = pickAriaProps( this.props );
+
 		// Generating a key that includes `tagName` ensures that if the tag
 		// changes, we unmount and destroy the previous TinyMCE element, then
 		// mount and initialize a new child element in its place.
@@ -693,7 +696,8 @@ export default class Editable extends Component {
 					style={ style }
 					defaultValue={ value }
 					isPlaceholderVisible={ isPlaceholderVisible }
-					label={ placeholder }
+					aria-label={ placeholder }
+					{ ...ariaProps }
 					className={ className }
 					key={ key }
 				/>
