@@ -276,7 +276,7 @@ function gutenberg_register_vendor_scripts() {
 	// See: gutenberg_ensure_wp_api_request (compat.php).
 	gutenberg_register_vendor_script(
 		'wp-api-request-shim',
-		'https://raw.githubusercontent.com/WordPress/wordpress-develop/master/src/wp-includes/js/api-request.js'
+		'https://rawgit.com/WordPress/wordpress-develop/master/src/wp-includes/js/api-request.js'
 	);
 }
 
