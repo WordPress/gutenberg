@@ -1,6 +1,7 @@
 # HEAD
 
 -   Changed: Updated `stylelint` peer dependency version to `^8.0.0`.
+-   Removed: Jest snapshots.
 
 # 12.0.0
 
