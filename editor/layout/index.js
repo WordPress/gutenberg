@@ -7,7 +7,8 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { NoticeList, Popover } from '@wordpress/components';
+import { NoticeList, Popover, navigateRegions } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -34,13 +35,13 @@ function Layout( { mode, isSidebarOpened, notices, ...props } ) {
 	} );
 
 	return (
-		<div key="editor" className={ className }>
+		<div className={ className }>
 			<DocumentTitle />
 			<NoticeList onRemove={ props.removeNotice } notices={ notices } />
 			<UnsavedChangesWarning />
 			<AutosaveMonitor />
 			<Header />
-			<div className="editor-layout__content">
+			<div className="editor-layout__content" role="region" aria-label={ __( 'Editor content' ) } tabIndex="-1">
 				<div className="editor-layout__editor">
 					{ mode === 'text' && <TextEditor /> }
 					{ mode === 'visual' && <VisualEditor /> }
@@ -60,4 +61,4 @@ export default connect(
 		notices: getNotices( state ),
 	} ),
 	{ removeNotice }
-)( Layout );
+)( navigateRegions( Layout ) );

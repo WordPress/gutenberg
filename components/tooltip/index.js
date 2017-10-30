@@ -108,7 +108,6 @@ class Tooltip extends Component {
 					position={ position }
 					className="components-tooltip"
 					aria-hidden="true"
-					tabIndex={ undefined }
 				>
 					{ text }
 				</Popover>,

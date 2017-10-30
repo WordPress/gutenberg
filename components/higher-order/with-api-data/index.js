@@ -11,7 +11,7 @@ import { Component } from 'element';
 /**
  * Internal dependencies
  */
-import request from './request';
+import request, { getCachedResponse } from './request';
 import { getRoute } from './routes';
 
 export default ( mapPropsToData ) => ( WrappedComponent ) => {
@@ -61,6 +61,11 @@ export default ( mapPropsToData ) => ( WrappedComponent ) => {
 					prevDataProps.hasOwnProperty( propName ) &&
 					prevDataProps[ propName ].path === dataProp.path
 				) {
+					return;
+				}
+
+				// Skip request is already assigned via cache
+				if ( dataProp[ this.getResponseDataKey( 'GET' ) ] ) {
 					return;
 				}
 
@@ -181,6 +186,13 @@ export default ( mapPropsToData ) => ( WrappedComponent ) => {
 					// Initialize pending flags as explicitly false
 					const pendingKey = this.getPendingKey( method );
 					result[ propName ][ pendingKey ] = false;
+
+					// If cached data already exists, populate in result
+					const cachedResponse = getCachedResponse( { path, method } );
+					if ( cachedResponse ) {
+						const dataKey = this.getResponseDataKey( method );
+						result[ propName ][ dataKey ] = cachedResponse.body;
+					}
 
 					// Track path for future map skipping
 					result[ propName ].path = path;

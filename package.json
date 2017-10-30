@@ -1,6 +1,6 @@
 {
   "name": "gutenberg",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "A new WordPress editor experience",
   "main": "build/app.js",
   "repository": "git+https://github.com/WordPress/gutenberg.git",
@@ -28,6 +28,7 @@
     "moment-timezone": "0.5.13",
     "mousetrap": "1.6.1",
     "prop-types": "15.5.10",
+    "re-resizable": "4.0.2",
     "react": "16.0.0",
     "react-autosize-textarea": "0.4.8",
     "react-click-outside": "2.3.1",
@@ -35,7 +36,6 @@
     "react-datepicker": "0.46.0",
     "react-dom": "16.0.0",
     "react-redux": "5.0.6",
-    "react-resizable-box": "2.0.6",
     "react-slot-fill": "1.0.1",
     "react-transition-group": "1.2.0",
     "redux": "3.7.2",
@@ -50,7 +50,7 @@
   "devDependencies": {
     "autoprefixer": "6.7.7",
     "babel-core": "6.26.0",
-    "babel-eslint": "7.2.3",
+    "babel-eslint": "8.0.1",
     "babel-jest": "21.2.0",
     "babel-loader": "6.4.1",
     "babel-plugin-lodash": "3.2.11",
@@ -65,11 +65,11 @@
     "deep-freeze": "0.0.1",
     "enzyme": "3.1.0",
     "enzyme-adapter-react-16": "1.0.2",
-    "eslint": "3.19.0",
-    "eslint-config-wordpress": "1.1.0",
+    "eslint": "4.9.0",
+    "eslint-config-wordpress": "2.0.0",
     "eslint-plugin-jest": "21.2.0",
-    "eslint-plugin-jsx-a11y": "4.0.0",
-    "eslint-plugin-react": "6.10.3",
+    "eslint-plugin-jsx-a11y": "6.0.2",
+    "eslint-plugin-react": "7.4.0",
     "expose-loader": "0.7.3",
     "extract-text-webpack-plugin": "3.0.0",
     "gettext-parser": "1.3.0",
@@ -87,7 +87,7 @@
     "sass-loader": "6.0.6",
     "style-loader": "0.18.2",
     "tinymce": "4.7.1",
-    "webpack": "3.6.0"
+    "webpack": "3.8.1"
   },
   "jest": {
     "collectCoverageFrom": [

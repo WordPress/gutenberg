@@ -1020,14 +1020,14 @@ describe( 'state', () => {
 
 	describe( 'notices()', () => {
 		it( 'should create a notice', () => {
-			const originalState = {
-				b: {
+			const originalState = [
+				{
 					id: 'b',
 					content: 'Error saving',
 					status: 'error',
 				},
-			};
-			const state = notices( originalState, {
+			];
+			const state = notices( deepFreeze( originalState ), {
 				type: 'CREATE_NOTICE',
 				notice: {
 					id: 'a',
@@ -1035,36 +1035,36 @@ describe( 'state', () => {
 					status: 'success',
 				},
 			} );
-			expect( state ).toEqual( {
-				b: originalState.b,
-				a: {
+			expect( state ).toEqual( [
+				originalState[ 0 ],
+				{
 					id: 'a',
 					content: 'Post saved',
 					status: 'success',
 				},
-			} );
+			] );
 		} );
 
 		it( 'should remove a notice', () => {
-			const originalState = {
-				a: {
+			const originalState = [
+				{
 					id: 'a',
 					content: 'Post saved',
 					status: 'success',
 				},
-				b: {
+				{
 					id: 'b',
 					content: 'Error saving',
 					status: 'error',
 				},
-			};
-			const state = notices( originalState, {
+			];
+			const state = notices( deepFreeze( originalState ), {
 				type: 'REMOVE_NOTICE',
 				noticeId: 'a',
 			} );
-			expect( state ).toEqual( {
-				b: originalState.b,
-			} );
+			expect( state ).toEqual( [
+				originalState[ 1 ],
+			] );
 		} );
 	} );
 

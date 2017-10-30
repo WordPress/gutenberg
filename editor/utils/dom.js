@@ -12,11 +12,12 @@ const { TEXT_NODE } = window.Node;
 /**
  * Check whether the caret is horizontally at the edge of the container.
  *
- * @param  {Element} container Focusable element.
- * @param  {Boolean} isReverse Set to true to check left, false for right.
- * @return {Boolean}           True if at the edge, false if not.
+ * @param  {Element} container       Focusable element.
+ * @param  {Boolean} isReverse       Set to true to check left, false for right.
+ * @param  {Boolean} collapseRanges  Whether or not to collapse the selection range before the check
+ * @return {Boolean}                 True if at the horizontal edge, false if not.
  */
-export function isHorizontalEdge( container, isReverse ) {
+export function isHorizontalEdge( container, isReverse, collapseRanges = false ) {
 	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
 		if ( container.selectionStart !== container.selectionEnd ) {
 			return false;
@@ -34,7 +35,11 @@ export function isHorizontalEdge( container, isReverse ) {
 	}
 
 	const selection = window.getSelection();
-	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+	let range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+	if ( collapseRanges ) {
+		range = range.cloneRange();
+		range.collapse( isReverse );
+	}
 
 	if ( ! range || ! range.collapsed ) {
 		return false;
@@ -70,11 +75,12 @@ export function isHorizontalEdge( container, isReverse ) {
 /**
  * Check whether the caret is vertically at the edge of the container.
  *
- * @param  {Element} container Focusable element.
- * @param  {Boolean} isReverse Set to true to check top, false for bottom.
- * @return {Boolean}           True if at the edge, false if not.
+ * @param  {Element} container       Focusable element.
+ * @param  {Boolean} isReverse       Set to true to check top, false for bottom.
+ * @param  {Boolean} collapseRanges  Whether or not to collapse the selection range before the check
+ * @return {Boolean}                 True if at the edge, false if not.
  */
-export function isVerticalEdge( container, isReverse ) {
+export function isVerticalEdge( container, isReverse, collapseRanges = false ) {
 	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
 		return isHorizontalEdge( container, isReverse );
 	}
@@ -84,7 +90,14 @@ export function isVerticalEdge( container, isReverse ) {
 	}
 
 	const selection = window.getSelection();
-	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+	let range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+	if ( collapseRanges && ! range.collapsed ) {
+		const newRange = document.createRange();
+		// Get the end point of the selection (see focusNode vs. anchorNode)
+		newRange.setStart( selection.focusNode, selection.focusOffset );
+		newRange.collapse( true );
+		range = newRange;
+	}
 
 	if ( ! range || ! range.collapsed ) {
 		return false;
@@ -92,9 +105,9 @@ export function isVerticalEdge( container, isReverse ) {
 
 	// Adjust for empty containers.
 	const rangeRect =
-		range.startContainer.nodeType === window.Node.ELEMENT_NODE
-		? range.startContainer.getBoundingClientRect()
-		: range.getClientRects()[ 0 ];
+		range.startContainer.nodeType === window.Node.ELEMENT_NODE ?
+			range.startContainer.getBoundingClientRect() :
+			range.getClientRects()[ 0 ];
 
 	if ( ! rangeRect ) {
 		return false;
@@ -132,9 +145,9 @@ export function computeCaretRect( container ) {
 	}
 
 	// Adjust for empty containers.
-	return range.startContainer.nodeType === window.Node.ELEMENT_NODE
-		? range.startContainer.getBoundingClientRect()
-		: range.getClientRects()[ 0 ];
+	return range.startContainer.nodeType === window.Node.ELEMENT_NODE ?
+		range.startContainer.getBoundingClientRect() :
+		range.getClientRects()[ 0 ];
 }
 
 /**
@@ -151,11 +164,11 @@ export function placeCaretAtHorizontalEdge( container, isReverse ) {
 	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
 		container.focus();
 		if ( isReverse ) {
-			container.selectionStart = 0;
-			container.selectionEnd = 0;
-		} else {
 			container.selectionStart = container.value.length;
 			container.selectionEnd = container.value.length;
+		} else {
+			container.selectionStart = 0;
+			container.selectionEnd = 0;
 		}
 		return;
 	}
@@ -255,7 +268,7 @@ export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScro
 
 	if ( ! range || ! container.contains( range.startContainer ) ) {
 		if ( mayUseScroll && (
-				( ! range || ! range.startContainer ) ||
+			( ! range || ! range.startContainer ) ||
 				! range.startContainer.contains( container ) ) ) {
 			// Might be out of view.
 			// Easier than attempting to calculate manually.

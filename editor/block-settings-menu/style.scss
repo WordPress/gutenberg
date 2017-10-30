@@ -1,8 +1,8 @@
 .editor-block-settings-menu {
 	position: absolute;
-	top: 0;
+	top: 2px;
 	right: 4px;
-	padding: 6px 0 6px 14px; // handles hover area
+	padding: 16px 0 20px 14px; // handles hover area
 
 	// Mobile
 	display: none;
@@ -31,6 +31,7 @@
 }
 
 .editor-block-settings-menu__toggle {
+	border-radius: 50%;
 	padding: 0;
 	transform: rotate( 90deg );
 	transition-duration: 0.3s;

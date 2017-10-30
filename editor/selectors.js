@@ -10,7 +10,6 @@ import {
 	last,
 	reduce,
 	some,
-	values,
 	keys,
 	without,
 	compact,
@@ -69,9 +68,9 @@ export function getMetaBox( state, location ) {
 export const getDirtyMetaBoxes = createSelector(
 	( state ) => {
 		return reduce( getMetaBoxes( state ), ( result, metaBox, location ) => {
-			return metaBox.isDirty && metaBox.isActive
-				? [ ...result, location ]
-				: result;
+			return metaBox.isDirty && metaBox.isActive ?
+				[ ...result, location ] :
+				result;
 		}, [] );
 	},
 	( state ) => state.metaBoxes,
@@ -291,9 +290,9 @@ export function getPostEdits( state ) {
  * @return {*}                    Post attribute value
  */
 export function getEditedPostAttribute( state, attributeName ) {
-	return state.editor.edits[ attributeName ] === undefined
-		? state.currentPost[ attributeName ]
-		: state.editor.edits[ attributeName ];
+	return state.editor.edits[ attributeName ] === undefined ?
+		state.currentPost[ attributeName ] :
+		state.editor.edits[ attributeName ];
 }
 
 /**
@@ -412,9 +411,9 @@ export function getDocumentTitle( state ) {
  * @return {String}       Raw post excerpt
  */
 export function getEditedPostExcerpt( state ) {
-	return state.editor.edits.excerpt === undefined
-		? state.currentPost.excerpt
-		: state.editor.edits.excerpt;
+	return state.editor.edits.excerpt === undefined ?
+		state.currentPost.excerpt :
+		state.editor.edits.excerpt;
 }
 
 /**
@@ -482,9 +481,9 @@ export const getBlock = createSelector(
 );
 
 function getPostMeta( state, key ) {
-	return has( state, [ 'editor', 'edits', 'meta', key ] )
-		? get( state, [ 'editor', 'edits', 'meta', key ] )
-		: get( state, [ 'currentPost', 'meta', key ] );
+	return has( state, [ 'editor', 'edits', 'meta', key ] ) ?
+		get( state, [ 'editor', 'edits', 'meta', key ] ) :
+		get( state, [ 'currentPost', 'meta', key ] );
 }
 
 /**
@@ -553,22 +552,25 @@ export function getSelectedBlock( state ) {
  * @param  {Object} state Global application state
  * @return {Array}        Multi-selected block unique UDs
  */
-export function getMultiSelectedBlockUids( state ) {
-	const { blockOrder } = state.editor;
-	const { start, end } = state.blockSelection;
-	if ( start === end ) {
-		return [];
-	}
+export const getMultiSelectedBlockUids = createSelector(
+	( state ) => {
+		const { blockOrder } = state.editor;
+		const { start, end } = state.blockSelection;
+		if ( start === end ) {
+			return [];
+		}
 
-	const startIndex = blockOrder.indexOf( start );
-	const endIndex = blockOrder.indexOf( end );
+		const startIndex = blockOrder.indexOf( start );
+		const endIndex = blockOrder.indexOf( end );
 
-	if ( startIndex > endIndex ) {
-		return blockOrder.slice( endIndex, startIndex + 1 );
-	}
+		if ( startIndex > endIndex ) {
+			return blockOrder.slice( endIndex, startIndex + 1 );
+		}
 
-	return blockOrder.slice( startIndex, endIndex + 1 );
-}
+		return blockOrder.slice( startIndex, endIndex + 1 );
+	},
+	( state ) => [ state.editor.blockOrder, state.blockSelection ],
+);
 
 /**
  * Returns the current multi-selection set of blocks, or an empty array if
@@ -577,9 +579,16 @@ export function getMultiSelectedBlockUids( state ) {
  * @param  {Object} state Global application state
  * @return {Array}        Multi-selected block objects
  */
-export function getMultiSelectedBlocks( state ) {
-	return getMultiSelectedBlockUids( state ).map( ( uid ) => getBlock( state, uid ) );
-}
+export const getMultiSelectedBlocks = createSelector(
+	( state ) => getMultiSelectedBlockUids( state ).map( ( uid ) => getBlock( state, uid ) ),
+	( state ) => [
+		state.editor.blockOrder,
+		state.blockSelection,
+		state.editor.blocksByUid,
+		state.editor.edits.meta,
+		state.currentPost.meta,
+	]
+);
 
 /**
  * Returns the unique ID of the first block in the multi-selection set, or null
@@ -739,9 +748,7 @@ export function getNextBlock( state, uid ) {
 
 /**
  * Returns true if the block corresponding to the specified unique ID is
- * currently selected and a multi-selection exists, null if there is no
- * multi-selection active, or false if multi-selection exists, but the
- * specified unique ID is not the selected block.
+ * currently selected and no multi-selection exists, or false otherwise.
  *
  * @param  {Object} state Global application state
  * @param  {String} uid   Block unique ID
@@ -751,7 +758,7 @@ export function isBlockSelected( state, uid ) {
 	const { start, end } = state.blockSelection;
 
 	if ( start !== end ) {
-		return null;
+		return false;
 	}
 
 	return start === uid;
@@ -965,7 +972,7 @@ export const getEditedPostContent = createSelector(
  * @return {Array}       List of notices
  */
 export function getNotices( state ) {
-	return values( state.notices );
+	return state.notices;
 }
 
 /**
@@ -993,9 +1000,9 @@ export const getMostFrequentlyUsedBlocks = createSelector(
 		const orderedByUsage = keys( blockUsage ).sort( ( a, b ) => blockUsage[ b ] - blockUsage[ a ] );
 		// add in paragraph and image blocks if they're not already in the usage data
 		return compact(
-				[ ...orderedByUsage, ...without( [ 'core/paragraph', 'core/image' ], ...orderedByUsage ) ]
-					.map( blockType => getBlockType( blockType ) )
-			).slice( 0, MAX_FREQUENT_BLOCKS );
+			[ ...orderedByUsage, ...without( [ 'core/paragraph', 'core/image' ], ...orderedByUsage ) ]
+				.map( blockType => getBlockType( blockType ) )
+		).slice( 0, MAX_FREQUENT_BLOCKS );
 	},
 	( state ) => state.preferences.blockUsage
 );
