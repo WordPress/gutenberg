@@ -79,7 +79,7 @@ function lastIndexOfSpace( text ) {
 	return -1;
 }
 
-class Autocomplete extends Component {
+export class Autocomplete extends Component {
 	static getInitialState() {
 		return {
 			search: /./,

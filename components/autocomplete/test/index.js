@@ -12,7 +12,7 @@ import { keycodes } from '@wordpress/utils';
 /**
  * Internal dependencies
  */
-import Autocomplete from '../';
+import { Autocomplete } from '../';
 
 const { ENTER, ESCAPE, UP, DOWN, SPACE } = keycodes;
 
@@ -33,6 +33,20 @@ class FakeEditor extends Component {
 			</div>
 		);
 	}
+}
+
+function makeAutocompleter( completers ) {
+	return mount(
+		<Autocomplete instanceId="1" completers={ completers }>{
+			( isExpanded, listBoxId, activeId ) => (
+				<FakeEditor
+					aria-autocomplete="list"
+					aria-expanded={ isExpanded }
+					{ ...( isExpanded ? { 'aria-owns': listBoxId, 'aria-activedescendant': activeId } : {} ) }
+				/>
+			)
+		}</Autocomplete>
+	);
 }
 
 /**
@@ -173,11 +187,7 @@ describe( 'Autocomplete', () => {
 
 	describe( 'render()', () => {
 		it( 'renders children', () => {
-			const wrapper = mount(
-				<Autocomplete completers={ [ ] }>
-					<FakeEditor />
-				</Autocomplete>
-			);
+			const wrapper = makeAutocompleter( [] );
 			expect( wrapper.state().open ).toBeUndefined();
 			expect( wrapper.find( 'Popover' ).prop( 'focusOnOpen' ) ).toBe( false );
 			expect( wrapper.childAt( 0 ).hasClass( 'components-autocomplete' ) ).toBe( true );
@@ -185,11 +195,7 @@ describe( 'Autocomplete', () => {
 		} );
 
 		it( 'opens on absent trigger prefix search', ( done ) => {
-			const wrapper = mount(
-				<Autocomplete completers={ [ basicCompleter ] }>
-					<FakeEditor />
-				</Autocomplete>
-			);
+			const wrapper = makeAutocompleter( [ basicCompleter ] );
 			expectInitialState( wrapper );
 			// simulate typing 'b'
 			simulateInput( wrapper, [ par( tx( 'b' ) ) ] );
@@ -210,11 +216,7 @@ describe( 'Autocomplete', () => {
 		} );
 
 		it( 'does not render popover as open if no results', ( done ) => {
-			const wrapper = mount(
-				<Autocomplete completers={ [ basicCompleter ] }>
-					<FakeEditor />
-				</Autocomplete>
-			);
+			const wrapper = makeAutocompleter( [ basicCompleter ] );
 			expectInitialState( wrapper );
 			// simulate typing 'zzz'
 			simulateInput( wrapper, [ tx( 'zzz' ) ] );
@@ -233,11 +235,7 @@ describe( 'Autocomplete', () => {
 		} );
 
 		it( 'does not open without trigger prefix', ( done ) => {
-			const wrapper = mount(
-				<Autocomplete completers={ [ slashCompleter ] }>
-					<FakeEditor />
-				</Autocomplete>
-			);
+			const wrapper = makeAutocompleter( [ slashCompleter ] );
 			expectInitialState( wrapper );
 			// simulate typing 'b'
 			simulateInput( wrapper, [ par( tx( 'b' ) ) ] );
@@ -251,11 +249,7 @@ describe( 'Autocomplete', () => {
 		} );
 
 		it( 'opens on trigger prefix search', ( done ) => {
-			const wrapper = mount(
-				<Autocomplete completers={ [ slashCompleter ] }>
-					<FakeEditor />
-				</Autocomplete>
-			);
+			const wrapper = makeAutocompleter( [ slashCompleter ] );
 			expectInitialState( wrapper );
 			// simulate typing '/'
 			simulateInput( wrapper, [ par( tx( '/' ) ) ] );
@@ -278,11 +272,7 @@ describe( 'Autocomplete', () => {
 		} );
 
 		it( 'searches by keywords', ( done ) => {
-			const wrapper = mount(
-				<Autocomplete completers={ [ basicCompleter ] }>
-					<FakeEditor />
-				</Autocomplete>
-			);
+			const wrapper = makeAutocompleter( [ basicCompleter ] );
 			expectInitialState( wrapper );
 			// simulate typing fruit (split over 2 text nodes because these things happen)
 			simulateInput( wrapper, [ par( tx( 'fru' ), tx( 'it' ) ) ] );
@@ -305,11 +295,7 @@ describe( 'Autocomplete', () => {
 		} );
 
 		it( 'closes when search ends (whitespace)', ( done ) => {
-			const wrapper = mount(
-				<Autocomplete completers={ [ basicCompleter ] }>
-					<FakeEditor />
-				</Autocomplete>
-			);
+			const wrapper = makeAutocompleter( [ basicCompleter ] );
 			expectInitialState( wrapper );
 			// simulate typing 'a'
 			simulateInput( wrapper, [ tx( 'a' ) ] );
@@ -348,11 +334,7 @@ describe( 'Autocomplete', () => {
 		} );
 
 		it( 'navigates options by arrow keys', ( done ) => {
-			const wrapper = mount(
-				<Autocomplete completers={ [ slashCompleter ] }>
-					<FakeEditor />
-				</Autocomplete>
-			);
+			const wrapper = makeAutocompleter( [ slashCompleter ] );
 			// listen to keydown events on the editor to see if it gets them
 			const editorKeydown = jest.fn();
 			const fakeEditor = wrapper.getDOMNode().querySelector( '.fake-editor' );
@@ -384,11 +366,7 @@ describe( 'Autocomplete', () => {
 		} );
 
 		it( 'resets selected index on subsequent search', ( done ) => {
-			const wrapper = mount(
-				<Autocomplete completers={ [ slashCompleter ] }>
-					<FakeEditor />
-				</Autocomplete>
-			);
+			const wrapper = makeAutocompleter( [ slashCompleter ] );
 			expectInitialState( wrapper );
 			// simulate typing '/'
 			simulateInput( wrapper, [ par( tx( '/' ) ) ] );
@@ -406,11 +384,7 @@ describe( 'Autocomplete', () => {
 		} );
 
 		it( 'closes by escape', ( done ) => {
-			const wrapper = mount(
-				<Autocomplete completers={ [ slashCompleter ] }>
-					<FakeEditor />
-				</Autocomplete>
-			);
+			const wrapper = makeAutocompleter( [ slashCompleter ] );
 			// listen to keydown events on the editor to see if it gets them
 			const editorKeydown = jest.fn();
 			const fakeEditor = wrapper.getDOMNode().querySelector( '.fake-editor' );
@@ -447,11 +421,7 @@ describe( 'Autocomplete', () => {
 
 		it( 'selects by enter', ( done ) => {
 			const onSelect = jest.fn();
-			const wrapper = mount(
-				<Autocomplete completers={ [ { ...slashCompleter, onSelect } ] }>
-					<FakeEditor />
-				</Autocomplete>
-			);
+			const wrapper = makeAutocompleter( [ { ...slashCompleter, onSelect } ] );
 			// listen to keydown events on the editor to see if it gets them
 			const editorKeydown = jest.fn();
 			const fakeEditor = wrapper.getDOMNode().querySelector( '.fake-editor' );
@@ -488,11 +458,7 @@ describe( 'Autocomplete', () => {
 		} );
 
 		it( 'doesn\'t otherwise interfere with keydown behavior', ( done ) => {
-			const wrapper = mount(
-				<Autocomplete completers={ [ slashCompleter ] }>
-					<FakeEditor />
-				</Autocomplete>
-			);
+			const wrapper = makeAutocompleter( [ slashCompleter ] );
 			// listen to keydown events on the editor to see if it gets them
 			const editorKeydown = jest.fn();
 			const fakeEditor = wrapper.getDOMNode().querySelector( '.fake-editor' );
@@ -508,11 +474,7 @@ describe( 'Autocomplete', () => {
 
 		it( 'selects by click on result', ( done ) => {
 			const onSelect = jest.fn();
-			const wrapper = mount(
-				<Autocomplete completers={ [ { ...slashCompleter, onSelect } ] }>
-					<FakeEditor />
-				</Autocomplete>
-			);
+			const wrapper = makeAutocompleter( [ { ...slashCompleter, onSelect } ] );
 			expectInitialState( wrapper );
 			// simulate typing '/'
 			simulateInput( wrapper, [ par( tx( '/' ) ) ] );
