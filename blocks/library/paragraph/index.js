@@ -188,7 +188,8 @@ registerBlockType( 'core/paragraph', {
 						placeholder={ placeholder || __( 'Add text or type / to insert content' ) }
 						aria-autocomplete="list"
 						aria-expanded={ isExpanded }
-						{ ...( isExpanded ? { 'aria-owns': listBoxId, 'aria-activedescendant': activeId } : {} ) }
+						aria-owns={ listBoxId }
+						aria-activedescendant={ activeId }
 					/>
 				) }
 			</Autocomplete>,

@@ -378,8 +378,8 @@ export class Autocomplete extends Component {
 		const classes = classnames( 'components-autocomplete__popover', className );
 		const filteredOptions = this.getFilteredOptions();
 		const isOpen = filteredOptions.length > 0;
-		const listBoxId = `components-autocomplete-listbox-${ instanceId }`;
-		const activeId = `components-autocomplete-item-${ instanceId }-${ selectedIndex }`;
+		const listBoxId = isOpen ? `components-autocomplete-listbox-${ instanceId }` : null;
+		const activeId = isOpen ? `components-autocomplete-item-${ instanceId }-${ selectedIndex }` : null;
 
 		return (
 			<div

@@ -42,7 +42,8 @@ function makeAutocompleter( completers ) {
 				<FakeEditor
 					aria-autocomplete="list"
 					aria-expanded={ isExpanded }
-					{ ...( isExpanded ? { 'aria-owns': listBoxId, 'aria-activedescendant': activeId } : {} ) }
+					aria-owns={ listBoxId }
+					aria-activedescendant={ activeId }
 				/>
 			)
 		}</Autocomplete>
