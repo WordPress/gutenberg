@@ -26,7 +26,7 @@ import { isMac } from '../../utils/dom';
 const { ESCAPE, F10 } = keycodes;
 
 function metaKeyPressed( event ) {
-	return isMac() ? event.metaKey : ( event.ctrlKey && ! event.altKey );
+	return isMac() ? event.metaKey : event.ctrlKey;
 }
 
 class HeaderToolbar extends Component {
@@ -43,8 +43,8 @@ class HeaderToolbar extends Component {
 	}
 
 	componentDidMount() {
-		document.addEventListener( 'keyup', this.onKeyUp );
-		document.addEventListener( 'keydown', this.onKeyDown );
+		document.addEventListener( 'keyup', this.onKeyUp, true );
+		document.addEventListener( 'keydown', this.onKeyDown, true );
 	}
 
 	componentWillUnmount() {
@@ -67,7 +67,11 @@ class HeaderToolbar extends Component {
 
 	onKeyUp( event ) {
 		const shouldFocusToolbar = this.metaCount === 1 || ( event.keyCode === F10 && event.altKey );
-		this.metaCount = 0;
+
+		// Reset the count if it's the final released key
+		if ( ! event.shiftKey && ! event.altKey && ( ! event.ctrlKey || ! isMac() ) ) {
+			this.metaCount = 0;
+		}
 
 		if ( shouldFocusToolbar ) {
 			const tabbables = focus.tabbable.find( this.toolbar );
