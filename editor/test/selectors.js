@@ -24,6 +24,8 @@ import {
 	isCleanNewPost,
 	getCurrentPost,
 	getCurrentPostId,
+	getCurrentPostLastRevisionId,
+	getCurrentPostRevisionsCount,
 	getCurrentPostType,
 	getPostEdits,
 	getEditedPostTitle,
@@ -872,6 +874,50 @@ describe( 'selectors', () => {
 			};
 
 			expect( getCurrentPostId( state ) ).toBe( 1 );
+		} );
+	} );
+
+	describe( 'getCurrentPostLastRevisionId', () => {
+		it( 'should return null if the post has not yet been saved', () => {
+			const state = {
+				currentPost: {},
+			};
+
+			expect( getCurrentPostLastRevisionId( state ) ).toBeNull();
+		} );
+
+		it( 'should return the last revision ID', () => {
+			const state = {
+				currentPost: {
+					revisions: {
+						last_id: 123,
+					},
+				},
+			};
+
+			expect( getCurrentPostLastRevisionId( state ) ).toBe( 123 );
+		} );
+	} );
+
+	describe( 'getCurrentPostRevisionsCount', () => {
+		it( 'should return 0 if the post has no revisions', () => {
+			const state = {
+				currentPost: {},
+			};
+
+			expect( getCurrentPostRevisionsCount( state ) ).toBe( 0 );
+		} );
+
+		it( 'should return the number of revisions', () => {
+			const state = {
+				currentPost: {
+					revisions: {
+						count: 5,
+					},
+				},
+			};
+
+			expect( getCurrentPostRevisionsCount( state ) ).toBe( 5 );
 		} );
 	} );
 

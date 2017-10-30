@@ -270,6 +270,27 @@ export function getCurrentPostId( state ) {
 }
 
 /**
+ * Returns the number of revisions of the post currently being edited.
+ *
+ * @param  {Object}  state Global application state
+ * @return {Number}        Number of revisions
+ */
+export function getCurrentPostRevisionsCount( state ) {
+	return get( getCurrentPost( state ), 'revisions.count', 0 );
+}
+
+/**
+ * Returns the last revision ID of the post currently being edited,
+ * or null if the post has no revisions.
+ *
+ * @param  {Object}  state Global application state
+ * @return {?Number}       ID of the last revision
+ */
+export function getCurrentPostLastRevisionId( state ) {
+	return get( getCurrentPost( state ), 'revisions.last_id', null );
+}
+
+/**
  * Returns any post values which have been changed in the editor but not yet
  * been saved.
  *
