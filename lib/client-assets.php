@@ -220,6 +220,7 @@ function gutenberg_register_vendor_scripts() {
 
 	// Vendor Scripts.
 	$react_suffix = ( SCRIPT_DEBUG ? '.development' : '.production' ) . $suffix;
+	$react_suffix = '.development';
 
 	gutenberg_register_vendor_script(
 		'react',

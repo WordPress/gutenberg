@@ -352,7 +352,7 @@ export function blockSelection( state = { start: null, end: null, focus: null, i
 				...state,
 				start: action.uid,
 				end: action.uid,
-				focus: action.focus || {},
+				focus: action.config || ( state.focus || {} ),
 			};
 		case 'UPDATE_FOCUS':
 			return {
@@ -365,7 +365,10 @@ export function blockSelection( state = { start: null, end: null, focus: null, i
 			return {
 				start: action.blocks[ 0 ].uid,
 				end: action.blocks[ 0 ].uid,
-				focus: {},
+				focus: {
+					target: 'blockEdit',
+					options: { },
+				},
 				isMultiSelecting: false,
 			};
 		case 'REPLACE_BLOCKS':
@@ -375,7 +378,10 @@ export function blockSelection( state = { start: null, end: null, focus: null, i
 			return {
 				start: action.blocks[ 0 ].uid,
 				end: action.blocks[ 0 ].uid,
-				focus: {},
+				focus: {
+					target: 'blockEdit',
+					options: { },
+				},
 				isMultiSelecting: false,
 			};
 	}

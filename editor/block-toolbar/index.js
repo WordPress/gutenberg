@@ -25,6 +25,8 @@ import BlockDeleteButton from '../block-settings-menu/block-delete-button';
 import { isMac } from '../utils/dom';
 import { getBlockMode } from '../selectors';
 
+import { focusBlockEdit } from '../actions';
+
 /**
  * Module Constants
  */
@@ -97,13 +99,8 @@ class BlockToolbar extends Component {
 			return;
 		}
 
-		// Is there a better way to focus the selected block
-		// TODO: separate focused/selected block state and use Redux actions instead
-		const selectedBlock = document.querySelector( '.editor-visual-editor__block.is-selected .editor-visual-editor__block-edit' );
-		if ( !! selectedBlock ) {
-			event.stopPropagation();
-			selectedBlock.focus();
-		}
+		this.props.focusBlockEdit();
+		event.stopPropagation();
 	}
 
 	render() {
@@ -161,6 +158,14 @@ class BlockToolbar extends Component {
 	}
 }
 
-export default connect( ( state, ownProps ) => ( {
-	mode: getBlockMode( state, ownProps.uid ),
-} ) )( BlockToolbar );
+export default connect(
+	( state, ownProps ) => ( {
+		mode: getBlockMode( state, ownProps.uid ),
+	} ),
+
+	( dispatch, ownProps ) => ( {
+		focusBlockEdit( ) {
+			dispatch( focusBlockEdit( ownProps.uid ) )
+		},
+	} ),
+)( BlockToolbar );
