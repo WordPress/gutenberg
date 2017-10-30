@@ -55,7 +55,7 @@ import {
 	getBlockMode,
 } from '../../selectors';
 
-const { BACKSPACE, ESCAPE, DELETE, ENTER, UP, RIGHT, DOWN, LEFT } = keycodes;
+const { BACKSPACE, ESCAPE, DELETE, ENTER, TAB, UP, RIGHT, DOWN, LEFT } = keycodes;
 
 class VisualEditorBlock extends Component {
 	constructor() {
@@ -251,13 +251,24 @@ class VisualEditorBlock extends Component {
 	}
 
 	onKeyDown( event ) {
-		const { uid, onRemove, previousBlock, nextBlock, onFocusBlockEdit, onFocusBlock } = this.props;
+		const { uid, onRemove, previousBlock, nextBlock, onFocusBlockEdit, onFocusBlock, focus } = this.props;
 
-		const { keyCode, target } = event;
+		const { keyCode, target, shiftKey } = event;
 
 		const focusOnContainer = target === this.node;
 
 		switch ( keyCode ) {
+			case TAB:
+				if ( ! shiftKey && focus && focus.target === 'blockEdit' && nextBlock ) {
+					event.preventDefault();
+					event.stopPropagation();
+					onFocusBlockEdit( nextBlock.uid );
+				} else if ( shiftKey && focus && focus.target === 'blockEdit' && previousBlock ) {
+					event.preventDefault();
+					event.stopPropagation();
+					onFocusBlockEdit( previousBlock.uid );
+				}
+				break;
 			case ENTER:
 				// Insert default block after current block if enter and event
 				// not already handled by descendant.
