@@ -21,6 +21,7 @@ export function PostVisibility( { user } ) {
 			{ ! canEdit && <span><PostVisibilityLabel /></span> }
 			{ canEdit && (
 				<Dropdown
+					id={ visibilityId }
 					position="bottom left"
 					contentClassName="editor-post-visibility__dialog"
 					renderToggle={ ( { isOpen, onToggle } ) => (
