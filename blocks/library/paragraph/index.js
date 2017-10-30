@@ -185,7 +185,7 @@ registerBlockType( 'core/paragraph', {
 					onMerge={ mergeBlocks }
 					onReplace={ onReplace }
 					placeholder={ placeholder || __( 'Add text or type / to insert content' ) }
-			/>
+				/>
 			</Autocomplete>,
 		];
 	},
