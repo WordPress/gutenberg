@@ -99,7 +99,7 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-03', {
 	save( { attributes, className } ) {
 		const { content } = attributes;
 
-		return <p className={ className }><Editable.value value={ content } /></p>;
+		return <p className={ className }><Editable.Value value={ content } /></p>;
 	},
 } );
 ```
