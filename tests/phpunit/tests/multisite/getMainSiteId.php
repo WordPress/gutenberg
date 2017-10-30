@@ -107,6 +107,25 @@ class Tests_Multisite_Get_Main_Site_ID extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 29684
+	 */
+	public function test_get_main_site_id_filtered_depending_on_network() {
+		add_filter( 'pre_get_main_site_id', array( $this, 'filter_get_main_site_id_depending_on_network' ), 10, 2 );
+		$result = get_main_site_id( self::$network_ids['wordpress.org/'] );
+
+		$this->assertSame( 333, $result );
+	}
+
+	public function filter_get_main_site_id_depending_on_network( $main_site_id, $network ) {
+		// Override main site ID for a specific network for the test.
+		if ( $network->id === (int) self::$network_ids['wordpress.org/'] ) {
+			return 333;
+		}
+
+		return $main_site_id;
+	}
+
+	/**
 	 * @ticket 41936
 	 */
 	public function test_get_main_site_id_with_property_value() {
