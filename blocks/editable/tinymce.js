@@ -47,9 +47,9 @@ export default class TinyMCE extends Component {
 
 		const { removedKeys, updatedKeys } = diffAriaProps( this.props, nextProps );
 		removedKeys.forEach( ( key ) =>
-				this.editorNode.removeAttribute( key ) );
+			this.editorNode.removeAttribute( key ) );
 		updatedKeys.forEach( ( key ) =>
-				this.editorNode.setAttribute( key, nextProps[ key ] ) );
+			this.editorNode.setAttribute( key, nextProps[ key ] ) );
 	}
 
 	componentWillUnmount() {
