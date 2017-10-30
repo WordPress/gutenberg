@@ -15,7 +15,7 @@ import {
 	noop,
 } from 'lodash';
 import { nodeListToReact } from 'dom-react';
-import { Fill } from 'react-slot-fill';
+import { Fill, Slot } from 'react-slot-fill';
 import 'element-closest';
 
 /**
@@ -325,9 +325,9 @@ export default class Editable extends Component {
 		// is absolute positioned and it's not shown when we compute the position here
 		// so we compute the position about its parent relative position and adds the offset
 		const toolbarOffset = this.props.inlineToolbar ?
-			{ top: 50, left: 0 } :
-			{ top: 40, left: -( ( blockPadding * 2 ) + blockMoverMargin ) };
-		const linkModalWidth = 250;
+			{ top: 10, left: 0 } :
+			{ top: 0, left: -( ( blockPadding * 2 ) + blockMoverMargin ) };
+		const linkModalWidth = 305;
 
 		return {
 			top: position.top - containerPosition.top + ( position.height ) + toolbarOffset.top,
@@ -709,6 +709,7 @@ export default class Editable extends Component {
 						{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }
 					</Tagname>
 				}
+				{ focus && <Slot name="Formatting.LinkDialog" /> }
 			</div>
 		);
 	}
