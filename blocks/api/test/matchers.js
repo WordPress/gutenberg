@@ -60,8 +60,8 @@ describe( 'matchers', () => {
 			const match = parse( html, sources.query( 'blockquote > p', sources.node( ) ) );
 
 			expect(
-				renderToString( valueToElement( match )
-			) ).toBe(
+				renderToString( valueToElement( match ) )
+			).toBe(
 				'<p>A delicious <b>sundae</b> dessert.</p><p>I want it!</p>'
 			);
 		} );
