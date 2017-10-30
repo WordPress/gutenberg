@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Slot, Fill } from 'react-slot-fill';
+import { Slot } from 'react-slot-fill';
 import classnames from 'classnames';
 import { connect } from 'react-redux';
 
@@ -21,7 +21,7 @@ import BlockMover from '../block-mover';
 import BlockInspectorButton from '../block-settings-menu/block-inspector-button';
 import BlockModeToggle from '../block-settings-menu/block-mode-toggle';
 import BlockDeleteButton from '../block-settings-menu/block-delete-button';
-import { getBlockMode } from '../selectors';
+import { getBlockMode, getSelectedBlock } from '../selectors';
 
 class BlockToolbar extends Component {
 	constructor() {
@@ -40,7 +40,11 @@ class BlockToolbar extends Component {
 
 	render() {
 		const { showMobileControls } = this.state;
-		const { uid, mode } = this.props;
+		const { block, mode } = this.props;
+
+		if ( ! block || ! block.isValid ) {
+			return null;
+		}
 
 		const toolbarClassname = classnames( 'editor-block-toolbar', {
 			'is-showing-mobile-controls': showMobileControls,
@@ -50,43 +54,44 @@ class BlockToolbar extends Component {
 		// bubbling events from children to determine focus shift intents.
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
-			<Fill name="Editor.Header">
-				<div
-					className={ toolbarClassname }
-				>
-					{ ! showMobileControls && mode === 'visual' && [
-						<BlockSwitcher key="switcher" uid={ uid } />,
-						<Slot key="slot" name="Formatting.Toolbar" />,
-					] }
-					<Toolbar className="editor-block-toolbar__mobile-tools">
-						<div>
-							{ mode === 'visual' &&
-								<IconButton
-									className="editor-block-toolbar__mobile-toggle"
-									onClick={ this.toggleMobileControls }
-									aria-expanded={ showMobileControls }
-									label={ __( 'Toggle extra controls' ) }
-									icon="ellipsis"
-								/>
-							}
-						</div>
-
-						{ ( mode === 'html' || showMobileControls ) &&
-							<div className="editor-block-toolbar__mobile-tools-content">
-								<BlockMover uids={ [ uid ] } />
-								<BlockInspectorButton small />
-								<BlockModeToggle uid={ uid } small />
-								<BlockDeleteButton uids={ [ uid ] } small />
-							</div>
+			<div className={ toolbarClassname }>
+				{ ! showMobileControls && mode === 'visual' && [
+					<BlockSwitcher key="switcher" uid={ block.uid } />,
+					<Slot key="slot" name="Formatting.Toolbar" />,
+				] }
+				<Toolbar className="editor-block-toolbar__mobile-tools">
+					<div>
+						{ mode === 'visual' &&
+							<IconButton
+								className="editor-block-toolbar__mobile-toggle"
+								onClick={ this.toggleMobileControls }
+								aria-expanded={ showMobileControls }
+								label={ __( 'Toggle extra controls' ) }
+								icon="ellipsis"
+							/>
 						}
-					</Toolbar>
-				</div>
-			</Fill>
+					</div>
+
+					{ ( mode === 'html' || showMobileControls ) &&
+						<div className="editor-block-toolbar__mobile-tools-content">
+							<BlockMover uids={ [ block.uid ] } />
+							<BlockInspectorButton small />
+							<BlockModeToggle uid={ block.uid } small />
+							<BlockDeleteButton uids={ [ block.uid ] } small />
+						</div>
+					}
+				</Toolbar>
+			</div>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
 }
 
-export default connect( ( state, ownProps ) => ( {
-	mode: getBlockMode( state, ownProps.uid ),
-} ) )( BlockToolbar );
+export default connect( ( state ) => {
+	const block = getSelectedBlock( state );
+
+	return ( {
+		block,
+		mode: block ? getBlockMode( state, block.uid ) : null,
+	} );
+} )( BlockToolbar );
