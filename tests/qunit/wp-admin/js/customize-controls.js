@@ -732,11 +732,15 @@ jQuery( window ).load( function (){
 		meridian = control.inputElements.meridian;
 
 		year( '23' );
-		assert.equal( typeof year(), 'number', 'Should always return integer' );
+		assert.ok( control.invalidDate );
 
+		year( '2100' );
 		month( '8' );
-		month( 'test' );
-		assert.equal( 8, month(), 'Should not accept text' );
+		assert.ok( ! control.invalidDate );
+		day( 'test' );
+		assert.ok( control.invalidDate );
+		day( '3' );
+		assert.ok( ! control.invalidDate );
 
 		// Test control.parseDateTime();
 		control.params.twelveHourFormat = false;
@@ -784,12 +788,13 @@ jQuery( window ).load( function (){
 		// Test control.updateDaysForMonth();.
 		year( 2017 );
 		month( 2 );
+		day( 28 );
+		assert.ok( ! control.invalidDate );
 		day( 31 );
-		control.updateDaysForMonth();
-		assert.deepEqual( day(), 28, 'Should update to the correct days' );
+		assert.ok( control.invalidDate );
 
 		day( 20 );
-		assert.deepEqual( day(), 20, 'Should not update if its less the correct number of days' );
+		assert.equal( day(), 20, 'Should not update if its less the correct number of days' );
 
 		// Test control.convertHourToTwentyFourHourFormat().
 		assert.equal( control.convertHourToTwentyFourHourFormat( 11, 'pm' ), 23 );
@@ -853,16 +858,6 @@ jQuery( window ).load( function (){
 
 		year( 2016 );
 		assert.notOk( control.isFutureDate() );
-
-		/**
-		 * Test control.updateMinutesForHour().
-		 * Run this at the end or else the above tests may fail.
-		 */
-		hour( 24 );
-		minute( 32 );
-		control.inputElements.meridian = false; // Because it works only when the time is twenty four hour format.
-		control.updateMinutesForHour();
-		assert.deepEqual( minute(), 0 );
 
 		// Tear Down.
 		wp.customize.control.remove( controlId );
