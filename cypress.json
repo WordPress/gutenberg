@@ -6,5 +6,6 @@
 	},
 	"integrationFolder": "test/e2e/integration",
 	"supportFile": "test/e2e/support",
-	"videoRecording": false
+	"videoRecording": false,
+	"chromeWebSecurity": false
 }
