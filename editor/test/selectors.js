@@ -1700,6 +1700,14 @@ describe( 'selectors', () => {
 			expect( isBlockSelected( state, 123 ) ).toBe( true );
 		} );
 
+		it( 'should return false if a multi-selection range exists', () => {
+			const state = {
+				blockSelection: { start: 123, end: 124 },
+			};
+
+			expect( isBlockSelected( state, 123 ) ).toBe( false );
+		} );
+
 		it( 'should return false if the block is not selected', () => {
 			const state = {
 				blockSelection: { start: null, end: null },
@@ -2083,16 +2091,13 @@ describe( 'selectors', () => {
 	describe( 'getNotices', () => {
 		it( 'should return the notices array', () => {
 			const state = {
-				notices: {
-					b: { id: 'b', content: 'Post saved' },
-					a: { id: 'a', content: 'Error saving' },
-				},
+				notices: [
+					{ id: 'b', content: 'Post saved' },
+					{ id: 'a', content: 'Error saving' },
+				],
 			};
 
-			expect( getNotices( state ) ).toEqual( [
-				state.notices.b,
-				state.notices.a,
-			] );
+			expect( getNotices( state ) ).toEqual( state.notices );
 		} );
 	} );
 

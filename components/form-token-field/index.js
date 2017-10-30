@@ -510,6 +510,10 @@ class FormTokenField extends Component {
 			} );
 		}
 
+		// Disable reason: There is no appropriate role which describes the
+		// input container intended accessible usability.
+		// TODO: Refactor click detection to use blur to stop propagation.
+		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
 			<div { ...tokenFieldProps } >
 				<label htmlFor={ `components-form-token-input-${ instanceId }` } className="screen-reader-text">
@@ -542,6 +546,7 @@ class FormTokenField extends Component {
 				</div>
 			</div>
 		);
+		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
 }
 

@@ -31,6 +31,7 @@ import './style.scss';
 import { pasteHandler } from '../api';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
+import { pickAriaProps } from './aria';
 import patterns from './patterns';
 import { EVENTS } from './constants';
 
@@ -313,9 +314,9 @@ export default class Editable extends Component {
 		const position = this.getEditorSelectionRect();
 
 		// Find the parent "relative" positioned container
-		const container = this.props.inlineToolbar
-			? this.editor.getBody().closest( '.blocks-editable' )
-			: this.editor.getBody().closest( '.editor-visual-editor__block' );
+		const container = this.props.inlineToolbar ?
+			this.editor.getBody().closest( '.blocks-editable' ) :
+			this.editor.getBody().closest( '.editor-visual-editor__block' );
 		const containerPosition = container.getBoundingClientRect();
 		const blockPadding = 14;
 		const blockMoverMargin = 18;
@@ -323,9 +324,9 @@ export default class Editable extends Component {
 		// These offsets are necessary because the toolbar where the link modal lives
 		// is absolute positioned and it's not shown when we compute the position here
 		// so we compute the position about its parent relative position and adds the offset
-		const toolbarOffset = this.props.inlineToolbar
-			? { top: 50, left: 0 }
-			: { top: 40, left: -( ( blockPadding * 2 ) + blockMoverMargin ) };
+		const toolbarOffset = this.props.inlineToolbar ?
+			{ top: 50, left: 0 } :
+			{ top: 40, left: -( ( blockPadding * 2 ) + blockMoverMargin ) };
 		const linkModalWidth = 250;
 
 		return {
@@ -656,6 +657,8 @@ export default class Editable extends Component {
 			formatters,
 		} = this.props;
 
+		const ariaProps = pickAriaProps( this.props );
+
 		// Generating a key that includes `tagName` ensures that if the tag
 		// changes, we unmount and destroy the previous TinyMCE element, then
 		// mount and initialize a new child element in its place.
@@ -693,7 +696,8 @@ export default class Editable extends Component {
 					style={ style }
 					defaultValue={ value }
 					isPlaceholderVisible={ isPlaceholderVisible }
-					label={ placeholder }
+					aria-label={ placeholder }
+					{ ...ariaProps }
 					className={ className }
 					key={ key }
 				/>

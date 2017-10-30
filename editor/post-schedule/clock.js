@@ -18,9 +18,9 @@ function PostScheduleClock( { is12Hour, selected, onChange } ) {
 			return;
 		}
 
-		const newDate = is12Hour
-			? selected.clone().hours( am === 'AM' ? value % 12 : ( ( ( value % 12 ) + 12 ) % 24 ) )
-			: selected.clone().hours( value );
+		const newDate = is12Hour ?
+			selected.clone().hours( am === 'AM' ? value % 12 : ( ( ( value % 12 ) + 12 ) % 24 ) ) :
+			selected.clone().hours( value );
 		onChange( newDate );
 	};
 

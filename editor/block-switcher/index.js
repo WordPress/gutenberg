@@ -25,6 +25,10 @@ import { getBlock } from '../selectors';
 const { DOWN } = keycodes;
 
 function BlockSwitcher( { block, onTransform } ) {
+	if ( ! block ) {
+		return null;
+	}
+
 	const blockType = getBlockType( block.name );
 	const blocksToBeTransformedFrom = reduce( getBlockTypes(), ( memo, type ) => {
 		const transformFrom = get( type, 'transforms.from', [] );

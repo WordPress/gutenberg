@@ -102,9 +102,9 @@ export default {
 		// If we publish/schedule a post, we show the corresponding publish message
 		// Unless we show an update notice
 		if ( isPublished || publishStatus.indexOf( post.status ) !== -1 ) {
-			const noticeMessage = ! isPublished && publishStatus.indexOf( post.status ) !== -1
-				? messages[ post.status ]
-				: __( 'Post updated!' );
+			const noticeMessage = ! isPublished && publishStatus.indexOf( post.status ) !== -1 ?
+				messages[ post.status ] :
+				__( 'Post updated!' );
 			dispatch( createSuccessNotice(
 				<p>
 					<span>{ noticeMessage }</span>
@@ -139,9 +139,9 @@ export default {
 			private: __( 'Publishing failed' ),
 			future: __( 'Scheduling failed' ),
 		};
-		const noticeMessage = ! isPublished && publishStatus.indexOf( edits.status ) !== -1
-			? messages[ edits.status ]
-			: __( 'Updating failed' );
+		const noticeMessage = ! isPublished && publishStatus.indexOf( edits.status ) !== -1 ?
+			messages[ edits.status ] :
+			__( 'Updating failed' );
 		dispatch( createErrorNotice( noticeMessage, { id: SAVE_POST_NOTICE_ID } ) );
 	},
 	TRASH_POST( action, store ) {
@@ -197,9 +197,9 @@ export default {
 
 		// We can only merge blocks with similar types
 		// thus, we transform the block to merge first
-		const blocksWithTheSameType = blockA.name === blockB.name
-			? [ blockB ]
-			: switchToBlockType( blockB, blockA.name );
+		const blocksWithTheSameType = blockA.name === blockB.name ?
+			[ blockB ] :
+			switchToBlockType( blockB, blockA.name );
 
 		// If the block types can not match, do nothing
 		if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {

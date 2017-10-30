@@ -23,10 +23,10 @@ class Sidebar extends Component {
 	}
 
 	render() {
-		const searchResults = this.state.searchValue
-			? getStories()
-				.filter( ( story ) => story.title.toLowerCase().indexOf( this.state.searchValue.toLowerCase() ) !== -1 )
-			: null;
+		const searchResults = this.state.searchValue ?
+			getStories()
+				.filter( ( story ) => story.title.toLowerCase().indexOf( this.state.searchValue.toLowerCase() ) !== -1 ) :
+			null;
 
 		return (
 			<div id="secondary" className="widget-area">
@@ -57,9 +57,9 @@ class Sidebar extends Component {
 							<ul>
 								{ getStories()
 									.filter( ( story ) => ! story.parent )
-										.map( ( story, index ) => (
-											<MenuItem key={ index } item={ story } searchResults={ searchResults } />
-										) )
+									.map( ( story, index ) => (
+										<MenuItem key={ index } item={ story } searchResults={ searchResults } />
+									) )
 								}
 							</ul>
 						</div>

@@ -2,7 +2,17 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { throttle, mapValues, noop, invert, flatMap } from 'lodash';
+import {
+	findLast,
+	flatMap,
+	invert,
+	isEqual,
+	mapValues,
+	noop,
+	throttle,
+} from 'lodash';
+import scrollIntoView from 'dom-scroll-into-view';
+import 'element-closest';
 
 /**
  * WordPress dependencies
@@ -40,13 +50,13 @@ class VisualEditorBlockList extends Component {
 		this.setBlockRef = this.setBlockRef.bind( this );
 		this.appendDefaultBlock = this.appendDefaultBlock.bind( this );
 		this.setLastClientY = this.setLastClientY.bind( this );
-		this.onPointerMove = throttle( this.onPointerMove.bind( this ), 250 );
+		this.onPointerMove = throttle( this.onPointerMove.bind( this ), 100 );
 		// Browser does not fire `*move` event when the pointer position changes
 		// relative to the document, so fire it with the last known position.
 		this.onScroll = () => this.onPointerMove( { clientY: this.lastClientY } );
 
 		this.lastClientY = 0;
-		this.refs = {};
+		this.nodes = {};
 	}
 
 	componentDidMount() {
@@ -61,38 +71,38 @@ class VisualEditorBlockList extends Component {
 		window.removeEventListener( 'mousemove', this.setLastClientY );
 	}
 
+	componentWillReceiveProps( nextProps ) {
+		if ( isEqual( this.props.multiSelectedBlockUids, nextProps.multiSelectedBlockUids ) ) {
+			return;
+		}
+
+		if ( nextProps.multiSelectedBlockUids && nextProps.multiSelectedBlockUids.length > 0 ) {
+			const extent = this.nodes[ nextProps.selectionEnd ];
+			scrollIntoView( extent, extent.closest( '.editor-layout__editor' ), {
+				onlyScrollIfNeeded: true,
+			} );
+		}
+	}
+
 	setLastClientY( { clientY } ) {
 		this.lastClientY = clientY;
 	}
 
-	setBlockRef( ref, uid ) {
-		if ( ref === null ) {
-			delete this.refs[ uid ];
+	setBlockRef( node, uid ) {
+		if ( node === null ) {
+			delete this.nodes[ uid ];
 		} else {
-			this.refs = {
-				...this.refs,
-				[ uid ]: ref,
+			this.nodes = {
+				...this.nodes,
+				[ uid ]: node,
 			};
 		}
 	}
 
 	onPointerMove( { clientY } ) {
-		const BUFFER = 20;
-		const { multiSelectedBlocks } = this.props;
-		const boundaries = this.refs[ this.selectionAtStart ].getBoundingClientRect();
+		const boundaries = this.nodes[ this.selectionAtStart ].getBoundingClientRect();
 		const y = clientY - boundaries.top;
-
-		// If there is no selection yet, make the use move at least BUFFER px
-		// away from the block with the pointer.
-		if (
-			! multiSelectedBlocks.length &&
-			y + BUFFER > 0 &&
-			y - BUFFER < boundaries.height
-		) {
-			return;
-		}
-
-		const key = this.coordMapKeys.reduce( ( acc, topY ) => y > topY ? topY : acc );
+		const key = findLast( this.coordMapKeys, ( coordY ) => coordY < y );
 
 		this.onSelectionChange( this.coordMap[ key ] );
 	}
@@ -120,16 +130,16 @@ class VisualEditorBlockList extends Component {
 	}
 
 	onSelectionStart( uid ) {
-		const boundaries = this.refs[ uid ].getBoundingClientRect();
+		const boundaries = this.nodes[ uid ].getBoundingClientRect();
 
-		// Create a uid to Y coödinate map.
-		const uidToCoordMap = mapValues( this.refs, ( node ) => {
+		// Create a uid to Y coördinate map.
+		const uidToCoordMap = mapValues( this.nodes, ( node ) => {
 			return node.getBoundingClientRect().top - boundaries.top;
 		} );
 
-		// Cache a Y coödinate to uid map for use in `onPointerMove`.
+		// Cache a Y coördinate to uid map for use in `onPointerMove`.
 		this.coordMap = invert( uidToCoordMap );
-		// Cache an array of the Y coödrinates for use in `onPointerMove`.
+		// Cache an array of the Y coördinates for use in `onPointerMove`.
 		this.coordMapKeys = Object.values( uidToCoordMap );
 		this.selectionAtStart = uid;
 
@@ -201,7 +211,7 @@ class VisualEditorBlockList extends Component {
 					<VisualEditorBlock
 						key={ 'block-' + uid }
 						uid={ uid }
-						blockRef={ ( ref ) => this.setBlockRef( ref, uid ) }
+						blockRef={ this.setBlockRef }
 						onSelectionStart={ this.onSelectionStart }
 						onShiftSelection={ this.onShiftSelection }
 					/>,
