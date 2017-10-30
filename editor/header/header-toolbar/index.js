@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { Slot } from 'react-slot-fill';
 
 /**
  * WordPress dependencies
@@ -17,6 +16,7 @@ import { focus, keycodes } from '@wordpress/utils';
  */
 import './style.scss';
 import Inserter from '../../inserter';
+import BlockToolbar from '../../block-toolbar';
 import { hasEditorUndo, hasEditorRedo } from '../../selectors';
 import { isMac } from '../../utils/dom';
 
@@ -115,7 +115,7 @@ class HeaderToolbar extends Component {
 					disabled={ ! hasRedo }
 					onClick={ redo } />
 				<div className="editor-header-toolbar__block-toolbar">
-					<Slot name="Editor.Header" />
+					<BlockToolbar />
 				</div>
 			</NavigableMenu>
 		);

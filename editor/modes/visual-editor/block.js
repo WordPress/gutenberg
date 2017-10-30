@@ -23,7 +23,6 @@ import BlockDropZone from './block-drop-zone';
 import BlockHtml from './block-html';
 import BlockMover from '../../block-mover';
 import BlockSettingsMenu from '../../block-settings-menu';
-import BlockToolbar from '../../block-toolbar';
 import {
 	clearSelectedBlock,
 	editPost,
@@ -359,7 +358,6 @@ class VisualEditorBlock extends Component {
 				<BlockDropZone index={ order } />
 				{ ( showUI || isProperlyHovered ) && <BlockMover uids={ [ block.uid ] } /> }
 				{ ( showUI || isProperlyHovered ) && <BlockSettingsMenu uids={ [ block.uid ] } /> }
-				{ isSelected && isValid && <BlockToolbar uid={ block.uid } /> }
 				{ isFirstMultiSelected && ! this.props.isSelecting &&
 					<BlockMover uids={ multiSelectedBlockUids } />
 				}
