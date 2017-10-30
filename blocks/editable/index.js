@@ -565,7 +565,7 @@ export default class Editable extends Component {
 				this.editor.selection.collapse( false );
 			}
 		} else if ( isActive ) {
-			this.editor.getBody().blur();
+			// this.editor.getBody().blur();
 		}
 	}
 
