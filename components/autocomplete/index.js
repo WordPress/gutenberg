@@ -17,6 +17,7 @@ import { keycodes } from '@wordpress/utils';
 import './style.scss';
 import Button from '../button';
 import Popover from '../popover';
+import withInstanceId from '../higher-order/with-instance-id';
 
 const { ENTER, ESCAPE, UP, DOWN, LEFT, RIGHT, TAB } = keycodes;
 
@@ -371,11 +372,14 @@ class Autocomplete extends Component {
 	}
 
 	render() {
-		const { children } = this.props;
+		const { children, instanceId } = this.props;
 		const { open, selectedIndex, range } = this.state;
 		const { className } = open || {};
 		const classes = classnames( 'components-autocomplete__popover', className );
 		const filteredOptions = this.getFilteredOptions();
+		const isOpen = filteredOptions.length > 0;
+		const listBoxId = `components-autocomplete-listbox-${ instanceId }`;
+		const activeId = `components-autocomplete-item-${ instanceId }-${ selectedIndex }`;
 
 		return (
 			<div
@@ -383,9 +387,9 @@ class Autocomplete extends Component {
 				onInput={ this.search }
 				className="components-autocomplete"
 			>
-				{ children }
+				{ children( isOpen, listBoxId, activeId ) }
 				<Popover
-					isOpen={ filteredOptions.length > 0 }
+					isOpen={ isOpen }
 					focusOnOpen={ false }
 					onClose={ () => this.reset() }
 					position="top right"
@@ -393,13 +397,16 @@ class Autocomplete extends Component {
 					range={ range }
 				>
 					<ul
-						role="menu"
+						id={ listBoxId }
+						role="listbox"
 						className="components-autocomplete__results"
 					>
 						{ filteredOptions.map( ( option, index ) => (
 							<li
 								key={ option.key }
-								role="menuitem"
+								id={ `components-autocomplete-item-${ instanceId }-${ index }` }
+								role="option"
+								aria-selected={ index === selectedIndex }
 								className={ classnames( 'components-autocomplete__result', {
 									'is-selected': index === selectedIndex,
 								} ) }
@@ -416,4 +423,4 @@ class Autocomplete extends Component {
 	}
 }
 
-export default Autocomplete;
+export default withInstanceId( Autocomplete );
