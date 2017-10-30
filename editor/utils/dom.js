@@ -150,12 +150,12 @@ export function placeCaretAtHorizontalEdge( container, isReverse ) {
 
 	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
 		container.focus();
-		if ( ! isReverse ) {
-			container.selectionStart = 0;
-			container.selectionEnd = 0;
-		} else {
+		if ( isReverse ) {
 			container.selectionStart = container.value.length;
 			container.selectionEnd = container.value.length;
+		} else {
+			container.selectionStart = 0;
+			container.selectionEnd = 0;
 		}
 		return;
 	}
