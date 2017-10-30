@@ -6,9 +6,9 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import { PostPendingStatus } from '../';
+import { PostPendingStatusCheck } from '../check';
 
-describe( 'PostPendingStatus', () => {
+describe( 'PostPendingStatusCheck', () => {
 	const user = {
 		data: {
 			capabilities: {
@@ -18,16 +18,20 @@ describe( 'PostPendingStatus', () => {
 	};
 
 	it( 'should not render anything if the user doesn\'t have the right capabilities', () => {
-		let wrapper = shallow( <PostPendingStatus user={ {} } /> );
+		let wrapper = shallow( <PostPendingStatusCheck user={ {} }>status</PostPendingStatusCheck> );
 		expect( wrapper.type() ).toBe( null );
-		wrapper = shallow( <PostPendingStatus user={
-			{ data: { capabilities: { publish_posts: false } } }
-		} /> );
+		wrapper = shallow(
+			<PostPendingStatusCheck user={
+				{ data: { capabilities: { publish_posts: false } } }
+			}>
+				status
+			</PostPendingStatusCheck>
+		);
 		expect( wrapper.type() ).toBe( null );
 	} );
 
 	it( 'should render if the user has the correct capability', () => {
-		const wrapper = shallow( <PostPendingStatus user={ user } /> );
+		const wrapper = shallow( <PostPendingStatusCheck user={ user }>status</PostPendingStatusCheck> );
 		expect( wrapper.type() ).not.toBe( null );
 	} );
 } );
