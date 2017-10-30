@@ -45,7 +45,7 @@ describe( 'VisualEditorInserter', () => {
 		};
 
 		wrapper
-			.findWhere( ( node ) => node.prop( 'children' ) === 'Paragraph' )
+			.findWhere( ( node ) => node.prop( 'aria-label' ) === 'Insert Paragraph' )
 			.simulate( 'click' );
 
 		expect( onInsertBlock ).toHaveBeenCalled();
