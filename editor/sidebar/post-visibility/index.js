@@ -13,10 +13,11 @@ import PostVisibilityForm from '../../post-visibility';
 
 export function PostVisibility( { user } ) {
 	const canEdit = user.data && user.data.capabilities.publish_posts;
+	const visibilityId = 'post-visibility-selector';
 
 	return (
 		<PanelRow className="editor-post-visibility">
-			<span>{ __( 'Visibility' ) }</span>
+			<label htmlFor={ visibilityId }>{ __( 'Visibility' ) }</label>
 			{ ! canEdit && <span><PostVisibilityLabel /></span> }
 			{ canEdit && (
 				<Dropdown
