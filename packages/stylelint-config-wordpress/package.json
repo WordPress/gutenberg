@@ -40,13 +40,11 @@
     "eslint-plugin-jest": "^21.0.0",
     "eslint-plugin-wordpress": "git://github.com/WordPress-Coding-Standards/eslint-plugin-wordpress.git#b65ae0cea1199c9714641ed3be7ea98fcb27dd6c",
     "jest": "^21.0.0",
-    "lodash": "^4.17.4",
     "npm-run-all": "^4.0.0",
     "npmpub": "^3.0.3",
     "remark-cli": "^4.0.0",
     "remark-preset-lint-consistent": "^2.0.0",
     "remark-preset-lint-recommended": "^3.0.0",
-    "strip-ansi": "^4.0.0",
     "stylelint": "^8.0.0",
     "stylelint-find-rules": "^1.0.1"
   },
@@ -71,8 +69,7 @@
     ],
     "testEnvironment": "node",
     "testMatch": [
-      "<rootDir>/__tests__/*.js",
-      "<rootDir>/__tests__/**/?(*.)test.js"
+      "<rootDir>/__tests__/*.js"
     ],
     "verbose": true
   },
