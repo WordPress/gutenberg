@@ -348,9 +348,9 @@ export function isEditedPostPublishable( state ) {
  */
 export function isEditedPostSaveable( state ) {
 	return (
-		!! getEditedPostContent( state ) ||
 		!! getEditedPostTitle( state ) ||
-		!! getEditedPostExcerpt( state )
+		!! getEditedPostExcerpt( state ) ||
+		!! getEditedPostContent( state )
 	);
 }
 

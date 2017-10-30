@@ -123,7 +123,10 @@ class WritingFlow extends Component {
 		const isReverse = isUp || isLeft;
 		const isHorizontal = isLeft || isRight;
 		const isVertical = isUp || isDown;
+		const isNav = isHorizontal || isVertical;
 		const isShift = event.shiftKey;
+
+		const isNavEdge = isVertical ? isVerticalEdge : isHorizontalEdge;
 
 		if ( ! isVertical ) {
 			this.verticalRect = null;
@@ -131,11 +134,11 @@ class WritingFlow extends Component {
 			this.verticalRect = computeCaretRect( target );
 		}
 
-		if ( isVertical && isShift && hasMultiSelection ) {
+		if ( isNav && isShift && hasMultiSelection ) {
 			// Shift key is down and existing block selection
 			event.preventDefault();
 			this.expandSelection( blocks, selectionStart, selectionEnd, isReverse ? -1 : +1 );
-		} else if ( isVertical && isShift && this.isEditableEdge( isReverse, target ) && isVerticalEdge( target, isReverse, true ) ) {
+		} else if ( isNav && isShift && this.isEditableEdge( isReverse, target ) && isNavEdge( target, isReverse, true ) ) {
 			// Shift key is down, but no existing block selection
 			event.preventDefault();
 			this.expandSelection( blocks, selectedBlock.uid, selectedBlock.uid, isReverse ? -1 : +1 );
