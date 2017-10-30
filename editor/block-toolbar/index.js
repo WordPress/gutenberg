@@ -8,10 +8,9 @@ import { connect } from 'react-redux';
 /**
  * WordPress Dependencies
  */
-import { IconButton, Toolbar, NavigableMenu } from '@wordpress/components';
-import { Component, findDOMNode } from '@wordpress/element';
+import { IconButton, Toolbar } from '@wordpress/components';
+import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { focus, keycodes } from '@wordpress/utils';
 
 /**
  * Internal Dependencies
@@ -22,88 +21,21 @@ import BlockMover from '../block-mover';
 import BlockInspectorButton from '../block-settings-menu/block-inspector-button';
 import BlockModeToggle from '../block-settings-menu/block-mode-toggle';
 import BlockDeleteButton from '../block-settings-menu/block-delete-button';
-import { isMac } from '../utils/dom';
 import { getBlockMode } from '../selectors';
-
-/**
- * Module Constants
- */
-const { ESCAPE, F10 } = keycodes;
-
-function metaKeyPressed( event ) {
-	return isMac() ? event.metaKey : ( event.ctrlKey && ! event.altKey );
-}
 
 class BlockToolbar extends Component {
 	constructor() {
 		super( ...arguments );
 		this.toggleMobileControls = this.toggleMobileControls.bind( this );
-		this.bindNode = this.bindNode.bind( this );
-		this.onKeyUp = this.onKeyUp.bind( this );
-		this.onKeyDown = this.onKeyDown.bind( this );
-		this.onToolbarKeyDown = this.onToolbarKeyDown.bind( this );
 		this.state = {
 			showMobileControls: false,
 		};
-
-		// it's not easy to know if the user only clicked on a "meta" key without simultaneously clicking on another key
-		// We keep track of the key counts to ensure it's reliable
-		this.metaCount = 0;
-	}
-
-	componentDidMount() {
-		document.addEventListener( 'keyup', this.onKeyUp );
-		document.addEventListener( 'keydown', this.onKeyDown );
-	}
-
-	componentWillUnmount() {
-		document.removeEventListener( 'keyup', this.onKeyUp );
-		document.removeEventListener( 'keydown', this.onKeyDown );
-	}
-
-	bindNode( ref ) {
-		// Disable reason: Need DOM node for finding first focusable element
-		// on keyboard interaction to shift to toolbar.
-		// eslint-disable-next-line react/no-find-dom-node
-		this.toolbar = findDOMNode( ref );
 	}
 
 	toggleMobileControls() {
 		this.setState( ( state ) => ( {
 			showMobileControls: ! state.showMobileControls,
 		} ) );
-	}
-
-	onKeyDown( event ) {
-		if ( metaKeyPressed( event ) ) {
-			this.metaCount++;
-		}
-	}
-
-	onKeyUp( event ) {
-		const shouldFocusToolbar = this.metaCount === 1 || ( event.keyCode === F10 && event.altKey );
-		this.metaCount = 0;
-
-		if ( shouldFocusToolbar ) {
-			const tabbables = focus.tabbable.find( this.toolbar );
-			if ( tabbables.length ) {
-				tabbables[ 0 ].focus();
-			}
-		}
-	}
-
-	onToolbarKeyDown( event ) {
-		if ( event.keyCode !== ESCAPE ) {
-			return;
-		}
-
-		// Is there a better way to focus the selected block
-		// TODO: separate focused/selected block state and use Redux actions instead
-		const selectedBlock = document.querySelector( '.editor-visual-editor__block.is-selected .editor-visual-editor__block-edit' );
-		if ( !! selectedBlock ) {
-			event.stopPropagation();
-			selectedBlock.focus();
-		}
 	}
 
 	render() {
@@ -119,14 +51,8 @@ class BlockToolbar extends Component {
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
 			<Fill name="Editor.Header">
-				<NavigableMenu
+				<div
 					className={ toolbarClassname }
-					ref={ this.bindNode }
-					orientation="horizontal"
-					role="toolbar"
-					deep
-					onKeyDown={ this.onToolbarKeyDown }
-					aria-label={ __( 'Block\'s toolbar' ) }
 				>
 					{ ! showMobileControls && mode === 'visual' && [
 						<BlockSwitcher key="switcher" uid={ uid } />,
@@ -154,7 +80,7 @@ class BlockToolbar extends Component {
 							</div>
 						}
 					</Toolbar>
-				</NavigableMenu>
+				</div>
 			</Fill>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
