@@ -41,3 +41,11 @@
 		margin: 0;
 	}
 }
+
+.blocks-url-input {
+	input[type=url] {
+		&::-ms-clear {
+			display: none;
+		}
+	}
+}
