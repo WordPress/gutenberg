@@ -44,12 +44,14 @@ jobs:
       env: WP_VERSION=latest
       script:
         - ./bin/run-wp-unit-tests.sh
+      if: branch = master and type != "pull_request"
 
     - stage: test
       php: 7.1
       env: WP_VERSION=latest SWITCH_TO_PHP=5.3
       script:
         - ./bin/run-wp-unit-tests.sh
+      if: branch = master and type != "pull_request"
 
     - stage: test
       php: 7.1
