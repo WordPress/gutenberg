@@ -197,7 +197,7 @@ class GalleryBlock extends Component {
 
 		return [
 			controls,
-			focus && images.length > 1 && (
+			focus && (
 				<InspectorControls key="inspector">
 					{blockDescription}
 					<h3>{ __( 'Gallery Settings' ) }</h3>
