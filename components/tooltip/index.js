@@ -99,6 +99,7 @@ class Tooltip extends Component {
 		return cloneElement( child, {
 			onMouseEnter: this.createToggleIsOver( 'onMouseEnter', true ),
 			onMouseLeave: this.createToggleIsOver( 'onMouseLeave' ),
+			onClick: this.createToggleIsOver( 'onClick' ),
 			onFocus: this.createToggleIsOver( 'onFocus' ),
 			onBlur: this.createToggleIsOver( 'onBlur' ),
 			children: concatChildren(
