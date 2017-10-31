@@ -18,6 +18,9 @@
 
 	.blocks-url-input {
 		width: auto;
+		input::-ms-clear {
+			display: none;
+		}
 	}
 }
 
@@ -39,13 +42,5 @@
 
 	.blocks-base-control {
 		margin: 0;
-	}
-}
-
-.blocks-url-input {
-	input[type=url] {
-		&::-ms-clear {
-			display: none;
-		}
 	}
 }
