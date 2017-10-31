@@ -7,6 +7,7 @@ $z-layers: (
 	'.editor-visual-editor__block:before': -1,
 	'.editor-visual-editor__block .wp-block-more:before': -1,
 	'.editor-visual-editor__block {core/image aligned left or right}': 20,
+	'.freeform-toolbar': 10,
 	'.editor-visual-editor__block-warning': 1,
 	'.editor-visual-editor__sibling-inserter': 1,
 	'.components-form-toggle__input': 1,
@@ -42,5 +43,9 @@ $z-layers: (
 );
 
 @function z-index( $key ) {
-	@return map-get( $z-layers, $key );
+	@if map-has-key( $z-layers, $key ) {
+		@return map-get( $z-layers, $key );
+	}
+
+	@error "Error: Specified z-index `#{$key}` does not exist in the mapping";
 }
