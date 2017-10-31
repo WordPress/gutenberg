@@ -42,5 +42,9 @@ $z-layers: (
 );
 
 @function z-index( $key ) {
-	@return map-get( $z-layers, $key );
+	@if map-has-key( $z-layers, $key ) {
+		@return map-get( $z-layers, $key );
+	}
+
+	@error "Error: Specified z-index `#{$key}` does not exist in the mapping";
 }
