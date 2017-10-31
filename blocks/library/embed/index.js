@@ -29,7 +29,15 @@ const { children } = source;
 // These embeds do not work in sandboxes
 const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
 
-function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, keywords = [] } ) {
+function getEmbedBlockSettings( {
+	title,
+	additionalAttributes,
+	icon,
+	category = 'embed',
+	transforms,
+	keywords = [],
+	getInspectorControls,
+} ) {
 	return {
 		title,
 
@@ -51,6 +59,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 			align: {
 				type: 'string',
 			},
+			...additionalAttributes,
 		},
 
 		transforms,
@@ -131,8 +140,8 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 
 			render() {
 				const { html, type, error, fetching } = this.state;
+				const { attributes, setAttributes, focus, setFocus } = this.props;
 				const { align, url, caption } = this.props.attributes;
-				const { setAttributes, focus, setFocus } = this.props;
 				const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 
 				const controls = [
@@ -149,6 +158,10 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 							<BlockDescription>
 								<p>{ __( 'The Embed block allows you to easily add videos, images, tweets, audio, and other content to your post or page.' ) }</p>
 							</BlockDescription>
+							{ getInspectorControls && getInspectorControls( {
+								attributes,
+								setAttributes,
+							} ) }
 						</InspectorControls>
 					),
 				];
@@ -229,7 +242,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 			const { url, caption, align } = attributes;
 
 			if ( ! url ) {
-				return;
+				return null;
 			}
 
 			return (
@@ -269,8 +282,24 @@ registerBlockType(
 	'core-embed/twitter',
 	getEmbedBlockSettings( {
 		title: 'Twitter',
+		additionalAttributes: {
+			theme: {
+				type: 'string',
+				default: 'light',
+			},
+		},
 		icon: 'embed-post',
 		keywords: [ __( 'tweet' ) ],
+		getInspectorControls: ( { attributes, setAttributes } ) => [
+			<InspectorControls.CheckboxControl
+				key="theme"
+				checked={ attributes.theme === 'dark' }
+				onChange={ ( nextValue ) => {
+					setAttributes( { theme: nextValue === '1' ? 'dark' : 'light' } );
+				} }
+				label={ __( 'Dark Theme' ) }
+			/>,
+		],
 	} )
 );
 registerBlockType(

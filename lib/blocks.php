@@ -92,4 +92,4 @@ function do_blocks( $content ) {
 
 	return $content_after_blocks;
 }
-add_filter( 'the_content', 'do_blocks', 9 ); // BEFORE do_shortcode() and wpautop().
+add_filter( 'the_content', 'do_blocks', 7 ); // BEFORE shortcode and wpautop filters.
