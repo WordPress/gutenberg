@@ -89,7 +89,7 @@ class VisualEditorBlock extends Component {
 		}
 
 		// Not Ideal, but it's the easiest way to get the scrollable container
-		this.editorLayout = document.querySelector( '.editor-layout__editor' );
+		this.editorLayout = document.querySelector( '.editor-layout__content' );
 	}
 
 	componentWillReceiveProps( newProps ) {
