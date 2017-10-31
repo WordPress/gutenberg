@@ -6,6 +6,7 @@ import ResizableBox from 're-resizable';
 import {
 	startCase,
 	isEmpty,
+	isEqual,
 	map,
 	get,
 	flowRight,
@@ -15,8 +16,8 @@ import {
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
-import { mediaUpload } from '@wordpress/utils';
+import { Component, findDOMNode } from '@wordpress/element';
+import { focus as focusutil, mediaUpload } from '@wordpress/utils';
 import {
 	Placeholder,
 	Dashicon,
@@ -44,11 +45,47 @@ import ImageSize from './image-size';
 class ImageBlock extends Component {
 	constructor() {
 		super( ...arguments );
+		this.bindNode = this.bindNode.bind( this );
+		this.isActive = this.isActive.bind( this );
+		this.updateFocus = this.updateFocus.bind( this );
 		this.updateAlt = this.updateAlt.bind( this );
 		this.updateAlignment = this.updateAlignment.bind( this );
 		this.onSelectImage = this.onSelectImage.bind( this );
 		this.onSetHref = this.onSetHref.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
+
+		this.nodes = {};
+	}
+
+	bindNode( name ) {
+		return ( node ) => this.nodes[ name ] = node;
+	}
+
+	isActive() {
+		const parent = this.nodes.placeholder || this.nodes.figure;
+		if ( parent ) {
+			const parentNode = findDOMNode( parent );
+			if ( parentNode.contains( document.activeElement ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	updateFocus() {
+		const { focus } = this.props;
+		const isActive = this.isActive();
+
+		if ( focus && ! isActive ) {
+			const parent = this.nodes.placeholder || this.nodes.figure;
+			if ( parent ) {
+				const tabbables = focusutil.tabbable.find( parent );
+				if ( tabbables.length > 0 ) {
+					const firstTabbable = tabbables[ 0 ];
+					setTimeout( () => firstTabbable.focus(), 0 );
+				}
+			}
+		}
 	}
 
 	onSelectImage( media ) {
@@ -76,6 +113,16 @@ class ImageBlock extends Component {
 
 	getAvailableSizes() {
 		return get( this.props.image, [ 'data', 'media_details', 'sizes' ], {} );
+	}
+
+	componentDidUpdate( prevProps ) {
+		if ( ! isEqual( this.props.focus, prevProps.focus ) ) {
+			this.updateFocus();
+		}
+	}
+
+	componentDidMount() {
+		this.updateFocus();
 	}
 
 	render() {
@@ -118,31 +165,32 @@ class ImageBlock extends Component {
 		if ( ! url ) {
 			return [
 				controls,
-				<Placeholder
-					key="placeholder"
-					instructions={ __( 'Drag image here or insert from media library' ) }
-					icon="format-image"
-					label={ __( 'Image' ) }
-					className={ className }>
-					<DropZone
-						onFilesDrop={ dropFiles }
-					/>
-					<FormFileUpload
-						isLarge
-						className="wp-block-image__upload-button"
-						onChange={ uploadFromFiles }
-						accept="image/*"
-					>
-						{ __( 'Upload' ) }
-					</FormFileUpload>
-					<MediaUploadButton
-						buttonProps={ uploadButtonProps }
-						onSelect={ this.onSelectImage }
-						type="image"
-					>
-						{ __( 'Insert from Media Library' ) }
-					</MediaUploadButton>
-				</Placeholder>,
+				<div key="placeholder" ref={ this.bindNode( 'placeholder' ) }>
+					<Placeholder
+						instructions={ __( 'Drag image here or insert from media library' ) }
+						icon="format-image"
+						label={ __( 'Image' ) }
+						className={ className }>
+						<DropZone
+							onFilesDrop={ dropFiles }
+						/>
+						<FormFileUpload
+							isLarge
+							className="wp-block-image__upload-button"
+							onChange={ uploadFromFiles }
+							accept="image/*"
+						>
+							{ __( 'Upload' ) }
+						</FormFileUpload>
+						<MediaUploadButton
+							buttonProps={ uploadButtonProps }
+							onSelect={ this.onSelectImage }
+							type="image"
+						>
+							{ __( 'Insert from Media Library' ) }
+						</MediaUploadButton>
+					</Placeholder>
+				</div>,
 			];
 		}
 
@@ -178,7 +226,7 @@ class ImageBlock extends Component {
 					) }
 				</InspectorControls>
 			),
-			<figure key="image" className={ classes } style={ figureStyle }>
+			<figure key="image" className={ classes } style={ figureStyle } ref={ this.bindNode( 'figure' ) }>
 				<ImageSize src={ url } dirtynessTrigger={ align }>
 					{ ( sizes ) => {
 						const {
