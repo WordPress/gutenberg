@@ -590,7 +590,11 @@ export const getMultiSelectedBlockUids = createSelector(
 
 		return blockOrder.slice( startIndex, endIndex + 1 );
 	},
-	( state ) => [ state.editor.blockOrder, state.blockSelection ],
+	( state ) => [
+		state.editor.blockOrder,
+		state.blockSelection.start,
+		state.blockSelection.end,
+	],
 );
 
 /**
@@ -604,7 +608,8 @@ export const getMultiSelectedBlocks = createSelector(
 	( state ) => getMultiSelectedBlockUids( state ).map( ( uid ) => getBlock( state, uid ) ),
 	( state ) => [
 		state.editor.blockOrder,
-		state.blockSelection,
+		state.blockSelection.start,
+		state.blockSelection.end,
 		state.editor.blocksByUid,
 		state.editor.edits.meta,
 		state.currentPost.meta,
