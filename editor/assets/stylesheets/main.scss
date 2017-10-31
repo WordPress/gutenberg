@@ -61,9 +61,9 @@ body.gutenberg-editor-page {
 	min-height: calc( 100vh - #{ $admin-bar-height-big } );
 	padding-top: $header-height + $stacked-toolbar-height;
 
+	// The parent relative container changes
 	@include break-small {
 		top: 0;
-		padding-top: $header-height;
 	}
 
 	// The WP header height changes at this breakpoint
