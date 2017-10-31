@@ -94,29 +94,28 @@
       "(blocks|components|date|editor|element|i18n|utils)/**/*.js"
     ],
     "coveragePathIgnorePatterns": [
-      "<rootDir>/[^/]+/build/index.js",
-      ".*/story/[^/]+.js"
+      "<rootDir>/[^/]+/build/index.js"
     ],
     "coverageDirectory": "coverage",
     "moduleNameMapper": {
-      "\\.(scss|css)$": "<rootDir>/test/style-mock.js",
+      "\\.(scss|css)$": "<rootDir>/test/unit/style-mock.js",
       "@wordpress\\/(blocks|components|date|editor|element|i18n|utils)": "$1"
     },
     "modulePaths": [
       "<rootDir>"
     ],
     "setupFiles": [
-      "<rootDir>/test/setup-globals.js",
-      "<rootDir>/test/setup-wp-aliases.js"
+      "<rootDir>/test/unit/setup-globals.js",
+      "<rootDir>/test/unit/setup-wp-aliases.js"
     ],
-    "setupTestFrameworkScriptFile": "<rootDir>/test/setup-test-framework.js",
+    "setupTestFrameworkScriptFile": "<rootDir>/test/unit/setup-test-framework.js",
     "testMatch": [
       "<rootDir>/(blocks|components|date|editor|element|i18n|utils)/**/test/*.js"
     ],
     "timers": "fake",
     "transform": {
       "^.+\\.jsx?$": "babel-jest",
-      "\\.pegjs$": "<rootDir>/test/pegjs-transform.js"
+      "\\.pegjs$": "<rootDir>/test/unit/pegjs-transform.js"
     },
     "verbose": true
   },
