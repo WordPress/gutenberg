@@ -53,6 +53,9 @@ class Tooltip extends Component {
 
 	createToggleIsOver( eventName, isDelayed ) {
 		return ( event ) => {
+			// Preserve original child callback behavior
+			this.emitToChild( eventName, event );
+
 			// Mouse events behave unreliably in React for disabled elements,
 			// firing on mouseenter but not mouseleave.  Further, the default
 			// behavior for disabled elements in some browsers is to ignore
@@ -77,8 +80,6 @@ class Tooltip extends Component {
 			} else {
 				this.setState( { isOver } );
 			}
-
-			this.emitToChild( eventName, event );
 		};
 	}
 
