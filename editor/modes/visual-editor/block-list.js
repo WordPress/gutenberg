@@ -79,7 +79,7 @@ class VisualEditorBlockList extends Component {
 		if ( nextProps.multiSelectedBlockUids && nextProps.multiSelectedBlockUids.length > 0 ) {
 			const extent = this.nodes[ nextProps.selectionEnd ];
 			if ( extent ) {
-				scrollIntoView( extent, extent.closest( '.editor-layout__editor' ), {
+				scrollIntoView( extent, extent.closest( '.editor-layout__content' ), {
 					onlyScrollIfNeeded: true,
 				} );
 			}
