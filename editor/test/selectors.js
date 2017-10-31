@@ -2132,6 +2132,33 @@ describe( 'selectors', () => {
 
 			expect( getSuggestedPostFormat( state ) ).toBe( 'quote' );
 		} );
+
+		it( 'returns Video if the first block is of type `core-embed/youtube`', () => {
+			const state = {
+				editor: {
+					blockOrder: [ 567 ],
+					blocksByUid: {
+						567: { uid: 567, name: 'core-embed/youtube' },
+					},
+				},
+			};
+
+			expect( getSuggestedPostFormat( state ) ).toBe( 'video' );
+		} );
+
+		it( 'returns Quote if the first block is of type `core/quote` and second is of type `core/paragraph`', () => {
+			const state = {
+				editor: {
+					blockOrder: [ 456, 789 ],
+					blocksByUid: {
+						456: { uid: 456, name: 'core/quote' },
+						789: { uid: 789, name: 'core/paragraph' },
+					},
+				},
+			};
+
+			expect( getSuggestedPostFormat( state ) ).toBe( 'quote' );
+		} );
 	} );
 
 	describe( 'getNotices', () => {
