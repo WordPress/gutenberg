@@ -709,7 +709,7 @@ export default class Editable extends Component {
 						{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }
 					</Tagname>
 				}
-				{ focus && <Slot name="Formatting.LinkDialog" /> }
+				{ focus && <Slot name="Editable.Siblings" /> }
 			</div>
 		);
 	}

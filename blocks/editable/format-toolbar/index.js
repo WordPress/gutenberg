@@ -177,7 +177,7 @@ class FormatToolbar extends Component {
 				<Toolbar controls={ toolbarControls } />
 
 				{ ( isAddingLink || isEditingLink ) &&
-					<Fill name="Formatting.LinkDialog">
+					<Fill name="Editable.Siblings">
 						<form
 							className="blocks-format-toolbar__link-modal"
 							style={ linkStyle }
@@ -192,7 +192,7 @@ class FormatToolbar extends Component {
 				}
 
 				{ !! formats.link && ! isAddingLink && ! isEditingLink &&
-					<Fill name="Formatting.LinkDialog">
+					<Fill name="Editable.Siblings">
 						<div className="blocks-format-toolbar__link-modal" style={ linkStyle }>
 							<a
 								className="blocks-format-toolbar__link-value"
