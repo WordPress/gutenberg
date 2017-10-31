@@ -1,15 +1,14 @@
 /**
  * External dependencies
  */
-import { nodeListToReact, nodeToReact } from 'dom-react';
-import { flatten, omit } from 'lodash';
 export { attr, prop, html, text, query } from 'hpq';
 
-function toArray( type, props, ...children ) {
-	return [ [ type, omit( props, 'key' ), ...children ] ];
-}
+/**
+ * Internal dependencies
+ */
+import { createSimpleNode, createSimpleNodeList } from './simple-dom';
 
-export const children = ( selector ) => {
+export const children = ( selector, filter ) => {
 	return ( domNode ) => {
 		let match = domNode;
 
@@ -18,14 +17,14 @@ export const children = ( selector ) => {
 		}
 
 		if ( match ) {
-			return nodeListToReact( match.childNodes || [], toArray );
+			return createSimpleNodeList( match.childNodes || [], filter );
 		}
 
 		return [];
 	};
 };
 
-export const node = ( selector ) => {
+export const node = ( selector, filter ) => {
 	return ( domNode ) => {
 		let match = domNode;
 
@@ -33,6 +32,6 @@ export const node = ( selector ) => {
 			match = domNode.querySelector( selector );
 		}
 
-		return flatten( nodeToReact( match, toArray ) );
+		return createSimpleNode( match, filter );
 	};
 };

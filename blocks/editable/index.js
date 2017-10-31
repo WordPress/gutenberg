@@ -14,13 +14,12 @@ import {
 	defer,
 	noop,
 } from 'lodash';
-import { nodeListToReact } from 'dom-react';
 import 'element-closest';
 
 /**
  * WordPress dependencies
  */
-import { createElement, Component, renderToString } from '@wordpress/element';
+import { createElement, Component } from '@wordpress/element';
 import { keycodes, createBlobURL } from '@wordpress/utils';
 import { Slot, Fill } from '@wordpress/components';
 
@@ -29,6 +28,8 @@ import { Slot, Fill } from '@wordpress/components';
  */
 import './style.scss';
 import { rawHandler } from '../api';
+import * as matchers from '../api/matchers';
+import { applySimpleNodeList } from '../api/simple-dom';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
 import { pickAriaProps } from './aria';
@@ -37,7 +38,10 @@ import { EVENTS } from './constants';
 
 const { BACKSPACE, DELETE, ENTER } = keycodes;
 
-function toArray( type, props, ...children ) {
+const createNode = matchers.node( null, nodeFilter );
+const createChildren = matchers.children( null, nodeFilter );
+
+function nodeFilter( type, props, ...children ) {
 	if ( props[ 'data-mce-bogus' ] === 'all' ) {
 		return null;
 	}
@@ -46,11 +50,11 @@ function toArray( type, props, ...children ) {
 		return children;
 	}
 
-	return [ [
+	return [
 		type,
 		omitBy( props, ( value, key ) => key.indexOf( 'data-mce-' ) === 0 || key === 'key' ),
 		...children,
-	] ];
+	];
 }
 
 function isLinkBoundary( fragment ) {
@@ -569,8 +573,8 @@ export default class Editable extends Component {
 				const index = dom.nodeIndex( selectedNode );
 				const beforeNodes = childNodes.slice( 0, index );
 				const afterNodes = childNodes.slice( index + 1 );
-				const beforeElement = nodeListToReact( beforeNodes, toArray );
-				const afterElement = nodeListToReact( afterNodes, toArray );
+				const beforeElement = beforeNodes.map( createNode );
+				const afterElement = afterNodes.map( createNode );
 
 				this.setContent( beforeElement );
 				this.props.onSplit( beforeElement, afterElement );
@@ -624,8 +628,8 @@ export default class Editable extends Component {
 			const beforeFragment = beforeRange.extractContents();
 			const afterFragment = afterRange.extractContents();
 
-			const beforeElement = nodeListToReact( beforeFragment.childNodes, toArray );
-			const afterElement = isLinkBoundary( afterFragment ) ? [] : nodeListToReact( afterFragment.childNodes, toArray );
+			const beforeElement = createChildren( beforeFragment );
+			const afterElement = isLinkBoundary( afterFragment ) ? [] : createChildren( afterFragment );
 
 			this.setContent( beforeElement );
 			this.props.onSplit( beforeElement, afterElement, ...blocks );
@@ -678,8 +682,8 @@ export default class Editable extends Component {
 		this.setContent( this.props.value );
 
 		this.props.onSplit(
-			nodeListToReact( before, toArray ),
-			nodeListToReact( after, toArray )
+			before.map( createNode ),
+			after.map( createNode )
 		);
 	}
 
@@ -709,17 +713,12 @@ export default class Editable extends Component {
 		this.editor.save();
 	}
 
-	setContent( content ) {
-		if ( ! content ) {
-			content = '';
-		}
-
-		content = renderToString( valueToElement( content ) );
-		this.editor.setContent( content, { format: 'raw' } );
+	setContent( content = [] ) {
+		applySimpleNodeList( content, this.editor.getBody() );
 	}
 
 	getContent() {
-		return nodeListToReact( this.editor.getBody().childNodes || [], toArray );
+		return createChildren( this.editor.getBody() );
 	}
 
 	updateFocus() {
