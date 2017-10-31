@@ -36,6 +36,7 @@
 	transform: rotate( 90deg );
 	transition-duration: 0.3s;
 	transition-property: transform;
+	width: auto;
 
 	&.is-opened {
 		transform: rotate( 0 );
