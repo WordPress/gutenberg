@@ -8,7 +8,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Button } from '@wordpress/components';
+import { IconButton } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { createBlock, BlockIcon } from '@wordpress/blocks';
 
@@ -58,17 +58,19 @@ export class VisualEditorInserter extends Component {
 					insertIndex={ blockCount }
 					position="top right" />
 				{ mostFrequentlyUsedBlocks && mostFrequentlyUsedBlocks.map( ( block ) => (
-					<Button
+					<IconButton
 						key={ 'frequently_used_' + block.name }
 						className="editor-inserter__block"
 						onClick={ () => this.insertBlock( block.name ) }
-						aria-label={ sprintf( __( 'Insert %s' ), block.title ) }
+						label={ sprintf( __( 'Insert %s' ), block.title ) }
+						icon={ (
+							<span className="editor-visual-editor__inserter-block-icon">
+								<BlockIcon icon={ block.icon } />
+							</span>
+						) }
 					>
-						<span className="editor-visual-editor__inserter-block-icon">
-							<BlockIcon icon={ block.icon } />
-						</span>
 						{ block.title }
-					</Button>
+					</IconButton>
 				) ) }
 			</div>
 		);
