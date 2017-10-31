@@ -19,7 +19,6 @@ import { blockAutocompleter, userAutocompleter } from '../../autocompleters';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import BlockControls from '../../block-controls';
-import BlockAutocomplete from '../../block-autocomplete';
 import Editable from '../../editable';
 import InspectorControls from '../../inspector-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
@@ -132,13 +131,13 @@ registerBlockType( 'core/paragraph', {
 							allowReset
 						/>
 					</PanelBody>
-					<PanelColor title={ __( 'Background' ) } colorValue={ backgroundColor }>
+					<PanelColor title={ __( 'Background' ) } colorValue={ backgroundColor } initialOpen={ false } key="panel-color-paragraph-1">
 						<ColorPalette
 							value={ backgroundColor }
 							onChange={ ( colorValue ) => setAttributes( { backgroundColor: colorValue } ) }
 						/>
 					</PanelColor>
-					<PanelColor title={ __( 'Text' ) } colorValue={ textColor }>
+					<PanelColor title={ __( 'Text' ) } colorValue={ textColor } initialOpen={ false } key="panel-color-paragraph-2">
 						<ColorPalette
 							value={ textColor }
 							onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
