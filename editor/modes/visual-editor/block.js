@@ -29,7 +29,7 @@ import {
 	focusBlock,
 	insertBlocks,
 	mergeBlocks,
-	removeBlocks,
+	removeBlock,
 	replaceBlocks,
 	selectBlock,
 	startTyping,
@@ -474,8 +474,8 @@ export default connect(
 			dispatch( focusBlock( ...args ) );
 		},
 
-		onRemove( uids ) {
-			dispatch( removeBlocks( uids ) );
+		onRemove( uid ) {
+			dispatch( removeBlock( uid ) );
 		},
 
 		onMerge( ...args ) {
