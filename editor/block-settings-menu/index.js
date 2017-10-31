@@ -18,6 +18,7 @@ import BlockInspectorButton from './block-inspector-button';
 import BlockModeToggle from './block-mode-toggle';
 import BlockDeleteButton from './block-delete-button';
 import { selectBlock } from '../actions';
+import UnknownConverter from './unknown-converter';
 
 function BlockSettingsMenu( { uids, onSelect } ) {
 	const count = uids.length;
@@ -50,6 +51,7 @@ function BlockSettingsMenu( { uids, onSelect } ) {
 				<div className="editor-block-settings-menu__content">
 					<BlockInspectorButton onClick={ onClose } />
 					{ count === 1 && <BlockModeToggle uid={ uids[ 0 ] } onToggle={ onClose } /> }
+					{ count === 1 && <UnknownConverter uid={ uids[ 0 ] } /> }
 					<BlockDeleteButton uids={ uids } />
 				</div>
 			) }
