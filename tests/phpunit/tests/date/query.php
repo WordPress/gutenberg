@@ -512,11 +512,12 @@ class Tests_WP_Date_Query extends WP_UnitTestCase {
 	 * @ticket 34228
 	 */
 	public function test_build_time_query_should_not_discard_hour_0() {
+		global $wpdb;
 		$q = new WP_Date_Query( array() );
 
 		$found = $q->build_time_query( 'post_date', '=', 0, 10 );
 
-		$this->assertContains( '%H', $found );
+		$this->assertContains( '%H', $wpdb->remove_placeholder_escape( $found ) );
 	}
 
 	public function test_build_time_query_compare_in() {
@@ -612,33 +613,36 @@ class Tests_WP_Date_Query extends WP_UnitTestCase {
 	}
 
 	public function test_build_time_query_hour_minute() {
+		global $wpdb;
 		$q = new WP_Date_Query( array() );
 
 		$found = $q->build_time_query( 'post_date', '=', 5, 15 );
 
 		// $compare value is floating point - use regex to account for
 		// varying precision on different PHP installations
-		$this->assertRegExp( "/DATE_FORMAT\( post_date, '%H\.%i' \) = 5\.150*/", $found );
+		$this->assertRegExp( "/DATE_FORMAT\( post_date, '%H\.%i' \) = 5\.150*/", $wpdb->remove_placeholder_escape( $found ) );
 	}
 
 	public function test_build_time_query_hour_minute_second() {
+		global $wpdb;
 		$q = new WP_Date_Query( array() );
 
 		$found = $q->build_time_query( 'post_date', '=', 5, 15, 35 );
 
 		// $compare value is floating point - use regex to account for
 		// varying precision on different PHP installations
-		$this->assertRegExp( "/DATE_FORMAT\( post_date, '%H\.%i%s' \) = 5\.15350*/", $found );
+		$this->assertRegExp( "/DATE_FORMAT\( post_date, '%H\.%i%s' \) = 5\.15350*/", $wpdb->remove_placeholder_escape( $found ) );
 	}
 
 	public function test_build_time_query_minute_second() {
+		global $wpdb;
 		$q = new WP_Date_Query( array() );
 
 		$found = $q->build_time_query( 'post_date', '=', null, 15, 35 );
 
 		// $compare value is floating point - use regex to account for
 		// varying precision on different PHP installations
-		$this->assertRegExp( "/DATE_FORMAT\( post_date, '0\.%i%s' \) = 0\.15350*/", $found );
+		$this->assertRegExp( "/DATE_FORMAT\( post_date, '0\.%i%s' \) = 0\.15350*/", $wpdb->remove_placeholder_escape( $found ) );
 	}
 
 	/**

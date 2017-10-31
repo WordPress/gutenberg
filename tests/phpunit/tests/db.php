@@ -270,6 +270,9 @@ class Tests_DB extends WP_UnitTestCase {
 	public function test_double_escaped_placeholders() {
 		global $wpdb;
 		$sql = $wpdb->prepare( "UPDATE test_table SET string_column = '%%f is a float, %%d is an int %d, %%s is a string', field = %s", 3, '4' );
+		$this->assertContains( $wpdb->placeholder_escape(), $sql );
+
+		$sql = $wpdb->remove_placeholder_escape( $sql );
 		$this->assertEquals( "UPDATE test_table SET string_column = '%f is a float, %d is an int 3, %s is a string', field = '4'", $sql );
 	}
 
@@ -432,12 +435,12 @@ class Tests_DB extends WP_UnitTestCase {
 			array(
 				"SELECT * FROM $wpdb->users WHERE id = %d AND %% AND user_login = %s",
 				array( 1, "admin", "extra-arg" ),
-				"SELECT * FROM $wpdb->users WHERE id = 1 AND % AND user_login = 'admin'",
+				"SELECT * FROM $wpdb->users WHERE id = 1 AND {$wpdb->placeholder_escape()} AND user_login = 'admin'",
 			),
 			array(
 				"SELECT * FROM $wpdb->users WHERE id = %%%d AND %F AND %f AND user_login = %s",
 				array( 1, 2.3, "4.5", "admin", "extra-arg" ),
-				"SELECT * FROM $wpdb->users WHERE id = %1 AND 2.300000 AND 4.500000 AND user_login = 'admin'",
+				"SELECT * FROM $wpdb->users WHERE id = {$wpdb->placeholder_escape()}1 AND 2.300000 AND 4.500000 AND user_login = 'admin'",
 			),
 			array(
 				"SELECT * FROM $wpdb->users WHERE id = %d AND user_login = %s",
@@ -1185,13 +1188,327 @@ class Tests_DB extends WP_UnitTestCase {
 	}
 
 	/**
-	 *
+	 * @dataProvider data_prepare_with_placeholders
 	 */
-	function test_prepare_with_unescaped_percents() {
+	function test_prepare_with_placeholders_and_individual_args( $sql, $values, $incorrect_usage, $expected) {
 		global $wpdb;
 
-		$sql = $wpdb->prepare( '%d %1$d %%% %', 1 );
-		$this->assertEquals( '1 %1$d %% %', $sql );
+		if ( $incorrect_usage ) {
+			$this->setExpectedIncorrectUsage( 'wpdb::prepare' );
+		}
+
+		if ( ! is_array( $values ) ) {
+			$values = array( $values );
+		}
+
+		array_unshift( $values, $sql );
+
+		$sql = call_user_func_array( array( $wpdb, 'prepare' ), $values );
+		$this->assertEquals( $expected, $sql );
+	}
+
+	/**
+	 * @dataProvider data_prepare_with_placeholders
+	 */
+	function test_prepare_with_placeholders_and_array_args( $sql, $values, $incorrect_usage, $expected) {
+		global $wpdb;
+
+		if ( $incorrect_usage ) {
+			$this->setExpectedIncorrectUsage( 'wpdb::prepare' );
+		}
+
+		if ( ! is_array( $values ) ) {
+			$values = array( $values );
+		}
+
+		$sql = call_user_func_array( array( $wpdb, 'prepare' ), array( $sql, $values ) );
+		$this->assertEquals( $expected, $sql );
+	}
+
+	function data_prepare_with_placeholders() {
+		global $wpdb;
+
+		return array(
+			array(
+				'%5s',   // SQL to prepare
+				'foo',   // Value to insert in the SQL
+				false,   // Whether to expect an incorrect usage error or not
+				'  foo', // Expected output
+			),
+			array(
+				'%1$d %%% % %%1$d%% %%%1$d%%',
+				1,
+				true,
+				"1 {$wpdb->placeholder_escape()}{$wpdb->placeholder_escape()} {$wpdb->placeholder_escape()} {$wpdb->placeholder_escape()}1\$d{$wpdb->placeholder_escape()} {$wpdb->placeholder_escape()}1{$wpdb->placeholder_escape()}",
+			),
+			array(
+				'%-5s',
+				'foo',
+				false,
+				'foo  ',
+			),
+			array(
+				'%05s',
+				'foo',
+				false,
+				'00foo',
+			),
+			array(
+				"%'#5s",
+				'foo',
+				false,
+				'##foo',
+			),
+			array(
+				'%.3s',
+				'foobar',
+				false,
+				'foo',
+			),
+			array(
+				'%.3f',
+				5.123456,
+				false,
+				'5.123',
+			),
+			array(
+				'%.3f',
+				5.12,
+				false,
+				'5.120',
+			),
+			array(
+				'%s',
+				' %s ',
+				false,
+				"' {$wpdb->placeholder_escape()}s '",
+			),
+			array(
+				'%1$s',
+				' %s ',
+				false,
+				" {$wpdb->placeholder_escape()}s ",
+			),
+			array(
+				'%1$s',
+				' %1$s ',
+				false,
+				" {$wpdb->placeholder_escape()}1\$s ",
+			),
+			array(
+				'%d %1$d %%% %',
+				1,
+				true,
+				"1 1 {$wpdb->placeholder_escape()}{$wpdb->placeholder_escape()} {$wpdb->placeholder_escape()}",
+			),
+			array(
+				'%d %2$s',
+				array( 1, 'hello' ),
+				false,
+				"1 hello",
+			),
+			array(
+				"'%s'",
+				'hello',
+				false,
+				"'hello'",
+			),
+			array(
+				'"%s"',
+				'hello',
+				false,
+				"'hello'",
+			),
+			array(
+				"%s '%1\$s'",
+				'hello',
+				true,
+				"'hello' 'hello'",
+			),
+			array(
+				"%s '%1\$s'",
+				'hello',
+				true,
+				"'hello' 'hello'",
+			),
+			array(
+				'%s "%1$s"',
+				'hello',
+				true,
+				"'hello' \"hello\"",
+			),
+			array(
+				"%%s %%'%1\$s'",
+				'hello',
+				false,
+				"{$wpdb->placeholder_escape()}s {$wpdb->placeholder_escape()}'hello'",
+			),
+			array(
+				'%%s %%"%1$s"',
+				'hello',
+				false,
+				"{$wpdb->placeholder_escape()}s {$wpdb->placeholder_escape()}\"hello\"",
+			),
+			array(
+				'%s',
+				' %  s ',
+				false,
+				"' {$wpdb->placeholder_escape()}  s '",
+			),
+			array(
+				'%%f %%"%1$f"',
+				3,
+				false,
+				"{$wpdb->placeholder_escape()}f {$wpdb->placeholder_escape()}\"3.000000\"",
+			),
+			array(
+				'WHERE second=\'%2$s\' AND first=\'%1$s\'',
+				array( 'first arg', 'second arg' ),
+				false,
+				"WHERE second='second arg' AND first='first arg'",
+			),
+			array(
+				'WHERE second=%2$d AND first=%1$d',
+				array( 1, 2 ),
+				false,
+				"WHERE second=2 AND first=1",
+			),
+			array(
+				"'%'%%s",
+				'hello',
+				true,
+				"'{$wpdb->placeholder_escape()}'{$wpdb->placeholder_escape()}s",
+			),
+			array(
+				"'%'%%s%s",
+				'hello',
+				false,
+				"'{$wpdb->placeholder_escape()}'{$wpdb->placeholder_escape()}s'hello'",
+			),
+			array(
+				"'%'%%s %s",
+				'hello',
+				false,
+				"'{$wpdb->placeholder_escape()}'{$wpdb->placeholder_escape()}s 'hello'",
+			),
+			array(
+				"'%-'#5s' '%'#-+-5s'",
+				array( 'hello', 'foo' ),
+				false,
+				"'hello' 'foo##'",
+			),
+		);
+	}
+
+	/**
+	 * @dataProvider data_escape_and_prepare
+	 */
+	function test_escape_and_prepare( $escape, $sql, $values, $incorrect_usage, $expected ) {
+		global $wpdb;
+
+		if ( $incorrect_usage ) {
+			$this->setExpectedIncorrectUsage( 'wpdb::prepare' );
+		}
+
+		$escape = esc_sql( $escape );
+
+		$sql = str_replace( '{ESCAPE}', $escape, $sql );
+
+		$actual = $wpdb->prepare( $sql, $values );
+
+		$this->assertEquals( $expected, $actual );
+	}
+
+	function data_escape_and_prepare() {
+		global $wpdb;
+		return array(
+			array(
+				'%s',                                  // String to pass through esc_url()
+				' {ESCAPE} ',                          // Query to insert the output of esc_url() into, replacing "{ESCAPE}"
+				'foo',                                 // Data to send to prepare()
+				true,                                  // Whether to expect an incorrect usage error or not
+				" {$wpdb->placeholder_escape()}s ",    // Expected output
+			),
+			array(
+				'foo%sbar',
+				"SELECT * FROM bar WHERE foo='{ESCAPE}' OR baz=%s",
+				array( ' SQLi -- -', 'pewpewpew' ),
+				true,
+				null,
+			),
+			array(
+				'%s',
+				' %s {ESCAPE} ',
+				'foo',
+				false,
+				" 'foo' {$wpdb->placeholder_escape()}s ",
+			),
+		);
+	}
+
+	/**
+	 * @expectedIncorrectUsage wpdb::prepare
+	 */
+	function test_double_prepare() {
+		global $wpdb;
+
+		$part = $wpdb->prepare( ' AND meta_value = %s', ' %s ' );
+		$this->assertNotContains( '%s', $part );
+		$query = $wpdb->prepare( 'SELECT * FROM {$wpdb->postmeta} WHERE meta_key = %s $part', array( 'foo', 'bar' ) );
+		$this->assertNull( $query );
+	}
+
+	function test_prepare_numeric_placeholders_float_args() {
+		global $wpdb;
+
+		$actual = $wpdb->prepare(
+			'WHERE second=%2$f AND first=%1$f',
+			1.1,
+			2.2
+		);
+
+		/* Floats can be right padded, need to assert differently */
+		$this->assertContains( ' first=1.1', $actual );
+		$this->assertContains( ' second=2.2', $actual );
+	}
+
+	function test_prepare_numeric_placeholders_float_array() {
+		global $wpdb;
+
+		$actual = $wpdb->prepare(
+			'WHERE second=%2$f AND first=%1$f',
+			array( 1.1, 2.2 )
+		);
+
+		/* Floats can be right padded, need to assert differently */
+		$this->assertContains( ' first=1.1', $actual );
+		$this->assertContains( ' second=2.2', $actual );
+	}
+
+	function test_query_unescapes_placeholders() {
+		global $wpdb;
+
+		$value = ' %s ';
+
+		$wpdb->query( "CREATE TABLE {$wpdb->prefix}test_placeholder( a VARCHAR(100) );" );
+		$sql = $wpdb->prepare( "INSERT INTO {$wpdb->prefix}test_placeholder VALUES(%s)", $value );
+		$wpdb->query( $sql );
+
+		$actual = $wpdb->get_var( "SELECT a FROM {$wpdb->prefix}test_placeholder" );
+
+		$wpdb->query( "DROP TABLE {$wpdb->prefix}test_placeholder" );
+
+		$this->assertNotContains( '%s', $sql );
+		$this->assertEquals( $value, $actual );
+	}
+
+	function test_esc_sql_with_unsupported_placeholder_type() {
+		global $wpdb;
+
+		$sql = $wpdb->prepare( ' %s %1$c ', 'foo' );
+		$sql = $wpdb->prepare( " $sql %s ", 'foo' );
+
+		$this->assertEquals( "  'foo' {$wpdb->placeholder_escape()}1\$c  'foo' ", $sql );
 	}
 
 	/**

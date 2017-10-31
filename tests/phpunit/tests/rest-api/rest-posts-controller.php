@@ -85,7 +85,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		global $wpdb;
 		$expected_clause = str_replace( '{posts}', $wpdb->posts, $pattern );
 		$this->assertCount( 1, $this->posts_clauses );
-		$this->assertEquals( $expected_clause, $this->posts_clauses[0][ $clause ] );
+		$this->assertEquals( $expected_clause, $wpdb->remove_placeholder_escape( $this->posts_clauses[0][ $clause ] ) );
 	}
 
 	public function assertPostsOrderedBy( $pattern ) {

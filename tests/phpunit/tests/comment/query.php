@@ -1218,22 +1218,24 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 	 * @ticket 35513
 	 */
 	public function test_search_int_0_should_not_be_ignored() {
+		global $wpdb;
 		$q = new WP_Comment_Query();
 		$q->query( array(
 			'search' => 0,
 		) );
-		$this->assertContains( "comment_author LIKE '%0%'", $q->request );
+		$this->assertContains( "comment_author LIKE '%0%'", $wpdb->remove_placeholder_escape( $q->request ) );
 	}
 
 	/**
 	 * @ticket 35513
 	 */
 	public function test_search_string_0_should_not_be_ignored() {
+		global $wpdb;
 		$q = new WP_Comment_Query();
 		$q->query( array(
 			'search' => '0',
 		) );
-		$this->assertContains( "comment_author LIKE '%0%'", $q->request );
+		$this->assertContains( "comment_author LIKE '%0%'", $wpdb->remove_placeholder_escape( $q->request ) );
 	}
 
 	public function test_orderby_default() {
