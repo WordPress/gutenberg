@@ -24,7 +24,15 @@ import inlineContentConverter from './inline-content-converter';
 import { deepFilterHTML, isInvalidInline, isNotWhitelisted, isPlain, isInline } from './utils';
 import showdown from 'showdown';
 
-export default function( { HTML, plainText, inline } ) {
+/**
+ * Converts an HTML string to known blocks. Strips everything else.
+ *
+ * @param  {String}       options.HTML        The HTML to convert.
+ * @param  {String}       [options.plainText] Plain text version.
+ * @param  {Boolean}      [options.inline]    Whether to content should be inline or not. Null to auto-detect, false to force blocks, true to force a string.
+ * @return {Array|String}                     A list of blocks or a string, depending on the `inline` option.
+ */
+export default function rawHandler( { HTML, plainText = '', inline = null } ) {
 	HTML = HTML.replace( /<meta[^>]+>/, '' );
 
 	// Block delimiters detected.
@@ -60,7 +68,7 @@ export default function( { HTML, plainText, inline } ) {
 	] );
 
 	// Inline paste.
-	if ( inline || isInlineContent( HTML ) ) {
+	if ( inline || ( inline === null && isInlineContent( HTML ) ) ) {
 		// Allows us to ask for this information when we get a report.
 		window.console.log( 'Processed inline HTML:\n\n', HTML );
 

@@ -1,4 +1,4 @@
-# Paste
+# Raw Handling (Paste)
 
 This folder contains all paste specific logic (filters, converters, normalisers...). Each module is tested on their own, and in addition we have some integration tests for frequently used editors.
 

@@ -22,6 +22,7 @@ import BlockInspectorButton from '../block-settings-menu/block-inspector-button'
 import BlockModeToggle from '../block-settings-menu/block-mode-toggle';
 import BlockDeleteButton from '../block-settings-menu/block-delete-button';
 import { getBlockMode, getSelectedBlock } from '../selectors';
+import UnknownConverter from '../block-settings-menu/unknown-converter';
 
 class BlockToolbar extends Component {
 	constructor() {
@@ -77,6 +78,7 @@ class BlockToolbar extends Component {
 							<BlockMover uids={ [ block.uid ] } />
 							<BlockInspectorButton small />
 							<BlockModeToggle uid={ block.uid } small />
+							<UnknownConverter uid={ block.uid } small />
 							<BlockDeleteButton uids={ [ block.uid ] } small />
 						</div>
 					}

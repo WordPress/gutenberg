@@ -28,7 +28,7 @@ import { keycodes } from '@wordpress/utils';
  * Internal dependencies
  */
 import './style.scss';
-import { pasteHandler } from '../api';
+import { rawHandler } from '../api';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
 import { pickAriaProps } from './aria';
@@ -248,7 +248,7 @@ export default class Editable extends Component {
 		window.console.log( 'Received HTML:\n\n', event.content );
 		window.console.log( 'Received plain text:\n\n', this.pastedPlainText );
 
-		const content = pasteHandler( {
+		const content = rawHandler( {
 			HTML: event.content,
 			plainText: this.pastedPlainText,
 			inline: ! this.props.onSplit,
