@@ -317,7 +317,7 @@ function gutenberg_can_edit_post_type( $post_type ) {
  */
 function gutenberg_post_has_blocks( $post ) {
 	$post = get_post( $post );
-	return $post && content_has_gutenberg_blocks( $post->post_content );
+	return $post && content_has_blocks( $post->post_content );
 }
 
 /**
@@ -328,7 +328,7 @@ function gutenberg_post_has_blocks( $post ) {
  * @param string $content Content to test.
  * @return bool Whether the content contains blocks.
  */
-function content_has_gutenberg_blocks( $content ) {
+function content_has_blocks( $content ) {
 	return false !== strpos( $content, '<!-- wp:' );
 }
 
