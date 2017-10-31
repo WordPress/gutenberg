@@ -185,7 +185,11 @@ class FormatToolbar extends Component {
 							<UrlInput value={ newLinkValue } onChange={ this.onChangeLinkValue } />
 							<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
 							<IconButton icon="editor-unlink" label={ __( 'Remove link' ) } onClick={ this.dropLink } />
-							<IconButton icon="admin-generic" onClick={ this.toggleLinkSettingsVisibility } aria-expanded={ settingsVisible } />
+							<IconButton
+								icon="admin-generic"
+								label={ __( 'Link Settings' ) }
+								onClick={ this.toggleLinkSettingsVisibility }
+								aria-expanded={ settingsVisible } />
 							{ linkSettings }
 						</form>
 					</Fill>
@@ -203,7 +207,11 @@ class FormatToolbar extends Component {
 							</a>
 							<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ this.editLink } />
 							<IconButton icon="editor-unlink" label={ __( 'Remove link' ) } onClick={ this.dropLink } />
-							<IconButton icon="admin-generic" onClick={ this.toggleLinkSettingsVisibility } aria-expanded={ settingsVisible } />
+							<IconButton
+								icon="admin-generic"
+								label={ __( 'Link Settings' ) }
+								onClick={ this.toggleLinkSettingsVisibility }
+								aria-expanded={ settingsVisible } />
 							{ linkSettings }
 						</div>
 					</Fill>
