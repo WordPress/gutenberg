@@ -61,12 +61,16 @@ function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, f
 }
 
 export default connect(
-	( state, ownProps ) => ( {
-		isFirst: isFirstBlock( state, first( ownProps.uids ) ),
-		isLast: isLastBlock( state, last( ownProps.uids ) ),
-		firstIndex: getBlockIndex( state, first( ownProps.uids ) ),
-		blockType: getBlockType( getBlock( state, first( ownProps.uids ) ).name ),
-	} ),
+	( state, ownProps ) => {
+		const block = getBlock( state, first( ownProps.uids ) );
+
+		return ( {
+			isFirst: isFirstBlock( state, first( ownProps.uids ) ),
+			isLast: isLastBlock( state, last( ownProps.uids ) ),
+			firstIndex: getBlockIndex( state, first( ownProps.uids ) ),
+			blockType: block ? getBlockType( block.name ) : null,
+		} );
+	},
 	( dispatch, ownProps ) => ( {
 		onMoveDown() {
 			if ( ownProps.uids.length === 1 ) {

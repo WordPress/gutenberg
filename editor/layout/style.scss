@@ -16,6 +16,7 @@
 .editor-layout__editor {
 	flex-basis: 100%;
 	overflow-y: auto;
+	-webkit-overflow-scrolling: touch;
 }
 
 .editor-layout .components-notice-list {
