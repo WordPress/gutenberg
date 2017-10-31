@@ -354,6 +354,9 @@ export class Autocomplete extends Component {
 		if ( ! this.node ) {
 			return;
 		}
+		// Disable reason: We need to add native event handlers because they must
+		// be able to cancel the event before TinyMCE's native event handler gets it.
+		// eslint-disable-next-line react/no-find-dom-node
 		const realNode = findDOMNode( this.node );
 		const handler = isListening ? 'addEventListener' : 'removeEventListener';
 		realNode[ handler ]( 'keydown', this.setSelectedIndex, true );
