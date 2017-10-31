@@ -462,12 +462,6 @@ function gutenberg_extend_wp_api_backbone_client() {
 				return model.prototype.route && route === model.prototype.route.index;
 			} );
 		};
-		wp.api.getPostTypeRevisionsCollection = function( postType ) {
-			var route = '/' + wpApiSettings.versionString + this.postTypeRestBaseMapping[ postType ] + '/(?P<parent>[\\\\d]+)/revisions';
-			return _.find( wp.api.collections, function( model ) {
-				return model.prototype.route && route === model.prototype.route.index;
-			} );
-		};
 		wp.api.getTaxonomyModel = function( taxonomy ) {
 			var route = '/' + wpApiSettings.versionString + this.taxonomyRestBaseMapping[ taxonomy ] + '/(?P<id>[\\\\d]+)';
 			return _.find( wp.api.models, function( model ) {
@@ -702,10 +696,6 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'/wp/v2/taxonomies?context=edit',
 		gutenberg_get_rest_link( $post_to_edit, 'about', 'edit' ),
 	);
-
-	if ( ! $is_new_post ) {
-		$preload_paths[] = gutenberg_get_rest_link( $post_to_edit, 'version-history' );
-	}
 
 	$preload_data = array_reduce(
 		$preload_paths,
