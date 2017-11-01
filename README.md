@@ -4,7 +4,7 @@
 
 Printing since 1440.
 
-![Text block](https://wpcoredesign.mystagingwebsite.com/gutenberg/gutenberg.png)
+![Gutenberg editing](https://cldup.com/H0oKBfpidk.png)
 
 This is the development hub for the <a href="https://make.wordpress.org/core/2017/01/04/focus-tech-and-design-leads/">editor focus in core</a>. Gutenberg is the project name. If you want the latest release for your WordPress, <a href="https://wordpress.org/plugins/gutenberg/">download Gutenberg from the WordPress.org plugins repository</a>. Conversations and discussions take place in #core-editor on <a href="https://make.wordpress.org/chat/">the core WordPress Slack</a>. This is our kickoff goal:
 
