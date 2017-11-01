@@ -73,6 +73,29 @@ export class PreviewButton extends Component {
 			'about:blank',
 			this.getWindowTarget()
 		);
+
+		const markup = `
+			<div>
+				<p>Please wait&hellip;</p>
+				<p>Generating preview.</p>
+			</div>
+			<style>
+				div {
+					display: flex;
+					flex-direction: column;
+					align-items: center;
+					justify-content: center;
+					height: 100vh;
+					width: 100vw;
+				}
+				p {
+					text-align: center;
+					font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+				}
+			</style>`;
+
+		this.previewWindow.document.write( markup );
+		this.previewWindow.document.close();
 	}
 
 	render() {
