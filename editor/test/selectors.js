@@ -76,16 +76,6 @@ import {
 } from '../selectors';
 
 describe( 'selectors', () => {
-	function getEditorState( states ) {
-		const past = [ ...states ];
-		const present = past.pop();
-
-		return {
-			...present,
-			history: { past, present },
-		};
-	}
-
 	beforeAll( () => {
 		registerBlockType( 'core/test-block', {
 			save: ( props ) => props.attributes.text,
@@ -96,7 +86,6 @@ describe( 'selectors', () => {
 
 	beforeEach( () => {
 		getDirtyMetaBoxes.clear();
-		isEditedPostDirty.clear();
 		getBlock.clear();
 		getBlocks.clear();
 		getEditedPostContent.clear();
@@ -478,312 +467,33 @@ describe( 'selectors', () => {
 			},
 		};
 
-		it( 'should return true when the post has edited attributes', () => {
+		it( 'should return true when post saved state dirty', () => {
 			const state = {
-				currentPost: {
-					title: '',
+				saveState: {
+					isDirty: true,
 				},
-				editor: getEditorState( [
-					{
-						edits: {
-							title: 'The Meat Eater\'s Guide to Delicious Meats',
-						},
-						blocksByUid: {},
-						blockOrder: [],
-					},
-				] ),
 				metaBoxes,
 			};
 
 			expect( isEditedPostDirty( state ) ).toBe( true );
 		} );
 
-		it( 'should return false when the post has no edited attributes and no past', () => {
+		it( 'should return false when post saved state not dirty', () => {
 			const state = {
-				currentPost: {
-					title: 'The Meat Eater\'s Guide to Delicious Meats',
+				saveState: {
+					isDirty: false,
 				},
-				editor: getEditorState( [
-					{
-						edits: {
-							title: 'The Meat Eater\'s Guide to Delicious Meats',
-						},
-						blocksByUid: {},
-						blockOrder: [],
-					},
-				] ),
 				metaBoxes,
 			};
 
 			expect( isEditedPostDirty( state ) ).toBe( false );
 		} );
 
-		it( 'should return false when the post has no edited attributes', () => {
+		it( 'should return true when post saved state not dirty, but meta box state has changed.', () => {
 			const state = {
-				currentPost: {
-					title: 'The Meat Eater\'s Guide to Delicious Meats',
+				saveState: {
+					isDirty: false,
 				},
-				editor: getEditorState( [
-					{
-						edits: {
-							title: 'The Meat Eater\'s Guide to Delicious Meats',
-						},
-						blocksByUid: {},
-						blockOrder: [],
-					},
-					{
-						edits: {
-							title: 'The Meat Eater\'s Guide to Delicious Meats',
-						},
-						blocksByUid: {
-							123: {
-								name: 'core/food',
-								attributes: { name: 'Chicken', delicious: false },
-							},
-						},
-						blockOrder: [
-							123,
-						],
-					},
-					{
-						edits: {
-							title: 'The Meat Eater\'s Guide to Delicious Meats',
-						},
-						blocksByUid: {},
-						blockOrder: [],
-					},
-				] ),
-				metaBoxes,
-			};
-
-			expect( isEditedPostDirty( state ) ).toBe( false );
-		} );
-
-		it( 'should return true when the post has edited block attributes', () => {
-			const state = {
-				currentPost: {
-					title: 'The Meat Eater\'s Guide to Delicious Meats',
-				},
-				editor: getEditorState( [
-					{
-						edits: {},
-						blocksByUid: {
-							123: {
-								name: 'core/food',
-								attributes: { name: 'Chicken', delicious: false },
-							},
-						},
-						blockOrder: [
-							123,
-						],
-					},
-					{
-						edits: {
-							title: 'The Meat Eater\'s Guide to Delicious Meats',
-						},
-						blocksByUid: {
-							123: {
-								name: 'core/food',
-								attributes: { name: 'Chicken', delicious: true },
-							},
-						},
-						blockOrder: [
-							123,
-						],
-					},
-				] ),
-				metaBoxes,
-			};
-
-			expect( isEditedPostDirty( state ) ).toBe( true );
-		} );
-
-		it( 'should return true when the post has new blocks', () => {
-			const state = {
-				currentPost: {
-					title: 'The Meat Eater\'s Guide to Delicious Meats',
-				},
-				editor: getEditorState( [
-					{
-						edits: {},
-						blocksByUid: {
-							123: {
-								name: 'core/food',
-								attributes: { name: 'Chicken', delicious: true },
-							},
-						},
-						blockOrder: [
-							123,
-							456,
-						],
-					},
-					{
-						edits: {
-							title: 'The Meat Eater\'s Guide to Delicious Meats',
-						},
-						blocksByUid: {
-							123: {
-								name: 'core/food',
-								attributes: { name: 'Chicken', delicious: true },
-							},
-							456: {
-								name: 'core/food',
-								attributes: { name: 'Ribs', delicious: true },
-							},
-						},
-						blockOrder: [
-							123,
-							456,
-						],
-					},
-				] ),
-				metaBoxes,
-			};
-
-			expect( isEditedPostDirty( state ) ).toBe( true );
-		} );
-
-		it( 'should return true when the post has changed block order', () => {
-			const state = {
-				currentPost: {
-					title: 'The Meat Eater\'s Guide to Delicious Meats',
-				},
-				editor: getEditorState( [
-					{
-						edits: {},
-						blocksByUid: {
-							123: {
-								name: 'core/food',
-								attributes: { name: 'Chicken', delicious: true },
-							},
-							456: {
-								name: 'core/food',
-								attributes: { name: 'Ribs', delicious: true },
-							},
-						},
-						blockOrder: [
-							123,
-							456,
-						],
-					},
-					{
-						edits: {
-							title: 'The Meat Eater\'s Guide to Delicious Meats',
-						},
-						blocksByUid: {
-							123: {
-								name: 'core/food',
-								attributes: { name: 'Chicken', delicious: true },
-							},
-							456: {
-								name: 'core/food',
-								attributes: { name: 'Ribs', delicious: true },
-							},
-						},
-						blockOrder: [
-							456,
-							123,
-						],
-					},
-				] ),
-				metaBoxes,
-			};
-
-			expect( isEditedPostDirty( state ) ).toBe( true );
-		} );
-
-		it( 'should return false when no edits, no changed block attributes, no changed order', () => {
-			const state = {
-				currentPost: {
-					title: 'The Meat Eater\'s Guide to Delicious Meats',
-				},
-				editor: getEditorState( [
-					{
-						edits: {},
-						blocksByUid: {
-							123: {
-								name: 'core/food',
-								attributes: { name: 'Chicken', delicious: true },
-							},
-							456: {
-								name: 'core/food',
-								attributes: { name: 'Ribs', delicious: true },
-							},
-						},
-						blockOrder: [
-							456,
-							123,
-						],
-					},
-					{
-						edits: {
-							title: 'The Meat Eater\'s Guide to Delicious Meats',
-						},
-						blocksByUid: {
-							123: {
-								name: 'core/food',
-								attributes: { name: 'Chicken', delicious: true },
-							},
-							456: {
-								name: 'core/food',
-								attributes: { name: 'Ribs', delicious: true },
-							},
-						},
-						blockOrder: [
-							456,
-							123,
-						],
-					},
-				] ),
-				metaBoxes,
-			};
-
-			expect( isEditedPostDirty( state ) ).toBe( false );
-		} );
-
-		it( 'should return true when no edits, no changed block attributes, no changed order, but meta box state has changed.', () => {
-			const state = {
-				currentPost: {
-					title: 'The Meat Eater\'s Guide to Delicious Meats',
-				},
-				editor: getEditorState( [
-					{
-						edits: {},
-						blocksByUid: {
-							123: {
-								name: 'core/food',
-								attributes: { name: 'Chicken', delicious: true },
-							},
-							456: {
-								name: 'core/food',
-								attributes: { name: 'Ribs', delicious: true },
-							},
-						},
-						blockOrder: [
-							456,
-							123,
-						],
-					},
-					{
-						edits: {
-							title: 'The Meat Eater\'s Guide to Delicious Meats',
-						},
-						blocksByUid: {
-							123: {
-								name: 'core/food',
-								attributes: { name: 'Chicken', delicious: true },
-							},
-							456: {
-								name: 'core/food',
-								attributes: { name: 'Ribs', delicious: true },
-							},
-						},
-						blockOrder: [
-							456,
-							123,
-						],
-					},
-				] ),
 				metaBoxes: dirtyMetaBoxes,
 			};
 
@@ -796,11 +506,9 @@ describe( 'selectors', () => {
 
 		it( 'should return true when the post is not dirty and has not been saved before', () => {
 			const state = {
-				editor: getEditorState( [
-					{
-						edits: {},
-					},
-				] ),
+				saveState: {
+					isDirty: false,
+				},
 				currentPost: {
 					id: 1,
 					status: 'auto-draft',
@@ -813,11 +521,9 @@ describe( 'selectors', () => {
 
 		it( 'should return false when the post is not dirty but the post has been saved', () => {
 			const state = {
-				editor: getEditorState( [
-					{
-						edits: {},
-					},
-				] ),
+				saveState: {
+					isDirty: false,
+				},
 				currentPost: {
 					id: 1,
 					status: 'draft',
@@ -830,14 +536,9 @@ describe( 'selectors', () => {
 
 		it( 'should return false when the post is dirty but the post has not been saved', () => {
 			const state = {
-				editor: getEditorState( [
-					{
-						edits: {},
-					},
-					{
-						edits: { title: 'Dirty' },
-					},
-				] ),
+				saveState: {
+					isDirty: true,
+				},
 				currentPost: {
 					id: 1,
 					status: 'auto-draft',
@@ -977,15 +678,16 @@ describe( 'selectors', () => {
 		const metaBoxes = { isDirty: false, isUpdating: false };
 		it( 'should return current title unedited existing post', () => {
 			const state = {
+				saveState: {
+					isDirty: false,
+				},
 				currentPost: {
 					id: 123,
 					title: 'The Title',
 				},
-				editor: getEditorState( [
-					{
-						edits: {},
-					},
-				] ),
+				editor: {
+					edits: {},
+				},
 				metaBoxes,
 			};
 
@@ -998,14 +700,11 @@ describe( 'selectors', () => {
 					id: 123,
 					title: 'The Title',
 				},
-				editor: getEditorState( [
-					{
-						edits: {},
+				editor: {
+					edits: {
+						title: 'Modified Title',
 					},
-					{
-						edits: { title: 'Modified Title' },
-					},
-				] ),
+				},
 				metaBoxes,
 			};
 
@@ -1014,16 +713,17 @@ describe( 'selectors', () => {
 
 		it( 'should return new post title when new post is clean', () => {
 			const state = {
+				saveState: {
+					isDirty: false,
+				},
 				currentPost: {
 					id: 1,
 					status: 'auto-draft',
 					title: '',
 				},
-				editor: getEditorState( [
-					{
-						edits: {},
-					},
-				] ),
+				editor: {
+					edits: {},
+				},
 				metaBoxes,
 			};
 
@@ -1032,16 +732,17 @@ describe( 'selectors', () => {
 
 		it( 'should return untitled title', () => {
 			const state = {
+				saveState: {
+					isDirty: true,
+				},
 				currentPost: {
 					id: 123,
 					status: 'draft',
 					title: '',
 				},
-				editor: getEditorState( [
-					{
-						edits: {},
-					},
-				] ),
+				editor: {
+					edits: {},
+				},
 				metaBoxes,
 			};
 
@@ -1184,14 +885,12 @@ describe( 'selectors', () => {
 
 		it( 'should return true for pending posts', () => {
 			const state = {
+				saveState: {
+					isDirty: false,
+				},
 				currentPost: {
 					status: 'pending',
 				},
-				editor: getEditorState( [
-					{
-						edits: {},
-					},
-				] ),
 				metaBoxes,
 			};
 
@@ -1200,14 +899,12 @@ describe( 'selectors', () => {
 
 		it( 'should return true for draft posts', () => {
 			const state = {
+				saveState: {
+					isDirty: false,
+				},
 				currentPost: {
 					status: 'draft',
 				},
-				editor: getEditorState( [
-					{
-						edits: {},
-					},
-				] ),
 				metaBoxes,
 			};
 
@@ -1216,30 +913,40 @@ describe( 'selectors', () => {
 
 		it( 'should return false for published posts', () => {
 			const state = {
+				saveState: {
+					isDirty: false,
+				},
 				currentPost: {
 					status: 'publish',
 				},
-				editor: getEditorState( [
-					{
-						edits: {},
-					},
-				] ),
 				metaBoxes,
 			};
 
 			expect( isEditedPostPublishable( state ) ).toBe( false );
 		} );
 
+		it( 'should return true for published, dirty posts', () => {
+			const state = {
+				saveState: {
+					isDirty: true,
+				},
+				currentPost: {
+					status: 'publish',
+				},
+				metaBoxes,
+			};
+
+			expect( isEditedPostPublishable( state ) ).toBe( true );
+		} );
+
 		it( 'should return false for private posts', () => {
 			const state = {
+				saveState: {
+					isDirty: false,
+				},
 				currentPost: {
 					status: 'private',
 				},
-				editor: getEditorState( [
-					{
-						edits: {},
-					},
-				] ),
 				metaBoxes,
 			};
 
@@ -1248,14 +955,12 @@ describe( 'selectors', () => {
 
 		it( 'should return false for scheduled posts', () => {
 			const state = {
-				currentPost: {
-					status: 'private',
+				saveState: {
+					isDirty: false,
 				},
-				editor: getEditorState( [
-					{
-						edits: {},
-					},
-				] ),
+				currentPost: {
+					status: 'future',
+				},
 				metaBoxes,
 			};
 
@@ -1264,17 +969,15 @@ describe( 'selectors', () => {
 
 		it( 'should return true for dirty posts with usable title', () => {
 			const state = {
+				saveState: {
+					isDirty: true,
+				},
 				currentPost: {
 					status: 'private',
 				},
-				editor: getEditorState( [
-					{
-						edits: {},
-					},
-					{
-						edits: { title: 'Dirty' },
-					},
-				] ),
+				editor: {
+					edits: { title: 'Dirty' },
+				},
 				metaBoxes,
 			};
 

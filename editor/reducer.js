@@ -28,6 +28,7 @@ import { getBlockTypes, getBlockType } from '@wordpress/blocks';
  */
 import { combineUndoableReducers } from './utils/undoable-reducer';
 import { STORE_DEFAULTS } from './store-defaults';
+import saveState from './state/save-state';
 
 /***
  * Module constants
@@ -658,4 +659,5 @@ export default optimist( combineReducers( {
 	saving,
 	notices,
 	metaBoxes,
+	saveState,
 } ) );

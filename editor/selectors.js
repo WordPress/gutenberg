@@ -6,10 +6,8 @@ import {
 	first,
 	get,
 	has,
-	isEqual,
 	last,
 	reduce,
-	some,
 	keys,
 	without,
 	compact,
@@ -181,49 +179,9 @@ export function isEditedPostNew( state ) {
  * @param  {Object}  state Global application state
  * @return {Boolean}       Whether unsaved values exist
  */
-export const isEditedPostDirty = createSelector(
-	( state ) => {
-		const edits = getPostEdits( state );
-		const currentPost = getCurrentPost( state );
-		const hasEditedAttributes = some( edits, ( value, key ) => {
-			return ! isEqual( value, currentPost[ key ] );
-		} );
-
-		if ( hasEditedAttributes ) {
-			return true;
-		}
-
-		if ( isMetaBoxStateDirty( state ) ) {
-			return true;
-		}
-
-		// This is a cheaper operation that still must occur after checking
-		// attributes, because a post initialized with attributes different
-		// from its saved copy should be considered dirty.
-		if ( ! hasEditorUndo( state ) ) {
-			return false;
-		}
-
-		// Check whether there are differences between editor from its original
-		// state (when history was last reset) and currently. Any difference in
-		// attributes, block type, order should consistute needing save.
-		const { history } = state.editor;
-		const originalEditor = history.past[ 0 ];
-		const currentEditor = history.present;
-		return some( [
-			'blocksByUid',
-			'blockOrder',
-		], ( key ) => ! isEqual(
-			originalEditor[ key ],
-			currentEditor[ key ]
-		) );
-	},
-	( state ) => [
-		state.editor,
-		state.currentPost,
-		state.metaBoxes,
-	]
-);
+export function isEditedPostDirty( state ) {
+	return state.saveState.isDirty || isMetaBoxStateDirty( state );
+}
 
 /**
  * Returns true if there are no unsaved values for the current edit session and if
