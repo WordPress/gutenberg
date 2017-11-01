@@ -91,7 +91,7 @@ export function isVerticalEdge( container, isReverse, collapseRanges = false ) {
 
 	const selection = window.getSelection();
 	let range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
-	if ( collapseRanges && ! range.collapsed ) {
+	if ( collapseRanges && range && ! range.collapsed ) {
 		const newRange = document.createRange();
 		// Get the end point of the selection (see focusNode vs. anchorNode)
 		newRange.setStart( selection.focusNode, selection.focusOffset );
