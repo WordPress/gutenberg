@@ -39,7 +39,7 @@ As we thought about these uses and how to make them obvious and consistent, we b
 
 Our goal with Gutenberg is not just to create a seamless post- and page-building experience. We also want to ensure that it provides a seamless writing experience. Though individual paragraphs of text will become their own “blocks,” the creation and editing of these blocks are being designed in a way that could be just as simple—if not more so—than the current WordPress editor experience. Here is a brief animation illustrating the Gutenberg writing experience:
 
-![Typing](https://make.wordpress.org/core/files/2017/08/typing.gif)
+![Typing](https://make.wordpress.org/core/files/2017/10/gutenberg-typing-1_6.gif)
 
 ## Is Gutenberg built on top of TinyMCE?
 
