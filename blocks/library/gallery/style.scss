@@ -1,4 +1,6 @@
 .wp-block-gallery,
+.wp-block-gallery.alignleft,
+.wp-block-gallery.alignright,
 .wp-block-gallery.aligncenter {
 	display: flex;
 	flex-wrap: wrap;
