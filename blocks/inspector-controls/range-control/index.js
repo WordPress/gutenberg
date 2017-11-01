@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
 import BaseControl from './../base-control';
 import './style.scss';
 
-function RangeControl( { label, value, instanceId, onChange, beforeIcon, afterIcon, help, allowReset, ...props } ) {
+function RangeControl( { label, value, instanceId, onChange, beforeIcon, afterIcon, help, allowReset, units, ...props } ) {
 	const id = 'inspector-range-control-' + instanceId;
 	const onChangeValue = ( event ) => onChange( Number( event.target.value ) );
 
@@ -33,6 +33,7 @@ function RangeControl( { label, value, instanceId, onChange, beforeIcon, afterIc
 				value={ value }
 				{ ...props }
 			/>
+			{ units }
 			{ allowReset &&
 				<Button onClick={ () => onChange() } disabled={ value === undefined }>
 					{ __( 'Reset' ) }

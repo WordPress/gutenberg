@@ -37,6 +37,22 @@ describe( 'sources', () => {
 		} );
 	} );
 
+	describe( 'childrenFirstMatch()', () => {
+		it( 'should return a source function', () => {
+			const source = sources.childrenFirstMatch();
+
+			expect( typeof source ).toBe( 'function' );
+		} );
+
+		it( 'should return HTML equivalent WPElement of the first selector that matches', () => {
+			const html = '<p><span><b>I am the content.</b></span></p>';
+			const selectors = [ 'p > div', 'p > span', 'p' ];
+			const match = parse( html, sources.childrenFirstMatch( selectors ) );
+
+			expect( renderToString( match ) ).toBe( '<b>I am the content.</b>' );
+		} );
+	} );
+
 	describe( 'node()', () => {
 		it( 'should return a source function', () => {
 			const source = sources.node();
