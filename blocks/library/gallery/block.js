@@ -65,8 +65,11 @@ class GalleryBlock extends Component {
 
 	onRemoveImage( index ) {
 		return () => {
+			const images = filter( this.props.attributes.images, ( img, i ) => index !== i );
+			const { columns } = this.props.attributes;
 			this.props.setAttributes( {
-				images: filter( this.props.attributes.images, ( img, i ) => index !== i ),
+				images,
+				columns: columns ? Math.min( images.length, columns ) : columns,
 			} );
 		};
 	}
