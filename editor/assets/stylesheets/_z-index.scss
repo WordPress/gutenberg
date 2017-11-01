@@ -29,7 +29,7 @@ $z-layers: (
 
 	// Show sidebar above wp-admin navigation bar for mobile viewports:
 	// #wpadminbar { z-index: 99999 }
-	'.editor-sidebar': 100000,
+	'.components-foldable-sidebar': 100000,
 
 	// Show notices below expanded wp-admin submenus:
 	// #adminmenuwrap { z-index: 9990 }

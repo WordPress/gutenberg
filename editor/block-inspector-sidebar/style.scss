@@ -1,0 +1,10 @@
+.editor-block-inspector-sidebar {
+	div.components-toolbar {
+		box-shadow: none;
+		margin-bottom: 1.5em;
+	}
+
+	p + div.components-toolbar {
+		margin-top: -1em;
+	}
+}

@@ -15,7 +15,9 @@ import { __ } from '@wordpress/i18n';
  */
 import './style.scss';
 import Header from '../header';
-import Sidebar from '../sidebar';
+import PostSettingsSidebar from '../post-settings-sidebar';
+import PostPublishSidebar from '../post-publish-sidebar';
+import BlockInspectorSidebar from '../block-inspector-sidebar';
 import TextEditor from '../modes/text-editor';
 import VisualEditor from '../modes/visual-editor';
 import UnsavedChangesWarning from '../unsaved-changes-warning';
@@ -25,14 +27,11 @@ import { removeNotice } from '../actions';
 import MetaBoxes from '../meta-boxes';
 import {
 	getEditorMode,
-	isEditorSidebarOpened,
 	getNotices,
 } from '../selectors';
 
-function Layout( { mode, isSidebarOpened, notices, ...props } ) {
-	const className = classnames( 'editor-layout', {
-		'is-sidebar-opened': isSidebarOpened,
-	} );
+function Layout( { mode, notices, ...props } ) {
+	const className = classnames( 'editor-layout' );
 
 	return (
 		<div className={ className }>
@@ -50,7 +49,9 @@ function Layout( { mode, isSidebarOpened, notices, ...props } ) {
 					<MetaBoxes location="normal" />
 				</div>
 			</div>
-			{ isSidebarOpened && <Sidebar /> }
+			<PostSettingsSidebar />
+			<PostPublishSidebar />
+			<BlockInspectorSidebar />
 			<Popover.Slot />
 		</div>
 	);
@@ -59,7 +60,6 @@ function Layout( { mode, isSidebarOpened, notices, ...props } ) {
 export default connect(
 	( state ) => ( {
 		mode: getEditorMode( state ),
-		isSidebarOpened: isEditorSidebarOpened( state ),
 		notices: getNotices( state ),
 	} ),
 	{ removeNotice }

@@ -13,28 +13,19 @@ import { IconButton } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { isEditorSidebarOpened } from '../selectors';
-import { toggleSidebar, setActivePanel } from '../actions';
+import { setActivePanel } from '../actions';
 
 export function BlockInspectorButton( {
-	isSidebarOpened,
-	onToggleSidebar,
 	onShowInspector,
 	onClick = noop,
 	small = false,
 } ) {
-	const toggleInspector = () => {
-		onShowInspector();
-		if ( ! isSidebarOpened ) {
-			onToggleSidebar();
-		}
-	};
 	const label = __( 'Settings' );
 
 	return (
 		<IconButton
 			className="editor-block-settings-menu__control"
-			onClick={ flow( toggleInspector, onClick ) }
+			onClick={ flow( onShowInspector, onClick ) }
 			icon="admin-generic"
 			label={ small ? label : undefined }
 		>
@@ -44,15 +35,8 @@ export function BlockInspectorButton( {
 }
 
 export default connect(
-	( state ) => ( {
-		isSidebarOpened: isEditorSidebarOpened( state ),
-	} ),
-	( dispatch ) => ( {
-		onShowInspector() {
-			dispatch( setActivePanel( 'block' ) );
-		},
-		onToggleSidebar() {
-			dispatch( toggleSidebar() );
-		},
-	} )
+	undefined,
+	{
+		onShowInspector: () => setActivePanel( 'block' ),
+	},
 )( BlockInspectorButton );

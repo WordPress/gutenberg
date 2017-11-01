@@ -1,7 +1,7 @@
 .editor-sidebar {
 	position: fixed;
 	z-index: z-index( '.editor-sidebar' );
-	top: 0;
+	top: $admin-bar-height-big;
 	right: 0;
 	bottom: 0;
 	width: $sidebar-width;
@@ -11,16 +11,18 @@
 	height: 100vh;
 	overflow: hidden;
 
+	/* Sidebar covers screen on mobile */
+	width: 100%;
+
 	@include break-small() {
-		top: $admin-bar-height-big + $header-height;
-		z-index: auto;
 		height: auto;
 		overflow: auto;
 		-webkit-overflow-scrolling: touch;
 	}
 
 	@include break-medium() {
-		top: $admin-bar-height + $header-height;
+		top: $admin-bar-height;
+		width: $sidebar-width;
 	}
 
 	> .components-panel {
@@ -82,28 +84,6 @@
 	}
 }
 
-/* Visual and Text editor both */
-.editor-layout.is-sidebar-opened .editor-layout__content {
-	@include break-medium() {
-		margin-right: $sidebar-width;
-	}
-}
-
-.editor-layout.is-sidebar-opened .editor-sidebar {
-	/* Sidebar covers screen on mobile */
-	width: 100%;
-
-	/* Sidebar sits on the side on larger breakpoints */
-	@include break-medium() {
-		width: $sidebar-width;
-	}
-}
-
-/* Text Editor specific */
-.editor-layout.is-sidebar-opened .editor-text-editor__formatting {
-	margin-right: $sidebar-width;
-}
-
 .components-panel__header.editor-sidebar__panel-tabs {
 	justify-content: flex-start;
 	padding-left: 0;
@@ -120,8 +100,8 @@
 	border: none;
 	border-bottom: 3px solid transparent;
 	cursor: pointer;
-	height: 50px;
-	line-height: 50px;
+	height: 56px;
+	line-height: 56px;
 	padding: 0 20px;
 	margin-left: 0;
 	font-weight: 400;

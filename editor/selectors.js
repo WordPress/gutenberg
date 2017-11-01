@@ -121,16 +121,6 @@ export function getPreference( state, preferenceKey, defaultValue ) {
 }
 
 /**
- * Returns true if the editor sidebar is open, or false otherwise.
- *
- * @param  {Object}  state Global application state
- * @return {Boolean}       Whether sidebar is open
- */
-export function isEditorSidebarOpened( state ) {
-	return getPreference( state, 'isSidebarOpened' );
-}
-
-/**
  * Returns true if the editor sidebar panel is open, or false otherwise.
  *
  * @param  {Object}  state Global application state

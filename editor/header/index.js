@@ -14,14 +14,14 @@ import { IconButton } from '@wordpress/components';
  */
 import './style.scss';
 import SavedState from './saved-state';
-import PublishWithDropdown from './publish-with-dropdown';
+import PublishToggle from './publish-toggle';
 import PreviewButton from './preview-button';
 import ModeSwitcher from './mode-switcher';
 import HeaderToolbar from './header-toolbar';
-import { isEditorSidebarOpened } from '../selectors';
-import { toggleSidebar } from '../actions';
+import { getActivePanel } from '../selectors';
+import { setActivePanel } from '../actions';
 
-function Header( { onToggleSidebar, isSidebarOpened } ) {
+function Header( { panel, closeSidebar, showPostSettings } ) {
 	return (
 		<div
 			role="region"
@@ -33,11 +33,11 @@ function Header( { onToggleSidebar, isSidebarOpened } ) {
 			<div className="editor-header__settings">
 				<SavedState />
 				<PreviewButton />
-				<PublishWithDropdown />
+				<PublishToggle />
 				<IconButton
 					icon="admin-generic"
-					onClick={ onToggleSidebar }
-					isToggled={ isSidebarOpened }
+					onClick={ panel === 'document' ? closeSidebar : showPostSettings }
+					isToggled={ panel === 'document' }
 					label={ __( 'Settings' ) }
 				/>
 				<ModeSwitcher />
@@ -48,9 +48,10 @@ function Header( { onToggleSidebar, isSidebarOpened } ) {
 
 export default connect(
 	( state ) => ( {
-		isSidebarOpened: isEditorSidebarOpened( state ),
+		panel: getActivePanel( state ),
 	} ),
-	( dispatch ) => ( {
-		onToggleSidebar: () => dispatch( toggleSidebar() ),
-	} )
+	{
+		closeSidebar: () => setActivePanel( null ),
+		showPostSettings: () => setActivePanel( 'document' ),
+	}
 )( Header );

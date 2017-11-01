@@ -22,17 +22,6 @@
 	border-bottom: 1px solid $light-gray-500;
 	min-height: $stacked-toolbar-height;
 
-	.is-sidebar-opened & {
-		display: none;
-	}
-
-	@include break-medium {
-		.is-sidebar-opened & {
-			display: block;
-			right: $sidebar-width;
-		}
-	}
-
 	// merge toolbars after this breakpoint
 	@include break-large {	// we should try and lower this breakpoint through an ellipsis overflow feature
 		padding-left: $item-spacing;
@@ -42,9 +31,5 @@
 		background: none;
 		border-bottom: none;
 		min-height: auto;
-
-		.is-sidebar-opened & {
-			right: auto;
-		}
 	}
 }

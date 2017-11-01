@@ -15,7 +15,6 @@ import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import {
 	getEditorMode,
 	getPreference,
-	isEditorSidebarOpened,
 	isEditorSidebarPanelOpened,
 	hasEditorUndo,
 	hasEditorRedo,
@@ -323,28 +322,10 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'isEditorSidebarOpened', () => {
-		it( 'should return true when the sidebar is opened', () => {
-			const state = {
-				preferences: { isSidebarOpened: true },
-			};
-
-			expect( isEditorSidebarOpened( state ) ).toBe( true );
-		} );
-
-		it( 'should return false when the sidebar is opened', () => {
-			const state = {
-				preferences: { isSidebarOpened: false },
-			};
-
-			expect( isEditorSidebarOpened( state ) ).toBe( false );
-		} );
-	} );
-
 	describe( 'isEditorSidebarPanelOpened', () => {
 		it( 'should return false if no panels preference', () => {
 			const state = {
-				preferences: { isSidebarOpened: true },
+				preferences: {},
 			};
 
 			expect( isEditorSidebarPanelOpened( state, 'post-taxonomies' ) ).toBe( false );
