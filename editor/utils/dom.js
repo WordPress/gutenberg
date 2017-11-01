@@ -303,12 +303,3 @@ export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScro
 	selection.removeAllRanges();
 	selection.addRange( range );
 }
-
-/**
- * Checks whether the user is on MacOS or not
- *
- * @return {Boolean}           Is Mac or Not
- */
-export function isMac() {
-	return window.navigator.platform.toLowerCase().indexOf( 'mac' ) !== -1;
-}
