@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isBoolean, noop } from 'lodash';
+import { isBoolean } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -63,7 +63,9 @@ export default class LinkEditor extends Component {
 			newLinkValue: this.props.linkValue,
 			isEditing: true,
 		} );
-		( this.props.onEdit || noop )();
+		if ( this.props.onEdit ) {
+			this.props.onEdit();
+		}
 	}
 
 	dropClicked() {
