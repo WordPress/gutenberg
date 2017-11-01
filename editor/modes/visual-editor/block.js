@@ -321,7 +321,7 @@ class VisualEditorBlock extends Component {
 
 		// Generate the wrapper class names handling the different states of the block.
 		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected, focus } = this.props;
-		const showUI = isSelected && ( ! this.props.isTyping || focus.collapsed === false );
+		const showUI = isSelected && ( ! this.props.isTyping || ( focus && focus.collapsed === false ) );
 		const isProperlyHovered = isHovered && ! this.props.isSelecting;
 		const { error } = this.state;
 		const wrapperClassName = classnames( 'editor-visual-editor__block', {
