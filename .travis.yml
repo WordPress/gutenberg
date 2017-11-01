@@ -19,7 +19,7 @@ cache:
     - $HOME/.phpbrew
 
 before_install:
-  - nvm install 6.11.1 && nvm use 6.11.1
+  - nvm install && nvm use
   - npm install --global npm@5
 
 jobs:
