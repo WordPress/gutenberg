@@ -26,6 +26,7 @@ export { default as Popover } from './popover';
 export { default as ResponsiveWrapper } from './responsive-wrapper';
 export { default as SandBox } from './sandbox';
 export { default as Spinner } from './spinner';
+export { default as TabPanel } from './tab-panel';
 export { default as Toolbar } from './toolbar';
 export { default as Tooltip } from './tooltip';
 export { Slot, Fill, Provider as SlotFillProvider } from './slot-fill';
