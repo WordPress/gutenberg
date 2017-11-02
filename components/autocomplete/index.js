@@ -391,7 +391,7 @@ export class Autocomplete extends Component {
 				<Popover
 					isOpen={ isExpanded }
 					focusOnOpen={ false }
-					onClose={ () => this.reset() }
+					onClose={ this.reset }
 					position="top right"
 					className={ classes }
 					range={ range }
