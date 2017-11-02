@@ -885,7 +885,14 @@ describe( 'state', () => {
 		it( 'should apply all defaults', () => {
 			const state = preferences( undefined, {} );
 
-			expect( state ).toEqual( { blockUsage: {}, recentlyUsedBlocks: [], mode: 'visual', isSidebarOpened: true, panels: { 'post-status': true } } );
+			expect( state ).toEqual( {
+				blockUsage: {},
+				recentlyUsedBlocks: [],
+				mode: 'visual',
+				isSidebarOpened: true,
+				panels: { 'post-status': true },
+				features: { fixedToolbar: true },
+			} );
 		} );
 
 		it( 'should toggle the sidebar open flag', () => {
@@ -993,6 +1000,14 @@ describe( 'state', () => {
 				type: 'SETUP_EDITOR',
 			} );
 			expect( state.blockUsage ).toEqual( { 'core-embed/youtube': 88 } );
+		} );
+
+		it( 'should toggle a feature flag', () => {
+			const state = preferences( deepFreeze( { features: { chicken: true } } ), {
+				type: 'TOGGLE_FEATURE',
+				feature: 'chicken',
+			} );
+			expect( state ).toEqual( { features: { chicken: false } } );
 		} );
 	} );
 

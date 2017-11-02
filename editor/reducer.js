@@ -33,9 +33,6 @@ import { STORE_DEFAULTS } from './store-defaults';
  * Module constants
  */
 const MAX_RECENT_BLOCKS = 8;
-const DEFAULT_FEATURES = {
-	fixedToolbar: true,
-};
 
 /**
  * Returns a post attribute value, flattening nested rendered content using its
@@ -513,6 +510,14 @@ export function preferences( state = STORE_DEFAULTS.preferences, action ) {
 					.slice( 0, MAX_RECENT_BLOCKS ),
 				blockUsage: filterInvalidBlocksFromObject( state.blockUsage ),
 			};
+		case 'TOGGLE_FEATURE':
+			return {
+				...state,
+				features: {
+					...state.features,
+					[ action.feature ]: ! state.features[ action.feature ],
+				},
+			};
 	}
 
 	return state;
@@ -640,24 +645,6 @@ export function metaBoxes( state = defaultMetaBoxState, action ) {
 	}
 }
 
-/**
- * Reducer keeping track of the enabled features hidden behind a flag
- *
- * @param  {Object} state  Current state
- * @param  {Object} action Dispatched action
- * @return {Object}        Updated state
- */
-export function features( state = DEFAULT_FEATURES, action ) {
-	if ( action.type === 'TOGGLE_FEATURE' ) {
-		return {
-			...state,
-			[ action.feature ]: ! state[ action.feature ],
-		};
-	}
-
-	return state;
-}
-
 export default optimist( combineReducers( {
 	editor,
 	currentPost,
@@ -671,5 +658,4 @@ export default optimist( combineReducers( {
 	saving,
 	notices,
 	metaBoxes,
-	features,
 } ) );

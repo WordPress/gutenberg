@@ -1060,5 +1060,5 @@ export const getMostFrequentlyUsedBlocks = createSelector(
  * @return {Booleean}         Is active
  */
 export function isFeatureActive( state, feature ) {
-	return !! state.features[ feature ];
+	return !! state.preferences.features[ feature ];
 }
