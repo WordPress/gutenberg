@@ -71,35 +71,72 @@ export function calculateMode( navigation ) {
 			};
 
 		case 'grid': {
-			const gridConfig = { cycle: true, deep: false, widget: false, width: 1, ...navigation };
+			const gridConfig = { deep: false, widget: false, width: 1, ...navigation };
+			const { width } = gridConfig;
+
+			const getCoords = ( index ) => {
+				const column = index % width;
+				const row = Math.floor( index / width );
+				return { column, row };
+			};
+
+			const toIndex = ( coord ) => {
+				return ( coord.row * width ) + coord.column;
+			};
+
+			const getColumnsInRow = ( row, total ) => {
+				// All but the last row will have the full number of columns (width)
+				const lastCoord = getCoords( total - 1 );
+				return row === lastCoord.row ? lastCoord.column + 1 : width;
+			};
+
+			const moveHorizontally = ( index, total, movement ) => {
+				const coord = getCoords( index );
+				const newColumn = movement( coord );
+				return toIndex( { column: newColumn, row: coord.row } );
+			};
+
+			const moveVertically = ( index, total, movement, fallback ) => {
+				const coord = getCoords( index );
+				const lastCoord = getCoords( total - 1 );
+				// Two edge conditions, pressing up in an irregular grid, and cycling.
+				const nextPossibleRow = movement( coord, lastCoord );
+				const columnsInNextRow = getColumnsInRow( nextPossibleRow, total );
+				const nextRow = coord.column >= columnsInNextRow ? fallback( nextPossibleRow ) : nextPossibleRow;
+				return toIndex( { column: coord.column, row: nextRow } );
+			};
+
 			return {
 				...pick( gridConfig, [ 'deep', 'widget', 'initialSelector' ] ),
 				useTabstops: false,
 				detect: ( event ) => {
 					const { keyCode } = event;
-					const { width } = gridConfig;
-
 					switch ( keyCode ) {
 						case LEFT:
-							return ( index/*, total */ ) => {
-								const offset = index % width === 0 ? width - 1 : -1;
-								return index + offset;
+							return ( index, total ) => {
+								const movement = ( coord ) => coord.column === 0 ? getColumnsInRow( coord.row, total ) - 1 : coord.column - 1;
+								return moveHorizontally( index, total, movement );
 							};
 						case RIGHT:
-							return ( index/*, total */ ) => {
-								// If at end, switch back to start.
-								const offset = index % width === width - 1 ? -width + 1 : +1;
-								return index + offset;
+							return ( index, total ) => {
+								const movement = ( coord ) => {
+									const onLastColumn = coord.column === getColumnsInRow( coord.row, total ) - 1;
+									return onLastColumn ? 0 : coord.column + 1;
+								};
+
+								return moveHorizontally( index, total, movement );
 							};
 						case UP:
 							return ( index, total ) => {
-								const offset = -width;
-								return gridConfig.cycle ? cycleValue( index, total, offset ) : index + offset;
+								const movement = ( coord, lastCoord ) => coord.row === 0 ? lastCoord.row : coord.row - 1;
+								const fallback = ( possibleRow ) => possibleRow - 1;
+								return moveVertically( index, total, movement, fallback );
 							};
 						case DOWN:
 							return ( index, total ) => {
-								const offset = width;
-								return gridConfig.cycle ? cycleValue( index, total, offset ) : index + offset;
+								const movement = ( coord, lastCoord ) => coord.row === lastCoord.row ? 0 : coord.row + 1;
+								const fallback = ( /* possibleRow */ ) => 0;
+								return moveVertically( index, total, movement, fallback );
 							};
 					}
 

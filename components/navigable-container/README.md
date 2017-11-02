@@ -11,14 +11,6 @@ NavigableContainer
 
 These are the props that `NavigableMenu`, `NavigableGrid` and `TabbableContainer` all share.
 
-### cycle
-
-A boolean which tells the component whether or not to cycle from the end back to the beginning and vice versa. If it is false, then as soon as navigation moves outside the component, the keydown event will not be handled.
-
-- Type: `Boolean`
-- Required: No
-- default: true
-
 
 ### initialSelector
 
@@ -49,7 +41,7 @@ A boolean which specifies whether or not the focusable elements in this componen
 
 - Type: `Boolean`
 - Required: No
-- default: true
+- default: true for `TabbableContainer`, false otherwise.
 
 
 ### NavigableMenu Usage
@@ -89,11 +81,20 @@ A boolean which specifies whether to stop the arrow keys that are not being used
 - Required: No
 - Default: true
 
+
+### cycle
+
+A boolean which tells the component whether or not to cycle from the end back to the beginning and vice versa. If it is false, then as soon as navigation moves outside the component, the keydown event will not be handled.
+
+- Type: `Boolean`
+- Required: No
+- default: true
+
 ----
 
 ## NavigableGrid Usage
 
-A NavigableGrid allows movement up and down and left and right through a grid of components using the arrow keys. Note, it expects that the grid is laid out in Left to Right, Top to Bottom DOM ordering.
+A NavigableGrid allows movement up and down and left and right through a grid of components using the arrow keys. Note, it expects that the grid is laid out in Left to Right, Top to Bottom DOM ordering. Navigable grids will always cycle.
 
 ```jsx
 import { NavigableGrid, Button } from '@wordpress/components';
@@ -140,5 +141,10 @@ function MyContainer() {
 }
 ```
 
-`TabbableContainer` has no additional props. It does however, set change `widget`'s default value to `true`.
+### cycle
 
+A boolean which tells the component whether or not to cycle from the end back to the beginning and vice versa. If it is false, then as soon as navigation moves outside the component, the keydown event will not be handled.
+
+- Type: `Boolean`
+- Required: No
+- default: true
