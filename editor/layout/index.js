@@ -20,7 +20,12 @@ import TextEditor from '../modes/text-editor';
 import VisualEditor from '../modes/visual-editor';
 import DocumentTitle from '../document-title';
 import { removeNotice } from '../actions';
-import { MetaBoxes, AutosaveMonitor, UnsavedChangesWarning } from '../components';
+import {
+	MetaBoxes,
+	AutosaveMonitor,
+	UnsavedChangesWarning,
+	PluginFills,
+} from '../components';
 import {
 	getEditorMode,
 	isEditorSidebarOpened,
@@ -50,6 +55,7 @@ function Layout( { mode, isSidebarOpened, notices, ...props } ) {
 			</div>
 			{ isSidebarOpened && <Sidebar /> }
 			<Popover.Slot />
+			<PluginFills />
 		</div>
 	);
 }

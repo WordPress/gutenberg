@@ -41,3 +41,4 @@ export { default as Warning } from './warning';
 
 // State Related Components
 export { default as EditorProvider } from './provider';
+export { default as PluginFills } from './plugin-fills';
