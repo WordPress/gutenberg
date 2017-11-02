@@ -70,7 +70,7 @@ describe( 'NavigableGrid', () => {
 		) );
 
 		const container = wrapper.find( 'div' );
-		wrapper.find( '#btn1' ).get( 0 ).focus();
+		wrapper.find( '#a1' ).get( 0 ).focus();
 
 		// Navigate options
 		function assertKeyDown( keyCode, expectedActiveIndex ) {
