@@ -350,13 +350,9 @@ export class Autocomplete extends Component {
 		// This exists because we must capture ENTER key presses before Editable.
 		// It seems that react fires the simulated capturing events after the
 		// native browser event has already bubbled so we can't stopPropagation
-		//  and avoid Editable getting the event from TinyMCE, hence we must
+		// and avoid Editable getting the event from TinyMCE, hence we must
 		// register a native event handler.
-		if ( ! this.node ) {
-			return;
-		}
-		// Disable reason: We need to add native event handlers because they must
-		// be able to cancel the event before TinyMCE's native event handler gets it.
+		// Disable reason: Accessing the DOM node to add native event handlers.
 		// eslint-disable-next-line react/no-find-dom-node
 		const realNode = findDOMNode( this.node );
 		const handler = isListening ? 'addEventListener' : 'removeEventListener';
