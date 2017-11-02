@@ -236,13 +236,14 @@ export class Autocomplete extends Component {
 			const after = this.createRange( endTextNode, endIndex, container, container.childNodes.length );
 			return allowContext( before, after );
 		} );
-		if ( open ) {
-			const { triggerPrefix = '' } = open;
-			const range = this.createRange( startTextNode, pos + 1, endTextNode, endIndex );
-			const query = text.substr( pos + 1 + triggerPrefix.length );
-			return { open, range, query };
+		// exit if no completers match
+		if ( ! open ) {
+			return null;
 		}
-		return null;
+		const { triggerPrefix = '' } = open;
+		const range = this.createRange( startTextNode, pos + 1, endTextNode, endIndex );
+		const query = text.substr( pos + 1 + triggerPrefix.length );
+		return { open, range, query };
 	}
 
 	search( event ) {
