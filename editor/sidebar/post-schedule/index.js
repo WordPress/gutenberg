@@ -15,11 +15,10 @@ export function PostSchedule( { user } ) {
 	if ( ! user.data || ! user.data.capabilities.publish_posts ) {
 		return null;
 	}
-	const scheduleId = 'post-schedule-selector';
 
 	return (
 		<PanelRow className="editor-post-schedule">
-			<label htmlFor={ scheduleId }>{ __( 'Publish' ) }</label>
+			<span>{ __( 'Publish' ) }</span>
 			<Dropdown
 				position="bottom left"
 				contentClassName="editor-post-schedule__dialog"

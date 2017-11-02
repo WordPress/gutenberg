@@ -61,10 +61,10 @@ class Dropdown extends Component {
 
 	render() {
 		const { isOpen } = this.state;
-		const { renderContent, renderToggle, position = 'bottom', className, contentClassName, id } = this.props;
+		const { renderContent, renderToggle, position = 'bottom', className, contentClassName } = this.props;
 		const args = { isOpen, onToggle: this.toggle, onClose: this.close };
 		return (
-			<div id={ id } className={ className } ref={ this.bindContainer }>
+			<div className={ className } ref={ this.bindContainer }>
 				{ renderToggle( args ) }
 				<Popover
 					className={ contentClassName }
