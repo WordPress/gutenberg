@@ -14,8 +14,8 @@ import { withInstanceId } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { getEditedPostAttribute } from '../../selectors';
-import { editPost } from '../../actions';
+import { getEditedPostAttribute } from '../selectors';
+import { editPost } from '../actions';
 
 const DEFAULT_QUERY = {
 	per_page: 100,
