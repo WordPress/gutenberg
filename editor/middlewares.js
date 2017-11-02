@@ -25,6 +25,7 @@ import { isCoeditingEnabled } from './selectors';
 
 export function coeditingMiddleware( { dispatch, getState } ) {
 	let app = null;
+	let buffer = null;
 
 	const isPeerConnected = () => app && app.isConnected;
 
@@ -43,6 +44,7 @@ export function coeditingMiddleware( { dispatch, getState } ) {
 		}
 
 		app = new Coediting( coeditingId );
+		buffer = [];
 		app.on( 'peerData', onPeerData );
 		app.on( 'peerConnected', function() {
 			dispatch( createInfoNotice( __( 'Collaborator joined!' ) ) );
@@ -65,10 +67,6 @@ export function coeditingMiddleware( { dispatch, getState } ) {
 	};
 
 	const peerSend = ( action ) => {
-		if ( ! isPeerConnected() || isPeerAction( action ) ) {
-			return;
-		}
-
 		const allowedActions = [
 			'COEDITING_CLEAR_FROZEN_BLOCK',
 			'COEDITING_FREEZE_BLOCK',
@@ -81,8 +79,25 @@ export function coeditingMiddleware( { dispatch, getState } ) {
 			'UPDATE_BLOCK_ATTRIBUTES',
 		];
 
-		if ( ! includes( allowedActions, action.type ) ) {
+		// Maintain buffer until peer is not connected.
+		if ( ! isPeerConnected() && includes( allowedActions, action.type ) ) {
+			buffer.push( action );
+		}
+
+		if ( ! isPeerConnected() || isPeerAction( action ) || ! includes( allowedActions, action.type ) ) {
 			return;
+		}
+
+		if ( buffer.length ) {
+			while ( buffer.length ) {
+				const bufferAction = buffer.shift();
+				app.send( {
+					...bufferAction,
+					meta: {
+						peerId: app.peerId,
+					},
+				} );
+			}
 		}
 
 		app.send( {
