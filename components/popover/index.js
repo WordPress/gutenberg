@@ -143,7 +143,7 @@ class Popover extends Component {
 		const isTop = 'top' === yAxis;
 		const isLeft = 'left' === xAxis;
 		const isRight = 'right' === xAxis;
-		let rect = anchor.parentNode.getBoundingClientRect();
+		let rect;
 		if ( range ) {
 			const rects = range.getClientRects();
 			if ( isLeft ) {
@@ -153,6 +153,8 @@ class Popover extends Component {
 			} else {
 				rect = range.getBoundingClientRect();
 			}
+		} else {
+			rect = anchor.parentNode.getBoundingClientRect();
 		}
 		// Offset top positioning by padding
 		const { paddingTop, paddingBottom } = window.getComputedStyle( anchor.parentNode );
