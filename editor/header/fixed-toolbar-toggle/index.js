@@ -20,12 +20,12 @@ function FeatureToggle( { onToggle, active } ) {
 	return (
 		<IconButton
 			className="editor-fixed-toolbar-toggle"
-			icon={ active ? 'yes' : 'no' }
+			icon="editor-kitchensink"
 			onClick={ () => {
 				onToggle();
 			} }
 		>
-			{ __( 'Fixed Block Toolbar' ) }
+			{ active ? __( 'Fix toolbar to block' ) : __( 'Fix toolbar to top' ) }
 		</IconButton>
 	);
 }
