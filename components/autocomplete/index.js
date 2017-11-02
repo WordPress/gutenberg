@@ -139,7 +139,12 @@ export class Autocomplete extends Component {
 	// this method is separate so it can be overrided in tests
 	getCursor( container ) {
 		const selection = window.getSelection();
-		if ( selection.isCollapsed && container.contains( selection.anchorNode ) ) {
+		if ( selection.isCollapsed ) {
+			if ( 'production' !== process.env.NODE_ENV ) {
+				if ( ! container.contains( selection.anchorNode ) ) {
+					throw new Error( 'Invalid assumption: expected selection to be within the autocomplete container' );
+				}
+			}
 			return {
 				node: selection.anchorNode,
 				offset: selection.anchorOffset,
