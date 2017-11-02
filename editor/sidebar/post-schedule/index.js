@@ -21,7 +21,6 @@ export function PostSchedule( { user } ) {
 		<PanelRow className="editor-post-schedule">
 			<label htmlFor={ scheduleId }>{ __( 'Publish' ) }</label>
 			<Dropdown
-				id={ scheduleId }
 				position="bottom left"
 				contentClassName="editor-post-schedule__dialog"
 				renderToggle={ ( { onToggle, isOpen } ) => (
