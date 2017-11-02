@@ -1,0 +1,43 @@
+.wp-blocks-authors {
+	display: flex;
+	flex-wrap: wrap;
+
+	&.columns-1 .blocks-single-author{
+		width: calc(100% / 1 - 16px);
+	}
+	&.columns-2 .blocks-single-author{
+		width: calc(100% / 2 - 16px);
+	}
+
+	// Responsive fallback value, 2 columns
+	&.columns-3 .blocks-single-author,
+	&.columns-4 .blocks-single-author,
+	&.columns-5 .blocks-single-author,
+	&.columns-6 .blocks-single-author,
+	&.columns-7 .blocks-single-author,
+	&.columns-8 .blocks-single-author {
+		width: calc(100% / 2 - 16px);
+	}
+
+	@include break-small {
+		&.columns-3 .blocks-single-author {
+			width: calc(100% / 3 - 16px);
+		}
+		&.columns-4 .blocks-single-author {
+			width: calc(100% / 4 - 16px);
+		}
+		&.columns-5 .blocks-single-author {
+			width: calc(100% / 5 - 16px);
+		}
+		&.columns-6 .blocks-single-author {
+			width: calc(100% / 6 - 16px);
+		}
+		&.columns-7 .blocks-single-author {
+			width: calc(100% / 7 - 16px);
+		}
+		&.columns-8 .blocks-single-author {
+			width: calc(100% / 8 - 16px);
+		}
+	}
+
+}

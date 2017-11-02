@@ -1,0 +1,14 @@
+.editor-visual-editor__block[data-type="core/author"] {
+	&[data-align="center"] {
+		text-align: center;
+	}
+
+	&[data-align="right"] {
+		text-align: right;
+	}
+}
+.blocks-single-author.withBio {
+	img {
+		margin-right: 10px;
+	}
+}
