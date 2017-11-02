@@ -162,7 +162,6 @@ export class NavigableMenu extends Component {
 		const { cycle = true, deep = true, widget = true, orientation = 'vertical', stopOtherArrows = true, initialSelector, ...rest } = this.props;
 		const navigation = {
 			mode: 'menu',
-
 			cycle,
 			orientation,
 			initialSelector,
