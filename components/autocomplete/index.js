@@ -174,14 +174,6 @@ export class Autocomplete extends Component {
 		const allowAnything = () => true;
 		let endTextNode;
 		let endIndex;
-		let completers = map( allCompleters, ( completer, idx ) => ( { ...completer, idx } ) );
-		if ( wasOpen ) {
-			// put the open completer at the start so it has priority
-			completers = [
-				wasOpen,
-				...filter( completers, ( completer ) => completer.idx !== wasOpen.idx ),
-			];
-		}
 		// search backwards to find the first preceeding space or non-text node.
 		if ( isTextNode( cursor.node ) ) { // TEXT node
 			endTextNode = cursor.node;
@@ -195,6 +187,15 @@ export class Autocomplete extends Component {
 		}
 		if ( endTextNode === null ) {
 			return null;
+		}
+		// store the index of a completer in the object so we can use it to reference the options
+		let completers = map( allCompleters, ( completer, idx ) => ( { ...completer, idx } ) );
+		if ( wasOpen ) {
+			// put the open completer at the start so it has priority
+			completers = [
+				wasOpen,
+				...filter( completers, ( completer ) => completer.idx !== wasOpen.idx ),
+			];
 		}
 		// filter the completers to those that could handle this node
 		completers = filter( completers,
