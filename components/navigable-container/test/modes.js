@@ -67,7 +67,7 @@ describe( 'calculateMode tabbing', () => {
 			deep: false,
 			widget: false,
 			extra: 10,
-		});
+		} );
 
 		expect( omit( actual, [ 'detect' ] ) ).toEqual( {
 			useTabstops: true,
@@ -283,7 +283,7 @@ describe( 'calculateMode grid', () => {
 				7: [
 					{ key: DOWN, result: 3 },
 					{ key: UP, result: 3 },
-					{ key: RIGHT, result: 4  },
+					{ key: RIGHT, result: 4 },
 					{ key: LEFT, result: 6 },
 				],
 

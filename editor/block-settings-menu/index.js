@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton, Dropdown } from '@wordpress/components';
+import { IconButton, Dropdown, NavigableMenu } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -48,12 +48,13 @@ function BlockSettingsMenu( { uids, onSelect } ) {
 				);
 			} }
 			renderContent={ ( { onClose } ) => (
-				<div className="editor-block-settings-menu__content">
+				// Should this just use a DropdownMenu instead of a DropDown ?
+				<NavigableMenu className="editor-block-settings-menu__content">
 					<BlockInspectorButton onClick={ onClose } />
 					{ count === 1 && <BlockModeToggle uid={ uids[ 0 ] } onToggle={ onClose } /> }
 					{ count === 1 && <UnknownConverter uid={ uids[ 0 ] } /> }
 					<BlockDeleteButton uids={ uids } />
-				</div>
+				</NavigableMenu>
 			) }
 		/>
 	);
