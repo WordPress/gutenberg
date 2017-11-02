@@ -30,7 +30,7 @@ import shortcodeConverter from './shortcode-converter';
  *
  * @param  {String}       options.HTML        The HTML to convert.
  * @param  {String}       [options.plainText] Plain text version.
- * @param  {Boolean}      [options.inline]    Whether to content should be inline or not. Null to auto-detect, false to force blocks, true to force a string.
+ * @param  {?Boolean}     [options.inline]    Whether to content should be inline or not. Null to auto-detect, false to force blocks, true to force a string.
  * @return {Array|String}                     A list of blocks or a string, depending on the `inline` option.
  */
 export default function rawHandler( { HTML, plainText = '', inline = null } ) {
