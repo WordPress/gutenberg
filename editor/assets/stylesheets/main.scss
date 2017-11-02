@@ -59,7 +59,7 @@ body.gutenberg-editor-page {
 	bottom: 0;
 	left: 0;
 	min-height: calc( 100vh - #{ $admin-bar-height-big } );
-	padding-top: $header-height + $stacked-toolbar-height;
+	padding-top: $header-height + $block-toolbar-height;
 
 	// The parent relative container changes
 	@include break-small {

@@ -1051,3 +1051,14 @@ export const getMostFrequentlyUsedBlocks = createSelector(
 	},
 	( state ) => state.preferences.blockUsage
 );
+
+/**
+ * Returns whether the given feature is enabled or not
+ *
+ * @param {Object}    state   Global application state
+ * @param {String}    feature Feature slug
+ * @return {Booleean}         Is active
+ */
+export function isFeatureActive( state, feature ) {
+	return !! state.features[ feature ];
+}

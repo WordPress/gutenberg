@@ -20,7 +20,7 @@
 	right: 0;
 	background: $white;
 	border-bottom: 1px solid $light-gray-500;
-	min-height: $stacked-toolbar-height;
+	min-height: $block-toolbar-height;
 
 	.is-sidebar-opened & {
 		display: none;

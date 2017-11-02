@@ -473,6 +473,20 @@ export function metaBoxStateChanged( location, hasChanged ) {
 	};
 }
 
+/**
+ * Returns an action object used to toggle a feature flag
+ *
+ * @param {String}  feature   Featurre name.
+ *
+ * @return {Object}           Action object
+ */
+export function toggleFeature( feature ) {
+	return {
+		type: 'TOGGLE_FEATURE',
+		feature,
+	};
+}
+
 export const createSuccessNotice = partial( createNotice, 'success' );
 export const createInfoNotice = partial( createNotice, 'info' );
 export const createErrorNotice = partial( createNotice, 'error' );
