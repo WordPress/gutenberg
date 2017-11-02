@@ -16,6 +16,7 @@ require dirname( __FILE__ ) . '/class-wp-rest-reusable-blocks-controller.php';
 require dirname( __FILE__ ) . '/blocks.php';
 require dirname( __FILE__ ) . '/client-assets.php';
 require dirname( __FILE__ ) . '/compat.php';
+require dirname( __FILE__ ) . '/plugin-compat.php';
 require dirname( __FILE__ ) . '/i18n.php';
 require dirname( __FILE__ ) . '/parser.php';
 require dirname( __FILE__ ) . '/register.php';

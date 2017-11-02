@@ -2,43 +2,39 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { flowRight, first } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { sprintf, _n } from '@wordpress/i18n';
-import { IconButton, PanelBody, withAPIData } from '@wordpress/components';
+import { IconButton, PanelBody } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import {
-	isEditedPostNew,
-	getCurrentPostId,
-	getCurrentPostType,
-	isSavingPost,
+	getCurrentPostLastRevisionId,
+	getCurrentPostRevisionsCount,
 } from '../../selectors';
 import { getWPAdminURL } from '../../utils/url';
 
-function LastRevision( { revisions } ) {
-	const lastRevision = first( revisions.data );
-	if ( ! lastRevision ) {
+function LastRevision( { lastRevisionId, revisionsCount } ) {
+	if ( ! lastRevisionId ) {
 		return null;
 	}
 
 	return (
 		<PanelBody>
 			<IconButton
-				href={ getWPAdminURL( 'revision.php', { revision: lastRevision.id } ) }
+				href={ getWPAdminURL( 'revision.php', { revision: lastRevisionId } ) }
 				className="editor-last-revision__title"
 				icon="backup"
 			>
 				{
 					sprintf(
-						_n( '%d Revision', '%d Revisions', revisions.data.length ),
-						revisions.data.length
+						_n( '%d Revision', '%d Revisions', revisionsCount ),
+						revisionsCount
 					)
 				}
 			</IconButton>
@@ -46,21 +42,11 @@ function LastRevision( { revisions } ) {
 	);
 }
 
-export default flowRight(
-	connect(
-		( state ) => {
-			return {
-				isNew: isEditedPostNew( state ),
-				postId: getCurrentPostId( state ),
-				postType: getCurrentPostType( state ),
-				isSaving: isSavingPost( state ),
-			};
-		}
-	),
-	withAPIData( ( props, { type } ) => {
-		const { postType, postId } = props;
+export default connect(
+	( state ) => {
 		return {
-			revisions: `/wp/v2/${ type( postType ) }/${ postId }/revisions`,
+			lastRevisionId: getCurrentPostLastRevisionId( state ),
+			revisionsCount: getCurrentPostRevisionsCount( state ),
 		};
-	} )
+	}
 )( LastRevision );

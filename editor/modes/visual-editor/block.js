@@ -23,14 +23,13 @@ import BlockDropZone from './block-drop-zone';
 import BlockHtml from './block-html';
 import BlockMover from '../../block-mover';
 import BlockSettingsMenu from '../../block-settings-menu';
-import BlockToolbar from '../../block-toolbar';
 import {
 	clearSelectedBlock,
 	editPost,
 	focusBlock,
 	insertBlocks,
 	mergeBlocks,
-	removeBlocks,
+	removeBlock,
 	replaceBlocks,
 	selectBlock,
 	startTyping,
@@ -90,7 +89,7 @@ class VisualEditorBlock extends Component {
 		}
 
 		// Not Ideal, but it's the easiest way to get the scrollable container
-		this.editorLayout = document.querySelector( '.editor-layout__editor' );
+		this.editorLayout = document.querySelector( '.editor-layout__content' );
 	}
 
 	componentWillReceiveProps( newProps ) {
@@ -359,7 +358,6 @@ class VisualEditorBlock extends Component {
 				<BlockDropZone index={ order } />
 				{ ( showUI || isProperlyHovered ) && <BlockMover uids={ [ block.uid ] } /> }
 				{ ( showUI || isProperlyHovered ) && <BlockSettingsMenu uids={ [ block.uid ] } /> }
-				{ isSelected && isValid && <BlockToolbar uid={ block.uid } /> }
 				{ isFirstMultiSelected && ! this.props.isSelecting &&
 					<BlockMover uids={ multiSelectedBlockUids } />
 				}
@@ -476,8 +474,8 @@ export default connect(
 			dispatch( focusBlock( ...args ) );
 		},
 
-		onRemove( uids ) {
-			dispatch( removeBlocks( uids ) );
+		onRemove( uid ) {
+			dispatch( removeBlock( uid ) );
 		},
 
 		onMerge( ...args ) {

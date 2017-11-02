@@ -9,7 +9,6 @@ import { __ } from '@wordpress/i18n';
 import './editor.scss';
 import './style.scss';
 import { registerBlockType, source } from '../../api';
-import GalleryImage from './gallery-image';
 import { default as GalleryBlock, defaultColumnsNumber } from './block';
 
 const { query, attr } = source;
@@ -47,6 +46,41 @@ registerBlockType( 'core/gallery', {
 		},
 	},
 
+	transforms: {
+		from: [
+			{
+				type: 'shortcode',
+				tag: 'gallery',
+				attributes: {
+					images: {
+						type: 'array',
+						shortcode: ( { named: { ids } } ) => {
+							if ( ! ids ) {
+								return [];
+							}
+
+							return ids.split( ',' ).map( ( id ) => ( {
+								id: parseInt( id, 10 ),
+							} ) );
+						},
+					},
+					columns: {
+						type: 'number',
+						shortcode: ( { named: { columns = '3' } } ) => {
+							return parseInt( columns, 10 );
+						},
+					},
+					linkTo: {
+						type: 'string',
+						shortcode: ( { named: { link = 'attachment' } } ) => {
+							return link === 'file' ? 'media' : link;
+						},
+					},
+				},
+			},
+		],
+	},
+
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
 		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
@@ -60,9 +94,26 @@ registerBlockType( 'core/gallery', {
 		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
 		return (
 			<div className={ `align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` } >
-				{ images.map( ( img ) => (
-					<GalleryImage key={ img.url } img={ img } linkTo={ linkTo } />
-				) ) }
+				{ images.map( ( image ) => {
+					let href;
+
+					switch ( linkTo ) {
+						case 'media':
+							href = image.url;
+							break;
+						case 'attachment':
+							href = image.link;
+							break;
+					}
+
+					const img = <img src={ image.url } alt={ image.alt } data-id={ image.id } />;
+
+					return (
+						<figure key={ image.id || image.url } className="blocks-gallery-image">
+							{ href ? <a href={ href }>{ img }</a> : img }
+						</figure>
+					);
+				} ) }
 			</div>
 		);
 	},

@@ -317,7 +317,19 @@ function gutenberg_can_edit_post_type( $post_type ) {
  */
 function gutenberg_post_has_blocks( $post ) {
 	$post = get_post( $post );
-	return $post && strpos( $post->post_content, '<!-- wp:' ) !== false;
+	return $post && content_has_blocks( $post->post_content );
+}
+
+/**
+ * Determine whether a content string contains gutenberg blocks.
+ *
+ * @since 1.6.0
+ *
+ * @param string $content Content to test.
+ * @return bool Whether the content contains blocks.
+ */
+function content_has_blocks( $content ) {
+	return false !== strpos( $content, '<!-- wp:' );
 }
 
 /**
@@ -359,6 +371,46 @@ function gutenberg_register_rest_routes() {
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_routes' );
 
+
+/**
+ * Gets revisions details for the selected post.
+ *
+ * @since 1.6.0
+ *
+ * @param array $post The post object from the response.
+ * @return array|null Revisions details or null when no revisions present.
+ */
+function gutenberg_get_post_revisions( $post ) {
+	$revisions       = wp_get_post_revisions( $post['id'] );
+	$revisions_count = count( $revisions );
+	if ( 0 === $revisions_count ) {
+		return null;
+	}
+
+	$last_revision = array_shift( $revisions );
+
+	return array(
+		'count'   => $revisions_count,
+		'last_id' => $last_revision->ID,
+	);
+}
+
+/**
+ * Adds the custom field `revisions` to the REST API response of post.
+ *
+ * TODO: This is a temporary solution. Next step would be to find a solution that is limited to the editor.
+ *
+ * @since 1.6.0
+ */
+function gutenberg_register_rest_api_post_revisions() {
+	register_rest_field( get_post_types( '', 'names' ),
+		'revisions',
+		array(
+			'get_callback' => 'gutenberg_get_post_revisions',
+		)
+	);
+}
+add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_revisions' );
 
 /**
  * Injects a hidden input in the edit form to propagate the information that classic editor is selected.
