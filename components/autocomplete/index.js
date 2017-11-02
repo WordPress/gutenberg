@@ -234,10 +234,7 @@ export class Autocomplete extends Component {
 			}
 			const before = this.createRange( container, 0, startTextNode, pos + 1 );
 			const after = this.createRange( endTextNode, endIndex, container, container.childNodes.length );
-			if ( ! allowContext( before, after ) ) {
-				return false;
-			}
-			return true;
+			return allowContext( before, after );
 		} );
 		if ( open ) {
 			const { triggerPrefix = '' } = open;
