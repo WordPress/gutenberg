@@ -209,20 +209,19 @@ export class Autocomplete extends Component {
 		let pos = lastIndexOfSpace( text );
 		while ( pos === -1 ) {
 			const prev = onlyTextNode( startTextNode.previousSibling );
-			if ( prev ) {
-				// filter the completers to those that could handle this node
-				completers = filter( completers,
-					( { allowNode = allowAnything } ) => allowNode( endTextNode, container ) );
-				// exit early if nothing can handle it
-				if ( completers.length === 0 ) {
-					return null;
-				}
-				startTextNode = prev;
-				text = prev.nodeValue + text;
-				pos = lastIndexOfSpace( prev.nodeValue );
-			} else {
+			if ( prev === null ) {
 				break;
 			}
+			// filter the completers to those that could handle this node
+			completers = filter( completers,
+				( { allowNode = allowAnything } ) => allowNode( endTextNode, container ) );
+			// exit early if nothing can handle it
+			if ( completers.length === 0 ) {
+				return null;
+			}
+			startTextNode = prev;
+			text = prev.nodeValue + text;
+			pos = lastIndexOfSpace( prev.nodeValue );
 		}
 		// exit early if nothing can handle it
 		if ( text.length <= pos + 1 ) {
