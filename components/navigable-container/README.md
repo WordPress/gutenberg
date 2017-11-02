@@ -44,10 +44,12 @@ A boolean which specifies whether or not the focusable elements in this componen
 - default: true for `TabbableContainer`, false otherwise.
 
 
-### NavigableMenu Usage
+## NavigableMenu
+
 
 A NavigableMenu allows movement up and down (or left and right) the component via the arrow keys. The `tab` key is not handled. The `orientation` prop is used to determine whether the arrow keys used are vertical or horizontal.
 
+### Usage
 
 ```jsx
 import { NavigableMenu, Button } from '@wordpress/components';
@@ -82,7 +84,7 @@ A boolean which specifies whether to stop the arrow keys that are not being used
 - Default: true
 
 
-### cycle
+#### cycle
 
 A boolean which tells the component whether or not to cycle from the end back to the beginning and vice versa. If it is false, then as soon as navigation moves outside the component, the keydown event will not be handled.
 
@@ -92,9 +94,11 @@ A boolean which tells the component whether or not to cycle from the end back to
 
 ----
 
-## NavigableGrid Usage
+## NavigableGrid
 
 A NavigableGrid allows movement up and down and left and right through a grid of components using the arrow keys. Note, it expects that the grid is laid out in Left to Right, Top to Bottom DOM ordering. Navigable grids will always cycle.
+
+### Usage
 
 ```jsx
 import { NavigableGrid, Button } from '@wordpress/components';
@@ -110,7 +114,7 @@ function MyGrid() {
 	);
 }
 ```
-## Additional Props
+### Additional Props
 
 ### width
 
@@ -122,9 +126,11 @@ An integer specifying the number of components that are displayed across the scr
 
 ----
 
-## TabbableContainer Usage
+## TabbableContainer
 
 A `TabbableContainer` will only be navigated using the `TAB` key. Every intended tabstop must have a tabIndex `0`.
+
+### Usage
 
 ```jsx
 import { TabbableContainer, Button } from '@wordpress/components';
