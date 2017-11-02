@@ -252,7 +252,7 @@ export default class Editable extends Component {
 			HTML: event.content,
 			plainText: this.pastedPlainText,
 			// Force inline paste if there's no `onSplit` prop.
-			inline: this.props.onSplit ? null : true,
+			mode: this.props.onSplit ? 'AUTO' : 'INLINE',
 		} );
 
 		if ( typeof content === 'string' ) {
