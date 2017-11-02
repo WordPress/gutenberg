@@ -26,7 +26,6 @@ import BlockIcon from '../block-icon';
 /**
  * @callback FnAllowContext
  * @param {Range} before the range before the auto complete trigger and query.
- * @param {Range} range the range of the autocomplete trigger and query.
  * @param {Range} after the range after the autocomplete trigger and query.
  * @returns {boolean} true if the completer can handle these ranges.
  */
@@ -71,7 +70,7 @@ export function blockAutocompleter( { onReplace } ) {
 
 	const getOptions = () => Promise.resolve( options );
 
-	const allowContext = ( before, range, after ) => {
+	const allowContext = ( before, after ) => {
 		return ! ( /\S/.test( before.toString() ) || /\S/.test( after.toString() ) );
 	};
 

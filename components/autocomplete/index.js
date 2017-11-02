@@ -232,10 +232,9 @@ export class Autocomplete extends Component {
 			if ( text.substr( pos + 1, triggerPrefix.length ) !== triggerPrefix ) {
 				return false;
 			}
-			const range = this.createRange( startTextNode, pos + 1, endTextNode, endIndex );
 			const before = this.createRange( container, 0, startTextNode, pos + 1 );
 			const after = this.createRange( endTextNode, endIndex, container, container.childNodes.length );
-			if ( ! allowContext( before, range, after ) ) {
+			if ( ! allowContext( before, after ) ) {
 				return false;
 			}
 			return true;
