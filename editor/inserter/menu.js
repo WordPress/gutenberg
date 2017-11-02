@@ -48,13 +48,13 @@ export class InserterMenu extends Component {
 	componentDidUpdate( prevProps, prevState ) {
 		const searchResults = this.searchBlocks( getBlockTypes() );
 		// Announce the blocks search results to screen readers.
-		if ( !! searchResults.length ) {
+		if ( this.state.filterValue && !! searchResults.length ) {
 			this.props.debouncedSpeak( sprintf( _n(
 				'%d result found',
 				'%d results found',
 				searchResults.length
 			), searchResults.length ), 'assertive' );
-		} else {
+		} else if ( this.state.filterValue ) {
 			this.props.debouncedSpeak( __( 'No results.' ), 'assertive' );
 		}
 

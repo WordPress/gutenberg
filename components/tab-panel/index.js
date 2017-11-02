@@ -25,7 +25,6 @@ class TabButton extends Component {
 }
 
 class TabPanel extends Component {
-
 	constructor() {
 		super( ...arguments );
 
