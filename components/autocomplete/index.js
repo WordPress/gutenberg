@@ -1,9 +1,8 @@
 /**
  * External dependencies
  */
-import escapeStringRegexp from 'escape-string-regexp';
 import classnames from 'classnames';
-import { find, filter, map } from 'lodash';
+import { escapeRegExp, find, filter, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -256,7 +255,7 @@ export class Autocomplete extends Component {
 		const match = this.findMatch( container, cursor, completers, wasOpen );
 		const { open, query, range } = match || {};
 		// create a regular expression to filter the options
-		const search = open ? new RegExp( escapeStringRegexp( query ), 'i' ) : /./;
+		const search = open ? new RegExp( escapeRegExp( query ), 'i' ) : /./;
 		// asynchronously load the options for the open completer
 		if ( open && ( ! wasOpen || open.idx !== wasOpen.idx ) ) {
 			this.loadOptions( open.idx );
