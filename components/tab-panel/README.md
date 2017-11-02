@@ -36,8 +36,8 @@ function MyTabPanel() {
 				},
 			] }>
 			{
-				( tabKey ) => {
-					return <p>${ tabKey }</p>;
+				( tabName ) => {
+					return <p>${ tabName }</p>;
 				}
 			}
 		</TabPanel>
