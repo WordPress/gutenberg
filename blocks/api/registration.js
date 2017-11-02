@@ -11,6 +11,11 @@ import { get, isFunction, some } from 'lodash';
 import { getCategories } from './categories';
 
 /**
+ * Internal dependencies
+ */
+import { applyFilters } from '../hooks';
+
+/**
  * Block settings keyed by block name.
  *
  * @type {Object}
@@ -113,13 +118,15 @@ export function registerBlockType( name, settings ) {
 	if ( ! settings.icon ) {
 		settings.icon = 'block-default';
 	}
-	const block = blocks[ name ] = {
+	settings = {
 		name,
 		attributes: get( window._wpBlocksAttributes, name ),
 		...settings,
 	};
 
-	return block;
+	settings = applyFilters( 'registerBlockType', settings, name );
+
+	return blocks[ name ] = settings;
 }
 
 /**

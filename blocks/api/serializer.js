@@ -65,10 +65,6 @@ export function getSaveContent( blockType, attributes ) {
 			extraProps.className = updatedClassName;
 		}
 
-		if ( blockType.supportAnchor && attributes.anchor ) {
-			extraProps.id = attributes.anchor;
-		}
-
 		return cloneElement( element, extraProps );
 	};
 	const contentWithClassname = Children.map( saveContent, addAdvancedAttributes );
