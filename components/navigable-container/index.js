@@ -152,7 +152,7 @@ export class NavigableGrid extends Component {
 			width,
 			widget,
 		};
-		return <NavigableContainer navigation={ navigation } { ...rest } />;
+		return <NavigableContainer role="grid" navigation={ navigation } { ...rest } />;
 	}
 }
 
