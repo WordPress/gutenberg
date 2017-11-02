@@ -3,7 +3,7 @@
  */
 import escapeStringRegexp from 'escape-string-regexp';
 import classnames from 'classnames';
-import { find } from 'lodash';
+import { find, filter, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -164,7 +164,7 @@ export class Autocomplete extends Component {
 	loadOptions( index ) {
 		this.props.completers[ index ].getOptions().then( ( options ) => {
 			this.setState( {
-				[ 'options_' + index ]: options.map(
+				[ 'options_' + index ]: map( options,
 					( option, i ) => ( { ...option, key: index + '_' + i } ) ),
 			} );
 		} );
@@ -174,12 +174,12 @@ export class Autocomplete extends Component {
 		const allowAnything = () => true;
 		let endTextNode;
 		let endIndex;
-		let completers = allCompleters.map( ( completer, idx ) => ( { ...completer, idx } ) );
+		let completers = map( allCompleters, ( completer, idx ) => ( { ...completer, idx } ) );
 		if ( wasOpen ) {
 			// put the open completer at the start so it has priority
 			completers = [
 				wasOpen,
-				...completers.filter( ( completer ) => completer.idx !== wasOpen.idx ),
+				...filter( completers, ( completer ) => completer.idx !== wasOpen.idx ),
 			];
 		}
 		// search backwards to find the first preceeding space or non-text node.
@@ -197,7 +197,7 @@ export class Autocomplete extends Component {
 			return null;
 		}
 		// filter the completers to those that could handle this node
-		completers = completers.filter(
+		completers = filter( completers,
 			( { allowNode = allowAnything } ) => allowNode( endTextNode, container ) );
 		// exit early if nothing can handle it
 		if ( completers.length === 0 ) {
@@ -210,7 +210,7 @@ export class Autocomplete extends Component {
 			const prev = onlyTextNode( startTextNode.previousSibling );
 			if ( prev ) {
 				// filter the completers to those that could handle this node
-				completers = completers.filter(
+				completers = filter( completers,
 					( { allowNode = allowAnything } ) => allowNode( endTextNode, container ) );
 				// exit early if nothing can handle it
 				if ( completers.length === 0 ) {
@@ -409,7 +409,7 @@ export class Autocomplete extends Component {
 						role="listbox"
 						className="components-autocomplete__results"
 					>
-						{ filteredOptions.map( ( option, index ) => (
+						{ map( filteredOptions, ( option, index ) => (
 							<li
 								key={ option.key }
 								id={ `components-autocomplete-item-${ instanceId }-${ index }` }
