@@ -45,16 +45,6 @@ class WritingFlow extends Component {
 		this.verticalRect = null;
 	}
 
-	componentDidMount() {
-		document.addEventListener( 'keydown', this.onKeyDown );
-		document.addEventListener( 'mousedown', this.clearVerticalRect );
-	}
-
-	componentWillUnmount() {
-		document.removeEventListener( 'keydown', this.onKeyDown );
-		document.addEventListener( 'mousedown', this.clearVerticalRect );
-	}
-
 	bindContainer( ref ) {
 		this.container = ref;
 	}
@@ -166,11 +156,19 @@ class WritingFlow extends Component {
 	render() {
 		const { children } = this.props;
 
+		// Disable reason: Wrapper itself is non-interactive, but must capture
+		// bubbling events from children to determine focus transition intents.
+		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
-			<div ref={ this.bindContainer }>
+			<div
+				ref={ this.bindContainer }
+				onKeyDown={ this.onKeyDown }
+				onMouseDown={ this.clearVerticalRect }
+			>
 				{ children }
 			</div>
 		);
+		/* eslint-disable jsx-a11y/no-static-element-interactions */
 	}
 }
 
