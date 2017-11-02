@@ -91,7 +91,7 @@ export function isVerticalEdge( container, isReverse, collapseRanges = false ) {
 
 	const selection = window.getSelection();
 	let range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
-	if ( collapseRanges && ! range.collapsed ) {
+	if ( collapseRanges && range && ! range.collapsed ) {
 		const newRange = document.createRange();
 		// Get the end point of the selection (see focusNode vs. anchorNode)
 		newRange.setStart( selection.focusNode, selection.focusOffset );
@@ -164,11 +164,11 @@ export function placeCaretAtHorizontalEdge( container, isReverse ) {
 	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
 		container.focus();
 		if ( isReverse ) {
-			container.selectionStart = 0;
-			container.selectionEnd = 0;
-		} else {
 			container.selectionStart = container.value.length;
 			container.selectionEnd = container.value.length;
+		} else {
+			container.selectionStart = 0;
+			container.selectionEnd = 0;
 		}
 		return;
 	}
@@ -302,13 +302,4 @@ export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScro
 	// This fixes it.
 	selection.removeAllRanges();
 	selection.addRange( range );
-}
-
-/**
- * Checks whether the user is on MacOS or not
- *
- * @return {Boolean}           Is Mac or Not
- */
-export function isMac() {
-	return window.navigator.platform.toLowerCase().indexOf( 'mac' ) !== -1;
 }

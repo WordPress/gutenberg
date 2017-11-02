@@ -9,7 +9,7 @@ import { uniq, get, reduce, find } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Dropdown, Dashicon, IconButton, Toolbar, NavigableMenu } from '@wordpress/components';
-import { getBlockType, getBlockTypes, switchToBlockType } from '@wordpress/blocks';
+import { getBlockType, getBlockTypes, switchToBlockType, BlockIcon } from '@wordpress/blocks';
 import { keycodes } from '@wordpress/utils';
 
 /**
@@ -64,7 +64,7 @@ function BlockSwitcher( { block, onTransform } ) {
 					<Toolbar>
 						<IconButton
 							className="editor-block-switcher__toggle"
-							icon={ blockType.icon }
+							icon={ <BlockIcon icon={ blockType.icon } /> }
 							onClick={ onToggle }
 							aria-haspopup="true"
 							aria-expanded={ isOpen }
@@ -95,7 +95,11 @@ function BlockSwitcher( { block, onTransform } ) {
 									onClose();
 								} }
 								className="editor-block-switcher__menu-item"
-								icon={ icon }
+								icon={ (
+									<span className="editor-block-switcher__block-icon">
+										<BlockIcon icon={ icon } />
+									</span>
+								) }
 								role="menuitem"
 							>
 								{ title }

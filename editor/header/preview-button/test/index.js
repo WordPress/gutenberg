@@ -53,7 +53,14 @@ describe( 'PreviewButton', () => {
 			const autosave = jest.fn();
 			const preventDefault = jest.fn();
 			const windowOpen = window.open;
-			window.open = jest.fn();
+			window.open = jest.fn( () => {
+				return {
+					document: {
+						write: jest.fn(),
+						close: jest.fn(),
+					},
+				};
+			} );
 
 			const wrapper = shallow(
 				<PreviewButton { ...props } autosave={ autosave } />
@@ -66,6 +73,7 @@ describe( 'PreviewButton', () => {
 				expect( preventDefault ).toHaveBeenCalled();
 				expect( wrapper.state( 'isAwaitingSave' ) ).toBe( true );
 				expect( window.open ).toHaveBeenCalled();
+				expect( wrapper.instance().previewWindow.document.write ).toHaveBeenCalled();
 			} else {
 				expect( autosave ).not.toHaveBeenCalled();
 				expect( preventDefault ).not.toHaveBeenCalled();

@@ -9,6 +9,7 @@ import {
 	isEqual,
 	mapValues,
 	noop,
+	sortBy,
 	throttle,
 } from 'lodash';
 import scrollIntoView from 'dom-scroll-into-view';
@@ -42,7 +43,6 @@ class VisualEditorBlockList extends Component {
 		super( props );
 
 		this.onSelectionStart = this.onSelectionStart.bind( this );
-		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.onSelectionEnd = this.onSelectionEnd.bind( this );
 		this.onShiftSelection = this.onShiftSelection.bind( this );
 		this.onCopy = this.onCopy.bind( this );
@@ -78,9 +78,11 @@ class VisualEditorBlockList extends Component {
 
 		if ( nextProps.multiSelectedBlockUids && nextProps.multiSelectedBlockUids.length > 0 ) {
 			const extent = this.nodes[ nextProps.selectionEnd ];
-			scrollIntoView( extent, extent.closest( '.editor-layout__editor' ), {
-				onlyScrollIfNeeded: true,
-			} );
+			if ( extent ) {
+				scrollIntoView( extent, extent.closest( '.editor-layout__content' ), {
+					onlyScrollIfNeeded: true,
+				} );
+			}
 		}
 	}
 
@@ -133,14 +135,15 @@ class VisualEditorBlockList extends Component {
 		const boundaries = this.nodes[ uid ].getBoundingClientRect();
 
 		// Create a uid to Y coördinate map.
-		const uidToCoordMap = mapValues( this.nodes, ( node ) => {
-			return node.getBoundingClientRect().top - boundaries.top;
-		} );
+		const uidToCoordMap = mapValues( this.nodes, ( node ) =>
+			node.getBoundingClientRect().top - boundaries.top );
 
 		// Cache a Y coördinate to uid map for use in `onPointerMove`.
 		this.coordMap = invert( uidToCoordMap );
 		// Cache an array of the Y coördinates for use in `onPointerMove`.
-		this.coordMapKeys = Object.values( uidToCoordMap );
+		// Sort the coördinates, as `this.nodes` will not necessarily reflect
+		// the current block sequence.
+		this.coordMapKeys = sortBy( Object.values( uidToCoordMap ) );
 		this.selectionAtStart = uid;
 
 		window.addEventListener( 'mousemove', this.onPointerMove );

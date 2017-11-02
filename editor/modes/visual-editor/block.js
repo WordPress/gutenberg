@@ -23,14 +23,13 @@ import BlockDropZone from './block-drop-zone';
 import BlockHtml from './block-html';
 import BlockMover from '../../block-mover';
 import BlockSettingsMenu from '../../block-settings-menu';
-import BlockToolbar from '../../block-toolbar';
 import {
 	clearSelectedBlock,
 	editPost,
 	focusBlock,
 	insertBlocks,
 	mergeBlocks,
-	removeBlocks,
+	removeBlock,
 	replaceBlocks,
 	selectBlock,
 	startTyping,
@@ -90,7 +89,7 @@ class VisualEditorBlock extends Component {
 		}
 
 		// Not Ideal, but it's the easiest way to get the scrollable container
-		this.editorLayout = document.querySelector( '.editor-layout__editor' );
+		this.editorLayout = document.querySelector( '.editor-layout__content' );
 	}
 
 	componentWillReceiveProps( newProps ) {
@@ -322,7 +321,7 @@ class VisualEditorBlock extends Component {
 
 		// Generate the wrapper class names handling the different states of the block.
 		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected, focus } = this.props;
-		const showUI = isSelected && ( ! this.props.isTyping || focus.collapsed === false );
+		const showUI = isSelected && ( ! this.props.isTyping || ( focus && focus.collapsed === false ) );
 		const isProperlyHovered = isHovered && ! this.props.isSelecting;
 		const { error } = this.state;
 		const wrapperClassName = classnames( 'editor-visual-editor__block', {
@@ -359,12 +358,14 @@ class VisualEditorBlock extends Component {
 				<BlockDropZone index={ order } />
 				{ ( showUI || isProperlyHovered ) && <BlockMover uids={ [ block.uid ] } /> }
 				{ ( showUI || isProperlyHovered ) && <BlockSettingsMenu uids={ [ block.uid ] } /> }
-				{ isSelected && isValid && <BlockToolbar uid={ block.uid } /> }
 				{ isFirstMultiSelected && ! this.props.isSelecting &&
 					<BlockMover uids={ multiSelectedBlockUids } />
 				}
 				{ isFirstMultiSelected && ! this.props.isSelecting &&
-					<BlockSettingsMenu uids={ multiSelectedBlockUids } />
+					<BlockSettingsMenu
+						uids={ multiSelectedBlockUids }
+						focus={ true }
+					/>
 				}
 				<div
 					ref={ this.bindBlockNode }
@@ -476,8 +477,8 @@ export default connect(
 			dispatch( focusBlock( ...args ) );
 		},
 
-		onRemove( uids ) {
-			dispatch( removeBlocks( uids ) );
+		onRemove( uid ) {
+			dispatch( removeBlock( uid ) );
 		},
 
 		onMerge( ...args ) {

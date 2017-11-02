@@ -742,6 +742,17 @@ describe( 'state', () => {
 		} );
 
 		it( 'should set multi selection', () => {
+			const original = deepFreeze( { focus: { editable: 'citation' }, isMultiSelecting: false } );
+			const state = blockSelection( original, {
+				type: 'MULTI_SELECT',
+				start: 'ribs',
+				end: 'chicken',
+			} );
+
+			expect( state ).toEqual( { start: 'ribs', end: 'chicken', focus: null, isMultiSelecting: false } );
+		} );
+
+		it( 'should set continuous multi selection', () => {
 			const original = deepFreeze( { focus: { editable: 'citation' }, isMultiSelecting: true } );
 			const state = blockSelection( original, {
 				type: 'MULTI_SELECT',
@@ -761,13 +772,22 @@ describe( 'state', () => {
 			expect( state ).toEqual( { start: 'ribs', end: 'ribs', focus: { editable: 'citation' }, isMultiSelecting: true } );
 		} );
 
-		it( 'should end multi selection', () => {
+		it( 'should end multi selection with selection', () => {
 			const original = deepFreeze( { start: 'ribs', end: 'chicken', focus: { editable: 'citation' }, isMultiSelecting: true } );
 			const state = blockSelection( original, {
 				type: 'STOP_MULTI_SELECT',
 			} );
 
-			expect( state ).toEqual( { start: 'ribs', end: 'chicken', focus: { editable: 'citation' }, isMultiSelecting: false } );
+			expect( state ).toEqual( { start: 'ribs', end: 'chicken', focus: null, isMultiSelecting: false } );
+		} );
+
+		it( 'should end multi selection without selection', () => {
+			const original = deepFreeze( { start: 'ribs', end: 'ribs', focus: { editable: 'citation' }, isMultiSelecting: true } );
+			const state = blockSelection( original, {
+				type: 'STOP_MULTI_SELECT',
+			} );
+
+			expect( state ).toEqual( { start: 'ribs', end: 'ribs', focus: { editable: 'citation' }, isMultiSelecting: false } );
 		} );
 
 		it( 'should not update the state if the block is already selected', () => {

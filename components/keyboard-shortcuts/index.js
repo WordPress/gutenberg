@@ -2,6 +2,7 @@
  * External dependencies
  */
 import Mousetrap from 'mousetrap';
+import 'mousetrap/plugins/global-bind/mousetrap-global-bind';
 import { forEach } from 'lodash';
 
 /**
@@ -13,7 +14,9 @@ class KeyboardShortcuts extends Component {
 	componentWillMount() {
 		this.mousetrap = new Mousetrap;
 		forEach( this.props.shortcuts, ( callback, key ) => {
-			this.mousetrap.bind( key, callback );
+			const { bindGlobal, eventName } = this.props;
+			const bindFn = bindGlobal ? 'bindGlobal' : 'bind';
+			this.mousetrap[ bindFn ]( key, callback, eventName );
 		} );
 	}
 

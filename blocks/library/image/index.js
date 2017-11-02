@@ -12,7 +12,7 @@ import './editor.scss';
 import { registerBlockType, source, createBlock } from '../../api';
 import ImageBlock from './block';
 
-const { attr, children } = source;
+const { attr, children, text } = source;
 
 registerBlockType( 'core/image', {
 	title: __( 'Image' ),
@@ -77,6 +77,45 @@ registerBlockType( 'core/image', {
 							id: media.id,
 							url: media.source_url,
 						} ) );
+				},
+			},
+			{
+				type: 'shortcode',
+				tag: 'caption',
+				attributes: {
+					url: {
+						type: 'string',
+						source: attr( 'img', 'src' ),
+					},
+					alt: {
+						type: 'string',
+						source: attr( 'img', 'alt' ),
+					},
+					caption: {
+						type: 'array',
+						// To do: needs to support HTML.
+						source: text(),
+					},
+					href: {
+						type: 'string',
+						source: attr( 'a', 'href' ),
+					},
+					id: {
+						type: 'number',
+						shortcode: ( { named: { id } } ) => {
+							if ( ! id ) {
+								return;
+							}
+
+							return parseInt( id.replace( 'attachment_', '' ), 10 );
+						},
+					},
+					align: {
+						type: 'string',
+						shortcode: ( { named: { align = 'alignnone' } } ) => {
+							return align.replace( 'align', '' );
+						},
+					},
 				},
 			},
 		],
