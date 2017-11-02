@@ -222,7 +222,7 @@ export class InserterMenu extends Component {
 					ref={ this.bindReferenceNode( 'search' ) }
 				/>
 				{ ! isSearching &&
-					<TabPanel className="editor-inserter__tabs is-recent" activeClass={ 'is-active' }
+					<TabPanel className="editor-inserter__tabs" activeClass={ 'is-active' }
 						tabs={ [
 							{
 								name: 'recent',
@@ -238,7 +238,7 @@ export class InserterMenu extends Component {
 							},
 							{
 								name: 'embeds',
-								title: __( 'Embed' ),
+								title: __( 'Embeds' ),
 								className: 'editor-inserter__tab',
 								onSelect: this.switchTab,
 							},
