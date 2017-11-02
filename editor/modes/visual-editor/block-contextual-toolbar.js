@@ -7,24 +7,22 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton, NavigableMenu, KeyboardShortcuts } from '@wordpress/components';
+import { NavigableMenu, KeyboardShortcuts } from '@wordpress/components';
 import { Component, findDOMNode } from '@wordpress/element';
 import { focus, keycodes } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
-import './style.scss';
-import Inserter from '../../inserter';
 import BlockToolbar from '../../block-toolbar';
-import { hasEditorUndo, hasEditorRedo, isFeatureActive } from '../../selectors';
+import { isFeatureActive } from '../../selectors';
 
 /**
  * Module Constants
  */
 const { ESCAPE } = keycodes;
 
-class HeaderToolbar extends Component {
+class BlockContextualToolbar extends Component {
 	constructor() {
 		super( ...arguments );
 		this.bindNode = this.bindNode.bind( this );
@@ -61,10 +59,15 @@ class HeaderToolbar extends Component {
 	}
 
 	render() {
-		const { hasUndo, hasRedo, hasFixedToolbar, undo, redo } = this.props;
+		const { hasFixedToolbar } = this.props;
+
+		if ( hasFixedToolbar ) {
+			return null;
+		}
+
 		return (
 			<NavigableMenu
-				className="editor-header-toolbar"
+				className="editor-block-contextual-toolbar"
 				orientation="horizontal"
 				role="toolbar"
 				deep
@@ -79,22 +82,7 @@ class HeaderToolbar extends Component {
 						'alt+f10': this.focusToolbar,
 					} }
 				/>
-				<Inserter position="bottom right" />
-				<IconButton
-					icon="undo"
-					label={ __( 'Undo' ) }
-					disabled={ ! hasUndo }
-					onClick={ undo } />
-				<IconButton
-					icon="redo"
-					label={ __( 'Redo' ) }
-					disabled={ ! hasRedo }
-					onClick={ redo } />
-				{ hasFixedToolbar && (
-					<div className="editor-header-toolbar__block-toolbar">
-						<BlockToolbar />
-					</div>
-				) }
+				<BlockToolbar />
 			</NavigableMenu>
 		);
 	}
@@ -102,12 +90,6 @@ class HeaderToolbar extends Component {
 
 export default connect(
 	( state ) => ( {
-		hasUndo: hasEditorUndo( state ),
-		hasRedo: hasEditorRedo( state ),
 		hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
 	} ),
-	( dispatch ) => ( {
-		undo: () => dispatch( { type: 'UNDO' } ),
-		redo: () => dispatch( { type: 'REDO' } ),
-	} )
-)( HeaderToolbar );
+)( BlockContextualToolbar );

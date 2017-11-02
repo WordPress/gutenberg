@@ -77,14 +77,6 @@
 	align-items: center;
 }
 
-.editor-mode-switcher {
-	margin-left: $item-spacing;
-
-	.components-button svg {
-		transform: rotate( 90deg );
-	}
-}
-
 .editor-header .components-button {
 	border-radius: 3px;
 

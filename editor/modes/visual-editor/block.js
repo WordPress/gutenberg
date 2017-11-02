@@ -21,6 +21,7 @@ import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockDropZone from './block-drop-zone';
 import BlockHtml from './block-html';
+import BlockContextualToolbar from './block-contextual-toolbar';
 import BlockMover from '../../block-mover';
 import BlockSettingsMenu from '../../block-settings-menu';
 import {
@@ -358,6 +359,7 @@ class VisualEditorBlock extends Component {
 				<BlockDropZone index={ order } />
 				{ ( showUI || isProperlyHovered ) && <BlockMover uids={ [ block.uid ] } /> }
 				{ ( showUI || isProperlyHovered ) && <BlockSettingsMenu uids={ [ block.uid ] } /> }
+				{ showUI && isValid && <BlockContextualToolbar /> }
 				{ isFirstMultiSelected && ! this.props.isSelecting &&
 					<BlockMover uids={ multiSelectedBlockUids } />
 				}
