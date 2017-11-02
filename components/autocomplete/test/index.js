@@ -38,7 +38,7 @@ class FakeEditor extends Component {
 function makeAutocompleter( completers ) {
 	return mount(
 		<Autocomplete instanceId="1" completers={ completers }>{
-			( isExpanded, listBoxId, activeId ) => (
+			( { isExpanded, listBoxId, activeId } ) => (
 				<FakeEditor
 					aria-autocomplete="list"
 					aria-expanded={ isExpanded }

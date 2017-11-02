@@ -380,9 +380,9 @@ export class Autocomplete extends Component {
 		const { className } = open || {};
 		const classes = classnames( 'components-autocomplete__popover', className );
 		const filteredOptions = this.getFilteredOptions();
-		const isOpen = filteredOptions.length > 0;
-		const listBoxId = isOpen ? `components-autocomplete-listbox-${ instanceId }` : null;
-		const activeId = isOpen ? `components-autocomplete-item-${ instanceId }-${ selectedIndex }` : null;
+		const isExpanded = filteredOptions.length > 0;
+		const listBoxId = isExpanded ? `components-autocomplete-listbox-${ instanceId }` : null;
+		const activeId = isExpanded ? `components-autocomplete-item-${ instanceId }-${ selectedIndex }` : null;
 
 		return (
 			<div
@@ -390,9 +390,9 @@ export class Autocomplete extends Component {
 				onInput={ this.search }
 				className="components-autocomplete"
 			>
-				{ children( isOpen, listBoxId, activeId ) }
+				{ children( { isExpanded, listBoxId, activeId } ) }
 				<Popover
-					isOpen={ isOpen }
+					isOpen={ isExpanded }
 					focusOnOpen={ false }
 					onClose={ () => this.reset() }
 					position="top right"

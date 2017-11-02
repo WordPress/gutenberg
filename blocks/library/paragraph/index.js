@@ -155,7 +155,7 @@ registerBlockType( 'core/paragraph', {
 				blockAutocompleter( { onReplace } ),
 				userAutocompleter(),
 			] }>
-				{ ( isExpanded, listBoxId, activeId ) => (
+				{ ( { isExpanded, listBoxId, activeId } ) => (
 					<Editable
 						tagName="p"
 						className={ classnames( 'wp-block-paragraph', className, {
