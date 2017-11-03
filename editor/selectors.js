@@ -270,6 +270,27 @@ export function getCurrentPostId( state ) {
 }
 
 /**
+ * Returns the number of revisions of the post currently being edited.
+ *
+ * @param  {Object}  state Global application state
+ * @return {Number}        Number of revisions
+ */
+export function getCurrentPostRevisionsCount( state ) {
+	return get( getCurrentPost( state ), 'revisions.count', 0 );
+}
+
+/**
+ * Returns the last revision ID of the post currently being edited,
+ * or null if the post has no revisions.
+ *
+ * @param  {Object}  state Global application state
+ * @return {?Number}       ID of the last revision
+ */
+export function getCurrentPostLastRevisionId( state ) {
+	return get( getCurrentPost( state ), 'revisions.last_id', null );
+}
+
+/**
  * Returns any post values which have been changed in the editor but not yet
  * been saved.
  *
@@ -569,7 +590,11 @@ export const getMultiSelectedBlockUids = createSelector(
 
 		return blockOrder.slice( startIndex, endIndex + 1 );
 	},
-	( state ) => [ state.editor.blockOrder, state.blockSelection ],
+	( state ) => [
+		state.editor.blockOrder,
+		state.blockSelection.start,
+		state.blockSelection.end,
+	],
 );
 
 /**
@@ -583,7 +608,8 @@ export const getMultiSelectedBlocks = createSelector(
 	( state ) => getMultiSelectedBlockUids( state ).map( ( uid ) => getBlock( state, uid ) ),
 	( state ) => [
 		state.editor.blockOrder,
-		state.blockSelection,
+		state.blockSelection.start,
+		state.blockSelection.end,
 		state.editor.blocksByUid,
 		state.editor.edits.meta,
 		state.currentPost.meta,
@@ -925,10 +951,18 @@ export function getSuggestedPostFormat( state ) {
 	const blocks = state.editor.blockOrder;
 
 	let name;
-	// If there is only one block in the content of the post grab its name so
+	// If there is only one block in the content of the post grab its name
 	// so we can derive a suitable post format from it.
 	if ( blocks.length === 1 ) {
 		name = state.editor.blocksByUid[ blocks[ 0 ] ].name;
+	}
+
+	// If there are two blocks in the content and the last one is a text blocks
+	// grab the name of the first one to also suggest a post format from it.
+	if ( blocks.length === 2 ) {
+		if ( state.editor.blocksByUid[ blocks[ 1 ] ].name === 'core/paragraph' ) {
+			name = state.editor.blocksByUid[ blocks[ 0 ] ].name;
+		}
 	}
 
 	// We only convert to default post formats in core.
@@ -936,7 +970,18 @@ export function getSuggestedPostFormat( state ) {
 		case 'core/image':
 			return 'image';
 		case 'core/quote':
+		case 'core/pullquote':
 			return 'quote';
+		case 'core/gallery':
+			return 'gallery';
+		case 'core/video':
+		case 'core-embed/youtube':
+		case 'core-embed/vimeo':
+			return 'video';
+		case 'core/audio':
+		case 'core-embed/spotify':
+		case 'core-embed/soundcloud':
+			return 'audio';
 	}
 
 	return null;

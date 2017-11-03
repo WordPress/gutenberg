@@ -46,7 +46,9 @@ function Layout( { mode, isSidebarOpened, notices, ...props } ) {
 					{ mode === 'text' && <TextEditor /> }
 					{ mode === 'visual' && <VisualEditor /> }
 				</div>
-				<MetaBoxes location="normal" />
+				<div className="editor-layout__metaboxes">
+					<MetaBoxes location="normal" />
+				</div>
 			</div>
 			{ isSidebarOpened && <Sidebar /> }
 			<Popover.Slot />

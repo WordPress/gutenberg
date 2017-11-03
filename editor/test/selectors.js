@@ -24,6 +24,8 @@ import {
 	isCleanNewPost,
 	getCurrentPost,
 	getCurrentPostId,
+	getCurrentPostLastRevisionId,
+	getCurrentPostRevisionsCount,
 	getCurrentPostType,
 	getPostEdits,
 	getEditedPostTitle,
@@ -872,6 +874,50 @@ describe( 'selectors', () => {
 			};
 
 			expect( getCurrentPostId( state ) ).toBe( 1 );
+		} );
+	} );
+
+	describe( 'getCurrentPostLastRevisionId', () => {
+		it( 'should return null if the post has not yet been saved', () => {
+			const state = {
+				currentPost: {},
+			};
+
+			expect( getCurrentPostLastRevisionId( state ) ).toBeNull();
+		} );
+
+		it( 'should return the last revision ID', () => {
+			const state = {
+				currentPost: {
+					revisions: {
+						last_id: 123,
+					},
+				},
+			};
+
+			expect( getCurrentPostLastRevisionId( state ) ).toBe( 123 );
+		} );
+	} );
+
+	describe( 'getCurrentPostRevisionsCount', () => {
+		it( 'should return 0 if the post has no revisions', () => {
+			const state = {
+				currentPost: {},
+			};
+
+			expect( getCurrentPostRevisionsCount( state ) ).toBe( 0 );
+		} );
+
+		it( 'should return the number of revisions', () => {
+			const state = {
+				currentPost: {
+					revisions: {
+						count: 5,
+					},
+				},
+			};
+
+			expect( getCurrentPostRevisionsCount( state ) ).toBe( 5 );
 		} );
 	} );
 
@@ -2080,6 +2126,33 @@ describe( 'selectors', () => {
 					blockOrder: [ 456 ],
 					blocksByUid: {
 						456: { uid: 456, name: 'core/quote' },
+					},
+				},
+			};
+
+			expect( getSuggestedPostFormat( state ) ).toBe( 'quote' );
+		} );
+
+		it( 'returns Video if the first block is of type `core-embed/youtube`', () => {
+			const state = {
+				editor: {
+					blockOrder: [ 567 ],
+					blocksByUid: {
+						567: { uid: 567, name: 'core-embed/youtube' },
+					},
+				},
+			};
+
+			expect( getSuggestedPostFormat( state ) ).toBe( 'video' );
+		} );
+
+		it( 'returns Quote if the first block is of type `core/quote` and second is of type `core/paragraph`', () => {
+			const state = {
+				editor: {
+					blockOrder: [ 456, 789 ],
+					blocksByUid: {
+						456: { uid: 456, name: 'core/quote' },
+						789: { uid: 789, name: 'core/paragraph' },
 					},
 				},
 			};

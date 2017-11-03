@@ -6,12 +6,12 @@ import { equal, deepEqual } from 'assert';
 /**
  * Internal dependencies
  */
-import paste from '../index';
+import rawHandler from '../index';
 import { registerBlockType, unregisterBlockType, setUnknownTypeHandlerName } from '../../registration';
 import { createBlock } from '../../factory';
 import { children, prop } from '../../source';
 
-describe( 'paste', () => {
+describe( 'rawHandler', () => {
 	beforeAll( () => {
 		registerBlockType( 'test/figure', {
 			category: 'common',
@@ -54,28 +54,37 @@ describe( 'paste', () => {
 		setUnknownTypeHandlerName( undefined );
 	} );
 
-	it( 'should convert recognised pasted content', () => {
-		const pastedBlock = paste( { HTML: '<figure>test</figure>' } )[ 0 ];
-		const block = createBlock( 'test/figure', { content: [ 'test' ] } );
+	it( 'should convert recognised raw content', () => {
+		const block = rawHandler( { HTML: '<figure>test</figure>' } )[ 0 ];
+		const { name, attributes } = createBlock( 'test/figure', { content: [ 'test' ] } );
 
-		equal( pastedBlock.name, block.name );
-		deepEqual( pastedBlock.attributes, block.attributes );
+		equal( block.name, name );
+		deepEqual( block.attributes, attributes );
 	} );
 
-	it( 'should handle unknown pasted content', () => {
-		const pastedBlock = paste( { HTML: '<figcaption>test</figcaption>' } )[ 0 ];
+	it( 'should handle unknown raw content', () => {
+		const block = rawHandler( { HTML: '<figcaption>test</figcaption>' } )[ 0 ];
 
-		equal( pastedBlock.name, 'test/unknown' );
-		equal( pastedBlock.attributes.content, '<figcaption>test</figcaption>' );
+		equal( block.name, 'test/unknown' );
+		equal( block.attributes.content, '<figcaption>test</figcaption>' );
 	} );
 
 	it( 'should filter inline content', () => {
-		const filtered = paste( {
+		const filtered = rawHandler( {
 			HTML: '<h2><em>test</em></h2>',
-			inline: true,
+			mode: 'INLINE',
 		} );
 
 		equal( filtered, '<em>test</em>' );
+	} );
+
+	it( 'should always return blocks', () => {
+		const blocks = rawHandler( {
+			HTML: 'test',
+			mode: 'BLOCKS',
+		} );
+
+		equal( Array.isArray( blocks ), true );
 	} );
 } );
 

@@ -10,7 +10,7 @@ import classnames from 'classnames';
 import { __, sprintf } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/components';
 import { Component } from '@wordpress/element';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, BlockIcon } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -57,18 +57,21 @@ export class VisualEditorInserter extends Component {
 				<Inserter
 					insertIndex={ blockCount }
 					position="top right" />
-				{ mostFrequentlyUsedBlocks && mostFrequentlyUsedBlocks.map(
-					( block ) =>
-						<IconButton
-							key={ 'frequently_used_' + block.name }
-							icon={ block.icon }
-							className="editor-inserter__block"
-							onClick={ () => this.insertBlock( block.name ) }
-							label={ sprintf( __( 'Insert %s' ), block.title ) }
-						>
-							{ block.title }
-						</IconButton>
-				) }
+				{ mostFrequentlyUsedBlocks && mostFrequentlyUsedBlocks.map( ( block ) => (
+					<IconButton
+						key={ 'frequently_used_' + block.name }
+						className="editor-inserter__block"
+						onClick={ () => this.insertBlock( block.name ) }
+						label={ sprintf( __( 'Insert %s' ), block.title ) }
+						icon={ (
+							<span className="editor-visual-editor__inserter-block-icon">
+								<BlockIcon icon={ block.icon } />
+							</span>
+						) }
+					>
+						{ block.title }
+					</IconButton>
+				) ) }
 			</div>
 		);
 	}

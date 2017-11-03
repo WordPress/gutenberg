@@ -13,6 +13,7 @@ import { Toolbar } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
+import './editor.scss';
 import { registerBlockType, createBlock, source } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';

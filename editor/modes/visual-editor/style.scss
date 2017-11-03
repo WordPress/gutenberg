@@ -410,16 +410,19 @@
 		font-size: $default-font-size;
 		box-shadow: none;
 		padding: 6px;
-
-		.dashicon {
-			margin-right: 8px;
-		}
+		align-items: center;
 	}
 
 	&:hover > .editor-inserter__block,
 	&.is-showing-controls > .editor-inserter__block {
 		opacity: 1;
 	}
+}
+
+.editor-visual-editor__inserter-block-icon {
+	display: inline-block;
+	margin-right: 8px;
+	height: 20px;
 }
 
 .editor-visual-editor__block-warning {

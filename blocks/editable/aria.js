@@ -5,6 +5,8 @@
 import {
 	difference,
 	isEqual,
+	isNil,
+	keys,
 	pickBy,
 	startsWith,
 } from 'lodash';
@@ -12,15 +14,12 @@ import {
 const isAriaPropName = ( name ) =>
 	startsWith( name, 'aria-' );
 
-const getAriaKeys = ( props ) =>
-	Object.keys( props ).filter( isAriaPropName );
-
 export const pickAriaProps = ( props ) =>
-	pickBy( props, ( value, key ) => isAriaPropName( key ) );
+	pickBy( props, ( value, key ) => isAriaPropName( key ) && ! isNil( value ) );
 
 export const diffAriaProps = ( props, nextProps ) => {
-	const prevAriaKeys = getAriaKeys( props );
-	const nextAriaKeys = getAriaKeys( nextProps );
+	const prevAriaKeys = keys( pickAriaProps( props ) );
+	const nextAriaKeys = keys( pickAriaProps( nextProps ) );
 	const removedKeys = difference( prevAriaKeys, nextAriaKeys );
 	const updatedKeys = nextAriaKeys.filter( ( key ) =>
 		! isEqual( props[ key ], nextProps[ key ] ) );
