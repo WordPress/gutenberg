@@ -17,7 +17,10 @@ describe( 'persistStore', () => {
 				preferences: { ribs: true },
 			};
 		};
-		const store = createStore( reducer, persistStore( 'preferences', storageKey, {} ) );
+		const store = createStore( reducer, persistStore( {
+			reducerKey: 'preferences',
+			storageKey,
+		} ) );
 		expect( store.getState().preferences ).toEqual( { chicken: true } );
 	} );
 
@@ -34,7 +37,10 @@ describe( 'persistStore', () => {
 				preferences: { ribs: true },
 			};
 		};
-		const store = createStore( reducer, persistStore( 'preferences', storageKey, {} ) );
+		const store = createStore( reducer, persistStore( {
+			reducerKey: 'preferences',
+			storageKey,
+		} ) );
 		store.dispatch( { type: 'UPDATE' } );
 		expect( JSON.parse( window.localStorage.getItem( storageKey ) ) ).toEqual( { chicken: true } );
 	} );
@@ -60,7 +66,11 @@ describe( 'persistStore', () => {
 		// store preferences without the `counter` default
 		window.localStorage.setItem( storageKey, JSON.stringify( {} ) );
 
-		const store = createStore( reducer, persistStore( 'preferences', storageKey, defaults ) );
+		const store = createStore( reducer, persistStore( {
+			reducerKey: 'preferences',
+			storageKey,
+			defaults: defaults.preferences,
+		} ) );
 		store.dispatch( { type: 'INCREMENT' } );
 
 		// the default should have been applied, as the `counter` was missing from the
@@ -88,7 +98,11 @@ describe( 'persistStore', () => {
 
 		window.localStorage.setItem( storageKey, JSON.stringify( { counter: 1 } ) );
 
-		const store = createStore( reducer, persistStore( 'preferences', storageKey, defaults ) );
+		const store = createStore( reducer, persistStore( {
+			reducerKey: 'preferences',
+			storageKey,
+			defaults: defaults.preferences,
+		} ) );
 		store.dispatch( { type: 'INCREMENT' } );
 
 		expect( JSON.parse( window.localStorage.getItem( storageKey ) ) ).toEqual( { counter: 2 } );
