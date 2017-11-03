@@ -234,7 +234,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 			return (
 				<figure className={ align ? `align${ align }` : null }>
 					{ `\n${ url }\n` /* URL needs to be on its own line. */ }
-					{ caption && caption.length > 0 && <figcaption><Editable.Value value={ caption } /></figcaption> }
+					<Editable.Value tagName="figcaption" value={ caption } />
 				</figure>
 			);
 		},

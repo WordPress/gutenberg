@@ -151,7 +151,7 @@ registerBlockType( 'core/image', {
 		return (
 			<figure className={ align ? `align${ align }` : null } style={ figureStyle }>
 				{ href ? <a href={ href }>{ image }</a> : image }
-				{ caption && caption.length > 0 && <figcaption><Editable.Value value={ caption } /></figcaption> }
+				<Editable.Value tagName="figcaption" value={ caption } />
 			</figure>
 		);
 	},

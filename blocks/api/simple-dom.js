@@ -63,3 +63,11 @@ export function applySimpleNodeList( tree, node ) {
 		}
 	} );
 }
+
+export function createHTMLFromSimpleNodeList( tree ) {
+	const doc = document.implementation.createHTMLDocument( '' );
+
+	applySimpleNodeList( tree, doc.body );
+
+	return doc.body.innerHTML;
+}

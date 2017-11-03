@@ -205,9 +205,13 @@ registerBlockType( 'core/button', {
 
 		return (
 			<div className={ `align${ align }` } style={ { backgroundColor: color } }>
-				<a href={ url } title={ title } style={ { color: textColor } }>
-					<Editable.Value value={ text } />
-				</a>
+				<Editable.Value
+					tagName="a"
+					value={ text }
+					href={ url }
+					title={ title }
+					style={ { color: textColor } }
+				/>
 			</div>
 		);
 	},

@@ -281,9 +281,12 @@ registerBlockType( 'core/paragraph', {
 		};
 
 		return (
-			<p style={ styles } className={ className ? className : undefined }>
-				<Editable.Value value={ content } />
-			</p>
+			<Editable.Value
+				tagName="p"
+				value={ content }
+				style={ styles }
+				className={ className ? className : undefined }
+			/>
 		);
 	},
 } );

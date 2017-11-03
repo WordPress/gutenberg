@@ -29,7 +29,7 @@ import { Slot, Fill } from '@wordpress/components';
 import './style.scss';
 import { rawHandler } from '../api';
 import * as matchers from '../api/matchers';
-import { applySimpleNodeList } from '../api/simple-dom';
+import { applySimpleNodeList, createHTMLFromSimpleNodeList } from '../api/simple-dom';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
 import { pickAriaProps } from './aria';
@@ -871,7 +871,7 @@ export default class Editable extends Component {
 					getSettings={ this.getSettings }
 					onSetup={ this.onSetup }
 					style={ style }
-					defaultValue={ valueToElement( value ) }
+					defaultValue={ createHTMLFromSimpleNodeList( value ) }
 					isPlaceholderVisible={ isPlaceholderVisible }
 					aria-label={ placeholder }
 					{ ...ariaProps }
@@ -901,4 +901,10 @@ Editable.defaultProps = {
 	formatters: [],
 };
 
-Editable.Value = ( { value } ) => valueToElement( value );
+Editable.Value = ( { tagName: TagName = 'div', value = [], ...props } ) => {
+	const HTML = createHTMLFromSimpleNodeList( value );
+
+	return (
+		<TagName dangerouslySetInnerHTML={ { __html: HTML } } { ...props } />
+	);
+};
