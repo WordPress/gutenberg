@@ -17,7 +17,7 @@ import PostVisibilityLabel from '../../post-visibility/label';
 import PostVisibilityForm from '../../post-visibility';
 
 export function PostVisibility( { user, instanceId } ) {
-	const canEdit = user.data && user.data.capabilities.publish_posts;
+	co	data.capabilities.publish_posts;
 	const postVisibilitySelectorId = 'post-visibility-selector-' + instanceId;
 
 	return (
@@ -46,11 +46,11 @@ export function PostVisibility( { user, instanceId } ) {
 	);
 }
 
+const applyWithAPIData = withAPIData( () => ( {
+	user: '/wp/v2/users/me?context=edit',
+} ) );
+
 export default flowRight( [
-	withAPIData( () => {
-		return {
-			user: '/wp/v2/users/me?context=edit',
-		};
-	} ),
+	applyWithAPIData,
 	withInstanceId,
 ] )( PostVisibility );

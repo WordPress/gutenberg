@@ -45,11 +45,11 @@ export function PostSchedule( { user, instanceId } ) {
 	);
 }
 
+const applyWithAPIData = withAPIData( () => ( {
+	user: '/wp/v2/users/me?context=edit',
+} ) );
+
 export default flowRight( [
-	withAPIData( () => {
-		return {
-			user: '/wp/v2/users/me?context=edit',
-		};
-	} ),
+	applyWithAPIData,
 	withInstanceId,
 ] )( PostSchedule );
