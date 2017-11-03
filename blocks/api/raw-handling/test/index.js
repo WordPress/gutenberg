@@ -72,7 +72,7 @@ describe( 'rawHandler', () => {
 	it( 'should filter inline content', () => {
 		const filtered = rawHandler( {
 			HTML: '<h2><em>test</em></h2>',
-			inline: true,
+			mode: 'INLINE',
 		} );
 
 		equal( filtered, '<em>test</em>' );
@@ -81,7 +81,7 @@ describe( 'rawHandler', () => {
 	it( 'should always return blocks', () => {
 		const blocks = rawHandler( {
 			HTML: 'test',
-			inline: false,
+			mode: 'BLOCKS',
 		} );
 
 		equal( Array.isArray( blocks ), true );

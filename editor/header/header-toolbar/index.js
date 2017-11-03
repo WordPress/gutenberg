@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton, NavigableMenu } from '@wordpress/components';
+import { IconButton, NavigableMenu, KeyboardShortcuts } from '@wordpress/components';
 import { Component, findDOMNode } from '@wordpress/element';
 import { focus, keycodes } from '@wordpress/utils';
 
@@ -18,38 +18,18 @@ import './style.scss';
 import Inserter from '../../inserter';
 import BlockToolbar from '../../block-toolbar';
 import { hasEditorUndo, hasEditorRedo } from '../../selectors';
-import { isMac } from '../../utils/dom';
 
 /**
  * Module Constants
  */
-const { ESCAPE, F10 } = keycodes;
-
-function metaKeyPressed( event ) {
-	return isMac() ? event.metaKey : event.ctrlKey;
-}
+const { ESCAPE } = keycodes;
 
 class HeaderToolbar extends Component {
 	constructor() {
 		super( ...arguments );
 		this.bindNode = this.bindNode.bind( this );
-		this.onKeyUp = this.onKeyUp.bind( this );
-		this.onKeyDown = this.onKeyDown.bind( this );
+		this.focusToolbar = this.focusToolbar.bind( this );
 		this.onToolbarKeyDown = this.onToolbarKeyDown.bind( this );
-
-		// it's not easy to know if the user only clicked on a "meta" key without simultaneously clicking on another key
-		// We keep track of the key counts to ensure it's reliable
-		this.metaCount = 0;
-	}
-
-	componentDidMount() {
-		document.addEventListener( 'keyup', this.onKeyUp, true );
-		document.addEventListener( 'keydown', this.onKeyDown, true );
-	}
-
-	componentWillUnmount() {
-		document.removeEventListener( 'keyup', this.onKeyUp );
-		document.removeEventListener( 'keydown', this.onKeyDown );
 	}
 
 	bindNode( ref ) {
@@ -59,25 +39,10 @@ class HeaderToolbar extends Component {
 		this.toolbar = findDOMNode( ref );
 	}
 
-	onKeyDown( event ) {
-		if ( metaKeyPressed( event ) ) {
-			this.metaCount++;
-		}
-	}
-
-	onKeyUp( event ) {
-		const shouldFocusToolbar = this.metaCount === 1 || ( event.keyCode === F10 && event.altKey );
-
-		// Reset the count if it's the final released key
-		if ( ! event.shiftKey && ! event.altKey && ( ! event.ctrlKey || ! isMac() ) ) {
-			this.metaCount = 0;
-		}
-
-		if ( shouldFocusToolbar ) {
-			const tabbables = focus.tabbable.find( this.toolbar );
-			if ( tabbables.length ) {
-				tabbables[ 0 ].focus();
-			}
+	focusToolbar() {
+		const tabbables = focus.tabbable.find( this.toolbar );
+		if ( tabbables.length ) {
+			tabbables[ 0 ].focus();
 		}
 	}
 
@@ -107,6 +72,13 @@ class HeaderToolbar extends Component {
 				ref={ this.bindNode }
 				onKeyDown={ this.onToolbarKeyDown }
 			>
+				<KeyboardShortcuts
+					bindGlobal
+					eventName="keyup"
+					shortcuts={ {
+						'alt+f10': this.focusToolbar,
+					} }
+				/>
 				<Inserter position="bottom right" />
 				<IconButton
 					icon="undo"
