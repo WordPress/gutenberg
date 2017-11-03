@@ -6,19 +6,33 @@
 
 	.dashicon {
 		margin-right: 4px;
+		margin-left: -4px;
 	}
 
 	&.button-link {
 		text-decoration: underline;
 		color: $blue-wordpress;
+		margin-right: $item-spacing;	// needs specificity to override core CSS bleed
 
 		&:focus {
-			box-shadow: none;
 			outline: none;
 		}
 
 		&:hover {
 			color: $blue-medium-500;
 		}
+	}
+}
+
+.editor-saved-state__mobile {
+	@include break-small {
+		display: none;
+	}
+}
+
+.editor-saved-state__desktop {
+	display: none;
+	@include break-small {
+		display: inline;
 	}
 }

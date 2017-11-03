@@ -1,44 +1,91 @@
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
+import './editor.scss';
 import './style.scss';
-import { registerBlockType, query as hpq } from '../../api';
+import { registerBlockType, source } from '../../api';
 import Editable from '../../editable';
+import BlockControls from '../../block-controls';
+import BlockAlignmentToolbar from '../../block-alignment-toolbar';
+import InspectorControls from '../../inspector-controls';
+import BlockDescription from '../../block-description';
 
-const { children, query } = hpq;
+const { children, query, node } = source;
 
 registerBlockType( 'core/pullquote', {
 
-	title: wp.i18n.__( 'Pullquote' ),
+	title: __( 'Pullquote' ),
 
 	icon: 'format-quote',
 
 	category: 'formatting',
 
 	attributes: {
-		value: query( 'blockquote > p', children() ),
-		citation: children( 'footer' ),
+		value: {
+			type: 'array',
+			source: query( 'blockquote > p', node() ),
+		},
+		citation: {
+			type: 'array',
+			source: children( 'footer' ),
+		},
+		align: {
+			type: 'string',
+			default: 'none',
+		},
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus } ) {
-		const { value, citation } = attributes;
+	getEditWrapperProps( attributes ) {
+		const { align } = attributes;
+		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
+			return { 'data-align': align };
+		}
+	},
 
-		return (
-			<blockquote className="blocks-pullquote">
+	edit( { attributes, setAttributes, focus, setFocus, className } ) {
+		const { value, citation, align } = attributes;
+		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
+
+		return [
+			focus && (
+				<InspectorControls key="inspector">
+					<BlockDescription>
+						<p>{ __( 'A pullquote is a brief, attention-catching quotation taken from the main text of an article and used as a subheading or graphic feature.' ) }</p>
+					</BlockDescription>
+				</InspectorControls>
+			),
+			focus && (
+				<BlockControls key="controls">
+					<BlockAlignmentToolbar
+						value={ align }
+						onChange={ updateAlignment }
+					/>
+				</BlockControls>
+			),
+			<blockquote key="quote" className={ className }>
 				<Editable
-					value={ value || wp.i18n.__( 'Write Quote…' ) }
+					multiline="p"
+					value={ value }
 					onChange={
 						( nextValue ) => setAttributes( {
 							value: nextValue,
 						} )
 					}
+					placeholder={ __( 'Write quote…' ) }
 					focus={ focus && focus.editable === 'value' ? focus : null }
 					onFocus={ ( props ) => setFocus( { ...props, editable: 'value' } ) }
+					wrapperClassName="blocks-pullquote__content"
 				/>
 				{ ( citation || !! focus ) && (
 					<Editable
 						tagName="footer"
-						value={ citation || wp.i18n.__( 'Write caption…' ) }
+						value={ citation }
+						placeholder={ __( 'Write caption…' ) }
 						onChange={
 							( nextCitation ) => setAttributes( {
 								citation: nextCitation,
@@ -46,22 +93,18 @@ registerBlockType( 'core/pullquote', {
 						}
 						focus={ focus && focus.editable === 'citation' ? focus : null }
 						onFocus={ ( props ) => setFocus( { ...props, editable: 'citation' } ) }
-						inline
 					/>
 				) }
-			</blockquote>
-		);
+			</blockquote>,
+		];
 	},
 
 	save( { attributes } ) {
-		const { value, citation } = attributes;
+		const { value, citation, align } = attributes;
 
 		return (
-			<blockquote className="blocks-pullquote">
-				{ value && value.map( ( paragraph, i ) => (
-					<p key={ i }>{ paragraph }</p>
-				) ) }
-
+			<blockquote className={ `align${ align }` }>
+				{ value && value.map( ( paragraph, i ) => <p key={ i }>{ paragraph.props.children }</p> ) }
 				{ citation && citation.length > 0 && (
 					<footer>{ citation }</footer>
 				) }

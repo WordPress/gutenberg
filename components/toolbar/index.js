@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import classnames from 'classnames';
 
 /**
  * Internal dependencies
@@ -9,8 +9,11 @@ import classNames from 'classnames';
 import './style.scss';
 import IconButton from '../icon-button';
 
-function Toolbar( { controls, focus } ) {
-	if ( ! controls || ! controls.length ) {
+function Toolbar( { controls = [], children, className } ) {
+	if (
+		( ! controls || ! controls.length ) &&
+		! children
+	) {
 		return null;
 	}
 
@@ -21,11 +24,11 @@ function Toolbar( { controls, focus } ) {
 	}
 
 	return (
-		<ul className="components-toolbar">
+		<div className={ classnames( 'components-toolbar', className ) }>
 			{ controlSets.reduce( ( result, controlSet, setIndex ) => [
 				...result,
 				...controlSet.map( ( control, controlIndex ) => (
-					<li
+					<div
 						key={ [ setIndex, controlIndex ].join() }
 						className={ setIndex > 0 && controlIndex === 0 ? 'has-left-divider' : null }
 					>
@@ -37,18 +40,18 @@ function Toolbar( { controls, focus } ) {
 								event.stopPropagation();
 								control.onClick();
 							} }
-							className={ classNames( 'components-toolbar__control', {
+							className={ classnames( 'components-toolbar__control', {
 								'is-active': control.isActive,
 							} ) }
 							aria-pressed={ control.isActive }
-							focus={ focus && setIndex === 0 && controlIndex === 0 }
 							disabled={ control.isDisabled }
 						/>
 						{ control.children }
-					</li>
+					</div>
 				) ),
 			], [] ) }
-		</ul>
+			{ children }
+		</div>
 	);
 }
 

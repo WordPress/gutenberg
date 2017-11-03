@@ -11,13 +11,16 @@
     "issues": "https://github.com/WordPress/gutenberg/issues"
   },
   "require-dev": {
+    "dealerdirect/phpcodesniffer-composer-installer": "^0.4",
     "squizlabs/php_codesniffer": "2.9.x",
+    "wimg/php-compatibility": "dev-master",
     "wp-coding-standards/wpcs": "^0.11.0"
   },
   "require": {
     "composer/installers": "~1.0"
   },
   "scripts": {
+    "lint": "phpcs",
     "post-install-cmd": [
       "phpcs --config-set installed_paths ../../wp-coding-standards/wpcs/"
     ]

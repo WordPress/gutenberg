@@ -1,57 +1,77 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import { isString } from 'lodash';
+import { __, sprintf } from '@wordpress/i18n';
+import { concatChildren } from '@wordpress/element';
+import { Toolbar } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import './style.scss';
-import { registerBlockType, createBlock, query } from '../../api';
+import './editor.scss';
+import { registerBlockType, createBlock, source } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
+import InspectorControls from '../../inspector-controls';
+import AlignmentToolbar from '../../alignment-toolbar';
+import BlockDescription from '../../block-description';
 
-const { children, prop } = query;
+const { children, prop } = source;
 
 registerBlockType( 'core/heading', {
-	title: wp.i18n.__( 'Heading' ),
+	title: __( 'Heading' ),
 
 	icon: 'heading',
 
 	category: 'common',
 
+	keywords: [ __( 'title' ), __( 'subtitle' ) ],
+
+	className: false,
+
+	supportAnchor: true,
+
 	attributes: {
-		content: children( 'h1,h2,h3,h4,h5,h6' ),
-		nodeName: prop( 'h1,h2,h3,h4,h5,h6', 'nodeName' ),
+		content: {
+			type: 'array',
+			source: children( 'h1,h2,h3,h4,h5,h6' ),
+		},
+		nodeName: {
+			type: 'string',
+			source: prop( 'h1,h2,h3,h4,h5,h6', 'nodeName' ),
+			default: 'H2',
+		},
+		align: {
+			type: 'string',
+		},
+		placeholder: {
+			type: 'string',
+		},
 	},
 
 	transforms: {
 		from: [
 			{
 				type: 'block',
-				blocks: [ 'core/text' ],
-				transform: ( { content, ...attrs } ) => {
-					if ( Array.isArray( content ) ) {
-						const headingContent = isString( content[ 0 ] )
-							? content[ 0 ]
-							: content[ 0 ].props.children;
-						const heading = createBlock( 'core/heading', {
-							content: headingContent,
-						} );
-						const blocks = [ heading ];
-
-						const remainingContent = content.slice( 1 );
-						if ( remainingContent.length ) {
-							const text = createBlock( 'core/text', {
-								...attrs,
-								content: remainingContent,
-							} );
-							blocks.push( text );
-						}
-
-						return blocks;
-					}
+				blocks: [ 'core/paragraph' ],
+				transform: ( { content } ) => {
 					return createBlock( 'core/heading', {
+						content,
+					} );
+				},
+			},
+			{
+				type: 'raw',
+				isMatch: ( node ) => /H\d/.test( node.nodeName ),
+			},
+			{
+				type: 'pattern',
+				regExp: /^(#{2,6})\s/,
+				transform: ( { content, match } ) => {
+					const level = match[ 1 ].length;
+
+					return createBlock( 'core/heading', {
+						nodeName: `H${ level }`,
 						content,
 					} );
 				},
@@ -60,9 +80,9 @@ registerBlockType( 'core/heading', {
 		to: [
 			{
 				type: 'block',
-				blocks: [ 'core/text' ],
+				blocks: [ 'core/paragraph' ],
 				transform: ( { content } ) => {
-					return createBlock( 'core/text', {
+					return createBlock( 'core/paragraph', {
 						content,
 					} );
 				},
@@ -72,27 +92,54 @@ registerBlockType( 'core/heading', {
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: wp.element.concatChildren( attributes.content, attributesToMerge.content ),
+			content: concatChildren( attributes.content, attributesToMerge.content ),
 		};
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, insertBlockAfter } ) {
-		const { content, nodeName = 'H2' } = attributes;
+	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, insertBlocksAfter } ) {
+		const { align, content, nodeName, placeholder } = attributes;
 
 		return [
 			focus && (
 				<BlockControls
 					key="controls"
 					controls={
-						'123456'.split( '' ).map( ( level ) => ( {
+						'234'.split( '' ).map( ( level ) => ( {
 							icon: 'heading',
-							title: wp.i18n.sprintf( wp.i18n.__( 'Heading %s' ), level ),
+							title: sprintf( __( 'Heading %s' ), level ),
 							isActive: 'H' + level === nodeName,
 							onClick: () => setAttributes( { nodeName: 'H' + level } ),
 							subscript: level,
 						} ) )
 					}
 				/>
+			),
+			focus && (
+				<InspectorControls key="inspector">
+					<BlockDescription>
+						<p>{ __( 'Search engines use the headings to index the structure and content of your web pages.' ) }</p>
+					</BlockDescription>
+					<h3>{ __( 'Heading Settings' ) }</h3>
+					<p>{ __( 'Size' ) }</p>
+					<Toolbar
+						controls={
+							'123456'.split( '' ).map( ( level ) => ( {
+								icon: 'heading',
+								title: sprintf( __( 'Heading %s' ), level ),
+								isActive: 'H' + level === nodeName,
+								onClick: () => setAttributes( { nodeName: 'H' + level } ),
+								subscript: level,
+							} ) )
+						}
+					/>
+					<p>{ __( 'Text Alignment' ) }</p>
+					<AlignmentToolbar
+						value={ align }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { align: nextAlign } );
+						} }
+					/>
+				</InspectorControls>
 			),
 			<Editable
 				key="editable"
@@ -102,23 +149,25 @@ registerBlockType( 'core/heading', {
 				onFocus={ setFocus }
 				onChange={ ( value ) => setAttributes( { content: value } ) }
 				onMerge={ mergeBlocks }
-				inline
-				onSplit={ ( before, after ) => {
+				onSplit={ ( before, after, ...blocks ) => {
 					setAttributes( { content: before } );
-					insertBlockAfter( createBlock( 'core/text', {
-						content: after,
-					} ) );
+					insertBlocksAfter( [
+						...blocks,
+						createBlock( 'core/paragraph', { content: after } ),
+					] );
 				} }
+				style={ { textAlign: align } }
+				placeholder={ placeholder || __( 'Write heading…' ) }
 			/>,
 		];
 	},
 
 	save( { attributes } ) {
-		const { nodeName = 'H2', content } = attributes;
+		const { align, nodeName, content } = attributes;
 		const Tag = nodeName.toLowerCase();
 
 		return (
-			<Tag>
+			<Tag style={ { textAlign: align } } >
 				{ content }
 			</Tag>
 		);

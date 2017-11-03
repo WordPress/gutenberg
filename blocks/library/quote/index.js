@@ -1,56 +1,62 @@
 /**
+ * External dependencies
+ */
+import { isString, isObject } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-import { switchChildrenNodeName } from 'element';
+import { __, sprintf } from '@wordpress/i18n';
+import { Toolbar } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, createBlock, query as hpq } from '../../api';
+import './editor.scss';
+import { registerBlockType, createBlock, source } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
 import Editable from '../../editable';
+import InspectorControls from '../../inspector-controls';
+import BlockDescription from '../../block-description';
 
-const { children, query } = hpq;
+const { children, node: element, query } = source;
 
 registerBlockType( 'core/quote', {
-	title: wp.i18n.__( 'Quote' ),
+	title: __( 'Quote' ),
 	icon: 'format-quote',
 	category: 'common',
 
 	attributes: {
-		value: query( 'blockquote > p', children() ),
-		citation: children( 'footer' ),
-	},
-
-	controls: [ 1, 2 ].map( ( variation ) => ( {
-		icon: 'format-quote',
-		title: wp.i18n.sprintf( wp.i18n.__( 'Quote style %d' ), variation ),
-		isActive: ( { style = 1 } ) => Number( style ) === variation,
-		onClick( attributes, setAttributes ) {
-			setAttributes( { style: variation } );
+		value: {
+			type: 'array',
+			source: query( 'blockquote > p', element() ),
+			default: [],
 		},
-		subscript: variation,
-	} ) ),
+		citation: {
+			type: 'array',
+			source: children( 'footer' ),
+		},
+		align: {
+			type: 'string',
+		},
+		style: {
+			type: 'number',
+			default: 1,
+		},
+	},
 
 	transforms: {
 		from: [
 			{
 				type: 'block',
-				blocks: [ 'core/text' ],
+				blocks: [ 'core/paragraph' ],
 				transform: ( { content } ) => {
 					return createBlock( 'core/quote', {
-						value: content,
-					} );
-				},
-			},
-			{
-				type: 'block',
-				blocks: [ 'core/list' ],
-				transform: ( { values } ) => {
-					return createBlock( 'core/quote', {
-						value: switchChildrenNodeName( values, 'p' ),
+						value: [
+							<p key="1">{ content }</p>,
+						],
 					} );
 				},
 			},
@@ -59,32 +65,54 @@ registerBlockType( 'core/quote', {
 				blocks: [ 'core/heading' ],
 				transform: ( { content } ) => {
 					return createBlock( 'core/quote', {
-						value: content,
+						value: [
+							<p key="1">{ content }</p>,
+						],
 					} );
 				},
+			},
+			{
+				type: 'pattern',
+				regExp: /^>\s/,
+				transform: ( { content } ) => {
+					return createBlock( 'core/quote', {
+						value: [
+							<p key="1">{ content }</p>,
+						],
+					} );
+				},
+			},
+			{
+				type: 'raw',
+				isMatch: ( node ) => node.nodeName === 'BLOCKQUOTE',
 			},
 		],
 		to: [
 			{
 				type: 'block',
-				blocks: [ 'core/text' ],
-				transform: ( { value, citation } ) => {
-					return createBlock( 'core/text', {
-						content: wp.element.concatChildren( value, citation ),
-					} );
-				},
-			},
-			{
-				type: 'block',
-				blocks: [ 'core/list' ],
-				transform: ( { value, citation } ) => {
-					const valueElements = switchChildrenNodeName( value, 'li' );
-					const values = citation
-						? wp.element.concatChildren( valueElements, <li>{ citation }</li> )
-						: valueElements;
-					return createBlock( 'core/list', {
-						nodeName: 'ul',
-						values,
+				blocks: [ 'core/paragraph' ],
+				transform: ( { value, citation, ...attrs } ) => {
+					const textElement = value[ 0 ];
+					if ( ! textElement ) {
+						return createBlock( 'core/paragraph', {
+							content: citation,
+						} );
+					}
+					const textContent = isString( textElement ) ? textElement : textElement.props.children;
+					if ( Array.isArray( value ) || citation ) {
+						const text = createBlock( 'core/paragraph', {
+							content: textContent,
+						} );
+						const quote = createBlock( 'core/quote', {
+							...attrs,
+							citation,
+							value: Array.isArray( value ) ? value.slice( 1 ) : '',
+						} );
+
+						return [ text, quote ];
+					}
+					return createBlock( 'core/paragraph', {
+						content: textContent,
 					} );
 				},
 			},
@@ -92,9 +120,14 @@ registerBlockType( 'core/quote', {
 				type: 'block',
 				blocks: [ 'core/heading' ],
 				transform: ( { value, citation, ...attrs } ) => {
-					if ( Array.isArray( value ) || citation ) {
+					const isMultiParagraph = Array.isArray( value ) && isObject( value[ 0 ] ) && value[ 0 ].type === 'p';
+					const headingElement = isMultiParagraph ? value[ 0 ] : value;
+					const headingContent = isObject( headingElement ) && value[ 0 ].type === 'p' ?
+						headingElement.props.children :
+						headingElement;
+					if ( isMultiParagraph || citation ) {
 						const heading = createBlock( 'core/heading', {
-							content: Array.isArray( value ) ? value[ 0 ] : value,
+							content: headingContent,
 						} );
 						const quote = createBlock( 'core/quote', {
 							...attrs,
@@ -105,20 +138,28 @@ registerBlockType( 'core/quote', {
 						return [ heading, quote ];
 					}
 					return createBlock( 'core/heading', {
-						content: value,
+						content: headingContent,
 					} );
 				},
 			},
 		],
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks } ) {
-		const { align, value, citation, style = 1 } = attributes;
+	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, className } ) {
+		const { align, value, citation, style } = attributes;
 		const focusedEditable = focus ? focus.editable || 'value' : null;
 
 		return [
 			focus && (
 				<BlockControls key="controls">
+					<Toolbar controls={ [ 1, 2 ].map( ( variation ) => ( {
+						icon: 1 === variation ? 'format-quote' : 'testimonial',
+						title: sprintf( __( 'Quote style %d' ), variation ),
+						isActive: Number( style ) === variation,
+						onClick() {
+							setAttributes( { style: variation } );
+						},
+					} ) ) } />
 					<AlignmentToolbar
 						value={ align }
 						onChange={ ( nextAlign ) => {
@@ -127,11 +168,19 @@ registerBlockType( 'core/quote', {
 					/>
 				</BlockControls>
 			),
+			focus && (
+				<InspectorControls key="inspector">
+					<BlockDescription>
+						<p>{ __( 'Quote. In quoting others, we cite ourselves. (Julio Cortázar)' ) }</p>
+					</BlockDescription>
+				</InspectorControls>
+			),
 			<blockquote
 				key="quote"
-				className={ `blocks-quote blocks-quote-style-${ style }` }
+				className={ `${ className } blocks-quote-style-${ style }` }
 			>
 				<Editable
+					multiline="p"
 					value={ value }
 					onChange={
 						( nextValue ) => setAttributes( {
@@ -142,12 +191,13 @@ registerBlockType( 'core/quote', {
 					onFocus={ ( props ) => setFocus( { ...props, editable: 'value' } ) }
 					onMerge={ mergeBlocks }
 					style={ { textAlign: align } }
+					placeholder={ __( 'Write quote…' ) }
 				/>
 				{ ( ( citation && citation.length > 0 ) || !! focus ) && (
 					<Editable
 						tagName="footer"
 						value={ citation }
-						placeholder={ wp.i18n.__( '— Add citation…' ) }
+						placeholder={ __( 'Write citation…' ) }
 						onChange={
 							( nextCitation ) => setAttributes( {
 								citation: nextCitation,
@@ -155,7 +205,6 @@ registerBlockType( 'core/quote', {
 						}
 						focus={ focusedEditable === 'citation' ? focus : null }
 						onFocus={ ( props ) => setFocus( { ...props, editable: 'citation' } ) }
-						inline
 					/>
 				) }
 			</blockquote>,
@@ -163,17 +212,15 @@ registerBlockType( 'core/quote', {
 	},
 
 	save( { attributes } ) {
-		const { align, value, citation, style = 1 } = attributes;
+		const { align, value, citation, style } = attributes;
 
 		return (
-			<blockquote className={ `blocks-quote-style-${ style }` }>
-				{ value && value.map( ( paragraph, i ) => (
-					<p
-						key={ i }
-						style={ { textAlign: align ? align : null } }
-					>
-						{ paragraph }
-					</p>
+			<blockquote
+				className={ `blocks-quote-style-${ style }` }
+				style={ { textAlign: align ? align : null } }
+			>
+				{ value.map( ( paragraph, i ) => (
+					<p key={ i }>{ paragraph.props.children }</p>
 				) ) }
 				{ citation && citation.length > 0 && (
 					<footer>{ citation }</footer>

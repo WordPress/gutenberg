@@ -1,18 +1,30 @@
 /* eslint no-console: [ 'error', { allow: [ 'error' ] } ] */
 
 /**
+ * External dependencies
+ */
+import { get, isFunction, some } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { getCategories } from './categories';
+
+/**
  * Block settings keyed by block name.
  *
  * @type {Object}
  */
 const blocks = {};
 
+const categories = getCategories();
+
 /**
  * Name of block handling unknown types.
  *
  * @type {?string}
  */
-let unknownTypeHandler;
+let unknownTypeHandlerName;
 
 /**
  * Name of the default block.
@@ -38,9 +50,27 @@ export function registerBlockType( name, settings ) {
 		);
 		return;
 	}
+	if ( /[A-Z]+/.test( name ) ) {
+		console.error(
+			'Block names must not contain uppercase characters.'
+		);
+		return;
+	}
 	if ( ! /^[a-z0-9-]+\/[a-z0-9-]+$/.test( name ) ) {
 		console.error(
 			'Block names must contain a namespace prefix. Example: my-plugin/my-custom-block'
+		);
+		return;
+	}
+	if ( ! settings || ! isFunction( settings.save ) ) {
+		console.error(
+			'The "save" property must be specified and must be a valid function.'
+		);
+		return;
+	}
+	if ( 'edit' in settings && ! isFunction( settings.edit ) ) {
+		console.error(
+			'The "edit" property must be a valid function.'
 		);
 		return;
 	}
@@ -50,8 +80,45 @@ export function registerBlockType( name, settings ) {
 		);
 		return;
 	}
-	const block = Object.assign( { name }, settings );
-	blocks[ name ] = block;
+	if ( 'keywords' in settings && settings.keywords.length > 3 ) {
+		console.error(
+			'The block "' + name + '" can have a maximum of 3 keywords.'
+		);
+		return;
+	}
+	if ( ! ( 'category' in settings ) ) {
+		console.error(
+			'The block "' + name + '" must have a category.'
+		);
+		return;
+	}
+	if ( 'category' in settings && ! some( categories, { slug: settings.category } ) ) {
+		console.error(
+			'The block "' + name + '" must have a registered category.'
+		);
+		return;
+	}
+	if ( ! ( 'title' in settings ) || settings.title === '' ) {
+		console.error(
+			'The block "' + name + '" must have a title.'
+		);
+		return;
+	}
+	if ( typeof settings.title !== 'string' ) {
+		console.error(
+			'Block titles must be strings.'
+		);
+		return;
+	}
+	if ( ! settings.icon ) {
+		settings.icon = 'block-default';
+	}
+	const block = blocks[ name ] = {
+		name,
+		attributes: get( window._wpBlocksAttributes, name ),
+		...settings,
+	};
+
 	return block;
 }
 
@@ -79,8 +146,8 @@ export function unregisterBlockType( name ) {
  *
  * @param {string} name Block name
  */
-export function setUnknownTypeHandler( name ) {
-	unknownTypeHandler = name;
+export function setUnknownTypeHandlerName( name ) {
+	unknownTypeHandlerName = name;
 }
 
 /**
@@ -89,8 +156,8 @@ export function setUnknownTypeHandler( name ) {
  *
  * @return {?string} Blog name
  */
-export function getUnknownTypeHandler() {
-	return unknownTypeHandler;
+export function getUnknownTypeHandlerName() {
+	return unknownTypeHandlerName;
 }
 
 /**
@@ -98,7 +165,7 @@ export function getUnknownTypeHandler() {
  *
  * @param {string} name Block name
  */
-export function setDefaultBlock( name ) {
+export function setDefaultBlockName( name ) {
 	defaultBlockName = name;
 }
 
@@ -107,7 +174,7 @@ export function setDefaultBlock( name ) {
  *
  * @return {?string} Blog name
  */
-export function getDefaultBlock() {
+export function getDefaultBlockName() {
 	return defaultBlockName;
 }
 

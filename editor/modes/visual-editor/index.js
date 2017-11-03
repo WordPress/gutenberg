@@ -2,21 +2,25 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import { first, last } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { Component, findDOMNode } from 'element';
+import { Component, findDOMNode } from '@wordpress/element';
+import { KeyboardShortcuts } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import Inserter from '../../inserter';
 import VisualEditorBlockList from './block-list';
+import VisualEditorInserter from './inserter';
 import PostTitle from '../../post-title';
-import { clearSelectedBlock } from '../../actions';
+import WritingFlow from '../../writing-flow';
+import TableOfContents from '../../table-of-contents';
+import { getBlockUids, getMultiSelectedBlockUids } from '../../selectors';
+import { clearSelectedBlock, multiSelect, redo, undo, removeBlocks } from '../../actions';
 
 class VisualEditor extends Component {
 	constructor() {
@@ -24,6 +28,9 @@ class VisualEditor extends Component {
 		this.bindContainer = this.bindContainer.bind( this );
 		this.bindBlocksContainer = this.bindBlocksContainer.bind( this );
 		this.onClick = this.onClick.bind( this );
+		this.selectAll = this.selectAll.bind( this );
+		this.undoOrRedo = this.undoOrRedo.bind( this );
+		this.deleteSelectedBlocks = this.deleteSelectedBlocks.bind( this );
 	}
 
 	bindContainer( ref ) {
@@ -31,6 +38,10 @@ class VisualEditor extends Component {
 	}
 
 	bindBlocksContainer( ref ) {
+		// Disable reason: Need DOM node to determine if clicking on layout
+		// canvas when intending to clear block selection.
+		// TODO: Refactor block selection clearing using blur events on block.
+		// eslint-disable-next-line react/no-find-dom-node
 		this.blocksContainer = findDOMNode( ref );
 	}
 
@@ -40,28 +51,72 @@ class VisualEditor extends Component {
 		}
 	}
 
+	selectAll( event ) {
+		const { uids, onMultiSelect } = this.props;
+		event.preventDefault();
+		onMultiSelect( first( uids ), last( uids ) );
+	}
+
+	undoOrRedo( event ) {
+		const { onRedo, onUndo } = this.props;
+		if ( event.shiftKey ) {
+			onRedo();
+		} else {
+			onUndo();
+		}
+
+		event.preventDefault();
+	}
+
+	deleteSelectedBlocks( event ) {
+		const { multiSelectedBlockUids, onRemove } = this.props;
+		if ( multiSelectedBlockUids.length ) {
+			event.preventDefault();
+			onRemove( multiSelectedBlockUids );
+		}
+	}
+
 	render() {
 		// Disable reason: Clicking the canvas should clear the selection
-		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
+		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
 			<div
-				role="region"
-				aria-label={ __( 'Visual Editor' ) }
 				className="editor-visual-editor"
 				onMouseDown={ this.onClick }
 				onTouchStart={ this.onClick }
 				ref={ this.bindContainer }
 			>
-				<PostTitle />
-				<VisualEditorBlockList ref={ this.bindBlocksContainer } />
-				<Inserter position="top right" />
+				<KeyboardShortcuts shortcuts={ {
+					'mod+a': this.selectAll,
+					'mod+z': this.undoOrRedo,
+					'mod+shift+z': this.undoOrRedo,
+					backspace: this.deleteSelectedBlocks,
+					del: this.deleteSelectedBlocks,
+				} } />
+				<WritingFlow>
+					<PostTitle />
+					<VisualEditorBlockList ref={ this.bindBlocksContainer } />
+				</WritingFlow>
+				<VisualEditorInserter />
+				<TableOfContents />
 			</div>
 		);
-		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
+		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
 }
 
 export default connect(
-	undefined,
-	{ clearSelectedBlock }
+	( state ) => {
+		return {
+			uids: getBlockUids( state ),
+			multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
+		};
+	},
+	{
+		clearSelectedBlock,
+		onMultiSelect: multiSelect,
+		onRedo: redo,
+		onUndo: undo,
+		onRemove: removeBlocks,
+	}
 )( VisualEditor );

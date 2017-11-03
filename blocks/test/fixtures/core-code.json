@@ -1,9 +1,0 @@
-[
-    {
-        "uid": "_uid_0",
-        "name": "core/code",
-        "attributes": {
-            "content": "export default function MyButton() {\n\treturn <Button>Click Me!</Button>;\n}"
-        }
-    }
-]

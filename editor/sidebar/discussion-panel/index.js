@@ -6,43 +6,31 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { PanelBody, FormToggle, withInstanceId } from 'components';
+import { __ } from '@wordpress/i18n';
+import { PanelBody, PanelRow } from '@wordpress/components';
 
 /**
  * Internal Dependencies
  */
-import './style.scss';
-import { getEditedPostAttribute } from '../../selectors';
-import { editPost } from '../../actions';
+import PostComments from '../../post-comments';
+import PostPingbacks from '../../post-pingbacks';
+import { isEditorSidebarPanelOpened } from '../../selectors';
+import { toggleSidebarPanel } from '../../actions';
 
-function DiscussionPanel( { pingStatus = 'open', commentStatus = 'open', instanceId, ...props } ) {
-	const onTogglePingback = () => props.editPost( { ping_status: pingStatus === 'open' ? 'closed' : 'open' } );
-	const onToggleComments = () => props.editPost( { comment_status: commentStatus === 'open' ? 'closed' : 'open' } );
+/**
+ * Module Constants
+ */
+const PANEL_NAME = 'discussion-panel';
 
-	const commentsToggleId = 'allow-comments-toggle-' + instanceId;
-	const pingbacksToggleId = 'allow-pingbacks-toggle-' + instanceId;
-
+function DiscussionPanel( { isOpened, onTogglePanel } ) {
 	return (
-		<PanelBody title={ __( 'Discussion' ) } initialOpen={ false }>
-			<div className="editor-discussion-panel__row">
-				<label htmlFor={ commentsToggleId }>{ __( 'Allow Comments' ) }</label>
-				<FormToggle
-					checked={ commentStatus === 'open' }
-					onChange={ onToggleComments }
-					showHint={ false }
-					id={ commentsToggleId }
-				/>
-			</div>
-			<div className="editor-discussion-panel__row">
-				<label htmlFor={ pingbacksToggleId }>{ __( 'Allow Pingbacks & Trackbacks' ) }</label>
-				<FormToggle
-					checked={ pingStatus === 'open' }
-					onChange={ onTogglePingback }
-					showHint={ false }
-					id={ pingbacksToggleId }
-				/>
-			</div>
+		<PanelBody title={ __( 'Discussion' ) } opened={ isOpened } onToggle={ onTogglePanel }>
+			<PanelRow>
+				<PostComments />
+			</PanelRow>
+			<PanelRow>
+				<PostPingbacks />
+			</PanelRow>
 		</PanelBody>
 	);
 }
@@ -50,10 +38,13 @@ function DiscussionPanel( { pingStatus = 'open', commentStatus = 'open', instanc
 export default connect(
 	( state ) => {
 		return {
-			pingStatus: getEditedPostAttribute( state, 'ping_status' ),
-			commentStatus: getEditedPostAttribute( state, 'comment_status' ),
+			isOpened: isEditorSidebarPanelOpened( state, PANEL_NAME ),
 		};
 	},
-	{ editPost }
-)( withInstanceId( DiscussionPanel ) );
+	{
+		onTogglePanel() {
+			return toggleSidebarPanel( PANEL_NAME );
+		},
+	}
+)( DiscussionPanel );
 

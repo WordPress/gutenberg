@@ -7,8 +7,8 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { Dashicon, Button } from 'components';
+import { __ } from '@wordpress/i18n';
+import { Dashicon, Button } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -17,6 +17,7 @@ import './style.scss';
 import { editPost, savePost } from '../../actions';
 import {
 	isEditedPostNew,
+	isCurrentPostPublished,
 	isEditedPostDirty,
 	isSavingPost,
 	isEditedPostSaveable,
@@ -24,11 +25,7 @@ import {
 	getEditedPostAttribute,
 } from '../../selectors';
 
-function SavedState( { isNew, isDirty, isSaving, isSaveable, status, onStatusChange, onSave } ) {
-	if ( ! isSaveable ) {
-		return null;
-	}
-
+export function SavedState( { isNew, isPublished, isDirty, isSaving, isSaveable, status, onStatusChange, onSave } ) {
 	const className = 'editor-saved-state';
 
 	if ( isSaving ) {
@@ -38,6 +35,11 @@ function SavedState( { isNew, isDirty, isSaving, isSaveable, status, onStatusCha
 			</span>
 		);
 	}
+
+	if ( ! isSaveable || isPublished ) {
+		return null;
+	}
+
 	if ( ! isNew && ! isDirty ) {
 		return (
 			<span className={ className }>
@@ -48,13 +50,17 @@ function SavedState( { isNew, isDirty, isSaving, isSaveable, status, onStatusCha
 	}
 
 	const onClick = () => {
-		onStatusChange( status || 'draft' );
+		if ( 'auto-draft' === status ) {
+			onStatusChange( 'draft' );
+		}
+
 		onSave();
 	};
 
 	return (
 		<Button className={ classnames( className, 'button-link' ) } onClick={ onClick }>
-			{ __( 'Save' ) }
+			<span className="editor-saved-state__mobile">{ __( 'Save' ) }</span>
+			<span className="editor-saved-state__desktop">{ __( 'Save Draft' ) }</span>
 		</Button>
 	);
 }
@@ -63,6 +69,7 @@ export default connect(
 	( state ) => ( {
 		post: getCurrentPost( state ),
 		isNew: isEditedPostNew( state ),
+		isPublished: isCurrentPostPublished( state ),
 		isDirty: isEditedPostDirty( state ),
 		isSaving: isSavingPost( state ),
 		isSaveable: isEditedPostSaveable( state ),

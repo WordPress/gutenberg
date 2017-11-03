@@ -7,78 +7,53 @@ import { includes } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Button, Placeholder, HtmlEmbed, Spinner } from 'components';
+import { __, sprintf } from '@wordpress/i18n';
+import { Component, renderToString } from '@wordpress/element';
+import { Button, Placeholder, Spinner, SandBox } from '@wordpress/components';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, query } from '../../api';
+import './editor.scss';
+import { registerBlockType, source, createBlock } from '../../api';
 import Editable from '../../editable';
+import BlockControls from '../../block-controls';
+import BlockAlignmentToolbar from '../../block-alignment-toolbar';
+import InspectorControls from '../../inspector-controls';
+import BlockDescription from '../../block-description';
 
-const { attr, children } = query;
+const { children } = source;
 
+// These embeds do not work in sandboxes
 const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
 
-/**
- * Returns an attribute setter with behavior that if the target value is
- * already the assigned attribute value, it will be set to undefined.
- *
- * @param  {string}   align Alignment value
- * @return {Function}       Attribute setter
- */
-function toggleAlignment( align ) {
-	return ( attributes, setAttributes ) => {
-		const nextAlign = attributes.align === align ? undefined : align;
-		setAttributes( { align: nextAlign } );
-	};
-}
-
-function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
+function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, keywords = [] } ) {
 	return {
-		title: wp.i18n.__( title ),
+		title,
 
 		icon,
 
 		category,
 
+		keywords,
+
 		attributes: {
-			title: attr( 'iframe', 'title' ),
-			caption: children( 'figcaption' ),
+			url: {
+				type: 'string',
+			},
+			caption: {
+				type: 'array',
+				source: children( 'figcaption' ),
+				default: [],
+			},
+			align: {
+				type: 'string',
+			},
 		},
 
-		controls: [
-			{
-				icon: 'align-left',
-				title: wp.i18n.__( 'Align left' ),
-				isActive: ( { align } ) => 'left' === align,
-				onClick: toggleAlignment( 'left' ),
-			},
-			{
-				icon: 'align-center',
-				title: wp.i18n.__( 'Align center' ),
-				isActive: ( { align } ) => ! align || 'center' === align,
-				onClick: toggleAlignment( 'center' ),
-			},
-			{
-				icon: 'align-right',
-				title: wp.i18n.__( 'Align right' ),
-				isActive: ( { align } ) => 'right' === align,
-				onClick: toggleAlignment( 'right' ),
-			},
-			{
-				icon: 'align-full-width',
-				title: wp.i18n.__( 'Wide width' ),
-				isActive: ( { align } ) => 'wide' === align,
-				onClick: toggleAlignment( 'wide' ),
-			},
-			{
-				icon: 'align-full-width',
-				title: wp.i18n.__( 'Full width' ),
-				isActive: ( { align } ) => 'full' === align,
-				onClick: toggleAlignment( 'full' ),
-			},
-		],
+		transforms,
 
 		getEditWrapperProps( attributes ) {
 			const { align } = attributes;
@@ -87,7 +62,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 			}
 		},
 
-		edit: class extends wp.element.Component {
+		edit: class extends Component {
 			constructor() {
 				super( ...arguments );
 				this.doServerSideRender = this.doServerSideRender.bind( this );
@@ -114,12 +89,22 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 				this.unmounting = true;
 			}
 
+			getPhotoHtml( photo ) {
+				// 100% width for the preview so it fits nicely into the document, some "thumbnails" are
+				// acually the full size photo.
+				const photoPreview = <p><img src={ photo.thumbnail_url } alt={ photo.title } width="100%" /></p>;
+				return renderToString( photoPreview );
+			}
+
 			doServerSideRender( event ) {
 				if ( event ) {
 					event.preventDefault();
 				}
 				const { url } = this.props.attributes;
-				const apiURL = wpApiSettings.root + 'oembed/1.0/proxy?url=' + encodeURIComponent( url ) + '&_wpnonce=' + wpApiSettings.nonce;
+				const apiURL = addQueryArgs( wpApiSettings.root + 'oembed/1.0/proxy', {
+					url: url,
+					_wpnonce: wpApiSettings.nonce,
+				} );
 
 				this.setState( { error: false, fetching: true } );
 				window.fetch( apiURL, {
@@ -133,6 +118,8 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 							const { html, type } = obj;
 							if ( html ) {
 								this.setState( { html, type } );
+							} else if ( 'photo' === type ) {
+								this.setState( { html: this.getPhotoHtml( obj ), type } );
 							} else {
 								this.setState( { error: true } );
 							}
@@ -144,122 +131,386 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 
 			render() {
 				const { html, type, error, fetching } = this.state;
-				const { url, caption } = this.props.attributes;
+				const { align, url, caption } = this.props.attributes;
 				const { setAttributes, focus, setFocus } = this.props;
+				const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
+
+				const controls = [
+					focus && (
+						<BlockControls key="controls">
+							<BlockAlignmentToolbar
+								value={ align }
+								onChange={ updateAlignment }
+							/>
+						</BlockControls>
+					),
+					focus && (
+						<InspectorControls key="inspector">
+							<BlockDescription>
+								<p>{ __( 'The Embed block allows you to easily add videos, images, tweets, audio, and other content to your post or page.' ) }</p>
+							</BlockDescription>
+						</InspectorControls>
+					),
+				];
 
 				if ( fetching ) {
-					return (
-						<div className="blocks-embed is-loading">
+					return [
+						controls,
+						<div key="loading" className="wp-block-embed is-loading">
 							<Spinner />
-							<p>{ wp.i18n.__( 'Embedding…' ) }</p>
-						</div>
-					);
+							<p>{ __( 'Embedding…' ) }</p>
+						</div>,
+					];
 				}
 
 				if ( ! html ) {
-					return (
-						<Placeholder icon={ icon } label={ wp.i18n.sprintf( wp.i18n.__( '%s URL' ), title ) } className="blocks-embed">
+					const label = sprintf( __( '%s URL' ), title );
+
+					return [
+						controls,
+						<Placeholder key="placeholder" icon={ icon } label={ label } className="wp-block-embed">
 							<form onSubmit={ this.doServerSideRender }>
 								<input
 									type="url"
 									value={ url || '' }
 									className="components-placeholder__input"
-									placeholder={ wp.i18n.__( 'Enter URL to embed here…' ) }
+									aria-label={ label }
+									placeholder={ __( 'Enter URL to embed here…' ) }
 									onChange={ ( event ) => setAttributes( { url: event.target.value } ) } />
 								<Button
 									isLarge
 									type="submit">
-									{ wp.i18n.__( 'Embed' ) }
+									{ __( 'Embed' ) }
 								</Button>
-								{ error && <p className="components-placeholder__error">{ wp.i18n.__( 'Sorry, we could not embed that content.' ) }</p> }
+								{ error && <p className="components-placeholder__error">{ __( 'Sorry, we could not embed that content.' ) }</p> }
 							</form>
-						</Placeholder>
-					);
+						</Placeholder>,
+					];
 				}
 
 				const parsedUrl = parse( url );
 				const cannotPreview = includes( HOSTS_NO_PREVIEWS, parsedUrl.host.replace( /^www\./, '' ) );
-				let typeClassName = 'blocks-embed';
-
+				const iframeTitle = sprintf( __( 'Embedded content from %s' ), parsedUrl.host );
+				let typeClassName = 'wp-block-embed';
 				if ( 'video' === type ) {
-					typeClassName = 'blocks-embed-video';
+					typeClassName += ' is-video';
 				}
 
-				return (
-					<figure className={ typeClassName }>
+				return [
+					controls,
+					<figure key="embed" className={ typeClassName }>
 						{ ( cannotPreview ) ? (
-							<Placeholder icon={ icon } label={ wp.i18n.__( 'Embed URL' ) }>
+							<Placeholder icon={ icon } label={ __( 'Embed URL' ) }>
 								<p className="components-placeholder__error"><a href={ url }>{ url }</a></p>
-								<p className="components-placeholder__error">{ wp.i18n.__( 'Previews for this are unavailable in the editor, sorry!' ) }</p>
+								<p className="components-placeholder__error">{ __( 'Previews for this are unavailable in the editor, sorry!' ) }</p>
 							</Placeholder>
 						) : (
-							<HtmlEmbed html={ html } />
+							<div className="wp-block-embed__wrapper">
+								<SandBox html={ html } title={ iframeTitle } type={ type } />
+							</div>
 						) }
 						{ ( caption && caption.length > 0 ) || !! focus ? (
 							<Editable
 								tagName="figcaption"
-								placeholder={ wp.i18n.__( 'Write caption…' ) }
+								placeholder={ __( 'Write caption…' ) }
 								value={ caption }
 								focus={ focus }
 								onFocus={ setFocus }
 								onChange={ ( value ) => setAttributes( { caption: value } ) }
-								inline
 								inlineToolbar
 							/>
 						) : null }
-					</figure>
-				);
+					</figure>,
+				];
 			}
 		},
 
 		save( { attributes } ) {
-			const { url, caption } = attributes;
-			if ( ! caption || ! caption.length ) {
-				return url;
+			const { url, caption, align } = attributes;
+
+			if ( ! url ) {
+				return;
 			}
 
 			return (
-				<figure>{ '\n' }
-					{ url }
-					<figcaption>{ caption }</figcaption>
+				<figure className={ align ? `align${ align }` : null }>
+					{ `\n${ url }\n` /* URL needs to be on its own line. */ }
+					{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
 				</figure>
 			);
 		},
 	};
 }
 
-registerBlockType( 'core/embed', getEmbedBlockSettings( { title: 'Embed', icon: 'video-alt3' } ) );
-registerBlockType( 'core/embedanimoto', getEmbedBlockSettings( { title: 'Animoto', icon: 'video-alt3' } ) );
-registerBlockType( 'core/embedcloudup', getEmbedBlockSettings( { title: 'Cloudup', icon: 'cloud' } ) );
-registerBlockType( 'core/embedcollegehumor', getEmbedBlockSettings( { title: 'CollegeHumor', icon: 'video-alt3' } ) );
-registerBlockType( 'core/embeddailymotion', getEmbedBlockSettings( { title: 'Dailymotion', icon: 'video-alt3' } ) );
-registerBlockType( 'core/embedfacebook', getEmbedBlockSettings( { title: 'Facebook', icon: 'facebook' } ) );
-registerBlockType( 'core/embedflickr', getEmbedBlockSettings( { title: 'Flickr', icon: 'format-image' } ) );
-registerBlockType( 'core/embedfunnyordie', getEmbedBlockSettings( { title: 'Funny or Die', icon: 'video-alt3' } ) );
-registerBlockType( 'core/embedhulu', getEmbedBlockSettings( { title: 'Hulu', icon: 'video-alt3' } ) );
-registerBlockType( 'core/embedimgur', getEmbedBlockSettings( { title: 'Imgur', icon: 'format-image' } ) );
-registerBlockType( 'core/embedinstagram', getEmbedBlockSettings( { title: 'Instagram', icon: 'camera' } ) );
-registerBlockType( 'core/embedissuu', getEmbedBlockSettings( { title: 'Issuu', icon: 'media-default' } ) );
-registerBlockType( 'core/embedkickstarter', getEmbedBlockSettings( { title: 'Kickstarter', icon: 'lightbulb' } ) );
-registerBlockType( 'core/embedmeetupcom', getEmbedBlockSettings( { title: 'Meetup.com', icon: 'location-alt' } ) );
-registerBlockType( 'core/embedmixcloud', getEmbedBlockSettings( { title: 'Mixcloud', icon: 'format-audio' } ) );
-registerBlockType( 'core/embedphotobucket', getEmbedBlockSettings( { title: 'Photobucket', icon: 'camera' } ) );
-registerBlockType( 'core/embedpolldaddy', getEmbedBlockSettings( { title: 'Polldaddy', icon: 'yes' } ) );
-registerBlockType( 'core/embedreddit', getEmbedBlockSettings( { title: 'Reddit', icon: 'share' } ) );
-registerBlockType( 'core/embedreverbnation', getEmbedBlockSettings( { title: 'ReverbNation', icon: 'format-audio' } ) );
-registerBlockType( 'core/embedscreencast', getEmbedBlockSettings( { title: 'Screencast', icon: 'video-alt3' } ) );
-registerBlockType( 'core/embedscribd', getEmbedBlockSettings( { title: 'Scribd', icon: 'book-alt' } ) );
-registerBlockType( 'core/embedslideshare', getEmbedBlockSettings( { title: 'Slideshare', icon: 'slides' } ) );
-registerBlockType( 'core/embedsmugmug', getEmbedBlockSettings( { title: 'SmugMug', icon: 'camera' } ) );
-registerBlockType( 'core/embedsoundcloud', getEmbedBlockSettings( { title: 'SoundCloud', icon: 'format-audio' } ) );
-registerBlockType( 'core/embedspeaker', getEmbedBlockSettings( { title: 'Speaker', icon: 'format-audio' } ) );
-registerBlockType( 'core/embedspotify', getEmbedBlockSettings( { title: 'Spotify', icon: 'format-audio' } ) );
-registerBlockType( 'core/embedted', getEmbedBlockSettings( { title: 'TED', icon: 'video-alt3' } ) );
-registerBlockType( 'core/embedtumblr', getEmbedBlockSettings( { title: 'Tumblr', icon: 'share' } ) );
-registerBlockType( 'core/embedtwitter', getEmbedBlockSettings( { title: 'Twitter', icon: 'twitter' } ) );
-registerBlockType( 'core/embedvideopress', getEmbedBlockSettings( { title: 'VideoPress', icon: 'video-alt3' } ) );
-registerBlockType( 'core/embedvimeo', getEmbedBlockSettings( { title: 'Vimeo', icon: 'video-alt3' } ) );
-registerBlockType( 'core/embedvine', getEmbedBlockSettings( { title: 'Vine', icon: 'video-alt3' } ) );
-registerBlockType( 'core/embedwordpress', getEmbedBlockSettings( { title: 'WordPress', icon: 'wordpress' } ) );
-registerBlockType( 'core/embedwordpresstv', getEmbedBlockSettings( { title: 'WordPress.tv', icon: 'video-alt3' } ) );
-registerBlockType( 'core/embedyoutube', getEmbedBlockSettings( { title: 'YouTube', icon: 'video-alt3' } ) );
+registerBlockType(
+	'core/embed',
+	getEmbedBlockSettings( {
+		title: __( 'Embed' ),
+		icon: 'embed-generic',
+		transforms: {
+			from: [
+				{
+					type: 'pattern',
+					trigger: 'paste',
+					regExp: /^\s*(https?:\/\/\S+)\s*/i,
+					transform: ( { match } ) => {
+						return createBlock( 'core/embed', {
+							url: match[ 1 ],
+						} );
+					},
+				},
+			],
+		},
+	} )
+);
+
+// Common
+registerBlockType(
+	'core-embed/twitter',
+	getEmbedBlockSettings( {
+		title: 'Twitter',
+		icon: 'embed-post',
+		keywords: [ __( 'tweet' ) ],
+	} )
+);
+registerBlockType(
+	'core-embed/youtube',
+	getEmbedBlockSettings( {
+		title: 'YouTube',
+		icon: 'embed-video',
+		keywords: [ __( 'music' ), __( 'video' ) ],
+	} )
+);
+registerBlockType(
+	'core-embed/facebook',
+	getEmbedBlockSettings( {
+		title: 'Facebook',
+		icon: 'embed-post',
+	} )
+);
+registerBlockType(
+	'core-embed/instagram',
+	getEmbedBlockSettings( {
+		title: 'Instagram',
+		icon: 'embed-photo',
+		keywords: [ __( 'image' ) ],
+	} )
+);
+registerBlockType(
+	'core-embed/wordpress',
+	getEmbedBlockSettings( {
+		title: 'WordPress',
+		icon: 'embed-post',
+		keywords: [ __( 'post' ), __( 'blog' ) ],
+	} )
+);
+registerBlockType(
+	'core-embed/soundcloud',
+	getEmbedBlockSettings( {
+		title: 'SoundCloud',
+		icon: 'embed-audio',
+		keywords: [ __( 'music' ), __( 'audio' ) ],
+	} )
+);
+registerBlockType(
+	'core-embed/spotify',
+	getEmbedBlockSettings( {
+		title: 'Spotify',
+		icon: 'embed-audio',
+		keywords: [ __( 'music' ), __( 'audio' ) ],
+	} )
+);
+registerBlockType(
+	'core-embed/flickr',
+	getEmbedBlockSettings( {
+		title: 'Flickr',
+		icon: 'embed-photo',
+		keywords: [ __( 'image' ) ],
+	} )
+);
+registerBlockType(
+	'core-embed/vimeo',
+	getEmbedBlockSettings( {
+		title: 'Vimeo',
+		icon: 'embed-video',
+		keywords: [ __( 'video' ) ],
+	} )
+);
+
+// Others
+registerBlockType(
+	'core-embed/animoto',
+	getEmbedBlockSettings( {
+		title: 'Animoto',
+		icon: 'embed-video',
+	} )
+);
+registerBlockType(
+	'core-embed/cloudup',
+	getEmbedBlockSettings( {
+		title: 'Cloudup',
+		icon: 'embed-post',
+	} )
+);
+registerBlockType(
+	'core-embed/collegehumor',
+	getEmbedBlockSettings( {
+		title: 'CollegeHumor',
+		icon: 'embed-video',
+	} )
+);
+registerBlockType(
+	'core-embed/dailymotion',
+	getEmbedBlockSettings( {
+		title: 'Dailymotion',
+		icon: 'embed-video',
+	} )
+);
+registerBlockType(
+	'core-embed/funnyordie',
+	getEmbedBlockSettings( {
+		title: 'Funny or Die',
+		icon: 'embed-video',
+	} ) );
+registerBlockType(
+	'core-embed/hulu',
+	getEmbedBlockSettings( {
+		title: 'Hulu',
+		icon: 'embed-video',
+	} )
+);
+registerBlockType(
+	'core-embed/imgur',
+	getEmbedBlockSettings( {
+		title: 'Imgur',
+		icon: 'embed-photo',
+	} )
+);
+registerBlockType(
+	'core-embed/issuu',
+	getEmbedBlockSettings( {
+		title: 'Issuu',
+		icon: 'embed-post',
+	} )
+);
+registerBlockType(
+	'core-embed/kickstarter',
+	getEmbedBlockSettings( {
+		title: 'Kickstarter',
+		icon: 'embed-post',
+	} )
+);
+registerBlockType(
+	'core-embed/meetup-com',
+	getEmbedBlockSettings( {
+		title: 'Meetup.com',
+		icon: 'embed-post',
+	} )
+);
+registerBlockType(
+	'core-embed/mixcloud',
+	getEmbedBlockSettings( {
+		title: 'Mixcloud',
+		icon: 'embed-audio',
+		keywords: [ __( 'music' ), __( 'audio' ) ],
+	} )
+);
+registerBlockType(
+	'core-embed/photobucket',
+	getEmbedBlockSettings( {
+		title: 'Photobucket',
+		icon: 'embed-photo',
+	} )
+);
+registerBlockType(
+	'core-embed/polldaddy',
+	getEmbedBlockSettings( {
+		title: 'Polldaddy',
+		icon: 'embed-post',
+	} )
+);
+registerBlockType(
+	'core-embed/reddit',
+	getEmbedBlockSettings( {
+		title: 'Reddit',
+		icon: 'embed-post',
+	} )
+);
+registerBlockType(
+	'core-embed/reverbnation',
+	getEmbedBlockSettings( {
+		title: 'ReverbNation',
+		icon: 'embed-audio',
+	} )
+);
+registerBlockType(
+	'core-embed/screencast',
+	getEmbedBlockSettings( {
+		title: 'Screencast',
+		icon: 'embed-video',
+	} )
+);
+registerBlockType(
+	'core-embed/scribd',
+	getEmbedBlockSettings( {
+		title: 'Scribd',
+		icon: 'embed-post',
+	} )
+);
+registerBlockType(
+	'core-embed/slideshare',
+	getEmbedBlockSettings( {
+		title: 'Slideshare',
+		icon: 'embed-post',
+	} )
+);
+registerBlockType(
+	'core-embed/smugmug',
+	getEmbedBlockSettings( {
+		title: 'SmugMug',
+		icon: 'embed-photo',
+	} )
+);
+registerBlockType(
+	'core-embed/speaker',
+	getEmbedBlockSettings( {
+		title: 'Speaker',
+		icon: 'embed-audio',
+	} )
+);
+registerBlockType(
+	'core-embed/ted',
+	getEmbedBlockSettings( {
+		title: 'TED',
+		icon: 'embed-video',
+	} )
+);
+registerBlockType(
+	'core-embed/tumblr',
+	getEmbedBlockSettings( {
+		title: 'Tumblr',
+		icon: 'embed-post',
+	} )
+);
+registerBlockType(
+	'core-embed/videopress',
+	getEmbedBlockSettings( {
+		title: 'VideoPress',
+		icon: 'embed-video',
+		keywords: [ __( 'video' ) ],
+	} )
+);
+registerBlockType(
+	'core-embed/vine',
+	getEmbedBlockSettings( {
+		title: 'Vine',
+		icon: 'embed-video',
+	} )
+);
+registerBlockType(
+	'core-embed/wordpress-tv',
+	getEmbedBlockSettings( {
+		title: 'WordPress.tv',
+		icon: 'embed-video',
+	} )
+);

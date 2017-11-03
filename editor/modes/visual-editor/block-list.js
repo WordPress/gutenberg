@@ -2,86 +2,110 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { throttle, reduce } from 'lodash';
+import {
+	findLast,
+	flatMap,
+	invert,
+	isEqual,
+	mapValues,
+	noop,
+	sortBy,
+	throttle,
+} from 'lodash';
+import scrollIntoView from 'dom-scroll-into-view';
+import 'element-closest';
 
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { serialize, getDefaultBlock, createBlock } from 'blocks';
+import { __ } from '@wordpress/i18n';
+import { Component } from '@wordpress/element';
+import { serialize, getDefaultBlockName, createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import VisualEditorBlock from './block';
+import VisualEditorSiblingInserter from './sibling-inserter';
+import BlockDropZone from './block-drop-zone';
 import {
 	getBlockUids,
-	getBlockInsertionPoint,
-	isBlockInsertionPointVisible,
 	getMultiSelectedBlocksStartUid,
 	getMultiSelectedBlocksEndUid,
 	getMultiSelectedBlocks,
 	getMultiSelectedBlockUids,
+	getSelectedBlock,
 } from '../../selectors';
-import { insertBlock } from '../../actions';
+import { insertBlock, startMultiSelect, stopMultiSelect, multiSelect, selectBlock } from '../../actions';
 
-const INSERTION_POINT_PLACEHOLDER = '[[insertion-point]]';
-
-class VisualEditorBlockList extends wp.element.Component {
+class VisualEditorBlockList extends Component {
 	constructor( props ) {
 		super( props );
 
 		this.onSelectionStart = this.onSelectionStart.bind( this );
-		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.onSelectionEnd = this.onSelectionEnd.bind( this );
+		this.onShiftSelection = this.onShiftSelection.bind( this );
 		this.onCopy = this.onCopy.bind( this );
 		this.onCut = this.onCut.bind( this );
 		this.setBlockRef = this.setBlockRef.bind( this );
 		this.appendDefaultBlock = this.appendDefaultBlock.bind( this );
-		this.onPointerMove = throttle( this.onPointerMove.bind( this ), 250 );
+		this.setLastClientY = this.setLastClientY.bind( this );
+		this.onPointerMove = throttle( this.onPointerMove.bind( this ), 100 );
 		// Browser does not fire `*move` event when the pointer position changes
 		// relative to the document, so fire it with the last known position.
 		this.onScroll = () => this.onPointerMove( { clientY: this.lastClientY } );
 
-		this.state = {
-			selectionAtStart: null,
-		};
-
-		this.coordMap = {};
-		this.coordMapKeys = [];
 		this.lastClientY = 0;
-		this.refs = {};
+		this.nodes = {};
 	}
 
 	componentDidMount() {
 		document.addEventListener( 'copy', this.onCopy );
 		document.addEventListener( 'cut', this.onCut );
+		window.addEventListener( 'mousemove', this.setLastClientY );
 	}
 
 	componentWillUnmount() {
 		document.removeEventListener( 'copy', this.onCopy );
 		document.removeEventListener( 'cut', this.onCut );
-
-		// Cancel throttled calls.
-		this.onPointerMove.cancel();
+		window.removeEventListener( 'mousemove', this.setLastClientY );
 	}
 
-	setBlockRef( ref, uid ) {
-		if ( ref === null ) {
-			delete this.refs[ uid ];
+	componentWillReceiveProps( nextProps ) {
+		if ( isEqual( this.props.multiSelectedBlockUids, nextProps.multiSelectedBlockUids ) ) {
+			return;
+		}
+
+		if ( nextProps.multiSelectedBlockUids && nextProps.multiSelectedBlockUids.length > 0 ) {
+			const extent = this.nodes[ nextProps.selectionEnd ];
+			if ( extent ) {
+				scrollIntoView( extent, extent.closest( '.editor-layout__content' ), {
+					onlyScrollIfNeeded: true,
+				} );
+			}
+		}
+	}
+
+	setLastClientY( { clientY } ) {
+		this.lastClientY = clientY;
+	}
+
+	setBlockRef( node, uid ) {
+		if ( node === null ) {
+			delete this.nodes[ uid ];
 		} else {
-			this.refs = {
-				...this.refs,
-				[ uid ]: ref,
+			this.nodes = {
+				...this.nodes,
+				[ uid ]: node,
 			};
 		}
 	}
 
 	onPointerMove( { clientY } ) {
-		const y = clientY + window.pageYOffset;
-		const key = this.coordMapKeys.reduce( ( acc, topY ) => y > topY ? topY : acc );
+		const boundaries = this.nodes[ this.selectionAtStart ].getBoundingClientRect();
+		const y = clientY - boundaries.top;
+		const key = findLast( this.coordMapKeys, ( coordY ) => coordY < y );
 
-		this.lastClientY = clientY;
 		this.onSelectionChange( this.coordMap[ key ] );
 	}
 
@@ -108,27 +132,31 @@ class VisualEditorBlockList extends wp.element.Component {
 	}
 
 	onSelectionStart( uid ) {
-		const { pageYOffset } = window;
+		const boundaries = this.nodes[ uid ].getBoundingClientRect();
 
-		// Create a Y coödinate map to unique block IDs.
-		this.coordMap = reduce( this.refs, ( acc, node, blockUid ) => ( {
-			...acc,
-			[ pageYOffset + node.getBoundingClientRect().top ]: blockUid,
-		} ), {} );
-		// Cache an array of the Y coödrinates for use in `onPointerMove`.
-		this.coordMapKeys = Object.keys( this.coordMap );
-		this.setState( { selectionAtStart: uid } );
+		// Create a uid to Y coördinate map.
+		const uidToCoordMap = mapValues( this.nodes, ( node ) =>
+			node.getBoundingClientRect().top - boundaries.top );
+
+		// Cache a Y coördinate to uid map for use in `onPointerMove`.
+		this.coordMap = invert( uidToCoordMap );
+		// Cache an array of the Y coördinates for use in `onPointerMove`.
+		// Sort the coördinates, as `this.nodes` will not necessarily reflect
+		// the current block sequence.
+		this.coordMapKeys = sortBy( Object.values( uidToCoordMap ) );
+		this.selectionAtStart = uid;
 
 		window.addEventListener( 'mousemove', this.onPointerMove );
-		window.addEventListener( 'touchmove', this.onPointerMove );
-		window.addEventListener( 'scroll', this.onScroll );
+		// Capture scroll on all elements.
+		window.addEventListener( 'scroll', this.onScroll, true );
 		window.addEventListener( 'mouseup', this.onSelectionEnd );
-		window.addEventListener( 'touchend', this.onSelectionEnd );
+
+		this.props.onStartMultiSelect();
 	}
 
 	onSelectionChange( uid ) {
 		const { onMultiSelect, selectionStart, selectionEnd } = this.props;
-		const { selectionAtStart } = this.state;
+		const { selectionAtStart } = this;
 		const isAtStart = selectionAtStart === uid;
 
 		if ( ! selectionAtStart ) {
@@ -136,71 +164,78 @@ class VisualEditorBlockList extends wp.element.Component {
 		}
 
 		if ( isAtStart && selectionStart ) {
-			onMultiSelect( { start: null, end: null } );
+			onMultiSelect( null, null );
 		}
 
 		if ( ! isAtStart && selectionEnd !== uid ) {
-			onMultiSelect( { start: selectionAtStart, end: uid } );
+			onMultiSelect( selectionAtStart, uid );
 		}
 	}
 
 	onSelectionEnd() {
-		this.setState( { selectionAtStart: null } );
+		// Cancel throttled calls.
+		this.onPointerMove.cancel();
+
+		delete this.coordMap;
+		delete this.coordMapKeys;
+		delete this.selectionAtStart;
 
 		window.removeEventListener( 'mousemove', this.onPointerMove );
-		window.removeEventListener( 'touchmove', this.onPointerMove );
-		window.removeEventListener( 'scroll', this.onScroll );
+		window.removeEventListener( 'scroll', this.onScroll, true );
 		window.removeEventListener( 'mouseup', this.onSelectionEnd );
-		window.removeEventListener( 'touchend', this.onSelectionEnd );
+
+		this.props.onStopMultiSelect();
+	}
+
+	onShiftSelection( uid ) {
+		const { selectedBlock, selectionStart, onMultiSelect, onSelect } = this.props;
+
+		if ( selectedBlock ) {
+			onMultiSelect( selectedBlock.uid, uid );
+		} else if ( selectionStart ) {
+			onMultiSelect( selectionStart, uid );
+		} else {
+			onSelect( uid );
+		}
 	}
 
 	appendDefaultBlock() {
-		const newBlock = createBlock( getDefaultBlock() );
+		const newBlock = createBlock( getDefaultBlockName() );
 		this.props.onInsertBlock( newBlock );
 	}
 
 	render() {
-		const { blocks, showInsertionPoint, insertionPoint, multiSelectedBlockUids } = this.props;
-		const insertionPointIndex = blocks.indexOf( insertionPoint );
-		const blocksWithInsertionPoint = showInsertionPoint
-			? [
-				...blocks.slice( 0, insertionPointIndex + 1 ),
-				INSERTION_POINT_PLACEHOLDER,
-				...blocks.slice( insertionPointIndex + 1 ),
-			]
-			: blocks;
+		const { blocks } = this.props;
 
 		return (
 			<div>
-				{ ! blocks.length && (
-					<input
-						type="text"
-						readOnly
-						className="editor-visual-editor__placeholder"
-						value={ __( 'Write your story' ) }
-						onFocus={ this.appendDefaultBlock }
-					/>
-				) }
-				{ !! blocks.length && blocksWithInsertionPoint.map( ( uid ) => {
-					if ( uid === INSERTION_POINT_PLACEHOLDER ) {
-						return (
-							<div
-								key={ INSERTION_POINT_PLACEHOLDER }
-								className="editor-visual-editor__insertion-point"
-							/>
-						);
-					}
-
-					return (
-						<VisualEditorBlock
-							key={ uid }
-							uid={ uid }
-							blockRef={ ( ref ) => this.setBlockRef( ref, uid ) }
-							onSelectionStart={ () => this.onSelectionStart( uid ) }
-							multiSelectedBlockUids={ multiSelectedBlockUids }
+				{ !! blocks.length && <VisualEditorSiblingInserter insertIndex={ 0 } /> }
+				{ flatMap( blocks, ( uid, index ) => [
+					<VisualEditorBlock
+						key={ 'block-' + uid }
+						uid={ uid }
+						blockRef={ this.setBlockRef }
+						onSelectionStart={ this.onSelectionStart }
+						onShiftSelection={ this.onShiftSelection }
+					/>,
+					<VisualEditorSiblingInserter
+						key={ 'sibling-inserter-' + uid }
+						insertIndex={ index + 1 }
+					/>,
+				] ) }
+				{ ! blocks.length &&
+					<div className="editor-visual-editor__placeholder">
+						<BlockDropZone />
+						<input
+							type="text"
+							readOnly
+							value={ __( 'Write your story' ) }
+							onFocus={ this.appendDefaultBlock }
+							onClick={ noop }
+							onKeyDown={ noop }
 						/>
-					);
-				} ) }
+					</div>
+				}
 			</div>
 		);
 	}
@@ -209,19 +244,27 @@ class VisualEditorBlockList extends wp.element.Component {
 export default connect(
 	( state ) => ( {
 		blocks: getBlockUids( state ),
-		insertionPoint: getBlockInsertionPoint( state ),
-		showInsertionPoint: isBlockInsertionPointVisible( state ),
 		selectionStart: getMultiSelectedBlocksStartUid( state ),
 		selectionEnd: getMultiSelectedBlocksEndUid( state ),
 		multiSelectedBlocks: getMultiSelectedBlocks( state ),
 		multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
+		selectedBlock: getSelectedBlock( state ),
 	} ),
 	( dispatch ) => ( {
 		onInsertBlock( block ) {
 			dispatch( insertBlock( block ) );
 		},
-		onMultiSelect( { start, end } ) {
-			dispatch( { type: 'MULTI_SELECT', start, end } );
+		onStartMultiSelect() {
+			dispatch( startMultiSelect() );
+		},
+		onStopMultiSelect() {
+			dispatch( stopMultiSelect() );
+		},
+		onMultiSelect( start, end ) {
+			dispatch( multiSelect( start, end ) );
+		},
+		onSelect( uid ) {
+			dispatch( selectBlock( uid ) );
 		},
 		onRemove( uids ) {
 			dispatch( { type: 'REMOVE_BLOCKS', uids } );

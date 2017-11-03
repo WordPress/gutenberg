@@ -1,0 +1,40 @@
+.components-autocomplete__popover .components-popover__content {
+	width: 200px;
+}
+
+.components-autocomplete__popover .components-autocomplete__results {
+	list-style-type: none;
+	padding: 3px;
+
+	&:empty {
+		display: none;
+	}
+}
+
+.components-autocomplete__result {
+	margin-bottom: 0;
+	border: 1px solid transparent;
+	font-family: $default-font;
+	font-size: $default-font-size;
+
+	&.is-selected {
+		box-shadow: none;
+		color: $dark-gray-500;
+		border-color: $dark-gray-500;
+	}
+
+	&:hover {
+		.components-button {
+			color: $blue-medium-500;
+		}
+	}
+
+	.components-button {
+		color: $dark-gray-500;
+		display: flex;
+		align-items: center;
+		width: 100%;
+		padding: 6px;
+		text-align: left;
+	}
+}

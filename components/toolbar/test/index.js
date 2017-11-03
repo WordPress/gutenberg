@@ -1,9 +1,7 @@
 /**
  * External dependencies
  */
-import { expect } from 'chai';
 import { shallow } from 'enzyme';
-import { spy } from 'sinon';
 
 /**
  * Internal dependencies
@@ -14,12 +12,12 @@ describe( 'Toolbar', () => {
 	describe( 'basic rendering', () => {
 		it( 'should render an empty node, when controls are not passed', () => {
 			const toolbar = shallow( <Toolbar /> );
-			expect( toolbar.type() ).to.be.null();
+			expect( toolbar.type() ).toBeNull();
 		} );
 
 		it( 'should render an empty node, when controls are empty', () => {
 			const toolbar = shallow( <Toolbar controls={ [] } /> );
-			expect( toolbar.type() ).to.be.null();
+			expect( toolbar.type() ).toBeNull();
 		} );
 
 		it( 'should render a list of controls with IconButtons', () => {
@@ -35,14 +33,12 @@ describe( 'Toolbar', () => {
 			];
 			const toolbar = shallow( <Toolbar controls={ controls } /> );
 			const listItem = toolbar.find( 'IconButton' );
-			expect( toolbar.type() ).to.equal( 'ul' );
-			expect( listItem.props() ).to.include( {
+			expect( listItem.props() ).toMatchObject( {
 				icon: 'wordpress',
 				label: 'WordPress',
 				'data-subscript': 'wp',
 				'aria-pressed': false,
 				className: 'components-toolbar__control',
-				focus: undefined,
 			} );
 		} );
 
@@ -59,7 +55,7 @@ describe( 'Toolbar', () => {
 			];
 			const toolbar = shallow( <Toolbar controls={ controls } /> );
 			const listItem = toolbar.find( 'IconButton' );
-			expect( listItem.props() ).to.include( {
+			expect( listItem.props() ).toMatchObject( {
 				'aria-pressed': true,
 				className: 'components-toolbar__control is-active',
 			} );
@@ -78,13 +74,13 @@ describe( 'Toolbar', () => {
 			];
 
 			const toolbar = shallow( <Toolbar controls={ controls } /> );
-			expect( toolbar.children() ).to.have.lengthOf( 2 );
-			expect( toolbar.childAt( 0 ).hasClass( 'has-left-divider' ) ).to.be.false();
-			expect( toolbar.childAt( 1 ).hasClass( 'has-left-divider' ) ).to.be.true();
+			expect( toolbar.children() ).toHaveLength( 2 );
+			expect( toolbar.childAt( 0 ).hasClass( 'has-left-divider' ) ).toBe( false );
+			expect( toolbar.childAt( 1 ).hasClass( 'has-left-divider' ) ).toBe( true );
 		} );
 
 		it( 'should call the clickHandler on click.', () => {
-			const clickHandler = spy();
+			const clickHandler = jest.fn();
 			const event = { stopPropagation: () => undefined };
 			const controls = [
 				{
@@ -98,22 +94,8 @@ describe( 'Toolbar', () => {
 			const toolbar = shallow( <Toolbar controls={ controls } /> );
 			const listItem = toolbar.find( 'IconButton' );
 			listItem.simulate( 'click', event );
-			expect( clickHandler ).to.have.been.calledOnce();
-			expect( clickHandler ).to.have.been.calledWith();
-		} );
-
-		it( 'should have a focus property of true.', () => {
-			const controls = [
-				{
-					icon: 'wordpress',
-					title: 'WordPress',
-					subscript: 'wp',
-					isActive: true,
-				},
-			];
-			const toolbar = shallow( <Toolbar controls={ controls } focus={ true } /> );
-			const listItem = toolbar.find( 'IconButton' );
-			expect( listItem.prop( 'focus' ) ).to.be.true();
+			expect( clickHandler ).toHaveBeenCalledTimes( 1 );
+			expect( clickHandler ).toHaveBeenCalledWith();
 		} );
 	} );
 } );

@@ -6,7 +6,8 @@ import { connect } from 'react-redux';
 /**
  * WordPress Dependencies
  */
-import { withFocusReturn } from 'components';
+import { __ } from '@wordpress/i18n';
+import { withFocusReturn } from '@wordpress/components';
 
 /**
  * Internal Dependencies
@@ -14,13 +15,21 @@ import { withFocusReturn } from 'components';
 import './style.scss';
 import PostSettings from './post-settings';
 import BlockInspector from './block-inspector';
-import { getSelectedBlock } from '../selectors';
+import Header from './header';
 
-const Sidebar = ( { selectedBlock } ) => {
+import { getActivePanel } from '../selectors';
+
+const Sidebar = ( { panel } ) => {
 	return (
-		<div className="editor-sidebar">
-			{ ! selectedBlock && <PostSettings /> }
-			{ selectedBlock && <BlockInspector /> }
+		<div
+			className="editor-sidebar"
+			role="region"
+			aria-label={ __( 'Editor settings' ) }
+			tabIndex="-1"
+		>
+			<Header />
+			{ panel === 'document' && <PostSettings key="settings" /> }
+			{ panel === 'block' && <BlockInspector /> }
 		</div>
 	);
 };
@@ -28,7 +37,7 @@ const Sidebar = ( { selectedBlock } ) => {
 export default connect(
 	( state ) => {
 		return {
-			selectedBlock: getSelectedBlock( state ),
+			panel: getActivePanel( state ),
 		};
 	}
 )( withFocusReturn( Sidebar ) );

@@ -7,44 +7,30 @@ import { Slot } from 'react-slot-fill';
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { Panel, PanelHeader, PanelBody } from 'components';
-import { getBlockType } from 'blocks';
+import { __ } from '@wordpress/i18n';
+import { Panel, PanelBody } from '@wordpress/components';
 
 /**
  * Internal Dependencies
  */
 import './style.scss';
-import { deselectBlock } from '../../actions';
-import { getSelectedBlock } from '../../selectors';
+import BlockInspectorAdvancedControls from './advanced-controls';
+import { getSelectedBlock, getSelectedBlockCount } from '../../selectors';
 
-const BlockInspector = ( { selectedBlock, ...props } ) => {
-	if ( ! selectedBlock ) {
-		return null;
+const BlockInspector = ( { selectedBlock, count } ) => {
+	if ( count > 1 ) {
+		return <span className="editor-block-inspector__multi-blocks">{ __( 'Coming Soon' ) }</span>;
 	}
 
-	const blockType = getBlockType( selectedBlock.name );
-
-	const onDeselect = ( event ) => {
-		event.preventDefault();
-		props.deselectBlock( selectedBlock.uid );
-	};
-
-	const header = (
-		<strong>
-			<a href="" onClick={ onDeselect } className="editor-block-inspector__deselect-post">
-				{ __( 'Post' ) }
-			</a>
-			{ ' → ' }
-			{ blockType.title }
-		</strong>
-	);
+	if ( ! selectedBlock ) {
+		return <span className="editor-block-inspector__no-blocks">{ __( 'No block selected.' ) }</span>;
+	}
 
 	return (
 		<Panel>
-			<PanelHeader label={ header } />
-			<PanelBody>
+			<PanelBody className="editor-block-inspector__content">
 				<Slot name="Inspector.Controls" />
+				<BlockInspectorAdvancedControls />
 			</PanelBody>
 		</Panel>
 	);
@@ -54,7 +40,7 @@ export default connect(
 	( state ) => {
 		return {
 			selectedBlock: getSelectedBlock( state ),
+			count: getSelectedBlockCount( state ),
 		};
-	},
-	{ deselectBlock }
+	}
 )( BlockInspector );

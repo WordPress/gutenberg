@@ -28,3 +28,13 @@
 		background-position: 28px 0;
 	}
 }
+
+@mixin loading_fade {
+	animation: loading_fade 1.6s ease-in-out infinite;
+}
+
+@keyframes loading_fade {
+	0% { opacity: .5; }
+	50% { opacity: 1; }
+	100% { opacity: .5; }
+}

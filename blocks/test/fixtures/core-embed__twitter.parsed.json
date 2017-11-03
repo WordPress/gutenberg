@@ -1,0 +1,13 @@
+[
+    {
+        "blockName": "core-embed/twitter",
+        "attrs": {
+            "url": "https://twitter.com/automattic"
+        },
+        "rawContent": "\n<figure class=\"wp-block-embed-twitter\">\n    https://twitter.com/automattic\n    <figcaption>We are Automattic</figcaption>\n</figure>\n"
+    },
+    {
+        "attrs": {},
+        "rawContent": "\n"
+    }
+]

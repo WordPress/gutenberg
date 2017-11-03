@@ -3,12 +3,14 @@
  */
 import { connect } from 'react-redux';
 import { uniq, get, reduce, find } from 'lodash';
-import clickOutside from 'react-click-outside';
 
 /**
  * WordPress dependencies
  */
-import { Dashicon, IconButton } from 'components';
+import { __ } from '@wordpress/i18n';
+import { Dropdown, Dashicon, IconButton, Toolbar, NavigableMenu } from '@wordpress/components';
+import { getBlockType, getBlockTypes, switchToBlockType, BlockIcon } from '@wordpress/blocks';
+import { keycodes } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -17,92 +19,97 @@ import './style.scss';
 import { replaceBlocks } from '../actions';
 import { getBlock } from '../selectors';
 
-class BlockSwitcher extends wp.element.Component {
-	constructor() {
-		super( ...arguments );
-		this.toggleMenu = this.toggleMenu.bind( this );
-		this.state = {
-			open: false,
-		};
+/**
+ * Module Constants
+ */
+const { DOWN } = keycodes;
+
+function BlockSwitcher( { block, onTransform } ) {
+	if ( ! block ) {
+		return null;
 	}
 
-	handleClickOutside() {
-		if ( ! this.state.open ) {
-			return;
-		}
-
-		this.toggleMenu();
-	}
-
-	toggleMenu() {
-		this.setState( {
-			open: ! this.state.open,
-		} );
-	}
-
-	switchBlockType( name ) {
-		return () => {
-			this.setState( {
-				open: false,
-			} );
-			this.props.onTransform( this.props.block, name );
-		};
-	}
-
-	render() {
-		const blockType = wp.blocks.getBlockType( this.props.block.name );
-		const blocksToBeTransformedFrom = reduce( wp.blocks.getBlockTypes(), ( memo, block ) => {
-			const transformFrom = get( block, 'transforms.from', [] );
-			const transformation = find( transformFrom, t => t.blocks.indexOf( this.props.block.name ) !== -1 );
-			return transformation ? memo.concat( [ block.name ] ) : memo;
+	const blockType = getBlockType( block.name );
+	const blocksToBeTransformedFrom = reduce( getBlockTypes(), ( memo, type ) => {
+		const transformFrom = get( type, 'transforms.from', [] );
+		const transformation = find( transformFrom, t => t.type === 'block' && t.blocks.indexOf( block.name ) !== -1 );
+		return transformation ? memo.concat( [ type.name ] ) : memo;
+	}, [] );
+	const blocksToBeTransformedTo = get( blockType, 'transforms.to', [] )
+		.reduce( ( memo, transformation ) => memo.concat( transformation.blocks ), [] );
+	const allowedBlocks = uniq( blocksToBeTransformedFrom.concat( blocksToBeTransformedTo ) )
+		.reduce( ( memo, name ) => {
+			const type = getBlockType( name );
+			return !! type ? memo.concat( type ) : memo;
 		}, [] );
-		const blocksToBeTransformedTo = get( blockType, 'transforms.to', [] )
-			.reduce( ( memo, transformation ) => memo.concat( transformation.blocks ), [] );
-		const allowedBlocks = uniq( blocksToBeTransformedFrom.concat( blocksToBeTransformedTo ) )
-			.reduce( ( memo, name ) => {
-				const block = wp.blocks.getBlockType( name );
-				return !! block ? memo.concat( block ) : memo;
-			}, [] );
 
-		if ( ! allowedBlocks.length ) {
-			return null;
-		}
+	if ( ! allowedBlocks.length ) {
+		return null;
+	}
 
-		return (
-			<div className="editor-block-switcher">
-				<IconButton
-					className="editor-block-switcher__toggle"
-					icon={ blockType.icon }
-					onClick={ this.toggleMenu }
-					aria-haspopup="true"
-					aria-expanded={ this.state.open }
-					label={ wp.i18n.__( 'Change block type' ) }
-				>
-					<Dashicon icon="arrow-down" />
-				</IconButton>
-				{ this.state.open &&
-					<div
-						className="editor-block-switcher__menu"
+	return (
+		<Dropdown
+			className="editor-block-switcher"
+			contentClassName="editor-block-switcher__popover"
+			renderToggle={ ( { onToggle, isOpen } ) => {
+				const openOnArrowDown = ( event ) => {
+					if ( ! isOpen && event.keyCode === DOWN ) {
+						event.preventDefault();
+						event.stopPropagation();
+						onToggle();
+					}
+				};
+
+				return (
+					<Toolbar>
+						<IconButton
+							className="editor-block-switcher__toggle"
+							icon={ <BlockIcon icon={ blockType.icon } /> }
+							onClick={ onToggle }
+							aria-haspopup="true"
+							aria-expanded={ isOpen }
+							label={ __( 'Change block type' ) }
+							onKeyDown={ openOnArrowDown }
+						>
+							<Dashicon icon="arrow-down" />
+						</IconButton>
+					</Toolbar>
+				);
+			} }
+			renderContent={ ( { onClose } ) => (
+				<div>
+					<span
+						className="editor-block-switcher__menu-title"
+					>
+						{ __( 'Transform into:' ) }
+					</span>
+					<NavigableMenu
 						role="menu"
-						tabIndex="0"
-						aria-label={ wp.i18n.__( 'Block types' ) }
+						aria-label={ __( 'Block types' ) }
 					>
 						{ allowedBlocks.map( ( { name, title, icon } ) => (
 							<IconButton
 								key={ name }
-								onClick={ this.switchBlockType( name ) }
+								onClick={ () => {
+									onTransform( block, name );
+									onClose();
+								} }
 								className="editor-block-switcher__menu-item"
-								icon={ icon }
+								icon={ (
+									<span className="editor-block-switcher__block-icon">
+										<BlockIcon icon={ icon } />
+									</span>
+								) }
 								role="menuitem"
 							>
 								{ title }
 							</IconButton>
 						) ) }
-					</div>
-				}
-			</div>
-		);
-	}
+					</NavigableMenu>
+				</div>
+			) }
+		/>
+	);
 }
 
 export default connect(
@@ -113,8 +120,8 @@ export default connect(
 		onTransform( block, name ) {
 			dispatch( replaceBlocks(
 				[ ownProps.uid ],
-				wp.blocks.switchToBlockType( block, name )
+				switchToBlockType( block, name )
 			) );
 		},
 	} )
-)( clickOutside( BlockSwitcher ) );
+)( BlockSwitcher );

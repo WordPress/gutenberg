@@ -107,4 +107,6 @@
 		@content;
 	}
 }
-$float-margin: calc( 50% - #{ $visual-editor-max-width / 2 } );
+
+$visual-editor-max-width-padding: $visual-editor-max-width + $block-mover-padding-visible + $block-mover-padding-visible;
+$float-margin: calc( 50% - #{ $visual-editor-max-width-padding / 2 } );

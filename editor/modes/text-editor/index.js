@@ -7,65 +7,50 @@ import Textarea from 'react-autosize-textarea';
 /**
  * WordPress dependencies
  */
-import { Component } from 'element';
-import { serialize, parse } from 'blocks';
+import { Component } from '@wordpress/element';
+import { parse } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import PostTitle from '../../post-title';
-import { getBlocks } from '../../selectors';
+import { getEditedPostContent } from '../../selectors';
+import { editPost, resetBlocks } from '../../actions';
 
 class TextEditor extends Component {
-	constructor( { blocks } ) {
+	constructor( props ) {
 		super( ...arguments );
-		const value = serialize( blocks );
-		this.state = {
-			blocks,
-			persistedValue: value,
-			value,
-		};
+
 		this.onChange = this.onChange.bind( this );
-		this.onBlur = this.onBlur.bind( this );
+		this.onPersist = this.onPersist.bind( this );
+
+		this.state = {
+			initialValue: props.value,
+		};
 	}
 
 	onChange( event ) {
-		this.setState( {
-			value: event.target.value,
-		} );
-		this.props.markDirty();
+		this.props.onChange( event.target.value );
 	}
 
-	onBlur() {
-		if ( this.state.value === this.state.persistedValue ) {
-			return;
-		}
-		const blocks = parse( this.state.value );
-		this.setState( {
-			blocks,
-		} );
-		this.props.onChange( blocks );
-		this.props.markDirty();
-	}
+	onPersist( event ) {
+		const { value } = event.target;
+		if ( value !== this.state.initialValue ) {
+			this.props.onPersist( value );
 
-	componentWillReceiveProps( newProps ) {
-		if ( newProps.blocks !== this.state.blocks ) {
-			const value = serialize( newProps.blocks );
 			this.setState( {
-				blocks: newProps.blocks,
-				persistedValue: value,
-				value,
+				initialValue: value,
 			} );
 		}
 	}
 
 	render() {
-		const { value } = this.state;
+		const { value } = this.props;
 
 		return (
 			<div className="editor-text-editor">
-				<header className="editor-text-editor__formatting">
+				<div className="editor-text-editor__formatting">
 					<div className="editor-text-editor__formatting-group">
 						<button className="editor-text-editor__bold">b</button>
 						<button className="editor-text-editor__italic">i</button>
@@ -81,14 +66,14 @@ class TextEditor extends Component {
 						<button>more</button>
 						<button>close tags</button>
 					</div>
-				</header>
+				</div>
 				<div className="editor-text-editor__body">
 					<PostTitle />
 					<Textarea
 						autoComplete="off"
 						value={ value }
 						onChange={ this.onChange }
-						onBlur={ this.onBlur }
+						onBlur={ this.onPersist }
 						className="editor-text-editor__textarea"
 					/>
 				</div>
@@ -99,19 +84,14 @@ class TextEditor extends Component {
 
 export default connect(
 	( state ) => ( {
-		blocks: getBlocks( state ),
+		value: getEditedPostContent( state ),
 	} ),
 	{
-		onChange( blocks ) {
-			return {
-				type: 'RESET_BLOCKS',
-				blocks,
-			};
+		onChange( content ) {
+			return editPost( { content } );
 		},
-		markDirty() {
-			return {
-				type: 'MARK_DIRTY',
-			};
+		onPersist( content ) {
+			return resetBlocks( parse( content ) );
 		},
 	}
 )( TextEditor );

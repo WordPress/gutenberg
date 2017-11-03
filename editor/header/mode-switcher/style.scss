@@ -1,48 +1,8 @@
-#wpbody .editor-mode-switcher {	/* #wpbody for extra specificity */
-	position: relative;
-	margin-right: $item-spacing;
-	padding-right: $item-spacing;
-	color: $dark-gray-500;
-	align-items: center;
-	cursor: pointer;
-	border-right: 1px solid $light-gray-500;
-	outline: none;
-	display: flex;
-	align-items: center;
-
-	.editor-mode-switcher__input {
-		background: transparent;
-		line-height: 1;
-		border: 0;
-		border-radius: 0;
-		-webkit-appearance: none;
-		outline: none;
-		cursor: pointer;
-		box-shadow: none;
-		padding-right: 0;
-		font-size: 13px;
-		height: auto;
-
-		@include break-small {
-			padding-right: 24px;
-		}
-	}
+.editor-mode-switcher__button {
+	width: 100%;
+	padding: 15px;
 
 	.dashicon {
-		position: relative;
-		z-index: z-index( '.editor-mode-switcher .dashicon' );
-		margin-left: -24px;
-		margin-top: -1px;
-
-		display: none;
-
-		@include break-small {
-			display: block;
-		}
-	}
-
-	&:hover,
-	select:hover {
-		color: $dark-gray-900;
+		margin-right: 20px;
 	}
 }

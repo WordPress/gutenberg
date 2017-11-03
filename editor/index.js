@@ -1,34 +1,33 @@
 /**
  * External dependencies
  */
-import { Provider as ReduxProvider } from 'react-redux';
-import { Provider as SlotFillProvider } from 'react-slot-fill';
-import { omit } from 'lodash';
 import moment from 'moment-timezone';
 import 'moment-timezone/moment-timezone-utils';
 
 /**
  * WordPress dependencies
  */
-import { settings } from 'date';
+import { render } from '@wordpress/element';
+import { settings as dateSettings } from '@wordpress/date';
 
 /**
  * Internal dependencies
  */
 import './assets/stylesheets/main.scss';
 import Layout from './layout';
-import { createReduxStore } from './state';
+import EditorProvider from './provider';
+import { initializeMetaBoxState } from './actions';
 
 // Configure moment globally
-moment.locale( settings.l10n.locale );
-if ( settings.timezone.string ) {
-	moment.tz.setDefault( settings.timezone.string );
+moment.locale( dateSettings.l10n.locale );
+if ( dateSettings.timezone.string ) {
+	moment.tz.setDefault( dateSettings.timezone.string );
 } else {
 	const momentTimezone = {
 		name: 'WP',
 		abbrs: [ 'WP' ],
 		untils: [ null ],
-		offsets: [ -settings.timezone.offset * 60 ],
+		offsets: [ -dateSettings.timezone.offset * 60 ],
 	};
 	const unpackedTimezone = moment.tz.pack( momentTimezone );
 	moment.tz.add( unpackedTimezone );
@@ -36,57 +35,38 @@ if ( settings.timezone.string ) {
 }
 
 /**
- * Initializes Redux state with bootstrapped post, if provided.
- *
- * @param {Redux.Store} store Redux store instance
- * @param {?Object}     post  Bootstrapped post object
+ * Configure heartbeat to refresh the wp-api nonce, keeping the editor authorization intact.
  */
-function preparePostState( store, post ) {
-	if ( ! post ) {
-		return;
+window.jQuery( document ).on( 'heartbeat-tick', ( event, response ) => {
+	if ( response[ 'rest-nonce' ] ) {
+		window.wpApiSettings.nonce = response[ 'rest-nonce' ];
 	}
-
-	store.dispatch( {
-		type: 'RESET_POST',
-		post,
-	} );
-	store.dispatch( {
-		type: 'RESET_BLOCKS',
-		blocks: wp.blocks.parse( post.content.raw ),
-	} );
-
-	if ( ! post.id ) {
-		// Each property that is set in `post-content.js` (other than `content`
-		// because it is serialized when a save is requested) needs to be
-		// registered as an edit now.  Otherwise the initial values of these
-		// properties will not be properly saved with the post.
-		store.dispatch( {
-			type: 'SETUP_NEW_POST',
-			edits: {
-				title: post.title.raw,
-				...omit( post, 'title', 'content' ),
-			},
-		} );
-	}
-}
+} );
 
 /**
  * Initializes and returns an instance of Editor.
  *
- * @param {String} id   Unique identifier for editor instance
- * @param {Object} post API entity for post to edit
+ * The return value of this function is not necessary if we change where we
+ * call createEditorInstance(). This is due to metaBox timing.
+ *
+ * @param {String}  id       Unique identifier for editor instance
+ * @param {Object}  post     API entity for post to edit
+ * @param {?Object} settings Editor settings object
+ * @return {Object} Editor interface. Currently supports metabox initialization.
  */
-export function createEditorInstance( id, post ) {
-	const store = createReduxStore();
+export function createEditorInstance( id, post, settings ) {
+	const target = document.getElementById( id );
 
-	preparePostState( store, post );
-
-	wp.element.render(
-		<ReduxProvider store={ store }>
-			<SlotFillProvider>
-				<Layout />
-			</SlotFillProvider>
-		</ReduxProvider>,
-		document.getElementById( id )
+	const provider = render(
+		<EditorProvider settings={ settings } post={ post }>
+			<Layout />
+		</EditorProvider>,
+		target
 	);
+
+	return {
+		initializeMetaBoxes( metaBoxes ) {
+			provider.store.dispatch( initializeMetaBoxState( metaBoxes ) );
+		},
+	};
 }

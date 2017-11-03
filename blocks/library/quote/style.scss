@@ -1,33 +1,25 @@
-.blocks-quote {
-	margin: 0;
+.wp-block-quote {
+	margin: 0 0 16px;
 	box-shadow: inset 0px 0px 0px 0px $light-gray-500;
 
 	footer {
 		color: $dark-gray-100;
-		margin-left: 1.3em;
 		margin-top: 1em;
 		position: relative;
 		font-size: $default-font-size;
 		font-style: normal;
-
-		&:before {
-			content: '— ';
-			position: absolute;
-			left: -1.3em;
-			top: 0;
-		}
 	}
-}
 
-.editor-visual-editor .blocks-quote-style-1 {
-	border-left: 4px solid $black;
-	padding-left: 1em;
-}
-
-.editor-visual-editor .blocks-quote-style-2 {
-	padding: 0 1em;
-	& > .blocks-editable p {
-		font-size: 24px;
-		font-style: italic;
+	&.blocks-quote-style-2 {
+		padding: 0 1em;
+		p {
+			font-size: 24px;
+			font-style: italic;
+			line-height: 1.6;
+		}
+		footer {
+			font-size: 19px;
+			text-align: right;
+		}
 	}
 }

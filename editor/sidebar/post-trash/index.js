@@ -6,38 +6,32 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { Button, Dashicon } from 'components';
+import { PanelRow } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { getCurrentPost } from '../../selectors';
-import { trashPost } from '../../actions';
+import PostTrashLink from '../../post-trash';
+import { isEditedPostNew, getCurrentPostId } from '../../selectors';
 
-function PostTrash( { postId, postType, ...props } ) {
-	if ( ! postId ) {
+function PostTrash( { isNew, postId } ) {
+	if ( isNew || ! postId ) {
 		return null;
 	}
 
-	const onClick = () => props.trashPost( postId, postType );
-
 	return (
-		<Button className="editor-post-trash" onClick={ onClick }>
-			{ __( 'Move to trash' ) }
-			<Dashicon icon="trash" />
-		</Button>
+		<PanelRow>
+			<PostTrashLink />
+		</PanelRow>
 	);
 }
 
 export default connect(
 	( state ) => {
-		const post = getCurrentPost( state );
 		return {
-			postId: post.id,
-			postType: post.type,
+			isNew: isEditedPostNew( state ),
+			postId: getCurrentPostId( state ),
 		};
 	},
-	{ trashPost }
 )( PostTrash );

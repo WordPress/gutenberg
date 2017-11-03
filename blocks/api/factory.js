@@ -2,7 +2,14 @@
  * External dependencies
  */
 import uuid from 'uuid/v4';
-import { get, castArray, findIndex, isObjectLike, find } from 'lodash';
+import {
+	get,
+	reduce,
+	castArray,
+	findIndex,
+	isObjectLike,
+	find,
+} from 'lodash';
 
 /**
  * Internal dependencies
@@ -12,18 +19,35 @@ import { getBlockType } from './registration';
 /**
  * Returns a block object given its type and attributes.
  *
- * @param  {String} name        Block name
- * @param  {Object} attributes  Block attributes
- * @return {Object}             Block object
+ * @param  {String} name             Block name
+ * @param  {Object} blockAttributes  Block attributes
+ * @return {Object}                  Block object
  */
-export function createBlock( name, attributes = {} ) {
+export function createBlock( name, blockAttributes = {} ) {
 	// Get the type definition associated with a registered block.
 	const blockType = getBlockType( name );
 
-	// Do we need this? What purpose does it have?
-	let defaultAttributes;
-	if ( blockType ) {
-		defaultAttributes = blockType.defaultAttributes;
+	// Ensure attributes contains only values defined by block type, and merge
+	// default values for missing attributes.
+	const attributes = reduce( blockType.attributes, ( result, source, key ) => {
+		const value = blockAttributes[ key ];
+		if ( undefined !== value ) {
+			result[ key ] = value;
+		} else if ( source.default ) {
+			result[ key ] = source.default;
+		}
+
+		return result;
+	}, {} );
+
+	// Keep the anchor if the block supports it
+	if ( blockType.supportAnchor && blockAttributes.anchor ) {
+		attributes.anchor = blockAttributes.anchor;
+	}
+
+	// Keep the className if the block supports it
+	if ( blockType.className !== false && blockAttributes.className ) {
+		attributes.className = blockAttributes.className;
 	}
 
 	// Blocks are stored with a unique ID, the assigned type name,
@@ -31,10 +55,8 @@ export function createBlock( name, attributes = {} ) {
 	return {
 		uid: uuid(),
 		name,
-		attributes: {
-			...defaultAttributes,
-			...attributes,
-		},
+		isValid: true,
+		attributes,
 	};
 }
 
@@ -53,8 +75,8 @@ export function switchToBlockType( block, name ) {
 	const transformationsFrom = get( destinationType, 'transforms.from', [] );
 	const transformationsTo = get( sourceType, 'transforms.to', [] );
 	const transformation =
-		find( transformationsTo, t => t.blocks.indexOf( name ) !== -1 ) ||
-		find( transformationsFrom, t => t.blocks.indexOf( block.name ) !== -1 );
+		find( transformationsTo, t => t.type === 'block' && t.blocks.indexOf( name ) !== -1 ) ||
+		find( transformationsFrom, t => t.type === 'block' && t.blocks.indexOf( block.name ) !== -1 );
 
 	// Stop if there is no valid transformation. (How did we get here?)
 	if ( ! transformation ) {
@@ -87,13 +109,10 @@ export function switchToBlockType( block, name ) {
 		return null;
 	}
 
-	return transformationResults.map( ( result, index ) => {
-		return {
-			// The first transformed block whose type matches the "destination"
-			// type gets to keep the existing block's UID.
-			uid: index === firstSwitchedBlock ? block.uid : result.uid,
-			name: result.name,
-			attributes: result.attributes,
-		};
-	} );
+	return transformationResults.map( ( result, index ) => ( {
+		...result,
+		// The first transformed block whose type matches the "destination"
+		// type gets to keep the existing block's UID.
+		uid: index === firstSwitchedBlock ? block.uid : result.uid,
+	} ) );
 }

@@ -7,3 +7,51 @@
 		color: inherit;
 	}
 }
+
+.editor-block-inspector__no-blocks,
+.editor-block-inspector__multi-blocks {
+	display: block;
+	font-size: $default-font-size;
+	background: $white;
+	padding: ( $panel-padding * 2 ) $panel-padding;
+	border-bottom: 1px solid $light-gray-500;
+	text-align: center;
+}
+
+.editor-block-inspector__content .components-panel__body {
+	border: none;
+	margin: 0 -16px;
+
+	.blocks-base-control {
+		margin: 0 0 1em 0;
+	}
+
+	&.is-opened > .components-panel__body-title {
+		margin-bottom: 5px;
+	}
+
+	.components-panel__body-toggle {
+		color: $dark-gray-500;
+	}
+}
+
+.editor-block-inspector__content .editor-advanced-controls {
+	margin-bottom: -14px;
+}
+
+.editor-advanced-controls__anchor {
+	display: inline-flex;
+	max-width: 100%;
+	align-items: center;
+}
+
+.editor-advanced-controls__anchor-link {
+	flex-grow: 1;
+	white-space: nowrap;
+	overflow: hidden;
+	position: relative;
+
+	&:after {
+		@include long-content-fade( $size: 20% );
+	}
+}

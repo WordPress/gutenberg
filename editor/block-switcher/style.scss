@@ -1,15 +1,5 @@
 .editor-block-switcher {
-	border: 1px solid $light-gray-500;
-	box-shadow: $shadow-popover;
-	background-color: $white;
-	font-family: $default-font;
-	font-size: $default-font-size;
-	line-height: $default-line-height;
-	margin-right: -1px;
-
-	@include break-small() {
-		margin-right: $item-spacing;
-	}
+	position: relative;
 }
 
 .editor-block-switcher__toggle {
@@ -26,18 +16,21 @@
 	}
 }
 
+.editor-block-switcher__popover .components-popover__content {
+	width: 200px;
+}
+
 .editor-block-switcher__menu {
-	position: absolute;
-	top: $block-controls-height - 1px;
-	left: 0;
 	box-shadow: $shadow-popover;
 	border: 1px solid $light-gray-500;
 	background: $white;
 	padding: 3px 3px 0 3px;
+}
 
-	input {
-		font-size: 13px;
-	}
+.editor-block-switcher__menu-title {
+	display: block;
+	padding: 6px;
+	color: $dark-gray-300;
 }
 
 .editor-block-switcher__menu-item {
@@ -58,8 +51,8 @@
 		color: $dark-gray-500;
 		border-color: $dark-gray-500;
 	}
+}
 
-	.dashicon {
-		margin-right: 5px;
-	}
+.editor-block-switcher__block-icon {
+	margin-right: 5px;
 }

@@ -1,8 +1,17 @@
 .editor-block-mover {
 	position: absolute;
-	top: 10px;
-	left: 0;
-	padding: 0 14px 20px 0; // handles hover area
+	top: 2px;
+	left: 4px;
+	height: $text-editor-font-size * 4; // same height as an empty paragraph
+	padding: 4px 14px 6px 0; // handles hover area
+	z-index: z-index( '.editor-block-mover' );
+
+	// Mobile, to be revisited
+	display: none;
+
+	@include break-small {
+		display: block;
+	}
 }
 
 .editor-block-mover__control {
@@ -25,5 +34,9 @@
 
 	.dashicon {
 		display: block;
+	}
+
+	&:first-child {
+		margin-bottom: 4px;
 	}
 }

@@ -25,18 +25,16 @@
 		font-family: $editor-html-font;
 		color: $dark-gray-500;
 		border: 1px solid transparent;
-	}
 
-	button:first-child {
-		margin-left: 0;
-	}
+		&:first-child {
+			margin-left: 0;
+		}
 
-	button:hover {
-		border: 1px solid $dark-gray-500;
-	}
-
-	button:focus {
-		outline: none;
+		&:hover,
+		&:focus {
+			outline: none;
+			border: 1px solid $dark-gray-500;
+		}
 	}
 
 	@include break-small() {
@@ -45,6 +43,7 @@
 		margin-left: 0;
 		margin-right: 0;
 		position: fixed;
+		z-index: z-index( '.editor-text-editor__formatting' );
 	}
 
 	.auto-fold.sticky-menu &,

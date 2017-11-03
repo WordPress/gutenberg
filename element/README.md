@@ -5,7 +5,7 @@ Element is, quite simply, an abstraction layer atop [React](https://facebook.git
 
 You may find yourself asking, "Why an abstraction layer?". For a few reasons:
 
-- In many applications, especially those extended by a rich plugin ecosystem as is the case with WordPress, it's wise to create interfaces to underlying third-party code. The thinking is that if ever a need arises to change or even replace the underlying implementation, it can be done without catestrophic rippling effects to dependent code, so long as the interface stays the same.
+- In many applications, especially those extended by a rich plugin ecosystem as is the case with WordPress, it's wise to create interfaces to underlying third-party code. The thinking is that if ever a need arises to change or even replace the underlying implementation, it can be done without catastrophic rippling effects to dependent code, so long as the interface stays the same.
 - It provides a mechanism to shield implementers by omitting features with uncertain futures (`createClass`, `PropTypes`).
 - It helps avoid incompatibilities between versions by ensuring that every plugin operates on a single centralized version of the code.
 

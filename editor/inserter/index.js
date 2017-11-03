@@ -1,87 +1,98 @@
 /**
  * External dependencies
  */
-import clickOutside from 'react-click-outside';
 import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 
 /**
  * WordPress dependencies
  */
-import { IconButton } from 'components';
+import { __ } from '@wordpress/i18n';
+import { Dropdown, IconButton } from '@wordpress/components';
+import { createBlock } from '@wordpress/blocks';
+import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import InserterMenu from './menu';
 import { getBlockInsertionPoint, getEditorMode } from '../selectors';
-import { insertBlock, hideInsertionPoint } from '../actions';
+import {
+	insertBlock,
+	setBlockInsertionPoint,
+	clearBlockInsertionPoint,
+	hideInsertionPoint,
+} from '../actions';
 
-class Inserter extends wp.element.Component {
+class Inserter extends Component {
 	constructor() {
 		super( ...arguments );
-		this.toggle = this.toggle.bind( this );
-		this.close = this.close.bind( this );
-		this.insertBlock = this.insertBlock.bind( this );
-		this.state = {
-			opened: false,
-		};
+
+		this.onToggle = this.onToggle.bind( this );
 	}
 
-	toggle() {
-		this.setState( {
-			opened: ! this.state.opened,
-		} );
-	}
+	onToggle( isOpen ) {
+		const {
+			insertIndex,
+			setInsertionPoint,
+			clearInsertionPoint,
+			onToggle,
+		} = this.props;
 
-	close() {
-		this.setState( {
-			opened: false,
-		} );
-	}
-
-	insertBlock( name ) {
-		if ( name ) {
-			const { insertionPoint, onInsertBlock } = this.props;
-			onInsertBlock(
-				name,
-				insertionPoint
-			);
+		// When inserting at specific index, assign as insertion point when
+		// the inserter is opened, clearing on close.
+		if ( insertIndex !== undefined ) {
+			if ( isOpen ) {
+				setInsertionPoint( insertIndex );
+			} else {
+				clearInsertionPoint();
+			}
 		}
 
-		this.close();
-	}
-
-	handleClickOutside() {
-		if ( ! this.state.opened ) {
-			return;
+		// Surface toggle callback to parent component
+		if ( onToggle ) {
+			onToggle( isOpen );
 		}
-
-		this.close();
 	}
 
 	render() {
-		const { opened } = this.state;
-		const { position, children } = this.props;
+		const {
+			position,
+			children,
+			onInsertBlock,
+			insertionPoint,
+		} = this.props;
 
 		return (
-			<div className="editor-inserter">
-				<IconButton
-					icon="insert"
-					label={ wp.i18n.__( 'Insert block' ) }
-					onClick={ this.toggle }
-					className="editor-inserter__toggle"
-					aria-haspopup="true"
-					aria-expanded={ opened }
-				>
-					{ children }
-				</IconButton>
-				{ opened && (
-					<InserterMenu
-						position={ position }
-						onSelect={ this.insertBlock }
-					/>
+			<Dropdown
+				className="editor-inserter"
+				position={ position }
+				onToggle={ this.onToggle }
+				renderToggle={ ( { onToggle, isOpen } ) => (
+					<IconButton
+						icon="insert"
+						label={ __( 'Insert block' ) }
+						onClick={ onToggle }
+						className="editor-inserter__toggle"
+						aria-haspopup="true"
+						aria-expanded={ isOpen }
+					>
+						{ children }
+					</IconButton>
 				) }
-			</div>
+				renderContent={ ( { onClose } ) => {
+					const onInsert = ( name ) => {
+						onInsertBlock(
+							name,
+							insertionPoint
+						);
+
+						onClose();
+					};
+
+					return <InserterMenu onSelect={ onInsert } />;
+				} }
+			/>
 		);
 	}
 }
@@ -94,12 +105,16 @@ export default connect(
 		};
 	},
 	( dispatch ) => ( {
-		onInsertBlock( name, after ) {
+		onInsertBlock( name, position ) {
 			dispatch( hideInsertionPoint() );
 			dispatch( insertBlock(
-				wp.blocks.createBlock( name ),
-				after
+				createBlock( name ),
+				position
 			) );
 		},
+		...bindActionCreators( {
+			setInsertionPoint: setBlockInsertionPoint,
+			clearInsertionPoint: clearBlockInsertionPoint,
+		}, dispatch ),
 	} )
-)( clickOutside( Inserter ) );
+)( Inserter );

@@ -1,3 +1,5 @@
 build
-docs
+coverage
 vendor
+node_modules
+/assets/js

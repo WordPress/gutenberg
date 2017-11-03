@@ -1,8 +1,6 @@
-.blocks-image {
-	margin: 0;
-
-	img {
-		display: block;
-		width: 100%;
-	}
+.wp-block-image figcaption {
+	margin-top: 0.5em;
+	color: $dark-gray-100;
+	text-align: center;
+	font-size: $default-font-size;
 }

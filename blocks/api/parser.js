@@ -1,40 +1,90 @@
 /**
  * External dependencies
  */
-import { parse as hpqParse } from 'hpq';
-import { pickBy } from 'lodash';
+import { parse as hpqParse, attr } from 'hpq';
+import { mapValues, reduce, pickBy } from 'lodash';
 
 /**
  * Internal dependencies
  */
 import { parse as grammarParse } from './post.pegjs';
-import { getBlockType, getUnknownTypeHandler } from './registration';
+import { getBlockType, getUnknownTypeHandlerName } from './registration';
 import { createBlock } from './factory';
+import { isValidBlock } from './validation';
+import { getCommentDelimitedContent } from './serializer';
+
+/**
+ * Returns true if the provided function is a valid attribute source, or false
+ * otherwise.
+ *
+ * Sources are implemented as functions receiving a DOM node to select data
+ * from. Using the DOM is incidental and we shouldn't guarantee a contract that
+ * this be provided, else block implementers may feel inclined to use the node.
+ * Instead, sources are intended as a generic interface to query data from any
+ * tree shape. Here we pick only sources which include an internal flag.
+ *
+ * @param  {Function} source Function to test
+ * @return {Boolean}         Whether function is an attribute source
+ */
+export function isValidSource( source ) {
+	return !! source && '_wpBlocksKnownSource' in source;
+}
 
 /**
  * Returns the block attributes parsed from raw content.
  *
- * @param  {String} rawContent    Raw block content
- * @param  {Object} blockType     Block type
- * @return {Object}               Block attributes
+ * @param  {String} rawContent Raw block content
+ * @param  {Object} schema     Block attribute schema
+ * @return {Object}            Block attribute values
  */
-export function parseBlockAttributes( rawContent, blockType ) {
-	const { attributes } = blockType;
-	if ( 'function' === typeof attributes ) {
-		return attributes( rawContent );
-	} else if ( attributes ) {
-		// Matchers are implemented as functions that receive a DOM node from
-		// which to select data. Use of the DOM is incidental and we shouldn't
-		// guarantee a contract that this be provided, else block implementers
-		// may feel compelled to use the node. Instead, matchers are intended
-		// as a generic interface to query data from any tree shape. Here we
-		// pick only matchers which include an internal flag.
-		const knownMatchers = pickBy( attributes, '_wpBlocksKnownMatcher' );
+export function getSourcedAttributes( rawContent, schema ) {
+	const sources = mapValues(
+		// Parse only sources with source defined
+		pickBy( schema, ( attributeSchema ) => isValidSource( attributeSchema.source ) ),
 
-		return hpqParse( rawContent, knownMatchers );
+		// Transform to object where source is value
+		( attributeSchema ) => attributeSchema.source
+	);
+
+	return hpqParse( rawContent, sources );
+}
+
+/**
+ * Returns value coerced to the specified JSON schema type string
+ *
+ * @see http://json-schema.org/latest/json-schema-validation.html#rfc.section.6.25
+ *
+ * @param  {*}      value Original value
+ * @param  {String} type  Type to coerce
+ * @return {*}            Coerced value
+ */
+export function asType( value, type ) {
+	switch ( type ) {
+		case 'string':
+			return String( value );
+
+		case 'boolean':
+			return Boolean( value );
+
+		case 'object':
+			return Object( value );
+
+		case 'null':
+			return null;
+
+		case 'array':
+			if ( Array.isArray( value ) ) {
+				return value;
+			}
+
+			return Array.from( value );
+
+		case 'integer':
+		case 'number':
+			return Number( value );
 	}
 
-	return {};
+	return value;
 }
 
 /**
@@ -46,18 +96,69 @@ export function parseBlockAttributes( rawContent, blockType ) {
  * @return {Object}                All block attributes
  */
 export function getBlockAttributes( blockType, rawContent, attributes ) {
-	// Merge any attributes present in comment delimiters with those
-	// that are specified in the block implementation.
-	attributes = attributes || {};
-	if ( blockType ) {
-		attributes = {
-			...blockType.defaultAttributes,
-			...attributes,
-			...parseBlockAttributes( rawContent, blockType ),
-		};
+	// Retrieve additional attributes sourced from content
+	const sourcedAttributes = getSourcedAttributes(
+		rawContent,
+		blockType.attributes
+	);
+
+	const blockAttributes = reduce( blockType.attributes, ( result, source, key ) => {
+		let value;
+		if ( sourcedAttributes.hasOwnProperty( key ) ) {
+			value = sourcedAttributes[ key ];
+		} else if ( attributes ) {
+			value = attributes[ key ];
+		}
+
+		// Return default if attribute value not assigned
+		if ( undefined === value ) {
+			// Nest the condition so that constructor coercion never occurs if
+			// value is undefined and block type doesn't specify default value
+			if ( 'default' in source ) {
+				value = source.default;
+			} else {
+				return result;
+			}
+		}
+
+		// Coerce value to specified type
+		const coercedValue = asType( value, source.type );
+
+		if ( 'development' === process.env.NODE_ENV &&
+				! sourcedAttributes.hasOwnProperty( key ) &&
+				value !== coercedValue ) {
+			// Only in case of sourcing attribute from content do we want to
+			// allow coercion, as comment attributes are serialized respecting
+			// original data type. In development environments, log if value
+			// coerced to specified type is not strictly equal. We still allow
+			// coerced value to be assigned into attributes to avoid errors.
+			//
+			// Example:
+			//   Number( 5 ) === 5
+			//   Number( '5' ) !== '5'
+
+			// eslint-disable-next-line no-console
+			console.error(
+				`Expected attribute "${ key }" of type ${ source.type } for ` +
+				`block type "${ blockType.name }" but received ${ typeof value }.`
+			);
+		}
+
+		result[ key ] = coercedValue;
+		return result;
+	}, {} );
+
+	// If the block supports anchor, parse the id
+	if ( blockType.supportAnchor ) {
+		blockAttributes.anchor = hpqParse( rawContent, attr( '*', 'id' ) );
 	}
 
-	return attributes;
+	// If the block supports a custom className parse it
+	if ( blockType.className !== false && attributes && attributes.className ) {
+		blockAttributes.className = attributes.className;
+	}
+
+	return blockAttributes;
 }
 
 /**
@@ -70,26 +171,48 @@ export function getBlockAttributes( blockType, rawContent, attributes ) {
  */
 export function createBlockWithFallback( name, rawContent, attributes ) {
 	// Use type from block content, otherwise find unknown handler.
-	name = name || getUnknownTypeHandler();
+	name = name || getUnknownTypeHandlerName();
+
+	// Convert 'core/text' blocks in existing content to the new
+	// 'core/paragraph'.
+	if ( name === 'core/text' || name === 'core/cover-text' ) {
+		name = 'core/paragraph';
+	}
 
 	// Try finding type for known block name, else fall back again.
 	let blockType = getBlockType( name );
-	const fallbackBlock = getUnknownTypeHandler();
+	const fallbackBlock = getUnknownTypeHandlerName();
 	if ( ! blockType ) {
+		// If detected as a block which is not registered, preserve comment
+		// delimiters in content of unknown type handler.
+		if ( name ) {
+			rawContent = getCommentDelimitedContent( name, attributes, rawContent );
+		}
+
 		name = fallbackBlock;
 		blockType = getBlockType( name );
 	}
 
 	// Include in set only if type were determined.
 	// TODO do we ever expect there to not be an unknown type handler?
-	if ( blockType && ( rawContent.trim() || name !== fallbackBlock ) ) {
+	if ( blockType && ( rawContent || name !== fallbackBlock ) ) {
 		// TODO allow blocks to opt-in to receiving a tree instead of a string.
 		// Gradually convert all blocks to this new format, then remove the
 		// string serialization.
 		const block = createBlock(
 			name,
-			getBlockAttributes( blockType, rawContent.trim(), attributes )
+			getBlockAttributes( blockType, rawContent, attributes )
 		);
+
+		// Validate that the parsed block is valid, meaning that if we were to
+		// reserialize it given the assumed attributes, the markup matches the
+		// original value.
+		block.isValid = isValidBlock( rawContent, blockType, block.attributes );
+
+		// Preserve original content for future use in case the block is parsed
+		// as invalid, or future serialization attempt results in an error
+		block.originalContent = rawContent;
+
 		return block;
 	}
 }
@@ -103,7 +226,7 @@ export function createBlockWithFallback( name, rawContent, attributes ) {
 export function parseWithGrammar( content ) {
 	return grammarParse( content ).reduce( ( memo, blockNode ) => {
 		const { blockName, rawContent, attrs } = blockNode;
-		const block = createBlockWithFallback( blockName, rawContent, attrs );
+		const block = createBlockWithFallback( blockName, rawContent.trim(), attrs );
 		if ( block ) {
 			memo.push( block );
 		}

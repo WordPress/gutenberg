@@ -1,34 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { Placeholder } from 'components';
+import { __ } from '@wordpress/i18n';
+import { createMediaFromFile } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, query } from '../../api';
-import Editable from '../../editable';
-import MediaUploadButton from '../../media-upload-button';
-import InspectorControls from '../../inspector-controls';
-import TextControl from '../../inspector-controls/text-control';
+import './editor.scss';
+import { registerBlockType, source, createBlock } from '../../api';
+import ImageBlock from './block';
 
-const { attr, children } = query;
-
-/**
- * Returns an attribute setter with behavior that if the target value is
- * already the assigned attribute value, it will be set to undefined.
- *
- * @param  {string}   align Alignment value
- * @return {Function}       Attribute setter
- */
-function toggleAlignment( align ) {
-	return ( attributes, setAttributes ) => {
-		const nextAlign = attributes.align === align ? undefined : align;
-		setAttributes( { align: nextAlign } );
-	};
-}
+const { attr, children, text } = source;
 
 registerBlockType( 'core/image', {
 	title: __( 'Image' ),
@@ -37,120 +21,125 @@ registerBlockType( 'core/image', {
 
 	category: 'common',
 
+	keywords: [ __( 'photo' ) ],
+
 	attributes: {
-		url: attr( 'img', 'src' ),
-		alt: attr( 'img', 'alt' ),
-		caption: children( 'figcaption' ),
+		url: {
+			type: 'string',
+			source: attr( 'img', 'src' ),
+		},
+		alt: {
+			type: 'string',
+			source: attr( 'img', 'alt' ),
+		},
+		caption: {
+			type: 'array',
+			source: children( 'figcaption' ),
+		},
+		href: {
+			type: 'string',
+			source: attr( 'a', 'href' ),
+		},
+		id: {
+			type: 'number',
+		},
+		align: {
+			type: 'string',
+		},
+		width: {
+			type: 'number',
+		},
+		height: {
+			type: 'number',
+		},
 	},
 
-	controls: [
-		{
-			icon: 'align-left',
-			title: __( 'Align left' ),
-			isActive: ( { align } ) => 'left' === align,
-			onClick: toggleAlignment( 'left' ),
-		},
-		{
-			icon: 'align-center',
-			title: __( 'Align center' ),
-			isActive: ( { align } ) => ! align || 'center' === align,
-			onClick: toggleAlignment( 'center' ),
-		},
-		{
-			icon: 'align-right',
-			title: __( 'Align right' ),
-			isActive: ( { align } ) => 'right' === align,
-			onClick: toggleAlignment( 'right' ),
-		},
-		{
-			icon: 'align-wide',
-			title: __( 'Wide width' ),
-			isActive: ( { align } ) => 'wide' === align,
-			onClick: toggleAlignment( 'wide' ),
-		},
-		{
-			icon: 'align-full-width',
-			title: __( 'Full width' ),
-			isActive: ( { align } ) => 'full' === align,
-			onClick: toggleAlignment( 'full' ),
-		},
-	],
+	transforms: {
+		from: [
+			{
+				type: 'raw',
+				isMatch: ( node ) => {
+					const tag = node.nodeName.toLowerCase();
+					const hasText = !! node.textContent.trim();
+					const hasImage = node.querySelector( 'img' );
+
+					return tag === 'img' || ( hasImage && ! hasText ) || ( hasImage && tag === 'figure' );
+				},
+			},
+			{
+				type: 'files',
+				isMatch( files ) {
+					return files.length === 1 && files[ 0 ].type.indexOf( 'image/' ) === 0;
+				},
+				transform( files ) {
+					return createMediaFromFile( files[ 0 ] )
+						.then( ( media ) => createBlock( 'core/image', {
+							id: media.id,
+							url: media.source_url,
+						} ) );
+				},
+			},
+			{
+				type: 'shortcode',
+				tag: 'caption',
+				attributes: {
+					url: {
+						type: 'string',
+						source: attr( 'img', 'src' ),
+					},
+					alt: {
+						type: 'string',
+						source: attr( 'img', 'alt' ),
+					},
+					caption: {
+						type: 'array',
+						// To do: needs to support HTML.
+						source: text(),
+					},
+					href: {
+						type: 'string',
+						source: attr( 'a', 'href' ),
+					},
+					id: {
+						type: 'number',
+						shortcode: ( { named: { id } } ) => {
+							if ( ! id ) {
+								return;
+							}
+
+							return parseInt( id.replace( 'attachment_', '' ), 10 );
+						},
+					},
+					align: {
+						type: 'string',
+						shortcode: ( { named: { align = 'alignnone' } } ) => {
+							return align.replace( 'align', '' );
+						},
+					},
+				},
+			},
+		],
+	},
 
 	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
+		const { align, width } = attributes;
 		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
-			return { 'data-align': align };
+			return { 'data-align': align, 'data-resized': !! width };
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus } ) {
-		const { url, alt, caption } = attributes;
-		const updateAlt = ( newAlt ) => setAttributes( { alt: newAlt } );
-
-		if ( ! url ) {
-			const uploadButtonProps = { isLarge: true };
-			const setMediaURL = ( media ) => setAttributes( { url: media.url } );
-			return [
-				<Placeholder
-					key="placeholder"
-					instructions={ __( 'Drag image here or insert from media library' ) }
-					icon="format-image"
-					label={ __( 'Image' ) }
-					className="blocks-image">
-					<MediaUploadButton
-						buttonProps={ uploadButtonProps }
-						onSelect={ setMediaURL }
-						type="image"
-						autoOpen
-					>
-						{ __( 'Insert from Media Library' ) }
-					</MediaUploadButton>
-				</Placeholder>,
-			];
-		}
-
-		const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
-
-		// Disable reason: Each block can be selected by clicking on it
-
-		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
-		return [
-			focus && (
-				<InspectorControls key="inspector">
-					<TextControl label={ __( 'Alternate Text' ) } value={ alt } onChange={ updateAlt } />
-				</InspectorControls>
-			),
-			<figure key="image" className="blocks-image">
-				<img src={ url } alt={ alt } onClick={ setFocus } />
-				{ ( caption && caption.length > 0 ) || !! focus ? (
-					<Editable
-						tagName="figcaption"
-						placeholder={ __( 'Write caption…' ) }
-						value={ caption }
-						focus={ focus && focus.editable === 'caption' ? focus : undefined }
-						onFocus={ focusCaption }
-						onChange={ ( value ) => setAttributes( { caption: value } ) }
-						inline
-						inlineToolbar
-					/>
-				) : null }
-			</figure>,
-		];
-		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
-	},
+	edit: ImageBlock,
 
 	save( { attributes } ) {
-		const { url, alt, caption, align = 'none' } = attributes;
-		const img = <img src={ url } alt={ alt } className={ `align${ align }` } />;
-
-		if ( ! caption || ! caption.length ) {
-			return img;
-		}
+		const { url, alt, caption, align, href, width, height } = attributes;
+		const extraImageProps = width || height ? { width, height } : {};
+		const figureStyle = width ? { width } : {};
+		const image = <img src={ url } alt={ alt } { ...extraImageProps } />;
 
 		return (
-			<figure>
-				{ img }
-				<figcaption>{ caption }</figcaption>
+			<figure className={ align ? `align${ align }` : null } style={ figureStyle }>
+				{ href ? <a href={ href }>{ image }</a> : image }
+				{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
 			</figure>
 		);
 	},

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { expect } from 'chai';
-
-/**
  * Internal dependencies
  */
 import { getBlockMoverLabel, getMultiBlockMoverLabel } from '../mover-label';
@@ -23,7 +18,7 @@ describe( 'block mover', () => {
 				true,
 				false,
 				dirUp,
-			) ).to.equal(
+			) ).toBe(
 				`Block "${ type }" is at the beginning of the content and can’t be moved up`
 			);
 		} );
@@ -36,9 +31,7 @@ describe( 'block mover', () => {
 				false,
 				true,
 				dirDown,
-			) ).to.equal(
-				`Block "${ type }" is at the end of the content and can’t be moved down`
-			);
+			) ).toBe( `Block "${ type }" is at the end of the content and can’t be moved down` );
 		} );
 
 		it( 'Should generate a title for the second item moving up', () => {
@@ -49,9 +42,7 @@ describe( 'block mover', () => {
 				false,
 				false,
 				dirUp,
-			) ).to.equal(
-				`Move "${ type }" block from position 2 up to position 1`
-			);
+			) ).toBe( `Move "${ type }" block from position 2 up to position 1` );
 		} );
 
 		it( 'Should generate a title for the second item moving down', () => {
@@ -62,9 +53,7 @@ describe( 'block mover', () => {
 				false,
 				false,
 				dirDown,
-			) ).to.equal(
-				`Move "${ type }" block from position 2 down to position 3`
-			);
+			) ).toBe( `Move "${ type }" block from position 2 down to position 3` );
 		} );
 
 		it( 'Should generate a title for the only item in the list', () => {
@@ -75,9 +64,7 @@ describe( 'block mover', () => {
 				true,
 				true,
 				dirDown,
-			) ).to.equal(
-				`Block "${ type }" is the only block, and cannot be moved`
-			);
+			) ).toBe( `Block "${ type }" is the only block, and cannot be moved` );
 		} );
 	} );
 
@@ -89,9 +76,7 @@ describe( 'block mover', () => {
 				false,
 				true,
 				dirUp,
-			) ).to.equal(
-				'Move 4 blocks from position 2 up by one place'
-			);
+			) ).toBe( 'Move 4 blocks from position 2 up by one place' );
 		} );
 
 		it( 'Should generate a title moving multiple blocks down', () => {
@@ -101,9 +86,7 @@ describe( 'block mover', () => {
 				true,
 				false,
 				dirDown,
-			) ).to.equal(
-				'Move 4 blocks from position 1 down by one place'
-			);
+			) ).toBe( 'Move 4 blocks from position 1 down by one place' );
 		} );
 
 		it( 'Should generate a title for a selection of blocks at the top', () => {
@@ -113,9 +96,7 @@ describe( 'block mover', () => {
 				true,
 				true,
 				dirUp,
-			) ).to.equal(
-				'Blocks cannot be moved up as they are already at the top'
-			);
+			) ).toBe( 'Blocks cannot be moved up as they are already at the top' );
 		} );
 
 		it( 'Should generate a title for a selection of blocks at the bottom', () => {
@@ -125,9 +106,7 @@ describe( 'block mover', () => {
 				false,
 				true,
 				dirDown,
-			) ).to.equal(
-				'Blocks cannot be moved down as they are already at the bottom'
-			);
+			) ).toBe( 'Blocks cannot be moved down as they are already at the bottom' );
 		} );
 	} );
 } );

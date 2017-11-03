@@ -1,102 +1,45 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-import clickOutside from 'react-click-outside';
-import DatePicker from 'react-datepicker';
-import moment from 'moment';
-
-/**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { Component } from 'element';
-import { dateI18n, settings } from 'date';
+import { __ } from '@wordpress/i18n';
+import { PanelRow, Dropdown, withAPIData } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import PostScheduleClock from './clock';
-import { getEditedPostAttribute } from '../../selectors';
-import { editPost } from '../../actions';
+import PostScheduleLabel from '../../post-schedule/label';
+import PostScheduleForm from '../../post-schedule';
 
-class PostSchedule extends Component {
-	constructor() {
-		super( ...arguments );
-		this.state = {
-			open: false,
-		};
-		this.toggleDialog = this.toggleDialog.bind( this );
+export function PostSchedule( { user } ) {
+	if ( ! user.data || ! user.data.capabilities.publish_posts ) {
+		return null;
 	}
 
-	toggleDialog( event ) {
-		event.preventDefault();
-		this.setState( { opened: ! this.state.opened } );
-	}
-
-	handleClickOutside() {
-		this.setState( { opened: false } );
-	}
-
-	render() {
-		const { date, onUpdateDate } = this.props;
-		const momentDate = date ? moment( date ) : moment();
-		const label = date
-			? dateI18n( settings.formats.datetime, date )
-			: __( 'Immediately' );
-		const handleChange = ( newDate ) => {
-			onUpdateDate( newDate.format( 'YYYY-MM-DDTHH:mm:ss' ) );
-		};
-
-		// To know if the current timezone is a 12 hour time with look for "a" in the time format
-		// We also make sure this a is not escaped by a "/"
-		const is12HourTime = /a(?!\\)/i.test(
-			settings.formats.time
-				.toLowerCase() // Test only the lower case a
-				.replace( /\\\\/g, '' ) // Replace "//" with empty strings
-				.split( '' ).reverse().join( '' ) // Reverse the string and test for "a" not followed by a slash
-		);
-
-		return (
-			<div className="editor-post-schedule">
-				<span>{ __( 'Publish' ) }</span>
-				<button className="editor-post-schedule__toggle button-link" onClick={ this.toggleDialog }>
-					{ label }
-				</button>
-
-				{ this.state.opened &&
-					<div className="editor-post-schedule__dialog">
-						<div className="editor-post-schedule__dialog-arrow" />
-						<DatePicker
-							inline
-							selected={ momentDate }
-							onChange={ handleChange }
-							locale={ settings.l10n.locale }
-						/>
-						<PostScheduleClock
-							selected={ momentDate }
-							onChange={ handleChange }
-							is12Hour={ is12HourTime }
-						/>
-					</div>
-				}
-			</div>
-		);
-	}
+	return (
+		<PanelRow className="editor-post-schedule">
+			<span>{ __( 'Publish' ) }</span>
+			<Dropdown
+				position="bottom left"
+				contentClassName="editor-post-schedule__dialog"
+				renderToggle={ ( { onToggle, isOpen } ) => (
+					<button
+						type="button"
+						className="editor-post-schedule__toggle button-link"
+						onClick={ onToggle }
+						aria-expanded={ isOpen }
+					>
+						<PostScheduleLabel />
+					</button>
+				) }
+				renderContent={ () => <PostScheduleForm /> }
+			/>
+		</PanelRow>
+	);
 }
 
-export default connect(
-	( state ) => {
-		return {
-			date: getEditedPostAttribute( state, 'date' ),
-		};
-	},
-	( dispatch ) => {
-		return {
-			onUpdateDate( date ) {
-				dispatch( editPost( { date } ) );
-			},
-		};
-	}
-)( clickOutside( PostSchedule ) );
+export default withAPIData( () => {
+	return {
+		user: '/wp/v2/users/me?context=edit',
+	};
+} )( PostSchedule );

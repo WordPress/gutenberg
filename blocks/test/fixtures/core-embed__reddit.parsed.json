@@ -1,0 +1,13 @@
+[
+    {
+        "blockName": "core-embed/reddit",
+        "attrs": {
+            "url": "https://reddit.com/"
+        },
+        "rawContent": "\n<figure class=\"wp-block-embed-reddit\">\n    https://reddit.com/\n    <figcaption>Embedded content from reddit</figcaption>\n</figure>\n"
+    },
+    {
+        "attrs": {},
+        "rawContent": "\n"
+    }
+]

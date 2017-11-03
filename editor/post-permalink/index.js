@@ -6,15 +6,15 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
-import { Component } from 'element';
-import { __ } from 'i18n';
-import { Dashicon, ClipboardButton, Button } from 'components';
+import { Component } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { Dashicon, ClipboardButton, Button } from '@wordpress/components';
 
 /**
  * Internal Dependencies
  */
 import './style.scss';
-import { getEditedPostAttribute } from '../selectors';
+import { isEditedPostNew, getEditedPostAttribute } from '../selectors';
 
 class PostPermalink extends Component {
 	constructor() {
@@ -25,7 +25,7 @@ class PostPermalink extends Component {
 		this.onCopy = this.onCopy.bind( this );
 	}
 
-	componentWillUnmout() {
+	componentWillUnmount() {
 		clearTimeout( this.dismissCopyConfirmation );
 	}
 
@@ -43,8 +43,8 @@ class PostPermalink extends Component {
 	}
 
 	render() {
-		const { link } = this.props;
-		if ( ! link ) {
+		const { isNew, link } = this.props;
+		if ( isNew || ! link ) {
 			return null;
 		}
 
@@ -66,6 +66,7 @@ class PostPermalink extends Component {
 export default connect(
 	( state ) => {
 		return {
+			isNew: isEditedPostNew( state ),
 			link: getEditedPostAttribute( state, 'link' ),
 		};
 	}

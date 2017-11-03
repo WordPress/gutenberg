@@ -25,6 +25,11 @@ export function undoable( reducer, options = {} ) {
 
 		switch ( action.type ) {
 			case 'UNDO':
+				// Can't undo if no past
+				if ( ! past.length ) {
+					break;
+				}
+
 				return {
 					past: past.slice( 0, past.length - 1 ),
 					present: past[ past.length - 1 ],
@@ -32,6 +37,11 @@ export function undoable( reducer, options = {} ) {
 				};
 
 			case 'REDO':
+				// Can't redo if no future
+				if ( ! future.length ) {
+					break;
+				}
+
 				return {
 					past: [ ...past, present ],
 					present: future[ 0 ],
@@ -96,7 +106,7 @@ export function combineUndoableReducers( reducers, options ) {
 
 	return ( state = initialState, action ) => {
 		const nextState = reducer( state.history, action );
-		if ( nextState === state.history.present ) {
+		if ( nextState === state.history ) {
 			return state;
 		}
 

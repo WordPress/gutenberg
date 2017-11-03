@@ -1,16 +1,15 @@
 /**
- * External dependencies
- */
-import { expect } from 'chai';
-
-/**
  * Internal dependencies
  */
 import {
 	focusBlock,
 	replaceBlocks,
-	startTypingInBlock,
-	stopTypingInBlock,
+	startTyping,
+	stopTyping,
+	requestMetaBoxUpdates,
+	handleMetaBoxReload,
+	metaBoxStateChanged,
+	initializeMetaBoxState,
 } from '../actions';
 
 describe( 'actions', () => {
@@ -20,7 +19,7 @@ describe( 'actions', () => {
 				editable: 'cite',
 			};
 
-			expect( focusBlock( 'chicken', focusConfig ) ).to.eql( {
+			expect( focusBlock( 'chicken', focusConfig ) ).toEqual( {
 				type: 'UPDATE_FOCUS',
 				uid: 'chicken',
 				config: focusConfig,
@@ -34,7 +33,7 @@ describe( 'actions', () => {
 				uid: 'ribs',
 			} ];
 
-			expect( replaceBlocks( [ 'chicken' ], blocks ) ).to.eql( {
+			expect( replaceBlocks( [ 'chicken' ], blocks ) ).toEqual( {
 				type: 'REPLACE_BLOCKS',
 				uids: [ 'chicken' ],
 				blocks,
@@ -42,20 +41,61 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'startTypingInBlock', () => {
+	describe( 'startTyping', () => {
 		it( 'should return the START_TYPING action', () => {
-			expect( startTypingInBlock( 'chicken' ) ).to.eql( {
+			expect( startTyping() ).toEqual( {
 				type: 'START_TYPING',
-				uid: 'chicken',
 			} );
 		} );
 	} );
 
-	describe( 'stopTypingInBlock', () => {
+	describe( 'stopTyping', () => {
 		it( 'should return the STOP_TYPING action', () => {
-			expect( stopTypingInBlock( 'chicken' ) ).to.eql( {
+			expect( stopTyping() ).toEqual( {
 				type: 'STOP_TYPING',
-				uid: 'chicken',
+			} );
+		} );
+	} );
+
+	describe( 'requestMetaBoxUpdates', () => {
+		it( 'should return the REQUEST_META_BOX_UPDATES action', () => {
+			expect( requestMetaBoxUpdates( [ 'normal' ] ) ).toEqual( {
+				type: 'REQUEST_META_BOX_UPDATES',
+				locations: [ 'normal' ],
+			} );
+		} );
+	} );
+
+	describe( 'handleMetaBoxReload', () => {
+		it( 'should return the HANDLE_META_BOX_RELOAD action with a location and node', () => {
+			expect( handleMetaBoxReload( 'normal' ) ).toEqual( {
+				type: 'HANDLE_META_BOX_RELOAD',
+				location: 'normal',
+			} );
+		} );
+	} );
+
+	describe( 'metaBoxStateChanged', () => {
+		it( 'should return the META_BOX_STATE_CHANGED action with a hasChanged flag', () => {
+			expect( metaBoxStateChanged( 'normal', true ) ).toEqual( {
+				type: 'META_BOX_STATE_CHANGED',
+				location: 'normal',
+				hasChanged: true,
+			} );
+		} );
+	} );
+
+	describe( 'initializeMetaBoxState', () => {
+		it( 'should return the META_BOX_STATE_CHANGED action with a hasChanged flag', () => {
+			const metaBoxes = {
+				side: true,
+				normal: true,
+				advanced: false,
+			};
+
+			expect( initializeMetaBoxState( metaBoxes ) ).toEqual( {
+				type: 'INITIALIZE_META_BOX_STATE',
+				metaBoxes,
 			} );
 		} );
 	} );

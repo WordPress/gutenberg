@@ -2,21 +2,36 @@
 .editor-post-title {
 	margin-left: auto;
 	margin-right: auto;
-	max-width: $visual-editor-max-width;
 	position: relative;
-	margin-bottom: 10px;
+	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );
+	padding: 5px 0;
+
+	@include break-small() {
+		padding: 5px ( $block-padding + $block-mover-padding-visible );
+	}
 
 	h1 {
-		border: 2px solid transparent;
-		margin: 0;
-		padding: #{ $block-padding / 2 } #{ $block-padding - 2px };
+		outline: 1px solid transparent;
 		font-size: $editor-font-size;
-		transition: 0.2s border-color;
+		transition: 0.2s outline;
+		margin-top: 0;
+		margin-bottom: 0;
+		padding: $block-padding;
+
+		@include break-small() {
+			margin-left: -$block-padding;
+			margin-right: -$block-padding;
+		}
+	}
+
+	&:hover h1 {
+		outline: 1px solid $light-gray-500;
+		transition: 0.2s outline;
 	}
 
 	&.is-selected h1 {
-		border: 2px solid $light-gray-500;
-		transition: 0.2s border-color;
+		outline: 2px solid $light-gray-500;
+		transition: 0.2s outline;
 	}
 
 	.editor-text-editor & {
@@ -29,7 +44,6 @@
 		}
 
 		@include break-large() {
-			max-width: $text-editor-max-width;
 			margin: 0 auto;
 			padding: 0;
 		}
@@ -40,7 +54,7 @@ textarea.editor-post-title__input {
 	display: block;
 	font-size: 2em;
 	font-family: $editor-font;
-	line-height: $editor-line-height;
+	line-height: $default-line-height;
 	outline: none;
 	border: none;
 	box-shadow: none;

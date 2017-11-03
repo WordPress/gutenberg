@@ -1,113 +1,144 @@
 /**
  * WordPress dependencies
  */
-import { IconButton } from 'components';
+import { __ } from '@wordpress/i18n';
+import { IconButton, PanelBody } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
+import './editor.scss';
 import './style.scss';
-import { registerBlockType, query } from '../../api';
+import { registerBlockType, source } from '../../api';
 import Editable from '../../editable';
+import UrlInput from '../../url-input';
+import BlockControls from '../../block-controls';
+import ToggleControl from '../../inspector-controls/toggle-control';
+import BlockAlignmentToolbar from '../../block-alignment-toolbar';
+import ColorPalette from '../../color-palette';
+import InspectorControls from '../../inspector-controls';
+import BlockDescription from '../../block-description';
 
-const { attr, children } = query;
-
-/**
- * Returns an attribute setter with behavior that if the target value is
- * already the assigned attribute value, it will be set to undefined.
- *
- * @param  {string}   align Alignment value
- * @return {Function}       Attribute setter
- */
-function applyOrUnset( align ) {
-	return ( attributes, setAttributes ) => {
-		const nextAlign = attributes.align === align ? undefined : align;
-		setAttributes( { align: nextAlign } );
-	};
-}
+const { attr, children } = source;
 
 registerBlockType( 'core/button', {
-	title: wp.i18n.__( 'Button' ),
+	title: __( 'Button' ),
 
 	icon: 'button',
 
 	category: 'layout',
 
 	attributes: {
-		url: attr( 'a', 'href' ),
-		title: attr( 'a', 'title' ),
-		text: children( 'a' ),
+		url: {
+			type: 'string',
+			source: attr( 'a', 'href' ),
+		},
+		title: {
+			type: 'string',
+			source: attr( 'a', 'title' ),
+		},
+		text: {
+			type: 'array',
+			source: children( 'a' ),
+		},
+		align: {
+			type: 'string',
+			default: 'none',
+		},
+		color: {
+			type: 'string',
+		},
+		textColor: {
+			type: 'string',
+		},
 	},
-
-	controls: [
-		{
-			icon: 'align-left',
-			title: wp.i18n.__( 'Align left' ),
-			isActive: ( { align } ) => 'left' === align,
-			onClick: applyOrUnset( 'left' ),
-		},
-		{
-			icon: 'align-center',
-			title: wp.i18n.__( 'Align center' ),
-			isActive: ( { align } ) => 'center' === align,
-			onClick: applyOrUnset( 'center' ),
-		},
-		{
-			icon: 'align-right',
-			title: wp.i18n.__( 'Align right' ),
-			isActive: ( { align } ) => 'right' === align,
-			onClick: applyOrUnset( 'right' ),
-		},
-	],
 
 	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
+		const { align, clear } = attributes;
+		const props = {};
+
 		if ( 'left' === align || 'right' === align || 'center' === align ) {
-			return { 'data-align': align };
+			props[ 'data-align' ] = align;
 		}
+
+		if ( clear ) {
+			props[ 'data-clear' ] = 'true';
+		}
+
+		return props;
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus } ) {
-		const { text, url, title } = attributes;
+	edit( { attributes, setAttributes, focus, setFocus, className } ) {
+		const { text, url, title, align, color, textColor, clear } = attributes;
+		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
+		const toggleClear = () => setAttributes( { clear: ! clear } );
 
-		return (
-			<span className="blocks-button" title={ title }>
+		return [
+			focus && (
+				<BlockControls key="controls">
+					<BlockAlignmentToolbar value={ align } onChange={ updateAlignment } />
+				</BlockControls>
+			),
+			<span key="button" className={ className } title={ title } style={ { backgroundColor: color } } >
 				<Editable
 					tagName="span"
-					placeholder={ wp.i18n.__( 'Write label…' ) }
+					placeholder={ __( 'Add text…' ) }
 					value={ text }
 					focus={ focus }
 					onFocus={ setFocus }
 					onChange={ ( value ) => setAttributes( { text: value } ) }
-					inline
-					inlineToolbar
 					formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
+					style={ {
+						color: textColor,
+					} }
+					keepPlaceholderOnFocus
 				/>
 				{ focus &&
 					<form
-						className="editable-format-toolbar__link-modal"
+						className="blocks-format-toolbar__link-modal"
 						onSubmit={ ( event ) => event.preventDefault() }>
-						<input
-							className="editable-format-toolbar__link-input"
-							type="url"
-							required
+						<UrlInput
 							value={ url }
-							onChange={ ( event ) => setAttributes( { url: event.target.value } ) }
-							placeholder={ wp.i18n.__( 'Paste URL or type' ) }
+							onChange={ ( value ) => setAttributes( { url: value } ) }
 						/>
-						<IconButton icon="editor-break" type="submit" />
+						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
 					</form>
 				}
-			</span>
-		);
+				{ focus &&
+					<InspectorControls key="inspector">
+						<BlockDescription>
+							<p>{ __( 'A nice little button. Call something out with it.' ) }</p>
+						</BlockDescription>
+
+						<ToggleControl
+							label={ __( 'Stand on a line' ) }
+							checked={ !! clear }
+							onChange={ toggleClear }
+						/>
+						<PanelBody title={ __( 'Button Background Color' ) }>
+							<ColorPalette
+								value={ color }
+								onChange={ ( colorValue ) => setAttributes( { color: colorValue } ) }
+							/>
+						</PanelBody>
+						<PanelBody title={ __( 'Button Text Color' ) }>
+							<ColorPalette
+								value={ textColor }
+								onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
+							/>
+						</PanelBody>
+					</InspectorControls>
+				}
+			</span>,
+		];
 	},
 
 	save( { attributes } ) {
-		const { url, text, title, align = 'none' } = attributes;
+		const { url, text, title, align, color, textColor } = attributes;
 
 		return (
-			<div className={ `align${ align }` }>
-				<a href={ url } title={ title }>
+			<div className={ `align${ align }` } style={ { backgroundColor: color } }>
+				<a href={ url } title={ title } style={ { color: textColor } }>
 					{ text }
 				</a>
 			</div>

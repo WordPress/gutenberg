@@ -1,0 +1,10 @@
+{
+	"env": {
+		"worker": true
+	},
+	"settings": {
+		"react": {
+			"pragma": "React"
+		}
+	}
+}

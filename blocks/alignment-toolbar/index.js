@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { Toolbar } from 'components';
+import { __ } from '@wordpress/i18n';
+import { Toolbar } from '@wordpress/components';
 
 const ALIGNMENT_CONTROLS = [
 	{

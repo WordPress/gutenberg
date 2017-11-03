@@ -1,37 +1,20 @@
 .components-popover {
-	box-shadow: $shadow-popover;
-	border: 1px solid $light-gray-500;
-	position: absolute;
-	background: $white;
+	position: fixed;
 	z-index: z-index( ".components-popover" );
-	left: 0;
-	right: 0;
-
-	@include break-medium {
-		width: 280px;
-		left: -122px;
-		right: auto;
-		height: auto;
-	}
+	left: 50%;
 
 	&:before {
-		border: 10px dashed $light-gray-500;
-		display: none;
-
-		@include break-medium {
-			display: block;
-		}
+		border: 8px solid $light-gray-500;
 	}
 
 	&:after {
-		border: 10px solid $white;
+		border: 8px solid $white;
 	}
 
 	&:before,
 	&:after {
 		content: "";
 		position: absolute;
-		left: 50%;
 		margin-left: -10px;
 		height: 0;
 		width: 0;
@@ -41,14 +24,15 @@
 	}
 
 	&.is-top {
-		bottom: 42px;
+		bottom: 100%;
+		margin-top: -8px;
 
 		&:before {
-			bottom: -10px;
+			bottom: -8px;
 		}
 
 		&:after {
-			bottom: -8px;
+			bottom: -6px;
 		}
 
 		&:before,
@@ -59,18 +43,15 @@
 	}
 
 	&.is-bottom {
-		top: $admin-bar-height-big + $item-spacing -1px;
-
-		@include break-medium {
-			top: $admin-bar-height + $item-spacing;
-		}
+		top: 100%;
+		margin-top: 8px;
 
 		&:before {
-			top: -10px;
+			top: -8px;
 		}
 
 		&:after {
-			top: -8px;
+			top: -6px;
 		}
 
 		&:before,
@@ -79,24 +60,37 @@
 			border-top: none;
 		}
 	}
+}
 
-	&.is-right {
-		left: -32px;
+.components-popover__content {
+	position: absolute;
+	box-shadow: $shadow-popover;
+	border: 1px solid $light-gray-500;
+	background: $white;
+	min-width: 240px;
 
-		&:before,
-		&:after {
-			left: 49px;
-		}
+	&:focus {
+		box-shadow: $button-focus-style;
 	}
 
-	&.is-left {
-		left: auto;
-		right: -42px;
+	.components-popover.is-top & {
+		bottom: 100%;
+	}
 
-		&:before,
-		&:after {
-			left: auto;
-			right: 49px;
-		}
+	.components-popover.is-center & {
+		left: 50%;
+		transform: translateX( -50% );
+	}
+
+	.components-popover.is-right & {
+		position: absolute;
+		left: 100%;
+		margin-left: -24px;
+	}
+
+	.components-popover.is-left & {
+		position: absolute;
+		right: 100%;
+		margin-right: -24px;
 	}
 }

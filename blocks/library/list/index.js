@@ -1,39 +1,148 @@
 /**
+ * External dependencies
+ */
+import { find } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-import { Component, createElement, switchChildrenNodeName } from 'element';
-import { find } from 'lodash';
-import { __ } from 'i18n';
+import { Component, createElement, Children, concatChildren } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import './style.scss';
-import { registerBlockType, query as hpq, createBlock } from '../../api';
+import './editor.scss';
+import { registerBlockType, source, createBlock } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
+import InspectorControls from '../../inspector-controls';
+import BlockDescription from '../../block-description';
 
-const { children, prop } = hpq;
+const { children, prop } = source;
+
+const fromBrDelimitedContent = ( content ) => {
+	if ( undefined === content ) {
+		// converting an empty block to a list block
+		return content;
+	}
+	const listItems = [];
+	listItems.push( createElement( 'li', [], [] ) );
+	content.forEach( function( element, elementIndex, elements ) {
+		// "split" the incoming content on 'br' elements
+		if ( 'br' === element.type && elementIndex < elements.length - 1 ) {
+			// if is br and there are more elements to come, push a new list item
+			listItems.push( createElement( 'li', [], [] ) );
+		} else {
+			listItems[ listItems.length - 1 ].props.children.push( element );
+		}
+	} );
+	return listItems;
+};
+
+const toBrDelimitedContent = ( values ) => {
+	if ( undefined === values ) {
+		// converting an empty list
+		return values;
+	}
+	const content = [];
+	values.forEach( function( li, liIndex, listItems ) {
+		if ( typeof li === 'string' ) {
+			content.push( li );
+			return;
+		}
+
+		Children.toArray( li.props.children ).forEach( function( element, elementIndex, liChildren ) {
+			if ( 'ul' === element.type || 'ol' === element.type ) { // lists within lists
+				// we know we've just finished processing a list item, so break the text
+				content.push( createElement( 'br' ) );
+				// push each element from the child list's converted content
+				content.push.apply( content, toBrDelimitedContent( Children.toArray( element.props.children ) ) );
+				// add a break if there are more list items to come, because the recursive call won't
+				// have added it when it finished processing the child list because it thinks the content ended
+				if ( liIndex !== listItems.length - 1 ) {
+					content.push( createElement( 'br' ) );
+				}
+			} else {
+				content.push( element );
+				if ( elementIndex === liChildren.length - 1 && liIndex !== listItems.length - 1 ) {
+					// last element in this list item, but not last element overall
+					content.push( createElement( 'br' ) );
+				}
+			}
+		} );
+	} );
+	return content;
+};
 
 registerBlockType( 'core/list', {
 	title: __( 'List' ),
 	icon: 'editor-ul',
 	category: 'common',
+	keywords: [ __( 'bullet list' ), __( 'ordered list' ), __( 'numbered list' ) ],
 
 	attributes: {
-		nodeName: prop( 'ol,ul', 'nodeName' ),
-		values: children( 'ol,ul' ),
+		nodeName: {
+			type: 'string',
+			source: prop( 'ol,ul', 'nodeName' ),
+			default: 'UL',
+		},
+		values: {
+			type: 'array',
+			source: children( 'ol,ul' ),
+			default: [],
+		},
 	},
+
+	className: false,
 
 	transforms: {
 		from: [
 			{
 				type: 'block',
-				blocks: [ 'core/text' ],
+				blocks: [ 'core/paragraph' ],
 				transform: ( { content } ) => {
 					return createBlock( 'core/list', {
-						nodeName: 'ul',
-						values: switchChildrenNodeName( content, 'li' ),
+						nodeName: 'UL',
+						values: fromBrDelimitedContent( content ),
+					} );
+				},
+			},
+			{
+				type: 'block',
+				blocks: [ 'core/quote' ],
+				transform: ( { value, citation } ) => {
+					const listItems = fromBrDelimitedContent( value );
+					const values = citation ?
+						concatChildren( listItems, <li>{ citation }</li> ) :
+						listItems;
+					return createBlock( 'core/list', {
+						nodeName: 'UL',
+						values,
+					} );
+				},
+			},
+			{
+				type: 'raw',
+				isMatch: ( node ) => node.nodeName === 'OL' || node.nodeName === 'UL',
+			},
+			{
+				type: 'pattern',
+				regExp: /^[*-]\s/,
+				transform: ( { content } ) => {
+					return createBlock( 'core/list', {
+						nodeName: 'UL',
+						values: fromBrDelimitedContent( content ),
+					} );
+				},
+			},
+			{
+				type: 'pattern',
+				regExp: /^1[.)]\s/,
+				transform: ( { content } ) => {
+					return createBlock( 'core/list', {
+						nodeName: 'OL',
+						values: fromBrDelimitedContent( content ),
 					} );
 				},
 			},
@@ -41,14 +150,40 @@ registerBlockType( 'core/list', {
 		to: [
 			{
 				type: 'block',
-				blocks: [ 'core/text' ],
+				blocks: [ 'core/paragraph' ],
 				transform: ( { values } ) => {
-					return createBlock( 'core/text', {
-						content: switchChildrenNodeName( values, 'p' ),
+					return createBlock( 'core/paragraph', {
+						content: toBrDelimitedContent( values ),
+					} );
+				},
+			},
+			{
+				type: 'block',
+				blocks: [ 'core/quote' ],
+				transform: ( { values } ) => {
+					return createBlock( 'core/quote', {
+						value: [ <p key="list">{ toBrDelimitedContent( values ) }</p> ],
 					} );
 				},
 			},
 		],
+	},
+
+	merge( attributes, attributesToMerge ) {
+		const valuesToMerge = attributesToMerge.values || [];
+
+		// Standard text-like block attribute.
+		if ( attributesToMerge.content ) {
+			valuesToMerge.push( attributesToMerge.content );
+		}
+
+		return {
+			...attributes,
+			values: [
+				...attributes.values,
+				...valuesToMerge,
+			],
+		};
 	},
 
 	edit: class extends Component {
@@ -66,7 +201,7 @@ registerBlockType( 'core/list', {
 
 		isListActive( listType ) {
 			const { internalListType } = this.state;
-			const { nodeName = 'OL' } = this.props.attributes;
+			const { nodeName } = this.props.attributes;
 
 			return listType === ( internalListType ? internalListType : nodeName );
 		}
@@ -82,6 +217,19 @@ registerBlockType( 'core/list', {
 					internalListType: this.findInternalListType( nodeInfo ),
 				} );
 			} );
+
+			// this checks for languages that do not typically have square brackets on their keyboards
+			const lang = window.navigator.browserLanguage || window.navigator.language;
+			const keyboardHasSqBracket = ! /^(?:fr|nl|sv|ru|de|es|it)/.test( lang );
+
+			if ( keyboardHasSqBracket ) {
+				// keycode 219 = '[' and keycode 221 = ']'
+				editor.shortcuts.add( 'meta+219', 'Decrease indent', 'Outdent' );
+				editor.shortcuts.add( 'meta+221', 'Increase indent', 'Indent' );
+			} else {
+				editor.shortcuts.add( 'meta+shift+m', 'Decrease indent', 'Outdent' );
+				editor.shortcuts.add( 'meta+m', 'Increase indent', 'Indent' );
+			}
 
 			this.editor = editor;
 		}
@@ -122,8 +270,15 @@ registerBlockType( 'core/list', {
 		}
 
 		render() {
-			const { attributes, focus, setFocus } = this.props;
-			const { nodeName = 'OL', values = [] } = attributes;
+			const {
+				attributes,
+				focus,
+				setFocus,
+				insertBlocksAfter,
+				setAttributes,
+				mergeBlocks,
+			} = this.props;
+			const { nodeName, values } = attributes;
 
 			return [
 				focus && (
@@ -132,13 +287,13 @@ registerBlockType( 'core/list', {
 						controls={ [
 							{
 								icon: 'editor-ul',
-								title: __( 'Convert to unordered' ),
+								title: __( 'Convert to unordered list' ),
 								isActive: this.isListActive( 'UL' ),
 								onClick: this.createSetListType( 'UL', 'InsertUnorderedList' ),
 							},
 							{
 								icon: 'editor-ol',
-								title: __( 'Convert to ordered' ),
+								title: __( 'Convert to ordered list' ),
 								isActive: this.isListActive( 'OL' ),
 								onClick: this.createSetListType( 'OL', 'InsertOrderedList' ),
 							},
@@ -155,7 +310,16 @@ registerBlockType( 'core/list', {
 						] }
 					/>
 				),
+				focus && (
+					<InspectorControls key="inspector">
+						<BlockDescription>
+							<p>{ __( 'List. Numbered or bulleted.' ) }</p>
+						</BlockDescription>
+						<p>{ __( 'No advanced options.' ) }</p>
+					</InspectorControls>
+				),
 				<Editable
+					multiline="li"
 					key="editable"
 					tagName={ nodeName.toLowerCase() }
 					getSettings={ this.getEditorSettings }
@@ -164,14 +328,31 @@ registerBlockType( 'core/list', {
 					value={ values }
 					focus={ focus }
 					onFocus={ setFocus }
-					className="blocks-list"
+					wrapperClassName="blocks-list"
+					placeholder={ __( 'Write list…' ) }
+					onMerge={ mergeBlocks }
+					onSplit={ ( before, after, ...blocks ) => {
+						if ( ! blocks.length ) {
+							blocks.push( createBlock( 'core/paragraph' ) );
+						}
+
+						if ( after.length ) {
+							blocks.push( createBlock( 'core/list', {
+								nodeName,
+								values: after,
+							} ) );
+						}
+
+						setAttributes( { values: before } );
+						insertBlocksAfter( blocks );
+					} }
 				/>,
 			];
 		}
 	},
 
 	save( { attributes } ) {
-		const { nodeName = 'OL', values = [] } = attributes;
+		const { nodeName, values } = attributes;
 
 		return createElement(
 			nodeName.toLowerCase(),

@@ -1,20 +1,14 @@
 .editor-visual-editor {
+	position: relative;
+	height: 100%;
 	margin: 0 auto;
-	padding: 50px 0;	// Floating up/down arrows invisible
+	padding: 50px 0 0;
 
 	&,
 	& p {
 		font-family: $editor-font;
 		font-size: $editor-font-size;
 		line-height: $editor-line-height;
-	}
-
-	@include break-small() {
-		padding: 50px 0;
-	}
-
-	@include break-large() {
-		padding: 60px 0;
 	}
 }
 
@@ -26,11 +20,16 @@
 .editor-visual-editor__block {
 	margin-left: auto;
 	margin-right: auto;
+	margin-bottom: $block-spacing;
 	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );
 	position: relative;
-	 // The block mover needs to stay inside the block to allow clicks when hovering the block
-	padding: $block-padding $block-padding + $block-mover-padding-visible;
-	transition: 0.2s border-color;
+
+	padding: $block-padding;
+
+	@include break-small {
+		// The block mover needs to stay inside the block to allow clicks when hovering the block
+		padding: $block-padding $block-padding + $block-mover-padding-visible;
+	}
 
 	&:before {
 		z-index: z-index( '.editor-visual-editor__block:before' );
@@ -38,27 +37,84 @@
 		position: absolute;
 		top: 0;
 		bottom: 0;
-		left: $block-mover-padding-visible;
-		right: $block-mover-padding-visible;
-		border: 2px solid transparent;
-		transition: 0.2s border-color;
+		left: 0;
+		right: 0;
+		outline: 1px solid transparent;
+
+		@include break-small {
+			left: $block-mover-padding-visible;
+			right: $block-mover-padding-visible;
+		}
 	}
 
-	&.is-hovered:before {
-		border-left-color: $light-gray-500;
+	&.has-warning .editor-visual-editor__block-edit {
+		position: relative;
+		min-height: 250px;
+
+		> :not( .editor-visual-editor__block-warning ) {
+			pointer-events: none;
+			user-select: none;
+		}
 	}
 
+	&.has-warning .editor-visual-editor__block-edit:after {
+		content: '';
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		background-color: rgba( $white, 0.6 );
+	}
+
+	// simpler style for a block that has cursor focus (but hasn't been selected)
+	&.is-selected .editor-block-mover:before,
+	&.is-hovered .editor-block-mover:before,
+	&.is-selected .editor-block-settings-menu:before,
+	&.is-hovered .editor-block-settings-menu:before {
+		content: '';
+		position: absolute;
+		height: 36px;
+		top: 10px;
+	}
+
+	&.is-selected .editor-block-mover:before,
+	&.is-hovered .editor-block-mover:before {
+		border-right: 1px solid $light-gray-500;
+		right: 4px;
+	}
+
+	&.is-selected .editor-block-settings-menu:before,
+	&.is-hovered .editor-block-settings-menu:before {
+		border-left: 1px solid $light-gray-500;
+		left: 4px;
+	}
+
+	&.is-selected .editor-block-mover:before,
+	&.is-hovered .editor-block-mover:before {
+		border-right: 1px solid $light-gray-500;
+		right: 6px;
+	}
+
+	&.is-selected .editor-block-settings-menu:before,
+	&.is-hovered .editor-block-settings-menu:before {
+		border-left: 1px solid $light-gray-500;
+		left: 6px;
+	}
+
+	// focused block-style
 	&.is-selected:before {
-		border-color: $light-gray-500;
+ 		outline: 1px solid $light-gray-500;
 	}
 
+	// selection style for multiple blocks
 	&.is-multi-selected *::selection {
 		background: transparent;
 	}
 
 	&.is-multi-selected:before {
-		background: $blue-medium-100;
-		border: 2px solid $blue-medium-200;
+		background: $blue-medium-200;
+		background: Highlight;	// This variable is a CSS 2.1 variable that selects the operating system select color
 	}
 
 	.iframe-overlay {
@@ -172,6 +228,7 @@
 
 		&:before {
 			left: 0;
+			right: 0;
 			border-left-width: 0;
 			border-right-width: 0;
 		}
@@ -179,65 +236,90 @@
 		.editor-block-mover {
 			display: none;
 		}
+
+		@include break-wide() {
+			.editor-block-mover {
+				display: block;
+				top: -29px;
+				left: 10px;
+				height: auto;
+
+				&:before {
+					content: none;
+				}
+			}
+
+			.editor-block-mover__control {
+				float: left;
+				margin-right: 8px;
+			}
+		}
+
+		.editor-block-settings-menu__control {
+			float: left;
+			margin-right: 8px;
+		}
+
+		.editor-block-settings-menu {
+			top: -41px;
+			right: 10px;
+			height: auto;
+
+			&:before {
+				content: none;
+			}
+		}
 	}
 
 	&[data-align="full"],
 	&[data-align="wide"] {
-		.editor-visual-editor__block-controls {
-			width: $visual-editor-max-width - $block-padding - $block-padding;
+		.editor-block-toolbar {
+			@include break-small() {
+				width: $visual-editor-max-width - $block-padding - $block-padding;
+			}
 			margin-left: auto;
 			margin-right: auto;
 		}
 	}
-}
 
-.editor-visual-editor__block-controls {
-	display: flex;
-	position: sticky;
-	z-index: z-index( '.editor-visual-editor__block-controls' );
-	margin-top: -$block-controls-height - $item-spacing;
-	margin-bottom: $item-spacing + 20px;	// 20px is the offset from the bottom of the selected block where it stops sticking
-	height: $block-controls-height;
-	width: 0;
-	white-space: nowrap;
-
-	top: $header-height + $item-spacing;
-
-	@include break-small() {
-		top: $header-height + $admin-bar-height-big + $item-spacing;
+	&[data-clear="true"] {
+		float: none;
 	}
 
-	@include break-medium() {
-		top: $header-height + $admin-bar-height + $item-spacing;
+	& > .components-drop-zone {
+		border: none;
+		top: -4px;
+		bottom: -4px;
+		margin: 0 $block-mover-padding-visible;
+		border-radius: 0;
+
+		.components-drop-zone__content {
+			display: none;
+		}
+
+		&.is-close-to-top {
+			background: none;
+			border-top: 3px solid $blue-medium-500;
+		}
+
+		&.is-close-to-bottom {
+			background: none;
+			border-bottom: 3px solid $blue-medium-500;
+		}
 	}
-
-	&.is-appearing-active {
-		@include animate_fade;
-	}
-}
-
-$sticky-bottom-offset: 20px;
-.editor-visual-editor__block-controls + div {
-	// prevent collapsing margins between block and toolbar, matches the 20px bottom offset
- 	margin-top: -$sticky-bottom-offset - 1px;
-	padding-top: 1px;
- }
-
-.editor-visual-editor__block-controls .components-toolbar {
-	display: inline-flex;
-	margin-right: -1px;
-
-	@include break-small() {
-		margin-right: $item-spacing;
-	}
-}
-
-.editor-visual-editor__block-controls .editor-block-switcher {
-	display: inline-flex;
 }
 
 .editor-visual-editor .editor-inserter {
-	margin: $item-spacing $item-spacing $item-spacing calc( 50% - #{ $visual-editor-max-width / 2 } );	// account for full-width trick
+	margin: $item-spacing;
+
+	.editor-inserter__toggle {
+		color: $dark-gray-300;
+		margin: 4px 0 0 -4px;	// align better with text blocks
+	}
+
+	.editor-inserter__toggle.components-icon-button:not(:disabled):hover {
+		color: $blue-medium-500;
+	}
 }
 
 .editor-visual-editor .editor-visual-editor__insertion-point {
@@ -248,8 +330,8 @@ $sticky-bottom-offset: 20px;
 
 	&:before {
 		position: absolute;
-		top: 6px;
-		height: 3px;
+		top: -1px;
+		height: 2px;
 		left: 0;
 		right: 0;
 		background: $blue-medium-500;
@@ -257,26 +339,188 @@ $sticky-bottom-offset: 20px;
 	}
 }
 
-.editor-visual-editor__placeholder[type=text] {
-	margin-left: auto;
-	margin-right: auto;
-	max-width: $visual-editor-max-width;
+.editor-visual-editor__placeholder {
+	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );
+	padding: 0;
+	clear: left;
+	margin: 0 auto;
 	position: relative;
-	padding: $block-padding;
-	border: 2px solid transparent;
-	background: none;
-	box-shadow: none;
-	display: block;
-	transition: 0.2s border-color;
-	text-align: left;
-	width: 100%;
-	color: inherit;
-	opacity: 0.5;
-	font-size: $editor-font-size;
-	cursor: text;
-	left: -2px;
 
-	&:hover {
-		border-left-color: $light-gray-500;
+	@include break-small() {
+		padding: 0 ( $block-padding + $block-mover-padding-visible );
+	}
+
+	input[type=text] {
+		height: $text-editor-font-size * 4; // same height as an empty paragraph
+		margin-top: 0px;
+		margin-bottom: 4px;
+		outline: 1px solid transparent;
+		border: none;
+		background: none;
+		box-shadow: none;
+		display: block;
+		transition: 0.2s outline;
+		text-align: left;
+		width: 100%;
+		color: $dark-gray-300;
+		font-size: $editor-font-size;
+		line-height: $editor-line-height;
+		cursor: text;
+		left: -1px;
+		max-width: none;	// fixes a bleed issue from the admin
+
+		&:hover {
+			outline: 1px solid $light-gray-500;
+		}
+
+		padding: ( $block-padding - 2px ) $block-padding;
+
+		@include break-small() {
+			margin-left: -$block-padding;
+			margin-right: -$block-padding;
+		}
+	}
+}
+
+.editor-visual-editor__inserter {
+	display: flex;
+	align-items: baseline;
+	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );
+	margin: 0 auto;
+	clear: both;
+
+	padding: 0;
+	@include break-small() {
+		padding: 0 ( $block-mover-padding-visible );
+	}
+
+	> .editor-inserter__block {
+		flex-direction: row;
+		opacity: 0;
+		transition: opacity 150ms;
+		margin: 0 10px;
+		width: auto;
+		font-family: $default-font;
+		font-size: $default-font-size;
+		box-shadow: none;
+		padding: 6px;
+		align-items: center;
+	}
+
+	&:hover > .editor-inserter__block,
+	&.is-showing-controls > .editor-inserter__block {
+		opacity: 1;
+	}
+}
+
+.editor-visual-editor__inserter-block-icon {
+	display: inline-block;
+	margin-right: 8px;
+	height: 20px;
+}
+
+.editor-visual-editor__block-warning {
+	z-index: z-index( '.editor-visual-editor__block-warning' );
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate( -50%, -50% );
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	align-items: center;
+	width: 96%;
+	max-width: 780px;
+	padding: 20px 20px 10px 20px;
+	background-color: $white;
+	border: 1px solid $light-gray-500;
+	text-align: center;
+	line-height: $default-line-height;
+	box-shadow: $shadow-popover;
+
+	p {
+		width: 100%;
+		font-family: $default-font;
+		font-size: $default-font-size;
+	}
+
+	.button + .button {
+		margin-left: $item-spacing;
+	}
+}
+
+.visual-editor__invalid-block-warning-buttons .components-button {
+	margin-bottom: 5px;
+}
+
+.editor-visual-editor__block .blocks-visual-editor__block-html-textarea {
+	display: block;
+	margin: 0;
+	width: 100%;
+	border: none;
+	outline: none;
+	box-shadow: none;
+	resize: none;
+	overflow: hidden;
+	font-family: $editor-html-font;
+	font-size: $text-editor-font-size;
+	line-height: 150%;
+	transition: padding .2s linear;
+
+	&:focus {
+		box-shadow: none;
+	}
+}
+
+.editor-visual-editor__sibling-inserter {
+	z-index: z-index( '.editor-visual-editor__sibling-inserter' );
+	position: relative;
+	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible ) - ( 2 * $block-padding );
+	margin: 0 auto;
+	opacity: 0;
+	transition: opacity 0.25s ease-in-out;
+	transition-delay: 0.3s;
+
+	@include break-small {
+		max-width: $visual-editor-max-width - ( 2 * $block-padding );
+	}
+
+	&:not( [data-insert-index="0"] ) {
+		top: #{ -1 * ( $block-spacing / 2 ) };
+	}
+
+	&.is-visible {
+		opacity: 1;
+	}
+
+	&:before {
+		content: '';
+		position: absolute;
+		width: 100%;
+		height: 44px;
+		transition: 0.1s height;
+		transform: translateY( -50% );
+	}
+
+	&:hover:before {
+		height: 44px;
+	}
+
+	.editor-inserter {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate( -50%, -50% );
+		margin: 0;
+	}
+
+	.editor-inserter__toggle.components-button {
+		margin: 0;
+		padding: 4px;
+		background-color: white;
+
+		.dashicon {
+			vertical-align: bottom;
+		}
 	}
 }

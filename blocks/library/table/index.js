@@ -1,135 +1,96 @@
 /**
- * Internal dependencies
+ * External dependencies
  */
-import './style.scss';
-import { registerBlockType, query as hpq } from '../../api';
-import Editable from '../../editable';
-
-const { children, query } = hpq;
+import { __ } from '@wordpress/i18n';
 
 /**
- * Returns an attribute setter with behavior that if the target value is
- * already the assigned attribute value, it will be set to undefined.
- *
- * @param  {string}   align Alignment value
- * @return {Function}       Attribute setter
+ * Internal dependencies
  */
-function toggleAlignment( align ) {
-	return ( attributes, setAttributes ) => {
-		const nextAlign = attributes.align === align ? undefined : align;
-		setAttributes( { align: nextAlign } );
-	};
-}
+import './editor.scss';
+import './style.scss';
+import { registerBlockType, source } from '../../api';
+import TableBlock from './table-block';
+import BlockControls from '../../block-controls';
+import BlockAlignmentToolbar from '../../block-alignment-toolbar';
+import InspectorControls from '../../inspector-controls';
+import BlockDescription from '../../block-description';
+
+const { children } = source;
 
 registerBlockType( 'core/table', {
-	title: wp.i18n.__( 'Table' ),
+	title: __( 'Table' ),
 	icon: 'editor-table',
 	category: 'formatting',
 
 	attributes: {
-		head: query( 'thead > tr', query( 'td,th', children() ) ),
-		body: query( 'tbody > tr', query( 'td,th', children() ) ),
-		foot: query( 'tfoot > tr', query( 'td,th', children() ) ),
+		content: {
+			type: 'array',
+			source: children( 'table' ),
+			default: [
+				<tbody key="1">
+					<tr><td><br /></td><td><br /></td></tr>
+					<tr><td><br /></td><td><br /></td></tr>
+				</tbody>,
+			],
+		},
+		align: {
+			type: 'string',
+		},
 	},
 
-	defaultAttributes: {
-		body: [ [ [], [] ], [ [], [] ] ],
+	transforms: {
+		from: [
+			{
+				type: 'raw',
+				isMatch: ( node ) => node.nodeName === 'TABLE',
+			},
+		],
 	},
-
-	controls: [
-		{
-			icon: 'align-left',
-			title: wp.i18n.__( 'Align left' ),
-			isActive: ( { align } ) => 'left' === align,
-			onClick: toggleAlignment( 'left' ),
-		},
-		{
-			icon: 'align-center',
-			title: wp.i18n.__( 'Align center' ),
-			isActive: ( { align } ) => 'center' === align,
-			onClick: toggleAlignment( 'center' ),
-		},
-		{
-			icon: 'align-right',
-			title: wp.i18n.__( 'Align right' ),
-			isActive: ( { align } ) => 'right' === align,
-			onClick: toggleAlignment( 'right' ),
-		},
-		{
-			icon: 'align-full-width',
-			title: wp.i18n.__( 'Wide width' ),
-			isActive: ( { align } ) => 'wide' === align,
-			onClick: toggleAlignment( 'wide' ),
-		},
-	],
 
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
-		if ( 'left' === align || 'right' === align || 'wide' === align ) {
+		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
 			return { 'data-align': align };
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus } ) {
-		const focussedKey = focus ? focus.editable || 'body.0.0' : null;
-
-		return (
-			<table>
-				{ [ 'head', 'body', 'foot' ].map( ( part ) =>
-					attributes[ part ] && attributes[ part ].length
-						? wp.element.createElement( 't' + part, { key: part },
-							attributes[ part ].map( ( rows = [], i ) =>
-								<tr key={ i }>
-									{ rows.map( ( value = '', ii ) => {
-										const key = part + i + '.' + ii;
-										const Cell = part === 'head' ? 'th' : 'td';
-
-										return (
-											<Cell key={ key }>
-												<Editable
-													inline
-													value={ value }
-													focus={ focussedKey === key ? focus : null }
-													onFocus={ ( props ) => setFocus( { ...props, editable: key } ) }
-													onChange={ ( nextValue ) => {
-														const nextPart = [ ...attributes[ part ] ];
-
-														nextPart[ i ][ ii ] = nextValue;
-
-														setAttributes( { [ part ]: nextPart } );
-													} }
-												/>
-											</Cell>
-										);
-									} ) }
-								</tr>
-							)
-						)
-						: null
-				) }
-			</table>
-		);
+	edit( { attributes, setAttributes, focus, setFocus, className } ) {
+		const { content } = attributes;
+		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
+		return [
+			focus && (
+				<InspectorControls key="inspector">
+					<BlockDescription>
+						<p>{ __( 'Tables. Best used for tabular data.' ) }</p>
+					</BlockDescription>
+				</InspectorControls>
+			),
+			focus && (
+				<BlockControls key="toolbar">
+					<BlockAlignmentToolbar
+						value={ attributes.align }
+						onChange={ updateAlignment }
+					/>
+				</BlockControls>
+			),
+			<TableBlock
+				key="editor"
+				onChange={ ( nextContent ) => {
+					setAttributes( { content: nextContent } );
+				} }
+				content={ content }
+				focus={ focus }
+				onFocus={ setFocus }
+				className={ className }
+			/>,
+		];
 	},
 
 	save( { attributes } ) {
+		const { content, align } = attributes;
 		return (
-			<table>
-				{ [ 'head', 'body', 'foot' ].map( ( part ) =>
-					attributes[ part ] && attributes[ part ].length
-						? wp.element.createElement( 't' + part, { key: part },
-							attributes[ part ].map( ( rows = [], i ) =>
-								<tr key={ i }>
-									{ rows.map( ( value = '', ii ) => {
-										const key = part + i + '.' + ii;
-										const Cell = part === 'head' ? 'th' : 'td';
-
-										return <Cell key={ key }>{ value }</Cell>;
-									} ) }
-								</tr>
-							)
-						)
-						: null
-				) }
+			<table className={ align ? `align${ align }` : null }>
+				{ content }
 			</table>
 		);
 	},

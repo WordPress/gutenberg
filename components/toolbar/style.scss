@@ -1,21 +1,17 @@
 .components-toolbar {
 	margin: 0;
 	border: 1px solid $light-gray-500;
-	box-shadow: $shadow-popover;
 	background-color: $white;
+	display: inline-flex;
 }
 
-.editor-visual-editor__block-controls ul.components-toolbar,
-.block-editable__inline-toolbar ul.components-toolbar {
-	list-style-type: none;
-
-	&> li {
+div.components-toolbar {
+	&> div {
 		display: inline-flex;
-		position: relative;
 		margin: 0;
 	}
 
-	&> li + li {
+	&> div + div {
 		margin-left: -3px;
 
 		&.has-left-divider {
@@ -94,14 +90,18 @@
 		color: $white;
 	}
 
+	&[data-subscript] svg {
+		padding: 4px 8px 4px 0px;
+	}
+
 	&[data-subscript]:after {
 		content: attr( data-subscript );
 		font-family: $default-font;
-		font-size: 10px;
+		font-size: $default-font-size;
 		font-weight: bold;
-		position: relative;
-		top: -6px;
-		left: -9px;
+		position: absolute;
+		right: 6px;
+		bottom: 8px;
 	}
 }
 

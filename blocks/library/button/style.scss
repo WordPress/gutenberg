@@ -1,6 +1,6 @@
 $blocks-button__height: 46px;
 
-.blocks-button {
+.wp-block-button {
 	font-family: $default-font;
 	display: inline-block;
 	text-decoration: none;
@@ -17,24 +17,18 @@ $blocks-button__height: 46px;
 	vertical-align: top;
 	position: relative;
 
+	a {
+		box-shadow: none !important;
+		color: $white;
+		cursor: pointer;
+		text-decoration: none !important;
+	}
+
 	&:hover {
 		color: $white;
 	}
 
-	.editable-format-toolbar__link-modal {
-		z-index: 2;
-		top: $blocks-button__height + 2px;
-		left: 50%;
-		transform: translateX( -50% );
-	}
-}
-
-.editor-visual-editor__block[data-type="core/button"] {
-	&[data-align="center"] {
-		text-align: center;
-	}
-
-	&[data-align="right"] {
-		text-align: right;
+	&.aligncenter {
+		display: inline-block;
 	}
 }

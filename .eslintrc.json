@@ -4,13 +4,15 @@
 	"extends": [
 		"wordpress",
 		"plugin:react/recommended",
-		"plugin:jsx-a11y/recommended"
+		"plugin:jsx-a11y/recommended",
+		"plugin:jest/recommended"
 	],
 	"env": {
 		"browser": false,
 		"es6": true,
 		"node": true,
-		"mocha": true
+		"mocha": true,
+		"jest/globals": true
 	},
 	"parserOptions": {
 		"sourceType": "module",
@@ -26,7 +28,8 @@
 	},
 	"plugins": [
 		"react",
-		"jsx-a11y"
+		"jsx-a11y",
+		"jest"
 	],
 	"settings": {
 		"react": {
@@ -44,13 +47,22 @@
 		"constructor-super": "error",
 		"dot-notation": "error",
 		"eol-last": "error",
+		"eqeqeq": "error",
 		"func-call-spacing": "error",
 		"indent": [ "error", "tab", { "SwitchCase": 1 } ],
+		"jsx-a11y/label-has-for": [ "error", {
+			"required": "id"
+		} ],
+		"jsx-a11y/media-has-caption": "off",
+		"jsx-a11y/no-noninteractive-tabindex": "off",
+		"jsx-a11y/role-has-required-aria-props": "off",
 		"jsx-quotes": "error",
 		"key-spacing": "error",
 		"keyword-spacing": "error",
+		"lines-around-comment": "off",
 		"no-alert": "error",
 		"no-bitwise": "error",
+		"no-caller": "error",
 		"no-console": "error",
 		"no-const-assign": "error",
 		"no-debugger": "error",
@@ -68,31 +80,54 @@
 		"no-mixed-spaces-and-tabs": "error",
 		"no-multiple-empty-lines": [ "error", { "max": 1 } ],
 		"no-multi-spaces": "error",
+		"no-multi-str": "off",
 		"no-negated-in-lhs": "error",
 		"no-nested-ternary": "error",
 		"no-redeclare": "error",
+		"no-restricted-syntax": [
+			"error",
+			{
+				"selector": "ImportDeclaration[source.value=/^@wordpress\\u002F.+\\u002F/]",
+				"message": "Path access on WordPress dependencies is not allowed."
+			},
+			{
+				"selector": "CallExpression[callee.name=/^__|_n|_x$/]:not([arguments.0.type=/^Literal|BinaryExpression$/])",
+				"message": "Translate function arguments must be string literals."
+			},
+			{
+				"selector": "CallExpression[callee.name=/^_n|_x$/]:not([arguments.1.type=/^Literal|BinaryExpression$/])",
+				"message": "Translate function arguments must be string literals."
+			},
+			{
+				"selector": "CallExpression[callee.name=_nx]:not([arguments.2.type=/^Literal|BinaryExpression$/])",
+				"message": "Translate function arguments must be string literals."
+			}
+		],
 		"no-shadow": "error",
+		"no-undef": "error",
 		"no-undef-init": "error",
 		"no-unreachable": "error",
 		"no-unsafe-negation": "error",
-		"no-use-before-define": [ "error", "nofunc" ],
+		"no-unused-expressions": "error",
+		"no-unused-vars": "error",
 		"no-useless-computed-key": "error",
 		"no-useless-constructor": "error",
 		"no-useless-return": "error",
 		"no-var": "error",
 		"no-whitespace-before-property": "error",
 		"object-curly-spacing": [ "error", "always" ],
-		"one-var": "off",
 		"padded-blocks": [ "error", "never" ],
 		"prefer-const": "error",
-		"quote-props": [ "error", "as-needed", { "keywords": true } ],
+		"quote-props": [ "error", "as-needed" ],
 		"react/display-name": "off",
 		"react/jsx-curly-spacing": [ "error", "always" ],
 		"react/jsx-equals-spacing": "error",
 		"react/jsx-indent": [ "error", "tab" ],
 		"react/jsx-indent-props": [ "error", "tab" ],
 		"react/jsx-key": "error",
-		"react/jsx-space-before-closing": "error",
+		"react/jsx-tag-spacing": "error",
+		"react/no-children-prop": "off",
+		"react/no-find-dom-node": "warn",
 		"react/prop-types": "off",
 		"semi": "error",
 		"semi-spacing": "error",
@@ -107,6 +142,7 @@
 		} ],
 		"template-curly-spacing": [ "error", "always" ],
 		"valid-jsdoc": [ "error", { "requireReturn": false } ],
-		"valid-typeof": "error"
+		"valid-typeof": "error",
+		"yoda": "off"
 	}
 }

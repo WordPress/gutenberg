@@ -1,0 +1,13 @@
+[
+    {
+        "blockName": "core-embed/kickstarter",
+        "attrs": {
+            "url": "https://kickstarter.com/"
+        },
+        "rawContent": "\n<figure class=\"wp-block-embed-kickstarter\">\n    https://kickstarter.com/\n    <figcaption>Embedded content from kickstarter</figcaption>\n</figure>\n"
+    },
+    {
+        "attrs": {},
+        "rawContent": "\n"
+    }
+]

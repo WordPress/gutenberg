@@ -1,25 +1,29 @@
 /**
- * External dependencies
- */
-import { expect } from 'chai';
-
-/**
  * Internal dependencies
  */
-import { addQueryArgs } from '../url';
+import { filterURLForDisplay } from '../url';
 
-describe( 'addQueryArgs', () => {
-	it( 'should append args to an URL without query string', () => {
-		const url = 'https://andalouses.com/beach';
-		const args = { sun: 'true', sand: 'false' };
-
-		expect( addQueryArgs( url, args ) ).to.eql( 'https://andalouses.com/beach?sun=true&sand=false' );
+describe( 'filterURLForDisplay', () => {
+	it( 'should remove protocol', () => {
+		let url = filterURLForDisplay( 'http://wordpress.org' );
+		expect( url ).toBe( 'wordpress.org' );
+		url = filterURLForDisplay( 'https://wordpress.org' );
+		expect( url ).toBe( 'wordpress.org' );
 	} );
-
-	it( 'should append args to an URL with query string', () => {
-		const url = 'https://andalouses.com/beach?night=false';
-		const args = { sun: 'true', sand: 'false' };
-
-		expect( addQueryArgs( url, args ) ).to.eql( 'https://andalouses.com/beach?night=false&sun=true&sand=false' );
+	it( 'should remove www subdomain', () => {
+		const url = filterURLForDisplay( 'http://www.wordpress.org' );
+		expect( url ).toBe( 'wordpress.org' );
+	} );
+	it( 'should remove single trailing slash', () => {
+		const url = filterURLForDisplay( 'http://www.wordpress.org/' );
+		expect( url ).toBe( 'wordpress.org' );
+	} );
+	it( 'should preserve slashes where the url has multiple in the path', () => {
+		const url = filterURLForDisplay( 'http://www.wordpress.org/something/' );
+		expect( url ).toBe( 'wordpress.org/something/' );
+	} );
+	it( 'should preserve slash where the url has path after the initial slash', () => {
+		const url = filterURLForDisplay( 'http://www.wordpress.org/something' );
+		expect( url ).toBe( 'wordpress.org/something' );
 	} );
 } );

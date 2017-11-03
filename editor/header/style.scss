@@ -5,21 +5,21 @@
 	background: $white;
 	display: flex;
 	flex-direction: row;
-	align-items: center;
+	align-items: stretch;
+	justify-content: space-between;
 	z-index: z-index( '.editor-header' );
 	left: 0;
 	right: 0;
 
-	top: 0;
-	position: sticky;
-
-	@include break-small() {
-		top: $admin-bar-height-big;
-		position: fixed;
-	}
+	top: $admin-bar-height-big;
+	position: fixed;
 
 	@include break-medium() {
 		top: $admin-bar-height;
+	}
+
+	@include break-large() {
+		left: $admin-sidebar-width;
 	}
 }
 
@@ -41,7 +41,11 @@
 
 /* Sidebar manually collapsed */
 .folded .editor-header {
-	left: $admin-sidebar-width-collapsed;
+	left: 0;
+
+	@include break-medium() {
+		left: $admin-sidebar-width-collapsed;
+	}
 }
 
 /* Mobile menu opened */
@@ -68,17 +72,43 @@
 	right: $admin-sidebar-width-big;
 }
 
-.editor-header-multi-select {
-	background: $blue-medium-100;
-	border-bottom: 1px solid $blue-medium-200;
+.editor-header__settings {
+	display: inline-flex;
+	align-items: center;
 }
 
-.editor-selected-count {
-	padding-right: $item-spacing;
-	color: $dark-gray-500;
-	border-right: 1px solid $light-gray-500;
+.editor-mode-switcher {
+	margin-left: $item-spacing;
+
+	.components-button svg {
+		transform: rotate( 90deg );
+	}
 }
 
-.editor-selected-clear {
-	margin: 0 0 0 auto;
+.editor-header .components-button {
+	border-radius: 3px;
+
+	&.is-toggled {
+		color: $white;
+	}
+
+	// put the gray background on a separate layer, so as to match the size of the publish button (34px)
+	&.is-toggled::before {
+		content: "";
+		border-radius: 3px;
+		position: absolute;
+		z-index: -1;
+		background: $dark-gray-500;
+		top: 1px;
+		right: 1px;
+		bottom: 1px;
+		left: 1px;
+	}
+
+	@include break-medium() {
+		&.editor-publish-button, &.editor-publish-with-dropdown__button {
+			height: 33px;
+			line-height: 32px;
+		}
+	}
 }

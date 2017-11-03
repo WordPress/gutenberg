@@ -1,0 +1,13 @@
+[
+    {
+        "blockName": "core-embed/cloudup",
+        "attrs": {
+            "url": "https://cloudup.com/"
+        },
+        "rawContent": "\n<figure class=\"wp-block-embed-cloudup\">\n    https://cloudup.com/\n    <figcaption>Embedded content from cloudup</figcaption>\n</figure>\n"
+    },
+    {
+        "attrs": {},
+        "rawContent": "\n"
+    }
+]

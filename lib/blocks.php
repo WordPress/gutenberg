@@ -9,121 +9,87 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );
 }
 
-$wp_registered_blocks = array();
-
 /**
- * Registers a block.
- *
- * @param  string $name Block name including namespace.
- * @param  array  $settings Block settings.
-
- * @return array            The block, if it has been successfully registered.
- */
-function register_block_type( $name, $settings ) {
-	global $wp_registered_blocks;
-
-	if ( ! is_string( $name ) ) {
-		$message = __( 'Block names must be strings.' );
-		_doing_it_wrong( __FUNCTION__, $message, '0.1.0' );
-		return false;
-	}
-
-	$name_matcher = '/^[a-z0-9-]+\/[a-z0-9-]+$/';
-	if ( ! preg_match( $name_matcher, $name ) ) {
-		$message = __( 'Block names must contain a namespace prefix. Example: my-plugin/my-custom-block' );
-		_doing_it_wrong( __FUNCTION__, $message, '0.1.0' );
-		return false;
-	}
-
-	if ( isset( $wp_registered_blocks[ $name ] ) ) {
-		/* translators: 1: block name */
-		$message = sprintf( __( 'Block "%s" is already registered.' ), $name );
-		_doing_it_wrong( __FUNCTION__, $message, '0.1.0' );
-		return false;
-	}
-
-	$settings['name'] = $name;
-	$wp_registered_blocks[ $name ] = $settings;
-
-	return $settings;
-}
-
-/**
- * Unregisters a block.
- *
- * @param  string $name Block name.
- * @return array        The previous block value, if it has been
- *                      successfully unregistered; otherwise `null`.
- */
-function unregister_block_type( $name ) {
-	global $wp_registered_blocks;
-	if ( ! isset( $wp_registered_blocks[ $name ] ) ) {
-		/* translators: 1: block name */
-		$message = sprintf( __( 'Block "%s" is not registered.' ), $name );
-		_doing_it_wrong( __FUNCTION__, $message, '0.1.0' );
-		return false;
-	}
-	$unregistered_block = $wp_registered_blocks[ $name ];
-	unset( $wp_registered_blocks[ $name ] );
-
-	return $unregistered_block;
-}
-
-/**
- * Extract the block attributes from the block's attributes string
+ * Registers a block type.
  *
  * @since 0.1.0
+ * @since 0.6.0 Now also accepts a WP_Block_Type instance as first parameter.
  *
- * @param string $attr_string Attributes string.
-
- * @return array
+ * @param string|WP_Block_Type $name Block type name including namespace, or alternatively a
+ *                                   complete WP_Block_Type instance. In case a WP_Block_Type
+ *                                   is provided, the $args parameter will be ignored.
+ * @param array                $args {
+ *     Optional. Array of block type arguments. Any arguments may be defined, however the
+ *     ones described below are supported by default. Default empty array.
+ *
+ *     @type callable $render_callback Callback used to render blocks of this block type.
+ * }
+ * @return WP_Block_Type|false The registered block type on success, or false on failure.
  */
-function parse_block_attributes( $attr_string ) {
-	$attributes_matcher = '/([^\s]+)="([^"]+)"\s*/';
-	preg_match_all( $attributes_matcher, $attr_string, $matches );
-	$attributes = array();
-	foreach ( $matches[1] as $index => $attribute_match ) {
-		$attributes[ $attribute_match ] = $matches[2][ $index ];
-	}
-
-	return $attributes;
+function register_block_type( $name, $args = array() ) {
+	return WP_Block_Type_Registry::get_instance()->register( $name, $args );
 }
 
 /**
- * Renders the dynamic blocks into the post content
+ * Unregisters a block type.
+ *
+ * @since 0.1.0
+ * @since 0.6.0 Now also accepts a WP_Block_Type instance as first parameter.
+ *
+ * @param string|WP_Block_Type $name Block type name including namespace, or alternatively a
+ *                                   complete WP_Block_Type instance.
+ * @return WP_Block_Type|false The unregistered block type on success, or false on failure.
+ */
+function unregister_block_type( $name ) {
+	return WP_Block_Type_Registry::get_instance()->unregister( $name );
+}
+
+/**
+ * Parses blocks out of a content string.
+ *
+ * @since 0.5.0
+ *
+ * @param  string $content Post content.
+ * @return array  Array of parsed block objects.
+ */
+function gutenberg_parse_blocks( $content ) {
+	$parser = new Gutenberg_PEG_Parser;
+	return $parser->parse( _gutenberg_utf8_split( $content ) );
+}
+
+/**
+ * Parses dynamic blocks out of `post_content` and re-renders them.
  *
  * @since 0.1.0
  *
  * @param  string $content Post content.
- *
  * @return string          Updated post content.
  */
 function do_blocks( $content ) {
-	global $wp_registered_blocks;
+	$registry = WP_Block_Type_Registry::get_instance();
 
-	// Extract the blocks from the post content.
-	$matcher = '/<!--\s*wp:([a-z](?:[a-z0-9\/]+)*)\s+((?:(?!-->).)*)\s*\/?-->(?:.*?<!--\s*\/wp:\g1\s+-->)?/';
-	preg_match_all( $matcher, $content, $matches, PREG_OFFSET_CAPTURE );
+	$blocks = gutenberg_parse_blocks( $content );
 
-	$new_content = $content;
-	foreach ( $matches[0] as $index => $block_match ) {
-		$block_name = $matches[1][ $index ][0];
-		// do nothing if the block is not registered.
-		if ( ! isset( $wp_registered_blocks[ $block_name ] ) ) {
-			continue;
+	$content_after_blocks = '';
+
+	foreach ( $blocks as $block ) {
+		$block_name  = isset( $block['blockName'] ) ? $block['blockName'] : null;
+		$attributes  = is_array( $block['attrs'] ) ? $block['attrs'] : array();
+		$raw_content = isset( $block['rawContent'] ) ? $block['rawContent'] : null;
+
+		if ( $block_name ) {
+			$block_type = $registry->get_registered( $block_name );
+			if ( null !== $block_type ) {
+				$content_after_blocks .= $block_type->render( $attributes, $raw_content );
+				continue;
+			}
 		}
 
-		$block_markup = $block_match[0];
-		$block_attributes_string = $matches[2][ $index ][0];
-		$block_attributes = parse_block_attributes( $block_attributes_string );
-
-		// Call the block's render function to generate the dynamic output.
-		$output = call_user_func( $wp_registered_blocks[ $block_name ]['render'], $block_attributes );
-
-		// Replace the matched block with the dynamic output.
-		$new_content = str_replace( $block_markup, $output, $new_content );
+		if ( $raw_content ) {
+			$content_after_blocks .= $raw_content;
+		}
 	}
 
-	return $new_content;
+	return $content_after_blocks;
 }
-add_filter( 'the_content', 'do_blocks', 10 ); // BEFORE do_shortcode().
+add_filter( 'the_content', 'do_blocks', 9 ); // BEFORE do_shortcode() and wpautop().

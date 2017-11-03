@@ -7,8 +7,9 @@ import { first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { IconButton } from 'components';
-import { getBlockType } from 'blocks';
+import { __ } from '@wordpress/i18n';
+import { IconButton } from '@wordpress/components';
+import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -16,6 +17,7 @@ import { getBlockType } from 'blocks';
 import './style.scss';
 import { isFirstBlock, isLastBlock, getBlockIndex, getBlock } from '../selectors';
 import { getBlockMoverLabel } from './mover-label';
+import { selectBlock } from '../actions';
 
 function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex } ) {
 	// We emulate a disabled state because forcefully applying the `disabled`
@@ -28,6 +30,7 @@ function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, f
 				className="editor-block-mover__control"
 				onClick={ isFirst ? null : onMoveUp }
 				icon="arrow-up-alt2"
+				tooltip={ __( 'Move Up' ) }
 				label={ getBlockMoverLabel(
 					uids.length,
 					blockType && blockType.title,
@@ -42,6 +45,7 @@ function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, f
 				className="editor-block-mover__control"
 				onClick={ isLast ? null : onMoveDown }
 				icon="arrow-down-alt2"
+				tooltip={ __( 'Move Down' ) }
 				label={ getBlockMoverLabel(
 					uids.length,
 					blockType && blockType.title,
@@ -57,20 +61,32 @@ function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, f
 }
 
 export default connect(
-	( state, ownProps ) => ( {
-		isFirst: isFirstBlock( state, first( ownProps.uids ) ),
-		isLast: isLastBlock( state, last( ownProps.uids ) ),
-		firstIndex: getBlockIndex( state, first( ownProps.uids ) ),
-		blockType: getBlockType( getBlock( state, first( ownProps.uids ) ).name ),
-	} ),
+	( state, ownProps ) => {
+		const block = getBlock( state, first( ownProps.uids ) );
+
+		return ( {
+			isFirst: isFirstBlock( state, first( ownProps.uids ) ),
+			isLast: isLastBlock( state, last( ownProps.uids ) ),
+			firstIndex: getBlockIndex( state, first( ownProps.uids ) ),
+			blockType: block ? getBlockType( block.name ) : null,
+		} );
+	},
 	( dispatch, ownProps ) => ( {
 		onMoveDown() {
+			if ( ownProps.uids.length === 1 ) {
+				dispatch( selectBlock( first( ownProps.uids ) ) );
+			}
+
 			dispatch( {
 				type: 'MOVE_BLOCKS_DOWN',
 				uids: ownProps.uids,
 			} );
 		},
 		onMoveUp() {
+			if ( ownProps.uids.length === 1 ) {
+				dispatch( selectBlock( first( ownProps.uids ) ) );
+			}
+
 			dispatch( {
 				type: 'MOVE_BLOCKS_UP',
 				uids: ownProps.uids,
