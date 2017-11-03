@@ -41,6 +41,7 @@
     "redux": "3.7.2",
     "redux-multi": "0.1.12",
     "redux-optimist": "0.0.2",
+    "redux-responsive": "4.3.4",
     "refx": "2.1.0",
     "rememo": "2.3.3",
     "showdown": "1.7.4",
