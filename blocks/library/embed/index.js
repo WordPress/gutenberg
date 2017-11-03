@@ -250,12 +250,11 @@ registerBlockType(
 		transforms: {
 			from: [
 				{
-					type: 'pattern',
-					trigger: 'paste',
-					regExp: /^\s*(https?:\/\/\S+)\s*/i,
-					transform: ( { match } ) => {
+					type: 'raw',
+					isMatch: ( node ) => node.nodeName === 'P' && /^\s*(https?:\/\/\S+)\s*/i.test( node.textContent ),
+					transform: ( node ) => {
 						return createBlock( 'core/embed', {
-							url: match[ 1 ],
+							url: node.textContent.trim(),
 						} );
 					},
 				},
