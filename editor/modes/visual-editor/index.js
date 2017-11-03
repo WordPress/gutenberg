@@ -20,7 +20,7 @@ import PostTitle from '../../post-title';
 import WritingFlow from '../../writing-flow';
 import TableOfContents from '../../table-of-contents';
 import { getBlockUids, getMultiSelectedBlockUids } from '../../selectors';
-import { clearSelectedBlock, multiSelect, redo, undo, removeBlocks } from '../../actions';
+import { clearSelectedBlock, multiSelect, redo, undo, deleteBlocks } from '../../actions';
 
 class VisualEditor extends Component {
 	constructor() {
@@ -69,10 +69,10 @@ class VisualEditor extends Component {
 	}
 
 	deleteSelectedBlocks( event ) {
-		const { multiSelectedBlockUids, onRemove } = this.props;
+		const { multiSelectedBlockUids, onDelete } = this.props;
 		if ( multiSelectedBlockUids.length ) {
 			event.preventDefault();
-			onRemove( multiSelectedBlockUids );
+			onDelete( multiSelectedBlockUids );
 		}
 	}
 
@@ -117,6 +117,6 @@ export default connect(
 		onMultiSelect: multiSelect,
 		onRedo: redo,
 		onUndo: undo,
-		onRemove: removeBlocks,
+		onDelete: deleteBlocks,
 	}
 )( VisualEditor );

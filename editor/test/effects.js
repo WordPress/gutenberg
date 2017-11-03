@@ -15,7 +15,9 @@ import {
 	resetPost,
 	setupNewPost,
 	mergeBlocks,
+	deleteBlocks,
 	focusBlock,
+	removeBlocks,
 	replaceBlocks,
 	editPost,
 	savePost,
@@ -30,6 +32,77 @@ describe( 'effects', () => {
 	const defaultBlockSettings = { save: () => 'Saved', category: 'common', title: 'block title' };
 
 	beforeEach( () => jest.resetAllMocks() );
+
+	describe( '.DELETE_BLOCKS', () => {
+		const handler = effects.DELETE_BLOCKS;
+
+		it( 'No blocks to be deleted', () => {
+			selectors.getNextBlock.mockReturnValue( null );
+			selectors.getPreviousBlock.mockReturnValue( null );
+
+			const dispatch = jest.fn();
+			handler( deleteBlocks( [ ] ), { dispatch, getState: () => 'state' } );
+
+			expect( selectors.getPreviousBlock ).toHaveBeenCalledTimes( 0 );
+			expect( selectors.getNextBlock ).toHaveBeenCalledTimes( 0 );
+			expect( dispatch ).toHaveBeenCalledTimes( 0 );
+		} );
+
+		it( 'All blocks to be deleted', () => {
+			selectors.getNextBlock.mockReturnValue( null );
+			selectors.getPreviousBlock.mockReturnValue( null );
+
+			const dispatch = jest.fn();
+			handler( deleteBlocks( [ 'one', 'two', 'three' ] ), { dispatch, getState: () => 'state' } );
+
+			expect( selectors.getPreviousBlock ).toHaveBeenCalledWith( 'state', 'one' );
+			expect( selectors.getNextBlock ).toHaveBeenCalledWith( 'state', 'three' );
+			expect( dispatch ).toHaveBeenCalledTimes( 1 );
+			expect( dispatch ).toHaveBeenCalledWith( removeBlocks( [ 'one', 'two', 'three' ] ) );
+		} );
+
+		it( 'All blocks to be deleted but first', () => {
+			selectors.getNextBlock.mockReturnValue( { uid: 'first' } );
+			selectors.getPreviousBlock.mockReturnValue( null );
+
+			const dispatch = jest.fn();
+			handler( deleteBlocks( [ 'one', 'two', 'three' ] ), { dispatch, getState: () => 'state' } );
+
+			expect( selectors.getPreviousBlock ).toHaveBeenCalledWith( 'state', 'one' );
+			expect( selectors.getNextBlock ).toHaveBeenCalledWith( 'state', 'three' );
+			expect( dispatch ).toHaveBeenCalledTimes( 2 );
+			expect( dispatch ).toHaveBeenCalledWith( removeBlocks( [ 'one', 'two', 'three' ] ) );
+			expect( dispatch ).toHaveBeenCalledWith( focusBlock( 'first' ) );
+		} );
+
+		it( 'All blocks to be deleted but last', () => {
+			selectors.getNextBlock.mockReturnValue( null );
+			selectors.getPreviousBlock.mockReturnValue( { uid: 'last' } );
+
+			const dispatch = jest.fn();
+			handler( deleteBlocks( [ 'one', 'two', 'three' ] ), { dispatch, getState: () => 'state' } );
+
+			expect( dispatch ).toHaveBeenCalledTimes( 2 );
+			expect( selectors.getPreviousBlock ).toHaveBeenCalledWith( 'state', 'one' );
+			expect( selectors.getNextBlock ).toHaveBeenCalledWith( 'state', 'three' );
+			expect( dispatch ).toHaveBeenCalledWith( removeBlocks( [ 'one', 'two', 'three' ] ) );
+			expect( dispatch ).toHaveBeenCalledWith( focusBlock( 'last' ) );
+		} );
+
+		it( 'All blocks in the middle to be deleted', () => {
+			selectors.getNextBlock.mockReturnValue( { uid: 'first' } );
+			selectors.getPreviousBlock.mockReturnValue( { uid: 'last' } );
+
+			const dispatch = jest.fn();
+			handler( deleteBlocks( [ 'one', 'two', 'three' ] ), { dispatch, getState: () => 'state' } );
+
+			expect( dispatch ).toHaveBeenCalledTimes( 2 );
+			expect( selectors.getPreviousBlock ).toHaveBeenCalledWith( 'state', 'one' );
+			expect( selectors.getNextBlock ).toHaveBeenCalledWith( 'state', 'three' );
+			expect( dispatch ).toHaveBeenCalledWith( removeBlocks( [ 'one', 'two', 'three' ] ) );
+			expect( dispatch ).toHaveBeenCalledWith( focusBlock( 'first' ) );
+		} );
+	} );
 
 	describe( '.MERGE_BLOCKS', () => {
 		const handler = effects.MERGE_BLOCKS;

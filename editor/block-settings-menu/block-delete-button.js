@@ -13,7 +13,7 @@ import { IconButton } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { removeBlocks } from '../actions';
+import { deleteBlocks } from '../actions';
 
 export function BlockDeleteButton( { onDelete, onClick = noop, small = false } ) {
 	const label = __( 'Delete' );
@@ -34,7 +34,7 @@ export default connect(
 	undefined,
 	( dispatch, ownProps ) => ( {
 		onDelete() {
-			dispatch( removeBlocks( ownProps.uids ) );
+			dispatch( deleteBlocks( ownProps.uids ) );
 		},
 	} )
 )( BlockDeleteButton );

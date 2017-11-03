@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, uniqueId } from 'lodash';
+import { get, uniqueId, first, last } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -22,6 +22,7 @@ import {
 	replaceBlocks,
 	createSuccessNotice,
 	createErrorNotice,
+	removeBlocks,
 	removeNotice,
 	savePost,
 	editPost,
@@ -33,6 +34,8 @@ import {
 	getDirtyMetaBoxes,
 	getEditedPostContent,
 	getPostEdits,
+	getPreviousBlock,
+	getNextBlock,
 	isCurrentPostPublished,
 	isEditedPostDirty,
 	isEditedPostNew,
@@ -183,6 +186,27 @@ export default {
 	TRASH_POST_FAILURE( action, store ) {
 		const message = action.error.message && action.error.code !== 'unknown_error' ? action.error.message : __( 'Trashing failed' );
 		store.dispatch( createErrorNotice( message, { id: TRASH_POST_NOTICE_ID } ) );
+	},
+	DELETE_BLOCKS( action, store ) {
+		const { dispatch } = store;
+		const blockUids = action.uids;
+
+		if ( blockUids.length === 0 ) {
+			return;
+		}
+
+		const state = store.getState();
+		const firstBlock = first( blockUids );
+		const lastBlock = last( blockUids );
+		const priorBlock = getPreviousBlock( state, firstBlock );
+		const nextBlock = getNextBlock( state, lastBlock );
+
+		dispatch( removeBlocks( blockUids ) );
+
+		const nextFocus = nextBlock || priorBlock;
+		if ( nextFocus ) {
+			dispatch( focusBlock( nextFocus.uid ) );
+		}
 	},
 	MERGE_BLOCKS( action, store ) {
 		const { dispatch } = store;
