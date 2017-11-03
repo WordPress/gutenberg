@@ -17,7 +17,7 @@ import PostVisibilityLabel from '../../post-visibility/label';
 import PostVisibilityForm from '../../post-visibility';
 
 export function PostVisibility( { user, instanceId } ) {
-	co	data.capabilities.publish_posts;
+	const canEdit = user.data && user.data.capabilities.publish_posts;
 	const postVisibilitySelectorId = 'post-visibility-selector-' + instanceId;
 
 	return (
