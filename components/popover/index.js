@@ -42,6 +42,7 @@ class Popover extends Component {
 
 		this.focus = this.focus.bind( this );
 		this.bindNode = this.bindNode.bind( this );
+		this.getAnchorRect = this.getAnchorRect.bind( this );
 		this.setOffset = this.setOffset.bind( this );
 		this.throttledSetOffset = this.throttledSetOffset.bind( this );
 		this.maybeClose = this.maybeClose.bind( this );
@@ -132,36 +133,36 @@ class Popover extends Component {
 		this.rafHandle = window.requestAnimationFrame( this.setOffset );
 	}
 
-	setOffset() {
-		const { range } = this.props;
-		const { anchor, popover } = this.nodes;
+	getAnchorRect( ) {
+		const { anchor } = this.nodes;
 		if ( ! anchor || ! anchor.parentNode ) {
 			return;
 		}
+		const rect = anchor.parentNode.getBoundingClientRect();
+		// subtract padding
+		const { paddingTop, paddingBottom } = window.getComputedStyle( anchor.parentNode );
+		const topPad = parseInt( paddingTop, 10 );
+		const bottomPad = parseInt( paddingBottom, 10 );
+		return {
+			...rect,
+			top: rect.top + topPad,
+			bottom: rect.bottom - bottomPad,
+			height: rect.height - topPad - bottomPad,
+		};
+	}
+
+	setOffset() {
+		const { getAnchorRect = this.getAnchorRect } = this.props;
+		const { popover } = this.nodes;
 
 		const [ yAxis, xAxis ] = this.getPositions();
 		const isTop = 'top' === yAxis;
 		const isLeft = 'left' === xAxis;
 		const isRight = 'right' === xAxis;
-		let rect;
-		let topOffset = 0;
-		if ( range ) {
-			const rects = range.getClientRects();
-			if ( isLeft ) {
-				rect = rects[ 0 ];
-			} else if ( isRight ) {
-				rect = rects[ rects.length - 1 ];
-			} else {
-				rect = range.getBoundingClientRect();
-			}
-		} else {
-			rect = anchor.parentNode.getBoundingClientRect();
-			// Offset top positioning by padding
-			const { paddingTop, paddingBottom } = window.getComputedStyle( anchor.parentNode );
-			topOffset = parseInt( isTop ? paddingTop : paddingBottom, 10 );
-			if ( ! isTop ) {
-				topOffset *= -1;
-			}
+
+		const rect = getAnchorRect( { isTop, isLeft, isRight } );
+		if ( ! rect ) {
+			return;
 		}
 
 		if ( isRight ) {
@@ -174,7 +175,7 @@ class Popover extends Component {
 		}
 
 		// Set at top or bottom of parent node based on popover position
-		popover.style.top = ( rect[ yAxis ] + topOffset ) + 'px';
+		popover.style.top = rect[ yAxis ] + 'px';
 	}
 
 	setForcedPositions() {
@@ -238,6 +239,7 @@ class Popover extends Component {
 			position,
 			range,
 			focusOnOpen,
+			getAnchorRect,
 			/* eslint-enable no-unused-vars */
 			...contentProps
 		} = this.props;

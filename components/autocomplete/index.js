@@ -97,6 +97,7 @@ export class Autocomplete extends Component {
 		this.reset = this.reset.bind( this );
 		this.search = this.search.bind( this );
 		this.setSelectedIndex = this.setSelectedIndex.bind( this );
+		this.getWordRect = this.getWordRect.bind( this );
 
 		this.state = this.constructor.getInitialState();
 	}
@@ -346,6 +347,21 @@ export class Autocomplete extends Component {
 		event.stopPropagation();
 	}
 
+	getWordRect( { isLeft, isRight } ) {
+		const { range } = this.state;
+		if ( ! range ) {
+			return;
+		}
+		if ( isLeft ) {
+			const rects = range.getClientRects();
+			return rects[ 0 ];
+		} else if ( isRight ) {
+			const rects = range.getClientRects();
+			return rects[ rects.length - 1 ];
+		}
+		return range.getBoundingClientRect();
+	}
+
 	toggleKeyEvents( isListening ) {
 		// This exists because we must capture ENTER key presses before Editable.
 		// It seems that react fires the simulated capturing events after the
@@ -373,7 +389,7 @@ export class Autocomplete extends Component {
 
 	render() {
 		const { children, instanceId } = this.props;
-		const { open, selectedIndex, range } = this.state;
+		const { open, selectedIndex } = this.state;
 		const { className } = open || {};
 		const classes = classnames( 'components-autocomplete__popover', className );
 		const filteredOptions = this.getFilteredOptions();
@@ -394,7 +410,7 @@ export class Autocomplete extends Component {
 					onClose={ this.reset }
 					position="top right"
 					className={ classes }
-					range={ range }
+					getAnchorRect={ this.getWordRect }
 				>
 					<ul
 						id={ listBoxId }
