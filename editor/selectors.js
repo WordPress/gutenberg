@@ -10,7 +10,6 @@ import {
 	last,
 	reduce,
 	some,
-	values,
 	keys,
 	without,
 	compact,
@@ -38,6 +37,55 @@ const MAX_FREQUENT_BLOCKS = 3;
 export function getEditorMode( state ) {
 	return getPreference( state, 'mode', 'visual' );
 }
+
+/**
+ * Returns the state of legacy meta boxes.
+ *
+ * @param  {Object}  state Global application state
+ * @return {Object}        State of meta boxes
+ */
+export function getMetaBoxes( state ) {
+	return state.metaBoxes;
+}
+
+/**
+ * Returns the state of legacy meta boxes.
+ *
+ * @param  {Object} state    Global application state
+ * @param  {String} location Location of the meta box.
+ * @return {Object}          State of meta box at specified location.
+ */
+export function getMetaBox( state, location ) {
+	return getMetaBoxes( state )[ location ];
+}
+
+/**
+ * Returns a list of dirty meta box locations.
+ *
+ * @param  {Object} state Global application state
+ * @return {Array}        Array of locations for dirty meta boxes.
+ */
+export const getDirtyMetaBoxes = createSelector(
+	( state ) => {
+		return reduce( getMetaBoxes( state ), ( result, metaBox, location ) => {
+			return metaBox.isDirty && metaBox.isActive ?
+				[ ...result, location ] :
+				result;
+		}, [] );
+	},
+	( state ) => state.metaBoxes,
+);
+
+/**
+ * Returns the dirty state of legacy meta boxes.
+ *
+ * Checks whether the entire meta box state is dirty. So if a sidebar is dirty,
+ * but a normal area is not dirty, this will overall return dirty.
+ *
+ * @param  {Object}  state Global application state
+ * @return {Boolean}       Whether state is dirty. True if dirty, false if not.
+ */
+export const isMetaBoxStateDirty = ( state ) => getDirtyMetaBoxes( state ).length > 0;
 
 /**
  * Returns the current active panel for the sidebar.
@@ -145,6 +193,10 @@ export const isEditedPostDirty = createSelector(
 			return true;
 		}
 
+		if ( isMetaBoxStateDirty( state ) ) {
+			return true;
+		}
+
 		// This is a cheaper operation that still must occur after checking
 		// attributes, because a post initialized with attributes different
 		// from its saved copy should be considered dirty.
@@ -169,6 +221,7 @@ export const isEditedPostDirty = createSelector(
 	( state ) => [
 		state.editor,
 		state.currentPost,
+		state.metaBoxes,
 	]
 );
 
@@ -217,6 +270,27 @@ export function getCurrentPostId( state ) {
 }
 
 /**
+ * Returns the number of revisions of the post currently being edited.
+ *
+ * @param  {Object}  state Global application state
+ * @return {Number}        Number of revisions
+ */
+export function getCurrentPostRevisionsCount( state ) {
+	return get( getCurrentPost( state ), 'revisions.count', 0 );
+}
+
+/**
+ * Returns the last revision ID of the post currently being edited,
+ * or null if the post has no revisions.
+ *
+ * @param  {Object}  state Global application state
+ * @return {?Number}       ID of the last revision
+ */
+export function getCurrentPostLastRevisionId( state ) {
+	return get( getCurrentPost( state ), 'revisions.last_id', null );
+}
+
+/**
  * Returns any post values which have been changed in the editor but not yet
  * been saved.
  *
@@ -237,9 +311,9 @@ export function getPostEdits( state ) {
  * @return {*}                    Post attribute value
  */
 export function getEditedPostAttribute( state, attributeName ) {
-	return state.editor.edits[ attributeName ] === undefined
-		? state.currentPost[ attributeName ]
-		: state.editor.edits[ attributeName ];
+	return state.editor.edits[ attributeName ] === undefined ?
+		state.currentPost[ attributeName ] :
+		state.editor.edits[ attributeName ];
 }
 
 /**
@@ -295,9 +369,9 @@ export function isEditedPostPublishable( state ) {
  */
 export function isEditedPostSaveable( state ) {
 	return (
-		!! getEditedPostContent( state ) ||
 		!! getEditedPostTitle( state ) ||
-		!! getEditedPostExcerpt( state )
+		!! getEditedPostExcerpt( state ) ||
+		!! getEditedPostContent( state )
 	);
 }
 
@@ -358,9 +432,9 @@ export function getDocumentTitle( state ) {
  * @return {String}       Raw post excerpt
  */
 export function getEditedPostExcerpt( state ) {
-	return state.editor.edits.excerpt === undefined
-		? state.currentPost.excerpt
-		: state.editor.edits.excerpt;
+	return state.editor.edits.excerpt === undefined ?
+		state.currentPost.excerpt :
+		state.editor.edits.excerpt;
 }
 
 /**
@@ -428,9 +502,9 @@ export const getBlock = createSelector(
 );
 
 function getPostMeta( state, key ) {
-	return has( state, [ 'editor', 'edits', 'meta', key ] )
-		? get( state, [ 'editor', 'edits', 'meta', key ] )
-		: get( state, [ 'currentPost', 'meta', key ] );
+	return has( state, [ 'editor', 'edits', 'meta', key ] ) ?
+		get( state, [ 'editor', 'edits', 'meta', key ] ) :
+		get( state, [ 'currentPost', 'meta', key ] );
 }
 
 /**
@@ -499,22 +573,29 @@ export function getSelectedBlock( state ) {
  * @param  {Object} state Global application state
  * @return {Array}        Multi-selected block unique UDs
  */
-export function getMultiSelectedBlockUids( state ) {
-	const { blockOrder } = state.editor;
-	const { start, end } = state.blockSelection;
-	if ( start === end ) {
-		return [];
-	}
+export const getMultiSelectedBlockUids = createSelector(
+	( state ) => {
+		const { blockOrder } = state.editor;
+		const { start, end } = state.blockSelection;
+		if ( start === end ) {
+			return [];
+		}
 
-	const startIndex = blockOrder.indexOf( start );
-	const endIndex = blockOrder.indexOf( end );
+		const startIndex = blockOrder.indexOf( start );
+		const endIndex = blockOrder.indexOf( end );
 
-	if ( startIndex > endIndex ) {
-		return blockOrder.slice( endIndex, startIndex + 1 );
-	}
+		if ( startIndex > endIndex ) {
+			return blockOrder.slice( endIndex, startIndex + 1 );
+		}
 
-	return blockOrder.slice( startIndex, endIndex + 1 );
-}
+		return blockOrder.slice( startIndex, endIndex + 1 );
+	},
+	( state ) => [
+		state.editor.blockOrder,
+		state.blockSelection.start,
+		state.blockSelection.end,
+	],
+);
 
 /**
  * Returns the current multi-selection set of blocks, or an empty array if
@@ -523,9 +604,17 @@ export function getMultiSelectedBlockUids( state ) {
  * @param  {Object} state Global application state
  * @return {Array}        Multi-selected block objects
  */
-export function getMultiSelectedBlocks( state ) {
-	return getMultiSelectedBlockUids( state ).map( ( uid ) => getBlock( state, uid ) );
-}
+export const getMultiSelectedBlocks = createSelector(
+	( state ) => getMultiSelectedBlockUids( state ).map( ( uid ) => getBlock( state, uid ) ),
+	( state ) => [
+		state.editor.blockOrder,
+		state.blockSelection.start,
+		state.blockSelection.end,
+		state.editor.blocksByUid,
+		state.editor.edits.meta,
+		state.currentPost.meta,
+	]
+);
 
 /**
  * Returns the unique ID of the first block in the multi-selection set, or null
@@ -685,9 +774,7 @@ export function getNextBlock( state, uid ) {
 
 /**
  * Returns true if the block corresponding to the specified unique ID is
- * currently selected and a multi-selection exists, null if there is no
- * multi-selection active, or false if multi-selection exists, but the
- * specified unique ID is not the selected block.
+ * currently selected and no multi-selection exists, or false otherwise.
  *
  * @param  {Object} state Global application state
  * @param  {String} uid   Block unique ID
@@ -697,7 +784,7 @@ export function isBlockSelected( state, uid ) {
 	const { start, end } = state.blockSelection;
 
 	if ( start !== end ) {
-		return null;
+		return false;
 	}
 
 	return start === uid;
@@ -864,10 +951,18 @@ export function getSuggestedPostFormat( state ) {
 	const blocks = state.editor.blockOrder;
 
 	let name;
-	// If there is only one block in the content of the post grab its name so
+	// If there is only one block in the content of the post grab its name
 	// so we can derive a suitable post format from it.
 	if ( blocks.length === 1 ) {
 		name = state.editor.blocksByUid[ blocks[ 0 ] ].name;
+	}
+
+	// If there are two blocks in the content and the last one is a text blocks
+	// grab the name of the first one to also suggest a post format from it.
+	if ( blocks.length === 2 ) {
+		if ( state.editor.blocksByUid[ blocks[ 1 ] ].name === 'core/paragraph' ) {
+			name = state.editor.blocksByUid[ blocks[ 0 ] ].name;
+		}
 	}
 
 	// We only convert to default post formats in core.
@@ -875,7 +970,18 @@ export function getSuggestedPostFormat( state ) {
 		case 'core/image':
 			return 'image';
 		case 'core/quote':
+		case 'core/pullquote':
 			return 'quote';
+		case 'core/gallery':
+			return 'gallery';
+		case 'core/video':
+		case 'core-embed/youtube':
+		case 'core-embed/vimeo':
+			return 'video';
+		case 'core/audio':
+		case 'core-embed/spotify':
+		case 'core-embed/soundcloud':
+			return 'audio';
 	}
 
 	return null;
@@ -911,7 +1017,7 @@ export const getEditedPostContent = createSelector(
  * @return {Array}       List of notices
  */
 export function getNotices( state ) {
-	return values( state.notices );
+	return state.notices;
 }
 
 /**
@@ -939,9 +1045,9 @@ export const getMostFrequentlyUsedBlocks = createSelector(
 		const orderedByUsage = keys( blockUsage ).sort( ( a, b ) => blockUsage[ b ] - blockUsage[ a ] );
 		// add in paragraph and image blocks if they're not already in the usage data
 		return compact(
-				[ ...orderedByUsage, ...without( [ 'core/paragraph', 'core/image' ], ...orderedByUsage ) ]
-					.map( blockType => getBlockType( blockType ) )
-			).slice( 0, MAX_FREQUENT_BLOCKS );
+			[ ...orderedByUsage, ...without( [ 'core/paragraph', 'core/image' ], ...orderedByUsage ) ]
+				.map( blockType => getBlockType( blockType ) )
+		).slice( 0, MAX_FREQUENT_BLOCKS );
 	},
 	( state ) => state.preferences.blockUsage
 );

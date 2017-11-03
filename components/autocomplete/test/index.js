@@ -12,7 +12,7 @@ import { keycodes } from '@wordpress/utils';
 /**
  * Internal dependencies
  */
-import Autocomplete from '../';
+import { Autocomplete } from '../';
 
 const { ENTER, ESCAPE, UP, DOWN, SPACE } = keycodes;
 
@@ -33,6 +33,21 @@ class FakeEditor extends Component {
 			</div>
 		);
 	}
+}
+
+function makeAutocompleter( completers ) {
+	return mount(
+		<Autocomplete instanceId="1" completers={ completers }>{
+			( { isExpanded, listBoxId, activeId } ) => (
+				<FakeEditor
+					aria-autocomplete="list"
+					aria-expanded={ isExpanded }
+					aria-owns={ listBoxId }
+					aria-activedescendant={ activeId }
+				/>
+			)
+		}</Autocomplete>
+	);
 }
 
 /**
@@ -76,6 +91,7 @@ function simulateInput( wrapper, nodeList, cursorPosition ) {
 	wrapper.find( '.fake-editor' ).simulate( 'input', {
 		target: fakeEditor,
 	} );
+	wrapper.update();
 }
 
 /**
@@ -87,6 +103,7 @@ function simulateKeydown( wrapper, keyCode ) {
 	const fakeEditor = wrapper.getDOMNode().querySelector( '.fake-editor' );
 	const event = new KeyboardEvent( 'keydown', { keyCode } ); // eslint-disable-line
 	fakeEditor.dispatchEvent( event );
+	wrapper.update();
 }
 
 /**
@@ -171,29 +188,21 @@ describe( 'Autocomplete', () => {
 
 	describe( 'render()', () => {
 		it( 'renders children', () => {
-			const wrapper = mount(
-				<Autocomplete completers={ [ ] }>
-					<FakeEditor />
-				</Autocomplete>
-			);
-
+			const wrapper = makeAutocompleter( [] );
 			expect( wrapper.state().open ).toBeUndefined();
-			expect( wrapper.find( 'Popover' ).props().focusOnOpen ).toBe( false );
-			expect( wrapper.hasClass( 'components-autocomplete' ) ).toBe( true );
+			expect( wrapper.find( 'Popover' ).prop( 'focusOnOpen' ) ).toBe( false );
+			expect( wrapper.childAt( 0 ).hasClass( 'components-autocomplete' ) ).toBe( true );
 			expect( wrapper.find( '.fake-editor' ) ).toHaveLength( 1 );
 		} );
 
 		it( 'opens on absent trigger prefix search', ( done ) => {
-			const wrapper = mount(
-				<Autocomplete completers={ [ basicCompleter ] }>
-					<FakeEditor />
-				</Autocomplete>
-			);
+			const wrapper = makeAutocompleter( [ basicCompleter ] );
 			expectInitialState( wrapper );
 			// simulate typing 'b'
 			simulateInput( wrapper, [ par( tx( 'b' ) ) ] );
 			// wait for getOptions promise
 			process.nextTick( function() {
+				wrapper.update();
 				expect( wrapper.state( 'open' ) ).toBeDefined();
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
 				expect( wrapper.state( 'query' ) ).toEqual( 'b' );
@@ -208,16 +217,13 @@ describe( 'Autocomplete', () => {
 		} );
 
 		it( 'does not render popover as open if no results', ( done ) => {
-			const wrapper = mount(
-				<Autocomplete completers={ [ basicCompleter ] }>
-					<FakeEditor />
-				</Autocomplete>
-			);
+			const wrapper = makeAutocompleter( [ basicCompleter ] );
 			expectInitialState( wrapper );
 			// simulate typing 'zzz'
 			simulateInput( wrapper, [ tx( 'zzz' ) ] );
 			// wait for getOptions promise
 			process.nextTick( () => {
+				wrapper.update();
 				// now check that we've opened the popup and filtered the options to empty
 				expect( wrapper.state( 'open' ) ).toBeDefined();
 				expect( wrapper.state( 'query' ) ).toEqual( 'zzz' );
@@ -230,16 +236,13 @@ describe( 'Autocomplete', () => {
 		} );
 
 		it( 'does not open without trigger prefix', ( done ) => {
-			const wrapper = mount(
-				<Autocomplete completers={ [ slashCompleter ] }>
-					<FakeEditor />
-				</Autocomplete>
-			);
+			const wrapper = makeAutocompleter( [ slashCompleter ] );
 			expectInitialState( wrapper );
 			// simulate typing 'b'
 			simulateInput( wrapper, [ par( tx( 'b' ) ) ] );
 			// wait for getOptions promise
 			process.nextTick( () => {
+				wrapper.update();
 				// now check that the popup is not open
 				expectInitialState( wrapper );
 				done();
@@ -247,16 +250,13 @@ describe( 'Autocomplete', () => {
 		} );
 
 		it( 'opens on trigger prefix search', ( done ) => {
-			const wrapper = mount(
-				<Autocomplete completers={ [ slashCompleter ] }>
-					<FakeEditor />
-				</Autocomplete>
-			);
+			const wrapper = makeAutocompleter( [ slashCompleter ] );
 			expectInitialState( wrapper );
 			// simulate typing '/'
 			simulateInput( wrapper, [ par( tx( '/' ) ) ] );
 			// wait for getOptions promise
 			process.nextTick( () => {
+				wrapper.update();
 				// now check that we've opened the popup and filtered the options
 				expect( wrapper.state( 'open' ) ).toBeDefined();
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
@@ -273,16 +273,13 @@ describe( 'Autocomplete', () => {
 		} );
 
 		it( 'searches by keywords', ( done ) => {
-			const wrapper = mount(
-				<Autocomplete completers={ [ basicCompleter ] }>
-					<FakeEditor />
-				</Autocomplete>
-			);
+			const wrapper = makeAutocompleter( [ basicCompleter ] );
 			expectInitialState( wrapper );
 			// simulate typing fruit (split over 2 text nodes because these things happen)
 			simulateInput( wrapper, [ par( tx( 'fru' ), tx( 'it' ) ) ] );
 			// wait for getOptions promise
 			process.nextTick( () => {
+				wrapper.update();
 				// now check that we've opened the popup and filtered the options
 				expect( wrapper.state( 'open' ) ).toBeDefined();
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
@@ -299,16 +296,13 @@ describe( 'Autocomplete', () => {
 		} );
 
 		it( 'closes when search ends (whitespace)', ( done ) => {
-			const wrapper = mount(
-				<Autocomplete completers={ [ basicCompleter ] }>
-					<FakeEditor />
-				</Autocomplete>
-			);
+			const wrapper = makeAutocompleter( [ basicCompleter ] );
 			expectInitialState( wrapper );
 			// simulate typing 'a'
 			simulateInput( wrapper, [ tx( 'a' ) ] );
 			// wait for getOptions promise
 			process.nextTick( () => {
+				wrapper.update();
 				// now check that we've opened the popup and all options are displayed
 				expect( wrapper.state( 'open' ) ).toBeDefined();
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
@@ -341,11 +335,7 @@ describe( 'Autocomplete', () => {
 		} );
 
 		it( 'navigates options by arrow keys', ( done ) => {
-			const wrapper = mount(
-				<Autocomplete completers={ [ slashCompleter ] }>
-					<FakeEditor />
-				</Autocomplete>
-			);
+			const wrapper = makeAutocompleter( [ slashCompleter ] );
 			// listen to keydown events on the editor to see if it gets them
 			const editorKeydown = jest.fn();
 			const fakeEditor = wrapper.getDOMNode().querySelector( '.fake-editor' );
@@ -361,6 +351,7 @@ describe( 'Autocomplete', () => {
 			simulateInput( wrapper, [ par( tx( '/' ) ) ] );
 			// wait for getOptions promise
 			process.nextTick( () => {
+				wrapper.update();
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
 				simulateKeydown( wrapper, DOWN );
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 1 );
@@ -376,16 +367,13 @@ describe( 'Autocomplete', () => {
 		} );
 
 		it( 'resets selected index on subsequent search', ( done ) => {
-			const wrapper = mount(
-				<Autocomplete completers={ [ slashCompleter ] }>
-					<FakeEditor />
-				</Autocomplete>
-			);
+			const wrapper = makeAutocompleter( [ slashCompleter ] );
 			expectInitialState( wrapper );
 			// simulate typing '/'
 			simulateInput( wrapper, [ par( tx( '/' ) ) ] );
 			// wait for getOptions promise
 			process.nextTick( () => {
+				wrapper.update();
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
 				simulateKeydown( wrapper, DOWN );
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 1 );
@@ -397,11 +385,7 @@ describe( 'Autocomplete', () => {
 		} );
 
 		it( 'closes by escape', ( done ) => {
-			const wrapper = mount(
-				<Autocomplete completers={ [ slashCompleter ] }>
-					<FakeEditor />
-				</Autocomplete>
-			);
+			const wrapper = makeAutocompleter( [ slashCompleter ] );
 			// listen to keydown events on the editor to see if it gets them
 			const editorKeydown = jest.fn();
 			const fakeEditor = wrapper.getDOMNode().querySelector( '.fake-editor' );
@@ -417,6 +401,7 @@ describe( 'Autocomplete', () => {
 			simulateInput( wrapper, [ par( tx( '/' ) ) ] );
 			// wait for getOptions promise
 			process.nextTick( () => {
+				wrapper.update();
 				// menu should be open with all options
 				expect( wrapper.state( 'open' ) ).toBeDefined();
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
@@ -437,11 +422,7 @@ describe( 'Autocomplete', () => {
 
 		it( 'selects by enter', ( done ) => {
 			const onSelect = jest.fn();
-			const wrapper = mount(
-				<Autocomplete completers={ [ { ...slashCompleter, onSelect } ] }>
-					<FakeEditor />
-				</Autocomplete>
-			);
+			const wrapper = makeAutocompleter( [ { ...slashCompleter, onSelect } ] );
 			// listen to keydown events on the editor to see if it gets them
 			const editorKeydown = jest.fn();
 			const fakeEditor = wrapper.getDOMNode().querySelector( '.fake-editor' );
@@ -457,6 +438,7 @@ describe( 'Autocomplete', () => {
 			simulateInput( wrapper, [ par( tx( '/' ) ) ] );
 			// wait for getOptions promise
 			process.nextTick( () => {
+				wrapper.update();
 				// menu should be open with all options
 				expect( wrapper.state( 'open' ) ).toBeDefined();
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
@@ -477,18 +459,15 @@ describe( 'Autocomplete', () => {
 		} );
 
 		it( 'doesn\'t otherwise interfere with keydown behavior', ( done ) => {
-			const wrapper = mount(
-				<Autocomplete completers={ [ slashCompleter ] }>
-					<FakeEditor />
-				</Autocomplete>
-			);
+			const wrapper = makeAutocompleter( [ slashCompleter ] );
 			// listen to keydown events on the editor to see if it gets them
 			const editorKeydown = jest.fn();
 			const fakeEditor = wrapper.getDOMNode().querySelector( '.fake-editor' );
 			fakeEditor.addEventListener( 'keydown', editorKeydown, false );
 			expectInitialState( wrapper );
-			[ UP, DOWN, ENTER, ESCAPE, SPACE ].forEach( ( keyCode ) => {
+			[ UP, DOWN, ENTER, ESCAPE, SPACE ].forEach( ( keyCode, i ) => {
 				simulateKeydown( wrapper, keyCode );
+				expect( editorKeydown ).toHaveBeenCalledTimes( i + 1 );
 			} );
 			expect( editorKeydown ).toHaveBeenCalledTimes( 5 );
 			done();
@@ -496,16 +475,13 @@ describe( 'Autocomplete', () => {
 
 		it( 'selects by click on result', ( done ) => {
 			const onSelect = jest.fn();
-			const wrapper = mount(
-				<Autocomplete completers={ [ { ...slashCompleter, onSelect } ] }>
-					<FakeEditor />
-				</Autocomplete>
-			);
+			const wrapper = makeAutocompleter( [ { ...slashCompleter, onSelect } ] );
 			expectInitialState( wrapper );
 			// simulate typing '/'
 			simulateInput( wrapper, [ par( tx( '/' ) ) ] );
 			// wait for getOptions promise
 			process.nextTick( () => {
+				wrapper.update();
 				// menu should be open with all options
 				expect( wrapper.state( 'open' ) ).toBeDefined();
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
@@ -517,6 +493,7 @@ describe( 'Autocomplete', () => {
 				] );
 				// clicking should reset and select the item
 				wrapper.find( '.components-autocomplete__result Button' ).at( 0 ).simulate( 'click' );
+				wrapper.update();
 				expectInitialState( wrapper );
 				expect( onSelect ).toHaveBeenCalled();
 				done();

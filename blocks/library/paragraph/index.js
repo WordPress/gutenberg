@@ -135,7 +135,6 @@ registerBlockType( 'core/paragraph', {
 						<ColorPalette
 							value={ backgroundColor }
 							onChange={ ( colorValue ) => setAttributes( { backgroundColor: colorValue } ) }
-							withTransparentOption
 						/>
 					</PanelBody>
 					<PanelBody title={ __( 'Text Color' ) }>
@@ -157,37 +156,43 @@ registerBlockType( 'core/paragraph', {
 				userAutocompleter(),
 				hashtagAutocompleter(),
 			] }>
-				<Editable
-					tagName="p"
-					className={ classnames( 'wp-block-paragraph', className, {
-						[ `align${ width }` ]: width,
-						'has-background': backgroundColor,
-					} ) }
-					style={ {
-						backgroundColor: backgroundColor,
-						color: textColor,
-						fontSize: fontSize ? fontSize + 'px' : undefined,
-						textAlign: align,
-					} }
-					value={ content }
-					onChange={ ( nextContent ) => {
-						setAttributes( {
-							content: nextContent,
-						} );
-					} }
-					focus={ focus }
-					onFocus={ setFocus }
-					onSplit={ ( before, after, ...blocks ) => {
-						setAttributes( { content: before } );
-						insertBlocksAfter( [
-							...blocks,
-							createBlock( 'core/paragraph', { content: after } ),
-						] );
-					} }
-					onMerge={ mergeBlocks }
-					onReplace={ onReplace }
-					placeholder={ placeholder || __( 'New Paragraph' ) }
-			/>
+				{ ( { isExpanded, listBoxId, activeId } ) => (
+					<Editable
+						tagName="p"
+						className={ classnames( 'wp-block-paragraph', className, {
+							[ `align${ width }` ]: width,
+							'has-background': backgroundColor,
+						} ) }
+						style={ {
+							backgroundColor: backgroundColor,
+							color: textColor,
+							fontSize: fontSize ? fontSize + 'px' : undefined,
+							textAlign: align,
+						} }
+						value={ content }
+						onChange={ ( nextContent ) => {
+							setAttributes( {
+								content: nextContent,
+							} );
+						} }
+						focus={ focus }
+						onFocus={ setFocus }
+						onSplit={ ( before, after, ...blocks ) => {
+							setAttributes( { content: before } );
+							insertBlocksAfter( [
+								...blocks,
+								createBlock( 'core/paragraph', { content: after } ),
+							] );
+						} }
+						onMerge={ mergeBlocks }
+						onReplace={ onReplace }
+						placeholder={ placeholder || __( 'Add text or type / to insert content' ) }
+						aria-autocomplete="list"
+						aria-expanded={ isExpanded }
+						aria-owns={ listBoxId }
+						aria-activedescendant={ activeId }
+					/>
+				) }
 			</Autocomplete>,
 		];
 	},

@@ -135,7 +135,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-blocks',
 		gutenberg_url( 'blocks/build/index.js' ),
-		array( 'wp-element', 'wp-components', 'wp-utils', 'wp-i18n', 'tinymce-latest', 'tinymce-latest-lists', 'tinymce-latest-paste', 'tinymce-latest-table', 'media-views', 'media-models' ),
+		array( 'wp-element', 'wp-components', 'wp-utils', 'wp-i18n', 'tinymce-latest', 'tinymce-latest-lists', 'tinymce-latest-paste', 'tinymce-latest-table', 'media-views', 'media-models', 'shortcode' ),
 		filemtime( gutenberg_dir_path() . 'blocks/build/index.js' )
 	);
 	wp_add_inline_script(
@@ -276,7 +276,7 @@ function gutenberg_register_vendor_scripts() {
 	// See: gutenberg_ensure_wp_api_request (compat.php).
 	gutenberg_register_vendor_script(
 		'wp-api-request-shim',
-		'https://raw.githubusercontent.com/WordPress/wordpress-develop/master/src/wp-includes/js/api-request.js'
+		'https://rawgit.com/WordPress/wordpress-develop/master/src/wp-includes/js/api-request.js'
 	);
 }
 
@@ -462,12 +462,6 @@ function gutenberg_extend_wp_api_backbone_client() {
 				return model.prototype.route && route === model.prototype.route.index;
 			} );
 		};
-		wp.api.getPostTypeRevisionsCollection = function( postType ) {
-			var route = '/' + wpApiSettings.versionString + this.postTypeRestBaseMapping[ postType ] + '/(?P<parent>[\\\\d]+)/revisions';
-			return _.find( wp.api.collections, function( model ) {
-				return model.prototype.route && route === model.prototype.route.index;
-			} );
-		};
 		wp.api.getTaxonomyModel = function( taxonomy ) {
 			var route = '/' + wpApiSettings.versionString + this.taxonomyRestBaseMapping[ taxonomy ] + '/(?P<id>[\\\\d]+)';
 			return _.find( wp.api.models, function( model ) {
@@ -620,7 +614,6 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 			'baseURL'  => includes_url( 'js/tinymce' ),
 			'suffix'   => SCRIPT_DEBUG ? '' : '.min',
 			'settings' => apply_filters( 'tiny_mce_before_init', array(
-				'external_plugins' => apply_filters( 'mce_external_plugins', array() ),
 				'plugins'          => array_unique( apply_filters( 'tiny_mce_plugins', array(
 					'charmap',
 					'colorpicker',
@@ -671,6 +664,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 				), 'editor' ) ),
 				'toolbar3'         => implode( ',', apply_filters( 'mce_buttons_3', array(), 'editor' ) ),
 				'toolbar4'         => implode( ',', apply_filters( 'mce_buttons_4', array(), 'editor' ) ),
+				'external_plugins' => apply_filters( 'mce_external_plugins', array() ),
 			), 'editor' ),
 		),
 	) );
@@ -702,10 +696,6 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'/wp/v2/taxonomies?context=edit',
 		gutenberg_get_rest_link( $post_to_edit, 'about', 'edit' ),
 	);
-
-	if ( ! $is_new_post ) {
-		$preload_paths[] = gutenberg_get_rest_link( $post_to_edit, 'version-history' );
-	}
 
 	$preload_data = array_reduce(
 		$preload_paths,
@@ -753,6 +743,15 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 	wp_localize_script( 'wp-blocks', '_wpBlocksAttributes', $schemas );
 
+	// Get admin url for handling meta boxes.
+	$meta_box_url = admin_url( 'post.php' );
+	$meta_box_url = add_query_arg( array(
+		'post'           => $post_to_edit['id'],
+		'action'         => 'edit',
+		'classic-editor' => true,
+	), $meta_box_url );
+	wp_localize_script( 'wp-editor', '_wpMetaBoxUrl', $meta_box_url );
+
 	// Initialize the editor.
 	$gutenberg_theme_support = get_theme_support( 'gutenberg' );
 	$color_palette           = gutenberg_color_palette();
@@ -767,7 +766,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	);
 
 	wp_add_inline_script( 'wp-editor', 'wp.api.init().done( function() {'
-		. 'wp.editor.createEditorInstance( \'editor\', window._wpGutenbergPost, ' . json_encode( $editor_settings ) . ' ); '
+		. 'window._wpGutenbergEditor = wp.editor.createEditorInstance( \'editor\', window._wpGutenbergPost, ' . json_encode( $editor_settings ) . ' ); '
 		. '} );'
 	);
 

@@ -67,10 +67,10 @@
 	box-shadow: $shadow-popover;
 	border: 1px solid $light-gray-500;
 	background: $white;
-	width: calc( 100vw - 20px );
+	min-width: 240px;
 
-	@include break-medium {
-		width: 300px;
+	&:focus {
+		box-shadow: $button-focus-style;
 	}
 
 	.components-popover.is-top & {

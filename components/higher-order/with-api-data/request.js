@@ -10,23 +10,23 @@ export const getStablePath = memoize( ( path ) => {
 		return base;
 	}
 
+	// 'b=1&c=2&a=5'
 	return base + '?' + query
-		// 'b=1&c=2&a=5'
 
-		.split( '&' )
 		// [ 'b=1', 'c=2', 'a=5' ]
+		.split( '&' )
 
-		.map( ( entry ) => entry.split( '=' ) )
 		// [ [ 'b, '1' ], [ 'c', '2' ], [ 'a', '5' ] ]
+		.map( ( entry ) => entry.split( '=' ) )
 
-		.sort( ( a, b ) => a[ 0 ].localeCompare( b[ 0 ] ) )
 		// [ [ 'a', '5' ], [ 'b, '1' ], [ 'c', '2' ] ]
+		.sort( ( a, b ) => a[ 0 ].localeCompare( b[ 0 ] ) )
 
-		.map( ( pair ) => pair.join( '=' ) )
 		// [ 'a=5', 'b=1', 'c=2' ]
+		.map( ( pair ) => pair.join( '=' ) )
 
-		.join( '&' );
 		// 'a=5&b=1&c=2'
+		.join( '&' );
 } );
 
 /**
@@ -49,19 +49,27 @@ export const cache = mapKeys(
  * @return {Array[]}            Array of header tuples
  */
 export function getResponseHeaders( xhr ) {
+	// 'date: Tue, 22 Aug 2017 18:45:28 GMT↵server: nginx'
 	return xhr.getAllResponseHeaders().trim()
-		// 'date: Tue, 22 Aug 2017 18:45:28 GMT↵server: nginx'
 
-		.split( '\u000d\u000a' )
 		// [ 'date: Tue, 22 Aug 2017 18:45:28 GMT', 'server: nginx' ]
+		.split( '\u000d\u000a' )
 
-		.map( ( entry ) => entry.split( '\u003a\u0020' ) );
 		// [ [ 'date', 'Tue, 22 Aug 2017 18:45:28 GMT' ], [ 'server', 'nginx' ] ]
+		.map( ( entry ) => entry.split( '\u003a\u0020' ) );
 }
 
-export function getResponseFromCache( request ) {
-	const response = cache[ getStablePath( request.path ) ];
-	return Promise.resolve( response );
+/**
+ * Returns a response payload if GET request and a cached result exists, or
+ * undefined otherwise.
+ *
+ * @param  {Object}  request Request object (path, method)
+ * @return {?Object}         Response object (body, headers)
+ */
+export function getCachedResponse( request ) {
+	if ( isRequestMethod( request, 'GET' ) ) {
+		return cache[ getStablePath( request.path ) ];
+	}
 }
 
 export function getResponseFromNetwork( request ) {
@@ -79,7 +87,8 @@ export function getResponseFromNetwork( request ) {
 		} );
 	}
 
-	return promise;
+	// Upgrade jQuery.Deferred to native promise
+	return Promise.resolve( promise );
 }
 
 export function isRequestMethod( request, method ) {
@@ -87,14 +96,10 @@ export function isRequestMethod( request, method ) {
 }
 
 export default function( request ) {
-	if ( ! isRequestMethod( request, 'GET' ) ) {
-		return getResponseFromNetwork( request );
+	const cachedResponse = getCachedResponse( request );
+	if ( cachedResponse ) {
+		return Promise.resolve( cachedResponse );
 	}
 
-	return getResponseFromCache( request )
-		.then( ( response ) => (
-			undefined === response
-				? getResponseFromNetwork( request )
-				: response
-		) );
+	return getResponseFromNetwork( request );
 }

@@ -24,6 +24,7 @@ import {
 	notices,
 	blocksMode,
 	blockInsertionPoint,
+	metaBoxes,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -741,6 +742,17 @@ describe( 'state', () => {
 		} );
 
 		it( 'should set multi selection', () => {
+			const original = deepFreeze( { focus: { editable: 'citation' }, isMultiSelecting: false } );
+			const state = blockSelection( original, {
+				type: 'MULTI_SELECT',
+				start: 'ribs',
+				end: 'chicken',
+			} );
+
+			expect( state ).toEqual( { start: 'ribs', end: 'chicken', focus: null, isMultiSelecting: false } );
+		} );
+
+		it( 'should set continuous multi selection', () => {
 			const original = deepFreeze( { focus: { editable: 'citation' }, isMultiSelecting: true } );
 			const state = blockSelection( original, {
 				type: 'MULTI_SELECT',
@@ -760,13 +772,22 @@ describe( 'state', () => {
 			expect( state ).toEqual( { start: 'ribs', end: 'ribs', focus: { editable: 'citation' }, isMultiSelecting: true } );
 		} );
 
-		it( 'should end multi selection', () => {
+		it( 'should end multi selection with selection', () => {
 			const original = deepFreeze( { start: 'ribs', end: 'chicken', focus: { editable: 'citation' }, isMultiSelecting: true } );
 			const state = blockSelection( original, {
 				type: 'STOP_MULTI_SELECT',
 			} );
 
-			expect( state ).toEqual( { start: 'ribs', end: 'chicken', focus: { editable: 'citation' }, isMultiSelecting: false } );
+			expect( state ).toEqual( { start: 'ribs', end: 'chicken', focus: null, isMultiSelecting: false } );
+		} );
+
+		it( 'should end multi selection without selection', () => {
+			const original = deepFreeze( { start: 'ribs', end: 'ribs', focus: { editable: 'citation' }, isMultiSelecting: true } );
+			const state = blockSelection( original, {
+				type: 'STOP_MULTI_SELECT',
+			} );
+
+			expect( state ).toEqual( { start: 'ribs', end: 'ribs', focus: { editable: 'citation' }, isMultiSelecting: false } );
 		} );
 
 		it( 'should not update the state if the block is already selected', () => {
@@ -1019,14 +1040,14 @@ describe( 'state', () => {
 
 	describe( 'notices()', () => {
 		it( 'should create a notice', () => {
-			const originalState = {
-				b: {
+			const originalState = [
+				{
 					id: 'b',
 					content: 'Error saving',
 					status: 'error',
 				},
-			};
-			const state = notices( originalState, {
+			];
+			const state = notices( deepFreeze( originalState ), {
 				type: 'CREATE_NOTICE',
 				notice: {
 					id: 'a',
@@ -1034,36 +1055,36 @@ describe( 'state', () => {
 					status: 'success',
 				},
 			} );
-			expect( state ).toEqual( {
-				b: originalState.b,
-				a: {
+			expect( state ).toEqual( [
+				originalState[ 0 ],
+				{
 					id: 'a',
 					content: 'Post saved',
 					status: 'success',
 				},
-			} );
+			] );
 		} );
 
 		it( 'should remove a notice', () => {
-			const originalState = {
-				a: {
+			const originalState = [
+				{
 					id: 'a',
 					content: 'Post saved',
 					status: 'success',
 				},
-				b: {
+				{
 					id: 'b',
 					content: 'Error saving',
 					status: 'error',
 				},
-			};
-			const state = notices( originalState, {
+			];
+			const state = notices( deepFreeze( originalState ), {
 				type: 'REMOVE_NOTICE',
 				noticeId: 'a',
 			} );
-			expect( state ).toEqual( {
-				b: originalState.b,
-			} );
+			expect( state ).toEqual( [
+				originalState[ 1 ],
+			] );
 		} );
 	} );
 
@@ -1086,6 +1107,112 @@ describe( 'state', () => {
 			const value = blocksMode( deepFreeze( { chicken: 'html' } ), action );
 
 			expect( value ).toEqual( { chicken: 'visual' } );
+		} );
+	} );
+
+	describe( 'metaBoxes()', () => {
+		it( 'should return default state', () => {
+			const actual = metaBoxes( undefined, {} );
+			const expected = {
+				advanced: {
+					isActive: false,
+					isDirty: false,
+					isUpdating: false,
+				},
+				normal: {
+					isActive: false,
+					isDirty: false,
+					isUpdating: false,
+				},
+				side: {
+					isActive: false,
+					isDirty: false,
+					isUpdating: false,
+				},
+			};
+
+			expect( actual ).toEqual( expected );
+		} );
+		it( 'should set the sidebar to active', () => {
+			const theMetaBoxes = {
+				normal: false,
+				advanced: false,
+				side: true,
+			};
+
+			const action = {
+				type: 'INITIALIZE_META_BOX_STATE',
+				metaBoxes: theMetaBoxes,
+			};
+
+			const actual = metaBoxes( undefined, action );
+			const expected = {
+				advanced: {
+					isActive: false,
+					isDirty: false,
+					isUpdating: false,
+				},
+				normal: {
+					isActive: false,
+					isDirty: false,
+					isUpdating: false,
+				},
+				side: {
+					isActive: true,
+					isDirty: false,
+					isUpdating: false,
+				},
+			};
+
+			expect( actual ).toEqual( expected );
+		} );
+		it( 'should switch updating to off', () => {
+			const action = {
+				type: 'HANDLE_META_BOX_RELOAD',
+				location: 'normal',
+			};
+
+			const theMetaBoxes = metaBoxes( { normal: { isUpdating: true, isActive: false, isDirty: true } }, action );
+			const actual = theMetaBoxes.normal;
+			const expected = {
+				isActive: false,
+				isUpdating: false,
+				isDirty: false,
+			};
+
+			expect( actual ).toEqual( expected );
+		} );
+		it( 'should switch updating to on', () => {
+			const action = {
+				type: 'REQUEST_META_BOX_UPDATES',
+				locations: [ 'normal' ],
+			};
+
+			const theMetaBoxes = metaBoxes( undefined, action );
+			const actual = theMetaBoxes.normal;
+			const expected = {
+				isActive: false,
+				isUpdating: true,
+				isDirty: false,
+			};
+
+			expect( actual ).toEqual( expected );
+		} );
+		it( 'should return with the isDirty flag as true', () => {
+			const action = {
+				type: 'META_BOX_STATE_CHANGED',
+				location: 'normal',
+				hasChanged: true,
+			};
+			const theMetaBoxes = metaBoxes( undefined, action );
+			const actual = theMetaBoxes.normal;
+			const expected = {
+				isActive: false,
+				isDirty: true,
+				isUpdating: false,
+			};
+
+			expect( actual ).toEqual( expected );
 		} );
 	} );
 } );

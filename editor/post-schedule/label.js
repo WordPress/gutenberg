@@ -15,9 +15,9 @@ import { dateI18n, settings } from '@wordpress/date';
 import { getEditedPostAttribute } from '../selectors';
 
 function PostScheduleLabel( { date } ) {
-	return date
-		? dateI18n( settings.formats.datetime, date )
-		: __( 'Immediately' );
+	return date ?
+		dateI18n( settings.formats.datetime, date ) :
+		__( 'Immediately' );
 }
 
 export default connect(

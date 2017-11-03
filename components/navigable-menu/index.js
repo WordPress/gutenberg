@@ -26,6 +26,10 @@ class NavigableMenu extends Component {
 	}
 
 	onKeyDown( event ) {
+		if ( this.props.onKeyDown ) {
+			this.props.onKeyDown( event );
+		}
+
 		const { orientation = 'vertical', onNavigate = noop, deep = false } = this.props;
 		if (
 			( orientation === 'vertical' && [ UP, DOWN, TAB ].indexOf( event.keyCode ) === -1 ) ||
@@ -61,11 +65,14 @@ class NavigableMenu extends Component {
 	render() {
 		const { children, ...props } = this.props;
 
+		// Disable reason: Assumed role is applied by parent via props spread.
+		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
 			<div ref={ this.bindContainer } { ...omit( props, [ 'orientation', 'onNavigate', 'deep' ] ) } onKeyDown={ this.onKeyDown }>
 				{ children }
 			</div>
 		);
+		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
 }
 

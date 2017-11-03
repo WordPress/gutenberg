@@ -1,9 +1,8 @@
 /**
  * External dependencies
  */
-import escapeStringRegexp from 'escape-string-regexp';
 import classnames from 'classnames';
-import { find } from 'lodash';
+import { escapeRegExp, find, filter, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,6 +16,7 @@ import { keycodes } from '@wordpress/utils';
 import './style.scss';
 import Button from '../button';
 import Popover from '../popover';
+import withInstanceId from '../higher-order/with-instance-id';
 
 const { ENTER, ESCAPE, UP, DOWN, LEFT, RIGHT, TAB } = keycodes;
 
@@ -78,7 +78,7 @@ function lastIndexOfSpace( text ) {
 	return -1;
 }
 
-class Autocomplete extends Component {
+export class Autocomplete extends Component {
 	static getInitialState() {
 		return {
 			search: /./,
@@ -97,6 +97,7 @@ class Autocomplete extends Component {
 		this.reset = this.reset.bind( this );
 		this.search = this.search.bind( this );
 		this.setSelectedIndex = this.setSelectedIndex.bind( this );
+		this.getWordRect = this.getWordRect.bind( this );
 
 		this.state = this.constructor.getInitialState();
 	}
@@ -138,7 +139,12 @@ class Autocomplete extends Component {
 	// this method is separate so it can be overrided in tests
 	getCursor( container ) {
 		const selection = window.getSelection();
-		if ( selection.isCollapsed && container.contains( selection.anchorNode ) ) {
+		if ( selection.isCollapsed ) {
+			if ( 'production' !== process.env.NODE_ENV ) {
+				if ( ! container.contains( selection.anchorNode ) ) {
+					throw new Error( 'Invalid assumption: expected selection to be within the autocomplete container' );
+				}
+			}
 			return {
 				node: selection.anchorNode,
 				offset: selection.anchorOffset,
@@ -158,7 +164,7 @@ class Autocomplete extends Component {
 	loadOptions( index ) {
 		this.props.completers[ index ].getOptions().then( ( options ) => {
 			this.setState( {
-				[ 'options_' + index ]: options.map(
+				[ 'options_' + index ]: map( options,
 					( option, i ) => ( { ...option, key: index + '_' + i } ) ),
 			} );
 		} );
@@ -168,14 +174,6 @@ class Autocomplete extends Component {
 		const allowAnything = () => true;
 		let endTextNode;
 		let endIndex;
-		let completers = allCompleters.map( ( completer, idx ) => ( { ...completer, idx } ) );
-		if ( wasOpen ) {
-			// put the open completer at the start so it has priority
-			completers = [
-				wasOpen,
-				...completers.filter( ( completer ) => completer.idx !== wasOpen.idx ),
-			];
-		}
 		// search backwards to find the first preceeding space or non-text node.
 		if ( isTextNode( cursor.node ) ) { // TEXT node
 			endTextNode = cursor.node;
@@ -190,8 +188,17 @@ class Autocomplete extends Component {
 		if ( endTextNode === null ) {
 			return null;
 		}
+		// store the index of a completer in the object so we can use it to reference the options
+		let completers = map( allCompleters, ( completer, idx ) => ( { ...completer, idx } ) );
+		if ( wasOpen ) {
+			// put the open completer at the start so it has priority
+			completers = [
+				wasOpen,
+				...filter( completers, ( completer ) => completer.idx !== wasOpen.idx ),
+			];
+		}
 		// filter the completers to those that could handle this node
-		completers = completers.filter(
+		completers = filter( completers,
 			( { allowNode = allowAnything } ) => allowNode( endTextNode, container ) );
 		// exit early if nothing can handle it
 		if ( completers.length === 0 ) {
@@ -202,20 +209,19 @@ class Autocomplete extends Component {
 		let pos = lastIndexOfSpace( text );
 		while ( pos === -1 ) {
 			const prev = onlyTextNode( startTextNode.previousSibling );
-			if ( prev ) {
-				// filter the completers to those that could handle this node
-				completers = completers.filter(
-					( { allowNode = allowAnything } ) => allowNode( endTextNode, container ) );
-				// exit early if nothing can handle it
-				if ( completers.length === 0 ) {
-					return null;
-				}
-				startTextNode = prev;
-				text = prev.nodeValue + text;
-				pos = lastIndexOfSpace( prev.nodeValue );
-			} else {
+			if ( prev === null ) {
 				break;
 			}
+			// filter the completers to those that could handle this node
+			completers = filter( completers,
+				( { allowNode = allowAnything } ) => allowNode( endTextNode, container ) );
+			// exit early if nothing can handle it
+			if ( completers.length === 0 ) {
+				return null;
+			}
+			startTextNode = prev;
+			text = prev.nodeValue + text;
+			pos = lastIndexOfSpace( prev.nodeValue );
 		}
 		// exit early if nothing can handle it
 		if ( text.length <= pos + 1 ) {
@@ -226,21 +232,18 @@ class Autocomplete extends Component {
 			if ( text.substr( pos + 1, triggerPrefix.length ) !== triggerPrefix ) {
 				return false;
 			}
-			const range = this.createRange( startTextNode, pos + 1, endTextNode, endIndex );
 			const before = this.createRange( container, 0, startTextNode, pos + 1 );
 			const after = this.createRange( endTextNode, endIndex, container, container.childNodes.length );
-			if ( ! allowContext( before, range, after ) ) {
-				return false;
-			}
-			return true;
+			return allowContext( before, after );
 		} );
-		if ( open ) {
-			const { triggerPrefix = '' } = open;
-			const range = this.createRange( startTextNode, pos + 1, endTextNode, endIndex );
-			const query = text.substr( pos + 1 + triggerPrefix.length );
-			return { open, range, query };
+		// exit if no completers match
+		if ( ! open ) {
+			return null;
 		}
-		return null;
+		const { triggerPrefix = '' } = open;
+		const range = this.createRange( startTextNode, pos + 1, endTextNode, endIndex );
+		const query = text.substr( pos + 1 + triggerPrefix.length );
+		return { open, range, query };
 	}
 
 	search( event ) {
@@ -253,7 +256,7 @@ class Autocomplete extends Component {
 		const match = this.findMatch( container, cursor, completers, wasOpen );
 		const { open, query, range } = match || {};
 		// create a regular expression to filter the options
-		const search = open ? new RegExp( escapeStringRegexp( query ), 'i' ) : /./;
+		const search = open ? new RegExp( escapeRegExp( query ), 'i' ) : /./;
 		// asynchronously load the options for the open completer
 		if ( open && ( ! wasOpen || open.idx !== wasOpen.idx ) ) {
 			this.loadOptions( open.idx );
@@ -344,15 +347,29 @@ class Autocomplete extends Component {
 		event.stopPropagation();
 	}
 
+	getWordRect( { isLeft, isRight } ) {
+		const { range } = this.state;
+		if ( ! range ) {
+			return;
+		}
+		if ( isLeft ) {
+			const rects = range.getClientRects();
+			return rects[ 0 ];
+		} else if ( isRight ) {
+			const rects = range.getClientRects();
+			return rects[ rects.length - 1 ];
+		}
+		return range.getBoundingClientRect();
+	}
+
 	toggleKeyEvents( isListening ) {
 		// This exists because we must capture ENTER key presses before Editable.
 		// It seems that react fires the simulated capturing events after the
 		// native browser event has already bubbled so we can't stopPropagation
-		//  and avoid Editable getting the event from TinyMCE, hence we must
+		// and avoid Editable getting the event from TinyMCE, hence we must
 		// register a native event handler.
-		if ( ! this.node ) {
-			return;
-		}
+		// Disable reason: Accessing the DOM node to add native event handlers.
+		// eslint-disable-next-line react/no-find-dom-node
 		const realNode = findDOMNode( this.node );
 		const handler = isListening ? 'addEventListener' : 'removeEventListener';
 		realNode[ handler ]( 'keydown', this.setSelectedIndex, true );
@@ -371,11 +388,14 @@ class Autocomplete extends Component {
 	}
 
 	render() {
-		const { children } = this.props;
-		const { open, selectedIndex, range } = this.state;
+		const { children, instanceId } = this.props;
+		const { open, selectedIndex } = this.state;
 		const { className } = open || {};
 		const classes = classnames( 'components-autocomplete__popover', className );
 		const filteredOptions = this.getFilteredOptions();
+		const isExpanded = filteredOptions.length > 0;
+		const listBoxId = isExpanded ? `components-autocomplete-listbox-${ instanceId }` : null;
+		const activeId = isExpanded ? `components-autocomplete-item-${ instanceId }-${ selectedIndex }` : null;
 
 		return (
 			<div
@@ -383,23 +403,26 @@ class Autocomplete extends Component {
 				onInput={ this.search }
 				className="components-autocomplete"
 			>
-				{ children }
+				{ children( { isExpanded, listBoxId, activeId } ) }
 				<Popover
-					isOpen={ filteredOptions.length > 0 }
+					isOpen={ isExpanded }
 					focusOnOpen={ false }
-					onClose={ () => this.reset() }
+					onClose={ this.reset }
 					position="top right"
 					className={ classes }
-					range={ range }
+					getAnchorRect={ this.getWordRect }
 				>
 					<ul
-						role="menu"
+						id={ listBoxId }
+						role="listbox"
 						className="components-autocomplete__results"
 					>
-						{ filteredOptions.map( ( option, index ) => (
+						{ map( filteredOptions, ( option, index ) => (
 							<li
 								key={ option.key }
-								role="menuitem"
+								id={ `components-autocomplete-item-${ instanceId }-${ index }` }
+								role="option"
+								aria-selected={ index === selectedIndex }
 								className={ classnames( 'components-autocomplete__result', {
 									'is-selected': index === selectedIndex,
 								} ) }
@@ -416,4 +439,4 @@ class Autocomplete extends Component {
 	}
 }
 
-export default Autocomplete;
+export default withInstanceId( Autocomplete );

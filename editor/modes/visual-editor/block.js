@@ -22,15 +22,14 @@ import BlockCrashBoundary from './block-crash-boundary';
 import BlockDropZone from './block-drop-zone';
 import BlockHtml from './block-html';
 import BlockMover from '../../block-mover';
-import BlockRightMenu from '../../block-settings-menu';
-import BlockToolbar from '../../block-toolbar';
+import BlockSettingsMenu from '../../block-settings-menu';
 import {
 	clearSelectedBlock,
 	editPost,
 	focusBlock,
 	insertBlocks,
 	mergeBlocks,
-	removeBlocks,
+	removeBlock,
 	replaceBlocks,
 	selectBlock,
 	startTyping,
@@ -54,18 +53,18 @@ import {
 	getBlockMode,
 } from '../../selectors';
 
-const { BACKSPACE, ESCAPE, DELETE, ENTER } = keycodes;
+const { BACKSPACE, ESCAPE, DELETE, ENTER, UP, RIGHT, DOWN, LEFT } = keycodes;
 
 class VisualEditorBlock extends Component {
 	constructor() {
 		super( ...arguments );
 
+		this.setBlockListRef = this.setBlockListRef.bind( this );
 		this.bindBlockNode = this.bindBlockNode.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
 		this.maybeHover = this.maybeHover.bind( this );
 		this.maybeStartTyping = this.maybeStartTyping.bind( this );
 		this.stopTypingOnMouseMove = this.stopTypingOnMouseMove.bind( this );
-		this.removeOrDeselect = this.removeOrDeselect.bind( this );
 		this.mergeBlocks = this.mergeBlocks.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
@@ -90,7 +89,7 @@ class VisualEditorBlock extends Component {
 		}
 
 		// Not Ideal, but it's the easiest way to get the scrollable container
-		this.editorLayout = document.querySelector( '.editor-layout__editor' );
+		this.editorLayout = document.querySelector( '.editor-layout__content' );
 	}
 
 	componentWillReceiveProps( newProps ) {
@@ -106,9 +105,9 @@ class VisualEditorBlock extends Component {
 	componentDidUpdate( prevProps ) {
 		// Preserve scroll prosition when block rearranged
 		if ( this.previousOffset ) {
-			this.editorLayout.scrollTop = this.editorLayout.scrollTop
-				+ this.node.getBoundingClientRect().top
-				- this.previousOffset;
+			this.editorLayout.scrollTop = this.editorLayout.scrollTop +
+				this.node.getBoundingClientRect().top -
+				this.previousOffset;
 			this.previousOffset = null;
 		}
 
@@ -133,6 +132,10 @@ class VisualEditorBlock extends Component {
 
 	removeStopTypingListener() {
 		document.removeEventListener( 'mousemove', this.stopTypingOnMouseMove );
+	}
+
+	setBlockListRef( node ) {
+		this.props.blockRef( node, this.props.uid );
 	}
 
 	bindBlockNode( node ) {
@@ -198,35 +201,6 @@ class VisualEditorBlock extends Component {
 		this.lastClientY = clientY;
 	}
 
-	removeOrDeselect( event ) {
-		const { keyCode, target } = event;
-		const {
-			uid,
-			previousBlock,
-			onRemove,
-			onFocus,
-			onDeselect,
-		} = this.props;
-
-		// Remove block on backspace.
-		if (
-			target === this.node &&
-			( BACKSPACE === keyCode || DELETE === keyCode )
-		) {
-			event.preventDefault();
-			onRemove( [ uid ] );
-
-			if ( previousBlock ) {
-				onFocus( previousBlock.uid, { offset: -1 } );
-			}
-		}
-
-		// Deselect on escape.
-		if ( ESCAPE === keyCode ) {
-			onDeselect();
-		}
-	}
-
 	mergeBlocks( forward = false ) {
 		const { block, previousBlock, nextBlock, onMerge } = this.props;
 
@@ -275,14 +249,48 @@ class VisualEditorBlock extends Component {
 
 	onKeyDown( event ) {
 		const { keyCode, target } = event;
-		if ( ENTER === keyCode && target === this.node ) {
-			event.preventDefault();
 
-			this.props.onInsertBlocks( [
-				createBlock( 'core/paragraph' ),
-			], this.props.order + 1 );
+		switch ( keyCode ) {
+			case ENTER:
+				// Insert default block after current block if enter and event
+				// not already handled by descendant.
+				if ( target === this.node ) {
+					event.preventDefault();
+
+					this.props.onInsertBlocks( [
+						createBlock( 'core/paragraph' ),
+					], this.props.order + 1 );
+				}
+				break;
+
+			case UP:
+			case RIGHT:
+			case DOWN:
+			case LEFT:
+				// Arrow keys do not fire keypress event, but should still
+				// trigger typing mode.
+				this.maybeStartTyping();
+				break;
+
+			case BACKSPACE:
+			case DELETE:
+				// Remove block on backspace.
+				if ( target === this.node ) {
+					event.preventDefault();
+					const { uid, onRemove, previousBlock, onFocus } = this.props;
+					onRemove( uid );
+
+					if ( previousBlock ) {
+						onFocus( previousBlock.uid, { offset: -1 } );
+					}
+				}
+				break;
+
+			case ESCAPE:
+				// Deselect on escape.
+				this.props.onDeselect();
+				break;
 		}
-		this.removeOrDeselect( event );
 	}
 
 	onBlockError( error ) {
@@ -313,10 +321,10 @@ class VisualEditorBlock extends Component {
 
 		// Generate the wrapper class names handling the different states of the block.
 		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected, focus } = this.props;
-		const showUI = isSelected && ( ! this.props.isTyping || focus.collapsed === false );
+		const showUI = isSelected && ( ! this.props.isTyping || ( focus && focus.collapsed === false ) );
 		const isProperlyHovered = isHovered && ! this.props.isSelecting;
 		const { error } = this.state;
-		const wrapperClassname = classnames( 'editor-visual-editor__block', {
+		const wrapperClassName = classnames( 'editor-visual-editor__block', {
 			'has-warning': ! isValid || !! error,
 			'is-selected': showUI,
 			'is-multi-selected': isMultiSelected,
@@ -339,23 +347,22 @@ class VisualEditorBlock extends Component {
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
 			<div
-				ref={ this.props.blockRef }
+				ref={ this.setBlockListRef }
 				onMouseMove={ this.maybeHover }
 				onMouseEnter={ this.maybeHover }
 				onMouseLeave={ onMouseLeave }
-				className={ wrapperClassname }
+				className={ wrapperClassName }
 				data-type={ block.name }
 				{ ...wrapperProps }
 			>
 				<BlockDropZone index={ order } />
 				{ ( showUI || isProperlyHovered ) && <BlockMover uids={ [ block.uid ] } /> }
-				{ ( showUI || isProperlyHovered ) && <BlockRightMenu uids={ [ block.uid ] } /> }
-				{ showUI && isValid && mode === 'visual' && <BlockToolbar uid={ block.uid } /> }
+				{ ( showUI || isProperlyHovered ) && <BlockSettingsMenu uids={ [ block.uid ] } /> }
 				{ isFirstMultiSelected && ! this.props.isSelecting &&
 					<BlockMover uids={ multiSelectedBlockUids } />
 				}
 				{ isFirstMultiSelected && ! this.props.isSelecting &&
-					<BlockRightMenu
+					<BlockSettingsMenu
 						uids={ multiSelectedBlockUids }
 						focus={ true }
 					/>
@@ -470,8 +477,8 @@ export default connect(
 			dispatch( focusBlock( ...args ) );
 		},
 
-		onRemove( uids ) {
-			dispatch( removeBlocks( uids ) );
+		onRemove( uid ) {
+			dispatch( removeBlock( uid ) );
 		},
 
 		onMerge( ...args ) {

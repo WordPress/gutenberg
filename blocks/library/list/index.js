@@ -113,9 +113,9 @@ registerBlockType( 'core/list', {
 				blocks: [ 'core/quote' ],
 				transform: ( { value, citation } ) => {
 					const listItems = fromBrDelimitedContent( value );
-					const values = citation
-						? concatChildren( listItems, <li>{ citation }</li> )
-						: listItems;
+					const values = citation ?
+						concatChildren( listItems, <li>{ citation }</li> ) :
+						listItems;
 					return createBlock( 'core/list', {
 						nodeName: 'UL',
 						values,
@@ -328,7 +328,7 @@ registerBlockType( 'core/list', {
 					value={ values }
 					focus={ focus }
 					onFocus={ setFocus }
-					wrapperClassname="blocks-list"
+					wrapperClassName="blocks-list"
 					placeholder={ __( 'Write list…' ) }
 					onMerge={ mergeBlocks }
 					onSplit={ ( before, after, ...blocks ) => {

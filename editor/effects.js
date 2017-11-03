@@ -13,7 +13,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { getGutenbergURL, getWPAdminURL } from './utils/url';
+import { getPostEditUrl, getWPAdminURL } from './utils/url';
 import {
 	resetPost,
 	setupNewPost,
@@ -25,10 +25,12 @@ import {
 	removeNotice,
 	savePost,
 	editPost,
+	requestMetaBoxUpdates,
 } from './actions';
 import {
 	getCurrentPost,
 	getCurrentPostType,
+	getDirtyMetaBoxes,
 	getEditedPostContent,
 	getPostEdits,
 	isCurrentPostPublished,
@@ -86,7 +88,7 @@ export default {
 	},
 	REQUEST_POST_UPDATE_SUCCESS( action, store ) {
 		const { previousPost, post } = action;
-		const { dispatch } = store;
+		const { dispatch, getState } = store;
 
 		const publishStatus = [ 'publish', 'private', 'future' ];
 		const isPublished = publishStatus.indexOf( previousPost.status ) !== -1;
@@ -100,9 +102,9 @@ export default {
 		// If we publish/schedule a post, we show the corresponding publish message
 		// Unless we show an update notice
 		if ( isPublished || publishStatus.indexOf( post.status ) !== -1 ) {
-			const noticeMessage = ! isPublished && publishStatus.indexOf( post.status ) !== -1
-				? messages[ post.status ]
-				: __( 'Post updated!' );
+			const noticeMessage = ! isPublished && publishStatus.indexOf( post.status ) !== -1 ?
+				messages[ post.status ] :
+				__( 'Post updated!' );
 			dispatch( createSuccessNotice(
 				<p>
 					<span>{ noticeMessage }</span>
@@ -113,13 +115,14 @@ export default {
 			) );
 		}
 
+		// Update dirty meta boxes.
+		dispatch( requestMetaBoxUpdates( getDirtyMetaBoxes( getState() ) ) );
+
 		if ( get( window.history.state, 'id' ) !== post.id ) {
 			window.history.replaceState(
 				{ id: post.id },
 				'Post ' + post.id,
-				getGutenbergURL( {
-					post_id: post.id,
-				} )
+				getPostEditUrl( post.id )
 			);
 		}
 	},
@@ -136,9 +139,9 @@ export default {
 			private: __( 'Publishing failed' ),
 			future: __( 'Scheduling failed' ),
 		};
-		const noticeMessage = ! isPublished && publishStatus.indexOf( edits.status ) !== -1
-			? messages[ edits.status ]
-			: __( 'Updating failed' );
+		const noticeMessage = ! isPublished && publishStatus.indexOf( edits.status ) !== -1 ?
+			messages[ edits.status ] :
+			__( 'Updating failed' );
 		dispatch( createErrorNotice( noticeMessage, { id: SAVE_POST_NOTICE_ID } ) );
 	},
 	TRASH_POST( action, store ) {
@@ -194,9 +197,9 @@ export default {
 
 		// We can only merge blocks with similar types
 		// thus, we transform the block to merge first
-		const blocksWithTheSameType = blockA.name === blockB.name
-			? [ blockB ]
-			: switchToBlockType( blockB, blockA.name );
+		const blocksWithTheSameType = blockA.name === blockB.name ?
+			[ blockB ] :
+			switchToBlockType( blockB, blockA.name );
 
 		// If the block types can not match, do nothing
 		if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {

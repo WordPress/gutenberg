@@ -3,7 +3,20 @@
  */
 import optimist from 'redux-optimist';
 import { combineReducers } from 'redux';
-import { difference, get, reduce, keyBy, keys, first, last, omit, pick, without, mapValues } from 'lodash';
+import {
+	difference,
+	get,
+	reduce,
+	keyBy,
+	keys,
+	first,
+	last,
+	omit,
+	pick,
+	without,
+	mapValues,
+	findIndex,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -29,7 +42,7 @@ const MAX_RECENT_BLOCKS = 8;
  * @return {*}       Raw value
  */
 export function getPostRawValue( value ) {
-	if ( 'object' === typeof value && 'raw' in value ) {
+	if ( value && 'object' === typeof value && 'raw' in value ) {
 		return value.raw;
 	}
 
@@ -248,7 +261,7 @@ export const editor = combineUndoableReducers( {
 
 		return state;
 	},
-}, { resetTypes: [ 'RESET_POST' ] } );
+}, { resetTypes: [ 'SETUP_EDITOR' ] } );
 
 /**
  * Reducer returning the last-known state of the current post, in the format
@@ -324,12 +337,14 @@ export function blockSelection( state = { start: null, end: null, focus: null, i
 			return {
 				...state,
 				isMultiSelecting: false,
+				focus: state.start === state.end ? state.focus : null,
 			};
 		case 'MULTI_SELECT':
 			return {
 				...state,
 				start: action.start,
 				end: action.end,
+				focus: state.isMultiSelecting ? state.focus : null,
 			};
 		case 'SELECT_BLOCK':
 			if ( action.uid === state.start && action.uid === state.end ) {
@@ -544,22 +559,82 @@ export function saving( state = {}, action ) {
 	return state;
 }
 
-export function notices( state = {}, action ) {
+export function notices( state = [], action ) {
 	switch ( action.type ) {
 		case 'CREATE_NOTICE':
-			return {
-				...state,
-				[ action.notice.id ]: action.notice,
-			};
+			return [ ...state, action.notice ];
+
 		case 'REMOVE_NOTICE':
-			if ( ! state.hasOwnProperty( action.noticeId ) ) {
+			const { noticeId } = action;
+			const index = findIndex( state, { id: noticeId } );
+			if ( index === -1 ) {
 				return state;
 			}
 
-			return omit( state, action.noticeId );
+			return [
+				...state.slice( 0, index ),
+				...state.slice( index + 1 ),
+			];
 	}
 
 	return state;
+}
+
+const locations = [
+	'advanced',
+	'normal',
+	'side',
+];
+
+const defaultMetaBoxState = locations.reduce( ( result, key ) => {
+	result[ key ] = {
+		isActive: false,
+		isDirty: false,
+		isUpdating: false,
+	};
+
+	return result;
+}, {} );
+
+export function metaBoxes( state = defaultMetaBoxState, action ) {
+	switch ( action.type ) {
+		case 'INITIALIZE_META_BOX_STATE':
+			return locations.reduce( ( newState, location ) => {
+				newState[ location ] = {
+					...state[ location ],
+					isActive: action.metaBoxes[ location ],
+				};
+				return newState;
+			}, { ...state } );
+		case 'HANDLE_META_BOX_RELOAD':
+			return {
+				...state,
+				[ action.location ]: {
+					...state[ action.location ],
+					isUpdating: false,
+					isDirty: false,
+				},
+			};
+		case 'REQUEST_META_BOX_UPDATES':
+			return action.locations.reduce( ( newState, location ) => {
+				newState[ location ] = {
+					...state[ location ],
+					isUpdating: true,
+					isDirty: false,
+				};
+				return newState;
+			}, { ...state } );
+		case 'META_BOX_STATE_CHANGED':
+			return {
+				...state,
+				[ action.location ]: {
+					...state[ action.location ],
+					isDirty: action.hasChanged,
+				},
+			};
+		default:
+			return state;
+	}
 }
 
 export default optimist( combineReducers( {
@@ -574,4 +649,5 @@ export default optimist( combineReducers( {
 	panel,
 	saving,
 	notices,
+	metaBoxes,
 } ) );

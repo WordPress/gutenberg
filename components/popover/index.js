@@ -14,8 +14,11 @@ import { focus, keycodes } from '@wordpress/utils';
  * Internal dependencies
  */
 import './style.scss';
+import withFocusReturn from '../higher-order/with-focus-return';
 import PopoverDetectOutside from './detect-outside';
 import { Slot, Fill } from '../slot-fill';
+
+const FocusManaged = withFocusReturn( ( { children } ) => children );
 
 const { ESCAPE } = keycodes;
 
@@ -39,6 +42,7 @@ class Popover extends Component {
 
 		this.focus = this.focus.bind( this );
 		this.bindNode = this.bindNode.bind( this );
+		this.getAnchorRect = this.getAnchorRect.bind( this );
 		this.setOffset = this.setOffset.bind( this );
 		this.throttledSetOffset = this.throttledSetOffset.bind( this );
 		this.maybeClose = this.maybeClose.bind( this );
@@ -110,7 +114,7 @@ class Popover extends Component {
 			return;
 		}
 
-		const { content, popover } = this.nodes;
+		const { content } = this.nodes;
 		if ( ! content ) {
 			return;
 		}
@@ -120,8 +124,8 @@ class Popover extends Component {
 		const firstTabbable = focus.tabbable.find( content )[ 0 ];
 		if ( firstTabbable ) {
 			firstTabbable.focus();
-		} else if ( popover ) {
-			popover.focus();
+		} else {
+			content.focus();
 		}
 	}
 
@@ -129,33 +133,36 @@ class Popover extends Component {
 		this.rafHandle = window.requestAnimationFrame( this.setOffset );
 	}
 
-	setOffset() {
-		const { range } = this.props;
-		const { anchor, popover } = this.nodes;
+	getAnchorRect( ) {
+		const { anchor } = this.nodes;
 		if ( ! anchor || ! anchor.parentNode ) {
 			return;
 		}
+		const rect = anchor.parentNode.getBoundingClientRect();
+		// subtract padding
+		const { paddingTop, paddingBottom } = window.getComputedStyle( anchor.parentNode );
+		const topPad = parseInt( paddingTop, 10 );
+		const bottomPad = parseInt( paddingBottom, 10 );
+		return {
+			...rect,
+			top: rect.top + topPad,
+			bottom: rect.bottom - bottomPad,
+			height: rect.height - topPad - bottomPad,
+		};
+	}
+
+	setOffset() {
+		const { getAnchorRect = this.getAnchorRect } = this.props;
+		const { popover } = this.nodes;
 
 		const [ yAxis, xAxis ] = this.getPositions();
 		const isTop = 'top' === yAxis;
 		const isLeft = 'left' === xAxis;
 		const isRight = 'right' === xAxis;
-		let rect = anchor.parentNode.getBoundingClientRect();
-		if ( range ) {
-			const rects = range.getClientRects();
-			if ( isLeft ) {
-				rect = rects[ 0 ];
-			} else if ( isRight ) {
-				rect = rects[ rects.length - 1 ];
-			} else {
-				rect = range.getBoundingClientRect();
-			}
-		}
-		// Offset top positioning by padding
-		const { paddingTop, paddingBottom } = window.getComputedStyle( anchor.parentNode );
-		let topOffset = parseInt( isTop ? paddingTop : paddingBottom, 10 );
-		if ( ! isTop ) {
-			topOffset *= -1;
+
+		const rect = getAnchorRect( { isTop, isLeft, isRight } );
+		if ( ! rect ) {
+			return;
 		}
 
 		if ( isRight ) {
@@ -168,7 +175,7 @@ class Popover extends Component {
 		}
 
 		// Set at top or bottom of parent node based on popover position
-		popover.style.top = ( rect[ yAxis ] + topOffset ) + 'px';
+		popover.style.top = rect[ yAxis ] + 'px';
 	}
 
 	setForcedPositions() {
@@ -232,6 +239,7 @@ class Popover extends Component {
 			position,
 			range,
 			focusOnOpen,
+			getAnchorRect,
 			/* eslint-enable no-unused-vars */
 			...contentProps
 		} = this.props;
@@ -257,13 +265,13 @@ class Popover extends Component {
 				<div
 					ref={ this.bindNode( 'popover' ) }
 					className={ classes }
-					tabIndex="0"
 					{ ...contentProps }
 					onKeyDown={ this.maybeClose }
 				>
 					<div
 						ref={ this.bindNode( 'content' ) }
 						className="components-popover__content"
+						tabIndex="-1"
 					>
 						{ children }
 					</div>
@@ -271,6 +279,12 @@ class Popover extends Component {
 			</PopoverDetectOutside>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
+
+		// Apply focus return behavior except when default focus on open
+		// behavior is disabled.
+		if ( false !== focusOnOpen ) {
+			content = <FocusManaged>{ content }</FocusManaged>;
+		}
 
 		// In case there is no slot context in which to render, default to an
 		// in-place rendering.

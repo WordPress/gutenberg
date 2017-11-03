@@ -1,50 +1,33 @@
 /**
- * WordPress dependencies
+ * External dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
-import { Panel, PanelBody, Dashicon } from '@wordpress/components';
+import { connect } from 'react-redux';
 
 /**
  * Internal dependencies
  */
-import './style.scss';
+import MetaBoxesIframe from './meta-boxes-iframe';
+import MetaBoxesPanel from './meta-boxes-panel';
+import { getMetaBox } from '../selectors';
 
-class MetaBoxes extends Component {
-	constructor() {
-		super( ...arguments );
-
-		this.toggle = this.toggle.bind( this );
-
-		this.state = {
-			isOpen: false,
-		};
+function MetaBox( { location, isActive, usePanel = false } ) {
+	if ( ! isActive ) {
+		return null;
 	}
 
-	toggle() {
-		this.setState( {
-			isOpen: ! this.state.isOpen,
-		} );
+	const element = <MetaBoxesIframe location={ location } />;
+
+	if ( ! usePanel ) {
+		return element;
 	}
 
-	render() {
-		const { isOpen } = this.state;
-
-		return (
-			<Panel className="editor-meta-boxes">
-				<PanelBody
-					title={ __( 'Extended Settings' ) }
-					opened={ isOpen }
-					onToggle={ this.toggle }>
-					<div className="editor-meta-boxes__coming-soon">
-						<Dashicon icon="flag" />
-						<h3>{ __( 'Coming Soon' ) }</h3>
-						<p>{ __( 'Meta boxes are not yet supported, but are planned for a future release.' ) }</p>
-					</div>
-				</PanelBody>
-			</Panel>
-		);
-	}
+	return (
+		<MetaBoxesPanel>
+			{ element }
+		</MetaBoxesPanel>
+	);
 }
 
-export default MetaBoxes;
+export default connect( ( state, ownProps ) => ( {
+	isActive: getMetaBox( state, ownProps.location ).isActive,
+} ) )( MetaBox );

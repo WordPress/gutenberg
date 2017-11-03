@@ -174,14 +174,14 @@ export function getBlockContent( block ) {
  * @return {String}               Comment-delimited block content
  */
 export function getCommentDelimitedContent( rawBlockName, attributes, content ) {
-	const serializedAttributes = ! isEmpty( attributes )
-		? serializeAttributes( attributes ) + ' '
-		: '';
+	const serializedAttributes = ! isEmpty( attributes ) ?
+		serializeAttributes( attributes ) + ' ' :
+		'';
 
 	// strip core blocks of their namespace prefix
-	const blockName = rawBlockName.startsWith( 'core/' )
-		? rawBlockName.slice( 5 )
-		: rawBlockName;
+	const blockName = rawBlockName.startsWith( 'core/' ) ?
+		rawBlockName.slice( 5 ) :
+		rawBlockName;
 
 	if ( ! content ) {
 		return `<!-- wp:${ blockName } ${ serializedAttributes }/-->`;
@@ -211,13 +211,13 @@ export function serializeBlock( block ) {
 		case 'core/more':
 			const { customText, noTeaser } = saveAttributes;
 
-			const moreTag = customText
-				? `<!--more ${ customText }-->`
-				: '<!--more-->';
+			const moreTag = customText ?
+				`<!--more ${ customText }-->` :
+				'<!--more-->';
 
-			const noTeaserTag = noTeaser
-				? '<!--noteaser-->'
-				: '';
+			const noTeaserTag = noTeaser ?
+				'<!--noteaser-->' :
+				'';
 
 			return compact( [ moreTag, noTeaserTag ] ).join( '\n' );
 
