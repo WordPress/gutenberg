@@ -147,7 +147,7 @@ export function isEditorSidebarPanelOpened( state, panel ) {
  * @return {Boolean}       Whether undo history exists
  */
 export function hasEditorUndo( state ) {
-	return state.editor.history.past.length > 0;
+	return state.editor.past.length > 0;
 }
 
 /**
@@ -158,7 +158,7 @@ export function hasEditorUndo( state ) {
  * @return {Boolean}       Whether redo history exists
  */
 export function hasEditorRedo( state ) {
-	return state.editor.history.future.length > 0;
+	return state.editor.future.length > 0;
 }
 
 /**
@@ -256,7 +256,7 @@ export function getCurrentPostLastRevisionId( state ) {
  * @return {Object}       Object of key value pairs comprising unsaved edits
  */
 export function getPostEdits( state ) {
-	return state.editor.edits;
+	return state.editor.present.edits;
 }
 
 /**
@@ -269,9 +269,9 @@ export function getPostEdits( state ) {
  * @return {*}                    Post attribute value
  */
 export function getEditedPostAttribute( state, attributeName ) {
-	return state.editor.edits[ attributeName ] === undefined ?
+	return state.editor.present.edits[ attributeName ] === undefined ?
 		state.currentPost[ attributeName ] :
-		state.editor.edits[ attributeName ];
+		state.editor.present.edits[ attributeName ];
 }
 
 /**
@@ -390,9 +390,9 @@ export function getDocumentTitle( state ) {
  * @return {String}       Raw post excerpt
  */
 export function getEditedPostExcerpt( state ) {
-	return state.editor.edits.excerpt === undefined ?
+	return state.editor.present.edits.excerpt === undefined ?
 		state.currentPost.excerpt :
-		state.editor.edits.excerpt;
+		state.editor.present.edits.excerpt;
 }
 
 /**
@@ -422,7 +422,7 @@ export function getEditedPostPreviewLink( state ) {
  */
 export const getBlock = createSelector(
 	( state, uid ) => {
-		const block = state.editor.blocksByUid[ uid ];
+		const block = state.editor.present.blocksByUid[ uid ];
 		if ( ! block ) {
 			return null;
 		}
@@ -475,11 +475,11 @@ function getPostMeta( state, key ) {
  */
 export const getBlocks = createSelector(
 	( state ) => {
-		return state.editor.blockOrder.map( ( uid ) => getBlock( state, uid ) );
+		return state.editor.present.blockOrder.map( ( uid ) => getBlock( state, uid ) );
 	},
 	( state ) => [
-		state.editor.blockOrder,
-		state.editor.blocksByUid,
+		state.editor.present.blockOrder,
+		state.editor.present.blocksByUid,
 	]
 );
 
@@ -533,7 +533,7 @@ export function getSelectedBlock( state ) {
  */
 export const getMultiSelectedBlockUids = createSelector(
 	( state ) => {
-		const { blockOrder } = state.editor;
+		const { blockOrder } = state.editor.present;
 		const { start, end } = state.blockSelection;
 		if ( start === end ) {
 			return [];
@@ -549,7 +549,7 @@ export const getMultiSelectedBlockUids = createSelector(
 		return blockOrder.slice( startIndex, endIndex + 1 );
 	},
 	( state ) => [
-		state.editor.blockOrder,
+		state.editor.present.blockOrder,
 		state.blockSelection.start,
 		state.blockSelection.end,
 	],
@@ -565,11 +565,11 @@ export const getMultiSelectedBlockUids = createSelector(
 export const getMultiSelectedBlocks = createSelector(
 	( state ) => getMultiSelectedBlockUids( state ).map( ( uid ) => getBlock( state, uid ) ),
 	( state ) => [
-		state.editor.blockOrder,
+		state.editor.present.blockOrder,
 		state.blockSelection.start,
 		state.blockSelection.end,
-		state.editor.blocksByUid,
-		state.editor.edits.meta,
+		state.editor.present.blocksByUid,
+		state.editor.present.edits.meta,
 		state.currentPost.meta,
 	]
 );
@@ -665,7 +665,7 @@ export function getMultiSelectedBlocksEndUid( state ) {
  * @return {Array}        Ordered unique IDs of post blocks
  */
 export function getBlockUids( state ) {
-	return state.editor.blockOrder;
+	return state.editor.present.blockOrder;
 }
 
 /**
@@ -677,7 +677,7 @@ export function getBlockUids( state ) {
  * @return {Number}       Index at which block exists in order
  */
 export function getBlockIndex( state, uid ) {
-	return state.editor.blockOrder.indexOf( uid );
+	return state.editor.present.blockOrder.indexOf( uid );
 }
 
 /**
@@ -689,7 +689,7 @@ export function getBlockIndex( state, uid ) {
  * @return {Boolean}       Whether block is first in post
  */
 export function isFirstBlock( state, uid ) {
-	return first( state.editor.blockOrder ) === uid;
+	return first( state.editor.present.blockOrder ) === uid;
 }
 
 /**
@@ -701,7 +701,7 @@ export function isFirstBlock( state, uid ) {
  * @return {Boolean}       Whether block is last in post
  */
 export function isLastBlock( state, uid ) {
-	return last( state.editor.blockOrder ) === uid;
+	return last( state.editor.present.blockOrder ) === uid;
 }
 
 /**
@@ -714,7 +714,7 @@ export function isLastBlock( state, uid ) {
  */
 export function getPreviousBlock( state, uid ) {
 	const order = getBlockIndex( state, uid );
-	return state.editor.blocksByUid[ state.editor.blockOrder[ order - 1 ] ] || null;
+	return state.editor.present.blocksByUid[ state.editor.present.blockOrder[ order - 1 ] ] || null;
 }
 
 /**
@@ -727,7 +727,7 @@ export function getPreviousBlock( state, uid ) {
  */
 export function getNextBlock( state, uid ) {
 	const order = getBlockIndex( state, uid );
-	return state.editor.blocksByUid[ state.editor.blockOrder[ order + 1 ] ] || null;
+	return state.editor.present.blocksByUid[ state.editor.present.blockOrder[ order + 1 ] ] || null;
 }
 
 /**
@@ -818,7 +818,7 @@ export function isTyping( state ) {
  */
 export function getBlockInsertionPoint( state ) {
 	if ( getEditorMode( state ) !== 'visual' ) {
-		return state.editor.blockOrder.length;
+		return state.editor.present.blockOrder.length;
 	}
 
 	const position = getBlockSiblingInserterPosition( state );
@@ -836,7 +836,7 @@ export function getBlockInsertionPoint( state ) {
 		return getBlockIndex( state, selectedBlock.uid ) + 1;
 	}
 
-	return state.editor.blockOrder.length;
+	return state.editor.present.blockOrder.length;
 }
 
 /**
@@ -906,20 +906,20 @@ export function didPostSaveRequestFail( state ) {
  * @return {?String}       Suggested post format
  */
 export function getSuggestedPostFormat( state ) {
-	const blocks = state.editor.blockOrder;
+	const blocks = state.editor.present.blockOrder;
 
 	let name;
 	// If there is only one block in the content of the post grab its name
 	// so we can derive a suitable post format from it.
 	if ( blocks.length === 1 ) {
-		name = state.editor.blocksByUid[ blocks[ 0 ] ].name;
+		name = state.editor.present.blocksByUid[ blocks[ 0 ] ].name;
 	}
 
 	// If there are two blocks in the content and the last one is a text blocks
 	// grab the name of the first one to also suggest a post format from it.
 	if ( blocks.length === 2 ) {
-		if ( state.editor.blocksByUid[ blocks[ 1 ] ].name === 'core/paragraph' ) {
-			name = state.editor.blocksByUid[ blocks[ 0 ] ].name;
+		if ( state.editor.present.blocksByUid[ blocks[ 1 ] ].name === 'core/paragraph' ) {
+			name = state.editor.present.blocksByUid[ blocks[ 0 ] ].name;
 		}
 	}
 
@@ -962,9 +962,9 @@ export const getEditedPostContent = createSelector(
 		return serialize( getBlocks( state ) );
 	},
 	( state ) => [
-		state.editor.edits.content,
-		state.editor.blocksByUid,
-		state.editor.blockOrder,
+		state.editor.present.edits.content,
+		state.editor.present.blocksByUid,
+		state.editor.present.blockOrder,
 	],
 );
 
