@@ -12,7 +12,6 @@ import { flowRight } from 'lodash';
 import effects from './effects';
 import reducer from './reducer';
 import storePersist from './store-persist';
-import { middleware as saveStateMiddleware } from './state/save-state';
 
 /**
  * Module constants
@@ -26,7 +25,7 @@ const GUTENBERG_PREFERENCES_KEY = `GUTENBERG_PREFERENCES_${ window.userSettings.
  */
 function createReduxStore() {
 	const enhancers = [
-		applyMiddleware( multi, refx( effects ), saveStateMiddleware ),
+		applyMiddleware( multi, refx( effects ) ),
 		storePersist( 'preferences', GUTENBERG_PREFERENCES_KEY ),
 	];
 

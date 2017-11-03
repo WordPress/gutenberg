@@ -465,7 +465,7 @@ describe( 'selectors', () => {
 
 		it( 'should return true when post saved state dirty', () => {
 			const state = {
-				saveState: {
+				editor: {
 					isDirty: true,
 				},
 				metaBoxes,
@@ -476,7 +476,7 @@ describe( 'selectors', () => {
 
 		it( 'should return false when post saved state not dirty', () => {
 			const state = {
-				saveState: {
+				editor: {
 					isDirty: false,
 				},
 				metaBoxes,
@@ -487,7 +487,7 @@ describe( 'selectors', () => {
 
 		it( 'should return true when post saved state not dirty, but meta box state has changed.', () => {
 			const state = {
-				saveState: {
+				editor: {
 					isDirty: false,
 				},
 				metaBoxes: dirtyMetaBoxes,
@@ -502,7 +502,7 @@ describe( 'selectors', () => {
 
 		it( 'should return true when the post is not dirty and has not been saved before', () => {
 			const state = {
-				saveState: {
+				editor: {
 					isDirty: false,
 				},
 				currentPost: {
@@ -517,7 +517,7 @@ describe( 'selectors', () => {
 
 		it( 'should return false when the post is not dirty but the post has been saved', () => {
 			const state = {
-				saveState: {
+				editor: {
 					isDirty: false,
 				},
 				currentPost: {
@@ -532,7 +532,7 @@ describe( 'selectors', () => {
 
 		it( 'should return false when the post is dirty but the post has not been saved', () => {
 			const state = {
-				saveState: {
+				editor: {
 					isDirty: true,
 				},
 				currentPost: {
@@ -680,9 +680,6 @@ describe( 'selectors', () => {
 		const metaBoxes = { isDirty: false, isUpdating: false };
 		it( 'should return current title unedited existing post', () => {
 			const state = {
-				saveState: {
-					isDirty: false,
-				},
 				currentPost: {
 					id: 123,
 					title: 'The Title',
@@ -693,6 +690,7 @@ describe( 'selectors', () => {
 						blocksByUid: {},
 						blockOrder: [],
 					},
+					isDirty: false,
 				},
 				metaBoxes,
 			};
@@ -721,9 +719,6 @@ describe( 'selectors', () => {
 
 		it( 'should return new post title when new post is clean', () => {
 			const state = {
-				saveState: {
-					isDirty: false,
-				},
 				currentPost: {
 					id: 1,
 					status: 'auto-draft',
@@ -735,6 +730,7 @@ describe( 'selectors', () => {
 						blocksByUid: {},
 						blockOrder: [],
 					},
+					isDirty: false,
 				},
 				metaBoxes,
 			};
@@ -744,9 +740,6 @@ describe( 'selectors', () => {
 
 		it( 'should return untitled title', () => {
 			const state = {
-				saveState: {
-					isDirty: true,
-				},
 				currentPost: {
 					id: 123,
 					status: 'draft',
@@ -758,6 +751,7 @@ describe( 'selectors', () => {
 						blocksByUid: {},
 						blockOrder: [],
 					},
+					isDirty: true,
 				},
 				metaBoxes,
 			};
@@ -913,7 +907,7 @@ describe( 'selectors', () => {
 
 		it( 'should return true for pending posts', () => {
 			const state = {
-				saveState: {
+				editor: {
 					isDirty: false,
 				},
 				currentPost: {
@@ -927,7 +921,7 @@ describe( 'selectors', () => {
 
 		it( 'should return true for draft posts', () => {
 			const state = {
-				saveState: {
+				editor: {
 					isDirty: false,
 				},
 				currentPost: {
@@ -941,7 +935,7 @@ describe( 'selectors', () => {
 
 		it( 'should return false for published posts', () => {
 			const state = {
-				saveState: {
+				editor: {
 					isDirty: false,
 				},
 				currentPost: {
@@ -955,7 +949,7 @@ describe( 'selectors', () => {
 
 		it( 'should return true for published, dirty posts', () => {
 			const state = {
-				saveState: {
+				editor: {
 					isDirty: true,
 				},
 				currentPost: {
@@ -969,7 +963,7 @@ describe( 'selectors', () => {
 
 		it( 'should return false for private posts', () => {
 			const state = {
-				saveState: {
+				editor: {
 					isDirty: false,
 				},
 				currentPost: {
@@ -983,7 +977,7 @@ describe( 'selectors', () => {
 
 		it( 'should return false for scheduled posts', () => {
 			const state = {
-				saveState: {
+				editor: {
 					isDirty: false,
 				},
 				currentPost: {
@@ -997,14 +991,11 @@ describe( 'selectors', () => {
 
 		it( 'should return true for dirty posts with usable title', () => {
 			const state = {
-				saveState: {
-					isDirty: true,
-				},
 				currentPost: {
 					status: 'private',
 				},
 				editor: {
-					edits: { title: 'Dirty' },
+					isDirty: true,
 				},
 				metaBoxes,
 			};

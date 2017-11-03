@@ -56,12 +56,15 @@ describe( 'state', () => {
 			unregisterBlockType( 'core/test-block' );
 		} );
 
-		it( 'should return empty edits, blocksByUid, blockOrder by default', () => {
+		it( 'should return history (empty edits, blocksByUid, blockOrder), dirty flag by default', () => {
 			const state = editor( undefined, {} );
 
+			expect( state.past ).toEqual( [] );
+			expect( state.future ).toEqual( [] );
 			expect( state.present.edits ).toEqual( {} );
 			expect( state.present.blocksByUid ).toEqual( {} );
 			expect( state.present.blockOrder ).toEqual( [] );
+			expect( state.isDirty ).toBe( false );
 		} );
 
 		it( 'should key by replaced blocks uid', () => {

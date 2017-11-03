@@ -180,7 +180,7 @@ export function isEditedPostNew( state ) {
  * @return {Boolean}       Whether unsaved values exist
  */
 export function isEditedPostDirty( state ) {
-	return state.saveState.isDirty || isMetaBoxStateDirty( state );
+	return state.editor.isDirty || isMetaBoxStateDirty( state );
 }
 
 /**
@@ -453,15 +453,15 @@ export const getBlock = createSelector(
 		};
 	},
 	( state, uid ) => [
-		get( state, [ 'editor', 'blocksByUid', uid ] ),
-		get( state, 'editor.edits.meta' ),
+		get( state, [ 'editor', 'present', 'blocksByUid', uid ] ),
+		get( state, [ 'editor', 'present', 'edits', 'meta' ] ),
 		get( state, 'currentPost.meta' ),
 	]
 );
 
 function getPostMeta( state, key ) {
-	return has( state, [ 'editor', 'edits', 'meta', key ] ) ?
-		get( state, [ 'editor', 'edits', 'meta', key ] ) :
+	return has( state, [ 'editor', 'edits', 'present', 'meta', key ] ) ?
+		get( state, [ 'editor', 'edits', 'present', 'meta', key ] ) :
 		get( state, [ 'currentPost', 'meta', key ] );
 }
 
