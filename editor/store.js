@@ -10,6 +10,7 @@ import { flowRight } from 'lodash';
  * Internal dependencies
  */
 import effects from './effects';
+import { mobileMiddleware } from './utils/mobile';
 import reducer from './reducer';
 import storePersist from './store-persist';
 import { PREFERENCES_DEFAULTS } from './store-defaults';
@@ -33,6 +34,7 @@ function createReduxStore( preloadedState ) {
 			storageKey: GUTENBERG_PREFERENCES_KEY,
 			defaults: PREFERENCES_DEFAULTS,
 		} ),
+		applyMiddleware( mobileMiddleware ),
 	];
 
 	if ( window.__REDUX_DEVTOOLS_EXTENSION__ ) {
