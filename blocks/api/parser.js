@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { parse as hpqParse } from 'hpq';
-import { mapValues } from 'lodash';
+import { mapValues, find } from 'lodash';
 
 /**
  * Internal dependencies
@@ -10,8 +10,8 @@ import { mapValues } from 'lodash';
 import { parse as grammarParse } from './post.pegjs';
 import { getBlockType, getUnknownTypeHandlerName } from './registration';
 import { createBlock } from './factory';
-import { isValidBlock } from './validation';
-import { getCommentDelimitedContent } from './serializer';
+import { isEquivalentHTML } from './validation';
+import { getCommentDelimitedContent, getSaveContent } from './serializer';
 import { attr, prop, html, text, query, node, children } from './matchers';
 
 /**
@@ -114,15 +114,15 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
 }
 
 /**
- * Returns the block attributes of a registered block node given its type.
+ * Returns the block attributes given its attributes schema
  *
- * @param  {?Object} blockType  Block type
+ * @param  {?Object} schema     Block attributes schema
  * @param  {string}  innerHTML  Raw block content
  * @param  {?Object} attributes Known block attributes (from delimiters)
  * @return {Object}             All block attributes
  */
-export function getBlockAttributes( blockType, innerHTML, attributes ) {
-	const blockAttributes = mapValues( blockType.attributes, ( attributeSchema, attributeKey ) => {
+export function getBlockAttributes( schema, innerHTML, attributes ) {
+	const blockAttributes = mapValues( schema, ( attributeSchema, attributeKey ) => {
 		return getBlockAttribute( attributeKey, attributeSchema, innerHTML, attributes );
 	} );
 
@@ -135,54 +135,87 @@ export function getBlockAttributes( blockType, innerHTML, attributes ) {
  * @param  {?String} name       Block type name
  * @param  {String}  innerHTML  Raw block content
  * @param  {?Object} attributes Attributes obtained from block delimiters
+ * @param  {?Number} version    The block version
  * @return {?Object}            An initialized block object (if possible)
  */
-export function createBlockWithFallback( name, innerHTML, attributes ) {
-	// Use type from block content, otherwise find unknown handler.
-	name = name || getUnknownTypeHandlerName();
+export function createBlockWithFallback( name, innerHTML, attributes, version ) {
+	let originalContent = innerHTML; // originalContent before parsing
+	let contentToValidate; // Content serialized after parsing or after migration from old block
+	let parsedAttributes; // Parsed block attributes or migrated to
 
 	// Convert 'core/text' blocks in existing content to the new
 	// 'core/paragraph'.
 	if ( 'core/text' === name || 'core/cover-text' === name ) {
 		name = 'core/paragraph';
 	}
+	let shouldFallback = false;
 
-	// Try finding type for known block name, else fall back again.
-	let blockType = getBlockType( name );
-	const fallbackBlock = getUnknownTypeHandlerName();
-	if ( ! blockType ) {
-		// If detected as a block which is not registered, preserve comment
-		// delimiters in content of unknown type handler.
-		if ( name ) {
-			innerHTML = getCommentDelimitedContent( name, attributes, innerHTML );
+	// Checking The BlockType
+	const blockType = getBlockType( name );
+	const fallbackBlockName = getUnknownTypeHandlerName();
+	if ( blockType ) {
+		const blockTypeVersion = blockType.version || 1;
+		if ( blockTypeVersion !== version ) {
+			const migration = find( blockType.migrations, ( mig ) => mig.version === version );
+			if ( ! migration ) {
+				shouldFallback = true;
+			} else {
+				// Needs to pass the migration.attributes instead to do the parsing
+				const oldAttributes = getBlockAttributes( migration.attributes, innerHTML, attributes );
+
+				// Serialize using the old save
+				contentToValidate = getSaveContent( {
+					...blockType,
+					attributes: migration.attributes,
+					save: migration.save,
+				}, oldAttributes );
+
+				// Migrate the old attributes
+				parsedAttributes = migration.migrate( oldAttributes );
+			}
+		} else {
+			parsedAttributes = getBlockAttributes( blockType.attributes, innerHTML, attributes );
+			contentToValidate = getSaveContent( blockType, parsedAttributes );
+		}
+	} else {
+		shouldFallback = true;
+	}
+
+	// Fallback to the fallback block type
+	if ( shouldFallback ) {
+		// Explicit empty fallback blocks are ignored
+		if ( ! name && ! innerHTML ) {
+			return;
 		}
 
-		name = fallbackBlock;
-		blockType = getBlockType( name );
+		const fallbackBlockType = getBlockType( fallbackBlockName );
+		if ( ! fallbackBlockType ) {
+			// eslint-disable-next-line no-console
+			console.warn( `Block ${ name } ignored, no fallback block` );
+			return;
+		}
+
+		if ( name ) {
+			originalContent = getCommentDelimitedContent( name, attributes, innerHTML, version );
+		}
+
+		name = fallbackBlockName;
+		parsedAttributes = getBlockAttributes( fallbackBlockType.attributes, originalContent, attributes );
+		contentToValidate = getSaveContent( fallbackBlockType, parsedAttributes );
 	}
 
-	// Include in set only if type were determined.
-	// TODO do we ever expect there to not be an unknown type handler?
-	if ( blockType && ( innerHTML || name !== fallbackBlock ) ) {
-		// TODO allow blocks to opt-in to receiving a tree instead of a string.
-		// Gradually convert all blocks to this new format, then remove the
-		// string serialization.
-		const block = createBlock(
-			name,
-			getBlockAttributes( blockType, innerHTML, attributes )
-		);
+	const block = createBlock(
+		name,
+		parsedAttributes
+	);
 
-		// Validate that the parsed block is valid, meaning that if we were to
-		// reserialize it given the assumed attributes, the markup matches the
-		// original value.
-		block.isValid = isValidBlock( innerHTML, blockType, block.attributes );
+	block.isValid = isEquivalentHTML( originalContent, contentToValidate );
 
-		// Preserve original content for future use in case the block is parsed
-		// as invalid, or future serialization attempt results in an error
-		block.originalContent = innerHTML;
+	// Preserve original content for future use in case the block is parsed
+	// as invalid, or future serialization attempt results in an error
+	block.originalContent = originalContent;
 
-		return block;
-	}
+	return block;
 }
 
 /**
@@ -193,8 +226,9 @@ export function createBlockWithFallback( name, innerHTML, attributes ) {
  */
 export function parseWithGrammar( content ) {
 	return grammarParse( content ).reduce( ( memo, blockNode ) => {
-		const { blockName, innerHTML, attrs } = blockNode;
-		const block = createBlockWithFallback( blockName, innerHTML.trim(), attrs );
+		const { blockName, innerHTML, attrs, version } = blockNode;
+		const block = createBlockWithFallback( blockName, innerHTML.trim(), attrs, version );
+
 		if ( block ) {
 			memo.push( block );
 		}

@@ -1,5 +1,6 @@
 [
     {
+        "version": 1,
         "blockName": "core-embed/vimeo",
         "attrs": {
             "url": "https://vimeo.com/"

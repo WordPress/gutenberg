@@ -1,5 +1,6 @@
 [
     {
+        "version": 1,
         "blockName": "core/text",
         "attrs": null,
         "innerBlocks": [],

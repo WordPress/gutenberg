@@ -1,5 +1,6 @@
 [
     {
+        "version": 1,
         "blockName": "core-embed/dailymotion",
         "attrs": {
             "url": "https://dailymotion.com/"

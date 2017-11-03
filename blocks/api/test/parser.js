@@ -129,33 +129,31 @@ describe( 'block parser', () => {
 
 	describe( 'getBlockAttributes()', () => {
 		it( 'should merge attributes with the parsed and default attributes', () => {
-			const blockType = {
-				attributes: {
-					content: {
-						type: 'string',
-						source: 'text',
-						selector: 'div',
-					},
-					number: {
-						type: 'number',
-						source: 'attribute',
-						attribute: 'data-number',
-						selector: 'div',
-					},
-					align: {
-						type: 'string',
-					},
-					topic: {
-						type: 'string',
-						default: 'none',
-					},
+			const schema = {
+				content: {
+					type: 'string',
+					source: 'text',
+					selector: 'div',
+				},
+				number: {
+					type: 'number',
+					source: 'attribute',
+					attribute: 'data-number',
+					selector: 'div',
+				},
+				align: {
+					type: 'string',
+				},
+				topic: {
+					type: 'string',
+					default: 'none',
 				},
 			};
 
 			const innerHTML = '<div data-number="10">Ribs</div>';
 			const attrs = { align: 'left', invalid: true };
 
-			expect( getBlockAttributes( blockType, innerHTML, attrs ) ).toEqual( {
+			expect( getBlockAttributes( schema, innerHTML, attrs ) ).toEqual( {
 				content: 'Ribs',
 				number: 10,
 				align: 'left',
@@ -171,7 +169,8 @@ describe( 'block parser', () => {
 			const block = createBlockWithFallback(
 				'core/test-block',
 				'Bananas',
-				{ fruit: 'Bananas' }
+				{ fruit: 'Bananas' },
+				1
 			);
 			expect( block.name ).toEqual( 'core/test-block' );
 			expect( block.attributes ).toEqual( { fruit: 'Bananas' } );
@@ -180,7 +179,7 @@ describe( 'block parser', () => {
 		it( 'should create the requested block with no attributes if it exists', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
-			const block = createBlockWithFallback( 'core/test-block', '' );
+			const block = createBlockWithFallback( 'core/test-block', '', {}, 1 );
 			expect( block.name ).toEqual( 'core/test-block' );
 			expect( block.attributes ).toEqual( {} );
 		} );
@@ -209,6 +208,10 @@ describe( 'block parser', () => {
 
 		it( 'should not create a block if no unknown type handler', () => {
 			const block = createBlockWithFallback( 'core/test-block', '' );
+			/* eslint-disable no-console */
+			expect( console.warn ).toHaveBeenCalled();
+			console.warn.mockClear();
+			/* eslint-enable no-console */
 			expect( block ).toBeUndefined();
 		} );
 	} );
@@ -278,6 +281,10 @@ describe( 'block parser', () => {
 				content: 'Ribs',
 			} );
 			expect( typeof parsed[ 0 ].uid ).toBe( 'string' );
+			/* eslint-disable no-console */
+			expect( console.warn ).toHaveBeenCalled();
+			console.warn.mockClear();
+			/* eslint-enable no-console */
 		} );
 
 		it( 'should add the core namespace to un-namespaced blocks', () => {
@@ -303,6 +310,10 @@ describe( 'block parser', () => {
 			);
 			expect( parsed ).toHaveLength( 1 );
 			expect( parsed[ 0 ].name ).toBe( 'core/test-block' );
+			/* eslint-disable no-console */
+			expect( console.warn ).toHaveBeenCalled();
+			console.warn.mockClear();
+			/* eslint-enable no-console */
 		} );
 
 		it( 'should parse the post content, using unknown block handler', () => {

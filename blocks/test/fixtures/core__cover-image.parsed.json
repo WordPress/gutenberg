@@ -1,5 +1,6 @@
 [
     {
+        "version": 1,
         "blockName": "core/cover-image",
         "attrs": {
             "url": "https://cldup.com/uuUqE_dXzy.jpg",

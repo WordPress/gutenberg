@@ -1,5 +1,6 @@
 [
     {
+        "version": 1,
         "blockName": "core/table",
         "attrs": null,
         "innerBlocks": [],

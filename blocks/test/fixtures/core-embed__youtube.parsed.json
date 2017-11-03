@@ -1,5 +1,6 @@
 [
     {
+        "version": 1,
         "blockName": "core-embed/youtube",
         "attrs": {
             "url": "https://youtube.com/"

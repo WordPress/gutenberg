@@ -1,5 +1,6 @@
 [
     {
+        "version": 1,
         "blockName": "core/separator",
         "attrs": null,
         "innerBlocks": [],

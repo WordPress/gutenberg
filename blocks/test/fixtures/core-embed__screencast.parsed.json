@@ -1,5 +1,6 @@
 [
     {
+        "version": 1,
         "blockName": "core-embed/screencast",
         "attrs": {
             "url": "https://screencast.com/"

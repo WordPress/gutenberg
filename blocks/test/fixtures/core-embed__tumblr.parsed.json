@@ -1,5 +1,6 @@
 [
     {
+        "version": 1,
         "blockName": "core-embed/tumblr",
         "attrs": {
             "url": "https://tumblr.com/"

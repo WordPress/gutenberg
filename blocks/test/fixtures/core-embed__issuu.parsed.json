@@ -1,5 +1,6 @@
 [
     {
+        "version": 1,
         "blockName": "core-embed/issuu",
         "attrs": {
             "url": "https://issuu.com/"

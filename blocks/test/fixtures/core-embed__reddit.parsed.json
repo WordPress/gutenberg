@@ -1,5 +1,6 @@
 [
     {
+        "version": 1,
         "blockName": "core-embed/reddit",
         "attrs": {
             "url": "https://reddit.com/"

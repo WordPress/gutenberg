@@ -1,5 +1,6 @@
 [
     {
+        "version": 1,
         "blockName": "core-embed/scribd",
         "attrs": {
             "url": "https://scribd.com/"

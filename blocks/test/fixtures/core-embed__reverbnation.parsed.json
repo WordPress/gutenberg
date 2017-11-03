@@ -1,5 +1,6 @@
 [
     {
+        "version": 1,
         "blockName": "core-embed/reverbnation",
         "attrs": {
             "url": "https://reverbnation.com/"
