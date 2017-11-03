@@ -152,7 +152,7 @@ describe( 'Editable', () => {
 	} );
 
 	describe( 'Editable.Value', () => {
-		const Component = ( { value } ) => (
+		const MyComponent = ( { value } ) => (
 			<div>
 				<Editable.Value value={ value } />
 			</div>
@@ -160,18 +160,18 @@ describe( 'Editable', () => {
 
 		it( 'should render value containing string', () => {
 			const value = [ 'Hello, Dolly!' ];
-			const wrapper = shallow( <Component value={ value } /> );
+			const wrapper = shallow( <MyComponent value={ value } /> );
 
 			expect( wrapper.html() ).toBe( '<div>Hello, Dolly!</div>' );
 		} );
 
 		it( 'should render value containing a single DOM node', () => {
 			const value = [
-				[ 'h1', {}, 'This is a header' ],
+				[ 'h1', { class: 'my-class' }, 'This is a header' ],
 			];
-			const wrapper = shallow( <Component value={ value } /> );
+			const wrapper = shallow( <MyComponent value={ value } /> );
 
-			expect( wrapper.html() ).toBe( '<div><h1>This is a header</h1></div>' );
+			expect( wrapper.html() ).toBe( '<div><h1 class="my-class">This is a header</h1></div>' );
 		} );
 
 		it( 'should render value with deeply nested DOM nodes', () => {
@@ -186,7 +186,7 @@ describe( 'Editable', () => {
 				] ],
 				'.',
 			];
-			const wrapper = shallow( <Component value={ value } /> );
+			const wrapper = shallow( <MyComponent value={ value } /> );
 
 			expect( wrapper.html() ).toBe(
 				'<div>This is a <strong>paragraph</strong> with a <a href=\"https://w.org/\">link with <b>bold <i>and italics</i></b></a>.</div>'

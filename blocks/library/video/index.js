@@ -144,7 +144,7 @@ registerBlockType( 'core/video', {
 		return (
 			<figure className={ align ? `align${ align }` : null }>
 				{ src && <video controls src={ src } /> }
-				<Editable.Value tagName="figcaption" value={ caption } />
+				{ caption && caption.length > 0 && <figcaption><Editable.Value value={ caption } /></figcaption> }
 			</figure>
 		);
 	},

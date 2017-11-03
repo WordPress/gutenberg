@@ -361,12 +361,8 @@ registerBlockType( 'core/list', {
 
 	save( { attributes } ) {
 		const { nodeName, values } = attributes;
+		const Tag = nodeName.toLowerCase();
 
-		return (
-			<Editable.Value
-				tagName={ nodeName.toLowerCase() }
-				value={ values }
-			/>
-		);
+		return <Tag><Editable.Value value={ values } /></Tag>;
 	},
 } );

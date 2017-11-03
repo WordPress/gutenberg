@@ -227,10 +227,10 @@ registerBlockType( 'core/quote', {
 				className={ style === 2 ? 'is-large' : '' }
 				style={ { textAlign: align ? align : null } }
 			>
-				{ value.map( ( [ tagName, , content ], i ) =>
-					<Editable.Value tagName={ tagName } value={ content } key={ i } />
+				<Editable.Value value={ value } />
+				{ citation && citation.length > 0 && (
+					<cite><Editable.Value value={ citation } /></cite>
 				) }
-				<Editable.Value tagName="cite" value={ citation } />
 			</blockquote>
 		);
 	},

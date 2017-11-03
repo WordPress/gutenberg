@@ -177,7 +177,7 @@ registerBlockType( 'core/audio', {
 		return (
 			<figure className={ align ? `align${ align }` : null }>
 				<audio controls="controls" src={ src } />
-				<Editable.Value tagName="figcaption" value={ caption } />
+				{ caption && caption.length > 0 && <figcaption><Editable.Value value={ caption } /></figcaption> }
 			</figure>
 		);
 	},

@@ -29,7 +29,7 @@ import { Slot, Fill } from '@wordpress/components';
 import './style.scss';
 import { rawHandler } from '../api';
 import * as matchers from '../api/matchers';
-import { applySimpleNodeList, createHTMLFromSimpleNodeList } from '../api/simple-dom';
+import { applySimpleNodeList } from '../api/simple-dom';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
 import { pickAriaProps } from './aria';
@@ -82,7 +82,7 @@ const DEFAULT_FORMATS = [ 'bold', 'italic', 'strikethrough', 'link' ];
  * @param {Array} value Value to transform
  * @return {WPElement} Element.
  */
-export function valueToElement( value ) {
+function valueToElement( value ) {
 	if ( ! Array.isArray( value ) ) {
 		return value;
 	}
@@ -93,8 +93,19 @@ export function valueToElement( value ) {
 		}
 
 		const [ type, props, ...children ] = element;
+		const reactProps = Object.keys( props ).reduce( ( accumulator, key ) => {
+			const mapping = {
+				class: 'className',
+				for: 'htmlFor',
+			};
 
-		return createElement( type, { ...props, key: i }, ...valueToElement( children ) );
+			return {
+				...accumulator,
+				[ mapping[ key ] ? mapping[ key ] : key ]: props[ key ],
+			};
+		}, { key: i } );
+
+		return createElement( type, { ...reactProps }, ...valueToElement( children ) );
 	} );
 }
 
@@ -871,7 +882,7 @@ export default class Editable extends Component {
 					getSettings={ this.getSettings }
 					onSetup={ this.onSetup }
 					style={ style }
-					defaultValue={ createHTMLFromSimpleNodeList( value ) }
+					defaultValue={ valueToElement( value ) }
 					isPlaceholderVisible={ isPlaceholderVisible }
 					aria-label={ placeholder }
 					{ ...ariaProps }
@@ -901,10 +912,4 @@ Editable.defaultProps = {
 	formatters: [],
 };
 
-Editable.Value = ( { tagName: TagName = 'div', value = [], ...props } ) => {
-	const HTML = createHTMLFromSimpleNodeList( value );
-
-	return (
-		<TagName dangerouslySetInnerHTML={ { __html: HTML } } { ...props } />
-	);
-};
+Editable.Value = ( { value } ) => valueToElement( value );

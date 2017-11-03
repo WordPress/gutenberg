@@ -107,13 +107,10 @@ registerBlockType( 'core/table', {
 
 	save( { attributes } ) {
 		const { content, align } = attributes;
-
 		return (
-			<Editable.Value
-				tagName="table"
-				value={ content }
-				className={ align ? `align${ align }` : null }
-			/>
+			<table className={ align ? `align${ align }` : null }>
+				<Editable.Value value={ content } />
+			</table>
 		);
 	},
 } );

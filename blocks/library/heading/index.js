@@ -169,13 +169,12 @@ registerBlockType( 'core/heading', {
 
 	save( { attributes } ) {
 		const { align, nodeName, content } = attributes;
+		const Tag = nodeName.toLowerCase();
 
 		return (
-			<Editable.Value
-				tagName={ nodeName.toLowerCase() }
-				value={ content }
-				style={ { textAlign: align } }
-			/>
+			<Tag style={ { textAlign: align } } >
+				<Editable.Value value={ content } />
+			</Tag>
 		);
 	},
 } );
