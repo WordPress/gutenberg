@@ -156,6 +156,9 @@ function gutenberg_meta_box_partial_page_admin_header( $hook_suffix, $current_sc
 	<html class="gutenberg-meta-box-html">
 	<head>
 	<?php
+	// Grab the admin body class.
+	$admin_body_class = preg_replace( '/[^a-z0-9_-]+/i', '-', $hook_suffix );
+
 	/**
 	 * The main way post.php sets body class.
 	 */
