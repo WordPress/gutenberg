@@ -17,7 +17,7 @@ import { Spinner } from '@wordpress/components';
  */
 import './style.scss';
 import './meta-box-area.scss';
-import { handleMetaBoxReload, metaBoxStateChanged } from '../../actions';
+import { handleMetaBoxReload, metaBoxStateChanged, metaBoxLoaded } from '../../actions';
 import { getMetaBox, isSavingPost } from '../../selectors';
 
 function insertAndRunScripts( element, html ) {
@@ -115,6 +115,8 @@ class MetaBoxesArea extends Component {
 				this.setState( { loading: false } );
 				if ( ! initial ) {
 					this.props.metaBoxReloaded( this.props.location );
+				} else {
+					this.props.metaBoxLoaded( this.props.location );
 				}
 			} );
 	}
@@ -177,6 +179,7 @@ function mapDispatchToProps( dispatch ) {
 		// Used to set the reference to the MetaBox in redux, fired when the component mounts.
 		metaBoxReloaded: ( location ) => dispatch( handleMetaBoxReload( location ) ),
 		changedMetaBoxState: ( location, hasChanged ) => dispatch( metaBoxStateChanged( location, hasChanged ) ),
+		metaBoxLoaded: ( location ) => dispatch( metaBoxLoaded( location ) ),
 	};
 }
 
