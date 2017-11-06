@@ -20,39 +20,6 @@ import './meta-box-area.scss';
 import { handleMetaBoxReload, metaBoxStateChanged, metaBoxLoaded } from '../../actions';
 import { getMetaBox, isSavingPost } from '../../selectors';
 
-function insertAndRunScripts( element, html ) {
-	element.innerHTML = html;
-	const scripts = [];
-	const ret = element.childNodes;
-	for ( let i = 0; ret[ i ]; i++ ) {
-		if ( scripts && nodeName( ret[ i ], 'script' ) && ( ! ret[ i ].type || ret[ i ].type.toLowerCase() === 'text/javascript' ) ) {
-			scripts.push( ret[ i ].parentNode ? ret[ i ].parentNode.removeChild( ret[ i ] ) : ret[ i ] );
-		}
-	}
-
-	for ( const script in scripts ) {
-		evalScript( scripts[ script ] );
-	}
-}
-
-function nodeName( elem, name ) {
-	return elem.nodeName && elem.nodeName.toUpperCase() === name.toUpperCase();
-}
-
-function evalScript( elem ) {
-	const data = ( elem.text || elem.textContent || elem.innerHTML || '' );
-	const head = document.getElementsByTagName( 'head' )[ 0 ] || document.documentElement,
-		script = document.createElement( 'script' );
-	script.type = 'text/javascript';
-	script.appendChild( document.createTextNode( data ) );
-	head.insertBefore( script, head.firstChild );
-	head.removeChild( script );
-
-	if ( elem.parentNode ) {
-		elem.parentNode.removeChild( elem );
-	}
-}
-
 class MetaBoxesArea extends Component {
 	constructor() {
 		super( ...arguments );
@@ -106,7 +73,7 @@ class MetaBoxesArea extends Component {
 				if ( ! this.mounted ) {
 					return;
 				}
-				insertAndRunScripts( this.node, body );
+				jQuery( this.node ).html( body );
 				this.form = this.node.querySelector( '.meta-box-form' );
 				this.form.onSubmit = ( event ) => event.preventDefault();
 				this.originalFormData = this.getFormData();
