@@ -12,7 +12,7 @@ import { includes } from 'lodash';
  * @param  {?Array}   options.resetTypes Action types upon which to clear past
  * @return {Function}                    Enhanced reducer
  */
-export default function undoableReducer( reducer, options = {} ) {
+export default function withHistory( reducer, options = {} ) {
 	const initialState = {
 		past: [],
 		present: reducer( undefined, {} ),

@@ -13,7 +13,7 @@ import { includes } from 'lodash';
  * @param  {?Array}   options.resetTypes Action types upon which to reset dirty
  * @return {Function}                    Enhanced reducer
  */
-export default function dirtyingReducer( reducer, options = {} ) {
+export default function withChangeDetection( reducer, options = {} ) {
 	let originalState;
 
 	return ( state, action ) => {

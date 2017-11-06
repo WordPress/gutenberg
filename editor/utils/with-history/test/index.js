@@ -1,15 +1,15 @@
 /**
  * Internal dependencies
  */
-import undoableReducer from '../undoable-reducer';
+import withHistory from '../';
 
-describe( 'undoableReducer', () => {
+describe( 'withHistory', () => {
 	const counter = ( state = 0, { type } ) => (
 		type === 'INCREMENT' ? state + 1 : state
 	);
 
 	it( 'should return a new reducer', () => {
-		const reducer = undoableReducer( counter );
+		const reducer = withHistory( counter );
 
 		expect( typeof reducer ).toBe( 'function' );
 		expect( reducer( undefined, {} ) ).toEqual( {
@@ -20,7 +20,7 @@ describe( 'undoableReducer', () => {
 	} );
 
 	it( 'should track history', () => {
-		const reducer = undoableReducer( counter );
+		const reducer = withHistory( counter );
 
 		let state;
 		state = reducer( undefined, {} );
@@ -34,7 +34,7 @@ describe( 'undoableReducer', () => {
 	} );
 
 	it( 'should perform undo', () => {
-		const reducer = undoableReducer( counter );
+		const reducer = withHistory( counter );
 
 		let state;
 		state = reducer( undefined, {} );
@@ -49,7 +49,7 @@ describe( 'undoableReducer', () => {
 	} );
 
 	it( 'should not perform undo on empty past', () => {
-		const reducer = undoableReducer( counter );
+		const reducer = withHistory( counter );
 
 		let state;
 		state = reducer( undefined, {} );
@@ -64,7 +64,7 @@ describe( 'undoableReducer', () => {
 	} );
 
 	it( 'should perform redo', () => {
-		const reducer = undoableReducer( counter );
+		const reducer = withHistory( counter );
 
 		let state;
 		state = reducer( undefined, {} );
@@ -80,7 +80,7 @@ describe( 'undoableReducer', () => {
 	} );
 
 	it( 'should not perform redo on empty future', () => {
-		const reducer = undoableReducer( counter );
+		const reducer = withHistory( counter );
 
 		let state;
 		state = reducer( undefined, {} );
@@ -95,7 +95,7 @@ describe( 'undoableReducer', () => {
 	} );
 
 	it( 'should reset history by options.resetTypes', () => {
-		const reducer = undoableReducer( counter, { resetTypes: [ 'RESET_HISTORY' ] } );
+		const reducer = withHistory( counter, { resetTypes: [ 'RESET_HISTORY' ] } );
 
 		let state;
 		state = reducer( undefined, {} );
@@ -112,7 +112,7 @@ describe( 'undoableReducer', () => {
 	} );
 
 	it( 'should return same reference if state has not changed', () => {
-		const reducer = undoableReducer( counter );
+		const reducer = withHistory( counter );
 		const original = reducer( undefined, {} );
 		const state = reducer( original, {} );
 

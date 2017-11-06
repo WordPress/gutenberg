@@ -28,8 +28,8 @@ import { getBlockTypes, getBlockType } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import undoableReducer from './utils/undoable-reducer';
-import dirtyingReducer from './utils/dirtying-reducer';
+import withHistory from './utils/with-history';
+import withChangeDetection from './utils/with-change-detection';
 import { STORE_DEFAULTS } from './store-defaults';
 
 /***
@@ -70,11 +70,11 @@ export const editor = flow( [
 	combineReducers,
 
 	// Track undo history, starting at editor initialization.
-	partialRight( undoableReducer, { resetTypes: [ 'SETUP_EDITOR' ] } ),
+	partialRight( withHistory, { resetTypes: [ 'SETUP_EDITOR' ] } ),
 
 	// Track whether changes exist, starting at editor initialization and
 	// resetting at each post save.
-	partialRight( dirtyingReducer, { resetTypes: [ 'SETUP_EDITOR', 'RESET_POST' ] } ),
+	partialRight( withChangeDetection, { resetTypes: [ 'SETUP_EDITOR', 'RESET_POST' ] } ),
 ] )( {
 	edits( state = {}, action ) {
 		switch ( action.type ) {

@@ -6,9 +6,9 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import dirtyingReducer from '../';
+import withChangeDetection from '../';
 
-describe( 'dirtyingReducer()', () => {
+describe( 'withChangeDetection()', () => {
 	const initialState = { count: 0 };
 
 	function originalReducer( state = initialState, action ) {
@@ -27,7 +27,7 @@ describe( 'dirtyingReducer()', () => {
 	}
 
 	it( 'should respect original reducer behavior', () => {
-		const reducer = dirtyingReducer( originalReducer );
+		const reducer = withChangeDetection( originalReducer );
 
 		const state = reducer( undefined, {} );
 		expect( state ).toEqual( { count: 0, isDirty: false } );
@@ -38,7 +38,7 @@ describe( 'dirtyingReducer()', () => {
 	} );
 
 	it( 'should allow reset types as option', () => {
-		const reducer = dirtyingReducer( originalReducer, { resetTypes: [ 'RESET' ] } );
+		const reducer = withChangeDetection( originalReducer, { resetTypes: [ 'RESET' ] } );
 
 		let state;
 
@@ -53,7 +53,7 @@ describe( 'dirtyingReducer()', () => {
 	} );
 
 	it( 'should preserve isDirty into non-resetting non-reference-changing types', () => {
-		const reducer = dirtyingReducer( originalReducer, { resetTypes: [ 'RESET' ] } );
+		const reducer = withChangeDetection( originalReducer, { resetTypes: [ 'RESET' ] } );
 
 		let state;
 
@@ -68,7 +68,7 @@ describe( 'dirtyingReducer()', () => {
 	} );
 
 	it( 'should reset if state reverts to its original reference', () => {
-		const reducer = dirtyingReducer( originalReducer, { resetTypes: [ 'RESET' ] } );
+		const reducer = withChangeDetection( originalReducer, { resetTypes: [ 'RESET' ] } );
 
 		let state;
 
@@ -83,7 +83,7 @@ describe( 'dirtyingReducer()', () => {
 	} );
 
 	it( 'should flag as not dirty even if reset type causes reference change', () => {
-		const reducer = dirtyingReducer( originalReducer, { resetTypes: [ 'RESET_AND_CHANGE_REFERENCE' ] } );
+		const reducer = withChangeDetection( originalReducer, { resetTypes: [ 'RESET_AND_CHANGE_REFERENCE' ] } );
 
 		let state;
 
