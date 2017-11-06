@@ -1,6 +1,5 @@
 describe( 'Adding blocks', () => {
 	before( () => {
-		cy.login();
 		cy.newPost();
 	} );
 
