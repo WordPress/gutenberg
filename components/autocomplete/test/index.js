@@ -211,7 +211,7 @@ describe( 'Autocomplete', () => {
 					{ key: '0_0', value: 1, label: 'Bananas', keywords: [ 'fruit' ] },
 				] );
 				expect( wrapper.find( 'Popover' ).prop( 'isOpen' ) ).toBe( true );
-				expect( wrapper.find( '.components-autocomplete__result' ) ).toHaveLength( 1 );
+				expect( wrapper.find( 'button.components-autocomplete__result' ) ).toHaveLength( 1 );
 				done();
 			} );
 		} );
@@ -230,7 +230,7 @@ describe( 'Autocomplete', () => {
 				expect( wrapper.state( 'search' ) ).toEqual( /zzz/i );
 				expect( wrapper.instance().getFilteredOptions() ).toEqual( [] );
 				expect( wrapper.find( 'Popover' ).prop( 'isOpen' ) ).toBe( false );
-				expect( wrapper.find( '.components-autocomplete__result' ) ).toHaveLength( 0 );
+				expect( wrapper.find( 'button.components-autocomplete__result' ) ).toHaveLength( 0 );
 				done();
 			} );
 		} );
@@ -267,7 +267,7 @@ describe( 'Autocomplete', () => {
 					{ key: '0_1', value: 2, label: 'Apple', keywords: [ 'fruit' ] },
 				] );
 				expect( wrapper.find( 'Popover' ).prop( 'isOpen' ) ).toBe( true );
-				expect( wrapper.find( '.components-autocomplete__result' ) ).toHaveLength( 2 );
+				expect( wrapper.find( 'button.components-autocomplete__result' ) ).toHaveLength( 2 );
 				done();
 			} );
 		} );
@@ -290,7 +290,7 @@ describe( 'Autocomplete', () => {
 					{ key: '0_1', value: 2, label: 'Apple', keywords: [ 'fruit' ] },
 				] );
 				expect( wrapper.find( 'Popover' ).prop( 'isOpen' ) ).toBe( true );
-				expect( wrapper.find( '.components-autocomplete__result' ) ).toHaveLength( 2 );
+				expect( wrapper.find( 'button.components-autocomplete__result' ) ).toHaveLength( 2 );
 				done();
 			} );
 		} );
@@ -313,7 +313,7 @@ describe( 'Autocomplete', () => {
 					{ key: '0_1', value: 2, label: 'Apple', keywords: [ 'fruit' ] },
 				] );
 				expect( wrapper.find( 'Popover' ).prop( 'isOpen' ) ).toBe( true );
-				expect( wrapper.find( '.components-autocomplete__result' ) ).toHaveLength( 2 );
+				expect( wrapper.find( 'button.components-autocomplete__result' ) ).toHaveLength( 2 );
 				// simulate typing 'p'
 				simulateInput( wrapper, [ tx( 'ap' ) ] );
 				// now check that the popup is still open and we've filtered the options to just the apple
@@ -325,7 +325,7 @@ describe( 'Autocomplete', () => {
 					{ key: '0_1', value: 2, label: 'Apple', keywords: [ 'fruit' ] },
 				] );
 				expect( wrapper.find( 'Popover' ).prop( 'isOpen' ) ).toBe( true );
-				expect( wrapper.find( '.components-autocomplete__result' ) ).toHaveLength( 1 );
+				expect( wrapper.find( 'button.components-autocomplete__result' ) ).toHaveLength( 1 );
 				// simulate typing ' '
 				simulateInput( wrapper, [ tx( 'ap ' ) ] );
 				// check the popup closes
