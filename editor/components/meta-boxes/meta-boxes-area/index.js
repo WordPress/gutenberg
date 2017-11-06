@@ -146,13 +146,16 @@ class MetaBoxesArea extends Component {
 
 		const classes = classnames(
 			'editor-meta-boxes-area',
-			`is-${ location }`
+			`is-${ location }`,
+			{
+				'is-loading': loading,
+			}
 		);
 
 		return (
 			<div className={ classes }>
 				{ loading && <Spinner /> }
-				<div ref={ this.bindNode } style={ loading ? { display: 'none' } : {} } />
+				<div ref={ this.bindNode } />
 			</div>
 		);
 	}
