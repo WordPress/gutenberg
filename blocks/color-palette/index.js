@@ -61,9 +61,10 @@ function ColorPalette( { colors, value, onChange } ) {
 				) }
 			/>
 
-			<button className="button-link blocks-color-palette__clear"
+			<button
+				className="button-link blocks-color-palette__clear"
+				type="button"
 				onClick={ () => onChange( undefined ) }
-				aria-label={ __( 'Remove color' ) }
 			>
 				{ __( 'Clear' ) }
 			</button>
