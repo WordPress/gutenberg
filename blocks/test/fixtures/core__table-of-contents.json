@@ -1,0 +1,12 @@
+[
+    {
+        "uid": "_uid_0",
+        "name": "core/table-of-contents",
+        "isValid": true,
+        "attributes": {
+            "title": "Table of Contents",
+            "numbered": true
+        },
+        "originalContent": ""
+    }
+]
