@@ -454,18 +454,12 @@ export function blockInsertionPoint( state = {}, action ) {
  *
  * @param  {Object}  state                 Current state
  * @param  {string}  state.mode            Current editor mode, either "visual" or "text".
- * @param  {Boolean} state.isSidebarOpened Whether the sidebar is opened or closed
  * @param  {Object}  state.panels          The state of the different sidebar panels
  * @param  {Object}  action                Dispatched action
  * @return {string}                        Updated state
  */
 export function preferences( state = STORE_DEFAULTS.preferences, action ) {
 	switch ( action.type ) {
-		case 'TOGGLE_SIDEBAR':
-			return {
-				...state,
-				isSidebarOpened: ! state.isSidebarOpened,
-			};
 		case 'TOGGLE_SIDEBAR_PANEL':
 			return {
 				...state,
@@ -515,7 +509,7 @@ export function preferences( state = STORE_DEFAULTS.preferences, action ) {
 	return state;
 }
 
-export function panel( state = 'document', action ) {
+export function panel( state = null, action ) {
 	switch ( action.type ) {
 		case 'SET_ACTIVE_PANEL':
 			return action.panel;

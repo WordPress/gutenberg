@@ -38,3 +38,13 @@
 	50% { opacity: 1; }
 	100% { opacity: .5; }
 }
+
+
+@mixin slide_left( $width ) {
+	right: - $width;
+	animation: slide_left 0.5s forwards;
+}
+
+@keyframes slide_left {
+	100% { right: 0; }
+}

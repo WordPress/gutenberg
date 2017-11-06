@@ -331,17 +331,6 @@ export function stopTyping() {
 }
 
 /**
- * Returns an action object used in signalling that the user toggled the sidebar
- *
- * @return {Object}         Action object
- */
-export function toggleSidebar() {
-	return {
-		type: 'TOGGLE_SIDEBAR',
-	};
-}
-
-/**
  * Returns an action object used in signalling that the user switched the active sidebar tab panel
  *
  * @param  {String} panel   The panel name

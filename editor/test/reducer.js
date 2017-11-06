@@ -885,42 +885,34 @@ describe( 'state', () => {
 		it( 'should apply all defaults', () => {
 			const state = preferences( undefined, {} );
 
-			expect( state ).toEqual( { blockUsage: {}, recentlyUsedBlocks: [], mode: 'visual', isSidebarOpened: true, panels: { 'post-status': true } } );
-		} );
-
-		it( 'should toggle the sidebar open flag', () => {
-			const state = preferences( deepFreeze( { isSidebarOpened: false } ), {
-				type: 'TOGGLE_SIDEBAR',
-			} );
-
-			expect( state ).toEqual( { isSidebarOpened: true } );
+			expect( state ).toEqual( { blockUsage: {}, recentlyUsedBlocks: [], mode: 'visual', panels: { 'post-status': true } } );
 		} );
 
 		it( 'should set the sidebar panel open flag to true if unset', () => {
-			const state = preferences( deepFreeze( { isSidebarOpened: false } ), {
+			const state = preferences( deepFreeze( {} ), {
 				type: 'TOGGLE_SIDEBAR_PANEL',
 				panel: 'post-taxonomies',
 			} );
 
-			expect( state ).toEqual( { isSidebarOpened: false, panels: { 'post-taxonomies': true } } );
+			expect( state ).toEqual( { panels: { 'post-taxonomies': true } } );
 		} );
 
 		it( 'should toggle the sidebar panel open flag', () => {
-			const state = preferences( deepFreeze( { isSidebarOpened: false, panels: { 'post-taxonomies': true } } ), {
+			const state = preferences( deepFreeze( { panels: { 'post-taxonomies': true } } ), {
 				type: 'TOGGLE_SIDEBAR_PANEL',
 				panel: 'post-taxonomies',
 			} );
 
-			expect( state ).toEqual( { isSidebarOpened: false, panels: { 'post-taxonomies': false } } );
+			expect( state ).toEqual( { panels: { 'post-taxonomies': false } } );
 		} );
 
 		it( 'should return switched mode', () => {
-			const state = preferences( deepFreeze( { isSidebarOpened: false } ), {
+			const state = preferences( deepFreeze( {} ), {
 				type: 'SWITCH_MODE',
 				mode: 'text',
 			} );
 
-			expect( state ).toEqual( { isSidebarOpened: false, mode: 'text' } );
+			expect( state ).toEqual( { mode: 'text' } );
 		} );
 
 		it( 'should record recently used blocks', () => {

@@ -1,0 +1,41 @@
+.components-foldable-sidebar {
+	position: fixed;
+	z-index: z-index( '.components-foldable-sidebar' );
+	top: $admin-bar-height-big;
+	right: 0;
+	bottom: 0;
+	width: $sidebar-width;
+	border-left: 1px solid $light-gray-500;
+	background: $light-gray-300;
+	color: $dark-gray-500;
+	overflow: hidden;
+	width: 100%;
+	@include slide_left( $sidebar-width );
+
+	@include break-small() {
+		overflow: auto;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	@include break-medium() {
+		top: $admin-bar-height;
+		width: $sidebar-width;
+	}
+
+	> .components-panel {
+		border-left: none;
+		border-right: none;
+		overflow: auto;
+		-webkit-overflow-scrolling: touch;
+		height: 100%;
+		padding-top: $sidebar-panel-header-height;
+		margin-top: -1px;
+		margin-bottom: -1px;
+
+		@include break-small() {
+			overflow: inherit;
+			height: auto;
+			padding-top: 0;
+		}
+	}
+}
