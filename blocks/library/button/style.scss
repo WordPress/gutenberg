@@ -17,13 +17,6 @@ $blocks-button__height: 46px;
 	vertical-align: top;
 	position: relative;
 
-	a {
-		box-shadow: none !important;
-		color: $white;
-		cursor: pointer;
-		text-decoration: none !important;
-	}
-
 	&:hover {
 		color: $white;
 	}
@@ -31,4 +24,11 @@ $blocks-button__height: 46px;
 	&.aligncenter {
 		display: inline-block;
 	}
+}
+
+.wp-block-button > a {
+	box-shadow: none !important;
+	color: $white;
+	cursor: pointer;
+	text-decoration: none !important;
 }

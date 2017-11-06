@@ -11,11 +11,13 @@ $blocks-button__height: 46px;
 }
 
 .wp-block-button {
-	.blocks-format-toolbar__link-modal {
+	.blocks-link-editor__link-modal {
 		z-index: 2;
 		top: $blocks-button__height + 2px;
 		left: 50%;
 		transform: translateX( -50% );
+		color: #444;
+		text-align: left;
 	}
 
 	.blocks-link-url__suggestions {
