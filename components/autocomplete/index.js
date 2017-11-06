@@ -412,13 +412,13 @@ export class Autocomplete extends Component {
 					className={ classes }
 					getAnchorRect={ this.getWordRect }
 				>
-					<ul
+					<div
 						id={ listBoxId }
 						role="listbox"
 						className="components-autocomplete__results"
 					>
 						{ map( filteredOptions, ( option, index ) => (
-							<li
+							<Button
 								key={ option.key }
 								id={ `components-autocomplete-item-${ instanceId }-${ index }` }
 								role="option"
@@ -426,13 +426,12 @@ export class Autocomplete extends Component {
 								className={ classnames( 'components-autocomplete__result', {
 									'is-selected': index === selectedIndex,
 								} ) }
+								onClick={ () => this.select( option ) }
 							>
-								<Button onClick={ () => this.select( option ) }>
-									{ option.label }
-								</Button>
-							</li>
+								{ option.label }
+							</Button>
 						) ) }
-					</ul>
+					</div>
 				</Popover>
 			</div>
 		);
