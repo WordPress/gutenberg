@@ -61,6 +61,9 @@ function gutenberg_meta_box_partial_page( $post_type, $meta_box_context ) {
 		return;
 	}
 
+	// Ths action is not needed since it's an XHR call.
+	remove_action( 'admin_head', 'wp_admin_canonical_url' );
+
 	$location = $_REQUEST['meta_box'];
 
 	if ( ! in_array( $_REQUEST['meta_box'], array( 'side', 'normal', 'advanced' ) ) ) {
