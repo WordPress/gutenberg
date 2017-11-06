@@ -134,25 +134,25 @@ export function userAutocompleter() {
 }
 
 export function hashtagAutocompleter() {
-	const c = wp.api.collections;
+	const { Posts, Pages, Tags, Categories } = wp.api.collections;
 	const getOptions = () => {
 		return Promise.all( [
-			( new c.Posts() ).fetch().then( function( posts ) {
+			( new Posts() ).fetch().then( function( posts ) {
 				return posts.map( ( { link, title: { rendered: text }, slug } ) => ( {
 					link, text, icon: 'admin-post', keywords: [ text, slug ],
 				} ) );
 			} ),
-			( new c.Pages() ).fetch().then( function( pages ) {
+			( new Pages() ).fetch().then( function( pages ) {
 				return pages.map( ( { link, title: { rendered: text }, slug } ) => ( {
 					link, text, icon: 'admin-page', keywords: [ text, slug ],
 				} ) );
 			} ),
-			( new c.Tags() ).fetch().then( function( tags ) {
+			( new Tags() ).fetch().then( function( tags ) {
 				return tags.map( ( { link, name: text, slug, description } ) => ( {
 					link, text, icon: 'tag', keywords: [ text, description, slug ],
 				} ) );
 			} ),
-			( new c.Categories() ).fetch().then( function( categories ) {
+			( new Categories() ).fetch().then( function( categories ) {
 				return categories.map( ( { link, name: text, slug, description } ) => ( {
 					link, text, icon: 'category', keywords: [ text, description, slug ],
 				} ) );
