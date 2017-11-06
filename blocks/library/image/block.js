@@ -16,7 +16,8 @@ import {
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { mediaUpload, createMediaFromFile, getBlobByURL, revokeBlobURL } from '@wordpress/utils';
+import { mediaUpload, createMediaFromFile, getBlobByURL, revokeBlobURL, viewPort } from '@wordpress/utils';
+import { mediaUpload,  } from '@wordpress/utils';
 import {
 	Placeholder,
 	Dashicon,
@@ -109,7 +110,7 @@ class ImageBlock extends Component {
 
 		const availableSizes = this.getAvailableSizes();
 		const figureStyle = width ? { width } : {};
-		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1;
+		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && ( ! viewPort.isExtraSmall() );
 		const uploadButtonProps = { isLarge: true };
 		const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setAttributes );
 		const dropFiles = ( files ) => mediaUpload( files, setAttributes );
