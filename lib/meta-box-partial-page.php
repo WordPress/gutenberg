@@ -204,13 +204,9 @@ function gutenberg_meta_box_partial_page_admin_header( $hook_suffix, $current_sc
 	}
 
 	$admin_body_class .= ' no-customize-support no-svg';
-
 	?>
 	</head>
-	<body class="wp-admin wp-core-ui no-js <?php echo $admin_body_classes . ' ' . $admin_body_class; ?>">
-	<script type="text/javascript">
-		document.body.className = document.body.className.replace('no-js','js');
-	</script>
+	<body>
 	<!-- Add in JavaScript variables that some meta box plugins make use of. -->
 	<script type="text/javascript">
 	addLoadEvent = function( func ){ if( typeof jQuery!="undefined" )jQuery( document ).ready( func );else if(typeof wpOnload!='function'){wpOnload=func;}else{var oldonload=wpOnload;wpOnload=function(){oldonload();func();}}};
