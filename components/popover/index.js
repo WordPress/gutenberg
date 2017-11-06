@@ -153,8 +153,8 @@ class Popover extends Component {
 			left: rect.left,
 			right: rect.right,
 			top: top,
-			bottom: top + height
-		}
+			bottom: top + height,
+		};
 	}
 
 	setOffset() {
