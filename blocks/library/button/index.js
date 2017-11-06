@@ -135,13 +135,13 @@ class ButtonBlock extends Component {
 							checked={ !! clear }
 							onChange={ this.toggleClear }
 						/>
-						<PanelColor title={ __( 'Button Background' ) } colorValue={ color } key="panel-color-button-1">
+						<PanelColor title={ __( 'Background Color' ) } colorValue={ color } >
 							<ColorPalette
 								value={ color }
 								onChange={ ( colorValue ) => setAttributes( { color: colorValue } ) }
 							/>
 						</PanelColor>
-						<PanelColor title={ __( 'Button Text' ) } colorValue={ textColor } key="panel-color-button-2">
+						<PanelColor title={ __( 'Text Color' ) } colorValue={ textColor } >
 							<ColorPalette
 								value={ textColor }
 								onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
