@@ -42,6 +42,14 @@ class MetaBoxesArea extends Component {
 
 	componentWillUnmout() {
 		this.mounted = false;
+		this.unbindFormEvents();
+	}
+
+	unbindFormEvents() {
+		if ( this.form ) {
+			this.form.removeEventListener( 'change', this.checkState );
+			this.form.removeEventListener( 'input', this.checkState );
+		}
 	}
 
 	componentWillReceiveProps( nextProps ) {
@@ -57,6 +65,7 @@ class MetaBoxesArea extends Component {
 			};
 			const request = window.fetch( addQueryArgs( window._wpMetaBoxUrl, { meta_box: location } ), fetchOptions );
 			this.onMetaboxResponse( request, false );
+			this.unbindFormEvents();
 		}
 	}
 
