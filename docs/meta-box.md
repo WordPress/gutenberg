@@ -42,9 +42,9 @@ this might now be possible. Test with ACF to make sure.
 `INITIALIZE_META_BOX_STATE` comes in, the store will update any active meta box
 areas by setting the `isActive` flag to `true`. Once this happens React will
 check for the new props sent in by Redux on the `MetaBox` component. If that
-`MetaBox` is now active, instead of rendering null, a `MetaBoxIframe` component will
+`MetaBox` is now active, instead of rendering null, a `MetaBoxArea` component will
 be rendered. The `MetaBox` component is the container component that mediates
-between the `MetaBoxIframe` and the Redux Store. *If no meta boxes are active,
+between the `MetaBoxArea` and the Redux Store. *If no meta boxes are active,
 nothing happens. This will be the default behavior, as all core meta boxes have
 been stripped.*
 
