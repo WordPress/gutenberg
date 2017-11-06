@@ -144,10 +144,14 @@ class Popover extends Component {
 		const topPad = parseInt( paddingTop, 10 );
 		const bottomPad = parseInt( paddingBottom, 10 );
 		return {
-			...rect,
+			x: rect.left,
+			y: rect.top + topPad,
+			width: rect.width,
+			height: rect.height - topPad - bottomPad,
+			left: rect.left,
+			right: rect.right,
 			top: rect.top + topPad,
 			bottom: rect.bottom - bottomPad,
-			height: rect.height - topPad - bottomPad,
 		};
 	}
 
