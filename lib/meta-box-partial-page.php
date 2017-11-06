@@ -218,7 +218,6 @@ function gutenberg_meta_box_partial_page_admin_header( $hook_suffix, $current_sc
 		decimalPoint = '<?php echo addslashes( $wp_locale->number_format['decimal_point'] ); ?>',
 		isRtl = <?php echo (int) is_rtl(); ?>;
 	</script>
-	<meta name="viewport" content="width=device-width,initial-scale=1.0">
 	<?php
 
 	/**
