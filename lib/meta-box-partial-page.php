@@ -152,8 +152,7 @@ function gutenberg_meta_box_partial_page_admin_header( $hook_suffix, $current_sc
 	wp_enqueue_script( 'common' );
 	wp_enqueue_script( 'svg-painter' );
 	?>
-	<!-- Add an html class so that scroll bars can be removed in css and make it appear as though the iframe is one with Gutenberg. -->
-	<html class="gutenberg-meta-box-html">
+	<html>
 	<head>
 	<?php
 	// Grab the admin body class.
@@ -368,7 +367,6 @@ function gutenberg_meta_box_partial_page_post_form( $post, $location ) {
 	 */
 	?>
 	<div id="poststuff" class="sidebar-open">
-		<div><!-- THIS IS SOMEHOW REALLY IMPORTANT FOR IFRAMES TO RESIZE CORRECTLY -->
 			<div id="postbox-container-2" class="postbox-container">
 	<?php
 }
@@ -381,10 +379,6 @@ function gutenberg_meta_box_partial_page_post_form( $post, $location ) {
  * @param string $hook_suffix The hook suffix of the current page.
  */
 function gutenberg_meta_box_partial_page_admin_footer( $hook_suffix ) {
-	?>
-	</div><!-- END of important resize div. -->
-	<?php
-
 	/**
 	 * Prints scripts or data before the default footer scripts.
 	 *
