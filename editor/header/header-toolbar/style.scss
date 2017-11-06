@@ -10,6 +10,10 @@
 .editor-header-toolbar {
 	display: inline-flex;
 	align-items: center;
+
+	.editor-block-switcher .components-toolbar {
+		border: none;
+	}
 }
 
 .editor-header-toolbar__block-toolbar {

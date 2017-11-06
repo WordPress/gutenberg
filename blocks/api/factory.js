@@ -3,6 +3,7 @@
  */
 import uuid from 'uuid/v4';
 import {
+	every,
 	get,
 	reduce,
 	castArray,
@@ -61,29 +62,42 @@ export function createBlock( name, blockAttributes = {} ) {
 }
 
 /**
- * Switch a block into one or more blocks of the new block type.
+ * Switch one or more blocks into one or more blocks of the new block type.
  *
- * @param  {Object} block      Block object
+ * @param  {Array}  blocks     Blocks array
  * @param  {string} name       Block name
  * @return {Array}             Block object
  */
-export function switchToBlockType( block, name ) {
+export function switchToBlockType( blocks, name ) {
+	const isMultiBlock = blocks.length > 1;
+	const fistBlock = blocks[ 0 ];
+	const sourceName = fistBlock.name;
+
+	if ( isMultiBlock && ! every( blocks, ( block ) => ( block.name === sourceName ) ) ) {
+		return null;
+	}
+
 	// Find the right transformation by giving priority to the "to"
 	// transformation.
 	const destinationType = getBlockType( name );
-	const sourceType = getBlockType( block.name );
+	const sourceType = getBlockType( sourceName );
 	const transformationsFrom = get( destinationType, 'transforms.from', [] );
 	const transformationsTo = get( sourceType, 'transforms.to', [] );
 	const transformation =
-		find( transformationsTo, t => t.type === 'block' && t.blocks.indexOf( name ) !== -1 ) ||
-		find( transformationsFrom, t => t.type === 'block' && t.blocks.indexOf( block.name ) !== -1 );
+		find( transformationsTo, t => t.type === 'block' && t.blocks.indexOf( name ) !== -1 && ( ! isMultiBlock || t.isMultiBlock ) ) ||
+		find( transformationsFrom, t => t.type === 'block' && t.blocks.indexOf( sourceName ) !== -1 && ( ! isMultiBlock || t.isMultiBlock ) );
 
 	// Stop if there is no valid transformation. (How did we get here?)
 	if ( ! transformation ) {
 		return null;
 	}
 
-	let transformationResults = transformation.transform( block.attributes );
+	let transformationResults;
+	if ( transformation.isMultiBlock ) {
+		transformationResults = transformation.transform( blocks.map( ( currentBlock ) => currentBlock.attributes ) );
+	} else {
+		transformationResults = transformation.transform( fistBlock.attributes );
+	}
 
 	// Ensure that the transformation function returned an object or an array
 	// of objects.
@@ -112,7 +126,7 @@ export function switchToBlockType( block, name ) {
 	return transformationResults.map( ( result, index ) => ( {
 		...result,
 		// The first transformed block whose type matches the "destination"
-		// type gets to keep the existing block's UID.
-		uid: index === firstSwitchedBlock ? block.uid : result.uid,
+		// type gets to keep the existing UID of the first block.
+		uid: index === firstSwitchedBlock ? fistBlock.uid : result.uid,
 	} ) );
 }

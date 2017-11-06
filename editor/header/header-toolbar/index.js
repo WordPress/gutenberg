@@ -14,11 +14,12 @@ import { IconButton } from '@wordpress/components';
  */
 import './style.scss';
 import Inserter from '../../inserter';
+import BlockSwitcher from '../../block-switcher';
 import BlockToolbar from '../../block-toolbar';
 import NavigableToolbar from '../../navigable-toolbar';
-import { hasEditorUndo, hasEditorRedo, isFeatureActive } from '../../selectors';
+import { getSelectedBlockCount, hasEditorUndo, hasEditorRedo, isFeatureActive } from '../../selectors';
 
-function HeaderToolbar( { hasUndo, hasRedo, hasFixedToolbar, undo, redo } ) {
+function HeaderToolbar( { hasUndo, hasRedo, hasFixedToolbar, undo, redo, isMultiBlockSelection } ) {
 	return (
 		<NavigableToolbar
 			className="editor-header-toolbar"
@@ -35,6 +36,7 @@ function HeaderToolbar( { hasUndo, hasRedo, hasFixedToolbar, undo, redo } ) {
 				label={ __( 'Redo' ) }
 				disabled={ ! hasRedo }
 				onClick={ redo } />
+			{ isMultiBlockSelection && <BlockSwitcher key="switcher" /> }
 			{ hasFixedToolbar && (
 				<div className="editor-header-toolbar__block-toolbar">
 					<BlockToolbar />
@@ -49,6 +51,7 @@ export default connect(
 		hasUndo: hasEditorUndo( state ),
 		hasRedo: hasEditorRedo( state ),
 		hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
+		isMultiBlockSelection: getSelectedBlockCount( state ) > 1,
 	} ),
 	( dispatch ) => ( {
 		undo: () => dispatch( { type: 'UNDO' } ),
