@@ -144,39 +144,67 @@ add_action( 'do_meta_boxes', 'gutenberg_meta_box_partial_page', 1000, 2 );
  * @param WP_Locale $wp_locale      Locale object.
  */
 function gutenberg_meta_box_partial_page_admin_header( $hook_suffix, $current_screen, $wp_locale ) {
-	/* Scripts and styles that meta boxes can potentially be using */
-	wp_enqueue_style( 'common' );
-	wp_enqueue_style( 'buttons' );
-	wp_enqueue_style( 'colors' );
-	wp_enqueue_style( 'ie' );
-
+	/* Scripts that meta boxes can potentially be using */
 	wp_enqueue_script( 'utils' );
 	wp_enqueue_script( 'common' );
 	wp_enqueue_script( 'svg-painter' );
-
-	// These assets are Gutenberg specific.
-	wp_enqueue_style(
-		'meta-box-gutenberg',
-		gutenberg_url( 'editor/build/meta-box-iframe.css' ),
-		array(),
-		filemtime( gutenberg_dir_path() . 'editor/build/meta-box-iframe.css' )
-	);
-
-	wp_enqueue_script(
-		'meta-box-resize',
-		gutenberg_url( 'assets/js/meta-box-resize.js' ),
-		array(),
-		filemtime( gutenberg_dir_path() . 'assets/js/meta-box-resize.js' ),
-		true
-	);
-
-	// Grab the admin body class.
-	$admin_body_class = preg_replace( '/[^a-z0-9_-]+/i', '-', $hook_suffix );
-
 	?>
 	<!-- Add an html class so that scroll bars can be removed in css and make it appear as though the iframe is one with Gutenberg. -->
 	<html class="gutenberg-meta-box-html">
 	<head>
+	<?php
+	/**
+	 * The main way post.php sets body class.
+	 */
+	if ( get_user_setting( 'mfold' ) == 'f' ) {
+		$admin_body_class .= ' folded';
+	}
+
+	if ( ! get_user_setting( 'unfold' ) ) {
+		$admin_body_class .= ' auto-fold';
+	}
+
+	if ( is_admin_bar_showing() ) {
+		$admin_body_class .= ' admin-bar';
+	}
+
+	if ( is_rtl() ) {
+		$admin_body_class .= ' rtl';
+	}
+
+	if ( $current_screen->post_type ) {
+		$admin_body_class .= ' post-type-' . $current_screen->post_type;
+	}
+
+	if ( $current_screen->taxonomy ) {
+		$admin_body_class .= ' taxonomy-' . $current_screen->taxonomy;
+	}
+
+	$admin_body_class .= ' branch-' . str_replace( array( '.', ',' ), '-', floatval( get_bloginfo( 'version' ) ) );
+	$admin_body_class .= ' version-' . str_replace( '.', '-', preg_replace( '/^([.0-9]+).*/', '$1', get_bloginfo( 'version' ) ) );
+	$admin_body_class .= ' admin-color-' . sanitize_html_class( get_user_option( 'admin_color' ), 'fresh' );
+	$admin_body_class .= ' locale-' . sanitize_html_class( strtolower( str_replace( '_', '-', get_user_locale() ) ) );
+
+	if ( wp_is_mobile() ) {
+		$admin_body_class .= ' mobile';
+	}
+
+	if ( is_multisite() ) {
+		$admin_body_class .= ' multisite';
+	}
+
+	if ( is_network_admin() ) {
+		$admin_body_class .= ' network-admin';
+	}
+
+	$admin_body_class .= ' no-customize-support no-svg';
+
+	?>
+	</head>
+	<body class="wp-admin wp-core-ui no-js <?php echo $admin_body_classes . ' ' . $admin_body_class; ?>">
+	<script type="text/javascript">
+		document.body.className = document.body.className.replace('no-js','js');
+	</script>
 	<!-- Add in JavaScript variables that some meta box plugins make use of. -->
 	<script type="text/javascript">
 	addLoadEvent = function( func ){ if( typeof jQuery!="undefined" )jQuery( document ).ready( func );else if(typeof wpOnload!='function'){wpOnload=func;}else{var oldonload=wpOnload;wpOnload=function(){oldonload();func();}}};
@@ -250,79 +278,6 @@ function gutenberg_meta_box_partial_page_admin_header( $hook_suffix, $current_sc
 	 * @since wp-core 2.1.0
 	 */
 	do_action( 'admin_head' );
-
-	/**
-	 * The main way post.php sets body class.
-	 */
-	if ( get_user_setting( 'mfold' ) == 'f' ) {
-		$admin_body_class .= ' folded';
-	}
-
-	if ( ! get_user_setting( 'unfold' ) ) {
-		$admin_body_class .= ' auto-fold';
-	}
-
-	if ( is_admin_bar_showing() ) {
-		$admin_body_class .= ' admin-bar';
-	}
-
-	if ( is_rtl() ) {
-		$admin_body_class .= ' rtl';
-	}
-
-	if ( $current_screen->post_type ) {
-		$admin_body_class .= ' post-type-' . $current_screen->post_type;
-	}
-
-	if ( $current_screen->taxonomy ) {
-		$admin_body_class .= ' taxonomy-' . $current_screen->taxonomy;
-	}
-
-	$admin_body_class .= ' branch-' . str_replace( array( '.', ',' ), '-', floatval( get_bloginfo( 'version' ) ) );
-	$admin_body_class .= ' version-' . str_replace( '.', '-', preg_replace( '/^([.0-9]+).*/', '$1', get_bloginfo( 'version' ) ) );
-	$admin_body_class .= ' admin-color-' . sanitize_html_class( get_user_option( 'admin_color' ), 'fresh' );
-	$admin_body_class .= ' locale-' . sanitize_html_class( strtolower( str_replace( '_', '-', get_user_locale() ) ) );
-
-	if ( wp_is_mobile() ) {
-		$admin_body_class .= ' mobile';
-	}
-
-	if ( is_multisite() ) {
-		$admin_body_class .= ' multisite';
-	}
-
-	if ( is_network_admin() ) {
-		$admin_body_class .= ' network-admin';
-	}
-
-	$admin_body_class .= ' no-customize-support no-svg';
-
-	?>
-	</head>
-	<?php
-
-	/**
-	 * Filters the CSS classes for the body tag in the admin.
-	 *
-	 * This filter differs from the {@see 'post_class'} and {@see 'body_class'} filters
-	 * in two important ways:
-	 *
-	 * 1. `$classes` is a space-separated string of class names instead of an array.
-	 * 2. Not all core admin classes are filterable, notably: wp-admin, wp-core-ui,
-	 *    and no-js cannot be removed.
-	 *
-	 * @since wp-core 2.3.0
-	 *
-	 * @param string $classes Space-separated list of CSS classes.
-	 */
-	$admin_body_classes = apply_filters( 'admin_body_class', '' );
-
-	?>
-	<body class="wp-admin wp-core-ui no-js <?php echo $admin_body_classes . ' ' . $admin_body_class; ?>">
-	<script type="text/javascript">
-		document.body.className = document.body.className.replace('no-js','js');
-	</script>
-	<?php
 }
 
 /**
@@ -350,7 +305,7 @@ function gutenberg_meta_box_partial_page_post_form( $post, $location ) {
 	$nonce_action = 'update-post_' . $post->ID;
 	$form_extra  .= "<input type='hidden' id='post_ID' name='post_ID' value='" . esc_attr( $post->ID ) . "' />";
 	?>
-	<form name="post" action="post.php" method="post" id="post" data-location="<?php echo esc_attr( $location ); ?>"
+	<form name="post" action="post.php" method="post" class="meta-box-form" data-location="<?php echo esc_attr( $location ); ?>"
 	<?php
 	/**
 	 * Fires inside the post editor form tag.
