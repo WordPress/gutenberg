@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find } from 'lodash';
+import { find, flatMap } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -100,11 +100,12 @@ registerBlockType( 'core/list', {
 		from: [
 			{
 				type: 'block',
+				isMultiBlock: true,
 				blocks: [ 'core/paragraph' ],
-				transform: ( { content } ) => {
+				transform: ( blockAttributes ) => {
 					return createBlock( 'core/list', {
 						nodeName: 'UL',
-						values: fromBrDelimitedContent( content ),
+						values: flatMap( blockAttributes, ( { content } ) => fromBrDelimitedContent( content ) ),
 					} );
 				},
 			},
