@@ -131,13 +131,13 @@ registerBlockType( 'core/paragraph', {
 							allowReset
 						/>
 					</PanelBody>
-					<PanelColor title={ __( 'Background' ) } colorValue={ backgroundColor } initialOpen={ false } key="panel-color-paragraph-1">
+					<PanelColor title={ __( 'Background Color' ) } colorValue={ backgroundColor } initialOpen={ false }>
 						<ColorPalette
 							value={ backgroundColor }
 							onChange={ ( colorValue ) => setAttributes( { backgroundColor: colorValue } ) }
 						/>
 					</PanelColor>
-					<PanelColor title={ __( 'Text' ) } colorValue={ textColor } initialOpen={ false } key="panel-color-paragraph-2">
+					<PanelColor title={ __( 'Text Color' ) } colorValue={ textColor } initialOpen={ false }>
 						<ColorPalette
 							value={ textColor }
 							onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
