@@ -626,7 +626,7 @@ export function metaBoxes( state = defaultMetaBoxState, action ) {
 				};
 				return newState;
 			}, { ...state } );
-		case 'METABOX_LOADED':
+		case 'META_BOX_LOADED':
 			return {
 				...state,
 				[ action.location ]: {

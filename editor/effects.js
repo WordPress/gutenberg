@@ -280,7 +280,7 @@ export default {
 
 		return effects;
 	},
-	METABOX_LOADED( action, store ) {
+	META_BOX_LOADED( action, store ) {
 		const { getState } = store;
 		const metaboxes = getMetaBoxes( getState() );
 		const unloadedMetaboxes = filter(

@@ -452,7 +452,7 @@ export function handleMetaBoxReload( location ) {
  */
 export function metaBoxLoaded( location ) {
 	return {
-		type: 'METABOX_LOADED',
+		type: 'META_BOX_LOADED',
 		location,
 	};
 }
