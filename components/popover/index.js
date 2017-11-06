@@ -143,12 +143,18 @@ class Popover extends Component {
 		const { paddingTop, paddingBottom } = window.getComputedStyle( anchor.parentNode );
 		const topPad = parseInt( paddingTop, 10 );
 		const bottomPad = parseInt( paddingBottom, 10 );
+		const top = rect.top + topPad;
+		const height = rect.height - topPad - bottomPad;
 		return {
-			...rect,
-			top: rect.top + topPad,
-			bottom: rect.bottom - bottomPad,
-			height: rect.height - topPad - bottomPad,
-		};
+			x: rect.left,
+			y: top,
+			width: rect.width,
+			height: height,
+			left: rect.left,
+			right: rect.right,
+			top: top,
+			bottom: top + height
+		}
 	}
 
 	setOffset() {
