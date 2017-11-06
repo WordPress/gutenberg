@@ -4,6 +4,8 @@
 import optimist from 'redux-optimist';
 import { combineReducers } from 'redux';
 import {
+	flow,
+	partialRight,
 	difference,
 	get,
 	reduce,
@@ -26,7 +28,8 @@ import { getBlockTypes, getBlockType } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { combineUndoableReducers } from './utils/undoable-reducer';
+import withHistory from './utils/with-history';
+import withChangeDetection from './utils/with-change-detection';
 import { STORE_DEFAULTS } from './store-defaults';
 
 /***
@@ -63,7 +66,16 @@ export function getPostRawValue( value ) {
  * @param  {Object} action Dispatched action
  * @return {Object}        Updated state
  */
-export const editor = combineUndoableReducers( {
+export const editor = flow( [
+	combineReducers,
+
+	// Track undo history, starting at editor initialization.
+	partialRight( withHistory, { resetTypes: [ 'SETUP_EDITOR' ] } ),
+
+	// Track whether changes exist, starting at editor initialization and
+	// resetting at each post save.
+	partialRight( withChangeDetection, { resetTypes: [ 'SETUP_EDITOR', 'RESET_POST' ] } ),
+] )( {
 	edits( state = {}, action ) {
 		switch ( action.type ) {
 			case 'EDIT_POST':
@@ -261,7 +273,7 @@ export const editor = combineUndoableReducers( {
 
 		return state;
 	},
-}, { resetTypes: [ 'SETUP_EDITOR' ] } );
+} );
 
 /**
  * Reducer returning the last-known state of the current post, in the format
