@@ -24,7 +24,6 @@ class NavigableContainer extends Component {
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 
-		this.getInitialFocus = this.getInitialFocus.bind( this );
 		this.getFocusableContext = this.getFocusableContext.bind( this );
 		this.getFocusableIndex = this.getFocusableIndex.bind( this );
 
@@ -51,19 +50,16 @@ class NavigableContainer extends Component {
 		return null;
 	}
 
-	getInitialFocus( ) {
-		const target = this.container.querySelector( '[aria-selected="true"]' );
-		return this.getFocusableContext( target );
-	}
-
 	onFocus( event ) {
 		const { onNavigate = noop } = this.props;
 
 		if ( event.target === this.container ) {
-			const initialFocus = this.getInitialFocus( );
-			if ( initialFocus ) {
-				initialFocus.target.focus();
-				onNavigate( initialFocus.index, initialFocus.target );
+			const selected = this.container.querySelector( '[aria-selected="true"]' );
+			const context = this.getFocusableContext( selected );
+			if ( context ) {
+				const { index, target } = context;
+				target.focus();
+				onNavigate( index, target );
 			}
 		}
 	}
@@ -96,11 +92,12 @@ class NavigableContainer extends Component {
 			return;
 		}
 
-		const { index, focusables } = getFocusableContext( document.activeElement );
+		const context = getFocusableContext( document.activeElement );
 
-		if ( index === -1 ) {
+		if ( ! context ) {
 			return;
 		}
+		const { index, focusables } = context;
 
 		const nextIndex = match( index, focusables.length );
 		if ( nextIndex >= 0 && nextIndex < focusables.length ) {
