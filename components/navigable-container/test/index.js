@@ -65,43 +65,6 @@ describe( 'NavigableMenu', () => {
 	} );
 } );
 
-describe( 'NavigableGrid', () => {
-	// Skipping this this because the `isVisible` check in utils/focus/tabbable.js always returns false in tests
-	// Probbably a jsdom issue
-	// eslint-disable-next-line jest/no-disabled-tests
-	it( 'should navigate by keypresses', () => {
-		let currentIndex = 0;
-		const wrapper = mount( (
-			<NavigableGrid onNavigate={ ( index ) => currentIndex = index } width={ 3 }>
-				<button id="a1">A1</button>
-				<button id="b1">B1</button>
-				<button id="c1">C1</button>
-				<button id="a2">A2</button>
-				<button id="b2">B2</button>
-				<button id="c2">C2</button>
-			</NavigableGrid >
-		) );
-
-		simulateVisible( wrapper, '*' );
-
-		const container = wrapper.find( 'div' );
-		wrapper.getDOMNode().querySelector( '#a1' ).focus();
-
-		// Navigate options
-		function assertKeyDown( keyCode, expectedActiveIndex ) {
-			fireKeyDown( container, keyCode );
-			expect( currentIndex ).toBe( expectedActiveIndex );
-		}
-
-		assertKeyDown( DOWN, 3 );
-		assertKeyDown( DOWN, 0 );
-		assertKeyDown( UP, 3 );
-		assertKeyDown( LEFT, 5 );
-		assertKeyDown( LEFT, 4 );
-		assertKeyDown( RIGHT, 5 );
-	} );
-} );
-
 describe( 'TabbableContainer', () => {
 	// Skipping this this because the `isVisible` check in utils/focus/tabbable.js always returns false in tests
 	// Probbably a jsdom issue
