@@ -59,8 +59,14 @@ export default class OldEditor extends Component {
 	componentDidUpdate( prevProps ) {
 		const { id, attributes: { content } } = this.props;
 
+		const editor = window.tinymce.get( id );
+
 		if ( prevProps.attributes.content !== content ) {
-			window.tinymce.get( id ).setContent( content || '' );
+			editor.setContent( content || '' );
+		}
+
+		if ( ! prevProps.focus && !! this.props.focus && document.activeElement !== editor.getBody() ) {
+			editor.getBody().focus();
 		}
 	}
 
@@ -121,45 +127,51 @@ export default class OldEditor extends Component {
 		// This should be fixed in core.
 		// See wp-includes/js/tinymce/plugins/wordpress/plugin.js
 		// Swaps node.nodeName === 'BODY' to node === editor.getBody()
-		editor.on( 'init', () => editor.addCommand( 'WP_More', function( tag ) {
-			var parent, html, title,
-				classname = 'wp-more-tag',
-				dom = editor.dom,
-				node = editor.selection.getNode(),
-				rootNode = editor.getBody();
-
-			tag = tag || 'more';
-			classname += ' mce-wp-' + tag;
-			title = tag === 'more' ? 'Read more...' : 'Next page';
-			title = editor.editorManager.i18n.translate( title );
-			html = '<img src="' + tinymce.Env.transparentSrc + '" alt="" title="' + title + '" class="' + classname + '" ' +
-				'data-wp-more="' + tag + '" data-mce-resize="false" data-mce-placeholder="1" />';
-
-			// Most common case
-			if ( node === rootNode || ( node.nodeName === 'P' && node.parentNode == rootNode ) ) {
-				editor.insertContent( html );
-				return;
+		editor.on( 'init', () => {
+			if ( this.props.focus && document.activeElement !== editor.getBody() ) {
+				editor.getBody().focus();
 			}
 
-			// Get the top level parent node
-			parent = dom.getParent( node, function( found ) {
-				if ( found.parentNode && found.parentNode === rootNode ) {
-					return true;
+			editor.addCommand( 'WP_More', function( tag ) {
+				var parent, html, title,
+					classname = 'wp-more-tag',
+					dom = editor.dom,
+					node = editor.selection.getNode(),
+					rootNode = editor.getBody();
+
+				tag = tag || 'more';
+				classname += ' mce-wp-' + tag;
+				title = tag === 'more' ? 'Read more...' : 'Next page';
+				title = editor.editorManager.i18n.translate( title );
+				html = '<img src="' + tinymce.Env.transparentSrc + '" alt="" title="' + title + '" class="' + classname + '" ' +
+					'data-wp-more="' + tag + '" data-mce-resize="false" data-mce-placeholder="1" />';
+
+				// Most common case
+				if ( node === rootNode || ( node.nodeName === 'P' && node.parentNode == rootNode ) ) {
+					editor.insertContent( html );
+					return;
 				}
 
-				return false;
-			}, editor.getBody() );
+				// Get the top level parent node
+				parent = dom.getParent( node, function( found ) {
+					if ( found.parentNode && found.parentNode === rootNode ) {
+						return true;
+					}
 
-			if ( parent ) {
-				if ( parent.nodeName === 'P' ) {
-					parent.appendChild( dom.create( 'p', null, html ).firstChild );
-				} else {
-					dom.insertAfter( dom.create( 'p', null, html ), parent );
+					return false;
+				}, editor.getBody() );
+
+				if ( parent ) {
+					if ( parent.nodeName === 'P' ) {
+						parent.appendChild( dom.create( 'p', null, html ).firstChild );
+					} else {
+						dom.insertAfter( dom.create( 'p', null, html ), parent );
+					}
+
+					editor.nodeChanged();
 				}
-
-				editor.nodeChanged();
-			}
-		} ) );
+			} );
+		} );
 
 		/* eslint-enable */
 	}
