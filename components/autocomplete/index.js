@@ -7,7 +7,7 @@ import { escapeRegExp, find, filter, map } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, findDOMNode, renderToString } from '@wordpress/element';
+import { Component, renderToString } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
 
 /**
@@ -368,11 +368,8 @@ export class Autocomplete extends Component {
 		// native browser event has already bubbled so we can't stopPropagation
 		// and avoid Editable getting the event from TinyMCE, hence we must
 		// register a native event handler.
-		// Disable reason: Accessing the DOM node to add native event handlers.
-		// eslint-disable-next-line react/no-find-dom-node
-		const realNode = findDOMNode( this.node );
 		const handler = isListening ? 'addEventListener' : 'removeEventListener';
-		realNode[ handler ]( 'keydown', this.setSelectedIndex, true );
+		this.node[ handler ]( 'keydown', this.setSelectedIndex, true );
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
