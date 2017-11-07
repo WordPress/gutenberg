@@ -15,14 +15,11 @@ import { calculateMode } from './modes.js';
  * Module Constants
  */
 
-
-
 class NavigableContainer extends Component {
 	constructor() {
 		super( ...arguments );
 		this.bindContainer = this.bindContainer.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
-		this.onFocus = this.onFocus.bind( this );
 
 		this.getFocusableContext = this.getFocusableContext.bind( this );
 		this.getFocusableIndex = this.getFocusableIndex.bind( this );
@@ -48,20 +45,6 @@ class NavigableContainer extends Component {
 			return { index, target, focusables };
 		}
 		return null;
-	}
-
-	onFocus( event ) {
-		const { onNavigate = noop } = this.props;
-
-		if ( event.target === this.container ) {
-			const selected = this.container.querySelector( '[aria-selected="true"]' );
-			const context = this.getFocusableContext( selected );
-			if ( context ) {
-				const { index, target } = context;
-				target.focus();
-				onNavigate( index, target );
-			}
-		}
 	}
 
 	getFocusableIndex( focusables, target ) {
