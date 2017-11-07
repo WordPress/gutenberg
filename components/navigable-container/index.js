@@ -15,6 +15,8 @@ import { calculateMode } from './modes.js';
  * Module Constants
  */
 
+
+
 class NavigableContainer extends Component {
 	constructor() {
 		super( ...arguments );
@@ -23,7 +25,7 @@ class NavigableContainer extends Component {
 		this.onFocus = this.onFocus.bind( this );
 
 		this.getInitialFocus = this.getInitialFocus.bind( this );
-		this.getFocusables = this.getFocusables.bind( this );
+		this.getFocusableContext = this.getFocusableContext.bind( this );
 		this.getFocusableIndex = this.getFocusableIndex.bind( this );
 
 		this.mode = calculateMode( this.props.navigation );
@@ -35,37 +37,23 @@ class NavigableContainer extends Component {
 		handleRef( ref );
 	}
 
-	getFocusables() {
+	getFocusableContext( target ) {
 		const { mode } = this;
 		const finder = mode.useTabstops ? focus.tabbable : focus.focusable;
-		return finder
+		const focusables = finder
 			.find( this.container )
 			.filter( ( node ) => mode.deep || node.parentElement === this.container );
+
+		const index = this.getFocusableIndex( focusables, target );
+		if ( index > -1 && target ) {
+			return { index, target, focusables };
+		}
+		return null;
 	}
 
 	getInitialFocus( ) {
-		const { mode } = this;
-		const tabbables = this.getFocusables();
-
-		if ( mode.initialSelector ) {
-			const target = this.container.querySelector( mode.initialSelector );
-			const index = tabbables.indexOf( target );
-			if ( target && index > -1 ) {
-				return {
-					target,
-					index,
-				};
-			}
-		}
-
-		if ( tabbables.length > 0 ) {
-			return {
-				target: tabbables[ 0 ],
-				index: 0,
-			};
-		}
-
-		return null;
+		const target = this.container.querySelector( '[aria-selected="true"]' );
+		return this.getFocusableContext( target );
 	}
 
 	onFocus( event ) {
@@ -80,15 +68,15 @@ class NavigableContainer extends Component {
 		}
 	}
 
-	getFocusableIndex( focusables ) {
+	getFocusableIndex( focusables, target ) {
 		const { mode } = this;
-		const directIndex = focusables.indexOf( document.activeElement );
+		const directIndex = focusables.indexOf( target );
 		if ( directIndex !== -1 ) {
 			return directIndex;
 		}
 
 		if ( mode.widget ) {
-			const indirectFocus = focusables.find( ( f ) => f.contains( document.activeElement ) );
+			const indirectFocus = focusables.find( ( f ) => f.contains( target ) );
 			if ( indirectFocus ) {
 				return focusables.indexOf( indirectFocus );
 			}
@@ -100,7 +88,7 @@ class NavigableContainer extends Component {
 			this.props.onKeyDown( event );
 		}
 
-		const { mode, getFocusables } = this;
+		const { mode, getFocusableContext } = this;
 		const { onNavigate = noop } = this.props;
 
 		const match = mode.detect( event );
@@ -108,14 +96,13 @@ class NavigableContainer extends Component {
 			return;
 		}
 
-		const focusables = getFocusables();
-		const currentIndex = this.getFocusableIndex( focusables );
+		const { index, focusables } = getFocusableContext( document.activeElement );
 
-		if ( currentIndex === -1 ) {
+		if ( index === -1 ) {
 			return;
 		}
 
-		const nextIndex = match( currentIndex, focusables.length );
+		const nextIndex = match( index, focusables.length );
 		if ( nextIndex >= 0 && nextIndex < focusables.length ) {
 			event.nativeEvent.stopImmediatePropagation();
 			event.stopPropagation();
