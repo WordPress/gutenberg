@@ -36,7 +36,10 @@ function HeaderToolbar( { hasUndo, hasRedo, hasFixedToolbar, undo, redo, isMulti
 				label={ __( 'Redo' ) }
 				disabled={ ! hasRedo }
 				onClick={ redo } />
-			{ isMultiBlockSelection && <BlockSwitcher key="switcher" uids={ selectedBlockUids } /> }
+			{ isMultiBlockSelection && (
+				<div className="editor-header-toolbar__block-toolbar">
+					<BlockSwitcher key="switcher" uids={ selectedBlockUids } />
+				</div> ) }
 			{ hasFixedToolbar && (
 				<div className="editor-header-toolbar__block-toolbar">
 					<BlockToolbar />
