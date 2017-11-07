@@ -89,6 +89,15 @@ registerBlockType( 'core/gallery', {
 				},
 			},
 		],
+		to: [
+			{
+				type: 'block',
+				blocks: [ 'core/image' ],
+				transform: ( { images } ) => (
+					images.map( ( { id, url, alt } ) => createBlock( 'core/image', { id, url, alt } ) )
+				),
+			},
+		],
 	},
 
 	getEditWrapperProps( attributes ) {
