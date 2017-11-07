@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { mount } from 'enzyme';
+import { each } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,10 +16,20 @@ import { NavigableGrid, TabbableContainer, NavigableMenu } from '../';
 
 const { UP, DOWN, TAB, LEFT, RIGHT } = keycodes;
 
+function simulateVisible( wrapper, selector ) {
+	const elements = wrapper.getDOMNode().querySelectorAll( selector );
+	each( elements, ( elem ) => {
+		elem.getClientRects = () => [ 'trick-jsdom-into-having-size-for-element-rect' ];
+	} );
+}
+
 function fireKeyDown( container, keyCode ) {
 	container.simulate( 'keydown', {
 		stopPropagation: () => {},
 		preventDefault: () => {},
+		nativeEvent: {
+			stopImmediatePropagation: () => { },
+		},
 		keyCode,
 	} );
 }
@@ -27,7 +38,7 @@ describe( 'NavigableMenu', () => {
 	// Skipping this this because the `isVisible` check in utils/focus/tabbable.js always returns false in tests
 	// Probbably a jsdom issue
 	// eslint-disable-next-line jest/no-disabled-tests
-	it.skip( 'should navigate by keypresses', () => {
+	it( 'should navigate by keypresses', () => {
 		let currentIndex = 0;
 		const wrapper = mount( (
 			<NavigableMenu onNavigate={ ( index ) => currentIndex = index }>
@@ -36,6 +47,8 @@ describe( 'NavigableMenu', () => {
 				<button id="btn3">Three</button>
 			</NavigableMenu >
 		) );
+
+		simulateVisible( wrapper, '*' );
 
 		const container = wrapper.find( 'div' );
 		wrapper.getDOMNode().querySelector( '#btn1' ).focus();
@@ -56,7 +69,7 @@ describe( 'NavigableGrid', () => {
 	// Skipping this this because the `isVisible` check in utils/focus/tabbable.js always returns false in tests
 	// Probbably a jsdom issue
 	// eslint-disable-next-line jest/no-disabled-tests
-	it.skip( 'should navigate by keypresses', () => {
+	it( 'should navigate by keypresses', () => {
 		let currentIndex = 0;
 		const wrapper = mount( (
 			<NavigableGrid onNavigate={ ( index ) => currentIndex = index } width={ 3 }>
@@ -68,6 +81,8 @@ describe( 'NavigableGrid', () => {
 				<button id="c2">C2</button>
 			</NavigableGrid >
 		) );
+
+		simulateVisible( wrapper, '*' );
 
 		const container = wrapper.find( 'div' );
 		wrapper.getDOMNode().querySelector( '#a1' ).focus();
@@ -91,17 +106,19 @@ describe( 'TabbableContainer', () => {
 	// Skipping this this because the `isVisible` check in utils/focus/tabbable.js always returns false in tests
 	// Probbably a jsdom issue
 	// eslint-disable-next-line jest/no-disabled-tests
-	it.skip( 'should navigate by keypresses', () => {
+	it( 'should navigate by keypresses', () => {
 		let currentIndex = 0;
 		const wrapper = mount( (
-			<TabbableContainer onNavigate={ ( index ) => currentIndex = index }>
-				<div id="section1" tabIndex="0">Section One</div>
-				<div id="section2" tabIndex="0">Section Two</div>
-				<div id="section3" tabIndex="0">Section Three</div>
+			<TabbableContainer className="wrapper" onNavigate={ ( index ) => currentIndex = index }>
+				<div className="section" id="section1" tabIndex="0">Section One</div>
+				<div className="section" id="section2" tabIndex="0">Section Two</div>
+				<div className="section" id="section3" tabIndex="0">Section Three</div>
 			</TabbableContainer >
 		) );
 
-		const container = wrapper.find( 'div' );
+		simulateVisible( wrapper, '*' );
+
+		const container = wrapper.find( 'div.wrapper' );
 		wrapper.getDOMNode().querySelector( '#section1' ).focus();
 
 		// Navigate options
