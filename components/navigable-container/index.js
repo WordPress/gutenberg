@@ -20,10 +20,8 @@ class NavigableContainer extends Component {
 		super( ...arguments );
 		this.bindContainer = this.bindContainer.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
-		this.onFocus = this.onFocus.bind( this );
 
-		this.getInitialFocus = this.getInitialFocus.bind( this );
-		this.getFocusables = this.getFocusables.bind( this );
+		this.getFocusableContext = this.getFocusableContext.bind( this );
 		this.getFocusableIndex = this.getFocusableIndex.bind( this );
 
 		this.mode = calculateMode( this.props.navigation );
@@ -35,60 +33,29 @@ class NavigableContainer extends Component {
 		handleRef( ref );
 	}
 
-	getFocusables() {
+	getFocusableContext( target ) {
 		const { mode } = this;
 		const finder = mode.useTabstops ? focus.tabbable : focus.focusable;
-		return finder
+		const focusables = finder
 			.find( this.container )
 			.filter( ( node ) => mode.deep || node.parentElement === this.container );
-	}
 
-	getInitialFocus( ) {
-		const { mode } = this;
-		const tabbables = this.getFocusables();
-
-		if ( mode.initialSelector ) {
-			const target = this.container.querySelector( mode.initialSelector );
-			const index = tabbables.indexOf( target );
-			if ( target && index > -1 ) {
-				return {
-					target,
-					index,
-				};
-			}
+		const index = this.getFocusableIndex( focusables, target );
+		if ( index > -1 && target ) {
+			return { index, target, focusables };
 		}
-
-		if ( tabbables.length > 0 ) {
-			return {
-				target: tabbables[ 0 ],
-				index: 0,
-			};
-		}
-
 		return null;
 	}
 
-	onFocus( event ) {
-		const { onNavigate = noop } = this.props;
-
-		if ( event.target === this.container ) {
-			const initialFocus = this.getInitialFocus( );
-			if ( initialFocus ) {
-				initialFocus.target.focus();
-				onNavigate( initialFocus.index, initialFocus.target );
-			}
-		}
-	}
-
-	getFocusableIndex( focusables ) {
+	getFocusableIndex( focusables, target ) {
 		const { mode } = this;
-		const directIndex = focusables.indexOf( document.activeElement );
+		const directIndex = focusables.indexOf( target );
 		if ( directIndex !== -1 ) {
 			return directIndex;
 		}
 
 		if ( mode.widget ) {
-			const indirectFocus = focusables.find( ( f ) => f.contains( document.activeElement ) );
+			const indirectFocus = focusables.find( ( f ) => f.contains( target ) );
 			if ( indirectFocus ) {
 				return focusables.indexOf( indirectFocus );
 			}
@@ -100,7 +67,7 @@ class NavigableContainer extends Component {
 			this.props.onKeyDown( event );
 		}
 
-		const { mode, getFocusables } = this;
+		const { mode, getFocusableContext } = this;
 		const { onNavigate = noop } = this.props;
 
 		const match = mode.detect( event );
@@ -108,14 +75,14 @@ class NavigableContainer extends Component {
 			return;
 		}
 
-		const focusables = getFocusables();
-		const currentIndex = this.getFocusableIndex( focusables );
+		const context = getFocusableContext( document.activeElement );
 
-		if ( currentIndex === -1 ) {
+		if ( ! context ) {
 			return;
 		}
+		const { index, focusables } = context;
 
-		const nextIndex = match( currentIndex, focusables.length );
+		const nextIndex = match( index, focusables.length );
 		if ( nextIndex >= 0 && nextIndex < focusables.length ) {
 			event.nativeEvent.stopImmediatePropagation();
 			event.stopPropagation();
@@ -143,11 +110,10 @@ class NavigableContainer extends Component {
 
 export class NavigableGrid extends Component {
 	render() {
-		const { cycle = true, deep = true, widget = true, width = 1, initialSelector, ...rest } = this.props;
+		const { cycle = true, deep = true, widget = true, width = 1, ...rest } = this.props;
 		const navigation = {
 			mode: 'grid',
 			cycle,
-			initialSelector,
 			deep,
 			width,
 			widget,
@@ -158,12 +124,11 @@ export class NavigableGrid extends Component {
 
 export class NavigableMenu extends Component {
 	render() {
-		const { cycle = true, deep = true, widget = true, orientation = 'vertical', stopOtherArrows = true, initialSelector, ...rest } = this.props;
+		const { cycle = true, deep = true, widget = true, orientation = 'vertical', stopOtherArrows = true, ...rest } = this.props;
 		const navigation = {
 			mode: 'menu',
 			cycle,
 			orientation,
-			initialSelector,
 			stopOtherArrows,
 			deep,
 			widget,
@@ -174,11 +139,10 @@ export class NavigableMenu extends Component {
 
 export class TabbableContainer extends Component {
 	render() {
-		const { cycle = true, deep = true, widget = true, initialSelector, ...rest } = this.props;
+		const { cycle = true, deep = true, widget = true, ...rest } = this.props;
 		const navigation = {
 			mode: 'tabbing',
 			cycle,
-			initialSelector,
 			deep,
 			widget,
 		};
