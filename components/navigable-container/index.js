@@ -69,7 +69,7 @@ class NavigableContainer extends Component {
 
 		const { keyCode } = event;
 		const { getFocusableContext } = this;
-		const { eventToOffset, onNavigate, preventBubblingArrowEvents = noop } = this.props;
+		const { eventToOffset, onNavigate = noop, preventBubblingArrowEvents = true } = this.props;
 
 		const offset = eventToOffset( event );
 		if ( offset === 0 ) {
