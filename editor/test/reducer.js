@@ -56,12 +56,15 @@ describe( 'state', () => {
 			unregisterBlockType( 'core/test-block' );
 		} );
 
-		it( 'should return empty blocksByUid, blockOrder, history by default', () => {
+		it( 'should return history (empty edits, blocksByUid, blockOrder), dirty flag by default', () => {
 			const state = editor( undefined, {} );
 
-			expect( state.blocksByUid ).toEqual( {} );
-			expect( state.blockOrder ).toEqual( [] );
-			expect( state ).toHaveProperty( 'history' );
+			expect( state.past ).toEqual( [] );
+			expect( state.future ).toEqual( [] );
+			expect( state.present.edits ).toEqual( {} );
+			expect( state.present.blocksByUid ).toEqual( {} );
+			expect( state.present.blockOrder ).toEqual( [] );
+			expect( state.isDirty ).toBe( false );
 		} );
 
 		it( 'should key by replaced blocks uid', () => {
@@ -71,9 +74,9 @@ describe( 'state', () => {
 				blocks: [ { uid: 'bananas' } ],
 			} );
 
-			expect( Object.keys( state.blocksByUid ) ).toHaveLength( 1 );
-			expect( values( state.blocksByUid )[ 0 ].uid ).toBe( 'bananas' );
-			expect( state.blockOrder ).toEqual( [ 'bananas' ] );
+			expect( Object.keys( state.present.blocksByUid ) ).toHaveLength( 1 );
+			expect( values( state.present.blocksByUid )[ 0 ].uid ).toBe( 'bananas' );
+			expect( state.present.blockOrder ).toEqual( [ 'bananas' ] );
 		} );
 
 		it( 'should insert block', () => {
@@ -93,9 +96,9 @@ describe( 'state', () => {
 				} ],
 			} );
 
-			expect( Object.keys( state.blocksByUid ) ).toHaveLength( 2 );
-			expect( values( state.blocksByUid )[ 1 ].uid ).toBe( 'ribs' );
-			expect( state.blockOrder ).toEqual( [ 'chicken', 'ribs' ] );
+			expect( Object.keys( state.present.blocksByUid ) ).toHaveLength( 2 );
+			expect( values( state.present.blocksByUid )[ 1 ].uid ).toBe( 'ribs' );
+			expect( state.present.blockOrder ).toEqual( [ 'chicken', 'ribs' ] );
 		} );
 
 		it( 'should replace the block', () => {
@@ -116,10 +119,10 @@ describe( 'state', () => {
 				} ],
 			} );
 
-			expect( Object.keys( state.blocksByUid ) ).toHaveLength( 1 );
-			expect( values( state.blocksByUid )[ 0 ].name ).toBe( 'core/freeform' );
-			expect( values( state.blocksByUid )[ 0 ].uid ).toBe( 'wings' );
-			expect( state.blockOrder ).toEqual( [ 'wings' ] );
+			expect( Object.keys( state.present.blocksByUid ) ).toHaveLength( 1 );
+			expect( values( state.present.blocksByUid )[ 0 ].name ).toBe( 'core/freeform' );
+			expect( values( state.present.blocksByUid )[ 0 ].uid ).toBe( 'wings' );
+			expect( state.present.blockOrder ).toEqual( [ 'wings' ] );
 		} );
 
 		it( 'should update the block', () => {
@@ -141,7 +144,7 @@ describe( 'state', () => {
 				},
 			} );
 
-			expect( state.blocksByUid.chicken ).toEqual( {
+			expect( state.present.blocksByUid.chicken ).toEqual( {
 				uid: 'chicken',
 				name: 'core/test-block',
 				attributes: { content: 'ribs' },
@@ -167,7 +170,7 @@ describe( 'state', () => {
 				uids: [ 'ribs' ],
 			} );
 
-			expect( state.blockOrder ).toEqual( [ 'ribs', 'chicken' ] );
+			expect( state.present.blockOrder ).toEqual( [ 'ribs', 'chicken' ] );
 		} );
 
 		it( 'should move multiple blocks up', () => {
@@ -192,7 +195,7 @@ describe( 'state', () => {
 				uids: [ 'ribs', 'veggies' ],
 			} );
 
-			expect( state.blockOrder ).toEqual( [ 'ribs', 'veggies', 'chicken' ] );
+			expect( state.present.blockOrder ).toEqual( [ 'ribs', 'veggies', 'chicken' ] );
 		} );
 
 		it( 'should not move the first block up', () => {
@@ -213,7 +216,7 @@ describe( 'state', () => {
 				uids: [ 'chicken' ],
 			} );
 
-			expect( state.blockOrder ).toBe( original.blockOrder );
+			expect( state.present.blockOrder ).toBe( original.present.blockOrder );
 		} );
 
 		it( 'should move the block down', () => {
@@ -234,7 +237,7 @@ describe( 'state', () => {
 				uids: [ 'chicken' ],
 			} );
 
-			expect( state.blockOrder ).toEqual( [ 'ribs', 'chicken' ] );
+			expect( state.present.blockOrder ).toEqual( [ 'ribs', 'chicken' ] );
 		} );
 
 		it( 'should move multiple blocks down', () => {
@@ -259,7 +262,7 @@ describe( 'state', () => {
 				uids: [ 'chicken', 'ribs' ],
 			} );
 
-			expect( state.blockOrder ).toEqual( [ 'veggies', 'chicken', 'ribs' ] );
+			expect( state.present.blockOrder ).toEqual( [ 'veggies', 'chicken', 'ribs' ] );
 		} );
 
 		it( 'should not move the last block down', () => {
@@ -280,7 +283,7 @@ describe( 'state', () => {
 				uids: [ 'ribs' ],
 			} );
 
-			expect( state.blockOrder ).toBe( original.blockOrder );
+			expect( state.present.blockOrder ).toBe( original.present.blockOrder );
 		} );
 
 		it( 'should remove the block', () => {
@@ -301,8 +304,8 @@ describe( 'state', () => {
 				uids: [ 'chicken' ],
 			} );
 
-			expect( state.blockOrder ).toEqual( [ 'ribs' ] );
-			expect( state.blocksByUid ).toEqual( {
+			expect( state.present.blockOrder ).toEqual( [ 'ribs' ] );
+			expect( state.present.blocksByUid ).toEqual( {
 				ribs: {
 					uid: 'ribs',
 					name: 'core/test-block',
@@ -333,8 +336,8 @@ describe( 'state', () => {
 				uids: [ 'chicken', 'veggies' ],
 			} );
 
-			expect( state.blockOrder ).toEqual( [ 'ribs' ] );
-			expect( state.blocksByUid ).toEqual( {
+			expect( state.present.blockOrder ).toEqual( [ 'ribs' ] );
+			expect( state.present.blocksByUid ).toEqual( {
 				ribs: {
 					uid: 'ribs',
 					name: 'core/test-block',
@@ -366,8 +369,8 @@ describe( 'state', () => {
 				} ],
 			} );
 
-			expect( Object.keys( state.blocksByUid ) ).toHaveLength( 3 );
-			expect( state.blockOrder ).toEqual( [ 'kumquat', 'persimmon', 'loquat' ] );
+			expect( Object.keys( state.present.blocksByUid ) ).toHaveLength( 3 );
+			expect( state.present.blockOrder ).toEqual( [ 'kumquat', 'persimmon', 'loquat' ] );
 		} );
 
 		describe( 'edits()', () => {
@@ -387,7 +390,7 @@ describe( 'state', () => {
 					},
 				} );
 
-				expect( state.edits ).toEqual( {
+				expect( state.present.edits ).toEqual( {
 					status: 'draft',
 					title: 'post title',
 					tags: [ 1 ],
@@ -410,7 +413,7 @@ describe( 'state', () => {
 					},
 				} );
 
-				expect( state.edits ).toBe( original.edits );
+				expect( state.present.edits ).toBe( original.present.edits );
 			} );
 
 			it( 'should save modified properties', () => {
@@ -431,7 +434,7 @@ describe( 'state', () => {
 					},
 				} );
 
-				expect( state.edits ).toEqual( {
+				expect( state.present.edits ).toEqual( {
 					status: 'draft',
 					title: 'modified title',
 					tags: [ 2 ],
@@ -447,7 +450,7 @@ describe( 'state', () => {
 					},
 				} );
 
-				expect( state.edits ).toEqual( {
+				expect( state.present.edits ).toEqual( {
 					status: 'draft',
 					title: 'post title',
 				} );
@@ -465,7 +468,7 @@ describe( 'state', () => {
 					},
 				} );
 
-				expect( state.edits ).toHaveProperty( 'content' );
+				expect( state.present.edits ).toHaveProperty( 'content' );
 
 				state = editor( original, {
 					type: 'RESET_BLOCKS',
@@ -480,7 +483,7 @@ describe( 'state', () => {
 					} ],
 				} );
 
-				expect( state.edits ).not.toHaveProperty( 'content' );
+				expect( state.present.edits ).not.toHaveProperty( 'content' );
 			} );
 		} );
 
@@ -501,7 +504,7 @@ describe( 'state', () => {
 					},
 				} );
 
-				expect( state.blocksByUid.kumquat.attributes.updated ).toBe( true );
+				expect( state.present.blocksByUid.kumquat.attributes.updated ).toBe( true );
 			} );
 
 			it( 'should accumulate attribute block updates', () => {
@@ -522,7 +525,7 @@ describe( 'state', () => {
 					},
 				} );
 
-				expect( state.blocksByUid.kumquat.attributes ).toEqual( {
+				expect( state.present.blocksByUid.kumquat.attributes ).toEqual( {
 					updated: true,
 					moreUpdated: true,
 				} );
@@ -541,7 +544,7 @@ describe( 'state', () => {
 					},
 				} );
 
-				expect( state.blocksByUid ).toBe( original.blocksByUid );
+				expect( state.present.blocksByUid ).toBe( original.present.blocksByUid );
 			} );
 
 			it( 'should return with same reference if no changes in updates', () => {
@@ -562,7 +565,7 @@ describe( 'state', () => {
 					},
 				} );
 
-				expect( state.blocksByUid ).toBe( state.blocksByUid );
+				expect( state.present.blocksByUid ).toBe( state.present.blocksByUid );
 			} );
 		} );
 	} );
@@ -885,7 +888,14 @@ describe( 'state', () => {
 		it( 'should apply all defaults', () => {
 			const state = preferences( undefined, {} );
 
-			expect( state ).toEqual( { blockUsage: {}, recentlyUsedBlocks: [], mode: 'visual', isSidebarOpened: true, panels: { 'post-status': true } } );
+			expect( state ).toEqual( {
+				blockUsage: {},
+				recentlyUsedBlocks: [],
+				mode: 'visual',
+				isSidebarOpened: true,
+				panels: { 'post-status': true },
+				features: { fixedToolbar: true },
+			} );
 		} );
 
 		it( 'should toggle the sidebar open flag', () => {
@@ -993,6 +1003,14 @@ describe( 'state', () => {
 				type: 'SETUP_EDITOR',
 			} );
 			expect( state.blockUsage ).toEqual( { 'core-embed/youtube': 88 } );
+		} );
+
+		it( 'should toggle a feature flag', () => {
+			const state = preferences( deepFreeze( { features: { chicken: true } } ), {
+				type: 'TOGGLE_FEATURE',
+				feature: 'chicken',
+			} );
+			expect( state ).toEqual( { features: { chicken: false } } );
 		} );
 	} );
 
