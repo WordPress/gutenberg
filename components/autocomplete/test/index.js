@@ -115,7 +115,7 @@ function expectInitialState( wrapper ) {
 	expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
 	expect( wrapper.state( 'query' ) ).toBeUndefined();
 	expect( wrapper.state( 'search' ) ).toEqual( /./ );
-	expect( wrapper.instance().getFilteredOptions() ).toEqual( [] );
+	expect( wrapper.state( 'filteredOptions' ) ).toEqual( [] );
 	expect( wrapper.find( 'Popover' ).prop( 'isOpen' ) ).toBe( false );
 	expect( wrapper.find( '.components-autocomplete__result' ) ).toHaveLength( 0 );
 }
@@ -207,8 +207,8 @@ describe( 'Autocomplete', () => {
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
 				expect( wrapper.state( 'query' ) ).toEqual( 'b' );
 				expect( wrapper.state( 'search' ) ).toEqual( /b/i );
-				expect( wrapper.instance().getFilteredOptions() ).toEqual( [
-					{ key: '0_0', value: 1, label: 'Bananas', keywords: [ 'fruit' ] },
+				expect( wrapper.state( 'filteredOptions' ) ).toEqual( [
+					{ key: '0-0', value: 1, label: 'Bananas', keywords: [ 'fruit' ] },
 				] );
 				expect( wrapper.find( 'Popover' ).prop( 'isOpen' ) ).toBe( true );
 				expect( wrapper.find( 'button.components-autocomplete__result' ) ).toHaveLength( 1 );
@@ -228,7 +228,7 @@ describe( 'Autocomplete', () => {
 				expect( wrapper.state( 'open' ) ).toBeDefined();
 				expect( wrapper.state( 'query' ) ).toEqual( 'zzz' );
 				expect( wrapper.state( 'search' ) ).toEqual( /zzz/i );
-				expect( wrapper.instance().getFilteredOptions() ).toEqual( [] );
+				expect( wrapper.state( 'filteredOptions' ) ).toEqual( [] );
 				expect( wrapper.find( 'Popover' ).prop( 'isOpen' ) ).toBe( false );
 				expect( wrapper.find( 'button.components-autocomplete__result' ) ).toHaveLength( 0 );
 				done();
@@ -262,9 +262,9 @@ describe( 'Autocomplete', () => {
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
 				expect( wrapper.state( 'query' ) ).toEqual( '' );
 				expect( wrapper.state( 'search' ) ).toEqual( new RegExp( '', 'i' ) );
-				expect( wrapper.instance().getFilteredOptions() ).toEqual( [
-					{ key: '0_0', value: 1, label: 'Bananas', keywords: [ 'fruit' ] },
-					{ key: '0_1', value: 2, label: 'Apple', keywords: [ 'fruit' ] },
+				expect( wrapper.state( 'filteredOptions' ) ).toEqual( [
+					{ key: '0-0', value: 1, label: 'Bananas', keywords: [ 'fruit' ] },
+					{ key: '0-1', value: 2, label: 'Apple', keywords: [ 'fruit' ] },
 				] );
 				expect( wrapper.find( 'Popover' ).prop( 'isOpen' ) ).toBe( true );
 				expect( wrapper.find( 'button.components-autocomplete__result' ) ).toHaveLength( 2 );
@@ -285,9 +285,9 @@ describe( 'Autocomplete', () => {
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
 				expect( wrapper.state( 'query' ) ).toEqual( 'fruit' );
 				expect( wrapper.state( 'search' ) ).toEqual( /fruit/i );
-				expect( wrapper.instance().getFilteredOptions() ).toEqual( [
-					{ key: '0_0', value: 1, label: 'Bananas', keywords: [ 'fruit' ] },
-					{ key: '0_1', value: 2, label: 'Apple', keywords: [ 'fruit' ] },
+				expect( wrapper.state( 'filteredOptions' ) ).toEqual( [
+					{ key: '0-0', value: 1, label: 'Bananas', keywords: [ 'fruit' ] },
+					{ key: '0-1', value: 2, label: 'Apple', keywords: [ 'fruit' ] },
 				] );
 				expect( wrapper.find( 'Popover' ).prop( 'isOpen' ) ).toBe( true );
 				expect( wrapper.find( 'button.components-autocomplete__result' ) ).toHaveLength( 2 );
@@ -308,9 +308,9 @@ describe( 'Autocomplete', () => {
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
 				expect( wrapper.state( 'query' ) ).toEqual( 'a' );
 				expect( wrapper.state( 'search' ) ).toEqual( /a/i );
-				expect( wrapper.instance().getFilteredOptions() ).toEqual( [
-					{ key: '0_0', value: 1, label: 'Bananas', keywords: [ 'fruit' ] },
-					{ key: '0_1', value: 2, label: 'Apple', keywords: [ 'fruit' ] },
+				expect( wrapper.state( 'filteredOptions' ) ).toEqual( [
+					{ key: '0-0', value: 1, label: 'Bananas', keywords: [ 'fruit' ] },
+					{ key: '0-1', value: 2, label: 'Apple', keywords: [ 'fruit' ] },
 				] );
 				expect( wrapper.find( 'Popover' ).prop( 'isOpen' ) ).toBe( true );
 				expect( wrapper.find( 'button.components-autocomplete__result' ) ).toHaveLength( 2 );
@@ -321,8 +321,8 @@ describe( 'Autocomplete', () => {
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
 				expect( wrapper.state( 'query' ) ).toEqual( 'ap' );
 				expect( wrapper.state( 'search' ) ).toEqual( /ap/i );
-				expect( wrapper.instance().getFilteredOptions() ).toEqual( [
-					{ key: '0_1', value: 2, label: 'Apple', keywords: [ 'fruit' ] },
+				expect( wrapper.state( 'filteredOptions' ) ).toEqual( [
+					{ key: '0-1', value: 2, label: 'Apple', keywords: [ 'fruit' ] },
 				] );
 				expect( wrapper.find( 'Popover' ).prop( 'isOpen' ) ).toBe( true );
 				expect( wrapper.find( 'button.components-autocomplete__result' ) ).toHaveLength( 1 );
@@ -404,16 +404,22 @@ describe( 'Autocomplete', () => {
 				wrapper.update();
 				// menu should be open with all options
 				expect( wrapper.state( 'open' ) ).toBeDefined();
+				expect( wrapper.state( 'suppress' ) ).toBeUndefined();
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
 				expect( wrapper.state( 'query' ) ).toEqual( '' );
 				expect( wrapper.state( 'search' ) ).toEqual( new RegExp( '', 'i' ) );
-				expect( wrapper.instance().getFilteredOptions() ).toEqual( [
-					{ key: '0_0', value: 1, label: 'Bananas', keywords: [ 'fruit' ] },
-					{ key: '0_1', value: 2, label: 'Apple', keywords: [ 'fruit' ] },
+				expect( wrapper.state( 'filteredOptions' ) ).toEqual( [
+					{ key: '0-0', value: 1, label: 'Bananas', keywords: [ 'fruit' ] },
+					{ key: '0-1', value: 2, label: 'Apple', keywords: [ 'fruit' ] },
 				] );
-				// pressing escape should close everything
+				// pressing escape should suppress the dialog but it maintains the state
 				simulateKeydown( wrapper, ESCAPE );
-				expectInitialState( wrapper );
+				expect( wrapper.state( 'suppress' ) ).toEqual( 0 );
+				expect( wrapper.state( 'filteredOptions' ) ).toEqual( [
+					{ key: '0-0', value: 1, label: 'Bananas', keywords: [ 'fruit' ] },
+					{ key: '0-1', value: 2, label: 'Apple', keywords: [ 'fruit' ] },
+				] );
+				expect( wrapper.find( 'Popover' ).prop( 'isOpen' ) ).toBe( false );
 				// the editor should not have gotten the event
 				expect( editorKeydown ).not.toHaveBeenCalled();
 				done();
@@ -444,9 +450,9 @@ describe( 'Autocomplete', () => {
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
 				expect( wrapper.state( 'query' ) ).toEqual( '' );
 				expect( wrapper.state( 'search' ) ).toEqual( new RegExp( '', 'i' ) );
-				expect( wrapper.instance().getFilteredOptions() ).toEqual( [
-					{ key: '0_0', value: 1, label: 'Bananas', keywords: [ 'fruit' ] },
-					{ key: '0_1', value: 2, label: 'Apple', keywords: [ 'fruit' ] },
+				expect( wrapper.state( 'filteredOptions' ) ).toEqual( [
+					{ key: '0-0', value: 1, label: 'Bananas', keywords: [ 'fruit' ] },
+					{ key: '0-1', value: 2, label: 'Apple', keywords: [ 'fruit' ] },
 				] );
 				// pressing enter should reset and call onSelect
 				simulateKeydown( wrapper, ENTER );
@@ -487,9 +493,9 @@ describe( 'Autocomplete', () => {
 				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
 				expect( wrapper.state( 'query' ) ).toEqual( '' );
 				expect( wrapper.state( 'search' ) ).toEqual( new RegExp( '', 'i' ) );
-				expect( wrapper.instance().getFilteredOptions() ).toEqual( [
-					{ key: '0_0', value: 1, label: 'Bananas', keywords: [ 'fruit' ] },
-					{ key: '0_1', value: 2, label: 'Apple', keywords: [ 'fruit' ] },
+				expect( wrapper.state( 'filteredOptions' ) ).toEqual( [
+					{ key: '0-0', value: 1, label: 'Bananas', keywords: [ 'fruit' ] },
+					{ key: '0-1', value: 2, label: 'Apple', keywords: [ 'fruit' ] },
 				] );
 				// clicking should reset and select the item
 				wrapper.find( '.components-autocomplete__result Button' ).at( 0 ).simulate( 'click' );
