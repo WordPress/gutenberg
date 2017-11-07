@@ -8,6 +8,8 @@
 		flex-grow: 0;
 		flex-shrink: 0;
 		max-width: none; // we must override the gutenberg default of 100%
+		width: 24px; // avoid jarring resize by seting the size upfront
+		height: 24px;
 	}
 	.name {
 		white-space: nowrap;
