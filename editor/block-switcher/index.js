@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { uniq, get, reduce, find } from 'lodash';
+import { every, uniq, get, reduce, find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -24,19 +24,33 @@ import { getBlock } from '../selectors';
  */
 const { DOWN } = keycodes;
 
-function BlockSwitcher( { block, onTransform } ) {
-	if ( ! block ) {
+function BlockSwitcher( { blocks, onTransform } ) {
+	if ( ! blocks || ! blocks[ 0 ] ) {
+		return null;
+	}
+	const isMultiBlock = blocks.length > 1;
+	const sourceBlockName = blocks[ 0 ].name;
+
+	if ( isMultiBlock && ! every( blocks, ( block ) => ( block.name === sourceBlockName ) ) ) {
 		return null;
 	}
 
-	const blockType = getBlockType( block.name );
+	const blockType = getBlockType( sourceBlockName );
 	const blocksToBeTransformedFrom = reduce( getBlockTypes(), ( memo, type ) => {
 		const transformFrom = get( type, 'transforms.from', [] );
-		const transformation = find( transformFrom, t => t.type === 'block' && t.blocks.indexOf( block.name ) !== -1 );
+		const transformation = find(
+			transformFrom,
+			t => t.type === 'block' && t.blocks.indexOf( sourceBlockName ) !== -1 &&
+				( ! isMultiBlock || t.isMultiBlock )
+		);
 		return transformation ? memo.concat( [ type.name ] ) : memo;
 	}, [] );
 	const blocksToBeTransformedTo = get( blockType, 'transforms.to', [] )
-		.reduce( ( memo, transformation ) => memo.concat( transformation.blocks ), [] );
+		.reduce(
+			( memo, transformation ) =>
+				memo.concat( ! isMultiBlock || transformation.isMultiBlock ? transformation.blocks : [] ),
+			[]
+		);
 	const allowedBlocks = uniq( blocksToBeTransformedFrom.concat( blocksToBeTransformedTo ) )
 		.reduce( ( memo, name ) => {
 			const type = getBlockType( name );
@@ -91,7 +105,7 @@ function BlockSwitcher( { block, onTransform } ) {
 							<IconButton
 								key={ name }
 								onClick={ () => {
-									onTransform( block, name );
+									onTransform( blocks, name );
 									onClose();
 								} }
 								className="editor-block-switcher__menu-item"
@@ -113,14 +127,16 @@ function BlockSwitcher( { block, onTransform } ) {
 }
 
 export default connect(
-	( state, ownProps ) => ( {
-		block: getBlock( state, ownProps.uid ),
-	} ),
+	( state, ownProps ) => {
+		return {
+			blocks: ownProps.uids.map( ( uid ) => getBlock( state, uid ) ),
+		};
+	},
 	( dispatch, ownProps ) => ( {
-		onTransform( block, name ) {
+		onTransform( blocks, name ) {
 			dispatch( replaceBlocks(
-				[ ownProps.uid ],
-				switchToBlockType( block, name )
+				ownProps.uids,
+				switchToBlockType( blocks, name )
 			) );
 		},
 	} )
