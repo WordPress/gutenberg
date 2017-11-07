@@ -35,9 +35,6 @@ function fireKeyDown( container, keyCode ) {
 }
 
 describe( 'NavigableMenu', () => {
-	// Skipping this this because the `isVisible` check in utils/focus/tabbable.js always returns false in tests
-	// Probbably a jsdom issue
-	// eslint-disable-next-line jest/no-disabled-tests
 	it( 'should navigate by keypresses', () => {
 		let currentIndex = 0;
 		const wrapper = mount( (
@@ -66,9 +63,6 @@ describe( 'NavigableMenu', () => {
 } );
 
 describe( 'TabbableContainer', () => {
-	// Skipping this this because the `isVisible` check in utils/focus/tabbable.js always returns false in tests
-	// Probbably a jsdom issue
-	// eslint-disable-next-line jest/no-disabled-tests
 	it( 'should navigate by keypresses', () => {
 		let currentIndex = 0;
 		const wrapper = mount( (
