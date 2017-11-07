@@ -130,11 +130,10 @@ class NavigableContainer extends Component {
 
 export class NavigableGrid extends Component {
 	render() {
-		const { cycle = true, deep = true, widget = true, width = 1, initialSelector, ...rest } = this.props;
+		const { cycle = true, deep = true, widget = true, width = 1, ...rest } = this.props;
 		const navigation = {
 			mode: 'grid',
 			cycle,
-			initialSelector,
 			deep,
 			width,
 			widget,
@@ -145,12 +144,11 @@ export class NavigableGrid extends Component {
 
 export class NavigableMenu extends Component {
 	render() {
-		const { cycle = true, deep = true, widget = true, orientation = 'vertical', stopOtherArrows = true, initialSelector, ...rest } = this.props;
+		const { cycle = true, deep = true, widget = true, orientation = 'vertical', stopOtherArrows = true, ...rest } = this.props;
 		const navigation = {
 			mode: 'menu',
 			cycle,
 			orientation,
-			initialSelector,
 			stopOtherArrows,
 			deep,
 			widget,
@@ -161,11 +159,10 @@ export class NavigableMenu extends Component {
 
 export class TabbableContainer extends Component {
 	render() {
-		const { cycle = true, deep = true, widget = true, initialSelector, ...rest } = this.props;
+		const { cycle = true, deep = true, widget = true, ...rest } = this.props;
 		const navigation = {
 			mode: 'tabbing',
 			cycle,
-			initialSelector,
 			deep,
 			widget,
 		};
