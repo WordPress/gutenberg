@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, flatMap } from 'lodash';
+import { find, compact, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -105,7 +105,7 @@ registerBlockType( 'core/list', {
 				transform: ( blockAttributes ) => {
 					return createBlock( 'core/list', {
 						nodeName: 'UL',
-						values: flatMap( blockAttributes, ( { content } ) => fromBrDelimitedContent( content ) ),
+						values: blockAttributes.map( ( { content }, index ) => ( <li key={ index }>{ content }</li> ) ),
 					} );
 				},
 			},
@@ -152,11 +152,9 @@ registerBlockType( 'core/list', {
 			{
 				type: 'block',
 				blocks: [ 'core/paragraph' ],
-				transform: ( { values } ) => {
-					return createBlock( 'core/paragraph', {
-						content: toBrDelimitedContent( values ),
-					} );
-				},
+				transform: ( { values } ) =>
+					compact( values.map( ( value ) => get( value, 'props.children', null ) ) )
+						.map( ( content ) => createBlock( 'core/paragraph', { content } ) ),
 			},
 			{
 				type: 'block',
