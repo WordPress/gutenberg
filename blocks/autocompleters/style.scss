@@ -3,12 +3,29 @@
 }
 
 .blocks-user-autocomplete {
-	img {
+	.components-autocomplete__result img {
 		margin-right: 8px;
+		flex-grow: 0;
+		flex-shrink: 0;
+		max-width: none; // we must override the gutenberg default of 100%
+	}
+	.name {
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		max-width: 200px;
+		flex-shrink: 0;
+		flex-grow: 1;
 	}
 	.slug {
 		margin-left: 8px;
 		color: $dark-gray-100;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		overflow: none;
+		max-width: 100px;
+		flex-grow: 0;
+		flex-shrink: 0;
 	}
 	.components-autocomplete__result:hover .slug {
 		color: $blue-medium-300;
