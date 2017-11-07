@@ -17,9 +17,9 @@ import Inserter from '../../inserter';
 import BlockSwitcher from '../../block-switcher';
 import BlockToolbar from '../../block-toolbar';
 import NavigableToolbar from '../../navigable-toolbar';
-import { getSelectedBlockCount, hasEditorUndo, hasEditorRedo, isFeatureActive } from '../../selectors';
+import { getMultiSelectedBlockUids, hasEditorUndo, hasEditorRedo, isFeatureActive } from '../../selectors';
 
-function HeaderToolbar( { hasUndo, hasRedo, hasFixedToolbar, undo, redo, isMultiBlockSelection } ) {
+function HeaderToolbar( { hasUndo, hasRedo, hasFixedToolbar, undo, redo, isMultiBlockSelection, selectedBlockUids } ) {
 	return (
 		<NavigableToolbar
 			className="editor-header-toolbar"
@@ -36,7 +36,7 @@ function HeaderToolbar( { hasUndo, hasRedo, hasFixedToolbar, undo, redo, isMulti
 				label={ __( 'Redo' ) }
 				disabled={ ! hasRedo }
 				onClick={ redo } />
-			{ isMultiBlockSelection && <BlockSwitcher key="switcher" /> }
+			{ isMultiBlockSelection && <BlockSwitcher key="switcher" uids={ selectedBlockUids } /> }
 			{ hasFixedToolbar && (
 				<div className="editor-header-toolbar__block-toolbar">
 					<BlockToolbar />
@@ -47,12 +47,16 @@ function HeaderToolbar( { hasUndo, hasRedo, hasFixedToolbar, undo, redo, isMulti
 }
 
 export default connect(
-	( state ) => ( {
-		hasUndo: hasEditorUndo( state ),
-		hasRedo: hasEditorRedo( state ),
-		hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
-		isMultiBlockSelection: getSelectedBlockCount( state ) > 1,
-	} ),
+	( state ) => {
+		const selectedBlockUids = getMultiSelectedBlockUids( state );
+		return {
+			hasUndo: hasEditorUndo( state ),
+			hasRedo: hasEditorRedo( state ),
+			hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
+			isMultiBlockSelection: selectedBlockUids.length > 1,
+			selectedBlockUids,
+		};
+	},
 	( dispatch ) => ( {
 		undo: () => dispatch( { type: 'UNDO' } ),
 		redo: () => dispatch( { type: 'REDO' } ),

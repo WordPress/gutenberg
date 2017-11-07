@@ -64,16 +64,17 @@ export function createBlock( name, blockAttributes = {} ) {
 /**
  * Switch one or more blocks into one or more blocks of the new block type.
  *
- * @param  {Array}  blocks     Blocks array
- * @param  {string} name       Block name
- * @return {Array}             Block object
+ * @param  {Array|Object}  blocks     Blocks array or block object
+ * @param  {string}        name       Block name
+ * @return {Array}                    Array of blocks
  */
 export function switchToBlockType( blocks, name ) {
-	const isMultiBlock = blocks.length > 1;
-	const fistBlock = blocks[ 0 ];
+	const blocksArray = castArray( blocks );
+	const isMultiBlock = blocksArray.length > 1;
+	const fistBlock = blocksArray[ 0 ];
 	const sourceName = fistBlock.name;
 
-	if ( isMultiBlock && ! every( blocks, ( block ) => ( block.name === sourceName ) ) ) {
+	if ( isMultiBlock && ! every( blocksArray, ( block ) => ( block.name === sourceName ) ) ) {
 		return null;
 	}
 
@@ -94,7 +95,7 @@ export function switchToBlockType( blocks, name ) {
 
 	let transformationResults;
 	if ( transformation.isMultiBlock ) {
-		transformationResults = transformation.transform( blocks.map( ( currentBlock ) => currentBlock.attributes ) );
+		transformationResults = transformation.transform( blocksArray.map( ( currentBlock ) => currentBlock.attributes ) );
 	} else {
 		transformationResults = transformation.transform( fistBlock.attributes );
 	}

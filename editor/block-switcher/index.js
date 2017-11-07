@@ -17,17 +17,18 @@ import { keycodes } from '@wordpress/utils';
  */
 import './style.scss';
 import { replaceBlocks } from '../actions';
-import { getBlock, getSelectedBlock, getSelectedBlockCount, getMultiSelectedBlocks } from '../selectors';
+import { getBlock } from '../selectors';
 
 /**
  * Module Constants
  */
 const { DOWN } = keycodes;
 
-function BlockSwitcher( { blocks, isMultiBlock, onTransform } ) {
+function BlockSwitcher( { blocks, onTransform } ) {
 	if ( ! blocks || ! blocks[ 0 ] ) {
 		return null;
 	}
+	const isMultiBlock = blocks.length > 1;
 	const sourceBlockName = blocks[ 0 ].name;
 
 	if ( isMultiBlock && ! every( blocks, ( block ) => ( block.name === sourceBlockName ) ) ) {
@@ -119,18 +120,14 @@ function BlockSwitcher( { blocks, isMultiBlock, onTransform } ) {
 
 export default connect(
 	( state, ownProps ) => {
-		const isMultiBlock = ! ownProps.uid && getSelectedBlockCount( state ) > 1;
-		const blocks = isMultiBlock ? getMultiSelectedBlocks( state ) :
-			[ getBlock( state, ownProps.uid ) || getSelectedBlock( state ) ];
 		return {
-			isMultiBlock,
-			blocks,
+			blocks: ownProps.uids.map( ( uid ) => getBlock( state, uid ) ),
 		};
 	},
-	( dispatch ) => ( {
+	( dispatch, ownProps ) => ( {
 		onTransform( blocks, name ) {
 			dispatch( replaceBlocks(
-				blocks.map( ( block ) => block.uid ),
+				ownProps.uids,
 				switchToBlockType( blocks, name )
 			) );
 		},

@@ -199,7 +199,7 @@ export default {
 		// thus, we transform the block to merge first
 		const blocksWithTheSameType = blockA.name === blockB.name ?
 			[ blockB ] :
-			switchToBlockType( [ blockB ], blockA.name );
+			switchToBlockType( blockB, blockA.name );
 
 		// If the block types can not match, do nothing
 		if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
