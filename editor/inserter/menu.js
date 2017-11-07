@@ -9,8 +9,8 @@ import { connect } from 'react-redux';
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { withInstanceId, withSpokenMessages, TabPanel, TabbableContainer, NavigableMenu } from '@wordpress/components';
-import { getCategories, getBlockTypes, BlockIcon } from '@wordpress/blocks';
+import { withInstanceId, withSpokenMessages, TabPanel, TabbableContainer } from '@wordpress/components';
+import { getCategories, getBlockTypes } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -18,6 +18,7 @@ import { getCategories, getBlockTypes, BlockIcon } from '@wordpress/blocks';
 import './style.scss';
 import { getBlocks, getRecentlyUsedBlocks } from '../selectors';
 import { showInsertionPoint, hideInsertionPoint } from '../actions';
+import { default as InserterGroup } from './group';
 
 export const searchBlocks = ( blocks, searchTerm ) => {
 	const normalizedSearchTerm = searchTerm.toLowerCase().trim();
@@ -27,67 +28,6 @@ export const searchBlocks = ( blocks, searchTerm ) => {
 		matchSearch( block.title ) || some( block.keywords, matchSearch )
 	);
 };
-
-class BlocksList extends Component {
-	constructor() {
-		super( ...arguments );
-		const { blocks } = this.props;
-
-		this.onNavigate = this.onNavigate.bind( this );
-
-		this.state = {
-			current: blocks[ 0 ] ? blocks[ 0 ].name : null,
-		};
-	}
-
-	isDisabledBlock( blockType ) {
-		return blockType.useOnce && find( this.props.blocks, ( { name } ) => blockType.name === name );
-	}
-
-	renderItem( block ) {
-		const { current } = this.state;
-		const disabled = this.isDisabledBlock( block );
-		const { selectBlock, bindReferenceNode } = this.props;
-		return (
-			<button
-				role="menuitem"
-				key={ block.name }
-				className="editor-inserter__block"
-				onClick={ selectBlock( block.name ) }
-				ref={ bindReferenceNode( block.name ) }
-				tabIndex={ current === block.name ? null : '-1' }
-				onMouseEnter={ ! disabled ? this.props.showInsertionPoint : null }
-				onMouseLeave={ ! disabled ? this.props.hideInsertionPoint : null }
-				disabled={ disabled }
-			>
-				<BlockIcon icon={ block.icon } />
-				{ block.title }
-			</button>
-		);
-	}
-
-	onNavigate( index ) {
-		const { blocks } = this.props;
-		const dest = blocks[ index ];
-		if ( dest ) {
-			this.setState( {
-				current: dest.name,
-			} );
-		}
-	}
-
-	render() {
-		const { labelledBy, blocks } = this.props;
-		console.log('blocks');
-
-		return <NavigableMenu
-			className="editor-inserter__category-blocks"
-			aria-labelledby={ labelledBy }
-			onNavigate={ this.onNavigate }>
-			{ blocks.map( ( block ) => this.renderItem( block ) ) }
-		</NavigableMenu>;
-	}
-}
 
 export class InserterMenu extends Component {
 	constructor() {
@@ -192,30 +132,10 @@ export class InserterMenu extends Component {
 		)( blockTypes );
 	}
 
-	// getBlockItem( block ) {
-	// 	const disabled = this.isDisabledBlock( block );
-	// 	return (
-	// 		<button
-	// 			role="menuitem"
-	// 			key={ block.name }
-	// 			className="editor-inserter__block"
-	// 			onClick={ this.selectBlock( block.name ) }
-	// 			ref={ this.bindReferenceNode( block.name ) }
-	// 			tabIndex="-1"
-	// 			onMouseEnter={ ! disabled ? this.props.showInsertionPoint : null }
-	// 			onMouseLeave={ ! disabled ? this.props.hideInsertionPoint : null }
-	// 			disabled={ disabled }
-	// 		>
-	// 			<BlockIcon icon={ block.icon } />
-	// 			{ block.title }
-	// 		</button>
-	// 	);
-	// }
-
 	renderBlocks( blocks, separatorSlug ) {
 		const { instanceId } = this.props;
 		const labelledBy = separatorSlug === undefined ? null : `editor-inserter__separator-${ separatorSlug }-${ instanceId }`;
-		return <BlocksList blocks={ blocks } labelledBy={ labelledBy }
+		return <InserterGroup blocks={ blocks } labelledBy={ labelledBy }
 			bindReferenceNode={ this.bindReferenceNode }
 			selectBlock={ this.selectBlock } />;
 	}
