@@ -663,9 +663,7 @@ export const reusableBlocks = combineReducers( {
 			case 'FETCH_REUSABLE_BLOCKS_SUCCESS': {
 				return reduce( action.reusableBlocks, ( newState, reusableBlock ) => ( {
 					...newState,
-					[ reusableBlock.id ]: {
-						...reusableBlock,
-					},
+					[ reusableBlock.id ]: reusableBlock,
 				} ), state );
 			}
 
@@ -692,12 +690,11 @@ export const reusableBlocks = combineReducers( {
 
 	isSaving( state = {}, action ) {
 		switch ( action.type ) {
-			case 'SAVE_REUSABLE_BLOCK': {
+			case 'SAVE_REUSABLE_BLOCK':
 				return {
 					...state,
 					[ action.id ]: true,
 				};
-			}
 
 			case 'SAVE_REUSABLE_BLOCK_SUCCESS':
 			case 'SAVE_REUSABLE_BLOCK_FAILURE': {
