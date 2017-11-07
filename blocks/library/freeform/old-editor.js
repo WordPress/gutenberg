@@ -91,6 +91,7 @@ export default class OldEditor extends Component {
 			setAttributes( {
 				content: editor.getContent(),
 			} );
+			return false;
 		} );
 
 		editor.on( 'keydown', ( event ) => {
@@ -179,6 +180,7 @@ export default class OldEditor extends Component {
 				id={ id + '-toolbar' }
 				ref={ ref => this.ref = ref }
 				className="freeform-toolbar"
+				style={ ! focus ? { display: 'none' } : {} }
 			/>,
 			<div
 				key="editor"
