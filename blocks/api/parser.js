@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { parse as hpqParse } from 'hpq';
-import { keys, reduce } from 'lodash';
+import { keys, mapValues } from 'lodash';
 
 /**
  * Internal dependencies
@@ -99,17 +99,18 @@ export function matcherFromSource( sourceConfig ) {
 export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, commentAttributes ) {
 	let value;
 	switch ( attributeSchema.source ) {
-		case 'meta':
-			break;
 		case 'comment':
 			value = commentAttributes ? commentAttributes[ attributeKey ] : undefined;
 			break;
-		default: {
-			// Coerce value to specified type
-			const matcher = matcherFromSource( attributeSchema );
-			value = hpqParse( innerHTML, matcher );
+		case 'attribute':
+		case 'property':
+		case 'html':
+		case 'text':
+		case 'children':
+		case 'node':
+		case 'query':
+			value = hpqParse( innerHTML, matcherFromSource( attributeSchema ) );
 			break;
-		}
 	}
 
 	return value === undefined ? attributeSchema.default : asType( value, attributeSchema.type );
@@ -124,13 +125,12 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
  * @return {Object}             All block attributes
  */
 export function getBlockAttributes( blockType, innerHTML, attributes ) {
-	const blockAttributes = reduce( blockType.attributes, ( memo, attributeSchema, attributeKey ) => {
-		memo[ attributeKey ] = getBlockAttribute( attributeKey, attributeSchema, innerHTML, attributes );
-		return memo;
-	}, {} );
+	const blockAttributes = mapValues( blockType.attributes, ( attributeSchema, attributeKey ) => {
+		return getBlockAttribute( attributeKey, attributeSchema, innerHTML, attributes );
+	} );
 
 	// If the block supports a custom className parse it
-	if ( blockType.className !== false && attributes && attributes.className ) {
+	if ( false !== blockType.className && attributes && attributes.className ) {
 		blockAttributes.className = attributes.className;
 	}
 
@@ -151,7 +151,7 @@ export function createBlockWithFallback( name, innerHTML, attributes ) {
 
 	// Convert 'core/text' blocks in existing content to the new
 	// 'core/paragraph'.
-	if ( name === 'core/text' || name === 'core/cover-text' ) {
+	if ( 'core/text' === name || 'core/cover-text' === name ) {
 		name = 'core/paragraph';
 	}
 
