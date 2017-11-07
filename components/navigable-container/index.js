@@ -133,7 +133,7 @@ export class NavigableMenu extends Component {
 			deep,
 			widget,
 		};
-		return <NavigableContainer navigation={ navigation } { ...rest } />;
+		return <NavigableContainer role="menu" navigation={ navigation } { ...rest } />;
 	}
 }
 
