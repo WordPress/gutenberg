@@ -13,9 +13,10 @@ import { NavigableMenu } from '../navigable-container';
 
 class TabButton extends Component {
 	render() {
-		const { tabId, children, clickTab, ...rest } = this.props;
+		const { tabId, children, clickTab, selected, ...rest } = this.props;
 		return <button role="tab"
-			tabIndex={ -1 }
+			tabIndex={ selected ? null : -1 }
+			aria-selected={ selected }
 			id={ tabId }
 			onClick={ partial( clickTab, tabId ) }
 			{ ...rest }>
@@ -77,15 +78,15 @@ class TabPanel extends Component {
 					aria-orientation={ orientation }
 					onNavigate={ this.onNavigate }
 					className={ className }
-					tabIndex={ 0 }
 					onFocus={ this.handleFocus }
 					onKeyDown={ this.handleKeyDown }>
 					{ tabs.map( ( t ) =>
 						<TabButton className={ `${ t.className } ${ t.name === selected ? activeClass : '' }` }
 							tabId={ instanceId + '-' + t.name }
 							aria-controls={ instanceId + '-' + t.name + '-view' }
-							aria-selected={ t.name === selected }
+							selected={ t.name === selected }
 							key={ t.name }
+
 							clickTab={ partial( this.handleClick, t.name, t.onSelect ) }>
 							{ t.title }
 						</TabButton> )
