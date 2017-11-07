@@ -69,29 +69,35 @@ class NavigableContainer extends Component {
 
 		const { keyCode } = event;
 		const { getFocusableContext } = this;
-		const { eventToOffset, onNavigate = noop, preventBubblingArrowEvents = true } = this.props;
+		const { cycle = true, eventToOffset, onNavigate = noop, preventBubblingArrowEvents = true, preventBubblingTabEvents = false } = this.props;
 
 		const offset = eventToOffset( event );
+
+		const stopNavigationKey = ( preventBubblingArrowEvents && [ LEFT, RIGHT, DOWN, UP ].indexOf( keyCode ) > -1 ) ||
+			( preventBubblingTabEvents && [ TAB ].indexOf( keyCode ) > -1 );
+
+		if ( stopNavigationKey ) {
+			if ( TAB === keyCode ) {
+				event.preventDefault();
+			}
+
+			// Prevents arrow key handlers bound to the document directly interfering
+			event.nativeEvent.stopImmediatePropagation();
+			event.stopPropagation();
+		}
+
 		if ( offset === 0 ) {
 			return;
 		}
 
 		const context = getFocusableContext( document.activeElement );
-
 		if ( ! context ) {
 			return;
 		}
+
 		const { index, focusables } = context;
-
-		const nextIndex = cycleValue( index, focusables.length, offset );
-
+		const nextIndex = cycle ? cycleValue( index, focusables.length, offset ) : index + offset;
 		if ( nextIndex >= 0 && nextIndex < focusables.length ) {
-			if ( preventBubblingArrowEvents && [ LEFT, RIGHT, DOWN, UP ].indexOf( keyCode ) > -1 ) {
-				// Stop any DOM events bound directly to the document (outside of React)
-				event.nativeEvent.stopImmediatePropagation();
-				event.stopPropagation();
-			}
-
 			focusables[ nextIndex ].focus();
 			onNavigate( nextIndex, focusables[ nextIndex ] );
 		}
@@ -104,7 +110,16 @@ class NavigableContainer extends Component {
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
 			<div ref={ this.bindContainer }
-				{ ...omit( props, [ 'preventBubblingArrowEvents', 'eventToOffset', 'onNavigate', 'handleRef', 'onlyBrowserTabstops' ] ) }
+				{ ...omit( props, [
+					'preventBubblingArrowEvents',
+					'preventBubblingTabEvents',
+					'eventToOffset',
+					'onNavigate',
+					'handleRef',
+					'cycle',
+					'deep',
+					'onlyBrowserTabstops',
+				] ) }
 				onKeyDown={ this.onKeyDown }
 				onFocus={ this.onFocus }>
 				{ children }
@@ -115,7 +130,7 @@ class NavigableContainer extends Component {
 
 export class NavigableMenu extends Component {
 	render() {
-		const { orientation = 'vertical', ...rest } = this.props;
+		const { deep = true, cycle = true, orientation = 'vertical', ...rest } = this.props;
 		const eventToOffset = ( evt ) => {
 			const { keyCode } = evt;
 			if ( LEFT === keyCode && orientation === 'horizontal' ) {
@@ -131,12 +146,13 @@ export class NavigableMenu extends Component {
 			return 0;
 		};
 
-		return <NavigableContainer eventToOffset={ eventToOffset } { ...rest } />;
+		return <NavigableContainer deep={ deep } cycle={ cycle } eventToOffset={ eventToOffset } { ...rest } />;
 	}
 }
 
 export class TabbableContainer extends Component {
 	render() {
+		const { deep = true, cycle = true, ...rest } = this.props;
 		const eventToOffset = ( evt ) => {
 			const { keyCode, shiftKey } = evt;
 			if ( TAB === keyCode ) {
@@ -144,6 +160,8 @@ export class TabbableContainer extends Component {
 			}
 		};
 
-		return <NavigableContainer onlyBrowserTabstops={ true } eventToOffset={ eventToOffset } { ...this.props } />;
+		return <NavigableContainer deep={ deep } cycle={ cycle }
+			preventBubblingArrowEvents={ false } preventBubblingTabEvents={ true }
+			onlyBrowserTabstops={ true } eventToOffset={ eventToOffset } { ...rest } />;
 	}
 }
