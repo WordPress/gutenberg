@@ -85,8 +85,14 @@ export function switchToBlockType( blocks, name ) {
 	const transformationsFrom = get( destinationType, 'transforms.from', [] );
 	const transformationsTo = get( sourceType, 'transforms.to', [] );
 	const transformation =
-		find( transformationsTo, t => t.type === 'block' && t.blocks.indexOf( name ) !== -1 && ( ! isMultiBlock || t.isMultiBlock ) ) ||
-		find( transformationsFrom, t => t.type === 'block' && t.blocks.indexOf( sourceName ) !== -1 && ( ! isMultiBlock || t.isMultiBlock ) );
+		find(
+			transformationsTo,
+			t => t.type === 'block' && t.blocks.indexOf( name ) !== -1 && ( ! isMultiBlock || t.isMultiBlock )
+		) ||
+		find(
+			transformationsFrom,
+			t => t.type === 'block' && t.blocks.indexOf( sourceName ) !== -1 && ( ! isMultiBlock || t.isMultiBlock )
+		);
 
 	// Stop if there is no valid transformation. (How did we get here?)
 	if ( ! transformation ) {

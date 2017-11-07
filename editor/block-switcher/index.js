@@ -38,11 +38,19 @@ function BlockSwitcher( { blocks, onTransform } ) {
 	const blockType = getBlockType( sourceBlockName );
 	const blocksToBeTransformedFrom = reduce( getBlockTypes(), ( memo, type ) => {
 		const transformFrom = get( type, 'transforms.from', [] );
-		const transformation = find( transformFrom, t => t.type === 'block' && t.blocks.indexOf( sourceBlockName ) !== -1 && ( ! isMultiBlock || t.isMultiBlock ) );
+		const transformation = find(
+			transformFrom,
+			t => t.type === 'block' && t.blocks.indexOf( sourceBlockName ) !== -1 &&
+				( ! isMultiBlock || t.isMultiBlock )
+		);
 		return transformation ? memo.concat( [ type.name ] ) : memo;
 	}, [] );
 	const blocksToBeTransformedTo = get( blockType, 'transforms.to', [] )
-		.reduce( ( memo, transformation ) => memo.concat( ! isMultiBlock || transformation.isMultiBlock ? transformation.blocks : [] ), [] );
+		.reduce(
+			( memo, transformation ) =>
+				memo.concat( ! isMultiBlock || transformation.isMultiBlock ? transformation.blocks : [] ),
+			[]
+		);
 	const allowedBlocks = uniq( blocksToBeTransformedFrom.concat( blocksToBeTransformedTo ) )
 		.reduce( ( memo, name ) => {
 			const type = getBlockType( name );
