@@ -132,7 +132,6 @@
 	}
 
 	&:focus {
-		box-shadow: $button-focus-style;
-		outline: none;
+		@include button-style__focus-active;
 	}
 }

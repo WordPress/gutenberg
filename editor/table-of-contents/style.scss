@@ -10,6 +10,28 @@
 	}
 }
 
+.table-of-contents__toggle {
+	background: none;
+	border: none;
+	box-shadow: none;
+	color: $dark-gray-300;
+	cursor: pointer;
+	font-family: $default-font;
+	font-size: 12px;
+	padding: 0 6px 4px;
+
+	.dashicon {
+		width: 20px;
+		height: 20px;
+		position: relative;
+		top: 5px;
+	}
+
+	&:focus {
+		@include button-style__focus-active;
+	}
+}
+
 .table-of-contents__popover .components-popover__content {
 	padding: 16px;
 }

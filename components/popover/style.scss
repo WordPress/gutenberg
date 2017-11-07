@@ -70,7 +70,7 @@
 	min-width: 240px;
 
 	&:focus {
-		box-shadow: $button-focus-style;
+		@include button-style__focus-active;
 	}
 
 	.components-popover.is-top & {

@@ -322,7 +322,7 @@
 	}
 
 	.editor-inserter__toggle.components-icon-button:not(:disabled):hover {
-		color: $blue-medium-500;
+		@include button-style__hover;
 	}
 }
 
