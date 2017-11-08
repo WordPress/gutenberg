@@ -8,6 +8,8 @@ import createHooks from '@wordpress/hooks';
  */
 import anchor from './anchor';
 
+const hooks = createHooks();
+
 const {
 	addAction,
 	addFilter,
@@ -23,7 +25,7 @@ const {
 	didFilter,
 	hasAction,
 	hasFilter,
-} = createHooks();
+} = hooks;
 
 export {
 	addAction,
@@ -42,4 +44,4 @@ export {
 	hasFilter,
 };
 
-addFilter( 'registerBlockType', 'core\supports-anchor', anchor );
+anchor( hooks );

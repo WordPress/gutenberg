@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import { getBlockType } from '../api';
+import { applyFilters } from '../hooks';
 
 function BlockEdit( props ) {
 	const { name, ...editProps } = props;
@@ -19,7 +20,7 @@ function BlockEdit( props ) {
 		Edit = blockType.edit || blockType.save;
 	}
 
-	return <Edit { ...editProps } />;
+	return applyFilters( 'BlockEdit', <Edit { ...editProps } />, props );
 }
 
 export default BlockEdit;

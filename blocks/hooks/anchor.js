@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { assign, get } from 'lodash';
+import { assign } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { source } from '../api';
+import { source, hasBlockSupport } from '../api';
 import InspectorControls from '../inspector-controls';
 
 /**
@@ -22,57 +22,78 @@ import InspectorControls from '../inspector-controls';
  */
 const ANCHOR_REGEX = /[\s#]/g;
 
-export default function anchor( settings ) {
-	if ( ! get( settings.supports, 'anchor' ) ) {
-		return settings;
+/**
+ * Filters registered block settings, extending attributes with anchor using ID
+ * of the first node
+ *
+ * @param  {Object} settings Original block settings
+ * @return {Object}          Filtered block settings
+ */
+export function addAttribute( settings ) {
+	if ( hasBlockSupport( settings, 'anchor' ) ) {
+		// Use Lodash's assign to gracefully handle if attributes are undefined
+		settings.attributes = assign( settings.attributes, {
+			anchor: {
+				type: 'string',
+				source: source.attr( '*', 'id' ),
+			},
+		} );
 	}
 
-	// Extend attributes with anchor determined by ID on the first node, using
-	// assign to gracefully handle if original attributes are undefined.
-	assign( settings.attributes, {
-		anchor: {
-			type: 'string',
-			source: source.attr( '*', 'id' ),
-		},
-	} );
-
-	// Override the default edit UI to include a new block inspector control
-	// for assigning the anchor ID
-	const { edit: Edit } = settings;
-	settings.edit = function( props ) {
-		return [
-			<Edit key="edit" { ...props } />,
-			props.focus && (
-				<InspectorControls key="inspector">
-					<InspectorControls.TextControl
-						label={ __( 'HTML Anchor' ) }
-						help={ __( 'Anchors lets you link directly to a section on a page.' ) }
-						value={ props.attributes.anchor || '' }
-						onChange={ ( nextValue ) => {
-							nextValue = nextValue.replace( ANCHOR_REGEX, '-' );
-
-							props.setAttributes( {
-								anchor: nextValue,
-							} );
-						} } />
-				</InspectorControls>
-			),
-		];
-	};
-
-	// Override the default block serialization to clone the returned element,
-	// injecting the attribute ID.
-	const { save } = settings;
-	settings.save = function( { attributes } ) {
-		const { anchor: id } = attributes;
-
-		let result = save( ...arguments );
-		if ( 'string' !== typeof result && id ) {
-			result = cloneElement( result, { id } );
-		}
-
-		return result;
-	};
-
 	return settings;
+}
+
+/**
+ * Override the default edit UI to include a new block inspector control for
+ * assigning the anchor ID, if block supports anchor
+ *
+ * @param  {Element} element Original edit element
+ * @param  {Object}  props   Props passed to BlockEdit
+ * @return {Element}         Filtered edit element
+ */
+export function addInspectorControl( element, props ) {
+	if ( hasBlockSupport( props.name, 'anchor' ) && props.focus ) {
+		element = [
+			cloneElement( element, { key: 'edit' } ),
+			<InspectorControls key="inspector">
+				<InspectorControls.TextControl
+					label={ __( 'HTML Anchor' ) }
+					help={ __( 'Anchors lets you link directly to a section on a page.' ) }
+					value={ props.attributes.anchor || '' }
+					onChange={ ( nextValue ) => {
+						nextValue = nextValue.replace( ANCHOR_REGEX, '-' );
+
+						props.setAttributes( {
+							anchor: nextValue,
+						} );
+					} } />
+			</InspectorControls>,
+		];
+	}
+
+	return element;
+}
+
+/**
+ * Override props assigned to save component to inject anchor ID, if block
+ * supports anchor. This is only applied if the block's save result is an
+ * element and not a markup string.
+ *
+ * @param  {Object} extraProps Additional props applied to save element
+ * @param  {Object} blockType  Block type
+ * @param  {Object} attributes Current block attributes
+ * @return {Object}            Filtered props applied to save element
+ */
+export function addSaveProps( extraProps, blockType, attributes ) {
+	if ( hasBlockSupport( blockType, 'anchor' ) ) {
+		extraProps.id = attributes.anchor;
+	}
+
+	return extraProps;
+}
+
+export default function anchor( { addFilter } ) {
+	addFilter( 'registerBlockType', 'core\anchor-attribute', addAttribute );
+	addFilter( 'BlockEdit', 'core\anchor-inspector-control', addInspectorControl );
+	addFilter( 'getSaveContent.extraProps', 'core\anchor-save-props', addSaveProps );
 }

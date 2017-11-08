@@ -203,3 +203,23 @@ export function getBlockType( name ) {
 export function getBlockTypes() {
 	return Object.values( blocks );
 }
+
+/**
+ * Returns true if the block defines support for a feature, or false otherwise
+ *
+ * @param  {(String|Object)} nameOrType      Block name or type object
+ * @param  {String}          feature         Feature to test
+ * @param  {Boolean}         defaultSupports Whether feature is supported by
+ *                                           default if not explicitly defined
+ * @return {Boolean}                         Whether block supports feature
+ */
+export function hasBlockSupport( nameOrType, feature, defaultSupports ) {
+	const blockType = 'string' === typeof nameOrType ?
+		getBlockType( nameOrType ) :
+		nameOrType;
+
+	return !! get( blockType, [
+		'supports',
+		feature,
+	], defaultSupports );
+}
