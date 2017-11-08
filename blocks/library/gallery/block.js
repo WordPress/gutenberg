@@ -65,8 +65,11 @@ class GalleryBlock extends Component {
 
 	onRemoveImage( index ) {
 		return () => {
+			const images = filter( this.props.attributes.images, ( img, i ) => index !== i );
+			const { columns } = this.props.attributes;
 			this.props.setAttributes( {
-				images: filter( this.props.attributes.images, ( img, i ) => index !== i ),
+				images,
+				columns: columns ? Math.min( images.length, columns ) : columns,
 			} );
 		};
 	}
@@ -194,17 +197,17 @@ class GalleryBlock extends Component {
 
 		return [
 			controls,
-			focus && images.length > 1 && (
+			focus && (
 				<InspectorControls key="inspector">
 					{blockDescription}
 					<h3>{ __( 'Gallery Settings' ) }</h3>
-					<RangeControl
+					{ images.length > 1 && <RangeControl
 						label={ __( 'Columns' ) }
 						value={ columns }
 						onChange={ this.setColumnsNumber }
 						min={ 1 }
 						max={ Math.min( MAX_COLUMNS, images.length ) }
-					/>
+					/> }
 					<ToggleControl
 						label={ __( 'Crop Images' ) }
 						checked={ !! imageCrop }

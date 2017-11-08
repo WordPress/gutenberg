@@ -4,6 +4,8 @@
 import optimist from 'redux-optimist';
 import { combineReducers } from 'redux';
 import {
+	flow,
+	partialRight,
 	difference,
 	get,
 	reduce,
@@ -26,7 +28,8 @@ import { getBlockTypes, getBlockType } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { combineUndoableReducers } from './utils/undoable-reducer';
+import withHistory from './utils/with-history';
+import withChangeDetection from './utils/with-change-detection';
 import { STORE_DEFAULTS } from './store-defaults';
 
 /***
@@ -63,7 +66,16 @@ export function getPostRawValue( value ) {
  * @param  {Object} action Dispatched action
  * @return {Object}        Updated state
  */
-export const editor = combineUndoableReducers( {
+export const editor = flow( [
+	combineReducers,
+
+	// Track undo history, starting at editor initialization.
+	partialRight( withHistory, { resetTypes: [ 'SETUP_EDITOR' ] } ),
+
+	// Track whether changes exist, starting at editor initialization and
+	// resetting at each post save.
+	partialRight( withChangeDetection, { resetTypes: [ 'SETUP_EDITOR', 'RESET_POST' ] } ),
+] )( {
 	edits( state = {}, action ) {
 		switch ( action.type ) {
 			case 'EDIT_POST':
@@ -261,7 +273,7 @@ export const editor = combineUndoableReducers( {
 
 		return state;
 	},
-}, { resetTypes: [ 'SETUP_EDITOR' ] } );
+} );
 
 /**
  * Reducer returning the last-known state of the current post, in the format
@@ -510,6 +522,14 @@ export function preferences( state = STORE_DEFAULTS.preferences, action ) {
 					.slice( 0, MAX_RECENT_BLOCKS ),
 				blockUsage: filterInvalidBlocksFromObject( state.blockUsage ),
 			};
+		case 'TOGGLE_FEATURE':
+			return {
+				...state,
+				features: {
+					...state.features,
+					[ action.feature ]: ! state.features[ action.feature ],
+				},
+			};
 	}
 
 	return state;
@@ -637,6 +657,56 @@ export function metaBoxes( state = defaultMetaBoxState, action ) {
 	}
 }
 
+export const reusableBlocks = combineReducers( {
+	data( state = {}, action ) {
+		switch ( action.type ) {
+			case 'FETCH_REUSABLE_BLOCKS_SUCCESS': {
+				return reduce( action.reusableBlocks, ( newState, reusableBlock ) => ( {
+					...newState,
+					[ reusableBlock.id ]: reusableBlock,
+				} ), state );
+			}
+
+			case 'UPDATE_REUSABLE_BLOCK': {
+				const { id, reusableBlock } = action;
+				const existingReusableBlock = state[ id ];
+
+				return {
+					...state,
+					[ id ]: {
+						...existingReusableBlock,
+						...reusableBlock,
+						attributes: {
+							...( existingReusableBlock && existingReusableBlock.attributes ),
+							...reusableBlock.attributes,
+						},
+					},
+				};
+			}
+		}
+
+		return state;
+	},
+
+	isSaving( state = {}, action ) {
+		switch ( action.type ) {
+			case 'SAVE_REUSABLE_BLOCK':
+				return {
+					...state,
+					[ action.id ]: true,
+				};
+
+			case 'SAVE_REUSABLE_BLOCK_SUCCESS':
+			case 'SAVE_REUSABLE_BLOCK_FAILURE': {
+				const { id } = action;
+				return omit( state, id );
+			}
+		}
+
+		return state;
+	},
+} );
+
 export default optimist( combineReducers( {
 	editor,
 	currentPost,
@@ -650,4 +720,5 @@ export default optimist( combineReducers( {
 	saving,
 	notices,
 	metaBoxes,
+	reusableBlocks,
 } ) );

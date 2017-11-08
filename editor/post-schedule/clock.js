@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { isInteger } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -12,6 +17,7 @@ function PostScheduleClock( { is12Hour, selected, onChange } ) {
 	const updateHours = ( event ) => {
 		const value = parseInt( event.target.value, 10 );
 		if (
+			! isInteger( value ) ||
 			( is12Hour && ( value < 1 || value > 12 ) ) ||
 			( ! is12Hour && ( value < 0 || value > 23 ) )
 		) {
@@ -26,7 +32,7 @@ function PostScheduleClock( { is12Hour, selected, onChange } ) {
 
 	const updateMinutes = ( event ) => {
 		const value = parseInt( event.target.value, 10 );
-		if ( value < 0 || value > 59 ) {
+		if ( ! isInteger( value ) || value < 0 || value > 59 ) {
 			return;
 		}
 		const newDate = selected.clone().minutes( value );

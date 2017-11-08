@@ -273,7 +273,7 @@
 
 	&[data-align="full"],
 	&[data-align="wide"] {
-		.editor-block-toolbar {
+		.editor-block-contextual-toolbar {
 			@include break-small() {
 				width: $visual-editor-max-width - $block-padding - $block-padding;
 			}
@@ -523,4 +523,51 @@
 			vertical-align: bottom;
 		}
 	}
+}
+
+$sticky-bottom-offset: 20px;
+
+.editor-block-contextual-toolbar {
+	position: sticky;
+	z-index: z-index( '.editor-block-contextual-toolbar' );
+	margin-top: - $block-toolbar-height - $block-padding - 1px;
+	margin-bottom: $block-padding + $sticky-bottom-offset;
+	white-space: nowrap;
+	text-align: left;
+	pointer-events: none;
+	height: $block-toolbar-height;
+	top: $header-height - 1px;
+
+	.editor-block-toolbar {
+		border: 1px solid $light-gray-500;
+		width: 100%;;
+		.components-toolbar:first-child {
+			margin-left: -1px;
+		}
+
+
+		@include break-small() {
+			width: auto;
+		}
+	}
+
+	// Reset pointer-events on children.
+	& > * {
+		pointer-events: auto;
+	}
+
+	@include break-small() {
+		margin-left: - $block-padding - 1px;
+		margin-right: - $block-padding - 1px;
+	}
+
+	@include break-medium() {
+		top: $item-spacing;
+	}
+}
+
+.editor-block-contextual-toolbar + div {
+	// prevent collapsing margins between block and toolbar, matches the 20px bottom offset		 +		display: flex;
+	margin-top: - $sticky-bottom-offset - 1px;
+	padding-top: 1px;
 }

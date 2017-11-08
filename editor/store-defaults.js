@@ -5,5 +5,8 @@ export const STORE_DEFAULTS = {
 		panels: { 'post-status': true },
 		recentlyUsedBlocks: [],
 		blockUsage: {},
+		features: {
+			fixedToolbar: true,
+		},
 	},
 };

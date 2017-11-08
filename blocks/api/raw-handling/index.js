@@ -30,15 +30,18 @@ import shortcodeConverter from './shortcode-converter';
  *
  * @param  {String}       options.HTML        The HTML to convert.
  * @param  {String}       [options.plainText] Plain text version.
- * @param  {Boolean}      [options.inline]    Whether to content should be inline or not. Null to auto-detect, false to force blocks, true to force a string.
- * @return {Array|String}                     A list of blocks or a string, depending on the `inline` option.
+ * @param  {String}       [options.mode]      Handle content as blocks or inline content.
+ *                                            * 'AUTO': Decide based on the content passed.
+ *                                            * 'INLINE': Always handle as inline content, and return string.
+ *                                            * 'BLOCKS': Always handle as blocks, and return array of blocks.
+ * @return {Array|String}                     A list of blocks or a string, depending on `handlerMode`.
  */
-export default function rawHandler( { HTML, plainText = '', inline = null } ) {
+export default function rawHandler( { HTML, plainText = '', mode = 'AUTO' } ) {
 	// First of all, strip any meta tags.
 	HTML = HTML.replace( /<meta[^>]+>/, '' );
 
 	// If we detect block delimiters, parse entirely as blocks.
-	if ( ! inline && HTML.indexOf( '<!-- wp:' ) !== -1 ) {
+	if ( mode !== 'INLINE' && HTML.indexOf( '<!-- wp:' ) !== -1 ) {
 		return parseWithGrammar( HTML );
 	}
 
@@ -55,7 +58,7 @@ export default function rawHandler( { HTML, plainText = '', inline = null } ) {
 	}
 
 	// Return filtered HTML if it's inline paste or all content is inline.
-	if ( inline || ( inline === null && isInlineContent( HTML ) ) ) {
+	if ( mode === 'INLINE' || ( mode === 'AUTO' && isInlineContent( HTML ) ) ) {
 		HTML = deepFilterHTML( HTML, [
 			// Add semantic formatting before attributes are stripped.
 			formattingTransformer,

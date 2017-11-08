@@ -1,52 +1,22 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
-import { sprintf, _n } from '@wordpress/i18n';
-import { IconButton, PanelBody } from '@wordpress/components';
+import { PanelBody } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import './style.scss';
-import {
-	getCurrentPostLastRevisionId,
-	getCurrentPostRevisionsCount,
-} from '../../selectors';
-import { getWPAdminURL } from '../../utils/url';
+import PostLastRevisionCheck from '../../post-last-revision/check';
+import PostLastRevision from '../../post-last-revision';
 
-function LastRevision( { lastRevisionId, revisionsCount } ) {
-	if ( ! lastRevisionId ) {
-		return null;
-	}
-
+function LastRevision() {
 	return (
-		<PanelBody>
-			<IconButton
-				href={ getWPAdminURL( 'revision.php', { revision: lastRevisionId } ) }
-				className="editor-last-revision__title"
-				icon="backup"
-			>
-				{
-					sprintf(
-						_n( '%d Revision', '%d Revisions', revisionsCount ),
-						revisionsCount
-					)
-				}
-			</IconButton>
-		</PanelBody>
+		<PostLastRevisionCheck>
+			<PanelBody>
+				<PostLastRevision />
+			</PanelBody>
+		</PostLastRevisionCheck>
 	);
 }
 
-export default connect(
-	( state ) => {
-		return {
-			lastRevisionId: getCurrentPostLastRevisionId( state ),
-			revisionsCount: getCurrentPostRevisionsCount( state ),
-		};
-	}
-)( LastRevision );
+export default LastRevision;
