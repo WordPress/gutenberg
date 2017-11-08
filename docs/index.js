@@ -29,6 +29,12 @@ addStory( {
 } );
 
 addStory( {
+	name: 'components',
+	title: 'Components',
+	markdown: require( './block-components.md' ),
+} );
+
+addStory( {
 	name: 'blocks',
 	title: 'Creating Block Types',
 	markdown: require( './blocks.md' ),
