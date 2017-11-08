@@ -12,7 +12,7 @@ a traditional `input` field, usually when the user exits the field.
 
 ### `value: Array`
 
-*Required.* Array of React DOM to make editable. The renedered HTML should be valid, and valid with respect to the `tagName` and `inline` property.
+*Required.* Array of React DOM to make editable. The rendered HTML should be valid, and valid with respect to the `tagName` and `inline` property.
 
 ### `onChange( value: Array ): Function`
 
@@ -33,7 +33,7 @@ a traditional `input` field, usually when the user exits the field.
 
 ### `onFocus( focus: Object ): Function`
 
-*Optional.* Fuction to call when the editable receives focus.
+*Optional.* Function to call when the editable receives focus.
 
 ### `multiline: String`
 
