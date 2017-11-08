@@ -31,9 +31,9 @@ function stopEvent( event ) {
 export function stopEventIfRequired( stopArrowEvents, stopTabEvents, event ) {
 	const { keyCode } = event;
 
-	if ( stopArrowEvents && [ LEFT, RIGHT ].indexOf( keyCode ) ) {
+	if ( stopArrowEvents && [ LEFT, RIGHT ].indexOf( keyCode ) > -1 ) {
 		handleHorizontalArrows( event );
-	} else if ( stopArrowEvents && [ UP, DOWN ].indexOf( keyCode ) ) {
+	} else if ( stopArrowEvents && [ UP, DOWN ].indexOf( keyCode ) > -1 ) {
 		stopEvent( event );
 	} else if ( stopTabEvents && TAB === keyCode ) {
 		stopEvent( event );
