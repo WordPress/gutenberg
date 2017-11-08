@@ -6,8 +6,7 @@ import { PanelRow } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import PostStickyCheck from '../../post-sticky/check';
-import PostStickyForm from '../../post-sticky';
+import { PostSticky as PostStickyForm, PostStickyCheck } from '../../components';
 
 export function PostSticky() {
 	return (

@@ -12,8 +12,8 @@ import { Dropdown, Button, Dashicon } from '@wordpress/components';
  * Internal Dependencies
  */
 import './style.scss';
+import { PostPublishButtonLabel } from '../../components';
 import PublishDropdown from '../publish-dropdown';
-import PublishButtonLabel from '../publish-button/label';
 import {
 	isSavingPost,
 	isEditedPostSaveable,
@@ -35,7 +35,7 @@ function PublishWithDropdown( { isSaving, isPublishable, isSaveable } ) {
 					aria-expanded={ isOpen }
 					disabled={ ! isButtonEnabled }
 				>
-					<PublishButtonLabel />
+					<PostPublishButtonLabel />
 					<Dashicon icon="arrow-down" />
 				</Button>
 			) }

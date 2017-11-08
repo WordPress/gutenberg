@@ -13,7 +13,7 @@ import { focus } from '@wordpress/utils';
 /**
  * Internal dependencies
  */
-import Inserter from '../../inserter';
+import { Inserter } from '../../components';
 import {
 	getBlockInsertionPoint,
 	isBlockInsertionPointVisible,
