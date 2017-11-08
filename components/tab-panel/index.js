@@ -72,10 +72,10 @@ class TabPanel extends Component {
 
 		return (
 			<div>
-				<NavigableMenu orientation={ orientation } initialSelector={ '[aria-selected="true"]' }
+				<NavigableMenu
 					handleRef={ this.bindTabsRef }
 					role="tablist"
-					aria-orientation={ orientation }
+					orientation={ orientation }
 					onNavigate={ this.onNavigate }
 					className={ className }
 					onFocus={ this.handleFocus }
