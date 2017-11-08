@@ -30,7 +30,6 @@ class TabPanel extends Component {
 		super( ...arguments );
 
 		this.handleClick = this.handleClick.bind( this );
-		this.handleFocus = this.handleFocus.bind( this );
 		this.bindTabsRef = this.bindTabsRef.bind( this );
 		this.onNavigate = this.onNavigate.bind( this );
 
@@ -54,15 +53,6 @@ class TabPanel extends Component {
 		child.click();
 	}
 
-	handleFocus( event ) {
-		if ( event.target === this.tabsNode ) {
-			const selectedNode = this.tabsNode.querySelector( '[aria-selected="true"]' );
-			if ( selectedNode ) {
-				selectedNode.focus();
-			}
-		}
-	}
-
 	render() {
 		const { selected } = this.state;
 		const { instanceId, tabs, activeClass, className, orientation = 'horizontal' } = this.props;
@@ -77,9 +67,7 @@ class TabPanel extends Component {
 					role="tablist"
 					orientation={ orientation }
 					onNavigate={ this.onNavigate }
-					className={ className }
-					onFocus={ this.handleFocus }
-					onKeyDown={ this.handleKeyDown }>
+					className={ className }>
 					{ tabs.map( ( t ) =>
 						<TabButton className={ `${ t.className } ${ t.name === selected ? activeClass : '' }` }
 							tabId={ instanceId + '-' + t.name }
