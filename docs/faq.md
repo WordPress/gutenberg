@@ -146,7 +146,7 @@ If you would like to contribute to the accessibility of Gutenberg, we can always
 
 ## Are there any design resources for Gutenberg?
 
-Yes, primarily https://github.com/WordPress/gutenberg/blob/master/docs/design.md
+Yes, primarily https://wordpress.org/gutenberg/handbook/reference/design-principles/
 
 We are still adding more documentation.
 
