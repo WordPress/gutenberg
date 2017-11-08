@@ -24,7 +24,7 @@ Gutenberg is built by many contributors and volunteers. Please see the full list
 - <a href="https://make.wordpress.org/core/2017/05/05/editor-how-little-blocks-work/">How Blocks Work</a>
 - <a href="https://github.com/Automattic/wp-post-grammar">WP Post Grammar Parser</a>
 - <a href="https://make.wordpress.org/core/tag/gutenberg/">Development updates on make.wordpress.org</a>
-- <a href="http://gutenberg-devdoc.surge.sh/">Documentation: Creating Blocks, Reference, and Guidelines</a>
+- <a href="https://wordpress.org/gutenberg/handbook/">Documentation: Creating Blocks, Reference, and Guidelines</a>
 
 ## How You Can Contribute
 
