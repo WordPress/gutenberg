@@ -191,7 +191,7 @@ export class InserterMenu extends Component {
 		const isSearching = this.state.filterValue;
 
 		return (
-			<TabbableContainer className="editor-inserter__menu">
+			<TabbableContainer className="editor-inserter__menu" deep={ true }>
 				<label htmlFor={ `editor-inserter__search-${ instanceId }` } className="screen-reader-text">
 					{ __( 'Search for a block' ) }
 				</label>
