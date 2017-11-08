@@ -166,6 +166,9 @@ export default class Editable extends Component {
 	 * Editable behavior takes effect. Should the event be handled by a
 	 * prop, it should `stopImmediatePropagation` on the event to stop
 	 * continued event handling.
+	 *
+	 * @param {string} name The name of the event.
+	 * @returns {void}
 	*/
 	proxyPropHandler( name ) {
 		return ( event ) => {
@@ -377,7 +380,7 @@ export default class Editable extends Component {
 	 * absolutely position the toolbar. It does this by finding the closest
 	 * relative element.
 	 *
-	 * @returns {{top: number, left: number}}
+	 * @returns {{top: number, left: number}} The desired position of the toolbar.
 	 */
 	getFocusPosition() {
 		const position = this.getEditorSelectionRect();
@@ -531,7 +534,7 @@ export default class Editable extends Component {
 	 * before the selection. Sends the elements after the selection to the `onSplit`
 	 * handler.
 	 *
-	 * @param {Array} blocks
+	 * @param {Array} blocks The blocks to add after the split point.
 	 */
 	splitContent( blocks = [] ) {
 		const { dom } = this.editor;
