@@ -13,7 +13,7 @@ import { IconButton } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import Inserter from '../../inserter';
+import { Inserter } from '../../components';
 import BlockSwitcher from '../../block-switcher';
 import BlockToolbar from '../../block-toolbar';
 import NavigableToolbar from '../../navigable-toolbar';

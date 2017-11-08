@@ -15,8 +15,10 @@ import { settings as dateSettings } from '@wordpress/date';
  */
 import './assets/stylesheets/main.scss';
 import Layout from './layout';
-import EditorProvider from './provider';
+import { EditorProvider } from './components';
 import { initializeMetaBoxState } from './actions';
+
+export * from './components';
 
 // Configure moment globally
 moment.locale( dateSettings.l10n.locale );

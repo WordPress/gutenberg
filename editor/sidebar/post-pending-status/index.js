@@ -6,8 +6,7 @@ import { PanelRow } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import PostPendingStatusCheck from '../../post-pending-status/check';
-import PostPendingStatusForm from '../../post-pending-status';
+import { PostPendingStatus as PostPendingStatusForm, PostPendingStatusCheck } from '../../components';
 
 export function PostPendingStatus() {
 	return (

@@ -12,7 +12,7 @@ import { PanelRow } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import PostTrashLink from '../../post-trash';
+import { PostTrash as PostTrashLink } from '../../components';
 import { isEditedPostNew, getCurrentPostId } from '../../selectors';
 
 function PostTrash( { isNew, postId } ) {
