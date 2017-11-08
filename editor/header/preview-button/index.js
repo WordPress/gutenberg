@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
  */
 import { Component } from '@wordpress/element';
 import { IconButton } from '@wordpress/components';
-import { _x } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -76,8 +76,8 @@ export class PreviewButton extends Component {
 
 		const markup = `
 			<div>
-				<p>Please wait&hellip;</p>
-				<p>Generating preview.</p>
+				<p>${ __( 'Please wait&hellip;' ) }</p>
+				<p>${ __( 'Generating preview.' ) }</p>
 			</div>
 			<style>
 				div {
