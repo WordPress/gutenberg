@@ -66,13 +66,3 @@ jobs:
 
 before_deploy:
   - npm install
-  - cd docutron
-  - npm install
-  - cd ../
-  - npm run docs-build
-
-deploy:
-  provider: surge
-  project: ./docutron/build/
-  skip_cleanup: true
-  domain: gutenberg-devdoc.surge.sh
