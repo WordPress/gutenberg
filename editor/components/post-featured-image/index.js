@@ -18,11 +18,14 @@ import './style.scss';
 import { getEditedPostAttribute } from '../../selectors';
 import { editPost } from '../../actions';
 
+const FEATURED_IMAGE_SELECT_TITLE = __( 'Select a Featured Image' );
+
 function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, media } ) {
 	return (
 		<div className="editor-post-featured-image">
 			{ !! featuredImageId &&
 				<MediaUploadButton
+					title={ FEATURED_IMAGE_SELECT_TITLE }
 					buttonProps={ { className: 'button-link editor-post-featured-image__preview' } }
 					onSelect={ onUpdateImage }
 					type="image"
@@ -45,6 +48,7 @@ function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, med
 			}
 			{ ! featuredImageId &&
 				<MediaUploadButton
+					title={ FEATURED_IMAGE_SELECT_TITLE }
 					buttonProps={ { className: 'editor-post-featured-image__toggle button-link' } }
 					onSelect={ onUpdateImage }
 					type="image"

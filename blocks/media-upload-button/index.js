@@ -59,14 +59,14 @@ const slimImageObject = ( img ) => {
 };
 
 class MediaUploadButton extends Component {
-	constructor( { multiple = false, type, gallery = false } ) {
+	constructor( { multiple = false, type, gallery = false, title = __( 'Select or Upload Media' ) } ) {
 		super( ...arguments );
 		this.openModal = this.openModal.bind( this );
 		this.onSelect = this.onSelect.bind( this );
 		this.onUpdate = this.onUpdate.bind( this );
 		this.onOpen = this.onOpen.bind( this );
 		const frameConfig = {
-			title: __( 'Select or Upload a media' ),
+			title,
 			button: {
 				text: __( 'Select' ),
 			},
