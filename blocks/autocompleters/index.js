@@ -3,6 +3,7 @@
  */
 import {
 	flatten,
+	sortBy,
 } from 'lodash';
 
 /**
@@ -158,7 +159,8 @@ export function hashtagAutocompleter() {
 				} ) );
 			} ),
 		] ).then( function( listOfLists ) {
-			return flatten( listOfLists ).map( ( { link, text, icon, keywords } ) => ( {
+			const sortedLists = listOfLists.map( ( list ) => sortBy( list, 'text' ) );
+			return flatten( sortedLists ).map( ( { link, text, icon, keywords } ) => ( {
 				value: { link, text },
 				label: [
 					<BlockIcon key="icon" icon={ icon } />,
