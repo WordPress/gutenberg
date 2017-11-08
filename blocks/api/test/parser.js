@@ -83,7 +83,6 @@ describe( 'block parser', () => {
 				'number',
 				{
 					type: 'number',
-					source: 'comment',
 				},
 				'',
 				{ number: 10 }
@@ -138,12 +137,10 @@ describe( 'block parser', () => {
 					},
 					align: {
 						type: 'string',
-						source: 'comment',
 					},
 					topic: {
 						type: 'string',
 						default: 'none',
-						source: 'comment',
 					},
 				},
 			};
