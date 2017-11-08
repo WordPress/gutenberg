@@ -47,7 +47,7 @@ class NavigableContainer extends Component {
 	}
 
 	getFocusableContext( target ) {
-		const { deep, onlyBrowserTabstops } = this.props;
+		const { deep = false, onlyBrowserTabstops } = this.props;
 		const finder = onlyBrowserTabstops ? focus.tabbable : focus.focusable;
 		const focusables = finder
 			.find( this.container )
@@ -123,7 +123,7 @@ class NavigableContainer extends Component {
 
 export class NavigableMenu extends Component {
 	render() {
-		const { orientation = 'vertical', ...rest } = this.props;
+		const { role = 'menu', orientation = 'vertical', ...rest } = this.props;
 		const eventToOffset = ( evt ) => {
 			const { keyCode } = evt;
 			if ( LEFT === keyCode && orientation === 'horizontal' ) {
@@ -140,7 +140,7 @@ export class NavigableMenu extends Component {
 		};
 
 		return <NavigableContainer stopArrowEvents={ true } stopTabEvents={ false }
-			onlyBrowserTabstops={ false } role="menu" aria-orientation={ orientation } eventToOffset={ eventToOffset } { ...rest } />;
+			onlyBrowserTabstops={ false } role={ role } aria-orientation={ orientation } eventToOffset={ eventToOffset } { ...rest } />;
 	}
 }
 
