@@ -116,7 +116,7 @@
 	"meetups": {
 		"title": "Meetups",
 		"slug": "meetups",
-		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/master\/talks.md",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/master\/meetups.md",
 		"parent": "outreach"
 	},
 	"talks": {
