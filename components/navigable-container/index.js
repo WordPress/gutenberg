@@ -9,6 +9,11 @@ import { omit, noop } from 'lodash';
 import { Component } from '@wordpress/element';
 import { focus, keycodes } from '@wordpress/utils';
 
+/*
+ * Internal Dependences
+ */
+import { stopEventIfRequired } from './stoppers';
+
 /**
  * Module Constants
  */
@@ -67,24 +72,12 @@ class NavigableContainer extends Component {
 			this.props.onKeyDown( event );
 		}
 
-		const { keyCode } = event;
 		const { getFocusableContext } = this;
-		const { cycle = true, eventToOffset, onNavigate = noop, preventBubblingArrowEvents = true, preventBubblingTabEvents = false } = this.props;
+		const { cycle = true, eventToOffset, onNavigate = noop, stopArrowEvents = true, stopTabEvents = false } = this.props;
 
 		const offset = eventToOffset( event );
 
-		const stopNavigationKey = ( preventBubblingArrowEvents && [ LEFT, RIGHT, DOWN, UP ].indexOf( keyCode ) > -1 ) ||
-			( preventBubblingTabEvents && [ TAB ].indexOf( keyCode ) > -1 );
-
-		if ( stopNavigationKey ) {
-			if ( TAB === keyCode ) {
-				event.preventDefault();
-			}
-
-			// Prevents arrow key handlers bound to the document directly interfering
-			event.nativeEvent.stopImmediatePropagation();
-			event.stopPropagation();
-		}
+		stopEventIfRequired( stopArrowEvents, stopTabEvents, event );
 
 		if ( offset === 0 ) {
 			return;
@@ -111,8 +104,8 @@ class NavigableContainer extends Component {
 		return (
 			<div ref={ this.bindContainer }
 				{ ...omit( props, [
-					'preventBubblingArrowEvents',
-					'preventBubblingTabEvents',
+					'stopArrowEvents',
+					'stopTabEvents',
 					'eventToOffset',
 					'onNavigate',
 					'handleRef',
@@ -130,7 +123,7 @@ class NavigableContainer extends Component {
 
 export class NavigableMenu extends Component {
 	render() {
-		const { deep = true, cycle = true, orientation = 'vertical', ...rest } = this.props;
+		const { orientation = 'vertical', ...rest } = this.props;
 		const eventToOffset = ( evt ) => {
 			const { keyCode } = evt;
 			if ( LEFT === keyCode && orientation === 'horizontal' ) {
@@ -146,13 +139,13 @@ export class NavigableMenu extends Component {
 			return 0;
 		};
 
-		return <NavigableContainer deep={ deep } cycle={ cycle } eventToOffset={ eventToOffset } { ...rest } />;
+		return <NavigableContainer stopArrowEvents={ true } stopTabEvents={ false }
+			onlyBrowserTabstops={ false } role="menu" aria-orientation={ orientation } eventToOffset={ eventToOffset } { ...rest } />;
 	}
 }
 
 export class TabbableContainer extends Component {
 	render() {
-		const { deep = true, cycle = true, ...rest } = this.props;
 		const eventToOffset = ( evt ) => {
 			const { keyCode, shiftKey } = evt;
 			if ( TAB === keyCode ) {
@@ -160,8 +153,7 @@ export class TabbableContainer extends Component {
 			}
 		};
 
-		return <NavigableContainer deep={ deep } cycle={ cycle }
-			preventBubblingArrowEvents={ false } preventBubblingTabEvents={ true }
-			onlyBrowserTabstops={ true } eventToOffset={ eventToOffset } { ...rest } />;
+		return <NavigableContainer stopArrowEvents={ false } stopTabEvents={ true }
+			onlyBrowserTabstops={ true } eventToOffset={ eventToOffset } { ...this.props } />;
 	}
 }
