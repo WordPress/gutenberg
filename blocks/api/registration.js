@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { get, isFunction, some, mapValues } from 'lodash';
+import { get, isFunction, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -121,15 +121,12 @@ export function registerBlockType( name, settings ) {
 
 	const attributes = settings.attributes ?
 		settings.attributes :
-		get( window._wpBlocksAttributes, name );
+		get( window._wpBlocksAttributes, name, {} );
 
 	let block = blocks[ name ] = {
 		...settings,
 		name,
-		attributes: mapValues( attributes, ( attribute ) => ( {
-			source: 'comment',
-			...attribute,
-		} ) ),
+		attributes,
 	};
 
 	block = applyFilters( 'registerBlockType', block, name );

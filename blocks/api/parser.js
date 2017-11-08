@@ -99,7 +99,8 @@ export function matcherFromSource( sourceConfig ) {
 export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, commentAttributes ) {
 	let value;
 	switch ( attributeSchema.source ) {
-		case 'comment':
+		// undefined source means that it's an attribute serialized to the block's "comment"
+		case undefined:
 			value = commentAttributes ? commentAttributes[ attributeKey ] : undefined;
 			break;
 		case 'attribute':

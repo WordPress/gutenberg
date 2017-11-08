@@ -160,11 +160,9 @@ describe( 'block serializer', () => {
 				},
 				category: {
 					type: 'string',
-					source: 'comment',
 				},
 				ripeness: {
 					type: 'string',
-					source: 'comment',
 				},
 			} } );
 
@@ -181,11 +179,9 @@ describe( 'block serializer', () => {
 			}, { attributes: {
 				fruit: {
 					type: 'string',
-					source: 'comment',
 				},
 				ripeness: {
 					type: 'string',
-					source: 'comment',
 				},
 			} } );
 

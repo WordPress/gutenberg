@@ -41,10 +41,7 @@ export default function( HTML ) {
 				getBlockAttributes(
 					{
 						...blockType,
-						attributes: mapValues( transform.attributes, attribute => ( {
-							source: 'comment',
-							...attribute,
-						} ) ),
+						attributes: transform.attributes,
 					},
 					match.shortcode.content,
 					attributes,
