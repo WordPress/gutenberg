@@ -36,9 +36,7 @@ class NavigableContainer extends Component {
 	}
 
 	bindContainer( ref ) {
-		const { handleRef = noop } = this.props;
 		this.container = ref;
-		handleRef( ref );
 	}
 
 	getFocusableContext( target ) {
@@ -108,7 +106,6 @@ class NavigableContainer extends Component {
 					'stopNavigationEvents',
 					'eventToOffset',
 					'onNavigate',
-					'handleRef',
 					'cycle',
 					'deep',
 					'onlyBrowserTabstops',
