@@ -12,7 +12,7 @@ import { keycodes } from '@wordpress/utils';
 /**
  * Internal dependencies
  */
-import { NavigableGrid, TabbableContainer, NavigableMenu } from '../';
+import { TabbableContainer, NavigableMenu } from '../';
 
 const { UP, DOWN, TAB, LEFT, RIGHT } = keycodes;
 
