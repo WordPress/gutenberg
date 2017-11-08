@@ -1,4 +1,4 @@
-.editor-featured-image__content {
+.editor-post-featured-image {
 	padding: 10px 0 0;
 
 	.spinner {
@@ -6,7 +6,7 @@
 	}
 }
 
-.editor-featured-image__toggle {
+.editor-post-featured-image__toggle {
 	text-decoration: underline;
 	color: $blue-wordpress;
 
@@ -20,12 +20,12 @@
 	}
 }
 
-.editor-featured-image__preview {
+.editor-post-featured-image__preview {
 	display: block;
 	width: 100%;
 }
 
-.editor-featured-image__howto {
+.editor-post-featured-image__howto {
 	color: $dark-gray-300;
 	font-style: italic;
 	margin: 10px 0;

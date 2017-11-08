@@ -16,7 +16,7 @@ import './style.scss';
 import SavedState from './saved-state';
 import PublishWithDropdown from './publish-with-dropdown';
 import PreviewButton from './preview-button';
-import ModeSwitcher from './mode-switcher';
+import EllipsisMenu from './ellipsis-menu';
 import HeaderToolbar from './header-toolbar';
 import { isEditorSidebarOpened } from '../selectors';
 import { toggleSidebar } from '../actions';
@@ -40,7 +40,7 @@ function Header( { onToggleSidebar, isSidebarOpened } ) {
 					isToggled={ isSidebarOpened }
 					label={ __( 'Settings' ) }
 				/>
-				<ModeSwitcher />
+				<EllipsisMenu />
 			</div>
 		</div>
 	);

@@ -29,7 +29,7 @@ A boolean to look for navigable children in the direct children or any descendan
 
 ### cycle
 
-A boolean which tells the component whether or not to cycle from the end back to the beginning and vice versa. If it is false, then as soon as navigation moves outside the component, the keydown event will not be handled.
+A boolean which tells the component whether or not to cycle from the end back to the beginning and vice versa.
 
 - Type: `Boolean`
 - Required: No

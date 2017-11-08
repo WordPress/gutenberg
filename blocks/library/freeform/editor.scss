@@ -98,10 +98,14 @@
 
 .freeform-toolbar .mce-tinymce-inline {
 	margin: 0;
-	margin-top: -$block-controls-height - $item-spacing;
+	margin-top: -$block-controls-height - $block-padding;
 	border: 1px solid $light-gray-500;
 	background-color: $white;
-	box-shadow: $shadow-popover;
+
+	@include break-small() {
+		margin-left: - $block-padding - 1px;
+		margin-right: - $block-padding - 1px;
+	}
 }
 
 // Overwrite inline styles.

@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton, Dropdown, NavigableMenu } from '@wordpress/components';
+import { IconButton } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -34,52 +34,33 @@ const MODES = [
 ];
 
 function ModeSwitcher( { onSwitch, mode } ) {
-	return (
-		<Dropdown
-			className="editor-mode-switcher"
-			position="bottom left"
-			renderToggle={ ( { isOpen, onToggle } ) => (
-				<IconButton
-					icon="ellipsis"
-					label={ __( 'More' ) }
-					onClick={ onToggle }
-					aria-expanded={ isOpen }
-				/>
-			) }
-			renderContent={ ( { onClose } ) => (
-				// Should this just be a DropdownMenu ?
-				<NavigableMenu>
-					{ MODES
-						.filter( ( { value } ) => value !== mode )
-						.map( ( { value, label, icon } ) => (
-							<IconButton
-								className="editor-mode-switcher__button"
-								key={ value }
-								icon={ icon }
-								onClick={ () => {
-									onSwitch( value );
-									onClose();
-								} }
-							>
-								{ label }
-							</IconButton>
-						) ) }
-				</NavigableMenu>
-			) }
-		/>
-	);
+	return MODES
+		.filter( ( { value } ) => value !== mode )
+		.map( ( { value, label, icon } ) => (
+			<IconButton
+				className="editor-mode-switcher__button"
+				key={ value }
+				icon={ icon }
+				onClick={ () => {
+					onSwitch( value );
+				} }
+			>
+				{ label }
+			</IconButton>
+		) );
 }
 
 export default connect(
 	( state ) => ( {
 		mode: getEditorMode( state ),
 	} ),
-	( dispatch ) => ( {
+	( dispatch, ownProps ) => ( {
 		onSwitch( mode ) {
 			dispatch( {
 				type: 'SWITCH_MODE',
 				mode: mode,
 			} );
+			ownProps.onSwitch( mode );
 		},
 	} )
 )( ModeSwitcher );

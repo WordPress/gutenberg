@@ -49,7 +49,7 @@ export class InserterMenu extends Component {
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
-		const searchResults = this.searchBlocks( getBlockTypes() );
+		const searchResults = this.searchBlocks( this.getBlockTypes() );
 		// Announce the blocks search results to screen readers.
 		if ( this.state.filterValue && !! searchResults.length ) {
 			this.props.debouncedSpeak( sprintf( _n(
@@ -89,6 +89,11 @@ export class InserterMenu extends Component {
 		};
 	}
 
+	getBlockTypes() {
+		// Block types that are marked as private should not appear in the inserter
+		return getBlockTypes().filter( ( block ) => ! block.isPrivate );
+	}
+
 	searchBlocks( blockTypes ) {
 		return searchBlocks( blockTypes, this.state.filterValue );
 	}
@@ -96,15 +101,15 @@ export class InserterMenu extends Component {
 	getBlocksForTab( tab ) {
 		// if we're searching, use everything, otherwise just get the blocks visible in this tab
 		if ( this.state.filterValue ) {
-			return getBlockTypes();
+			return this.getBlockTypes();
 		}
 		switch ( tab ) {
 			case 'recent':
 				return this.props.recentlyUsedBlocks;
 			case 'blocks':
-				return filter( getBlockTypes(), ( block ) => block.category !== 'embed' );
+				return filter( this.getBlockTypes(), ( block ) => block.category !== 'embed' );
 			case 'embeds':
-				return filter( getBlockTypes(), ( block ) => block.category === 'embed' );
+				return filter( this.getBlockTypes(), ( block ) => block.category === 'embed' );
 		}
 	}
 

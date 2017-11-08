@@ -251,7 +251,8 @@ export default class Editable extends Component {
 		const content = rawHandler( {
 			HTML: event.content,
 			plainText: this.pastedPlainText,
-			inline: ! this.props.onSplit,
+			// Force inline paste if there's no `onSplit` prop.
+			mode: this.props.onSplit ? 'AUTO' : 'INLINE',
 		} );
 
 		if ( typeof content === 'string' ) {
