@@ -110,7 +110,9 @@ function BlockSwitcher( { blocks, onTransform } ) {
 								} }
 								className="editor-block-switcher__menu-item"
 								icon={ (
-									<BlockIcon icon={ icon } />
+									<span className="editor-block-switcher__block-icon">
+										<BlockIcon icon={ icon } />
+									</span>
 								) }
 								role="menuitem"
 							>
