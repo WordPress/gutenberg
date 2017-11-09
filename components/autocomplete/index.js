@@ -249,8 +249,12 @@ export class Autocomplete extends Component {
 	search( event ) {
 		const { open: wasOpen } = this.state;
 		const { completers } = this.props;
-		// ensure that the cursor location is unambiguous
 		const container = event.target;
+		// check that the event came from a contentEditable="true"
+		if ( container.contentEditable !== 'true' && container.contentEditable !== true ) {
+			return;
+		}
+		// ensure that the cursor location is unambiguous
 		const cursor = this.getCursor( container );
 		// look for the trigger prefix and search query just before the cursor location
 		const match = this.findMatch( container, cursor, completers, wasOpen );
