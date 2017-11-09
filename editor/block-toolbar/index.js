@@ -57,7 +57,7 @@ class BlockToolbar extends Component {
 		return (
 			<div className={ toolbarClassname }>
 				{ ! showMobileControls && mode === 'visual' && [
-					<BlockSwitcher key="switcher" uid={ block.uid } />,
+					<BlockSwitcher key="switcher" uids={ [ block.uid ] } />,
 					<Slot key="slot" name="Formatting.Toolbar" />,
 				] }
 				<Toolbar className="editor-block-toolbar__mobile-tools">

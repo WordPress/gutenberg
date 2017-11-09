@@ -8,7 +8,7 @@ import { __ } from '@wordpress/i18n';
  */
 import './editor.scss';
 import './style.scss';
-import { registerBlockType, source } from '../../api';
+import { registerBlockType, source, createBlock } from '../../api';
 import { default as GalleryBlock, defaultColumnsNumber } from './block';
 
 const { query, attr } = source;
@@ -49,6 +49,16 @@ registerBlockType( 'core/gallery', {
 	transforms: {
 		from: [
 			{
+				type: 'block',
+				isMultiBlock: true,
+				blocks: [ 'core/image' ],
+				transform: ( blockAttributes ) => {
+					return createBlock( 'core/gallery', {
+						images: blockAttributes.map( ( { id, url, alt } ) => ( { id, url, alt } ) ),
+					} );
+				},
+			},
+			{
 				type: 'shortcode',
 				tag: 'gallery',
 				attributes: {
@@ -77,6 +87,15 @@ registerBlockType( 'core/gallery', {
 						},
 					},
 				},
+			},
+		],
+		to: [
+			{
+				type: 'block',
+				blocks: [ 'core/image' ],
+				transform: ( { images } ) => (
+					images.map( ( { id, url, alt } ) => createBlock( 'core/image', { id, url, alt } ) )
+				),
 			},
 		],
 	},

@@ -197,17 +197,17 @@ class GalleryBlock extends Component {
 
 		return [
 			controls,
-			focus && images.length > 1 && (
+			focus && (
 				<InspectorControls key="inspector">
 					{blockDescription}
 					<h3>{ __( 'Gallery Settings' ) }</h3>
-					<RangeControl
+					{ images.length > 1 && <RangeControl
 						label={ __( 'Columns' ) }
 						value={ columns }
 						onChange={ this.setColumnsNumber }
 						min={ 1 }
 						max={ Math.min( MAX_COLUMNS, images.length ) }
-					/>
+					/> }
 					<ToggleControl
 						label={ __( 'Crop Images' ) }
 						checked={ !! imageCrop }

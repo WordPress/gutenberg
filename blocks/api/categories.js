@@ -17,6 +17,7 @@ const categories = [
 	{ slug: 'layout', title: __( 'Layout Blocks' ) },
 	{ slug: 'widgets', title: __( 'Widgets' ) },
 	{ slug: 'embed', title: __( 'Embed' ) },
+	{ slug: 'reusable-blocks', title: __( 'My Reusable Blocks' ) },
 ];
 
 /**

@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { combineReducers } from 'redux';
 import { includes } from 'lodash';
 
 /**
@@ -13,7 +12,7 @@ import { includes } from 'lodash';
  * @param  {?Array}   options.resetTypes Action types upon which to clear past
  * @return {Function}                    Enhanced reducer
  */
-export function undoable( reducer, options = {} ) {
+export default function withHistory( reducer, options = {} ) {
 	const initialState = {
 		past: [],
 		present: reducer( undefined, {} ),
@@ -68,48 +67,5 @@ export function undoable( reducer, options = {} ) {
 			present: nextPresent,
 			future: [],
 		};
-	};
-}
-
-/**
- * A wrapper for combineReducers which applies an undo history to the combined
- * reducer. As a convenience, properties of the reducers object are accessible
- * via object getters, with history assigned to a nested history property.
- *
- * @see undoable
- *
- * @param  {Object}   reducers Object of reducers
- * @param  {?Object}  options  Optional options
- * @return {Function}          Combined reducer
- */
-export function combineUndoableReducers( reducers, options ) {
-	const reducer = undoable( combineReducers( reducers ), options );
-
-	function withGetters( history ) {
-		const state = { history };
-		const keys = Object.getOwnPropertyNames( history.present );
-		const getters = keys.reduce( ( memo, key ) => {
-			memo[ key ] = {
-				get: function() {
-					return this.history.present[ key ];
-				},
-			};
-
-			return memo;
-		}, {} );
-		Object.defineProperties( state, getters );
-
-		return state;
-	}
-
-	const initialState = withGetters( reducer( undefined, {} ) );
-
-	return ( state = initialState, action ) => {
-		const nextState = reducer( state.history, action );
-		if ( nextState === state.history ) {
-			return state;
-		}
-
-		return withGetters( nextState );
 	};
 }
