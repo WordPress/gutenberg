@@ -34,9 +34,13 @@ class SlotFillProvider extends Component {
 		] );
 	}
 
-	registerSlot( name, node ) {
-		this.slots[ name ] = node;
+	registerSlot( name, slot ) {
+		this.slots[ name ] = slot;
 		this.forceUpdateFills( name );
+
+		// Sometimes the fills are registered after the intial render of slot
+		// But before the registerSlot call, we need to rerender the slot
+		this.forceUpdateSlot( name );
 	}
 
 	registerFill( name, instance ) {
@@ -78,6 +82,7 @@ class SlotFillProvider extends Component {
 
 	forceUpdateSlot( name ) {
 		const slot = this.getSlot( name );
+
 		if ( slot ) {
 			slot.forceUpdate();
 		}
