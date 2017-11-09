@@ -257,6 +257,9 @@ export class Autocomplete extends Component {
 		}
 		// ensure that the cursor location is unambiguous
 		const cursor = this.getCursor( container );
+		if ( ! cursor ) {
+			return;
+		}
 		// look for the trigger prefix and search query just before the cursor location
 		const match = this.findMatch( container, cursor, completers, wasOpen );
 		const { open, query, range } = match || {};
