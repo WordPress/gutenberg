@@ -1,5 +1,7 @@
 Cypress.Commands.add( 'auditBlockFocus', ( blockType, setupBlock = () => { } ) => {
-	cy.get( '.editor-visual-editor__inserter [aria-label="' + blockType + '"]' ).click();
+	// cy.get( '.editor-visual-editor__inserter [aria-label="' + blockType + '"]' ).click();
+	cy.get( 'button.editor-inserter__toggle:first' ).click()
+	cy.get( '.editor-inserter__menu .editor-inserter__block:contains("' + blockType + '"):first' ).click();
 
 	cy.focused().then( ( preFocus ) => {
 		cy.wrap( preFocus ).closest( '.editor-visual-editor__block-edit' ).then( ( outer ) => {
