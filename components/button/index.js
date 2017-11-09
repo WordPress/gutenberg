@@ -12,15 +12,15 @@ import { Component, createElement } from '@wordpress/element';
  * Internal dependencies
  */
 import './style.scss';
-
 class Button extends Component {
 	constructor( props ) {
 		super( props );
 		this.setRef = this.setRef.bind( this );
 	}
 
-	componentDidMount() {
-		if ( this.props.focus ) {
+	componentWillReceiveProps( nextProps ) {
+		// consider blurring and improve checking here.
+		if ( this.props.focus !== nextProps.focus && nextProps.focus ) {
 			this.ref.focus();
 		}
 	}

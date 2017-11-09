@@ -110,11 +110,13 @@ class ImageBlock extends Component {
 	render() {
 		const { attributes, setAttributes, focus, setFocus, className, settings } = this.props;
 		const { url, alt, caption, align, id, href, width, height } = attributes;
+		const fallbackFocus = url ? 'caption' : 'upload';
+		const focused = focus ? ( focus.editable || fallbackFocus ) : null;
 
 		const availableSizes = this.getAvailableSizes();
 		const figureStyle = width ? { width } : {};
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1;
-		const uploadButtonProps = { isLarge: true };
+		const uploadButtonProps = { isLarge: true, focus: focused === 'media' };
 		const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setAttributes );
 		const dropFiles = ( files ) => mediaUpload( files, setAttributes );
 
@@ -161,6 +163,7 @@ class ImageBlock extends Component {
 						className="wp-block-image__upload-button"
 						onChange={ uploadFromFiles }
 						accept="image/*"
+						focus={ focused === 'upload' ? true : null }
 					>
 						{ __( 'Upload' ) }
 					</FormFileUpload>
@@ -268,7 +271,7 @@ class ImageBlock extends Component {
 						tagName="figcaption"
 						placeholder={ __( 'Write caption…' ) }
 						value={ caption }
-						focus={ focus && focus.editable === 'caption' ? focus : undefined }
+						focus={ focused === 'caption' ? focus : undefined }
 						onFocus={ focusCaption }
 						onChange={ ( value ) => setAttributes( { caption: value } ) }
 						inlineToolbar

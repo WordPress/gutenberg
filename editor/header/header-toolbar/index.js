@@ -63,5 +63,8 @@ export default connect(
 	( dispatch ) => ( {
 		undo: () => dispatch( { type: 'UNDO' } ),
 		redo: () => dispatch( { type: 'REDO' } ),
+		onFocusBlockEdit( uid, config ) {
+			dispatch( focusBlockEdit( uid, config ) );
+		},
 	} )
 )( HeaderToolbar );

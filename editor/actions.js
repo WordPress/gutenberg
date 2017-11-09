@@ -93,11 +93,25 @@ export function updateBlock( uid, updates ) {
 	};
 }
 
-export function focusBlock( uid, config ) {
+export function focusBlock( uid ) {
 	return {
 		type: 'UPDATE_FOCUS',
 		uid,
-		config,
+		config: {
+			target: 'block',
+			options: { },
+		},
+	};
+}
+
+export function focusBlockEdit( uid, config ) {
+	return {
+		type: 'UPDATE_FOCUS',
+		uid,
+		config: {
+			target: 'blockEdit',
+			options: config || {},
+		},
 	};
 }
 

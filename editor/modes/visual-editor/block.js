@@ -28,6 +28,7 @@ import {
 	clearSelectedBlock,
 	editPost,
 	focusBlock,
+	focusBlockEdit,
 	insertBlocks,
 	mergeBlocks,
 	removeBlock,
@@ -54,7 +55,7 @@ import {
 	getBlockMode,
 } from '../../selectors';
 
-const { BACKSPACE, ESCAPE, DELETE, ENTER, UP, RIGHT, DOWN, LEFT } = keycodes;
+const { BACKSPACE, ESCAPE, DELETE, ENTER, TAB, UP, RIGHT, DOWN, LEFT } = keycodes;
 
 class VisualEditorBlock extends Component {
 	constructor() {
@@ -81,7 +82,7 @@ class VisualEditorBlock extends Component {
 	}
 
 	componentDidMount() {
-		if ( this.props.focus ) {
+		if ( this.props.focus && this.props.focus.target === 'block' ) {
 			this.node.focus();
 		}
 
@@ -113,7 +114,7 @@ class VisualEditorBlock extends Component {
 		}
 
 		// Focus node when focus state is programmatically transferred.
-		if ( this.props.focus && ! prevProps.focus && ! this.node.contains( document.activeElement ) ) {
+		if ( this.props.focus !== prevProps.focus && this.props.focus && this.props.focus.target === 'block' ) {
 			this.node.focus();
 		}
 
@@ -225,8 +226,9 @@ class VisualEditorBlock extends Component {
 	}
 
 	onFocus( event ) {
+		const { onFocusBlock } = this.props;
 		if ( event.target === this.node ) {
-			this.props.onSelect();
+			onFocusBlock( this.props.uid );
 		}
 	}
 
@@ -249,24 +251,49 @@ class VisualEditorBlock extends Component {
 	}
 
 	onKeyDown( event ) {
-		const { keyCode, target } = event;
+		const { uid, onRemove, previousBlock, nextBlock, onFocusBlockEdit, onFocusBlock, focus } = this.props;
+
+		const { keyCode, target, shiftKey } = event;
+
+		const focusOnContainer = target === this.node;
 
 		switch ( keyCode ) {
+			case TAB:
+				if ( ! shiftKey && focus && focus.target === 'blockEdit' && nextBlock ) {
+					event.preventDefault();
+					event.stopPropagation();
+					onFocusBlockEdit( nextBlock.uid );
+				} else if ( shiftKey && focus && focus.target === 'blockEdit' && previousBlock ) {
+					event.preventDefault();
+					event.stopPropagation();
+					onFocusBlockEdit( previousBlock.uid );
+				}
+				break;
 			case ENTER:
 				// Insert default block after current block if enter and event
 				// not already handled by descendant.
-				if ( target === this.node ) {
+				if ( focusOnContainer ) {
 					event.preventDefault();
-
-					this.props.onInsertBlocks( [
-						createBlock( 'core/paragraph' ),
-					], this.props.order + 1 );
+					event.stopPropagation();
+					onFocusBlockEdit( this.props.uid );
 				}
 				break;
 
 			case UP:
-			case RIGHT:
+				if ( focusOnContainer && previousBlock ) {
+					event.preventDefault();
+					event.stopPropagation();
+					onFocusBlock( previousBlock.uid );
+				}
+				break;
 			case DOWN:
+				if ( focusOnContainer && nextBlock ) {
+					event.preventDefault();
+					event.stopPropagation();
+					onFocusBlock( nextBlock.uid );
+				}
+				break;
+			case RIGHT:
 			case LEFT:
 				// Arrow keys do not fire keypress event, but should still
 				// trigger typing mode.
@@ -276,20 +303,20 @@ class VisualEditorBlock extends Component {
 			case BACKSPACE:
 			case DELETE:
 				// Remove block on backspace.
-				if ( target === this.node ) {
+				if ( focusOnContainer ) {
 					event.preventDefault();
-					const { uid, onRemove, previousBlock, onFocus } = this.props;
 					onRemove( uid );
 
 					if ( previousBlock ) {
-						onFocus( previousBlock.uid, { offset: -1 } );
+						onFocusBlockEdit( previousBlock.uid, { offset: -1 } );
 					}
 				}
 				break;
 
 			case ESCAPE:
-				// Deselect on escape.
-				this.props.onDeselect();
+				if ( ! focusOnContainer ) {
+					onFocusBlock( this.props.uid );
+				}
 				break;
 		}
 	}
@@ -322,17 +349,22 @@ class VisualEditorBlock extends Component {
 
 		// Generate the wrapper class names handling the different states of the block.
 		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected, focus } = this.props;
-		const showUI = isSelected && ( ! this.props.isTyping || ( focus && focus.collapsed === false ) );
+
+		const isNavigating = focus && focus.target === 'block';
+
+		// Ignoring focus collapsed ... probably want to add that.
+		const showUI = isSelected && ( ! this.props.isTyping && focus && focus.target === 'blockEdit' );
 		const isProperlyHovered = isHovered && ! this.props.isSelecting;
 		const { error } = this.state;
 		const wrapperClassName = classnames( 'editor-visual-editor__block', {
 			'has-warning': ! isValid || !! error,
-			'is-selected': showUI,
+			'is-selected': isSelected && ! isNavigating,
 			'is-multi-selected': isMultiSelected,
 			'is-hovered': isProperlyHovered,
+			'is-navigating': isNavigating,
 		} );
 
-		const { onMouseLeave, onFocus, onReplace } = this.props;
+		const { onMouseLeave, onFocusBlockEdit, onReplace } = this.props;
 
 		// Determine whether the block has props to apply to the wrapper.
 		let wrapperProps;
@@ -383,12 +415,12 @@ class VisualEditorBlock extends Component {
 					<BlockCrashBoundary onError={ this.onBlockError }>
 						{ isValid && mode === 'visual' && (
 							<BlockEdit
-								focus={ focus }
+								focus={ focus && focus.target === 'blockEdit' ? focus.options : null }
 								attributes={ block.attributes }
 								setAttributes={ this.setAttributes }
 								insertBlocksAfter={ this.insertBlocksAfter }
 								onReplace={ onReplace }
-								setFocus={ partial( onFocus, block.uid ) }
+								setFocus={ partial( onFocusBlockEdit, block.uid ) }
 								mergeBlocks={ this.mergeBlocks }
 								className={ className }
 								id={ block.uid }
@@ -441,6 +473,10 @@ export default connect(
 			dispatch( updateBlockAttributes( uid, attributes ) );
 		},
 
+		onFocusBlock( uid ) {
+			dispatch( focusBlock( uid ) );
+		},
+
 		onSelect() {
 			dispatch( selectBlock( ownProps.uid ) );
 		},
@@ -475,8 +511,8 @@ export default connect(
 			dispatch( insertBlocks( blocks, position ) );
 		},
 
-		onFocus( ...args ) {
-			dispatch( focusBlock( ...args ) );
+		onFocusBlockEdit( uid, config ) {
+			dispatch( focusBlockEdit( uid, config ) );
 		},
 
 		onRemove( uid ) {

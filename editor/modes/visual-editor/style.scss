@@ -107,6 +107,12 @@
  		outline: 1px solid $light-gray-500;
 	}
 
+	/* This is a temporary addition to show navigation mode */
+	&.is-navigating:before {
+		outline: 2px solid darkblue;
+		transition: 0.2s outline;
+	}
+
 	// selection style for multiple blocks
 	&.is-multi-selected *::selection {
 		background: transparent;

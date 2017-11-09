@@ -89,11 +89,13 @@ class BlockToolbar extends Component {
 	}
 }
 
-export default connect( ( state ) => {
-	const block = getSelectedBlock( state );
+export default connect(
+	( state ) => {
+		const block = getSelectedBlock( state );
 
-	return ( {
-		block,
-		mode: block ? getBlockMode( state, block.uid ) : null,
-	} );
-} )( BlockToolbar );
+		return ( {
+			block,
+			mode: block ? getBlockMode( state, block.uid ) : null,
+		} );
+	}
+)( BlockToolbar );
