@@ -158,10 +158,10 @@ class Popover extends Component {
 	}
 
 	setOffset() {
-		const { getAnchorRect = this.getAnchorRect } = this.props;
+		const { getAnchorRect = this.getAnchorRect, expandOnMobile = true } = this.props;
 		const { popover } = this.nodes;
 
-		if ( isMobile() ) {
+		if ( isMobile() && expandOnMobile ) {
 			popover.style.left = 0;
 			popover.style.top = 0;
 			popover.style.right = 0;
