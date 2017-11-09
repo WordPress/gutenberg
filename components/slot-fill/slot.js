@@ -57,7 +57,7 @@ class Slot extends Component {
 				{ map( getFills( name ), ( fill ) => {
 					const fillKey = fill.props.instanceId;
 					return Children.map( fill.props.children, ( child, childIndex ) => {
-						const childKey = fillKey + '---' + ( child.props.key || childIndex );
+						const childKey = `${ fillKey }---${ child.props.key || childIndex }`;
 						return cloneElement( child, { key: childKey } );
 					} );
 				} ) }
