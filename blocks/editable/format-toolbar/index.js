@@ -1,14 +1,9 @@
 /**
- * External dependencies
- */
-import { Fill } from 'react-slot-fill';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { IconButton, Toolbar, withSpokenMessages } from '@wordpress/components';
+import { IconButton, Toolbar, withSpokenMessages, Fill } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
 
 /**

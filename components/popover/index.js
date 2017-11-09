@@ -305,6 +305,6 @@ Popover.contextTypes = {
 	getSlot: noop,
 };
 
-Popover.Slot = () => <Slot name={ SLOT_NAME } />;
+Popover.Slot = () => <Slot bubble name={ SLOT_NAME } />;
 
 export default Popover;
