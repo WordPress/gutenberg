@@ -45,10 +45,10 @@ class Slot extends Component {
 	}
 
 	render() {
-		const { name, bubble = false } = this.props;
+		const { name, bubblesVirtually = false } = this.props;
 		const { getFills = noop } = this.context;
 
-		if ( bubble ) {
+		if ( bubblesVirtually ) {
 			return <div ref={ this.bindNode } />;
 		}
 
@@ -57,7 +57,7 @@ class Slot extends Component {
 				{ map( getFills( name ), ( fill ) => {
 					const fillKey = fill.props.instanceId;
 					return Children.map( fill.props.children, ( child, childIndex ) => {
-						const childKey = fillKey + '---' + child.props.key || childIndex;
+						const childKey = fillKey + '---' + ( child.props.key || childIndex );
 						return cloneElement( child, { key: childKey } );
 					} );
 				} ) }

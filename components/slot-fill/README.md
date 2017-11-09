@@ -48,4 +48,7 @@ The `SlotFillProvider` component does not accept any props.
 
 Both `Slot` and `Fill` accept a `name` string prop, where a `Slot` with a given `name` will render the `children` of any associated `Fill`s.
 
-`Slot` also accepts a `bubble` event which changes the rendering behavior. If we want to bubble events to the Fills parent component, we need to pass this prop to the correspondig `Slot`.
+`Slot` also accepts a `bubblesVirtually` prop which changes the event bubbling behaviour:
+
+ - By default, events will bubble to their parents on the DOM hierarchy (native event bubbling)
+ - If `bubblesVirtually` is set to true, events will bubble to their virtual parent in the React elements hierarchy instead.
