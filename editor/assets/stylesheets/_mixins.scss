@@ -126,7 +126,7 @@ $float-margin: calc( 50% - #{ $visual-editor-max-width-padding / 2 } );
 
 @mixin button-style__focus-active() {
 	outline: none;
-	box-shadow: 0 0 0 1px $dark-gray-500, inset 0 0 0 1px $white;
+	box-shadow: inset 0 0 0 1px $dark-gray-500, inset 0 0 0 2px $white;
 	color: $dark-gray-900;
 	background: $light-gray-300;
 }

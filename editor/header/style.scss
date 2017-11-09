@@ -88,7 +88,7 @@
 	// put the gray background on a separate layer, so as to match the size of the publish button (34px)
 	&.is-toggled::before {
 		content: "";
-		border-radius: 3px;
+		border-radius: $button-style__radius-roundrect;
 		position: absolute;
 		z-index: -1;
 		background: $dark-gray-500;
