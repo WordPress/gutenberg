@@ -84,7 +84,7 @@ export default class Editable extends Component {
 				`Invalid value of type ${ typeof value } passed to Editable ` +
 				'(expected array). Attribute values should be sourced using ' +
 				'the `children` source when used with Editable.\n\n' +
-				'See: http://gutenberg-devdoc.surge.sh/reference/attributes/#children'
+				'See: https://wordpress.org/gutenberg/handbook/reference/attributes/#children'
 			);
 		}
 
