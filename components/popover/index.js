@@ -35,6 +35,7 @@ const ARROW_OFFSET = 20;
  * @type {String}
  */
 const SLOT_NAME = 'Popover';
+const isMobile = () => window.innerWidth < 782;
 
 class Popover extends Component {
 	constructor() {
@@ -52,6 +53,7 @@ class Popover extends Component {
 		this.state = {
 			forcedYAxis: null,
 			forcedXAxis: null,
+			isMobile: false,
 		};
 	}
 
@@ -159,6 +161,20 @@ class Popover extends Component {
 		const { getAnchorRect = this.getAnchorRect } = this.props;
 		const { popover } = this.nodes;
 
+		if ( isMobile() ) {
+			popover.style.left = 0;
+			popover.style.top = 0;
+			popover.style.right = 0;
+			popover.style.bottom = 0;
+			this.setState( {
+				isMobile: true,
+			} );
+			return;
+		}
+		this.setState( {
+			isMobile: false,
+		} );
+
 		const [ yAxis, xAxis ] = this.getPositions();
 		const isTop = 'top' === yAxis;
 		const isLeft = 'left' === xAxis;
@@ -168,6 +184,9 @@ class Popover extends Component {
 		if ( ! rect ) {
 			return;
 		}
+
+		//popover.style.bottom = 'auto';
+		//popover.style.right = 'auto';
 
 		if ( isRight ) {
 			popover.style.left = rect.left + ARROW_OFFSET + 'px';
@@ -258,6 +277,9 @@ class Popover extends Component {
 			className,
 			'is-' + yAxis,
 			'is-' + xAxis,
+			{
+				'is-mobile': this.state.isMobile,
+			}
 		);
 
 		// Disable reason: We care to capture the _bubbled_ events from inputs
