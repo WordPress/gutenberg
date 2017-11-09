@@ -2,133 +2,133 @@
 	{
 		"title": "Introduction",
 		"slug": "handbook",
-		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/master\/readme.md",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/readme.md",
 		"parent": null
 	},
 	{
 		"title": "The Language of Gutenberg",
 		"slug": "language",
-		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/master\/language.md",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/language.md",
 		"parent": null
 	},
 	{
 		"title": "Block API",
 		"slug": "block-api",
-		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/master\/block-api.md",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/block-api.md",
 		"parent": null
 	},
 	{
 		"title": "Edit and Save",
 		"slug": "block-edit-save",
-		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/master\/block-edit-save.md",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/block-edit-save.md",
 		"parent": null
 	},
 	{
 		"title": "Creating Block Types",
 		"slug": "blocks",
-		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/master\/blocks.md",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/blocks.md",
 		"parent": null
 	},
 	{
 		"title": "Writing Your First Block Type",
 		"slug": "writing-your-first-block-type",
-		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/master\/blocks-basic.md",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/blocks-basic.md",
 		"parent": "blocks"
 	},
 	{
 		"title": "Applying Styles With Stylesheets",
 		"slug": "applying-styles-with-stylesheets",
-		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/master\/blocks-stylesheet.md",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/blocks-stylesheet.md",
 		"parent": "blocks"
 	},
 	{
 		"title": "Introducing Attributes and Editable Fields",
 		"slug": "introducing-attributes-and-editable-fields",
-		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/master\/blocks-editable.md",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/blocks-editable.md",
 		"parent": "blocks"
 	},
 	{
 		"title": "Block Controls: Toolbars and Inspector",
 		"slug": "block-controls-toolbars-and-inspector",
-		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/master\/blocks-controls.md",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/blocks-controls.md",
 		"parent": "blocks"
 	},
 	{
 		"title": "Reference",
 		"slug": "reference",
-		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/master\/reference.md",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/reference.md",
 		"parent": null
 	},
 	{
 		"title": "Attributes",
 		"slug": "attributes",
-		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/master\/attributes.md",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/attributes.md",
 		"parent": "reference"
 	},
 	{
 		"title": "Theme Support",
 		"slug": "theme-support",
-		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/master\/themes.md",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/themes.md",
 		"parent": "reference"
 	},
 	{
 		"title": "Glossary",
 		"slug": "glossary",
-		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/master\/glossary.md",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/glossary.md",
 		"parent": "reference"
 	},
 	{
 		"title": "Design Principles",
 		"slug": "design-principles",
-		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/master\/design.md",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/design.md",
 		"parent": "reference"
 	},
 	{
 		"title": "History",
 		"slug": "history",
-		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/master\/history.md",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/history.md",
 		"parent": "reference"
 	},
 	{
 		"title": "Coding Guidelines",
 		"slug": "coding-guidelines",
-		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/master\/coding-guidelines.md",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/coding-guidelines.md",
 		"parent": "reference"
 	},
 	{
 		"title": "Frequently Asked Questions",
 		"slug": "faq",
-		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/master\/faq.md",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/faq.md",
 		"parent": "reference"
 	},
 	{
 		"title": "Outreach",
 		"slug": "outreach",
-		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/master\/outreach.md",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/outreach.md",
 		"parent": null
 	},
 	{
 		"title": "Articles",
 		"slug": "articles",
-		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/master\/articles.md",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/articles.md",
 		"parent": "outreach"
 	},
 	{
 		"title": "Meetups",
 		"slug": "meetups",
-		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/master\/meetups.md",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/meetups.md",
 		"parent": "outreach"
 	},
 	{
 		"title": "Talks",
 		"slug": "talks",
-		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/master\/talks.md",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/talks.md",
 		"parent": "outreach"
 	},
 	{
 		"title": "Resources",
 		"slug": "resources",
-		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/task\/master\/resources.md",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/resources.md",
 		"parent": "outreach"
 	}
 ]
