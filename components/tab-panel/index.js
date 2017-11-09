@@ -30,16 +30,11 @@ class TabPanel extends Component {
 		super( ...arguments );
 
 		this.handleClick = this.handleClick.bind( this );
-		this.bindTabsRef = this.bindTabsRef.bind( this );
 		this.onNavigate = this.onNavigate.bind( this );
 
 		this.state = {
 			selected: this.props.tabs.length > 0 ? this.props.tabs[ 0 ].name : null,
 		};
-	}
-
-	bindTabsRef( ref ) {
-		this.tabsNode = ref;
 	}
 
 	handleClick( tabKey, onSelect = noop ) {
@@ -63,7 +58,6 @@ class TabPanel extends Component {
 		return (
 			<div>
 				<NavigableMenu
-					handleRef={ this.bindTabsRef }
 					role="tablist"
 					orientation={ orientation }
 					onNavigate={ this.onNavigate }
