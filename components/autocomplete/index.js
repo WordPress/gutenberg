@@ -312,7 +312,7 @@ export class Autocomplete extends Component {
 			this.loadOptions( open.idx );
 		}
 		// create a regular expression to filter the options
-		const search = open ? new RegExp( escapeRegExp( query ), 'i' ) : /./;
+		const search = open ? new RegExp( '(?:\\b|\\s|^)' + escapeRegExp( query ), 'i' ) : /./;
 		// filter the options we already have
 		const filteredOptions = open ? filterOptions( search, this.state[ 'options_' + open.idx ] ) : [];
 		// check if we should still suppress the popover
