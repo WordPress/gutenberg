@@ -263,6 +263,7 @@ class Popover extends Component {
 			range,
 			focusOnOpen,
 			getAnchorRect,
+			expandOnMobile,
 			/* eslint-enable no-unused-vars */
 			...contentProps
 		} = this.props;
