@@ -74,6 +74,7 @@ class Inserter extends Component {
 				className="editor-inserter"
 				position={ position }
 				onToggle={ this.onToggle }
+				expandOnMobile
 				renderToggle={ ( { onToggle, isOpen } ) => (
 					<IconButton
 						icon="insert"

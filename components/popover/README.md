@@ -100,11 +100,10 @@ A callback invoked when the user clicks outside the opened popover, passing the 
 - Type: `Function`
 - Required: No
 
-
 ## expandOnMobile
 
-Popovers automatically shows up fullscreen on mobile, pass `false` in this prop to avoid this behavior.
+Opt-in prop to show popovers fullscreen on mobile, pass `false` in this prop to avoid this behavior.
 
  - Type: `Boolean`
  - Required: No
- - Default: `true`
+ - Default: `false`
