@@ -51,7 +51,7 @@ Gutenberg will work in modern browsers, and Internet Explorer 11.
 
 ## How do I make my own block?
 
-The API for creating blocks is a crucial aspect of the project. We are working on improved documentation and tutorials. Check out the [Creating Block Types](http://gutenberg-devdoc.surge.sh/blocks/) section to get started.
+The API for creating blocks is a crucial aspect of the project. We are working on improved documentation and tutorials. Check out the [Creating Block Types](https://wordpress.org/gutenberg/handbook/blocks/) section to get started.
 
 ## Does Gutenberg involve editing posts/pages in the front-end?
 
@@ -97,7 +97,7 @@ Blocks will be able to provide base structural CSS styles, and themes can add st
 
 Other features, like the new _wide_ and _full-wide_ alignment options, will simply be CSS classes applied to blocks that offer this alignment. We are looking at how a theme can opt in to this feature, for example using `add_theme_support`.
 
-*See:* [Theme Support](http://gutenberg-devdoc.surge.sh/reference/theme-support/)
+*See:* [Theme Support](https://wordpress.org/gutenberg/handbook/reference/theme-support/)
 
 ## How will editor styles work?
 
@@ -146,7 +146,7 @@ If you would like to contribute to the accessibility of Gutenberg, we can always
 
 ## Are there any design resources for Gutenberg?
 
-Yes, primarily https://github.com/WordPress/gutenberg/blob/master/docs/design.md
+Yes, primarily https://wordpress.org/gutenberg/handbook/reference/design-principles/
 
 We are still adding more documentation.
 

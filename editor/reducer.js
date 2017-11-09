@@ -657,6 +657,56 @@ export function metaBoxes( state = defaultMetaBoxState, action ) {
 	}
 }
 
+export const reusableBlocks = combineReducers( {
+	data( state = {}, action ) {
+		switch ( action.type ) {
+			case 'FETCH_REUSABLE_BLOCKS_SUCCESS': {
+				return reduce( action.reusableBlocks, ( newState, reusableBlock ) => ( {
+					...newState,
+					[ reusableBlock.id ]: reusableBlock,
+				} ), state );
+			}
+
+			case 'UPDATE_REUSABLE_BLOCK': {
+				const { id, reusableBlock } = action;
+				const existingReusableBlock = state[ id ];
+
+				return {
+					...state,
+					[ id ]: {
+						...existingReusableBlock,
+						...reusableBlock,
+						attributes: {
+							...( existingReusableBlock && existingReusableBlock.attributes ),
+							...reusableBlock.attributes,
+						},
+					},
+				};
+			}
+		}
+
+		return state;
+	},
+
+	isSaving( state = {}, action ) {
+		switch ( action.type ) {
+			case 'SAVE_REUSABLE_BLOCK':
+				return {
+					...state,
+					[ action.id ]: true,
+				};
+
+			case 'SAVE_REUSABLE_BLOCK_SUCCESS':
+			case 'SAVE_REUSABLE_BLOCK_FAILURE': {
+				const { id } = action;
+				return omit( state, id );
+			}
+		}
+
+		return state;
+	},
+} );
+
 export default optimist( combineReducers( {
 	editor,
 	currentPost,
@@ -670,4 +720,5 @@ export default optimist( combineReducers( {
 	saving,
 	notices,
 	metaBoxes,
+	reusableBlocks,
 } ) );

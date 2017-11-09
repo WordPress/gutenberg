@@ -25,6 +25,7 @@ import {
 	blocksMode,
 	blockInsertionPoint,
 	metaBoxes,
+	reusableBlocks,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -1231,6 +1232,167 @@ describe( 'state', () => {
 			};
 
 			expect( actual ).toEqual( expected );
+		} );
+	} );
+
+	describe( 'reusableBlocks()', () => {
+		it( 'should start out empty', () => {
+			const state = reusableBlocks( undefined, {} );
+			expect( state ).toEqual( {
+				data: {},
+				isSaving: {},
+			} );
+		} );
+
+		it( 'should add fetched reusable blocks', () => {
+			const reusableBlock = {
+				id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
+				name: 'My cool block',
+				type: 'core/paragraph',
+				attributes: {
+					content: 'Hello!',
+				},
+			};
+
+			const state = reusableBlocks( {}, {
+				type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
+				reusableBlocks: [ reusableBlock ],
+			} );
+
+			expect( state ).toEqual( {
+				data: {
+					[ reusableBlock.id ]: reusableBlock,
+				},
+				isSaving: {},
+			} );
+		} );
+
+		it( 'should add a reusable block', () => {
+			const reusableBlock = {
+				id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
+				name: 'My cool block',
+				type: 'core/paragraph',
+				attributes: {
+					content: 'Hello!',
+				},
+			};
+
+			const state = reusableBlocks( {}, {
+				type: 'UPDATE_REUSABLE_BLOCK',
+				id: reusableBlock.id,
+				reusableBlock,
+			} );
+
+			expect( state ).toEqual( {
+				data: {
+					[ reusableBlock.id ]: reusableBlock,
+				},
+				isSaving: {},
+			} );
+		} );
+
+		it( 'should update a reusable block', () => {
+			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
+			const initialState = {
+				data: {
+					[ id ]: {
+						id,
+						name: 'My cool block',
+						type: 'core/paragraph',
+						attributes: {
+							content: 'Hello!',
+							dropCap: true,
+						},
+					},
+				},
+				isSaving: {},
+			};
+
+			const state = reusableBlocks( initialState, {
+				type: 'UPDATE_REUSABLE_BLOCK',
+				id,
+				reusableBlock: {
+					name: 'My better block',
+					attributes: {
+						content: 'Yo!',
+					},
+				},
+			} );
+
+			expect( state ).toEqual( {
+				data: {
+					[ id ]: {
+						id,
+						name: 'My better block',
+						type: 'core/paragraph',
+						attributes: {
+							content: 'Yo!',
+							dropCap: true,
+						},
+					},
+				},
+				isSaving: {},
+			} );
+		} );
+
+		it( 'should indicate that a reusable block is saving', () => {
+			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
+			const initialState = {
+				data: {},
+				isSaving: {},
+			};
+
+			const state = reusableBlocks( initialState, {
+				type: 'SAVE_REUSABLE_BLOCK',
+				id,
+			} );
+
+			expect( state ).toEqual( {
+				data: {},
+				isSaving: {
+					[ id ]: true,
+				},
+			} );
+		} );
+
+		it( 'should stop indicating that a reusable block is saving when the save succeeded', () => {
+			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
+			const initialState = {
+				data: {},
+				isSaving: {
+					[ id ]: true,
+				},
+			};
+
+			const state = reusableBlocks( initialState, {
+				type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
+				id,
+			} );
+
+			expect( state ).toEqual( {
+				data: {},
+				isSaving: {},
+			} );
+		} );
+
+		it( 'should stop indicating that a reusable block is saving when there is an error', () => {
+			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
+			const initialState = {
+				data: {},
+				isSaving: {
+					[ id ]: true,
+				},
+			};
+
+			const state = reusableBlocks( initialState, {
+				type: 'SAVE_REUSABLE_BLOCK_FAILURE',
+				id,
+			} );
+
+			expect( state ).toEqual( {
+				data: {},
+				isSaving: {},
+			} );
 		} );
 	} );
 } );
