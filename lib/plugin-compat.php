@@ -26,7 +26,7 @@
  * @return array $post      Post object.
  */
 function gutenberg_remove_wpcom_markdown_support( $post ) {
-	if ( content_has_blocks( $post->post_content ) ) {
+	if ( gutenberg_content_has_blocks( $post->post_content ) ) {
 		remove_post_type_support( 'post', 'wpcom-markdown' );
 	}
 	return $post;
