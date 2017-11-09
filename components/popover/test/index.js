@@ -13,7 +13,7 @@ describe( 'Popover', () => {
 		let wrapper, mocks;
 		beforeEach( () => {
 			wrapper = shallow(
-				<Popover expandOnMobile={ false } />,
+				<Popover />,
 				{ lifecycleExperimental: true }
 			);
 
@@ -206,7 +206,7 @@ describe( 'Popover', () => {
 		} );
 
 		function getInstanceWithParentNode() {
-			const instance = new Popover( { expandOnMobile: false } );
+			const instance = new Popover( {} );
 
 			instance.nodes.anchor = {
 				parentNode: {

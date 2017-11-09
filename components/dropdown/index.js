@@ -61,7 +61,14 @@ class Dropdown extends Component {
 
 	render() {
 		const { isOpen } = this.state;
-		const { renderContent, renderToggle, position = 'bottom', className, contentClassName } = this.props;
+		const {
+			renderContent,
+			renderToggle,
+			position = 'bottom',
+			className,
+			contentClassName,
+			expandOnMobile,
+		} = this.props;
 		const args = { isOpen, onToggle: this.toggle, onClose: this.close };
 		return (
 			<div className={ className } ref={ this.bindContainer }>
@@ -72,6 +79,7 @@ class Dropdown extends Component {
 					position={ position }
 					onClose={ this.close }
 					onClickOutside={ this.clickOutside }
+					expandOnMobile={ expandOnMobile }
 				>
 					<FocusManaged>
 						{ renderContent( args ) }

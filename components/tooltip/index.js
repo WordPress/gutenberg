@@ -177,7 +177,6 @@ class Tooltip extends Component {
 					position={ position }
 					className="components-tooltip"
 					aria-hidden="true"
-					expandOnMobile={ false }
 				>
 					{ text }
 				</Popover>,
