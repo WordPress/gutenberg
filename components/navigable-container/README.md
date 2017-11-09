@@ -35,13 +35,6 @@ A boolean which tells the component whether or not to cycle from the end back to
 - Required: No
 - default: true
 
-## handleRef
-
-A function which is passed the ref.
-
-- Type: `Function`
-- Required: No
-
 ### orientation (NavigableMenu only)
 
 The orientation of the menu. It could be "vertical" or "horizontal"
@@ -96,7 +89,7 @@ function MyContainer() {
 			<div tabIndex="0">Section 1</div>
 			<div tabIndex="0">Section 2</div>
 			<div tabIndex="0">Section 3</div>
-      <div tabIndex="0">Section 4</div>
+			<div tabIndex="0">Section 4</div>
 		</TabbableContainer>
 	);
 }

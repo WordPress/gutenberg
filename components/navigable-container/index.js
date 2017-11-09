@@ -9,11 +9,6 @@ import { omit, noop } from 'lodash';
 import { Component } from '@wordpress/element';
 import { focus, keycodes } from '@wordpress/utils';
 
-/*
- * Internal Dependences
- */
-import { stopEventIfRequired } from './stoppers';
-
 /**
  * Module Constants
  */
@@ -41,9 +36,7 @@ class NavigableContainer extends Component {
 	}
 
 	bindContainer( ref ) {
-		const { handleRef = noop } = this.props;
 		this.container = ref;
-		handleRef( ref );
 	}
 
 	getFocusableContext( target ) {
@@ -73,13 +66,19 @@ class NavigableContainer extends Component {
 		}
 
 		const { getFocusableContext } = this;
-		const { cycle = true, eventToOffset, onNavigate = noop, stopArrowEvents = true, stopTabEvents = false } = this.props;
+		const { cycle = true, eventToOffset, onNavigate = noop, stopNavigationEvents } = this.props;
 
 		const offset = eventToOffset( event );
 
-		stopEventIfRequired( stopArrowEvents, stopTabEvents, event );
+		// eventToOffset returns undefined if the event is not handled by the component
+		if ( offset !== undefined && stopNavigationEvents ) {
+			// Prevents arrow key handlers bound to the document directly interfering
+			event.nativeEvent.stopImmediatePropagation();
+			event.preventDefault();
+			event.stopPropagation();
+		}
 
-		if ( offset === 0 ) {
+		if ( ! offset ) {
 			return;
 		}
 
@@ -104,11 +103,9 @@ class NavigableContainer extends Component {
 		return (
 			<div ref={ this.bindContainer }
 				{ ...omit( props, [
-					'stopArrowEvents',
-					'stopTabEvents',
+					'stopNavigationEvents',
 					'eventToOffset',
 					'onNavigate',
-					'handleRef',
 					'cycle',
 					'deep',
 					'onlyBrowserTabstops',
@@ -135,12 +132,18 @@ export class NavigableMenu extends Component {
 			} else if ( DOWN === keyCode && orientation === 'vertical' ) {
 				return +1;
 			}
-
-			return 0;
 		};
 
-		return <NavigableContainer stopArrowEvents={ true } stopTabEvents={ false }
-			onlyBrowserTabstops={ false } role={ role } aria-orientation={ orientation } eventToOffset={ eventToOffset } { ...rest } />;
+		return (
+			<NavigableContainer
+				stopNavigationEvents
+				onlyBrowserTabstops={ false }
+				role={ role }
+				aria-orientation={ orientation }
+				eventToOffset={ eventToOffset }
+				{ ...rest }
+			/>
+		);
 	}
 }
 
@@ -153,7 +156,13 @@ export class TabbableContainer extends Component {
 			}
 		};
 
-		return <NavigableContainer stopArrowEvents={ false } stopTabEvents={ true }
-			onlyBrowserTabstops={ true } eventToOffset={ eventToOffset } { ...this.props } />;
+		return (
+			<NavigableContainer
+				stopNavigationEvents
+				onlyBrowserTabstops
+				eventToOffset={ eventToOffset }
+				{ ...this.props }
+			/>
+		);
 	}
 }
