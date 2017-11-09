@@ -571,5 +571,5 @@ $sticky-bottom-offset: 20px;
 .editor-block-contextual-toolbar + div {
 	// prevent collapsing margins between block and toolbar, matches the 20px bottom offset		 +		display: flex;
 	margin-top: - $sticky-bottom-offset - 1px;
-	padding-top: 1px;
+	padding-top: 2px;
 }
