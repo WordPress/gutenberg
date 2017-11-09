@@ -130,3 +130,16 @@ $float-margin: calc( 50% - #{ $visual-editor-max-width-padding / 2 } );
 	color: $dark-gray-900;
 	background: $light-gray-300;
 }
+
+@mixin tab-style__focus-active() {
+	outline: none;
+	box-shadow: 0 0 0 1px $dark-gray-500;
+	color: $dark-gray-900;
+	background: $light-gray-300;
+}
+
+@mixin input-style__focus-active() {
+	outline: none;
+	box-shadow: 0 0 0 1px $dark-gray-500;
+	color: $dark-gray-900;
+}

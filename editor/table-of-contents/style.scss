@@ -18,13 +18,13 @@
 	cursor: pointer;
 	font-family: $default-font;
 	font-size: 12px;
-	padding: 0 6px 4px;
+	padding: 6px;
+	border-radius: $button-style__radius-round;
 
 	.dashicon {
+		display: block;
 		width: 20px;
 		height: 20px;
-		position: relative;
-		top: 5px;
 	}
 
 	&:focus {

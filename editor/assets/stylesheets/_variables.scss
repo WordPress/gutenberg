@@ -32,7 +32,7 @@ $blue-medium-200: #BFE7F3;
 $blue-medium-100: #E5F5FA;
 $blue-medium-highlight: #b3e7fe;
 
-// Alerts
+/* Alerts */
 $alert-yellow: #f0b849;
 $alert-red: #d94f4f;
 $alert-green: #4ab866;
@@ -75,6 +75,10 @@ $block-mover-margin: 18px;
 $block-mover-padding-hidden: 10px;
 $block-mover-padding-visible: 32px;
 $block-spacing: 4px;
+
+/* Button styles */
+$button-style__radius-roundrect: 4px;
+$button-style__radius-round: 50%;
 
 /* Media Queries */
 

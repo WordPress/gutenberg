@@ -78,7 +78,9 @@
 }
 
 .editor-header .components-button {
+	border-radius: $button-style__radius-roundrect;
 
+	// header toggle buttons
 	&.is-toggled {
 		color: $white;
 	}
@@ -94,6 +96,13 @@
 		right: 1px;
 		bottom: 1px;
 		left: 1px;
+	}
+
+	&.is-toggled:focus {
+		outline: none;
+		box-shadow: 0 0 0 1px $dark-gray-500, inset 0 0 0 1px $white;
+		color: $white;
+		background: $dark-gray-500;
 	}
 
 	@include break-medium() {

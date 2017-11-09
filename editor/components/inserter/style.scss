@@ -23,7 +23,7 @@
 	transition: color .2s ease;
 
 	.editor-layout__content & {
-		border-radius: $icon-button-size / 2;
+		border-radius: $button-style__radius-round;
 	}
 }
 
@@ -43,15 +43,15 @@ input[type="search"].editor-inserter__search {
 	width: 100%;
 	margin: 0;
 	box-shadow: none;
-	border: 1px solid transparent;
 	padding: 8px 11px;
 	font-size: $default-font-size;
 	position: relative;
 	z-index: 1;
-	border-bottom: 1px solid $light-gray-500;
+	border: none;
+	box-shadow: 0 1px 0 0 $light-gray-500;
 
 	&:focus {
-		@include button-style__focus-active;
+		@include input-style__focus-active;
 	}
 }
 
@@ -89,7 +89,7 @@ input[type="search"].editor-inserter__search {
 	display: flex;
 	flex-direction: column;
 	width: calc( 50% - 16px );
-	border-radius: 4px;
+	border-radius: $button-style__radius-roundrect;
 	font-size: $default-font-size;
 	color: $dark-gray-500;
 	margin: 8px;
@@ -147,6 +147,7 @@ input[type="search"].editor-inserter__search {
 	font-size: $default-font;
 	padding: 8px 8px;
 	width: 100%;
+	border-radius: 0;
 	margin: 0;
 	color: $dark-gray-500;
 	cursor: pointer;
@@ -161,6 +162,6 @@ input[type="search"].editor-inserter__search {
 	&:active,
 	&:focus {
 		z-index: z-index( '.editor-inserter__tab.is-active' );
-		@include button-style__focus-active;
+		@include tab-style__focus-active;
 	}
 }
