@@ -75,7 +75,7 @@ function do_blocks( $content ) {
 	foreach ( $blocks as $block ) {
 		$block_name  = isset( $block['blockName'] ) ? $block['blockName'] : null;
 		$attributes  = is_array( $block['attrs'] ) ? $block['attrs'] : array();
-		$raw_content = isset( $block['rawContent'] ) ? $block['rawContent'] : null;
+		$raw_content = isset( $block['innerHTML'] ) ? $block['innerHTML'] : null;
 
 		if ( $block_name ) {
 			$block_type = $registry->get_registered( $block_name );
