@@ -1,4 +1,5 @@
 Cypress.Commands.add( 'newPost', () => {
+	console.log('here');
 	cy.visitAdmin( '/post-new.php' );
 } );
 
