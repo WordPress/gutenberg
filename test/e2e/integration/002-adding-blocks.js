@@ -30,7 +30,7 @@ describe( 'Adding blocks', () => {
 		cy.get( 'button' ).contains( 'Switch To Text Mode' ).click();
 
 		// Assertions
-		cy.get( '.editor-text-editor__textarea' )
+		cy.get( '.editor-post-text-editor' )
 			.should( 'contain', 'First Paragraph' )
 			.should( 'contain', 'Second Paragraph' )
 			.should( 'contain', 'Quote block' )
