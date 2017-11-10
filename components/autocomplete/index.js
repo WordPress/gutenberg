@@ -2,23 +2,24 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escapeRegExp, find, filter, map } from 'lodash';
+import { escapeRegExp, find, filter, map, flowRight } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Component, findDOMNode, renderToString } from '@wordpress/element';
+import { Component, renderToString } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
+import withFocusOutside from '../higher-order/with-focus-outside';
 import Button from '../button';
 import Popover from '../popover';
 import withInstanceId from '../higher-order/with-instance-id';
 
-const { ENTER, ESCAPE, UP, DOWN, LEFT, RIGHT, TAB } = keycodes;
+const { ENTER, ESCAPE, UP, DOWN, LEFT, RIGHT } = keycodes;
 
 /**
  * Recursively select the firstChild until hitting a leaf node.
@@ -134,6 +135,10 @@ export class Autocomplete extends Component {
 
 	reset() {
 		this.setState( this.constructor.getInitialState() );
+	}
+
+	handleFocusOutside() {
+		this.reset();
 	}
 
 	// this method is separate so it can be overrided in tests
@@ -333,7 +338,6 @@ export class Autocomplete extends Component {
 
 			case LEFT:
 			case RIGHT:
-			case TAB:
 				this.reset();
 				return;
 
@@ -368,11 +372,8 @@ export class Autocomplete extends Component {
 		// native browser event has already bubbled so we can't stopPropagation
 		// and avoid Editable getting the event from TinyMCE, hence we must
 		// register a native event handler.
-		// Disable reason: Accessing the DOM node to add native event handlers.
-		// eslint-disable-next-line react/no-find-dom-node
-		const realNode = findDOMNode( this.node );
 		const handler = isListening ? 'addEventListener' : 'removeEventListener';
-		realNode[ handler ]( 'keydown', this.setSelectedIndex, true );
+		this.node[ handler ]( 'keydown', this.setSelectedIndex, true );
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
@@ -439,4 +440,7 @@ export class Autocomplete extends Component {
 	}
 }
 
-export default withInstanceId( Autocomplete );
+export default flowRight( [
+	withInstanceId,
+	withFocusOutside,
+] )( Autocomplete );

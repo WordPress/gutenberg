@@ -15,14 +15,14 @@ import {
 	noop,
 } from 'lodash';
 import { nodeListToReact } from 'dom-react';
-import { Fill, Slot } from 'react-slot-fill';
 import 'element-closest';
 
 /**
  * WordPress dependencies
  */
 import { createElement, Component, renderToString } from '@wordpress/element';
-import { keycodes } from '@wordpress/utils';
+import { keycodes, createBlobURL } from '@wordpress/utils';
+import { Slot, Fill } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -84,7 +84,7 @@ export default class Editable extends Component {
 				`Invalid value of type ${ typeof value } passed to Editable ` +
 				'(expected array). Attribute values should be sourced using ' +
 				'the `children` source when used with Editable.\n\n' +
-				'See: http://gutenberg-devdoc.surge.sh/reference/attributes/#children'
+				'See: https://wordpress.org/gutenberg/handbook/reference/attributes/#children'
 			);
 		}
 
@@ -134,7 +134,7 @@ export default class Editable extends Component {
 		editor.on( 'selectionChange', this.onSelectionChange );
 		editor.on( 'BeforeExecCommand', this.maybePropagateUndo );
 		editor.on( 'PastePreProcess', this.onPastePreProcess, true /* Add before core handlers */ );
-		editor.on( 'paste', this.onPaste );
+		editor.on( 'paste', this.onPaste, true /* Add before core handlers */ );
 
 		patterns.apply( this, [ editor ] );
 
@@ -238,18 +238,29 @@ export default class Editable extends Component {
 	}
 
 	onPaste( event ) {
-		const dataTransfer = event.clipboardData || this.editor.getDoc().dataTransfer;
+		const dataTransfer = event.clipboardData || event.dataTransfer || this.editor.getDoc().dataTransfer;
+		const { items = [], files = [] } = dataTransfer;
+		const item = find( [ ...items, ...files ], ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
+
+		if ( item ) {
+			// Allows us to ask for this information when we get a report.
+			window.console.log( 'Received item:\n\n', item );
+
+			const blob = item.getAsFile ? item.getAsFile() : item;
+
+			this.pastedContent = `<img src="${ createBlobURL( blob ) }">`;
+		}
 
 		this.pastedPlainText = dataTransfer ? dataTransfer.getData( 'text/plain' ) : '';
 	}
 
 	onPastePreProcess( event ) {
 		// Allows us to ask for this information when we get a report.
-		window.console.log( 'Received HTML:\n\n', event.content );
+		window.console.log( 'Received HTML:\n\n', this.pastedContent || event.content );
 		window.console.log( 'Received plain text:\n\n', this.pastedPlainText );
 
 		const content = rawHandler( {
-			HTML: event.content,
+			HTML: this.pastedContent || event.content,
 			plainText: this.pastedPlainText,
 			// Force inline paste if there's no `onSplit` prop.
 			mode: this.props.onSplit ? 'AUTO' : 'INLINE',

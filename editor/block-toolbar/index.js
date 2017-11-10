@@ -1,14 +1,13 @@
 /**
  * External dependencies
  */
-import { Slot } from 'react-slot-fill';
 import classnames from 'classnames';
 import { connect } from 'react-redux';
 
 /**
  * WordPress Dependencies
  */
-import { IconButton, Toolbar } from '@wordpress/components';
+import { IconButton, Toolbar, Slot } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 

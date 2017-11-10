@@ -1,12 +1,7 @@
 /**
- * External dependencies
- */
-import { Fill } from 'react-slot-fill';
-
-/**
  * WordPress dependencies
  */
-import { Toolbar } from '@wordpress/components';
+import { Toolbar, Fill } from '@wordpress/components';
 
 export default function BlockControls( { controls, children } ) {
 	return (

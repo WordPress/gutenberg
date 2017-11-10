@@ -16,7 +16,7 @@ import {
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { mediaUpload } from '@wordpress/utils';
+import { mediaUpload, createMediaFromFile, getBlobByURL, revokeBlobURL } from '@wordpress/utils';
 import {
 	Placeholder,
 	Dashicon,
@@ -49,6 +49,31 @@ class ImageBlock extends Component {
 		this.onSelectImage = this.onSelectImage.bind( this );
 		this.onSetHref = this.onSetHref.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
+	}
+
+	componentDidMount() {
+		const { attributes, setAttributes } = this.props;
+		const { id, url = '' } = attributes;
+
+		if ( ! id && url.indexOf( 'blob:' ) === 0 ) {
+			getBlobByURL( url )
+				.then( createMediaFromFile )
+				.then( ( media ) => {
+					setAttributes( {
+						id: media.id,
+						url: media.source_url,
+					} );
+				} );
+		}
+	}
+
+	componentDidUpdate( prevProps ) {
+		const { id: prevID, url: prevUrl = '' } = prevProps.attributes;
+		const { id, url = '' } = this.props.attributes;
+
+		if ( ! prevID && prevUrl.indexOf( 'blob:' ) === 0 && id && url.indexOf( 'blob:' ) === -1 ) {
+			revokeBlobURL( url );
+		}
 	}
 
 	onSelectImage( media ) {

@@ -4,10 +4,11 @@
         "attrs": {
             "align": "center"
         },
-        "rawContent": "\n<div class=\"wp-block-button aligncenter\"><a href=\"https://github.com/WordPress/gutenberg\">Help build Gutenberg</a></div>\n"
+        "innerBlocks": [],
+        "innerHTML": "\n<div class=\"wp-block-button aligncenter\"><a href=\"https://github.com/WordPress/gutenberg\">Help build Gutenberg</a></div>\n"
     },
     {
         "attrs": {},
-        "rawContent": "\n"
+        "innerHTML": "\n"
     }
 ]
