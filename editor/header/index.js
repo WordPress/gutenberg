@@ -38,6 +38,7 @@ function Header( { onToggleSidebar, isSidebarOpened } ) {
 					onClick={ onToggleSidebar }
 					isToggled={ isSidebarOpened }
 					label={ __( 'Settings' ) }
+					aria-expanded={ isSidebarOpened }
 				/>
 				<EllipsisMenu />
 			</div>
