@@ -43,21 +43,28 @@ class PostPermalink extends Component {
 	}
 
 	render() {
-		const { isNew, link } = this.props;
+		const { isNew, link, sample_permalink } = this.props;
 		if ( isNew || ! link ) {
 			return null;
+		}
+
+		let permalink = link,
+			viewLink = link;
+		if ( sample_permalink ) {
+			permalink = sample_permalink[0].replace( '%postname%', sample_permalink[1] );
+			viewLink += '&preview=true';
 		}
 
 		return (
 			<div className="editor-post-permalink">
 				<Dashicon icon="admin-links" />
 				<span className="editor-post-permalink__label">{ __( 'Permalink:' ) }</span>
-				<Button className="editor-post-permalink__link" href={ link } target="_blank">
-					{ link }
+				<Button className="editor-post-permalink__link" href={ viewLink } target="_blank">
+					{ permalink }
 				</Button>
 				<ClipboardButton
 					className="button"
-					text={ link }
+					text={ viewLink }
 					onCopy={ this.onCopy }
 					onFinishCopy={ this.onFinishCopy }
 				>
@@ -73,6 +80,7 @@ export default connect(
 		return {
 			isNew: isEditedPostNew( state ),
 			link: getEditedPostAttribute( state, 'link' ),
+			sample_permalink: getEditedPostAttribute( state, 'sample_permalink' ),
 		};
 	}
 )( PostPermalink );
