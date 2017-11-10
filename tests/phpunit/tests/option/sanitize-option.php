@@ -157,4 +157,46 @@ class Tests_Sanitize_Option extends WP_UnitTestCase {
 			array( '/%year/%postname%/', '/%year/%postname%/', true ),
 		);
 	}
+
+	/**
+	 * Test calling get_settings_errors() with variations on where it gets errors from.
+	 *
+	 * @ticket 42498
+	 * @covers get_settings_errors()
+	 * @global array $wp_settings_errors
+	 */
+	public function test_get_settings_errors_sources() {
+		global $wp_settings_errors;
+
+		$blogname_error = array(
+			'setting' => 'blogname',
+			'code'    => 'blogname',
+			'message' => 'Capital P dangit!',
+			'type'    => 'error',
+		);
+		$blogdescription_error = array(
+			'setting' => 'blogdescription',
+			'code'    => 'blogdescription',
+			'message' => 'Too short',
+			'type'    => 'error',
+		);
+
+		$wp_settings_errors = null;
+		$this->assertSame( array(), get_settings_errors( 'blogname' ) );
+
+		// Test getting errors from transient.
+		$_GET['settings-updated'] = '1';
+		set_transient( 'settings_errors', array( $blogname_error ) );
+		$wp_settings_errors = null;
+		$this->assertSame( array( $blogname_error ), get_settings_errors( 'blogname' ) );
+
+		// Test getting errors from transient and from global.
+		$_GET['settings-updated'] = '1';
+		set_transient( 'settings_errors', array( $blogname_error ) );
+		$wp_settings_errors = null;
+		add_settings_error( $blogdescription_error['setting'], $blogdescription_error['code'], $blogdescription_error['message'], $blogdescription_error['type'] );
+		$this->assertEqualSets( array( $blogname_error, $blogdescription_error ), get_settings_errors() );
+
+		$wp_settings_errors = null;
+	}
 }
