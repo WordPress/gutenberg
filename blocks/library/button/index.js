@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton, PanelBody } from '@wordpress/components';
+import { Dashicon, IconButton, PanelBody } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -94,17 +94,6 @@ registerBlockType( 'core/button', {
 					keepPlaceholderOnFocus
 				/>
 				{ focus &&
-					<form
-						className="blocks-format-toolbar__link-modal"
-						onSubmit={ ( event ) => event.preventDefault() }>
-						<UrlInput
-							value={ url }
-							onChange={ ( value ) => setAttributes( { url: value } ) }
-						/>
-						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
-					</form>
-				}
-				{ focus &&
 					<InspectorControls key="inspector">
 						<BlockDescription>
 							<p>{ __( 'A nice little button. Call something out with it.' ) }</p>
@@ -130,6 +119,18 @@ registerBlockType( 'core/button', {
 					</InspectorControls>
 				}
 			</span>,
+			focus && (
+				<form
+					className="blocks-format-toolbar__inline-link-modal"
+					onSubmit={ ( event ) => event.preventDefault() }>
+					<Dashicon icon="admin-links" />
+					<UrlInput
+						value={ url }
+						onChange={ ( value ) => setAttributes( { url: value } ) }
+					/>
+					<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
+				</form>
+			)
 		];
 	},
 
