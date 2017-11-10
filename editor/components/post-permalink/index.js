@@ -43,15 +43,15 @@ class PostPermalink extends Component {
 	}
 
 	render() {
-		const { isNew, link, sample_permalink } = this.props;
+		const { isNew, link, samplePermalink } = this.props;
 		if ( isNew || ! link ) {
 			return null;
 		}
 
 		let permalink = link,
 			viewLink = link;
-		if ( sample_permalink ) {
-			permalink = sample_permalink[0].replace( '%postname%', sample_permalink[1] );
+		if ( samplePermalink ) {
+			permalink = samplePermalink[ 0 ].replace( '%postname%', samplePermalink[ 1 ] );
 			viewLink += '&preview=true';
 		}
 
@@ -80,7 +80,7 @@ export default connect(
 		return {
 			isNew: isEditedPostNew( state ),
 			link: getEditedPostAttribute( state, 'link' ),
-			sample_permalink: getEditedPostAttribute( state, 'sample_permalink' ),
+			samplePermalink: getEditedPostAttribute( state, 'sample_permalink' ),
 		};
 	}
 )( PostPermalink );
