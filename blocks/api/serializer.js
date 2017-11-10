@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, reduce, isObject, castArray, compact } from 'lodash';
+import { isEmpty, reduce, isObject, castArray, compact, startsWith } from 'lodash';
 import { html as beautifyHtml } from 'js-beautify';
 import classnames from 'classnames';
 
@@ -179,7 +179,7 @@ export function getCommentDelimitedContent( rawBlockName, attributes, content ) 
 		'';
 
 	// strip core blocks of their namespace prefix
-	const blockName = rawBlockName.startsWith( 'core/' ) ?
+	const blockName = startsWith( rawBlockName, 'core/' ) ?
 		rawBlockName.slice( 5 ) :
 		rawBlockName;
 
