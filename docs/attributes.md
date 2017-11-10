@@ -25,40 +25,6 @@ _Example_: Extract the `src` attribute from an image found in the block's markup
 // { "url": "https://lorempixel.com/1200/800/" }
 ```
 
-### `attribute`
-
-Use `attribute` to extract the value of an attribute from markup.
-
-_Example_: Extract the `src` attribute from an image found in the block's markup.
-
-```js
-{
-	url: {
-		source: 'attribute',
-		selector: 'img',
-		attribute: 'src',
-	}
-}
-// { "url": "https://lorempixel.com/1200/800/" }
-```
-
-### `property`
-
-Use `property` to extract the value of a property of a DOM Node from markup.
-
-_Example_: Extract the `nodeName` property from a heading's node.
-
-```js
-{
-	tagName: {
-		source: 'property',
-		selector: 'h1,h2,h3,h4,h5,h6',
-		property: 'nodeName',
-	}
-}
-// { "tagName": "h2" }
-```
-
 ### `text`
 
 Use `text` to extract the inner text from markup.

@@ -20,8 +20,7 @@ registerBlockType( 'core/freeform', {
 	attributes: {
 		content: {
 			type: 'string',
-			source: 'property',
-			property: 'innerHTML',
+			source: 'html',
 		},
 	},
 
