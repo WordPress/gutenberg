@@ -127,8 +127,9 @@ export class Autocomplete extends Component {
 		this.bindNode = this.bindNode.bind( this );
 		this.select = this.select.bind( this );
 		this.reset = this.reset.bind( this );
+		this.resetWhenSuppressed = this.resetWhenSuppressed.bind( this );
 		this.search = this.search.bind( this );
-		this.setSelectedIndex = this.setSelectedIndex.bind( this );
+		this.handleKeyDown = this.handleKeyDown.bind( this );
 		this.getWordRect = this.getWordRect.bind( this );
 
 		this.state = this.constructor.getInitialState();
@@ -166,6 +167,13 @@ export class Autocomplete extends Component {
 
 	reset() {
 		this.setState( this.constructor.getInitialState() );
+	}
+
+	resetWhenSuppressed() {
+		const { open, suppress } = this.state;
+		if ( open && suppress === open.idx ) {
+			this.reset();
+		}
 	}
 
 	handleFocusOutside() {
@@ -332,21 +340,35 @@ export class Autocomplete extends Component {
 		}
 	}
 
-	setSelectedIndex( event ) {
+	handleKeyDown( event ) {
 		const { open, suppress, selectedIndex, filteredOptions } = this.state;
-		if ( ! open || filteredOptions.length === 0 ) {
+		if ( ! open ) {
 			return;
 		}
 		if ( suppress === open.idx ) {
-			const { keyCode, ctrlKey, shiftKey, altKey, metaKey } = event;
-			if ( keyCode === SPACE && ctrlKey && ! ( shiftKey || altKey || metaKey ) ) {
-				this.setState( { suppress: undefined } );
-				event.preventDefault();
-				event.stopPropagation();
+			switch ( event.keyCode ) {
+				// cancel popup suppression on CTRL+SPACE
+				case SPACE:
+					const { ctrlKey, shiftKey, altKey, metaKey } = event;
+					if ( ctrlKey && ! ( shiftKey || altKey || metaKey ) ) {
+						this.setState( { suppress: undefined } );
+						event.preventDefault();
+						event.stopPropagation();
+					}
+					break;
+
+				// reset on cursor movement
+				case UP:
+				case DOWN:
+				case LEFT:
+				case RIGHT:
+					this.reset();
 			}
 			return;
 		}
-
+		if ( filteredOptions.length === 0 ) {
+			return;
+		}
 		let nextSelectedIndex;
 		switch ( event.keyCode ) {
 			case UP:
@@ -404,7 +426,7 @@ export class Autocomplete extends Component {
 		// and avoid Editable getting the event from TinyMCE, hence we must
 		// register a native event handler.
 		const handler = isListening ? 'addEventListener' : 'removeEventListener';
-		this.node[ handler ]( 'keydown', this.setSelectedIndex, true );
+		this.node[ handler ]( 'keydown', this.handleKeyDown, true );
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
@@ -428,11 +450,13 @@ export class Autocomplete extends Component {
 		const isExpanded = suppress !== idx && filteredOptions.length > 0;
 		const listBoxId = isExpanded ? `components-autocomplete-listbox-${ instanceId }` : null;
 		const activeId = isExpanded ? `components-autocomplete-item-${ instanceId }-${ selectedKey }` : null;
-
+		// Disable reason: Clicking the editor should reset the autocomplete when the menu is suppressed
+		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
 			<div
 				ref={ this.bindNode }
 				onInput={ this.search }
+				onClick={ this.resetWhenSuppressed }
 				className="components-autocomplete"
 			>
 				{ children( { isExpanded, listBoxId, activeId } ) }
@@ -467,11 +491,12 @@ export class Autocomplete extends Component {
 				</Popover>
 			</div>
 		);
+		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 	}
 }
 
 export default flowRight( [
 	withInstanceId,
 	withFocusOutside,
-  withSpokenMessages,
+	withSpokenMessages,
 ] )( Autocomplete );
