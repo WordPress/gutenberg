@@ -27,6 +27,7 @@ class VisualEditorSiblingInserter extends Component {
 		this.focusFirstTabbable = this.focusFirstTabbable.bind( this );
 		this.show = this.toggleVisible.bind( this, true );
 		this.hide = this.toggleVisible.bind( this, false );
+		this.onBlur = this.onBlur.bind( this );
 		this.showAndFocus = this.showAndFocus.bind( this );
 		this.suspendToggleVisible = this.suspendToggleVisible.bind( this );
 
@@ -86,6 +87,12 @@ class VisualEditorSiblingInserter extends Component {
 		this.setState( { isToggleVisibleSuspended: isOpen } );
 	}
 
+	onBlur( evt ) {
+		if ( ! document.activeElement || ( ! evt.target.contains( document.activeElement ) ) ) {
+			this.hide();
+		}
+	}
+
 	render() {
 		const { insertIndex, showInsertionPoint } = this.props;
 		const { isVisible } = this.state;
@@ -100,7 +107,7 @@ class VisualEditorSiblingInserter extends Component {
 				data-insert-index={ insertIndex }
 				className={ classes }
 				onFocus={ this.showAndFocus }
-				onBlur={ this.hide }
+				onBlur={ this.onBlur }
 				onMouseEnter={ this.show }
 				onMouseLeave={ this.hide }
 				tabIndex={ isVisible ? -1 : 0 }>
