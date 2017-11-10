@@ -107,14 +107,22 @@
  		outline: 1px solid $light-gray-500;
 	}
 
+	// selection style for textarea
+	::-moz-selection {
+		background: $blue-medium-highlight;
+	}
+
+	::selection {
+		background: $blue-medium-highlight;
+	}
+
 	// selection style for multiple blocks
 	&.is-multi-selected *::selection {
 		background: transparent;
 	}
 
 	&.is-multi-selected:before {
-		background: $blue-medium-200;
-		background: Highlight;	// This variable is a CSS 2.1 variable that selects the operating system select color
+		background: $blue-medium-highlight;
 	}
 
 	.iframe-overlay {
