@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escapeRegExp, find, filter, map } from 'lodash';
+import { escapeRegExp, find, filter, map, flowRight } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,12 +15,13 @@ import { __, _n, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './style.scss';
+import withFocusOutside from '../higher-order/with-focus-outside';
 import Button from '../button';
 import Popover from '../popover';
 import withInstanceId from '../higher-order/with-instance-id';
 import withSpokenMessages from '../higher-order/with-spoken-messages';
 
-const { ENTER, ESCAPE, UP, DOWN, LEFT, RIGHT, TAB, SPACE } = keycodes;
+const { ENTER, ESCAPE, UP, DOWN, LEFT, RIGHT, SPACE } = keycodes;
 
 /**
  * Recursively select the firstChild until hitting a leaf node.
@@ -165,6 +166,10 @@ export class Autocomplete extends Component {
 
 	reset() {
 		this.setState( this.constructor.getInitialState() );
+	}
+
+	handleFocusOutside() {
+		this.reset();
 	}
 
 	// this method is separate so it can be overrided in tests
@@ -364,7 +369,6 @@ export class Autocomplete extends Component {
 
 			case LEFT:
 			case RIGHT:
-			case TAB:
 				this.reset();
 				return;
 
@@ -466,4 +470,8 @@ export class Autocomplete extends Component {
 	}
 }
 
-export default withSpokenMessages( withInstanceId( Autocomplete ) );
+export default flowRight( [
+	withInstanceId,
+	withFocusOutside,
+  withSpokenMessages,
+] )( Autocomplete );

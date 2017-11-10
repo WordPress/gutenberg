@@ -55,10 +55,6 @@ class ImageBlock extends Component {
 		const { attributes, setAttributes } = this.props;
 		const { id, url = '' } = attributes;
 
-		if ( id ) {
-			this.fetchMedia( id );
-		}
-
 		if ( ! id && url.indexOf( 'blob:' ) === 0 ) {
 			getBlobByURL( url )
 				.then( createMediaFromFile )

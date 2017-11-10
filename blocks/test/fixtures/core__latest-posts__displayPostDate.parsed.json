@@ -5,10 +5,11 @@
             "postsToShow": 5,
             "displayPostDate": true
         },
-        "rawContent": ""
+        "innerBlocks": [],
+        "innerHTML": ""
     },
     {
         "attrs": {},
-        "rawContent": "\n"
+        "innerHTML": "\n"
     }
 ]

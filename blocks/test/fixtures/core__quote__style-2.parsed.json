@@ -4,10 +4,11 @@
         "attrs": {
             "style": "2"
         },
-        "rawContent": "\n<blockquote class=\"wp-block-quote blocks-quote-style-2\"><p>There is no greater agony than bearing an untold story inside you.</p><footer>Maya Angelou</footer></blockquote>\n"
+        "innerBlocks": [],
+        "innerHTML": "\n<blockquote class=\"wp-block-quote blocks-quote-style-2\"><p>There is no greater agony than bearing an untold story inside you.</p><footer>Maya Angelou</footer></blockquote>\n"
     },
     {
         "attrs": {},
-        "rawContent": "\n"
+        "innerHTML": "\n"
     }
 ]

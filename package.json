@@ -36,7 +36,6 @@
     "react-datepicker": "0.46.0",
     "react-dom": "16.0.0",
     "react-redux": "5.0.6",
-    "react-slot-fill": "1.0.1",
     "react-transition-group": "1.2.0",
     "redux": "3.7.2",
     "redux-multi": "0.1.12",

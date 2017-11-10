@@ -12,9 +12,11 @@ import { keycodes } from '@wordpress/utils';
 /**
  * Internal dependencies
  */
-import { Autocomplete } from '../';
+import EnhancedAutocomplete, { Autocomplete } from '../';
 
 const { ENTER, ESCAPE, UP, DOWN, SPACE } = keycodes;
+
+jest.useFakeTimers();
 
 class FakeEditor extends Component {
 	// we want to change the editor contents manually so don't let react update it
@@ -35,9 +37,9 @@ class FakeEditor extends Component {
 	}
 }
 
-function makeAutocompleter( completers ) {
+function makeAutocompleter( completers, AutocompleteComponent = Autocomplete ) {
 	return mount(
-		<Autocomplete instanceId="1" completers={ completers }>{
+		<AutocompleteComponent instanceId="1" completers={ completers }>{
 			( { isExpanded, listBoxId, activeId } ) => (
 				<FakeEditor
 					aria-autocomplete="list"
@@ -46,7 +48,7 @@ function makeAutocompleter( completers ) {
 					aria-activedescendant={ activeId }
 				/>
 			)
-		}</Autocomplete>
+		}</AutocompleteComponent>
 	);
 }
 
@@ -439,6 +441,18 @@ describe( 'Autocomplete', () => {
 				expect( editorKeydown ).not.toHaveBeenCalled();
 				done();
 			} );
+		} );
+
+		it( 'closes by blur', () => {
+			jest.spyOn( Autocomplete.prototype, 'handleFocusOutside' );
+
+			const wrapper = makeAutocompleter( [], EnhancedAutocomplete );
+			simulateInput( wrapper, [ par( tx( '/' ) ) ] );
+			wrapper.find( '.fake-editor' ).simulate( 'blur' );
+
+			jest.runAllTimers();
+
+			expect( Autocomplete.prototype.handleFocusOutside ).toHaveBeenCalled();
 		} );
 
 		it( 'selects by enter', ( done ) => {

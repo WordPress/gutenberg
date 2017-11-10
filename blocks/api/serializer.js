@@ -30,22 +30,22 @@ export function getBlockDefaultClassname( blockName ) {
  * Given a block type containg a save render implementation and attributes, returns the
  * static markup to be saved.
  *
- * @param  {Object}               blockType  Block type
- * @param  {Object}               attributes Block attributes
- * @return {string}                          Save content
+ * @param  {Object} blockType  Block type
+ * @param  {Object} attributes Block attributes
+ * @return {string}            Save content
  */
 export function getSaveContent( blockType, attributes ) {
 	const { save, className = getBlockDefaultClassname( blockType.name ) } = blockType;
-	let rawContent;
+	let saveContent;
 
 	if ( save.prototype instanceof Component ) {
-		rawContent = createElement( save, { attributes } );
+		saveContent = createElement( save, { attributes } );
 	} else {
-		rawContent = save( { attributes } );
+		saveContent = save( { attributes } );
 
 		// Special-case function render implementation to allow raw HTML return
-		if ( 'string' === typeof rawContent ) {
-			return rawContent;
+		if ( 'string' === typeof saveContent ) {
+			return saveContent;
 		}
 	}
 
@@ -71,7 +71,7 @@ export function getSaveContent( blockType, attributes ) {
 
 		return cloneElement( element, extraProps );
 	};
-	const contentWithClassname = Children.map( rawContent, addAdvancedAttributes );
+	const contentWithClassname = Children.map( saveContent, addAdvancedAttributes );
 
 	// Otherwise, infer as element
 	return renderToString( contentWithClassname );
