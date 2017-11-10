@@ -268,8 +268,23 @@ function gutenberg_add_sample_permalink_to_draft_posts( $response, $post, $reque
 		return $response;
 	}
 
+	if ( ! function_exists( 'get_sample_permalink' ) ) {
+		require_once ABSPATH . '/wp-admin/includes/post.php';
+	}
+
 	$response->data['sample_permalink'] = get_sample_permalink( $post );
 
 	return $response;
 }
-add_filter( 'rest_prepare_post', 'gutenberg_add_sample_permalink_to_draft_posts', 10, 3 );
+
+/**
+ * Whenever a post type is registered, ensure we're hooked into it's WP REST API response.
+ *
+ * @param string $post_type The newly registered post type.
+ * @return string That same post type.
+ */
+function gutenberg_register_sample_permalink_function( $post_type ) {
+	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_sample_permalink_to_draft_posts', 10, 3 );
+	return $post_type;
+}
+add_filter( 'registered_post_type', 'gutenberg_register_sample_permalink_function' );
