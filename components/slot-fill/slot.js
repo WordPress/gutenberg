@@ -56,7 +56,7 @@ class Slot extends Component {
 			<div ref={ this.bindNode }>
 				{ map( getFills( name ), ( fill ) => {
 					const fillKey = fill.props.instanceId;
-					return Children.map( fill.props.children, ( child, childIndex ) => {
+					return Children.toArray( fill.props.children ).map( ( child, childIndex ) => {
 						const childKey = `${ fillKey }---${ child.props.key || childIndex }`;
 						return cloneElement( child, { key: childKey } );
 					} );
