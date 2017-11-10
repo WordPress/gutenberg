@@ -21,6 +21,17 @@ import withInstanceId from '../higher-order/with-instance-id';
 const { ENTER, ESCAPE, UP, DOWN, LEFT, RIGHT, TAB } = keycodes;
 
 /**
+ * Polyfill Element.matches to support IE
+ */
+/* eslint-disable no-undef */
+if ( ! Element.prototype.matches ) {
+	Element.prototype.matches =
+		Element.prototype.msMatchesSelector ||
+		Element.prototype.webkitMatchesSelector;
+}
+/* eslint-enable no-undef */
+
+/**
  * Recursively select the firstChild until hitting a leaf node.
  * @param {Node} node the node to find the recursive first child.
  * @returns {Node} the first leaf-node >= node in the ordering.
@@ -248,11 +259,13 @@ export class Autocomplete extends Component {
 
 	search( event ) {
 		const { open: wasOpen } = this.state;
-		const { completers } = this.props;
+		const { selector = '*', completers } = this.props;
 		const container = event.target;
 		// check that the event came from a contentEditable
 		// Note that the hasAttribute/getAttribute is because JsDOM does not support container.contentEditable
-		if ( ! container.hasAttribute( 'contentEditable' ) || container.getAttribute( 'contentEditable' ) === 'false' ) {
+		if ( ! container.hasAttribute( 'contentEditable' ) ||
+				container.getAttribute( 'contentEditable' ) === 'false' ||
+				! container.matches( selector ) ) {
 			return;
 		}
 		// ensure that the cursor location is unambiguous

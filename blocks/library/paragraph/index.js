@@ -151,7 +151,7 @@ registerBlockType( 'core/paragraph', {
 					</PanelBody>
 				</InspectorControls>
 			),
-			<Autocomplete key="editable" completers={ [
+			<Autocomplete key="editable" selector="p.wp-block-paragraph" completers={ [
 				blockAutocompleter( { onReplace } ),
 				userAutocompleter(),
 			] }>
