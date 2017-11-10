@@ -276,3 +276,25 @@ function gutenberg_filter_oembed_result( $response, $handler, $request ) {
 	return $response;
 }
 add_filter( 'rest_request_after_callbacks', 'gutenberg_filter_oembed_result', 10, 3 );
+
+/**
+ * Add a sample permalink to draft posts in the post REST API response.
+ *
+ * @param WP_REST_Response $response WP REST API response of a post.
+ * @param WP_Post          $post The post being returned.
+ * @param WP_REST_Request  $request WP REST API request.
+ * @return WP_REST_Response Response containing the sample_permalink, where appropriate.
+ */
+function gutenberg_add_sample_permalink_to_draft_posts( $response, $post, $request ) {
+	if ( 'draft' !== $response->data['status'] ) {
+		return $response;
+	}
+	if ( 'edit' !== $request['context'] ) {
+		return $response;
+	}
+
+	$response->data['sample_permalink'] = get_sample_permalink( $post );
+
+	return $response;
+}
+add_filter( 'rest_prepare_post', 'gutenberg_add_sample_permalink_to_draft_posts', 10, 3 );
