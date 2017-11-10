@@ -90,12 +90,12 @@ class PostPermalink extends Component {
 						{ prefix }
 					</span>
 					{ ! editingSlug &&
-						<span
+						<Button
 							className="editor-post-permalink__slug"
 							onClick={ this.onEditPermalink }
 						>
 							{ slug }
-						</span>
+						</Button>
 					}
 					{ editingSlug &&
 						<form className="editor-post-permalink__slug-form" onSubmit={ this.onSavePermalink }>
