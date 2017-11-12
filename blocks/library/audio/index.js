@@ -120,6 +120,7 @@ registerBlockType( 'core/audio', {
 
 			if ( editing ) {
 				return [
+					controls,
 					inspectorControls,
 					<Placeholder
 						key="placeholder"
