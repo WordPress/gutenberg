@@ -87,7 +87,7 @@ registerBlockType( 'core/audio', {
 				}
 				return false;
 			};
-			const controls = focus && (
+			const controls = focus && [
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar
 						value={ align }
@@ -105,23 +105,20 @@ registerBlockType( 'core/audio', {
 							<Dashicon icon="edit" />
 						</Button>
 					</Toolbar>
-				</BlockControls>
-			);
+				</BlockControls>,
 
-			const inspectorControls = focus && (
 				<InspectorControls key="inspector">
 					<BlockDescription>
 						<p>{ __( 'The Audio block allows you to embed audio files and play them back using a simple player.' ) }</p>
 					</BlockDescription>
 				</InspectorControls>
-			);
+			];
 
 			const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
 
 			if ( editing ) {
 				return [
 					controls,
-					inspectorControls,
 					<Placeholder
 						key="placeholder"
 						icon="media-audio"
@@ -155,7 +152,6 @@ registerBlockType( 'core/audio', {
 			/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 			return [
 				controls,
-				inspectorControls,
 				<figure key="audio" className={ className }>
 					<audio controls="controls" src={ src } />
 					{ ( ( caption && caption.length ) || !! focus ) && (
