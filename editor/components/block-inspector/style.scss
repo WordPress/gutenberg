@@ -1,13 +1,3 @@
-.editor-block-inspector__deselect-post {
-	font-weight: 600;
-	text-decoration: underline;
-	color: inherit;
-
-	&:hover {
-		color: inherit;
-	}
-}
-
 .editor-block-inspector__no-blocks,
 .editor-block-inspector__multi-blocks {
 	display: block;
@@ -16,27 +6,6 @@
 	padding: ( $panel-padding * 2 ) $panel-padding;
 	border-bottom: 1px solid $light-gray-500;
 	text-align: center;
-}
-
-.editor-block-inspector__content .components-panel__body {
-	border: none;
-	margin: 0 -16px;
-
-	.blocks-base-control {
-		margin: 0 0 1em 0;
-	}
-
-	&.is-opened > .components-panel__body-title {
-		margin-bottom: 5px;
-	}
-
-	.components-panel__body-toggle {
-		color: $dark-gray-500;
-	}
-}
-
-.editor-block-inspector__content .editor-advanced-controls {
-	margin-bottom: -14px;
 }
 
 .editor-advanced-controls__anchor {
