@@ -15,24 +15,17 @@ import { Component } from '@wordpress/element';
 import { default as withInstanceId } from '../higher-order/with-instance-id';
 import { NavigableMenu } from '../navigable-container';
 
-class TabButton extends Component {
-	constructor( { tabName, clickTab } ) {
-		super( ...arguments );
-		this.onClick = partial( clickTab, tabName );
-	}
-	render() {
-		const { tabId, children, selected, ...rest } = this.props;
-		return <button role="tab"
-			tabIndex={ selected ? null : -1 }
-			aria-selected={ selected }
-			id={ tabId }
-			onClick={ this.onClick }
-			{ ...omit( rest, [ 'tabName', 'clickTab' ] ) }
-		>
-			{ children }
-		</button>;
-	}
-}
+const TabButton = ( { tabId, onClick, children, selected, ...rest } ) => {
+	return <button role="tab"
+		tabIndex={ selected ? null : -1 }
+		aria-selected={ selected }
+		id={ tabId }
+		onClick={ onClick }
+		{ ...rest }
+	>
+		{ children }
+	</button>;
+};
 
 class TabPanel extends Component {
 	constructor() {
@@ -76,11 +69,10 @@ class TabPanel extends Component {
 					{ tabs.map( ( tab ) =>
 						<TabButton className={ `${ tab.className } ${ tab.name === selected ? activeClass : '' }` }
 							tabId={ instanceId + '-' + tab.name }
-							tabName={ tab.name }
 							aria-controls={ instanceId + '-' + tab.name + '-view' }
 							selected={ tab.name === selected }
 							key={ tab.name }
-							clickTab={ this.handleClick }
+							onClick={ partial( this.handleClick, tab.name ) }
 						>
 							{ tab.title }
 						</TabButton> )
