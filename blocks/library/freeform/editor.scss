@@ -91,7 +91,7 @@
 	width: auto;
 	top: $header-height;
 	margin: 0;
-	margin-top: -$block-controls-height + 1px;
+	margin-top: -$block-controls-height;
 	border: 1px solid $light-gray-500;
 	z-index: z-index( '.freeform-toolbar' );
 	background-color: $white;
