@@ -15,7 +15,7 @@ import { createBlock, BlockIcon } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import Inserter from '../../inserter';
+import { Inserter } from '../../components';
 import { insertBlock } from '../../actions';
 import { getMostFrequentlyUsedBlocks, getBlockCount } from '../../selectors';
 

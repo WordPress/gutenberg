@@ -86,7 +86,7 @@
     "react-test-renderer": "16.0.0",
     "sass-loader": "6.0.6",
     "style-loader": "0.18.2",
-    "tinymce": "4.7.1",
+    "tinymce": "4.7.2",
     "webpack": "3.8.1"
   },
   "jest": {

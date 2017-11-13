@@ -12,7 +12,7 @@ import { PanelBody } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import PostFeaturedImage from '../../post-featured-image';
+import { PostFeaturedImage } from '../../components';
 import { isEditorSidebarPanelOpened } from '../../selectors';
 import { toggleSidebarPanel } from '../../actions';
 

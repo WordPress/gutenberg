@@ -6,8 +6,7 @@ import { PanelRow } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import PostFormatCheck from '../../post-format/check';
-import PostFormatForm from '../../post-format';
+import { PostFormat as PostFormatForm, PostFormatCheck } from '../../components';
 
 export function PostFormat() {
 	return (
