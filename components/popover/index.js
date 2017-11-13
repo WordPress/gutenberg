@@ -167,14 +167,19 @@ class Popover extends Component {
 			popover.style.top = 0;
 			popover.style.right = 0;
 			popover.style.bottom = 0;
-			this.setState( {
-				isMobile: true,
-			} );
+			if ( ! this.state.isMobile ) {
+				this.setState( {
+					isMobile: true,
+				} );
+			}
 			return;
 		}
-		this.setState( {
-			isMobile: false,
-		} );
+
+		if ( this.state.isMobile ) {
+			this.setState( {
+				isMobile: false,
+			} );
+		}
 
 		const [ yAxis, xAxis ] = this.getPositions();
 		const isTop = 'top' === yAxis;
@@ -186,8 +191,8 @@ class Popover extends Component {
 			return;
 		}
 
-		//popover.style.bottom = 'auto';
-		//popover.style.right = 'auto';
+		popover.style.bottom = 'auto';
+		popover.style.right = 'auto';
 
 		if ( isRight ) {
 			popover.style.left = rect.left + ARROW_OFFSET + 'px';
