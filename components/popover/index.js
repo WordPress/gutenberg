@@ -16,6 +16,7 @@ import { focus, keycodes } from '@wordpress/utils';
 import './style.scss';
 import withFocusReturn from '../higher-order/with-focus-return';
 import PopoverDetectOutside from './detect-outside';
+import IconButton from '../icon-button';
 import { Slot, Fill } from '../slot-fill';
 
 const FocusManaged = withFocusReturn( ( { children } ) => children );
@@ -300,6 +301,9 @@ class Popover extends Component {
 						className="components-popover__content"
 						tabIndex="-1"
 					>
+						{ this.state.isMobile &&
+							<IconButton className="components-popover__close" icon="no-alt" onClick={ onClose } />
+						}
 						{ children }
 					</div>
 				</div>
