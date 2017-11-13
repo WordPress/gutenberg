@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { filter } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -53,9 +58,13 @@ registerBlockType( 'core/gallery', {
 				isMultiBlock: true,
 				blocks: [ 'core/image' ],
 				transform: ( blockAttributes ) => {
-					return createBlock( 'core/gallery', {
-						images: blockAttributes.map( ( { id, url, alt } ) => ( { id, url, alt } ) ),
-					} );
+					const validImages = filter( blockAttributes, ( { id, url } ) => id && url );
+					if ( validImages.length > 0 ) {
+						return createBlock( 'core/gallery', {
+							images: validImages.map( ( { id, url, alt } ) => ( { id, url, alt } ) ),
+						} );
+					}
+					return createBlock( 'core/gallery' );
 				},
 			},
 			{
@@ -93,9 +102,12 @@ registerBlockType( 'core/gallery', {
 			{
 				type: 'block',
 				blocks: [ 'core/image' ],
-				transform: ( { images } ) => (
-					images.map( ( { id, url, alt } ) => createBlock( 'core/image', { id, url, alt } ) )
-				),
+				transform: ( { images } ) => {
+					if ( images.length > 0 ) {
+						return images.map( ( { id, url, alt } ) => createBlock( 'core/image', { id, url, alt } ) );
+					}
+					return createBlock( 'core/image' );
+				},
 			},
 		],
 	},
