@@ -76,6 +76,7 @@ class VisualEditorBlock extends Component {
 		this.onClick = this.onClick.bind( this );
 
 		this.previousOffset = null;
+		this.hadTouchStart = false;
 
 		this.state = {
 			error: null,
@@ -167,9 +168,12 @@ class VisualEditorBlock extends Component {
 	}
 
 	onTouchStart() {
+		// Detect touchstart to disable hover on iOS
 		this.hadTouchStart = true;
 	}
 	onClick() {
+		// Clear touchstart detection
+		// Browser will try to emulate mouse events also see https://www.html5rocks.com/en/mobile/touchandmouse/
 		this.hadTouchStart = false;
 	}
 
