@@ -496,7 +496,7 @@ export class Autocomplete extends Component {
 }
 
 export default flowRight( [
-	withInstanceId,
-	withFocusOutside,
 	withSpokenMessages,
+	withInstanceId,
+	withFocusOutside, // this MUST be the innermost HOC as it calls handleFocusOutside
 ] )( Autocomplete );
