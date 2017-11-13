@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { partial, noop } from 'lodash';
+import { partial, noop, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -23,7 +23,7 @@ class TabButton extends Component {
 			aria-selected={ selected }
 			id={ tabId }
 			onClick={ this.onClick }
-			{ ...rest }
+			{ ...omit( rest, [ 'tabName', 'clickTab' ] ) }
 		>
 			{ children }
 		</button>;
@@ -43,7 +43,7 @@ class TabPanel extends Component {
 	}
 
 	handleClick( tabKey ) {
-		const { onSelect } = this.props;
+		const { onSelect = noop } = this.props;
 		this.setState( {
 			selected: tabKey,
 		} );

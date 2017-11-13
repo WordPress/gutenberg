@@ -1,7 +1,7 @@
 TabPanel
 =======
 
-TabPanel is a React component to render an ARIA-compliant TabPanel. It has two sections: a list of tabs, and the view to show when tabs are chosen. When the list of tabs gets focused, the active tab gets focus (the first tab if there isn't one already). Using the arrow keys navigate between tabs AND select the newly focused tab at the same time.
+TabPanel is a React component to render an ARIA-compliant TabPanel. It has two sections: a list of tabs, and the view to show when tabs are chosen. When the list of tabs gets focused, the active tab gets focus (the first tab if there isn't one already). Use the arrow keys to navigate between tabs AND select the newly focused tab at the same time.
 
 TabPanel is a Function-as-Children component. The function takes `tabName` as an argument.
 
