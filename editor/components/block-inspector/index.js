@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Panel, PanelBody, Slot } from '@wordpress/components';
+import { Slot } from '@wordpress/components';
 
 /**
  * Internal Dependencies
@@ -26,12 +26,10 @@ const BlockInspector = ( { selectedBlock, count } ) => {
 	}
 
 	return (
-		<Panel>
-			<PanelBody className="editor-block-inspector__content">
-				<Slot name="Inspector.Controls" />
-				<BlockInspectorAdvancedControls key={ `advanced-controls-${ selectedBlock.uid }` } />
-			</PanelBody>
-		</Panel>
+		<div>
+			<Slot name="Inspector.Controls" />
+			<BlockInspectorAdvancedControls key={ `advanced-controls-${ selectedBlock.uid }` } />
+		</div>
 	);
 };
 

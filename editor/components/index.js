@@ -34,6 +34,7 @@ export { default as UnsavedChangesWarning } from './unsaved-changes-warning';
 export { default as WordCount } from './word-count';
 
 // Content Related Components
+export { default as BlockInspector } from './block-inspector';
 export { default as Inserter } from './inserter';
 
 // State Related Components
