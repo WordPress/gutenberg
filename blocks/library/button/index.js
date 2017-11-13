@@ -121,7 +121,7 @@ registerBlockType( 'core/button', {
 			</span>,
 			focus && (
 				<form
-					className="blocks-format-toolbar__inline-link-modal"
+					className="blocks-button__inline-link"
 					onSubmit={ ( event ) => event.preventDefault() }>
 					<Dashicon icon="admin-links" />
 					<UrlInput
