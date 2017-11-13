@@ -1,7 +1,9 @@
+import { viewPort } from '../utils';
+
 export const STORE_DEFAULTS = {
 	preferences: {
 		mode: 'visual',
-		isSidebarOpened: window.innerWidth >= 782,
+		isSidebarOpened: ! viewPort.isExtraSmall(),
 		panels: { 'post-status': true },
 		recentlyUsedBlocks: [],
 		blockUsage: {},
