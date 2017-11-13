@@ -14,7 +14,7 @@ export { default as FormToggle } from './form-toggle';
 export { default as FormTokenField } from './form-token-field';
 export { default as IconButton } from './icon-button';
 export { default as KeyboardShortcuts } from './keyboard-shortcuts';
-export { default as NavigableMenu } from './navigable-menu';
+export { NavigableMenu, TabbableContainer } from './navigable-container';
 export { default as Notice } from './notice';
 export { default as NoticeList } from './notice/list';
 export { default as Panel } from './panel';
@@ -31,7 +31,9 @@ export { default as Tooltip } from './tooltip';
 export { Slot, Fill, Provider as SlotFillProvider } from './slot-fill';
 
 // Higher-Order Components
+export { default as navigateRegions } from './higher-order/navigate-regions';
 export { default as withAPIData } from './higher-order/with-api-data';
+export { default as withFocusOutside } from './higher-order/with-focus-outside';
 export { default as withFocusReturn } from './higher-order/with-focus-return';
 export { default as withInstanceId } from './higher-order/with-instance-id';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';

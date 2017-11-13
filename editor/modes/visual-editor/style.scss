@@ -2,21 +2,13 @@
 	position: relative;
 	height: 100%;
 	margin: 0 auto;
-	padding: 50px 0;	// Floating up/down arrows invisible
+	padding: 50px 0 0;
 
 	&,
 	& p {
 		font-family: $editor-font;
 		font-size: $editor-font-size;
 		line-height: $editor-line-height;
-	}
-
-	@include break-small() {
-		padding: 50px 0;
-	}
-
-	@include break-large() {
-		padding: 60px 0;
 	}
 }
 
@@ -43,13 +35,11 @@
 		z-index: z-index( '.editor-visual-editor__block:before' );
 		content: '';
 		position: absolute;
-		outline: 1px solid transparent;
-		transition: 0.2s outline;
 		top: 0;
 		bottom: 0;
-
 		left: 0;
 		right: 0;
+		outline: 1px solid transparent;
 
 		@include break-small {
 			left: $block-mover-padding-visible;
@@ -67,7 +57,7 @@
 		}
 	}
 
-	&.has-warning .editor-visual-editor__block-edit::after {
+	&.has-warning .editor-visual-editor__block-edit:after {
 		content: '';
 		position: absolute;
 		top: 0;
@@ -77,24 +67,62 @@
 		background-color: rgba( $white, 0.6 );
 	}
 
-	&.is-hovered:before {
-		outline: 1px solid $light-gray-500;
-		transition: 0.2s outline;
+	// simpler style for a block that has cursor focus (but hasn't been selected)
+	&.is-selected .editor-block-mover:before,
+	&.is-hovered .editor-block-mover:before,
+	&.is-selected .editor-block-settings-menu:before,
+	&.is-hovered .editor-block-settings-menu:before {
+		content: '';
+		position: absolute;
+		height: 36px;
+		top: 10px;
 	}
 
+	&.is-selected .editor-block-mover:before,
+	&.is-hovered .editor-block-mover:before {
+		border-right: 1px solid $light-gray-500;
+		right: 4px;
+	}
+
+	&.is-selected .editor-block-settings-menu:before,
+	&.is-hovered .editor-block-settings-menu:before {
+		border-left: 1px solid $light-gray-500;
+		left: 4px;
+	}
+
+	&.is-selected .editor-block-mover:before,
+	&.is-hovered .editor-block-mover:before {
+		border-right: 1px solid $light-gray-500;
+		right: 6px;
+	}
+
+	&.is-selected .editor-block-settings-menu:before,
+	&.is-hovered .editor-block-settings-menu:before {
+		border-left: 1px solid $light-gray-500;
+		left: 6px;
+	}
+
+	// focused block-style
 	&.is-selected:before {
-		outline: 2px solid $light-gray-500;
-		transition: 0.2s outline;
+ 		outline: 1px solid $light-gray-500;
 	}
 
+	// selection style for textarea
+	::-moz-selection {
+		background: $blue-medium-highlight;
+	}
+
+	::selection {
+		background: $blue-medium-highlight;
+	}
+
+	// selection style for multiple blocks
 	&.is-multi-selected *::selection {
 		background: transparent;
 	}
 
 	&.is-multi-selected:before {
-		background: $blue-medium-100;
-		outline: 2px solid $blue-medium-200;
-		transition: 0s outline;
+		background: $blue-medium-highlight;
 	}
 
 	.iframe-overlay {
@@ -220,12 +248,13 @@
 		@include break-wide() {
 			.editor-block-mover {
 				display: block;
-			}
-
-			.editor-block-mover {
-				top: -30px;
+				top: -29px;
 				left: 10px;
 				height: auto;
+
+				&:before {
+					content: none;
+				}
 			}
 
 			.editor-block-mover__control {
@@ -240,15 +269,19 @@
 		}
 
 		.editor-block-settings-menu {
-			top: -30px;
+			top: -41px;
 			right: 10px;
 			height: auto;
+
+			&:before {
+				content: none;
+			}
 		}
 	}
 
 	&[data-align="full"],
 	&[data-align="wide"] {
-		.editor-block-toolbar {
+		.editor-block-contextual-toolbar {
 			@include break-small() {
 				width: $visual-editor-max-width - $block-padding - $block-padding;
 			}
@@ -328,7 +361,7 @@
 	input[type=text] {
 		height: $text-editor-font-size * 4; // same height as an empty paragraph
 		margin-top: 0px;
-		margin-bottom: 5px;
+		margin-bottom: 4px;
 		outline: 1px solid transparent;
 		border: none;
 		background: none;
@@ -379,16 +412,19 @@
 		font-size: $default-font-size;
 		box-shadow: none;
 		padding: 6px;
-
-		.dashicon {
-			margin-right: 8px;
-		}
+		align-items: center;
 	}
 
 	&:hover > .editor-inserter__block,
 	&.is-showing-controls > .editor-inserter__block {
 		opacity: 1;
 	}
+}
+
+.editor-visual-editor__inserter-block-icon {
+	display: inline-block;
+	margin-right: 8px;
+	height: 20px;
 }
 
 .editor-visual-editor__block-warning {
@@ -465,7 +501,7 @@
 		opacity: 1;
 	}
 
-	&::before {
+	&:before {
 		content: '';
 		position: absolute;
 		width: 100%;
@@ -474,7 +510,7 @@
 		transform: translateY( -50% );
 	}
 
-	&:hover::before {
+	&:hover:before {
 		height: 44px;
 	}
 
@@ -495,4 +531,51 @@
 			vertical-align: bottom;
 		}
 	}
+}
+
+$sticky-bottom-offset: 20px;
+
+.editor-block-contextual-toolbar {
+	position: sticky;
+	z-index: z-index( '.editor-block-contextual-toolbar' );
+	margin-top: - $block-toolbar-height - $block-padding - 1px;
+	margin-bottom: $block-padding + $sticky-bottom-offset;
+	white-space: nowrap;
+	text-align: left;
+	pointer-events: none;
+	height: $block-toolbar-height;
+	top: $header-height - 1px;
+
+	.editor-block-toolbar {
+		border: 1px solid $light-gray-500;
+		width: 100%;;
+		.components-toolbar:first-child {
+			margin-left: -1px;
+		}
+
+
+		@include break-small() {
+			width: auto;
+		}
+	}
+
+	// Reset pointer-events on children.
+	& > * {
+		pointer-events: auto;
+	}
+
+	@include break-small() {
+		margin-left: - $block-padding - 1px;
+		margin-right: - $block-padding - 1px;
+	}
+
+	@include break-medium() {
+		top: $item-spacing;
+	}
+}
+
+.editor-block-contextual-toolbar + div {
+	// prevent collapsing margins between block and toolbar, matches the 20px bottom offset		 +		display: flex;
+	margin-top: - $sticky-bottom-offset - 1px;
+	padding-top: 1px;
 }

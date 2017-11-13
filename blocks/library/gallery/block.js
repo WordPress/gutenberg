@@ -48,6 +48,7 @@ class GalleryBlock extends Component {
 		this.toggleImageCrop = this.toggleImageCrop.bind( this );
 		this.uploadFromFiles = this.uploadFromFiles.bind( this );
 		this.onRemoveImage = this.onRemoveImage.bind( this );
+		this.setImageAttributes = this.setImageAttributes.bind( this );
 
 		this.state = {
 			selectedImage: null,
@@ -64,8 +65,11 @@ class GalleryBlock extends Component {
 
 	onRemoveImage( index ) {
 		return () => {
+			const images = filter( this.props.attributes.images, ( img, i ) => index !== i );
+			const { columns } = this.props.attributes;
 			this.props.setAttributes( {
-				images: filter( this.props.attributes.images, ( img, i ) => index !== i ),
+				images,
+				columns: columns ? Math.min( images.length, columns ) : columns,
 			} );
 		};
 	}
@@ -92,6 +96,21 @@ class GalleryBlock extends Component {
 
 	uploadFromFiles( event ) {
 		mediaUpload( event.target.files, this.props.setAttributes, isGallery );
+	}
+
+	setImageAttributes( index, attributes ) {
+		const { attributes: { images }, setAttributes } = this.props;
+
+		setAttributes( {
+			images: [
+				...images.slice( 0, index ),
+				{
+					...images[ index ],
+					...attributes,
+				},
+				...images.slice( index + 1 ),
+			],
+		} );
 	}
 
 	render() {
@@ -178,17 +197,17 @@ class GalleryBlock extends Component {
 
 		return [
 			controls,
-			focus && images.length > 1 && (
+			focus && (
 				<InspectorControls key="inspector">
 					{blockDescription}
 					<h3>{ __( 'Gallery Settings' ) }</h3>
-					<RangeControl
+					{ images.length > 1 && <RangeControl
 						label={ __( 'Columns' ) }
 						value={ columns }
 						onChange={ this.setColumnsNumber }
 						min={ 1 }
 						max={ Math.min( MAX_COLUMNS, images.length ) }
-					/>
+					/> }
 					<ToggleControl
 						label={ __( 'Crop Images' ) }
 						checked={ !! imageCrop }
@@ -204,10 +223,15 @@ class GalleryBlock extends Component {
 			),
 			<div key="gallery" className={ `${ className } align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` }>
 				{ images.map( ( img, index ) => (
-					<GalleryImage key={ img.url } img={ img }
+					<GalleryImage
+						key={ img.id || img.url }
+						url={ img.url }
+						alt={ img.alt }
+						id={ img.id }
 						isSelected={ this.state.selectedImage === index }
 						onRemove={ this.onRemoveImage( index ) }
 						onClick={ this.onSelectImage( index ) }
+						setAttributes={ ( attrs ) => this.setImageAttributes( index, attrs ) }
 					/>
 				) ) }
 			</div>,

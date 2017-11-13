@@ -11,13 +11,8 @@
 	left: 0;
 	right: 0;
 
-	top: 0;
-	position: sticky;
-
-	@include break-small() {
-		top: $admin-bar-height-big;
-		position: fixed;
-	}
+	top: $admin-bar-height-big;
+	position: fixed;
 
 	@include break-medium() {
 		top: $admin-bar-height;
@@ -77,27 +72,9 @@
 	right: $admin-sidebar-width-big;
 }
 
-// hide all action buttons except the inserter on mobile
-.editor-header__content-tools > .components-button {
-	display: none;
-
-	@include break-small() {
-		display: inline-flex;
-	}
-}
-
-.editor-header__content-tools,
 .editor-header__settings {
 	display: inline-flex;
 	align-items: center;
-}
-
-.editor-mode-switcher {
-	margin-left: $item-spacing;
-
-	.components-button svg {
-		transform: rotate( 90deg );
-	}
 }
 
 .editor-header .components-button {
@@ -121,7 +98,7 @@
 	}
 
 	@include break-medium() {
-		&.editor-publish-button, &.editor-publish-with-dropdown__button {
+		&.editor-post-publish-button, &.editor-publish-with-dropdown__button {
 			height: 33px;
 			line-height: 32px;
 		}

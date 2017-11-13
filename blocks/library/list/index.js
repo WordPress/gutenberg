@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find } from 'lodash';
+import { find, compact, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -100,11 +100,12 @@ registerBlockType( 'core/list', {
 		from: [
 			{
 				type: 'block',
+				isMultiBlock: true,
 				blocks: [ 'core/paragraph' ],
-				transform: ( { content } ) => {
+				transform: ( blockAttributes ) => {
 					return createBlock( 'core/list', {
 						nodeName: 'UL',
-						values: fromBrDelimitedContent( content ),
+						values: blockAttributes.map( ( { content }, index ) => ( <li key={ index }>{ content }</li> ) ),
 					} );
 				},
 			},
@@ -113,9 +114,9 @@ registerBlockType( 'core/list', {
 				blocks: [ 'core/quote' ],
 				transform: ( { value, citation } ) => {
 					const listItems = fromBrDelimitedContent( value );
-					const values = citation
-						? concatChildren( listItems, <li>{ citation }</li> )
-						: listItems;
+					const values = citation ?
+						concatChildren( listItems, <li>{ citation }</li> ) :
+						listItems;
 					return createBlock( 'core/list', {
 						nodeName: 'UL',
 						values,
@@ -151,11 +152,9 @@ registerBlockType( 'core/list', {
 			{
 				type: 'block',
 				blocks: [ 'core/paragraph' ],
-				transform: ( { values } ) => {
-					return createBlock( 'core/paragraph', {
-						content: toBrDelimitedContent( values ),
-					} );
-				},
+				transform: ( { values } ) =>
+					compact( values.map( ( value ) => get( value, 'props.children', null ) ) )
+						.map( ( content ) => createBlock( 'core/paragraph', { content } ) ),
 			},
 			{
 				type: 'block',

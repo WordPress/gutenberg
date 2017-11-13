@@ -218,4 +218,6 @@ This concept is speculative, but it's one direction Gutenberg could go in the fu
 
 If you'd like to contribute, you can download a Sketch file of the Gutenberg mockups. Note that those are still mockups, and not 1:1 accurate: **<a href="https://cloudup.com/ccnN8GCsXwC">Download Sketch file</a>**.
 
-Be sure to also read <a href="https://github.com/WordPress/gutenberg/blob/master/docs/faq.md">the FAQ</a>, and <a href="http://gutenberg-devdoc.surge.sh/">how to build blocks</a>.
+A pattern file is here:  **<a href="https://cloudup.com/c0Q8RQDHByq">Download Pattern Sketch file</a>**
+
+Be sure to also read <a href="https://wordpress.org/gutenberg/handbook/reference/faq/">the FAQ</a>, and <a href="https://wordpress.org/gutenberg/handbook/">how to build blocks</a>.

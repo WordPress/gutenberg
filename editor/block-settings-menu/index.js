@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton, Dropdown } from '@wordpress/components';
+import { IconButton, Dropdown, NavigableMenu } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -18,8 +18,9 @@ import BlockInspectorButton from './block-inspector-button';
 import BlockModeToggle from './block-mode-toggle';
 import BlockDeleteButton from './block-delete-button';
 import { selectBlock } from '../actions';
+import UnknownConverter from './unknown-converter';
 
-function BlockSettingsMenu( { uids, onSelect } ) {
+function BlockSettingsMenu( { uids, onSelect, focus } ) {
 	const count = uids.length;
 
 	return (
@@ -31,6 +32,7 @@ function BlockSettingsMenu( { uids, onSelect } ) {
 				const toggleClassname = classnames( 'editor-block-settings-menu__toggle', {
 					'is-opened': isOpen,
 				} );
+
 				return (
 					<IconButton
 						className={ toggleClassname }
@@ -43,15 +45,18 @@ function BlockSettingsMenu( { uids, onSelect } ) {
 						icon="ellipsis"
 						label={ isOpen ? __( 'Close Settings Menu' ) : __( 'Open Settings Menu' ) }
 						aria-expanded={ isOpen }
+						focus={ focus }
 					/>
 				);
 			} }
 			renderContent={ ( { onClose } ) => (
-				<div className="editor-block-settings-menu__content">
+				// Should this just use a DropdownMenu instead of a DropDown ?
+				<NavigableMenu className="editor-block-settings-menu__content">
 					<BlockInspectorButton onClick={ onClose } />
 					{ count === 1 && <BlockModeToggle uid={ uids[ 0 ] } onToggle={ onClose } /> }
+					{ count === 1 && <UnknownConverter uid={ uids[ 0 ] } /> }
 					<BlockDeleteButton uids={ uids } />
-				</div>
+				</NavigableMenu>
 			) }
 		/>
 	);

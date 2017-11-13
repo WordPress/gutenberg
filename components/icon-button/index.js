@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { isString } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -25,7 +26,7 @@ class IconButton extends Component {
 
 		let element = (
 			<Button { ...additionalProps } aria-label={ label } className={ classes } focus={ focus }>
-				<Dashicon icon={ icon } />
+				{ isString( icon ) ? <Dashicon icon={ icon } /> : icon }
 				{ children }
 			</Button>
 		);

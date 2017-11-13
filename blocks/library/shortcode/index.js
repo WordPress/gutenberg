@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import TextareaAutosize from 'react-autosize-textarea';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -30,6 +35,8 @@ registerBlockType( 'core/shortcode', {
 
 	className: false,
 
+	supportHTML: false,
+
 	edit: withInstanceId(
 		( { attributes, setAttributes, instanceId, focus } ) => {
 			const inputId = `blocks-shortcode-input-${ instanceId }`;
@@ -40,14 +47,15 @@ registerBlockType( 'core/shortcode', {
 						<Dashicon icon="editor-code" />
 						{ __( 'Shortcode' ) }
 					</label>
-					<input
+					<TextareaAutosize
 						id={ inputId }
-						type="text"
+						autoComplete="off"
 						value={ attributes.text }
 						placeholder={ __( 'Write shortcode here…' ) }
 						onChange={ ( event ) => setAttributes( {
 							text: event.target.value,
-						} ) } />
+						} ) }
+					/>
 					{ focus &&
 						<InspectorControls>
 							<BlockDescription>

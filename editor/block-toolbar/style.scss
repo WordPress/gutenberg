@@ -1,62 +1,18 @@
-
 .editor-block-toolbar {
-	display: flex;
-	position: sticky;
-	z-index: z-index( '.editor-block-toolbar' );
-	margin-top: -$block-controls-height - $item-spacing;
-	margin-bottom: $item-spacing + 20px;	// 20px is the offset from the bottom of the selected block where it stops sticking
-	white-space: nowrap;
-	height: $block-controls-height;
-
-	// Mobile viewport
-	top: $header-height - 1px;
-	margin-left: -$block-padding;
-	margin-right: -$block-padding;
-
-	// Allow this invisible layer to be clicked through.
-	pointer-events: none;
-
-	// Reset pointer-events on children.
-	& > * {
-		pointer-events: auto;
-	}
-
-	// Larger viewports
-	@include break-small() {
-		margin-left: 0;
-	}
-
-	@include break-medium() {
-		top: $item-spacing;
-	}
-
-	&.is-appearing-active {
-		@include animate_fade;
-	}
-}
-
-.editor-block-toolbar__group {
 	display: inline-flex;
-	box-shadow: $shadow-toolbar;
+	overflow: auto; // allow horizontal scrolling on mobile
+	flex-grow: 1;
 	width: 100%;
-	background: $white;
-	overflow: auto;	// allow horizontal scrolling on mobile
 
-	@include break-small() {
-		width: auto;
-		overflow: hidden;
+	.components-toolbar {
+		border: none;
+		border-left: 1px solid $light-gray-500;
 	}
-}
 
-$sticky-bottom-offset: 20px;
-.editor-block-toolbar + div {
-	// prevent collapsing margins between block and toolbar, matches the 20px bottom offset
- 	margin-top: -$sticky-bottom-offset - 1px;
-	padding-top: 1px;
- }
-
-.editor-block-toolbar .components-toolbar {
-	margin-right: -1px;
+	// this should probably have its own class
+	> div:not( .editor-block-toolbar__mobile-tools ) {
+		display: flex;
+	}
 }
 
 .editor-block-toolbar .editor-block-switcher {
@@ -64,11 +20,11 @@ $sticky-bottom-offset: 20px;
 }
 
 .editor-block-toolbar__mobile-tools {
-	align-items: baseline;
+	align-items: stretch;
 	display: flex;
 	justify-content: space-between;
 	flex-direction: row-reverse;
-	width: 100%;
+	flex-grow: 1;
 
 	&.components-toolbar {
 		margin-right: 0;
@@ -82,6 +38,8 @@ $sticky-bottom-offset: 20px;
 		display: inline-flex;
 		height: auto;
 		position: initial;
+		padding: 0 5px;
+		align-items: stretch;
 	}
 }
 
@@ -92,6 +50,7 @@ $sticky-bottom-offset: 20px;
 		margin: 0 5px 0 0;
 		padding: 0 5px;
 		width: auto;
+		height: auto;
 
 		.dashicon {
 			margin: 0;

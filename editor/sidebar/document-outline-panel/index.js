@@ -13,7 +13,7 @@ import { PanelBody } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import DocumentOutline from '../../document-outline';
+import { DocumentOutline } from '../../components';
 import { getBlocks, isEditorSidebarPanelOpened } from '../../selectors';
 import { toggleSidebarPanel } from '../../actions';
 

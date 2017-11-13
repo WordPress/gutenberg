@@ -13,52 +13,34 @@ import { IconButton } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import SavedState from './saved-state';
 import PublishWithDropdown from './publish-with-dropdown';
-import PreviewButton from './preview-button';
-import ModeSwitcher from './mode-switcher';
-import Inserter from '../inserter';
-import { hasEditorUndo, hasEditorRedo, isEditorSidebarOpened } from '../selectors';
+import { PostPreviewButton, PostSavedState } from '../components';
+import EllipsisMenu from './ellipsis-menu';
+import HeaderToolbar from './header-toolbar';
+import { isEditorSidebarOpened } from '../selectors';
 import { toggleSidebar } from '../actions';
 
-function Header( {
-	undo,
-	redo,
-	hasRedo,
-	hasUndo,
-	onToggleSidebar,
-	isSidebarOpened,
-} ) {
+function Header( { onToggleSidebar, isSidebarOpened } ) {
 	return (
 		<div
 			role="region"
 			aria-label={ __( 'Editor toolbar' ) }
 			className="editor-header"
+			tabIndex="-1"
 		>
-			<div className="editor-header__content-tools">
-				<Inserter position="bottom right" />
-				<IconButton
-					icon="undo"
-					label={ __( 'Undo' ) }
-					disabled={ ! hasUndo }
-					onClick={ undo } />
-				<IconButton
-					icon="redo"
-					label={ __( 'Redo' ) }
-					disabled={ ! hasRedo }
-					onClick={ redo } />
-			</div>
+			<HeaderToolbar />
 			<div className="editor-header__settings">
-				<SavedState />
-				<PreviewButton />
+				<PostSavedState />
+				<PostPreviewButton />
 				<PublishWithDropdown />
 				<IconButton
 					icon="admin-generic"
 					onClick={ onToggleSidebar }
 					isToggled={ isSidebarOpened }
 					label={ __( 'Settings' ) }
+					aria-expanded={ isSidebarOpened }
 				/>
-				<ModeSwitcher />
+				<EllipsisMenu />
 			</div>
 		</div>
 	);
@@ -66,13 +48,9 @@ function Header( {
 
 export default connect(
 	( state ) => ( {
-		hasUndo: hasEditorUndo( state ),
-		hasRedo: hasEditorRedo( state ),
 		isSidebarOpened: isEditorSidebarOpened( state ),
 	} ),
 	( dispatch ) => ( {
-		undo: () => dispatch( { type: 'UNDO' } ),
-		redo: () => dispatch( { type: 'REDO' } ),
 		onToggleSidebar: () => dispatch( toggleSidebar() ),
 	} )
 )( Header );

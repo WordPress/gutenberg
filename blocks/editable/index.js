@@ -15,22 +15,23 @@ import {
 	noop,
 } from 'lodash';
 import { nodeListToReact } from 'dom-react';
-import { Fill } from 'react-slot-fill';
 import 'element-closest';
 
 /**
  * WordPress dependencies
  */
 import { createElement, Component, renderToString } from '@wordpress/element';
-import { keycodes } from '@wordpress/utils';
+import { keycodes, createBlobURL } from '@wordpress/utils';
+import { Slot, Fill } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { pasteHandler } from '../api';
+import { rawHandler } from '../api';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
+import { pickAriaProps } from './aria';
 import patterns from './patterns';
 import { EVENTS } from './constants';
 
@@ -58,6 +59,19 @@ function isLinkBoundary( fragment ) {
 		fragment.childNodes[ 0 ].text[ 0 ] === '\uFEFF';
 }
 
+function getFormatProperties( formatName, parents ) {
+	switch ( formatName ) {
+		case 'link' : {
+			const anchor = find( parents, node => node.nodeName.toLowerCase() === 'a' );
+			return !! anchor ? { value: anchor.getAttribute( 'href' ) || '', target: anchor.getAttribute( 'target' ) || '', node: anchor } : {};
+		}
+		default:
+			return {};
+	}
+}
+
+const DEFAULT_FORMATS = [ 'bold', 'italic', 'strikethrough', 'link' ];
+
 export default class Editable extends Component {
 	constructor( props ) {
 		super( ...arguments );
@@ -70,7 +84,7 @@ export default class Editable extends Component {
 				`Invalid value of type ${ typeof value } passed to Editable ` +
 				'(expected array). Attribute values should be sourced using ' +
 				'the `children` source when used with Editable.\n\n' +
-				'See: http://gutenberg-devdoc.surge.sh/reference/attributes/#children'
+				'See: https://wordpress.org/gutenberg/handbook/reference/attributes/#children'
 			);
 		}
 
@@ -120,7 +134,7 @@ export default class Editable extends Component {
 		editor.on( 'selectionChange', this.onSelectionChange );
 		editor.on( 'BeforeExecCommand', this.maybePropagateUndo );
 		editor.on( 'PastePreProcess', this.onPastePreProcess, true /* Add before core handlers */ );
-		editor.on( 'paste', this.onPaste );
+		editor.on( 'paste', this.onPaste, true /* Add before core handlers */ );
 
 		patterns.apply( this, [ editor ] );
 
@@ -150,6 +164,24 @@ export default class Editable extends Component {
 
 	onInit() {
 		this.updateFocus();
+		this.registerCustomFormatters();
+	}
+
+	adaptFormatter( options ) {
+		switch ( options.type ) {
+			case 'inline-style': {
+				return {
+					inline: 'span',
+					styles: { ...options.style },
+				};
+			}
+		}
+	}
+
+	registerCustomFormatters() {
+		forEach( this.props.formatters, ( formatter ) => {
+			this.editor.formatter.register( formatter.format, this.adaptFormatter( formatter ) );
+		} );
 	}
 
 	onFocus() {
@@ -206,20 +238,32 @@ export default class Editable extends Component {
 	}
 
 	onPaste( event ) {
-		const dataTransfer = event.clipboardData || this.editor.getDoc().dataTransfer;
+		const dataTransfer = event.clipboardData || event.dataTransfer || this.editor.getDoc().dataTransfer;
+		const { items = [], files = [] } = dataTransfer;
+		const item = find( [ ...items, ...files ], ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
+
+		if ( item ) {
+			// Allows us to ask for this information when we get a report.
+			window.console.log( 'Received item:\n\n', item );
+
+			const blob = item.getAsFile ? item.getAsFile() : item;
+
+			this.pastedContent = `<img src="${ createBlobURL( blob ) }">`;
+		}
 
 		this.pastedPlainText = dataTransfer ? dataTransfer.getData( 'text/plain' ) : '';
 	}
 
 	onPastePreProcess( event ) {
 		// Allows us to ask for this information when we get a report.
-		window.console.log( 'Received HTML:\n\n', event.content );
+		window.console.log( 'Received HTML:\n\n', this.pastedContent || event.content );
 		window.console.log( 'Received plain text:\n\n', this.pastedPlainText );
 
-		const content = pasteHandler( {
-			HTML: event.content,
+		const content = rawHandler( {
+			HTML: this.pastedContent || event.content,
 			plainText: this.pastedPlainText,
-			inline: ! this.props.onSplit,
+			// Force inline paste if there's no `onSplit` prop.
+			mode: this.props.onSplit ? 'AUTO' : 'INLINE',
 		} );
 
 		if ( typeof content === 'string' ) {
@@ -282,9 +326,9 @@ export default class Editable extends Component {
 		const position = this.getEditorSelectionRect();
 
 		// Find the parent "relative" positioned container
-		const container = this.props.inlineToolbar
-			? this.editor.getBody().closest( '.blocks-editable' )
-			: this.editor.getBody().closest( '.editor-visual-editor__block' );
+		const container = this.props.inlineToolbar ?
+			this.editor.getBody().closest( '.blocks-editable' ) :
+			this.editor.getBody().closest( '.editor-visual-editor__block' );
 		const containerPosition = container.getBoundingClientRect();
 		const blockPadding = 14;
 		const blockMoverMargin = 18;
@@ -292,10 +336,10 @@ export default class Editable extends Component {
 		// These offsets are necessary because the toolbar where the link modal lives
 		// is absolute positioned and it's not shown when we compute the position here
 		// so we compute the position about its parent relative position and adds the offset
-		const toolbarOffset = this.props.inlineToolbar
-			? { top: 50, left: 0 }
-			: { top: 40, left: -( ( blockPadding * 2 ) + blockMoverMargin ) };
-		const linkModalWidth = 250;
+		const toolbarOffset = this.props.inlineToolbar ?
+			{ top: 10, left: 0 } :
+			{ top: 0, left: -( ( blockPadding * 2 ) + blockMoverMargin ) };
+		const linkModalWidth = 305;
 
 		return {
 			top: position.top - containerPosition.top + ( position.height ) + toolbarOffset.top,
@@ -480,13 +524,15 @@ export default class Editable extends Component {
 	}
 
 	onNodeChange( { parents } ) {
-		const formats = {};
-		const link = find( parents, ( node ) => node.nodeName.toLowerCase() === 'a' );
-		if ( link ) {
-			formats.link = { value: link.getAttribute( 'href' ) || '', target: link.getAttribute( 'target' ) || '', node: link };
-		}
-		const activeFormats = this.editor.formatter.matchAll( [	'bold', 'italic', 'strikethrough' ] );
-		activeFormats.forEach( ( activeFormat ) => formats[ activeFormat ] = true );
+		const formatNames = this.props.formattingControls;
+		const formats = this.editor.formatter.matchAll( formatNames ).reduce( ( accFormats, activeFormat ) => {
+			accFormats[ activeFormat ] = {
+				isActive: true,
+				...getFormatProperties( activeFormat, parents ),
+			};
+
+			return accFormats;
+		}, {} );
 
 		const focusPosition = this.getFocusPosition();
 		this.setState( { formats, focusPosition, selectedNodeId: this.state.selectedNodeId + 1 } );
@@ -556,8 +602,17 @@ export default class Editable extends Component {
 		}
 	}
 
+	componentWillReceiveProps( nextProps ) {
+		if ( 'development' === process.env.NODE_ENV ) {
+			if ( ! isEqual( this.props.formatters, nextProps.formatters ) ) {
+				// eslint-disable-next-line no-console
+				console.error( 'Formatters passed via `formatters` prop will only be registered once. Formatters can be enabled/disabled via the `formattingControls` prop.' );
+			}
+		}
+	}
+
 	isFormatActive( format ) {
-		return !! this.state.formats[ format ];
+		return this.state.formats[ format ] && this.state.formats[ format ].isActive;
 	}
 
 	removeFormat( format ) {
@@ -611,7 +666,10 @@ export default class Editable extends Component {
 			placeholder,
 			multiline: MultilineTag,
 			keepPlaceholderOnFocus = false,
+			formatters,
 		} = this.props;
+
+		const ariaProps = pickAriaProps( this.props );
 
 		// Generating a key that includes `tagName` ensures that if the tag
 		// changes, we unmount and destroy the previous TinyMCE element, then
@@ -627,6 +685,7 @@ export default class Editable extends Component {
 				formats={ this.state.formats }
 				onChange={ this.changeFormats }
 				enabledControls={ formattingControls }
+				customControls={ formatters }
 			/>
 		);
 
@@ -649,7 +708,8 @@ export default class Editable extends Component {
 					style={ style }
 					defaultValue={ value }
 					isPlaceholderVisible={ isPlaceholderVisible }
-					label={ placeholder }
+					aria-label={ placeholder }
+					{ ...ariaProps }
 					className={ className }
 					key={ key }
 				/>
@@ -661,6 +721,7 @@ export default class Editable extends Component {
 						{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }
 					</Tagname>
 				}
+				{ focus && <Slot name="Editable.Siblings" /> }
 			</div>
 		);
 	}
@@ -668,4 +729,9 @@ export default class Editable extends Component {
 
 Editable.contextTypes = {
 	onUndo: noop,
+};
+
+Editable.defaultProps = {
+	formattingControls: DEFAULT_FORMATS,
+	formatters: [],
 };

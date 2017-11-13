@@ -4,7 +4,6 @@
 import { Component, renderToString } from '@wordpress/element';
 
 export default class Sandbox extends Component {
-
 	constructor() {
 		super( ...arguments );
 		this.state = {

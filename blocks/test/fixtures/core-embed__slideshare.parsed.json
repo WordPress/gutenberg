@@ -4,10 +4,11 @@
         "attrs": {
             "url": "https://slideshare.com/"
         },
-        "rawContent": "\n<figure class=\"wp-block-embed-slideshare\">\n    https://slideshare.com/\n    <figcaption>Embedded content from slideshare</figcaption>\n</figure>\n"
+        "innerBlocks": [],
+        "innerHTML": "\n<figure class=\"wp-block-embed-slideshare\">\n    https://slideshare.com/\n    <figcaption>Embedded content from slideshare</figcaption>\n</figure>\n"
     },
     {
         "attrs": {},
-        "rawContent": "\n"
+        "innerHTML": "\n"
     }
 ]

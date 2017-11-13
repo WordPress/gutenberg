@@ -374,12 +374,12 @@ export function isEquivalentHTML( a, b ) {
  *
  * Logs to console in development environments when invalid.
  *
- * @param  {String}  rawContent Original block content
+ * @param  {String}  innerHTML  Original block content
  * @param  {String}  blockType  Block type
  * @param  {Object}  attributes Parsed block attributes
  * @return {Boolean}            Whether block is valid
  */
-export function isValidBlock( rawContent, blockType, attributes ) {
+export function isValidBlock( innerHTML, blockType, attributes ) {
 	let saveContent;
 	try {
 		saveContent = getSaveContent( blockType, attributes );
@@ -387,5 +387,5 @@ export function isValidBlock( rawContent, blockType, attributes ) {
 		return false;
 	}
 
-	return isEquivalentHTML( rawContent, saveContent );
+	return isEquivalentHTML( innerHTML, saveContent );
 }

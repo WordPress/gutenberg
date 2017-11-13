@@ -15,7 +15,7 @@ import DiscussionPanel from '../discussion-panel';
 import LastRevision from '../last-revision';
 import PageAttributes from '../page-attributes';
 import DocumentOutlinePanel from '../document-outline-panel';
-import MetaBoxes from '../../meta-boxes';
+import { MetaBoxes } from '../../components';
 
 const panel = (
 	<Panel>
@@ -27,7 +27,7 @@ const panel = (
 		<DiscussionPanel />
 		<PageAttributes />
 		<DocumentOutlinePanel />
-		<MetaBoxes location="side" />
+		<MetaBoxes location="side" usePanel />
 	</Panel>
 );
 
