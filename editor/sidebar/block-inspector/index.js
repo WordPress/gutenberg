@@ -29,7 +29,7 @@ const BlockInspector = ( { selectedBlock, count } ) => {
 		<Panel>
 			<PanelBody className="editor-block-inspector__content">
 				<Slot name="Inspector.Controls" />
-				<BlockInspectorAdvancedControls />
+				<BlockInspectorAdvancedControls key={ `advanced-controls-${ selectedBlock.uid }` } />
 			</PanelBody>
 		</Panel>
 	);

@@ -149,10 +149,6 @@
 		// Without z-index, won't be clickable as "above" adjacent content
 		z-index: z-index( '.editor-visual-editor__block {core/image aligned left or right}' );
 		max-width: 370px;
-
-		.editor-block-mover {
-			display: none;
-		}
 	}
 
 	&[data-align="left"] {
@@ -360,8 +356,7 @@
 
 	input[type=text] {
 		height: $text-editor-font-size * 4; // same height as an empty paragraph
-		margin-top: 0px;
-		margin-bottom: 4px;
+		margin: 0px 0px 4px 0px;
 		outline: 1px solid transparent;
 		border: none;
 		background: none;
@@ -374,7 +369,6 @@
 		font-size: $editor-font-size;
 		line-height: $editor-line-height;
 		cursor: text;
-		left: -1px;
 		max-width: none;	// fixes a bleed issue from the admin
 
 		&:hover {

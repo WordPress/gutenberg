@@ -69,7 +69,11 @@ class BlockInspectorAdvancedControls extends Component {
 		}
 
 		return (
-			<PanelBody className="editor-advanced-controls" title={ __( 'Advanced' ) }>
+			<PanelBody
+				className="editor-advanced-controls"
+				initialOpen={ false }
+				title={ __( 'Advanced' ) }
+			>
 				{ false !== blockType.className &&
 					<InspectorControls.TextControl
 						label={ __( 'Additional CSS Class' ) }

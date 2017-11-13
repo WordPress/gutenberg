@@ -25,6 +25,8 @@ export { default as PostScheduleLabel } from './post-schedule/label';
 export { default as PostSticky } from './post-sticky';
 export { default as PostStickyCheck } from './post-sticky/check';
 export { default as PostTaxonomies } from './post-taxonomies';
+export { default as PostTextEditor } from './post-text-editor';
+export { default as PostTextEditorToolbar } from './post-text-editor/toolbar';
 export { default as PostTrash } from './post-trash';
 export { default as PostVisibility } from './post-visibility';
 export { default as PostVisibilityLabel } from './post-visibility/label';

@@ -51,3 +51,6 @@ global.window.localStorage = {
 
 // UserSettings global
 global.window.userSettings = { uid: 1 };
+
+// Mock jQuery
+global.window.jQuery = { holdReady() {} };
