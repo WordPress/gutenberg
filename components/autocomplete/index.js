@@ -329,7 +329,7 @@ export class Autocomplete extends Component {
 		// filter the options we already have
 		const filteredOptions = open ? filterOptions( search, this.state[ 'options_' + open.idx ] ) : [];
 		// check if we should still suppress the popover
-		const suppress = open && wasSuppress === open.idx ? wasSuppress : undefined;
+		const suppress = ( open && wasSuppress === open.idx ) ? wasSuppress : undefined;
 		// update the state
 		if ( wasOpen || open ) {
 			this.setState( { selectedIndex: 0, filteredOptions, suppress, search, open, query, range } );
