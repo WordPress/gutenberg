@@ -17,7 +17,6 @@ import {
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { mediaUpload, createMediaFromFile, getBlobByURL, revokeBlobURL, viewPort } from '@wordpress/utils';
-import { mediaUpload,  } from '@wordpress/utils';
 import {
 	Placeholder,
 	Dashicon,
