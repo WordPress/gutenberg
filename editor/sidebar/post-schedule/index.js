@@ -8,8 +8,7 @@ import { PanelRow, Dropdown, withAPIData } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import PostScheduleLabel from '../../post-schedule/label';
-import PostScheduleForm from '../../post-schedule';
+import { PostSchedule as PostScheduleForm, PostScheduleLabel } from '../../components';
 
 export function PostSchedule( { user } ) {
 	if ( ! user.data || ! user.data.capabilities.publish_posts ) {

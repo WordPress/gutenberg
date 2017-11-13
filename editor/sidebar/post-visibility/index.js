@@ -8,8 +8,7 @@ import { PanelRow, Dropdown, withAPIData } from '@wordpress/components';
  * Internal Dependencies
  */
 import './style.scss';
-import PostVisibilityLabel from '../../post-visibility/label';
-import PostVisibilityForm from '../../post-visibility';
+import { PostVisibility as PostVisibilityForm, PostVisibilityLabel } from '../../components';
 
 export function PostVisibility( { user } ) {
 	const canEdit = user.data && user.data.capabilities.publish_posts;

@@ -82,9 +82,10 @@ export default class OldEditor extends Component {
 	onSetup( editor ) {
 		const { attributes: { content }, setAttributes } = this.props;
 		const { ref } = this;
-		const initialContent = window.switchEditors.wpautop( content || '' );
 
-		editor.on( 'loadContent', () => editor.setContent( initialContent ) );
+		if ( content ) {
+			editor.on( 'loadContent', () => editor.setContent( content ) );
+		}
 
 		editor.on( 'blur', () => {
 			setAttributes( {

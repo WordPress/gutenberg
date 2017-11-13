@@ -2,13 +2,12 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { Slot } from 'react-slot-fill';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Panel, PanelBody } from '@wordpress/components';
+import { Panel, PanelBody, Slot } from '@wordpress/components';
 
 /**
  * Internal Dependencies

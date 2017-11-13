@@ -12,7 +12,7 @@ import { PanelBody } from '@wordpress/components';
 /**
  * Internal Dependencies
  */
-import PostExcerptForm from '../../post-excerpt';
+import { PostExcerpt as PostExcerptForm } from '../../components';
 import { isEditorSidebarPanelOpened } from '../../selectors';
 import { toggleSidebarPanel } from '../../actions';
 

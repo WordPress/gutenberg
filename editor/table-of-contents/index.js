@@ -14,8 +14,7 @@ import { Dashicon, Dropdown } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import DocumentOutline from '../document-outline';
-import WordCount from '../word-count';
+import { WordCount, DocumentOutline } from '../components';
 import { getBlocks } from '../selectors';
 import { selectBlock } from '../actions';
 

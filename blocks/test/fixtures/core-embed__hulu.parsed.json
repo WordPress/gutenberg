@@ -4,10 +4,11 @@
         "attrs": {
             "url": "https://hulu.com/"
         },
-        "rawContent": "\n<figure class=\"wp-block-embed-hulu\">\n    https://hulu.com/\n    <figcaption>Embedded content from hulu</figcaption>\n</figure>\n"
+        "innerBlocks": [],
+        "innerHTML": "\n<figure class=\"wp-block-embed-hulu\">\n    https://hulu.com/\n    <figcaption>Embedded content from hulu</figcaption>\n</figure>\n"
     },
     {
         "attrs": {},
-        "rawContent": "\n"
+        "innerHTML": "\n"
     }
 ]

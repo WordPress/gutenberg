@@ -36,7 +36,6 @@
     "react-datepicker": "0.46.0",
     "react-dom": "16.0.0",
     "react-redux": "5.0.6",
-    "react-slot-fill": "1.0.1",
     "react-transition-group": "1.2.0",
     "redux": "3.7.2",
     "redux-multi": "0.1.12",
@@ -87,7 +86,7 @@
     "react-test-renderer": "16.0.0",
     "sass-loader": "6.0.6",
     "style-loader": "0.18.2",
-    "tinymce": "4.7.1",
+    "tinymce": "4.7.2",
     "webpack": "3.8.1"
   },
   "jest": {
@@ -132,8 +131,6 @@
     "fixtures:generate": "npm run fixtures:server-attributes && cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
     "fixtures:regenerate": "npm run fixtures:clean && npm run fixtures:generate",
     "package-plugin": "./bin/build-plugin-zip.sh",
-    "docs-start": "./docutron/bin/cli.js start",
-    "docs-build": "./docutron/bin/cli.js build",
     "test-unit": "jest",
     "test-unit:coverage": "jest --coverage",
     "test-unit:coverage-ci": "jest --coverage --maxWorkers 1 && codecov",

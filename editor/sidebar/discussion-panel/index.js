@@ -12,8 +12,7 @@ import { PanelBody, PanelRow } from '@wordpress/components';
 /**
  * Internal Dependencies
  */
-import PostComments from '../../post-comments';
-import PostPingbacks from '../../post-pingbacks';
+import { PostComments, PostPingbacks } from '../../components';
 import { isEditorSidebarPanelOpened } from '../../selectors';
 import { toggleSidebarPanel } from '../../actions';
 
