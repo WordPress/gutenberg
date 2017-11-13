@@ -1,0 +1,24 @@
+.components-choice-menu {
+	width: 100%;
+	padding: 10px;
+}
+
+.components-choice-menu__label {
+	font-weight: 600;
+	color: $light-gray-900;
+	margin-bottom: 10px;
+}
+
+.components-choice-menu__item {
+	width: 100%;
+	padding: 6px;
+
+	.dashicon {
+		margin-right: 10px;
+	}
+
+	&.is-selected {
+		background: $dark-gray-500;
+		color: $white;
+	}
+}

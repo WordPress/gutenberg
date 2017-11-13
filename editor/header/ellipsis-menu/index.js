@@ -23,10 +23,11 @@ const element = (
 				aria-expanded={ isOpen }
 			/>
 		) }
-		renderContent={ ( { onClose } ) => (
+		renderContent={ () => (
 			<div>
-				<ModeSwitcher onSwitch={ onClose } />
-				<FixedToolbarToggle onToggle={ onClose } />
+				<ModeSwitcher />
+				<div className="editor-ellipsis-menu__separator" />
+				<FixedToolbarToggle />
 			</div>
 		) }
 	/>
