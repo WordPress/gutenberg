@@ -79,7 +79,7 @@ export function blockAutocompleter( { onReplace } ) {
 	};
 
 	return {
-		className: 'blocks-block-autocomplete',
+		className: 'blocks-autocompleters__block',
 		triggerPrefix: '/',
 		getOptions,
 		allowContext,
@@ -99,9 +99,9 @@ export function userAutocompleter() {
 				return {
 					value: user,
 					label: [
-						<img key="avatar" alt="" src={ user.avatar_urls[ 24 ] } />,
-						<span key="name" className="name">{ user.name }</span>,
-						<span key="slug" className="slug">{ user.slug }</span>,
+						<img key="avatar" className="blocks-autocompleters__user-avatar" alt="" src={ user.avatar_urls[ 24 ] } />,
+						<span key="name" className="blocks-autocompleters__user-name">{ user.name }</span>,
+						<span key="slug" className="blocks-autocompleters__user-slug">{ user.slug }</span>,
 					],
 					keywords: [ user.slug, user.name ],
 				};
@@ -118,7 +118,7 @@ export function userAutocompleter() {
 	};
 
 	return {
-		className: 'blocks-user-autocomplete',
+		className: 'blocks-autocompleters__user',
 		triggerPrefix: '@',
 		getOptions,
 		allowNode,

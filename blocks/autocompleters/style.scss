@@ -1,9 +1,9 @@
-.blocks-block-autocomplete .dashicon {
+.blocks-autocompleters__block .dashicon {
 	margin-right: 8px;
 }
 
-.blocks-user-autocomplete {
-	.components-autocomplete__result img {
+.blocks-autocompleters__user {
+	.blocks-autocompleters__user-avatar {
 		margin-right: 8px;
 		flex-grow: 0;
 		flex-shrink: 0;
@@ -11,7 +11,7 @@
 		width: 24px; // avoid jarring resize by seting the size upfront
 		height: 24px;
 	}
-	.name {
+	.blocks-autocompleters__user-name {
 		white-space: nowrap;
 		text-overflow: ellipsis;
 		overflow: hidden;
@@ -19,7 +19,7 @@
 		flex-shrink: 0;
 		flex-grow: 1;
 	}
-	.slug {
+	.blocks-autocompleters__user-slug {
 		margin-left: 8px;
 		color: $dark-gray-100;
 		white-space: nowrap;
@@ -29,7 +29,7 @@
 		flex-grow: 0;
 		flex-shrink: 0;
 	}
-	.components-autocomplete__result:hover .slug {
+	&:hover .blocks-autocompleters__user-slug {
 		color: $blue-medium-300;
 	}
 } 

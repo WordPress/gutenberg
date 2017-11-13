@@ -446,7 +446,6 @@ export class Autocomplete extends Component {
 		const { open, suppress, selectedIndex, filteredOptions } = this.state;
 		const { key: selectedKey = '' } = filteredOptions[ selectedIndex ] || {};
 		const { className, idx } = open || {};
-		const classes = classnames( 'components-autocomplete__popover', className );
 		const isExpanded = suppress !== idx && filteredOptions.length > 0;
 		const listBoxId = isExpanded ? `components-autocomplete-listbox-${ instanceId }` : null;
 		const activeId = isExpanded ? `components-autocomplete-item-${ instanceId }-${ selectedKey }` : null;
@@ -465,7 +464,7 @@ export class Autocomplete extends Component {
 					focusOnOpen={ false }
 					onClose={ this.reset }
 					position="top right"
-					className={ classes }
+					className="components-autocomplete__popover"
 					getAnchorRect={ this.getWordRect }
 				>
 					<div
@@ -479,7 +478,7 @@ export class Autocomplete extends Component {
 								id={ `components-autocomplete-item-${ instanceId }-${ option.key }` }
 								role="option"
 								aria-selected={ index === selectedIndex }
-								className={ classnames( 'components-autocomplete__result', {
+								className={ classnames( 'components-autocomplete__result', className, {
 									'is-selected': index === selectedIndex,
 								} ) }
 								onClick={ () => this.select( option ) }
