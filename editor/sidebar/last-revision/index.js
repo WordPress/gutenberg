@@ -6,8 +6,7 @@ import { PanelBody } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import PostLastRevisionCheck from '../../post-last-revision/check';
-import PostLastRevision from '../../post-last-revision';
+import { PostLastRevision, PostLastRevisionCheck } from '../../components';
 
 function LastRevision() {
 	return (

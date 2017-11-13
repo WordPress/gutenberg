@@ -6,4 +6,5 @@ export { focus };
 export { keycodes };
 export { decodeEntities };
 
+export * from './blob-cache';
 export * from './mediaupload';

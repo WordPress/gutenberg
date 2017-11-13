@@ -10,6 +10,10 @@
 .editor-header-toolbar {
 	display: inline-flex;
 	align-items: center;
+
+	.editor-block-switcher .components-toolbar {
+		border: none;
+	}
 }
 
 .editor-header-toolbar__block-toolbar {
@@ -20,7 +24,7 @@
 	right: 0;
 	background: $white;
 	border-bottom: 1px solid $light-gray-500;
-	min-height: $stacked-toolbar-height;
+	min-height: $block-toolbar-height;
 
 	.is-sidebar-opened & {
 		display: none;

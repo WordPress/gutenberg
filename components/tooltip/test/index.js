@@ -116,6 +116,8 @@ describe( 'Tooltip', () => {
 			const button = wrapper.find( 'button' );
 			button.simulate( 'mouseenter' );
 
+			expect( originalMouseEnter ).toHaveBeenCalled();
+
 			const popover = wrapper.find( 'Popover' );
 			wrapper.instance().delayedSetIsOver.flush();
 			expect( wrapper.state( 'isOver' ) ).toBe( false );

@@ -8,6 +8,11 @@ import { noop } from 'lodash';
  */
 import { Component, createPortal } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import withInstanceId from '../higher-order/with-instance-id';
+
 class Fill extends Component {
 	componentDidMount() {
 		const { registerFill = noop } = this.context;
@@ -37,10 +42,12 @@ class Fill extends Component {
 	render() {
 		const { getSlot = noop } = this.context;
 		const { name, children } = this.props;
-
 		const slot = getSlot( name );
+		if ( ! slot || ! slot.props.bubblesVirtually ) {
+			return null;
+		}
 
-		return slot ? createPortal( children, slot ) : null;
+		return createPortal( children, slot.node );
 	}
 }
 
@@ -50,4 +57,4 @@ Fill.contextTypes = {
 	unregisterFill: noop,
 };
 
-export default Fill;
+export default withInstanceId( Fill );

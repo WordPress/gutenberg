@@ -13,10 +13,9 @@ import { IconButton } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import SavedState from './saved-state';
 import PublishWithDropdown from './publish-with-dropdown';
-import PreviewButton from './preview-button';
-import ModeSwitcher from './mode-switcher';
+import { PostPreviewButton, PostSavedState } from '../components';
+import EllipsisMenu from './ellipsis-menu';
 import HeaderToolbar from './header-toolbar';
 import { isEditorSidebarOpened } from '../selectors';
 import { toggleSidebar } from '../actions';
@@ -31,16 +30,17 @@ function Header( { onToggleSidebar, isSidebarOpened } ) {
 		>
 			<HeaderToolbar />
 			<div className="editor-header__settings">
-				<SavedState />
-				<PreviewButton />
+				<PostSavedState />
+				<PostPreviewButton />
 				<PublishWithDropdown />
 				<IconButton
 					icon="admin-generic"
 					onClick={ onToggleSidebar }
 					isToggled={ isSidebarOpened }
 					label={ __( 'Settings' ) }
+					aria-expanded={ isSidebarOpened }
 				/>
-				<ModeSwitcher />
+				<EllipsisMenu />
 			</div>
 		</div>
 	);
