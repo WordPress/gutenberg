@@ -1,3 +1,3 @@
 export function isExtraSmall() {
-	return window && window.innerWidth < 768;
+	return window && window.innerWidth < 782;
 }
