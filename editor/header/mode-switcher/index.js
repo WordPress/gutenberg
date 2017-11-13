@@ -7,12 +7,11 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton } from '@wordpress/components';
+import { ChoiceMenu } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import './style.scss';
 import { getEditorMode } from '../../selectors';
 
 /**
@@ -23,44 +22,37 @@ import { getEditorMode } from '../../selectors';
 const MODES = [
 	{
 		value: 'visual',
-		label: __( 'Switch To Visual Mode' ),
+		label: __( 'Visual Mode' ),
 		icon: 'screenoptions',
 	},
 	{
 		value: 'text',
-		label: __( 'Switch To Text Mode' ),
+		label: __( 'Text Mode' ),
 		icon: 'editor-code',
 	},
 ];
 
 function ModeSwitcher( { onSwitch, mode } ) {
-	return MODES
-		.filter( ( { value } ) => value !== mode )
-		.map( ( { value, label, icon } ) => (
-			<IconButton
-				className="editor-mode-switcher__button"
-				key={ value }
-				icon={ icon }
-				onClick={ () => {
-					onSwitch( value );
-				} }
-			>
-				{ label }
-			</IconButton>
-		) );
+	return (
+		<ChoiceMenu
+			label={ __( 'Choose Editor' ) }
+			choices={ MODES }
+			value={ mode }
+			onSelect={ onSwitch }
+		/>
+	);
 }
 
 export default connect(
 	( state ) => ( {
 		mode: getEditorMode( state ),
 	} ),
-	( dispatch, ownProps ) => ( {
+	( dispatch ) => ( {
 		onSwitch( mode ) {
 			dispatch( {
 				type: 'SWITCH_MODE',
 				mode: mode,
 			} );
-			ownProps.onSwitch( mode );
 		},
 	} )
 )( ModeSwitcher );

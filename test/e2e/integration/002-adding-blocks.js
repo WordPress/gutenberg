@@ -27,7 +27,7 @@ describe( 'Adding blocks', () => {
 
 		// Switch to Text Mode to check HTML Output
 		cy.get( '.editor-ellipsis-menu [aria-label="More"]' ).click();
-		cy.get( 'button' ).contains( 'Switch To Text Mode' ).click();
+		cy.get( 'button' ).contains( 'Text Mode' ).click();
 
 		// Assertions
 		cy.get( '.editor-post-text-editor' )
