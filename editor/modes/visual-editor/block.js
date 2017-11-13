@@ -72,8 +72,11 @@ class VisualEditorBlock extends Component {
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onBlockError = this.onBlockError.bind( this );
 		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
+		this.onTouchStart = this.onTouchStart.bind( this );
+		this.onClick = this.onClick.bind( this );
 
 		this.previousOffset = null;
+		this.hadTouchStart = false;
 
 		this.state = {
 			error: null,
@@ -164,10 +167,20 @@ class VisualEditorBlock extends Component {
 		}
 	}
 
+	onTouchStart() {
+		// Detect touchstart to disable hover on iOS
+		this.hadTouchStart = true;
+	}
+	onClick() {
+		// Clear touchstart detection
+		// Browser will try to emulate mouse events also see https://www.html5rocks.com/en/mobile/touchandmouse/
+		this.hadTouchStart = false;
+	}
+
 	maybeHover() {
 		const { isHovered, isSelected, isMultiSelected, onHover } = this.props;
 
-		if ( isHovered || isSelected || isMultiSelected ) {
+		if ( isHovered || isSelected || isMultiSelected || this.hadTouchStart ) {
 			return;
 		}
 
@@ -353,6 +366,8 @@ class VisualEditorBlock extends Component {
 				onMouseLeave={ onMouseLeave }
 				className={ wrapperClassName }
 				data-type={ block.name }
+				onTouchStart={ this.onTouchStart }
+				onClick={ this.onClick }
 				{ ...wrapperProps }
 			>
 				<BlockDropZone index={ order } />
