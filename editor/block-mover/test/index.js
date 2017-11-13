@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { expect } from 'chai';
 import { shallow } from 'enzyme';
 
 /**
@@ -19,20 +18,20 @@ describe( 'BlockMover', () => {
 
 		it( 'should render two IconButton components with the following props', () => {
 			const blockMover = shallow( <BlockMover uids={ selectedUids } blockType={ blockType } firstIndex={ 0 } /> );
-			expect( blockMover.hasClass( 'editor-block-mover' ) );
+			expect( blockMover.hasClass( 'editor-block-mover' ) ).toBe( true );
 
 			const moveUp = blockMover.childAt( 0 );
 			const moveDown = blockMover.childAt( 1 );
-			expect( moveUp.type().name ).to.equal( 'IconButton' );
-			expect( moveDown.type().name ).to.equal( 'IconButton' );
-			expect( moveUp.props() ).to.include( {
+			expect( moveUp.type().name ).toBe( 'IconButton' );
+			expect( moveDown.type().name ).toBe( 'IconButton' );
+			expect( moveUp.props() ).toMatchObject( {
 				className: 'editor-block-mover__control',
 				onClick: undefined,
 				icon: 'arrow-up-alt2',
 				label: 'Move 2 blocks from position 1 up by one place',
 				'aria-disabled': undefined,
 			} );
-			expect( moveDown.props() ).to.include( {
+			expect( moveDown.props() ).toMatchObject( {
 				className: 'editor-block-mover__control',
 				onClick: undefined,
 				icon: 'arrow-down-alt2',
@@ -48,9 +47,9 @@ describe( 'BlockMover', () => {
 					blockType={ blockType }
 					onMoveUp={ onMoveUp }
 					firstIndex={ 0 } />
-				);
+			);
 			const moveUp = blockMover.childAt( 0 );
-			expect( moveUp.prop( 'onClick' ) ).to.equal( onMoveUp );
+			expect( moveUp.prop( 'onClick' ) ).toBe( onMoveUp );
 		} );
 
 		it( 'should render the down arrow with a onMoveDown callback', () => {
@@ -60,9 +59,9 @@ describe( 'BlockMover', () => {
 					blockType={ blockType }
 					onMoveDown={ onMoveDown }
 					firstIndex={ 0 } />
-				);
+			);
 			const moveDown = blockMover.childAt( 1 );
-			expect( moveDown.prop( 'onClick' ) ).to.equal( onMoveDown );
+			expect( moveDown.prop( 'onClick' ) ).toBe( onMoveDown );
 		} );
 
 		it( 'should render with a disabled up arrown when the block isFirst', () => {
@@ -73,9 +72,9 @@ describe( 'BlockMover', () => {
 					onMoveUp={ onMoveUp }
 					isFirst
 					firstIndex={ 0 } />
-				);
+			);
 			const moveUp = blockMover.childAt( 0 );
-			expect( moveUp.props() ).to.include( {
+			expect( moveUp.props() ).toMatchObject( {
 				onClick: null,
 				'aria-disabled': true,
 			} );
@@ -89,9 +88,9 @@ describe( 'BlockMover', () => {
 					onMoveDown={ onMoveDown }
 					isLast
 					firstIndex={ 0 } />
-				);
+			);
 			const moveDown = blockMover.childAt( 1 );
-			expect( moveDown.props() ).to.include( {
+			expect( moveDown.props() ).toMatchObject( {
 				onClick: null,
 				'aria-disabled': true,
 			} );
