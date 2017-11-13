@@ -4,10 +4,11 @@
         "attrs": {
             "url": "https://youtube.com/"
         },
-        "rawContent": "\n<figure class=\"wp-block-embed-youtube\">\n    https://youtube.com/\n    <figcaption>Embedded content from youtube</figcaption>\n</figure>\n"
+        "innerBlocks": [],
+        "innerHTML": "\n<figure class=\"wp-block-embed-youtube\">\n    https://youtube.com/\n    <figcaption>Embedded content from youtube</figcaption>\n</figure>\n"
     },
     {
         "attrs": {},
-        "rawContent": "\n"
+        "innerHTML": "\n"
     }
 ]

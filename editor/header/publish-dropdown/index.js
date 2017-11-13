@@ -8,11 +8,13 @@ import { withAPIData, PanelBody } from '@wordpress/components';
  * Internal Dependencies
  */
 import './style.scss';
-import PostVisibilityLabel from '../../post-visibility/label';
-import PostVisibilityForm from '../../post-visibility';
-import PostScheduleLabel from '../../post-schedule/label';
-import PostScheduleForm from '../../post-schedule';
-import PublishButton from '../publish-button';
+import {
+	PostVisibilityLabel,
+	PostVisibility,
+	PostScheduleLabel,
+	PostSchedule,
+	PostPublishButton,
+} from '../../components';
 
 function PublishDropdown( { user, onSubmit } ) {
 	const canPublish = user.data && user.data.capabilities.publish_posts;
@@ -31,7 +33,7 @@ function PublishDropdown( { user, onSubmit } ) {
 					__( 'Visibility: ' ),
 					<PostVisibilityLabel key="label" />,
 				] }>
-					<PostVisibilityForm />
+					<PostVisibility />
 				</PanelBody>
 			}
 			{ canPublish &&
@@ -39,11 +41,11 @@ function PublishDropdown( { user, onSubmit } ) {
 					__( 'Publish: ' ),
 					<PostScheduleLabel key="label" />,
 				] }>
-					<PostScheduleForm />
+					<PostSchedule />
 				</PanelBody>
 			}
 			<div className="editor-publish-dropdown__publish-button-container">
-				<PublishButton onSubmit={ onSubmit } />
+				<PostPublishButton onSubmit={ onSubmit } />
 			</div>
 		</div>
 	);

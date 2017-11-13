@@ -72,7 +72,7 @@ function gutenberg_menu() {
 		$submenu['gutenberg'][] = array(
 			__( 'Documentation', 'gutenberg' ),
 			'edit_posts',
-			'http://gutenberg-devdoc.surge.sh/',
+			'https://wordpress.org/gutenberg/handbook/',
 		);
 	}
 }

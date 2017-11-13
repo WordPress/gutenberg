@@ -12,8 +12,7 @@ import { PanelBody, PanelRow } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import PageAttributesCheck from '../../page-attributes/check';
-import PageAttributesForm from '../../page-attributes';
+import { PageAttributes as PageAttributesForm, PageAttributesCheck } from '../../components';
 import { toggleSidebarPanel } from '../../actions';
 import { isEditorSidebarPanelOpened } from '../../selectors';
 

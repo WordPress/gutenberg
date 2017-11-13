@@ -90,6 +90,19 @@ class Admin_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests gutenberg_content_has_blocks().
+	 *
+	 * @covers gutenberg_content_has_blocks
+	 */
+	function test_gutenberg_content_has_blocks() {
+		$content_with_blocks    = get_post_field( 'post_content', self::$post_with_blocks );
+		$content_without_blocks = get_post_field( 'post_content', self::$post_without_blocks );
+
+		$this->assertTrue( gutenberg_content_has_blocks( $content_with_blocks ) );
+		$this->assertFalse( gutenberg_content_has_blocks( $content_without_blocks ) );
+	}
+
+	/**
 	 * Tests gutenberg_add_gutenberg_post_state().
 	 *
 	 * @covers gutenberg_add_gutenberg_post_state

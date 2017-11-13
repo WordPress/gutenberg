@@ -24,6 +24,7 @@ import BlockHtml from './block-html';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import BlockMover from '../../block-mover';
 import BlockSettingsMenu from '../../block-settings-menu';
+import BlockMultiControls from './multi-controls';
 import {
 	clearSelectedBlock,
 	editPost,
@@ -43,7 +44,6 @@ import {
 	isMultiSelecting,
 	getBlockIndex,
 	getEditedPostAttribute,
-	getMultiSelectedBlockUids,
 	getNextBlock,
 	getPreviousBlock,
 	isBlockHovered,
@@ -299,7 +299,7 @@ class VisualEditorBlock extends Component {
 	}
 
 	render() {
-		const { block, multiSelectedBlockUids, order, mode } = this.props;
+		const { block, order, mode } = this.props;
 		const { name: blockName, isValid } = block;
 		const blockType = getBlockType( blockName );
 		// translators: %s: Type of block (i.e. Text, Image etc)
@@ -323,13 +323,12 @@ class VisualEditorBlock extends Component {
 		// Generate the wrapper class names handling the different states of the block.
 		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected, focus } = this.props;
 		const showUI = isSelected && ( ! this.props.isTyping || ( focus && focus.collapsed === false ) );
-		const isProperlyHovered = isHovered && ! this.props.isSelecting;
 		const { error } = this.state;
 		const wrapperClassName = classnames( 'editor-visual-editor__block', {
 			'has-warning': ! isValid || !! error,
 			'is-selected': showUI,
 			'is-multi-selected': isMultiSelected,
-			'is-hovered': isProperlyHovered,
+			'is-hovered': isHovered,
 		} );
 
 		const { onMouseLeave, onFocus, onReplace } = this.props;
@@ -357,18 +356,10 @@ class VisualEditorBlock extends Component {
 				{ ...wrapperProps }
 			>
 				<BlockDropZone index={ order } />
-				{ ( showUI || isProperlyHovered ) && <BlockMover uids={ [ block.uid ] } /> }
-				{ ( showUI || isProperlyHovered ) && <BlockSettingsMenu uids={ [ block.uid ] } /> }
+				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
+				{ ( showUI || isHovered ) && <BlockSettingsMenu uids={ [ block.uid ] } /> }
 				{ showUI && isValid && <BlockContextualToolbar /> }
-				{ isFirstMultiSelected && ! this.props.isSelecting &&
-					<BlockMover uids={ multiSelectedBlockUids } />
-				}
-				{ isFirstMultiSelected && ! this.props.isSelecting &&
-					<BlockSettingsMenu
-						uids={ multiSelectedBlockUids }
-						focus={ true }
-					/>
-				}
+				{ isFirstMultiSelected && <BlockMultiControls /> }
 				<div
 					ref={ this.bindBlockNode }
 					onKeyPress={ this.maybeStartTyping }
@@ -426,12 +417,10 @@ export default connect(
 			isSelected: isBlockSelected( state, ownProps.uid ),
 			isMultiSelected: isBlockMultiSelected( state, ownProps.uid ),
 			isFirstMultiSelected: isFirstMultiSelectedBlock( state, ownProps.uid ),
-			isHovered: isBlockHovered( state, ownProps.uid ),
+			isHovered: isBlockHovered( state, ownProps.uid ) && ! isMultiSelecting( state ),
 			focus: getBlockFocus( state, ownProps.uid ),
-			isSelecting: isMultiSelecting( state ),
 			isTyping: isTyping( state ),
 			order: getBlockIndex( state, ownProps.uid ),
-			multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
 			meta: getEditedPostAttribute( state, 'meta' ),
 			mode: getBlockMode( state, ownProps.uid ),
 		};
