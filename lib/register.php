@@ -363,7 +363,7 @@ add_filter( 'display_post_states', 'gutenberg_add_gutenberg_post_state', 10, 2 )
  * @since 0.10.0
  */
 function gutenberg_register_post_types() {
-	register_post_type( 'gb_reusable_block', array(
+	register_post_type( 'wp_block', array(
 		'public' => false,
 	) );
 }
