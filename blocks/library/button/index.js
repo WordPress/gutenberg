@@ -130,7 +130,7 @@ registerBlockType( 'core/button', {
 					/>
 					<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
 				</form>
-			)
+			),
 		];
 	},
 
