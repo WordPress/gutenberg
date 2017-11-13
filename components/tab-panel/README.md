@@ -79,7 +79,6 @@ A list of tabs where each tab is defined by an object with the following fields:
 1. name: String. Defines the key for the tab
 2. title: String. Defines the translated text for the tab
 3. className: String. Defines the class to put on the tab.
-4. onSelect: function taking tabName. This is called when the tab is selected.
 
 - Type: Array
 - Required: Yes
@@ -89,7 +88,8 @@ A list of tabs where each tab is defined by an object with the following fields:
 The class to add to the active tab
 
 - Type: `String`
-- Required: Yes
+- Required: No
+- Default: `is-active`
 
 ### children
 

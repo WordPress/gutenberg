@@ -8,6 +8,10 @@ import { partial, noop, omit } from 'lodash';
  */
 // import './style.scss';
 import { Component } from '@wordpress/element';
+
+/**
+ * Internal Dependencies
+ */
 import { default as withInstanceId } from '../higher-order/with-instance-id';
 import { NavigableMenu } from '../navigable-container';
 
@@ -56,7 +60,7 @@ class TabPanel extends Component {
 
 	render() {
 		const { selected } = this.state;
-		const { instanceId, tabs, activeClass, className, orientation = 'horizontal' } = this.props;
+		const { instanceId, tabs, activeClass = 'is-active', className, orientation = 'horizontal' } = this.props;
 
 		const selectedTab = tabs.find( ( t ) => t.name === selected );
 		const selectedId = instanceId + '-' + selectedTab.name;
