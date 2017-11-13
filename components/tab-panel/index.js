@@ -12,14 +12,19 @@ import { default as withInstanceId } from '../higher-order/with-instance-id';
 import { NavigableMenu } from '../navigable-container';
 
 class TabButton extends Component {
+	constructor( { tabName, clickTab } ) {
+		super( ...arguments );
+		this.onClick = partial( clickTab, tabName );
+	}
 	render() {
-		const { tabId, children, clickTab, selected, ...rest } = this.props;
+		const { tabId, children, selected, ...rest } = this.props;
 		return <button role="tab"
 			tabIndex={ selected ? null : -1 }
 			aria-selected={ selected }
 			id={ tabId }
-			onClick={ partial( clickTab, tabId ) }
-			{ ...rest }>
+			onClick={ this.onClick }
+			{ ...rest }
+		>
 			{ children }
 		</button>;
 	}
@@ -37,7 +42,8 @@ class TabPanel extends Component {
 		};
 	}
 
-	handleClick( tabKey, onSelect = noop ) {
+	handleClick( tabKey ) {
+		const { onSelect } = this.props;
 		this.setState( {
 			selected: tabKey,
 		} );
@@ -61,26 +67,28 @@ class TabPanel extends Component {
 					role="tablist"
 					orientation={ orientation }
 					onNavigate={ this.onNavigate }
-					className={ className }>
-					{ tabs.map( ( t ) =>
-						<TabButton className={ `${ t.className } ${ t.name === selected ? activeClass : '' }` }
-							tabId={ instanceId + '-' + t.name }
-							aria-controls={ instanceId + '-' + t.name + '-view' }
-							selected={ t.name === selected }
-							key={ t.name }
-
-							clickTab={ partial( this.handleClick, t.name, t.onSelect ) }>
-							{ t.title }
+					className={ className }
+				>
+					{ tabs.map( ( tab ) =>
+						<TabButton className={ `${ tab.className } ${ tab.name === selected ? activeClass : '' }` }
+							tabId={ instanceId + '-' + tab.name }
+							tabName={ tab.name }
+							aria-controls={ instanceId + '-' + tab.name + '-view' }
+							selected={ tab.name === selected }
+							key={ tab.name }
+							clickTab={ this.handleClick }
+						>
+							{ tab.title }
 						</TabButton> )
 					}
 				</NavigableMenu>
 				{
-					selectedTab ?
+					selectedTab &&
 						<div aria-labelledby={ selectedId }
 							role="tabpanel"
 							id={ selectedId + '-view' }>
 							{ this.props.children( selectedTab.name ) }
-						</div> : null
+						</div>
 				}
 			</div>
 		);

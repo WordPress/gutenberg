@@ -67,7 +67,7 @@ export default class InserterGroup extends Component {
 			aria-labelledby={ labelledBy }
 			cycle={ false }
 			onNavigate={ this.onNavigate }>
-			{ blocks.map( ( block ) => this.renderItem( block ) ) }
+			{ blocks.map( this.renderItem, this ) }
 		</NavigableMenu>;
 	}
 }

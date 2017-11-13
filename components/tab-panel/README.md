@@ -3,7 +3,7 @@ TabPanel
 
 TabPanel is a React component to render an ARIA-compliant TabPanel. It has two sections: a list of tabs, and the view to show when tabs are chosen. When the list of tabs gets focused, the active tab gets focus (the first tab if there isn't one already). Using the arrow keys navigate between tabs AND select the newly focused tab at the same time.
 
-TabPanel's children are rendered using Function as a Child Component. The function is the tabName as an argument.
+TabPanel is a Function-as-Children component. The function takes `tabName` as an argument.
 
 ## Usage
 
@@ -13,26 +13,25 @@ Renders a TabPanel with each tab representing a paragraph with its title.
 
 import { TabPanel } from '@wordpress/components';
 
-const chooseTab = ( tabName ) => {
-	console.log( 'Choosing tab', tabName );
+const onSelect = ( tabName ) => {
+	console.log( 'Selecting tab', tabName );
 };
 
 function MyTabPanel() {
 	return (
 		<TabPanel className="my-tab-panel"
 			activeClass="active-tab"
+			onSelect={ onSelect }
 			tabs={ [
 				{
 					name: 'tab1',
 					title: 'Tab 1',
 					className: 'tab-one',
-					onSelect: this.chooseTab,
 				},
 				{
 					name: 'tab2',
 					title: 'Tab 2',
 					className: 'tab-two',
-					onSelect: this.chooseTab,
 				},
 			] }>
 			{
@@ -64,6 +63,14 @@ The orientation of the tablist (`vertical` or `horizontal`)
 - Type: `String`
 - Required: No
 - Default: `horizontal`
+
+### onSelect
+
+The function called when a tab has been selected. It is passed the `tabName` as an argument.
+
+- Type: `Function`
+- Required: No
+- Default: `noop`
 
 ### tabs
 

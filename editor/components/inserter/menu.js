@@ -143,7 +143,8 @@ export class InserterMenu extends Component {
 		const labelledBy = separatorSlug === undefined ? null : `editor-inserter__separator-${ separatorSlug }-${ instanceId }`;
 		return <InserterGroup blocks={ blocks } labelledBy={ labelledBy }
 			bindReferenceNode={ this.bindReferenceNode }
-			selectBlock={ this.selectBlock } />;
+			selectBlock={ this.selectBlock }
+		/>;
 	}
 
 	renderCategory( category, blocks ) {
@@ -192,7 +193,7 @@ export class InserterMenu extends Component {
 		const isSearching = this.state.filterValue;
 
 		return (
-			<TabbableContainer className="editor-inserter__menu" deep={ true }>
+			<TabbableContainer className="editor-inserter__menu" deep>
 				<label htmlFor={ `editor-inserter__search-${ instanceId }` } className="screen-reader-text">
 					{ __( 'Search for a block' ) }
 				</label>
@@ -205,27 +206,26 @@ export class InserterMenu extends Component {
 					ref={ this.bindReferenceNode( 'search' ) }
 				/>
 				{ ! isSearching &&
-					<TabPanel className="editor-inserter__tabs" activeClass={ 'is-active' }
+					<TabPanel className="editor-inserter__tabs" activeClass="is-active"
+						onSelect={ this.switchTab }
 						tabs={ [
 							{
 								name: 'recent',
 								title: __( 'Recent' ),
 								className: 'editor-inserter__tab',
-								onSelect: this.switchTab,
 							},
 							{
 								name: 'blocks',
 								title: __( 'Blocks' ),
 								className: 'editor-inserter__tab',
-								onSelect: this.switchTab,
 							},
 							{
 								name: 'embeds',
 								title: __( 'Embeds' ),
 								className: 'editor-inserter__tab',
-								onSelect: this.switchTab,
 							},
-						] }>
+						] }
+					>
 						{
 							( tabKey ) => {
 								const blocksForTab = this.getBlocksForTab( tabKey );
