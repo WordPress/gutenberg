@@ -32,6 +32,7 @@ function TableOfContents( { blocks } ) {
 					icon="admin-page"
 					aria-expanded={ isOpen }
 					label={ __( 'Information' ) }
+					disabled={ blocks.length === 0 }
 				/>
 			) }
 			renderContent={ () => ( [
