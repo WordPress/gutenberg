@@ -111,7 +111,7 @@ registerBlockType( 'core/audio', {
 					<BlockDescription>
 						<p>{ __( 'The Audio block allows you to embed audio files and play them back using a simple player.' ) }</p>
 					</BlockDescription>
-				</InspectorControls>
+				</InspectorControls>,
 			];
 
 			const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
