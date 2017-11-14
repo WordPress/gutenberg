@@ -17,6 +17,7 @@ import { Inserter } from '../../components';
 import BlockSwitcher from '../../block-switcher';
 import BlockToolbar from '../../block-toolbar';
 import NavigableToolbar from '../../navigable-toolbar';
+import TableOfContents from '../../table-of-contents';
 import { getMultiSelectedBlockUids, hasEditorUndo, hasEditorRedo, isFeatureActive } from '../../selectors';
 
 function HeaderToolbar( { hasUndo, hasRedo, hasFixedToolbar, undo, redo, isMultiBlockSelection, selectedBlockUids } ) {
@@ -36,6 +37,7 @@ function HeaderToolbar( { hasUndo, hasRedo, hasFixedToolbar, undo, redo, isMulti
 				label={ __( 'Redo' ) }
 				disabled={ ! hasRedo }
 				onClick={ redo } />
+			<TableOfContents />
 			{ isMultiBlockSelection && (
 				<div className="editor-header-toolbar__block-toolbar">
 					<BlockSwitcher key="switcher" uids={ selectedBlockUids } />

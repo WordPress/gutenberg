@@ -8,7 +8,7 @@ import { filter } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Dashicon, Dropdown } from '@wordpress/components';
+import { Dropdown, IconButton } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -26,13 +26,13 @@ function TableOfContents( { blocks } ) {
 			position="bottom"
 			className="table-of-contents"
 			contentClassName="table-of-contents__popover"
-			renderToggle={ ( { onToggle } ) => (
-				<button
-					className="table-of-contents__toggle"
+			renderToggle={ ( { isOpen, onToggle } ) => (
+				<IconButton
 					onClick={ onToggle }
-				>
-					<Dashicon icon="info" />
-				</button>
+					icon="admin-page"
+					aria-expanded={ isOpen }
+					label={ __( 'Information' ) }
+				/>
 			) }
 			renderContent={ () => ( [
 				<div key="counts" className="table-of-contents__counts">
