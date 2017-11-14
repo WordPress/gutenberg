@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { parse as hpqParse, attr } from 'hpq';
+import { parse as hpqParse } from 'hpq';
 import { mapValues, reduce, pickBy } from 'lodash';
 
 /**
@@ -147,11 +147,6 @@ export function getBlockAttributes( blockType, innerHTML, attributes ) {
 		result[ key ] = coercedValue;
 		return result;
 	}, {} );
-
-	// If the block supports anchor, parse the id
-	if ( blockType.supportAnchor ) {
-		blockAttributes.anchor = hpqParse( innerHTML, attr( '*', 'id' ) );
-	}
 
 	// If the block supports a custom className parse it
 	if ( blockType.className !== false && attributes && attributes.className ) {

@@ -121,20 +121,6 @@ describe( 'block serializer', () => {
 
 				expect( saved ).toBe( '<div>Bananas</div>' );
 			} );
-
-			it( 'should add an id if the block supports anchors', () => {
-				const saved = getSaveContent(
-					{
-						save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),
-						supportAnchor: true,
-						name: 'myplugin/fruit',
-						className: false,
-					},
-					{ fruit: 'Bananas', anchor: 'my-fruit' }
-				);
-
-				expect( saved ).toBe( '<div id="my-fruit">Bananas</div>' );
-			} );
 		} );
 
 		describe( 'component save', () => {

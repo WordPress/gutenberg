@@ -14,6 +14,7 @@ import { Component, createElement, renderToString, cloneElement, Children } from
  * Internal dependencies
  */
 import { getBlockType, getUnknownTypeHandlerName } from './registration';
+import { applyFilters } from '../hooks';
 
 /**
  * Returns the block's default classname from its name
@@ -55,7 +56,7 @@ export function getSaveContent( blockType, attributes ) {
 			return element;
 		}
 
-		const extraProps = {};
+		const extraProps = applyFilters( 'getSaveContent.extraProps', {}, blockType, attributes );
 		if ( !! className ) {
 			const updatedClassName = classnames(
 				className,
@@ -63,10 +64,6 @@ export function getSaveContent( blockType, attributes ) {
 				attributes.className
 			);
 			extraProps.className = updatedClassName;
-		}
-
-		if ( blockType.supportAnchor && attributes.anchor ) {
-			extraProps.id = attributes.anchor;
 		}
 
 		return cloneElement( element, extraProps );
