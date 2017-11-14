@@ -143,7 +143,7 @@ window._wpGutenbergPost.content = {
 		'<!-- /wp:paragraph -->',
 
 		'<!-- wp:button { "align": "center" } -->',
-		'<div class="wp-block-button aligncenter"><a href="https://github.com/WordPress/gutenberg"><span>Help build Gutenberg</span></a></div>',
+		'<div class="wp-block-button aligncenter"><a class="wp-block-button-link" href="https://github.com/WordPress/gutenberg">Help build Gutenberg</a></div>',
 		'<!-- /wp:button -->',
 
 		'<!-- wp:separator -->',
