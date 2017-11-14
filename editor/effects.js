@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, uniqueId, map, filter } from 'lodash';
+import { get, uniqueId, map, filter, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -42,9 +42,6 @@ import {
 
 const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
 const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
-
-// Hold jquery.ready until the metaboxes load
-jQuery.holdReady( true );
 
 export default {
 	REQUEST_POST_UPDATE( action, store ) {
@@ -279,6 +276,12 @@ export default {
 		}
 
 		return effects;
+	},
+	INITIALIZE_META_BOX_STATE( action ) {
+		// Hold jquery.ready until the metaboxes load
+		if ( some( action.metaBoxes ) ) {
+			jQuery.holdReady( true );
+		}
 	},
 	META_BOX_LOADED( action, store ) {
 		const { getState } = store;
