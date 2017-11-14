@@ -20,6 +20,7 @@ import { selectBlock } from '../actions';
 
 function TableOfContents( { blocks } ) {
 	const headings = filter( blocks, ( block ) => block.name === 'core/heading' );
+	const paragraphs = filter( blocks, ( block ) => block.name === 'core/paragraph' );
 
 	return (
 		<Dropdown
@@ -48,6 +49,10 @@ function TableOfContents( { blocks } ) {
 					<div className="table-of-contents__count">
 						<span className="table-of-contents__number">{ headings.length }</span>
 						{ __( 'Headings' ) }
+					</div>
+					<div className="table-of-contents__count">
+						<span className="table-of-contents__number">{ paragraphs.length }</span>
+						{ __( 'Paragraphs' ) }
 					</div>
 				</div>,
 				headings.length > 0 && (
