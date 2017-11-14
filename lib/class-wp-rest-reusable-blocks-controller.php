@@ -91,7 +91,7 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 	 */
 	public function get_items( $request ) {
 		$reusable_blocks = get_posts( array(
-			'post_type' => 'gb_reusable_block',
+			'post_type' => 'wp_block',
 		) );
 
 		$collection = array();
@@ -219,7 +219,7 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 			$prepared_reusable_block->ID = $existing_reusable_block->ID;
 		}
 
-		$prepared_reusable_block->post_type   = 'gb_reusable_block';
+		$prepared_reusable_block->post_type   = 'wp_block';
 		$prepared_reusable_block->post_status = 'publish';
 
 		// ID. We already validated this in self::update_item().
@@ -327,7 +327,7 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 	 */
 	private function get_reusable_block( $uuid ) {
 		$reusable_blocks = get_posts( array(
-			'post_type' => 'gb_reusable_block',
+			'post_type' => 'wp_block',
 			'name'      => $uuid,
 		) );
 

@@ -19,7 +19,7 @@ import { isFirstBlock, isLastBlock, getBlockIndex, getBlock } from '../selectors
 import { getBlockMoverLabel } from './mover-label';
 import { selectBlock } from '../actions';
 
-function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex } ) {
+export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex } ) {
 	// We emulate a disabled state because forcefully applying the `disabled`
 	// attribute on the button while it has focus causes the screen to change
 	// to an unfocused state (body as active element) without firing blur on,

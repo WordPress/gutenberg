@@ -1133,11 +1133,6 @@ describe( 'state', () => {
 		it( 'should return default state', () => {
 			const actual = metaBoxes( undefined, {} );
 			const expected = {
-				advanced: {
-					isActive: false,
-					isDirty: false,
-					isUpdating: false,
-				},
 				normal: {
 					isActive: false,
 					isDirty: false,
@@ -1166,20 +1161,17 @@ describe( 'state', () => {
 
 			const actual = metaBoxes( undefined, action );
 			const expected = {
-				advanced: {
-					isActive: false,
-					isDirty: false,
-					isUpdating: false,
-				},
 				normal: {
 					isActive: false,
 					isDirty: false,
 					isUpdating: false,
+					isLoaded: false,
 				},
 				side: {
 					isActive: true,
 					isDirty: false,
 					isUpdating: false,
+					isLoaded: false,
 				},
 			};
 

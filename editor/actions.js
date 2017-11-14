@@ -444,6 +444,20 @@ export function handleMetaBoxReload( location ) {
 }
 
 /**
+ * Returns an action object used to signify that a meta box finished loading.
+ *
+ * @param {String} location Location of meta box: 'normal', 'side'.
+ *
+ * @return {Object} Action object
+ */
+export function metaBoxLoaded( location ) {
+	return {
+		type: 'META_BOX_LOADED',
+		location,
+	};
+}
+
+/**
  * Returns an action object used to request meta box update.
  *
  * @param {Array} locations Locations of meta boxes: ['normal', 'side' ].

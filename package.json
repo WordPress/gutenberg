@@ -44,6 +44,7 @@
     "rememo": "2.3.3",
     "showdown": "1.7.4",
     "simple-html-tokenizer": "0.4.1",
+    "tinycolor2": "1.4.1",
     "uuid": "3.1.0"
   },
   "devDependencies": {
