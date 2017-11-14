@@ -29,7 +29,7 @@
 		overflow: auto;
 		-webkit-overflow-scrolling: touch;
 		height: 100%;
-		padding-top: $sidebar-panel-header-height;
+		padding-top: $panel-header-height;
 		margin-top: -1px;
 		margin-bottom: -1px;
 
@@ -46,7 +46,7 @@
 		top: 0;
 		left: 0;
 		right: 0;
-		height: $sidebar-panel-header-height;
+		height: $panel-header-height;
 
 		@include break-small() {
 			position: inherit;

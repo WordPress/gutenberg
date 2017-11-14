@@ -49,10 +49,6 @@ input[type="search"].editor-inserter__search {
 	&:focus {
 		@include input-style__focus-active;
 	}
-
-	.components-popover.is-mobile & {
-		padding-right: 30px;
-	}
 }
 
 .editor-inserter__category-blocks {

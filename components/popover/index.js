@@ -301,14 +301,16 @@ class Popover extends Component {
 					{ ...contentProps }
 					onKeyDown={ this.maybeClose }
 				>
+					{ this.state.isMobile && (
+						<div className="components-popover__header">
+							<IconButton className="components-popover__close" icon="no-alt" onClick={ onClose } />
+						</div>
+					) }
 					<div
 						ref={ this.bindNode( 'content' ) }
 						className="components-popover__content"
 						tabIndex="-1"
 					>
-						{ this.state.isMobile &&
-							<IconButton className="components-popover__close" icon="no-alt" onClick={ onClose } />
-						}
 						{ children }
 					</div>
 				</div>

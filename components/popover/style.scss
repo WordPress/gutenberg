@@ -70,8 +70,9 @@
 	background: $white;
 	height: 100%;
 
-	&:focus {
-		box-shadow: $button-focus-style;
+	.components-popover.is-mobile & {
+		height: calc( 100% - #{ $panel-header-height } );
+		border-top: 0;
 	}
 
 	.components-popover:not(.is-mobile) & {
@@ -107,9 +108,17 @@
 	height: 100%;
 }
 
+.components-popover__header {
+	height: $panel-header-height;
+	background: $light-gray-300;
+	padding: 0 $panel-padding;
+	border: 1px solid $light-gray-500;
+	position: relative;
+}
+
 .components-popover__close.components-icon-button {
 	position: absolute;
-	top: 0;
-	right: 0;
+	top: 6px;
+	right: 6px;
 	z-index: z-index( '.components-popover__close' );
 }
