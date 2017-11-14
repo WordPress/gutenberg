@@ -7,12 +7,13 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { concatChildren } from '@wordpress/element';
-import { Autocomplete, PanelBody, PanelColor } from '@wordpress/components';
+import { concatChildren, Component } from '@wordpress/element';
+import { Autocomplete, PanelBody, PanelColor, withFallbackStyles } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
+import './editor.scss';
 import './style.scss';
 import { registerBlockType, createBlock, setDefaultBlockName } from '../../api';
 import { blockAutocompleter, userAutocompleter } from '../../autocompleters';
@@ -25,7 +26,9 @@ import ToggleControl from '../../inspector-controls/toggle-control';
 import RangeControl from '../../inspector-controls/range-control';
 import ColorPalette from '../../color-palette';
 import BlockDescription from '../../block-description';
+import ContrastChecker from '../../contrast-checker';
 
+const { getComputedStyle } = window;
 
 class ParagraphBlock extends Component {
 	constructor() {
@@ -43,6 +46,8 @@ class ParagraphBlock extends Component {
 			attributes,
 			setAttributes,
 			insertBlocksAfter,
+			fallbackBackgroundColor,
+			fallbackTextColor,
 			focus,
 			setFocus,
 			mergeBlocks,
@@ -106,6 +111,11 @@ class ParagraphBlock extends Component {
 							onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
 						/>
 					</PanelColor>
+					<ContrastChecker
+						textColor={ textColor || fallbackTextColor }
+						backgroundColor={ backgroundColor || fallbackBackgroundColor }
+						isLargeText={ true }
+					/>
 					<PanelBody title={ __( 'Block Alignment' ) }>
 						<BlockAlignmentToolbar
 							value={ width }
@@ -159,6 +169,15 @@ class ParagraphBlock extends Component {
 		];
 	}
 }
+
+const ParagraphBlockFallbackStyles = withFallbackStyles( ( node, ownProps ) => {
+	const { textColor, backgroundColor } = ownProps.attributes;
+	const computedStyles = ( ! textColor || ! backgroundColor ) ? getComputedStyle( node.querySelector( '[contenteditable="true"]' ) ) : null;
+	return {
+		fallbackBackgroundColor: backgroundColor ? undefined : computedStyles.backgroundColor,
+		fallbackTextColor: textColor ? undefined : computedStyles.color,
+	};
+} )( ParagraphBlock );
 
 registerBlockType( 'core/paragraph', {
 	title: __( 'Paragraph' ),
@@ -231,7 +250,7 @@ registerBlockType( 'core/paragraph', {
 	},
 
 	edit( props ) {
-		return <ParagraphBlock { ...props } />;
+		return <ParagraphBlockFallbackStyles { ...props } />;
 	},
 
 	save( { attributes } ) {
