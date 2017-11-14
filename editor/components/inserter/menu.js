@@ -9,7 +9,12 @@ import { connect } from 'react-redux';
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { withInstanceId, withSpokenMessages, TabPanel, TabbableContainer } from '@wordpress/components';
+import {
+	TabPanel,
+	TabbableContainer,
+	withInstanceId,
+	withSpokenMessages,
+} from '@wordpress/components';
 import { getCategories, getBlockTypes } from '@wordpress/blocks';
 
 /**
@@ -144,10 +149,12 @@ export class InserterMenu extends Component {
 		const blockTypesInfo = blockTypes.map( ( blockType ) => (
 			{ ...blockType, disabled: this.isDisabledBlock( blockType ) }
 		) );
-		return <InserterGroup blockTypes={ blockTypesInfo } labelledBy={ labelledBy }
-			bindReferenceNode={ this.bindReferenceNode }
-			selectBlock={ this.selectBlock }
-		/>;
+		return (
+			<InserterGroup blockTypes={ blockTypesInfo } labelledBy={ labelledBy }
+				bindReferenceNode={ this.bindReferenceNode }
+				selectBlock={ this.selectBlock }
+			/>
+		);
 	}
 
 	renderCategory( category, blockTypes ) {
@@ -234,10 +241,12 @@ export class InserterMenu extends Component {
 								const blocksForTab = this.getBlocksForTab( tabKey );
 								const visibleBlocks = this.getVisibleBlocksByCategory( blocksForTab );
 
-								return <div ref={ ( ref ) => this.tabContainer = ref }
-									className="editor-inserter__content">
-									{ this.renderTabView( tabKey, visibleBlocks ) }
-								</div>;
+								return (
+									<div ref={ ( ref ) => this.tabContainer = ref }
+										className="editor-inserter__content">
+										{ this.renderTabView( tabKey, visibleBlocks ) }
+									</div>
+								);
 							}
 						}
 					</TabPanel>

@@ -1,22 +1,21 @@
 /**
  * External dependencies
  */
-import { partial, noop, omit } from 'lodash';
+import { partial, noop } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-// import './style.scss';
 import { Component } from '@wordpress/element';
 
 /**
- * Internal Dependencies
+ * Internal dependencies
  */
 import { default as withInstanceId } from '../higher-order/with-instance-id';
 import { NavigableMenu } from '../navigable-container';
 
-const TabButton = ( { tabId, onClick, children, selected, ...rest } ) => {
-	return <button role="tab"
+const TabButton = ( { tabId, onClick, children, selected, ...rest } ) => (
+	<button role="tab"
 		tabIndex={ selected ? null : -1 }
 		aria-selected={ selected }
 		id={ tabId }
@@ -24,8 +23,8 @@ const TabButton = ( { tabId, onClick, children, selected, ...rest } ) => {
 		{ ...rest }
 	>
 		{ children }
-	</button>;
-};
+	</button>
+);
 
 class TabPanel extends Component {
 	constructor() {
@@ -53,9 +52,15 @@ class TabPanel extends Component {
 
 	render() {
 		const { selected } = this.state;
-		const { instanceId, tabs, activeClass = 'is-active', className, orientation = 'horizontal' } = this.props;
+		const {
+			activeClass = 'is-active',
+			className,
+			instanceId,
+			orientation = 'horizontal',
+			tabs,
+		} = this.props;
 
-		const selectedTab = tabs.find( ( t ) => t.name === selected );
+		const selectedTab = tabs.find( ( { name } ) => name === selected );
 		const selectedId = instanceId + '-' + selectedTab.name;
 
 		return (
@@ -66,7 +71,7 @@ class TabPanel extends Component {
 					onNavigate={ this.onNavigate }
 					className={ className }
 				>
-					{ tabs.map( ( tab ) =>
+					{ tabs.map( ( tab ) => (
 						<TabButton className={ `${ tab.className } ${ tab.name === selected ? activeClass : '' }` }
 							tabId={ instanceId + '-' + tab.name }
 							aria-controls={ instanceId + '-' + tab.name + '-view' }
@@ -75,17 +80,17 @@ class TabPanel extends Component {
 							onClick={ partial( this.handleClick, tab.name ) }
 						>
 							{ tab.title }
-						</TabButton> )
-					}
+						</TabButton>
+					) ) }
 				</NavigableMenu>
-				{
-					selectedTab &&
-						<div aria-labelledby={ selectedId }
-							role="tabpanel"
-							id={ selectedId + '-view' }>
-							{ this.props.children( selectedTab.name ) }
-						</div>
-				}
+				{ selectedTab && (
+					<div aria-labelledby={ selectedId }
+						role="tabpanel"
+						id={ selectedId + '-view' }
+					>
+						{ this.props.children( selectedTab.name ) }
+					</div>
+				) }
 			</div>
 		);
 	}

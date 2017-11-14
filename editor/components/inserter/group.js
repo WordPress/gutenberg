@@ -42,7 +42,7 @@ export default class InserterGroup extends Component {
 	renderItem( block ) {
 		const { current } = this.state;
 		const { selectBlock, bindReferenceNode } = this.props;
-		const disabled = block.disabled;
+		const { disabled } = block;
 		return (
 			<button
 				role="menuitem"
@@ -74,13 +74,15 @@ export default class InserterGroup extends Component {
 	render() {
 		const { labelledBy, blockTypes } = this.props;
 
-		return <NavigableMenu
-			className="editor-inserter__category-blocks"
-			orientation="vertical"
-			aria-labelledby={ labelledBy }
-			cycle={ false }
-			onNavigate={ this.onNavigate }>
-			{ blockTypes.map( this.renderItem, this ) }
-		</NavigableMenu>;
+		return (
+			<NavigableMenu
+				className="editor-inserter__category-blocks"
+				orientation="vertical"
+				aria-labelledby={ labelledBy }
+				cycle={ false }
+				onNavigate={ this.onNavigate }>
+				{ blockTypes.map( this.renderItem, this ) }
+			</NavigableMenu>
+		);
 	}
 }
