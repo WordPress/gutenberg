@@ -82,7 +82,7 @@ describe( 'Slot', () => {
 		expect( element.find( 'Slot > div' ).html() ).toBe( '<div><span></span><div></div>text</div>' );
 	} );
 
-	it( 'should re-render when bubbling virtually', () => {
+	it( 'should re-render Slot when not bubbling virtually', () => {
 		const element = mount(
 			<Provider>
 				<Slot name="egg" />
