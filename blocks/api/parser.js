@@ -126,11 +126,6 @@ export function getBlockAttributes( blockType, innerHTML, attributes ) {
 		return getBlockAttribute( attributeKey, attributeSchema, innerHTML, attributes );
 	} );
 
-	// If the block supports a custom className parse it
-	if ( blockType.className !== false && attributes && attributes.className ) {
-		blockAttributes.className = attributes.className;
-	}
-
 	return blockAttributes;
 }
 

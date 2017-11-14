@@ -135,6 +135,13 @@ Optional block extended support features. The following options are supported, a
 anchor: true,
 ```
 
+- `customClassName` (default `true`): This property adds a field to define a custom className for the block's wrapper.
+
+```js
+// Remove the support for a the custom className .
+customClassName: false,
+```
+
 #### supportHTML (optional)
 
 * **Type:** `Bool`
