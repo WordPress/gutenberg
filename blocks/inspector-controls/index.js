@@ -23,6 +23,15 @@ export default function InspectorControls( { children } ) {
 	);
 }
 
+function InspectorAdvancedControls( { children } ) {
+	return (
+		<Fill name="Inspector.AdvancedControls">
+			{ children }
+		</Fill>
+	);
+}
+
+InspectorControls.Advanced = InspectorAdvancedControls;
 InspectorControls.BaseControl = BaseControl;
 InspectorControls.CheckboxControl = CheckboxControl;
 InspectorControls.RadioControl = RadioControl;
