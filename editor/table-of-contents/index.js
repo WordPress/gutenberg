@@ -26,10 +26,11 @@ function TableOfContents( { blocks } ) {
 			position="bottom"
 			className="table-of-contents"
 			contentClassName="table-of-contents__popover"
-			renderToggle={ ( { onToggle } ) => (
+			renderToggle={ ( { isOpen, onToggle } ) => (
 				<IconButton
 					onClick={ onToggle }
 					icon="admin-page"
+					aria-expanded={ isOpen }
 					label={ __( 'Information' ) }
 				/>
 			) }
