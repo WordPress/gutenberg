@@ -1,7 +1,17 @@
 /**
  * External dependencies
  */
-import { flow, groupBy, sortBy, findIndex, filter, find, some } from 'lodash';
+import {
+	filter,
+	find,
+	findIndex,
+	flow,
+	groupBy,
+	includes,
+	pick,
+	some,
+	sortBy,
+} from 'lodash';
 import { connect } from 'react-redux';
 
 /**
@@ -16,6 +26,7 @@ import {
 	withSpokenMessages,
 } from '@wordpress/components';
 import { getCategories, getBlockTypes } from '@wordpress/blocks';
+import { keycodes } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -34,6 +45,11 @@ export const searchBlocks = ( blocks, searchTerm ) => {
 		matchSearch( block.title ) || some( block.keywords, matchSearch )
 	);
 };
+
+/**
+ * Module constants
+ */
+const ARROWS = pick( keycodes, [ 'UP', 'DOWN', 'LEFT', 'RIGHT' ] );
 
 export class InserterMenu extends Component {
 	constructor() {
@@ -198,12 +214,26 @@ export class InserterMenu extends Component {
 		}
 	}
 
+	interceptArrows( event ) {
+		if ( includes( ARROWS, event.keyCode ) ) {
+			// Prevent cases of focus being unexpectedly stolen up in the tree,
+			// notably when using VisualEditorSiblingInserter, where focus is
+			// moved to sibling blocks.
+			//
+			// We don't need to stop the native event, which has its uses, e.g.
+			// allowing window scrolling.
+			event.stopPropagation();
+		}
+	}
+
 	render() {
 		const { instanceId } = this.props;
 		const isSearching = this.state.filterValue;
 
 		return (
-			<TabbableContainer className="editor-inserter__menu" deep>
+			<TabbableContainer className="editor-inserter__menu" deep
+				onKeyDown={ this.interceptArrows }
+			>
 				<label htmlFor={ `editor-inserter__search-${ instanceId }` } className="screen-reader-text">
 					{ __( 'Search for a block' ) }
 				</label>
