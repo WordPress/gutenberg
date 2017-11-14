@@ -24,12 +24,10 @@ const CHOICES = [
 	{
 		value: 'top',
 		label: __( 'Fix to top' ),
-		icon: 'editor-kitchensink',
 	},
 	{
 		value: 'block',
 		label: __( 'Fix to block' ),
-		icon: 'block-default',
 	},
 ];
 
@@ -42,7 +40,7 @@ function FeatureToggle( { onToggle, active } ) {
 	};
 	return (
 		<ChoiceMenu
-			label={ __( 'Toolbar position' ) }
+			label={ __( 'Toolbar' ) }
 			choices={ CHOICES }
 			value={ currentValue }
 			onSelect={ onSelect }

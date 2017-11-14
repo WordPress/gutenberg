@@ -22,20 +22,18 @@ import { getEditorMode } from '../../selectors';
 const MODES = [
 	{
 		value: 'visual',
-		label: __( 'Visual Mode' ),
-		icon: 'screenoptions',
+		label: __( 'Visual Editor' ),
 	},
 	{
 		value: 'text',
-		label: __( 'Text Mode' ),
-		icon: 'editor-code',
+		label: __( 'HTML Editor' ),
 	},
 ];
 
 function ModeSwitcher( { onSwitch, mode } ) {
 	return (
 		<ChoiceMenu
-			label={ __( 'Choose Editor' ) }
+			label={ __( 'Editor' ) }
 			choices={ MODES }
 			value={ mode }
 			onSelect={ onSwitch }
