@@ -11,7 +11,7 @@ import { Warning } from '../../components';
 const warning = (
 	<Warning>
 		<p>{ __(
-			'This block has suffered from an unhandled error and cannot be previewed.'
+			'This block has encountered an error and cannot be previewed.'
 		) }</p>
 	</Warning>
 );
