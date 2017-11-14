@@ -77,11 +77,13 @@ div.components-toolbar {
 			box-shadow: inset 0 0 0 1px $dark-gray-500;
 		}
 	}
-	
+
 	// special active style
-	&.is-active > svg {
-		background: $dark-gray-500;
+	&.is-active {
 		color: $white;
+		> svg {
+			background: $dark-gray-500;
+		}
 	}
 
 	// focus style
