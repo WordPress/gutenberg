@@ -10,28 +10,6 @@
 	}
 }
 
-.table-of-contents__toggle {
-	background: none;
-	border: none;
-	box-shadow: none;
-	color: $dark-gray-300;
-	cursor: pointer;
-	font-family: $default-font;
-	font-size: 12px;
-	padding: 6px;
-	border-radius: $button-style__radius-round;
-
-	.dashicon {
-		display: block;
-		width: 20px;
-		height: 20px;
-	}
-
-	&:focus {
-		@include button-style__focus-active;
-	}
-}
-
 .table-of-contents__popover .components-popover__content {
 	padding: 16px;
 }
