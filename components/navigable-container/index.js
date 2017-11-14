@@ -44,7 +44,7 @@ class NavigableContainer extends Component {
 		const finder = onlyBrowserTabstops ? focus.tabbable : focus.focusable;
 		const focusables = finder
 			.find( this.container )
-			.filter( ( node ) => deep || node.parentElement === this.container );
+			.filter( ( node ) => ! node.disabled && ( deep || node.parentElement === this.container ) );
 
 		const index = this.getFocusableIndex( focusables, target );
 		if ( index > -1 && target ) {

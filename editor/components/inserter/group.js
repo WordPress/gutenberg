@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find } from 'lodash';
+import { isEqual } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,26 +10,38 @@ import { Component } from '@wordpress/element';
 import { NavigableMenu } from '@wordpress/components';
 import { BlockIcon } from '@wordpress/blocks';
 
+function deriveActiveBlocks( blocks ) {
+	return blocks.filter( ( block ) => ! block.disabled );
+}
+
 export default class InserterGroup extends Component {
 	constructor() {
 		super( ...arguments );
-		const { blocks } = this.props;
 
 		this.onNavigate = this.onNavigate.bind( this );
 
+		this.activeBlocks = deriveActiveBlocks( this.props.blockTypes );
 		this.state = {
-			current: blocks[ 0 ] ? blocks[ 0 ].name : null,
+			current: this.activeBlocks.length > 0 ? this.activeBlocks[ 0 ].name : null,
 		};
 	}
 
-	isDisabledBlock( blockType ) {
-		return blockType.useOnce && find( this.props.blocks, ( { name } ) => blockType.name === name );
+	componentWillReceiveProps( nextProps ) {
+		if ( ! isEqual( this.props.blockTypes, nextProps.blockTypes ) ) {
+			this.activeBlocks = deriveActiveBlocks( nextProps.blockTypes );
+			const current = this.activeBlocks.find( block => block.name !== this.state.current );
+			if ( ! current ) {
+				this.setState( {
+					current: this.activeBlocks.length > 0 ? this.activeBlocks[ 0 ].name : null,
+				} );
+			}
+		}
 	}
 
 	renderItem( block ) {
 		const { current } = this.state;
-		const disabled = this.isDisabledBlock( block );
 		const { selectBlock, bindReferenceNode } = this.props;
+		const disabled = block.disabled;
 		return (
 			<button
 				role="menuitem"
@@ -49,8 +61,8 @@ export default class InserterGroup extends Component {
 	}
 
 	onNavigate( index ) {
-		const { blocks } = this.props;
-		const dest = blocks[ index ];
+		const { activeBlocks } = this;
+		const dest = activeBlocks[ index ];
 		if ( dest ) {
 			this.setState( {
 				current: dest.name,
@@ -59,7 +71,7 @@ export default class InserterGroup extends Component {
 	}
 
 	render() {
-		const { labelledBy, blocks } = this.props;
+		const { labelledBy, blockTypes } = this.props;
 
 		return <NavigableMenu
 			className="editor-inserter__category-blocks"
@@ -67,7 +79,7 @@ export default class InserterGroup extends Component {
 			aria-labelledby={ labelledBy }
 			cycle={ false }
 			onNavigate={ this.onNavigate }>
-			{ blocks.map( this.renderItem, this ) }
+			{ blockTypes.map( this.renderItem, this ) }
 		</NavigableMenu>;
 	}
 }

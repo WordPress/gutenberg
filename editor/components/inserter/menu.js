@@ -138,18 +138,21 @@ export class InserterMenu extends Component {
 		)( blockTypes );
 	}
 
-	renderBlocks( blocks, separatorSlug ) {
+	renderBlocks( blockTypes, separatorSlug ) {
 		const { instanceId } = this.props;
 		const labelledBy = separatorSlug === undefined ? null : `editor-inserter__separator-${ separatorSlug }-${ instanceId }`;
-		return <InserterGroup blocks={ blocks } labelledBy={ labelledBy }
+		const blockTypesInfo = blockTypes.map( ( blockType ) => (
+			{ ...blockType, disabled: this.isDisabledBlock( blockType ) }
+		) );
+		return <InserterGroup blockTypes={ blockTypesInfo } labelledBy={ labelledBy }
 			bindReferenceNode={ this.bindReferenceNode }
 			selectBlock={ this.selectBlock }
 		/>;
 	}
 
-	renderCategory( category, blocks ) {
+	renderCategory( category, blockTypes ) {
 		const { instanceId } = this.props;
-		return blocks && (
+		return blockTypes && (
 			<div key={ category.slug }>
 				<div
 					className="editor-inserter__separator"
@@ -158,7 +161,7 @@ export class InserterMenu extends Component {
 				>
 					{ category.title }
 				</div>
-				{ this.renderBlocks( blocks, category.slug ) }
+				{ this.renderBlocks( blockTypes, category.slug ) }
 			</div>
 		);
 	}
