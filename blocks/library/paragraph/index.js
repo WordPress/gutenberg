@@ -26,78 +26,40 @@ import RangeControl from '../../inspector-controls/range-control';
 import ColorPalette from '../../color-palette';
 import BlockDescription from '../../block-description';
 
-registerBlockType( 'core/paragraph', {
-	title: __( 'Paragraph' ),
 
-	icon: 'editor-paragraph',
+class ParagraphBlock extends Component {
+	constructor() {
+		super( ...arguments );
+		this.toggleDropCap = this.toggleDropCap.bind( this );
+	}
 
-	category: 'common',
+	toggleDropCap() {
+		const { attributes, setAttributes } = this.props;
+		setAttributes( { dropCap: ! attributes.dropCap } );
+	}
 
-	keywords: [ __( 'text' ) ],
+	render() {
+		const {
+			attributes,
+			setAttributes,
+			insertBlocksAfter,
+			focus,
+			setFocus,
+			mergeBlocks,
+			onReplace,
+		} = this.props;
 
-	supports: {
-		className: false,
-	},
+		const {
+			align,
+			content,
+			dropCap,
+			placeholder,
+			fontSize,
+			backgroundColor,
+			textColor,
+			width,
+		} = attributes;
 
-	attributes: {
-		content: {
-			type: 'array',
-			source: 'children',
-			selector: 'p',
-		},
-		align: {
-			type: 'string',
-		},
-		dropCap: {
-			type: 'boolean',
-			default: false,
-		},
-		placeholder: {
-			type: 'string',
-		},
-		width: {
-			type: 'string',
-		},
-		textColor: {
-			type: 'string',
-		},
-		backgroundColor: {
-			type: 'string',
-		},
-		fontSize: {
-			type: 'number',
-		},
-	},
-
-	transforms: {
-		from: [
-			{
-				type: 'raw',
-				isMatch: ( node ) => (
-					node.nodeName === 'P' &&
-					// Do not allow embedded content.
-					! node.querySelector( 'audio, canvas, embed, iframe, img, math, object, svg, video' )
-				),
-			},
-		],
-	},
-
-	merge( attributes, attributesToMerge ) {
-		return {
-			content: concatChildren( attributes.content, attributesToMerge.content ),
-		};
-	},
-
-	getEditWrapperProps( attributes ) {
-		const { width } = attributes;
-		if ( [ 'wide', 'full', 'left', 'right' ].indexOf( width ) !== -1 ) {
-			return { 'data-align': width };
-		}
-	},
-
-	edit( { attributes, setAttributes, insertBlocksAfter, focus, setFocus, mergeBlocks, onReplace } ) {
-		const { align, content, dropCap, placeholder, fontSize, backgroundColor, textColor, width } = attributes;
-		const toggleDropCap = () => setAttributes( { dropCap: ! dropCap } );
 		const className = dropCap ? 'has-drop-cap' : null;
 
 		return [
@@ -120,7 +82,7 @@ registerBlockType( 'core/paragraph', {
 						<ToggleControl
 							label={ __( 'Drop Cap' ) }
 							checked={ !! dropCap }
-							onChange={ toggleDropCap }
+							onChange={ this.toggleDropCap }
 						/>
 						<RangeControl
 							label={ __( 'Font Size' ) }
@@ -195,6 +157,81 @@ registerBlockType( 'core/paragraph', {
 				) }
 			</Autocomplete>,
 		];
+	}
+}
+
+registerBlockType( 'core/paragraph', {
+	title: __( 'Paragraph' ),
+
+	icon: 'editor-paragraph',
+
+	category: 'common',
+
+	keywords: [ __( 'text' ) ],
+
+	supports: {
+		className: false,
+	},
+
+
+	attributes: {
+		content: {
+			type: 'array',
+			source: 'children',
+			selector: 'p',
+		},
+		align: {
+			type: 'string',
+		},
+		dropCap: {
+			type: 'boolean',
+			default: false,
+		},
+		placeholder: {
+			type: 'string',
+		},
+		width: {
+			type: 'string',
+		},
+		textColor: {
+			type: 'string',
+		},
+		backgroundColor: {
+			type: 'string',
+		},
+		fontSize: {
+			type: 'number',
+		},
+	},
+
+	transforms: {
+		from: [
+			{
+				type: 'raw',
+				isMatch: ( node ) => (
+					node.nodeName === 'P' &&
+					// Do not allow embedded content.
+					! node.querySelector( 'audio, canvas, embed, iframe, img, math, object, svg, video' )
+				),
+			},
+		],
+	},
+
+	merge( attributes, attributesToMerge ) {
+		return {
+			content: concatChildren( attributes.content, attributesToMerge.content ),
+		};
+	},
+
+	getEditWrapperProps( attributes ) {
+		const { width } = attributes;
+		if ( [ 'wide', 'full', 'left', 'right' ].indexOf( width ) !== -1 ) {
+			return { 'data-align': width };
+		}
+	},
+
+	edit( props ) {
+		return <ParagraphBlock { ...props } />;
 	},
 
 	save( { attributes } ) {
