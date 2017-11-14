@@ -119,6 +119,7 @@
 	background: transparent;
 	border: none;
 	border-bottom: 3px solid transparent;
+	border-radius: 0;
 	cursor: pointer;
 	height: 50px;
 	line-height: 50px;
@@ -132,7 +133,6 @@
 	}
 
 	&:focus {
-		box-shadow: $button-focus-style;
-		outline: none;
+		@include button-style__focus-active;
 	}
 }

@@ -15,7 +15,6 @@
 
 .components-autocomplete__result.components-button {
 	margin-bottom: 0;
-	border: 1px solid transparent;
 	font-family: $default-font;
 	font-size: $default-font-size;
 	color: $dark-gray-500;
@@ -28,12 +27,10 @@
 	text-align: left;
 
 	&.is-selected {
-		box-shadow: none;
-		color: $dark-gray-500;
-		border-color: $dark-gray-500;
+		@include button-style__focus-active;
 	}
 
 	&:hover {
-		color: $blue-medium-500;
+		@include button-style__hover;
 	}
 }
