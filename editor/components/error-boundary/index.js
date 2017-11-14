@@ -14,34 +14,37 @@ import { Button, ClipboardButton } from '@wordpress/components';
  * Internal dependencies
  */
 import { Warning } from '../';
+import { getEditedPostContent } from '../../selectors';
 
 class ErrorBoundary extends Component {
 	constructor() {
 		super( ...arguments );
 
 		this.reboot = this.reboot.bind( this );
-		this.getStateText = this.getStateText.bind( this );
+		this.getContent = this.getContent.bind( this );
 
 		this.state = {
-			hasEncounteredError: false,
+			error: null,
 		};
 	}
 
-	componentDidCatch() {
-		this.setState( { hasEncounteredError: true } );
+	componentDidCatch( error ) {
+		this.setState( { error } );
 	}
 
 	reboot() {
 		this.props.onError( this.context.store.getState() );
 	}
 
-	getStateText() {
-		return JSON.stringify( this.context.store.getState() );
+	getContent() {
+		try {
+			return getEditedPostContent( this.context.store.getState() );
+		} catch ( error ) {}
 	}
 
 	render() {
-		const { hasEncounteredError } = this.state;
-		if ( ! hasEncounteredError ) {
+		const { error } = this.state;
+		if ( ! error ) {
 			return this.props.children;
 		}
 
@@ -54,8 +57,11 @@ class ErrorBoundary extends Component {
 					<Button onClick={ this.reboot } isLarge>
 						{ __( 'Attempt Recovery' ) }
 					</Button>
-					<ClipboardButton text={ this.getStateText } isLarge>
-						{ __( 'Copy State to Clipboard' ) }
+					<ClipboardButton text={ this.getContent } isLarge>
+						{ __( 'Copy Post Text' ) }
+					</ClipboardButton>
+					<ClipboardButton text={ error.stack } isLarge>
+						{ __( 'Copy Error' ) }
 					</ClipboardButton>
 				</p>
 			</Warning>
