@@ -42,8 +42,13 @@ class EditorProvider extends Component {
 	constructor( props ) {
 		super( ...arguments );
 
-		const store = createReduxStore();
-		store.dispatch( setupEditor( props.post ) );
+		const store = createReduxStore( props.initialState );
+
+		// If initial state is passed, assume that we don't need to initialize,
+		// as in the case of an error recovery.
+		if ( ! props.initialState ) {
+			store.dispatch( setupEditor( props.post ) );
+		}
 
 		this.store = store;
 		this.settings = {
