@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEqual } from 'lodash';
+import { isEqual, find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -30,7 +30,7 @@ export default class InserterGroup extends Component {
 		if ( ! isEqual( this.props.blockTypes, nextProps.blockTypes ) ) {
 			this.activeBlocks = deriveActiveBlocks( nextProps.blockTypes );
 			// Try and preserve any still valid selected state.
-			const current = this.activeBlocks.find( block => block.name === this.state.current );
+			const current = find( this.activeBlocks, { name: this.state.current } );
 			if ( ! current ) {
 				this.setState( {
 					current: this.activeBlocks.length > 0 ? this.activeBlocks[ 0 ].name : null,

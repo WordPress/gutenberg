@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { partial, noop } from 'lodash';
+import { partial, noop, find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -60,7 +60,7 @@ class TabPanel extends Component {
 			tabs,
 		} = this.props;
 
-		const selectedTab = tabs.find( ( { name } ) => name === selected );
+		const selectedTab = find( tabs, { name: selected } );
 		const selectedId = instanceId + '-' + selectedTab.name;
 
 		return (
