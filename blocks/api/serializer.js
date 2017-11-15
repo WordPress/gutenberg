@@ -98,7 +98,8 @@ export function getCommentAttributes( allAttributes, blockType ) {
 			return result;
 		}
 
-		// Ignore values sources from content and post meta
+		// Ignore all attributes but the ones with an "undefined" source
+		// "undefined" source refers to attributes saved in the block comment
 		if ( attributeSchema.source !== undefined ) {
 			return result;
 		}

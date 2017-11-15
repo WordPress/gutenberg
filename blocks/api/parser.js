@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { parse as hpqParse } from 'hpq';
-import { keys, mapValues } from 'lodash';
+import { mapValues } from 'lodash';
 
 /**
  * Internal dependencies
@@ -73,11 +73,7 @@ export function matcherFromSource( sourceConfig ) {
 		case 'node':
 			return node( sourceConfig.selector );
 		case 'query':
-			const subMatchers = keys( sourceConfig.query ).reduce( ( memo, key ) => {
-				memo[ key ] = matcherFromSource( sourceConfig.query[ key ] );
-				return memo;
-			}, {} );
-
+			const subMatchers = mapValues( sourceConfig.query, matcherFromSource );
 			return query( sourceConfig.selector, subMatchers );
 		default:
 			// eslint-disable-next-line no-console
@@ -131,7 +127,7 @@ export function getBlockAttributes( blockType, innerHTML, attributes ) {
 	} );
 
 	// If the block supports a custom className parse it
-	if ( false !== blockType.className && attributes && attributes.className ) {
+	if ( blockType.className !== false && attributes && attributes.className ) {
 		blockAttributes.className = attributes.className;
 	}
 
