@@ -388,9 +388,6 @@
 	position: relative;
 	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible ) - ( 2 * $block-padding );
 	margin: 0 auto;
-	opacity: 0;
-	transition: opacity 0.25s ease-in-out;
-	transition-delay: 0.3s;
 
 	@include break-small {
 		max-width: $visual-editor-max-width - ( 2 * $block-padding );
@@ -398,10 +395,6 @@
 
 	&:not( [data-insert-index="0"] ) {
 		top: #{ -1 * ( $block-spacing / 2 ) };
-	}
-
-	&.is-visible {
-		opacity: 1;
 	}
 
 	&:before {
@@ -423,6 +416,18 @@
 		left: 50%;
 		transform: translate( -50%, -50% );
 		margin: 0;
+	}
+
+	.editor-inserter__toggle {
+		opacity: 0;
+		transition: opacity 0.25s ease-in-out;
+		transition-delay: 0.3s;
+	}
+
+	&.is-forced-visible .editor-inserter__toggle,
+	&:hover .editor-inserter__toggle,
+	.editor-inserter__toggle:focus {
+		opacity: 1;
 	}
 
 	.editor-inserter__toggle.components-button {
