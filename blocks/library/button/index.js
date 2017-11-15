@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { Dashicon, IconButton, PanelColor } from '@wordpress/components';
+import { Dashicon, IconButton, PanelColor, withFallbackStyles } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -26,26 +26,8 @@ const { getComputedStyle } = window;
 class ButtonBlock extends Component {
 	constructor() {
 		super( ...arguments );
-
-		this.containers = {};
-		this.fallbackColors = {};
-
-		this.state = {
-			fallbackBackgroundColor: undefined,
-			fallbackTextColor: undefined,
-		};
-
 		this.updateAlignment = this.updateAlignment.bind( this );
 		this.toggleClear = this.toggleClear.bind( this );
-		this.bindRef = this.bindRef.bind( this );
-	}
-
-	componentDidMount() {
-		this.grabColors();
-	}
-
-	componentDidUpdate() {
-		this.grabColors();
 	}
 
 	updateAlignment( nextAlign ) {
@@ -57,29 +39,6 @@ class ButtonBlock extends Component {
 		setAttributes( { clear: ! attributes.clear } );
 	}
 
-	bindRef( node ) {
-		if ( ! node ) {
-			return;
-		}
-
-		this.containers.background = node;
-		this.containers.text = node.querySelector( '[contenteditable="true"]' );
-	}
-
-	grabColors() {
-		const { background, text } = this.containers;
-		const { textColor, color } = this.props.attributes;
-		const { fallbackTextColor, fallbackBackgroundColor } = this.state;
-
-		if ( ! color && ! fallbackBackgroundColor && background ) {
-			this.setState( { fallbackBackgroundColor: getComputedStyle( background ).backgroundColor } );
-		}
-
-		if ( ! textColor && ! fallbackTextColor && text ) {
-			this.setState( { fallbackTextColor: getComputedStyle( text ).color } );
-		}
-	}
-
 	render() {
 		const {
 			attributes,
@@ -87,6 +46,8 @@ class ButtonBlock extends Component {
 			focus,
 			setFocus,
 			className,
+			fallbackBackgroundColor,
+			fallbackTextColor,
 		} = this.props;
 
 		const {
@@ -99,17 +60,13 @@ class ButtonBlock extends Component {
 			clear,
 		} = attributes;
 
-		const {
-			fallbackBackgroundColor,
-			fallbackTextColor,
-		} = this.state;
 		return [
 			focus && (
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar value={ align } onChange={ this.updateAlignment } />
 				</BlockControls>
 			),
-			<span key="button" className={ className } title={ title } style={ { backgroundColor: color } } ref={ this.bindRef }>
+			<span key="button" className={ className } title={ title } style={ { backgroundColor: color } }>
 				<Editable
 					tagName="span"
 					placeholder={ __( 'Add text…' ) }
@@ -171,6 +128,14 @@ class ButtonBlock extends Component {
 	}
 }
 
+const ButtonBlockFallbackStyles = withFallbackStyles( ( node, ownProps ) => {
+	const { textColor, color } = ownProps.attributes;
+	return {
+		fallbackBackgroundColor: color ? undefined : getComputedStyle( node.querySelector( `.${ ownProps.className }` ) ).backgroundColor,
+		fallbackTextColor: textColor ? undefined : getComputedStyle( node.querySelector( '[contenteditable="true"]' ) ).color,
+	};
+} )( ButtonBlock );
+
 registerBlockType( 'core/button', {
 	title: __( 'Button' ),
 
@@ -223,7 +188,9 @@ registerBlockType( 'core/button', {
 		return props;
 	},
 
-	edit: ButtonBlock,
+	edit( props ) {
+		return <ButtonBlockFallbackStyles { ...props } />;
+	},
 
 	save( { attributes } ) {
 		const { url, text, title, align, color, textColor } = attributes;
