@@ -68,36 +68,24 @@
 	}
 
 	// simpler style for a block that has cursor focus (but hasn't been selected)
-	&.is-selected .editor-block-mover:before,
-	&.is-hovered .editor-block-mover:before,
-	&.is-selected .editor-block-settings-menu:before,
-	&.is-hovered .editor-block-settings-menu:before {
+	&.is-selected > .editor-block-mover:before,
+	&.is-hovered > .editor-block-mover:before,
+	&.is-selected > .editor-block-settings-menu:before,
+	&.is-hovered > .editor-block-settings-menu:before {
 		content: '';
 		position: absolute;
 		height: 36px;
 		top: 10px;
 	}
 
-	&.is-selected .editor-block-mover:before,
-	&.is-hovered .editor-block-mover:before {
-		border-right: 1px solid $light-gray-500;
-		right: 4px;
-	}
-
-	&.is-selected .editor-block-settings-menu:before,
-	&.is-hovered .editor-block-settings-menu:before {
-		border-left: 1px solid $light-gray-500;
-		left: 4px;
-	}
-
-	&.is-selected .editor-block-mover:before,
-	&.is-hovered .editor-block-mover:before {
+	&.is-selected > .editor-block-mover:before,
+	&.is-hovered > .editor-block-mover:before {
 		border-right: 1px solid $light-gray-500;
 		right: 6px;
 	}
 
-	&.is-selected .editor-block-settings-menu:before,
-	&.is-hovered .editor-block-settings-menu:before {
+	&.is-selected > .editor-block-settings-menu:before,
+	&.is-hovered > .editor-block-settings-menu:before {
 		border-left: 1px solid $light-gray-500;
 		left: 6px;
 	}
@@ -309,6 +297,36 @@
 		&.is-close-to-bottom {
 			background: none;
 			border-bottom: 3px solid $blue-medium-500;
+		}
+	}
+
+	> .editor-block-settings-menu {
+		position: absolute;
+		top: 2px;
+		right: 4px;
+		padding: 16px 0 20px 14px; // handles hover area
+
+		// Mobile
+		display: none;
+
+		@include break-small {
+			display: flex;
+			flex-direction: column;
+		}
+	}
+
+	> .editor-block-mover {
+		position: absolute;
+		top: 2px;
+		left: 4px;
+		height: $text-editor-font-size * 4; // same height as an empty paragraph
+		padding: 4px 14px 6px 0; // handles hover area
+		z-index: z-index( '.editor-block-mover' );
+
+		// Mobile, to be revisited
+		display: none;
+		@include break-small {
+			display: block;
 		}
 	}
 }

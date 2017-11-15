@@ -6,8 +6,8 @@ import { connect } from 'react-redux';
 /**
  * Internal dependencies
  */
-import BlockMover from '../../block-mover';
-import BlockSettingsMenu from '../../block-settings-menu';
+import BlockMover from '../../components/block-mover';
+import BlockSettingsMenu from '../../components/block-settings-menu';
 import {
 	getMultiSelectedBlockUids,
 	isMultiSelecting,

@@ -1,18 +1,3 @@
-.editor-block-settings-menu {
-	position: absolute;
-	top: 2px;
-	right: 4px;
-	padding: 16px 0 20px 14px; // handles hover area
-
-	// Mobile
-	display: none;
-
-	@include break-small {
-		display: flex;
-		flex-direction: column;
-	}
-}
-
 .editor-block-settings-menu__popover {
 	z-index: z-index( '.editor-block-settings-menu__popover' );
 

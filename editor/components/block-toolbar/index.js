@@ -20,8 +20,8 @@ import BlockMover from '../block-mover';
 import BlockInspectorButton from '../block-settings-menu/block-inspector-button';
 import BlockModeToggle from '../block-settings-menu/block-mode-toggle';
 import BlockDeleteButton from '../block-settings-menu/block-delete-button';
-import { getBlockMode, getSelectedBlock } from '../selectors';
 import UnknownConverter from '../block-settings-menu/unknown-converter';
+import { getBlockMode, getSelectedBlock } from '../../selectors';
 
 class BlockToolbar extends Component {
 	constructor() {
