@@ -253,6 +253,10 @@ class ImageBlock extends Component {
 										height: currentHeight + delta.height,
 									} );
 								} }
+								onResizeStart={ ( event ) => {
+									// Stop image resizing fire multi-select
+									event.stopPropagation();
+								} }
 							>
 								{ img }
 							</ResizableBox>
