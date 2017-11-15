@@ -254,7 +254,7 @@ class ImageBlock extends Component {
 									} );
 								} }
 								onResizeStart={ ( event ) => {
-									// Stop image resizing fire multi-select
+									// Stop image resizing firing multi-select
 									event.stopPropagation();
 								} }
 							>
