@@ -209,8 +209,8 @@ class VisualEditorBlockList extends Component {
 
 		return (
 			<div>
-				{ !! blocks.length && <VisualEditorSiblingInserter insertIndex={ 0 } /> }
-				{ flatMap( blocks, ( uid, index ) => [
+				{ !! blocks.length && <VisualEditorSiblingInserter /> }
+				{ flatMap( blocks, ( uid ) => [
 					<VisualEditorBlock
 						key={ 'block-' + uid }
 						uid={ uid }
@@ -220,7 +220,7 @@ class VisualEditorBlockList extends Component {
 					/>,
 					<VisualEditorSiblingInserter
 						key={ 'sibling-inserter-' + uid }
-						insertIndex={ index + 1 }
+						uid={ uid }
 					/>,
 				] ) }
 				{ ! blocks.length &&
