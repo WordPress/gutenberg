@@ -287,8 +287,10 @@ export default class Editable extends Component {
 		}
 	}
 
-	onChange( forced ) {
-		if ( ! forced && ! this.editor.isDirty() ) {
+	onChange( shouldForce ) {
+		// Note that due to efficiency, speed and low cost requirements isDirty may
+		// not reflect reality for a brief period immediately after a change.
+		if ( ! shouldForce && ! this.editor.isDirty() ) {
 			return;
 		}
 
