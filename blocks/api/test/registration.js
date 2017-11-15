@@ -17,6 +17,7 @@ import {
 	getDefaultBlockName,
 	getBlockType,
 	getBlockTypes,
+	hasBlockSupport,
 } from '../registration';
 
 describe( 'blocks', () => {
@@ -270,6 +271,69 @@ describe( 'blocks', () => {
 					icon: 'block-default',
 				},
 			] );
+		} );
+	} );
+
+	describe( 'hasBlockSupport', () => {
+		it( 'should return false if block has no supports', () => {
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+
+			expect( hasBlockSupport( 'core/test-block', 'foo' ) ).toBe( false );
+		} );
+
+		it( 'should return false if block does not define support by name', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				supports: {
+					bar: true,
+				},
+			} );
+
+			expect( hasBlockSupport( 'core/test-block', 'foo' ) ).toBe( false );
+		} );
+
+		it( 'should return custom default supports if block does not define support by name', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				supports: {
+					bar: true,
+				},
+			} );
+
+			expect( hasBlockSupport( 'core/test-block', 'foo', true ) ).toBe( true );
+		} );
+
+		it( 'should return true if block type supports', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				supports: {
+					foo: true,
+				},
+			} );
+
+			expect( hasBlockSupport( 'core/test-block', 'foo' ) ).toBe( true );
+		} );
+
+		it( 'should return true if block author defines unsupported but truthy value', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				supports: {
+					foo: 'hmmm',
+				},
+			} );
+
+			expect( hasBlockSupport( 'core/test-block', 'foo' ) ).toBe( true );
+		} );
+
+		it( 'should handle block settings object as argument to test', () => {
+			const settings = {
+				...defaultBlockSettings,
+				supports: {
+					foo: true,
+				},
+			};
+
+			expect( hasBlockSupport( settings, 'foo' ) ).toBe( true );
 		} );
 	} );
 } );

@@ -65,6 +65,10 @@ const textEmbedBlock = {
 };
 
 describe( 'InserterMenu', () => {
+	// NOTE: Due to https://github.com/airbnb/enzyme/issues/1174, some of the selectors passed through to
+	// wrapper.find have had to be strengthened (and the filterWhere strengthened also), otherwise two
+	// results would be returned even though only one was in the DOM.
+
 	const unregisterAllBlocks = () => {
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
@@ -96,7 +100,7 @@ describe( 'InserterMenu', () => {
 			/>
 		);
 
-		const activeCategory = wrapper.find( '.editor-inserter__tab .is-active' );
+		const activeCategory = wrapper.find( '.editor-inserter__tab button.is-active' );
 		expect( activeCategory.text() ).toBe( 'Recent' );
 
 		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
@@ -131,10 +135,10 @@ describe( 'InserterMenu', () => {
 			/>
 		);
 		const embedTab = wrapper.find( '.editor-inserter__tab' )
-			.filterWhere( ( node ) => node.text() === 'Embeds' );
+			.filterWhere( ( node ) => node.text() === 'Embeds' && node.name() === 'button' );
 		embedTab.simulate( 'click' );
 
-		const activeCategory = wrapper.find( '.editor-inserter__tab .is-active' );
+		const activeCategory = wrapper.find( '.editor-inserter__tab button.is-active' );
 		expect( activeCategory.text() ).toBe( 'Embeds' );
 
 		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
@@ -154,10 +158,10 @@ describe( 'InserterMenu', () => {
 			/>
 		);
 		const blocksTab = wrapper.find( '.editor-inserter__tab' )
-			.filterWhere( ( node ) => node.text() === 'Blocks' );
+			.filterWhere( ( node ) => node.text() === 'Blocks' && node.name() === 'button' );
 		blocksTab.simulate( 'click' );
 
-		const activeCategory = wrapper.find( '.editor-inserter__tab .is-active' );
+		const activeCategory = wrapper.find( '.editor-inserter__tab button.is-active' );
 		expect( activeCategory.text() ).toBe( 'Blocks' );
 
 		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
@@ -179,7 +183,7 @@ describe( 'InserterMenu', () => {
 			/>
 		);
 		const blocksTab = wrapper.find( '.editor-inserter__tab' )
-			.filterWhere( ( node ) => node.text() === 'Blocks' );
+			.filterWhere( ( node ) => node.text() === 'Blocks' && node.name() === 'button' );
 		blocksTab.simulate( 'click' );
 		wrapper.update();
 

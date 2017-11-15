@@ -10,7 +10,7 @@ import { has, partial, reduce, size } from 'lodash';
  */
 import { Component, createElement } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
-import { getBlockType, getBlockDefaultClassname, createBlock } from '@wordpress/blocks';
+import { getBlockType, BlockEdit, getBlockDefaultClassname, createBlock } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -72,8 +72,11 @@ class VisualEditorBlock extends Component {
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onBlockError = this.onBlockError.bind( this );
 		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
+		this.onTouchStart = this.onTouchStart.bind( this );
+		this.onClick = this.onClick.bind( this );
 
 		this.previousOffset = null;
+		this.hadTouchStart = false;
 
 		this.state = {
 			error: null,
@@ -164,10 +167,20 @@ class VisualEditorBlock extends Component {
 		}
 	}
 
+	onTouchStart() {
+		// Detect touchstart to disable hover on iOS
+		this.hadTouchStart = true;
+	}
+	onClick() {
+		// Clear touchstart detection
+		// Browser will try to emulate mouse events also see https://www.html5rocks.com/en/mobile/touchandmouse/
+		this.hadTouchStart = false;
+	}
+
 	maybeHover() {
 		const { isHovered, isSelected, isMultiSelected, onHover } = this.props;
 
-		if ( isHovered || isSelected || isMultiSelected ) {
+		if ( isHovered || isSelected || isMultiSelected || this.hadTouchStart ) {
 			return;
 		}
 
@@ -305,20 +318,7 @@ class VisualEditorBlock extends Component {
 		// translators: %s: Type of block (i.e. Text, Image etc)
 		const blockLabel = sprintf( __( 'Block: %s' ), blockType.title );
 		// The block as rendered in the editor is composed of general block UI
-		// (mover, toolbar, wrapper) and the display of the block content, which
-		// is referred to as <BlockEdit />.
-		let BlockEdit;
-		// `edit` and `save` are functions or components describing the markup
-		// with which a block is displayed. If `blockType` is valid, assign
-		// them preferencially as the render value for the block.
-		if ( blockType ) {
-			BlockEdit = blockType.edit || blockType.save;
-		}
-
-		// Should `BlockEdit` return as null, we have nothing to display for the block.
-		if ( ! BlockEdit ) {
-			return null;
-		}
+		// (mover, toolbar, wrapper) and the display of the block content.
 
 		// Generate the wrapper class names handling the different states of the block.
 		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected, focus } = this.props;
@@ -353,6 +353,8 @@ class VisualEditorBlock extends Component {
 				onMouseLeave={ onMouseLeave }
 				className={ wrapperClassName }
 				data-type={ block.name }
+				onTouchStart={ this.onTouchStart }
+				onClick={ this.onClick }
 				{ ...wrapperProps }
 			>
 				<BlockDropZone index={ order } />
@@ -374,6 +376,7 @@ class VisualEditorBlock extends Component {
 					<BlockCrashBoundary onError={ this.onBlockError }>
 						{ isValid && mode === 'visual' && (
 							<BlockEdit
+								name={ blockName }
 								focus={ focus }
 								attributes={ block.attributes }
 								setAttributes={ this.setAttributes }

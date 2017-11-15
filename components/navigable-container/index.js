@@ -10,7 +10,7 @@ import { Component } from '@wordpress/element';
 import { focus, keycodes } from '@wordpress/utils';
 
 /**
- * Module Constants
+ * Module constants
  */
 const { UP, DOWN, LEFT, RIGHT, TAB } = keycodes;
 

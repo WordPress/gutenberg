@@ -119,16 +119,17 @@ Whether a block can only be used once per post.
 useOnce: true,
 ```
 
-#### supportAnchor (optional)
+#### supports (optional)
 
-* **Type:** `Bool`
-* **Default:** `false`
+* **Type:** `Object`
 
-Anchors let you link directly to a specific block on a page. This property adds a field to define an id for the block and a button to copy the direct link.
+Optional block extended support features. The following options are supported, and should be specified as a boolean `true` or `false` value:
+
+- `anchor` (default `false`): Anchors let you link directly to a specific block on a page. This property adds a field to define an id for the block and a button to copy the direct link.
 
 ```js
 // Add the support for an anchor link.
-supportAnchor: true,
+anchor: true,
 ```
 
 #### supportHTML (optional)

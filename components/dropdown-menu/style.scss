@@ -54,25 +54,13 @@
 
 	.components-dropdown-menu__menu-item {
 		width: 100%;
-		margin-bottom: 3px;
 		padding: 6px;
-		background: none;
-		border: 1px solid transparent;
 		border-radius: 0;
 		outline: none;
-		color: $dark-gray-500;
 		cursor: pointer;
 
-		&:hover,
-		&:focus,
-		&:not(:disabled):hover {
-			box-shadow: none;
-			color: $dark-gray-500;
-			border-color: $dark-gray-500;
-		}
-
 		.dashicon {
-			margin-right: 5px;
+			margin-right: 8px;
 		}
 	}
 }

@@ -51,7 +51,7 @@
 		position: relative;
 		min-height: 250px;
 
-		> :not( .editor-visual-editor__block-warning ) {
+		> :not( .editor-warning ) {
 			pointer-events: none;
 			user-select: none;
 		}
@@ -149,10 +149,6 @@
 		// Without z-index, won't be clickable as "above" adjacent content
 		z-index: z-index( '.editor-visual-editor__block {core/image aligned left or right}' );
 		max-width: 370px;
-
-		.editor-block-mover {
-			display: none;
-		}
 	}
 
 	&[data-align="left"] {
@@ -326,7 +322,7 @@
 	}
 
 	.editor-inserter__toggle.components-icon-button:not(:disabled):hover {
-		color: $blue-medium-500;
+		@include button-style__hover;
 	}
 }
 
@@ -360,8 +356,7 @@
 
 	input[type=text] {
 		height: $text-editor-font-size * 4; // same height as an empty paragraph
-		margin-top: 0px;
-		margin-bottom: 4px;
+		margin: 0px 0px 4px 0px;
 		outline: 1px solid transparent;
 		border: none;
 		background: none;
@@ -374,7 +369,6 @@
 		font-size: $editor-font-size;
 		line-height: $editor-line-height;
 		cursor: text;
-		left: -1px;
 		max-width: none;	// fixes a bleed issue from the admin
 
 		&:hover {
@@ -425,40 +419,6 @@
 	display: inline-block;
 	margin-right: 8px;
 	height: 20px;
-}
-
-.editor-visual-editor__block-warning {
-	z-index: z-index( '.editor-visual-editor__block-warning' );
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate( -50%, -50% );
-	display: flex;
-	flex-direction: column;
-	justify-content: space-around;
-	align-items: center;
-	width: 96%;
-	max-width: 780px;
-	padding: 20px 20px 10px 20px;
-	background-color: $white;
-	border: 1px solid $light-gray-500;
-	text-align: center;
-	line-height: $default-line-height;
-	box-shadow: $shadow-popover;
-
-	p {
-		width: 100%;
-		font-family: $default-font;
-		font-size: $default-font-size;
-	}
-
-	.button + .button {
-		margin-left: $item-spacing;
-	}
-}
-
-.visual-editor__invalid-block-warning-buttons .components-button {
-	margin-bottom: 5px;
 }
 
 .editor-visual-editor__block .blocks-visual-editor__block-html-textarea {
@@ -525,7 +485,11 @@
 	.editor-inserter__toggle.components-button {
 		margin: 0;
 		padding: 4px;
-		background-color: white;
+		background: $white;
+
+		&:focus {
+			background: $light-gray-300;
+		}
 
 		.dashicon {
 			vertical-align: bottom;
@@ -548,11 +512,16 @@ $sticky-bottom-offset: 20px;
 
 	.editor-block-toolbar {
 		border: 1px solid $light-gray-500;
-		width: 100%;;
-		.components-toolbar:first-child {
+		width: 100%;
+
+		// remove stacked borders in inline toolbar
+		> div:first-child {
 			margin-left: -1px;
 		}
 
+		> .editor-block-switcher:first-child {
+			margin-left: -2px;
+		}
 
 		@include break-small() {
 			width: auto;
@@ -577,5 +546,5 @@ $sticky-bottom-offset: 20px;
 .editor-block-contextual-toolbar + div {
 	// prevent collapsing margins between block and toolbar, matches the 20px bottom offset		 +		display: flex;
 	margin-top: - $sticky-bottom-offset - 1px;
-	padding-top: 1px;
+	padding-top: 2px;
 }

@@ -7,7 +7,7 @@ import 'moment-timezone/moment-timezone-utils';
 /**
  * WordPress dependencies
  */
-import { render } from '@wordpress/element';
+import { render, unmountComponentAtNode } from '@wordpress/element';
 import { settings as dateSettings } from '@wordpress/date';
 
 /**
@@ -15,7 +15,7 @@ import { settings as dateSettings } from '@wordpress/date';
  */
 import './assets/stylesheets/main.scss';
 import Layout from './layout';
-import { EditorProvider } from './components';
+import { EditorProvider, ErrorBoundary } from './components';
 import { initializeMetaBoxState } from './actions';
 
 export * from './components';
@@ -46,22 +46,48 @@ window.jQuery( document ).on( 'heartbeat-tick', ( event, response ) => {
 } );
 
 /**
+ * Reinitializes the editor after the user chooses to reboot the editor after
+ * an unhandled error occurs, replacing previously mounted editor element using
+ * an initial state from prior to the crash.
+ *
+ * @param {Element} target       DOM node in which editor is rendered
+ * @param {*}       initialState Initial editor state to hydrate
+ */
+export function recreateEditorInstance( target, initialState ) {
+	unmountComponentAtNode( target );
+
+	const reboot = recreateEditorInstance.bind( null, target );
+
+	render(
+		<EditorProvider initialState={ initialState }>
+			<ErrorBoundary onError={ reboot }>
+				<Layout />
+			</ErrorBoundary>
+		</EditorProvider>,
+		target
+	);
+}
+
+/**
  * Initializes and returns an instance of Editor.
  *
  * The return value of this function is not necessary if we change where we
  * call createEditorInstance(). This is due to metaBox timing.
  *
- * @param {String}  id       Unique identifier for editor instance
- * @param {Object}  post     API entity for post to edit
- * @param {?Object} settings Editor settings object
- * @return {Object} Editor interface. Currently supports metabox initialization.
+ * @param  {String}  id       Unique identifier for editor instance
+ * @param  {Object}  post     API entity for post to edit
+ * @param  {?Object} settings Editor settings object
+ * @return {Object}           Editor interface
  */
 export function createEditorInstance( id, post, settings ) {
 	const target = document.getElementById( id );
+	const reboot = recreateEditorInstance.bind( null, target );
 
 	const provider = render(
 		<EditorProvider settings={ settings } post={ post }>
-			<Layout />
+			<ErrorBoundary onError={ reboot }>
+				<Layout />
+			</ErrorBoundary>
 		</EditorProvider>,
 		target
 	);

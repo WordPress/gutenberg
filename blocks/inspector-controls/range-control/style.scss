@@ -76,17 +76,17 @@
 
 	// webkit
 	&:focus::-webkit-slider-thumb {
-		box-shadow: $button-focus-style;;
+		@include button-style__focus-active;
 	}
 
 	// moz
 	&:focus::-moz-range-thumb {
-		box-shadow: $button-focus-style;;
+		@include button-style__focus-active;
 	}
 
 	// ie
 	&:focus::-ms-thumb {
-		box-shadow: $button-focus-style;;
+		@include button-style__focus-active;
 	}
 
 	/**

@@ -1,7 +1,17 @@
 /**
  * External dependencies
  */
-import { flow, groupBy, sortBy, findIndex, filter, find, some } from 'lodash';
+import {
+	filter,
+	find,
+	findIndex,
+	flow,
+	groupBy,
+	includes,
+	pick,
+	some,
+	sortBy,
+} from 'lodash';
 import { connect } from 'react-redux';
 
 /**
@@ -9,18 +19,23 @@ import { connect } from 'react-redux';
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { withInstanceId, withSpokenMessages } from '@wordpress/components';
+import {
+	TabPanel,
+	TabbableContainer,
+	withInstanceId,
+	withSpokenMessages,
+} from '@wordpress/components';
+import { getCategories, getBlockTypes } from '@wordpress/blocks';
 import { keycodes } from '@wordpress/utils';
-import { getCategories, getBlockTypes, BlockIcon } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
+
 import { getBlocks, getRecentlyUsedBlocks } from '../../selectors';
 import { showInsertionPoint, hideInsertionPoint } from '../../actions';
-
-const { TAB, LEFT, UP, RIGHT, DOWN } = keycodes;
+import { default as InserterGroup } from './group';
 
 export const searchBlocks = ( blocks, searchTerm ) => {
 	const normalizedSearchTerm = searchTerm.toLowerCase().trim();
@@ -31,43 +46,40 @@ export const searchBlocks = ( blocks, searchTerm ) => {
 	);
 };
 
+/**
+ * Module constants
+ */
+const ARROWS = pick( keycodes, [ 'UP', 'DOWN', 'LEFT', 'RIGHT' ] );
+
 export class InserterMenu extends Component {
 	constructor() {
 		super( ...arguments );
 		this.nodes = {};
 		this.state = {
 			filterValue: '',
-			currentFocus: 'search',
 			tab: 'recent',
 		};
 		this.filter = this.filter.bind( this );
-		this.setSearchFocus = this.setSearchFocus.bind( this );
-		this.onKeyDown = this.onKeyDown.bind( this );
 		this.searchBlocks = this.searchBlocks.bind( this );
-		this.getBlocksForCurrentTab = this.getBlocksForCurrentTab.bind( this );
+		this.getBlocksForTab = this.getBlocksForTab.bind( this );
 		this.sortBlocks = this.sortBlocks.bind( this );
+		this.bindReferenceNode = this.bindReferenceNode.bind( this );
+		this.selectBlock = this.selectBlock.bind( this );
 
 		this.tabScrollTop = { recent: 0, blocks: 0, embeds: 0 };
-	}
-
-	componentDidMount() {
-		document.addEventListener( 'keydown', this.onKeyDown, true );
-	}
-
-	componentWillUnmount() {
-		document.removeEventListener( 'keydown', this.onKeyDown, true );
+		this.switchTab = this.switchTab.bind( this );
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
 		const searchResults = this.searchBlocks( this.getBlockTypes() );
 		// Announce the blocks search results to screen readers.
-		if ( !! searchResults.length ) {
+		if ( this.state.filterValue && !! searchResults.length ) {
 			this.props.debouncedSpeak( sprintf( _n(
 				'%d result found',
 				'%d results found',
 				searchResults.length
 			), searchResults.length ), 'assertive' );
-		} else {
+		} else if ( this.state.filterValue ) {
 			this.props.debouncedSpeak( __( 'No results.' ), 'assertive' );
 		}
 
@@ -95,7 +107,6 @@ export class InserterMenu extends Component {
 			this.props.onSelect( name );
 			this.setState( {
 				filterValue: '',
-				currentFocus: null,
 			} );
 		};
 	}
@@ -109,12 +120,12 @@ export class InserterMenu extends Component {
 		return searchBlocks( blockTypes, this.state.filterValue );
 	}
 
-	getBlocksForCurrentTab() {
+	getBlocksForTab( tab ) {
 		// if we're searching, use everything, otherwise just get the blocks visible in this tab
 		if ( this.state.filterValue ) {
 			return this.getBlockTypes();
 		}
-		switch ( this.state.tab ) {
+		switch ( tab ) {
 			case 'recent':
 				return this.props.recentlyUsedBlocks;
 			case 'blocks':
@@ -148,180 +159,23 @@ export class InserterMenu extends Component {
 		)( blockTypes );
 	}
 
-	findByIncrement( blockTypes, increment = 1 ) {
-		const currentIndex = findIndex( blockTypes, ( blockType ) => this.state.currentFocus === blockType.name );
-		const highestIndex = blockTypes.length - 1;
-		const lowestIndex = 0;
-
-		let nextIndex = currentIndex;
-		let blockType;
-		do {
-			nextIndex += increment;
-			// Return the name of the next block type.
-			blockType = blockTypes[ nextIndex ];
-			if ( blockType && ! this.isDisabledBlock( blockType ) ) {
-				return blockType.name;
-			}
-		} while ( blockType );
-
-		if ( nextIndex > highestIndex ) {
-			return 'search';
-		}
-
-		if ( nextIndex < lowestIndex ) {
-			return 'search';
-		}
-	}
-
-	findNext( blockTypes ) {
-		/**
-		 * null is the initial state value and triggers start at beginning.
-		 */
-		if ( null === this.state.currentFocus ) {
-			return blockTypes[ 0 ].name;
-		}
-
-		return this.findByIncrement( blockTypes, 1 );
-	}
-
-	findPrevious( blockTypes ) {
-		/**
-		 * null is the initial state value and triggers start at beginning.
-		 */
-		if ( null === this.state.currentFocus ) {
-			return blockTypes[ 0 ].name;
-		}
-
-		return this.findByIncrement( blockTypes, -1 );
-	}
-
-	focusNext() {
-		const sortedByCategory = flow(
-			this.searchBlocks,
-			this.sortBlocks,
-		)( this.getBlocksForCurrentTab() );
-
-		// If the block list is empty return early.
-		if ( ! sortedByCategory.length ) {
-			return;
-		}
-
-		const nextBlock = this.findNext( sortedByCategory );
-		this.changeMenuSelection( nextBlock );
-	}
-
-	focusPrevious() {
-		const sortedByCategory = flow(
-			this.searchBlocks,
-			this.sortBlocks,
-		)( this.getBlocksForCurrentTab() );
-
-		// If the block list is empty return early.
-		if ( ! sortedByCategory.length ) {
-			return;
-		}
-
-		const nextBlock = this.findPrevious( sortedByCategory );
-		this.changeMenuSelection( nextBlock );
-	}
-
-	onKeyDown( keydown ) {
-		switch ( keydown.keyCode ) {
-			case TAB:
-				if ( keydown.shiftKey ) {
-					// Previous.
-					keydown.preventDefault();
-					this.focusPrevious( this );
-					break;
-				}
-				// Next.
-				keydown.preventDefault();
-				this.focusNext( this );
-				break;
-
-			case LEFT:
-				if ( this.state.currentFocus === 'search' ) {
-					return;
-				}
-				this.focusPrevious( this );
-				break;
-
-			case UP:
-				keydown.preventDefault();
-				this.focusPrevious( this );
-				break;
-
-			case RIGHT:
-				if ( this.state.currentFocus === 'search' ) {
-					return;
-				}
-				this.focusNext( this );
-				break;
-
-			case DOWN:
-				keydown.preventDefault();
-				this.focusNext( this );
-				break;
-
-			default:
-				return;
-		}
-
-		// Since unhandled key will return in the default case, we can assume
-		// having reached this point implies that the key is handled.
-		keydown.stopImmediatePropagation();
-	}
-
-	changeMenuSelection( refName ) {
-		this.setState( {
-			currentFocus: refName,
-		} );
-
-		// Focus the DOM node.
-		this.nodes[ refName ].focus();
-	}
-
-	setSearchFocus() {
-		this.changeMenuSelection( 'search' );
-	}
-
-	getBlockItem( block ) {
-		const disabled = this.isDisabledBlock( block );
-		return (
-			<button
-				role="menuitem"
-				key={ block.name }
-				className="editor-inserter__block"
-				onClick={ this.selectBlock( block.name ) }
-				ref={ this.bindReferenceNode( block.name ) }
-				tabIndex="-1"
-				onMouseEnter={ ! disabled ? this.props.showInsertionPoint : null }
-				onMouseLeave={ ! disabled ? this.props.hideInsertionPoint : null }
-				disabled={ disabled }
-			>
-				<BlockIcon icon={ block.icon } />
-				{ block.title }
-			</button>
-		);
-	}
-
-	renderBlocks( blocks, separatorSlug ) {
+	renderBlocks( blockTypes, separatorSlug ) {
 		const { instanceId } = this.props;
 		const labelledBy = separatorSlug === undefined ? null : `editor-inserter__separator-${ separatorSlug }-${ instanceId }`;
+		const blockTypesInfo = blockTypes.map( ( blockType ) => (
+			{ ...blockType, disabled: this.isDisabledBlock( blockType ) }
+		) );
 		return (
-			<div
-				className="editor-inserter__category-blocks"
-				tabIndex="0"
-				aria-labelledby={ labelledBy }
-			>
-				{ blocks.map( ( block ) => this.getBlockItem( block ) ) }
-			</div>
+			<InserterGroup blockTypes={ blockTypesInfo } labelledBy={ labelledBy }
+				bindReferenceNode={ this.bindReferenceNode }
+				selectBlock={ this.selectBlock }
+			/>
 		);
 	}
 
-	renderCategory( category, blocks ) {
+	renderCategory( category, blockTypes ) {
 		const { instanceId } = this.props;
-		return blocks && (
+		return blockTypes && (
 			<div key={ category.slug }>
 				<div
 					className="editor-inserter__separator"
@@ -330,7 +184,7 @@ export class InserterMenu extends Component {
 				>
 					{ category.title }
 				</div>
-				{ this.renderBlocks( blocks, category.slug ) }
+				{ this.renderBlocks( blockTypes, category.slug ) }
 			</div>
 		);
 	}
@@ -347,15 +201,39 @@ export class InserterMenu extends Component {
 		this.setState( { tab } );
 	}
 
+	renderTabView( tab, visibleBlocks ) {
+		switch ( tab ) {
+			case 'recent':
+				return this.renderBlocks( this.props.recentlyUsedBlocks, undefined );
+
+			case 'embed':
+				return this.renderBlocks( visibleBlocks.embed, undefined );
+
+			default:
+				return this.renderCategories( visibleBlocks, undefined );
+		}
+	}
+
+	interceptArrows( event ) {
+		if ( includes( ARROWS, event.keyCode ) ) {
+			// Prevent cases of focus being unexpectedly stolen up in the tree,
+			// notably when using VisualEditorSiblingInserter, where focus is
+			// moved to sibling blocks.
+			//
+			// We don't need to stop the native event, which has its uses, e.g.
+			// allowing window scrolling.
+			event.stopPropagation();
+		}
+	}
+
 	render() {
 		const { instanceId } = this.props;
-		const visibleBlocksByCategory = this.getVisibleBlocksByCategory( this.getBlocksForCurrentTab() );
 		const isSearching = this.state.filterValue;
-		const isShowingEmbeds = ! isSearching && 'embeds' === this.state.tab;
-		const isShowingRecent = ! isSearching && 'recent' === this.state.tab;
 
 		return (
-			<div className="editor-inserter__menu">
+			<TabbableContainer className="editor-inserter__menu" deep
+				onKeyDown={ this.interceptArrows }
+			>
 				<label htmlFor={ `editor-inserter__search-${ instanceId }` } className="screen-reader-text">
 					{ __( 'Search for a block' ) }
 				</label>
@@ -365,38 +243,50 @@ export class InserterMenu extends Component {
 					placeholder={ __( 'Search for a block' ) }
 					className="editor-inserter__search"
 					onChange={ this.filter }
-					onClick={ this.setSearchFocus }
 					ref={ this.bindReferenceNode( 'search' ) }
 				/>
 				{ ! isSearching &&
-					<div className="editor-inserter__tabs is-recent">
-						<button
-							className={ `editor-inserter__tab ${ this.state.tab === 'recent' ? 'is-active' : '' }` }
-							onClick={ () => this.switchTab( 'recent' ) }
-						>
-							{ __( 'Recent' ) }
-						</button>
-						<button
-							className={ `editor-inserter__tab ${ this.state.tab === 'blocks' ? 'is-active' : '' }` }
-							onClick={ () => this.switchTab( 'blocks' ) }
-						>
-							{ __( 'Blocks' ) }
-						</button>
-						<button
-							className={ `editor-inserter__tab ${ this.state.tab === 'embeds' ? 'is-active' : '' }` }
-							onClick={ () => this.switchTab( 'embeds' ) }
-						>
-							{ __( 'Embeds' ) }
-						</button>
+					<TabPanel className="editor-inserter__tabs" activeClass="is-active"
+						onSelect={ this.switchTab }
+						tabs={ [
+							{
+								name: 'recent',
+								title: __( 'Recent' ),
+								className: 'editor-inserter__tab',
+							},
+							{
+								name: 'blocks',
+								title: __( 'Blocks' ),
+								className: 'editor-inserter__tab',
+							},
+							{
+								name: 'embeds',
+								title: __( 'Embeds' ),
+								className: 'editor-inserter__tab',
+							},
+						] }
+					>
+						{
+							( tabKey ) => {
+								const blocksForTab = this.getBlocksForTab( tabKey );
+								const visibleBlocks = this.getVisibleBlocksByCategory( blocksForTab );
+
+								return (
+									<div ref={ ( ref ) => this.tabContainer = ref }
+										className="editor-inserter__content">
+										{ this.renderTabView( tabKey, visibleBlocks ) }
+									</div>
+								);
+							}
+						}
+					</TabPanel>
+				}
+				{ isSearching &&
+					<div role="menu" className="editor-inserter__content">
+						{ this.renderCategories( this.getVisibleBlocksByCategory( getBlockTypes() ) ) }
 					</div>
 				}
-				<div role="menu" className="editor-inserter__content"
-					ref={ ( ref ) => this.tabContainer = ref }>
-					{ isShowingRecent && this.renderBlocks( this.props.recentlyUsedBlocks ) }
-					{ isShowingEmbeds && this.renderBlocks( visibleBlocksByCategory.embed ) }
-					{ ! isShowingRecent && ! isShowingEmbeds && this.renderCategories( visibleBlocksByCategory ) }
-				</div>
-			</div>
+			</TabbableContainer>
 		);
 	}
 }
