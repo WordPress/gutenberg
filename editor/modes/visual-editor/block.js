@@ -16,14 +16,14 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import BlockMover from '../../components/block-mover';
+import BlockSettingsMenu from '../../components/block-settings-menu';
 import InvalidBlockWarning from './invalid-block-warning';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockDropZone from './block-drop-zone';
 import BlockHtml from './block-html';
 import BlockContextualToolbar from './block-contextual-toolbar';
-import BlockMover from '../../block-mover';
-import BlockSettingsMenu from '../../block-settings-menu';
 import BlockMultiControls from './multi-controls';
 import {
 	clearSelectedBlock,
