@@ -39,6 +39,14 @@ class Fill extends Component {
 		}
 	}
 
+	componentDidUpdate() {
+		const { getSlot = noop } = this.context;
+		const slot = getSlot( this.props.name );
+		if ( slot && ! slot.props.bubblesVirtually ) {
+			slot.forceUpdate();
+		}
+	}
+
 	render() {
 		const { getSlot = noop } = this.context;
 		const { name, children } = this.props;

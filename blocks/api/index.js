@@ -19,4 +19,5 @@ export {
 	getDefaultBlockName,
 	getBlockType,
 	getBlockTypes,
+	hasBlockSupport,
 } from './registration';

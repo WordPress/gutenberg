@@ -287,8 +287,10 @@ export default class Editable extends Component {
 		}
 	}
 
-	onChange() {
-		if ( ! this.editor.isDirty() ) {
+	onChange( shouldForce ) {
+		// Note that due to efficiency, speed and low cost requirements isDirty may
+		// not reflect reality for a brief period immediately after a change.
+		if ( ! shouldForce && ! this.editor.isDirty() ) {
 			return;
 		}
 
@@ -391,7 +393,7 @@ export default class Editable extends Component {
 			)
 		) {
 			const forward = event.keyCode === DELETE;
-			this.onChange();
+			this.onChange( true );
 			this.props.onMerge( forward );
 			event.preventDefault();
 			event.stopImmediatePropagation();

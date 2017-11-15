@@ -10,7 +10,7 @@ import { has, partial, reduce, size } from 'lodash';
  */
 import { Component, createElement } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
-import { getBlockType, getBlockDefaultClassname, createBlock } from '@wordpress/blocks';
+import { getBlockType, BlockEdit, getBlockDefaultClassname, createBlock } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -318,20 +318,7 @@ class VisualEditorBlock extends Component {
 		// translators: %s: Type of block (i.e. Text, Image etc)
 		const blockLabel = sprintf( __( 'Block: %s' ), blockType.title );
 		// The block as rendered in the editor is composed of general block UI
-		// (mover, toolbar, wrapper) and the display of the block content, which
-		// is referred to as <BlockEdit />.
-		let BlockEdit;
-		// `edit` and `save` are functions or components describing the markup
-		// with which a block is displayed. If `blockType` is valid, assign
-		// them preferencially as the render value for the block.
-		if ( blockType ) {
-			BlockEdit = blockType.edit || blockType.save;
-		}
-
-		// Should `BlockEdit` return as null, we have nothing to display for the block.
-		if ( ! BlockEdit ) {
-			return null;
-		}
+		// (mover, toolbar, wrapper) and the display of the block content.
 
 		// Generate the wrapper class names handling the different states of the block.
 		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected, focus } = this.props;
@@ -389,6 +376,7 @@ class VisualEditorBlock extends Component {
 					<BlockCrashBoundary onError={ this.onBlockError }>
 						{ isValid && mode === 'visual' && (
 							<BlockEdit
+								name={ blockName }
 								focus={ focus }
 								attributes={ block.attributes }
 								setAttributes={ this.setAttributes }

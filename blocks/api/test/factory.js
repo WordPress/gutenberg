@@ -57,30 +57,6 @@ describe( 'block factory', () => {
 			expect( typeof block.uid ).toBe( 'string' );
 		} );
 
-		it( 'should keep the anchor if the block supports it', () => {
-			registerBlockType( 'core/test-block', {
-				attributes: {
-					align: {
-						type: 'string',
-					},
-				},
-				save: noop,
-				category: 'common',
-				title: 'test block',
-				supportAnchor: true,
-			} );
-			const block = createBlock( 'core/test-block', {
-				align: 'left',
-				anchor: 'chicken',
-			} );
-
-			expect( block.attributes ).toEqual( {
-				anchor: 'chicken',
-				align: 'left',
-			} );
-			expect( block.isValid ).toBe( true );
-		} );
-
 		it( 'should keep the className if the block supports it', () => {
 			registerBlockType( 'core/test-block', {
 				attributes: {},
