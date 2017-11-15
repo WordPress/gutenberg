@@ -279,7 +279,8 @@ export default {
 	},
 	INITIALIZE_META_BOX_STATE( action ) {
 		// Hold jquery.ready until the metaboxes load
-		if ( some( action.metaBoxes ) ) {
+		const locations = [ 'normal', 'side' ];
+		if ( some( locations, ( location ) => !! action.metaBoxes[ location ] ) ) {
 			jQuery.holdReady( true );
 		}
 	},
