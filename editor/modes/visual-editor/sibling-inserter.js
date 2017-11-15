@@ -15,6 +15,7 @@ import { focus } from '@wordpress/utils';
  */
 import { Inserter } from '../../components';
 import {
+	getBlockUids,
 	getBlockInsertionPoint,
 	isBlockInsertionPointVisible,
 	isBlockWithinSelection,
@@ -126,12 +127,16 @@ class VisualEditorSiblingInserter extends Component {
 }
 
 export default connect(
-	( state, ownProps ) => {
+	( state, { uid } ) => {
+		const blockIndex = uid ? getBlockUids( state ).indexOf( uid ) : -1;
+		const insertIndex = blockIndex > -1 ? blockIndex + 1 : 0;
+
 		return {
-			shouldDisable: isBlockWithinSelection( state, ownProps.uid ),
+			shouldDisable: isBlockWithinSelection( state, uid ),
+			insertIndex,
 			showInsertionPoint: (
 				isBlockInsertionPointVisible( state ) &&
-				getBlockInsertionPoint( state ) === ownProps.insertIndex
+				getBlockInsertionPoint( state ) === insertIndex
 			),
 		};
 	}
