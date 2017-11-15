@@ -218,7 +218,7 @@ class VisualEditorBlockList extends Component {
 						onSelectionStart={ this.onSelectionStart }
 						onShiftSelection={ this.onShiftSelection }
 					/>,
-					<VisualEditorSiblingInserter
+					index < blocks.length - 1 && <VisualEditorSiblingInserter
 						key={ 'sibling-inserter-' + uid }
 						insertIndex={ index + 1 }
 					/>,
