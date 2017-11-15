@@ -17,6 +17,7 @@ import { Inserter } from '../../components';
 import {
 	getBlockInsertionPoint,
 	isBlockInsertionPointVisible,
+	isBlockWithinSelection,
 } from '../../selectors';
 
 class VisualEditorSiblingInserter extends Component {
@@ -87,6 +88,10 @@ class VisualEditorSiblingInserter extends Component {
 	}
 
 	render() {
+		if ( this.props.shouldDisable ) {
+			return null;
+		}
+
 		const { insertIndex, showInsertionPoint } = this.props;
 		const { isVisible } = this.state;
 
@@ -123,6 +128,7 @@ class VisualEditorSiblingInserter extends Component {
 export default connect(
 	( state, ownProps ) => {
 		return {
+			shouldDisable: isBlockWithinSelection( state, ownProps.uid ),
 			showInsertionPoint: (
 				isBlockInsertionPointVisible( state ) &&
 				getBlockInsertionPoint( state ) === ownProps.insertIndex
