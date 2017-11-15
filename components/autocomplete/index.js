@@ -315,11 +315,6 @@ export class Autocomplete extends Component {
 		const { open: wasOpen, suppress: wasSuppress } = this.state;
 		const { completers } = this.props;
 		const container = event.target;
-		// check that the event came from a contentEditable
-		// Note that the hasAttribute/getAttribute is because JsDOM does not support container.contentEditable
-		if ( ! container.hasAttribute( 'contentEditable' ) || container.getAttribute( 'contentEditable' ) === 'false' ) {
-			return;
-		}
 		// ensure that the cursor location is unambiguous
 		const cursor = this.getCursor( container );
 		if ( ! cursor ) {
