@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -9,7 +10,7 @@ import { connect } from 'react-redux';
 import { Component } from '@wordpress/element';
 import { getBlockType, InspectorControls } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
-import { PanelBody } from '@wordpress/components';
+import { PanelBody, Slot } from '@wordpress/components';
 
 /**
  * Internal Dependencies
@@ -30,25 +31,32 @@ class BlockInspectorAdvancedControls extends Component {
 	}
 
 	render() {
-		const { selectedBlock } = this.props;
-		const blockType = getBlockType( selectedBlock.name );
-		if ( false === blockType.className ) {
-			return null;
-		}
-
 		return (
-			<PanelBody
-				className="editor-advanced-controls"
-				initialOpen={ false }
-				title={ __( 'Advanced' ) }
-			>
-				{ false !== blockType.className &&
-					<InspectorControls.TextControl
-						label={ __( 'Additional CSS Class' ) }
-						value={ selectedBlock.attributes.className || '' }
-						onChange={ this.setClassName } />
-				}
-			</PanelBody>
+			<Slot
+				name="Inspector.AdvancedControls"
+				renderFills={ ( fills ) => {
+					const { selectedBlock } = this.props;
+					const blockType = getBlockType( selectedBlock.name );
+					if ( false === blockType.className && isEmpty( fills ) ) {
+						return null;
+					}
+
+					return (
+						<PanelBody
+							className="editor-advanced-controls"
+							initialOpen={ false }
+							title={ __( 'Advanced' ) }
+						>
+							{ false !== blockType.className &&
+							<InspectorControls.TextControl
+								label={ __( 'Additional CSS Class' ) }
+								value={ selectedBlock.attributes.className || '' }
+								onChange={ this.setClassName } />
+							}
+							{ fills }
+						</PanelBody>
+					);
+				} } />
 		);
 	}
 }

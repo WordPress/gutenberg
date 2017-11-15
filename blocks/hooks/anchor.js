@@ -55,7 +55,7 @@ export function addInspectorControl( element, props ) {
 	if ( hasBlockSupport( props.name, 'anchor' ) && props.focus ) {
 		element = [
 			cloneElement( element, { key: 'edit' } ),
-			<InspectorControls key="inspector">
+			<InspectorControls.Advanced key="inspector">
 				<InspectorControls.TextControl
 					label={ __( 'HTML Anchor' ) }
 					help={ __( 'Anchors lets you link directly to a section on a page.' ) }
@@ -67,7 +67,7 @@ export function addInspectorControl( element, props ) {
 							anchor: nextValue,
 						} );
 					} } />
-			</InspectorControls>,
+			</InspectorControls.Advanced>,
 		];
 	}
 
