@@ -287,16 +287,18 @@ export default class Editable extends Component {
 		}
 	}
 
-	onChange( shouldForce ) {
-		// Note that due to efficiency, speed and low cost requirements isDirty may
-		// not reflect reality for a brief period immediately after a change.
-		if ( ! shouldForce && ! this.editor.isDirty() ) {
-			return;
-		}
-
+	fireChange() {
 		this.savedContent = this.getContent();
 		this.editor.save();
 		this.props.onChange( this.savedContent );
+	}
+
+	onChange() {
+		// Note that due to efficiency, speed and low cost requirements isDirty may
+		// not reflect reality for a brief period immediately after a change.
+		if ( this.editor.isDirty() ) {
+			this.fireChange();
+		}
 	}
 
 	getEditorSelectionRect() {
@@ -393,7 +395,7 @@ export default class Editable extends Component {
 			)
 		) {
 			const forward = event.keyCode === DELETE;
-			this.onChange( true );
+			this.fireChange();
 			this.props.onMerge( forward );
 			event.preventDefault();
 			event.stopImmediatePropagation();
