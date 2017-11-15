@@ -119,19 +119,15 @@ export function registerBlockType( name, settings ) {
 		settings.icon = 'block-default';
 	}
 
-	const attributes = settings.attributes ?
-		settings.attributes :
-		get( window._wpBlocksAttributes, name, {} );
-
-	let block = blocks[ name ] = {
-		...settings,
+	settings = {
 		name,
-		attributes,
+		attributes: get( window._wpBlocksAttributes, name, {} ),
+		...settings,
 	};
 
-	block = applyFilters( 'registerBlockType', block, name );
+	settings = applyFilters( 'registerBlockType', settings, name );
 
-	return blocks[ name ] = block;
+	return blocks[ name ] = settings;
 }
 
 /**
