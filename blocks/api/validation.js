@@ -267,15 +267,25 @@ export function isEqualTagAttributePairs( a, b ) {
 
 		const aValue = aAttributes[ name ];
 		const bValue = bAttributes[ name ];
+		let attributesAreEqual = true;
 
 		const isEqualAttributes = isEqualAttributesOfName[ name ];
 		if ( isEqualAttributes ) {
 			// Defer custom attribute equality handling
-			if ( ! isEqualAttributes( aValue, bValue ) ) {
-				return false;
-			}
-		} else if ( aValue !== bValue ) {
+			attributesAreEqual = isEqualAttributes( aValue, bValue );
+		} else if (
+			! isNaN( parseFloat( aValue ) ) &&
+			! isNaN( parseFloat( bValue ) )
+		) {
+			// Float values should be compared using the rounded values,
+			// PHP and JavaScript serializing  have different precisions
+			attributesAreEqual = Number( aValue ).toFixed( 10 ) === Number( bValue ).toFixed( 10 );
+		} else {
 			// Otherwise strict inequality should bail
+			attributesAreEqual = aValue === bValue;
+		}
+
+		if ( ! attributesAreEqual ) {
 			return false;
 		}
 	}

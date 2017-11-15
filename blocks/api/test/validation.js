@@ -218,6 +218,32 @@ describe( 'validation', () => {
 
 			expect( isEqual ).toBe( true );
 		} );
+
+		it( 'returns true if equal float values', () => {
+			const isEqual = isEqualTagAttributePairs(
+				[
+					[ 'height', '1.012345678910' ],
+				],
+				[
+					[ 'height', '1.01234567891011' ],
+				]
+			);
+
+			expect( isEqual ).toBe( true );
+		} );
+
+		it( 'returns false for different float values', () => {
+			const isEqual = isEqualTagAttributePairs(
+				[
+					[ 'height', '1.0123' ],
+				],
+				[
+					[ 'height', '1.0124' ],
+				]
+			);
+
+			expect( isEqual ).toBe( false );
+		} );
 	} );
 
 	describe( 'isEqualTokensOfType', () => {
