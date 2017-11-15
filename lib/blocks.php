@@ -220,7 +220,15 @@ function gutenberg_wpautop_block_content( $content ) {
  */
 function gutenberg_wpautop_insert_post_data( $data ) {
 	if ( ! empty( $data['post_content'] ) && gutenberg_content_has_blocks( $data['post_content'] ) ) {
-		$data['post_content'] = gutenberg_wpautop_block_content( $data['post_content'] );
+		// WP_REST_Posts_Controller slashes post data before inserting/updating
+		// a post. This data gets unslashed by `wp_insert_post` right before
+		// saving to the DB. The PEG parser needs unslashed input in order to
+		// properly parse JSON attributes.
+		$content = wp_unslash( $data['post_content'] );
+		$content = gutenberg_wpautop_block_content( $content );
+		$content = wp_slash( $content );
+
+		$data['post_content'] = $content;
 	}
 
 	return $data;

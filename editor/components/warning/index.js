@@ -3,13 +3,18 @@
  */
 import { Dashicon } from '@wordpress/components';
 
-function BlockWarning( { children } ) {
+/**
+ * Internal dependencies
+ */
+import './style.scss';
+
+function Warning( { children } ) {
 	return (
-		<div className="editor-visual-editor__block-warning">
+		<div className="editor-warning">
 			<Dashicon icon="warning" />
 			{ children }
 		</div>
 	);
 }
 
-export default BlockWarning;
+export default Warning;

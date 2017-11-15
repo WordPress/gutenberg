@@ -29,7 +29,9 @@ registerBlockType( 'core/heading', {
 
 	className: false,
 
-	supportAnchor: true,
+	supports: {
+		anchor: true,
+	},
 
 	attributes: {
 		content: {

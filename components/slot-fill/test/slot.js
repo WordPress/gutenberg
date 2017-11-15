@@ -10,6 +10,27 @@ import Slot from '../slot';
 import Fill from '../fill';
 import Provider from '../provider';
 
+/**
+ * WordPress Dependencies
+ */
+import { Component } from '@wordpress/element';
+
+class Filler extends Component {
+	constructor() {
+		super( ...arguments );
+
+		this.state = {
+			num: 1,
+		};
+	}
+	render() {
+		return [
+			<button key="1" type="button" onClick={ () => this.setState( { num: this.state.num + 1 } ) } />,
+			<Fill name={ this.props.name } key="2">{ this.state.num.toString() }</Fill>,
+		];
+	}
+}
+
 describe( 'Slot', () => {
 	it( 'should render empty Fills', () => {
 		const element = mount(
@@ -59,5 +80,20 @@ describe( 'Slot', () => {
 		);
 
 		expect( element.find( 'Slot > div' ).html() ).toBe( '<div><span></span><div></div>text</div>' );
+	} );
+
+	it( 'should re-render Slot when not bubbling virtually', () => {
+		const element = mount(
+			<Provider>
+				<Slot name="egg" />
+				<Filler name="egg" />
+			</Provider>
+		);
+
+		expect( element.find( 'Slot > div' ).html() ).toBe( '<div>1</div>' );
+
+		element.find( 'button' ).simulate( 'click' );
+
+		expect( element.find( 'Slot > div' ).html() ).toBe( '<div>2</div>' );
 	} );
 } );

@@ -12,6 +12,7 @@
   ],
   "dependencies": {
     "@wordpress/a11y": "0.1.0-beta.1",
+    "@wordpress/hooks": "0.1.0-beta.5",
     "@wordpress/url": "0.1.0-beta.1",
     "classnames": "2.2.5",
     "clipboard": "1.7.1",
@@ -44,6 +45,7 @@
     "rememo": "2.3.3",
     "showdown": "1.7.4",
     "simple-html-tokenizer": "0.4.1",
+    "tinycolor2": "1.4.1",
     "uuid": "3.1.0"
   },
   "devDependencies": {

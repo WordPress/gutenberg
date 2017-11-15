@@ -601,7 +601,6 @@ export function notices( state = [], action ) {
 }
 
 const locations = [
-	'advanced',
 	'normal',
 	'side',
 ];
@@ -622,10 +621,21 @@ export function metaBoxes( state = defaultMetaBoxState, action ) {
 			return locations.reduce( ( newState, location ) => {
 				newState[ location ] = {
 					...state[ location ],
+					isLoaded: false,
 					isActive: action.metaBoxes[ location ],
 				};
 				return newState;
 			}, { ...state } );
+		case 'META_BOX_LOADED':
+			return {
+				...state,
+				[ action.location ]: {
+					...state[ action.location ],
+					isLoaded: true,
+					isUpdating: false,
+					isDirty: false,
+				},
+			};
 		case 'HANDLE_META_BOX_RELOAD':
 			return {
 				...state,
