@@ -61,7 +61,6 @@ class FormatToolbar extends Component {
 		this.onChangeLinkValue = this.onChangeLinkValue.bind( this );
 		this.toggleLinkSettingsVisibility = this.toggleLinkSettingsVisibility.bind( this );
 		this.setLinkTarget = this.setLinkTarget.bind( this );
-		this.stopMousePropagation = this.stopMousePropagation.bind( this );
 	}
 
 	componentDidMount() {
