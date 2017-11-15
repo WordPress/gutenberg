@@ -11,6 +11,7 @@ import { get, partial, reduce, size } from 'lodash';
 import { Component, createElement } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
 import { getBlockType, BlockEdit, getBlockDefaultClassname, createBlock, hasBlockSupport } from '@wordpress/blocks';
+import { withFilters } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -438,7 +439,7 @@ class BlockListBlock extends Component {
 	}
 }
 
-export default connect(
+export default withFilters( 'VisualEditorBlock' )( connect(
 	( state, ownProps ) => {
 		return {
 			previousBlock: getPreviousBlock( state, ownProps.uid ),
@@ -514,4 +515,4 @@ export default connect(
 			dispatch( editPost( { meta } ) );
 		},
 	} )
-)( BlockListBlock );
+) )( BlockListBlock );
