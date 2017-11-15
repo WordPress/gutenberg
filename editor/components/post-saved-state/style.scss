@@ -9,7 +9,7 @@
 		margin-left: -4px;
 	}
 
-	&.button-link {
+	.wp-core-ui &.button-link {
 		text-decoration: underline;
 		color: $blue-wordpress;
 		margin-right: $item-spacing;	// needs specificity to override core CSS bleed
