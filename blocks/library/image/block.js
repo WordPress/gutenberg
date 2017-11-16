@@ -249,8 +249,8 @@ class ImageBlock extends Component {
 								enable={ { top: false, right: true, bottom: false, left: false, topRight: true, bottomRight: true, bottomLeft: true, topLeft: true } }
 								onResizeStop={ ( event, direction, elt, delta ) => {
 									setAttributes( {
-										width: currentWidth + delta.width,
-										height: currentHeight + delta.height,
+										width: parseInt( currentWidth + delta.width, 10 ),
+										height: parseInt( currentHeight + delta.height, 10 ),
 									} );
 								} }
 							>

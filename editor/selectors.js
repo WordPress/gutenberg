@@ -749,6 +749,26 @@ export function isBlockSelected( state, uid ) {
 }
 
 /**
+ * Returns true if the block corresponding to the specified unique ID is
+ * currently selected but isn't the last of the selected blocks. Here "last"
+ * refers to the block sequence in the document, _not_ the sequence of
+ * multi-selection, which is why `state.blockSelection.end` isn't used.
+ *
+ * @param  {Object} state Global application state
+ * @param  {String} uid   Block unique ID
+ * @return {Boolean}      Whether block is selected and not the last in the selection
+ */
+export function isBlockWithinSelection( state, uid ) {
+	if ( ! uid ) {
+		return false;
+	}
+
+	const uids = getMultiSelectedBlockUids( state );
+	const index = uids.indexOf( uid );
+	return index > -1 && index < uids.length - 1;
+}
+
+/**
  * Returns true if the cursor is hovering the block corresponding to the
  * specified unique ID, or false otherwise.
  *

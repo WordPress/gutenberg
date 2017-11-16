@@ -259,11 +259,42 @@ export default class Editable extends Component {
 		window.console.log( 'Received HTML:\n\n', this.pastedContent || event.content );
 		window.console.log( 'Received plain text:\n\n', this.pastedPlainText );
 
+		// There is a selection, check if a link is pasted.
+		if ( ! this.editor.selection.isCollapsed() ) {
+			const linkRegExp = /^(?:https?:)?\/\/\S+$/i;
+			const pastedText = event.content.replace( /<[^>]+>/g, '' ).trim();
+			const selectedText = this.editor.selection.getContent().replace( /<[^>]+>/g, '' ).trim();
+
+			// The pasted text is a link, and the selected text is not.
+			if ( linkRegExp.test( pastedText ) && ! linkRegExp.test( selectedText ) ) {
+				this.editor.execCommand( 'mceInsertLink', false, {
+					href: this.editor.dom.decode( pastedText ),
+				} );
+
+				// Allows us to ask for this information when we get a report.
+				window.console.log( 'Created link:\n\n', pastedText );
+
+				event.preventDefault();
+
+				return;
+			}
+		}
+
+		const rootNode = this.editor.getBody();
+		const isEmpty = this.editor.dom.isEmpty( rootNode );
+
+		let mode = 'INLINE';
+
+		if ( isEmpty && this.props.onReplace ) {
+			mode = 'BLOCKS';
+		} else if ( this.props.onSplit ) {
+			mode = 'AUTO';
+		}
+
 		const content = rawHandler( {
 			HTML: this.pastedContent || event.content,
 			plainText: this.pastedPlainText,
-			// Force inline paste if there's no `onSplit` prop.
-			mode: this.props.onSplit ? 'AUTO' : 'INLINE',
+			mode,
 		} );
 
 		if ( typeof content === 'string' ) {
@@ -277,9 +308,7 @@ export default class Editable extends Component {
 				return;
 			}
 
-			const rootNode = this.editor.getBody();
-
-			if ( this.editor.dom.isEmpty( rootNode ) && this.props.onReplace ) {
+			if ( isEmpty && this.props.onReplace ) {
 				this.props.onReplace( content );
 			} else {
 				this.splitContent( content );

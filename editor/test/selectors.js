@@ -53,6 +53,7 @@ import {
 	getPreviousBlock,
 	getNextBlock,
 	isBlockSelected,
+	isBlockWithinSelection,
 	isBlockMultiSelected,
 	isFirstMultiSelectedBlock,
 	isBlockHovered,
@@ -1545,6 +1546,60 @@ describe( 'selectors', () => {
 			};
 
 			expect( isBlockSelected( state, 23 ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isBlockWithinSelection', () => {
+		it( 'should return true if the block is selected but not the last', () => {
+			const state = {
+				blockSelection: { start: 5, end: 3 },
+				editor: {
+					present: {
+						blockOrder: [ 5, 4, 3, 2, 1 ],
+					},
+				},
+			};
+
+			expect( isBlockWithinSelection( state, 4 ) ).toBe( true );
+		} );
+
+		it( 'should return false if the block is the last selected', () => {
+			const state = {
+				blockSelection: { start: 5, end: 3 },
+				editor: {
+					present: {
+						blockOrder: [ 5, 4, 3, 2, 1 ],
+					},
+				},
+			};
+
+			expect( isBlockWithinSelection( state, 3 ) ).toBe( false );
+		} );
+
+		it( 'should return false if the block is not selected', () => {
+			const state = {
+				blockSelection: { start: 5, end: 3 },
+				editor: {
+					present: {
+						blockOrder: [ 5, 4, 3, 2, 1 ],
+					},
+				},
+			};
+
+			expect( isBlockWithinSelection( state, 2 ) ).toBe( false );
+		} );
+
+		it( 'should return false if there is no selection', () => {
+			const state = {
+				blockSelection: {},
+				editor: {
+					present: {
+						blockOrder: [ 5, 4, 3, 2, 1 ],
+					},
+				},
+			};
+
+			expect( isBlockWithinSelection( state, 4 ) ).toBe( false );
 		} );
 	} );
 

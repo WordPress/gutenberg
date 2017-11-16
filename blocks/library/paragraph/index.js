@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import { concatChildren } from '@wordpress/element';
-import { Autocomplete, PanelBody } from '@wordpress/components';
+import { Autocomplete, PanelBody, PanelColor } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -131,18 +131,18 @@ registerBlockType( 'core/paragraph', {
 							allowReset
 						/>
 					</PanelBody>
-					<PanelBody title={ __( 'Background Color' ) }>
+					<PanelColor title={ __( 'Background Color' ) } colorValue={ backgroundColor } initialOpen={ false }>
 						<ColorPalette
 							value={ backgroundColor }
 							onChange={ ( colorValue ) => setAttributes( { backgroundColor: colorValue } ) }
 						/>
-					</PanelBody>
-					<PanelBody title={ __( 'Text Color' ) }>
+					</PanelColor>
+					<PanelColor title={ __( 'Text Color' ) } colorValue={ textColor } initialOpen={ false }>
 						<ColorPalette
 							value={ textColor }
 							onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
 						/>
-					</PanelBody>
+					</PanelColor>
 					<PanelBody title={ __( 'Block Alignment' ) }>
 						<BlockAlignmentToolbar
 							value={ width }
