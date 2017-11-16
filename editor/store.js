@@ -12,7 +12,7 @@ import { flowRight } from 'lodash';
 import effects from './effects';
 import reducer from './reducer';
 import storePersist from './store-persist';
-import { STORE_DEFAULTS } from './store-defaults';
+import { PREFERENCES_DEFAULTS } from './store-defaults';
 
 /**
  * Module constants
@@ -31,7 +31,7 @@ function createReduxStore( preloadedState ) {
 		storePersist( {
 			reducerKey: 'preferences',
 			storageKey: GUTENBERG_PREFERENCES_KEY,
-			defaults: STORE_DEFAULTS.preferences,
+			defaults: PREFERENCES_DEFAULTS,
 		} ),
 	];
 

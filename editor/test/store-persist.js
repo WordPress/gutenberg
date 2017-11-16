@@ -46,10 +46,8 @@ describe( 'persistStore', () => {
 	} );
 
 	it( 'should apply defaults to any missing properties on previously stored objects', () => {
-		const defaults = {
-			preferences: {
-				counter: 41,
-			},
+		const defaultsPreferences = {
+			counter: 41,
 		};
 		const storageKey = 'dumbStorageKey3';
 		const reducer = ( state, action ) => {
@@ -69,7 +67,7 @@ describe( 'persistStore', () => {
 		const store = createStore( reducer, persistStore( {
 			reducerKey: 'preferences',
 			storageKey,
-			defaults: defaults.preferences,
+			defaults: defaultsPreferences,
 		} ) );
 		store.dispatch( { type: 'INCREMENT' } );
 
@@ -79,10 +77,8 @@ describe( 'persistStore', () => {
 	} );
 
 	it( 'should not override stored values with defaults', () => {
-		const defaults = {
-			preferences: {
-				counter: 41,
-			},
+		const defaultsPreferences = {
+			counter: 41,
 		};
 		const storageKey = 'dumbStorageKey4';
 		const reducer = ( state, action ) => {
@@ -101,7 +97,7 @@ describe( 'persistStore', () => {
 		const store = createStore( reducer, persistStore( {
 			reducerKey: 'preferences',
 			storageKey,
-			defaults: defaults.preferences,
+			defaults: defaultsPreferences,
 		} ) );
 		store.dispatch( { type: 'INCREMENT' } );
 
