@@ -14,12 +14,12 @@ import { Notice } from '@wordpress/components';
  */
 import './style.scss';
 
-function ContrastChecker( { backgroundColor, textColor, isLargeText } ) {
-	if ( ! backgroundColor || ! textColor ) {
+function ContrastChecker( { backgroundColor, textColor, isLargeText, fallbackBackgroundColor, fallbackTextColor } ) {
+	if ( ! ( backgroundColor || fallbackBackgroundColor ) || ! ( textColor || fallbackTextColor ) ) {
 		return null;
 	}
-	const tinyBackgroundColor = tinycolor( backgroundColor );
-	const tinyTextColor = tinycolor( textColor );
+	const tinyBackgroundColor = tinycolor( backgroundColor || fallbackBackgroundColor );
+	const tinyTextColor = tinycolor( textColor || fallbackTextColor );
 	if ( tinycolor.isReadable(
 		tinyBackgroundColor,
 		tinyTextColor,

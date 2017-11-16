@@ -12,7 +12,7 @@ export default ( mapNodeToProps ) => ( WrappedComponent ) => {
 	return class extends Component {
 		constructor() {
 			super( ...arguments );
-			this.nodeRef = null;
+			this.nodeRef = this.props.node;
 			this.state = {
 				fallbackStyles: undefined,
 				grabStylesCompleted: false,
@@ -50,11 +50,8 @@ export default ( mapNodeToProps ) => ( WrappedComponent ) => {
 		}
 
 		render() {
-			return (
-				<div ref={ this.bindRef }>
-					<WrappedComponent { ...this.props } { ...this.state.fallbackStyles } />
-				</div>
-			);
+			const wrappedComponent = <WrappedComponent { ...this.props } { ...this.state.fallbackStyles } />;
+			return this.props.node ? wrappedComponent : <div ref={ this.bindRef }> { wrappedComponent } </div>;
 		}
 	};
 };
