@@ -12,11 +12,6 @@
 	}
 }
 
-.editor-visual-editor {
-	margin-left: auto;
-	margin-right: auto;
-}
-
 .editor-visual-editor__block {
 	margin-left: auto;
 	margin-right: auto;
@@ -565,4 +560,24 @@ $sticky-bottom-offset: 20px;
 	// prevent collapsing margins between block and toolbar, matches the 20px bottom offset		 +		display: flex;
 	margin-top: - $sticky-bottom-offset - 1px;
 	padding-top: 2px;
+}
+
+.editor-visual-editor .editor-post-title {
+	margin-left: auto;
+	margin-right: auto;
+	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );
+
+	.editor-post-permalink {
+		left: $block-padding;
+		right: $block-padding;
+	}
+
+	@include break-small() {
+		padding: 5px ( $block-mover-padding-visible );
+
+		.editor-post-permalink {
+			left: $block-mover-padding-visible;
+			right: $block-mover-padding-visible;
+		}
+	}
 }

@@ -17,9 +17,9 @@ import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
  * Internal dependencies
  */
 import './style.scss';
-import { getEditedPostTitle } from '../selectors';
-import { insertBlock, editPost, clearSelectedBlock } from '../actions';
 import PostPermalink from '../post-permalink';
+import { getEditedPostTitle } from '../../selectors';
+import { insertBlock, editPost, clearSelectedBlock } from '../../actions';
 
 /**
  * Constants
