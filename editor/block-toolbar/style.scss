@@ -2,6 +2,7 @@
 	display: inline-flex;
 	overflow: auto; // allow horizontal scrolling on mobile
 	flex-grow: 1;
+	width: 100%;
 
 	.components-toolbar {
 		border: none;
@@ -16,14 +17,15 @@
 
 .editor-block-toolbar .editor-block-switcher {
 	display: inline-flex;
+	border-left: 1px solid $light-gray-500;
 }
 
 .editor-block-toolbar__mobile-tools {
-	align-items: baseline;
+	align-items: stretch;
 	display: flex;
 	justify-content: space-between;
 	flex-direction: row-reverse;
-	width: 100%;
+	flex-grow: 1;
 
 	&.components-toolbar {
 		margin-right: 0;
@@ -37,6 +39,8 @@
 		display: inline-flex;
 		height: auto;
 		position: initial;
+		padding: 0 5px;
+		align-items: stretch;
 	}
 }
 
@@ -47,6 +51,7 @@
 		margin: 0 5px 0 0;
 		padding: 0 5px;
 		width: auto;
+		height: auto;
 
 		.dashicon {
 			margin: 0;

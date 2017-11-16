@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { createElement, Component, cloneElement, Children } from 'react';
-import { render, findDOMNode, createPortal } from 'react-dom';
+import { render, findDOMNode, createPortal, unmountComponentAtNode } from 'react-dom';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { isString } from 'lodash';
 
@@ -26,6 +26,13 @@ export { createElement };
  * @param {Element}   target  DOM node into which element should be rendered
  */
 export { render };
+
+/**
+ * Removes any mounted element from the target DOM node.
+ *
+ * @param {Element} target DOM node in which element is to be removed
+ */
+export { unmountComponentAtNode };
 
 /**
  * A base class to create WordPress Components (Refs, state and lifecycle hooks)

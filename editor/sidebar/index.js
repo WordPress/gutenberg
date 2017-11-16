@@ -14,17 +14,22 @@ import { withFocusReturn } from '@wordpress/components';
  */
 import './style.scss';
 import PostSettings from './post-settings';
-import BlockInspector from './block-inspector';
+import BlockInspectorPanel from './block-inspector-panel';
 import Header from './header';
 
 import { getActivePanel } from '../selectors';
 
 const Sidebar = ( { panel } ) => {
 	return (
-		<div className="editor-sidebar" role="region" aria-label={ __( 'Editor settings' ) }>
+		<div
+			className="editor-sidebar"
+			role="region"
+			aria-label={ __( 'Editor settings' ) }
+			tabIndex="-1"
+		>
 			<Header />
-			{ panel === 'document' && <PostSettings key="settings" /> }
-			{ panel === 'block' && <BlockInspector /> }
+			{ panel === 'document' && <PostSettings /> }
+			{ panel === 'block' && <BlockInspectorPanel /> }
 		</div>
 	);
 };

@@ -38,7 +38,7 @@ class REST_Reusable_Blocks_Controller_Test extends WP_Test_REST_Controller_Testc
 	 */
 	public static function wpSetUpBeforeClass( $factory ) {
 		self::$reusable_block_post_id = wp_insert_post( array(
-			'post_type'    => 'gb_reusable_block',
+			'post_type'    => 'wp_block',
 			'post_status'  => 'publish',
 			'post_name'    => '2d66a5c5-776c-43b1-98c7-49521cef8ea6',
 			'post_title'   => 'My cool block',

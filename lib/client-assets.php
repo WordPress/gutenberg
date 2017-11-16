@@ -135,7 +135,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-blocks',
 		gutenberg_url( 'blocks/build/index.js' ),
-		array( 'wp-element', 'wp-components', 'wp-utils', 'wp-i18n', 'tinymce-latest', 'tinymce-latest-lists', 'tinymce-latest-paste', 'tinymce-latest-table', 'media-views', 'media-models' ),
+		array( 'wp-element', 'wp-components', 'wp-utils', 'wp-i18n', 'tinymce-latest', 'tinymce-latest-lists', 'tinymce-latest-paste', 'tinymce-latest-table', 'media-views', 'media-models', 'shortcode' ),
 		filemtime( gutenberg_dir_path() . 'blocks/build/index.js' )
 	);
 	wp_add_inline_script(
@@ -241,7 +241,7 @@ function gutenberg_register_vendor_scripts() {
 		'https://unpkg.com/moment@2.18.1/' . $moment_script,
 		array( 'react' )
 	);
-	$tinymce_version = '4.7.1';
+	$tinymce_version = '4.7.2';
 	gutenberg_register_vendor_script(
 		'tinymce-latest',
 		'https://fiddle.azurewebsites.net/tinymce/' . $tinymce_version . '/tinymce' . $suffix . '.js'
@@ -276,7 +276,7 @@ function gutenberg_register_vendor_scripts() {
 	// See: gutenberg_ensure_wp_api_request (compat.php).
 	gutenberg_register_vendor_script(
 		'wp-api-request-shim',
-		'https://raw.githubusercontent.com/WordPress/wordpress-develop/master/src/wp-includes/js/api-request.js'
+		'https://rawgit.com/WordPress/wordpress-develop/master/src/wp-includes/js/api-request.js'
 	);
 }
 
@@ -462,12 +462,6 @@ function gutenberg_extend_wp_api_backbone_client() {
 				return model.prototype.route && route === model.prototype.route.index;
 			} );
 		};
-		wp.api.getPostTypeRevisionsCollection = function( postType ) {
-			var route = '/' + wpApiSettings.versionString + this.postTypeRestBaseMapping[ postType ] + '/(?P<parent>[\\\\d]+)/revisions';
-			return _.find( wp.api.collections, function( model ) {
-				return model.prototype.route && route === model.prototype.route.index;
-			} );
-		};
 		wp.api.getTaxonomyModel = function( taxonomy ) {
 			var route = '/' + wpApiSettings.versionString + this.taxonomyRestBaseMapping[ taxonomy ] + '/(?P<id>[\\\\d]+)';
 			return _.find( wp.api.models, function( model ) {
@@ -609,7 +603,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	wp_enqueue_script(
 		'wp-editor',
 		gutenberg_url( 'editor/build/index.js' ),
-		array( 'wp-api', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element', 'wp-components', 'wp-utils', 'word-count', 'editor', 'heartbeat' ),
+		array( 'jquery', 'wp-api', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element', 'wp-components', 'wp-utils', 'word-count', 'editor', 'heartbeat' ),
 		filemtime( gutenberg_dir_path() . 'editor/build/index.js' ),
 		true // enqueue in the footer.
 	);
@@ -688,6 +682,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	}
 
 	// Set initial title to empty string for auto draft for duration of edit.
+	// Otherwise, title defaults to and displays as "Auto Draft".
 	$is_new_post = 'auto-draft' === $post_to_edit['status'];
 	if ( $is_new_post ) {
 		$post_to_edit['title'] = array(
@@ -696,16 +691,18 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		);
 	}
 
+	// Set initial content to apply autop on unknown blocks, preserving this
+	// behavior for classic content while otherwise disabling for blocks.
+	if ( ! $is_new_post && is_array( $post_to_edit['content'] ) ) {
+		$post_to_edit['content']['raw'] = gutenberg_wpautop_block_content( $post_to_edit['content']['raw'] );
+	}
+
 	// Preload common data.
 	$preload_paths = array(
 		'/wp/v2/users/me?context=edit',
 		'/wp/v2/taxonomies?context=edit',
 		gutenberg_get_rest_link( $post_to_edit, 'about', 'edit' ),
 	);
-
-	if ( ! $is_new_post ) {
-		$preload_paths[] = gutenberg_get_rest_link( $post_to_edit, 'version-history' );
-	}
 
 	$preload_data = array_reduce(
 		$preload_paths,

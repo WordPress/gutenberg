@@ -6,10 +6,14 @@ import {
 	findLast,
 	flatMap,
 	invert,
+	isEqual,
 	mapValues,
 	noop,
+	sortBy,
 	throttle,
 } from 'lodash';
+import scrollIntoView from 'dom-scroll-into-view';
+import 'element-closest';
 
 /**
  * WordPress dependencies
@@ -39,7 +43,6 @@ class VisualEditorBlockList extends Component {
 		super( props );
 
 		this.onSelectionStart = this.onSelectionStart.bind( this );
-		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.onSelectionEnd = this.onSelectionEnd.bind( this );
 		this.onShiftSelection = this.onShiftSelection.bind( this );
 		this.onCopy = this.onCopy.bind( this );
@@ -53,7 +56,7 @@ class VisualEditorBlockList extends Component {
 		this.onScroll = () => this.onPointerMove( { clientY: this.lastClientY } );
 
 		this.lastClientY = 0;
-		this.refs = {};
+		this.nodes = {};
 	}
 
 	componentDidMount() {
@@ -68,23 +71,38 @@ class VisualEditorBlockList extends Component {
 		window.removeEventListener( 'mousemove', this.setLastClientY );
 	}
 
+	componentWillReceiveProps( nextProps ) {
+		if ( isEqual( this.props.multiSelectedBlockUids, nextProps.multiSelectedBlockUids ) ) {
+			return;
+		}
+
+		if ( nextProps.multiSelectedBlockUids && nextProps.multiSelectedBlockUids.length > 0 ) {
+			const extent = this.nodes[ nextProps.selectionEnd ];
+			if ( extent ) {
+				scrollIntoView( extent, extent.closest( '.editor-layout__content' ), {
+					onlyScrollIfNeeded: true,
+				} );
+			}
+		}
+	}
+
 	setLastClientY( { clientY } ) {
 		this.lastClientY = clientY;
 	}
 
-	setBlockRef( ref, uid ) {
-		if ( ref === null ) {
-			delete this.refs[ uid ];
+	setBlockRef( node, uid ) {
+		if ( node === null ) {
+			delete this.nodes[ uid ];
 		} else {
-			this.refs = {
-				...this.refs,
-				[ uid ]: ref,
+			this.nodes = {
+				...this.nodes,
+				[ uid ]: node,
 			};
 		}
 	}
 
 	onPointerMove( { clientY } ) {
-		const boundaries = this.refs[ this.selectionAtStart ].getBoundingClientRect();
+		const boundaries = this.nodes[ this.selectionAtStart ].getBoundingClientRect();
 		const y = clientY - boundaries.top;
 		const key = findLast( this.coordMapKeys, ( coordY ) => coordY < y );
 
@@ -114,17 +132,18 @@ class VisualEditorBlockList extends Component {
 	}
 
 	onSelectionStart( uid ) {
-		const boundaries = this.refs[ uid ].getBoundingClientRect();
+		const boundaries = this.nodes[ uid ].getBoundingClientRect();
 
 		// Create a uid to Y coördinate map.
-		const uidToCoordMap = mapValues( this.refs, ( node ) => {
-			return node.getBoundingClientRect().top - boundaries.top;
-		} );
+		const uidToCoordMap = mapValues( this.nodes, ( node ) =>
+			node.getBoundingClientRect().top - boundaries.top );
 
 		// Cache a Y coördinate to uid map for use in `onPointerMove`.
 		this.coordMap = invert( uidToCoordMap );
 		// Cache an array of the Y coördinates for use in `onPointerMove`.
-		this.coordMapKeys = Object.values( uidToCoordMap );
+		// Sort the coördinates, as `this.nodes` will not necessarily reflect
+		// the current block sequence.
+		this.coordMapKeys = sortBy( Object.values( uidToCoordMap ) );
 		this.selectionAtStart = uid;
 
 		window.addEventListener( 'mousemove', this.onPointerMove );
@@ -190,18 +209,18 @@ class VisualEditorBlockList extends Component {
 
 		return (
 			<div>
-				{ !! blocks.length && <VisualEditorSiblingInserter insertIndex={ 0 } /> }
-				{ flatMap( blocks, ( uid, index ) => [
+				{ !! blocks.length && <VisualEditorSiblingInserter /> }
+				{ flatMap( blocks, ( uid ) => [
 					<VisualEditorBlock
 						key={ 'block-' + uid }
 						uid={ uid }
-						blockRef={ ( ref ) => this.setBlockRef( ref, uid ) }
+						blockRef={ this.setBlockRef }
 						onSelectionStart={ this.onSelectionStart }
 						onShiftSelection={ this.onShiftSelection }
 					/>,
 					<VisualEditorSiblingInserter
 						key={ 'sibling-inserter-' + uid }
-						insertIndex={ index + 1 }
+						uid={ uid }
 					/>,
 				] ) }
 				{ ! blocks.length &&

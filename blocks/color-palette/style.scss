@@ -3,6 +3,11 @@ $color-palette-circle-spacing: 14px;
 
 .blocks-color-palette {
 	margin-right: -14px;
+
+	.blocks-color-palette__clear {
+		float: right;
+		margin-right: 20px;
+	}
 }
 
 .blocks-color-palette__item-wrapper {

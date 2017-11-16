@@ -1,24 +1,29 @@
 # Contributing
 
-## Installing & Building the Plugin
+## Getting Started
 
-Gutenberg is a Node.js-based project, built primarily in JavaScript. Be sure to have <a href="https://nodejs.org/en/">Node.js installed first</a>. If you already have Node.js installed, make sure it's version 6.11.1 or higher for this plugin to work correctly. You can check your Node.js version by typing `node -v` in the Terminal prompt.
+Gutenberg is a Node.js-based project, built primarily in JavaScript. Be sure to have <a href="https://nodejs.org/en/">Node.js installed first</a>. You should be running a Node version matching the [current active LTS release](https://github.com/nodejs/Release#release-schedule) or newer for this plugin to work correctly. You can check your Node.js version by typing `node -v` in the Terminal prompt.
 
 You should also have the latest release of <a href="https://npmjs.org">npm installed</a>, npm is a separate project from Node.js and is updated frequently. If you've just installed Node.js which includes a version of npm within the installation you most likely will need to also update your npm install. To update npm, type this into your terminal: `npm install npm@latest -g`
 
 To test the plugin, or to contribute to it, you can clone this repository and build the plugin files using Node. How you do that depends on whether you're developing locally or uploading the plugin to a remote host.
 
+### Local Environment
+
+First, you need a WordPress Environment to run the plugin on. The quickest way to get up and running is to use the provided docker setup. Just install [docker](https://www.docker.com/) on your machine and run `./bin/setup-local-env.sh`.
+
+The WordPress installation should be available at `http://localhost:8888` (username: `admin`, password: `password`).
+Inside the "docker" directory, you can use any docker command to interact with your containers.
+
+Alternatively, you can use your own local WordPress environment and clone this repository right into your `wp-content/plugins` directory.
+
+Next, open a terminal (or if on Windows, a command prompt) and navigate to the repository you cloned. Now type `npm install` to get the dependencies all set up. Then you can type `npm run dev` in your terminal or command prompt to keep the plugin building in the background as you work on it.
+
 ### On A Remote Server
 
-Open a terminal (or if on Windows, a command prompt) and navigate to the repository you cloned. Now type `npm install` to get the dependencies all set up. Once that finishes, you can type `npm run build`. You can now upload the entire repository to your `wp-content/plugins` directory on your webserver and activate the plugin from the WordPress admin. You'll get a separate WordPress menu item called Gutenberg.
+Open a terminal (or if on Windows, a command prompt) and navigate to the repository you cloned. Now type `npm install` to get the dependencies all set up. Once that finishes, you can type `npm run build`. You can now upload the entire repository to your `wp-content/plugins` directory on your webserver and activate the plugin from the WordPress admin.
 
 You can also type `npm run package-plugin` which will run the two commands above and create a zip file automatically for you which you can use to install Gutenberg through the WordPress admin.
-
-### On a Local WordPress Environment
-
-If you have a local WordPress environment, you can clone this repository right into your `wp-content/plugins` directory. `npm install` will get the dependencies set up. Then you can type `npm run dev` in your terminal or command prompt to keep the plugin building in the background as you work on it.
-
-Some good options for a local WordPress development environment include <a href="https://varyingvagrantvagrants.org/">VVV</a> and <a href="https://www.mamp.info/">Mamp</a>.
 
 ## Workflow
 
@@ -52,6 +57,27 @@ To run unit tests only, use `npm run test-unit` instead.
 
 Code style in JavaScript is enforced using [ESLint](http://eslint.org/). The above `npm test` will execute both unit tests and code linting. Code linting can be verified independently by running `npm run lint`.
 
+### End to end Testing (integration tests)
+
+If you're using the built-in local environment above, you can run the e2e tests locally using this command:
+
+```bash
+npm run test-e2e
+```
+
+or interactively
+
+```bash
+npm run test-e2e:watch
+```
+
+If you're using another local environment setup, you can still run the e2e tests by overriding the base URL and the default WP username/password used in the tests like so:
+
+```bash
+cypress_base_url=http://my-custom-basee-url cypress_username=myusername cypress_password=mypassword npm run test-e2e
+```
+
+
 ### PHP Testing
 
 Tests for PHP use [PHPUnit](https://phpunit.de/) as the testing framework. Before starting, you should install PHPUnit and have a copy of [WordPress Develop](https://github.com/WordPress/wordpress-develop) available and setup a [`wp-tests-config.php`](https://make.wordpress.org/core/handbook/testing/automated-testing/phpunit/#setup) file. If the Gutenberg plugin is installed in the context of a WordPress Develop site, you can run `phpunit` directly from the command-line. Otherwise, you will need to specify the path to WordPress Develop's test directory as an environment variable:
@@ -76,18 +102,6 @@ If you'd like to contribute to the design or front-end, feel free to contribute 
 
 ### Contribute to the Documentation
 
-We're using an internal tool called `docutron` to generate the [Gutenberg Documentation Website](http://gutenberg-devdoc.surge.sh). You can run a local version of this website by cloning the repository and then running :
+Documentation is automatically synced from master to the [Gutenberg Documentation Website](https://wordpress.org/gutenberg/handbook/) every 15 minutes.
 
-```bash
-npm install && npm run docs-start
-```
-
-To add a new documentation page, you'll have to create a markdown file in the [docs](https://github.com/WordPress/gutenberg/tree/master/docs) folder and create a story referencing this file in the docs [stories file](https://github.com/WordPress/gutenberg/blob/master/docs/index.js) like so:
-
-```js
-addStory( {
-	name: 'story-name', // used in the url
-	title: 'Story Title',
-	markdown: require( './story-markdown-file.md' ),
-} );
-```
+To add a new documentation page, you'll have to create a Markdown file in the [docs](https://github.com/WordPress/gutenberg/tree/master/docs) folder and add an item to the [manifest file](https://github.com/WordPress/gutenberg/blob/master/docs/manifest.json).

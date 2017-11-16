@@ -19,7 +19,7 @@ import { isFirstBlock, isLastBlock, getBlockIndex, getBlock } from '../selectors
 import { getBlockMoverLabel } from './mover-label';
 import { selectBlock } from '../actions';
 
-function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex } ) {
+export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex } ) {
 	// We emulate a disabled state because forcefully applying the `disabled`
 	// attribute on the button while it has focus causes the screen to change
 	// to an unfocused state (body as active element) without firing blur on,
@@ -61,12 +61,16 @@ function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, f
 }
 
 export default connect(
-	( state, ownProps ) => ( {
-		isFirst: isFirstBlock( state, first( ownProps.uids ) ),
-		isLast: isLastBlock( state, last( ownProps.uids ) ),
-		firstIndex: getBlockIndex( state, first( ownProps.uids ) ),
-		blockType: getBlockType( getBlock( state, first( ownProps.uids ) ).name ),
-	} ),
+	( state, ownProps ) => {
+		const block = getBlock( state, first( ownProps.uids ) );
+
+		return ( {
+			isFirst: isFirstBlock( state, first( ownProps.uids ) ),
+			isLast: isLastBlock( state, last( ownProps.uids ) ),
+			firstIndex: getBlockIndex( state, first( ownProps.uids ) ),
+			blockType: block ? getBlockType( block.name ) : null,
+		} );
+	},
 	( dispatch, ownProps ) => ( {
 		onMoveDown() {
 			if ( ownProps.uids.length === 1 ) {

@@ -5,20 +5,27 @@
 
 .editor-layout {
 	position: relative;
+
+	.components-notice-list {
+		position: fixed;
+		top: 100px;
+		right: auto;
+	}
+}
+
+.editor-layout__metaboxes:not(:empty) {
+	border-top: 1px solid $light-gray-500;
+	margin-top: 10px;
+	padding: 10px 0;
+
+	.editor-meta-boxes-area {
+		max-width: $visual-editor-max-width;
+		margin: auto;
+	}
 }
 
 .editor-layout__content {
-	display: flex;
-	flex-direction: column;
-}
-
-.editor-layout__editor {
-	flex-basis: 100%;
+	position: relative;
 	overflow-y: auto;
-}
-
-.editor-layout .components-notice-list {
-	position: fixed;
-	top: 100px;
-	right: auto;
+	-webkit-overflow-scrolling: touch;
 }

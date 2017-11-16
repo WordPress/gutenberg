@@ -67,18 +67,18 @@ describe( 'block parser', () => {
 				},
 			};
 
-			const rawContent = '<span>Ribs <strong>& Chicken</strong></span>';
+			const innerHTML = '<span>Ribs <strong>& Chicken</strong></span>';
 
-			expect( getSourcedAttributes( rawContent, sources ) ).toEqual( {
+			expect( getSourcedAttributes( innerHTML, sources ) ).toEqual( {
 				emphasis: '& Chicken',
 			} );
 		} );
 
 		it( 'should return an empty object if no sources defined', () => {
 			const sources = {};
-			const rawContent = '<span>Ribs <strong>& Chicken</strong></span>';
+			const innerHTML = '<span>Ribs <strong>& Chicken</strong></span>';
 
-			expect( getSourcedAttributes( rawContent, sources ) ).toEqual( {} );
+			expect( getSourcedAttributes( innerHTML, sources ) ).toEqual( {} );
 		} );
 	} );
 
@@ -146,34 +146,14 @@ describe( 'block parser', () => {
 				},
 			};
 
-			const rawContent = '<div data-number="10">Ribs</div>';
+			const innerHTML = '<div data-number="10">Ribs</div>';
 			const attrs = { align: 'left', invalid: true };
 
-			expect( getBlockAttributes( blockType, rawContent, attrs ) ).toEqual( {
+			expect( getBlockAttributes( blockType, innerHTML, attrs ) ).toEqual( {
 				content: 'Ribs',
 				number: 10,
 				align: 'left',
 				topic: 'none',
-			} );
-		} );
-
-		it( 'should parse the anchor if the block supports it', () => {
-			const blockType = {
-				attributes: {
-					content: {
-						type: 'string',
-						source: text( 'div' ),
-					},
-				},
-				supportAnchor: true,
-			};
-
-			const rawContent = '<div id="chicken">Ribs</div>';
-			const attrs = {};
-
-			expect( getBlockAttributes( blockType, rawContent, attrs ) ).toEqual( {
-				content: 'Ribs',
-				anchor: 'chicken',
 			} );
 		} );
 
@@ -182,10 +162,10 @@ describe( 'block parser', () => {
 				attributes: {},
 			};
 
-			const rawContent = '<div class="chicken">Ribs</div>';
+			const innerHTML = '<div class="chicken">Ribs</div>';
 			const attrs = { className: 'chicken' };
 
-			expect( getBlockAttributes( blockType, rawContent, attrs ) ).toEqual( {
+			expect( getBlockAttributes( blockType, innerHTML, attrs ) ).toEqual( {
 				className: 'chicken',
 			} );
 		} );
@@ -196,10 +176,10 @@ describe( 'block parser', () => {
 				className: false,
 			};
 
-			const rawContent = '<div class="chicken">Ribs</div>';
+			const innerHTML = '<div class="chicken">Ribs</div>';
 			const attrs = { className: 'chicken' };
 
-			expect( getBlockAttributes( blockType, rawContent, attrs ) ).toEqual( {} );
+			expect( getBlockAttributes( blockType, innerHTML, attrs ) ).toEqual( {} );
 		} );
 	} );
 

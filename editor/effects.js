@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, uniqueId } from 'lodash';
+import { get, uniqueId, map, filter, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -37,6 +37,7 @@ import {
 	isEditedPostDirty,
 	isEditedPostNew,
 	isEditedPostSaveable,
+	getMetaBoxes,
 } from './selectors';
 
 const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
@@ -102,9 +103,9 @@ export default {
 		// If we publish/schedule a post, we show the corresponding publish message
 		// Unless we show an update notice
 		if ( isPublished || publishStatus.indexOf( post.status ) !== -1 ) {
-			const noticeMessage = ! isPublished && publishStatus.indexOf( post.status ) !== -1
-				? messages[ post.status ]
-				: __( 'Post updated!' );
+			const noticeMessage = ! isPublished && publishStatus.indexOf( post.status ) !== -1 ?
+				messages[ post.status ] :
+				__( 'Post updated!' );
 			dispatch( createSuccessNotice(
 				<p>
 					<span>{ noticeMessage }</span>
@@ -139,9 +140,9 @@ export default {
 			private: __( 'Publishing failed' ),
 			future: __( 'Scheduling failed' ),
 		};
-		const noticeMessage = ! isPublished && publishStatus.indexOf( edits.status ) !== -1
-			? messages[ edits.status ]
-			: __( 'Updating failed' );
+		const noticeMessage = ! isPublished && publishStatus.indexOf( edits.status ) !== -1 ?
+			messages[ edits.status ] :
+			__( 'Updating failed' );
 		dispatch( createErrorNotice( noticeMessage, { id: SAVE_POST_NOTICE_ID } ) );
 	},
 	TRASH_POST( action, store ) {
@@ -197,9 +198,9 @@ export default {
 
 		// We can only merge blocks with similar types
 		// thus, we transform the block to merge first
-		const blocksWithTheSameType = blockA.name === blockB.name
-			? [ blockB ]
-			: switchToBlockType( blockB, blockA.name );
+		const blocksWithTheSameType = blockA.name === blockB.name ?
+			[ blockB ] :
+			switchToBlockType( blockB, blockA.name );
 
 		// If the block types can not match, do nothing
 		if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
@@ -275,5 +276,26 @@ export default {
 		}
 
 		return effects;
+	},
+	INITIALIZE_META_BOX_STATE( action ) {
+		// Hold jquery.ready until the metaboxes load
+		const locations = [ 'normal', 'side' ];
+		if ( some( locations, ( location ) => !! action.metaBoxes[ location ] ) ) {
+			jQuery.holdReady( true );
+		}
+	},
+	META_BOX_LOADED( action, store ) {
+		const { getState } = store;
+		const metaboxes = getMetaBoxes( getState() );
+		const unloadedMetaboxes = filter(
+			map( metaboxes, ( value, key ) => ( {
+				...value,
+				key,
+			} ) ),
+			( metabox ) => metabox.isActive && ! metabox.isLoaded
+		);
+		if ( unloadedMetaboxes.length === 1 && unloadedMetaboxes[ 0 ].key === action.location ) {
+			jQuery.holdReady( false );
+		}
 	},
 };

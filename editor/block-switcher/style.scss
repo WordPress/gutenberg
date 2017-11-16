@@ -34,25 +34,15 @@
 }
 
 .editor-block-switcher__menu-item {
-	width: 100%;
-	margin-bottom: 3px;
-	padding: 6px;
-	background: none;
-	border: 1px solid transparent;
-	outline: none;
-	border-radius: 0;
 	color: $dark-gray-500;
-	cursor: pointer;
+	display: flex;
+	align-items: center;
+	width: 100%;
+	padding: 6px;
+	text-align: left;
 
-	&:hover,
-	&:focus,
-	&:not(:disabled):hover {
-		box-shadow: none;
-		color: $dark-gray-500;
-		border-color: $dark-gray-500;
-	}
-
-	.dashicon {
-		margin-right: 5px;
+	.editor-block-switcher__block-icon {
+		margin-right: 8px;
+		height: 20px;
 	}
 }

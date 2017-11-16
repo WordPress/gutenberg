@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { parse as hpqParse, attr } from 'hpq';
+import { parse as hpqParse } from 'hpq';
 import { mapValues, reduce, pickBy } from 'lodash';
 
 /**
@@ -33,11 +33,11 @@ export function isValidSource( source ) {
 /**
  * Returns the block attributes parsed from raw content.
  *
- * @param  {String} rawContent Raw block content
- * @param  {Object} schema     Block attribute schema
- * @return {Object}            Block attribute values
+ * @param  {String} innerHTML Raw block content
+ * @param  {Object} schema    Block attribute schema
+ * @return {Object}           Block attribute values
  */
-export function getSourcedAttributes( rawContent, schema ) {
+export function getSourcedAttributes( innerHTML, schema ) {
 	const sources = mapValues(
 		// Parse only sources with source defined
 		pickBy( schema, ( attributeSchema ) => isValidSource( attributeSchema.source ) ),
@@ -46,7 +46,7 @@ export function getSourcedAttributes( rawContent, schema ) {
 		( attributeSchema ) => attributeSchema.source
 	);
 
-	return hpqParse( rawContent, sources );
+	return hpqParse( innerHTML, sources );
 }
 
 /**
@@ -90,15 +90,15 @@ export function asType( value, type ) {
 /**
  * Returns the block attributes of a registered block node given its type.
  *
- * @param  {?Object} blockType     Block type
- * @param  {string}  rawContent    Raw block content
- * @param  {?Object} attributes    Known block attributes (from delimiters)
- * @return {Object}                All block attributes
+ * @param  {?Object} blockType  Block type
+ * @param  {string}  innerHTML  Raw block content
+ * @param  {?Object} attributes Known block attributes (from delimiters)
+ * @return {Object}             All block attributes
  */
-export function getBlockAttributes( blockType, rawContent, attributes ) {
+export function getBlockAttributes( blockType, innerHTML, attributes ) {
 	// Retrieve additional attributes sourced from content
 	const sourcedAttributes = getSourcedAttributes(
-		rawContent,
+		innerHTML,
 		blockType.attributes
 	);
 
@@ -148,11 +148,6 @@ export function getBlockAttributes( blockType, rawContent, attributes ) {
 		return result;
 	}, {} );
 
-	// If the block supports anchor, parse the id
-	if ( blockType.supportAnchor ) {
-		blockAttributes.anchor = hpqParse( rawContent, attr( '*', 'id' ) );
-	}
-
 	// If the block supports a custom className parse it
 	if ( blockType.className !== false && attributes && attributes.className ) {
 		blockAttributes.className = attributes.className;
@@ -165,11 +160,11 @@ export function getBlockAttributes( blockType, rawContent, attributes ) {
  * Creates a block with fallback to the unknown type handler.
  *
  * @param  {?String} name       Block type name
- * @param  {String}  rawContent Raw block content
+ * @param  {String}  innerHTML  Raw block content
  * @param  {?Object} attributes Attributes obtained from block delimiters
  * @return {?Object}            An initialized block object (if possible)
  */
-export function createBlockWithFallback( name, rawContent, attributes ) {
+export function createBlockWithFallback( name, innerHTML, attributes ) {
 	// Use type from block content, otherwise find unknown handler.
 	name = name || getUnknownTypeHandlerName();
 
@@ -186,7 +181,7 @@ export function createBlockWithFallback( name, rawContent, attributes ) {
 		// If detected as a block which is not registered, preserve comment
 		// delimiters in content of unknown type handler.
 		if ( name ) {
-			rawContent = getCommentDelimitedContent( name, attributes, rawContent );
+			innerHTML = getCommentDelimitedContent( name, attributes, innerHTML );
 		}
 
 		name = fallbackBlock;
@@ -195,23 +190,23 @@ export function createBlockWithFallback( name, rawContent, attributes ) {
 
 	// Include in set only if type were determined.
 	// TODO do we ever expect there to not be an unknown type handler?
-	if ( blockType && ( rawContent || name !== fallbackBlock ) ) {
+	if ( blockType && ( innerHTML || name !== fallbackBlock ) ) {
 		// TODO allow blocks to opt-in to receiving a tree instead of a string.
 		// Gradually convert all blocks to this new format, then remove the
 		// string serialization.
 		const block = createBlock(
 			name,
-			getBlockAttributes( blockType, rawContent, attributes )
+			getBlockAttributes( blockType, innerHTML, attributes )
 		);
 
 		// Validate that the parsed block is valid, meaning that if we were to
 		// reserialize it given the assumed attributes, the markup matches the
 		// original value.
-		block.isValid = isValidBlock( rawContent, blockType, block.attributes );
+		block.isValid = isValidBlock( innerHTML, blockType, block.attributes );
 
 		// Preserve original content for future use in case the block is parsed
 		// as invalid, or future serialization attempt results in an error
-		block.originalContent = rawContent;
+		block.originalContent = innerHTML;
 
 		return block;
 	}
@@ -225,8 +220,8 @@ export function createBlockWithFallback( name, rawContent, attributes ) {
  */
 export function parseWithGrammar( content ) {
 	return grammarParse( content ).reduce( ( memo, blockNode ) => {
-		const { blockName, rawContent, attrs } = blockNode;
-		const block = createBlockWithFallback( blockName, rawContent.trim(), attrs );
+		const { blockName, innerHTML, attrs } = blockNode;
+		const block = createBlockWithFallback( blockName, innerHTML.trim(), attrs );
 		if ( block ) {
 			memo.push( block );
 		}

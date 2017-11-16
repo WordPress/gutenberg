@@ -7,7 +7,6 @@ import { first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { Component, findDOMNode } from '@wordpress/element';
 import { KeyboardShortcuts } from '@wordpress/components';
 
@@ -19,7 +18,6 @@ import VisualEditorBlockList from './block-list';
 import VisualEditorInserter from './inserter';
 import PostTitle from '../../post-title';
 import WritingFlow from '../../writing-flow';
-import TableOfContents from '../../table-of-contents';
 import { getBlockUids, getMultiSelectedBlockUids } from '../../selectors';
 import { clearSelectedBlock, multiSelect, redo, undo, removeBlocks } from '../../actions';
 
@@ -39,6 +37,10 @@ class VisualEditor extends Component {
 	}
 
 	bindBlocksContainer( ref ) {
+		// Disable reason: Need DOM node to determine if clicking on layout
+		// canvas when intending to clear block selection.
+		// TODO: Refactor block selection clearing using blur events on block.
+		// eslint-disable-next-line react/no-find-dom-node
 		this.blocksContainer = findDOMNode( ref );
 	}
 
@@ -75,11 +77,9 @@ class VisualEditor extends Component {
 
 	render() {
 		// Disable reason: Clicking the canvas should clear the selection
-		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
+		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
 			<div
-				role="region"
-				aria-label={ __( 'Editor content' ) }
 				className="editor-visual-editor"
 				onMouseDown={ this.onClick }
 				onTouchStart={ this.onClick }
@@ -91,16 +91,16 @@ class VisualEditor extends Component {
 					'mod+shift+z': this.undoOrRedo,
 					backspace: this.deleteSelectedBlocks,
 					del: this.deleteSelectedBlocks,
+					escape: this.props.clearSelectedBlock,
 				} } />
 				<WritingFlow>
 					<PostTitle />
 					<VisualEditorBlockList ref={ this.bindBlocksContainer } />
 				</WritingFlow>
 				<VisualEditorInserter />
-				<TableOfContents />
 			</div>
 		);
-		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
+		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
 }
 

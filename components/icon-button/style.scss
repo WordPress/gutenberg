@@ -20,6 +20,6 @@
 	}
 
 	&:not( :disabled ):hover {
-		color: $blue-medium-500;
+		@include button-style__hover;
 	}
 }

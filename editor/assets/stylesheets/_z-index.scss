@@ -7,14 +7,18 @@ $z-layers: (
 	'.editor-visual-editor__block:before': -1,
 	'.editor-visual-editor__block .wp-block-more:before': -1,
 	'.editor-visual-editor__block {core/image aligned left or right}': 20,
-	'.editor-visual-editor__block-warning': 1,
+	'.freeform-toolbar': 10,
+	'.editor-warning': 1,
 	'.editor-visual-editor__sibling-inserter': 1,
 	'.components-form-toggle__input': 1,
 	'.editor-format-list__menu': 1,
 	'.editor-inserter__tabs': 1,
 	'.editor-inserter__tab.is-active': 1,
 	'.components-panel__header': 1,
-	'.blocks-format-toolbar__link-modal': 1,
+	'.editor-meta-boxes-area.is-loading:before': 1,
+	'.editor-meta-boxes-area .spinner': 2,
+	'.blocks-format-toolbar__link-modal': 2,
+	'.editor-block-contextual-toolbar': 2,
 	'.editor-block-switcher__menu': 2,
 	'.editor-block-mover': 20,
 	'.blocks-gallery-image__inline-menu': 20,
@@ -42,5 +46,9 @@ $z-layers: (
 );
 
 @function z-index( $key ) {
-	@return map-get( $z-layers, $key );
+	@if map-has-key( $z-layers, $key ) {
+		@return map-get( $z-layers, $key );
+	}
+
+	@error "Error: Specified z-index `#{$key}` does not exist in the mapping";
 }

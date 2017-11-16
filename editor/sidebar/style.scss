@@ -16,6 +16,7 @@
 		z-index: auto;
 		height: auto;
 		overflow: auto;
+		-webkit-overflow-scrolling: touch;
 	}
 
 	@include break-medium() {
@@ -26,6 +27,7 @@
 		border-left: none;
 		border-right: none;
 		overflow: auto;
+		-webkit-overflow-scrolling: touch;
 		height: 100%;
 		padding-top: $sidebar-panel-header-height;
 		margin-top: -1px;
@@ -117,6 +119,7 @@
 	background: transparent;
 	border: none;
 	border-bottom: 3px solid transparent;
+	border-radius: 0;
 	cursor: pointer;
 	height: 50px;
 	line-height: 50px;
@@ -130,7 +133,6 @@
 	}
 
 	&:focus {
-		box-shadow: $button-focus-style;
-		outline: none;
+		@include button-style__focus-active;
 	}
 }

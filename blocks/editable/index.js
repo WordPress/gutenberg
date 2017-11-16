@@ -15,22 +15,23 @@ import {
 	noop,
 } from 'lodash';
 import { nodeListToReact } from 'dom-react';
-import { Fill } from 'react-slot-fill';
 import 'element-closest';
 
 /**
  * WordPress dependencies
  */
 import { createElement, Component, renderToString } from '@wordpress/element';
-import { keycodes } from '@wordpress/utils';
+import { keycodes, createBlobURL } from '@wordpress/utils';
+import { Slot, Fill } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { pasteHandler } from '../api';
+import { rawHandler } from '../api';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
+import { pickAriaProps } from './aria';
 import patterns from './patterns';
 import { EVENTS } from './constants';
 
@@ -83,7 +84,7 @@ export default class Editable extends Component {
 				`Invalid value of type ${ typeof value } passed to Editable ` +
 				'(expected array). Attribute values should be sourced using ' +
 				'the `children` source when used with Editable.\n\n' +
-				'See: http://gutenberg-devdoc.surge.sh/reference/attributes/#children'
+				'See: https://wordpress.org/gutenberg/handbook/reference/attributes/#children'
 			);
 		}
 
@@ -133,7 +134,7 @@ export default class Editable extends Component {
 		editor.on( 'selectionChange', this.onSelectionChange );
 		editor.on( 'BeforeExecCommand', this.maybePropagateUndo );
 		editor.on( 'PastePreProcess', this.onPastePreProcess, true /* Add before core handlers */ );
-		editor.on( 'paste', this.onPaste );
+		editor.on( 'paste', this.onPaste, true /* Add before core handlers */ );
 
 		patterns.apply( this, [ editor ] );
 
@@ -237,20 +238,63 @@ export default class Editable extends Component {
 	}
 
 	onPaste( event ) {
-		const dataTransfer = event.clipboardData || this.editor.getDoc().dataTransfer;
+		const dataTransfer = event.clipboardData || event.dataTransfer || this.editor.getDoc().dataTransfer;
+		const { items = [], files = [] } = dataTransfer;
+		const item = find( [ ...items, ...files ], ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
+
+		if ( item ) {
+			// Allows us to ask for this information when we get a report.
+			window.console.log( 'Received item:\n\n', item );
+
+			const blob = item.getAsFile ? item.getAsFile() : item;
+
+			this.pastedContent = `<img src="${ createBlobURL( blob ) }">`;
+		}
 
 		this.pastedPlainText = dataTransfer ? dataTransfer.getData( 'text/plain' ) : '';
 	}
 
 	onPastePreProcess( event ) {
 		// Allows us to ask for this information when we get a report.
-		window.console.log( 'Received HTML:\n\n', event.content );
+		window.console.log( 'Received HTML:\n\n', this.pastedContent || event.content );
 		window.console.log( 'Received plain text:\n\n', this.pastedPlainText );
 
-		const content = pasteHandler( {
-			HTML: event.content,
+		// There is a selection, check if a link is pasted.
+		if ( ! this.editor.selection.isCollapsed() ) {
+			const linkRegExp = /^(?:https?:)?\/\/\S+$/i;
+			const pastedText = event.content.replace( /<[^>]+>/g, '' ).trim();
+			const selectedText = this.editor.selection.getContent().replace( /<[^>]+>/g, '' ).trim();
+
+			// The pasted text is a link, and the selected text is not.
+			if ( linkRegExp.test( pastedText ) && ! linkRegExp.test( selectedText ) ) {
+				this.editor.execCommand( 'mceInsertLink', false, {
+					href: this.editor.dom.decode( pastedText ),
+				} );
+
+				// Allows us to ask for this information when we get a report.
+				window.console.log( 'Created link:\n\n', pastedText );
+
+				event.preventDefault();
+
+				return;
+			}
+		}
+
+		const rootNode = this.editor.getBody();
+		const isEmpty = this.editor.dom.isEmpty( rootNode );
+
+		let mode = 'INLINE';
+
+		if ( isEmpty && this.props.onReplace ) {
+			mode = 'BLOCKS';
+		} else if ( this.props.onSplit ) {
+			mode = 'AUTO';
+		}
+
+		const content = rawHandler( {
+			HTML: this.pastedContent || event.content,
 			plainText: this.pastedPlainText,
-			inline: ! this.props.onSplit,
+			mode,
 		} );
 
 		if ( typeof content === 'string' ) {
@@ -264,9 +308,7 @@ export default class Editable extends Component {
 				return;
 			}
 
-			const rootNode = this.editor.getBody();
-
-			if ( this.editor.dom.isEmpty( rootNode ) && this.props.onReplace ) {
+			if ( isEmpty && this.props.onReplace ) {
 				this.props.onReplace( content );
 			} else {
 				this.splitContent( content );
@@ -274,14 +316,18 @@ export default class Editable extends Component {
 		}
 	}
 
-	onChange() {
-		if ( ! this.editor.isDirty() ) {
-			return;
-		}
-
+	fireChange() {
 		this.savedContent = this.getContent();
 		this.editor.save();
 		this.props.onChange( this.savedContent );
+	}
+
+	onChange() {
+		// Note that due to efficiency, speed and low cost requirements isDirty may
+		// not reflect reality for a brief period immediately after a change.
+		if ( this.editor.isDirty() ) {
+			this.fireChange();
+		}
 	}
 
 	getEditorSelectionRect() {
@@ -313,9 +359,9 @@ export default class Editable extends Component {
 		const position = this.getEditorSelectionRect();
 
 		// Find the parent "relative" positioned container
-		const container = this.props.inlineToolbar
-			? this.editor.getBody().closest( '.blocks-editable' )
-			: this.editor.getBody().closest( '.editor-visual-editor__block' );
+		const container = this.props.inlineToolbar ?
+			this.editor.getBody().closest( '.blocks-editable' ) :
+			this.editor.getBody().closest( '.editor-visual-editor__block' );
 		const containerPosition = container.getBoundingClientRect();
 		const blockPadding = 14;
 		const blockMoverMargin = 18;
@@ -323,10 +369,10 @@ export default class Editable extends Component {
 		// These offsets are necessary because the toolbar where the link modal lives
 		// is absolute positioned and it's not shown when we compute the position here
 		// so we compute the position about its parent relative position and adds the offset
-		const toolbarOffset = this.props.inlineToolbar
-			? { top: 50, left: 0 }
-			: { top: 40, left: -( ( blockPadding * 2 ) + blockMoverMargin ) };
-		const linkModalWidth = 250;
+		const toolbarOffset = this.props.inlineToolbar ?
+			{ top: 10, left: 0 } :
+			{ top: 0, left: -( ( blockPadding * 2 ) + blockMoverMargin ) };
+		const linkModalWidth = 305;
 
 		return {
 			top: position.top - containerPosition.top + ( position.height ) + toolbarOffset.top,
@@ -378,7 +424,7 @@ export default class Editable extends Component {
 			)
 		) {
 			const forward = event.keyCode === DELETE;
-			this.onChange();
+			this.fireChange();
 			this.props.onMerge( forward );
 			event.preventDefault();
 			event.stopImmediatePropagation();
@@ -656,6 +702,8 @@ export default class Editable extends Component {
 			formatters,
 		} = this.props;
 
+		const ariaProps = pickAriaProps( this.props );
+
 		// Generating a key that includes `tagName` ensures that if the tag
 		// changes, we unmount and destroy the previous TinyMCE element, then
 		// mount and initialize a new child element in its place.
@@ -693,7 +741,8 @@ export default class Editable extends Component {
 					style={ style }
 					defaultValue={ value }
 					isPlaceholderVisible={ isPlaceholderVisible }
-					label={ placeholder }
+					aria-label={ placeholder }
+					{ ...ariaProps }
 					className={ className }
 					key={ key }
 				/>
@@ -705,6 +754,7 @@ export default class Editable extends Component {
 						{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }
 					</Tagname>
 				}
+				{ focus && <Slot name="Editable.Siblings" /> }
 			</div>
 		);
 	}

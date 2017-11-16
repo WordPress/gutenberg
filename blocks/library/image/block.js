@@ -16,7 +16,7 @@ import {
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { mediaUpload } from '@wordpress/utils';
+import { mediaUpload, createMediaFromFile, getBlobByURL, revokeBlobURL, viewPort } from '@wordpress/utils';
 import {
 	Placeholder,
 	Dashicon,
@@ -51,6 +51,31 @@ class ImageBlock extends Component {
 		this.updateImageURL = this.updateImageURL.bind( this );
 	}
 
+	componentDidMount() {
+		const { attributes, setAttributes } = this.props;
+		const { id, url = '' } = attributes;
+
+		if ( ! id && url.indexOf( 'blob:' ) === 0 ) {
+			getBlobByURL( url )
+				.then( createMediaFromFile )
+				.then( ( media ) => {
+					setAttributes( {
+						id: media.id,
+						url: media.source_url,
+					} );
+				} );
+		}
+	}
+
+	componentDidUpdate( prevProps ) {
+		const { id: prevID, url: prevUrl = '' } = prevProps.attributes;
+		const { id, url = '' } = this.props.attributes;
+
+		if ( ! prevID && prevUrl.indexOf( 'blob:' ) === 0 && id && url.indexOf( 'blob:' ) === -1 ) {
+			revokeBlobURL( url );
+		}
+	}
+
 	onSelectImage( media ) {
 		this.props.setAttributes( { url: media.url, alt: media.alt, caption: media.caption, id: media.id } );
 	}
@@ -64,9 +89,9 @@ class ImageBlock extends Component {
 	}
 
 	updateAlignment( nextAlign ) {
-		const extraUpdatedAttributes = [ 'wide', 'full' ].indexOf( nextAlign ) !== -1
-			? { width: undefined, height: undefined }
-			: {};
+		const extraUpdatedAttributes = [ 'wide', 'full' ].indexOf( nextAlign ) !== -1 ?
+			{ width: undefined, height: undefined } :
+			{};
 		this.props.setAttributes( { ...extraUpdatedAttributes, align: nextAlign } );
 	}
 
@@ -84,7 +109,7 @@ class ImageBlock extends Component {
 
 		const availableSizes = this.getAvailableSizes();
 		const figureStyle = width ? { width } : {};
-		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1;
+		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && ( ! viewPort.isExtraSmall() );
 		const uploadButtonProps = { isLarge: true };
 		const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setAttributes );
 		const dropFiles = ( files ) => mediaUpload( files, setAttributes );
@@ -188,6 +213,9 @@ class ImageBlock extends Component {
 							imageHeight,
 						} = sizes;
 
+						// Disable reason: Image itself is not meant to be
+						// interactive, but should direct focus to block
+						// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
 						const img = <img src={ url } alt={ alt } onClick={ setFocus } />;
 
 						if ( ! isResizable || ! imageWidthWithinContainer ) {
@@ -221,8 +249,8 @@ class ImageBlock extends Component {
 								enable={ { top: false, right: true, bottom: false, left: false, topRight: true, bottomRight: true, bottomLeft: true, topLeft: true } }
 								onResizeStop={ ( event, direction, elt, delta ) => {
 									setAttributes( {
-										width: currentWidth + delta.width,
-										height: currentHeight + delta.height,
+										width: parseInt( currentWidth + delta.width, 10 ),
+										height: parseInt( currentHeight + delta.height, 10 ),
 									} );
 								} }
 							>

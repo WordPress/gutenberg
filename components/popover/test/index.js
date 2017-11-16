@@ -74,9 +74,9 @@ describe( 'Popover', () => {
 			wrapper = mount( <Popover /> );
 			wrapper.setProps( { isOpen: true } );
 
-			const popover = wrapper.find( '.components-popover' ).getDOMNode();
+			const content = wrapper.find( '.components-popover__content' ).getDOMNode();
 
-			expect( document.activeElement ).toBe( popover );
+			expect( document.activeElement ).toBe( content );
 		} );
 
 		it( 'should allow focus-on-open behavior to be disabled', () => {
