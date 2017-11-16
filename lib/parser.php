@@ -1363,13 +1363,13 @@ class Gutenberg_PEG_Parser {
 
       $s0 = $this->peg_currPos;
       $s1 = $this->peg_currPos;
-      $s2 = $this->peg_parseASCII_Letter();
+      $s2 = $this->peg_parseASCII_LowercaseLetter();
       if ($s2 !== $this->peg_FAILED) {
         $s3 = array();
-        $s4 = $this->peg_parseASCII_AlphaNumeric();
+        $s4 = $this->peg_parseASCII_LowercaseAlphaNumeric();
         while ($s4 !== $this->peg_FAILED) {
           $s3[] = $s4;
-          $s4 = $this->peg_parseASCII_AlphaNumeric();
+          $s4 = $this->peg_parseASCII_LowercaseAlphaNumeric();
         }
         if ($s3 !== $this->peg_FAILED) {
           if ($this->input_substr($this->peg_currPos, 1) === $this->peg_c15) {
@@ -1382,13 +1382,13 @@ class Gutenberg_PEG_Parser {
             }
           }
           if ($s4 !== $this->peg_FAILED) {
-            $s5 = $this->peg_parseASCII_Letter();
+            $s5 = $this->peg_parseASCII_LowercaseLetter();
             if ($s5 !== $this->peg_FAILED) {
               $s6 = array();
-              $s7 = $this->peg_parseASCII_AlphaNumeric();
+              $s7 = $this->peg_parseASCII_LowercaseAlphaNumeric();
               while ($s7 !== $this->peg_FAILED) {
                 $s6[] = $s7;
-                $s7 = $this->peg_parseASCII_AlphaNumeric();
+                $s7 = $this->peg_parseASCII_LowercaseAlphaNumeric();
               }
               if ($s6 !== $this->peg_FAILED) {
                 $s2 = array($s2, $s3, $s4, $s5, $s6);
@@ -1427,13 +1427,13 @@ class Gutenberg_PEG_Parser {
       $s0 = $this->peg_currPos;
       $s1 = $this->peg_currPos;
       $s2 = $this->peg_currPos;
-      $s3 = $this->peg_parseASCII_Letter();
+      $s3 = $this->peg_parseASCII_LowercaseLetter();
       if ($s3 !== $this->peg_FAILED) {
         $s4 = array();
-        $s5 = $this->peg_parseASCII_AlphaNumeric();
+        $s5 = $this->peg_parseASCII_LowercaseAlphaNumeric();
         while ($s5 !== $this->peg_FAILED) {
           $s4[] = $s5;
-          $s5 = $this->peg_parseASCII_AlphaNumeric();
+          $s5 = $this->peg_parseASCII_LowercaseAlphaNumeric();
         }
         if ($s4 !== $this->peg_FAILED) {
           $s3 = array($s3, $s4);
@@ -1718,9 +1718,9 @@ class Gutenberg_PEG_Parser {
       return $s0;
     }
 
-    private function peg_parseASCII_AlphaNumeric() {
+    private function peg_parseASCII_LowercaseAlphaNumeric() {
 
-      $s0 = $this->peg_parseASCII_Letter();
+      $s0 = $this->peg_parseASCII_LowercaseLetter();
       if ($s0 === $this->peg_FAILED) {
         $s0 = $this->peg_parseASCII_Digit();
         if ($s0 === $this->peg_FAILED) {
@@ -1731,7 +1731,7 @@ class Gutenberg_PEG_Parser {
       return $s0;
     }
 
-    private function peg_parseASCII_Letter() {
+    private function peg_parseASCII_LowercaseLetter() {
 
       if (Gutenberg_PEG_peg_char_class_test($this->peg_c22, $this->input_substr($this->peg_currPos, 1))) {
         $s0 = $this->input_substr($this->peg_currPos, 1);
@@ -1888,8 +1888,8 @@ class Gutenberg_PEG_Parser {
     $this->peg_c19 = "}";
     $this->peg_c20 = array( "type" => "literal", "value" => "}", "description" => "\"}\"" );
     $this->peg_c21 = "";
-    $this->peg_c22 = array(array(97,122), array(65,90));
-    $this->peg_c23 = array( "type" => "class", "value" => "[a-zA-Z]", "description" => "[a-zA-Z]" );
+    $this->peg_c22 = array(array(97,122));
+    $this->peg_c23 = array( "type" => "class", "value" => "[a-z]", "description" => "[a-z]" );
     $this->peg_c24 = array(array(48,57));
     $this->peg_c25 = array( "type" => "class", "value" => "[0-9]", "description" => "[0-9]" );
     $this->peg_c26 = array(array(45,45), array(95,95));
