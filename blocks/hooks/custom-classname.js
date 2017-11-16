@@ -14,7 +14,6 @@ import { __ } from '@wordpress/i18n';
  */
 import { hasBlockSupport } from '../api';
 import InspectorControls from '../inspector-controls';
-import { extendElement } from './utils';
 
 /**
  * Filters registered block settings, extending attributes with anchor using ID
@@ -46,9 +45,9 @@ export function addAttribute( settings ) {
  */
 export function addInspectorControl( element, props ) {
 	if ( hasBlockSupport( props.name, 'customClassName', true ) && props.focus ) {
-		element = extendElement(
+		element = [
 			element,
-			<InspectorControls key="inspector">
+			<InspectorControls key="inspector-custom-classname">
 				<InspectorControls.TextControl
 					label={ __( 'Additional CSS Class' ) }
 					value={ props.attributes.className || '' }
@@ -59,7 +58,7 @@ export function addInspectorControl( element, props ) {
 					} }
 				/>
 			</InspectorControls>,
-		);
+		];
 	}
 
 	return element;

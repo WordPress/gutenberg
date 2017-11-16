@@ -11,7 +11,6 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { extendElement } from './utils';
 import { hasBlockSupport } from '../api';
 import InspectorControls from '../inspector-controls';
 
@@ -55,9 +54,9 @@ export function addAttribute( settings ) {
  */
 export function addInspectorControl( element, props ) {
 	if ( hasBlockSupport( props.name, 'anchor' ) && props.focus ) {
-		element = extendElement(
+		element = [
 			element,
-			<InspectorControls key="inspector">
+			<InspectorControls key="inspector-anchor">
 				<InspectorControls.TextControl
 					label={ __( 'HTML Anchor' ) }
 					help={ __( 'Anchors lets you link directly to a section on a page.' ) }
@@ -70,7 +69,7 @@ export function addInspectorControl( element, props ) {
 						} );
 					} } />
 			</InspectorControls>,
-		);
+		];
 	}
 
 	return element;
