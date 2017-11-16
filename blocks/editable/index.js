@@ -32,6 +32,7 @@ import { rawHandler } from '../api';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
 import { pickAriaProps } from './aria';
+import emoji from './emoji';
 import patterns from './patterns';
 import { EVENTS } from './constants';
 
@@ -44,6 +45,10 @@ function createTinyMCEElement( type, props, ...children ) {
 
 	if ( props.hasOwnProperty( 'data-mce-bogus' ) ) {
 		return children;
+	}
+
+	if ( props.hasOwnProperty( 'data-wp-emoji' ) ) {
+		return props.alt;
 	}
 
 	return createElement(
@@ -136,6 +141,7 @@ export default class Editable extends Component {
 		editor.on( 'PastePreProcess', this.onPastePreProcess, true /* Add before core handlers */ );
 		editor.on( 'paste', this.onPaste, true /* Add before core handlers */ );
 
+		emoji.apply( this, [ editor ] );
 		patterns.apply( this, [ editor ] );
 
 		if ( this.props.onSetup ) {
