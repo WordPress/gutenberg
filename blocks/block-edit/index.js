@@ -15,12 +15,10 @@ function BlockEdit( props ) {
 	// `edit` and `save` are functions or components describing the markup
 	// with which a block is displayed. If `blockType` is valid, assign
 	// them preferencially as the render value for the block.
-	let Edit;
-	if ( blockType ) {
-		Edit = blockType.edit || blockType.save;
-	}
+	const Edit = blockType.edit || blockType.save;
+	Edit.displayName = 'Edit';
 
-	return applyFilters( 'BlockEdit', <Edit { ...editProps } />, props );
+	return applyFilters( 'BlockEdit', <Edit key="edit" { ...editProps } />, props );
 }
 
 export default BlockEdit;

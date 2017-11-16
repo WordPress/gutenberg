@@ -27,13 +27,13 @@ class Fill extends Component {
 	}
 
 	componentWillReceiveProps( nextProps ) {
-		const { name } = nextProps;
+		const { name, force } = nextProps;
 		const {
 			unregisterFill = noop,
 			registerFill = noop,
 		} = this.context;
 
-		if ( this.props.name !== name ) {
+		if ( this.props.name !== name || force ) {
 			unregisterFill( this.props.name, this );
 			registerFill( name, this );
 		}

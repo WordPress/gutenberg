@@ -15,9 +15,9 @@ import TextControl from './text-control';
 import TextareaControl from './textarea-control';
 import ToggleControl from './toggle-control';
 
-export default function InspectorControls( { children } ) {
+export default function InspectorControls( { force = false, children } ) {
 	return (
-		<Fill name="Inspector.Controls">
+		<Fill name="Inspector.Controls" force={ force }>
 			{ children }
 		</Fill>
 	);
