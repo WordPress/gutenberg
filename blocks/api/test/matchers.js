@@ -11,9 +11,9 @@ import { renderToString } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import * as sources from '../source';
+import * as sources from '../matchers';
 
-describe( 'sources', () => {
+describe( 'matchers', () => {
 	describe( 'children()', () => {
 		it( 'should return a source function', () => {
 			const source = sources.children();
