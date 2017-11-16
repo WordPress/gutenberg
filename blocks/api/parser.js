@@ -12,7 +12,7 @@ import { getBlockType, getUnknownTypeHandlerName } from './registration';
 import { createBlock } from './factory';
 import { isValidBlock } from './validation';
 import { getCommentDelimitedContent } from './serializer';
-import { attr, prop, html, text, query, node, children } from './source';
+import { attr, prop, html, text, query, node, children } from './matchers';
 
 /**
  * Returns value coerced to the specified JSON schema type string

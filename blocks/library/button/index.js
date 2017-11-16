@@ -156,6 +156,7 @@ class ButtonBlock extends Component {
 			</span>,
 			focus && (
 				<form
+					key="form-link"
 					className="blocks-button__inline-link"
 					onSubmit={ ( event ) => event.preventDefault() }>
 					<Dashicon icon="admin-links" />

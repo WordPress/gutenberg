@@ -15,3 +15,7 @@ export {
 	getBlockTypes,
 	hasBlockSupport,
 } from './registration';
+
+// Deprecated matchers
+import * as source from './source';
+export { source };

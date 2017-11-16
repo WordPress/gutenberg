@@ -1,38 +1,66 @@
-/**
- * WordPress dependencies
- */
-import { createElement } from '@wordpress/element';
+function warnAboutDeprecatedMatcher() {
+	// eslint-disable-next-line no-console
+	console.warn(
+		'Attributes matchers are deprecated and they will be removed in a future version of Gutenberg. ' +
+		'Please update your attributes definition https://wordpress.org/gutenberg/handbook/reference/attributes/'
+	);
+}
 
-/**
- * External dependencies
- */
-import { nodeListToReact, nodeToReact } from 'dom-react';
-export { attr, prop, html, text, query } from 'hpq';
-
-export const children = ( selector ) => {
-	return ( domNode ) => {
-		let match = domNode;
-
-		if ( selector ) {
-			match = domNode.querySelector( selector );
-		}
-
-		if ( match ) {
-			return nodeListToReact( match.childNodes || [], createElement );
-		}
-
-		return [];
+export const attr = ( selector, attribute ) => () => {
+	warnAboutDeprecatedMatcher();
+	return {
+		source: 'attribute',
+		attribute: attribute === undefined ? selector : attribute,
+		selector: attribute === undefined ? undefined : selector,
 	};
 };
 
-export const node = ( selector ) => {
-	return ( domNode ) => {
-		let match = domNode;
+export const prop = ( selector, property ) => () => {
+	warnAboutDeprecatedMatcher();
+	return {
+		source: 'property',
+		property: property === undefined ? selector : property,
+		selector: property === undefined ? undefined : selector,
+	};
+};
 
-		if ( selector ) {
-			match = domNode.querySelector( selector );
-		}
+export const html = ( selector ) => () => {
+	warnAboutDeprecatedMatcher();
+	return {
+		source: 'html',
+		selector,
+	};
+};
 
-		return nodeToReact( match, createElement );
+export const text = ( selector ) => () => {
+	warnAboutDeprecatedMatcher();
+	return {
+		source: 'text',
+		selector,
+	};
+};
+
+export const query = ( selector, subMatchers ) => () => {
+	warnAboutDeprecatedMatcher();
+	return {
+		source: 'query',
+		selector,
+		query: subMatchers,
+	};
+};
+
+export const children = ( selector ) => () => {
+	warnAboutDeprecatedMatcher();
+	return {
+		source: 'children',
+		selector,
+	};
+};
+
+export const node = ( selector ) => () => {
+	warnAboutDeprecatedMatcher();
+	return {
+		source: 'node',
+		selector,
 	};
 };
