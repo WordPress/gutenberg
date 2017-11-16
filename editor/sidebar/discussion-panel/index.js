@@ -13,8 +13,8 @@ import { PanelBody, PanelRow } from '@wordpress/components';
  * Internal Dependencies
  */
 import { PostComments, PostPingbacks } from '../../components';
-import { isEditorSidebarPanelOpened } from '../../selectors';
-import { toggleSidebarPanel } from '../../actions';
+import { isEditorSidebarPanelOpened } from '../../state/selectors';
+import { toggleSidebarPanel } from '../../state/actions';
 
 /**
  * Module Constants

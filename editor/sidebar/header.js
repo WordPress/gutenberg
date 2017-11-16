@@ -12,8 +12,8 @@ import { IconButton } from '@wordpress/components';
 /**
  * Internal Dependencies
  */
-import { getActivePanel, getSelectedBlockCount } from '../selectors';
-import { toggleSidebar, setActivePanel } from '../actions';
+import { getActivePanel, getSelectedBlockCount } from '../state/selectors';
+import { toggleSidebar, setActivePanel } from '../state/actions';
 
 const SidebarHeader = ( { panel, onSetPanel, onToggleSidebar, count } ) => {
 	// Do not display "0 Blocks".

@@ -17,7 +17,7 @@ import PostSettings from './post-settings';
 import BlockInspectorPanel from './block-inspector-panel';
 import Header from './header';
 
-import { getActivePanel } from '../selectors';
+import { getActivePanel } from '../state/selectors';
 
 const Sidebar = ( { panel } ) => {
 	return (

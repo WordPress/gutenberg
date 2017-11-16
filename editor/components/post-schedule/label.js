@@ -12,7 +12,7 @@ import { dateI18n, settings } from '@wordpress/date';
 /**
  * Internal dependencies
  */
-import { getEditedPostAttribute } from '../../selectors';
+import { getEditedPostAttribute } from '../../state/selectors';
 
 function PostScheduleLabel( { date } ) {
 	return date ?

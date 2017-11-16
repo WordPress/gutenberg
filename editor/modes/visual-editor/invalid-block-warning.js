@@ -22,7 +22,7 @@ import {
 /**
  * Internal dependencies
  */
-import { replaceBlock } from '../../actions';
+import { replaceBlock } from '../../state/actions';
 
 function InvalidBlockWarning( { ignoreInvalid, switchToBlockType } ) {
 	const htmlBlockName = 'core/html';

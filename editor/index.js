@@ -16,7 +16,7 @@ import { settings as dateSettings } from '@wordpress/date';
 import './assets/stylesheets/main.scss';
 import Layout from './layout';
 import { EditorProvider, ErrorBoundary } from './components';
-import { initializeMetaBoxState } from './actions';
+import { initializeMetaBoxState } from './state/actions';
 
 export * from './components';
 

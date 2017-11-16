@@ -13,8 +13,8 @@ import { IconButton, withInstanceId } from '@wordpress/components';
  * Internal Dependencies
  */
 import './style.scss';
-import { isFeatureActive } from '../../selectors';
-import { toggleFeature } from '../../actions';
+import { isFeatureActive } from '../../state/selectors';
+import { toggleFeature } from '../../state/actions';
 
 function FeatureToggle( { onToggle, active } ) {
 	return (

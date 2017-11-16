@@ -12,7 +12,7 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { isEditedPostDirty } from '../../selectors';
+import { isEditedPostDirty } from '../../state/selectors';
 
 class UnsavedChangesWarning extends Component {
 	constructor() {

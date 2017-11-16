@@ -17,8 +17,8 @@ import {
 	isEditedPostNew,
 	getCurrentPostId,
 	getCurrentPostType,
-} from '../../selectors';
-import { trashPost } from '../../actions';
+} from '../../state/selectors';
+import { trashPost } from '../../state/actions';
 
 function PostTrash( { isNew, postId, postType, ...props } ) {
 	if ( isNew || ! postId ) {

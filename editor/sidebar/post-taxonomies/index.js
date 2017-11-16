@@ -13,8 +13,8 @@ import { PanelBody } from '@wordpress/components';
  * Internal dependencies
  */
 import { PostTaxonomies as PostTaxonomiesForm } from '../../components';
-import { isEditorSidebarPanelOpened } from '../../selectors';
-import { toggleSidebarPanel } from '../../actions';
+import { isEditorSidebarPanelOpened } from '../../state/selectors';
+import { toggleSidebarPanel } from '../../state/actions';
 
 /**
  * Module Constants

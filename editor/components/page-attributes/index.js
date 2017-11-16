@@ -14,8 +14,8 @@ import { withInstanceId } from '@wordpress/components';
  * Internal dependencies
  */
 import PageAttributesCheck from './check';
-import { editPost } from '../../actions';
-import { getEditedPostAttribute } from '../../selectors';
+import { editPost } from '../../state/actions';
+import { getEditedPostAttribute } from '../../state/selectors';
 
 export function PageAttributes( { onUpdateOrder, instanceId, order } ) {
 	const setUpdatedOrder = ( event ) => {

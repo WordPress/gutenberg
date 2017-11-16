@@ -15,14 +15,14 @@ import { Button, withAPIData } from '@wordpress/components';
  */
 import './style.scss';
 import PublishButtonLabel from './label';
-import { editPost, savePost } from '../../actions';
+import { editPost, savePost } from '../../state/actions';
 import {
 	isSavingPost,
 	isEditedPostBeingScheduled,
 	getEditedPostVisibility,
 	isEditedPostSaveable,
 	isEditedPostPublishable,
-} from '../../selectors';
+} from '../../state/selectors';
 
 export function PostPublishButton( {
 	isSaving,

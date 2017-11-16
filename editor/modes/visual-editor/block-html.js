@@ -14,8 +14,8 @@ import TextareaAutosize from 'react-autosize-textarea';
 /**
  * Internal Dependencies
  */
-import { updateBlock } from '../../actions';
-import { getBlock } from '../../selectors';
+import { updateBlock } from '../../state/actions';
+import { getBlock } from '../../state/selectors';
 
 class BlockHTML extends Component {
 	constructor( props ) {

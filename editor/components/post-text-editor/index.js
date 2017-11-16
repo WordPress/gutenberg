@@ -14,8 +14,8 @@ import { parse } from '@wordpress/blocks';
  * Internal dependencies
  */
 import './style.scss';
-import { getEditedPostContent } from '../../selectors';
-import { editPost, resetBlocks } from '../../actions';
+import { getEditedPostContent } from '../../state/selectors';
+import { editPost, resetBlocks } from '../../state/actions';
 
 class PostTextEditor extends Component {
 	constructor( props ) {

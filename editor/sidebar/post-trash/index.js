@@ -13,7 +13,7 @@ import { PanelRow } from '@wordpress/components';
  */
 import './style.scss';
 import { PostTrash as PostTrashLink } from '../../components';
-import { isEditedPostNew, getCurrentPostId } from '../../selectors';
+import { isEditedPostNew, getCurrentPostId } from '../../state/selectors';
 
 function PostTrash( { isNew, postId } ) {
 	if ( isNew || ! postId ) {

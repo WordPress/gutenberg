@@ -19,7 +19,7 @@ import {
 	getBlockInsertionPoint,
 	isBlockInsertionPointVisible,
 	isBlockWithinSelection,
-} from '../../selectors';
+} from '../../state/selectors';
 
 class VisualEditorSiblingInserter extends Component {
 	constructor() {

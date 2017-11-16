@@ -17,7 +17,7 @@ import PostLastRevisionCheck from './check';
 import {
 	getCurrentPostLastRevisionId,
 	getCurrentPostRevisionsCount,
-} from '../../selectors';
+} from '../../state/selectors';
 import { getWPAdminURL } from '../../utils/url';
 
 function LastRevision( { lastRevisionId, revisionsCount } ) {

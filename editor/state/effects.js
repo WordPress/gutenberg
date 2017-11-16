@@ -13,7 +13,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { getPostEditUrl, getWPAdminURL } from './utils/url';
+import { getPostEditUrl, getWPAdminURL } from '../utils/url';
 import {
 	resetPost,
 	setupNewPost,

@@ -17,8 +17,8 @@ import PublishWithDropdown from './publish-with-dropdown';
 import { PostPreviewButton, PostSavedState } from '../components';
 import EllipsisMenu from './ellipsis-menu';
 import HeaderToolbar from './header-toolbar';
-import { isEditorSidebarOpened } from '../selectors';
-import { toggleSidebar } from '../actions';
+import { isEditorSidebarOpened } from '../state/selectors';
+import { toggleSidebar } from '../state/actions';
 
 function Header( { onToggleSidebar, isSidebarOpened } ) {
 	return (

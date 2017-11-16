@@ -14,7 +14,7 @@ import { Dashicon, Button } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import { editPost, savePost } from '../../actions';
+import { editPost, savePost } from '../../state/actions';
 import {
 	isEditedPostNew,
 	isCurrentPostPublished,
@@ -23,7 +23,7 @@ import {
 	isEditedPostSaveable,
 	getCurrentPost,
 	getEditedPostAttribute,
-} from '../../selectors';
+} from '../../state/selectors';
 
 export function PostSavedState( { isNew, isPublished, isDirty, isSaving, isSaveable, status, onStatusChange, onSave } ) {
 	const className = 'editor-post-saved-state';

@@ -18,7 +18,7 @@ import {
 	isSavingPost,
 	isEditedPostSaveable,
 	isEditedPostPublishable,
-} from '../../selectors';
+} from '../../state/selectors';
 
 function PublishWithDropdown( { isSaving, isPublishable, isSaveable } ) {
 	const isButtonEnabled = ! isSaving && isPublishable && isSaveable;

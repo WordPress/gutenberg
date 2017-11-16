@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 /**
  * Internal dependencies
  */
-import { getCurrentPostLastRevisionId } from '../../selectors';
+import { getCurrentPostLastRevisionId } from '../../state/selectors';
 
 function PostLastRevisionCheck( { lastRevisionId, children } ) {
 	if ( ! lastRevisionId ) {

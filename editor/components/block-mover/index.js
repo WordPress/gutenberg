@@ -16,8 +16,8 @@ import { getBlockType } from '@wordpress/blocks';
  */
 import './style.scss';
 import { getBlockMoverLabel } from './mover-label';
-import { isFirstBlock, isLastBlock, getBlockIndex, getBlock } from '../../selectors';
-import { selectBlock } from '../../actions';
+import { isFirstBlock, isLastBlock, getBlockIndex, getBlock } from '../../state/selectors';
+import { selectBlock } from '../../state/actions';
 
 export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex } ) {
 	// We emulate a disabled state because forcefully applying the `disabled`

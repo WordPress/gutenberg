@@ -13,8 +13,8 @@ import { getUnknownTypeHandlerName, rawHandler, serialize } from '@wordpress/blo
 /**
  * Internal dependencies
  */
-import { getBlock } from '../../selectors';
-import { replaceBlocks } from '../../actions';
+import { getBlock } from '../../state/selectors';
+import { replaceBlocks } from '../../state/actions';
 
 export function UnknownConverter( { block, convertToBlocks, small } ) {
 	if ( ! block || getUnknownTypeHandlerName() !== block.name ) {

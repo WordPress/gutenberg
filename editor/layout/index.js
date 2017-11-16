@@ -19,13 +19,13 @@ import Sidebar from '../sidebar';
 import TextEditor from '../modes/text-editor';
 import VisualEditor from '../modes/visual-editor';
 import DocumentTitle from '../document-title';
-import { removeNotice } from '../actions';
+import { removeNotice } from '../state/actions';
 import { MetaBoxes, AutosaveMonitor, UnsavedChangesWarning } from '../components';
 import {
 	getEditorMode,
 	isEditorSidebarOpened,
 	getNotices,
-} from '../selectors';
+} from '../state/selectors';
 
 function Layout( { mode, isSidebarOpened, notices, ...props } ) {
 	const className = classnames( 'editor-layout', {

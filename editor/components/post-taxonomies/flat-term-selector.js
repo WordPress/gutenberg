@@ -14,8 +14,8 @@ import { FormTokenField } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { getEditedPostAttribute } from '../../selectors';
-import { editPost } from '../../actions';
+import { getEditedPostAttribute } from '../../state/selectors';
+import { editPost } from '../../state/actions';
 
 const DEFAULT_QUERY = {
 	per_page: 100,

@@ -13,7 +13,7 @@ import { IconButton } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { removeBlocks } from '../../actions';
+import { removeBlocks } from '../../state/actions';
 
 export function BlockDeleteButton( { onDelete, onClick = noop, small = false } ) {
 	const label = __( 'Delete' );

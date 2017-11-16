@@ -7,7 +7,7 @@ import { Component } from 'react';
 /**
  * Internal dependencies
  */
-import { getDocumentTitle } from '../selectors';
+import { getDocumentTitle } from '../state/selectors';
 
 class DocumentTitle extends Component {
 	constructor( props ) {

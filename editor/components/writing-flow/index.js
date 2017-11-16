@@ -26,8 +26,8 @@ import {
 	getMultiSelectedBlocksEndUid,
 	getMultiSelectedBlocks,
 	getSelectedBlock,
-} from '../../selectors';
-import { multiSelect } from '../../actions';
+} from '../../state/selectors';
+import { multiSelect } from '../../state/actions';
 
 /**
  * Module Constants

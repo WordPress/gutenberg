@@ -13,7 +13,7 @@ import { IconButton } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import { getEditorMode } from '../../selectors';
+import { getEditorMode } from '../../state/selectors';
 
 /**
  * Set of available mode options.

@@ -13,8 +13,8 @@ import { FormToggle, withInstanceId } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { getEditedPostAttribute } from '../../selectors';
-import { editPost } from '../../actions';
+import { getEditedPostAttribute } from '../../state/selectors';
+import { editPost } from '../../state/actions';
 import PostStickyCheck from './check';
 
 export function PostSticky( { onUpdateSticky, postSticky = false, instanceId } ) {

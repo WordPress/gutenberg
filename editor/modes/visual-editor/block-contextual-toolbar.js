@@ -13,7 +13,7 @@ import { __ } from '@wordpress/i18n';
  */
 import NavigableToolbar from '../../navigable-toolbar';
 import { BlockToolbar } from '../../components';
-import { isFeatureActive } from '../../selectors';
+import { isFeatureActive } from '../../state/selectors';
 
 function BlockContextualToolbar( { hasFixedToolbar } ) {
 	if ( hasFixedToolbar ) {
