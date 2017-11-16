@@ -14,7 +14,7 @@ import { Button, Dashicon } from '@wordpress/components';
  */
 import './style.scss';
 import {
-	isEditedPostNew,
+	isCurrentPostNew,
 	getCurrentPostId,
 	getCurrentPostType,
 } from '../../state/selectors';
@@ -38,7 +38,7 @@ function PostTrash( { isNew, postId, postType, ...props } ) {
 export default connect(
 	( state ) => {
 		return {
-			isNew: isEditedPostNew( state ),
+			isNew: isCurrentPostNew( state ),
 			postId: getCurrentPostId( state ),
 			postType: getCurrentPostType( state ),
 		};

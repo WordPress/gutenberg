@@ -13,7 +13,7 @@ import { PanelRow } from '@wordpress/components';
  */
 import './style.scss';
 import { PostTrash as PostTrashLink } from '../../components';
-import { isEditedPostNew, getCurrentPostId } from '../../state/selectors';
+import { isCurrentPostNew, getCurrentPostId } from '../../state/selectors';
 
 function PostTrash( { isNew, postId } ) {
 	if ( isNew || ! postId ) {
@@ -30,7 +30,7 @@ function PostTrash( { isNew, postId } ) {
 export default connect(
 	( state ) => {
 		return {
-			isNew: isEditedPostNew( state ),
+			isNew: isCurrentPostNew( state ),
 			postId: getCurrentPostId( state ),
 		};
 	},

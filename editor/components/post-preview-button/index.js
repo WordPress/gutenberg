@@ -14,10 +14,10 @@ import { _x } from '@wordpress/i18n';
  * Internal dependencies
  */
 import {
-	getEditedPostPreviewLink,
+	getCurrentPostPreviewLink,
 	getEditedPostAttribute,
 	isEditedPostDirty,
-	isEditedPostNew,
+	isCurrentPostNew,
 	isEditedPostSaveable,
 } from '../../state/selectors';
 import { autosave } from '../../state/actions';
@@ -117,9 +117,9 @@ export class PostPreviewButton extends Component {
 export default connect(
 	( state ) => ( {
 		postId: state.currentPost.id,
-		link: getEditedPostPreviewLink( state ),
+		link: getCurrentPostPreviewLink( state ),
 		isDirty: isEditedPostDirty( state ),
-		isNew: isEditedPostNew( state ),
+		isNew: isCurrentPostNew( state ),
 		isSaveable: isEditedPostSaveable( state ),
 		modified: getEditedPostAttribute( state, 'modified' ),
 	} ),

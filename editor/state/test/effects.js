@@ -187,7 +187,7 @@ describe( 'effects', () => {
 			selectors.isEditedPostSaveable.mockReturnValue( false );
 			selectors.isEditedPostDirty.mockReturnValue( true );
 			selectors.isCurrentPostPublished.mockReturnValue( false );
-			selectors.isEditedPostNew.mockReturnValue( true );
+			selectors.isCurrentPostNew.mockReturnValue( true );
 
 			expect( dispatch ).not.toHaveBeenCalled();
 		} );
@@ -196,7 +196,7 @@ describe( 'effects', () => {
 			selectors.isEditedPostSaveable.mockReturnValue( true );
 			selectors.isEditedPostDirty.mockReturnValue( false );
 			selectors.isCurrentPostPublished.mockReturnValue( false );
-			selectors.isEditedPostNew.mockReturnValue( false );
+			selectors.isCurrentPostNew.mockReturnValue( false );
 
 			expect( dispatch ).not.toHaveBeenCalled();
 		} );
@@ -205,7 +205,7 @@ describe( 'effects', () => {
 			selectors.isEditedPostSaveable.mockReturnValue( true );
 			selectors.isEditedPostDirty.mockReturnValue( false );
 			selectors.isCurrentPostPublished.mockReturnValue( false );
-			selectors.isEditedPostNew.mockReturnValue( true );
+			selectors.isCurrentPostNew.mockReturnValue( true );
 
 			handler( {}, store );
 
@@ -218,7 +218,7 @@ describe( 'effects', () => {
 			selectors.isEditedPostSaveable.mockReturnValue( true );
 			selectors.isEditedPostDirty.mockReturnValue( true );
 			selectors.isCurrentPostPublished.mockReturnValue( true );
-			selectors.isEditedPostNew.mockReturnValue( true );
+			selectors.isCurrentPostNew.mockReturnValue( true );
 
 			// TODO: Publish autosave
 			expect( dispatch ).not.toHaveBeenCalled();
@@ -228,7 +228,7 @@ describe( 'effects', () => {
 			selectors.isEditedPostSaveable.mockReturnValue( true );
 			selectors.isEditedPostDirty.mockReturnValue( true );
 			selectors.isCurrentPostPublished.mockReturnValue( false );
-			selectors.isEditedPostNew.mockReturnValue( true );
+			selectors.isCurrentPostNew.mockReturnValue( true );
 
 			handler( {}, store );
 
@@ -241,7 +241,7 @@ describe( 'effects', () => {
 			selectors.isEditedPostSaveable.mockReturnValue( true );
 			selectors.isEditedPostDirty.mockReturnValue( true );
 			selectors.isCurrentPostPublished.mockReturnValue( false );
-			selectors.isEditedPostNew.mockReturnValue( false );
+			selectors.isCurrentPostNew.mockReturnValue( false );
 
 			handler( {}, store );
 

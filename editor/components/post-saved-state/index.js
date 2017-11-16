@@ -16,7 +16,7 @@ import { Dashicon, Button } from '@wordpress/components';
 import './style.scss';
 import { editPost, savePost } from '../../state/actions';
 import {
-	isEditedPostNew,
+	isCurrentPostNew,
 	isCurrentPostPublished,
 	isEditedPostDirty,
 	isSavingPost,
@@ -68,7 +68,7 @@ export function PostSavedState( { isNew, isPublished, isDirty, isSaving, isSavea
 export default connect(
 	( state ) => ( {
 		post: getCurrentPost( state ),
-		isNew: isEditedPostNew( state ),
+		isNew: isCurrentPostNew( state ),
 		isPublished: isCurrentPostPublished( state ),
 		isDirty: isEditedPostDirty( state ),
 		isSaving: isSavingPost( state ),

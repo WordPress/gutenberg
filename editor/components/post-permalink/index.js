@@ -14,7 +14,7 @@ import { Dashicon, ClipboardButton, Button } from '@wordpress/components';
  * Internal Dependencies
  */
 import './style.scss';
-import { isEditedPostNew, getEditedPostAttribute } from '../../state/selectors';
+import { isCurrentPostNew, getEditedPostAttribute } from '../../state/selectors';
 
 class PostPermalink extends Component {
 	constructor() {
@@ -66,7 +66,7 @@ class PostPermalink extends Component {
 export default connect(
 	( state ) => {
 		return {
-			isNew: isEditedPostNew( state ),
+			isNew: isCurrentPostNew( state ),
 			link: getEditedPostAttribute( state, 'link' ),
 		};
 	}

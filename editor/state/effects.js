@@ -20,13 +20,15 @@ import {
 	resetBlocks,
 	focusBlock,
 	replaceBlocks,
-	createSuccessNotice,
-	createErrorNotice,
-	removeNotice,
 	savePost,
 	editPost,
 	requestMetaBoxUpdates,
 } from './actions';
+import {
+	createSuccessNotice,
+	createErrorNotice,
+	removeNotice,
+} from './notices';
 import {
 	getCurrentPost,
 	getCurrentPostType,
@@ -35,7 +37,7 @@ import {
 	getPostEdits,
 	isCurrentPostPublished,
 	isEditedPostDirty,
-	isEditedPostNew,
+	isCurrentPostNew,
 	isEditedPostSaveable,
 	getMetaBoxes,
 } from './selectors';
@@ -235,7 +237,7 @@ export default {
 			return;
 		}
 
-		if ( ! isEditedPostNew( state ) && ! isEditedPostDirty( state ) ) {
+		if ( ! isCurrentPostNew( state ) && ! isEditedPostDirty( state ) ) {
 			return;
 		}
 
@@ -249,7 +251,7 @@ export default {
 		}
 
 		// Change status from auto-draft to draft
-		if ( isEditedPostNew( state ) ) {
+		if ( isCurrentPostNew( state ) ) {
 			dispatch( editPost( { status: 'draft' } ) );
 		}
 
