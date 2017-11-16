@@ -164,9 +164,14 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: 'block-default',
-				attributes: { ok: {
-					type: 'boolean',
-				} },
+				attributes: {
+					ok: {
+						type: 'boolean',
+					},
+					className: {
+						type: 'string',
+					},
+				},
 			} );
 		} );
 
