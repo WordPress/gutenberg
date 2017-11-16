@@ -52,9 +52,10 @@ export default connect(
 	( state ) => ( {
 		active: isFeatureActive( state, 'fixedToolbar' ),
 	} ),
-	( dispatch ) => ( {
+	( dispatch, ownProps ) => ( {
 		onToggle() {
 			dispatch( toggleFeature( 'fixedToolbar' ) );
+			ownProps.onToggle();
 		},
 	} )
 )( withInstanceId( FeatureToggle ) );

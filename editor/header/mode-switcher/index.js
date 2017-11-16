@@ -45,12 +45,13 @@ export default connect(
 	( state ) => ( {
 		mode: getEditorMode( state ),
 	} ),
-	( dispatch ) => ( {
+	( dispatch, ownProps ) => ( {
 		onSwitch( mode ) {
 			dispatch( {
 				type: 'SWITCH_MODE',
 				mode: mode,
 			} );
+			ownProps.onSelect( mode );
 		},
 	} )
 )( ModeSwitcher );
