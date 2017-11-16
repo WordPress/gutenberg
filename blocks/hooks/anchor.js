@@ -6,7 +6,6 @@ import { assign } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { concatChildren } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -55,9 +54,9 @@ export function addAttribute( settings ) {
  */
 export function addInspectorControl( element, props ) {
 	if ( hasBlockSupport( props.name, 'anchor' ) && props.focus ) {
-		element = concatChildren(
+		element = [
 			element,
-			<InspectorControls>
+			<InspectorControls key="inspector-anchor">
 				<InspectorControls.TextControl
 					label={ __( 'HTML Anchor' ) }
 					help={ __( 'Anchors lets you link directly to a section on a page.' ) }
@@ -69,8 +68,8 @@ export function addInspectorControl( element, props ) {
 							anchor: nextValue,
 						} );
 					} } />
-			</InspectorControls>
-		);
+			</InspectorControls>,
+		];
 	}
 
 	return element;

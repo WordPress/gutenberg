@@ -8,16 +8,23 @@ import { noop } from 'lodash';
  */
 import { Component, createPortal } from '@wordpress/element';
 
-/**
- * Internal dependencies
- */
-import withInstanceId from '../higher-order/with-instance-id';
+let occurrences = 0;
 
 class Fill extends Component {
+	componentWillMount() {
+		this.occurrence = ++occurrences;
+	}
+
 	componentDidMount() {
 		const { registerFill = noop } = this.context;
 
 		registerFill( this.props.name, this );
+	}
+
+	componentWillUpdate() {
+		if ( ! this.occurrence ) {
+			this.occurrence = ++occurrences;
+		}
 	}
 
 	componentWillUnmount() {
@@ -27,13 +34,13 @@ class Fill extends Component {
 	}
 
 	componentWillReceiveProps( nextProps ) {
-		const { name, force } = nextProps;
+		const { name } = nextProps;
 		const {
 			unregisterFill = noop,
 			registerFill = noop,
 		} = this.context;
 
-		if ( this.props.name !== name || force ) {
+		if ( this.props.name !== name ) {
 			unregisterFill( this.props.name, this );
 			registerFill( name, this );
 		}
@@ -45,6 +52,10 @@ class Fill extends Component {
 		if ( slot && ! slot.props.bubblesVirtually ) {
 			slot.forceUpdate();
 		}
+	}
+
+	resetOccurrence() {
+		this.occurrence = null;
 	}
 
 	render() {
@@ -65,4 +76,4 @@ Fill.contextTypes = {
 	unregisterFill: noop,
 };
 
-export default withInstanceId( Fill );
+export default Fill;

@@ -7,7 +7,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { concatChildren } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -46,9 +45,9 @@ export function addAttribute( settings ) {
  */
 export function addInspectorControl( element, props ) {
 	if ( hasBlockSupport( props.name, 'customClassName', true ) && props.focus ) {
-		element = concatChildren(
+		element = [
 			element,
-			<InspectorControls force>
+			<InspectorControls key="inspector-custom-classname">
 				<InspectorControls.TextControl
 					label={ __( 'Additional CSS Class' ) }
 					value={ props.attributes.className || '' }
@@ -58,8 +57,8 @@ export function addInspectorControl( element, props ) {
 						} );
 					} }
 				/>
-			</InspectorControls>
-		);
+			</InspectorControls>,
+		];
 	}
 
 	return element;

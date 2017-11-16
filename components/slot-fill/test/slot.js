@@ -26,7 +26,7 @@ class Filler extends Component {
 	render() {
 		return [
 			<button key="1" type="button" onClick={ () => this.setState( { num: this.state.num + 1 } ) } />,
-			<Fill name={ this.props.name } key="2">{ this.state.num.toString() }</Fill>,
+			<Fill name={ this.props.name } key="2">{ this.props.text || this.state.num.toString() }</Fill>,
 		];
 	}
 }
@@ -95,5 +95,38 @@ describe( 'Slot', () => {
 		element.find( 'button' ).simulate( 'click' );
 
 		expect( element.find( 'Slot > div' ).html() ).toBe( '<div>2</div>' );
+	} );
+
+	it( 'should render in expected order', () => {
+		const element = mount(
+			<Provider>
+				<Slot name="egg" key="slot" />
+			</Provider>
+		);
+
+		element.setProps( {
+			children: [
+				<Slot name="egg" key="slot" />,
+				<Filler name="egg" key="first" text="first" />,
+				<Filler name="egg" key="second" text="second" />,
+			],
+		} );
+
+		element.setProps( {
+			children: [
+				<Slot name="egg" key="slot" />,
+				<Filler name="egg" key="second" text="second" />,
+			],
+		} );
+
+		element.setProps( {
+			children: [
+				<Slot name="egg" key="slot" />,
+				<Filler name="egg" key="first" text="first" />,
+				<Filler name="egg" key="second" text="second" />,
+			],
+		} );
+
+		expect( element.find( 'Slot > div' ).html() ).toBe( '<div>firstsecond</div>' );
 	} );
 } );
