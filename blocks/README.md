@@ -203,7 +203,7 @@ attributes, you need not worry about maintaining the state of the page, or how
 your block interacts in the context of the surrounding editor.
 
 But how does the markup become an object of attributes? We need a pattern for
-encoding the values into the published post's markup, and then retrieving them
+encoding the values into the published post's markup and then retrieve them
 the next time the post is edited. This is the motivation for the block's
 `attributes` property. The shape of this object matches that of the attributes
 object we'd like to receive, where each value is a
