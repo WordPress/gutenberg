@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { find, compact, get } from 'lodash';
+import { find, compact, get, first } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Component, createElement, Children, concatChildren } from '@wordpress/element';
+import { Component, createElement, Children } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -114,13 +114,10 @@ registerBlockType( 'core/list', {
 				type: 'block',
 				blocks: [ 'core/quote' ],
 				transform: ( { value, citation } ) => {
-					const listItems = fromBrDelimitedContent( value );
-					const values = citation ?
-						concatChildren( listItems, <li>{ citation }</li> ) :
-						listItems;
 					return createBlock( 'core/list', {
 						nodeName: 'UL',
-						values,
+						values: value.map( ( item, index ) => <li key={ index } >{ get( item, 'children.props.children', '' ) } </li> )
+							.concat( citation ? <li key="citation">{ citation }</li> : [] ),
 					} );
 				},
 			},
