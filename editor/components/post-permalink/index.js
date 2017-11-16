@@ -14,7 +14,7 @@ import { Dashicon, ClipboardButton, Button } from '@wordpress/components';
  * Internal Dependencies
  */
 import './style.scss';
-import { isEditedPostNew, getEditedPostAttribute } from '../selectors';
+import { isEditedPostNew, getEditedPostAttribute } from '../../selectors';
 
 class PostPermalink extends Component {
 	constructor() {
