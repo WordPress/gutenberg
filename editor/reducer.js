@@ -30,7 +30,7 @@ import { getBlockTypes, getBlockType } from '@wordpress/blocks';
  */
 import withHistory from './utils/with-history';
 import withChangeDetection from './utils/with-change-detection';
-import { STORE_DEFAULTS } from './store-defaults';
+import { PREFERENCES_DEFAULTS } from './store-defaults';
 
 /***
  * Module constants
@@ -471,7 +471,7 @@ export function blockInsertionPoint( state = {}, action ) {
  * @param  {Object}  action                Dispatched action
  * @return {string}                        Updated state
  */
-export function preferences( state = STORE_DEFAULTS.preferences, action ) {
+export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 	switch ( action.type ) {
 		case 'TOGGLE_SIDEBAR':
 			return {

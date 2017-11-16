@@ -1,14 +1,12 @@
 import { viewPort } from '../utils';
 
-export const STORE_DEFAULTS = {
-	preferences: {
-		mode: 'visual',
-		isSidebarOpened: ! viewPort.isExtraSmall(),
-		panels: { 'post-status': true },
-		recentlyUsedBlocks: [],
-		blockUsage: {},
-		features: {
-			fixedToolbar: true,
-		},
+export const PREFERENCES_DEFAULTS = {
+	mode: 'visual',
+	isSidebarOpened: ! viewPort.isExtraSmall(),
+	panels: { 'post-status': true },
+	recentlyUsedBlocks: [],
+	blockUsage: {},
+	features: {
+		fixedToolbar: true,
 	},
 };
