@@ -23,9 +23,21 @@ import BlockDescription from '../../block-description';
 
 const { getComputedStyle } = window;
 
+const ContrastCheckerWithFallbackStyles = withFallbackStyles( ( node, ownProps ) => {
+	const { textColor, backgroundColor } = ownProps;
+	//avoid the use of querySelector if textColor color is known and verify if node is available.
+	const textNode = ! textColor && node ? node.querySelector( '[contenteditable="true"]' ) : null;
+	return {
+		fallbackBackgroundColor: backgroundColor || ! node ? undefined : getComputedStyle( node ).backgroundColor,
+		fallbackTextColor: textColor || ! textNode ? undefined : getComputedStyle( textNode ).color,
+	};
+} )( ContrastChecker );
+
 class ButtonBlock extends Component {
 	constructor() {
 		super( ...arguments );
+		this.nodeRef = null;
+		this.bindRef = this.bindRef.bind( this );
 		this.updateAlignment = this.updateAlignment.bind( this );
 		this.toggleClear = this.toggleClear.bind( this );
 	}
@@ -39,6 +51,13 @@ class ButtonBlock extends Component {
 		setAttributes( { clear: ! attributes.clear } );
 	}
 
+	bindRef( node ) {
+		if ( ! node ) {
+			return;
+		}
+		this.nodeRef = node;
+	}
+
 	render() {
 		const {
 			attributes,
@@ -46,8 +65,6 @@ class ButtonBlock extends Component {
 			focus,
 			setFocus,
 			className,
-			fallbackBackgroundColor,
-			fallbackTextColor,
 		} = this.props;
 
 		const {
@@ -66,7 +83,7 @@ class ButtonBlock extends Component {
 					<BlockAlignmentToolbar value={ align } onChange={ this.updateAlignment } />
 				</BlockControls>
 			),
-			<span key="button" className={ className } title={ title } style={ { backgroundColor: color } }>
+			<span key="button" className={ className } title={ title } style={ { backgroundColor: color } } ref={ this.bindRef }>
 				<Editable
 					tagName="span"
 					placeholder={ __( 'Add text…' ) }
@@ -103,11 +120,12 @@ class ButtonBlock extends Component {
 								onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
 							/>
 						</PanelColor>
-						<ContrastChecker
-							textColor={ textColor || fallbackTextColor }
-							backgroundColor={ color || fallbackBackgroundColor }
+						{ this.nodeRef && <ContrastCheckerWithFallbackStyles
+							node={ this.nodeRef }
+							textColor={ textColor }
+							backgroundColor={ color }
 							isLargeText={ true }
-						/>
+						/> }
 					</InspectorControls>
 				}
 			</span>,
@@ -127,14 +145,6 @@ class ButtonBlock extends Component {
 		];
 	}
 }
-
-const ButtonBlockFallbackStyles = withFallbackStyles( ( node, ownProps ) => {
-	const { textColor, color } = ownProps.attributes;
-	return {
-		fallbackBackgroundColor: color ? undefined : getComputedStyle( node.querySelector( `.${ ownProps.className }` ) ).backgroundColor,
-		fallbackTextColor: textColor ? undefined : getComputedStyle( node.querySelector( '[contenteditable="true"]' ) ).color,
-	};
-} )( ButtonBlock );
 
 registerBlockType( 'core/button', {
 	title: __( 'Button' ),
@@ -188,9 +198,7 @@ registerBlockType( 'core/button', {
 		return props;
 	},
 
-	edit( props ) {
-		return <ButtonBlockFallbackStyles { ...props } />;
-	},
+	edit: ButtonBlock,
 
 	save( { attributes } ) {
 		const { url, text, title, align, color, textColor } = attributes;
