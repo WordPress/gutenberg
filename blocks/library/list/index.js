@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, compact, get, first } from 'lodash';
+import { find, compact, get, initial, last } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -159,7 +159,9 @@ registerBlockType( 'core/list', {
 				blocks: [ 'core/quote' ],
 				transform: ( { values } ) => {
 					return createBlock( 'core/quote', {
-						value: [ <p key="list">{ toBrDelimitedContent( values ) }</p> ],
+						value: ( values.length === 1 ? values : initial( values ) )
+							.map( ( value ) => ( { children: <p> { get( value, 'props.children' ) } </p> } ) ),
+						citation: ( values.length === 1 ? undefined : get( last( values ), 'props.children' ) ),
 					} );
 				},
 			},
