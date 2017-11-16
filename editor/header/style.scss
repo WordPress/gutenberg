@@ -77,17 +77,10 @@
 	align-items: center;
 }
 
-.editor-mode-switcher {
-	margin-left: $item-spacing;
-
-	.components-button svg {
-		transform: rotate( 90deg );
-	}
-}
-
 .editor-header .components-button {
-	border-radius: 3px;
+	border-radius: $button-style__radius-roundrect;
 
+	// header toggle buttons
 	&.is-toggled {
 		color: $white;
 	}
@@ -95,7 +88,7 @@
 	// put the gray background on a separate layer, so as to match the size of the publish button (34px)
 	&.is-toggled::before {
 		content: "";
-		border-radius: 3px;
+		border-radius: $button-style__radius-roundrect;
 		position: absolute;
 		z-index: -1;
 		background: $dark-gray-500;
@@ -105,8 +98,15 @@
 		left: 1px;
 	}
 
+	&.is-toggled:focus {
+		outline: none;
+		box-shadow: 0 0 0 1px $dark-gray-500, inset 0 0 0 1px $white;
+		color: $white;
+		background: $dark-gray-500;
+	}
+
 	@include break-medium() {
-		&.editor-publish-button, &.editor-publish-with-dropdown__button {
+		&.editor-post-publish-button, &.editor-publish-with-dropdown__button {
 			height: 33px;
 			line-height: 32px;
 		}

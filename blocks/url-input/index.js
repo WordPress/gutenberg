@@ -15,6 +15,11 @@ import { Spinner, withInstanceId, withSpokenMessages } from '@wordpress/componen
 
 const { UP, DOWN, ENTER } = keycodes;
 
+// Since URLInput is rendered in the context of other inputs, but should be
+// considered a separate modal node, prevent keyboard events from propagating
+// as being considered from the input.
+const stopEventPropagation = ( event ) => event.stopPropagation();
+
 class UrlInput extends Component {
 	constructor() {
 		super( ...arguments );
@@ -177,6 +182,7 @@ class UrlInput extends Component {
 					required
 					value={ value }
 					onChange={ this.onChange }
+					onInput={ stopEventPropagation }
 					placeholder={ __( 'Paste URL or type' ) }
 					onKeyDown={ this.onKeyDown }
 					role="combobox"

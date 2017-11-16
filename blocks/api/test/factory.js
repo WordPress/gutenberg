@@ -6,7 +6,7 @@ import { noop } from 'lodash';
 /**
  * Internal dependencies
  */
-import { createBlock, switchToBlockType } from '../factory';
+import { createBlock, switchToBlockType, createReusableBlock } from '../factory';
 import { getBlockTypes, unregisterBlockType, setUnknownTypeHandlerName, registerBlockType } from '../registration';
 
 describe( 'block factory', () => {
@@ -55,30 +55,6 @@ describe( 'block factory', () => {
 			} );
 			expect( block.isValid ).toBe( true );
 			expect( typeof block.uid ).toBe( 'string' );
-		} );
-
-		it( 'should keep the anchor if the block supports it', () => {
-			registerBlockType( 'core/test-block', {
-				attributes: {
-					align: {
-						type: 'string',
-					},
-				},
-				save: noop,
-				category: 'common',
-				title: 'test block',
-				supportAnchor: true,
-			} );
-			const block = createBlock( 'core/test-block', {
-				align: 'left',
-				anchor: 'chicken',
-			} );
-
-			expect( block.attributes ).toEqual( {
-				anchor: 'chicken',
-				align: 'left',
-			} );
-			expect( block.isValid ).toBe( true );
 		} );
 
 		it( 'should keep the className if the block supports it', () => {
@@ -457,6 +433,20 @@ describe( 'block factory', () => {
 			expect( transformedBlocks[ 1 ].isValid ).toBe( true );
 			expect( transformedBlocks[ 1 ].attributes ).toEqual( {
 				value: 'smoked ribs',
+			} );
+		} );
+	} );
+
+	describe( 'createReusableBlock', () => {
+		it( 'should create a reusable block', () => {
+			const type = 'core/test-block';
+			const attributes = { name: 'Big Bird' };
+
+			expect( createReusableBlock( type, attributes ) ).toMatchObject( {
+				id: expect.stringMatching( /\w{8}-\w{4}-\w{4}-\w{4}-\w{12}/ ),
+				name: 'Untitled block',
+				type,
+				attributes,
 			} );
 		} );
 	} );

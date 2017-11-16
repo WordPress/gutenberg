@@ -1,6 +1,5 @@
 describe( 'Adding blocks', () => {
 	before( () => {
-		cy.login();
 		cy.newPost();
 	} );
 
@@ -27,11 +26,11 @@ describe( 'Adding blocks', () => {
 		cy.get( '[placeholder="Write code…"]' ).type( 'Code block' );
 
 		// Switch to Text Mode to check HTML Output
-		cy.get( '.editor-mode-switcher [aria-label="More"]' ).click();
+		cy.get( '.editor-ellipsis-menu [aria-label="More"]' ).click();
 		cy.get( 'button' ).contains( 'Switch To Text Mode' ).click();
 
 		// Assertions
-		cy.get( '.editor-text-editor__textarea' )
+		cy.get( '.editor-post-text-editor' )
 			.should( 'contain', 'First Paragraph' )
 			.should( 'contain', 'Second Paragraph' )
 			.should( 'contain', 'Quote block' )

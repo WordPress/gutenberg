@@ -2,10 +2,11 @@
     {
         "blockName": "core/shortcode",
         "attrs": null,
-        "rawContent": "\n[gallery ids=\"238,338\"]\n"
+        "innerBlocks": [],
+        "innerHTML": "\n[gallery ids=\"238,338\"]\n"
     },
     {
         "attrs": {},
-        "rawContent": "\n"
+        "innerHTML": "\n"
     }
 ]

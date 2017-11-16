@@ -308,7 +308,12 @@ function gutenberg_can_edit_post_type( $post_type ) {
 }
 
 /**
- * Determine whether a post has blocks.
+ * Determine whether a post has blocks. This test optimizes for performance
+ * rather than strict accuracy, detecting the pattern of a block but not
+ * validating its structure. For strict accuracy, you should use the block
+ * parser on post content.
+ *
+ * @see gutenberg_parse_blocks()
  *
  * @since 0.5.0
  *
@@ -317,18 +322,22 @@ function gutenberg_can_edit_post_type( $post_type ) {
  */
 function gutenberg_post_has_blocks( $post ) {
 	$post = get_post( $post );
-	return $post && content_has_blocks( $post->post_content );
+	return $post && gutenberg_content_has_blocks( $post->post_content );
 }
 
 /**
- * Determine whether a content string contains gutenberg blocks.
+ * Determine whether a content string contains blocks. This test optimizes for
+ * performance rather than strict accuracy, detecting the pattern of a block
+ * but not validating its structure. For strict accuracy, you should use the
+ * block parser on post content.
  *
  * @since 1.6.0
+ * @see gutenberg_parse_blocks()
  *
  * @param string $content Content to test.
  * @return bool Whether the content contains blocks.
  */
-function content_has_blocks( $content ) {
+function gutenberg_content_has_blocks( $content ) {
 	return false !== strpos( $content, '<!-- wp:' );
 }
 
@@ -354,7 +363,7 @@ add_filter( 'display_post_states', 'gutenberg_add_gutenberg_post_state', 10, 2 )
  * @since 0.10.0
  */
 function gutenberg_register_post_types() {
-	register_post_type( 'gb_reusable_block', array(
+	register_post_type( 'wp_block', array(
 		'public' => false,
 	) );
 }

@@ -45,7 +45,7 @@ describe( 'Tooltip', () => {
 
 		it( 'should show popover on focus', () => {
 			const originalFocus = jest.fn();
-			const event = { type: 'focus', target: {} };
+			const event = { type: 'focus', currentTarget: {} };
 			const wrapper = shallow(
 				<Tooltip text="Help Text">
 					<button
@@ -78,13 +78,17 @@ describe( 'Tooltip', () => {
 						onMouseEnter={ originalMouseEnter }
 						onFocus={ originalMouseEnter }
 					>
-						Hover Me!
+						<span>Hover Me!</span>
 					</button>
 				</Tooltip>
 			);
 
-			const button = wrapper.find( 'button' );
-			button.simulate( 'mouseenter' );
+			wrapper.find( 'button' ).simulate( 'mouseenter', {
+				// Enzyme does not accurately emulate event targets
+				// See: https://github.com/airbnb/enzyme/issues/218
+				currentTarget: wrapper.find( 'button' ).getDOMNode(),
+				target: wrapper.find( 'button > span' ).getDOMNode(),
+			} );
 
 			expect( originalMouseEnter ).toHaveBeenCalled();
 
@@ -108,13 +112,19 @@ describe( 'Tooltip', () => {
 						onFocus={ originalMouseEnter }
 						disabled
 					>
-						Hover Me!
+						<span>Hover Me!</span>
 					</button>
 				</Tooltip>
 			);
 
-			const button = wrapper.find( 'button' );
-			button.simulate( 'mouseenter' );
+			wrapper.find( 'button' ).simulate( 'mouseenter', {
+				// Enzyme does not accurately emulate event targets
+				// See: https://github.com/airbnb/enzyme/issues/218
+				currentTarget: wrapper.find( 'button' ).getDOMNode(),
+				target: wrapper.find( 'button > span' ).getDOMNode(),
+			} );
+
+			expect( originalMouseEnter ).toHaveBeenCalled();
 
 			const popover = wrapper.find( 'Popover' );
 			wrapper.instance().delayedSetIsOver.flush();

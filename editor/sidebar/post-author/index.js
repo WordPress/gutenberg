@@ -7,8 +7,7 @@ import { PanelRow } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import PostAuthorCheck from '../../post-author/check';
-import PostAuthorForm from '../../post-author';
+import { PostAuthor as PostAuthorForm, PostAuthorCheck } from '../../components';
 
 export function PostAuthor() {
 	return (

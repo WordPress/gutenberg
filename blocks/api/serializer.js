@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, reduce, isObject, castArray, compact } from 'lodash';
+import { isEmpty, reduce, isObject, castArray, compact, startsWith } from 'lodash';
 import { html as beautifyHtml } from 'js-beautify';
 import classnames from 'classnames';
 
@@ -14,6 +14,7 @@ import { Component, createElement, renderToString, cloneElement, Children } from
  * Internal dependencies
  */
 import { getBlockType, getUnknownTypeHandlerName } from './registration';
+import { applyFilters } from '../hooks';
 
 /**
  * Returns the block's default classname from its name
@@ -30,22 +31,22 @@ export function getBlockDefaultClassname( blockName ) {
  * Given a block type containg a save render implementation and attributes, returns the
  * static markup to be saved.
  *
- * @param  {Object}               blockType  Block type
- * @param  {Object}               attributes Block attributes
- * @return {string}                          Save content
+ * @param  {Object} blockType  Block type
+ * @param  {Object} attributes Block attributes
+ * @return {string}            Save content
  */
 export function getSaveContent( blockType, attributes ) {
 	const { save, className = getBlockDefaultClassname( blockType.name ) } = blockType;
-	let rawContent;
+	let saveContent;
 
 	if ( save.prototype instanceof Component ) {
-		rawContent = createElement( save, { attributes } );
+		saveContent = createElement( save, { attributes } );
 	} else {
-		rawContent = save( { attributes } );
+		saveContent = save( { attributes } );
 
 		// Special-case function render implementation to allow raw HTML return
-		if ( 'string' === typeof rawContent ) {
-			return rawContent;
+		if ( 'string' === typeof saveContent ) {
+			return saveContent;
 		}
 	}
 
@@ -55,7 +56,7 @@ export function getSaveContent( blockType, attributes ) {
 			return element;
 		}
 
-		const extraProps = {};
+		const extraProps = applyFilters( 'getSaveContent.extraProps', {}, blockType, attributes );
 		if ( !! className ) {
 			const updatedClassName = classnames(
 				className,
@@ -65,13 +66,9 @@ export function getSaveContent( blockType, attributes ) {
 			extraProps.className = updatedClassName;
 		}
 
-		if ( blockType.supportAnchor && attributes.anchor ) {
-			extraProps.id = attributes.anchor;
-		}
-
 		return cloneElement( element, extraProps );
 	};
-	const contentWithClassname = Children.map( rawContent, addAdvancedAttributes );
+	const contentWithClassname = Children.map( saveContent, addAdvancedAttributes );
 
 	// Otherwise, infer as element
 	return renderToString( contentWithClassname );
@@ -101,8 +98,9 @@ export function getCommentAttributes( allAttributes, blockType ) {
 			return result;
 		}
 
-		// Ignore values sources from content and post meta
-		if ( attributeSchema.source || attributeSchema.meta ) {
+		// Ignore all attributes but the ones with an "undefined" source
+		// "undefined" source refers to attributes saved in the block comment
+		if ( attributeSchema.source !== undefined ) {
 			return result;
 		}
 
@@ -179,7 +177,7 @@ export function getCommentDelimitedContent( rawBlockName, attributes, content ) 
 		'';
 
 	// strip core blocks of their namespace prefix
-	const blockName = rawBlockName.startsWith( 'core/' ) ?
+	const blockName = startsWith( rawBlockName, 'core/' ) ?
 		rawBlockName.slice( 5 ) :
 		rawBlockName;
 

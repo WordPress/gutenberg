@@ -124,6 +124,10 @@ export default function rawHandler( { HTML, plainText = '', mode = 'AUTO' } ) {
 					return acc;
 				}
 
+				if ( transform.transform ) {
+					return transform.transform( node );
+				}
+
 				return createBlock(
 					blockType.name,
 					getBlockAttributes(

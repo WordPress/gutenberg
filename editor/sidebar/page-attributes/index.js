@@ -2,111 +2,50 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { get, flowRight } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
-import { PanelBody, PanelRow, withAPIData, withInstanceId } from '@wordpress/components';
+import { PanelBody, PanelRow } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import { editPost, toggleSidebarPanel } from '../../actions';
-import { getCurrentPostType, getEditedPostAttribute, isEditorSidebarPanelOpened } from '../../selectors';
+import { PageAttributes as PageAttributesForm, PageAttributesCheck } from '../../components';
+import { toggleSidebarPanel } from '../../actions';
+import { isEditorSidebarPanelOpened } from '../../selectors';
 
 /**
  * Module Constants
  */
 const PANEL_NAME = 'page-attributes';
 
-export class PageAttributes extends Component {
-	constructor() {
-		super( ...arguments );
-
-		this.setUpdatedOrder = this.setUpdatedOrder.bind( this );
-
-		this.state = {
-			supportsPageAttributes: false,
-		};
-	}
-
-	setUpdatedOrder( event ) {
-		const order = Number( event.target.value );
-		if ( order >= 0 ) {
-			this.props.onUpdateOrder( order );
-		}
-	}
-
-	render() {
-		const { instanceId, order, postType, isOpened, onTogglePanel } = this.props;
-		const supportsPageAttributes = get( postType.data, [
-			'supports',
-			'page-attributes',
-		], false );
-
-		// Only render fields if post type supports page attributes
-		if ( ! supportsPageAttributes ) {
-			return null;
-		}
-
-		// Create unique identifier for inputs
-		const inputId = `editor-page-attributes__order-${ instanceId }`;
-
-		return (
+export function PageAttributes( { isOpened, onTogglePanel } ) {
+	return (
+		<PageAttributesCheck>
 			<PanelBody
 				title={ __( 'Page Attributes' ) }
 				opened={ isOpened }
 				onToggle={ onTogglePanel }
 			>
 				<PanelRow>
-					<label htmlFor={ inputId }>
-						{ __( 'Order' ) }
-					</label>
-					<input
-						type="text"
-						value={ order || 0 }
-						onChange={ this.setUpdatedOrder }
-						id={ inputId }
-						size={ 6 } />
+					<PageAttributesForm />
 				</PanelRow>
 			</PanelBody>
-		);
-	}
+		</PageAttributesCheck>
+	);
 }
 
-const applyConnect = connect(
+export default connect(
 	( state ) => {
 		return {
-			postTypeSlug: getCurrentPostType( state ),
-			order: getEditedPostAttribute( state, 'menu_order' ),
 			isOpened: isEditorSidebarPanelOpened( state, PANEL_NAME ),
 		};
 	},
 	{
-		onUpdateOrder( order ) {
-			return editPost( {
-				menu_order: order,
-			} );
-		},
 		onTogglePanel() {
 			return toggleSidebarPanel( PANEL_NAME );
 		},
 	}
-);
-
-const applyWithAPIData = withAPIData( ( props ) => {
-	const { postTypeSlug } = props;
-
-	return {
-		postType: `/wp/v2/types/${ postTypeSlug }?context=edit`,
-	};
-} );
-
-export default flowRight( [
-	applyConnect,
-	applyWithAPIData,
-	withInstanceId,
-] )( PageAttributes );
+)( PageAttributes );

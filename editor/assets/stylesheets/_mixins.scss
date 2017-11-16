@@ -110,3 +110,36 @@
 
 $visual-editor-max-width-padding: $visual-editor-max-width + $block-mover-padding-visible + $block-mover-padding-visible;
 $float-margin: calc( 50% - #{ $visual-editor-max-width-padding / 2 } );
+
+/**
+ * Button states and focus styles
+ */
+
+@mixin button-style__disabled {
+	opacity: 0.6;
+	cursor: default;
+}
+
+@mixin button-style__hover {
+	color: $dark-gray-900;	// previously $blue-medium-500
+}
+
+@mixin button-style__focus-active() {
+	outline: none;
+	box-shadow: inset 0 0 0 1px $dark-gray-500, inset 0 0 0 2px $white;
+	color: $dark-gray-900;
+	background: $light-gray-300;
+}
+
+@mixin tab-style__focus-active() {
+	outline: none;
+	box-shadow: 0 0 0 1px $dark-gray-500;
+	color: $dark-gray-900;
+	background: $light-gray-300;
+}
+
+@mixin input-style__focus-active() {
+	outline: none;
+	box-shadow: 0 0 0 1px $dark-gray-500;
+	color: $dark-gray-900;
+}

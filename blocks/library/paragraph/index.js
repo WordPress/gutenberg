@@ -8,13 +8,13 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import { concatChildren } from '@wordpress/element';
-import { Autocomplete, PanelBody } from '@wordpress/components';
+import { Autocomplete, PanelBody, PanelColor } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, createBlock, source, setDefaultBlockName } from '../../api';
+import { registerBlockType, createBlock, setDefaultBlockName } from '../../api';
 import { blockAutocompleter, userAutocompleter } from '../../autocompleters';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
@@ -25,8 +25,6 @@ import ToggleControl from '../../inspector-controls/toggle-control';
 import RangeControl from '../../inspector-controls/range-control';
 import ColorPalette from '../../color-palette';
 import BlockDescription from '../../block-description';
-
-const { children } = source;
 
 registerBlockType( 'core/paragraph', {
 	title: __( 'Paragraph' ),
@@ -42,7 +40,8 @@ registerBlockType( 'core/paragraph', {
 	attributes: {
 		content: {
 			type: 'array',
-			source: children( 'p' ),
+			source: 'children',
+			selector: 'p',
 		},
 		align: {
 			type: 'string',
@@ -131,18 +130,18 @@ registerBlockType( 'core/paragraph', {
 							allowReset
 						/>
 					</PanelBody>
-					<PanelBody title={ __( 'Background Color' ) }>
+					<PanelColor title={ __( 'Background Color' ) } colorValue={ backgroundColor } initialOpen={ false }>
 						<ColorPalette
 							value={ backgroundColor }
 							onChange={ ( colorValue ) => setAttributes( { backgroundColor: colorValue } ) }
 						/>
-					</PanelBody>
-					<PanelBody title={ __( 'Text Color' ) }>
+					</PanelColor>
+					<PanelColor title={ __( 'Text Color' ) } colorValue={ textColor } initialOpen={ false }>
 						<ColorPalette
 							value={ textColor }
 							onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
 						/>
-					</PanelBody>
+					</PanelColor>
 					<PanelBody title={ __( 'Block Alignment' ) }>
 						<BlockAlignmentToolbar
 							value={ width }

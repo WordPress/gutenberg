@@ -17,14 +17,12 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import './style.scss';
 import './editor.scss';
-import { registerBlockType, source, createBlock } from '../../api';
+import { registerBlockType, createBlock } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
-
-const { children } = source;
 
 // These embeds do not work in sandboxes
 const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
@@ -45,7 +43,8 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 			},
 			caption: {
 				type: 'array',
-				source: children( 'figcaption' ),
+				source: 'children',
+				selector: 'figcaption',
 				default: [],
 			},
 			align: {
@@ -250,12 +249,11 @@ registerBlockType(
 		transforms: {
 			from: [
 				{
-					type: 'pattern',
-					trigger: 'paste',
-					regExp: /^\s*(https?:\/\/\S+)\s*/i,
-					transform: ( { match } ) => {
+					type: 'raw',
+					isMatch: ( node ) => node.nodeName === 'P' && /^\s*(https?:\/\/\S+)\s*/i.test( node.textContent ),
+					transform: ( node ) => {
 						return createBlock( 'core/embed', {
-							url: match[ 1 ],
+							url: node.textContent.trim(),
 						} );
 					},
 				},

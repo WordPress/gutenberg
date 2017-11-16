@@ -6,7 +6,6 @@ import { createElement, Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { text } from '../source';
 import serialize, {
 	getCommentAttributes,
 	getBeautifulContent,
@@ -121,20 +120,6 @@ describe( 'block serializer', () => {
 
 				expect( saved ).toBe( '<div>Bananas</div>' );
 			} );
-
-			it( 'should add an id if the block supports anchors', () => {
-				const saved = getSaveContent(
-					{
-						save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),
-						supportAnchor: true,
-						name: 'myplugin/fruit',
-						className: false,
-					},
-					{ fruit: 'Bananas', anchor: 'my-fruit' }
-				);
-
-				expect( saved ).toBe( '<div id="my-fruit">Bananas</div>' );
-			} );
 		} );
 
 		describe( 'component save', () => {
@@ -171,7 +156,7 @@ describe( 'block serializer', () => {
 			}, { attributes: {
 				fruit: {
 					type: 'string',
-					source: text(),
+					source: 'text',
 				},
 				category: {
 					type: 'string',
@@ -373,7 +358,7 @@ describe( 'block serializer', () => {
 					},
 					content: {
 						type: 'string',
-						source: text(),
+						source: 'text',
 					},
 					stuff: {
 						type: 'string',
@@ -436,7 +421,7 @@ describe( 'block serializer', () => {
 				attributes: {
 					content: {
 						type: 'string',
-						source: text(),
+						source: 'text',
 					},
 				},
 				save( { attributes } ) {

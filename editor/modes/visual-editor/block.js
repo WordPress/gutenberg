@@ -3,26 +3,28 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
-import { has, partial, reduce, size } from 'lodash';
+import { get, partial, reduce, size } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { Component, createElement } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
-import { getBlockType, getBlockDefaultClassname, createBlock } from '@wordpress/blocks';
+import { getBlockType, BlockEdit, getBlockDefaultClassname, createBlock } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
+import BlockMover from '../../components/block-mover';
+import BlockSettingsMenu from '../../components/block-settings-menu';
 import InvalidBlockWarning from './invalid-block-warning';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockDropZone from './block-drop-zone';
 import BlockHtml from './block-html';
-import BlockMover from '../../block-mover';
-import BlockSettingsMenu from '../../block-settings-menu';
+import BlockContextualToolbar from './block-contextual-toolbar';
+import BlockMultiControls from './multi-controls';
 import {
 	clearSelectedBlock,
 	editPost,
@@ -42,7 +44,6 @@ import {
 	isMultiSelecting,
 	getBlockIndex,
 	getEditedPostAttribute,
-	getMultiSelectedBlockUids,
 	getNextBlock,
 	getPreviousBlock,
 	isBlockHovered,
@@ -71,8 +72,11 @@ class VisualEditorBlock extends Component {
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onBlockError = this.onBlockError.bind( this );
 		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
+		this.onTouchStart = this.onTouchStart.bind( this );
+		this.onClick = this.onClick.bind( this );
 
 		this.previousOffset = null;
+		this.hadTouchStart = false;
 
 		this.state = {
 			error: null,
@@ -148,7 +152,7 @@ class VisualEditorBlock extends Component {
 		onChange( block.uid, attributes );
 
 		const metaAttributes = reduce( attributes, ( result, value, key ) => {
-			if ( type && has( type, [ 'attributes', key, 'meta' ] ) ) {
+			if ( get( type, [ 'attributes', key, 'source' ] ) === 'meta' ) {
 				result[ type.attributes[ key ].meta ] = value;
 			}
 
@@ -163,10 +167,20 @@ class VisualEditorBlock extends Component {
 		}
 	}
 
+	onTouchStart() {
+		// Detect touchstart to disable hover on iOS
+		this.hadTouchStart = true;
+	}
+	onClick() {
+		// Clear touchstart detection
+		// Browser will try to emulate mouse events also see https://www.html5rocks.com/en/mobile/touchandmouse/
+		this.hadTouchStart = false;
+	}
+
 	maybeHover() {
 		const { isHovered, isSelected, isMultiSelected, onHover } = this.props;
 
-		if ( isHovered || isSelected || isMultiSelected ) {
+		if ( isHovered || isSelected || isMultiSelected || this.hadTouchStart ) {
 			return;
 		}
 
@@ -298,37 +312,23 @@ class VisualEditorBlock extends Component {
 	}
 
 	render() {
-		const { block, multiSelectedBlockUids, order, mode } = this.props;
+		const { block, order, mode } = this.props;
 		const { name: blockName, isValid } = block;
 		const blockType = getBlockType( blockName );
 		// translators: %s: Type of block (i.e. Text, Image etc)
 		const blockLabel = sprintf( __( 'Block: %s' ), blockType.title );
 		// The block as rendered in the editor is composed of general block UI
-		// (mover, toolbar, wrapper) and the display of the block content, which
-		// is referred to as <BlockEdit />.
-		let BlockEdit;
-		// `edit` and `save` are functions or components describing the markup
-		// with which a block is displayed. If `blockType` is valid, assign
-		// them preferencially as the render value for the block.
-		if ( blockType ) {
-			BlockEdit = blockType.edit || blockType.save;
-		}
-
-		// Should `BlockEdit` return as null, we have nothing to display for the block.
-		if ( ! BlockEdit ) {
-			return null;
-		}
+		// (mover, toolbar, wrapper) and the display of the block content.
 
 		// Generate the wrapper class names handling the different states of the block.
 		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected, focus } = this.props;
 		const showUI = isSelected && ( ! this.props.isTyping || ( focus && focus.collapsed === false ) );
-		const isProperlyHovered = isHovered && ! this.props.isSelecting;
 		const { error } = this.state;
 		const wrapperClassName = classnames( 'editor-visual-editor__block', {
 			'has-warning': ! isValid || !! error,
 			'is-selected': showUI,
 			'is-multi-selected': isMultiSelected,
-			'is-hovered': isProperlyHovered,
+			'is-hovered': isHovered,
 		} );
 
 		const { onMouseLeave, onFocus, onReplace } = this.props;
@@ -353,20 +353,15 @@ class VisualEditorBlock extends Component {
 				onMouseLeave={ onMouseLeave }
 				className={ wrapperClassName }
 				data-type={ block.name }
+				onTouchStart={ this.onTouchStart }
+				onClick={ this.onClick }
 				{ ...wrapperProps }
 			>
 				<BlockDropZone index={ order } />
-				{ ( showUI || isProperlyHovered ) && <BlockMover uids={ [ block.uid ] } /> }
-				{ ( showUI || isProperlyHovered ) && <BlockSettingsMenu uids={ [ block.uid ] } /> }
-				{ isFirstMultiSelected && ! this.props.isSelecting &&
-					<BlockMover uids={ multiSelectedBlockUids } />
-				}
-				{ isFirstMultiSelected && ! this.props.isSelecting &&
-					<BlockSettingsMenu
-						uids={ multiSelectedBlockUids }
-						focus={ true }
-					/>
-				}
+				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
+				{ ( showUI || isHovered ) && <BlockSettingsMenu uids={ [ block.uid ] } /> }
+				{ showUI && isValid && <BlockContextualToolbar /> }
+				{ isFirstMultiSelected && <BlockMultiControls /> }
 				<div
 					ref={ this.bindBlockNode }
 					onKeyPress={ this.maybeStartTyping }
@@ -381,6 +376,7 @@ class VisualEditorBlock extends Component {
 					<BlockCrashBoundary onError={ this.onBlockError }>
 						{ isValid && mode === 'visual' && (
 							<BlockEdit
+								name={ blockName }
 								focus={ focus }
 								attributes={ block.attributes }
 								setAttributes={ this.setAttributes }
@@ -424,12 +420,10 @@ export default connect(
 			isSelected: isBlockSelected( state, ownProps.uid ),
 			isMultiSelected: isBlockMultiSelected( state, ownProps.uid ),
 			isFirstMultiSelected: isFirstMultiSelectedBlock( state, ownProps.uid ),
-			isHovered: isBlockHovered( state, ownProps.uid ),
+			isHovered: isBlockHovered( state, ownProps.uid ) && ! isMultiSelecting( state ),
 			focus: getBlockFocus( state, ownProps.uid ),
-			isSelecting: isMultiSelecting( state ),
 			isTyping: isTyping( state ),
 			order: getBlockIndex( state, ownProps.uid ),
-			multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
 			meta: getEditedPostAttribute( state, 'meta' ),
 			mode: getBlockMode( state, ownProps.uid ),
 		};

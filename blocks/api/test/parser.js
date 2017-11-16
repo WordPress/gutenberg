@@ -6,12 +6,10 @@ import { noop } from 'lodash';
 /**
  * Internal dependencies
  */
-import { text, attr, html } from '../source';
 import {
-	isValidSource,
+	getBlockAttribute,
 	getBlockAttributes,
 	asType,
-	getSourcedAttributes,
 	createBlockWithFallback,
 	default as parse,
 } from '../parser';
@@ -38,47 +36,6 @@ describe( 'block parser', () => {
 		setUnknownTypeHandlerName( undefined );
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
-		} );
-	} );
-
-	describe( 'isValidSource()', () => {
-		it( 'returns false if falsey argument', () => {
-			expect( isValidSource() ).toBe( false );
-		} );
-
-		it( 'returns true if valid source argument', () => {
-			expect( isValidSource( text() ) ).toBe( true );
-		} );
-
-		it( 'returns false if invalid source argument', () => {
-			expect( isValidSource( () => {} ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'getSourcedAttributes()', () => {
-		it( 'should return matched attributes from valid sources', () => {
-			const sources = {
-				number: {
-					type: 'number',
-				},
-				emphasis: {
-					type: 'string',
-					source: text( 'strong' ),
-				},
-			};
-
-			const rawContent = '<span>Ribs <strong>& Chicken</strong></span>';
-
-			expect( getSourcedAttributes( rawContent, sources ) ).toEqual( {
-				emphasis: '& Chicken',
-			} );
-		} );
-
-		it( 'should return an empty object if no sources defined', () => {
-			const sources = {};
-			const rawContent = '<span>Ribs <strong>& Chicken</strong></span>';
-
-			expect( getSourcedAttributes( rawContent, sources ) ).toEqual( {} );
 		} );
 	} );
 
@@ -120,17 +77,63 @@ describe( 'block parser', () => {
 		} );
 	} );
 
+	describe( 'getBlockAttribute', () => {
+		it( 'should return the comment attribute value', () => {
+			const value = getBlockAttribute(
+				'number',
+				{
+					type: 'number',
+				},
+				'',
+				{ number: 10 }
+			);
+
+			expect( value ).toBe( 10 );
+		} );
+
+		it( 'should return the matcher\'s attribute value', () => {
+			const value = getBlockAttribute(
+				'content',
+				{
+					type: 'string',
+					source: 'text',
+					selector: 'div',
+				},
+				'<div>chicken</div>',
+				{}
+			);
+			expect( value ).toBe( 'chicken' );
+		} );
+
+		it( 'should return undefined for meta attributes', () => {
+			const value = getBlockAttribute(
+				'content',
+				{
+					type: 'string',
+					source: 'meta',
+					meta: 'content',
+				},
+				'<div>chicken</div>',
+				{}
+			);
+			expect( value ).toBeUndefined();
+		} );
+	} );
+
 	describe( 'getBlockAttributes()', () => {
 		it( 'should merge attributes with the parsed and default attributes', () => {
 			const blockType = {
 				attributes: {
 					content: {
 						type: 'string',
-						source: text( 'div' ),
+						source: 'text',
+						selector: 'div',
 					},
 					number: {
 						type: 'number',
-						source: attr( 'div', 'data-number' ),
+						source: 'attribute',
+						attribute: 'data-number',
+						selector: 'div',
 					},
 					align: {
 						type: 'string',
@@ -139,41 +142,17 @@ describe( 'block parser', () => {
 						type: 'string',
 						default: 'none',
 					},
-					ignoredDomSource: {
-						type: 'string',
-						source: ( node ) => node.innerHTML,
-					},
 				},
 			};
 
-			const rawContent = '<div data-number="10">Ribs</div>';
+			const innerHTML = '<div data-number="10">Ribs</div>';
 			const attrs = { align: 'left', invalid: true };
 
-			expect( getBlockAttributes( blockType, rawContent, attrs ) ).toEqual( {
+			expect( getBlockAttributes( blockType, innerHTML, attrs ) ).toEqual( {
 				content: 'Ribs',
 				number: 10,
 				align: 'left',
 				topic: 'none',
-			} );
-		} );
-
-		it( 'should parse the anchor if the block supports it', () => {
-			const blockType = {
-				attributes: {
-					content: {
-						type: 'string',
-						source: text( 'div' ),
-					},
-				},
-				supportAnchor: true,
-			};
-
-			const rawContent = '<div id="chicken">Ribs</div>';
-			const attrs = {};
-
-			expect( getBlockAttributes( blockType, rawContent, attrs ) ).toEqual( {
-				content: 'Ribs',
-				anchor: 'chicken',
 			} );
 		} );
 
@@ -182,10 +161,10 @@ describe( 'block parser', () => {
 				attributes: {},
 			};
 
-			const rawContent = '<div class="chicken">Ribs</div>';
+			const innerHTML = '<div class="chicken">Ribs</div>';
 			const attrs = { className: 'chicken' };
 
-			expect( getBlockAttributes( blockType, rawContent, attrs ) ).toEqual( {
+			expect( getBlockAttributes( blockType, innerHTML, attrs ) ).toEqual( {
 				className: 'chicken',
 			} );
 		} );
@@ -196,10 +175,10 @@ describe( 'block parser', () => {
 				className: false,
 			};
 
-			const rawContent = '<div class="chicken">Ribs</div>';
+			const innerHTML = '<div class="chicken">Ribs</div>';
 			const attrs = { className: 'chicken' };
 
-			expect( getBlockAttributes( blockType, rawContent, attrs ) ).toEqual( {} );
+			expect( getBlockAttributes( blockType, innerHTML, attrs ) ).toEqual( {} );
 		} );
 	} );
 
@@ -231,7 +210,7 @@ describe( 'block parser', () => {
 				attributes: {
 					content: {
 						type: 'string',
-						source: html(),
+						source: 'html',
 					},
 					fruit: {
 						type: 'string',
@@ -272,7 +251,7 @@ describe( 'block parser', () => {
 				attributes: {
 					content: {
 						type: 'string',
-						source: text(),
+						source: 'text',
 					},
 					smoked: { type: 'string' },
 					url: { type: 'string' },
@@ -311,7 +290,7 @@ describe( 'block parser', () => {
 				attributes: {
 					content: {
 						type: 'string',
-						source: text(),
+						source: 'text',
 					},
 				},
 				save: noop,
@@ -384,7 +363,7 @@ describe( 'block parser', () => {
 				attributes: {
 					content: {
 						type: 'string',
-						source: html(),
+						source: 'html',
 					},
 				},
 				save: noop,
