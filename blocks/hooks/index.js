@@ -7,7 +7,7 @@ import createHooks from '@wordpress/hooks';
  * Internal dependencies
  */
 import anchor from './anchor';
-import customClassName from './custom-classname';
+import customClassName from './custom-class-name';
 
 const hooks = createHooks();
 

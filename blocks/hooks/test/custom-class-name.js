@@ -11,9 +11,9 @@ import createHooks from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import customClassName from '../custom-classname';
+import customClassName from '../custom-class-name';
 
-describe( 'anchor', () => {
+describe( 'custom className', () => {
 	const hooks = createHooks();
 
 	let blockSettings;

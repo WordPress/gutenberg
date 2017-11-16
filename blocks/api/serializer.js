@@ -50,13 +50,15 @@ export function getSaveContent( blockType, attributes ) {
 		}
 	}
 
-	// Adding a generic classname
-	const addGeneratedClassname = ( element ) => {
+	const addExtraContainerProps = ( element ) => {
 		if ( ! element || ! isObject( element ) ) {
 			return element;
 		}
 
+		// Applying the filters adding extra props
 		const props = applyFilters( 'getSaveContent.extraProps', { ...element.props }, blockType, attributes );
+
+		// Adding the generated classname
 		if ( !! className ) {
 			const updatedClassName = classnames(
 				className,
@@ -67,7 +69,7 @@ export function getSaveContent( blockType, attributes ) {
 
 		return cloneElement( element, props );
 	};
-	const contentWithClassname = Children.map( saveContent, addGeneratedClassname );
+	const contentWithClassname = Children.map( saveContent, addExtraContainerProps );
 
 	// Otherwise, infer as element
 	return renderToString( contentWithClassname );
