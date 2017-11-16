@@ -51,15 +51,16 @@ window.jQuery( document ).on( 'heartbeat-tick', ( event, response ) => {
  * an initial state from prior to the crash.
  *
  * @param {Element} target       DOM node in which editor is rendered
+ * @param {?Object} settings     Editor settings object
  * @param {*}       initialState Initial editor state to hydrate
  */
-export function recreateEditorInstance( target, initialState ) {
+export function recreateEditorInstance( target, settings, initialState ) {
 	unmountComponentAtNode( target );
 
-	const reboot = recreateEditorInstance.bind( null, target );
+	const reboot = recreateEditorInstance.bind( null, target, settings );
 
 	render(
-		<EditorProvider initialState={ initialState }>
+		<EditorProvider settings={ settings } initialState={ initialState }>
 			<ErrorBoundary onError={ reboot }>
 				<Layout />
 			</ErrorBoundary>
@@ -81,7 +82,7 @@ export function recreateEditorInstance( target, initialState ) {
  */
 export function createEditorInstance( id, post, settings ) {
 	const target = document.getElementById( id );
-	const reboot = recreateEditorInstance.bind( null, target );
+	const reboot = recreateEditorInstance.bind( null, target, settings );
 
 	const provider = render(
 		<EditorProvider settings={ settings } post={ post }>
