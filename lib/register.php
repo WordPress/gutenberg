@@ -460,6 +460,11 @@ add_filter( 'redirect_post_location', 'gutenberg_redirect_to_classic_editor_when
 function gutenberg_link_revisions_to_classic_editor( $url ) {
 	global $pagenow;
 	if ( 'revision.php' === $pagenow ) {
+
+		// Only reset the classic editor link.
+		if ( isset( $_REQUEST['gutenberg'] ) ) {
+			return $url;
+		}
 		$url = add_query_arg( 'classic-editor', '', $url );
 	}
 	return $url;
