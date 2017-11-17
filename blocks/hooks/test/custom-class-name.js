@@ -11,14 +11,14 @@ import createHooks from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import anchor from '../anchor';
+import customClassName from '../custom-class-name';
 
-describe( 'anchor', () => {
+describe( 'custom className', () => {
 	const hooks = createHooks();
 
 	let blockSettings;
 	beforeEach( () => {
-		anchor( hooks );
+		customClassName( hooks );
 
 		blockSettings = {
 			save: noop,
@@ -35,21 +35,21 @@ describe( 'anchor', () => {
 	describe( 'addAttribute()', () => {
 		const addAttribute = hooks.applyFilters.bind( null, 'registerBlockType' );
 
-		it( 'should do nothing if the block settings do not define anchor support', () => {
-			const settings = addAttribute( blockSettings );
+		it( 'should do nothing if the block settings disable custom className support', () => {
+			const settings = addAttribute( {
+				...blockSettings,
+				supports: {
+					customClassName: false,
+				},
+			} );
 
 			expect( settings.attributes ).toBe( undefined );
 		} );
 
-		it( 'should assign a new anchor attribute', () => {
-			const settings = addAttribute( {
-				...blockSettings,
-				supports: {
-					anchor: true,
-				},
-			} );
+		it( 'should assign a new custom className attribute', () => {
+			const settings = addAttribute( blockSettings );
 
-			expect( settings.attributes ).toHaveProperty( 'anchor' );
+			expect( settings.attributes ).toHaveProperty( 'className' );
 		} );
 	} );
 
@@ -57,23 +57,22 @@ describe( 'anchor', () => {
 		const addSaveProps = hooks.applyFilters.bind( null, 'getSaveContent.extraProps' );
 
 		it( 'should do nothing if the block settings do not define anchor support', () => {
-			const attributes = { anchor: 'foo' };
-			const extraProps = addSaveProps( {}, blockSettings, attributes );
+			const attributes = { className: 'foo' };
+			const extraProps = addSaveProps( {}, {
+				...blockSettings,
+				supports: {
+					customClassName: false,
+				},
+			}, attributes );
 
-			expect( extraProps ).not.toHaveProperty( 'id' );
+			expect( extraProps ).not.toHaveProperty( 'className' );
 		} );
 
 		it( 'should inject anchor attribute ID', () => {
-			const attributes = { anchor: 'foo' };
-			blockSettings = {
-				...blockSettings,
-				supports: {
-					anchor: true,
-				},
-			};
-			const extraProps = addSaveProps( {}, blockSettings, attributes );
+			const attributes = { className: 'bar' };
+			const extraProps = addSaveProps( { className: 'foo' }, blockSettings, attributes );
 
-			expect( extraProps.id ).toBe( 'foo' );
+			expect( extraProps.className ).toBe( 'foo bar' );
 		} );
 	} );
 } );

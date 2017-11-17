@@ -31,6 +31,10 @@ registerBlockType( 'core/html', {
 
 	supportHTML: false,
 
+	supports: {
+		customClassName: false,
+	},
+
 	attributes: {
 		content: {
 			type: 'string',

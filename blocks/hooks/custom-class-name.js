@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { assign } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -15,13 +16,6 @@ import { hasBlockSupport } from '../api';
 import InspectorControls from '../inspector-controls';
 
 /**
- * Regular expression matching invalid anchor characters for replacement.
- *
- * @type {RegExp}
- */
-const ANCHOR_REGEX = /[\s#]/g;
-
-/**
  * Filters registered block settings, extending attributes with anchor using ID
  * of the first node
  *
@@ -29,14 +23,11 @@ const ANCHOR_REGEX = /[\s#]/g;
  * @return {Object}          Filtered block settings
  */
 export function addAttribute( settings ) {
-	if ( hasBlockSupport( settings, 'anchor' ) ) {
+	if ( hasBlockSupport( settings, 'customClassName', true ) ) {
 		// Use Lodash's assign to gracefully handle if attributes are undefined
 		settings.attributes = assign( settings.attributes, {
-			anchor: {
+			className: {
 				type: 'string',
-				source: 'attribute',
-				attribute: 'id',
-				selector: '*',
 			},
 		} );
 	}
@@ -53,21 +44,19 @@ export function addAttribute( settings ) {
  * @return {Element}         Filtered edit element
  */
 export function addInspectorControl( element, props ) {
-	if ( hasBlockSupport( props.name, 'anchor' ) && props.focus ) {
+	if ( hasBlockSupport( props.name, 'customClassName', true ) && props.focus ) {
 		element = [
 			element,
-			<InspectorControls key="inspector-anchor">
+			<InspectorControls key="inspector-custom-class-name">
 				<InspectorControls.TextControl
-					label={ __( 'HTML Anchor' ) }
-					help={ __( 'Anchors lets you link directly to a section on a page.' ) }
-					value={ props.attributes.anchor || '' }
+					label={ __( 'Additional CSS Class' ) }
+					value={ props.attributes.className || '' }
 					onChange={ ( nextValue ) => {
-						nextValue = nextValue.replace( ANCHOR_REGEX, '-' );
-
 						props.setAttributes( {
-							anchor: nextValue,
+							className: nextValue,
 						} );
-					} } />
+					} }
+				/>
 			</InspectorControls>,
 		];
 	}
@@ -86,15 +75,15 @@ export function addInspectorControl( element, props ) {
  * @return {Object}            Filtered props applied to save element
  */
 export function addSaveProps( extraProps, blockType, attributes ) {
-	if ( hasBlockSupport( blockType, 'anchor' ) ) {
-		extraProps.id = attributes.anchor;
+	if ( hasBlockSupport( blockType, 'customClassName', true ) && attributes.className ) {
+		extraProps.className = classnames( extraProps.className, attributes.className );
 	}
 
 	return extraProps;
 }
 
-export default function anchor( { addFilter } ) {
-	addFilter( 'registerBlockType', 'core\anchor-attribute', addAttribute );
-	addFilter( 'BlockEdit', 'core\anchor-inspector-control', addInspectorControl );
-	addFilter( 'getSaveContent.extraProps', 'core\anchor-save-props', addSaveProps );
+export default function customClassName( { addFilter } ) {
+	addFilter( 'registerBlockType', 'core\custom-class-name-attribute', addAttribute );
+	addFilter( 'BlockEdit', 'core\custom-class-name-inspector-control', addInspectorControl );
+	addFilter( 'getSaveContent.extraProps', 'core\custom-class-name-save-props', addSaveProps );
 }
