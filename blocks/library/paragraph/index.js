@@ -20,7 +20,6 @@ import AlignmentToolbar from '../../alignment-toolbar';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import BlockControls from '../../block-controls';
 import Editable from '../../editable';
-import InspectorControls from '../../inspector-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
 import RangeControl from '../../inspector-controls/range-control';
 import ColorPalette from '../../color-palette';
@@ -93,9 +92,55 @@ registerBlockType( 'core/paragraph', {
 		}
 	},
 
+	inspector( { attributes, setAttributes } ) {
+		const { dropCap, fontSize, backgroundColor, textColor, width } = attributes;
+		const toggleDropCap = () => setAttributes( { dropCap: ! dropCap } );
+
+		return (
+			<div>
+				<BlockDescription>
+					<p>{ __( 'Text. Great things start here.' ) }</p>
+				</BlockDescription>
+				<PanelBody title={ __( 'Text Settings' ) }>
+					<ToggleControl
+						label={ __( 'Drop Cap' ) }
+						checked={ !! dropCap }
+						onChange={ toggleDropCap }
+					/>
+					<RangeControl
+						label={ __( 'Font Size' ) }
+						value={ fontSize || '' }
+						onChange={ ( value ) => setAttributes( { fontSize: value } ) }
+						min={ 10 }
+						max={ 200 }
+						beforeIcon="editor-textcolor"
+						allowReset
+					/>
+				</PanelBody>
+				<PanelColor title={ __( 'Background Color' ) } colorValue={ backgroundColor } initialOpen={ false }>
+					<ColorPalette
+						value={ backgroundColor }
+						onChange={ ( colorValue ) => setAttributes( { backgroundColor: colorValue } ) }
+					/>
+				</PanelColor>
+				<PanelColor title={ __( 'Text Color' ) } colorValue={ textColor } initialOpen={ false }>
+					<ColorPalette
+						value={ textColor }
+						onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
+					/>
+				</PanelColor>
+				<PanelBody title={ __( 'Block Alignment' ) }>
+					<BlockAlignmentToolbar
+						value={ width }
+						onChange={ ( nextWidth ) => setAttributes( { width: nextWidth } ) }
+					/>
+				</PanelBody>
+			</div>
+		);
+	},
+
 	edit( { attributes, setAttributes, insertBlocksAfter, focus, setFocus, mergeBlocks, onReplace } ) {
 		const { align, content, dropCap, placeholder, fontSize, backgroundColor, textColor, width } = attributes;
-		const toggleDropCap = () => setAttributes( { dropCap: ! dropCap } );
 		const className = dropCap ? 'has-drop-cap' : null;
 
 		return [
@@ -109,47 +154,7 @@ registerBlockType( 'core/paragraph', {
 					/>
 				</BlockControls>
 			),
-			focus && (
-				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'Text. Great things start here.' ) }</p>
-					</BlockDescription>
-					<PanelBody title={ __( 'Text Settings' ) }>
-						<ToggleControl
-							label={ __( 'Drop Cap' ) }
-							checked={ !! dropCap }
-							onChange={ toggleDropCap }
-						/>
-						<RangeControl
-							label={ __( 'Font Size' ) }
-							value={ fontSize || '' }
-							onChange={ ( value ) => setAttributes( { fontSize: value } ) }
-							min={ 10 }
-							max={ 200 }
-							beforeIcon="editor-textcolor"
-							allowReset
-						/>
-					</PanelBody>
-					<PanelColor title={ __( 'Background Color' ) } colorValue={ backgroundColor } initialOpen={ false }>
-						<ColorPalette
-							value={ backgroundColor }
-							onChange={ ( colorValue ) => setAttributes( { backgroundColor: colorValue } ) }
-						/>
-					</PanelColor>
-					<PanelColor title={ __( 'Text Color' ) } colorValue={ textColor } initialOpen={ false }>
-						<ColorPalette
-							value={ textColor }
-							onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
-						/>
-					</PanelColor>
-					<PanelBody title={ __( 'Block Alignment' ) }>
-						<BlockAlignmentToolbar
-							value={ width }
-							onChange={ ( nextWidth ) => setAttributes( { width: nextWidth } ) }
-						/>
-					</PanelBody>
-				</InspectorControls>
-			),
+
 			<Autocomplete key="editable" completers={ [
 				blockAutocompleter( { onReplace } ),
 				userAutocompleter(),
