@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { getBlocks } from '../../selectors';
-import { serialize } from 'blocks';
+import { serialize } from '@wordpress/blocks';
 
 function WordCount( { content } ) {
 	const wordCount = wp.utils.WordCounter.prototype.count( content );

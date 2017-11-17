@@ -7,7 +7,7 @@ import { unescape as unescapeString, without, groupBy, map, repeat, find } from 
 /**
  * WordPress dependencies
  */
-import { __, _x } from 'i18n';
+import { __, _x } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { withInstanceId } from '@wordpress/components';
 
