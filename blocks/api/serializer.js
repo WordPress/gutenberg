@@ -58,7 +58,7 @@ export function getSaveContent( blockType, attributes ) {
 		// Applying the filters adding extra props
 		const props = applyFilters( 'getSaveContent.extraProps', { ...element.props }, blockType, attributes );
 
-		// Adding the generated classname
+		// Adding the generated className
 		if ( !! className ) {
 			const updatedClassName = classnames(
 				className,
@@ -69,10 +69,10 @@ export function getSaveContent( blockType, attributes ) {
 
 		return cloneElement( element, props );
 	};
-	const contentWithClassname = Children.map( saveContent, addExtraContainerProps );
+	const contentWithClassName = Children.map( saveContent, addExtraContainerProps );
 
 	// Otherwise, infer as element
-	return renderToString( contentWithClassname );
+	return renderToString( contentWithClassName );
 }
 
 /**

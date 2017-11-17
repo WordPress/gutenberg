@@ -47,7 +47,7 @@ export function addInspectorControl( element, props ) {
 	if ( hasBlockSupport( props.name, 'customClassName', true ) && props.focus ) {
 		element = [
 			element,
-			<InspectorControls key="inspector-custom-classname">
+			<InspectorControls key="inspector-custom-class-name">
 				<InspectorControls.TextControl
 					label={ __( 'Additional CSS Class' ) }
 					value={ props.attributes.className || '' }
@@ -83,7 +83,7 @@ export function addSaveProps( extraProps, blockType, attributes ) {
 }
 
 export default function customClassName( { addFilter } ) {
-	addFilter( 'registerBlockType', 'core\custom-classname-attribute', addAttribute );
-	addFilter( 'BlockEdit', 'core\custom-classname-inspector-control', addInspectorControl );
-	addFilter( 'getSaveContent.extraProps', 'core\custom-classname-save-props', addSaveProps );
+	addFilter( 'registerBlockType', 'core\custom-class-name-attribute', addAttribute );
+	addFilter( 'BlockEdit', 'core\custom-class-name-inspector-control', addInspectorControl );
+	addFilter( 'getSaveContent.extraProps', 'core\custom-class-name-save-props', addSaveProps );
 }
