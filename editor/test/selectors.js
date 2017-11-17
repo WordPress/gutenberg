@@ -36,6 +36,7 @@ import {
 	isEditedPostPublishable,
 	isEditedPostSaveable,
 	isEditedPostBeingScheduled,
+	isMobile,
 	getEditedPostPreviewLink,
 	getBlock,
 	getBlocks,
@@ -320,17 +321,64 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'isEditorSidebarOpened', () => {
-		it( 'should return true when the sidebar is opened', () => {
+		it( 'should return true when is not mobile and the normal sidebar is opened', () => {
 			const state = {
-				preferences: { isSidebarOpened: true },
+				responsive: {
+					greaterThan: {
+						medium: true,
+					},
+				},
+				preferences: {
+					isSidebarOpened: true,
+					isSidebarOpenedMobile: false,
+				},
 			};
 
 			expect( isEditorSidebarOpened( state ) ).toBe( true );
 		} );
 
-		it( 'should return false when the sidebar is opened', () => {
+		it( 'should return false when is not mobile and the normal sidebar is closed', () => {
 			const state = {
-				preferences: { isSidebarOpened: false },
+				responsive: {
+					greaterThan: {
+						medium: true,
+					},
+				},
+				preferences: {
+					isSidebarOpened: false,
+				},
+			};
+
+			expect( isEditorSidebarOpened( state ) ).toBe( false );
+		} );
+
+		it( 'should return true when is mobile and the mobile sidebar is opened', () => {
+			const state = {
+				responsive: {
+					greaterThan: {
+						medium: false,
+					},
+				},
+				preferences: {
+					isSidebarOpened: false,
+					isSidebarOpenedMobile: true,
+				},
+			};
+
+			expect( isEditorSidebarOpened( state ) ).toBe( true );
+		} );
+
+		it( 'should return false when is mobile and the mobile sidebar is closed', () => {
+			const state = {
+				responsive: {
+					greaterThan: {
+						medium: false,
+					},
+				},
+				preferences: {
+					isSidebarOpened: true,
+					isSidebarOpenedMobile: false,
+				},
 			};
 
 			expect( isEditorSidebarOpened( state ) ).toBe( false );
@@ -550,6 +598,32 @@ describe( 'selectors', () => {
 			};
 
 			expect( isCleanNewPost( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isMobile', () => {
+		it( 'should return true if resolution is equal or less than medium breakpoint', () => {
+			const state = {
+				responsive: {
+					greaterThan: {
+						medium: false,
+					},
+				},
+			};
+
+			expect( isMobile( state ) ).toBe( true );
+		} );
+
+		it( 'should return true if resolution is greater than medium breakpoint', () => {
+			const state = {
+				responsive: {
+					greaterThan: {
+						medium: true,
+					},
+				},
+			};
+
+			expect( isMobile( state ) ).toBe( false );
 		} );
 	} );
 

@@ -131,7 +131,9 @@ export function getPreference( state, preferenceKey, defaultValue ) {
  * @return {Boolean}       Whether sidebar is open
  */
 export function isEditorSidebarOpened( state ) {
-	return getPreference( state, 'isSidebarOpened' );
+	return isMobile( state ) ?
+		getPreference( state, 'isSidebarOpenedMobile' ) :
+		getPreference( state, 'isSidebarOpened' );
 }
 
 /**
@@ -198,6 +200,16 @@ export function isEditedPostDirty( state ) {
  */
 export function isCleanNewPost( state ) {
 	return ! isEditedPostDirty( state ) && isEditedPostNew( state );
+}
+
+/**
+ * Returns true if the current window size corresponds to mobile resolutions (<= medium breakpoint)
+ *
+ * @param  {Object}  state Global application state
+ * @return {Boolean}       Whether current window size corresponds to mobile resolutions
+ */
+export function isMobile( state ) {
+	return ! state.responsive.greaterThan.medium;
 }
 
 /**
