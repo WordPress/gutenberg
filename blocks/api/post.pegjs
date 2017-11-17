@@ -283,14 +283,17 @@ Block_Name
   / Core_Block_Name
 
 Namespaced_Block_Name
-  = $(ASCII_LowercaseLetter ASCII_LowercaseAlphaNumeric* "/" ASCII_LowercaseLetter ASCII_LowercaseAlphaNumeric*)
+  = $( Block_Name_Part "/" Block_Name_Part )
 
 Core_Block_Name
-  = type:$(ASCII_LowercaseLetter ASCII_LowercaseAlphaNumeric*)
+  = type:$( Block_Name_Part )
   {
     /** <?php return "core/$type"; ?> **/
     return 'core/' + type;
   }
+
+Block_Name_Part
+  = $( [a-z][a-z0-9_-]* )
 
 Block_Attributes
   = attrs:$("{" (!("}" WS+ """/"? "-->") .)* "}")
@@ -298,20 +301,6 @@ Block_Attributes
     /** <?php return json_decode( $attrs, true ); ?> **/
     return maybeJSON( attrs );
   }
-
-ASCII_LowercaseAlphaNumeric
-  = ASCII_LowercaseLetter
-  / ASCII_Digit
-  / Special_Chars
-
-ASCII_LowercaseLetter
-  = [a-z]
-
-ASCII_Digit
-  = [0-9]
-
-Special_Chars
-  = [\-\_]
 
 WS
   = [ \t\r\n]
