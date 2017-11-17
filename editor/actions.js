@@ -335,11 +335,13 @@ export function stopTyping() {
 /**
  * Returns an action object used in signalling that the user toggled the sidebar
  *
- * @return {Object}         Action object
+ * @param  {Boolean} isMobile  Flag indicating if we are in mobile context
+ * @return {Object}            Action object
  */
-export function toggleSidebar() {
+export function toggleSidebar( isMobile ) {
 	return {
 		type: 'TOGGLE_SIDEBAR',
+		isMobile,
 	};
 }
 
