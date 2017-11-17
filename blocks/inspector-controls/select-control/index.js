@@ -14,7 +14,7 @@ import { withInstanceId } from '@wordpress/components';
 import BaseControl from './../base-control';
 import './style.scss';
 
-function SelectControl( { label, help, instanceId, onChange, options = [], ...props } ) {
+function SelectControl( { label, selected, help, instanceId, onChange, options = [], ...props } ) {
 	const id = 'inspector-select-control-' + instanceId;
 	const onChangeValue = ( event ) => onChange( event.target.value );
 
@@ -28,6 +28,7 @@ function SelectControl( { label, help, instanceId, onChange, options = [], ...pr
 				className="blocks-select-control__input"
 				onChange={ onChangeValue }
 				aria-describedby={ !! help ? id + '__help' : undefined }
+				defaultValue={ selected }
 				{ ...props }
 			>
 				{ options.map( ( option ) =>

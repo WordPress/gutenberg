@@ -32,7 +32,7 @@ function RadioControl( { label, selected, help, instanceId, onChange, options = 
 						name={ id }
 						value={ option.value }
 						onChange={ onChangeValue }
-						selected={ option.value === selected }
+						defaultChecked={ option.value === selected }
 						aria-describedby={ !! help ? id + '__help' : undefined }
 					/>
 					<label key={ option.value } htmlFor={ ( id + '-' + index ) }>
