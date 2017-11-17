@@ -894,6 +894,7 @@ describe( 'state', () => {
 				recentlyUsedBlocks: [],
 				mode: 'visual',
 				isSidebarOpened: true,
+				isSidebarOpenedMobile: false,
 				panels: { 'post-status': true },
 				features: { fixedToolbar: false },
 			} );

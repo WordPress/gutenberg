@@ -4,21 +4,32 @@
 import { disableIsSidebarOpenedOnMobile } from '../';
 
 describe( 'disableIsSidebarOpenOnMobile()', () => {
-	it( 'should disable isSidebarOpen on mobile and keep other properties as before', () => {
+	it( 'should disable isSidebarOpenedMobile and keep other properties as before', () => {
 		const input = {
-				isSidebarOpened: true,
+				isSidebarOpenedMobile: true,
 				dummyPref: 'dummy',
 			},
 			output = {
-				isSidebarOpened: false,
+				isSidebarOpenedMobile: false,
 				dummyPref: 'dummy',
-			},
-			isMobile = true;
+			};
 
-		expect( disableIsSidebarOpenedOnMobile( input, isMobile ) ).toEqual( output );
+		expect( disableIsSidebarOpenedOnMobile( input ) ).toEqual( output );
 	} );
 
-	it( 'should keep isSidebarOpen on non-mobile and keep other properties as before', () => {
+	it( 'should keep isSidebarOpenedMobile as false if it was false', () => {
+		const input = {
+				isSidebarOpenedMobile: false,
+				dummy: 'non-dummy',
+			},
+			output = {
+				isSidebarOpenedMobile: false,
+				dummy: 'non-dummy',
+			};
+		expect( disableIsSidebarOpenedOnMobile( input ) ).toEqual( output );
+	} );
+
+	it( 'should not make any change if the payload does not contain isSidebarOpenedMobile flag', () => {
 		const input = {
 				isSidebarOpened: true,
 				dummy: 'non-dummy',
@@ -26,8 +37,7 @@ describe( 'disableIsSidebarOpenOnMobile()', () => {
 			output = {
 				isSidebarOpened: true,
 				dummy: 'non-dummy',
-			},
-			isMobile = false;
-		expect( disableIsSidebarOpenedOnMobile( input, isMobile ) ).toEqual( output );
+			};
+		expect( disableIsSidebarOpenedOnMobile( input ) ).toEqual( output );
 	} );
 } );
