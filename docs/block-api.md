@@ -40,9 +40,9 @@ title: 'Book'
 
 #### Category
 
-* **Type:** `String [ common | formatting | layout | widgets | embeds ]`
+* **Type:** `String [ common | formatting | layout | widgets | embed ]`
 
-Blocks are grouped into categories to help users browse and discover them. The core provided categories are `common`, `formatting`, `layout`, `widgets`, and `embeds`.
+Blocks are grouped into categories to help users browse and discover them. The core provided categories are `common`, `formatting`, `layout`, `widgets`, and `embed`.
 
 ```js
 // Assigning to the 'layout' category
