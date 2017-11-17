@@ -1,4 +1,4 @@
-import { viewPort } from '../utils';
+import { viewPort } from '@wordpress/utils';
 
 export const PREFERENCES_DEFAULTS = {
 	mode: 'visual',

@@ -3,13 +3,13 @@
  */
 import { connect } from 'react-redux';
 import 'element-closest';
-
+import { find, reverse } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from 'element';
+import { Component } from '@wordpress/element';
 import { keycodes, focus } from '@wordpress/utils';
-import { find, reverse } from 'lodash';
+
 /**
  * Internal dependencies
  */
