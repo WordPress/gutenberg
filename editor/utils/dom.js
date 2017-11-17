@@ -42,7 +42,6 @@ function getFilteredCursorStart( node ) {
  * @return {Boolean}        whether or not the offset is at the first cursor position in node
  */
 function isAtCursorStart( node, offset ) {
-	// NOTE: In the future, we may want to skip some non-inhabitable positions in some nodes
 	return offset === 0 || offset === getFilteredCursorStart( node );
 }
 
