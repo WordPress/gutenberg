@@ -43,7 +43,7 @@ export default connect(
 		convertToBlocks( block ) {
 			dispatch( replaceBlocks( uid, rawHandler( {
 				HTML: serialize( block ),
-				inline: false,
+				mode: 'BLOCKS',
 			} ) ) );
 		},
 	} )
