@@ -3,6 +3,11 @@ $color-palette-circle-spacing: 14px;
 
 .blocks-color-palette {
 	margin-right: -14px;
+
+	.blocks-color-palette__clear {
+		float: right;
+		margin-right: 20px;
+	}
 }
 
 .blocks-color-palette__item-wrapper {
@@ -121,8 +126,4 @@ $color-palette-circle-spacing: 14px;
 					linear-gradient(0deg, transparent 50%, #feac00 50%);
 
 	background-clip: content-box, content-box, content-box, content-box, content-box, content-box, padding-box, padding-box, padding-box, padding-box, padding-box, padding-box;
-}
-
-.blocks-color-palette__picker .chrome-picker {
-	width: 100% !important;
 }

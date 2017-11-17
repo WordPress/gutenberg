@@ -6,8 +6,16 @@
         "attributes": {
             "value": [
                 {
-                    "type": "p",
-                    "children": "Testing pullquote block..."
+                    "children": {
+                        "type": "p",
+                        "key": null,
+                        "ref": null,
+                        "props": {
+                            "children": "Testing pullquote block..."
+                        },
+                        "_owner": null,
+                        "_store": {}
+                    }
                 }
             ],
             "citation": [

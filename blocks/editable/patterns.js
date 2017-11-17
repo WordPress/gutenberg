@@ -29,7 +29,6 @@ export default function( editor ) {
 	const settings = editor.settings.wptextpattern || {};
 
 	const {
-		paste: pastePatterns,
 		enter: enterPatterns,
 		undefined: spacePatterns,
 	} = groupBy( getBlockTypes().reduce( ( acc, blockType ) => {
@@ -46,10 +45,6 @@ export default function( editor ) {
 
 	editor.on( 'selectionchange', function() {
 		canUndo = null;
-	} );
-
-	editor.on( 'pastepostprocess', () => {
-		setTimeout( () => searchFirstText( pastePatterns ) );
 	} );
 
 	editor.on( 'keydown', function( event ) {

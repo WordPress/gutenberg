@@ -36,6 +36,8 @@ registerBlockType( 'core/latest-posts', {
 
 	keywords: [ __( 'recent posts' ) ],
 
+	supportHTML: false,
+
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
 		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
@@ -51,7 +53,7 @@ registerBlockType( 'core/latest-posts', {
 			const { postsToShow } = this.props.attributes;
 
 			this.state = {
-				latestPosts: [],
+				latestPosts: null,
 			};
 
 			this.latestPostsRequest = getLatestPosts( postsToShow );
@@ -95,27 +97,62 @@ registerBlockType( 'core/latest-posts', {
 
 		render() {
 			const { latestPosts } = this.state;
-			const { setAttributes } = this.props;
+			const { attributes, focus, setAttributes } = this.props;
+			const { displayPostDate, align, layout, columns, postsToShow } = attributes;
 
-			if ( ! latestPosts.length ) {
-				return (
-					<Placeholder
+			const inspectorControls = focus && (
+				<InspectorControls key="inspector">
+					<BlockDescription>
+						<p>{ __( 'Shows a list of your site\'s most recent posts.' ) }</p>
+					</BlockDescription>
+					<h3>{ __( 'Latest Posts Settings' ) }</h3>
+					<ToggleControl
+						label={ __( 'Display post date' ) }
+						checked={ displayPostDate }
+						onChange={ this.toggleDisplayPostDate }
+					/>
+					{ layout === 'grid' &&
+						<RangeControl
+							label={ __( 'Columns' ) }
+							value={ columns }
+							onChange={ ( value ) => setAttributes( { columns: value } ) }
+							min={ 2 }
+							max={ Math.min( MAX_POSTS_COLUMNS, latestPosts.length ) }
+						/>
+					}
+					<TextControl
+						label={ __( 'Number of posts to show' ) }
+						type="number"
+						min={ MIN_POSTS }
+						max={ MAX_POSTS }
+						value={ postsToShow }
+						onChange={ ( value ) => this.changePostsToShow( value ) }
+					/>
+				</InspectorControls>
+			);
+
+			const hasPosts = Array.isArray( latestPosts ) && latestPosts.length;
+			if ( ! hasPosts ) {
+				return [
+					inspectorControls,
+					<Placeholder key="placeholder"
 						icon="admin-post"
 						label={ __( 'Latest Posts' ) }
 					>
-						<Spinner />
-					</Placeholder>
-				);
+						{ ! Array.isArray( latestPosts ) ?
+							<Spinner /> :
+							__( 'No posts found.' )
+						}
+					</Placeholder>,
+				];
 			}
 
 			// Removing posts from display should be instant.
-			const postsDifference = latestPosts.length - this.props.attributes.postsToShow;
+			const postsDifference = latestPosts.length - postsToShow;
 			if ( postsDifference > 0 ) {
-				latestPosts.splice( this.props.attributes.postsToShow, postsDifference );
+				latestPosts.splice( postsToShow, postsDifference );
 			}
 
-			const { focus } = this.props;
-			const { displayPostDate, align, layout, columns } = this.props.attributes;
 			const layoutControls = [
 				{
 					icon: 'list-view',
@@ -132,6 +169,7 @@ registerBlockType( 'core/latest-posts', {
 			];
 
 			return [
+				inspectorControls,
 				focus && (
 					<BlockControls key="controls">
 						<BlockAlignmentToolbar
@@ -143,36 +181,6 @@ registerBlockType( 'core/latest-posts', {
 						/>
 						<Toolbar controls={ layoutControls } />
 					</BlockControls>
-				),
-				focus && (
-					<InspectorControls key="inspector">
-						<BlockDescription>
-							<p>{ __( 'Shows a list of your site\'s most recent posts.' ) }</p>
-						</BlockDescription>
-						<h3>{ __( 'Latest Posts Settings' ) }</h3>
-						<ToggleControl
-							label={ __( 'Display post date' ) }
-							checked={ displayPostDate }
-							onChange={ this.toggleDisplayPostDate }
-						/>
-						{ layout === 'grid' &&
-							<RangeControl
-								label={ __( 'Columns' ) }
-								value={ columns }
-								onChange={ ( value ) => setAttributes( { columns: value } ) }
-								min={ 2 }
-								max={ Math.min( MAX_POSTS_COLUMNS, latestPosts.length ) }
-							/>
-						}
-						<TextControl
-							label={ __( 'Number of posts to show' ) }
-							type="number"
-							min={ MIN_POSTS }
-							max={ MAX_POSTS }
-							value={ this.props.attributes.postsToShow }
-							onChange={ ( value ) => this.changePostsToShow( value ) }
-						/>
-					</InspectorControls>
 				),
 				<ul
 					className={ classnames( this.props.className, 'columns-' + columns, {

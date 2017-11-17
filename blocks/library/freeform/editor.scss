@@ -1,6 +1,8 @@
 .editor-visual-editor__block[data-type="core/freeform"] .blocks-editable__tinymce {
+	margin-top: $item-spacing;
+
 	p {
-		line-height: inherit;
+		line-height: $editor-line-height;
 	}
 
 	ul, ol {
@@ -56,7 +58,6 @@
 
 	&.mce-edit-focus {
 		outline: none;
-		margin-top: $item-spacing;
 	}
 
 	a {
@@ -86,22 +87,24 @@
 }
 
 .freeform-toolbar {
-	width: auto;
-	top: $header-height - 1px;
-	z-index: z-index( '.editor-block-toolbar' );
 	position: sticky;
+	width: auto;
+	top: $header-height;
+	margin: 0;
+	margin-top: -$block-controls-height;
+	border: 1px solid $light-gray-500;
+	z-index: z-index( '.freeform-toolbar' );
+	background-color: $white;
+	min-height: $block-controls-height;
 
 	@include break-medium() {
 		top: $item-spacing;
 	}
-}
 
-.freeform-toolbar .mce-tinymce-inline {
-	margin: 0;
-	margin-top: -$block-controls-height - $item-spacing;
-	border: 1px solid $light-gray-500;
-	background-color: $white;
-	box-shadow: $shadow-popover;
+	@include break-small() {
+		margin-left: - $block-padding - 1px;
+		margin-right: - $block-padding - 1px;
+	}
 }
 
 // Overwrite inline styles.

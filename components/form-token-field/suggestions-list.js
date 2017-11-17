@@ -108,8 +108,8 @@ class SuggestionsList extends Component {
 								onMouseEnter={ this.handleHover( suggestion ) }
 								aria-selected={ index === this.props.selectedIndex }
 							>
-								{ match
-									? (
+								{ match ?
+									(
 										<span aria-label={ this.props.displayTransform( suggestion ) }>
 											{ match.suggestionBeforeMatch }
 											<strong className="components-form-token-field__suggestion-match">
@@ -117,8 +117,8 @@ class SuggestionsList extends Component {
 											</strong>
 											{ match.suggestionAfterMatch }
 										</span>
-									)
-									: this.props.displayTransform( suggestion )
+									) :
+									this.props.displayTransform( suggestion )
 								}
 							</li>
 						);

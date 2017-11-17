@@ -14,12 +14,6 @@ import { renderToString } from '@wordpress/element';
 import * as sources from '../source';
 
 describe( 'sources', () => {
-	it( 'should generate sources which apply internal flag', () => {
-		for ( const sourceFn in sources ) {
-			expect( sources[ sourceFn ]()._wpBlocksKnownSource ).toBe( true );
-		}
-	} );
-
 	describe( 'children()', () => {
 		it( 'should return a source function', () => {
 			const source = sources.children();

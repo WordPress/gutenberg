@@ -10,7 +10,7 @@ import classnames from 'classnames';
  */
 import './editor.scss';
 import './style.scss';
-import { registerBlockType, source } from '../../api';
+import { registerBlockType } from '../../api';
 import Editable from '../../editable';
 import MediaUploadButton from '../../media-upload-button';
 import BlockControls from '../../block-controls';
@@ -19,8 +19,6 @@ import InspectorControls from '../../inspector-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
 import RangeControl from '../../inspector-controls/range-control';
 import BlockDescription from '../../block-description';
-
-const { children } = source;
 
 const validAlignments = [ 'left', 'center', 'right', 'wide', 'full' ];
 
@@ -34,7 +32,8 @@ registerBlockType( 'core/cover-image', {
 	attributes: {
 		title: {
 			type: 'array',
-			source: children( 'h2' ),
+			source: 'children',
+			selector: 'h2',
 		},
 		url: {
 			type: 'string',
@@ -68,9 +67,9 @@ registerBlockType( 'core/cover-image', {
 		const onSelectImage = ( media ) => setAttributes( { url: media.url, id: media.id } );
 		const toggleParallax = () => setAttributes( { hasParallax: ! hasParallax } );
 		const setDimRatio = ( ratio ) => setAttributes( { dimRatio: ratio } );
-		const style = url
-			? { backgroundImage: `url(${ url })` }
-			: undefined;
+		const style = url ?
+			{ backgroundImage: `url(${ url })` } :
+			undefined;
 		const classes = classnames(
 			className,
 			dimRatioToClass( dimRatio ),
@@ -88,19 +87,17 @@ registerBlockType( 'core/cover-image', {
 				/>
 
 				<Toolbar>
-					<li>
-						<MediaUploadButton
-							buttonProps={ {
-								className: 'components-icon-button components-toolbar__control',
-								'aria-label': __( 'Edit image' ),
-							} }
-							onSelect={ onSelectImage }
-							type="image"
-							value={ id }
-						>
-							<Dashicon icon="edit" />
-						</MediaUploadButton>
-					</li>
+					<MediaUploadButton
+						buttonProps={ {
+							className: 'components-icon-button components-toolbar__control',
+							'aria-label': __( 'Edit image' ),
+						} }
+						onSelect={ onSelectImage }
+						type="image"
+						value={ id }
+					>
+						<Dashicon icon="edit" />
+					</MediaUploadButton>
 				</Toolbar>
 			</BlockControls>,
 			<InspectorControls key="inspector">
@@ -170,9 +167,9 @@ registerBlockType( 'core/cover-image', {
 
 	save( { attributes, className } ) {
 		const { url, title, hasParallax, dimRatio } = attributes;
-		const style = url
-			? { backgroundImage: `url(${ url })` }
-			: undefined;
+		const style = url ?
+			{ backgroundImage: `url(${ url })` } :
+			undefined;
 		const classes = classnames(
 			className,
 			dimRatioToClass( dimRatio ),
@@ -191,7 +188,7 @@ registerBlockType( 'core/cover-image', {
 } );
 
 function dimRatioToClass( ratio ) {
-	return ( ratio === 0 || ratio === 50 )
-		? null
-		: 'has-background-dim-' + ( 10 * Math.round( ratio / 10 ) );
+	return ( ratio === 0 || ratio === 50 ) ?
+		null :
+		'has-background-dim-' + ( 10 * Math.round( ratio / 10 ) );
 }

@@ -52,7 +52,7 @@ to describe the behavior of your custom block.
 Note that all JavaScript code samples in this document are enclosed in a
 function that is evaluated immediately afterwards.  We recommend using either
 ES6 modules
-[as used in this project](https://github.com/WordPress/gutenberg/blob/master/docs/coding-guidelines.md#imports)
+[as used in this project](https://wordpress.org/gutenberg/handbook/reference/coding-guidelines/#imports)
 (documentation on setting up a plugin with Webpack + ES6 modules coming soon)
 or these
 ["immediately-invoked function expressions"](https://en.wikipedia.org/wiki/Immediately-invoked_function_expression)
@@ -138,7 +138,9 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 		attributes: {
 			category: {
 				type: 'string',
-				source: source.attr( 'img', 'alt' )
+				source: 'attribute',
+				attribute: 'alt',
+				selector: 'img',
 			}
 		},
 
@@ -237,9 +239,9 @@ editor interface where blocks are implemented.
 - `attributes: Object | Function` - An object of attribute schemas, where the
   keys of the object define the shape of attributes, and each value an object
   schema describing the `type`, `default` (optional), and
-  [`source`](http://gutenberg-devdoc.surge.sh/reference/attributes/)
-  (optional) of the attribute. If `source` is omitted, the attribute is 
-  serialized into the block's comment delimiters. Alternatively, define 
+  [`source`](https://wordpress.org/gutenberg/handbook/reference/attributes/)
+  (optional) of the attribute. If `source` is omitted, the attribute is
+  serialized into the block's comment delimiters. Alternatively, define
   `attributes` as a function which returns the attributes object.
 - `category: string` - Slug of the block's category. The category is used to
   organize the blocks in the block inserter.

@@ -8,32 +8,33 @@ import { filter } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Dashicon, Dropdown } from '@wordpress/components';
+import { Dropdown, IconButton } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import DocumentOutline from '../document-outline';
-import WordCount from '../word-count';
+import { WordCount, DocumentOutline } from '../components';
 import { getBlocks } from '../selectors';
 import { selectBlock } from '../actions';
 
 function TableOfContents( { blocks } ) {
 	const headings = filter( blocks, ( block ) => block.name === 'core/heading' );
+	const paragraphs = filter( blocks, ( block ) => block.name === 'core/paragraph' );
 
 	return (
 		<Dropdown
 			position="bottom"
 			className="table-of-contents"
 			contentClassName="table-of-contents__popover"
-			renderToggle={ ( { onToggle } ) => (
-				<button
-					className="table-of-contents__toggle"
+			renderToggle={ ( { isOpen, onToggle } ) => (
+				<IconButton
 					onClick={ onToggle }
-				>
-					<Dashicon icon="info" />
-				</button>
+					icon="admin-page"
+					aria-expanded={ isOpen }
+					label={ __( 'Information' ) }
+					disabled={ blocks.length === 0 }
+				/>
 			) }
 			renderContent={ () => ( [
 				<div key="counts" className="table-of-contents__counts">
@@ -48,6 +49,10 @@ function TableOfContents( { blocks } ) {
 					<div className="table-of-contents__count">
 						<span className="table-of-contents__number">{ headings.length }</span>
 						{ __( 'Headings' ) }
+					</div>
+					<div className="table-of-contents__count">
+						<span className="table-of-contents__number">{ paragraphs.length }</span>
+						{ __( 'Paragraphs' ) }
 					</div>
 				</div>,
 				headings.length > 0 && (

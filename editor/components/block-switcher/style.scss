@@ -1,0 +1,48 @@
+.editor-block-switcher {
+	position: relative;
+}
+
+.editor-block-switcher__toggle {
+	width: auto;
+	margin: 0;
+	padding: 8px;
+	border-radius: 0;
+
+	&:focus:before {
+		top: -3px;
+		right: -3px;
+		bottom: -3px;
+		left: -3px;
+	}
+}
+
+.editor-block-switcher__popover .components-popover__content {
+	width: 200px;
+}
+
+.editor-block-switcher__menu {
+	box-shadow: $shadow-popover;
+	border: 1px solid $light-gray-500;
+	background: $white;
+	padding: 3px 3px 0 3px;
+}
+
+.editor-block-switcher__menu-title {
+	display: block;
+	padding: 6px;
+	color: $dark-gray-300;
+}
+
+.editor-block-switcher__menu-item {
+	color: $dark-gray-500;
+	display: flex;
+	align-items: center;
+	width: 100%;
+	padding: 6px;
+	text-align: left;
+
+	.editor-block-switcher__block-icon {
+		margin-right: 8px;
+		height: 20px;
+	}
+}

@@ -44,6 +44,8 @@ registerBlockType( 'core/categories', {
 		},
 	},
 
+	supportHTML: false,
+
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
 		if ( 'left' === align || 'right' === align || 'full' === align ) {
@@ -180,9 +182,9 @@ registerBlockType( 'core/categories', {
 					{ times( level * 3, () => '\xa0' ) }
 					{ this.renderCategoryName( category ) }
 					{
-						!! showPostCounts
-							? ` (${ category.count })`
-							: ''
+						!! showPostCounts ?
+							` (${ category.count })` :
+							''
 					}
 				</option>,
 				showHierarchy &&
@@ -247,9 +249,9 @@ registerBlockType( 'core/categories', {
 				),
 				<div key="categories" className={ this.props.className }>
 					{
-						displayAsDropdown
-							? this.renderCategoryDropdown()
-							: this.renderCategoryList()
+						displayAsDropdown ?
+							this.renderCategoryDropdown() :
+							this.renderCategoryList()
 					}
 				</div>,
 			];

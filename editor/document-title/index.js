@@ -10,7 +10,6 @@ import { Component } from 'react';
 import { getDocumentTitle } from '../selectors';
 
 class DocumentTitle extends Component {
-
 	constructor( props ) {
 		super( props );
 		this.originalDocumentTitle = document.title;

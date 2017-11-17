@@ -85,11 +85,28 @@
 	margin-right: -5px;
 }
 
+.components-panel__color-title {
+	float: left;
+	height: 19px;
+}
+
+.components-panel__color-area {
+	width: 25px;
+	height: 16px;
+	margin-left: 15px;
+	border: 1px solid #DADADA;
+	display: inline-block;
+}
+
 .components-panel__row {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
 	margin-top: 20px;
+
+	label {
+		margin-right: 10px;
+	}
 
 	&:empty {
 		margin-top: 0;

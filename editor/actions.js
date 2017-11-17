@@ -186,6 +186,32 @@ export function hideInsertionPoint() {
 	};
 }
 
+/**
+ * Returns an action object used in signalling that block insertion should
+ * occur at the specified block index position.
+ *
+ * @param  {Number} position Position at which to insert
+ * @return {Object}          Action object
+ */
+export function setBlockInsertionPoint( position ) {
+	return {
+		type: 'SET_BLOCK_INSERTION_POINT',
+		position,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the block insertion point
+ * should be reset.
+ *
+ * @return {Object} Action object
+ */
+export function clearBlockInsertionPoint() {
+	return {
+		type: 'CLEAR_BLOCK_INSERTION_POINT',
+	};
+}
+
 export function editPost( edits ) {
 	return {
 		type: 'EDIT_POST',
@@ -382,7 +408,171 @@ export function removeNotice( id ) {
 	};
 }
 
+/**
+ * Returns an action object used to check the state of meta boxes at a location.
+ *
+ * This should only be fired once to initialize meta box state. If a meta box
+ * area is empty, this will set the store state to indicate that React should
+ * not render the meta box area.
+ *
+ * Example: metaBoxes = { side: true, normal: false }
+ * This indicates that the sidebar has a meta box but the normal area does not.
+ *
+ * @param {Object} metaBoxes Whether meta box locations are active.
+ *
+ * @return {Object} Action object
+ */
+export function initializeMetaBoxState( metaBoxes ) {
+	return {
+		type: 'INITIALIZE_META_BOX_STATE',
+		metaBoxes,
+	};
+}
+
+/**
+ * Returns an action object used to signify that a meta box finished reloading.
+ *
+ * @param {String} location Location of meta box: 'normal', 'side'.
+ *
+ * @return {Object} Action object
+ */
+export function handleMetaBoxReload( location ) {
+	return {
+		type: 'HANDLE_META_BOX_RELOAD',
+		location,
+	};
+}
+
+/**
+ * Returns an action object used to signify that a meta box finished loading.
+ *
+ * @param {String} location Location of meta box: 'normal', 'side'.
+ *
+ * @return {Object} Action object
+ */
+export function metaBoxLoaded( location ) {
+	return {
+		type: 'META_BOX_LOADED',
+		location,
+	};
+}
+
+/**
+ * Returns an action object used to request meta box update.
+ *
+ * @param {Array} locations Locations of meta boxes: ['normal', 'side' ].
+ *
+ * @return {Object}     Action object
+ */
+export function requestMetaBoxUpdates( locations ) {
+	return {
+		type: 'REQUEST_META_BOX_UPDATES',
+		locations,
+	};
+}
+
+/**
+ * Returns an action object used to set meta box state changed.
+ *
+ * @param {String}  location   Location of meta box: 'normal', 'side'.
+ * @param {Boolean} hasChanged Whether the meta box has changed.
+ *
+ * @return {Object} Action object
+ */
+export function metaBoxStateChanged( location, hasChanged ) {
+	return {
+		type: 'META_BOX_STATE_CHANGED',
+		location,
+		hasChanged,
+	};
+}
+
+/**
+ * Returns an action object used to toggle a feature flag
+ *
+ * @param {String}  feature   Featurre name.
+ *
+ * @return {Object}           Action object
+ */
+export function toggleFeature( feature ) {
+	return {
+		type: 'TOGGLE_FEATURE',
+		feature,
+	};
+}
+
 export const createSuccessNotice = partial( createNotice, 'success' );
 export const createInfoNotice = partial( createNotice, 'info' );
 export const createErrorNotice = partial( createNotice, 'error' );
 export const createWarningNotice = partial( createNotice, 'warning' );
+
+/**
+ * Returns an action object used to fetch a single reusable block or all
+ * reusable blocks from the REST API into the store.
+ *
+ * @param {?string} id If given, only a single reusable block with this ID will be fetched
+ * @return {Object}   Action object
+ */
+export function fetchReusableBlocks( id ) {
+	return {
+		type: 'FETCH_REUSABLE_BLOCKS',
+		id,
+	};
+}
+
+/**
+ * Returns an action object used to insert or update a reusable block into the store.
+ *
+ * @param {Object} id            The ID of the reusable block to update
+ * @param {Object} reusableBlock The new reusable block object. Any omitted keys are not changed
+ * @return {Object}              Action object
+ */
+export function updateReusableBlock( id, reusableBlock ) {
+	return {
+		type: 'UPDATE_REUSABLE_BLOCK',
+		id,
+		reusableBlock,
+	};
+}
+
+/**
+ * Returns an action object used to save a reusable block that's in the store
+ * to the REST API.
+ *
+ * @param {Object} id The ID of the reusable block to save
+ * @return {Object}   Action object
+ */
+export function saveReusableBlock( id ) {
+	return {
+		type: 'SAVE_REUSABLE_BLOCK',
+		id,
+	};
+}
+
+/**
+ * Returns an action object used to convert a reusable block into a static
+ * block.
+ *
+ * @param {Object} uid The ID of the block to attach
+ * @return {Object}    Action object
+ */
+export function convertBlockToStatic( uid ) {
+	return {
+		type: 'CONVERT_BLOCK_TO_STATIC',
+		uid,
+	};
+}
+
+/**
+ * Returns an action object used to convert a static block into a reusable
+ * block.
+ *
+ * @param {Object} uid The ID of the block to detach
+ * @return {Object}    Action object
+ */
+export function convertBlockToReusable( uid ) {
+	return {
+		type: 'CONVERT_BLOCK_TO_REUSABLE',
+		uid,
+	};
+}

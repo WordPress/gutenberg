@@ -12,7 +12,7 @@ import { Button } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import BlockWarning from './block-warning';
+import { Warning } from '../../components';
 import {
 	getBlockType,
 	getUnknownTypeHandlerName,
@@ -31,7 +31,7 @@ function InvalidBlockWarning( { ignoreInvalid, switchToBlockType } ) {
 	const switchTo = ( blockType ) => () => switchToBlockType( blockType );
 
 	return (
-		<BlockWarning>
+		<Warning>
 			<p>{ defaultBlockType && htmlBlockType && sprintf( __(
 				'This block appears to have been modified externally. ' +
 				'Overwrite the external changes or Convert to %s or %s to keep ' +
@@ -67,7 +67,7 @@ function InvalidBlockWarning( { ignoreInvalid, switchToBlockType } ) {
 					</Button>
 				) }
 			</p>
-		</BlockWarning>
+		</Warning>
 	);
 }
 

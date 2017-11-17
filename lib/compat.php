@@ -132,7 +132,7 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_ensure_wp_api_request', 20 );
  */
 function gutenberg_disable_editor_settings_wpautop( $settings ) {
 	$post = get_post();
-	if ( is_object( $post ) && gutenberg_post_has_blocks( $post->ID ) ) {
+	if ( is_object( $post ) && gutenberg_post_has_blocks( $post ) ) {
 		$settings['wpautop'] = false;
 	}
 
@@ -152,3 +152,42 @@ function gutenberg_add_rest_nonce_to_heartbeat_response_headers( $response ) {
 }
 
 add_filter( 'wp_refresh_nonces', 'gutenberg_add_rest_nonce_to_heartbeat_response_headers' );
+
+/**
+ * Ensure that the wp-json index contains the `permalink_structure` setting as
+ * part of its site info elements.
+ *
+ * @see https://core.trac.wordpress.org/ticket/42465
+ *
+ * @param WP_REST_Response $response WP REST API response of the wp-json index.
+ * @return WP_REST_Response Response that contains the permalink structure.
+ */
+function gutenberg_ensure_wp_json_has_permalink_structure( $response ) {
+	$site_info = $response->get_data();
+
+	if ( ! array_key_exists( 'permalink_structure', $site_info ) ) {
+		$site_info['permalink_structure'] = get_option( 'permalink_structure' );
+	}
+
+	$response->set_data( $site_info );
+
+	return $response;
+}
+add_filter( 'rest_index', 'gutenberg_ensure_wp_json_has_permalink_structure' );
+
+/**
+ * As a substitute for the default content `wpautop` filter, applies autop
+ * behavior only for posts where content does not contain blocks.
+ *
+ * @param  string $content Post content.
+ * @return string          Paragraph-converted text if non-block content.
+ */
+function gutenberg_wpautop( $content ) {
+	if ( gutenberg_content_has_blocks( $content ) ) {
+		return $content;
+	}
+
+	return wpautop( $content );
+}
+remove_filter( 'the_content', 'wpautop' );
+add_filter( 'the_content', 'gutenberg_wpautop' );

@@ -13,8 +13,7 @@ One challenge of maintaining the representation of a block as a JavaScript objec
 ```js
 var el = wp.element.createElement,
 	registerBlockType = wp.blocks.registerBlockType,
-	Editable = wp.blocks.Editable,
-	children = wp.blocks.source.children;
+	Editable = wp.blocks.Editable;
 
 registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-03', {
 	title: 'Hello World (Step 3)',
@@ -26,7 +25,8 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-03', {
 	attributes: {
 		content: {
 			type: 'array',
-			source: children( 'p' )
+			source: 'children',
+			selector: 'p',
 		}
 	},
 
@@ -61,7 +61,6 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-03', {
 {% ESNext %}
 ```js
 const { registerBlockType, Editable, source } = wp.blocks;
-const { children } = source;
 
 registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-03', {
 	title: 'Hello World (Step 3)',
@@ -73,7 +72,8 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-03', {
 	attributes: {
 		content: {
 			type: 'array',
-			source: children( 'p' ),
+			source: 'children',
+			selector: 'p',
 		},
 	},
 
@@ -105,7 +105,7 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-03', {
 ```
 {% end %}
 
-When registering a new block type, the `attributes` property describes the shape of the attributes object you'd like to receive in the `edit` and `save` functions. Each value is a [source function](attributes.md) to find the desired value from the markup of the block.
+When registering a new block type, the `attributes` property describes the shape of the attributes object you'd like to receive in the `edit` and `save` functions. Each value is a [source function](../../reference/attributes) to find the desired value from the markup of the block.
 
 In the code snippet above, when loading the editor, we will extract the `content` value as the children of the paragraph element in the saved post's markup.
 

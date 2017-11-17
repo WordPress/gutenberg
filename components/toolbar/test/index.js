@@ -33,7 +33,6 @@ describe( 'Toolbar', () => {
 			];
 			const toolbar = shallow( <Toolbar controls={ controls } /> );
 			const listItem = toolbar.find( 'IconButton' );
-			expect( toolbar.type() ).toBe( 'ul' );
 			expect( listItem.props() ).toMatchObject( {
 				icon: 'wordpress',
 				label: 'WordPress',

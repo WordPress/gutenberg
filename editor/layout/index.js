@@ -7,7 +7,8 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { NoticeList } from '@wordpress/components';
+import { NoticeList, Popover, navigateRegions } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -17,11 +18,9 @@ import Header from '../header';
 import Sidebar from '../sidebar';
 import TextEditor from '../modes/text-editor';
 import VisualEditor from '../modes/visual-editor';
-import MetaBoxes from '../meta-boxes';
-import UnsavedChangesWarning from '../unsaved-changes-warning';
 import DocumentTitle from '../document-title';
-import AutosaveMonitor from '../autosave-monitor';
 import { removeNotice } from '../actions';
+import { MetaBoxes, AutosaveMonitor, UnsavedChangesWarning } from '../components';
 import {
 	getEditorMode,
 	isEditorSidebarOpened,
@@ -40,14 +39,17 @@ function Layout( { mode, isSidebarOpened, notices, ...props } ) {
 			<UnsavedChangesWarning />
 			<AutosaveMonitor />
 			<Header />
-			<div className="editor-layout__content">
+			<div className="editor-layout__content" role="region" aria-label={ __( 'Editor content' ) } tabIndex="-1">
 				<div className="editor-layout__editor">
 					{ mode === 'text' && <TextEditor /> }
 					{ mode === 'visual' && <VisualEditor /> }
 				</div>
-				<MetaBoxes />
+				<div className="editor-layout__metaboxes">
+					<MetaBoxes location="normal" />
+				</div>
 			</div>
 			{ isSidebarOpened && <Sidebar /> }
+			<Popover.Slot />
 		</div>
 	);
 }
@@ -59,4 +61,4 @@ export default connect(
 		notices: getNotices( state ),
 	} ),
 	{ removeNotice }
-)( Layout );
+)( navigateRegions( Layout ) );

@@ -1,4 +1,3 @@
-import './paragraph';
 import './image';
 import './gallery';
 import './heading';
@@ -22,3 +21,5 @@ import './text-columns';
 import './verse';
 import './video';
 import './audio';
+import './reusable-block';
+import './paragraph';

@@ -4,10 +4,11 @@
         "attrs": {
             "url": "https://vimeo.com/"
         },
-        "rawContent": "\n<figure class=\"wp-block-embed-vimeo\">\n    https://vimeo.com/\n    <figcaption>Embedded content from vimeo</figcaption>\n</figure>\n"
+        "innerBlocks": [],
+        "innerHTML": "\n<figure class=\"wp-block-embed-vimeo\">\n    https://vimeo.com/\n    <figcaption>Embedded content from vimeo</figcaption>\n</figure>\n"
     },
     {
         "attrs": {},
-        "rawContent": "\n"
+        "innerHTML": "\n"
     }
 ]

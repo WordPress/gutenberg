@@ -1,5 +1,3 @@
-@import '~react-datepicker/dist/react-datepicker';
-
 .editor-post-schedule {
 	width: 100%;
 	position: relative;
@@ -8,6 +6,7 @@
 .editor-post-schedule__toggle.button-link {
 	text-decoration: underline;
 	color: $blue-wordpress;
+	text-align: right;
 
 	&:focus {
 		outline: none;
@@ -24,38 +23,4 @@
 	@include break-medium {
 		width: 270px;
 	}
-}
-
-.editor-post-schedule__clock {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	margin-top: 10px;
-}
-
-.editor-post-schedule__clock-input {
-	width: 40px;
-}
-
-.editor-post-schedule__clock-separator {
-	padding: 0 4px;
-}
-
-.wp-core-ui .editor-post-schedule__clock-am-button {
-	margin-left: 8px;
-	margin-right: -1px;
-	border-radius: 3px 0 0 3px;
-}
-
-.wp-core-ui .editor-post-schedule__clock-pm-button {
-	margin-left: -1px;
-	border-radius: 0 3px 3px 0;
-}
-
-.wp-core-ui .editor-post-schedule__clock-am-button.is-toggled,
-.wp-core-ui .editor-post-schedule__clock-pm-button.is-toggled {
-	background: $light-gray-300;
-	border-color: $dark-gray-100;
-	box-shadow: inset 0 2px 5px -3px $dark-gray-500;
-	transform: translateY(1px);
 }

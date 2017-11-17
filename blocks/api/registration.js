@@ -11,6 +11,11 @@ import { get, isFunction, some } from 'lodash';
 import { getCategories } from './categories';
 
 /**
+ * Internal dependencies
+ */
+import { applyFilters } from '../hooks';
+
+/**
  * Block settings keyed by block name.
  *
  * @type {Object}
@@ -111,15 +116,18 @@ export function registerBlockType( name, settings ) {
 		return;
 	}
 	if ( ! settings.icon ) {
-		settings.icon = 'star-filled';
+		settings.icon = 'block-default';
 	}
-	const block = blocks[ name ] = {
+
+	settings = {
 		name,
-		attributes: get( window._wpBlocksAttributes, name ),
+		attributes: get( window._wpBlocksAttributes, name, {} ),
 		...settings,
 	};
 
-	return block;
+	settings = applyFilters( 'registerBlockType', settings, name );
+
+	return blocks[ name ] = settings;
 }
 
 /**
@@ -195,4 +203,24 @@ export function getBlockType( name ) {
  */
 export function getBlockTypes() {
 	return Object.values( blocks );
+}
+
+/**
+ * Returns true if the block defines support for a feature, or false otherwise
+ *
+ * @param  {(String|Object)} nameOrType      Block name or type object
+ * @param  {String}          feature         Feature to test
+ * @param  {Boolean}         defaultSupports Whether feature is supported by
+ *                                           default if not explicitly defined
+ * @return {Boolean}                         Whether block supports feature
+ */
+export function hasBlockSupport( nameOrType, feature, defaultSupports ) {
+	const blockType = 'string' === typeof nameOrType ?
+		getBlockType( nameOrType ) :
+		nameOrType;
+
+	return !! get( blockType, [
+		'supports',
+		feature,
+	], defaultSupports );
 }

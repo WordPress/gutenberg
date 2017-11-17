@@ -8,25 +8,23 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import { concatChildren } from '@wordpress/element';
-import { PanelBody } from '@wordpress/components';
+import { Autocomplete, PanelBody, PanelColor } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, createBlock, source, setDefaultBlockName } from '../../api';
+import { registerBlockType, createBlock, setDefaultBlockName } from '../../api';
+import { blockAutocompleter, userAutocompleter } from '../../autocompleters';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import BlockControls from '../../block-controls';
-import BlockAutocomplete from '../../block-autocomplete';
 import Editable from '../../editable';
 import InspectorControls from '../../inspector-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
 import RangeControl from '../../inspector-controls/range-control';
 import ColorPalette from '../../color-palette';
 import BlockDescription from '../../block-description';
-
-const { children } = source;
 
 registerBlockType( 'core/paragraph', {
 	title: __( 'Paragraph' ),
@@ -42,7 +40,8 @@ registerBlockType( 'core/paragraph', {
 	attributes: {
 		content: {
 			type: 'array',
-			source: children( 'p' ),
+			source: 'children',
+			selector: 'p',
 		},
 		align: {
 			type: 'string',
@@ -131,19 +130,18 @@ registerBlockType( 'core/paragraph', {
 							allowReset
 						/>
 					</PanelBody>
-					<PanelBody title={ __( 'Background Color' ) }>
+					<PanelColor title={ __( 'Background Color' ) } colorValue={ backgroundColor } initialOpen={ false }>
 						<ColorPalette
 							value={ backgroundColor }
 							onChange={ ( colorValue ) => setAttributes( { backgroundColor: colorValue } ) }
-							withTransparentOption
 						/>
-					</PanelBody>
-					<PanelBody title={ __( 'Text Color' ) }>
+					</PanelColor>
+					<PanelColor title={ __( 'Text Color' ) } colorValue={ textColor } initialOpen={ false }>
 						<ColorPalette
 							value={ textColor }
 							onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
 						/>
-					</PanelBody>
+					</PanelColor>
 					<PanelBody title={ __( 'Block Alignment' ) }>
 						<BlockAlignmentToolbar
 							value={ width }
@@ -152,39 +150,48 @@ registerBlockType( 'core/paragraph', {
 					</PanelBody>
 				</InspectorControls>
 			),
-			<BlockAutocomplete key="editable" onReplace={ onReplace }>
-				<Editable
-					tagName="p"
-					className={ classnames( 'wp-block-paragraph', className, {
-						[ `align${ width }` ]: width,
-						'has-background': backgroundColor,
-					} ) }
-					style={ {
-						backgroundColor: backgroundColor,
-						color: textColor,
-						fontSize: fontSize ? fontSize + 'px' : undefined,
-						textAlign: align,
-					} }
-					value={ content }
-					onChange={ ( nextContent ) => {
-						setAttributes( {
-							content: nextContent,
-						} );
-					} }
-					focus={ focus }
-					onFocus={ setFocus }
-					onSplit={ ( before, after, ...blocks ) => {
-						setAttributes( { content: before } );
-						insertBlocksAfter( [
-							...blocks,
-							createBlock( 'core/paragraph', { content: after } ),
-						] );
-					} }
-					onMerge={ mergeBlocks }
-					onReplace={ onReplace }
-					placeholder={ placeholder || __( 'New Paragraph' ) }
-				/>
-			</BlockAutocomplete>,
+			<Autocomplete key="editable" completers={ [
+				blockAutocompleter( { onReplace } ),
+				userAutocompleter(),
+			] }>
+				{ ( { isExpanded, listBoxId, activeId } ) => (
+					<Editable
+						tagName="p"
+						className={ classnames( 'wp-block-paragraph', className, {
+							[ `align${ width }` ]: width,
+							'has-background': backgroundColor,
+						} ) }
+						style={ {
+							backgroundColor: backgroundColor,
+							color: textColor,
+							fontSize: fontSize ? fontSize + 'px' : undefined,
+							textAlign: align,
+						} }
+						value={ content }
+						onChange={ ( nextContent ) => {
+							setAttributes( {
+								content: nextContent,
+							} );
+						} }
+						focus={ focus }
+						onFocus={ setFocus }
+						onSplit={ ( before, after, ...blocks ) => {
+							setAttributes( { content: before } );
+							insertBlocksAfter( [
+								...blocks,
+								createBlock( 'core/paragraph', { content: after } ),
+							] );
+						} }
+						onMerge={ mergeBlocks }
+						onReplace={ onReplace }
+						placeholder={ placeholder || __( 'Add text or type / to insert content' ) }
+						aria-autocomplete="list"
+						aria-expanded={ isExpanded }
+						aria-owns={ listBoxId }
+						aria-activedescendant={ activeId }
+					/>
+				) }
+			</Autocomplete>,
 		];
 	},
 

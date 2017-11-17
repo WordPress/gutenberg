@@ -1,21 +1,14 @@
 .editor-visual-editor {
 	position: relative;
+	height: 100%;
 	margin: 0 auto;
-	padding: 50px 0;	// Floating up/down arrows invisible
+	padding: 50px 0 0;
 
 	&,
 	& p {
 		font-family: $editor-font;
 		font-size: $editor-font-size;
 		line-height: $editor-line-height;
-	}
-
-	@include break-small() {
-		padding: 50px 0;
-	}
-
-	@include break-large() {
-		padding: 60px 0;
 	}
 }
 
@@ -27,7 +20,7 @@
 .editor-visual-editor__block {
 	margin-left: auto;
 	margin-right: auto;
-	margin-bottom: 5px;
+	margin-bottom: $block-spacing;
 	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );
 	position: relative;
 
@@ -42,13 +35,11 @@
 		z-index: z-index( '.editor-visual-editor__block:before' );
 		content: '';
 		position: absolute;
-		outline: 1px solid transparent;
-		transition: 0.2s outline;
 		top: 0;
 		bottom: 0;
-
 		left: 0;
 		right: 0;
+		outline: 1px solid transparent;
 
 		@include break-small {
 			left: $block-mover-padding-visible;
@@ -60,13 +51,13 @@
 		position: relative;
 		min-height: 250px;
 
-		> :not( .editor-visual-editor__block-warning ) {
+		> :not( .editor-warning ) {
 			pointer-events: none;
 			user-select: none;
 		}
 	}
 
-	&.has-warning .editor-visual-editor__block-edit::after {
+	&.has-warning .editor-visual-editor__block-edit:after {
 		content: '';
 		position: absolute;
 		top: 0;
@@ -76,24 +67,50 @@
 		background-color: rgba( $white, 0.6 );
 	}
 
-	&.is-hovered:before {
-		outline: 1px solid $light-gray-500;
-		transition: 0.2s outline;
+	// simpler style for a block that has cursor focus (but hasn't been selected)
+	&.is-selected > .editor-block-mover:before,
+	&.is-hovered > .editor-block-mover:before,
+	&.is-selected > .editor-block-settings-menu:before,
+	&.is-hovered > .editor-block-settings-menu:before {
+		content: '';
+		position: absolute;
+		height: 36px;
+		top: 10px;
 	}
 
+	&.is-selected > .editor-block-mover:before,
+	&.is-hovered > .editor-block-mover:before {
+		border-right: 1px solid $light-gray-500;
+		right: 6px;
+	}
+
+	&.is-selected > .editor-block-settings-menu:before,
+	&.is-hovered > .editor-block-settings-menu:before {
+		border-left: 1px solid $light-gray-500;
+		left: 6px;
+	}
+
+	// focused block-style
 	&.is-selected:before {
-		outline: 2px solid $light-gray-500;
-		transition: 0.2s outline;
+ 		outline: 1px solid $light-gray-500;
 	}
 
+	// selection style for textarea
+	::-moz-selection {
+		background: $blue-medium-highlight;
+	}
+
+	::selection {
+		background: $blue-medium-highlight;
+	}
+
+	// selection style for multiple blocks
 	&.is-multi-selected *::selection {
 		background: transparent;
 	}
 
 	&.is-multi-selected:before {
-		background: $blue-medium-100;
-		outline: 2px solid $blue-medium-200;
-		transition: 0s outline;
+		background: $blue-medium-highlight;
 	}
 
 	.iframe-overlay {
@@ -120,10 +137,6 @@
 		// Without z-index, won't be clickable as "above" adjacent content
 		z-index: z-index( '.editor-visual-editor__block {core/image aligned left or right}' );
 		max-width: 370px;
-
-		.editor-block-mover {
-			display: none;
-		}
 	}
 
 	&[data-align="left"] {
@@ -219,12 +232,13 @@
 		@include break-wide() {
 			.editor-block-mover {
 				display: block;
-			}
-
-			.editor-block-mover {
-				top: -30px;
+				top: -29px;
 				left: 10px;
 				height: auto;
+
+				&:before {
+					content: none;
+				}
 			}
 
 			.editor-block-mover__control {
@@ -239,15 +253,19 @@
 		}
 
 		.editor-block-settings-menu {
-			top: -30px;
+			top: -41px;
 			right: 10px;
 			height: auto;
+
+			&:before {
+				content: none;
+			}
 		}
 	}
 
 	&[data-align="full"],
 	&[data-align="wide"] {
-		.editor-block-toolbar {
+		.editor-block-contextual-toolbar {
 			@include break-small() {
 				width: $visual-editor-max-width - $block-padding - $block-padding;
 			}
@@ -281,6 +299,36 @@
 			border-bottom: 3px solid $blue-medium-500;
 		}
 	}
+
+	> .editor-block-settings-menu {
+		position: absolute;
+		top: 2px;
+		right: 4px;
+		padding: 16px 0 20px 14px; // handles hover area
+
+		// Mobile
+		display: none;
+
+		@include break-small {
+			display: flex;
+			flex-direction: column;
+		}
+	}
+
+	> .editor-block-mover {
+		position: absolute;
+		top: 2px;
+		left: 4px;
+		height: $text-editor-font-size * 4; // same height as an empty paragraph
+		padding: 4px 14px 6px 0; // handles hover area
+		z-index: z-index( '.editor-block-mover' );
+
+		// Mobile, to be revisited
+		display: none;
+		@include break-small {
+			display: block;
+		}
+	}
 }
 
 .editor-visual-editor .editor-inserter {
@@ -292,7 +340,7 @@
 	}
 
 	.editor-inserter__toggle.components-icon-button:not(:disabled):hover {
-		color: $blue-medium-500;
+		@include button-style__hover;
 	}
 }
 
@@ -304,8 +352,8 @@
 
 	&:before {
 		position: absolute;
-		top: 6px;
-		height: 3px;
+		top: -1px;
+		height: 2px;
 		left: 0;
 		right: 0;
 		background: $blue-medium-500;
@@ -326,8 +374,7 @@
 
 	input[type=text] {
 		height: $text-editor-font-size * 4; // same height as an empty paragraph
-		margin-top: 0px;
-		margin-bottom: 5px;
+		margin: 0px 0px 4px 0px;
 		outline: 1px solid transparent;
 		border: none;
 		background: none;
@@ -340,7 +387,7 @@
 		font-size: $editor-font-size;
 		line-height: $editor-line-height;
 		cursor: text;
-		left: -1px;
+		max-width: none;	// fixes a bleed issue from the admin
 
 		&:hover {
 			outline: 1px solid $light-gray-500;
@@ -368,6 +415,7 @@
 	}
 
 	> .editor-inserter__block {
+		flex-direction: row;
 		opacity: 0;
 		transition: opacity 150ms;
 		margin: 0 10px;
@@ -375,11 +423,8 @@
 		font-family: $default-font;
 		font-size: $default-font-size;
 		box-shadow: none;
-
-		&:active {
-			background: none;
-			color: $blue-medium-500;
-		}
+		padding: 6px;
+		align-items: center;
 	}
 
 	&:hover > .editor-inserter__block,
@@ -388,38 +433,10 @@
 	}
 }
 
-.editor-visual-editor__block-warning {
-	z-index: z-index( '.editor-visual-editor__block-warning' );
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate( -50%, -50% );
-	display: flex;
-	flex-direction: column;
-	justify-content: space-around;
-	align-items: center;
-	width: 96%;
-	max-width: 380px;
-	padding: 20px 20px 10px 20px;
-	background-color: $white;
-	border: 1px solid $light-gray-500;
-	text-align: center;
-	line-height: $default-line-height;
-	box-shadow: $shadow-popover;
-
-	p {
-		width: 100%;
-		font-family: $default-font;
-		font-size: $default-font-size;
-	}
-
-	.button + .button {
-		margin-left: $item-spacing;
-	}
-}
-
-.visual-editor__invalid-block-warning-buttons .components-button {
-	margin-bottom: 5px;
+.editor-visual-editor__inserter-block-icon {
+	display: inline-block;
+	margin-right: 8px;
+	height: 20px;
 }
 
 .editor-visual-editor__block .blocks-visual-editor__block-html-textarea {
@@ -439,4 +456,113 @@
 	&:focus {
 		box-shadow: none;
 	}
+}
+
+.editor-visual-editor__sibling-inserter {
+	z-index: z-index( '.editor-visual-editor__sibling-inserter' );
+	position: relative;
+	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible ) - ( 2 * $block-padding );
+	margin: 0 auto;
+	opacity: 0;
+	transition: opacity 0.25s ease-in-out;
+	transition-delay: 0.3s;
+
+	@include break-small {
+		max-width: $visual-editor-max-width - ( 2 * $block-padding );
+	}
+
+	&:not( [data-insert-index="0"] ) {
+		top: #{ -1 * ( $block-spacing / 2 ) };
+	}
+
+	&.is-visible {
+		opacity: 1;
+	}
+
+	&:before {
+		content: '';
+		position: absolute;
+		width: 100%;
+		height: 44px;
+		transition: 0.1s height;
+		transform: translateY( -50% );
+	}
+
+	&:hover:before {
+		height: 44px;
+	}
+
+	.editor-inserter {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate( -50%, -50% );
+		margin: 0;
+	}
+
+	.editor-inserter__toggle.components-button {
+		margin: 0;
+		padding: 4px;
+		background: $white;
+
+		&:focus {
+			background: $light-gray-300;
+		}
+
+		.dashicon {
+			vertical-align: bottom;
+		}
+	}
+}
+
+$sticky-bottom-offset: 20px;
+
+.editor-block-contextual-toolbar {
+	position: sticky;
+	z-index: z-index( '.editor-block-contextual-toolbar' );
+	margin-top: - $block-toolbar-height - $block-padding - 1px;
+	margin-bottom: $block-padding + $sticky-bottom-offset;
+	white-space: nowrap;
+	text-align: left;
+	pointer-events: none;
+	height: $block-toolbar-height;
+	top: $header-height - 1px;
+
+	.editor-block-toolbar {
+		border: 1px solid $light-gray-500;
+		width: 100%;
+
+		// remove stacked borders in inline toolbar
+		> div:first-child {
+			margin-left: -1px;
+		}
+
+		> .editor-block-switcher:first-child {
+			margin-left: -2px;
+		}
+
+		@include break-small() {
+			width: auto;
+		}
+	}
+
+	// Reset pointer-events on children.
+	& > * {
+		pointer-events: auto;
+	}
+
+	@include break-small() {
+		margin-left: - $block-padding - 1px;
+		margin-right: - $block-padding - 1px;
+	}
+
+	@include break-medium() {
+		top: $item-spacing;
+	}
+}
+
+.editor-block-contextual-toolbar + div {
+	// prevent collapsing margins between block and toolbar, matches the 20px bottom offset		 +		display: flex;
+	margin-top: - $sticky-bottom-offset - 1px;
+	padding-top: 2px;
 }

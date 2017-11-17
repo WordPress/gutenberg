@@ -95,7 +95,7 @@ class DropZoneProvider extends Component {
 		const isDraggingOverDocument = isValidDrag; // && this.dragEnterNodes.length;
 		const hoveredDropZone = isDraggingOverDocument && findIndex( this.dropzones, ( { element } ) =>
 			this.isWithinZoneBounds( element, detail.clientX, detail.clientY
-		) );
+			) );
 		let position = null;
 		if ( hoveredDropZone !== -1 ) {
 			const rect = this.dropzones[ hoveredDropZone ].element.getBoundingClientRect();

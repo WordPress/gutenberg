@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import ResizableBox from 'react-resizable-box';
+import ResizableBox from 're-resizable';
 import {
 	startCase,
 	isEmpty,
@@ -16,7 +16,7 @@ import {
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { mediaUpload } from '@wordpress/utils';
+import { mediaUpload, createMediaFromFile, getBlobByURL, revokeBlobURL, viewPort } from '@wordpress/utils';
 import {
 	Placeholder,
 	Dashicon,
@@ -51,6 +51,31 @@ class ImageBlock extends Component {
 		this.updateImageURL = this.updateImageURL.bind( this );
 	}
 
+	componentDidMount() {
+		const { attributes, setAttributes } = this.props;
+		const { id, url = '' } = attributes;
+
+		if ( ! id && url.indexOf( 'blob:' ) === 0 ) {
+			getBlobByURL( url )
+				.then( createMediaFromFile )
+				.then( ( media ) => {
+					setAttributes( {
+						id: media.id,
+						url: media.source_url,
+					} );
+				} );
+		}
+	}
+
+	componentDidUpdate( prevProps ) {
+		const { id: prevID, url: prevUrl = '' } = prevProps.attributes;
+		const { id, url = '' } = this.props.attributes;
+
+		if ( ! prevID && prevUrl.indexOf( 'blob:' ) === 0 && id && url.indexOf( 'blob:' ) === -1 ) {
+			revokeBlobURL( url );
+		}
+	}
+
 	onSelectImage( media ) {
 		this.props.setAttributes( { url: media.url, alt: media.alt, caption: media.caption, id: media.id } );
 	}
@@ -64,9 +89,9 @@ class ImageBlock extends Component {
 	}
 
 	updateAlignment( nextAlign ) {
-		const extraUpdatedAttributes = [ 'wide', 'full' ].indexOf( nextAlign ) !== -1
-			? { width: undefined, height: undefined }
-			: {};
+		const extraUpdatedAttributes = [ 'wide', 'full' ].indexOf( nextAlign ) !== -1 ?
+			{ width: undefined, height: undefined } :
+			{};
 		this.props.setAttributes( { ...extraUpdatedAttributes, align: nextAlign } );
 	}
 
@@ -84,7 +109,7 @@ class ImageBlock extends Component {
 
 		const availableSizes = this.getAvailableSizes();
 		const figureStyle = width ? { width } : {};
-		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1;
+		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && ( ! viewPort.isExtraSmall() );
 		const uploadButtonProps = { isLarge: true };
 		const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setAttributes );
 		const dropFiles = ( files ) => mediaUpload( files, setAttributes );
@@ -98,19 +123,17 @@ class ImageBlock extends Component {
 					/>
 
 					<Toolbar>
-						<li>
-							<MediaUploadButton
-								buttonProps={ {
-									className: 'components-icon-button components-toolbar__control',
-									'aria-label': __( 'Edit image' ),
-								} }
-								onSelect={ this.onSelectImage }
-								type="image"
-								value={ id }
-							>
-								<Dashicon icon="edit" />
-							</MediaUploadButton>
-						</li>
+						<MediaUploadButton
+							buttonProps={ {
+								className: 'components-icon-button components-toolbar__control',
+								'aria-label': __( 'Edit image' ),
+							} }
+							onSelect={ this.onSelectImage }
+							type="image"
+							value={ id }
+						>
+							<Dashicon icon="edit" />
+						</MediaUploadButton>
 						<UrlInputButton onChange={ this.onSetHref } url={ href } />
 					</Toolbar>
 				</BlockControls>
@@ -189,35 +212,45 @@ class ImageBlock extends Component {
 							imageWidth,
 							imageHeight,
 						} = sizes;
-						const currentWidth = width || imageWidthWithinContainer;
-						const currentHeight = height || imageHeightWithinContainer;
+
+						// Disable reason: Image itself is not meant to be
+						// interactive, but should direct focus to block
+						// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
 						const img = <img src={ url } alt={ alt } onClick={ setFocus } />;
+
 						if ( ! isResizable || ! imageWidthWithinContainer ) {
 							return img;
 						}
+
+						const currentWidth = width || imageWidthWithinContainer;
+						const currentHeight = height || imageHeightWithinContainer;
+
 						const ratio = imageWidth / imageHeight;
 						const minWidth = imageWidth < imageHeight ? 10 : 10 * ratio;
 						const minHeight = imageHeight < imageWidth ? 10 : 10 / ratio;
+
 						return (
 							<ResizableBox
-								width={ currentWidth }
-								height={ currentHeight }
+								size={ {
+									width: currentWidth,
+									height: currentHeight,
+								} }
 								minWidth={ minWidth }
 								maxWidth={ settings.maxWidth }
 								minHeight={ minHeight }
 								maxHeight={ settings.maxWidth / ratio }
 								lockAspectRatio
-								handlerClasses={ {
+								handleClasses={ {
 									topRight: 'wp-block-image__resize-handler-top-right',
 									bottomRight: 'wp-block-image__resize-handler-bottom-right',
 									topLeft: 'wp-block-image__resize-handler-top-left',
 									bottomLeft: 'wp-block-image__resize-handler-bottom-left',
 								} }
 								enable={ { top: false, right: true, bottom: false, left: false, topRight: true, bottomRight: true, bottomLeft: true, topLeft: true } }
-								onResize={ ( event, direction, elt ) => {
+								onResizeStop={ ( event, direction, elt, delta ) => {
 									setAttributes( {
-										width: elt.clientWidth,
-										height: elt.clientHeight,
+										width: parseInt( currentWidth + delta.width, 10 ),
+										height: parseInt( currentHeight + delta.height, 10 ),
 									} );
 								} }
 							>

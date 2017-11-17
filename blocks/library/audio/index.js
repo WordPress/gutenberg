@@ -13,15 +13,13 @@ import { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, source } from '../../api';
+import { registerBlockType } from '../../api';
 import MediaUploadButton from '../../media-upload-button';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
-
-const { attr, children } = source;
 
 registerBlockType( 'core/audio', {
 	title: __( 'Audio' ),
@@ -33,14 +31,17 @@ registerBlockType( 'core/audio', {
 	attributes: {
 		src: {
 			type: 'string',
-			source: attr( 'audio', 'src' ),
+			source: 'attribute',
+			selector: 'audio',
+			attribute: 'src',
 		},
 		align: {
 			type: 'string',
 		},
 		caption: {
 			type: 'array',
-			source: children( 'figcaption' ),
+			source: 'children',
+			selector: 'figcaption',
 		},
 	},
 
@@ -94,18 +95,16 @@ registerBlockType( 'core/audio', {
 						onChange={ updateAlignment }
 					/>
 					<Toolbar>
-						<li>
-							<Button
-								buttonProps={ {
-									className: 'components-icon-button components-toolbar__control',
-									'aria-label': __( 'Edit audio' ),
-								} }
-								type="audio"
-								onClick={ switchToEditing }
-							>
-								<Dashicon icon="edit" />
-							</Button>
-						</li>
+						<Button
+							buttonProps={ {
+								className: 'components-icon-button components-toolbar__control',
+								'aria-label': __( 'Edit audio' ),
+							} }
+							type="audio"
+							onClick={ switchToEditing }
+						>
+							<Dashicon icon="edit" />
+						</Button>
 					</Toolbar>
 				</BlockControls>
 			);

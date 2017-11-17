@@ -40,9 +40,9 @@ function BlockAlignmentToolbar( { value, onChange, controls = DEFAULT_CONTROLS, 
 		return () => onChange( value === align ? undefined : align );
 	}
 
-	const enabledControls = wideControlsEnabled
-		? controls
-		: controls.filter( ( control ) => WIDE_CONTROLS.indexOf( control ) === -1 );
+	const enabledControls = wideControlsEnabled ?
+		controls :
+		controls.filter( ( control ) => WIDE_CONTROLS.indexOf( control ) === -1 );
 
 	return (
 		<Toolbar

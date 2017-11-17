@@ -45,7 +45,7 @@ describe( 'Tooltip', () => {
 
 		it( 'should show popover on focus', () => {
 			const originalFocus = jest.fn();
-			const event = { type: 'focus', target: {} };
+			const event = { type: 'focus', currentTarget: {} };
 			const wrapper = shallow(
 				<Tooltip text="Help Text">
 					<button
@@ -67,6 +67,8 @@ describe( 'Tooltip', () => {
 		} );
 
 		it( 'should show popover on delayed mouseenter', () => {
+			const expectPopoverOpened = ( wrapper, opened ) => expect( wrapper.find( 'Popover' ) ).toHaveProp( 'isOpen', opened );
+
 			// Mount: Issues with using `setState` asynchronously with shallow-
 			// rendered components: https://github.com/airbnb/enzyme/issues/450
 			const originalMouseEnter = jest.fn();
@@ -76,24 +78,27 @@ describe( 'Tooltip', () => {
 						onMouseEnter={ originalMouseEnter }
 						onFocus={ originalMouseEnter }
 					>
-						Hover Me!
+						<span>Hover Me!</span>
 					</button>
 				</Tooltip>
 			);
 
-			const button = wrapper.find( 'button' );
-			button.simulate( 'mouseenter' );
+			wrapper.find( 'button' ).simulate( 'mouseenter', {
+				// Enzyme does not accurately emulate event targets
+				// See: https://github.com/airbnb/enzyme/issues/218
+				currentTarget: wrapper.find( 'button' ).getDOMNode(),
+				target: wrapper.find( 'button > span' ).getDOMNode(),
+			} );
 
 			expect( originalMouseEnter ).toHaveBeenCalled();
 
-			const popover = wrapper.find( 'Popover' );
 			expect( wrapper.state( 'isOver' ) ).toBe( false );
-			expect( popover.prop( 'isOpen' ) ).toBe( false );
-
+			expectPopoverOpened( wrapper, false );
 			wrapper.instance().delayedSetIsOver.flush();
+			wrapper.update();
 
 			expect( wrapper.state( 'isOver' ) ).toBe( true );
-			expect( popover.prop( 'isOpen' ) ).toBe( true );
+			expectPopoverOpened( wrapper, true );
 		} );
 
 		it( 'should ignore mouseenter on disabled elements', () => {
@@ -107,13 +112,19 @@ describe( 'Tooltip', () => {
 						onFocus={ originalMouseEnter }
 						disabled
 					>
-						Hover Me!
+						<span>Hover Me!</span>
 					</button>
 				</Tooltip>
 			);
 
-			const button = wrapper.find( 'button' );
-			button.simulate( 'mouseenter' );
+			wrapper.find( 'button' ).simulate( 'mouseenter', {
+				// Enzyme does not accurately emulate event targets
+				// See: https://github.com/airbnb/enzyme/issues/218
+				currentTarget: wrapper.find( 'button' ).getDOMNode(),
+				target: wrapper.find( 'button > span' ).getDOMNode(),
+			} );
+
+			expect( originalMouseEnter ).toHaveBeenCalled();
 
 			const popover = wrapper.find( 'Popover' );
 			wrapper.instance().delayedSetIsOver.flush();

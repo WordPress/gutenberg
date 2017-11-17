@@ -7,14 +7,18 @@ import { isEqual, noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createPortal, Component } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { focus, keycodes } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
+import withFocusReturn from '../higher-order/with-focus-return';
 import PopoverDetectOutside from './detect-outside';
+import { Slot, Fill } from '../slot-fill';
+
+const FocusManaged = withFocusReturn( ( { children } ) => children );
 
 const { ESCAPE } = keycodes;
 
@@ -25,12 +29,20 @@ const { ESCAPE } = keycodes;
  */
 const ARROW_OFFSET = 20;
 
-export class Popover extends Component {
+/**
+ * Name of slot in which popover should fill.
+ *
+ * @type {String}
+ */
+const SLOT_NAME = 'Popover';
+
+class Popover extends Component {
 	constructor() {
 		super( ...arguments );
 
 		this.focus = this.focus.bind( this );
 		this.bindNode = this.bindNode.bind( this );
+		this.getAnchorRect = this.getAnchorRect.bind( this );
 		this.setOffset = this.setOffset.bind( this );
 		this.throttledSetOffset = this.throttledSetOffset.bind( this );
 		this.maybeClose = this.maybeClose.bind( this );
@@ -102,7 +114,7 @@ export class Popover extends Component {
 			return;
 		}
 
-		const { content, popover } = this.nodes;
+		const { content } = this.nodes;
 		if ( ! content ) {
 			return;
 		}
@@ -112,8 +124,8 @@ export class Popover extends Component {
 		const firstTabbable = focus.tabbable.find( content )[ 0 ];
 		if ( firstTabbable ) {
 			firstTabbable.focus();
-		} else if ( popover ) {
-			popover.focus();
+		} else {
+			content.focus();
 		}
 	}
 
@@ -121,23 +133,40 @@ export class Popover extends Component {
 		this.rafHandle = window.requestAnimationFrame( this.setOffset );
 	}
 
-	setOffset() {
-		const { anchor, popover } = this.nodes;
+	getAnchorRect( ) {
+		const { anchor } = this.nodes;
 		if ( ! anchor || ! anchor.parentNode ) {
 			return;
 		}
-
 		const rect = anchor.parentNode.getBoundingClientRect();
+		// subtract padding
+		const { paddingTop, paddingBottom } = window.getComputedStyle( anchor.parentNode );
+		const topPad = parseInt( paddingTop, 10 );
+		const bottomPad = parseInt( paddingBottom, 10 );
+		return {
+			x: rect.left,
+			y: rect.top + topPad,
+			width: rect.width,
+			height: rect.height - topPad - bottomPad,
+			left: rect.left,
+			right: rect.right,
+			top: rect.top + topPad,
+			bottom: rect.bottom - bottomPad,
+		};
+	}
+
+	setOffset() {
+		const { getAnchorRect = this.getAnchorRect } = this.props;
+		const { popover } = this.nodes;
+
 		const [ yAxis, xAxis ] = this.getPositions();
 		const isTop = 'top' === yAxis;
 		const isLeft = 'left' === xAxis;
 		const isRight = 'right' === xAxis;
 
-		// Offset top positioning by padding
-		const { paddingTop, paddingBottom } = window.getComputedStyle( anchor.parentNode );
-		let topOffset = parseInt( isTop ? paddingTop : paddingBottom, 10 );
-		if ( ! isTop ) {
-			topOffset *= -1;
+		const rect = getAnchorRect( { isTop, isLeft, isRight } );
+		if ( ! rect ) {
+			return;
 		}
 
 		if ( isRight ) {
@@ -150,7 +179,7 @@ export class Popover extends Component {
 		}
 
 		// Set at top or bottom of parent node based on popover position
-		popover.style.top = ( rect[ yAxis ] + topOffset ) + 'px';
+		popover.style.top = rect[ yAxis ] + 'px';
 	}
 
 	setForcedPositions() {
@@ -187,6 +216,7 @@ export class Popover extends Component {
 
 		// Close on escape
 		if ( event.keyCode === ESCAPE && onClose ) {
+			event.stopPropagation();
 			onClose();
 		}
 
@@ -211,7 +241,9 @@ export class Popover extends Component {
 			// of props which aren't explicitly handled by this component.
 			/* eslint-disable no-unused-vars */
 			position,
+			range,
 			focusOnOpen,
+			getAnchorRect,
 			/* eslint-enable no-unused-vars */
 			...contentProps
 		} = this.props;
@@ -221,7 +253,6 @@ export class Popover extends Component {
 			return null;
 		}
 
-		const { popoverTarget = document.body } = this.context;
 		const classes = classnames(
 			'components-popover',
 			className,
@@ -233,35 +264,47 @@ export class Popover extends Component {
 		// within popover as inferring close intent.
 
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
-		return (
-			<span ref={ this.bindNode( 'anchor' ) }>
-				{ createPortal(
-					<PopoverDetectOutside onClickOutside={ onClickOutside }>
-						<div
-							ref={ this.bindNode( 'popover' ) }
-							className={ classes }
-							tabIndex="0"
-							{ ...contentProps }
-							onKeyDown={ this.maybeClose }
-						>
-							<div
-								ref={ this.bindNode( 'content' ) }
-								className="components-popover__content"
-							>
-								{ children }
-							</div>
-						</div>
-					</PopoverDetectOutside>,
-					popoverTarget
-				) }
-			</span>
+		let content = (
+			<PopoverDetectOutside onClickOutside={ onClickOutside }>
+				<div
+					ref={ this.bindNode( 'popover' ) }
+					className={ classes }
+					{ ...contentProps }
+					onKeyDown={ this.maybeClose }
+				>
+					<div
+						ref={ this.bindNode( 'content' ) }
+						className="components-popover__content"
+						tabIndex="-1"
+					>
+						{ children }
+					</div>
+				</div>
+			</PopoverDetectOutside>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
+
+		// Apply focus return behavior except when default focus on open
+		// behavior is disabled.
+		if ( false !== focusOnOpen ) {
+			content = <FocusManaged>{ content }</FocusManaged>;
+		}
+
+		// In case there is no slot context in which to render, default to an
+		// in-place rendering.
+		const { getSlot } = this.context;
+		if ( getSlot && getSlot( SLOT_NAME ) ) {
+			content = <Fill name={ SLOT_NAME }>{ content }</Fill>;
+		}
+
+		return <span ref={ this.bindNode( 'anchor' ) }>{ content }</span>;
 	}
 }
 
 Popover.contextTypes = {
-	popoverTarget: noop,
+	getSlot: noop,
 };
+
+Popover.Slot = () => <Slot bubblesVirtually name={ SLOT_NAME } />;
 
 export default Popover;

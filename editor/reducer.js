@@ -3,7 +3,22 @@
  */
 import optimist from 'redux-optimist';
 import { combineReducers } from 'redux';
-import { difference, get, reduce, keyBy, keys, first, last, omit, pick, without, mapValues } from 'lodash';
+import {
+	flow,
+	partialRight,
+	difference,
+	get,
+	reduce,
+	keyBy,
+	keys,
+	first,
+	last,
+	omit,
+	pick,
+	without,
+	mapValues,
+	findIndex,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -13,7 +28,8 @@ import { getBlockTypes, getBlockType } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { combineUndoableReducers } from './utils/undoable-reducer';
+import withHistory from './utils/with-history';
+import withChangeDetection from './utils/with-change-detection';
 import { STORE_DEFAULTS } from './store-defaults';
 
 /***
@@ -29,7 +45,7 @@ const MAX_RECENT_BLOCKS = 8;
  * @return {*}       Raw value
  */
 export function getPostRawValue( value ) {
-	if ( 'object' === typeof value && 'raw' in value ) {
+	if ( value && 'object' === typeof value && 'raw' in value ) {
 		return value.raw;
 	}
 
@@ -50,7 +66,16 @@ export function getPostRawValue( value ) {
  * @param  {Object} action Dispatched action
  * @return {Object}        Updated state
  */
-export const editor = combineUndoableReducers( {
+export const editor = flow( [
+	combineReducers,
+
+	// Track undo history, starting at editor initialization.
+	partialRight( withHistory, { resetTypes: [ 'SETUP_EDITOR' ] } ),
+
+	// Track whether changes exist, starting at editor initialization and
+	// resetting at each post save.
+	partialRight( withChangeDetection, { resetTypes: [ 'SETUP_EDITOR', 'RESET_POST' ] } ),
+] )( {
 	edits( state = {}, action ) {
 		switch ( action.type ) {
 			case 'EDIT_POST':
@@ -248,7 +273,7 @@ export const editor = combineUndoableReducers( {
 
 		return state;
 	},
-}, { resetTypes: [ 'RESET_POST' ] } );
+} );
 
 /**
  * Reducer returning the last-known state of the current post, in the format
@@ -306,13 +331,14 @@ export function isTyping( state = false, action ) {
  * @param  {Object} action Dispatched action
  * @return {Object}        Updated state
  */
-export function blockSelection( state = { start: null, end: null, focus: null }, action ) {
+export function blockSelection( state = { start: null, end: null, focus: null, isMultiSelecting: false }, action ) {
 	switch ( action.type ) {
 		case 'CLEAR_SELECTED_BLOCK':
 			return {
 				start: null,
 				end: null,
 				focus: null,
+				isMultiSelecting: false,
 			};
 		case 'START_MULTI_SELECT':
 			return {
@@ -320,24 +346,31 @@ export function blockSelection( state = { start: null, end: null, focus: null },
 				isMultiSelecting: true,
 			};
 		case 'STOP_MULTI_SELECT':
-			return omit( state, 'isMultiSelecting' );
+			return {
+				...state,
+				isMultiSelecting: false,
+				focus: state.start === state.end ? state.focus : null,
+			};
 		case 'MULTI_SELECT':
 			return {
+				...state,
 				start: action.start,
 				end: action.end,
-				focus: state.focus,
+				focus: state.isMultiSelecting ? state.focus : null,
 			};
 		case 'SELECT_BLOCK':
 			if ( action.uid === state.start && action.uid === state.end ) {
 				return state;
 			}
 			return {
+				...state,
 				start: action.uid,
 				end: action.uid,
 				focus: action.focus || {},
 			};
 		case 'UPDATE_FOCUS':
 			return {
+				...state,
 				start: action.uid,
 				end: action.uid,
 				focus: action.config || {},
@@ -347,6 +380,7 @@ export function blockSelection( state = { start: null, end: null, focus: null },
 				start: action.blocks[ 0 ].uid,
 				end: action.blocks[ 0 ].uid,
 				focus: {},
+				isMultiSelecting: false,
 			};
 		case 'REPLACE_BLOCKS':
 			if ( ! action.blocks || ! action.blocks.length || action.uids.indexOf( state.start ) === -1 ) {
@@ -356,6 +390,7 @@ export function blockSelection( state = { start: null, end: null, focus: null },
 				start: action.blocks[ 0 ].uid,
 				end: action.blocks[ 0 ].uid,
 				focus: {},
+				isMultiSelecting: false,
 			};
 	}
 
@@ -407,12 +442,20 @@ export function blocksMode( state = {}, action ) {
  * @param  {Object} action Dispatched action
  * @return {Object}        Updated state
  */
-export function showInsertionPoint( state = false, action ) {
+export function blockInsertionPoint( state = {}, action ) {
 	switch ( action.type ) {
+		case 'SET_BLOCK_INSERTION_POINT':
+			const { position } = action;
+			return { ...state, position };
+
+		case 'CLEAR_BLOCK_INSERTION_POINT':
+			return { ...state, position: null };
+
 		case 'SHOW_INSERTION_POINT':
-			return true;
+			return { ...state, visible: true };
+
 		case 'HIDE_INSERTION_POINT':
-			return false;
+			return { ...state, visible: false };
 	}
 
 	return state;
@@ -479,6 +522,14 @@ export function preferences( state = STORE_DEFAULTS.preferences, action ) {
 					.slice( 0, MAX_RECENT_BLOCKS ),
 				blockUsage: filterInvalidBlocksFromObject( state.blockUsage ),
 			};
+		case 'TOGGLE_FEATURE':
+			return {
+				...state,
+				features: {
+					...state.features,
+					[ action.feature ]: ! state.features[ action.feature ],
+				},
+			};
 	}
 
 	return state;
@@ -528,23 +579,143 @@ export function saving( state = {}, action ) {
 	return state;
 }
 
-export function notices( state = {}, action ) {
+export function notices( state = [], action ) {
 	switch ( action.type ) {
 		case 'CREATE_NOTICE':
-			return {
-				...state,
-				[ action.notice.id ]: action.notice,
-			};
+			return [ ...state, action.notice ];
+
 		case 'REMOVE_NOTICE':
-			if ( ! state.hasOwnProperty( action.noticeId ) ) {
+			const { noticeId } = action;
+			const index = findIndex( state, { id: noticeId } );
+			if ( index === -1 ) {
 				return state;
 			}
 
-			return omit( state, action.noticeId );
+			return [
+				...state.slice( 0, index ),
+				...state.slice( index + 1 ),
+			];
 	}
 
 	return state;
 }
+
+const locations = [
+	'normal',
+	'side',
+];
+
+const defaultMetaBoxState = locations.reduce( ( result, key ) => {
+	result[ key ] = {
+		isActive: false,
+		isDirty: false,
+		isUpdating: false,
+	};
+
+	return result;
+}, {} );
+
+export function metaBoxes( state = defaultMetaBoxState, action ) {
+	switch ( action.type ) {
+		case 'INITIALIZE_META_BOX_STATE':
+			return locations.reduce( ( newState, location ) => {
+				newState[ location ] = {
+					...state[ location ],
+					isLoaded: false,
+					isActive: action.metaBoxes[ location ],
+				};
+				return newState;
+			}, { ...state } );
+		case 'META_BOX_LOADED':
+			return {
+				...state,
+				[ action.location ]: {
+					...state[ action.location ],
+					isLoaded: true,
+					isUpdating: false,
+					isDirty: false,
+				},
+			};
+		case 'HANDLE_META_BOX_RELOAD':
+			return {
+				...state,
+				[ action.location ]: {
+					...state[ action.location ],
+					isUpdating: false,
+					isDirty: false,
+				},
+			};
+		case 'REQUEST_META_BOX_UPDATES':
+			return action.locations.reduce( ( newState, location ) => {
+				newState[ location ] = {
+					...state[ location ],
+					isUpdating: true,
+					isDirty: false,
+				};
+				return newState;
+			}, { ...state } );
+		case 'META_BOX_STATE_CHANGED':
+			return {
+				...state,
+				[ action.location ]: {
+					...state[ action.location ],
+					isDirty: action.hasChanged,
+				},
+			};
+		default:
+			return state;
+	}
+}
+
+export const reusableBlocks = combineReducers( {
+	data( state = {}, action ) {
+		switch ( action.type ) {
+			case 'FETCH_REUSABLE_BLOCKS_SUCCESS': {
+				return reduce( action.reusableBlocks, ( newState, reusableBlock ) => ( {
+					...newState,
+					[ reusableBlock.id ]: reusableBlock,
+				} ), state );
+			}
+
+			case 'UPDATE_REUSABLE_BLOCK': {
+				const { id, reusableBlock } = action;
+				const existingReusableBlock = state[ id ];
+
+				return {
+					...state,
+					[ id ]: {
+						...existingReusableBlock,
+						...reusableBlock,
+						attributes: {
+							...( existingReusableBlock && existingReusableBlock.attributes ),
+							...reusableBlock.attributes,
+						},
+					},
+				};
+			}
+		}
+
+		return state;
+	},
+
+	isSaving( state = {}, action ) {
+		switch ( action.type ) {
+			case 'SAVE_REUSABLE_BLOCK':
+				return {
+					...state,
+					[ action.id ]: true,
+				};
+
+			case 'SAVE_REUSABLE_BLOCK_SUCCESS':
+			case 'SAVE_REUSABLE_BLOCK_FAILURE': {
+				const { id } = action;
+				return omit( state, id );
+			}
+		}
+
+		return state;
+	},
+} );
 
 export default optimist( combineReducers( {
 	editor,
@@ -553,9 +724,11 @@ export default optimist( combineReducers( {
 	blockSelection,
 	hoveredBlock,
 	blocksMode,
-	showInsertionPoint,
+	blockInsertionPoint,
 	preferences,
 	panel,
 	saving,
 	notices,
+	metaBoxes,
+	reusableBlocks,
 } ) );

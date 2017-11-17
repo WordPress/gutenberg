@@ -9,9 +9,19 @@ import { identity, fromPairs } from 'lodash';
  */
 import withAPIData from '../';
 
-jest.mock( '../request', () => jest.fn( () => Promise.resolve( {
-	body: {},
-} ) ) );
+jest.mock( '../request', () => {
+	const request = jest.fn( () => Promise.resolve( {
+		body: {},
+	} ) );
+
+	request.getCachedResponse = ( { method, path } ) => {
+		return method === 'GET' && '/wp/v2/pages/10' === path ?
+			{ body: { title: 'OK!' }, headers: [] } :
+			undefined;
+	};
+
+	return request;
+} );
 
 describe( 'withAPIData()', () => {
 	const schema = {
@@ -70,12 +80,38 @@ describe( 'withAPIData()', () => {
 		} );
 	} );
 
-	it( 'should ignore unmatched resources', () => {
+	it( 'should preassign cached data', ( done ) => {
 		const wrapper = getWrapper( () => ( {
-			revision: '/wp/v2/pages/5/revisions/10',
+			page: '/wp/v2/pages/10',
 		} ) );
 
-		expect( wrapper.state( 'dataProps' ) ).toEqual( {} );
+		const dataProps = wrapper.state( 'dataProps' );
+		expect( Object.keys( dataProps ) ).toEqual( [ 'page' ] );
+		expect( Object.keys( dataProps.page ) ).toEqual( expect.arrayContaining( [
+			'get',
+			'isLoading',
+			'path',
+			'data',
+		] ) );
+		expect( dataProps.page.isLoading ).toBe( false );
+		expect( wrapper.state( 'dataProps' ).page.data ).toEqual( { title: 'OK!' } );
+
+		process.nextTick( () => {
+			expect( wrapper.state( 'dataProps' ).page.isLoading ).toBe( false );
+
+			done();
+		} );
+	} );
+
+	it( 'should assign an empty prop object for unmatched resources', () => {
+		const wrapper = getWrapper( () => ( {
+			unknown: '/wp/v2/unknown/route',
+		} ) );
+
+		const dataProps = wrapper.state( 'dataProps' );
+		expect( Object.keys( dataProps ) ).toEqual( [ 'unknown' ] );
+		expect( Object.keys( dataProps.unknown ) ).toEqual( [] );
+		expect( wrapper.prop( 'unknown' ) ).toEqual( {} );
 	} );
 
 	it( 'should include full gamut of method available properties', () => {

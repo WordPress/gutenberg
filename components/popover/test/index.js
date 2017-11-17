@@ -6,8 +6,7 @@ import { shallow, mount } from 'enzyme';
 /**
  * Internal dependencies
  */
-import { Popover } from '../';
-import PopoverProvider from '../provider';
+import Popover from '../';
 
 describe( 'Popover', () => {
 	describe( '#componentDidUpdate()', () => {
@@ -75,9 +74,9 @@ describe( 'Popover', () => {
 			wrapper = mount( <Popover /> );
 			wrapper.setProps( { isOpen: true } );
 
-			const popover = wrapper.find( '.components-popover' ).getDOMNode();
+			const content = wrapper.find( '.components-popover__content' ).getDOMNode();
 
-			expect( document.activeElement ).toBe( popover );
+			expect( document.activeElement ).toBe( content );
 		} );
 
 		it( 'should allow focus-on-open behavior to be disabled', () => {
@@ -263,29 +262,15 @@ describe( 'Popover', () => {
 		} );
 
 		it( 'should render content if popover is open', () => {
-			const wrapper = shallow( <Popover isOpen>Hello</Popover> );
+			const wrapper = shallow( <Popover isOpen>Hello</Popover>, { disableLifecycleMethods: true } );
 
 			expect( wrapper.type() ).not.toBeNull();
 		} );
 
 		it( 'should pass additional to portaled element', () => {
-			const wrapper = shallow( <Popover isOpen role="tooltip">Hello</Popover> );
+			const wrapper = shallow( <Popover isOpen role="tooltip">Hello</Popover>, { disableLifecycleMethods: true } );
 
 			expect( wrapper.find( '.components-popover' ).prop( 'role' ) ).toBe( 'tooltip' );
-		} );
-
-		it( 'should render into provider context', () => {
-			const element = require( '@wordpress/element' );
-			jest.spyOn( element, 'createPortal' );
-			const target = document.createElement( 'div' );
-
-			mount(
-				<PopoverProvider target={ target }>
-					<Popover isOpen>Hello</Popover>
-				</PopoverProvider>
-			);
-
-			expect( element.createPortal.mock.calls[ 0 ][ 1 ] ).toBe( target );
 		} );
 	} );
 } );

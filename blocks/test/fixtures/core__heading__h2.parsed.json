@@ -2,10 +2,11 @@
     {
         "blockName": "core/heading",
         "attrs": null,
-        "rawContent": "\n<h2>A picture is worth a thousand words, or so the saying goes</h2>\n"
+        "innerBlocks": [],
+        "innerHTML": "\n<h2>A picture is worth a thousand words, or so the saying goes</h2>\n"
     },
     {
         "attrs": {},
-        "rawContent": "\n"
+        "innerHTML": "\n"
     }
 ]

@@ -12,11 +12,9 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './editor.scss';
-import { registerBlockType, source, createBlock } from '../../api';
+import { registerBlockType, createBlock } from '../../api';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
-
-const { prop } = source;
 
 registerBlockType( 'core/code', {
 	title: __( 'Code' ),
@@ -28,9 +26,13 @@ registerBlockType( 'core/code', {
 	attributes: {
 		content: {
 			type: 'string',
-			source: prop( 'code', 'textContent' ),
+			source: 'property',
+			selector: 'code',
+			property: 'textContent',
 		},
 	},
+
+	supportHTML: false,
 
 	transforms: {
 		from: [
