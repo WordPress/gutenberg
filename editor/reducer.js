@@ -483,9 +483,10 @@ export function blockInsertionPoint( state = {}, action ) {
 export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 	switch ( action.type ) {
 		case 'TOGGLE_SIDEBAR':
+			const isSidebarOpenedKey = action.isMobile ? 'isSidebarOpenedMobile' : 'isSidebarOpened';
 			return {
 				...state,
-				isSidebarOpened: ! state.isSidebarOpened,
+				[ isSidebarOpenedKey ]: ! state[ isSidebarOpenedKey ],
 			};
 		case 'TOGGLE_SIDEBAR_PANEL':
 			return {
@@ -676,7 +677,7 @@ export function metaBoxes( state = defaultMetaBoxState, action ) {
 	}
 }
 
-// Create responsive reducer with lib default breakpoints excluding small where we are currently using 782.
+// Create responsive reducer with the breakpoints imported from the scss variables file.
 const responsive = createResponsiveStateReducer( {
 	mobile: BREAK_MOBILE,
 	small: BREAK_SMALL,
@@ -685,6 +686,7 @@ const responsive = createResponsiveStateReducer( {
 	wide: BREAK_WIDE,
 	huge: BREAK_HUGE,
 } );
+
 export const reusableBlocks = combineReducers( {
 	data( state = {}, action ) {
 		switch ( action.type ) {
