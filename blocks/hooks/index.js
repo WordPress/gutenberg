@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import createHooks from '@wordpress/hooks';
+import { addFilter } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -11,41 +11,7 @@ import customClassName from './custom-class-name';
 import generatedClassName from './generated-class-name';
 import matchers from './matchers';
 
-const hooks = createHooks();
-
-const {
-	addAction,
-	addFilter,
-	removeAction,
-	removeFilter,
-	removeAllActions,
-	removeAllFilters,
-	doAction,
-	applyFilters,
-	doingAction,
-	doingFilter,
-	didAction,
-	didFilter,
-	hasAction,
-	hasFilter,
-} = hooks;
-
-export {
-	addAction,
-	addFilter,
-	removeAction,
-	removeFilter,
-	removeAllActions,
-	removeAllFilters,
-	doAction,
-	applyFilters,
-	doingAction,
-	doingFilter,
-	didAction,
-	didFilter,
-	hasAction,
-	hasFilter,
-};
+const hooks = { addFilter };
 
 anchor( hooks );
 customClassName( hooks );

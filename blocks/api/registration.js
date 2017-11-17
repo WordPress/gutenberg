@@ -8,12 +8,12 @@ import { get, isFunction, some } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { getCategories } from './categories';
+import { applyFilters } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
-import { applyFilters } from '../hooks';
+import { getCategories } from './categories';
 
 /**
  * Block settings keyed by block name.
