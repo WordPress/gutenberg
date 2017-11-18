@@ -32,7 +32,6 @@ registerBlockType( 'core/gallery', {
 		images: {
 			type: 'array',
 			default: [],
-<<<<<<< HEAD
 			source: 'query',
 			selector: 'ul.wp-block-gallery .blocks-gallery-item img',
 			query: {
@@ -49,13 +48,6 @@ registerBlockType( 'core/gallery', {
 					attribute: 'data-id',
 				},
 			},
-=======
-			source: query( 'ul.wp-block-gallery .blocks-gallery-item img', {
-				url: attr( 'src' ),
-				alt: attr( 'alt' ),
-				id: attr( 'data-id' ),
-			} ),
->>>>>>> Change class to blocks-gallery-item.
 		},
 		columns: {
 			type: 'number',
