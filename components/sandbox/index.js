@@ -140,6 +140,9 @@ export default class Sandbox extends Component {
 				margin-top: 0 !important;	/* has to have !important to override inline styles */
 				margin-bottom: 0 !important;
 			}
+			body > div > blockquote {
+				display: none;
+			}
 		`;
 
 		// put the html snippet into a html document, and then write it to the iframe's document
