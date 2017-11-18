@@ -43,7 +43,7 @@ body.gutenberg-editor-page {
 		box-sizing: border-box;
 	}
 
-	ul {
+	ul:not(.wp-block-gallery) {
 		list-style-type: disc;
 	}
 
@@ -51,7 +51,7 @@ body.gutenberg-editor-page {
 		list-style-type: decimal;
 	}
 
-	ul,
+	ul:not(.wp-block-gallery),
 	ol {
 		margin: 0;
 		padding: 0;

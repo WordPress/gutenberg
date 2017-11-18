@@ -33,7 +33,7 @@ registerBlockType( 'core/gallery', {
 			type: 'array',
 			default: [],
 			source: 'query',
-			selector: 'div.wp-block-gallery figure.blocks-gallery-image img',
+			selector: 'ul.wp-block-gallery .blocks-gallery-item img',
 			query: {
 				url: {
 					source: 'attribute',
@@ -150,7 +150,7 @@ registerBlockType( 'core/gallery', {
 	save( { attributes } ) {
 		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
 		return (
-			<div className={ `align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` } >
+			<ul className={ `align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` } >
 				{ images.map( ( image ) => {
 					let href;
 
@@ -166,12 +166,14 @@ registerBlockType( 'core/gallery', {
 					const img = <img src={ image.url } alt={ image.alt } data-id={ image.id } />;
 
 					return (
-						<figure key={ image.id || image.url } className="blocks-gallery-image">
-							{ href ? <a href={ href }>{ img }</a> : img }
-						</figure>
+						<li key={ image.id || image.url } className="blocks-gallery-item">
+							<figure>
+								{ href ? <a href={ href }>{ img }</a> : img }
+							</figure>
+						</li>
 					);
 				} ) }
-			</div>
+			</ul>
 		);
 	},
 
