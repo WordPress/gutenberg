@@ -5,7 +5,8 @@
             "url": "https://wordpress.com/"
         },
         "innerBlocks": [],
-        "innerHTML": "\n<figure class=\"wp-block-embed-wordpress\">\n    https://wordpress.com/\n    <figcaption>Embedded content from WordPress</figcaption>\n</figure>\n"
+        "innerHTML": "\n<figure class=\"wp-block-embed-wordpress\">\n    https://wordpress.com/\n    <figcaption>Embedded content from WordPress</figcaption>\n</figure>\n",
+        "outerHTML": "<!-- wp:core-embed/wordpress {\"url\":\"https://wordpress.com/\"} -->\n<figure class=\"wp-block-embed-wordpress\">\n    https://wordpress.com/\n    <figcaption>Embedded content from WordPress</figcaption>\n</figure>\n<!-- /wp:core-embed/wordpress -->"
     },
     {
         "attrs": {},

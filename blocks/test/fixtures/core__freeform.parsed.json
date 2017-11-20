@@ -3,7 +3,8 @@
         "blockName": "core/freeform",
         "attrs": null,
         "innerBlocks": [],
-        "innerHTML": "\nTesting freeform block with some\n<div class=\"wp-some-class\">\n\tHTML <span style=\"color: red;\">content</span>\n</div>\n"
+        "innerHTML": "\nTesting freeform block with some\n<div class=\"wp-some-class\">\n\tHTML <span style=\"color: red;\">content</span>\n</div>\n",
+        "outerHTML": "<!-- wp:core/freeform -->\nTesting freeform block with some\n<div class=\"wp-some-class\">\n\tHTML <span style=\"color: red;\">content</span>\n</div>\n<!-- /wp:core/freeform -->"
     },
     {
         "attrs": {},

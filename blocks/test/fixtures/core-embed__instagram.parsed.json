@@ -5,7 +5,8 @@
             "url": "https://instagram.com/"
         },
         "innerBlocks": [],
-        "innerHTML": "\n<figure class=\"wp-block-embed-instagram\">\n    https://instagram.com/\n    <figcaption>Embedded content from instagram</figcaption>\n</figure>\n"
+        "innerHTML": "\n<figure class=\"wp-block-embed-instagram\">\n    https://instagram.com/\n    <figcaption>Embedded content from instagram</figcaption>\n</figure>\n",
+        "outerHTML": "<!-- wp:core-embed/instagram {\"url\":\"https://instagram.com/\"} -->\n<figure class=\"wp-block-embed-instagram\">\n    https://instagram.com/\n    <figcaption>Embedded content from instagram</figcaption>\n</figure>\n<!-- /wp:core-embed/instagram -->"
     },
     {
         "attrs": {},

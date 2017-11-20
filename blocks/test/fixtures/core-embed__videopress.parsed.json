@@ -5,7 +5,8 @@
             "url": "https://videopress.com/"
         },
         "innerBlocks": [],
-        "innerHTML": "\n<figure class=\"wp-block-embed-videopress\">\n    https://videopress.com/\n    <figcaption>Embedded content from videopress</figcaption>\n</figure>\n"
+        "innerHTML": "\n<figure class=\"wp-block-embed-videopress\">\n    https://videopress.com/\n    <figcaption>Embedded content from videopress</figcaption>\n</figure>\n",
+        "outerHTML": "<!-- wp:core-embed/videopress {\"url\":\"https://videopress.com/\"} -->\n<figure class=\"wp-block-embed-videopress\">\n    https://videopress.com/\n    <figcaption>Embedded content from videopress</figcaption>\n</figure>\n<!-- /wp:core-embed/videopress -->"
     },
     {
         "attrs": {},

@@ -5,7 +5,8 @@
             "url": "https://polldaddy.com/"
         },
         "innerBlocks": [],
-        "innerHTML": "\n<figure class=\"wp-block-embed-polldaddy\">\n    https://polldaddy.com/\n    <figcaption>Embedded content from polldaddy</figcaption>\n</figure>\n"
+        "innerHTML": "\n<figure class=\"wp-block-embed-polldaddy\">\n    https://polldaddy.com/\n    <figcaption>Embedded content from polldaddy</figcaption>\n</figure>\n",
+        "outerHTML": "<!-- wp:core-embed/polldaddy {\"url\":\"https://polldaddy.com/\"} -->\n<figure class=\"wp-block-embed-polldaddy\">\n    https://polldaddy.com/\n    <figcaption>Embedded content from polldaddy</figcaption>\n</figure>\n<!-- /wp:core-embed/polldaddy -->"
     },
     {
         "attrs": {},

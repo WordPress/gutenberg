@@ -5,7 +5,8 @@
             "url": "https://screencast.com/"
         },
         "innerBlocks": [],
-        "innerHTML": "\n<figure class=\"wp-block-embed-screencast\">\n    https://screencast.com/\n    <figcaption>Embedded content from screencast</figcaption>\n</figure>\n"
+        "innerHTML": "\n<figure class=\"wp-block-embed-screencast\">\n    https://screencast.com/\n    <figcaption>Embedded content from screencast</figcaption>\n</figure>\n",
+        "outerHTML": "<!-- wp:core-embed/screencast {\"url\":\"https://screencast.com/\"} -->\n<figure class=\"wp-block-embed-screencast\">\n    https://screencast.com/\n    <figcaption>Embedded content from screencast</figcaption>\n</figure>\n<!-- /wp:core-embed/screencast -->"
     },
     {
         "attrs": {},

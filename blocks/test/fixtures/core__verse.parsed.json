@@ -3,7 +3,8 @@
         "blockName": "core/verse",
         "attrs": null,
         "innerBlocks": [],
-        "innerHTML": "\n<pre class=\"wp-block-verse\">A <em>verse</em>…<br>And more!</pre>\n"
+        "innerHTML": "\n<pre class=\"wp-block-verse\">A <em>verse</em>…<br>And more!</pre>\n",
+        "outerHTML": "<!-- wp:core/verse -->\n<pre class=\"wp-block-verse\">A <em>verse</em>…<br>And more!</pre>\n<!-- /wp:core/verse -->"
     },
     {
         "attrs": {},

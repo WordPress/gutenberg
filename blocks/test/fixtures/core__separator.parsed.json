@@ -3,7 +3,8 @@
         "blockName": "core/separator",
         "attrs": null,
         "innerBlocks": [],
-        "innerHTML": "\n<hr class=\"wp-block-separator\" />\n"
+        "innerHTML": "\n<hr class=\"wp-block-separator\" />\n",
+        "outerHTML": "<!-- wp:core/separator -->\n<hr class=\"wp-block-separator\" />\n<!-- /wp:core/separator -->"
     },
     {
         "attrs": {},

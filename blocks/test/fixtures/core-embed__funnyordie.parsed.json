@@ -5,7 +5,8 @@
             "url": "https://funnyordie.com/"
         },
         "innerBlocks": [],
-        "innerHTML": "\n<figure class=\"wp-block-embed-funnyordie\">\n    https://funnyordie.com/\n    <figcaption>Embedded content from funnyordie</figcaption>\n</figure>\n"
+        "innerHTML": "\n<figure class=\"wp-block-embed-funnyordie\">\n    https://funnyordie.com/\n    <figcaption>Embedded content from funnyordie</figcaption>\n</figure>\n",
+        "outerHTML": "<!-- wp:core-embed/funnyordie {\"url\":\"https://funnyordie.com/\"} -->\n<figure class=\"wp-block-embed-funnyordie\">\n    https://funnyordie.com/\n    <figcaption>Embedded content from funnyordie</figcaption>\n</figure>\n<!-- /wp:core-embed/funnyordie -->"
     },
     {
         "attrs": {},

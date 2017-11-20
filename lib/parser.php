@@ -102,7 +102,7 @@ class Gutenberg_PEG_Parser {
 
 
     private function text() {
-      return substr($this->input, $this->peg_reportedPos, $this->peg_reportedPos + $this->peg_currPos);
+      return $this->input_substr($this->peg_reportedPos, $this->peg_currPos - $this->peg_reportedPos);
     }
 
     private function offset() {
@@ -272,7 +272,8 @@ class Gutenberg_PEG_Parser {
         return array(
            'blockName' => 'core/more',
            'attrs' => $attrs,
-           'innerHTML' => ''
+           'innerHTML' => '',
+           'outerHTML' => $this->text(),
         );
         }
     private function peg_f4($blockName, $a) { return $a; }
@@ -282,6 +283,7 @@ class Gutenberg_PEG_Parser {
           'attrs'      => $attrs,
           'innerBlocks' => array(),
           'innerHTML' => '',
+          'outerHTML' => $this->text(),
         );
         }
     private function peg_f6($s, $children, $e) {
@@ -292,6 +294,7 @@ class Gutenberg_PEG_Parser {
           'attrs'      => $s['attrs'],
           'innerBlocks'  => $innerBlocks,
           'innerHTML'  => implode( '', $innerHTML ),
+          'outerHTML' => $this->text(),
         );
         }
     private function peg_f7($blockName, $attrs) {

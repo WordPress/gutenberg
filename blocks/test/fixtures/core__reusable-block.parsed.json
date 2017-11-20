@@ -5,7 +5,8 @@
             "ref": "358b59ee-bab3-4d6f-8445-e8c6971a5605"
         },
         "innerBlocks": [],
-        "innerHTML": ""
+        "innerHTML": "",
+        "outerHTML": "<!-- wp:core/reusable-block {\"ref\":\"358b59ee-bab3-4d6f-8445-e8c6971a5605\"} /-->"
     },
     {
         "attrs": {},

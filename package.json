@@ -80,7 +80,7 @@
     "node-sass": "4.5.3",
     "pegjs": "0.10.0",
     "pegjs-loader": "0.5.4",
-    "phpegjs": "1.0.0-beta7",
+    "phpegjs": "aduth/phpegjs#fix/text-input-substr",
     "postcss-loader": "2.0.6",
     "prismjs": "1.6.0",
     "raw-loader": "0.5.1",

@@ -5,7 +5,8 @@
             "url": "https://flickr.com/"
         },
         "innerBlocks": [],
-        "innerHTML": "\n<figure class=\"wp-block-embed-flickr\">\n    https://flickr.com/\n    <figcaption>Embedded content from flickr</figcaption>\n</figure>\n"
+        "innerHTML": "\n<figure class=\"wp-block-embed-flickr\">\n    https://flickr.com/\n    <figcaption>Embedded content from flickr</figcaption>\n</figure>\n",
+        "outerHTML": "<!-- wp:core-embed/flickr {\"url\":\"https://flickr.com/\"} -->\n<figure class=\"wp-block-embed-flickr\">\n    https://flickr.com/\n    <figcaption>Embedded content from flickr</figcaption>\n</figure>\n<!-- /wp:core-embed/flickr -->"
     },
     {
         "attrs": {},

@@ -183,7 +183,8 @@ Tag_More
     return array(
        'blockName' => 'core/more',
        'attrs' => $attrs,
-       'innerHTML' => ''
+       'innerHTML' => '',
+       'outerHTML' => $this->text(),
     );
     ?> **/
     return {
@@ -192,7 +193,8 @@ Tag_More
         customText: customText || undefined,
         noTeaser: !! noTeaser
       },
-      innerHTML: ''
+      innerHTML: '',
+      outerHTML: text()
     }
   }
 
@@ -208,6 +210,7 @@ Block_Void
       'attrs'      => $attrs,
       'innerBlocks' => array(),
       'innerHTML' => '',
+      'outerHTML' => $this->text(),
     );
     ?> **/
 
@@ -215,7 +218,8 @@ Block_Void
       blockName: blockName,
       attrs: attrs,
       innerBlocks: [],
-      innerHTML: ''
+      innerHTML: '',
+      outerHTML: text()
     };
   }
 
@@ -230,6 +234,7 @@ Block_Balanced
       'attrs'      => $s['attrs'],
       'innerBlocks'  => $innerBlocks,
       'innerHTML'  => implode( '', $innerHTML ),
+      'outerHTML' => $this->text(),
     );
     ?> **/
 
@@ -241,7 +246,8 @@ Block_Balanced
       blockName: s.blockName,
       attrs: s.attrs,
       innerBlocks: innerBlocks,
-      innerHTML: innerHTML.join( '' )
+      innerHTML: innerHTML.join( '' ),
+      outerHTML: text()
     };
   }
 

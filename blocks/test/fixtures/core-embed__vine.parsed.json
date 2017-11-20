@@ -5,7 +5,8 @@
             "url": "https://vine.com/"
         },
         "innerBlocks": [],
-        "innerHTML": "\n<figure class=\"wp-block-embed-vine\">\n    https://vine.com/\n    <figcaption>Embedded content from vine</figcaption>\n</figure>\n"
+        "innerHTML": "\n<figure class=\"wp-block-embed-vine\">\n    https://vine.com/\n    <figcaption>Embedded content from vine</figcaption>\n</figure>\n",
+        "outerHTML": "<!-- wp:core-embed/vine {\"url\":\"https://vine.com/\"} -->\n<figure class=\"wp-block-embed-vine\">\n    https://vine.com/\n    <figcaption>Embedded content from vine</figcaption>\n</figure>\n<!-- /wp:core-embed/vine -->"
     },
     {
         "attrs": {},

@@ -58,80 +58,6 @@ function gutenberg_parse_blocks( $content ) {
 }
 
 /**
- * Given an array of parsed blocks, returns content string.
- *
- * @since 1.7.0
- *
- * @param array $blocks Parsed blocks.
- *
- * @return string Content string.
- */
-function gutenberg_serialize_blocks( $blocks ) {
-	return implode( '', array_map( 'gutenberg_serialize_block', $blocks ) );
-}
-
-/**
- * Given a parsed block, returns content string.
- *
- * @since 1.7.0
- *
- * @param array $block Parsed block.
- *
- * @return string Content string.
- */
-function gutenberg_serialize_block( $block ) {
-	// Return content of unknown block verbatim.
-	if ( ! isset( $block['blockName'] ) ) {
-		return $block['innerHTML'];
-	}
-
-	// Custom formatting for specific block types.
-	if ( 'core/more' === $block['blockName'] ) {
-		$content = '<!--more';
-		if ( ! empty( $block['attrs']['customText'] ) ) {
-			$content .= ' ' . $block['attrs']['customText'];
-		}
-
-		$content .= '-->';
-		if ( ! empty( $block['attrs']['noTeaser'] ) ) {
-			$content .= "\n" . '<!--noteaser-->';
-		}
-
-		return $content;
-	}
-
-	// For standard blocks, return with comment-delimited wrapper.
-	$content = '<!-- wp:' . $block['blockName'] . ' ';
-
-	if ( ! empty( $block['attrs'] ) ) {
-		$attrs_json = json_encode( $block['attrs'] );
-
-		// In PHP 5.4+, we would pass the `JSON_UNESCAPED_SLASHES` option to
-		// `json_encode`. To support older versions, we must apply manually.
-		$attrs_json = str_replace( '\\/', '/', $attrs_json );
-
-		// Don't break HTML comments.
-		$attrs_json = str_replace( '--', '\\u002d\\u002d', $attrs_json );
-
-		// Don't break standard-non-compliant tools.
-		$attrs_json = str_replace( '<', '\\u003c', $attrs_json );
-		$attrs_json = str_replace( '>', '\\u003e', $attrs_json );
-		$attrs_json = str_replace( '&', '\\u0026', $attrs_json );
-
-		$content .= $attrs_json . ' ';
-	}
-
-	if ( empty( $block['innerHTML'] ) ) {
-		return $content . '/-->';
-	}
-
-	$content .= '-->';
-	$content .= $block['innerHTML'];
-	$content .= '<!-- /wp:' . $block['blockName'] . ' -->';
-	return $content;
-}
-
-/**
  * Parses dynamic blocks out of `post_content` and re-renders them.
  *
  * @since 0.1.0
@@ -182,31 +108,33 @@ add_filter( 'the_content', 'do_blocks', 9 ); // BEFORE do_shortcode() and wpauto
  */
 function gutenberg_wpautop_block_content( $content ) {
 	$blocks = gutenberg_parse_blocks( $content );
+
+	$formatted_content = '';
 	foreach ( $blocks as $i => $block ) {
 		if ( isset( $block['blockName'] ) ) {
-			continue;
+			$block_content = $block['outerHTML'];
+		} else {
+			$block_content = $block['innerHTML'];
+
+			// wpautop will trim leading whitespace and return whitespace-only
+			// text as empty string. Preserve to prefix leading whitespace.
+			preg_match( '/^(\s+)/', $block_content, $prefix_match );
+			$prefix = empty( $prefix_match ) ? '' : $prefix_match[0];
+
+			$block_content = $prefix . wpautop( $block_content, false );
+
+			// To normalize as text where wpautop would not be applied, restore
+			// double newline to wpautop'd text if not at the end of content.
+			$is_last_block = ( count( $blocks ) === $i + 1 );
+			if ( ! $is_last_block ) {
+				$block_content = str_replace( "</p>\n", "</p>\n\n", $block_content );
+			}
 		}
 
-		$content = $block['innerHTML'];
-
-		// wpautop will trim leading whitespace and return whitespace-only text
-		// as an empty string. Preserve to apply leading whitespace as prefix.
-		preg_match( '/^(\s+)/', $content, $prefix_match );
-		$prefix = empty( $prefix_match ) ? '' : $prefix_match[0];
-
-		$content = $prefix . wpautop( $content, false );
-
-		// To normalize as text where wpautop would not be applied, restore
-		// double newline to wpautop'd text if not at the end of content.
-		$is_last_block = ( count( $blocks ) === $i + 1 );
-		if ( ! $is_last_block ) {
-			$content = str_replace( "</p>\n", "</p>\n\n", $content );
-		}
-
-		$blocks[ $i ]['innerHTML'] = $content;
+		$formatted_content .= $block_content;
 	}
 
-	return gutenberg_serialize_blocks( $blocks );
+	return $formatted_content;
 }
 
 /**
