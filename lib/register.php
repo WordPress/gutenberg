@@ -219,10 +219,16 @@ function gutenberg_collect_meta_box_data() {
 
 	// If the meta box should be empty set to false.
 	foreach ( $locations as $location ) {
-		if ( isset( $_meta_boxes_copy[ $post->post_type ][ $location ] ) && gutenberg_is_meta_box_empty( $_meta_boxes_copy, $location, $post->post_type ) ) {
-			$meta_box_data[ $location ] = false;
-		} else {
-			$meta_box_data[ $location ] = true;
+		if ( isset( $_meta_boxes_copy[ $post->post_type ][ $location ] ) && ! gutenberg_is_meta_box_empty( $_meta_boxes_copy, $location, $post->post_type ) ) {
+			?>
+			<script type="text/javascript">
+				var joiner = '?';
+				if ( window.location.search ) {
+					joiner = '&';
+				}
+				window.location.href += joiner + 'classic-editor';
+			</script>
+			<?php
 		}
 	}
 
