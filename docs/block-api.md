@@ -93,7 +93,7 @@ attributes: {
 },
 ```
 
-* **See: [Attributes](/reference/attributes/).**
+* **See: [Attributes](https://wordpress.org/gutenberg/handbook/reference/attributes/).**
 
 #### Transforms (optional)
 
