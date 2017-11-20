@@ -4,12 +4,12 @@
 
 $z-layers: (
 	'.editor-block-switcher__arrow': 1,
-	'.editor-visual-editor__block:before': -1,
-	'.editor-visual-editor__block .wp-block-more:before': -1,
-	'.editor-visual-editor__block {core/image aligned left or right}': 20,
+	'.editor-block-list__block:before': -1,
+	'.editor-block-list__block .wp-block-more:before': -1,
+	'.editor-block-list__block {core/image aligned left or right}': 20,
 	'.freeform-toolbar': 10,
 	'.editor-warning': 1,
-	'.editor-visual-editor__sibling-inserter': 1,
+	'.editor-block-list__sibling-inserter': 1,
 	'.components-form-toggle__input': 1,
 	'.editor-format-list__menu': 1,
 	'.editor-inserter__tabs': 1,

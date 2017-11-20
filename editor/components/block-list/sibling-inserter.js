@@ -13,7 +13,7 @@ import { focus } from '@wordpress/utils';
 /**
  * Internal dependencies
  */
-import { Inserter } from '../../components';
+import Inserter from '../inserter';
 import {
 	getBlockUids,
 	getBlockInsertionPoint,
@@ -21,7 +21,7 @@ import {
 	isBlockWithinSelection,
 } from '../../selectors';
 
-class VisualEditorSiblingInserter extends Component {
+class BlockListSiblingInserter extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -96,7 +96,7 @@ class VisualEditorSiblingInserter extends Component {
 		const { insertIndex, showInsertionPoint } = this.props;
 		const { isVisible } = this.state;
 
-		const classes = classnames( 'editor-visual-editor__sibling-inserter', {
+		const classes = classnames( 'editor-block-list__sibling-inserter', {
 			'is-visible': isVisible || showInsertionPoint,
 		} );
 
@@ -111,7 +111,7 @@ class VisualEditorSiblingInserter extends Component {
 				onMouseLeave={ this.hide }
 				tabIndex={ isVisible ? -1 : 0 }>
 				{ showInsertionPoint && (
-					<div className="editor-visual-editor__insertion-point" />
+					<div className="editor-block-list__insertion-point" />
 				) }
 				{ isVisible &&
 					<Inserter
@@ -140,4 +140,4 @@ export default connect(
 			),
 		};
 	}
-)( VisualEditorSiblingInserter );
+)( BlockListSiblingInserter );

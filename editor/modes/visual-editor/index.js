@@ -14,9 +14,8 @@ import { KeyboardShortcuts } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import VisualEditorBlockList from './block-list';
 import VisualEditorInserter from './inserter';
-import { PostTitle, WritingFlow } from '../../components';
+import { BlockList, PostTitle, WritingFlow } from '../../components';
 import { getBlockUids, getMultiSelectedBlockUids } from '../../selectors';
 import { clearSelectedBlock, multiSelect, redo, undo, removeBlocks } from '../../actions';
 
@@ -94,7 +93,7 @@ class VisualEditor extends Component {
 				} } />
 				<WritingFlow>
 					<PostTitle />
-					<VisualEditorBlockList ref={ this.bindBlocksContainer } />
+					<BlockList ref={ this.bindBlocksContainer } />
 				</WritingFlow>
 				<VisualEditorInserter />
 			</div>

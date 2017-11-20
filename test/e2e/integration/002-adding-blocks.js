@@ -4,7 +4,7 @@ describe( 'Adding blocks', () => {
 	} );
 
 	it( 'Should insert content using the placeholder, the quick inserter, the regular inserter', () => {
-		const lastBlockSelector = '.editor-visual-editor__block-edit:last [contenteditable="true"]:first';
+		const lastBlockSelector = '.editor-block-list__block-edit:last [contenteditable="true"]:first';
 
 		// Using the placeholder
 		cy.get( '[value="Write your story"]' ).click();

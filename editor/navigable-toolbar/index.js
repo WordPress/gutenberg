@@ -39,7 +39,7 @@ class NavigableToolbar extends Component {
 
 		// Is there a better way to focus the selected block
 		// TODO: separate focused/selected block state and use Redux actions instead
-		const selectedBlock = document.querySelector( '.editor-visual-editor__block.is-selected .editor-visual-editor__block-edit' );
+		const selectedBlock = document.querySelector( '.editor-block-list__block.is-selected .editor-block-list__block-edit' );
 		if ( !! selectedBlock ) {
 			event.stopPropagation();
 			selectedBlock.focus();
