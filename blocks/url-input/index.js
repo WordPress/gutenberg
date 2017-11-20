@@ -138,19 +138,16 @@ class UrlInput extends Component {
 				if ( this.state.selectedSuggestion ) {
 					event.stopPropagation();
 					const post = this.state.posts[ this.state.selectedSuggestion ];
-					this.props.onChange( post.link );
-					this.setState( {
-						showSuggestions: false,
-					} );
+					this.selectLink( post.link );
 				}
 			}
 		}
 	}
 
-	onClickInputSuggestion( index, link ) {
+	selectLink( link ) {
 		this.props.onChange( link );
 		this.setState( {
-			selectedSuggestion: index,
+			selectedSuggestion: null,
 			showSuggestions: false,
 		} );
 	}
@@ -220,7 +217,7 @@ class UrlInput extends Component {
 								className={ classnames( 'blocks-url-input__suggestion', {
 									'is-selected': index === selectedSuggestion,
 								} ) }
-								onClick={ () => this.onClickInputSuggestion( index, post.link ) }
+								onClick={ () => this.selectLink( post.link ) }
 								aria-selected={ index === selectedSuggestion }
 							>
 								{ post.title.rendered }
