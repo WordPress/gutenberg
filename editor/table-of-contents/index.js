@@ -30,9 +30,9 @@ function TableOfContents( { blocks } ) {
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<IconButton
 					onClick={ onToggle }
-					icon="admin-page"
+					icon="info-outline"
 					aria-expanded={ isOpen }
-					label={ __( 'Information' ) }
+					label={ __( 'Content Structure' ) }
 					disabled={ blocks.length === 0 }
 				/>
 			) }
