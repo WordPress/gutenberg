@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
  * WordPress Dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { ChoiceMenu, withInstanceId } from '@wordpress/components';
+import { MenuItemsGroup, MenuItemsToggle, withInstanceId } from '@wordpress/components';
 
 /**
  * Internal Dependencies
@@ -15,36 +15,17 @@ import { ChoiceMenu, withInstanceId } from '@wordpress/components';
 import { isFeatureActive } from '../../selectors';
 import { toggleFeature } from '../../actions';
 
-/**
- * Set of available choices options.
- *
- * @type {Array}
- */
-const CHOICES = [
-	{
-		value: 'top',
-		label: __( 'Fix to top' ),
-	},
-	{
-		value: 'block',
-		label: __( 'Fix to block' ),
-	},
-];
-
 function FeatureToggle( { onToggle, active } ) {
-	const currentValue = active ? 'block' : 'top';
-	const onSelect = ( value ) => {
-		if ( currentValue !== value ) {
-			onToggle();
-		}
-	};
 	return (
-		<ChoiceMenu
+		<MenuItemsGroup
 			label={ __( 'Toolbar' ) }
-			choices={ CHOICES }
-			value={ currentValue }
-			onSelect={ onSelect }
-		/>
+		>
+			<MenuItemsToggle
+				label={ __( 'Fix toolbar to block' ) }
+				isSelected={ active }
+				onClick={ onToggle }
+			/>
+		</MenuItemsGroup>
 	);
 }
 
