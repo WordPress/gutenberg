@@ -91,6 +91,6 @@ export function resolveAttributes( settings ) {
 	return settings;
 }
 
-export default function anchor( { addFilter } ) {
+export default function matchers( { addFilter } ) {
 	addFilter( 'registerBlockType', 'core\matchers', resolveAttributes );
 }
