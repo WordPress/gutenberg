@@ -571,7 +571,7 @@ function gutenberg_intercept_meta_box_render() {
 					}
 					if ( ! isset( $wp_meta_boxes[ $post_type ][ $context ][ $priority ][ $id ]['args']['__original_callback'] ) ) {
 						$wp_meta_boxes[ $post_type ][ $context ][ $priority ][ $id ]['args']['__original_callback'] = $box['callback'];
-						$wp_meta_boxes[ $post_type ][ $context ][ $priority ][ $id ]['callback'] = 'gutenberg_override_meta_box_callback';
+						$wp_meta_boxes[ $post_type ][ $context ][ $priority ][ $id ]['callback']                    = 'gutenberg_override_meta_box_callback';
 					}
 				}
 			}
@@ -587,6 +587,9 @@ add_action( 'edit_form_advanced', 'gutenberg_intercept_meta_box_render' );
  * Check if this metabox only exists for back compat purposes, show a warning if it doesn't.
  *
  * @since 1.8.0
+ *
+ * @param mixed $object The object being operated on, on this screen.
+ * @param array $box The current meta box definition.
  */
 function gutenberg_override_meta_box_callback( $object, $box ) {
 	$callback = $box['args']['__original_callback'];
@@ -605,6 +608,8 @@ function gutenberg_override_meta_box_callback( $object, $box ) {
  * Display a warning in the metabox that the current plugin is causing the fallback to the old editor.
  *
  * @since 1.8.0
+ *
+ * @param callable $callback The function that a plugin has defined to render a meta box.
  */
 function gutenberg_show_meta_box_warning( $callback ) {
 	// Only show the warning when WP_DEBUG is enabled.
@@ -613,7 +618,7 @@ function gutenberg_show_meta_box_warning( $callback ) {
 	}
 
 	// Don't show in the Gutenberg meta box UI.
-	if ( ! isset( $_REQUEST['classic-editor' ] ) ) {
+	if ( ! isset( $_REQUEST['classic-editor'] ) ) {
 		return;
 	}
 
@@ -640,7 +645,12 @@ function gutenberg_show_meta_box_warning( $callback ) {
 		if ( strpos( $name, $filename ) === 0 ) {
 			?>
 				<div class="error inline">
-					<p><?php printf( __( 'Gutenberg incompatible meta box, from the "%s" plugin.', 'gutenberg' ), $plugin['Name'] ); ?></p>
+					<p>
+						<?php
+							/* translators: %s is the name of the plugin that generated this meta box. */
+							printf( __( 'Gutenberg incompatible meta box, from the "%s" plugin.', 'gutenberg' ), $plugin['Name'] );
+						?>
+					</p>
 				</div>
 			<?php
 		}
