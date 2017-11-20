@@ -15,8 +15,8 @@ import { withInstanceId } from '@wordpress/components';
  */
 import './style.scss';
 import PostFormatCheck from './check';
-import { getEditedPostAttribute, getSuggestedPostFormat } from '../../selectors';
-import { editPost } from '../../actions';
+import { getEditedPostAttribute, getSuggestedPostFormat } from '../../state/selectors';
+import { editPost } from '../../state/actions';
 
 const POST_FORMATS = [
 	{ id: 'aside', caption: __( 'Aside' ) },

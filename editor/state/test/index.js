@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import createReduxStore from '../store';
+import createReduxStore from '../';
 
 describe( 'store', () => {
 	describe( 'createReduxStore()', () => {

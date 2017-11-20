@@ -13,8 +13,8 @@ import { IconButton } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { isEditorSidebarOpened } from '../../selectors';
-import { toggleSidebar, setActivePanel } from '../../actions';
+import { isEditorSidebarOpened } from '../../state/selectors';
+import { toggleSidebar, setActivePanel } from '../../state/actions';
 
 export function BlockInspectorButton( {
 	isSidebarOpened,

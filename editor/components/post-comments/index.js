@@ -12,8 +12,8 @@ import { FormToggle, withInstanceId } from '@wordpress/components';
 /**
  * Internal Dependencies
  */
-import { getEditedPostAttribute } from '../../selectors';
-import { editPost } from '../../actions';
+import { getEditedPostAttribute } from '../../state/selectors';
+import { editPost } from '../../state/actions';
 
 function PostComments( { commentStatus = 'open', instanceId, ...props } ) {
 	const onToggleComments = () => props.editPost( { comment_status: commentStatus === 'open' ? 'closed' : 'open' } );

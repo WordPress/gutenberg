@@ -15,8 +15,8 @@ import { MediaUploadButton } from '@wordpress/blocks';
  * Internal dependencies
  */
 import './style.scss';
-import { getEditedPostAttribute } from '../../selectors';
-import { editPost } from '../../actions';
+import { getEditedPostAttribute } from '../../state/selectors';
+import { editPost } from '../../state/actions';
 
 function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, media } ) {
 	return (

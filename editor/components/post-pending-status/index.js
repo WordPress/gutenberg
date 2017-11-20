@@ -14,8 +14,8 @@ import { FormToggle, withInstanceId } from '@wordpress/components';
  * Internal dependencies
  */
 import PostPendingStatusCheck from './check';
-import { getEditedPostAttribute } from '../../selectors';
-import { editPost } from '../../actions';
+import { getEditedPostAttribute } from '../../state/selectors';
+import { editPost } from '../../state/actions';
 
 export function PostPendingStatus( { instanceId, status, onUpdateStatus } ) {
 	const pendingId = 'pending-toggle-' + instanceId;

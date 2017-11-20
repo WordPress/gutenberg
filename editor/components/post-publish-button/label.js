@@ -17,7 +17,7 @@ import './style.scss';
 import {
 	isCurrentPostPublished,
 	isEditedPostBeingScheduled,
-} from '../../selectors';
+} from '../../state/selectors';
 
 export function PublishButtonLabel( {
 	isPublished,

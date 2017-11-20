@@ -13,7 +13,7 @@ import { getBlockTypes } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { insertBlocks } from '../../actions';
+import { insertBlocks } from '../../state/actions';
 
 function BlockDropZone( { index, ...props } ) {
 	const dropFiles = ( files, position ) => {

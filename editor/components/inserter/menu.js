@@ -33,8 +33,8 @@ import { keycodes } from '@wordpress/utils';
  */
 import './style.scss';
 
-import { getBlocks, getRecentlyUsedBlocks } from '../../selectors';
-import { showInsertionPoint, hideInsertionPoint } from '../../actions';
+import { getBlocks, getRecentlyUsedBlocks } from '../../state/selectors';
+import { showInsertionPoint, hideInsertionPoint } from '../../state/actions';
 import { default as InserterGroup } from './group';
 
 export const searchBlocks = ( blocks, searchTerm ) => {

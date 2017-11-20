@@ -7,7 +7,7 @@ import { find } from 'lodash';
 /**
  * Internal Dependencies
  */
-import { getEditedPostVisibility } from '../../selectors';
+import { getEditedPostVisibility } from '../../state/selectors';
 import { visibilityOptions } from './utils';
 
 function PostVisibilityLabel( { visibility } ) {

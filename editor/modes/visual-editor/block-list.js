@@ -35,8 +35,8 @@ import {
 	getMultiSelectedBlocks,
 	getMultiSelectedBlockUids,
 	getSelectedBlock,
-} from '../../selectors';
-import { insertBlock, startMultiSelect, stopMultiSelect, multiSelect, selectBlock } from '../../actions';
+} from '../../state/selectors';
+import { insertBlock, startMultiSelect, stopMultiSelect, multiSelect, selectBlock } from '../../state/actions';
 
 class VisualEditorBlockList extends Component {
 	constructor( props ) {

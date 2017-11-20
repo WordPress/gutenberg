@@ -17,8 +17,8 @@ import './style.scss';
 import VisualEditorBlockList from './block-list';
 import VisualEditorInserter from './inserter';
 import { PostTitle, WritingFlow } from '../../components';
-import { getBlockUids, getMultiSelectedBlockUids } from '../../selectors';
-import { clearSelectedBlock, multiSelect, redo, undo, removeBlocks } from '../../actions';
+import { getBlockUids, getMultiSelectedBlockUids } from '../../state/selectors';
+import { clearSelectedBlock, multiSelect, redo, undo, removeBlocks } from '../../state/actions';
 
 class VisualEditor extends Component {
 	constructor() {

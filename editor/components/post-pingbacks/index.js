@@ -12,8 +12,8 @@ import { FormToggle, withInstanceId } from '@wordpress/components';
 /**
  * Internal Dependencies
  */
-import { getEditedPostAttribute } from '../../selectors';
-import { editPost } from '../../actions';
+import { getEditedPostAttribute } from '../../state/selectors';
+import { editPost } from '../../state/actions';
 
 function PostPingbacks( { pingStatus = 'open', instanceId, ...props } ) {
 	const onTogglePingback = () => props.editPost( { ping_status: pingStatus === 'open' ? 'closed' : 'open' } );

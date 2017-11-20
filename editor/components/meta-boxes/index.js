@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
  */
 import MetaBoxesArea from './meta-boxes-area';
 import MetaBoxesPanel from './meta-boxes-panel';
-import { getMetaBox } from '../../selectors';
+import { getMetaBox } from '../../state/selectors';
 
 function MetaBoxes( { location, isActive, usePanel = false } ) {
 	if ( ! isActive ) {

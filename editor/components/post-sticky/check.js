@@ -12,7 +12,7 @@ import { withAPIData } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { getCurrentPostType } from '../../selectors';
+import { getCurrentPostType } from '../../state/selectors';
 
 export function PostStickyCheck( { postType, children, user } ) {
 	if (

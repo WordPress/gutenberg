@@ -21,7 +21,7 @@ import BlockInspectorButton from '../block-settings-menu/block-inspector-button'
 import BlockModeToggle from '../block-settings-menu/block-mode-toggle';
 import BlockDeleteButton from '../block-settings-menu/block-delete-button';
 import UnknownConverter from '../block-settings-menu/unknown-converter';
-import { getBlockMode, getSelectedBlock } from '../../selectors';
+import { getBlockMode, getSelectedBlock } from '../../state/selectors';
 
 class BlockToolbar extends Component {
 	constructor() {

@@ -11,7 +11,7 @@ import BlockSettingsMenu from '../../components/block-settings-menu';
 import {
 	getMultiSelectedBlockUids,
 	isMultiSelecting,
-} from '../../selectors';
+} from '../../state/selectors';
 
 function VisualEditorBlockMultiControls( { multiSelectedBlockUids, isSelecting } ) {
 	if ( isSelecting ) {

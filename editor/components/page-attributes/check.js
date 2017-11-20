@@ -12,7 +12,7 @@ import { withAPIData } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { getCurrentPostType } from '../../selectors';
+import { getCurrentPostType } from '../../state/selectors';
 
 export function PageAttributesCheck( { postType, children } ) {
 	const supportsPageAttributes = get( postType.data, [

@@ -16,8 +16,8 @@ import { keycodes } from '@wordpress/utils';
  * Internal dependencies
  */
 import './style.scss';
-import { replaceBlocks } from '../../actions';
-import { getBlock } from '../../selectors';
+import { replaceBlocks } from '../../state/actions';
+import { getBlock } from '../../state/selectors';
 
 /**
  * Module Constants

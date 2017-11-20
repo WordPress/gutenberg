@@ -18,7 +18,7 @@ import BlockInspectorButton from './block-inspector-button';
 import BlockModeToggle from './block-mode-toggle';
 import BlockDeleteButton from './block-delete-button';
 import UnknownConverter from './unknown-converter';
-import { selectBlock } from '../../actions';
+import { selectBlock } from '../../state/actions';
 
 function BlockSettingsMenu( { uids, onSelect, focus } ) {
 	const count = uids.length;

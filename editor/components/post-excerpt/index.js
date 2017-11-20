@@ -13,8 +13,8 @@ import { ExternalLink } from '@wordpress/components';
  * Internal Dependencies
  */
 import './style.scss';
-import { getEditedPostExcerpt } from '../../selectors';
-import { editPost } from '../../actions';
+import { getEditedPostExcerpt } from '../../state/selectors';
+import { editPost } from '../../state/actions';
 
 function PostExcerpt( { excerpt, onUpdateExcerpt } ) {
 	const onChange = ( event ) => onUpdateExcerpt( event.target.value );

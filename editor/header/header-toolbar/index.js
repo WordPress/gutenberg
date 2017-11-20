@@ -17,7 +17,7 @@ import { Inserter, BlockToolbar } from '../../components';
 import BlockSwitcher from '../../components/block-switcher';
 import NavigableToolbar from '../../navigable-toolbar';
 import TableOfContents from '../../table-of-contents';
-import { getMultiSelectedBlockUids, hasEditorUndo, hasEditorRedo, isFeatureActive } from '../../selectors';
+import { getMultiSelectedBlockUids, hasEditorUndo, hasEditorRedo, isFeatureActive } from '../../state/selectors';
 
 function HeaderToolbar( { hasUndo, hasRedo, hasFixedToolbar, undo, redo, isMultiBlockSelection, selectedBlockUids } ) {
 	return (

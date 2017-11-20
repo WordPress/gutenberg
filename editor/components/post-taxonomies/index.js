@@ -15,7 +15,7 @@ import { withAPIData } from '@wordpress/components';
 import './style.scss';
 import HierarchicalTermSelector from './hierarchical-term-selector';
 import FlatTermSelector from './flat-term-selector';
-import { getCurrentPostType } from '../../selectors';
+import { getCurrentPostType } from '../../state/selectors';
 
 function PostTaxonomies( { postType, taxonomies } ) {
 	const availableTaxonomies = filter( taxonomies.data, ( taxonomy ) => taxonomy.types.indexOf( postType ) !== -1 );

@@ -14,16 +14,16 @@ import { Dashicon, Button } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import { editPost, savePost } from '../../actions';
+import { editPost, savePost } from '../../state/actions';
 import {
-	isEditedPostNew,
+	isCurrentPostNew,
 	isCurrentPostPublished,
 	isEditedPostDirty,
 	isSavingPost,
 	isEditedPostSaveable,
 	getCurrentPost,
 	getEditedPostAttribute,
-} from '../../selectors';
+} from '../../state/selectors';
 
 export function PostSavedState( { isNew, isPublished, isDirty, isSaving, isSaveable, status, onStatusChange, onSave } ) {
 	const className = 'editor-post-saved-state';
@@ -68,7 +68,7 @@ export function PostSavedState( { isNew, isPublished, isDirty, isSaving, isSavea
 export default connect(
 	( state ) => ( {
 		post: getCurrentPost( state ),
-		isNew: isEditedPostNew( state ),
+		isNew: isCurrentPostNew( state ),
 		isPublished: isCurrentPostPublished( state ),
 		isDirty: isEditedPostDirty( state ),
 		isSaving: isSavingPost( state ),

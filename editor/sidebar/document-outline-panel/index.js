@@ -14,8 +14,8 @@ import { PanelBody } from '@wordpress/components';
  * Internal dependencies
  */
 import { DocumentOutline } from '../../components';
-import { getBlocks, isEditorSidebarPanelOpened } from '../../selectors';
-import { toggleSidebarPanel } from '../../actions';
+import { getBlocks, isEditorSidebarPanelOpened } from '../../state/selectors';
+import { toggleSidebarPanel } from '../../state/actions';
 
 /**
  * Module constants

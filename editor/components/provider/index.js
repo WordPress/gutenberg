@@ -19,8 +19,8 @@ import {
 /**
  * Internal Dependencies
  */
-import { setupEditor, undo } from '../../actions';
-import createReduxStore from '../../store';
+import { setupEditor, undo } from '../../state/actions';
+import createReduxStore from '../../state';
 
 /**
  * The default editor settings
