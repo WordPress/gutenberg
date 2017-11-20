@@ -1,3 +1,6 @@
+/**
+ * WordPress dependencies
+ */
 import { viewPort } from '@wordpress/utils';
 
 export const PREFERENCES_DEFAULTS = {
