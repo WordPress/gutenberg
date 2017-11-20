@@ -16,8 +16,7 @@ import { KeyboardShortcuts } from '@wordpress/components';
 import './style.scss';
 import VisualEditorBlockList from './block-list';
 import VisualEditorInserter from './inserter';
-import WritingFlow from '../../writing-flow';
-import { PostTitle } from '../../components';
+import { PostTitle, WritingFlow } from '../../components';
 import { getBlockUids, getMultiSelectedBlockUids } from '../../selectors';
 import { clearSelectedBlock, multiSelect, redo, undo, removeBlocks } from '../../actions';
 

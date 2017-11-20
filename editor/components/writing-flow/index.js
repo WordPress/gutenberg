@@ -19,16 +19,15 @@ import {
 	isVerticalEdge,
 	placeCaretAtHorizontalEdge,
 	placeCaretAtVerticalEdge,
-} from '../utils/dom';
+} from '../../utils/dom';
 import {
 	getBlockUids,
 	getMultiSelectedBlocksStartUid,
 	getMultiSelectedBlocksEndUid,
 	getMultiSelectedBlocks,
 	getSelectedBlock,
-} from '../selectors';
-
-import { multiSelect } from '../actions';
+} from '../../selectors';
+import { multiSelect } from '../../actions';
 
 /**
  * Module Constants
