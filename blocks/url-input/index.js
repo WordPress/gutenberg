@@ -215,7 +215,7 @@ class UrlInput extends Component {
 								onClick={ () => this.props.onChange( post.link ) }
 								aria-selected={ index === selectedSuggestion }
 							>
-								{ post.title.rendered }
+								{ post.title.rendered || `( ${ __( 'no title' ) } )` }
 							</button>
 						) ) }
 					</div>
