@@ -1,19 +1,21 @@
 /**
  * WordPress dependencies
  */
+import { wrapperDisplayName } from '@wordpress/element';
 import { applyFilters } from '@wordpress/utils';
 
 /**
- * Internal dependencies
+ * Creates a higher-order component which adds filtering capability to the wrapped component.
+ *
+ * @param {String} hookName Hook name exposed to be used by filters.
+ * @return {Function}      Higher-order component factory.
  */
-import wrapperDisplayName from '../wrapper-display-name';
-
 export default function withFilters( hookName ) {
 	return ( WrappedComponent ) => {
 		const FiltersComponent = ( props ) => {
 			return applyFilters( hookName, <WrappedComponent { ...props } />, props );
 		};
-		FiltersComponent.displayName = wrapperDisplayName( 'filters', WrappedComponent );
+		FiltersComponent.displayName = wrapperDisplayName( WrappedComponent, 'filters' );
 
 		return FiltersComponent;
 	};

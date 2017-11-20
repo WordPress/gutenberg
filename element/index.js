@@ -4,7 +4,7 @@
 import { createElement, Component, cloneElement, Children } from 'react';
 import { render, findDOMNode, createPortal, unmountComponentAtNode } from 'react-dom';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { isString } from 'lodash';
+import { flowRight, isString, startCase } from 'lodash';
 
 /**
  * Returns a new element of given type. Type can be either a string tag name or
@@ -113,4 +113,27 @@ export function switchChildrenNodeName( children, nodeName ) {
 		const { children: childrenProp, ...props } = elt.props;
 		return createElement( nodeName, { key: index, ...props }, childrenProp );
 	} );
+}
+
+/**
+ * Composes multiple higher-order components into a single higher-order component. Performs right-to-left function
+ * composition, where each successive invocation is supplied the return value of the previous.
+ *
+ * @param {...Function} hocs The HOC functions to invoke.
+ * @return {Function}        Returns the new composite function.
+ */
+export { flowRight as compose };
+
+/**
+ * Returns a wrapped version of a React component's display name.
+ * Higher-order components use wrapDisplayName().
+ *
+ * @param {Function|Component} BaseComponent used to detect the existing display name.
+ * @param {String} wrapperName Wrapper name to prepend to the display name.
+ * @return {String}            Wrapped display name.
+ */
+export function wrapperDisplayName( BaseComponent, wrapperName ) {
+	const { displayName = BaseComponent.name || 'Component' } = BaseComponent;
+
+	return `${ startCase( wrapperName ) }(${ displayName })`;
 }

@@ -3,7 +3,7 @@ withFilters
 
 `withFilters` is a part of [Native Gutenberg Extensibility](https://github.com/WordPress/gutenberg/issues/3330). It is also a React [higher-order component](https://facebook.github.io/react/docs/higher-order-components.html).
 
-Wrapping a component with `withFilters` provides a unique `instanceId` to serve this purpose.
+Wrapping a component with `withFilters` provides a filtering capability controlled externally by the `hookName`.
 
 ## Usage
 

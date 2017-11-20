@@ -1,7 +1,14 @@
 /**
  * Internal dependencies
  */
-import { createElement, renderToString, concatChildren, switchChildrenNodeName } from '../';
+import {
+	Component,
+	createElement,
+	concatChildren,
+	renderToString,
+	switchChildrenNodeName,
+	wrapperDisplayName,
+} from '../';
 
 describe( 'element', () => {
 	describe( 'renderToString', () => {
@@ -84,6 +91,41 @@ describe( 'element', () => {
 			expect( children[ 0 ].props.align ).toBe( 'left' );
 			expect( children[ 1 ].type ).toBe( 'em' );
 			expect( children[ 1 ].props.children ).toBe( 'Concombre' );
+		} );
+	} );
+
+	describe( 'wrapperDisplayName()', () => {
+		it( 'should use default name for anonymous function', () => {
+			expect( wrapperDisplayName( () => <div />, 'test' ) ).toBe( 'Test(Component)' );
+		} );
+
+		it( 'should use function name', () => {
+			function SomeComponent() {
+				return <div />;
+			}
+
+			expect( wrapperDisplayName( SomeComponent, 'test' ) ).toBe( 'Test(SomeComponent)' );
+		} );
+
+		it( 'should use component class name', () => {
+			class SomeComponent extends Component {
+				render() {
+					return <div />;
+				}
+			}
+
+			expect( wrapperDisplayName( SomeComponent, 'test' ) ).toBe( 'Test(SomeComponent)' );
+		} );
+
+		it( 'should use displayName property', () => {
+			class SomeComponent extends Component {
+				render() {
+					return <div />;
+				}
+			}
+			SomeComponent.displayName = 'CustomDisplayName';
+
+			expect( wrapperDisplayName( SomeComponent, 'test' ) ).toBe( 'Test(CustomDisplayName)' );
 		} );
 	} );
 } );
