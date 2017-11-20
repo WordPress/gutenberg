@@ -2,7 +2,7 @@
     {
         "uid": "_uid_0",
         "name": "core/gallery",
-        "isValid": false,
+        "isValid": true,
         "attributes": {
             "align": "none",
             "images": [
@@ -18,6 +18,6 @@
             "imageCrop": true,
             "linkTo": "none"
         },
-        "originalContent": "<div class=\"wp-block-gallery\">\n\t<figure class=\"blocks-gallery-image\">\n\t\t<img src=\"https://cldup.com/uuUqE_dXzy.jpg\" alt=\"title\" />\n\t</figure>\n\t<figure class=\"blocks-gallery-image\">\n\t\t<img src=\"http://google.com/hi.png\" alt=\"title\" />\n\t</figure>\n</div>"
+        "originalContent": "<div class=\"wp-block-gallery alignnone columns-2 is-cropped\">\n\t<figure class=\"blocks-gallery-image\">\n\t\t<img src=\"https://cldup.com/uuUqE_dXzy.jpg\" alt=\"title\" />\n\t</figure>\n\t<figure class=\"blocks-gallery-image\">\n\t\t<img src=\"http://google.com/hi.png\" alt=\"title\" />\n\t</figure>\n</div>"
     }
 ]

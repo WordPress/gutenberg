@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import {
@@ -30,6 +25,18 @@ describe( 'block parser', () => {
 		save: ( { attributes } ) => attributes.fruit,
 		category: 'common',
 		title: 'block title',
+	};
+
+	const unknownBlockSettings = {
+		category: 'common',
+		title: 'unknown block',
+		attributes: {
+			content: {
+				type: 'string',
+				source: 'html',
+			},
+		},
+		save: ( { attributes } ) => attributes.content,
 	};
 
 	afterEach( () => {
@@ -163,7 +170,7 @@ describe( 'block parser', () => {
 
 			const block = createBlockWithFallback(
 				'core/test-block',
-				'content',
+				'Bananas',
 				{ fruit: 'Bananas' }
 			);
 			expect( block.name ).toEqual( 'core/test-block' );
@@ -173,49 +180,35 @@ describe( 'block parser', () => {
 		it( 'should create the requested block with no attributes if it exists', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
-			const block = createBlockWithFallback( 'core/test-block', 'content' );
+			const block = createBlockWithFallback( 'core/test-block', '' );
 			expect( block.name ).toEqual( 'core/test-block' );
 			expect( block.attributes ).toEqual( {} );
 		} );
 
 		it( 'should fall back to the unknown type handler for unknown blocks if present', () => {
-			registerBlockType( 'core/unknown-block', {
-				category: 'common',
-				title: 'unknown block',
-				attributes: {
-					content: {
-						type: 'string',
-						source: 'html',
-					},
-					fruit: {
-						type: 'string',
-					},
-				},
-				save: ( { attributes } ) => attributes.content,
-			} );
+			registerBlockType( 'core/unknown-block', unknownBlockSettings );
 			setUnknownTypeHandlerName( 'core/unknown-block' );
 
 			const block = createBlockWithFallback(
 				'core/test-block',
-				'content',
+				'Bananas',
 				{ fruit: 'Bananas' }
 			);
 			expect( block.name ).toBe( 'core/unknown-block' );
-			expect( block.attributes.fruit ).toBe( 'Bananas' );
 			expect( block.attributes.content ).toContain( 'wp:test-block' );
 		} );
 
 		it( 'should fall back to the unknown type handler if block type not specified', () => {
-			registerBlockType( 'core/unknown-block', defaultBlockSettings );
+			registerBlockType( 'core/unknown-block', unknownBlockSettings );
 			setUnknownTypeHandlerName( 'core/unknown-block' );
 
 			const block = createBlockWithFallback( null, 'content' );
 			expect( block.name ).toEqual( 'core/unknown-block' );
-			expect( block.attributes ).toEqual( {} );
+			expect( block.attributes ).toEqual( { content: 'content' } );
 		} );
 
 		it( 'should not create a block if no unknown type handler', () => {
-			const block = createBlockWithFallback( 'core/test-block', 'content' );
+			const block = createBlockWithFallback( 'core/test-block', '' );
 			expect( block ).toBeUndefined();
 		} );
 	} );
@@ -232,7 +225,7 @@ describe( 'block parser', () => {
 					url: { type: 'string' },
 					chicken: { type: 'string' },
 				},
-				save: noop,
+				save: ( { attributes } ) => attributes.content,
 				category: 'common',
 				title: 'test block',
 			} );
@@ -268,7 +261,7 @@ describe( 'block parser', () => {
 						source: 'text',
 					},
 				},
-				save: noop,
+				save: ( { attributes } ) => attributes.content,
 				category: 'common',
 				title: 'test block',
 			} );
@@ -291,7 +284,7 @@ describe( 'block parser', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
 			const parsed = parse(
-				'<!-- wp:test-block -->\nRibs\n<!-- /wp:test-block -->'
+				'<!-- wp:test-block {"fruit":"Bananas"} -->\nBananas\n<!-- /wp:test-block -->'
 			);
 
 			expect( parsed ).toHaveLength( 1 );
@@ -304,7 +297,7 @@ describe( 'block parser', () => {
 			setUnknownTypeHandlerName( 'core/unknown-block' );
 
 			const parsed = parse(
-				'<!-- wp:core/test-block -->Ribs<!-- /wp:core/test-block -->' +
+				'<!-- wp:test-block {"fruit":"Bananas"} -->\nBananas\n<!-- /wp:test-block -->' +
 				'<p>Broccoli</p>' +
 				'<!-- wp:core/unknown/block -->Ribs<!-- /wp:core/unknown/block -->'
 			);
@@ -314,12 +307,12 @@ describe( 'block parser', () => {
 
 		it( 'should parse the post content, using unknown block handler', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
-			registerBlockType( 'core/unknown-block', defaultBlockSettings );
+			registerBlockType( 'core/unknown-block', unknownBlockSettings );
 
 			setUnknownTypeHandlerName( 'core/unknown-block' );
 
 			const parsed = parse(
-				'<!-- wp:core/test-block -->Ribs<!-- /wp:core/test-block -->' +
+				'<!-- wp:test-block {"fruit":"Bananas"} -->\nBananas\n<!-- /wp:test-block -->' +
 				'<p>Broccoli</p>' +
 				'<!-- wp:core/unknown-block -->Ribs<!-- /wp:core/unknown-block -->'
 			);
@@ -334,25 +327,15 @@ describe( 'block parser', () => {
 
 		it( 'should parse the post content, including raw HTML at each end', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
-			registerBlockType( 'core/unknown-block', {
-				attributes: {
-					content: {
-						type: 'string',
-						source: 'html',
-					},
-				},
-				save: noop,
-				category: 'common',
-				title: 'unknown block',
-			} );
+			registerBlockType( 'core/unknown-block', unknownBlockSettings );
 
 			setUnknownTypeHandlerName( 'core/unknown-block' );
 
 			const parsed = parse(
 				'<p>Cauliflower</p>' +
-				'<!-- wp:core/test-block -->Ribs<!-- /wp:core/test-block -->' +
+				'<!-- wp:test-block {"fruit":"Bananas"} -->\nBananas\n<!-- /wp:test-block -->' +
 				'\n<p>Broccoli</p>\n' +
-				'<!-- wp:core/test-block -->Ribs<!-- /wp:core/test-block -->' +
+				'<!-- wp:test-block {"fruit":"Bananas"} -->\nBananas\n<!-- /wp:test-block -->' +
 				'<p>Romanesco</p>'
 			);
 

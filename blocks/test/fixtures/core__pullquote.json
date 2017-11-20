@@ -2,7 +2,7 @@
     {
         "uid": "_uid_0",
         "name": "core/pullquote",
-        "isValid": false,
+        "isValid": true,
         "attributes": {
             "value": [
                 {
@@ -23,6 +23,6 @@
             ],
             "align": "none"
         },
-        "originalContent": "<blockquote class=\"wp-block-pullquote\">\n<p>Testing pullquote block...</p><footer>...with a caption</footer>\n</blockquote>"
+        "originalContent": "<blockquote class=\"wp-block-pullquote alignnone\">\n<p>Testing pullquote block...</p><footer>...with a caption</footer>\n</blockquote>"
     }
 ]
