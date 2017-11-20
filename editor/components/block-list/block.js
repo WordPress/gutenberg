@@ -10,7 +10,7 @@ import { get, partial, reduce, size } from 'lodash';
  */
 import { Component, createElement } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
-import { getBlockType, BlockEdit, getBlockDefaultClassname, createBlock } from '@wordpress/blocks';
+import { getBlockType, BlockEdit, getBlockDefaultClassname, createBlock, hasBlockSupport } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -365,8 +365,10 @@ class BlockListBlock extends Component {
 		}
 
 		// Generate a class name for the block's editable form
-		let { className = getBlockDefaultClassname( block.name ) } = blockType;
-		className = classnames( className, block.attributes.className );
+		const generatedClassName = hasBlockSupport( blockType, 'generatedClassName', true ) ?
+			getBlockDefaultClassname( block.name ) :
+			null;
+		const className = classnames( generatedClassName, block.attributes.className );
 
 		// Disable reason: Each block can be selected by clicking on it
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */

@@ -77,19 +77,6 @@ describe( 'block serializer', () => {
 				expect( saved ).toBe( '<div class="wp-block-myplugin-fruit">Bananas</div>' );
 			} );
 
-			it( 'should allow overriding the className', () => {
-				const saved = getSaveContent(
-					{
-						save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),
-						name: 'myplugin/fruit',
-						className: 'apples',
-					},
-					{ fruit: 'Bananas' }
-				);
-
-				expect( saved ).toBe( '<div class="apples">Bananas</div>' );
-			} );
-
 			it( 'should include additional classes in block attributes', () => {
 				const saved = getSaveContent(
 					{
@@ -97,7 +84,6 @@ describe( 'block serializer', () => {
 							className: 'fruit',
 						}, attributes.fruit ),
 						name: 'myplugin/fruit',
-						className: 'apples',
 					},
 					{
 						fruit: 'Bananas',
@@ -105,7 +91,7 @@ describe( 'block serializer', () => {
 					}
 				);
 
-				expect( saved ).toBe( '<div class="apples fruit fresh">Bananas</div>' );
+				expect( saved ).toBe( '<div class="wp-block-myplugin-fruit fruit fresh">Bananas</div>' );
 			} );
 
 			it( 'should not add a className if falsy', () => {
@@ -113,7 +99,9 @@ describe( 'block serializer', () => {
 					{
 						save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),
 						name: 'myplugin/fruit',
-						className: false,
+						supports: {
+							generatedClassName: false,
+						},
 					},
 					{ fruit: 'Bananas' }
 				);
@@ -186,22 +174,6 @@ describe( 'block serializer', () => {
 			} } );
 
 			expect( attributes ).toEqual( { fruit: 'bananas' } );
-		} );
-
-		it( 'should return the className attribute if allowed', () => {
-			const attributes = getCommentAttributes( {
-				className: 'chicken',
-			}, { attributes: {} } );
-
-			expect( attributes ).toEqual( { className: 'chicken' } );
-		} );
-
-		it( 'should not return the className attribute if not supported', () => {
-			const attributes = getCommentAttributes( {
-				className: 'chicken',
-			}, { attributes: {}, className: false } );
-
-			expect( attributes ).toEqual( {} );
 		} );
 	} );
 
