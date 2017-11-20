@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { get, isFunction, some, mapValues } from 'lodash';
+import { get, isFunction, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -118,17 +118,6 @@ export function registerBlockType( name, settings ) {
 		attributes: get( window._wpBlocksAttributes, name, {} ),
 		...settings,
 	};
-
-	// Resolve deprecated attributes
-	settings.attributes = mapValues( settings.attributes, ( attribute ) => {
-		if ( isFunction( attribute.source ) ) {
-			return {
-				...attribute,
-				...attribute.source(),
-			};
-		}
-		return attribute;
-	} );
 
 	settings = applyFilters( 'registerBlockType', settings, name );
 

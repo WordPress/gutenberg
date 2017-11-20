@@ -1,3 +1,8 @@
+/**
+ * External dependencies
+ */
+import { isFunction, mapValues } from 'lodash';
+
 function warnAboutDeprecatedMatcher() {
 	// eslint-disable-next-line no-console
 	console.warn(
@@ -64,3 +69,28 @@ export const node = ( selector ) => () => {
 		selector,
 	};
 };
+
+/**
+ * Resolve the matchers attributes for backwards compatibilty
+ *
+ * @param  {Object} settings Original block settings
+ * @return {Object}          Filtered block settings
+ */
+export function resolveAttributes( settings ) {
+	// Resolve deprecated attributes
+	settings.attributes = mapValues( settings.attributes, ( attribute ) => {
+		if ( isFunction( attribute.source ) ) {
+			return {
+				...attribute,
+				...attribute.source(),
+			};
+		}
+		return attribute;
+	} );
+
+	return settings;
+}
+
+export default function anchor( { addFilter } ) {
+	addFilter( 'registerBlockType', 'core\matchers', resolveAttributes );
+}
