@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { ChoiceMenu } from '@wordpress/components';
+import { MenuItemsGroup } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -32,7 +32,7 @@ const MODES = [
 
 function ModeSwitcher( { onSwitch, mode } ) {
 	return (
-		<ChoiceMenu
+		<MenuItemsGroup
 			label={ __( 'Editor' ) }
 			choices={ MODES }
 			value={ mode }

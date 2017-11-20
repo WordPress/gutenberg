@@ -2,7 +2,6 @@
 export { default as APIProvider } from './higher-order/with-api-data/provider';
 export { default as Autocomplete } from './autocomplete';
 export { default as Button } from './button';
-export { default as ChoiceMenu } from './choice-menu';
 export { default as ClipboardButton } from './clipboard-button';
 export { default as Dashicon } from './dashicon';
 export { default as DropZone } from './drop-zone';
@@ -15,6 +14,8 @@ export { default as FormToggle } from './form-toggle';
 export { default as FormTokenField } from './form-token-field';
 export { default as IconButton } from './icon-button';
 export { default as KeyboardShortcuts } from './keyboard-shortcuts';
+export { default as MenuItemsGroup } from './menu-items/menu-items-group';
+export { default as MenuItemsToggle } from './menu-items/menu-items-toggle';
 export { NavigableMenu, TabbableContainer } from './navigable-container';
 export { default as Notice } from './notice';
 export { default as NoticeList } from './notice/list';
