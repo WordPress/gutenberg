@@ -26,7 +26,7 @@ const MODES = [
 	},
 	{
 		value: 'text',
-		label: __( 'HTML Editor' ),
+		label: __( 'Code Editor' ),
 	},
 ];
 
