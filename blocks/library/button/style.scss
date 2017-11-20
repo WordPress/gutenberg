@@ -10,7 +10,7 @@ $blocks-button__height: 46px;
 	cursor: default;
 	border-radius: $blocks-button__height / 2;
 	white-space: nowrap;
-	background: currentColor;
+	background: $dark-gray-700;
 	vertical-align: top;
 	position: relative;
 
