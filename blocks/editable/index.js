@@ -126,7 +126,7 @@ export default class Editable extends Component {
 	}
 
 	/**
-	 * @summary Handles the onSetup event for the tinyMCE component
+	 * Handles the onSetup event for the tinyMCE component
 	 *
 	 * Will setup event handlers for the tinyMCE instance.
 	 * An `onSetup` function in the props will be called if it is present.
@@ -160,7 +160,7 @@ export default class Editable extends Component {
 	}
 
 	/**
-	 * @summary Allows prop event handlers to handle an event
+	 * Allows prop event handlers to handle an event
 	 *
 	 * Allow props an opportunity to handle the event, before default
 	 * Editable behavior takes effect. Should the event be handled by a
@@ -225,7 +225,7 @@ export default class Editable extends Component {
 	}
 
 	/**
-	 * @summary Handles the global selection change event.
+	 * Handles the global selection change event.
 	 *
 	 * Will call the onFocus handler if one is defined and this block is focused.
 	 */
@@ -253,7 +253,7 @@ export default class Editable extends Component {
 	}
 
 	/**
-	 * @summary Handles an undo event from tinyMCE
+	 * Handles an undo event from tinyMCE
 	 *
 	 * When user attempts Undo when empty Undo stack, propagate undo
 	 * action to context handler. The compromise here is that: TinyMCE
@@ -276,7 +276,7 @@ export default class Editable extends Component {
 	}
 
 	/**
-	 * @summary Handles a paste event from tinyMCE
+	 * Handles a paste event from tinyMCE
 	 *
 	 * Saves the pasted data as plain text in `pastedPlainText`.
 	 *
@@ -300,7 +300,7 @@ export default class Editable extends Component {
 	}
 
 	/**
-	 * @summary Handles a PrePasteProcess event from tinyMCE
+	 * Handles a PrePasteProcess event from tinyMCE
 	 *
 	 * Will call the paste handler with the pasted data. If it is a string tries
 	 * to put it in the containing tinyMCE editor. Otherwise call the `onSplit` handler.
@@ -572,7 +572,7 @@ export default class Editable extends Component {
 	}
 
 	/**
-	 * @summary Splits the content at the location of the selection.
+	 * Splits the content at the location of the selection.
 	 *
 	 * Replaces the content of the editor inside this element with the contents
 	 * before the selection. Sends the elements after the selection to the `onSplit`
