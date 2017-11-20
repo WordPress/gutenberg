@@ -7,14 +7,13 @@ import { ChromePicker } from 'react-color';
 /**
  * WordPress dependencies
  */
-import { Dropdown } from '@wordpress/components';
+import { Dropdown, withContext } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import withEditorSettings from '../with-editor-settings';
 
 function ColorPalette( { colors, value, onChange } ) {
 	return (
@@ -72,7 +71,7 @@ function ColorPalette( { colors, value, onChange } ) {
 	);
 }
 
-export default withEditorSettings(
+export default withContext( 'editor' )(
 	( settings ) => ( {
 		colors: settings.colors,
 	} )
