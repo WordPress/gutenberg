@@ -40,6 +40,7 @@ export { default as BlockToolbar } from './block-toolbar';
 export { default as ErrorBoundary } from './error-boundary';
 export { default as Inserter } from './inserter';
 export { default as Warning } from './warning';
+export { default as WritingFlow } from './writing-flow';
 
 // State Related Components
 export { default as EditorProvider } from './provider';
