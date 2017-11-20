@@ -56,6 +56,30 @@ import {
 
 const { BACKSPACE, ESCAPE, DELETE, ENTER, UP, RIGHT, DOWN, LEFT } = keycodes;
 
+/**
+ * Given a DOM node, finds the closest scrollable container node.
+ *
+ * @param  {Element}  node Node from which to start
+ * @return {?Element}      Scrollable container node, if found
+ */
+function getScrollContainer( node ) {
+	if ( ! node ) {
+		return;
+	}
+
+	// Scrollable if scrollable height exceeds displayed...
+	if ( node.scrollHeight > node.clientHeight ) {
+		// ...except when overflow is defined to be hidden or visible
+		const { overflowY } = window.getComputedStyle( node );
+		if ( /(auto|scroll)/.test( overflowY ) ) {
+			return node;
+		}
+	}
+
+	// Continue traversing
+	return getScrollContainer( node.parentNode );
+}
+
 class BlockListBlock extends Component {
 	constructor() {
 		super( ...arguments );
@@ -91,9 +115,6 @@ class BlockListBlock extends Component {
 		if ( this.props.isTyping ) {
 			document.addEventListener( 'mousemove', this.stopTypingOnMouseMove );
 		}
-
-		// Not Ideal, but it's the easiest way to get the scrollable container
-		this.editorLayout = document.querySelector( '.editor-layout__content' );
 	}
 
 	componentWillReceiveProps( newProps ) {
@@ -109,9 +130,13 @@ class BlockListBlock extends Component {
 	componentDidUpdate( prevProps ) {
 		// Preserve scroll prosition when block rearranged
 		if ( this.previousOffset ) {
-			this.editorLayout.scrollTop = this.editorLayout.scrollTop +
-				this.node.getBoundingClientRect().top -
-				this.previousOffset;
+			const scrollContainer = getScrollContainer( this.node );
+			if ( scrollContainer ) {
+				scrollContainer.scrollTop = scrollContainer.scrollTop +
+					this.node.getBoundingClientRect().top -
+					this.previousOffset;
+			}
+
 			this.previousOffset = null;
 		}
 
