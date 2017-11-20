@@ -23,7 +23,7 @@ function gutenberg_meta_box_partial_page( $post_type, $meta_box_context ) {
 	 *
 	 * @see https://github.com/WordPress/gutenberg/commit/bdf94e65ac0c10b3ce5d8e214f0c9e1081997d9b
 	 */
-	if ( ! isset( $_REQUEST['classic-editor'] ) ) {
+	if ( ! isset( $_REQUEST['classic'] ) ) {
 		return;
 	}
 
@@ -457,7 +457,7 @@ function gutenberg_meta_box_save_redirect( $location, $post_id ) {
 			array(
 				'meta_box'       => $meta_box_location,
 				'action'         => 'edit',
-				'classic-editor' => true,
+				'classic' => true,
 				'post'           => $post_id,
 			),
 			admin_url( 'post.php' )
