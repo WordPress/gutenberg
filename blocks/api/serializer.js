@@ -3,7 +3,6 @@
  */
 import { isEmpty, reduce, isObject, castArray, compact, startsWith } from 'lodash';
 import { html as beautifyHtml } from 'js-beautify';
-import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -36,7 +35,7 @@ export function getBlockDefaultClassname( blockName ) {
  * @return {string}            Save content
  */
 export function getSaveContent( blockType, attributes ) {
-	const { save, className = getBlockDefaultClassname( blockType.name ) } = blockType;
+	const { save } = blockType;
 	let saveContent;
 
 	if ( save.prototype instanceof Component ) {
@@ -57,15 +56,6 @@ export function getSaveContent( blockType, attributes ) {
 
 		// Applying the filters adding extra props
 		const props = applyFilters( 'getSaveContent.extraProps', { ...element.props }, blockType, attributes );
-
-		// Adding the generated className
-		if ( !! className ) {
-			const updatedClassName = classnames(
-				className,
-				props.className,
-			);
-			props.className = updatedClassName;
-		}
 
 		return cloneElement( element, props );
 	};
@@ -114,10 +104,6 @@ export function getCommentAttributes( allAttributes, blockType ) {
 		result[ key ] = value;
 		return result;
 	}, {} );
-
-	if ( blockType.className !== false && allAttributes.className ) {
-		attributes.className = allAttributes.className;
-	}
 
 	return attributes;
 }

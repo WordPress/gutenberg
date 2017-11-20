@@ -31,12 +31,11 @@ registerBlockType( 'core/shortcode', {
 		},
 	},
 
-	className: false,
-
 	supportHTML: false,
 
 	supports: {
 		customClassName: false,
+		generatedClassName: false,
 	},
 
 	edit: withInstanceId(
