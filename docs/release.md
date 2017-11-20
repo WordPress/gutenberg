@@ -11,7 +11,7 @@ This document is a checklist for building and releasing a new version of Gutenbe
 
 ## Bumping the Version
 
-* Create a PR like [https://github.com/WordPress/gutenberg/pull/2370/files](this one), bumping the version number in `gutenberg.php` and `package.json`.
+* Create a PR like [https://github.com/WordPress/gutenberg/pull/3479/files](this one), bumping the version number in `gutenberg.php`, `package.json`, and `package-lock.json`.
 * Check that there's no work in progress that's just about to land, and inform committers to hold off on merging any changes until after the release process is complete.
 * Merge the version bump PR.
 
