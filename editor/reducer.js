@@ -331,10 +331,11 @@ export function isTyping( state = false, action ) {
  * @param  {Object} action Dispatched action
  * @return {Object}        Updated state
  */
-export function blockSelection( state = { start: null, end: null, focus: null, isMultiSelecting: false }, action ) {
+export function blockSelection( state = { selected: [ ], start: null, end: null, focus: null, isMultiSelecting: false }, action ) {
 	switch ( action.type ) {
 		case 'CLEAR_SELECTED_BLOCK':
 			return {
+				selected: [ ],
 				start: null,
 				end: null,
 				focus: null,
@@ -364,6 +365,7 @@ export function blockSelection( state = { start: null, end: null, focus: null, i
 			}
 			return {
 				...state,
+				selected: [ ],
 				start: action.uid,
 				end: action.uid,
 				focus: action.focus || {},
@@ -371,6 +373,7 @@ export function blockSelection( state = { start: null, end: null, focus: null, i
 		case 'UPDATE_FOCUS':
 			return {
 				...state,
+				selected: [ ],
 				start: action.uid,
 				end: action.uid,
 				focus: action.config || {},
@@ -379,6 +382,7 @@ export function blockSelection( state = { start: null, end: null, focus: null, i
 			return {
 				start: action.blocks[ 0 ].uid,
 				end: action.blocks[ 0 ].uid,
+				selected: [ ],
 				focus: {},
 				isMultiSelecting: false,
 			};
@@ -389,6 +393,7 @@ export function blockSelection( state = { start: null, end: null, focus: null, i
 			return {
 				start: action.blocks[ 0 ].uid,
 				end: action.blocks[ 0 ].uid,
+				selected: [ ],
 				focus: {},
 				isMultiSelecting: false,
 			};

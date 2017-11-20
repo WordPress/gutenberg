@@ -8,6 +8,7 @@ import {
 	has,
 	last,
 	reduce,
+	includes,
 	keys,
 	without,
 	compact,
@@ -516,8 +517,8 @@ export function getSelectedBlockCount( state ) {
  * @return {?Object}       Selected block
  */
 export function getSelectedBlock( state ) {
-	const { start, end } = state.blockSelection;
-	if ( start !== end || ! start ) {
+	const { start, end, selected } = state.blockSelection;
+	if ( start !== end || ! start || selected.length > 0 ) {
 		return null;
 	}
 
@@ -534,24 +535,33 @@ export function getSelectedBlock( state ) {
 export const getMultiSelectedBlockUids = createSelector(
 	( state ) => {
 		const { blockOrder } = state.editor.present;
-		const { start, end } = state.blockSelection;
+		const { start, end, selected } = state.blockSelection;
 		if ( start === end ) {
-			return [];
+			return selected;
 		}
 
-		const startIndex = blockOrder.indexOf( start );
-		const endIndex = blockOrder.indexOf( end );
+		const rangeUids = () => {
+			const startIndex = blockOrder.indexOf( start );
+			const endIndex = blockOrder.indexOf( end );
 
-		if ( startIndex > endIndex ) {
-			return blockOrder.slice( endIndex, startIndex + 1 );
-		}
+			if ( startIndex > endIndex ) {
+				return blockOrder.slice( endIndex, startIndex + 1 );
+			}
 
-		return blockOrder.slice( startIndex, endIndex + 1 );
+			return blockOrder.slice( startIndex, endIndex + 1 );
+		};
+
+		const otherUids = selected;
+		const output = otherUids.concat( rangeUids() ).sort( ( a, b ) => blockOrder.indexOf( a ) < blockOrder.indexOf( b ) );
+
+		console.log('output', output, otherUids);
+		return output;
 	},
 	( state ) => [
 		state.editor.present.blockOrder,
 		state.blockSelection.start,
 		state.blockSelection.end,
+		state.blockSelection.selected,
 	],
 );
 
@@ -568,6 +578,7 @@ export const getMultiSelectedBlocks = createSelector(
 		state.editor.present.blockOrder,
 		state.blockSelection.start,
 		state.blockSelection.end,
+		state.blockSelection.selected,
 		state.editor.present.blocksByUid,
 		state.editor.present.edits.meta,
 		state.currentPost.meta,
