@@ -1,0 +1,58 @@
+.editor-block-toolbar {
+	display: inline-flex;
+	overflow: auto; // allow horizontal scrolling on mobile
+	flex-grow: 1;
+	width: 100%;
+
+	.components-toolbar {
+		border: none;
+		border-left: 1px solid $light-gray-500;
+	}
+
+	// this should probably have its own class
+	> div:not( .editor-block-toolbar__mobile-tools ) {
+		display: flex;
+	}
+}
+
+.editor-block-toolbar .editor-block-switcher {
+	display: inline-flex;
+	border-left: 1px solid $light-gray-500;
+}
+
+.editor-block-toolbar__mobile-tools {
+	align-items: stretch;
+	display: flex;
+	justify-content: space-between;
+	flex-direction: row-reverse;
+	flex-grow: 1;
+
+	&.components-toolbar {
+		margin-right: 0;
+	}
+
+	@include break-small {
+		display: none;
+	}
+
+	.editor-block-mover {
+		display: inline-flex;
+		padding: 0 5px;
+		align-items: stretch;
+	}
+}
+
+.editor-block-toolbar__mobile-tools-content {
+	overflow: hidden;
+
+	.components-button {
+		margin: 0 5px 0 0;
+		padding: 0 5px;
+		width: auto;
+		height: auto;
+
+		.dashicon {
+			margin: 0;
+		}
+	}
+}

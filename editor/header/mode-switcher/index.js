@@ -7,12 +7,11 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton } from '@wordpress/components';
+import { MenuItemsGroup } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import './style.scss';
 import { getEditorMode } from '../../selectors';
 
 /**
@@ -23,31 +22,23 @@ import { getEditorMode } from '../../selectors';
 const MODES = [
 	{
 		value: 'visual',
-		label: __( 'Switch To Visual Mode' ),
-		icon: 'screenoptions',
+		label: __( 'Visual Editor' ),
 	},
 	{
 		value: 'text',
-		label: __( 'Switch To Text Mode' ),
-		icon: 'editor-code',
+		label: __( 'Code Editor' ),
 	},
 ];
 
 function ModeSwitcher( { onSwitch, mode } ) {
-	return MODES
-		.filter( ( { value } ) => value !== mode )
-		.map( ( { value, label, icon } ) => (
-			<IconButton
-				className="editor-mode-switcher__button"
-				key={ value }
-				icon={ icon }
-				onClick={ () => {
-					onSwitch( value );
-				} }
-			>
-				{ label }
-			</IconButton>
-		) );
+	return (
+		<MenuItemsGroup
+			label={ __( 'Editor' ) }
+			choices={ MODES }
+			value={ mode }
+			onSelect={ onSwitch }
+		/>
+	);
 }
 
 export default connect(
@@ -60,7 +51,7 @@ export default connect(
 				type: 'SWITCH_MODE',
 				mode: mode,
 			} );
-			ownProps.onSwitch( mode );
+			ownProps.onSelect( mode );
 		},
 	} )
 )( ModeSwitcher );

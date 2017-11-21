@@ -19,7 +19,9 @@ The name for a block is a unique string that identifies a block. Names have to b
 registerBlockType( 'my-plugin/book', {} );
 ```
 
-*Note:* this name is used on the comment delimiters as `<!-- wp:my-plugin/book -->`. Those blocks provided by core don't include a namespace when serialized.
+*Note:* A block name can only contain lowercase alphanumeric characters and dashes, and must begin with a letter.
+
+*Note:* This name is used on the comment delimiters as `<!-- wp:my-plugin/book -->`. Those blocks provided by core don't include a namespace when serialized.
 
 ### Block Configuration
 
@@ -40,9 +42,9 @@ title: 'Book'
 
 #### Category
 
-* **Type:** `String [ common | formatting | layout | widgets | embeds ]`
+* **Type:** `String [ common | formatting | layout | widgets | embed ]`
 
-Blocks are grouped into categories to help users browse and discover them. The core provided categories are `common`, `formatting`, `layout`, `widgets`, and `embeds`.
+Blocks are grouped into categories to help users browse and discover them. The core provided categories are `common`, `formatting`, `layout`, `widgets`, and `embed`.
 
 ```js
 // Assigning to the 'layout' category
@@ -78,11 +80,14 @@ Attributes provide the structured data needs of a block. They can exist in diffe
 attributes: {
 	cover: {
 		type: 'string',
-		source: attr( 'img', 'src' ),
+		source: 'attribute',
+		selector: 'img',
+		attribute: 'src',
 	},
 	author: {
 		type: 'string',
-		source: children( '.book-author' ),
+		source: 'children',
+		selector: '.book-author',
 	},
 	pages: {
 		type: 'number',
@@ -90,7 +95,7 @@ attributes: {
 },
 ```
 
-* **See: [Attributes](/reference/attributes/).**
+* **See: [Attributes](https://wordpress.org/gutenberg/handbook/reference/attributes/).**
 
 #### Transforms (optional)
 
@@ -132,6 +137,13 @@ Optional block extended support features. The following options are supported, a
 anchor: true,
 ```
 
+- `customClassName` (default `true`): This property adds a field to define a custom className for the block's wrapper.
+
+```js
+// Remove the support for a the custom className .
+customClassName: false,
+```
+
 #### supportHTML (optional)
 
 * **Type:** `Bool`
@@ -146,4 +158,4 @@ supportHTML: false,
 
 ## Edit and Save
 
-The `edit` and `save` functions define the editor interface with which a user would interact, and the markup to be serialized back when a post is saved. They are the heart of how a block operates, so they are [covered separately](/block-edit-save/).
+The `edit` and `save` functions define the editor interface with which a user would interact, and the markup to be serialized back when a post is saved. They are the heart of how a block operates, so they are [covered separately](https://wordpress.org/gutenberg/handbook/block-edit-save/).

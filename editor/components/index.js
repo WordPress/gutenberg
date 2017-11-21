@@ -27,6 +27,7 @@ export { default as PostStickyCheck } from './post-sticky/check';
 export { default as PostTaxonomies } from './post-taxonomies';
 export { default as PostTextEditor } from './post-text-editor';
 export { default as PostTextEditorToolbar } from './post-text-editor/toolbar';
+export { default as PostTitle } from './post-title';
 export { default as PostTrash } from './post-trash';
 export { default as PostVisibility } from './post-visibility';
 export { default as PostVisibilityLabel } from './post-visibility/label';
@@ -35,9 +36,11 @@ export { default as WordCount } from './word-count';
 
 // Content Related Components
 export { default as BlockInspector } from './block-inspector';
+export { default as BlockToolbar } from './block-toolbar';
 export { default as ErrorBoundary } from './error-boundary';
 export { default as Inserter } from './inserter';
 export { default as Warning } from './warning';
+export { default as WritingFlow } from './writing-flow';
 
 // State Related Components
 export { default as EditorProvider } from './provider';

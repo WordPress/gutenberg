@@ -1,0 +1,26 @@
+.editor-block-mover__control {
+	display: block;
+	padding: 0;
+	border: none;
+	outline: none;
+	background: none;
+	color: $dark-gray-300;
+	cursor: pointer;
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+
+	&[aria-disabled="true"] {
+		cursor: default;
+		color: $light-gray-300;
+		pointer-events: none;
+	}
+
+	.dashicon {
+		display: block;
+	}
+
+	&:first-child {
+		margin-bottom: 4px;
+	}
+}

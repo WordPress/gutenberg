@@ -433,7 +433,7 @@ export const getBlock = createSelector(
 		}
 
 		const metaAttributes = reduce( type.attributes, ( result, value, key ) => {
-			if ( value && 'meta' in value ) {
+			if ( value.source === 'meta' ) {
 				result[ key ] = getPostMeta( state, value.meta );
 			}
 

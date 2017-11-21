@@ -20,7 +20,7 @@ function BlockEdit( props ) {
 		Edit = blockType.edit || blockType.save;
 	}
 
-	return applyFilters( 'BlockEdit', <Edit { ...editProps } />, props );
+	return applyFilters( 'BlockEdit', <Edit key="edit" { ...editProps } />, props );
 }
 
 export default BlockEdit;

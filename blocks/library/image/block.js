@@ -41,6 +41,11 @@ import BlockDescription from '../../block-description';
 import UrlInputButton from '../../url-input/button';
 import ImageSize from './image-size';
 
+/**
+ * Module constants
+ */
+const MIN_SIZE = 20;
+
 class ImageBlock extends Component {
 	constructor() {
 		super( ...arguments );
@@ -226,8 +231,8 @@ class ImageBlock extends Component {
 						const currentHeight = height || imageHeightWithinContainer;
 
 						const ratio = imageWidth / imageHeight;
-						const minWidth = imageWidth < imageHeight ? 10 : 10 * ratio;
-						const minHeight = imageHeight < imageWidth ? 10 : 10 / ratio;
+						const minWidth = imageWidth < imageHeight ? MIN_SIZE : MIN_SIZE * ratio;
+						const minHeight = imageHeight < imageWidth ? MIN_SIZE : MIN_SIZE / ratio;
 
 						return (
 							<ResizableBox

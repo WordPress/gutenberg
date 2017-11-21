@@ -2,8 +2,7 @@
  * Internal dependencies
  */
 import './style.scss';
-import { PostTextEditor, PostTextEditorToolbar } from '../../components';
-import PostTitle from '../../post-title';
+import { PostTextEditor, PostTextEditorToolbar, PostTitle } from '../../components';
 
 function TextEditor() {
 	return (

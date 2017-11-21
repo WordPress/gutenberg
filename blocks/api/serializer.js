@@ -50,28 +50,29 @@ export function getSaveContent( blockType, attributes ) {
 		}
 	}
 
-	// Adding a generic classname
-	const addAdvancedAttributes = ( element ) => {
+	const addExtraContainerProps = ( element ) => {
 		if ( ! element || ! isObject( element ) ) {
 			return element;
 		}
 
-		const extraProps = applyFilters( 'getSaveContent.extraProps', {}, blockType, attributes );
+		// Applying the filters adding extra props
+		const props = applyFilters( 'getSaveContent.extraProps', { ...element.props }, blockType, attributes );
+
+		// Adding the generated className
 		if ( !! className ) {
 			const updatedClassName = classnames(
 				className,
-				element.props.className,
-				attributes.className
+				props.className,
 			);
-			extraProps.className = updatedClassName;
+			props.className = updatedClassName;
 		}
 
-		return cloneElement( element, extraProps );
+		return cloneElement( element, props );
 	};
-	const contentWithClassname = Children.map( saveContent, addAdvancedAttributes );
+	const contentWithClassName = Children.map( saveContent, addExtraContainerProps );
 
 	// Otherwise, infer as element
-	return renderToString( contentWithClassname );
+	return renderToString( contentWithClassName );
 }
 
 /**
@@ -98,8 +99,9 @@ export function getCommentAttributes( allAttributes, blockType ) {
 			return result;
 		}
 
-		// Ignore values sources from content and post meta
-		if ( attributeSchema.source || attributeSchema.meta ) {
+		// Ignore all attributes but the ones with an "undefined" source
+		// "undefined" source refers to attributes saved in the block comment
+		if ( attributeSchema.source !== undefined ) {
 			return result;
 		}
 

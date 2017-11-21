@@ -13,9 +13,8 @@ import { IconButton } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import { Inserter } from '../../components';
-import BlockSwitcher from '../../block-switcher';
-import BlockToolbar from '../../block-toolbar';
+import { Inserter, BlockToolbar } from '../../components';
+import BlockSwitcher from '../../components/block-switcher';
 import NavigableToolbar from '../../navigable-toolbar';
 import TableOfContents from '../../table-of-contents';
 import { getMultiSelectedBlockUids, hasEditorUndo, hasEditorRedo, isFeatureActive } from '../../selectors';

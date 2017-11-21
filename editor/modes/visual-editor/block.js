@@ -3,7 +3,7 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
-import { has, partial, reduce, size } from 'lodash';
+import { get, partial, reduce, size } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,14 +16,14 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import BlockMover from '../../components/block-mover';
+import BlockSettingsMenu from '../../components/block-settings-menu';
 import InvalidBlockWarning from './invalid-block-warning';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockDropZone from './block-drop-zone';
 import BlockHtml from './block-html';
 import BlockContextualToolbar from './block-contextual-toolbar';
-import BlockMover from '../../block-mover';
-import BlockSettingsMenu from '../../block-settings-menu';
 import BlockMultiControls from './multi-controls';
 import {
 	clearSelectedBlock,
@@ -152,7 +152,7 @@ class VisualEditorBlock extends Component {
 		onChange( block.uid, attributes );
 
 		const metaAttributes = reduce( attributes, ( result, value, key ) => {
-			if ( type && has( type, [ 'attributes', key, 'meta' ] ) ) {
+			if ( get( type, [ 'attributes', key, 'source' ] ) === 'meta' ) {
 				result[ type.attributes[ key ].meta ] = value;
 			}
 

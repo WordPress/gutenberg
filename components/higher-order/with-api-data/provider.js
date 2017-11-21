@@ -6,7 +6,7 @@ import { mapValues, noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from 'element';
+import { Component } from '@wordpress/element';
 
 export default class APIProvider extends Component {
 	getChildContext() {

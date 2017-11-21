@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { parse as hpqParse } from 'hpq';
-import { mapValues, reduce, pickBy } from 'lodash';
+import { mapValues } from 'lodash';
 
 /**
  * Internal dependencies
@@ -12,42 +12,7 @@ import { getBlockType, getUnknownTypeHandlerName } from './registration';
 import { createBlock } from './factory';
 import { isValidBlock } from './validation';
 import { getCommentDelimitedContent } from './serializer';
-
-/**
- * Returns true if the provided function is a valid attribute source, or false
- * otherwise.
- *
- * Sources are implemented as functions receiving a DOM node to select data
- * from. Using the DOM is incidental and we shouldn't guarantee a contract that
- * this be provided, else block implementers may feel inclined to use the node.
- * Instead, sources are intended as a generic interface to query data from any
- * tree shape. Here we pick only sources which include an internal flag.
- *
- * @param  {Function} source Function to test
- * @return {Boolean}         Whether function is an attribute source
- */
-export function isValidSource( source ) {
-	return !! source && '_wpBlocksKnownSource' in source;
-}
-
-/**
- * Returns the block attributes parsed from raw content.
- *
- * @param  {String} innerHTML Raw block content
- * @param  {Object} schema    Block attribute schema
- * @return {Object}           Block attribute values
- */
-export function getSourcedAttributes( innerHTML, schema ) {
-	const sources = mapValues(
-		// Parse only sources with source defined
-		pickBy( schema, ( attributeSchema ) => isValidSource( attributeSchema.source ) ),
-
-		// Transform to object where source is value
-		( attributeSchema ) => attributeSchema.source
-	);
-
-	return hpqParse( innerHTML, sources );
-}
+import { attr, prop, html, text, query, node, children } from './matchers';
 
 /**
  * Returns value coerced to the specified JSON schema type string
@@ -88,6 +53,67 @@ export function asType( value, type ) {
 }
 
 /**
+ * Returns an hpq matcher given a source object
+ *
+ * @param  {Object}   sourceConfig Attribute Source object
+ * @return {Function}              hpq Matcher
+ */
+export function matcherFromSource( sourceConfig ) {
+	switch ( sourceConfig.source ) {
+		case 'attribute':
+			return attr( sourceConfig.selector, sourceConfig.attribute );
+		case 'property':
+			return prop( sourceConfig.selector, sourceConfig.property );
+		case 'html':
+			return html( sourceConfig.selector );
+		case 'text':
+			return text( sourceConfig.selector );
+		case 'children':
+			return children( sourceConfig.selector );
+		case 'node':
+			return node( sourceConfig.selector );
+		case 'query':
+			const subMatchers = mapValues( sourceConfig.query, matcherFromSource );
+			return query( sourceConfig.selector, subMatchers );
+		default:
+			// eslint-disable-next-line no-console
+			console.error( `Unkown source type "${ sourceConfig.source }"` );
+	}
+}
+
+/**
+ * Given an attribute key, an attribute's schema, a block's raw content and the commentAttributes
+ * returns the attribute value depending on its source definition of the given attribute key
+ *
+ * @param  {string} attributeKey        Attribute key
+ * @param  {Object} attributeSchema     Attribute's schema
+ * @param  {string} innerHTML           Block's raw content
+ * @param  {Object} commentAttributes   Block's comment attributes
+ *
+ * @return {*}                          Attribute value
+ */
+export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, commentAttributes ) {
+	let value;
+	switch ( attributeSchema.source ) {
+		// undefined source means that it's an attribute serialized to the block's "comment"
+		case undefined:
+			value = commentAttributes ? commentAttributes[ attributeKey ] : undefined;
+			break;
+		case 'attribute':
+		case 'property':
+		case 'html':
+		case 'text':
+		case 'children':
+		case 'node':
+		case 'query':
+			value = hpqParse( innerHTML, matcherFromSource( attributeSchema ) );
+			break;
+	}
+
+	return value === undefined ? attributeSchema.default : asType( value, attributeSchema.type );
+}
+
+/**
  * Returns the block attributes of a registered block node given its type.
  *
  * @param  {?Object} blockType  Block type
@@ -96,62 +122,9 @@ export function asType( value, type ) {
  * @return {Object}             All block attributes
  */
 export function getBlockAttributes( blockType, innerHTML, attributes ) {
-	// Retrieve additional attributes sourced from content
-	const sourcedAttributes = getSourcedAttributes(
-		innerHTML,
-		blockType.attributes
-	);
-
-	const blockAttributes = reduce( blockType.attributes, ( result, source, key ) => {
-		let value;
-		if ( sourcedAttributes.hasOwnProperty( key ) ) {
-			value = sourcedAttributes[ key ];
-		} else if ( attributes ) {
-			value = attributes[ key ];
-		}
-
-		// Return default if attribute value not assigned
-		if ( undefined === value ) {
-			// Nest the condition so that constructor coercion never occurs if
-			// value is undefined and block type doesn't specify default value
-			if ( 'default' in source ) {
-				value = source.default;
-			} else {
-				return result;
-			}
-		}
-
-		// Coerce value to specified type
-		const coercedValue = asType( value, source.type );
-
-		if ( 'development' === process.env.NODE_ENV &&
-				! sourcedAttributes.hasOwnProperty( key ) &&
-				value !== coercedValue ) {
-			// Only in case of sourcing attribute from content do we want to
-			// allow coercion, as comment attributes are serialized respecting
-			// original data type. In development environments, log if value
-			// coerced to specified type is not strictly equal. We still allow
-			// coerced value to be assigned into attributes to avoid errors.
-			//
-			// Example:
-			//   Number( 5 ) === 5
-			//   Number( '5' ) !== '5'
-
-			// eslint-disable-next-line no-console
-			console.error(
-				`Expected attribute "${ key }" of type ${ source.type } for ` +
-				`block type "${ blockType.name }" but received ${ typeof value }.`
-			);
-		}
-
-		result[ key ] = coercedValue;
-		return result;
-	}, {} );
-
-	// If the block supports a custom className parse it
-	if ( blockType.className !== false && attributes && attributes.className ) {
-		blockAttributes.className = attributes.className;
-	}
+	const blockAttributes = mapValues( blockType.attributes, ( attributeSchema, attributeKey ) => {
+		return getBlockAttribute( attributeKey, attributeSchema, innerHTML, attributes );
+	} );
 
 	return blockAttributes;
 }
@@ -170,7 +143,7 @@ export function createBlockWithFallback( name, innerHTML, attributes ) {
 
 	// Convert 'core/text' blocks in existing content to the new
 	// 'core/paragraph'.
-	if ( name === 'core/text' || name === 'core/cover-text' ) {
+	if ( 'core/text' === name || 'core/cover-text' === name ) {
 		name = 'core/paragraph';
 	}
 

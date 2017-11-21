@@ -25,6 +25,10 @@ registerBlockType( 'core/more', {
 
 	supportHTML: false,
 
+	supports: {
+		customClassName: false,
+	},
+
 	attributes: {
 		customText: {
 			type: 'string',

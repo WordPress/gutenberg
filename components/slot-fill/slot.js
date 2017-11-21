@@ -55,7 +55,7 @@ class Slot extends Component {
 		return (
 			<div ref={ this.bindNode }>
 				{ map( getFills( name ), ( fill ) => {
-					const fillKey = fill.props.instanceId;
+					const fillKey = fill.occurrence;
 					return Children.map( fill.props.children, ( child, childIndex ) => {
 						if ( ! child || isString( child ) ) {
 							return child;

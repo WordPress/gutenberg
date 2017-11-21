@@ -6,13 +6,12 @@ import { assign } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { cloneElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { source, hasBlockSupport } from '../api';
+import { hasBlockSupport } from '../api';
 import InspectorControls from '../inspector-controls';
 
 /**
@@ -35,7 +34,9 @@ export function addAttribute( settings ) {
 		settings.attributes = assign( settings.attributes, {
 			anchor: {
 				type: 'string',
-				source: source.attr( '*', 'id' ),
+				source: 'attribute',
+				attribute: 'id',
+				selector: '*',
 			},
 		} );
 	}
@@ -54,8 +55,8 @@ export function addAttribute( settings ) {
 export function addInspectorControl( element, props ) {
 	if ( hasBlockSupport( props.name, 'anchor' ) && props.focus ) {
 		element = [
-			cloneElement( element, { key: 'edit' } ),
-			<InspectorControls key="inspector">
+			element,
+			<InspectorControls key="inspector-anchor">
 				<InspectorControls.TextControl
 					label={ __( 'HTML Anchor' ) }
 					help={ __( 'Anchors lets you link directly to a section on a page.' ) }

@@ -7,6 +7,8 @@ import createHooks from '@wordpress/hooks';
  * Internal dependencies
  */
 import anchor from './anchor';
+import customClassName from './custom-class-name';
+import matchers from './matchers';
 
 const hooks = createHooks();
 
@@ -45,3 +47,5 @@ export {
 };
 
 anchor( hooks );
+customClassName( hooks );
+matchers( hooks );

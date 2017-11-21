@@ -1,9 +1,3 @@
-/**
- * External dependencies
- */
-import * as source from './source';
-
-export { source };
 export { createBlock, switchToBlockType, createReusableBlock } from './factory';
 export { default as parse, getSourcedAttributes } from './parser';
 export { default as rawHandler } from './raw-handling';
@@ -21,3 +15,4 @@ export {
 	getBlockTypes,
 	hasBlockSupport,
 } from './registration';
+
