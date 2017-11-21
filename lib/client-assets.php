@@ -759,11 +759,6 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	), $meta_box_url );
 	wp_localize_script( 'wp-editor', '_wpMetaBoxUrl', $meta_box_url );
 
-	// Ensure that we've got jQuery.
-	if ( ! wp_script_is( 'jquery', 'done' ) ) {
-		wp_enqueue_script( 'jquery' );
-	}
-
 	// Initialize the editor.
 	$gutenberg_theme_support = get_theme_support( 'gutenberg' );
 	$color_palette           = gutenberg_color_palette();
@@ -780,10 +775,8 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$script  = '( function() {';
 	$script .= sprintf( 'var editorSettings = %s;', wp_json_encode( $editor_settings ) );
 	$script .= <<<JS
-		window._wpGutenbergEditor = jQuery.Deferred();
-		jQuery.when( wp.api.init(), wp.api.init( { versionString: 'gutenberg/v1' } ) ).done( function() {
-			var editor = wp.editor.createEditorInstance( 'editor', window._wpGutenbergPost, editorSettings );
-			window._wpGutenbergEditor.resolve( editor );
+		window._wpGutenbergEditor = Promise.all( [ wp.api.init(), wp.api.init( { versionString: 'gutenberg/v1' } ) ] ).then( function() {
+			return wp.editor.createEditorInstance( 'editor', window._wpGutenbergPost, editorSettings );
 		} );
 JS;
 	$script .= '} )();';

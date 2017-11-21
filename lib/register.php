@@ -236,7 +236,7 @@ function gutenberg_collect_meta_box_data() {
 	 */
 	wp_add_inline_script(
 		'wp-editor',
-		'window._wpGutenbergEditor.done( function( editor ) { editor.initializeMetaBoxes( ' . wp_json_encode( $meta_box_data ) . ' ) } );'
+		'window._wpGutenbergEditor.then( function( editor ) { editor.initializeMetaBoxes( ' . wp_json_encode( $meta_box_data ) . ' ) } );'
 	);
 
 	// Restore any global variables that we temporarily modified above.
