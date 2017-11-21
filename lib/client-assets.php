@@ -782,10 +782,15 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'blockTypes' => $allowed_block_types,
 	);
 
-	wp_add_inline_script( 'wp-editor', 'wp.api.init().done( function() {'
-		. 'window._wpGutenbergEditor = wp.editor.createEditorInstance( \'editor\', window._wpGutenbergPost, ' . json_encode( $editor_settings ) . ' ); '
-		. '} );'
-	);
+	$script  = '( function() {';
+	$script .= sprintf( 'var editorSettings = %s;', wp_json_encode( $editor_settings ) );
+	$script .= <<<JS
+		window._wpLoadGutenbergEditor = Promise.all( [ wp.api.init(), wp.api.init( { versionString: 'gutenberg/v1' } ) ] ).then( function() {
+			return wp.editor.createEditorInstance( 'editor', window._wpGutenbergPost, editorSettings );
+		} );
+JS;
+	$script .= '} )();';
+	wp_add_inline_script( 'wp-editor', $script );
 
 	/**
 	 * Scripts
