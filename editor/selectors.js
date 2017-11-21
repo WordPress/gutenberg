@@ -9,6 +9,7 @@ import {
 	last,
 	reduce,
 	includes,
+	sortBy,
 	keys,
 	without,
 	compact,
@@ -547,7 +548,7 @@ export function getBlocksInRange( blockOrder, start, end ) {
 }
 
 function sortByOrder( blockOrder ) {
-	return ( a, b ) => blockOrder.indexOf( a ) < blockOrder.indexOf( b );
+	return ( a ) => blockOrder.indexOf( a );
 }
 
 export const hasMultiSelection = createSelector(
@@ -593,7 +594,9 @@ export const getMultiSelectedBlockUids = createSelector(
 		const { start, end, selected } = state.blockSelection;
 
 		const ranged = start && start === end ? [ start ] : getBlocksInRange( blockOrder, start, end );
-		return selected.concat( ranged ).sort( sortByOrder( blockOrder ) );
+		const all = sortBy( selected.concat( ranged ), sortByOrder( blockOrder ) );
+		console.log( 'all', all, 'blockOrder', blockOrder );
+		return all;
 	},
 	( state ) => [
 		state.editor.present.blockOrder,
@@ -655,7 +658,9 @@ export function getLastMultiSelectedBlockUid( state ) {
  * @return {Boolean}       Whether block is first in mult-selection
  */
 export function isFirstMultiSelectedBlock( state, uid ) {
-	return getFirstMultiSelectedBlockUid( state ) === uid;
+	const firstUid = getFirstMultiSelectedBlockUid( state )
+	console.log( 'firstUid', firstUid );
+	return firstUid === uid;
 }
 
 /**
