@@ -14,6 +14,7 @@ import {
 	APIProvider,
 	DropZoneProvider,
 	SlotFillProvider,
+	HooksProvider,
 } from '@wordpress/components';
 
 /**
@@ -41,6 +42,8 @@ const DEFAULT_SETTINGS = {
 class EditorProvider extends Component {
 	constructor( props ) {
 		super( ...arguments );
+
+		this.setHooks = this.setHooks.bind( this );
 
 		const store = createReduxStore( props.initialState );
 
@@ -73,6 +76,10 @@ class EditorProvider extends Component {
 		}
 	}
 
+	setHooks( node ) {
+		this.hooks = node.hooks;
+	}
+
 	render() {
 		const { children } = this.props;
 		const providers = [
@@ -101,6 +108,11 @@ class EditorProvider extends Component {
 			//  - context.unregisterSlot
 			[
 				SlotFillProvider,
+			],
+
+			[
+				HooksProvider,
+				{ ref: this.setHooks },
 			],
 
 			// APIProvider

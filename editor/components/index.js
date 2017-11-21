@@ -44,3 +44,4 @@ export { default as WritingFlow } from './writing-flow';
 
 // State Related Components
 export { default as EditorProvider } from './provider';
+export { default as PluginFills } from './plugin-fills';

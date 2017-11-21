@@ -2,7 +2,7 @@
  * WordPress Dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { withAPIData, PanelBody } from '@wordpress/components';
+import { withAPIData, PanelBody, Slot } from '@wordpress/components';
 
 /**
  * Internal Dependencies
@@ -44,6 +44,7 @@ function PublishDropdown( { user, onSubmit } ) {
 					<PostSchedule />
 				</PanelBody>
 			}
+			<Slot name="publish-dropdown" />
 			<div className="editor-publish-dropdown__publish-button-container">
 				<PostPublishButton onSubmit={ onSubmit } />
 			</div>

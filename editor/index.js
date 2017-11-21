@@ -97,5 +97,8 @@ export function createEditorInstance( id, post, settings ) {
 		initializeMetaBoxes( metaBoxes ) {
 			provider.store.dispatch( initializeMetaBoxState( metaBoxes ) );
 		},
+		registerFill( fill, component ) {
+			provider.hooks.doAction( 'registerFill', fill, component );
+		},
 	};
 }
