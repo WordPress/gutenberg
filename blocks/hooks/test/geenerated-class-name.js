@@ -40,7 +40,7 @@ describe( 'generated className', () => {
 			const extraProps = addSaveProps( {}, {
 				...blockSettings,
 				supports: {
-					generatedClassName: false,
+					className: false,
 				},
 			}, attributes );
 

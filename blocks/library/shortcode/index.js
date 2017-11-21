@@ -35,7 +35,7 @@ registerBlockType( 'core/shortcode', {
 
 	supports: {
 		customClassName: false,
-		generatedClassName: false,
+		className: false,
 	},
 
 	edit: withInstanceId(
