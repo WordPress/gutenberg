@@ -365,7 +365,7 @@ class BlockListBlock extends Component {
 		}
 
 		// Generate a class name for the block's editable form
-		const generatedClassName = hasBlockSupport( blockType, 'generatedClassName', true ) ?
+		const generatedClassName = hasBlockSupport( blockType, 'className', true ) ?
 			getBlockDefaultClassname( block.name ) :
 			null;
 		const className = classnames( generatedClassName, block.attributes.className );

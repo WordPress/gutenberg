@@ -31,7 +31,7 @@ registerBlockType( 'core/html', {
 
 	supports: {
 		customClassName: false,
-		generatedClassName: false,
+		className: false,
 	},
 
 	attributes: {

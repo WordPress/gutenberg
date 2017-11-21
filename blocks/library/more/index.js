@@ -25,7 +25,7 @@ registerBlockType( 'core/more', {
 
 	supports: {
 		customClassName: false,
-		generatedClassName: false,
+		className: false,
 	},
 
 	attributes: {

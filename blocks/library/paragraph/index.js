@@ -36,7 +36,7 @@ registerBlockType( 'core/paragraph', {
 	keywords: [ __( 'text' ) ],
 
 	supports: {
-		generatedClassName: false,
+		className: false,
 	},
 
 	attributes: {

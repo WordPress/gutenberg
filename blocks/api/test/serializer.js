@@ -100,7 +100,7 @@ describe( 'block serializer', () => {
 						save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),
 						name: 'myplugin/fruit',
 						supports: {
-							generatedClassName: false,
+							className: false,
 						},
 					},
 					{ fruit: 'Bananas' }

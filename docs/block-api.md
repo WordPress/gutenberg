@@ -133,11 +133,11 @@ anchor: true,
 customClassName: false,
 ```
 
-- `generatedClassName` (default `true`): By default, Gutenberg adds a class with the form `.wp-blocks-your-block-name` to the root element of your saved markup. This helps having a consistent mechanism for styling blocks that themes and plugins can rely on. If for whatever reason a class is not desired on the markup, this functionality can be disabled.
+- `className` (default `true`): By default, Gutenberg adds a class with the form `.wp-block-your-block-name` to the root element of your saved markup. This helps having a consistent mechanism for styling blocks that themes and plugins can rely on. If for whatever reason a class is not desired on the markup, this functionality can be disabled.
 
 ```js
 // Remove the support for a the generated className .
-generatedClassName: false,
+className: false,
 ```
 
 #### supportHTML (optional)

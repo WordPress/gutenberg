@@ -19,7 +19,7 @@ import { hasBlockSupport, getBlockDefaultClassname } from '../api';
  */
 export function addGeneratedClassName( extraProps, blockType ) {
 	// Adding the generated className
-	if ( hasBlockSupport( blockType, 'generatedClassName', true ) ) {
+	if ( hasBlockSupport( blockType, 'className', true ) ) {
 		const updatedClassName = classnames(
 			getBlockDefaultClassname( blockType.name ),
 			extraProps.className,
