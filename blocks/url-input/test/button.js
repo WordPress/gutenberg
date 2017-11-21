@@ -9,6 +9,7 @@ import { shallow, mount } from 'enzyme';
 import UrlInputButton from '../button';
 
 describe( 'UrlInputButton', () => {
+	const startEditing = ( wrapper ) => wrapper.find( 'IconButton.components-toolbar__control' ).simulate( 'click' );
 	it( 'should has valid class in wrapper tag', () => {
 		const wrapper = shallow( <UrlInputButton /> );
 		expect( wrapper.hasClass( 'blocks-url-input__button' ) ).toBe( true );
@@ -28,7 +29,7 @@ describe( 'UrlInputButton', () => {
 	} );
 	it( 'should visible form if Edit Link button clicked', () => {
 		const wrapper = shallow( <UrlInputButton /> );
-		wrapper.find( 'IconButton.components-toolbar__control' ).simulate( 'click' );
+		startEditing( wrapper );
 		expect( wrapper.find( 'form' ).length ).toBe( 1 );
 		expect( wrapper.state().expanded ).toBe( true );
 	} );
