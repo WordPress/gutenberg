@@ -525,7 +525,7 @@ export function getSelectedBlock( state ) {
 	return getBlock( state, current );
 }
 
-function getBlocksInRange( blockOrder, start, end ) {
+export function getBlocksInRange( blockOrder, start, end ) {
 	if ( ! start || ! end ) return [ ];
 	const startIndex = blockOrder.indexOf( start );
 	const endIndex = blockOrder.indexOf( end );

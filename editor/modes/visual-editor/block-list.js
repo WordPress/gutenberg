@@ -36,7 +36,7 @@ import {
 	getMultiSelectedBlockUids,
 	getSelectedBlock,
 } from '../../selectors';
-import { insertBlock, startMultiSelect, stopMultiSelect, multiSelect, spawnSelection, selectBlock } from '../../actions';
+import { insertBlock, startMultiSelect, toggleOffSelection, stopMultiSelect, multiSelect, spawnSelection, selectBlock } from '../../actions';
 
 class VisualEditorBlockList extends Component {
 	constructor( props ) {
@@ -201,8 +201,12 @@ class VisualEditorBlockList extends Component {
 	}
 
 	onMetaSelection( uid ) {
-		const { onSpawnSelection } = this.props;
-		onSpawnSelection( uid );
+		const { onSpawnSelection, onToggleOffSelection, multiSelectedBlockUids } = this.props;
+		if ( multiSelectedBlockUids.indexOf( uid ) > -1 ) {
+			onToggleOffSelection( uid );
+		} else {
+			onSpawnSelection( uid );
+		}
 	}
 
 	appendDefaultBlock() {
@@ -278,6 +282,9 @@ export default connect(
 		},
 		onSpawnSelection( uid ) {
 			dispatch( spawnSelection( uid ) );
+		},
+		onToggleOffSelection( uid ) {
+			dispatch( toggleOffSelection( uid ) );
 		},
 	} )
 )( VisualEditorBlockList );

@@ -144,6 +144,13 @@ export function spawnSelection( uid ) {
 	};
 }
 
+export function toggleOffSelection( uid ) {
+	return {
+		type: 'TOGGLE_OFF_SELECTION',
+		uid,
+	};
+}
+
 export function clearSelectedBlock() {
 	return {
 		type: 'CLEAR_SELECTED_BLOCK',
