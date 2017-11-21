@@ -282,7 +282,9 @@ class ImageBlock extends Component {
 }
 
 export default flowRight( [
-	withContext( 'editor' ),
+	withContext( 'editor' )( ( settings ) => {
+		return { settings };
+	} ),
 	withAPIData( ( props ) => {
 		const { id } = props.attributes;
 		if ( ! id ) {
