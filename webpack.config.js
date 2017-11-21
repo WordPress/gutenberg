@@ -53,6 +53,10 @@ const entryPointNames = [
 	'utils',
 ];
 
+const packageNames = [
+	'hooks',
+];
+
 const externals = {
 	react: 'React',
 	'react-dom': 'ReactDOM',
@@ -61,17 +65,23 @@ const externals = {
 	moment: 'moment',
 };
 
-entryPointNames.forEach( entryPointName => {
-	externals[ '@wordpress/' + entryPointName ] = {
-		this: [ 'wp', entryPointName ],
+[ ...entryPointNames, ...packageNames ].forEach( name => {
+	externals[ `@wordpress/${ name }` ] = {
+		this: [ 'wp', name ],
 	};
 } );
 
 const config = {
-	entry: entryPointNames.reduce( ( memo, entryPointName ) => {
-		memo[ entryPointName ] = './' + entryPointName + '/index.js';
-		return memo;
-	}, {} ),
+	entry: Object.assign(
+		entryPointNames.reduce( ( memo, entryPointName ) => {
+			memo[ entryPointName ] = `./${ entryPointName }/index.js`;
+			return memo;
+		}, {} ),
+		packageNames.reduce( ( memo, packageName ) => {
+			memo[ packageName ] = `./node_modules/@wordpress/${ packageName }`;
+			return memo;
+		}, {} ),
+	),
 	output: {
 		filename: '[name]/build/index.js',
 		path: __dirname,

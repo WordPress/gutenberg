@@ -7,7 +7,7 @@ import { mount, shallow } from 'enzyme';
  * WordPress dependencies
  */
 import { concatChildren } from '@wordpress/element';
-import { addFilter, removeAllFilters } from '@wordpress/utils';
+import { addFilter, removeAllFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies

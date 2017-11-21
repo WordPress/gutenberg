@@ -8,7 +8,6 @@ export { keycodes };
 export { decodeEntities };
 
 export * from './blob-cache';
-export * from './hooks';
 export * from './mediaupload';
 
 export { viewPort };
