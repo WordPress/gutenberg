@@ -10,7 +10,7 @@ import UrlInputButton from '../button';
 
 describe( 'UrlInputButton', () => {
 	const clickEditLink = ( wrapper ) => wrapper.find( 'IconButton.components-toolbar__control' ).simulate( 'click' );
-	
+
 	it( 'should have a valid class name in the wrapper tag', () => {
 		const wrapper = shallow( <UrlInputButton /> );
 		expect( wrapper.hasClass( 'blocks-url-input__button' ) ).toBe( true );
