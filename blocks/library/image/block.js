@@ -189,7 +189,7 @@ class ImageBlock extends Component {
 						<p>{ __( 'Worth a thousand words.' ) }</p>
 					</BlockDescription>
 					<h3>{ __( 'Image Settings' ) }</h3>
-					<TextControl label={ __( 'Textual Alternative' ) } value={ alt } onChange={ this.updateAlt } helpText={ __( 'Describe the purpose of the image. Leave empty if the image is not a key part of the content.' ) } />
+					<TextControl label={ __( 'Textual Alternative' ) } value={ alt } onChange={ this.updateAlt } help={ __( 'Describe the purpose of the image. Leave empty if the image is not a key part of the content.' ) } />
 					{ ! isEmpty( availableSizes ) && (
 						<SelectControl
 							label={ __( 'Size' ) }
