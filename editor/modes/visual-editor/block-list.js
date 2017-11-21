@@ -36,7 +36,7 @@ import {
 	getMultiSelectedBlockUids,
 	getSelectedBlock,
 } from '../../selectors';
-import { insertBlock, startMultiSelect, stopMultiSelect, multiSelect, selectBlock } from '../../actions';
+import { insertBlock, startMultiSelect, toggleOffSelection, stopMultiSelect, multiSelect, spawnSelection, selectBlock } from '../../actions';
 
 class VisualEditorBlockList extends Component {
 	constructor( props ) {
@@ -45,6 +45,7 @@ class VisualEditorBlockList extends Component {
 		this.onSelectionStart = this.onSelectionStart.bind( this );
 		this.onSelectionEnd = this.onSelectionEnd.bind( this );
 		this.onShiftSelection = this.onShiftSelection.bind( this );
+		this.onMetaSelection = this.onMetaSelection.bind( this );
 		this.onCopy = this.onCopy.bind( this );
 		this.onCut = this.onCut.bind( this );
 		this.setBlockRef = this.setBlockRef.bind( this );
@@ -189,13 +190,22 @@ class VisualEditorBlockList extends Component {
 
 	onShiftSelection( uid ) {
 		const { selectedBlock, selectionStart, onMultiSelect, onSelect } = this.props;
-
+		console.log("selected", selectedBlock, 'start', selectionStart);
 		if ( selectedBlock ) {
 			onMultiSelect( selectedBlock.uid, uid );
 		} else if ( selectionStart ) {
 			onMultiSelect( selectionStart, uid );
 		} else {
 			onSelect( uid );
+		}
+	}
+
+	onMetaSelection( uid ) {
+		const { onSpawnSelection, onToggleOffSelection, multiSelectedBlockUids } = this.props;
+		if ( multiSelectedBlockUids.indexOf( uid ) > -1 ) {
+			onToggleOffSelection( uid );
+		} else {
+			onSpawnSelection( uid );
 		}
 	}
 
@@ -217,6 +227,7 @@ class VisualEditorBlockList extends Component {
 						blockRef={ this.setBlockRef }
 						onSelectionStart={ this.onSelectionStart }
 						onShiftSelection={ this.onShiftSelection }
+						onMetaSelection={ this.onMetaSelection }
 					/>,
 					<VisualEditorSiblingInserter
 						key={ 'sibling-inserter-' + uid }
@@ -268,6 +279,12 @@ export default connect(
 		},
 		onRemove( uids ) {
 			dispatch( { type: 'REMOVE_BLOCKS', uids } );
+		},
+		onSpawnSelection( uid ) {
+			dispatch( spawnSelection( uid ) );
+		},
+		onToggleOffSelection( uid ) {
+			dispatch( toggleOffSelection( uid ) );
 		},
 	} )
 )( VisualEditorBlockList );

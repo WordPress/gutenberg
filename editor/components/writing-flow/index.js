@@ -27,7 +27,7 @@ import {
 	getMultiSelectedBlocks,
 	getSelectedBlock,
 } from '../../selectors';
-import { multiSelect } from '../../actions';
+import { multiSelect, selectBlock } from '../../actions';
 
 /**
  * Module Constants
@@ -114,6 +114,11 @@ class WritingFlow extends Component {
 	onKeyDown( event ) {
 		const { selectedBlock, selectionStart, selectionEnd, blocks, hasMultiSelection } = this.props;
 
+		if ( selectedBlock === null && ! hasMultiSelection ) {
+			console.error('selectedBlock is null');
+			return;
+		}
+
 		const { keyCode, target } = event;
 		const isUp = keyCode === UP;
 		const isDown = keyCode === DOWN;
@@ -141,6 +146,9 @@ class WritingFlow extends Component {
 			// Shift key is down, but no existing block selection
 			event.preventDefault();
 			this.expandSelection( blocks, selectedBlock.uid, selectedBlock.uid, isReverse ? -1 : +1 );
+		} else if ( isNav && ! isShift && hasMultiSelection ) {
+			this.props.selectBlock( selectionEnd );
+
 		} else if ( isVertical && isVerticalEdge( target, isReverse, isShift ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
 			placeCaretAtVerticalEdge( closestTabbable, isReverse, this.verticalRect );
@@ -176,12 +184,15 @@ export default connect(
 		blocks: getBlockUids( state ),
 		selectionStart: getMultiSelectedBlocksStartUid( state ),
 		selectionEnd: getMultiSelectedBlocksEndUid( state ),
-		hasMultiSelection: getMultiSelectedBlocks( state ).length > 1,
+		hasMultiSelection: getMultiSelectedBlocks( state ).length > 0,
 		selectedBlock: getSelectedBlock( state ),
 	} ),
 	( dispatch ) => ( {
 		onMultiSelect( start, end ) {
 			dispatch( multiSelect( start, end ) );
+		},
+		selectBlock( uid ) {
+			dispatch( selectBlock( uid ) );
 		},
 	} )
 )( WritingFlow );

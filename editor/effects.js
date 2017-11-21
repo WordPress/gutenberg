@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, uniqueId, map, filter, some } from 'lodash';
+import { get, uniqueId, map, filter, remove, some, includes, last } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,6 +15,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { getPostEditUrl, getWPAdminURL } from './utils/url';
 import {
+	setSelection,
 	resetPost,
 	setupNewPost,
 	resetBlocks,
@@ -32,12 +33,14 @@ import {
 	getCurrentPostType,
 	getDirtyMetaBoxes,
 	getEditedPostContent,
+	getAllSelectedBlockUids,
 	getPostEdits,
 	isCurrentPostPublished,
 	isEditedPostDirty,
 	isEditedPostNew,
 	isEditedPostSaveable,
 	getMetaBoxes,
+	getBlocksInRange,
 } from './selectors';
 
 const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
@@ -297,5 +300,62 @@ export default {
 		if ( unloadedMetaboxes.length === 1 && unloadedMetaboxes[ 0 ].key === action.location ) {
 			jQuery.holdReady( false );
 		}
+	},
+
+	SPAWN_SELECTION( action, store ) {
+		const { getState, dispatch } = store;
+		console.log( 'spawn.state.lookup.pre', getState().blockSelection );
+		// Take everything that is currently in the start->end range, and put it in selected
+		const selectedUids = getAllSelectedBlockUids( getState() );
+		console.log( 'spawn.state.lookup.post', selectedUids );
+		const filteredUids = filter( selectedUids, ( uid ) => action.uid !== uid );
+		console.log('spawning.initial', getState().blockSelection );
+		dispatch( setSelection( action.uid, action.uid, filteredUids ) );
+		console.log('spawning.result', getState( ).blockSelection );
+	},
+
+	TOGGLE_OFF_SELECTION( action, store ) {
+		const { getState, dispatch } = store;
+
+
+		const state = getState();
+		console.log('toggling off', action.uid, state.blockSelection.selected );
+		// If this is just in the selecteds, remove it.
+		if ( includes( state.blockSelection.selected, action.uid ) ) {
+			console.log(' should be clearing selection' );
+			dispatch(
+				setSelection( state.blockSelection.start, state.blockSelection.end, filter( state.blockSelection.selected, ( s ) => s !== action.uid ) )
+			);
+			return;
+		}
+
+		const inRange = getBlocksInRange( state.editor.present.blockOrder, state.blockSelection.start, state.blockSelection.end );
+		if ( action.uid === state.blockSelection.start ) {
+			const selectedUids = getAllSelectedBlockUids( getState() );
+			const filteredUids = filter( selectedUids, ( uid ) => {
+				return uid !== action.uid;
+			} );
+			const startUid = last( filteredUids );
+			dispatch(
+				setSelection( startUid, startUid, filteredUids.slice( 0, filteredUids.length - 1 ) )
+			);
+		} else if ( includes( inRange, action.uid ) ) {
+			const selectedUids = getAllSelectedBlockUids( getState() );
+
+			const filteredUids = filter( selectedUids, ( uid ) => {
+				return uid !== action.uid && uid !== state.blockSelection.start;
+			} );
+
+			dispatch(
+				setSelection( state.blockSelection.start, state.blockSelection.start, filteredUids )
+			)
+
+			// Make this the last anchor point.
+		}
+
+		// If this is in the range part, push all the range to selected, except start if different.
+
+		// If this in the the range part, and is the start, push all the range to selected, and remove
+		// the last one to be the next anchor
 	},
 };

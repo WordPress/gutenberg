@@ -28,6 +28,7 @@ function BlockSwitcher( { blocks, onTransform } ) {
 	if ( ! blocks || ! blocks[ 0 ] ) {
 		return null;
 	}
+
 	const isMultiBlock = blocks.length > 1;
 	const sourceBlockName = blocks[ 0 ].name;
 

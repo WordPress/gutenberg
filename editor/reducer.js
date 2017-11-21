@@ -331,10 +331,12 @@ export function isTyping( state = false, action ) {
  * @param  {Object} action Dispatched action
  * @return {Object}        Updated state
  */
-export function blockSelection( state = { start: null, end: null, focus: null, isMultiSelecting: false }, action ) {
+export function blockSelection( state = { current: null, selected: [ ], start: null, end: null, focus: null, isMultiSelecting: false }, action ) {
 	switch ( action.type ) {
 		case 'CLEAR_SELECTED_BLOCK':
 			return {
+				current: null,
+				selected: [ ],
 				start: null,
 				end: null,
 				focus: null,
@@ -356,29 +358,45 @@ export function blockSelection( state = { start: null, end: null, focus: null, i
 				...state,
 				start: action.start,
 				end: action.end,
+				current: null,
 				focus: state.isMultiSelecting ? state.focus : null,
 			};
 		case 'SELECT_BLOCK':
-			if ( action.uid === state.start && action.uid === state.end ) {
+			if ( action.uid === state.current && ! state.start && ! state.end ) {
 				return state;
 			}
 			return {
 				...state,
-				start: action.uid,
-				end: action.uid,
+				selected: [ ],
+				current: action.uid,
+				start: null,
+				end: null,
 				focus: action.focus || {},
 			};
 		case 'UPDATE_FOCUS':
 			return {
 				...state,
-				start: action.uid,
-				end: action.uid,
+				start: null,
+				current: action.uid,
+				end: null,
 				focus: action.config || {},
 			};
+
+		case 'SET_SELECTION':
+			return {
+				...state,
+				current: null,
+				selected: action.selected,
+				start: action.start,
+				end: action.end,
+			};
+
 		case 'INSERT_BLOCKS':
 			return {
-				start: action.blocks[ 0 ].uid,
-				end: action.blocks[ 0 ].uid,
+				current: action.blocks[ 0 ].uid,
+				start: null,
+				end: null,
+				selected: [ ],
 				focus: {},
 				isMultiSelecting: false,
 			};
@@ -387,8 +405,10 @@ export function blockSelection( state = { start: null, end: null, focus: null, i
 				return state;
 			}
 			return {
-				start: action.blocks[ 0 ].uid,
-				end: action.blocks[ 0 ].uid,
+				current: action.blocks[ 0 ].uid,
+				start: null,
+				end: null,
+				selected: [ ],
 				focus: {},
 				isMultiSelecting: false,
 			};
