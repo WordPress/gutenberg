@@ -190,7 +190,7 @@ class VisualEditorBlockList extends Component {
 
 	onShiftSelection( uid ) {
 		const { selectedBlock, selectionStart, onMultiSelect, onSelect } = this.props;
-
+		console.log("selected", selectedBlock, 'start', selectionStart);
 		if ( selectedBlock ) {
 			onMultiSelect( selectedBlock.uid, uid );
 		} else if ( selectionStart ) {

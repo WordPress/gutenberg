@@ -675,10 +675,11 @@ export function isBlockMultiSelected( state, uid ) {
  * @return {?String}       Unique ID of block beginning multi-selection
  */
 export function getMultiSelectedBlocksStartUid( state ) {
-	const { start, end, current } = state.blockSelection;
-	if ( start === end ) {
+	const { start, current } = state.blockSelection;
+	if ( ! start ) {
 		return current;
 	}
+
 	return start || null;
 }
 
@@ -694,10 +695,10 @@ export function getMultiSelectedBlocksStartUid( state ) {
  */
 export function getMultiSelectedBlocksEndUid( state ) {
 	const { start, end, current } = state.blockSelection;
-	if ( start === end ) {
-		return current;
+	if ( ! end ) {
+		return start || current;
 	}
-	return end || null;
+	return end;
 }
 
 /**
