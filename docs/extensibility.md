@@ -1,18 +1,36 @@
 # Extensibility
 
-Extensibility is key for WordPress and like the rest of WordPress components, Gutenberg is hightly extensible.
+Extensibility is key for WordPress and like the rest of WordPress components, Gutenberg is highly extensible.
 
 
 ## Creating Blocks
 
 Gutenberg is about blocks and the main extensibility API of Gutenberg is the Block API. It allows you to create static blocks, dynamic blocks rendering on the server and also blocks saving data to Post Meta for more structured content.
 
-If you want to learn more about block creations, The [Blocks Tutorial](./blocks) is the best place to sart.
+Here is a small example of a static custom block type (you can try it in your browser's console):
+
+```js
+var el = wp.element.createElement;
+
+wp.blocks.registerBlockType( 'mytheme/red-block', {
+	title: 'Red Block',
+	icon: 'universal-access-alt',
+	category: 'layout',
+	edit: function() {
+		return el( 'div', { style: { backgroundColor: '#900', color: '#fff', padding: '20px' } }, 'I am a red block.' );
+	},
+	save: function() {
+		return el( 'div', { style: { backgroundColor: '#900', color: '#fff', padding: '20px' } }, 'I am a red block.' );
+	}
+} );
+```
+
+If you want to learn more about block creation, The [Blocks Tutorial](./blocks) is the best place to start.
 
 
 ## Removing Blocks
 
-### Using a black list
+### Using a blacklist
 
 Adding blocks is easy enough, removing them is as easy. Plugin or theme authors have the possibility to "unregister" blocks.
 
@@ -39,28 +57,28 @@ add_action( 'enqueue_block_editor_assets', 'myplugin_blacklist_blocks' );
 ```
 
 
-### Using a white list
+### Using a whitelist
 
 If you want to disable all blocks except a whitelisted list, you can adapt the script above like so:
 
 ```js
 // myplugin.js
 var allowedBlocks = [
-  'core/paragraph',
-  'core/image',
-  'core/html',
-  'core/freeform'
+	'core/paragraph',
+	'core/image',
+	'core/html',
+	'core/freeform'
 ];
 
 wp.blocks.getBlockTypes().forEach( function( blockType ) {
-  if ( allowedBlocks.indexOf( blockType.name ) === -1 ) {
-    wp.blocks.unregisterBlockType( blockType.name );
-  }
+	if ( allowedBlocks.indexOf( blockType.name ) === -1 ) {
+		wp.blocks.unregisterBlockType( blockType.name );
+	}
 } );
 ```
 
 
-## Modifying Blocks
+## Modifying Blocks (Experimental)
 
 To modify the behaviour of existing blocks, Gutenberg exposes a list of filters:
 
@@ -81,7 +99,7 @@ function addBackgroundProp( props ) {
 }
 
 // Adding the filter
-window._wpGutenbergEditor.hooks.addFilter(
+wp.blocks.addFilter(
 	'getSaveContent.extraProps',
 	'myplugin\add-background',
 	addBackgroundProp
