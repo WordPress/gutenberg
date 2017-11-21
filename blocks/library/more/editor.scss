@@ -1,9 +1,9 @@
-.editor-visual-editor__block[data-type="core/more"] {
+.editor-block-list__block[data-type="core/more"] {
 	max-width: 100%;
 	text-align: center;
 }
 
-.editor-visual-editor__block .wp-block-more {
+.editor-block-list__block .wp-block-more {
 	input {
 		font-size: 12px;
 		text-transform: uppercase;
@@ -29,6 +29,6 @@
 		left: $block-mover-padding-visible + $block-padding;
 		right: $block-mover-padding-visible + $block-padding;
 		border-top: 3px dashed $light-gray-700;
-		z-index: z-index( '.editor-visual-editor__block .wp-block-more:before' );
+		z-index: z-index( '.editor-block-list__block .wp-block-more:before' );
 	}
 }

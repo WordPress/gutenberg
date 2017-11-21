@@ -8,11 +8,6 @@ import { connect } from 'react-redux';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
-import { Warning } from '../../components';
 import {
 	getBlockType,
 	getUnknownTypeHandlerName,
@@ -23,6 +18,7 @@ import {
  * Internal dependencies
  */
 import { replaceBlock } from '../../actions';
+import Warning from '../warning';
 
 function InvalidBlockWarning( { ignoreInvalid, switchToBlockType } ) {
 	const htmlBlockName = 'core/html';
@@ -37,7 +33,7 @@ function InvalidBlockWarning( { ignoreInvalid, switchToBlockType } ) {
 				'Overwrite the external changes or Convert to %s or %s to keep ' +
 				'your changes.'
 			), defaultBlockType.title, htmlBlockType.title ) }</p>
-			<p className="visual-editor__invalid-block-warning-buttons">
+			<p>
 				<Button
 					onClick={ ignoreInvalid }
 					isLarge

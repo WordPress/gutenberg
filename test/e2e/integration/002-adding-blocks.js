@@ -4,7 +4,7 @@ describe( 'Adding blocks', () => {
 	} );
 
 	it( 'Should insert content using the placeholder, the quick inserter, the regular inserter', () => {
-		const lastBlockSelector = '.editor-visual-editor__block-edit:last [contenteditable="true"]:first';
+		const lastBlockSelector = '.editor-block-list__block-edit:last [contenteditable="true"]:first';
 
 		// Using the placeholder
 		cy.get( '[value="Write your story"]' ).click();
@@ -20,7 +20,7 @@ describe( 'Adding blocks', () => {
 		cy.get( lastBlockSelector ).type( 'Quote block' );
 
 		// Using the regular inserter
-		cy.get( '.editor-visual-editor [aria-label="Insert block"]' ).click();
+		cy.get( '.editor-visual-editor__inserter [aria-label="Insert block"]' ).click();
 		cy.get( '[placeholder="Search for a block"]' ).type( 'code' );
 		cy.get( '.editor-inserter__block' ).contains( 'Code' ).click();
 		cy.get( '[placeholder="Write code…"]' ).type( 'Code block' );

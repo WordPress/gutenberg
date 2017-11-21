@@ -8,12 +8,12 @@ import { noop } from 'lodash';
  */
 import { Component } from '@wordpress/element';
 
-const withEditorSettings = ( mapSettingsToProps ) => ( OriginalComponent ) => {
+const withContext = ( contextName ) => ( mapSettingsToProps ) => ( OriginalComponent ) => {
 	class WrappedComponent extends Component {
 		render() {
 			const extraProps = mapSettingsToProps ?
-				mapSettingsToProps( this.context.editor, this.props ) :
-				{ settings: this.context.editor };
+				mapSettingsToProps( this.context[ contextName ], this.props ) :
+				{ [ contextName ]: this.context[ contextName ] };
 
 			return (
 				<OriginalComponent
@@ -25,10 +25,10 @@ const withEditorSettings = ( mapSettingsToProps ) => ( OriginalComponent ) => {
 	}
 
 	WrappedComponent.contextTypes = {
-		editor: noop,
+		[ contextName ]: noop,
 	};
 
 	return WrappedComponent;
 };
 
-export default withEditorSettings;
+export default withContext;

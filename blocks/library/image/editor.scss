@@ -52,7 +52,7 @@
 	left: -6px !important;
 }
 
-.editor-visual-editor__block[data-type="core/image"] {
+.editor-block-list__block[data-type="core/image"] {
 	.blocks-format-toolbar__link-modal {
 		top: 0;
 		left: 0;
@@ -73,8 +73,8 @@
 	}
 }
 
-.editor-visual-editor__block[data-type="core/image"][data-align="right"],
-.editor-visual-editor__block[data-type="core/image"][data-align="left"] {
+.editor-block-list__block[data-type="core/image"][data-align="right"],
+.editor-block-list__block[data-type="core/image"][data-align="left"] {
 	max-width: none !important;
 	&[data-resized="false"] {
 		max-width: 370px !important;

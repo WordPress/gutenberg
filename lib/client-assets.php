@@ -767,15 +767,30 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		$color_palette = $gutenberg_theme_support[0]['colors'];
 	}
 
+	/**
+	 * Filters the allowed block types for the editor, defaulting to true (all
+	 * block types supported).
+	 *
+	 * @param bool|array $allowed_block_types Array of block type slugs, or
+	 *                                        boolean to enable/disable all.
+	 */
+	$allowed_block_types = apply_filters( 'allowed_block_types', true );
+
 	$editor_settings = array(
 		'wideImages' => ! empty( $gutenberg_theme_support[0]['wide-images'] ),
 		'colors'     => $color_palette,
+		'blockTypes' => $allowed_block_types,
 	);
 
-	wp_add_inline_script( 'wp-editor', 'wp.api.init().done( function() {'
-		. 'window._wpGutenbergEditor = wp.editor.createEditorInstance( \'editor\', window._wpGutenbergPost, ' . json_encode( $editor_settings ) . ' ); '
-		. '} );'
-	);
+	$script  = '( function() {';
+	$script .= sprintf( 'var editorSettings = %s;', wp_json_encode( $editor_settings ) );
+	$script .= <<<JS
+		window._wpLoadGutenbergEditor = Promise.all( [ wp.api.init(), wp.api.init( { versionString: 'gutenberg/v1' } ) ] ).then( function() {
+			return wp.editor.createEditorInstance( 'editor', window._wpGutenbergPost, editorSettings );
+		} );
+JS;
+	$script .= '} )();';
+	wp_add_inline_script( 'wp-editor', $script );
 
 	/**
 	 * Scripts

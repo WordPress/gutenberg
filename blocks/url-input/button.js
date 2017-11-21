@@ -59,7 +59,7 @@ class UrlInputButton extends Component {
 							label={ __( 'Close' ) }
 							onClick={ this.toggle }
 						/>
-						<UrlInput value={ url || '' } onChange={ onChange } />
+						<UrlInput value={ url || '' } onChange={ onChange } data-test="UrlInput" />
 						<IconButton
 							icon="editor-break"
 							label={ __( 'Submit' ) }

@@ -25,8 +25,9 @@ import { serialize, getDefaultBlockName, createBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import VisualEditorBlock from './block';
-import VisualEditorSiblingInserter from './sibling-inserter';
+import './style.scss';
+import BlockListBlock from './block';
+import BlockListSiblingInserter from './sibling-inserter';
 import BlockDropZone from './block-drop-zone';
 import {
 	getBlockUids,
@@ -38,7 +39,7 @@ import {
 } from '../../selectors';
 import { insertBlock, startMultiSelect, stopMultiSelect, multiSelect, selectBlock } from '../../actions';
 
-class VisualEditorBlockList extends Component {
+class BlockList extends Component {
 	constructor( props ) {
 		super( props );
 
@@ -209,22 +210,22 @@ class VisualEditorBlockList extends Component {
 
 		return (
 			<div>
-				{ !! blocks.length && <VisualEditorSiblingInserter /> }
+				{ !! blocks.length && <BlockListSiblingInserter /> }
 				{ flatMap( blocks, ( uid ) => [
-					<VisualEditorBlock
+					<BlockListBlock
 						key={ 'block-' + uid }
 						uid={ uid }
 						blockRef={ this.setBlockRef }
 						onSelectionStart={ this.onSelectionStart }
 						onShiftSelection={ this.onShiftSelection }
 					/>,
-					<VisualEditorSiblingInserter
+					<BlockListSiblingInserter
 						key={ 'sibling-inserter-' + uid }
 						uid={ uid }
 					/>,
 				] ) }
 				{ ! blocks.length &&
-					<div className="editor-visual-editor__placeholder">
+					<div className="editor-block-list__placeholder">
 						<BlockDropZone />
 						<input
 							type="text"
@@ -270,4 +271,4 @@ export default connect(
 			dispatch( { type: 'REMOVE_BLOCKS', uids } );
 		},
 	} )
-)( VisualEditorBlockList );
+)( BlockList );

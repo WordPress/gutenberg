@@ -36,6 +36,9 @@ export { default as WordCount } from './word-count';
 
 // Content Related Components
 export { default as BlockInspector } from './block-inspector';
+export { default as BlockList } from './block-list';
+export { default as BlockMover } from './block-mover';
+export { default as BlockSettingsMenu } from './block-settings-menu';
 export { default as BlockToolbar } from './block-toolbar';
 export { default as ErrorBoundary } from './error-boundary';
 export { default as Inserter } from './inserter';

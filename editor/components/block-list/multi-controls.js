@@ -6,14 +6,14 @@ import { connect } from 'react-redux';
 /**
  * Internal dependencies
  */
-import BlockMover from '../../components/block-mover';
-import BlockSettingsMenu from '../../components/block-settings-menu';
+import BlockMover from '../block-mover';
+import BlockSettingsMenu from '../block-settings-menu';
 import {
 	getMultiSelectedBlockUids,
 	isMultiSelecting,
 } from '../../selectors';
 
-function VisualEditorBlockMultiControls( { multiSelectedBlockUids, isSelecting } ) {
+function BlockListMultiControls( { multiSelectedBlockUids, isSelecting } ) {
 	if ( isSelecting ) {
 		return null;
 	}
@@ -36,4 +36,4 @@ export default connect( ( state ) => {
 		multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
 		isSelecting: isMultiSelecting( state ),
 	};
-} )( VisualEditorBlockMultiControls );
+} )( BlockListMultiControls );

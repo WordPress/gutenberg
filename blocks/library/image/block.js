@@ -24,12 +24,12 @@ import {
 	DropZone,
 	FormFileUpload,
 	withAPIData,
+	withContext,
 } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import withEditorSettings from '../../with-editor-settings';
 import Editable from '../../editable';
 import MediaUploadButton from '../../media-upload-button';
 import InspectorControls from '../../inspector-controls';
@@ -194,7 +194,7 @@ class ImageBlock extends Component {
 						<p>{ __( 'Worth a thousand words.' ) }</p>
 					</BlockDescription>
 					<h3>{ __( 'Image Settings' ) }</h3>
-					<TextControl label={ __( 'Alternate Text' ) } value={ alt } onChange={ this.updateAlt } />
+					<TextControl label={ __( 'Textual Alternative' ) } value={ alt } onChange={ this.updateAlt } help={ __( 'Describe the purpose of the image. Leave empty if the image is not a key part of the content.' ) } />
 					{ ! isEmpty( availableSizes ) && (
 						<SelectControl
 							label={ __( 'Size' ) }
@@ -282,7 +282,9 @@ class ImageBlock extends Component {
 }
 
 export default flowRight( [
-	withEditorSettings(),
+	withContext( 'editor' )( ( settings ) => {
+		return { settings };
+	} ),
 	withAPIData( ( props ) => {
 		const { id } = props.attributes;
 		if ( ! id ) {
