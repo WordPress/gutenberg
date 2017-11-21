@@ -4,10 +4,6 @@
 import { shallow, mount } from 'enzyme';
 
 /**
- * External dependencies
- */
-
-/**
  * Internal dependencies
  */
 import UrlInputButton from '../button';
@@ -15,26 +11,26 @@ import UrlInputButton from '../button';
 describe( 'UrlInputButton', () => {
 	it( 'should has valid class in wrapper tag', () => {
 		const wrapper = shallow( <UrlInputButton /> );
-		expect( wrapper.hasClass( 'blocks-url-input__button' ) ).toBeTruthy();
+		expect( wrapper.hasClass( 'blocks-url-input__button' ) ).toBe( true );
 	} );
 	it( 'should not have is-active class if url prop not defined', () => {
 		const wrapper = shallow( <UrlInputButton /> );
-		expect( wrapper.find( 'IconButton' ).hasClass( 'is-active' ) ).toBeFalsy();
+		expect( wrapper.find( 'IconButton' ).hasClass( 'is-active' ) ).toBe( false );
 	} );
 	it( 'should have is-active class if url prop defined', () => {
 		const wrapper = shallow( <UrlInputButton url="https://example.com" /> );
-		expect( wrapper.find( 'IconButton' ).hasClass( 'is-active' ) ).toBeTruthy();
+		expect( wrapper.find( 'IconButton' ).hasClass( 'is-active' ) ).toBe( true );
 	} );
 	it( 'should hidden form for default', () => {
 		const wrapper = shallow( <UrlInputButton /> );
 		expect( wrapper.find( 'form' ).length ).toBe( 0 );
-		expect( wrapper.state().expanded ).toBeFalsy();
+		expect( wrapper.state().expanded ).toBe( false );
 	} );
 	it( 'should visible form if Edit Link button clicked', () => {
 		const wrapper = shallow( <UrlInputButton /> );
 		wrapper.find( 'IconButton.components-toolbar__control' ).simulate( 'click' );
 		expect( wrapper.find( 'form' ).length ).toBe( 1 );
-		expect( wrapper.state().expanded ).toBeTruthy();
+		expect( wrapper.state().expanded ).toBe( true );
 	} );
 	it( 'should call onChange function at once if value changes at once', () => {
 		const onChangeMock = jest.fn();
@@ -54,16 +50,16 @@ describe( 'UrlInputButton', () => {
 	it( 'should close form if user clicked Close button', () => {
 		const wrapper = shallow( <UrlInputButton /> );
 		wrapper.setState( { expanded: true } );
-		expect( wrapper.state().expanded ).toBeTruthy();
+		expect( wrapper.state().expanded ).toBe( true );
 		wrapper.find( '.blocks-url-input__back' ).simulate( 'click' );
-		expect( wrapper.state().expanded ).toBeFalsy();
+		expect( wrapper.state().expanded ).toBe( false );
 	} );
 	it( 'should close form if user submit the form', () => {
 		const wrapper = mount( <UrlInputButton /> );
 		wrapper.setState( { expanded: true } );
-		expect( wrapper.state().expanded ).toBeTruthy();
+		expect( wrapper.state().expanded ).toBe( true );
 		wrapper.find( 'form' ).simulate( 'submit' );
-		expect( wrapper.state().expanded ).toBeFalsy();
+		expect( wrapper.state().expanded ).toBe( false );
 		wrapper.unmount();
 	} );
 } );
