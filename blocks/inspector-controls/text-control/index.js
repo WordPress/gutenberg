@@ -9,12 +9,12 @@ import { withInstanceId } from '@wordpress/components';
 import BaseControl from './../base-control';
 import './style.scss';
 
-function TextControl( { label, value, help, instanceId, onChange, type = 'text', ...props } ) {
+function TextControl( { label, value, help, helpText, instanceId, onChange, type = 'text', ...props } ) {
 	const id = 'inspector-text-control-' + instanceId;
 	const onChangeValue = ( event ) => onChange( event.target.value );
 
 	return (
-		<BaseControl label={ label } id={ id } help={ help }>
+		<BaseControl label={ label } id={ id } help={ help } helpText={ helpText }>
 			<input className="blocks-text-control__input"
 				type={ type }
 				id={ id }
@@ -23,6 +23,9 @@ function TextControl( { label, value, help, instanceId, onChange, type = 'text',
 				aria-describedby={ !! help ? id + '__help' : undefined }
 				{ ...props }
 			/>
+			{ helpText ? (
+				<p><em>{ helpText }</em></p>
+			) : '' }
 		</BaseControl>
 	);
 }
