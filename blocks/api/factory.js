@@ -22,6 +22,8 @@ import { __ } from '@wordpress/i18n';
  */
 import { getBlockType } from './registration';
 
+let counter = 0;
+
 /**
  * Returns a block object given its type and attributes.
  *
@@ -46,10 +48,13 @@ export function createBlock( name, blockAttributes = {} ) {
 		return result;
 	}, {} );
 
+	counter++;
+
 	// Blocks are stored with a unique ID, the assigned type name,
 	// and the block attributes.
 	return {
-		uid: uuid(),
+		// uid: uuid(),
+		uid: counter + '-block',
 		name,
 		isValid: true,
 		attributes,

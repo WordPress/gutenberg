@@ -331,11 +331,11 @@ export function isTyping( state = false, action ) {
  * @param  {Object} action Dispatched action
  * @return {Object}        Updated state
  */
-export function blockSelection( state = { current: null, selected: [ ], start: null, end: null, focus: null, isMultiSelecting: false }, action ) {
+export function blockSelection( state = { selected: [ ], start: null, end: null, focus: null, isMultiSelecting: false }, action ) {
+	console.log("switching", action.type, state);
 	switch ( action.type ) {
 		case 'CLEAR_SELECTED_BLOCK':
 			return {
-				current: null,
 				selected: [ ],
 				start: null,
 				end: null,
@@ -351,33 +351,27 @@ export function blockSelection( state = { current: null, selected: [ ], start: n
 			return {
 				...state,
 				isMultiSelecting: false,
-				focus: state.start === state.end ? state.focus : null,
+				focus: state.start && ! state.end ? state.focus : null,
 			};
 		case 'MULTI_SELECT':
 			return {
 				...state,
 				start: action.start,
 				end: action.end,
-				current: null,
 				focus: state.isMultiSelecting ? state.focus : null,
 			};
 		case 'SELECT_BLOCK':
-			if ( action.uid === state.current && ! state.start && ! state.end ) {
-				return state;
-			}
 			return {
 				...state,
 				selected: [ ],
-				current: action.uid,
-				start: null,
+				start: action.uid,
 				end: null,
 				focus: action.focus || {},
 			};
 		case 'UPDATE_FOCUS':
 			return {
 				...state,
-				start: null,
-				current: action.uid,
+				start: action.uid,
 				end: null,
 				focus: action.config || {},
 			};
@@ -385,7 +379,6 @@ export function blockSelection( state = { current: null, selected: [ ], start: n
 		case 'SET_SELECTION':
 			return {
 				...state,
-				current: null,
 				selected: action.selected,
 				start: action.start,
 				end: action.end,
@@ -393,8 +386,7 @@ export function blockSelection( state = { current: null, selected: [ ], start: n
 
 		case 'INSERT_BLOCKS':
 			return {
-				current: action.blocks[ 0 ].uid,
-				start: null,
+				start: action.blocks[ 0 ].uid,
 				end: null,
 				selected: [ ],
 				focus: {},
@@ -405,8 +397,7 @@ export function blockSelection( state = { current: null, selected: [ ], start: n
 				return state;
 			}
 			return {
-				current: action.blocks[ 0 ].uid,
-				start: null,
+				start: action.blocks[ 0 ].uid,
 				end: null,
 				selected: [ ],
 				focus: {},

@@ -240,7 +240,6 @@ class VisualEditorBlock extends Component {
 
 	onFocus( event ) {
 		// BUG: Cannot control click without a multi-selection, because this clobbers it.
-		console.log('focusing', this.props.isMultiSelected);
 		if ( event.target === this.node && ! this.props.isMultiSelected ) {
 			this.props.onSelect();
 		}

@@ -24,13 +24,15 @@ import { getBlock } from '../../selectors';
  */
 const { DOWN } = keycodes;
 
-function BlockSwitcher( { blocks, onTransform } ) {
+function BlockSwitcher( { blocks, onTransform, uids } ) {
 	if ( ! blocks || ! blocks[ 0 ] ) {
 		return null;
 	}
 
 	const isMultiBlock = blocks.length > 1;
 	const sourceBlockName = blocks[ 0 ].name;
+
+	console.log('blocks', blocks, uids);
 
 	if ( isMultiBlock && ! every( blocks, ( block ) => ( block.name === sourceBlockName ) ) ) {
 		return null;

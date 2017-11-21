@@ -160,12 +160,14 @@ class VisualEditorBlockList extends Component {
 		const { selectionAtStart } = this;
 		const isAtStart = selectionAtStart === uid;
 
+		console.log('start', selectionStart, 'end', selectionEnd, ' selectionAtStart', selectionAtStart );
+
 		if ( ! selectionAtStart ) {
 			return;
 		}
 
 		if ( isAtStart && selectionStart ) {
-			onMultiSelect( null, null );
+			onMultiSelect( uid, null );
 		}
 
 		if ( ! isAtStart && selectionEnd !== uid ) {

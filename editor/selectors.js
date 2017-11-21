@@ -516,17 +516,26 @@ export function getSelectedBlockCount( state ) {
  * @param  {Object}  state Global application state
  * @return {?Object}       Selected block
  */
-export function getSelectedBlock( state ) {
-	const { current } = state.blockSelection;
-	if ( ! current ) {
-		return null;
-	}
+export const getSelectedBlock = createSelector(
+	( state ) => {
+		const { start, end } = state.blockSelection;
+		if ( start && ! end ) {
+			return getBlock( state, start );
+		}
 
-	return getBlock( state, current );
-}
+		return null;
+	},
+	( state ) => [
+		state.blockSelection.start,
+		state.blockSelection.end,
+	]
+);
 
 export function getBlocksInRange( blockOrder, start, end ) {
-	if ( ! start || ! end ) return [ ];
+	if ( ! start || ! end ) {
+		return [ ];
+	}
+
 	const startIndex = blockOrder.indexOf( start );
 	const endIndex = blockOrder.indexOf( end );
 
@@ -541,29 +550,28 @@ function sortByOrder( blockOrder ) {
 	return ( a, b ) => blockOrder.indexOf( a ) < blockOrder.indexOf( b );
 }
 
-export const getCurrentBlock = createSelector(
-	( state ) => state.blockSelection.current,
+export const hasMultiSelection = createSelector(
+	( state ) => {
+		const { end, selected } = state.blockSelection;
+		return selected.length > 0 || !! end;
+	},
 	( state ) => [
-		state.blockSelection.current,
+		state.blockSelection.selected,
+		state.blockSelection.start,
+		state.blockSelection.end,
 	]
-);
+)
 
 export const getAllSelectedBlockUids = createSelector(
 	( state ) => {
-		const { current } = state.blockSelection;
-
-		if ( current ) {
-			return [ current ];
-		}
-
-		return getMultiSelectedBlockUids( state );
+		const single = getSelectedBlock( state );
+		return single ? [ single.uid ] : getMultiSelectedBlockUids( state );
 	},
 	( state ) => [
 		state.editor.present.blockOrder,
 		state.blockSelection.start,
 		state.blockSelection.end,
 		state.blockSelection.selected,
-		state.blockSelection.current,
 	],
 );
 
@@ -576,15 +584,15 @@ export const getAllSelectedBlockUids = createSelector(
  */
 export const getMultiSelectedBlockUids = createSelector(
 	( state ) => {
-		const { blockOrder } = state.editor.present;
-		const { start, end, selected, current } = state.blockSelection;
-
-		if ( current ) {
+		const single = getSelectedBlock( state );
+		if ( single ) {
 			return [ ];
 		}
 
+		const { blockOrder } = state.editor.present;
+		const { start, end, selected } = state.blockSelection;
+
 		const ranged = start && start === end ? [ start ] : getBlocksInRange( blockOrder, start, end );
-		console.log( 'ranged', ranged, 'from state', state.blockSelection );
 		return selected.concat( ranged ).sort( sortByOrder( blockOrder ) );
 	},
 	( state ) => [
@@ -592,7 +600,6 @@ export const getMultiSelectedBlockUids = createSelector(
 		state.blockSelection.start,
 		state.blockSelection.end,
 		state.blockSelection.selected,
-		state.blockSelection.current,
 	],
 );
 
@@ -675,8 +682,8 @@ export function isBlockMultiSelected( state, uid ) {
  * @return {?String}       Unique ID of block beginning multi-selection
  */
 export function getMultiSelectedBlocksStartUid( state ) {
-	const { start, current } = state.blockSelection;
-	return start || current;
+	const { start } = state.blockSelection;
+	return start;
 }
 
 /**
@@ -690,10 +697,7 @@ export function getMultiSelectedBlocksStartUid( state ) {
  * @return {?String}       Unique ID of block ending multi-selection
  */
 export function getMultiSelectedBlocksEndUid( state ) {
-	const { start, end, current } = state.blockSelection;
-	if ( ! end ) {
-		return start || current;
-	}
+	const { end } = state.blockSelection;
 	return end;
 }
 
@@ -779,9 +783,8 @@ export function getNextBlock( state, uid ) {
  * @return {Boolean}      Whether block is selected and multi-selection exists
  */
 export function isBlockSelected( state, uid ) {
-	const { current } = state.blockSelection;
-
-	return current === uid;
+	const single = getSelectedBlock( state );
+	return single && single.uid === uid;
 }
 
 /**
@@ -826,12 +829,7 @@ export function isBlockHovered( state, uid ) {
  * @return {Object}       Block focus state
  */
 export function getBlockFocus( state, uid ) {
-	// If there is multi-selection, keep returning the focus object for the start block.
-	if ( ! isBlockSelected( state, uid ) && state.blockSelection.start !== uid ) {
-		return null;
-	}
-
-	return state.blockSelection.focus;
+	return isBlockSelected( state, uid ) ? state.blockSelection.focus : null;
 }
 
 /**

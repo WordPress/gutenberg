@@ -113,11 +113,7 @@ class WritingFlow extends Component {
 
 	onKeyDown( event ) {
 		const { selectedBlock, selectionStart, selectionEnd, blocks, hasMultiSelection } = this.props;
-
-		if ( selectedBlock === null && ! hasMultiSelection ) {
-			console.error('selectedBlock is null');
-			return;
-		}
+		console.log( 'selectedBlock', selectedBlock, this.props.stateDump );
 
 		const { keyCode, target } = event;
 		const isUp = keyCode === UP;
@@ -186,6 +182,7 @@ export default connect(
 		selectionEnd: getMultiSelectedBlocksEndUid( state ),
 		hasMultiSelection: getMultiSelectedBlocks( state ).length > 0,
 		selectedBlock: getSelectedBlock( state ),
+		stateDump: state,
 	} ),
 	( dispatch ) => ( {
 		onMultiSelect( start, end ) {
