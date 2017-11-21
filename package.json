@@ -29,7 +29,7 @@
     "moment-timezone": "0.5.13",
     "mousetrap": "1.6.1",
     "prop-types": "15.5.10",
-    "re-resizable": "4.0.2",
+    "re-resizable": "4.0.3",
     "react": "16.0.0",
     "react-autosize-textarea": "0.4.8",
     "react-click-outside": "2.3.1",
