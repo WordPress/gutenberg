@@ -331,10 +331,11 @@ export function isTyping( state = false, action ) {
  * @param  {Object} action Dispatched action
  * @return {Object}        Updated state
  */
-export function blockSelection( state = { selected: [ ], start: null, end: null, focus: null, isMultiSelecting: false }, action ) {
+export function blockSelection( state = { current: null, selected: [ ], start: null, end: null, focus: null, isMultiSelecting: false }, action ) {
 	switch ( action.type ) {
 		case 'CLEAR_SELECTED_BLOCK':
 			return {
+				current: null,
 				selected: [ ],
 				start: null,
 				end: null,
@@ -357,31 +358,44 @@ export function blockSelection( state = { selected: [ ], start: null, end: null,
 				...state,
 				start: action.start,
 				end: action.end,
+				current: null,
 				focus: state.isMultiSelecting ? state.focus : null,
 			};
 		case 'SELECT_BLOCK':
-			if ( action.uid === state.start && action.uid === state.end ) {
+			if ( action.uid === state.current ) {
 				return state;
 			}
 			return {
 				...state,
 				selected: [ ],
-				start: action.uid,
-				end: action.uid,
+				current: action.uid,
+				start: null,
+				end: null,
 				focus: action.focus || {},
 			};
 		case 'UPDATE_FOCUS':
 			return {
 				...state,
-				selected: [ ],
-				start: action.uid,
-				end: action.uid,
+				start: null,
+				current: action.uid,
+				end: null,
 				focus: action.config || {},
 			};
+
+		case 'SET_SELECTION':
+			return {
+				...state,
+				current: null,
+				selected: action.selected,
+				start: action.start,
+				end: action.end,
+			};
+
 		case 'INSERT_BLOCKS':
 			return {
-				start: action.blocks[ 0 ].uid,
-				end: action.blocks[ 0 ].uid,
+				current: action.blocks[ 0 ].uid,
+				start: null,
+				end: null,
 				selected: [ ],
 				focus: {},
 				isMultiSelecting: false,
@@ -391,8 +405,9 @@ export function blockSelection( state = { selected: [ ], start: null, end: null,
 				return state;
 			}
 			return {
-				start: action.blocks[ 0 ].uid,
-				end: action.blocks[ 0 ].uid,
+				current: action.blocks[ 0 ].uid,
+				start: null,
+				end: null,
 				selected: [ ],
 				focus: {},
 				isMultiSelecting: false,

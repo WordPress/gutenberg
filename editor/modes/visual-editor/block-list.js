@@ -36,7 +36,7 @@ import {
 	getMultiSelectedBlockUids,
 	getSelectedBlock,
 } from '../../selectors';
-import { insertBlock, startMultiSelect, stopMultiSelect, multiSelect, selectBlock } from '../../actions';
+import { insertBlock, startMultiSelect, stopMultiSelect, multiSelect, spawnSelection, selectBlock } from '../../actions';
 
 class VisualEditorBlockList extends Component {
 	constructor( props ) {
@@ -45,6 +45,7 @@ class VisualEditorBlockList extends Component {
 		this.onSelectionStart = this.onSelectionStart.bind( this );
 		this.onSelectionEnd = this.onSelectionEnd.bind( this );
 		this.onShiftSelection = this.onShiftSelection.bind( this );
+		this.onMetaSelection = this.onMetaSelection.bind( this );
 		this.onCopy = this.onCopy.bind( this );
 		this.onCut = this.onCut.bind( this );
 		this.setBlockRef = this.setBlockRef.bind( this );
@@ -199,6 +200,11 @@ class VisualEditorBlockList extends Component {
 		}
 	}
 
+	onMetaSelection( uid ) {
+		const { onSpawnSelection } = this.props;
+		onSpawnSelection( uid );
+	}
+
 	appendDefaultBlock() {
 		const newBlock = createBlock( getDefaultBlockName() );
 		this.props.onInsertBlock( newBlock );
@@ -217,6 +223,7 @@ class VisualEditorBlockList extends Component {
 						blockRef={ this.setBlockRef }
 						onSelectionStart={ this.onSelectionStart }
 						onShiftSelection={ this.onShiftSelection }
+						onMetaSelection={ this.onMetaSelection }
 					/>,
 					<VisualEditorSiblingInserter
 						key={ 'sibling-inserter-' + uid }
@@ -268,6 +275,9 @@ export default connect(
 		},
 		onRemove( uids ) {
 			dispatch( { type: 'REMOVE_BLOCKS', uids } );
+		},
+		onSpawnSelection( uid ) {
+			dispatch( spawnSelection( uid ) );
 		},
 	} )
 )( VisualEditorBlockList );

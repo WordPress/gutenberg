@@ -128,6 +128,22 @@ export function multiSelect( start, end ) {
 	};
 }
 
+export function setSelection( start, end, selected ) {
+	return {
+		type: 'SET_SELECTION',
+		start,
+		end,
+		selected,
+	};
+}
+
+export function spawnSelection( uid ) {
+	return {
+		type: 'SPAWN_SELECTION',
+		uid,
+	};
+}
+
 export function clearSelectedBlock() {
 	return {
 		type: 'CLEAR_SELECTED_BLOCK',

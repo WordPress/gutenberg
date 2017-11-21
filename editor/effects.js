@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, uniqueId, map, filter, some } from 'lodash';
+import { get, uniqueId, map, filter, remove, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,6 +15,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { getPostEditUrl, getWPAdminURL } from './utils/url';
 import {
+	setSelection,
 	resetPost,
 	setupNewPost,
 	resetBlocks,
@@ -32,6 +33,7 @@ import {
 	getCurrentPostType,
 	getDirtyMetaBoxes,
 	getEditedPostContent,
+	getAllSelectedBlockUids,
 	getPostEdits,
 	isCurrentPostPublished,
 	isEditedPostDirty,
@@ -297,5 +299,17 @@ export default {
 		if ( unloadedMetaboxes.length === 1 && unloadedMetaboxes[ 0 ].key === action.location ) {
 			jQuery.holdReady( false );
 		}
+	},
+
+	SPAWN_SELECTION( action, store ) {
+		const { getState, dispatch } = store;
+		console.log( 'spawn.state.lookup.pre', getState().blockSelection );
+		// Take everything that is currently in the start->end range, and put it in selected
+		const selectedUids = getAllSelectedBlockUids( getState() );
+		console.log( 'spawn.state.lookup.post', selectedUids );
+		const filteredUids = filter( selectedUids, ( uid ) => action.uid !== uid );
+		console.log('spawning.initial', getState().blockSelection );
+		dispatch( setSelection( action.uid, action.uid, filteredUids ) );
+		console.log('spawning.result', getState( ).blockSelection );
 	},
 };

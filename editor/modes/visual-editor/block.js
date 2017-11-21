@@ -255,6 +255,11 @@ class VisualEditorBlock extends Component {
 				this.props.onShiftSelection( this.props.uid );
 				event.preventDefault();
 			}
+		} else if ( event.ctrlKey ) {
+			// Generalise for Mac as well.
+			this.props.onMetaSelection( this.props.uid );
+			event.preventDefault();
+			console.log(' stopping Ctrl+shift');
 		} else {
 			this.props.onSelectionStart( this.props.uid );
 			this.props.onSelect();
@@ -468,7 +473,7 @@ export default connect(
 		},
 
 		onFocus( ...args ) {
-			dispatch( focusBlock( ...args ) );
+			// dispatch( focusBlock( ...args ) );
 		},
 
 		onRemove( uid ) {
