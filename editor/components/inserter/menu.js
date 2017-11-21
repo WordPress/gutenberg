@@ -298,15 +298,14 @@ export class InserterMenu extends Component {
 						] }
 					>
 						{ ( tabKey ) => (
-							<div ref={ ( ref ) => this.tabContainer = ref }
-								className="editor-inserter__content">
+							<div ref={ ( ref ) => this.tabContainer = ref }>
 								{ this.renderTabView( tabKey ) }
 							</div>
 						) }
 					</TabPanel>
 				}
 				{ isSearching &&
-					<div role="menu" className="editor-inserter__content">
+					<div role="menu" className="editor-inserter__search-results">
 						{ this.renderCategories( this.getVisibleBlocksByCategory( getBlockTypes() ) ) }
 					</div>
 				}
