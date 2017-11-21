@@ -59,10 +59,10 @@ export function getSaveContent( blockType, attributes ) {
 
 		return cloneElement( element, props );
 	};
-	const contentWithClassName = Children.map( saveContent, addExtraContainerProps );
+	const contentWithExtraProps = Children.map( saveContent, addExtraContainerProps );
 
 	// Otherwise, infer as element
-	return renderToString( contentWithClassName );
+	return renderToString( contentWithExtraProps );
 }
 
 /**
