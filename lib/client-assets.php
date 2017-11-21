@@ -767,9 +767,19 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		$color_palette = $gutenberg_theme_support[0]['colors'];
 	}
 
+	/**
+	 * Filters the allowed block types for the editor, defaulting to true (all
+	 * block types supported).
+	 *
+	 * @param bool|array $allowed_block_types Array of block type slugs, or
+	 *                                        boolean to enable/disable all.
+	 */
+	$allowed_block_types = apply_filters( 'allowed_block_types', true );
+
 	$editor_settings = array(
 		'wideImages' => ! empty( $gutenberg_theme_support[0]['wide-images'] ),
 		'colors'     => $color_palette,
+		'blockTypes' => $allowed_block_types,
 	);
 
 	wp_add_inline_script( 'wp-editor', 'wp.api.init().done( function() {'
