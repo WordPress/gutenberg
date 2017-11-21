@@ -8,3 +8,5 @@ A list of meetups about Gutenberg so far:
 - https://wpleeds.co.uk/events/plugins-gutenberg-wordpress-leeds-july-2017/
 - https://www.meetup.com/WordPress-Melbourne/events/241543639/
 - https://wpmeetups.de/termin/29-wp-meetup-stuttgart-gutenberg-editor-rueckblick-wordcamp-europe/
+- https://www.meetup.com/Big-Media-Enterprise-WordPress-London-Meetup/events/243302081/
+- https://www.meetup.com/Tuscaloosa-WordPress-Meetup/events/244584939/
