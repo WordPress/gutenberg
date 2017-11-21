@@ -73,6 +73,12 @@ function gutenberg_get_script_polyfill( $tests ) {
  * @since 0.1.0
  */
 function gutenberg_register_scripts_and_styles() {
+	// We need to return early when this GET variable is set. This happens when the editor loads the metaboxes and for
+	// this case we don't need to register scripts and styles.
+	if ( isset( $_GET['classic-editor'] ) ) {
+		return false;
+	}
+
 	gutenberg_register_vendor_scripts();
 
 	// Editor Scripts.
