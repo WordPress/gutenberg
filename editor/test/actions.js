@@ -15,6 +15,7 @@ import {
 	saveReusableBlock,
 	convertBlockToStatic,
 	convertBlockToReusable,
+	toggleSelection,
 } from '../actions';
 
 describe( 'actions', () => {
@@ -161,6 +162,29 @@ describe( 'actions', () => {
 		expect( convertBlockToReusable( uid ) ).toEqual( {
 			type: 'CONVERT_BLOCK_TO_REUSABLE',
 			uid,
+		} );
+	} );
+
+	describe( 'toggleSelection', () => {
+		it( 'should return the TOGGLE_SELECTION action with default value for isSelectionEnabled = true', () => {
+			expect( toggleSelection() ).toEqual( {
+				type: 'TOGGLE_SELECTION',
+				isSelectionEnabled: true,
+			} );
+		} );
+
+		it( 'should return the TOGGLE_SELECTION action with isSelectionEnabled = true as passed in the argument', () => {
+			expect( toggleSelection( true ) ).toEqual( {
+				type: 'TOGGLE_SELECTION',
+				isSelectionEnabled: true,
+			} );
+		} );
+
+		it( 'should return the TOGGLE_SELECTION action with isSelectionEnabled = false as passed in the argument', () => {
+			expect( toggleSelection( false ) ).toEqual( {
+				type: 'TOGGLE_SELECTION',
+				isSelectionEnabled: false,
+			} );
 		} );
 	} );
 } );

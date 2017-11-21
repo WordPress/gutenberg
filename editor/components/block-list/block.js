@@ -38,6 +38,7 @@ import {
 	startTyping,
 	stopTyping,
 	updateBlockAttributes,
+	toggleSelection,
 } from '../../actions';
 import {
 	getBlock,
@@ -51,6 +52,7 @@ import {
 	isBlockMultiSelected,
 	isBlockSelected,
 	isFirstMultiSelectedBlock,
+	isSelectionEnabled,
 	isTyping,
 	getBlockMode,
 } from '../../selectors';
@@ -414,6 +416,8 @@ class BlockListBlock extends Component {
 								mergeBlocks={ this.mergeBlocks }
 								className={ className }
 								id={ block.uid }
+								isSelectionEnabled={ this.props.isSelectionEnabled }
+								toggleSelection={ this.props.toggleSelection }
 							/>
 						) }
 						{ isValid && mode === 'html' && (
@@ -452,6 +456,7 @@ const mapStateToProps = ( state, { uid } ) => ( {
 	order: getBlockIndex( state, uid ),
 	meta: getEditedPostAttribute( state, 'meta' ),
 	mode: getBlockMode( state, uid ),
+	isSelectionEnabled: isSelectionEnabled( state ),
 } );
 
 const mapDispatchToProps = ( dispatch, ownProps ) => ( {
@@ -511,6 +516,9 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 
 	onMetaChange( meta ) {
 		dispatch( editPost( { meta } ) );
+	},
+	toggleSelection( selectionEnabled ) {
+		dispatch( toggleSelection( selectionEnabled ) );
 	},
 } );
 
