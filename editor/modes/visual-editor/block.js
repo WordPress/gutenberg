@@ -50,6 +50,7 @@ import {
 	isBlockMultiSelected,
 	isBlockSelected,
 	isFirstMultiSelectedBlock,
+	getMultiSelectedBlocksStartUid,
 	isTyping,
 	getBlockMode,
 } from '../../selectors';
@@ -238,7 +239,9 @@ class VisualEditorBlock extends Component {
 	}
 
 	onFocus( event ) {
-		if ( event.target === this.node ) {
+		// BUG: Cannot control click without a multi-selection, because this clobbers it.
+		console.log('focusing', this.props.isMultiSelected);
+		if ( event.target === this.node && ! this.props.isMultiSelected ) {
 			this.props.onSelect();
 		}
 	}
@@ -259,7 +262,6 @@ class VisualEditorBlock extends Component {
 			// Generalise for Mac as well.
 			this.props.onMetaSelection( this.props.uid );
 			event.preventDefault();
-			console.log(' stopping Ctrl+shift');
 		} else {
 			this.props.onSelectionStart( this.props.uid );
 			this.props.onSelect();
@@ -382,7 +384,7 @@ class VisualEditorBlock extends Component {
 						{ isValid && mode === 'visual' && (
 							<BlockEdit
 								name={ blockName }
-								focus={ focus }
+								focus={ isMultiSelected ? null : focus }
 								attributes={ block.attributes }
 								setAttributes={ this.setAttributes }
 								insertBlocksAfter={ this.insertBlocksAfter }
@@ -423,6 +425,7 @@ export default connect(
 			nextBlock: getNextBlock( state, ownProps.uid ),
 			block: getBlock( state, ownProps.uid ),
 			isSelected: isBlockSelected( state, ownProps.uid ),
+			multiSelectStartUid: getMultiSelectedBlocksStartUid( state ),
 			isMultiSelected: isBlockMultiSelected( state, ownProps.uid ),
 			isFirstMultiSelected: isFirstMultiSelectedBlock( state, ownProps.uid ),
 			isHovered: isBlockHovered( state, ownProps.uid ) && ! isMultiSelecting( state ),
@@ -473,7 +476,7 @@ export default connect(
 		},
 
 		onFocus( ...args ) {
-			// dispatch( focusBlock( ...args ) );
+			dispatch( focusBlock( ...args ) );
 		},
 
 		onRemove( uid ) {

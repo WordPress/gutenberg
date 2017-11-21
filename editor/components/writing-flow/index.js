@@ -114,6 +114,11 @@ class WritingFlow extends Component {
 	onKeyDown( event ) {
 		const { selectedBlock, selectionStart, selectionEnd, blocks, hasMultiSelection } = this.props;
 
+		if ( selectedBlock === null && ! hasMultiSelection ) {
+			console.error('selectedBlock is null');
+			return;
+		}
+
 		const { keyCode, target } = event;
 		const isUp = keyCode === UP;
 		const isDown = keyCode === DOWN;
@@ -141,6 +146,9 @@ class WritingFlow extends Component {
 			// Shift key is down, but no existing block selection
 			event.preventDefault();
 			this.expandSelection( blocks, selectedBlock.uid, selectedBlock.uid, isReverse ? -1 : +1 );
+		} else if ( isNav && ! isShift && hasMultiSelection ) {
+			this.props.selectBlock( selectionEnd );
+
 		} else if ( isVertical && isVerticalEdge( target, isReverse, isShift ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
 			placeCaretAtVerticalEdge( closestTabbable, isReverse, this.verticalRect );
@@ -149,10 +157,6 @@ class WritingFlow extends Component {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
 			placeCaretAtHorizontalEdge( closestTabbable, isReverse );
 			event.preventDefault();
-		}
-
-		if ( ! isShift && isNav && hasMultiSelection ) {
-			this.props.onMultiSelect( null, null );
 		}
 	}
 

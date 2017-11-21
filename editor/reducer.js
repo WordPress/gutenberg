@@ -362,7 +362,7 @@ export function blockSelection( state = { current: null, selected: [ ], start: n
 				focus: state.isMultiSelecting ? state.focus : null,
 			};
 		case 'SELECT_BLOCK':
-			if ( action.uid === state.current ) {
+			if ( action.uid === state.current && ! state.start && ! state.end ) {
 				return state;
 			}
 			return {

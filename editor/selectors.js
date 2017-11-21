@@ -676,11 +676,7 @@ export function isBlockMultiSelected( state, uid ) {
  */
 export function getMultiSelectedBlocksStartUid( state ) {
 	const { start, current } = state.blockSelection;
-	if ( ! start ) {
-		return current;
-	}
-
-	return start || null;
+	return start || current;
 }
 
 /**
