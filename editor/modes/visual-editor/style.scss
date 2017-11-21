@@ -40,11 +40,8 @@
 }
 
 .editor-visual-editor .editor-inserter {
-	margin: $item-spacing;
-
 	.editor-inserter__toggle {
 		color: $dark-gray-300;
-		margin: 4px 0 0 -4px;	// align better with text blocks
 	}
 
 	.editor-inserter__toggle.components-icon-button:not(:disabled):hover {
@@ -76,9 +73,11 @@
 	margin: 0 auto;
 	clear: both;
 
-	padding: 0;
-	@include break-small() {
-		padding: 0 ( $block-mover-padding-visible );
+	padding: $block-padding;
+	padding-left: $block-padding - 8px; // Offset by left button's own padding
+	@include break-small {
+		padding: $block-padding ( $block-padding + $block-mover-padding-visible );
+		padding-left: $block-padding + $block-mover-padding-visible - 8px;
 	}
 
 	> .editor-inserter__block {
