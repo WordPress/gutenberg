@@ -5,10 +5,9 @@
  */
 import { mediaUpload } from '../mediaupload';
 
-// mediaUpload is passed the setAttributes function
-// so we can stub that out have it pass the data to
-// console.error to check if proper thing is called
-const setAttributesStub = ( obj ) => console.error( obj );
+jest.mock( '../object', () => ( {
+	createObjectUrl: () => { },
+} ) );
 
 const invalidMediaObj = {
 	url: 'https://cldup.com/uuUqE_dXzy.jpg',
@@ -28,13 +27,27 @@ describe( 'mediaUpload', () => {
 		window.getUserSetting = originalGetUserSetting;
 	} );
 
-	it( 'should do nothing on no files', () => {
-		mediaUpload( [ ], setAttributesStub );
-		expect( console.error ).not.toHaveBeenCalled();
+	it( 'should do nothing on no files', done => {
+		const tempImageCallback = jest.fn();
+		const uploadedImageCallback = jest.fn();
+
+		mediaUpload( [ ], tempImageCallback, uploadedImageCallback, () => {
+			expect( tempImageCallback.mock.calls.length ).toBe( 1 );
+			expect( tempImageCallback.mock.calls[ 0 ][ 0 ] ).toEqual( [] );
+			expect( uploadedImageCallback.mock.calls.length ).toBe( 0 );
+			done();
+		} );
 	} );
 
-	it( 'should do nothing on invalid image type', () => {
-		mediaUpload( [ invalidMediaObj ], setAttributesStub );
-		expect( console.error ).not.toHaveBeenCalled();
+	it( 'should do nothing on invalid image type', done => {
+		const tempImageCallback = jest.fn();
+		const uploadedImageCallback = jest.fn();
+
+		mediaUpload( [ invalidMediaObj ], tempImageCallback, uploadedImageCallback, () => {
+			expect( tempImageCallback.mock.calls.length ).toBe( 1 );
+			expect( tempImageCallback.mock.calls[ 0 ][ 0 ] ).toEqual( [] );
+			expect( uploadedImageCallback.mock.calls.length ).toBe( 0 );
+			done();
+		} );
 	} );
 } );
