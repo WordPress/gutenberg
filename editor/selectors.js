@@ -827,6 +827,16 @@ export function isMultiSelecting( state ) {
 }
 
 /**
+ * Whether is selection disable or not.
+ *
+ * @param  {Object} state Global application state
+ * @return {Boolean}      True if multi is disable, false if not.
+ */
+export function isSelectionEnabled( state ) {
+	return state.blockSelection.isEnabled;
+}
+
+/**
  * Returns thee block's editing mode
  *
  * @param  {Object} state Global application state
