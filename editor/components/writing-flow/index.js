@@ -27,7 +27,7 @@ import {
 	getMultiSelectedBlocks,
 	getSelectedBlock,
 } from '../../selectors';
-import { multiSelect } from '../../actions';
+import { multiSelect, selectBlock } from '../../actions';
 
 /**
  * Module Constants
@@ -150,6 +150,10 @@ class WritingFlow extends Component {
 			placeCaretAtHorizontalEdge( closestTabbable, isReverse );
 			event.preventDefault();
 		}
+
+		if ( ! isShift && isNav && hasMultiSelection ) {
+			this.props.onMultiSelect( null, null );
+		}
 	}
 
 	render() {
@@ -176,12 +180,15 @@ export default connect(
 		blocks: getBlockUids( state ),
 		selectionStart: getMultiSelectedBlocksStartUid( state ),
 		selectionEnd: getMultiSelectedBlocksEndUid( state ),
-		hasMultiSelection: getMultiSelectedBlocks( state ).length > 1,
+		hasMultiSelection: getMultiSelectedBlocks( state ).length > 0,
 		selectedBlock: getSelectedBlock( state ),
 	} ),
 	( dispatch ) => ( {
 		onMultiSelect( start, end ) {
 			dispatch( multiSelect( start, end ) );
+		},
+		selectBlock( uid ) {
+			dispatch( selectBlock( uid ) );
 		},
 	} )
 )( WritingFlow );

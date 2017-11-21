@@ -517,8 +517,8 @@ export function getSelectedBlockCount( state ) {
  * @return {?Object}       Selected block
  */
 export function getSelectedBlock( state ) {
-	const { current, start, end, selected } = state.blockSelection;
-	if ( start !== end || selected.length > 0 || ! current ) {
+	const { current } = state.blockSelection;
+	if ( ! current ) {
 		return null;
 	}
 
