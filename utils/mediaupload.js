@@ -1,7 +1,7 @@
 import { flowRight } from 'lodash';
 
 import { attachCallbacks, fromJqueryPromise } from './promise';
-import { createObjectUrl } from './object';
+import { createObjectUrl } from './url';
 
 export function mediaUpload( filesList, tempImageCallback, uploadedImageCallback, completedCallback ) {
 	// Cast filesList to array

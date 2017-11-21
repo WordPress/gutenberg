@@ -5,7 +5,7 @@
  */
 import { mediaUpload } from '../mediaupload';
 
-jest.mock( '../object', () => ( {
+jest.mock( '../url', () => ( {
 	createObjectUrl: () => { },
 } ) );
 
