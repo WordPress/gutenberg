@@ -16,8 +16,8 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import BlockMover from '../../components/block-mover';
-import BlockSettingsMenu from '../../components/block-settings-menu';
+import BlockMover from '../block-mover';
+import BlockSettingsMenu from '../block-settings-menu';
 import InvalidBlockWarning from './invalid-block-warning';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
@@ -56,7 +56,31 @@ import {
 
 const { BACKSPACE, ESCAPE, DELETE, ENTER, UP, RIGHT, DOWN, LEFT } = keycodes;
 
-class VisualEditorBlock extends Component {
+/**
+ * Given a DOM node, finds the closest scrollable container node.
+ *
+ * @param  {Element}  node Node from which to start
+ * @return {?Element}      Scrollable container node, if found
+ */
+function getScrollContainer( node ) {
+	if ( ! node ) {
+		return;
+	}
+
+	// Scrollable if scrollable height exceeds displayed...
+	if ( node.scrollHeight > node.clientHeight ) {
+		// ...except when overflow is defined to be hidden or visible
+		const { overflowY } = window.getComputedStyle( node );
+		if ( /(auto|scroll)/.test( overflowY ) ) {
+			return node;
+		}
+	}
+
+	// Continue traversing
+	return getScrollContainer( node.parentNode );
+}
+
+class BlockListBlock extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -91,9 +115,6 @@ class VisualEditorBlock extends Component {
 		if ( this.props.isTyping ) {
 			document.addEventListener( 'mousemove', this.stopTypingOnMouseMove );
 		}
-
-		// Not Ideal, but it's the easiest way to get the scrollable container
-		this.editorLayout = document.querySelector( '.editor-layout__content' );
 	}
 
 	componentWillReceiveProps( newProps ) {
@@ -109,9 +130,13 @@ class VisualEditorBlock extends Component {
 	componentDidUpdate( prevProps ) {
 		// Preserve scroll prosition when block rearranged
 		if ( this.previousOffset ) {
-			this.editorLayout.scrollTop = this.editorLayout.scrollTop +
-				this.node.getBoundingClientRect().top -
-				this.previousOffset;
+			const scrollContainer = getScrollContainer( this.node );
+			if ( scrollContainer ) {
+				scrollContainer.scrollTop = scrollContainer.scrollTop +
+					this.node.getBoundingClientRect().top -
+					this.previousOffset;
+			}
+
 			this.previousOffset = null;
 		}
 
@@ -324,7 +349,7 @@ class VisualEditorBlock extends Component {
 		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected, focus } = this.props;
 		const showUI = isSelected && ( ! this.props.isTyping || ( focus && focus.collapsed === false ) );
 		const { error } = this.state;
-		const wrapperClassName = classnames( 'editor-visual-editor__block', {
+		const wrapperClassName = classnames( 'editor-block-list__block', {
 			'has-warning': ! isValid || !! error,
 			'is-selected': showUI,
 			'is-multi-selected': isMultiSelected,
@@ -369,7 +394,7 @@ class VisualEditorBlock extends Component {
 					onMouseDown={ this.onPointerDown }
 					onKeyDown={ this.onKeyDown }
 					onFocus={ this.onFocus }
-					className="editor-visual-editor__block-edit"
+					className="editor-block-list__block-edit"
 					tabIndex="0"
 					aria-label={ blockLabel }
 				>
@@ -487,4 +512,4 @@ export default connect(
 			dispatch( editPost( { meta } ) );
 		},
 	} )
-)( VisualEditorBlock );
+)( BlockListBlock );
