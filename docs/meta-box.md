@@ -5,6 +5,38 @@ the superior developer and user experience of blocks however, especially once,
 block templates are available, **converting PHP meta boxes to blocks is highly
 encouraged!**
 
+### Testing, Converting, and Maintaining Existing Meta Boxes
+
+Before converting meta boxes to blocks, it may be  easier to test if a meta box works with Gutenberg, and explicitly mark it as such.
+
+If a meta box *doesn't* work with in Gutenberg, and updating it to work correctly is not an option, the next step is to add the `__block_editor_compatible_meta_box` argument to the meta box declaration:
+
+```php
+add_meta_box( 'my-meta-box', 'My Meta Box', 'my_meta_box_callback',
+    null, 'normal', 'high',
+	array(
+		'__block_editor_compatible_meta_box' => false,
+	)
+);
+```
+
+This will cause WordPress to fall back to the Classic editor, where the meta box will continue working as before.
+
+Explicitly setting `__block_editor_compatible_meta_box` to `true` will cause WordPress to stay in Gutenberg (assuming another meta box doesn't cause a fallback, of course).
+
+After a meta box is converted to a block, it can be declared as existing for backwards compatibility:
+
+```php
+add_meta_box( 'my-meta-box', 'My Meta Box', 'my_meta_box_callback',
+    null, 'normal', 'high',
+	array(
+		'__back_compat_meta_box' => false,
+	)
+);
+```
+
+When Gutenberg is run, this meta box will no longer be displayed in the meta box area, as it now only exists for backwards compatibility purposes. It will continue to be displayed correctly in the Classic editor, should some other meta box cause a fallback.
+
 ### Meta Box Data Collection
 
 On each Gutenberg page load, the global state of post.php is mimicked, this is
@@ -22,7 +54,9 @@ namely `add_meta_boxes`, `add_meta_boxes_{$post->post_type}`, and `do_meta_boxes
 
 A copy of the global `$wp_meta_boxes` is made then filtered through
 `apply_filters( 'filter_gutenberg_meta_boxes', $_meta_boxes_copy );`, which will
-strip out any core meta boxes along with standard custom taxonomy meta boxes.
+strip out any core meta boxes, standard custom taxonomy meta boxes, and any meta
+boxes that have declared themselves as only existing for backwards compatibility
+purposes.
 
 Then each location for this particular type of meta box is checked for whether it
 is active. If it is not empty a value of true is stored, if it is empty a value
@@ -36,7 +70,7 @@ have to do, unless we want to move `createEditorInstance()` to fire in the foote
 or at some point after `admin_head`. With recent changes to editor bootstrapping
 this might now be possible. Test with ACF to make sure.
 
-### Redux and React Meta Box Management.
+### Redux and React Meta Box Management
 
 *The Redux store by default will hold all meta boxes as inactive*. When
 `INITIALIZE_META_BOX_STATE` comes in, the store will update any active meta box
