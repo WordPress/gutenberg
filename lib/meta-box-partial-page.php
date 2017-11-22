@@ -516,7 +516,7 @@ function gutenberg_filter_meta_boxes( $meta_boxes ) {
 						unset( $meta_boxes[ $page ][ $context ][ $priority ][ $name ] );
 					}
 					// Filter out meta boxes that are just registered for back compat.
-					if ( is_array( $data['args'] ) && isset( $data['args']['__back_compat_meta_box'] ) ) {
+					if ( isset( $data['args']['__back_compat_meta_box'] ) && $data['args']['__back_compat_meta_box'] ) {
 						unset( $meta_boxes[ $page ][ $context ][ $priority ][ $name ] );
 					}
 				}
