@@ -31,7 +31,7 @@ function FeatureToggle( { onToggle, active } ) {
 
 export default connect(
 	( state ) => ( {
-		active: isFeatureActive( state, 'fixedToolbar' ),
+		active: !isFeatureActive( state, 'fixedToolbar' ),
 	} ),
 	( dispatch, ownProps ) => ( {
 		onToggle() {
