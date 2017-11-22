@@ -1,4 +1,4 @@
-import { sortBy, includes, last, difference } from 'lodash';
+import { sortBy, includes, last, difference, isEqual } from 'lodash';
 
 function getRange( start, end, ordering ) {
 	if ( start && ! end ) {
@@ -66,10 +66,8 @@ export function toggle( current, uid, ordering ) {
 }
 
 export function includeRange( current, start, end, ordering ) {
-	// get the range based on the range here.
-	const everything = getSelected( current, ordering );
 	const inRange = getRange( start, end, ordering );
-	const withoutRange = difference( everything, inRange );
+	const withoutRange = difference( current.selected, inRange );
 	return { selected: withoutRange, start: start, end: end };
 }
 

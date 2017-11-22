@@ -409,7 +409,6 @@ export function blockSelection( state = { selected: [ ], start: null, end: null,
 	};
 
 	const res = ff();
-	console.log( 'res', res );
 	return res;
 }
 

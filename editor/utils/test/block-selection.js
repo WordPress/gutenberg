@@ -121,13 +121,13 @@ describe( 'block-selection', () => {
 		it( 'Add a ranged selection that does not overlap with the current selection', () => {
 			const current = { selected: [ ], start: 'alpha', end: 'gamma' };
 			const actual = includeRange( current, 'delta', 'rho', ordering );
-			expect( actual ).toEqual( { selected: [ 'alpha', 'beta', 'gamma' ], start: 'delta', end: 'rho' } );
+			expect( actual ).toEqual( { selected: [ ], start: 'delta', end: 'rho' } );
 		} );
 
 		it( 'Add a ranged selection that overlaps with some of the selected', () => {
 			const current = { selected: [ 'epsilon' ], start: 'alpha', end: 'gamma' };
 			const actual = includeRange( current, 'delta', 'rho', ordering );
-			expect( actual ).toEqual( { selected: [ 'alpha', 'beta', 'gamma' ], start: 'delta', end: 'rho' } );
+			expect( actual ).toEqual( { selected: [ ], start: 'delta', end: 'rho' } );
 		} );
 
 		it( 'Add a ranged selection that overlaps with all of the range', () => {
@@ -139,13 +139,19 @@ describe( 'block-selection', () => {
 		it( 'Add a ranged selection that overlaps with some of the range', () => {
 			const current = { selected: [ 'epsilon' ], start: 'alpha', end: 'gamma' };
 			const actual = includeRange( current, 'beta', 'delta', ordering );
-			expect( actual ).toEqual( { selected: [ 'alpha', 'epsilon' ], start: 'beta', end: 'delta' } );
+			expect( actual ).toEqual( { selected: [ 'epsilon' ], start: 'beta', end: 'delta' } );
 		} );
 
 		it( 'Add a ranged selection that overlaps with all of the range (plus more)', () => {
 			const current = { selected: [ ], start: 'alpha', end: 'gamma' };
 			const actual = includeRange( current, 'alpha', 'delta', ordering );
 			expect( actual ).toEqual( { selected: [ ], start: 'alpha', end: 'delta' } );
+		} );
+
+		it( 'Add a decreased range should deselect the previous range', () => {
+			const current = { selected: [ ], start: 'alpha', end: 'delta' };
+			const actual = includeRange( current, 'alpha', 'gamma', ordering );
+			expect( actual ).toEqual( { selected: [ ], start: 'alpha', end: 'gamma' } );
 		} );
 	} );
 } );

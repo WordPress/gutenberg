@@ -214,8 +214,6 @@ class VisualEditorBlockList extends Component {
 	render() {
 		const { blocks } = this.props;
 
-		console.log( '***** MULTI_SELECT', this.props.multiSelectedBlockUids, this.props.stateDump );
-
 		return (
 			<div>
 				{ !! blocks.length && <VisualEditorSiblingInserter /> }
