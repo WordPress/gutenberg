@@ -31,7 +31,7 @@
 	&[data-align="wide"] {
 		.editor-block-contextual-toolbar {
 			@include break-small() {
-				width: $visual-editor-max-width - $block-padding - $block-padding;
+				width: $visual-editor-max-width + 2;	// 1px border left and right
 			}
 			margin-left: auto;
 			margin-right: auto;
