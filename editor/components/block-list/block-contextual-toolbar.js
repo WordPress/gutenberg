@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -13,13 +8,8 @@ import { __ } from '@wordpress/i18n';
  */
 import NavigableToolbar from '../../navigable-toolbar';
 import { BlockToolbar } from '../';
-import { isFeatureActive } from '../../selectors';
 
-function BlockContextualToolbar( { hasFixedToolbar } ) {
-	if ( hasFixedToolbar ) {
-		return null;
-	}
-
+function BlockContextualToolbar() {
 	return (
 		<NavigableToolbar
 			className="editor-block-contextual-toolbar"
@@ -30,8 +20,4 @@ function BlockContextualToolbar( { hasFixedToolbar } ) {
 	);
 }
 
-export default connect(
-	( state ) => ( {
-		hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
-	} ),
-)( BlockContextualToolbar );
+export default BlockContextualToolbar;
