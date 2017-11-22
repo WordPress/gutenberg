@@ -43,7 +43,6 @@ export function resetRange( current, start, end ) {
 }
 
 export function toggle( current, uid, ordering ) {
-	console.log('args', arguments);
 	const everything = getSelected( current, ordering );
 
 	if ( ! includes( everything, uid ) ) {

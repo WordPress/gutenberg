@@ -65,14 +65,14 @@ describe( 'block-selection', () => {
 			expect( actual ).toEqual( { selected: [ 'alpha' ], start: 'beta', end: 'beta' } );
 		} );
 
-		it( 'Exclude a selection when only a start value (cannot do)', () => {
+		it( 'Toggle a selection when only a start value  (should select it)', () => {
 			const current = {
 				selected: [ ],
 				start: 'alpha',
 				end: null,
 			};
 			const actual = toggle( current, 'alpha', ordering );
-			expect( actual ).toEqual( { selected: [ ], start: 'alpha', end: null } );
+			expect( actual ).toEqual( { selected: [ ], start: 'alpha', end: 'alpha' } );
 		} );
 
 		it( 'Add to selection when no start value, but a selected array', () => {
