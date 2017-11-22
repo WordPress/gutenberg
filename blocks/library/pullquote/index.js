@@ -80,7 +80,7 @@ registerBlockType( 'core/pullquote', {
 			<blockquote key="quote" className={ className }>
 				<Editable
 					multiline="p"
-					value={ toEditableValue( value ) }
+					value={ value && toEditableValue( value ) }
 					onChange={
 						( nextValue ) => setAttributes( {
 							value: fromEditableValue( nextValue ),
