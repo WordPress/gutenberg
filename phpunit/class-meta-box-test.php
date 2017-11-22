@@ -137,6 +137,33 @@ class Meta_Box_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests for meta box area that only contains back compat meta boxes.
+	 */
+	public function test_gutenberg_is_meta_box_empty_with_back_compat_meta_box() {
+		$context    = 'normal';
+		$post_type  = 'post';
+		$meta_boxes = array(
+			'post' => array(
+				'normal' => array(
+					'high' => array(
+						'some-meta-box' => array(
+							'id'       => 'some-meta-box',
+							'title'    => 'Some Meta Box',
+							'callback' => 'some_meta_box',
+							'args'     => array(
+								'__back_compat_meta_box' => true,
+							),
+						),
+					),
+				),
+			),
+		);
+
+		$is_empty = gutenberg_is_meta_box_empty( $meta_boxes, $context, $post_type );
+		$this->assertTrue( $is_empty );
+	}
+
+	/**
 	 * Tests for non existant location.
 	 */
 	public function test_gutenberg_is_meta_box_empty_with_non_existant_location() {
