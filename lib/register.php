@@ -219,16 +219,40 @@ function gutenberg_collect_meta_box_data() {
 
 	// If the meta box should be empty set to false.
 	foreach ( $locations as $location ) {
-		if ( isset( $_meta_boxes_copy[ $post->post_type ][ $location ] ) && ! gutenberg_is_meta_box_empty( $_meta_boxes_copy, $location, $post->post_type ) ) {
-			?>
-			<script type="text/javascript">
-				var joiner = '?';
-				if ( window.location.search ) {
-					joiner = '&';
+		if ( isset( $_meta_boxes_copy[ $post->post_type ][ $location ] ) && gutenberg_is_meta_box_empty( $_meta_boxes_copy, $location, $post->post_type ) ) {
+			$meta_box_data[ $location ] = false;
+		} else {
+			$meta_box_data[ $location ] = true;
+			$incompatible_meta_box      = false;
+			// Check if we have a meta box that has declared itself incompatible with the block editor.
+			foreach ( $_meta_boxes_copy[ $post->post_type ][ $location ] as $boxes ) {
+				foreach ( $boxes as $box ) {
+					/*
+					 * If __block_editor_compatible_meta_box is declared as a false-y value,
+					 * the meta box is not compatible with the block editor.
+					 */
+					if ( is_array( $box['args'] )
+						&& isset( $box['args']['__block_editor_compatible_meta_box'] )
+						&& ! $box['args']['__block_editor_compatible_meta_box'] ) {
+							$incompatible_meta_box = true;
+							break 2;
+					}
 				}
-				window.location.href += joiner + 'classic-editor';
-			</script>
-			<?php
+			}
+
+			// Incompatible meta boxes require an immediate redirect to the classic editor.
+			if ( $incompatible_meta_box ) {
+				?>
+				<script type="text/javascript">
+					var joiner = '?';
+					if ( window.location.search ) {
+						joiner = '&';
+					}
+					window.location.href += joiner + 'classic-editor';
+				</script>
+				<?php
+				exit;
+			}
 		}
 	}
 
