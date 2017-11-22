@@ -57,7 +57,11 @@ export function toggle( current, uid, ordering ) {
 	return { selected: difference( withoutUid, [ current.start ] ), start: current.start, end: null };
 }
 
-export function includeRange( current, start, end, ordering ) {
-	return current;
+export function incorporate( current, start, end, ordering ) {
+	// get the range based on the range here.
+	const everything = getSelected( current, ordering );
+	const inRange = getRange( start, end, ordering );
+	const withoutRange = difference( everything, inRange );
+	return { selected: withoutRange, start: start, end: end };
 }
 

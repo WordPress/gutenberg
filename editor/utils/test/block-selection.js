@@ -1,4 +1,4 @@
-import { reset, toggle } from '../block-selection';
+import { reset, toggle, incorporate } from '../block-selection';
 
 const nothing = { selected: [ ], start: null, end: null };
 
@@ -87,6 +87,13 @@ describe( 'block-selection', () => {
 			const current = { selected: [ 'alpha' ], start: 'beta', end: 'delta' };
 			const actual = toggle( current, 'beta', ordering );
 			expect( actual ).toEqual( { selected: [ 'alpha', 'gamma' ], start: 'delta', end: null } );
+		} );
+	} );
+
+	describe( 'incorporate', () => {
+		it( 'Nothing >>> (alpha, alpha)', () => {
+			const actual = incorporate( nothing, 'alpha', 'alpha', ordering );
+			expect( actual ).toEqual( { selected: [ ], start: 'alpha', end: 'alpha' } );
 		} );
 	} );
 } );
