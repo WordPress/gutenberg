@@ -1,5 +1,10 @@
 .editor-ellipsis-menu {
-	margin-left: $item-spacing;
+	// the padding and margin of the ellipsis menu is intentionally non-standard
+	margin-left: 4px;
+
+	.components-icon-button {
+		padding: 8px 4px;
+	}
 
 	.components-button svg {
 		transform: rotate( 90deg );
