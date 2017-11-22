@@ -16,7 +16,7 @@ import { KeyboardShortcuts } from '@wordpress/components';
 import './style.scss';
 import VisualEditorInserter from './inserter';
 import { BlockList, PostTitle, WritingFlow } from '../../components';
-import { getBlockUids, getMultiSelectedBlockUids } from '../../selectors';
+import { getBlockUids, getMultiSelectedBlockUids, isFeatureActive } from '../../selectors';
 import { clearSelectedBlock, multiSelect, redo, undo, removeBlocks } from '../../actions';
 
 class VisualEditor extends Component {
@@ -93,7 +93,10 @@ class VisualEditor extends Component {
 				} } />
 				<WritingFlow>
 					<PostTitle />
-					<BlockList ref={ this.bindBlocksContainer } />
+					<BlockList
+						ref={ this.bindBlocksContainer }
+						showContextualToolbar={ ! this.props.hasFixedToolbar }
+					/>
 				</WritingFlow>
 				<VisualEditorInserter />
 			</div>
@@ -107,6 +110,7 @@ export default connect(
 		return {
 			uids: getBlockUids( state ),
 			multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
+			hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
 		};
 	},
 	{
