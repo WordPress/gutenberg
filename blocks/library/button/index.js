@@ -82,7 +82,7 @@ class ButtonBlock extends Component {
 					<BlockAlignmentToolbar value={ align } onChange={ this.updateAlignment } />
 				</BlockControls>
 			),
-			<span key="button" className={ className } title={ title } style={ { backgroundColor: color } } ref={ this.bindRef }>
+			<span key="button" className={ className } title={ title } ref={ this.bindRef }>
 				<Editable
 					tagName="span"
 					placeholder={ __( 'Add text…' ) }
@@ -91,7 +91,9 @@ class ButtonBlock extends Component {
 					onFocus={ setFocus }
 					onChange={ ( value ) => setAttributes( { text: value } ) }
 					formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
+					className="wp-block-button-link"
 					style={ {
+						backgroundColor: color,
 						color: textColor,
 					} }
 					keepPlaceholderOnFocus
@@ -200,9 +202,16 @@ registerBlockType( 'core/button', {
 	save( { attributes } ) {
 		const { url, text, title, align, color, textColor } = attributes;
 
+		const buttonStyle = {
+			backgroundColor: color,
+			color: textColor,
+		};
+
+		const linkClass = 'wp-block-button-link';
+
 		return (
-			<div className={ `align${ align }` } style={ { backgroundColor: color } }>
-				<a href={ url } title={ title } style={ { color: textColor } }>
+			<div className={ `align${ align }` }>
+				<a className={ linkClass } href={ url } title={ title } style={ buttonStyle }>
 					{ text }
 				</a>
 			</div>

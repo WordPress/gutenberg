@@ -5,7 +5,7 @@
             "align": "center"
         },
         "innerBlocks": [],
-        "innerHTML": "\n<div class=\"wp-block-button aligncenter\"><a href=\"https://github.com/WordPress/gutenberg\">Help build Gutenberg</a></div>\n"
+        "innerHTML": "\n<div class=\"wp-block-button aligncenter\"><a class=\"wp-block-button-link\" href=\"https://github.com/WordPress/gutenberg\">Help build Gutenberg</a></div>\n"
     },
     {
         "attrs": {},
