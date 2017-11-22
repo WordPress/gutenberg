@@ -302,11 +302,34 @@ export default {
 		}
 	},
 
-	SPAWN_SELECTION( action, store ) {
+	ADD_SELECTION_RANGE( action, store ) {
 		const { getState, dispatch } = store;
-		console.log( 'spawn.state.lookup.pre', getState().blockSelection );
-		// Take everything that is currently in the start->end range, and put it in selected
+		const state = getState();
+
+		const inRange = getBlocksInRange( state.editor.present.blockOrder, action.start, action.end );
 		const selectedUids = getAllSelectedBlockUids( getState() );
+		const filteredUids = filter( selectedUids, ( uid ) => ! includes( inRange, uid ) );
+		dispatch( setSelection( action.start, action.end, filteredUids ) );
+	},
+
+	// HERE. Breaking everything again.
+	TOGGLE_SELECTION( action, store ) {
+		const { getState, dispatch } = store;
+		const state = getState();
+
+		// Find everything currently selected.
+		const selectedUids = getAllSelectedBlockUids( getState() );
+
+		// If already selected, remove it from selection.
+		if ( includes( selectedUids, action.uid ) ) {
+			const uidsWithout = filter( state.blockSelection.selected, ( s ) => s !== action.uid );
+			dispatch(
+				setSelection( state.blockSelection.start, state.blockSelection.end, uidsWithout )
+			);
+		} else {
+
+		}
+
 		console.log( 'spawn.state.lookup.post', selectedUids );
 		const filteredUids = filter( selectedUids, ( uid ) => action.uid !== uid );
 		console.log('spawning.initial', getState().blockSelection );
@@ -314,7 +337,7 @@ export default {
 		console.log('spawning.result', getState( ).blockSelection );
 	},
 
-	TOGGLE_OFF_SELECTION( action, store ) {
+	TOGGLE_SELECTION( action, store ) {
 		const { getState, dispatch } = store;
 
 
@@ -323,9 +346,7 @@ export default {
 		// If this is just in the selecteds, remove it.
 		if ( includes( state.blockSelection.selected, action.uid ) ) {
 			console.log(' should be clearing selection' );
-			dispatch(
-				setSelection( state.blockSelection.start, state.blockSelection.end, filter( state.blockSelection.selected, ( s ) => s !== action.uid ) )
-			);
+
 			return;
 		}
 
