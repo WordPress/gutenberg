@@ -43,7 +43,6 @@ export function toggle( current, uid, ordering ) {
 	}
 
 	const withoutUid = difference( everything, [ uid ] );
-	console.log( 'withoutUid', withoutUid );
 
 	if ( current.start === uid ) {
 		const nextStart = last( withoutUid );

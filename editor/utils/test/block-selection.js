@@ -76,5 +76,17 @@ describe( 'block-selection', () => {
 			const actual = toggle( current, 'gamma', ordering );
 			expect( actual ).toEqual( { selected: [ 'alpha', 'delta' ], start: 'beta', end: null } );
 		} );
+
+		it( 'Toggle off selection something that is in selected', () => {
+			const current = { selected: [ 'alpha' ], start: 'beta', end: 'delta' };
+			const actual = toggle( current, 'alpha', ordering );
+			expect( actual ).toEqual( { selected: [ 'gamma', 'delta' ], start: 'beta', end: null } );
+		} );
+
+		it( 'Toggle off selection something that is the start', () => {
+			const current = { selected: [ 'alpha' ], start: 'beta', end: 'delta' };
+			const actual = toggle( current, 'beta', ordering );
+			expect( actual ).toEqual( { selected: [ 'alpha', 'gamma' ], start: 'delta', end: null } );
+		} );
 	} );
 } );
