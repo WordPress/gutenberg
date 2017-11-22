@@ -545,10 +545,8 @@ function gutenberg_is_meta_box_empty( $meta_boxes, $context, $post_type ) {
 	}
 
 	foreach ( $meta_boxes[ $page ][ $context ] as $priority => $boxes ) {
-		foreach ( $boxes as $id => $box ) {
-			if ( ! empty( $boxes ) ) {
-				return false;
-			}
+		if ( ! empty( $boxes ) ) {
+			return false;
 		}
 	}
 
