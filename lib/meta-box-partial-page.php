@@ -597,11 +597,15 @@ add_action( 'edit_form_advanced', 'gutenberg_intercept_meta_box_render' );
 function gutenberg_override_meta_box_callback( $object, $box ) {
 	$callback = $box['args']['__original_callback'];
 	unset( $box['args']['__original_callback'] );
-	unset( $box['args']['__block_editor_compatible_meta_box'] );
+
+	if ( isset( $box['args']['__block_editor_compatible_meta_box'] ) ) {
+		$block_compatible = $box['args']['__block_editor_compatible_meta_box'];
+		unset( $box['args']['__block_editor_compatible_meta_box'] );
+	}
 
 	if ( isset( $box['args']['__back_compat_meta_box'] ) ) {
 		unset( $box['args']['__back_compat_meta_box'] );
-	} else {
+	} elseif ( ! $block_compatible ) {
 		gutenberg_show_meta_box_warning( $callback );
 	}
 
