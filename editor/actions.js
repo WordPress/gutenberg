@@ -122,7 +122,7 @@ export function stopMultiSelect() {
 
 export function multiSelect( start, end ) {
 	return {
-		type: 'MULTI_SELECT',
+		type: 'ADD_SELECTION_RANGE',
 		start,
 		end,
 	};
@@ -137,16 +137,9 @@ export function setSelection( start, end, selected ) {
 	};
 }
 
-export function spawnSelection( uid ) {
+export function toggleSelection( uid ) {
 	return {
-		type: 'SPAWN_SELECTION',
-		uid,
-	};
-}
-
-export function toggleOffSelection( uid ) {
-	return {
-		type: 'TOGGLE_OFF_SELECTION',
+		type: 'TOGGLE_SELECTION',
 		uid,
 	};
 }

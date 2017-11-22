@@ -14,6 +14,8 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { getPostEditUrl, getWPAdminURL } from './utils/url';
+import { reset, resetRange, toggle, includeRange } from './utils/block-selection';
+
 import {
 	setSelection,
 	resetPost,
@@ -302,81 +304,45 @@ export default {
 		}
 	},
 
+	RESET_SELECTION( action, store ) {
+		const { getState, dispatch } = store;
+
+		const state = getState();
+		const newSelection = reset( state.blockSelection, action.uid );
+		dispatch(
+			setSelection( newSelection.start, newSelection.end, newSelection.selected )
+		);
+	},
+
+	RESET_SELECTION_RANGE( action, store ) {
+		const { getState, dispatch } = store;
+
+		const state = getState();
+		const newSelection = resetRange( state.blockSelection, action.start, action.end );
+		dispatch(
+			setSelection( newSelection.start, newSelection.end, newSelection.selected )
+		);
+	},
+
 	ADD_SELECTION_RANGE( action, store ) {
 		const { getState, dispatch } = store;
+
 		const state = getState();
-
-		const inRange = getBlocksInRange( state.editor.present.blockOrder, action.start, action.end );
-		const selectedUids = getAllSelectedBlockUids( getState() );
-		const filteredUids = filter( selectedUids, ( uid ) => ! includes( inRange, uid ) );
-		dispatch( setSelection( action.start, action.end, filteredUids ) );
-	},
-
-	// HERE. Breaking everything again.
-	TOGGLE_SELECTION( action, store ) {
-		const { getState, dispatch } = store;
-		const state = getState();
-
-		// Find everything currently selected.
-		const selectedUids = getAllSelectedBlockUids( getState() );
-
-		// If already selected, remove it from selection.
-		if ( includes( selectedUids, action.uid ) ) {
-			const uidsWithout = filter( state.blockSelection.selected, ( s ) => s !== action.uid );
-			dispatch(
-				setSelection( state.blockSelection.start, state.blockSelection.end, uidsWithout )
-			);
-		} else {
-
-		}
-
-		console.log( 'spawn.state.lookup.post', selectedUids );
-		const filteredUids = filter( selectedUids, ( uid ) => action.uid !== uid );
-		console.log('spawning.initial', getState().blockSelection );
-		dispatch( setSelection( action.uid, action.uid, filteredUids ) );
-		console.log('spawning.result', getState( ).blockSelection );
+		const newSelection = includeRange( state.blockSelection, action.start, action.end, state.editor.present.blockOrder );
+		dispatch(
+			setSelection( newSelection.start, newSelection.end, newSelection.selected )
+		);
 	},
 
 	TOGGLE_SELECTION( action, store ) {
 		const { getState, dispatch } = store;
 
-
 		const state = getState();
-		console.log('toggling off', action.uid, state.blockSelection.selected );
-		// If this is just in the selecteds, remove it.
-		if ( includes( state.blockSelection.selected, action.uid ) ) {
-			console.log(' should be clearing selection' );
-
-			return;
-		}
-
-		const inRange = getBlocksInRange( state.editor.present.blockOrder, state.blockSelection.start, state.blockSelection.end );
-		if ( action.uid === state.blockSelection.start ) {
-			const selectedUids = getAllSelectedBlockUids( getState() );
-			const filteredUids = filter( selectedUids, ( uid ) => {
-				return uid !== action.uid;
-			} );
-			const startUid = last( filteredUids );
-			dispatch(
-				setSelection( startUid, startUid, filteredUids.slice( 0, filteredUids.length - 1 ) )
-			);
-		} else if ( includes( inRange, action.uid ) ) {
-			const selectedUids = getAllSelectedBlockUids( getState() );
-
-			const filteredUids = filter( selectedUids, ( uid ) => {
-				return uid !== action.uid && uid !== state.blockSelection.start;
-			} );
-
-			dispatch(
-				setSelection( state.blockSelection.start, state.blockSelection.start, filteredUids )
-			)
-
-			// Make this the last anchor point.
-		}
-
-		// If this is in the range part, push all the range to selected, except start if different.
-
-		// If this in the the range part, and is the start, push all the range to selected, and remove
-		// the last one to be the next anchor
+		console.log('state', state);
+		const newSelection = toggle( state.blockSelection, action.uid, state.editor.present.blockOrder );
+		console.log( 'newSelection', newSelection );
+		dispatch(
+			setSelection( newSelection.start, newSelection.end, newSelection.selected )
+		);
 	},
 };

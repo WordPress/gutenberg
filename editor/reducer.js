@@ -332,80 +332,85 @@ export function isTyping( state = false, action ) {
  * @return {Object}        Updated state
  */
 export function blockSelection( state = { selected: [ ], start: null, end: null, focus: null, isMultiSelecting: false }, action ) {
-	console.log("switching", action.type, state);
-	switch ( action.type ) {
-		case 'CLEAR_SELECTED_BLOCK':
-			return {
-				selected: [ ],
-				start: null,
-				end: null,
-				focus: null,
-				isMultiSelecting: false,
-			};
-		case 'START_MULTI_SELECT':
-			return {
-				...state,
-				isMultiSelecting: true,
-			};
-		case 'STOP_MULTI_SELECT':
-			return {
-				...state,
-				isMultiSelecting: false,
-				focus: state.start && ! state.end ? state.focus : null,
-			};
-		case 'MULTI_SELECT':
-			return {
-				...state,
-				start: action.start,
-				end: action.end,
-				focus: state.isMultiSelecting ? state.focus : null,
-			};
-		case 'SELECT_BLOCK':
-			return {
-				...state,
-				selected: [ ],
-				start: action.uid,
-				end: null,
-				focus: action.focus || {},
-			};
-		case 'UPDATE_FOCUS':
-			return {
-				...state,
-				start: action.uid,
-				end: null,
-				focus: action.config || {},
-			};
+	const ff = () => {
+		switch ( action.type ) {
+			case 'CLEAR_SELECTED_BLOCK':
+				return {
+					selected: [ ],
+					start: null,
+					end: null,
+					focus: null,
+					isMultiSelecting: false,
+				};
+			case 'START_MULTI_SELECT':
+				return {
+					...state,
+					isMultiSelecting: true,
+				};
+			case 'STOP_MULTI_SELECT':
+				return {
+					...state,
+					isMultiSelecting: false,
+					focus: state.start && ! state.end ? state.focus : null,
+				};
+			case 'MULTI_SELECT':
+				return {
+					...state,
+					start: action.start,
+					end: action.end,
+					focus: state.isMultiSelecting ? state.focus : null,
+				};
+			case 'SELECT_BLOCK':
+				return {
+					...state,
+					selected: [ ],
+					start: action.uid,
+					end: null,
+					focus: action.focus || {},
+				};
+			case 'UPDATE_FOCUS':
+				return {
+					...state,
+					start: action.uid,
+					end: null,
+					focus: action.config || {},
+				};
 
-		case 'SET_SELECTION':
-			return {
-				...state,
-				selected: action.selected,
-				start: action.start,
-				end: action.end,
-			};
+			case 'SET_SELECTION':
+				return {
+					...state,
+					selected: action.selected,
+					start: action.start,
+					end: action.end,
+				};
 
-		case 'INSERT_BLOCKS':
-			return {
-				start: action.blocks[ 0 ].uid,
-				end: null,
-				selected: [ ],
-				focus: {},
-				isMultiSelecting: false,
-			};
-		case 'REPLACE_BLOCKS':
-			if ( ! action.blocks || ! action.blocks.length || action.uids.indexOf( state.start ) === -1 ) {
-				return state;
-			}
-			return {
-				start: action.blocks[ 0 ].uid,
-				end: null,
-				selected: [ ],
-				focus: {},
-				isMultiSelecting: false,
-			};
-	}
+			case 'INSERT_BLOCKS':
+				return {
+					start: action.blocks[ 0 ].uid,
+					end: null,
+					selected: [ ],
+					focus: {},
+					isMultiSelecting: false,
+				};
+			case 'REPLACE_BLOCKS':
+				if ( ! action.blocks || ! action.blocks.length || action.uids.indexOf( state.start ) === -1 ) {
+					return state;
+				}
+				return {
+					start: action.blocks[ 0 ].uid,
+					end: null,
+					selected: [ ],
+					focus: {},
+					isMultiSelecting: false,
+				};
+		}
 
-	return state;
+		return state;
+	};
+
+	const res = ff();
+	console.log( 'res', res );
+	return res;
 }
 
 /**

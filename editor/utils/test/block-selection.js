@@ -52,7 +52,7 @@ describe( 'block-selection', () => {
 	describe( 'toggle', () => {
 		it( 'Nothing >>> alpha', () => {
 			const actual = toggle( nothing, 'alpha', ordering );
-			expect( actual ).toEqual( { selected: [ ], start: 'alpha', end: null } );
+			expect( actual ).toEqual( { selected: [ ], start: 'alpha', end: 'alpha' } );
 		} );
 
 		it( 'Include a selection when only a start value', () => {
@@ -62,7 +62,7 @@ describe( 'block-selection', () => {
 				end: null,
 			};
 			const actual = toggle( current, 'beta', ordering );
-			expect( actual ).toEqual( { selected: [ 'alpha' ], start: 'beta', end: null } );
+			expect( actual ).toEqual( { selected: [ 'alpha' ], start: 'beta', end: 'beta' } );
 		} );
 
 		it( 'Exclude a selection when only a start value (cannot do)', () => {
@@ -78,37 +78,37 @@ describe( 'block-selection', () => {
 		it( 'Add to selection when no start value, but a selected array', () => {
 			const current = { selected: [ 'alpha' ], start: null, end: null };
 			const actual = toggle( current, 'beta', ordering );
-			expect( actual ).toEqual( { selected: [ 'alpha' ], start: 'beta', end: null } );
+			expect( actual ).toEqual( { selected: [ 'alpha' ], start: 'beta', end: 'beta' } );
 		} );
 
 		it( 'Add to selection when no selected, but a start->end range', () => {
 			const current = { selected: [ ], start: 'alpha', end: 'gamma' };
 			const actual = toggle( current, 'epsilon', ordering );
-			expect( actual ).toEqual( { selected: [ 'alpha', 'beta', 'gamma' ], start: 'epsilon', end: null } );
+			expect( actual ).toEqual( { selected: [ 'alpha', 'beta', 'gamma' ], start: 'epsilon', end: 'epsilon' } );
 		} );
 
 		it( 'Add to selection selected AND a start->end range', () => {
 			const current = { selected: [ 'alpha' ], start: 'beta', end: 'delta' };
 			const actual = toggle( current, 'epsilon', ordering );
-			expect( actual ).toEqual( { selected: [ 'alpha', 'beta', 'gamma', 'delta' ], start: 'epsilon', end: null } );
+			expect( actual ).toEqual( { selected: [ 'alpha', 'beta', 'gamma', 'delta' ], start: 'epsilon', end: 'epsilon' } );
 		} );
 
 		it( 'Toggle off selection something that is already within the range', () => {
 			const current = { selected: [ 'alpha' ], start: 'beta', end: 'delta' };
 			const actual = toggle( current, 'gamma', ordering );
-			expect( actual ).toEqual( { selected: [ 'alpha', 'delta' ], start: 'beta', end: null } );
+			expect( actual ).toEqual( { selected: [ 'alpha', 'delta' ], start: 'beta', end: 'beta' } );
 		} );
 
 		it( 'Toggle off selection something that is in selected', () => {
 			const current = { selected: [ 'alpha' ], start: 'beta', end: 'delta' };
 			const actual = toggle( current, 'alpha', ordering );
-			expect( actual ).toEqual( { selected: [ 'gamma', 'delta' ], start: 'beta', end: null } );
+			expect( actual ).toEqual( { selected: [ 'gamma', 'delta' ], start: 'beta', end: 'beta' } );
 		} );
 
 		it( 'Toggle off selection something that is the start', () => {
 			const current = { selected: [ 'alpha' ], start: 'beta', end: 'delta' };
 			const actual = toggle( current, 'beta', ordering );
-			expect( actual ).toEqual( { selected: [ 'alpha', 'gamma' ], start: 'delta', end: null } );
+			expect( actual ).toEqual( { selected: [ 'alpha', 'gamma' ], start: 'delta', end: 'delta' } );
 		} );
 	} );
 

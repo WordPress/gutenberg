@@ -36,7 +36,7 @@ import {
 	getMultiSelectedBlockUids,
 	getSelectedBlock,
 } from '../../selectors';
-import { insertBlock, startMultiSelect, toggleOffSelection, stopMultiSelect, multiSelect, spawnSelection, selectBlock } from '../../actions';
+import { insertBlock, startMultiSelect, toggleSelection, stopMultiSelect, multiSelect, selectBlock } from '../../actions';
 
 class VisualEditorBlockList extends Component {
 	constructor( props ) {
@@ -192,7 +192,6 @@ class VisualEditorBlockList extends Component {
 
 	onShiftSelection( uid ) {
 		const { selectedBlock, selectionStart, onMultiSelect, onSelect } = this.props;
-		console.log("selected", selectedBlock, 'start', selectionStart);
 		if ( selectedBlock ) {
 			onMultiSelect( selectedBlock.uid, uid );
 		} else if ( selectionStart ) {
@@ -203,12 +202,8 @@ class VisualEditorBlockList extends Component {
 	}
 
 	onMetaSelection( uid ) {
-		const { onSpawnSelection, onToggleOffSelection, multiSelectedBlockUids } = this.props;
-		if ( multiSelectedBlockUids.indexOf( uid ) > -1 ) {
-			onToggleOffSelection( uid );
-		} else {
-			onSpawnSelection( uid );
-		}
+		const { onToggleSelection } = this.props;
+		onToggleSelection( uid );
 	}
 
 	appendDefaultBlock() {
@@ -218,6 +213,8 @@ class VisualEditorBlockList extends Component {
 
 	render() {
 		const { blocks } = this.props;
+
+		console.log( '***** MULTI_SELECT', this.props.multiSelectedBlockUids, this.props.stateDump );
 
 		return (
 			<div>
@@ -262,6 +259,7 @@ export default connect(
 		multiSelectedBlocks: getMultiSelectedBlocks( state ),
 		multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
 		selectedBlock: getSelectedBlock( state ),
+		stateDump: state,
 	} ),
 	( dispatch ) => ( {
 		onInsertBlock( block ) {
@@ -282,11 +280,8 @@ export default connect(
 		onRemove( uids ) {
 			dispatch( { type: 'REMOVE_BLOCKS', uids } );
 		},
-		onSpawnSelection( uid ) {
-			dispatch( spawnSelection( uid ) );
-		},
-		onToggleOffSelection( uid ) {
-			dispatch( toggleOffSelection( uid ) );
+		onToggleSelection( uid ) {
+			dispatch( toggleSelection( uid ) );
 		},
 	} )
 )( VisualEditorBlockList );

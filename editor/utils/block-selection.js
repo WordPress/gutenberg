@@ -43,11 +43,12 @@ export function resetRange( current, start, end ) {
 }
 
 export function toggle( current, uid, ordering ) {
+	console.log('args', arguments);
 	const everything = getSelected( current, ordering );
 
 	if ( ! includes( everything, uid ) ) {
 		// This is not in our selection, so let's make it our new anchor
-		return { selected: everything, start: uid, end: null };
+		return { selected: everything, start: uid, end: uid };
 	}
 
 	const withoutUid = difference( everything, [ uid ] );
@@ -55,14 +56,14 @@ export function toggle( current, uid, ordering ) {
 	if ( current.start === uid ) {
 		const nextStart = last( withoutUid );
 		if ( nextStart ) {
-			return { selected: withoutUid.slice( 0, withoutUid.length - 1 ), start: nextStart, end: null };
+			return { selected: withoutUid.slice( 0, withoutUid.length - 1 ), start: nextStart, end: nextStart };
 		}
 
 		// I don't know what should happen here
-		return { selected: [ ], start: uid, end: null };
+		return { selected: [ ], start: uid, end: uid };
 	}
 
-	return { selected: difference( withoutUid, [ current.start ] ), start: current.start, end: null };
+	return { selected: difference( withoutUid, [ current.start ] ), start: current.start, end: current.start };
 }
 
 export function includeRange( current, start, end, ordering ) {

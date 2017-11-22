@@ -32,8 +32,6 @@ function BlockSwitcher( { blocks, onTransform, uids } ) {
 	const isMultiBlock = blocks.length > 1;
 	const sourceBlockName = blocks[ 0 ].name;
 
-	console.log('blocks', blocks, uids);
-
 	if ( isMultiBlock && ! every( blocks, ( block ) => ( block.name === sourceBlockName ) ) ) {
 		return null;
 	}

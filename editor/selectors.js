@@ -658,9 +658,7 @@ export function getLastMultiSelectedBlockUid( state ) {
  * @return {Boolean}       Whether block is first in mult-selection
  */
 export function isFirstMultiSelectedBlock( state, uid ) {
-	const firstUid = getFirstMultiSelectedBlockUid( state )
-	console.log( 'firstUid', firstUid );
-	return firstUid === uid;
+	return getFirstMultiSelectedBlockUid( state ) === uid;
 }
 
 /**
