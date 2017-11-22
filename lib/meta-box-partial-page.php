@@ -515,6 +515,10 @@ function gutenberg_filter_meta_boxes( $meta_boxes ) {
 					if ( isset( $data['callback'] ) && in_array( $data['callback'], $taxonomy_callbacks_to_unset ) ) {
 						unset( $meta_boxes[ $page ][ $context ][ $priority ][ $name ] );
 					}
+					// Filter out meta boxes that are just registered for back compat.
+					if ( is_array( $box['args'] ) && isset( $box['args']['__back_compat_meta_box'] ) ) {
+						unset( $meta_boxes[ $page ][ $context ][ $priority ][ $name ] );
+					}
 				}
 			}
 		}
@@ -542,8 +546,7 @@ function gutenberg_is_meta_box_empty( $meta_boxes, $context, $post_type ) {
 
 	foreach ( $meta_boxes[ $page ][ $context ] as $priority => $boxes ) {
 		foreach ( $boxes as $id => $box ) {
-			// The meta box is only empty if a meta box exists, and hasn't declared it self as being for back compat purposes.
-			if ( ! is_array( $box['args'] ) || ! isset( $box['args']['__back_compat_meta_box'] ) ) {
+			if ( ! empty( $boxes ) ) {
 				return false;
 			}
 		}
