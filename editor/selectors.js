@@ -594,9 +594,7 @@ export const getMultiSelectedBlockUids = createSelector(
 		const { start, end, selected } = state.blockSelection;
 
 		const ranged = start && start === end ? [ start ] : getBlocksInRange( blockOrder, start, end );
-		const all = sortBy( selected.concat( ranged ), sortByOrder( blockOrder ) );
-		console.log( 'all', all, 'blockOrder', blockOrder );
-		return all;
+		return sortBy( selected.concat( ranged ), sortByOrder( blockOrder ) );
 	},
 	( state ) => [
 		state.editor.present.blockOrder,
@@ -623,6 +621,13 @@ export const getMultiSelectedBlocks = createSelector(
 		state.editor.present.blocksByUid,
 		state.editor.present.edits.meta,
 		state.currentPost.meta,
+	]
+);
+
+export const isNavigating = createSelector(
+	( state ) => state.blockSelection.isNavigating,
+	( state ) => [
+		state.blockSelection.isNavigating,
 	]
 );
 

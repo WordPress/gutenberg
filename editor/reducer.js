@@ -331,11 +331,12 @@ export function isTyping( state = false, action ) {
  * @param  {Object} action Dispatched action
  * @return {Object}        Updated state
  */
-export function blockSelection( state = { selected: [ ], start: null, end: null, focus: null, isMultiSelecting: false }, action ) {
+export function blockSelection( state = { isNavigating: false, selected: [ ], start: null, end: null, focus: null, isMultiSelecting: false }, action ) {
 	const ff = () => {
 		switch ( action.type ) {
 			case 'CLEAR_SELECTED_BLOCK':
 				return {
+					isNavigating: state.isNavigating,
 					selected: [ ],
 					start: null,
 					end: null,
@@ -376,6 +377,12 @@ export function blockSelection( state = { selected: [ ], start: null, end: null,
 					focus: action.config || {},
 				};
 
+			case 'START_NAVIGATION':
+				return {
+					...state,
+					isNavigating: true,
+				};
+
 			case 'SET_SELECTION':
 				return {
 					...state,
@@ -386,6 +393,7 @@ export function blockSelection( state = { selected: [ ], start: null, end: null,
 
 			case 'INSERT_BLOCKS':
 				return {
+					isNavigating: state.isNavigating,
 					start: action.blocks[ 0 ].uid,
 					end: null,
 					selected: [ ],
@@ -397,6 +405,7 @@ export function blockSelection( state = { selected: [ ], start: null, end: null,
 					return state;
 				}
 				return {
+					isNavigating: state.isNavigating,
 					start: action.blocks[ 0 ].uid,
 					end: null,
 					selected: [ ],

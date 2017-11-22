@@ -36,6 +36,7 @@ import {
 	selectBlock,
 	startTyping,
 	stopTyping,
+	startNavigation,
 	updateBlockAttributes,
 } from '../../actions';
 import {
@@ -50,6 +51,7 @@ import {
 	isBlockMultiSelected,
 	isBlockSelected,
 	isFirstMultiSelectedBlock,
+	isNavigating,
 	getMultiSelectedBlocksStartUid,
 	isTyping,
 	getBlockMode,
@@ -71,6 +73,7 @@ class VisualEditorBlock extends Component {
 		this.onFocus = this.onFocus.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
+		this.onContainerKeyDown = this.onContainerKeyDown.bind( this );
 		this.onBlockError = this.onBlockError.bind( this );
 		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
 		this.onTouchStart = this.onTouchStart.bind( this );
@@ -85,7 +88,7 @@ class VisualEditorBlock extends Component {
 	}
 
 	componentDidMount() {
-		if ( this.props.focus ) {
+		if ( this.props.focus && this.props.navigating ) {
 			this.node.focus();
 		}
 
@@ -117,7 +120,7 @@ class VisualEditorBlock extends Component {
 		}
 
 		// Focus node when focus state is programmatically transferred.
-		if ( this.props.focus && ! prevProps.focus && ! this.node.contains( document.activeElement ) ) {
+		if ( this.props.focus && ! prevProps.focus && ! this.node.contains( document.activeElement ) && this.props.navigating ) {
 			this.node.focus();
 		}
 
@@ -239,7 +242,6 @@ class VisualEditorBlock extends Component {
 	}
 
 	onFocus( event ) {
-		// BUG: Cannot control click without a multi-selection, because this clobbers it.
 		if ( event.target === this.node && ! this.props.isMultiSelected ) {
 			this.props.onSelect();
 		}
@@ -264,6 +266,20 @@ class VisualEditorBlock extends Component {
 		} else {
 			this.props.onSelectionStart( this.props.uid );
 			this.props.onSelect();
+		}
+	}
+
+	onContainerKeyDown( event ) {
+		const { keyCode } = event;
+
+		switch ( keyCode ) {
+			case ESCAPE:
+				this.props.onStartNavigation();
+				event.stopPropagation();
+
+				// Deselect on escape.
+				// this.props.onDeselect();
+				break;
 		}
 	}
 
@@ -304,11 +320,6 @@ class VisualEditorBlock extends Component {
 						onFocus( previousBlock.uid, { offset: -1 } );
 					}
 				}
-				break;
-
-			case ESCAPE:
-				// Deselect on escape.
-				this.props.onDeselect();
 				break;
 		}
 	}
@@ -354,6 +365,7 @@ class VisualEditorBlock extends Component {
 		return (
 			<div
 				ref={ this.setBlockListRef }
+				onKeyDown={ this.onContainerKeyDown }
 				onMouseMove={ this.maybeHover }
 				onMouseEnter={ this.maybeHover }
 				onMouseLeave={ onMouseLeave }
@@ -383,7 +395,7 @@ class VisualEditorBlock extends Component {
 						{ isValid && mode === 'visual' && (
 							<BlockEdit
 								name={ blockName }
-								focus={ isMultiSelected ? null : focus }
+								focus={ isMultiSelected || this.props.navigating ? null : focus }
 								attributes={ block.attributes }
 								setAttributes={ this.setAttributes }
 								insertBlocksAfter={ this.insertBlocksAfter }
@@ -433,6 +445,7 @@ export default connect(
 			order: getBlockIndex( state, ownProps.uid ),
 			meta: getEditedPostAttribute( state, 'meta' ),
 			mode: getBlockMode( state, ownProps.uid ),
+			navigating: isNavigating( state ),
 		};
 	},
 	( dispatch, ownProps ) => ( {
@@ -492,6 +505,10 @@ export default connect(
 
 		onMetaChange( meta ) {
 			dispatch( editPost( { meta } ) );
+		},
+
+		onStartNavigation() {
+			dispatch( startNavigation() );
 		},
 	} )
 )( VisualEditorBlock );

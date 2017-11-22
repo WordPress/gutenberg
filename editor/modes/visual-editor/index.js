@@ -90,7 +90,6 @@ class VisualEditor extends Component {
 					'mod+shift+z': this.undoOrRedo,
 					backspace: this.deleteSelectedBlocks,
 					del: this.deleteSelectedBlocks,
-					escape: this.props.clearSelectedBlock,
 				} } />
 				<WritingFlow>
 					<PostTitle />

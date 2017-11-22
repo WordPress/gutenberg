@@ -113,7 +113,6 @@ class WritingFlow extends Component {
 
 	onKeyDown( event ) {
 		const { selectedBlock, selectionStart, selectionEnd, blocks, hasMultiSelection } = this.props;
-		console.log( 'selectedBlock', selectedBlock, this.props.stateDump );
 
 		const { keyCode, target } = event;
 		const isUp = keyCode === UP;

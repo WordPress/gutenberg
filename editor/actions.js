@@ -144,6 +144,12 @@ export function toggleSelection( uid ) {
 	};
 }
 
+export function startNavigation() {
+	return {
+		type: 'START_NAVIGATION',
+	};
+}
+
 export function clearSelectedBlock() {
 	return {
 		type: 'CLEAR_SELECTED_BLOCK',

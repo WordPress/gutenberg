@@ -42,7 +42,7 @@ class NavigableToolbar extends Component {
 		const selectedBlock = document.querySelector( '.editor-visual-editor__block.is-selected .editor-visual-editor__block-edit' );
 		if ( !! selectedBlock ) {
 			event.stopPropagation();
-			selectedBlock.focus();
+			// selectedBlock.focus();
 		}
 	}
 
