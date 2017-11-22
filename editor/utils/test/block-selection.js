@@ -1,8 +1,8 @@
-import { reset, toggle, incorporate } from '../block-selection';
+import { reset, toggle, includeRange, resetRange } from '../block-selection';
 
 const nothing = { selected: [ ], start: null, end: null };
 
-const ordering = [ 'alpha', 'beta', 'gamma', 'delta', 'epsilon', 'rho' ];
+const ordering = [ 'alpha', 'beta', 'gamma', 'delta', 'epsilon', 'rho', 'gnu' ];
 
 describe( 'block-selection', () => {
 	describe( 'reset', () => {
@@ -24,6 +24,28 @@ describe( 'block-selection', () => {
 		it( '([ delta ], Beta -> Gamma) >>> alpha', () => {
 			const actual = reset( { selected: [ 'delta' ], start: 'beta', end: 'gamma' }, 'alpha' );
 			expect( actual ).toEqual( { selected: [ ], start: 'alpha', end: null } );
+		} );
+	} );
+
+	describe( 'resetRange', () => {
+		it( 'Nothing >>> (alpha -> gamma)', () => {
+			const actual = resetRange( nothing, 'alpha', 'gamma' );
+			expect( actual ).toEqual( { selected: [ ], start: 'alpha', end: 'gamma' } );
+		} );
+
+		it( '(Beta -> ..) >>> (alpha -> gamma)', () => {
+			const actual = resetRange( { selected: [ ], start: 'beta', end: null }, 'alpha', 'gamma' );
+			expect( actual ).toEqual( { selected: [ ], start: 'alpha', end: 'gamma' } );
+		} );
+
+		it( '(Beta -> Gamma) >>> alpha', () => {
+			const actual = resetRange( { selected: [ ], start: 'beta', end: 'gamma' }, 'alpha', 'gamma' );
+			expect( actual ).toEqual( { selected: [ ], start: 'alpha', end: 'gamma' } );
+		} );
+
+		it( '([ delta ], Beta -> Gamma) >>> alpha', () => {
+			const actual = resetRange( { selected: [ 'delta' ], start: 'beta', end: 'gamma' }, 'alpha', 'gamma' );
+			expect( actual ).toEqual( { selected: [ ], start: 'alpha', end: 'gamma' } );
 		} );
 	} );
 
@@ -90,10 +112,40 @@ describe( 'block-selection', () => {
 		} );
 	} );
 
-	describe( 'incorporate', () => {
+	describe( 'includeRange', () => {
 		it( 'Nothing >>> (alpha, alpha)', () => {
-			const actual = incorporate( nothing, 'alpha', 'alpha', ordering );
+			const actual = includeRange( nothing, 'alpha', 'alpha', ordering );
 			expect( actual ).toEqual( { selected: [ ], start: 'alpha', end: 'alpha' } );
+		} );
+
+		it( 'Add a ranged selection that does not overlap with the current selection', () => {
+			const current = { selected: [ ], start: 'alpha', end: 'gamma' };
+			const actual = includeRange( current, 'delta', 'rho', ordering );
+			expect( actual ).toEqual( { selected: [ 'alpha', 'beta', 'gamma' ], start: 'delta', end: 'rho' } );
+		} );
+
+		it( 'Add a ranged selection that overlaps with some of the selected', () => {
+			const current = { selected: [ 'epsilon' ], start: 'alpha', end: 'gamma' };
+			const actual = includeRange( current, 'delta', 'rho', ordering );
+			expect( actual ).toEqual( { selected: [ 'alpha', 'beta', 'gamma' ], start: 'delta', end: 'rho' } );
+		} );
+
+		it( 'Add a ranged selection that overlaps with all of the range', () => {
+			const current = { selected: [ 'epsilon' ], start: 'alpha', end: 'gamma' };
+			const actual = includeRange( current, 'alpha', 'gamma', ordering );
+			expect( actual ).toEqual( { selected: [ 'epsilon' ], start: 'alpha', end: 'gamma' } );
+		} );
+
+		it( 'Add a ranged selection that overlaps with some of the range', () => {
+			const current = { selected: [ 'epsilon' ], start: 'alpha', end: 'gamma' };
+			const actual = includeRange( current, 'beta', 'delta', ordering );
+			expect( actual ).toEqual( { selected: [ 'alpha', 'epsilon' ], start: 'beta', end: 'delta' } );
+		} );
+
+		it( 'Add a ranged selection that overlaps with all of the range (plus more)', () => {
+			const current = { selected: [ ], start: 'alpha', end: 'gamma' };
+			const actual = includeRange( current, 'alpha', 'delta', ordering );
+			expect( actual ).toEqual( { selected: [ ], start: 'alpha', end: 'delta' } );
 		} );
 	} );
 } );

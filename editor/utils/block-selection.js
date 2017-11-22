@@ -34,6 +34,14 @@ export function reset( current, uid ) {
 	};
 }
 
+export function resetRange( current, start, end ) {
+	return {
+		selected: [ ],
+		start: start,
+		end: end,
+	};
+}
+
 export function toggle( current, uid, ordering ) {
 	const everything = getSelected( current, ordering );
 
@@ -57,7 +65,7 @@ export function toggle( current, uid, ordering ) {
 	return { selected: difference( withoutUid, [ current.start ] ), start: current.start, end: null };
 }
 
-export function incorporate( current, start, end, ordering ) {
+export function includeRange( current, start, end, ordering ) {
 	// get the range based on the range here.
 	const everything = getSelected( current, ordering );
 	const inRange = getRange( start, end, ordering );
