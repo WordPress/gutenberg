@@ -268,7 +268,7 @@ class ImageBlock extends Component {
 					<Editable
 						tagName="figcaption"
 						placeholder={ __( 'Write caption…' ) }
-						value={ caption }
+						value={ caption ? caption : undefined }
 						focus={ focus && focus.editable === 'caption' ? focus : undefined }
 						onFocus={ focusCaption }
 						onChange={ ( value ) => setAttributes( { caption: value } ) }
