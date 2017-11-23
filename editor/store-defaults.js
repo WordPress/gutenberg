@@ -10,6 +10,6 @@ export const PREFERENCES_DEFAULTS = {
 	recentlyUsedBlocks: [],
 	blockUsage: {},
 	features: {
-		fixedToolbar: true,
+		fixedToolbar: false,
 	},
 };

@@ -895,7 +895,7 @@ describe( 'state', () => {
 				mode: 'visual',
 				isSidebarOpened: true,
 				panels: { 'post-status': true },
-				features: { fixedToolbar: true },
+				features: { fixedToolbar: false },
 			} );
 		} );
 
