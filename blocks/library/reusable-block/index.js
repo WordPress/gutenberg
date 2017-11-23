@@ -114,7 +114,7 @@ class ReusableBlockEdit extends Component {
 
 const ConnectedReusableBlockEdit = connect(
 	( state, ownProps ) => ( {
-		reusableBlock: state.reusableBlocks[ ownProps.attributes.ref ],
+		reusableBlock: state.reusableBlocks.data[ ownProps.attributes.ref ],
 	} ),
 	( dispatch, ownProps ) => ( {
 		fetchReusableBlock() {
