@@ -225,6 +225,8 @@ class VisualEditorBlockList extends Component {
 						onSelectionStart={ this.onSelectionStart }
 						onShiftSelection={ this.onShiftSelection }
 						onMetaSelection={ this.onMetaSelection }
+						isMultiSelectFocus={ this.props.selectionEnd === uid ? true : false }
+						isMultiSelectAnchor={ this.props.selectionStart === uid ? true : false }
 					/>,
 					<VisualEditorSiblingInserter
 						key={ 'sibling-inserter-' + uid }

@@ -108,6 +108,14 @@
 		background: $blue-medium-highlight;
 	}
 
+	&.is-multi-selected-focus:before {
+		outline: 1px solid blue;
+	}
+
+	&.is-multi-selected-anchor:before {
+		outline: 1px solid yellowgreen;
+	}
+
 	.iframe-overlay {
 		position: relative;
 	}

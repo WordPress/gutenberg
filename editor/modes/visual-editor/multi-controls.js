@@ -26,7 +26,6 @@ function VisualEditorBlockMultiControls( { multiSelectedBlockUids, isSelecting }
 		<BlockSettingsMenu
 			key="menu"
 			uids={ multiSelectedBlockUids }
-			focus
 		/>,
 	];
 }

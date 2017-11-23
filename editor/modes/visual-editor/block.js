@@ -53,6 +53,7 @@ import {
 	isFirstMultiSelectedBlock,
 	isNavigating,
 	getMultiSelectedBlocksStartUid,
+	getMultiSelectedBlocksEndUid,
 	isTyping,
 	getBlockMode,
 } from '../../selectors';
@@ -131,6 +132,12 @@ class VisualEditorBlock extends Component {
 			} else {
 				this.removeStopTypingListener();
 			}
+		}
+
+		if ( this.props.isMultiSelectFocus && ! prevProps.isMultiSelectFocus ) {
+			this.node.focus();
+		} else if ( prevProps.isMultiSelectFocus && ! this.props.isMultiSelectFocus ) {
+			// blur ?
 		}
 	}
 
@@ -248,7 +255,6 @@ class VisualEditorBlock extends Component {
 	}
 
 	onPointerDown( event ) {
-		console.log( 'event', event.nativeEvent );
 		// Not the main button.
 		// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
 		if ( event.button !== 0 ) {
@@ -347,6 +353,8 @@ class VisualEditorBlock extends Component {
 			'is-selected': showUI,
 			'is-multi-selected': isMultiSelected,
 			'is-hovered': isHovered,
+			'is-multi-selected-focus': this.props.isMultiSelectFocus,
+			'is-multi-selected-anchor': this.props.isMultiSelectAnchor,
 		} );
 
 		const { onMouseLeave, onFocus, onReplace } = this.props;
