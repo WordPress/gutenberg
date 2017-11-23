@@ -95,8 +95,10 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [] }
+				reusableBlocks={ [] }
 				recentlyUsedBlocks={ [] }
 				debouncedSpeak={ noop }
+				fetchReusableBlocks={ noop }
 				blockTypes
 			/>
 		);
@@ -114,8 +116,10 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [] }
+				reusableBlocks={ [] }
 				recentlyUsedBlocks={ [ advancedTextBlock ] }
 				debouncedSpeak={ noop }
+				fetchReusableBlocks={ noop }
 				blockTypes={ false }
 			/>
 		);
@@ -130,8 +134,10 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [] }
+				reusableBlocks={ [] }
 				recentlyUsedBlocks={ [ textBlock, advancedTextBlock ] }
 				debouncedSpeak={ noop }
+				fetchReusableBlocks={ noop }
 				blockTypes={ [ textBlock.name ] }
 			/>
 		);
@@ -147,6 +153,7 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [] }
+				reusableBlocks={ [] }
 				recentlyUsedBlocks={ [
 					// Actually recently used by user, thus present at the top.
 					advancedTextBlock,
@@ -157,6 +164,7 @@ describe( 'InserterMenu', () => {
 					someOtherBlock,
 				] }
 				debouncedSpeak={ noop }
+				fetchReusableBlocks={ noop }
 				blockTypes
 			/>
 		);
@@ -173,8 +181,10 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [] }
+				reusableBlocks={ [] }
 				recentlyUsedBlocks={ [] }
 				debouncedSpeak={ noop }
+				fetchReusableBlocks={ noop }
 				blockTypes
 			/>
 		);
@@ -197,8 +207,10 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [] }
+				reusableBlocks={ [] }
 				recentlyUsedBlocks={ [] }
 				debouncedSpeak={ noop }
+				fetchReusableBlocks={ noop }
 				blockTypes
 			/>
 		);
@@ -223,8 +235,10 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [ { name: moreBlock.name } ] }
+				reusableBlocks={ [] }
 				recentlyUsedBlocks={ [] }
 				debouncedSpeak={ noop }
+				fetchReusableBlocks={ noop }
 				blockTypes
 			/>
 		);
@@ -244,8 +258,10 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [] }
+				reusableBlocks={ [] }
 				recentlyUsedBlocks={ [] }
 				debouncedSpeak={ noop }
+				fetchReusableBlocks={ noop }
 				blockTypes
 			/>
 		);
@@ -267,8 +283,10 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [] }
+				reusableBlocks={ [] }
 				recentlyUsedBlocks={ [] }
 				debouncedSpeak={ noop }
+				fetchReusableBlocks={ noop }
 				blockTypes
 			/>
 		);

@@ -34,8 +34,8 @@ import { keycodes } from '@wordpress/utils';
  */
 import './style.scss';
 
-import { getBlocks, getRecentlyUsedBlocks } from '../../selectors';
-import { showInsertionPoint, hideInsertionPoint } from '../../actions';
+import { getBlocks, getRecentlyUsedBlocks, getReusableBlocks } from '../../selectors';
+import { showInsertionPoint, hideInsertionPoint, fetchReusableBlocks } from '../../actions';
 import { default as InserterGroup } from './group';
 
 export const searchBlocks = ( blocks, searchTerm ) => {
@@ -71,6 +71,10 @@ export class InserterMenu extends Component {
 		this.switchTab = this.switchTab.bind( this );
 	}
 
+	componentDidMount() {
+		this.props.fetchReusableBlocks();
+	}
+
 	componentDidUpdate( prevProps, prevState ) {
 		const searchResults = this.searchBlocks( this.getBlockTypes() );
 		// Announce the blocks search results to screen readers.
@@ -103,16 +107,16 @@ export class InserterMenu extends Component {
 		} );
 	}
 
-	selectBlock( name ) {
+	selectBlock( name, attributes ) {
 		return () => {
-			this.props.onSelect( name );
+			this.props.onSelect( name, attributes );
 			this.setState( {
 				filterValue: '',
 			} );
 		};
 	}
 
-	getBlockTypes() {
+	getStaticBlockTypes() {
 		const { blockTypes } = this.props;
 
 		// If all block types disabled, return empty set
@@ -134,6 +138,28 @@ export class InserterMenu extends Component {
 				includes( blockTypes, block.name )
 			);
 		} );
+	}
+
+	getReusableBlockTypes() {
+		const { reusableBlocks } = this.props;
+
+		// Display reusable blocks that we've fetched in the inserter
+		return reusableBlocks.map( ( reusableBlock ) => ( {
+			name: 'core/reusable-block',
+			attributes: {
+				ref: reusableBlock.id,
+			},
+			title: reusableBlock.name,
+			icon: 'layout',
+			category: 'reusable-blocks',
+		} ) );
+	}
+
+	getBlockTypes() {
+		return [
+			...this.getStaticBlockTypes(),
+			...this.getReusableBlockTypes(),
+		];
 	}
 
 	searchBlocks( blockTypes ) {
@@ -324,9 +350,10 @@ const connectComponent = connect(
 		return {
 			recentlyUsedBlocks: getRecentlyUsedBlocks( state ),
 			blocks: getBlocks( state ),
+			reusableBlocks: getReusableBlocks( state ),
 		};
 	},
-	{ showInsertionPoint, hideInsertionPoint }
+	{ showInsertionPoint, hideInsertionPoint, fetchReusableBlocks }
 );
 
 export default flow(
