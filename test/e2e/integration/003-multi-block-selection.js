@@ -10,12 +10,9 @@ describe( 'Multi-block selection', () => {
 		const multiSelectedCssClass = 'is-multi-selected';
 
 		// Creating test blocks
-		// Using the placeholder
-		cy.get( '[value="Write your story"]' ).click();
+		cy.get( '.editor-default-block-appender' ).click();
 		cy.get( lastBlockSelector ).type( 'First Paragraph' );
-
-		// Using the quick inserter
-		cy.get( '.editor-visual-editor__inserter [aria-label="Insert Paragraph"]' ).click();
+		cy.get( '.editor-default-block-appender' ).click();
 		cy.get( lastBlockSelector ).type( 'Second Paragraph' );
 
 		// Default: No selection
