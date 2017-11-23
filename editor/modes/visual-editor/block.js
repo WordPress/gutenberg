@@ -136,11 +136,11 @@ class VisualEditorBlock extends Component {
 			}
 		}
 
-		if ( this.props.isMultiSelectFocus && ! prevProps.isMultiSelectFocus ) {
-			this.outerNode.focus();
-		} else if ( prevProps.isMultiSelectFocus && ! this.props.isMultiSelectFocus ) {
-			// blur ?
-		}
+		// if ( this.props.isMultiSelectFocus && ! prevProps.isMultiSelectFocus ) {
+		// 	this.outerNode.focus();
+		// } else if ( prevProps.isMultiSelectFocus && ! this.props.isMultiSelectFocus ) {
+		// 	// blur ?
+		// }
 	}
 
 	componentWillUnmount() {
@@ -253,7 +253,7 @@ class VisualEditorBlock extends Component {
 	}
 
 	onFocus( event ) {
-		if ( event.target === this.node && ! this.props.isMultiSelected ) {
+		if ( event.target === this.node ) {
 			this.props.onSelect();
 		}
 	}

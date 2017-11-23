@@ -340,9 +340,9 @@ export default {
 		const state = getState();
 		console.log('state', state);
 		const newSelection = toggle( state.blockSelection, action.uid, state.editor.present.blockOrder );
-		console.log( 'newSelection', newSelection );
+		console.log( 'newSelection', newSelection, 'action', action.focusUid );
 		dispatch(
-			setSelection( newSelection.start, newSelection.end, newSelection.selected )
+			setSelection( newSelection.start, newSelection.end, newSelection.selected, action.focusUid )
 		);
 	},
 };

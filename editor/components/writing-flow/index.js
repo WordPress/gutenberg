@@ -28,12 +28,12 @@ import {
 	getSelectedBlock,
 	isNavigating,
 } from '../../selectors';
-import { multiSelect, focusBlock, selectBlock } from '../../actions';
+import { multiSelect, focusBlock, selectBlock, toggleSelection } from '../../actions';
 
 /**
  * Module Constants
  */
-const { UP, DOWN, LEFT, RIGHT } = keycodes;
+const { UP, DOWN, LEFT, RIGHT, SPACE, ENTER } = keycodes;
 
 class WritingFlow extends Component {
 	constructor() {
@@ -136,7 +136,7 @@ class WritingFlow extends Component {
 
 		const isNavEdge = isVertical ? isVerticalEdge : isHorizontalEdge;
 
-		const focusedUid = selectedBlock ? selectedBlock.uid : focusedBlock;
+		const focusedUid = focusedBlock;
 
 		console.log( 'focusedUid', focusedUid, focusedBlock, this.props.stateDump );
 
@@ -158,8 +158,8 @@ class WritingFlow extends Component {
 			// Shift key is down, but no existing block selection
 			event.preventDefault();
 			this.expandSelection( blocks, focusedUid, focusedUid, isReverse ? -1 : +1 );
-		} else if ( isNav && ! isShift && hasMultiSelection ) {
-			console.log('FOCUSING');
+		} else if ( isNav && ! isShift && this.props.inNavigationMode ) {
+			console.log('FOCUS ON CURRENTLY', focusedUid );
 			this.focusBlock( blocks, focusedUid, isReverse ? -1 : 1 );
 		} else if ( isVertical && isVerticalEdge( target, isReverse, isShift ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
@@ -169,6 +169,14 @@ class WritingFlow extends Component {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
 			placeCaretAtHorizontalEdge( closestTabbable, isReverse );
 			event.preventDefault();
+		} else if ( hasMultiSelection && keyCode === SPACE ) {
+			this.props.toggleSelection( focusedUid, focusedUid );
+			event.preventDefault();
+			event.stopPropagation();
+		} else if ( hasMultiSelection && keyCode === ENTER ) {
+			this.props.selectBlock( focusedUid );
+			event.preventDefault();
+			event.stopPropagation();
 		}
 	}
 
@@ -201,6 +209,7 @@ export default connect(
 		focusedBlock: state.blockSelection.focus && state.blockSelection.focus.uid,
 
 		hasMultiSelection: getMultiSelectedBlocks( state ).length > 0,
+		inNavigationMode: isNavigating( state ),
 		selectedBlock: getSelectedBlock( state ),
 		stateDump: state,
 	} ),
@@ -214,6 +223,10 @@ export default connect(
 
 		focusBlock( uid, config ) {
 			dispatch( focusBlock( uid, config ) );
+		},
+
+		toggleSelection( uid, focusUid ) {
+			dispatch( toggleSelection( uid, focusUid ) );
 		},
 	} )
 )( WritingFlow );

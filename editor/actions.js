@@ -128,19 +128,21 @@ export function multiSelect( start, end ) {
 	};
 }
 
-export function setSelection( start, end, selected ) {
+export function setSelection( start, end, selected, focusUid ) {
 	return {
 		type: 'SET_SELECTION',
 		start,
 		end,
 		selected,
+		focusUid,
 	};
 }
 
-export function toggleSelection( uid ) {
+export function toggleSelection( uid, focusUid = null ) {
 	return {
 		type: 'TOGGLE_SELECTION',
 		uid,
+		focusUid,
 	};
 }
 

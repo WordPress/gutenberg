@@ -333,6 +333,7 @@ export function isTyping( state = false, action ) {
  */
 export function blockSelection( state = { isNavigating: false, selected: [ ], start: null, end: null, focus: null, isMultiSelecting: false }, action ) {
 	const ff = () => {
+		console.log('action', action);
 		switch ( action.type ) {
 			case 'CLEAR_SELECTED_BLOCK':
 				return {
@@ -369,6 +370,7 @@ export function blockSelection( state = { isNavigating: false, selected: [ ], st
 				return {
 					...state,
 					selected: [ ],
+					isNavigating: false,
 					start: action.uid,
 					end: null,
 					focus: {
@@ -403,7 +405,7 @@ export function blockSelection( state = { isNavigating: false, selected: [ ], st
 					end: action.end,
 					isNavigating: action.selected.length > 0 || !! action.end,
 					focus: {
-						uid: action.end,
+						uid: action.focusUid || action.end,
 						config: { },
 					},
 				};
@@ -441,6 +443,7 @@ export function blockSelection( state = { isNavigating: false, selected: [ ], st
 	};
 
 	const res = ff();
+	console.log('resulting state', res);
 	return res;
 }
 
