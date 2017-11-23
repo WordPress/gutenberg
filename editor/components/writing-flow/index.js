@@ -3,7 +3,7 @@
  */
 import { connect } from 'react-redux';
 import 'element-closest';
-import { find, reverse } from 'lodash';
+import { find, reverse, includes } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -25,6 +25,7 @@ import {
 	getMultiSelectedBlocksStartUid,
 	getMultiSelectedBlocksEndUid,
 	getMultiSelectedBlocks,
+	getMultiSelectedBlockUids,
 	getSelectedBlock,
 	isNavigating,
 } from '../../selectors';
@@ -152,7 +153,7 @@ class WritingFlow extends Component {
 			this.verticalRect = computeCaretRect( target );
 		}
 
-		if ( isNav && isShift && hasMultiSelection ) {
+		if ( isNav && isShift && isNavigating ) {
 			// Shift key is down and existing block selection
 			event.preventDefault();
 
@@ -183,16 +184,19 @@ class WritingFlow extends Component {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
 			placeCaretAtHorizontalEdge( closestTabbable, isReverse );
 			event.preventDefault();
-		} else if ( hasMultiSelection && keyCode === SPACE ) {
+		} else if ( this.props.inNavigationMode && keyCode === SPACE ) {
 			if ( event.metaKey || event.ctrlKey ) {
 				this.props.toggleSelection( focusedUid, focusedUid );
+			} else if ( includes( this.props.multiSelectedUids, focusedUid ) ) {
+				this.props.setSelection( focusedUid, null, [ ], focusedUid )
 			} else {
+				// HERE LIES BAD CODE.
 				this.props.setSelection( focusedUid, focusedUid, [ ], focusedUid );
 			}
 
 			event.preventDefault();
 			event.stopPropagation();
-		} else if ( hasMultiSelection && keyCode === ENTER ) {
+		} else if ( this.props.inNavigationMode && keyCode === ENTER ) {
 			this.props.selectBlock( focusedUid );
 			event.preventDefault();
 			event.stopPropagation();
@@ -226,6 +230,8 @@ export default connect(
 
 		// Temporary hack
 		focusedBlock: state.blockSelection.focus && state.blockSelection.focus.uid,
+
+		multiSelectedUids: getMultiSelectedBlockUids( state ),
 
 		hasMultiSelection: getMultiSelectedBlocks( state ).length > 0,
 		inNavigationMode: isNavigating( state ),

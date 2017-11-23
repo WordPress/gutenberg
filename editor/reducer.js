@@ -381,6 +381,8 @@ export function blockSelection( state = { isNavigating: false, selected: [ ], st
 			case 'UPDATE_FOCUS':
 				return {
 					...state,
+					// Update the start if don't have a multi-selection
+					start: state.end ? state.start : action.uid,
 					focus: {
 						uid: action.uid,
 						config: action.config,
@@ -403,7 +405,7 @@ export function blockSelection( state = { isNavigating: false, selected: [ ], st
 					selected: action.selected,
 					start: action.start,
 					end: action.end,
-					isNavigating: action.selected.length > 0 || !! action.end,
+					isNavigating: true,
 					focus: {
 						uid: action.focusUid || action.end,
 						config: { },
