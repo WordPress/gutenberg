@@ -14,8 +14,7 @@ import { KeyboardShortcuts } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import VisualEditorInserter from './inserter';
-import { BlockList, PostTitle, WritingFlow } from '../../../components';
+import { BlockList, PostTitle, WritingFlow, DefaultBlockAppender } from '../../../components';
 import { getBlockUids, getMultiSelectedBlockUids, isFeatureActive } from '../../../selectors';
 import { clearSelectedBlock, multiSelect, redo, undo, removeBlocks } from '../../../actions';
 
@@ -98,7 +97,7 @@ class VisualEditor extends Component {
 						showContextualToolbar={ ! this.props.hasFixedToolbar }
 					/>
 				</WritingFlow>
-				<VisualEditorInserter />
+				<DefaultBlockAppender />
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */

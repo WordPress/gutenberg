@@ -17,11 +17,11 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BlockMover from '../block-mover';
+import BlockDropZone from '../block-drop-zone';
 import BlockSettingsMenu from '../block-settings-menu';
 import InvalidBlockWarning from './invalid-block-warning';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
-import BlockDropZone from './block-drop-zone';
 import BlockHtml from './block-html';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import BlockMultiControls from './multi-controls';

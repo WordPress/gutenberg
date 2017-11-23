@@ -323,47 +323,6 @@
 	}
 }
 
-.editor-block-list__placeholder {
-	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );
-	padding: 0;
-	clear: left;
-	margin: 0 auto;
-	position: relative;
-
-	@include break-small() {
-		padding: 0 ( $block-padding + $block-mover-padding-visible );
-	}
-
-	input[type=text] {
-		height: $text-editor-font-size * 4; // same height as an empty paragraph
-		margin: 0px 0px 4px 0px;
-		outline: 1px solid transparent;
-		border: none;
-		background: none;
-		box-shadow: none;
-		display: block;
-		transition: 0.2s outline;
-		text-align: left;
-		width: 100%;
-		color: $dark-gray-300;
-		font-size: $editor-font-size;
-		line-height: $editor-line-height;
-		cursor: text;
-		max-width: none;	// fixes a bleed issue from the admin
-
-		&:hover {
-			outline: 1px solid $light-gray-500;
-		}
-
-		padding: ( $block-padding - 2px ) $block-padding;
-
-		@include break-small() {
-			margin-left: -$block-padding;
-			margin-right: -$block-padding;
-		}
-	}
-}
-
 .editor-block-list__block .blocks-visual-editor__block-html-textarea {
 	display: block;
 	margin: 0;
