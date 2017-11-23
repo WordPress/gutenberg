@@ -1,0 +1,12 @@
+.editor-default-block-appender input[type=text] {
+	border: none;
+	background: none;
+	box-shadow: none;
+	display: block;
+	width: 100%;
+	height: $text-editor-font-size * 4; // same height as an empty paragraph
+	font-size: $editor-font-size;
+	line-height: $editor-line-height;
+	cursor: text;
+	max-width: none;	// fixes a bleed issue from the admin
+}

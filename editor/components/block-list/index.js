@@ -8,7 +8,6 @@ import {
 	invert,
 	isEqual,
 	mapValues,
-	noop,
 	sortBy,
 	throttle,
 } from 'lodash';
@@ -18,9 +17,8 @@ import 'element-closest';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { serialize, getDefaultBlockName, createBlock } from '@wordpress/blocks';
+import { serialize } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -28,7 +26,6 @@ import { serialize, getDefaultBlockName, createBlock } from '@wordpress/blocks';
 import './style.scss';
 import BlockListBlock from './block';
 import BlockListSiblingInserter from './sibling-inserter';
-import BlockDropZone from './block-drop-zone';
 import {
 	getBlockUids,
 	getMultiSelectedBlocksStartUid,
@@ -37,7 +34,7 @@ import {
 	getMultiSelectedBlockUids,
 	getSelectedBlock,
 } from '../../selectors';
-import { insertBlock, startMultiSelect, stopMultiSelect, multiSelect, selectBlock } from '../../actions';
+import { startMultiSelect, stopMultiSelect, multiSelect, selectBlock } from '../../actions';
 
 class BlockList extends Component {
 	constructor( props ) {
@@ -49,7 +46,6 @@ class BlockList extends Component {
 		this.onCopy = this.onCopy.bind( this );
 		this.onCut = this.onCut.bind( this );
 		this.setBlockRef = this.setBlockRef.bind( this );
-		this.appendDefaultBlock = this.appendDefaultBlock.bind( this );
 		this.setLastClientY = this.setLastClientY.bind( this );
 		this.onPointerMove = throttle( this.onPointerMove.bind( this ), 100 );
 		// Browser does not fire `*move` event when the pointer position changes
@@ -200,11 +196,6 @@ class BlockList extends Component {
 		}
 	}
 
-	appendDefaultBlock() {
-		const newBlock = createBlock( getDefaultBlockName() );
-		this.props.onInsertBlock( newBlock );
-	}
-
 	render() {
 		const { blocks, showContextualToolbar } = this.props;
 
@@ -225,19 +216,6 @@ class BlockList extends Component {
 						uid={ uid }
 					/>,
 				] ) }
-				{ ! blocks.length &&
-					<div className="editor-block-list__placeholder">
-						<BlockDropZone />
-						<input
-							type="text"
-							readOnly
-							value={ __( 'Write your story' ) }
-							onFocus={ this.appendDefaultBlock }
-							onClick={ noop }
-							onKeyDown={ noop }
-						/>
-					</div>
-				}
 			</div>
 		);
 	}
@@ -253,9 +231,6 @@ export default connect(
 		selectedBlock: getSelectedBlock( state ),
 	} ),
 	( dispatch ) => ( {
-		onInsertBlock( block ) {
-			dispatch( insertBlock( block ) );
-		},
 		onStartMultiSelect() {
 			dispatch( startMultiSelect() );
 		},
