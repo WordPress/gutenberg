@@ -14,7 +14,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { getPostEditUrl, getWPAdminURL } from './utils/url';
-import { reset, resetRange, toggle, includeRange } from './utils/block-selection';
+import { reset, resetRange, toggle, includeRange, combineRange } from './utils/block-selection';
 
 import {
 	setSelection,
@@ -329,6 +329,16 @@ export default {
 
 		const state = getState();
 		const newSelection = includeRange( state.blockSelection, action.start, action.end, state.editor.present.blockOrder );
+		dispatch(
+			setSelection( newSelection.start, newSelection.end, newSelection.selected )
+		);
+	},
+
+	COMBINE_SELECTION_RANGE( action, store ) {
+		const { getState, dispatch } = store;
+
+		const state = getState();
+		const newSelection = combineRange( state.blockSelection, action.start, action.end, state.editor.present.blockOrder );
 		dispatch(
 			setSelection( newSelection.start, newSelection.end, newSelection.selected )
 		);

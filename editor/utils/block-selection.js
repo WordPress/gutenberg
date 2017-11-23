@@ -71,3 +71,12 @@ export function includeRange( current, start, end, ordering ) {
 	return { selected: withoutRange, start: start, end: end };
 }
 
+export function combineRange( current, start, end, ordering ) {
+	const everything = getSelected( current, ordering );
+
+	const inRange = getRange( start, end, ordering );
+
+	const withoutRange = difference( everything, inRange );
+	return { selected: withoutRange, start: start, end: end };
+}
+

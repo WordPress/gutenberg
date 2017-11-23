@@ -28,7 +28,7 @@ import {
 	getSelectedBlock,
 	isNavigating,
 } from '../../selectors';
-import { multiSelect, focusBlock, selectBlock, setSelection, toggleSelection } from '../../actions';
+import { multiSelect, focusBlock, selectBlock, combineRange, setSelection, toggleSelection } from '../../actions';
 
 /**
  * Module Constants
@@ -140,6 +140,8 @@ class WritingFlow extends Component {
 
 		console.log( 'focusedUid', focusedUid, focusedBlock, this.props.stateDump );
 
+		const wayward = focusedUid !== selectionEnd;
+
 		if ( ! focusedUid ) {
 			return;
 		}
@@ -153,7 +155,19 @@ class WritingFlow extends Component {
 		if ( isNav && isShift && hasMultiSelection ) {
 			// Shift key is down and existing block selection
 			event.preventDefault();
-			this.expandSelection( blocks, selectionStart, selectionEnd, isReverse ? -1 : +1 );
+
+			// If the focus has shifted away from the ranged selection, spawn another one.
+			if ( wayward ) {
+				const lastIndex = blocks.indexOf( focusedUid );
+				const nextIndex = Math.max( 0, Math.min( blocks.length - 1, lastIndex + ( isReverse ? -1 : +1 ) ) );
+				if ( event.ctrlKey ) {
+					this.props.combineRange( focusedUid, blocks[ nextIndex ] || focusedUid );
+				} else {
+					this.props.setSelection( focusedUid, blocks[ nextIndex ] || focusedUid, [ ], null );
+				}
+			} else {
+				this.expandSelection( blocks, selectionStart, selectionEnd, isReverse ? -1 : +1 );
+			}
 		} else if ( isNav && isShift && this.isEditableEdge( isReverse, target ) && isNavEdge( target, isReverse, true ) ) {
 			// Shift key is down, but no existing block selection
 			event.preventDefault();
@@ -236,6 +250,10 @@ export default connect(
 
 		setSelection( start, end, selected, focusUid ) {
 			dispatch( setSelection( start, end, selected, focusUid ) );
+		},
+
+		combineRange( start, end ) {
+			dispatch( combineRange( start, end ) );
 		},
 	} )
 )( WritingFlow );

@@ -128,6 +128,14 @@ export function multiSelect( start, end ) {
 	};
 }
 
+export function combineRange( start, end ) {
+	return {
+		type: 'COMBINE_SELECTION_RANGE',
+		start,
+		end,
+	};
+}
+
 export function setSelection( start, end, selected, focusUid ) {
 	return {
 		type: 'SET_SELECTION',
