@@ -28,7 +28,7 @@ import {
 	getSelectedBlock,
 	isNavigating,
 } from '../../selectors';
-import { multiSelect, focusBlock, selectBlock, toggleSelection } from '../../actions';
+import { multiSelect, focusBlock, selectBlock, setSelection, toggleSelection } from '../../actions';
 
 /**
  * Module Constants
@@ -170,7 +170,12 @@ class WritingFlow extends Component {
 			placeCaretAtHorizontalEdge( closestTabbable, isReverse );
 			event.preventDefault();
 		} else if ( hasMultiSelection && keyCode === SPACE ) {
-			this.props.toggleSelection( focusedUid, focusedUid );
+			if ( event.metaKey || event.ctrlKey ) {
+				this.props.toggleSelection( focusedUid, focusedUid );
+			} else {
+				this.props.setSelection( focusedUid, focusedUid, [ ], focusedUid );
+			}
+
 			event.preventDefault();
 			event.stopPropagation();
 		} else if ( hasMultiSelection && keyCode === ENTER ) {
@@ -227,6 +232,10 @@ export default connect(
 
 		toggleSelection( uid, focusUid ) {
 			dispatch( toggleSelection( uid, focusUid ) );
+		},
+
+		setSelection( start, end, selected, focusUid ) {
+			dispatch( setSelection( start, end, selected, focusUid ) );
 		},
 	} )
 )( WritingFlow );
