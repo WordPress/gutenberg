@@ -172,11 +172,11 @@ export function getCommentDelimitedContent( rawBlockName, attributes, content, v
 		rawBlockName;
 
 	if ( ! content ) {
-		return `<!-- wp:${ blockName } ${ serializedAttributes }${ serializedVersion }/-->`;
+		return `<!-- wp:${ blockName } ${ serializedVersion }${ serializedAttributes }/-->`;
 	}
 
 	return (
-		`<!-- wp:${ blockName } ${ serializedAttributes }${ serializedVersion }-->\n` +
+		`<!-- wp:${ blockName } ${ serializedVersion }${ serializedAttributes }-->\n` +
 		content +
 		`\n<!-- /wp:${ blockName } -->`
 	);
