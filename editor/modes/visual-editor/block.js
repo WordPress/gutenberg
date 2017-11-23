@@ -83,6 +83,8 @@ class VisualEditorBlock extends Component {
 		this.previousOffset = null;
 		this.hadTouchStart = false;
 
+		this.outerNode = null;
+
 		this.state = {
 			error: null,
 		};
@@ -90,7 +92,7 @@ class VisualEditorBlock extends Component {
 
 	componentDidMount() {
 		if ( this.props.focus && this.props.navigating ) {
-			this.node.focus();
+			this.outerNode.focus();
 		}
 
 		if ( this.props.isTyping ) {
@@ -122,7 +124,7 @@ class VisualEditorBlock extends Component {
 
 		// Focus node when focus state is programmatically transferred.
 		if ( this.props.focus && ! prevProps.focus && ! this.node.contains( document.activeElement ) && this.props.navigating ) {
-			this.node.focus();
+			this.outerNode.focus();
 		}
 
 		// Bind or unbind mousemove from page when user starts or stops typing
@@ -135,7 +137,7 @@ class VisualEditorBlock extends Component {
 		}
 
 		if ( this.props.isMultiSelectFocus && ! prevProps.isMultiSelectFocus ) {
-			this.node.focus();
+			this.outerNode.focus();
 		} else if ( prevProps.isMultiSelectFocus && ! this.props.isMultiSelectFocus ) {
 			// blur ?
 		}
@@ -151,6 +153,8 @@ class VisualEditorBlock extends Component {
 
 	setBlockListRef( node ) {
 		this.props.blockRef( node, this.props.uid );
+
+		this.outerNode = node;
 	}
 
 	bindBlockNode( node ) {
@@ -381,6 +385,7 @@ class VisualEditorBlock extends Component {
 				className={ wrapperClassName }
 				data-type={ block.name }
 				onTouchStart={ this.onTouchStart }
+				tabIndex="0"
 				onClick={ this.onClick }
 				{ ...wrapperProps }
 			>

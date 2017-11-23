@@ -116,6 +116,11 @@
 		outline: 1px solid yellowgreen;
 	}
 
+	&:focus {
+		outline: 4px solid magenta;
+	}
+
+
 	.iframe-overlay {
 		position: relative;
 	}

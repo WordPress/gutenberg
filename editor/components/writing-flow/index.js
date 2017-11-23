@@ -26,8 +26,9 @@ import {
 	getMultiSelectedBlocksEndUid,
 	getMultiSelectedBlocks,
 	getSelectedBlock,
+	isNavigating,
 } from '../../selectors';
-import { multiSelect, selectBlock } from '../../actions';
+import { multiSelect, focusBlock, selectBlock } from '../../actions';
 
 /**
  * Module Constants
@@ -98,6 +99,14 @@ class WritingFlow extends Component {
 		} );
 	}
 
+	focusBlock( blocks, focusedUid, delta ) {
+		console.log( 'focusedUid', focusedUid );
+		const lastIndex = blocks.indexOf( focusedUid );
+		const nextIndex = Math.max( 0, Math.min( blocks.length - 1, lastIndex + delta ) );
+		console.log(' blocks', blocks[nextIndex ]);
+		this.props.focusBlock( blocks[ nextIndex ], { } );
+	}
+
 	expandSelection( blocks, currentStartUid, currentEndUid, delta ) {
 		const lastIndex = blocks.indexOf( currentEndUid );
 		const nextIndex = Math.max( 0, Math.min( blocks.length - 1, lastIndex + delta ) );
@@ -112,7 +121,7 @@ class WritingFlow extends Component {
 	}
 
 	onKeyDown( event ) {
-		const { selectedBlock, selectionStart, selectionEnd, blocks, hasMultiSelection } = this.props;
+		const { selectedBlock, selectionStart, selectionEnd, blocks, hasMultiSelection, focusedBlock } = this.props;
 
 		const { keyCode, target } = event;
 		const isUp = keyCode === UP;
@@ -127,6 +136,14 @@ class WritingFlow extends Component {
 
 		const isNavEdge = isVertical ? isVerticalEdge : isHorizontalEdge;
 
+		const focusedUid = selectedBlock ? selectedBlock.uid : focusedBlock;
+
+		console.log( 'focusedUid', focusedUid, focusedBlock, this.props.stateDump );
+
+		if ( ! focusedUid ) {
+			return;
+		}
+
 		if ( ! isVertical ) {
 			this.verticalRect = null;
 		} else if ( ! this.verticalRect ) {
@@ -140,10 +157,10 @@ class WritingFlow extends Component {
 		} else if ( isNav && isShift && this.isEditableEdge( isReverse, target ) && isNavEdge( target, isReverse, true ) ) {
 			// Shift key is down, but no existing block selection
 			event.preventDefault();
-			this.expandSelection( blocks, selectedBlock.uid, selectedBlock.uid, isReverse ? -1 : +1 );
+			this.expandSelection( blocks, focusedUid, focusedUid, isReverse ? -1 : +1 );
 		} else if ( isNav && ! isShift && hasMultiSelection ) {
-			this.props.selectBlock( selectionEnd );
-
+			console.log('FOCUSING');
+			this.focusBlock( blocks, focusedUid, isReverse ? -1 : 1 );
 		} else if ( isVertical && isVerticalEdge( target, isReverse, isShift ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
 			placeCaretAtVerticalEdge( closestTabbable, isReverse, this.verticalRect );
@@ -179,6 +196,10 @@ export default connect(
 		blocks: getBlockUids( state ),
 		selectionStart: getMultiSelectedBlocksStartUid( state ),
 		selectionEnd: getMultiSelectedBlocksEndUid( state ),
+
+		// Temporary hack
+		focusedBlock: state.blockSelection.focus && state.blockSelection.focus.uid,
+
 		hasMultiSelection: getMultiSelectedBlocks( state ).length > 0,
 		selectedBlock: getSelectedBlock( state ),
 		stateDump: state,
@@ -189,6 +210,10 @@ export default connect(
 		},
 		selectBlock( uid ) {
 			dispatch( selectBlock( uid ) );
+		},
+
+		focusBlock( uid, config ) {
+			dispatch( focusBlock( uid, config ) );
 		},
 	} )
 )( WritingFlow );

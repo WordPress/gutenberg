@@ -352,16 +352,17 @@ export function blockSelection( state = { isNavigating: false, selected: [ ], st
 				return {
 					...state,
 					isMultiSelecting: false,
-					focus: state.start && ! state.end ? state.focus : null,
+					// focus: state.start && ! state.end ? state.focus : null,
 				};
 			case 'MULTI_SELECT':
 				return {
 					...state,
 					start: action.start,
 					end: action.end,
+					isNavigating: true,
 					focus: {
 						... state.focus,
-						uid: action.uid,
+						uid: action.end,
 					},
 				};
 			case 'SELECT_BLOCK':
@@ -378,8 +379,6 @@ export function blockSelection( state = { isNavigating: false, selected: [ ], st
 			case 'UPDATE_FOCUS':
 				return {
 					...state,
-					start: action.uid,
-					end: null,
 					focus: {
 						uid: action.uid,
 						config: action.config,
@@ -402,6 +401,11 @@ export function blockSelection( state = { isNavigating: false, selected: [ ], st
 					selected: action.selected,
 					start: action.start,
 					end: action.end,
+					isNavigating: action.selected.length > 0 || !! action.end,
+					focus: {
+						uid: action.end,
+						config: { },
+					},
 				};
 
 			case 'INSERT_BLOCKS':
