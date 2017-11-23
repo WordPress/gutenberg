@@ -191,7 +191,8 @@ class WritingFlow extends Component {
 			} else if ( includes( this.props.multiSelectedUids, focusedUid ) ) {
 				this.props.setSelection( focusedUid, null, [ ], focusedUid )
 
-				// Can't just always prevent default, because need to fire space on buttons.
+				// Can't just always prevent default, because need to fire space on buttons. Or is that
+				// handled now with stopPropagation in the menus?
 				event.preventDefault();
 			} else {
 				// HERE LIES BAD CODE.
