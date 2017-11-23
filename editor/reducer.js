@@ -10,11 +10,9 @@ import {
 	get,
 	reduce,
 	keyBy,
-	keys,
 	first,
 	last,
 	omit,
-	pick,
 	without,
 	mapValues,
 	findIndex,
@@ -492,24 +490,18 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 				mode: action.mode,
 			};
 		case 'INSERT_BLOCKS':
-			// record the block usage and put the block in the recently used blocks
-			let blockUsage = state.blockUsage;
+			// put the block in the recently used blocks
 			let recentlyUsedBlocks = [ ...state.recentlyUsedBlocks ];
 			action.blocks.forEach( ( block ) => {
-				const uses = ( blockUsage[ block.name ] || 0 ) + 1;
-				blockUsage = omit( blockUsage, block.name );
-				blockUsage[ block.name ] = uses;
 				recentlyUsedBlocks = [ block.name, ...without( recentlyUsedBlocks, block.name ) ].slice( 0, MAX_RECENT_BLOCKS );
 			} );
 			return {
 				...state,
-				blockUsage,
 				recentlyUsedBlocks,
 			};
 		case 'SETUP_EDITOR':
 			const isBlockDefined = name => getBlockType( name ) !== undefined;
 			const filterInvalidBlocksFromList = list => list.filter( isBlockDefined );
-			const filterInvalidBlocksFromObject = obj => pick( obj, keys( obj ).filter( isBlockDefined ) );
 			const commonBlocks = getBlockTypes()
 				.filter( ( blockType ) => 'common' === blockType.category )
 				.map( ( blockType ) => blockType.name );
@@ -520,7 +512,6 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 				recentlyUsedBlocks: filterInvalidBlocksFromList( [ ...state.recentlyUsedBlocks ] )
 					.concat( difference( commonBlocks, state.recentlyUsedBlocks ) )
 					.slice( 0, MAX_RECENT_BLOCKS ),
-				blockUsage: filterInvalidBlocksFromObject( state.blockUsage ),
 			};
 		case 'TOGGLE_FEATURE':
 			return {
