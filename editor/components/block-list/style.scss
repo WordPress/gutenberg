@@ -72,6 +72,11 @@
  		outline: 1px solid $light-gray-500;
 	}
 
+	// give reusable blocks a dashed outline
+	&.is-reusable.is-selected:before {
+		outline: 1px dashed $light-gray-500;
+	}
+
 	// selection style for textarea
 	::-moz-selection {
 		background: $blue-medium-highlight;

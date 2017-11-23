@@ -354,11 +354,13 @@ class BlockListBlock extends Component {
 		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected, focus } = this.props;
 		const showUI = isSelected && ( ! this.props.isTyping || ( focus && focus.collapsed === false ) );
 		const { error } = this.state;
+		const isReusableBlock = blockType.name === 'core/reusable-block';
 		const wrapperClassName = classnames( 'editor-block-list__block', {
 			'has-warning': ! isValid || !! error,
 			'is-selected': showUI,
 			'is-multi-selected': isMultiSelected,
 			'is-hovered': isHovered,
+			'is-reusable': isReusableBlock,
 		} );
 
 		const { onMouseLeave, onFocus, onReplace } = this.props;
