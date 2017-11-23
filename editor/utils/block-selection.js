@@ -43,7 +43,6 @@ export function resetRange( current, start, end ) {
 }
 
 export function toggle( current, uid, ordering ) {
-	console.log("TOGGLING");
 	const everything = getSelected( current, ordering );
 
 	if ( ! includes( everything, uid ) ) {
@@ -54,16 +53,13 @@ export function toggle( current, uid, ordering ) {
 	const withoutUid = difference( everything, [ uid ] );
 
 	if ( current.start === uid ) {
-		console.log( "STARTING");
 		const nextStart = last( withoutUid );
 		if ( nextStart ) {
-			console.log("NEXTING");
 			return { selected: withoutUid.slice( 0, withoutUid.length - 1 ), start: nextStart, end: nextStart };
 		}
-		console.log("OTHERING");
 
 		// I don't know what should happen here
-		return { selected: [ ], start: uid, end: null };
+		return { selected: [ ], start: uid, end: uid };
 	}
 
 	return { selected: difference( withoutUid, [ current.start ] ), start: current.start, end: current.start };
