@@ -4,7 +4,7 @@
 	box-shadow: none;
 	display: block;
 	width: 100%;
-	height: $text-editor-font-size * 4; // same height as an empty paragraph
+	height: $text-editor-font-size * 6; // 1.5 times the height of an empty paragraph
 	font-size: $editor-font-size;
 	line-height: $editor-line-height;
 	cursor: text;
