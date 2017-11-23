@@ -7,20 +7,16 @@ describe( 'Adding blocks', () => {
 		const lastBlockSelector = '.editor-block-list__block-edit:last [contenteditable="true"]:first';
 
 		// Using the placeholder
-		cy.get( '[value="Write your story"]' ).click();
-		cy.get( lastBlockSelector ).type( 'First Paragraph' );
-
-		// Using the quick inserter
-		cy.get( '.editor-visual-editor__inserter [aria-label="Insert Paragraph"]' ).click();
-		cy.get( lastBlockSelector ).type( 'Second Paragraph' );
+		cy.get( '.editor-default-block-appender' ).click();
+		cy.get( lastBlockSelector ).type( 'Paragraph block' );
 
 		// Using the slash command
-		cy.get( '.editor-visual-editor__inserter [aria-label="Insert Paragraph"]' ).click();
+		cy.get( '.editor-default-block-appender' ).click();
 		cy.get( lastBlockSelector ).type( '/quote{enter}' );
 		cy.get( lastBlockSelector ).type( 'Quote block' );
 
 		// Using the regular inserter
-		cy.get( '.editor-visual-editor__inserter [aria-label="Insert block"]' ).click();
+		cy.get( '.editor-header [aria-label="Insert block"]' ).click();
 		cy.get( '[placeholder="Search for a block"]' ).type( 'code' );
 		cy.get( '.editor-inserter__block' ).contains( 'Code' ).click();
 		cy.get( '[placeholder="Write code…"]' ).type( 'Code block' );
@@ -31,8 +27,7 @@ describe( 'Adding blocks', () => {
 
 		// Assertions
 		cy.get( '.editor-post-text-editor' )
-			.should( 'contain', 'First Paragraph' )
-			.should( 'contain', 'Second Paragraph' )
+			.should( 'contain', 'Paragraph block' )
 			.should( 'contain', 'Quote block' )
 			.should( 'contain', 'Code block' );
 	} );
