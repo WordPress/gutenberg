@@ -1072,3 +1072,30 @@ export function isSavingReusableBlock( state, ref ) {
 export function getReusableBlocks( state ) {
 	return Object.values( state.reusableBlocks.data );
 }
+
+/**
+ * Returns all the annotations for a specific block.
+ *
+ * @param {Object} state Global application state.
+ * @param {string} uid The block UID to get annotations for.
+ * @returns {Object[]} The annotations relevant for this block.
+ */
+export const getAnnotationsForBlock = createSelector(
+	( state, uid ) => {
+		const { blockOrder } = state.editor.present;
+		const { annotations } = state;
+
+		return annotations.filter( ( annotation ) => {
+			const startIndex = blockOrder.indexOf( annotation.start.block );
+			const endIndex = blockOrder.indexOf( annotation.end.block );
+
+			const annotatedBlocks = blockOrder.slice( startIndex, endIndex + 1 );
+
+			return annotatedBlocks.includes( uid );
+		} );
+	},
+	( state, uid ) => [
+		state.annotations,
+	],
+);
+

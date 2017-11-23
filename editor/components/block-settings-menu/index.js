@@ -3,6 +3,7 @@
  */
 import classnames from 'classnames';
 import { connect } from 'react-redux';
+import { flow, noop, head, last } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -18,9 +19,9 @@ import BlockInspectorButton from './block-inspector-button';
 import BlockModeToggle from './block-mode-toggle';
 import BlockDeleteButton from './block-delete-button';
 import UnknownConverter from './unknown-converter';
-import { selectBlock } from '../../actions';
+import { selectBlock, annotateBlocks } from '../../actions';
 
-function BlockSettingsMenu( { uids, onSelect, focus } ) {
+function BlockSettingsMenu( { uids, onSelect, focus, onAnnotate } ) {
 	const count = uids.length;
 
 	return (
@@ -55,6 +56,13 @@ function BlockSettingsMenu( { uids, onSelect, focus } ) {
 					<BlockInspectorButton onClick={ onClose } />
 					{ count === 1 && <BlockModeToggle uid={ uids[ 0 ] } onToggle={ onClose } /> }
 					{ count === 1 && <UnknownConverter uid={ uids[ 0 ] } /> }
+					<IconButton
+						className="editor-block-settings-menu__control"
+						onClick={ () => onAnnotate( uids ) }
+						icon="admin-generic"
+					>
+						{ __( 'Annotate' ) }
+					</IconButton>
 					<BlockDeleteButton uids={ uids } />
 				</NavigableMenu>
 			) }
@@ -68,5 +76,8 @@ export default connect(
 		onSelect( uid ) {
 			dispatch( selectBlock( uid ) );
 		},
+		onAnnotate( uids ) {
+			dispatch( annotateBlocks( head( uids ), last( uids ) ) );
+		}
 	} )
 )( BlockSettingsMenu );
