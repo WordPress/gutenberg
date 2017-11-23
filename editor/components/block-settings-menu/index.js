@@ -35,6 +35,7 @@ function BlockSettingsMenu( { uids, onSelect, focus } ) {
 
 				return (
 					<IconButton
+						onKeyDown={ ( evt ) => evt.stopPropagation() }
 						className={ toggleClassname }
 						onClick={ () => {
 							if ( uids.length === 1 ) {
@@ -51,7 +52,9 @@ function BlockSettingsMenu( { uids, onSelect, focus } ) {
 			} }
 			renderContent={ ( { onClose } ) => (
 				// Should this just use a DropdownMenu instead of a DropDown ?
-				<NavigableMenu className="editor-block-settings-menu__content">
+				<NavigableMenu className="editor-block-settings-menu__content"
+					onKeyDown={ ( evt ) => evt.stopPropagation() }
+				>
 					<BlockInspectorButton onClick={ onClose } />
 					{ count === 1 && <BlockModeToggle uid={ uids[ 0 ] } onToggle={ onClose } /> }
 					{ count === 1 && <UnknownConverter uid={ uids[ 0 ] } /> }

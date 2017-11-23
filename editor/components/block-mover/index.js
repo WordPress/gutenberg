@@ -16,7 +16,7 @@ import { getBlockType } from '@wordpress/blocks';
  */
 import './style.scss';
 import { getBlockMoverLabel } from './mover-label';
-import { isFirstBlock, isLastBlock, getBlockIndex, getBlock } from '../../selectors';
+import { isFirstBlock, isLastBlock, getBlockIndex, getBlock, isNavigating } from '../../selectors';
 import { selectBlock } from '../../actions';
 
 export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex } ) {
@@ -27,6 +27,7 @@ export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, block
 	return (
 		<div className="editor-block-mover">
 			<IconButton
+				onKeyDown={ ( evt ) => evt.stopPropagation() }
 				className="editor-block-mover__control"
 				onClick={ isFirst ? null : onMoveUp }
 				icon="arrow-up-alt2"
@@ -42,6 +43,7 @@ export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, block
 				aria-disabled={ isFirst }
 			/>
 			<IconButton
+				onKeyDown={ ( evt ) => evt.stopPropagation() }
 				className="editor-block-mover__control"
 				onClick={ isLast ? null : onMoveDown }
 				icon="arrow-down-alt2"
@@ -69,11 +71,12 @@ export default connect(
 			isLast: isLastBlock( state, last( ownProps.uids ) ),
 			firstIndex: getBlockIndex( state, first( ownProps.uids ) ),
 			blockType: block ? getBlockType( block.name ) : null,
+			isNavigating: isNavigating( state ),
 		} );
 	},
 	( dispatch, ownProps ) => ( {
 		onMoveDown() {
-			if ( ownProps.uids.length === 1 ) {
+			if ( ownProps.uids.length === 1 && ! isNavigating ) {
 				dispatch( selectBlock( first( ownProps.uids ) ) );
 			}
 
@@ -83,7 +86,7 @@ export default connect(
 			} );
 		},
 		onMoveUp() {
-			if ( ownProps.uids.length === 1 ) {
+			if ( ownProps.uids.length === 1 && ! isNavigating ) {
 				dispatch( selectBlock( first( ownProps.uids ) ) );
 			}
 

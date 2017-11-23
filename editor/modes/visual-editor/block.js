@@ -361,7 +361,7 @@ class VisualEditorBlock extends Component {
 			'is-multi-selected-anchor': this.props.isMultiSelectAnchor,
 		} );
 
-		const { onMouseLeave, onFocus, onReplace } = this.props;
+		const { onMouseLeave, onFocus, onReplace, hasNavigationFocus } = this.props;
 
 		// Determine whether the block has props to apply to the wrapper.
 		let wrapperProps;
@@ -402,7 +402,7 @@ class VisualEditorBlock extends Component {
 					onKeyDown={ this.onKeyDown }
 					onFocus={ this.onFocus }
 					className="editor-visual-editor__block-edit"
-					tabIndex="0"
+					tabIndex={ this.props.navigating ? '-1' : '0' }
 					aria-label={ blockLabel }
 				>
 					<BlockCrashBoundary onError={ this.onBlockError }>
@@ -460,6 +460,7 @@ export default connect(
 			meta: getEditedPostAttribute( state, 'meta' ),
 			mode: getBlockMode( state, ownProps.uid ),
 			navigating: isNavigating( state ),
+			hasNavigationFocus: isNavigating( state ) && getBlockFocus( state, ownProps.uid ),
 		};
 	},
 	( dispatch, ownProps ) => ( {

@@ -143,17 +143,17 @@ class WritingFlow extends Component {
 
 		const wayward = focusedUid !== selectionEnd;
 
-		if ( ! focusedUid ) {
-			return;
-		}
-
 		if ( ! isVertical ) {
 			this.verticalRect = null;
 		} else if ( ! this.verticalRect ) {
 			this.verticalRect = computeCaretRect( target );
 		}
 
-		if ( isNav && isShift && isNavigating ) {
+		// NOTE: This is going to stop up moving away from blocks (e.g. post title) in navigation mode.
+
+		// Also, space and enter on the other buttons are now being intercepted.
+
+		if ( focusedUid && isNav && isShift && this.props.inNavigationMode ) {
 			// Shift key is down and existing block selection
 			event.preventDefault();
 
@@ -169,11 +169,11 @@ class WritingFlow extends Component {
 			} else {
 				this.expandSelection( blocks, selectionStart, selectionEnd, isReverse ? -1 : +1 );
 			}
-		} else if ( isNav && isShift && this.isEditableEdge( isReverse, target ) && isNavEdge( target, isReverse, true ) ) {
+		} else if ( focusedUid, isNav && isShift && this.isEditableEdge( isReverse, target ) && isNavEdge( target, isReverse, true ) ) {
 			// Shift key is down, but no existing block selection
 			event.preventDefault();
 			this.expandSelection( blocks, focusedUid, focusedUid, isReverse ? -1 : +1 );
-		} else if ( isNav && ! isShift && this.props.inNavigationMode ) {
+		} else if ( focusedUid && isNav && ! isShift && this.props.inNavigationMode ) {
 			console.log('FOCUS ON CURRENTLY', focusedUid );
 			this.focusBlock( blocks, focusedUid, isReverse ? -1 : 1 );
 		} else if ( isVertical && isVerticalEdge( target, isReverse, isShift ) ) {
@@ -184,7 +184,7 @@ class WritingFlow extends Component {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
 			placeCaretAtHorizontalEdge( closestTabbable, isReverse );
 			event.preventDefault();
-		} else if ( this.props.inNavigationMode && keyCode === SPACE ) {
+		} else if ( focusedUid && this.props.inNavigationMode && keyCode === SPACE ) {
 			if ( event.metaKey || event.ctrlKey ) {
 				this.props.toggleSelection( focusedUid, focusedUid );
 			} else if ( includes( this.props.multiSelectedUids, focusedUid ) ) {
@@ -194,11 +194,11 @@ class WritingFlow extends Component {
 				this.props.setSelection( focusedUid, focusedUid, [ ], focusedUid );
 			}
 
-			event.preventDefault();
+			// event.preventDefault();
 			event.stopPropagation();
-		} else if ( this.props.inNavigationMode && keyCode === ENTER ) {
+		} else if ( focusedUid && this.props.inNavigationMode && keyCode === ENTER ) {
 			this.props.selectBlock( focusedUid );
-			event.preventDefault();
+			// event.preventDefault();
 			event.stopPropagation();
 		}
 	}
