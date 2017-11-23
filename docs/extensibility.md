@@ -77,6 +77,16 @@ wp.blocks.getBlockTypes().forEach( function( blockType ) {
 } );
 ```
 
+## Hiding blocks from the inserter
+
+On the server, you can filter the list of blocks shown in the inserter using the `allowed_block_types` filter. you can return either true (all block types supported), false (no block types supported), or an array of block type names to allow.
+
+```php
+add_filter( 'allowed_block_types', function() {
+	return [ 'core/paragraph' ];
+} );
+```
+
 
 ## Modifying Blocks (Experimental)
 
