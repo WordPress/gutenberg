@@ -1,12 +1,25 @@
-.editor-default-block-appender input[type=text] {
-	border: none;
-	background: none;
-	box-shadow: none;
-	display: block;
-	width: 100%;
-	height: $text-editor-font-size * 6; // 1.5 times the height of an empty paragraph
-	font-size: $editor-font-size;
-	line-height: $editor-line-height;
-	cursor: text;
-	max-width: none;	// fixes a bleed issue from the admin
+.editor-default-block-appender {
+	input[type=text] {
+		border: none;
+		background: none;
+		box-shadow: none;
+		display: block;
+		width: 100%;
+		height: $text-editor-font-size * 6; // 1.5 times the height of an empty paragraph
+		font-size: $editor-font-size;
+		line-height: $editor-line-height;
+		cursor: text;
+		max-width: none;	// fixes a bleed issue from the admin
+	}
+
+	&.is-visible-placeholder input[type=text] {
+		height: $text-editor-font-size * 4; // the height of an empty paragraph
+		color: $dark-gray-300;
+		outline: 1px solid transparent;
+		transition: 0.2s outline;
+
+		&:hover {
+			outline: 1px solid $light-gray-500;
+		}
+	}
 }

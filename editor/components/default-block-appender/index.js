@@ -3,11 +3,13 @@
  */
 import { connect } from 'react-redux';
 import { noop } from 'lodash';
+import classnames from 'classnames';
 import 'element-closest';
 
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { getDefaultBlockName, createBlock } from '@wordpress/blocks';
 
@@ -17,6 +19,7 @@ import { getDefaultBlockName, createBlock } from '@wordpress/blocks';
 import './style.scss';
 import BlockDropZone from '../block-drop-zone';
 import { insertBlock } from '../../actions';
+import { getBlockCount } from '../../selectors';
 
 class DefaultBlockAppender extends Component {
 	constructor( props ) {
@@ -30,8 +33,13 @@ class DefaultBlockAppender extends Component {
 	}
 
 	render() {
+		const { count } = this.props;
+		const className = classnames( 'editor-default-block-appender', {
+			'is-visible-placeholder': count === 0,
+		} );
+
 		return (
-			<div className="editor-default-block-appender">
+			<div className={ className }>
 				<BlockDropZone />
 				<input
 					type="text"
@@ -39,6 +47,7 @@ class DefaultBlockAppender extends Component {
 					onFocus={ this.appendDefaultBlock }
 					onClick={ noop }
 					onKeyDown={ noop }
+					value={ count === 0 ? __( 'Write your story' ) : '' }
 				/>
 			</div>
 		);
@@ -46,6 +55,8 @@ class DefaultBlockAppender extends Component {
 }
 
 export default connect(
-	undefined,
+	( state ) => ( {
+		count: getBlockCount( state ),
+	} ),
 	{ onInsertBlock: insertBlock }
 )( DefaultBlockAppender );

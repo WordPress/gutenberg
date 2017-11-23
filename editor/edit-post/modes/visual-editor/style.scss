@@ -93,6 +93,10 @@
 	position: relative;
 
 	@include break-small() {
-		padding: 0 ( $block-padding + $block-mover-padding-visible );
+		padding: 0 $block-mover-padding-visible;
+
+		input[type=text] {
+			padding: 0 $block-padding;
+		}
 	}
 }
