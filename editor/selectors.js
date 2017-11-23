@@ -837,7 +837,7 @@ export function isBlockHovered( state, uid ) {
  * @return {Object}       Block focus state
  */
 export function getBlockFocus( state, uid ) {
-	return isBlockSelected( state, uid ) ? state.blockSelection.focus : null;
+	return state.blockSelection.focus && state.blockSelection.focus.uid === uid ? state.blockSelection.focus.config : null;
 }
 
 /**

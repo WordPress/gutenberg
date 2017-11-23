@@ -359,7 +359,10 @@ export function blockSelection( state = { isNavigating: false, selected: [ ], st
 					...state,
 					start: action.start,
 					end: action.end,
-					focus: state.isMultiSelecting ? state.focus : null,
+					focus: {
+						... state.focus,
+						uid: action.uid,
+					},
 				};
 			case 'SELECT_BLOCK':
 				return {
@@ -367,20 +370,30 @@ export function blockSelection( state = { isNavigating: false, selected: [ ], st
 					selected: [ ],
 					start: action.uid,
 					end: null,
-					focus: action.focus || {},
+					focus: {
+						uid: action.uid,
+						config: action.config || { },
+					},
 				};
 			case 'UPDATE_FOCUS':
 				return {
 					...state,
 					start: action.uid,
 					end: null,
-					focus: action.config || {},
+					focus: {
+						uid: action.uid,
+						config: action.config,
+					},
 				};
 
 			case 'START_NAVIGATION':
 				return {
 					...state,
 					isNavigating: true,
+					focus: {
+						uid: state.end || state.start,
+						config: { },
+					},
 				};
 
 			case 'SET_SELECTION':
@@ -397,7 +410,10 @@ export function blockSelection( state = { isNavigating: false, selected: [ ], st
 					start: action.blocks[ 0 ].uid,
 					end: null,
 					selected: [ ],
-					focus: {},
+					focus: {
+						uid: action.blocks[ 0 ].uid,
+						config: { },
+					},
 					isMultiSelecting: false,
 				};
 			case 'REPLACE_BLOCKS':
@@ -409,7 +425,10 @@ export function blockSelection( state = { isNavigating: false, selected: [ ], st
 					start: action.blocks[ 0 ].uid,
 					end: null,
 					selected: [ ],
-					focus: {},
+					focus: {
+						uid: action.blocks[ 0 ].uid,
+						config: { },
+					},
 					isMultiSelecting: false,
 				};
 		}
