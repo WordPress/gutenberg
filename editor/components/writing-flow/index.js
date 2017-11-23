@@ -161,7 +161,7 @@ class WritingFlow extends Component {
 			if ( wayward ) {
 				const lastIndex = blocks.indexOf( focusedUid );
 				const nextIndex = Math.max( 0, Math.min( blocks.length - 1, lastIndex + ( isReverse ? -1 : +1 ) ) );
-				if ( event.ctrlKey ) {
+				if ( event.ctrlKey || event.metaKey ) {
 					this.props.combineRange( focusedUid, blocks[ nextIndex ] || focusedUid );
 				} else {
 					this.props.setSelection( focusedUid, blocks[ nextIndex ] || focusedUid, [ ], null );
@@ -176,6 +176,7 @@ class WritingFlow extends Component {
 		} else if ( focusedUid && isNav && ! isShift && this.props.inNavigationMode ) {
 			console.log('FOCUS ON CURRENTLY', focusedUid );
 			this.focusBlock( blocks, focusedUid, isReverse ? -1 : 1 );
+			event.preventDefault();
 		} else if ( isVertical && isVerticalEdge( target, isReverse, isShift ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
 			placeCaretAtVerticalEdge( closestTabbable, isReverse, this.verticalRect );
@@ -189,6 +190,9 @@ class WritingFlow extends Component {
 				this.props.toggleSelection( focusedUid, focusedUid );
 			} else if ( includes( this.props.multiSelectedUids, focusedUid ) ) {
 				this.props.setSelection( focusedUid, null, [ ], focusedUid )
+
+				// Can't just always prevent default, because need to fire space on buttons.
+				event.preventDefault();
 			} else {
 				// HERE LIES BAD CODE.
 				this.props.setSelection( focusedUid, focusedUid, [ ], focusedUid );
