@@ -248,6 +248,7 @@ class VisualEditorBlock extends Component {
 	}
 
 	onPointerDown( event ) {
+		console.log( 'event', event.nativeEvent );
 		// Not the main button.
 		// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
 		if ( event.button !== 0 ) {
@@ -259,7 +260,7 @@ class VisualEditorBlock extends Component {
 				this.props.onShiftSelection( this.props.uid );
 				event.preventDefault();
 			}
-		} else if ( event.ctrlKey ) {
+		} else if ( event.ctrlKey || event.metaKey ) {
 			// Generalise for Mac as well.
 			this.props.onMetaSelection( this.props.uid );
 			event.preventDefault();
