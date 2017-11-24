@@ -1,6 +1,7 @@
 // Post Related Components
 export { default as AutosaveMonitor } from './autosave-monitor';
 export { default as DocumentOutline } from './document-outline';
+export { default as EditorGlobalKeyboardShortcuts } from './editor-global-keyboard-shortcuts';
 export { default as EditorHistoryRedo } from './editor-history/redo';
 export { default as EditorHistoryUndo } from './editor-history/undo';
 export { default as MetaBoxes } from './meta-boxes';
