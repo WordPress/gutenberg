@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { noop } from 'lodash';
 import classnames from 'classnames';
 import 'element-closest';
 
@@ -34,6 +33,7 @@ class DefaultBlockAppender extends Component {
 
 	render() {
 		const { count } = this.props;
+
 		const className = classnames( 'editor-default-block-appender', {
 			'is-visible-placeholder': count === 0,
 		} );
@@ -41,14 +41,23 @@ class DefaultBlockAppender extends Component {
 		return (
 			<div className={ className }>
 				<BlockDropZone />
-				<input
-					type="text"
-					readOnly
-					onFocus={ this.appendDefaultBlock }
-					onClick={ noop }
-					onKeyDown={ noop }
-					value={ count === 0 ? __( 'Write your story' ) : '' }
-				/>
+				{ count === 0 &&
+					<input
+						className="editor-default-block-appender__content"
+						type="text"
+						readOnly
+						onFocus={ this.appendDefaultBlock }
+						onClick={ this.appendDefaultBlock }
+						onKeyDown={ this.appendDefaultBlock }
+						value={ __( 'Write your story' ) }
+					/>
+				}
+				{ count !== 0 &&
+					<button
+						className="editor-default-block-appender__content"
+						onClick={ this.appendDefaultBlock }
+					/>
+				}
 			</div>
 		);
 	}
