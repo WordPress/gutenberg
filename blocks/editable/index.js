@@ -375,7 +375,7 @@ export default class Editable extends Component {
 		this.props.onChange( this.savedContent );
 	}
 
-  /**
+	/**
 	 * Handles any case where the content of the tinyMCE instance has changed.
 	 */
 	onChange() {
@@ -386,7 +386,7 @@ export default class Editable extends Component {
 		}
 	}
 
-  /**
+	/**
 	 * Determines the DOM rectangle for the selection in the editor.
 	 *
 	 * @returns {DOMRect} The DOMRect based on the selection in the editor.
