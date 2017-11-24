@@ -8,6 +8,7 @@ export const PREFERENCES_DEFAULTS = {
 	isSidebarOpened: ! viewPort.isExtraSmall(),
 	panels: { 'post-status': true },
 	recentlyUsedBlocks: [],
+	blockUsage: {},
 	features: {
 		fixedToolbar: false,
 	},
