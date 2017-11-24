@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { PanelRow } from '@wordpress/components';
@@ -12,26 +7,14 @@ import { PanelRow } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import { PostTrash as PostTrashLink } from '../../../components';
-import { isEditedPostNew, getCurrentPostId } from '../../../selectors';
+import { PostTrash as PostTrashLink, PostTrashCheck } from '../../../components';
 
-function PostTrash( { isNew, postId } ) {
-	if ( isNew || ! postId ) {
-		return null;
-	}
-
+export default function PostTrash() {
 	return (
-		<PanelRow>
-			<PostTrashLink />
-		</PanelRow>
+		<PostTrashCheck>
+			<PanelRow>
+				<PostTrashLink />
+			</PanelRow>
+		</PostTrashCheck>
 	);
 }
-
-export default connect(
-	( state ) => {
-		return {
-			isNew: isEditedPostNew( state ),
-			postId: getCurrentPostId( state ),
-		};
-	},
-)( PostTrash );
