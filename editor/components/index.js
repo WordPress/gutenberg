@@ -46,6 +46,7 @@ export { default as BlockToolbar } from './block-toolbar';
 export { default as DefaultBlockAppender } from './default-block-appender';
 export { default as ErrorBoundary } from './error-boundary';
 export { default as Inserter } from './inserter';
+export { default as MultiBlocksSwitcher } from './block-switcher/multi-blocks-switcher';
 export { default as Warning } from './warning';
 export { default as WritingFlow } from './writing-flow';
 
