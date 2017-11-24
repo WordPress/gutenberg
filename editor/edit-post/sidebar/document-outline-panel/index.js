@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { filter } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -13,8 +12,8 @@ import { PanelBody } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { DocumentOutline } from '../../../components';
-import { getBlocks, isEditorSidebarPanelOpened } from '../../../selectors';
+import { DocumentOutline, DocumentOutlineCheck } from '../../../components';
+import { isEditorSidebarPanelOpened } from '../../../selectors';
 import { toggleSidebarPanel } from '../../../actions';
 
 /**
@@ -22,24 +21,19 @@ import { toggleSidebarPanel } from '../../../actions';
  */
 const PANEL_NAME = 'table-of-contents';
 
-const DocumentOutlinePanel = ( { blocks, isOpened, onTogglePanel } ) => {
-	const headings = filter( blocks, ( block ) => block.name === 'core/heading' );
-
-	if ( headings.length <= 1 ) {
-		return null;
-	}
-
+function DocumentOutlinePanel( { isOpened, onTogglePanel } ) {
 	return (
-		<PanelBody title={ __( 'Document Outline' ) } opened={ isOpened } onToggle={ onTogglePanel }>
-			<DocumentOutline />
-		</PanelBody>
+		<DocumentOutlineCheck>
+			<PanelBody title={ __( 'Document Outline' ) } opened={ isOpened } onToggle={ onTogglePanel }>
+				<DocumentOutline />
+			</PanelBody>
+		</DocumentOutlineCheck>
 	);
-};
+}
 
 export default connect(
 	( state ) => {
 		return {
-			blocks: getBlocks( state ),
 			isOpened: isEditorSidebarPanelOpened( state, PANEL_NAME ),
 		};
 	},
