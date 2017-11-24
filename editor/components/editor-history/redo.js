@@ -31,5 +31,7 @@ export default connect(
 	} ),
 	( dispatch ) => ( {
 		redo: () => dispatch( { type: 'REDO' } ),
-	} )
+	} ),
+	undefined,
+	{ storeKey: 'editorStore' }
 )( EditorHistoryRedo );

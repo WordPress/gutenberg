@@ -123,5 +123,7 @@ export default connect(
 		isSaveable: isEditedPostSaveable( state ),
 		modified: getEditedPostAttribute( state, 'modified' ),
 	} ),
-	{ autosave }
+	{ autosave },
+	undefined,
+	{ storeKey: 'editorStore' }
 )( PostPreviewButton );

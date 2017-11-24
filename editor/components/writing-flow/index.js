@@ -183,5 +183,7 @@ export default connect(
 		onMultiSelect( start, end ) {
 			dispatch( multiSelect( start, end ) );
 		},
-	} )
+	} ),
+	undefined,
+	{ storeKey: 'editorStore' }
 )( WritingFlow );

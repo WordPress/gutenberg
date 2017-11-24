@@ -11,3 +11,4 @@ export * from './blob-cache';
 export * from './mediaupload';
 
 export { viewPort };
+export { default as storePersist } from './store-persist';

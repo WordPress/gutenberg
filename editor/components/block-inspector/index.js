@@ -35,5 +35,8 @@ export default connect(
 			selectedBlock: getSelectedBlock( state ),
 			count: getSelectedBlockCount( state ),
 		};
-	}
+	},
+	undefined,
+	undefined,
+	{ storeKey: 'editorStore' }
 )( BlockInspector );

@@ -83,7 +83,9 @@ const applyConnect = connect(
 	{
 		onStatusChange: ( status ) => editPost( { status } ),
 		onSave: savePost,
-	}
+	},
+	undefined,
+	{ storeKey: 'editorStore' }
 );
 
 const applyWithAPIData = withAPIData( () => {

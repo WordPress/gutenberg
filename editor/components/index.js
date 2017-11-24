@@ -2,11 +2,13 @@
 export { default as AutosaveMonitor } from './autosave-monitor';
 export { default as DocumentOutline } from './document-outline';
 export { default as DocumentOutlineCheck } from './document-outline/check';
+export { default as DocumentTitle } from './document-title';
 export { default as EditorGlobalKeyboardShortcuts } from './editor-global-keyboard-shortcuts';
 export { default as EditorHistoryRedo } from './editor-history/redo';
 export { default as EditorHistoryUndo } from './editor-history/undo';
 export { default as EditorNotices } from './editor-notices';
 export { default as MetaBoxes } from './meta-boxes';
+export { default as NavigableToolbar } from './navigable-toolbar';
 export { default as PageAttributes } from './page-attributes';
 export { default as PageAttributesCheck } from './page-attributes/check';
 export { default as PostAuthor } from './post-author';
@@ -43,6 +45,8 @@ export { default as UnsavedChangesWarning } from './unsaved-changes-warning';
 export { default as WordCount } from './word-count';
 
 // Content Related Components
+export { default as BlockSelectionClearer } from './block-selection-clearer';
+export { default as BlockCount } from './block-count';
 export { default as BlockInspector } from './block-inspector';
 export { default as BlockList } from './block-list';
 export { default as BlockMover } from './block-mover';
@@ -51,6 +55,7 @@ export { default as BlockToolbar } from './block-toolbar';
 export { default as DefaultBlockAppender } from './default-block-appender';
 export { default as ErrorBoundary } from './error-boundary';
 export { default as Inserter } from './inserter';
+export { default as InserterWithShortcuts } from './inserter-with-shortcuts';
 export { default as MultiBlocksSwitcher } from './block-switcher/multi-blocks-switcher';
 export { default as Warning } from './warning';
 export { default as WritingFlow } from './writing-flow';

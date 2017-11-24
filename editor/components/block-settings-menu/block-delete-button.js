@@ -36,5 +36,7 @@ export default connect(
 		onDelete() {
 			dispatch( removeBlocks( ownProps.uids ) );
 		},
-	} )
+	} ),
+	undefined,
+	{ storeKey: 'editorStore' }
 )( BlockDeleteButton );

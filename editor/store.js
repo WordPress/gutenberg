@@ -7,12 +7,16 @@ import multi from 'redux-multi';
 import { flowRight } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { storePersist } from '@wordpress/utils';
+
+/**
  * Internal dependencies
  */
 import effects from './effects';
 import { mobileMiddleware } from './utils/mobile';
 import reducer from './reducer';
-import storePersist from './store-persist';
 import { PREFERENCES_DEFAULTS } from './store-defaults';
 
 /**

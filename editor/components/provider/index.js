@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { bindActionCreators } from 'redux';
-import { Provider as ReduxProvider } from 'react-redux';
+import { createProvider } from 'react-redux';
 import { flow, pick, noop } from 'lodash';
 
 /**
@@ -19,7 +19,7 @@ import {
 /**
  * Internal Dependencies
  */
-import { setupEditor, undo } from '../../actions';
+import { setupEditor, undo, initializeMetaBoxState } from '../../actions';
 import createReduxStore from '../../store';
 
 /**
@@ -50,11 +50,16 @@ class EditorProvider extends Component {
 			store.dispatch( setupEditor( props.post ) );
 		}
 
+		this.provider = createProvider( 'editorStore' );
 		this.store = store;
 		this.settings = {
 			...DEFAULT_SETTINGS,
 			...props.settings,
 		};
+	}
+
+	initializeMetaBoxes( metaBoxes ) {
+		this.store.dispatch( initializeMetaBoxState( metaBoxes ) );
 	}
 
 	getChildContext() {
@@ -80,7 +85,7 @@ class EditorProvider extends Component {
 			//
 			//  - context.store
 			[
-				ReduxProvider,
+				this.provider,
 				{ store: this.store },
 			],
 

@@ -41,7 +41,10 @@ const applyConnect = connect(
 	( state ) => ( {
 		isPublished: isCurrentPostPublished( state ),
 		isBeingScheduled: isEditedPostBeingScheduled( state ),
-	} )
+	} ),
+	undefined,
+	undefined,
+	{ storeKey: 'editorStore' }
 );
 
 const applyWithAPIData = withAPIData( () => {

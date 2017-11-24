@@ -45,6 +45,8 @@ export default connect(
 		onUpdateExcerpt( excerpt ) {
 			return editPost( { excerpt } );
 		},
-	}
+	},
+	undefined,
+	{ storeKey: 'editorStore' }
 )( PostExcerpt );
 

@@ -33,12 +33,12 @@ class ErrorBoundary extends Component {
 	}
 
 	reboot() {
-		this.props.onError( this.context.store.getState() );
+		this.props.onError( this.context.editorStore.getState() );
 	}
 
 	getContent() {
 		try {
-			return getEditedPostContent( this.context.store.getState() );
+			return getEditedPostContent( this.context.editorStore.getState() );
 		} catch ( error ) {}
 	}
 

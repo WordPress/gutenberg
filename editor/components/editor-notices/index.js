@@ -18,5 +18,7 @@ export default connect(
 	( state ) => ( {
 		notices: getNotices( state ),
 	} ),
-	{ onRemove: removeNotice }
+	{ onRemove: removeNotice },
+	undefined,
+	{ storeKey: 'editorStore' }
 )( NoticeList );

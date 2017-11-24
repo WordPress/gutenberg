@@ -68,7 +68,7 @@ function InvalidBlockWarning( { ignoreInvalid, switchToBlockType } ) {
 }
 
 export default connect(
-	null,
+	undefined,
 	( dispatch, ownProps ) => {
 		return {
 			ignoreInvalid() {
@@ -88,5 +88,7 @@ export default connect(
 				}
 			},
 		};
-	}
+	},
+	undefined,
+	{ storeKey: 'editorStore' }
 )( InvalidBlockWarning );

@@ -139,5 +139,7 @@ export default connect(
 			return editPost( { title } );
 		},
 		clearSelectedBlock,
-	}
+	},
+	undefined,
+	{ storeKey: 'editorStore' }
 )( PostTitle );

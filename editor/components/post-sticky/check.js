@@ -33,6 +33,9 @@ const applyConnect = connect(
 			postType: getCurrentPostType( state ),
 		};
 	},
+	undefined,
+	undefined,
+	{ storeKey: 'editorStore' }
 );
 
 const applyWithAPIData = withAPIData( () => {

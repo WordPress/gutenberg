@@ -81,6 +81,8 @@ const applyConnect = connect(
 			return editPost( { author } );
 		},
 	},
+	undefined,
+	{ storeKey: 'editorStore' }
 );
 
 const applyWithAPIData = withAPIData( () => {

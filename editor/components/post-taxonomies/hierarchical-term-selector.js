@@ -286,5 +286,7 @@ export default connect(
 		onUpdateTerms( terms, restBase ) {
 			return editPost( { [ restBase ]: terms } );
 		},
-	}
+	},
+	undefined,
+	{ storeKey: 'editorStore' }
 )( withInstanceId( HierarchicalTermSelector ) );

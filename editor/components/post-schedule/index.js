@@ -62,5 +62,7 @@ export default connect(
 				dispatch( editPost( { date } ) );
 			},
 		};
-	}
+	},
+	undefined,
+	{ storeKey: 'editorStore' }
 )( PostSchedule );

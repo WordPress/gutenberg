@@ -31,5 +31,7 @@ export default connect(
 	} ),
 	( dispatch ) => ( {
 		undo: () => dispatch( { type: 'UNDO' } ),
-	} )
+	} ),
+	undefined,
+	{ storeKey: 'editorStore' }
 )( EditorHistoryUndo );

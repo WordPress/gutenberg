@@ -101,6 +101,7 @@ zip -r gutenberg.zip \
 	components/build/*.{js,map} \
 	date/build/*.{js,map} \
 	editor/build/*.{js,map} \
+	edit-post/build/*.{js,map} \
 	element/build/*.{js,map} \
 	i18n/build/*.{js,map} \
 	utils/build/*.{js,map} \

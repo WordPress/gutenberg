@@ -78,5 +78,7 @@ export default connect(
 		onSelect( uid ) {
 			return selectBlock( uid );
 		},
-	}
+	},
+	undefined,
+	{ storeKey: 'editorStore' }
 )( TableOfContents );

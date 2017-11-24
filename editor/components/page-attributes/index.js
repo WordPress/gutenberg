@@ -55,7 +55,9 @@ const applyConnect = connect(
 				menu_order: order,
 			} );
 		},
-	}
+	},
+	undefined,
+	{ storeKey: 'editorStore' }
 );
 
 export default flowRight( [

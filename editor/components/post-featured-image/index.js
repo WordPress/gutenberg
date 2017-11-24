@@ -74,7 +74,9 @@ const applyConnect = connect(
 		onRemoveImage() {
 			return editPost( { featured_media: 0 } );
 		},
-	}
+	},
+	undefined,
+	{ storeKey: 'editorStore' }
 );
 
 const applyWithAPIData = withAPIData( ( { featuredImageId } ) => {

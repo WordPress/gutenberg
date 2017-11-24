@@ -25,5 +25,8 @@ export default connect(
 		return {
 			content: serialize( getBlocks( state ) ),
 		};
-	}
+	},
+	undefined,
+	undefined,
+	{ storeKey: 'editorStore' }
 )( WordCount );

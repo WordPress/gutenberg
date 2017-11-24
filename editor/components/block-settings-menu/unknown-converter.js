@@ -46,5 +46,7 @@ export default connect(
 				mode: 'BLOCKS',
 			} ) ) );
 		},
-	} )
+	} ),
+	undefined,
+	{ storeKey: 'editorStore' }
 )( UnknownConverter );

@@ -13,7 +13,7 @@ import {
 	isMultiSelecting,
 } from '../../selectors';
 
-function BlockListMultiControls( { multiSelectedBlockUids, isSelecting } ) {
+function BlockListMultiControls( { multiSelectedBlockUids, isSelecting, onShowInspector } ) {
 	if ( isSelecting ) {
 		return null;
 	}
@@ -26,14 +26,20 @@ function BlockListMultiControls( { multiSelectedBlockUids, isSelecting } ) {
 		<BlockSettingsMenu
 			key="menu"
 			uids={ multiSelectedBlockUids }
+			onShowInspector={ onShowInspector }
 			focus
 		/>,
 	];
 }
 
-export default connect( ( state ) => {
-	return {
-		multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
-		isSelecting: isMultiSelecting( state ),
-	};
-} )( BlockListMultiControls );
+export default connect(
+	( state ) => {
+		return {
+			multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
+			isSelecting: isMultiSelecting( state ),
+		};
+	},
+	undefined,
+	undefined,
+	{ storeKey: 'editorStore' }
+)( BlockListMultiControls );

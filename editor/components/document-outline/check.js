@@ -22,5 +22,8 @@ function DocumentOutlineCheck( { blocks, children } ) {
 export default connect(
 	( state ) => ( {
 		blocks: getBlocks( state ),
-	} )
+	} ),
+	undefined,
+	undefined,
+	{ storeKey: 'editorStore' }
 )( DocumentOutlineCheck );

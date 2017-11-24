@@ -43,5 +43,7 @@ export default connect(
 			postType: getCurrentPostType( state ),
 		};
 	},
-	{ trashPost }
+	{ trashPost },
+	undefined,
+	{ storeKey: 'editorStore' }
 )( PostTrash );

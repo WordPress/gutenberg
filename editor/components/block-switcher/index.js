@@ -139,5 +139,7 @@ export default connect(
 				switchToBlockType( blocks, name )
 			) );
 		},
-	} )
+	} ),
+	undefined,
+	{ storeKey: 'editorStore' }
 )( BlockSwitcher );

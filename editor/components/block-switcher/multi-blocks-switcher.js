@@ -26,5 +26,8 @@ export default connect(
 			isMultiBlockSelection: selectedBlockUids.length > 1,
 			selectedBlockUids,
 		};
-	}
+	},
+	undefined,
+	undefined,
+	{ storeKey: 'editorStore' }
 )( MultiBlocksSwitcher );

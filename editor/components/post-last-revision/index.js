@@ -45,5 +45,8 @@ export default connect(
 			lastRevisionId: getCurrentPostLastRevisionId( state ),
 			revisionsCount: getCurrentPostRevisionsCount( state ),
 		};
-	}
+	},
+	undefined,
+	undefined,
+	{ storeKey: 'editorStore' }
 )( LastRevision );

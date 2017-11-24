@@ -25,5 +25,8 @@ export default connect(
 		return {
 			date: getEditedPostAttribute( state, 'date' ),
 		};
-	}
+	},
+	undefined,
+	undefined,
+	{ storeKey: 'editorStore' }
 )( PostScheduleLabel );

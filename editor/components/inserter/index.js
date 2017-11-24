@@ -17,7 +17,7 @@ import { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import InserterMenu from './menu';
-import { getBlockInsertionPoint, getEditorMode } from '../../selectors';
+import { getBlockInsertionPoint } from '../../selectors';
 import {
 	insertBlock,
 	setBlockInsertionPoint,
@@ -109,7 +109,6 @@ export default flowRight( [
 		( state ) => {
 			return {
 				insertionPoint: getBlockInsertionPoint( state ),
-				mode: getEditorMode( state ),
 			};
 		},
 		( dispatch ) => ( {
@@ -124,7 +123,9 @@ export default flowRight( [
 				setInsertionPoint: setBlockInsertionPoint,
 				clearInsertionPoint: clearBlockInsertionPoint,
 			}, dispatch ),
-		} )
+		} ),
+		undefined,
+		{ storeKey: 'editorStore' }
 	),
 	withContext( 'editor' )( ( settings ) => {
 		const { blockTypes } = settings;

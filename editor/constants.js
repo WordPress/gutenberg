@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import scssVariables from '!!sass-variables-loader!./assets/stylesheets/_variables.scss';
+import scssVariables from '!!sass-variables-loader!../edit-post/assets/stylesheets/_variables.scss';
 
 export const BREAK_HUGE = parseInt( scssVariables.breakHuge );
 export const BREAK_WIDE = parseInt( scssVariables.breakWide );

@@ -29,6 +29,9 @@ export default flowRight( [
 				postTypeSlug: getCurrentPostType( state ),
 			};
 		},
+		undefined,
+		undefined,
+		{ storeKey: 'editorStore' }
 	),
 	withAPIData( ( props ) => {
 		const { postTypeSlug } = props;

@@ -21,5 +21,8 @@ export default connect(
 		return {
 			lastRevisionId: getCurrentPostLastRevisionId( state ),
 		};
-	}
+	},
+	undefined,
+	undefined,
+	{ storeKey: 'editorStore' }
 )( PostLastRevisionCheck );

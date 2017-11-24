@@ -26,6 +26,7 @@ import { serialize } from '@wordpress/blocks';
 import './style.scss';
 import BlockListBlock from './block';
 import BlockListSiblingInserter from './sibling-inserter';
+import BlockSelectionClearer from '../block-selection-clearer';
 import {
 	getBlockUids,
 	getMultiSelectedBlocksStartUid,
@@ -197,10 +198,10 @@ class BlockList extends Component {
 	}
 
 	render() {
-		const { blocks, showContextualToolbar } = this.props;
+		const { blocks, showContextualToolbar, onShowInspector } = this.props;
 
 		return (
-			<div>
+			<BlockSelectionClearer>
 				{ !! blocks.length && <BlockListSiblingInserter /> }
 				{ flatMap( blocks, ( uid ) => [
 					<BlockListBlock
@@ -209,6 +210,7 @@ class BlockList extends Component {
 						blockRef={ this.setBlockRef }
 						onSelectionStart={ this.onSelectionStart }
 						onShiftSelection={ this.onShiftSelection }
+						onShowInspector={ onShowInspector }
 						showContextualToolbar={ showContextualToolbar }
 					/>,
 					<BlockListSiblingInserter
@@ -216,7 +218,7 @@ class BlockList extends Component {
 						uid={ uid }
 					/>,
 				] ) }
-			</div>
+			</BlockSelectionClearer>
 		);
 	}
 }
@@ -246,5 +248,7 @@ export default connect(
 		onRemove( uids ) {
 			dispatch( { type: 'REMOVE_BLOCKS', uids } );
 		},
-	} )
+	} ),
+	undefined,
+	{ storeKey: 'editorStore' }
 )( BlockList );
