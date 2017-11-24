@@ -95,7 +95,7 @@
 	@include break-small() {
 		padding: 0 $block-mover-padding-visible;
 
-		input[type=text] {
+		.editor-default-block-appender__content {
 			padding: 0 $block-padding;
 		}
 	}
