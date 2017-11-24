@@ -82,16 +82,10 @@ class ImageBlock extends Component {
 	}
 
 	onSelectImage( media ) {
-		const attributes = { 
-			url: media.url, 
-			alt: media.alt, 
-			id: media.id,
-		};
-
+		const attributes = { url: media.url, alt: media.alt, id: media.id };
 		if ( media.caption ) {
 			attributes.caption = [ media.caption ];
 		}
-
 		this.props.setAttributes( attributes );
 	}
 
