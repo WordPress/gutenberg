@@ -1,0 +1,26 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DocumentOutline header blocks present should match snapshot 1`] = `
+<div
+  className="document-outline"
+>
+  <ul>
+    <TableOfContentsItem
+      isValid={2}
+      key="0"
+      level={2}
+      onClick={[Function]}
+    >
+      Heading parent
+    </TableOfContentsItem>
+    <TableOfContentsItem
+      isValid={3}
+      key="1"
+      level={3}
+      onClick={[Function]}
+    >
+      Heading child
+    </TableOfContentsItem>
+  </ul>
+</div>
+`;
