@@ -11,7 +11,7 @@ describe( 'Adding blocks', () => {
 		cy.get( lastBlockSelector ).type( 'Paragraph block' );
 
 		// Using the slash command
-		cy.get( '.editor-default-block-appender' ).click();
+		cy.get( '.editor-visual-editor__inserter [aria-label="Insert Paragraph"]' ).click();
 		cy.get( lastBlockSelector ).type( '/quote{enter}' );
 		cy.get( lastBlockSelector ).type( 'Quote block' );
 

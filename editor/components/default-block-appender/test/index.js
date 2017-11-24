@@ -51,14 +51,5 @@ describe( 'DefaultBlockAppender', () => {
 
 			expect( wrapper ).toMatchSnapshot();
 		} );
-
-		it( 'should append a default block when button clicked', () => {
-			const insertBlock = jest.fn();
-			const wrapper = shallow( <DefaultBlockAppender count={ 5 } onInsertBlock={ insertBlock } /> );
-
-			wrapper.find( 'button.editor-default-block-appender__content' ).simulate( 'click' );
-
-			expectInsertBlockCalled( insertBlock );
-		} );
 	} );
 } );
