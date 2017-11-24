@@ -348,7 +348,7 @@ export default {
 		const { getState, dispatch } = store;
 
 		const state = getState();
-		console.log('state', state);
+		console.log( '**** ', action );
 		const newSelection = toggle( state.blockSelection, action.uid, state.editor.present.blockOrder );
 		console.log( 'newSelection', newSelection, 'action', action.focusUid );
 		dispatch(

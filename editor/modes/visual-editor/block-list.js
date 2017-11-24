@@ -203,7 +203,7 @@ class VisualEditorBlockList extends Component {
 
 	onMetaSelection( uid ) {
 		const { onToggleSelection } = this.props;
-		onToggleSelection( uid );
+		onToggleSelection( uid, uid );
 	}
 
 	appendDefaultBlock() {
@@ -280,8 +280,8 @@ export default connect(
 		onRemove( uids ) {
 			dispatch( { type: 'REMOVE_BLOCKS', uids } );
 		},
-		onToggleSelection( uid ) {
-			dispatch( toggleSelection( uid ) );
+		onToggleSelection( uid, focusUid ) {
+			dispatch( toggleSelection( uid, focusUid ) );
 		},
 	} )
 )( VisualEditorBlockList );
