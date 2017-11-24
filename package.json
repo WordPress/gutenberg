@@ -20,6 +20,7 @@
     "dom-scroll-into-view": "1.2.1",
     "element-closest": "2.0.2",
     "escape-string-regexp": "1.0.5",
+    "hash-string": "1.0.0",
     "hpq": "1.2.0",
     "jed": "1.1.1",
     "js-beautify": "1.6.14",

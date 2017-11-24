@@ -20,9 +20,12 @@ $blocks-button__height: 46px;
 
 	a {
 		box-shadow: none !important;
-		color: $white;
 		cursor: pointer;
 		text-decoration: none !important;
+	}
+
+	a:not(.custom-color) {
+		color: $white;
 	}
 
 	&.aligncenter {

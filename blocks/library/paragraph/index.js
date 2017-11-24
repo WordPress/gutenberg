@@ -17,6 +17,7 @@ import './editor.scss';
 import './style.scss';
 import { registerBlockType, createBlock, setDefaultBlockName } from '../../api';
 import { blockAutocompleter, userAutocompleter } from '../../autocompleters';
+import { generateClass, generateStyle } from '../../style-generator';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import BlockControls from '../../block-controls';
@@ -265,20 +266,34 @@ registerBlockType( 'core/paragraph', {
 
 	save( { attributes } ) {
 		const { width, align, content, dropCap, backgroundColor, textColor, fontSize } = attributes;
+		const styles = {
+			backgroundColor: backgroundColor,
+			color: textColor,
+			fontSize: fontSize && fontSize + 'px',
+			textAlign: align,
+		};
+		const customClass = generateClass( styles, 'custom-paragraph-' );
 		const className = classnames( {
 			[ `align${ width }` ]: width,
 			'has-background': backgroundColor,
 			'has-drop-cap': dropCap,
+			[ customClass ]: customClass,
 		} );
+
+		return <p className={ className ? className : undefined }>{ content }</p>;
+	},
+
+	saveStyles( { attributes } ) {
+		const { align, backgroundColor, textColor, fontSize } = attributes;
 		const styles = {
 			backgroundColor: backgroundColor,
 			color: textColor,
-			fontSize: fontSize,
+			fontSize: fontSize && fontSize + 'px',
 			textAlign: align,
 		};
-
-		return <p style={ styles } className={ className ? className : undefined }>{ content }</p>;
+		return generateStyle( styles, generateClass( styles, 'custom-paragraph-' ) );
 	},
+
 } );
 
 setDefaultBlockName( 'core/paragraph' );
