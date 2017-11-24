@@ -4,6 +4,7 @@ export { default as DocumentOutline } from './document-outline';
 export { default as EditorGlobalKeyboardShortcuts } from './editor-global-keyboard-shortcuts';
 export { default as EditorHistoryRedo } from './editor-history/redo';
 export { default as EditorHistoryUndo } from './editor-history/undo';
+export { default as EditorNotices } from './editor-notices';
 export { default as MetaBoxes } from './meta-boxes';
 export { default as PageAttributes } from './page-attributes';
 export { default as PageAttributesCheck } from './page-attributes/check';
