@@ -31,6 +31,7 @@ export { default as PostTitle } from './post-title';
 export { default as PostTrash } from './post-trash';
 export { default as PostVisibility } from './post-visibility';
 export { default as PostVisibilityLabel } from './post-visibility/label';
+export { default as TableOfContents } from './table-of-contents';
 export { default as UnsavedChangesWarning } from './unsaved-changes-warning';
 export { default as WordCount } from './word-count';
 
