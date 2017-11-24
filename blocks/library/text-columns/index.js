@@ -77,7 +77,15 @@ registerBlockType( 'core/text-columns', {
 					<RangeControl
 						label={ __( 'Columns' ) }
 						value={ columns }
-						onChange={ ( value ) => setAttributes( { columns: value } ) }
+						onChange={ ( value ) => {
+							// Add additional content values when adding columns
+							if ( value > content.length ) {
+								while ( value > content.length ) {
+									content.push( '' );
+								}
+							}
+							setAttributes( { columns: value, content } );
+						} }
 						min={ 2 }
 						max={ 4 }
 					/>
