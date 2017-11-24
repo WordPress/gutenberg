@@ -106,7 +106,7 @@
 	}
 
 	@include break-medium() {
-		&.editor-post-publish-button, &.editor-publish-with-dropdown__button {
+		&.editor-post-publish-button, &.editor-post-publish-with-dropdown__button {
 			height: 33px;
 			line-height: 32px;
 		}
