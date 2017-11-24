@@ -1,15 +1,3 @@
-.table-of-contents {
-	display: none;
-
-	.is-sidebar-opened & {
-		right: $sidebar-width + 16px;
-	}
-
-	@include break-small() {
-		display: block;
-	}
-}
-
 .table-of-contents__popover .components-popover__content {
 	padding: 16px;
 }

@@ -13,10 +13,9 @@ import { IconButton } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import { Inserter, BlockToolbar } from '../../../components';
+import { Inserter, BlockToolbar, TableOfContents } from '../../../components';
 import BlockSwitcher from '../../../components/block-switcher';
 import NavigableToolbar from '../../../components/navigable-toolbar';
-import TableOfContents from '../../table-of-contents';
 import { getMultiSelectedBlockUids, hasEditorUndo, hasEditorRedo, isFeatureActive } from '../../../selectors';
 
 function HeaderToolbar( { hasUndo, hasRedo, hasFixedToolbar, undo, redo, isMultiBlockSelection, selectedBlockUids } ) {

@@ -14,7 +14,8 @@ import { Dropdown, IconButton } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import { WordCount, DocumentOutline } from '../../components';
+import WordCount from '../word-count';
+import DocumentOutline from '../document-outline';
 import { getBlocks } from '../../selectors';
 import { selectBlock } from '../../actions';
 
