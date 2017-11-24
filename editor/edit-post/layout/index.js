@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { NoticeList, Popover, navigateRegions } from '@wordpress/components';
+import { Popover, navigateRegions } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -19,15 +19,13 @@ import Sidebar from '../sidebar';
 import TextEditor from '../modes/text-editor';
 import VisualEditor from '../modes/visual-editor';
 import DocumentTitle from '../document-title';
-import { removeNotice } from '../../actions';
-import { MetaBoxes, AutosaveMonitor, UnsavedChangesWarning } from '../../components';
+import { MetaBoxes, AutosaveMonitor, UnsavedChangesWarning, EditorNotices } from '../../components';
 import {
 	getEditorMode,
 	isEditorSidebarOpened,
-	getNotices,
 } from '../../selectors';
 
-function Layout( { mode, isSidebarOpened, notices, ...props } ) {
+function Layout( { mode, isSidebarOpened } ) {
 	const className = classnames( 'editor-layout', {
 		'is-sidebar-opened': isSidebarOpened,
 	} );
@@ -35,7 +33,7 @@ function Layout( { mode, isSidebarOpened, notices, ...props } ) {
 	return (
 		<div className={ className }>
 			<DocumentTitle />
-			<NoticeList onRemove={ props.removeNotice } notices={ notices } />
+			<EditorNotices />
 			<UnsavedChangesWarning />
 			<AutosaveMonitor />
 			<Header />
@@ -58,7 +56,5 @@ export default connect(
 	( state ) => ( {
 		mode: getEditorMode( state ),
 		isSidebarOpened: isEditorSidebarOpened( state ),
-		notices: getNotices( state ),
 	} ),
-	{ removeNotice }
 )( navigateRegions( Layout ) );
