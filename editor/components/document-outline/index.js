@@ -51,10 +51,10 @@ const getHeadingLevel = heading => {
 
 const isEmptyHeading = heading => ! heading.attributes.content || heading.attributes.content.length === 0;
 
-const DocumentOutline = ( { blocks, onSelect } ) => {
+export const DocumentOutline = ( { blocks = [], onSelect } ) => {
 	const headings = filter( blocks, ( block ) => block.name === 'core/heading' );
 
-	if ( headings.length <= 1 ) {
+	if ( headings.length < 1 ) {
 		return null;
 	}
 
