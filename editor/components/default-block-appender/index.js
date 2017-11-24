@@ -20,7 +20,7 @@ import BlockDropZone from '../block-drop-zone';
 import { insertBlock } from '../../actions';
 import { getBlockCount } from '../../selectors';
 
-class DefaultBlockAppender extends Component {
+export class DefaultBlockAppender extends Component {
 	constructor( props ) {
 		super( props );
 		this.appendDefaultBlock = this.appendDefaultBlock.bind( this );
