@@ -8,6 +8,6 @@ Key take-aways from parsing that paragraph:
  
 - Authoring richly laid out posts is a key strength of WordPress.
 - By embracing "the block", we can potentially unify multiple different interfaces into one. Instead of learning how to write shortcodes, custom HTML, or paste URLs to embed, you should do with just learning the block, and all the pieces should fall in place.
-- "Mystery meat" refers to hidden features in software, features that you have to discover. WordPress already supports a large amount of blocks and 30+ embeds, so let's surface them.
+- "Mystery meat" refers to hidden features in software, features that you have to discover. WordPress already supports a large number of blocks and 30+ embeds, so let's surface them.
  
 Gutenberg is being developed on [GitHub](https://github.com/WordPress/gutenberg), and you can try [an early beta version today from the plugin repository](https://wordpress.org/plugins/gutenberg/). Though keep in mind it's not fully functional, feature complete, or production ready.

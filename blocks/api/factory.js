@@ -46,11 +46,6 @@ export function createBlock( name, blockAttributes = {} ) {
 		return result;
 	}, {} );
 
-	// Keep the className if the block supports it
-	if ( blockType.className !== false && blockAttributes.className ) {
-		attributes.className = blockAttributes.className;
-	}
-
 	// Blocks are stored with a unique ID, the assigned type name,
 	// and the block attributes.
 	return {

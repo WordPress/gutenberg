@@ -9,10 +9,8 @@ import { createMediaFromFile } from '@wordpress/utils';
  */
 import './style.scss';
 import './editor.scss';
-import { registerBlockType, source, createBlock } from '../../api';
+import { registerBlockType, createBlock } from '../../api';
 import ImageBlock from './block';
-
-const { attr, children, text } = source;
 
 registerBlockType( 'core/image', {
 	title: __( 'Image' ),
@@ -26,19 +24,26 @@ registerBlockType( 'core/image', {
 	attributes: {
 		url: {
 			type: 'string',
-			source: attr( 'img', 'src' ),
+			source: 'attribute',
+			selector: 'img',
+			attribute: 'src',
 		},
 		alt: {
 			type: 'string',
-			source: attr( 'img', 'alt' ),
+			source: 'attribute',
+			selector: 'img',
+			attribute: 'alt',
 		},
 		caption: {
 			type: 'array',
-			source: children( 'figcaption' ),
+			source: 'children',
+			selector: 'figcaption',
 		},
 		href: {
 			type: 'string',
-			source: attr( 'a', 'href' ),
+			source: 'attribute',
+			selector: 'a',
+			attribute: 'href',
 		},
 		id: {
 			type: 'number',
@@ -85,20 +90,26 @@ registerBlockType( 'core/image', {
 				attributes: {
 					url: {
 						type: 'string',
-						source: attr( 'img', 'src' ),
+						source: 'attribute',
+						attribute: 'src',
+						selector: 'img',
 					},
 					alt: {
 						type: 'string',
-						source: attr( 'img', 'alt' ),
+						source: 'attribute',
+						attribute: 'alt',
+						selector: 'img',
 					},
 					caption: {
 						type: 'array',
 						// To do: needs to support HTML.
-						source: text(),
+						source: 'text',
 					},
 					href: {
 						type: 'string',
-						source: attr( 'a', 'href' ),
+						source: 'attribute',
+						attribute: 'href',
+						selector: 'a',
 					},
 					id: {
 						type: 'number',

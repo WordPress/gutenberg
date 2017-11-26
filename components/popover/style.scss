@@ -3,90 +3,122 @@
 	z-index: z-index( ".components-popover" );
 	left: 50%;
 
-	&:before {
-		border: 8px solid $light-gray-500;
-	}
-
-	&:after {
-		border: 8px solid $white;
-	}
-
-	&:before,
-	&:after {
-		content: "";
-		position: absolute;
-		margin-left: -10px;
-		height: 0;
-		width: 0;
-		border-left-color: transparent;
-		border-right-color: transparent;
-		line-height: 0;
-	}
-
-	&.is-top {
-		bottom: 100%;
-		margin-top: -8px;
-
+	&:not(.is-mobile) {
 		&:before {
-			bottom: -8px;
+			border: 8px solid $light-gray-500;
 		}
 
 		&:after {
-			bottom: -6px;
+			border: 8px solid $white;
 		}
 
 		&:before,
 		&:after {
-			border-top-style: solid;
-			border-bottom: none;
-		}
-	}
-
-	&.is-bottom {
-		top: 100%;
-		margin-top: 8px;
-
-		&:before {
-			top: -8px;
+			content: "";
+			position: absolute;
+			margin-left: -10px;
+			height: 0;
+			width: 0;
+			border-left-color: transparent;
+			border-right-color: transparent;
+			line-height: 0;
 		}
 
-		&:after {
-			top: -6px;
+		&.is-top {
+			bottom: 100%;
+			margin-top: -8px;
+
+			&:before {
+				bottom: -8px;
+			}
+
+			&:after {
+				bottom: -6px;
+			}
+
+			&:before,
+			&:after {
+				border-top-style: solid;
+				border-bottom: none;
+			}
 		}
 
-		&:before,
-		&:after {
-			border-bottom-style: solid;
-			border-top: none;
+		&.is-bottom {
+			top: 100%;
+			margin-top: 8px;
+
+			&:before {
+				top: -8px;
+			}
+
+			&:after {
+				top: -6px;
+			}
+
+			&:before,
+			&:after {
+				border-bottom-style: solid;
+				border-top: none;
+			}
 		}
 	}
 }
 
 .components-popover__content {
-	position: absolute;
 	box-shadow: $shadow-popover;
 	border: 1px solid $light-gray-500;
 	background: $white;
-	min-width: 240px;
+	height: 100%;
 
-	.components-popover.is-top & {
+	.components-popover.is-mobile & {
+		height: calc( 100% - #{ $panel-header-height } );
+		border-top: 0;
+	}
+
+	.components-popover:not(.is-mobile) & {
+		position: absolute;
+		min-width: 240px;
+		height: auto;
+	}
+
+	.components-popover:not(.is-mobile).is-top & {
 		bottom: 100%;
 	}
 
-	.components-popover.is-center & {
+	.components-popover:not(.is-mobile).is-center & {
 		left: 50%;
 		transform: translateX( -50% );
 	}
 
-	.components-popover.is-right & {
+	.components-popover:not(.is-mobile).is-right & {
 		position: absolute;
 		left: 100%;
 		margin-left: -24px;
 	}
 
-	.components-popover.is-left & {
+	.components-popover:not(.is-mobile).is-left & {
 		position: absolute;
 		right: 100%;
 		margin-right: -24px;
 	}
+}
+
+// The withFocusReturn div
+.components-popover__content > div {
+	height: 100%;
+}
+
+.components-popover__header {
+	height: $panel-header-height;
+	background: $light-gray-300;
+	padding: 0 $panel-padding;
+	border: 1px solid $light-gray-500;
+	position: relative;
+}
+
+.components-popover__close.components-icon-button {
+	position: absolute;
+	top: 6px;
+	right: 6px;
+	z-index: z-index( '.components-popover__close' );
 }

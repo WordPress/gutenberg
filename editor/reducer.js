@@ -10,11 +10,9 @@ import {
 	get,
 	reduce,
 	keyBy,
-	keys,
 	first,
 	last,
 	omit,
-	pick,
 	without,
 	mapValues,
 	findIndex,
@@ -30,7 +28,7 @@ import { getBlockTypes, getBlockType } from '@wordpress/blocks';
  */
 import withHistory from './utils/with-history';
 import withChangeDetection from './utils/with-change-detection';
-import { STORE_DEFAULTS } from './store-defaults';
+import { PREFERENCES_DEFAULTS } from './store-defaults';
 
 /***
  * Module constants
@@ -471,7 +469,7 @@ export function blockInsertionPoint( state = {}, action ) {
  * @param  {Object}  action                Dispatched action
  * @return {string}                        Updated state
  */
-export function preferences( state = STORE_DEFAULTS.preferences, action ) {
+export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 	switch ( action.type ) {
 		case 'TOGGLE_SIDEBAR':
 			return {
@@ -492,24 +490,18 @@ export function preferences( state = STORE_DEFAULTS.preferences, action ) {
 				mode: action.mode,
 			};
 		case 'INSERT_BLOCKS':
-			// record the block usage and put the block in the recently used blocks
-			let blockUsage = state.blockUsage;
+			// put the block in the recently used blocks
 			let recentlyUsedBlocks = [ ...state.recentlyUsedBlocks ];
 			action.blocks.forEach( ( block ) => {
-				const uses = ( blockUsage[ block.name ] || 0 ) + 1;
-				blockUsage = omit( blockUsage, block.name );
-				blockUsage[ block.name ] = uses;
 				recentlyUsedBlocks = [ block.name, ...without( recentlyUsedBlocks, block.name ) ].slice( 0, MAX_RECENT_BLOCKS );
 			} );
 			return {
 				...state,
-				blockUsage,
 				recentlyUsedBlocks,
 			};
 		case 'SETUP_EDITOR':
 			const isBlockDefined = name => getBlockType( name ) !== undefined;
 			const filterInvalidBlocksFromList = list => list.filter( isBlockDefined );
-			const filterInvalidBlocksFromObject = obj => pick( obj, keys( obj ).filter( isBlockDefined ) );
 			const commonBlocks = getBlockTypes()
 				.filter( ( blockType ) => 'common' === blockType.category )
 				.map( ( blockType ) => blockType.name );
@@ -520,7 +512,6 @@ export function preferences( state = STORE_DEFAULTS.preferences, action ) {
 				recentlyUsedBlocks: filterInvalidBlocksFromList( [ ...state.recentlyUsedBlocks ] )
 					.concat( difference( commonBlocks, state.recentlyUsedBlocks ) )
 					.slice( 0, MAX_RECENT_BLOCKS ),
-				blockUsage: filterInvalidBlocksFromObject( state.blockUsage ),
 			};
 		case 'TOGGLE_FEATURE':
 			return {

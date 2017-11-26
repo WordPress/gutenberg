@@ -1,5 +1,5 @@
 .wp-block-text-columns {
 	.blocks-editable__tinymce:focus {
-		@include button-style__focus-active;
+		outline: 1px solid $light-gray-500;
 	}
 }

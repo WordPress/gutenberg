@@ -27,3 +27,7 @@ export { default as InspectorControls } from './inspector-controls';
 export { default as MediaUploadButton } from './media-upload-button';
 export { default as UrlInput } from './url-input';
 export { default as UrlInputButton } from './url-input/button';
+
+// Deprecated matchers
+import { attr, prop, text, html, query, node, children } from './hooks/matchers';
+export const source = { attr, prop, text, html, query, node, children };

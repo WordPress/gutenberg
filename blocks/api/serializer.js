@@ -3,7 +3,6 @@
  */
 import { isEmpty, reduce, isObject, castArray, compact, startsWith } from 'lodash';
 import { html as beautifyHtml } from 'js-beautify';
-import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -36,7 +35,7 @@ export function getBlockDefaultClassname( blockName ) {
  * @return {string}            Save content
  */
 export function getSaveContent( blockType, attributes ) {
-	const { save, className = getBlockDefaultClassname( blockType.name ) } = blockType;
+	const { save } = blockType;
 	let saveContent;
 
 	if ( save.prototype instanceof Component ) {
@@ -50,28 +49,20 @@ export function getSaveContent( blockType, attributes ) {
 		}
 	}
 
-	// Adding a generic classname
-	const addAdvancedAttributes = ( element ) => {
+	const addExtraContainerProps = ( element ) => {
 		if ( ! element || ! isObject( element ) ) {
 			return element;
 		}
 
-		const extraProps = applyFilters( 'getSaveContent.extraProps', {}, blockType, attributes );
-		if ( !! className ) {
-			const updatedClassName = classnames(
-				className,
-				element.props.className,
-				attributes.className
-			);
-			extraProps.className = updatedClassName;
-		}
+		// Applying the filters adding extra props
+		const props = applyFilters( 'getSaveContent.extraProps', { ...element.props }, blockType, attributes );
 
-		return cloneElement( element, extraProps );
+		return cloneElement( element, props );
 	};
-	const contentWithClassname = Children.map( saveContent, addAdvancedAttributes );
+	const contentWithExtraProps = Children.map( saveContent, addExtraContainerProps );
 
 	// Otherwise, infer as element
-	return renderToString( contentWithClassname );
+	return renderToString( contentWithExtraProps );
 }
 
 /**
@@ -98,8 +89,9 @@ export function getCommentAttributes( allAttributes, blockType ) {
 			return result;
 		}
 
-		// Ignore values sources from content and post meta
-		if ( attributeSchema.source || attributeSchema.meta ) {
+		// Ignore all attributes but the ones with an "undefined" source
+		// "undefined" source refers to attributes saved in the block comment
+		if ( attributeSchema.source !== undefined ) {
 			return result;
 		}
 
@@ -112,10 +104,6 @@ export function getCommentAttributes( allAttributes, blockType ) {
 		result[ key ] = value;
 		return result;
 	}, {} );
-
-	if ( blockType.className !== false && allAttributes.className ) {
-		attributes.className = allAttributes.className;
-	}
 
 	return attributes;
 }

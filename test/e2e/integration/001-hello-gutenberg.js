@@ -7,6 +7,5 @@ describe( 'Hello Gutenberg', () => {
 		// Assertions
 		cy.url().should( 'include', 'post-new.php' );
 		cy.get( '[placeholder="Add title"]' ).should( 'exist' );
-		cy.get( '[value="Write your story"]' ).should( 'exist' );
 	} );
 } );

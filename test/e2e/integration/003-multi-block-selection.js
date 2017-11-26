@@ -4,18 +4,15 @@ describe( 'Multi-block selection', () => {
 	} );
 
 	it( 'Should select/unselect multiple blocks', () => {
-		const lastBlockSelector = '.editor-visual-editor__block-edit:last [contenteditable="true"]:first';
-		const firstBlockContainerSelector = '.editor-visual-editor__block:first';
-		const lastBlockContainerSelector = '.editor-visual-editor__block:last';
+		const lastBlockSelector = '.editor-block-list__block-edit:last [contenteditable="true"]:first';
+		const firstBlockContainerSelector = '.editor-block-list__block:first';
+		const lastBlockContainerSelector = '.editor-block-list__block:last';
 		const multiSelectedCssClass = 'is-multi-selected';
 
 		// Creating test blocks
-		// Using the placeholder
-		cy.get( '[value="Write your story"]' ).click();
+		cy.get( '.editor-default-block-appender' ).click();
 		cy.get( lastBlockSelector ).type( 'First Paragraph' );
-
-		// Using the quick inserter
-		cy.get( '.editor-visual-editor__inserter [aria-label="Insert Paragraph"]' ).click();
+		cy.get( '.editor-default-block-appender' ).click();
 		cy.get( lastBlockSelector ).type( 'Second Paragraph' );
 
 		// Default: No selection

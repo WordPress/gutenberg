@@ -6,7 +6,7 @@ import { mapValues, reduce, forEach, noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from 'element';
+import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies

@@ -16,6 +16,7 @@ import { focus, keycodes } from '@wordpress/utils';
 import './style.scss';
 import withFocusReturn from '../higher-order/with-focus-return';
 import PopoverDetectOutside from './detect-outside';
+import IconButton from '../icon-button';
 import { Slot, Fill } from '../slot-fill';
 
 const FocusManaged = withFocusReturn( ( { children } ) => children );
@@ -35,6 +36,7 @@ const ARROW_OFFSET = 20;
  * @type {String}
  */
 const SLOT_NAME = 'Popover';
+const isMobile = () => window.innerWidth < 782;
 
 class Popover extends Component {
 	constructor() {
@@ -52,6 +54,7 @@ class Popover extends Component {
 		this.state = {
 			forcedYAxis: null,
 			forcedXAxis: null,
+			isMobile: false,
 		};
 	}
 
@@ -156,8 +159,27 @@ class Popover extends Component {
 	}
 
 	setOffset() {
-		const { getAnchorRect = this.getAnchorRect } = this.props;
+		const { getAnchorRect = this.getAnchorRect, expandOnMobile = false } = this.props;
 		const { popover } = this.nodes;
+
+		if ( isMobile() && expandOnMobile ) {
+			popover.style.left = 0;
+			popover.style.top = 0;
+			popover.style.right = 0;
+			popover.style.bottom = 0;
+			if ( ! this.state.isMobile ) {
+				this.setState( {
+					isMobile: true,
+				} );
+			}
+			return;
+		}
+
+		if ( this.state.isMobile ) {
+			this.setState( {
+				isMobile: false,
+			} );
+		}
 
 		const [ yAxis, xAxis ] = this.getPositions();
 		const isTop = 'top' === yAxis;
@@ -168,6 +190,9 @@ class Popover extends Component {
 		if ( ! rect ) {
 			return;
 		}
+
+		popover.style.bottom = 'auto';
+		popover.style.right = 'auto';
 
 		if ( isRight ) {
 			popover.style.left = rect.left + ARROW_OFFSET + 'px';
@@ -244,6 +269,7 @@ class Popover extends Component {
 			range,
 			focusOnOpen,
 			getAnchorRect,
+			expandOnMobile,
 			/* eslint-enable no-unused-vars */
 			...contentProps
 		} = this.props;
@@ -258,6 +284,9 @@ class Popover extends Component {
 			className,
 			'is-' + yAxis,
 			'is-' + xAxis,
+			{
+				'is-mobile': this.state.isMobile,
+			}
 		);
 
 		// Disable reason: We care to capture the _bubbled_ events from inputs
@@ -272,6 +301,11 @@ class Popover extends Component {
 					{ ...contentProps }
 					onKeyDown={ this.maybeClose }
 				>
+					{ this.state.isMobile && (
+						<div className="components-popover__header">
+							<IconButton className="components-popover__close" icon="no-alt" onClick={ onClose } />
+						</div>
+					) }
 					<div
 						ref={ this.bindNode( 'content' ) }
 						className="components-popover__content"

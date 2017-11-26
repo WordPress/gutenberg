@@ -9,7 +9,7 @@ import deepFreeze from 'deep-freeze';
 import withChangeDetection from '../';
 
 describe( 'withChangeDetection()', () => {
-	const initialState = { count: 0 };
+	const initialState = deepFreeze( { count: 0 } );
 
 	function originalReducer( state = initialState, action ) {
 		switch ( action.type ) {
@@ -18,9 +18,6 @@ describe( 'withChangeDetection()', () => {
 
 			case 'RESET_AND_CHANGE_REFERENCE':
 				return { ...state };
-
-			case 'SET_STATE':
-				return action.state;
 		}
 
 		return state;
@@ -67,19 +64,19 @@ describe( 'withChangeDetection()', () => {
 		expect( state ).toEqual( { count: 1, isDirty: true } );
 	} );
 
-	it( 'should reset if state reverts to its original reference', () => {
-		const reducer = withChangeDetection( originalReducer, { resetTypes: [ 'RESET' ] } );
+	it( 'should maintain separate states', () => {
+		const reducer = withChangeDetection( originalReducer );
 
-		let state;
+		let firstState;
 
-		const originalState = state = reducer( undefined, {} );
-		expect( state ).toEqual( { count: 0, isDirty: false } );
+		firstState = reducer( undefined, {} );
+		expect( firstState ).toEqual( { count: 0, isDirty: false } );
 
-		state = reducer( deepFreeze( state ), { type: 'INCREMENT' } );
-		expect( state ).toEqual( { count: 1, isDirty: true } );
+		const secondState = reducer( undefined, { type: 'INCREMENT' } );
+		expect( secondState ).toEqual( { count: 1, isDirty: false } );
 
-		state = reducer( deepFreeze( state ), { type: 'SET_STATE', state: originalState } );
-		expect( state ).toEqual( { count: 0, isDirty: false } );
+		firstState = reducer( deepFreeze( firstState ), {} );
+		expect( firstState ).toEqual( { count: 0, isDirty: false } );
 	} );
 
 	it( 'should flag as not dirty even if reset type causes reference change', () => {
