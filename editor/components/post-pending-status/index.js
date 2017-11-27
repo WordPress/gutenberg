@@ -45,7 +45,9 @@ const applyConnect = connect(
 		onUpdateStatus( status ) {
 			return editPost( { status } );
 		},
-	}
+	},
+	undefined,
+	{ storeKey: 'editorStore' }
 );
 
 export default flowRight(

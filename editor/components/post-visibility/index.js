@@ -144,7 +144,9 @@ const applyConnect = connect(
 		onUpdateVisibility( status, password = null ) {
 			return editPost( { status, password } );
 		},
-	}
+	},
+	undefined,
+	{ storeKey: 'editorStore' }
 );
 
 export default flowRight(

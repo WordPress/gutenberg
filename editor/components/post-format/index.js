@@ -81,6 +81,8 @@ export default flowRight( [
 				return editPost( { format: postFormat } );
 			},
 		},
+		undefined,
+		{ storeKey: 'editorStore' }
 	),
 	withInstanceId,
 ] )( PostFormat );

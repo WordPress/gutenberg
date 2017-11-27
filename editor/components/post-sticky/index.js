@@ -47,6 +47,8 @@ const applyConnect = connect(
 			},
 		};
 	},
+	undefined,
+	{ storeKey: 'editorStore' }
 );
 
 export default flowRight( [

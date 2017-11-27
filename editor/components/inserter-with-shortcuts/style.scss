@@ -1,0 +1,28 @@
+.editor-inserter-with-shortcuts {
+	display: flex;
+	align-items: baseline;
+
+	> .editor-inserter-with-shortcuts__block {
+		flex-direction: row;
+		opacity: 0;
+		transition: opacity 150ms;
+		margin: 0 10px;
+		width: auto;
+		font-family: $default-font;
+		font-size: $default-font-size;
+		box-shadow: none;
+		padding: 6px;
+		align-items: center;
+	}
+
+	&:hover > .editor-inserter-with-shortcuts__block,
+	&.is-showing-controls > .editor-inserter-with-shortcuts__block {
+		opacity: 1;
+	}
+}
+
+.editor-inserter-with-shortcuts-block-icon {
+	display: inline-block;
+	margin-right: 8px;
+	height: 20px;
+}

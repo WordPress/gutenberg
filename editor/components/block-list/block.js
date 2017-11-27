@@ -337,7 +337,7 @@ class BlockListBlock extends Component {
 	}
 
 	render() {
-		const { block, order, mode, showContextualToolbar } = this.props;
+		const { block, order, mode, showContextualToolbar, onShowInspector } = this.props;
 		const { name: blockName, isValid } = block;
 		const blockType = getBlockType( blockName );
 		// translators: %s: Type of block (i.e. Text, Image etc)
@@ -386,9 +386,9 @@ class BlockListBlock extends Component {
 			>
 				<BlockDropZone index={ order } />
 				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
-				{ ( showUI || isHovered ) && <BlockSettingsMenu uids={ [ block.uid ] } /> }
-				{ showUI && isValid && showContextualToolbar && <BlockContextualToolbar /> }
-				{ isFirstMultiSelected && <BlockMultiControls /> }
+				{ ( showUI || isHovered ) && <BlockSettingsMenu uids={ [ block.uid ] } onShowInspector={ onShowInspector } /> }
+				{ showUI && isValid && showContextualToolbar && <BlockContextualToolbar onShowInspector={ onShowInspector } /> }
+				{ isFirstMultiSelected && <BlockMultiControls onShowInspector={ onShowInspector } /> }
 				<div
 					ref={ this.bindBlockNode }
 					onKeyPress={ this.maybeStartTyping }
@@ -513,5 +513,7 @@ export default connect(
 		onMetaChange( meta ) {
 			dispatch( editPost( { meta } ) );
 		},
-	} )
+	} ),
+	undefined,
+	{ storeKey: 'editorStore' }
 )( BlockListBlock );

@@ -33,7 +33,10 @@ const applyConnect = connect(
 		return {
 			postTypeSlug: getCurrentPostType( state ),
 		};
-	}
+	},
+	undefined,
+	undefined,
+	{ storeKey: 'editorStore' }
 );
 
 const applyWithAPIData = withAPIData( ( props ) => {

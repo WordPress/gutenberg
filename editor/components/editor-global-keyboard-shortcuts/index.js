@@ -76,5 +76,7 @@ export default connect(
 		onRedo: redo,
 		onUndo: undo,
 		onRemove: removeBlocks,
-	}
+	},
+	undefined,
+	{ storeKey: 'editorStore' }
 )( EditorGlobalKeyboardShortcuts );

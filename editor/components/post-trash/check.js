@@ -23,4 +23,7 @@ export default connect(
 			postId: getCurrentPostId( state ),
 		};
 	},
+	undefined,
+	undefined,
+	{ storeKey: 'editorStore' }
 )( PostTrashCheck );

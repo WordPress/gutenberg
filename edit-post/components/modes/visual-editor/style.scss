@@ -1,0 +1,115 @@
+.editor-visual-editor {
+	position: relative;
+	height: 100%;
+	margin: 0 auto;
+	margin-left: auto;
+	margin-right: auto;
+	padding: 50px 0 0;
+
+	&,
+	& p {
+		font-family: $editor-font;
+		font-size: $editor-font-size;
+		line-height: $editor-line-height;
+	}
+}
+
+.editor-visual-editor .editor-block-list__block {
+	margin-left: auto;
+	margin-right: auto;
+	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );
+
+	&[data-align="wide"] {
+		max-width: 1100px;
+	}
+
+	&[data-align="full"] {
+		max-width: 100%;
+	}
+
+	&[data-align="full"],
+	&[data-align="wide"] {
+		.editor-block-contextual-toolbar {
+			@include break-small() {
+				width: $visual-editor-max-width + 2;	// 1px border left and right
+			}
+			margin-left: auto;
+			margin-right: auto;
+		}
+	}
+}
+
+.editor-visual-editor .editor-inserter {
+	.editor-inserter__toggle {
+		color: $dark-gray-300;
+	}
+
+	.editor-inserter__toggle.components-icon-button:not(:disabled):hover {
+		@include button-style__hover;
+	}
+}
+
+.editor-visual-editor .editor-visual-editor__insertion-point {
+	position: relative;
+	width: $visual-editor-max-width - $block-padding - $block-padding;
+	margin-left: auto;
+	margin-right: auto;
+
+	&:before {
+		position: absolute;
+		top: -1px;
+		height: 2px;
+		left: 0;
+		right: 0;
+		background: $blue-medium-500;
+		content: '';
+	}
+}
+
+.editor-visual-editor .editor-post-title {
+	margin-left: auto;
+	margin-right: auto;
+	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );
+
+	.editor-post-permalink {
+		left: $block-padding;
+		right: $block-padding;
+	}
+
+	@include break-small() {
+		padding: 5px ( $block-mover-padding-visible );
+
+		.editor-post-permalink {
+			left: $block-mover-padding-visible;
+			right: $block-mover-padding-visible;
+		}
+	}
+}
+
+.editor-visual-editor .editor-default-block-appender {
+	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );
+	clear: left;
+	margin: 0 auto;
+	position: relative;
+
+	@include break-small() {
+		padding: 0 $block-mover-padding-visible;
+
+		.editor-default-block-appender__content {
+			padding: 0 $block-padding;
+		}
+	}
+}
+
+.editor-visual-editor .editor-inserter-with-shortcuts {
+	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );
+	margin: 0 auto;
+	clear: both;
+
+	padding: $block-padding;
+	padding-left: $block-padding - 8px; // Offset by left button's own padding
+	@include break-small {
+		padding: $block-padding ( $block-padding + $block-mover-padding-visible );
+		padding-left: $block-padding + $block-mover-padding-visible - 8px;
+	}
+}

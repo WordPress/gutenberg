@@ -78,5 +78,7 @@ export default connect(
 	{
 		onStatusChange: ( status ) => editPost( { status } ),
 		onSave: savePost,
-	}
+	},
+	undefined,
+	{ storeKey: 'editorStore' }
 )( PostSavedState );

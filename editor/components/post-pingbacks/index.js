@@ -40,6 +40,8 @@ export default connect(
 	},
 	{
 		editPost,
-	}
+	},
+	undefined,
+	{ storeKey: 'editorStore' }
 )( withInstanceId( PostPingbacks ) );
 

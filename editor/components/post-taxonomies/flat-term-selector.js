@@ -189,6 +189,8 @@ export default connect(
 				dispatch( editPost( { [ restBase ]: terms } ) );
 			},
 		};
-	}
+	},
+	undefined,
+	{ storeKey: 'editorStore' }
 )( FlatTermSelector );
 

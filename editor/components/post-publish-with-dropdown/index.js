@@ -50,4 +50,7 @@ export default connect(
 		isSaveable: isEditedPostSaveable( state ),
 		isPublishable: isEditedPostPublishable( state ),
 	} ),
+	undefined,
+	undefined,
+	{ storeKey: 'editorStore' }
 )( PostPublishWithDropdown );

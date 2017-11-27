@@ -70,5 +70,7 @@ export default connect(
 		onPersist( content ) {
 			return resetBlocks( parse( content ) );
 		},
-	}
+	},
+	undefined,
+	{ storeKey: 'editorStore' }
 )( PostTextEditor );

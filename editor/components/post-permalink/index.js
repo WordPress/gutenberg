@@ -69,6 +69,9 @@ export default connect(
 			isNew: isEditedPostNew( state ),
 			link: getEditedPostAttribute( state, 'link' ),
 		};
-	}
+	},
+	undefined,
+	undefined,
+	{ storeKey: 'editorStore' }
 )( PostPermalink );
 

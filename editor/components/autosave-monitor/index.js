@@ -53,5 +53,7 @@ export default connect(
 			isSaveable: isEditedPostSaveable( state ),
 		};
 	},
-	{ autosave }
+	{ autosave },
+	undefined,
+	{ storeKey: 'editorStore' }
 )( AutosaveMonitor );

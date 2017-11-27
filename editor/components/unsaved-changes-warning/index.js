@@ -43,5 +43,8 @@ class UnsavedChangesWarning extends Component {
 export default connect(
 	( state ) => ( {
 		isDirty: isEditedPostDirty( state ),
-	} )
+	} ),
+	undefined,
+	undefined,
+	{ storeKey: 'editorStore' }
 )( UnsavedChangesWarning );

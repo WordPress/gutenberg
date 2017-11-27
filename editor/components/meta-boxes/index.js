@@ -28,6 +28,11 @@ function MetaBoxes( { location, isActive, usePanel = false } ) {
 	);
 }
 
-export default connect( ( state, ownProps ) => ( {
-	isActive: getMetaBox( state, ownProps.location ).isActive,
-} ) )( MetaBoxes );
+export default connect(
+	( state, ownProps ) => ( {
+		isActive: getMetaBox( state, ownProps.location ).isActive,
+	} ),
+	undefined,
+	undefined,
+	{ storeKey: 'editorStore' }
+)( MetaBoxes );

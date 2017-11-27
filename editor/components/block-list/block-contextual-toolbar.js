@@ -9,13 +9,13 @@ import { __ } from '@wordpress/i18n';
 import NavigableToolbar from '../navigable-toolbar';
 import { BlockToolbar } from '../';
 
-function BlockContextualToolbar() {
+function BlockContextualToolbar( { onShowInspector } ) {
 	return (
 		<NavigableToolbar
 			className="editor-block-contextual-toolbar"
 			aria-label={ __( 'Block Toolbar' ) }
 		>
-			<BlockToolbar />
+			<BlockToolbar onShowInspector={ onShowInspector } />
 		</NavigableToolbar>
 	);
 }

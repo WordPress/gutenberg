@@ -52,5 +52,7 @@ export default connect(
 			dispatch( toggleBlockMode( uid ) );
 			onToggle();
 		},
-	} )
+	} ),
+	undefined,
+	{ storeKey: 'editorStore' }
 )( BlockModeToggle );

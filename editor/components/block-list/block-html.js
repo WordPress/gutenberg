@@ -67,5 +67,7 @@ export default connect(
 		onChange( uid, attributes, originalContent, isValid ) {
 			return updateBlock( uid, { attributes, originalContent, isValid } );
 		},
-	}
+	},
+	undefined,
+	{ storeKey: 'editorStore' }
 )( BlockHTML );

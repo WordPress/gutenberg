@@ -321,7 +321,9 @@ const connectComponent = connect(
 			blocks: getBlocks( state ),
 		};
 	},
-	{ showInsertionPoint, hideInsertionPoint }
+	{ showInsertionPoint, hideInsertionPoint },
+	undefined,
+	{ storeKey: 'editorStore' }
 );
 
 export default flow(

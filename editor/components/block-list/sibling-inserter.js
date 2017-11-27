@@ -81,5 +81,8 @@ export default connect(
 				getBlockInsertionPoint( state ) === insertIndex
 			),
 		};
-	}
+	},
+	undefined,
+	undefined,
+	{ storeKey: 'editorStore' }
 )( BlockListSiblingInserter );

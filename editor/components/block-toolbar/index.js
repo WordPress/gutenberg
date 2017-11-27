@@ -40,7 +40,7 @@ class BlockToolbar extends Component {
 
 	render() {
 		const { showMobileControls } = this.state;
-		const { block, mode } = this.props;
+		const { block, mode, onShowInspector } = this.props;
 
 		if ( ! block || ! block.isValid ) {
 			return null;
@@ -75,7 +75,7 @@ class BlockToolbar extends Component {
 					{ ( mode === 'html' || showMobileControls ) &&
 						<div className="editor-block-toolbar__mobile-tools-content">
 							<BlockMover uids={ [ block.uid ] } />
-							<BlockInspectorButton small />
+							<BlockInspectorButton small onClick={ onShowInspector } />
 							<BlockModeToggle uid={ block.uid } small />
 							<UnknownConverter uid={ block.uid } small />
 							<BlockDeleteButton uids={ [ block.uid ] } small />
@@ -88,11 +88,16 @@ class BlockToolbar extends Component {
 	}
 }
 
-export default connect( ( state ) => {
-	const block = getSelectedBlock( state );
+export default connect(
+	( state ) => {
+		const block = getSelectedBlock( state );
 
-	return ( {
-		block,
-		mode: block ? getBlockMode( state, block.uid ) : null,
-	} );
-} )( BlockToolbar );
+		return ( {
+			block,
+			mode: block ? getBlockMode( state, block.uid ) : null,
+		} );
+	},
+	undefined,
+	undefined,
+	{ storeKey: 'editorStore' }
+)( BlockToolbar );

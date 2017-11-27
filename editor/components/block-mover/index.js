@@ -92,5 +92,7 @@ export default connect(
 				uids: ownProps.uids,
 			} );
 		},
-	} )
+	} ),
+	undefined,
+	{ storeKey: 'editorStore' }
 )( BlockMover );

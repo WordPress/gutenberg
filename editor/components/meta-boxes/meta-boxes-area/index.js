@@ -158,4 +158,9 @@ function mapDispatchToProps( dispatch ) {
 	};
 }
 
-export default connect( mapStateToProps, mapDispatchToProps )( MetaBoxesArea );
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps,
+	undefined,
+	{ storeKey: 'editorStore' }
+)( MetaBoxesArea );

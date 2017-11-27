@@ -95,7 +95,7 @@
   },
   "jest": {
     "collectCoverageFrom": [
-      "(blocks|components|date|editor|element|i18n|utils)/**/*.js"
+      "(blocks|components|date|editor|element|i18n|utils|edit-post)/**/*.js"
     ],
     "coveragePathIgnorePatterns": [
       "<rootDir>/[^/]+/build/index.js"
@@ -103,7 +103,7 @@
     "coverageDirectory": "coverage",
     "moduleNameMapper": {
       "\\.(scss|css)$": "<rootDir>/test/unit/style-mock.js",
-      "@wordpress\\/(blocks|components|date|editor|element|i18n|utils)": "$1"
+      "@wordpress\\/(blocks|components|date|editor|element|i18n|utils|edit-post)": "$1"
     },
     "modulePaths": [
       "<rootDir>"
@@ -114,7 +114,7 @@
     ],
     "setupTestFrameworkScriptFile": "<rootDir>/test/unit/setup-test-framework.js",
     "testMatch": [
-      "<rootDir>/(blocks|components|date|editor|element|i18n|utils)/**/test/*.js"
+      "<rootDir>/(blocks|components|date|editor|element|i18n|utils|edit-post)/**/test/*.js"
     ],
     "timers": "fake",
     "transform": {

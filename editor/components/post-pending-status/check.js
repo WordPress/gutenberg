@@ -26,6 +26,9 @@ const applyConnect = connect(
 	( state ) => ( {
 		isPublished: isCurrentPostPublished( state ),
 	} ),
+	undefined,
+	undefined,
+	{ storeKey: 'editorStore' }
 );
 
 const applyWithAPIData = withAPIData( () => {

@@ -3,6 +3,7 @@
  */
 import classnames from 'classnames';
 import { connect } from 'react-redux';
+import { flow } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -20,7 +21,7 @@ import BlockDeleteButton from './block-delete-button';
 import UnknownConverter from './unknown-converter';
 import { selectBlock } from '../../actions';
 
-function BlockSettingsMenu( { uids, onSelect, focus } ) {
+function BlockSettingsMenu( { uids, onSelect, focus, onShowInspector } ) {
 	const count = uids.length;
 
 	return (
@@ -52,7 +53,7 @@ function BlockSettingsMenu( { uids, onSelect, focus } ) {
 			renderContent={ ( { onClose } ) => (
 				// Should this just use a DropdownMenu instead of a DropDown ?
 				<NavigableMenu className="editor-block-settings-menu__content">
-					<BlockInspectorButton onClick={ onClose } />
+					<BlockInspectorButton onClick={ flow( onClose, onShowInspector ) } />
 					{ count === 1 && <BlockModeToggle uid={ uids[ 0 ] } onToggle={ onClose } /> }
 					{ count === 1 && <UnknownConverter uid={ uids[ 0 ] } /> }
 					<BlockDeleteButton uids={ uids } />
@@ -68,5 +69,7 @@ export default connect(
 		onSelect( uid ) {
 			dispatch( selectBlock( uid ) );
 		},
-	} )
+	} ),
+	undefined,
+	{ storeKey: 'editorStore' }
 )( BlockSettingsMenu );

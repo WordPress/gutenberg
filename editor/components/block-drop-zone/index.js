@@ -47,5 +47,7 @@ function BlockDropZone( { index, ...props } ) {
 
 export default connect(
 	undefined,
-	{ insertBlocks }
+	{ insertBlocks },
+	undefined,
+	{ storeKey: 'editorStore' }
 )( BlockDropZone );

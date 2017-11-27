@@ -19,5 +19,8 @@ function PostVisibilityLabel( { visibility } ) {
 export default connect(
 	( state ) => ( {
 		visibility: getEditedPostVisibility( state ),
-	} )
+	} ),
+	undefined,
+	undefined,
+	{ storeKey: 'editorStore' }
 )( PostVisibilityLabel );
