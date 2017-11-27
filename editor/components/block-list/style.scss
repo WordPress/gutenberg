@@ -388,12 +388,6 @@
 	position: relative;
 	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible ) - ( 2 * $block-padding );
 	margin: 0 auto;
-	clear: left; // fixes horizontal scrollbar when there is left aligned element
-	
-	[data-align="left"] + &,
-	[data-align="right"] + & {
-		clear: none; // above scrollbar fix applies only for inserters next to aligned elements
-	}
 
 	@include break-small {
 		max-width: $visual-editor-max-width - ( 2 * $block-padding );
