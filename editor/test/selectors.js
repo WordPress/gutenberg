@@ -77,7 +77,10 @@ import {
 	getReusableBlock,
 	isSavingReusableBlock,
 	getReusableBlocks,
+	getStateBeforeOptimisticTransaction,
+	isPublishingPost,
 } from '../selectors';
+import { POST_UPDATE_TRANSACTION_ID } from '../effects';
 
 describe( 'selectors', () => {
 	beforeAll( () => {
@@ -2185,6 +2188,177 @@ describe( 'selectors', () => {
 
 			const reusableBlocks = getReusableBlocks( state );
 			expect( reusableBlocks ).toEqual( [] );
+		} );
+	} );
+
+	describe( 'getStateBeforeOptimisticTransaction', () => {
+		it( 'should return null if no transaction can be found', () => {
+			const beforeState = getStateBeforeOptimisticTransaction( {
+				optimist: [],
+			}, 'foo' );
+
+			expect( beforeState ).toBe( null );
+		} );
+
+		it( 'should return null if a transaction with ID can be found, but lacks before state', () => {
+			const beforeState = getStateBeforeOptimisticTransaction( {
+				optimist: [
+					{
+						action: {
+							optimist: {
+								id: 'foo',
+							},
+						},
+					},
+				],
+			}, 'foo' );
+
+			expect( beforeState ).toBe( null );
+		} );
+
+		it( 'should return the before state matching the given transaction id', () => {
+			const expectedBeforeState = {};
+			const beforeState = getStateBeforeOptimisticTransaction( {
+				optimist: [
+					{
+						beforeState: expectedBeforeState,
+						action: {
+							optimist: {
+								id: 'foo',
+							},
+						},
+					},
+				],
+			}, 'foo' );
+
+			expect( beforeState ).toBe( expectedBeforeState );
+		} );
+	} );
+
+	describe( 'isPublishingPost', () => {
+		it( 'should return false if the post is not being saved', () => {
+			const isPublishing = isPublishingPost( {
+				optimist: [],
+				saving: {
+					requesting: false,
+				},
+				editor: {
+					edits: {},
+				},
+				currentPost: {
+					status: 'publish',
+				},
+			} );
+
+			expect( isPublishing ).toBe( false );
+		} );
+
+		it( 'should return false if the current post is not considered published', () => {
+			const isPublishing = isPublishingPost( {
+				optimist: [],
+				saving: {
+					requesting: true,
+				},
+				editor: {
+					edits: {},
+				},
+				currentPost: {
+					status: 'draft',
+				},
+			} );
+
+			expect( isPublishing ).toBe( false );
+		} );
+
+		it( 'should return false if the optimistic transaction cannot be found', () => {
+			const isPublishing = isPublishingPost( {
+				optimist: [],
+				saving: {
+					requesting: true,
+				},
+				editor: {
+					edits: {},
+				},
+				currentPost: {
+					status: 'publish',
+				},
+			} );
+
+			expect( isPublishing ).toBe( false );
+		} );
+
+		it( 'should return false if the current post prior to request was already published', () => {
+			const isPublishing = isPublishingPost( {
+				optimist: [
+					{
+						beforeState: {
+							saving: {
+								requesting: false,
+							},
+							editor: {
+								edits: {},
+							},
+							currentPost: {
+								status: 'publish',
+							},
+						},
+						action: {
+							optimist: {
+								id: POST_UPDATE_TRANSACTION_ID,
+							},
+						},
+					},
+				],
+				saving: {
+					requesting: true,
+				},
+				editor: {
+					edits: {},
+				},
+				currentPost: {
+					status: 'publish',
+				},
+			} );
+
+			expect( isPublishing ).toBe( false );
+		} );
+
+		it( 'should return true if the current post prior to request was not published', () => {
+			const isPublishing = isPublishingPost( {
+				optimist: [
+					{
+						beforeState: {
+							saving: {
+								requesting: false,
+							},
+							editor: {
+								edits: {
+									status: 'publish',
+								},
+							},
+							currentPost: {
+								status: 'draft',
+							},
+						},
+						action: {
+							optimist: {
+								id: POST_UPDATE_TRANSACTION_ID,
+							},
+						},
+					},
+				],
+				saving: {
+					requesting: true,
+				},
+				editor: {
+					edits: {},
+				},
+				currentPost: {
+					status: 'publish',
+				},
+			} );
+
+			expect( isPublishing ).toBe( true );
 		} );
 	} );
 } );

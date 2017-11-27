@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, uniqueId, map, filter, some, castArray } from 'lodash';
+import { get, map, filter, some, castArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -54,6 +54,7 @@ import {
 const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
 const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
 const SAVE_REUSABLE_BLOCK_NOTICE_ID = 'SAVE_REUSABLE_BLOCK_NOTICE_ID';
+export const POST_UPDATE_TRANSACTION_ID = 'post-update';
 
 export default {
 	REQUEST_POST_UPDATE( action, store ) {
@@ -66,12 +67,11 @@ export default {
 			content: getEditedPostContent( state ),
 			id: post.id,
 		};
-		const transactionId = uniqueId();
 
 		dispatch( {
 			type: 'UPDATE_POST',
 			edits: toSend,
-			optimist: { type: BEGIN, id: transactionId },
+			optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
 		} );
 		dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
 		const Model = wp.api.getPostTypeModel( getCurrentPostType( state ) );
@@ -84,7 +84,7 @@ export default {
 				type: 'REQUEST_POST_UPDATE_SUCCESS',
 				previousPost: post,
 				post: newPost,
-				optimist: { type: COMMIT, id: transactionId },
+				optimist: { type: COMMIT, id: POST_UPDATE_TRANSACTION_ID },
 			} );
 		} ).fail( ( err ) => {
 			dispatch( {
@@ -95,7 +95,7 @@ export default {
 				} ),
 				post,
 				edits,
-				optimist: { type: REVERT, id: transactionId },
+				optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
 			} );
 		} );
 	},

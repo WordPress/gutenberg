@@ -18,6 +18,7 @@ import {
 	isCurrentPostPublished,
 	isEditedPostBeingScheduled,
 	isSavingPost,
+	isPublishingPost,
 } from '../../selectors';
 
 export function PublishButtonLabel( {
@@ -52,7 +53,7 @@ const applyConnect = connect(
 		isBeingScheduled: isEditedPostBeingScheduled( state ),
 		isSaving: isSavingPost( state ),
 		// Need a selector
-		isPublishing: false,
+		isPublishing: isPublishingPost( state ),
 	} )
 );
 
