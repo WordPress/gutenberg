@@ -223,7 +223,7 @@ describe( 'block parser', () => {
 					},
 				},
 				save: ( { attributes } ) => <div>{attributes.fruit}</div>,
-				deprecatedVersions: [
+				deprecated: [
 					{
 						attributes: {
 							fruit: {

@@ -181,10 +181,12 @@ export function createBlockWithFallback( name, innerHTML, attributes ) {
 		// as invalid, or future serialization attempt results in an error
 		block.originalContent = innerHTML;
 
-		// If the block is invalid, try to find an older compatible version
-		if ( ! block.isValid && blockType.deprecatedVersions ) {
+		// When a block is invalid, attempt to validate again using a supplied `deprecated` definition.
+		// This allows blocks to modify their attribute and markup structure without invalidating
+		// content written in previous formats.
+		if ( ! block.isValid && blockType.deprecated ) {
 			let attributesParsedWithDeprecatedVersion;
-			const hasValidOlderVersion = find( blockType.deprecatedVersions, ( oldBlockType ) => {
+			const hasValidOlderVersion = find( blockType.deprecated, ( oldBlockType ) => {
 				const deprecatedBlockType = {
 					...omit( blockType, [ 'attributes', 'save', 'supports' ] ), // Parsing/Serialization properties
 					...oldBlockType,
