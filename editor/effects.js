@@ -275,7 +275,7 @@ export default {
 		if ( post.content.raw ) {
 			effects.push( resetBlocks( parse( post.content.raw ) ) );
 		} else if ( settings.template ) {
-			const blocks = map( settings.template.blocks, ( { name, attributes } ) => {
+			const blocks = map( settings.template, ( [ name, attributes ] ) => {
 				const block = createBlock( name );
 				block.attributes = {
 					...block.attributes,
