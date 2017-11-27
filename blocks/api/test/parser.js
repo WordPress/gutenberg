@@ -211,6 +211,47 @@ describe( 'block parser', () => {
 			const block = createBlockWithFallback( 'core/test-block', '' );
 			expect( block ).toBeUndefined();
 		} );
+
+		it( 'should fallback to an older version of the block if the current one is invalid', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					fruit: {
+						type: 'string',
+						source: 'text',
+						selector: 'div',
+					},
+				},
+				save: ( { attributes } ) => <div>{attributes.fruit}</div>,
+				deprecatedVersions: [
+					{
+						attributes: {
+							fruit: {
+								type: 'string',
+								source: 'text',
+								selector: 'span',
+							},
+						},
+						save: ( { attributes } ) => <span>{attributes.fruit}</span>,
+					},
+				],
+			} );
+
+			const block = createBlockWithFallback(
+				'core/test-block',
+				'<span class="wp-block-test-block">Bananas</span>',
+				{ fruit: 'Bananas' }
+			);
+			expect( block.name ).toEqual( 'core/test-block' );
+			expect( block.attributes ).toEqual( { fruit: 'Bananas' } );
+			expect( block.isValid ).toBe( true );
+			/* eslint-disable no-console */
+			expect( console.error ).toHaveBeenCalled();
+			expect( console.warn ).toHaveBeenCalled();
+			console.warn.mockClear();
+			console.error.mockClear();
+			/* eslint-enable no-console */
+		} );
 	} );
 
 	describe( 'parse()', () => {
