@@ -18,6 +18,7 @@ A lightweight & efficient filter and action manager.
 
 ### API Usage
 
+* `createHooks()`
 * `addAction( 'hookName', 'functionName', callback, priority )`
 * `addFilter( 'hookName', 'functionName', callback, priority )`
 * `removeAction( 'hookName', 'functionName' )`
@@ -32,9 +33,11 @@ A lightweight & efficient filter and action manager.
 * `didFilter( 'hookName' )`
 * `hasAction( 'hookName' )`
 * `hasFilter( 'hookName' )`
+* `actions`
+* `filters`
 
 Hooks can be added to an object via composition:
-`import createHooks from '../';`
+`import { createHooks } from '@wordpress/hooks';`
 
 `myObject.hooks = createHooks();`
 
