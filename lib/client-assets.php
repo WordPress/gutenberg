@@ -783,7 +783,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	);
 
 	$post_type_object = get_post_type_object( $post_to_edit['type'] );
-	if ( $post_type_object->template ) {
+	if ( ! empty( $post_type_object->template ) ) {
 		$editor_settings['template'] = $post_type_object->template;
 	}
 
