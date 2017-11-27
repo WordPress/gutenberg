@@ -18,9 +18,10 @@ import {
 	isSavingPost,
 	isEditedPostSaveable,
 	isEditedPostPublishable,
+	isCurrentPostPublished,
 } from '../../selectors';
 
-function PostPublishWithDropdown( { isSaving, isPublishable, isSaveable } ) {
+function PostPublishWithDropdown( { isSaving, isPublishable, isSaveable, isPublished } ) {
 	const isButtonEnabled = ! isSaving && isPublishable && isSaveable;
 
 	return (
@@ -34,6 +35,7 @@ function PostPublishWithDropdown( { isSaving, isPublishable, isSaveable } ) {
 					onClick={ onToggle }
 					aria-expanded={ isOpen }
 					disabled={ ! isButtonEnabled }
+					isBusy={ isSaving && isPublished }
 				>
 					<PostPublishButtonLabel />
 					<Dashicon icon="arrow-down" />
@@ -49,5 +51,6 @@ export default connect(
 		isSaving: isSavingPost( state ),
 		isSaveable: isEditedPostSaveable( state ),
 		isPublishable: isEditedPostPublishable( state ),
+		isPublished: isCurrentPostPublished( state ),
 	} ),
 )( PostPublishWithDropdown );
