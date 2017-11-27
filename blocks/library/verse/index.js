@@ -1,16 +1,16 @@
 /**
  * WordPress
  */
-import { __ } from 'i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import './style.scss';
-import { registerBlockType, createBlock, query } from '../../api';
+import './editor.scss';
+import { registerBlockType, createBlock } from '../../api';
 import Editable from '../../editable';
-
-const { children } = query;
+import InspectorControls from '../../inspector-controls';
+import BlockDescription from '../../block-description';
 
 registerBlockType( 'core/verse', {
 	title: __( 'Verse' ),
@@ -19,15 +19,21 @@ registerBlockType( 'core/verse', {
 
 	category: 'formatting',
 
+	keywords: [ __( 'poetry' ) ],
+
 	attributes: {
-		content: children( 'pre' ),
+		content: {
+			type: 'array',
+			source: 'children',
+			selector: 'pre',
+		},
 	},
 
 	transforms: {
 		from: [
 			{
 				type: 'block',
-				blocks: [ 'core/text' ],
+				blocks: [ 'core/paragraph' ],
 				transform: ( attributes ) =>
 					createBlock( 'core/verse', attributes ),
 			},
@@ -35,9 +41,9 @@ registerBlockType( 'core/verse', {
 		to: [
 			{
 				type: 'block',
-				blocks: [ 'core/text' ],
+				blocks: [ 'core/paragraph' ],
 				transform: ( attributes ) =>
-					createBlock( 'core/text', attributes ),
+					createBlock( 'core/paragraph', attributes ),
 			},
 		],
 	},
@@ -45,9 +51,17 @@ registerBlockType( 'core/verse', {
 	edit( { attributes, setAttributes, focus, setFocus, className } ) {
 		const { content } = attributes;
 
-		return (
+		return [
+			focus && (
+				<InspectorControls key="inspector">
+					<BlockDescription>
+						<p>{ __( 'Write poetry and other literary expressions honoring all spaces and line-breaks.' ) }</p>
+					</BlockDescription>
+				</InspectorControls>
+			),
 			<Editable
 				tagName="pre"
+				key="editable"
 				value={ content }
 				onChange={ ( nextContent ) => {
 					setAttributes( {
@@ -57,10 +71,10 @@ registerBlockType( 'core/verse', {
 				focus={ focus }
 				onFocus={ setFocus }
 				placeholder={ __( 'Write…' ) }
-				className={ className }
+				wrapperClassName={ className }
 				formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
-			/>
-		);
+			/>,
+		];
 	},
 
 	save( { attributes, className } ) {

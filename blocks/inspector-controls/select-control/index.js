@@ -6,7 +6,7 @@ import { isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { withInstanceId } from 'components';
+import { withInstanceId } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -14,30 +14,34 @@ import { withInstanceId } from 'components';
 import BaseControl from './../base-control';
 import './style.scss';
 
-function SelectControl( { label, selected, instanceId, onBlur, options = [], ...props } ) {
+function SelectControl( { label, help, instanceId, onChange, options = [], ...props } ) {
 	const id = 'inspector-select-control-' + instanceId;
-	const onBlurValue = ( event ) => onBlur( event.target.value );
+	const onChangeValue = ( event ) => onChange( event.target.value );
 
+	// Disable reason: A select with an onchange throws a warning
+
+	/* eslint-disable jsx-a11y/no-onchange */
 	return ! isEmpty( options ) && (
-		<BaseControl label={ label } id={ id }>
+		<BaseControl label={ label } id={ id } help={ help }>
 			<select
 				id={ id }
 				className="blocks-select-control__input"
-				onBlur={ onBlurValue }
+				onChange={ onChangeValue }
+				aria-describedby={ !! help ? id + '__help' : undefined }
 				{ ...props }
 			>
 				{ options.map( ( option ) =>
 					<option
 						key={ option.value }
 						value={ option.value }
-						selected={ option.value === selected }
 					>
-						{ label }
+						{ option.label }
 					</option>
 				) }
 			</select>
 		</BaseControl>
 	);
+	/* eslint-enable jsx-a11y/no-onchange */
 }
 
 export default withInstanceId( SelectControl );

@@ -1,19 +1,24 @@
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
+import './editor.scss';
 import './style.scss';
-import './block.scss';
-import { registerBlockType, query as hpq } from '../../api';
+import { registerBlockType } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
+import InspectorControls from '../../inspector-controls';
+import BlockDescription from '../../block-description';
 
-const { children, query } = hpq;
+const toEditableValue = value => value.map( ( subValue => subValue.children ) );
+const fromEditableValue = value => value.map( ( subValue ) => ( {
+	children: subValue,
+} ) );
 
 registerBlockType( 'core/pullquote', {
 
@@ -24,8 +29,25 @@ registerBlockType( 'core/pullquote', {
 	category: 'formatting',
 
 	attributes: {
-		value: query( 'blockquote > p', children() ),
-		citation: children( 'footer' ),
+		value: {
+			type: 'array',
+			source: 'query',
+			selector: 'blockquote > p',
+			query: {
+				children: {
+					source: 'node',
+				},
+			},
+		},
+		citation: {
+			type: 'array',
+			source: 'children',
+			selector: 'footer',
+		},
+		align: {
+			type: 'string',
+			default: 'none',
+		},
 	},
 
 	getEditWrapperProps( attributes ) {
@@ -41,27 +63,33 @@ registerBlockType( 'core/pullquote', {
 
 		return [
 			focus && (
+				<InspectorControls key="inspector">
+					<BlockDescription>
+						<p>{ __( 'A pullquote is a brief, attention-catching quotation taken from the main text of an article and used as a subheading or graphic feature.' ) }</p>
+					</BlockDescription>
+				</InspectorControls>
+			),
+			focus && (
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar
 						value={ align }
 						onChange={ updateAlignment }
-						controls={ [ 'left', 'center', 'right', 'wide', 'full' ] }
 					/>
 				</BlockControls>
 			),
 			<blockquote key="quote" className={ className }>
 				<Editable
 					multiline="p"
-					value={ value }
+					value={ value && toEditableValue( value ) }
 					onChange={
 						( nextValue ) => setAttributes( {
-							value: nextValue,
+							value: fromEditableValue( nextValue ),
 						} )
 					}
 					placeholder={ __( 'Write quote…' ) }
 					focus={ focus && focus.editable === 'value' ? focus : null }
 					onFocus={ ( props ) => setFocus( { ...props, editable: 'value' } ) }
-					className="blocks-pullquote__content"
+					wrapperClassName="blocks-pullquote__content"
 				/>
 				{ ( citation || !! focus ) && (
 					<Editable
@@ -82,14 +110,13 @@ registerBlockType( 'core/pullquote', {
 	},
 
 	save( { attributes } ) {
-		const { value, citation, align = 'none' } = attributes;
+		const { value, citation, align } = attributes;
 
 		return (
 			<blockquote className={ `align${ align }` }>
-				{ value && value.map( ( paragraph, i ) => (
-					<p key={ i }>{ paragraph }</p>
-				) ) }
-
+				{ value && value.map( ( paragraph, i ) =>
+					<p key={ i }>{ paragraph.children && paragraph.children.props.children }</p>
+				) }
 				{ citation && citation.length > 0 && (
 					<footer>{ citation }</footer>
 				) }

@@ -3,24 +3,39 @@
  */
 import tinymce from 'tinymce';
 import classnames from 'classnames';
-import { last, isEqual, omitBy, forEach, merge, identity, find } from 'lodash';
+import {
+	last,
+	isEqual,
+	omitBy,
+	forEach,
+	merge,
+	identity,
+	find,
+	defer,
+	noop,
+} from 'lodash';
 import { nodeListToReact } from 'dom-react';
-import { Fill } from 'react-slot-fill';
 import 'element-closest';
 
 /**
  * WordPress dependencies
  */
-import { createElement, Component, renderToString } from 'element';
-import { parse, pasteHandler } from '../api';
-import { BACKSPACE, DELETE, ENTER } from 'utils/keycodes';
+import { createElement, Component, renderToString } from '@wordpress/element';
+import { keycodes, createBlobURL } from '@wordpress/utils';
+import { Slot, Fill } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
+import { rawHandler } from '../api';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
+import { pickAriaProps } from './aria';
+import patterns from './patterns';
+import { EVENTS } from './constants';
+
+const { BACKSPACE, DELETE, ENTER } = keycodes;
 
 function createTinyMCEElement( type, props, ...children ) {
 	if ( props[ 'data-mce-bogus' ] === 'all' ) {
@@ -38,9 +53,40 @@ function createTinyMCEElement( type, props, ...children ) {
 	);
 }
 
+function isLinkBoundary( fragment ) {
+	return fragment.childNodes && fragment.childNodes.length === 1 &&
+		fragment.childNodes[ 0 ].nodeName === 'A' && fragment.childNodes[ 0 ].text.length === 1 &&
+		fragment.childNodes[ 0 ].text[ 0 ] === '\uFEFF';
+}
+
+function getFormatProperties( formatName, parents ) {
+	switch ( formatName ) {
+		case 'link' : {
+			const anchor = find( parents, node => node.nodeName.toLowerCase() === 'a' );
+			return !! anchor ? { value: anchor.getAttribute( 'href' ) || '', target: anchor.getAttribute( 'target' ) || '', node: anchor } : {};
+		}
+		default:
+			return {};
+	}
+}
+
+const DEFAULT_FORMATS = [ 'bold', 'italic', 'strikethrough', 'link' ];
+
 export default class Editable extends Component {
 	constructor( props ) {
 		super( ...arguments );
+
+		const { value } = props;
+		if ( 'production' !== process.env.NODE_ENV && undefined !== value &&
+					! Array.isArray( value ) ) {
+			// eslint-disable-next-line no-console
+			console.error(
+				`Invalid value of type ${ typeof value } passed to Editable ` +
+				'(expected array). Attribute values should be sourced using ' +
+				'the `children` source when used with Editable.\n\n' +
+				'See: https://wordpress.org/gutenberg/handbook/reference/attributes/#children'
+			);
+		}
 
 		this.onInit = this.onInit.bind( this );
 		this.getSettings = this.getSettings.bind( this );
@@ -53,12 +99,14 @@ export default class Editable extends Component {
 		this.onKeyUp = this.onKeyUp.bind( this );
 		this.changeFormats = this.changeFormats.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
-		this.onPastePostProcess = this.onPastePostProcess.bind( this );
+		this.maybePropagateUndo = this.maybePropagateUndo.bind( this );
+		this.onPastePreProcess = this.onPastePreProcess.bind( this );
+		this.onPaste = this.onPaste.bind( this );
 
 		this.state = {
 			formats: {},
-			bookmark: null,
-			empty: ! props.value || ! props.value.length,
+			empty: ! value || ! value.length,
+			selectedNodeId: 0,
 		};
 	}
 
@@ -71,6 +119,11 @@ export default class Editable extends Component {
 
 	onSetup( editor ) {
 		this.editor = editor;
+
+		EVENTS.forEach( ( name ) => {
+			editor.on( name, this.proxyPropHandler( name ) );
+		} );
+
 		editor.on( 'init', this.onInit );
 		editor.on( 'focusout', this.onChange );
 		editor.on( 'NewBlock', this.onNewBlock );
@@ -79,15 +132,56 @@ export default class Editable extends Component {
 		editor.on( 'keydown', this.onKeyDown );
 		editor.on( 'keyup', this.onKeyUp );
 		editor.on( 'selectionChange', this.onSelectionChange );
-		editor.on( 'PastePostProcess', this.onPastePostProcess );
+		editor.on( 'BeforeExecCommand', this.maybePropagateUndo );
+		editor.on( 'PastePreProcess', this.onPastePreProcess, true /* Add before core handlers */ );
+		editor.on( 'paste', this.onPaste, true /* Add before core handlers */ );
+
+		patterns.apply( this, [ editor ] );
 
 		if ( this.props.onSetup ) {
 			this.props.onSetup( editor );
 		}
 	}
 
+	proxyPropHandler( name ) {
+		return ( event ) => {
+			// TODO: Reconcile with `onFocus` instance handler which does not
+			// pass the event object. Otherwise we have double focus handling
+			// and editor instance being stored into state.
+			if ( name === 'Focus' ) {
+				return;
+			}
+
+			// Allow props an opportunity to handle the event, before default
+			// Editable behavior takes effect. Should the event be handled by a
+			// prop, it should `stopImmediatePropagation` on the event to stop
+			// continued event handling.
+			if ( 'function' === typeof this.props[ 'on' + name ] ) {
+				this.props[ 'on' + name ]( event );
+			}
+		};
+	}
+
 	onInit() {
 		this.updateFocus();
+		this.registerCustomFormatters();
+	}
+
+	adaptFormatter( options ) {
+		switch ( options.type ) {
+			case 'inline-style': {
+				return {
+					inline: 'span',
+					styles: { ...options.style },
+				};
+			}
+		}
+	}
+
+	registerCustomFormatters() {
+		forEach( this.props.formatters, ( formatter ) => {
+			this.editor.formatter.register( formatter.format, this.adaptFormatter( formatter ) );
+		} );
 	}
 
 	onFocus() {
@@ -126,55 +220,148 @@ export default class Editable extends Component {
 		}
 	}
 
-	onPastePostProcess( event ) {
-		const childNodes = Array.from( event.node.childNodes );
-		const isBlockDelimiter = ( node ) =>
-			node.nodeType === 8 && /^ wp:/.test( node.nodeValue );
-		const isDoubleBR = ( node ) =>
-			node.nodeName === 'BR' && node.previousSibling && node.previousSibling.nodeName === 'BR';
-		const isBlockPart = ( node ) =>
-			isDoubleBR( node ) || this.editor.dom.isBlock( node );
+	maybePropagateUndo( event ) {
+		const { onUndo } = this.context;
+		if ( onUndo && event.command === 'Undo' && ! this.editor.undoManager.hasUndo() ) {
+			// When user attempts Undo when empty Undo stack, propagate undo
+			// action to context handler. The compromise here is that: TinyMCE
+			// handles Undo until change, at which point `editor.save` resets
+			// history. If no history exists, let context handler have a turn.
+			// Defer in case an immediate undo causes TinyMCE to be destroyed,
+			// if other undo behaviors test presence of an input field.
+			defer( onUndo );
 
-		// If there's no `onSplit` prop, content will later be converted to
-		// inline content.
-		if ( this.props.onSplit ) {
-			let blocks = [];
+			// We could return false here to stop other TinyMCE event handlers
+			// from running, but we assume TinyMCE won't do anything on an
+			// empty undo stack anyways.
+		}
+	}
 
-			// Internal paste, so parse.
-			if ( childNodes.some( isBlockDelimiter ) ) {
-				blocks = parse( event.node.innerHTML.replace( /<meta[^>]+>/, '' ) );
-			// External paste with block level content, so attempt to assign
-			// blocks.
-			} else if ( childNodes.some( isBlockPart ) ) {
-				blocks = pasteHandler( childNodes );
+	onPaste( event ) {
+		const dataTransfer = event.clipboardData || event.dataTransfer || this.editor.getDoc().dataTransfer;
+		const { items = [], files = [] } = dataTransfer;
+		const item = find( [ ...items, ...files ], ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
+
+		if ( item ) {
+			// Allows us to ask for this information when we get a report.
+			window.console.log( 'Received item:\n\n', item );
+
+			const blob = item.getAsFile ? item.getAsFile() : item;
+
+			this.pastedContent = `<img src="${ createBlobURL( blob ) }">`;
+		}
+
+		this.pastedPlainText = dataTransfer ? dataTransfer.getData( 'text/plain' ) : '';
+	}
+
+	onPastePreProcess( event ) {
+		// Allows us to ask for this information when we get a report.
+		window.console.log( 'Received HTML:\n\n', this.pastedContent || event.content );
+		window.console.log( 'Received plain text:\n\n', this.pastedPlainText );
+
+		// There is a selection, check if a link is pasted.
+		if ( ! this.editor.selection.isCollapsed() ) {
+			const linkRegExp = /^(?:https?:)?\/\/\S+$/i;
+			const pastedText = event.content.replace( /<[^>]+>/g, '' ).trim();
+			const selectedText = this.editor.selection.getContent().replace( /<[^>]+>/g, '' ).trim();
+
+			// The pasted text is a link, and the selected text is not.
+			if ( linkRegExp.test( pastedText ) && ! linkRegExp.test( selectedText ) ) {
+				this.editor.execCommand( 'mceInsertLink', false, {
+					href: this.editor.dom.decode( pastedText ),
+				} );
+
+				// Allows us to ask for this information when we get a report.
+				window.console.log( 'Created link:\n\n', pastedText );
+
+				event.preventDefault();
+
+				return;
+			}
+		}
+
+		const rootNode = this.editor.getBody();
+		const isEmpty = this.editor.dom.isEmpty( rootNode );
+
+		let mode = 'INLINE';
+
+		if ( isEmpty && this.props.onReplace ) {
+			mode = 'BLOCKS';
+		} else if ( this.props.onSplit ) {
+			mode = 'AUTO';
+		}
+
+		const content = rawHandler( {
+			HTML: this.pastedContent || event.content,
+			plainText: this.pastedPlainText,
+			mode,
+		} );
+
+		if ( typeof content === 'string' ) {
+			// Let MCE process further with the given content.
+			event.content = content;
+		} else if ( this.props.onSplit ) {
+			// Abort pasting to split the content
+			event.preventDefault();
+
+			if ( ! content.length ) {
+				return;
 			}
 
-			if ( blocks.length ) {
-				// We must wait for TinyMCE to clean up paste containers after this
-				// event.
-				window.setTimeout( () => this.splitContent( blocks ), 0 );
-				event.preventDefault();
+			if ( isEmpty && this.props.onReplace ) {
+				this.props.onReplace( content );
+			} else {
+				this.splitContent( content );
 			}
 		}
 	}
 
-	onChange() {
-		if ( ! this.editor.isDirty() ) {
-			return;
-		}
-
+	fireChange() {
 		this.savedContent = this.getContent();
 		this.editor.save();
 		this.props.onChange( this.savedContent );
 	}
 
-	getRelativePosition( node ) {
-		const position = node.getBoundingClientRect();
+	onChange() {
+		// Note that due to efficiency, speed and low cost requirements isDirty may
+		// not reflect reality for a brief period immediately after a change.
+		if ( this.editor.isDirty() ) {
+			this.fireChange();
+		}
+	}
+
+	getEditorSelectionRect() {
+		let range = this.editor.selection.getRng();
+
+		// getBoundingClientRect doesn't work in Safari when range is collapsed
+		if ( range.collapsed ) {
+			const { startContainer, startOffset } = range;
+			range = document.createRange();
+
+			if ( ( ! startContainer.nodeValue ) || startContainer.nodeValue.length === 0 ) {
+				// container has no text content, select node (empty block)
+				range.selectNode( startContainer );
+			} else if ( startOffset === startContainer.nodeValue.length ) {
+				// at end of text content, select last character
+				range.setStart( startContainer, startContainer.nodeValue.length - 1 );
+				range.setEnd( startContainer, startContainer.nodeValue.length );
+			} else {
+				// select 1 character from current position
+				range.setStart( startContainer, startOffset );
+				range.setEnd( startContainer, startOffset + 1 );
+			}
+		}
+
+		return range.getBoundingClientRect();
+	}
+
+	getFocusPosition() {
+		const position = this.getEditorSelectionRect();
 
 		// Find the parent "relative" positioned container
-		const container = this.props.inlineToolbar
-			? this.editor.getBody().closest( '.blocks-editable' )
-			: this.editor.getBody().closest( '.editor-visual-editor__block' );
+		const container = this.props.inlineToolbar ?
+			this.editor.getBody().closest( '.blocks-editable' ) :
+			this.editor.getBody().closest( '.editor-block-list__block' );
 		const containerPosition = container.getBoundingClientRect();
 		const blockPadding = 14;
 		const blockMoverMargin = 18;
@@ -182,10 +369,10 @@ export default class Editable extends Component {
 		// These offsets are necessary because the toolbar where the link modal lives
 		// is absolute positioned and it's not shown when we compute the position here
 		// so we compute the position about its parent relative position and adds the offset
-		const toolbarOffset = this.props.inlineToolbar
-			? { top: 50, left: 0 }
-			: { top: 40, left: -( ( blockPadding * 2 ) + blockMoverMargin ) };
-		const linkModalWidth = 250;
+		const toolbarOffset = this.props.inlineToolbar ?
+			{ top: 10, left: 0 } :
+			{ top: 0, left: -( ( blockPadding * 2 ) + blockMoverMargin ) };
+		const linkModalWidth = 305;
 
 		return {
 			top: position.top - containerPosition.top + ( position.height ) + toolbarOffset.top,
@@ -237,7 +424,7 @@ export default class Editable extends Component {
 			)
 		) {
 			const forward = event.keyCode === DELETE;
-			this.onChange();
+			this.fireChange();
 			this.props.onMerge( forward );
 			event.preventDefault();
 			event.stopImmediatePropagation();
@@ -245,11 +432,44 @@ export default class Editable extends Component {
 
 		// If we click shift+Enter on inline Editables, we avoid creating two contenteditables
 		// We also split the content and call the onSplit prop if provided.
-		if ( event.keyCode === ENTER && event.shiftKey && ! this.props.multiline ) {
-			event.preventDefault();
+		if ( event.keyCode === ENTER ) {
+			if ( this.props.multiline ) {
+				if ( ! this.props.onSplit ) {
+					return;
+				}
 
-			if ( this.props.onSplit ) {
-				this.splitContent();
+				const rootNode = this.editor.getBody();
+				const selectedNode = this.editor.selection.getNode();
+
+				if ( selectedNode.parentNode !== rootNode ) {
+					return;
+				}
+
+				const dom = this.editor.dom;
+
+				if ( ! dom.isEmpty( selectedNode ) ) {
+					return;
+				}
+
+				event.preventDefault();
+
+				const childNodes = Array.from( rootNode.childNodes );
+				const index = dom.nodeIndex( selectedNode );
+				const beforeNodes = childNodes.slice( 0, index );
+				const afterNodes = childNodes.slice( index + 1 );
+				const beforeElement = nodeListToReact( beforeNodes, createTinyMCEElement );
+				const afterElement = nodeListToReact( afterNodes, createTinyMCEElement );
+
+				this.setContent( beforeElement );
+				this.props.onSplit( beforeElement, afterElement );
+			} else {
+				event.preventDefault();
+
+				if ( event.shiftKey || ! this.props.onSplit ) {
+					this.editor.execCommand( 'InsertLineBreak', false, event );
+				} else {
+					this.splitContent();
+				}
 			}
 		}
 	}
@@ -257,27 +477,6 @@ export default class Editable extends Component {
 	onKeyUp( { keyCode } ) {
 		if ( keyCode === BACKSPACE ) {
 			this.onSelectionChange();
-		}
-
-		if ( keyCode === ENTER && ! this.props.multiline && this.props.onSplit ) {
-			const endNode = this.editor.selection.getEnd();
-
-			// Make sure the current selection is on a line break.
-			if ( endNode.nodeName !== 'BR' ) {
-				return;
-			}
-
-			const prevNode = endNode.previousSibling;
-
-			// Make sure the previous node is a line break. We only want to
-			// split on a double line break.
-			if ( ! prevNode || prevNode.nodeName !== 'BR' ) {
-				return;
-			}
-
-			this.editor.dom.remove( prevNode );
-			this.editor.dom.remove( endNode );
-			this.splitContent();
 		}
 	}
 
@@ -288,20 +487,25 @@ export default class Editable extends Component {
 		const afterRange = dom.createRng();
 		const selectionRange = this.editor.selection.getRng();
 
-		beforeRange.setStart( rootNode, 0 );
-		beforeRange.setEnd( selectionRange.startContainer, selectionRange.startOffset );
+		if ( rootNode.childNodes.length ) {
+			beforeRange.setStart( rootNode, 0 );
+			beforeRange.setEnd( selectionRange.startContainer, selectionRange.startOffset );
 
-		afterRange.setStart( selectionRange.endContainer, selectionRange.endOffset );
-		afterRange.setEnd( rootNode, dom.nodeIndex( rootNode.lastChild ) + 1 );
+			afterRange.setStart( selectionRange.endContainer, selectionRange.endOffset );
+			afterRange.setEnd( rootNode, dom.nodeIndex( rootNode.lastChild ) + 1 );
 
-		const beforeFragment = beforeRange.extractContents();
-		const afterFragment = afterRange.extractContents();
+			const beforeFragment = beforeRange.extractContents();
+			const afterFragment = afterRange.extractContents();
 
-		const beforeElement = nodeListToReact( beforeFragment.childNodes, createTinyMCEElement );
-		const afterElement = nodeListToReact( afterFragment.childNodes, createTinyMCEElement );
+			const beforeElement = nodeListToReact( beforeFragment.childNodes, createTinyMCEElement );
+			const afterElement = isLinkBoundary( afterFragment ) ? [] : nodeListToReact( afterFragment.childNodes, createTinyMCEElement );
 
-		this.setContent( beforeElement );
-		this.props.onSplit( beforeElement, afterElement, ...blocks );
+			this.setContent( beforeElement );
+			this.props.onSplit( beforeElement, afterElement, ...blocks );
+		} else {
+			this.setContent( [] );
+			this.props.onSplit( [], [], ...blocks );
+		}
 	}
 
 	onNewBlock() {
@@ -352,18 +556,19 @@ export default class Editable extends Component {
 		);
 	}
 
-	onNodeChange( { element, parents } ) {
-		const formats = {};
-		const link = find( parents, ( node ) => node.nodeName.toLowerCase() === 'a' );
-		if ( link ) {
-			formats.link = { value: link.getAttribute( 'href' ) || '', link };
-		}
-		const activeFormats = this.editor.formatter.matchAll( [	'bold', 'italic', 'strikethrough' ] );
-		activeFormats.forEach( ( activeFormat ) => formats[ activeFormat ] = true );
+	onNodeChange( { parents } ) {
+		const formatNames = this.props.formattingControls;
+		const formats = this.editor.formatter.matchAll( formatNames ).reduce( ( accFormats, activeFormat ) => {
+			accFormats[ activeFormat ] = {
+				isActive: true,
+				...getFormatProperties( activeFormat, parents ),
+			};
 
-		const focusPosition = this.getRelativePosition( element );
-		const bookmark = this.editor.selection.getBookmark( 2, true );
-		this.setState( { bookmark, formats, focusPosition } );
+			return accFormats;
+		}, {} );
+
+		const focusPosition = this.getFocusPosition();
+		this.setState( { formats, focusPosition, selectedNodeId: this.state.selectedNodeId + 1 } );
 	}
 
 	updateContent() {
@@ -430,32 +635,46 @@ export default class Editable extends Component {
 		}
 	}
 
+	componentWillReceiveProps( nextProps ) {
+		if ( 'development' === process.env.NODE_ENV ) {
+			if ( ! isEqual( this.props.formatters, nextProps.formatters ) ) {
+				// eslint-disable-next-line no-console
+				console.error( 'Formatters passed via `formatters` prop will only be registered once. Formatters can be enabled/disabled via the `formattingControls` prop.' );
+			}
+		}
+	}
+
 	isFormatActive( format ) {
-		return !! this.state.formats[ format ];
+		return this.state.formats[ format ] && this.state.formats[ format ].isActive;
+	}
+
+	removeFormat( format ) {
+		this.editor.focus();
+		this.editor.formatter.remove( format );
+	}
+	applyFormat( format, args, node ) {
+		this.editor.focus();
+		this.editor.formatter.apply( format, args, node );
 	}
 
 	changeFormats( formats ) {
 		forEach( formats, ( formatValue, format ) => {
 			if ( format === 'link' ) {
-				if ( this.state.bookmark ) {
-					this.editor.selection.moveToBookmark( this.state.bookmark );
-				}
-
 				if ( formatValue !== undefined ) {
 					const anchor = this.editor.dom.getParent( this.editor.selection.getNode(), 'a' );
 					if ( ! anchor ) {
-						this.editor.formatter.remove( 'link' );
+						this.removeFormat( 'link' );
 					}
-					this.editor.formatter.apply( 'link', { href: formatValue.value }, anchor );
+					this.applyFormat( 'link', { href: formatValue.value, target: formatValue.target }, anchor );
 				} else {
 					this.editor.execCommand( 'Unlink' );
 				}
 			} else {
 				const isActive = this.isFormatActive( format );
 				if ( isActive && ! formatValue ) {
-					this.editor.formatter.remove( format );
+					this.removeFormat( format );
 				} else if ( ! isActive && formatValue ) {
-					this.editor.formatter.apply( format );
+					this.applyFormat( format );
 				}
 			}
 		} );
@@ -473,26 +692,33 @@ export default class Editable extends Component {
 			style,
 			value,
 			focus,
+			wrapperClassName,
 			className,
 			inlineToolbar = false,
 			formattingControls,
 			placeholder,
 			multiline: MultilineTag,
+			keepPlaceholderOnFocus = false,
+			formatters,
 		} = this.props;
+
+		const ariaProps = pickAriaProps( this.props );
 
 		// Generating a key that includes `tagName` ensures that if the tag
 		// changes, we unmount and destroy the previous TinyMCE element, then
 		// mount and initialize a new child element in its place.
 		const key = [ 'editor', Tagname ].join();
-		const isPlaceholderVisible = placeholder && this.state.empty;
-		const classes = classnames( className, 'blocks-editable' );
+		const isPlaceholderVisible = placeholder && ( ! focus || keepPlaceholderOnFocus ) && this.state.empty;
+		const classes = classnames( wrapperClassName, 'blocks-editable' );
 
 		const formatToolbar = (
 			<FormatToolbar
+				selectedNodeId={ this.state.selectedNodeId }
 				focusPosition={ this.state.focusPosition }
 				formats={ this.state.formats }
 				onChange={ this.changeFormats }
 				enabledControls={ formattingControls }
+				customControls={ formatters }
 			/>
 		);
 
@@ -515,18 +741,30 @@ export default class Editable extends Component {
 					style={ style }
 					defaultValue={ value }
 					isPlaceholderVisible={ isPlaceholderVisible }
-					label={ placeholder }
+					aria-label={ placeholder }
+					{ ...ariaProps }
+					className={ className }
 					key={ key }
 				/>
 				{ isPlaceholderVisible &&
 					<Tagname
-						className="blocks-editable__tinymce"
+						className={ classnames( 'blocks-editable__tinymce', className ) }
 						style={ style }
 					>
 						{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }
 					</Tagname>
 				}
+				{ focus && <Slot name="Editable.Siblings" /> }
 			</div>
 		);
 	}
 }
+
+Editable.contextTypes = {
+	onUndo: noop,
+};
+
+Editable.defaultProps = {
+	formattingControls: DEFAULT_FORMATS,
+	formatters: [],
+};

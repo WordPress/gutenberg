@@ -1,0 +1,31 @@
+.editor-layout,
+.editor-layout__content {
+	height: 100%;
+}
+
+.editor-layout {
+	position: relative;
+
+	.components-notice-list {
+		position: fixed;
+		top: 100px;
+		right: auto;
+	}
+}
+
+.editor-layout__metaboxes:not(:empty) {
+	border-top: 1px solid $light-gray-500;
+	margin-top: 10px;
+	padding: 10px 0;
+
+	.editor-meta-boxes-area {
+		max-width: $visual-editor-max-width;
+		margin: auto;
+	}
+}
+
+.editor-layout__content {
+	position: relative;
+	overflow-y: auto;
+	-webkit-overflow-scrolling: touch;
+}

@@ -4,7 +4,7 @@ To keep things simple for our first example, let's create a new block type which
 
 Blocks containing static content are implemented entirely in JavaScript using the `registerBlockType` function. This function is responsible for specifying the blueprint of a block, describing the behaviors necessary for the editor to understand how it appears, changes when edited, and is ultimately saved in the post's content.
 
-## Enqueueing Block Scripts
+## Enqueuing Block Scripts
 
 While the block type itself is implemented in JavaScript, you'll need to use the `enqueue_block_editor_assets` [WordPress action](https://codex.wordpress.org/Glossary#Action) to have your scripts included in the editor. This is similar to the [`wp_enqueue_scripts` action](https://developer.wordpress.org/reference/hooks/wp_enqueue_scripts/), but specifically targeting editor scripts and styles.
 
@@ -76,7 +76,7 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-01', {
 ```
 {% end %}
 
-Once a block is registered, you should immediately see that it becomes available as an option in the editor inserter dialog, using values from `title`, `icon`, and `category` to organize its display. You can choose an icon from any included in the built-in [Dashicons icon set](https://developer.wordpress.org/resource/dashicons/).
+Once a block is registered, you should immediately see that it becomes available as an option in the editor inserter dialog, using values from `title`, `icon`, and `category` to organize its display. You can choose an icon from any included in the built-in [Dashicons icon set](https://developer.wordpress.org/resource/dashicons/), or provide your own by assigning the value of `icon` as a [WordPress Element](https://github.com/WordPress/gutenberg/tree/master/element) element or component.
 
 A block name must be prefixed with a namespace specific to your plugin. This helps prevent conflicts when more than one plugin registers a block with the same name.
 

@@ -1,30 +1,94 @@
 /**
  * Internal dependencies
  */
-import { isEditableElement } from '../dom';
+import { isHorizontalEdge, placeCaretAtHorizontalEdge } from '../dom';
 
-describe( 'isEditableElement', () => {
-	it( 'should return false for non editable nodes', () => {
-		const div = document.createElement( 'div' );
+describe( 'DOM', () => {
+	let parent;
 
-		expect( isEditableElement( div ) ).toBe( false );
+	beforeEach( () => {
+		parent = document.createElement( 'div' );
+		document.body.appendChild( parent );
 	} );
 
-	it( 'should return true for inputs', () => {
-		const input = document.createElement( 'input' );
-
-		expect( isEditableElement( input ) ).toBe( true );
+	afterEach( () => {
+		parent.remove();
 	} );
 
-	it( 'should return true for textareas', () => {
-		const textarea = document.createElement( 'textarea' );
+	describe( 'isHorizontalEdge', () => {
+		it( 'Should return true for empty input', () => {
+			const input = document.createElement( 'input' );
+			parent.appendChild( input );
+			input.focus();
+			expect( isHorizontalEdge( input, true ) ).toBe( true );
+			expect( isHorizontalEdge( input, false ) ).toBe( true );
+		} );
 
-		expect( isEditableElement( textarea ) ).toBe( true );
+		it( 'Should return the right values if we focus the end of the input', () => {
+			const input = document.createElement( 'input' );
+			parent.appendChild( input );
+			input.value = 'value';
+			input.focus();
+			input.selectionStart = 5;
+			input.selectionEnd = 5;
+			expect( isHorizontalEdge( input, true ) ).toBe( false );
+			expect( isHorizontalEdge( input, false ) ).toBe( true );
+		} );
+
+		it( 'Should return the right values if we focus the start of the input', () => {
+			const input = document.createElement( 'input' );
+			parent.appendChild( input );
+			input.value = 'value';
+			input.focus();
+			input.selectionStart = 0;
+			input.selectionEnd = 0;
+			expect( isHorizontalEdge( input, true ) ).toBe( true );
+			expect( isHorizontalEdge( input, false ) ).toBe( false );
+		} );
+
+		it( 'Should return false if we\'re not at the edge', () => {
+			const input = document.createElement( 'input' );
+			parent.appendChild( input );
+			input.value = 'value';
+			input.focus();
+			input.selectionStart = 3;
+			input.selectionEnd = 3;
+			expect( isHorizontalEdge( input, true ) ).toBe( false );
+			expect( isHorizontalEdge( input, false ) ).toBe( false );
+		} );
+
+		it( 'Should return false if the selection is not collapseds', () => {
+			const input = document.createElement( 'input' );
+			parent.appendChild( input );
+			input.value = 'value';
+			input.focus();
+			input.selectionStart = 0;
+			input.selectionEnd = 5;
+			expect( isHorizontalEdge( input, true ) ).toBe( false );
+			expect( isHorizontalEdge( input, false ) ).toBe( false );
+		} );
+
+		it( 'Should always return true for non content editabless', () => {
+			const div = document.createElement( 'div' );
+			parent.appendChild( div );
+			expect( isHorizontalEdge( div, true ) ).toBe( true );
+			expect( isHorizontalEdge( div, false ) ).toBe( true );
+		} );
 	} );
 
-	it( 'should return true for selects', () => {
-		const select = document.createElement( 'select' );
+	describe( 'placeCaretAtHorizontalEdge', () => {
+		it( 'should place caret at the start of the input', () => {
+			const input = document.createElement( 'input' );
+			input.value = 'value';
+			placeCaretAtHorizontalEdge( input, true );
+			expect( isHorizontalEdge( input, false ) ).toBe( true );
+		} );
 
-		expect( isEditableElement( select ) ).toBe( true );
+		it( 'should place caret at the end of the input', () => {
+			const input = document.createElement( 'input' );
+			input.value = 'value';
+			placeCaretAtHorizontalEdge( input, false );
+			expect( isHorizontalEdge( input, true ) ).toBe( true );
+		} );
 	} );
 } );

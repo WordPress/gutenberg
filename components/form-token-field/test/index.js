@@ -21,7 +21,7 @@ const keyCodes = {
 	upArrow: 38,
 	rightArrow: 39,
 	downArrow: 40,
-	'delete': 46,
+	delete: 46,
 	comma: 188,
 };
 
@@ -32,21 +32,21 @@ const charCodes = {
 const maybeDescribe = process.env.RUN_SLOW_TESTS ? describe : describe.skip;
 
 maybeDescribe( 'FormTokenField', function() {
-	let wrapper, tokenFieldNode, textInputNode;
+	let wrapper, textInputNode;
 
 	function setText( text ) {
 		textInputNode.simulate( 'change', { target: { value: text } } );
 	}
 
 	function sendKeyDown( keyCode, shiftKey ) {
-		tokenFieldNode.simulate( 'keyDown', {
+		wrapper.simulate( 'keyDown', {
 			keyCode: keyCode,
 			shiftKey: ! ! shiftKey,
 		} );
 	}
 
 	function sendKeyPress( charCode ) {
-		tokenFieldNode.simulate( 'keyPress', {
+		wrapper.simulate( 'keyPress', {
 			charCode: charCode,
 		} );
 	}
@@ -58,13 +58,13 @@ maybeDescribe( 'FormTokenField', function() {
 	}
 
 	function getTokensHTML() {
-		const textNodes = tokenFieldNode.find( '.components-form-token-field__token-text' );
+		const textNodes = wrapper.find( '.components-form-token-field__token-text' );
 
 		return textNodes.map( getNodeInnerHtml );
 	}
 
 	function getSuggestionsText( selector ) {
-		const suggestionNodes = tokenFieldNode.find( selector || '.components-form-token-field__suggestion' );
+		const suggestionNodes = wrapper.find( selector || '.components-form-token-field__suggestion' );
 
 		return suggestionNodes.map( getSuggestionNodeText );
 	}
@@ -97,8 +97,7 @@ maybeDescribe( 'FormTokenField', function() {
 
 	beforeEach( function() {
 		wrapper = mount( <TokenFieldWrapper /> );
-		tokenFieldNode = wrapper.ref( 'tokenField' );
-		textInputNode = tokenFieldNode.find( '.components-form-token-field__input' );
+		textInputNode = wrapper.find( '.components-form-token-field__input' );
 		textInputNode.simulate( 'focus' );
 	} );
 
@@ -185,7 +184,7 @@ maybeDescribe( 'FormTokenField', function() {
 			sendKeyDown( keyCodes.downArrow ); // 'that'
 			expect( getSelectedSuggestion() ).toEqual( [ 'th', 'at' ] );
 
-			const hoverSuggestion = tokenFieldNode.find( '.components-form-token-field__suggestion' ).at( 3 ); // 'with'
+			const hoverSuggestion = wrapper.find( '.components-form-token-field__suggestion' ).at( 3 ); // 'with'
 			expect( getSuggestionNodeText( hoverSuggestion ) ).toEqual( [ 'wi', 'th' ] );
 
 			// before sending a hover event, we need to wait for
@@ -279,7 +278,7 @@ maybeDescribe( 'FormTokenField', function() {
 				expect( wrapper.state( 'tokens' ) ).toEqual( expectedTokens );
 				expect( textInputNode.prop( 'value' ) ).toBe( '' );
 				expect( getSelectedSuggestion() ).toBe( null );
-				expect( tokenFieldNode.find( 'div' ).first().hasClass( 'is-active' ) ).toBe( isActive );
+				expect( wrapper.find( 'div' ).first().hasClass( 'is-active' ) ).toBe( isActive );
 			}
 
 			document.activeElement.blur();
@@ -291,41 +290,41 @@ maybeDescribe( 'FormTokenField', function() {
 
 		it( 'should add the current text when the input field loses focus', function() {
 			testOnBlur(
-				't',                   // initialText
-				false,                 // selectSuggestion
-				null,                  // expectedSuggestion
-				[ 'foo', 'bar', 't' ]  // expectedTokens
+				't', // initialText
+				false, // selectSuggestion
+				null, // expectedSuggestion
+				[ 'foo', 'bar', 't' ] // expectedTokens
 			);
 		} );
 
 		it( 'shouldn\'t show any suggestion when the initial text is smaller than two characters', function() {
 			testOnBlur(
-				't',                    // initialText
-				true,                   // selectSuggestion
-				null,                   // expectedSuggestion
-				[ 'foo', 'bar', 'to' ]  // expectedTokens
+				't', // initialText
+				true, // selectSuggestion
+				null, // expectedSuggestion
+				[ 'foo', 'bar', 'to' ] // expectedTokens
 			);
 		} );
 
 		it( 'should add the suggested token when the (non-blank) input field loses focus', function() {
 			testOnBlur(
-				'to',                    // initialText
-				true,                    // selectSuggestion
-				[ 'to' ],            // expectedSuggestion
-				[ 'foo', 'bar', 'to' ]   // expectedTokens
+				'to', // initialText
+				true, // selectSuggestion
+				[ 'to' ], // expectedSuggestion
+				[ 'foo', 'bar', 'to' ] // expectedTokens
 			);
 		} );
 
 		it( 'should not lose focus when a suggestion is clicked', function() {
 			// prevents regression of https://github.com/Automattic/wp-calypso/issues/1884
 			setText( 'th' );
-			const firstSuggestion = tokenFieldNode.find( '.components-form-token-field__suggestion' ).at( 0 );
+			const firstSuggestion = wrapper.find( '.components-form-token-field__suggestion' ).at( 0 );
 			firstSuggestion.simulate( 'click' );
 
 			// wait for setState call
 			jest.runTimersToTime( 10 );
 
-			expect( tokenFieldNode.find( 'div' ).first().hasClass( 'is-active' ) ).toBe( true );
+			expect( wrapper.find( 'div' ).first().hasClass( 'is-active' ) ).toBe( true );
 		} );
 
 		it( 'should add tokens in the middle of the current tokens', function() {
@@ -405,7 +404,7 @@ maybeDescribe( 'FormTokenField', function() {
 
 	describe( 'removing tokens', function() {
 		it( 'should remove tokens when X icon clicked', function() {
-			tokenFieldNode.find( '.components-form-token-field__remove-token' ).first().simulate( 'click' );
+			wrapper.find( '.components-form-token-field__remove-token' ).first().simulate( 'click' );
 			expect( wrapper.state( 'tokens' ) ).toEqual( [ 'bar' ] );
 		} );
 

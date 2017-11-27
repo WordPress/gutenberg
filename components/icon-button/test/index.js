@@ -27,8 +27,16 @@ describe( 'IconButton', () => {
 		} );
 
 		it( 'should add an aria-label when the label property is used', () => {
-			const iconButton = shallow( <IconButton label="WordPress" /> );
+			const iconButton = shallow( <IconButton label="WordPress">WordPress</IconButton> );
+			expect( iconButton.name() ).toBe( 'Button' );
 			expect( iconButton.prop( 'aria-label' ) ).toBe( 'WordPress' );
+		} );
+
+		it( 'should add an aria-label when the label property is used, with Tooltip wrapper', () => {
+			const iconButton = shallow( <IconButton label="WordPress" /> );
+			expect( iconButton.name() ).toBe( 'Tooltip' );
+			expect( iconButton.prop( 'text' ) ).toBe( 'WordPress' );
+			expect( iconButton.find( 'Button' ).prop( 'aria-label' ) ).toBe( 'WordPress' );
 		} );
 
 		it( 'should add an additional className', () => {
@@ -39,6 +47,19 @@ describe( 'IconButton', () => {
 		it( 'should add an additonal prop to the IconButton element', () => {
 			const iconButton = shallow( <IconButton test="test" /> );
 			expect( iconButton.props().test ).toBe( 'test' );
+		} );
+
+		it( 'should allow custom tooltip text', () => {
+			const iconButton = shallow( <IconButton label="WordPress" tooltip="Custom" /> );
+			expect( iconButton.name() ).toBe( 'Tooltip' );
+			expect( iconButton.prop( 'text' ) ).toBe( 'Custom' );
+			expect( iconButton.find( 'Button' ).prop( 'aria-label' ) ).toBe( 'WordPress' );
+		} );
+
+		it( 'should allow tooltip disable', () => {
+			const iconButton = shallow( <IconButton label="WordPress" tooltip={ false } /> );
+			expect( iconButton.name() ).toBe( 'Button' );
+			expect( iconButton.prop( 'aria-label' ) ).toBe( 'WordPress' );
 		} );
 	} );
 } );

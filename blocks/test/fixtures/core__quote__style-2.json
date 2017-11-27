@@ -2,17 +2,27 @@
     {
         "uid": "_uid_0",
         "name": "core/quote",
+        "isValid": true,
         "attributes": {
-            "style": "2",
             "value": [
                 {
-                    "children": "There is no greater agony than bearing an untold story inside you.",
-                    "type": "p"
+                    "children": {
+                        "type": "p",
+                        "key": null,
+                        "ref": null,
+                        "props": {
+                            "children": "There is no greater agony than bearing an untold story inside you."
+                        },
+                        "_owner": null,
+                        "_store": {}
+                    }
                 }
             ],
             "citation": [
                 "Maya Angelou"
-            ]
-        }
+            ],
+            "style": 2
+        },
+        "originalContent": "<blockquote class=\"wp-block-quote blocks-quote-style-2\"><p>There is no greater agony than bearing an untold story inside you.</p><footer>Maya Angelou</footer></blockquote>"
     }
 ]

@@ -13,7 +13,7 @@ function NoticeList( { notices, onRemove = noop } ) {
 
 	return (
 		<div className="components-notice-list">
-			{ notices.reverse().map( ( notice ) => (
+			{ [ ...notices ].reverse().map( ( notice ) => (
 				<Notice { ...notice } key={ notice.id } onRemove={ removeNotice( notice.id ) } />
 			) ) }
 		</div>

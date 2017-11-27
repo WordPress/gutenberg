@@ -11,9 +11,10 @@ import babelPlugin from '../babel-plugin';
 
 describe( 'babel-plugin', () => {
 	const {
+		getNodeAsString,
+		getTranslatorComment,
 		isValidTranslationKey,
 		isSameTranslation,
-		getTranslatorComment,
 	} = babelPlugin;
 
 	describe( '.isValidTranslationKey()', () => {
@@ -88,6 +89,37 @@ describe( 'babel-plugin', () => {
 			const comment = getCommentFromString( '/* translators: Long comment\nspanning multiple \nlines */\nconst string = __( \'Hello world\' );' );
 
 			expect( comment ).toBe( 'Long comment spanning multiple lines' );
+		} );
+	} );
+
+	describe( '.getNodeAsString()', () => {
+		function getNodeAsStringFromArgument( source ) {
+			let string;
+			traverse( transform( source ).ast, {
+				CallExpression( path ) {
+					string = getNodeAsString( path.node.arguments[ 0 ] );
+				},
+			} );
+
+			return string;
+		}
+
+		it( 'should returns an empty string by default', () => {
+			const string = getNodeAsStringFromArgument( '__( {} );' );
+
+			expect( string ).toBe( '' );
+		} );
+
+		it( 'should return a string value', () => {
+			const string = getNodeAsStringFromArgument( '__( "hello" );' );
+
+			expect( string ).toBe( 'hello' );
+		} );
+
+		it( 'should be a concatenated binary expression string value', () => {
+			const string = getNodeAsStringFromArgument( '__( "hello" + " world" );' );
+
+			expect( string ).toBe( 'hello world' );
 		} );
 	} );
 } );

@@ -1,11 +1,39 @@
+/**
+ * WordPress dependencies
+ */
+import { Component } from '@wordpress/element';
+import { Toolbar, DropdownMenu } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
-import { Toolbar, DropdownMenu } from 'components';
-import { __ } from 'i18n';
+
+function isTableSelected( editor ) {
+	return editor.dom.getParent(
+		editor.selection.getStart( true ),
+		'table',
+		editor.getBody().parentNode
+	);
+}
+
+function selectFirstCell( editor ) {
+	const cell = editor.getBody().querySelector( 'td,th' );
+	if ( cell ) {
+		cell.focus();
+		editor.selection.select( cell, true );
+		editor.selection.collapse( false );
+	}
+}
 
 function execCommand( command ) {
 	return ( editor ) => {
 		if ( editor ) {
+			if ( ! isTableSelected( editor ) ) {
+				selectFirstCell( editor );
+			}
 			editor.execCommand( command );
 		}
 	};
@@ -44,7 +72,7 @@ const TABLE_CONTROLS = [
 	},
 ];
 
-export default class TableBlock extends wp.element.Component {
+export default class TableBlock extends Component {
 	constructor() {
 		super();
 		this.handleSetup = this.handleSetup.bind( this );
@@ -56,11 +84,8 @@ export default class TableBlock extends wp.element.Component {
 	handleSetup( editor, focus ) {
 		// select the end of the first table cell
 		editor.on( 'init', () => {
-			const cell = editor.getBody().querySelector( 'td,th' );
-			if ( cell && focus ) {
-				cell.focus();
-				editor.selection.select( cell, true );
-				editor.selection.collapse( false );
+			if ( focus ) {
+				selectFirstCell( editor );
 			}
 		} );
 		this.setState( { editor } );
@@ -73,10 +98,11 @@ export default class TableBlock extends wp.element.Component {
 			<Editable
 				key="editor"
 				tagName="table"
-				className={ className }
+				wrapperClassName={ className }
 				getSettings={ ( settings ) => ( {
 					...settings,
 					plugins: ( settings.plugins || [] ).concat( 'table' ),
+					table_tab_navigation: false,
 				} ) }
 				onSetup={ ( editor ) => this.handleSetup( editor, focus ) }
 				onChange={ onChange }
@@ -87,17 +113,15 @@ export default class TableBlock extends wp.element.Component {
 			focus && (
 				<BlockControls key="menu">
 					<Toolbar>
-						<li>
-							<DropdownMenu
-								icon="editor-table"
-								label={ __( 'Edit Table' ) }
-								controls={
-									TABLE_CONTROLS.map( ( control ) => ( {
-										...control,
-										onClick: () => control.onClick( this.state.editor ),
-									} ) ) }
-							/>
-						</li>
+						<DropdownMenu
+							icon="editor-table"
+							label={ __( 'Edit Table' ) }
+							controls={
+								TABLE_CONTROLS.map( ( control ) => ( {
+									...control,
+									onClick: () => control.onClick( this.state.editor ),
+								} ) ) }
+						/>
 					</Toolbar>
 				</BlockControls>
 			),

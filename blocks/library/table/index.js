@@ -1,29 +1,48 @@
 /**
+ * External dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
+import './editor.scss';
 import './style.scss';
-import { registerBlockType, query as hpq } from '../../api';
+import { registerBlockType } from '../../api';
 import TableBlock from './table-block';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
-
-const { children } = hpq;
+import InspectorControls from '../../inspector-controls';
+import BlockDescription from '../../block-description';
 
 registerBlockType( 'core/table', {
-	title: wp.i18n.__( 'Table' ),
+	title: __( 'Table' ),
 	icon: 'editor-table',
 	category: 'formatting',
 
 	attributes: {
-		content: children( 'table' ),
+		content: {
+			type: 'array',
+			source: 'children',
+			selector: 'table',
+			default: [
+				<tbody key="1">
+					<tr><td><br /></td><td><br /></td></tr>
+					<tr><td><br /></td><td><br /></td></tr>
+				</tbody>,
+			],
+		},
+		align: {
+			type: 'string',
+		},
 	},
 
-	defaultAttributes: {
-		content: [
-			<tbody key="1">
-				<tr><td><br /></td><td><br /></td></tr>
-				<tr><td><br /></td><td><br /></td></tr>
-			</tbody>,
+	transforms: {
+		from: [
+			{
+				type: 'raw',
+				isMatch: ( node ) => node.nodeName === 'TABLE',
+			},
 		],
 	},
 
@@ -39,11 +58,17 @@ registerBlockType( 'core/table', {
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		return [
 			focus && (
+				<InspectorControls key="inspector">
+					<BlockDescription>
+						<p>{ __( 'Tables. Best used for tabular data.' ) }</p>
+					</BlockDescription>
+				</InspectorControls>
+			),
+			focus && (
 				<BlockControls key="toolbar">
 					<BlockAlignmentToolbar
 						value={ attributes.align }
 						onChange={ updateAlignment }
-						controls={ [ 'left', 'center', 'right', 'wide', 'full' ] }
 					/>
 				</BlockControls>
 			),
@@ -61,9 +86,9 @@ registerBlockType( 'core/table', {
 	},
 
 	save( { attributes } ) {
-		const { content } = attributes;
+		const { content, align } = attributes;
 		return (
-			<table>
+			<table className={ align ? `align${ align }` : null }>
 				{ content }
 			</table>
 		);

@@ -1,6 +1,6 @@
 # Reference
 
-- [Attribute Matchers](./reference/attribute-matchers)
+- [Attributes](./reference/attributes)
 - [Glossary](./reference/glossary)
 - [Design Principles](./reference/design-principles)
 - [Coding Guidelines](./reference/coding-guidelines)

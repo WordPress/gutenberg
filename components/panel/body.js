@@ -1,13 +1,18 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { Component } from 'element';
-import { __, sprintf } from 'i18n';
+import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import IconButton from '../icon-button';
+import Button from '../button';
+import Dashicon from '../dashicon';
 
 class PanelBody extends Component {
 	constructor( props ) {
@@ -20,29 +25,38 @@ class PanelBody extends Component {
 
 	toggle( event ) {
 		event.preventDefault();
-		this.setState( ( state ) => ( {
-			opened: ! state.opened,
-		} ) );
+		if ( this.props.opened === undefined ) {
+			this.setState( ( state ) => ( {
+				opened: ! state.opened,
+			} ) );
+		}
+
+		if ( this.props.onToggle ) {
+			this.props.onToggle();
+		}
 	}
 
 	render() {
-		const { title, children } = this.props;
+		const { title, children, opened, className } = this.props;
+		const isOpened = opened === undefined ? this.state.opened : opened;
+		const icon = `arrow-${ isOpened ? 'down' : 'right' }`;
+		const classes = classnames( 'components-panel__body', className, { 'is-opened': isOpened } );
+
 		return (
-			<div className="components-panel__body">
+			<div className={ classes }>
 				{ !! title && (
 					<h3 className="components-panel__body-title">
-						<IconButton
+						<Button
 							className="components-panel__body-toggle"
 							onClick={ this.toggle }
-							icon={ this.state.opened ? 'arrow-down' : 'arrow-right' }
-							aria-expanded={ this.state.opened }
-							label={ sprintf( __( 'Open section: %s' ), title ) }
+							aria-expanded={ isOpened }
 						>
+							<Dashicon icon={ icon } />
 							{ title }
-						</IconButton>
+						</Button>
 					</h3>
 				) }
-				{ this.state.opened && children }
+				{ isOpened && children }
 			</div>
 		);
 	}

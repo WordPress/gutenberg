@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Component } from 'element';
+import { Component } from '@wordpress/element';
 import { unescape } from 'lodash';
 
 /**
@@ -37,7 +37,6 @@ class TokenFieldWrapper extends Component {
 				value={ this.state.tokens }
 				displayTransform={ unescapeAndFormatSpaces }
 				onChange={ this.onTokensChange }
-				ref="tokenField"
 			/>
 		);
 	}

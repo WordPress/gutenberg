@@ -2,7 +2,20 @@
  * External dependencies
  */
 import uuid from 'uuid/v4';
-import { get, castArray, findIndex, isObjectLike, find } from 'lodash';
+import {
+	every,
+	get,
+	reduce,
+	castArray,
+	findIndex,
+	isObjectLike,
+	find,
+} from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -12,56 +25,81 @@ import { getBlockType } from './registration';
 /**
  * Returns a block object given its type and attributes.
  *
- * @param  {String} name        Block name
- * @param  {Object} attributes  Block attributes
- * @return {Object}             Block object
+ * @param  {String} name             Block name
+ * @param  {Object} blockAttributes  Block attributes
+ * @return {Object}                  Block object
  */
-export function createBlock( name, attributes = {} ) {
+export function createBlock( name, blockAttributes = {} ) {
 	// Get the type definition associated with a registered block.
 	const blockType = getBlockType( name );
 
-	// Do we need this? What purpose does it have?
-	let defaultAttributes;
-	if ( blockType ) {
-		defaultAttributes = blockType.defaultAttributes;
-	}
+	// Ensure attributes contains only values defined by block type, and merge
+	// default values for missing attributes.
+	const attributes = reduce( blockType.attributes, ( result, source, key ) => {
+		const value = blockAttributes[ key ];
+		if ( undefined !== value ) {
+			result[ key ] = value;
+		} else if ( source.default ) {
+			result[ key ] = source.default;
+		}
+
+		return result;
+	}, {} );
 
 	// Blocks are stored with a unique ID, the assigned type name,
 	// and the block attributes.
 	return {
 		uid: uuid(),
 		name,
-		attributes: {
-			...defaultAttributes,
-			...attributes,
-		},
+		isValid: true,
+		attributes,
 	};
 }
 
 /**
- * Switch a block into one or more blocks of the new block type.
+ * Switch one or more blocks into one or more blocks of the new block type.
  *
- * @param  {Object} block      Block object
- * @param  {string} name       Block name
- * @return {Array}             Block object
+ * @param  {Array|Object}  blocks     Blocks array or block object
+ * @param  {string}        name       Block name
+ * @return {Array}                    Array of blocks
  */
-export function switchToBlockType( block, name ) {
+export function switchToBlockType( blocks, name ) {
+	const blocksArray = castArray( blocks );
+	const isMultiBlock = blocksArray.length > 1;
+	const fistBlock = blocksArray[ 0 ];
+	const sourceName = fistBlock.name;
+
+	if ( isMultiBlock && ! every( blocksArray, ( block ) => ( block.name === sourceName ) ) ) {
+		return null;
+	}
+
 	// Find the right transformation by giving priority to the "to"
 	// transformation.
 	const destinationType = getBlockType( name );
-	const sourceType = getBlockType( block.name );
+	const sourceType = getBlockType( sourceName );
 	const transformationsFrom = get( destinationType, 'transforms.from', [] );
 	const transformationsTo = get( sourceType, 'transforms.to', [] );
 	const transformation =
-		find( transformationsTo, t => t.blocks.indexOf( name ) !== -1 ) ||
-		find( transformationsFrom, t => t.blocks.indexOf( block.name ) !== -1 );
+		find(
+			transformationsTo,
+			t => t.type === 'block' && t.blocks.indexOf( name ) !== -1 && ( ! isMultiBlock || t.isMultiBlock )
+		) ||
+		find(
+			transformationsFrom,
+			t => t.type === 'block' && t.blocks.indexOf( sourceName ) !== -1 && ( ! isMultiBlock || t.isMultiBlock )
+		);
 
 	// Stop if there is no valid transformation. (How did we get here?)
 	if ( ! transformation ) {
 		return null;
 	}
 
-	let transformationResults = transformation.transform( block.attributes );
+	let transformationResults;
+	if ( transformation.isMultiBlock ) {
+		transformationResults = transformation.transform( blocksArray.map( ( currentBlock ) => currentBlock.attributes ) );
+	} else {
+		transformationResults = transformation.transform( fistBlock.attributes );
+	}
 
 	// Ensure that the transformation function returned an object or an array
 	// of objects.
@@ -87,13 +125,26 @@ export function switchToBlockType( block, name ) {
 		return null;
 	}
 
-	return transformationResults.map( ( result, index ) => {
-		return {
-			// The first transformed block whose type matches the "destination"
-			// type gets to keep the existing block's UID.
-			uid: index === firstSwitchedBlock ? block.uid : result.uid,
-			name: result.name,
-			attributes: result.attributes,
-		};
-	} );
+	return transformationResults.map( ( result, index ) => ( {
+		...result,
+		// The first transformed block whose type matches the "destination"
+		// type gets to keep the existing UID of the first block.
+		uid: index === firstSwitchedBlock ? fistBlock.uid : result.uid,
+	} ) );
+}
+
+/**
+ * Creates a new reusable block.
+ *
+ * @param {String} type       The type of the block referenced by the reusable block
+ * @param {Object} attributes The attributes of the block referenced by the reusable block
+ * @return {Object}           A reusable block object
+ */
+export function createReusableBlock( type, attributes ) {
+	return {
+		id: uuid(),
+		name: __( 'Untitled block' ),
+		type,
+		attributes,
+	};
 }

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { createElement, Component, cloneElement, Children } from 'react';
-import { render, findDOMNode } from 'react-dom';
+import { render, findDOMNode, createPortal, unmountComponentAtNode } from 'react-dom';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { isString } from 'lodash';
 
@@ -26,6 +26,13 @@ export { createElement };
  * @param {Element}   target  DOM node into which element should be rendered
  */
 export { render };
+
+/**
+ * Removes any mounted element from the target DOM node.
+ *
+ * @param {Element} target DOM node in which element is to be removed
+ */
+export { unmountComponentAtNode };
 
 /**
  * A base class to create WordPress Components (Refs, state and lifecycle hooks)
@@ -52,32 +59,22 @@ export { findDOMNode };
 export { Children };
 
 /**
+ * Creates a portal into which a component can be rendered.
+ *
+ * @see https://github.com/facebook/react/issues/10309#issuecomment-318433235
+ *
+ * @param {Component} component Component
+ * @param {Element}   target    DOM node into which element should be rendered
+ */
+export { createPortal };
+
+/**
  * Renders a given element into a string
  *
  * @param  {WPElement} element Element to render
  * @return {String}            HTML
  */
-export function renderToString( element ) {
-	if ( ! element ) {
-		return '';
-	}
-
-	if ( 'string' === typeof element ) {
-		return element;
-	}
-
-	if ( Array.isArray( element ) ) {
-		// React 16 supports rendering array children of an element, but not as
-		// an argument to the render methods directly. To support this, we pass
-		// the array as children of a dummy wrapper, then remove the wrapper's
-		// opening and closing tags.
-		return renderToStaticMarkup(
-			createElement( 'div', null, ...element )
-		).slice( 5 /* <div> */, -6 /* </div> */ );
-	}
-
-	return renderToStaticMarkup( element );
-}
+export { renderToStaticMarkup as renderToString };
 
 /**
  * Concatenate two or more React children objects

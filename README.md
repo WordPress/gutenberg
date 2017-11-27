@@ -1,10 +1,10 @@
 # Gutenberg
 [![Build Status](https://img.shields.io/travis/WordPress/gutenberg/master.svg)](https://travis-ci.org/WordPress/gutenberg)
-[![Coverage](https://img.shields.io/coveralls/WordPress/gutenberg/master.svg)](https://coveralls.io/github/WordPress/gutenberg)
+[![Coverage](https://img.shields.io/codecov/c/github/WordPress/gutenberg/master.svg)](https://codecov.io/gh/WordPress/gutenberg)
 
 Printing since 1440.
 
-![Text block](https://wpcoredesign.mystagingwebsite.com/gutenberg/gutenberg.png)
+![Gutenberg editing](https://cldup.com/H0oKBfpidk.png)
 
 This is the development hub for the <a href="https://make.wordpress.org/core/2017/01/04/focus-tech-and-design-leads/">editor focus in core</a>. Gutenberg is the project name. If you want the latest release for your WordPress, <a href="https://wordpress.org/plugins/gutenberg/">download Gutenberg from the WordPress.org plugins repository</a>. Conversations and discussions take place in #core-editor on <a href="https://make.wordpress.org/chat/">the core WordPress Slack</a>. This is our kickoff goal:
 
@@ -12,11 +12,11 @@ This is the development hub for the <a href="https://make.wordpress.org/core/201
 
 WordPress already supports a large amount of "blocks", but doesn't surface them very well, nor does it give them much in the way of layout options. By embracing the blocky nature of rich post content, we will surface the blocks that already exist, as well as provide more advanced layout options for each of them. This will allow you to easily compose beautiful posts like <a href="http://moc.co/sandbox/example-post/">this example</a>.
 
-Check out the <a href="https://github.com/WordPress/gutenberg/blob/master/docs/faq.md">FAQ</a> for answers to the most common questions about the project.
+Check out the <a href="https://wordpress.org/gutenberg/handbook/reference/faq/">FAQ</a> for answers to the most common questions about the project.
 
 ## Contributors
 
-Gutenberg is built by many contributors and volunteers. Please see the full list in <a href="CONTRIBUTORS.md">CONTRIBUTORS.md</a>.
+Gutenberg is built by many contributors and volunteers. Please see the full list in <a href="https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTORS.md">CONTRIBUTORS.md</a>.
 
 ## Further Reading
 
@@ -24,10 +24,11 @@ Gutenberg is built by many contributors and volunteers. Please see the full list
 - <a href="https://make.wordpress.org/core/2017/05/05/editor-how-little-blocks-work/">How Blocks Work</a>
 - <a href="https://github.com/Automattic/wp-post-grammar">WP Post Grammar Parser</a>
 - <a href="https://make.wordpress.org/core/tag/gutenberg/">Development updates on make.wordpress.org</a>
+- <a href="https://wordpress.org/gutenberg/handbook/">Documentation: Creating Blocks, Reference, and Guidelines</a>
 
 ## How You Can Contribute
 
-Please see [CONTRIBUTING.md](CONTRIBUTING.md).
+Please see <a href="https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a>.
 
 ## Why
 
@@ -43,6 +44,6 @@ By showing critical UI in the body of the content, many can get their basic blog
 
 **Advanced Formatting**
 
-When the Post Settings sidebar is open — which it is by default — you are essentially in advanced layout mode. By default, you'll see all your metaboxes right there.
+When the Post Settings sidebar is open — which it is by default — you are essentially in advanced layout mode. By default, you'll see all your meta boxes right there.
 
-Every block can be _inspected_ by clicking it. And every block has advanced layout options available in the inspector; text might have drop-cap, image might have fixed position scrolling. As such, block attributes fall in two camps — the most important ones available right on the block, advanced ones living in the sidebar inspector.
+Every block can be _inspected_ by clicking it. And every block has advanced layout options available in the inspector; text might have drop-cap, image might have fixed position scrolling. As such, block attributes fall into two camps — the most important ones available right on the block, advanced ones living in the sidebar inspector.

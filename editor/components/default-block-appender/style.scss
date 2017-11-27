@@ -1,0 +1,22 @@
+$empty-paragraph-height: $text-editor-font-size * 4;
+
+input[type=text].editor-default-block-appender__content {
+	border: none;
+	background: none;
+	box-shadow: none;
+	display: block;
+	width: 100%;
+	font-size: $editor-font-size;
+	line-height: $editor-line-height;
+	cursor: text;
+	max-width: none;	// fixes a bleed issue from the admin
+
+	height: $empty-paragraph-height;
+	color: $dark-gray-300;
+	outline: 1px solid transparent;
+	transition: 0.2s outline;
+
+	&:focus, &:hover {
+		outline: 1px solid $light-gray-500;
+	}
+}

@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { Toolbar } from 'components';
+import { __ } from '@wordpress/i18n';
+import { Toolbar, withContext } from '@wordpress/components';
 
 const BLOCK_ALIGNMENTS_CONTROLS = {
 	left: {
@@ -27,17 +27,22 @@ const BLOCK_ALIGNMENTS_CONTROLS = {
 	},
 };
 
-const DEFAULT_CONTROLS = [ 'left', 'center', 'right' ];
+const DEFAULT_CONTROLS = [ 'left', 'center', 'right', 'wide', 'full' ];
+const WIDE_CONTROLS = [ 'wide', 'full' ];
 
-export default function BlockAlignmentToolbar( { value, onChange, controls = DEFAULT_CONTROLS } ) {
+function BlockAlignmentToolbar( { value, onChange, controls = DEFAULT_CONTROLS, wideControlsEnabled = false } ) {
 	function applyOrUnset( align ) {
 		return () => onChange( value === align ? undefined : align );
 	}
 
+	const enabledControls = wideControlsEnabled ?
+		controls :
+		controls.filter( ( control ) => WIDE_CONTROLS.indexOf( control ) === -1 );
+
 	return (
 		<Toolbar
 			controls={
-				controls.map( control => {
+				enabledControls.map( control => {
 					return {
 						...BLOCK_ALIGNMENTS_CONTROLS[ control ],
 						isActive: value === control,
@@ -48,3 +53,9 @@ export default function BlockAlignmentToolbar( { value, onChange, controls = DEF
 		/>
 	);
 }
+
+export default withContext( 'editor' )(
+	( settings ) => ( {
+		wideControlsEnabled: settings.wideImages,
+	} )
+)( BlockAlignmentToolbar );

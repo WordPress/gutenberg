@@ -6,17 +6,17 @@ import TextareaAutosize from 'react-autosize-textarea';
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { Component } from 'element';
+import { __ } from '@wordpress/i18n';
+import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import './style.scss';
-import { registerBlockType, query } from '../../api';
+import './editor.scss';
+import { registerBlockType } from '../../api';
 import BlockControls from '../../block-controls';
-
-const { html } = query;
+import InspectorControls from '../../inspector-controls';
+import BlockDescription from '../../block-description';
 
 registerBlockType( 'core/html', {
 	title: __( 'Custom HTML' ),
@@ -25,10 +25,20 @@ registerBlockType( 'core/html', {
 
 	category: 'formatting',
 
-	className: false,
+	keywords: [ __( 'embed' ) ],
+
+	supportHTML: false,
+
+	supports: {
+		customClassName: false,
+		className: false,
+	},
 
 	attributes: {
-		content: html(),
+		content: {
+			type: 'string',
+			source: 'html',
+		},
 	},
 
 	edit: class extends Component {
@@ -71,12 +81,19 @@ registerBlockType( 'core/html', {
 							</ul>
 						</BlockControls>
 					}
-					{ preview
-						? <div dangerouslySetInnerHTML={ { __html: attributes.content } } />
-						: <TextareaAutosize
+					{ preview ?
+						<div dangerouslySetInnerHTML={ { __html: attributes.content } } /> :
+						<TextareaAutosize
 							value={ attributes.content }
 							onChange={ ( event ) => setAttributes( { content: event.target.value } ) }
 						/>
+					}
+					{ focus &&
+						<InspectorControls key="inspector">
+							<BlockDescription>
+								<p>{ __( 'Add custom HTML code and preview it right here in the editor.' ) }</p>
+							</BlockDescription>
+						</InspectorControls>
 					}
 				</div>
 			);

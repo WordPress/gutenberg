@@ -23,7 +23,14 @@ const blocksCSSPlugin = new ExtractTextPlugin( {
 const extractConfig = {
 	use: [
 		{ loader: 'raw-loader' },
-		{ loader: 'postcss-loader' },
+		{
+			loader: 'postcss-loader',
+			options: {
+				plugins: [
+					require( 'autoprefixer' ),
+				],
+			},
+		},
 		{
 			loader: 'sass-loader',
 			query: {
@@ -37,13 +44,13 @@ const extractConfig = {
 };
 
 const entryPointNames = [
-	'element',
-	'i18n',
-	'components',
-	'utils',
 	'blocks',
+	'components',
 	'date',
 	'editor',
+	'element',
+	'i18n',
+	'utils',
 ];
 
 const externals = {
@@ -55,8 +62,8 @@ const externals = {
 };
 
 entryPointNames.forEach( entryPointName => {
-	externals[ entryPointName ] = {
-		'this': [ 'wp', entryPointName ],
+	externals[ '@wordpress/' + entryPointName ] = {
+		this: [ 'wp', entryPointName ],
 	};
 } );
 
@@ -77,11 +84,6 @@ const config = {
 			__dirname,
 			'node_modules',
 		],
-		alias: {
-			// There are currently resolution errors on RSF's "mitt" dependency
-			// when imported as native ES module
-			'react-slot-fill': 'react-slot-fill/lib/rsf.js',
-		},
 	},
 	module: {
 		rules: [
@@ -95,19 +97,16 @@ const config = {
 				use: 'babel-loader',
 			},
 			{
-				test: /block\.s?css$/,
+				test: /style\.s?css$/,
 				include: [
 					/blocks/,
 				],
 				use: blocksCSSPlugin.extract( extractConfig ),
 			},
 			{
-				test: /\.s?css$/,
+				test: /editor\.s?css$/,
 				include: [
 					/blocks/,
-				],
-				exclude: [
-					/block\.s?css$/,
 				],
 				use: editBlocksCSSPlugin.extract( extractConfig ),
 			},
@@ -130,11 +129,6 @@ const config = {
 		new webpack.LoaderOptionsPlugin( {
 			minimize: process.env.NODE_ENV === 'production',
 			debug: process.env.NODE_ENV !== 'production',
-			options: {
-				postcss: [
-					require( 'autoprefixer' ),
-				],
-			},
 		} ),
 	],
 	stats: {

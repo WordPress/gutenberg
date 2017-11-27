@@ -13,8 +13,7 @@ One challenge of maintaining the representation of a block as a JavaScript objec
 ```js
 var el = wp.element.createElement,
 	registerBlockType = wp.blocks.registerBlockType,
-	Editable = wp.blocks.Editable,
-	children = wp.blocks.query.children;
+	Editable = wp.blocks.Editable;
 
 registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-03', {
 	title: 'Hello World (Step 3)',
@@ -24,7 +23,11 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-03', {
 	category: 'layout',
 
 	attributes: {
-		content: children( 'p' ),
+		content: {
+			type: 'array',
+			source: 'children',
+			selector: 'p',
+		}
 	},
 
 	edit: function( props ) {
@@ -57,8 +60,7 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-03', {
 ```
 {% ESNext %}
 ```js
-const { registerBlockType, Editable, query } = wp.blocks;
-const { children } = query;
+const { registerBlockType, Editable, source } = wp.blocks;
 
 registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-03', {
 	title: 'Hello World (Step 3)',
@@ -68,10 +70,14 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-03', {
 	category: 'layout',
 
 	attributes: {
-		content: children( 'p' ),
+		content: {
+			type: 'array',
+			source: 'children',
+			selector: 'p',
+		},
 	},
 
-	edit( { attributes, setAttributes, focus, className } ) {
+	edit( { attributes, className, focus, setAttributes, setFocus } ) {
 		const { content } = attributes;
 
 		function onChangeContent( newContent ) {
@@ -85,7 +91,7 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-03', {
 				onChange={ onChangeContent }
 				value={ content }
 				focus={ focus }
-				onFocus={ props.setFocus }
+				onFocus={ setFocus }
 			/>
 		);
 	},
@@ -99,7 +105,7 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-03', {
 ```
 {% end %}
 
-When registering a new block type, the `attributes` property describes the shape of the attributes object you'd like to receive in the `edit` and `save` functions. Each value is a [matcher function](attribute-matchers.md) to find the desired value from the markup of the block.
+When registering a new block type, the `attributes` property describes the shape of the attributes object you'd like to receive in the `edit` and `save` functions. Each value is a [source function](../../reference/attributes) to find the desired value from the markup of the block.
 
 In the code snippet above, when loading the editor, we will extract the `content` value as the children of the paragraph element in the saved post's markup.
 
@@ -111,4 +117,4 @@ The `Editable` component can be considered as a super-powered `textarea` element
 
 Implementing this behavior as a component enables you as the block implementer to be much more granular about editable fields. Your block may not need `Editable` at all, or it may need many independent `Editable` elements, each operating on a subset of the overall block state.
 
-Because `Editable` allows for nested nodes, you'll most often use it in conjunction with the `children` attribute matcher when extracting the value from saved content.
+Because `Editable` allows for nested nodes, you'll most often use it in conjunction with the `children` attribute source when extracting the value from saved content.

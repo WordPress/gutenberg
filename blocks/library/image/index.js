@@ -1,29 +1,16 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { Placeholder, Dashicon, Toolbar, DropZone } from 'components';
+import { __ } from '@wordpress/i18n';
+import { createMediaFromFile } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, query } from '../../api';
-import Editable from '../../editable';
-import MediaUploadButton from '../../media-upload-button';
-import InspectorControls from '../../inspector-controls';
-import TextControl from '../../inspector-controls/text-control';
-import BlockControls from '../../block-controls';
-import BlockAlignmentToolbar from '../../block-alignment-toolbar';
-import BlockDescription from '../../block-description';
-import UrlInput from '../../url-input';
-
-const { attr, children } = query;
+import './editor.scss';
+import { registerBlockType, createBlock } from '../../api';
+import ImageBlock from './block';
 
 registerBlockType( 'core/image', {
 	title: __( 'Image' ),
@@ -32,174 +19,138 @@ registerBlockType( 'core/image', {
 
 	category: 'common',
 
+	keywords: [ __( 'photo' ) ],
+
 	attributes: {
-		url: attr( 'img', 'src' ),
-		alt: attr( 'img', 'alt' ),
-		caption: children( 'figcaption' ),
-		href: attr( 'a', 'href' ),
+		url: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'img',
+			attribute: 'src',
+		},
+		alt: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'img',
+			attribute: 'alt',
+		},
+		caption: {
+			type: 'array',
+			source: 'children',
+			selector: 'figcaption',
+		},
+		href: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'a',
+			attribute: 'href',
+		},
+		id: {
+			type: 'number',
+		},
+		align: {
+			type: 'string',
+		},
+		width: {
+			type: 'number',
+		},
+		height: {
+			type: 'number',
+		},
 	},
 
 	transforms: {
 		from: [
 			{
 				type: 'raw',
-				matcher: ( node ) => (
-					node.nodeName === 'IMG' ||
-					( ! node.textContent && node.querySelector( 'img' ) )
-				),
+				isMatch: ( node ) => {
+					const tag = node.nodeName.toLowerCase();
+					const hasText = !! node.textContent.trim();
+					const hasImage = node.querySelector( 'img' );
+
+					return tag === 'img' || ( hasImage && ! hasText ) || ( hasImage && tag === 'figure' );
+				},
+			},
+			{
+				type: 'files',
+				isMatch( files ) {
+					return files.length === 1 && files[ 0 ].type.indexOf( 'image/' ) === 0;
+				},
+				transform( files ) {
+					return createMediaFromFile( files[ 0 ] )
+						.then( ( media ) => createBlock( 'core/image', {
+							id: media.id,
+							url: media.source_url,
+						} ) );
+				},
+			},
+			{
+				type: 'shortcode',
+				tag: 'caption',
 				attributes: {
-					url: attr( 'img', 'src' ),
-					alt: attr( 'img', 'alt' ),
-					caption: children( 'figcaption' ),
+					url: {
+						type: 'string',
+						source: 'attribute',
+						attribute: 'src',
+						selector: 'img',
+					},
+					alt: {
+						type: 'string',
+						source: 'attribute',
+						attribute: 'alt',
+						selector: 'img',
+					},
+					caption: {
+						type: 'array',
+						// To do: needs to support HTML.
+						source: 'text',
+					},
+					href: {
+						type: 'string',
+						source: 'attribute',
+						attribute: 'href',
+						selector: 'a',
+					},
+					id: {
+						type: 'number',
+						shortcode: ( { named: { id } } ) => {
+							if ( ! id ) {
+								return;
+							}
+
+							return parseInt( id.replace( 'attachment_', '' ), 10 );
+						},
+					},
+					align: {
+						type: 'string',
+						shortcode: ( { named: { align = 'alignnone' } } ) => {
+							return align.replace( 'align', '' );
+						},
+					},
 				},
 			},
 		],
 	},
 
 	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
+		const { align, width } = attributes;
 		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
-			return { 'data-align': align };
+			return { 'data-align': align, 'data-resized': !! width };
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, className } ) {
-		const { url, alt, caption, align, id, href } = attributes;
-		const updateAlt = ( newAlt ) => setAttributes( { alt: newAlt } );
-		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
-		const onSelectImage = ( media ) => {
-			setAttributes( { url: media.url, alt: media.alt, caption: media.caption, id: media.id } );
-		};
-		const uploadButtonProps = { isLarge: true };
-		const onSetHref = ( event ) => setAttributes( { href: event.target.value } );
-
-		const controls = (
-			focus && (
-				<BlockControls key="controls">
-					<BlockAlignmentToolbar
-						value={ align }
-						onChange={ updateAlignment }
-						controls={ [ 'left', 'center', 'right', 'wide', 'full' ] }
-					/>
-
-					<Toolbar>
-						<li>
-							<MediaUploadButton
-								buttonProps={ {
-									className: 'components-icon-button components-toolbar__control',
-									'aria-label': __( 'Edit image' ),
-								} }
-								onSelect={ onSelectImage }
-								type="image"
-								value={ id }
-							>
-								<Dashicon icon="edit" />
-							</MediaUploadButton>
-						</li>
-						<UrlInput onChange={ onSetHref } url={ href } />
-					</Toolbar>
-				</BlockControls>
-			)
-		);
-
-		if ( ! url ) {
-			return [
-				controls,
-				<Placeholder
-					key="placeholder"
-					instructions={ __( 'Drag image here or insert from media library' ) }
-					icon="format-image"
-					label={ __( 'Image' ) }
-					className={ className }>
-					<DropZone
-						onFilesDrop={ ( files ) => {
-							const media = files[ 0 ];
-
-							// Only allow image uploads
-							if ( ! /^image\//.test( media.type ) ) {
-								return;
-							}
-
-							// Use File API to assign temporary URL from upload
-							setAttributes( {
-								url: window.URL.createObjectURL( media ),
-							} );
-
-							// Create upload payload
-							const data = new window.FormData();
-							data.append( 'file', media );
-
-							new wp.api.models.Media().save( null, {
-								data: data,
-								contentType: false,
-							} ).done( ( savedMedia ) => {
-								setAttributes( {
-									id: savedMedia.id,
-									url: savedMedia.source_url,
-								} );
-							} ).fail( () => {
-								// Reset to empty on failure.
-								// TODO: Better failure messaging
-								setAttributes( { url: null } );
-							} );
-						} }
-					/>
-					<MediaUploadButton
-						buttonProps={ uploadButtonProps }
-						onSelect={ onSelectImage }
-						type="image"
-					>
-						{ __( 'Insert from Media Library' ) }
-					</MediaUploadButton>
-				</Placeholder>,
-			];
-		}
-
-		const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
-		const classes = classnames( className, {
-			'is-transient': 0 === url.indexOf( 'blob:' ),
-		} );
-
-		// Disable reason: Each block can be selected by clicking on it
-
-		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
-		return [
-			controls,
-			focus && (
-				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'Worth a thousand words.' ) }</p>
-					</BlockDescription>
-					<h3>{ __( 'Image Settings' ) }</h3>
-					<TextControl label={ __( 'Alternate Text' ) } value={ alt } onChange={ updateAlt } />
-				</InspectorControls>
-			),
-			<figure key="image" className={ classes }>
-				<img src={ url } alt={ alt } onClick={ setFocus } />
-				{ ( caption && caption.length > 0 ) || !! focus ? (
-					<Editable
-						tagName="figcaption"
-						placeholder={ __( 'Write caption…' ) }
-						value={ caption }
-						focus={ focus && focus.editable === 'caption' ? focus : undefined }
-						onFocus={ focusCaption }
-						onChange={ ( value ) => setAttributes( { caption: value } ) }
-						inlineToolbar
-					/>
-				) : null }
-			</figure>,
-		];
-		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
-	},
+	edit: ImageBlock,
 
 	save( { attributes } ) {
-		const { url, alt, caption = [], align, href } = attributes;
-		const image = <img src={ url } alt={ alt } />;
+		const { url, alt, caption, align, href, width, height } = attributes;
+		const extraImageProps = width || height ? { width, height } : {};
+		const figureStyle = width ? { width } : {};
+		const image = <img src={ url } alt={ alt } { ...extraImageProps } />;
 
 		return (
-			<figure className={ align && `align${ align }` }>
+			<figure className={ align ? `align${ align }` : null } style={ figureStyle }>
 				{ href ? <a href={ href }>{ image }</a> : image }
-				{ caption.length > 0 && <figcaption>{ caption }</figcaption> }
+				{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
 			</figure>
 		);
 	},

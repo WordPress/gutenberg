@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Component, findDOMNode } from 'element';
+import { Component } from '@wordpress/element';
 
 /**
  * Higher Order Component used to be used to wrap disposable elements like Sidebars, modals, dropdowns.
@@ -14,25 +14,37 @@ import { Component, findDOMNode } from 'element';
  */
 function withFocusReturn( WrappedComponent ) {
 	return class extends Component {
-		componentDidMount() {
-			this.activeElement = document.activeElement;
+		constructor() {
+			super( ...arguments );
+
+			this.setIsFocusedTrue = () => this.isFocused = true;
+			this.setIsFocusedFalse = () => this.isFocused = false;
+		}
+
+		componentWillMount() {
+			this.activeElementOnMount = document.activeElement;
 		}
 
 		componentWillUnmount() {
-			const wrapper = findDOMNode( this );
-			if (
-				this.activeElement && (
-					( document.activeElement && wrapper && wrapper.contains( document.activeElement ) ) ||
-					( ! document.activeElement || document.body === document.activeElement )
-				)
-			) {
-				this.activeElement.focus();
+			const { activeElementOnMount, isFocused } = this;
+			if ( ! activeElementOnMount ) {
+				return;
+			}
+
+			const { body, activeElement } = document;
+			if ( isFocused || null === activeElement || body === activeElement ) {
+				activeElementOnMount.focus();
 			}
 		}
 
 		render() {
 			return (
-				<WrappedComponent { ...this.props } />
+				<div
+					onFocus={ this.setIsFocusedTrue }
+					onBlur={ this.setIsFocusedFalse }
+				>
+					<WrappedComponent { ...this.props } />
+				</div>
 			);
 		}
 	};

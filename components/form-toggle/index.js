@@ -7,14 +7,14 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 
-function FormToggle( { className, checked, id, onChange = noop, showHint = true } ) {
+function FormToggle( { className, checked, id, onChange = noop, showHint = true, ...props } ) {
 	const wrapperClasses = classnames(
 		'components-form-toggle',
 		className,
@@ -29,7 +29,10 @@ function FormToggle( { className, checked, id, onChange = noop, showHint = true 
 				type="checkbox"
 				checked={ checked }
 				onChange={ onChange }
+				{ ...props }
 			/>
+			<span className="components-form-toggle__track"></span>
+			<span className="components-form-toggle__thumb"></span>
 			{ showHint &&
 				<span className="components-form-toggle__hint" aria-hidden>
 					{ checked ? __( 'On' ) : __( 'Off' ) }

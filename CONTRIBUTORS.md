@@ -43,7 +43,7 @@ This list is manually curated to include valuable contributions by volunteers th
 | @lamosty | |
 | @willybahuaud | |
 | @maurobringolf | |
-| @aaronjorbin | |
+| @aaronjorbin | @jorbin |
 | @spocke | |
 | @androb | |
 | @annaephox | |
@@ -70,3 +70,19 @@ This list is manually curated to include valuable contributions by volunteers th
 | @shaunandrews | |
 | @hugobaeta | |
 | @mizejewski | |
+| @buzztone | |
+| @mathetos | |
+| @GaryJones | |
+| @jasonagnew | |
+| @brickbones | |
+| @iamgabrielma | |
+| @swissspidy | |
+| @dixitadusara | |
+| @ameeker | |
+| @StaggerLeee | |
+| @jblz | |
+| | @nicbertino |
+| @rahmon | @rahmohn |
+| @vladanost | |
+| @gziolo | @gziolo |
+| @lancewillett

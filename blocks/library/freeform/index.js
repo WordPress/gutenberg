@@ -1,16 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import './style.scss';
-import { registerBlockType, query, setUnknownTypeHandler } from '../../api';
+import './editor.scss';
+import { registerBlockType, setUnknownTypeHandlerName } from '../../api';
 import OldEditor from './old-editor';
-
-const { prop } = query;
 
 registerBlockType( 'core/freeform', {
 	title: __( 'Classic Text' ),
@@ -20,7 +18,10 @@ registerBlockType( 'core/freeform', {
 	category: 'formatting',
 
 	attributes: {
-		content: prop( 'innerHTML' ),
+		content: {
+			type: 'string',
+			source: 'html',
+		},
 	},
 
 	edit: OldEditor,
@@ -31,4 +32,4 @@ registerBlockType( 'core/freeform', {
 	},
 } );
 
-setUnknownTypeHandler( 'core/freeform' );
+setUnknownTypeHandlerName( 'core/freeform' );

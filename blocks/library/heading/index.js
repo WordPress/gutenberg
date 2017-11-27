@@ -1,27 +1,20 @@
 /**
- * External dependencies
- */
-import { isObject } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { __, sprintf } from 'i18n';
-import { concatChildren } from 'element';
-import { Toolbar } from 'components';
+import { __, sprintf } from '@wordpress/i18n';
+import { concatChildren } from '@wordpress/element';
+import { Toolbar } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import './style.scss';
-import { registerBlockType, createBlock, query } from '../../api';
+import './editor.scss';
+import { registerBlockType, createBlock } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import InspectorControls from '../../inspector-controls';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockDescription from '../../block-description';
-
-const { children, prop } = query;
 
 registerBlockType( 'core/heading', {
 	title: __( 'Heading' ),
@@ -30,44 +23,40 @@ registerBlockType( 'core/heading', {
 
 	category: 'common',
 
-	className: false,
+	keywords: [ __( 'title' ), __( 'subtitle' ) ],
 
-	attributes: {
-		content: children( 'h1,h2,h3,h4,h5,h6' ),
-		nodeName: prop( 'h1,h2,h3,h4,h5,h6', 'nodeName' ),
+	supports: {
+		className: false,
+		anchor: true,
 	},
 
-	defaultAttributes: {
-		nodeName: 'H2',
+	attributes: {
+		content: {
+			type: 'array',
+			source: 'children',
+			selector: 'h1,h2,h3,h4,h5,h6',
+		},
+		nodeName: {
+			type: 'string',
+			source: 'property',
+			selector: 'h1,h2,h3,h4,h5,h6',
+			property: 'nodeName',
+			default: 'H2',
+		},
+		align: {
+			type: 'string',
+		},
+		placeholder: {
+			type: 'string',
+		},
 	},
 
 	transforms: {
 		from: [
 			{
 				type: 'block',
-				blocks: [ 'core/text' ],
-				transform: ( { content, ...attrs } ) => {
-					const isMultiParagraph = Array.isArray( content ) && isObject( content[ 0 ] ) && content[ 0 ].type === 'p';
-					if ( isMultiParagraph ) {
-						const headingContent = isObject( content[ 0 ] ) && content[ 0 ].type === 'p'
-							? content[ 0 ].props.children
-							: content[ 0 ];
-						const heading = createBlock( 'core/heading', {
-							content: headingContent,
-						} );
-						const blocks = [ heading ];
-
-						const remainingContent = content.slice( 1 );
-						if ( remainingContent.length ) {
-							const text = createBlock( 'core/text', {
-								...attrs,
-								content: remainingContent,
-							} );
-							blocks.push( text );
-						}
-
-						return blocks;
-					}
+				blocks: [ 'core/paragraph' ],
+				transform: ( { content } ) => {
 					return createBlock( 'core/heading', {
 						content,
 					} );
@@ -75,19 +64,27 @@ registerBlockType( 'core/heading', {
 			},
 			{
 				type: 'raw',
-				matcher: ( node ) => /H\d/.test( node.nodeName ),
-				attributes: {
-					content: children( 'h1,h2,h3,h4,h5,h6' ),
-					nodeName: prop( 'h1,h2,h3,h4,h5,h6', 'nodeName' ),
+				isMatch: ( node ) => /H\d/.test( node.nodeName ),
+			},
+			{
+				type: 'pattern',
+				regExp: /^(#{2,6})\s/,
+				transform: ( { content, match } ) => {
+					const level = match[ 1 ].length;
+
+					return createBlock( 'core/heading', {
+						nodeName: `H${ level }`,
+						content,
+					} );
 				},
 			},
 		],
 		to: [
 			{
 				type: 'block',
-				blocks: [ 'core/text' ],
+				blocks: [ 'core/paragraph' ],
 				transform: ( { content } ) => {
-					return createBlock( 'core/text', {
+					return createBlock( 'core/paragraph', {
 						content,
 					} );
 				},
@@ -158,7 +155,7 @@ registerBlockType( 'core/heading', {
 					setAttributes( { content: before } );
 					insertBlocksAfter( [
 						...blocks,
-						createBlock( 'core/text', { content: after } ),
+						createBlock( 'core/paragraph', { content: after } ),
 					] );
 				} }
 				style={ { textAlign: align } }

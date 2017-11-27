@@ -34,8 +34,13 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 	 * Tear down.
 	 */
 	function tearDown() {
+		parent::tearDown();
+
 		$this->dummy_block_instance_number = 0;
-		$GLOBALS['wp_registered_blocks'] = array();
+
+		foreach ( WP_Block_Type_Registry::get_instance()->get_all_registered() as $name => $block_type ) {
+			WP_Block_Type_Registry::get_instance()->unregister( $name );
+		}
 	}
 
 	/**
@@ -45,7 +50,7 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 	 */
 	function test_dynamic_block_rendering() {
 		$settings = array(
-			'render' => array(
+			'render_callback' => array(
 				$this,
 				'render_dummy_block',
 			),
@@ -81,7 +86,7 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 	 */
 	function test_dynamic_block_rendering_with_content() {
 		$settings = array(
-			'render' => array(
+			'render_callback' => array(
 				$this,
 				'render_dummy_block',
 			),

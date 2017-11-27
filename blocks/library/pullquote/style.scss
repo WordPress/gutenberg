@@ -1,18 +1,35 @@
 .wp-block-pullquote {
-	footer .blocks-editable__tinymce[data-is-empty="true"]:before {
-		font-size: 16px;
+	border-top: 4px solid $dark-gray-500;
+	border-bottom: 4px solid $dark-gray-500;
+	color: $dark-gray-600;
+	padding: 3em 0;
+	text-align: center;
+
+	&.alignleft,
+	&.alignright {
+		max-width: 400px;
+
+		> p {
+			font-size: 20px;
+		}
+	}
+
+	> p {
 		font-family: $default-font;
+		font-size: 24px;
+		font-weight: 900;
+		line-height: 1.6;
 	}
 
-	.blocks-editable__tinymce[data-is-empty="true"]:before {
-		width: 100%;
-		left: 50%;
-		transform: translateX( -50% );
+	footer {
+		color: $dark-gray-600;
+		position: relative;
+		font-weight: 900;
+		text-transform: uppercase;
+		font-size: 13px;
 	}
 
-	& > .blocks-pullquote__content .blocks-editable__tinymce[data-is-empty="true"]:before,
-	& > .blocks-editable p {
-		font-size: 48px;
-		font-weight: bold;
+	footer p {
+		font-family: $default-font;
 	}
 }

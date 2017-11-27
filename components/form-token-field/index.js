@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import { last, take, clone, uniq, map, difference, each, identity, some, throttle } from 'lodash';
+import { last, take, clone, uniq, map, difference, each, identity, some } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { __, _n, sprintf } from 'i18n';
-import { Component } from 'element';
+import { __, _n, sprintf } from '@wordpress/i18n';
+import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -18,6 +18,7 @@ import Token from './token';
 import TokenInput from './token-input';
 import SuggestionsList from './suggestions-list';
 import withInstanceId from '../higher-order/with-instance-id';
+import withSpokenMessages from '../higher-order/with-spoken-messages';
 
 const initialState = {
 	incompleteTokenValue: '',
@@ -46,7 +47,6 @@ class FormTokenField extends Component {
 		this.onInputChange = this.onInputChange.bind( this );
 		this.bindInput = this.bindInput.bind( this );
 		this.bindTokensAndInput = this.bindTokensAndInput.bind( this );
-		this.throlltedSpeak = throttle( this.speak.bind( this ), 1000 );
 	}
 
 	componentDidUpdate() {
@@ -193,13 +193,13 @@ class FormTokenField extends Component {
 		if ( showMessage ) {
 			const matchingSuggestions = this.getMatchingSuggestions( tokenValue );
 			if ( !! matchingSuggestions.length ) {
-				this.throlltedSpeak( sprintf( _n(
+				this.props.debouncedSpeak( sprintf( _n(
 					'%d result found, use up and down arrow keys to navigate.',
 					'%d results found, use up and down arrow keys to navigate.',
 					matchingSuggestions.length
-				), matchingSuggestions.length ) );
+				), matchingSuggestions.length ), 'assertive' );
 			} else {
-				this.throlltedSpeak( __( 'No results.' ) );
+				this.props.debouncedSpeak( __( 'No results.' ), 'assertive' );
 			}
 		}
 	}
@@ -340,7 +340,7 @@ class FormTokenField extends Component {
 
 	addNewToken( token ) {
 		this.addNewTokens( [ token ] );
-		this.speak( this.props.messages.added );
+		this.props.speak( this.props.messages.added, 'assertive' );
 
 		this.setState( {
 			incompleteTokenValue: '',
@@ -358,7 +358,7 @@ class FormTokenField extends Component {
 			return this.getTokenValue( item ) !== this.getTokenValue( token );
 		} );
 		this.props.onChange( newTokens );
-		this.speak( this.props.messages.removed );
+		this.props.speak( this.props.messages.removed, 'assertive' );
 	}
 
 	getTokenValue( token ) {
@@ -400,10 +400,6 @@ class FormTokenField extends Component {
 		}
 
 		return take( suggestions, maxSuggestions );
-	}
-
-	speak( message ) {
-		wp.a11y.speak( message, 'assertive' );
 	}
 
 	getSelectedSuggestion() {
@@ -514,6 +510,10 @@ class FormTokenField extends Component {
 			} );
 		}
 
+		// Disable reason: There is no appropriate role which describes the
+		// input container intended accessible usability.
+		// TODO: Refactor click detection to use blur to stop propagation.
+		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
 			<div { ...tokenFieldProps } >
 				<label htmlFor={ `components-form-token-input-${ instanceId }` } className="screen-reader-text">
@@ -546,6 +546,7 @@ class FormTokenField extends Component {
 				</div>
 			</div>
 		);
+		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
 }
 
@@ -568,4 +569,4 @@ FormTokenField.defaultProps = {
 	},
 };
 
-export default withInstanceId( FormTokenField );
+export default withSpokenMessages( withInstanceId( FormTokenField ) );
