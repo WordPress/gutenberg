@@ -13,7 +13,7 @@ registerBlockType( 'core/style', {
 
 	icon: 'editor-code',
 
-	category: 'formatting',
+	category: 'hidden',
 
 	attributes: {
 		content: {
