@@ -78,6 +78,12 @@
 		"parent": "reference"
 	},
 	{
+		"title": "Meta Boxes",
+		"slug": "meta-box",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/meta-box.md",
+		"parent": "reference"
+	},
+	{
 		"title": "Glossary",
 		"slug": "glossary",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/glossary.md",

@@ -515,6 +515,10 @@ function gutenberg_filter_meta_boxes( $meta_boxes ) {
 					if ( isset( $data['callback'] ) && in_array( $data['callback'], $taxonomy_callbacks_to_unset ) ) {
 						unset( $meta_boxes[ $page ][ $context ][ $priority ][ $name ] );
 					}
+					// Filter out meta boxes that are just registered for back compat.
+					if ( isset( $data['args']['__back_compat_meta_box'] ) && $data['args']['__back_compat_meta_box'] ) {
+						unset( $meta_boxes[ $page ][ $context ][ $priority ][ $name ] );
+					}
 				}
 			}
 		}
@@ -550,3 +554,115 @@ function gutenberg_is_meta_box_empty( $meta_boxes, $context, $post_type ) {
 }
 
 add_filter( 'filter_gutenberg_meta_boxes', 'gutenberg_filter_meta_boxes' );
+
+/**
+ * Go through the global metaboxes, and override the render callback, so we can trigger our warning if needed.
+ *
+ * @since 1.8.0
+ */
+function gutenberg_intercept_meta_box_render() {
+	global $wp_meta_boxes;
+
+	foreach ( $wp_meta_boxes as $post_type => $contexts ) {
+		foreach ( $contexts as $context => $priorities ) {
+			foreach ( $priorities as $priority => $boxes ) {
+				foreach ( $boxes as $id => $box ) {
+					if ( ! is_array( $wp_meta_boxes[ $post_type ][ $context ][ $priority ][ $id ]['args'] ) ) {
+						$wp_meta_boxes[ $post_type ][ $context ][ $priority ][ $id ]['args'] = array();
+					}
+					if ( ! isset( $wp_meta_boxes[ $post_type ][ $context ][ $priority ][ $id ]['args']['__original_callback'] ) ) {
+						$wp_meta_boxes[ $post_type ][ $context ][ $priority ][ $id ]['args']['__original_callback'] = $box['callback'];
+						$wp_meta_boxes[ $post_type ][ $context ][ $priority ][ $id ]['callback']                    = 'gutenberg_override_meta_box_callback';
+					}
+				}
+			}
+		}
+	}
+}
+add_action( 'submitpost_box', 'gutenberg_intercept_meta_box_render' );
+add_action( 'submitpage_box', 'gutenberg_intercept_meta_box_render' );
+add_action( 'edit_page_form', 'gutenberg_intercept_meta_box_render' );
+add_action( 'edit_form_advanced', 'gutenberg_intercept_meta_box_render' );
+
+/**
+ * Check if this metabox only exists for back compat purposes, show a warning if it doesn't.
+ *
+ * @since 1.8.0
+ *
+ * @param mixed $object The object being operated on, on this screen.
+ * @param array $box The current meta box definition.
+ */
+function gutenberg_override_meta_box_callback( $object, $box ) {
+	$callback = $box['args']['__original_callback'];
+	unset( $box['args']['__original_callback'] );
+
+	$block_compatible = true;
+	if ( isset( $box['args']['__block_editor_compatible_meta_box'] ) ) {
+		$block_compatible = (bool) $box['args']['__block_editor_compatible_meta_box'];
+		unset( $box['args']['__block_editor_compatible_meta_box'] );
+	}
+
+	if ( isset( $box['args']['__back_compat_meta_box'] ) ) {
+		$block_compatible |= (bool) $box['args']['__back_compat_meta_box'];
+		unset( $box['args']['__back_compat_meta_box'] );
+	}
+
+	if ( ! $block_compatible ) {
+		gutenberg_show_meta_box_warning( $callback );
+	}
+
+	call_user_func( $callback, $object, $box );
+}
+
+/**
+ * Display a warning in the metabox that the current plugin is causing the fallback to the old editor.
+ *
+ * @since 1.8.0
+ *
+ * @param callable $callback The function that a plugin has defined to render a meta box.
+ */
+function gutenberg_show_meta_box_warning( $callback ) {
+	// Only show the warning when WP_DEBUG is enabled.
+	if ( ! WP_DEBUG ) {
+		return;
+	}
+
+	// Don't show in the Gutenberg meta box UI.
+	if ( ! isset( $_REQUEST['classic-editor'] ) ) {
+		return;
+	}
+
+	if ( is_array( $callback ) ) {
+		$reflection = new ReflectionMethod( $callback[0], $callback[1] );
+	} else {
+		$reflection = new ReflectionFunction( $callback );
+	}
+
+	if ( $reflection->isInternal() ) {
+		return;
+	}
+
+	$filename = $reflection->getFileName();
+	if ( strpos( $filename, WP_PLUGIN_DIR ) !== 0 ) {
+		return;
+	}
+
+	$filename = str_replace( WP_PLUGIN_DIR, '', $filename );
+	$filename = preg_replace( '|^/([^/]*/).*$|', '\\1', $filename );
+
+	$plugins = get_plugins();
+	foreach ( $plugins as $name => $plugin ) {
+		if ( strpos( $name, $filename ) === 0 ) {
+			?>
+				<div class="error inline">
+					<p>
+						<?php
+							/* translators: %s is the name of the plugin that generated this meta box. */
+							printf( __( 'Gutenberg incompatible meta box, from the "%s" plugin.', 'gutenberg' ), $plugin['Name'] );
+						?>
+					</p>
+				</div>
+			<?php
+		}
+	}
+}
