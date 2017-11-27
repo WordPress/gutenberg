@@ -342,7 +342,7 @@ describe( 'effects', () => {
 				status: 'draft',
 			};
 
-			const result = handler( { post } );
+			const result = handler( { post, settings: {} } );
 
 			expect( result ).toEqual( [
 				resetPost( post ),
@@ -362,7 +362,7 @@ describe( 'effects', () => {
 				status: 'draft',
 			};
 
-			const result = handler( { post } );
+			const result = handler( { post, settings: {} } );
 
 			expect( result ).toHaveLength( 2 );
 			expect( result ).toContainEqual( resetPost( post ) );
@@ -383,7 +383,7 @@ describe( 'effects', () => {
 				status: 'auto-draft',
 			};
 
-			const result = handler( { post } );
+			const result = handler( { post, settings: {} } );
 
 			expect( result ).toEqual( [
 				resetPost( post ),
