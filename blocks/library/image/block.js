@@ -118,6 +118,12 @@ class ImageBlock extends Component {
 		const uploadButtonProps = { isLarge: true };
 		const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setAttributes );
 		const dropFiles = ( files ) => mediaUpload( files, setAttributes );
+		
+		const blockDescription = (
+			<BlockDescription>
+				<p>{ __( 'Worth a thousand words.' ) }</p>
+			</BlockDescription>
+		);
 
 		const controls = (
 			focus && (
@@ -148,6 +154,11 @@ class ImageBlock extends Component {
 		if ( ! url ) {
 			return [
 				controls,
+				focus && (
+					<InspectorControls key="inspector">
+						{blockDescription}
+					</InspectorControls>
+				),
 				<Placeholder
 					key="placeholder"
 					instructions={ __( 'Drag image here or insert from media library' ) }
@@ -190,9 +201,7 @@ class ImageBlock extends Component {
 			controls,
 			focus && (
 				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'Worth a thousand words.' ) }</p>
-					</BlockDescription>
+					{blockDescription}
 					<h3>{ __( 'Image Settings' ) }</h3>
 					<TextControl label={ __( 'Textual Alternative' ) } value={ alt } onChange={ this.updateAlt } help={ __( 'Describe the purpose of the image. Leave empty if the image is not a key part of the content.' ) } />
 					{ ! isEmpty( availableSizes ) && (
