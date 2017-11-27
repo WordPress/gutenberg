@@ -33,11 +33,11 @@ function Layout( { mode, isSidebarOpened } ) {
 	return (
 		<div className={ className }>
 			<DocumentTitle />
-			<EditorNotices />
 			<UnsavedChangesWarning />
 			<AutosaveMonitor />
 			<Header />
 			<div className="editor-layout__content" role="region" aria-label={ __( 'Editor content' ) } tabIndex="-1">
+				<EditorNotices />
 				<div className="editor-layout__editor">
 					{ mode === 'text' && <TextEditor /> }
 					{ mode === 'visual' && <VisualEditor /> }
