@@ -1559,6 +1559,14 @@ class Tests_DB extends WP_UnitTestCase {
 				false,
 			),
 			array(
+				':/tmp/mysql:with_colon.sock',
+				false,
+				'',
+				null,
+				'/tmp/mysql:with_colon.sock',
+				false,
+			),
+			array(
 				'127.0.0.1',
 				false,
 				'127.0.0.1',
@@ -1572,6 +1580,14 @@ class Tests_DB extends WP_UnitTestCase {
 				'127.0.0.1',
 				'3306',
 				null,
+				false,
+			),
+			array(
+				'127.0.0.1:3306:/tmp/mysql:with_colon.sock',
+				false,
+				'127.0.0.1',
+				'3306',
+				'/tmp/mysql:with_colon.sock',
 				false,
 			),
 			array(
@@ -1607,6 +1623,14 @@ class Tests_DB extends WP_UnitTestCase {
 				false,
 			),
 			array(
+				'localhost:/tmp/mysql:with_colon.sock',
+				false,
+				'localhost',
+				null,
+				'/tmp/mysql:with_colon.sock',
+				false,
+			),
+			array(
 				'0000:0000:0000:0000:0000:0000:0000:0001',
 				false,
 				'0000:0000:0000:0000:0000:0000:0000:0001',
@@ -1636,6 +1660,14 @@ class Tests_DB extends WP_UnitTestCase {
 				'::1',
 				'3306',
 				null,
+				true,
+			),
+			array(
+				'[::1]:3306:/tmp/mysql:with_colon.sock',
+				false,
+				'::1',
+				'3306',
+				'/tmp/mysql:with_colon.sock',
 				true,
 			),
 			array(
