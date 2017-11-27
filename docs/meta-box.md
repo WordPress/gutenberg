@@ -121,7 +121,7 @@ post.php loads it will set up all of its state correctly, and when it hits the
 three `do_action( 'do_meta_boxes' )` hooks it will trigger our partial page.
 
 When the new block editor was made into the default editor it is now required to
-provide the classic-editor flag to access the metabox partial page.
+provide the classic flag to access the metabox partial page.
 
 `gutenberg_meta_box_partial_page()` is used to render the meta boxes for a context
 then exit the execution thread early. A `meta_box` request parameter is used to
@@ -129,7 +129,7 @@ trigger this early exit. The `meta_box` request parameter should match one of
 `'advanced'`, `'normal'`, or `'side'`. This value will determine which meta box
 area is served. So an example url would look like:
 
-`mysite.com/wp-admin/post.php?post=1&action=edit&meta_box=$location&classic-editor`
+`mysite.com/wp-admin/post.php?post=1&action=edit&meta_box=$location&classic`
 
 This url is automatically passed into React via a `_wpMetaBoxUrl` global variable.
 The partial page is very similar to post.php and pretty much imitates it and

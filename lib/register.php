@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 function gutenberg_trick_plugins_into_registering_meta_boxes() {
 	global $pagenow;
 
-	if ( in_array( $pagenow, array( 'post.php', 'post-new.php' ), true ) && ! isset( $_REQUEST['classic-editor'] ) ) {
+	if ( in_array( $pagenow, array( 'post.php', 'post-new.php' ), true ) && ! isset( $_REQUEST['classic'] ) ) {
 		// As early as possible, but after any plugins ( ACF ) that adds meta boxes.
 		add_action( 'admin_head', 'gutenberg_collect_meta_box_data', 99 );
 	}
@@ -458,7 +458,7 @@ add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_revisions' );
  */
 function gutenberg_remember_classic_editor_when_saving_posts() {
 	?>
-	<input type="hidden" name="classic-editor" />
+	<input type="hidden" name="classic" />
 	<?php
 }
 add_action( 'edit_form_top', 'gutenberg_remember_classic_editor_when_saving_posts' );
@@ -472,8 +472,8 @@ add_action( 'edit_form_top', 'gutenberg_remember_classic_editor_when_saving_post
  * @return string Redirect url.
  */
 function gutenberg_redirect_to_classic_editor_when_saving_posts( $url ) {
-	if ( isset( $_REQUEST['classic-editor'] ) ) {
-		$url = add_query_arg( 'classic-editor', '', $url );
+	if ( isset( $_REQUEST['classic'] ) ) {
+		$url = add_query_arg( 'classic', '', $url );
 	}
 	return $url;
 }
@@ -490,7 +490,7 @@ add_filter( 'redirect_post_location', 'gutenberg_redirect_to_classic_editor_when
 function gutenberg_link_revisions_to_classic_editor( $url ) {
 	global $pagenow;
 	if ( 'revision.php' === $pagenow ) {
-		$url = add_query_arg( 'classic-editor', '', $url );
+		$url = add_query_arg( 'classic', '', $url );
 	}
 	return $url;
 }

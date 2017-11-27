@@ -132,7 +132,7 @@ function gutenberg_init( $return, $post ) {
 		return $return;
 	}
 
-	if ( isset( $_GET['classic-editor'] ) ) {
+	if ( isset( $_GET['classic'] ) ) {
 		return false;
 	}
 
@@ -343,7 +343,7 @@ function gutenberg_add_edit_link( $actions, $post ) {
 	}
 
 	$edit_url = get_edit_post_link( $post->ID, 'raw' );
-	$edit_url = add_query_arg( 'classic-editor', '', $edit_url );
+	$edit_url = add_query_arg( 'classic', '', $edit_url );
 
 	// Build the classic edit action. See also: WP_Posts_List_Table::handle_row_actions().
 	$title       = _draft_or_post_title( $post->ID );
@@ -356,7 +356,7 @@ function gutenberg_add_edit_link( $actions, $post ) {
 				__( 'Edit &#8220;%s&#8221; in the classic editor', 'gutenberg' ),
 				$title
 			) ),
-			__( 'Classic Editor', 'gutenberg' )
+			__( 'Classic', 'gutenberg' )
 		),
 	);
 
@@ -380,7 +380,7 @@ function gutenberg_add_edit_link( $actions, $post ) {
  * @param string $url  The URL to modify.
  * @param string $path The path part of $url.
  *
- * @return string The URL with the classic-editor parameter added.
+ * @return string The URL with the classic parameter added.
  */
 function gutenberg_modify_add_new_button_url( $url, $path ) {
 	global $pagenow;
@@ -399,7 +399,7 @@ function gutenberg_modify_add_new_button_url( $url, $path ) {
 		return $url;
 	}
 
-	return add_query_arg( 'classic-editor', '', $url );
+	return add_query_arg( 'classic', '', $url );
 }
 add_filter( 'admin_url', 'gutenberg_modify_add_new_button_url', 10, 2 );
 
@@ -495,13 +495,13 @@ function gutenberg_replace_default_add_new_button() {
 			}
 
 			var url = button.href;
-			var newUrl = url.replace( /&?classic-editor/, '' );
+			var newUrl = url.replace( /&?classic/, '' );
 
 			var newbutton = '<span id="split-page-title-action" class="split-page-title-action">';
 			newbutton += '<a href="' + newUrl + '">' + button.innerText + '</a>';
 			newbutton += '<span class="expander" tabindex="0" role="button" aria-haspopup="true" aria-label="<?php echo esc_js( __( 'Toggle editor selection menu', 'gutenberg' ) ); ?>"></span>';
 			newbutton += '<span class="dropdown"><a href="' + newUrl + '">Gutenberg</a>';
-			newbutton += '<a href="' + url + '"><?php echo esc_js( __( 'Classic Editor', 'gutenberg' ) ); ?></a></span></span>';
+			newbutton += '<a href="' + url + '"><?php echo esc_js( __( 'Classic', 'gutenberg' ) ); ?></a></span></span>';
 
 			button.insertAdjacentHTML( 'afterend', newbutton );
 			button.remove();

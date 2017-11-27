@@ -755,7 +755,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$meta_box_url = add_query_arg( array(
 		'post'           => $post_to_edit['id'],
 		'action'         => 'edit',
-		'classic-editor' => true,
+		'classic' => true,
 	), $meta_box_url );
 	wp_localize_script( 'wp-editor', '_wpMetaBoxUrl', $meta_box_url );
 
