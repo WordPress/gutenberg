@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { parse as hpqParse } from 'hpq';
-import { mapValues } from 'lodash';
+import { mapValues, find, omit } from 'lodash';
 
 /**
  * Internal dependencies
@@ -180,6 +180,26 @@ export function createBlockWithFallback( name, innerHTML, attributes ) {
 		// Preserve original content for future use in case the block is parsed
 		// as invalid, or future serialization attempt results in an error
 		block.originalContent = innerHTML;
+
+		// If the block is invalid, try to find an older compatible version
+		if ( ! block.isValid && blockType.deprecatedVersions ) {
+			let attributesParsedWithDeprecatedVersion;
+			const hasValidOlderVersion = find( blockType.deprecatedVersions, ( oldBlockType ) => {
+				const deprecatedBlockType = {
+					...omit( blockType, [ 'attributes', 'save', 'supports' ] ), // Parsing/Serialization properties
+					...oldBlockType,
+				};
+				const deprecatedBlockAttributes = getBlockAttributes( deprecatedBlockType, innerHTML, attributes );
+				const isValid = isValidBlock( innerHTML, deprecatedBlockType, deprecatedBlockAttributes );
+				attributesParsedWithDeprecatedVersion = isValid ? deprecatedBlockAttributes : undefined;
+				return isValid;
+			} );
+
+			if ( hasValidOlderVersion ) {
+				block.isValid = true;
+				block.attributes = attributesParsedWithDeprecatedVersion;
+			}
+		}
 
 		return block;
 	}
