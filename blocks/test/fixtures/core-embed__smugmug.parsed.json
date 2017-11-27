@@ -1,5 +1,6 @@
 [
     {
+        "version": 1,
         "blockName": "core-embed/smugmug",
         "attrs": {
             "url": "https://smugmug.com/"

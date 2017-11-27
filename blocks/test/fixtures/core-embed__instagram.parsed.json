@@ -1,5 +1,6 @@
 [
     {
+        "version": 1,
         "blockName": "core-embed/instagram",
         "attrs": {
             "url": "https://instagram.com/"

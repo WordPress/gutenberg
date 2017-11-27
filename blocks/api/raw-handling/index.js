@@ -131,7 +131,7 @@ export default function rawHandler( { HTML, plainText = '', mode = 'AUTO' } ) {
 				return createBlock(
 					blockType.name,
 					getBlockAttributes(
-						blockType,
+						blockType.attributes,
 						node.outerHTML
 					)
 				);

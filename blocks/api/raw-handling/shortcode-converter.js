@@ -39,10 +39,7 @@ export default function( HTML ) {
 			const block = createBlock(
 				blockType.name,
 				getBlockAttributes(
-					{
-						...blockType,
-						attributes: transform.attributes,
-					},
+					transform.attributes,
 					match.shortcode.content,
 					attributes,
 				)

@@ -1,5 +1,6 @@
 [
     {
+        "version": 1,
         "blockName": "core-embed/slideshare",
         "attrs": {
             "url": "https://slideshare.com/"

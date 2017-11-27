@@ -1,5 +1,6 @@
 [
     {
+        "version": 1,
         "blockName": "core-embed/meetup-com",
         "attrs": {
             "url": "https://meetup.com/"

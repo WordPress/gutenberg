@@ -1,5 +1,6 @@
 [
     {
+        "version": 1,
         "blockName": "core-embed/twitter",
         "attrs": {
             "url": "https://twitter.com/automattic"

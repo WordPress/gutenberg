@@ -1,5 +1,6 @@
 [
     {
+        "version": 1,
         "blockName": "core-embed/hulu",
         "attrs": {
             "url": "https://hulu.com/"

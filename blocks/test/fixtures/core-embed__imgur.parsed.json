@@ -1,5 +1,6 @@
 [
     {
+        "version": 1,
         "blockName": "core-embed/imgur",
         "attrs": {
             "url": "https://imgur.com/"

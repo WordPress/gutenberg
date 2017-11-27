@@ -1,5 +1,6 @@
 [
     {
+        "version": 1,
         "blockName": "core-embed/wordpress-tv",
         "attrs": {
             "url": "https://wordpress.tv/"

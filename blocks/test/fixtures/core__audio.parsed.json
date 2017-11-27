@@ -1,5 +1,6 @@
 [
     {
+        "version": 1,
         "blockName": "core/audio",
         "attrs": {
             "align": "right"

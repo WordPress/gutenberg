@@ -1,5 +1,6 @@
 [
     {
+        "version": 1,
         "blockName": "core/text-columns",
         "attrs": {
             "width": "center"

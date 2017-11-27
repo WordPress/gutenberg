@@ -1,5 +1,6 @@
 [
     {
+        "version": 1,
         "blockName": "core-embed/polldaddy",
         "attrs": {
             "url": "https://polldaddy.com/"

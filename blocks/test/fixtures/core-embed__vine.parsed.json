@@ -1,5 +1,6 @@
 [
     {
+        "version": 1,
         "blockName": "core-embed/vine",
         "attrs": {
             "url": "https://vine.com/"
