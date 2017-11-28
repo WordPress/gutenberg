@@ -307,9 +307,6 @@
 
 .editor-block-list__insertion-point {
 	position: relative;
-	width: $visual-editor-max-width - $block-padding - $block-padding;
-	margin-left: auto;
-	margin-right: auto;
 
 	&:before {
 		position: absolute;
