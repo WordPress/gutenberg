@@ -78,8 +78,8 @@ export function splitAtCaret( editor ) {
 	afterRange.setStart( selectionRange.endContainer, selectionRange.endOffset );
 	afterRange.setEnd( rootNode, dom.nodeIndex( rootNode.lastChild ) + 1 );
 
-	const beforeFragment = beforeRange.extractContents();
-	const afterFragment = afterRange.extractContents();
+	const beforeFragment = beforeRange.cloneContents();
+	const afterFragment = afterRange.cloneContents();
 
 	const beforeElement = domreact.nodeListToReact( beforeFragment.childNodes, createTinyMCEElement );
 	const afterElement = isLinkBoundary( afterFragment ) ? [] : domreact.nodeListToReact( afterFragment.childNodes, createTinyMCEElement );
