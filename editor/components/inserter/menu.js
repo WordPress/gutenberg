@@ -107,9 +107,9 @@ export class InserterMenu extends Component {
 		} );
 	}
 
-	selectBlock( name, attributes ) {
+	selectBlock( block ) {
 		return () => {
-			this.props.onSelect( name, attributes );
+			this.props.onSelect( block.name, block.initialAttributes );
 			this.setState( {
 				filterValue: '',
 			} );
@@ -146,7 +146,7 @@ export class InserterMenu extends Component {
 		// Display reusable blocks that we've fetched in the inserter
 		return reusableBlocks.map( ( reusableBlock ) => ( {
 			name: 'core/reusable-block',
-			attributes: {
+			initialAttributes: {
 				ref: reusableBlock.id,
 			},
 			title: reusableBlock.name,
