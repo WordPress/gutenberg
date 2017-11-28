@@ -17,14 +17,24 @@ import './style.scss';
 import {
 	isCurrentPostPublished,
 	isEditedPostBeingScheduled,
+	isSavingPost,
+	isPublishingPost,
 } from '../../selectors';
 
 export function PublishButtonLabel( {
 	isPublished,
 	isBeingScheduled,
+	isSaving,
+	isPublishing,
 	user,
 } ) {
 	const isContributor = user.data && ! user.data.capabilities.publish_posts;
+
+	if ( isPublishing ) {
+		return __( 'Publishing…' );
+	} else if ( isSaving ) {
+		return __( 'Updating…' );
+	}
 
 	if ( isContributor ) {
 		return __( 'Submit for Review' );
@@ -41,6 +51,9 @@ const applyConnect = connect(
 	( state ) => ( {
 		isPublished: isCurrentPostPublished( state ),
 		isBeingScheduled: isEditedPostBeingScheduled( state ),
+		isSaving: isSavingPost( state ),
+		// Need a selector
+		isPublishing: isPublishingPost( state ),
 	} )
 );
 

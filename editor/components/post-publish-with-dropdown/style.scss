@@ -9,4 +9,8 @@
 .wp-core-ui .editor-post-publish-with-dropdown__button.button-primary {
 	display: inline-flex;
 	align-items: center;
+
+	&.is-busy .dashicon {
+		display: none;
+	}
 }

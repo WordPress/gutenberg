@@ -11,6 +11,7 @@ import {
 	keys,
 	without,
 	compact,
+	find,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -20,6 +21,11 @@ import createSelector from 'rememo';
 import { serialize, getBlockType } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
+
+/**
+ * Internal dependencies
+ */
+import { POST_UPDATE_TRANSACTION_ID } from './effects';
 
 /***
  * Module constants
@@ -1071,4 +1077,50 @@ export function isSavingReusableBlock( state, ref ) {
  */
 export function getReusableBlocks( state ) {
 	return Object.values( state.reusableBlocks.data );
+}
+
+/**
+ * Returns state object prior to a specified optimist transaction ID, or `null`
+ * if the transaction corresponding to the given ID cannot be found.
+ *
+ * @param  {Object} state         Current global application state
+ * @param  {Object} transactionId Optimist transaction ID
+ * @return {Object}               Global application state prior to transaction
+ */
+export function getStateBeforeOptimisticTransaction( state, transactionId ) {
+	const transaction = find( state.optimist, ( entry ) => (
+		entry.beforeState &&
+		get( entry.action, [ 'optimist', 'id' ] ) === transactionId
+	) );
+
+	return transaction ? transaction.beforeState : null;
+}
+
+/**
+ * Returns true if the post is being published, or false otherwise
+ *
+ * @param  {Object}  state Global application state
+ * @return {Boolean}       Whether post is being published
+ */
+export function isPublishingPost( state ) {
+	if ( ! isSavingPost( state ) ) {
+		return false;
+	}
+
+	// Saving is optimistic, so assume that current post would be marked as
+	// published if publishing
+	if ( ! isCurrentPostPublished( state ) ) {
+		return false;
+	}
+
+	// Use post update transaction ID to retrieve the state prior to the
+	// optimistic transaction
+	const stateBeforeRequest = getStateBeforeOptimisticTransaction(
+		state,
+		POST_UPDATE_TRANSACTION_ID
+	);
+
+	// Consider as publishing when current post prior to request was not
+	// considered published
+	return !! stateBeforeRequest && ! isCurrentPostPublished( stateBeforeRequest );
 }
