@@ -332,21 +332,25 @@ registerBlockType( 'core/list', {
 					wrapperClassName="blocks-list"
 					placeholder={ __( 'Write list…' ) }
 					onMerge={ mergeBlocks }
-					onSplit={ ( before, after, ...blocks ) => {
-						if ( ! blocks.length ) {
-							blocks.push( createBlock( 'core/paragraph' ) );
-						}
+					onSplit={
+						insertBlocksAfter ?
+							( before, after, ...blocks ) => {
+								if ( ! blocks.length ) {
+									blocks.push( createBlock( 'core/paragraph' ) );
+								}
 
-						if ( after.length ) {
-							blocks.push( createBlock( 'core/list', {
-								nodeName,
-								values: after,
-							} ) );
-						}
+								if ( after.length ) {
+									blocks.push( createBlock( 'core/list', {
+										nodeName,
+										values: after,
+									} ) );
+								}
 
-						setAttributes( { values: before } );
-						insertBlocksAfter( blocks );
-					} }
+								setAttributes( { values: before } );
+								insertBlocksAfter( blocks );
+							} :
+							undefined
+					}
 				/>,
 			];
 		}

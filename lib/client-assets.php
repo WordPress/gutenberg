@@ -790,7 +790,8 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 	$post_type_object = get_post_type_object( $post_to_edit['type'] );
 	if ( ! empty( $post_type_object->template ) ) {
-		$editor_settings['template'] = $post_type_object->template;
+		$editor_settings['template']     = $post_type_object->template;
+		$editor_settings['templateLock'] = ! empty( $post_type_object->template_lock ) && $post_type_object->template_lock;
 	}
 
 	$script  = '( function() {';

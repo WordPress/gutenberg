@@ -2,13 +2,13 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { every, uniq, get, reduce, find } from 'lodash';
+import { every, uniq, get, reduce, find, flow } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Dropdown, Dashicon, IconButton, Toolbar, NavigableMenu } from '@wordpress/components';
+import { Dropdown, Dashicon, IconButton, Toolbar, NavigableMenu, withContext } from '@wordpress/components';
 import { getBlockType, getBlockTypes, switchToBlockType, BlockIcon } from '@wordpress/blocks';
 import { keycodes } from '@wordpress/utils';
 
@@ -24,8 +24,8 @@ import { getBlock } from '../../selectors';
  */
 const { DOWN } = keycodes;
 
-function BlockSwitcher( { blocks, onTransform } ) {
-	if ( ! blocks || ! blocks[ 0 ] ) {
+function BlockSwitcher( { blocks, onTransform, isLocked } ) {
+	if ( ! blocks || ! blocks[ 0 ] || isLocked ) {
 		return null;
 	}
 	const isMultiBlock = blocks.length > 1;
@@ -126,18 +126,27 @@ function BlockSwitcher( { blocks, onTransform } ) {
 	);
 }
 
-export default connect(
-	( state, ownProps ) => {
-		return {
-			blocks: ownProps.uids.map( ( uid ) => getBlock( state, uid ) ),
-		};
-	},
-	( dispatch, ownProps ) => ( {
-		onTransform( blocks, name ) {
-			dispatch( replaceBlocks(
-				ownProps.uids,
-				switchToBlockType( blocks, name )
-			) );
+export default flow(
+	connect(
+		( state, ownProps ) => {
+			return {
+				blocks: ownProps.uids.map( ( uid ) => getBlock( state, uid ) ),
+			};
 		},
-	} )
+		( dispatch, ownProps ) => ( {
+			onTransform( blocks, name ) {
+				dispatch( replaceBlocks(
+					ownProps.uids,
+					switchToBlockType( blocks, name )
+				) );
+			},
+		} )
+	),
+	withContext( 'editor' )( ( settings ) => {
+		const { templateLock } = settings;
+
+		return {
+			isLocked: true === templateLock,
+		};
+	} ),
 )( BlockSwitcher );
