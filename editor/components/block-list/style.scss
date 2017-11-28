@@ -381,7 +381,10 @@
 	.editor-inserter__toggle {
 		opacity: 0;
 		transition: opacity 0.25s ease-in-out;
-		transition-delay: 0.3s;
+
+		&:not( :focus ) {
+			transition-delay: 0.3s;
+		}
 	}
 
 	&.is-forced-visible .editor-inserter__toggle,
