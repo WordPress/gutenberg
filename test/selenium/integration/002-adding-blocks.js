@@ -13,8 +13,8 @@ module.exports.run = ( config, driver ) => {
 			first.getAttribute( 'data-type' ).then( ( type ) => chai.expect( type ).to.equal( 'core/paragraph' ) );
 			first.getText().then( ( text ) => chai.expect( text ).to.equal( 'First Paragraph' ) );
 
-			// Using the invisible quick inserter
-			driver.findElement( By.css( '.editor-default-block-appender' ) ).click();
+			// Using the quick inserter
+			driver.findElement( By.css( '.editor-visual-editor__inserter [aria-label="Insert Paragraph"]' ) ).click();
 			driver.switchTo().activeElement().sendKeys( 'Second Paragraph' );
 			const second = findBlockByIndex( driver, 1 );
 			second.getAttribute( 'data-type' ).then( ( type ) => chai.expect( type ).to.equal( 'core/paragraph' ) );

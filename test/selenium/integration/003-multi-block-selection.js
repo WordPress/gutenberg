@@ -22,12 +22,9 @@ module.exports.run = ( config, driver ) => {
 				( className ) => chai.expect( className ).to.match( selectionRe ) );
 
 			// Creating test blocks x 3
-			const quickInserterSelector = '.editor-default-block-appender';
 			driver.findElement( By.css( '[value="Write your story"]' ) ).click();
-			driver.switchTo().activeElement().sendKeys( 'First Paragraph' );
-			driver.findElement( By.css( quickInserterSelector ) ).click();
-			driver.switchTo().activeElement().sendKeys( 'Second Paragraph' );
-			driver.findElement( By.css( quickInserterSelector ) ).click();
+			driver.switchTo().activeElement().sendKeys( 'First Paragraph', Key.ENTER );
+			driver.switchTo().activeElement().sendKeys( 'Second Paragraph', Key.ENTER );
 			driver.switchTo().activeElement().sendKeys( 'Third Paragraph' );
 
 			// Default: No selection
