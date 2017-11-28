@@ -104,7 +104,7 @@ class HierarchicalTermSelector extends Component {
 				adding: true,
 			} );
 			// Tries to create a term or fetch it if it already exists
-			const Model = wp.api.getTaxonomyModel( this.props.slug );
+			const Model = wp.api.getModelByType( this.props.slug );
 			this.addRequest = new Model( {
 				name: formName,
 				parent: formParent ? formParent : undefined,
@@ -156,7 +156,7 @@ class HierarchicalTermSelector extends Component {
 	}
 
 	componentDidMount() {
-		const Collection = wp.api.getTaxonomyCollection( this.props.slug );
+		const Collection = wp.api.getCollectionByType( this.props.slug );
 		this.fetchRequest = new Collection()
 			.fetch( { data: DEFAULT_QUERY } )
 			.done( ( terms ) => {
