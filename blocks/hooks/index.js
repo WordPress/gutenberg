@@ -10,6 +10,7 @@ import anchor from './anchor';
 import customClassName from './custom-class-name';
 import generatedClassName from './generated-class-name';
 import matchers from './matchers';
+import footnotes from './footnotes';
 
 const hooks = createHooks();
 
@@ -51,3 +52,4 @@ anchor( hooks );
 customClassName( hooks );
 generatedClassName( hooks );
 matchers( hooks );
+footnotes( hooks );

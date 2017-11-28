@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { createElement, Component, cloneElement, Children } from 'react';
+import { createElement, Component, cloneElement, Children, isValidElement } from 'react';
 import { render, findDOMNode, createPortal, unmountComponentAtNode } from 'react-dom';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { isString } from 'lodash';
@@ -57,6 +57,8 @@ export { cloneElement };
 export { findDOMNode };
 
 export { Children };
+
+export { isValidElement };
 
 /**
  * Creates a portal into which a component can be rendered.
