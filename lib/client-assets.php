@@ -553,9 +553,9 @@ function gutenberg_register_vendor_script( $handle, $src, $deps = array() ) {
  */
 function gutenberg_extend_wp_api_backbone_client() {
 	// Post Types Mapping.
-	$post_type_rest_base_mapping = array();
-	$post_type_rest_base_mapping[ 'attachment' ] = "media";
-	$post_type_rest_base_mapping = apply_filters( 'post_type_rest_base_mapping', $post_type_rest_base_mapping );
+	$post_type_rest_base_mapping               = array();
+	$post_type_rest_base_mapping['attachment'] = 'media';
+	$post_type_rest_base_mapping               = apply_filters( 'post_type_rest_base_mapping', $post_type_rest_base_mapping );
 
 	// Taxonomies Mapping.
 	$taxonomy_rest_base_mapping = array();
