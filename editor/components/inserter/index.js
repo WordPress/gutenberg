@@ -63,9 +63,10 @@ class Inserter extends Component {
 			onInsertBlock,
 			insertionPoint,
 			hasSupportedBlocks,
+			isLocked,
 		} = this.props;
 
-		if ( ! hasSupportedBlocks ) {
+		if ( ! hasSupportedBlocks || isLocked ) {
 			return null;
 		}
 
@@ -127,10 +128,11 @@ export default flowRight( [
 		} )
 	),
 	withContext( 'editor' )( ( settings ) => {
-		const { blockTypes } = settings;
+		const { blockTypes, templateLock } = settings;
 
 		return {
 			hasSupportedBlocks: true === blockTypes || ! isEmpty( blockTypes ),
+			isLocked: true === templateLock,
 		};
 	} ),
 ] )( Inserter );

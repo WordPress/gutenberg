@@ -16,6 +16,11 @@ describe( 'BlockMover', () => {
 			title: 'yolo-block',
 		};
 
+		it( 'should not render if the editor is locked', () => {
+			const wrapper = shallow( <BlockMover isLocked /> );
+			expect( wrapper.type() ).toBe( null );
+		} );
+
 		it( 'should render two IconButton components with the following props', () => {
 			const blockMover = shallow( <BlockMover uids={ selectedUids } blockType={ blockType } firstIndex={ 0 } /> );
 			expect( blockMover.hasClass( 'editor-block-mover' ) ).toBe( true );
