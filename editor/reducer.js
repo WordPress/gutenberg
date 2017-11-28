@@ -717,6 +717,19 @@ export const reusableBlocks = combineReducers( {
 	},
 } );
 
+export function annotations( state = [], action ) {
+	switch ( action.type ) {
+		case 'ADD_ANNOTATION':
+			return [
+				action.annotation,
+				...state
+			];
+			break;
+	}
+
+	return state;
+}
+
 export default optimist( combineReducers( {
 	editor,
 	currentPost,
@@ -731,4 +744,5 @@ export default optimist( combineReducers( {
 	notices,
 	metaBoxes,
 	reusableBlocks,
+	annotations,
 } ) );

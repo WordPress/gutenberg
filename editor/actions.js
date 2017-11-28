@@ -578,3 +578,25 @@ export function convertBlockToReusable( uid ) {
 		uid,
 	};
 }
+
+/**
+ * Returns an action object used to add an annotation to the editor.
+ *
+ * @param {string} start The ID of the block to start the annotation.
+ * @param {string} end The ID of the block to end the annotation.
+ * @returns {Object} Action object.
+ */
+export function annotateBlocks( start, end ) {
+	return {
+		type: 'ADD_ANNOTATION',
+		annotation: {
+			start: {
+				block: start,
+			},
+			end: {
+				block: end,
+			},
+			blockAnnotation: true,
+		},
+	};
+}

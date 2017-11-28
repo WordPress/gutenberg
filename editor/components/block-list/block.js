@@ -52,6 +52,7 @@ import {
 	isFirstMultiSelectedBlock,
 	isTyping,
 	getBlockMode,
+	getAnnotationsForBlock,
 } from '../../selectors';
 
 const { BACKSPACE, ESCAPE, DELETE, ENTER, UP, RIGHT, DOWN, LEFT } = keycodes;
@@ -346,7 +347,7 @@ class BlockListBlock extends Component {
 		// (mover, toolbar, wrapper) and the display of the block content.
 
 		// Generate the wrapper class names handling the different states of the block.
-		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected, focus } = this.props;
+		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected, focus, annotations } = this.props;
 		const showUI = isSelected && ( ! this.props.isTyping || ( focus && focus.collapsed === false ) );
 		const { error } = this.state;
 		const wrapperClassName = classnames( 'editor-block-list__block', {
@@ -354,6 +355,7 @@ class BlockListBlock extends Component {
 			'is-selected': showUI,
 			'is-multi-selected': isMultiSelected,
 			'is-hovered': isHovered,
+			'is-fully-annotated': annotations.filter( annotation => annotation.blockAnnotation ).length !== 0,
 		} );
 
 		const { onMouseLeave, onFocus, onReplace } = this.props;
@@ -453,6 +455,7 @@ export default connect(
 			order: getBlockIndex( state, ownProps.uid ),
 			meta: getEditedPostAttribute( state, 'meta' ),
 			mode: getBlockMode( state, ownProps.uid ),
+			annotations: getAnnotationsForBlock( state, ownProps.uid ),
 		};
 	},
 	( dispatch, ownProps ) => ( {

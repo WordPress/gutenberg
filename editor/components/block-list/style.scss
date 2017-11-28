@@ -91,6 +91,10 @@
 		background: $blue-medium-highlight;
 	}
 
+	&.is-fully-annotated {
+		outline: 1px solid red;
+	}
+
 	.iframe-overlay {
 		position: relative;
 	}
