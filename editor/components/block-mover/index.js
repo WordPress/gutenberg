@@ -103,7 +103,7 @@ export default flow(
 		const { templateLock } = settings;
 
 		return {
-			isLocked: true === templateLock,
+			isLocked: templateLock === 'all',
 		};
 	} ),
 )( BlockMover );
