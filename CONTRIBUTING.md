@@ -12,8 +12,35 @@ Ideally name your branches with prefixes and descriptions, like this: `[type]/[c
 
 For example, `add/foo-module` means you're working on adding a new foo module.
 
-You can pick among all the <a href="https://github.com/WordPress/packages/issues">tickets</a>, or some of the ones labelled <a href="https://github.com/WordPress/packages/labels/Good%20First%20Task">Good First Task</a>.
+You can pick among all the <a href="https://github.com/WordPress/packages/issues">issues</a>, or some of the ones labelled <a href="https://github.com/WordPress/packages/labels/Good%20First%20Issue">Good First Issue</a>.
 
+## Developing
+
+Packages is built for Node 6 and up. You can check this with `node -v`.
+
+Make sure that npm is installed with version >= `5.0.0` using `npm -v`.
+
+### Setup
+
+```sh
+$ git clone https://github.com/WordPress/packages.git
+$ cd packages
+$ npm install
+```
+
+### Testing
+
+In order to run the tests:
+
+```sh
+$ npm test
+
+# If you want to watch for changes
+$ npm run test:watch
+
+# If you want to check code coverage
+$ npm run test:coverage
+```
 
 ## Releasing
 

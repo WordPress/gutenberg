@@ -1,34 +1,44 @@
-import createAddHook from './createAddHook';
-import createRemoveHook from './createRemoveHook';
-import createHasHook from './createHasHook';
-import createRunHook from './createRunHook';
-import createCurrentHook from './createCurrentHook';
-import createDoingHook from './createDoingHook';
-import createDidHook from './createDidHook';
+import createHooks from './createHooks';
 
-function createHooks() {
-	const actions = {};
-	const filters = {};
+const {
+	addAction,
+	addFilter,
+	removeAction,
+	removeFilter,
+	hasAction,
+	hasFilter,
+	removeAllActions,
+	removeAllFilters,
+	doAction,
+	applyFilters,
+	currentAction,
+	currentFilter,
+	doingAction,
+	doingFilter,
+	didAction,
+	didFilter,
+	actions,
+	filters,
+} = createHooks();
 
-	return {
-		addAction:        createAddHook( actions ),
-		addFilter:        createAddHook( filters ),
-		removeAction:     createRemoveHook( actions ),
-		removeFilter:     createRemoveHook( filters ),
-		hasAction:        createHasHook( actions ),
-		hasFilter:        createHasHook( filters ),
-		removeAllActions: createRemoveHook( actions, true ),
-		removeAllFilters: createRemoveHook( filters, true ),
-		doAction:         createRunHook( actions ),
-		applyFilters:     createRunHook( filters, true ),
-		currentAction:    createCurrentHook( actions ),
-		currentFilter:    createCurrentHook( filters ),
-		doingAction:      createDoingHook( actions ),
-		doingFilter:      createDoingHook( filters ),
-		didAction:        createDidHook( actions ),
-		didFilter:        createDidHook( filters ),
-		actions:          actions,
-		filters:          filters,
-	};
+export {
+	createHooks,
+	addAction,
+	addFilter,
+	removeAction,
+	removeFilter,
+	hasAction,
+	hasFilter,
+	removeAllActions,
+	removeAllFilters,
+	doAction,
+	applyFilters,
+	currentAction,
+	currentFilter,
+	doingAction,
+	doingFilter,
+	didAction,
+	didFilter,
+	actions,
+	filters,
 };
-export default createHooks;
