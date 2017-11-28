@@ -13,7 +13,7 @@ If a meta box *doesn't* work with in Gutenberg, and updating it to work correctl
 
 ```php
 add_meta_box( 'my-meta-box', 'My Meta Box', 'my_meta_box_callback',
-    null, 'normal', 'high',
+	null, 'normal', 'high',
 	array(
 		'__block_editor_compatible_meta_box' => false,
 	)
@@ -28,7 +28,7 @@ After a meta box is converted to a block, it can be declared as existing for bac
 
 ```php
 add_meta_box( 'my-meta-box', 'My Meta Box', 'my_meta_box_callback',
-    null, 'normal', 'high',
+	null, 'normal', 'high',
 	array(
 		'__back_compat_meta_box' => false,
 	)
