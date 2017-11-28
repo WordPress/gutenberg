@@ -195,10 +195,15 @@ export class InserterMenu extends Component {
 		const blockTypesInfo = blockTypes.map( ( blockType ) => (
 			{ ...blockType, disabled: this.isDisabledBlock( blockType ) }
 		) );
+
 		return (
-			<InserterGroup blockTypes={ blockTypesInfo } labelledBy={ labelledBy }
+			<InserterGroup
+				blockTypes={ blockTypesInfo }
+				labelledBy={ labelledBy }
 				bindReferenceNode={ this.bindReferenceNode }
 				selectBlock={ this.selectBlock }
+				showInsertionPoint={ this.props.showInsertionPoint }
+				hideInsertionPoint={ this.props.hideInsertionPoint }
 			/>
 		);
 	}

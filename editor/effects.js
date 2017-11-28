@@ -268,12 +268,22 @@ export default {
 		dispatch( savePost() );
 	},
 	SETUP_EDITOR( action ) {
-		const { post } = action;
+		const { post, settings } = action;
 		const effects = [];
 
 		// Parse content as blocks
 		if ( post.content.raw ) {
 			effects.push( resetBlocks( parse( post.content.raw ) ) );
+		} else if ( settings.template ) {
+			const blocks = map( settings.template, ( [ name, attributes ] ) => {
+				const block = createBlock( name );
+				block.attributes = {
+					...block.attributes,
+					...attributes,
+				};
+				return block;
+			} );
+			effects.push( resetBlocks( blocks ) );
 		}
 
 		// Resetting post should occur after blocks have been reset, since it's

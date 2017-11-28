@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { map } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -15,8 +20,8 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
 
-const toEditableValue = value => value.map( ( subValue => subValue.children ) );
-const fromEditableValue = value => value.map( ( subValue ) => ( {
+const toEditableValue = value => map( value, ( subValue => subValue.children ) );
+const fromEditableValue = value => map( value, ( subValue ) => ( {
 	children: subValue,
 } ) );
 
@@ -80,7 +85,7 @@ registerBlockType( 'core/pullquote', {
 			<blockquote key="quote" className={ className }>
 				<Editable
 					multiline="p"
-					value={ value && toEditableValue( value ) }
+					value={ toEditableValue( value ) }
 					onChange={
 						( nextValue ) => setAttributes( {
 							value: fromEditableValue( nextValue ),

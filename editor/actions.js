@@ -6,15 +6,17 @@ import { partial, castArray } from 'lodash';
 
 /**
  * Returns an action object used in signalling that editor has initialized with
- * the specified post object.
+ * the specified post object and editor settings.
  *
- * @param  {Object} post Post object
- * @return {Object}      Action object
+ * @param  {Object} post     Post object
+ * @param  {Object} settings Editor settings object
+ * @return {Object}          Action object
  */
-export function setupEditor( post ) {
+export function setupEditor( post, settings ) {
 	return {
 		type: 'SETUP_EDITOR',
 		post,
+		settings,
 	};
 }
 
