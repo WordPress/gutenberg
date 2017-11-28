@@ -19,7 +19,9 @@ const addContainer = function( ariaLive ) {
 		'height: 1px;' +
 		'width: 1px;' +
 		'overflow: hidden;' +
-		'clip: rect( 0 0 0 0 );' +
+		'clip: rect(1px, 1px, 1px, 1px);' +
+		'-webkit-clip-path: inset(50%);' +
+		'clip-path: inset(50%);' +
 		'border: 0;' +
 		'word-wrap: normal !important;'
 	) );
