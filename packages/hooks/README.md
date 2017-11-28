@@ -7,7 +7,7 @@ A lightweight & efficient EventManager for JavaScript in WordPress.
 Install the module
 
 ```bash
-npm install @wordpress/hooks@next --save
+npm install @wordpress/hooks --save
 ```
 
 ### Usage
