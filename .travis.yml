@@ -5,7 +5,6 @@ node_js:
   - '6'
 
 script:
-  - lerna bootstrap && npm run build
   - npm run test:coverage-ci
 
 notifications:
