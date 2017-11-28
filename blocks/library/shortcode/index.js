@@ -31,6 +31,27 @@ registerBlockType( 'core/shortcode', {
 		},
 	},
 
+	transforms: {
+		from: [
+			{
+				type: 'shortcode',
+				// Per "Shortcode names should be all lowercase and use all
+				// letters, but numbers and underscores should work fine too.
+				// Be wary of using hyphens (dashes), you'll be better off not
+				// using them." in https://codex.wordpress.org/Shortcode_API
+				tag: '[a-z0-9_-]+',
+				attributes: {
+					text: {
+						type: 'string',
+						shortcode: ( attrs, { content } ) => {
+							return content;
+						},
+					},
+				},
+			},
+		],
+	},
+
 	supportHTML: false,
 
 	supports: {
