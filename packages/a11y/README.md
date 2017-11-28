@@ -7,7 +7,7 @@ Collection of JS modules for enhancing accessibility.
 Install the module
 
 ```bash
-npm install @wordpress/a11y@next --save
+npm install @wordpress/a11y --save
 ```
 
 ## speak
