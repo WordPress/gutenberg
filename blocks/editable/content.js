@@ -1,27 +1,15 @@
-import { renderToString, createElement } from '@wordpress/element';
-import { domreact } from '@wordpress/utils';
-import { omitBy, last } from 'lodash';
+import { renderToString } from '@wordpress/element';
+import { last } from 'lodash';
+import { childrenToReact } from './tree';
 
-function createTinyMCEElement( type, props, ...children ) {
-	if ( props[ 'data-mce-bogus' ] === 'all' ) {
-		return null;
-	}
+export function nodeListToReact( editor, nodeList ) {
+	const fragment = editor.getDoc().createDocumentFragment();
 
-	if ( props.hasOwnProperty( 'data-mce-bogus' ) ) {
-		return children;
-	}
+	nodeList.forEach( function( node ) {
+		fragment.appendChild( node.cloneNode( true ) );
+	} );
 
-	return createElement(
-		type,
-		omitBy( props, ( value, key ) => key.indexOf( 'data-mce-' ) === 0 ),
-		...children
-	);
-}
-
-function isLinkBoundary( fragment ) {
-	return fragment.childNodes && fragment.childNodes.length === 1 &&
-		fragment.childNodes[ 0 ].nodeName === 'A' && fragment.childNodes[ 0 ].text.length === 1 &&
-		fragment.childNodes[ 0 ].text[ 0 ] === '\uFEFF';
+	return childrenToReact( editor.serializer.serialize( fragment, { format: 'tree' } ) );
 }
 
 function splitResult( before, after ) {
@@ -38,7 +26,7 @@ export function setContent( editor, content ) {
 }
 
 export function getContent( editor ) {
-	return domreact.nodeListToReact( editor.getBody().childNodes || [], createTinyMCEElement );
+	return childrenToReact( editor.getContent( { format: 'tree' } ) );
 }
 
 export function getSplitAtLine( editor ) {
@@ -46,7 +34,7 @@ export function getSplitAtLine( editor ) {
 	const selectedNode = editor.selection.getNode();
 
 	if ( selectedNode.parentNode !== rootNode ) {
-		return;
+		return null;
 	}
 
 	const dom = editor.dom;
@@ -59,8 +47,8 @@ export function getSplitAtLine( editor ) {
 	const index = dom.nodeIndex( selectedNode );
 	const beforeNodes = childNodes.slice( 0, index );
 	const afterNodes = childNodes.slice( index + 1 );
-	const beforeElement = domreact.nodeListToReact( beforeNodes, createTinyMCEElement );
-	const afterElement = domreact.nodeListToReact( afterNodes, createTinyMCEElement );
+	const beforeElement = nodeListToReact( editor, beforeNodes );
+	const afterElement = nodeListToReact( editor, afterNodes );
 
 	return splitResult( beforeElement, afterElement );
 }
@@ -81,8 +69,8 @@ export function splitAtCaret( editor ) {
 	const beforeFragment = beforeRange.cloneContents();
 	const afterFragment = afterRange.cloneContents();
 
-	const beforeElement = domreact.nodeListToReact( beforeFragment.childNodes, createTinyMCEElement );
-	const afterElement = isLinkBoundary( afterFragment ) ? [] : domreact.nodeListToReact( afterFragment.childNodes, createTinyMCEElement );
+	const beforeElement = nodeListToReact( editor, beforeFragment.childNodes );
+	const afterElement = nodeListToReact( editor, afterFragment.childNodes );
 
 	return splitResult( beforeElement, afterElement );
 }
@@ -122,8 +110,8 @@ export function splitAtBlock( editor ) {
 		return memo;
 	}, [] );
 
-	const beforeElement = domreact.nodeListToReact( before, createTinyMCEElement );
-	const afterElement = domreact.nodeListToReact( after, createTinyMCEElement );
+	const beforeElement = nodeListToReact( editor, before );
+	const afterElement = nodeListToReact( editor, after );
 
 	return splitResult( beforeElement, afterElement );
 }
