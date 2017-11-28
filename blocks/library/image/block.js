@@ -118,7 +118,7 @@ class ImageBlock extends Component {
 		const uploadButtonProps = { isLarge: true };
 		const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setAttributes );
 		const dropFiles = ( files ) => mediaUpload( files, setAttributes );
-		
+
 		const blockDescription = (
 			<BlockDescription>
 				<p>{ __( 'Worth a thousand words.' ) }</p>
