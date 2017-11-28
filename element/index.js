@@ -5,6 +5,7 @@ import { createElement, Component, cloneElement, Children } from 'react';
 import { render, findDOMNode, createPortal, unmountComponentAtNode } from 'react-dom';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { isString } from 'lodash';
+import createClass from 'create-react-class';
 
 /**
  * Returns a new element of given type. Type can be either a string tag name or
@@ -18,6 +19,13 @@ import { isString } from 'lodash';
  * @return {WPElement}                   Element
  */
 export { createElement };
+
+/**
+ * Creates and returns a component class (Refs, state and lifecycle methods).
+ *
+ * For cases when ES6 is not available yet. Using Component is preferred.
+ */
+export { createClass };
 
 /**
  * Renders a given element into the target DOM node.

@@ -16,6 +16,7 @@
     "@wordpress/url": "0.1.0-beta.1",
     "classnames": "2.2.5",
     "clipboard": "1.7.1",
+    "create-react-class": "15.6.2",
     "dom-react": "2.2.0",
     "dom-scroll-into-view": "1.2.1",
     "element-closest": "2.0.2",
