@@ -181,11 +181,11 @@ input[type="text"].components-form-token-field__input {
 	cursor: pointer;
 
 	&.is-selected {
-		background: $blue-medium-500;
+		background: $blue-dark-900;
 		color: $white;
 	}
 }
 
 .components-form-token-field__suggestion-match {
-	color: $dark-gray-800;
+	text-decoration: underline;
 }
