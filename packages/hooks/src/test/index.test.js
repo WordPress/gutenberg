@@ -147,14 +147,7 @@ test( 'cannot add filters with empty-string namespaces', () => {
 test( 'cannot add filters with invalid namespaces', () => {
 	addFilter( 'hook_name', 'invalid_%&name', () => null );
 	expect( console.error ).toHaveBeenCalledWith(
-		'The namespace can only contain numbers, letters, dashes, periods and underscores.'
-	);
-} );
-
-test( 'cannot add filters with namespaces missing a functionDescription', () => {
-	addFilter( 'hook_name', 'invalid_name/', () => null );
-	expect( console.error ).toHaveBeenCalledWith(
-		'The namespace can only contain numbers, letters, dashes, periods and underscores.'
+		'The namespace can only contain numbers, letters, dashes, periods, underscores and slashes.'
 	);
 } );
 
@@ -164,7 +157,17 @@ test( 'Can add filters with dashes in namespaces', () => {
 } );
 
 test( 'Can add filters with capitals in namespaces', () => {
-	addFilter( 'hook_name', 'my_name-OhNoaction', () => null );
+	addFilter( 'hook_name', 'My_Name-OhNoaction', () => null );
+	expect( console.error ).toHaveBeenCalledTimes( 0 );
+} );
+
+test( 'Can add filters with slashes in namespaces', () => {
+	addFilter( 'hook_name', 'my/name/action', () => null );
+	expect( console.error ).toHaveBeenCalledTimes( 0 );
+} );
+
+test( 'Can add filters with periods in namespaces', () => {
+	addFilter( 'hook_name', 'my.name.action', () => null );
 	expect( console.error ).toHaveBeenCalledTimes( 0 );
 } );
 
@@ -186,7 +189,14 @@ test( 'Can add filters with periods in hookName', () => {
 test( 'cannot add filters with invalid namespaces', () => {
 	addFilter( 'hook_name', '/invalid_name', () => null );
 	expect( console.error ).toHaveBeenCalledWith(
-		'The namespace can only contain numbers, letters, dashes, periods and underscores.'
+		'The namespace can only contain numbers, letters, dashes, periods, underscores and slashes.'
+	);
+} );
+
+test( 'cannot add filters with namespace containing backslash', () => {
+	addFilter( 'hook_name', 'i\n\v\a\l\i\d\n\a\m\e', () => null );
+	expect( console.error ).toHaveBeenCalledWith(
+		'The namespace can only contain numbers, letters, dashes, periods, underscores and slashes.'
 	);
 } );
 

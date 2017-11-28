@@ -13,8 +13,8 @@ function validateNamespace( namespace ) {
 		return false;
 	}
 
-	if ( ! /^[a-zA-Z][a-zA-Z0-9_.\-]*$/.test( namespace ) ) {
-		console.error( 'The namespace can only contain numbers, letters, dashes, periods and underscores.' );
+	if ( ! /^[a-zA-Z][a-zA-Z0-9_.\-\/]*$/.test( namespace ) ) {
+		console.error( 'The namespace can only contain numbers, letters, dashes, periods, underscores and slashes.' );
 		return false;
 	}
 
