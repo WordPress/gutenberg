@@ -3,7 +3,7 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
-import { get, partial, reduce, size, flow } from 'lodash';
+import { get, partial, reduce, size } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,9 +11,8 @@ import { get, partial, reduce, size, flow } from 'lodash';
 import { Component, compose, createElement } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
 import { getBlockType, BlockEdit, getBlockDefaultClassname, createBlock, hasBlockSupport } from '@wordpress/blocks';
-import { withFilters } from '@wordpress/components';
+import { withFilters, withContext } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { withContext } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -525,14 +524,14 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 	},
 } );
 
-export default flow(
+export default compose(
 	withFilters( 'Editor.BlockItem' ),
 	connect( mapStateToProps, mapDispatchToProps ),
 	withContext( 'editor' )( ( settings ) => {
 		const { templateLock } = settings;
 
 		return {
-			isLocked: true === templateLock,
+			isLocked: !! templateLock,
 		};
 	} ),
 )( BlockListBlock );

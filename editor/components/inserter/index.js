@@ -132,7 +132,7 @@ export default flowRight( [
 
 		return {
 			hasSupportedBlocks: true === blockTypes || ! isEmpty( blockTypes ),
-			isLocked: true === templateLock,
+			isLocked: !! templateLock,
 		};
 	} ),
 ] )( Inserter );
