@@ -14,14 +14,13 @@ import {
 	defer,
 	noop,
 } from 'lodash';
-import { nodeListToReact } from 'dom-react';
 import 'element-closest';
 
 /**
  * WordPress dependencies
  */
 import { createElement, Component, renderToString } from '@wordpress/element';
-import { keycodes, createBlobURL } from '@wordpress/utils';
+import { keycodes, createBlobURL, domreact } from '@wordpress/utils';
 import { Slot, Fill } from '@wordpress/components';
 
 /**
@@ -543,8 +542,8 @@ export default class Editable extends Component {
 				const index = dom.nodeIndex( selectedNode );
 				const beforeNodes = childNodes.slice( 0, index );
 				const afterNodes = childNodes.slice( index + 1 );
-				const beforeElement = nodeListToReact( beforeNodes, createTinyMCEElement );
-				const afterElement = nodeListToReact( afterNodes, createTinyMCEElement );
+				const beforeElement = domreact.nodeListToReact( beforeNodes, createTinyMCEElement );
+				const afterElement = domreact.nodeListToReact( afterNodes, createTinyMCEElement );
 
 				this.setContent( beforeElement );
 				this.props.onSplit( beforeElement, afterElement );
@@ -597,8 +596,8 @@ export default class Editable extends Component {
 			const beforeFragment = beforeRange.extractContents();
 			const afterFragment = afterRange.extractContents();
 
-			const beforeElement = nodeListToReact( beforeFragment.childNodes, createTinyMCEElement );
-			const afterElement = isLinkBoundary( afterFragment ) ? [] : nodeListToReact( afterFragment.childNodes, createTinyMCEElement );
+			const beforeElement = domreact.nodeListToReact( beforeFragment.childNodes, createTinyMCEElement );
+			const afterElement = isLinkBoundary( afterFragment ) ? [] : domreact.nodeListToReact( afterFragment.childNodes, createTinyMCEElement );
 
 			this.setContent( beforeElement );
 			this.props.onSplit( beforeElement, afterElement, ...blocks );
@@ -651,8 +650,8 @@ export default class Editable extends Component {
 		this.setContent( this.props.value );
 
 		this.props.onSplit(
-			nodeListToReact( before, createTinyMCEElement ),
-			nodeListToReact( after, createTinyMCEElement )
+			domreact.nodeListToReact( before, createTinyMCEElement ),
+			domreact.nodeListToReact( after, createTinyMCEElement )
 		);
 	}
 
@@ -692,7 +691,7 @@ export default class Editable extends Component {
 	}
 
 	getContent() {
-		return nodeListToReact( this.editor.getBody().childNodes || [], createTinyMCEElement );
+		return domreact.nodeListToReact( this.editor.getBody().childNodes || [], createTinyMCEElement );
 	}
 
 	updateFocus() {

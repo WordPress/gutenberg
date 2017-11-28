@@ -6,7 +6,7 @@ import { createElement } from '@wordpress/element';
 /**
  * External dependencies
  */
-import { nodeListToReact, nodeToReact } from 'dom-react';
+import { domreact } from '@wordpress/utils';
 export { attr, prop, html, text, query } from 'hpq';
 
 export const children = ( selector ) => {
@@ -18,7 +18,7 @@ export const children = ( selector ) => {
 		}
 
 		if ( match ) {
-			return nodeListToReact( match.childNodes || [], createElement );
+			return domreact.nodeListToReact( match.childNodes || [], createElement );
 		}
 
 		return [];
@@ -33,6 +33,6 @@ export const node = ( selector ) => {
 			match = domNode.querySelector( selector );
 		}
 
-		return nodeToReact( match, createElement );
+		return domreact.nodeToReact( match, createElement );
 	};
 };
