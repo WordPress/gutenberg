@@ -25,6 +25,11 @@ body.gutenberg-editor-page {
 	svg {
 		fill: currentColor;
 	}
+
+	ul#adminmenu a.wp-has-current-submenu:after,
+	ul#adminmenu>li.current>a.current:after {
+		border-right-color: $white;
+	}
 }
 
 .gutenberg {
