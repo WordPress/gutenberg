@@ -15,9 +15,11 @@ module.exports.run = ( config, driver ) => {
 			// click the blocks tab
 			findElementWithText( driver, 'button.editor-inserter__tab', 'Blocks' ).click();
 			// get a list of all the blocks
-			const blockTitles = promise.filter( driver.findElements( By.css( 'button.editor-inserter__block[role="menuitem"]' ) ).then( ( buttons ) => {
-				return promise.map( buttons, ( button ) => button.getText() );
-			} ), ( title ) => ignoreBlocks.indexOf( title ) === -1 );
+			const blockTitles = promise.filter(
+				promise.map(
+					driver.findElements( By.css( 'button.editor-inserter__block[role="menuitem"]' ) ),
+					( button ) => button.getText() ),
+				( title ) => ignoreBlocks.indexOf( title ) === -1 );
 			// close the menu
 			driver.switchTo().activeElement().sendKeys( Key.ESCAPE );
 			// generate tests
