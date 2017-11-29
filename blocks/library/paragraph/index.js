@@ -268,15 +268,13 @@ registerBlockType( 'core/paragraph', {
 	edit: ParagraphBlock,
 
 	save( { attributes } ) {
-		const { width, align, content, dropCap, backgroundColor, textColor, fontSize } = attributes;
+		const { width, align, content, dropCap, backgroundColor, fontSize } = attributes;
 		const className = classnames( {
 			[ `align${ width }` ]: width,
 			'has-background': backgroundColor,
 			'has-drop-cap': dropCap,
 		} );
 		const styles = {
-			backgroundColor: backgroundColor,
-			color: textColor,
 			fontSize: fontSize,
 			textAlign: align,
 		};
