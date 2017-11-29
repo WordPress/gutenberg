@@ -5,7 +5,8 @@
             "url": "https://cloudup.com/"
         },
         "innerBlocks": [],
-        "innerHTML": "\n<figure class=\"wp-block-embed-cloudup\">\n    https://cloudup.com/\n    <figcaption>Embedded content from cloudup</figcaption>\n</figure>\n"
+        "innerHTML": "\n<figure class=\"wp-block-embed-cloudup\">\n    https://cloudup.com/\n    <figcaption>Embedded content from cloudup</figcaption>\n</figure>\n",
+        "outerHTML": "<!-- wp:core-embed/cloudup {\"url\":\"https://cloudup.com/\"} -->\n<figure class=\"wp-block-embed-cloudup\">\n    https://cloudup.com/\n    <figcaption>Embedded content from cloudup</figcaption>\n</figure>\n<!-- /wp:core-embed/cloudup -->"
     },
     {
         "attrs": {},

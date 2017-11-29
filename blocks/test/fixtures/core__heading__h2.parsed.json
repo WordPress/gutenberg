@@ -3,7 +3,8 @@
         "blockName": "core/heading",
         "attrs": null,
         "innerBlocks": [],
-        "innerHTML": "\n<h2>A picture is worth a thousand words, or so the saying goes</h2>\n"
+        "innerHTML": "\n<h2>A picture is worth a thousand words, or so the saying goes</h2>\n",
+        "outerHTML": "<!-- wp:core/heading -->\n<h2>A picture is worth a thousand words, or so the saying goes</h2>\n<!-- /wp:core/heading -->"
     },
     {
         "attrs": {},

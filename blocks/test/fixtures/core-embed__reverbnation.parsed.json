@@ -5,7 +5,8 @@
             "url": "https://reverbnation.com/"
         },
         "innerBlocks": [],
-        "innerHTML": "\n<figure class=\"wp-block-embed-reverbnation\">\n    https://reverbnation.com/\n    <figcaption>Embedded content from reverbnation</figcaption>\n</figure>\n"
+        "innerHTML": "\n<figure class=\"wp-block-embed-reverbnation\">\n    https://reverbnation.com/\n    <figcaption>Embedded content from reverbnation</figcaption>\n</figure>\n",
+        "outerHTML": "<!-- wp:core-embed/reverbnation {\"url\":\"https://reverbnation.com/\"} -->\n<figure class=\"wp-block-embed-reverbnation\">\n    https://reverbnation.com/\n    <figcaption>Embedded content from reverbnation</figcaption>\n</figure>\n<!-- /wp:core-embed/reverbnation -->"
     },
     {
         "attrs": {},

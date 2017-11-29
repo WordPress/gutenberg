@@ -5,7 +5,8 @@
             "url": "https://slideshare.com/"
         },
         "innerBlocks": [],
-        "innerHTML": "\n<figure class=\"wp-block-embed-slideshare\">\n    https://slideshare.com/\n    <figcaption>Embedded content from slideshare</figcaption>\n</figure>\n"
+        "innerHTML": "\n<figure class=\"wp-block-embed-slideshare\">\n    https://slideshare.com/\n    <figcaption>Embedded content from slideshare</figcaption>\n</figure>\n",
+        "outerHTML": "<!-- wp:core-embed/slideshare {\"url\":\"https://slideshare.com/\"} -->\n<figure class=\"wp-block-embed-slideshare\">\n    https://slideshare.com/\n    <figcaption>Embedded content from slideshare</figcaption>\n</figure>\n<!-- /wp:core-embed/slideshare -->"
     },
     {
         "attrs": {},

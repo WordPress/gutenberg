@@ -5,7 +5,8 @@
             "url": "https://youtube.com/"
         },
         "innerBlocks": [],
-        "innerHTML": "\n<figure class=\"wp-block-embed-youtube\">\n    https://youtube.com/\n    <figcaption>Embedded content from youtube</figcaption>\n</figure>\n"
+        "innerHTML": "\n<figure class=\"wp-block-embed-youtube\">\n    https://youtube.com/\n    <figcaption>Embedded content from youtube</figcaption>\n</figure>\n",
+        "outerHTML": "<!-- wp:core-embed/youtube {\"url\":\"https://youtube.com/\"} -->\n<figure class=\"wp-block-embed-youtube\">\n    https://youtube.com/\n    <figcaption>Embedded content from youtube</figcaption>\n</figure>\n<!-- /wp:core-embed/youtube -->"
     },
     {
         "attrs": {},

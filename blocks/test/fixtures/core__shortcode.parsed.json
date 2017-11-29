@@ -3,7 +3,8 @@
         "blockName": "core/shortcode",
         "attrs": null,
         "innerBlocks": [],
-        "innerHTML": "\n[gallery ids=\"238,338\"]\n"
+        "innerHTML": "\n[gallery ids=\"238,338\"]\n",
+        "outerHTML": "<!-- wp:core/shortcode -->\n[gallery ids=\"238,338\"]\n<!-- /wp:core/shortcode -->"
     },
     {
         "attrs": {},

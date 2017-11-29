@@ -5,7 +5,8 @@
             "customText": "Continue Reading",
             "noTeaser": true
         },
-        "innerHTML": ""
+        "innerHTML": "",
+        "outerHTML": "<!--more Continue Reading-->\n<!--noteaser-->"
     },
     {
         "attrs": {},

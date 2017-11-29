@@ -5,7 +5,8 @@
             "url": "https://spotify.com/"
         },
         "innerBlocks": [],
-        "innerHTML": "\n<figure class=\"wp-block-embed-spotify\">\n    https://spotify.com/\n    <figcaption>Embedded content from spotify</figcaption>\n</figure>\n"
+        "innerHTML": "\n<figure class=\"wp-block-embed-spotify\">\n    https://spotify.com/\n    <figcaption>Embedded content from spotify</figcaption>\n</figure>\n",
+        "outerHTML": "<!-- wp:core-embed/spotify {\"url\":\"https://spotify.com/\"} -->\n<figure class=\"wp-block-embed-spotify\">\n    https://spotify.com/\n    <figcaption>Embedded content from spotify</figcaption>\n</figure>\n<!-- /wp:core-embed/spotify -->"
     },
     {
         "attrs": {},

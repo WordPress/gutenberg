@@ -5,7 +5,8 @@
             "url": "https://hulu.com/"
         },
         "innerBlocks": [],
-        "innerHTML": "\n<figure class=\"wp-block-embed-hulu\">\n    https://hulu.com/\n    <figcaption>Embedded content from hulu</figcaption>\n</figure>\n"
+        "innerHTML": "\n<figure class=\"wp-block-embed-hulu\">\n    https://hulu.com/\n    <figcaption>Embedded content from hulu</figcaption>\n</figure>\n",
+        "outerHTML": "<!-- wp:core-embed/hulu {\"url\":\"https://hulu.com/\"} -->\n<figure class=\"wp-block-embed-hulu\">\n    https://hulu.com/\n    <figcaption>Embedded content from hulu</figcaption>\n</figure>\n<!-- /wp:core-embed/hulu -->"
     },
     {
         "attrs": {},

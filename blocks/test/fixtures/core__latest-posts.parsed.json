@@ -6,7 +6,8 @@
             "displayPostDate": false
         },
         "innerBlocks": [],
-        "innerHTML": ""
+        "innerHTML": "",
+        "outerHTML": "<!-- wp:core/latest-posts {\"postsToShow\":5,\"displayPostDate\":false} /-->"
     },
     {
         "attrs": {},

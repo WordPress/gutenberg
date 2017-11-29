@@ -5,7 +5,8 @@
             "url": "https://speaker.com/"
         },
         "innerBlocks": [],
-        "innerHTML": "\n<figure class=\"wp-block-embed-speaker\">\n    https://speaker.com/\n    <figcaption>Embedded content from speaker</figcaption>\n</figure>\n"
+        "innerHTML": "\n<figure class=\"wp-block-embed-speaker\">\n    https://speaker.com/\n    <figcaption>Embedded content from speaker</figcaption>\n</figure>\n",
+        "outerHTML": "<!-- wp:core-embed/speaker {\"url\":\"https://speaker.com/\"} -->\n<figure class=\"wp-block-embed-speaker\">\n    https://speaker.com/\n    <figcaption>Embedded content from speaker</figcaption>\n</figure>\n<!-- /wp:core-embed/speaker -->"
     },
     {
         "attrs": {},

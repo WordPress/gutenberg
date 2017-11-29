@@ -5,7 +5,8 @@
             "url": "https://smugmug.com/"
         },
         "innerBlocks": [],
-        "innerHTML": "\n<figure class=\"wp-block-embed-smugmug\">\n    https://smugmug.com/\n    <figcaption>Embedded content from smugmug</figcaption>\n</figure>\n"
+        "innerHTML": "\n<figure class=\"wp-block-embed-smugmug\">\n    https://smugmug.com/\n    <figcaption>Embedded content from smugmug</figcaption>\n</figure>\n",
+        "outerHTML": "<!-- wp:core-embed/smugmug {\"url\":\"https://smugmug.com/\"} -->\n<figure class=\"wp-block-embed-smugmug\">\n    https://smugmug.com/\n    <figcaption>Embedded content from smugmug</figcaption>\n</figure>\n<!-- /wp:core-embed/smugmug -->"
     },
     {
         "attrs": {},

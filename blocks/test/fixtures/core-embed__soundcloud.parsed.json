@@ -5,7 +5,8 @@
             "url": "https://soundcloud.com/"
         },
         "innerBlocks": [],
-        "innerHTML": "\n<figure class=\"wp-block-embed-soundcloud\">\n    https://soundcloud.com/\n    <figcaption>Embedded content from soundcloud</figcaption>\n</figure>\n"
+        "innerHTML": "\n<figure class=\"wp-block-embed-soundcloud\">\n    https://soundcloud.com/\n    <figcaption>Embedded content from soundcloud</figcaption>\n</figure>\n",
+        "outerHTML": "<!-- wp:core-embed/soundcloud {\"url\":\"https://soundcloud.com/\"} -->\n<figure class=\"wp-block-embed-soundcloud\">\n    https://soundcloud.com/\n    <figcaption>Embedded content from soundcloud</figcaption>\n</figure>\n<!-- /wp:core-embed/soundcloud -->"
     },
     {
         "attrs": {},

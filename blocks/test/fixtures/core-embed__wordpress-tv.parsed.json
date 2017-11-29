@@ -5,7 +5,8 @@
             "url": "https://wordpress.tv/"
         },
         "innerBlocks": [],
-        "innerHTML": "\n<figure class=\"wp-block-embed-wordpress-tv\">\n    https://wordpress.tv/\n    <figcaption>Embedded content from wordpress-tv</figcaption>\n</figure>\n"
+        "innerHTML": "\n<figure class=\"wp-block-embed-wordpress-tv\">\n    https://wordpress.tv/\n    <figcaption>Embedded content from wordpress-tv</figcaption>\n</figure>\n",
+        "outerHTML": "<!-- wp:core-embed/wordpress-tv {\"url\":\"https://wordpress.tv/\"} -->\n<figure class=\"wp-block-embed-wordpress-tv\">\n    https://wordpress.tv/\n    <figcaption>Embedded content from wordpress-tv</figcaption>\n</figure>\n<!-- /wp:core-embed/wordpress-tv -->"
     },
     {
         "attrs": {},
