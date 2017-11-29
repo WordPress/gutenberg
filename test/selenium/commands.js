@@ -86,7 +86,9 @@ function newPost( config, driver ) {
 module.exports.newPost = newPost;
 
 function actionNewPost( config, driver ) {
-	return () => {
+	return function() {
+		// the initial load after server start can be slow so a 5 second timeout is too small
+		this.timeout( 10000 );
 		newPost( config, driver );
 		return driver;
 	};
