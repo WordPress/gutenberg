@@ -39,29 +39,32 @@ export function addAttribute( settings ) {
  * Override the default edit UI to include a new block inspector control for
  * assigning the anchor ID, if block supports anchor
  *
- * @param  {Element} element Original edit element
+ * @param  {Element} elements Original edit element
  * @param  {Object}  props   Props passed to BlockEdit
  * @return {Element}         Filtered edit element
  */
-export function addInspectorControl( element, props ) {
+export function addInspectorControl( { edit, fragments }, props ) {
 	if ( hasBlockSupport( props.name, 'customClassName', true ) && props.focus ) {
-		element = [
-			element,
-			<InspectorControls key="inspector-custom-class-name">
-				<InspectorControls.TextControl
-					label={ __( 'Additional CSS Class' ) }
-					value={ props.attributes.className || '' }
-					onChange={ ( nextValue ) => {
-						props.setAttributes( {
-							className: nextValue,
-						} );
-					} }
-				/>
-			</InspectorControls>,
-		];
+		return {
+			edit,
+			fragments: [
+				...fragments,
+				<InspectorControls key="inspector-custom-class-name">
+					<InspectorControls.TextControl
+						label={ __( 'Additional CSS Class' ) }
+						value={ props.attributes.className || '' }
+						onChange={ ( nextValue ) => {
+							props.setAttributes( {
+								className: nextValue,
+							} );
+						} }
+					/>
+				</InspectorControls>,
+			],
+		};
 	}
 
-	return element;
+	return { edit, fragments };
 }
 
 /**

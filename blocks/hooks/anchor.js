@@ -48,31 +48,34 @@ export function addAttribute( settings ) {
  * Override the default edit UI to include a new block inspector control for
  * assigning the anchor ID, if block supports anchor
  *
- * @param  {Element} element Original edit element
+ * @param  {Element} edit Original edit element
  * @param  {Object}  props   Props passed to BlockEdit
  * @return {Element}         Filtered edit element
  */
-export function addInspectorControl( element, props ) {
+export function addInspectorControl( { edit, fragments }, props ) {
 	if ( hasBlockSupport( props.name, 'anchor' ) && props.focus ) {
-		element = [
-			element,
-			<InspectorControls key="inspector-anchor">
-				<InspectorControls.TextControl
-					label={ __( 'HTML Anchor' ) }
-					help={ __( 'Anchors lets you link directly to a section on a page.' ) }
-					value={ props.attributes.anchor || '' }
-					onChange={ ( nextValue ) => {
-						nextValue = nextValue.replace( ANCHOR_REGEX, '-' );
+		return {
+			edit,
+			fragments: [
+				...fragments,
+				<InspectorControls key="inspector-anchor">
+					<InspectorControls.TextControl
+						label={ __( 'HTML Anchor' ) }
+						help={ __( 'Anchors lets you link directly to a section on a page.' ) }
+						value={ props.attributes.anchor || '' }
+						onChange={ ( nextValue ) => {
+							nextValue = nextValue.replace( ANCHOR_REGEX, '-' );
 
-						props.setAttributes( {
-							anchor: nextValue,
-						} );
-					} } />
-			</InspectorControls>,
-		];
+							props.setAttributes( {
+								anchor: nextValue,
+							} );
+						} } />
+				</InspectorControls>,
+			],
+		};
 	}
 
-	return element;
+	return { edit, fragments };
 }
 
 /**
