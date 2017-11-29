@@ -24,6 +24,7 @@ import {
 export function PublishButtonLabel( {
 	isPublished,
 	isBeingScheduled,
+	isSaving,
 	isPublishing,
 	user,
 } ) {
@@ -31,6 +32,8 @@ export function PublishButtonLabel( {
 
 	if ( isPublishing ) {
 		return __( 'Publishing…' );
+	} else if ( isPublished && isSaving ) {
+		return __( 'Updating…' );
 	}
 
 	if ( isContributor ) {
@@ -49,7 +52,6 @@ const applyConnect = connect(
 		isPublished: isCurrentPostPublished( state ),
 		isBeingScheduled: isEditedPostBeingScheduled( state ),
 		isSaving: isSavingPost( state ),
-		// Need a selector
 		isPublishing: isPublishingPost( state ),
 	} )
 );
