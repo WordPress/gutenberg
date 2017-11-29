@@ -1,6 +1,6 @@
 {
   "name": "@wordpress/a11y",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Collection of JS modules and tools for WordPress development",
   "homepage": "https://github.com/WordPress/packages/tree/master/packages/a11y/README.md",
   "author": "WordPress",
