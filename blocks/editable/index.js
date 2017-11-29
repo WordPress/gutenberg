@@ -700,6 +700,12 @@ export default class Editable extends Component {
 	}
 
 	updateFocus() {
+		// We can't update focus if the editor hasn't finished initializing.
+		// Initialization callback `onInit` will call this function anyways.
+		if ( ! this.editor ) {
+			return;
+		}
+
 		const { focus } = this.props;
 		const isActive = this.isActive();
 
