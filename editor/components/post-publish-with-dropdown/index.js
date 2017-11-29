@@ -22,7 +22,9 @@ import {
 } from '../../selectors';
 
 function PostPublishWithDropdown( { isSaving, isPublishable, isSaveable, isPublished } ) {
-	const isButtonEnabled = ! isSaving && isPublishable && isSaveable;
+	const isButtonEnabled = (
+		! isSaving && isPublishable && isSaveable
+	) || isPublished;
 
 	return (
 		<Dropdown

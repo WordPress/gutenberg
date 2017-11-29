@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, map, filter, some, castArray } from 'lodash';
+import { get, includes, map, filter, some, castArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -104,25 +104,37 @@ export default {
 		const { dispatch, getState } = store;
 
 		const publishStatus = [ 'publish', 'private', 'future' ];
-		const isPublished = publishStatus.indexOf( previousPost.status ) !== -1;
-		const messages = {
-			publish: __( 'Post published!' ),
-			private: __( 'Post published privately!' ),
-			future: __( 'Post scheduled!' ),
-		};
+		const isPublished = includes( publishStatus, previousPost.status );
+		const willPublish = includes( publishStatus, post.status );
 
-		// If we save a non published post, we don't show any notice
-		// If we publish/schedule a post, we show the corresponding publish message
-		// Unless we show an update notice
-		if ( isPublished || publishStatus.indexOf( post.status ) !== -1 ) {
-			const noticeMessage = ! isPublished && publishStatus.indexOf( post.status ) !== -1 ?
-				messages[ post.status ] :
-				__( 'Post updated!' );
+		let noticeMessage;
+		let shouldShowLink = true;
+		if ( ! isPublished && ! willPublish ) {
+			// If saving a non published post, don't show any notice
+			noticeMessage = null;
+		} else if ( isPublished && ! willPublish ) {
+			// If undoing publish status, show specific notice
+			noticeMessage = __( 'Post reverted to draft.' );
+			shouldShowLink = false;
+		} else if ( ! isPublished && willPublish ) {
+			// If publishing or scheduling a post, show the corresponding
+			// publish message
+			noticeMessage = {
+				publish: __( 'Post published!' ),
+				private: __( 'Post published privately!' ),
+				future: __( 'Post scheduled!' ),
+			}[ post.status ];
+		} else {
+			// Generic fallback notice
+			noticeMessage = __( 'Post updated!' );
+		}
+
+		if ( noticeMessage ) {
 			dispatch( createSuccessNotice(
 				<p>
 					<span>{ noticeMessage }</span>
 					{ ' ' }
-					<a href={ post.link }>{ __( 'View post' ) }</a>
+					{ shouldShowLink && <a href={ post.link }>{ __( 'View post' ) }</a> }
 				</p>,
 				{ id: SAVE_POST_NOTICE_ID }
 			) );
