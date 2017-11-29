@@ -88,7 +88,7 @@ registerBlockType( 'core/text-columns', {
 					<div className="wp-block-column" key={ `column-${ index }` }>
 						<Editable
 							tagName="p"
-							value={ content && content[ index ].children }
+							value={ content && content[ index ] && content[ index ].children }
 							onChange={ ( nextContent ) => {
 								setAttributes( {
 									content: [
