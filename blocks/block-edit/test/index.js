@@ -24,7 +24,7 @@ describe( 'BlockEdit', () => {
 	it( 'should return null if block type not defined', () => {
 		const wrapper = shallow( <BlockEdit name="core/test-block" /> );
 
-		expect( wrapper.type() ).toBe( null );
+		expect( wrapper.first().type() ).toBe( null );
 	} );
 
 	it( 'should use edit implementation of block', () => {
@@ -38,7 +38,7 @@ describe( 'BlockEdit', () => {
 
 		const wrapper = shallow( <BlockEdit name="core/test-block" /> );
 
-		expect( wrapper.type() ).toBe( edit );
+		expect( wrapper.first().type() ).toBe( edit );
 	} );
 
 	it( 'should use save implementation of block as fallback', () => {
@@ -51,6 +51,6 @@ describe( 'BlockEdit', () => {
 
 		const wrapper = shallow( <BlockEdit name="core/test-block" /> );
 
-		expect( wrapper.type() ).toBe( save );
+		expect( wrapper.first().type() ).toBe( save );
 	} );
 } );
