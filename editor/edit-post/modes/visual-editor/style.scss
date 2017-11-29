@@ -128,14 +128,7 @@
 .editor-visual-editor .editor-default-block-appender {
 	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );
 	clear: left;
-	margin: 0 auto;
+	margin-left: auto;
+	margin-right: auto;
 	position: relative;
-
-	@include break-small() {
-		padding: 0 $block-mover-padding-visible;
-
-		.editor-default-block-appender__content {
-			padding: 0 $block-padding;
-		}
-	}
 }

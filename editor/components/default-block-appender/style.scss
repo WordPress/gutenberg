@@ -1,5 +1,17 @@
 $empty-paragraph-height: $text-editor-font-size * 4;
 
+.editor-default-block-appender {
+	@include break-small() {
+		padding: 0 ( $block-mover-padding-visible - 1px );	// subtract 1px for border
+		padding: 0 $block-mover-padding-visible;
+
+		.editor-default-block-appender__content {
+			padding: 0 ( $block-padding - 1px );	// subtract 1px for border
+			padding: 0 $block-padding;
+		}
+	}
+}
+
 input[type=text].editor-default-block-appender__content {
 	border: none;
 	background: none;
@@ -7,14 +19,18 @@ input[type=text].editor-default-block-appender__content {
 	display: block;
 	width: 100%;
 	font-size: $editor-font-size;
-	line-height: $editor-line-height;
 	cursor: text;
 	max-width: none;	// fixes a bleed issue from the admin
-
 	height: $empty-paragraph-height;
 	color: $dark-gray-300;
 	outline: 1px solid transparent;
 	transition: 0.2s outline;
+
+	// subtract 1px for border
+	position: relative;
+	top: -1px;
+	left: -1px;
+	margin-bottom: $block-spacing - 1px;
 
 	&:focus, &:hover {
 		outline: 1px solid $light-gray-500;
