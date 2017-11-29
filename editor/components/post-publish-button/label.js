@@ -24,7 +24,6 @@ import {
 export function PublishButtonLabel( {
 	isPublished,
 	isBeingScheduled,
-	isSaving,
 	isPublishing,
 	user,
 } ) {
@@ -32,8 +31,6 @@ export function PublishButtonLabel( {
 
 	if ( isPublishing ) {
 		return __( 'Publishing…' );
-	} else if ( isSaving ) {
-		return __( 'Updating…' );
 	}
 
 	if ( isContributor ) {
