@@ -1,6 +1,4 @@
 .editor-block-list__block[data-type="core/freeform"] .blocks-editable__tinymce {
-	margin-top: $item-spacing;
-
 	p {
 		line-height: $editor-line-height;
 	}
@@ -86,25 +84,26 @@
 	}
 }
 
+// freeform toolbar
 .freeform-toolbar {
 	position: sticky;
 	width: auto;
-	top: $header-height;
-	margin: 0;
-	margin-top: -$block-controls-height;
+	top: -1px;	// stack borders
+	margin-top: -$block-controls-height - 16px;
 	border: 1px solid $light-gray-500;
 	z-index: z-index( '.freeform-toolbar' );
 	background-color: $white;
 	min-height: $block-controls-height;
-
-	@include break-medium() {
-		top: $item-spacing;
-	}
+	margin-bottom: 14px;
 
 	@include break-small() {
 		margin-left: - $block-padding - 1px;
 		margin-right: - $block-padding - 1px;
 	}
+}
+
+.freeform-toolbar.has-advanced-toolbar {
+	margin-top: -89px;	// pull upwards the classic text toolbar when enabled, height is manually entered
 }
 
 // Overwrite inline styles.
@@ -147,10 +146,6 @@
 
 .freeform-toolbar.has-advanced-toolbar .mce-toolbar-grp .mce-toolbar {
 	display: block;
-}
-
-.freeform-toolbar.has-advanced-toolbar {
-	margin-top: -85px;	/* Pull upwards the classic text toolbar when enabled */
 }
 
 .freeform-toolbar div.mce-btn-group {

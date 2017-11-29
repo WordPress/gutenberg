@@ -32,7 +32,7 @@ export function PublishButtonLabel( {
 
 	if ( isPublishing ) {
 		return __( 'Publishing…' );
-	} else if ( isSaving ) {
+	} else if ( isPublished && isSaving ) {
 		return __( 'Updating…' );
 	}
 
@@ -52,7 +52,6 @@ const applyConnect = connect(
 		isPublished: isCurrentPostPublished( state ),
 		isBeingScheduled: isEditedPostBeingScheduled( state ),
 		isSaving: isSavingPost( state ),
-		// Need a selector
 		isPublishing: isPublishingPost( state ),
 	} )
 );

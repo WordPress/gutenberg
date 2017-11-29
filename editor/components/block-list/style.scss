@@ -1,7 +1,6 @@
 .editor-block-list__block {
 	margin-bottom: $block-spacing;
 	position: relative;
-
 	padding: $block-padding;
 
 	@include break-small {
@@ -419,7 +418,7 @@ $sticky-bottom-offset: 20px;
 	text-align: left;
 	pointer-events: none;
 	height: $block-toolbar-height;
-	top: $header-height - 1px;
+	top: -1px;	// stack borders
 
 	.editor-block-toolbar {
 		border: 1px solid $light-gray-500;
@@ -447,10 +446,6 @@ $sticky-bottom-offset: 20px;
 	@include break-small() {
 		margin-left: - $block-padding - 1px;
 		margin-right: - $block-padding - 1px;
-	}
-
-	@include break-medium() {
-		top: $item-spacing;
 	}
 }
 
