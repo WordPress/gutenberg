@@ -1124,3 +1124,8 @@ export function isPublishingPost( state ) {
 	// considered published
 	return !! stateBeforeRequest && ! isCurrentPostPublished( stateBeforeRequest );
 }
+
+export {
+	isBlockFrozenByPeer,
+	isCoeditingEnabled,
+} from './state/coediting';

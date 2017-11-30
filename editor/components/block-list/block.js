@@ -47,6 +47,7 @@ import {
 	getEditedPostAttribute,
 	getNextBlock,
 	getPreviousBlock,
+	isBlockFrozenByPeer,
 	isBlockHovered,
 	isBlockMultiSelected,
 	isBlockSelected,
@@ -355,6 +356,8 @@ class BlockListBlock extends Component {
 			'is-selected': showUI,
 			'is-multi-selected': isMultiSelected,
 			'is-hovered': isHovered,
+			'is-frozen-by-peer': this.props.isFrozenByPeer,
+			'is-green': this.props.isFrozenByPeer,
 		} );
 
 		const { onMouseLeave, onFocus, onReplace } = this.props;
@@ -452,6 +455,7 @@ const mapStateToProps = ( state, { uid } ) => ( {
 	order: getBlockIndex( state, uid ),
 	meta: getEditedPostAttribute( state, 'meta' ),
 	mode: getBlockMode( state, uid ),
+	isFrozenByPeer: isBlockFrozenByPeer( state, uid ),
 } );
 
 const mapDispatchToProps = ( dispatch, ownProps ) => ( {

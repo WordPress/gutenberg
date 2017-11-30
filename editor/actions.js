@@ -503,6 +503,12 @@ export function toggleFeature( feature ) {
 	};
 }
 
+export {
+	clearFrozenBlock,
+	freezeBlock,
+	toggleCoediting,
+} from './state/coediting';
+
 export const createSuccessNotice = partial( createNotice, 'success' );
 export const createInfoNotice = partial( createNotice, 'info' );
 export const createErrorNotice = partial( createNotice, 'error' );

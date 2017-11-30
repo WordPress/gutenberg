@@ -81,6 +81,70 @@
 		background: $blue-medium-highlight;
 	}
 
+	&.is-frozen-by-peer {
+		cursor: not-allowed;
+		pointer-events: none;
+		opacity: 0.8;
+
+		.coediting-legend {
+			float: right;
+			margin-top: -14px;
+			margin-right: -14px;
+			color: #fff;
+			font-size: 12px;
+		}
+
+		&.is-green {
+			&:before {
+				outline: 2px solid $coediting-green;
+				transition: 0.2s outline;
+			}
+			.coediting-legend {
+				background: $coediting-green;
+			}
+		}
+
+		&.is-orange {
+			&:before {
+				outline: 2px solid $coediting-orange;
+				transition: 0.2s outline;
+			}
+			.coediting-legend {
+				background: $coediting-orange;
+			}
+		}
+
+		&.is-purple {
+			&:before {
+				outline: 2px solid $coediting-purple;
+				transition: 0.2s outline;
+			}
+			.coediting-legend {
+				background: $coediting-purple;
+			}
+		}
+
+		&.is-red {
+			&:before {
+				outline: 2px solid $coediting-red;
+				transition: 0.2s outline;
+			}
+			.coediting-legend {
+				background: $coediting-red;
+			}
+		}
+
+		&.is-yellow {
+			&:before {
+				outline: 2px solid $coediting-yellow;
+				transition: 0.2s outline;
+			}
+			.coediting-legend {
+				background: $coediting-yellow;
+			}
+		}
+	}
+
 	// selection style for multiple blocks
 	&.is-multi-selected *::selection {
 		background: transparent;

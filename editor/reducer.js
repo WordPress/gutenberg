@@ -31,6 +31,7 @@ import { getBlockTypes, getBlockType } from '@wordpress/blocks';
 import withHistory from './utils/with-history';
 import withChangeDetection from './utils/with-change-detection';
 import { PREFERENCES_DEFAULTS } from './store-defaults';
+import { reducer as coediting } from './state/coediting';
 
 /***
  * Module constants
@@ -731,4 +732,5 @@ export default optimist( combineReducers( {
 	notices,
 	metaBoxes,
 	reusableBlocks,
+	coediting,
 } ) );
