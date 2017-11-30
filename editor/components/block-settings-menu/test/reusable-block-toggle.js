@@ -28,6 +28,6 @@ describe( 'ReusableBlockToggle', () => {
 		);
 		const text = wrapper.find( 'IconButton' ).first().prop( 'children' );
 
-		expect( text ).toEqual( 'Make into a Reusable Block' );
+		expect( text ).toEqual( 'Convert to Reusable Block' );
 	} );
 } );

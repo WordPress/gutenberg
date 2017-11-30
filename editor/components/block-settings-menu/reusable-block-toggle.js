@@ -25,7 +25,7 @@ export function ReusableBlockToggle( { block, convertToStatic, convertToReusable
 			icon="controls-repeat"
 			onClick={ isReusableBlock ? convertToStatic : convertToReusable }
 		>
-			{ isReusableBlock ? __( 'Detach from Reusable Block' ) : __( 'Make into a Reusable Block' ) }
+			{ isReusableBlock ? __( 'Detach from Reusable Block' ) : __( 'Convert to Reusable Block' ) }
 		</IconButton>
 	);
 }
