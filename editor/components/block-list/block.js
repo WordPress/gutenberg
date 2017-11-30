@@ -41,6 +41,7 @@ import {
 	focusBlock,
 	insertBlocks,
 	mergeBlocks,
+	updateBlock,
 	removeBlock,
 	replaceBlocks,
 	selectBlock,
@@ -486,6 +487,8 @@ export class BlockListBlock extends Component {
 								onReplace={ isLocked ? undefined : onReplace }
 								setFocus={ partial( onFocus, block.uid ) }
 								mergeBlocks={ isLocked ? undefined : this.mergeBlocks }
+								innerBlocks={ block.innerBlocks }
+								setInnerBlocks={ isLocked ? undefined : this.props.setInnerBlocks }
 								id={ block.uid }
 								isSelectionEnabled={ this.props.isSelectionEnabled }
 								toggleSelection={ this.props.toggleSelection }
@@ -588,8 +591,13 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 	onMetaChange( meta ) {
 		dispatch( editPost( { meta } ) );
 	},
+
 	toggleSelection( selectionEnabled ) {
 		dispatch( toggleSelection( selectionEnabled ) );
+	},
+
+	setInnerBlocks( innerBlocks ) {
+		dispatch( updateBlock( ownProps.uid, { innerBlocks } ) );
 	},
 } );
 
