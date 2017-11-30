@@ -337,7 +337,7 @@ export class InserterMenu extends Component {
 				}
 				{ isSearching &&
 					<div role="menu" className="editor-inserter__search-results">
-						{ this.renderCategories( this.getVisibleBlocksByCategory( getBlockTypes() ) ) }
+						{ this.renderCategories( this.getVisibleBlocksByCategory( this.getBlockTypes() ) ) }
 					</div>
 				}
 			</TabbableContainer>
