@@ -23,3 +23,4 @@ import './video';
 import './audio';
 import './reusable-block';
 import './paragraph';
+import './style';

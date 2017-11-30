@@ -163,7 +163,7 @@ export function createBlockWithFallback( name, innerHTML, attributes ) {
 
 	// Include in set only if type were determined.
 	// TODO do we ever expect there to not be an unknown type handler?
-	if ( blockType && ( innerHTML || name !== fallbackBlock ) ) {
+	if ( blockType && ( innerHTML || name !== fallbackBlock ) && ! blockType.isComputedBlock ) {
 		// TODO allow blocks to opt-in to receiving a tree instead of a string.
 		// Gradually convert all blocks to this new format, then remove the
 		// string serialization.

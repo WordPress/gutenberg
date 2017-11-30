@@ -225,7 +225,7 @@ export class InserterMenu extends Component {
 	}
 
 	renderCategories( visibleBlocksByCategory ) {
-		return getCategories().map(
+		return getCategories().filter( category => category.slug !== 'hidden' ).map(
 			( category ) => this.renderCategory( category, visibleBlocksByCategory[ category.slug ] )
 		);
 	}

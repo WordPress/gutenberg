@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, reduce, isObject, castArray, compact, startsWith } from 'lodash';
+import { assign, isEmpty, reduce, isObject, castArray, compact, startsWith, values } from 'lodash';
 import { html as beautifyHtml } from 'js-beautify';
 
 /**
@@ -13,6 +13,7 @@ import { Component, createElement, renderToString, cloneElement, Children } from
  * Internal dependencies
  */
 import { getBlockType, getUnknownTypeHandlerName } from './registration';
+import { createBlock } from './factory';
 import { applyFilters } from '../hooks';
 
 /**
@@ -214,6 +215,27 @@ export function serializeBlock( block ) {
 	}
 }
 
+export function serializeStyles( blocks ) {
+	const customStyles = values( reduce( blocks, ( memo, block ) => {
+		const blockName = block.name;
+		const blockType = getBlockType( blockName );
+		if ( blockType && blockType.saveStyles ) {
+			const { attributes } = block;
+			const blockStyles = blockType.saveStyles( { attributes } );
+			if ( blockStyles ) {
+				return assign( memo, blockStyles );
+			}
+		}
+		return memo;
+	}, {} ) ).join( '' );
+	if ( customStyles ) {
+		return serializeBlock( createBlock( 'core/style', {
+			content: customStyles,
+		} ) ).replace( /\n\n/g, '\n' );
+	}
+	return '';
+}
+
 /**
  * Takes a block or set of blocks and returns the serialized post content.
  *
@@ -221,5 +243,5 @@ export function serializeBlock( block ) {
  * @return {String}        The post content
  */
 export default function serialize( blocks ) {
-	return castArray( blocks ).map( serializeBlock ).join( '\n\n' );
+	return `${ castArray( blocks ).map( serializeBlock ).join( '\n\n' ) }\n${ serializeStyles( blocks ) }`;
 }

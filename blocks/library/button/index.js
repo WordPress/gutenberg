@@ -1,4 +1,8 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -11,6 +15,7 @@ import { Dashicon, IconButton, PanelColor, withFallbackStyles } from '@wordpress
 import './editor.scss';
 import './style.scss';
 import { registerBlockType } from '../../api';
+import { generateClassBackgroundColor, generateClassColor, generateStyleBackgroundColor, generateStyleColor } from '../../style-generator';
 import Editable from '../../editable';
 import UrlInput from '../../url-input';
 import BlockControls from '../../block-controls';
@@ -202,13 +207,25 @@ registerBlockType( 'core/button', {
 
 	save( { attributes } ) {
 		const { url, text, title, align, color, textColor } = attributes;
-
+		const className = classnames( {
+			[ `align${ align }` ]: align,
+			[ generateClassBackgroundColor( color ) ]: color,
+		} );
 		return (
-			<div className={ `align${ align }` } style={ { backgroundColor: color } }>
-				<a href={ url } title={ title } style={ { color: textColor } }>
+			<div className={ className ? className : undefined }>
+				<a href={ url } className={ textColor ? `custom-color ${ generateClassColor( textColor ) }` : undefined } title={ title }>
 					{ text }
 				</a>
 			</div>
 		);
 	},
+
+	saveStyles( { attributes } ) {
+		const { color, textColor } = attributes;
+		return {
+			...generateStyleBackgroundColor( color ),
+			...generateStyleColor( textColor ),
+		};
+	},
+
 } );
