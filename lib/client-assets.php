@@ -778,12 +778,6 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		);
 	}
 
-	// Set initial content to apply autop on unknown blocks, preserving this
-	// behavior for classic content while otherwise disabling for blocks.
-	if ( ! $is_new_post && is_array( $post_to_edit['content'] ) ) {
-		$post_to_edit['content']['raw'] = gutenberg_wpautop_block_content( $post_to_edit['content']['raw'] );
-	}
-
 	// Set the post type name.
 	$post_type = get_post_type( $post );
 
