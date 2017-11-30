@@ -11,6 +11,7 @@ import { createProvider } from 'react-redux';
 import { render, unmountComponentAtNode } from '@wordpress/element';
 import { settings as dateSettings } from '@wordpress/date';
 import { EditorProvider, ErrorBoundary } from '@wordpress/editor';
+import { SlotFillProvider } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -63,7 +64,9 @@ export function reinitializeEditor( target, settings ) {
 		<EditorProvider settings={ settings } recovery>
 			<ErrorBoundary onError={ reboot }>
 				<ReduxProvider store={ store }>
-					<Layout />
+					<SlotFillProvider>
+						<Layout />
+					</SlotFillProvider>
 				</ReduxProvider>
 			</ErrorBoundary>
 		</EditorProvider>,
@@ -92,7 +95,9 @@ export function initializeEditor( id, post, settings ) {
 		<EditorProvider settings={ settings } post={ post }>
 			<ErrorBoundary onError={ reboot }>
 				<ReduxProvider store={ store }>
-					<Layout />
+					<SlotFillProvider>
+						<Layout />
+					</SlotFillProvider>
 				</ReduxProvider>
 			</ErrorBoundary>
 		</EditorProvider>,
