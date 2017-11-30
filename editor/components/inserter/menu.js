@@ -150,8 +150,8 @@ export class InserterMenu extends Component {
 		let predicate;
 		switch ( tab ) {
 			case 'recent':
-				predicate = ( block ) => find( this.props.recentlyUsedBlocks, { name: block.name } );
-				break;
+				return filter( this.props.recentlyUsedBlocks,
+					( { name } ) => find( blockTypes, { name } ) );
 
 			case 'blocks':
 				predicate = ( block ) => block.category !== 'embed';
