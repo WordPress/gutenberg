@@ -1,4 +1,5 @@
 import './shortcode';
+import './columns';
 import './image';
 import './gallery';
 import './heading';
