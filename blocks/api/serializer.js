@@ -31,20 +31,21 @@ export function getBlockDefaultClassname( blockName ) {
  * Given a block type containg a save render implementation and attributes, returns the
  * enhanced element to be saved or string when raw HTML expected.
  *
- * @param {Object} blockType  Block type.
- * @param {Object} attributes Block attributes.
+ * @param {Object} blockType   Block type.
+ * @param {Object} attributes  Block attributes.
+ * @param {?Array} innerBlocks Nested blocks.
  *
- * @returns {Object|string} Save content.
+ * @returns {Object|string} Save element or raw HTML string.
  */
-export function getSaveElement( blockType, attributes ) {
+export function getSaveElement( blockType, attributes, innerBlocks = [] ) {
 	const { save } = blockType;
 
 	let saveElement;
 
 	if ( save.prototype instanceof Component ) {
-		saveElement = createElement( save, { attributes } );
+		saveElement = createElement( save, { attributes, innerBlocks } );
 	} else {
-		saveElement = save( { attributes } );
+		saveElement = save( { attributes, innerBlocks } );
 
 		// Special-case function render implementation to allow raw HTML return
 		if ( 'string' === typeof saveElement ) {
@@ -70,13 +71,14 @@ export function getSaveElement( blockType, attributes ) {
  * Given a block type containg a save render implementation and attributes, returns the
  * static markup to be saved.
  *
- * @param {Object} blockType  Block type.
- * @param {Object} attributes Block attributes.
+ * @param {Object} blockType   Block type.
+ * @param {Object} attributes  Block attributes.
+ * @param {?Array} innerBlocks Nested blocks.
  *
  * @returns {string} Save content.
  */
-export function getSaveContent( blockType, attributes ) {
-	const saveElement = getSaveElement( blockType, attributes );
+export function getSaveContent( blockType, attributes, innerBlocks ) {
+	const saveElement = getSaveElement( blockType, attributes, innerBlocks );
 
 	// Special-case function render implementation to allow raw HTML return
 	if ( 'string' === typeof saveElement ) {
@@ -84,7 +86,12 @@ export function getSaveContent( blockType, attributes ) {
 	}
 
 	// Otherwise, infer as element
-	return renderToString( saveElement );
+	let content = renderToString( saveElement );
+
+	// Drop raw HTML wrappers (support dangerous inner HTML without wrapper)
+	content = content.replace( /<\/?wp-raw-html>/g, '' );
+
+	return content;
 }
 
 /**
@@ -169,7 +176,7 @@ export function getBlockContent( block ) {
 	let saveContent = block.originalContent;
 	if ( block.isValid ) {
 		try {
-			saveContent = getSaveContent( blockType, block.attributes );
+			saveContent = getSaveContent( blockType, block.attributes, block.innerBlocks );
 		} catch ( error ) {}
 	}
 
