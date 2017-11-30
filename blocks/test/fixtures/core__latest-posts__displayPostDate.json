@@ -12,6 +12,7 @@
             "order": "desc",
             "orderBy": "date"
         },
+        "innerBlocks": [],
         "originalContent": ""
     }
 ]

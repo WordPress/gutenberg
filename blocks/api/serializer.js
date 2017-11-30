@@ -32,12 +32,13 @@ export function getBlockDefaultClassname( blockName ) {
  * Given a block type containg a save render implementation and attributes, returns the
  * enhanced element to be saved or string when raw HTML expected.
  *
- * @param {Object} blockType  Block type.
- * @param {Object} attributes Block attributes.
+ * @param {Object} blockType   Block type.
+ * @param {Object} attributes  Block attributes.
+ * @param {?Array} innerBlocks Nested blocks.
  *
- * @return {Object|string} Save content.
+ * @return {Object|string} Save element or raw HTML string.
  */
-export function getSaveElement( blockType, attributes ) {
+export function getSaveElement( blockType, attributes, innerBlocks = [] ) {
 	let { save } = blockType;
 
 	// Component classes are unsupported for save since serialization must
@@ -48,7 +49,7 @@ export function getSaveElement( blockType, attributes ) {
 		save = instance.render.bind( instance );
 	}
 
-	let element = save( { attributes } );
+	let element = save( { attributes, innerBlocks } );
 
 	if ( isObject( element ) && hasFilter( 'blocks.getSaveContent.extraProps' ) ) {
 		/**
@@ -84,13 +85,14 @@ export function getSaveElement( blockType, attributes ) {
  * Given a block type containg a save render implementation and attributes, returns the
  * static markup to be saved.
  *
- * @param {Object} blockType  Block type.
- * @param {Object} attributes Block attributes.
+ * @param {Object} blockType   Block type.
+ * @param {Object} attributes  Block attributes.
+ * @param {?Array} innerBlocks Nested blocks.
  *
  * @return {string} Save content.
  */
-export function getSaveContent( blockType, attributes ) {
-	return renderToString( getSaveElement( blockType, attributes ) );
+export function getSaveContent( blockType, attributes, innerBlocks ) {
+	return renderToString( getSaveElement( blockType, attributes, innerBlocks ) );
 }
 
 /**
@@ -175,7 +177,7 @@ export function getBlockContent( block ) {
 	let saveContent = block.originalContent;
 	if ( block.isValid ) {
 		try {
-			saveContent = getSaveContent( blockType, block.attributes );
+			saveContent = getSaveContent( blockType, block.attributes, block.innerBlocks );
 		} catch ( error ) {}
 	}
 

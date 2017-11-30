@@ -77,13 +77,19 @@ function normalizeParsedBlocks( blocks ) {
 		// Clone and remove React-instance-specific stuff; also, attribute
 		// values that equal `undefined` will be removed
 		block = JSON.parse( JSON.stringify( block ) );
+
 		// Change unique UIDs to a predictable value
 		block.uid = '_uid_' + index;
+
 		// Walk each attribute and get a more concise representation of any
 		// React elements
 		for ( const k in block.attributes ) {
 			block.attributes[ k ] = normalizeReactTree( block.attributes[ k ] );
 		}
+
+		// Recurse to normalize inner blocks
+		block.innerBlocks = normalizeParsedBlocks( block.innerBlocks );
+
 		return block;
 	} );
 }
