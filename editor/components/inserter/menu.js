@@ -180,11 +180,15 @@ export class InserterMenu extends Component {
 					( { name } ) => find( blockTypes, { name } ) );
 
 			case 'blocks':
-				predicate = ( block ) => block.category !== 'embed';
+				predicate = ( block ) => block.category !== 'embed' && block.category !== 'reusable-blocks';
 				break;
 
 			case 'embeds':
 				predicate = ( block ) => block.category === 'embed';
+				break;
+
+			case 'saved':
+				predicate = ( block ) => block.category === 'reusable-blocks';
 				break;
 		}
 
@@ -324,6 +328,11 @@ export class InserterMenu extends Component {
 							{
 								name: 'embeds',
 								title: __( 'Embeds' ),
+								className: 'editor-inserter__tab',
+							},
+							{
+								name: 'saved',
+								title: __( 'Saved' ),
 								className: 'editor-inserter__tab',
 							},
 						] }
