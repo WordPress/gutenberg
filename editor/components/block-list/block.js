@@ -515,6 +515,6 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 } );
 
 export default compose(
-	withFilters( 'Editor.Block' ),
+	withFilters( 'Editor.BlockItem' ),
 	connect( mapStateToProps, mapDispatchToProps )
 )( BlockListBlock );
