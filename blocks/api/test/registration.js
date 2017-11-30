@@ -24,6 +24,11 @@ describe( 'blocks', () => {
 	const error = console.error;
 	const defaultBlockSettings = { save: noop, category: 'common', title: 'block title' };
 
+	beforeAll( () => {
+		// Load all hooks that modify blocks
+		require( 'blocks/hooks' );
+	} );
+
 	// Reset block state before each test.
 	beforeEach( () => {
 		console.error = jest.fn();

@@ -8,9 +8,10 @@ import { get, partial, reduce, size } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, createElement } from '@wordpress/element';
+import { Component, compose, createElement } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
 import { getBlockType, BlockEdit, getBlockDefaultClassname, createBlock, hasBlockSupport } from '@wordpress/blocks';
+import { withFilters } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -438,80 +439,82 @@ class BlockListBlock extends Component {
 	}
 }
 
-export default connect(
-	( state, ownProps ) => {
-		return {
-			previousBlock: getPreviousBlock( state, ownProps.uid ),
-			nextBlock: getNextBlock( state, ownProps.uid ),
-			block: getBlock( state, ownProps.uid ),
-			isSelected: isBlockSelected( state, ownProps.uid ),
-			isMultiSelected: isBlockMultiSelected( state, ownProps.uid ),
-			isFirstMultiSelected: isFirstMultiSelectedBlock( state, ownProps.uid ),
-			isHovered: isBlockHovered( state, ownProps.uid ) && ! isMultiSelecting( state ),
-			focus: getBlockFocus( state, ownProps.uid ),
-			isTyping: isTyping( state ),
-			order: getBlockIndex( state, ownProps.uid ),
-			meta: getEditedPostAttribute( state, 'meta' ),
-			mode: getBlockMode( state, ownProps.uid ),
-		};
+const mapStateToProps = ( state, { uid } ) => ( {
+	previousBlock: getPreviousBlock( state, uid ),
+	nextBlock: getNextBlock( state, uid ),
+	block: getBlock( state, uid ),
+	isSelected: isBlockSelected( state, uid ),
+	isMultiSelected: isBlockMultiSelected( state, uid ),
+	isFirstMultiSelected: isFirstMultiSelectedBlock( state, uid ),
+	isHovered: isBlockHovered( state, uid ) && ! isMultiSelecting( state ),
+	focus: getBlockFocus( state, uid ),
+	isTyping: isTyping( state ),
+	order: getBlockIndex( state, uid ),
+	meta: getEditedPostAttribute( state, 'meta' ),
+	mode: getBlockMode( state, uid ),
+} );
+
+const mapDispatchToProps = ( dispatch, ownProps ) => ( {
+	onChange( uid, attributes ) {
+		dispatch( updateBlockAttributes( uid, attributes ) );
 	},
-	( dispatch, ownProps ) => ( {
-		onChange( uid, attributes ) {
-			dispatch( updateBlockAttributes( uid, attributes ) );
-		},
 
-		onSelect() {
-			dispatch( selectBlock( ownProps.uid ) );
-		},
-		onDeselect() {
-			dispatch( clearSelectedBlock() );
-		},
+	onSelect() {
+		dispatch( selectBlock( ownProps.uid ) );
+	},
+	onDeselect() {
+		dispatch( clearSelectedBlock() );
+	},
 
-		onStartTyping() {
-			dispatch( startTyping() );
-		},
+	onStartTyping() {
+		dispatch( startTyping() );
+	},
 
-		onStopTyping() {
-			dispatch( stopTyping() );
-		},
+	onStopTyping() {
+		dispatch( stopTyping() );
+	},
 
-		onHover() {
-			dispatch( {
-				type: 'TOGGLE_BLOCK_HOVERED',
-				hovered: true,
-				uid: ownProps.uid,
-			} );
-		},
-		onMouseLeave() {
-			dispatch( {
-				type: 'TOGGLE_BLOCK_HOVERED',
-				hovered: false,
-				uid: ownProps.uid,
-			} );
-		},
+	onHover() {
+		dispatch( {
+			type: 'TOGGLE_BLOCK_HOVERED',
+			hovered: true,
+			uid: ownProps.uid,
+		} );
+	},
+	onMouseLeave() {
+		dispatch( {
+			type: 'TOGGLE_BLOCK_HOVERED',
+			hovered: false,
+			uid: ownProps.uid,
+		} );
+	},
 
-		onInsertBlocks( blocks, position ) {
-			dispatch( insertBlocks( blocks, position ) );
-		},
+	onInsertBlocks( blocks, position ) {
+		dispatch( insertBlocks( blocks, position ) );
+	},
 
-		onFocus( ...args ) {
-			dispatch( focusBlock( ...args ) );
-		},
+	onFocus( ...args ) {
+		dispatch( focusBlock( ...args ) );
+	},
 
-		onRemove( uid ) {
-			dispatch( removeBlock( uid ) );
-		},
+	onRemove( uid ) {
+		dispatch( removeBlock( uid ) );
+	},
 
-		onMerge( ...args ) {
-			dispatch( mergeBlocks( ...args ) );
-		},
+	onMerge( ...args ) {
+		dispatch( mergeBlocks( ...args ) );
+	},
 
-		onReplace( blocks ) {
-			dispatch( replaceBlocks( [ ownProps.uid ], blocks ) );
-		},
+	onReplace( blocks ) {
+		dispatch( replaceBlocks( [ ownProps.uid ], blocks ) );
+	},
 
-		onMetaChange( meta ) {
-			dispatch( editPost( { meta } ) );
-		},
-	} )
+	onMetaChange( meta ) {
+		dispatch( editPost( { meta } ) );
+	},
+} );
+
+export default compose(
+	withFilters( 'Editor.BlockItem' ),
+	connect( mapStateToProps, mapDispatchToProps )
 )( BlockListBlock );

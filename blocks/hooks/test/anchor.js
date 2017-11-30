@@ -4,9 +4,9 @@
 import { noop } from 'lodash';
 
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import createHooks from '@wordpress/hooks';
+import { createHooks } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
