@@ -134,7 +134,7 @@ function gutenberg_serialize_block( $block ) {
 /**
  * Renders a single block into a HTML string.
  *
- * @since 1.3.0
+ * @since 1.9.0
  *
  * @param  array $block A single parsed block object.
  * @return string String of rendered HTML.
