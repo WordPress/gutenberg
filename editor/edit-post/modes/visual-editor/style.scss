@@ -39,33 +39,6 @@
 	}
 }
 
-.editor-visual-editor .editor-inserter {
-	.editor-inserter__toggle {
-		color: $dark-gray-300;
-	}
-
-	.editor-inserter__toggle.components-icon-button:not(:disabled):hover {
-		@include button-style__hover;
-	}
-}
-
-.editor-visual-editor .editor-block-list__insertion-point {
-	position: relative;
-	width: $visual-editor-max-width - $block-padding - $block-padding;
-	margin-left: auto;
-	margin-right: auto;
-
-	&:before {
-		position: absolute;
-		top: -1px;
-		height: 2px;
-		left: 0;
-		right: 0;
-		background: $blue-medium-500;
-		content: '';
-	}
-}
-
 .editor-visual-editor__inserter {
 	display: flex;
 	align-items: baseline;
