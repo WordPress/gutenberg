@@ -23,6 +23,7 @@ export { default as BlockIcon } from './block-icon';
 export { default as ColorPalette } from './color-palette';
 export { default as Editable } from './editable';
 export { default as EditableProvider } from './editable/provider';
+export { default as InnerBlocks } from './inner-blocks';
 export { default as InspectorControls } from './inspector-controls';
 export { default as MediaUpload } from './media-upload';
 export { default as MediaUploadButton } from './media-upload/button';

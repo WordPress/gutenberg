@@ -38,15 +38,14 @@ class EditorProvider extends Component {
 	constructor( props ) {
 		super( ...arguments );
 
-		this.store = store;
-
+		this.store = props.store || store;
 		this.settings = {
 			...DEFAULT_SETTINGS,
 			...props.settings,
 		};
 
 		// Assume that we don't need to initialize in the case of an error recovery.
-		if ( ! props.recovery ) {
+		if ( ! props.recovery && props.post ) {
 			this.store.dispatch( setupEditor( props.post, this.settings ) );
 		}
 	}

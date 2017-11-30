@@ -18,10 +18,14 @@ import './hooks';
 import './assets/stylesheets/main.scss';
 import Layout from './edit-post/layout';
 import { EditorProvider, ErrorBoundary } from './components';
-import { initializeMetaBoxState } from './store/actions';
+import * as selectors from './store/selectors';
+import * as actions from './store/actions';
+import store from './store';
 
+export { createStore } from './store';
 export * from './components';
-import store from './store'; // Registers the state tree
+export { selectors };
+export { actions };
 
 // Configure moment globally
 moment.locale( dateSettings.l10n.locale );
@@ -103,7 +107,7 @@ export function createEditorInstance( id, post, settings ) {
 
 	return {
 		initializeMetaBoxes( metaBoxes ) {
-			store.dispatch( initializeMetaBoxState( metaBoxes ) );
+			store.dispatch( actions.initializeMetaBoxState( metaBoxes ) );
 		},
 	};
 }
