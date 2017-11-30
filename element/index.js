@@ -132,7 +132,7 @@ export { flowRight as compose };
  * @param {String} wrapperName Wrapper name to prepend to the display name.
  * @return {String}            Wrapped display name.
  */
-export function wrapperDisplayName( BaseComponent, wrapperName ) {
+export function getWrapperDisplayName( BaseComponent, wrapperName ) {
 	const { displayName = BaseComponent.name || 'Component' } = BaseComponent;
 
 	return `${ startCase( wrapperName ) }(${ displayName })`;

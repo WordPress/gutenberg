@@ -6,7 +6,7 @@ import { mapValues, reduce, forEach, noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, wrapperDisplayName } from '@wordpress/element';
+import { Component, getWrapperDisplayName } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -213,7 +213,7 @@ export default ( mapPropsToData ) => ( WrappedComponent ) => {
 		}
 	}
 
-	APIDataComponent.displayName = wrapperDisplayName( WrappedComponent, 'apiData' );
+	APIDataComponent.displayName = getWrapperDisplayName( WrappedComponent, 'apiData' );
 
 	APIDataComponent.contextTypes = {
 		getAPISchema: noop,

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { wrapperDisplayName } from '@wordpress/element';
+import { getWrapperDisplayName } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 
 /**
@@ -15,7 +15,7 @@ export default function withFilters( hookName ) {
 		const FiltersComponent = ( props ) => {
 			return applyFilters( hookName, <WrappedComponent { ...props } />, props );
 		};
-		FiltersComponent.displayName = wrapperDisplayName( WrappedComponent, 'filters' );
+		FiltersComponent.displayName = getWrapperDisplayName( WrappedComponent, 'filters' );
 
 		return FiltersComponent;
 	};
