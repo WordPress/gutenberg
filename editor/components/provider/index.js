@@ -10,11 +10,7 @@ import { flow, pick, noop } from 'lodash';
  */
 import { createElement, Component } from '@wordpress/element';
 import { EditableProvider } from '@wordpress/blocks';
-import {
-	APIProvider,
-	DropZoneProvider,
-	SlotFillProvider,
-} from '@wordpress/components';
+import { APIProvider, DropZoneProvider } from '@wordpress/components';
 
 /**
  * Internal Dependencies
@@ -89,15 +85,6 @@ class EditorProvider extends Component {
 				bindActionCreators( {
 					onUndo: undo,
 				}, this.store.dispatch ),
-			],
-
-			// Slot / Fill provider:
-			//
-			//  - context.getSlot
-			//  - context.registerSlot
-			//  - context.unregisterSlot
-			[
-				SlotFillProvider,
 			],
 
 			// APIProvider
