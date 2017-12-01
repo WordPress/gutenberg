@@ -156,7 +156,7 @@ class ImageBlock extends Component {
 				controls,
 				focus && (
 					<InspectorControls key="inspector">
-						{blockDescription}
+						{ blockDescription }
 					</InspectorControls>
 				),
 				<Placeholder
