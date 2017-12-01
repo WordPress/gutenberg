@@ -25,6 +25,7 @@ import {
 	UnsavedChangesWarning,
 	EditorNotices,
 	PostPublishPanel,
+	EditorModeShortcuts,
 } from '../../components';
 import {
 	getEditorMode,
@@ -57,6 +58,7 @@ function Layout( {
 			<div className="editor-layout__content" role="region" aria-label={ __( 'Editor content' ) } tabIndex="-1">
 				<EditorNotices />
 				<div className="editor-layout__editor">
+					<EditorModeShortcuts />
 					{ mode === 'text' && <TextEditor /> }
 					{ mode === 'visual' && <VisualEditor /> }
 				</div>
