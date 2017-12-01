@@ -23,11 +23,13 @@ import { MetaBoxes, AutosaveMonitor, UnsavedChangesWarning, EditorNotices } from
 import {
 	getEditorMode,
 	isEditorSidebarOpened,
+	isFeatureActive,
 } from '../../selectors';
 
-function Layout( { mode, isSidebarOpened } ) {
+function Layout( { mode, isSidebarOpened, hasFixedToolbar } ) {
 	const className = classnames( 'editor-layout', {
 		'is-sidebar-opened': isSidebarOpened,
+		'has-fixed-toolbar': hasFixedToolbar,
 	} );
 
 	return (
@@ -56,5 +58,6 @@ export default connect(
 	( state ) => ( {
 		mode: getEditorMode( state ),
 		isSidebarOpened: isEditorSidebarOpened( state ),
+		hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
 	} ),
 )( navigateRegions( Layout ) );

@@ -4,6 +4,7 @@
 }
 
 .editor-layout {
+	padding-top: $header-height;
 	position: relative;
 
 	.components-notice-list {
@@ -20,6 +21,14 @@
 			.notice-dismiss {
 				margin: 5px;
 			}
+		}
+	}
+
+	&.has-fixed-toolbar {
+		padding-top: $header-height + $block-toolbar-height; 
+
+		@include break-large {
+			padding-top: $header-height;
 		}
 	}
 }

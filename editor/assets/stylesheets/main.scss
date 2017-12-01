@@ -64,7 +64,6 @@ body.gutenberg-editor-page {
 	bottom: 0;
 	left: 0;
 	min-height: calc( 100vh - #{ $admin-bar-height-big } );
-	padding-top: $header-height + $block-toolbar-height;
 
 	// The parent relative container changes
 	@include break-small {
@@ -74,11 +73,6 @@ body.gutenberg-editor-page {
 	// The WP header height changes at this breakpoint
 	@include break-medium {
 		min-height: calc( 100vh - #{ $admin-bar-height } );
-	}
-
-	// The block toolbar disappears at this breakpoint
-	@include break-large {
-		padding-top: $header-height;
 	}
 
 	img {
