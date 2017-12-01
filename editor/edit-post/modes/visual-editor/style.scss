@@ -17,6 +17,7 @@
 .editor-visual-editor .editor-block-list__block {
 	margin-left: auto;
 	margin-right: auto;
+	margin-top: 1%;
 	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );
 
 	&[data-align="wide"] {
