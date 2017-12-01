@@ -1,17 +1,5 @@
 $empty-paragraph-height: $text-editor-font-size * 4;
 
-.editor-default-block-appender {
-	@include break-small() {
-		padding: 0 ( $block-mover-padding-visible - 1px );	// subtract 1px for border
-		padding: 0 $block-mover-padding-visible;
-
-		.editor-default-block-appender__content {
-			padding: 0 ( $block-padding - 1px );	// subtract 1px for border
-			padding: 0 $block-padding;
-		}
-	}
-}
-
 input[type=text].editor-default-block-appender__content {
 	border: none;
 	background: none;
