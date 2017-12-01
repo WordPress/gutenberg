@@ -19,14 +19,18 @@ import Sidebar from '../sidebar';
 import TextEditor from '../modes/text-editor';
 import VisualEditor from '../modes/visual-editor';
 import DocumentTitle from '../document-title';
+<<<<<<< HEAD
 import {
 	MetaBoxes,
 	AutosaveMonitor,
 	UnsavedChangesWarning,
 	EditorNotices,
 	PostPublishPanel,
-	EditorModeShortcuts,
+	EditorModeKeyboardShortcuts,
 } from '../../components';
+=======
+import { MetaBoxes, AutosaveMonitor, UnsavedChangesWarning, EditorNotices, EditorModeKeyboardShortcuts } from '../../components';
+>>>>>>> renaming component
 import {
 	getEditorMode,
 	hasOpenSidebar,
@@ -58,7 +62,7 @@ function Layout( {
 			<div className="editor-layout__content" role="region" aria-label={ __( 'Editor content' ) } tabIndex="-1">
 				<EditorNotices />
 				<div className="editor-layout__editor">
-					<EditorModeShortcuts />
+					<EditorModeKeyboardShortcuts />
 					{ mode === 'text' && <TextEditor /> }
 					{ mode === 'visual' && <VisualEditor /> }
 				</div>
