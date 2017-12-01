@@ -99,6 +99,10 @@ describe( 'element', () => {
 			expect( getWrapperDisplayName( () => <div />, 'test' ) ).toBe( 'Test(Component)' );
 		} );
 
+		it( 'should use camel case starting with upper for wrapper prefix ', () => {
+			expect( getWrapperDisplayName( () => <div />, 'one-two_threeFOUR' ) ).toBe( 'OneTwoThreeFour(Component)' );
+		} );
+
 		it( 'should use function name', () => {
 			function SomeComponent() {
 				return <div />;

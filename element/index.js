@@ -4,7 +4,7 @@
 import { createElement, Component, cloneElement, Children } from 'react';
 import { render, findDOMNode, createPortal, unmountComponentAtNode } from 'react-dom';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { flowRight, isString, startCase } from 'lodash';
+import { camelCase, flowRight, isString, upperFirst } from 'lodash';
 
 /**
  * Returns a new element of given type. Type can be either a string tag name or
@@ -135,5 +135,5 @@ export { flowRight as compose };
 export function getWrapperDisplayName( BaseComponent, wrapperName ) {
 	const { displayName = BaseComponent.name || 'Component' } = BaseComponent;
 
-	return `${ startCase( wrapperName ) }(${ displayName })`;
+	return `${ upperFirst( camelCase( wrapperName ) ) }(${ displayName })`;
 }
