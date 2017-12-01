@@ -128,7 +128,7 @@ class ImageBlock extends Component {
 				<p>{ __( 'Worth a thousand words.' ) }</p>
 			</BlockDescription>
 		);
-	
+
 		const controls = (
 			focus && (
 				<BlockControls key="controls">
