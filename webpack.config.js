@@ -80,7 +80,7 @@ const config = {
 		packageNames.reduce( ( memo, packageName ) => {
 			memo[ packageName ] = `./node_modules/@wordpress/${ packageName }`;
 			return memo;
-		}, {} ),
+		}, {} )
 	),
 	output: {
 		filename: '[name]/build/index.js',
