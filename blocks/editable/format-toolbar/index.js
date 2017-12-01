@@ -140,6 +140,10 @@ class FormatToolbar extends Component {
 		return this.props.formats[ format ] && this.props.formats[ format ].isActive;
 	}
 
+	stopMousePropagation( event ) {
+		event.stopPropagation();
+	}
+
 	render() {
 		const { formats, focusPosition, enabledControls = DEFAULT_CONTROLS, customControls = [] } = this.props;
 		const { isAddingLink, isEditingLink, newLinkValue, settingsVisible, opensInNewWindow } = this.state;
@@ -168,12 +172,14 @@ class FormatToolbar extends Component {
 		);
 
 		return (
-			<div className="blocks-format-toolbar">
+			<div className="blocks-format-toolbar" >
 				<Toolbar controls={ toolbarControls } />
 
 				{ ( isAddingLink || isEditingLink ) &&
+					/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 					<Fill name="Editable.Siblings">
 						<form
+							onMouseDown={ this.stopMousePropagation }
 							className="blocks-format-toolbar__link-modal"
 							style={ linkStyle }
 							onSubmit={ this.submitLink }>
@@ -191,8 +197,11 @@ class FormatToolbar extends Component {
 				}
 
 				{ !! formats.link && ! isAddingLink && ! isEditingLink &&
+					/* eslint-disable jsx-a11y/no-static-element-interactions */
 					<Fill name="Editable.Siblings">
-						<div className="blocks-format-toolbar__link-modal" style={ linkStyle }>
+						<div className="blocks-format-toolbar__link-modal" style={ linkStyle }
+							onMouseDown={ this.stopMousePropagation }
+						>
 							<a
 								className="blocks-format-toolbar__link-value"
 								href={ formats.link.value }
