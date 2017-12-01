@@ -72,6 +72,25 @@ registerBlockType( 'core/image', {
 				},
 			},
 			{
+				type: 'html',
+				isMatch( html ) {
+					const wrapper = document.createElement( 'div' );
+					wrapper.innerHTML = html;
+					return wrapper.childNodes.length === 1 && wrapper.childNodes[ 0 ].nodeName.toLowerCase() === 'img';
+				},
+				transform( html ) {
+					const wrapper = document.createElement( 'div' );
+					wrapper.innerHTML = html;
+					const img = wrapper.querySelector( 'img' );
+					return Promise.resolve(
+						createBlock( 'core/image', {
+							id: img.id,
+							url: img.src,
+						} )
+					);
+				},
+			},
+			{
 				type: 'files',
 				isMatch( files ) {
 					return files.length === 1 && files[ 0 ].type.indexOf( 'image/' ) === 0;
