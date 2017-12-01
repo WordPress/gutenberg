@@ -466,8 +466,8 @@ export const getBlock = createSelector(
 );
 
 function getPostMeta( state, key ) {
-	return has( state, [ 'editor', 'edits', 'present', 'meta', key ] ) ?
-		get( state, [ 'editor', 'edits', 'present', 'meta', key ] ) :
+	return has( state, [ 'editor', 'present', 'edits', 'meta', key ] ) ?
+		get( state, [ 'editor', 'present', 'edits', 'meta', key ] ) :
 		get( state, [ 'currentPost', 'meta', key ] );
 }
 
