@@ -1,12 +1,11 @@
 /**
  * External dependencies
  */
-import { mount, shallow } from 'enzyme';
+import { shallow } from 'enzyme';
 
 /**
  * WordPress dependencies
  */
-import { concatChildren } from '@wordpress/element';
 import { addFilter, removeAllFilters } from '@wordpress/hooks';
 
 /**
@@ -30,10 +29,11 @@ describe( 'withFilters', () => {
 	} );
 
 	it( 'should display a component overridden by the filter', () => {
+		const OverriddenComponent = () => <div>Overridden component</div>;
 		addFilter(
 			'EnhancedComponent',
-			'test\enhanced-component-override',
-			() => <div>Overridden component</div>
+			'test/enhanced-component-override',
+			() => OverriddenComponent
 		);
 
 		const wrapper = shallow( <EnhancedComponent /> );
@@ -45,13 +45,17 @@ describe( 'withFilters', () => {
 		const ComposedComponent = () => <div>Composed component</div>;
 		addFilter(
 			hookName,
-			'test\enhanced-component-compose',
-			( element ) => concatChildren( element, <ComposedComponent /> )
+			'test/enhanced-component-compose',
+			( FilteredComponent ) => () => (
+				<div>
+					<FilteredComponent />
+					<ComposedComponent />
+				</div>
+			)
 		);
 
-		const wrapper = mount( <EnhancedComponent /> );
+		const wrapper = shallow( <EnhancedComponent /> );
 
-		expect( wrapper.find( MyComponent ) ).toBePresent();
-		expect( wrapper.find( ComposedComponent ) ).toBePresent();
+		expect( wrapper.html() ).toBe( '<div><div>My component</div><div>Composed component</div></div>' );
 	} );
 } );

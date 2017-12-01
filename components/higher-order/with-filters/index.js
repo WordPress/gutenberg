@@ -13,7 +13,9 @@ import { applyFilters } from '@wordpress/hooks';
 export default function withFilters( hookName ) {
 	return ( WrappedComponent ) => {
 		const FiltersComponent = ( props ) => {
-			return applyFilters( hookName, <WrappedComponent { ...props } />, props );
+			const EnhancedComponent = applyFilters( hookName, WrappedComponent, props );
+
+			return <EnhancedComponent { ...props } />;
 		};
 		FiltersComponent.displayName = getWrapperDisplayName( WrappedComponent, 'filters' );
 
