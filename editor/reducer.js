@@ -19,6 +19,7 @@ import {
 	without,
 	mapValues,
 	findIndex,
+	reject,
 } from 'lodash';
 
 /**
@@ -592,7 +593,10 @@ export function saving( state = {}, action ) {
 export function notices( state = [], action ) {
 	switch ( action.type ) {
 		case 'CREATE_NOTICE':
-			return [ ...state, action.notice ];
+			return [
+				...reject( state, { id: action.notice.id } ),
+				action.notice,
+			];
 
 		case 'REMOVE_NOTICE':
 			const { noticeId } = action;
