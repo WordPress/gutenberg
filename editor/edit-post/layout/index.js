@@ -19,18 +19,14 @@ import Sidebar from '../sidebar';
 import TextEditor from '../modes/text-editor';
 import VisualEditor from '../modes/visual-editor';
 import DocumentTitle from '../document-title';
-<<<<<<< HEAD
+import EditorModeKeyboardShortcuts from '../modes/keyboard-shortcuts';
 import {
 	MetaBoxes,
 	AutosaveMonitor,
 	UnsavedChangesWarning,
 	EditorNotices,
 	PostPublishPanel,
-	EditorModeKeyboardShortcuts,
 } from '../../components';
-=======
-import { MetaBoxes, AutosaveMonitor, UnsavedChangesWarning, EditorNotices, EditorModeKeyboardShortcuts } from '../../components';
->>>>>>> renaming component
 import {
 	getEditorMode,
 	hasOpenSidebar,
