@@ -12,9 +12,7 @@ import { KeyboardShortcuts } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import shortcuts from '../../keyboard-shortcuts';
-import { getEditorMode } from '../../../store/selectors';
-import { switchEditorMode } from '../../../store/actions';
+import { getEditorMode } from '../../../selectors';
 
 class EditorModeKeyboardShortcuts extends Component {
 	constructor() {
@@ -31,7 +29,7 @@ class EditorModeKeyboardShortcuts extends Component {
 	render() {
 		return (
 			<KeyboardShortcuts shortcuts={ {
-				[ shortcuts.toggleEditorMode.value ]: this.toggleMode,
+				'mod+shift+alt+m': this.toggleMode,
 			} } />
 		);
 	}
@@ -46,7 +44,9 @@ export default connect(
 	( dispatch ) => {
 		return {
 			switchMode: ( mode ) => {
-				dispatch( switchEditorMode( mode ) );
+				dispatch( {
+					type: 'SWITCH_MODE', mode: mode,
+				} );
 			},
 		};
 	},
