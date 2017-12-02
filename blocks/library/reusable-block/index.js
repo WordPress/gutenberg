@@ -3,6 +3,7 @@
  */
 import { pickBy, noop } from 'lodash';
 import { connect } from 'react-redux';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -14,7 +15,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { getBlockType, registerBlockType } from '../../api';
+import { getBlockType, registerBlockType, hasBlockSupport, getBlockDefaultClassname } from '../../api';
 import ReusableBlockEditPanel from './edit-panel';
 
 class ReusableBlockEdit extends Component {
@@ -84,8 +85,15 @@ class ReusableBlockEdit extends Component {
 			return <Placeholder><Spinner /></Placeholder>;
 		}
 
+		const reusableBlockAttributes = { ...reusableBlock.attributes, ...attributes };
 		const blockType = getBlockType( reusableBlock.type );
 		const BlockEdit = blockType.edit || blockType.save;
+
+		// Generate a class name for the block's editable form
+		const generatedClassName = hasBlockSupport( blockType, 'className', true ) ?
+			getBlockDefaultClassname( reusableBlock.type ) :
+			null;
+		const className = classnames( generatedClassName, reusableBlockAttributes.className );
 
 		return [
 			// We fake the block being read-only by wrapping it with an element that has pointer-events: none
@@ -93,8 +101,10 @@ class ReusableBlockEdit extends Component {
 				<BlockEdit
 					{ ...this.props }
 					focus={ isEditing ? focus : null }
-					attributes={ { ...reusableBlock.attributes, ...attributes } }
-					setAttributes={ isEditing ? this.setAttributes : noop } />
+					attributes={ reusableBlockAttributes }
+					setAttributes={ isEditing ? this.setAttributes : noop }
+					className={ className }
+				/>
 			</div>,
 			focus && (
 				<ReusableBlockEditPanel
@@ -106,7 +116,8 @@ class ReusableBlockEdit extends Component {
 					onDetach={ convertBlockToStatic }
 					onChangeName={ this.setName }
 					onSave={ this.updateReusableBlock }
-					onCancel={ this.stopEditing } />
+					onCancel={ this.stopEditing }
+				/>
 			),
 		];
 	}
