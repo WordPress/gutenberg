@@ -67,18 +67,14 @@ registerBlockType( 'core/html', {
 				<div>
 					{ focus &&
 						<BlockControls key="controls">
-							<ul className="components-toolbar">
-								<li>
-									<button className={ `components-tab-button ${ ! preview ? 'is-active' : '' }` } onClick={ this.edit }>
-										<span>HTML</span>
-									</button>
-								</li>
-								<li>
-									<button className={ `components-tab-button ${ preview ? 'is-active' : '' }` } onClick={ this.preview }>
-										<span>{ __( 'Preview' ) }</span>
-									</button>
-								</li>
-							</ul>
+							<div className="components-toolbar">
+								<button className={ `components-tab-button ${ ! preview ? 'is-active' : '' }` } onClick={ this.edit }>
+									<span>HTML</span>
+								</button>
+								<button className={ `components-tab-button ${ preview ? 'is-active' : '' }` } onClick={ this.preview }>
+									<span>{ __( 'Preview' ) }</span>
+								</button>
+							</div>
 						</BlockControls>
 					}
 					{ preview ?
