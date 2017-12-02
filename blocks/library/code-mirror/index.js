@@ -9,10 +9,9 @@ require( 'codemirror/lib/codemirror.css' );
 /**
  * Internal dependencies
  */
-import { __ } from 'i18n';
+import { __ } from '@wordpress/i18n';
 import InspectorControls from '../../inspector-controls';
-import { registerBlockType, source } from '../../api';
-const { prop } = source;
+import { registerBlockType } from '../../api';
 
 let initialized = false;
 let CodeMirror; // loaded on-demand below
@@ -54,12 +53,17 @@ const modes = {
 const languageList = Object.keys( modes ).sort( ( a, b ) => modes[ a ].label.localeCompare( modes[ b ].label ) );
 
 registerBlockType( 'core/code-mirror', {
-	title: wp.i18n.__( 'Code Editor' ),
+	title: __( 'Code Editor' ),
 	icon: 'text',
 	category: 'formatting',
 
 	attributes: {
-		content: { type: 'string', source: prop( 'code', 'textContent' ) },
+		content: {
+			type: 'string',
+			source: 'property',
+			selector: 'code',
+			property: 'textContent',
+		},
 		language: { type: 'string' },
 	},
 
@@ -100,6 +104,7 @@ registerBlockType( 'core/code-mirror', {
 					options={ {
 						lineNumbers: true,
 						mode,
+						readOnly: ! focus,
 					} }
 				/>
 				{ focus && (
