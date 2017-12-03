@@ -368,6 +368,104 @@ describe( 'actions', () => {
 		} );
 	} );
 
+	describe( 'createNotice', () => {
+		const status = 'status';
+		const content = <p>element</p>;
+		it( 'should return CREATE_NOTICE action when options is empty', () => {
+			const result = actions.createNotice( status, content );
+			expect( result.type ).toEqual( 'CREATE_NOTICE' );
+			expect( result.notice.status ).toEqual( 'status' );
+			expect( result.notice.content ).toEqual( <p>element</p> );
+			expect( result.notice.isDismissible ).toEqual( true );
+			expect( result.notice.id ).toBeDefined();
+		} );
+		it( 'should return CREATE_NOTICE action when options is desined', () => {
+			const options = {
+				id: 'id',
+				isDismissible: false,
+			};
+			const result = actions.createNotice( status, content, options );
+			expect( result ).toEqual( {
+				type: 'CREATE_NOTICE',
+				notice: {
+					id: 'id',
+					status: 'status',
+					content: <p>element</p>,
+					isDismissible: false,
+				},
+			} );
+		} );
+	} );
+	describe( 'createSuccessNotice', () => {
+		it( 'should return CREATE_NOTICE action', () => {
+			const result = actions.createSuccessNotice( <p>element</p> );
+			expect( result.type ).toEqual( 'CREATE_NOTICE' );
+			expect( result.notice.status ).toEqual( 'success' );
+			expect( result.notice.content ).toEqual( <p>element</p> );
+			expect( result.notice.isDismissible ).toEqual( true );
+			expect( result.notice.id ).toBeDefined();
+		} );
+	} );
+	describe( 'createInfoNotice', () => {
+		it( 'should return CREATE_NOTICE action', () => {
+			const result = actions.createInfoNotice( <p>element</p> );
+			expect( result.type ).toEqual( 'CREATE_NOTICE' );
+			expect( result.notice.status ).toEqual( 'info' );
+			expect( result.notice.content ).toEqual( <p>element</p> );
+			expect( result.notice.isDismissible ).toEqual( true );
+			expect( result.notice.id ).toBeDefined();
+		} );
+	} );
+	describe( 'createErrorNotice', () => {
+		it( 'should return CREATE_NOTICE action', () => {
+			const result = actions.createErrorNotice( <p>element</p> );
+			expect( result.type ).toEqual( 'CREATE_NOTICE' );
+			expect( result.notice.status ).toEqual( 'error' );
+			expect( result.notice.content ).toEqual( <p>element</p> );
+			expect( result.notice.isDismissible ).toEqual( true );
+			expect( result.notice.id ).toBeDefined();
+		} );
+	} );
+	describe( 'createWarningNotice', () => {
+		it( 'should return CREATE_NOTICE action', () => {
+			const result = actions.createWarningNotice( <p>element</p> );
+			expect( result.type ).toEqual( 'CREATE_NOTICE' );
+			expect( result.notice.status ).toEqual( 'warning' );
+			expect( result.notice.content ).toEqual( <p>element</p> );
+			expect( result.notice.isDismissible ).toEqual( true );
+			expect( result.notice.id ).toBeDefined();
+		} );
+	} );
+	describe( 'removeNotice', () => {
+		it( 'should return REMOVE_NOTICE actions', () => {
+			const id = 'id';
+			expect( actions.removeNotice( id ) ).toEqual( {
+				type: 'REMOVE_NOTICE',
+				noticeId: 'id',
+			} );
+		} );
+	} );
+
+	describe( 'metaBoxLoaded', () => {
+		it( 'should return META_BOX_LOADED action', () => {
+			const location = 'normal';
+			expect( actions.metaBoxLoaded( location ) ).toEqual( {
+				type: 'META_BOX_LOADED',
+				location: 'normal',
+			} );
+		} );
+	} );
+
+	describe( 'toggleFeature', () => {
+		it( 'should return TOGGLE_FEATURE action', () => {
+			const feature = 'name';
+			expect( actions.toggleFeature( feature ) ).toEqual( {
+				type: 'TOGGLE_FEATURE',
+				feature: 'name',
+			} );
+		} );
+	} );
+
 	describe( 'requestMetaBoxUpdates', () => {
 		it( 'should return the REQUEST_META_BOX_UPDATES action', () => {
 			expect( actions.requestMetaBoxUpdates( [ 'normal' ] ) ).toEqual( {
