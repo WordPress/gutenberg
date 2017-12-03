@@ -4,6 +4,72 @@
 import * as actions from '../actions';
 
 describe( 'actions', () => {
+	describe( 'setupEditor', () => {
+		it( 'should return the SETUP_EDITOR action', () => {
+			const post = {};
+			const settings = {};
+			const result = actions.setupEditor( post, settings );
+			expect( result ).toEqual( {
+				type: 'SETUP_EDITOR',
+				post: {},
+				settings: {},
+			} );
+		} );
+	} );
+	describe( 'resetPost', () => {
+		it( 'should return the RESET_POST action', () => {
+			const post = {};
+			const result = actions.resetPost( post );
+			expect( result ).toEqual( {
+				type: 'RESET_POST',
+				post: {},
+			} );
+		} );
+	} );
+	describe( 'setupNewPost', () => {
+		it( 'should return the SETUP_NEW_POST action', () => {
+			const edits = {};
+			const result = actions.setupNewPost( edits );
+			expect( result ).toEqual( {
+				type: 'SETUP_NEW_POST',
+				edits: {},
+			} );
+		} );
+	} );
+	describe( 'resetBlocks', () => {
+		it( 'should return the RESET_BLOCKS actions', () => {
+			const blocks = [];
+			const result = actions.resetBlocks( blocks );
+			expect( result ).toEqual( {
+				type: 'RESET_BLOCKS',
+				blocks: [],
+			} );
+		} );
+	} );
+	describe( 'updateBlockAttributes', () => {
+		it( 'should return the UPDATE_BLOCK_ATTRIBUTES action', () => {
+			const uid = 'string';
+			const attributes = {};
+			const result = actions.updateBlockAttributes( uid, attributes );
+			expect( result ).toEqual( {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				uid: 'string',
+				attributes: {},
+			} );
+		} );
+	} );
+	describe( 'updateBlock', () => {
+		it( 'should return the UPDATE_BLOCK action', () => {
+			const uid = 'uid';
+			const updates = {};
+			const result = actions.updateBlock( uid, updates );
+			expect( result ).toEqual( {
+				type: 'UPDATE_BLOCK',
+				uid: 'uid',
+				updates: {},
+			} );
+		} );
+	} );
 	describe( 'focusBlock', () => {
 		it( 'should return the UPDATE_FOCUS action', () => {
 			const focusConfig = {
@@ -18,6 +84,61 @@ describe( 'actions', () => {
 		} );
 	} );
 
+	describe( 'selectBlock', () => {
+		it( 'should return the SELECT_BLOCK action', () => {
+			const uid = 'uid';
+			const result = actions.selectBlock( uid );
+			expect( result ).toEqual( {
+				type: 'SELECT_BLOCK',
+				uid: 'uid',
+			} );
+		} );
+	} );
+	describe( 'startMultiSelect', () => {
+		it( 'should return the START_MULTI_SELECT', () => {
+			expect( actions.startMultiSelect() ).toEqual( {
+				type: 'START_MULTI_SELECT',
+			} );
+		} );
+	} );
+	describe( 'stopMultiSelect', () => {
+		it( 'should return the Stop_MULTI_SELECT', () => {
+			expect( actions.stopMultiSelect() ).toEqual( {
+				type: 'STOP_MULTI_SELECT',
+			} );
+		} );
+	} );
+	describe( 'multiSelect', () => {
+		it( 'should return MULTI_SELECT action', () => {
+			const start = 'start';
+			const end = 'end';
+			expect( actions.multiSelect( start, end ) ).toEqual( {
+				type: 'MULTI_SELECT',
+				start: 'start',
+				end: 'end',
+			} );
+		} );
+	} );
+	describe( 'clearSelectedBlock', () => {
+		it( 'should return CLEAR_SELECTED_BLOCK action', () => {
+			expect( actions.clearSelectedBlock() ).toEqual( {
+				type: 'CLEAR_SELECTED_BLOCK',
+			} );
+		} );
+	} );
+	describe( 'replaceBlock', () => {
+		it( 'should return the REPLACE_BLOCKS action', () => {
+			const blocks = {
+				uid: 'ribs',
+			};
+
+			expect( actions.replaceBlock( [ 'chicken' ], blocks ) ).toEqual( {
+				type: 'REPLACE_BLOCKS',
+				uids: [ 'chicken' ],
+				blocks: [ blocks ],
+			} );
+		} );
+	} );
 	describe( 'replaceBlocks', () => {
 		it( 'should return the REPLACE_BLOCKS action', () => {
 			const blocks = [ {
@@ -28,6 +149,178 @@ describe( 'actions', () => {
 				type: 'REPLACE_BLOCKS',
 				uids: [ 'chicken' ],
 				blocks,
+			} );
+		} );
+	} );
+
+	describe( 'insertBlock', () => {
+		it( 'should return the INSERT_BLOCKS action', () => {
+			const block = {
+				uid: 'ribs',
+			};
+			const position = 'position';
+			expect( actions.insertBlock( block, position ) ).toEqual( {
+				type: 'INSERT_BLOCKS',
+				blocks: [
+					{
+						uid: 'ribs',
+					},
+				],
+				position: 'position',
+			} );
+		} );
+	} );
+	describe( 'insertBlocks', () => {
+		it( 'should return the INSERT_BLOCKS action', () => {
+			const block = [ {
+				uid: 'ribs',
+			} ];
+			const position = 'position';
+			expect( actions.insertBlocks( block, position ) ).toEqual( {
+				type: 'INSERT_BLOCKS',
+				blocks: [
+					{
+						uid: 'ribs',
+					},
+				],
+				position: 'position',
+			} );
+		} );
+	} );
+
+	describe( 'showInsertionPoint', () => {
+		it( 'should return the SHOW_INSERTION_POINT action', () => {
+			expect( actions.showInsertionPoint() ).toEqual( {
+				type: 'SHOW_INSERTION_POINT',
+			} );
+		} );
+	} );
+	describe( 'hideInsertionPoint', () => {
+		it( 'should return the HIDE_INSERTION_POINT action', () => {
+			expect( actions.hideInsertionPoint() ).toEqual( {
+				type: 'HIDE_INSERTION_POINT',
+			} );
+		} );
+	} );
+
+	describe( 'setBlockInsertionPoint', () => {
+		it( 'should return the SET_BLOCK_INSERTION_POINT action', () => {
+			const position = 1;
+			expect( actions.setBlockInsertionPoint( position ) ).toEqual( {
+				type: 'SET_BLOCK_INSERTION_POINT',
+				position: 1,
+			} );
+		} );
+	} );
+
+	describe( 'clearBlockInsertionPoint', () => {
+		it( 'should return the CLEAR_BLOCK_INSERTION_POINT action', () => {
+			expect( actions.clearBlockInsertionPoint() ).toEqual( {
+				type: 'CLEAR_BLOCK_INSERTION_POINT',
+			} );
+		} );
+	} );
+
+	describe( 'editPost', () => {
+		it( 'should return EDIT_POST action', () => {
+			const edits = { format: 'sample' };
+			expect( actions.editPost( edits ) ).toEqual( {
+				type: 'EDIT_POST',
+				edits: {
+					format: 'sample',
+				},
+			} );
+		} );
+	} );
+
+	describe( 'savePost', () => {
+		it( 'should return REQUEST_POST_UPDATE action', () => {
+			expect( actions.savePost() ).toEqual( {
+				type: 'REQUEST_POST_UPDATE',
+			} );
+		} );
+	} );
+	describe( 'trashPost', () => {
+		it( 'should return TRASH_POST action', () => {
+			const postId = 1;
+			const postType = 'post';
+			expect( actions.trashPost( postId, postType ) ).toEqual( {
+				type: 'TRASH_POST',
+				postId: 1,
+				postType: 'post',
+			} );
+		} );
+	} );
+	describe( 'mergeBlocks', () => {
+		it( 'should return MERGE_BLOCKS action', () => {
+			const blockA = {
+				uid: 'blockA',
+			};
+			const blockB = {
+				uid: 'blockB',
+			};
+			expect( actions.mergeBlocks( blockA, blockB ) ).toEqual( {
+				type: 'MERGE_BLOCKS',
+				blocks: [ {
+					uid: 'blockA',
+				}, {
+					uid: 'blockB',
+				} ],
+			} );
+		} );
+	} );
+
+	describe( 'autosave', () => {
+		it( 'should return AUTOSAVE action', () => {
+			expect( actions.autosave() ).toEqual( {
+				type: 'AUTOSAVE',
+			} );
+		} );
+	} );
+	describe( 'redo', () => {
+		it( 'should return REDO action', () => {
+			expect( actions.redo() ).toEqual( {
+				type: 'REDO',
+			} );
+		} );
+	} );
+	describe( 'undo', () => {
+		it( 'should return UNDO action', () => {
+			expect( actions.undo() ).toEqual( {
+				type: 'UNDO',
+			} );
+		} );
+	} );
+
+	describe( 'removeBlocks', () => {
+		it( 'should return REMOVE_BLOCKS action', () => {
+			const uids = [ 'uid' ];
+			expect( actions.removeBlocks( uids ) ).toEqual( {
+				type: 'REMOVE_BLOCKS',
+				uids: [
+					'uid',
+				],
+			} );
+		} );
+	} );
+	describe( 'removeBlock', () => {
+		it( 'should return REMOVE_BLOCKS action', () => {
+			const uid = 'uid';
+			expect( actions.removeBlock( uid ) ).toEqual( {
+				type: 'REMOVE_BLOCKS',
+				uids: [
+					'uid',
+				],
+			} );
+		} );
+	} );
+
+	describe( 'toggleBlockMode', () => {
+		it( 'should return TOGGLE_BLOCK_MODE action', () => {
+			const uid = 'uid';
+			expect( actions.toggleBlockMode( uid ) ).toEqual( {
+				type: 'TOGGLE_BLOCK_MODE',
+				uid: 'uid',
 			} );
 		} );
 	} );
@@ -44,6 +337,33 @@ describe( 'actions', () => {
 		it( 'should return the STOP_TYPING action', () => {
 			expect( actions.stopTyping() ).toEqual( {
 				type: 'STOP_TYPING',
+			} );
+		} );
+	} );
+
+	describe( 'toggleSidebar', () => {
+		it( 'should return TOGGLE_SIDEBAR action', () => {
+			const isMobile = true;
+			expect( actions.toggleSidebar( isMobile ) ).toEqual( {
+				type: 'TOGGLE_SIDEBAR',
+				isMobile: true,
+			} );
+		} );
+	} );
+
+	describe( 'setActivePanel', () => {
+		const panel = 'panelName';
+		expect( actions.setActivePanel( panel ) ).toEqual( {
+			type: 'SET_ACTIVE_PANEL',
+			panel: 'panelName',
+		} );
+	} );
+	describe( 'toggleSidebarPanel', () => {
+		it( 'should return TOGGLE_SIDEBAR_PANEL action', () => {
+			const panel = 'panelName';
+			expect( actions.toggleSidebarPanel( panel ) ).toEqual( {
+				type: 'TOGGLE_SIDEBAR_PANEL',
+				panel: 'panelName',
 			} );
 		} );
 	} );
