@@ -22,7 +22,7 @@ exports[`PanelColor should match snapshot 1`] = `
 />
 `;
 
-exports[`PanelColor should match snapshot when colorValue is empty 1`] = `
+exports[`PanelColor should match snapshot when title is empty 1`] = `
 <PanelBody
   title={
     Array [
