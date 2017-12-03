@@ -19,7 +19,9 @@ The name for a block is a unique string that identifies a block. Names have to b
 registerBlockType( 'my-plugin/book', {} );
 ```
 
-*Note:* this name is used on the comment delimiters as `<!-- wp:my-plugin/book -->`. Those blocks provided by core don't include a namespace when serialized.
+*Note:* A block name can only contain lowercase alphanumeric characters and dashes, and must begin with a letter.
+
+*Note:* This name is used on the comment delimiters as `<!-- wp:my-plugin/book -->`. Those blocks provided by core don't include a namespace when serialized.
 
 ### Block Configuration
 
@@ -40,9 +42,9 @@ title: 'Book'
 
 #### Category
 
-* **Type:** `String [ common | formatting | layout | widgets | embeds ]`
+* **Type:** `String [ common | formatting | layout | widgets | embed ]`
 
-Blocks are grouped into categories to help users browse and discover them. The core provided categories are `common`, `formatting`, `layout`, `widgets`, and `embeds`.
+Blocks are grouped into categories to help users browse and discover them. The core provided categories are `common`, `formatting`, `layout`, `widgets`, and `embed`.
 
 ```js
 // Assigning to the 'layout' category
@@ -78,11 +80,14 @@ Attributes provide the structured data needs of a block. They can exist in diffe
 attributes: {
 	cover: {
 		type: 'string',
-		source: attr( 'img', 'src' ),
+		source: 'attribute',
+		selector: 'img',
+		attribute: 'src',
 	},
 	author: {
 		type: 'string',
-		source: children( '.book-author' ),
+		source: 'children',
+		selector: '.book-author',
 	},
 	pages: {
 		type: 'number',
@@ -90,22 +95,11 @@ attributes: {
 },
 ```
 
-* **See: [Attributes](/reference/attributes/).**
+* **See: [Attributes](https://wordpress.org/gutenberg/handbook/reference/attributes/).**
 
 #### Transforms (optional)
 
 Work in progress...
-
-#### className (optional)
-
-* **Type:** `Bool`
-
-By default, Gutenberg adds a class with the form `.wp-blocks-your-block-name` to the root element of your saved markup. This helps having a consistent mechanism for styling blocks that themes and plugins can rely on. If for whatever reason a class is not desired on the markup, this functionality can be disabled.
-
-```js
-// Do not generate classes for this block
-className: false,
-```
 
 #### useOnce (optional)
 
@@ -119,16 +113,31 @@ Whether a block can only be used once per post.
 useOnce: true,
 ```
 
-#### supportAnchor (optional)
+#### supports (optional)
 
-* **Type:** `Bool`
-* **Default:** `false`
+* **Type:** `Object`
 
-Anchors let you link directly to a specific block on a page. This property adds a field to define an id for the block and a button to copy the direct link.
+Optional block extended support features. The following options are supported, and should be specified as a boolean `true` or `false` value:
+
+- `anchor` (default `false`): Anchors let you link directly to a specific block on a page. This property adds a field to define an id for the block and a button to copy the direct link.
 
 ```js
 // Add the support for an anchor link.
-supportAnchor: true,
+anchor: true,
+```
+
+- `customClassName` (default `true`): This property adds a field to define a custom className for the block's wrapper.
+
+```js
+// Remove the support for a the custom className .
+customClassName: false,
+```
+
+- `className` (default `true`): By default, Gutenberg adds a class with the form `.wp-block-your-block-name` to the root element of your saved markup. This helps having a consistent mechanism for styling blocks that themes and plugins can rely on. If for whatever reason a class is not desired on the markup, this functionality can be disabled.
+
+```js
+// Remove the support for a the generated className .
+className: false,
 ```
 
 #### supportHTML (optional)
@@ -145,4 +154,4 @@ supportHTML: false,
 
 ## Edit and Save
 
-The `edit` and `save` functions define the editor interface with which a user would interact, and the markup to be serialized back when a post is saved. They are the heart of how a block operates, so they are [covered separately](/block-edit-save/).
+The `edit` and `save` functions define the editor interface with which a user would interact, and the markup to be serialized back when a post is saved. They are the heart of how a block operates, so they are [covered separately](https://wordpress.org/gutenberg/handbook/block-edit-save/).

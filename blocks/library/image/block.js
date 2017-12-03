@@ -16,7 +16,7 @@ import {
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { mediaUpload } from '@wordpress/utils';
+import { mediaUpload, createMediaFromFile, getBlobByURL, revokeBlobURL, viewPort } from '@wordpress/utils';
 import {
 	Placeholder,
 	Dashicon,
@@ -24,12 +24,12 @@ import {
 	DropZone,
 	FormFileUpload,
 	withAPIData,
+	withContext,
 } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import withEditorSettings from '../../with-editor-settings';
 import Editable from '../../editable';
 import MediaUploadButton from '../../media-upload-button';
 import InspectorControls from '../../inspector-controls';
@@ -41,6 +41,11 @@ import BlockDescription from '../../block-description';
 import UrlInputButton from '../../url-input/button';
 import ImageSize from './image-size';
 
+/**
+ * Module constants
+ */
+const MIN_SIZE = 20;
+
 class ImageBlock extends Component {
 	constructor() {
 		super( ...arguments );
@@ -51,8 +56,37 @@ class ImageBlock extends Component {
 		this.updateImageURL = this.updateImageURL.bind( this );
 	}
 
+	componentDidMount() {
+		const { attributes, setAttributes } = this.props;
+		const { id, url = '' } = attributes;
+
+		if ( ! id && url.indexOf( 'blob:' ) === 0 ) {
+			getBlobByURL( url )
+				.then( createMediaFromFile )
+				.then( ( media ) => {
+					setAttributes( {
+						id: media.id,
+						url: media.source_url,
+					} );
+				} );
+		}
+	}
+
+	componentDidUpdate( prevProps ) {
+		const { id: prevID, url: prevUrl = '' } = prevProps.attributes;
+		const { id, url = '' } = this.props.attributes;
+
+		if ( ! prevID && prevUrl.indexOf( 'blob:' ) === 0 && id && url.indexOf( 'blob:' ) === -1 ) {
+			revokeBlobURL( url );
+		}
+	}
+
 	onSelectImage( media ) {
-		this.props.setAttributes( { url: media.url, alt: media.alt, caption: media.caption, id: media.id } );
+		const attributes = { url: media.url, alt: media.alt, id: media.id };
+		if ( media.caption ) {
+			attributes.caption = [ media.caption ];
+		}
+		this.props.setAttributes( attributes );
 	}
 
 	onSetHref( value ) {
@@ -84,7 +118,7 @@ class ImageBlock extends Component {
 
 		const availableSizes = this.getAvailableSizes();
 		const figureStyle = width ? { width } : {};
-		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1;
+		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && ( ! viewPort.isExtraSmall() );
 		const uploadButtonProps = { isLarge: true };
 		const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setAttributes );
 		const dropFiles = ( files ) => mediaUpload( files, setAttributes );
@@ -164,7 +198,7 @@ class ImageBlock extends Component {
 						<p>{ __( 'Worth a thousand words.' ) }</p>
 					</BlockDescription>
 					<h3>{ __( 'Image Settings' ) }</h3>
-					<TextControl label={ __( 'Alternate Text' ) } value={ alt } onChange={ this.updateAlt } />
+					<TextControl label={ __( 'Textual Alternative' ) } value={ alt } onChange={ this.updateAlt } help={ __( 'Describe the purpose of the image. Leave empty if the image is not a key part of the content.' ) } />
 					{ ! isEmpty( availableSizes ) && (
 						<SelectControl
 							label={ __( 'Size' ) }
@@ -201,8 +235,8 @@ class ImageBlock extends Component {
 						const currentHeight = height || imageHeightWithinContainer;
 
 						const ratio = imageWidth / imageHeight;
-						const minWidth = imageWidth < imageHeight ? 10 : 10 * ratio;
-						const minHeight = imageHeight < imageWidth ? 10 : 10 / ratio;
+						const minWidth = imageWidth < imageHeight ? MIN_SIZE : MIN_SIZE * ratio;
+						const minHeight = imageHeight < imageWidth ? MIN_SIZE : MIN_SIZE / ratio;
 
 						return (
 							<ResizableBox
@@ -224,8 +258,8 @@ class ImageBlock extends Component {
 								enable={ { top: false, right: true, bottom: false, left: false, topRight: true, bottomRight: true, bottomLeft: true, topLeft: true } }
 								onResizeStop={ ( event, direction, elt, delta ) => {
 									setAttributes( {
-										width: currentWidth + delta.width,
-										height: currentHeight + delta.height,
+										width: parseInt( currentWidth + delta.width, 10 ),
+										height: parseInt( currentHeight + delta.height, 10 ),
 									} );
 								} }
 							>
@@ -252,7 +286,9 @@ class ImageBlock extends Component {
 }
 
 export default flowRight( [
-	withEditorSettings(),
+	withContext( 'editor' )( ( settings ) => {
+		return { settings };
+	} ),
 	withAPIData( ( props ) => {
 		const { id } = props.attributes;
 		if ( ! id ) {

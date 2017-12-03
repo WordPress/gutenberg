@@ -7,14 +7,13 @@ import { ChromePicker } from 'react-color';
 /**
  * WordPress dependencies
  */
-import { Dropdown } from '@wordpress/components';
+import { Dropdown, withContext } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import withEditorSettings from '../with-editor-settings';
 
 function ColorPalette( { colors, value, onChange } ) {
 	return (
@@ -61,20 +60,18 @@ function ColorPalette( { colors, value, onChange } ) {
 				) }
 			/>
 
-			<div className="blocks-color-palette__item-wrapper blocks-color-palette__clear-color">
-				<button
-					className="blocks-color-palette__item"
-					onClick={ () => onChange( undefined ) }
-					aria-label={ __( 'Remove color' ) }
-				>
-					<span className="blocks-color-palette__clear-color-line" />
-				</button>
-			</div>
+			<button
+				className="button-link blocks-color-palette__clear"
+				type="button"
+				onClick={ () => onChange( undefined ) }
+			>
+				{ __( 'Clear' ) }
+			</button>
 		</div>
 	);
 }
 
-export default withEditorSettings(
+export default withContext( 'editor' )(
 	( settings ) => ( {
 		colors: settings.colors,
 	} )

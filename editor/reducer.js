@@ -3,7 +3,10 @@
  */
 import optimist from 'redux-optimist';
 import { combineReducers } from 'redux';
+import { createResponsiveStateReducer } from 'redux-responsive';
 import {
+	flow,
+	partialRight,
 	difference,
 	get,
 	reduce,
@@ -16,6 +19,7 @@ import {
 	without,
 	mapValues,
 	findIndex,
+	reject,
 } from 'lodash';
 
 /**
@@ -26,8 +30,17 @@ import { getBlockTypes, getBlockType } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { combineUndoableReducers } from './utils/undoable-reducer';
-import { STORE_DEFAULTS } from './store-defaults';
+import withHistory from './utils/with-history';
+import withChangeDetection from './utils/with-change-detection';
+import { PREFERENCES_DEFAULTS } from './store-defaults';
+import {
+	BREAK_HUGE,
+	BREAK_WIDE,
+	BREAK_LARGE,
+	BREAK_MEDIUM,
+	BREAK_SMALL,
+	BREAK_MOBILE,
+} from './constants';
 
 /***
  * Module constants
@@ -63,7 +76,16 @@ export function getPostRawValue( value ) {
  * @param  {Object} action Dispatched action
  * @return {Object}        Updated state
  */
-export const editor = combineUndoableReducers( {
+export const editor = flow( [
+	combineReducers,
+
+	// Track undo history, starting at editor initialization.
+	partialRight( withHistory, { resetTypes: [ 'SETUP_EDITOR' ] } ),
+
+	// Track whether changes exist, starting at editor initialization and
+	// resetting at each post save.
+	partialRight( withChangeDetection, { resetTypes: [ 'SETUP_EDITOR', 'RESET_POST' ] } ),
+] )( {
 	edits( state = {}, action ) {
 		switch ( action.type ) {
 			case 'EDIT_POST':
@@ -261,7 +283,7 @@ export const editor = combineUndoableReducers( {
 
 		return state;
 	},
-}, { resetTypes: [ 'SETUP_EDITOR' ] } );
+} );
 
 /**
  * Reducer returning the last-known state of the current post, in the format
@@ -459,12 +481,13 @@ export function blockInsertionPoint( state = {}, action ) {
  * @param  {Object}  action                Dispatched action
  * @return {string}                        Updated state
  */
-export function preferences( state = STORE_DEFAULTS.preferences, action ) {
+export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 	switch ( action.type ) {
 		case 'TOGGLE_SIDEBAR':
+			const isSidebarOpenedKey = action.isMobile ? 'isSidebarOpenedMobile' : 'isSidebarOpened';
 			return {
 				...state,
-				isSidebarOpened: ! state.isSidebarOpened,
+				[ isSidebarOpenedKey ]: ! state[ isSidebarOpenedKey ],
 			};
 		case 'TOGGLE_SIDEBAR_PANEL':
 			return {
@@ -509,6 +532,14 @@ export function preferences( state = STORE_DEFAULTS.preferences, action ) {
 					.concat( difference( commonBlocks, state.recentlyUsedBlocks ) )
 					.slice( 0, MAX_RECENT_BLOCKS ),
 				blockUsage: filterInvalidBlocksFromObject( state.blockUsage ),
+			};
+		case 'TOGGLE_FEATURE':
+			return {
+				...state,
+				features: {
+					...state.features,
+					[ action.feature ]: ! state.features[ action.feature ],
+				},
 			};
 	}
 
@@ -562,7 +593,10 @@ export function saving( state = {}, action ) {
 export function notices( state = [], action ) {
 	switch ( action.type ) {
 		case 'CREATE_NOTICE':
-			return [ ...state, action.notice ];
+			return [
+				...reject( state, { id: action.notice.id } ),
+				action.notice,
+			];
 
 		case 'REMOVE_NOTICE':
 			const { noticeId } = action;
@@ -581,7 +615,6 @@ export function notices( state = [], action ) {
 }
 
 const locations = [
-	'advanced',
 	'normal',
 	'side',
 ];
@@ -602,10 +635,21 @@ export function metaBoxes( state = defaultMetaBoxState, action ) {
 			return locations.reduce( ( newState, location ) => {
 				newState[ location ] = {
 					...state[ location ],
+					isLoaded: false,
 					isActive: action.metaBoxes[ location ],
 				};
 				return newState;
 			}, { ...state } );
+		case 'META_BOX_LOADED':
+			return {
+				...state,
+				[ action.location ]: {
+					...state[ action.location ],
+					isLoaded: true,
+					isUpdating: false,
+					isDirty: false,
+				},
+			};
 		case 'HANDLE_META_BOX_RELOAD':
 			return {
 				...state,
@@ -637,6 +681,66 @@ export function metaBoxes( state = defaultMetaBoxState, action ) {
 	}
 }
 
+// Create responsive reducer with the breakpoints imported from the scss variables file.
+const responsive = createResponsiveStateReducer( {
+	mobile: BREAK_MOBILE,
+	small: BREAK_SMALL,
+	medium: BREAK_MEDIUM,
+	large: BREAK_LARGE,
+	wide: BREAK_WIDE,
+	huge: BREAK_HUGE,
+} );
+
+export const reusableBlocks = combineReducers( {
+	data( state = {}, action ) {
+		switch ( action.type ) {
+			case 'FETCH_REUSABLE_BLOCKS_SUCCESS': {
+				return reduce( action.reusableBlocks, ( newState, reusableBlock ) => ( {
+					...newState,
+					[ reusableBlock.id ]: reusableBlock,
+				} ), state );
+			}
+
+			case 'UPDATE_REUSABLE_BLOCK': {
+				const { id, reusableBlock } = action;
+				const existingReusableBlock = state[ id ];
+
+				return {
+					...state,
+					[ id ]: {
+						...existingReusableBlock,
+						...reusableBlock,
+						attributes: {
+							...( existingReusableBlock && existingReusableBlock.attributes ),
+							...reusableBlock.attributes,
+						},
+					},
+				};
+			}
+		}
+
+		return state;
+	},
+
+	isSaving( state = {}, action ) {
+		switch ( action.type ) {
+			case 'SAVE_REUSABLE_BLOCK':
+				return {
+					...state,
+					[ action.id ]: true,
+				};
+
+			case 'SAVE_REUSABLE_BLOCK_SUCCESS':
+			case 'SAVE_REUSABLE_BLOCK_FAILURE': {
+				const { id } = action;
+				return omit( state, id );
+			}
+		}
+
+		return state;
+	},
+} );
+
 export default optimist( combineReducers( {
 	editor,
 	currentPost,
@@ -650,4 +754,6 @@ export default optimist( combineReducers( {
 	saving,
 	notices,
 	metaBoxes,
+	responsive,
+	reusableBlocks,
 } ) );

@@ -33,7 +33,10 @@ export default function( HTML ) {
 
 			const attributes = mapValues(
 				pickBy( transform.attributes, ( schema ) => schema.shortcode ),
-				( schema ) => schema.shortcode( match.shortcode.attrs ),
+				// Passing all of `match` as second argument is intentionally
+				// broad but shouldn't be too relied upon. See
+				// https://github.com/WordPress/gutenberg/pull/3610#discussion_r152546926
+				( schema ) => schema.shortcode( match.shortcode.attrs, match ),
 			);
 
 			const block = createBlock(

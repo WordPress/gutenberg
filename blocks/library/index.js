@@ -1,4 +1,4 @@
-import './paragraph';
+import './shortcode';
 import './image';
 import './gallery';
 import './heading';
@@ -17,8 +17,9 @@ import './freeform';
 import './latest-posts';
 import './categories';
 import './cover-image';
-import './shortcode';
 import './text-columns';
 import './verse';
 import './video';
 import './audio';
+import './reusable-block';
+import './paragraph';

@@ -15,7 +15,7 @@ import './style.scss';
 import IconButton from '../icon-button';
 import Dashicon from '../dashicon';
 import Dropdown from '../dropdown';
-import NavigableMenu from '../navigable-menu';
+import { NavigableMenu } from '../navigable-container';
 
 const { DOWN } = keycodes;
 

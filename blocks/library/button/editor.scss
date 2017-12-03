@@ -1,6 +1,6 @@
 $blocks-button__height: 46px;
 
-.editor-visual-editor__block[data-type="core/button"] {
+.editor-block-list__block[data-type="core/button"] {
 	&[data-align="center"] {
 		text-align: center;
 	}
@@ -24,5 +24,38 @@ $blocks-button__height: 46px;
 
 	.blocks-editable__tinymce {
 		cursor: text;
+	}
+}
+
+.blocks-button__inline-link {
+	background: #fff;
+	width: 280px;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	font-family: $default-font;
+	font-size: $default-font-size;
+	line-height: $default-line-height;
+
+	.blocks-url-input {
+		width: auto;
+	}
+
+	.dashicon {
+		color: $dark-gray-100;
+	}
+
+	.blocks-url-input input[type=text]::placeholder {
+		color: $dark-gray-100;
+	}
+
+	[data-align="center"] & {
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	[data-align="right"] & {
+		margin-left: auto;
+		margin-right: 0;
 	}
 }

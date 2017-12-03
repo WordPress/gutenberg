@@ -1,14 +1,26 @@
 // `babel-jest` should be doing this instead, but apparently it's not working.
 require( 'core-js/modules/es7.object.values' );
 
-/**
- * External dependencies
- */
-import Adapter from 'enzyme-adapter-react-16';
-import Enzyme from 'enzyme';
-import 'jest-enzyme';
+// It "mocks" enzyme, so that we can delay loading of
+// the utility functions until enzyme is imported in tests.
+// Props to @gdborton for sharing this technique in his article:
+// https://medium.com/airbnb-engineering/unlocking-test-performance-migrating-from-mocha-to-jest-2796c508ec50.
+let mockEnzymeSetup = false;
 
-Enzyme.configure( { adapter: new Adapter() } );
+jest.mock( 'enzyme', () => {
+	const actualEnzyme = require.requireActual( 'enzyme' );
+	if ( ! mockEnzymeSetup ) {
+		mockEnzymeSetup = true;
+
+		// configure enzyme 3 for React, from docs: http://airbnb.io/enzyme/docs/installation/index.html
+		const Adapter = require.requireActual( 'enzyme-adapter-react-16' );
+		actualEnzyme.configure( { adapter: new Adapter() } );
+
+		// configure assertions for enzyme
+		require.requireActual( 'jest-enzyme' );
+	}
+	return actualEnzyme;
+} );
 
 // Sets spies on console object to make it possible to convert them into test failures.
 const spyError = jest.spyOn( console, 'error' );

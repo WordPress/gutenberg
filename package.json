@@ -1,6 +1,6 @@
 {
   "name": "gutenberg",
-  "version": "1.6.1",
+  "version": "1.8.1",
   "description": "A new WordPress editor experience",
   "main": "build/app.js",
   "repository": "git+https://github.com/WordPress/gutenberg.git",
@@ -12,6 +12,7 @@
   ],
   "dependencies": {
     "@wordpress/a11y": "0.1.0-beta.1",
+    "@wordpress/hooks": "1.0.1",
     "@wordpress/url": "0.1.0-beta.1",
     "classnames": "2.2.5",
     "clipboard": "1.7.1",
@@ -28,7 +29,7 @@
     "moment-timezone": "0.5.13",
     "mousetrap": "1.6.1",
     "prop-types": "15.5.10",
-    "re-resizable": "4.0.2",
+    "re-resizable": "4.0.3",
     "react": "16.0.0",
     "react-autosize-textarea": "0.4.8",
     "react-click-outside": "2.3.1",
@@ -36,15 +37,16 @@
     "react-datepicker": "0.46.0",
     "react-dom": "16.0.0",
     "react-redux": "5.0.6",
-    "react-slot-fill": "1.0.1",
     "react-transition-group": "1.2.0",
     "redux": "3.7.2",
     "redux-multi": "0.1.12",
     "redux-optimist": "0.0.2",
+    "redux-responsive": "4.3.4",
     "refx": "2.1.0",
     "rememo": "2.3.3",
     "showdown": "1.7.4",
     "simple-html-tokenizer": "0.4.1",
+    "tinycolor2": "1.4.1",
     "uuid": "3.1.0"
   },
   "devDependencies": {
@@ -86,8 +88,10 @@
     "react-markdown": "2.5.0",
     "react-test-renderer": "16.0.0",
     "sass-loader": "6.0.6",
+    "sass-variables-loader": "0.1.3",
+    "sprintf-js": "1.1.1",
     "style-loader": "0.18.2",
-    "tinymce": "4.7.1",
+    "tinymce": "4.7.2",
     "webpack": "3.8.1"
   },
   "jest": {
@@ -132,8 +136,6 @@
     "fixtures:generate": "npm run fixtures:server-attributes && cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
     "fixtures:regenerate": "npm run fixtures:clean && npm run fixtures:generate",
     "package-plugin": "./bin/build-plugin-zip.sh",
-    "docs-start": "./docutron/bin/cli.js start",
-    "docs-build": "./docutron/bin/cli.js build",
     "test-unit": "jest",
     "test-unit:coverage": "jest --coverage",
     "test-unit:coverage-ci": "jest --coverage --maxWorkers 1 && codecov",

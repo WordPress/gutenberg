@@ -6,15 +6,17 @@ import { partial, castArray } from 'lodash';
 
 /**
  * Returns an action object used in signalling that editor has initialized with
- * the specified post object.
+ * the specified post object and editor settings.
  *
- * @param  {Object} post Post object
- * @return {Object}      Action object
+ * @param  {Object} post     Post object
+ * @param  {Object} settings Editor settings object
+ * @return {Object}          Action object
  */
-export function setupEditor( post ) {
+export function setupEditor( post, settings ) {
 	return {
 		type: 'SETUP_EDITOR',
 		post,
+		settings,
 	};
 }
 
@@ -333,11 +335,13 @@ export function stopTyping() {
 /**
  * Returns an action object used in signalling that the user toggled the sidebar
  *
- * @return {Object}         Action object
+ * @param  {Boolean} isMobile  Flag indicating if we are in mobile context
+ * @return {Object}            Action object
  */
-export function toggleSidebar() {
+export function toggleSidebar( isMobile ) {
 	return {
 		type: 'TOGGLE_SIDEBAR',
+		isMobile,
 	};
 }
 
@@ -444,6 +448,20 @@ export function handleMetaBoxReload( location ) {
 }
 
 /**
+ * Returns an action object used to signify that a meta box finished loading.
+ *
+ * @param {String} location Location of meta box: 'normal', 'side'.
+ *
+ * @return {Object} Action object
+ */
+export function metaBoxLoaded( location ) {
+	return {
+		type: 'META_BOX_LOADED',
+		location,
+	};
+}
+
+/**
  * Returns an action object used to request meta box update.
  *
  * @param {Array} locations Locations of meta boxes: ['normal', 'side' ].
@@ -473,7 +491,92 @@ export function metaBoxStateChanged( location, hasChanged ) {
 	};
 }
 
+/**
+ * Returns an action object used to toggle a feature flag
+ *
+ * @param {String}  feature   Featurre name.
+ *
+ * @return {Object}           Action object
+ */
+export function toggleFeature( feature ) {
+	return {
+		type: 'TOGGLE_FEATURE',
+		feature,
+	};
+}
+
 export const createSuccessNotice = partial( createNotice, 'success' );
 export const createInfoNotice = partial( createNotice, 'info' );
 export const createErrorNotice = partial( createNotice, 'error' );
 export const createWarningNotice = partial( createNotice, 'warning' );
+
+/**
+ * Returns an action object used to fetch a single reusable block or all
+ * reusable blocks from the REST API into the store.
+ *
+ * @param {?string} id If given, only a single reusable block with this ID will be fetched
+ * @return {Object}   Action object
+ */
+export function fetchReusableBlocks( id ) {
+	return {
+		type: 'FETCH_REUSABLE_BLOCKS',
+		id,
+	};
+}
+
+/**
+ * Returns an action object used to insert or update a reusable block into the store.
+ *
+ * @param {Object} id            The ID of the reusable block to update
+ * @param {Object} reusableBlock The new reusable block object. Any omitted keys are not changed
+ * @return {Object}              Action object
+ */
+export function updateReusableBlock( id, reusableBlock ) {
+	return {
+		type: 'UPDATE_REUSABLE_BLOCK',
+		id,
+		reusableBlock,
+	};
+}
+
+/**
+ * Returns an action object used to save a reusable block that's in the store
+ * to the REST API.
+ *
+ * @param {Object} id The ID of the reusable block to save
+ * @return {Object}   Action object
+ */
+export function saveReusableBlock( id ) {
+	return {
+		type: 'SAVE_REUSABLE_BLOCK',
+		id,
+	};
+}
+
+/**
+ * Returns an action object used to convert a reusable block into a static
+ * block.
+ *
+ * @param {Object} uid The ID of the block to attach
+ * @return {Object}    Action object
+ */
+export function convertBlockToStatic( uid ) {
+	return {
+		type: 'CONVERT_BLOCK_TO_STATIC',
+		uid,
+	};
+}
+
+/**
+ * Returns an action object used to convert a static block into a reusable
+ * block.
+ *
+ * @param {Object} uid The ID of the block to detach
+ * @return {Object}    Action object
+ */
+export function convertBlockToReusable( uid ) {
+	return {
+		type: 'CONVERT_BLOCK_TO_REUSABLE',
+		uid,
+	};
+}

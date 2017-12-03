@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { pick, without, noop } from 'lodash';
+import { pick, sortBy, forEach, without, noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,6 +17,7 @@ class SlotFillProvider extends Component {
 		this.unregisterSlot = this.unregisterSlot.bind( this );
 		this.unregisterFill = this.unregisterFill.bind( this );
 		this.getSlot = this.getSlot.bind( this );
+		this.getFills = this.getFills.bind( this );
 
 		this.slots = {};
 		this.fills = {};
@@ -29,13 +30,17 @@ class SlotFillProvider extends Component {
 			'unregisterSlot',
 			'unregisterFill',
 			'getSlot',
+			'getFills',
 		] );
 	}
 
-	registerSlot( name, node ) {
-		this.slots[ name ] = node;
-
+	registerSlot( name, slot ) {
+		this.slots[ name ] = slot;
 		this.forceUpdateFills( name );
+
+		// Sometimes the fills are registered after the intial render of slot
+		// But before the registerSlot call, we need to rerender the slot
+		this.forceUpdateSlot( name );
 	}
 
 	registerFill( name, instance ) {
@@ -43,10 +48,12 @@ class SlotFillProvider extends Component {
 			...( this.fills[ name ] || [] ),
 			instance,
 		];
+		this.forceUpdateSlot( name );
 	}
 
 	unregisterSlot( name ) {
 		delete this.slots[ name ];
+		this.forceUpdateFills( name );
 	}
 
 	unregisterFill( name, instance ) {
@@ -54,17 +61,35 @@ class SlotFillProvider extends Component {
 			this.fills[ name ],
 			instance
 		);
+		this.resetFillOccurrence( name );
+		this.forceUpdateSlot( name );
 	}
 
 	getSlot( name ) {
 		return this.slots[ name ];
 	}
 
+	getFills( name ) {
+		return sortBy( this.fills[ name ], 'occurrence' );
+	}
+
+	resetFillOccurrence( name ) {
+		forEach( this.fills[ name ], ( instance ) => {
+			instance.resetOccurrence();
+		} );
+	}
+
 	forceUpdateFills( name ) {
-		if ( this.fills.hasOwnProperty( name ) ) {
-			this.fills[ name ].forEach( ( instance ) => {
-				instance.forceUpdate();
-			} );
+		forEach( this.fills[ name ], ( instance ) => {
+			instance.forceUpdate();
+		} );
+	}
+
+	forceUpdateSlot( name ) {
+		const slot = this.getSlot( name );
+
+		if ( slot ) {
+			slot.forceUpdate();
 		}
 	}
 
@@ -79,6 +104,7 @@ SlotFillProvider.childContextTypes = {
 	registerFill: noop,
 	unregisterFill: noop,
 	getSlot: noop,
+	getFills: noop,
 };
 
 export default SlotFillProvider;

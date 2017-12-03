@@ -6,8 +6,9 @@
 import { get, isFunction, some } from 'lodash';
 
 /**
- * WordPress dependencies
+ * Internal dependencies
  */
+import { applyFilters } from '../hooks';
 import { getCategories } from './categories';
 
 /**
@@ -50,15 +51,9 @@ export function registerBlockType( name, settings ) {
 		);
 		return;
 	}
-	if ( /[A-Z]+/.test( name ) ) {
+	if ( ! /^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/.test( name ) ) {
 		console.error(
-			'Block names must not contain uppercase characters.'
-		);
-		return;
-	}
-	if ( ! /^[a-z0-9-]+\/[a-z0-9-]+$/.test( name ) ) {
-		console.error(
-			'Block names must contain a namespace prefix. Example: my-plugin/my-custom-block'
+			'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block'
 		);
 		return;
 	}
@@ -113,13 +108,16 @@ export function registerBlockType( name, settings ) {
 	if ( ! settings.icon ) {
 		settings.icon = 'block-default';
 	}
-	const block = blocks[ name ] = {
+
+	settings = {
 		name,
-		attributes: get( window._wpBlocksAttributes, name ),
+		attributes: get( window._wpBlocksAttributes, name, {} ),
 		...settings,
 	};
 
-	return block;
+	settings = applyFilters( 'registerBlockType', settings, name );
+
+	return blocks[ name ] = settings;
 }
 
 /**
@@ -195,4 +193,24 @@ export function getBlockType( name ) {
  */
 export function getBlockTypes() {
 	return Object.values( blocks );
+}
+
+/**
+ * Returns true if the block defines support for a feature, or false otherwise
+ *
+ * @param  {(String|Object)} nameOrType      Block name or type object
+ * @param  {String}          feature         Feature to test
+ * @param  {Boolean}         defaultSupports Whether feature is supported by
+ *                                           default if not explicitly defined
+ * @return {Boolean}                         Whether block supports feature
+ */
+export function hasBlockSupport( nameOrType, feature, defaultSupports ) {
+	const blockType = 'string' === typeof nameOrType ?
+		getBlockType( nameOrType ) :
+		nameOrType;
+
+	return !! get( blockType, [
+		'supports',
+		feature,
+	], defaultSupports );
 }

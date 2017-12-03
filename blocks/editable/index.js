@@ -15,14 +15,14 @@ import {
 	noop,
 } from 'lodash';
 import { nodeListToReact } from 'dom-react';
-import { Fill, Slot } from 'react-slot-fill';
 import 'element-closest';
 
 /**
  * WordPress dependencies
  */
 import { createElement, Component, renderToString } from '@wordpress/element';
-import { keycodes } from '@wordpress/utils';
+import { keycodes, createBlobURL } from '@wordpress/utils';
+import { Slot, Fill } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -84,7 +84,7 @@ export default class Editable extends Component {
 				`Invalid value of type ${ typeof value } passed to Editable ` +
 				'(expected array). Attribute values should be sourced using ' +
 				'the `children` source when used with Editable.\n\n' +
-				'See: http://gutenberg-devdoc.surge.sh/reference/attributes/#children'
+				'See: https://wordpress.org/gutenberg/handbook/reference/attributes/#children'
 			);
 		}
 
@@ -110,6 +110,14 @@ export default class Editable extends Component {
 		};
 	}
 
+	/**
+	 * Retrieves the settings for this block.
+	 *
+	 * Allows passing in settings which will be overwritten.
+	 *
+	 * @param {Object} settings The settings to overwrite.
+	 * @returns {Object} The settings for this block.
+	 */
 	getSettings( settings ) {
 		return ( this.props.getSettings || identity )( {
 			...settings,
@@ -117,6 +125,14 @@ export default class Editable extends Component {
 		} );
 	}
 
+	/**
+	 * Handles the onSetup event for the tinyMCE component
+	 *
+	 * Will setup event handlers for the tinyMCE instance.
+	 * An `onSetup` function in the props will be called if it is present.
+	 *
+	 * @param {tinymce} editor The editor instance as passed by tinyMCE.
+	 */
 	onSetup( editor ) {
 		this.editor = editor;
 
@@ -134,7 +150,7 @@ export default class Editable extends Component {
 		editor.on( 'selectionChange', this.onSelectionChange );
 		editor.on( 'BeforeExecCommand', this.maybePropagateUndo );
 		editor.on( 'PastePreProcess', this.onPastePreProcess, true /* Add before core handlers */ );
-		editor.on( 'paste', this.onPaste );
+		editor.on( 'paste', this.onPaste, true /* Add before core handlers */ );
 
 		patterns.apply( this, [ editor ] );
 
@@ -143,6 +159,17 @@ export default class Editable extends Component {
 		}
 	}
 
+	/**
+	 * Allows prop event handlers to handle an event
+	 *
+	 * Allow props an opportunity to handle the event, before default
+	 * Editable behavior takes effect. Should the event be handled by a
+	 * prop, it should `stopImmediatePropagation` on the event to stop
+	 * continued event handling.
+	 *
+	 * @param {string} name The name of the event.
+	 * @returns {void}
+	*/
 	proxyPropHandler( name ) {
 		return ( event ) => {
 			// TODO: Reconcile with `onFocus` instance handler which does not
@@ -197,6 +224,11 @@ export default class Editable extends Component {
 		return document.activeElement === this.editor.getBody();
 	}
 
+	/**
+	 * Handles the global selection change event.
+	 *
+	 * Will call the onFocus handler if one is defined and this block is focused.
+	 */
 	onSelectionChange() {
 		// We must check this because selectionChange is a global event.
 		if ( ! this.isActive() ) {
@@ -220,15 +252,21 @@ export default class Editable extends Component {
 		}
 	}
 
+	/**
+	 * Handles an undo event from tinyMCE
+	 *
+	 * When user attempts Undo when empty Undo stack, propagate undo
+	 * action to context handler. The compromise here is that: TinyMCE
+	 * handles Undo until change, at which point `editor.save` resets
+	 * history. If no history exists, let context handler have a turn.
+	 * Defer in case an immediate undo causes TinyMCE to be destroyed,
+	 * if other undo behaviors test presence of an input field.
+	 *
+	 * @param {UndoEvent} event The undo event as triggered by tinyMCE.
+	 */
 	maybePropagateUndo( event ) {
 		const { onUndo } = this.context;
 		if ( onUndo && event.command === 'Undo' && ! this.editor.undoManager.hasUndo() ) {
-			// When user attempts Undo when empty Undo stack, propagate undo
-			// action to context handler. The compromise here is that: TinyMCE
-			// handles Undo until change, at which point `editor.save` resets
-			// history. If no history exists, let context handler have a turn.
-			// Defer in case an immediate undo causes TinyMCE to be destroyed,
-			// if other undo behaviors test presence of an input field.
 			defer( onUndo );
 
 			// We could return false here to stop other TinyMCE event handlers
@@ -237,22 +275,83 @@ export default class Editable extends Component {
 		}
 	}
 
+	/**
+	 * Handles a paste event from tinyMCE
+	 *
+	 * Saves the pasted data as plain text in `pastedPlainText`.
+	 *
+	 * @param {PasteEvent} event The paste event as triggered by tinyMCE.
+	 */
 	onPaste( event ) {
-		const dataTransfer = event.clipboardData || this.editor.getDoc().dataTransfer;
+		const dataTransfer = event.clipboardData || event.dataTransfer || this.editor.getDoc().dataTransfer;
+		const { items = [], files = [] } = dataTransfer;
+		const item = find( [ ...items, ...files ], ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
+
+		if ( item ) {
+			// Allows us to ask for this information when we get a report.
+			window.console.log( 'Received item:\n\n', item );
+
+			const blob = item.getAsFile ? item.getAsFile() : item;
+
+			this.pastedContent = `<img src="${ createBlobURL( blob ) }">`;
+		}
 
 		this.pastedPlainText = dataTransfer ? dataTransfer.getData( 'text/plain' ) : '';
+		this.isPlainTextPaste = ( dataTransfer &&
+			dataTransfer.types.length === 1 &&
+			dataTransfer.types[ 0 ] === 'text/plain' );
 	}
 
+	/**
+	 * Handles a PrePasteProcess event from tinyMCE
+	 *
+	 * Will call the paste handler with the pasted data. If it is a string tries
+	 * to put it in the containing tinyMCE editor. Otherwise call the `onSplit` handler.
+	 *
+	 * @param {PrePasteProcessEvent} event The PrePasteProcess event as triggered by tinyMCE.
+	 */
 	onPastePreProcess( event ) {
+		const HTML = this.isPlainTextPaste ? this.pastedPlainText : event.content;
 		// Allows us to ask for this information when we get a report.
-		window.console.log( 'Received HTML:\n\n', event.content );
+		window.console.log( 'Received HTML:\n\n', this.pastedContent || HTML );
 		window.console.log( 'Received plain text:\n\n', this.pastedPlainText );
 
+		// There is a selection, check if a link is pasted.
+		if ( ! this.editor.selection.isCollapsed() ) {
+			const linkRegExp = /^(?:https?:)?\/\/\S+$/i;
+			const pastedText = event.content.replace( /<[^>]+>/g, '' ).trim();
+			const selectedText = this.editor.selection.getContent().replace( /<[^>]+>/g, '' ).trim();
+
+			// The pasted text is a link, and the selected text is not.
+			if ( linkRegExp.test( pastedText ) && ! linkRegExp.test( selectedText ) ) {
+				this.editor.execCommand( 'mceInsertLink', false, {
+					href: this.editor.dom.decode( pastedText ),
+				} );
+
+				// Allows us to ask for this information when we get a report.
+				window.console.log( 'Created link:\n\n', pastedText );
+
+				event.preventDefault();
+
+				return;
+			}
+		}
+
+		const rootNode = this.editor.getBody();
+		const isEmpty = this.editor.dom.isEmpty( rootNode );
+
+		let mode = 'INLINE';
+
+		if ( isEmpty && this.props.onReplace ) {
+			mode = 'BLOCKS';
+		} else if ( this.props.onSplit ) {
+			mode = 'AUTO';
+		}
+
 		const content = rawHandler( {
-			HTML: event.content,
+			HTML: this.pastedContent || HTML,
 			plainText: this.pastedPlainText,
-			// Force inline paste if there's no `onSplit` prop.
-			mode: this.props.onSplit ? 'AUTO' : 'INLINE',
+			mode,
 		} );
 
 		if ( typeof content === 'string' ) {
@@ -266,9 +365,7 @@ export default class Editable extends Component {
 				return;
 			}
 
-			const rootNode = this.editor.getBody();
-
-			if ( this.editor.dom.isEmpty( rootNode ) && this.props.onReplace ) {
+			if ( isEmpty && this.props.onReplace ) {
 				this.props.onReplace( content );
 			} else {
 				this.splitContent( content );
@@ -276,16 +373,28 @@ export default class Editable extends Component {
 		}
 	}
 
-	onChange() {
-		if ( ! this.editor.isDirty() ) {
-			return;
-		}
-
+	fireChange() {
 		this.savedContent = this.getContent();
 		this.editor.save();
 		this.props.onChange( this.savedContent );
 	}
 
+	/**
+	 * Handles any case where the content of the tinyMCE instance has changed.
+	 */
+	onChange() {
+		// Note that due to efficiency, speed and low cost requirements isDirty may
+		// not reflect reality for a brief period immediately after a change.
+		if ( this.editor.isDirty() ) {
+			this.fireChange();
+		}
+	}
+
+	/**
+	 * Determines the DOM rectangle for the selection in the editor.
+	 *
+	 * @returns {DOMRect} The DOMRect based on the selection in the editor.
+	 */
 	getEditorSelectionRect() {
 		let range = this.editor.selection.getRng();
 
@@ -311,13 +420,23 @@ export default class Editable extends Component {
 		return range.getBoundingClientRect();
 	}
 
+	/**
+	 * Calculates the relative position where the link toolbar should be.
+	 *
+	 * Based on the selection of the text inside this element a position is
+	 * calculated where the toolbar should be. This can be used downstream to
+	 * absolutely position the toolbar. It does this by finding the closest
+	 * relative element.
+	 *
+	 * @returns {{top: number, left: number}} The desired position of the toolbar.
+	 */
 	getFocusPosition() {
 		const position = this.getEditorSelectionRect();
 
 		// Find the parent "relative" positioned container
 		const container = this.props.inlineToolbar ?
 			this.editor.getBody().closest( '.blocks-editable' ) :
-			this.editor.getBody().closest( '.editor-visual-editor__block' );
+			this.editor.getBody().closest( '.editor-block-list__block' );
 		const containerPosition = container.getBoundingClientRect();
 		const blockPadding = 14;
 		const blockMoverMargin = 18;
@@ -336,6 +455,11 @@ export default class Editable extends Component {
 		};
 	}
 
+	/**
+	 * Determines if the current selection within the editor is at the start.
+	 *
+	 * @returns {boolean} Whether or not the selection is at the start of the editor.
+	 */
 	isStartOfEditor() {
 		const range = this.editor.selection.getRng();
 		if ( range.startOffset !== 0 || ! range.collapsed ) {
@@ -354,6 +478,11 @@ export default class Editable extends Component {
 		return true;
 	}
 
+	/**
+	 * Determines if the current selection within the editor is at the end.
+	 *
+	 * @returns {boolean} Whether or not the selection is at the end of the editor.
+	 */
 	isEndOfEditor() {
 		const range = this.editor.selection.getRng();
 		if ( range.endOffset !== range.endContainer.textContent.length || ! range.collapsed ) {
@@ -372,6 +501,11 @@ export default class Editable extends Component {
 		return true;
 	}
 
+	/**
+	 * Handles a keydown event from tinyMCE
+	 *
+	 * @param {KeydownEvent} event The keydow event as triggered by tinyMCE.
+	 */
 	onKeyDown( event ) {
 		if (
 			this.props.onMerge && (
@@ -380,7 +514,7 @@ export default class Editable extends Component {
 			)
 		) {
 			const forward = event.keyCode === DELETE;
-			this.onChange();
+			this.fireChange();
 			this.props.onMerge( forward );
 			event.preventDefault();
 			event.stopImmediatePropagation();
@@ -430,12 +564,26 @@ export default class Editable extends Component {
 		}
 	}
 
+	/**
+	 * Handles tinyMCE key up event
+	 *
+	 * @param {number} keyCode The key code that has been pressed on the keyboard.
+	 */
 	onKeyUp( { keyCode } ) {
 		if ( keyCode === BACKSPACE ) {
 			this.onSelectionChange();
 		}
 	}
 
+	/**
+	 * Splits the content at the location of the selection.
+	 *
+	 * Replaces the content of the editor inside this element with the contents
+	 * before the selection. Sends the elements after the selection to the `onSplit`
+	 * handler.
+	 *
+	 * @param {Array} blocks The blocks to add after the split point.
+	 */
 	splitContent( blocks = [] ) {
 		const { dom } = this.editor;
 		const rootNode = this.editor.getBody();
@@ -552,6 +700,12 @@ export default class Editable extends Component {
 	}
 
 	updateFocus() {
+		// We can't update focus if the editor hasn't finished initializing.
+		// Initialization callback `onInit` will call this function anyways.
+		if ( ! this.editor ) {
+			return;
+		}
+
 		const { focus } = this.props;
 		const isActive = this.isActive();
 

@@ -61,6 +61,9 @@ function gutenberg_meta_box_partial_page( $post_type, $meta_box_context ) {
 		return;
 	}
 
+	// Ths action is not needed since it's an XHR call.
+	remove_action( 'admin_head', 'wp_admin_canonical_url' );
+
 	$location = $_REQUEST['meta_box'];
 
 	if ( ! in_array( $_REQUEST['meta_box'], array( 'side', 'normal', 'advanced' ) ) ) {
@@ -144,39 +147,65 @@ add_action( 'do_meta_boxes', 'gutenberg_meta_box_partial_page', 1000, 2 );
  * @param WP_Locale $wp_locale      Locale object.
  */
 function gutenberg_meta_box_partial_page_admin_header( $hook_suffix, $current_screen, $wp_locale ) {
-	/* Scripts and styles that meta boxes can potentially be using */
-	wp_enqueue_style( 'common' );
-	wp_enqueue_style( 'buttons' );
-	wp_enqueue_style( 'colors' );
-	wp_enqueue_style( 'ie' );
-
+	/* Scripts that meta boxes can potentially be using */
 	wp_enqueue_script( 'utils' );
 	wp_enqueue_script( 'common' );
 	wp_enqueue_script( 'svg-painter' );
-
-	// These assets are Gutenberg specific.
-	wp_enqueue_style(
-		'meta-box-gutenberg',
-		gutenberg_url( 'editor/build/meta-box-iframe.css' ),
-		array(),
-		filemtime( gutenberg_dir_path() . 'editor/build/meta-box-iframe.css' )
-	);
-
-	wp_enqueue_script(
-		'meta-box-resize',
-		gutenberg_url( 'assets/js/meta-box-resize.js' ),
-		array(),
-		filemtime( gutenberg_dir_path() . 'assets/js/meta-box-resize.js' ),
-		true
-	);
-
+	?>
+	<html>
+	<head>
+	<?php
 	// Grab the admin body class.
 	$admin_body_class = preg_replace( '/[^a-z0-9_-]+/i', '-', $hook_suffix );
 
+	/**
+	 * The main way post.php sets body class.
+	 */
+	if ( get_user_setting( 'mfold' ) == 'f' ) {
+		$admin_body_class .= ' folded';
+	}
+
+	if ( ! get_user_setting( 'unfold' ) ) {
+		$admin_body_class .= ' auto-fold';
+	}
+
+	if ( is_admin_bar_showing() ) {
+		$admin_body_class .= ' admin-bar';
+	}
+
+	if ( is_rtl() ) {
+		$admin_body_class .= ' rtl';
+	}
+
+	if ( $current_screen->post_type ) {
+		$admin_body_class .= ' post-type-' . $current_screen->post_type;
+	}
+
+	if ( $current_screen->taxonomy ) {
+		$admin_body_class .= ' taxonomy-' . $current_screen->taxonomy;
+	}
+
+	$admin_body_class .= ' branch-' . str_replace( array( '.', ',' ), '-', floatval( get_bloginfo( 'version' ) ) );
+	$admin_body_class .= ' version-' . str_replace( '.', '-', preg_replace( '/^([.0-9]+).*/', '$1', get_bloginfo( 'version' ) ) );
+	$admin_body_class .= ' admin-color-' . sanitize_html_class( get_user_option( 'admin_color' ), 'fresh' );
+	$admin_body_class .= ' locale-' . sanitize_html_class( strtolower( str_replace( '_', '-', get_user_locale() ) ) );
+
+	if ( wp_is_mobile() ) {
+		$admin_body_class .= ' mobile';
+	}
+
+	if ( is_multisite() ) {
+		$admin_body_class .= ' multisite';
+	}
+
+	if ( is_network_admin() ) {
+		$admin_body_class .= ' network-admin';
+	}
+
+	$admin_body_class .= ' no-customize-support no-svg';
 	?>
-	<!-- Add an html class so that scroll bars can be removed in css and make it appear as though the iframe is one with Gutenberg. -->
-	<html class="gutenberg-meta-box-html">
-	<head>
+	</head>
+	<body>
 	<!-- Add in JavaScript variables that some meta box plugins make use of. -->
 	<script type="text/javascript">
 	addLoadEvent = function( func ){ if( typeof jQuery!="undefined" )jQuery( document ).ready( func );else if(typeof wpOnload!='function'){wpOnload=func;}else{var oldonload=wpOnload;wpOnload=function(){oldonload();func();}}};
@@ -188,7 +217,6 @@ function gutenberg_meta_box_partial_page_admin_header( $hook_suffix, $current_sc
 		decimalPoint = '<?php echo addslashes( $wp_locale->number_format['decimal_point'] ); ?>',
 		isRtl = <?php echo (int) is_rtl(); ?>;
 	</script>
-	<meta name="viewport" content="width=device-width,initial-scale=1.0">
 	<?php
 
 	/**
@@ -250,79 +278,6 @@ function gutenberg_meta_box_partial_page_admin_header( $hook_suffix, $current_sc
 	 * @since wp-core 2.1.0
 	 */
 	do_action( 'admin_head' );
-
-	/**
-	 * The main way post.php sets body class.
-	 */
-	if ( get_user_setting( 'mfold' ) == 'f' ) {
-		$admin_body_class .= ' folded';
-	}
-
-	if ( ! get_user_setting( 'unfold' ) ) {
-		$admin_body_class .= ' auto-fold';
-	}
-
-	if ( is_admin_bar_showing() ) {
-		$admin_body_class .= ' admin-bar';
-	}
-
-	if ( is_rtl() ) {
-		$admin_body_class .= ' rtl';
-	}
-
-	if ( $current_screen->post_type ) {
-		$admin_body_class .= ' post-type-' . $current_screen->post_type;
-	}
-
-	if ( $current_screen->taxonomy ) {
-		$admin_body_class .= ' taxonomy-' . $current_screen->taxonomy;
-	}
-
-	$admin_body_class .= ' branch-' . str_replace( array( '.', ',' ), '-', floatval( get_bloginfo( 'version' ) ) );
-	$admin_body_class .= ' version-' . str_replace( '.', '-', preg_replace( '/^([.0-9]+).*/', '$1', get_bloginfo( 'version' ) ) );
-	$admin_body_class .= ' admin-color-' . sanitize_html_class( get_user_option( 'admin_color' ), 'fresh' );
-	$admin_body_class .= ' locale-' . sanitize_html_class( strtolower( str_replace( '_', '-', get_user_locale() ) ) );
-
-	if ( wp_is_mobile() ) {
-		$admin_body_class .= ' mobile';
-	}
-
-	if ( is_multisite() ) {
-		$admin_body_class .= ' multisite';
-	}
-
-	if ( is_network_admin() ) {
-		$admin_body_class .= ' network-admin';
-	}
-
-	$admin_body_class .= ' no-customize-support no-svg';
-
-	?>
-	</head>
-	<?php
-
-	/**
-	 * Filters the CSS classes for the body tag in the admin.
-	 *
-	 * This filter differs from the {@see 'post_class'} and {@see 'body_class'} filters
-	 * in two important ways:
-	 *
-	 * 1. `$classes` is a space-separated string of class names instead of an array.
-	 * 2. Not all core admin classes are filterable, notably: wp-admin, wp-core-ui,
-	 *    and no-js cannot be removed.
-	 *
-	 * @since wp-core 2.3.0
-	 *
-	 * @param string $classes Space-separated list of CSS classes.
-	 */
-	$admin_body_classes = apply_filters( 'admin_body_class', '' );
-
-	?>
-	<body class="wp-admin wp-core-ui no-js <?php echo $admin_body_classes . ' ' . $admin_body_class; ?>">
-	<script type="text/javascript">
-		document.body.className = document.body.className.replace('no-js','js');
-	</script>
-	<?php
 }
 
 /**
@@ -350,7 +305,7 @@ function gutenberg_meta_box_partial_page_post_form( $post, $location ) {
 	$nonce_action = 'update-post_' . $post->ID;
 	$form_extra  .= "<input type='hidden' id='post_ID' name='post_ID' value='" . esc_attr( $post->ID ) . "' />";
 	?>
-	<form name="post" action="post.php" method="post" id="post" data-location="<?php echo esc_attr( $location ); ?>"
+	<form name="post" action="post.php" method="post" class="meta-box-form" data-location="<?php echo esc_attr( $location ); ?>"
 	<?php
 	/**
 	 * Fires inside the post editor form tag.
@@ -412,7 +367,6 @@ function gutenberg_meta_box_partial_page_post_form( $post, $location ) {
 	 */
 	?>
 	<div id="poststuff" class="sidebar-open">
-		<div><!-- THIS IS SOMEHOW REALLY IMPORTANT FOR IFRAMES TO RESIZE CORRECTLY -->
 			<div id="postbox-container-2" class="postbox-container">
 	<?php
 }
@@ -425,10 +379,6 @@ function gutenberg_meta_box_partial_page_post_form( $post, $location ) {
  * @param string $hook_suffix The hook suffix of the current page.
  */
 function gutenberg_meta_box_partial_page_admin_footer( $hook_suffix ) {
-	?>
-	</div><!-- END of important resize div. -->
-	<?php
-
 	/**
 	 * Prints scripts or data before the default footer scripts.
 	 *
@@ -565,6 +515,10 @@ function gutenberg_filter_meta_boxes( $meta_boxes ) {
 					if ( isset( $data['callback'] ) && in_array( $data['callback'], $taxonomy_callbacks_to_unset ) ) {
 						unset( $meta_boxes[ $page ][ $context ][ $priority ][ $name ] );
 					}
+					// Filter out meta boxes that are just registered for back compat.
+					if ( isset( $data['args']['__back_compat_meta_box'] ) && $data['args']['__back_compat_meta_box'] ) {
+						unset( $meta_boxes[ $page ][ $context ][ $priority ][ $name ] );
+					}
 				}
 			}
 		}
@@ -600,3 +554,115 @@ function gutenberg_is_meta_box_empty( $meta_boxes, $context, $post_type ) {
 }
 
 add_filter( 'filter_gutenberg_meta_boxes', 'gutenberg_filter_meta_boxes' );
+
+/**
+ * Go through the global metaboxes, and override the render callback, so we can trigger our warning if needed.
+ *
+ * @since 1.8.0
+ */
+function gutenberg_intercept_meta_box_render() {
+	global $wp_meta_boxes;
+
+	foreach ( $wp_meta_boxes as $post_type => $contexts ) {
+		foreach ( $contexts as $context => $priorities ) {
+			foreach ( $priorities as $priority => $boxes ) {
+				foreach ( $boxes as $id => $box ) {
+					if ( ! is_array( $wp_meta_boxes[ $post_type ][ $context ][ $priority ][ $id ]['args'] ) ) {
+						$wp_meta_boxes[ $post_type ][ $context ][ $priority ][ $id ]['args'] = array();
+					}
+					if ( ! isset( $wp_meta_boxes[ $post_type ][ $context ][ $priority ][ $id ]['args']['__original_callback'] ) ) {
+						$wp_meta_boxes[ $post_type ][ $context ][ $priority ][ $id ]['args']['__original_callback'] = $box['callback'];
+						$wp_meta_boxes[ $post_type ][ $context ][ $priority ][ $id ]['callback']                    = 'gutenberg_override_meta_box_callback';
+					}
+				}
+			}
+		}
+	}
+}
+add_action( 'submitpost_box', 'gutenberg_intercept_meta_box_render' );
+add_action( 'submitpage_box', 'gutenberg_intercept_meta_box_render' );
+add_action( 'edit_page_form', 'gutenberg_intercept_meta_box_render' );
+add_action( 'edit_form_advanced', 'gutenberg_intercept_meta_box_render' );
+
+/**
+ * Check if this metabox only exists for back compat purposes, show a warning if it doesn't.
+ *
+ * @since 1.8.0
+ *
+ * @param mixed $object The object being operated on, on this screen.
+ * @param array $box The current meta box definition.
+ */
+function gutenberg_override_meta_box_callback( $object, $box ) {
+	$callback = $box['args']['__original_callback'];
+	unset( $box['args']['__original_callback'] );
+
+	$block_compatible = true;
+	if ( isset( $box['args']['__block_editor_compatible_meta_box'] ) ) {
+		$block_compatible = (bool) $box['args']['__block_editor_compatible_meta_box'];
+		unset( $box['args']['__block_editor_compatible_meta_box'] );
+	}
+
+	if ( isset( $box['args']['__back_compat_meta_box'] ) ) {
+		$block_compatible |= (bool) $box['args']['__back_compat_meta_box'];
+		unset( $box['args']['__back_compat_meta_box'] );
+	}
+
+	if ( ! $block_compatible ) {
+		gutenberg_show_meta_box_warning( $callback );
+	}
+
+	call_user_func( $callback, $object, $box );
+}
+
+/**
+ * Display a warning in the metabox that the current plugin is causing the fallback to the old editor.
+ *
+ * @since 1.8.0
+ *
+ * @param callable $callback The function that a plugin has defined to render a meta box.
+ */
+function gutenberg_show_meta_box_warning( $callback ) {
+	// Only show the warning when WP_DEBUG is enabled.
+	if ( ! WP_DEBUG ) {
+		return;
+	}
+
+	// Don't show in the Gutenberg meta box UI.
+	if ( ! isset( $_REQUEST['classic-editor'] ) ) {
+		return;
+	}
+
+	if ( is_array( $callback ) ) {
+		$reflection = new ReflectionMethod( $callback[0], $callback[1] );
+	} else {
+		$reflection = new ReflectionFunction( $callback );
+	}
+
+	if ( $reflection->isInternal() ) {
+		return;
+	}
+
+	$filename = $reflection->getFileName();
+	if ( strpos( $filename, WP_PLUGIN_DIR ) !== 0 ) {
+		return;
+	}
+
+	$filename = str_replace( WP_PLUGIN_DIR, '', $filename );
+	$filename = preg_replace( '|^/([^/]*/).*$|', '\\1', $filename );
+
+	$plugins = get_plugins();
+	foreach ( $plugins as $name => $plugin ) {
+		if ( strpos( $name, $filename ) === 0 ) {
+			?>
+				<div class="error inline">
+					<p>
+						<?php
+							/* translators: %s is the name of the plugin that generated this meta box. */
+							printf( __( 'Gutenberg incompatible meta box, from the "%s" plugin.', 'gutenberg' ), $plugin['Name'] );
+						?>
+					</p>
+				</div>
+			<?php
+		}
+	}
+}

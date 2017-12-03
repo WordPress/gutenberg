@@ -1,0 +1,26 @@
+.editor-post-schedule {
+	width: 100%;
+	position: relative;
+}
+
+.editor-post-schedule__toggle.button-link {
+	text-decoration: underline;
+	color: $blue-wordpress;
+	text-align: right;
+
+	&:focus {
+		outline: none;
+	}
+
+	&:hover {
+		color: $blue-medium-500;
+	}
+}
+
+.editor-post-schedule__dialog .components-popover__content {
+	padding: 10px;
+
+	@include break-medium {
+		width: 270px;
+	}
+}

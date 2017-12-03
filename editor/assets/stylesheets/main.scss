@@ -25,6 +25,11 @@ body.gutenberg-editor-page {
 	svg {
 		fill: currentColor;
 	}
+
+	ul#adminmenu a.wp-has-current-submenu:after,
+	ul#adminmenu>li.current>a.current:after {
+		border-right-color: $white;
+	}
 }
 
 .gutenberg {
@@ -59,7 +64,6 @@ body.gutenberg-editor-page {
 	bottom: 0;
 	left: 0;
 	min-height: calc( 100vh - #{ $admin-bar-height-big } );
-	padding-top: $header-height + $stacked-toolbar-height;
 
 	// The parent relative container changes
 	@include break-small {
@@ -69,11 +73,6 @@ body.gutenberg-editor-page {
 	// The WP header height changes at this breakpoint
 	@include break-medium {
 		min-height: calc( 100vh - #{ $admin-bar-height } );
-	}
-
-	// The block toolbar disappears at this breakpoint
-	@include break-large {
-		padding-top: $header-height;
 	}
 
 	img {
@@ -90,7 +89,7 @@ body.gutenberg-editor-page {
 }
 
 .editor-post-title,
-.editor-visual-editor__block {
+.editor-block-list__block {
 	input,
 	textarea {
 		border-radius: 4px;

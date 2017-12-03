@@ -2,12 +2,19 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, uniqueId } from 'lodash';
+import { get, includes, map, filter, some, castArray } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { parse, getBlockType, switchToBlockType } from '@wordpress/blocks';
+import {
+	parse,
+	getBlockType,
+	switchToBlockType,
+	createBlock,
+	serialize,
+	createReusableBlock,
+} from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -26,6 +33,8 @@ import {
 	savePost,
 	editPost,
 	requestMetaBoxUpdates,
+	updateReusableBlock,
+	saveReusableBlock,
 } from './actions';
 import {
 	getCurrentPost,
@@ -37,10 +46,15 @@ import {
 	isEditedPostDirty,
 	isEditedPostNew,
 	isEditedPostSaveable,
+	getMetaBoxes,
+	getBlock,
+	getReusableBlock,
 } from './selectors';
 
 const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
 const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
+const SAVE_REUSABLE_BLOCK_NOTICE_ID = 'SAVE_REUSABLE_BLOCK_NOTICE_ID';
+export const POST_UPDATE_TRANSACTION_ID = 'post-update';
 
 export default {
 	REQUEST_POST_UPDATE( action, store ) {
@@ -53,12 +67,11 @@ export default {
 			content: getEditedPostContent( state ),
 			id: post.id,
 		};
-		const transactionId = uniqueId();
 
 		dispatch( {
 			type: 'UPDATE_POST',
 			edits: toSend,
-			optimist: { type: BEGIN, id: transactionId },
+			optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
 		} );
 		dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
 		const Model = wp.api.getPostTypeModel( getCurrentPostType( state ) );
@@ -71,7 +84,7 @@ export default {
 				type: 'REQUEST_POST_UPDATE_SUCCESS',
 				previousPost: post,
 				post: newPost,
-				optimist: { type: COMMIT, id: transactionId },
+				optimist: { type: COMMIT, id: POST_UPDATE_TRANSACTION_ID },
 			} );
 		} ).fail( ( err ) => {
 			dispatch( {
@@ -82,7 +95,7 @@ export default {
 				} ),
 				post,
 				edits,
-				optimist: { type: REVERT, id: transactionId },
+				optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
 			} );
 		} );
 	},
@@ -91,25 +104,37 @@ export default {
 		const { dispatch, getState } = store;
 
 		const publishStatus = [ 'publish', 'private', 'future' ];
-		const isPublished = publishStatus.indexOf( previousPost.status ) !== -1;
-		const messages = {
-			publish: __( 'Post published!' ),
-			private: __( 'Post published privately!' ),
-			future: __( 'Post scheduled!' ),
-		};
+		const isPublished = includes( publishStatus, previousPost.status );
+		const willPublish = includes( publishStatus, post.status );
 
-		// If we save a non published post, we don't show any notice
-		// If we publish/schedule a post, we show the corresponding publish message
-		// Unless we show an update notice
-		if ( isPublished || publishStatus.indexOf( post.status ) !== -1 ) {
-			const noticeMessage = ! isPublished && publishStatus.indexOf( post.status ) !== -1 ?
-				messages[ post.status ] :
-				__( 'Post updated!' );
+		let noticeMessage;
+		let shouldShowLink = true;
+		if ( ! isPublished && ! willPublish ) {
+			// If saving a non published post, don't show any notice
+			noticeMessage = null;
+		} else if ( isPublished && ! willPublish ) {
+			// If undoing publish status, show specific notice
+			noticeMessage = __( 'Post reverted to draft.' );
+			shouldShowLink = false;
+		} else if ( ! isPublished && willPublish ) {
+			// If publishing or scheduling a post, show the corresponding
+			// publish message
+			noticeMessage = {
+				publish: __( 'Post published!' ),
+				private: __( 'Post published privately!' ),
+				future: __( 'Post scheduled!' ),
+			}[ post.status ];
+		} else {
+			// Generic fallback notice
+			noticeMessage = __( 'Post updated!' );
+		}
+
+		if ( noticeMessage ) {
 			dispatch( createSuccessNotice(
 				<p>
 					<span>{ noticeMessage }</span>
 					{ ' ' }
-					<a href={ post.link }>{ __( 'View post' ) }</a>
+					{ shouldShowLink && <a href={ post.link }>{ __( 'View post' ) }</a> }
 				</p>,
 				{ id: SAVE_POST_NOTICE_ID }
 			) );
@@ -255,12 +280,22 @@ export default {
 		dispatch( savePost() );
 	},
 	SETUP_EDITOR( action ) {
-		const { post } = action;
+		const { post, settings } = action;
 		const effects = [];
 
 		// Parse content as blocks
 		if ( post.content.raw ) {
 			effects.push( resetBlocks( parse( post.content.raw ) ) );
+		} else if ( settings.template ) {
+			const blocks = map( settings.template, ( [ name, attributes ] ) => {
+				const block = createBlock( name );
+				block.attributes = {
+					...block.attributes,
+					...attributes,
+				};
+				return block;
+			} );
+			effects.push( resetBlocks( blocks ) );
 		}
 
 		// Resetting post should occur after blocks have been reset, since it's
@@ -275,5 +310,100 @@ export default {
 		}
 
 		return effects;
+	},
+	INITIALIZE_META_BOX_STATE( action ) {
+		// Hold jquery.ready until the metaboxes load
+		const locations = [ 'normal', 'side' ];
+		if ( some( locations, ( location ) => !! action.metaBoxes[ location ] ) ) {
+			jQuery.holdReady( true );
+		}
+	},
+	META_BOX_LOADED( action, store ) {
+		const { getState } = store;
+		const metaboxes = getMetaBoxes( getState() );
+		const unloadedMetaboxes = filter(
+			map( metaboxes, ( value, key ) => ( {
+				...value,
+				key,
+			} ) ),
+			( metabox ) => metabox.isActive && ! metabox.isLoaded
+		);
+		if ( unloadedMetaboxes.length === 1 && unloadedMetaboxes[ 0 ].key === action.location ) {
+			jQuery.holdReady( false );
+		}
+	},
+	FETCH_REUSABLE_BLOCKS( action, store ) {
+		const { id } = action;
+		const { dispatch } = store;
+
+		let result;
+		if ( id ) {
+			result = new wp.api.models.ReusableBlocks( { id } ).fetch();
+		} else {
+			result = new wp.api.collections.ReusableBlocks().fetch();
+		}
+
+		result.then(
+			( reusableBlockOrBlocks ) => {
+				dispatch( {
+					type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
+					reusableBlocks: castArray( reusableBlockOrBlocks ).map( ( { id: itemId, name, content } ) => {
+						const [ { name: type, attributes } ] = parse( content );
+						return { id: itemId, name, type, attributes };
+					} ),
+				} );
+			},
+			( error ) => {
+				dispatch( {
+					type: 'FETCH_REUSABLE_BLOCKS_FAILURE',
+					error: error.responseJSON || {
+						code: 'unknown_error',
+						message: __( 'An unknown error occurred.' ),
+					},
+				} );
+			}
+		);
+	},
+	SAVE_REUSABLE_BLOCK( action, store ) {
+		const { id } = action;
+		const { getState, dispatch } = store;
+
+		const { name, type, attributes } = getReusableBlock( getState(), id );
+		const content = serialize( createBlock( type, attributes ) );
+
+		new wp.api.models.ReusableBlocks( { id, name, content } ).save().then(
+			() => {
+				dispatch( { type: 'SAVE_REUSABLE_BLOCK_SUCCESS', id } );
+				dispatch( createSuccessNotice(
+					__( 'Reusable block updated' ),
+					{ id: SAVE_REUSABLE_BLOCK_NOTICE_ID }
+				) );
+			},
+			( error ) => {
+				dispatch( { type: 'SAVE_REUSABLE_BLOCK_FAILURE', id } );
+				dispatch( createErrorNotice(
+					get( error.responseJSON, 'message', __( 'An unknown error occured' ) ),
+					{ id: SAVE_REUSABLE_BLOCK_NOTICE_ID }
+				) );
+			}
+		);
+	},
+	CONVERT_BLOCK_TO_STATIC( action, store ) {
+		const { getState, dispatch } = store;
+
+		const oldBlock = getBlock( getState(), action.uid );
+		const reusableBlock = getReusableBlock( getState(), oldBlock.attributes.ref );
+		const newBlock = createBlock( reusableBlock.type, reusableBlock.attributes );
+		dispatch( replaceBlocks( [ oldBlock.uid ], [ newBlock ] ) );
+	},
+	CONVERT_BLOCK_TO_REUSABLE( action, store ) {
+		const { getState, dispatch } = store;
+
+		const oldBlock = getBlock( getState(), action.uid );
+		const reusableBlock = createReusableBlock( oldBlock.name, oldBlock.attributes );
+		const newBlock = createBlock( 'core/reusable-block', { ref: reusableBlock.id } );
+		dispatch( updateReusableBlock( reusableBlock.id, reusableBlock ) );
+		dispatch( saveReusableBlock( reusableBlock.id ) );
+		dispatch( replaceBlocks( [ oldBlock.uid ], [ newBlock ] ) );
 	},
 };

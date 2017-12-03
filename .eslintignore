@@ -1,5 +1,5 @@
 build
 coverage
-vendor
+cypress
 node_modules
-/assets/js
+vendor

@@ -13,10 +13,12 @@ import './library';
 // Blocks are inferred from the HTML source of a post through a parsing mechanism
 // and then stored as objects in state, from which it is then rendered for editing.
 export * from './api';
+export * from './hooks';
 export { default as AlignmentToolbar } from './alignment-toolbar';
 export { default as BlockAlignmentToolbar } from './block-alignment-toolbar';
 export { default as BlockControls } from './block-controls';
 export { default as BlockDescription } from './block-description';
+export { default as BlockEdit } from './block-edit';
 export { default as BlockIcon } from './block-icon';
 export { default as ColorPalette } from './color-palette';
 export { default as Editable } from './editable';
@@ -25,3 +27,7 @@ export { default as InspectorControls } from './inspector-controls';
 export { default as MediaUploadButton } from './media-upload-button';
 export { default as UrlInput } from './url-input';
 export { default as UrlInputButton } from './url-input/button';
+
+// Deprecated matchers
+import { attr, prop, text, html, query, node, children } from './hooks/matchers';
+export const source = { attr, prop, text, html, query, node, children };

@@ -6,7 +6,6 @@ import { createElement, Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { text } from '../source';
 import serialize, {
 	getCommentAttributes,
 	getBeautifulContent,
@@ -25,6 +24,11 @@ import {
 import { createBlock } from '../';
 
 describe( 'block serializer', () => {
+	beforeAll( () => {
+		// Load all hooks that modify blocks
+		require( 'blocks/hooks' );
+	} );
+
 	afterEach( () => {
 		setUnknownTypeHandlerName( undefined );
 		getBlockTypes().forEach( block => {
@@ -78,19 +82,6 @@ describe( 'block serializer', () => {
 				expect( saved ).toBe( '<div class="wp-block-myplugin-fruit">Bananas</div>' );
 			} );
 
-			it( 'should allow overriding the className', () => {
-				const saved = getSaveContent(
-					{
-						save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),
-						name: 'myplugin/fruit',
-						className: 'apples',
-					},
-					{ fruit: 'Bananas' }
-				);
-
-				expect( saved ).toBe( '<div class="apples">Bananas</div>' );
-			} );
-
 			it( 'should include additional classes in block attributes', () => {
 				const saved = getSaveContent(
 					{
@@ -98,7 +89,6 @@ describe( 'block serializer', () => {
 							className: 'fruit',
 						}, attributes.fruit ),
 						name: 'myplugin/fruit',
-						className: 'apples',
 					},
 					{
 						fruit: 'Bananas',
@@ -106,7 +96,7 @@ describe( 'block serializer', () => {
 					}
 				);
 
-				expect( saved ).toBe( '<div class="apples fruit fresh">Bananas</div>' );
+				expect( saved ).toBe( '<div class="wp-block-myplugin-fruit fruit fresh">Bananas</div>' );
 			} );
 
 			it( 'should not add a className if falsy', () => {
@@ -114,26 +104,14 @@ describe( 'block serializer', () => {
 					{
 						save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),
 						name: 'myplugin/fruit',
-						className: false,
+						supports: {
+							className: false,
+						},
 					},
 					{ fruit: 'Bananas' }
 				);
 
 				expect( saved ).toBe( '<div>Bananas</div>' );
-			} );
-
-			it( 'should add an id if the block supports anchors', () => {
-				const saved = getSaveContent(
-					{
-						save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),
-						supportAnchor: true,
-						name: 'myplugin/fruit',
-						className: false,
-					},
-					{ fruit: 'Bananas', anchor: 'my-fruit' }
-				);
-
-				expect( saved ).toBe( '<div id="my-fruit">Bananas</div>' );
 			} );
 		} );
 
@@ -171,7 +149,7 @@ describe( 'block serializer', () => {
 			}, { attributes: {
 				fruit: {
 					type: 'string',
-					source: text(),
+					source: 'text',
 				},
 				category: {
 					type: 'string',
@@ -201,22 +179,6 @@ describe( 'block serializer', () => {
 			} } );
 
 			expect( attributes ).toEqual( { fruit: 'bananas' } );
-		} );
-
-		it( 'should return the className attribute if allowed', () => {
-			const attributes = getCommentAttributes( {
-				className: 'chicken',
-			}, { attributes: {} } );
-
-			expect( attributes ).toEqual( { className: 'chicken' } );
-		} );
-
-		it( 'should not return the className attribute if not supported', () => {
-			const attributes = getCommentAttributes( {
-				className: 'chicken',
-			}, { attributes: {}, className: false } );
-
-			expect( attributes ).toEqual( {} );
 		} );
 	} );
 
@@ -373,7 +335,7 @@ describe( 'block serializer', () => {
 					},
 					content: {
 						type: 'string',
-						source: text(),
+						source: 'text',
 					},
 					stuff: {
 						type: 'string',
@@ -436,7 +398,7 @@ describe( 'block serializer', () => {
 				attributes: {
 					content: {
 						type: 'string',
-						source: text(),
+						source: 'text',
 					},
 				},
 				save( { attributes } ) {

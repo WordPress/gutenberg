@@ -219,10 +219,40 @@ function gutenberg_collect_meta_box_data() {
 
 	// If the meta box should be empty set to false.
 	foreach ( $locations as $location ) {
-		if ( isset( $_meta_boxes_copy[ $post->post_type ][ $location ] ) && gutenberg_is_meta_box_empty( $_meta_boxes_copy, $location, $post->post_type ) ) {
+		if ( gutenberg_is_meta_box_empty( $_meta_boxes_copy, $location, $post->post_type ) ) {
 			$meta_box_data[ $location ] = false;
 		} else {
 			$meta_box_data[ $location ] = true;
+			$incompatible_meta_box      = false;
+			// Check if we have a meta box that has declared itself incompatible with the block editor.
+			foreach ( $_meta_boxes_copy[ $post->post_type ][ $location ] as $boxes ) {
+				foreach ( $boxes as $box ) {
+					/*
+					 * If __block_editor_compatible_meta_box is declared as a false-y value,
+					 * the meta box is not compatible with the block editor.
+					 */
+					if ( is_array( $box['args'] )
+						&& isset( $box['args']['__block_editor_compatible_meta_box'] )
+						&& ! $box['args']['__block_editor_compatible_meta_box'] ) {
+							$incompatible_meta_box = true;
+							break 2;
+					}
+				}
+			}
+
+			// Incompatible meta boxes require an immediate redirect to the classic editor.
+			if ( $incompatible_meta_box ) {
+				?>
+				<script type="text/javascript">
+					var joiner = '?';
+					if ( window.location.search ) {
+						joiner = '&';
+					}
+					window.location.href += joiner + 'classic-editor';
+				</script>
+				<?php
+				exit;
+			}
 		}
 	}
 
@@ -236,7 +266,7 @@ function gutenberg_collect_meta_box_data() {
 	 */
 	wp_add_inline_script(
 		'wp-editor',
-		'window._wpGutenbergEditor.initializeMetaBoxes( ' . wp_json_encode( $meta_box_data ) . ' )'
+		'window._wpLoadGutenbergEditor.then( function( editor ) { editor.initializeMetaBoxes( ' . wp_json_encode( $meta_box_data ) . ' ) } );'
 	);
 
 	// Restore any global variables that we temporarily modified above.
@@ -308,7 +338,12 @@ function gutenberg_can_edit_post_type( $post_type ) {
 }
 
 /**
- * Determine whether a post has blocks.
+ * Determine whether a post has blocks. This test optimizes for performance
+ * rather than strict accuracy, detecting the pattern of a block but not
+ * validating its structure. For strict accuracy, you should use the block
+ * parser on post content.
+ *
+ * @see gutenberg_parse_blocks()
  *
  * @since 0.5.0
  *
@@ -317,18 +352,22 @@ function gutenberg_can_edit_post_type( $post_type ) {
  */
 function gutenberg_post_has_blocks( $post ) {
 	$post = get_post( $post );
-	return $post && content_has_blocks( $post->post_content );
+	return $post && gutenberg_content_has_blocks( $post->post_content );
 }
 
 /**
- * Determine whether a content string contains gutenberg blocks.
+ * Determine whether a content string contains blocks. This test optimizes for
+ * performance rather than strict accuracy, detecting the pattern of a block
+ * but not validating its structure. For strict accuracy, you should use the
+ * block parser on post content.
  *
  * @since 1.6.0
+ * @see gutenberg_parse_blocks()
  *
  * @param string $content Content to test.
  * @return bool Whether the content contains blocks.
  */
-function content_has_blocks( $content ) {
+function gutenberg_content_has_blocks( $content ) {
 	return false !== strpos( $content, '<!-- wp:' );
 }
 
@@ -354,7 +393,7 @@ add_filter( 'display_post_states', 'gutenberg_add_gutenberg_post_state', 10, 2 )
  * @since 0.10.0
  */
 function gutenberg_register_post_types() {
-	register_post_type( 'gb_reusable_block', array(
+	register_post_type( 'wp_block', array(
 		'public' => false,
 	) );
 }
