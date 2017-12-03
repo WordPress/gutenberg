@@ -111,6 +111,8 @@
 
 	label {
 		margin-right: 10px;
+		flex-shrink: 0;
+		max-width: 75%;
 	}
 
 	&:empty {
