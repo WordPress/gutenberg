@@ -1115,6 +1115,41 @@ describe( 'state', () => {
 				originalState[ 1 ],
 			] );
 		} );
+
+		it( 'should dedupe distinct ids', () => {
+			const originalState = [
+				{
+					id: 'a',
+					content: 'Post saved',
+					status: 'success',
+				},
+				{
+					id: 'b',
+					content: 'Error saving',
+					status: 'error',
+				},
+			];
+			const state = notices( deepFreeze( originalState ), {
+				type: 'CREATE_NOTICE',
+				notice: {
+					id: 'a',
+					content: 'Post updated',
+					status: 'success',
+				},
+			} );
+			expect( state ).toEqual( [
+				{
+					id: 'b',
+					content: 'Error saving',
+					status: 'error',
+				},
+				{
+					id: 'a',
+					content: 'Post updated',
+					status: 'success',
+				},
+			] );
+		} );
 	} );
 
 	describe( 'blocksMode', () => {
