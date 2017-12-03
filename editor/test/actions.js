@@ -1,21 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
-	focusBlock,
-	replaceBlocks,
-	startTyping,
-	stopTyping,
-	requestMetaBoxUpdates,
-	handleMetaBoxReload,
-	metaBoxStateChanged,
-	initializeMetaBoxState,
-	fetchReusableBlocks,
-	updateReusableBlock,
-	saveReusableBlock,
-	convertBlockToStatic,
-	convertBlockToReusable,
-} from '../actions';
+import * as actions from '../actions';
 
 describe( 'actions', () => {
 	describe( 'focusBlock', () => {
@@ -24,7 +10,7 @@ describe( 'actions', () => {
 				editable: 'cite',
 			};
 
-			expect( focusBlock( 'chicken', focusConfig ) ).toEqual( {
+			expect( actions.focusBlock( 'chicken', focusConfig ) ).toEqual( {
 				type: 'UPDATE_FOCUS',
 				uid: 'chicken',
 				config: focusConfig,
@@ -38,7 +24,7 @@ describe( 'actions', () => {
 				uid: 'ribs',
 			} ];
 
-			expect( replaceBlocks( [ 'chicken' ], blocks ) ).toEqual( {
+			expect( actions.replaceBlocks( [ 'chicken' ], blocks ) ).toEqual( {
 				type: 'REPLACE_BLOCKS',
 				uids: [ 'chicken' ],
 				blocks,
@@ -48,7 +34,7 @@ describe( 'actions', () => {
 
 	describe( 'startTyping', () => {
 		it( 'should return the START_TYPING action', () => {
-			expect( startTyping() ).toEqual( {
+			expect( actions.startTyping() ).toEqual( {
 				type: 'START_TYPING',
 			} );
 		} );
@@ -56,7 +42,7 @@ describe( 'actions', () => {
 
 	describe( 'stopTyping', () => {
 		it( 'should return the STOP_TYPING action', () => {
-			expect( stopTyping() ).toEqual( {
+			expect( actions.stopTyping() ).toEqual( {
 				type: 'STOP_TYPING',
 			} );
 		} );
@@ -64,7 +50,7 @@ describe( 'actions', () => {
 
 	describe( 'requestMetaBoxUpdates', () => {
 		it( 'should return the REQUEST_META_BOX_UPDATES action', () => {
-			expect( requestMetaBoxUpdates( [ 'normal' ] ) ).toEqual( {
+			expect( actions.requestMetaBoxUpdates( [ 'normal' ] ) ).toEqual( {
 				type: 'REQUEST_META_BOX_UPDATES',
 				locations: [ 'normal' ],
 			} );
@@ -73,7 +59,7 @@ describe( 'actions', () => {
 
 	describe( 'handleMetaBoxReload', () => {
 		it( 'should return the HANDLE_META_BOX_RELOAD action with a location and node', () => {
-			expect( handleMetaBoxReload( 'normal' ) ).toEqual( {
+			expect( actions.handleMetaBoxReload( 'normal' ) ).toEqual( {
 				type: 'HANDLE_META_BOX_RELOAD',
 				location: 'normal',
 			} );
@@ -82,7 +68,7 @@ describe( 'actions', () => {
 
 	describe( 'metaBoxStateChanged', () => {
 		it( 'should return the META_BOX_STATE_CHANGED action with a hasChanged flag', () => {
-			expect( metaBoxStateChanged( 'normal', true ) ).toEqual( {
+			expect( actions.metaBoxStateChanged( 'normal', true ) ).toEqual( {
 				type: 'META_BOX_STATE_CHANGED',
 				location: 'normal',
 				hasChanged: true,
@@ -98,7 +84,7 @@ describe( 'actions', () => {
 				advanced: false,
 			};
 
-			expect( initializeMetaBoxState( metaBoxes ) ).toEqual( {
+			expect( actions.initializeMetaBoxState( metaBoxes ) ).toEqual( {
 				type: 'INITIALIZE_META_BOX_STATE',
 				metaBoxes,
 			} );
@@ -107,14 +93,14 @@ describe( 'actions', () => {
 
 	describe( 'fetchReusableBlocks', () => {
 		it( 'should return the FETCH_REUSABLE_BLOCKS action', () => {
-			expect( fetchReusableBlocks() ).toEqual( {
+			expect( actions.fetchReusableBlocks() ).toEqual( {
 				type: 'FETCH_REUSABLE_BLOCKS',
 			} );
 		} );
 
 		it( 'should take an optional id argument', () => {
 			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-			expect( fetchReusableBlocks( id ) ).toEqual( {
+			expect( actions.fetchReusableBlocks( id ) ).toEqual( {
 				type: 'FETCH_REUSABLE_BLOCKS',
 				id,
 			} );
@@ -132,7 +118,7 @@ describe( 'actions', () => {
 					content: 'Hello!',
 				},
 			};
-			expect( updateReusableBlock( id, reusableBlock ) ).toEqual( {
+			expect( actions.updateReusableBlock( id, reusableBlock ) ).toEqual( {
 				type: 'UPDATE_REUSABLE_BLOCK',
 				id,
 				reusableBlock,
@@ -142,7 +128,7 @@ describe( 'actions', () => {
 
 	describe( 'saveReusableBlock', () => {
 		const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-		expect( saveReusableBlock( id ) ).toEqual( {
+		expect( actions.saveReusableBlock( id ) ).toEqual( {
 			type: 'SAVE_REUSABLE_BLOCK',
 			id,
 		} );
@@ -150,7 +136,7 @@ describe( 'actions', () => {
 
 	describe( 'convertBlockToStatic', () => {
 		const uid = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-		expect( convertBlockToStatic( uid ) ).toEqual( {
+		expect( actions.convertBlockToStatic( uid ) ).toEqual( {
 			type: 'CONVERT_BLOCK_TO_STATIC',
 			uid,
 		} );
@@ -158,7 +144,7 @@ describe( 'actions', () => {
 
 	describe( 'convertBlockToReusable', () => {
 		const uid = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-		expect( convertBlockToReusable( uid ) ).toEqual( {
+		expect( actions.convertBlockToReusable( uid ) ).toEqual( {
 			type: 'CONVERT_BLOCK_TO_REUSABLE',
 			uid,
 		} );
