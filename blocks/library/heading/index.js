@@ -98,7 +98,7 @@ registerBlockType( 'core/heading', {
 		};
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, insertBlocksAfter } ) {
+	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, insertBlocksAfter, onReplace } ) {
 		const { align, content, nodeName, placeholder } = attributes;
 
 		return [
@@ -158,6 +158,7 @@ registerBlockType( 'core/heading', {
 						createBlock( 'core/paragraph', { content: after } ),
 					] );
 				} }
+				onReplace={ onReplace }
 				style={ { textAlign: align } }
 				placeholder={ placeholder || __( 'Write heading…' ) }
 			/>,
