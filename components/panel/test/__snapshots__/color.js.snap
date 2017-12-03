@@ -21,3 +21,23 @@ exports[`PanelColor should match snapshot 1`] = `
   }
 />
 `;
+
+exports[`PanelColor should match snapshot when colorValue is empty 1`] = `
+<PanelBody
+  title={
+    Array [
+      <span
+        className="components-panel__color-title"
+      />,
+      <span
+        className="components-panel__color-area"
+        style={
+          Object {
+            "background": "red",
+          }
+        }
+      />,
+    ]
+  }
+/>
+`;
