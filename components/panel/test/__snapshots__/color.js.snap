@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PanelColor should match snapshot 1`] = `
+<PanelBody
+  title={
+    Array [
+      <span
+        className="components-panel__color-title"
+      >
+        sample title
+      </span>,
+      <span
+        className="components-panel__color-area"
+        style={
+          Object {
+            "background": "red",
+          }
+        }
+      />,
+    ]
+  }
+/>
+`;
