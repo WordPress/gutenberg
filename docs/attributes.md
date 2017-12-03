@@ -108,7 +108,6 @@ Attributes may be obtained from a post's meta rather than from the block's repre
 attributes: {
 	author: {
 		type: 'string',
-		source: 'meta',
 		meta: 'author'
 	},
 },
