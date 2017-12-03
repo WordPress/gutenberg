@@ -1,0 +1,16 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BlockSwitcher Test block switcher with blocks 1`] = `
+<Dropdown
+  className="editor-block-switcher"
+  contentClassName="editor-block-switcher__popover"
+  renderContent={[Function]}
+  renderToggle={[Function]}
+/>
+`;
+
+exports[`BlockSwitcher Test block switcher with multi block of different types. 1`] = `""`;
+
+exports[`BlockSwitcher Test block switcher with multi block of same types. 1`] = `""`;
+
+exports[`BlockSwitcher Test block switcher without blocks 1`] = `""`;

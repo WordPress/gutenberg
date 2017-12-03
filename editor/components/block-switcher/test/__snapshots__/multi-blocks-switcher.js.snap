@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MultiBlocksSwitcher should return a BlockSwitcher element matching the snapshot. 1`] = `
+<WrappedComponent
+  uids={
+    Array [
+      "an-uid",
+      "another-uid",
+    ]
+  }
+/>
+`;
