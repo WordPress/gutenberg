@@ -182,26 +182,7 @@ export class BlockListBlock extends Component {
 			return;
 		}
 
-		// There are several cases in which focus transitions outside the DOM
-		// space of a block, but is not truly outside, typically when managing
-		// toolbar or inspector controls. While this implementation binds
-		// awareness to ancestry, it still retains more self-sufficiency to a
-		// block than attempting to externally manage focus transitions. An
-		// alternative here would leverage React 16 portal virtual event
-		// bubbling, but we must first eliminate dependencies between toolbar
-		// and multi-selection DOM-based event bubbling.
-		//
-		// See: https://github.com/WordPress/gutenberg/pull/3083
-		// See: https://reactjs.org/docs/portals.html#event-bubbling-through-portals
-		const { relatedTarget } = event;
-		const isOutside = ! relatedTarget || ! relatedTarget.closest( [
-			'.editor-header',
-			'.editor-sidebar',
-		].join( ',' ) );
-
-		if ( isOutside ) {
-			this.props.onDeselect();
-		}
+		this.props.onDeselect( event );
 	}
 
 	bindBlockNode( node ) {
@@ -496,8 +477,15 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 	onSelect() {
 		dispatch( selectBlock( ownProps.uid ) );
 	},
-	onDeselect() {
-		dispatch( clearSelectedBlock() );
+
+	onDeselect( event, ...args ) {
+		if ( ownProps.onDeselect ) {
+			ownProps.onDeselect( event, ...args );
+		}
+
+		if ( ! event || ! event.isDefaultPrevented() ) {
+			dispatch( clearSelectedBlock() );
+		}
 	},
 
 	onStartTyping() {

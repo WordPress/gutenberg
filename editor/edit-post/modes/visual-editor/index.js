@@ -12,13 +12,34 @@ import VisualEditorInserter from './inserter';
 import { hasFixedToolbar } from '../../../store/selectors';
 import { clearSelectedBlock } from '../../../store/actions';
 
+/**
+ * Detects whether a block deselect attempt should be prevented. There are
+ * several cases in which focus transitions outside the DOM space of a block,
+ * but is not truly outside, e.g. managing toolbar or inspector controls.
+ *
+ * @param  {Event} event DOM event
+ */
+function preventChromeDeselect( event ) {
+	const { relatedTarget } = event;
+	const isOutside = ! relatedTarget || relatedTarget.closest( [
+		'.editor-header',
+		'.editor-sidebar',
+	].join( ',' ) );
+
+	if ( isOutside ) {
+		event.preventDefault();
+	}
+}
+
 function VisualEditor( { isFixedToolbar } ) {
 	return (
 		<div className="editor-visual-editor">
 			<EditorGlobalKeyboardShortcuts />
 			<WritingFlow>
 				<PostTitle />
-				<BlockList showContextualToolbar={ ! isFixedToolbar } />
+				<BlockList
+					showContextualToolbar={ ! isFixedToolbar }
+					onDeselectBlock={ preventChromeDeselect } />
 				<DefaultBlockAppender />
 			</WritingFlow>
 			<VisualEditorInserter />
