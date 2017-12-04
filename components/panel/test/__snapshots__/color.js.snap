@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`PanelColor should match snapshot 1`] = `
+exports[`PanelColor should match snapshot when title is provided 1`] = `
 <PanelBody
   title={
     Array [
@@ -9,34 +9,7 @@ exports[`PanelColor should match snapshot 1`] = `
       >
         sample title
       </span>,
-      <span
-        className="components-panel__color-area"
-        style={
-          Object {
-            "background": "red",
-          }
-        }
-      />,
-    ]
-  }
-/>
-`;
-
-exports[`PanelColor should match snapshot when title is empty 1`] = `
-<PanelBody
-  title={
-    Array [
-      <span
-        className="components-panel__color-title"
-      />,
-      <span
-        className="components-panel__color-area"
-        style={
-          Object {
-            "background": "red",
-          }
-        }
-      />,
+      undefined,
     ]
   }
 />
