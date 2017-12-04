@@ -30,6 +30,7 @@ function the_gutenberg_project() {
 	?>
 	<div class="nvda-temp-fix screen-reader-text">&nbsp;</div>
 	<div class="gutenberg">
+		<h1 class="screen-reader-text">Edit Post</h1>
 		<div id="editor" class="gutenberg__editor"></div>
 	</div>
 	<?php
