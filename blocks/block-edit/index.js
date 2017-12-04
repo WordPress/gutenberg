@@ -3,6 +3,7 @@
  */
 import { applyFilters } from '../hooks';
 import { getBlockType } from '../api';
+import { withContext } from '@wordpress/components';
 
 function BlockEdit( props ) {
 	const { name, ...editProps } = props;
@@ -20,4 +21,8 @@ function BlockEdit( props ) {
 	return applyFilters( 'BlockEdit', <Edit key="edit" { ...editProps } />, props );
 }
 
-export default BlockEdit;
+export default withContext( 'editor' )(
+	( settings ) => ( {
+		customClassDropdown: settings.customClassDropdown,
+	} )
+)( BlockEdit );

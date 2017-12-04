@@ -781,11 +781,13 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	 *                                        boolean to enable/disable all.
 	 */
 	$allowed_block_types = apply_filters( 'allowed_block_types', true );
+	$custom_class_dropdown = apply_filters( 'custom_class_dropdown', array() );
 
 	$editor_settings = array(
-		'wideImages' => ! empty( $gutenberg_theme_support[0]['wide-images'] ),
-		'colors'     => $color_palette,
-		'blockTypes' => $allowed_block_types,
+		'wideImages'          => ! empty( $gutenberg_theme_support[0]['wide-images'] ),
+		'colors'              => $color_palette,
+		'blockTypes'          => $allowed_block_types,
+		'customClassDropdown' => is_array( $custom_class_dropdown ) ? $custom_class_dropdown : false,
 	);
 
 	$post_type_object = get_post_type_object( $post_to_edit['type'] );

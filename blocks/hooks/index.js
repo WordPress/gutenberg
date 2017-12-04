@@ -9,6 +9,7 @@ import { createHooks } from '@wordpress/hooks';
 import anchor from './anchor';
 import customClassName from './custom-class-name';
 import generatedClassName from './generated-class-name';
+import customClassDropdown from './custom-class-dropdown';
 import matchers from './matchers';
 
 const hooks = createHooks();
@@ -35,5 +36,6 @@ export {
 
 anchor( hooks );
 customClassName( hooks );
+customClassDropdown( hooks );
 generatedClassName( hooks );
 matchers( hooks );
