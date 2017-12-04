@@ -42,6 +42,13 @@ const FORMATTING_CONTROLS = [
 // Default controls shown if no `enabledControls` prop provided
 const DEFAULT_CONTROLS = [ 'bold', 'italic', 'strikethrough', 'link' ];
 
+/* We need to stop the keypress event here, because block.js is firing
+	 a maybeStartTyping on keypress, and that hides the "fixed-to-block" toolbar
+	 which unregisters the slot, so when Editable tries to re-render its input
+	 dialog, the slot is no longer in the system, and the dialog disappears
+ */
+const stopKeyPressPropagation = ( event ) => event.stopPropagation();
+
 class FormatToolbar extends Component {
 	constructor() {
 		super( ...arguments );
@@ -172,10 +179,13 @@ class FormatToolbar extends Component {
 				<Toolbar controls={ toolbarControls } />
 
 				{ ( isAddingLink || isEditingLink ) &&
+					// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
+					/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 					<Fill name="Editable.Siblings">
 						<form
 							className="blocks-format-toolbar__link-modal"
 							style={ linkStyle }
+							onKeyPress={ stopKeyPressPropagation }
 							onSubmit={ this.submitLink }>
 							<UrlInput value={ newLinkValue } onChange={ this.onChangeLinkValue } />
 							<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
@@ -191,8 +201,13 @@ class FormatToolbar extends Component {
 				}
 
 				{ !! formats.link && ! isAddingLink && ! isEditingLink &&
+					// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
+					/* eslint-disable jsx-a11y/no-static-element-interactions */
 					<Fill name="Editable.Siblings">
-						<div className="blocks-format-toolbar__link-modal" style={ linkStyle }>
+						<div
+							className="blocks-format-toolbar__link-modal"
+							style={ linkStyle }
+							onKeyPress={ stopKeyPressPropagation }>
 							<a
 								className="blocks-format-toolbar__link-value"
 								href={ formats.link.value }
