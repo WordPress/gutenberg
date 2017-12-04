@@ -190,4 +190,4 @@ function gutenberg_wpautop( $content ) {
 	return wpautop( $content );
 }
 remove_filter( 'the_content', 'wpautop' );
-add_filter( 'the_content', 'gutenberg_wpautop' );
+add_filter( 'the_content', 'gutenberg_wpautop', 8 );
