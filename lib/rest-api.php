@@ -45,6 +45,14 @@ function gutenberg_register_rest_routes() {
 		$autosaves_controller = new WP_REST_Autosaves_Controller( $post_type->name );
 		$autosaves_controller->register_routes();
 	}
+
+	/*
+	 * REST API for Annotations.
+	 */
+	$annotations_controller = new WP_REST_Annotations_Controller();
+	$annotations_controller->register_routes();
+
+	add_filter( 'rest_comment_query', 'WP_Annotation_Utils::on_rest_comment_query', 10, 2 );
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_routes' );
 

@@ -532,6 +532,17 @@ function gutenberg_register_post_types() {
 add_action( 'init', 'gutenberg_register_post_types' );
 
 /**
+ * Initializes annotations.
+ *
+ * @since [version]
+ */
+function gutenberg_init_annotations() {
+	add_filter( 'map_meta_cap', 'WP_Annotation_Caps::on_map_meta_cap', 10, 4 );
+	add_filter( 'comments_clauses', 'WP_Annotation_Utils::on_comments_clauses', 1000, 2 );
+}
+add_action( 'init', 'gutenberg_init_annotations' );
+
+/**
  * Injects a hidden input in the edit form to propagate the information that classic editor is selected.
  *
  * @since 1.5.2
