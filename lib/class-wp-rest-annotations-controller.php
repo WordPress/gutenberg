@@ -31,7 +31,7 @@ class WP_REST_Annotations_Controller extends WP_REST_Posts_Controller {
 	}
 
 	/*
-     * @TODO hierarchical responses like comments.
+	 * @TODO hierarchical responses like comments.
 	 */
 
 	/**
@@ -81,7 +81,7 @@ class WP_REST_Annotations_Controller extends WP_REST_Posts_Controller {
 		$post_type = get_post_type_object( $this->post_type );
 
 		/*
-         * Parent 'posts' (non-annotation).
+		 * Parent 'posts' (non-annotation).
 		 */
 		$parent_post_ids = $request['parent_post_id'];
 		$parent_post_ids = $parent_post_ids ? (array) $parent_post_ids : array();
@@ -102,7 +102,7 @@ class WP_REST_Annotations_Controller extends WP_REST_Posts_Controller {
 		}
 
 		/*
-         * Parents 'annotations'.
+		 * Parents 'annotations'.
 		 */
 		$parent_ids = $request['parent'];
 		$parent_ids = $parent_ids ? (array) $parent_ids : array();
@@ -117,7 +117,7 @@ class WP_REST_Annotations_Controller extends WP_REST_Posts_Controller {
 		}
 
 		/*
-         * May only list if you can edit.
+		 * May only list if you can edit.
 		 */
 		if ( current_user_can( $post_type->cap->edit_posts ) ) {
 			return true;
@@ -271,8 +271,8 @@ class WP_REST_Annotations_Controller extends WP_REST_Posts_Controller {
 		}
 
 		/*
-         * Annotations are not registered with REST API support.
-         * However, Gutenberg exposes *this* controller, which obviously *is* allowed.
+		 * Annotations are not registered with REST API support.
+		 * However, Gutenberg exposes *this* controller, which obviously *is* allowed.
 		 */
 		if ( $post_type->name === $this->post_type || ! empty( $post_type->show_in_rest ) ) {
 			return true;

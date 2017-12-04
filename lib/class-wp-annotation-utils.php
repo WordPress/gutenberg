@@ -507,7 +507,7 @@ final class WP_Annotation_Utils {
 		}
 
 		/*
-         * Preserve an existing meta query.
+		 * Preserve an existing meta query.
 		 */
 		if ( $meta_queries ) {
 			if ( ! empty( $args['meta_query'] ) ) {
@@ -545,8 +545,8 @@ final class WP_Annotation_Utils {
 	 */
 	public static function on_get_additional_rest_field( $post, $field, $request ) {
 		/*
-         * There is some inconsistency (array|WP_Post) in the REST API hooks.
-         * Double-checking the $post data type before we begin here.
+		 * There is some inconsistency (array|WP_Post) in the REST API hooks.
+		 * Double-checking the $post data type before we begin here.
 		 */
 		if ( is_array( $post ) ) {
 			if ( ! empty( $post['id'] ) ) {
@@ -628,8 +628,8 @@ final class WP_Annotation_Utils {
 	 */
 	public static function on_update_additional_rest_field( $value, $post, $field, $request ) {
 		/*
-         * There is some inconsistency (array|WP_Post) in the REST API hooks.
-         * Double-checking the $post data type before we begin here.
+		 * There is some inconsistency (array|WP_Post) in the REST API hooks.
+		 * Double-checking the $post data type before we begin here.
 		 */
 		if ( is_array( $post ) ) {
 			if ( ! empty( $post['id'] ) ) {
@@ -728,7 +728,7 @@ final class WP_Annotation_Utils {
 		}
 
 		/*
-         * Parent permissions are checked in WP_REST_Annotations_Controller already.
+		 * Parent permissions are checked in WP_REST_Annotations_Controller already.
 		 */
 		return $parent_post_id;
 	}
@@ -763,8 +763,8 @@ final class WP_Annotation_Utils {
 		$id = mb_substr( trim( $id, '_-' ), 0, 250 );
 
 		/*
-         * Numeric IDs point to real WP_User's and we need to distinguish.
-         * So an annotator cannot use a numeric ID. Just start with a letter.
+		 * Numeric IDs point to real WP_User's and we need to distinguish.
+		 * So an annotator cannot use a numeric ID. Just start with a letter.
 		 */
 		if ( ! $id || is_numeric( $id ) || $id !== $raw_id ) {
 			return $error;
