@@ -198,6 +198,7 @@ class FormatToolbar extends Component {
 							{ linkSettings }
 						</form>
 					</Fill>
+					/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
 				}
 
 				{ !! formats.link && ! isAddingLink && ! isEditingLink &&
@@ -225,6 +226,7 @@ class FormatToolbar extends Component {
 							{ linkSettings }
 						</div>
 					</Fill>
+					/* eslint-enable jsx-a11y/no-static-element-interactions */
 				}
 			</div>
 		);
