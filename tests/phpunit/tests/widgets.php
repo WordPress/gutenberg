@@ -709,7 +709,7 @@ class Tests_Widgets extends WP_UnitTestCase {
 		global $sidebars_widgets, $_wp_sidebars_widgets;
 
 		wp_widgets_init();
-		$this->register_sidebars( array( 'sidebar-1', 'sidebar-2', 'sidebar-3', 'wp_inactive_widgets' ) );
+		$this->register_sidebars( array( 'sidebar-1', 'sidebar-2', 'sidebar-3', 'sidebar-4', 'wp_inactive_widgets' ) );
 
 		// Test restoring sidebars widgets when previously activated.
 		set_theme_mod( 'sidebars_widgets', array(
@@ -718,6 +718,7 @@ class Tests_Widgets extends WP_UnitTestCase {
 				'sidebar-1' => array( 'tag_cloud-1' ),
 				'sidebar-2' => array(),
 				'sidebar-3' => array( 'unregistered_widget-1', 'text-1', 'media_image-1' ),
+				'sidebar-4' => null, // Should be converted to array.
 				'orphaned_widgets_1' => array( 'media_video-2' ),
 			),
 		) );
