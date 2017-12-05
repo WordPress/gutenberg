@@ -280,6 +280,218 @@ describe( 'effects', () => {
 		} );
 	} );
 
+	describe( '.REQUEST_POST_UPDATE', () => {
+		const handler = effects.REQUEST_POST_UPDATE;
+		const dispatch = jest.fn();
+
+		beforeEach( () => {
+			dispatch.mockReset();
+		} );
+
+		// Mock wp.api
+		const apiCall = function( post ) {
+			return {
+				// getPostTypeModel appears to return an object constructor.
+				getPostTypeModel: function( postType ) { // eslint-disable-line no-unused-vars
+					return function( toSend ) { // eslint-disable-line no-unused-vars
+						this.save = function() {
+							return this;
+						};
+						// Callback takes a post object.
+						this.done = function( callback ) {
+							if ( post !== 'error' ) {
+								callback( post );
+							}
+							return this;
+						};
+						this.fail = function( callback ) {
+							if ( post === 'error' ) {
+								callback( post );
+							}
+							return this;
+						};
+					};
+				},
+			};
+		};
+
+		it( 'should dispatch four actions on successful post.', () => {
+			const post = {
+				id: 1,
+				title: {
+					raw: 'A History of Pork',
+				},
+				content: {
+					raw: '',
+				},
+				status: 'draft',
+			};
+
+			const store = { getState: () => ( {
+				currentPost: post,
+				previousPost: post,
+				editor: {
+					present: {
+						edits: {
+							content: 'yao',
+						},
+					},
+					past: {},
+				},
+				content: 'Yao',
+			} ), dispatch };
+
+			// Mock wp.api
+			wp.api = apiCall( post );
+
+			handler( {}, store );
+
+			const updatePost = {
+				edits: {
+					content: 'yao',
+					id: 1,
+				},
+				optimist: {
+					id: 'post-update',
+					type: 'BEGIN',
+				},
+				type: 'UPDATE_POST',
+			};
+
+			const removeNotice = {
+				noticeId: 'SAVE_POST_NOTICE_ID',
+				type: 'REMOVE_NOTICE',
+			};
+
+			const resetPostAction = {
+				post: {
+					content: {
+						raw: '',
+					},
+					id: 1,
+					status: 'draft',
+					title: {
+						raw: 'A History of Pork',
+					},
+				},
+				type: 'RESET_POST',
+			};
+
+			const requestPostUpdateSuccess = {
+				optimist: {
+					id: 'post-update',
+					type: 'COMMIT',
+				},
+				post: {
+					content: {
+						raw: '',
+					},
+					id: 1,
+					status: 'draft',
+					title: {
+						raw: 'A History of Pork',
+					},
+				},
+				previousPost: {
+					content: {
+						raw: '',
+					},
+					id: 1,
+					status: 'draft',
+					title: {
+						raw: 'A History of Pork',
+					},
+				},
+				type: 'REQUEST_POST_UPDATE_SUCCESS',
+			};
+
+			expect( dispatch ).toHaveBeenCalledTimes( 4 );
+			expect( dispatch.mock.calls[ 0 ][ 0 ] ).toEqual( updatePost );
+			expect( dispatch.mock.calls[ 1 ][ 0 ] ).toEqual( removeNotice );
+			expect( dispatch.mock.calls[ 2 ][ 0 ] ).toEqual( resetPostAction );
+			expect( dispatch.mock.calls[ 3 ][ 0 ] ).toEqual( requestPostUpdateSuccess );
+		} );
+
+		it( 'should dispatch three actions on failure post.', () => {
+			const post = {
+				id: 1,
+				title: {
+					raw: 'A History of Pork',
+				},
+				content: {
+					raw: '',
+				},
+				status: 'draft',
+			};
+
+			const store = { getState: () => ( {
+				currentPost: post,
+				previousPost: post,
+				editor: {
+					present: {
+						edits: {
+							content: 'yao',
+						},
+					},
+					past: {},
+				},
+				content: 'Yao',
+			} ), dispatch };
+
+			// Mock wp.api
+			wp.api = apiCall( 'error' );
+
+			handler( {}, store );
+
+			const updatePost = {
+				edits: {
+					content: 'yao',
+					id: 1,
+				},
+				optimist: {
+					id: 'post-update',
+					type: 'BEGIN',
+				},
+				type: 'UPDATE_POST',
+			};
+
+			const removeNotice = {
+				noticeId: 'SAVE_POST_NOTICE_ID',
+				type: 'REMOVE_NOTICE',
+			};
+
+			const requestPostFailure = {
+				edits: {
+					content: 'yao',
+				},
+				error: {
+					code: 'unknown_error',
+					message: 'An unknown error occurred.',
+				},
+				optimist: {
+					id: 'post-update',
+					type: 'REVERT',
+				},
+				post: {
+					content: {
+						raw: '',
+					},
+					id: 1,
+					status: 'draft',
+					title: {
+						raw: 'A History of Pork',
+					},
+				},
+				type: 'REQUEST_POST_UPDATE_FAILURE',
+			};
+
+			expect( dispatch ).toHaveBeenCalledTimes( 3 );
+			expect( dispatch.mock.calls[ 0 ][ 0 ] ).toEqual( updatePost );
+			expect( dispatch.mock.calls[ 1 ][ 0 ] ).toEqual( removeNotice );
+			expect( dispatch.mock.calls[ 2 ][ 0 ] ).toEqual( requestPostFailure );
+		} );
+	} );
+
 	describe( '.REQUEST_POST_UPDATE_SUCCESS', () => {
 		beforeAll( () => {
 			selectors.getDirtyMetaBoxes = jest.spyOn( selectors, 'getDirtyMetaBoxes' );
