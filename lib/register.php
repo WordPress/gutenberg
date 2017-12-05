@@ -480,23 +480,42 @@ function gutenberg_redirect_to_classic_editor_when_saving_posts( $url ) {
 add_filter( 'redirect_post_location', 'gutenberg_redirect_to_classic_editor_when_saving_posts', 10, 1 );
 
 /**
- * Appends a query argument to the edit url to make sure it gets redirected to the classic editor.
+ * Appends a query argument to the edit url to make sure it is redirected to
+ * the editor from which the user navigated.
  *
  * @since 1.5.2
  *
  * @param string $url Edit url.
  * @return string Edit url.
  */
-function gutenberg_link_revisions_to_classic_editor( $url ) {
+function gutenberg_revisions_link_to_editor( $url ) {
 	global $pagenow;
-	if ( 'revision.php' === $pagenow ) {
-
-		// Only reset the classic editor link.
-		if ( isset( $_REQUEST['gutenberg'] ) ) {
-			return $url;
-		}
-		$url = add_query_arg( 'classic-editor', '', $url );
+	if ( 'revision.php' !== $pagenow || isset( $_REQUEST['gutenberg'] ) ) {
+		return $url;
 	}
-	return $url;
+
+	return add_query_arg( 'classic-editor', '', $url );
 }
-add_filter( 'get_edit_post_link', 'gutenberg_link_revisions_to_classic_editor' );
+add_filter( 'get_edit_post_link', 'gutenberg_revisions_link_to_editor' );
+
+/**
+ * Modifies revisions data to preserve Gutenberg argument used in determining
+ * where to redirect user returning to editor.
+ *
+ * @since 1.9.0
+ *
+ * @param array $revisions_data The bootstrapped data for the revisions screen.
+ * @return array Modified bootstrapped data for the revisions screen.
+ */
+function gutenberg_revisions_restore( $revisions_data ) {
+	if ( isset( $_REQUEST['gutenberg'] ) ) {
+		$revisions_data['restoreUrl'] = add_query_arg(
+			'gutenberg',
+			$_REQUEST['gutenberg'],
+			$revisions_data['restoreUrl']
+		);
+	}
+
+	return $revisions_data;
+}
+add_filter( 'wp_prepare_revision_for_js', 'gutenberg_revisions_restore' );
