@@ -42,11 +42,7 @@ const FORMATTING_CONTROLS = [
 // Default controls shown if no `enabledControls` prop provided
 const DEFAULT_CONTROLS = [ 'bold', 'italic', 'strikethrough', 'link' ];
 
-/* We need to stop the keypress event here, because block.js is firing
-	 a maybeStartTyping on keypress, and that hides the "fixed-to-block" toolbar
-	 which unregisters the slot, so when Editable tries to re-render its input
-	 dialog, the slot is no longer in the system, and the dialog disappears
- */
+// Stop the keypress event from propagating up to maybeStartTyping in BlockListBlock
 const stopKeyPressPropagation = ( event ) => event.stopPropagation();
 
 class FormatToolbar extends Component {
