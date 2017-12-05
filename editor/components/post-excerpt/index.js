@@ -18,15 +18,17 @@ import { editPost } from '../../actions';
 
 function PostExcerpt( { excerpt, onUpdateExcerpt } ) {
 	const onChange = ( event ) => onUpdateExcerpt( event.target.value );
+	const excerptTextareaId = 'editor-post-excerpt';
 
 	return (
 		<div>
+			<label key="label" htmlFor={ excerptTextareaId }>{ __( 'Write an excerpt (optional)' ) }</label>
 			<textarea
 				className="editor-post-excerpt__textarea"
 				onChange={ onChange }
 				value={ excerpt }
-				placeholder={ __( 'Write an excerpt (optional)' ) }
 				aria-label={ __( 'Excerpt' ) }
+				id={ excerptTextareaId }
 			/>
 			<ExternalLink href="https://codex.wordpress.org/Excerpt">
 				{ __( 'Learn more about manual excerpts' ) }
@@ -47,4 +49,3 @@ export default connect(
 		},
 	}
 )( PostExcerpt );
-
