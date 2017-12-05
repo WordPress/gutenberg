@@ -42,6 +42,9 @@ const FORMATTING_CONTROLS = [
 // Default controls shown if no `enabledControls` prop provided
 const DEFAULT_CONTROLS = [ 'bold', 'italic', 'strikethrough', 'link' ];
 
+// Stop the keypress event from propagating up to maybeStartTyping in BlockListBlock
+const stopKeyPressPropagation = ( event ) => event.stopPropagation();
+
 class FormatToolbar extends Component {
 	constructor() {
 		super( ...arguments );
@@ -172,10 +175,13 @@ class FormatToolbar extends Component {
 				<Toolbar controls={ toolbarControls } />
 
 				{ ( isAddingLink || isEditingLink ) &&
+					// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
+					/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 					<Fill name="Editable.Siblings">
 						<form
 							className="blocks-format-toolbar__link-modal"
 							style={ linkStyle }
+							onKeyPress={ stopKeyPressPropagation }
 							onSubmit={ this.submitLink }>
 							<div className="blocks-format-toolbar__link-modal-line">
 								<UrlInput value={ newLinkValue } onChange={ this.onChangeLinkValue } />
@@ -190,13 +196,17 @@ class FormatToolbar extends Component {
 							{ linkSettings }
 						</form>
 					</Fill>
+					/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
 				}
 
 				{ !! formats.link && ! isAddingLink && ! isEditingLink &&
+					// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
+					/* eslint-disable jsx-a11y/no-static-element-interactions */
 					<Fill name="Editable.Siblings">
 						<div
 							className="blocks-format-toolbar__link-modal"
 							style={ linkStyle }
+							onKeyPress={ stopKeyPressPropagation }
 						>
 							<div className="blocks-format-toolbar__link-modal-line">
 								<a
@@ -217,6 +227,7 @@ class FormatToolbar extends Component {
 							{ linkSettings }
 						</div>
 					</Fill>
+					/* eslint-enable jsx-a11y/no-static-element-interactions */
 				}
 			</div>
 		);
