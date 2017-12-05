@@ -296,11 +296,11 @@ describe( 'effects', () => {
 			window.history.replaceState.mockRestore();
 		} );
 
-		const handler = effects.REQUEST_POST_UPDATE_SUCCESS;
-		const dispatch = jest.fn();
-		const store = { getState: () => {}, dispatch };
-
 		it( 'should dispatch meta box updates on success for dirty meta boxes.', () => {
+			const handler = effects.REQUEST_POST_UPDATE_SUCCESS;
+			const dispatch = jest.fn();
+			const store = { getState: () => {}, dispatch };
+
 			selectors.getDirtyMetaBoxes.mockReturnValue( [ 'normal', 'side' ] );
 
 			const post = {
@@ -318,6 +318,117 @@ describe( 'effects', () => {
 
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( requestMetaBoxUpdates( [ 'normal', 'side' ] ) );
+		} );
+
+		it( 'should dispatch notices when reverting a published post to a draft.', () => {
+			const handler = effects.REQUEST_POST_UPDATE_SUCCESS;
+			const dispatch = jest.fn();
+			const store = { getState: () => {}, dispatch };
+
+			selectors.getDirtyMetaBoxes.mockReturnValue( [ 'normal', 'side' ] );
+
+			const post = {
+				id: 1,
+				title: {
+					raw: 'A History of Pork',
+				},
+				content: {
+					raw: '',
+				},
+				status: 'publish',
+			};
+
+			const previousPost = {
+				...post,
+				status: 'draft',
+			};
+
+			handler( { post, previousPost }, store );
+
+			expect( dispatch ).toHaveBeenCalledTimes( 2 );
+			expect( dispatch.mock.calls[ 0 ][ 0 ] ).toEqual( {
+				notice: {
+					content: <p><span>Post published!</span> <a href={ undefined }>View post</a></p>, // eslint-disable-line jsx-a11y/anchor-is-valid
+					id: 'SAVE_POST_NOTICE_ID',
+					isDismissible: true,
+					status: 'success',
+				},
+				type: 'CREATE_NOTICE',
+			} );
+		} );
+
+		it( 'should dispatch notices when publishing or scheduling a post.', () => {
+			const handler = effects.REQUEST_POST_UPDATE_SUCCESS;
+			const dispatch = jest.fn();
+			const store = { getState: () => {}, dispatch };
+
+			selectors.getDirtyMetaBoxes.mockReturnValue( [ 'normal', 'side' ] );
+
+			const post = {
+				id: 1,
+				title: {
+					raw: 'A History of Pork',
+				},
+				content: {
+					raw: '',
+				},
+				status: 'draft',
+			};
+
+			const previousPost = {
+				...post,
+				status: 'publish',
+			};
+
+			handler( { post, previousPost }, store );
+
+			expect( dispatch ).toHaveBeenCalledTimes( 2 );
+			expect( dispatch.mock.calls[ 0 ][ 0 ].notice ).toEqual( {
+				content: <p>
+					<span>Post reverted to draft.</span>
+					{ ' ' }
+					{ false && <a href={ post.link }>{ 'View post' }</a> }
+				</p>,
+				id: 'SAVE_POST_NOTICE_ID',
+				isDismissible: true,
+				status: 'success',
+			} );
+			expect( dispatch.mock.calls[ 0 ][ 0 ].type ).toBe( 'CREATE_NOTICE' );
+		} );
+
+		it( 'should dispatch notices when just updating a published post again.', () => {
+			const handler = effects.REQUEST_POST_UPDATE_SUCCESS;
+			const dispatch = jest.fn();
+			const store = { getState: () => {}, dispatch };
+
+			selectors.getDirtyMetaBoxes.mockReturnValue( [ 'normal', 'side' ] );
+
+			const post = {
+				id: 1,
+				title: {
+					raw: 'A History of Pork',
+				},
+				content: {
+					raw: '',
+				},
+				status: 'publish',
+			};
+
+			const previousPost = {
+				...post,
+				status: 'publish',
+			};
+
+			handler( { post, previousPost }, store );
+
+			expect( dispatch ).toHaveBeenCalledTimes( 2 );
+			expect( dispatch.mock.calls[ 0 ][ 0 ].notice ).toEqual( {
+				content: <p><span>Post updated!</span>{ ' ' }<a href={ undefined }>{ 'View post' }</a></p>, // eslint-disable-line jsx-a11y/anchor-is-valid
+				id: 'SAVE_POST_NOTICE_ID',
+				isDismissible: true,
+				status: 'success',
+			} );
+			expect( dispatch.mock.calls[ 0 ][ 0 ].type ).toBe( 'CREATE_NOTICE' );
 		} );
 	} );
 
