@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isString } from 'lodash';
+import { isString, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -101,33 +101,17 @@ registerBlockType( 'core/quote', {
 			{
 				type: 'block',
 				blocks: [ 'core/paragraph' ],
-				transform: ( { value, citation, ...attrs } ) => {
-					const textElement = value[ 0 ];
-					if ( ! textElement ) {
-						return createBlock( 'core/paragraph', {
-							content: citation,
-						} );
+				transform: ( { value, citation } ) => {
+					// transforming an empty quote
+					if ( ( ! value || ! value.length ) && ! citation ) {
+						return createBlock( 'core/paragraph' );
 					}
-					const textContent = isString( textElement.children ) ?
-						textElement.children :
-						textElement.children.props.children;
-					if ( Array.isArray( value ) || citation ) {
-						const text = createBlock( 'core/paragraph', {
-							content: textContent,
-						} );
-						const quote = createBlock( 'core/quote', {
-							...attrs,
-							citation,
-							value: Array.isArray( value ) ?
-								value.slice( 1 ) :
-								[],
-						} );
-
-						return [ text, quote ];
-					}
-					return createBlock( 'core/paragraph', {
-						content: textContent,
-					} );
+					// transforming a quote with content
+					return ( value || [] ).map( item => createBlock( 'core/paragraph', {
+						content: [ get( item, 'children.props.children', '' ) ],
+					} ) ).concat( citation ? createBlock( 'core/paragraph', {
+						content: citation,
+					} ) : [] );
 				},
 			},
 			{
