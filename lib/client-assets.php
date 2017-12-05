@@ -555,18 +555,20 @@ function gutenberg_extend_wp_api_backbone_client() {
 
 	// Type to Model Mapping, only need to map types that name differs from model.
 	// For example, no need to map post => post, or page => page.
-	$type_model_mapping               = array();
-	$type_model_mapping['attachment'] = 'media';
-	$type_model_mapping['post_tag']   = 'tag';
+	$type_model_mapping = array(
+		'attachment' => 'media',
+		'post_tag'   => 'tag',
+	);
 	// You can use the filter to extend or map a custom type to another.
 	$type_model_mapping = apply_filters( 'type_model_mapping', $type_model_mapping );
 
 	// Type to Collection Mapping, only need to map types that name differs from collection.
-	$type_collection_mapping             = array();
-	$type_collection_mapping['category'] = 'categories';
-	$type_collection_mapping['page']     = 'pages';
-	$type_collection_mapping['post']     = 'posts';
-	$type_collection_mapping['post_tag'] = 'tags';
+	$type_collection_mapping = array(
+		'category' => 'categories',
+		'page'     => 'pages',
+		'post'     => 'posts',
+		'post_tag' => 'tags',
+	);
 	// You can use the filter to extend or map a custom type to another.
 	$type_collection_mapping = apply_filters( 'type_collection_mapping', $type_collection_mapping );
 
