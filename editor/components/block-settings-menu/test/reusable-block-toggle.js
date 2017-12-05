@@ -12,7 +12,7 @@ describe( 'ReusableBlockToggle', () => {
 	it( 'should allow converting a reusable block to static', () => {
 		const wrapper = shallow(
 			<ReusableBlockToggle
-				block={ { name: 'core/reusable-block' } }
+				block={ { name: 'core/block' } }
 			/>
 		);
 		const text = wrapper.find( 'IconButton' ).first().prop( 'children' );

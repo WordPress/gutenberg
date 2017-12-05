@@ -1,12 +1,12 @@
 <?php
 /**
- * Server-side rendering of the `core/reusable-block` block.
+ * Server-side rendering of the `core/block` block.
  *
  * @package gutenberg
  */
 
 /**
- * Renders the `core/reusable-block` block on server.
+ * Renders the `core/block` block on server.
  *
  * @param array $attributes The block attributes.
  *
@@ -33,7 +33,7 @@ function gutenberg_render_block_core_reusable_block( $attributes ) {
 	return gutenberg_render_block( $block );
 }
 
-register_block_type( 'core/reusable-block', array(
+register_block_type( 'core/block', array(
 	'attributes'      => array(
 		'ref' => array(
 			'type' => 'string',

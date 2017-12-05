@@ -402,7 +402,7 @@ describe( 'effects', () => {
 					name: { type: 'string' },
 				},
 			} );
-			registerBlockType( 'core/reusable-block', {
+			registerBlockType( 'core/block', {
 				title: 'Reusable Block',
 				category: 'common',
 				save: () => null,
@@ -414,7 +414,7 @@ describe( 'effects', () => {
 
 		afterAll( () => {
 			unregisterBlockType( 'core/test-block' );
-			unregisterBlockType( 'core/reusable-block' );
+			unregisterBlockType( 'core/block' );
 		} );
 
 		describe( '.FETCH_REUSABLE_BLOCKS', () => {
@@ -624,7 +624,7 @@ describe( 'effects', () => {
 				};
 				const staticBlock = {
 					uid: 'd6b55aa9-16b5-4123-9675-749d75a7f14d',
-					name: 'core/reusable-block',
+					name: 'core/block',
 					attributes: {
 						ref: reusableBlock.id,
 					},
@@ -685,7 +685,7 @@ describe( 'effects', () => {
 				expect( dispatch ).toHaveBeenCalledWith(
 					replaceBlocks(
 						[ staticBlock.uid ],
-						[ createBlock( 'core/reusable-block', { ref: 'this-is-a-mock-uuid' } ) ]
+						[ createBlock( 'core/block', { ref: 'this-is-a-mock-uuid' } ) ]
 					)
 				);
 			} );

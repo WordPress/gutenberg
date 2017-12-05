@@ -145,7 +145,7 @@ export class InserterMenu extends Component {
 
 		// Display reusable blocks that we've fetched in the inserter
 		return reusableBlocks.map( ( reusableBlock ) => ( {
-			name: 'core/reusable-block',
+			name: 'core/block',
 			initialAttributes: {
 				ref: reusableBlock.id,
 			},

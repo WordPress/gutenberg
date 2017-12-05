@@ -17,7 +17,7 @@ import { getBlock } from '../../selectors';
 import { convertBlockToStatic, convertBlockToReusable } from '../../actions';
 
 export function ReusableBlockToggle( { block, convertToStatic, convertToReusable } ) {
-	const isReusableBlock = block.name === 'core/reusable-block';
+	const isReusableBlock = block.name === 'core/block';
 
 	return (
 		<IconButton
