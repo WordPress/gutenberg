@@ -20,6 +20,11 @@
 
 	@include break-large() {
 		left: $admin-sidebar-width;
+
+		body.rtl & {
+			left: 0;
+			right: $admin-sidebar-width;
+		}
 	}
 }
 

@@ -73,11 +73,28 @@
 	font-weight: 600;
 	text-align: left;
 
+	body.rtl & {
+		text-align: right;
+	}
+
 	.dashicon {
 		position: absolute;
-		right: 10px;
+		right: $item-spacing;
 		top: 50%;
 		transform: translateY( -50% );
+
+		body.rtl & {
+			right: auto;
+			left: $item-spacing;
+		}
+	}
+
+	// mirror the arrow horizontally in RTL languages
+	body.rtl & .dashicons-arrow-right {
+		transform: scaleX(-1);
+		-ms-filter: fliph;
+		filter: FlipH;
+		margin-top: -10px;
 	}
 }
 

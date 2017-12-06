@@ -30,6 +30,12 @@ body.gutenberg-editor-page {
 	ul#adminmenu>li.current>a.current:after {
 		border-right-color: $white;
 	}
+
+	&.rtl ul#adminmenu a.wp-has-current-submenu:after,
+	&.rtl ul#adminmenu>li.current>a.current:after {
+		border-right-color: transparent;
+		border-left-color: $white;
+	}
 }
 
 .gutenberg {
