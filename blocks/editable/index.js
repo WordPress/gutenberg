@@ -4,9 +4,7 @@
 import tinymce from 'tinymce';
 import classnames from 'classnames';
 import {
-	last,
 	isEqual,
-	omitBy,
 	forEach,
 	merge,
 	identity,
@@ -14,13 +12,12 @@ import {
 	defer,
 	noop,
 } from 'lodash';
-import { nodeListToReact } from 'dom-react';
 import 'element-closest';
 
 /**
  * WordPress dependencies
  */
-import { createElement, Component, renderToString } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { keycodes, createBlobURL } from '@wordpress/utils';
 import { Slot, Fill } from '@wordpress/components';
 
@@ -34,30 +31,9 @@ import TinyMCE from './tinymce';
 import { pickAriaProps } from './aria';
 import patterns from './patterns';
 import { EVENTS } from './constants';
+import { getContent, setContent, getSplitAtLine, splitAtCaret, splitAtBlock } from './content';
 
 const { BACKSPACE, DELETE, ENTER } = keycodes;
-
-function createTinyMCEElement( type, props, ...children ) {
-	if ( props[ 'data-mce-bogus' ] === 'all' ) {
-		return null;
-	}
-
-	if ( props.hasOwnProperty( 'data-mce-bogus' ) ) {
-		return children;
-	}
-
-	return createElement(
-		type,
-		omitBy( props, ( value, key ) => key.indexOf( 'data-mce-' ) === 0 ),
-		...children
-	);
-}
-
-function isLinkBoundary( fragment ) {
-	return fragment.childNodes && fragment.childNodes.length === 1 &&
-		fragment.childNodes[ 0 ].nodeName === 'A' && fragment.childNodes[ 0 ].text.length === 1 &&
-		fragment.childNodes[ 0 ].text[ 0 ] === '\uFEFF';
-}
 
 function getFormatProperties( formatName, parents ) {
 	switch ( formatName ) {
@@ -528,30 +504,13 @@ export default class Editable extends Component {
 					return;
 				}
 
-				const rootNode = this.editor.getBody();
-				const selectedNode = this.editor.selection.getNode();
+				const split = getSplitAtLine( this.editor );
 
-				if ( selectedNode.parentNode !== rootNode ) {
-					return;
+				if ( split ) {
+					event.preventDefault();
+					this.setContent( split.before );
+					this.props.onSplit( split.before, split.after );
 				}
-
-				const dom = this.editor.dom;
-
-				if ( ! dom.isEmpty( selectedNode ) ) {
-					return;
-				}
-
-				event.preventDefault();
-
-				const childNodes = Array.from( rootNode.childNodes );
-				const index = dom.nodeIndex( selectedNode );
-				const beforeNodes = childNodes.slice( 0, index );
-				const afterNodes = childNodes.slice( index + 1 );
-				const beforeElement = nodeListToReact( beforeNodes, createTinyMCEElement );
-				const afterElement = nodeListToReact( afterNodes, createTinyMCEElement );
-
-				this.setContent( beforeElement );
-				this.props.onSplit( beforeElement, afterElement );
 			} else {
 				event.preventDefault();
 
@@ -585,27 +544,12 @@ export default class Editable extends Component {
 	 * @param {Array} blocks The blocks to add after the split point.
 	 */
 	splitContent( blocks = [] ) {
-		const { dom } = this.editor;
 		const rootNode = this.editor.getBody();
-		const beforeRange = dom.createRng();
-		const afterRange = dom.createRng();
-		const selectionRange = this.editor.selection.getRng();
 
 		if ( rootNode.childNodes.length ) {
-			beforeRange.setStart( rootNode, 0 );
-			beforeRange.setEnd( selectionRange.startContainer, selectionRange.startOffset );
-
-			afterRange.setStart( selectionRange.endContainer, selectionRange.endOffset );
-			afterRange.setEnd( rootNode, dom.nodeIndex( rootNode.lastChild ) + 1 );
-
-			const beforeFragment = beforeRange.extractContents();
-			const afterFragment = afterRange.extractContents();
-
-			const beforeElement = nodeListToReact( beforeFragment.childNodes, createTinyMCEElement );
-			const afterElement = isLinkBoundary( afterFragment ) ? [] : nodeListToReact( afterFragment.childNodes, createTinyMCEElement );
-
-			this.setContent( beforeElement );
-			this.props.onSplit( beforeElement, afterElement, ...blocks );
+			const split = splitAtCaret( this.editor );
+			this.setContent( split.before );
+			this.props.onSplit( split.before, split.after, ...blocks );
 		} else {
 			this.setContent( [] );
 			this.props.onSplit( [], [], ...blocks );
@@ -617,47 +561,16 @@ export default class Editable extends Component {
 			return;
 		}
 
-		// Getting the content before and after the cursor
-		const childNodes = Array.from( this.editor.getBody().childNodes );
-		let selectedChild = this.editor.selection.getStart();
-		while ( childNodes.indexOf( selectedChild ) === -1 && selectedChild.parentNode ) {
-			selectedChild = selectedChild.parentNode;
+		const split = splitAtBlock( this.editor );
+
+		if ( split ) {
+			// Splitting into two blocks
+			this.setContent( this.props.value );
+			this.props.onSplit(
+				split.before,
+				split.after
+			);
 		}
-		const splitIndex = childNodes.indexOf( selectedChild );
-		if ( splitIndex === -1 ) {
-			return;
-		}
-		const beforeNodes = childNodes.slice( 0, splitIndex );
-		const lastNodeBeforeCursor = last( beforeNodes );
-		// Avoid splitting on single enter
-		if (
-			! lastNodeBeforeCursor ||
-			beforeNodes.length < 2 ||
-			!! lastNodeBeforeCursor.textContent
-		) {
-			return;
-		}
-
-		const before = beforeNodes.slice( 0, beforeNodes.length - 1 );
-
-		// Removing empty nodes from the beginning of the "after"
-		// avoids empty paragraphs at the beginning of newly created blocks.
-		const after = childNodes.slice( splitIndex ).reduce( ( memo, node ) => {
-			if ( ! memo.length && ! node.textContent ) {
-				return memo;
-			}
-
-			memo.push( node );
-			return memo;
-		}, [] );
-
-		// Splitting into two blocks
-		this.setContent( this.props.value );
-
-		this.props.onSplit(
-			nodeListToReact( before, createTinyMCEElement ),
-			nodeListToReact( after, createTinyMCEElement )
-		);
 	}
 
 	onNodeChange( { parents } ) {
@@ -687,16 +600,11 @@ export default class Editable extends Component {
 	}
 
 	setContent( content ) {
-		if ( ! content ) {
-			content = '';
-		}
-
-		content = renderToString( content );
-		this.editor.setContent( content, { format: 'raw' } );
+		setContent( this.editor, content );
 	}
 
 	getContent() {
-		return nodeListToReact( this.editor.getBody().childNodes || [], createTinyMCEElement );
+		return getContent( this.editor );
 	}
 
 	updateFocus() {
