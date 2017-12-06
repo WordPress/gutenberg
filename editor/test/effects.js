@@ -24,6 +24,7 @@ import {
 	updateReusableBlock,
 	saveReusableBlock,
 	fetchReusableBlocks,
+	removeNotice,
 	convertBlockToStatic,
 	convertBlockToReusable,
 } from '../actions';
@@ -318,6 +319,96 @@ describe( 'effects', () => {
 
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( requestMetaBoxUpdates( [ 'normal', 'side' ] ) );
+		} );
+	} );
+
+	describe( '.TRASH_POST', () => {
+		it( 'should dispatch an removal notice for trashing a post as well as a trash post success action.', () => {
+			const apiCall = ( post ) => ( {
+				getPostTypeModel: function( postType ) { // eslint-disable-line no-unused-vars
+					return function( postObject ) { // eslint-disable-line no-unused-vars
+						return {
+							destroy: function() {
+								return this;
+							},
+							then: function( callback, errorHandler ) {
+								if ( post !== 'error' ) {
+									callback();
+								} else {
+									errorHandler( 'error' );
+								}
+							},
+						};
+					};
+				},
+			} );
+			const post = {
+				id: 1,
+				title: {
+					raw: 'A History of Pork',
+				},
+				content: {
+					raw: '',
+				},
+				status: 'draft',
+			};
+			wp.api = apiCall( post );
+
+			const handler = effects.TRASH_POST;
+			const dispatch = jest.fn();
+			const store = { getState: () => ( { currentPost: post } ), dispatch };
+
+			const action = { postId: 1 };
+
+			handler( action, store );
+
+			expect( dispatch ).toHaveBeenCalledTimes( 2 );
+			expect( dispatch.mock.calls[ 0 ][ 0 ] ).toEqual( removeNotice( 'TRASH_POST_NOTICE_ID' ) );
+			expect( dispatch.mock.calls[ 1 ][ 0 ] ).toEqual( {
+				...action,
+				type: 'TRASH_POST_SUCCESS',
+			} );
+		} );
+
+		it( 'should dispatch removal notice as well as a trash post failure.', () => {
+			const apiCall = ( post ) => ( {
+				getPostTypeModel: function( postType ) { // eslint-disable-line no-unused-vars
+					return function( postObject ) { // eslint-disable-line no-unused-vars
+						return {
+							destroy: function() {
+								return this;
+							},
+							then: function( callback, errorHandler ) {
+								if ( post !== 'error' ) {
+									callback();
+								} else {
+									errorHandler( 'error' );
+								}
+							},
+						};
+					};
+				},
+			} );
+			const post = 'error';
+			wp.api = apiCall( post );
+
+			const handler = effects.TRASH_POST;
+			const dispatch = jest.fn();
+			const store = { getState: () => ( { currentPost: post } ), dispatch };
+			const action = { postId: 1 };
+
+			handler( action, store );
+
+			expect( dispatch ).toHaveBeenCalledTimes( 2 );
+			expect( dispatch.mock.calls[ 0 ][ 0 ] ).toEqual( removeNotice( 'TRASH_POST_NOTICE_ID' ) );
+			expect( dispatch.mock.calls[ 1 ][ 0 ] ).toEqual( {
+				...action,
+				error: {
+					code: 'unknown_error',
+					message: 'An unknown error occurred.',
+				},
+				type: 'TRASH_POST_FAILURE',
+			} );
 		} );
 	} );
 
