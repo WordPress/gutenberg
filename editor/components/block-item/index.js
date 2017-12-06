@@ -17,6 +17,7 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import './style.scss';
 import BlockMover from '../block-mover';
 import BlockDropZone from '../block-drop-zone';
 import BlockSettingsMenu from '../block-settings-menu';
@@ -83,7 +84,7 @@ function getScrollContainer( node ) {
 	return getScrollContainer( node.parentNode );
 }
 
-class BlockListBlock extends Component {
+class BlockItem extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -352,7 +353,7 @@ class BlockListBlock extends Component {
 		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected, focus } = this.props;
 		const showUI = isSelected && ( ! this.props.isTyping || ( focus && focus.collapsed === false ) );
 		const { error } = this.state;
-		const wrapperClassName = classnames( 'editor-block-list__block', {
+		const wrapperClassName = classnames( 'editor-block-item', {
 			'has-warning': ! isValid || !! error,
 			'is-selected': showUI,
 			'is-multi-selected': isMultiSelected,
@@ -399,7 +400,7 @@ class BlockListBlock extends Component {
 					onMouseDown={ this.onPointerDown }
 					onKeyDown={ this.onKeyDown }
 					onFocus={ this.onFocus }
-					className="editor-block-list__block-edit"
+					className="editor-block-item__edit"
 					tabIndex="0"
 					aria-label={ blockLabel }
 				>
@@ -523,6 +524,6 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 } );
 
 export default compose(
-	withFilters( 'Editor.BlockItem' ),
+	withFilters( 'editor.BlockItem' ),
 	connect( mapStateToProps, mapDispatchToProps )
-)( BlockListBlock );
+)( BlockItem );

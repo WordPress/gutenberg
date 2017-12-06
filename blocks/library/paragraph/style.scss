@@ -19,6 +19,6 @@ p.has-background {
 	padding: 20px 30px;
 }
 
-.editor-block-list__block:not( .is-multi-selected ) .wp-block-paragraph {
+.editor-block-item:not( .is-multi-selected ) .wp-block-paragraph {
 	background: white;
 }

@@ -4,9 +4,9 @@ describe( 'Multi-block selection', () => {
 	} );
 
 	it( 'Should select/unselect multiple blocks', () => {
-		const lastBlockSelector = '.editor-block-list__block-edit:last [contenteditable="true"]:first';
-		const firstBlockContainerSelector = '.editor-block-list__block:first';
-		const lastBlockContainerSelector = '.editor-block-list__block:last';
+		const lastBlockSelector = '.editor-block-item__edit:last [contenteditable="true"]:first';
+		const firstBlockContainerSelector = '.editor-block-item:first';
+		const lastBlockContainerSelector = '.editor-block-item:last';
 		const multiSelectedCssClass = 'is-multi-selected';
 
 		// Creating test blocks

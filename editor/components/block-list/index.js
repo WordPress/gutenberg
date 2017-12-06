@@ -24,7 +24,7 @@ import { serialize } from '@wordpress/blocks';
  * Internal dependencies
  */
 import './style.scss';
-import BlockListBlock from './block';
+import BlockItem from '../block-item';
 import BlockListSiblingInserter from './sibling-inserter';
 import {
 	getBlockUids,
@@ -212,7 +212,7 @@ class BlockList extends Component {
 			<div>
 				{ !! blocks.length && <BlockListSiblingInserter /> }
 				{ flatMap( blocks, ( uid ) => [
-					<BlockListBlock
+					<BlockItem
 						key={ 'block-' + uid }
 						uid={ uid }
 						blockRef={ this.setBlockRef }
