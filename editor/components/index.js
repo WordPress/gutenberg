@@ -44,6 +44,7 @@ export { default as WordCount } from './word-count';
 
 // Content Related Components
 export { default as BlockInspector } from './block-inspector';
+export { default as BlockItem } from './block-item';
 export { default as BlockList } from './block-list';
 export { default as BlockMover } from './block-mover';
 export { default as BlockSettingsMenu } from './block-settings-menu';

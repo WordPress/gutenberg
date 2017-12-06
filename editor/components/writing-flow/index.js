@@ -53,7 +53,7 @@ class WritingFlow extends Component {
 	}
 
 	getEditables( target ) {
-		const outer = target.closest( '.editor-block-list__block-edit' );
+		const outer = target.closest( '.editor-block-item__edit' );
 		if ( ! outer || target === outer ) {
 			return [ target ];
 		}
@@ -69,7 +69,7 @@ class WritingFlow extends Component {
 				node.nodeName === 'INPUT' ||
 				node.nodeName === 'TEXTAREA' ||
 				node.contentEditable === 'true' ||
-				node.classList.contains( 'editor-block-list__block-edit' )
+				node.classList.contains( 'editor-block-item__edit' )
 			) );
 	}
 

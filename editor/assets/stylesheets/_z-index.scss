@@ -4,9 +4,9 @@
 
 $z-layers: (
 	'.editor-block-switcher__arrow': 1,
-	'.editor-block-list__block:before': -1,
-	'.editor-block-list__block .wp-block-more:before': -1,
-	'.editor-block-list__block {core/image aligned left or right}': 20,
+	'.editor-block-item:before': -1,
+	'.editor-block-item .wp-block-more:before': -1,
+	'.editor-block-item {core/image aligned left or right}': 20,
 	'.freeform-toolbar': 10,
 	'.editor-warning': 1,
 	'.editor-block-list__sibling-inserter': 1,

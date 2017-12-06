@@ -436,7 +436,7 @@ export default class Editable extends Component {
 		// Find the parent "relative" positioned container
 		const container = this.props.inlineToolbar ?
 			this.editor.getBody().closest( '.blocks-editable' ) :
-			this.editor.getBody().closest( '.editor-block-list__block' );
+			this.editor.getBody().closest( '.editor-block-item' );
 		const containerPosition = container.getBoundingClientRect();
 		const blockPadding = 14;
 		const blockMoverMargin = 18;
