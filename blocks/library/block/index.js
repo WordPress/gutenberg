@@ -78,7 +78,7 @@ class ReusableBlockEdit extends Component {
 	}
 
 	render() {
-		const { focus, reusableBlock, convertBlockToStatic } = this.props;
+		const { focus, reusableBlock, isSaving, convertBlockToStatic } = this.props;
 		const { isEditing, name, attributes } = this.state;
 
 		if ( ! reusableBlock ) {
@@ -111,7 +111,7 @@ class ReusableBlockEdit extends Component {
 					key="panel"
 					isEditing={ isEditing }
 					name={ name !== null ? name : reusableBlock.name }
-					isSaving={ reusableBlock.isSaving }
+					isSaving={ isSaving }
 					onEdit={ this.startEditing }
 					onDetach={ convertBlockToStatic }
 					onChangeName={ this.setName }
@@ -126,6 +126,7 @@ class ReusableBlockEdit extends Component {
 const ConnectedReusableBlockEdit = connect(
 	( state, ownProps ) => ( {
 		reusableBlock: state.reusableBlocks.data[ ownProps.attributes.ref ],
+		isSaving: state.reusableBlocks.isSaving[ ownProps.attributes.ref ],
 	} ),
 	( dispatch, ownProps ) => ( {
 		fetchReusableBlock() {

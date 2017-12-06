@@ -45,7 +45,7 @@ function ReusableBlockEditPanel( props ) {
 					key="save"
 					isPrimary
 					isLarge
-					isIndicatingProgress={ isSaving }
+					isBusy={ isSaving }
 					disabled={ ! name || isSaving }
 					className="reusable-block-edit-panel__button"
 					onClick={ onSave }>
