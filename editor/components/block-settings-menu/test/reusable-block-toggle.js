@@ -11,9 +11,7 @@ import { ReusableBlockToggle } from '../reusable-block-toggle';
 describe( 'ReusableBlockToggle', () => {
 	it( 'should allow converting a reusable block to static', () => {
 		const wrapper = shallow(
-			<ReusableBlockToggle
-				block={ { name: 'core/block' } }
-			/>
+			<ReusableBlockToggle isReusable={ true } />
 		);
 		const text = wrapper.find( 'IconButton' ).first().prop( 'children' );
 
@@ -22,9 +20,7 @@ describe( 'ReusableBlockToggle', () => {
 
 	it( 'should allow converting a static block to reusable', () => {
 		const wrapper = shallow(
-			<ReusableBlockToggle
-				block={ { name: 'core/paragraph' } }
-			/>
+			<ReusableBlockToggle isReusable={ false } />
 		);
 		const text = wrapper.find( 'IconButton' ).first().prop( 'children' );
 

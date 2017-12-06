@@ -9,6 +9,7 @@ import { noop } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/components';
+import { isReusableBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -16,24 +17,23 @@ import { IconButton } from '@wordpress/components';
 import { getBlock } from '../../selectors';
 import { convertBlockToStatic, convertBlockToReusable } from '../../actions';
 
-export function ReusableBlockToggle( { block, convertToStatic, convertToReusable } ) {
-	const isReusableBlock = block.name === 'core/block';
-
+export function ReusableBlockToggle( { isReusable, convertToStatic, convertToReusable } ) {
 	return (
 		<IconButton
 			className="editor-block-settings-menu__control"
 			icon="controls-repeat"
-			onClick={ isReusableBlock ? convertToStatic : convertToReusable }
+			onClick={ isReusable ? convertToStatic : convertToReusable }
 		>
-			{ isReusableBlock ? __( 'Detach from Reusable Block' ) : __( 'Convert to Reusable Block' ) }
+			{ isReusable ? __( 'Detach from Reusable Block' ) : __( 'Convert to Reusable Block' ) }
 		</IconButton>
 	);
 }
 
 export default connect(
 	( state, { uid } ) => {
+		const block = getBlock( state, uid );
 		return {
-			block: getBlock( state, uid ),
+			isReusable: isReusableBlock( block ),
 		};
 	},
 	( dispatch, { uid, onToggle = noop } ) => ( {

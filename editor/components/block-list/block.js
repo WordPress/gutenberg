@@ -10,7 +10,14 @@ import { get, partial, reduce, size } from 'lodash';
  */
 import { Component, compose, createElement } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
-import { getBlockType, BlockEdit, getBlockDefaultClassname, createBlock, hasBlockSupport } from '@wordpress/blocks';
+import {
+	getBlockType,
+	BlockEdit,
+	getBlockDefaultClassname,
+	createBlock,
+	hasBlockSupport,
+	isReusableBlock,
+} from '@wordpress/blocks';
 import { withFilters, withContext } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -354,13 +361,12 @@ class BlockListBlock extends Component {
 		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected, focus } = this.props;
 		const showUI = isSelected && ( ! this.props.isTyping || ( focus && focus.collapsed === false ) );
 		const { error } = this.state;
-		const isReusableBlock = blockType.name === 'core/block';
 		const wrapperClassName = classnames( 'editor-block-list__block', {
 			'has-warning': ! isValid || !! error,
 			'is-selected': showUI,
 			'is-multi-selected': isMultiSelected,
 			'is-hovered': isHovered,
-			'is-reusable': isReusableBlock,
+			'is-reusable': isReusableBlock( blockType ),
 		} );
 
 		const { onMouseLeave, onFocus, onReplace } = this.props;
