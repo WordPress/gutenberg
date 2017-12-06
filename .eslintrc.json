@@ -115,6 +115,10 @@
 				"message": "Use @wordpress/i18n as import path instead."
 			},
 			{
+				"selector": "ImportDeclaration[source.value=/^data$/]",
+				"message": "Use @wordpress/data as import path instead."
+			},
+			{
 				"selector": "ImportDeclaration[source.value=/^utils$/]",
 				"message": "Use @wordpress/utils as import path instead."
 			},

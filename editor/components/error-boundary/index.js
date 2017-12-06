@@ -33,7 +33,7 @@ class ErrorBoundary extends Component {
 	}
 
 	reboot() {
-		this.props.onError( this.context.store.getState() );
+		this.props.onError();
 	}
 
 	getContent() {
