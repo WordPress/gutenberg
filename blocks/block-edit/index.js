@@ -24,4 +24,4 @@ function BlockEdit( props ) {
 	return <Edit { ...editProps } />;
 }
 
-export default withFilters( 'BlockEdit' )( BlockEdit );
+export default withFilters( 'blocks.BlockEdit' )( BlockEdit );

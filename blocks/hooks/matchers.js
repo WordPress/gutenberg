@@ -3,6 +3,11 @@
  */
 import { isFunction, mapValues } from 'lodash';
 
+/**
+ * WordPress dependecies
+ */
+import { addFilter } from '@wordpress/hooks';
+
 function warnAboutDeprecatedMatcher() {
 	// eslint-disable-next-line no-console
 	console.warn(
@@ -91,6 +96,6 @@ export function resolveAttributes( settings ) {
 	return settings;
 }
 
-export default function matchers( { addFilter } ) {
-	addFilter( 'registerBlockType', 'core/matchers', resolveAttributes );
+export default function matchers() {
+	addFilter( 'blocks.registerBlockType', 'core/matchers', resolveAttributes );
 }

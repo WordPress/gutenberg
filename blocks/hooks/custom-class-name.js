@@ -8,6 +8,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { getWrapperDisplayName } from '@wordpress/element';
+import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -87,8 +88,8 @@ export function addSaveProps( extraProps, blockType, attributes ) {
 	return extraProps;
 }
 
-export default function customClassName( { addFilter } ) {
-	addFilter( 'registerBlockType', 'core/custom-class-name/attribute', addAttribute );
-	addFilter( 'BlockEdit', 'core/custom-class-name/inspector-control', withInspectorControl );
-	addFilter( 'getSaveContent.extraProps', 'core/custom-class-name/save-props', addSaveProps );
+export default function customClassName() {
+	addFilter( 'blocks.registerBlockType', 'core/custom-class-name/attribute', addAttribute );
+	addFilter( 'blocks.BlockEdit', 'core/custom-class-name/inspector-control', withInspectorControl );
+	addFilter( 'blocks.getSaveContent.extraProps', 'core/custom-class-name/save-props', addSaveProps );
 }

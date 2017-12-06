@@ -7,6 +7,7 @@ import { assign } from 'lodash';
  * WordPress dependencies
  */
 import { getWrapperDisplayName } from '@wordpress/element';
+import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -97,8 +98,8 @@ export function addSaveProps( extraProps, blockType, attributes ) {
 	return extraProps;
 }
 
-export default function anchor( { addFilter } ) {
-	addFilter( 'registerBlockType', 'core/anchor/attribute', addAttribute );
-	addFilter( 'BlockEdit', 'core/anchor/inspector-control', withInspectorControl );
-	addFilter( 'getSaveContent.extraProps', 'core/anchor/save-props', addSaveProps );
+export default function anchor() {
+	addFilter( 'blocks.registerBlockType', 'core/anchor/attribute', addAttribute );
+	addFilter( 'blocks.BlockEdit', 'core/anchor/inspector-control', withInspectorControl );
+	addFilter( 'blocks.getSaveContent.extraProps', 'core/anchor/save-props', addSaveProps );
 }

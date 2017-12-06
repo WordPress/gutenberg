@@ -4,6 +4,11 @@
 import classnames from 'classnames';
 
 /**
+ * WordPress dependencies
+ */
+import { addFilter } from '@wordpress/hooks';
+
+/**
  * Internal dependencies
  */
 import { hasBlockSupport, getBlockDefaultClassname } from '../api';
@@ -30,6 +35,6 @@ export function addGeneratedClassName( extraProps, blockType ) {
 	return extraProps;
 }
 
-export default function generatedClassName( { addFilter } ) {
-	addFilter( 'getSaveContent.extraProps', 'core/generated-class-name/save-props', addGeneratedClassName );
+export default function generatedClassName() {
+	addFilter( 'blocks.getSaveContent.extraProps', 'core/generated-class-name/save-props', addGeneratedClassName );
 }

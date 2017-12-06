@@ -119,7 +119,7 @@ export function registerBlockType( name, settings ) {
 		...settings,
 	};
 
-	settings = applyFilters( 'registerBlockType', settings, name );
+	settings = applyFilters( 'blocks.registerBlockType', settings, name );
 
 	return blocks[ name ] = settings;
 }
