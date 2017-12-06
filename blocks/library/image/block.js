@@ -16,7 +16,7 @@ import {
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { mediaUpload, createMediaFromFile, getBlobByURL, revokeBlobURL, viewPort } from '@wordpress/utils';
+import { mediaUpload, revokeBlobURL, viewPort } from '@wordpress/utils';
 import {
 	Placeholder,
 	Dashicon,
@@ -54,31 +54,13 @@ class ImageBlock extends Component {
 		this.onSelectImage = this.onSelectImage.bind( this );
 		this.onSetHref = this.onSetHref.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
-	}
+		this.handleTemporaryImage = this.handleTemporaryImage.bind( this );
+		this.handleImageUploaded = this.handleImageUploaded.bind( this );
+		this.handleUploadCompleted = this.handleUploadCompleted.bind( this );
 
-	componentDidMount() {
-		const { attributes, setAttributes } = this.props;
-		const { id, url = '' } = attributes;
-
-		if ( ! id && url.indexOf( 'blob:' ) === 0 ) {
-			getBlobByURL( url )
-				.then( createMediaFromFile )
-				.then( ( media ) => {
-					setAttributes( {
-						id: media.id,
-						url: media.source_url,
-					} );
-				} );
-		}
-	}
-
-	componentDidUpdate( prevProps ) {
-		const { id: prevID, url: prevUrl = '' } = prevProps.attributes;
-		const { id, url = '' } = this.props.attributes;
-
-		if ( ! prevID && prevUrl.indexOf( 'blob:' ) === 0 && id && url.indexOf( 'blob:' ) === -1 ) {
-			revokeBlobURL( url );
-		}
+		this.state = {
+			temporaryUrl: '',
+		};
 	}
 
 	onSelectImage( media ) {
@@ -108,8 +90,32 @@ class ImageBlock extends Component {
 		this.props.setAttributes( { url } );
 	}
 
+	handleTemporaryImage( [ url ] ) {
+		this.setState( { temporaryUrl: url } );
+	}
+
+	handleImageUploaded( error, result ) {
+		if ( error ) {
+			// This needs better handling but replicates current handling...
+			this.props.setAttributes( { url: null } );
+			this.setState( { temporaryUrl: '' } );
+		} else {
+			const { image: { id, source_url: url } } = result;
+			this.props.setAttributes( { url, id } );
+		}
+	}
+
+	handleUploadCompleted() {
+		revokeBlobURL( this.state.temporaryUrl );
+		this.setState( { temporaryUrl: '' } );
+	}
+
 	getAvailableSizes() {
 		return get( this.props.image, [ 'data', 'media_details', 'sizes' ], {} );
+	}
+
+	haveImageUrl() {
+		return this.state.temporaryUrl || this.props.attributes.url;
 	}
 
 	render() {
@@ -120,8 +126,8 @@ class ImageBlock extends Component {
 		const figureStyle = width ? { width } : {};
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && ( ! viewPort.isExtraSmall() );
 		const uploadButtonProps = { isLarge: true };
-		const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setAttributes );
-		const dropFiles = ( files ) => mediaUpload( files, setAttributes );
+		const uploadFromFiles = ( event ) => mediaUpload( event.target.files, this.handleTemporaryImage, this.handleImageUploaded, this.handleUploadCompleted );
+		const dropFiles = ( files ) => mediaUpload( files, this.handleTemporaryImage, this.handleImageUploaded, this.handleUploadCompleted );
 
 		const blockDescription = (
 			<BlockDescription>
@@ -155,7 +161,7 @@ class ImageBlock extends Component {
 			)
 		);
 
-		if ( ! url ) {
+		if ( ! this.haveImageUrl() ) {
 			return [
 				controls,
 				focus && (
@@ -193,7 +199,7 @@ class ImageBlock extends Component {
 
 		const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
 		const classes = classnames( className, {
-			'is-transient': 0 === url.indexOf( 'blob:' ),
+			'is-transient': !! this.state.temporaryUrl,
 			'is-resized': !! width,
 			'is-focused': !! focus,
 		} );
@@ -234,7 +240,7 @@ class ImageBlock extends Component {
 						// Disable reason: Image itself is not meant to be
 						// interactive, but should direct focus to block
 						// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-						const img = <img src={ url } alt={ alt } onClick={ setFocus } />;
+						const img = <img src={ url || this.state.temporaryUrl } alt={ alt } onClick={ setFocus } />;
 
 						if ( ! isResizable || ! imageWidthWithinContainer ) {
 							return img;

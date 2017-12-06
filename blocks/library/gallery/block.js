@@ -49,9 +49,13 @@ class GalleryBlock extends Component {
 		this.uploadFromFiles = this.uploadFromFiles.bind( this );
 		this.onRemoveImage = this.onRemoveImage.bind( this );
 		this.setImageAttributes = this.setImageAttributes.bind( this );
+		this.handleTemporaryImages = this.handleTemporaryImages.bind( this );
+		this.handleImageUploaded = this.handleImageUploaded.bind( this );
+		this.handleUploadCompleted = this.handleUploadCompleted.bind( this );
 
 		this.state = {
 			selectedImage: null,
+			temporaryImages: [],
 		};
 	}
 
@@ -95,7 +99,29 @@ class GalleryBlock extends Component {
 	}
 
 	uploadFromFiles( event ) {
-		mediaUpload( event.target.files, this.props.setAttributes, isGallery );
+		mediaUpload( event.target.files, this.handleTemporaryImages, this.handleImageUploaded, this.handleUploadCompleted, isGallery );
+	}
+
+	handleTemporaryImages( urls ) {
+		this.setState( { temporaryImages: urls.map( url => ( { url } ) ) } );
+	}
+
+	handleImageUploaded( error, result ) {
+		if ( error ) {
+			// This needs better handling but replicates current handling...
+			const newImages = [ ...( this.props.images || [] ) ];
+			newImages[ error.index ] = null; // getImages will filter these out
+			this.props.setAttributes( { images: newImages } );
+		} else {
+			const { image: { source_url: url, id }, index } = result;
+			const newImages = [ ...( this.props.attributes.images || [] ) ];
+			newImages[ index ] = { url, id };
+			this.props.setAttributes( { images: newImages } );
+		}
+	}
+
+	handleUploadCompleted() {
+		this.setState( { temporaryImages: [] } );
 	}
 
 	setImageAttributes( index, attributes ) {
@@ -113,9 +139,16 @@ class GalleryBlock extends Component {
 		} );
 	}
 
+	getImages() {
+		const images = this.props.attributes.images || [];
+		const temporaryImages = this.state.temporaryImages;
+		return temporaryImages.length > 0 ? temporaryImages.map( ( tempImage, index ) => images[ index ] || tempImage ) : images.filter( image => !! image );
+	}
+
 	render() {
 		const { attributes, focus, className } = this.props;
-		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
+		const { columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
+		const images = this.getImages();
 
 		const blockDescription = (
 			<BlockDescription>
