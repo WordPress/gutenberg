@@ -34,13 +34,30 @@
 	}
 }
 
+body.rtl.sticky-menu .editor-header {
+	@include break-medium() {
+		left: 0;
+		right: $admin-sidebar-width;
+	}
+}
+
 .auto-fold .editor-header {		/* Auto fold is when on smaller breakpoints, nav menu auto colllapses */
 	@include break-medium() {
 		left: $admin-sidebar-width-collapsed;
+
+		body.rtl & {
+			left: 0;
+			right: $admin-sidebar-width-collapsed;
+		}
 	}
 
 	@include break-large() {
 		left: $admin-sidebar-width;
+
+		body.rtl & {
+			left: 0;
+			right: $admin-sidebar-width;
+		}
 	}
 }
 
@@ -48,8 +65,17 @@
 .folded .editor-header {
 	left: 0;
 
+	body.rtl & {
+		right: 0;
+	}
+
 	@include break-medium() {
 		left: $admin-sidebar-width-collapsed;
+
+		body.rtl & {
+			left: 0;
+			right: $admin-sidebar-width-collapsed;
+		}
 	}
 }
 
@@ -57,24 +83,11 @@
 .auto-fold .wp-responsive-open .editor-header {
 	left: $admin-sidebar-width-big;
 	right: -$admin-sidebar-width-big;
-}
 
-/* RTL */
-.rtl.auto-fold .editor-header {
-	@include break-medium() {
-		left: 0;
-		right: $admin-sidebar-width-collapsed;
+	body.rtl & {
+		left: -$admin-sidebar-width-big;
+		right: $admin-sidebar-width-big;
 	}
-
-	@include break-large() {
-		left: 0;
-		right: $admin-sidebar-width;
-	}
-}
-
-.rtl.auto-fold .wp-responsive-open .editor-header {
-	left: -$admin-sidebar-width-big;
-	right: $admin-sidebar-width-big;
 }
 
 .editor-header__settings {
