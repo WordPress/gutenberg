@@ -14,6 +14,16 @@
 final class WP_Annotation_Utils {
 
 	/**
+	 * Annotation post type.
+	 *
+	 * @since [version]
+	 * @access public
+	 *
+	 * @var string Post type name.
+	 */
+	public static $post_type = 'wp_annotation';
+
+	/**
 	 * Valid annotation substatuses.
 	 *
 	 * @since [version]
@@ -31,11 +41,9 @@ final class WP_Annotation_Utils {
 	 *
 	 * @since [version]
 	 * @access public
-	 *
-	 * @see gutenberg_register_post_types()
 	 */
 	public static function register_post_type() {
-		register_post_type( gutenberg_annotation_post_type(), array(
+		register_post_type( self::$post_type, array(
 			'public'                => false,
 			'delete_with_user'      => false,
 			'hierarchical'          => true,
@@ -76,6 +84,7 @@ final class WP_Annotation_Utils {
 		) );
 
 		add_filter( 'user_has_cap', array( __CLASS__, 'on_user_has_cap' ), 10, 4 );
+		add_action( 'delete_post', array( __CLASS__, 'on_delete_post' ), 10, 1 );
 	}
 
 	/**
@@ -126,7 +135,7 @@ final class WP_Annotation_Utils {
 
 		// Only dealing with annotations.
 		$post = get_post( $meta_cap_obj_id );
-		if ( ! $post || gutenberg_annotation_post_type() !== $post->post_type ) {
+		if ( ! $post || $post->post_type !== self::$post_type ) {
 			return $filtered_caps;
 		}
 
@@ -173,9 +182,9 @@ final class WP_Annotation_Utils {
 			return false;
 		}
 
-		if ( ! $is_parent && gutenberg_annotation_post_type() !== $post->post_type ) {
+		if ( ! $is_parent && $post->post_type !== self::$post_type ) {
 			return false; // If it's not a known parent, require an annotation.
-		} elseif ( $is_parent && gutenberg_annotation_post_type() === $post->post_type ) {
+		} elseif ( $is_parent && $post->post_type === self::$post_type ) {
 			return false; // If it's a known parent, it shouldn't be an annotation.
 		}
 
@@ -201,20 +210,54 @@ final class WP_Annotation_Utils {
 	}
 
 	/**
+	 * Delete all of a post's annotations whenever its `parent_post_id` is permanently deleted from the database.
+	 *
+	 * @since [version]
+	 * @access public
+	 *
+	 * @param int $post_id Post ID that will be deleted.
+	 */
+	public static function on_delete_post( $post_id ) {
+		$post = get_post( $post_id );
+
+		if ( ! $post || $post->post_type === self::$post_type ) {
+			return; // Only dealing with non-annotation types.
+		}
+
+		$query          = new WP_Query();
+		$annotation_ids = $query->query( array(
+			'fields'              => 'ids',
+			'post_type'           => self::$post_type,
+			'post_status'         => array_keys( get_post_stati() ),
+			'ignore_sticky_posts' => true,
+			'no_found_rows'       => true,
+			'suppress_filters'    => true,
+			'posts_per_page'      => -1,
+			'meta_query'          => array(
+				'key'   => '_parent_post_id',
+				'value' => $post->ID,
+			),
+		) );
+
+		foreach ( $annotation_ids as $annotation_id ) {
+			wp_delete_post( $annotation_id, true );
+		}
+	}
+
+	/**
 	 * Registers additional fields.
 	 *
 	 * @since [version]
 	 * @access public
 	 */
 	public static function register_additional_rest_fields() {
-		$post_type = gutenberg_annotation_post_type();
-		$contexts  = array( 'view', 'edit' );
+		$contexts = array( 'view', 'edit' );
 
 		/*
 		 * Register additional REST API fields.
 		 */
 
-		register_rest_field( $post_type, 'parent_post_id', array(
+		register_rest_field( self::$post_type, 'parent_post_id', array(
 			'get_callback'    => array( __CLASS__, 'on_get_additional_rest_field' ),
 			'update_callback' => array( __CLASS__, 'on_update_additional_rest_field' ),
 			'schema'          => array(
@@ -225,7 +268,7 @@ final class WP_Annotation_Utils {
 			),
 		) );
 
-		register_rest_field( $post_type, 'annotator', array(
+		register_rest_field( self::$post_type, 'annotator', array(
 			'get_callback'    => array( __CLASS__, 'on_get_additional_rest_field' ),
 			'update_callback' => array( __CLASS__, 'on_update_additional_rest_field' ),
 			'schema'          => array(
@@ -239,7 +282,7 @@ final class WP_Annotation_Utils {
 			),
 		) );
 
-		register_rest_field( $post_type, 'annotator_meta', array(
+		register_rest_field( self::$post_type, 'annotator_meta', array(
 			'get_callback'    => array( __CLASS__, 'on_get_additional_rest_field' ),
 			'update_callback' => array( __CLASS__, 'on_update_additional_rest_field' ),
 			'schema'          => array(
@@ -262,7 +305,7 @@ final class WP_Annotation_Utils {
 			),
 		) );
 
-		register_rest_field( $post_type, 'selection', array(
+		register_rest_field( self::$post_type, 'selection', array(
 			'get_callback'    => array( __CLASS__, 'on_get_additional_rest_field' ),
 			'update_callback' => array( __CLASS__, 'on_update_additional_rest_field' ),
 			'schema'          => array(
@@ -315,7 +358,7 @@ final class WP_Annotation_Utils {
 			),
 		) );
 
-		register_rest_field( $post_type, 'substatus', array(
+		register_rest_field( self::$post_type, 'substatus', array(
 			'get_callback'    => array( __CLASS__, 'on_get_additional_rest_field' ),
 			'update_callback' => array( __CLASS__, 'on_update_additional_rest_field' ),
 			'schema'          => array(
@@ -326,7 +369,7 @@ final class WP_Annotation_Utils {
 			),
 		) );
 
-		register_rest_field( $post_type, 'last_substatus_time', array(
+		register_rest_field( self::$post_type, 'last_substatus_time', array(
 			'get_callback' => array( __CLASS__, 'on_get_additional_rest_field' ),
 			'schema'       => array(
 				'readonly'    => true,
@@ -336,7 +379,7 @@ final class WP_Annotation_Utils {
 			),
 		) );
 
-		register_rest_field( $post_type, 'substatus_history', array(
+		register_rest_field( self::$post_type, 'substatus_history', array(
 			'get_callback' => array( __CLASS__, 'on_get_additional_rest_field' ),
 			'schema'       => array(
 				'readonly'    => true,
@@ -403,8 +446,8 @@ final class WP_Annotation_Utils {
 		 * Filters that further implement the fields above.
 		 */
 
-		add_filter( 'rest_' . $post_type . '_collection_params', array( __CLASS__, 'on_rest_collection_params' ) );
-		add_filter( 'rest_' . $post_type . '_query', array( __CLASS__, 'on_rest_collection_query' ), 10, 2 );
+		add_filter( 'rest_' . self::$post_type . '_collection_params', array( __CLASS__, 'on_rest_collection_params' ) );
+		add_filter( 'rest_' . self::$post_type . '_query', array( __CLASS__, 'on_rest_collection_query' ), 10, 2 );
 	}
 
 	/**
@@ -741,7 +784,7 @@ final class WP_Annotation_Utils {
 		$parent_post_id = (int) $parent_post_id;
 		$post           = get_post( $parent_post_id );
 
-		if ( ! $post || gutenberg_annotation_post_type() === $post->post_type ) {
+		if ( ! $post || $post->post_type === self::$post_type ) {
 			return $error; // Must be a child of a non-annotation post type.
 		}
 

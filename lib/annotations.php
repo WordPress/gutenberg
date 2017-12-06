@@ -18,5 +18,5 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return string Post type name.
  */
 function gutenberg_annotation_post_type() {
-	return 'wp_annotation';
+	return WP_Annotation_Utils::$post_type;
 }
