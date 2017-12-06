@@ -1,28 +1,29 @@
 .editor-post-featured-image {
-	padding: 10px 0 0;
+	padding: 0;
 
 	.spinner {
 		margin: 0;
 	}
-}
 
-.editor-post-featured-image__toggle {
-	text-decoration: underline;
-	color: $blue-wordpress;
-
-	&:focus {
-		box-shadow: none;
-		outline: none;
-	}
-
-	&:hover {
-		color: $blue-medium-500;
+	.button {
+		margin: 0 8px 8px 0;
 	}
 }
 
+.editor-post-featured-image__toggle,
 .editor-post-featured-image__preview {
 	display: block;
 	width: 100%;
+	margin-bottom: 1em;
+	padding: 0;
+}
+
+.editor-post-featured-image__toggle {
+	border: 1px dashed $light-gray-900;
+	background-color: $light-gray-300;
+	line-height: 20px;
+	padding: $item-spacing 0;
+	text-align: center;
 }
 
 .editor-post-featured-image__howto {
