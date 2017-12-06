@@ -105,11 +105,41 @@ class REST_Annotations_Controller_Test extends WP_Test_REST_Post_Type_Controller
 				),
 			) );
 
-			self::$annotation_id[ 'reply_by_' . $role ] = $factory->post->create( array(
+			self::$annotation_id[ '_reply_by_' . $role ] = $factory->post->create( array(
 				'post_status'  => 'publish',
 				'post_parent'  => self::$annotation_id[ 'by_' . $role ],
 				'post_type'    => gutenberg_annotation_post_type(),
 				'post_content' => '<p><strong>bold</strong> <em>italic</em> test annotation reply.</p>',
+				'meta_input'   => array(
+					'_parent_post_id'      => self::$post_id[ 'by_' . $role ],
+					'_selection'           => array(
+						'ranges' => array(
+							array(
+								'begin' => array(
+									'offset' => 0,
+								),
+								'end'   => array(
+									'offset' => 100,
+								),
+							),
+						),
+					),
+					'_annotator'           => 'x-plugin',
+					'_annotator_meta'      => array(
+						'display_name' => 'X Plugin',
+						'md5_email'    => 'c8e0057f78fa5b54326cd437494b87e9',
+					),
+					'_substatus'           => '',
+					'_last_substatus_time' => 0,
+					'_substatus_history'   => array(),
+				),
+			) );
+
+			self::$annotation_id[ '__reply_by_' . $role ] = $factory->post->create( array(
+				'post_status'  => 'publish',
+				'post_parent'  => self::$annotation_id[ '_reply_by_' . $role ],
+				'post_type'    => gutenberg_annotation_post_type(),
+				'post_content' => '<p><strong>bold</strong> <em>italic</em> test annotation nested reply.</p>',
 				'meta_input'   => array(
 					'_parent_post_id'      => self::$post_id[ 'by_' . $role ],
 					'_selection'           => array(
@@ -144,7 +174,8 @@ class REST_Annotations_Controller_Test extends WP_Test_REST_Post_Type_Controller
 		foreach ( self::$roles as $role ) {
 			wp_delete_post( self::$post_id[ 'by_' . $role ] );
 			wp_delete_post( self::$annotation_id[ 'by_' . $role ] );
-			wp_delete_post( self::$annotation_id[ 'reply_by_' . $role ] );
+			wp_delete_post( self::$annotation_id[ '_reply_by_' . $role ] );
+			wp_delete_post( self::$annotation_id[ '__reply_by_' . $role ] );
 			self::delete_user( self::$user_id[ $role ] );
 		}
 	}
@@ -184,12 +215,14 @@ class REST_Annotations_Controller_Test extends WP_Test_REST_Post_Type_Controller
 	 * Check that we have defined a JSON schema.
 	 */
 	public function test_get_item_schema() {
-		$request    = new WP_REST_Request( 'OPTIONS', self::$rest_ns_base );
+		$request = new WP_REST_Request( 'OPTIONS', self::$rest_ns_base );
+
 		$response   = $this->server->dispatch( $request );
+		$status     = $response->get_status();
 		$data       = $response->get_data();
 		$properties = $data['schema']['properties'];
 
-		$this->assertSame( 23, count( $properties ) );
+		$this->assertSame( 23, count( $properties ) ); // Not including conditional `children` property.
 		$this->assertArrayHasKey( 'parent_post_id', $properties );
 		$this->assertArrayHasKey( 'selection', $properties );
 		$this->assertArrayHasKey( 'annotator', $properties );
@@ -205,15 +238,19 @@ class REST_Annotations_Controller_Test extends WP_Test_REST_Post_Type_Controller
 	public function test_context_param() {
 		wp_set_current_user( self::$user_id['editor'] );
 
-		$request  = new WP_REST_Request( 'OPTIONS', self::$rest_ns_base );
+		$request = new WP_REST_Request( 'OPTIONS', self::$rest_ns_base );
+
 		$response = $this->server->dispatch( $request );
+		$status   = $response->get_status();
 		$data     = $response->get_data();
 
 		$this->assertSame( 'view', $data['endpoints'][0]['args']['context']['default'] );
 		$this->assertSame( array( 'view', 'embed', 'edit' ), $data['endpoints'][0]['args']['context']['enum'] );
 
-		$request  = new WP_REST_Request( 'OPTIONS', self::$rest_ns_base . '/' . self::$annotation_id['by_editor'] );
+		$request = new WP_REST_Request( 'OPTIONS', self::$rest_ns_base . '/' . self::$annotation_id['by_editor'] );
+
 		$response = $this->server->dispatch( $request );
+		$status   = $response->get_status();
 		$data     = $response->get_data();
 
 		$this->assertSame( 'view', $data['endpoints'][0]['args']['context']['default'] );
@@ -230,11 +267,15 @@ class REST_Annotations_Controller_Test extends WP_Test_REST_Post_Type_Controller
 	public function test_get_items() {
 		wp_set_current_user( self::$user_id['editor'] );
 
-		$request  = new WP_REST_Request( 'GET', self::$rest_ns_base );
-		$response = $this->server->dispatch( $request );
+		$request = new WP_REST_Request( 'GET', self::$rest_ns_base );
+		$request->set_param( 'per_page', 100 );
 
-		$this->assertSame( 200, $response->get_status() );
-		$this->assertSame( count( self::$roles ) * 2, count( $response->get_data() ) );
+		$response = $this->server->dispatch( $request );
+		$status   = $response->get_status();
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $status );
+		$this->assertSame( 5 * 3, count( $data ) ); // roles * annotations per role.
 		$this->check_get_posts_response( $response );
 	}
 
@@ -246,10 +287,14 @@ class REST_Annotations_Controller_Test extends WP_Test_REST_Post_Type_Controller
 
 		$request = new WP_REST_Request( 'GET', self::$rest_ns_base );
 		$request->set_param( 'parent_post_id', self::$post_id['by_editor'] );
-		$response = $this->server->dispatch( $request );
+		$request->set_param( 'per_page', 100 );
 
-		$this->assertSame( 200, $response->get_status() );
-		$this->assertSame( 1 * 2, count( $response->get_data() ) );
+		$response = $this->server->dispatch( $request );
+		$status   = $response->get_status();
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $status );
+		$this->assertSame( 1 * 3, count( $data ) ); // roles * annotations per role.
 		$this->check_get_posts_response( $response );
 	}
 
@@ -261,9 +306,14 @@ class REST_Annotations_Controller_Test extends WP_Test_REST_Post_Type_Controller
 
 		$request = new WP_REST_Request( 'GET', self::$rest_ns_base );
 		$request->set_param( 'parent_post_id', array( self::$post_id['by_editor'], self::$post_id['by_author'], self::$post_id['by_contributor'] ) );
-		$response = $this->server->dispatch( $request );
+		$request->set_param( 'per_page', 100 );
 
-		$this->assertSame( 3 * 2, count( $response->get_data() ) );
+		$response = $this->server->dispatch( $request );
+		$status   = $response->get_status();
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $status );
+		$this->assertSame( 3 * 3, count( $data ) ); // roles * annotations per role.
 		$this->check_get_posts_response( $response );
 	}
 
@@ -277,9 +327,95 @@ class REST_Annotations_Controller_Test extends WP_Test_REST_Post_Type_Controller
 		$request = new WP_REST_Request( 'GET', self::$rest_ns_base );
 		$request->set_param( 'parent_post_id', array( self::$post_id['by_editor'], self::$post_id['by_author'], self::$post_id['by_contributor'] ) );
 		$request->set_param( 'parent', array( self::$annotation_id['by_editor'], self::$annotation_id['by_author'], self::$annotation_id['by_contributor'] ) );
-		$response = $this->server->dispatch( $request );
+		$request->set_param( 'per_page', 100 );
 
-		$this->assertSame( ( 3 * 2 ) / 2, count( $response->get_data() ) );
+		$response = $this->server->dispatch( $request );
+		$status   = $response->get_status();
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $status );
+		$this->assertSame( 3 * 1, count( $data ) ); // roles * parent annotations per role.
+		$this->check_get_posts_response( $response );
+	}
+
+	/**
+	 * Check that we can GET a collection of all annotations, and that they're flat by default.
+	 */
+	public function test_get_flat_items() {
+		wp_set_current_user( self::$user_id['editor'] );
+
+		$request = new WP_REST_Request( 'GET', self::$rest_ns_base );
+		$request->set_param( 'parent', array( 0 ) );
+		$request->set_param( 'per_page', 100 );
+
+		$response = $this->server->dispatch( $request );
+		$status   = $response->get_status();
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $status );
+		$this->assertSame( 5 * 1, count( $data ) ); // roles * top-level annotations per role.
+
+		foreach ( $data as $flat ) {
+			$this->assertArrayNotHasKey( 'children', $flat );
+		}
+		$this->check_get_posts_response( $response );
+	}
+
+	/**
+	 * Check that we can GET a collection of all annotations in hierarchical=flat format.
+	 */
+	public function test_get_hierarchical_flat_items() {
+		wp_set_current_user( self::$user_id['editor'] );
+
+		$request = new WP_REST_Request( 'GET', self::$rest_ns_base );
+		$request->set_param( 'hierarchical', 'flat' );
+		$request->set_param( 'per_page', 100 );
+
+		$response = $this->server->dispatch( $request );
+		$status   = $response->get_status();
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $status );
+		$this->assertSame( 5 * 3, count( $data ) ); // roles * annotations per role.
+
+		foreach ( $data as $flat ) {
+			$this->assertArrayNotHasKey( 'children', $flat );
+		}
+		$this->check_get_posts_response( $response );
+	}
+
+	/**
+	 * Check that we can GET a collection of all annotations in hierarchical=threaded format.
+	 */
+	public function test_get_hierarchical_threaded_items() {
+		wp_set_current_user( self::$user_id['editor'] );
+
+		$request = new WP_REST_Request( 'GET', self::$rest_ns_base );
+		$request->set_param( 'hierarchical', 'threaded' );
+		$request->set_param( 'parent', array( 0 ) );
+		$request->set_param( 'per_page', 100 );
+
+		$response = $this->server->dispatch( $request );
+		$status   = $response->get_status();
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $status );
+		$this->assertSame( 5 * 1, count( $data ) ); // roles * level (0) annotations per role.
+
+		foreach ( $data as $level0 ) {
+			$this->assertArrayHasKey( 'children', $level0 );
+			$this->assertSame( 1, count( $level0['children'] ) ); // level (0) child annotations per role.
+
+			foreach ( $level0['children'] as $level1 ) {
+				$this->assertArrayHasKey( 'children', $level1 );
+				$this->assertSame( 1, count( $level1['children'] ) ); // level (1) child annotations per role.
+
+				foreach ( $level1['children'] as $level2 ) {
+					$this->assertArrayHasKey( 'children', $level2 );
+					$this->assertSame( 0, count( $level2['children'] ) ); // level (2) child annotations per role (none).
+				}
+			}
+		}
 		$this->check_get_posts_response( $response );
 	}
 
@@ -295,9 +431,12 @@ class REST_Annotations_Controller_Test extends WP_Test_REST_Post_Type_Controller
 
 		$request = new WP_REST_Request( 'GET', self::$rest_ns_base . '/' . self::$annotation_id['by_editor'] );
 		$request->set_param( 'context', 'edit' );
-		$response = $this->server->dispatch( $request );
 
-		$this->assertSame( 200, $response->get_status() );
+		$response = $this->server->dispatch( $request );
+		$status   = $response->get_status();
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $status );
 		$this->check_get_post_response( $response, 'edit' );
 	}
 
@@ -307,10 +446,13 @@ class REST_Annotations_Controller_Test extends WP_Test_REST_Post_Type_Controller
 	public function test_get_item() {
 		wp_set_current_user( self::$user_id['editor'] );
 
-		$request  = new WP_REST_Request( 'GET', self::$rest_ns_base . '/' . self::$annotation_id['by_editor'] );
-		$response = $this->server->dispatch( $request );
+		$request = new WP_REST_Request( 'GET', self::$rest_ns_base . '/' . self::$annotation_id['by_editor'] );
 
-		$this->assertSame( 200, $response->get_status() );
+		$response = $this->server->dispatch( $request );
+		$status   = $response->get_status();
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $status );
 		$this->check_get_post_response( $response );
 	}
 
@@ -320,10 +462,13 @@ class REST_Annotations_Controller_Test extends WP_Test_REST_Post_Type_Controller
 	public function test_get_item_by_other() {
 		wp_set_current_user( self::$user_id['editor'] );
 
-		$request  = new WP_REST_Request( 'GET', self::$rest_ns_base . '/' . self::$annotation_id['by_contributor'] );
-		$response = $this->server->dispatch( $request );
+		$request = new WP_REST_Request( 'GET', self::$rest_ns_base . '/' . self::$annotation_id['by_contributor'] );
 
-		$this->assertSame( 200, $response->get_status() );
+		$response = $this->server->dispatch( $request );
+		$status   = $response->get_status();
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $status );
 		$this->check_get_post_response( $response );
 	}
 
@@ -362,10 +507,12 @@ class REST_Annotations_Controller_Test extends WP_Test_REST_Post_Type_Controller
 			),
 			'substatus'      => '',
 		) );
+
 		$response = $this->server->dispatch( $request );
+		$status   = $response->get_status();
 		$data     = $response->get_data();
 
-		$this->assertSame( 201, $response->get_status() );
+		$this->assertSame( 201, $status );
 		$this->check_create_post_response( $response );
 
 		wp_delete_post( $data['id'] );
@@ -381,9 +528,12 @@ class REST_Annotations_Controller_Test extends WP_Test_REST_Post_Type_Controller
 		$request->set_body_params( array(
 			'content' => 'hello world',
 		) );
-		$response = $this->server->dispatch( $request );
 
-		$this->assertSame( 200, $response->get_status() );
+		$response = $this->server->dispatch( $request );
+		$status   = $response->get_status();
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $status );
 		$this->check_update_post_response( $response );
 	}
 
@@ -401,13 +551,21 @@ class REST_Annotations_Controller_Test extends WP_Test_REST_Post_Type_Controller
 			'content'        => '<p><strong>bold</strong> <em>italic</em> test annotation.</p>',
 			'parent_post_id' => self::$post_id['by_editor'],
 		) );
+
 		$response = $this->server->dispatch( $request );
+		$status   = $response->get_status();
 		$data     = $response->get_data();
 
-		$request  = new WP_REST_Request( 'DELETE', self::$rest_ns_base . '/' . $data['id'] );
-		$response = $this->server->dispatch( $request );
+		$this->assertSame( 201, $response->get_status() );
+		$this->check_create_post_response( $response );
 
-		$this->assertSame( 200, $response->get_status() );
+		$request = new WP_REST_Request( 'DELETE', self::$rest_ns_base . '/' . $data['id'] );
+
+		$response = $this->server->dispatch( $request );
+		$status   = $response->get_status();
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $status );
 	}
 
 	/*
@@ -420,11 +578,14 @@ class REST_Annotations_Controller_Test extends WP_Test_REST_Post_Type_Controller
 	public function test_get_items_when_not_allowed() {
 		wp_set_current_user( self::$user_id['subscriber'] );
 
-		$request  = new WP_REST_Request( 'GET', self::$rest_ns_base );
+		$request = new WP_REST_Request( 'GET', self::$rest_ns_base );
+		$request->set_param( 'per_page', 100 );
+
 		$response = $this->server->dispatch( $request );
+		$status   = $response->get_status();
 		$data     = $response->get_data();
 
-		$this->assertSame( rest_authorization_required_code(), $response->get_status() );
+		$this->assertSame( rest_authorization_required_code(), $status );
 		$this->assertSame( 'gutenberg_annotations_cannot_list_all', $data['code'] );
 	}
 
@@ -437,10 +598,13 @@ class REST_Annotations_Controller_Test extends WP_Test_REST_Post_Type_Controller
 
 		$request = new WP_REST_Request( 'GET', self::$rest_ns_base );
 		$request->set_param( 'parent_post_id', self::$post_id['by_editor'] );
+		$request->set_param( 'per_page', 100 );
+
 		$response = $this->server->dispatch( $request );
+		$status   = $response->get_status();
 		$data     = $response->get_data();
 
-		$this->assertSame( rest_authorization_required_code(), $response->get_status() );
+		$this->assertSame( rest_authorization_required_code(), $status );
 		$this->assertSame( 'gutenberg_annotations_cannot_list_parent_post', $data['code'] );
 	}
 
@@ -453,25 +617,30 @@ class REST_Annotations_Controller_Test extends WP_Test_REST_Post_Type_Controller
 
 		$request = new WP_REST_Request( 'GET', self::$rest_ns_base );
 		$request->set_param( 'parent_post_id', array( self::$post_id['by_contributor'], self::$post_id['by_editor'] ) );
+		$request->set_param( 'per_page', 100 );
 
 		$response = $this->server->dispatch( $request );
+		$status   = $response->get_status();
 		$data     = $response->get_data();
 
-		$this->assertSame( rest_authorization_required_code(), $response->get_status() );
+		$this->assertSame( rest_authorization_required_code(), $status );
 		$this->assertSame( 'gutenberg_annotations_cannot_list_parent_post', $data['code'] );
 	}
 
 	/**
-	 * Check that a user without permission can't GET a single annotation.
+	 * Check that a user without permission can't GET a single annotation, even if they are the original author.
 	 */
 	public function test_get_item_when_not_allowed() {
 		wp_set_current_user( self::$user_id['subscriber'] );
 
-		$request  = new WP_REST_Request( 'GET', self::$rest_ns_base . '/' . self::$annotation_id['by_subscriber'] );
+		$request = new WP_REST_Request( 'GET', self::$rest_ns_base . '/' . self::$annotation_id['by_subscriber'] );
+		$request->set_param( 'per_page', 100 );
+
 		$response = $this->server->dispatch( $request );
+		$status   = $response->get_status();
 		$data     = $response->get_data();
 
-		$this->assertSame( rest_authorization_required_code(), $response->get_status() );
+		$this->assertSame( rest_authorization_required_code(), $status );
 		$this->assertSame( 'rest_forbidden', $data['code'] );
 	}
 
@@ -481,11 +650,14 @@ class REST_Annotations_Controller_Test extends WP_Test_REST_Post_Type_Controller
 	public function test_get_item_when_not_allowed2() {
 		wp_set_current_user( self::$user_id['author'] );
 
-		$request  = new WP_REST_Request( 'GET', self::$rest_ns_base . '/' . self::$annotation_id['by_contributor'] );
+		$request = new WP_REST_Request( 'GET', self::$rest_ns_base . '/' . self::$annotation_id['by_contributor'] );
+		$request->set_param( 'per_page', 100 );
+
 		$response = $this->server->dispatch( $request );
+		$status   = $response->get_status();
 		$data     = $response->get_data();
 
-		$this->assertSame( rest_authorization_required_code(), $response->get_status() );
+		$this->assertSame( rest_authorization_required_code(), $status );
 		$this->assertSame( 'rest_forbidden', $data['code'] );
 	}
 
@@ -495,11 +667,14 @@ class REST_Annotations_Controller_Test extends WP_Test_REST_Post_Type_Controller
 	public function test_get_item_not_found() {
 		wp_set_current_user( self::$user_id['editor'] );
 
-		$request  = new WP_REST_Request( 'GET', self::$rest_ns_base . '/xyz' );
+		$request = new WP_REST_Request( 'GET', self::$rest_ns_base . '/xyz' );
+		$request->set_param( 'per_page', 100 );
+
 		$response = $this->server->dispatch( $request );
+		$status   = $response->get_status();
 		$data     = $response->get_data();
 
-		$this->assertSame( 404, $response->get_status() );
+		$this->assertSame( 404, $status );
 		$this->assertSame( 'rest_no_route', $data['code'] );
 	}
 
@@ -509,11 +684,14 @@ class REST_Annotations_Controller_Test extends WP_Test_REST_Post_Type_Controller
 	public function test_get_missing_item_not_found() {
 		wp_set_current_user( self::$user_id['editor'] );
 
-		$request  = new WP_REST_Request( 'GET', self::$rest_ns_base . '/999' );
+		$request = new WP_REST_Request( 'GET', self::$rest_ns_base . '/999' );
+		$request->set_param( 'per_page', 100 );
+
 		$response = $this->server->dispatch( $request );
+		$status   = $response->get_status();
 		$data     = $response->get_data();
 
-		$this->assertSame( 404, $response->get_status() );
+		$this->assertSame( 404, $status );
 		$this->assertSame( 'rest_post_invalid_id', $data['code'] );
 	}
 
@@ -525,10 +703,12 @@ class REST_Annotations_Controller_Test extends WP_Test_REST_Post_Type_Controller
 
 		$request = new WP_REST_Request( 'PUT', self::$rest_ns_base . '/' . self::$annotation_id['by_subscriber'] );
 		$request->set_param( 'substatus', 'archived' );
+
 		$response = $this->server->dispatch( $request );
+		$status   = $response->get_status();
 		$data     = $response->get_data();
 
-		$this->assertSame( rest_authorization_required_code(), $response->get_status() );
+		$this->assertSame( rest_authorization_required_code(), $status );
 		$this->assertSame( 'rest_cannot_edit', $data['code'] );
 	}
 
@@ -542,10 +722,12 @@ class REST_Annotations_Controller_Test extends WP_Test_REST_Post_Type_Controller
 		$request->set_body_params( array(
 			'substatus' => 'foo',
 		) );
+
 		$response = $this->server->dispatch( $request );
+		$status   = $response->get_status();
 		$data     = $response->get_data();
 
-		$this->assertSame( 400, $response->get_status() );
+		$this->assertSame( 400, $status );
 		$this->assertSame( 'rest_invalid_param', $data['code'] );
 	}
 
@@ -555,11 +737,13 @@ class REST_Annotations_Controller_Test extends WP_Test_REST_Post_Type_Controller
 	public function test_delete_item_when_not_allowed() {
 		wp_set_current_user( self::$user_id['author'] );
 
-		$request  = new WP_REST_Request( 'DELETE', self::$rest_ns_base . '/' . self::$annotation_id['reply_by_contributor'] );
+		$request = new WP_REST_Request( 'DELETE', self::$rest_ns_base . '/' . self::$annotation_id['_reply_by_contributor'] );
+
 		$response = $this->server->dispatch( $request );
+		$status   = $response->get_status();
 		$data     = $response->get_data();
 
-		$this->assertSame( rest_authorization_required_code(), $response->get_status() );
+		$this->assertSame( rest_authorization_required_code(), $status );
 		$this->assertSame( 'rest_cannot_delete', $data['code'] );
 	}
 }

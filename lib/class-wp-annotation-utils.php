@@ -421,6 +421,13 @@ final class WP_Annotation_Utils {
 	public static function on_rest_collection_params( $params ) {
 		$contexts = array( 'view', 'edit' );
 
+		$params['hierarchical'] = array(
+			'type'        => 'string',
+			'description' => __( 'Results in hierarchical format?', 'gutenberg' ),
+			'enum'        => array( '', 'flat', 'threaded' ),
+			'default'     => '',
+		);
+
 		$params['parent_post_id'] = array(
 			'type'        => 'array',
 			'description' => __( 'Limit result set to those with one or more parent post IDs.', 'gutenberg' ),
@@ -461,13 +468,24 @@ final class WP_Annotation_Utils {
 	 * @since [version]
 	 * @access public
 	 *
-	 * @param array           $args    WP_Query args.
-	 * @param WP_REST_Request $request REST API request.
-	 * @return array                   Filtered query args.
+	 * @param array           $query_vars WP_Query vars.
+	 * @param WP_REST_Request $request    REST API request.
+	 * @return array                      Filtered query args.
 	 *
 	 * @see register_additional_rest_fields()
 	 */
-	public static function on_rest_collection_query( $args, $request ) {
+	public static function on_rest_collection_query( $query_vars, $request ) {
+		/*
+		 * A hierarchical request sets post_parent to 0 by default.
+		 * This behavior matches that found in WP_Comment_Query.
+		 */
+		if ( $request['hierarchical'] && ! $request['parent'] ) {
+			$query_vars['post_parent'] = 0;
+		}
+
+		/*
+		 * Build meta queries.
+		 */
 		$meta_queries = array();
 
 		$parent_post_ids = $request['parent_post_id'];
@@ -510,24 +528,24 @@ final class WP_Annotation_Utils {
 		 * Preserve an existing meta query.
 		 */
 		if ( $meta_queries ) {
-			if ( ! empty( $args['meta_query'] ) ) {
-				$args['meta_query'] = array(
+			if ( ! empty( $query_vars['meta_query'] ) ) {
+				$query_vars['meta_query'] = array(
 					'relation' => 'AND',
-					$args['meta_query'],
+					$query_vars['meta_query'],
 					array(
 						'relation' => 'AND',
 						$meta_queries,
 					),
 				);
 			} else {
-				$args['meta_query'] = array(
+				$query_vars['meta_query'] = array(
 					'relation' => 'AND',
 					$meta_queries,
 				);
 			}
 		}
 
-		return $args;
+		return $query_vars;
 	}
 
 	/**
@@ -873,13 +891,9 @@ final class WP_Annotation_Utils {
 		foreach ( $selection['ranges'] as $range ) {
 			if ( ! is_array( $range ) ) {
 				return $error;
-			} elseif ( ! isset( $range['begin']['offset'] ) ) {
+			} elseif ( ! isset( $range['begin']['offset'], $range['end']['offset'] ) ) {
 				return $error;
-			} elseif ( ! isset( $range['end']['offset'] ) ) {
-				return $error;
-			} elseif ( ! is_int( $range['begin']['offset'] ) ) {
-				return $error;
-			} elseif ( ! is_int( $range['end']['offset'] ) ) {
+			} elseif ( ! is_int( $range['begin']['offset'] ) || ! is_int( $range['end']['offset'] ) ) {
 				return $error;
 			} elseif ( 2 !== count( array_keys( $range ) ) ) {
 				return $error;
