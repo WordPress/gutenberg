@@ -6,9 +6,13 @@
 import { get, isFunction, some } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { applyFilters } from '@wordpress/hooks';
+
+/**
  * Internal dependencies
  */
-import { applyFilters } from '../hooks';
 import { getCategories } from './categories';
 
 /**

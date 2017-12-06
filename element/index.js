@@ -126,7 +126,7 @@ export { flowRight as compose };
 
 /**
  * Returns a wrapped version of a React component's display name.
- * Higher-order components use wrapDisplayName().
+ * Higher-order components use getWrapperDisplayName().
  *
  * @param {Function|Component} BaseComponent used to detect the existing display name.
  * @param {String} wrapperName Wrapper name to prepend to the display name.

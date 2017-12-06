@@ -7,6 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { getWrapperDisplayName } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -37,16 +38,19 @@ export function addAttribute( settings ) {
 
 /**
  * Override the default edit UI to include a new block inspector control for
- * assigning the anchor ID, if block supports anchor
+ * assigning the custom class name, if block supports custom class name.
  *
- * @param  {Element} element Original edit element
- * @param  {Object}  props   Props passed to BlockEdit
- * @return {Element}         Filtered edit element
+ * @param  {function|Component} BlockEdit Original component
+ * @return {function}                     Wrapped component
  */
-export function addInspectorControl( element, props ) {
-	if ( hasBlockSupport( props.name, 'customClassName', true ) && props.focus ) {
-		element = [
-			element,
+export function withInspectorControl( BlockEdit ) {
+	const WrappedBlockEdit = ( props ) => {
+		if ( ! hasBlockSupport( props.name, 'customClassName', true ) || ! props.focus ) {
+			return <BlockEdit { ...props } />;
+		}
+
+		return [
+			<BlockEdit key="edit-block-custom-class-name" { ...props } />,
 			<InspectorControls key="inspector-custom-class-name">
 				<InspectorControls.TextControl
 					label={ __( 'Additional CSS Class' ) }
@@ -59,9 +63,10 @@ export function addInspectorControl( element, props ) {
 				/>
 			</InspectorControls>,
 		];
-	}
+	};
+	WrappedBlockEdit.displayName = getWrapperDisplayName( BlockEdit, 'customClassName' );
 
-	return element;
+	return WrappedBlockEdit;
 }
 
 /**
@@ -84,6 +89,6 @@ export function addSaveProps( extraProps, blockType, attributes ) {
 
 export default function customClassName( { addFilter } ) {
 	addFilter( 'registerBlockType', 'core/custom-class-name/attribute', addAttribute );
-	addFilter( 'BlockEdit', 'core/custom-class-name/inspector-control', addInspectorControl );
+	addFilter( 'BlockEdit', 'core/custom-class-name/inspector-control', withInspectorControl );
 	addFilter( 'getSaveContent.extraProps', 'core/custom-class-name/save-props', addSaveProps );
 }

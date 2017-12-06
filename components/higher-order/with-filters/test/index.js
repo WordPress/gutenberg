@@ -16,13 +16,13 @@ import withFilters from '../';
 describe( 'withFilters', () => {
 	const hookName = 'EnhancedComponent';
 	const MyComponent = () => <div>My component</div>;
-	const EnhancedComponent = withFilters( hookName )( MyComponent );
 
 	afterEach( () => {
 		removeAllFilters( hookName );
 	} );
 
 	it( 'should display original component when no filters applied', () => {
+		const EnhancedComponent = withFilters( hookName )( MyComponent );
 		const wrapper = shallow( <EnhancedComponent /> );
 
 		expect( wrapper.html() ).toBe( '<div>My component</div>' );
@@ -35,6 +35,7 @@ describe( 'withFilters', () => {
 			'test/enhanced-component-override',
 			() => OverriddenComponent
 		);
+		const EnhancedComponent = withFilters( hookName )( MyComponent );
 
 		const wrapper = shallow( <EnhancedComponent /> );
 
@@ -53,6 +54,7 @@ describe( 'withFilters', () => {
 				</div>
 			)
 		);
+		const EnhancedComponent = withFilters( hookName )( MyComponent );
 
 		const wrapper = shallow( <EnhancedComponent /> );
 
