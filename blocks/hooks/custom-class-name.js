@@ -46,13 +46,11 @@ export function addAttribute( settings ) {
  */
 export function withInspectorControl( BlockEdit ) {
 	const WrappedBlockEdit = ( props ) => {
-		if ( ! hasBlockSupport( props.name, 'customClassName', true ) || ! props.focus ) {
-			return <BlockEdit { ...props } />;
-		}
+		const hasCustomClassName = hasBlockSupport( props.name, 'customClassName', true ) && props.focus;
 
 		return [
-			<BlockEdit key="edit-block-custom-class-name" { ...props } />,
-			<InspectorControls key="inspector-custom-class-name">
+			<BlockEdit key="block-edit-custom-class-name" { ...props } />,
+			hasCustomClassName && <InspectorControls key="inspector-custom-class-name">
 				<InspectorControls.TextControl
 					label={ __( 'Additional CSS Class' ) }
 					value={ props.attributes.className || '' }

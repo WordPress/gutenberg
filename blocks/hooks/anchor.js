@@ -55,13 +55,11 @@ export function addAttribute( settings ) {
  */
 export function withInspectorControl( BlockEdit ) {
 	const WrappedBlockEdit = ( props ) => {
-		if ( ! hasBlockSupport( props.name, 'anchor' ) || ! props.focus ) {
-			return <BlockEdit { ...props } />;
-		}
+		const hasAnchor = hasBlockSupport( props.name, 'anchor' ) && props.focus;
 
 		return [
-			<BlockEdit key="edit-block-anchor" { ...props } />,
-			<InspectorControls key="inspector-anchor">
+			<BlockEdit key="block-edit-anchor" { ...props } />,
+			hasAnchor && <InspectorControls key="inspector-anchor">
 				<InspectorControls.TextControl
 					label={ __( 'HTML Anchor' ) }
 					help={ __( 'Anchors lets you link directly to a section on a page.' ) }
