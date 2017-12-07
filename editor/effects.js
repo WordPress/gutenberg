@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, includes, map, filter, some, castArray } from 'lodash';
+import { get, includes, map, castArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -46,7 +46,6 @@ import {
 	isEditedPostDirty,
 	isEditedPostNew,
 	isEditedPostSaveable,
-	getMetaBoxes,
 	getBlock,
 	getReusableBlock,
 } from './selectors';
@@ -310,27 +309,6 @@ export default {
 		}
 
 		return effects;
-	},
-	INITIALIZE_META_BOX_STATE( action ) {
-		// Hold jquery.ready until the metaboxes load
-		const locations = [ 'normal', 'side' ];
-		if ( some( locations, ( location ) => !! action.metaBoxes[ location ] ) ) {
-			jQuery.holdReady( true );
-		}
-	},
-	META_BOX_LOADED( action, store ) {
-		const { getState } = store;
-		const metaboxes = getMetaBoxes( getState() );
-		const unloadedMetaboxes = filter(
-			map( metaboxes, ( value, key ) => ( {
-				...value,
-				key,
-			} ) ),
-			( metabox ) => metabox.isActive && ! metabox.isLoaded
-		);
-		if ( unloadedMetaboxes.length === 1 && unloadedMetaboxes[ 0 ].key === action.location ) {
-			jQuery.holdReady( false );
-		}
 	},
 	FETCH_REUSABLE_BLOCKS( action, store ) {
 		const { id } = action;

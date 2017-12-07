@@ -2,12 +2,12 @@
  * External Dependencies
  */
 import { connect } from 'react-redux';
-import { reduce, get, find } from 'lodash';
+import { reduce, get, find, flow } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { DropZone } from '@wordpress/components';
+import { DropZone, withContext } from '@wordpress/components';
 import { getBlockTypes } from '@wordpress/blocks';
 
 /**
@@ -15,7 +15,11 @@ import { getBlockTypes } from '@wordpress/blocks';
  */
 import { insertBlocks } from '../../actions';
 
-function BlockDropZone( { index, ...props } ) {
+function BlockDropZone( { index, isLocked, ...props } ) {
+	if ( isLocked ) {
+		return null;
+	}
+
 	const dropFiles = ( files, position ) => {
 		const transformation = reduce( getBlockTypes(), ( ret, blockType ) => {
 			if ( ret ) {
@@ -45,7 +49,16 @@ function BlockDropZone( { index, ...props } ) {
 	);
 }
 
-export default connect(
-	undefined,
-	{ insertBlocks }
+export default flow(
+	connect(
+		undefined,
+		{ insertBlocks }
+	),
+	withContext( 'editor' )( ( settings ) => {
+		const { templateLock } = settings;
+
+		return {
+			isLocked: !! templateLock,
+		};
+	} )
 )( BlockDropZone );

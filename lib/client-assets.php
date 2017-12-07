@@ -609,7 +609,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	wp_enqueue_script(
 		'wp-editor',
 		gutenberg_url( 'editor/build/index.js' ),
-		array( 'jquery', 'wp-api', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element', 'wp-components', 'wp-utils', 'word-count', 'editor', 'heartbeat' ),
+		array( 'wp-api', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element', 'wp-components', 'wp-utils', 'word-count', 'editor', 'heartbeat' ),
 		filemtime( gutenberg_dir_path() . 'editor/build/index.js' ),
 		true // enqueue in the footer.
 	);
@@ -790,7 +790,8 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 	$post_type_object = get_post_type_object( $post_to_edit['type'] );
 	if ( ! empty( $post_type_object->template ) ) {
-		$editor_settings['template'] = $post_type_object->template;
+		$editor_settings['template']     = $post_type_object->template;
+		$editor_settings['templateLock'] = ! empty( $post_type_object->template_lock ) ? $post_type_object->template_lock : false;
 	}
 
 	$script  = '( function() {';

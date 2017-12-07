@@ -33,6 +33,7 @@ import {
 	getMultiSelectedBlocks,
 	getMultiSelectedBlockUids,
 	getSelectedBlock,
+	isSelectionEnabled,
 } from '../../selectors';
 import { startMultiSelect, stopMultiSelect, multiSelect, selectBlock } from '../../actions';
 
@@ -129,6 +130,10 @@ class BlockList extends Component {
 	}
 
 	onSelectionStart( uid ) {
+		if ( ! this.props.isSelectionEnabled ) {
+			return;
+		}
+
 		const boundaries = this.nodes[ uid ].getBoundingClientRect();
 
 		// Create a uid to Y coördinate map.
@@ -156,7 +161,7 @@ class BlockList extends Component {
 		const { selectionAtStart } = this;
 		const isAtStart = selectionAtStart === uid;
 
-		if ( ! selectionAtStart ) {
+		if ( ! selectionAtStart || ! this.props.isSelectionEnabled ) {
 			return;
 		}
 
@@ -185,6 +190,10 @@ class BlockList extends Component {
 	}
 
 	onShiftSelection( uid ) {
+		if ( ! this.props.isSelectionEnabled ) {
+			return;
+		}
+
 		const { selectedBlock, selectionStart, onMultiSelect, onSelect } = this.props;
 
 		if ( selectedBlock ) {
@@ -229,6 +238,7 @@ export default connect(
 		multiSelectedBlocks: getMultiSelectedBlocks( state ),
 		multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
 		selectedBlock: getSelectedBlock( state ),
+		isSelectionEnabled: isSelectionEnabled( state ),
 	} ),
 	( dispatch ) => ( {
 		onStartMultiSelect() {

@@ -137,6 +137,19 @@ export function clearSelectedBlock() {
 }
 
 /**
+ * Returns an action object that enables or disables block selection
+ *
+ * @param {boolean} [isSelectionEnabled=true] Whether block selection should be enabled
+ * @return {Object}                           Action object
+ */
+export function toggleSelection( isSelectionEnabled = true ) {
+	return {
+		type: 'TOGGLE_SELECTION',
+		isSelectionEnabled,
+	};
+}
+
+/**
  * Returns an action object signalling that a blocks should be replaced with
  * one or more replacement blocks.
  *

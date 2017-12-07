@@ -77,6 +77,7 @@ import {
 	isMetaBoxStateDirty,
 	getReusableBlock,
 	isSavingReusableBlock,
+	isSelectionEnabled,
 	getReusableBlocks,
 	getStateBeforeOptimisticTransaction,
 	isPublishingPost,
@@ -1822,6 +1823,28 @@ describe( 'selectors', () => {
 			};
 
 			expect( isTyping( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isSelectionEnabled', () => {
+		it( 'should return true if selection is enable', () => {
+			const state = {
+				blockSelection: {
+					isEnabled: true,
+				},
+			};
+
+			expect( isSelectionEnabled( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if selection is disabled', () => {
+			const state = {
+				blockSelection: {
+					isEnabled: false,
+				},
+			};
+
+			expect( isSelectionEnabled( state ) ).toBe( false );
 		} );
 	} );
 

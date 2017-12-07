@@ -742,7 +742,13 @@ describe( 'state', () => {
 				uid: 'kumquat',
 			} );
 
-			expect( state ).toEqual( { start: 'kumquat', end: 'kumquat', focus: {}, isMultiSelecting: false } );
+			expect( state ).toEqual( {
+				start: 'kumquat',
+				end: 'kumquat',
+				focus: {},
+				isMultiSelecting: false,
+				isEnabled: true,
+			} );
 		} );
 
 		it( 'should set multi selection', () => {
@@ -842,7 +848,13 @@ describe( 'state', () => {
 				config: { editable: 'citation' },
 			} );
 
-			expect( state ).toEqual( { start: 'chicken', end: 'chicken', focus: { editable: 'citation' }, isMultiSelecting: false } );
+			expect( state ).toEqual( {
+				start: 'chicken',
+				end: 'chicken',
+				focus: { editable: 'citation' },
+				isMultiSelecting: false,
+				isEnabled: true,
+			} );
 		} );
 
 		it( 'should update the focus and merge the existing state', () => {
