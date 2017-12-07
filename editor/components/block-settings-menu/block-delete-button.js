@@ -8,14 +8,18 @@ import { flow, noop } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton } from '@wordpress/components';
+import { IconButton, withContext } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { removeBlocks } from '../../actions';
 
-export function BlockDeleteButton( { onDelete, onClick = noop, small = false } ) {
+export function BlockDeleteButton( { onDelete, onClick = noop, isLocked, small = false } ) {
+	if ( isLocked ) {
+		return null;
+	}
+
 	const label = __( 'Delete' );
 
 	return (
@@ -30,11 +34,20 @@ export function BlockDeleteButton( { onDelete, onClick = noop, small = false } )
 	);
 }
 
-export default connect(
-	undefined,
-	( dispatch, ownProps ) => ( {
-		onDelete() {
-			dispatch( removeBlocks( ownProps.uids ) );
-		},
-	} )
+export default flow(
+	connect(
+		undefined,
+		( dispatch, ownProps ) => ( {
+			onDelete() {
+				dispatch( removeBlocks( ownProps.uids ) );
+			},
+		} )
+	),
+	withContext( 'editor' )( ( settings ) => {
+		const { templateLock } = settings;
+
+		return {
+			isLocked: !! templateLock,
+		};
+	} ),
 )( BlockDeleteButton );

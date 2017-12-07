@@ -108,6 +108,12 @@
 		"parent": "reference"
 	},
 	{
+		"title": "Testing Overview",
+		"slug": "testing-overview",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/testing-overview.md",
+		"parent": "reference"
+	},
+	{
 		"title": "Frequently Asked Questions",
 		"slug": "faq",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/faq.md",
