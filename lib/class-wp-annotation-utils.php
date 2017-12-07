@@ -92,7 +92,7 @@ final class WP_Annotation_Utils {
 	 *
 	 * An annotation is a post type, so the checks below are in addition to those registered with the post type.
 	 * Here, we're focused on meta cap checks and the annotation's parent post ID, because an annotation can be a
-	 * child of all other post types. Make sure the non-annotation parent post ID is readable by the user.
+	 * child of all other post types. Make sure the non-annotation parent post ID is editable by the user.
 	 *
 	 * @since [version]
 	 * @access public
