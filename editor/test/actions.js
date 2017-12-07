@@ -182,14 +182,14 @@ describe( 'actions', () => {
 	} );
 	describe( 'replaceBlock', () => {
 		it( 'should return the REPLACE_BLOCKS action', () => {
-			const blocks = {
+			const block = {
 				uid: 'ribs',
 			};
 
-			expect( replaceBlock( [ 'chicken' ], blocks ) ).toEqual( {
+			expect( replaceBlock( [ 'chicken' ], block ) ).toEqual( {
 				type: 'REPLACE_BLOCKS',
 				uids: [ 'chicken' ],
-				blocks: [ blocks ],
+				blocks: [ block ],
 			} );
 		} );
 	} );
@@ -492,8 +492,7 @@ describe( 'actions', () => {
 	} );
 	describe( 'removeNotice', () => {
 		it( 'should return REMOVE_NOTICE actions', () => {
-			const id = 'id';
-			expect( removeNotice( id ) ).toEqual( {
+			expect( removeNotice( 'id' ) ).toEqual( {
 				type: 'REMOVE_NOTICE',
 				noticeId: 'id',
 			} );
