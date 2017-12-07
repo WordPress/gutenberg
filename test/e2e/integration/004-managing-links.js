@@ -1,17 +1,15 @@
-describe( 'Managing blocks', () => {
+describe( 'Managing links', () => {
 	before( () => {
 		cy.newPost();
 	} );
 
 	const fixedIsOn = 'button.is-selected:contains("Fix toolbar to block")';
-	const fixedIsOff = 'button:contains("Fix toolbar to block"):not(".is-selected")'
-
+	const fixedIsOff = 'button:contains("Fix toolbar to block"):not(".is-selected")';
 
 	const switchToMode = ( setFixed ) => {
 		cy.get( '.editor-ellipsis-menu button' ).click();
 
 		cy.get( 'body' ).then( ( $body ) => {
-
 			const candidate = setFixed ? fixedIsOff : fixedIsOn;
 			const toggleNeeded = $body.find( candidate );
 			if ( toggleNeeded.length ) {
