@@ -73,7 +73,7 @@ final class WP_Annotation_Utils {
 				'read_private_posts'     => 'read_private_posts',
 
 				// Primitive caps used in map_meta_cap().
-				'read'                   => 'read',
+				'read'                   => 'edit_posts',            // non-default.
 				'delete_posts'           => 'delete_posts',
 				'delete_private_posts'   => 'delete_private_posts',
 				'delete_published_posts' => 'delete_posts',          // non-default.
@@ -92,7 +92,7 @@ final class WP_Annotation_Utils {
 	 *
 	 * An annotation is a post type, so the checks below are in addition to those registered with the post type.
 	 * Here, we're focused on meta cap checks and the annotation's parent post ID, because an annotation can be a
-	 * child of all other post types. Make sure the non-annotation parent post ID is editable by the user.
+	 * child of all other post types. Make sure the non-annotation parent post ID is readable by the user.
 	 *
 	 * @since [version]
 	 * @access public
@@ -139,7 +139,7 @@ final class WP_Annotation_Utils {
 			return $filtered_caps;
 		}
 
-		// Check if user can edit the annotation's parent post ID.
+		// Check if user can edit the parent post ID.
 		if ( ! self::user_can_edit_parent_post( $post, $user ) ) {
 			return array(); // Deny; revoke all caps in this check.
 		}
@@ -155,10 +155,10 @@ final class WP_Annotation_Utils {
 	 *
 	 * @param  int|WP_Post|null $post      Post ID or object. Defaults to current post.
 	 * @param  int|WP_User|null $user      User ID or object. Defaults to current user.
-	 * @param  bool             $is_parent Set to true if the $post *is* the parent post you're checking.
+	 * @param  bool             $is_parent Set to true if the $post *is* the parent post.
 	 * @return bool                        True if $post is an annotation, it has a parent post ID,
 	 *                                     and the user can edit the annotation's parent post ID.
-	 *                                     Or, if $is_parent, $post is not annotation, and user can edit $post.
+	 *                                     Or, if $is_parent, $post is not an annotation, and user can edit $post.
 	 *
 	 * @see on_user_has_cap()
 	 * @see WP_REST_Annotations_Controller
@@ -192,7 +192,8 @@ final class WP_Annotation_Utils {
 			$parent_post      = $post; // It *is* the parent.
 			$parent_post_type = get_post_type_object( $parent_post->post_type );
 
-			if ( $parent_post_type && $user->has_cap( $parent_post_type->cap->edit_post, $parent_post->ID ) ) {
+			if ( $parent_post && $parent_post_type
+					&& $user->has_cap( $parent_post_type->cap->edit_post, $parent_post->ID ) ) {
 				return true;
 			}
 		} else {

@@ -33,7 +33,7 @@ class WP_REST_Annotations_Controller extends WP_REST_Posts_Controller {
 	 * @access public
 	 */
 	public function __construct() {
-		parent::__construct( gutenberg_annotation_post_type() );
+		parent::__construct( WP_Annotation_Utils::$post_type );
 
 		// `rest_base` is already configured via register_post_type().
 		$this->namespace = 'gutenberg/v1'; // @codingStandardsIgnoreLine - PHPCS false positive on 'namespace'.
