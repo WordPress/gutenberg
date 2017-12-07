@@ -427,11 +427,15 @@ describe( 'actions', () => {
 		const content = <p>element</p>;
 		it( 'should return CREATE_NOTICE action when options is empty', () => {
 			const result = createNotice( status, content );
-			expect( result.type ).toEqual( 'CREATE_NOTICE' );
-			expect( result.notice.status ).toEqual( 'status' );
-			expect( result.notice.content ).toEqual( <p>element</p> );
-			expect( result.notice.isDismissible ).toEqual( true );
-			expect( result.notice.id ).toBeDefined();
+			expect( result ).toMatchObject( {
+				type: 'CREATE_NOTICE',
+				notice: {
+					status,
+					content,
+					isDismissible: true,
+					id: expect.any( String ),
+				},
+			} );
 		} );
 		it( 'should return CREATE_NOTICE action when options is desined', () => {
 			const options = {
@@ -452,42 +456,62 @@ describe( 'actions', () => {
 	} );
 	describe( 'createSuccessNotice', () => {
 		it( 'should return CREATE_NOTICE action', () => {
-			const result = createSuccessNotice( <p>element</p> );
-			expect( result.type ).toEqual( 'CREATE_NOTICE' );
-			expect( result.notice.status ).toEqual( 'success' );
-			expect( result.notice.content ).toEqual( <p>element</p> );
-			expect( result.notice.isDismissible ).toEqual( true );
-			expect( result.notice.id ).toBeDefined();
+			const content = <p>element</p>;
+			const result = createSuccessNotice( content );
+			expect( result ).toMatchObject( {
+				type: 'CREATE_NOTICE',
+				notice: {
+					status: 'success',
+					content,
+					isDismissible: true,
+					id: expect.any( String ),
+				},
+			} );
 		} );
 	} );
 	describe( 'createInfoNotice', () => {
 		it( 'should return CREATE_NOTICE action', () => {
-			const result = createInfoNotice( <p>element</p> );
-			expect( result.type ).toEqual( 'CREATE_NOTICE' );
-			expect( result.notice.status ).toEqual( 'info' );
-			expect( result.notice.content ).toEqual( <p>element</p> );
-			expect( result.notice.isDismissible ).toEqual( true );
-			expect( result.notice.id ).toBeDefined();
+			const content = <p>element</p>;
+			const result = createInfoNotice( content );
+			expect( result ).toMatchObject( {
+				type: 'CREATE_NOTICE',
+				notice: {
+					status: 'info',
+					content,
+					isDismissible: true,
+					id: expect.any( String ),
+				},
+			} );
 		} );
 	} );
 	describe( 'createErrorNotice', () => {
 		it( 'should return CREATE_NOTICE action', () => {
-			const result = createErrorNotice( <p>element</p> );
-			expect( result.type ).toEqual( 'CREATE_NOTICE' );
-			expect( result.notice.status ).toEqual( 'error' );
-			expect( result.notice.content ).toEqual( <p>element</p> );
-			expect( result.notice.isDismissible ).toEqual( true );
-			expect( result.notice.id ).toBeDefined();
+			const content = <p>element</p>;
+			const result = createErrorNotice( content );
+			expect( result ).toMatchObject( {
+				type: 'CREATE_NOTICE',
+				notice: {
+					status: 'error',
+					content,
+					isDismissible: true,
+					id: expect.any( String ),
+				},
+			} );
 		} );
 	} );
 	describe( 'createWarningNotice', () => {
 		it( 'should return CREATE_NOTICE action', () => {
-			const result = createWarningNotice( <p>element</p> );
-			expect( result.type ).toEqual( 'CREATE_NOTICE' );
-			expect( result.notice.status ).toEqual( 'warning' );
-			expect( result.notice.content ).toEqual( <p>element</p> );
-			expect( result.notice.isDismissible ).toEqual( true );
-			expect( result.notice.id ).toBeDefined();
+			const content = <p>element</p>;
+			const result = createWarningNotice( content );
+			expect( result ).toMatchObject( {
+				type: 'CREATE_NOTICE',
+				notice: {
+					status: 'warning',
+					content,
+					isDismissible: true,
+					id: expect.any( String ),
+				},
+			} );
 		} );
 	} );
 	describe( 'removeNotice', () => {
