@@ -135,7 +135,7 @@ window._wpGutenbergPost.content = {
 		'<!-- /wp:paragraph -->',
 
 		'<!-- wp:pullquote -->',
-		'<blockquote class="wp-block-pullquote alignnone"><p>Code is Poetry</p><footer>The WordPress community</footer></blockquote>',
+		'<blockquote class="wp-block-pullquote alignnone"><p>Code is Poetry</p><cite>The WordPress community</cite></blockquote>',
 		'<!-- /wp:pullquote -->',
 
 		'<!-- wp:paragraph {"align":"center"} -->',
