@@ -3,6 +3,8 @@
  */
 const webpack = require( 'webpack' );
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
+const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
+
 
 // Main CSS loader for everything but blocks..
 const mainCSSExtractTextPlugin = new ExtractTextPlugin( {
@@ -136,6 +138,9 @@ const config = {
 		blocksCSSPlugin,
 		editBlocksCSSPlugin,
 		mainCSSExtractTextPlugin,
+		new WebpackRTLPlugin( {
+			suffix: '-rtl',
+		} ),
 		new webpack.LoaderOptionsPlugin( {
 			minimize: process.env.NODE_ENV === 'production',
 			debug: process.env.NODE_ENV !== 'production',
