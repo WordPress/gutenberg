@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { get, tail } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -98,7 +103,7 @@ registerBlockType( 'core/heading', {
 		};
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, insertBlocksAfter } ) {
+	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, insertBlocksAfter, onReplace } ) {
 		const { align, content, nodeName, placeholder } = attributes;
 
 		return [
@@ -157,6 +162,25 @@ registerBlockType( 'core/heading', {
 						...blocks,
 						createBlock( 'core/paragraph', { content: after } ),
 					] );
+				} }
+				onReplace={ ( blocks ) => {
+					const firstBlockType = get( blocks, [ 0, 'name' ] );
+					switch ( firstBlockType ) {
+						case 'core/heading':
+							onReplace( blocks );
+							return;
+						case 'core/paragraph':
+							onReplace( [
+								createBlock(
+									'core/heading',
+									{ ...attributes, content: get( blocks, [ 0, 'attributes', 'content' ] ) }
+								),
+								...tail( blocks ),
+							] );
+							return;
+						default:
+							onReplace( [ createBlock( 'core/heading', attributes ), ...blocks ] );
+					}
 				} }
 				style={ { textAlign: align } }
 				placeholder={ placeholder || __( 'Write heading…' ) }
