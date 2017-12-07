@@ -8,9 +8,8 @@
 	border: 1px solid #e0e5e9;
 	background: #fff;
 	width: 305px;
-	display: inline-flex;
-	flex-wrap: wrap;
-	align-items: center;
+	display: flex;
+	flex-direction: column;
 	font-family: $default-font;
 	font-size: $default-font-size;
 	line-height: $default-line-height;
@@ -21,11 +20,27 @@
 	}
 }
 
-.blocks-format-toolbar__link-value {
-	padding: 10px;
+.blocks-format-toolbar__link-modal-line {
+	display: flex;
+	flex-direction: row;
 	flex-grow: 1;
+	flex-shrink: 1;
+	min-width: 0;
+	align-items: center;
+
+	.components-button {
+		flex-shrink: 0;
+	}
+}
+
+.blocks-format-toolbar__link-value {
+	margin: 10px;
+	flex-grow: 1;
+	flex-shrink: 1;
 	overflow: hidden;
 	position: relative;
+	white-space: nowrap;
+	min-width: 0;
 
 	&:after {
 		@include long-content-fade( $size: 40% );
@@ -33,11 +48,13 @@
 }
 
 .blocks-format-toolbar__link-settings {
+	padding: 7px 8px;
 	border-top: 1px solid $light-gray-500;
-	width: 100%;
-	padding: 10px 8px;
+	padding-top: 8px; // add 1px for the border
 
 	.blocks-base-control {
 		margin: 0;
+		flex-grow: 1;
+		flex-shrink: 1;
 	}
 }
