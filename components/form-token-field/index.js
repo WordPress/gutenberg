@@ -50,8 +50,9 @@ class FormTokenField extends Component {
 	}
 
 	componentDidUpdate() {
+		// Make sure to focus the input when the isActive state is true.
 		if ( this.state.isActive && ! this.input.hasFocus() ) {
-			this.input.focus(); // make sure focus is on input
+			this.input.focus();
 		}
 	}
 
@@ -73,7 +74,18 @@ class FormTokenField extends Component {
 	}
 
 	onFocus( event ) {
-		this.setState( { isActive: true } );
+		// If focus is on the input or on the container, set the isActive state to true.
+		if ( this.input.hasFocus() || event.target === this.tokensAndInput ) {
+			this.setState( { isActive: true } );
+		} else {
+			/*
+			 * Otherwise, focus is on one of the token "remove" buttons and we
+			 * set the isActive state to false to prevent the input to be
+			 * re-focused, see componentDidUpdate().
+			 */
+			this.setState( { isActive: false } );
+		}
+
 		if ( 'function' === typeof this.props.onFocus ) {
 			this.props.onFocus( event );
 		}
@@ -154,6 +166,7 @@ class FormTokenField extends Component {
 
 	onTokenClickRemove( event ) {
 		this.deleteToken( event.value );
+		this.input.focus();
 	}
 
 	onSuggestionHovered( suggestion ) {
