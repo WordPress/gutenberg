@@ -350,8 +350,10 @@ class WP_REST_Annotations_Controller extends WP_REST_Posts_Controller {
 		$parent_ids = $parent_ids ? (array) $parent_ids : array();
 		$parent_ids = array_map( 'absint', $parent_ids );
 
-		foreach ( $parent_ids as $parent_id ) {
-			if ( $parent_id && ! WP_Annotation_Utils::user_can_edit_parent_post( $parent_id ) ) {
+		foreach ( $parent_ids as $key => $parent_id ) {
+			$parent = get_post( $parent_id );
+
+			if ( $parent && ! WP_Annotation_Utils::user_can_edit_parent_post( $parent ) ) {
 				return new WP_Error( 'gutenberg_annotations_cannot_list_parent', __( 'Sorry, you are not allowed to read annotations as this user.', 'gutenberg' ), array(
 					'status' => rest_authorization_required_code(),
 				) );
