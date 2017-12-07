@@ -104,8 +104,15 @@
 	align-items: center;
 	margin-top: 20px;
 
+	select {
+		// Necessary for select to respond to flexbox
+		min-width: 0;
+	}
+
 	label {
 		margin-right: 10px;
+		flex-shrink: 0;
+		max-width: 75%;
 	}
 
 	&:empty {

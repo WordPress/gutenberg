@@ -3,12 +3,13 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
+import { flow } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { IconButton } from '@wordpress/components';
+import { IconButton, withContext } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { createBlock, BlockIcon } from '@wordpress/blocks';
 
@@ -41,12 +42,16 @@ export class VisualEditorInserter extends Component {
 	}
 
 	render() {
-		const { blockCount } = this.props;
+		const { blockCount, isLocked } = this.props;
 		const { isShowingControls } = this.state;
 		const { mostFrequentlyUsedBlocks } = this.props;
 		const classes = classnames( 'editor-visual-editor__inserter', {
 			'is-showing-controls': isShowingControls,
 		} );
+
+		if ( isLocked ) {
+			return null;
+		}
 
 		return (
 			<div
@@ -77,12 +82,21 @@ export class VisualEditorInserter extends Component {
 	}
 }
 
-export default connect(
-	( state ) => {
+export default flow(
+	connect(
+		( state ) => {
+			return {
+				mostFrequentlyUsedBlocks: getMostFrequentlyUsedBlocks( state ),
+				blockCount: getBlockCount( state ),
+			};
+		},
+		{ onInsertBlock: insertBlock },
+	),
+	withContext( 'editor' )( ( settings ) => {
+		const { templateLock } = settings;
+
 		return {
-			mostFrequentlyUsedBlocks: getMostFrequentlyUsedBlocks( state ),
-			blockCount: getBlockCount( state ),
+			isLocked: !! templateLock,
 		};
-	},
-	{ onInsertBlock: insertBlock },
+	} ),
 )( VisualEditorInserter );

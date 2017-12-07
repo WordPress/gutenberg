@@ -189,7 +189,7 @@ _Note: this block doesn't exist in Gutenberg currently, but the above describes 
 
 ## Future Opportunities
 
-Gutenberg as part of the kickoff coal is primarily limited to the confines of the _content area_ (specifically `post_content`) of posts and pages. Within those confines, we are embracing the web as a vertical river of content, by appending blocks sequentially, then adding layout options to each block.
+Gutenberg as part of the kickoff goal is primarily limited to the confines of the _content area_ (specifically `post_content`) of posts and pages. Within those confines, we are embracing the web as a vertical river of content, by appending blocks sequentially, then adding layout options to each block.
 
 But just like how the verticality of the web itself doesn't prevent more advanced layouts from being possible, similarly there isn't any fixed limit to the kind of layout Gutenberg will be able to accomplish. As such, it's very possible for Gutenberg to grow beyond the confines of post and page _content_, to include the whole page, including everything that surrounds the content.
 

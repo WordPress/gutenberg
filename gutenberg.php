@@ -31,6 +31,9 @@ function the_gutenberg_project() {
 	<div class="nvda-temp-fix screen-reader-text">&nbsp;</div>
 	<div class="gutenberg">
 		<div id="editor" class="gutenberg__editor"></div>
+		<div id="metaboxes" style="display: none;">
+			<?php the_gutenberg_metaboxes(); ?>
+		</div>
 	</div>
 	<?php
 }
@@ -495,7 +498,7 @@ function gutenberg_replace_default_add_new_button() {
 			}
 
 			var url = button.href;
-			var newUrl = url.replace( /&?classic-editor/, '' );
+			var newUrl = url.replace( /[&\?]?classic-editor/, '' );
 
 			var newbutton = '<span id="split-page-title-action" class="split-page-title-action">';
 			newbutton += '<a href="' + newUrl + '">' + button.innerText + '</a>';
