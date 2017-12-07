@@ -28,6 +28,7 @@ const extractConfig = {
 			options: {
 				plugins: [
 					require( 'autoprefixer' ),
+					require( 'postcss-rtl' )(),
 				],
 			},
 		},

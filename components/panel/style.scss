@@ -73,29 +73,22 @@
 	font-weight: 600;
 	text-align: left;
 
-	body.rtl & {
-		text-align: right;
-	}
-
 	.dashicon {
 		position: absolute;
 		right: $item-spacing;
 		top: 50%;
 		transform: translateY( -50% );
-
-		body.rtl & {
-			right: auto;
-			left: $item-spacing;
-		}
 	}
 
 	// mirror the arrow horizontally in RTL languages
+	/* rtl:begin:ignore */
 	body.rtl & .dashicons-arrow-right {
 		transform: scaleX(-1);
 		-ms-filter: fliph;
 		filter: FlipH;
 		margin-top: -10px;
 	}
+	/* rtl:end:ignore */
 }
 
 .components-panel__body-toggle-icon {
