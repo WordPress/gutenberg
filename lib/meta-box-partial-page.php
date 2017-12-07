@@ -206,6 +206,9 @@ function gutenberg_intercept_meta_box_render() {
 		foreach ( $contexts as $context => $priorities ) {
 			foreach ( $priorities as $priority => $boxes ) {
 				foreach ( $boxes as $id => $box ) {
+					if ( false === $box ) {
+						continue; // remove_meta_box() sets a box to `false`.
+					}
 					if ( ! is_array( $wp_meta_boxes[ $post_type ][ $context ][ $priority ][ $id ]['args'] ) ) {
 						$wp_meta_boxes[ $post_type ][ $context ][ $priority ][ $id ]['args'] = array();
 					}
