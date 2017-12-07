@@ -535,5 +535,6 @@ add_action( 'admin_print_scripts-edit.php', 'gutenberg_replace_default_add_new_b
  * @return string The $classes string, with gutenberg-editor-page appended.
  */
 function gutenberg_add_admin_body_class( $classes ) {
-	return "$classes gutenberg-editor-page";
+	$ltr_rtl_class = is_rtl() ? 'dir-rtl' : 'dir-ltr';
+	return "$classes gutenberg-editor-page $ltr_rtl_class";
 }

@@ -1,3 +1,5 @@
+	// If we don't ignore this part we'll have a style ordering issue
+	/* rtl:begin:ignore */
 .components-button {
 	background: none;
 	border: none;
@@ -5,7 +7,10 @@
 	text-decoration: none;
 	margin: 0;
 	border-radius: 0;
+}
+/* rtl:end:ignore */
 
+.components-button {
 	&:active {
 		color: currentColor;
 	}

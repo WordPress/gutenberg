@@ -99,3 +99,9 @@ export function createEditorInstance( id, post, settings ) {
 		},
 	};
 }
+
+// Hack to fix LTR, This should be done in WP Core automatically
+const isRtl = document.documentElement.getAttribute( 'dir' ) === 'rtl';
+if ( ! isRtl ) {
+	document.documentElement.setAttribute( 'dir', 'ltr' );
+}
