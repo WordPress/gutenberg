@@ -5,7 +5,6 @@ const webpack = require( 'webpack' );
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
 
-
 // Main CSS loader for everything but blocks..
 const mainCSSExtractTextPlugin = new ExtractTextPlugin( {
 	filename: './[name]/build/style.css',
@@ -138,6 +137,7 @@ const config = {
 		blocksCSSPlugin,
 		editBlocksCSSPlugin,
 		mainCSSExtractTextPlugin,
+		// Create RTL files with a -rtl suffix
 		new WebpackRTLPlugin( {
 			suffix: '-rtl',
 		} ),

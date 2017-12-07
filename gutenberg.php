@@ -461,10 +461,10 @@ function gutenberg_replace_default_add_new_button() {
 			speak: none;
 			top: 1px;
 			<?php if ( is_rtl() ) : ?>
-            right: -1px;
-            <?php else : ?>
-            left: -1px;
-            <?php endif; ?>
+			right: -1px;
+			<?php else : ?>
+			left: -1px;
+			<?php endif; ?>
 			position: relative;
 			vertical-align: top;
 			-webkit-font-smoothing: antialiased;
@@ -488,11 +488,11 @@ function gutenberg_replace_default_add_new_button() {
 			display: block;
 			top: 0;
 			margin: -1px 0;
-        <?php if ( is_rtl() ) : ?>
-            padding-left: 9px;
-        <?php else : ?>
-            padding-right: 9px;
-        <?php endif; ?>
+		<?php if ( is_rtl() ) : ?>
+			padding-left: 9px;
+		<?php else : ?>
+			padding-right: 9px;
+		<?php endif; ?>
 		}
 
 	</style>
