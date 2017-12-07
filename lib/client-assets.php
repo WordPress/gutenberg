@@ -625,7 +625,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 			'baseURL'  => includes_url( 'js/tinymce' ),
 			'suffix'   => SCRIPT_DEBUG ? '' : '.min',
 			'settings' => apply_filters( 'tiny_mce_before_init', array(
-				'plugins'          => array_unique( apply_filters( 'tiny_mce_plugins', array(
+				'plugins'          => implode( ',', array_unique( apply_filters( 'tiny_mce_plugins', array(
 					'charmap',
 					'colorpicker',
 					'hr',
@@ -644,7 +644,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 					'wpdialogs',
 					'wptextpattern',
 					'wpview',
-				) ) ),
+				) ) ) ),
 				'toolbar1'         => implode( ',', array_merge( apply_filters( 'mce_buttons', array(
 					'formatselect',
 					'bold',
