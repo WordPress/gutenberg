@@ -72,8 +72,8 @@ describe( 'NavigableMenu', () => {
 		assertKeyDown( UP, 2, true );
 		assertKeyDown( UP, 1, true );
 		assertKeyDown( UP, 0, true );
-		assertKeyDown( LEFT, 0, true );
-		assertKeyDown( RIGHT, 0, true );
+		assertKeyDown( LEFT, 0, false );
+		assertKeyDown( RIGHT, 0, false );
 		assertKeyDown( SPACE, 0, false );
 	} );
 
@@ -108,8 +108,8 @@ describe( 'NavigableMenu', () => {
 		assertKeyDown( UP, 2, true );
 		assertKeyDown( UP, 1, true );
 		assertKeyDown( UP, 0, true );
-		assertKeyDown( LEFT, 0, true );
-		assertKeyDown( RIGHT, 0, true );
+		assertKeyDown( LEFT, 0, false );
+		assertKeyDown( RIGHT, 0, false );
 		assertKeyDown( SPACE, 0, false );
 	} );
 
@@ -146,8 +146,8 @@ describe( 'NavigableMenu', () => {
 		assertKeyDown( UP, 2, true );
 		assertKeyDown( UP, 1, true );
 		assertKeyDown( UP, 0, true );
-		assertKeyDown( LEFT, 0, true );
-		assertKeyDown( RIGHT, 0, true );
+		assertKeyDown( LEFT, 0, false );
+		assertKeyDown( RIGHT, 0, false );
 		assertKeyDown( SPACE, 0, false );
 	} );
 
@@ -179,8 +179,8 @@ describe( 'NavigableMenu', () => {
 		assertKeyDown( UP, 1, true );
 		assertKeyDown( UP, 0, true );
 		assertKeyDown( UP, 0, true );
-		assertKeyDown( LEFT, 0, true );
-		assertKeyDown( RIGHT, 0, true );
+		assertKeyDown( LEFT, 0, false );
+		assertKeyDown( RIGHT, 0, false );
 		assertKeyDown( SPACE, 0, false );
 	} );
 
@@ -212,8 +212,8 @@ describe( 'NavigableMenu', () => {
 		assertKeyDown( LEFT, 2, true );
 		assertKeyDown( LEFT, 1, true );
 		assertKeyDown( LEFT, 0, true );
-		assertKeyDown( UP, 0, true );
-		assertKeyDown( DOWN, 0, true );
+		assertKeyDown( UP, 0, false );
+		assertKeyDown( DOWN, 0, false );
 		assertKeyDown( SPACE, 0, false );
 	} );
 
@@ -248,8 +248,8 @@ describe( 'NavigableMenu', () => {
 		assertKeyDown( LEFT, 2, true );
 		assertKeyDown( LEFT, 1, true );
 		assertKeyDown( LEFT, 0, true );
-		assertKeyDown( UP, 0, true );
-		assertKeyDown( DOWN, 0, true );
+		assertKeyDown( UP, 0, false );
+		assertKeyDown( DOWN, 0, false );
 		assertKeyDown( SPACE, 0, false );
 	} );
 
@@ -286,8 +286,8 @@ describe( 'NavigableMenu', () => {
 		assertKeyDown( LEFT, 2, true );
 		assertKeyDown( LEFT, 1, true );
 		assertKeyDown( LEFT, 0, true );
-		assertKeyDown( UP, 0, true );
-		assertKeyDown( DOWN, 0, true );
+		assertKeyDown( UP, 0, false );
+		assertKeyDown( DOWN, 0, false );
 		assertKeyDown( SPACE, 0, false );
 	} );
 
@@ -319,8 +319,8 @@ describe( 'NavigableMenu', () => {
 		assertKeyDown( LEFT, 1, true );
 		assertKeyDown( LEFT, 0, true );
 		assertKeyDown( LEFT, 0, true );
-		assertKeyDown( DOWN, 0, true );
-		assertKeyDown( UP, 0, true );
+		assertKeyDown( DOWN, 0, false );
+		assertKeyDown( UP, 0, false );
 		assertKeyDown( SPACE, 0, false );
 	} );
 } );
