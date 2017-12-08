@@ -10,7 +10,14 @@ import { get, partial, reduce, size } from 'lodash';
  */
 import { Component, compose, createElement } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
-import { getBlockType, BlockEdit, getBlockDefaultClassname, createBlock, hasBlockSupport } from '@wordpress/blocks';
+import {
+	getBlockType,
+	BlockEdit,
+	getBlockDefaultClassname,
+	createBlock,
+	hasBlockSupport,
+	isReusableBlock,
+} from '@wordpress/blocks';
 import { withFilters, withContext } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -359,6 +366,7 @@ class BlockListBlock extends Component {
 			'is-selected': showUI,
 			'is-multi-selected': isMultiSelected,
 			'is-hovered': isHovered,
+			'is-reusable': isReusableBlock( blockType ),
 		} );
 
 		const { onMouseLeave, onFocus, onReplace } = this.props;

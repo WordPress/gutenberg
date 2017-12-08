@@ -14,5 +14,6 @@ export {
 	getBlockType,
 	getBlockTypes,
 	hasBlockSupport,
+	isReusableBlock,
 } from './registration';
 

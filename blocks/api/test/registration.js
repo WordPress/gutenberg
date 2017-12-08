@@ -18,6 +18,7 @@ import {
 	getBlockType,
 	getBlockTypes,
 	hasBlockSupport,
+	isReusableBlock,
 } from '../registration';
 
 describe( 'blocks', () => {
@@ -410,6 +411,18 @@ describe( 'blocks', () => {
 			};
 
 			expect( hasBlockSupport( settings, 'foo' ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isReusableBlock', () => {
+		it( 'should return true for a reusable block', () => {
+			const block = { name: 'core/block' };
+			expect( isReusableBlock( block ) ).toBe( true );
+		} );
+
+		it( 'should return false for other blocks', () => {
+			const block = { name: 'core/paragraph' };
+			expect( isReusableBlock( block ) ).toBe( false );
 		} );
 	} );
 } );
