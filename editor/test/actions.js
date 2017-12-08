@@ -65,65 +65,71 @@ describe( 'actions', () => {
 			const result = setupEditor( post, settings );
 			expect( result ).toEqual( {
 				type: 'SETUP_EDITOR',
-				post: {},
-				settings: {},
+				post,
+				settings,
 			} );
 		} );
 	} );
+
 	describe( 'resetPost', () => {
 		it( 'should return the RESET_POST action', () => {
 			const post = {};
 			const result = resetPost( post );
 			expect( result ).toEqual( {
 				type: 'RESET_POST',
-				post: {},
+				post,
 			} );
 		} );
 	} );
+
 	describe( 'setupNewPost', () => {
 		it( 'should return the SETUP_NEW_POST action', () => {
 			const edits = {};
 			const result = setupNewPost( edits );
 			expect( result ).toEqual( {
 				type: 'SETUP_NEW_POST',
-				edits: {},
+				edits,
 			} );
 		} );
 	} );
+
 	describe( 'resetBlocks', () => {
 		it( 'should return the RESET_BLOCKS actions', () => {
 			const blocks = [];
 			const result = resetBlocks( blocks );
 			expect( result ).toEqual( {
 				type: 'RESET_BLOCKS',
-				blocks: [],
+				blocks,
 			} );
 		} );
 	} );
+
 	describe( 'updateBlockAttributes', () => {
 		it( 'should return the UPDATE_BLOCK_ATTRIBUTES action', () => {
-			const uid = 'string';
+			const uid = 'my-uid';
 			const attributes = {};
 			const result = updateBlockAttributes( uid, attributes );
 			expect( result ).toEqual( {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				uid: 'string',
-				attributes: {},
+				uid,
+				attributes,
 			} );
 		} );
 	} );
+
 	describe( 'updateBlock', () => {
 		it( 'should return the UPDATE_BLOCK action', () => {
-			const uid = 'uid';
+			const uid = 'myuid';
 			const updates = {};
 			const result = updateBlock( uid, updates );
 			expect( result ).toEqual( {
 				type: 'UPDATE_BLOCK',
-				uid: 'uid',
-				updates: {},
+				uid,
+				updates,
 			} );
 		} );
 	} );
+
 	describe( 'focusBlock', () => {
 		it( 'should return the UPDATE_FOCUS action', () => {
 			const focusConfig = {
@@ -140,14 +146,15 @@ describe( 'actions', () => {
 
 	describe( 'selectBlock', () => {
 		it( 'should return the SELECT_BLOCK action', () => {
-			const uid = 'uid';
+			const uid = 'my-uid';
 			const result = selectBlock( uid );
 			expect( result ).toEqual( {
 				type: 'SELECT_BLOCK',
-				uid: 'uid',
+				uid,
 			} );
 		} );
 	} );
+
 	describe( 'startMultiSelect', () => {
 		it( 'should return the START_MULTI_SELECT', () => {
 			expect( startMultiSelect() ).toEqual( {
@@ -155,6 +162,7 @@ describe( 'actions', () => {
 			} );
 		} );
 	} );
+
 	describe( 'stopMultiSelect', () => {
 		it( 'should return the Stop_MULTI_SELECT', () => {
 			expect( stopMultiSelect() ).toEqual( {
@@ -168,11 +176,12 @@ describe( 'actions', () => {
 			const end = 'end';
 			expect( multiSelect( start, end ) ).toEqual( {
 				type: 'MULTI_SELECT',
-				start: 'start',
-				end: 'end',
+				start,
+				end,
 			} );
 		} );
 	} );
+
 	describe( 'clearSelectedBlock', () => {
 		it( 'should return CLEAR_SELECTED_BLOCK action', () => {
 			expect( clearSelectedBlock() ).toEqual( {
@@ -180,6 +189,7 @@ describe( 'actions', () => {
 			} );
 		} );
 	} );
+
 	describe( 'replaceBlock', () => {
 		it( 'should return the REPLACE_BLOCKS action', () => {
 			const block = {
@@ -193,6 +203,7 @@ describe( 'actions', () => {
 			} );
 		} );
 	} );
+
 	describe( 'replaceBlocks', () => {
 		it( 'should return the REPLACE_BLOCKS action', () => {
 			const blocks = [ {
@@ -212,32 +223,25 @@ describe( 'actions', () => {
 			const block = {
 				uid: 'ribs',
 			};
-			const position = 'position';
+			const position = 5;
 			expect( insertBlock( block, position ) ).toEqual( {
 				type: 'INSERT_BLOCKS',
-				blocks: [
-					{
-						uid: 'ribs',
-					},
-				],
-				position: 'position',
+				blocks: [ block ],
+				position,
 			} );
 		} );
 	} );
+
 	describe( 'insertBlocks', () => {
 		it( 'should return the INSERT_BLOCKS action', () => {
-			const block = [ {
+			const blocks = [ {
 				uid: 'ribs',
 			} ];
-			const position = 'position';
-			expect( insertBlocks( block, position ) ).toEqual( {
+			const position = 3;
+			expect( insertBlocks( blocks, position ) ).toEqual( {
 				type: 'INSERT_BLOCKS',
-				blocks: [
-					{
-						uid: 'ribs',
-					},
-				],
-				position: 'position',
+				blocks,
+				position,
 			} );
 		} );
 	} );
@@ -249,6 +253,7 @@ describe( 'actions', () => {
 			} );
 		} );
 	} );
+
 	describe( 'hideInsertionPoint', () => {
 		it( 'should return the HIDE_INSERTION_POINT action', () => {
 			expect( hideInsertionPoint() ).toEqual( {
@@ -262,7 +267,7 @@ describe( 'actions', () => {
 			const position = 1;
 			expect( setBlockInsertionPoint( position ) ).toEqual( {
 				type: 'SET_BLOCK_INSERTION_POINT',
-				position: 1,
+				position,
 			} );
 		} );
 	} );
@@ -280,9 +285,7 @@ describe( 'actions', () => {
 			const edits = { format: 'sample' };
 			expect( editPost( edits ) ).toEqual( {
 				type: 'EDIT_POST',
-				edits: {
-					format: 'sample',
-				},
+				edits,
 			} );
 		} );
 	} );
@@ -294,17 +297,19 @@ describe( 'actions', () => {
 			} );
 		} );
 	} );
+
 	describe( 'trashPost', () => {
 		it( 'should return TRASH_POST action', () => {
 			const postId = 1;
 			const postType = 'post';
 			expect( trashPost( postId, postType ) ).toEqual( {
 				type: 'TRASH_POST',
-				postId: 1,
-				postType: 'post',
+				postId,
+				postType,
 			} );
 		} );
 	} );
+
 	describe( 'mergeBlocks', () => {
 		it( 'should return MERGE_BLOCKS action', () => {
 			const blockA = {
@@ -315,11 +320,7 @@ describe( 'actions', () => {
 			};
 			expect( mergeBlocks( blockA, blockB ) ).toEqual( {
 				type: 'MERGE_BLOCKS',
-				blocks: [ {
-					uid: 'blockA',
-				}, {
-					uid: 'blockB',
-				} ],
+				blocks: [ blockA, blockB ],
 			} );
 		} );
 	} );
@@ -331,6 +332,7 @@ describe( 'actions', () => {
 			} );
 		} );
 	} );
+
 	describe( 'redo', () => {
 		it( 'should return REDO action', () => {
 			expect( redo() ).toEqual( {
@@ -338,6 +340,7 @@ describe( 'actions', () => {
 			} );
 		} );
 	} );
+
 	describe( 'undo', () => {
 		it( 'should return UNDO action', () => {
 			expect( undo() ).toEqual( {
@@ -351,19 +354,18 @@ describe( 'actions', () => {
 			const uids = [ 'uid' ];
 			expect( removeBlocks( uids ) ).toEqual( {
 				type: 'REMOVE_BLOCKS',
-				uids: [
-					'uid',
-				],
+				uids,
 			} );
 		} );
 	} );
+
 	describe( 'removeBlock', () => {
 		it( 'should return REMOVE_BLOCKS action', () => {
-			const uid = 'uid';
+			const uid = 'my-uid';
 			expect( removeBlock( uid ) ).toEqual( {
 				type: 'REMOVE_BLOCKS',
 				uids: [
-					'uid',
+					uid,
 				],
 			} );
 		} );
@@ -371,10 +373,10 @@ describe( 'actions', () => {
 
 	describe( 'toggleBlockMode', () => {
 		it( 'should return TOGGLE_BLOCK_MODE action', () => {
-			const uid = 'uid';
+			const uid = 'my-uid';
 			expect( toggleBlockMode( uid ) ).toEqual( {
 				type: 'TOGGLE_BLOCK_MODE',
-				uid: 'uid',
+				uid,
 			} );
 		} );
 	} );
@@ -400,7 +402,7 @@ describe( 'actions', () => {
 			const isMobile = true;
 			expect( toggleSidebar( isMobile ) ).toEqual( {
 				type: 'TOGGLE_SIDEBAR',
-				isMobile: true,
+				isMobile,
 			} );
 		} );
 	} );
@@ -409,15 +411,16 @@ describe( 'actions', () => {
 		const panel = 'panelName';
 		expect( setActivePanel( panel ) ).toEqual( {
 			type: 'SET_ACTIVE_PANEL',
-			panel: 'panelName',
+			panel,
 		} );
 	} );
+
 	describe( 'toggleSidebarPanel', () => {
 		it( 'should return TOGGLE_SIDEBAR_PANEL action', () => {
 			const panel = 'panelName';
 			expect( toggleSidebarPanel( panel ) ).toEqual( {
 				type: 'TOGGLE_SIDEBAR_PANEL',
-				panel: 'panelName',
+				panel,
 			} );
 		} );
 	} );
@@ -438,22 +441,24 @@ describe( 'actions', () => {
 			} );
 		} );
 		it( 'should return CREATE_NOTICE action when options is desined', () => {
+			const id = 'my-id';
 			const options = {
-				id: 'id',
+				id,
 				isDismissible: false,
 			};
 			const result = createNotice( status, content, options );
 			expect( result ).toEqual( {
 				type: 'CREATE_NOTICE',
 				notice: {
-					id: 'id',
-					status: 'status',
-					content: <p>element</p>,
+					id,
+					status,
+					content,
 					isDismissible: false,
 				},
 			} );
 		} );
 	} );
+
 	describe( 'createSuccessNotice', () => {
 		it( 'should return CREATE_NOTICE action', () => {
 			const content = <p>element</p>;
@@ -469,6 +474,7 @@ describe( 'actions', () => {
 			} );
 		} );
 	} );
+
 	describe( 'createInfoNotice', () => {
 		it( 'should return CREATE_NOTICE action', () => {
 			const content = <p>element</p>;
@@ -484,6 +490,7 @@ describe( 'actions', () => {
 			} );
 		} );
 	} );
+
 	describe( 'createErrorNotice', () => {
 		it( 'should return CREATE_NOTICE action', () => {
 			const content = <p>element</p>;
@@ -499,6 +506,7 @@ describe( 'actions', () => {
 			} );
 		} );
 	} );
+
 	describe( 'createWarningNotice', () => {
 		it( 'should return CREATE_NOTICE action', () => {
 			const content = <p>element</p>;
@@ -514,11 +522,13 @@ describe( 'actions', () => {
 			} );
 		} );
 	} );
+
 	describe( 'removeNotice', () => {
 		it( 'should return REMOVE_NOTICE actions', () => {
-			expect( removeNotice( 'id' ) ).toEqual( {
+			const noticeId = 'id';
+			expect( removeNotice( noticeId ) ).toEqual( {
 				type: 'REMOVE_NOTICE',
-				noticeId: 'id',
+				noticeId,
 			} );
 		} );
 	} );
@@ -528,7 +538,7 @@ describe( 'actions', () => {
 			const location = 'normal';
 			expect( metaBoxLoaded( location ) ).toEqual( {
 				type: 'META_BOX_LOADED',
-				location: 'normal',
+				location,
 			} );
 		} );
 	} );
@@ -538,7 +548,7 @@ describe( 'actions', () => {
 			const feature = 'name';
 			expect( toggleFeature( feature ) ).toEqual( {
 				type: 'TOGGLE_FEATURE',
-				feature: 'name',
+				feature,
 			} );
 		} );
 	} );
