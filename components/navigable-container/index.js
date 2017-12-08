@@ -132,7 +132,7 @@ export class NavigableMenu extends Component {
 				previous = [ LEFT ];
 			}
 
-			if ( orientation === 'all' ) {
+			if ( orientation === 'both' ) {
 				next = [ RIGHT, DOWN ];
 				previous = [ LEFT, UP ];
 			}
