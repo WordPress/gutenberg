@@ -153,6 +153,35 @@ describe( 'state', () => {
 			} );
 		} );
 
+		it( 'should update the reusable block reference if the temporary id is swapped', () => {
+			const original = editor( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [ {
+					uid: 'chicken',
+					name: 'core/block',
+					attributes: {
+						ref: 'random-uid',
+					},
+					isValid: false,
+				} ],
+			} );
+
+			const state = editor( deepFreeze( original ), {
+				type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
+				id: 'random-uid',
+				updatedId: 3,
+			} );
+
+			expect( state.present.blocksByUid.chicken ).toEqual( {
+				uid: 'chicken',
+				name: 'core/block',
+				attributes: {
+					ref: 3,
+				},
+				isValid: false,
+			} );
+		} );
+
 		it( 'should move the block up', () => {
 			const original = editor( undefined, {
 				type: 'RESET_BLOCKS',
@@ -1384,6 +1413,46 @@ describe( 'state', () => {
 			} );
 		} );
 
+		it( 'should update the reusable block\'s id if it was temporary', () => {
+			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
+			const initialState = {
+				data: {
+					[ id ]: {
+						id,
+						isTemporary: true,
+						name: 'My cool block',
+						type: 'core/paragraph',
+						attributes: {
+							content: 'Hello!',
+							dropCap: true,
+						},
+					},
+				},
+				isSaving: {},
+			};
+
+			const state = reusableBlocks( initialState, {
+				type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
+				id,
+				updatedId: 3,
+			} );
+
+			expect( state ).toEqual( {
+				data: {
+					3: {
+						id: 3,
+						name: 'My cool block',
+						type: 'core/paragraph',
+						attributes: {
+							content: 'Hello!',
+							dropCap: true,
+						},
+					},
+				},
+				isSaving: {},
+			} );
+		} );
+
 		it( 'should indicate that a reusable block is saving', () => {
 			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
 			const initialState = {
@@ -1407,7 +1476,9 @@ describe( 'state', () => {
 		it( 'should stop indicating that a reusable block is saving when the save succeeded', () => {
 			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
 			const initialState = {
-				data: {},
+				data: {
+					[ id ]: { id },
+				},
 				isSaving: {
 					[ id ]: true,
 				},
@@ -1416,10 +1487,13 @@ describe( 'state', () => {
 			const state = reusableBlocks( initialState, {
 				type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
 				id,
+				updatedId: id,
 			} );
 
 			expect( state ).toEqual( {
-				data: {},
+				data: {
+					[ id ]: { id },
+				},
 				isSaving: {},
 			} );
 		} );

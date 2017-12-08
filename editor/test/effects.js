@@ -529,9 +529,9 @@ describe( 'effects', () => {
 		describe( '.SAVE_REUSABLE_BLOCK', () => {
 			const handler = effects.SAVE_REUSABLE_BLOCK;
 
-			it( 'should save a reusable block', () => {
+			it( 'should save a reusable block and swaps its id', () => {
 				let modelAttributes;
-				const promise = Promise.resolve();
+				const promise = Promise.resolve( { id: 3 } );
 
 				set( global, 'wp.api.models.ReusableBlocks', class {
 					constructor( attributes ) {
@@ -570,6 +570,7 @@ describe( 'effects', () => {
 					expect( dispatch ).toHaveBeenCalledWith( {
 						type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
 						id: reusableBlock.id,
+						updatedId: 3,
 					} );
 				} );
 			} );
@@ -674,6 +675,7 @@ describe( 'effects', () => {
 				expect( dispatch ).toHaveBeenCalledWith(
 					updateReusableBlock( 'this-is-a-mock-uuid', {
 						id: 'this-is-a-mock-uuid',
+						isTemporary: true,
 						name: 'Untitled block',
 						type: staticBlock.name,
 						attributes: staticBlock.attributes,

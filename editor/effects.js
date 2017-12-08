@@ -346,12 +346,16 @@ export default {
 		const { id } = action;
 		const { getState, dispatch } = store;
 
-		const { name, type, attributes } = getReusableBlock( getState(), id );
+		const { name, type, attributes, isTemporary } = getReusableBlock( getState(), id );
 		const content = serialize( createBlock( type, attributes ) );
-
-		new wp.api.models.ReusableBlocks( { id, name, content } ).save().then(
-			() => {
-				dispatch( { type: 'SAVE_REUSABLE_BLOCK_SUCCESS', id } );
+		const requestData = isTemporary ? { name, content } : { id, name, content };
+		new wp.api.models.ReusableBlocks( requestData ).save().then(
+			( updatedReusableBlock ) => {
+				dispatch( {
+					type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
+					updatedId: updatedReusableBlock.id,
+					id,
+				} );
 				dispatch( createSuccessNotice(
 					__( 'Reusable block updated' ),
 					{ id: SAVE_REUSABLE_BLOCK_NOTICE_ID }

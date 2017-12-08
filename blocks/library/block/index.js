@@ -94,7 +94,6 @@ class ReusableBlockEdit extends Component {
 			getBlockDefaultClassname( reusableBlock.type ) :
 			null;
 		const className = classnames( generatedClassName, reusableBlockAttributes.className );
-
 		return [
 			// We fake the block being read-only by wrapping it with an element that has pointer-events: none
 			<div key="edit" style={ { pointerEvents: isEditing ? 'auto' : 'none' } }>
