@@ -25,13 +25,9 @@ describe( 'MultiBlocksSwitcher', () => {
 
 	describe( 'mapStateToProps', () => {
 		test( 'should return the expected selected block uids and whether there is a multiselection.', () => {
-			//const isMultiBlockSelection = true;
 			const start = 'an-uid';
 			const end = 'another-uid';
-			const selectedBlockUids = [
-				start,
-				end,
-			];
+			const selectedBlockUids = [ start, end ];
 			const state = {
 				editor: {
 					present: {
@@ -43,10 +39,12 @@ describe( 'MultiBlocksSwitcher', () => {
 					end,
 				},
 			};
+
 			const expected = {
-				isMultiBlockSelection: selectedBlockUids.length > 1,
+				isMultiBlockSelection: true,
 				selectedBlockUids,
 			};
+
 			expect( mapStateToProps( state ) ).toEqual( expected );
 		} );
 	} );

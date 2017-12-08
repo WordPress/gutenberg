@@ -8,9 +8,3 @@ exports[`BlockSwitcher Test block switcher with blocks 1`] = `
   renderToggle={[Function]}
 />
 `;
-
-exports[`BlockSwitcher Test block switcher with multi block of different types. 1`] = `""`;
-
-exports[`BlockSwitcher Test block switcher with multi block of same types. 1`] = `""`;
-
-exports[`BlockSwitcher Test block switcher without blocks 1`] = `""`;

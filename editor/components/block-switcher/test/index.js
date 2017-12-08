@@ -16,179 +16,130 @@ import { BlockSwitcher } from '../';
 const { DOWN } = keycodes;
 
 describe( 'BlockSwitcher', () => {
+	const headingBlock1 = {
+		attributes: {
+			content: [ 'How are you?' ],
+			nodeName: 'H2',
+		},
+		isValid: true,
+		name: 'core/heading',
+		originalContent: '<h2>How are you?</h2>',
+		uid: 'a1303fd6-3e60-4fff-a770-0e0ea656c5b9',
+	};
+
+	const textBlock = {
+		attributes: {
+			content: [ 'I am great!' ],
+			nodeName: 'P',
+		},
+		isValid: true,
+		name: 'core/text',
+		originalContent: '<p>I am great!</p>',
+		uid: 'b1303fd6-3e60-4fff-a770-0e0ea656c5b9',
+	};
+
+	const headingBlock2 = {
+		attributes: {
+			content: [ 'I am great!' ],
+			nodeName: 'H3',
+		},
+		isValid: true,
+		name: 'core/heading',
+		originalContent: '<h3>I am great!</h3>',
+		uid: 'b1303fd6-3e60-4fff-a770-0e0ea656c5b9',
+	};
+
 	test( 'Test block switcher without blocks', () => {
-		expect( shallow( <BlockSwitcher /> ) ).toMatchSnapshot();
+		expect( shallow( <BlockSwitcher /> ).html() ).toBeNull();
 	} );
 	test( 'Test block switcher with blocks', () => {
-		const block = {
-			attributes: {
-				content: [ 'How are you?' ],
-				nodeName: 'H2',
-			},
-			isValid: true,
-			name: 'core/heading',
-			originalContent: '<h2>How are you?</h2>',
-			uid: 'a1303fd6-3e60-4fff-a770-0e0ea656c5b9',
-		};
-
 		const blocks = [
-			block,
+			headingBlock1,
 		];
 
 		expect( shallow( <BlockSwitcher blocks={ blocks } /> ) ).toMatchSnapshot();
 	} );
 
 	test( 'Test block switcher with multi block of different types.', () => {
-		const block1 = {
-			attributes: {
-				content: [ 'How are you?' ],
-				nodeName: 'H2',
-			},
-			isValid: true,
-			name: 'core/heading',
-			originalContent: '<h2>How are you?</h2>',
-			uid: 'a1303fd6-3e60-4fff-a770-0e0ea656c5b9',
-		};
-
-		const block2 = {
-			attributes: {
-				content: [ 'I am great!' ],
-				nodeName: 'P',
-			},
-			isValid: true,
-			name: 'core/text',
-			originalContent: '<p>I am great!</p>',
-			uid: 'b1303fd6-3e60-4fff-a770-0e0ea656c5b9',
-		};
-
 		const blocks = [
-			block1,
-			block2,
+			headingBlock1,
+			textBlock,
 		];
 
-		expect( shallow( <BlockSwitcher blocks={ blocks } /> ) ).toMatchSnapshot();
+		expect( shallow( <BlockSwitcher blocks={ blocks } /> ).html() ).toBeNull();
 	} );
 
-	test( 'Test block switcher with multi block of same types.', () => {
-		const block1 = {
-			attributes: {
-				content: [ 'How are you?' ],
-				nodeName: 'H2',
-			},
-			isValid: true,
-			name: 'core/heading',
-			originalContent: '<h2>How are you?</h2>',
-			uid: 'a1303fd6-3e60-4fff-a770-0e0ea656c5b9',
-		};
-
-		const block2 = {
-			attributes: {
-				content: [ 'I am great!' ],
-				nodeName: 'H3',
-			},
-			isValid: true,
-			name: 'core/heading',
-			originalContent: '<h3>I am great!</h3>',
-			uid: 'b1303fd6-3e60-4fff-a770-0e0ea656c5b9',
-		};
-
+	test( 'should render a component when the multi selected types of blocks match.', () => {
 		const blocks = [
-			block1,
-			block2,
+			headingBlock1,
+			headingBlock2,
 		];
 
-		expect( shallow( <BlockSwitcher blocks={ blocks } /> ) ).toMatchSnapshot();
+		expect( shallow( <BlockSwitcher blocks={ blocks } /> ).html() ).toBeNull();
 	} );
 
-	test( 'should have inner components that work as expected.', () => {
-		const block1 = {
-			attributes: {
-				content: [ 'How are you?' ],
-				nodeName: 'H2',
-			},
-			isValid: true,
-			name: 'core/heading',
-			originalContent: '<h2>How are you?</h2>',
-			uid: 'a1303fd6-3e60-4fff-a770-0e0ea656c5b9',
-		};
-
+	describe( 'Dropdown', () => {
 		const blocks = [
-			block1,
+			headingBlock1,
 		];
 
-		const blockSwitcher = shallow( <BlockSwitcher blocks={ blocks } /> );
+		const onTransform = jest.fn();
 
-		expect( blockSwitcher.find( 'Dropdown' ).length ).toBe( 1 );
-
+		const blockSwitcher = shallow( <BlockSwitcher blocks={ blocks } onTransform={ onTransform } /> );
 		const dropdown = blockSwitcher.find( 'Dropdown' );
 
-		// Create a stub for the onToggle callback.
-		let onToggle = jest.fn();
+		test( 'should exist', () => {
+			expect( dropdown.length ).toBe( 1 );
+		} );
 
-		const toggleClosed = shallow( dropdown.props().renderToggle( { onToggle, isOpen: false } ) );
-		let iconButton = toggleClosed.find( 'IconButton' );
-
-		let mockKeyDown = {
-			preventDefault: () => {},
-			stopPropagation: () => {},
-			keyCode: DOWN,
-		};
-
-		iconButton.simulate( 'keydown', mockKeyDown );
-		expect( onToggle ).toHaveBeenCalledTimes( 1 );
-
-		// Create a new onToggle stub.
-		onToggle = jest.fn();
-
-		const toggleOpen = shallow( dropdown.props().renderToggle( { onToggle, isOpen: true } ) );
-		iconButton = toggleOpen.find( 'IconButton' );
-
-		mockKeyDown = {
-			preventDefault: () => {},
-			stopPropagation: () => {},
-			keyCode: DOWN,
-		};
-
-		iconButton.simulate( 'keydown', mockKeyDown );
-		expect( onToggle ).toHaveBeenCalledTimes( 0 );
-	} );
-
-	describe( '.renderContent', () => {
-		test( 'should work as expected', () => {
-			const block1 = {
-				attributes: {
-					content: [ 'How are you?' ],
-					nodeName: 'H2',
-				},
-				isValid: true,
-				name: 'core/heading',
-				originalContent: '<h2>How are you?</h2>',
-				uid: 'a1303fd6-3e60-4fff-a770-0e0ea656c5b9',
+		describe( '.renderToggle', () => {
+			// Create a stub for the onToggle callback.
+			const onToggle = jest.fn();
+			const mockKeyDown = {
+				preventDefault: () => {},
+				stopPropagation: () => {},
+				keyCode: DOWN,
 			};
 
-			const blocks = [
-				block1,
-			];
+			test( 'should simulate a keydown event, which should call onToggle and open transform toggle.', () => {
+				const toggleClosed = shallow( dropdown.props().renderToggle( { onToggle, isOpen: false } ) );
+				const iconButtonClosed = toggleClosed.find( 'IconButton' );
 
-			const onTransform = jest.fn();
+				iconButtonClosed.simulate( 'keydown', mockKeyDown );
+				expect( onToggle ).toHaveBeenCalledTimes( 1 );
 
-			const blockSwitcher = shallow( <BlockSwitcher blocks={ blocks } onTransform={ onTransform } /> );
+				// Reset onToggle stub.
+				onToggle.mockClear();
+			} );
 
-			expect( blockSwitcher.find( 'Dropdown' ).length ).toBe( 1 );
+			test( 'should simulate a click event, which should call onToggle.', () => {
+				const toggleOpen = shallow( dropdown.props().renderToggle( { onToggle, isOpen: true } ) );
+				const iconButtonOpen = toggleOpen.find( 'IconButton' );
 
-			const dropdown = blockSwitcher.find( 'Dropdown' );
+				iconButtonOpen.simulate( 'keydown', mockKeyDown );
+				expect( onToggle ).toHaveBeenCalledTimes( 0 );
 
+				// Reset onToggle stub.
+				onToggle.mockClear();
+			} );
+		} );
+
+		describe( '.renderContent', () => {
 			// Create a stub for the onClose callback.
 			const onClose = jest.fn();
 
 			const content = shallow( dropdown.props().renderContent( { onClose } ) );
 			const iconButtons = content.find( 'IconButton' );
-			expect( iconButtons.length ).toBe( 2 );
 
-			// When clicked the transformation window should close and transform the block.
-			iconButtons.first().simulate( 'click' );
-			expect( onClose ).toHaveBeenCalledTimes( 1 );
-			expect( onTransform ).toHaveBeenCalledTimes( 1 );
+			test( 'should create the iconButtons for the chosen block. A heading block will have 2', () => {
+				expect( iconButtons.length ).toBe( 2 );
+			} );
+
+			test( 'should simulate the click event by closing the switcher and causing a block transform on iconButtons.', () => {
+				iconButtons.first().simulate( 'click' );
+				expect( onClose ).toHaveBeenCalledTimes( 1 );
+				expect( onTransform ).toHaveBeenCalledTimes( 1 );
+			} );
 		} );
 	} );
 } );
