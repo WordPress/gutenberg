@@ -324,24 +324,6 @@ describe( 'effects', () => {
 
 	describe( '.TRASH_POST', () => {
 		it( 'should dispatch an removal notice for trashing a post as well as a trash post success action.', () => {
-			const apiCall = ( post ) => ( {
-				getPostTypeModel: function( postType ) { // eslint-disable-line no-unused-vars
-					return function( postObject ) { // eslint-disable-line no-unused-vars
-						return {
-							destroy: function() {
-								return this;
-							},
-							then: function( callback, errorHandler ) {
-								if ( post !== 'error' ) {
-									callback();
-								} else {
-									errorHandler( 'error' );
-								}
-							},
-						};
-					};
-				},
-			} );
 			const post = {
 				id: 1,
 				title: {
@@ -352,7 +334,23 @@ describe( 'effects', () => {
 				},
 				status: 'draft',
 			};
-			wp.api = apiCall( post );
+
+			wp.api = {
+				getPostTypeModel: jest.fn(),
+			};
+
+			wp.api.getPostTypeModel.mockImplementation( ( postType ) => ( postObject ) => ( { // eslint-disable-line no-unused-vars
+				destroy: function() {
+					return this;
+				},
+				then: function( callback, errorHandler ) {
+					if ( post !== 'error' ) {
+						callback();
+					} else {
+						errorHandler( 'error' );
+					}
+				},
+			} ) );
 
 			const handler = effects.TRASH_POST;
 			const dispatch = jest.fn();
@@ -363,8 +361,8 @@ describe( 'effects', () => {
 			handler( action, store );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 2 );
-			expect( dispatch.mock.calls[ 0 ][ 0 ] ).toEqual( removeNotice( 'TRASH_POST_NOTICE_ID' ) );
-			expect( dispatch.mock.calls[ 1 ][ 0 ] ).toEqual( {
+			expect( dispatch ).toHaveBeenCalledWith( removeNotice( 'TRASH_POST_NOTICE_ID' ) );
+			expect( dispatch ).toHaveBeenCalledWith( {
 				...action,
 				type: 'TRASH_POST_SUCCESS',
 			} );
