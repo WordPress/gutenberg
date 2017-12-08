@@ -4,7 +4,8 @@
 }
 
 .editor-block-list__block[data-type="core/gallery"] .editor-block-list__block-edit {
-	overflow: hidden;
+	// todo: improve gallery markup to not need negative margins
+	// overflow: hidden;
 }
 
 .blocks-gallery-image {
