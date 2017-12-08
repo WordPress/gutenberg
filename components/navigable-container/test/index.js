@@ -44,7 +44,7 @@ function fireKeyDown( container, keyCode, shiftKey ) {
 }
 
 describe( 'NavigableMenu', () => {
-	it( 'should navigate by right/down and left/up', () => {
+	it( 'vertical: should navigate by right/down and left/up', () => {
 		let currentIndex = 0;
 		const wrapper = mount( (
 			<NavigableMenu onNavigate={ ( index ) => currentIndex = index }>
@@ -81,10 +81,10 @@ describe( 'NavigableMenu', () => {
 		assertKeyDown( SPACE, 0, false );
 	} );
 
-	it( 'should navigate by right/down and left/up, and skip deep candidates', () => {
+	it( 'vertical: should navigate by right/down and left/up, and skip deep candidates', () => {
 		let currentIndex = 0;
 		const wrapper = mount( (
-			<NavigableMenu onNavigate={ ( index ) => currentIndex = index }>
+			<NavigableMenu orientation="vertical" onNavigate={ ( index ) => currentIndex = index }>
 				<span tabIndex="-1" id="btn1">One</span>
 				<span tabIndex="-1" id="btn2">Two</span>
 				<span id="btn-deep-wrapper">
@@ -121,10 +121,10 @@ describe( 'NavigableMenu', () => {
 		assertKeyDown( SPACE, 0, false );
 	} );
 
-	it( 'should navigate by right/down and left/up, and explore deep candidates', () => {
+	it( 'vertical: should navigate by right/down and left/up, and explore deep candidates', () => {
 		let currentIndex = 0;
 		const wrapper = mount( (
-			<NavigableMenu deep={ true } onNavigate={ ( index ) => currentIndex = index }>
+			<NavigableMenu deep={ true } orientation="vertical" onNavigate={ ( index ) => currentIndex = index }>
 				<span tabIndex="-1" id="btn1">One</span>
 				<span tabIndex="-1" id="btn2">Two</span>
 				<span id="btn-deep-wrapper">
@@ -165,10 +165,10 @@ describe( 'NavigableMenu', () => {
 		assertKeyDown( SPACE, 0, false );
 	} );
 
-	it( 'should navigate by right/down and left/up, and stop at edges', () => {
+	it( 'vertical: should navigate by right/down and left/up, and stop at edges', () => {
 		let currentIndex = 0;
 		const wrapper = mount( (
-			<NavigableMenu cycle={ false } onNavigate={ ( index ) => currentIndex = index }>
+			<NavigableMenu cycle={ false } orientation="vertical" onNavigate={ ( index ) => currentIndex = index }>
 				<span tabIndex="-1" id="btn1">One</span>
 				<span tabIndex="-1" id="btn2">Two</span>
 				<span tabIndex="-1" id="btn3">Three</span>
