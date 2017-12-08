@@ -357,14 +357,14 @@ export default {
 					id,
 				} );
 				dispatch( createSuccessNotice(
-					__( 'Reusable block updated' ),
+					__( 'Block updated.' ),
 					{ id: SAVE_REUSABLE_BLOCK_NOTICE_ID }
 				) );
 			},
 			( error ) => {
 				dispatch( { type: 'SAVE_REUSABLE_BLOCK_FAILURE', id } );
 				dispatch( createErrorNotice(
-					get( error.responseJSON, 'message', __( 'An unknown error occured' ) ),
+					get( error.responseJSON, 'message', __( 'An unknown error occured.' ) ),
 					{ id: SAVE_REUSABLE_BLOCK_NOTICE_ID }
 				) );
 			}
