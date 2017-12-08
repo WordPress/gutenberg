@@ -8,16 +8,23 @@ import { noop } from 'lodash';
  */
 import { Component, createPortal } from '@wordpress/element';
 
-/**
- * Internal dependencies
- */
-import withInstanceId from '../higher-order/with-instance-id';
+let occurrences = 0;
 
 class Fill extends Component {
+	componentWillMount() {
+		this.occurrence = ++occurrences;
+	}
+
 	componentDidMount() {
 		const { registerFill = noop } = this.context;
 
 		registerFill( this.props.name, this );
+	}
+
+	componentWillUpdate() {
+		if ( ! this.occurrence ) {
+			this.occurrence = ++occurrences;
+		}
 	}
 
 	componentWillUnmount() {
@@ -47,6 +54,10 @@ class Fill extends Component {
 		}
 	}
 
+	resetOccurrence() {
+		this.occurrence = null;
+	}
+
 	render() {
 		const { getSlot = noop } = this.context;
 		const { name, children } = this.props;
@@ -65,4 +76,4 @@ Fill.contextTypes = {
 	unregisterFill: noop,
 };
 
-export default withInstanceId( Fill );
+export default Fill;

@@ -30,6 +30,18 @@ describe( 'validation', () => {
 		title: 'block title',
 	};
 
+	/* eslint-disable no-console */
+	function expectError() {
+		expect( console.error ).toHaveBeenCalled();
+		console.error.mockClear();
+	}
+
+	function expectWarning() {
+		expect( console.warn ).toHaveBeenCalled();
+		console.warn.mockClear();
+	}
+	/* eslint-enable no-console */
+
 	afterEach( () => {
 		setUnknownTypeHandlerName( undefined );
 		getBlockTypes().forEach( ( block ) => {
@@ -102,6 +114,7 @@ describe( 'validation', () => {
 				{ chars: 'a \n c \t b  ' },
 			);
 
+			expectWarning();
 			expect( isEqual ).toBe( false );
 		} );
 
@@ -178,7 +191,7 @@ describe( 'validation', () => {
 				expect( isEqual ).toBe( true );
 			} );
 
-			it( 'returns true if not same style', () => {
+			it( 'returns false if not same style', () => {
 				const isEqual = isEqualAttributesOfName.style(
 					'background-image: url( "https://wordpress.org/img.png" ); color: red;',
 					'color: red;  font-size: 13px; background-image: url(\'https://wordpress.org/img.png\');'
@@ -201,6 +214,7 @@ describe( 'validation', () => {
 				]
 			);
 
+			expectWarning();
 			expect( isEqual ).toBe( false );
 		} );
 
@@ -228,6 +242,7 @@ describe( 'validation', () => {
 					{ tagName: 'section' }
 				);
 
+				expectWarning();
 				expect( isEqual ).toBe( false );
 			} );
 
@@ -248,6 +263,7 @@ describe( 'validation', () => {
 					}
 				);
 
+				expectWarning();
 				expect( isEqual ).toBe( false );
 			} );
 
@@ -306,6 +322,7 @@ describe( 'validation', () => {
 				'<div>Hello <span class="a">World!</span></div>'
 			);
 
+			expectWarning();
 			expect( isEquivalent ).toBe( false );
 		} );
 
@@ -324,6 +341,7 @@ describe( 'validation', () => {
 				'<div>Hello'
 			);
 
+			expectWarning();
 			expect( isEquivalent ).toBe( false );
 		} );
 
@@ -333,6 +351,7 @@ describe( 'validation', () => {
 				'<div>Hello</div>'
 			);
 
+			expectWarning();
 			expect( isEquivalent ).toBe( false );
 		} );
 
@@ -369,6 +388,7 @@ describe( 'validation', () => {
 				'<input>'
 			);
 
+			expectWarning();
 			expect( isEquivalent ).toBe( false );
 		} );
 
@@ -378,6 +398,7 @@ describe( 'validation', () => {
 				'<div>'
 			);
 
+			expectWarning();
 			expect( isEquivalent ).toBe( false );
 		} );
 
@@ -387,22 +408,27 @@ describe( 'validation', () => {
 				'<div>'
 			);
 
+			expectWarning();
 			expect( isEquivalent ).toBe( false );
 		} );
 	} );
 
 	describe( 'isValidBlock()', () => {
-		it( 'returns false is block is not valid', () => {
+		it( 'returns false if block is not valid', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
-			expect( isValidBlock(
+			const isValid = isValidBlock(
 				'Apples',
 				getBlockType( 'core/test-block' ),
 				{ fruit: 'Bananas' }
-			) ).toBe( false );
+			);
+
+			expectWarning();
+			expectError();
+			expect( isValid ).toBe( false );
 		} );
 
-		it( 'returns false is error occurs while generating block save', () => {
+		it( 'returns false if error occurs while generating block save', () => {
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
 				save() {
@@ -410,21 +436,26 @@ describe( 'validation', () => {
 				},
 			} );
 
-			expect( isValidBlock(
+			const isValid = isValidBlock(
 				'Bananas',
 				getBlockType( 'core/test-block' ),
 				{ fruit: 'Bananas' }
-			) ).toBe( false );
+			);
+
+			expectError();
+			expect( isValid ).toBe( false );
 		} );
 
 		it( 'returns true is block is valid', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
-			expect( isValidBlock(
+			const isValid = isValidBlock(
 				'Bananas',
 				getBlockType( 'core/test-block' ),
 				{ fruit: 'Bananas' }
-			) ).toBe( true );
+			);
+
+			expect( isValid ).toBe( true );
 		} );
 	} );
 } );

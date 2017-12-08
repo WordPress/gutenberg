@@ -14,10 +14,8 @@ import { includes } from 'lodash';
  * @return {Function}                    Enhanced reducer
  */
 export default function withChangeDetection( reducer, options = {} ) {
-	let originalState;
-
 	return ( state, action ) => {
-		let nextState = reducer( state, action );
+		const nextState = reducer( state, action );
 
 		// Reset at:
 		//  - Initial state
@@ -27,22 +25,17 @@ export default function withChangeDetection( reducer, options = {} ) {
 			includes( options.resetTypes, action.type )
 		);
 
-		const nextIsDirty = ! isReset && originalState !== nextState;
-
-		// Only revise state if changing.
-		if ( nextIsDirty !== nextState.isDirty ) {
-			// In case the original reducer returned the same reference and we
-			// intend to mutate, create a shallow clone.
-			if ( state === nextState ) {
-				nextState = { ...nextState };
-			}
-
-			nextState.isDirty = nextIsDirty;
+		if ( isReset ) {
+			return {
+				...nextState,
+				isDirty: false,
+			};
 		}
 
-		// Track original state against which dirty test compares reference
-		if ( isReset ) {
-			originalState = nextState;
+		const isChanging = state !== nextState;
+
+		if ( isChanging ) {
+			nextState.isDirty = true;
 		}
 
 		return nextState;

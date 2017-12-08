@@ -3,12 +3,13 @@
  */
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import { flowRight, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Dropdown, IconButton } from '@wordpress/components';
+import { Dropdown, IconButton, withContext } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 
@@ -61,13 +62,19 @@ class Inserter extends Component {
 			children,
 			onInsertBlock,
 			insertionPoint,
+			hasSupportedBlocks,
 		} = this.props;
+
+		if ( ! hasSupportedBlocks ) {
+			return null;
+		}
 
 		return (
 			<Dropdown
 				className="editor-inserter"
 				position={ position }
 				onToggle={ this.onToggle }
+				expandOnMobile
 				renderToggle={ ( { onToggle, isOpen } ) => (
 					<IconButton
 						icon="insert"
@@ -97,24 +104,33 @@ class Inserter extends Component {
 	}
 }
 
-export default connect(
-	( state ) => {
-		return {
-			insertionPoint: getBlockInsertionPoint( state ),
-			mode: getEditorMode( state ),
-		};
-	},
-	( dispatch ) => ( {
-		onInsertBlock( name, position ) {
-			dispatch( hideInsertionPoint() );
-			dispatch( insertBlock(
-				createBlock( name ),
-				position
-			) );
+export default flowRight( [
+	connect(
+		( state ) => {
+			return {
+				insertionPoint: getBlockInsertionPoint( state ),
+				mode: getEditorMode( state ),
+			};
 		},
-		...bindActionCreators( {
-			setInsertionPoint: setBlockInsertionPoint,
-			clearInsertionPoint: clearBlockInsertionPoint,
-		}, dispatch ),
-	} )
-)( Inserter );
+		( dispatch ) => ( {
+			onInsertBlock( name, position ) {
+				dispatch( hideInsertionPoint() );
+				dispatch( insertBlock(
+					createBlock( name ),
+					position
+				) );
+			},
+			...bindActionCreators( {
+				setInsertionPoint: setBlockInsertionPoint,
+				clearInsertionPoint: clearBlockInsertionPoint,
+			}, dispatch ),
+		} )
+	),
+	withContext( 'editor' )( ( settings ) => {
+		const { blockTypes } = settings;
+
+		return {
+			hasSupportedBlocks: true === blockTypes || ! isEmpty( blockTypes ),
+		};
+	} ),
+] )( Inserter );

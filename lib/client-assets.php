@@ -83,6 +83,12 @@ function gutenberg_register_scripts_and_styles() {
 		filemtime( gutenberg_dir_path() . 'utils/build/index.js' )
 	);
 	wp_register_script(
+		'wp-hooks',
+		gutenberg_url( 'hooks/build/index.js' ),
+		array(),
+		filemtime( gutenberg_dir_path() . 'hooks/build/index.js' )
+	);
+	wp_register_script(
 		'wp-date',
 		gutenberg_url( 'date/build/index.js' ),
 		array( 'moment' ),
@@ -129,13 +135,13 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-components',
 		gutenberg_url( 'components/build/index.js' ),
-		array( 'wp-element', 'wp-i18n', 'wp-utils', 'wp-api-request' ),
+		array( 'wp-element', 'wp-i18n', 'wp-utils', 'wp-hooks', 'wp-api-request' ),
 		filemtime( gutenberg_dir_path() . 'components/build/index.js' )
 	);
 	wp_register_script(
 		'wp-blocks',
 		gutenberg_url( 'blocks/build/index.js' ),
-		array( 'wp-element', 'wp-components', 'wp-utils', 'wp-i18n', 'tinymce-latest', 'tinymce-latest-lists', 'tinymce-latest-paste', 'tinymce-latest-table', 'media-views', 'media-models', 'shortcode' ),
+		array( 'wp-element', 'wp-components', 'wp-utils', 'wp-hooks', 'wp-i18n', 'tinymce-latest', 'tinymce-latest-lists', 'tinymce-latest-paste', 'tinymce-latest-table', 'media-views', 'media-models', 'shortcode' ),
 		filemtime( gutenberg_dir_path() . 'blocks/build/index.js' )
 	);
 	wp_add_inline_script(
@@ -478,7 +484,7 @@ JS;
 	wp_add_inline_script( 'wp-api', $script );
 
 	// Localize the wp-api settings and schema.
-	$schema_response = rest_do_request( new WP_REST_Request( 'GET', '/wp/v2' ) );
+	$schema_response = rest_do_request( new WP_REST_Request( 'GET', '/' ) );
 	if ( ! $schema_response->is_error() ) {
 		wp_add_inline_script( 'wp-api', sprintf(
 			'wpApiSettings.cacheSchema = true; wpApiSettings.schema = %s;',
@@ -767,15 +773,35 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		$color_palette = $gutenberg_theme_support[0]['colors'];
 	}
 
+	/**
+	 * Filters the allowed block types for the editor, defaulting to true (all
+	 * block types supported).
+	 *
+	 * @param bool|array $allowed_block_types Array of block type slugs, or
+	 *                                        boolean to enable/disable all.
+	 */
+	$allowed_block_types = apply_filters( 'allowed_block_types', true );
+
 	$editor_settings = array(
 		'wideImages' => ! empty( $gutenberg_theme_support[0]['wide-images'] ),
 		'colors'     => $color_palette,
+		'blockTypes' => $allowed_block_types,
 	);
 
-	wp_add_inline_script( 'wp-editor', 'wp.api.init().done( function() {'
-		. 'window._wpGutenbergEditor = wp.editor.createEditorInstance( \'editor\', window._wpGutenbergPost, ' . json_encode( $editor_settings ) . ' ); '
-		. '} );'
-	);
+	$post_type_object = get_post_type_object( $post_to_edit['type'] );
+	if ( ! empty( $post_type_object->template ) ) {
+		$editor_settings['template'] = $post_type_object->template;
+	}
+
+	$script  = '( function() {';
+	$script .= sprintf( 'var editorSettings = %s;', wp_json_encode( $editor_settings ) );
+	$script .= <<<JS
+		window._wpLoadGutenbergEditor = Promise.all( [ wp.api.init(), wp.api.init( { versionString: 'gutenberg/v1' } ) ] ).then( function() {
+			return wp.editor.createEditorInstance( 'editor', window._wpGutenbergPost, editorSettings );
+		} );
+JS;
+	$script .= '} )();';
+	wp_add_inline_script( 'wp-editor', $script );
 
 	/**
 	 * Scripts

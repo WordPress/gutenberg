@@ -12,6 +12,12 @@
 		"parent": null
 	},
 	{
+		"title": "Extensibility",
+		"slug": "extensibility",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/extensibility.md",
+		"parent": null
+	},
+	{
 		"title": "Block API",
 		"slug": "block-api",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/block-api.md",
@@ -72,6 +78,12 @@
 		"parent": "reference"
 	},
 	{
+		"title": "Meta Boxes",
+		"slug": "meta-box",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/meta-box.md",
+		"parent": "reference"
+	},
+	{
 		"title": "Glossary",
 		"slug": "glossary",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/glossary.md",
@@ -99,6 +111,12 @@
 		"title": "Frequently Asked Questions",
 		"slug": "faq",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/faq.md",
+		"parent": "reference"
+	},
+	{
+		"title": "Release Process",
+		"slug": "release",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/release.md",
 		"parent": "reference"
 	},
 	{

@@ -97,6 +97,7 @@ describe( 'InserterMenu', () => {
 				blocks={ [] }
 				recentlyUsedBlocks={ [] }
 				debouncedSpeak={ noop }
+				blockTypes
 			/>
 		);
 
@@ -107,6 +108,39 @@ describe( 'InserterMenu', () => {
 		expect( visibleBlocks.length ).toBe( 0 );
 	} );
 
+	it( 'should show no blocks if all block types disabled', () => {
+		const wrapper = mount(
+			<InserterMenu
+				position={ 'top center' }
+				instanceId={ 1 }
+				blocks={ [] }
+				recentlyUsedBlocks={ [ advancedTextBlock ] }
+				debouncedSpeak={ noop }
+				blockTypes={ false }
+			/>
+		);
+
+		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
+		expect( visibleBlocks.length ).toBe( 0 );
+	} );
+
+	it( 'should show filtered block types', () => {
+		const wrapper = mount(
+			<InserterMenu
+				position={ 'top center' }
+				instanceId={ 1 }
+				blocks={ [] }
+				recentlyUsedBlocks={ [ textBlock, advancedTextBlock ] }
+				debouncedSpeak={ noop }
+				blockTypes={ [ textBlock.name ] }
+			/>
+		);
+
+		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
+		expect( visibleBlocks.length ).toBe( 1 );
+		expect( visibleBlocks.at( 0 ).text() ).toBe( 'Text' );
+	} );
+
 	it( 'should show the recently used blocks in the recent tab', () => {
 		const wrapper = mount(
 			<InserterMenu
@@ -115,6 +149,7 @@ describe( 'InserterMenu', () => {
 				blocks={ [] }
 				recentlyUsedBlocks={ [ advancedTextBlock ] }
 				debouncedSpeak={ noop }
+				blockTypes
 			/>
 		);
 
@@ -132,6 +167,7 @@ describe( 'InserterMenu', () => {
 				blocks={ [] }
 				recentlyUsedBlocks={ [] }
 				debouncedSpeak={ noop }
+				blockTypes
 			/>
 		);
 		const embedTab = wrapper.find( '.editor-inserter__tab' )
@@ -155,6 +191,7 @@ describe( 'InserterMenu', () => {
 				blocks={ [] }
 				recentlyUsedBlocks={ [] }
 				debouncedSpeak={ noop }
+				blockTypes
 			/>
 		);
 		const blocksTab = wrapper.find( '.editor-inserter__tab' )
@@ -180,6 +217,7 @@ describe( 'InserterMenu', () => {
 				blocks={ [ { name: moreBlock.name } ] }
 				recentlyUsedBlocks={ [] }
 				debouncedSpeak={ noop }
+				blockTypes
 			/>
 		);
 		const blocksTab = wrapper.find( '.editor-inserter__tab' )
@@ -200,6 +238,7 @@ describe( 'InserterMenu', () => {
 				blocks={ [] }
 				recentlyUsedBlocks={ [] }
 				debouncedSpeak={ noop }
+				blockTypes
 			/>
 		);
 		wrapper.setState( { filterValue: 'text' } );
@@ -222,6 +261,7 @@ describe( 'InserterMenu', () => {
 				blocks={ [] }
 				recentlyUsedBlocks={ [] }
 				debouncedSpeak={ noop }
+				blockTypes
 			/>
 		);
 		wrapper.setState( { filterValue: ' text' } );

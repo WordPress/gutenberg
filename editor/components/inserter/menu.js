@@ -24,6 +24,7 @@ import {
 	TabbableContainer,
 	withInstanceId,
 	withSpokenMessages,
+	withContext,
 } from '@wordpress/components';
 import { getCategories, getBlockTypes } from '@wordpress/blocks';
 import { keycodes } from '@wordpress/utils';
@@ -112,8 +113,27 @@ export class InserterMenu extends Component {
 	}
 
 	getBlockTypes() {
+		const { blockTypes } = this.props;
+
+		// If all block types disabled, return empty set
+		if ( ! blockTypes ) {
+			return [];
+		}
+
 		// Block types that are marked as private should not appear in the inserter
-		return getBlockTypes().filter( ( block ) => ! block.isPrivate );
+		return getBlockTypes().filter( ( block ) => {
+			if ( block.isPrivate ) {
+				return false;
+			}
+
+			// Block types defined as either `true` or array:
+			//  - True: Allow
+			//  - Array: Check block name within whitelist
+			return (
+				! Array.isArray( blockTypes ) ||
+				includes( blockTypes, block.name )
+			);
+		} );
 	}
 
 	searchBlocks( blockTypes ) {
@@ -121,18 +141,28 @@ export class InserterMenu extends Component {
 	}
 
 	getBlocksForTab( tab ) {
+		const blockTypes = this.getBlockTypes();
 		// if we're searching, use everything, otherwise just get the blocks visible in this tab
 		if ( this.state.filterValue ) {
-			return this.getBlockTypes();
+			return blockTypes;
 		}
+
+		let predicate;
 		switch ( tab ) {
 			case 'recent':
-				return this.props.recentlyUsedBlocks;
+				predicate = ( block ) => find( this.props.recentlyUsedBlocks, { name: block.name } );
+				break;
+
 			case 'blocks':
-				return filter( this.getBlockTypes(), ( block ) => block.category !== 'embed' );
+				predicate = ( block ) => block.category !== 'embed';
+				break;
+
 			case 'embeds':
-				return filter( this.getBlockTypes(), ( block ) => block.category === 'embed' );
+				predicate = ( block ) => block.category === 'embed';
+				break;
 		}
+
+		return filter( blockTypes, predicate );
 	}
 
 	sortBlocks( blockTypes ) {
@@ -165,10 +195,15 @@ export class InserterMenu extends Component {
 		const blockTypesInfo = blockTypes.map( ( blockType ) => (
 			{ ...blockType, disabled: this.isDisabledBlock( blockType ) }
 		) );
+
 		return (
-			<InserterGroup blockTypes={ blockTypesInfo } labelledBy={ labelledBy }
+			<InserterGroup
+				blockTypes={ blockTypesInfo }
+				labelledBy={ labelledBy }
 				bindReferenceNode={ this.bindReferenceNode }
 				selectBlock={ this.selectBlock }
+				showInsertionPoint={ this.props.showInsertionPoint }
+				hideInsertionPoint={ this.props.hideInsertionPoint }
 			/>
 		);
 	}
@@ -201,17 +236,18 @@ export class InserterMenu extends Component {
 		this.setState( { tab } );
 	}
 
-	renderTabView( tab, visibleBlocks ) {
-		switch ( tab ) {
-			case 'recent':
-				return this.renderBlocks( this.props.recentlyUsedBlocks, undefined );
-
-			case 'embed':
-				return this.renderBlocks( visibleBlocks.embed, undefined );
-
-			default:
-				return this.renderCategories( visibleBlocks, undefined );
+	renderTabView( tab ) {
+		const blocksForTab = this.getBlocksForTab( tab );
+		if ( 'recent' === tab ) {
+			return this.renderBlocks( blocksForTab );
 		}
+
+		const visibleBlocks = this.getVisibleBlocksByCategory( blocksForTab );
+		if ( 'embed' === tab ) {
+			return this.renderBlocks( visibleBlocks.embed );
+		}
+
+		return this.renderCategories( visibleBlocks );
 	}
 
 	interceptArrows( event ) {
@@ -266,23 +302,15 @@ export class InserterMenu extends Component {
 							},
 						] }
 					>
-						{
-							( tabKey ) => {
-								const blocksForTab = this.getBlocksForTab( tabKey );
-								const visibleBlocks = this.getVisibleBlocksByCategory( blocksForTab );
-
-								return (
-									<div ref={ ( ref ) => this.tabContainer = ref }
-										className="editor-inserter__content">
-										{ this.renderTabView( tabKey, visibleBlocks ) }
-									</div>
-								);
-							}
-						}
+						{ ( tabKey ) => (
+							<div ref={ ( ref ) => this.tabContainer = ref }>
+								{ this.renderTabView( tabKey ) }
+							</div>
+						) }
 					</TabPanel>
 				}
 				{ isSearching &&
-					<div role="menu" className="editor-inserter__content">
+					<div role="menu" className="editor-inserter__search-results">
 						{ this.renderCategories( this.getVisibleBlocksByCategory( getBlockTypes() ) ) }
 					</div>
 				}
@@ -304,5 +332,6 @@ const connectComponent = connect(
 export default flow(
 	withInstanceId,
 	withSpokenMessages,
+	withContext( 'editor' )( ( settings ) => pick( settings, 'blockTypes' ) ),
 	connectComponent
 )( InserterMenu );

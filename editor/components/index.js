@@ -1,6 +1,11 @@
 // Post Related Components
 export { default as AutosaveMonitor } from './autosave-monitor';
 export { default as DocumentOutline } from './document-outline';
+export { default as DocumentOutlineCheck } from './document-outline/check';
+export { default as EditorGlobalKeyboardShortcuts } from './editor-global-keyboard-shortcuts';
+export { default as EditorHistoryRedo } from './editor-history/redo';
+export { default as EditorHistoryUndo } from './editor-history/undo';
+export { default as EditorNotices } from './editor-notices';
 export { default as MetaBoxes } from './meta-boxes';
 export { default as PageAttributes } from './page-attributes';
 export { default as PageAttributesCheck } from './page-attributes/check';
@@ -19,6 +24,7 @@ export { default as PostPingbacks } from './post-pingbacks';
 export { default as PostPreviewButton } from './post-preview-button';
 export { default as PostPublishButton } from './post-publish-button';
 export { default as PostPublishButtonLabel } from './post-publish-button/label';
+export { default as PostPublishWithDropdown } from './post-publish-with-dropdown';
 export { default as PostSavedState } from './post-saved-state';
 export { default as PostSchedule } from './post-schedule';
 export { default as PostScheduleLabel } from './post-schedule/label';
@@ -27,17 +33,27 @@ export { default as PostStickyCheck } from './post-sticky/check';
 export { default as PostTaxonomies } from './post-taxonomies';
 export { default as PostTextEditor } from './post-text-editor';
 export { default as PostTextEditorToolbar } from './post-text-editor/toolbar';
+export { default as PostTitle } from './post-title';
 export { default as PostTrash } from './post-trash';
+export { default as PostTrashCheck } from './post-trash/check';
 export { default as PostVisibility } from './post-visibility';
 export { default as PostVisibilityLabel } from './post-visibility/label';
+export { default as TableOfContents } from './table-of-contents';
 export { default as UnsavedChangesWarning } from './unsaved-changes-warning';
 export { default as WordCount } from './word-count';
 
 // Content Related Components
 export { default as BlockInspector } from './block-inspector';
+export { default as BlockList } from './block-list';
+export { default as BlockMover } from './block-mover';
+export { default as BlockSettingsMenu } from './block-settings-menu';
+export { default as BlockToolbar } from './block-toolbar';
+export { default as DefaultBlockAppender } from './default-block-appender';
 export { default as ErrorBoundary } from './error-boundary';
 export { default as Inserter } from './inserter';
+export { default as MultiBlocksSwitcher } from './block-switcher/multi-blocks-switcher';
 export { default as Warning } from './warning';
+export { default as WritingFlow } from './writing-flow';
 
 // State Related Components
 export { default as EditorProvider } from './provider';

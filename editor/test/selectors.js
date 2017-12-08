@@ -36,6 +36,7 @@ import {
 	isEditedPostPublishable,
 	isEditedPostSaveable,
 	isEditedPostBeingScheduled,
+	isMobile,
 	getEditedPostPreviewLink,
 	getBlock,
 	getBlocks,
@@ -76,8 +77,12 @@ import {
 	isMetaBoxStateDirty,
 	getReusableBlock,
 	isSavingReusableBlock,
+	isSelectionEnabled,
 	getReusableBlocks,
+	getStateBeforeOptimisticTransaction,
+	isPublishingPost,
 } from '../selectors';
+import { POST_UPDATE_TRANSACTION_ID } from '../effects';
 
 describe( 'selectors', () => {
 	beforeAll( () => {
@@ -317,17 +322,64 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'isEditorSidebarOpened', () => {
-		it( 'should return true when the sidebar is opened', () => {
+		it( 'should return true when is not mobile and the normal sidebar is opened', () => {
 			const state = {
-				preferences: { isSidebarOpened: true },
+				responsive: {
+					greaterThan: {
+						medium: true,
+					},
+				},
+				preferences: {
+					isSidebarOpened: true,
+					isSidebarOpenedMobile: false,
+				},
 			};
 
 			expect( isEditorSidebarOpened( state ) ).toBe( true );
 		} );
 
-		it( 'should return false when the sidebar is opened', () => {
+		it( 'should return false when is not mobile and the normal sidebar is closed', () => {
 			const state = {
-				preferences: { isSidebarOpened: false },
+				responsive: {
+					greaterThan: {
+						medium: true,
+					},
+				},
+				preferences: {
+					isSidebarOpened: false,
+				},
+			};
+
+			expect( isEditorSidebarOpened( state ) ).toBe( false );
+		} );
+
+		it( 'should return true when is mobile and the mobile sidebar is opened', () => {
+			const state = {
+				responsive: {
+					greaterThan: {
+						medium: false,
+					},
+				},
+				preferences: {
+					isSidebarOpened: false,
+					isSidebarOpenedMobile: true,
+				},
+			};
+
+			expect( isEditorSidebarOpened( state ) ).toBe( true );
+		} );
+
+		it( 'should return false when is mobile and the mobile sidebar is closed', () => {
+			const state = {
+				responsive: {
+					greaterThan: {
+						medium: false,
+					},
+				},
+				preferences: {
+					isSidebarOpened: true,
+					isSidebarOpenedMobile: false,
+				},
 			};
 
 			expect( isEditorSidebarOpened( state ) ).toBe( false );
@@ -547,6 +599,32 @@ describe( 'selectors', () => {
 			};
 
 			expect( isCleanNewPost( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isMobile', () => {
+		it( 'should return true if resolution is equal or less than medium breakpoint', () => {
+			const state = {
+				responsive: {
+					greaterThan: {
+						medium: false,
+					},
+				},
+			};
+
+			expect( isMobile( state ) ).toBe( true );
+		} );
+
+		it( 'should return true if resolution is greater than medium breakpoint', () => {
+			const state = {
+				responsive: {
+					greaterThan: {
+						medium: true,
+					},
+				},
+			};
+
+			expect( isMobile( state ) ).toBe( false );
 		} );
 	} );
 
@@ -1167,6 +1245,7 @@ describe( 'selectors', () => {
 				attributes: {
 					foo: {
 						type: 'string',
+						source: 'meta',
 						meta: 'foo',
 					},
 				},
@@ -1747,6 +1826,28 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'isSelectionEnabled', () => {
+		it( 'should return true if selection is enable', () => {
+			const state = {
+				blockSelection: {
+					isEnabled: true,
+				},
+			};
+
+			expect( isSelectionEnabled( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if selection is disabled', () => {
+			const state = {
+				blockSelection: {
+					isEnabled: false,
+				},
+			};
+
+			expect( isSelectionEnabled( state ) ).toBe( false );
+		} );
+	} );
+
 	describe( 'getBlockInsertionPoint', () => {
 		it( 'should return the uid of the selected block', () => {
 			const state = {
@@ -2184,6 +2285,177 @@ describe( 'selectors', () => {
 
 			const reusableBlocks = getReusableBlocks( state );
 			expect( reusableBlocks ).toEqual( [] );
+		} );
+	} );
+
+	describe( 'getStateBeforeOptimisticTransaction', () => {
+		it( 'should return null if no transaction can be found', () => {
+			const beforeState = getStateBeforeOptimisticTransaction( {
+				optimist: [],
+			}, 'foo' );
+
+			expect( beforeState ).toBe( null );
+		} );
+
+		it( 'should return null if a transaction with ID can be found, but lacks before state', () => {
+			const beforeState = getStateBeforeOptimisticTransaction( {
+				optimist: [
+					{
+						action: {
+							optimist: {
+								id: 'foo',
+							},
+						},
+					},
+				],
+			}, 'foo' );
+
+			expect( beforeState ).toBe( null );
+		} );
+
+		it( 'should return the before state matching the given transaction id', () => {
+			const expectedBeforeState = {};
+			const beforeState = getStateBeforeOptimisticTransaction( {
+				optimist: [
+					{
+						beforeState: expectedBeforeState,
+						action: {
+							optimist: {
+								id: 'foo',
+							},
+						},
+					},
+				],
+			}, 'foo' );
+
+			expect( beforeState ).toBe( expectedBeforeState );
+		} );
+	} );
+
+	describe( 'isPublishingPost', () => {
+		it( 'should return false if the post is not being saved', () => {
+			const isPublishing = isPublishingPost( {
+				optimist: [],
+				saving: {
+					requesting: false,
+				},
+				editor: {
+					edits: {},
+				},
+				currentPost: {
+					status: 'publish',
+				},
+			} );
+
+			expect( isPublishing ).toBe( false );
+		} );
+
+		it( 'should return false if the current post is not considered published', () => {
+			const isPublishing = isPublishingPost( {
+				optimist: [],
+				saving: {
+					requesting: true,
+				},
+				editor: {
+					edits: {},
+				},
+				currentPost: {
+					status: 'draft',
+				},
+			} );
+
+			expect( isPublishing ).toBe( false );
+		} );
+
+		it( 'should return false if the optimistic transaction cannot be found', () => {
+			const isPublishing = isPublishingPost( {
+				optimist: [],
+				saving: {
+					requesting: true,
+				},
+				editor: {
+					edits: {},
+				},
+				currentPost: {
+					status: 'publish',
+				},
+			} );
+
+			expect( isPublishing ).toBe( false );
+		} );
+
+		it( 'should return false if the current post prior to request was already published', () => {
+			const isPublishing = isPublishingPost( {
+				optimist: [
+					{
+						beforeState: {
+							saving: {
+								requesting: false,
+							},
+							editor: {
+								edits: {},
+							},
+							currentPost: {
+								status: 'publish',
+							},
+						},
+						action: {
+							optimist: {
+								id: POST_UPDATE_TRANSACTION_ID,
+							},
+						},
+					},
+				],
+				saving: {
+					requesting: true,
+				},
+				editor: {
+					edits: {},
+				},
+				currentPost: {
+					status: 'publish',
+				},
+			} );
+
+			expect( isPublishing ).toBe( false );
+		} );
+
+		it( 'should return true if the current post prior to request was not published', () => {
+			const isPublishing = isPublishingPost( {
+				optimist: [
+					{
+						beforeState: {
+							saving: {
+								requesting: false,
+							},
+							editor: {
+								edits: {
+									status: 'publish',
+								},
+							},
+							currentPost: {
+								status: 'draft',
+							},
+						},
+						action: {
+							optimist: {
+								id: POST_UPDATE_TRANSACTION_ID,
+							},
+						},
+					},
+				],
+				saving: {
+					requesting: true,
+				},
+				editor: {
+					edits: {},
+				},
+				currentPost: {
+					status: 'publish',
+				},
+			} );
+
+			expect( isPublishing ).toBe( true );
 		} );
 	} );
 } );

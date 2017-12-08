@@ -21,6 +21,11 @@ describe( 'block factory', () => {
 		title: 'block title',
 	};
 
+	beforeAll( () => {
+		// Load all hooks that modify blocks
+		require( 'blocks/hooks' );
+	} );
+
 	afterEach( () => {
 		setUnknownTypeHandlerName( undefined );
 		getBlockTypes().forEach( ( block ) => {
@@ -80,7 +85,9 @@ describe( 'block factory', () => {
 				save: noop,
 				category: 'common',
 				title: 'test block',
-				className: false,
+				supports: {
+					customClassName: false,
+				},
 			} );
 			const block = createBlock( 'core/test-block', {
 				className: 'chicken',

@@ -13,7 +13,6 @@ import { Slot } from '@wordpress/components';
  * Internal Dependencies
  */
 import './style.scss';
-import BlockInspectorAdvancedControls from './advanced-controls';
 import { getSelectedBlock, getSelectedBlockCount } from '../../selectors';
 
 const BlockInspector = ( { selectedBlock, count } ) => {
@@ -26,10 +25,7 @@ const BlockInspector = ( { selectedBlock, count } ) => {
 	}
 
 	return (
-		<div>
-			<Slot name="Inspector.Controls" />
-			<BlockInspectorAdvancedControls key={ `advanced-controls-${ selectedBlock.uid }` } />
-		</div>
+		<Slot name="Inspector.Controls" />
 	);
 };
 

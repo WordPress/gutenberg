@@ -24,6 +24,11 @@ describe( 'blocks', () => {
 	const error = console.error;
 	const defaultBlockSettings = { save: noop, category: 'common', title: 'block title' };
 
+	beforeAll( () => {
+		// Load all hooks that modify blocks
+		require( 'blocks/hooks' );
+	} );
+
 	// Reset block state before each test.
 	beforeEach( () => {
 		console.error = jest.fn();
@@ -48,32 +53,49 @@ describe( 'blocks', () => {
 
 		it( 'should reject blocks without a namespace', () => {
 			const block = registerBlockType( 'doing-it-wrong' );
-			expect( console.error ).toHaveBeenCalledWith( 'Block names must contain a namespace prefix. Example: my-plugin/my-custom-block' );
+			expect( console.error ).toHaveBeenCalledWith( 'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block' );
 			expect( block ).toBeUndefined();
 		} );
 
 		it( 'should reject blocks with too many namespaces', () => {
 			const block = registerBlockType( 'doing/it/wrong' );
-			expect( console.error ).toHaveBeenCalledWith( 'Block names must contain a namespace prefix. Example: my-plugin/my-custom-block' );
+			expect( console.error ).toHaveBeenCalledWith( 'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block' );
 			expect( block ).toBeUndefined();
 		} );
 
 		it( 'should reject blocks with invalid characters', () => {
 			const block = registerBlockType( 'still/_doing_it_wrong' );
-			expect( console.error ).toHaveBeenCalledWith( 'Block names must contain a namespace prefix. Example: my-plugin/my-custom-block' );
+			expect( console.error ).toHaveBeenCalledWith( 'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block' );
 			expect( block ).toBeUndefined();
 		} );
 
 		it( 'should reject blocks with uppercase characters', () => {
 			const block = registerBlockType( 'Core/Paragraph' );
-			expect( console.error ).toHaveBeenCalledWith( 'Block names must not contain uppercase characters.' );
+			expect( console.error ).toHaveBeenCalledWith( 'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block' );
+			expect( block ).toBeUndefined();
+		} );
+
+		it( 'should reject blocks not starting with a letter', () => {
+			const block = registerBlockType( 'my-plugin/4-fancy-block', defaultBlockSettings );
+			expect( console.error ).toHaveBeenCalledWith( 'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block' );
 			expect( block ).toBeUndefined();
 		} );
 
 		it( 'should accept valid block names', () => {
 			const block = registerBlockType( 'my-plugin/fancy-block-4', defaultBlockSettings );
 			expect( console.error ).not.toHaveBeenCalled();
-			expect( block ).toEqual( { name: 'my-plugin/fancy-block-4', icon: 'block-default', save: noop, category: 'common', title: 'block title' } );
+			expect( block ).toEqual( {
+				name: 'my-plugin/fancy-block-4',
+				icon: 'block-default',
+				save: noop,
+				category: 'common',
+				title: 'block title',
+				attributes: {
+					className: {
+						type: 'string',
+					},
+				},
+			} );
 		} );
 
 		it( 'should prohibit registering the same block twice', () => {
@@ -153,7 +175,14 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: 'block-default',
-				attributes,
+				attributes: {
+					ok: {
+						type: 'boolean',
+					},
+					className: {
+						type: 'string',
+					},
+				},
 			} );
 		} );
 
@@ -168,6 +197,11 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: 'block-default',
+				attributes: {
+					className: {
+						type: 'string',
+					},
+				},
 			} );
 		} );
 	} );
@@ -182,7 +216,18 @@ describe( 'blocks', () => {
 		it( 'should unregister existing blocks', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 			expect( getBlockTypes() ).toEqual( [
-				{ name: 'core/test-block', save: noop, category: 'common', title: 'block title', icon: 'block-default' },
+				{
+					name: 'core/test-block',
+					save: noop,
+					category: 'common',
+					title: 'block title',
+					icon: 'block-default',
+					attributes: {
+						className: {
+							type: 'string',
+						},
+					},
+				},
 			] );
 			const oldBlock = unregisterBlockType( 'core/test-block' );
 			expect( console.error ).not.toHaveBeenCalled();
@@ -192,6 +237,11 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: 'block-default',
+				attributes: {
+					className: {
+						type: 'string',
+					},
+				},
 			} );
 			expect( getBlockTypes() ).toEqual( [] );
 		} );
@@ -234,6 +284,11 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: 'block-default',
+				attributes: {
+					className: {
+						type: 'string',
+					},
+				},
 			} );
 		} );
 
@@ -247,6 +302,11 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: 'block-default',
+				attributes: {
+					className: {
+						type: 'string',
+					},
+				},
 			} );
 		} );
 	} );
@@ -261,7 +321,18 @@ describe( 'blocks', () => {
 			const blockType = { settingName: 'settingValue', save: noop, category: 'common', title: 'block title' };
 			registerBlockType( 'core/test-block-with-settings', blockType );
 			expect( getBlockTypes() ).toEqual( [
-				{ name: 'core/test-block', save: noop, category: 'common', title: 'block title', icon: 'block-default' },
+				{
+					name: 'core/test-block',
+					save: noop,
+					category: 'common',
+					title: 'block title',
+					icon: 'block-default',
+					attributes: {
+						className: {
+							type: 'string',
+						},
+					},
+				},
 				{
 					name: 'core/test-block-with-settings',
 					settingName: 'settingValue',
@@ -269,6 +340,11 @@ describe( 'blocks', () => {
 					category: 'common',
 					title: 'block title',
 					icon: 'block-default',
+					attributes: {
+						className: {
+							type: 'string',
+						},
+					},
 				},
 			] );
 		} );

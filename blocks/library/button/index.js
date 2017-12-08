@@ -3,14 +3,14 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { Dashicon, IconButton, PanelColor } from '@wordpress/components';
+import { Dashicon, IconButton, PanelColor, withFallbackStyles } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './editor.scss';
 import './style.scss';
-import { registerBlockType, source } from '../../api';
+import { registerBlockType } from '../../api';
 import Editable from '../../editable';
 import UrlInput from '../../url-input';
 import BlockControls from '../../block-controls';
@@ -21,32 +21,25 @@ import ContrastChecker from '../../contrast-checker';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
 
-const { attr, children } = source;
 const { getComputedStyle } = window;
+
+const ContrastCheckerWithFallbackStyles = withFallbackStyles( ( node, ownProps ) => {
+	const { textColor, backgroundColor } = ownProps;
+	//avoid the use of querySelector if textColor color is known and verify if node is available.
+	const textNode = ! textColor && node ? node.querySelector( '[contenteditable="true"]' ) : null;
+	return {
+		fallbackBackgroundColor: backgroundColor || ! node ? undefined : getComputedStyle( node ).backgroundColor,
+		fallbackTextColor: textColor || ! textNode ? undefined : getComputedStyle( textNode ).color,
+	};
+} )( ContrastChecker );
 
 class ButtonBlock extends Component {
 	constructor() {
 		super( ...arguments );
-
-		this.containers = {};
-		this.fallbackColors = {};
-
-		this.state = {
-			fallbackBackgroundColor: undefined,
-			fallbackTextColor: undefined,
-		};
-
+		this.nodeRef = null;
+		this.bindRef = this.bindRef.bind( this );
 		this.updateAlignment = this.updateAlignment.bind( this );
 		this.toggleClear = this.toggleClear.bind( this );
-		this.bindRef = this.bindRef.bind( this );
-	}
-
-	componentDidMount() {
-		this.grabColors();
-	}
-
-	componentDidUpdate() {
-		this.grabColors();
 	}
 
 	updateAlignment( nextAlign ) {
@@ -62,23 +55,7 @@ class ButtonBlock extends Component {
 		if ( ! node ) {
 			return;
 		}
-
-		this.containers.background = node;
-		this.containers.text = node.querySelector( '[contenteditable="true"]' );
-	}
-
-	grabColors() {
-		const { background, text } = this.containers;
-		const { textColor, color } = this.props.attributes;
-		const { fallbackTextColor, fallbackBackgroundColor } = this.state;
-
-		if ( ! color && ! fallbackBackgroundColor && background ) {
-			this.setState( { fallbackBackgroundColor: getComputedStyle( background ).backgroundColor } );
-		}
-
-		if ( ! textColor && ! fallbackTextColor && text ) {
-			this.setState( { fallbackTextColor: getComputedStyle( text ).color } );
-		}
+		this.nodeRef = node;
 	}
 
 	render() {
@@ -100,10 +77,6 @@ class ButtonBlock extends Component {
 			clear,
 		} = attributes;
 
-		const {
-			fallbackBackgroundColor,
-			fallbackTextColor,
-		} = this.state;
 		return [
 			focus && (
 				<BlockControls key="controls">
@@ -147,16 +120,18 @@ class ButtonBlock extends Component {
 								onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
 							/>
 						</PanelColor>
-						<ContrastChecker
-							textColor={ textColor || fallbackTextColor }
-							backgroundColor={ color || fallbackBackgroundColor }
+						{ this.nodeRef && <ContrastCheckerWithFallbackStyles
+							node={ this.nodeRef }
+							textColor={ textColor }
+							backgroundColor={ color }
 							isLargeText={ true }
-						/>
+						/> }
 					</InspectorControls>
 				}
 			</span>,
 			focus && (
 				<form
+					key="form-link"
 					className="blocks-button__inline-link"
 					onSubmit={ ( event ) => event.preventDefault() }>
 					<Dashicon icon="admin-links" />
@@ -181,15 +156,20 @@ registerBlockType( 'core/button', {
 	attributes: {
 		url: {
 			type: 'string',
-			source: attr( 'a', 'href' ),
+			source: 'attribute',
+			selector: 'a',
+			attribute: 'href',
 		},
 		title: {
 			type: 'string',
-			source: attr( 'a', 'title' ),
+			source: 'attribute',
+			selector: 'a',
+			attribute: 'title',
 		},
 		text: {
 			type: 'array',
-			source: children( 'a' ),
+			source: 'children',
+			selector: 'a',
 		},
 		align: {
 			type: 'string',
@@ -218,9 +198,7 @@ registerBlockType( 'core/button', {
 		return props;
 	},
 
-	edit( props ) {
-		return <ButtonBlock { ...props } />;
-	},
+	edit: ButtonBlock,
 
 	save( { attributes } ) {
 		const { url, text, title, align, color, textColor } = attributes;

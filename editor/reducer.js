@@ -3,6 +3,7 @@
  */
 import optimist from 'redux-optimist';
 import { combineReducers } from 'redux';
+import { createResponsiveStateReducer } from 'redux-responsive';
 import {
 	flow,
 	partialRight,
@@ -18,6 +19,7 @@ import {
 	without,
 	mapValues,
 	findIndex,
+	reject,
 } from 'lodash';
 
 /**
@@ -30,7 +32,15 @@ import { getBlockTypes, getBlockType } from '@wordpress/blocks';
  */
 import withHistory from './utils/with-history';
 import withChangeDetection from './utils/with-change-detection';
-import { STORE_DEFAULTS } from './store-defaults';
+import { PREFERENCES_DEFAULTS } from './store-defaults';
+import {
+	BREAK_HUGE,
+	BREAK_WIDE,
+	BREAK_LARGE,
+	BREAK_MEDIUM,
+	BREAK_SMALL,
+	BREAK_MOBILE,
+} from './constants';
 
 /***
  * Module constants
@@ -331,10 +341,17 @@ export function isTyping( state = false, action ) {
  * @param  {Object} action Dispatched action
  * @return {Object}        Updated state
  */
-export function blockSelection( state = { start: null, end: null, focus: null, isMultiSelecting: false }, action ) {
+export function blockSelection( state = {
+	start: null,
+	end: null,
+	focus: null,
+	isMultiSelecting: false,
+	isEnabled: true,
+}, action ) {
 	switch ( action.type ) {
 		case 'CLEAR_SELECTED_BLOCK':
 			return {
+				...state,
 				start: null,
 				end: null,
 				focus: null,
@@ -377,6 +394,7 @@ export function blockSelection( state = { start: null, end: null, focus: null, i
 			};
 		case 'INSERT_BLOCKS':
 			return {
+				...state,
 				start: action.blocks[ 0 ].uid,
 				end: action.blocks[ 0 ].uid,
 				focus: {},
@@ -387,10 +405,16 @@ export function blockSelection( state = { start: null, end: null, focus: null, i
 				return state;
 			}
 			return {
+				...state,
 				start: action.blocks[ 0 ].uid,
 				end: action.blocks[ 0 ].uid,
 				focus: {},
 				isMultiSelecting: false,
+			};
+		case 'TOGGLE_SELECTION':
+			return {
+				...state,
+				isEnabled: action.isSelectionEnabled,
 			};
 	}
 
@@ -471,12 +495,13 @@ export function blockInsertionPoint( state = {}, action ) {
  * @param  {Object}  action                Dispatched action
  * @return {string}                        Updated state
  */
-export function preferences( state = STORE_DEFAULTS.preferences, action ) {
+export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 	switch ( action.type ) {
 		case 'TOGGLE_SIDEBAR':
+			const isSidebarOpenedKey = action.isMobile ? 'isSidebarOpenedMobile' : 'isSidebarOpened';
 			return {
 				...state,
-				isSidebarOpened: ! state.isSidebarOpened,
+				[ isSidebarOpenedKey ]: ! state[ isSidebarOpenedKey ],
 			};
 		case 'TOGGLE_SIDEBAR_PANEL':
 			return {
@@ -582,7 +607,10 @@ export function saving( state = {}, action ) {
 export function notices( state = [], action ) {
 	switch ( action.type ) {
 		case 'CREATE_NOTICE':
-			return [ ...state, action.notice ];
+			return [
+				...reject( state, { id: action.notice.id } ),
+				action.notice,
+			];
 
 		case 'REMOVE_NOTICE':
 			const { noticeId } = action;
@@ -667,6 +695,16 @@ export function metaBoxes( state = defaultMetaBoxState, action ) {
 	}
 }
 
+// Create responsive reducer with the breakpoints imported from the scss variables file.
+const responsive = createResponsiveStateReducer( {
+	mobile: BREAK_MOBILE,
+	small: BREAK_SMALL,
+	medium: BREAK_MEDIUM,
+	large: BREAK_LARGE,
+	wide: BREAK_WIDE,
+	huge: BREAK_HUGE,
+} );
+
 export const reusableBlocks = combineReducers( {
 	data( state = {}, action ) {
 		switch ( action.type ) {
@@ -730,5 +768,6 @@ export default optimist( combineReducers( {
 	saving,
 	notices,
 	metaBoxes,
+	responsive,
 	reusableBlocks,
 } ) );

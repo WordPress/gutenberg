@@ -6,14 +6,10 @@
 import { get, isFunction, some } from 'lodash';
 
 /**
- * WordPress dependencies
- */
-import { getCategories } from './categories';
-
-/**
  * Internal dependencies
  */
 import { applyFilters } from '../hooks';
+import { getCategories } from './categories';
 
 /**
  * Block settings keyed by block name.
@@ -55,15 +51,9 @@ export function registerBlockType( name, settings ) {
 		);
 		return;
 	}
-	if ( /[A-Z]+/.test( name ) ) {
+	if ( ! /^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/.test( name ) ) {
 		console.error(
-			'Block names must not contain uppercase characters.'
-		);
-		return;
-	}
-	if ( ! /^[a-z0-9-]+\/[a-z0-9-]+$/.test( name ) ) {
-		console.error(
-			'Block names must contain a namespace prefix. Example: my-plugin/my-custom-block'
+			'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block'
 		);
 		return;
 	}
@@ -118,9 +108,10 @@ export function registerBlockType( name, settings ) {
 	if ( ! settings.icon ) {
 		settings.icon = 'block-default';
 	}
+
 	settings = {
 		name,
-		attributes: get( window._wpBlocksAttributes, name ),
+		attributes: get( window._wpBlocksAttributes, name, {} ),
 		...settings,
 	};
 

@@ -238,6 +238,8 @@ describe( 'Popover', () => {
 			expect( instance.nodes.popover.style ).toEqual( {
 				left: '225px',
 				top: '210px',
+				right: 'auto',
+				bottom: 'auto',
 			} );
 		} );
 
@@ -250,6 +252,8 @@ describe( 'Popover', () => {
 			expect( instance.nodes.popover.style ).toEqual( {
 				left: '225px',
 				top: '395px',
+				right: 'auto',
+				bottom: 'auto',
 			} );
 		} );
 	} );

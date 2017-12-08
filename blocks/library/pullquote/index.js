@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { map } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -8,14 +13,17 @@ import { __ } from '@wordpress/i18n';
  */
 import './editor.scss';
 import './style.scss';
-import { registerBlockType, source } from '../../api';
+import { registerBlockType } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
 
-const { children, query, node } = source;
+const toEditableValue = value => map( value, ( subValue => subValue.children ) );
+const fromEditableValue = value => map( value, ( subValue ) => ( {
+	children: subValue,
+} ) );
 
 registerBlockType( 'core/pullquote', {
 
@@ -28,11 +36,18 @@ registerBlockType( 'core/pullquote', {
 	attributes: {
 		value: {
 			type: 'array',
-			source: query( 'blockquote > p', node() ),
+			source: 'query',
+			selector: 'blockquote > p',
+			query: {
+				children: {
+					source: 'node',
+				},
+			},
 		},
 		citation: {
 			type: 'array',
-			source: children( 'footer' ),
+			source: 'children',
+			selector: 'footer',
 		},
 		align: {
 			type: 'string',
@@ -70,10 +85,10 @@ registerBlockType( 'core/pullquote', {
 			<blockquote key="quote" className={ className }>
 				<Editable
 					multiline="p"
-					value={ value }
+					value={ toEditableValue( value ) }
 					onChange={
 						( nextValue ) => setAttributes( {
-							value: nextValue,
+							value: fromEditableValue( nextValue ),
 						} )
 					}
 					placeholder={ __( 'Write quote…' ) }
@@ -104,7 +119,9 @@ registerBlockType( 'core/pullquote', {
 
 		return (
 			<blockquote className={ `align${ align }` }>
-				{ value && value.map( ( paragraph, i ) => <p key={ i }>{ paragraph.props.children }</p> ) }
+				{ value && value.map( ( paragraph, i ) =>
+					<p key={ i }>{ paragraph.children && paragraph.children.props.children }</p>
+				) }
 				{ citation && citation.length > 0 && (
 					<footer>{ citation }</footer>
 				) }

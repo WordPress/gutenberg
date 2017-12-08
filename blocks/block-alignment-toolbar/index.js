@@ -2,12 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Toolbar } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
-import withEditorSettings from '../with-editor-settings';
+import { Toolbar, withContext } from '@wordpress/components';
 
 const BLOCK_ALIGNMENTS_CONTROLS = {
 	left: {
@@ -59,7 +54,7 @@ function BlockAlignmentToolbar( { value, onChange, controls = DEFAULT_CONTROLS, 
 	);
 }
 
-export default withEditorSettings(
+export default withContext( 'editor' )(
 	( settings ) => ( {
 		wideControlsEnabled: settings.wideImages,
 	} )

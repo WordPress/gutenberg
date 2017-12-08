@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { pick, without, noop } from 'lodash';
+import { pick, sortBy, forEach, without, noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -61,6 +61,7 @@ class SlotFillProvider extends Component {
 			this.fills[ name ],
 			instance
 		);
+		this.resetFillOccurrence( name );
 		this.forceUpdateSlot( name );
 	}
 
@@ -69,15 +70,19 @@ class SlotFillProvider extends Component {
 	}
 
 	getFills( name ) {
-		return this.fills[ name ];
+		return sortBy( this.fills[ name ], 'occurrence' );
+	}
+
+	resetFillOccurrence( name ) {
+		forEach( this.fills[ name ], ( instance ) => {
+			instance.resetOccurrence();
+		} );
 	}
 
 	forceUpdateFills( name ) {
-		if ( this.fills.hasOwnProperty( name ) ) {
-			this.fills[ name ].forEach( ( instance ) => {
-				instance.forceUpdate();
-			} );
-		}
+		forEach( this.fills[ name ], ( instance ) => {
+			instance.forceUpdate();
+		} );
 	}
 
 	forceUpdateSlot( name ) {

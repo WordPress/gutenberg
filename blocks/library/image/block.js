@@ -24,12 +24,12 @@ import {
 	DropZone,
 	FormFileUpload,
 	withAPIData,
+	withContext,
 } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import withEditorSettings from '../../with-editor-settings';
 import Editable from '../../editable';
 import MediaUploadButton from '../../media-upload-button';
 import InspectorControls from '../../inspector-controls';
@@ -40,6 +40,11 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import BlockDescription from '../../block-description';
 import UrlInputButton from '../../url-input/button';
 import ImageSize from './image-size';
+
+/**
+ * Module constants
+ */
+const MIN_SIZE = 20;
 
 class ImageBlock extends Component {
 	constructor() {
@@ -77,7 +82,11 @@ class ImageBlock extends Component {
 	}
 
 	onSelectImage( media ) {
-		this.props.setAttributes( { url: media.url, alt: media.alt, caption: media.caption, id: media.id } );
+		const attributes = { url: media.url, alt: media.alt, id: media.id };
+		if ( media.caption ) {
+			attributes.caption = [ media.caption ];
+		}
+		this.props.setAttributes( attributes );
 	}
 
 	onSetHref( value ) {
@@ -104,7 +113,7 @@ class ImageBlock extends Component {
 	}
 
 	render() {
-		const { attributes, setAttributes, focus, setFocus, className, settings } = this.props;
+		const { attributes, setAttributes, focus, setFocus, className, settings, toggleSelection } = this.props;
 		const { url, alt, caption, align, id, href, width, height } = attributes;
 
 		const availableSizes = this.getAvailableSizes();
@@ -113,6 +122,12 @@ class ImageBlock extends Component {
 		const uploadButtonProps = { isLarge: true };
 		const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setAttributes );
 		const dropFiles = ( files ) => mediaUpload( files, setAttributes );
+
+		const blockDescription = (
+			<BlockDescription>
+				<p>{ __( 'Worth a thousand words.' ) }</p>
+			</BlockDescription>
+		);
 
 		const controls = (
 			focus && (
@@ -143,6 +158,11 @@ class ImageBlock extends Component {
 		if ( ! url ) {
 			return [
 				controls,
+				focus && (
+					<InspectorControls key="inspector">
+						{ blockDescription }
+					</InspectorControls>
+				),
 				<Placeholder
 					key="placeholder"
 					instructions={ __( 'Drag image here or insert from media library' ) }
@@ -185,11 +205,9 @@ class ImageBlock extends Component {
 			controls,
 			focus && (
 				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'Worth a thousand words.' ) }</p>
-					</BlockDescription>
+					{ blockDescription }
 					<h3>{ __( 'Image Settings' ) }</h3>
-					<TextControl label={ __( 'Alternate Text' ) } value={ alt } onChange={ this.updateAlt } />
+					<TextControl label={ __( 'Textual Alternative' ) } value={ alt } onChange={ this.updateAlt } help={ __( 'Describe the purpose of the image. Leave empty if the image is not a key part of the content.' ) } />
 					{ ! isEmpty( availableSizes ) && (
 						<SelectControl
 							label={ __( 'Size' ) }
@@ -226,8 +244,8 @@ class ImageBlock extends Component {
 						const currentHeight = height || imageHeightWithinContainer;
 
 						const ratio = imageWidth / imageHeight;
-						const minWidth = imageWidth < imageHeight ? 10 : 10 * ratio;
-						const minHeight = imageHeight < imageWidth ? 10 : 10 / ratio;
+						const minWidth = imageWidth < imageHeight ? MIN_SIZE : MIN_SIZE * ratio;
+						const minHeight = imageHeight < imageWidth ? MIN_SIZE : MIN_SIZE / ratio;
 
 						return (
 							<ResizableBox
@@ -247,11 +265,15 @@ class ImageBlock extends Component {
 									bottomLeft: 'wp-block-image__resize-handler-bottom-left',
 								} }
 								enable={ { top: false, right: true, bottom: false, left: false, topRight: true, bottomRight: true, bottomLeft: true, topLeft: true } }
+								onResizeStart={ () => {
+									toggleSelection( false );
+								} }
 								onResizeStop={ ( event, direction, elt, delta ) => {
 									setAttributes( {
 										width: parseInt( currentWidth + delta.width, 10 ),
 										height: parseInt( currentHeight + delta.height, 10 ),
 									} );
+									toggleSelection( true );
 								} }
 							>
 								{ img }
@@ -277,7 +299,9 @@ class ImageBlock extends Component {
 }
 
 export default flowRight( [
-	withEditorSettings(),
+	withContext( 'editor' )( ( settings ) => {
+		return { settings };
+	} ),
 	withAPIData( ( props ) => {
 		const { id } = props.attributes;
 		if ( ! id ) {

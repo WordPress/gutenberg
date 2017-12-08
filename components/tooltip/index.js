@@ -128,7 +128,7 @@ class Tooltip extends Component {
 			// mouse events. Don't bother trying to to handle them.
 			//
 			// See: https://github.com/facebook/react/issues/4251
-			if ( event.target.disabled ) {
+			if ( event.currentTarget.disabled ) {
 				return;
 			}
 

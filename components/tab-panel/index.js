@@ -64,12 +64,12 @@ class TabPanel extends Component {
 		const selectedId = instanceId + '-' + selectedTab.name;
 
 		return (
-			<div>
+			<div className={ className }>
 				<NavigableMenu
 					role="tablist"
 					orientation={ orientation }
 					onNavigate={ this.onNavigate }
-					className={ className }
+					className="components-tab-panel__tabs"
 				>
 					{ tabs.map( ( tab ) => (
 						<TabButton className={ `${ tab.className } ${ tab.name === selected ? activeClass : '' }` }
@@ -87,6 +87,7 @@ class TabPanel extends Component {
 					<div aria-labelledby={ selectedId }
 						role="tabpanel"
 						id={ selectedId + '-view' }
+						className="components-tab-panel__tab-content"
 					>
 						{ this.props.children( selectedTab.name ) }
 					</div>

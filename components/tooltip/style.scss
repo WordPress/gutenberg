@@ -15,10 +15,13 @@
 }
 
 .components-tooltip .components-popover__content {
-	min-width: 0;
 	padding: 4px 12px;
 	background: $dark-gray-400;
 	border-width: 0;
 	color: white;
 	white-space: nowrap;
+}
+
+.components-tooltip:not(.is-mobile) .components-popover__content {
+	min-width: 0;
 }

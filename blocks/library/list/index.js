@@ -1,25 +1,23 @@
 /**
  * External dependencies
  */
-import { find, compact, get } from 'lodash';
+import { find, compact, get, initial, last } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Component, createElement, Children, concatChildren } from '@wordpress/element';
+import { Component, createElement, Children } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import './editor.scss';
-import { registerBlockType, source, createBlock } from '../../api';
+import { registerBlockType, createBlock } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
-
-const { children, prop } = source;
 
 const fromBrDelimitedContent = ( content ) => {
 	if ( undefined === content ) {
@@ -84,17 +82,22 @@ registerBlockType( 'core/list', {
 	attributes: {
 		nodeName: {
 			type: 'string',
-			source: prop( 'ol,ul', 'nodeName' ),
+			source: 'property',
+			selector: 'ol,ul',
+			property: 'nodeName',
 			default: 'UL',
 		},
 		values: {
 			type: 'array',
-			source: children( 'ol,ul' ),
+			source: 'children',
+			selector: 'ol,ul',
 			default: [],
 		},
 	},
 
-	className: false,
+	supports: {
+		className: false,
+	},
 
 	transforms: {
 		from: [
@@ -113,13 +116,10 @@ registerBlockType( 'core/list', {
 				type: 'block',
 				blocks: [ 'core/quote' ],
 				transform: ( { value, citation } ) => {
-					const listItems = fromBrDelimitedContent( value );
-					const values = citation ?
-						concatChildren( listItems, <li>{ citation }</li> ) :
-						listItems;
 					return createBlock( 'core/list', {
 						nodeName: 'UL',
-						values,
+						values: value.map( ( item, index ) => <li key={ index } >{ get( item, 'children.props.children', '' ) } </li> )
+							.concat( citation ? <li key="citation">{ citation }</li> : [] ),
 					} );
 				},
 			},
@@ -161,7 +161,9 @@ registerBlockType( 'core/list', {
 				blocks: [ 'core/quote' ],
 				transform: ( { values } ) => {
 					return createBlock( 'core/quote', {
-						value: [ <p key="list">{ toBrDelimitedContent( values ) }</p> ],
+						value: ( values.length === 1 ? values : initial( values ) )
+							.map( ( value ) => ( { children: <p> { get( value, 'props.children' ) } </p> } ) ),
+						citation: ( values.length === 1 ? undefined : get( last( values ), 'props.children' ) ),
 					} );
 				},
 			},

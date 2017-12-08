@@ -3,7 +3,7 @@
  * Plugin Name: Gutenberg
  * Plugin URI: https://github.com/WordPress/gutenberg
  * Description: Printing since 1440. This is the development plugin for the new block editor in core. <strong>Meant for development, do not run on real sites.</strong>
- * Version: 1.7.0
+ * Version: 1.8.1
  * Author: Gutenberg Team
  *
  * @package gutenberg
@@ -495,7 +495,7 @@ function gutenberg_replace_default_add_new_button() {
 			}
 
 			var url = button.href;
-			var newUrl = url.replace( /&?classic-editor/, '' );
+			var newUrl = url.replace( /[&\?]?classic-editor/, '' );
 
 			var newbutton = '<span id="split-page-title-action" class="split-page-title-action">';
 			newbutton += '<a href="' + newUrl + '">' + button.innerText + '</a>';

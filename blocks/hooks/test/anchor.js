@@ -4,9 +4,9 @@
 import { noop } from 'lodash';
 
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import createHooks from '@wordpress/hooks';
+import { createHooks } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -58,7 +58,7 @@ describe( 'anchor', () => {
 
 		it( 'should do nothing if the block settings do not define anchor support', () => {
 			const attributes = { anchor: 'foo' };
-			const extraProps = addSaveProps( blockSettings, attributes );
+			const extraProps = addSaveProps( {}, blockSettings, attributes );
 
 			expect( extraProps ).not.toHaveProperty( 'id' );
 		} );

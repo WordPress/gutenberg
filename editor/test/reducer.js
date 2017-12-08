@@ -742,7 +742,13 @@ describe( 'state', () => {
 				uid: 'kumquat',
 			} );
 
-			expect( state ).toEqual( { start: 'kumquat', end: 'kumquat', focus: {}, isMultiSelecting: false } );
+			expect( state ).toEqual( {
+				start: 'kumquat',
+				end: 'kumquat',
+				focus: {},
+				isMultiSelecting: false,
+				isEnabled: true,
+			} );
 		} );
 
 		it( 'should set multi selection', () => {
@@ -842,7 +848,13 @@ describe( 'state', () => {
 				config: { editable: 'citation' },
 			} );
 
-			expect( state ).toEqual( { start: 'chicken', end: 'chicken', focus: { editable: 'citation' }, isMultiSelecting: false } );
+			expect( state ).toEqual( {
+				start: 'chicken',
+				end: 'chicken',
+				focus: { editable: 'citation' },
+				isMultiSelecting: false,
+				isEnabled: true,
+			} );
 		} );
 
 		it( 'should update the focus and merge the existing state', () => {
@@ -894,8 +906,9 @@ describe( 'state', () => {
 				recentlyUsedBlocks: [],
 				mode: 'visual',
 				isSidebarOpened: true,
+				isSidebarOpenedMobile: false,
 				panels: { 'post-status': true },
-				features: { fixedToolbar: true },
+				features: { fixedToolbar: false },
 			} );
 		} );
 
@@ -905,6 +918,15 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( { isSidebarOpened: true } );
+		} );
+
+		it( 'should toggle the mobile sidebar open flag', () => {
+			const state = preferences( deepFreeze( { isSidebarOpenedMobile: false } ), {
+				type: 'TOGGLE_SIDEBAR',
+				isMobile: true,
+			} );
+
+			expect( state ).toEqual( { isSidebarOpenedMobile: true } );
 		} );
 
 		it( 'should set the sidebar panel open flag to true if unset', () => {
@@ -1103,6 +1125,41 @@ describe( 'state', () => {
 			} );
 			expect( state ).toEqual( [
 				originalState[ 1 ],
+			] );
+		} );
+
+		it( 'should dedupe distinct ids', () => {
+			const originalState = [
+				{
+					id: 'a',
+					content: 'Post saved',
+					status: 'success',
+				},
+				{
+					id: 'b',
+					content: 'Error saving',
+					status: 'error',
+				},
+			];
+			const state = notices( deepFreeze( originalState ), {
+				type: 'CREATE_NOTICE',
+				notice: {
+					id: 'a',
+					content: 'Post updated',
+					status: 'success',
+				},
+			} );
+			expect( state ).toEqual( [
+				{
+					id: 'b',
+					content: 'Error saving',
+					status: 'error',
+				},
+				{
+					id: 'a',
+					content: 'Post updated',
+					status: 'success',
+				},
 			] );
 		} );
 	} );

@@ -11,6 +11,7 @@ import {
 	keys,
 	without,
 	compact,
+	find,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -20,6 +21,11 @@ import createSelector from 'rememo';
 import { serialize, getBlockType } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
+
+/**
+ * Internal dependencies
+ */
+import { POST_UPDATE_TRANSACTION_ID } from './effects';
 
 /***
  * Module constants
@@ -125,7 +131,9 @@ export function getPreference( state, preferenceKey, defaultValue ) {
  * @return {Boolean}       Whether sidebar is open
  */
 export function isEditorSidebarOpened( state ) {
-	return getPreference( state, 'isSidebarOpened' );
+	return isMobile( state ) ?
+		getPreference( state, 'isSidebarOpenedMobile' ) :
+		getPreference( state, 'isSidebarOpened' );
 }
 
 /**
@@ -192,6 +200,16 @@ export function isEditedPostDirty( state ) {
  */
 export function isCleanNewPost( state ) {
 	return ! isEditedPostDirty( state ) && isEditedPostNew( state );
+}
+
+/**
+ * Returns true if the current window size corresponds to mobile resolutions (<= medium breakpoint)
+ *
+ * @param  {Object}  state Global application state
+ * @return {Boolean}       Whether current window size corresponds to mobile resolutions
+ */
+export function isMobile( state ) {
+	return ! state.responsive.greaterThan.medium;
 }
 
 /**
@@ -433,7 +451,7 @@ export const getBlock = createSelector(
 		}
 
 		const metaAttributes = reduce( type.attributes, ( result, value, key ) => {
-			if ( value && 'meta' in value ) {
+			if ( value.source === 'meta' ) {
 				result[ key ] = getPostMeta( state, value.meta );
 			}
 
@@ -460,8 +478,8 @@ export const getBlock = createSelector(
 );
 
 function getPostMeta( state, key ) {
-	return has( state, [ 'editor', 'edits', 'present', 'meta', key ] ) ?
-		get( state, [ 'editor', 'edits', 'present', 'meta', key ] ) :
+	return has( state, [ 'editor', 'present', 'edits', 'meta', key ] ) ?
+		get( state, [ 'editor', 'present', 'edits', 'meta', key ] ) :
 		get( state, [ 'currentPost', 'meta', key ] );
 }
 
@@ -809,6 +827,16 @@ export function isMultiSelecting( state ) {
 }
 
 /**
+ * Whether is selection disable or not.
+ *
+ * @param  {Object} state Global application state
+ * @return {Boolean}      True if multi is disable, false if not.
+ */
+export function isSelectionEnabled( state ) {
+	return state.blockSelection.isEnabled;
+}
+
+/**
  * Returns thee block's editing mode
  *
  * @param  {Object} state Global application state
@@ -1071,4 +1099,50 @@ export function isSavingReusableBlock( state, ref ) {
  */
 export function getReusableBlocks( state ) {
 	return Object.values( state.reusableBlocks.data );
+}
+
+/**
+ * Returns state object prior to a specified optimist transaction ID, or `null`
+ * if the transaction corresponding to the given ID cannot be found.
+ *
+ * @param  {Object} state         Current global application state
+ * @param  {Object} transactionId Optimist transaction ID
+ * @return {Object}               Global application state prior to transaction
+ */
+export function getStateBeforeOptimisticTransaction( state, transactionId ) {
+	const transaction = find( state.optimist, ( entry ) => (
+		entry.beforeState &&
+		get( entry.action, [ 'optimist', 'id' ] ) === transactionId
+	) );
+
+	return transaction ? transaction.beforeState : null;
+}
+
+/**
+ * Returns true if the post is being published, or false otherwise
+ *
+ * @param  {Object}  state Global application state
+ * @return {Boolean}       Whether post is being published
+ */
+export function isPublishingPost( state ) {
+	if ( ! isSavingPost( state ) ) {
+		return false;
+	}
+
+	// Saving is optimistic, so assume that current post would be marked as
+	// published if publishing
+	if ( ! isCurrentPostPublished( state ) ) {
+		return false;
+	}
+
+	// Use post update transaction ID to retrieve the state prior to the
+	// optimistic transaction
+	const stateBeforeRequest = getStateBeforeOptimisticTransaction(
+		state,
+		POST_UPDATE_TRANSACTION_ID
+	);
+
+	// Consider as publishing when current post prior to request was not
+	// considered published
+	return !! stateBeforeRequest && ! isCurrentPostPublished( stateBeforeRequest );
 }

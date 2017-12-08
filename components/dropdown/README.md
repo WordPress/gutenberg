@@ -75,3 +75,11 @@ A callback invoked to render the content of the dropdown menu. Its first argumen
 
 - Type: `Function`
 - Required: Yes
+
+## expandOnMobile
+
+Opt-in prop to show popovers fullscreen on mobile, pass `false` in this prop to avoid this behavior.
+
+ - Type: `Boolean`
+ - Required: No
+ - Default: `false`

@@ -17,7 +17,10 @@ describe( 'persistStore', () => {
 				preferences: { ribs: true },
 			};
 		};
-		const store = createStore( reducer, persistStore( 'preferences', storageKey, {} ) );
+		const store = createStore( reducer, persistStore( {
+			reducerKey: 'preferences',
+			storageKey,
+		} ) );
 		expect( store.getState().preferences ).toEqual( { chicken: true } );
 	} );
 
@@ -34,16 +37,17 @@ describe( 'persistStore', () => {
 				preferences: { ribs: true },
 			};
 		};
-		const store = createStore( reducer, persistStore( 'preferences', storageKey, {} ) );
+		const store = createStore( reducer, persistStore( {
+			reducerKey: 'preferences',
+			storageKey,
+		} ) );
 		store.dispatch( { type: 'UPDATE' } );
 		expect( JSON.parse( window.localStorage.getItem( storageKey ) ) ).toEqual( { chicken: true } );
 	} );
 
 	it( 'should apply defaults to any missing properties on previously stored objects', () => {
-		const defaults = {
-			preferences: {
-				counter: 41,
-			},
+		const defaultsPreferences = {
+			counter: 41,
 		};
 		const storageKey = 'dumbStorageKey3';
 		const reducer = ( state, action ) => {
@@ -60,7 +64,11 @@ describe( 'persistStore', () => {
 		// store preferences without the `counter` default
 		window.localStorage.setItem( storageKey, JSON.stringify( {} ) );
 
-		const store = createStore( reducer, persistStore( 'preferences', storageKey, defaults ) );
+		const store = createStore( reducer, persistStore( {
+			reducerKey: 'preferences',
+			storageKey,
+			defaults: defaultsPreferences,
+		} ) );
 		store.dispatch( { type: 'INCREMENT' } );
 
 		// the default should have been applied, as the `counter` was missing from the
@@ -69,10 +77,8 @@ describe( 'persistStore', () => {
 	} );
 
 	it( 'should not override stored values with defaults', () => {
-		const defaults = {
-			preferences: {
-				counter: 41,
-			},
+		const defaultsPreferences = {
+			counter: 41,
 		};
 		const storageKey = 'dumbStorageKey4';
 		const reducer = ( state, action ) => {
@@ -88,7 +94,11 @@ describe( 'persistStore', () => {
 
 		window.localStorage.setItem( storageKey, JSON.stringify( { counter: 1 } ) );
 
-		const store = createStore( reducer, persistStore( 'preferences', storageKey, defaults ) );
+		const store = createStore( reducer, persistStore( {
+			reducerKey: 'preferences',
+			storageKey,
+			defaults: defaultsPreferences,
+		} ) );
 		store.dispatch( { type: 'INCREMENT' } );
 
 		expect( JSON.parse( window.localStorage.getItem( storageKey ) ) ).toEqual( { counter: 2 } );

@@ -1,0 +1,51 @@
+.editor-layout,
+.editor-layout__content {
+	height: 100%;
+}
+
+.editor-layout {
+	padding-top: $header-height;
+	position: relative;
+
+	.components-notice-list {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+
+		.notice {
+			margin: 0 0 5px;
+			padding: 6px 12px;
+			min-height: $panel-header-height;
+
+			.notice-dismiss {
+				margin: 5px;
+			}
+		}
+	}
+
+	&.has-fixed-toolbar {
+		padding-top: $header-height + $block-toolbar-height; 
+
+		@include break-large {
+			padding-top: $header-height;
+		}
+	}
+}
+
+.editor-layout__metaboxes:not(:empty) {
+	border-top: 1px solid $light-gray-500;
+	margin-top: 10px;
+	padding: 10px 0;
+
+	.editor-meta-boxes-area {
+		max-width: $visual-editor-max-width;
+		margin: auto;
+	}
+}
+
+.editor-layout__content {
+	position: relative;
+	overflow-y: auto;
+	-webkit-overflow-scrolling: touch;
+}
