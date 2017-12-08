@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import './hooks';
 import './library';
 
 // A "block" is the abstract term used to describe units of markup that,
@@ -13,7 +14,6 @@ import './library';
 // Blocks are inferred from the HTML source of a post through a parsing mechanism
 // and then stored as objects in state, from which it is then rendered for editing.
 export * from './api';
-export * from './hooks';
 export { default as AlignmentToolbar } from './alignment-toolbar';
 export { default as BlockAlignmentToolbar } from './block-alignment-toolbar';
 export { default as BlockControls } from './block-controls';
