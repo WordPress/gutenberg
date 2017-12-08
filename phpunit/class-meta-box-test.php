@@ -247,6 +247,6 @@ class Meta_Box_Test extends WP_UnitTestCase {
 
 		gutenberg_intercept_meta_box_render();
 
-		$this->assertFalse( $wp_meta_boxes[ 'post' ][ 'side' ][ 'default' ][ 'test-intercept-box' ] );
+		$this->assertFalse( $wp_meta_boxes['post']['side']['default']['test-intercept-box'] );
 	}
 }
