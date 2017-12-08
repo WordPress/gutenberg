@@ -124,18 +124,23 @@ export class NavigableMenu extends Component {
 		const eventToOffset = ( evt ) => {
 			const { keyCode } = evt;
 
-			const isVertical = orientation === 'vertical';
-			const isHorizontal = orientation === 'horizontal';
+			let next = [ RIGHT, DOWN ];
+			let previous = [ LEFT, UP ];
 
-			// Still handle any arrow keys, even if the opposite orientation
-			if ( LEFT === keyCode ) {
-				return isHorizontal ? -1 : 0;
-			} else if ( UP === keyCode ) {
-				return isVertical ? -1 : 0;
-			} else if ( RIGHT === keyCode ) {
-				return isHorizontal ? +1 : 0;
-			} else if ( DOWN === keyCode ) {
-				return isVertical ? +1 : 0;
+			if ( orientation === 'vertical' ) {
+				next = [ DOWN ];
+				previous = [ UP ];
+			}
+
+			if ( orientation === 'horizontal' ) {
+				next = [ RIGHT ];
+				previous = [ LEFT ];
+			}
+
+			if ( next.includes( keyCode ) ) {
+				return 1;
+			} else if ( previous.includes( keyCode ) ) {
+				return -1;
 			}
 		};
 
