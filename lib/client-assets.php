@@ -177,6 +177,13 @@ function gutenberg_register_scripts_and_styles() {
 		filemtime( gutenberg_dir_path() . 'blocks/build/edit-blocks.css' )
 	);
 	wp_style_add_data( 'wp-edit-blocks', 'rtl', 'replace' );
+
+	if ( WP_DEBUG ) {
+		wp_enqueue_script(
+			'gutenberg-live-reload',
+			'http://localhost:35729/livereload.js'
+		);
+	}
 }
 add_action( 'wp_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 );
 add_action( 'admin_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 );

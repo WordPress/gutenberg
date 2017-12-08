@@ -4,6 +4,7 @@
 const webpack = require( 'webpack' );
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
+const LiveReloadPlugin = require( 'webpack-livereload-plugin' );
 
 // Main CSS loader for everything but blocks..
 const mainCSSExtractTextPlugin = new ExtractTextPlugin( {
@@ -158,6 +159,7 @@ switch ( process.env.NODE_ENV ) {
 
 	default:
 		config.devtool = 'source-map';
+		config.plugins.push( new LiveReloadPlugin() );
 }
 
 module.exports = config;

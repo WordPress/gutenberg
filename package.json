@@ -93,6 +93,7 @@
     "style-loader": "0.18.2",
     "tinymce": "4.7.2",
     "webpack": "3.8.1",
+    "webpack-livereload-plugin": "1.0.0",
     "webpack-rtl-plugin": "github:yoavf/webpack-rtl-plugin#develop"
   },
   "jest": {
