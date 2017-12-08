@@ -56,14 +56,6 @@ The class to give to the outer container for the TabPanel
 - Required: No
 - Default: ''
 
-### orientation
-
-The orientation of the tablist (`vertical` or `horizontal`)
-
-- Type: `String`
-- Required: No
-- Default: `horizontal`
-
 ### onSelect
 
 The function called when a tab has been selected. It is passed the `tabName` as an argument.

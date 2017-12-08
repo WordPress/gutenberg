@@ -9,7 +9,7 @@ function MenuItemsGroup( { label, value, choices = [], onSelect, children } ) {
 	return (
 		<div className="components-choice-menu">
 			<div className="components-choice-menu__label">{ label }</div>
-			<NavigableMenu orientation="vertical">
+			<NavigableMenu>
 				{ choices.map( ( item ) => {
 					const isSelected = value === item.value;
 					return (

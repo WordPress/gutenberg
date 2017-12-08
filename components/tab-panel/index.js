@@ -56,7 +56,6 @@ class TabPanel extends Component {
 			activeClass = 'is-active',
 			className,
 			instanceId,
-			orientation = 'horizontal',
 			tabs,
 		} = this.props;
 
@@ -67,7 +66,6 @@ class TabPanel extends Component {
 			<div className={ className }>
 				<NavigableMenu
 					role="tablist"
-					orientation={ orientation }
 					onNavigate={ this.onNavigate }
 					className="components-tab-panel__tabs"
 				>

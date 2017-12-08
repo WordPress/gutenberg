@@ -120,7 +120,7 @@ class NavigableContainer extends Component {
 
 export class NavigableMenu extends Component {
 	render() {
-		const { role = 'menu', orientation = 'vertical', ...rest } = this.props;
+		const { role = 'menu', ...rest } = this.props;
 		const eventToOffset = ( evt ) => {
 			const { keyCode } = evt;
 
@@ -136,7 +136,6 @@ export class NavigableMenu extends Component {
 				stopNavigationEvents
 				onlyBrowserTabstops={ false }
 				role={ role }
-				aria-orientation={ orientation }
 				eventToOffset={ eventToOffset }
 				{ ...rest }
 			/>
