@@ -77,7 +77,7 @@ export default class InserterGroup extends Component {
 		return (
 			<NavigableMenu
 				className="editor-inserter__category-blocks"
-				orientation="vertical"
+				orientation="vertical_two_columns"
 				aria-labelledby={ labelledBy }
 				cycle={ false }
 				onNavigate={ this.onNavigate }>
