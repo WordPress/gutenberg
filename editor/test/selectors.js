@@ -84,6 +84,10 @@ import {
 } from '../selectors';
 import { POST_UPDATE_TRANSACTION_ID } from '../effects';
 
+jest.mock( '../constants', () => ( {
+	BREAK_MEDIUM: 500,
+} ) );
+
 describe( 'selectors', () => {
 	beforeAll( () => {
 		registerBlockType( 'core/test-block', {
@@ -324,10 +328,8 @@ describe( 'selectors', () => {
 	describe( 'isEditorSidebarOpened', () => {
 		it( 'should return true when is not mobile and the normal sidebar is opened', () => {
 			const state = {
-				responsive: {
-					greaterThan: {
-						medium: true,
-					},
+				browser: {
+					width: 1000,
 				},
 				preferences: {
 					isSidebarOpened: true,
@@ -340,10 +342,8 @@ describe( 'selectors', () => {
 
 		it( 'should return false when is not mobile and the normal sidebar is closed', () => {
 			const state = {
-				responsive: {
-					greaterThan: {
-						medium: true,
-					},
+				browser: {
+					width: 1000,
 				},
 				preferences: {
 					isSidebarOpened: false,
@@ -355,10 +355,8 @@ describe( 'selectors', () => {
 
 		it( 'should return true when is mobile and the mobile sidebar is opened', () => {
 			const state = {
-				responsive: {
-					greaterThan: {
-						medium: false,
-					},
+				browser: {
+					width: 100,
 				},
 				preferences: {
 					isSidebarOpened: false,
@@ -371,10 +369,8 @@ describe( 'selectors', () => {
 
 		it( 'should return false when is mobile and the mobile sidebar is closed', () => {
 			const state = {
-				responsive: {
-					greaterThan: {
-						medium: false,
-					},
+				browser: {
+					width: 100,
 				},
 				preferences: {
 					isSidebarOpened: true,
@@ -605,10 +601,8 @@ describe( 'selectors', () => {
 	describe( 'isMobile', () => {
 		it( 'should return true if resolution is equal or less than medium breakpoint', () => {
 			const state = {
-				responsive: {
-					greaterThan: {
-						medium: false,
-					},
+				browser: {
+					width: 100,
 				},
 			};
 
@@ -617,10 +611,8 @@ describe( 'selectors', () => {
 
 		it( 'should return true if resolution is greater than medium breakpoint', () => {
 			const state = {
-				responsive: {
-					greaterThan: {
-						medium: true,
-					},
+				browser: {
+					width: 1000,
 				},
 			};
 
