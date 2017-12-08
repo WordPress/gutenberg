@@ -4,12 +4,32 @@
 }
 
 .editor-layout {
+	padding-top: $header-height;
 	position: relative;
 
 	.components-notice-list {
-		position: fixed;
-		top: 100px;
-		right: auto;
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+
+		.notice {
+			margin: 0 0 5px;
+			padding: 6px 12px;
+			min-height: $panel-header-height;
+
+			.notice-dismiss {
+				margin: 5px;
+			}
+		}
+	}
+
+	&.has-fixed-toolbar {
+		padding-top: $header-height + $block-toolbar-height; 
+
+		@include break-large {
+			padding-top: $header-height;
+		}
 	}
 }
 

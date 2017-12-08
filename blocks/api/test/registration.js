@@ -18,11 +18,17 @@ import {
 	getBlockType,
 	getBlockTypes,
 	hasBlockSupport,
+	isReusableBlock,
 } from '../registration';
 
 describe( 'blocks', () => {
 	const error = console.error;
 	const defaultBlockSettings = { save: noop, category: 'common', title: 'block title' };
+
+	beforeAll( () => {
+		// Load all hooks that modify blocks
+		require( 'blocks/hooks' );
+	} );
 
 	// Reset block state before each test.
 	beforeEach( () => {
@@ -405,6 +411,18 @@ describe( 'blocks', () => {
 			};
 
 			expect( hasBlockSupport( settings, 'foo' ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isReusableBlock', () => {
+		it( 'should return true for a reusable block', () => {
+			const block = { name: 'core/block' };
+			expect( isReusableBlock( block ) ).toBe( true );
+		} );
+
+		it( 'should return false for other blocks', () => {
+			const block = { name: 'core/paragraph' };
+			expect( isReusableBlock( block ) ).toBe( false );
 		} );
 	} );
 } );

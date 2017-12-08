@@ -12,8 +12,8 @@ import { Component, createElement, renderToString, cloneElement, Children } from
 /**
  * Internal dependencies
  */
-import { getBlockType, getUnknownTypeHandlerName } from './registration';
 import { applyFilters } from '../hooks';
+import { getBlockType, getUnknownTypeHandlerName } from './registration';
 
 /**
  * Returns the block's default classname from its name

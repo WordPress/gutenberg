@@ -6,15 +6,17 @@ import { partial, castArray } from 'lodash';
 
 /**
  * Returns an action object used in signalling that editor has initialized with
- * the specified post object.
+ * the specified post object and editor settings.
  *
- * @param  {Object} post Post object
- * @return {Object}      Action object
+ * @param  {Object} post     Post object
+ * @param  {Object} settings Editor settings object
+ * @return {Object}          Action object
  */
-export function setupEditor( post ) {
+export function setupEditor( post, settings ) {
 	return {
 		type: 'SETUP_EDITOR',
 		post,
+		settings,
 	};
 }
 
@@ -131,6 +133,19 @@ export function multiSelect( start, end ) {
 export function clearSelectedBlock() {
 	return {
 		type: 'CLEAR_SELECTED_BLOCK',
+	};
+}
+
+/**
+ * Returns an action object that enables or disables block selection
+ *
+ * @param {boolean} [isSelectionEnabled=true] Whether block selection should be enabled
+ * @return {Object}                           Action object
+ */
+export function toggleSelection( isSelectionEnabled = true ) {
+	return {
+		type: 'TOGGLE_SELECTION',
+		isSelectionEnabled,
 	};
 }
 
@@ -333,11 +348,13 @@ export function stopTyping() {
 /**
  * Returns an action object used in signalling that the user toggled the sidebar
  *
- * @return {Object}         Action object
+ * @param  {Boolean} isMobile  Flag indicating if we are in mobile context
+ * @return {Object}            Action object
  */
-export function toggleSidebar() {
+export function toggleSidebar( isMobile ) {
 	return {
 		type: 'TOGGLE_SIDEBAR',
+		isMobile,
 	};
 }
 

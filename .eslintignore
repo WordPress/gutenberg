@@ -1,4 +1,5 @@
 build
 coverage
-vendor
+cypress
 node_modules
+vendor

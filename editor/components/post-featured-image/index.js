@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { flowRight } from 'lodash';
+import { flowRight, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,14 +15,20 @@ import { MediaUploadButton } from '@wordpress/blocks';
  * Internal dependencies
  */
 import './style.scss';
-import { getEditedPostAttribute } from '../../selectors';
+import { getCurrentPostType, getEditedPostAttribute } from '../../selectors';
 import { editPost } from '../../actions';
 
-function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, media } ) {
+//used when labels from post tyoe were not yet loaded or when they are not present.
+const DEFAULT_SET_FEATURE_IMAGE_LABEL = __( 'Set featured image' );
+const DEFAULT_REMOVE_FEATURE_IMAGE_LABEL = __( 'Remove featured image' );
+
+function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, media, postType } ) {
+	const postLabel = get( postType, 'data.labels', {} );
 	return (
 		<div className="editor-post-featured-image">
 			{ !! featuredImageId &&
 				<MediaUploadButton
+					title={ postLabel.set_featured_image }
 					buttonProps={ { className: 'button-link editor-post-featured-image__preview' } }
 					onSelect={ onUpdateImage }
 					type="image"
@@ -45,16 +51,17 @@ function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, med
 			}
 			{ ! featuredImageId &&
 				<MediaUploadButton
+					title={ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
 					buttonProps={ { className: 'editor-post-featured-image__toggle button-link' } }
 					onSelect={ onUpdateImage }
 					type="image"
 				>
-					{ __( 'Set featured image' ) }
+					{ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
 				</MediaUploadButton>
 			}
 			{ !! featuredImageId &&
 				<Button className="editor-post-featured-image__toggle button-link" onClick={ onRemoveImage }>
-					{ __( 'Remove featured image' ) }
+					{ postLabel.remove_featured_image || DEFAULT_REMOVE_FEATURE_IMAGE_LABEL }
 				</Button>
 			}
 		</div>
@@ -65,6 +72,7 @@ const applyConnect = connect(
 	( state ) => {
 		return {
 			featuredImageId: getEditedPostAttribute( state, 'featured_media' ),
+			postTypeName: getCurrentPostType( state ),
 		};
 	},
 	{
@@ -77,13 +85,10 @@ const applyConnect = connect(
 	}
 );
 
-const applyWithAPIData = withAPIData( ( { featuredImageId } ) => {
-	if ( ! featuredImageId ) {
-		return {};
-	}
-
+const applyWithAPIData = withAPIData( ( { featuredImageId, postTypeName } ) => {
 	return {
-		media: `/wp/v2/media/${ featuredImageId }`,
+		media: featuredImageId ? `/wp/v2/media/${ featuredImageId }` : undefined,
+		postType: postTypeName ? `/wp/v2/types/${ postTypeName }?context=edit` : undefined,
 	};
 } );
 

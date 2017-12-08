@@ -26,6 +26,21 @@ describe( 'PublishButtonLabel', () => {
 		},
 	} );
 
+	it( 'should show publishing if publishing in progress', () => {
+		const label = PublishButtonLabel( { user, isPublishing: true } );
+		expect( label ).toBe( 'Publishing…' );
+	} );
+
+	it( 'should show updating if published and saving in progress', () => {
+		const label = PublishButtonLabel( { user, isPublished: true, isSaving: true } );
+		expect( label ).toBe( 'Updating…' );
+	} );
+
+	it( 'should show publish if not published and saving in progress', () => {
+		const label = PublishButtonLabel( { user, isPublished: false, isSaving: true } );
+		expect( label ).toBe( 'Publish' );
+	} );
+
 	it( 'should show publish if user unknown', () => {
 		const label = PublishButtonLabel( { user: {} } );
 		expect( label ).toBe( 'Publish' );

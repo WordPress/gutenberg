@@ -7,8 +7,8 @@ window._wpGutenbergPost.title = {
 
 window._wpGutenbergPost.content = {
 	raw: [
-		'<!-- wp:cover-image {"url":"https://cldup.com/GCwahb3aOb.jpg","align":"full","hasParallax":true,"hasBackgroundDim":true} -->',
-		'<section class="wp-block-cover-image has-parallax has-background-dim" style="background-image:url(https://cldup.com/GCwahb3aOb.jpg)"><h2>Of mountains &amp; printing presses</h2></section>',
+		'<!-- wp:cover-image {"url":"https://cldup.com/Fz-ASbo2s3.jpg","align":"wide"} -->',
+		'<section class="wp-block-cover-image has-background-dim" style="background-image:url(https://cldup.com/Fz-ASbo2s3.jpg)"><h2>Of Mountains &amp; Printing Presses</h2></section>',
 		'<!-- /wp:cover-image -->',
 
 		'<!-- wp:paragraph -->',
@@ -28,7 +28,7 @@ window._wpGutenbergPost.content = {
 		'<!-- /wp:paragraph -->',
 
 		'<!-- wp:heading -->',
-		'<h2>A picture is worth a thousand words, or so the saying goes</h2>',
+		'<h2>A Picture is worth a Thousand Words</h2>',
 		'<!-- /wp:heading -->',
 
 		'<!-- wp:paragraph -->',
@@ -36,7 +36,7 @@ window._wpGutenbergPost.content = {
 		'<!-- /wp:paragraph -->',
 
 		'<!-- wp:image {"align":"center"} -->',
-		'<figure class="wp-block-image aligncenter"><img src="https://cldup.com/YLYhpou2oq.jpg" alt="Beautiful landscape" /><figcaption>Give it a try. Press the &quot;really wide&quot; button on the image toolbar.</figcaption></figure>',
+		'<figure class="wp-block-image aligncenter"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="Beautiful landscape" /><figcaption>Give it a try. Press the &quot;wide&quot; button on the image toolbar.</figcaption></figure>',
 		'<!-- /wp:image -->',
 
 		'<!-- wp:paragraph -->',
@@ -59,14 +59,6 @@ window._wpGutenbergPost.content = {
 		'<ul><li>Text &amp; Headings</li><li>Images &amp; Videos</li><li>Galleries</li><li>Embeds, like YouTube, Tweets, or other WordPress posts.</li><li>Layout blocks, like Buttons, Hero Images, Separators, etc.</li><li>And <em>Lists</em> like this one of course :)</li></ul>',
 		'<!-- /wp:list -->',
 
-		'<!-- wp:paragraph -->',
-		'<p>If you want to learn more about how to build additional blocks, or if you are interested in helping with the project, head over to the <a href="https://github.com/WordPress/gutenberg">GitHub repository</a>.</p>',
-		'<!-- /wp:paragraph -->',
-
-		'<!-- wp:button { "align": "center" } -->',
-		'<div class="wp-block-button aligncenter"><a href="https://github.com/WordPress/gutenberg"><span>Help build Gutenberg</span></a></div>',
-		'<!-- /wp:button -->',
-
 		'<!-- wp:separator -->',
 		'<hr class="wp-block-separator" />',
 		'<!-- /wp:separator -->',
@@ -80,7 +72,7 @@ window._wpGutenbergPost.content = {
 		'<!-- /wp:paragraph -->',
 
 		'<!-- wp:quote {"style":1} -->',
-		'<blockquote class="wp-block-quote blocks-quote-style-1"><p>The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.</p><footer>Matt Mullenweg, 2017</footer></blockquote>',
+		'<blockquote class="wp-block-quote"><p>The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.</p><cite>Matt Mullenweg, 2017</cite></blockquote>',
 		'<!-- /wp:quote -->',
 
 		'<!-- wp:paragraph -->',
@@ -91,91 +83,80 @@ window._wpGutenbergPost.content = {
 		'<p>Blocks can be anything you need. For instance, you may want to insert a subdued quote as part of the composition of your text, or you may prefer to display a giant stylized one. All of these options are available in the inserter.</p>',
 		'<!-- /wp:paragraph -->',
 
-		'<!-- wp:quote {"style":2} -->',
-		'<blockquote class="wp-block-quote blocks-quote-style-2"><p>There is no greater agony than bearing an untold story inside you.</p><footer>Maya Angelou</footer></blockquote>',
-		'<!-- /wp:quote -->',
-
-		'<!-- wp:separator -->',
-		'<hr class="wp-block-separator" />',
-		'<!-- /wp:separator -->',
-
-		'<!-- wp:heading -->',
-		'<h2>Sea id autem nominavi deseruisse</h2>',
-		'<!-- /wp:heading -->',
-
-		'<!-- wp:paragraph -->',
-		'<p>Ea veniam homero eam. Ex inimicus molestiae cum, debet scaevola at eos. Vis assum veritus ut, has ea nostrud accusata, offendit appareat comprehensam ea pro. Ad quo quem veritus appellantur, te est quas phaedrum, eum alia habeo ad. Ei est erroribus imperdiet, omnis dicam propriae sed no. His vitae oratio fierent ne, cu duo tota eligendi, electram rationibus in qui.</p>',
-		'<!-- /wp:paragraph -->',
-
-		'<!-- wp:image {"align":"wide"} -->',
-		'<figure class="wp-block-image alignwide"><img src="https://cldup.com/uuUqE_dXzy.jpg" alt="Accessibility is important don&#x27;t forget image alt attribute" /></figure>',
-		'<!-- /wp:image -->',
-
-		'<!-- wp:paragraph -->',
-		'<p>Est quis reque cetero ad. Sea id autem nominavi deseruisse. <strong>Veniam qualisque definitionem pri id</strong>, ea autem feugiat delenit ius, mei at loem affert accumsan. Dicat eruditi cu est, te pro dicant pericula conclusionemque, ei vim detracto euripidis intellegam. Eius postea volumus mei ad.</p>',
-		'<!-- /wp:paragraph -->',
-
-		'<!-- wp:paragraph -->',
-		'<p>Prima ridens denique his te, ferri illum volumus an his. Eu vel dicat homero qualisqu, vitae regione deserunt vis ei. Graeci incorrupte liberavisse no mea, saepe voluptaria usu ex, vis dicant euismod id. At dolor reprimique eos, quo altera detraxit moderatius id. Quo iudico utinam eu, ad alia munere mel.</p>',
-		'<!-- /wp:paragraph -->',
-
-		'<!-- wp:code -->',
-		'<pre class="wp-block-code"><code>export default function MyButton() {\n\
-return &lt;Button&gt;Click Me!&lt;/Button&gt;;\n\
-}</code></pre>',
-
-		'<!-- /wp:code -->',
-
-		'<!-- wp:gallery {"align":"wide","images":[{"url":"https://cldup.com/GCwahb3aOb.jpg","alt":""},{"url":"https://cldup.com/lUUQPv6w9c.jpg","alt":""}]} -->',
-		'<div class="wp-block-gallery alignwide columns-2 is-cropped">',
-		'<figure class="blocks-gallery-image"><img src="https://cldup.com/GCwahb3aOb.jpg" alt="" /></figure>',
-		'<figure class="blocks-gallery-image"><img src="https://cldup.com/lUUQPv6w9c.jpg" alt="" /></figure>',
+		'<!-- wp:gallery {"columns":2} -->',
+		'<div class="wp-block-gallery alignnone columns-2 is-cropped">',
+		'<figure class="blocks-gallery-image"><img src="https://cldup.com/n0g6ME5VKC.jpg" alt="" /></figure>',
+		'<figure class="blocks-gallery-image"><img src="https://cldup.com/ZjESfxPI3R.jpg" alt="" /></figure>',
+		'<figure class="blocks-gallery-image"><img src="https://cldup.com/EKNF8xD2UM.jpg" alt="" /></figure>',
 		'</div>',
 		'<!-- /wp:gallery -->',
 
-		'<!-- wp:preformatted -->',
-		'<pre class="wp-block-preformatted">An old silent pond...<br/>A frog jumps into the pond,<br/>splash! Silence again.</pre>',
-		'<!-- /wp:preformatted -->',
-
 		'<!-- wp:paragraph -->',
-		'<p>Eu integre accusata prodesset est, <em>sed te impetus gubergren conceptam</em>, ex sed wisi nostrum ocurreret. Esse velit omittantur ius te, alii dissentias ei vis. At sed unum veritus fabellas. Te volutpat appellantur duo. Ad natum fuisset intellegebat eam, causae invidunt usu id, et vis impetus appetere.</p>',
+		'<p>You can change the amount of columns in your galleries by dragging a slider in the block inspector in the sidebar.</p>',
 		'<!-- /wp:paragraph -->',
 
 		'<!-- wp:heading -->',
-		'<h6>Nominavi deseruisse</h6>',
+		'<h2>Media Rich</h2>',
 		'<!-- /wp:heading -->',
 
-		'<!-- wp:list -->',
-		'<ul><li>Est quis reque cetero ad</li><li>Sea id autem nominavi deseruisse</li><li>Veniam qualisque definitionem pri id, ea autem feugiat delenit ius, mei at loem affert accumsan</li><li>Dicat eruditi cu est, te pro dicant pericula conclusionemque</li><li>Eius postea volumus mei ad</li></ul>',
-		'<!-- /wp:list -->',
+		'<!-- wp:paragraph -->',
+		'<p>If you combine the new <strong>wide</strong> and <strong>full-wide</strong> alignments with galleries, you can create a very media rich layout, very quickly:</p>',
+		'<!-- /wp:paragraph -->',
+
+		'<!-- wp:image {"align":"full"} -->',
+		'<figure class="wp-block-image alignfull"><img src="https://cldup.com/8lhI-gKnI2.jpg" alt="Accessibility is important don&#x27;t forget image alt attribute" /></figure>',
+		'<!-- /wp:image -->',
+
+		'<!-- wp:paragraph -->',
+		'<p>Sure, the full-wide image can be pretty big. But sometimes the image is worth it.</p>',
+		'<!-- /wp:paragraph -->',
+
+		'<!-- wp:gallery {"align":"wide","images":[{"url":"https://cldup.com/_rSwtEeDGD.jpg","alt":""},{"url":"https://cldup.com/L-cC3qX2DN.jpg","alt":""}]} -->',
+		'<div class="wp-block-gallery alignwide columns-2 is-cropped">',
+		'<figure class="blocks-gallery-image"><img src="https://cldup.com/_rSwtEeDGD.jpg" alt="" /></figure>',
+		'<figure class="blocks-gallery-image"><img src="https://cldup.com/L-cC3qX2DN.jpg" alt="" /></figure>',
+		'</div>',
+		'<!-- /wp:gallery -->',
+
+		'<!-- wp:paragraph -->',
+		'<p>The above is a gallery with just two images. It\'s an easier way to create visually appealing layouts, without having to deal with floats. You can also easily convert the gallery back to individual images again, by using the block switcher.</p>',
+		'<!-- /wp:paragraph -->',
+
+		'<!-- wp:paragraph -->',
+		'<p>Any block can opt into these alignments. The embed block has them also, and is responsive out of the box:</p>',
+		'<!-- /wp:paragraph -->',
+
+		'<!-- wp:embed {"url":"https://vimeo.com/22439234","align":"wide"} -->',
+		'<figure class="wp-block-embed alignwide">https://vimeo.com/22439234</figure>',
+		'<!-- /wp:embed -->',
+
+		'<!-- wp:paragraph -->',
+		'<p>You can build any block you like, static or dynamic, decorative or plain. Here\'s a pullquote block:</p>',
+		'<!-- /wp:paragraph -->',
 
 		'<!-- wp:pullquote -->',
-		'<blockquote class="wp-block-pullquote alignnone"><p>Code is Poetry</p><footer>The WordPress community</footer></blockquote>',
+		'<blockquote class="wp-block-pullquote alignnone"><p>Code is Poetry</p><cite>The WordPress community</cite></blockquote>',
 		'<!-- /wp:pullquote -->',
+
+		'<!-- wp:paragraph {"align":"center"} -->',
+		'<p style="text-align:center"><em>If you want to learn more about how to build additional blocks, or if you are interested in helping with the project, head over to the <a href="https://github.com/WordPress/gutenberg">GitHub repository</a>.</em></p>',
+		'<!-- /wp:paragraph -->',
+
+		'<!-- wp:button { "align": "center" } -->',
+		'<div class="wp-block-button aligncenter"><a href="https://github.com/WordPress/gutenberg"><span>Help build Gutenberg</span></a></div>',
+		'<!-- /wp:button -->',
 
 		'<!-- wp:separator -->',
 		'<hr class="wp-block-separator" />',
 		'<!-- /wp:separator -->',
 
-		'<!-- wp:table -->',
-		'<table class="wp-block-table"><thead><tr><th>Version</th><th>Musician</th><th>Date</th></tr></thead><tbody><tr><th><a href="https://wordpress.org/news/2015/12/clifford/">4.4</a></th><td>Clifford Brown</td><td>December 8, 2015</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2016/04/coleman/">4.5</a></th><td>Coleman Hawkins</td><td>April 12, 2016</td></tr><tr><th><a href="https://wordpress.org/news/2016/08/pepper/">4.6</a></th><td>Pepper Adams</td><td>August 16, 2016</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2016/12/vaughan/">4.7</a></th><td>Sarah Vaughan</td><td>December 6, 2016</td></tr></tbody></table>',
-		'<!-- /wp:table -->',
+		'<!-- wp:paragraph {"align":"center"} -->',
+		'<p style="text-align:center">Thanks for testing Gutenberg!</p>',
+		'<!-- /wp:paragraph -->',
 
-		'<!-- wp:heading -->',
-		'<h2>All that you can embed!</h2>',
-		'<!-- /wp:heading -->',
-
-		'<!-- wp:embed {"url":"https://www.youtube.com/watch?v=Nl6U7UotA-M"} -->',
-		'<figure class="wp-block-embed">\nhttps://www.youtube.com/watch?v=Nl6U7UotA-M\n<figcaption>State of the Word 2016</figcaption></figure>',
-		'<!-- /wp:embed -->',
-
-		'<!-- wp:embed {"url":"https://twitter.com/photomatt/status/868657763970404352"} -->',
-		'<figure class="wp-block-embed">\nhttps://twitter.com/photomatt/status/868657763970404352\n</figure>',
-		'<!-- /wp:embed -->',
-
-		'<!-- wp:embed {"url":"https://make.wordpress.org/core/2017/01/17/editor-technical-overview/"} -->',
-		'<figure class="wp-block-embed">\nhttps://make.wordpress.org/core/2017/01/17/editor-technical-overview/\n</figure>',
-		'<!-- /wp:embed -->',
+		'<!-- wp:paragraph {"align":"center"} -->',
+		'<p style="text-align:center"><img draggable="false" class="emoji" alt="👋" src="https://s.w.org/images/core/emoji/2.3/svg/1f44b.svg" /></p>',
+		'<!-- /wp:paragraph -->',
 
 	].join( '' ),
 };

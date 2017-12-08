@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { map } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -15,10 +20,31 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
 
-const toEditableValue = value => value.map( ( subValue => subValue.children ) );
-const fromEditableValue = value => value.map( ( subValue ) => ( {
+const toEditableValue = value => map( value, ( subValue => subValue.children ) );
+const fromEditableValue = value => map( value, ( subValue ) => ( {
 	children: subValue,
 } ) );
+const blockAttributes = {
+	value: {
+		type: 'array',
+		source: 'query',
+		selector: 'blockquote > p',
+		query: {
+			children: {
+				source: 'node',
+			},
+		},
+	},
+	citation: {
+		type: 'array',
+		source: 'children',
+		selector: 'cite',
+	},
+	align: {
+		type: 'string',
+		default: 'none',
+	},
+};
 
 registerBlockType( 'core/pullquote', {
 
@@ -28,27 +54,7 @@ registerBlockType( 'core/pullquote', {
 
 	category: 'formatting',
 
-	attributes: {
-		value: {
-			type: 'array',
-			source: 'query',
-			selector: 'blockquote > p',
-			query: {
-				children: {
-					source: 'node',
-				},
-			},
-		},
-		citation: {
-			type: 'array',
-			source: 'children',
-			selector: 'footer',
-		},
-		align: {
-			type: 'string',
-			default: 'none',
-		},
-	},
+	attributes: blockAttributes,
 
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
@@ -80,7 +86,7 @@ registerBlockType( 'core/pullquote', {
 			<blockquote key="quote" className={ className }>
 				<Editable
 					multiline="p"
-					value={ value && toEditableValue( value ) }
+					value={ toEditableValue( value ) }
 					onChange={
 						( nextValue ) => setAttributes( {
 							value: fromEditableValue( nextValue ),
@@ -118,9 +124,35 @@ registerBlockType( 'core/pullquote', {
 					<p key={ i }>{ paragraph.children && paragraph.children.props.children }</p>
 				) }
 				{ citation && citation.length > 0 && (
-					<footer>{ citation }</footer>
+					<cite>{ citation }</cite>
 				) }
 			</blockquote>
 		);
 	},
+
+	deprecated: [ {
+		attributes: {
+			...blockAttributes,
+			citation: {
+				type: 'array',
+				source: 'children',
+				selector: 'footer',
+			},
+		},
+
+		save( { attributes } ) {
+			const { value, citation, align } = attributes;
+
+			return (
+				<blockquote className={ `align${ align }` }>
+					{ value && value.map( ( paragraph, i ) =>
+						<p key={ i }>{ paragraph.children && paragraph.children.props.children }</p>
+					) }
+					{ citation && citation.length > 0 && (
+						<footer>{ citation }</footer>
+					) }
+				</blockquote>
+			);
+		},
+	} ],
 } );

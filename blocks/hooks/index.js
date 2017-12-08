@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import createHooks from '@wordpress/hooks';
+import { createHooks } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -14,36 +14,22 @@ import matchers from './matchers';
 const hooks = createHooks();
 
 const {
-	addAction,
 	addFilter,
-	removeAction,
 	removeFilter,
-	removeAllActions,
 	removeAllFilters,
-	doAction,
 	applyFilters,
-	doingAction,
 	doingFilter,
-	didAction,
 	didFilter,
-	hasAction,
 	hasFilter,
 } = hooks;
 
 export {
-	addAction,
 	addFilter,
-	removeAction,
 	removeFilter,
-	removeAllActions,
 	removeAllFilters,
-	doAction,
 	applyFilters,
-	doingAction,
 	doingFilter,
-	didAction,
 	didFilter,
-	hasAction,
 	hasFilter,
 };
 

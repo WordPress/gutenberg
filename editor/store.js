@@ -5,6 +5,7 @@ import { applyMiddleware, createStore } from 'redux';
 import refx from 'refx';
 import multi from 'redux-multi';
 import { flowRight } from 'lodash';
+import { responsiveStoreEnhancer } from 'redux-responsive';
 
 /**
  * Internal dependencies
@@ -29,6 +30,7 @@ const GUTENBERG_PREFERENCES_KEY = `GUTENBERG_PREFERENCES_${ window.userSettings.
 function createReduxStore( preloadedState ) {
 	const enhancers = [
 		applyMiddleware( multi, refx( effects ) ),
+		responsiveStoreEnhancer,
 		storePersist( {
 			reducerKey: 'preferences',
 			storageKey: GUTENBERG_PREFERENCES_KEY,

@@ -1,6 +1,6 @@
 [
     {
-        "blockName": "core/reusable-block",
+        "blockName": "core/block",
         "attrs": {
             "ref": "358b59ee-bab3-4d6f-8445-e8c6971a5605"
         },

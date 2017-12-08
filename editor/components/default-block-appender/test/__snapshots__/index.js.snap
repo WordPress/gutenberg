@@ -1,22 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`DefaultBlockAppender blocks present should match snapshot 1`] = `
-<div
-  className="editor-default-block-appender"
->
-  <Connect(BlockDropZone) />
-  <button
-    className="editor-default-block-appender__content"
-    onClick={[Function]}
-  />
-</div>
-`;
+exports[`DefaultBlockAppender blocks present should match snapshot 1`] = `""`;
 
 exports[`DefaultBlockAppender no block present should match snapshot 1`] = `
 <div
-  className="editor-default-block-appender is-visible-placeholder"
+  className="editor-default-block-appender"
 >
-  <Connect(BlockDropZone) />
+  <WrappedComponent />
   <input
     className="editor-default-block-appender__content"
     onClick={[Function]}

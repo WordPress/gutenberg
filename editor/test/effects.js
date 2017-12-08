@@ -342,7 +342,7 @@ describe( 'effects', () => {
 				status: 'draft',
 			};
 
-			const result = handler( { post } );
+			const result = handler( { post, settings: {} } );
 
 			expect( result ).toEqual( [
 				resetPost( post ),
@@ -362,7 +362,7 @@ describe( 'effects', () => {
 				status: 'draft',
 			};
 
-			const result = handler( { post } );
+			const result = handler( { post, settings: {} } );
 
 			expect( result ).toHaveLength( 2 );
 			expect( result ).toContainEqual( resetPost( post ) );
@@ -383,7 +383,7 @@ describe( 'effects', () => {
 				status: 'auto-draft',
 			};
 
-			const result = handler( { post } );
+			const result = handler( { post, settings: {} } );
 
 			expect( result ).toEqual( [
 				resetPost( post ),
@@ -402,7 +402,7 @@ describe( 'effects', () => {
 					name: { type: 'string' },
 				},
 			} );
-			registerBlockType( 'core/reusable-block', {
+			registerBlockType( 'core/block', {
 				title: 'Reusable Block',
 				category: 'common',
 				save: () => null,
@@ -414,7 +414,7 @@ describe( 'effects', () => {
 
 		afterAll( () => {
 			unregisterBlockType( 'core/test-block' );
-			unregisterBlockType( 'core/reusable-block' );
+			unregisterBlockType( 'core/block' );
 		} );
 
 		describe( '.FETCH_REUSABLE_BLOCKS', () => {
@@ -529,9 +529,9 @@ describe( 'effects', () => {
 		describe( '.SAVE_REUSABLE_BLOCK', () => {
 			const handler = effects.SAVE_REUSABLE_BLOCK;
 
-			it( 'should save a reusable block', () => {
+			it( 'should save a reusable block and swaps its id', () => {
 				let modelAttributes;
-				const promise = Promise.resolve();
+				const promise = Promise.resolve( { id: 3 } );
 
 				set( global, 'wp.api.models.ReusableBlocks', class {
 					constructor( attributes ) {
@@ -570,6 +570,7 @@ describe( 'effects', () => {
 					expect( dispatch ).toHaveBeenCalledWith( {
 						type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
 						id: reusableBlock.id,
+						updatedId: 3,
 					} );
 				} );
 			} );
@@ -624,7 +625,7 @@ describe( 'effects', () => {
 				};
 				const staticBlock = {
 					uid: 'd6b55aa9-16b5-4123-9675-749d75a7f14d',
-					name: 'core/reusable-block',
+					name: 'core/block',
 					attributes: {
 						ref: reusableBlock.id,
 					},
@@ -674,6 +675,7 @@ describe( 'effects', () => {
 				expect( dispatch ).toHaveBeenCalledWith(
 					updateReusableBlock( 'this-is-a-mock-uuid', {
 						id: 'this-is-a-mock-uuid',
+						isTemporary: true,
 						name: 'Untitled block',
 						type: staticBlock.name,
 						attributes: staticBlock.attributes,
@@ -685,7 +687,7 @@ describe( 'effects', () => {
 				expect( dispatch ).toHaveBeenCalledWith(
 					replaceBlocks(
 						[ staticBlock.uid ],
-						[ createBlock( 'core/reusable-block', { ref: 'this-is-a-mock-uuid' } ) ]
+						[ createBlock( 'core/block', { ref: 'this-is-a-mock-uuid' } ) ]
 					)
 				);
 			} );
