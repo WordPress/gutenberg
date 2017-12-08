@@ -77,7 +77,7 @@ export default class InserterGroup extends Component {
 		return (
 			<NavigableMenu
 				className="editor-inserter__category-blocks"
-				orientation="undefined"
+				orientation="all"
 				aria-labelledby={ labelledBy }
 				cycle={ false }
 				onNavigate={ this.onNavigate }>

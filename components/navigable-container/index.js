@@ -124,17 +124,17 @@ export class NavigableMenu extends Component {
 		const eventToOffset = ( evt ) => {
 			const { keyCode } = evt;
 
-			let next = [ RIGHT, DOWN ];
-			let previous = [ LEFT, UP ];
-
-			if ( orientation === 'vertical' ) {
-				next = [ DOWN ];
-				previous = [ UP ];
-			}
+			let next = [ DOWN ];
+			let previous = [ UP ];
 
 			if ( orientation === 'horizontal' ) {
 				next = [ RIGHT ];
 				previous = [ LEFT ];
+			}
+
+			if ( orientation === 'all' ) {
+				next = [ RIGHT, DOWN ];
+				previous = [ LEFT, UP ];
 			}
 
 			if ( next.includes( keyCode ) ) {
