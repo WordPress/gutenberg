@@ -39,7 +39,6 @@ function Token( {
 	return (
 		<span
 			className={ tokenClasses }
-			tabIndex="-1"
 			onMouseEnter={ onMouseEnter }
 			onMouseLeave={ onMouseLeave }
 			title={ title }

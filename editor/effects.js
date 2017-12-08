@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, includes, map, filter, some, castArray } from 'lodash';
+import { get, includes, map, castArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -46,7 +46,6 @@ import {
 	isEditedPostDirty,
 	isEditedPostNew,
 	isEditedPostSaveable,
-	getMetaBoxes,
 	getBlock,
 	getReusableBlock,
 } from './selectors';
@@ -311,27 +310,6 @@ export default {
 
 		return effects;
 	},
-	INITIALIZE_META_BOX_STATE( action ) {
-		// Hold jquery.ready until the metaboxes load
-		const locations = [ 'normal', 'side' ];
-		if ( some( locations, ( location ) => !! action.metaBoxes[ location ] ) ) {
-			jQuery.holdReady( true );
-		}
-	},
-	META_BOX_LOADED( action, store ) {
-		const { getState } = store;
-		const metaboxes = getMetaBoxes( getState() );
-		const unloadedMetaboxes = filter(
-			map( metaboxes, ( value, key ) => ( {
-				...value,
-				key,
-			} ) ),
-			( metabox ) => metabox.isActive && ! metabox.isLoaded
-		);
-		if ( unloadedMetaboxes.length === 1 && unloadedMetaboxes[ 0 ].key === action.location ) {
-			jQuery.holdReady( false );
-		}
-	},
 	FETCH_REUSABLE_BLOCKS( action, store ) {
 		const { id } = action;
 		const { dispatch } = store;
@@ -368,12 +346,16 @@ export default {
 		const { id } = action;
 		const { getState, dispatch } = store;
 
-		const { name, type, attributes } = getReusableBlock( getState(), id );
+		const { name, type, attributes, isTemporary } = getReusableBlock( getState(), id );
 		const content = serialize( createBlock( type, attributes ) );
-
-		new wp.api.models.ReusableBlocks( { id, name, content } ).save().then(
-			() => {
-				dispatch( { type: 'SAVE_REUSABLE_BLOCK_SUCCESS', id } );
+		const requestData = isTemporary ? { name, content } : { id, name, content };
+		new wp.api.models.ReusableBlocks( requestData ).save().then(
+			( updatedReusableBlock ) => {
+				dispatch( {
+					type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
+					updatedId: updatedReusableBlock.id,
+					id,
+				} );
 				dispatch( createSuccessNotice(
 					__( 'Reusable block updated' ),
 					{ id: SAVE_REUSABLE_BLOCK_NOTICE_ID }
@@ -401,7 +383,7 @@ export default {
 
 		const oldBlock = getBlock( getState(), action.uid );
 		const reusableBlock = createReusableBlock( oldBlock.name, oldBlock.attributes );
-		const newBlock = createBlock( 'core/reusable-block', { ref: reusableBlock.id } );
+		const newBlock = createBlock( 'core/block', { ref: reusableBlock.id } );
 		dispatch( updateReusableBlock( reusableBlock.id, reusableBlock ) );
 		dispatch( saveReusableBlock( reusableBlock.id ) );
 		dispatch( replaceBlocks( [ oldBlock.uid ], [ newBlock ] ) );

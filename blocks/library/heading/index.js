@@ -151,13 +151,17 @@ registerBlockType( 'core/heading', {
 				onFocus={ setFocus }
 				onChange={ ( value ) => setAttributes( { content: value } ) }
 				onMerge={ mergeBlocks }
-				onSplit={ ( before, after, ...blocks ) => {
-					setAttributes( { content: before } );
-					insertBlocksAfter( [
-						...blocks,
-						createBlock( 'core/paragraph', { content: after } ),
-					] );
-				} }
+				onSplit={
+					insertBlocksAfter ?
+						( before, after, ...blocks ) => {
+							setAttributes( { content: before } );
+							insertBlocksAfter( [
+								...blocks,
+								createBlock( 'core/paragraph', { content: after } ),
+							] );
+						} :
+						undefined
+				}
 				style={ { textAlign: align } }
 				placeholder={ placeholder || __( 'Write heading…' ) }
 			/>,

@@ -54,24 +54,6 @@
 	right: -$admin-sidebar-width-big;
 }
 
-/* RTL */
-.rtl.auto-fold .editor-header {
-	@include break-medium() {
-		left: 0;
-		right: $admin-sidebar-width-collapsed;
-	}
-
-	@include break-large() {
-		left: 0;
-		right: $admin-sidebar-width;
-	}
-}
-
-.rtl.auto-fold .wp-responsive-open .editor-header {
-	left: -$admin-sidebar-width-big;
-	right: $admin-sidebar-width-big;
-}
-
 .editor-header__settings {
 	display: inline-flex;
 	align-items: center;

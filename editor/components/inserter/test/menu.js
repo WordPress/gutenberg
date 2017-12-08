@@ -95,8 +95,10 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [] }
+				reusableBlocks={ [] }
 				recentlyUsedBlocks={ [] }
 				debouncedSpeak={ noop }
+				fetchReusableBlocks={ noop }
 				blockTypes
 			/>
 		);
@@ -114,8 +116,10 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [] }
+				reusableBlocks={ [] }
 				recentlyUsedBlocks={ [ advancedTextBlock ] }
 				debouncedSpeak={ noop }
+				fetchReusableBlocks={ noop }
 				blockTypes={ false }
 			/>
 		);
@@ -130,8 +134,10 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [] }
+				reusableBlocks={ [] }
 				recentlyUsedBlocks={ [ textBlock, advancedTextBlock ] }
 				debouncedSpeak={ noop }
+				fetchReusableBlocks={ noop }
 				blockTypes={ [ textBlock.name ] }
 			/>
 		);
@@ -147,14 +153,24 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [] }
-				recentlyUsedBlocks={ [ advancedTextBlock ] }
+				reusableBlocks={ [] }
+				recentlyUsedBlocks={ [
+					// Actually recently used by user, thus present at the top.
+					advancedTextBlock,
+					// Blocks of category 'common' injected on SETUP_EDITOR.
+					// These have to be listed here in the order in which they
+					// are registered.
+					textBlock,
+					someOtherBlock,
+				] }
 				debouncedSpeak={ noop }
+				fetchReusableBlocks={ noop }
 				blockTypes
 			/>
 		);
 
 		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
-		expect( visibleBlocks.length ).toBe( 1 );
+		expect( visibleBlocks.length ).toBe( 3 );
 		expect( visibleBlocks.at( 0 ).childAt( 0 ).name() ).toBe( 'BlockIcon' );
 		expect( visibleBlocks.at( 0 ).text() ).toBe( 'Advanced Text' );
 	} );
@@ -165,8 +181,10 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [] }
+				reusableBlocks={ [] }
 				recentlyUsedBlocks={ [] }
 				debouncedSpeak={ noop }
+				fetchReusableBlocks={ noop }
 				blockTypes
 			/>
 		);
@@ -189,8 +207,10 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [] }
+				reusableBlocks={ [] }
 				recentlyUsedBlocks={ [] }
 				debouncedSpeak={ noop }
+				fetchReusableBlocks={ noop }
 				blockTypes
 			/>
 		);
@@ -215,8 +235,10 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [ { name: moreBlock.name } ] }
+				reusableBlocks={ [] }
 				recentlyUsedBlocks={ [] }
 				debouncedSpeak={ noop }
+				fetchReusableBlocks={ noop }
 				blockTypes
 			/>
 		);
@@ -236,8 +258,10 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [] }
+				reusableBlocks={ [] }
 				recentlyUsedBlocks={ [] }
 				debouncedSpeak={ noop }
+				fetchReusableBlocks={ noop }
 				blockTypes
 			/>
 		);
@@ -259,8 +283,10 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				blocks={ [] }
+				reusableBlocks={ [] }
 				recentlyUsedBlocks={ [] }
 				debouncedSpeak={ noop }
+				fetchReusableBlocks={ noop }
 				blockTypes
 			/>
 		);

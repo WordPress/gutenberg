@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { parse as hpqParse } from 'hpq';
-import { mapValues } from 'lodash';
+import { mapValues, omit } from 'lodash';
 
 /**
  * Internal dependencies
@@ -130,6 +130,32 @@ export function getBlockAttributes( blockType, innerHTML, attributes ) {
 }
 
 /**
+ * Attempt to parse the innerHTML using using a supplied `deprecated` definition.
+ *
+ * @param  {?Object} blockType  Block type
+ * @param  {string}  innerHTML  Raw block content
+ * @param  {?Object} attributes Known block attributes (from delimiters)
+ * @return {Object}             Block attributes
+ */
+export function getAttributesFromDeprecatedVersion( blockType, innerHTML, attributes ) {
+	if ( ! blockType.deprecated ) {
+		return;
+	}
+
+	for ( let i = 0; i < blockType.deprecated.length; i++ ) {
+		const deprecatedBlockType = {
+			...omit( blockType, [ 'attributes', 'save', 'supports' ] ), // Parsing/Serialization properties
+			...blockType.deprecated[ i ],
+		};
+		const deprecatedBlockAttributes = getBlockAttributes( deprecatedBlockType, innerHTML, attributes );
+		const isValid = isValidBlock( innerHTML, deprecatedBlockType, deprecatedBlockAttributes );
+		if ( isValid ) {
+			return deprecatedBlockAttributes;
+		}
+	}
+}
+
+/**
  * Creates a block with fallback to the unknown type handler.
  *
  * @param  {?String} name       Block type name
@@ -180,6 +206,19 @@ export function createBlockWithFallback( name, innerHTML, attributes ) {
 		// Preserve original content for future use in case the block is parsed
 		// as invalid, or future serialization attempt results in an error
 		block.originalContent = innerHTML;
+
+		// When a block is invalid, attempt to parse it using a supplied `deprecated` definition.
+		// This allows blocks to modify their attribute and markup structure without invalidating
+		// content written in previous formats.
+		if ( ! block.isValid ) {
+			const attributesParsedWithDeprecatedVersion = getAttributesFromDeprecatedVersion(
+				blockType, innerHTML, attributes
+			);
+			if ( attributesParsedWithDeprecatedVersion ) {
+				block.isValid = true;
+				block.attributes = attributesParsedWithDeprecatedVersion;
+			}
+		}
 
 		return block;
 	}

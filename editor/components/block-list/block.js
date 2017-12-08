@@ -10,8 +10,15 @@ import { get, partial, reduce, size } from 'lodash';
  */
 import { Component, compose, createElement } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
-import { getBlockType, BlockEdit, getBlockDefaultClassname, createBlock, hasBlockSupport } from '@wordpress/blocks';
-import { withFilters } from '@wordpress/components';
+import {
+	getBlockType,
+	BlockEdit,
+	getBlockDefaultClassname,
+	createBlock,
+	hasBlockSupport,
+	isReusableBlock,
+} from '@wordpress/blocks';
+import { withFilters, withContext } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -296,7 +303,7 @@ class BlockListBlock extends Component {
 			case ENTER:
 				// Insert default block after current block if enter and event
 				// not already handled by descendant.
-				if ( target === this.node ) {
+				if ( target === this.node && ! this.props.isLocked ) {
 					event.preventDefault();
 
 					this.props.onInsertBlocks( [
@@ -318,12 +325,14 @@ class BlockListBlock extends Component {
 			case DELETE:
 				// Remove block on backspace.
 				if ( target === this.node ) {
+					const { uid, onRemove, previousBlock, onFocus, isLocked } = this.props;
 					event.preventDefault();
-					const { uid, onRemove, previousBlock, onFocus } = this.props;
-					onRemove( uid );
+					if ( ! isLocked ) {
+						onRemove( uid );
 
-					if ( previousBlock ) {
-						onFocus( previousBlock.uid, { offset: -1 } );
+						if ( previousBlock ) {
+							onFocus( previousBlock.uid, { offset: -1 } );
+						}
 					}
 				}
 				break;
@@ -340,7 +349,7 @@ class BlockListBlock extends Component {
 	}
 
 	render() {
-		const { block, order, mode, showContextualToolbar } = this.props;
+		const { block, order, mode, showContextualToolbar, isLocked } = this.props;
 		const { name: blockName, isValid } = block;
 		const blockType = getBlockType( blockName );
 		// translators: %s: Type of block (i.e. Text, Image etc)
@@ -357,6 +366,7 @@ class BlockListBlock extends Component {
 			'is-selected': showUI,
 			'is-multi-selected': isMultiSelected,
 			'is-hovered': isHovered,
+			'is-reusable': isReusableBlock( blockType ),
 		} );
 
 		const { onMouseLeave, onFocus, onReplace } = this.props;
@@ -410,10 +420,10 @@ class BlockListBlock extends Component {
 								focus={ focus }
 								attributes={ block.attributes }
 								setAttributes={ this.setAttributes }
-								insertBlocksAfter={ this.insertBlocksAfter }
-								onReplace={ onReplace }
+								insertBlocksAfter={ isLocked ? undefined : this.insertBlocksAfter }
+								onReplace={ isLocked ? undefined : onReplace }
 								setFocus={ partial( onFocus, block.uid ) }
-								mergeBlocks={ this.mergeBlocks }
+								mergeBlocks={ isLocked ? undefined : this.mergeBlocks }
 								className={ className }
 								id={ block.uid }
 								isSelectionEnabled={ this.props.isSelectionEnabled }
@@ -524,5 +534,12 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 
 export default compose(
 	withFilters( 'Editor.BlockItem' ),
-	connect( mapStateToProps, mapDispatchToProps )
+	connect( mapStateToProps, mapDispatchToProps ),
+	withContext( 'editor' )( ( settings ) => {
+		const { templateLock } = settings;
+
+		return {
+			isLocked: !! templateLock,
+		};
+	} ),
 )( BlockListBlock );

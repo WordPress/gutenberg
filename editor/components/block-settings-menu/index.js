@@ -17,6 +17,7 @@ import './style.scss';
 import BlockInspectorButton from './block-inspector-button';
 import BlockModeToggle from './block-mode-toggle';
 import BlockDeleteButton from './block-delete-button';
+import ReusableBlockToggle from './reusable-block-toggle';
 import UnknownConverter from './unknown-converter';
 import { selectBlock } from '../../actions';
 
@@ -56,6 +57,7 @@ function BlockSettingsMenu( { uids, onSelect, focus } ) {
 					{ count === 1 && <BlockModeToggle uid={ uids[ 0 ] } onToggle={ onClose } /> }
 					{ count === 1 && <UnknownConverter uid={ uids[ 0 ] } /> }
 					<BlockDeleteButton uids={ uids } />
+					{ count === 1 && <ReusableBlockToggle uid={ uids[ 0 ] } onToggle={ onClose } /> }
 				</NavigableMenu>
 			) }
 		/>
