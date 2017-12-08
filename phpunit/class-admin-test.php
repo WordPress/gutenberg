@@ -126,7 +126,7 @@ class Admin_Test extends WP_UnitTestCase {
 		global $pagenow;
 
 		// Set up $pagenow so the filter will work.
-		$pagenow = 'revisions.php';
+		$pagenow = 'revision.php';
 
 		// Test the filter when Gutenberg is the active editor.
 		$_REQUEST['gutenberg'] = '1';
@@ -145,12 +145,12 @@ class Admin_Test extends WP_UnitTestCase {
 	function test_gutenberg_revisions_restore() {
 		// Test the filter when Gutenberg is the active editor.
 		$_REQUEST['gutenberg'] = '1';
-		$link = apply_filters( 'wp_prepare_revision_for_js',  array() );
-		$this->assertEquals( array( 'restoreUrl' => 'http://test.com' ), $link );
+		$link = apply_filters( 'wp_prepare_revision_for_js',  array( 'restoreUrl' => 'http://test.com' ) );
+		$this->assertEquals( array( 'restoreUrl' => 'http://test.com?gutenberg=1' ), $link );
 
 		// Test the filter when Gutenberg is not the active editor.
 		unset( $_REQUEST['gutenberg'] );
-		$link = apply_filters( 'wp_prepare_revision_for_js', array() );
-		$this->assertEquals( array( 'restoreUrl' => 'http://test.com?gutenberg=1' ), $link );
+		$link = apply_filters( 'wp_prepare_revision_for_js', array( 'restoreUrl' => 'http://test.com' ) );
+		$this->assertEquals( array( 'restoreUrl' => 'http://test.com' ), $link );
 	}
 }
