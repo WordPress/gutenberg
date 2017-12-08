@@ -44,7 +44,7 @@ function fireKeyDown( container, keyCode, shiftKey ) {
 }
 
 describe( 'NavigableMenu', () => {
-	it( 'vertical: should navigate by up and down', () => {
+	it( 'vertical: should navigate by right/down and left/up', () => {
 		let currentIndex = 0;
 		const wrapper = mount( (
 			<NavigableMenu onNavigate={ ( index ) => currentIndex = index }>
@@ -72,12 +72,16 @@ describe( 'NavigableMenu', () => {
 		assertKeyDown( UP, 2, true );
 		assertKeyDown( UP, 1, true );
 		assertKeyDown( UP, 0, true );
-		assertKeyDown( LEFT, 0, true );
+		assertKeyDown( RIGHT, 1, true );
+		assertKeyDown( RIGHT, 2, true );
 		assertKeyDown( RIGHT, 0, true );
+		assertKeyDown( LEFT, 2, true );
+		assertKeyDown( LEFT, 1, true );
+		assertKeyDown( LEFT, 0, true );
 		assertKeyDown( SPACE, 0, false );
 	} );
 
-	it( 'vertical: should navigate by up and down, and skip deep candidates', () => {
+	it( 'vertical: should navigate by right/down and left/up, and skip deep candidates', () => {
 		let currentIndex = 0;
 		const wrapper = mount( (
 			<NavigableMenu orientation="vertical" onNavigate={ ( index ) => currentIndex = index }>
@@ -108,12 +112,16 @@ describe( 'NavigableMenu', () => {
 		assertKeyDown( UP, 2, true );
 		assertKeyDown( UP, 1, true );
 		assertKeyDown( UP, 0, true );
-		assertKeyDown( LEFT, 0, true );
+		assertKeyDown( RIGHT, 1, true );
+		assertKeyDown( RIGHT, 2, true );
 		assertKeyDown( RIGHT, 0, true );
+		assertKeyDown( LEFT, 2, true );
+		assertKeyDown( LEFT, 1, true );
+		assertKeyDown( LEFT, 0, true );
 		assertKeyDown( SPACE, 0, false );
 	} );
 
-	it( 'vertical: should navigate by up and down, and explore deep candidates', () => {
+	it( 'vertical: should navigate by right/down and left/up, and explore deep candidates', () => {
 		let currentIndex = 0;
 		const wrapper = mount( (
 			<NavigableMenu deep={ true } orientation="vertical" onNavigate={ ( index ) => currentIndex = index }>
@@ -146,12 +154,18 @@ describe( 'NavigableMenu', () => {
 		assertKeyDown( UP, 2, true );
 		assertKeyDown( UP, 1, true );
 		assertKeyDown( UP, 0, true );
-		assertKeyDown( LEFT, 0, true );
+		assertKeyDown( RIGHT, 1, true );
+		assertKeyDown( RIGHT, 2, true );
+		assertKeyDown( RIGHT, 3, true );
 		assertKeyDown( RIGHT, 0, true );
+		assertKeyDown( LEFT, 3, true );
+		assertKeyDown( LEFT, 2, true );
+		assertKeyDown( LEFT, 1, true );
+		assertKeyDown( LEFT, 0, true );
 		assertKeyDown( SPACE, 0, false );
 	} );
 
-	it( 'vertical: should navigate by up and down, and stop at edges', () => {
+	it( 'vertical: should navigate by right/down and left/up, and stop at edges', () => {
 		let currentIndex = 0;
 		const wrapper = mount( (
 			<NavigableMenu cycle={ false } orientation="vertical" onNavigate={ ( index ) => currentIndex = index }>
@@ -179,148 +193,12 @@ describe( 'NavigableMenu', () => {
 		assertKeyDown( UP, 1, true );
 		assertKeyDown( UP, 0, true );
 		assertKeyDown( UP, 0, true );
-		assertKeyDown( LEFT, 0, true );
-		assertKeyDown( RIGHT, 0, true );
-		assertKeyDown( SPACE, 0, false );
-	} );
-
-	it( 'horizontal: should navigate by left and right', () => {
-		let currentIndex = 0;
-		const wrapper = mount( (
-			<NavigableMenu orientation="horizontal" onNavigate={ ( index ) => currentIndex = index }>
-				<button id="btn1">One</button>
-				<button id="btn2">Two</button>
-				<button id="btn3">Three</button>
-			</NavigableMenu >
-		) );
-
-		simulateVisible( wrapper, '*' );
-
-		const container = wrapper.find( 'div' );
-		wrapper.getDOMNode().querySelector( '#btn1' ).focus();
-
-		// Navigate options
-		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
-			const interaction = fireKeyDown( container, keyCode, false );
-			expect( currentIndex ).toBe( expectedActiveIndex );
-			expect( interaction.stopped ).toBe( expectedStop );
-		}
-
-		assertKeyDown( RIGHT, 1, true );
-		assertKeyDown( RIGHT, 2, true );
-		assertKeyDown( RIGHT, 0, true );
-		assertKeyDown( LEFT, 2, true );
-		assertKeyDown( LEFT, 1, true );
-		assertKeyDown( LEFT, 0, true );
-		assertKeyDown( UP, 0, true );
-		assertKeyDown( DOWN, 0, true );
-		assertKeyDown( SPACE, 0, false );
-	} );
-
-	it( 'horizontal: should navigate by left and right, and skip deep candidates', () => {
-		let currentIndex = 0;
-		const wrapper = mount( (
-			<NavigableMenu orientation="horizontal" onNavigate={ ( index ) => currentIndex = index }>
-				<span tabIndex="-1" id="btn1">One</span>
-				<span tabIndex="-1" id="btn2">Two</span>
-				<span id="btn-deep-wrapper">
-					<span id="btn-deep" tabIndex="-1">Deep</span>
-				</span>
-				<span tabIndex="-1" id="btn3">Three</span>
-			</NavigableMenu >
-		) );
-
-		simulateVisible( wrapper, '*' );
-
-		const container = wrapper.find( 'div' );
-		wrapper.getDOMNode().querySelector( '#btn1' ).focus();
-
-		// Navigate options
-		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
-			const interaction = fireKeyDown( container, keyCode, false );
-			expect( currentIndex ).toBe( expectedActiveIndex );
-			expect( interaction.stopped ).toBe( expectedStop );
-		}
-
-		assertKeyDown( RIGHT, 1, true );
-		assertKeyDown( RIGHT, 2, true );
-		assertKeyDown( RIGHT, 0, true );
-		assertKeyDown( LEFT, 2, true );
-		assertKeyDown( LEFT, 1, true );
-		assertKeyDown( LEFT, 0, true );
-		assertKeyDown( UP, 0, true );
-		assertKeyDown( DOWN, 0, true );
-		assertKeyDown( SPACE, 0, false );
-	} );
-
-	it( 'horizontal: should navigate by left and right, and explore deep candidates', () => {
-		let currentIndex = 0;
-		const wrapper = mount( (
-			<NavigableMenu deep={ true } orientation="horizontal" onNavigate={ ( index ) => currentIndex = index }>
-				<span tabIndex="-1" id="btn1">One</span>
-				<span tabIndex="-1" id="btn2">Two</span>
-				<span id="btn-deep-wrapper">
-					<span id="btn-deep" tabIndex="-1">Deep</span>
-				</span>
-				<span tabIndex="-1" id="btn3">Three</span>
-			</NavigableMenu >
-		) );
-
-		simulateVisible( wrapper, '*' );
-
-		const container = wrapper.find( 'div' );
-		wrapper.getDOMNode().querySelector( '#btn1' ).focus();
-
-		// Navigate options
-		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
-			const interaction = fireKeyDown( container, keyCode, false );
-			expect( currentIndex ).toBe( expectedActiveIndex );
-			expect( interaction.stopped ).toBe( expectedStop );
-		}
-
-		assertKeyDown( RIGHT, 1, true );
-		assertKeyDown( RIGHT, 2, true );
-		assertKeyDown( RIGHT, 3, true );
-		assertKeyDown( RIGHT, 0, true );
-		assertKeyDown( LEFT, 3, true );
-		assertKeyDown( LEFT, 2, true );
-		assertKeyDown( LEFT, 1, true );
-		assertKeyDown( LEFT, 0, true );
-		assertKeyDown( UP, 0, true );
-		assertKeyDown( DOWN, 0, true );
-		assertKeyDown( SPACE, 0, false );
-	} );
-
-	it( 'horizontal: should navigate by left and right, and stop at edges', () => {
-		let currentIndex = 0;
-		const wrapper = mount( (
-			<NavigableMenu cycle={ false } orientation="horizontal" onNavigate={ ( index ) => currentIndex = index }>
-				<span tabIndex="-1" id="btn1">One</span>
-				<span tabIndex="-1" id="btn2">Two</span>
-				<span tabIndex="-1" id="btn3">Three</span>
-			</NavigableMenu >
-		) );
-
-		simulateVisible( wrapper, '*' );
-
-		const container = wrapper.find( 'div' );
-		wrapper.getDOMNode().querySelector( '#btn1' ).focus();
-
-		// Navigate options
-		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
-			const interaction = fireKeyDown( container, keyCode, false );
-			expect( currentIndex ).toBe( expectedActiveIndex );
-			expect( interaction.stopped ).toBe( expectedStop );
-		}
-
 		assertKeyDown( RIGHT, 1, true );
 		assertKeyDown( RIGHT, 2, true );
 		assertKeyDown( RIGHT, 2, true );
 		assertKeyDown( LEFT, 1, true );
 		assertKeyDown( LEFT, 0, true );
 		assertKeyDown( LEFT, 0, true );
-		assertKeyDown( DOWN, 0, true );
-		assertKeyDown( UP, 0, true );
 		assertKeyDown( SPACE, 0, false );
 	} );
 } );
