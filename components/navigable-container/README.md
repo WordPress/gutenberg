@@ -35,12 +35,20 @@ A boolean which tells the component whether or not to cycle from the end back to
 - Required: No
 - default: true
 
+### orientation (NavigableMenu only)
+
+The orientation of the menu. It could be "vertical" or "horizontal"
+
+- Type: `String`
+- Required: No
+- Default: `"vertical"`
+
 ## Classes
 
 ### NavigableMenu
 
 
-A NavigableMenu allows movement up and down (or left and right) the component via the arrow keys. The `tab` key is not handled.
+A NavigableMenu allows movement up and down (or left and right) the component via the arrow keys. The `tab` key is not handled. The `orientation` prop is used to determine whether the arrow keys used are vertical or horizontal.
 
 ### Usage
 

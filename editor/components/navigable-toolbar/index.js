@@ -50,6 +50,7 @@ class NavigableToolbar extends Component {
 		const { children, ...props } = this.props;
 		return (
 			<NavigableMenu
+				orientation="horizontal"
 				role="toolbar"
 				deep
 				ref={ this.bindNode }
