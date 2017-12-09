@@ -906,35 +906,6 @@ class REST_Annotations_Controller_Test extends WP_Test_REST_Post_Type_Controller
 	}
 
 	/**
-	 * Test that contributors are unable to PUT annotations in any published post.
-	 * Contributors cannot edit_published_posts, so once published they lose access.
-	 */
-	public function test_contributor_update_item_in_any_post_deny_permissions() {
-		foreach ( array( 'contributor' ) as $r ) {
-			wp_set_current_user( self::$user_id[ $r ] );
-
-			foreach ( self::$roles as $_r ) {
-				foreach ( array( 'in_post_by' ) as $k ) {
-					$request = new WP_REST_Request(
-						'PUT',
-						self::$rest_ns_base .
-						'/' . self::$anno_id[ "${r}:{$k}_{$_r}" ]
-					);
-					$request->set_body_params( array(
-						'content' => 'hello world',
-					) );
-					$response = $this->server->dispatch( $request );
-					$status   = $response->get_status();
-					$data     = $response->get_data();
-
-					$this->assertSame( rest_authorization_required_code(), $status );
-					$this->assertSame( 'rest_cannot_edit', $data['code'] );
-				}
-			}
-		}
-	}
-
-	/**
 	 * Test that authors and contributors are unable to DELETE annotations in others' posts.
 	 */
 	public function test_author_contributor_delete_item_in_others_post_deny_permissions() {
@@ -963,7 +934,7 @@ class REST_Annotations_Controller_Test extends WP_Test_REST_Post_Type_Controller
 	}
 
 	/**
-	 * Test that authors and contributors are able to PUT their own annotations in their own drafts.
+	 * Test that authors and contributors are able to PUT their own annotations in their own posts.
 	 */
 	public function test_author_contributor_update_item_in_own_draft_deny_permissions() {
 		foreach ( array( 'author', 'contributor' ) as $r ) {
@@ -973,7 +944,7 @@ class REST_Annotations_Controller_Test extends WP_Test_REST_Post_Type_Controller
 				if ( $r !== $_r ) {
 					continue; // Skip others.
 				}
-				foreach ( array( 'in_draft_by' ) as $k ) {
+				foreach ( array( 'in_post_by', 'in_draft_by' ) as $k ) {
 					$request = new WP_REST_Request(
 						'PUT',
 						self::$rest_ns_base .
@@ -994,7 +965,7 @@ class REST_Annotations_Controller_Test extends WP_Test_REST_Post_Type_Controller
 	}
 
 	/**
-	 * Test that authors and contributors are able to DELETE their own annotations in their own drafts.
+	 * Test that authors and contributors are able to DELETE their own annotations in their own posts.
 	 */
 	public function test_author_contributor_delete_item_in_own_draft_deny_permissions() {
 		foreach ( array( 'author', 'contributor' ) as $r ) {
@@ -1004,7 +975,7 @@ class REST_Annotations_Controller_Test extends WP_Test_REST_Post_Type_Controller
 				if ( $r !== $_r ) {
 					continue; // Skip others.
 				}
-				foreach ( array( 'in_draft_by' ) as $k ) {
+				foreach ( array( 'in_post_by', 'in_draft_by' ) as $k ) {
 					$request  = new WP_REST_Request(
 						'DELETE',
 						self::$rest_ns_base .

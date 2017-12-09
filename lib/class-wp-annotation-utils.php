@@ -92,7 +92,7 @@ final class WP_Annotation_Utils {
 	 *
 	 * An annotation is a post type, so the checks below are in addition to those registered with the post type.
 	 * Here, we're focused on meta cap checks and the annotation's parent post ID, because an annotation can be a
-	 * child of all other post types. Make sure the non-annotation parent post ID is editable by the user.
+	 * child of all other post types. Make sure the non-annotation parent post can be annotated by the user.
 	 *
 	 * @since [version]
 	 * @access public
@@ -139,8 +139,8 @@ final class WP_Annotation_Utils {
 			return $filtered_caps;
 		}
 
-		// Check if user can edit the parent post ID.
-		if ( ! self::user_can_edit_parent_post( $post, $user ) ) {
+		// Check if user can annotate the parent post ID.
+		if ( ! self::user_can_annotate_parent_post( $post, $user ) ) {
 			return array(); // Deny; revoke all caps in this check.
 		}
 
@@ -148,7 +148,7 @@ final class WP_Annotation_Utils {
 	}
 
 	/**
-	 * Checks if a user can edit an annotation's parent post ID.
+	 * Checks if a user can annotate a parent post.
 	 *
 	 * @since [version]
 	 * @access public
@@ -156,14 +156,19 @@ final class WP_Annotation_Utils {
 	 * @param  int|WP_Post|null $post      Post ID or object. Defaults to current post.
 	 * @param  int|WP_User|null $user      User ID or object. Defaults to current user.
 	 * @param  bool             $is_parent Set to true if the $post *is* the parent post.
-	 * @return bool                        True if $post is an annotation, it has a parent post ID,
-	 *                                     and the user can edit the annotation's parent post ID.
-	 *                                     Or, if $is_parent, $post is not an annotation, and user can edit $post.
+	 *
+	 * @return bool                        True if $post is an annotation,
+	 *                                     the annotation has a parent post ID,
+	 *                                     and the user can annotate the parent post ID.
+	 *
+	 *                                     Or, $is_parent is true,
+	 *                                     $post is not an annotation,
+	 *                                     and the user can annotate the $post.
 	 *
 	 * @see on_user_has_cap()
 	 * @see WP_REST_Annotations_Controller
 	 */
-	public static function user_can_edit_parent_post( $post = null, $user = null, $is_parent = false ) {
+	public static function user_can_annotate_parent_post( $post = null, $user = null, $is_parent = false ) {
 		if ( null === $post ) {
 			$post = get_post();
 		} elseif ( is_int( $post ) && $post > 0 ) {
@@ -189,20 +194,32 @@ final class WP_Annotation_Utils {
 		}
 
 		if ( $is_parent ) {
+			$parent_post_id   = $post->ID;
 			$parent_post      = $post; // It *is* the parent.
 			$parent_post_type = get_post_type_object( $parent_post->post_type );
-
-			if ( $parent_post && $parent_post_type
-					&& $user->has_cap( $parent_post_type->cap->edit_post, $parent_post->ID ) ) {
-				return true;
-			}
 		} else {
 			$parent_post_id   = (int) get_post_meta( $post->ID, '_parent_post_id', true );
 			$parent_post      = $parent_post_id ? get_post( $parent_post_id ) : null;
 			$parent_post_type = $parent_post ? get_post_type_object( $parent_post->post_type ) : null;
+		}
 
-			if ( $parent_post_id && $parent_post && $parent_post_type
-					&& $user->has_cap( $parent_post_type->cap->edit_post, $parent_post->ID ) ) {
+		if ( $parent_post_id && $parent_post && $parent_post_type ) {
+			/*
+			 * If they can edit the parent.
+			 */
+			if ( $user->has_cap( $parent_post_type->cap->edit_post, $parent_post->ID ) ) {
+				return true;
+			}
+
+			/*
+			 * Or, if the only reason they can't edit is because
+			 * they can't edit_published_posts; e.g., a Contributor.
+			 */
+			if ( (int) $parent_post->post_author === $user->ID
+				&& in_array( $parent_post->post_status, array( 'publish', 'future' ), true )
+				&& ! $user->has_cap( $parent_post_type->cap->edit_published_posts )
+				&& $user->has_cap( $parent_post_type->cap->edit_posts )
+			) {
 				return true;
 			}
 		}

@@ -269,6 +269,7 @@ class Annotations_Test extends WP_UnitTestCase {
 
 	/**
 	 * Check that admins and editors can access all annotations without restriction.
+	 * Admins and editors can read, edit, delete, and otherwise manipulate any annotation.
 	 */
 	public function test_admin_editor_allow_permissions() {
 		$post_type = get_post_type_object( WP_Annotation_Utils::$post_type );
@@ -302,35 +303,10 @@ class Annotations_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Check that authors are able to access annotations in their own posts.
-	 * An author can edit_published_posts, so they can annotate published posts too.
+	 * Check that authors and contributors are able to read, edit, and delete
+	 * annotations in their own published posts and their own drafts.
 	 */
 	public function test_author_allow_permissions() {
-		$post_type = get_post_type_object( WP_Annotation_Utils::$post_type );
-		$cap       = $post_type->cap; // Shorter.
-
-		foreach ( array( 'author' ) as $r ) {
-			wp_set_current_user( self::$user_id[ $r ] );
-
-			foreach ( self::$roles as $_r ) {
-				if ( $r !== $_r ) {
-					continue; // Skip over other roles.
-				}
-				foreach ( array( 'in_post_by', 'in_draft_by' ) as $k ) {
-					$this->assertSame( "{$r}:read_post:{$k}_{$_r}:true", "$r:read_post:{$k}_{$_r}:" . ( current_user_can( $cap->read_post, self::$anno_id[ "{$r}:{$k}_{$_r}" ] ) ? 'true' : 'false' ) );
-					$this->assertSame( "{$r}:edit_post:{$k}_{$_r}:true", "$r:edit_post:{$k}_{$_r}:" . ( current_user_can( $cap->edit_post, self::$anno_id[ "{$r}:{$k}_{$_r}" ] ) ? 'true' : 'false' ) );
-					$this->assertSame( "{$r}:delete_post:{$k}_{$_r}:true", "$r:delete_post:{$k}_{$_r}:" . ( current_user_can( $cap->delete_post, self::$anno_id[ "{$r}:{$k}_{$_r}" ] ) ? 'true' : 'false' ) );
-				}
-			}
-		}
-	}
-
-	/**
-	 * Check that authors and contributors are able to access their own annotations
-	 * in a draft. Note: Contributors are unable to access once a post is published,
-	 * because a contributor is unable to edit_published_posts.
-	 */
-	public function test_author_contributor_allow_permissions() {
 		$post_type = get_post_type_object( WP_Annotation_Utils::$post_type );
 		$cap       = $post_type->cap; // Shorter.
 
@@ -339,9 +315,9 @@ class Annotations_Test extends WP_UnitTestCase {
 
 			foreach ( self::$roles as $_r ) {
 				if ( $r !== $_r ) {
-					continue; // Skip over others'.
+					continue; // Skip over other roles.
 				}
-				foreach ( array( 'in_draft_by' ) as $k ) {
+				foreach ( array( 'in_post_by', 'in_draft_by' ) as $k ) {
 					$this->assertSame( "{$r}:read_post:{$k}_{$_r}:true", "$r:read_post:{$k}_{$_r}:" . ( current_user_can( $cap->read_post, self::$anno_id[ "{$r}:{$k}_{$_r}" ] ) ? 'true' : 'false' ) );
 					$this->assertSame( "{$r}:edit_post:{$k}_{$_r}:true", "$r:edit_post:{$k}_{$_r}:" . ( current_user_can( $cap->edit_post, self::$anno_id[ "{$r}:{$k}_{$_r}" ] ) ? 'true' : 'false' ) );
 					$this->assertSame( "{$r}:delete_post:{$k}_{$_r}:true", "$r:delete_post:{$k}_{$_r}:" . ( current_user_can( $cap->delete_post, self::$anno_id[ "{$r}:{$k}_{$_r}" ] ) ? 'true' : 'false' ) );
@@ -366,27 +342,6 @@ class Annotations_Test extends WP_UnitTestCase {
 					continue; // Skip over their own here.
 				}
 				foreach ( array( 'in_post_by', 'in_draft_by' ) as $k ) {
-					$this->assertSame( "{$r}:read_post:{$k}_{$_r}:false", "$r:read_post:{$k}_{$_r}:" . ( current_user_can( $cap->read_post, self::$anno_id[ "{$r}:{$k}_{$_r}" ] ) ? 'true' : 'false' ) );
-					$this->assertSame( "{$r}:edit_post:{$k}_{$_r}:false", "$r:edit_post:{$k}_{$_r}:" . ( current_user_can( $cap->edit_post, self::$anno_id[ "{$r}:{$k}_{$_r}" ] ) ? 'true' : 'false' ) );
-					$this->assertSame( "{$r}:delete_post:{$k}_{$_r}:false", "$r:delete_post:{$k}_{$_r}:" . ( current_user_can( $cap->delete_post, self::$anno_id[ "{$r}:{$k}_{$_r}" ] ) ? 'true' : 'false' ) );
-				}
-			}
-		}
-	}
-
-	/**
-	 * Check that contributors are unable to access annotations (including their own)
-	 * in a post 'published' by anyone (including them). Contributors can't edit_published_posts.
-	 */
-	public function test_contributor_deny_permissions() {
-		$post_type = get_post_type_object( WP_Annotation_Utils::$post_type );
-		$cap       = $post_type->cap; // Shorter.
-
-		foreach ( array( 'contributor' ) as $r ) {
-			wp_set_current_user( self::$user_id[ $r ] );
-
-			foreach ( self::$roles as $_r ) {
-				foreach ( array( 'in_post_by' ) as $k ) {
 					$this->assertSame( "{$r}:read_post:{$k}_{$_r}:false", "$r:read_post:{$k}_{$_r}:" . ( current_user_can( $cap->read_post, self::$anno_id[ "{$r}:{$k}_{$_r}" ] ) ? 'true' : 'false' ) );
 					$this->assertSame( "{$r}:edit_post:{$k}_{$_r}:false", "$r:edit_post:{$k}_{$_r}:" . ( current_user_can( $cap->edit_post, self::$anno_id[ "{$r}:{$k}_{$_r}" ] ) ? 'true' : 'false' ) );
 					$this->assertSame( "{$r}:delete_post:{$k}_{$_r}:false", "$r:delete_post:{$k}_{$_r}:" . ( current_user_can( $cap->delete_post, self::$anno_id[ "{$r}:{$k}_{$_r}" ] ) ? 'true' : 'false' ) );
