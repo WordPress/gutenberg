@@ -10,6 +10,38 @@ import Editable from '../';
 import { diffAriaProps, pickAriaProps } from '../aria';
 
 describe( 'Editable', () => {
+	describe( 'Component', () => {
+		describe( '.proxyPropHandler', () => {
+			// Add tests.
+			const onChange = jest.fn();
+			const wrapper = shallow( <Editable value={ [ 'value' ] } onChange={ onChange } /> );
+
+			beforeEach( () => {
+				onChange.mockClear();
+			} );
+
+			test( 'should return undefined when trying to proxy onFocus', () => {
+				// When trying to override onFocus, via Focus, this method should return null until issue below is resolved.
+				// TODO: Reconcile with `onFocus` instance handler which does not
+				// pass the event object. Otherwise we have double focus handling
+				// and editor instance being stored into state.
+				expect( wrapper.instance().proxyPropHandler( 'Focus' )( {} ) ).toBeUndefined();
+			} );
+
+			test( 'should call the event handler provided via props', () => {
+				wrapper.instance().proxyPropHandler( 'Change' )( {} );
+
+				expect( onChange ).toHaveBeenCalledTimes( 1 );
+				expect( onChange ).toHaveBeenCalledWith( {} );
+			} );
+
+			test( 'should not call the event handler when not existent proxyPropHandler is used', () => {
+				wrapper.instance().proxyPropHandler( 'DoesNotExist' )( {} );
+
+				expect( onChange ).toHaveBeenCalledTimes( 0 );
+			} );
+		} );
+	} );
 	describe( '.propTypes', () => {
 		/* eslint-disable no-console */
 		let consoleError;
