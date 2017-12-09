@@ -37,7 +37,7 @@ import { EVENTS } from './constants';
 
 const { BACKSPACE, DELETE, ENTER } = keycodes;
 
-function createTinyMCEElement( type, props, ...children ) {
+export function createTinyMCEElement( type, props, ...children ) {
 	if ( props[ 'data-mce-bogus' ] === 'all' ) {
 		return null;
 	}
@@ -53,13 +53,13 @@ function createTinyMCEElement( type, props, ...children ) {
 	);
 }
 
-function isLinkBoundary( fragment ) {
+export function isLinkBoundary( fragment ) {
 	return fragment.childNodes && fragment.childNodes.length === 1 &&
 		fragment.childNodes[ 0 ].nodeName === 'A' && fragment.childNodes[ 0 ].text.length === 1 &&
 		fragment.childNodes[ 0 ].text[ 0 ] === '\uFEFF';
 }
 
-function getFormatProperties( formatName, parents ) {
+export function getFormatProperties( formatName, parents ) {
 	switch ( formatName ) {
 		case 'link' : {
 			const anchor = find( parents, node => node.nodeName.toLowerCase() === 'a' );
