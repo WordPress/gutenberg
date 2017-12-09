@@ -1,7 +1,7 @@
 {
   "name": "wordpress/gutenberg",
   "type": "wordpress-plugin",
-  "license": "GPL-2.0",
+  "license": "GPL-2.0+",
   "description": "Prototyping since 1440. Development hub for the editor focus in core.",
   "homepage": "https://wordpress.github.io/gutenberg/",
   "keywords": [
