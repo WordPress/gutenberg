@@ -15,7 +15,7 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import './style.scss';
 
-function ColorPalette( { defaultColors, colors, value, onChange } ) {
+export function ColorPalette( { defaultColors, colors, value, onChange } ) {
 	const usedColors = colors || defaultColors;
 
 	return (
