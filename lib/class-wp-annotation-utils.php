@@ -1022,8 +1022,18 @@ final class WP_Annotation_Utils {
 		}
 
 		if ( $new_history_entry ) {
+			/**
+			 * Allows annotation substatus history length to be increased or decreased.
+			 *
+			 * @since [version]
+			 *
+			 * @param int $length Maximum substatus changes to remember in each annotation.
+			 *                    By default, substatus history will remember the last 25 changes.
+			 */
+			$history_length = apply_filters( 'gutenberg_rest_annotation_substatus_history_length', 25 );
+
 			$history[] = $new_history_entry;
-			$history   = array_slice( $history, -25 ); // Last 25 changes only.
+			$history   = array_slice( $history, -$history_length );
 
 			update_post_meta( $post->ID, '_last_substatus_time', $current_time );
 			update_post_meta( $post->ID, '_substatus_history', $history );
