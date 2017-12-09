@@ -208,6 +208,19 @@ function gutenberg_preload_api_request( $memo, $path ) {
 
 	$response = rest_do_request( $request );
 	if ( 200 === $response->status ) {
+
+		// Makes sure a SuperAdministrator can publish on any sites of the network.
+		if ( '/wp/v2/users/me?context=edit' === $path && is_multisite() && current_user_can( 'manage_sites' ) ) {
+			if ( ! isset( $response->data['capabilities']->publish_posts ) ) {
+				$response->set_data(
+					array(
+						'roles'        => array( 'administrator' ),
+						'capabilities' => get_role( 'administrator' )->capabilities,
+					)
+				);
+			}
+		}
+
 		$memo[ $path ] = array(
 			'body'    => $response->data,
 			'headers' => $response->headers,
