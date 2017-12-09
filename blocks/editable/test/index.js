@@ -10,6 +10,24 @@ import Editable from '../';
 import { diffAriaProps, pickAriaProps } from '../aria';
 
 describe( 'Editable', () => {
+	describe( 'Component', () => {
+		describe( '.adaptFormatter', () => {
+			const wrapper = shallow( <Editable value={ [ 'valid' ] } /> );
+			const options = {
+				type: 'inline-style',
+				style: {
+					'font-weight': 'bold',
+				},
+			};
+
+			test( 'should return an object on inline: span, and a styles property matching the style object provided', () => {
+				expect( wrapper.instance().adaptFormatter( options ) ).toEqual( {
+					inline: 'span',
+					styles: options.style,
+				} );
+			} );
+		} );
+	} );
 	describe( '.propTypes', () => {
 		/* eslint-disable no-console */
 		let consoleError;
