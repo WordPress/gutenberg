@@ -1,0 +1,7 @@
+version: '3.1'
+
+services:
+  wordpress:
+    volumes:
+      - ../../gutenberg-examples:/var/www/html/wp-content/plugins/gutenberg-examples
+      - ../:/var/www/html/wp-content/plugins/gutenberg
