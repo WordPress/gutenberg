@@ -58,7 +58,7 @@ jobs:
         - ./bin/run-wp-unit-tests.sh
 
     - stage: test
-	  env: INSTALL_GUTENBERG_EXAMPLES=true
+      env: INSTALL_GUTENBERG_EXAMPLES=true
       script:
         - npm install || exit 1
         - npm run build || exit 1
