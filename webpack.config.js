@@ -3,6 +3,7 @@
  */
 const webpack = require( 'webpack' );
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
+const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
 
 // Main CSS loader for everything but blocks..
 const mainCSSExtractTextPlugin = new ExtractTextPlugin( {
@@ -35,7 +36,7 @@ const extractConfig = {
 			loader: 'sass-loader',
 			query: {
 				includePaths: [ 'editor/assets/stylesheets' ],
-				data: '@import "colors"; @import "breakpoints"; @import "variables"; @import "mixins"; @import "animations";@import "z-index";',
+				data: '@import "colors"; @import "admin-schemes"; @import "breakpoints"; @import "variables"; @import "mixins"; @import "animations";@import "z-index";',
 				outputStyle: 'production' === process.env.NODE_ENV ?
 					'compressed' : 'nested',
 			},
@@ -136,6 +137,10 @@ const config = {
 		blocksCSSPlugin,
 		editBlocksCSSPlugin,
 		mainCSSExtractTextPlugin,
+		// Create RTL files with a -rtl suffix
+		new WebpackRTLPlugin( {
+			suffix: '-rtl',
+		} ),
 		new webpack.LoaderOptionsPlugin( {
 			minimize: process.env.NODE_ENV === 'production',
 			debug: process.env.NODE_ENV !== 'production',

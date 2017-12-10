@@ -142,7 +142,8 @@ export function switchToBlockType( blocks, name ) {
  */
 export function createReusableBlock( type, attributes ) {
 	return {
-		id: uuid(),
+		id: uuid(), // Temorary id replaced when the block is saved server side
+		isTemporary: true,
 		name: __( 'Untitled block' ),
 		type,
 		attributes,

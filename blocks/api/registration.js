@@ -214,3 +214,15 @@ export function hasBlockSupport( nameOrType, feature, defaultSupports ) {
 		feature,
 	], defaultSupports );
 }
+
+/**
+ * Determines whether or not the given block is a reusable block. This is a
+ * special block type that is used to point to a global block stored via the
+ * API.
+ * 
+ * @param {Object} blockOrType Block or Block Type to test
+ * @return {Boolean}           Whether the given block is a reusable block
+ */
+export function isReusableBlock( blockOrType ) {
+	return blockOrType.name === 'core/block';
+}

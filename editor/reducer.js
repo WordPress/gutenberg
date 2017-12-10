@@ -3,7 +3,6 @@
  */
 import optimist from 'redux-optimist';
 import { combineReducers } from 'redux';
-import { createResponsiveStateReducer } from 'redux-responsive';
 import {
 	flow,
 	partialRight,
@@ -33,14 +32,6 @@ import { getBlockTypes, getBlockType } from '@wordpress/blocks';
 import withHistory from './utils/with-history';
 import withChangeDetection from './utils/with-change-detection';
 import { PREFERENCES_DEFAULTS } from './store-defaults';
-import {
-	BREAK_HUGE,
-	BREAK_WIDE,
-	BREAK_LARGE,
-	BREAK_MEDIUM,
-	BREAK_SMALL,
-	BREAK_MOBILE,
-} from './constants';
 
 /***
  * Module constants
@@ -203,6 +194,29 @@ export const editor = flow( [
 
 			case 'REMOVE_BLOCKS':
 				return omit( state, action.uids );
+
+			case 'SAVE_REUSABLE_BLOCK_SUCCESS': {
+				const { id, updatedId } = action;
+
+				// If a temporary reusable block is saved, we swap the temporary id with the final one
+				if ( id === updatedId ) {
+					return state;
+				}
+
+				return mapValues( state, ( block ) => {
+					if ( block.name === 'core/block' && block.attributes.ref === id ) {
+						return {
+							...block,
+							attributes: {
+								...block.attributes,
+								ref: updatedId,
+							},
+						};
+					}
+
+					return block;
+				} );
+			}
 		}
 
 		return state;
@@ -695,15 +709,12 @@ export function metaBoxes( state = defaultMetaBoxState, action ) {
 	}
 }
 
-// Create responsive reducer with the breakpoints imported from the scss variables file.
-const responsive = createResponsiveStateReducer( {
-	mobile: BREAK_MOBILE,
-	small: BREAK_SMALL,
-	medium: BREAK_MEDIUM,
-	large: BREAK_LARGE,
-	wide: BREAK_WIDE,
-	huge: BREAK_HUGE,
-} );
+export function browser( state = {}, action ) {
+	if ( action.type === 'BROWSER_RESIZE' ) {
+		return { width: action.width, height: action.height };
+	}
+	return state;
+}
 
 export const reusableBlocks = combineReducers( {
 	data( state = {}, action ) {
@@ -728,6 +739,22 @@ export const reusableBlocks = combineReducers( {
 							...( existingReusableBlock && existingReusableBlock.attributes ),
 							...reusableBlock.attributes,
 						},
+					},
+				};
+			}
+
+			case 'SAVE_REUSABLE_BLOCK_SUCCESS': {
+				const { id, updatedId } = action;
+
+				// If a temporary reusable block is saved, we swap the temporary id with the final one
+				if ( id === updatedId ) {
+					return state;
+				}
+				return {
+					...omit( state, id ),
+					[ updatedId ]: {
+						...omit( state[ id ], [ 'id', 'isTemporary' ] ),
+						id: updatedId,
 					},
 				};
 			}
@@ -768,6 +795,6 @@ export default optimist( combineReducers( {
 	saving,
 	notices,
 	metaBoxes,
-	responsive,
+	browser,
 	reusableBlocks,
 } ) );

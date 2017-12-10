@@ -89,9 +89,10 @@ class Inserter extends Component {
 					</IconButton>
 				) }
 				renderContent={ ( { onClose } ) => {
-					const onInsert = ( name ) => {
+					const onInsert = ( name, initialAttributes ) => {
 						onInsertBlock(
 							name,
+							initialAttributes,
 							insertionPoint
 						);
 
@@ -114,10 +115,10 @@ export default flowRight( [
 			};
 		},
 		( dispatch ) => ( {
-			onInsertBlock( name, position ) {
+			onInsertBlock( name, initialAttributes, position ) {
 				dispatch( hideInsertionPoint() );
 				dispatch( insertBlock(
-					createBlock( name ),
+					createBlock( name, initialAttributes ),
 					position
 				) );
 			},
