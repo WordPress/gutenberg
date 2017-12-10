@@ -161,3 +161,7 @@ components that are directly rendered by the component we want to test.
 
 [snapshot testing]: https://facebook.github.io/jest/docs/en/snapshot-testing.html
 [update snapshots]: https://facebook.github.io/jest/docs/en/snapshot-testing.html#updating-snapshots
+
+## Testing with the Example Plugins
+
+The [gutenberg examples](https://github.com/WordPress/gutenberg-examples) can be tested by setting the `INSTALL_GUTENBERG_EXAMPLES` enviormental variable to true. In order for the examples to be installed, the initial run of `./bin/setup-local-env.sh` should also have `INSTALL_GUTENBERG_EXAMPLES` set to true. This can be done by running the command as `INSTALL_GUTENBERG_EXAMPLES=true ./bin/setup-local-env.sh`.
