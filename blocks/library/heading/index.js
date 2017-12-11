@@ -121,7 +121,7 @@ registerBlockType( 'core/heading', {
 					<BlockDescription>
 						<p>{ __( 'Search engines use the headings to index the structure and content of your web pages.' ) }</p>
 					</BlockDescription>
-					<h2>{ __( 'Heading Settings' ) }</h2>
+					<h3>{ __( 'Heading Settings' ) }</h3>
 					<p>{ __( 'Size' ) }</p>
 					<Toolbar
 						controls={
