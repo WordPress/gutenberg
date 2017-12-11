@@ -59,10 +59,10 @@ function gutenberg_parse_blocks( $content ) {
 	 */
 	if ( false === strpos( $content, '<!-- wp:' ) ) {
 		return array(
-				array(
-					'attrs' => array(),
-					'innerHTML' => $content,
-				),
+			array(
+				'attrs'     => array(),
+				'innerHTML' => $content,
+			),
 		);
 	}
 
