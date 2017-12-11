@@ -2,7 +2,7 @@
 	position: relative;
 	padding: 5px 0;
 
-	div {
+	h1 {
 		border: 1px solid transparent;
 		font-size: $editor-font-size;
 		transition: 0.2s outline;
@@ -11,12 +11,12 @@
 		padding: $block-padding;
 	}
 
-	&:hover div {
+	&:hover h1 {
 		border: 1px solid $light-gray-500;
 		transition: 0.2s outline;
 	}
 
-	&.is-selected div {
+	&.is-selected h1 {
 		border: 1px solid $light-gray-500;
 		transition: 0.2s outline;
 	}
@@ -34,9 +34,6 @@ textarea.editor-post-title__input {
 	padding: 5px 0;
 	margin: 0;
 
-	// inherited from h1
-	font-weight: 600;
-
 	&:focus {
 		outline: none;
 		box-shadow: none;
@@ -44,7 +41,6 @@ textarea.editor-post-title__input {
 }
 
 .editor-post-title .editor-post-permalink {
-	font-size: $default-font-size;
 	position: absolute;
 	top: -34px;
 	left: 0;

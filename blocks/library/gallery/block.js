@@ -222,7 +222,7 @@ class GalleryBlock extends Component {
 			focus && (
 				<InspectorControls key="inspector">
 					{blockDescription}
-					<h2>{ __( 'Gallery Settings' ) }</h2>
+					<h3>{ __( 'Gallery Settings' ) }</h3>
 					{ images.length > 1 && <RangeControl
 						label={ __( 'Columns' ) }
 						value={ columns }
