@@ -17,12 +17,7 @@ function gutenberg_render_block_core_reusable_block( $attributes ) {
 		return '';
 	}
 
-	$reusable_block_id = absint( $attributes['ref'] );
-	if ( ! $reusable_block_id ) {
-		return '';
-	}
-
-	$reusable_block = get_post( $reusable_block_id );
+	$reusable_block = get_post( $attributes['ref'] );
 	if ( ! $reusable_block || 'wp_block' !== $reusable_block->post_type ) {
 		return '';
 	}
