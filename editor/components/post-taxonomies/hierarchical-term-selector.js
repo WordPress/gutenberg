@@ -9,7 +9,7 @@ import { unescape as unescapeString, without, groupBy, map, repeat, find } from 
  */
 import { __, _x } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { withInstanceId } from '@wordpress/components';
+import { withInstanceId, withSpokenMessages } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -114,7 +114,9 @@ class HierarchicalTermSelector extends Component {
 			.then( ( term ) => {
 				const hasTerm = !! find( this.state.availableTerms, ( availableTerm ) => availableTerm.id === term.id );
 				const newAvailableTerms = hasTerm ? this.state.availableTerms : [ term, ...this.state.availableTerms ];
-				const { onUpdateTerms, restBase, terms } = this.props;
+				const { onUpdateTerms, restBase, terms, slug } = this.props;
+				const termAddedMessage = slug === 'category' ? __( 'Category added' ) : __( 'Term added' );
+				this.props.speak( termAddedMessage, 'assertive' );
 				this.setState( {
 					adding: false,
 					formName: '',
@@ -287,4 +289,4 @@ export default connect(
 			return editPost( { [ restBase ]: terms } );
 		},
 	}
-)( withInstanceId( HierarchicalTermSelector ) );
+)( withSpokenMessages( withInstanceId( HierarchicalTermSelector ) ) );
