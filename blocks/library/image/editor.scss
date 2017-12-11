@@ -32,6 +32,7 @@
 	}
 }
 
+/*!rtl:begin:ignore*/
 .wp-block-image__resize-handler-top-right {
 	top: -6px !important;
 	right: -6px !important;
@@ -51,6 +52,7 @@
 	bottom: -6px !important;
 	left: -6px !important;
 }
+/*!rtl:end:ignore*/
 
 .editor-block-list__block[data-type="core/image"] {
 	.blocks-format-toolbar__link-modal {
