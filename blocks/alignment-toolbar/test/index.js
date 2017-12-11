@@ -9,37 +9,36 @@ import { shallow } from 'enzyme';
 import AlignmentToolbar from '../';
 
 describe( 'AlignmentToolbar', () => {
-	const value = 'left';
-	const onChange = jest.fn();
+	const alignment = 'left';
+	const onChangeSpy = jest.fn();
 
-	const wrapper = shallow( <AlignmentToolbar value={ value } onChange={ onChange } /> );
+	const wrapper = shallow( <AlignmentToolbar value={ alignment } onChange={ onChangeSpy } /> );
 
 	const controls = wrapper.props().controls;
 
-	beforeEach( () => {
-		onChange.mockClear();
+	afterEach( () => {
+		onChangeSpy.mockClear();
 	} );
 
-	test( 'should render the component.', () => {
+	test( 'should match snapshot', () => {
 		expect( wrapper ).toMatchSnapshot();
 	} );
 
-	test( 'should call on change with null when a control is already active.', () => {
-		// Check onClick handler for an active control.
-		controls.find( ( control ) => control.isActive ).onClick();
+	test( 'should call on change with null when a control is already active', () => {
+		const activeControl = controls.find( ( { isActive } ) => isActive );
+		activeControl.onClick();
 
-		expect( onChange ).toHaveBeenCalledTimes( 1 );
-		// Should be called null when active control is clicked.
-		expect( onChange ).toHaveBeenCalledWith( null );
+		expect( activeControl.align ).toBe( alignment );
+		expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
+		expect( onChangeSpy ).toHaveBeenCalledWith( null );
 	} );
 
-	test( 'should call on change a new value when the control is not active.', () => {
-		// Check onClick handler for an inactive control.
-		const inactiveControl = controls.find( ( control ) => ! control.isActive );
+	test( 'should call on change a new value when the control is not active', () => {
+		const inactiveControl = controls.find( ( { align } ) => align === 'center' );
 		inactiveControl.onClick();
 
-		expect( onChange ).toHaveBeenCalledTimes( 1 );
-		// Should be called null when inactive control is clicked.
-		expect( onChange ).toHaveBeenCalledWith( inactiveControl.align );
+		expect( inactiveControl.isActive ).toBe( false );
+		expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
+		expect( onChangeSpy ).toHaveBeenCalledWith( 'center' );
 	} );
 } );

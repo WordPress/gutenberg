@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`AlignmentToolbar should render the component. 1`] = `
+exports[`AlignmentToolbar should match snapshot 1`] = `
 <Toolbar
   controls={
     Array [
