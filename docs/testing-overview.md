@@ -12,9 +12,9 @@ Assuming you've followed the instructions above to install Node and project depe
 npm test
 ```
 
-To run unit tests only, use `npm run test-unit` instead.
-
 Code style in JavaScript is enforced using [ESLint](http://eslint.org/). The above `npm test` will execute both unit tests and code linting. Code linting can be verified independently by running `npm run lint`.
+
+To run unit tests only, without the linter, use `npm run test-unit` instead.
 
 ### Snapshot testing
 
@@ -159,7 +159,7 @@ Code coverage is measured for each PR using the [codecov.io](https://codecov.io/
 
 ## End to end Testing
 
-If you're using the built-in local environment above, you can run the e2e tests locally using this command:
+If you're using the built-in [local environment](https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md#local-environment), you can run the e2e tests locally using this command:
 
 ```bash
 npm run test-e2e
