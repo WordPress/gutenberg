@@ -37,9 +37,12 @@ describe( 'Multi-block selection', () => {
 		cy.get( lastBlockContainerSelector ).should( 'not.have.class', multiSelectedCssClass );
 
 		// Multiselect via keyboard
-		// Mac uses meta modifier so we press both here
-		cy.get( 'body' ).type( '{ctrl}a' );
-		cy.get( 'body' ).type( '{meta}a' );
+		const isMacOs = Cypress.platform === 'darwin';
+		if ( isMacOs ) {
+			cy.get( 'body' ).type( '{meta}a' );
+		} else {
+			cy.get( 'body' ).type( '{ctrl}a' );
+		}
 
 		// Verify selection
 		cy.get( firstBlockContainerSelector ).should( 'have.class', multiSelectedCssClass );
