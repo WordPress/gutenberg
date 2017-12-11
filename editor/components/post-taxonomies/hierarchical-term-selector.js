@@ -215,7 +215,7 @@ class HierarchicalTermSelector extends Component {
 		/* eslint-disable jsx-a11y/no-onchange */
 		return (
 			<div className="editor-post-taxonomies__hierarchical-terms-selector">
-				<h4 className="editor-post-taxonomies__hierarchical-terms-selector-title">{ label }</h4>
+				<h3 className="editor-post-taxonomies__hierarchical-terms-selector-title">{ label }</h3>
 				{ this.renderTerms( availableTermsTree ) }
 				{ ! loading &&
 					<button
