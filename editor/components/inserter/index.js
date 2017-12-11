@@ -3,7 +3,7 @@
  */
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { flowRight, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,7 +11,7 @@ import { flowRight, isEmpty } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { Dropdown, IconButton, withContext } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
-import { Component } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -106,7 +106,7 @@ class Inserter extends Component {
 	}
 }
 
-export default flowRight( [
+export default compose( [
 	connect(
 		( state ) => {
 			return {
