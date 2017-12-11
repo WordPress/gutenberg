@@ -86,8 +86,8 @@ class HierarchicalTermSelector extends Component {
 
 	onAddTerm( event ) {
 		event.preventDefault();
-		const { formName, formParent } = this.state;
-		if ( formName === '' ) {
+		const { formName, formParent, adding } = this.state;
+		if ( formName === '' || adding ) {
 			return;
 		}
 		const findOrCreatePromise = new Promise( ( resolve, reject ) => {
@@ -203,7 +203,7 @@ class HierarchicalTermSelector extends Component {
 	}
 
 	render() {
-		const { availableTermsTree, availableTerms, formName, formParent, loading, adding, showForm } = this.state;
+		const { availableTermsTree, availableTerms, formName, formParent, loading, showForm } = this.state;
 		const { label, slug, instanceId } = this.props;
 
 		const newTermButtonLabel = slug === 'category' ? __( 'Add new category' ) : __( 'Add new term' );
@@ -266,7 +266,6 @@ class HierarchicalTermSelector extends Component {
 						<button
 							type="submit"
 							className="button editor-post-taxonomies__hierarchical-terms-submit"
-							disabled={ adding }
 						>
 							{ newTermSubmitLabel }
 						</button>
