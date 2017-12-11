@@ -9,35 +9,36 @@ import { shallow } from 'enzyme';
 import { BlockAlignmentToolbar } from '../';
 
 describe( 'BlockAlignmentToolbar', () => {
-	const value = 'left';
+	const alignment = 'left';
 	const onChange = jest.fn();
 
-	const wrapper = shallow( <BlockAlignmentToolbar value={ value } onChange={ onChange } /> );
+	const wrapper = shallow( <BlockAlignmentToolbar value={ alignment } onChange={ onChange } /> );
 
 	const controls = wrapper.props().controls;
 
-	beforeEach( () => {
+	afterEach( () => {
 		onChange.mockClear();
 	} );
 
-	test( 'should render the component.', () => {
+	test( 'should match snapshot', () => {
 		expect( wrapper ).toMatchSnapshot();
 	} );
 
-	test( 'should call onChange with undefined, when the control is already active.', () => {
-		// Check onClick handler for an active control.
-		controls.find( ( control ) => control.isActive ).onClick();
+	test( 'should call onChange with undefined, when the control is already active', () => {
+		const activeControl = controls.find( ( { icon } ) => icon === `align-${ alignment }` );
+		activeControl.onClick();
 
+		expect( activeControl.isActive ).toBe( true );
 		expect( onChange ).toHaveBeenCalledTimes( 1 );
-		// Should be called null when active control is clicked.
 		expect( onChange ).toHaveBeenCalledWith( undefined );
 	} );
 
-	test( 'should call onChange when the control is inactive.', () => {
-		// Check onClick handler for an inactive control.
-		const inactiveControl = controls.find( ( control ) => ! control.isActive );
-		inactiveControl.onClick();
+	test( 'should call onChange with alignment value when the control is inactive', () => {
+		const inactiveCenterControl = controls.find( ( { icon } ) => icon === 'align-center' );
+		inactiveCenterControl.onClick();
 
+		expect( inactiveCenterControl.isActive ).toBe( false );
 		expect( onChange ).toHaveBeenCalledTimes( 1 );
+		expect( onChange ).toHaveBeenCalledWith( 'center' );
 	} );
 } );
