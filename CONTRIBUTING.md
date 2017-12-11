@@ -77,6 +77,11 @@ If you're using another local environment setup, you can still run the e2e tests
 cypress_base_url=http://my-custom-basee-url cypress_username=myusername cypress_password=mypassword npm run test-e2e
 ```
 
+If you have the [gutenberg examples](https://github.com/WordPress/gutenberg-examples) installed, you can also run tests for them by setting the `INSTALL_GUTENBERG_EXAMPLES` enviormental variable to true. This is usefull if you are making changes to the exposed API. You can do so like so:
+
+```bash
+INSTALL_GUTENBERG_EXAMPLES=true npm run test-e2e
+```
 
 ### PHP Testing
 

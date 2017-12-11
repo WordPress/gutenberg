@@ -3,11 +3,22 @@
 # Exit if any command fails
 set -e
 
+EXAMPLES_DIR="$(cd `dirname $0` && pwd)/../../gutenberg-examples"
+# Install examples if needed 
+if [ $INSTALL_GUTENBERG_EXAMPLES ] && [ ! -d $EXAMPLES_DIR ] && [ GIT ]; then
+	git clone https://github.com/WordPress/gutenberg-examples.git $EXAMPLES_DIR 
+	find $EXAMPLES_DIR  -type d -name "*esnext" -print0 | xargs -0  -I @@ bash -c "npm install --prefix @@; npm run build --prefix @@;" bash;
+fi
+
 # Change to the expected directory
 cd "$(dirname "$0")/../docker"
 
 # Launch the WordPress docker
-docker-compose up -d
+if [ $INSTALL_GUTENBERG_EXAMPLES ]; then
+	docker-compose -f docker-compose.yml -f examples-compose.yml up -d	
+else
+	docker-compose up -d	
+fi
 
 # Wait until the docker containers are setup properely
 echo "Attempting to connect to wordpress"
@@ -21,3 +32,9 @@ docker run -it --rm --volumes-from wordpress-dev --network container:wordpress-d
 
 # Activate Gutenberg
 docker run -it --rm --volumes-from wordpress-dev --network container:wordpress-dev wordpress:cli plugin activate gutenberg
+
+
+# Activate Gutenberg Examples if present 
+if [ -d $EXAMPLES_DIR ]; then
+	docker run -it --rm --volumes-from wordpress-dev --network container:wordpress-dev wordpress:cli plugin activate gutenberg-examples
+fi
