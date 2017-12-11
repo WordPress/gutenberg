@@ -133,14 +133,3 @@
 .components-panel .circle-picker {
 	padding-bottom: 20px;
 }
-
-body.rtl .gutenberg .dashicon {
-	&.dashicons-editor-outdent,
-	&.dashicons-editor-indent,
-	&.dashicons-list-view,
-	&.dashicons-editor-ul {
-		transform: scaleX(-1);
-		-ms-filter: fliph;
-		filter: FlipH;
-	}
-}
