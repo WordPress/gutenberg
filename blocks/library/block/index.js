@@ -163,7 +163,7 @@ registerBlockType( 'core/block', {
 
 	attributes: {
 		ref: {
-			type: 'string',
+			type: 'number',
 		},
 	},
 

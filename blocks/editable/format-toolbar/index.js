@@ -14,7 +14,7 @@ import UrlInput from '../../url-input';
 import { filterURLForDisplay } from '../../../editor/utils/url';
 import ToggleControl from '../../inspector-controls/toggle-control';
 
-const { ESCAPE } = keycodes;
+const { ESCAPE, LEFT, RIGHT, UP, DOWN } = keycodes;
 
 const FORMATTING_CONTROLS = [
 	{
@@ -42,8 +42,8 @@ const FORMATTING_CONTROLS = [
 // Default controls shown if no `enabledControls` prop provided
 const DEFAULT_CONTROLS = [ 'bold', 'italic', 'strikethrough', 'link' ];
 
-// Stop the keypress event from propagating up to maybeStartTyping in BlockListBlock
-const stopKeyPressPropagation = ( event ) => event.stopPropagation();
+// Stop the key event from propagating up to maybeStartTyping in BlockListBlock
+const stopKeyPropagation = ( event ) => event.stopPropagation();
 
 class FormatToolbar extends Component {
 	constructor() {
@@ -66,20 +66,15 @@ class FormatToolbar extends Component {
 		this.setLinkTarget = this.setLinkTarget.bind( this );
 	}
 
-	componentDidMount() {
-		document.addEventListener( 'keydown', this.onKeyDown );
-	}
-
-	componentWillUnmount() {
-		document.removeEventListener( 'keydown', this.onKeyDown );
-	}
-
 	onKeyDown( event ) {
 		if ( event.keyCode === ESCAPE ) {
 			if ( this.state.isEditingLink ) {
 				event.stopPropagation();
 				this.dropLink();
 			}
+		}
+		if ( [ LEFT, DOWN, RIGHT, UP ].indexOf( event.keyCode ) > -1 ) {
+			stopKeyPropagation( event );
 		}
 	}
 
@@ -181,7 +176,8 @@ class FormatToolbar extends Component {
 						<form
 							className="blocks-format-toolbar__link-modal"
 							style={ linkStyle }
-							onKeyPress={ stopKeyPressPropagation }
+							onKeyPress={ stopKeyPropagation }
+							onKeyDown={ this.onKeyDown }
 							onSubmit={ this.submitLink }>
 							<div className="blocks-format-toolbar__link-modal-line">
 								<UrlInput value={ newLinkValue } onChange={ this.onChangeLinkValue } />
@@ -206,7 +202,7 @@ class FormatToolbar extends Component {
 						<div
 							className="blocks-format-toolbar__link-modal"
 							style={ linkStyle }
-							onKeyPress={ stopKeyPressPropagation }
+							onKeyPress={ stopKeyPropagation }
 						>
 							<div className="blocks-format-toolbar__link-modal-line">
 								<a

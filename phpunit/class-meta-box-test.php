@@ -235,4 +235,18 @@ class Meta_Box_Test extends WP_UnitTestCase {
 
 		$this->assertEquals( $expected, $actual );
 	}
+
+	/**
+	 * Test that a removed meta box remains empty after gutenberg_intercept_meta_box_render() fires.
+	 */
+	public function test_gutenberg_intercept_meta_box_render_skips_empty_boxes() {
+		global $wp_meta_boxes;
+
+		add_meta_box( 'test-intercept-box', 'Test Intercept box', '__return_empty_string', 'post', 'side', 'default' );
+		remove_meta_box( 'test-intercept-box', 'post', 'side' );
+
+		gutenberg_intercept_meta_box_render();
+
+		$this->assertFalse( $wp_meta_boxes['post']['side']['default']['test-intercept-box'] );
+	}
 }

@@ -41,66 +41,13 @@ You can pick among all the <a href="https://github.com/WordPress/gutenberg/issue
 
 ## Testing
 
-Gutenberg contains both PHP and JavaScript code, and encourages testing and code style linting for both.
+Gutenberg contains both PHP and JavaScript code, and encourages testing and code style linting for both. It also incorporates end-to-end testing using [Cypress](https://www.cypress.io/). You can find out more details in [Testing Overview document](./docs/testing-overview.md).
 
-### JavaScript Testing
-
-Tests for JavaScript use [Jest](http://facebook.github.io/jest/) as the test runner. If needed, you can also use [Enzyme](https://github.com/airbnb/enzyme) for React component testing.
-
-Assuming you've followed the instructions above to install Node and project dependencies, tests can be run from the command-line with NPM:
-
-```
-npm test
-```
-
-To run unit tests only, use `npm run test-unit` instead.
-
-Code style in JavaScript is enforced using [ESLint](http://eslint.org/). The above `npm test` will execute both unit tests and code linting. Code linting can be verified independently by running `npm run lint`.
-
-### End to end Testing (integration tests)
-
-If you're using the built-in local environment above, you can run the e2e tests locally using this command:
-
-```bash
-npm run test-e2e
-```
-
-or interactively
-
-```bash
-npm run test-e2e:watch
-```
-
-If you're using another local environment setup, you can still run the e2e tests by overriding the base URL and the default WP username/password used in the tests like so:
-
-```bash
-cypress_base_url=http://my-custom-basee-url cypress_username=myusername cypress_password=mypassword npm run test-e2e
-```
-
-
-### PHP Testing
-
-Tests for PHP use [PHPUnit](https://phpunit.de/) as the testing framework. Before starting, you should install PHPUnit and have a copy of [WordPress Develop](https://github.com/WordPress/wordpress-develop) available and setup a [`wp-tests-config.php`](https://make.wordpress.org/core/handbook/testing/automated-testing/phpunit/#setup) file. If the Gutenberg plugin is installed in the context of a WordPress Develop site, you can run `phpunit` directly from the command-line. Otherwise, you will need to specify the path to WordPress Develop's test directory as an environment variable:
-
-```
-WP_TESTS_DIR=/path/to/wordpress-develop/tests/phpunit phpunit
-```
-
-Code style in PHP is enforced using [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer). It is recommended that you install PHP_CodeSniffer and the [WordPress Coding Standards for PHP_CodeSniffer](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards#installation) ruleset using [Composer](https://getcomposer.org/). With Composer installed, run `composer install` from the project directory to install dependencies, then `composer run-script lint` to verify PHP code standards.
-
-### Code Coverage
-
-Code coverage is measured for each PR using the
-[codecov.io](https://codecov.io/gh/WordPress/gutenberg)
-tool.
-[Code coverage](https://en.wikipedia.org/wiki/Code_coverage)
-is a way of measuring the amount of code covered by the tests in the test suite of a project.  In Gutenberg, it is currently measured for JavaScript code only.
-
-### How Designers Can Contribute
+## How Designers Can Contribute
 
 If you'd like to contribute to the design or front-end, feel free to contribute to tickets labelled <a href="https://github.com/WordPress/gutenberg/issues?q=is%3Aissue+is%3Aopen+label%3ADesign">Design</a>. We could use your thoughtful replies, mockups, animatics, sketches, doodles. Proposed changes are best done as minimal and specific iterations on the work that precedes it so we can compare. If you use <a href="https://www.sketchapp.com/">Sketch</a>, you can grab <a href="https://cloudup.com/cMPXM8Va2cy">the source file for the mockups</a> (updated April 6th).
 
-### Contribute to the Documentation
+## Contribute to the Documentation
 
 Documentation is automatically synced from master to the [Gutenberg Documentation Website](https://wordpress.org/gutenberg/handbook/) every 15 minutes.
 

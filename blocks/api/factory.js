@@ -10,6 +10,7 @@ import {
 	findIndex,
 	isObjectLike,
 	find,
+	uniqueId,
 } from 'lodash';
 
 /**
@@ -142,7 +143,7 @@ export function switchToBlockType( blocks, name ) {
  */
 export function createReusableBlock( type, attributes ) {
 	return {
-		id: uuid(), // Temorary id replaced when the block is saved server side
+		id: +uniqueId(), // Temorary id replaced when the block is saved server side
 		isTemporary: true,
 		name: __( 'Untitled block' ),
 		type,

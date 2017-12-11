@@ -1,6 +1,6 @@
 {
   "name": "gutenberg",
-  "version": "1.8.1",
+  "version": "1.9.0",
   "description": "A new WordPress editor experience",
   "main": "build/app.js",
   "repository": "git+https://github.com/WordPress/gutenberg.git",
@@ -10,6 +10,10 @@
     "WordPress",
     "editor"
   ],
+  "engines": {
+    "node": ">=8.0.0",
+    "npm": ">=5.0.0"
+  },
   "dependencies": {
     "@wordpress/a11y": "0.1.0-beta.1",
     "@wordpress/hooks": "1.0.1",
@@ -60,10 +64,11 @@
     "babel-plugin-transform-runtime": "6.23.0",
     "babel-preset-env": "1.6.0",
     "babel-traverse": "6.26.0",
+    "check-node-version": "3.1.1",
     "codecov": "2.3.0",
     "concurrently": "3.5.0",
     "cross-env": "3.2.4",
-    "cypress": "1.0.2",
+    "cypress": "1.1.4",
     "deep-freeze": "0.0.1",
     "enzyme": "3.1.0",
     "enzyme-adapter-react-16": "1.0.2",
@@ -125,9 +130,11 @@
     "verbose": true
   },
   "scripts": {
+    "prebuild": "check-node-version --package",
     "build": "cross-env BABEL_ENV=default NODE_ENV=production webpack",
     "gettext-strings": "cross-env BABEL_ENV=gettext webpack",
     "lint": "eslint .",
+    "predev": "check-node-version --package",
     "dev": "cross-env BABEL_ENV=default webpack --watch",
     "test": "npm run lint && npm run test-unit",
     "ci": "concurrently \"npm run lint && npm run build\" \"npm run test-unit:coverage-ci\"",
