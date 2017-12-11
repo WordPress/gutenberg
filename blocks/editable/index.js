@@ -558,6 +558,7 @@ export default class Editable extends Component {
 				if ( event.shiftKey || ! this.props.onSplit ) {
 					this.editor.execCommand( 'InsertLineBreak', false, event );
 				} else {
+					event.stopImmediatePropagation();
 					this.splitContent();
 				}
 			}
