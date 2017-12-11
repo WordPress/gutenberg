@@ -31,14 +31,14 @@ export function PageAttributes( { onUpdateOrder, instanceId, order } ) {
 		<PageAttributesCheck>
 			<label htmlFor={ inputId }>
 				{ __( 'Order' ) }
-			</label>,
+			</label>
 			<input
 				type="text"
 				value={ order || 0 }
 				onChange={ setUpdatedOrder }
 				id={ inputId }
 				size={ 6 }
-			/>,
+			/>
 		</PageAttributesCheck>
 	);
 }
