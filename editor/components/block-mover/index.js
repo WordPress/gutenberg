@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { first, last, flow } from 'lodash';
+import { first, last } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,6 +10,7 @@ import { first, last, flow } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { IconButton, withContext } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
+import { compose } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -64,7 +65,7 @@ export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, block
 	);
 }
 
-export default flow(
+export default compose(
 	connect(
 		( state, ownProps ) => {
 			const block = getBlock( state, first( ownProps.uids ) );
