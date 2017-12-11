@@ -512,7 +512,7 @@ function gutenberg_replace_default_add_new_button() {
 			newbutton += '<a href="' + newUrl + '">' + button.innerText + '</a>';
 			newbutton += '<span class="expander" tabindex="0" role="button" aria-haspopup="true" aria-label="<?php echo esc_js( __( 'Toggle editor selection menu', 'gutenberg' ) ); ?>"></span>';
 			newbutton += '<span class="dropdown"><a href="' + newUrl + '">Gutenberg</a>';
-			newbutton += '<a href="' + url + '"><?php echo esc_js( __( 'Classic Editor', 'gutenberg' ) ); ?></a></span></span>';
+			newbutton += '<a href="' + url + '"><?php echo esc_js( __( 'Classic Editor', 'gutenberg' ) ); ?></a></span></span><span class="page-title-action" style="display:none;"></span>';
 
 			button.insertAdjacentHTML( 'afterend', newbutton );
 			button.remove();
