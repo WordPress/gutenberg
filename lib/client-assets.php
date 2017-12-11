@@ -219,7 +219,7 @@ function gutenberg_preload_api_request( $memo, $path ) {
 		if ( '/wp/v2/users/me?context=edit' === $path ) {
 			global $post;
 
-			// Get the Post's post type
+			// Get the Post's post type.
 			$post_type = get_post_type( $post );
 
 			// Use the REST API User's Controller caps as default ones.
@@ -231,7 +231,7 @@ function gutenberg_preload_api_request( $memo, $path ) {
 
 				// Loop in the Post Type's caps to validate the User's caps for it.
 				foreach ( $post_type_object->cap as $post_cap => $post_type_cap ) {
-					// Ignore caps requiring a post ID
+					// Ignore caps requiring a post ID.
 					if ( in_array( $post_cap, array( 'edit_post', 'read_post', 'delete_post' ) ) ) {
 						continue;
 					}
