@@ -53,6 +53,19 @@ function unregister_block_type( $name ) {
  * @return array  Array of parsed block objects.
  */
 function gutenberg_parse_blocks( $content ) {
+	/*
+	 * If there are no blocks in the content, return a single block, rather
+	 * than wasting time trying to parse the string.
+	 */
+	if ( false === strpos( $content, '<!-- wp:' ) ) {
+		return array(
+				array(
+					'attrs' => array(),
+					'innerHTML' => $content,
+				),
+		);
+	}
+
 	$parser = new Gutenberg_PEG_Parser;
 	return $parser->parse( _gutenberg_utf8_split( $content ) );
 }
