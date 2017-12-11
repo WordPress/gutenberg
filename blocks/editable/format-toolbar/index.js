@@ -14,7 +14,7 @@ import UrlInput from '../../url-input';
 import { filterURLForDisplay } from '../../../editor/utils/url';
 import ToggleControl from '../../inspector-controls/toggle-control';
 
-const { ESCAPE, LEFT, DOWN } = keycodes;
+const { ESCAPE, LEFT, RIGHT, UP, DOWN } = keycodes;
 
 const FORMATTING_CONTROLS = [
 	{
@@ -73,7 +73,7 @@ class FormatToolbar extends Component {
 				this.dropLink();
 			}
 		}
-		if ( event.keyCode >= LEFT && event.keyCode <= DOWN ) {
+		if ( [ LEFT, DOWN, RIGHT, UP ].indexOf( event.keyCode ) > -1 ) {
 			stopKeyPropagation( event );
 		}
 	}

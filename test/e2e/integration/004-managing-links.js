@@ -6,11 +6,11 @@ describe( 'Managing links', () => {
 	const fixedIsOn = 'button.is-selected:contains("Fix toolbar to block")';
 	const fixedIsOff = 'button:contains("Fix toolbar to block"):not(".is-selected")';
 
-	const switchToMode = ( setFixed ) => {
+	const setFixedToolbar = ( b ) => {
 		cy.get( '.editor-ellipsis-menu button' ).click();
 
 		cy.get( 'body' ).then( ( $body ) => {
-			const candidate = setFixed ? fixedIsOff : fixedIsOn;
+			const candidate = b ? fixedIsOff : fixedIsOn;
 			const toggleNeeded = $body.find( candidate );
 			if ( toggleNeeded.length ) {
 				return 'button:contains("Fix toolbar to block")';
@@ -24,7 +24,7 @@ describe( 'Managing links', () => {
 	};
 
 	it( 'Pressing Left and Esc in Link Dialog in "Fixed to Toolbar" mode', () => {
-		switchToMode( true );
+		setFixedToolbar( true );
 
 		cy.get( '.editor-default-block-appender' ).click();
 
@@ -40,7 +40,7 @@ describe( 'Managing links', () => {
 	} );
 
 	it( 'Pressing Left and Esc in Link Dialog in "Docked Toolbar" mode', () => {
-		switchToMode( false );
+		setFixedToolbar( false );
 
 		const lastBlockSelector = '.editor-block-list__block-edit:last [contenteditable="true"]:first';
 
