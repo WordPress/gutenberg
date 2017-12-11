@@ -31,7 +31,7 @@ function gutenberg_render_block_core_reusable_block( $attributes ) {
 register_block_type( 'core/block', array(
 	'attributes'      => array(
 		'ref' => array(
-			'type' => 'string',
+			'type' => 'number',
 		),
 	),
 

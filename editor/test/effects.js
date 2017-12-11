@@ -673,8 +673,8 @@ describe( 'effects', () => {
 				handler( convertBlockToReusable( staticBlock.uid ), store );
 
 				expect( dispatch ).toHaveBeenCalledWith(
-					updateReusableBlock( 'this-is-a-mock-uuid', {
-						id: 'this-is-a-mock-uuid',
+					updateReusableBlock( 1, {
+						id: 1,
 						isTemporary: true,
 						name: 'Untitled block',
 						type: staticBlock.name,
@@ -682,12 +682,12 @@ describe( 'effects', () => {
 					} )
 				);
 				expect( dispatch ).toHaveBeenCalledWith(
-					saveReusableBlock( 'this-is-a-mock-uuid' )
+					saveReusableBlock( 1 )
 				);
 				expect( dispatch ).toHaveBeenCalledWith(
 					replaceBlocks(
 						[ staticBlock.uid ],
-						[ createBlock( 'core/block', { ref: 'this-is-a-mock-uuid' } ) ]
+						[ createBlock( 'core/block', { ref: 1 } ) ]
 					)
 				);
 			} );
