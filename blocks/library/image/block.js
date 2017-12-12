@@ -205,7 +205,7 @@ class ImageBlock extends Component {
 			focus && (
 				<InspectorControls key="inspector">
 					{ blockDescription }
-					<h3>{ __( 'Image Settings' ) }</h3>
+					<h2>{ __( 'Image Settings' ) }</h2>
 					<TextControl label={ __( 'Textual Alternative' ) } value={ alt } onChange={ this.updateAlt } help={ __( 'Describe the purpose of the image. Leave empty if the image is not a key part of the content.' ) } />
 					{ ! isEmpty( availableSizes ) && (
 						<SelectControl
