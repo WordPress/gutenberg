@@ -8,6 +8,7 @@ import { connect } from 'react-redux';
  */
 import { sprintf, _n } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/components';
+import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -20,7 +21,7 @@ import {
 } from '../../selectors';
 import { getWPAdminURL } from '../../utils/url';
 
-function LastRevision( { lastRevisionId, revisionsCount } ) {
+export function LastRevision( { lastRevisionId, revisionsCount } ) {
 	return (
 		<PostLastRevisionCheck>
 			<IconButton
