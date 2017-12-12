@@ -8,7 +8,7 @@ import { unescape as unescapeString, without, groupBy, map, repeat, find } from 
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 import { withInstanceId, withSpokenMessages } from '@wordpress/components';
 
 /**
@@ -277,7 +277,7 @@ class HierarchicalTermSelector extends Component {
 	}
 }
 
-export default connect(
+const applyConnect = connect(
 	( state, onwProps ) => {
 		return {
 			terms: getEditedPostAttribute( state, onwProps.restBase ),
@@ -288,4 +288,10 @@ export default connect(
 			return editPost( { [ restBase ]: terms } );
 		},
 	}
-)( withSpokenMessages( withInstanceId( HierarchicalTermSelector ) ) );
+);
+
+export default compose(
+	applyConnect,
+	withSpokenMessages,
+	withInstanceId
+)( HierarchicalTermSelector );
