@@ -26,6 +26,7 @@
     "escape-string-regexp": "1.0.5",
     "hpq": "1.2.0",
     "jed": "1.1.1",
+    "jquery": "3.2.1",
     "js-beautify": "1.6.14",
     "lodash": "4.17.4",
     "memize": "1.0.4",
