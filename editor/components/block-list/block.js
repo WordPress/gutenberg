@@ -4,7 +4,6 @@
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 import { get, partial, reduce, size } from 'lodash';
-import 'element-closest';
 
 /**
  * WordPress dependencies
@@ -18,7 +17,7 @@ import {
 	getSaveElement,
 	isReusableBlock,
 } from '@wordpress/blocks';
-import { withFilters, withContext, withFocusOutside } from '@wordpress/components';
+import { withFilters, withContext } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -28,6 +27,7 @@ import BlockMover from '../block-mover';
 import BlockDropZone from '../block-drop-zone';
 import BlockSettingsMenu from '../block-settings-menu';
 import InvalidBlockWarning from './invalid-block-warning';
+import BlockListDeselect from './deselect';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
@@ -175,14 +175,6 @@ export class BlockListBlock extends Component {
 
 	setBlockListRef( node ) {
 		this.props.blockRef( node, this.props.uid );
-	}
-
-	handleFocusOutside( event ) {
-		if ( ! this.props.isSelected ) {
-			return;
-		}
-
-		this.props.onDeselect( event );
 	}
 
 	bindBlockNode( node ) {
@@ -387,7 +379,7 @@ export class BlockListBlock extends Component {
 
 		// Disable reason: Each block can be selected by clicking on it
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
-		return (
+		const element = (
 			<div
 				ref={ this.setBlockListRef }
 				onMouseMove={ this.maybeHover }
@@ -450,6 +442,16 @@ export class BlockListBlock extends Component {
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
+
+		if ( isSelected || isMultiSelected ) {
+			return (
+				<BlockListDeselect onDeselect={ this.props.onDeselect }>
+					{ element }
+				</BlockListDeselect>
+			);
+		}
+
+		return element;
 	}
 }
 
@@ -483,7 +485,7 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 			ownProps.onDeselect( event, ...args );
 		}
 
-		if ( ! event || ! event.isDefaultPrevented() ) {
+		if ( ! event || ! event.defaultPrevented ) {
 			dispatch( clearSelectedBlock() );
 		}
 	},
@@ -550,6 +552,5 @@ export default compose(
 			isLocked: !! templateLock,
 		};
 	} ),
-	withFilters( 'editor.BlockListBlock' ),
-	withFocusOutside
+	withFilters( 'editor.BlockListBlock' )
 )( BlockListBlock );

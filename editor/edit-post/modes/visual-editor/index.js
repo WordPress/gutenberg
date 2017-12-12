@@ -20,8 +20,8 @@ import { clearSelectedBlock } from '../../../store/actions';
  * @param  {Event} event DOM event
  */
 function preventChromeDeselect( event ) {
-	const { relatedTarget } = event;
-	const isOutside = ! relatedTarget || relatedTarget.closest( [
+	const { target } = event;
+	const isOutside = ! target || target.closest( [
 		'.editor-header',
 		'.editor-sidebar',
 	].join( ',' ) );
