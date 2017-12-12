@@ -6,26 +6,36 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import { LastRevision } from '../';
+import { PostLastRevisionCheck } from '../check';
 
-describe( 'LastRevision', () => {
+describe( 'PostLastRevisionCheck', () => {
+	it( 'should not render anything if the last revision ID is unknown', () => {
+		const wrapper = shallow(
+			<PostLastRevisionCheck revisionsCount={ 2 }>
+				Children
+			</PostLastRevisionCheck>
+		);
+
+		expect( wrapper.type() ).toBe( null );
+	} );
 
 	it( 'should not render anything if there is only one revision', () => {
-		let wrapper = shallow( <LastRevision lastRevisionId={1} revisionsCount={1} /> );
-		expect( wrapper.type().WrappedComponent({
-			'lastRevisionId': 1,
-			'revisionsCount' : 1,
-			'children': []
-		} ) ).toBe( null );
+		const wrapper = shallow(
+			<PostLastRevisionCheck lastRevisionId={ 1 } revisionsCount={ 1 }>
+				Children
+			</PostLastRevisionCheck>
+		);
+
+		expect( wrapper.type() ).toBe( null );
 	} );
 
 	it( 'should render if there are two revisions', () => {
-		let wrapper = shallow( <LastRevision lastRevisionId={1} revisionsCount={2} /> );
-		expect( wrapper.type().WrappedComponent({
-			'lastRevisionId': 1,
-			'revisionsCount' : 2,
-			'children': []
-		} ) ).toEqual( [] );
-	} );
+		const wrapper = shallow(
+			<PostLastRevisionCheck lastRevisionId={ 1 } revisionsCount={ 2 }>
+				Children
+			</PostLastRevisionCheck>
+		);
 
+		expect( wrapper.text() ).toEqual( 'Children' );
+	} );
 } );

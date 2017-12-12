@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
  */
 import { getCurrentPostLastRevisionId, getCurrentPostRevisionsCount } from '../../selectors';
 
-function PostLastRevisionCheck( { lastRevisionId, revisionsCount, children } ) {
+export function PostLastRevisionCheck( { lastRevisionId, revisionsCount, children } ) {
 	if ( ! lastRevisionId || revisionsCount < 2 ) {
 		return null;
 	}
