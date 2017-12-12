@@ -60,7 +60,7 @@ describe( 'element', () => {
 				[ createElement( 'strong', {}, 'Courgette' ) ],
 				createElement( 'strong', {}, 'Concombre' )
 			);
-			expect( concat.length ).toBe( 2 );
+			expect( concat ).toHaveLength( 2 );
 			expect( concat[ 0 ].key ).toBe( '0,0' );
 			expect( concat[ 1 ].key ).toBe( '1,0' );
 		} );
@@ -73,7 +73,7 @@ describe( 'element', () => {
 
 		it( 'should switch strings', () => {
 			const children = switchChildrenNodeName( [ 'a', 'b' ], 'strong' );
-			expect( children.length ).toBe( 2 );
+			expect( children ).toHaveLength( 2 );
 			expect( children[ 0 ].type ).toBe( 'strong' );
 			expect( children[ 0 ].props.children ).toBe( 'a' );
 			expect( children[ 1 ].type ).toBe( 'strong' );
@@ -85,7 +85,7 @@ describe( 'element', () => {
 				createElement( 'strong', { align: 'left' }, 'Courgette' ),
 				createElement( 'strong', {}, 'Concombre' ),
 			], 'em' );
-			expect( children.length ).toBe( 2 );
+			expect( children ).toHaveLength( 2 );
 			expect( children[ 0 ].type ).toBe( 'em' );
 			expect( children[ 0 ].props.children ).toBe( 'Courgette' );
 			expect( children[ 0 ].props.align ).toBe( 'left' );

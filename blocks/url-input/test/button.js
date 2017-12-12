@@ -25,13 +25,13 @@ describe( 'UrlInputButton', () => {
 	} );
 	it( 'should have hidden form by default', () => {
 		const wrapper = shallow( <UrlInputButton /> );
-		expect( wrapper.find( 'form' ).length ).toBe( 0 );
+		expect( wrapper.find( 'form' ) ).toHaveLength( 0 );
 		expect( wrapper.state().expanded ).toBe( false );
 	} );
 	it( 'should have visible form when Edit Link button clicked', () => {
 		const wrapper = shallow( <UrlInputButton /> );
 		clickEditLink( wrapper );
-		expect( wrapper.find( 'form' ).length ).toBe( 1 );
+		expect( wrapper.find( 'form' ) ).toHaveLength( 1 );
 		expect( wrapper.state().expanded ).toBe( true );
 	} );
 	it( 'should call onChange function once when value changes once', () => {
