@@ -281,6 +281,7 @@ registerBlockType( 'core/list', {
 				insertBlocksAfter,
 				setAttributes,
 				mergeBlocks,
+				onReplace,
 			} = this.props;
 			const { nodeName, values } = attributes;
 
@@ -354,6 +355,7 @@ registerBlockType( 'core/list', {
 							} :
 							undefined
 					}
+					onRemove={ () => onReplace( [] ) }
 				/>,
 			];
 		}
