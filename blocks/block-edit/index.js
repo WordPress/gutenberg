@@ -23,7 +23,6 @@ function BlockEdit( props ) {
 	const filteredElements = applyFilters( 'BlockEdit', { edit: <Edit key="edit" { ...editProps } />, fragments: [] }, props );
 
 	if ( filteredElements.edit.type !== Edit ) {
-		// eslint-disable-next-line no-console
 		console.error( 'edit must be a ' + Edit.toString() );
 	}
 
