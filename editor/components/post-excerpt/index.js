@@ -17,7 +17,7 @@ import { getEditedPostExcerpt } from '../../selectors';
 import { editPost } from '../../actions';
 
 function PostExcerpt( { excerpt, onUpdateExcerpt, instanceId } ) {
-	const id = 'editor-post-excerpt-' + instanceId;
+	const id = `editor-post-excerpt-${ instanceId }`;
 	const onChange = ( event ) => onUpdateExcerpt( event.target.value );
 
 	return (
