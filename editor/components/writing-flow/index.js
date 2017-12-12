@@ -3,10 +3,11 @@
  */
 import { connect } from 'react-redux';
 import 'element-closest';
-import { find, reverse } from 'lodash';
+import { find, last, reverse } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { getDefaultBlockName, createBlock } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import { keycodes, focus } from '@wordpress/utils';
 
@@ -27,7 +28,7 @@ import {
 	getMultiSelectedBlocks,
 	getSelectedBlock,
 } from '../../selectors';
-import { multiSelect } from '../../actions';
+import { multiSelect, insertBlock } from '../../actions';
 
 /**
  * Module Constants
@@ -98,6 +99,11 @@ class WritingFlow extends Component {
 		} );
 	}
 
+	isLastNonEmptyTabbable( target ) {
+		const el = last( this.getVisibleTabbables() );
+		return el && el.contains( target ) && !! el.innerText.trim();
+	}
+
 	expandSelection( blocks, currentStartUid, currentEndUid, delta ) {
 		const lastIndex = blocks.indexOf( currentEndUid );
 		const nextIndex = Math.max( 0, Math.min( blocks.length - 1, lastIndex + delta ) );
@@ -150,6 +156,13 @@ class WritingFlow extends Component {
 			placeCaretAtHorizontalEdge( closestTabbable, isReverse );
 			event.preventDefault();
 		}
+
+		if ( isDown && ! isShift && ! hasMultiSelection &&
+				this.isLastNonEmptyTabbable( target ) &&
+				isVerticalEdge( target, false, false )
+		) {
+			this.props.onBottomReached();
+		}
 	}
 
 	render() {
@@ -182,6 +195,10 @@ export default connect(
 	( dispatch ) => ( {
 		onMultiSelect( start, end ) {
 			dispatch( multiSelect( start, end ) );
+		},
+		onBottomReached() {
+			const newBlock = createBlock( getDefaultBlockName() );
+			dispatch( insertBlock( newBlock ) );
 		},
 	} )
 )( WritingFlow );
