@@ -63,14 +63,6 @@ We plan to continue supporting existing meta boxes while providing new ways to e
 
 *See:* [Pull request #2804](https://github.com/WordPress/gutenberg/pull/2804)
 
-## What are some reasons why an existing PHP meta box might not work in Gutenberg?
-
-Most PHP meta boxes should continue to work in Gutenberg, however some meta boxes that include advanced functionality could break. The following list describes some of the most common reasons why meta boxes might not work as expected in Gutenberg:
-
-- Plugins relying on selectors that target the post title, post content fields, and other metaboxes (of the old editor).
-- Plugins relying on TinyMCE's API because there's no longer a single TinyMCE instance to talk to in Gutenberg.
-- Plugins making updates to their DOM on "submit" or on "save".
-
 ## How can plugins extend the Gutenberg UI?
 
 The main extension point we want to emphasize is creating new blocks. We are still working on how to extend the rest of the UI that is built in JS. We are tracking it here: [Issue #1352](https://github.com/WordPress/gutenberg/issues/1352)
