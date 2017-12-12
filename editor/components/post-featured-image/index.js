@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { flowRight, get } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,6 +10,7 @@ import { flowRight, get } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { Button, Spinner, ResponsiveWrapper, withAPIData } from '@wordpress/components';
 import { MediaUploadButton } from '@wordpress/blocks';
+import { compose } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -92,7 +93,7 @@ const applyWithAPIData = withAPIData( ( { featuredImageId, postTypeName } ) => {
 	};
 } );
 
-export default flowRight(
+export default compose(
 	applyConnect,
 	applyWithAPIData,
 )( PostFeaturedImage );

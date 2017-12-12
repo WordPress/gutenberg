@@ -2,14 +2,14 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { filter, flowRight } from 'lodash';
+import { filter } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { withAPIData, withInstanceId } from '@wordpress/components';
-import { Component } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -89,7 +89,7 @@ const applyWithAPIData = withAPIData( () => {
 	};
 } );
 
-export default flowRight( [
+export default compose( [
 	applyConnect,
 	applyWithAPIData,
 	withInstanceId,

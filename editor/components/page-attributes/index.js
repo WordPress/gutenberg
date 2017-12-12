@@ -2,13 +2,13 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { flowRight } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { withInstanceId } from '@wordpress/components';
+import { compose } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -58,7 +58,7 @@ const applyConnect = connect(
 	}
 );
 
-export default flowRight( [
+export default compose( [
 	applyConnect,
 	withInstanceId,
 ] )( PageAttributes );

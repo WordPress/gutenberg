@@ -3,12 +3,13 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
-import { flowRight, noop } from 'lodash';
+import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { Button, withAPIData } from '@wordpress/components';
+import { compose } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -92,7 +93,7 @@ const applyWithAPIData = withAPIData( () => {
 	};
 } );
 
-export default flowRight( [
+export default compose( [
 	applyConnect,
 	applyWithAPIData,
 ] )( PostPublishButton );

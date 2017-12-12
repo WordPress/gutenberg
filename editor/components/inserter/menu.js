@@ -18,7 +18,7 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 import {
 	TabPanel,
 	TabbableContainer,
@@ -365,9 +365,9 @@ const connectComponent = connect(
 	{ showInsertionPoint, hideInsertionPoint, fetchReusableBlocks }
 );
 
-export default flow(
-	withInstanceId,
-	withSpokenMessages,
+export default compose(
+	connectComponent,
 	withContext( 'editor' )( ( settings ) => pick( settings, 'blockTypes' ) ),
-	connectComponent
+	withSpokenMessages,
+	withInstanceId
 )( InserterMenu );

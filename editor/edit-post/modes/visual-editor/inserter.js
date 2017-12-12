@@ -3,14 +3,13 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
-import { flow } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { IconButton, withContext } from '@wordpress/components';
-import { Component } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 import { createBlock, BlockIcon } from '@wordpress/blocks';
 
 /**
@@ -82,7 +81,7 @@ export class VisualEditorInserter extends Component {
 	}
 }
 
-export default flow(
+export default compose(
 	connect(
 		( state ) => {
 			return {
