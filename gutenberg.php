@@ -21,16 +21,12 @@ gutenberg_pre_init();
  * The main entry point for the Gutenberg editor. Renders the editor on the
  * wp-admin page for the plugin.
  *
- * @todo Remove the temporary fix for the NVDA screen reader and use meaningful
- *       content instead. See pull #2380 and issues #467 and #503.
- *
  * @since 0.1.0
  */
 function the_gutenberg_project() {
 	global $post_type, $post_type_object;
 	$post_type_object = get_post_type_object( $post_type );
 	?>
-	<div class="nvda-temp-fix screen-reader-text">&nbsp;</div>
 	<div class="gutenberg">
 		<h1 class="screen-reader-text"><?php echo esc_html( $post_type_object->labels->edit_item ); ?></h1>
 		<div id="editor" class="gutenberg__editor"></div>
