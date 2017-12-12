@@ -6,29 +6,19 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { applyFilters, removeAllFilters } from '@wordpress/hooks';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
  */
-import customClassName from '../custom-class-name';
+import '../custom-class-name';
 
 describe( 'custom className', () => {
-	let blockSettings;
-	beforeEach( () => {
-		customClassName();
-
-		blockSettings = {
-			save: noop,
-			category: 'common',
-			title: 'block title',
-		};
-	} );
-
-	afterEach( () => {
-		removeAllFilters( 'blocks.registerBlockType' );
-		removeAllFilters( 'blocks.getSaveContent.extraProps' );
-	} );
+	const blockSettings = {
+		save: noop,
+		category: 'common',
+		title: 'block title',
+	};
 
 	describe( 'addAttribute()', () => {
 		const addAttribute = applyFilters.bind( null, 'blocks.registerBlockType' );

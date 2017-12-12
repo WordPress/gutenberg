@@ -96,8 +96,6 @@ export function addSaveProps( extraProps, blockType, attributes ) {
 	return extraProps;
 }
 
-export default function anchor() {
-	addFilter( 'blocks.registerBlockType', 'core/anchor/attribute', addAttribute );
-	addFilter( 'blocks.BlockEdit', 'core/anchor/inspector-control', withInspectorControl );
-	addFilter( 'blocks.getSaveContent.extraProps', 'core/anchor/save-props', addSaveProps );
-}
+addFilter( 'blocks.registerBlockType', 'core/anchor/attribute', addAttribute );
+addFilter( 'blocks.BlockEdit', 'core/anchor/inspector-control', withInspectorControl );
+addFilter( 'blocks.getSaveContent.extraProps', 'core/anchor/save-props', addSaveProps );

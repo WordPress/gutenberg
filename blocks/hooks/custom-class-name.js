@@ -86,8 +86,6 @@ export function addSaveProps( extraProps, blockType, attributes ) {
 	return extraProps;
 }
 
-export default function customClassName() {
-	addFilter( 'blocks.registerBlockType', 'core/custom-class-name/attribute', addAttribute );
-	addFilter( 'blocks.BlockEdit', 'core/custom-class-name/inspector-control', withInspectorControl );
-	addFilter( 'blocks.getSaveContent.extraProps', 'core/custom-class-name/save-props', addSaveProps );
-}
+addFilter( 'blocks.registerBlockType', 'core/custom-class-name/attribute', addAttribute );
+addFilter( 'blocks.BlockEdit', 'core/custom-class-name/inspector-control', withInspectorControl );
+addFilter( 'blocks.getSaveContent.extraProps', 'core/custom-class-name/save-props', addSaveProps );
