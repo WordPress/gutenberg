@@ -4,7 +4,7 @@
 import { createElement, Component, cloneElement, Children } from 'react';
 import { render, findDOMNode, createPortal, unmountComponentAtNode } from 'react-dom';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { flowRight, isString, startCase } from 'lodash';
+import { camelCase, flowRight, isString, upperFirst } from 'lodash';
 
 /**
  * Returns a new element of given type. Type can be either a string tag name or
@@ -126,7 +126,7 @@ export { flowRight as compose };
 
 /**
  * Returns a wrapped version of a React component's display name.
- * Higher-order components use wrapDisplayName().
+ * Higher-order components use getWrapperDisplayName().
  *
  * @param {Function|Component} BaseComponent used to detect the existing display name.
  * @param {String} wrapperName Wrapper name to prepend to the display name.
@@ -135,5 +135,5 @@ export { flowRight as compose };
 export function getWrapperDisplayName( BaseComponent, wrapperName ) {
 	const { displayName = BaseComponent.name || 'Component' } = BaseComponent;
 
-	return `${ startCase( wrapperName ) }(${ displayName })`;
+	return `${ upperFirst( camelCase( wrapperName ) ) }(${ displayName })`;
 }

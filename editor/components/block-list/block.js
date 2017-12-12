@@ -533,7 +533,6 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 } );
 
 export default compose(
-	withFilters( 'Editor.BlockItem' ),
 	connect( mapStateToProps, mapDispatchToProps ),
 	withContext( 'editor' )( ( settings ) => {
 		const { templateLock } = settings;
@@ -542,4 +541,5 @@ export default compose(
 			isLocked: !! templateLock,
 		};
 	} ),
+	withFilters( 'editor.BlockListBlock' ),
 )( BlockListBlock );
