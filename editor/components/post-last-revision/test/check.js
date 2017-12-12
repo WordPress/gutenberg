@@ -6,21 +6,26 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import { PostLastRevisionCheck } from '../../';
+import { LastRevision } from '../';
 
-describe( 'PostLastRevisionCheck', () => {
-	const lastRevisionId = 0;
-	const revisionsCount = 0;
+describe( 'LastRevision', () => {
 
 	it( 'should not render anything if there is only one revision', () => {
-		let wrapper = shallow( <PostLastRevisionCheck lastRevisionId={1} revisionsCount={1} /> );
-		expect( wrapper.type() ).toBe( null );
+		let wrapper = shallow( <LastRevision lastRevisionId={1} revisionsCount={1} /> );
+		expect( wrapper.type().WrappedComponent({
+			'lastRevisionId': 1,
+			'revisionsCount' : 1,
+			'children': []
+		} ) ).toBe( null );
 	} );
 
-	it( 'should render anything if there are two revisions', () => {
-		let wrapper = shallow( <PostLastRevisionCheck lastRevisionId={1} revisionsCount={2} /> );
-		expect( wrapper.type() ).toNotBe( null );
+	it( 'should render if there are two revisions', () => {
+		let wrapper = shallow( <LastRevision lastRevisionId={1} revisionsCount={2} /> );
+		expect( wrapper.type().WrappedComponent({
+			'lastRevisionId': 1,
+			'revisionsCount' : 2,
+			'children': []
+		} ) ).toEqual( [] );
 	} );
-
 
 } );
