@@ -41,11 +41,10 @@
 
 // This is a focus style shown for blocks that need an indicator even when in an isEditing state
 // like for example an image block that receives arrowkey focus.
-// Blocks can opt into receiving this focus by adding an `.is-editing-focus` class.
-.editor-visual-editor .editor-block-list__block:not( .is-selected ) {
-	:focus .is-editing-focus {
-		outline: 2px solid $blue-medium-300;
-	}
+.editor-visual-editor .editor-block-list__block:not( .is-selected ) .editor-block-list__block-edit:focus  {
+	outline: 2px solid $blue-medium-300;
+	transition: 0s outline;
+	transition-delay: .05s;
 }
 
 .editor-visual-editor__inserter {

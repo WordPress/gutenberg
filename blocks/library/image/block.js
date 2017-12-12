@@ -196,7 +196,6 @@ class ImageBlock extends Component {
 			'is-transient': 0 === url.indexOf( 'blob:' ),
 			'is-resized': !! width,
 			'is-focused': !! focus,
-			'is-editing-focus': true,
 		} );
 
 		// Disable reason: Each block can be selected by clicking on it

@@ -10,7 +10,7 @@ import './style.scss';
 import Dashicon from '../dashicon';
 
 function Placeholder( { icon, children, label, instructions, className, ...additionalProps } ) {
-	const classes = classnames( 'components-placeholder', 'is-editing-focus', className );
+	const classes = classnames( 'components-placeholder', className );
 
 	return (
 		<div { ...additionalProps } className={ classes }>

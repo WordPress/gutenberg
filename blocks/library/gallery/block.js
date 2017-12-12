@@ -243,7 +243,7 @@ class GalleryBlock extends Component {
 					/>
 				</InspectorControls>
 			),
-			<div key="gallery" className={ `${ className } align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' } is-editing-focus` }>
+			<div key="gallery" className={ `${ className } align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` }>
 				{ dropZone }
 				{ images.map( ( img, index ) => (
 					<GalleryImage

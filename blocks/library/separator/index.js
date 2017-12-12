@@ -44,7 +44,7 @@ registerBlockType( 'core/separator', {
 					</BlockDescription>
 				</InspectorControls>
 			),
-			<hr key="hr" className={ `${ className } is-editing-focus` } />,
+			<hr key="hr" className={ `${ className }` } />,
 		];
 	},
 
