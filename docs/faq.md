@@ -57,11 +57,19 @@ The API for creating blocks is a crucial aspect of the project. We are working o
 
 No, we are designing Gutenberg primarily as a replacement for the post and page editing screens. That said, front-end editing is often confused with an editor that looks exactly like the front end. And that is something that Gutenberg will allow as themes customize individual blocks and provide those styles to the editor. Since content is designed to be distributed across so many different experiences—from desktop and mobile to full-text feeds and syndicated article platforms—we believe it's not ideal to create or design posts from just one front-end experience.
 
-## Given Gutenberg is built in JavaScript, how will old metaboxes (PHP) work?
+## Given Gutenberg is built in JavaScript, how will old meta boxes (PHP) work?
 
-We plan to continue supporting existing metaboxes while providing new ways to extend the interface.
+We plan to continue supporting existing meta boxes while providing new ways to extend the interface.
 
 *See:* [Pull request #2804](https://github.com/WordPress/gutenberg/pull/2804)
+
+## What are some reasons why an existing PHP meta box might not work in Gutenberg?
+
+Most PHP meta boxes should continue to work in Gutenberg, however some meta boxes that include advanced functionality could break. The following list describes some of the most common reasons why meta boxes might not work as expected in Gutenberg.
+
+- Plugins relying on selectors that target the post title, post content fields, and other metaboxes (of the old editor).
+- Plugins relying on TinyMCE's API because there's no longer a single TinyMCE instance to talk to in Gutenberg.
+- Plugins making updates to their DOM on "submit" or on "save".
 
 ## How can plugins extend the Gutenberg UI?
 
