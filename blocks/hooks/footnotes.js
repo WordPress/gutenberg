@@ -37,15 +37,12 @@ function addFootnoteNumbering( props, blockType ) {
 	return props;
 }
 
-function removeFootnoteNumbering( { edit, fragments }, props ) {
+function removeFootnoteNumbering( element, props ) {
 	if ( hasBlockSupport( props.name, 'footnotes' ) ) {
-		return {
-			edit: cloneElement( edit, { ...props, attributes: { ... props.attributes, content: numberChildrenFootnotes( props.attributes.content, () => '?' ) } } ),
-			fragments,
-		};
+		return cloneElement( element, { ...props, attributes: { ... props.attributes, content: numberChildrenFootnotes( props.attributes.content, () => '?' ) } } );
 	}
 
-	return { edit, fragments };
+	return element;
 }
 
 export default function footnotes( { addFilter } ) {

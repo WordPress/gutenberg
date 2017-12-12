@@ -20,13 +20,7 @@ function BlockEdit( props ) {
 		Edit = blockType.edit || blockType.save;
 	}
 
-	const filteredElements = applyFilters( 'BlockEdit', { edit: <Edit key="edit" { ...editProps } />, fragments: [] }, props );
-
-	if ( filteredElements.edit.type !== Edit ) {
-		console.error( 'edit must be a ' + Edit.toString() );
-	}
-
-	return [ filteredElements.edit, ...filteredElements.fragments ];
+	return applyFilters( 'BlockEdit', <Edit key="edit" { ...editProps } />, props );
 }
 
 export default BlockEdit;
