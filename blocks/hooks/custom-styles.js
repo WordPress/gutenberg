@@ -45,7 +45,7 @@ export function addAnchorWhenStylesNeed( BlockEdit ) {
 		}
 
 		return [
-			BlockEdit,
+			<BlockEdit key="block-edit-add-anchor" { ...props } />,
 			hasAnchor && <AddAnchorWhenNeeded key="add-anchor" { ...props } />,
 		];
 	};
