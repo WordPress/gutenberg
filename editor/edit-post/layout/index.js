@@ -47,6 +47,9 @@ function Layout( { mode, isSidebarOpened, hasFixedToolbar } ) {
 				<div className="editor-layout__metaboxes">
 					<MetaBoxes location="normal" />
 				</div>
+				<div className="editor-layout__metaboxes">
+					<MetaBoxes location="advanced" />
+				</div>
 			</div>
 			{ isSidebarOpened && <Sidebar /> }
 			<Popover.Slot />

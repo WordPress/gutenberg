@@ -25,7 +25,7 @@
 	}
 
 	&.has-fixed-toolbar {
-		padding-top: $header-height + $block-toolbar-height; 
+		padding-top: $header-height + $block-toolbar-height;
 
 		@include break-large {
 			padding-top: $header-height;
@@ -36,7 +36,8 @@
 .editor-layout__metaboxes:not(:empty) {
 	border-top: 1px solid $light-gray-500;
 	margin-top: 10px;
-	padding: 10px 0;
+	padding: 10px 0 10px;
+	clear: both;
 
 	.editor-meta-boxes-area {
 		max-width: $visual-editor-max-width;
