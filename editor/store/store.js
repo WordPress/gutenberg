@@ -17,8 +17,9 @@ import { mobileMiddleware } from '../utils/mobile';
 import effects from './effects';
 
 /**
- * This function applies the custom middlewares used specifically in the editor moodule
- * It also restricts the getState call to the module's partial state only.
+ * Applies the custom middlewares used specifically in the editor module
+ *
+ * It also restricts the getState call to the module's partial state only
  *
  * @return {Object} Redux custom store
  */

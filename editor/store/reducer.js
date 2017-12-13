@@ -710,7 +710,6 @@ export function metaBoxes( state = defaultMetaBoxState, action ) {
 	}
 }
 
-// Create responsive reducer with the breakpoints imported from the scss variables file.
 export function browser( state = {}, action ) {
 	if ( action.type === 'BROWSER_RESIZE' ) {
 		return { width: action.width, height: action.height };

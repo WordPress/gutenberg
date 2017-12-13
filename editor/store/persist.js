@@ -35,7 +35,8 @@ export function withRehydratation( reducer, reducerKey ) {
 }
 
 /**
- * Load the initial state and persist on changes
+ * Loads the initial state and persist on changes
+ *
  * This should be executed after the reducer's registration
  *
  * @param {String}     reducerKey  The reducer key to persist (example: reducerKey.subReducerKey)

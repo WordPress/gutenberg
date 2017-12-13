@@ -12,10 +12,9 @@ const enhancers = [];
 if ( window.__REDUX_DEVTOOLS_EXTENSION__ ) {
 	enhancers.push( window.__REDUX_DEVTOOLS_EXTENSION__() );
 }
-const store = createStore( dynamicReducer, {}, flowRight( enhancers ) );
 
 /**
- * Reducer function combining the dynamic "reducers" array
+ * Combines the dynamic "reducers" array to create one reducer
  *
  * @param {Object} state  Global state
  * @param {Object} action Action
@@ -23,19 +22,22 @@ const store = createStore( dynamicReducer, {}, flowRight( enhancers ) );
  * @return {Object}       Updated global state
  */
 function dynamicReducer( state = {}, action ) {
-	let hasChanges = false;
-	const newState = {};
-	reducers.forEach( ( { key, reducer } ) => {
-		const newSubState = reducer( state[ key ] || {}, action );
-		hasChanges = hasChanges || newSubState !== state[ key ];
-		newState[ key ] = newSubState;
-	} );
-
-	return hasChanges ? newState : state;
+	let hasChanged = false;
+	const nextState = {};
+	for ( let i = 0; i < reducers.length; i++ ) {
+		const { key, reducer } = reducers[ i ];
+		const previousStateForKey = state[ key ];
+		const nextStateForKey = reducer( previousStateForKey, action );
+		nextState[ key ] = nextStateForKey;
+		hasChanged = hasChanged || nextStateForKey !== previousStateForKey;
+	}
+	return hasChanged ? nextState : state;
 }
 
+const store = createStore( dynamicReducer, {}, flowRight( enhancers ) );
+
 /**
- * Register a new sub reducer to the global sate
+ * Registers a new sub reducer to the global state
  *
  * @param {String} key     Reducer key
  * @param {Object} reducer Reducer function
