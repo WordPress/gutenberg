@@ -645,6 +645,7 @@ export function notices( state = [], action ) {
 const locations = [
 	'normal',
 	'side',
+	'advanced',
 ];
 
 const defaultMetaBoxState = locations.reduce( ( result, key ) => {

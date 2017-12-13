@@ -1229,6 +1229,11 @@ describe( 'state', () => {
 					isDirty: false,
 					isUpdating: false,
 				},
+				advanced: {
+					isActive: false,
+					isDirty: false,
+					isUpdating: false,
+				},
 			};
 
 			expect( actual ).toEqual( expected );
@@ -1255,6 +1260,12 @@ describe( 'state', () => {
 				},
 				side: {
 					isActive: true,
+					isDirty: false,
+					isUpdating: false,
+					isLoaded: false,
+				},
+				advanced: {
+					isActive: false,
 					isDirty: false,
 					isUpdating: false,
 					isLoaded: false,
