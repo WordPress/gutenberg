@@ -13,6 +13,7 @@ import { keycodes, focus } from '@wordpress/utils';
 /**
  * Internal dependencies
  */
+import { BlockListBlock } from '../block-list/block';
 import {
 	computeCaretRect,
 	isHorizontalEdge,
@@ -112,7 +113,7 @@ class WritingFlow extends Component {
 		}
 
 		// Find block-level ancestor of said last tabbable
-		const blockEl = lastTabbable.closest( '.editor-block-list__block-edit' );
+		const blockEl = lastTabbable.closest( '.' + BlockListBlock.className );
 		const blockIndex = tabbables.indexOf( blockEl );
 
 		// Unexpected, so we'll leave quietly.
