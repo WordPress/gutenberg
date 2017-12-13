@@ -145,7 +145,7 @@ class Admin_Test extends WP_UnitTestCase {
 	function test_gutenberg_revisions_restore() {
 		// Test the filter when Gutenberg is the active editor.
 		$_REQUEST['gutenberg'] = '1';
-		$link                  = apply_filters( 'wp_prepare_revision_for_js',  array( 'restoreUrl' => 'http://test.com' ) );
+		$link                  = apply_filters( 'wp_prepare_revision_for_js', array( 'restoreUrl' => 'http://test.com' ) );
 		$this->assertEquals( array( 'restoreUrl' => 'http://test.com?gutenberg=1' ), $link );
 
 		// Test the filter when Gutenberg is not the active editor.
