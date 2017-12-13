@@ -593,3 +593,9 @@ export function convertBlockToReusable( uid ) {
 		uid,
 	};
 }
+
+export function appendDefaultBlock() {
+	return {
+		type: 'APPEND_DEFAULT_BLOCK',
+	};
+}

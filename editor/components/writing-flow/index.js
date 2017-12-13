@@ -7,7 +7,6 @@ import { find, last, reverse } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { getDefaultBlockName, createBlock } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import { keycodes, focus } from '@wordpress/utils';
 
@@ -28,7 +27,7 @@ import {
 	getMultiSelectedBlocks,
 	getSelectedBlock,
 } from '../../selectors';
-import { multiSelect, insertBlock } from '../../actions';
+import { multiSelect, appendDefaultBlock } from '../../actions';
 
 /**
  * Module Constants
@@ -192,13 +191,8 @@ export default connect(
 		hasMultiSelection: getMultiSelectedBlocks( state ).length > 1,
 		selectedBlock: getSelectedBlock( state ),
 	} ),
-	( dispatch ) => ( {
-		onMultiSelect( start, end ) {
-			dispatch( multiSelect( start, end ) );
-		},
-		onBottomReached() {
-			const newBlock = createBlock( getDefaultBlockName() );
-			dispatch( insertBlock( newBlock ) );
-		},
-	} )
+	{
+		onMultiSelect: multiSelect,
+		onBottomReached: appendDefaultBlock,
+	}
 )( WritingFlow );
