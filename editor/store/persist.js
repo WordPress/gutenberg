@@ -4,11 +4,6 @@
 import { get } from 'lodash';
 
 /**
- * WordPress dependencies
- */
-import { subscribe, dispatch, getState } from '@wordpress/data';
-
-/**
  * Adds the rehydratation behavior to redux reducers
  *
  * @param {Function}   reducer     The reducer to enhance
@@ -39,11 +34,12 @@ export function withRehydratation( reducer, reducerKey ) {
  *
  * This should be executed after the reducer's registration
  *
+ * @param {Object}     store       Store to enhance
  * @param {String}     reducerKey  The reducer key to persist (example: reducerKey.subReducerKey)
  * @param {String}     storageKey  The storage key to use
  * @param {Object}     defaults    Default values of the reducer key
  */
-export function loadAndPersist( reducerKey, storageKey, defaults = {} ) {
+export function loadAndPersist( store, reducerKey, storageKey, defaults = {} ) {
 	// Load initially persisted value
 	const persistedString = window.localStorage.getItem( storageKey );
 	if ( persistedString ) {
@@ -52,16 +48,16 @@ export function loadAndPersist( reducerKey, storageKey, defaults = {} ) {
 			...JSON.parse( persistedString ),
 		};
 
-		dispatch( {
+		store.dispatch( {
 			type: 'REDUX_REHYDRATE',
 			payload: persistedState,
 		} );
 	}
 
 	// Persist updated preferences
-	let currentStateValue = get( getState(), reducerKey );
-	subscribe( () => {
-		const newStateValue = get( getState(), reducerKey );
+	let currentStateValue = get( store.getState(), reducerKey );
+	store.subscribe( () => {
+		const newStateValue = get( store.getState(), reducerKey );
 		if ( newStateValue !== currentStateValue ) {
 			currentStateValue = newStateValue;
 			window.localStorage.setItem( storageKey, JSON.stringify( currentStateValue ) );

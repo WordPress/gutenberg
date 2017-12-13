@@ -18,7 +18,7 @@ import store from './store';
 const STORAGE_KEY = `GUTENBERG_PREFERENCES_${ window.userSettings.uid }`;
 
 registerReducer( 'core/editor', withRehydratation( reducer, 'preferences' ) );
-loadAndPersist( 'core/editor.preferences', STORAGE_KEY, PREFERENCES_DEFAULTS );
+loadAndPersist( store, 'preferences', STORAGE_KEY, PREFERENCES_DEFAULTS );
 enhanceWithBrowserSize( store );
 
 export default store;

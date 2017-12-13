@@ -81,8 +81,8 @@ import {
 	getReusableBlocks,
 	getStateBeforeOptimisticTransaction,
 	isPublishingPost,
+	POST_UPDATE_TRANSACTION_ID,
 } from '../selectors';
-import { POST_UPDATE_TRANSACTION_ID } from '../effects';
 
 jest.mock( '../constants', () => ( {
 	BREAK_MEDIUM: 500,
