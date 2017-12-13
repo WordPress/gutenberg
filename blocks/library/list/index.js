@@ -106,9 +106,11 @@ registerBlockType( 'core/list', {
 				isMultiBlock: true,
 				blocks: [ 'core/paragraph' ],
 				transform: ( blockAttributes ) => {
+					const items = blockAttributes.map( ( { content } ) => content );
+					const hasItems = ! items.every( isEmpty );
 					return createBlock( 'core/list', {
 						nodeName: 'UL',
-						values: blockAttributes.map( ( { content }, index ) => ( <li key={ index }>{ content }</li> ) ),
+						values: hasItems ? items.map( ( content, index ) => <li key={ index }>{ content }</li> ) : [],
 					} );
 				},
 			},
