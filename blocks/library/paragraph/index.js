@@ -207,6 +207,7 @@ registerBlockType( 'core/paragraph', {
 	supports: {
 		className: false,
 		anchor: true,
+		customStyles: true,
 	},
 
 	attributes: {

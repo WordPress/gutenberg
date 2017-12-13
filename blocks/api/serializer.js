@@ -16,7 +16,7 @@ import { applyFilters } from '@wordpress/hooks';
 import { getBlockType, getUnknownTypeHandlerName } from './registration';
 
 /**
- * Returns the block's name with common prefixes: 'core/' or 'core-' (in 'core-embed/') dropped
+ * Returns the block's name with common prefixes ('core/', 'core-') dropped
  *
  * @param {String}   blockName  The block name
  * @return {string}             Friendly name
