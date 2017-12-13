@@ -1,14 +1,8 @@
 /**
  * Internal dependencies
  */
-import { BREAK_MEDIUM } from '../../constants';
-
-/**
- * Checks if we are in a mobile resolution using window.innerWidth if available
- *
- * @return {Boolean}  Returns true if on mobile resolution and false if on non mobile or impossible to check.
- */
-const isMobileChecker = () => 'object' === typeof window && window.innerWidth < BREAK_MEDIUM;
+import { isMobile } from '../../selectors';
+import { toggleSidebar } from '../../actions';
 
 /**
  * Disables isSidebarOpened on rehydrate payload if the user is on a mobile screen size.
@@ -18,20 +12,23 @@ const isMobileChecker = () => 'object' === typeof window && window.innerWidth < 
  *
  * @return {Object}            rehydrate payload with isSidebarOpened disabled if on mobile
  */
-export const disableIsSidebarOpenedOnMobile = ( payload, isMobile = isMobileChecker() ) => (
-	isMobile ? { ...payload, isSidebarOpened: false } : payload
+export const disableIsSidebarOpenedOnMobile = ( payload ) => (
+	payload.isSidebarOpenedMobile ? { ...payload, isSidebarOpenedMobile: false } : payload
 );
 
 /**
  * Middleware
  */
 
-export const mobileMiddleware = () => next => action => {
+export const mobileMiddleware = ( { getState } ) => next => action => {
 	if ( action.type === 'REDUX_REHYDRATE' ) {
 		return next( {
 			type: 'REDUX_REHYDRATE',
 			payload: disableIsSidebarOpenedOnMobile( action.payload ),
 		} );
+	}
+	if ( action.type === 'TOGGLE_SIDEBAR' && action.isMobile === undefined ) {
+		return next( toggleSidebar( isMobile( getState() ) ) );
 	}
 	return next( action );
 };

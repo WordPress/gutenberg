@@ -10,12 +10,15 @@ import {
 	get,
 	reduce,
 	keyBy,
+	keys,
 	first,
 	last,
 	omit,
+	pick,
 	without,
 	mapValues,
 	findIndex,
+	reject,
 } from 'lodash';
 
 /**
@@ -191,6 +194,29 @@ export const editor = flow( [
 
 			case 'REMOVE_BLOCKS':
 				return omit( state, action.uids );
+
+			case 'SAVE_REUSABLE_BLOCK_SUCCESS': {
+				const { id, updatedId } = action;
+
+				// If a temporary reusable block is saved, we swap the temporary id with the final one
+				if ( id === updatedId ) {
+					return state;
+				}
+
+				return mapValues( state, ( block ) => {
+					if ( block.name === 'core/block' && block.attributes.ref === id ) {
+						return {
+							...block,
+							attributes: {
+								...block.attributes,
+								ref: updatedId,
+							},
+						};
+					}
+
+					return block;
+				} );
+			}
 		}
 
 		return state;
@@ -329,10 +355,17 @@ export function isTyping( state = false, action ) {
  * @param  {Object} action Dispatched action
  * @return {Object}        Updated state
  */
-export function blockSelection( state = { start: null, end: null, focus: null, isMultiSelecting: false }, action ) {
+export function blockSelection( state = {
+	start: null,
+	end: null,
+	focus: null,
+	isMultiSelecting: false,
+	isEnabled: true,
+}, action ) {
 	switch ( action.type ) {
 		case 'CLEAR_SELECTED_BLOCK':
 			return {
+				...state,
 				start: null,
 				end: null,
 				focus: null,
@@ -375,6 +408,7 @@ export function blockSelection( state = { start: null, end: null, focus: null, i
 			};
 		case 'INSERT_BLOCKS':
 			return {
+				...state,
 				start: action.blocks[ 0 ].uid,
 				end: action.blocks[ 0 ].uid,
 				focus: {},
@@ -385,10 +419,16 @@ export function blockSelection( state = { start: null, end: null, focus: null, i
 				return state;
 			}
 			return {
+				...state,
 				start: action.blocks[ 0 ].uid,
 				end: action.blocks[ 0 ].uid,
 				focus: {},
 				isMultiSelecting: false,
+			};
+		case 'TOGGLE_SELECTION':
+			return {
+				...state,
+				isEnabled: action.isSelectionEnabled,
 			};
 	}
 
@@ -472,9 +512,10 @@ export function blockInsertionPoint( state = {}, action ) {
 export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 	switch ( action.type ) {
 		case 'TOGGLE_SIDEBAR':
+			const isSidebarOpenedKey = action.isMobile ? 'isSidebarOpenedMobile' : 'isSidebarOpened';
 			return {
 				...state,
-				isSidebarOpened: ! state.isSidebarOpened,
+				[ isSidebarOpenedKey ]: ! state[ isSidebarOpenedKey ],
 			};
 		case 'TOGGLE_SIDEBAR_PANEL':
 			return {
@@ -490,18 +531,24 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 				mode: action.mode,
 			};
 		case 'INSERT_BLOCKS':
-			// put the block in the recently used blocks
+			// record the block usage and put the block in the recently used blocks
+			let blockUsage = state.blockUsage;
 			let recentlyUsedBlocks = [ ...state.recentlyUsedBlocks ];
 			action.blocks.forEach( ( block ) => {
+				const uses = ( blockUsage[ block.name ] || 0 ) + 1;
+				blockUsage = omit( blockUsage, block.name );
+				blockUsage[ block.name ] = uses;
 				recentlyUsedBlocks = [ block.name, ...without( recentlyUsedBlocks, block.name ) ].slice( 0, MAX_RECENT_BLOCKS );
 			} );
 			return {
 				...state,
+				blockUsage,
 				recentlyUsedBlocks,
 			};
 		case 'SETUP_EDITOR':
 			const isBlockDefined = name => getBlockType( name ) !== undefined;
 			const filterInvalidBlocksFromList = list => list.filter( isBlockDefined );
+			const filterInvalidBlocksFromObject = obj => pick( obj, keys( obj ).filter( isBlockDefined ) );
 			const commonBlocks = getBlockTypes()
 				.filter( ( blockType ) => 'common' === blockType.category )
 				.map( ( blockType ) => blockType.name );
@@ -512,6 +559,7 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 				recentlyUsedBlocks: filterInvalidBlocksFromList( [ ...state.recentlyUsedBlocks ] )
 					.concat( difference( commonBlocks, state.recentlyUsedBlocks ) )
 					.slice( 0, MAX_RECENT_BLOCKS ),
+				blockUsage: filterInvalidBlocksFromObject( state.blockUsage ),
 			};
 		case 'TOGGLE_FEATURE':
 			return {
@@ -573,7 +621,10 @@ export function saving( state = {}, action ) {
 export function notices( state = [], action ) {
 	switch ( action.type ) {
 		case 'CREATE_NOTICE':
-			return [ ...state, action.notice ];
+			return [
+				...reject( state, { id: action.notice.id } ),
+				action.notice,
+			];
 
 		case 'REMOVE_NOTICE':
 			const { noticeId } = action;
@@ -658,6 +709,13 @@ export function metaBoxes( state = defaultMetaBoxState, action ) {
 	}
 }
 
+export function browser( state = {}, action ) {
+	if ( action.type === 'BROWSER_RESIZE' ) {
+		return { width: action.width, height: action.height };
+	}
+	return state;
+}
+
 export const reusableBlocks = combineReducers( {
 	data( state = {}, action ) {
 		switch ( action.type ) {
@@ -681,6 +739,22 @@ export const reusableBlocks = combineReducers( {
 							...( existingReusableBlock && existingReusableBlock.attributes ),
 							...reusableBlock.attributes,
 						},
+					},
+				};
+			}
+
+			case 'SAVE_REUSABLE_BLOCK_SUCCESS': {
+				const { id, updatedId } = action;
+
+				// If a temporary reusable block is saved, we swap the temporary id with the final one
+				if ( id === updatedId ) {
+					return state;
+				}
+				return {
+					...omit( state, id ),
+					[ updatedId ]: {
+						...omit( state[ id ], [ 'id', 'isTemporary' ] ),
+						id: updatedId,
 					},
 				};
 			}
@@ -721,5 +795,6 @@ export default optimist( combineReducers( {
 	saving,
 	notices,
 	metaBoxes,
+	browser,
 	reusableBlocks,
 } ) );

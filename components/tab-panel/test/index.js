@@ -54,37 +54,37 @@ describe( 'TabPanel', () => {
 			const getActiveView = () => wrapper.find( 'div[role="tabpanel"]' );
 
 			expect( getActiveTab().text() ).toBe( 'Alpha' );
-			expect( getAlphaView().length ).toBe( 1 );
-			expect( getBetaView().length ).toBe( 0 );
-			expect( getGammaView().length ).toBe( 0 );
+			expect( getAlphaView() ).toHaveLength( 1 );
+			expect( getBetaView() ).toHaveLength( 0 );
+			expect( getGammaView() ).toHaveLength( 0 );
 			expect( getActiveView().text() ).toBe( 'alpha' );
 
 			betaTab.simulate( 'click' );
 			expect( getActiveTab().text() ).toBe( 'Beta' );
-			expect( getAlphaView().length ).toBe( 0 );
-			expect( getBetaView().length ).toBe( 1 );
-			expect( getGammaView().length ).toBe( 0 );
+			expect( getAlphaView() ).toHaveLength( 0 );
+			expect( getBetaView() ).toHaveLength( 1 );
+			expect( getGammaView() ).toHaveLength( 0 );
 			expect( getActiveView().text() ).toBe( 'beta' );
 
 			betaTab.simulate( 'click' );
 			expect( getActiveTab().text() ).toBe( 'Beta' );
-			expect( getAlphaView().length ).toBe( 0 );
-			expect( getBetaView().length ).toBe( 1 );
-			expect( getGammaView().length ).toBe( 0 );
+			expect( getAlphaView() ).toHaveLength( 0 );
+			expect( getBetaView() ).toHaveLength( 1 );
+			expect( getGammaView() ).toHaveLength( 0 );
 			expect( getActiveView().text() ).toBe( 'beta' );
 
 			gammaTab.simulate( 'click' );
 			expect( getActiveTab().text() ).toBe( 'Gamma' );
-			expect( getAlphaView().length ).toBe( 0 );
-			expect( getBetaView().length ).toBe( 0 );
-			expect( getGammaView().length ).toBe( 1 );
+			expect( getAlphaView() ).toHaveLength( 0 );
+			expect( getBetaView() ).toHaveLength( 0 );
+			expect( getGammaView() ).toHaveLength( 1 );
 			expect( getActiveView().text() ).toBe( 'gamma' );
 
 			alphaTab.simulate( 'click' );
 			expect( getActiveTab().text() ).toBe( 'Alpha' );
-			expect( getAlphaView().length ).toBe( 1 );
-			expect( getBetaView().length ).toBe( 0 );
-			expect( getGammaView().length ).toBe( 0 );
+			expect( getAlphaView() ).toHaveLength( 1 );
+			expect( getBetaView() ).toHaveLength( 0 );
+			expect( getGammaView() ).toHaveLength( 0 );
 			expect( getActiveView().text() ).toBe( 'alpha' );
 		} );
 	} );

@@ -154,16 +154,19 @@ registerBlockType( 'core/list', {
 				blocks: [ 'core/paragraph' ],
 				transform: ( { values } ) =>
 					compact( values.map( ( value ) => get( value, 'props.children', null ) ) )
-						.map( ( content ) => createBlock( 'core/paragraph', { content } ) ),
+						.map( ( content ) => createBlock( 'core/paragraph', {
+							content: [ content ],
+						} ) ),
 			},
 			{
 				type: 'block',
 				blocks: [ 'core/quote' ],
 				transform: ( { values } ) => {
 					return createBlock( 'core/quote', {
-						value: ( values.length === 1 ? values : initial( values ) )
-							.map( ( value ) => ( { children: <p> { get( value, 'props.children' ) } </p> } ) ),
-						citation: ( values.length === 1 ? undefined : get( last( values ), 'props.children' ) ),
+						value: compact( ( values.length === 1 ? values : initial( values ) )
+							.map( ( value ) => get( value, 'props.children', null ) ) )
+							.map( ( children ) => ( { children: <p>{ children }</p> } ) ),
+						citation: ( values.length === 1 ? undefined : [ get( last( values ), 'props.children' ) ] ),
 					} );
 				},
 			},
@@ -332,21 +335,25 @@ registerBlockType( 'core/list', {
 					wrapperClassName="blocks-list"
 					placeholder={ __( 'Write list…' ) }
 					onMerge={ mergeBlocks }
-					onSplit={ ( before, after, ...blocks ) => {
-						if ( ! blocks.length ) {
-							blocks.push( createBlock( 'core/paragraph' ) );
-						}
+					onSplit={
+						insertBlocksAfter ?
+							( before, after, ...blocks ) => {
+								if ( ! blocks.length ) {
+									blocks.push( createBlock( 'core/paragraph' ) );
+								}
 
-						if ( after.length ) {
-							blocks.push( createBlock( 'core/list', {
-								nodeName,
-								values: after,
-							} ) );
-						}
+								if ( after.length ) {
+									blocks.push( createBlock( 'core/list', {
+										nodeName,
+										values: after,
+									} ) );
+								}
 
-						setAttributes( { values: before } );
-						insertBlocksAfter( blocks );
-					} }
+								setAttributes( { values: before } );
+								insertBlocksAfter( blocks );
+							} :
+							undefined
+					}
 				/>,
 			];
 		}

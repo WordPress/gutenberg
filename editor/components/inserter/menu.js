@@ -18,7 +18,7 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 import {
 	TabPanel,
 	TabbableContainer,
@@ -34,8 +34,8 @@ import { keycodes } from '@wordpress/utils';
  */
 import './style.scss';
 
-import { getBlocks, getRecentlyUsedBlocks } from '../../selectors';
-import { showInsertionPoint, hideInsertionPoint } from '../../actions';
+import { getBlocks, getRecentlyUsedBlocks, getReusableBlocks } from '../../selectors';
+import { showInsertionPoint, hideInsertionPoint, fetchReusableBlocks } from '../../actions';
 import { default as InserterGroup } from './group';
 
 export const searchBlocks = ( blocks, searchTerm ) => {
@@ -71,6 +71,10 @@ export class InserterMenu extends Component {
 		this.switchTab = this.switchTab.bind( this );
 	}
 
+	componentDidMount() {
+		this.props.fetchReusableBlocks();
+	}
+
 	componentDidUpdate( prevProps, prevState ) {
 		const searchResults = this.searchBlocks( this.getBlockTypes() );
 		// Announce the blocks search results to screen readers.
@@ -103,16 +107,16 @@ export class InserterMenu extends Component {
 		} );
 	}
 
-	selectBlock( name ) {
+	selectBlock( block ) {
 		return () => {
-			this.props.onSelect( name );
+			this.props.onSelect( block.name, block.initialAttributes );
 			this.setState( {
 				filterValue: '',
 			} );
 		};
 	}
 
-	getBlockTypes() {
+	getStaticBlockTypes() {
 		const { blockTypes } = this.props;
 
 		// If all block types disabled, return empty set
@@ -136,6 +140,28 @@ export class InserterMenu extends Component {
 		} );
 	}
 
+	getReusableBlockTypes() {
+		const { reusableBlocks } = this.props;
+
+		// Display reusable blocks that we've fetched in the inserter
+		return reusableBlocks.map( ( reusableBlock ) => ( {
+			name: 'core/block',
+			initialAttributes: {
+				ref: reusableBlock.id,
+			},
+			title: reusableBlock.name,
+			icon: 'layout',
+			category: 'reusable-blocks',
+		} ) );
+	}
+
+	getBlockTypes() {
+		return [
+			...this.getStaticBlockTypes(),
+			...this.getReusableBlockTypes(),
+		];
+	}
+
 	searchBlocks( blockTypes ) {
 		return searchBlocks( blockTypes, this.state.filterValue );
 	}
@@ -150,15 +176,19 @@ export class InserterMenu extends Component {
 		let predicate;
 		switch ( tab ) {
 			case 'recent':
-				predicate = ( block ) => find( this.props.recentlyUsedBlocks, { name: block.name } );
-				break;
+				return filter( this.props.recentlyUsedBlocks,
+					( { name } ) => find( blockTypes, { name } ) );
 
 			case 'blocks':
-				predicate = ( block ) => block.category !== 'embed';
+				predicate = ( block ) => block.category !== 'embed' && block.category !== 'reusable-blocks';
 				break;
 
 			case 'embeds':
 				predicate = ( block ) => block.category === 'embed';
+				break;
+
+			case 'saved':
+				predicate = ( block ) => block.category === 'reusable-blocks';
 				break;
 		}
 
@@ -195,10 +225,15 @@ export class InserterMenu extends Component {
 		const blockTypesInfo = blockTypes.map( ( blockType ) => (
 			{ ...blockType, disabled: this.isDisabledBlock( blockType ) }
 		) );
+
 		return (
-			<InserterGroup blockTypes={ blockTypesInfo } labelledBy={ labelledBy }
+			<InserterGroup
+				blockTypes={ blockTypesInfo }
+				labelledBy={ labelledBy }
 				bindReferenceNode={ this.bindReferenceNode }
 				selectBlock={ this.selectBlock }
+				showInsertionPoint={ this.props.showInsertionPoint }
+				hideInsertionPoint={ this.props.hideInsertionPoint }
 			/>
 		);
 	}
@@ -295,6 +330,11 @@ export class InserterMenu extends Component {
 								title: __( 'Embeds' ),
 								className: 'editor-inserter__tab',
 							},
+							{
+								name: 'saved',
+								title: __( 'Saved' ),
+								className: 'editor-inserter__tab',
+							},
 						] }
 					>
 						{ ( tabKey ) => (
@@ -306,7 +346,7 @@ export class InserterMenu extends Component {
 				}
 				{ isSearching &&
 					<div role="menu" className="editor-inserter__search-results">
-						{ this.renderCategories( this.getVisibleBlocksByCategory( getBlockTypes() ) ) }
+						{ this.renderCategories( this.getVisibleBlocksByCategory( this.getBlockTypes() ) ) }
 					</div>
 				}
 			</TabbableContainer>
@@ -319,14 +359,15 @@ const connectComponent = connect(
 		return {
 			recentlyUsedBlocks: getRecentlyUsedBlocks( state ),
 			blocks: getBlocks( state ),
+			reusableBlocks: getReusableBlocks( state ),
 		};
 	},
-	{ showInsertionPoint, hideInsertionPoint }
+	{ showInsertionPoint, hideInsertionPoint, fetchReusableBlocks }
 );
 
-export default flow(
-	withInstanceId,
-	withSpokenMessages,
+export default compose(
+	connectComponent,
 	withContext( 'editor' )( ( settings ) => pick( settings, 'blockTypes' ) ),
-	connectComponent
+	withSpokenMessages,
+	withInstanceId
 )( InserterMenu );

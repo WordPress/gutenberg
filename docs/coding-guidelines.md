@@ -89,17 +89,8 @@ import VisualEditor from '../visual-editor';
 ## PHP
 
 We use
-[`phpcs` (PHP\_CodeSniffer)](https://github.com/squizlabs/PHP_CodeSniffer)
-with the
-[WordPress Coding Standards ruleset](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards)
-to run a lot of automated checks against all PHP code in this project.  This
-ensures that we are consistent with WordPress PHP coding standards.
+[`phpcs` (PHP\_CodeSniffer)](https://github.com/squizlabs/PHP_CodeSniffer) with the [WordPress Coding Standards ruleset](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards) to run a lot of automated checks against all PHP code in this project.  This ensures that we are consistent with WordPress PHP coding standards.
 
-When making any changes to the PHP code in this project, it's recommended to
-install and run `phpcs` on your computer.  This is a step in our Travis CI
-build as well, but it is better to catch errors locally.
+When making any changes to the PHP code in this project, it's recommended to install and run `phpcs` on your computer.  This is a step in our Travis CI build as well, but it is better to catch errors locally.
 
-The easiest way to do this is using `composer`.
-[Install `composer`](https://getcomposer.org/download/)
-on your computer, then run `composer install`.  This will install `phpcs` and
-`WordPress-Coding-Standards` which you can the run via `vendor/bin/phpcs`.
+The easiest way to do this is using `composer`. [Install `composer`](https://getcomposer.org/download/) on your computer, then run `composer install`.  This will install `phpcs` and `WordPress-Coding-Standards` which you can the run via `vendor/bin/phpcs`.

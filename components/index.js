@@ -39,6 +39,7 @@ export { default as navigateRegions } from './higher-order/navigate-regions';
 export { default as withAPIData } from './higher-order/with-api-data';
 export { default as withContext } from './higher-order/with-context';
 export { default as withFallbackStyles } from './higher-order/with-fallback-styles';
+export { default as withFilters } from './higher-order/with-filters';
 export { default as withFocusOutside } from './higher-order/with-focus-outside';
 export { default as withFocusReturn } from './higher-order/with-focus-return';
 export { default as withInstanceId } from './higher-order/with-instance-id';

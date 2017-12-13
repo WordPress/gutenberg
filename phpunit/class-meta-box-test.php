@@ -181,6 +181,37 @@ class Meta_Box_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test filtering back compat meta boxes
+	 */
+	public function test_gutenberg_filter_back_compat_meta_boxes() {
+		$meta_boxes = $this->meta_boxes;
+
+		// Add in a back compat meta box.
+		$meta_boxes['post']['normal']['high']['some-meta-box'] = array(
+			'id'       => 'some-meta-box',
+			'title'    => 'Some Meta Box',
+			'callback' => 'some_meta_box',
+			'args'     => array(
+				'__back_compat_meta_box' => true,
+			),
+		);
+
+		// Add in a normal meta box.
+		$meta_boxes['post']['normal']['high']['some-other-meta-box'] = array( 'other-meta-box-stuff' );
+
+		$expected_meta_boxes = $this->meta_boxes;
+		// We expect to remove only core meta boxes.
+		$expected_meta_boxes['post']['normal']['core']                        = array();
+		$expected_meta_boxes['post']['side']['core']                          = array();
+		$expected_meta_boxes['post']['normal']['high']['some-other-meta-box'] = array( 'other-meta-box-stuff' );
+
+		$actual   = gutenberg_filter_meta_boxes( $meta_boxes );
+		$expected = $expected_meta_boxes;
+
+		$this->assertEquals( $expected, $actual );
+	}
+
+	/**
 	 * Test filtering of meta box data with taxonomy meta boxes.
 	 *
 	 * By default Gutenberg will provide a much enhanced JavaScript alternative
@@ -203,5 +234,19 @@ class Meta_Box_Test extends WP_UnitTestCase {
 		$expected = $expected_meta_boxes;
 
 		$this->assertEquals( $expected, $actual );
+	}
+
+	/**
+	 * Test that a removed meta box remains empty after gutenberg_intercept_meta_box_render() fires.
+	 */
+	public function test_gutenberg_intercept_meta_box_render_skips_empty_boxes() {
+		global $wp_meta_boxes;
+
+		add_meta_box( 'test-intercept-box', 'Test Intercept box', '__return_empty_string', 'post', 'side', 'default' );
+		remove_meta_box( 'test-intercept-box', 'post', 'side' );
+
+		gutenberg_intercept_meta_box_render();
+
+		$this->assertFalse( $wp_meta_boxes['post']['side']['default']['test-intercept-box'] );
 	}
 }

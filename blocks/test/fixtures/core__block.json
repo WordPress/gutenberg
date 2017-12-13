@@ -1,10 +1,10 @@
 [
     {
         "uid": "_uid_0",
-        "name": "core/reusable-block",
+        "name": "core/block",
         "isValid": true,
         "attributes": {
-            "ref": "358b59ee-bab3-4d6f-8445-e8c6971a5605"
+            "ref": 123
         },
         "originalContent": ""
     }

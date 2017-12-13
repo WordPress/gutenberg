@@ -23,21 +23,23 @@ import { MetaBoxes, AutosaveMonitor, UnsavedChangesWarning, EditorNotices } from
 import {
 	getEditorMode,
 	isEditorSidebarOpened,
+	isFeatureActive,
 } from '../../selectors';
 
-function Layout( { mode, isSidebarOpened } ) {
+function Layout( { mode, isSidebarOpened, hasFixedToolbar } ) {
 	const className = classnames( 'editor-layout', {
 		'is-sidebar-opened': isSidebarOpened,
+		'has-fixed-toolbar': hasFixedToolbar,
 	} );
 
 	return (
 		<div className={ className }>
 			<DocumentTitle />
-			<EditorNotices />
 			<UnsavedChangesWarning />
 			<AutosaveMonitor />
 			<Header />
 			<div className="editor-layout__content" role="region" aria-label={ __( 'Editor content' ) } tabIndex="-1">
+				<EditorNotices />
 				<div className="editor-layout__editor">
 					{ mode === 'text' && <TextEditor /> }
 					{ mode === 'visual' && <VisualEditor /> }
@@ -56,5 +58,6 @@ export default connect(
 	( state ) => ( {
 		mode: getEditorMode( state ),
 		isSidebarOpened: isEditorSidebarOpened( state ),
+		hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
 	} ),
 )( navigateRegions( Layout ) );

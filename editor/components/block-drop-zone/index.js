@@ -7,15 +7,20 @@ import { reduce, get, find } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { DropZone } from '@wordpress/components';
+import { DropZone, withContext } from '@wordpress/components';
 import { getBlockTypes } from '@wordpress/blocks';
+import { compose } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { insertBlocks } from '../../actions';
 
-function BlockDropZone( { index, ...props } ) {
+function BlockDropZone( { index, isLocked, ...props } ) {
+	if ( isLocked ) {
+		return null;
+	}
+
 	const dropFiles = ( files, position ) => {
 		const transformation = reduce( getBlockTypes(), ( ret, blockType ) => {
 			if ( ret ) {
@@ -45,7 +50,16 @@ function BlockDropZone( { index, ...props } ) {
 	);
 }
 
-export default connect(
-	undefined,
-	{ insertBlocks }
+export default compose(
+	connect(
+		undefined,
+		{ insertBlocks }
+	),
+	withContext( 'editor' )( ( settings ) => {
+		const { templateLock } = settings;
+
+		return {
+			isLocked: !! templateLock,
+		};
+	} )
 )( BlockDropZone );

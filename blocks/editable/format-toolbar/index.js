@@ -14,7 +14,7 @@ import UrlInput from '../../url-input';
 import { filterURLForDisplay } from '../../../editor/utils/url';
 import ToggleControl from '../../inspector-controls/toggle-control';
 
-const { ESCAPE } = keycodes;
+const { ESCAPE, LEFT, RIGHT, UP, DOWN } = keycodes;
 
 const FORMATTING_CONTROLS = [
 	{
@@ -42,6 +42,9 @@ const FORMATTING_CONTROLS = [
 // Default controls shown if no `enabledControls` prop provided
 const DEFAULT_CONTROLS = [ 'bold', 'italic', 'strikethrough', 'link' ];
 
+// Stop the key event from propagating up to maybeStartTyping in BlockListBlock
+const stopKeyPropagation = ( event ) => event.stopPropagation();
+
 class FormatToolbar extends Component {
 	constructor() {
 		super( ...arguments );
@@ -63,20 +66,15 @@ class FormatToolbar extends Component {
 		this.setLinkTarget = this.setLinkTarget.bind( this );
 	}
 
-	componentDidMount() {
-		document.addEventListener( 'keydown', this.onKeyDown );
-	}
-
-	componentWillUnmount() {
-		document.removeEventListener( 'keydown', this.onKeyDown );
-	}
-
 	onKeyDown( event ) {
 		if ( event.keyCode === ESCAPE ) {
 			if ( this.state.isEditingLink ) {
 				event.stopPropagation();
 				this.dropLink();
 			}
+		}
+		if ( [ LEFT, DOWN, RIGHT, UP ].indexOf( event.keyCode ) > -1 ) {
+			stopKeyPropagation( event );
 		}
 	}
 
@@ -159,12 +157,12 @@ class FormatToolbar extends Component {
 			} );
 
 		const linkSettings = settingsVisible && (
-			<fieldset className="blocks-format-toolbar__link-settings">
+			<div className="blocks-format-toolbar__link-modal-line blocks-format-toolbar__link-settings">
 				<ToggleControl
 					label={ __( 'Open in new window' ) }
 					checked={ opensInNewWindow }
 					onChange={ this.setLinkTarget } />
-			</fieldset>
+			</div>
 		);
 
 		return (
@@ -172,44 +170,60 @@ class FormatToolbar extends Component {
 				<Toolbar controls={ toolbarControls } />
 
 				{ ( isAddingLink || isEditingLink ) &&
+					// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
+					/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 					<Fill name="Editable.Siblings">
 						<form
 							className="blocks-format-toolbar__link-modal"
 							style={ linkStyle }
+							onKeyPress={ stopKeyPropagation }
+							onKeyDown={ this.onKeyDown }
 							onSubmit={ this.submitLink }>
-							<UrlInput value={ newLinkValue } onChange={ this.onChangeLinkValue } />
-							<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
-							<IconButton icon="editor-unlink" label={ __( 'Remove link' ) } onClick={ this.dropLink } />
-							<IconButton
-								icon="admin-generic"
-								label={ __( 'Link Settings' ) }
-								onClick={ this.toggleLinkSettingsVisibility }
-								aria-expanded={ settingsVisible } />
+							<div className="blocks-format-toolbar__link-modal-line">
+								<UrlInput value={ newLinkValue } onChange={ this.onChangeLinkValue } />
+								<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
+								<IconButton icon="editor-unlink" label={ __( 'Remove link' ) } onClick={ this.dropLink } />
+								<IconButton
+									icon="admin-generic"
+									label={ __( 'Link Settings' ) }
+									onClick={ this.toggleLinkSettingsVisibility }
+									aria-expanded={ settingsVisible } />
+							</div>
 							{ linkSettings }
 						</form>
 					</Fill>
+					/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
 				}
 
 				{ !! formats.link && ! isAddingLink && ! isEditingLink &&
+					// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
+					/* eslint-disable jsx-a11y/no-static-element-interactions */
 					<Fill name="Editable.Siblings">
-						<div className="blocks-format-toolbar__link-modal" style={ linkStyle }>
-							<a
-								className="blocks-format-toolbar__link-value"
-								href={ formats.link.value }
-								target="_blank"
-							>
-								{ formats.link.value && filterURLForDisplay( decodeURI( formats.link.value ) ) }
-							</a>
-							<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ this.editLink } />
-							<IconButton icon="editor-unlink" label={ __( 'Remove link' ) } onClick={ this.dropLink } />
-							<IconButton
-								icon="admin-generic"
-								label={ __( 'Link Settings' ) }
-								onClick={ this.toggleLinkSettingsVisibility }
-								aria-expanded={ settingsVisible } />
+						<div
+							className="blocks-format-toolbar__link-modal"
+							style={ linkStyle }
+							onKeyPress={ stopKeyPropagation }
+						>
+							<div className="blocks-format-toolbar__link-modal-line">
+								<a
+									className="blocks-format-toolbar__link-value"
+									href={ formats.link.value }
+									target="_blank"
+								>
+									{ formats.link.value && filterURLForDisplay( decodeURI( formats.link.value ) ) }
+								</a>
+								<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ this.editLink } />
+								<IconButton icon="editor-unlink" label={ __( 'Remove link' ) } onClick={ this.dropLink } />
+								<IconButton
+									icon="admin-generic"
+									label={ __( 'Link Settings' ) }
+									onClick={ this.toggleLinkSettingsVisibility }
+									aria-expanded={ settingsVisible } />
+							</div>
 							{ linkSettings }
 						</div>
 					</Fill>
+					/* eslint-enable jsx-a11y/no-static-element-interactions */
 				}
 			</div>
 		);

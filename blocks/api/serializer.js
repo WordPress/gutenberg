@@ -8,12 +8,12 @@ import { html as beautifyHtml } from 'js-beautify';
  * WordPress dependencies
  */
 import { Component, createElement, renderToString, cloneElement, Children } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
  */
 import { getBlockType, getUnknownTypeHandlerName } from './registration';
-import { applyFilters } from '../hooks';
 
 /**
  * Returns the block's default classname from its name
@@ -55,7 +55,7 @@ export function getSaveContent( blockType, attributes ) {
 		}
 
 		// Applying the filters adding extra props
-		const props = applyFilters( 'getSaveContent.extraProps', { ...element.props }, blockType, attributes );
+		const props = applyFilters( 'blocks.getSaveContent.extraProps', { ...element.props }, blockType, attributes );
 
 		return cloneElement( element, props );
 	};

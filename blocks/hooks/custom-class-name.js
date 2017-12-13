@@ -7,6 +7,8 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { getWrapperDisplayName } from '@wordpress/element';
+import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -37,17 +39,18 @@ export function addAttribute( settings ) {
 
 /**
  * Override the default edit UI to include a new block inspector control for
- * assigning the anchor ID, if block supports anchor
+ * assigning the custom class name, if block supports custom class name.
  *
- * @param  {Element} element Original edit element
- * @param  {Object}  props   Props passed to BlockEdit
- * @return {Element}         Filtered edit element
+ * @param  {function|Component} BlockEdit Original component
+ * @return {function}                     Wrapped component
  */
-export function addInspectorControl( element, props ) {
-	if ( hasBlockSupport( props.name, 'customClassName', true ) && props.focus ) {
-		element = [
-			element,
-			<InspectorControls key="inspector-custom-class-name">
+export function withInspectorControl( BlockEdit ) {
+	const WrappedBlockEdit = ( props ) => {
+		const hasCustomClassName = hasBlockSupport( props.name, 'customClassName', true ) && props.focus;
+
+		return [
+			<BlockEdit key="block-edit-custom-class-name" { ...props } />,
+			hasCustomClassName && <InspectorControls key="inspector-custom-class-name">
 				<InspectorControls.TextControl
 					label={ __( 'Additional CSS Class' ) }
 					value={ props.attributes.className || '' }
@@ -59,9 +62,10 @@ export function addInspectorControl( element, props ) {
 				/>
 			</InspectorControls>,
 		];
-	}
+	};
+	WrappedBlockEdit.displayName = getWrapperDisplayName( BlockEdit, 'customClassName' );
 
-	return element;
+	return WrappedBlockEdit;
 }
 
 /**
@@ -82,8 +86,8 @@ export function addSaveProps( extraProps, blockType, attributes ) {
 	return extraProps;
 }
 
-export default function customClassName( { addFilter } ) {
-	addFilter( 'registerBlockType', 'core-custom-class-name-attribute', addAttribute );
-	addFilter( 'BlockEdit', 'core-custom-class-name-inspector-control', addInspectorControl );
-	addFilter( 'getSaveContent.extraProps', 'core-custom-class-name-save-props', addSaveProps );
+export default function customClassName() {
+	addFilter( 'blocks.registerBlockType', 'core/custom-class-name/attribute', addAttribute );
+	addFilter( 'blocks.BlockEdit', 'core/custom-class-name/inspector-control', withInspectorControl );
+	addFilter( 'blocks.getSaveContent.extraProps', 'core/custom-class-name/save-props', addSaveProps );
 }

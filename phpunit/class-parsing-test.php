@@ -58,7 +58,8 @@ class Parsing_Test extends WP_UnitTestCase {
 		$html            = self::strip_r( file_get_contents( $html_path ) );
 		$expected_parsed = json_decode( self::strip_r( file_get_contents( $parsed_json_path ) ), true );
 
-		$result = gutenberg_parse_blocks( $html );
+		$parser = new Gutenberg_PEG_Parser;
+		$result = $parser->parse( _gutenberg_utf8_split( $html ) );
 
 		$this->assertEquals(
 			$expected_parsed,

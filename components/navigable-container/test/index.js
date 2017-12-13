@@ -14,7 +14,7 @@ import { keycodes } from '@wordpress/utils';
  */
 import { TabbableContainer, NavigableMenu } from '../';
 
-const { UP, DOWN, TAB, LEFT, RIGHT } = keycodes;
+const { UP, DOWN, TAB, LEFT, RIGHT, SPACE } = keycodes;
 
 function simulateVisible( wrapper, selector ) {
 	const elements = wrapper.getDOMNode().querySelectorAll( selector );
@@ -24,8 +24,14 @@ function simulateVisible( wrapper, selector ) {
 }
 
 function fireKeyDown( container, keyCode, shiftKey ) {
+	const interaction = {
+		stopped: false,
+	};
+
 	container.simulate( 'keydown', {
-		stopPropagation: () => {},
+		stopPropagation: () => {
+			interaction.stopped = true;
+		},
 		preventDefault: () => {},
 		nativeEvent: {
 			stopImmediatePropagation: () => { },
@@ -33,6 +39,8 @@ function fireKeyDown( container, keyCode, shiftKey ) {
 		keyCode,
 		shiftKey,
 	} );
+
+	return interaction;
 }
 
 describe( 'NavigableMenu', () => {
@@ -52,19 +60,21 @@ describe( 'NavigableMenu', () => {
 		wrapper.getDOMNode().querySelector( '#btn1' ).focus();
 
 		// Navigate options
-		function assertKeyDown( keyCode, expectedActiveIndex ) {
-			fireKeyDown( container, keyCode );
+		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
+			const interaction = fireKeyDown( container, keyCode );
 			expect( currentIndex ).toBe( expectedActiveIndex );
+			expect( interaction.stopped ).toBe( expectedStop );
 		}
 
-		assertKeyDown( DOWN, 1 );
-		assertKeyDown( DOWN, 2 );
-		assertKeyDown( DOWN, 0 );
-		assertKeyDown( UP, 2 );
-		assertKeyDown( UP, 1 );
-		assertKeyDown( UP, 0 );
-		assertKeyDown( LEFT, 0 );
-		assertKeyDown( RIGHT, 0 );
+		assertKeyDown( DOWN, 1, true );
+		assertKeyDown( DOWN, 2, true );
+		assertKeyDown( DOWN, 0, true );
+		assertKeyDown( UP, 2, true );
+		assertKeyDown( UP, 1, true );
+		assertKeyDown( UP, 0, true );
+		assertKeyDown( LEFT, 0, true );
+		assertKeyDown( RIGHT, 0, true );
+		assertKeyDown( SPACE, 0, false );
 	} );
 
 	it( 'vertical: should navigate by up and down, and skip deep candidates', () => {
@@ -86,19 +96,21 @@ describe( 'NavigableMenu', () => {
 		wrapper.getDOMNode().querySelector( '#btn1' ).focus();
 
 		// Navigate options
-		function assertKeyDown( keyCode, expectedActiveIndex ) {
-			fireKeyDown( container, keyCode, false );
+		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
+			const interaction = fireKeyDown( container, keyCode, false );
 			expect( currentIndex ).toBe( expectedActiveIndex );
+			expect( interaction.stopped ).toBe( expectedStop );
 		}
 
-		assertKeyDown( DOWN, 1 );
-		assertKeyDown( DOWN, 2 );
-		assertKeyDown( DOWN, 0 );
-		assertKeyDown( UP, 2 );
-		assertKeyDown( UP, 1 );
-		assertKeyDown( UP, 0 );
-		assertKeyDown( LEFT, 0 );
-		assertKeyDown( RIGHT, 0 );
+		assertKeyDown( DOWN, 1, true );
+		assertKeyDown( DOWN, 2, true );
+		assertKeyDown( DOWN, 0, true );
+		assertKeyDown( UP, 2, true );
+		assertKeyDown( UP, 1, true );
+		assertKeyDown( UP, 0, true );
+		assertKeyDown( LEFT, 0, true );
+		assertKeyDown( RIGHT, 0, true );
+		assertKeyDown( SPACE, 0, false );
 	} );
 
 	it( 'vertical: should navigate by up and down, and explore deep candidates', () => {
@@ -120,21 +132,23 @@ describe( 'NavigableMenu', () => {
 		wrapper.getDOMNode().querySelector( '#btn1' ).focus();
 
 		// Navigate options
-		function assertKeyDown( keyCode, expectedActiveIndex ) {
-			fireKeyDown( container, keyCode, false );
+		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
+			const interaction = fireKeyDown( container, keyCode, false );
 			expect( currentIndex ).toBe( expectedActiveIndex );
+			expect( interaction.stopped ).toBe( expectedStop );
 		}
 
-		assertKeyDown( DOWN, 1 );
-		assertKeyDown( DOWN, 2 );
-		assertKeyDown( DOWN, 3 );
-		assertKeyDown( DOWN, 0 );
-		assertKeyDown( UP, 3 );
-		assertKeyDown( UP, 2 );
-		assertKeyDown( UP, 1 );
-		assertKeyDown( UP, 0 );
-		assertKeyDown( LEFT, 0 );
-		assertKeyDown( RIGHT, 0 );
+		assertKeyDown( DOWN, 1, true );
+		assertKeyDown( DOWN, 2, true );
+		assertKeyDown( DOWN, 3, true );
+		assertKeyDown( DOWN, 0, true );
+		assertKeyDown( UP, 3, true );
+		assertKeyDown( UP, 2, true );
+		assertKeyDown( UP, 1, true );
+		assertKeyDown( UP, 0, true );
+		assertKeyDown( LEFT, 0, true );
+		assertKeyDown( RIGHT, 0, true );
+		assertKeyDown( SPACE, 0, false );
 	} );
 
 	it( 'vertical: should navigate by up and down, and stop at edges', () => {
@@ -153,19 +167,21 @@ describe( 'NavigableMenu', () => {
 		wrapper.getDOMNode().querySelector( '#btn1' ).focus();
 
 		// Navigate options
-		function assertKeyDown( keyCode, expectedActiveIndex ) {
-			fireKeyDown( container, keyCode, false );
+		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
+			const interaction = fireKeyDown( container, keyCode, false );
 			expect( currentIndex ).toBe( expectedActiveIndex );
+			expect( interaction.stopped ).toBe( expectedStop );
 		}
 
-		assertKeyDown( DOWN, 1 );
-		assertKeyDown( DOWN, 2 );
-		assertKeyDown( DOWN, 2 );
-		assertKeyDown( UP, 1 );
-		assertKeyDown( UP, 0 );
-		assertKeyDown( UP, 0 );
-		assertKeyDown( LEFT, 0 );
-		assertKeyDown( RIGHT, 0 );
+		assertKeyDown( DOWN, 1, true );
+		assertKeyDown( DOWN, 2, true );
+		assertKeyDown( DOWN, 2, true );
+		assertKeyDown( UP, 1, true );
+		assertKeyDown( UP, 0, true );
+		assertKeyDown( UP, 0, true );
+		assertKeyDown( LEFT, 0, true );
+		assertKeyDown( RIGHT, 0, true );
+		assertKeyDown( SPACE, 0, false );
 	} );
 
 	it( 'horizontal: should navigate by left and right', () => {
@@ -184,19 +200,21 @@ describe( 'NavigableMenu', () => {
 		wrapper.getDOMNode().querySelector( '#btn1' ).focus();
 
 		// Navigate options
-		function assertKeyDown( keyCode, expectedActiveIndex ) {
-			fireKeyDown( container, keyCode, false );
+		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
+			const interaction = fireKeyDown( container, keyCode, false );
 			expect( currentIndex ).toBe( expectedActiveIndex );
+			expect( interaction.stopped ).toBe( expectedStop );
 		}
 
-		assertKeyDown( RIGHT, 1 );
-		assertKeyDown( RIGHT, 2 );
-		assertKeyDown( RIGHT, 0 );
-		assertKeyDown( LEFT, 2 );
-		assertKeyDown( LEFT, 1 );
-		assertKeyDown( LEFT, 0 );
-		assertKeyDown( UP, 0 );
-		assertKeyDown( DOWN, 0 );
+		assertKeyDown( RIGHT, 1, true );
+		assertKeyDown( RIGHT, 2, true );
+		assertKeyDown( RIGHT, 0, true );
+		assertKeyDown( LEFT, 2, true );
+		assertKeyDown( LEFT, 1, true );
+		assertKeyDown( LEFT, 0, true );
+		assertKeyDown( UP, 0, true );
+		assertKeyDown( DOWN, 0, true );
+		assertKeyDown( SPACE, 0, false );
 	} );
 
 	it( 'horizontal: should navigate by left and right, and skip deep candidates', () => {
@@ -218,19 +236,21 @@ describe( 'NavigableMenu', () => {
 		wrapper.getDOMNode().querySelector( '#btn1' ).focus();
 
 		// Navigate options
-		function assertKeyDown( keyCode, expectedActiveIndex ) {
-			fireKeyDown( container, keyCode, false );
+		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
+			const interaction = fireKeyDown( container, keyCode, false );
 			expect( currentIndex ).toBe( expectedActiveIndex );
+			expect( interaction.stopped ).toBe( expectedStop );
 		}
 
-		assertKeyDown( RIGHT, 1 );
-		assertKeyDown( RIGHT, 2 );
-		assertKeyDown( RIGHT, 0 );
-		assertKeyDown( LEFT, 2 );
-		assertKeyDown( LEFT, 1 );
-		assertKeyDown( LEFT, 0 );
-		assertKeyDown( UP, 0 );
-		assertKeyDown( DOWN, 0 );
+		assertKeyDown( RIGHT, 1, true );
+		assertKeyDown( RIGHT, 2, true );
+		assertKeyDown( RIGHT, 0, true );
+		assertKeyDown( LEFT, 2, true );
+		assertKeyDown( LEFT, 1, true );
+		assertKeyDown( LEFT, 0, true );
+		assertKeyDown( UP, 0, true );
+		assertKeyDown( DOWN, 0, true );
+		assertKeyDown( SPACE, 0, false );
 	} );
 
 	it( 'horizontal: should navigate by left and right, and explore deep candidates', () => {
@@ -252,21 +272,23 @@ describe( 'NavigableMenu', () => {
 		wrapper.getDOMNode().querySelector( '#btn1' ).focus();
 
 		// Navigate options
-		function assertKeyDown( keyCode, expectedActiveIndex ) {
-			fireKeyDown( container, keyCode, false );
+		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
+			const interaction = fireKeyDown( container, keyCode, false );
 			expect( currentIndex ).toBe( expectedActiveIndex );
+			expect( interaction.stopped ).toBe( expectedStop );
 		}
 
-		assertKeyDown( RIGHT, 1 );
-		assertKeyDown( RIGHT, 2 );
-		assertKeyDown( RIGHT, 3 );
-		assertKeyDown( RIGHT, 0 );
-		assertKeyDown( LEFT, 3 );
-		assertKeyDown( LEFT, 2 );
-		assertKeyDown( LEFT, 1 );
-		assertKeyDown( LEFT, 0 );
-		assertKeyDown( UP, 0 );
-		assertKeyDown( DOWN, 0 );
+		assertKeyDown( RIGHT, 1, true );
+		assertKeyDown( RIGHT, 2, true );
+		assertKeyDown( RIGHT, 3, true );
+		assertKeyDown( RIGHT, 0, true );
+		assertKeyDown( LEFT, 3, true );
+		assertKeyDown( LEFT, 2, true );
+		assertKeyDown( LEFT, 1, true );
+		assertKeyDown( LEFT, 0, true );
+		assertKeyDown( UP, 0, true );
+		assertKeyDown( DOWN, 0, true );
+		assertKeyDown( SPACE, 0, false );
 	} );
 
 	it( 'horizontal: should navigate by left and right, and stop at edges', () => {
@@ -285,17 +307,21 @@ describe( 'NavigableMenu', () => {
 		wrapper.getDOMNode().querySelector( '#btn1' ).focus();
 
 		// Navigate options
-		function assertKeyDown( keyCode, expectedActiveIndex ) {
-			fireKeyDown( container, keyCode, false );
+		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
+			const interaction = fireKeyDown( container, keyCode, false );
 			expect( currentIndex ).toBe( expectedActiveIndex );
+			expect( interaction.stopped ).toBe( expectedStop );
 		}
 
-		assertKeyDown( RIGHT, 1 );
-		assertKeyDown( RIGHT, 2 );
-		assertKeyDown( RIGHT, 2 );
-		assertKeyDown( LEFT, 1 );
-		assertKeyDown( LEFT, 0 );
-		assertKeyDown( LEFT, 0 );
+		assertKeyDown( RIGHT, 1, true );
+		assertKeyDown( RIGHT, 2, true );
+		assertKeyDown( RIGHT, 2, true );
+		assertKeyDown( LEFT, 1, true );
+		assertKeyDown( LEFT, 0, true );
+		assertKeyDown( LEFT, 0, true );
+		assertKeyDown( DOWN, 0, true );
+		assertKeyDown( UP, 0, true );
+		assertKeyDown( SPACE, 0, false );
 	} );
 } );
 
@@ -317,17 +343,19 @@ describe( 'TabbableContainer', () => {
 		wrapper.getDOMNode().querySelector( '#section1' ).focus();
 
 		// Navigate options
-		function assertKeyDown( keyCode, shiftKey, expectedActiveIndex ) {
-			fireKeyDown( container, keyCode, shiftKey );
+		function assertKeyDown( keyCode, shiftKey, expectedActiveIndex, expectedStop ) {
+			const interaction = fireKeyDown( container, keyCode, shiftKey );
 			expect( currentIndex ).toBe( expectedActiveIndex );
+			expect( interaction.stopped ).toBe( expectedStop );
 		}
 
-		assertKeyDown( TAB, false, 1 );
-		assertKeyDown( TAB, false, 2 );
-		assertKeyDown( TAB, false, 0 );
-		assertKeyDown( TAB, true, 2 );
-		assertKeyDown( TAB, true, 1 );
-		assertKeyDown( TAB, true, 0 );
+		assertKeyDown( TAB, false, 1, true );
+		assertKeyDown( TAB, false, 2, true );
+		assertKeyDown( TAB, false, 0, true );
+		assertKeyDown( TAB, true, 2, true );
+		assertKeyDown( TAB, true, 1, true );
+		assertKeyDown( TAB, true, 0, true );
+		assertKeyDown( SPACE, false, 0, false );
 	} );
 
 	it( 'should navigate by keypresses and overlook deep candidates', () => {
@@ -349,17 +377,19 @@ describe( 'TabbableContainer', () => {
 		wrapper.getDOMNode().querySelector( '#section1' ).focus();
 
 		// Navigate options
-		function assertKeyDown( keyCode, shiftKey, expectedActiveIndex ) {
-			fireKeyDown( container, keyCode, shiftKey );
+		function assertKeyDown( keyCode, shiftKey, expectedActiveIndex, expectedStop ) {
+			const interaction = fireKeyDown( container, keyCode, shiftKey );
 			expect( currentIndex ).toBe( expectedActiveIndex );
+			expect( interaction.stopped ).toBe( expectedStop );
 		}
 
-		assertKeyDown( TAB, false, 1 );
-		assertKeyDown( TAB, false, 2 );
-		assertKeyDown( TAB, false, 0 );
-		assertKeyDown( TAB, true, 2 );
-		assertKeyDown( TAB, true, 1 );
-		assertKeyDown( TAB, true, 0 );
+		assertKeyDown( TAB, false, 1, true );
+		assertKeyDown( TAB, false, 2, true );
+		assertKeyDown( TAB, false, 0, true );
+		assertKeyDown( TAB, true, 2, true );
+		assertKeyDown( TAB, true, 1, true );
+		assertKeyDown( TAB, true, 0, true );
+		assertKeyDown( SPACE, false, 0, false );
 	} );
 
 	it( 'should navigate by keypresses and explore deep candidates', () => {
@@ -381,19 +411,21 @@ describe( 'TabbableContainer', () => {
 		wrapper.getDOMNode().querySelector( '#section1' ).focus();
 
 		// Navigate options
-		function assertKeyDown( keyCode, shiftKey, expectedActiveIndex ) {
-			fireKeyDown( container, keyCode, shiftKey );
+		function assertKeyDown( keyCode, shiftKey, expectedActiveIndex, expectedStop ) {
+			const interaction = fireKeyDown( container, keyCode, shiftKey );
 			expect( currentIndex ).toBe( expectedActiveIndex );
+			expect( interaction.stopped ).toBe( expectedStop );
 		}
 
-		assertKeyDown( TAB, false, 1 );
-		assertKeyDown( TAB, false, 2 );
-		assertKeyDown( TAB, false, 3 );
-		assertKeyDown( TAB, false, 0 );
-		assertKeyDown( TAB, true, 3 );
-		assertKeyDown( TAB, true, 2 );
-		assertKeyDown( TAB, true, 1 );
-		assertKeyDown( TAB, true, 0 );
+		assertKeyDown( TAB, false, 1, true );
+		assertKeyDown( TAB, false, 2, true );
+		assertKeyDown( TAB, false, 3, true );
+		assertKeyDown( TAB, false, 0, true );
+		assertKeyDown( TAB, true, 3, true );
+		assertKeyDown( TAB, true, 2, true );
+		assertKeyDown( TAB, true, 1, true );
+		assertKeyDown( TAB, true, 0, true );
+		assertKeyDown( SPACE, false, 0, false );
 	} );
 
 	it( 'should navigate by keypresses and stop at edges', () => {
@@ -412,16 +444,18 @@ describe( 'TabbableContainer', () => {
 		wrapper.getDOMNode().querySelector( '#section1' ).focus();
 
 		// Navigate options
-		function assertKeyDown( keyCode, shiftKey, expectedActiveIndex ) {
-			fireKeyDown( container, keyCode, shiftKey );
+		function assertKeyDown( keyCode, shiftKey, expectedActiveIndex, expectedStop ) {
+			const interaction = fireKeyDown( container, keyCode, shiftKey );
 			expect( currentIndex ).toBe( expectedActiveIndex );
+			expect( interaction.stopped ).toBe( expectedStop );
 		}
 
-		assertKeyDown( TAB, false, 1 );
-		assertKeyDown( TAB, false, 2 );
-		assertKeyDown( TAB, false, 2 );
-		assertKeyDown( TAB, true, 1 );
-		assertKeyDown( TAB, true, 0 );
-		assertKeyDown( TAB, true, 0 );
+		assertKeyDown( TAB, false, 1, true );
+		assertKeyDown( TAB, false, 2, true );
+		assertKeyDown( TAB, false, 2, true );
+		assertKeyDown( TAB, true, 1, true );
+		assertKeyDown( TAB, true, 0, true );
+		assertKeyDown( TAB, true, 0, true );
+		assertKeyDown( SPACE, false, 0, false );
 	} );
 } );

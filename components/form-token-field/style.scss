@@ -159,18 +159,13 @@ input[type="text"].components-form-token-field__input {
 // Suggestion list
 .components-form-token-field__suggestions-list {
 	background: $white;
-	max-height: 0;
+	max-height: 9em;
 	overflow-y: scroll;
 	transition: all .15s ease-in-out;
 	list-style: none;
+	border-top: 1px solid $dark-gray-300;
 	margin: 0;
-
-	&.is-expanded {
-		background: $white;
-		border-top: 1px solid $dark-gray-300;
-		max-height: 9em;
-		padding-top: 3px;
-	}
+	padding-top: 3px;
 }
 
 .components-form-token-field__suggestion {
@@ -181,11 +176,11 @@ input[type="text"].components-form-token-field__input {
 	cursor: pointer;
 
 	&.is-selected {
-		background: $blue-medium-500;
+		background: $blue-dark-900;
 		color: $white;
 	}
 }
 
 .components-form-token-field__suggestion-match {
-	color: $dark-gray-800;
+	text-decoration: underline;
 }

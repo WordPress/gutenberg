@@ -7,8 +7,8 @@ import { first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-import { KeyboardShortcuts } from '@wordpress/components';
+import { Component, compose } from '@wordpress/element';
+import { KeyboardShortcuts, withContext } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -42,10 +42,12 @@ class EditorGlobalKeyboardShortcuts extends Component {
 	}
 
 	deleteSelectedBlocks( event ) {
-		const { multiSelectedBlockUids, onRemove } = this.props;
+		const { multiSelectedBlockUids, onRemove, isLocked } = this.props;
 		if ( multiSelectedBlockUids.length ) {
 			event.preventDefault();
-			onRemove( multiSelectedBlockUids );
+			if ( ! isLocked ) {
+				onRemove( multiSelectedBlockUids );
+			}
 		}
 	}
 
@@ -63,18 +65,27 @@ class EditorGlobalKeyboardShortcuts extends Component {
 	}
 }
 
-export default connect(
-	( state ) => {
+export default compose(
+	connect(
+		( state ) => {
+			return {
+				uids: getBlockUids( state ),
+				multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
+			};
+		},
+		{
+			clearSelectedBlock,
+			onMultiSelect: multiSelect,
+			onRedo: redo,
+			onUndo: undo,
+			onRemove: removeBlocks,
+		}
+	),
+	withContext( 'editor' )( ( settings ) => {
+		const { templateLock } = settings;
+
 		return {
-			uids: getBlockUids( state ),
-			multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
+			isLocked: !! templateLock,
 		};
-	},
-	{
-		clearSelectedBlock,
-		onMultiSelect: multiSelect,
-		onRedo: redo,
-		onUndo: undo,
-		onRemove: removeBlocks,
-	}
+	} ),
 )( EditorGlobalKeyboardShortcuts );

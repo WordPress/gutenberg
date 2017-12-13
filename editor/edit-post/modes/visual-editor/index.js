@@ -13,6 +13,7 @@ import { Component, findDOMNode } from '@wordpress/element';
  */
 import './style.scss';
 import { BlockList, PostTitle, WritingFlow, DefaultBlockAppender, EditorGlobalKeyboardShortcuts } from '../../../components';
+import VisualEditorInserter from './inserter';
 import { isFeatureActive } from '../../../selectors';
 import { clearSelectedBlock } from '../../../actions';
 
@@ -59,8 +60,9 @@ class VisualEditor extends Component {
 						ref={ this.bindBlocksContainer }
 						showContextualToolbar={ ! this.props.hasFixedToolbar }
 					/>
+					<DefaultBlockAppender />
 				</WritingFlow>
-				<DefaultBlockAppender />
+				<VisualEditorInserter />
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */

@@ -92,11 +92,11 @@ add_filter( 'allowed_block_types', function() {
 
 To modify the behaviour of existing blocks, Gutenberg exposes a list of filters:
 
-- `registerBlockType`: Used to filter the block settings. It receives the block settings and the name of the block the registered block as arguments.
+- `blocks.registerBlockType`: Used to filter the block settings. It receives the block settings and the name of the block the registered block as arguments.
 
-- `getSaveContent.extraProps`: A filter that applies to all blocks returning a WP Element in the `save` function. This filter is used to add extra props to the root element of the `save` function. For example: to add a className, an id, or any valid prop for this element. It receives the current props of the `save` element, the block Type and the block attributes as arguments.
+- `blocks.getSaveContent.extraProps`: A filter that applies to all blocks returning a WP Element in the `save` function. This filter is used to add extra props to the root element of the `save` function. For example: to add a className, an id, or any valid prop for this element. It receives the current props of the `save` element, the block Type and the block attributes as arguments.
 
-- `BlockEdit`: Used to filter the block's `edit` function receiving the WP element returned from the original block `edit` element.
+- `blocks.BlockEdit`: Used to modify the block's `edit` component. It receives the original block `edit` component and returns a new wrapped component.
 
 **Example**
 
@@ -109,9 +109,9 @@ function addBackgroundProp( props ) {
 }
 
 // Adding the filter
-wp.blocks.addFilter(
-	'getSaveContent.extraProps',
-	'myplugin\add-background',
+wp.hooks.addFilter(
+	'blocks.getSaveContent.extraProps',
+	'myplugin/add-background',
 	addBackgroundProp
 );
 ```

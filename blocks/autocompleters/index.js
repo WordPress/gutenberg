@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { sortBy } from 'lodash';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
@@ -56,7 +61,11 @@ import BlockIcon from '../block-icon';
  * @returns {Completer}          Completer object used by the Autocomplete component.
  */
 export function blockAutocompleter( { onReplace } ) {
-	const options = getBlockTypes().map( ( blockType ) => {
+	// Prioritize common category in block type options
+	const options = sortBy(
+		getBlockTypes(),
+		( { category } ) => 'common' !== category
+	).map( ( blockType ) => {
 		const { name, title, icon, keywords = [] } = blockType;
 		return {
 			value: name,

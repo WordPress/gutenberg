@@ -43,6 +43,11 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 				'callback'            => array( $this, 'get_items' ),
 				'permission_callback' => array( $this, 'get_items_permissions_check' ),
 			),
+			array(
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => array( $this, 'save_item' ),
+				'permission_callback' => array( $this, 'save_item_permissions_check' ),
+			),
 			'schema' => array( $this, 'get_public_item_schema' ),
 		) );
 
@@ -54,8 +59,8 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 			),
 			array(
 				'methods'             => WP_REST_Server::EDITABLE,
-				'callback'            => array( $this, 'update_item' ),
-				'permission_callback' => array( $this, 'update_item_permissions_check' ),
+				'callback'            => array( $this, 'save_item' ),
+				'permission_callback' => array( $this, 'save_item_permissions_check' ),
 			),
 			'schema' => array( $this, 'get_public_item_schema' ),
 		) );
@@ -133,14 +138,8 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function get_item( $request ) {
-		$uuid = $request['id'];
-		if ( ! $this->is_valid_uuid4( $uuid ) ) {
-			return new WP_Error( 'gutenberg_reusable_block_invalid_id', __( 'ID is not a valid UUID v4.', 'gutenberg' ), array(
-				'status' => 404,
-			) );
-		}
-
-		$reusable_block = $this->get_reusable_block( $uuid );
+		$id             = $request['id'];
+		$reusable_block = get_post( $id );
 		if ( ! $reusable_block ) {
 			return new WP_Error( 'gutenberg_reusable_block_not_found', __( 'No reusable block with that ID found.', 'gutenberg' ), array(
 				'status' => 404,
@@ -151,7 +150,7 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Checks if a given request has access to update a reusable block.
+	 * Checks if a given request has access to update/create a reusable block.
 	 *
 	 * @since 0.10.0
 	 * @access public
@@ -159,7 +158,7 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has access to update the item, WP_Error object otherwise.
 	 */
-	public function update_item_permissions_check( $request ) {
+	public function save_item_permissions_check( $request ) {
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			return new WP_Error( 'gutenberg_reusable_block_cannot_edit', __( 'Sorry, you are not allowed to edit reusable blocks as this user.', 'gutenberg' ), array(
 				'status' => rest_authorization_required_code(),
@@ -170,7 +169,7 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Updates a single reusable block.
+	 * Updates a single reusable block or creates a new one if no id provided.
 	 *
 	 * @since 0.10.0
 	 * @access public
@@ -178,14 +177,7 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
-	public function update_item( $request ) {
-		$uuid = $request['id'];
-		if ( ! $this->is_valid_uuid4( $uuid ) ) {
-			return new WP_Error( 'gutenberg_reusable_block_invalid_id', __( 'ID is not a valid UUID v4.', 'gutenberg' ), array(
-				'status' => 404,
-			) );
-		}
-
+	public function save_item( $request ) {
 		$reusable_block = $this->prepare_item_for_database( $request );
 		if ( is_wp_error( $reusable_block ) ) {
 			return $reusable_block;
@@ -214,16 +206,13 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 	protected function prepare_item_for_database( $request ) {
 		$prepared_reusable_block = new stdClass();
 
-		$existing_reusable_block = $this->get_reusable_block( $request['id'] );
+		$existing_reusable_block = get_post( $request['id'] );
 		if ( $existing_reusable_block ) {
 			$prepared_reusable_block->ID = $existing_reusable_block->ID;
 		}
 
 		$prepared_reusable_block->post_type   = 'wp_block';
 		$prepared_reusable_block->post_status = 'publish';
-
-		// ID. We already validated this in self::update_item().
-		$prepared_reusable_block->post_name = $request['id'];
 
 		// Name.
 		if ( isset( $request['name'] ) && is_string( $request['name'] ) ) {
@@ -258,7 +247,7 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 	 */
 	public function prepare_item_for_response( $reusable_block, $request ) {
 		$data = array(
-			'id'      => $reusable_block->post_name,
+			'id'      => $reusable_block->ID,
 			'name'    => $reusable_block->post_title,
 			'content' => $reusable_block->post_content,
 		);
@@ -294,7 +283,7 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 			'type'       => 'object',
 			'properties' => array(
 				'id'      => array(
-					'description' => __( 'UUID that identifies this reusable block.', 'gutenberg' ),
+					'description' => __( 'ID that identifies this reusable block.', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'view', 'edit' ),
 					'readonly'    => true,
@@ -313,41 +302,5 @@ class WP_REST_Reusable_Blocks_Controller extends WP_REST_Controller {
 				),
 			),
 		);
-	}
-
-	/**
-	 * Fetches a reusable block by its UUID ID. Reusable blocks are stored as posts with a custom post type.
-	 *
-	 * @since 0.10.0
-	 * @access private
-	 *
-	 * @param string $uuid A UUID string that uniquely identifies the reusable block.
-	 *
-	 * @return WP_Post|null The block (a WP_Post), or null if none was found.
-	 */
-	private function get_reusable_block( $uuid ) {
-		$reusable_blocks = get_posts( array(
-			'post_type' => 'wp_block',
-			'name'      => $uuid,
-		) );
-
-		return array_shift( $reusable_blocks );
-	}
-
-	/**
-	 * Checks if the given value is a valid UUID v4 string.
-	 *
-	 * @since 0.10.0
-	 * @access private
-	 *
-	 * @param mixed $uuid The value to validate.
-	 * @return bool Whether or not the string is a valid UUID v4 string.
-	 */
-	private function is_valid_uuid4( $uuid ) {
-		if ( ! is_string( $uuid ) ) {
-			return false;
-		}
-
-		return (bool) preg_match( '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $uuid );
 	}
 }

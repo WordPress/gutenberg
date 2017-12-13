@@ -170,13 +170,16 @@ class ParagraphBlock extends Component {
 							} }
 							focus={ focus }
 							onFocus={ setFocus }
-							onSplit={ ( before, after, ...blocks ) => {
-								setAttributes( { content: before } );
-								insertBlocksAfter( [
-									...blocks,
-									createBlock( 'core/paragraph', { content: after } ),
-								] );
-							} }
+							onSplit={ insertBlocksAfter ?
+								( before, after, ...blocks ) => {
+									setAttributes( { content: before } );
+									insertBlocksAfter( [
+										...blocks,
+										createBlock( 'core/paragraph', { content: after } ),
+									] );
+								} :
+								undefined
+							}
 							onMerge={ mergeBlocks }
 							onReplace={ onReplace }
 							placeholder={ placeholder || __( 'Add text or type / to insert content' ) }

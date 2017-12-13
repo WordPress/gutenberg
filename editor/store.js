@@ -14,6 +14,7 @@ import { mobileMiddleware } from './utils/mobile';
 import reducer from './reducer';
 import storePersist from './store-persist';
 import { PREFERENCES_DEFAULTS } from './store-defaults';
+import enhanceWithBrowserSize from './store-browser-enhancer';
 
 /**
  * Module constants
@@ -42,6 +43,7 @@ function createReduxStore( preloadedState ) {
 	}
 
 	const store = createStore( reducer, preloadedState, flowRight( enhancers ) );
+	enhanceWithBrowserSize( store );
 
 	return store;
 }

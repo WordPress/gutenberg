@@ -43,12 +43,16 @@ export default class InserterGroup extends Component {
 		const { current } = this.state;
 		const { selectBlock, bindReferenceNode } = this.props;
 		const { disabled } = block;
+
 		return (
 			<button
 				role="menuitem"
-				key={ block.name }
+				key={ block.name === 'core/block' && block.initialAttributes ?
+					block.name + block.initialAttributes.ref :
+					block.name
+				}
 				className="editor-inserter__block"
-				onClick={ selectBlock( block.name ) }
+				onClick={ selectBlock( block ) }
 				ref={ bindReferenceNode( block.name ) }
 				tabIndex={ current === block.name || disabled ? null : '-1' }
 				onMouseEnter={ ! disabled ? this.props.showInsertionPoint : null }

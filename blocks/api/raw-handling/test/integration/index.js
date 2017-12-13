@@ -8,7 +8,6 @@ import path from 'path';
 /**
  * Internal dependencies
  */
-import '../../../../library';
 import rawHandler from '../../index';
 import serialize from '../../../serializer';
 
@@ -21,6 +20,13 @@ const types = [
 ];
 
 describe( 'raw handling: integration', () => {
+	beforeAll( () => {
+		// Load all hooks that modify blocks
+		require( 'blocks/hooks' );
+		// Load all blocks
+		require( 'blocks/library' );
+	} );
+
 	types.forEach( ( type ) => {
 		it( type, () => {
 			const input = fs.readFileSync( path.join( __dirname, `${ type }-in.html` ), 'utf8' ).trim();

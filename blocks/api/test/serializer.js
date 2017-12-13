@@ -24,6 +24,11 @@ import {
 import { createBlock } from '../';
 
 describe( 'block serializer', () => {
+	beforeAll( () => {
+		// Load all hooks that modify blocks
+		require( 'blocks/hooks' );
+	} );
+
 	afterEach( () => {
 		setUnknownTypeHandlerName( undefined );
 		getBlockTypes().forEach( block => {

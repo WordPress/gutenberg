@@ -2,12 +2,13 @@
  * External Dependencies
  */
 import { connect } from 'react-redux';
-import { flowRight, filter } from 'lodash';
+import { filter } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { withAPIData } from '@wordpress/components';
+import { compose } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -49,7 +50,7 @@ const applyWithAPIData = withAPIData( () => ( {
 	taxonomies: '/wp/v2/taxonomies?context=edit',
 } ) );
 
-export default flowRight( [
+export default compose( [
 	applyConnect,
 	applyWithAPIData,
 ] )( PostTaxonomies );

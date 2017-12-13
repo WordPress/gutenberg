@@ -4,7 +4,7 @@
 	margin: 0 auto;
 	margin-left: auto;
 	margin-right: auto;
-	padding: 50px 0 0;
+	padding: 50px 0;
 
 	&,
 	& p {
@@ -39,31 +39,43 @@
 	}
 }
 
-.editor-visual-editor .editor-inserter {
-	.editor-inserter__toggle {
-		color: $dark-gray-300;
+.editor-visual-editor__inserter {
+	display: flex;
+	align-items: baseline;
+	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );
+	margin: 0 auto;
+	clear: both;
+
+	padding: $block-padding;
+	padding-left: $block-padding - 8px; // Offset by left button's own padding
+	@include break-small {
+		padding: $block-padding ( $block-padding + $block-mover-padding-visible );
+		padding-left: $block-padding + $block-mover-padding-visible - 8px;
 	}
 
-	.editor-inserter__toggle.components-icon-button:not(:disabled):hover {
-		@include button-style__hover;
+	> .editor-inserter__block {
+		flex-direction: row;
+		opacity: 0;
+		transition: opacity 150ms;
+		margin: 0 10px;
+		width: auto;
+		font-family: $default-font;
+		font-size: $default-font-size;
+		box-shadow: none;
+		padding: 6px;
+		align-items: center;
+	}
+
+	&:hover > .editor-inserter__block,
+	&.is-showing-controls > .editor-inserter__block {
+		opacity: 1;
 	}
 }
 
-.editor-visual-editor .editor-visual-editor__insertion-point {
-	position: relative;
-	width: $visual-editor-max-width - $block-padding - $block-padding;
-	margin-left: auto;
-	margin-right: auto;
-
-	&:before {
-		position: absolute;
-		top: -1px;
-		height: 2px;
-		left: 0;
-		right: 0;
-		background: $blue-medium-500;
-		content: '';
-	}
+.editor-visual-editor__inserter-block-icon {
+	display: inline-block;
+	margin-right: 8px;
+	height: 20px;
 }
 
 .editor-visual-editor .editor-post-title {
@@ -89,13 +101,16 @@
 .editor-visual-editor .editor-default-block-appender {
 	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );
 	clear: left;
-	margin: 0 auto;
+	margin-left: auto;
+	margin-right: auto;
 	position: relative;
 
 	@include break-small() {
+		padding: 0 ( $block-mover-padding-visible - 1px );	// subtract 1px for border
 		padding: 0 $block-mover-padding-visible;
 
 		.editor-default-block-appender__content {
+			padding: 0 ( $block-padding - 1px );	// subtract 1px for border
 			padding: 0 $block-padding;
 		}
 	}

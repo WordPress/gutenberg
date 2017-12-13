@@ -83,6 +83,12 @@ function gutenberg_register_scripts_and_styles() {
 		filemtime( gutenberg_dir_path() . 'utils/build/index.js' )
 	);
 	wp_register_script(
+		'wp-hooks',
+		gutenberg_url( 'hooks/build/index.js' ),
+		array(),
+		filemtime( gutenberg_dir_path() . 'hooks/build/index.js' )
+	);
+	wp_register_script(
 		'wp-date',
 		gutenberg_url( 'date/build/index.js' ),
 		array( 'moment' ),
@@ -129,13 +135,13 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-components',
 		gutenberg_url( 'components/build/index.js' ),
-		array( 'wp-element', 'wp-i18n', 'wp-utils', 'wp-api-request' ),
+		array( 'wp-element', 'wp-i18n', 'wp-utils', 'wp-hooks', 'wp-api-request' ),
 		filemtime( gutenberg_dir_path() . 'components/build/index.js' )
 	);
 	wp_register_script(
 		'wp-blocks',
 		gutenberg_url( 'blocks/build/index.js' ),
-		array( 'wp-element', 'wp-components', 'wp-utils', 'wp-i18n', 'tinymce-latest', 'tinymce-latest-lists', 'tinymce-latest-paste', 'tinymce-latest-table', 'media-views', 'media-models', 'shortcode' ),
+		array( 'wp-element', 'wp-components', 'wp-utils', 'wp-hooks', 'wp-i18n', 'tinymce-latest', 'tinymce-latest-lists', 'tinymce-latest-paste', 'tinymce-latest-table', 'media-views', 'media-models', 'shortcode' ),
 		filemtime( gutenberg_dir_path() . 'blocks/build/index.js' )
 	);
 	wp_add_inline_script(
@@ -154,18 +160,23 @@ function gutenberg_register_scripts_and_styles() {
 		array(),
 		filemtime( gutenberg_dir_path() . 'components/build/style.css' )
 	);
+	wp_style_add_data( 'wp-components', 'rtl', 'replace' );
+
 	wp_register_style(
 		'wp-blocks',
 		gutenberg_url( 'blocks/build/style.css' ),
 		array(),
 		filemtime( gutenberg_dir_path() . 'blocks/build/style.css' )
 	);
+	wp_style_add_data( 'wp-blocks', 'rtl', 'replace' );
+
 	wp_register_style(
 		'wp-edit-blocks',
 		gutenberg_url( 'blocks/build/edit-blocks.css' ),
 		array(),
 		filemtime( gutenberg_dir_path() . 'blocks/build/edit-blocks.css' )
 	);
+	wp_style_add_data( 'wp-edit-blocks', 'rtl', 'replace' );
 }
 add_action( 'wp_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 );
 add_action( 'admin_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 );
@@ -223,16 +234,16 @@ function gutenberg_register_vendor_scripts() {
 
 	gutenberg_register_vendor_script(
 		'react',
-		'https://unpkg.com/react@16.0.0/umd/react' . $react_suffix . '.js'
+		'https://unpkg.com/react@16.2.0/umd/react' . $react_suffix . '.js'
 	);
 	gutenberg_register_vendor_script(
 		'react-dom',
-		'https://unpkg.com/react-dom@16.0.0/umd/react-dom' . $react_suffix . '.js',
+		'https://unpkg.com/react-dom@16.2.0/umd/react-dom' . $react_suffix . '.js',
 		array( 'react' )
 	);
 	gutenberg_register_vendor_script(
 		'react-dom-server',
-		'https://unpkg.com/react-dom@16.0.0/umd/react-dom-server.browser' . $react_suffix . '.js',
+		'https://unpkg.com/react-dom@16.2.0/umd/react-dom-server.browser' . $react_suffix . '.js',
 		array( 'react' )
 	);
 	$moment_script = SCRIPT_DEBUG ? 'moment.js' : 'min/moment.min.js';
@@ -478,7 +489,7 @@ JS;
 	wp_add_inline_script( 'wp-api', $script );
 
 	// Localize the wp-api settings and schema.
-	$schema_response = rest_do_request( new WP_REST_Request( 'GET', '/wp/v2' ) );
+	$schema_response = rest_do_request( new WP_REST_Request( 'GET', '/' ) );
 	if ( ! $schema_response->is_error() ) {
 		wp_add_inline_script( 'wp-api', sprintf(
 			'wpApiSettings.cacheSchema = true; wpApiSettings.schema = %s;',
@@ -603,7 +614,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	wp_enqueue_script(
 		'wp-editor',
 		gutenberg_url( 'editor/build/index.js' ),
-		array( 'jquery', 'wp-api', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element', 'wp-components', 'wp-utils', 'word-count', 'editor', 'heartbeat' ),
+		array( 'wp-api', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element', 'wp-components', 'wp-utils', 'word-count', 'editor', 'heartbeat' ),
 		filemtime( gutenberg_dir_path() . 'editor/build/index.js' ),
 		true // enqueue in the footer.
 	);
@@ -614,7 +625,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 			'baseURL'  => includes_url( 'js/tinymce' ),
 			'suffix'   => SCRIPT_DEBUG ? '' : '.min',
 			'settings' => apply_filters( 'tiny_mce_before_init', array(
-				'plugins'          => array_unique( apply_filters( 'tiny_mce_plugins', array(
+				'plugins'          => implode( ',', array_unique( apply_filters( 'tiny_mce_plugins', array(
 					'charmap',
 					'colorpicker',
 					'hr',
@@ -633,7 +644,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 					'wpdialogs',
 					'wptextpattern',
 					'wpview',
-				) ) ),
+				) ) ) ),
 				'toolbar1'         => implode( ',', array_merge( apply_filters( 'mce_buttons', array(
 					'formatselect',
 					'bold',
@@ -782,10 +793,16 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'blockTypes' => $allowed_block_types,
 	);
 
+	$post_type_object = get_post_type_object( $post_to_edit['type'] );
+	if ( ! empty( $post_type_object->template ) ) {
+		$editor_settings['template']     = $post_type_object->template;
+		$editor_settings['templateLock'] = ! empty( $post_type_object->template_lock ) ? $post_type_object->template_lock : false;
+	}
+
 	$script  = '( function() {';
 	$script .= sprintf( 'var editorSettings = %s;', wp_json_encode( $editor_settings ) );
 	$script .= <<<JS
-		window._wpLoadGutenbergEditor = Promise.all( [ wp.api.init(), wp.api.init( { versionString: 'gutenberg/v1' } ) ] ).then( function() {
+		window._wpLoadGutenbergEditor = Promise.all( [ wp.api.init(), wp.api.init( { versionString: 'gutenberg/v1/' } ) ] ).then( function() {
 			return wp.editor.createEditorInstance( 'editor', window._wpGutenbergPost, editorSettings );
 		} );
 JS;
@@ -808,12 +825,14 @@ JS;
 		'wp-editor-font',
 		'https://fonts.googleapis.com/css?family=Noto+Serif:400,400i,700,700i'
 	);
+
 	wp_enqueue_style(
 		'wp-editor',
 		gutenberg_url( 'editor/build/style.css' ),
 		array( 'wp-components', 'wp-blocks', 'wp-edit-blocks' ),
 		filemtime( gutenberg_dir_path() . 'editor/build/style.css' )
 	);
+	wp_style_add_data( 'wp-editor', 'rtl', 'replace' );
 
 	/**
 	 * Fires after block assets have been enqueued for the editing interface.

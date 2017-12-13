@@ -3,7 +3,7 @@
  */
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { flowRight, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,7 +11,7 @@ import { flowRight, isEmpty } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { Dropdown, IconButton, withContext } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
-import { Component } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -63,9 +63,10 @@ class Inserter extends Component {
 			onInsertBlock,
 			insertionPoint,
 			hasSupportedBlocks,
+			isLocked,
 		} = this.props;
 
-		if ( ! hasSupportedBlocks ) {
+		if ( ! hasSupportedBlocks || isLocked ) {
 			return null;
 		}
 
@@ -88,9 +89,10 @@ class Inserter extends Component {
 					</IconButton>
 				) }
 				renderContent={ ( { onClose } ) => {
-					const onInsert = ( name ) => {
+					const onInsert = ( name, initialAttributes ) => {
 						onInsertBlock(
 							name,
+							initialAttributes,
 							insertionPoint
 						);
 
@@ -104,7 +106,7 @@ class Inserter extends Component {
 	}
 }
 
-export default flowRight( [
+export default compose( [
 	connect(
 		( state ) => {
 			return {
@@ -113,10 +115,10 @@ export default flowRight( [
 			};
 		},
 		( dispatch ) => ( {
-			onInsertBlock( name, position ) {
+			onInsertBlock( name, initialAttributes, position ) {
 				dispatch( hideInsertionPoint() );
 				dispatch( insertBlock(
-					createBlock( name ),
+					createBlock( name, initialAttributes ),
 					position
 				) );
 			},
@@ -127,10 +129,11 @@ export default flowRight( [
 		} )
 	),
 	withContext( 'editor' )( ( settings ) => {
-		const { blockTypes } = settings;
+		const { blockTypes, templateLock } = settings;
 
 		return {
 			hasSupportedBlocks: true === blockTypes || ! isEmpty( blockTypes ),
+			isLocked: !! templateLock,
 		};
 	} ),
 ] )( Inserter );

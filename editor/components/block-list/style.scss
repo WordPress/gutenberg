@@ -1,7 +1,6 @@
 .editor-block-list__block {
 	margin-bottom: $block-spacing;
 	position: relative;
-
 	padding: $block-padding;
 
 	@include break-small {
@@ -71,6 +70,11 @@
 	// focused block-style
 	&.is-selected:before {
  		outline: 1px solid $light-gray-500;
+	}
+
+	// give reusable blocks a dashed outline
+	&.is-reusable.is-selected:before {
+		outline: 1px dashed $light-gray-500;
 	}
 
 	// selection style for textarea
@@ -306,11 +310,8 @@
 	}
 }
 
-.editor-block-list .editor-block-list__insertion-point {
+.editor-block-list__insertion-point {
 	position: relative;
-	width: $visual-editor-max-width - $block-padding - $block-padding;
-	margin-left: auto;
-	margin-right: auto;
 
 	&:before {
 		position: absolute;
@@ -323,7 +324,7 @@
 	}
 }
 
-.editor-block-list__block .blocks-visual-editor__block-html-textarea {
+.editor-block-list__block .editor-block-list__block-html-textarea {
 	display: block;
 	margin: 0;
 	width: 100%;
@@ -359,6 +360,7 @@
 	&:before {
 		content: '';
 		position: absolute;
+		left: 0;
 		width: 100%;
 		height: 44px;
 		transition: 0.1s height;
@@ -380,7 +382,10 @@
 	.editor-inserter__toggle {
 		opacity: 0;
 		transition: opacity 0.25s ease-in-out;
-		transition-delay: 0.3s;
+
+		&:not( :focus ) {
+			transition-delay: 0.3s;
+		}
 	}
 
 	&.is-forced-visible .editor-inserter__toggle,
@@ -415,7 +420,7 @@ $sticky-bottom-offset: 20px;
 	text-align: left;
 	pointer-events: none;
 	height: $block-toolbar-height;
-	top: $header-height - 1px;
+	top: -1px;	// stack borders
 
 	.editor-block-toolbar {
 		border: 1px solid $light-gray-500;
@@ -443,10 +448,6 @@ $sticky-bottom-offset: 20px;
 	@include break-small() {
 		margin-left: - $block-padding - 1px;
 		margin-right: - $block-padding - 1px;
-	}
-
-	@include break-medium() {
-		top: $item-spacing;
 	}
 }
 

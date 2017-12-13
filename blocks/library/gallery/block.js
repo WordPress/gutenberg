@@ -9,7 +9,7 @@ import { filter } from 'lodash';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { mediaUpload } from '@wordpress/utils';
-import { Dashicon, Toolbar, Placeholder, FormFileUpload } from '@wordpress/components';
+import { Dashicon, DropZone, Toolbar, Placeholder, FormFileUpload } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -49,6 +49,7 @@ class GalleryBlock extends Component {
 		this.uploadFromFiles = this.uploadFromFiles.bind( this );
 		this.onRemoveImage = this.onRemoveImage.bind( this );
 		this.setImageAttributes = this.setImageAttributes.bind( this );
+		this.dropFiles = this.dropFiles.bind( this );
 
 		this.state = {
 			selectedImage: null,
@@ -113,6 +114,20 @@ class GalleryBlock extends Component {
 		} );
 	}
 
+	dropFiles( files ) {
+		const currentImages = this.props.attributes.images || [];
+		const { setAttributes } = this.props;
+		mediaUpload(
+			files,
+			( { images } ) => {
+				setAttributes( {
+					images: currentImages.concat( images ),
+				} );
+			},
+			isGallery
+		);
+	}
+
 	render() {
 		const { attributes, focus, className } = this.props;
 		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
@@ -131,6 +146,12 @@ class GalleryBlock extends Component {
 					{blockDescription}
 				</InspectorControls>
 			)
+		);
+
+		const dropZone = (
+			<DropZone
+				onFilesDrop={ this.dropFiles }
+			/>
 		);
 
 		const controls = (
@@ -173,6 +194,7 @@ class GalleryBlock extends Component {
 					icon="format-gallery"
 					label={ __( 'Gallery' ) }
 					className={ className }>
+					{ dropZone }
 					<FormFileUpload
 						isLarge
 						className="wp-block-image__upload-button"
@@ -222,6 +244,7 @@ class GalleryBlock extends Component {
 				</InspectorControls>
 			),
 			<div key="gallery" className={ `${ className } align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` }>
+				{ dropZone }
 				{ images.map( ( img, index ) => (
 					<GalleryImage
 						key={ img.id || img.url }

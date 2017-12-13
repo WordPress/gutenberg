@@ -4,9 +4,9 @@
 import { noop } from 'lodash';
 
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import createHooks from '@wordpress/hooks';
+import { applyFilters, removeAllFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -14,11 +14,9 @@ import createHooks from '@wordpress/hooks';
 import customClassName from '../custom-class-name';
 
 describe( 'custom className', () => {
-	const hooks = createHooks();
-
 	let blockSettings;
 	beforeEach( () => {
-		customClassName( hooks );
+		customClassName();
 
 		blockSettings = {
 			save: noop,
@@ -28,12 +26,12 @@ describe( 'custom className', () => {
 	} );
 
 	afterEach( () => {
-		hooks.removeAllFilters( 'registerBlockType' );
-		hooks.removeAllFilters( 'getSaveContent.extraProps' );
+		removeAllFilters( 'blocks.registerBlockType' );
+		removeAllFilters( 'blocks.getSaveContent.extraProps' );
 	} );
 
 	describe( 'addAttribute()', () => {
-		const addAttribute = hooks.applyFilters.bind( null, 'registerBlockType' );
+		const addAttribute = applyFilters.bind( null, 'blocks.registerBlockType' );
 
 		it( 'should do nothing if the block settings disable custom className support', () => {
 			const settings = addAttribute( {
@@ -54,7 +52,7 @@ describe( 'custom className', () => {
 	} );
 
 	describe( 'addSaveProps', () => {
-		const addSaveProps = hooks.applyFilters.bind( null, 'getSaveContent.extraProps' );
+		const addSaveProps = applyFilters.bind( null, 'blocks.getSaveContent.extraProps' );
 
 		it( 'should do nothing if the block settings do not define custom className support', () => {
 			const attributes = { className: 'foo' };

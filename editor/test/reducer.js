@@ -153,6 +153,35 @@ describe( 'state', () => {
 			} );
 		} );
 
+		it( 'should update the reusable block reference if the temporary id is swapped', () => {
+			const original = editor( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [ {
+					uid: 'chicken',
+					name: 'core/block',
+					attributes: {
+						ref: 'random-uid',
+					},
+					isValid: false,
+				} ],
+			} );
+
+			const state = editor( deepFreeze( original ), {
+				type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
+				id: 'random-uid',
+				updatedId: 3,
+			} );
+
+			expect( state.present.blocksByUid.chicken ).toEqual( {
+				uid: 'chicken',
+				name: 'core/block',
+				attributes: {
+					ref: 3,
+				},
+				isValid: false,
+			} );
+		} );
+
 		it( 'should move the block up', () => {
 			const original = editor( undefined, {
 				type: 'RESET_BLOCKS',
@@ -742,7 +771,13 @@ describe( 'state', () => {
 				uid: 'kumquat',
 			} );
 
-			expect( state ).toEqual( { start: 'kumquat', end: 'kumquat', focus: {}, isMultiSelecting: false } );
+			expect( state ).toEqual( {
+				start: 'kumquat',
+				end: 'kumquat',
+				focus: {},
+				isMultiSelecting: false,
+				isEnabled: true,
+			} );
 		} );
 
 		it( 'should set multi selection', () => {
@@ -842,7 +877,13 @@ describe( 'state', () => {
 				config: { editable: 'citation' },
 			} );
 
-			expect( state ).toEqual( { start: 'chicken', end: 'chicken', focus: { editable: 'citation' }, isMultiSelecting: false } );
+			expect( state ).toEqual( {
+				start: 'chicken',
+				end: 'chicken',
+				focus: { editable: 'citation' },
+				isMultiSelecting: false,
+				isEnabled: true,
+			} );
 		} );
 
 		it( 'should update the focus and merge the existing state', () => {
@@ -890,9 +931,11 @@ describe( 'state', () => {
 			const state = preferences( undefined, {} );
 
 			expect( state ).toEqual( {
+				blockUsage: {},
 				recentlyUsedBlocks: [],
 				mode: 'visual',
 				isSidebarOpened: true,
+				isSidebarOpenedMobile: false,
 				panels: { 'post-status': true },
 				features: { fixedToolbar: false },
 			} );
@@ -904,6 +947,15 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( { isSidebarOpened: true } );
+		} );
+
+		it( 'should toggle the mobile sidebar open flag', () => {
+			const state = preferences( deepFreeze( { isSidebarOpenedMobile: false } ), {
+				type: 'TOGGLE_SIDEBAR',
+				isMobile: true,
+			} );
+
+			expect( state ).toEqual( { isSidebarOpenedMobile: true } );
 		} );
 
 		it( 'should set the sidebar panel open flag to true if unset', () => {
@@ -934,7 +986,7 @@ describe( 'state', () => {
 		} );
 
 		it( 'should record recently used blocks', () => {
-			const state = preferences( deepFreeze( { recentlyUsedBlocks: [] } ), {
+			const state = preferences( deepFreeze( { recentlyUsedBlocks: [], blockUsage: {} } ), {
 				type: 'INSERT_BLOCKS',
 				blocks: [ {
 					uid: 'bacon',
@@ -944,7 +996,7 @@ describe( 'state', () => {
 
 			expect( state.recentlyUsedBlocks[ 0 ] ).toEqual( 'core-embed/twitter' );
 
-			const twoRecentBlocks = preferences( deepFreeze( { recentlyUsedBlocks: [] } ), {
+			const twoRecentBlocks = preferences( deepFreeze( { recentlyUsedBlocks: [], blockUsage: {} } ), {
 				type: 'INSERT_BLOCKS',
 				blocks: [ {
 					uid: 'eggs',
@@ -957,6 +1009,24 @@ describe( 'state', () => {
 
 			expect( twoRecentBlocks.recentlyUsedBlocks[ 0 ] ).toEqual( 'core-embed/youtube' );
 			expect( twoRecentBlocks.recentlyUsedBlocks[ 1 ] ).toEqual( 'core-embed/twitter' );
+		} );
+
+		it( 'should record block usage', () => {
+			const state = preferences( deepFreeze( { recentlyUsedBlocks: [], blockUsage: {} } ), {
+				type: 'INSERT_BLOCKS',
+				blocks: [ {
+					uid: 'eggs',
+					name: 'core-embed/twitter',
+				}, {
+					uid: 'bacon',
+					name: 'core-embed/youtube',
+				}, {
+					uid: 'milk',
+					name: 'core-embed/youtube',
+				} ],
+			} );
+
+			expect( state.blockUsage ).toEqual( { 'core-embed/youtube': 2, 'core-embed/twitter': 1 } );
 		} );
 
 		it( 'should populate recentlyUsedBlocks, filling up with common blocks, on editor setup', () => {
@@ -978,6 +1048,13 @@ describe( 'state', () => {
 				type: 'SETUP_EDITOR',
 			} );
 			expect( state.recentlyUsedBlocks[ 0 ] ).toEqual( 'core-embed/youtube' );
+		} );
+
+		it( 'should remove unregistered blocks from persisted block usage stats', () => {
+			const state = preferences( deepFreeze( { recentlyUsedBlocks: [], blockUsage: { 'core/i-do-not-exist': 42, 'core-embed/youtube': 88 } } ), {
+				type: 'SETUP_EDITOR',
+			} );
+			expect( state.blockUsage ).toEqual( { 'core-embed/youtube': 88 } );
 		} );
 
 		it( 'should toggle a feature flag', () => {
@@ -1077,6 +1154,41 @@ describe( 'state', () => {
 			} );
 			expect( state ).toEqual( [
 				originalState[ 1 ],
+			] );
+		} );
+
+		it( 'should dedupe distinct ids', () => {
+			const originalState = [
+				{
+					id: 'a',
+					content: 'Post saved',
+					status: 'success',
+				},
+				{
+					id: 'b',
+					content: 'Error saving',
+					status: 'error',
+				},
+			];
+			const state = notices( deepFreeze( originalState ), {
+				type: 'CREATE_NOTICE',
+				notice: {
+					id: 'a',
+					content: 'Post updated',
+					status: 'success',
+				},
+			} );
+			expect( state ).toEqual( [
+				{
+					id: 'b',
+					content: 'Error saving',
+					status: 'error',
+				},
+				{
+					id: 'a',
+					content: 'Post updated',
+					status: 'success',
+				},
 			] );
 		} );
 	} );
@@ -1301,6 +1413,46 @@ describe( 'state', () => {
 			} );
 		} );
 
+		it( 'should update the reusable block\'s id if it was temporary', () => {
+			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
+			const initialState = {
+				data: {
+					[ id ]: {
+						id,
+						isTemporary: true,
+						name: 'My cool block',
+						type: 'core/paragraph',
+						attributes: {
+							content: 'Hello!',
+							dropCap: true,
+						},
+					},
+				},
+				isSaving: {},
+			};
+
+			const state = reusableBlocks( initialState, {
+				type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
+				id,
+				updatedId: 3,
+			} );
+
+			expect( state ).toEqual( {
+				data: {
+					3: {
+						id: 3,
+						name: 'My cool block',
+						type: 'core/paragraph',
+						attributes: {
+							content: 'Hello!',
+							dropCap: true,
+						},
+					},
+				},
+				isSaving: {},
+			} );
+		} );
+
 		it( 'should indicate that a reusable block is saving', () => {
 			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
 			const initialState = {
@@ -1324,7 +1476,9 @@ describe( 'state', () => {
 		it( 'should stop indicating that a reusable block is saving when the save succeeded', () => {
 			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
 			const initialState = {
-				data: {},
+				data: {
+					[ id ]: { id },
+				},
 				isSaving: {
 					[ id ]: true,
 				},
@@ -1333,10 +1487,13 @@ describe( 'state', () => {
 			const state = reusableBlocks( initialState, {
 				type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
 				id,
+				updatedId: id,
 			} );
 
 			expect( state ).toEqual( {
-				data: {},
+				data: {
+					[ id ]: { id },
+				},
 				isSaving: {},
 			} );
 		} );

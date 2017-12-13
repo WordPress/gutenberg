@@ -8,12 +8,12 @@ import { get, isFunction, some } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { getCategories } from './categories';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
  */
-import { applyFilters } from '../hooks';
+import { getCategories } from './categories';
 
 /**
  * Block settings keyed by block name.
@@ -119,7 +119,7 @@ export function registerBlockType( name, settings ) {
 		...settings,
 	};
 
-	settings = applyFilters( 'registerBlockType', settings, name );
+	settings = applyFilters( 'blocks.registerBlockType', settings, name );
 
 	return blocks[ name ] = settings;
 }
@@ -217,4 +217,16 @@ export function hasBlockSupport( nameOrType, feature, defaultSupports ) {
 		'supports',
 		feature,
 	], defaultSupports );
+}
+
+/**
+ * Determines whether or not the given block is a reusable block. This is a
+ * special block type that is used to point to a global block stored via the
+ * API.
+ * 
+ * @param {Object} blockOrType Block or Block Type to test
+ * @return {Boolean}           Whether the given block is a reusable block
+ */
+export function isReusableBlock( blockOrType ) {
+	return blockOrType.name === 'core/block';
 }

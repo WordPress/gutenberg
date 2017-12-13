@@ -24,6 +24,7 @@ const initialState = {
 	incompleteTokenValue: '',
 	inputOffsetFromEnd: 0,
 	isActive: false,
+	isExpanded: false,
 	selectedSuggestionIndex: -1,
 	selectedSuggestionScroll: false,
 };
@@ -50,8 +51,9 @@ class FormTokenField extends Component {
 	}
 
 	componentDidUpdate() {
+		// Make sure to focus the input when the isActive state is true.
 		if ( this.state.isActive && ! this.input.hasFocus() ) {
-			this.input.focus(); // make sure focus is on input
+			this.input.focus();
 		}
 	}
 
@@ -73,7 +75,18 @@ class FormTokenField extends Component {
 	}
 
 	onFocus( event ) {
-		this.setState( { isActive: true } );
+		// If focus is on the input or on the container, set the isActive state to true.
+		if ( this.input.hasFocus() || event.target === this.tokensAndInput ) {
+			this.setState( { isActive: true } );
+		} else {
+			/*
+			 * Otherwise, focus is on one of the token "remove" buttons and we
+			 * set the isActive state to false to prevent the input to be
+			 * re-focused, see componentDidUpdate().
+			 */
+			this.setState( { isActive: false } );
+		}
+
 		if ( 'function' === typeof this.props.onFocus ) {
 			this.props.onFocus( event );
 		}
@@ -154,6 +167,7 @@ class FormTokenField extends Component {
 
 	onTokenClickRemove( event ) {
 		this.deleteToken( event.value );
+		this.input.focus();
 	}
 
 	onSuggestionHovered( suggestion ) {
@@ -185,13 +199,17 @@ class FormTokenField extends Component {
 			incompleteTokenValue: tokenValue,
 			selectedSuggestionIndex: -1,
 			selectedSuggestionScroll: false,
+			isExpanded: false,
 		} );
 
 		this.props.onInputChange( tokenValue );
 
-		const showMessage = tokenValue.trim().length > 1;
-		if ( showMessage ) {
+		const inputHasMinimumChars = tokenValue.trim().length > 1;
+		if ( inputHasMinimumChars ) {
 			const matchingSuggestions = this.getMatchingSuggestions( tokenValue );
+
+			this.setState( { isExpanded: !! matchingSuggestions.length } );
+
 			if ( !! matchingSuggestions.length ) {
 				this.props.debouncedSpeak( sprintf( _n(
 					'%d result found, use up and down arrow keys to navigate.',
@@ -466,7 +484,7 @@ class FormTokenField extends Component {
 			disabled: this.props.disabled,
 			value: this.state.incompleteTokenValue,
 			onBlur: this.onBlur,
-			isExpanded: this.state.isActive,
+			isExpanded: this.state.isExpanded,
 			selectedSuggestionIndex: this.state.selectedSuggestionIndex,
 		};
 
@@ -500,7 +518,8 @@ class FormTokenField extends Component {
 			tabIndex: '-1',
 		};
 		const matchingSuggestions = this.getMatchingSuggestions();
-		const showSuggestions = this.state.incompleteTokenValue.trim().length > 1;
+		const inputHasMinimumChars = this.state.incompleteTokenValue.trim().length > 1;
+		const showSuggestions = inputHasMinimumChars && !! matchingSuggestions.length;
 
 		if ( ! disabled ) {
 			tokenFieldProps = Object.assign( {}, tokenFieldProps, {
@@ -536,7 +555,6 @@ class FormTokenField extends Component {
 						suggestions={ matchingSuggestions }
 						selectedIndex={ this.state.selectedSuggestionIndex }
 						scrollIntoView={ this.state.selectedSuggestionScroll }
-						isExpanded={ this.state.isActive }
 						onHover={ this.onSuggestionHovered }
 						onSelect={ this.onSuggestionSelected }
 					/>
