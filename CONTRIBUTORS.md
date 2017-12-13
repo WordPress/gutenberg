@@ -86,3 +86,7 @@ This list is manually curated to include valuable contributions by volunteers th
 | @vladanost | |
 | @gziolo | @gziolo |
 | @lancewillett
+| | @lynneux
+| | @betsela
+| | @fuyuko
+| | @msdesign21
