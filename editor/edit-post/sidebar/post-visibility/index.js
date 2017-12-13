@@ -11,7 +11,10 @@ import './style.scss';
 import { PostVisibility as PostVisibilityForm, PostVisibilityLabel } from '../../../components';
 
 export function PostVisibility( { user } ) {
-	const canEdit = user.data && user.data.capabilities.publish_posts;
+	const userCaps = user.data ?
+		{ ...user.data.capabilities, ...user.data.post_type_capabilities } :
+		{ 'publish_posts': false };
+	const canEdit = userCaps.publish_posts;
 
 	return (
 		<PanelRow className="editor-post-visibility">
@@ -39,7 +42,9 @@ export function PostVisibility( { user } ) {
 }
 
 export default withAPIData( () => {
+	const postTypeSlug = window._wpGutenbergPost.type;
+
 	return {
-		user: '/wp/v2/users/me?context=edit',
+		user: `/wp/v2/users/me?post_type=${ postTypeSlug }&context=edit`,
 	};
 } )( PostVisibility );
