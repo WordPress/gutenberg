@@ -2,13 +2,13 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { flowRight } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { withInstanceId } from '@wordpress/components';
+import { compose } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -31,14 +31,14 @@ export function PageAttributes( { onUpdateOrder, instanceId, order } ) {
 		<PageAttributesCheck>
 			<label htmlFor={ inputId }>
 				{ __( 'Order' ) }
-			</label>,
+			</label>
 			<input
 				type="text"
 				value={ order || 0 }
 				onChange={ setUpdatedOrder }
 				id={ inputId }
 				size={ 6 }
-			/>,
+			/>
 		</PageAttributesCheck>
 	);
 }
@@ -58,7 +58,7 @@ const applyConnect = connect(
 	}
 );
 
-export default flowRight( [
+export default compose( [
 	applyConnect,
 	withInstanceId,
 ] )( PageAttributes );

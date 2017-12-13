@@ -9,6 +9,7 @@ import { flow, noop } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { IconButton, withContext } from '@wordpress/components';
+import { compose } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -34,7 +35,7 @@ export function BlockDeleteButton( { onDelete, onClick = noop, isLocked, small =
 	);
 }
 
-export default flow(
+export default compose(
 	connect(
 		undefined,
 		( dispatch, ownProps ) => ( {

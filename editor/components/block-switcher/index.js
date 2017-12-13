@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { every, uniq, get, reduce, find, flow } from 'lodash';
+import { every, uniq, get, reduce, find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,6 +10,7 @@ import { every, uniq, get, reduce, find, flow } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { Dropdown, Dashicon, IconButton, Toolbar, NavigableMenu, withContext } from '@wordpress/components';
 import { getBlockType, getBlockTypes, switchToBlockType, BlockIcon } from '@wordpress/blocks';
+import { compose } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
 
 /**
@@ -126,7 +127,7 @@ function BlockSwitcher( { blocks, onTransform, isLocked } ) {
 	);
 }
 
-export default flow(
+export default compose(
 	connect(
 		( state, ownProps ) => {
 			return {

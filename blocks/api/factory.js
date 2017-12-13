@@ -67,8 +67,8 @@ export function createBlock( name, blockAttributes = {} ) {
 export function switchToBlockType( blocks, name ) {
 	const blocksArray = castArray( blocks );
 	const isMultiBlock = blocksArray.length > 1;
-	const fistBlock = blocksArray[ 0 ];
-	const sourceName = fistBlock.name;
+	const firstBlock = blocksArray[ 0 ];
+	const sourceName = firstBlock.name;
 
 	if ( isMultiBlock && ! every( blocksArray, ( block ) => ( block.name === sourceName ) ) ) {
 		return null;
@@ -99,7 +99,7 @@ export function switchToBlockType( blocks, name ) {
 	if ( transformation.isMultiBlock ) {
 		transformationResults = transformation.transform( blocksArray.map( ( currentBlock ) => currentBlock.attributes ) );
 	} else {
-		transformationResults = transformation.transform( fistBlock.attributes );
+		transformationResults = transformation.transform( firstBlock.attributes );
 	}
 
 	// Ensure that the transformation function returned an object or an array
@@ -130,7 +130,7 @@ export function switchToBlockType( blocks, name ) {
 		...result,
 		// The first transformed block whose type matches the "destination"
 		// type gets to keep the existing UID of the first block.
-		uid: index === firstSwitchedBlock ? fistBlock.uid : result.uid,
+		uid: index === firstSwitchedBlock ? firstBlock.uid : result.uid,
 	} ) );
 }
 

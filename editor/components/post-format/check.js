@@ -2,12 +2,13 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { get, flowRight } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { withAPIData } from '@wordpress/components';
+import { compose } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -22,7 +23,7 @@ function PostFormatCheck( { postType, children } ) {
 	return children;
 }
 
-export default flowRight( [
+export default compose( [
 	connect(
 		( state ) => {
 			return {

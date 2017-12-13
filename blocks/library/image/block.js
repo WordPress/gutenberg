@@ -8,14 +8,13 @@ import {
 	isEmpty,
 	map,
 	get,
-	flowRight,
 } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 import { mediaUpload, createMediaFromFile, getBlobByURL, revokeBlobURL, viewPort } from '@wordpress/utils';
 import {
 	Placeholder,
@@ -298,7 +297,7 @@ class ImageBlock extends Component {
 	}
 }
 
-export default flowRight( [
+export default compose( [
 	withContext( 'editor' )( ( settings ) => {
 		return { settings };
 	} ),

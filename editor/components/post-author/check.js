@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import { flowRight, filter } from 'lodash';
+import { filter } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { withAPIData, withInstanceId } from '@wordpress/components';
+import { compose } from '@wordpress/element';
 
 export function PostAuthorCheck( { user, users, children } ) {
 	const authors = filter( users.data, ( { capabilities } ) => capabilities.level_1 );
@@ -24,7 +25,7 @@ const applyWithAPIData = withAPIData( () => {
 	};
 } );
 
-export default flowRight( [
+export default compose( [
 	applyWithAPIData,
 	withInstanceId,
 ] )( PostAuthorCheck );

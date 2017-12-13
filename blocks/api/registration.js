@@ -6,9 +6,13 @@
 import { get, isFunction, some } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { applyFilters } from '@wordpress/hooks';
+
+/**
  * Internal dependencies
  */
-import { applyFilters } from '../hooks';
 import { getCategories } from './categories';
 
 /**
@@ -115,7 +119,7 @@ export function registerBlockType( name, settings ) {
 		...settings,
 	};
 
-	settings = applyFilters( 'registerBlockType', settings, name );
+	settings = applyFilters( 'blocks.registerBlockType', settings, name );
 
 	return blocks[ name ] = settings;
 }

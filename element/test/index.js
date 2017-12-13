@@ -60,7 +60,7 @@ describe( 'element', () => {
 				[ createElement( 'strong', {}, 'Courgette' ) ],
 				createElement( 'strong', {}, 'Concombre' )
 			);
-			expect( concat.length ).toBe( 2 );
+			expect( concat ).toHaveLength( 2 );
 			expect( concat[ 0 ].key ).toBe( '0,0' );
 			expect( concat[ 1 ].key ).toBe( '1,0' );
 		} );
@@ -73,7 +73,7 @@ describe( 'element', () => {
 
 		it( 'should switch strings', () => {
 			const children = switchChildrenNodeName( [ 'a', 'b' ], 'strong' );
-			expect( children.length ).toBe( 2 );
+			expect( children ).toHaveLength( 2 );
 			expect( children[ 0 ].type ).toBe( 'strong' );
 			expect( children[ 0 ].props.children ).toBe( 'a' );
 			expect( children[ 1 ].type ).toBe( 'strong' );
@@ -85,7 +85,7 @@ describe( 'element', () => {
 				createElement( 'strong', { align: 'left' }, 'Courgette' ),
 				createElement( 'strong', {}, 'Concombre' ),
 			], 'em' );
-			expect( children.length ).toBe( 2 );
+			expect( children ).toHaveLength( 2 );
 			expect( children[ 0 ].type ).toBe( 'em' );
 			expect( children[ 0 ].props.children ).toBe( 'Courgette' );
 			expect( children[ 0 ].props.align ).toBe( 'left' );
@@ -97,6 +97,10 @@ describe( 'element', () => {
 	describe( 'getWrapperDisplayName()', () => {
 		it( 'should use default name for anonymous function', () => {
 			expect( getWrapperDisplayName( () => <div />, 'test' ) ).toBe( 'Test(Component)' );
+		} );
+
+		it( 'should use camel case starting with upper for wrapper prefix ', () => {
+			expect( getWrapperDisplayName( () => <div />, 'one-two_threeFOUR' ) ).toBe( 'OneTwoThreeFour(Component)' );
 		} );
 
 		it( 'should use function name', () => {
