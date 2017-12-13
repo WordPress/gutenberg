@@ -13,7 +13,7 @@ import { PostSchedule as PostScheduleForm, PostScheduleLabel } from '../../../co
 export function PostSchedule( { user } ) {
 	const userCaps = user.data ?
 		{ ...user.data.capabilities, ...user.data.post_type_capabilities } :
-		{ 'publish_posts': false };
+		{ publish_posts: false };
 
 	if ( ! userCaps.publish_posts ) {
 		return null;

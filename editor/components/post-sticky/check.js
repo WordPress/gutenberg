@@ -17,7 +17,7 @@ import { getCurrentPostType } from '../../selectors';
 export function PostStickyCheck( { postType, children, user } ) {
 	const userCaps = user.data ?
 		{ ...user.data.capabilities, ...user.data.post_type_capabilities } :
-		{ 'publish_posts': false, 'edit_others_posts': false };
+		{ publish_posts: false, edit_others_posts: false };
 
 	if (
 		postType !== 'post' ||

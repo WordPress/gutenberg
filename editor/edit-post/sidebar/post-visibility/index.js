@@ -13,7 +13,7 @@ import { PostVisibility as PostVisibilityForm, PostVisibilityLabel } from '../..
 export function PostVisibility( { user } ) {
 	const userCaps = user.data ?
 		{ ...user.data.capabilities, ...user.data.post_type_capabilities } :
-		{ 'publish_posts': false };
+		{ publish_posts: false };
 	const canEdit = userCaps.publish_posts;
 
 	return (

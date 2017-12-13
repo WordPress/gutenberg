@@ -39,7 +39,7 @@ export function PostPublishButton( {
 	const isButtonEnabled = user.data && ! isSaving && isPublishable && isSaveable;
 	const userCaps = user.data ?
 		{ ...user.data.capabilities, ...user.data.post_type_capabilities } :
-		{ 'publish_posts': false };
+		{ publish_posts: false };
 	const isContributor = ! userCaps.publish_posts;
 
 	let publishStatus;

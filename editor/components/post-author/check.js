@@ -13,7 +13,7 @@ export function PostAuthorCheck( { user, users, children } ) {
 	const authors = filter( users.data, ( { capabilities } ) => capabilities.level_1 );
 	const userCaps = user.data ?
 		{ ...user.data.capabilities, ...user.data.post_type_capabilities } :
-		{ 'publish_posts': false };
+		{ publish_posts: false };
 
 	if ( ! userCaps.publish_posts || authors.length < 2 ) {
 		return null;
