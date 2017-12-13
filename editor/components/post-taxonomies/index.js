@@ -18,7 +18,7 @@ import HierarchicalTermSelector from './hierarchical-term-selector';
 import FlatTermSelector from './flat-term-selector';
 import { getCurrentPostType } from '../../selectors';
 
-function PostTaxonomies( { postType, taxonomies } ) {
+export function PostTaxonomies( { postType, taxonomies } ) {
 	const availableTaxonomies = filter( taxonomies.data, ( taxonomy ) => includes( taxonomy.types, postType ) );
 
 	return (
