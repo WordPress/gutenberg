@@ -180,7 +180,7 @@ function gutenberg_render_block( $block ) {
  *
  * @return string CSS style block or empty string
  */
-function compute_styles( $blocks ) {
+function do_blocks_styles( $blocks ) {
 	$map_attrs_styles = array(
 		'textColor'       => 'color',
 		'backgroundColor' => 'background-color',
@@ -215,7 +215,7 @@ function compute_styles( $blocks ) {
 function do_blocks( $content ) {
 	$blocks = gutenberg_parse_blocks( $content );
 
-	$content_after_blocks = compute_styles( $blocks );
+	$content_after_blocks = do_blocks_styles( $blocks );
 	foreach ( $blocks as $block ) {
 		$content_after_blocks .= gutenberg_render_block( $block );
 	}
