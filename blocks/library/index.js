@@ -21,5 +21,4 @@ import './text-columns';
 import './verse';
 import './video';
 import './audio';
-import './block';
 import './paragraph';
