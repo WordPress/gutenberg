@@ -16,7 +16,10 @@ import PostPublishButton from '../post-publish-button';
 import PostSwitchToDraftButton from '../post-switch-to-draft-button';
 
 function PostPublishDropdown( { user, onSubmit } ) {
-	const canPublish = user.data && user.data.capabilities.publish_posts;
+	const userCaps = user.data ?
+		{ ...user.data.capabilities, ...user.data.post_type_capabilities } :
+		{ 'publish_posts': false };
+	const canPublish = userCaps.publish_posts;
 
 	return (
 		<div className="editor-post-publish-dropdown">
@@ -52,7 +55,9 @@ function PostPublishDropdown( { user, onSubmit } ) {
 }
 
 export default withAPIData( () => {
+	const postTypeSlug = window._wpGutenbergPost.type;
+
 	return {
-		user: '/wp/v2/users/me?context=edit',
+		user: `/wp/v2/users/me?post_type=${ postTypeSlug }&context=edit`,
 	};
 } )( PostPublishDropdown );

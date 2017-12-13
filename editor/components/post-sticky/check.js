@@ -15,11 +15,14 @@ import { compose } from '@wordpress/element';
 import { getCurrentPostType } from '../../selectors';
 
 export function PostStickyCheck( { postType, children, user } ) {
+	const userCaps = user.data ?
+		{ ...user.data.capabilities, ...user.data.post_type_capabilities } :
+		{ 'publish_posts': false, 'edit_others_posts': false };
+
 	if (
 		postType !== 'post' ||
-		! user.data ||
-		! user.data.capabilities.publish_posts ||
-		! user.data.capabilities.edit_others_posts
+		! userCaps.publish_posts ||
+		! userCaps.edit_others_posts
 	) {
 		return null;
 	}
@@ -36,8 +39,10 @@ const applyConnect = connect(
 );
 
 const applyWithAPIData = withAPIData( () => {
+	const postTypeSlug = window._wpGutenbergPost.type;
+
 	return {
-		user: '/wp/v2/users/me?context=edit',
+		user: `/wp/v2/users/me?post_type=${ postTypeSlug }&context=edit`,
 	};
 } );
 

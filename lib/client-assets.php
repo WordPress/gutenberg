@@ -208,40 +208,6 @@ function gutenberg_preload_api_request( $memo, $path ) {
 
 	$response = rest_do_request( $request );
 	if ( 200 === $response->status ) {
-
-		// Makes sure to check User's capabilities for the Post type being edited.
-		if ( '/wp/v2/users/me?context=edit' === $path ) {
-			global $post;
-
-			// Get the Post's post type.
-			$post_type = get_post_type( $post );
-
-			// Use the REST API User's Controller caps as default ones.
-			$post_type_caps = (array) $response->data['capabilities'];
-
-			if ( post_type_exists( $post_type ) ) {
-				// The Post Type object contains the Post Type's specific caps.
-				$post_type_object = get_post_type_object( $post_type );
-
-				// Loop in the Post Type's caps to validate the User's caps for it.
-				foreach ( $post_type_object->cap as $post_cap => $post_type_cap ) {
-					// Ignore caps requiring a post ID.
-					if ( in_array( $post_cap, array( 'edit_post', 'read_post', 'delete_post' ) ) ) {
-						continue;
-					}
-
-					// Set or reset User's cap for the post type.
-					$post_type_caps[ $post_cap ] = current_user_can( $post_type_cap );
-				}
-
-				$response->set_data(
-					array(
-						'capabilities' => $post_type_caps,
-					)
-				);
-			}
-		}
-
 		$memo[ $path ] = array(
 			'body'    => $response->data,
 			'headers' => $response->headers,
@@ -742,9 +708,12 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		$post_to_edit['content']['raw'] = gutenberg_wpautop_block_content( $post_to_edit['content']['raw'] );
 	}
 
+	// Set the post type name.
+	$post_type = get_post_type( $post );
+
 	// Preload common data.
 	$preload_paths = array(
-		'/wp/v2/users/me?context=edit',
+		sprintf( '/wp/v2/users/me?post_type=%s&context=edit', sanitize_key( $post_type ) ),
 		'/wp/v2/taxonomies?context=edit',
 		gutenberg_get_rest_link( $post_to_edit, 'about', 'edit' ),
 	);

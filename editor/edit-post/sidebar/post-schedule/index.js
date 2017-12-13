@@ -11,7 +11,11 @@ import './style.scss';
 import { PostSchedule as PostScheduleForm, PostScheduleLabel } from '../../../components';
 
 export function PostSchedule( { user } ) {
-	if ( ! user.data || ! user.data.capabilities.publish_posts ) {
+	const userCaps = user.data ?
+		{ ...user.data.capabilities, ...user.data.post_type_capabilities } :
+		{ 'publish_posts': false };
+
+	if ( ! userCaps.publish_posts ) {
 		return null;
 	}
 
@@ -38,7 +42,9 @@ export function PostSchedule( { user } ) {
 }
 
 export default withAPIData( () => {
+	const postTypeSlug = window._wpGutenbergPost.type;
+
 	return {
-		user: '/wp/v2/users/me?context=edit',
+		user: `/wp/v2/users/me?post_type=${ postTypeSlug }&context=edit`,
 	};
 } )( PostSchedule );
