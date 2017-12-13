@@ -13,11 +13,12 @@ import { IconButton } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { isEditorSidebarOpened } from '../../selectors';
+import { isEditorSidebarOpened, getActivePanel } from '../../selectors';
 import { toggleSidebar, setActivePanel } from '../../actions';
 
 export function BlockInspectorButton( {
 	isSidebarOpened,
+	panel,
 	onToggleSidebar,
 	onShowInspector,
 	onClick = noop,
@@ -25,11 +26,11 @@ export function BlockInspectorButton( {
 } ) {
 	const toggleInspector = () => {
 		onShowInspector();
-		if ( ! isSidebarOpened ) {
+		if ( ! isSidebarOpened || ( isSidebarOpened && panel === 'block' ) ) {
 			onToggleSidebar();
 		}
 	};
-	const label = __( 'Settings' );
+	const label = ( isSidebarOpened && panel === 'block' ) ? __( 'Hide Advanced Settings' ) : __( 'Show Advanced Settings' );
 
 	return (
 		<IconButton
@@ -46,6 +47,7 @@ export function BlockInspectorButton( {
 export default connect(
 	( state ) => ( {
 		isSidebarOpened: isEditorSidebarOpened( state ),
+		panel: getActivePanel( state ),
 	} ),
 	( dispatch ) => ( {
 		onShowInspector() {

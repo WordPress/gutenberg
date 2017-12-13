@@ -24,7 +24,7 @@ const Sidebar = ( { panel } ) => {
 		<div
 			className="editor-sidebar"
 			role="region"
-			aria-label={ __( 'Editor settings' ) }
+			aria-label={ __( 'Editor advanced settings' ) }
 			tabIndex="-1"
 		>
 			<Header />
