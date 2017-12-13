@@ -15,6 +15,7 @@ export default function( HTML ) {
 
 function deepCheck( nodes ) {
 	return nodes.every( ( node ) => {
-		return isInline( node ) && deepCheck( Array.from( node.children ) );
+		return ( 'SPAN' === node.nodeName || isInline( node ) ) &&
+			deepCheck( Array.from( node.children ) );
 	} );
 }
