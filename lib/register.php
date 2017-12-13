@@ -459,8 +459,8 @@ add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_revisions' );
  *
  * @since ?
  *
- * @param array $user An array containing user properties.
- * @param string $name The name of the custom field.
+ * @param array           $user An array containing user properties.
+ * @param string          $name The name of the custom field.
  * @param WP_REST_Request $request Full details about the REST API request.
  * @return object The Post Type capabilities.
  */
@@ -501,7 +501,7 @@ function gutenberg_register_rest_api_post_type_capabilities() {
 		array(
 			'get_callback' => 'gutenberg_get_post_type_capabities',
 			'schema'       => array(
-				'description' => __( 'Post Type capabilities for the user.' ),
+				'description' => __( 'Post Type capabilities for the user.', 'gutenberg' ),
 				'type'        => 'object',
 				'context'     => array( 'edit' ),
 				'readonly'    => true,

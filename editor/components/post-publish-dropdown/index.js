@@ -18,7 +18,7 @@ import PostSwitchToDraftButton from '../post-switch-to-draft-button';
 function PostPublishDropdown( { user, onSubmit } ) {
 	const userCaps = user.data ?
 		{ ...user.data.capabilities, ...user.data.post_type_capabilities } :
-		{ 'publish_posts': false };
+		{ publish_posts: false };
 	const canPublish = userCaps.publish_posts;
 
 	return (

@@ -17,7 +17,7 @@ import { isCurrentPostPublished } from '../../store/selectors';
 export function PostPendingStatusCheck( { isPublished, children, user } ) {
 	const userCaps = user.data ?
 		{ ...user.data.capabilities, ...user.data.post_type_capabilities } :
-		{ 'publish_posts': false };
+		{ publish_posts: false };
 
 	if ( isPublished || ! userCaps.publish_posts ) {
 		return null;
