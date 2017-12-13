@@ -72,8 +72,8 @@ describe( 'NavigableMenu', () => {
 		assertKeyDown( UP, 2, true );
 		assertKeyDown( UP, 1, true );
 		assertKeyDown( UP, 0, true );
-		assertKeyDown( LEFT, 0, true );
-		assertKeyDown( RIGHT, 0, true );
+		assertKeyDown( LEFT, 0, false );
+		assertKeyDown( RIGHT, 0, false );
 		assertKeyDown( SPACE, 0, false );
 	} );
 
@@ -108,8 +108,8 @@ describe( 'NavigableMenu', () => {
 		assertKeyDown( UP, 2, true );
 		assertKeyDown( UP, 1, true );
 		assertKeyDown( UP, 0, true );
-		assertKeyDown( LEFT, 0, true );
-		assertKeyDown( RIGHT, 0, true );
+		assertKeyDown( LEFT, 0, false );
+		assertKeyDown( RIGHT, 0, false );
 		assertKeyDown( SPACE, 0, false );
 	} );
 
@@ -146,8 +146,8 @@ describe( 'NavigableMenu', () => {
 		assertKeyDown( UP, 2, true );
 		assertKeyDown( UP, 1, true );
 		assertKeyDown( UP, 0, true );
-		assertKeyDown( LEFT, 0, true );
-		assertKeyDown( RIGHT, 0, true );
+		assertKeyDown( LEFT, 0, false );
+		assertKeyDown( RIGHT, 0, false );
 		assertKeyDown( SPACE, 0, false );
 	} );
 
@@ -179,8 +179,8 @@ describe( 'NavigableMenu', () => {
 		assertKeyDown( UP, 1, true );
 		assertKeyDown( UP, 0, true );
 		assertKeyDown( UP, 0, true );
-		assertKeyDown( LEFT, 0, true );
-		assertKeyDown( RIGHT, 0, true );
+		assertKeyDown( LEFT, 0, false );
+		assertKeyDown( RIGHT, 0, false );
 		assertKeyDown( SPACE, 0, false );
 	} );
 
@@ -212,8 +212,8 @@ describe( 'NavigableMenu', () => {
 		assertKeyDown( LEFT, 2, true );
 		assertKeyDown( LEFT, 1, true );
 		assertKeyDown( LEFT, 0, true );
-		assertKeyDown( UP, 0, true );
-		assertKeyDown( DOWN, 0, true );
+		assertKeyDown( UP, 0, false );
+		assertKeyDown( DOWN, 0, false );
 		assertKeyDown( SPACE, 0, false );
 	} );
 
@@ -248,8 +248,8 @@ describe( 'NavigableMenu', () => {
 		assertKeyDown( LEFT, 2, true );
 		assertKeyDown( LEFT, 1, true );
 		assertKeyDown( LEFT, 0, true );
-		assertKeyDown( UP, 0, true );
-		assertKeyDown( DOWN, 0, true );
+		assertKeyDown( UP, 0, false );
+		assertKeyDown( DOWN, 0, false );
 		assertKeyDown( SPACE, 0, false );
 	} );
 
@@ -286,8 +286,8 @@ describe( 'NavigableMenu', () => {
 		assertKeyDown( LEFT, 2, true );
 		assertKeyDown( LEFT, 1, true );
 		assertKeyDown( LEFT, 0, true );
-		assertKeyDown( UP, 0, true );
-		assertKeyDown( DOWN, 0, true );
+		assertKeyDown( UP, 0, false );
+		assertKeyDown( DOWN, 0, false );
 		assertKeyDown( SPACE, 0, false );
 	} );
 
@@ -319,8 +319,45 @@ describe( 'NavigableMenu', () => {
 		assertKeyDown( LEFT, 1, true );
 		assertKeyDown( LEFT, 0, true );
 		assertKeyDown( LEFT, 0, true );
+		assertKeyDown( DOWN, 0, false );
+		assertKeyDown( UP, 0, false );
+		assertKeyDown( SPACE, 0, false );
+	} );
+
+	it( 'both: should navigate by up/down and left/right', () => {
+		let currentIndex = 0;
+		const wrapper = mount( (
+			<NavigableMenu orientation="both" onNavigate={ ( index ) => currentIndex = index }>
+				<button id="btn1">One</button>
+				<button id="btn2">Two</button>
+				<button id="btn3">Three</button>
+			</NavigableMenu >
+		) );
+
+		simulateVisible( wrapper, '*' );
+
+		const container = wrapper.find( 'div' );
+		wrapper.getDOMNode().querySelector( '#btn1' ).focus();
+
+		// Navigate options
+		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
+			const interaction = fireKeyDown( container, keyCode );
+			expect( currentIndex ).toBe( expectedActiveIndex );
+			expect( interaction.stopped ).toBe( expectedStop );
+		}
+
+		assertKeyDown( DOWN, 1, true );
+		assertKeyDown( DOWN, 2, true );
 		assertKeyDown( DOWN, 0, true );
+		assertKeyDown( RIGHT, 1, true );
+		assertKeyDown( RIGHT, 2, true );
+		assertKeyDown( RIGHT, 0, true );
+		assertKeyDown( UP, 2, true );
+		assertKeyDown( UP, 1, true );
 		assertKeyDown( UP, 0, true );
+		assertKeyDown( LEFT, 2, true );
+		assertKeyDown( LEFT, 1, true );
+		assertKeyDown( LEFT, 0, true );
 		assertKeyDown( SPACE, 0, false );
 	} );
 } );
