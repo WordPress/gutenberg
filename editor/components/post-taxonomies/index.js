@@ -2,7 +2,7 @@
  * External Dependencies
  */
 import { connect } from 'react-redux';
-import { flowRight, filter } from 'lodash';
+import { flowRight, filter, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -18,7 +18,7 @@ import FlatTermSelector from './flat-term-selector';
 import { getCurrentPostType } from '../../selectors';
 
 function PostTaxonomies( { postType, taxonomies } ) {
-	const availableTaxonomies = filter( taxonomies.data, ( taxonomy ) => taxonomy.types.indexOf( postType ) !== -1 );
+	const availableTaxonomies = filter( taxonomies.data, ( taxonomy ) => includes( taxonomy.types, postType ) );
 
 	return (
 		<div>
