@@ -173,8 +173,9 @@ registerBlockType( 'core/latest-posts', {
 					</BlockControls>
 				),
 				<ul
-					className={ classnames( this.props.className, 'columns-' + columns, {
+					className={ classnames( this.props.className, {
 						'is-grid': layout === 'grid',
+						[ `columns-${ columns }` ]: layout === 'grid',
 					} ) }
 					key="latest-posts"
 				>
