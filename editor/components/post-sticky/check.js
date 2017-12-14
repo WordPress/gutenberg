@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,14 +16,12 @@ import { compose } from '@wordpress/element';
 import { getCurrentPostType } from '../../store/selectors';
 
 export function PostStickyCheck( { postType, children, user } ) {
-	const userCaps = user.data ?
-		{ ...user.data.capabilities, ...user.data.post_type_capabilities } :
-		{ publish_posts: false, edit_others_posts: false };
+	const userCan = get( user, 'data.post_type_capabilities', {} );
 
 	if (
 		postType !== 'post' ||
-		! userCaps.publish_posts ||
-		! userCaps.edit_others_posts
+		! userCan.publish_posts ||
+		! userCan.edit_others_posts
 	) {
 		return null;
 	}
@@ -38,11 +37,11 @@ const applyConnect = connect(
 	},
 );
 
-const applyWithAPIData = withAPIData( () => {
-	const postTypeSlug = window._wpGutenbergPost.type;
+const applyWithAPIData = withAPIData( ( props ) => {
+	const { postType } = props;
 
 	return {
-		user: `/wp/v2/users/me?post_type=${ postTypeSlug }&context=edit`,
+		user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
 	};
 } );
 

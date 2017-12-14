@@ -1,20 +1,25 @@
 /**
+ * External dependencies
+ */
+import { connect } from 'react-redux';
+import { get } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { PanelRow, Dropdown, withAPIData } from '@wordpress/components';
+import { compose } from '@wordpress/element';
 
 /**
  * Internal Dependencies
  */
 import './style.scss';
 import { PostVisibility as PostVisibilityForm, PostVisibilityLabel } from '../../../components';
+import { getCurrentPostType } from '../../../selectors';
 
 export function PostVisibility( { user } ) {
-	const userCaps = user.data ?
-		{ ...user.data.capabilities, ...user.data.post_type_capabilities } :
-		{ publish_posts: false };
-	const canEdit = userCaps.publish_posts;
+	const canEdit = get( user, 'data.post_type_capabilities.publish_posts', false );
 
 	return (
 		<PanelRow className="editor-post-visibility">
@@ -41,10 +46,23 @@ export function PostVisibility( { user } ) {
 	);
 }
 
-export default withAPIData( () => {
-	const postTypeSlug = window._wpGutenbergPost.type;
+const applyConnect = connect(
+	( state ) => {
+		return {
+			postType: getCurrentPostType( state ),
+		};
+	},
+);
+
+const applyWithAPIData = withAPIData( ( props ) => {
+	const { postType } = props;
 
 	return {
-		user: `/wp/v2/users/me?post_type=${ postTypeSlug }&context=edit`,
+		user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
 	};
-} )( PostVisibility );
+} );
+
+export default compose( [
+	applyConnect,
+	applyWithAPIData,
+] )( PostVisibility );
