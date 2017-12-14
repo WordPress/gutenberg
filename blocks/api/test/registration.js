@@ -41,7 +41,7 @@ describe( 'blocks', () => {
 		} );
 		setUnknownTypeHandlerName( undefined );
 		setDefaultBlockName( undefined );
-		window._wpBlocksAttributes = {};
+		window._wpBlocks = {};
 		console.error = error;
 	} );
 
@@ -163,8 +163,8 @@ describe( 'blocks', () => {
 
 		it( 'should default to browser-initialized global attributes', () => {
 			const attributes = { ok: { type: 'boolean' } };
-			window._wpBlocksAttributes = {
-				'core/test-block-with-attributes': attributes,
+			window._wpBlocks = {
+				'core/test-block-with-attributes': { attributes },
 			};
 
 			const blockType = { settingName: 'settingValue', save: noop, category: 'common', title: 'block title' };
