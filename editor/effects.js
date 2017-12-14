@@ -14,6 +14,7 @@ import {
 	createBlock,
 	serialize,
 	createReusableBlock,
+	getDefaultBlockName,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
@@ -35,6 +36,7 @@ import {
 	requestMetaBoxUpdates,
 	updateReusableBlock,
 	saveReusableBlock,
+	insertBlock,
 } from './actions';
 import {
 	getCurrentPost,
@@ -387,5 +389,8 @@ export default {
 		dispatch( updateReusableBlock( reusableBlock.id, reusableBlock ) );
 		dispatch( saveReusableBlock( reusableBlock.id ) );
 		dispatch( replaceBlocks( [ oldBlock.uid ], [ newBlock ] ) );
+	},
+	APPEND_DEFAULT_BLOCK() {
+		return insertBlock( createBlock( getDefaultBlockName() ) );
 	},
 };

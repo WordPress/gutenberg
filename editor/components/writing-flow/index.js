@@ -3,7 +3,7 @@
  */
 import { connect } from 'react-redux';
 import 'element-closest';
-import { find, reverse } from 'lodash';
+import { find, last, reverse } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -13,6 +13,7 @@ import { keycodes, focus } from '@wordpress/utils';
 /**
  * Internal dependencies
  */
+import { BlockListBlock } from '../block-list/block';
 import {
 	computeCaretRect,
 	isHorizontalEdge,
@@ -27,12 +28,16 @@ import {
 	getMultiSelectedBlocks,
 	getSelectedBlock,
 } from '../../selectors';
-import { multiSelect } from '../../actions';
+import { multiSelect, appendDefaultBlock } from '../../actions';
 
 /**
  * Module Constants
  */
 const { UP, DOWN, LEFT, RIGHT } = keycodes;
+
+function isElementNonEmpty( el ) {
+	return !! el.innerText.trim();
+}
 
 class WritingFlow extends Component {
 	constructor() {
@@ -98,6 +103,37 @@ class WritingFlow extends Component {
 		} );
 	}
 
+	isInLastNonEmptyBlock( target ) {
+		const tabbables = this.getVisibleTabbables();
+
+		// Find last tabbable, compare with target
+		const lastTabbable = last( tabbables );
+		if ( ! lastTabbable || ! lastTabbable.contains( target ) ) {
+			return false;
+		}
+
+		// Find block-level ancestor of said last tabbable
+		const blockEl = lastTabbable.closest( '.' + BlockListBlock.className );
+		const blockIndex = tabbables.indexOf( blockEl );
+
+		// Unexpected, so we'll leave quietly.
+		if ( blockIndex === -1 ) {
+			return false;
+		}
+
+		// Maybe there are no descendants, and the target is the block itself?
+		if ( lastTabbable === blockEl ) {
+			return isElementNonEmpty( blockEl );
+		}
+
+		// Otherwise, find the descendants of the ancestor, i.e. the target and
+		// its siblings, and check them instead.
+		return tabbables
+			.slice( blockIndex + 1 )
+			.some( ( el ) =>
+				blockEl.contains( el ) && isElementNonEmpty( el ) );
+	}
+
 	expandSelection( blocks, currentStartUid, currentEndUid, delta ) {
 		const lastIndex = blocks.indexOf( currentEndUid );
 		const nextIndex = Math.max( 0, Math.min( blocks.length - 1, lastIndex + delta ) );
@@ -150,6 +186,13 @@ class WritingFlow extends Component {
 			placeCaretAtHorizontalEdge( closestTabbable, isReverse );
 			event.preventDefault();
 		}
+
+		if ( isDown && ! isShift && ! hasMultiSelection &&
+				this.isInLastNonEmptyBlock( target ) &&
+				isVerticalEdge( target, false, false )
+		) {
+			this.props.onBottomReached();
+		}
 	}
 
 	render() {
@@ -179,9 +222,8 @@ export default connect(
 		hasMultiSelection: getMultiSelectedBlocks( state ).length > 1,
 		selectedBlock: getSelectedBlock( state ),
 	} ),
-	( dispatch ) => ( {
-		onMultiSelect( start, end ) {
-			dispatch( multiSelect( start, end ) );
-		},
-	} )
+	{
+		onMultiSelect: multiSelect,
+		onBottomReached: appendDefaultBlock,
+	}
 )( WritingFlow );
