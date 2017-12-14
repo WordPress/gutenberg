@@ -34,7 +34,9 @@ registerBlockType( 'core/latest-posts', {
 
 	keywords: [ __( 'recent posts' ) ],
 
-	supportHTML: false,
+	supports: {
+		html: false,
+	},
 
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
