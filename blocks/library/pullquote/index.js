@@ -99,7 +99,7 @@ registerBlockType( 'core/pullquote', {
 				/>
 				{ ( citation || !! focus ) && (
 					<Editable
-						tagName="footer"
+						tagName="cite"
 						value={ citation }
 						placeholder={ __( 'Write caption…' ) }
 						onChange={
