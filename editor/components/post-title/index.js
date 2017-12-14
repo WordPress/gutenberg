@@ -136,7 +136,7 @@ export default connect(
 			return insertBlock( createBlock( getDefaultBlockName() ), 0 );
 		},
 		onUpdate( title ) {
-			return editPost( { title } );
+			return editPost( { title }, { batch: true } );
 		},
 		clearSelectedBlock,
 	}
