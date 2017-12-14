@@ -281,6 +281,8 @@ describe( 'effects', () => {
 	} );
 
 	describe( '.REQUEST_POST_UPDATE_SUCCESS', () => {
+		const handler = effects.REQUEST_POST_UPDATE_SUCCESS;
+
 		beforeAll( () => {
 			selectors.getDirtyMetaBoxes = jest.spyOn( selectors, 'getDirtyMetaBoxes' );
 			window.history.replaceState = jest.spyOn( window.history, 'replaceState' );
@@ -297,7 +299,6 @@ describe( 'effects', () => {
 		} );
 
 		it( 'should dispatch meta box updates on success for dirty meta boxes.', () => {
-			const handler = effects.REQUEST_POST_UPDATE_SUCCESS;
 			const dispatch = jest.fn();
 			const store = { getState: () => {}, dispatch };
 
@@ -321,7 +322,6 @@ describe( 'effects', () => {
 		} );
 
 		it( 'should dispatch notices when reverting a published post to a draft.', () => {
-			const handler = effects.REQUEST_POST_UPDATE_SUCCESS;
 			const dispatch = jest.fn();
 			const store = { getState: () => {}, dispatch };
 
@@ -346,7 +346,7 @@ describe( 'effects', () => {
 			handler( { post, previousPost }, store );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 2 );
-			expect( dispatch.mock.calls[ 0 ][ 0 ] ).toEqual( {
+			expect( dispatch ).toHaveBeenCalledWith( expect.objectContaining( {
 				notice: {
 					content: <p><span>Post published!</span> <a href={ undefined }>View post</a></p>, // eslint-disable-line jsx-a11y/anchor-is-valid
 					id: 'SAVE_POST_NOTICE_ID',
@@ -354,11 +354,10 @@ describe( 'effects', () => {
 					status: 'success',
 				},
 				type: 'CREATE_NOTICE',
-			} );
+			} ) );
 		} );
 
 		it( 'should dispatch notices when publishing or scheduling a post.', () => {
-			const handler = effects.REQUEST_POST_UPDATE_SUCCESS;
 			const dispatch = jest.fn();
 			const store = { getState: () => {}, dispatch };
 
@@ -383,21 +382,22 @@ describe( 'effects', () => {
 			handler( { post, previousPost }, store );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 2 );
-			expect( dispatch.mock.calls[ 0 ][ 0 ].notice ).toEqual( {
-				content: <p>
-					<span>Post reverted to draft.</span>
-					{ ' ' }
-					{ false && <a href={ post.link }>{ 'View post' }</a> }
-				</p>,
-				id: 'SAVE_POST_NOTICE_ID',
-				isDismissible: true,
-				status: 'success',
-			} );
-			expect( dispatch.mock.calls[ 0 ][ 0 ].type ).toBe( 'CREATE_NOTICE' );
+			expect( dispatch ).toHaveBeenCalledWith( expect.objectContaining( {
+				notice: {
+					content: <p>
+						<span>Post reverted to draft.</span>
+						{ ' ' }
+						{ false && <a href={ post.link }>{ 'View post' }</a> }
+					</p>,
+					id: 'SAVE_POST_NOTICE_ID',
+					isDismissible: true,
+					status: 'success',
+				},
+				type: 'CREATE_NOTICE',
+			} ) );
 		} );
 
 		it( 'should dispatch notices when just updating a published post again.', () => {
-			const handler = effects.REQUEST_POST_UPDATE_SUCCESS;
 			const dispatch = jest.fn();
 			const store = { getState: () => {}, dispatch };
 
@@ -422,13 +422,15 @@ describe( 'effects', () => {
 			handler( { post, previousPost }, store );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 2 );
-			expect( dispatch.mock.calls[ 0 ][ 0 ].notice ).toEqual( {
-				content: <p><span>Post updated!</span>{ ' ' }<a href={ undefined }>{ 'View post' }</a></p>, // eslint-disable-line jsx-a11y/anchor-is-valid
-				id: 'SAVE_POST_NOTICE_ID',
-				isDismissible: true,
-				status: 'success',
-			} );
-			expect( dispatch.mock.calls[ 0 ][ 0 ].type ).toBe( 'CREATE_NOTICE' );
+			expect( dispatch ).toHaveBeenCalledWith( expect.objectContaining( {
+				notice: {
+					content: <p><span>Post updated!</span>{ ' ' }<a href={ undefined }>{ 'View post' }</a></p>, // eslint-disable-line jsx-a11y/anchor-is-valid
+					id: 'SAVE_POST_NOTICE_ID',
+					isDismissible: true,
+					status: 'success',
+				},
+				type: 'CREATE_NOTICE',
+			} ) );
 		} );
 	} );
 
