@@ -172,6 +172,39 @@ function gutenberg_render_block( $block ) {
 }
 
 /**
+ * Given an array of parsed blocks, returns the css styles they require.
+ *
+ * @since 1.8.1
+ *
+ * @param array $blocks Parsed block array.
+ *
+ * @return string CSS style block or empty string
+ */
+function do_blocks_styles( $blocks ) {
+	$map_attrs_styles = array(
+		'textColor'       => 'color',
+		'backgroundColor' => 'background-color',
+	);
+
+	$styles = '';
+	foreach ( $blocks as $block ) {
+		$attributes = is_array( $block['attrs'] ) ? $block['attrs'] : array();
+		if ( isset( $attributes['anchor'] ) ) {
+			$rules = '';
+			foreach ( $map_attrs_styles as $attr_key => $css_property ) {
+				if ( isset( $attributes[ $attr_key ] ) ) {
+					$rules .= "\n\t" . esc_attr( sprintf( '%1$s: %2$s;', $css_property, $attributes[ $attr_key ] ) );
+				}
+			}
+			if ( '' !== $rules ) {
+				$styles .= sprintf( "\n.has-custom-styles#%1\$s { %2\$s\n}", esc_attr( $attributes['anchor'] ), $rules );
+			}
+		}
+	}
+	return '' !== $styles ? sprintf( "<style type\"text/css\">%1\$s\n</style>", $styles ) : '';
+}
+
+/**
  * Parses dynamic blocks out of `post_content` and re-renders them.
  *
  * @since 0.1.0
@@ -182,7 +215,7 @@ function gutenberg_render_block( $block ) {
 function do_blocks( $content ) {
 	$blocks = gutenberg_parse_blocks( $content );
 
-	$content_after_blocks = '';
+	$content_after_blocks = do_blocks_styles( $blocks );
 	foreach ( $blocks as $block ) {
 		$content_after_blocks .= gutenberg_render_block( $block );
 	}
