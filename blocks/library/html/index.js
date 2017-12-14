@@ -7,7 +7,7 @@ import TextareaAutosize from 'react-autosize-textarea';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { withState } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -41,60 +41,42 @@ registerBlockType( 'core/html', {
 		},
 	},
 
-	edit: class extends Component {
-		constructor() {
-			super( ...arguments );
-			this.preview = this.preview.bind( this );
-			this.edit = this.edit.bind( this );
-			this.state = {
-				preview: false,
-			};
-		}
-
-		preview() {
-			this.setState( { preview: true } );
-		}
-
-		edit() {
-			this.setState( { preview: false } );
-		}
-
-		render() {
-			const { preview } = this.state;
-			const { attributes, setAttributes, focus } = this.props;
-
-			return (
-				<div>
-					{ focus &&
-						<BlockControls key="controls">
-							<div className="components-toolbar">
-								<button className={ `components-tab-button ${ ! preview ? 'is-active' : '' }` } onClick={ this.edit }>
-									<span>HTML</span>
-								</button>
-								<button className={ `components-tab-button ${ preview ? 'is-active' : '' }` } onClick={ this.preview }>
-									<span>{ __( 'Preview' ) }</span>
-								</button>
-							</div>
-						</BlockControls>
-					}
-					{ preview ?
-						<div dangerouslySetInnerHTML={ { __html: attributes.content } } /> :
-						<TextareaAutosize
-							value={ attributes.content }
-							onChange={ ( event ) => setAttributes( { content: event.target.value } ) }
-						/>
-					}
-					{ focus &&
-						<InspectorControls key="inspector">
-							<BlockDescription>
-								<p>{ __( 'Add custom HTML code and preview it right here in the editor.' ) }</p>
-							</BlockDescription>
-						</InspectorControls>
-					}
+	edit: withState( {
+		preview: false,
+	} )( ( { attributes, setAttributes, setState, focus, preview } ) => [
+		focus && (
+			<BlockControls key="controls">
+				<div className="components-toolbar">
+					<button
+						className={ `components-tab-button ${ ! preview ? 'is-active' : '' }` }
+						onClick={ () => setState( { preview: false } ) }>
+						<span>HTML</span>
+					</button>
+					<button
+						className={ `components-tab-button ${ preview ? 'is-active' : '' }` }
+						onClick={ () => setState( { preview: true } ) }>
+						<span>{ __( 'Preview' ) }</span>
+					</button>
 				</div>
-			);
-		}
-	},
+			</BlockControls>
+		),
+		preview ?
+			<div
+				key="preview"
+				dangerouslySetInnerHTML={ { __html: attributes.content } } /> :
+			<TextareaAutosize
+				key="editor"
+				value={ attributes.content }
+				onChange={ ( event ) => setAttributes( { content: event.target.value } ) }
+			/>,
+		focus && (
+			<InspectorControls key="inspector">
+				<BlockDescription>
+					<p>{ __( 'Add custom HTML code and preview it right here in the editor.' ) }</p>
+				</BlockDescription>
+			</InspectorControls>
+		),
+	] ),
 
 	save( { attributes } ) {
 		return attributes.content;
