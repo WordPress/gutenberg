@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { includes } from 'lodash';
+import { includes, get } from 'lodash';
 
 /**
  * Reducer enhancer which transforms the result of the original reducer into an
@@ -18,6 +18,8 @@ export default function withHistory( reducer, options = {} ) {
 		present: reducer( undefined, {} ),
 		future: [],
 	};
+
+	let isBatching = false;
 
 	return ( state = initialState, action ) => {
 		const { past, present, future } = state;
@@ -62,8 +64,22 @@ export default function withHistory( reducer, options = {} ) {
 			return state;
 		}
 
+		const nextPast = [ ...past, present ];
+
+		// If batching, prevent accumulating past until the next action which
+		// doesn't include the batch flag.
+		if ( get( action.meta, 'batchHistory' ) ) {
+			if ( isBatching ) {
+				nextPast.splice( -1, 1 );
+			}
+
+			isBatching = true;
+		} else {
+			isBatching = false;
+		}
+
 		return {
-			past: [ ...past, present ],
+			past: nextPast,
 			present: nextPresent,
 			future: [],
 		};
