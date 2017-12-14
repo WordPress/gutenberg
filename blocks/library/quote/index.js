@@ -209,7 +209,7 @@ registerBlockType( 'core/quote', {
 				/>
 				{ ( ( citation && citation.length > 0 ) || !! focus ) && (
 					<Editable
-						tagName="footer"
+						tagName="cite"
 						value={ citation }
 						placeholder={ __( 'Write citation…' ) }
 						onChange={
