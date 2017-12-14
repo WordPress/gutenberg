@@ -8,7 +8,7 @@ import { withFilters } from '@wordpress/components';
  */
 import { getBlockType } from '../api';
 
-function BlockEdit( props ) {
+export function BlockEdit( props ) {
 	const { name, ...editProps } = props;
 	const blockType = getBlockType( name );
 
