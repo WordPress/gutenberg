@@ -11,4 +11,4 @@ anchor();
 customClassName();
 generatedClassName();
 matchers();
-footnotes( hooks );
+footnotes();

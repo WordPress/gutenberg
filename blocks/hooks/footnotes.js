@@ -1,5 +1,14 @@
+/**
+ * WordPress dependencies
+ */
+import { addFilter } from '@wordpress/hooks';
 import { isValidElement, Children, createElement, cloneElement } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
 import { hasBlockSupport } from '../api';
+
 
 // TODO: need redux state to get block -> footnote mapping
 
@@ -37,15 +46,17 @@ function addFootnoteNumbering( props, blockType ) {
 	return props;
 }
 
-function removeFootnoteNumbering( element, props ) {
-	if ( hasBlockSupport( props.name, 'footnotes' ) ) {
-		return cloneElement( element, { ...props, attributes: { ... props.attributes, content: numberChildrenFootnotes( props.attributes.content, () => '?' ) } } );
-	}
-
-	return element;
+function removeFootnoteNumbering( BlockEdit ) {
+	return ( props ) => {
+		if ( hasBlockSupport( props.name, 'footnotes' ) ) {
+			const newProps = { ...props, attributes: { ... props.attributes, content: numberChildrenFootnotes( props.attributes.content, () => '?' ) } };
+			return <BlockEdit { ...newProps } />;
+		}
+		return <BlockEdit { ...props } />;
+	};
 }
 
-export default function footnotes( { addFilter } ) {
-	addFilter( 'getSaveContent.extraProps', 'core-footnotes', addFootnoteNumbering );
-	addFilter( 'BlockEdit', 'core-footnotes', removeFootnoteNumbering );
+export default function footnotes() {
+	addFilter( 'blocks.getSaveContent.extraProps', 'core/footnotes', addFootnoteNumbering );
+	addFilter( 'blocks.BlockEdit', 'core/footnotes', removeFootnoteNumbering );
 }
