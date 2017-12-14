@@ -286,6 +286,29 @@ final class WP_Annotation_Utils {
 			),
 		) );
 
+		register_rest_field( self::$post_type, 'author_meta', array(
+			'get_callback' => array( __CLASS__, 'on_get_additional_rest_field' ),
+			'schema'       => array(
+				'readonly'    => true,
+				'type'        => 'object',
+				'context'     => $contexts,
+				'description' => __( 'Author metadata.', 'gutenberg' ),
+
+				'properties'  => array(
+					'display_name' => array(
+						'type'        => 'string',
+						'context'     => $contexts,
+						'description' => __( 'Display name.', 'gutenberg' ),
+					),
+					'image_url'    => array(
+						'type'        => 'string',
+						'context'     => $contexts,
+						'description' => __( 'Square avatar image URL.', 'gutenberg' ),
+					),
+				),
+			),
+		) );
+
 		register_rest_field( self::$post_type, 'annotator', array(
 			'get_callback'    => array( __CLASS__, 'on_get_additional_rest_field' ),
 			'update_callback' => array( __CLASS__, 'on_update_additional_rest_field' ),
@@ -304,22 +327,23 @@ final class WP_Annotation_Utils {
 			'get_callback'    => array( __CLASS__, 'on_get_additional_rest_field' ),
 			'update_callback' => array( __CLASS__, 'on_update_additional_rest_field' ),
 			'schema'          => array(
-				'type'        => 'object',
-				'context'     => $contexts,
-				'description' => __( 'Annotator metadata.', 'gutenberg' ),
+				'type'                 => 'object',
+				'context'              => $contexts,
+				'description'          => __( 'Annotator metadata.', 'gutenberg' ),
 
-				'properties'  => array(
+				'properties'           => array(
 					'display_name' => array(
 						'type'        => 'string',
 						'context'     => $contexts,
 						'description' => __( 'Display name.', 'gutenberg' ),
 					),
-					'md5_email'    => array(
+					'image_url'    => array(
 						'type'        => 'string',
 						'context'     => $contexts,
-						'description' => __( 'MD5 hash of lowercase email address.', 'gutenberg' ),
+						'description' => __( 'Square avatar image URL.', 'gutenberg' ),
 					),
 				),
+				'additionalProperties' => true,
 			),
 		) );
 
@@ -431,10 +455,10 @@ final class WP_Annotation_Utils {
 									'context'     => $contexts,
 									'description' => __( 'Display name.', 'gutenberg' ),
 								),
-								'md5_email'    => array(
+								'image_url'    => array(
 									'type'        => 'string',
 									'context'     => $contexts,
-									'description' => __( 'MD5 hash of lowercase email address.', 'gutenberg' ),
+									'description' => __( 'Square avatar image URL.', 'gutenberg' ),
 								),
 							),
 						),
@@ -644,6 +668,17 @@ final class WP_Annotation_Utils {
 				}
 				return 0;
 
+			case 'author_meta':
+				$defaults = array(
+					'display_name' => '',
+					'image_url'    => '',
+				);
+
+				if ( is_array( $value ) ) {
+					return array_merge( $defaults, $value );
+				}
+				return $defaults;
+
 			case 'annotator':
 				if ( is_string( $value ) || is_int( $value ) ) {
 					return (string) $value;
@@ -666,7 +701,7 @@ final class WP_Annotation_Utils {
 				$defaults  = apply_filters( 'gutenberg_rest_annotator_meta_defaults', array(), $post, $request, 'get' );
 				$defaults += array(
 					'display_name' => '',
-					'md5_email'    => '',
+					'image_url'    => '',
 				);
 
 				if ( is_array( $value ) ) {
@@ -864,7 +899,7 @@ final class WP_Annotation_Utils {
 		$default_meta  = apply_filters( 'gutenberg_rest_annotator_meta_defaults', array(), $post, $request, 'update' );
 		$default_meta += array(
 			'display_name' => '',
-			'md5_email'    => '',
+			'image_url'    => '',
 		);
 
 		$raw_meta = $meta; // Original input meta.
@@ -887,9 +922,9 @@ final class WP_Annotation_Utils {
 			return $error;
 		}
 
-		if ( ! is_string( $meta['md5_email'] ) ) {
+		if ( ! is_string( $meta['image_url'] ) ) {
 			return $error;
-		} elseif ( ! preg_match( '/^[0-9a-f]{32}$/i', $meta['md5_email'] ) ) {
+		} elseif ( ! wp_parse_url( $meta['image_url'] ) ) {
 			return $error;
 		}
 
@@ -1019,7 +1054,7 @@ final class WP_Annotation_Utils {
 				'identity'      => $annotator['id'],
 				'identity_meta' => array(
 					'display_name' => $annotator['meta']['display_name'],
-					'md5_email'    => $annotator['meta']['md5_email'],
+					'image_url'    => $annotator['meta']['image_url'],
 				),
 				'time'          => $current_time,
 				'old'           => $old,
@@ -1030,7 +1065,7 @@ final class WP_Annotation_Utils {
 				'identity'      => (string) $user->ID,
 				'identity_meta' => array(
 					'display_name' => $user->display_name,
-					'md5_email'    => md5( strtolower( $user->user_email ) ),
+					'image_url'    => get_avatar_url( $user->ID ),
 				),
 				'time'          => $current_time,
 				'old'           => $old,

@@ -216,7 +216,7 @@ class REST_Annotations_Controller_Test extends WP_Test_REST_Post_Type_Controller
 		$data       = $response->get_data();
 		$properties = $data['schema']['properties'];
 
-		$this->assertSame( 23, count( $properties ) );
+		$this->assertSame( 24, count( $properties ) );
 		$this->assertArrayHasKey( 'parent_post_id', $properties );
 		$this->assertArrayHasKey( 'selection', $properties );
 		$this->assertArrayHasKey( 'annotator', $properties );
