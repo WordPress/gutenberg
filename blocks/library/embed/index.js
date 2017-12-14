@@ -205,7 +205,12 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 							</Placeholder>
 						) : (
 							<div className="wp-block-embed__wrapper">
-								<SandBox html={ html } title={ iframeTitle } type={ type } />
+								<SandBox
+									html={ html }
+									title={ iframeTitle }
+									type={ type }
+									onFocus={ () => setFocus() }
+								/>
 							</div>
 						) }
 						{ ( caption && caption.length > 0 ) || !! focus ? (
