@@ -152,7 +152,7 @@ registerBlockType( 'core/quote', {
 		],
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, className } ) {
+	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, onReplace, className } ) {
 		const { align, value, citation, style } = attributes;
 		const focusedEditable = focus ? focus.editable || 'value' : null;
 		const containerClassname = classnames( className, style === 2 ? 'is-large' : '' );
@@ -198,6 +198,12 @@ registerBlockType( 'core/quote', {
 					focus={ focusedEditable === 'value' ? focus : null }
 					onFocus={ ( props ) => setFocus( { ...props, editable: 'value' } ) }
 					onMerge={ mergeBlocks }
+					onRemove={ ( forward ) => {
+						const hasEmptyCitation = ! citation || citation.length === 0;
+						if ( ! forward && hasEmptyCitation ) {
+							onReplace( [] );
+						}
+					} }
 					style={ { textAlign: align } }
 					placeholder={ __( 'Write quote…' ) }
 				/>
@@ -213,6 +219,11 @@ registerBlockType( 'core/quote', {
 						}
 						focus={ focusedEditable === 'citation' ? focus : null }
 						onFocus={ ( props ) => setFocus( { ...props, editable: 'citation' } ) }
+						onRemove={ ( forward ) => {
+							if ( ! forward ) {
+								setFocus( { ...focus, editable: 'value' } );
+							}
+						} }
 					/>
 				) }
 			</blockquote>,

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, compact, get, initial, last } from 'lodash';
+import { find, compact, get, initial, last, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -106,9 +106,11 @@ registerBlockType( 'core/list', {
 				isMultiBlock: true,
 				blocks: [ 'core/paragraph' ],
 				transform: ( blockAttributes ) => {
+					const items = blockAttributes.map( ( { content } ) => content );
+					const hasItems = ! items.every( isEmpty );
 					return createBlock( 'core/list', {
 						nodeName: 'UL',
-						values: blockAttributes.map( ( { content }, index ) => ( <li key={ index }>{ content }</li> ) ),
+						values: hasItems ? items.map( ( content, index ) => <li key={ index }>{ content }</li> ) : [],
 					} );
 				},
 			},
@@ -116,10 +118,14 @@ registerBlockType( 'core/list', {
 				type: 'block',
 				blocks: [ 'core/quote' ],
 				transform: ( { value, citation } ) => {
+					const items = value.map( p => get( p, 'children.props.children' ) );
+					if ( ! isEmpty( citation ) ) {
+						items.push( citation );
+					}
+					const hasItems = ! items.every( isEmpty );
 					return createBlock( 'core/list', {
 						nodeName: 'UL',
-						values: value.map( ( item, index ) => <li key={ index } >{ get( item, 'children.props.children', '' ) } </li> )
-							.concat( citation ? <li key="citation">{ citation }</li> : [] ),
+						values: hasItems ? items.map( ( content, index ) => <li key={ index }>{ content }</li> ) : [],
 					} );
 				},
 			},
@@ -281,6 +287,7 @@ registerBlockType( 'core/list', {
 				insertBlocksAfter,
 				setAttributes,
 				mergeBlocks,
+				onReplace,
 			} = this.props;
 			const { nodeName, values } = attributes;
 
@@ -354,6 +361,7 @@ registerBlockType( 'core/list', {
 							} :
 							undefined
 					}
+					onRemove={ () => onReplace( [] ) }
 				/>,
 			];
 		}
