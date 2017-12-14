@@ -8,7 +8,7 @@ import { flow, noop } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton } from '@wordpress/components';
+import { IconButton, withSpokenMessages } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -23,6 +23,7 @@ export function BlockInspectorButton( {
 	onShowInspector,
 	onClick = noop,
 	small = false,
+	speak,
 } ) {
 	const toggleInspector = () => {
 		onShowInspector();
@@ -30,12 +31,21 @@ export function BlockInspectorButton( {
 			onToggleSidebar();
 		}
 	};
+
+	const speakMessage = () => {
+		if ( ! isSidebarOpened || ( isSidebarOpened && panel !== 'block' ) ) {
+			speak( __( 'Additional settings are now available in the Editor advanced settings sidebar' ) );
+		} else {
+			speak( __( 'Advanced settings closed' ) );
+		}
+	};
+
 	const label = ( isSidebarOpened && panel === 'block' ) ? __( 'Hide Advanced Settings' ) : __( 'Show Advanced Settings' );
 
 	return (
 		<IconButton
 			className="editor-block-settings-menu__control"
-			onClick={ flow( toggleInspector, onClick ) }
+			onClick={ flow( toggleInspector, speakMessage, onClick ) }
 			icon="admin-generic"
 			label={ small ? label : undefined }
 		>
@@ -57,4 +67,4 @@ export default connect(
 			dispatch( toggleSidebar() );
 		},
 	} )
-)( BlockInspectorButton );
+)( withSpokenMessages( BlockInspectorButton ) );
