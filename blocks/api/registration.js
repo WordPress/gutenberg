@@ -51,6 +51,7 @@ let defaultBlockName;
 export function registerBlockType( name, settings ) {
 	settings = {
 		name,
+		attributes: {},
 		...get( window._wpBlocks, name ),
 		...settings,
 	};
@@ -115,9 +116,24 @@ export function registerBlockType( name, settings ) {
 		);
 		return;
 	}
+	if ( typeof settings.attributes !== 'object' || settings.attributes === null ) {
+		console.error(
+			'Block attributes must be an object.'
+		);
+		return;
+	}
 	if ( ! settings.icon ) {
 		settings.icon = 'block-default';
 	}
+
+	// All blocks can have annotations.
+	settings.attributes.annotations = {
+		type: 'array',
+		items: {
+			type: 'integer',
+		},
+		default: [],
+	};
 
 	settings = applyFilters( 'blocks.registerBlockType', settings, name );
 

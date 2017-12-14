@@ -49,6 +49,8 @@ class BlockList extends Component {
 		this.setBlockRef = this.setBlockRef.bind( this );
 		this.setLastClientY = this.setLastClientY.bind( this );
 		this.onPointerMove = throttle( this.onPointerMove.bind( this ), 100 );
+		this.onClickAnnotationsButton = this.onClickAnnotationsButton.bind( this );
+
 		// Browser does not fire `*move` event when the pointer position changes
 		// relative to the document, so fire it with the last known position.
 		this.onScroll = () => this.onPointerMove( { clientY: this.lastClientY } );
@@ -205,6 +207,15 @@ class BlockList extends Component {
 		}
 	}
 
+	onClickAnnotationsButton( event ) {
+		const button = event.currentTarget;
+		const uids = button.getAttribute( 'data-uids' ).split( ',' );
+
+		if ( uids ) {
+			// @TODO
+		}
+	}
+
 	render() {
 		const { blocks, showContextualToolbar } = this.props;
 
@@ -219,6 +230,7 @@ class BlockList extends Component {
 						onSelectionStart={ this.onSelectionStart }
 						onShiftSelection={ this.onShiftSelection }
 						showContextualToolbar={ showContextualToolbar }
+						onClickAnnotationsButton={ this.onClickAnnotationsButton }
 					/>,
 					<BlockListSiblingInserter
 						key={ 'sibling-inserter-' + uid }

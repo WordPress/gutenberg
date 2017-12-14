@@ -13,7 +13,12 @@ import { IconButton } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import { PostPreviewButton, PostSavedState, PostPublishWithDropdown } from '../../components';
+import {
+	PostAnnotationsButton,
+	PostPreviewButton,
+	PostSavedState,
+	PostPublishWithDropdown,
+} from '../../components';
 import EllipsisMenu from './ellipsis-menu';
 import HeaderToolbar from './header-toolbar';
 import { isEditorSidebarOpened } from '../../store/selectors';
@@ -31,6 +36,7 @@ function Header( { onToggleSidebar, isSidebarOpened } ) {
 			<div className="editor-header__settings">
 				<PostSavedState />
 				<PostPreviewButton />
+				<PostAnnotationsButton />
 				<PostPublishWithDropdown />
 				<IconButton
 					icon="admin-generic"

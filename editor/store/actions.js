@@ -599,3 +599,107 @@ export function appendDefaultBlock() {
 		type: 'APPEND_DEFAULT_BLOCK',
 	};
 }
+
+/**
+ * Returns an action object used to open annotations.
+ *
+ * @param  {?String} anchor  Anchor selector; e.g., .editor-post-title
+ *                           If empty, simply open with existing or default anchor.
+ *                           If not empty, new anchor overrides previous.
+ *
+ * @param  {?Object} filters Filters to apply; e.g., { blockUid: [], substatus: [ '' ] }
+ *                           If empty, simply open with existing or default filters.
+ *                           If not empty, new filters override all previous.
+ *
+ * @return {Object}          Action object.
+ */
+export function openAnnotations( anchor, filters ) {
+	return {
+		type: 'OPEN_ANNOTATIONS',
+		anchor,
+		filters,
+	};
+}
+
+/**
+ * Returns an action object used to toggle annotations open/closed.
+ *
+ * @param  {?String} anchor  Anchor selector; e.g., .editor-post-title
+ *                           If empty, simply open with existing or default anchor.
+ *                           If not empty, new anchor overrides previous.
+ *
+ * @param  {?Object} filters Filters to apply when opening; e.g., { blockUid: [], substatus: [ '' ] }
+ *                           If empty, simply open with existing or default filters.
+ *                           If not empty, new filters override all previous.
+ *
+ * @return {Object}          Action object.
+ */
+export function toggleAnnotations( anchor, filters ) {
+	return {
+		type: 'TOGGLE_ANNOTATIONS',
+		anchor,
+		filters,
+	};
+}
+
+/**
+ * Returns an action object used to close annotations.
+ *
+ * @return {Object} Action object.
+ */
+export function closeAnnotations() {
+	return {
+		type: 'CLOSE_ANNOTATIONS',
+	};
+}
+
+/**
+ * Returns an action object used to fetch a single annotation, or a collection.
+ *
+ * @param  {?Object}        params Optional REST API collection parameters (when fetching a collection).
+ *                                 The only parameter supported here at this time is `params.substatus`.
+ *                                 All other parameters are set automatically by the action handler.
+ *
+ * @param  {?(Number|null)} id     Optional. If given, only a single annotation with the ID is fetched.
+ *                                 If no ID, then a collection of annotations will be fetched recursively.
+ *
+ * @return {Object}                Action object.
+ */
+export function fetchAnnotations( params, id ) {
+	return {
+		type: 'FETCH_ANNOTATIONS',
+		params: params || {},
+		id,
+	};
+}
+
+/**
+ * Returns an action object used to insert or update an annotation.
+ *
+ * @param  {Object} newData New annotation data.
+ *                          To create a new annotation omit the `id` property.
+ *                          When updating an existing annotation, you must include the `id` property.
+ *                          When updating an existing annotation, any omitted properties will remain unchanged.
+ *
+ * @return {Object}         Action object.
+ */
+export function saveAnnotation( newData ) {
+	return {
+		type: 'REQUEST_ANNOTATION_SAVE',
+		newData,
+	};
+}
+
+/**
+ * Returns an action object used to trash an annotation.
+ *
+ * @param  {Number} id An annotation ID that you'd like to trash.
+ *
+ * @return {Object}    Action object.
+ */
+export function trashAnnotation( id ) {
+	return {
+		type: 'REQUEST_ANNOTATION_TRASH',
+		id,
+	};
+}

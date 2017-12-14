@@ -26,6 +26,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import BlockMover from '../block-mover';
 import BlockDropZone from '../block-drop-zone';
 import BlockSettingsMenu from '../block-settings-menu';
+import BlockAnnotationsButton from '../block-annotations-button';
 import InvalidBlockWarning from './invalid-block-warning';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
@@ -62,6 +63,7 @@ import {
 	isSelectionEnabled,
 	isTyping,
 	getBlockMode,
+	getAnnotations,
 } from '../../store/selectors';
 
 const { BACKSPACE, ESCAPE, DELETE, ENTER, UP, RIGHT, DOWN, LEFT } = keycodes;
@@ -350,6 +352,7 @@ export class BlockListBlock extends Component {
 
 	render() {
 		const { block, order, mode, showContextualToolbar, isLocked } = this.props;
+		const { openAnnotationCount, onClickAnnotationsButton } = this.props;
 		const { name: blockName, isValid } = block;
 		const blockType = getBlockType( blockName );
 		// translators: %s: Type of block (i.e. Text, Image etc)
@@ -392,6 +395,12 @@ export class BlockListBlock extends Component {
 				{ ...wrapperProps }
 			>
 				<BlockDropZone index={ order } />
+				{ ( showUI || isHovered || openAnnotationCount > 0 ) &&
+					<BlockAnnotationsButton
+						uids={ [ block.uid ] }
+						count={ openAnnotationCount }
+						onClick={ onClickAnnotationsButton }
+					/> }
 				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
 				{ ( showUI || isHovered ) && <BlockSettingsMenu uids={ [ block.uid ] } /> }
 				{ showUI && isValid && showContextualToolbar && <BlockContextualToolbar /> }
@@ -459,6 +468,7 @@ const mapStateToProps = ( state, { uid } ) => ( {
 	meta: getEditedPostAttribute( state, 'meta' ),
 	mode: getBlockMode( state, uid ),
 	isSelectionEnabled: isSelectionEnabled( state ),
+	openAnnotationCount: getAnnotations( state, { blockUid: [ uid ], substatus: [ '' ] }, false ).length,
 } );
 
 const mapDispatchToProps = ( dispatch, ownProps ) => ( {
