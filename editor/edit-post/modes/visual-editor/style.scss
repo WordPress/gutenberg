@@ -80,6 +80,10 @@
 	&:hover > .editor-inserter__block,
 	&.is-showing-controls > .editor-inserter__block {
 		opacity: 1;
+
+		&:disabled {
+			@include button-style__disabled;
+		}
 	}
 }
 
