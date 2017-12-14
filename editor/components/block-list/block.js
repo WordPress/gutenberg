@@ -424,7 +424,6 @@ export class BlockListBlock extends Component {
 								onReplace={ isLocked ? undefined : onReplace }
 								setFocus={ partial( onFocus, block.uid ) }
 								mergeBlocks={ isLocked ? undefined : this.mergeBlocks }
-								className={ className }
 								id={ block.uid }
 								isSelectionEnabled={ this.props.isSelectionEnabled }
 								toggleSelection={ this.props.toggleSelection }
