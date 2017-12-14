@@ -11,7 +11,7 @@ import { PostPendingStatusCheck } from '../check';
 describe( 'PostPendingStatusCheck', () => {
 	const user = {
 		data: {
-			capabilities: {
+			post_type_capabilities: {
 				publish_posts: true,
 			},
 		},
@@ -22,7 +22,7 @@ describe( 'PostPendingStatusCheck', () => {
 		expect( wrapper.type() ).toBe( null );
 		wrapper = shallow(
 			<PostPendingStatusCheck user={
-				{ data: { capabilities: { publish_posts: false } } }
+				{ data: { post_type_capabilities: { publish_posts: false } } }
 			}>
 				status
 			</PostPendingStatusCheck>
