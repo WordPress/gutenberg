@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,14 +13,12 @@ import { compose } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { isCurrentPostPublished } from '../../selectors';
+import { isCurrentPostPublished, getCurrentPostType } from '../../selectors';
 
 export function PostPendingStatusCheck( { isPublished, children, user } ) {
-	const userCaps = user.data ?
-		{ ...user.data.capabilities, ...user.data.post_type_capabilities } :
-		{ publish_posts: false };
+	const userCanPublishPosts = get( user, 'data.post_type_capabilities.publish_posts', false );
 
-	if ( isPublished || ! userCaps.publish_posts ) {
+	if ( isPublished || ! userCanPublishPosts ) {
 		return null;
 	}
 
@@ -29,14 +28,15 @@ export function PostPendingStatusCheck( { isPublished, children, user } ) {
 const applyConnect = connect(
 	( state ) => ( {
 		isPublished: isCurrentPostPublished( state ),
+		postType: getCurrentPostType( state ),
 	} ),
 );
 
-const applyWithAPIData = withAPIData( () => {
-	const postTypeSlug = window._wpGutenbergPost.type;
+const applyWithAPIData = withAPIData( ( props ) => {
+	const { postType } = props;
 
 	return {
-		user: `/wp/v2/users/me?post_type=${ postTypeSlug }&context=edit`,
+		user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
 	};
 } );
 
