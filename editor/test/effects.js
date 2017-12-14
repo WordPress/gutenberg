@@ -406,10 +406,10 @@ describe( 'effects', () => {
 			};
 
 			expect( dispatch ).toHaveBeenCalledTimes( 4 );
-			expect( dispatch.mock.calls[ 0 ][ 0 ] ).toEqual( updatePost );
-			expect( dispatch.mock.calls[ 1 ][ 0 ] ).toEqual( removeNotice );
-			expect( dispatch.mock.calls[ 2 ][ 0 ] ).toEqual( resetPostAction );
-			expect( dispatch.mock.calls[ 3 ][ 0 ] ).toEqual( requestPostUpdateSuccess );
+			expect( dispatch ).toHaveBeenCalledWith( updatePost );
+			expect( dispatch ).toHaveBeenCalledWith( removeNotice );
+			expect( dispatch ).toHaveBeenCalledWith( resetPostAction );
+			expect( dispatch ).toHaveBeenCalledWith( requestPostUpdateSuccess );
 		} );
 
 		it( 'should dispatch three actions on failure post.', () => {
@@ -486,9 +486,9 @@ describe( 'effects', () => {
 			};
 
 			expect( dispatch ).toHaveBeenCalledTimes( 3 );
-			expect( dispatch.mock.calls[ 0 ][ 0 ] ).toEqual( updatePost );
-			expect( dispatch.mock.calls[ 1 ][ 0 ] ).toEqual( removeNotice );
-			expect( dispatch.mock.calls[ 2 ][ 0 ] ).toEqual( requestPostFailure );
+			expect( dispatch ).toHaveBeenCalledWith( updatePost );
+			expect( dispatch ).toHaveBeenCalledWith( removeNotice );
+			expect( dispatch ).toHaveBeenCalledWith( requestPostFailure );
 		} );
 	} );
 
