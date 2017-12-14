@@ -207,6 +207,7 @@ registerBlockType( 'core/paragraph', {
 
 	supports: {
 		className: false,
+		footnotes: true,
 	},
 
 	attributes: {
