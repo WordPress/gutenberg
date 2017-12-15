@@ -10,13 +10,13 @@ import { __ } from '@wordpress/i18n';
 import './style.scss';
 
 function ReusableBlockEditPanel( props ) {
-	const { isEditing, name, isSaving, onEdit, onDetach, onChangeName, onSave, onCancel } = props;
+	const { isEditing, title, isSaving, onEdit, onDetach, onChangeTitle, onSave, onCancel } = props;
 
 	return (
 		<div className="reusable-block-edit-panel">
 			{ ! isEditing && ! isSaving && [
 				<span key="info" className="reusable-block-edit-panel__info">
-					<b>{ name }</b>
+					<b>{ title }</b>
 				</span>,
 				<Button
 					key="edit"
@@ -35,18 +35,18 @@ function ReusableBlockEditPanel( props ) {
 			] }
 			{ ( isEditing || isSaving ) && [
 				<input
-					key="name"
+					key="title"
 					type="text"
 					disabled={ isSaving }
-					className="reusable-block-edit-panel__name"
-					value={ name }
-					onChange={ ( event ) => onChangeName( event.target.value ) } />,
+					className="reusable-block-edit-panel__title"
+					value={ title }
+					onChange={ ( event ) => onChangeTitle( event.target.value ) } />,
 				<Button
 					key="save"
 					isPrimary
 					isLarge
 					isBusy={ isSaving }
-					disabled={ ! name || isSaving }
+					disabled={ ! title || isSaving }
 					className="reusable-block-edit-panel__button"
 					onClick={ onSave }>
 					{ __( 'Save' ) }
