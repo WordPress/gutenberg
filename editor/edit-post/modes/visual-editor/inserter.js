@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { find } from 'lodash';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 
@@ -17,7 +18,7 @@ import { createBlock, BlockIcon } from '@wordpress/blocks';
  */
 import { Inserter } from '../../../components';
 import { insertBlock } from '../../../actions';
-import { getMostFrequentlyUsedBlocks, getBlockCount } from '../../../selectors';
+import { getMostFrequentlyUsedBlocks, getBlockCount, getBlocks } from '../../../selectors';
 
 export class VisualEditorInserter extends Component {
 	constructor() {
@@ -38,6 +39,10 @@ export class VisualEditorInserter extends Component {
 	insertBlock( name ) {
 		const { onInsertBlock } = this.props;
 		onInsertBlock( createBlock( name ) );
+	}
+
+	isDisabledBlock( block ) {
+		return block.useOnce && find( this.props.blocks, ( { name } ) => block.name === name );
 	}
 
 	render() {
@@ -67,7 +72,7 @@ export class VisualEditorInserter extends Component {
 						className="editor-inserter__block"
 						onClick={ () => this.insertBlock( block.name ) }
 						label={ sprintf( __( 'Insert %s' ), block.title ) }
-						disabled={ block.useOnce }
+						disabled={ this.isDisabledBlock( block ) }
 						icon={ (
 							<span className="editor-visual-editor__inserter-block-icon">
 								<BlockIcon icon={ block.icon } />
@@ -88,6 +93,7 @@ export default compose(
 			return {
 				mostFrequentlyUsedBlocks: getMostFrequentlyUsedBlocks( state ),
 				blockCount: getBlockCount( state ),
+				blocks: getBlocks( state ),
 			};
 		},
 		{ onInsertBlock: insertBlock },
