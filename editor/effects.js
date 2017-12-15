@@ -63,9 +63,13 @@ export default {
 		const state = getState();
 		const post = getCurrentPost( state );
 		const edits = getPostEdits( state );
+		const editedPostContent = getEditedPostContent( state );
+
+		dispatch( resetBlocks( parse( editedPostContent ) ) );
+
 		const toSend = {
 			...edits,
-			content: getEditedPostContent( state ),
+			content: editedPostContent,
 			id: post.id,
 		};
 
