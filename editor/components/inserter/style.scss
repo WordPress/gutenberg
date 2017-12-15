@@ -115,6 +115,13 @@ input[type="search"].editor-inserter__search {
 	overflow: auto;
 }
 
+.editor-inserter__no-results {
+	display: block;
+	text-align: center;
+	font-style: italic;
+	padding: 8px;
+}
+
 .editor-inserter__tabs {
 	display: flex;
 	flex-direction: column;
