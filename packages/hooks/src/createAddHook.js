@@ -1,5 +1,6 @@
 import validateNamespace from './validateNamespace.js';
 import validateHookName from './validateHookName.js';
+import { doAction } from './';
 
 /**
  * Returns a function which, when invoked, will add a hook.
@@ -68,6 +69,8 @@ function createAddHook( hooks ) {
 				runs: 0,
 			};
 		}
+
+		doAction( 'hookAdded', hookName, namespace, callback, priority );
 	};
 }
 
