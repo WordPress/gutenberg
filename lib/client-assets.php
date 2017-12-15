@@ -598,6 +598,41 @@ add_action( 'wp_enqueue_scripts', 'gutenberg_common_scripts_and_styles' );
 add_action( 'admin_enqueue_scripts', 'gutenberg_common_scripts_and_styles' );
 
 /**
+ * Enqueues registered block scripts and styles, depending on current rendered
+ * context (only enqueuing editor scripts while in context of the editor).
+ *
+ * @since 2.0.0
+ */
+function gutenberg_enqueue_registered_block_scripts_and_styles() {
+	$is_editor = ( 'enqueue_block_editor_assets' === current_action() );
+
+	$block_registry = WP_Block_Type_Registry::get_instance();
+	foreach ( $block_registry->get_all_registered() as $block_name => $block_type ) {
+		// Front-end styles.
+		if ( ! empty( $block_type->style ) ) {
+			wp_enqueue_style( $block_type->style );
+		}
+
+		// Front-end script.
+		if ( ! empty( $block_type->script ) ) {
+			wp_enqueue_script( $block_type->script );
+		}
+
+		// Editor styles.
+		if ( $is_editor && ! empty( $block_type->editor_style ) ) {
+			wp_enqueue_style( $block_type->editor_style );
+		}
+
+		// Editor script.
+		if ( $is_editor && ! empty( $block_type->editor_script ) ) {
+			wp_enqueue_script( $block_type->editor_script );
+		}
+	}
+}
+add_action( 'enqueue_block_assets', 'gutenberg_enqueue_registered_block_scripts_and_styles' );
+add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_registered_block_scripts_and_styles' );
+
+/**
  * Returns a default color palette.
  *
  * @return array Color strings in hex format.
