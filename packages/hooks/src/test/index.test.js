@@ -64,6 +64,14 @@ function action_c() {
 	window.actionValue += 'c';
 }
 
+function handle_hook_added ( ...args ) {
+	window.hookAdded = { ...args };
+}
+
+function handle_hook_removed ( ...args ) {
+	window.hookRemoved = { ...args };
+}
+
 const consoleErrorOriginal = console.error;
 
 beforeEach( () => {
@@ -619,4 +627,31 @@ test( 'Test `this` context via composition', () => {
 
 	const testObject2 = {};
 	Object.assign( testObject2, createHooks() );
+} );
+
+// Test adding a hook triggers a hookAdded action.
+test( 'adding a hood triggers a hookAdded action passing all callback details', () => {
+	const testObject = {};
+
+	addAction( 'hookAdded', 'my_callback', handle_hook_added );
+	addAction( 'testHook', 'my_callback2', action_a, 9 );
+	expect( window.hookAdded ).toEqual( {
+		'0': 'testHook',
+		'1': 'my_callback2',
+		'2': action_a,
+		'3': 9
+	} );
+} );
+
+// Test removing a hood triggers a hookRemoved action.
+test( 'adding a hood triggers a hookRemoved action passing all callback details', () => {
+	const testObject = {};
+
+	addAction( 'hookRemoved', 'my_callback', handle_hook_removed );
+	addAction( 'testHook', 'my_callback2', action_a, 9 );
+	removeAction( 'testHook', 'my_callback2' );
+	expect( window.hookRemoved ).toEqual( {
+		'0': 'testHook',
+		'1': 'my_callback2'
+	} );
 } );
