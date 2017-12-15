@@ -27,11 +27,10 @@ registerBlockType( 'core/html', {
 
 	keywords: [ __( 'embed' ) ],
 
-	supportHTML: false,
-
 	supports: {
 		customClassName: false,
 		className: false,
+		html: false,
 	},
 
 	attributes: {

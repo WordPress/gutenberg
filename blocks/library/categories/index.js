@@ -44,7 +44,9 @@ registerBlockType( 'core/categories', {
 		},
 	},
 
-	supportHTML: false,
+	supports: {
+		html: false,
+	},
 
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
