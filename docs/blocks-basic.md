@@ -6,19 +6,23 @@ Blocks containing static content are implemented entirely in JavaScript using th
 
 ## Enqueuing Block Scripts
 
-While the block type itself is implemented in JavaScript, you'll need to use the `enqueue_block_editor_assets` [WordPress action](https://codex.wordpress.org/Glossary#Action) to have your scripts included in the editor. This is similar to the [`wp_enqueue_scripts` action](https://developer.wordpress.org/reference/hooks/wp_enqueue_scripts/), but specifically targeting editor scripts and styles.
+While the block's editor behaviors are implemented in JavaScript, you'll need to register your block server-side to ensure that the script is enqueued when the editor loads. Register scripts and styles using [`wp_register_script`](https://developer.wordpress.org/reference/functions/wp_register_script/) and [`wp_register_style`](https://developer.wordpress.org/reference/functions/wp_register_style/), then assign these as handles associated with your block using the `script`, `style`, `editor_script`, and `editor_style` block type registration settings. The `editor_`-prefixed handles will only be enqueued in the context of the editor, while `script` and `style` will be enqueued both in the editor and when viewing a post on the front of your site.
 
 ```php
 <?php
 
-function gutenberg_boilerplate_enqueue_block_editor_assets() {
-	wp_enqueue_script(
+function gutenberg_boilerplate_block() {
+	wp_register_script(
 		'gutenberg-boilerplate-es5-step01',
 		plugins_url( 'step-01/block.js', __FILE__ ),
 		array( 'wp-blocks', 'wp-element' )
 	);
+
+	register_block_type( 'gutenberg-boilerplate-es5/hello-world-step-01', array(
+		'editor_script' => 'gutenberg-boilerplate-es5-step01',
+	) );
 }
-add_action( 'enqueue_block_editor_assets', 'gutenberg_boilerplate_enqueue_block_editor_assets' );
+add_action( 'init', 'gutenberg_boilerplate_block' );
 ```
 
 Note the two script dependencies:
