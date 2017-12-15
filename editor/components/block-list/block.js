@@ -8,14 +8,13 @@ import { get, partial, reduce, size } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, compose, createElement } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
 import {
-	getBlockType,
 	BlockEdit,
-	getBlockDefaultClassname,
 	createBlock,
-	hasBlockSupport,
+	getBlockType,
+	getSaveElement,
 	isReusableBlock,
 } from '@wordpress/blocks';
 import { withFilters, withContext } from '@wordpress/components';
@@ -377,12 +376,6 @@ export class BlockListBlock extends Component {
 			wrapperProps = blockType.getEditWrapperProps( block.attributes );
 		}
 
-		// Generate a class name for the block's editable form
-		const generatedClassName = hasBlockSupport( blockType, 'className', true ) ?
-			getBlockDefaultClassname( block.name ) :
-			null;
-		const className = classnames( generatedClassName, block.attributes.className );
-
 		// Disable reason: Each block can be selected by clicking on it
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
@@ -433,11 +426,7 @@ export class BlockListBlock extends Component {
 							<BlockHtml uid={ block.uid } />
 						) }
 						{ ! isValid && [
-							createElement( blockType.save, {
-								key: 'invalid-preview',
-								attributes: block.attributes,
-								className,
-							} ),
+							getSaveElement( blockType, block.attributes ),
 							<InvalidBlockWarning
 								key="invalid-warning"
 								block={ block }
