@@ -715,8 +715,19 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	array_push( $word_count_script->deps, 'wp-utils' );
 
 	global $post;
+	// On admin pages, global $post is the only post.
+	if ( is_admin() ) {
+		$post_to_edit = $post;
+	} else {
+		// On front-end editing, global $post might be last post in the_loop
+		// which is probably not what we want to edit especially in the case
+		// for a site like P2 which creates posts on the front-end.
+		// Use admin function get_default_post_to_edit() to get new empty post.
+		require_once( ABSPATH . '/wp-admin/includes/post.php' );
+		$post_to_edit = get_default_post_to_edit( 'post', true );
+	}
 	// Generate API-prepared post.
-	$post_to_edit = gutenberg_get_post_to_edit( $post );
+	$post_to_edit = gutenberg_get_post_to_edit( $post_to_edit );
 	if ( is_wp_error( $post_to_edit ) ) {
 		wp_die( $post_to_edit->get_error_message() );
 	}
