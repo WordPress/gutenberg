@@ -630,7 +630,7 @@ test( 'Test `this` context via composition', () => {
 } );
 
 // Test adding a hook triggers a hookAdded action.
-test( 'adding a hood triggers a hookAdded action passing all callback details', () => {
+test( 'adding a hook triggers a hookAdded action passing all callback details', () => {
 	const testObject = {};
 
 	addAction( 'hookAdded', 'my_callback', handle_hook_added );
@@ -643,8 +643,8 @@ test( 'adding a hood triggers a hookAdded action passing all callback details', 
 	} );
 } );
 
-// Test removing a hood triggers a hookRemoved action.
-test( 'adding a hood triggers a hookRemoved action passing all callback details', () => {
+// Test removing a hook triggers a hookRemoved action.
+test( 'adding a hook triggers a hookRemoved action passing all callback details', () => {
 	const testObject = {};
 
 	addAction( 'hookRemoved', 'my_callback', handle_hook_removed );
