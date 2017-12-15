@@ -1,140 +1,290 @@
 /**
- * Replaces two line breaks with a paragraph tag and one line break with a <br>.
+ * The regular expression for an HTML element.
  *
- * Similar to `wpautop()` in formatting.php.
- *
- * @param   {string} text The text input.
- * @returns {string}      The formatted text.
+ * @type {String}
  */
-export function autop( text ) {
-	const blocklist = (
-		'table|thead|tfoot|caption|col|colgroup|tbody|tr|td|th|div|dl|dd|dt|ul|ol|li|pre' +
-		'|form|map|area|blockquote|address|math|style|p|h[1-6]|hr|fieldset|legend|section' +
-		'|article|aside|hgroup|header|footer|nav|figure|figcaption|details|menu|summary'
-	);
+const htmlSplitRegex = ( () => {
+	/* eslint-disable no-multi-spaces */
+	const comments =
+		'!' +           // Start of comment, after the <.
+		'(?:' +         // Unroll the loop: Consume everything until --> is found.
+			'-(?!->)' + // Dash not followed by end of comment.
+			'[^\\-]*' + // Consume non-dashes.
+		')*' +          // Loop possessively.
+		'(?:-->)?';     // End of comment. If not found, match all input.
 
-	let preserveLinebreaks = false;
-	let preserveBr = false;
+	const cdata =
+		'!\\[CDATA\\[' + // Start of comment, after the <.
+		'[^\\]]*' +      // Consume non-].
+		'(?:' +          // Unroll the loop: Consume everything until ]]> is found.
+			'](?!]>)' +  // One ] not followed by end of comment.
+			'[^\\]]*' +  // Consume non-].
+		')*?' +          // Loop possessively.
+		'(?:]]>)?';      // End of comment. If not found, match all input.
 
-	// Normalize line breaks.
-	text = text.replace( /\r\n|\r/g, '\n' );
+	const escaped =
+		'(?=' +              // Is the element escaped?
+			'!--' +
+		'|' +
+			'!\\[CDATA\\[' +
+		')' +
+		'((?=!-)' +          // If yes, which type?
+			comments +
+		'|' +
+			cdata +
+		')';
 
-	// Remove line breaks from <object>.
-	if ( text.indexOf( '<object' ) !== -1 ) {
-		text = text.replace( /<object[\s\S]+?<\/object>/g, function( a ) {
-			return a.replace( /\n+/g, '' );
-		} );
+	const regex =
+		'(' +               // Capture the entire match.
+			'<' +           // Find start of element.
+			'(' +           // Conditional expression follows.
+				escaped +   // Find end of escaped element.
+			'|' +           // ... else ...
+				'[^>]*>?' + // Find end of normal element.
+			')' +
+		')';
+
+	return new RegExp( regex );
+	/* eslint-enable no-multi-spaces */
+} )();
+
+/**
+ * Separate HTML elements and comments from the text.
+ *
+ * @param  {String} input The text which has to be formatted.
+ * @return {Array}        The formatted text.
+ */
+function htmlSplit( input ) {
+	const parts = [];
+	let workingInput = input;
+
+	let match;
+	while ( ( match = workingInput.match( htmlSplitRegex ) ) ) {
+		parts.push( workingInput.slice( 0, match.index ) );
+		parts.push( match[ 0 ] );
+		workingInput = workingInput.slice( match.index + match[ 0 ].length );
 	}
 
-	// Remove line breaks from tags.
-	text = text.replace( /<[^<>]+>/g, function( a ) {
-		return a.replace( /[\n\t ]+/g, ' ' );
-	} );
-
-	// Preserve line breaks in <pre> and <script> tags.
-	if ( text.indexOf( '<pre' ) !== -1 || text.indexOf( '<script' ) !== -1 ) {
-		preserveLinebreaks = true;
-		text = text.replace( /<(pre|script)[^>]*>[\s\S]*?<\/\1>/g, function( a ) {
-			return a.replace( /\n/g, '<wp-line-break>' );
-		} );
+	if ( workingInput.length ) {
+		parts.push( workingInput );
 	}
 
-	if ( text.indexOf( '<figcaption' ) !== -1 ) {
-		text = text.replace( /\s*(<figcaption[^>]*>)/g, '$1' );
-		text = text.replace( /<\/figcaption>\s*/g, '</figcaption>' );
+	return parts;
+}
+
+/**
+ * Replace characters or phrases within HTML elements only.
+ *
+ * @param  {String} haystack     The text which has to be formatted.
+ * @param  {Object} replacePairs In the form {from: 'to', ...}.
+ * @return {String}              The formatted text.
+ */
+function replaceInHtmlTags( haystack, replacePairs ) {
+	// Find all elements.
+	const textArr = htmlSplit( haystack );
+	let changed = false;
+
+	// Extract all needles.
+	const needles = Object.keys( replacePairs );
+
+	// Loop through delimiters (elements) only.
+	for ( let i = 1; i < textArr.length; i += 2 ) {
+		for ( let j = 0; j < needles.length; j++ ) {
+			const needle = needles[ j ];
+			if ( -1 !== textArr[ i ].indexOf( needle ) ) {
+				textArr[ i ] = textArr[ i ].replace( new RegExp( needle, 'g' ), replacePairs[ needle ] );
+				changed = true;
+				// After one strtr() break out of the foreach loop and look at next element.
+				break;
+			}
+		}
 	}
 
-	// Keep <br> tags inside captions.
-	if ( text.indexOf( '[caption' ) !== -1 ) {
-		preserveBr = true;
-
-		text = text.replace( /\[caption[\s\S]+?\[\/caption\]/g, function( a ) {
-			a = a.replace( /<br([^>]*)>/g, '<wp-temp-br$1>' );
-
-			a = a.replace( /<[^<>]+>/g, function( b ) {
-				return b.replace( /[\n\t ]+/, ' ' );
-			} );
-
-			return a.replace( /\s*\n\s*/g, '<wp-temp-br />' );
-		} );
+	if ( changed ) {
+		haystack = textArr.join( '' );
 	}
 
-	text = text + '\n\n';
-	text = text.replace( /<br \/>\s*<br \/>/gi, '\n\n' );
+	return haystack;
+}
 
-	// Pad block tags with two line breaks.
-	text = text.replace( new RegExp( '(<(?:' + blocklist + ')(?: [^>]*)?>)', 'gi' ), '\n\n$1' );
-	text = text.replace( new RegExp( '(</(?:' + blocklist + ')>)', 'gi' ), '$1\n\n' );
-	text = text.replace( /<hr( [^>]*)?>/gi, '<hr$1>\n\n' );
+/**
+ * Replaces double line-breaks with paragraph elements.
+ *
+ * A group of regex replaces used to identify text formatted with newlines and
+ * replace double line-breaks with HTML paragraph tags. The remaining line-
+ * breaks after conversion become <<br />> tags, unless br is set to 'false'.
+ *
+ * @param  {String}    text The text which has to be formatted.
+ * @param  {Boolean}   br   Optional. If set, will convert all remaining line-
+ *                          breaks after paragraphing. Default true.
+ * @return {String}         Text which has been converted into paragraph tags.
+ */
+export function autop( text, br = true ) {
+	const preTags = [];
 
-	// Remove white space chars around <option>.
-	text = text.replace( /\s*<option/gi, '<option' );
-	text = text.replace( /<\/option>\s*/gi, '</option>' );
+	if ( text.trim() === '' ) {
+		return '';
+	}
 
-	// Normalize multiple line breaks and white space chars.
-	text = text.replace( /\n\s*\n+/g, '\n\n' );
+	// Just to make things a little easier, pad the end.
+	text = text + '\n';
 
-	// Convert two line breaks to a paragraph.
-	text = text.replace( /([\s\S]+?)\n\n/g, '<p>$1</p>\n' );
+	/*
+	 * Pre tags shouldn't be touched by autop.
+	 * Replace pre tags with placeholders and bring them back after autop.
+	 */
+	if ( text.indexOf( '<pre' ) !== -1 ) {
+		const textParts = text.split( '</pre>' );
+		const lastText = textParts.pop();
+		text = '';
 
-	// Remove empty paragraphs.
-	text = text.replace( /<p>\s*?<\/p>/gi, '' );
+		for ( let i = 0; i < textParts.length; i++ ) {
+			const textPart = textParts[ i ];
+			const start = textPart.indexOf( '<pre' );
 
-	// Remove <p> tags that are around block tags.
-	text = text.replace( new RegExp( '<p>\\s*(</?(?:' + blocklist + ')(?: [^>]*)?>)\\s*</p>', 'gi' ), '$1' );
-	text = text.replace( /<p>(<li.+?)<\/p>/gi, '$1' );
+			// Malformed html?
+			if ( start === -1 ) {
+				text += textPart;
+				continue;
+			}
 
-	// Fix <p> in blockquotes.
-	text = text.replace( /<p>\s*<blockquote([^>]*)>/gi, '<blockquote$1><p>' );
-	text = text.replace( /<\/blockquote>\s*<\/p>/gi, '</p></blockquote>' );
+			const name = '<pre wp-pre-tag-' + i + '></pre>';
+			preTags.push( [ name, textPart.substr( start ) + '</pre>' ] );
 
-	// Remove <p> tags that are wrapped around block tags.
-	text = text.replace( new RegExp( '<p>\\s*(</?(?:' + blocklist + ')(?: [^>]*)?>)', 'gi' ), '$1' );
-	text = text.replace( new RegExp( '(</?(?:' + blocklist + ')(?: [^>]*)?>)\\s*</p>', 'gi' ), '$1' );
-
-	text = text.replace( /(<br[^>]*>)\s*\n/gi, '$1' );
-
-	// Add <br> tags.
-	text = text.replace( /\s*\n/g, '<br />\n' );
-
-	// Remove <br> tags that are around block tags.
-	text = text.replace( new RegExp( '(</?(?:' + blocklist + ')[^>]*>)\\s*<br />', 'gi' ), '$1' );
-	text = text.replace( /<br \/>(\s*<\/?(?:p|li|div|dl|dd|dt|th|pre|td|ul|ol)>)/gi, '$1' );
-
-	// Remove <p> and <br> around captions.
-	text = text.replace( /(?:<p>|<br ?\/?>)*\s*\[caption([^\[]+)\[\/caption\]\s*(?:<\/p>|<br ?\/?>)*/gi, '[caption$1[/caption]' );
-
-	// Make sure there is <p> when there is </p> inside block tags that can contain other blocks.
-	text = text.replace( /(<(?:div|th|td|form|fieldset|dd)[^>]*>)(.*?)<\/p>/g, function( a, b, c ) {
-		if ( c.match( /<p( [^>]*)?>/ ) ) {
-			return a;
+			text += textPart.substr( 0, start ) + name;
 		}
 
-		return b + '<p>' + c + '</p>';
-	} );
+		text += lastText;
+	}
+	// Change multiple <br>s into two line breaks, which will turn into paragraphs.
+	text = text.replace( /<br\s*\/?>\s*<br\s*\/?>/g, '\n\n' );
 
-	// Restore the line breaks in <pre> and <script> tags.
-	if ( preserveLinebreaks ) {
-		text = text.replace( /<wp-line-break>/g, '\n' );
+	const allBlocks = '(?:table|thead|tfoot|caption|col|colgroup|tbody|tr|td|th|div|dl|dd|dt|ul|ol|li|pre|form|map|area|blockquote|address|math|style|p|h[1-6]|hr|fieldset|legend|section|article|aside|hgroup|header|footer|nav|figure|figcaption|details|menu|summary)';
+
+	// Add a double line break above block-level opening tags.
+	text = text.replace( new RegExp( '(<' + allBlocks + '[\s\/>])', 'g' ), '\n\n$1' );
+
+	// Add a double line break below block-level closing tags.
+	text = text.replace( new RegExp( '(<\/' + allBlocks + '>)', 'g' ), '$1\n\n' );
+
+	// Standardize newline characters to "\n".
+	text = text.replace( /\r\n|\r/g, '\n' );
+
+	// Find newlines in all elements and add placeholders.
+	text = replaceInHtmlTags( text, { '\n': ' <!-- wpnl --> ' } );
+
+	// Collapse line breaks before and after <option> elements so they don't get autop'd.
+	if ( text.indexOf( '<option' ) !== -1 ) {
+		text = text.replace( /\s*<option/g, '<option' );
+		text = text.replace( /<\/option>\s*/g, '</option>' );
 	}
 
-	// Restore the <br> tags in captions.
-	if ( preserveBr ) {
-		text = text.replace( /<wp-temp-br([^>]*)>/g, '<br$1>' );
+	/*
+	 * Collapse line breaks inside <object> elements, before <param> and <embed> elements
+	 * so they don't get autop'd.
+	 */
+	if ( text.indexOf( '</object>' ) !== -1 ) {
+		text = text.replace( /(<object[^>]*>)\s*/g, '$1' );
+		text = text.replace( /\s*<\/object>/g, '</object>' );
+		text = text.replace( /\s*(<\/?(?:param|embed)[^>]*>)\s*/g, '$1' );
+	}
+
+	/*
+	 * Collapse line breaks inside <audio> and <video> elements,
+	 * before and after <source> and <track> elements.
+	 */
+	if ( text.indexOf( '<source' ) !== -1 || text.indexOf( '<track' ) !== -1 ) {
+		text = text.replace( /([<\[](?:audio|video)[^>\]]*[>\]])\s*/g, '$1' );
+		text = text.replace( /\s*([<\[]\/(?:audio|video)[>\]])/g, '$1' );
+		text = text.replace( /\s*(<(?:source|track)[^>]*>)\s*/g, '$1' );
+	}
+
+	// Collapse line breaks before and after <figcaption> elements.
+	if ( text.indexOf( '<figcaption' ) !== -1 ) {
+		text = text.replace( /\s*(<figcaption[^>]*>)/, '$1' );
+		text = text.replace( /<\/figcaption>\s*/, '</figcaption>' );
+	}
+
+	// Remove more than two contiguous line breaks.
+	text = text.replace( /\n\n+/g, '\n\n' );
+
+	// Split up the contents into an array of strings, separated by double line breaks.
+	const texts = text.split( /\n\s*\n/ ).filter( Boolean );
+
+	// Reset text prior to rebuilding.
+	text = '';
+
+	// Rebuild the content as a string, wrapping every bit with a <p>.
+	texts.forEach( ( textPiece ) => {
+		text += '<p>' + textPiece.replace( /^\n*|\n*$/g, '' ) + '</p>\n';
+	} );
+
+	// Under certain strange conditions it could create a P of entirely whitespace.
+	text = text.replace( /<p>\s*<\/p>/g, '' );
+
+	// Add a closing <p> inside <div>, <address>, or <form> tag if missing.
+	text = text.replace( /<p>([^<]+)<\/(div|address|form)>/g, '<p>$1</p></$2>' );
+
+	// If an opening or closing block element tag is wrapped in a <p>, unwrap it.
+	text = text.replace( new RegExp( '<p>\s*(<\/?' + allBlocks + '[^>]*>)\s*<\/p>', 'g' ), '$1' );
+
+	// In some cases <li> may get wrapped in <p>, fix them.
+	text = text.replace( /<p>(<li.+?)<\/p>/g, '$1' );
+
+	// If a <blockquote> is wrapped with a <p>, move it inside the <blockquote>.
+	text = text.replace( /<p><blockquote([^>]*)>/gi, '<blockquote$1><p>' );
+	text = text.replace( /<\/blockquote><\/p>/g, '</p></blockquote>' );
+
+	// If an opening or closing block element tag is preceded by an opening <p> tag, remove it.
+	text = text.replace( new RegExp( '<p>\s*(<\/?' + allBlocks + '[^>]*>)', 'g' ), '$1' );
+
+	// If an opening or closing block element tag is followed by a closing <p> tag, remove it.
+	text = text.replace( new RegExp( '(<\/?' + allBlocks + '[^>]*>)\s*<\/p>', 'g' ), '$1' );
+
+	// Optionally insert line breaks.
+	if ( br ) {
+		// Replace newlines that shouldn't be touched with a placeholder.
+		text = text.replace( /<(script|style).*?<\/\\1>/g, ( match ) => match[ 0 ].replace( /\n/g, '<WPPreserveNewline />' ) );
+
+		// Normalize <br>
+		text = text.replace( /<br>|<br\/>/g, '<br />' );
+
+		// Replace any new line characters that aren't preceded by a <br /> with a <br />.
+		text = text.replace( /(<br \/>)?\s*\n/g, ( a, b ) => b ? a : '<br />\n' );
+
+		// Replace newline placeholders with newlines.
+		text = text.replace( /<WPPreserveNewline \/>/g, '\n' );
+	}
+
+	// If a <br /> tag is after an opening or closing block tag, remove it.
+	text = text.replace( new RegExp( '(<\/?' + allBlocks + '[^>]*>)\s*<br \/>', 'g' ), '$1' );
+
+	// If a <br /> tag is before a subset of opening or closing block tags, remove it.
+	text = text.replace( /<br \/>(\s*<\/?(?:p|li|div|dl|dd|dt|th|pre|td|ul|ol)[^>]*>)/g, '$1' );
+	text = text.replace( /\n<\/p>$/g, '</p>' );
+
+	// Replace placeholder <pre> tags with their original content.
+	preTags.forEach( ( preTag ) => {
+		const [ name, original ] = preTag;
+		text = text.replace( name, original );
+	} );
+
+	// Restore newlines in all elements.
+	if ( -1 !== text.indexOf( '<!-- wpnl -->' ) ) {
+		text = text.replace( /\s?<!-- wpnl -->\s?/g, '\n' );
 	}
 
 	return text;
 }
 
 /**
- * Replaces <p> tags with two line breaks. "Opposite" of wpautop().
+ * Replaces <p> tags with two line breaks. "Opposite" of autop().
  *
  * Replaces <p> tags with two line breaks except where the <p> has attributes.
- * Unifies whitespace.
- * Indents <li>, <dt> and <dd> for better readability.
+ * Unifies whitespace. Indents <li>, <dt> and <dd> for better readability.
  *
- * @param  {string} html The content from the editor.
- * @return {string}      The content with stripped paragraph tags.
+ * @param  {String} html The content from the editor.
+ * @return {String}      The content with stripped paragraph tags.
  */
 export function removep( html ) {
 	const blocklist = 'blockquote|ul|ol|li|dl|dt|dd|table|thead|tbody|tfoot|tr|th|td|h[1-6]|fieldset|figure';

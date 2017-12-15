@@ -91,7 +91,7 @@ test( 'skip input elements', () => {
 	expect( autop( str ).trim() ).toBe( '<p>' + str + '</p>' );
 } );
 
-test.skip( 'source_track_elements', () => {
+test( 'source_track_elements', () => {
 	const content = `Paragraph one.
 
 <video class="wp-video-shortcode" id="video-0-1" width="640" height="360" preload="metadata" controls="controls">
@@ -178,7 +178,7 @@ Paragraph two.`;
 	expect( autop( shortcodeContent ).trim() ).toBe( shortcodeExpected );
 } );
 
-test.skip( 'param embed elements', () => {
+test( 'param embed elements', () => {
 	const content1 = `Paragraph one.
 
 <object width="400" height="224" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,40,0">
@@ -256,7 +256,7 @@ test( 'skip select option elements', () => {
 	expect( autop( str ).trim() ).toBe( '<p>' + str + '</p>' );
 } );
 
-test.skip( 'that_autop_treats_block_level_elements_as_blocks', () => {
+test( 'that_autop_treats_block_level_elements_as_blocks', () => {
 	const blocks = [
 		'table',
 		'thead',
@@ -317,7 +317,7 @@ test.skip( 'that_autop_treats_block_level_elements_as_blocks', () => {
 
 	expect( autop( input ).trim() ).toBe( expected );
 
-	input = join( '', $content ); // WS difference
+	input = content.join( '' ); // WS difference
 
 	expect( autop( input ).trim() ).toBe( expected );
 
@@ -398,7 +398,7 @@ test( 'that autop treats inline elements as inline', () => {
 	expect( autop( content ).trim() ).toBe( expected );
 } );
 
-test.skip( 'element sanity', () => {
+test( 'element sanity', () => {
 	[
 		[
 			'Hello <a\nhref="world">',
@@ -443,7 +443,7 @@ test.skip( 'element sanity', () => {
 	} );
 } );
 
-test.skip( 'that autop skips line breaks after br', () => {
+test( 'that autop skips line breaks after br', () => {
 	const content = `
 line 1<br>
 line 2<br/>
@@ -461,7 +461,7 @@ line 5</p>`;
 	expect( autop( content ).trim() ).toBe( expected );
 } );
 
-test.skip( 'that autop adds a paragraph after multiple br', () => {
+test( 'that autop adds a paragraph after multiple br', () => {
 	const content = `
 line 1<br>
 <br/>
@@ -482,7 +482,7 @@ test( 'that text before blocks is peed', () => {
 	expect( autop( content ).trim() ).toBe( expected );
 } );
 
-test.skip( 'that autop doses not add extra closing p in figure', () => {
+test( 'that autop doses not add extra closing p in figure', () => {
 	const content1 = '<figure><img src="example.jpg" /><figcaption>Caption</figcaption></figure>';
 	const expected1 = content1;
 
