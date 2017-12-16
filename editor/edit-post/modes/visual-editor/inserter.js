@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find } from 'lodash';
+import { some } from 'lodash';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 
@@ -42,7 +42,7 @@ export class VisualEditorInserter extends Component {
 	}
 
 	isDisabledBlock( block ) {
-		return block.useOnce && find( this.props.blocks, ( { name } ) => block.name === name );
+		return block.useOnce && some( this.props.blocks, ( { name } ) => block.name === name );
 	}
 
 	render() {
