@@ -17,8 +17,9 @@ import 'element-closest';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 import { serialize } from '@wordpress/blocks';
+import { withDragAndDropContext } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -230,31 +231,34 @@ class BlockList extends Component {
 	}
 }
 
-export default connect(
-	( state ) => ( {
-		blocks: getBlockUids( state ),
-		selectionStart: getMultiSelectedBlocksStartUid( state ),
-		selectionEnd: getMultiSelectedBlocksEndUid( state ),
-		multiSelectedBlocks: getMultiSelectedBlocks( state ),
-		multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
-		selectedBlock: getSelectedBlock( state ),
-		isSelectionEnabled: isSelectionEnabled( state ),
-	} ),
-	( dispatch ) => ( {
-		onStartMultiSelect() {
-			dispatch( startMultiSelect() );
-		},
-		onStopMultiSelect() {
-			dispatch( stopMultiSelect() );
-		},
-		onMultiSelect( start, end ) {
-			dispatch( multiSelect( start, end ) );
-		},
-		onSelect( uid ) {
-			dispatch( selectBlock( uid ) );
-		},
-		onRemove( uids ) {
-			dispatch( { type: 'REMOVE_BLOCKS', uids } );
-		},
-	} )
+export default compose(
+	withDragAndDropContext,
+	connect(
+		( state ) => ( {
+			blocks: getBlockUids( state ),
+			selectionStart: getMultiSelectedBlocksStartUid( state ),
+			selectionEnd: getMultiSelectedBlocksEndUid( state ),
+			multiSelectedBlocks: getMultiSelectedBlocks( state ),
+			multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
+			selectedBlock: getSelectedBlock( state ),
+			isSelectionEnabled: isSelectionEnabled( state ),
+		} ),
+		( dispatch ) => ( {
+			onStartMultiSelect() {
+				dispatch( startMultiSelect() );
+			},
+			onStopMultiSelect() {
+				dispatch( stopMultiSelect() );
+			},
+			onMultiSelect( start, end ) {
+				dispatch( multiSelect( start, end ) );
+			},
+			onSelect( uid ) {
+				dispatch( selectBlock( uid ) );
+			},
+			onRemove( uids ) {
+				dispatch( { type: 'REMOVE_BLOCKS', uids } );
+			},
+		} )
+	)
 )( BlockList );

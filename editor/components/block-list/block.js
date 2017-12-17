@@ -24,6 +24,7 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import { DragAndDropSource, DragAndDropTarget } from '../draggable';
 import BlockMover from '../block-mover';
 import BlockDropZone from '../block-drop-zone';
 import BlockSettingsMenu from '../block-settings-menu';
@@ -46,6 +47,7 @@ import {
 	stopTyping,
 	updateBlockAttributes,
 	toggleSelection,
+	moveBlockToIndex,
 } from '../../actions';
 import {
 	getBlock,
@@ -62,7 +64,9 @@ import {
 	isSelectionEnabled,
 	isTyping,
 	getBlockMode,
+	isReorderingInProgress,
 } from '../../selectors';
+import { DRAGGABLE_BLOCK } from '../../constants';
 
 const { BACKSPACE, ESCAPE, DELETE, ENTER, UP, RIGHT, DOWN, LEFT } = keycodes;
 
@@ -397,7 +401,40 @@ export class BlockListBlock extends Component {
 				onClick={ this.onClick }
 				{ ...wrapperProps }
 			>
-				<BlockDropZone index={ order } />
+
+
+
+				{ true &&
+					<DragAndDropSource
+						draggableType={ DRAGGABLE_BLOCK }
+						dragSourceUid={ this.props.uid }
+						index={ order }
+					>
+						<div>DRAG</div>
+					</DragAndDropSource>
+				}
+
+				{ true &&
+					<DragAndDropTarget
+						draggableType={ DRAGGABLE_BLOCK }
+						dropTargetUid={ this.props.uid }
+						index={ order }
+						hoverIndexBreakpoint={ false }
+						reIndexCallback={ this.props.onMoveBlockToIndex }
+					>
+						<div>DROP HERE</div>
+					</DragAndDropTarget>
+				}
+
+
+
+				{ false && ! this.props.isReorderingInProgress &&
+					<BlockDropZone index={ order } isReorderingInProgress={ this.props.isReorderingInProgress } />
+				}
+
+				{ false && <BlockDropZone index={ order } isReorderingInProgress={ this.props.isReorderingInProgress } /> }
+
+
 				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
 				{ ( showUI || isHovered ) && <BlockSettingsMenu uids={ [ block.uid ] } /> }
 				{ showUI && isValid && showContextualToolbar && <BlockContextualToolbar /> }
@@ -467,6 +504,7 @@ const mapStateToProps = ( state, { uid } ) => ( {
 	meta: getEditedPostAttribute( state, 'meta' ),
 	mode: getBlockMode( state, uid ),
 	isSelectionEnabled: isSelectionEnabled( state ),
+	isReorderingInProgress: isReorderingInProgress( state ),
 } );
 
 const mapDispatchToProps = ( dispatch, ownProps ) => ( {
@@ -477,6 +515,7 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 	onSelect() {
 		dispatch( selectBlock( ownProps.uid ) );
 	},
+
 	onDeselect() {
 		dispatch( clearSelectedBlock() );
 	},
@@ -496,6 +535,7 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 			uid: ownProps.uid,
 		} );
 	},
+
 	onMouseLeave() {
 		dispatch( {
 			type: 'TOGGLE_BLOCK_HOVERED',
@@ -527,8 +567,13 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 	onMetaChange( meta ) {
 		dispatch( editPost( { meta } ) );
 	},
+
 	toggleSelection( selectionEnabled ) {
 		dispatch( toggleSelection( selectionEnabled ) );
+	},
+
+	onMoveBlockToIndex( uid, index ) {
+		dispatch( moveBlockToIndex( uid, index ) );
 	},
 } );
 

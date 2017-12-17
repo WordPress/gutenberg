@@ -58,7 +58,7 @@ const ModifiedBackend = ( ...args ) => {
  * @return { Function }                  A component wrapped with the react-dnd HOC.
  */
 export default function withDragAndDropContext( WrappedComponent ) {
-	return DragDropContext( ModifiedBackend )( WrappedComponent );
+	return DragDropContext( HTML5Backend )( WrappedComponent );
 }
 
 /**
