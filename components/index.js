@@ -45,3 +45,4 @@ export { default as withFocusReturn } from './higher-order/with-focus-return';
 export { default as withInstanceId } from './higher-order/with-instance-id';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
 export { default as withState } from './higher-order/with-state';
+export { default as withDragAndDropContext, withDragSource, withDropTarget } from './higher-order/with-dnd';
