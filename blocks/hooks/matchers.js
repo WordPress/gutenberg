@@ -96,6 +96,4 @@ export function resolveAttributes( settings ) {
 	return settings;
 }
 
-export default function matchers() {
-	addFilter( 'blocks.registerBlockType', 'core/matchers', resolveAttributes );
-}
+addFilter( 'blocks.registerBlockType', 'core/matchers', resolveAttributes );

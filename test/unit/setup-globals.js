@@ -54,3 +54,6 @@ global.window.userSettings = { uid: 1 };
 
 // Mock jQuery
 global.window.jQuery = { holdReady() {} };
+
+// Bootstrap server-registered blocks
+global.window._wpBlocks = require( 'blocks/test/server-registered.json' );

@@ -331,7 +331,7 @@ export function isEqualTagAttributePairs( actual, expected ) {
 export const isEqualTokensOfType = {
 	StartTag: ( actual, expected ) => {
 		if ( actual.tagName !== expected.tagName ) {
-			log.warning( 'Expected tag name `%s`, instead saw `%s`.', actual.tagName, expected.tagName );
+			log.warning( 'Expected tag name `%s`, instead saw `%s`.', expected.tagName, actual.tagName );
 			return false;
 		}
 

@@ -182,6 +182,7 @@ class ParagraphBlock extends Component {
 							}
 							onMerge={ mergeBlocks }
 							onReplace={ onReplace }
+							onRemove={ () => onReplace( [] ) }
 							placeholder={ placeholder || __( 'Add text or type / to insert content' ) }
 							aria-autocomplete="list"
 							aria-expanded={ isExpanded }

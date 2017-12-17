@@ -32,7 +32,9 @@ registerBlockType( 'core/code', {
 		},
 	},
 
-	supportHTML: false,
+	supports: {
+		html: false,
+	},
 
 	transforms: {
 		from: [

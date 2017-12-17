@@ -532,6 +532,35 @@ function gutenberg_get_post_to_edit( $post_id ) {
 }
 
 /**
+ * Prepares server-registered blocks for JavaScript, returning an associative
+ * array of registered block data keyed by block name. Data includes properties
+ * of a block relevant for client registration.
+ *
+ * @return array An associative array of registered block data.
+ */
+function gutenberg_prepare_blocks_for_js() {
+	$block_registry = WP_Block_Type_Registry::get_instance();
+	$blocks         = array();
+	$keys_to_pick   = array( 'title', 'icon', 'category', 'keywords', 'supports', 'attributes' );
+
+	foreach ( $block_registry->get_all_registered() as $block_name => $block_type ) {
+		foreach ( $keys_to_pick as $key ) {
+			if ( ! isset( $block_type->{ $key } ) ) {
+				continue;
+			}
+
+			if ( ! isset( $blocks[ $block_name ] ) ) {
+				$blocks[ $block_name ] = array();
+			}
+
+			$blocks[ $block_name ][ $key ] = $block_type->{ $key };
+		}
+	}
+
+	return $blocks;
+}
+
+/**
  * Handles the enqueueing of block scripts and styles that are common to both
  * the editor and the front-end.
  *
@@ -614,7 +643,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	wp_enqueue_script(
 		'wp-editor',
 		gutenberg_url( 'editor/build/index.js' ),
-		array( 'wp-api', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element', 'wp-components', 'wp-utils', 'word-count', 'editor', 'heartbeat' ),
+		array( 'jquery', 'wp-api', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element', 'wp-components', 'wp-utils', 'word-count', 'editor', 'heartbeat' ),
 		filemtime( gutenberg_dir_path() . 'editor/build/index.js' ),
 		true // enqueue in the footer.
 	);
@@ -753,16 +782,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	);
 
 	// Preload server-registered block schemas.
-	$block_registry = WP_Block_Type_Registry::get_instance();
-	$schemas        = array();
-
-	foreach ( $block_registry->get_all_registered() as $block_name => $block_type ) {
-		if ( isset( $block_type->attributes ) ) {
-			$schemas[ $block_name ] = $block_type->attributes;
-		}
-	}
-
-	wp_localize_script( 'wp-blocks', '_wpBlocksAttributes', $schemas );
+	wp_localize_script( 'wp-blocks', '_wpBlocks', gutenberg_prepare_blocks_for_js() );
 
 	// Get admin url for handling meta boxes.
 	$meta_box_url = admin_url( 'post.php' );

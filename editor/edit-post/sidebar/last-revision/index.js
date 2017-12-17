@@ -6,12 +6,13 @@ import { PanelBody } from '@wordpress/components';
 /**
  * Internal dependencies
  */
+import './style.scss';
 import { PostLastRevision, PostLastRevisionCheck } from '../../../components';
 
 function LastRevision() {
 	return (
 		<PostLastRevisionCheck>
-			<PanelBody>
+			<PanelBody className="editor-last-revision__panel">
 				<PostLastRevision />
 			</PanelBody>
 		</PostLastRevisionCheck>

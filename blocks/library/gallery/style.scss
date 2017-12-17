@@ -1,3 +1,7 @@
+.wp-block-gallery:not( .components-placeholder ) {
+	margin: -8px;
+}
+
 .wp-block-gallery,
 .wp-block-gallery.alignleft,
 .wp-block-gallery.alignright,
@@ -6,7 +10,7 @@
 	flex-wrap: wrap;
 
 	.blocks-gallery-image {
-		margin: 0 16px 16px 0;
+		margin: 8px;
 		display: flex;
 		flex-grow: 1;
 		flex-direction: column;

@@ -281,43 +281,120 @@ describe( 'effects', () => {
 	} );
 
 	describe( '.REQUEST_POST_UPDATE_SUCCESS', () => {
+		const handler = effects.REQUEST_POST_UPDATE_SUCCESS;
+		let getDirtyMetaBoxesSpy, replaceStateSpy;
+
+		const defaultPost = {
+			id: 1,
+			title: {
+				raw: 'A History of Pork',
+			},
+			content: {
+				raw: '',
+			},
+		};
+		const getDraftPost = () => ( {
+			...defaultPost,
+			status: 'draft',
+		} );
+		const getPublishedPost = () => ( {
+			...defaultPost,
+			status: 'publish',
+		} );
+
 		beforeAll( () => {
-			selectors.getDirtyMetaBoxes = jest.spyOn( selectors, 'getDirtyMetaBoxes' );
-			window.history.replaceState = jest.spyOn( window.history, 'replaceState' );
+			getDirtyMetaBoxesSpy = jest.spyOn( selectors, 'getDirtyMetaBoxes' );
+			replaceStateSpy = jest.spyOn( window.history, 'replaceState' );
 		} );
 
 		beforeEach( () => {
-			selectors.getDirtyMetaBoxes.mockReset();
-			window.history.replaceState.mockReset();
+			getDirtyMetaBoxesSpy.mockReset();
+			getDirtyMetaBoxesSpy.mockReturnValue( [ 'normal', 'side' ] );
+			replaceStateSpy.mockReset();
 		} );
 
 		afterAll( () => {
-			selectors.getDirtyMetaBoxes.mockRestore();
-			window.history.replaceState.mockRestore();
+			getDirtyMetaBoxesSpy.mockRestore();
+			replaceStateSpy.mockRestore();
 		} );
 
-		const handler = effects.REQUEST_POST_UPDATE_SUCCESS;
-		const dispatch = jest.fn();
-		const store = { getState: () => {}, dispatch };
+		it( 'should dispatch meta box updates on success for dirty meta boxes', () => {
+			const dispatch = jest.fn();
+			const store = { getState: () => {}, dispatch };
 
-		it( 'should dispatch meta box updates on success for dirty meta boxes.', () => {
-			selectors.getDirtyMetaBoxes.mockReturnValue( [ 'normal', 'side' ] );
-
-			const post = {
-				id: 1,
-				title: {
-					raw: 'A History of Pork',
-				},
-				content: {
-					raw: '',
-				},
-				status: 'draft',
-			};
+			const post = getDraftPost();
 
 			handler( { post: post, previousPost: post }, store );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( requestMetaBoxUpdates( [ 'normal', 'side' ] ) );
+		} );
+
+		it( 'should dispatch notices when publishing or scheduling a post', () => {
+			const dispatch = jest.fn();
+			const store = { getState: () => {}, dispatch };
+
+			const previousPost = getDraftPost();
+			const post = getPublishedPost();
+
+			handler( { post, previousPost }, store );
+
+			expect( dispatch ).toHaveBeenCalledTimes( 2 );
+			expect( dispatch ).toHaveBeenCalledWith( expect.objectContaining( {
+				notice: {
+					content: <p><span>Post published!</span> <a>View post</a></p>, // eslint-disable-line jsx-a11y/anchor-is-valid
+					id: 'SAVE_POST_NOTICE_ID',
+					isDismissible: true,
+					status: 'success',
+				},
+				type: 'CREATE_NOTICE',
+			} ) );
+		} );
+
+		it( 'should dispatch notices when reverting a published post to a draft', () => {
+			const dispatch = jest.fn();
+			const store = { getState: () => {}, dispatch };
+
+			const previousPost = getPublishedPost();
+			const post = getDraftPost();
+
+			handler( { post, previousPost }, store );
+
+			expect( dispatch ).toHaveBeenCalledTimes( 2 );
+			expect( dispatch ).toHaveBeenCalledWith( expect.objectContaining( {
+				notice: {
+					content: <p>
+						<span>Post reverted to draft.</span>
+						{ ' ' }
+						{ false }
+					</p>,
+					id: 'SAVE_POST_NOTICE_ID',
+					isDismissible: true,
+					status: 'success',
+				},
+				type: 'CREATE_NOTICE',
+			} ) );
+		} );
+
+		it( 'should dispatch notices when just updating a published post again', () => {
+			const dispatch = jest.fn();
+			const store = { getState: () => {}, dispatch };
+
+			const previousPost = getPublishedPost();
+			const post = getPublishedPost();
+
+			handler( { post, previousPost }, store );
+
+			expect( dispatch ).toHaveBeenCalledTimes( 2 );
+			expect( dispatch ).toHaveBeenCalledWith( expect.objectContaining( {
+				notice: {
+					content: <p><span>Post updated!</span>{ ' ' }<a>{ 'View post' }</a></p>, // eslint-disable-line jsx-a11y/anchor-is-valid
+					id: 'SAVE_POST_NOTICE_ID',
+					isDismissible: true,
+					status: 'success',
+				},
+				type: 'CREATE_NOTICE',
+			} ) );
 		} );
 	} );
 

@@ -55,11 +55,10 @@ registerBlockType( 'core/shortcode', {
 		],
 	},
 
-	supportHTML: false,
-
 	supports: {
 		customClassName: false,
 		className: false,
+		html: false,
 	},
 
 	edit: withInstanceId(

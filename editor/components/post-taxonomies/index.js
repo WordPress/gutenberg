@@ -2,7 +2,7 @@
  * External Dependencies
  */
 import { connect } from 'react-redux';
-import { filter } from 'lodash';
+import { filter, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -18,8 +18,8 @@ import HierarchicalTermSelector from './hierarchical-term-selector';
 import FlatTermSelector from './flat-term-selector';
 import { getCurrentPostType } from '../../selectors';
 
-function PostTaxonomies( { postType, taxonomies } ) {
-	const availableTaxonomies = filter( taxonomies.data, ( taxonomy ) => taxonomy.types.indexOf( postType ) !== -1 );
+export function PostTaxonomies( { postType, taxonomies } ) {
+	const availableTaxonomies = filter( taxonomies.data, ( taxonomy ) => includes( taxonomy.types, postType ) );
 
 	return (
 		<div>

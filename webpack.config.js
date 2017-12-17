@@ -64,6 +64,7 @@ const externals = {
 	'react-dom/server': 'ReactDOMServer',
 	tinymce: 'tinymce',
 	moment: 'moment',
+	jquery: 'jQuery',
 };
 
 [ ...entryPointNames, ...packageNames ].forEach( name => {

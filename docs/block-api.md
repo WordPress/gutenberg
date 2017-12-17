@@ -140,16 +140,11 @@ customClassName: false,
 className: false,
 ```
 
-#### supportHTML (optional)
-
-* **Type:** `Bool`
-* **Default:** `true`
-
-Whether a block can be edited in HTML mode.
+- `html` (default `true`): By default, Gutenberg will allow a block's markup to be edited individually. To disable this behavior, set `html` to `false`.
 
 ```js
 // Remove support for an HTML mode.
-supportHTML: false,
+html: false,
 ```
 
 ## Edit and Save

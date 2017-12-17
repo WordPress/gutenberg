@@ -61,10 +61,18 @@
 		right: 6px;
 	}
 
+	&.is-reusable.is-selected > .editor-block-mover:before {
+		border-right: none;
+	}
+
 	&.is-selected > .editor-block-settings-menu:before,
 	&.is-hovered > .editor-block-settings-menu:before {
 		border-left: 1px solid $light-gray-500;
 		left: 6px;
+	}
+
+	&.is-reusable.is-selected > .editor-block-settings-menu:before {
+		border-left: none;
 	}
 
 	// focused block-style
