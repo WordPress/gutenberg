@@ -9,3 +9,5 @@ export const BREAK_LARGE = parseInt( breakpointsScssVariables.breakLarge );
 export const BREAK_MEDIUM = parseInt( breakpointsScssVariables.breakMedium );
 export const BREAK_SMALL = parseInt( breakpointsScssVariables.breakSmall );
 export const BREAK_MOBILE = parseInt( breakpointsScssVariables.breakMobile );
+export const DRAGGABLE_BLOCK = 'DRAGGABLE_BLOCK';
+export const DRAGGABLE_IMAGE = 'DRAGGABLE_IMAGE';
