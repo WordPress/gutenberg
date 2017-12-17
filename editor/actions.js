@@ -613,3 +613,25 @@ export function appendDefaultBlock() {
 		type: 'APPEND_DEFAULT_BLOCK',
 	};
 }
+
+/**
+ * @todo :clk:doc
+ * [startReordering description]
+ * @return {[type]} [description]
+ */
+export function startReordering( ) {
+	return {
+		type: 'START_DRAG_AND_DROP'
+	};
+}
+
+/**
+ * @todo :clk:doc
+ * [stopReordering description]
+ * @return {[type]} [description]
+ */
+export function stopReordering( ) {
+	return {
+		type: 'STOP_DRAG_AND_DROP'
+	};
+}

@@ -814,6 +814,23 @@ export const reusableBlocks = combineReducers( {
 	},
 } );
 
+/**
+ * @todo :clk:doc
+ * Reducer returning drag and drop in progress status.
+ * @return {Boolean}        Updated state
+ */
+export function isReorderingInProgress( state = false, action ) {
+	switch ( action.type ) {
+		case 'START_DRAG_AND_DROP':
+			return true;
+
+		case 'STOP_DRAG_AND_DROP':
+			return false;
+	}
+
+	return state;
+}
+
 export default optimist( combineReducers( {
 	editor,
 	currentPost,
@@ -829,4 +846,5 @@ export default optimist( combineReducers( {
 	metaBoxes,
 	browser,
 	reusableBlocks,
+	isReorderingInProgress,
 } ) );

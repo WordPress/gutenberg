@@ -1147,3 +1147,12 @@ export function isPublishingPost( state ) {
 	// considered published
 	return !! stateBeforeRequest && ! isCurrentPostPublished( stateBeforeRequest );
 }
+
+/**
+ * @todo :clk:doc
+ * @param  {[type]}  state [description]
+ * @return {Boolean}       [description]
+ */
+export function isReorderingInProgress( state ) {
+	return state.isReorderingInProgress;
+}
