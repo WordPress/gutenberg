@@ -6,7 +6,7 @@
 export function getCategories() {
 	const categoriesCollection = new wp.api.collections.Categories();
 
-	const categories = categoriesCollection.fetch();
+	const categories = categoriesCollection.fetch( { data: { per_page: 100 } } );
 
 	return categories;
 }
