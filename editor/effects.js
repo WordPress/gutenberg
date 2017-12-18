@@ -76,7 +76,11 @@ export default {
 		} );
 		dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
 		const Model = wp.api.getPostTypeModel( getCurrentPostType( state ) );
-		new Model( toSend ).save().done( ( newPost ) => {
+		const newModel = new Model( toSend );
+
+		// Tag the autosave action to avoid creating revisions.
+		newModel.url = newModel.url() + '?gutenberg_autosave=' + ( action.options && action.options.autosave ? '1' : '' );
+		newModel.save().done( ( newPost ) => {
 			dispatch( {
 				type: 'RESET_POST',
 				post: newPost,
@@ -278,7 +282,7 @@ export default {
 			dispatch( editPost( { status: 'draft' } ) );
 		}
 
-		dispatch( savePost() );
+		dispatch( savePost( { 'autosave': 1 } ) );
 	},
 	SETUP_EDITOR( action ) {
 		const { post, settings } = action;
