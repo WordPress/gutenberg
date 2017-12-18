@@ -43,16 +43,9 @@ function BlockDropZone( { index, isLocked, isReorderingInProgress, ...props } ) 
 		}
 	};
 
-	// do not mount the dropzone if a reordering operation via drag & drop is in progress
-	// otherwise one of the two (react-dnd,or dropzones) will take precedence
-	if ( isReorderingInProgress ) {
-		return null;
-	}
-
 	return (
 		<DropZone
 			onFilesDrop={ dropFiles }
-			isReorderingInProgress={ isReorderingInProgress }
 		/>
 	);
 }

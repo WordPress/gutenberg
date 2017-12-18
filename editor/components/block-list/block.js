@@ -353,7 +353,7 @@ export class BlockListBlock extends Component {
 	}
 
 	render() {
-		const { block, order, mode, showContextualToolbar, isLocked } = this.props;
+		const { block, order, mode, showContextualToolbar, isLocked, isReorderingInProgress } = this.props;
 		const { name: blockName, isValid } = block;
 		const blockType = getBlockType( blockName );
 		// translators: %s: Type of block (i.e. Text, Image etc)
@@ -425,14 +425,7 @@ export class BlockListBlock extends Component {
 					</DragAndDropTarget>
 				}
 
-
-
-				{ false && ! this.props.isReorderingInProgress &&
-					<BlockDropZone index={ order } isReorderingInProgress={ this.props.isReorderingInProgress } />
-				}
-
-				{ true && <BlockDropZone index={ order } isReorderingInProgress={ this.props.isReorderingInProgress } /> }
-
+				{ ! this.props.isReorderingInProgress && <BlockDropZone index={ order } /> }
 
 				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
 				{ ( showUI || isHovered ) && <BlockSettingsMenu uids={ [ block.uid ] } /> }
@@ -483,6 +476,7 @@ export class BlockListBlock extends Component {
 					</BlockCrashBoundary>
 				</div>
 				{ !! error && <BlockCrashWarning /> }
+
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */

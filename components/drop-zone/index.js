@@ -61,7 +61,7 @@ class DropZone extends Component {
 	}
 
 	render() {
-		const { className, label, isReorderingInProgress } = this.props;
+		const { className, label } = this.props;
 		const { isDraggingOverDocument, isDraggingOverElement, position } = this.state;
 		const classes = classnames( 'components-drop-zone', className, {
 			'is-active': isDraggingOverDocument || isDraggingOverElement,
@@ -71,7 +71,6 @@ class DropZone extends Component {
 			'is-close-to-bottom': position && position.y === 'bottom',
 			'is-close-to-left': position && position.x === 'left',
 			'is-close-to-right': position && position.x === 'right',
-			'is-reordering-in-progress': isReorderingInProgress,
 		} );
 
 		return (
