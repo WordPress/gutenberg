@@ -8,7 +8,9 @@
             "displayPostDate": false,
             "layout": "list",
             "columns": 3,
-            "align": "center"
+            "align": "center",
+            "order": "desc",
+            "orderBy": "date"
         },
         "originalContent": ""
     }

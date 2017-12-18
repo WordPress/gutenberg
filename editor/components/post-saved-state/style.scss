@@ -10,17 +10,7 @@
 	}
 
 	.wp-core-ui &.button-link {
-		text-decoration: underline;
-		color: $blue-wordpress;
-		margin-right: $item-spacing;	// needs specificity to override core CSS bleed
-
-		&:focus {
-			outline: none;
-		}
-
-		&:hover {
-			color: $blue-medium-500;
-		}
+		margin-right: $item-spacing;
 	}
 }
 

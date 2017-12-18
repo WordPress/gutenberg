@@ -2,12 +2,13 @@
  * External Dependencies
  */
 import { connect } from 'react-redux';
-import { flowRight, filter } from 'lodash';
+import { filter, includes } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { withAPIData } from '@wordpress/components';
+import { compose } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -17,8 +18,8 @@ import HierarchicalTermSelector from './hierarchical-term-selector';
 import FlatTermSelector from './flat-term-selector';
 import { getCurrentPostType } from '../../selectors';
 
-function PostTaxonomies( { postType, taxonomies } ) {
-	const availableTaxonomies = filter( taxonomies.data, ( taxonomy ) => taxonomy.types.indexOf( postType ) !== -1 );
+export function PostTaxonomies( { postType, taxonomies } ) {
+	const availableTaxonomies = filter( taxonomies.data, ( taxonomy ) => includes( taxonomy.types, postType ) );
 
 	return (
 		<div>
@@ -49,7 +50,7 @@ const applyWithAPIData = withAPIData( () => ( {
 	taxonomies: '/wp/v2/taxonomies?context=edit',
 } ) );
 
-export default flowRight( [
+export default compose( [
 	applyConnect,
 	applyWithAPIData,
 ] )( PostTaxonomies );

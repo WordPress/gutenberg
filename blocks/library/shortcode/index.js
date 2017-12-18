@@ -39,7 +39,10 @@ registerBlockType( 'core/shortcode', {
 				// letters, but numbers and underscores should work fine too.
 				// Be wary of using hyphens (dashes), you'll be better off not
 				// using them." in https://codex.wordpress.org/Shortcode_API
-				tag: '[a-z0-9_-]+',
+				// Require that the first character be a letter. This notably
+				// prevents footnote markings ([1]) from being caught as
+				// shortcodes.
+				tag: '[a-z][a-z0-9_-]*',
 				attributes: {
 					text: {
 						type: 'string',
@@ -52,11 +55,10 @@ registerBlockType( 'core/shortcode', {
 		],
 	},
 
-	supportHTML: false,
-
 	supports: {
 		customClassName: false,
 		className: false,
+		html: false,
 	},
 
 	edit: withInstanceId(

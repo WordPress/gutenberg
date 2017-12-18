@@ -1,10 +1,14 @@
 /**
+ * WordPress dependencies
+ */
+import { withFilters } from '@wordpress/components';
+
+/**
  * Internal dependencies
  */
-import { applyFilters } from '../hooks';
 import { getBlockType } from '../api';
 
-function BlockEdit( props ) {
+export function BlockEdit( props ) {
 	const { name, ...editProps } = props;
 	const blockType = getBlockType( name );
 
@@ -17,7 +21,7 @@ function BlockEdit( props ) {
 	// them preferencially as the render value for the block.
 	const Edit = blockType.edit || blockType.save;
 
-	return applyFilters( 'BlockEdit', <Edit key="edit" { ...editProps } />, props );
+	return <Edit { ...editProps } />;
 }
 
-export default BlockEdit;
+export default withFilters( 'blocks.BlockEdit' )( BlockEdit );

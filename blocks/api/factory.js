@@ -8,8 +8,13 @@ import {
 	reduce,
 	castArray,
 	findIndex,
+	includes,
 	isObjectLike,
+	filter,
 	find,
+	first,
+	flatMap,
+	uniqueId,
 } from 'lodash';
 
 /**
@@ -20,7 +25,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { getBlockType } from './registration';
+import { getBlockType, getBlockTypes } from './registration';
 
 /**
  * Returns a block object given its type and attributes.
@@ -57,6 +62,81 @@ export function createBlock( name, blockAttributes = {} ) {
 }
 
 /**
+ * Returns a predicate that receives a transformation and returns true if the given
+ * transformation is able to execute in the situation specified in the params
+ *
+ * @param  {String}    sourceName    Block name
+ * @param  {Boolean}   isMultiBlock  Array of possible block transformations
+ * @return {Function}                Predicate that receives a block type.
+ */
+const isTransformForBlockSource = ( sourceName, isMultiBlock = false ) => ( transform ) => (
+	transform.type === 'block' &&
+	transform.blocks.indexOf( sourceName ) !== -1 &&
+	( ! isMultiBlock || transform.isMultiBlock )
+);
+
+/**
+ * Returns a predicate that receives a block type and returns true if the given block type contains a
+ * transformation able to execute in the situation specified in the params
+ *
+ * @param  {String}    sourceName    Block name
+ * @param  {Boolean}   isMultiBlock  Array of possible block transformations
+ * @return {Function}                Predicate that receives a block type.
+ */
+const createIsTypeTransformableFrom = ( sourceName, isMultiBlock = false ) => ( type ) => (
+	!! find(
+		get( type, 'transforms.from', [] ),
+		isTransformForBlockSource( sourceName, isMultiBlock ),
+	)
+);
+
+/**
+ * Returns an array of possible block transformations that could happen on the set of blocks received as argument.
+ *
+ * @param  {Array}  blocks Blocks array
+ * @return {Array}         Array of possible block transformations
+ */
+export function getPossibleBlockTransformations( blocks ) {
+	const sourceBlock = first( blocks );
+	if ( ! blocks || ! sourceBlock ) {
+		return [];
+	}
+	const isMultiBlock = blocks.length > 1;
+	const sourceBlockName = sourceBlock.name;
+
+	if ( isMultiBlock && ! every( blocks, { name: sourceBlockName } ) ) {
+		return [];
+	}
+
+	//compute the block that have a from transformation able to transfer blocks passed as argument.
+	const blocksToBeTransformedFrom = filter(
+		getBlockTypes(),
+		createIsTypeTransformableFrom( sourceBlockName, isMultiBlock ),
+	).map( type => type.name );
+
+	const blockType = getBlockType( sourceBlockName );
+	const transformsTo = get( blockType, 'transforms.to', [] );
+
+	//computes a list of blocks that source block can be transformed into using the "to transformations" implemented in it.
+	const blocksToBeTransformedTo = flatMap(
+		isMultiBlock ? filter( transformsTo, 'isMultiBlock' ) : transformsTo,
+		transformation => transformation.blocks
+	);
+
+	//returns a unique list of blocks that blocks passed as argument can transform into
+	return reduce( [
+		...blocksToBeTransformedFrom,
+		...blocksToBeTransformedTo,
+	], ( result, name ) => {
+		const transformBlockType = getBlockType( name );
+		if ( transformBlockType && ! includes( result, transformBlockType ) ) {
+			result.push( transformBlockType );
+		}
+		return result;
+	}, [] );
+}
+
+/**
  * Switch one or more blocks into one or more blocks of the new block type.
  *
  * @param  {Array|Object}  blocks     Blocks array or block object
@@ -66,8 +146,8 @@ export function createBlock( name, blockAttributes = {} ) {
 export function switchToBlockType( blocks, name ) {
 	const blocksArray = castArray( blocks );
 	const isMultiBlock = blocksArray.length > 1;
-	const fistBlock = blocksArray[ 0 ];
-	const sourceName = fistBlock.name;
+	const firstBlock = blocksArray[ 0 ];
+	const sourceName = firstBlock.name;
 
 	if ( isMultiBlock && ! every( blocksArray, ( block ) => ( block.name === sourceName ) ) ) {
 		return null;
@@ -98,7 +178,7 @@ export function switchToBlockType( blocks, name ) {
 	if ( transformation.isMultiBlock ) {
 		transformationResults = transformation.transform( blocksArray.map( ( currentBlock ) => currentBlock.attributes ) );
 	} else {
-		transformationResults = transformation.transform( fistBlock.attributes );
+		transformationResults = transformation.transform( firstBlock.attributes );
 	}
 
 	// Ensure that the transformation function returned an object or an array
@@ -129,7 +209,7 @@ export function switchToBlockType( blocks, name ) {
 		...result,
 		// The first transformed block whose type matches the "destination"
 		// type gets to keep the existing UID of the first block.
-		uid: index === firstSwitchedBlock ? fistBlock.uid : result.uid,
+		uid: index === firstSwitchedBlock ? firstBlock.uid : result.uid,
 	} ) );
 }
 
@@ -142,7 +222,7 @@ export function switchToBlockType( blocks, name ) {
  */
 export function createReusableBlock( type, attributes ) {
 	return {
-		id: uuid(), // Temorary id replaced when the block is saved server side
+		id: +uniqueId(), // Temorary id replaced when the block is saved server side
 		isTemporary: true,
 		name: __( 'Untitled block' ),
 		type,

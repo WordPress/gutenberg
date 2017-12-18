@@ -90,7 +90,7 @@ function getScrollContainer( node ) {
 	return getScrollContainer( node.parentNode );
 }
 
-class BlockListBlock extends Component {
+export class BlockListBlock extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -409,7 +409,7 @@ class BlockListBlock extends Component {
 					onMouseDown={ this.onPointerDown }
 					onKeyDown={ this.onKeyDown }
 					onFocus={ this.onFocus }
-					className="editor-block-list__block-edit"
+					className={ BlockListBlock.className }
 					tabIndex="0"
 					aria-label={ blockLabel }
 				>
@@ -532,8 +532,9 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 	},
 } );
 
+BlockListBlock.className = 'editor-block-list__block-edit';
+
 export default compose(
-	withFilters( 'Editor.BlockItem' ),
 	connect( mapStateToProps, mapDispatchToProps ),
 	withContext( 'editor' )( ( settings ) => {
 		const { templateLock } = settings;
@@ -542,4 +543,5 @@ export default compose(
 			isLocked: !! templateLock,
 		};
 	} ),
+	withFilters( 'editor.BlockListBlock' ),
 )( BlockListBlock );

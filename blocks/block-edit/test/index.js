@@ -7,7 +7,7 @@ import { noop } from 'lodash';
 /**
  * Internal dependencies
  */
-import BlockEdit from '../';
+import { BlockEdit } from '../';
 import {
 	registerBlockType,
 	unregisterBlockType,

@@ -208,20 +208,27 @@ class Popover extends Component {
 	}
 
 	setForcedPositions() {
+		const anchor = this.getAnchorRect();
 		const rect = this.nodes.content.getBoundingClientRect();
 
-		// Check exceeding top or bottom of viewport
-		if ( rect.top < 0 ) {
-			this.setState( { forcedYAxis: 'bottom' } );
-		} else if ( rect.bottom > window.innerHeight ) {
-			this.setState( { forcedYAxis: 'top' } );
+		// Check exceeding top or bottom of viewport and switch direction if the space is begger
+		if ( rect.top < 0 || rect.bottom > window.innerHeight ) {
+			const overflowBottom = window.innerHeight - ( anchor.bottom + rect.height );
+			const overflowTop = anchor.top - rect.height;
+			const direction = overflowTop < overflowBottom ? 'bottom' : 'top';
+			if ( direction !== this.state.forcedYAxis ) {
+				this.setState( { forcedYAxis: direction } );
+			}
 		}
 
-		// Check exceeding left or right of viewport
-		if ( rect.left < 0 ) {
-			this.setState( { forcedXAxis: 'right' } );
-		} else if ( rect.right > window.innerWidth ) {
-			this.setState( { forcedXAxis: 'left' } );
+		// Check exceeding left or right of viewport and switch direction if the space is begger
+		if ( rect.left < 0 || rect.right > window.innerWidth ) {
+			const overflowLeft = anchor.left - rect.width;
+			const overflowRight = window.innerWidth - ( anchor.right + rect.width );
+			const direction = overflowLeft < overflowRight ? 'right' : 'left';
+			if ( direction !== this.state.forcedXAxis ) {
+				this.setState( { forcedXAxis: direction } );
+			}
 		}
 	}
 

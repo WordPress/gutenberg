@@ -6,34 +6,23 @@ import { noop } from 'lodash';
 /**
  * External dependencies
  */
-import { createHooks } from '@wordpress/hooks';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
  */
-import generatedClassName from '../generated-class-name';
+import '../generated-class-name';
 
 describe( 'generated className', () => {
-	const hooks = createHooks();
-
-	let blockSettings;
-	beforeEach( () => {
-		generatedClassName( hooks );
-
-		blockSettings = {
-			name: 'chicken/ribs',
-			save: noop,
-			category: 'common',
-			title: 'block title',
-		};
-	} );
-
-	afterEach( () => {
-		hooks.removeAllFilters( 'getSaveContent.extraProps' );
-	} );
+	const blockSettings = {
+		name: 'chicken/ribs',
+		save: noop,
+		category: 'common',
+		title: 'block title',
+	};
 
 	describe( 'addSaveProps', () => {
-		const addSaveProps = hooks.applyFilters.bind( null, 'getSaveContent.extraProps' );
+		const addSaveProps = applyFilters.bind( null, 'blocks.getSaveContent.extraProps' );
 
 		it( 'should do nothing if the block settings do not define generated className support', () => {
 			const attributes = { className: 'foo' };

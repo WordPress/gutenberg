@@ -64,6 +64,7 @@ const externals = {
 	'react-dom/server': 'ReactDOMServer',
 	tinymce: 'tinymce',
 	moment: 'moment',
+	jquery: 'jQuery',
 };
 
 [ ...entryPointNames, ...packageNames ].forEach( name => {
@@ -140,6 +141,9 @@ const config = {
 		// Create RTL files with a -rtl suffix
 		new WebpackRTLPlugin( {
 			suffix: '-rtl',
+			minify: {
+				safe: true,
+			},
 		} ),
 		new webpack.LoaderOptionsPlugin( {
 			minimize: process.env.NODE_ENV === 'production',

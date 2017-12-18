@@ -13,8 +13,12 @@
  * @return string Rendered HTML of the referenced block.
  */
 function gutenberg_render_block_core_reusable_block( $attributes ) {
+	if ( empty( $attributes['ref'] ) ) {
+		return '';
+	}
+
 	$reusable_block = get_post( $attributes['ref'] );
-	if ( ! $reusable_block ) {
+	if ( ! $reusable_block || 'wp_block' !== $reusable_block->post_type ) {
 		return '';
 	}
 
@@ -31,7 +35,7 @@ function gutenberg_render_block_core_reusable_block( $attributes ) {
 register_block_type( 'core/block', array(
 	'attributes'      => array(
 		'ref' => array(
-			'type' => 'string',
+			'type' => 'number',
 		),
 	),
 

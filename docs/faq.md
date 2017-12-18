@@ -12,11 +12,11 @@ Key takeaways include the following points:
 - By embracing blocks as an interaction paradigm, we can unify multiple different interfaces into one. Instead of learning how to write shortcodes and custom HTML, or pasting URLs to embed media, there's a common, reliable flow for inserting any kind of content.
 - "Mystery meat" refers to hidden features in software, features that you have to discover. WordPress already supports a large number of blocks and 30+ embeds, so let's surface them.
 
-Gutenberg is being developed on <a href="https://github.com/WordPress/gutenberg">GitHub</a> under the WordPress organization, and you can try <a href="https://wordpress.org/plugins/gutenberg/">a beta version today—it's available in the plugin repository</a>. It's important to keep in mind that Gutenberg is not yet fully functional, feature complete, or production ready. But we'd love your help to make that a reality.
+Gutenberg is being developed on [GitHub](https://github.com/WordPress/gutenberg) under the WordPress organization, and you can try [a beta version today—it's available in the plugin repository](https://wordpress.org/plugins/gutenberg/). It's important to keep in mind that Gutenberg is not yet fully functional, feature complete, or production ready. But we'd love your help to make that a reality.
 
 ## When will Gutenberg be merged into WordPress?
 
-We are hoping that Gutenberg will be sufficiently polished, tested, iterated, and proven enough to be <a href="https://ma.tt/2017/06/4-8-and-whats-coming/">merged into WordPress 5.0</a>, with an estimated release date of 2018.
+We are hoping that Gutenberg will be sufficiently polished, tested, iterated, and proven enough to be [merged into WordPress 5.0](https://ma.tt/2017/06/4-8-and-whats-coming/), with an estimated release date of 2018.
 
 The editor focus started in early 2017 with the first three months spent designing, planning, prototyping, and testing prototypes, to help us inform how to approach this project. The actual plugin, which you can install from the repository, was launched during WordCamp Europe in June.
 
@@ -57,15 +57,15 @@ The API for creating blocks is a crucial aspect of the project. We are working o
 
 No, we are designing Gutenberg primarily as a replacement for the post and page editing screens. That said, front-end editing is often confused with an editor that looks exactly like the front end. And that is something that Gutenberg will allow as themes customize individual blocks and provide those styles to the editor. Since content is designed to be distributed across so many different experiences—from desktop and mobile to full-text feeds and syndicated article platforms—we believe it's not ideal to create or design posts from just one front-end experience.
 
-## Given Gutenberg is built in JavaScript, how will old metaboxes (PHP) work?
+## Given Gutenberg is built in JavaScript, how will old meta boxes (PHP) work?
 
-We plan to continue supporting existing metaboxes while providing new ways to extend the interface.
+We plan to continue supporting existing meta boxes while providing new ways to extend the interface.
 
-*See:* https://github.com/WordPress/gutenberg/pull/2804
+*See:* [Pull request #2804](https://github.com/WordPress/gutenberg/pull/2804)
 
 ## How can plugins extend the Gutenberg UI?
 
-The main extension point we want to emphasize is creating new blocks. We are still working on how to extend the rest of the UI that is built in JS. We are tracking it here: https://github.com/WordPress/gutenberg/issues/1352
+The main extension point we want to emphasize is creating new blocks. We are still working on how to extend the rest of the UI that is built in JS. We are tracking it here: [Issue #1352](https://github.com/WordPress/gutenberg/issues/1352)
 
 ## Will Custom Post Types be supported?
 
@@ -75,13 +75,13 @@ Indeed. There are multiple ways in which custom post types can leverage Gutenber
 
 Our primary goal is on a solid block foundation before exploring column support.
 
-*See:* https://github.com/WordPress/gutenberg/issues/219
+*See:* [Issue #219](https://github.com/WordPress/gutenberg/issues/219)
 
 ## Will there be nested blocks?
 
 We are currently implementing the infrastructure for nested blocks support. We expect this to open further customization opportunities. Block authors also can nest components and HTML inside of a block during construction. The UI for manipulating nested blocks is still being refined, and depending on the timing, it might not be included in the first version of Gutenberg.
 
-See also https://github.com/WordPress/gutenberg/issues/428
+See also [Issue #428](https://github.com/WordPress/gutenberg/issues/428)
 
 ## Will drag and drop be used for rearranging blocks?
 
@@ -146,15 +146,15 @@ If you would like to contribute to the accessibility of Gutenberg, we can always
 
 ## Are there any design resources for Gutenberg?
 
-Yes, primarily https://wordpress.org/gutenberg/handbook/reference/design-principles/
+Yes, primarily in [design principles](https://wordpress.org/gutenberg/handbook/reference/design-principles/)
 
 We are still adding more documentation.
 
 ## How is data stored? I've seen HTML comments, what is their purpose?
 
-Our approach—as outlined in <a href="https://make.wordpress.org/core/2017/01/17/editor-technical-overview/">the technical overview introduction</a>—is to augment the existing data format in a way that doesn’t break the decade-and-a-half-fabric of content WordPress provides. In other terms, this optimizes for a format that prioritizes human readability (the HTML document of the web) and easy-to-render-anywhere over a machine convenient file (JSON in post-meta) that benefits the editing context primarily.
+Our approach—as outlined in [the technical overview introduction](https://make.wordpress.org/core/2017/01/17/editor-technical-overview/)—is to augment the existing data format in a way that doesn’t break the decade-and-a-half-fabric of content WordPress provides. In other terms, this optimizes for a format that prioritizes human readability (the HTML document of the web) and easy-to-render-anywhere over a machine convenient file (JSON in post-meta) that benefits the editing context primarily.
 
-This also <a href="https://github.com/WordPress/gutenberg/issues/1516">gives us the flexibility</a> to store those blocks that are inherently separate from the content stream (reusable pieces like widgets or small post type elements) elsewhere, and just keep token references for their placement.
+This also [gives us the flexibility](https://github.com/WordPress/gutenberg/issues/1516) to store those blocks that are inherently separate from the content stream (reusable pieces like widgets or small post type elements) elsewhere, and just keep token references for their placement.
 
 We suggest you look at the [language of Gutenberg](../language/) to learn more about how this aspect of the project works.
 
@@ -184,4 +184,4 @@ With the editor, we lay the foundation for bigger things when it comes to page b
 A lot of features are planned, too many to list. But a rough roadmap is: v1) post and page editor v2) page template editor, v3) site builder.
 
 ## WordPress is already the world's most popular publishing platform. Why change the editor at all?
-As an open-source project, we believe that it is critical for WordPress to continue to innovate and keep working to make the core experience intuitive and enjoyable for all users. As a community project, Gutenberg has the potential to do just that, and we're excited to pursue this goal together. If you'd like to test, contribute, or offer feedback, <a href="http://wordpressdotorg.polldaddy.com/s/gutenberg-support">we welcome it here</a>.
+As an open-source project, we believe that it is critical for WordPress to continue to innovate and keep working to make the core experience intuitive and enjoyable for all users. As a community project, Gutenberg has the potential to do just that, and we're excited to pursue this goal together. If you'd like to test, contribute, or offer feedback, [we welcome it here](http://wordpressdotorg.polldaddy.com/s/gutenberg-support).

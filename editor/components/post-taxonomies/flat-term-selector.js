@@ -150,9 +150,9 @@ class FlatTermSelector extends Component {
 		const termNames = availableTerms.map( ( term ) => term.name );
 
 		const newTermPlaceholderLabel = slug === 'post_tag' ? __( 'Add New Tag' ) : __( 'Add New Term' );
-		const termAddedLabel = slug === 'post_tag' ? __( 'Tag added.' ) : __( 'Term added.' );
-		const termRemovedLabel = slug === 'post_tag' ? __( 'Tag removed.' ) : __( 'Term removed.' );
-		const removeTermLabel = slug === 'post_tag' ? __( 'Remove Tag: %s.' ) : __( 'Remove Term: %s.' );
+		const termAddedLabel = slug === 'post_tag' ? __( 'Tag added' ) : __( 'Term added' );
+		const termRemovedLabel = slug === 'post_tag' ? __( 'Tag removed' ) : __( 'Term removed' );
+		const removeTermLabel = slug === 'post_tag' ? __( 'Remove Tag: %s' ) : __( 'Remove Term: %s' );
 
 		return (
 			<div className="editor-post-taxonomies__flat-terms-selector">
@@ -191,4 +191,3 @@ export default connect(
 		};
 	}
 )( FlatTermSelector );
-

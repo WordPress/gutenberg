@@ -107,7 +107,7 @@ describe( 'InserterMenu', () => {
 		expect( activeCategory.text() ).toBe( 'Recent' );
 
 		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
-		expect( visibleBlocks.length ).toBe( 0 );
+		expect( visibleBlocks ).toHaveLength( 0 );
 	} );
 
 	it( 'should show no blocks if all block types disabled', () => {
@@ -125,7 +125,7 @@ describe( 'InserterMenu', () => {
 		);
 
 		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
-		expect( visibleBlocks.length ).toBe( 0 );
+		expect( visibleBlocks ).toHaveLength( 0 );
 	} );
 
 	it( 'should show filtered block types', () => {
@@ -143,7 +143,7 @@ describe( 'InserterMenu', () => {
 		);
 
 		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
-		expect( visibleBlocks.length ).toBe( 1 );
+		expect( visibleBlocks ).toHaveLength( 1 );
 		expect( visibleBlocks.at( 0 ).text() ).toBe( 'Text' );
 	} );
 
@@ -170,7 +170,7 @@ describe( 'InserterMenu', () => {
 		);
 
 		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
-		expect( visibleBlocks.length ).toBe( 3 );
+		expect( visibleBlocks ).toHaveLength( 3 );
 		expect( visibleBlocks.at( 0 ).childAt( 0 ).name() ).toBe( 'BlockIcon' );
 		expect( visibleBlocks.at( 0 ).text() ).toBe( 'Advanced Text' );
 	} );
@@ -196,7 +196,7 @@ describe( 'InserterMenu', () => {
 		expect( activeCategory.text() ).toBe( 'Embeds' );
 
 		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
-		expect( visibleBlocks.length ).toBe( 2 );
+		expect( visibleBlocks ).toHaveLength( 2 );
 		expect( visibleBlocks.at( 0 ).text() ).toBe( 'YouTube' );
 		expect( visibleBlocks.at( 1 ).text() ).toBe( 'A Text Embed' );
 	} );
@@ -222,7 +222,7 @@ describe( 'InserterMenu', () => {
 		expect( activeCategory.text() ).toBe( 'Blocks' );
 
 		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
-		expect( visibleBlocks.length ).toBe( 4 );
+		expect( visibleBlocks ).toHaveLength( 4 );
 		expect( visibleBlocks.at( 0 ).text() ).toBe( 'Text' );
 		expect( visibleBlocks.at( 1 ).text() ).toBe( 'Advanced Text' );
 		expect( visibleBlocks.at( 2 ).text() ).toBe( 'Some Other Block' );
@@ -248,7 +248,7 @@ describe( 'InserterMenu', () => {
 		wrapper.update();
 
 		const disabledBlocks = wrapper.find( '.editor-inserter__block[disabled]' );
-		expect( disabledBlocks.length ).toBe( 1 );
+		expect( disabledBlocks ).toHaveLength( 1 );
 		expect( disabledBlocks.at( 0 ).text() ).toBe( 'More' );
 	} );
 
@@ -268,10 +268,10 @@ describe( 'InserterMenu', () => {
 		wrapper.setState( { filterValue: 'text' } );
 
 		const tabs = wrapper.find( '.editor-inserter__tab' );
-		expect( tabs.length ).toBe( 0 );
+		expect( tabs ).toHaveLength( 0 );
 
 		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
-		expect( visibleBlocks.length ).toBe( 3 );
+		expect( visibleBlocks ).toHaveLength( 3 );
 		expect( visibleBlocks.at( 0 ).text() ).toBe( 'Text' );
 		expect( visibleBlocks.at( 1 ).text() ).toBe( 'Advanced Text' );
 		expect( visibleBlocks.at( 2 ).text() ).toBe( 'A Text Embed' );
@@ -293,10 +293,10 @@ describe( 'InserterMenu', () => {
 		wrapper.setState( { filterValue: ' text' } );
 
 		const tabs = wrapper.find( '.editor-inserter__tab' );
-		expect( tabs.length ).toBe( 0 );
+		expect( tabs ).toHaveLength( 0 );
 
 		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
-		expect( visibleBlocks.length ).toBe( 3 );
+		expect( visibleBlocks ).toHaveLength( 3 );
 		expect( visibleBlocks.at( 0 ).text() ).toBe( 'Text' );
 		expect( visibleBlocks.at( 1 ).text() ).toBe( 'Advanced Text' );
 		expect( visibleBlocks.at( 2 ).text() ).toBe( 'A Text Embed' );
