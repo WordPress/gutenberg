@@ -69,7 +69,8 @@ registerBlockType( 'core/audio', {
 			const { editing, className, src } = this.state;
 			const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 			const switchToEditing = () => {
-				this.setState( { editing: true } );
+				setAttributes( { src: '' } );
+				this.setState( { editing: true, src: '' } );
 			};
 			const onSelectAudio = ( media ) => {
 				if ( media && media.url ) {
@@ -95,7 +96,7 @@ registerBlockType( 'core/audio', {
 						onChange={ updateAlignment }
 					/>
 					<Toolbar>
-						<Button
+						{ src && <Button
 							buttonProps={ {
 								className: 'components-icon-button components-toolbar__control',
 								'aria-label': __( 'Edit audio' ),
@@ -104,7 +105,7 @@ registerBlockType( 'core/audio', {
 							onClick={ switchToEditing }
 						>
 							<Dashicon icon="edit" />
-						</Button>
+						</Button> }
 					</Toolbar>
 				</BlockControls>,
 
