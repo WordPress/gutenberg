@@ -1,0 +1,77 @@
+It is also possible to create dynamic blocks. These are blocks that can change their content even if the post is not saved. One example from WordPress itself is the latest posts block. This block will update everywhere it is used whena new post is published.
+
+The following code example shows how to create the latest post block dynamic block.
+
+```js
+// myblock.js
+
+var el = wp.element.createElement,
+	registerBlockType = wp.blocks.registerBlockType,
+	withAPIData = wp.components.withAPIData;
+
+registerBlockType( 'riad/latest-post', {
+	title: 'Latest Post',
+	icon: 'megaphone',
+	category: 'widgets',
+
+	edit: withAPIData( function() {
+		return {
+			posts: '/wp/v2/posts?per_page=1'
+		};
+	} )( function( props ) {
+		if ( ! props.posts.data ) {
+			return "loading !";
+		}
+		if ( props.posts.data.length === 0 ) {
+			return "No posts";
+		}
+		var className = props.className;
+		var post = props.posts.data[ 0 ];
+		
+		return el(
+			'a', 
+			{ className: className, href: post.link },
+			post.title.rendered
+		);
+	} ),
+
+	save: function() {
+		// Rendering in PHP
+		return null;
+	},
+} );
+```
+
+Because it is a dynamic block it also needs a server component. The rendering can be added using the `render_callback` property when using the `register_block_type` function.
+
+```php
+<?php
+// block.php
+
+function riad_render_block_latest_post( $attribites ) {
+	$recent_posts = wp_get_recent_posts( array(
+		'numberposts' => 1,
+		'post_status' => 'publish',
+	) );
+	if ( count( $recent_posts ) === 0 ) {
+		return 'No posts';
+	}
+	$post = $recent_posts[ 0 ];
+	$post_id = $post['ID'];
+	return sprintf(
+		'<a class="wp-block-riad-latest-post" href="%1$s">%2$s</a>',
+		esc_url( get_permalink( $post_id ) ),
+		esc_html( get_the_title( $post_id ) )
+	);
+}
+
+register_block_type( 'riad/latest-post', array(
+	'render_callback' => 'riad_render_block_latest_post',
+) );
+```
+
+There are a few things to notice:
+
+* The edit function still shows a representation of the block in the editor's context (this could be very different from the rendered version, it's up to the block's author)
+* The save function just returns null because the rendering is performed server-side.
+* The server-side rendering is a function taking the block attributes as an argument and returning the markup (quite similar to shortcodes)
