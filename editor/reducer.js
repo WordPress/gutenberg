@@ -251,9 +251,9 @@ export const editor = flow( [
 					return state;
 				}
 
-				return without( state.reduce( ( acc, elem, i ) => {
+				return state.reduce( ( acc, elem, i ) => {
 					if ( blockIndex === i ) {
-						return [ ...acc, null ];
+						return acc;
 					}
 
 					if ( action.index === i ) {
@@ -265,7 +265,7 @@ export const editor = flow( [
 
 					return [ ...acc, elem ];
 
-				}, [] ), null );
+				}, [] );
 			}
 
 			case 'MOVE_BLOCKS_UP': {
