@@ -545,3 +545,17 @@ add_action( 'admin_print_scripts-edit.php', 'gutenberg_replace_default_add_new_b
 function gutenberg_add_admin_body_class( $classes ) {
 	return "$classes gutenberg-editor-page";
 }
+
+/**
+ * Filter the number of revisikons for posts, skipping revisions when autosaving.
+ * @param  int $count The number of revisions to save.
+ * @return int        The original count, or zero if this is a Gutenberg autosave.
+ */
+function gutenberg_filter_revisions( $count ) {
+
+	if ( isset( $_REQUEST['gutenberg_autosave'] ) && '1' ===  $_REQUEST['gutenberg_autosave'] ) {
+		return 0;
+	}
+	return $count;
+}
+add_filter( 'wp_revisions_to_keep', 'gutenberg_filter_revisions' );
