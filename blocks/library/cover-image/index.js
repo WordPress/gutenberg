@@ -166,7 +166,7 @@ registerBlockType( 'core/cover-image', {
 	},
 
 	save( { attributes, className } ) {
-		const { url, title, hasParallax, dimRatio } = attributes;
+		const { url, title, hasParallax, dimRatio, align } = attributes;
 		const style = url ?
 			{ backgroundImage: `url(${ url })` } :
 			undefined;
@@ -176,7 +176,8 @@ registerBlockType( 'core/cover-image', {
 			{
 				'has-background-dim': dimRatio !== 0,
 				'has-parallax': hasParallax,
-			}
+			},
+			align ? `align${ align }` : null,
 		);
 
 		return (
