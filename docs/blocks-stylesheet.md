@@ -68,20 +68,20 @@ Like scripts, your block's editor-specific styles should be enqueued by assignin
 
 function gutenberg_boilerplate_block() {
 	wp_register_script(
-		'gutenberg-boilerplate-es5-step02-editor-script',
+		'gutenberg-boilerplate-es5-step02-editor',
 		plugins_url( 'step-02/block.js', __FILE__ ),
 		array( 'wp-blocks', 'wp-element' )
 	);
 	wp_register_style(
-		'gutenberg-boilerplate-es5-step02-editor-style',
+		'gutenberg-boilerplate-es5-step02-editor',
 		plugins_url( 'step-02/editor.css', __FILE__ ),
 		array( 'wp-edit-blocks' ),
 		filemtime( plugin_dir_path( __FILE__ ) . 'step-02/editor.css' )
 	);
 
 	register_block_type( 'gutenberg-boilerplate-esnext/hello-world-step-02', array(
-		'editor_script' => 'gutenberg-boilerplate-es5-step02-editor-script',
-		'editor_style'  => 'gutenberg-boilerplate-es5-step02-editor-style',
+		'editor_script' => 'gutenberg-boilerplate-es5-step02-editor',
+		'editor_style'  => 'gutenberg-boilerplate-es5-step02-editor',
 	) );
 }
 add_action( 'init', 'gutenberg_boilerplate_block' );
@@ -98,14 +98,14 @@ When registering a block, you can assign one or both of `style` and `editor_styl
 
 function gutenberg_boilerplate_block() {
 	wp_register_style(
-		'gutenberg-boilerplate-es5-step02-style',
+		'gutenberg-boilerplate-es5-step02',
 		plugins_url( 'step-02/style.css', __FILE__ ),
 		array( 'wp-blocks' ),
 		filemtime( plugin_dir_path( __FILE__ ) . 'step-02/style.css' )
 	);
 
 	register_block_type( 'gutenberg-boilerplate-esnext/hello-world-step-02', array(
-		'style' => 'gutenberg-boilerplate-es5-step02-style',
+		'style' => 'gutenberg-boilerplate-es5-step02',
 	) );
 }
 add_action( 'init', 'gutenberg_boilerplate_block' );
