@@ -39,7 +39,7 @@
     "eslint": "^4.1.0",
     "eslint-plugin-jest": "^21.0.0",
     "eslint-plugin-wordpress": "git://github.com/WordPress-Coding-Standards/eslint-plugin-wordpress.git#b65ae0cea1199c9714641ed3be7ea98fcb27dd6c",
-    "jest": "^21.0.0",
+    "jest": "^22.0.0",
     "npm-run-all": "^4.0.0",
     "npmpub": "^3.0.3",
     "remark-cli": "^4.0.0",
