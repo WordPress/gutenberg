@@ -78,13 +78,15 @@ registerBlockType( 'core/text-columns', {
 						label={ __( 'Columns' ) }
 						value={ columns }
 						onChange={ ( value ) => {
+							const nextAttributes = { columns: value };
 							// Add additional content values when adding columns
 							if ( value > content.length ) {
-								while ( value > content.length ) {
-									content.push( '' );
-								}
+								nextAttributes.content = [
+									...content,
+									...times( value - content.length, () => [] ),
+								];
 							}
-							setAttributes( { columns: value, content } );
+							setAttributes( nextAttributes );
 						} }
 						min={ 2 }
 						max={ 4 }
