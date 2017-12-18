@@ -19,6 +19,7 @@ import { EditorProvider, ErrorBoundary } from './components';
 import { initializeMetaBoxState } from './actions';
 
 export * from './components';
+import store from './store'; // Registers the state tree
 
 // Configure moment globally
 moment.locale( dateSettings.l10n.locale );
@@ -52,15 +53,14 @@ window.jQuery( document ).on( 'heartbeat-tick', ( event, response ) => {
  *
  * @param {Element} target       DOM node in which editor is rendered
  * @param {?Object} settings     Editor settings object
- * @param {*}       initialState Initial editor state to hydrate
  */
-export function recreateEditorInstance( target, settings, initialState ) {
+export function recreateEditorInstance( target, settings ) {
 	unmountComponentAtNode( target );
 
 	const reboot = recreateEditorInstance.bind( null, target, settings );
 
 	render(
-		<EditorProvider settings={ settings } initialState={ initialState }>
+		<EditorProvider settings={ settings } recovery>
 			<ErrorBoundary onError={ reboot }>
 				<Layout />
 			</ErrorBoundary>
@@ -84,7 +84,7 @@ export function createEditorInstance( id, post, settings ) {
 	const target = document.getElementById( id );
 	const reboot = recreateEditorInstance.bind( null, target, settings );
 
-	const provider = render(
+	render(
 		<EditorProvider settings={ settings } post={ post }>
 			<ErrorBoundary onError={ reboot }>
 				<Layout />
@@ -95,7 +95,7 @@ export function createEditorInstance( id, post, settings ) {
 
 	return {
 		initializeMetaBoxes( metaBoxes ) {
-			provider.store.dispatch( initializeMetaBoxState( metaBoxes ) );
+			store.dispatch( initializeMetaBoxState( metaBoxes ) );
 		},
 	};
 }

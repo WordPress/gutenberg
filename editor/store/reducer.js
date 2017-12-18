@@ -29,9 +29,9 @@ import { getBlockTypes, getBlockType } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import withHistory from './utils/with-history';
-import withChangeDetection from './utils/with-change-detection';
-import { PREFERENCES_DEFAULTS } from './store-defaults';
+import withHistory from '../utils/with-history';
+import withChangeDetection from '../utils/with-change-detection';
+import { PREFERENCES_DEFAULTS } from './defaults';
 
 /***
  * Module constants
@@ -645,6 +645,7 @@ export function notices( state = [], action ) {
 const locations = [
 	'normal',
 	'side',
+	'advanced',
 ];
 
 const defaultMetaBoxState = locations.reduce( ( result, key ) => {

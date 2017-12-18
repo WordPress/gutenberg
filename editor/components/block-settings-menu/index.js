@@ -45,7 +45,7 @@ function BlockSettingsMenu( { uids, onSelect, focus } ) {
 							onToggle();
 						} }
 						icon="ellipsis"
-						label={ isOpen ? __( 'Close Settings Menu' ) : __( 'Open Settings Menu' ) }
+						label={ __( 'More Options' ) }
 						aria-expanded={ isOpen }
 						focus={ focus }
 					/>
