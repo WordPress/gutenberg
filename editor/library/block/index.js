@@ -11,12 +11,14 @@ import classnames from 'classnames';
 import { Component } from '@wordpress/element';
 import { Placeholder, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { getBlockType, registerBlockType, hasBlockSupport, getBlockDefaultClassname } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import { getBlockType, registerBlockType, hasBlockSupport, getBlockDefaultClassname } from '../../api';
 import ReusableBlockEditPanel from './edit-panel';
+import { fetchReusableBlocks, updateReusableBlock, saveReusableBlock, convertBlockToStatic } from '../../actions';
+import { getReusableBlock, isSavingReusableBlock } from '../../selectors';
 
 class ReusableBlockEdit extends Component {
 	constructor() {
@@ -26,7 +28,7 @@ class ReusableBlockEdit extends Component {
 		this.stopEditing = this.stopEditing.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
 		this.setName = this.setName.bind( this );
-		this.updateReusableBlock = this.updateReusableBlock.bind( this );
+		this.saveChanges = this.saveChanges.bind( this );
 
 		this.state = {
 			isEditing: false,
@@ -37,7 +39,7 @@ class ReusableBlockEdit extends Component {
 
 	componentDidMount() {
 		if ( ! this.props.reusableBlock ) {
-			this.props.fetchReusableBlock();
+			this.props.onFetch();
 		}
 	}
 
@@ -63,7 +65,7 @@ class ReusableBlockEdit extends Component {
 		this.setState( { name } );
 	}
 
-	updateReusableBlock() {
+	saveChanges() {
 		const { name, attributes } = this.state;
 
 		// Use pickBy to include only changed (assigned) values in payload
@@ -72,13 +74,13 @@ class ReusableBlockEdit extends Component {
 			attributes,
 		} );
 
-		this.props.updateReusableBlock( payload );
-		this.props.saveReusableBlock();
+		this.props.onUpdate( payload );
+		this.props.onSave();
 		this.stopEditing();
 	}
 
 	render() {
-		const { focus, reusableBlock, isSaving, convertBlockToStatic } = this.props;
+		const { focus, reusableBlock, isSaving, onConvert } = this.props;
 		const { isEditing, name, attributes } = this.state;
 
 		if ( ! reusableBlock ) {
@@ -112,9 +114,9 @@ class ReusableBlockEdit extends Component {
 					name={ name !== null ? name : reusableBlock.name }
 					isSaving={ isSaving }
 					onEdit={ this.startEditing }
-					onDetach={ convertBlockToStatic }
+					onDetach={ onConvert }
 					onChangeName={ this.setName }
-					onSave={ this.updateReusableBlock }
+					onSave={ this.saveChanges }
 					onCancel={ this.stopEditing }
 				/>
 			),
@@ -124,34 +126,21 @@ class ReusableBlockEdit extends Component {
 
 const ConnectedReusableBlockEdit = connect(
 	( state, ownProps ) => ( {
-		reusableBlock: state.reusableBlocks.data[ ownProps.attributes.ref ],
-		isSaving: state.reusableBlocks.isSaving[ ownProps.attributes.ref ],
+		reusableBlock: getReusableBlock( state, ownProps.attributes.ref ),
+		isSaving: isSavingReusableBlock( state, ownProps.attributes.ref ),
 	} ),
 	( dispatch, ownProps ) => ( {
-		fetchReusableBlock() {
-			dispatch( {
-				type: 'FETCH_REUSABLE_BLOCKS',
-				id: ownProps.attributes.ref,
-			} );
+		onFetch() {
+			dispatch( fetchReusableBlocks( ownProps.attributes.ref ) );
 		},
-		updateReusableBlock( reusableBlock ) {
-			dispatch( {
-				type: 'UPDATE_REUSABLE_BLOCK',
-				id: ownProps.attributes.ref,
-				reusableBlock,
-			} );
+		onUpdate( reusableBlock ) {
+			dispatch( updateReusableBlock( ownProps.attributes.ref, reusableBlock ) );
 		},
-		saveReusableBlock() {
-			dispatch( {
-				type: 'SAVE_REUSABLE_BLOCK',
-				id: ownProps.attributes.ref,
-			} );
+		onSave() {
+			dispatch( saveReusableBlock( ownProps.attributes.ref ) );
 		},
-		convertBlockToStatic() {
-			dispatch( {
-				type: 'CONVERT_BLOCK_TO_STATIC',
-				uid: ownProps.id,
-			} );
+		onConvert() {
+			dispatch( convertBlockToStatic( ownProps.id ) );
 		},
 	} )
 )( ReusableBlockEdit );
