@@ -814,9 +814,10 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$allowed_block_types = apply_filters( 'allowed_block_types', true );
 
 	$editor_settings = array(
-		'wideImages' => ! empty( $gutenberg_theme_support[0]['wide-images'] ),
-		'colors'     => $color_palette,
-		'blockTypes' => $allowed_block_types,
+		'wideImages'       => ! empty( $gutenberg_theme_support[0]['wide-images'] ),
+		'colors'           => $color_palette,
+		'blockTypes'       => $allowed_block_types,
+		'titlePlaceholder' => apply_filters( 'enter_title_here', __( 'Add title', 'gutenberg' ), $post ),
 	);
 
 	$post_type_object = get_post_type_object( $post_to_edit['type'] );
