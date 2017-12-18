@@ -3,12 +3,7 @@
  */
 import refx from 'refx';
 import multi from 'redux-multi';
-import { get, flowRight } from 'lodash';
-
-/**
- * WordPress dependencies
- */
-import { dispatch, getState, subscribe } from '@wordpress/data';
+import { flowRight } from 'lodash';
 
 /**
  * Internal dependencies
@@ -19,18 +14,17 @@ import effects from './effects';
 /**
  * Applies the custom middlewares used specifically in the editor module
  *
- * It also restricts the getState call to the module's partial state only
+ * @param  {Object}  store Store Object
  *
- * @return {Object} Redux custom store
+ * @return {Object}        Update Store Object
  */
-function applyMiddlewaresAndRestrictState() {
+function applyMiddlewares( store ) {
 	const middlewares = [
 		mobileMiddleware,
 		refx( effects ),
 		multi,
 	];
 
-	const enhancedGetState = () => get( getState(), 'core/editor' );
 	let enhancedDispatch = () => {
 		throw new Error(
 			'Dispatching while constructing your middleware is not allowed. ' +
@@ -40,17 +34,16 @@ function applyMiddlewaresAndRestrictState() {
 	let chain = [];
 
 	const middlewareAPI = {
-		getState: enhancedGetState,
+		getState: store.getState,
 		dispatch: ( ...args ) => enhancedDispatch( ...args ),
 	};
 	chain = middlewares.map( middleware => middleware( middlewareAPI ) );
-	enhancedDispatch = flowRight( ...chain )( dispatch );
+	enhancedDispatch = flowRight( ...chain )( store.dispatch );
 
 	return {
+		...store,
 		dispatch: enhancedDispatch,
-		getState: enhancedGetState,
-		subscribe,
 	};
 }
 
-export default applyMiddlewaresAndRestrictState();
+export default applyMiddlewares;
