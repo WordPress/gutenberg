@@ -40,8 +40,8 @@ export function addAttribute( settings ) {
  * Returns an array of valid alignments for a block type depending on its
  * defined supports. Returns an empty array if block does not support align.
  *
- * @param  {String}   blockName Block name to check
- * @return {String[]}           Valid alignments for block
+ * @param  {string}   blockName Block name to check
+ * @return {string[]}           Valid alignments for block
  */
 export function getBlockValidAlignments( blockName ) {
 	// Explicitly defined array set of valid alignments
