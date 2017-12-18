@@ -16,7 +16,7 @@ import { compose } from '@wordpress/element';
 import { getCurrentPostType } from '../../selectors';
 
 export function PostStickyCheck( { postType, children, user } ) {
-	const userCan = get( user, 'data.post_type_capabilities', {} );
+	const userCan = get( user.data, 'post_type_capabilities', false );
 
 	if (
 		postType !== 'post' ||

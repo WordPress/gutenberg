@@ -38,7 +38,7 @@ export function PostPublishButton( {
 	onSubmit = noop,
 } ) {
 	const isButtonEnabled = user.data && ! isSaving && isPublishable && isSaveable;
-	const isContributor = ! get( user, 'data.post_type_capabilities.publish_posts', false );
+	const isContributor = ! get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );
 
 	let publishStatus;
 	if ( isContributor ) {
