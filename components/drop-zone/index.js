@@ -61,8 +61,8 @@ class DropZone extends Component {
 	}
 
 	render() {
-		const { className, label } = this.props;
-		const { isDraggingOverDocument, isDraggingOverElement, position, isReorderingInProgress } = this.state;
+		const { className, label, isReorderingInProgress } = this.props;
+		const { isDraggingOverDocument, isDraggingOverElement, position } = this.state;
 		const classes = classnames( 'components-drop-zone', className, {
 			'is-active': isDraggingOverDocument || isDraggingOverElement,
 			'is-dragging-over-document': isDraggingOverDocument,

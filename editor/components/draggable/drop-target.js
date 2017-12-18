@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import classnames from 'classnames';
 import { findDOMNode } from 'react-dom';
 
 /**
@@ -110,8 +111,10 @@ class DropTarget extends Component {
     }
 
     render() {
+        const classes = classnames( 'draggable-drop-target');
+
         return this.props.connectDropTarget(
-            <div className='draggable-drop-target'>
+            <div className={ classes }>
                 { this.props.children }
             </div>
         );

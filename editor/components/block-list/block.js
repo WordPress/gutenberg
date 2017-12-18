@@ -403,7 +403,6 @@ export class BlockListBlock extends Component {
 			>
 
 
-
 				{ true &&
 					<DragAndDropSource
 						draggableType={ DRAGGABLE_BLOCK }
@@ -432,7 +431,7 @@ export class BlockListBlock extends Component {
 					<BlockDropZone index={ order } isReorderingInProgress={ this.props.isReorderingInProgress } />
 				}
 
-				{ false && <BlockDropZone index={ order } isReorderingInProgress={ this.props.isReorderingInProgress } /> }
+				{ true && <BlockDropZone index={ order } isReorderingInProgress={ this.props.isReorderingInProgress } /> }
 
 
 				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }

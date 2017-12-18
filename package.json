@@ -42,6 +42,7 @@
     "react-datepicker": "0.61.0",
     "react-dnd": "2.5.4",
     "react-dnd-html5-backend": "2.5.4",
+    "react-dnd-html5-mixed-backend": "2.0.1",
     "react-dom": "16.2.0",
     "react-redux": "5.0.6",
     "redux": "3.7.2",

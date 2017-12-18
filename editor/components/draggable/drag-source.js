@@ -38,7 +38,7 @@ function sourceCollect( connect, monitor ) {
  */
 const sourceSpec = {
     beginDrag( props ) {
-        // props.startReordering();
+        props.startReordering();
 
         return {
             dragSourceUid: props.dragSourceUid,
@@ -46,8 +46,9 @@ const sourceSpec = {
         };
     },
 
+    // every drag is [guaranteed] to fire this endDrag callback
     endDrag( props ) {
-        // setTimeout( () => { console.log(234); props.stopReordering(); }, 500 );
+        setTimeout( props.stopReordering, 500 );
         // props.hideDropIndicator();
     },
 
@@ -59,8 +60,10 @@ class DragSource extends Component {
     }
 
     render() {
+        const classes = classnames( 'draggable-drag-source');
+
         return this.props.connectDragSource(
-            <div className='draggable-drag-source'>
+            <div className={ classes }>
                 { this.props.children }
             </div>
         );

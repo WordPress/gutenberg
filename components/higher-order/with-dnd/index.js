@@ -2,55 +2,13 @@
  * External dependencies
  */
 import { DragDropContext, DragSource, DropTarget } from 'react-dnd';
-import HTML5Backend from 'react-dnd-html5-backend';
+import MixedHTML5Backend from 'react-dnd-html5-mixed-backend';
+// import HTML5Backend from 'react-dnd-html5-backend';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-
-/* Testing... */
-const ModifiedBackend = ( ...args ) => {
-    const instance = new HTML5Backend( ...args );
-
-    const listeners = [
-        'handleTopDragStart',
-        'handleTopDragStartCapture',
-        'handleTopDragEndCapture',
-        'handleTopDragEnter',
-        'handleTopDragEnterCapture',
-        'handleTopDragLeaveCapture',
-        'handleTopDragOver',
-        'handleTopDragOverCapture',
-        'handleTopDrop',
-        'handleTopDropCapture',
-        'handleSelectStart',
-    ];
-
-    const shouldIgnoreTarget = ( target ) => {
-        return target.className.split(' ').indexOf( 'is-reordering-in-progress' );
-    }
-
-    listeners.forEach( name => {
-        const original = instance[ name ];
-
-        instance[ name ] = ( e, ...extraArgs ) => {
-
-            if ( name === 'handleTopDrop' ) {
-                console.log( e.target );
-                console.log( e.target.className );
-            }
-
-            if ( ! shouldIgnoreTarget( e.target ) ) {
-                original( e, ...extraArgs );
-            }
-        };
-    });
-
-    return instance;
-};
-
-
 
 /**
  * A wrapper around react-dnd DragDropContext higher order component.
@@ -58,7 +16,7 @@ const ModifiedBackend = ( ...args ) => {
  * @return { Function }                  A component wrapped with the react-dnd HOC.
  */
 export default function withDragAndDropContext( WrappedComponent ) {
-	return DragDropContext( HTML5Backend )( WrappedComponent );
+	return DragDropContext( MixedHTML5Backend )( WrappedComponent );
 }
 
 /**
