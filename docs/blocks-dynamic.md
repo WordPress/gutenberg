@@ -2,6 +2,8 @@ It is also possible to create dynamic blocks. These are blocks that can change t
 
 The following code example shows how to create the latest post block dynamic block.
 
+{% codetabs %}
+{% ES5 %}
 ```js
 // myblock.js
 
@@ -9,7 +11,7 @@ var el = wp.element.createElement,
 	registerBlockType = wp.blocks.registerBlockType,
 	withAPIData = wp.components.withAPIData;
 
-registerBlockType( 'riad/latest-post', {
+registerBlockType( 'my-plugin/latest-post', {
 	title: 'Latest Post',
 	icon: 'megaphone',
 	category: 'widgets',
@@ -41,6 +43,44 @@ registerBlockType( 'riad/latest-post', {
 	},
 } );
 ```
+{% ESNext %}
+```js
+// myblock.js
+
+const { el } = wp.element;
+const { registerBlockType } = wp.blocks;
+const { withAPIData } = wp.components;
+
+registerBlockType( 'my-plugin/latest-post', {
+	title: 'Latest Post',
+	icon: 'megaphone',
+	category: 'widgets',
+
+	edit: withAPIData( () => {
+		return {
+			posts: '/wp/v2/posts?per_page=1'
+		};
+	} )( ( { posts, className } ) => {
+		if ( ! posts.data ) {
+			return "loading !";
+		}
+		if ( posts.data.length === 0 ) {
+			return "No posts";
+		}
+		var post = posts.data[ 0 ];
+		
+		return <a className={ className } href={ post.link }>
+			{ post.title.rendered }
+		</a>;
+	} ),
+
+	save() {
+		// Rendering in PHP
+		return null;
+	},
+} );
+```
+{% end %}
 
 Because it is a dynamic block it also needs a server component. The rendering can be added using the `render_callback` property when using the `register_block_type` function.
 
