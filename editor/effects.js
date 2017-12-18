@@ -17,6 +17,7 @@ import {
 	getDefaultBlockName,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -79,7 +80,9 @@ export default {
 		const newModel = new Model( toSend );
 
 		// Tag the autosave action to avoid creating revisions.
-		newModel.url = newModel.url() + '?gutenberg_autosave=' + ( action.options && action.options.autosave ? '1' : '' );
+		if ( action.options && action.options.autosave ) {
+			newModel.url = addQueryArgs( newModel.url(), { 'gutenberg_autosave': '1' } );
+		}
 		newModel.save().done( ( newPost ) => {
 			dispatch( {
 				type: 'RESET_POST',
