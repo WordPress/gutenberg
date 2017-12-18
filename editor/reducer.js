@@ -236,6 +236,38 @@ export const editor = flow( [
 				];
 			}
 
+			case 'MOVE_BLOCK_TO_INDEX': {
+				if ( ! Number.isInteger( action.index ) ) {
+					return state;
+				}
+
+				if ( ! state.length || action.index > state.length - 1 || action.index < 0 ) {
+					return state;
+				}
+
+				const blockIndex = state.indexOf( action.uid );
+
+				if ( blockIndex === -1 || blockIndex === action.index ) {
+					return state;
+				}
+
+				return without( state.reduce( ( acc, elem, i ) => {
+					if ( blockIndex === i ) {
+						return [ ...acc, null ];
+					}
+
+					if ( action.index === i ) {
+						return [
+							...acc,
+							...( action.index < blockIndex ? [ action.uid, elem ] : [ elem, action.uid ] )
+						];
+					}
+
+					return [ ...acc, elem ];
+
+				}, [] ), null );
+			}
+
 			case 'MOVE_BLOCKS_UP': {
 				const firstUid = first( action.uids );
 				const lastUid = last( action.uids );
@@ -783,6 +815,23 @@ export const reusableBlocks = combineReducers( {
 	},
 } );
 
+/**
+ * @todo :clk:doc
+ * Reducer returning drag and drop in progress status.
+ * @return {Boolean}        Updated state
+ */
+export function isReorderingInProgress( state = false, action ) {
+	switch ( action.type ) {
+		case 'START_DRAG_AND_DROP':
+			return true;
+
+		case 'STOP_DRAG_AND_DROP':
+			return false;
+	}
+
+	return state;
+}
+
 export default optimist( combineReducers( {
 	editor,
 	currentPost,
@@ -798,4 +847,5 @@ export default optimist( combineReducers( {
 	metaBoxes,
 	browser,
 	reusableBlocks,
+	isReorderingInProgress,
 } ) );

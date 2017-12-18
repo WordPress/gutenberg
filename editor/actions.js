@@ -177,6 +177,20 @@ export function replaceBlock( uid, block ) {
 	return replaceBlocks( uid, block );
 }
 
+/**
+ * @todo :clk:doc
+ * @param  {[type]} uid   [description]
+ * @param  {[type]} index [description]
+ * @return {[type]}       [description]
+ */
+export function moveBlockToIndex( uid, index ) {
+	return {
+		type: 'MOVE_BLOCK_TO_INDEX',
+		uid,
+		index
+	};
+}
+
 export function insertBlock( block, position ) {
 	return insertBlocks( [ block ], position );
 }
@@ -597,5 +611,27 @@ export function convertBlockToReusable( uid ) {
 export function appendDefaultBlock() {
 	return {
 		type: 'APPEND_DEFAULT_BLOCK',
+	};
+}
+
+/**
+ * @todo :clk:doc
+ * [startReordering description]
+ * @return {[type]} [description]
+ */
+export function startReordering( ) {
+	return {
+		type: 'START_DRAG_AND_DROP'
+	};
+}
+
+/**
+ * @todo :clk:doc
+ * [stopReordering description]
+ * @return {[type]} [description]
+ */
+export function stopReordering( ) {
+	return {
+		type: 'STOP_DRAG_AND_DROP'
 	};
 }
