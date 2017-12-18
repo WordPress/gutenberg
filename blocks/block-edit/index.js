@@ -36,7 +36,7 @@ export function BlockEdit( props ) {
 	// them preferencially as the render value for the block.
 	const Edit = blockType.edit || blockType.save;
 
-	return <Edit className={ className } { ...props } />;
+	return <Edit { ...props } className={ className } />;
 }
 
 export default withFilters( 'blocks.BlockEdit' )( BlockEdit );

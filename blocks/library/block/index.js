@@ -14,7 +14,8 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { getBlockType, registerBlockType } from '../../api';
+import BlockEdit from '../../block-edit';
+import { registerBlockType } from '../../api';
 import ReusableBlockEditPanel from './edit-panel';
 
 class ReusableBlockEdit extends Component {
@@ -85,14 +86,13 @@ class ReusableBlockEdit extends Component {
 		}
 
 		const reusableBlockAttributes = { ...reusableBlock.attributes, ...attributes };
-		const blockType = getBlockType( reusableBlock.type );
-		const BlockEdit = blockType.edit || blockType.save;
 
 		return [
 			// We fake the block being read-only by wrapping it with an element that has pointer-events: none
 			<div key="edit" style={ { pointerEvents: isEditing ? 'auto' : 'none' } }>
 				<BlockEdit
 					{ ...this.props }
+					name={ reusableBlock.type }
 					focus={ isEditing ? focus : null }
 					attributes={ reusableBlockAttributes }
 					setAttributes={ isEditing ? this.setAttributes : noop }
@@ -158,6 +158,10 @@ registerBlockType( 'core/block', {
 		ref: {
 			type: 'number',
 		},
+	},
+
+	supports: {
+		customClassName: false,
 	},
 
 	edit: ConnectedReusableBlockEdit,
