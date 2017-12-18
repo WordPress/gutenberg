@@ -24,7 +24,7 @@ import PostSwitchToDraftButton from '../post-switch-to-draft-button';
 import { getCurrentPostType } from '../../selectors';
 
 function PostPublishDropdown( { user, onSubmit } ) {
-	const canPublish = get( user, 'data.post_type_capabilities.publish_posts', false );
+	const canPublish = get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );
 
 	return (
 		<div className="editor-post-publish-dropdown">

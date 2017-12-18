@@ -16,7 +16,7 @@ import { compose } from '@wordpress/element';
 import { isCurrentPostPublished, getCurrentPostType } from '../../store/selectors';
 
 export function PostPendingStatusCheck( { isPublished, children, user } ) {
-	const userCanPublishPosts = get( user, 'data.post_type_capabilities.publish_posts', false );
+	const userCanPublishPosts = get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );
 
 	if ( isPublished || ! userCanPublishPosts ) {
 		return null;

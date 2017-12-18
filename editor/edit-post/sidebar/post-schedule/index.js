@@ -19,7 +19,7 @@ import { PostSchedule as PostScheduleForm, PostScheduleLabel } from '../../../co
 import { getCurrentPostType } from '../../../selectors';
 
 export function PostSchedule( { user } ) {
-	const userCanPublishPosts = get( user, 'data.post_type_capabilities.publish_posts', false );
+	const userCanPublishPosts = get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );
 
 	if ( ! userCanPublishPosts ) {
 		return null;

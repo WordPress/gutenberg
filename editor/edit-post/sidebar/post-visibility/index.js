@@ -19,7 +19,7 @@ import { PostVisibility as PostVisibilityForm, PostVisibilityLabel } from '../..
 import { getCurrentPostType } from '../../../selectors';
 
 export function PostVisibility( { user } ) {
-	const canEdit = get( user, 'data.post_type_capabilities.publish_posts', false );
+	const canEdit = get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );
 
 	return (
 		<PanelRow className="editor-post-visibility">

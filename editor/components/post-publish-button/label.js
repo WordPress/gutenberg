@@ -30,7 +30,7 @@ export function PublishButtonLabel( {
 	isPublishing,
 	user,
 } ) {
-	const userCanPublishPosts = get( user, 'data.post_type_capabilities.publish_posts', false );
+	const userCanPublishPosts = get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );
 	const isContributor = user.data && ! userCanPublishPosts;
 
 	if ( isPublishing ) {
