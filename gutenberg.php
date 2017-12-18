@@ -547,8 +547,10 @@ function gutenberg_add_admin_body_class( $classes ) {
 }
 
 /**
- * Filter the number of revisikons for posts, skipping revisions when autosaving.
+ * Filter the number of revisions for posts, skipping revisions when autosaving.
+ *
  * @param  int $count The number of revisions to save.
+ *
  * @return int        The original count, or zero if this is a Gutenberg autosave.
  */
 function gutenberg_filter_revisions( $count ) {
