@@ -184,7 +184,7 @@ registerBlockType( 'core/latest-posts', {
 						<li key={ i }>
 							<a href={ post.link } target="_blank">{ decodeEntities( post.title.rendered.trim() ) || __( '(Untitled)' ) }</a>
 							{ displayPostDate && post.date_gmt &&
-								<time dateTime={ moment( post.date_gmt ).utc().format() } className={ `${ this.props.className }__post-date` }>
+								<time dateTime={ moment( post.date_gmt ).utc().format() } className={ 'wp-block-latest-posts__post-date' }>
 									{ moment( post.date_gmt ).local().format( 'MMMM DD, Y' ) }
 								</time>
 							}
