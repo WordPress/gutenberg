@@ -13,6 +13,7 @@ global.wp = {
 	'blocks',
 	'date',
 	'editor',
+	'data',
 ].forEach( entryPointName => {
 	Object.defineProperty( global.wp, entryPointName, {
 		get: () => require( entryPointName ),

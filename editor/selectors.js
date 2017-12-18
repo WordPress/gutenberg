@@ -25,12 +25,12 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import { POST_UPDATE_TRANSACTION_ID } from './effects';
 import { BREAK_MEDIUM } from './constants';
 
 /***
  * Module constants
  */
+export const POST_UPDATE_TRANSACTION_ID = 'post-update';
 const MAX_FREQUENT_BLOCKS = 3;
 
 /**
