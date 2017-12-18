@@ -426,7 +426,9 @@ export class BlockListBlock extends Component {
 							<BlockHtml uid={ block.uid } />
 						) }
 						{ ! isValid && [
-							getSaveElement( blockType, block.attributes ),
+							<div key="invalid-preview">
+								{ getSaveElement( blockType, block.attributes ) }
+							</div>,
 							<InvalidBlockWarning
 								key="invalid-warning"
 								block={ block }
