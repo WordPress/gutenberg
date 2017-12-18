@@ -96,10 +96,8 @@ registerBlockType( 'core/audio', {
 					/>
 					<Toolbar>
 						<Button
-							buttonProps={ {
-								className: 'components-icon-button components-toolbar__control',
-								'aria-label': __( 'Edit audio' ),
-							} }
+							className="components-icon-button components-toolbar__control"
+							aria-label={ __( 'Edit audio' ) }
 							type="audio"
 							onClick={ switchToEditing }
 						>
