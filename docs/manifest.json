@@ -60,6 +60,12 @@
 		"parent": "blocks"
 	},
 	{
+		"title": "Creating dynamic blocks",
+		"slug": "creating-dynamic-blocks",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/blocks-dynamic.md",
+		"parent": "blocks"
+	},
+	{
 		"title": "Reference",
 		"slug": "reference",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/reference.md",
