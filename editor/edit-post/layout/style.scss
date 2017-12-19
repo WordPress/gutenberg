@@ -4,7 +4,6 @@
 }
 
 .editor-layout {
-	padding-top: $header-height;
 	position: relative;
 
 	.components-notice-list {
@@ -24,8 +23,16 @@
 		}
 	}
 
+	// on mobile, toolbars behave differently
+	@include break-small {
+		padding-top: $header-height;
+	}
+
 	&.has-fixed-toolbar {
-		padding-top: $header-height + $block-toolbar-height;
+		// on mobile, toolbars behave differently
+		@include break-small {
+			padding-top: $header-height + $block-toolbar-height;
+		}
 
 		@include break-large {
 			padding-top: $header-height;
@@ -47,6 +54,11 @@
 
 .editor-layout__content {
 	position: relative;
-	overflow-y: auto;
-	-webkit-overflow-scrolling: touch;
+
+	// on mobile the main content area has to scroll
+	// otherwise you can invoke the overscroll bounce on the non-scrolling container, causing (ノಠ益ಠ)ノ彡┻━┻
+	@include break-small {
+		overflow-y: auto;
+		-webkit-overflow-scrolling: touch;
+	}
 }
