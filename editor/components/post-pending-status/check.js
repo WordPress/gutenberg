@@ -12,7 +12,7 @@ import { compose } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { isCurrentPostPublished } from '../../selectors';
+import { isCurrentPostPublished } from '../../store/selectors';
 
 export function PostPendingStatusCheck( { isPublished, children, user } ) {
 	if ( isPublished || ! user.data || ! user.data.capabilities.publish_posts ) {

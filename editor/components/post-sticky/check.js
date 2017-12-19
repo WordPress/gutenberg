@@ -12,7 +12,7 @@ import { compose } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { getCurrentPostType } from '../../selectors';
+import { getCurrentPostType } from '../../store/selectors';
 
 export function PostStickyCheck( { postType, children, user } ) {
 	if (

@@ -14,8 +14,8 @@ import { Component, findDOMNode } from '@wordpress/element';
 import './style.scss';
 import { BlockList, PostTitle, WritingFlow, DefaultBlockAppender, EditorGlobalKeyboardShortcuts } from '../../../components';
 import VisualEditorInserter from './inserter';
-import { isFeatureActive } from '../../../selectors';
-import { clearSelectedBlock } from '../../../actions';
+import { isFeatureActive } from '../../../store/selectors';
+import { clearSelectedBlock } from '../../../store/actions';
 
 class VisualEditor extends Component {
 	constructor() {

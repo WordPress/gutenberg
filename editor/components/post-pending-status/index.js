@@ -14,8 +14,8 @@ import { compose } from '@wordpress/element';
  * Internal dependencies
  */
 import PostPendingStatusCheck from './check';
-import { getEditedPostAttribute } from '../../selectors';
-import { editPost } from '../../actions';
+import { getEditedPostAttribute } from '../../store/selectors';
+import { editPost } from '../../store/actions';
 
 export function PostPendingStatus( { instanceId, status, onUpdateStatus } ) {
 	const pendingId = 'pending-toggle-' + instanceId;

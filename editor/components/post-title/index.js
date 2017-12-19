@@ -19,8 +19,8 @@ import { withContext } from '@wordpress/components';
  */
 import './style.scss';
 import PostPermalink from '../post-permalink';
-import { getEditedPostTitle } from '../../selectors';
-import { insertBlock, editPost, clearSelectedBlock } from '../../actions';
+import { getEditedPostTitle } from '../../store/selectors';
+import { insertBlock, editPost, clearSelectedBlock } from '../../store/actions';
 
 /**
  * Constants

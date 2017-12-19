@@ -7,7 +7,7 @@ import { filter } from 'lodash';
 /**
  * Internal dependencies
  */
-import { getBlocks } from '../../selectors';
+import { getBlocks } from '../../store/selectors';
 
 function DocumentOutlineCheck( { blocks, children } ) {
 	const headings = filter( blocks, ( block ) => block.name === 'core/heading' );

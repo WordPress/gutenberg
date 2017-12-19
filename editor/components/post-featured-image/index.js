@@ -16,8 +16,8 @@ import { compose } from '@wordpress/element';
  * Internal dependencies
  */
 import './style.scss';
-import { getCurrentPostType, getEditedPostAttribute } from '../../selectors';
-import { editPost } from '../../actions';
+import { getCurrentPostType, getEditedPostAttribute } from '../../store/selectors';
+import { editPost } from '../../store/actions';
 
 //used when labels from post tyoe were not yet loaded or when they are not present.
 const DEFAULT_SET_FEATURE_IMAGE_LABEL = __( 'Set featured image' );

@@ -11,8 +11,8 @@ import { NoticeList } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { removeNotice } from '../../actions';
-import { getNotices } from '../../selectors';
+import { removeNotice } from '../../store/actions';
+import { getNotices } from '../../store/selectors';
 
 export default connect(
 	( state ) => ( {

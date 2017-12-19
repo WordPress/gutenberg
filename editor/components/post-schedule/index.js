@@ -15,8 +15,8 @@ import { settings } from '@wordpress/date';
  */
 import './style.scss';
 import PostScheduleClock from './clock';
-import { getEditedPostAttribute } from '../../selectors';
-import { editPost } from '../../actions';
+import { getEditedPostAttribute } from '../../store/selectors';
+import { editPost } from '../../store/actions';
 
 export function PostSchedule( { date, onUpdateDate } ) {
 	const momentDate = date ? moment( date ) : moment();

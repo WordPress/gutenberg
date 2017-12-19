@@ -15,8 +15,8 @@ import { Component } from '@wordpress/element';
  */
 import './style.scss';
 import BlockDropZone from '../block-drop-zone';
-import { appendDefaultBlock } from '../../actions';
-import { getBlockCount } from '../../selectors';
+import { appendDefaultBlock } from '../../store/actions';
+import { getBlockCount } from '../../store/selectors';
 
 export class DefaultBlockAppender extends Component {
 	render() {

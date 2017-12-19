@@ -34,8 +34,8 @@ import {
 	getMultiSelectedBlockUids,
 	getSelectedBlock,
 	isSelectionEnabled,
-} from '../../selectors';
-import { startMultiSelect, stopMultiSelect, multiSelect, selectBlock } from '../../actions';
+} from '../../store/selectors';
+import { startMultiSelect, stopMultiSelect, multiSelect, selectBlock } from '../../store/actions';
 
 class BlockList extends Component {
 	constructor( props ) {

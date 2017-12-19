@@ -14,7 +14,7 @@ import { compose } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { removeBlocks } from '../../actions';
+import { removeBlocks } from '../../store/actions';
 
 export function BlockDeleteButton( { onDelete, onClick = noop, isLocked, small = false } ) {
 	if ( isLocked ) {
