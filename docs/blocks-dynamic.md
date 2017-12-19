@@ -90,7 +90,7 @@ Because it is a dynamic block it also needs a server component. The rendering ca
 <?php
 // block.php
 
-function my_plugin_render_block_latest_post( $attribites ) {
+function my_plugin_render_block_latest_post( $attributes ) {
 	$recent_posts = wp_get_recent_posts( array(
 		'numberposts' => 1,
 		'post_status' => 'publish',
