@@ -115,6 +115,7 @@ export default class TinyMCE extends Component {
 			ref: ( node ) => this.editorNode = node,
 			style,
 			suppressContentEditableWarning: true,
+			role: 'textbox',
 		}, children );
 	}
 }
