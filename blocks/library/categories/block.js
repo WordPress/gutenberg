@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { Placeholder, Spinner } from '@wordpress/components';
+import { Placeholder, Spinner, withAPIData } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { times, unescape } from 'lodash';
 
@@ -11,35 +11,19 @@ import { times, unescape } from 'lodash';
  */
 import './editor.scss';
 import './style.scss';
-import { getCategories } from './data.js';
 import InspectorControls from '../../inspector-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
 import BlockDescription from '../../block-description';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
-export default class CategoriesBlock extends Component {
+class CategoriesBlock extends Component {
 	constructor() {
 		super( ...arguments );
-
-		this.state = {
-			categories: [],
-		};
-
-		this.categoriesRequest = getCategories();
-
-		this.categoriesRequest
-			.then( categories => this.setState( { categories } ) );
 
 		this.toggleDisplayAsDropdown = this.toggleDisplayAsDropdown.bind( this );
 		this.toggleShowPostCounts = this.toggleShowPostCounts.bind( this );
 		this.toggleShowHierarchy = this.toggleShowHierarchy.bind( this );
-	}
-
-	componentWillUnmount() {
-		if ( this.categoriesRequest.state() === 'pending' ) {
-			this.categoriesRequest.abort();
-		}
 	}
 
 	toggleDisplayAsDropdown() {
@@ -64,9 +48,9 @@ export default class CategoriesBlock extends Component {
 	}
 
 	getCategories( parentId = null ) {
-		const { categories } = this.state;
-		if ( ! categories.length ) {
-			return categories;
+		const categories = this.props.categories.data;
+		if ( ! categories || ! categories.length ) {
+			return [];
 		}
 
 		if ( parentId === null ) {
@@ -222,3 +206,9 @@ export default class CategoriesBlock extends Component {
 		];
 	}
 }
+
+export default withAPIData( () => {
+	return {
+		categories: '/wp/v2/categories',
+	};
+} )( CategoriesBlock );
