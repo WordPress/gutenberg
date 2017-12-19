@@ -81,6 +81,7 @@ import {
 	getReusableBlocks,
 	getStateBeforeOptimisticTransaction,
 	isPublishingPost,
+	isSavingBlocked,
 	POST_UPDATE_TRANSACTION_ID,
 } from '../selectors';
 
@@ -1089,6 +1090,27 @@ describe( 'selectors', () => {
 					},
 				},
 				currentPost: {},
+				saving: {},
+			};
+
+			expect( isEditedPostSaveable( state ) ).toBe( false );
+		} );
+
+		it( 'should return false if saving is blocked', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUid: {},
+						blockOrder: [],
+						edits: {},
+					},
+				},
+				currentPost: {
+					title: 'sassel',
+				},
+				saving: {
+					blocked: true,
+				},
 			};
 
 			expect( isEditedPostSaveable( state ) ).toBe( false );
@@ -1106,6 +1128,7 @@ describe( 'selectors', () => {
 				currentPost: {
 					title: 'sassel',
 				},
+				saving: {},
 			};
 
 			expect( isEditedPostSaveable( state ) ).toBe( true );
@@ -1123,6 +1146,7 @@ describe( 'selectors', () => {
 				currentPost: {
 					excerpt: 'sassel',
 				},
+				saving: {},
 			};
 
 			expect( isEditedPostSaveable( state ) ).toBe( true );
@@ -1146,6 +1170,7 @@ describe( 'selectors', () => {
 					},
 				},
 				currentPost: {},
+				saving: {},
 			};
 
 			expect( isEditedPostSaveable( state ) ).toBe( true );
@@ -2448,6 +2473,36 @@ describe( 'selectors', () => {
 			} );
 
 			expect( isPublishing ).toBe( true );
+		} );
+	} );
+
+	describe( 'isSavingBlocked()', () => {
+		it( 'returns false if saving blocked is not set', () => {
+			const isBlocked = isSavingBlocked( {
+				saving: {},
+			} );
+
+			expect( isBlocked ).toBe( false );
+		} );
+
+		it( 'returns false if saving is not blocked', () => {
+			const isBlocked = isSavingBlocked( {
+				saving: {
+					blocked: false,
+				},
+			} );
+
+			expect( isBlocked ).toBe( false );
+		} );
+
+		it( 'returns true if saving is blocked', () => {
+			const isBlocked = isSavingBlocked( {
+				saving: {
+					blocked: true,
+				},
+			} );
+
+			expect( isBlocked ).toBe( true );
 		} );
 	} );
 } );

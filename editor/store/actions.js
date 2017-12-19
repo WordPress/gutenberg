@@ -227,7 +227,14 @@ export function clearBlockInsertionPoint() {
 	};
 }
 
-export function editPost( edits ) {
+/**
+ * Returns an action object used in signalling that properties of the edited
+ * post have been updated.
+ *
+ * @param  {?Object} edits Updated post properties
+ * @return {Object}        Action object
+ */
+export function editPost( edits = {} ) {
 	return {
 		type: 'EDIT_POST',
 		edits,
@@ -237,6 +244,20 @@ export function editPost( edits ) {
 export function savePost() {
 	return {
 		type: 'REQUEST_POST_UPDATE',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that save blocking should be
+ * toggled to the specified state.
+ *
+ * @param  {Boolean} isBlocked Whether saving is to be blocked
+ * @return {Object}            Action object
+ */
+export function toggleSavingBlocked( isBlocked ) {
+	return {
+		type: 'TOGGLE_SAVING_BLOCKED',
+		isBlocked,
 	};
 }
 
