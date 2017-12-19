@@ -14,7 +14,7 @@ import { sortBy, find } from 'lodash';
  *
  * @var {Array} categories
  */
-let categories = [
+const categories = [
 	{ slug: 'common', title: __( 'Common Blocks' ) },
 	{ slug: 'formatting', title: __( 'Formatting' ) },
 	{ slug: 'layout', title: __( 'Layout Blocks' ) },
@@ -22,6 +22,14 @@ let categories = [
 	{ slug: 'embed', title: __( 'Embed' ) },
 	{ slug: 'reusable-blocks', title: __( 'Saved Blocks' ) },
 ];
+
+/**
+ * @type {RegExp}
+ * @const
+ *
+ * Category names must be a combination of lower-case letters, numbers, and hypens
+ */
+const categoryNamePattern = /^[a-z0-9-]+$/;
 
 /**
  * Returns all the block categories.
@@ -52,13 +60,14 @@ export function registerCategory( category ) {
 		);
 		return;
 	}
-	if ( ! /^[a-z0-9-]+$/.test( category.slug ) ) {
+	if ( ! categoryNamePattern.test( category.slug ) ) {
 		console.error(
 			'The block Category slug must not contain characters which are invalid for urls'
 		);
 		return;
 	}
-	if ( categories.find( x => x.slug === category.slug ) ) {
+
+	if ( categories.some( x => x.slug === category.slug ) ) {
 		console.error(
 			'The block Category "' + category.slug + '" is already registered'
 		);
@@ -97,8 +106,9 @@ export function getSortedCategories( sortProperty ) {
 		);
 		return;
 	}
-	categories = sortBy( categories, sortProperty );
-	return categories;
+
+	const sortedCategories = sortBy( categories, sortProperty );
+	return sortedCategories;
 }
 
 /**
