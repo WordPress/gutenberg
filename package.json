@@ -56,7 +56,7 @@
     "autoprefixer": "6.7.7",
     "babel-core": "6.26.0",
     "babel-eslint": "8.0.3",
-    "babel-jest": "21.2.0",
+    "babel-jest": "22.0.1",
     "babel-loader": "7.1.2",
     "babel-plugin-lodash": "3.2.11",
     "babel-plugin-transform-object-rest-spread": "6.26.0",
