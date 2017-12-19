@@ -1,15 +1,22 @@
 {
   "name": "@wordpress/hooks",
   "version": "1.0.1",
+  "description": "WordPress Hooks library",
+  "author": "WordPress",
+  "license": "GPL-2.0+",
+  "keywords": [
+    "hooks"
+  ],
+  "homepage": "https://github.com/WordPress/packages/tree/master/packages/hooks/README.md",
   "repository": {
     "type": "git",
     "url": "https://github.com/WordPress/packages.git"
   },
-  "description": "WordPress Hooks library",
+  "bugs": {
+    "url": "https://github.com/WordPress/packages/issues"
+  },
   "main": "build/index.js",
   "module": "build-module/index.js",
-  "author": "WordPress",
-  "license": "GPL-2.0+",
   "publishConfig": {
     "access": "public"
   }

@@ -1,15 +1,22 @@
 {
   "name": "@wordpress/url",
   "version": "0.1.0-beta.5",
+  "description": "WordPress URL utilities",
+  "author": "WordPress",
+  "license": "GPL-2.0+",
+  "keywords": [
+    "url"
+  ],
+  "homepage": "https://github.com/WordPress/packages/tree/master/packages/url/README.md",
   "repository": {
     "type": "git",
     "url": "https://github.com/WordPress/packages.git"
   },
-  "description": "WordPress URL utilities",
+  "bugs": {
+    "url": "https://github.com/WordPress/packages/issues"
+  },
   "main": "build/index.js",
   "module": "build-module/index.js",
-  "author": "WordPress",
-  "license": "GPL-2.0+",
   "publishConfig": {
     "access": "public"
   }

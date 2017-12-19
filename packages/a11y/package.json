@@ -2,14 +2,13 @@
   "name": "@wordpress/a11y",
   "version": "1.0.1",
   "description": "Collection of JS modules and tools for WordPress development",
-  "homepage": "https://github.com/WordPress/packages/tree/master/packages/a11y/README.md",
   "author": "WordPress",
+  "license": "GPL-2.0+",
   "keywords": [
     "a11y",
     "aria-live"
   ],
-  "main": "build/index.js",
-  "module": "build-module/index.js",
+  "homepage": "https://github.com/WordPress/packages/tree/master/packages/a11y/README.md",
   "repository": {
     "type": "git",
     "url": "https://github.com/WordPress/packages.git"
@@ -17,6 +16,8 @@
   "bugs": {
     "url": "https://github.com/WordPress/packages/issues"
   },
+  "main": "build/index.js",
+  "module": "build-module/index.js",
   "dependencies": {
     "@wordpress/dom-ready": "^0.1.0-beta.6"
   },
