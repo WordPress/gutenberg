@@ -555,7 +555,7 @@ function gutenberg_add_admin_body_class( $classes ) {
  */
 function gutenberg_filter_revisions( $count ) {
 
-	if ( isset( $_REQUEST['gutenberg_autosave'] ) && '1' ===  $_REQUEST['gutenberg_autosave'] ) {
+	if ( isset( $_REQUEST['gutenberg_autosave'] ) && '1' === $_REQUEST['gutenberg_autosave'] ) {
 		return 0;
 	}
 	return $count;
