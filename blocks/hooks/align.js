@@ -83,6 +83,7 @@ export function withToolbarControls( BlockEdit ) {
 					<BlockAlignmentToolbar
 						value={ props.attributes.align }
 						onChange={ updateAlignment }
+						controls={ validAlignments }
 					/>
 				</BlockControls>
 			),
