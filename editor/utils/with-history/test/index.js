@@ -118,4 +118,53 @@ describe( 'withHistory', () => {
 
 		expect( state ).toBe( original );
 	} );
+
+	it( 'should allow history batching', () => {
+		const reducer = withHistory( counter );
+
+		let state;
+		state = reducer( undefined, {} );
+
+		state = reducer( state, { type: 'INCREMENT', meta: { batchHistory: true } } );
+		expect( state ).toEqual( {
+			past: [ 0 ],
+			present: 1,
+			future: [],
+		} );
+
+		state = reducer( state, { type: 'INCREMENT', meta: { batchHistory: true } } );
+		expect( state ).toEqual( {
+			past: [ 0 ],
+			present: 2,
+			future: [],
+		} );
+
+		state = reducer( state, { type: 'INCREMENT' } );
+		expect( state ).toEqual( {
+			past: [ 0, 2 ],
+			present: 3,
+			future: [],
+		} );
+
+		state = reducer( state, { type: 'INCREMENT', meta: { batchHistory: true } } );
+		expect( state ).toEqual( {
+			past: [ 0, 2, 3 ],
+			present: 4,
+			future: [],
+		} );
+
+		state = reducer( state, { type: 'INCREMENT', meta: { batchHistory: true } } );
+		expect( state ).toEqual( {
+			past: [ 0, 2, 3 ],
+			present: 5,
+			future: [],
+		} );
+
+		state = reducer( state, { type: 'UNDO' } );
+		expect( state ).toEqual( {
+			past: [ 0, 2 ],
+			present: 3,
+			future: [ 5 ],
+		} );
+	} );
 } );

@@ -227,10 +227,24 @@ export function clearBlockInsertionPoint() {
 	};
 }
 
-export function editPost( edits ) {
+/**
+ * Returns an action object used in signalling that the post has been edited.
+ *
+ * @param  {Object}  edits   Key-value pairs of edited post attributes
+ * @param  {?Object} options Optional object of options, currently supporting
+ *                           batch flag (for grouping sequential edits)
+ * @return {Object}          Action object
+ */
+export function editPost( edits, options ) {
+	let meta;
+	if ( options && options.batch ) {
+		meta = { batchHistory: true };
+	}
+
 	return {
 		type: 'EDIT_POST',
 		edits,
+		meta,
 	};
 }
 

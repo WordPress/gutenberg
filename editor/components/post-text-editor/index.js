@@ -65,7 +65,7 @@ export default connect(
 	} ),
 	{
 		onChange( content ) {
-			return editPost( { content } );
+			return editPost( { content }, { batch: true } );
 		},
 		onPersist( content ) {
 			return resetBlocks( parse( content ) );
