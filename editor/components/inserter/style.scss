@@ -31,7 +31,6 @@ input[type="search"].editor-inserter__search {
 	display: block;
 	width: 100%;
 	margin: 0;
-	box-shadow: none;
 	padding: 8px 11px;
 	font-size: $default-font-size;
 	position: relative;
@@ -135,6 +134,7 @@ input[type="search"].editor-inserter__search {
 		background: $light-gray-300;
 		border-bottom: 1px solid $light-gray-500;
 		flex-shrink: 0;
+		margin-top: 1px;
 	}
 }
 
