@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { sortBy } from 'lodash';
+import { includes, sortBy } from 'lodash';
 
 /**
  * Internal dependencies
@@ -58,17 +58,28 @@ import BlockIcon from '../block-icon';
  */
 
 /**
- * Returns an "completer" definition for selecting from available blocks to replace the current one.
- * The definition can be understood by the Autocomplete component.
+ * Returns completer definition for selecting from available blocks to replace
+ * the current one, understood by the Autocomplete component.
  *
- * @param {Function} onReplace  Callback to replace the current block.
+ * @param {Function}           onReplace                 Callback to replace
+ *                                                       the current block
+ * @param {(Boolean|String[])} options.allowedBlockTypes Allowed block types
  *
  * @returns {Completer} Completer object used by the Autocomplete component.
  */
-export function blockAutocompleter( { onReplace } ) {
+export function blockAutocompleter( { onReplace, allowedBlockTypes = true } ) {
+	let blockTypes = getBlockTypes();
+
+	// Optionally filter allowed block types
+	if ( Array.isArray( allowedBlockTypes ) ) {
+		blockTypes = blockTypes.filter( ( blockType ) => (
+			includes( allowedBlockTypes, blockType.name )
+		) );
+	}
+
 	// Prioritize common category in block type options
 	const options = sortBy(
-		getBlockTypes(),
+		blockTypes,
 		( { category } ) => 'common' !== category
 	).map( ( blockType ) => {
 		const { name, title, icon, keywords = [] } = blockType;

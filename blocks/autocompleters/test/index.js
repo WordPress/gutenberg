@@ -76,4 +76,20 @@ describe( 'blockAutocompleter', () => {
 			] );
 		} );
 	} );
+
+	it( 'should omit disallowed block types', () => {
+		return blockAutocompleter( {
+			allowedBlockTypes: [ 'core/baz', 'core/bar' ],
+		} ).getOptions().then( ( options ) => {
+			expect( options ).toHaveLength( 2 );
+			expect( options[ 0 ] ).toMatchObject( {
+				keywords: [ 'baz' ],
+				value: 'core/baz',
+			} );
+			expect( options[ 1 ] ).toMatchObject( {
+				keywords: [ 'bar' ],
+				value: 'core/bar',
+			} );
+		} );
+	} );
 } );
