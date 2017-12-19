@@ -805,8 +805,8 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	}
 
 	/**
-	 * Filters the allowed block types for the editor, defaulting to true (all
-	 * block types supported).
+	 * Filters the allowed block types for the inserter, defaulting to true (all
+	 * block types present in the inserter).
 	 *
 	 * @param bool|array $allowed_block_types Array of block type slugs, or
 	 *                                        boolean to enable/disable all.
