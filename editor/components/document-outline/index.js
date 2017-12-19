@@ -14,8 +14,8 @@ import { __ } from '@wordpress/i18n';
  */
 import './style.scss';
 import DocumentOutlineItem from './item';
-import { getBlocks } from '../../selectors';
-import { selectBlock } from '../../actions';
+import { getBlocks } from '../../store/selectors';
+import { selectBlock } from '../../store/actions';
 
 /**
  * Module constants

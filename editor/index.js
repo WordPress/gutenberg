@@ -16,7 +16,7 @@ import { settings as dateSettings } from '@wordpress/date';
 import './assets/stylesheets/main.scss';
 import Layout from './edit-post/layout';
 import { EditorProvider, ErrorBoundary } from './components';
-import { initializeMetaBoxState } from './actions';
+import { initializeMetaBoxState } from './store/actions';
 
 export * from './components';
 import store from './store'; // Registers the state tree

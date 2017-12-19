@@ -45,7 +45,7 @@ import {
 	stopTyping,
 	updateBlockAttributes,
 	toggleSelection,
-} from '../../actions';
+} from '../../store/actions';
 import {
 	getBlock,
 	getBlockFocus,
@@ -61,7 +61,7 @@ import {
 	isSelectionEnabled,
 	isTyping,
 	getBlockMode,
-} from '../../selectors';
+} from '../../store/selectors';
 
 const { BACKSPACE, ESCAPE, DELETE, ENTER, UP, RIGHT, DOWN, LEFT } = keycodes;
 

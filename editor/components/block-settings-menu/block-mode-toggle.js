@@ -14,8 +14,8 @@ import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { getBlockMode, getBlock } from '../../selectors';
-import { toggleBlockMode } from '../../actions';
+import { getBlockMode, getBlock } from '../../store/selectors';
+import { toggleBlockMode } from '../../store/actions';
 
 export function BlockModeToggle( { blockType, mode, onToggleMode, small = false } ) {
 	if ( ! hasBlockSupport( blockType, 'html', true ) ) {

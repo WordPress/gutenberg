@@ -19,7 +19,7 @@ import {
 	isEditedPostBeingScheduled,
 	isSavingPost,
 	isPublishingPost,
-} from '../../selectors';
+} from '../../store/selectors';
 
 export function PublishButtonLabel( {
 	isPublished,

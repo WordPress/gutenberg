@@ -11,7 +11,7 @@ import { serialize } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { getBlocks } from '../../selectors';
+import { getBlocks } from '../../store/selectors';
 
 function WordCount( { content } ) {
 	const wordCount = wp.utils.WordCounter.prototype.count( content );

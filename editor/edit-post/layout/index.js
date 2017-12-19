@@ -24,7 +24,7 @@ import {
 	getEditorMode,
 	isEditorSidebarOpened,
 	isFeatureActive,
-} from '../../selectors';
+} from '../../store/selectors';
 
 function Layout( { mode, isSidebarOpened, hasFixedToolbar } ) {
 	const className = classnames( 'editor-layout', {

@@ -11,11 +11,11 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { autosave } from '../../actions';
+import { autosave } from '../../store/actions';
 import {
 	isEditedPostDirty,
 	isEditedPostSaveable,
-} from '../../selectors';
+} from '../../store/selectors';
 
 export class AutosaveMonitor extends Component {
 	componentDidUpdate( prevProps ) {

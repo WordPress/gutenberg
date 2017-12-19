@@ -16,7 +16,7 @@ import { compose } from '@wordpress/element';
 import './style.scss';
 import HierarchicalTermSelector from './hierarchical-term-selector';
 import FlatTermSelector from './flat-term-selector';
-import { getCurrentPostType } from '../../selectors';
+import { getCurrentPostType } from '../../store/selectors';
 
 export function PostTaxonomies( { postType, taxonomies } ) {
 	const availableTaxonomies = filter( taxonomies.data, ( taxonomy ) => includes( taxonomy.types, postType ) );

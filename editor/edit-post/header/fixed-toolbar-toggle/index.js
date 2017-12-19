@@ -12,8 +12,8 @@ import { MenuItemsGroup, MenuItemsToggle, withInstanceId } from '@wordpress/comp
 /**
  * Internal Dependencies
  */
-import { isFeatureActive } from '../../../selectors';
-import { toggleFeature } from '../../../actions';
+import { isFeatureActive } from '../../../store/selectors';
+import { toggleFeature } from '../../../store/actions';
 
 function FeatureToggle( { onToggle, active } ) {
 	return (
