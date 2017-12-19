@@ -66,7 +66,9 @@ function createRemoveHook( hooks, removeAll ) {
 				}
 			}
 		}
-		doAction( 'hookRemoved', hookName, namespace );
+		if ( hookName !== 'hookRemoved' ) {
+			doAction( 'hookRemoved', hookName, namespace );
+		}
 
 		return handlersRemoved;
 	};
