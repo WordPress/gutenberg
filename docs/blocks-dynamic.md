@@ -90,7 +90,7 @@ Because it is a dynamic block it also needs a server component. The rendering ca
 <?php
 // block.php
 
-function riad_render_block_latest_post( $attribites ) {
+function my_plugin_render_block_latest_post( $attribites ) {
 	$recent_posts = wp_get_recent_posts( array(
 		'numberposts' => 1,
 		'post_status' => 'publish',
@@ -101,14 +101,14 @@ function riad_render_block_latest_post( $attribites ) {
 	$post = $recent_posts[ 0 ];
 	$post_id = $post['ID'];
 	return sprintf(
-		'<a class="wp-block-riad-latest-post" href="%1$s">%2$s</a>',
+		'<a class="wp-block-my-plugin-latest-post" href="%1$s">%2$s</a>',
 		esc_url( get_permalink( $post_id ) ),
 		esc_html( get_the_title( $post_id ) )
 	);
 }
 
-register_block_type( 'riad/latest-post', array(
-	'render_callback' => 'riad_render_block_latest_post',
+register_block_type( 'my-plugin/latest-post', array(
+	'render_callback' => 'my_plugin_render_block_latest_post',
 ) );
 ```
 
