@@ -87,6 +87,6 @@ registerBlockType( 'core/preformatted', {
 	save( { attributes } ) {
 		const { content } = attributes;
 
-		return <pre>{ content }</pre>;
+		return <pre><Editable.Value value={ content } /></pre>;
 	},
 } );

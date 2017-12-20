@@ -6,14 +6,16 @@
         "attributes": {
             "content": [
                 "A ",
-                {
-                    "type": "em",
-                    "children": "verse"
-                },
+                [
+                    "em",
+                    {},
+                    "verse"
+                ],
                 "…",
-                {
-                    "type": "br"
-                },
+                [
+                    "br",
+                    {}
+                ],
                 "And more!"
             ]
         },

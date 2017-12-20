@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { concatChildren, Component } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { Autocomplete, PanelBody, PanelColor, withFallbackStyles } from '@wordpress/components';
 
 /**
@@ -254,7 +254,7 @@ registerBlockType( 'core/paragraph', {
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: concatChildren( attributes.content, attributesToMerge.content ),
+			content: [ ...attributes.content, ...attributesToMerge.content ],
 		};
 	},
 
@@ -281,7 +281,11 @@ registerBlockType( 'core/paragraph', {
 			textAlign: align,
 		};
 
-		return <p style={ styles } className={ className ? className : undefined }>{ content }</p>;
+		return (
+			<p style={ styles } className={ className ? className : undefined }>
+				<Editable.Value value={ content } />
+			</p>
+		);
 	},
 } );
 

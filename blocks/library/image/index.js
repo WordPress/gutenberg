@@ -11,6 +11,7 @@ import './style.scss';
 import './editor.scss';
 import { registerBlockType, createBlock } from '../../api';
 import ImageBlock from './block';
+import Editable from '../../editable';
 
 registerBlockType( 'core/image', {
 	title: __( 'Image' ),
@@ -150,7 +151,7 @@ registerBlockType( 'core/image', {
 		return (
 			<figure className={ align ? `align${ align }` : null } style={ figureStyle }>
 				{ href ? <a href={ href }>{ image }</a> : image }
-				{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
+				{ caption && caption.length > 0 && <figcaption><Editable.Value value={ caption } /></figcaption> }
 			</figure>
 		);
 	},

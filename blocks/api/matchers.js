@@ -1,15 +1,14 @@
 /**
- * WordPress dependencies
- */
-import { createElement } from '@wordpress/element';
-
-/**
  * External dependencies
  */
-import { nodeListToReact, nodeToReact } from 'dom-react';
 export { attr, prop, html, text, query } from 'hpq';
 
-export const children = ( selector ) => {
+/**
+ * Internal dependencies
+ */
+import { createSimpleNode, createSimpleNodeList } from './simple-dom';
+
+export const children = ( selector, filter ) => {
 	return ( domNode ) => {
 		let match = domNode;
 
@@ -18,14 +17,14 @@ export const children = ( selector ) => {
 		}
 
 		if ( match ) {
-			return nodeListToReact( match.childNodes || [], createElement );
+			return createSimpleNodeList( match.childNodes || [], filter );
 		}
 
 		return [];
 	};
 };
 
-export const node = ( selector ) => {
+export const node = ( selector, filter ) => {
 	return ( domNode ) => {
 		let match = domNode;
 
@@ -33,6 +32,6 @@ export const node = ( selector ) => {
 			match = domNode.querySelector( selector );
 		}
 
-		return nodeToReact( match, createElement );
+		return createSimpleNode( match, filter );
 	};
 };

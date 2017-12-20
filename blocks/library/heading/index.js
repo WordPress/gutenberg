@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { concatChildren } from '@wordpress/element';
 import { Toolbar } from '@wordpress/components';
 
 /**
@@ -94,7 +93,7 @@ registerBlockType( 'core/heading', {
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: concatChildren( attributes.content, attributesToMerge.content ),
+			content: [ ...attributes.content, ...attributesToMerge.content ],
 		};
 	},
 
@@ -175,7 +174,7 @@ registerBlockType( 'core/heading', {
 
 		return (
 			<Tag style={ { textAlign: align } } >
-				{ content }
+				<Editable.Value value={ content } />
 			</Tag>
 		);
 	},

@@ -78,6 +78,6 @@ registerBlockType( 'core/verse', {
 	},
 
 	save( { attributes, className } ) {
-		return <pre className={ className }>{ attributes.content }</pre>;
+		return <pre className={ className }><Editable.Value value={ attributes.content } /></pre>;
 	},
 } );

@@ -14,6 +14,7 @@ import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
+import Editable from '../../editable';
 
 registerBlockType( 'core/table', {
 	title: __( 'Table' ),
@@ -26,10 +27,29 @@ registerBlockType( 'core/table', {
 			source: 'children',
 			selector: 'table',
 			default: [
-				<tbody key="1">
-					<tr><td><br /></td><td><br /></td></tr>
-					<tr><td><br /></td><td><br /></td></tr>
-				</tbody>,
+				[
+					'tbody', {}, [
+						'tr', {}, [
+							'td', {}, [
+								'br', {},
+							],
+						], [
+							'td', {}, [
+								'br', {},
+							],
+						],
+					], [
+						'tr', {}, [
+							'td', {}, [
+								'br', {},
+							],
+						], [
+							'td', {}, [
+								'br', {},
+							],
+						],
+					],
+				],
 			],
 		},
 		align: {
@@ -89,7 +109,7 @@ registerBlockType( 'core/table', {
 		const { content, align } = attributes;
 		return (
 			<table className={ align ? `align${ align }` : null }>
-				{ content }
+				<Editable.Value value={ content } />
 			</table>
 		);
 	},

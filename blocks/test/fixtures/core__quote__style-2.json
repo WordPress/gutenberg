@@ -5,18 +5,11 @@
         "isValid": true,
         "attributes": {
             "value": [
-                {
-                    "children": {
-                        "type": "p",
-                        "key": null,
-                        "ref": null,
-                        "props": {
-                            "children": "There is no greater agony than bearing an untold story inside you."
-                        },
-                        "_owner": null,
-                        "_store": {}
-                    }
-                }
+                [
+                    "p",
+                    {},
+                    "There is no greater agony than bearing an untold story inside you."
+                ]
             ],
             "citation": [
                 "Maya Angelou"
