@@ -13,7 +13,7 @@ import { compose } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { getCurrentPostType } from '../../selectors';
+import { getCurrentPostType } from '../../store/selectors';
 
 export function PageAttributesCheck( { postType, children } ) {
 	const supportsPageAttributes = get( postType.data, [

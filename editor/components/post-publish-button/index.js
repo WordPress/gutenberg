@@ -16,14 +16,14 @@ import { compose } from '@wordpress/element';
  */
 import './style.scss';
 import PublishButtonLabel from './label';
-import { editPost, savePost } from '../../actions';
+import { editPost, savePost } from '../../store/actions';
 import {
 	isSavingPost,
 	isEditedPostBeingScheduled,
 	getEditedPostVisibility,
 	isEditedPostSaveable,
 	isEditedPostPublishable,
-} from '../../selectors';
+} from '../../store/selectors';
 
 export function PostPublishButton( {
 	isSaving,

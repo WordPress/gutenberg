@@ -14,7 +14,7 @@ import { Button, ClipboardButton } from '@wordpress/components';
  * Internal dependencies
  */
 import { Warning } from '../';
-import { getEditedPostContent } from '../../selectors';
+import { getEditedPostContent } from '../../store/selectors';
 
 class ErrorBoundary extends Component {
 	constructor() {
@@ -33,7 +33,7 @@ class ErrorBoundary extends Component {
 	}
 
 	reboot() {
-		this.props.onError( this.context.store.getState() );
+		this.props.onError();
 	}
 
 	getContent() {

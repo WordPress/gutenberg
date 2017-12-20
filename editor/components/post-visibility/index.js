@@ -17,8 +17,8 @@ import { visibilityOptions } from './utils';
 import {
 	getEditedPostAttribute,
 	getEditedPostVisibility,
-} from '../../selectors';
-import { editPost, savePost } from '../../actions';
+} from '../../store/selectors';
+import { editPost, savePost } from '../../store/actions';
 
 export class PostVisibility extends Component {
 	constructor( props ) {

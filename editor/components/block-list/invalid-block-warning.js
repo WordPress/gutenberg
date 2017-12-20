@@ -17,7 +17,7 @@ import {
 /**
  * Internal dependencies
  */
-import { replaceBlock } from '../../actions';
+import { replaceBlock } from '../../store/actions';
 import Warning from '../warning';
 
 function InvalidBlockWarning( { ignoreInvalid, switchToBlockType } ) {

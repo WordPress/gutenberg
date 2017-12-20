@@ -11,7 +11,7 @@ import { registerBlockType, setUnknownTypeHandlerName } from '../../api';
 import OldEditor from './old-editor';
 
 registerBlockType( 'core/freeform', {
-	title: __( 'Classic Text' ),
+	title: __( 'Classic' ),
 
 	icon: 'editor-kitchensink',
 

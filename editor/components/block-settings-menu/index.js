@@ -20,7 +20,7 @@ import BlockDeleteButton from './block-delete-button';
 import BlockTransformations from './block-transformations';
 import ReusableBlockToggle from './reusable-block-toggle';
 import UnknownConverter from './unknown-converter';
-import { selectBlock } from '../../actions';
+import { selectBlock } from '../../store/actions';
 
 function BlockSettingsMenu( { uids, onSelect, focus } ) {
 	const count = uids.length;
@@ -45,7 +45,7 @@ function BlockSettingsMenu( { uids, onSelect, focus } ) {
 							onToggle();
 						} }
 						icon="ellipsis"
-						label={ isOpen ? __( 'Close Settings Menu' ) : __( 'Open Settings Menu' ) }
+						label={ __( 'More Options' ) }
 						aria-expanded={ isOpen }
 						focus={ focus }
 					/>

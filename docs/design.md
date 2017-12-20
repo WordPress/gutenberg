@@ -122,7 +122,7 @@ Selected state:
 
 Advanced block options:
 
-- Has description: "Text. Great things start here."
+- Has description: "This is a simple text only block for inserting a single paragraph of content."
 - Has option to enable or disable a drop-cap. Note that the drop-cap is only visible in the blocks unselected (preview) state.
 
 _Because the drop-cap feature is not critical to the basic operation of the block, it's in the advanced sidebar, thus keeping the Quick Toolbar light-weight._

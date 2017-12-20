@@ -53,4 +53,23 @@ describe( 'BlockEdit', () => {
 
 		expect( wrapper.type() ).toBe( save );
 	} );
+
+	it( 'should combine the default class name with a custom one', () => {
+		const edit = ( { className } ) => <div className={ className } />;
+		const attributes = {
+			className: 'my-class',
+		};
+		registerBlockType( 'core/test-block', {
+			edit,
+			save: noop,
+			category: 'common',
+			title: 'block title',
+		} );
+
+		const wrapper = shallow(
+			<BlockEdit name="core/test-block" attributes={ attributes } />
+		);
+
+		expect( wrapper.prop( 'className' ) ).toBe( 'wp-block-test-block my-class' );
+	} );
 } );

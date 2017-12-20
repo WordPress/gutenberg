@@ -1,8 +1,8 @@
 /**
  * Internal dependencies
  */
-import { isMobile } from '../../selectors';
-import { toggleSidebar } from '../../actions';
+import { isMobile } from '../../store/selectors';
+import { toggleSidebar } from '../../store/actions';
 
 /**
  * Disables isSidebarOpened on rehydrate payload if the user is on a mobile screen size.

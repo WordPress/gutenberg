@@ -104,6 +104,7 @@ zip -r gutenberg.zip \
 	element/build/*.{js,map} \
 	hooks/build/*.{js,map} \
 	i18n/build/*.{js,map} \
+	data/build/*.{js,map} \
 	utils/build/*.{js,map} \
 	blocks/build/*.css \
 	components/build/*.css \

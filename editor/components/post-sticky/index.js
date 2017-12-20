@@ -13,8 +13,8 @@ import { compose } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { getEditedPostAttribute } from '../../selectors';
-import { editPost } from '../../actions';
+import { getEditedPostAttribute } from '../../store/selectors';
+import { editPost } from '../../store/actions';
 import PostStickyCheck from './check';
 
 export function PostSticky( { onUpdateSticky, postSticky = false, instanceId } ) {

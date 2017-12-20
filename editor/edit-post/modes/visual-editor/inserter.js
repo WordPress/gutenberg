@@ -17,8 +17,8 @@ import { createBlock, BlockIcon } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { Inserter } from '../../../components';
-import { insertBlock } from '../../../actions';
-import { getMostFrequentlyUsedBlocks, getBlockCount, getBlocks } from '../../../selectors';
+import { insertBlock } from '../../../store/actions';
+import { getMostFrequentlyUsedBlocks, getBlockCount, getBlocks } from '../../../store/selectors';
 
 export class VisualEditorInserter extends Component {
 	constructor() {
