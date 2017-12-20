@@ -1,7 +1,7 @@
 /**
  * WordPress Dependencies
  */
-import { registerReducer } from '@wordpress/data';
+import { registerReducer, registerSchema } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -11,6 +11,7 @@ import reducer from './reducer';
 import { withRehydratation, loadAndPersist } from './persist';
 import enhanceWithBrowserSize from './browser';
 import store from './store';
+import { schema, resolver } from './data';
 
 /**
  * Module Constants
@@ -18,6 +19,7 @@ import store from './store';
 const STORAGE_KEY = `GUTENBERG_PREFERENCES_${ window.userSettings.uid }`;
 
 registerReducer( 'core/editor', withRehydratation( reducer, 'preferences' ) );
+registerSchema( schema, resolver );
 loadAndPersist( store, 'preferences', STORAGE_KEY, PREFERENCES_DEFAULTS );
 enhanceWithBrowserSize( store );
 
