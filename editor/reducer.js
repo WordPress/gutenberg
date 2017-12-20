@@ -237,11 +237,7 @@ export const editor = flow( [
 			}
 
 			case 'MOVE_BLOCK_TO_INDEX': {
-				if ( ! Number.isInteger( action.index ) ) {
-					return state;
-				}
-
-				if ( ! state.length || action.index > state.length - 1 || action.index < 0 ) {
+				if ( ! Number.isInteger( action.index ) || ! state.length ) {
 					return state;
 				}
 
@@ -251,21 +247,17 @@ export const editor = flow( [
 					return state;
 				}
 
-				return state.reduce( ( acc, elem, i ) => {
-					if ( blockIndex === i ) {
-						return acc;
-					}
+				if ( action.index < 0 ) {
+					action.index = 0;
+				} else if ( action.index >= state.length ) {
+					action.index = state.length - 1;
+				}
 
-					if ( action.index === i ) {
-						return [
-							...acc,
-							...( action.index < blockIndex ? [ action.uid, elem ] : [ elem, action.uid ] )
-						];
-					}
+				const _state = [ ...state ];
 
-					return [ ...acc, elem ];
+				_state.splice( action.index, 0, _state.splice( blockIndex, 1 )[ 0 ] );
 
-				}, [] );
+				return _state;
 			}
 
 			case 'MOVE_BLOCKS_UP': {

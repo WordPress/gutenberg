@@ -403,6 +403,84 @@ describe( 'state', () => {
 			expect( state.present.blockOrder ).toEqual( [ 'kumquat', 'persimmon', 'loquat' ] );
 		} );
 
+		it( 'should move block to lower index', () => {
+			const original = editor( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [ {
+					uid: 'chicken',
+					name: 'core/test-block',
+					attributes: {},
+				}, {
+					uid: 'ribs',
+					name: 'core/test-block',
+					attributes: {},
+				}, {
+					uid: 'veggies',
+					name: 'core/test-block',
+					attributes: {},
+				} ],
+			} );
+			const state = editor( original, {
+				type: 'MOVE_BLOCK_TO_INDEX',
+				uid: 'ribs',
+				index: 0
+			} );
+
+			expect( state.present.blockOrder ).toEqual( [ 'ribs', 'chicken', 'veggies', ] );
+		} );
+
+		it( 'should move block to higher index', () => {
+			const original = editor( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [ {
+					uid: 'chicken',
+					name: 'core/test-block',
+					attributes: {},
+				}, {
+					uid: 'ribs',
+					name: 'core/test-block',
+					attributes: {},
+				}, {
+					uid: 'veggies',
+					name: 'core/test-block',
+					attributes: {},
+				} ],
+			} );
+			const state = editor( original, {
+				type: 'MOVE_BLOCK_TO_INDEX',
+				uid: 'ribs',
+				index: 2
+			} );
+
+			expect( state.present.blockOrder ).toEqual( [ 'chicken', 'veggies', 'ribs', ] );
+		} );
+
+		it( 'should not move block if passed same index', () => {
+			const original = editor( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [ {
+					uid: 'chicken',
+					name: 'core/test-block',
+					attributes: {},
+				}, {
+					uid: 'ribs',
+					name: 'core/test-block',
+					attributes: {},
+				}, {
+					uid: 'veggies',
+					name: 'core/test-block',
+					attributes: {},
+				} ],
+			} );
+			const state = editor( original, {
+				type: 'MOVE_BLOCK_TO_INDEX',
+				uid: 'ribs',
+				index: 1
+			} );
+
+			expect( state.present.blockOrder ).toEqual( [ 'chicken', 'ribs', 'veggies', ] );
+		} );
+
 		describe( 'edits()', () => {
 			it( 'should save newly edited properties', () => {
 				const original = editor( undefined, {
