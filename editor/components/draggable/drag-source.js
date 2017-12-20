@@ -25,10 +25,10 @@ import { startReordering, stopReordering } from '../../actions';
  * @return {[type]}         [description]
  */
 function sourceCollect( connect, monitor ) {
-    return {
-        connectDragSource: connect.dragSource(),
-        isDragging: monitor.isDragging()
-    };
+	return {
+		connectDragSource: connect.dragSource(),
+		isDragging: monitor.isDragging()
+	};
 }
 
 /**
@@ -37,51 +37,51 @@ function sourceCollect( connect, monitor ) {
  * @type {Object}
  */
 const sourceSpec = {
-    beginDrag( props ) {
-        props.startReordering();
+	beginDrag( props ) {
+		props.startReordering();
 
-        return {
-            dragSourceUid: props.dragSourceUid,
-            index: props.index,
-        };
-    },
+		return {
+			dragSourceUid: props.dragSourceUid,
+			index: props.index,
+		};
+	},
 
-    // every drag is [guaranteed] to fire this endDrag callback
-    endDrag( props ) {
-        setTimeout( props.stopReordering, 500 );
-        // props.hideDropIndicator();
-    },
+	// every drag is [guaranteed] to fire this endDrag callback
+	endDrag( props ) {
+		setTimeout( props.stopReordering, 500 );
+		// props.hideDropIndicator();
+	},
 
 };
 
 class DragSource extends Component {
-    constructor( props ) {
-        super( props );
-    }
+	constructor( props ) {
+		super( props );
+	}
 
-    render() {
-        const classes = classnames( 'draggable-drag-source');
+	render() {
+		const classes = classnames( 'draggable-drag-source');
 
-        return this.props.connectDragSource(
-            <div className={ classes }>
-                { this.props.children }
-            </div>
-        );
-    }
+		return this.props.connectDragSource(
+			<div className={ classes }>
+				{ this.props.children }
+			</div>
+		);
+	}
 }
 
 const mapDispatchToProps = ( dispatch ) => ( {
-    startReordering() {
-        dispatch( startReordering() );
-    },
+	startReordering() {
+		dispatch( startReordering() );
+	},
 
-    stopReordering() {
-        dispatch( stopReordering() );
-    },
+	stopReordering() {
+		dispatch( stopReordering() );
+	},
 
 } );
 
 export default compose(
-    connect( undefined, mapDispatchToProps ),
-    withDragSource( props => props.draggableType, sourceSpec, sourceCollect ),
+	connect( undefined, mapDispatchToProps ),
+	withDragSource( props => props.draggableType, sourceSpec, sourceCollect ),
 )( DragSource );

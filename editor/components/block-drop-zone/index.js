@@ -16,7 +16,7 @@ import { compose } from '@wordpress/element';
  */
 import { insertBlocks } from '../../actions';
 
-function BlockDropZone( { index, isLocked, isReorderingInProgress, ...props } ) {
+function BlockDropZone( { index, isLocked, ...props } ) {
 	if ( isLocked ) {
 		return null;
 	}

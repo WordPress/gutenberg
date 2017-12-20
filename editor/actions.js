@@ -187,7 +187,7 @@ export function moveBlockToIndex( uid, index ) {
 	return {
 		type: 'MOVE_BLOCK_TO_INDEX',
 		uid,
-		index
+		index,
 	};
 }
 
@@ -621,7 +621,7 @@ export function appendDefaultBlock() {
  */
 export function startReordering( ) {
 	return {
-		type: 'START_DRAG_AND_DROP'
+		type: 'START_DRAG_AND_DROP',
 	};
 }
 
@@ -632,6 +632,6 @@ export function startReordering( ) {
  */
 export function stopReordering( ) {
 	return {
-		type: 'STOP_DRAG_AND_DROP'
+		type: 'STOP_DRAG_AND_DROP',
 	};
 }

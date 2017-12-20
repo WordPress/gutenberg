@@ -24,10 +24,10 @@ import './style.scss';
  * @return {[type]}         [description]
  */
 function targetCollect( connect, monitor ) {
-    return {
-        connectDropTarget: connect.dropTarget(),
-        isOver: monitor.isOver()
-    };
+	return {
+		connectDropTarget: connect.dropTarget(),
+		isOver: monitor.isOver()
+	};
 }
 
 /**
@@ -36,89 +36,89 @@ function targetCollect( connect, monitor ) {
  * @type {Object}
  */
 const targetSpec = {
-    drop( props, monitor, component ) {
-        const dragIndex = monitor.getItem().index; // index of dragged item
-        const hoverIndex = props.index; // index of hovered over item
+	drop( props, monitor, component ) {
+		const dragIndex = monitor.getItem().index; // index of dragged item
+		const hoverIndex = props.index; // index of hovered over item
 
-        console.log(`Drag index: ${dragIndex}`);
-        console.log(`Drop index: ${hoverIndex}`);
+		console.log(`Drag index: ${dragIndex}`);
+		console.log(`Drop index: ${hoverIndex}`);
 
-        if ( dragIndex === hoverIndex ) {
-            return;
-        }
+		if ( dragIndex === hoverIndex ) {
+			return;
+		}
 
-        props.reIndexCallback( monitor.getItem().dragSourceUid, hoverIndex );
-        return;
+		props.reIndexCallback( monitor.getItem().dragSourceUid, hoverIndex );
+		return;
 
-        // monitor.getItem().index = hoverIndex;
+		// monitor.getItem().index = hoverIndex;
 
-        // Determine rectangle on screen
-        const hoverBoundingRect = findDOMNode( component ).getBoundingClientRect();
+		// Determine rectangle on screen
+		const hoverBoundingRect = findDOMNode( component ).getBoundingClientRect();
 
-        // Get vertical middle
-        const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top ) / 2;
+		// Get vertical middle
+		const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top ) / 2;
 
-        // Determine mouse position
-        const clientOffset = monitor.getClientOffset();
+		// Determine mouse position
+		const clientOffset = monitor.getClientOffset();
 
-        // Get pixels to the top
-        const hoverClientY = clientOffset.y - hoverBoundingRect.top;
+		// Get pixels to the top
+		const hoverClientY = clientOffset.y - hoverBoundingRect.top;
 
 
-        // Dragging downwards
-        if ( dragIndex < hoverIndex ) {
-            let dropIndex;
+		// Dragging downwards
+		if ( dragIndex < hoverIndex ) {
+			let dropIndex;
 
-            if ( hoverClientY < hoverMiddleY ) {
-                dropIndex = hoverIndex - 1;
-            } else {
-                dropIndex = hoverIndex;
-            }
+			if ( hoverClientY < hoverMiddleY ) {
+				dropIndex = hoverIndex - 1;
+			} else {
+				dropIndex = hoverIndex;
+			}
 
-            if ( dragIndex !== dropIndex ) {
-                // props.moveBlock( dragIndex, dropIndex );
-                props.reIndexCallback( monitor.getItem().dragSourceUid, dropIndex );
-            }
-            // monitor.getItem().index = dropIndex;
-        }
+			if ( dragIndex !== dropIndex ) {
+				// props.moveBlock( dragIndex, dropIndex );
+				props.reIndexCallback( monitor.getItem().dragSourceUid, dropIndex );
+			}
+			// monitor.getItem().index = dropIndex;
+		}
 
-        // Dragging upwards
-        if ( dragIndex > hoverIndex ) {
-            let dropIndex;
+		// Dragging upwards
+		if ( dragIndex > hoverIndex ) {
+			let dropIndex;
 
-            if ( hoverClientY > hoverMiddleY ) {
-                dropIndex = hoverIndex + 1;
-            } else {
-                dropIndex = hoverIndex;
-            }
+			if ( hoverClientY > hoverMiddleY ) {
+				dropIndex = hoverIndex + 1;
+			} else {
+				dropIndex = hoverIndex;
+			}
 
-            if ( dragIndex !== dropIndex ) {
-                // props.moveBlock( dragIndex, dropIndex );
-                props.reIndexCallback( monitor.getItem().dragSourceUid, dropIndex );
-            }
-            // monitor.getItem().index = dropIndex;
-        }
+			if ( dragIndex !== dropIndex ) {
+				// props.moveBlock( dragIndex, dropIndex );
+				props.reIndexCallback( monitor.getItem().dragSourceUid, dropIndex );
+			}
+			// monitor.getItem().index = dropIndex;
+		}
 
-    },
-    hover( props, monitor, component ) {
+	},
+	hover( props, monitor, component ) {
 
-    }
+	}
 }
 
 class DropTarget extends Component {
-    constructor( props ) {
-        super( props );
-    }
+	constructor( props ) {
+		super( props );
+	}
 
-    render() {
-        const classes = classnames( 'draggable-drop-target');
+	render() {
+		const classes = classnames( 'draggable-drop-target');
 
-        return this.props.connectDropTarget(
-            <div className={ classes }>
-                { this.props.children }
-            </div>
-        );
-    }
+		return this.props.connectDropTarget(
+			<div className={ classes }>
+				{ this.props.children }
+			</div>
+		);
+	}
 }
 
 export default withDropTarget( props => props.draggableType, targetSpec, targetCollect )( DropTarget );
