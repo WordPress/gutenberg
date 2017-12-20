@@ -20,7 +20,7 @@ import { getBlockMoverLabel } from './mover-label';
 import { isFirstBlock, isLastBlock, getBlockIndex, getBlock } from '../../selectors';
 import { selectBlock } from '../../actions';
 
-export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex, isLocked } ) {
+export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex, isLocked, ...props } ) {
 	if ( isLocked ) {
 		return null;
 	}
@@ -30,7 +30,12 @@ export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, block
 	// to an unfocused state (body as active element) without firing blur on,
 	// the rendering parent, leaving it unable to react to focus out.
 	return (
-		<div className="editor-block-mover">
+		<div
+			className="editor-block-mover"
+			draggable={ props.draggable }
+			onDragStart={ props.onDragStart }
+			onDragEnd={ props.onDragEnd }
+		>
 			<IconButton
 				className="editor-block-mover__control"
 				onClick={ isFirst ? null : onMoveUp }

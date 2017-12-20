@@ -1,3 +1,8 @@
+body.dragging {
+	cursor: -webkit-grabbing;
+	cursor: grabbing;
+}
+
 body.gutenberg-editor-page {
 	background: $white;
 

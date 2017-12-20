@@ -46,6 +46,7 @@ import {
 	stopTyping,
 	updateBlockAttributes,
 	toggleSelection,
+	moveBlockToIndex,
 } from '../../actions';
 import {
 	getBlock,
@@ -108,6 +109,9 @@ export class BlockListBlock extends Component {
 		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
 		this.onTouchStart = this.onTouchStart.bind( this );
 		this.onClick = this.onClick.bind( this );
+		this.onDrop = this.onDrop.bind( this );
+		this.onDragStart = this.onDragStart.bind( this );
+		this.onDragEnd = this.onDragEnd.bind( this );
 
 		this.previousOffset = null;
 		this.hadTouchStart = false;
@@ -348,6 +352,43 @@ export class BlockListBlock extends Component {
 		this.setState( { error } );
 	}
 
+	onDragStart( event ) {
+		const block = document.getElementById( `block-${ this.props.uid }` );
+		const overlay = document.getElementById( `block-overlay-${ this.props.uid }` );
+
+		document.body.classList.add( 'dragging' );
+		event.dataTransfer.effectAllowed = 'Move';
+		event.dataTransfer.setData( 'uid', this.props.uid );
+		// order matters next. '.dragged' must be added before setting the drag image
+		block.classList.add( 'dragged' );
+		event.dataTransfer.setDragImage( block, 0, 0 );
+		event.stopPropagation();
+
+		setTimeout( addOverlay( block, overlay ) );
+
+		function addOverlay( _block, _overlay ) {
+			return () => {
+				_block.classList.remove( 'dragged' );
+				_block.classList.add( 'hide' );
+				_overlay.classList.add( 'visible' );
+			};
+		}
+	}
+
+	onDragEnd( event ) {
+		const block = document.getElementById( `block-${ this.props.uid }` );
+		const overlay = document.getElementById( `block-overlay-${ this.props.uid }` );
+
+		document.body.classList.remove( 'dragging' );
+		block.classList.remove( 'hide' );
+		overlay.classList.remove( 'visible' );
+		event.stopPropagation();
+	}
+
+	onDrop( event, index ) {
+		this.props.moveBlockToIndex( event.dataTransfer.getData( 'uid' ), index );
+	}
+
 	render() {
 		const { block, order, mode, showContextualToolbar, isLocked } = this.props;
 		const { name: blockName, isValid } = block;
@@ -368,6 +409,8 @@ export class BlockListBlock extends Component {
 			'is-hovered': isHovered,
 			'is-reusable': isReusableBlock( blockType ),
 		} );
+		const containerClassName = 'editor-block-list__block-container';
+		const blockOverlayClassName = 'editor-block-list__block-overlay';
 
 		const { onMouseLeave, onFocus, onReplace } = this.props;
 
@@ -387,66 +430,94 @@ export class BlockListBlock extends Component {
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
 			<div
-				ref={ this.setBlockListRef }
-				onMouseMove={ this.maybeHover }
-				onMouseEnter={ this.maybeHover }
-				onMouseLeave={ onMouseLeave }
-				className={ wrapperClassName }
-				data-type={ block.name }
-				onTouchStart={ this.onTouchStart }
-				onClick={ this.onClick }
-				{ ...wrapperProps }
+				className={ containerClassName }
+				id={ `block-container-${ this.props.uid }` }
 			>
-				<BlockDropZone index={ order } />
-				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
-				{ ( showUI || isHovered ) && <BlockSettingsMenu uids={ [ block.uid ] } /> }
-				{ showUI && isValid && showContextualToolbar && <BlockContextualToolbar /> }
-				{ isFirstMultiSelected && <BlockMultiControls /> }
+
 				<div
-					ref={ this.bindBlockNode }
-					onKeyPress={ this.maybeStartTyping }
-					onDragStart={ ( event ) => event.preventDefault() }
-					onMouseDown={ this.onPointerDown }
-					onKeyDown={ this.onKeyDown }
-					onFocus={ this.onFocus }
-					className={ BlockListBlock.className }
-					tabIndex="0"
-					aria-label={ blockLabel }
+					id={ `block-${ this.props.uid }` }
+					ref={ this.setBlockListRef }
+					onMouseMove={ this.maybeHover }
+					onMouseEnter={ this.maybeHover }
+					onMouseLeave={ onMouseLeave }
+					className={ wrapperClassName }
+					data-type={ block.name }
+					onTouchStart={ this.onTouchStart }
+					onClick={ this.onClick }
+					{ ...wrapperProps }
 				>
-					<BlockCrashBoundary onError={ this.onBlockError }>
-						{ isValid && mode === 'visual' && (
-							<BlockEdit
-								name={ blockName }
-								focus={ focus }
-								attributes={ block.attributes }
-								setAttributes={ this.setAttributes }
-								insertBlocksAfter={ isLocked ? undefined : this.insertBlocksAfter }
-								onReplace={ isLocked ? undefined : onReplace }
-								setFocus={ partial( onFocus, block.uid ) }
-								mergeBlocks={ isLocked ? undefined : this.mergeBlocks }
-								className={ className }
-								id={ block.uid }
-								isSelectionEnabled={ this.props.isSelectionEnabled }
-								toggleSelection={ this.props.toggleSelection }
-							/>
-						) }
-						{ isValid && mode === 'html' && (
-							<BlockHtml uid={ block.uid } />
-						) }
-						{ ! isValid && [
-							createElement( blockType.save, {
-								key: 'invalid-preview',
-								attributes: block.attributes,
-								className,
-							} ),
-							<InvalidBlockWarning
-								key="invalid-warning"
-								block={ block }
-							/>,
-						] }
-					</BlockCrashBoundary>
+
+					<div
+						id={ `block-overlay-${ this.props.uid }` }
+						draggable={ true }
+						onDragStart={ this.onDragStart }
+						onDragEnd={ this.onDragEnd }
+						className={ blockOverlayClassName }
+					></div>
+
+					<BlockDropZone
+						index={ order }
+						onDrop={ this.onDrop }
+						dropEffect="reorder"
+					/>
+
+					{ ( showUI || isHovered ) &&
+						<BlockMover
+							draggable={ true }
+							onDragStart={ this.onDragStart }
+							onDragEnd={ this.onDragEnd }
+							uids={ [ block.uid ] }
+						/>
+					}
+					{ ( showUI || isHovered ) && <BlockSettingsMenu uids={ [ block.uid ] } /> }
+					{ showUI && isValid && showContextualToolbar && <BlockContextualToolbar /> }
+					{ isFirstMultiSelected && <BlockMultiControls /> }
+					<div
+						ref={ this.bindBlockNode }
+						onKeyPress={ this.maybeStartTyping }
+						onDragStart={ ( event ) => event.preventDefault() }
+						onMouseDown={ this.onPointerDown }
+						onKeyDown={ this.onKeyDown }
+						onFocus={ this.onFocus }
+						className={ BlockListBlock.className }
+						tabIndex="0"
+						aria-label={ blockLabel }
+					>
+						<BlockCrashBoundary onError={ this.onBlockError }>
+							{ isValid && mode === 'visual' && (
+								<BlockEdit
+									name={ blockName }
+									focus={ focus }
+									attributes={ block.attributes }
+									setAttributes={ this.setAttributes }
+									insertBlocksAfter={ isLocked ? undefined : this.insertBlocksAfter }
+									onReplace={ isLocked ? undefined : onReplace }
+									setFocus={ partial( onFocus, block.uid ) }
+									mergeBlocks={ isLocked ? undefined : this.mergeBlocks }
+									className={ className }
+									id={ block.uid }
+									isSelectionEnabled={ this.props.isSelectionEnabled }
+									toggleSelection={ this.props.toggleSelection }
+								/>
+							) }
+							{ isValid && mode === 'html' && (
+								<BlockHtml uid={ block.uid } />
+							) }
+							{ ! isValid && [
+								createElement( blockType.save, {
+									key: 'invalid-preview',
+									attributes: block.attributes,
+									className,
+								} ),
+								<InvalidBlockWarning
+									key="invalid-warning"
+									block={ block }
+								/>,
+							] }
+						</BlockCrashBoundary>
+					</div>
+					{ !! error && <BlockCrashWarning /> }
 				</div>
-				{ !! error && <BlockCrashWarning /> }
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
@@ -477,6 +548,7 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 	onSelect() {
 		dispatch( selectBlock( ownProps.uid ) );
 	},
+
 	onDeselect() {
 		dispatch( clearSelectedBlock() );
 	},
@@ -496,6 +568,7 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 			uid: ownProps.uid,
 		} );
 	},
+
 	onMouseLeave() {
 		dispatch( {
 			type: 'TOGGLE_BLOCK_HOVERED',
@@ -527,8 +600,13 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 	onMetaChange( meta ) {
 		dispatch( editPost( { meta } ) );
 	},
+
 	toggleSelection( selectionEnabled ) {
 		dispatch( toggleSelection( selectionEnabled ) );
+	},
+
+	moveBlockToIndex( uid, index ) {
+		dispatch( moveBlockToIndex( uid, index ) );
 	},
 } );
 
