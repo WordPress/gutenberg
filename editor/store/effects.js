@@ -268,11 +268,7 @@ export default {
 		}
 
 		if ( isCurrentPostPublished( state ) ) {
-			// TODO: Publish autosave.
-			//  - Autosaves are created as revisions for published posts, but
-			//    the necessary REST API behavior does not yet exist
-			//  - May need to check for whether the status of the edited post
-			//    has changed from the saved copy (i.e. published -> pending)
+			dispatch( savePost( { 'autosave': 1 } ) );
 			return;
 		}
 

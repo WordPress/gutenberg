@@ -121,6 +121,24 @@ function gutenberg_pre_init() {
 	}
 }
 
+function gutenberg_add_rest_filters() {
+
+	// Read the request payload.
+	$request_body = file_get_contents('php://input');
+	$data = json_decode($request_body);
+
+	if ( ! $data ) {
+		return;
+	}
+
+	if ( isset( $_GET['gutenberg_autosave'] ) && '1' === $_GET['gutenberg_autosave'] ) {
+		$post_id = (int) $data->id;
+		$post = get_post( $post_id );
+		add_filter( 'rest_pre_insert_' . $post->post_type, 'gutenberg_handle_rest_pre_insert', 10, 2 );
+	}
+
+}
+add_action( 'rest_api_init', 'gutenberg_add_rest_filters' );
 /**
  * Initialize Gutenberg.
  *
@@ -151,6 +169,104 @@ function gutenberg_init( $return, $post ) {
 	the_gutenberg_project();
 
 	return true;
+}
+
+/**
+ * In rest_pre_insert, possibly create an autosave.
+ *
+ * @param stdClass        $prepared_post An object representing a single post prepared
+ *                                       for inserting or updating the database.
+ * @param WP_REST_Request $request       Request object.
+ *
+ * @return array The prepared post data.
+ */
+function gutenberg_handle_rest_pre_insert( $prepared_post ) {
+	if ( isset( $_GET['gutenberg_autosave'] ) && '1' === $_GET['gutenberg_autosave'] ) {
+		$autosave_id = gutenberg_create_post_autosave( (array) $prepared_post );
+		return new WP_Error(
+			'gutenberg_create_post_autosave_interrupt',
+			__( 'Interrupt normal post saving to create an autosave for Gutenberg.', 'gutenberg' ),
+			$autosave_id
+		);
+	}
+
+	return $prepared_post;
+
+}
+
+/**
+ * Hijack the response process to avoid throwing an error. Possibly could be client side instead.
+ */
+function gutenberg_handle_rest_request_after_callbacks( $response, $handler, $request ) {
+
+	if (
+		isset( $_GET['gutenberg_autosave'] ) && '1' === $_GET['gutenberg_autosave'] &&
+		'gutenberg_create_post_autosave_interrupt' === $response->get_error_code()
+	) {
+			$post = get_post( (int) $response->get_error_data() );
+			$post->post_status = null;
+			$post->post_name   = null;
+			return $post;
+	}
+	return $response;
+}
+
+add_filter( 'rest_request_after_callbacks', 'gutenberg_handle_rest_request_after_callbacks', 10, 3 );
+
+/**
+ * Creates autosave data for the specified post from $_POST data.
+ *
+ * From core post.php.
+ *
+ * @since 2.6.0
+ *
+ * @param mixed $post_data Associative array containing the post data or int post ID.
+ * @return mixed The autosave revision ID. WP_Error or 0 on error.
+ */
+function gutenberg_create_post_autosave( $post_data ) {
+
+	$post_id = (int) $post_data['ID'];
+	set_query_var( 'post_id', $post_id );
+	$post_author = get_current_user_id();
+
+	// Store one autosave per author. If there is already an autosave, overwrite it.
+	if ( $old_autosave = wp_get_post_autosave( $post_id, $post_author ) ) {
+		$new_autosave                = _wp_post_revision_data( $post_data, true );
+		$new_autosave['ID']          = $old_autosave->ID;
+		$new_autosave['post_author'] = $post_author;
+
+		// If the new autosave has the same content as the post, delete the autosave.
+		$post                  = get_post( $post_id );
+		$autosave_is_different = false;
+		foreach ( array_intersect( array_keys( $new_autosave ), array_keys( _wp_post_revision_fields( $post ) ) ) as $field ) {
+			if ( normalize_whitespace( $new_autosave[ $field ] ) != normalize_whitespace( $post->$field ) ) {
+				$autosave_is_different = true;
+				break;
+			}
+		}
+
+		if ( ! $autosave_is_different ) {
+			wp_delete_post_revision( $old_autosave->ID );
+			return 0;
+		}
+
+		/**
+		 * Fires before an autosave is stored.
+		 *
+		 * @since 4.1.0
+		 *
+		 * @param array $new_autosave Post array - the autosave that is about to be saved.
+		 */
+		do_action( 'wp_creating_autosave', $new_autosave );
+
+		return wp_update_post( $new_autosave );
+	}
+
+	// _wp_put_post_revision() expects unescaped.
+	$post_data = wp_unslash( $post_data );
+
+	// Otherwise create the new autosave as a special post revision
+	return _wp_put_post_revision( $post_data, true );
 }
 
 /**

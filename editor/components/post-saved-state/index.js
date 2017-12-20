@@ -36,7 +36,7 @@ export function PostSavedState( { isNew, isPublished, isDirty, isSaving, isSavea
 		);
 	}
 
-	if ( ! isSaveable || isPublished ) {
+	if ( ! isSaveable ) {
 		return null;
 	}
 
