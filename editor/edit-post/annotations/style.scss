@@ -1,8 +1,14 @@
 .editor-annotations {
 	display: none;
 	position: fixed;
-	background: $white;
 	z-index: z-index( '.editor-annotations' );
+
+	width: 100%;
+	height: calc( 100% - #{ $admin-bar-height-big } );
+	margin: $admin-bar-height-big 0 0;
+
+	border: 0;
+	background: $white;
 
 	&.is-open {
 		display: block;
@@ -54,8 +60,16 @@
 		}
 	}
 
+	@include break-medium {
+		height: calc( 100% - #{ $admin-bar-height } );
+		width: calc( 100% - #{ $admin-sidebar-width-collapsed } );
+		margin: $admin-bar-height 0 0 $admin-sidebar-width-collapsed;
+	}
+
 	@include break-large {
+		margin: 0;
 		width: 320px;
+		height: auto;
 		max-height: 50vh;
 
 		box-shadow: $shadow-popover;

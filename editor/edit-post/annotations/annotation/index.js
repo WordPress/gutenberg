@@ -15,7 +15,7 @@ import { IconButton } from '@wordpress/components';
 /**
  * Internal Dependencies
  */
-import { getAnnotation } from '../../../selectors';
+import { getAnnotation } from '../../../store/selectors';
 
 /**
  * Annotation
@@ -29,11 +29,11 @@ class Annotation extends Component {
 
 		this.state = {};
 
-		this.getTime.bind( this );
-		this.getIdentity.bind( this );
-		this.prepareHeader.bind( this );
-		this.prepareContent.bind( this );
-		this.prepareFooter.bind( this );
+		this.getTime = this.getTime.bind( this );
+		this.getIdentity = this.getIdentity.bind( this );
+		this.prepareHeader = this.prepareHeader.bind( this );
+		this.prepareContent = this.prepareContent.bind( this );
+		this.prepareFooter = this.prepareFooter.bind( this );
 	}
 
 	/**

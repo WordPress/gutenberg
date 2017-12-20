@@ -17,7 +17,7 @@ import { Button } from '@wordpress/components';
  */
 import {
 	isSavingAnnotation,
-} from '../../../selectors';
+} from '../../../store/selectors';
 
 /**
  * Annotation Form
@@ -31,14 +31,14 @@ class AnnotationForm extends Component {
 
 		this.state = {};
 
-		this.ref = null;
+		this.node = null;
 		this.editor = null;
 
-		this.setRef.bind( this );
-		this.prepareHeader.bind( this );
-		this.prepareEditable.bind( this );
-		this.initializeEditable.bind( this );
-		this.prepareFooter.bind( this );
+		this.bindNode = this.bindNode.bind( this );
+		this.prepareHeader = this.prepareHeader.bind( this );
+		this.prepareEditable = this.prepareEditable.bind( this );
+		this.initializeEditable = this.initializeEditable.bind( this );
+		this.prepareFooter = this.prepareFooter.bind( this );
 	}
 
 	/**
@@ -49,12 +49,12 @@ class AnnotationForm extends Component {
 	}
 
 	/**
-	 * Sets element reference.
+	 * Sets node reference.
 	 *
-	 * @param {Object} ref Element.
+	 * @param {Object} node Node.
 	 */
-	setRef( ref ) {
-		this.ref = ref;
+	bindNode( node ) {
+		this.node = node;
 	}
 
 	/**
@@ -101,7 +101,7 @@ class AnnotationForm extends Component {
 			formats: { strikethrough: { inline: 'del' } },
 			inline_boundaries_selector: 'a[href],code,b,i,strong,em,del,ins,sup,sub',
 
-			target: this.ref.querySelector( '> .editable' ),
+			target: this.node.querySelector( '.editable' ),
 			setup: ( editor ) => {
 				this.editor = editor;
 			},
@@ -151,7 +151,7 @@ class AnnotationForm extends Component {
 				method="post"
 				className={ className }
 				aria-label={ __( 'New Annotation Form' ) }
-				ref={ this.setRef }
+				ref={ this.bindNode }
 			>
 				{ this.prepareHeader() }
 				{ this.prepareEditable() }

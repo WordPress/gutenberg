@@ -46,8 +46,8 @@ $z-layers: (
 	'.components-autocomplete__results': 1000000,
 	'.blocks-url-input__suggestions': 9999,
 
-	// Show annotations above wp-admin menus and sidebar, but underneath popovers.
-	'.editor-annotations': 100001,
+	// Show annotations above most standard content, but below any overlays:
+	'.editor-annotations': 100,
 );
 
 @function z-index( $key ) {

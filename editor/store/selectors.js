@@ -27,7 +27,7 @@ import { addQueryArgs } from '@wordpress/url';
  * Internal dependencies
  */
 import { BREAK_MEDIUM } from './constants';
-import { queryAnnotations } from './utils/annotations';
+import { queryAnnotations } from '../utils/annotations';
 
 /***
  * Module constants

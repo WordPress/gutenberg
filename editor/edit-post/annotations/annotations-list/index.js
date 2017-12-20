@@ -16,7 +16,7 @@ import { Spinner } from '@wordpress/components';
  */
 import {
 	isFetchingAnnotation,
-} from '../../../selectors';
+} from '../../../store/selectors';
 
 import {
 	extractTopLevelAnnotations,
@@ -38,10 +38,10 @@ class AnnotationsList extends Component {
 
 		this.state = {};
 
-		this.prepareIssues.bind( this );
-		this.prepareAnnotations.bind( this );
-		this.prepareChildren.bind( this );
-		this.getItemProps.bind( this );
+		this.prepareIssues = this.prepareIssues.bind( this );
+		this.prepareAnnotations = this.prepareAnnotations.bind( this );
+		this.prepareChildren = this.prepareChildren.bind( this );
+		this.getItemProps = this.getItemProps.bind( this );
 	}
 
 	/**

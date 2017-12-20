@@ -13,8 +13,8 @@ import { IconButton } from '@wordpress/components';
 /**
  * Internal Dependencies
  */
-import { toggleAnnotations } from '../../actions';
-import { isAnnotationsOpen, getAnnotations } from '../../selectors';
+import { toggleAnnotations } from '../../store/actions';
+import { isAnnotationsOpen, getAnnotations } from '../../store/selectors';
 
 /**
  * Renders component.

@@ -3,7 +3,7 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
-import { pick } from 'lodash';
+import { pick, castArray } from 'lodash';
 
 /**
  * WordPress Dependencies
@@ -27,14 +27,14 @@ import {
 	getFetchedAnnotationSubstatuses,
 	isSavingAnnotation,
 	isTrashingAnnotation,
-} from '../../selectors';
+} from '../../store/selectors';
 
 import {
 	fetchAnnotations,
 	saveAnnotation,
 	trashAnnotation,
 	closeAnnotations,
-} from '../../actions';
+} from '../../store/actions';
 
 import AnnotationsList from './annotations-list';
 import AnnotationForm from './annotation-form';
@@ -52,35 +52,37 @@ class Annotations extends Component {
 		this.state = {
 			isEditing: false,
 		};
-		this.ref = null;
+		this.node = null;
 		this.rafHandle = null;
 
-		this.setRef.bind( this );
-		this.isLarge.bind( this );
-		this.maybeFetch.bind( this );
-		this.toggleWindowEvents.bind( this );
-		this.throttledSetOffset.bind( this );
-		this.setOffset.bind( this );
-		this.getOffsetPosition.bind( this );
-		this.getListProps.bind( this );
-		this.getFormProps.bind( this );
-		this.userIsPostAuthor.bind( this );
-		this.userIsAuthor.bind( this );
-		this.userCan.bind( this );
-		this.prepareHeader.bind( this );
-		this.prepareContent.bind( this );
-		this.prepareFooter.bind( this );
+		this.bindNode = this.bindNode.bind( this );
+		this.isLarge = this.isLarge.bind( this );
+		this.maybeFetch = this.maybeFetch.bind( this );
+		this.toggleWindowEvents = this.toggleWindowEvents.bind( this );
+		this.throttledSetOffset = this.throttledSetOffset.bind( this );
+		this.setOffset = this.setOffset.bind( this );
+		this.getOffsetPosition = this.getOffsetPosition.bind( this );
+		this.getListProps = this.getListProps.bind( this );
+		this.getFormProps = this.getFormProps.bind( this );
+		this.userIsPostAuthor = this.userIsPostAuthor.bind( this );
+		this.userIsAuthor = this.userIsAuthor.bind( this );
+		this.userCan = this.userCan.bind( this );
+		this.prepareHeader = this.prepareHeader.bind( this );
+		this.prepareContent = this.prepareContent.bind( this );
+		this.prepareFooter = this.prepareFooter.bind( this );
 	}
 
 	/**
 	 * After mounted.
 	 */
 	componentDidMount() {
-		if ( this.props.isOpen ) {
-			this.maybeFetch();
-			this.setOffset();
-			this.toggleWindowEvents( true );
+		if ( ! this.props.isOpen ) {
+			return;
 		}
+
+		this.maybeFetch();
+		this.setOffset();
+		this.toggleWindowEvents( true );
 	}
 
 	/**
@@ -88,18 +90,6 @@ class Annotations extends Component {
 	 */
 	componentWillUnmount() {
 		this.toggleWindowEvents( false );
-	}
-
-	/**
-	 * On props change.
-	 *
-	 * @param {Object} nextProps Next props.
-	 */
-	componentWillReceiveProps( nextProps ) {
-		if ( nextProps.isOpen ) {
-			this.maybeFetch();
-		}
-		this.toggleWindowEvents( nextProps.isOpen );
 	}
 
 	/**
@@ -111,18 +101,36 @@ class Annotations extends Component {
 	 * @return {?Boolean} False if shouldn't update.
 	 */
 	shouldComponentUpdate() {
-		if ( this.isEditing ) {
-			return false;
+		return this.state.isEditing ? false : true;
+	}
+
+	/**
+	 * After re-rendering.
+	 *
+	 * @param {Object} prevProps Previous props.
+	 * @param {Object} prevState Previous state.
+	 */
+	componentDidUpdate( prevProps ) {
+		if ( ! this.props.isOpen ) {
+			return;
+		}
+
+		if ( ! prevProps.isOpen ) {
+			this.maybeFetch();
+			this.setOffset();
+			this.toggleWindowEvents( true );
+		} else if ( prevProps.anchor !== this.props.anchor ) {
+			this.setOffset();
 		}
 	}
 
 	/**
-	 * Sets element reference.
+	 * Sets node reference.
 	 *
-	 * @param {Object} ref Element.
+	 * @param {Object} node Node.
 	 */
-	setRef( ref ) {
-		this.ref = ref;
+	bindNode( node ) {
+		this.node = node;
 	}
 
 	/**
@@ -139,11 +147,12 @@ class Annotations extends Component {
 	 */
 	maybeFetch() {
 		const { filters, fetchedSubstatuses, onFetch } = this.props;
+		const substatus = castArray( filters.substatus || [] );
 
-		if ( ! filters.substatus.every( ( substatus ) => {
-			return fetchedSubstatuses.includes( substatus );
+		if ( ! substatus.every( ( _substatus ) => {
+			return fetchedSubstatuses.includes( _substatus );
 		} ) ) {
-			onFetch( { substatus: filters.substatus } );
+			onFetch( { substatus } );
 		}
 	}
 
@@ -170,8 +179,9 @@ class Annotations extends Component {
 	 */
 	setOffset() {
 		const position = this.getOffsetPosition();
+
 		for ( const key in position ) {
-			this.ref.style[ key ] = position[ key ];
+			this.node.style[ key ] = position[ key ];
 		}
 	}
 
@@ -182,10 +192,13 @@ class Annotations extends Component {
 	 *
 	 * @return {Object} e.g., { top: 0, right: 0, bottom: 0, left: 0 }
 	 */
-	getOffsetPosition( anchor = '.editor-post-title' ) {
+	getOffsetPosition( anchor ) {
 		if ( ! this.isLarge() ) {
 			return { top: 0, right: 0, bottom: 0, left: 0 };
 		}
+
+		anchor = this.props.anchor || '.editor-post-title';
+
 		const context = document.querySelector( '.editor-layout' );
 		const element = context.querySelector( anchor );
 
@@ -196,9 +209,9 @@ class Annotations extends Component {
 		const scrollLeft = document.body.scrollLeft;
 
 		return {
-			top: rect.top + scrollTop,
+			top: ( rect.top + scrollTop ) + 'px',
 			right: 'auto', bottom: 'auto',
-			left: rect.left + scrollLeft + outerWidth,
+			left: ( rect.left + scrollLeft + outerWidth ) + 'px',
 		};
 	}
 
@@ -323,6 +336,10 @@ class Annotations extends Component {
 	 * @return {?Object} Element.
 	 */
 	prepareContent() {
+		if ( ! this.props.annotations.length ) {
+			return null;
+		}
+
 		return (
 			<div className="scroll">
 				<div className="content">
@@ -351,15 +368,22 @@ class Annotations extends Component {
 	 * @return {?Object} Element.
 	 */
 	render() {
-		const { isOpen } = this.props;
+		if ( ! this.props.isOpen ) {
+			return null;
+		}
+
+		const { isOpen, isFetching, isSaving, isTrashing } = this.props;
 
 		const className = classnames( 'editor-annotations', {
 			'is-open': isOpen,
+			'is-fetching': isFetching,
+			'is-saving': isSaving,
+			'is-trashing': isTrashing,
 		} );
 
 		return (
 			<dialog
-				ref={ this.setRef }
+				ref={ this.bindNode }
 				className={ className }
 				open={ isOpen || null }
 			>
