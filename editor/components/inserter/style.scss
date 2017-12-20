@@ -99,12 +99,12 @@ input[type="search"].editor-inserter__search {
 }
 
 .editor-inserter__separator {
-	border-top: 1px solid $light-gray-500;
+	border-bottom: 1px solid $light-gray-500;
 	background: rgba( $white, .8 );
-	text-align: center;
+	text-align: left;
 	display: block;
 	margin: 0;
-	padding: 12px 14px 0 14px;
+	padding: 12px 14px 12px 14px;
 	font-size: $default-font-size;
 	font-weight: 600;
 	margin-top: -1px;	// hide the first top border
