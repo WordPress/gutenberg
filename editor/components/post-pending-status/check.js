@@ -13,7 +13,7 @@ import { compose } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { isCurrentPostPublished, getCurrentPostType } from '../../selectors';
+import { isCurrentPostPublished, getCurrentPostType } from '../../store/selectors';
 
 export function PostPendingStatusCheck( { isPublished, children, user } ) {
 	const userCanPublishPosts = get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );

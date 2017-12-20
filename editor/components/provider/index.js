@@ -19,7 +19,7 @@ import {
 /**
  * Internal Dependencies
  */
-import { setupEditor, undo } from '../../actions';
+import { setupEditor, undo } from '../../store/actions';
 import store from '../../store';
 
 /**

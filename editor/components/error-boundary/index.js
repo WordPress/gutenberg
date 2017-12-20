@@ -14,7 +14,7 @@ import { Button, ClipboardButton } from '@wordpress/components';
  * Internal dependencies
  */
 import { Warning } from '../';
-import { getEditedPostContent } from '../../selectors';
+import { getEditedPostContent } from '../../store/selectors';
 
 class ErrorBoundary extends Component {
 	constructor() {

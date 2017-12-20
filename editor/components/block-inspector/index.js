@@ -13,7 +13,7 @@ import { Slot } from '@wordpress/components';
  * Internal Dependencies
  */
 import './style.scss';
-import { getSelectedBlock, getSelectedBlockCount } from '../../selectors';
+import { getSelectedBlock, getSelectedBlockCount } from '../../store/selectors';
 
 const BlockInspector = ( { selectedBlock, count } ) => {
 	if ( count > 1 ) {

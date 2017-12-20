@@ -17,13 +17,13 @@ import { Component, compose } from '@wordpress/element';
  * Internal dependencies
  */
 import InserterMenu from './menu';
-import { getBlockInsertionPoint, getEditorMode } from '../../selectors';
+import { getBlockInsertionPoint, getEditorMode } from '../../store/selectors';
 import {
 	insertBlock,
 	setBlockInsertionPoint,
 	clearBlockInsertionPoint,
 	hideInsertionPoint,
-} from '../../actions';
+} from '../../store/actions';
 
 class Inserter extends Component {
 	constructor() {

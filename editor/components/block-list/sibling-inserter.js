@@ -18,7 +18,7 @@ import {
 	getBlockInsertionPoint,
 	isBlockInsertionPointVisible,
 	isBlockWithinSelection,
-} from '../../selectors';
+} from '../../store/selectors';
 
 class BlockListSiblingInserter extends Component {
 	constructor() {

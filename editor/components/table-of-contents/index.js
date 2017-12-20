@@ -16,8 +16,8 @@ import { Dropdown, IconButton } from '@wordpress/components';
 import './style.scss';
 import WordCount from '../word-count';
 import DocumentOutline from '../document-outline';
-import { getBlocks } from '../../selectors';
-import { selectBlock } from '../../actions';
+import { getBlocks } from '../../store/selectors';
+import { selectBlock } from '../../store/actions';
 
 function TableOfContents( { blocks } ) {
 	const headings = filter( blocks, ( block ) => block.name === 'core/heading' );

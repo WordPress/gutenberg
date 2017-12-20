@@ -13,7 +13,7 @@ import { compose } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { getCurrentPostType } from '../../selectors';
+import { getCurrentPostType } from '../../store/selectors';
 
 function PostFormatCheck( { postType, children } ) {
 	if ( ! get( postType.data, [ 'supports', 'post-formats' ] ) ) {

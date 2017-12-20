@@ -20,7 +20,7 @@ import BlockDeleteButton from './block-delete-button';
 import BlockTransformations from './block-transformations';
 import ReusableBlockToggle from './reusable-block-toggle';
 import UnknownConverter from './unknown-converter';
-import { selectBlock } from '../../actions';
+import { selectBlock } from '../../store/actions';
 
 function BlockSettingsMenu( { uids, onSelect, focus } ) {
 	const count = uids.length;

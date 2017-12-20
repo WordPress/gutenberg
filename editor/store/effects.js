@@ -37,7 +37,7 @@ import {
 	updateReusableBlock,
 	saveReusableBlock,
 	insertBlock,
-} from '../actions';
+} from './actions';
 import {
 	getCurrentPost,
 	getCurrentPostType,
@@ -51,7 +51,7 @@ import {
 	getBlock,
 	getReusableBlock,
 	POST_UPDATE_TRANSACTION_ID,
-} from '../selectors';
+} from './selectors';
 
 /**
  * Module Constants

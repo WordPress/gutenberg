@@ -13,8 +13,8 @@ import { ExternalLink, withInstanceId } from '@wordpress/components';
  * Internal Dependencies
  */
 import './style.scss';
-import { getEditedPostExcerpt } from '../../selectors';
-import { editPost } from '../../actions';
+import { getEditedPostExcerpt } from '../../store/selectors';
+import { editPost } from '../../store/actions';
 
 function PostExcerpt( { excerpt, onUpdateExcerpt, instanceId } ) {
 	const id = `editor-post-excerpt-${ instanceId }`;

@@ -21,7 +21,7 @@ import PostSchedule from '../post-schedule';
 import PostScheduleLabel from '../post-schedule/label';
 import PostPublishButton from '../post-publish-button';
 import PostSwitchToDraftButton from '../post-switch-to-draft-button';
-import { getCurrentPostType } from '../../selectors';
+import { getCurrentPostType } from '../../store/selectors';
 
 function PostPublishDropdown( { user, onSubmit } ) {
 	const canPublish = get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );

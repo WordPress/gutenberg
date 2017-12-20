@@ -13,7 +13,7 @@ import { compose } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { getCurrentPostType } from '../../selectors';
+import { getCurrentPostType } from '../../store/selectors';
 
 export function PostAuthorCheck( { user, users, children } ) {
 	const authors = filter( users.data, ( { capabilities } ) => capabilities.level_1 );

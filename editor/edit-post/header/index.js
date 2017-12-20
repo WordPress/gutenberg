@@ -16,8 +16,8 @@ import './style.scss';
 import { PostPreviewButton, PostSavedState, PostPublishWithDropdown } from '../../components';
 import EllipsisMenu from './ellipsis-menu';
 import HeaderToolbar from './header-toolbar';
-import { isEditorSidebarOpened } from '../../selectors';
-import { toggleSidebar } from '../../actions';
+import { isEditorSidebarOpened } from '../../store/selectors';
+import { toggleSidebar } from '../../store/actions';
 
 function Header( { onToggleSidebar, isSidebarOpened } ) {
 	return (

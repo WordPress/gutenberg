@@ -16,8 +16,8 @@ import { compose } from '@wordpress/element';
  * Internal dependencies
  */
 import './style.scss';
-import { getBlock } from '../../selectors';
-import { replaceBlocks } from '../../actions';
+import { getBlock } from '../../store/selectors';
+import { replaceBlocks } from '../../store/actions';
 
 function BlockTransformations( { blocks, small = false, onTransform, onClick = noop, isLocked } ) {
 	const possibleBlockTransformations = getPossibleBlockTransformations( blocks );

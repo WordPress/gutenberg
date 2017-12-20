@@ -13,8 +13,8 @@ import { KeyboardShortcuts, withContext } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { getBlockUids, getMultiSelectedBlockUids } from '../../selectors';
-import { clearSelectedBlock, multiSelect, redo, undo, removeBlocks } from '../../actions';
+import { getBlockUids, getMultiSelectedBlockUids } from '../../store/selectors';
+import { clearSelectedBlock, multiSelect, redo, undo, removeBlocks } from '../../store/actions';
 
 class EditorGlobalKeyboardShortcuts extends Component {
 	constructor() {

@@ -13,7 +13,7 @@ import { compose } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { getCurrentPostType } from '../../selectors';
+import { getCurrentPostType } from '../../store/selectors';
 
 export function PostStickyCheck( { postType, children, user } ) {
 	const userCan = get( user.data, 'post_type_capabilities', false );

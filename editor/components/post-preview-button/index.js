@@ -19,8 +19,8 @@ import {
 	isEditedPostDirty,
 	isEditedPostNew,
 	isEditedPostSaveable,
-} from '../../selectors';
-import { autosave } from '../../actions';
+} from '../../store/selectors';
+import { autosave } from '../../store/actions';
 
 export class PostPreviewButton extends Component {
 	constructor() {

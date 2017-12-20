@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import breakpointsScssVariables from '!!sass-variables-loader!./assets/stylesheets/_breakpoints.scss';
+import breakpointsScssVariables from '!!sass-variables-loader!../assets/stylesheets/_breakpoints.scss';
 
 export const BREAK_HUGE = parseInt( breakpointsScssVariables.breakHuge );
 export const BREAK_WIDE = parseInt( breakpointsScssVariables.breakWide );

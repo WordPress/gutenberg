@@ -12,7 +12,7 @@ import { MenuItemsGroup } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { getEditorMode } from '../../../selectors';
+import { getEditorMode } from '../../../store/selectors';
 
 /**
  * Set of available mode options.

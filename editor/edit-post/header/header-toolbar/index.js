@@ -21,7 +21,7 @@ import {
 	MultiBlocksSwitcher,
 } from '../../../components';
 import NavigableToolbar from '../../../components/navigable-toolbar';
-import { isFeatureActive } from '../../../selectors';
+import { isFeatureActive } from '../../../store/selectors';
 
 function HeaderToolbar( { hasFixedToolbar } ) {
 	return (
