@@ -64,14 +64,6 @@ function action_c() {
 	window.actionValue += 'c';
 }
 
-function handle_hook_added ( ...args ) {
-	window.hookAdded = { ...args };
-}
-
-function handle_hook_removed ( ...args ) {
-	window.hookRemoved = { ...args };
-}
-
 const consoleErrorOriginal = console.error;
 
 beforeEach( () => {
@@ -629,29 +621,31 @@ test( 'Test `this` context via composition', () => {
 	Object.assign( testObject2, createHooks() );
 } );
 
-// Test adding a hook triggers a hookAdded action.
 test( 'adding a hook triggers a hookAdded action passing all callback details', () => {
-	const testObject = {};
+	const hook_added_spy = jest.fn();
 
-	addAction( 'hookAdded', 'my_callback', handle_hook_added );
+	addAction( 'hookAdded', 'my_callback', hook_added_spy );
 	addAction( 'testHook', 'my_callback2', action_a, 9 );
-	expect( window.hookAdded ).toEqual( {
-		'0': 'testHook',
-		'1': 'my_callback2',
-		'2': action_a,
-		'3': 9
-	} );
+
+	expect( hook_added_spy ).toHaveBeenCalledTimes( 1 );
+	expect( hook_added_spy ).toHaveBeenCalledWith(
+		'testHook',
+		'my_callback2',
+		action_a,
+		9
+	);
 } );
 
-// Test removing a hook triggers a hookRemoved action.
 test( 'adding a hook triggers a hookRemoved action passing all callback details', () => {
-	const testObject = {};
+	const hook_removed_spy = jest.fn();
 
-	addAction( 'hookRemoved', 'my_callback', handle_hook_removed );
+	addAction( 'hookRemoved', 'my_callback', hook_removed_spy );
 	addAction( 'testHook', 'my_callback2', action_a, 9 );
 	removeAction( 'testHook', 'my_callback2' );
-	expect( window.hookRemoved ).toEqual( {
-		'0': 'testHook',
-		'1': 'my_callback2'
-	} );
+
+	expect( hook_removed_spy ).toHaveBeenCalledTimes( 1 );
+	expect( hook_removed_spy ).toHaveBeenCalledWith(
+		'testHook',
+		'my_callback2'
+	);
 } );

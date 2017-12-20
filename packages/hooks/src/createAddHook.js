@@ -70,7 +70,9 @@ function createAddHook( hooks ) {
 			};
 		}
 
-		doAction( 'hookAdded', hookName, namespace, callback, priority );
+		if ( hookName !== 'hookAdded' ) {
+			doAction( 'hookAdded', hookName, namespace, callback, priority );
+		}
 	};
 }
 
