@@ -24,7 +24,6 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BlockMover from '../block-mover';
-import BlockDeleteButton from '../block-settings-menu/block-delete-button';
 import BlockDropZone from '../block-drop-zone';
 import BlockSettingsMenu from '../block-settings-menu';
 import InvalidBlockWarning from './invalid-block-warning';
@@ -33,6 +32,7 @@ import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import BlockMultiControls from './multi-controls';
+import BlockMobileToolbar from './block-mobile-toolbar';
 import {
 	clearSelectedBlock,
 	editPost,
@@ -436,13 +436,7 @@ export class BlockListBlock extends Component {
 							/>,
 						] }
 					</BlockCrashBoundary>
-					{ ( showUI ) &&
-						<div className="editor-block-list__mobile-tools">
-							<BlockMover uids={ [ block.uid ] } />
-							<BlockDeleteButton uids={ [ block.uid ] } small />
-							<BlockSettingsMenu uids={ [ block.uid ] } />
-						</div>
-					}
+					{ showUI && <BlockMobileToolbar uid={ block.uid } /> }
 				</div>
 				{ !! error && <BlockCrashWarning /> }
 			</div>
