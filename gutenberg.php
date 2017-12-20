@@ -493,7 +493,7 @@ function gutenberg_replace_default_add_new_button() {
 			<?php else : ?>
 			padding-right: 9px;
 			<?php endif; ?>
-		}
+		}	
 
 	</style>
 	<script type="text/javascript">
@@ -505,19 +505,23 @@ function gutenberg_replace_default_add_new_button() {
 				return;
 			}
 
-			var url = button.href;
-			var newUrl = url.replace( /[&\?]?classic-editor/, '' );
+			var url = button.href; 
+			var classicUrl = button.href + "?classic-editor";
+			/* Gutenberg is now the default editor. 
+			 * The Classic Editor requires the 
+			 * appropriate query string to appear.
+			 */
 
 			var newbutton = '<span id="split-page-title-action" class="split-page-title-action">';
-			newbutton += '<a href="' + newUrl + '">' + button.innerText + '</a>';
+			newbutton += '<a href="' + url + '">' + button.innerText + '</a>';
 			newbutton += '<span class="expander" tabindex="0" role="button" aria-haspopup="true" aria-label="<?php echo esc_js( __( 'Toggle editor selection menu', 'gutenberg' ) ); ?>"></span>';
-			newbutton += '<span class="dropdown"><a href="' + newUrl + '">Gutenberg</a>';
-			newbutton += '<a href="' + url + '"><?php echo esc_js( __( 'Classic Editor', 'gutenberg' ) ); ?></a></span></span><span class="page-title-action" style="display:none;"></span>';
+			newbutton += '<span class="dropdown"><a href="' + url + '">Gutenberg</a>';
+			newbutton += '<a href="' + classicUrl + '"><?php echo esc_js( __( 'Classic Editor', 'gutenberg' ) ); ?></a></span></span><span class="page-title-action" style="display:none;"></span>';
 
 			button.insertAdjacentHTML( 'afterend', newbutton );
 			button.remove();
 
-			var expander = document.getElementById( 'split-page-title-action' ).getElementsByClassName( 'expander' ).item( 0 );
+			var expander = document.egtElementById( 'split-page-title-action' ).getElementsByClassName( 'expander' ).item( 0 );
 			expander.addEventListener( 'click', function( e ) {
 				e.preventDefault();
 				e.target.parentNode.getElementsByClassName( 'dropdown' ).item( 0 ).classList.toggle( 'visible' );
