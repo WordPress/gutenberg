@@ -177,6 +177,20 @@ export function replaceBlock( uid, block ) {
 	return replaceBlocks( uid, block );
 }
 
+/**
+ * @todo :clk:doc
+ * @param  {[type]} uid   [description]
+ * @param  {[type]} index [description]
+ * @return {[type]}       [description]
+ */
+export function moveBlockToIndex( uid, index ) {
+	return {
+		type: 'MOVE_BLOCK_TO_INDEX',
+		uid,
+		index,
+	};
+}
+
 export function insertBlock( block, position ) {
 	return insertBlocks( [ block ], position );
 }

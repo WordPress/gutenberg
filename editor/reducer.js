@@ -236,6 +236,30 @@ export const editor = flow( [
 				];
 			}
 
+			case 'MOVE_BLOCK_TO_INDEX': {
+				if ( ! Number.isInteger( action.index ) || ! state.length ) {
+					return state;
+				}
+
+				const blockIndex = state.indexOf( action.uid );
+
+				if ( blockIndex === -1 || blockIndex === action.index ) {
+					return state;
+				}
+
+				if ( action.index < 0 ) {
+					action.index = 0;
+				} else if ( action.index >= state.length ) {
+					action.index = state.length - 1;
+				}
+
+				const _state = [ ...state ];
+
+				_state.splice( action.index, 0, _state.splice( blockIndex, 1 )[ 0 ] );
+
+				return _state;
+			}
+
 			case 'MOVE_BLOCKS_UP': {
 				const firstUid = first( action.uids );
 				const lastUid = last( action.uids );
