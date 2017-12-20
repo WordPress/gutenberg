@@ -22,7 +22,7 @@ A lightweight & efficient filter and action manager.
 * `addAction( 'hookName', 'functionName', callback, priority )`
 * `addFilter( 'hookName', 'functionName', callback, priority )`
 * `removeAction( 'hookName', 'functionName' )`
-* `removeFilter( 'hookName',  'functionName' )`
+* `removeFilter( 'hookName', 'functionName' )`
 * `removeAllActions( 'hookName' )`
 * `removeAllFilters( 'hookName' )`
 * `doAction( 'hookName', arg1, arg2, moreArgs, finalArg )`
@@ -41,4 +41,11 @@ Hooks can be added to an object via composition:
 
 `myObject.hooks = createHooks();`
 
-API functions are then be called: `myObject.hooks.addAction()`...
+API functions are then be called: `myObject.hooks.addAction()`.
+
+### Events on action/filter add or remove.
+
+Whenever an action or filter is added or removed, a matching `hookAdded` or `hookRemoved` action is triggered.
+
+* `hookAdded` is triggered when `hooks.addFilter` or `hooks.addAction` is called, passing values for `hookName`, `functionName`, `callback` and `priority`.
+* `hookRemoved` is triggered when `hooks.removeFilter` or `hooks.removeAction` is called, passing values for `hookName` and `functionName`.
