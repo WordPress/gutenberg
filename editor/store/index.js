@@ -1,7 +1,7 @@
 /**
  * WordPress Dependencies
  */
-import { registerReducer } from '@wordpress/data';
+import { registerReducer, registerSelectors } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -11,14 +11,18 @@ import reducer from './reducer';
 import { withRehydratation, loadAndPersist } from './persist';
 import enhanceWithBrowserSize from './browser';
 import store from './store';
+import { getEditedPostTitle } from './selectors';
 
 /**
  * Module Constants
  */
 const STORAGE_KEY = `GUTENBERG_PREFERENCES_${ window.userSettings.uid }`;
+const MODULE_KEY = 'core/editor';
 
-registerReducer( 'core/editor', withRehydratation( reducer, 'preferences' ) );
+registerReducer( MODULE_KEY, withRehydratation( reducer, 'preferences' ) );
 loadAndPersist( store, 'preferences', STORAGE_KEY, PREFERENCES_DEFAULTS );
 enhanceWithBrowserSize( store );
+
+registerSelectors( MODULE_KEY, { getEditedPostTitle } );
 
 export default store;
