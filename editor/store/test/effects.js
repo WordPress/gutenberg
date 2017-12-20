@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { noop, reduce, set } from 'lodash';
+import lodash from 'lodash';
 
 /**
  * WordPress dependencies
@@ -23,6 +23,7 @@ import {
 	requestMetaBoxUpdates,
 	updateReusableBlock,
 	saveReusableBlock,
+	deleteReusableBlock,
 	fetchReusableBlocks,
 	convertBlockToStatic,
 	convertBlockToReusable,
@@ -30,6 +31,8 @@ import {
 import reducer from '../reducer';
 import effects from '../effects';
 import * as selectors from '../../store/selectors';
+
+const { noop, reduce, set } = lodash;
 
 // Make all generated UUIDs the same for testing
 jest.mock( 'uuid/v4', () => {
@@ -474,6 +477,8 @@ describe( 'effects', () => {
 
 	describe( 'reusable block effects', () => {
 		beforeAll( () => {
+			lodash.uniqueId = jest.spyOn( lodash, 'uniqueId' );
+
 			registerBlockType( 'core/test-block', {
 				title: 'Test block',
 				category: 'common',
@@ -492,7 +497,13 @@ describe( 'effects', () => {
 			} );
 		} );
 
+		beforeEach( () => {
+			lodash.uniqueId.mockReset();
+		} );
+
 		afterAll( () => {
+			lodash.uniqueId.mockRestore();
+
 			unregisterBlockType( 'core/test-block' );
 			unregisterBlockType( 'core/block' );
 		} );
@@ -691,6 +702,71 @@ describe( 'effects', () => {
 			} );
 		} );
 
+		describe( '.DELETE_REUSABLE_BLOCK', () => {
+			const handler = effects.DELETE_REUSABLE_BLOCK;
+
+			it( 'should delete a reusable block', () => {
+				let modelAttributes;
+				const promise = Promise.resolve( {} );
+
+				set( global, 'wp.api.models.Blocks', class {
+					constructor( attributes ) {
+						modelAttributes = attributes;
+					}
+
+					destroy() {
+						return promise;
+					}
+				} );
+
+				const state = reducer( undefined, {} );
+				const dispatch = jest.fn();
+				const store = { getState: () => state, dispatch };
+
+				handler( deleteReusableBlock( 123 ), store );
+
+				expect( dispatch ).toHaveBeenCalledWith( {
+					type: 'REMOVE_REUSABLE_BLOCK',
+					id: 123,
+					optimist: expect.any( Object ),
+				} );
+				expect( modelAttributes ).toEqual( {
+					id: 123,
+				} );
+				return promise.then( () => {
+					expect( dispatch ).toHaveBeenCalledWith( {
+						type: 'DELETE_REUSABLE_BLOCK_SUCCESS',
+						id: 123,
+						optimist: expect.any( Object ),
+					} );
+				} );
+			} );
+
+			it( 'should handle an API error', () => {
+				const promise = Promise.reject( {} );
+
+				set( global, 'wp.api.models.Blocks', class {
+					destroy() {
+						return promise;
+					}
+				} );
+
+				const state = reducer( undefined, {} );
+				const dispatch = jest.fn();
+				const store = { getState: () => state, dispatch };
+
+				handler( deleteReusableBlock( 123 ), store );
+
+				return promise.catch( () => {
+					expect( dispatch ).toHaveBeenCalledWith( {
+						type: 'DELETE_REUSABLE_BLOCK_FAILURE',
+						id: 123,
+						optimist: expect.any( Object ),
+					} );
+				} );
+			} );
+		} );
+
 		describe( '.CONVERT_BLOCK_TO_STATIC', () => {
 			const handler = effects.CONVERT_BLOCK_TO_STATIC;
 
@@ -749,6 +825,8 @@ describe( 'effects', () => {
 
 				const dispatch = jest.fn();
 				const store = { getState: () => state, dispatch };
+
+				lodash.uniqueId.mockReturnValue( 1 );
 
 				handler( convertBlockToReusable( staticBlock.uid ), store );
 

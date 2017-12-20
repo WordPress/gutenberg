@@ -1456,6 +1456,34 @@ describe( 'state', () => {
 			} );
 		} );
 
+		it( 'should remove a reusable block', () => {
+			const id = 123;
+			const initialState = {
+				data: {
+					[ id ]: {
+						id,
+						name: 'My cool block',
+						type: 'core/paragraph',
+						attributes: {
+							content: 'Hello!',
+							dropCap: true,
+						},
+					},
+				},
+				isSaving: {},
+			};
+
+			const state = reusableBlocks( deepFreeze( initialState ), {
+				type: 'REMOVE_REUSABLE_BLOCK',
+				id,
+			} );
+
+			expect( state ).toEqual( {
+				data: {},
+				isSaving: {},
+			} );
+		} );
+
 		it( 'should indicate that a reusable block is saving', () => {
 			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
 			const initialState = {
