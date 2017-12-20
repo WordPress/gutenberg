@@ -20,8 +20,10 @@ import { getCurrentPostType, getEditedPostAttribute } from '../../store/selector
 import { editPost } from '../../store/actions';
 
 //used when labels from post tyoe were not yet loaded or when they are not present.
-const DEFAULT_SET_FEATURE_IMAGE_LABEL = __( 'Set featured image' );
-const DEFAULT_REMOVE_FEATURE_IMAGE_LABEL = __( 'Remove featured image' );
+const DEFAULT_SET_FEATURE_IMAGE_LABEL = __( 'No image selected' );
+const DEFAULT_ADD_FEATURE_IMAGE_LABEL = __( 'Add Image' );
+const DEFAULT_REMOVE_FEATURE_IMAGE_LABEL = __( 'Remove Image' );
+const DEFAULT_REPLACE_FEATURE_IMAGE_LABEL = __( 'Replace Image' );
 
 function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, media, postType } ) {
 	const postLabel = get( postType, 'data.labels', {} );
@@ -30,7 +32,7 @@ function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, med
 			{ !! featuredImageId &&
 				<MediaUploadButton
 					title={ postLabel.set_featured_image }
-					buttonProps={ { className: 'button-link editor-post-featured-image__preview' } }
+					buttonProps={ { className: 'editor-post-featured-image__preview' } }
 					onSelect={ onUpdateImage }
 					type="image"
 				>
@@ -46,22 +48,37 @@ function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, med
 				</MediaUploadButton>
 			}
 			{ !! featuredImageId && media && ! media.isLoading &&
-				<p className="editor-post-featured-image__howto">
-					{ __( 'Click the image to edit or update' ) }
-				</p>
-			}
-			{ ! featuredImageId &&
 				<MediaUploadButton
-					title={ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
-					buttonProps={ { className: 'editor-post-featured-image__toggle button-link' } }
+					title={ postLabel.set_featured_image }
+					buttonProps={ { className: 'button' } }
 					onSelect={ onUpdateImage }
 					type="image"
 				>
-					{ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
+					{ postLabel.set_featured_image || DEFAULT_REPLACE_FEATURE_IMAGE_LABEL }
 				</MediaUploadButton>
 			}
+			{ ! featuredImageId &&
+				<div>
+					<MediaUploadButton
+						title={ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
+						buttonProps={ { className: 'editor-post-featured-image__toggle' } }
+						onSelect={ onUpdateImage }
+						type="image"
+					>
+						{ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
+					</MediaUploadButton>
+					<MediaUploadButton
+						title={ postLabel.set_featured_image || DEFAULT_ADD_FEATURE_IMAGE_LABEL }
+						buttonProps={ { className: 'button' } }
+						onSelect={ onUpdateImage }
+						type="image"
+					>
+						{ postLabel.set_featured_image || DEFAULT_ADD_FEATURE_IMAGE_LABEL }
+					</MediaUploadButton>
+				</div>
+			}
 			{ !! featuredImageId &&
-				<Button className="editor-post-featured-image__toggle button-link" onClick={ onRemoveImage }>
+				<Button className="button" onClick={ onRemoveImage }>
 					{ postLabel.remove_featured_image || DEFAULT_REMOVE_FEATURE_IMAGE_LABEL }
 				</Button>
 			}
