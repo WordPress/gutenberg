@@ -674,5 +674,4 @@ test( 'removing a hook triggers a hookRemoved action passing all callback detail
 		'my_callback3'
 	);
 
-
 } );
