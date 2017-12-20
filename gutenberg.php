@@ -521,7 +521,7 @@ function gutenberg_replace_default_add_new_button() {
 			button.insertAdjacentHTML( 'afterend', newbutton );
 			button.remove();
 
-			var expander = document.egtElementById( 'split-page-title-action' ).getElementsByClassName( 'expander' ).item( 0 );
+			var expander = document.getElementById( 'split-page-title-action' ).getElementsByClassName( 'expander' ).item( 0 );
 			expander.addEventListener( 'click', function( e ) {
 				e.preventDefault();
 				e.target.parentNode.getElementsByClassName( 'dropdown' ).item( 0 ).classList.toggle( 'visible' );
