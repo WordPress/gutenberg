@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, includes, map, castArray } from 'lodash';
+import { get, includes, map, castArray, uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -58,7 +58,7 @@ import {
  */
 const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
 const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
-const SAVE_REUSABLE_BLOCK_NOTICE_ID = 'SAVE_REUSABLE_BLOCK_NOTICE_ID';
+const REUSABLE_BLOCK_NOTICE_ID = 'REUSABLE_BLOCK_NOTICE_ID';
 
 export default {
 	REQUEST_POST_UPDATE( action, store ) {
@@ -363,14 +363,51 @@ export default {
 				} );
 				dispatch( createSuccessNotice(
 					__( 'Block updated.' ),
-					{ id: SAVE_REUSABLE_BLOCK_NOTICE_ID }
+					{ id: REUSABLE_BLOCK_NOTICE_ID }
 				) );
 			},
 			( error ) => {
 				dispatch( { type: 'SAVE_REUSABLE_BLOCK_FAILURE', id } );
 				dispatch( createErrorNotice(
-					get( error.responseJSON, 'message', __( 'An unknown error occured.' ) ),
-					{ id: SAVE_REUSABLE_BLOCK_NOTICE_ID }
+					get( error.responseJSON, 'message', __( 'An unknown error occurred.' ) ),
+					{ id: REUSABLE_BLOCK_NOTICE_ID }
+				) );
+			}
+		);
+	},
+	DELETE_REUSABLE_BLOCK( action, store ) {
+		const { id } = action;
+		const { dispatch } = store;
+
+		const transactionId = uniqueId();
+
+		dispatch( {
+			type: 'REMOVE_REUSABLE_BLOCK',
+			id,
+			optimist: { type: BEGIN, id: transactionId },
+		} );
+
+		new wp.api.models.Blocks( { id } ).destroy().then(
+			() => {
+				dispatch( {
+					type: 'DELETE_REUSABLE_BLOCK_SUCCESS',
+					id,
+					optimist: { type: COMMIT, id: transactionId },
+				} );
+				dispatch( createSuccessNotice(
+					__( 'Block deleted.' ),
+					{ id: REUSABLE_BLOCK_NOTICE_ID },
+				) );
+			},
+			( error ) => {
+				dispatch( {
+					type: 'DELETE_REUSABLE_BLOCK_FAILURE',
+					id,
+					optimist: { type: REVERT, id: transactionId },
+				} );
+				dispatch( createErrorNotice(
+					get( error.responseJSON, 'message', __( 'An unknown error occurred.' ) ),
+					{ id: REUSABLE_BLOCK_NOTICE_ID }
 				) );
 			}
 		);

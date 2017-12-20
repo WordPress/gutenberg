@@ -759,6 +759,11 @@ export const reusableBlocks = combineReducers( {
 					},
 				};
 			}
+
+			case 'REMOVE_REUSABLE_BLOCK': {
+				const { id } = action;
+				return omit( state, id );
+			}
 		}
 
 		return state;
