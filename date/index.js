@@ -314,6 +314,29 @@ export function dateI18n( dateFormat, dateValue = new Date(), gmt = false ) {
 	return format( dateFormat, dateMoment );
 }
 
+/**
+ * Human time difference (like `human_time_diff()` in PHP).
+ *
+ * @param  {?(Date|String|Number|Moment|null)} from    Value parsable by moment.js or 'now'. Default is now.
+ * @param  {?(Date|String|Number|Moment|null)} to      Value parsable by moment.js or 'now'. Default is now.
+ * @param  {?Boolean}                          verbose True to add an an 'ago' (past) or 'from now' (future) suffix.
+ *                                                     Defaults to false so it matches `human_time_diff()` in PHP,
+ *                                                     which doesn't support this additional argument yet.
+ *
+ * @return {String}                                    Difference; e.g., 3 days, in 3 days, 3 days ago, 3 days from now.
+ */
+export function humanTimeDiff( from, to, verbose = false ) {
+	// Establish 'from' and 'to' times.
+	from = ! from || from === 'now' ? new Date() : from;
+	to = ! to || to === 'now' ? new Date() : to;
+	// Convert to moment.
+	const fromMoment = moment( from );
+	// Set the locale.
+	fromMoment.locale( window._wpDateSettings.l10n.locale );
+	// Format and return.
+	return fromMoment.to( to, ! verbose ? true : false );
+}
+
 export const settings = window._wpDateSettings;
 
 // Initialize.
