@@ -11,8 +11,16 @@
 	left: 0;
 	right: 0;
 
-	top: $admin-bar-height-big;
-	position: fixed;
+	// mobile edgecase for toolbar
+	top: 0;
+	position: sticky;
+
+	// on mobile the main content area has to scroll
+	// otherwise you can invoke the overscroll bounce on the non-scrolling container, causing (ノಠ益ಠ)ノ彡┻━┻
+	@include break-small {
+		position: fixed;
+		top: $admin-bar-height-big;
+	}
 
 	@include break-medium() {
 		top: $admin-bar-height;

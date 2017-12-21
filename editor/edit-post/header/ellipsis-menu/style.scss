@@ -1,9 +1,12 @@
 .editor-ellipsis-menu {
 	// the padding and margin of the ellipsis menu is intentionally non-standard
-	margin-left: 4px;
+	@include break-small() {
+		margin-left: 4px;
+	}
 
 	.components-icon-button {
 		padding: 8px 4px;
+		width: auto;
 	}
 
 	.components-button svg {
