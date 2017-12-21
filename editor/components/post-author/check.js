@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { filter } from 'lodash';
+import { connect } from 'react-redux';
+import { filter, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -9,23 +10,41 @@ import { filter } from 'lodash';
 import { withAPIData, withInstanceId } from '@wordpress/components';
 import { compose } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import { getCurrentPostType } from '../../store/selectors';
+
 export function PostAuthorCheck( { user, users, children } ) {
 	const authors = filter( users.data, ( { capabilities } ) => capabilities.level_1 );
-	if ( ! user.data || ! user.data.capabilities.publish_posts || authors.length < 2 ) {
+	const userCanPublishPosts = get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );
+
+	if ( ! userCanPublishPosts || authors.length < 2 ) {
 		return null;
 	}
 
 	return children;
 }
 
-const applyWithAPIData = withAPIData( () => {
+const applyConnect = connect(
+	( state ) => {
+		return {
+			postType: getCurrentPostType( state ),
+		};
+	},
+);
+
+const applyWithAPIData = withAPIData( ( props ) => {
+	const { postType } = props;
+
 	return {
 		users: '/wp/v2/users?context=edit&per_page=100',
-		user: '/wp/v2/users/me?context=edit',
+		user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
 	};
 } );
 
 export default compose( [
+	applyConnect,
 	applyWithAPIData,
 	withInstanceId,
 ] )( PostAuthorCheck );

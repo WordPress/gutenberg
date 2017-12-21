@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -19,6 +20,7 @@ import {
 	isEditedPostBeingScheduled,
 	isSavingPost,
 	isPublishingPost,
+	getCurrentPostType,
 } from '../../store/selectors';
 
 export function PublishButtonLabel( {
@@ -28,7 +30,8 @@ export function PublishButtonLabel( {
 	isPublishing,
 	user,
 } ) {
-	const isContributor = user.data && ! user.data.capabilities.publish_posts;
+	const userCanPublishPosts = get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );
+	const isContributor = user.data && ! userCanPublishPosts;
 
 	if ( isPublishing ) {
 		return __( 'Publishing…' );
@@ -53,12 +56,15 @@ const applyConnect = connect(
 		isBeingScheduled: isEditedPostBeingScheduled( state ),
 		isSaving: isSavingPost( state ),
 		isPublishing: isPublishingPost( state ),
+		postType: getCurrentPostType( state ),
 	} )
 );
 
-const applyWithAPIData = withAPIData( () => {
+const applyWithAPIData = withAPIData( ( props ) => {
+	const { postType } = props;
+
 	return {
-		user: '/wp/v2/users/me?context=edit',
+		user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
 	};
 } );
 

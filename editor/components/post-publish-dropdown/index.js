@@ -1,8 +1,15 @@
 /**
+ * External dependencies
+ */
+import { connect } from 'react-redux';
+import { get } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { withAPIData, PanelBody } from '@wordpress/components';
+import { compose } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -14,9 +21,10 @@ import PostSchedule from '../post-schedule';
 import PostScheduleLabel from '../post-schedule/label';
 import PostPublishButton from '../post-publish-button';
 import PostSwitchToDraftButton from '../post-switch-to-draft-button';
+import { getCurrentPostType } from '../../store/selectors';
 
 function PostPublishDropdown( { user, onSubmit } ) {
-	const canPublish = user.data && user.data.capabilities.publish_posts;
+	const canPublish = get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );
 
 	return (
 		<div className="editor-post-publish-dropdown">
@@ -51,8 +59,23 @@ function PostPublishDropdown( { user, onSubmit } ) {
 	);
 }
 
-export default withAPIData( () => {
+const applyConnect = connect(
+	( state ) => {
+		return {
+			postType: getCurrentPostType( state ),
+		};
+	},
+);
+
+const applyWithAPIData = withAPIData( ( props ) => {
+	const { postType } = props;
+
 	return {
-		user: '/wp/v2/users/me?context=edit',
+		user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
 	};
-} )( PostPublishDropdown );
+} );
+
+export default compose( [
+	applyConnect,
+	applyWithAPIData,
+] )( PostPublishDropdown );
