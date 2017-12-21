@@ -86,6 +86,7 @@
 		left: auto;
 		width: $sidebar-width;
 		border-left: 1px solid $light-gray-500;
+		@include slide_in_right;
 	}
 }
 

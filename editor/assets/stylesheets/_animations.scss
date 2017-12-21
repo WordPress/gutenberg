@@ -38,3 +38,13 @@
 	50% { opacity: 1; }
 	100% { opacity: .5; }
 }
+
+
+@mixin slide_in_right {
+	transform: translateX(+100%);
+	animation: slide_in_right 0.2s forwards;
+}
+
+@keyframes slide_in_right {
+	100% { transform: translateX(0%); }
+}
