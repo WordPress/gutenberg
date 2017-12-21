@@ -15,7 +15,8 @@ import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import {
 	getEditorMode,
 	getPreference,
-	isEditorSidebarOpened,
+	isSidebarOpened,
+	hasOpenSidebar,
 	isEditorSidebarPanelOpened,
 	hasEditorUndo,
 	hasEditorRedo,
@@ -325,19 +326,21 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'isEditorSidebarOpened', () => {
+	describe( 'isSidebarOpened', () => {
 		it( 'should return true when is not mobile and the normal sidebar is opened', () => {
 			const state = {
 				browser: {
 					width: 1000,
 				},
 				preferences: {
-					isSidebarOpened: true,
-					isSidebarOpenedMobile: false,
+					sidebars: {
+						desktop: true,
+						mobile: false,
+					},
 				},
 			};
 
-			expect( isEditorSidebarOpened( state ) ).toBe( true );
+			expect( isSidebarOpened( state ) ).toBe( true );
 		} );
 
 		it( 'should return false when is not mobile and the normal sidebar is closed', () => {
@@ -346,11 +349,14 @@ describe( 'selectors', () => {
 					width: 1000,
 				},
 				preferences: {
-					isSidebarOpened: false,
+					sidebars: {
+						desktop: false,
+						mobile: true,
+					},
 				},
 			};
 
-			expect( isEditorSidebarOpened( state ) ).toBe( false );
+			expect( isSidebarOpened( state ) ).toBe( false );
 		} );
 
 		it( 'should return true when is mobile and the mobile sidebar is opened', () => {
@@ -359,12 +365,14 @@ describe( 'selectors', () => {
 					width: 100,
 				},
 				preferences: {
-					isSidebarOpened: false,
-					isSidebarOpenedMobile: true,
+					sidebars: {
+						desktop: false,
+						mobile: true,
+					},
 				},
 			};
 
-			expect( isEditorSidebarOpened( state ) ).toBe( true );
+			expect( isSidebarOpened( state ) ).toBe( true );
 		} );
 
 		it( 'should return false when is mobile and the mobile sidebar is closed', () => {
@@ -373,12 +381,38 @@ describe( 'selectors', () => {
 					width: 100,
 				},
 				preferences: {
-					isSidebarOpened: true,
-					isSidebarOpenedMobile: false,
+					sidebars: {
+						desktop: true,
+						mobile: false,
+					},
 				},
 			};
 
-			expect( isEditorSidebarOpened( state ) ).toBe( false );
+			expect( isSidebarOpened( state ) ).toBe( false );
+		} );
+
+		it( 'should return true when the given is opened', () => {
+			const state = {
+				preferences: {
+					sidebars: {
+						publish: true,
+					},
+				},
+			};
+
+			expect( isSidebarOpened( state, 'publish' ) ).toBe( true );
+		} );
+
+		it( 'should return false when the given is not opened', () => {
+			const state = {
+				preferences: {
+					sidebars: {
+						publish: false,
+					},
+				},
+			};
+
+			expect( isSidebarOpened( state, 'publish' ) ).toBe( false );
 		} );
 	} );
 

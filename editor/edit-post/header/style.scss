@@ -102,25 +102,3 @@
 		}
 	}
 }
-
-.editor-header .editor-post-publish-panel {
-	position: fixed;
-	z-index: z-index( '.editor-layout .editor-post-publish-panel' );
-	top: $admin-bar-height-big;
-	bottom: 0;
-	right: 0;
-	left: 0;
-	overflow: auto;
-	position: fixed;
-
-	@include break-medium() {
-		top: $admin-bar-height;
-		left: auto;
-		width: $sidebar-width;
-		border-left: 1px solid $light-gray-500;
-	}
-}
-
-.editor-header .editor-post-publish-panel__header-publish-button {
-	margin-right: 52px; // This number is approximative to keep the publish button at the same position when opening the panel
-}

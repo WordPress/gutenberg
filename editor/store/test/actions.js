@@ -399,10 +399,10 @@ describe( 'actions', () => {
 
 	describe( 'toggleSidebar', () => {
 		it( 'should return TOGGLE_SIDEBAR action', () => {
-			const isMobile = true;
-			expect( toggleSidebar( isMobile ) ).toEqual( {
+			expect( toggleSidebar( 'publish', true ) ).toEqual( {
 				type: 'TOGGLE_SIDEBAR',
-				isMobile,
+				sidebar: 'publish',
+				force: true,
 			} );
 		} );
 	} );
