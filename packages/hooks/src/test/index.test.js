@@ -621,13 +621,14 @@ test( 'Test `this` context via composition', () => {
 	Object.assign( testObject2, createHooks() );
 } );
 
-test( 'adding a hook triggers a hookAdded action passing all callback details', () => {
+const setupActionListener = ( hookName, callback ) =>
+	addAction( hookName, 'my_callback', callback );
+
+test( 'adding an action triggers a hookAdded action passing all callback details', () => {
 	const hook_added_spy = jest.fn();
 
-	// Set up a listener for the 'hookAdded' action.
-	addAction( 'hookAdded', 'my_callback', hook_added_spy );
+	setupActionListener( 'hookAdded', hook_added_spy );
 
-	// Test addAction.
 	addAction( 'testAction', 'my_callback2', action_a, 9 );
 	expect( hook_added_spy ).toHaveBeenCalledTimes( 1 );
 	expect( hook_added_spy ).toHaveBeenCalledWith(
@@ -636,26 +637,28 @@ test( 'adding a hook triggers a hookAdded action passing all callback details', 
 		action_a,
 		9
 	);
+} );
 
-	// Test addFilter.
+test( 'adding a filter triggers a hookAdded action passing all callback details', () => {
+	const hook_added_spy = jest.fn();
+
+	setupActionListener( 'hookAdded', hook_added_spy );
+
 	addFilter( 'testFilter', 'my_callback3', filter_a, 8 );
-	expect( hook_added_spy ).toHaveBeenCalledTimes( 2 );
+	expect( hook_added_spy ).toHaveBeenCalledTimes( 1 );
 	expect( hook_added_spy ).toHaveBeenCalledWith(
 		'testFilter',
 		'my_callback3',
 		filter_a,
 		8
 	);
-
 } );
 
-test( 'removing a hook triggers a hookRemoved action passing all callback details', () => {
+test( 'removing an action triggers a hookRemoved action passing all callback details', () => {
 	const hook_removed_spy = jest.fn();
 
-	// Set up a listener for the 'hookRemoved' action.
-	addAction( 'hookRemoved', 'my_callback', hook_removed_spy );
+	setupActionListener( 'hookRemoved', hook_removed_spy );
 
-	// Test removeAction.
 	addAction( 'testAction', 'my_callback2', action_a, 9 );
 	removeAction( 'testAction', 'my_callback2' );
 
@@ -664,14 +667,19 @@ test( 'removing a hook triggers a hookRemoved action passing all callback detail
 		'testAction',
 		'my_callback2'
 	);
+} );
 
-	// Test removeFilter.
+test( 'removing a filter triggers a hookRemoved action passing all callback details', () => {
+	const hook_removed_spy = jest.fn();
+
+	setupActionListener( 'hookRemoved', hook_removed_spy );
+
 	addFilter( 'testFilter', 'my_callback3', filter_a, 8 );
 	removeFilter( 'testFilter', 'my_callback3' );
-	expect( hook_removed_spy ).toHaveBeenCalledTimes( 2 );
+
+	expect( hook_removed_spy ).toHaveBeenCalledTimes( 1 );
 	expect( hook_removed_spy ).toHaveBeenCalledWith(
 		'testFilter',
 		'my_callback3'
 	);
-
 } );
