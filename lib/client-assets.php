@@ -258,11 +258,8 @@ function gutenberg_register_vendor_scripts() {
 		'https://unpkg.com/moment@2.18.1/' . $moment_script,
 		array( 'react' )
 	);
-	$tinymce_version = '4.7.2';
-	gutenberg_register_vendor_script(
-		'tinymce-latest',
-		'https://fiddle.azurewebsites.net/tinymce/' . $tinymce_version . '/tinymce' . $suffix . '.js'
-	);
+	$tinymce_version = '4.6.7';
+	wp_register_script( 'tinymce-latest', includes_url( 'js/tinymce/' ) . 'wp-tinymce.php', array( 'jquery' ), false, true );
 	gutenberg_register_vendor_script(
 		'tinymce-latest-lists',
 		'https://fiddle.azurewebsites.net/tinymce/' . $tinymce_version . '/plugins/lists/plugin' . $suffix . '.js',
