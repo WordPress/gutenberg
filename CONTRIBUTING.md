@@ -29,7 +29,7 @@ To enable webpack hot module reloading, place the following line in `wp-config.p
 define( 'GUTENBERG_WEBPACK_HMR', true );
 ```
 
-Build the project ( `npm run build` ), and start the hmr development server by running `npm run hot`. Any changes to files used by the editor ( `/editor` ), should be reflected in the browser without hot reloading.
+Build the project ( `npm run build` ), and start the hmr development server by running `npm run hot`. Any changes to files used by the editor ( `/editor` ), should be reflected in the browser without reloading the page.
 
 *Warning*: This is still an experimental development feature.
 
