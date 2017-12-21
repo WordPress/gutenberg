@@ -90,6 +90,7 @@
     "postcss-loader": "2.0.6",
     "prismjs": "1.6.0",
     "raw-loader": "0.5.1",
+    "react-hot-loader": "3.1.3",
     "react-markdown": "2.5.0",
     "react-test-renderer": "16.0.0",
     "sass-loader": "6.0.6",
@@ -98,6 +99,7 @@
     "style-loader": "0.18.2",
     "tinymce": "4.7.2",
     "webpack": "3.10.0",
+    "webpack-dev-server": "2.9.7",
     "webpack-rtl-plugin": "github:yoavf/webpack-rtl-plugin#develop"
   },
   "jest": {
@@ -137,6 +139,7 @@
     "lint": "eslint .",
     "predev": "check-node-version --package",
     "dev": "cross-env BABEL_ENV=default webpack --watch",
+    "hot": "cross-env BABEL_ENV=default webpack-dev-server --config ./webpack.config.hot.js",
     "test": "npm run lint && npm run test-unit",
     "ci": "concurrently \"npm run lint && npm run build\" \"npm run test-unit:coverage-ci\"",
     "fixtures:clean": "rimraf \"blocks/test/fixtures/*.+(json|serialized.html)\"",

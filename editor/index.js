@@ -3,20 +3,20 @@
  */
 import moment from 'moment-timezone';
 import 'moment-timezone/moment-timezone-utils';
+import { AppContainer } from 'react-hot-loader';
 
 /**
  * WordPress dependencies
  */
-import { render, unmountComponentAtNode } from '@wordpress/element';
+import { render as elRender, unmountComponentAtNode } from '@wordpress/element';
 import { settings as dateSettings } from '@wordpress/date';
 
 /**
  * Internal dependencies
  */
 import './assets/stylesheets/main.scss';
-import Layout from './edit-post/layout';
-import { EditorProvider, ErrorBoundary } from './components';
 import { initializeMetaBoxState } from './store/actions';
+import Editor from './components/editor';
 
 export * from './components';
 import store from './store'; // Registers the state tree
@@ -46,6 +46,15 @@ window.jQuery( document ).on( 'heartbeat-tick', ( event, response ) => {
 	}
 } );
 
+const render = ( Component, props, target ) => {
+	elRender(
+		<AppContainer>
+			<Component { ...props } />
+		</AppContainer>,
+		target
+	);
+};
+
 /**
  * Reinitializes the editor after the user chooses to reboot the editor after
  * an unhandled error occurs, replacing previously mounted editor element using
@@ -60,11 +69,12 @@ export function recreateEditorInstance( target, settings ) {
 	const reboot = recreateEditorInstance.bind( null, target, settings );
 
 	render(
-		<EditorProvider settings={ settings } recovery>
-			<ErrorBoundary onError={ reboot }>
-				<Layout />
-			</ErrorBoundary>
-		</EditorProvider>,
+		Editor,
+		{
+			settings: settings,
+			onError: reboot,
+			recovery: true,
+		},
 		target
 	);
 }
@@ -84,14 +94,19 @@ export function createEditorInstance( id, post, settings ) {
 	const target = document.getElementById( id );
 	const reboot = recreateEditorInstance.bind( null, target, settings );
 
-	render(
-		<EditorProvider settings={ settings } post={ post }>
-			<ErrorBoundary onError={ reboot }>
-				<Layout />
-			</ErrorBoundary>
-		</EditorProvider>,
-		target
-	);
+	const props = {
+		settings: settings,
+		post: post,
+		onError: reboot,
+	};
+
+	render( Editor, props, target );
+
+	if ( module.hot ) {
+		module.hot.accept( './components/editor', () => {
+			render( Editor, props, target );
+		} );
+	}
 
 	return {
 		initializeMetaBoxes( metaBoxes ) {
