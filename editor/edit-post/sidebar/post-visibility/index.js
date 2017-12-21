@@ -16,7 +16,7 @@ import { compose } from '@wordpress/element';
  */
 import './style.scss';
 import { PostVisibility as PostVisibilityForm, PostVisibilityLabel } from '../../../components';
-import { getCurrentPostType } from '../../../selectors';
+import { getCurrentPostType } from '../../../store/selectors';
 
 export function PostVisibility( { user } ) {
 	const canEdit = get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );

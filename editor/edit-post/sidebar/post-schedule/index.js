@@ -16,7 +16,7 @@ import { compose } from '@wordpress/element';
  */
 import './style.scss';
 import { PostSchedule as PostScheduleForm, PostScheduleLabel } from '../../../components';
-import { getCurrentPostType } from '../../../selectors';
+import { getCurrentPostType } from '../../../store/selectors';
 
 export function PostSchedule( { user } ) {
 	const userCanPublishPosts = get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );
