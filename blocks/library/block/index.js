@@ -78,7 +78,7 @@ class ReusableBlockEdit extends Component {
 	}
 
 	render() {
-		const { focus, reusableBlock, isSaving, convertBlockToStatic } = this.props;
+		const { focus, reusableBlock, isSaving } = this.props;
 		const { isEditing, title, attributes } = this.state;
 
 		if ( ! reusableBlock ) {
@@ -105,7 +105,6 @@ class ReusableBlockEdit extends Component {
 					title={ title !== null ? title : reusableBlock.title }
 					isSaving={ isSaving }
 					onEdit={ this.startEditing }
-					onDetach={ convertBlockToStatic }
 					onChangeTitle={ this.setTitle }
 					onSave={ this.updateReusableBlock }
 					onCancel={ this.stopEditing }
@@ -138,12 +137,6 @@ const ConnectedReusableBlockEdit = connect(
 			dispatch( {
 				type: 'SAVE_REUSABLE_BLOCK',
 				id: ownProps.attributes.ref,
-			} );
-		},
-		convertBlockToStatic() {
-			dispatch( {
-				type: 'CONVERT_BLOCK_TO_STATIC',
-				uid: ownProps.id,
 			} );
 		},
 	} )
