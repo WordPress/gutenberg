@@ -23,10 +23,10 @@ Next, open a terminal (or if on Windows, a command prompt) and navigate to the r
 
 Webpack hot module reloading (hmr) with is available for the editor. While developing this allows you to see your changes without having to refresh the page.
 
-To enable webpack hot module reloading, place the following line in `gutenberg.php`:
+To enable webpack hot module reloading, place the following line in `wp-config.php` (in the root of your WordPress installation):
 
 ```php
-define( 'WEBPACK_HMR', true );
+define( 'GUTENBERG_WEBPACK_HMR', true );
 ```
 
 Build the project ( `npm run build` ), and start the hmr development server by running `npm run hot`. Any changes to files used by the editor ( `/editor` ), should be reflected in the browser without hot reloading.
