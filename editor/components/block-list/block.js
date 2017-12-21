@@ -358,11 +358,14 @@ export class BlockListBlock extends Component {
 
 		document.body.classList.add( 'dragging' );
 		event.dataTransfer.effectAllowed = 'Move';
-		event.dataTransfer.setData( 'uid', this.props.uid );
+		event.dataTransfer.setData(
+			'json/text',
+			JSON.stringify( { uid: this.props.uid, fromIndex: this.props.order } )
+		);
 		// order matters next. '.dragged' must be added before setting the drag image
 		block.classList.add( 'dragged' );
 		event.dataTransfer.setDragImage( block, 0, 0 );
-		event.stopPropagation();
+		// event.stopPropagation();
 
 		setTimeout( addOverlay( block, overlay ) );
 
@@ -375,18 +378,18 @@ export class BlockListBlock extends Component {
 		}
 	}
 
-	onDragEnd( event ) {
+	onDragEnd() {
 		const block = document.getElementById( `block-${ this.props.uid }` );
 		const overlay = document.getElementById( `block-overlay-${ this.props.uid }` );
 
 		document.body.classList.remove( 'dragging' );
 		block.classList.remove( 'hide' );
 		overlay.classList.remove( 'visible' );
-		event.stopPropagation();
+		// event.stopPropagation();
 	}
 
-	onDrop( event, index ) {
-		this.props.moveBlockToIndex( event.dataTransfer.getData( 'uid' ), index );
+	onDrop( uid, toIndex ) {
+		this.props.moveBlockToIndex( uid, toIndex );
 	}
 
 	render() {
