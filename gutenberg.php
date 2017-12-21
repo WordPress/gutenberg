@@ -182,15 +182,25 @@ function gutenberg_init( $return, $post ) {
  */
 function gutenberg_handle_rest_pre_insert( $prepared_post ) {
 	if ( isset( $_GET['gutenberg_autosave'] ) && '1' === $_GET['gutenberg_autosave'] ) {
-		$autosave_id = gutenberg_create_post_autosave( (array) $prepared_post );
 		if ( ! current_user_can( 'edit_post', (int) $prepared_post->ID ) ) {
 			return $prepared_post;
 		}
 
+		// Map new fields onto the existing post data.
+		$existing_post = get_post( (int) $prepared_post->ID );
+		foreach( $prepared_post as $key => $value ) {
+			$existing_post->$key = $value;
+		}
+
+		$autosave_id = gutenberg_create_post_autosave( (array) $existing_post );
+
+		// Pass the autosave id as part of the error data so we can return the autosave data later.
 		return new WP_Error(
 			'gutenberg_create_post_autosave_interrupt',
 			__( 'Interrupt normal post saving to create an autosave for Gutenberg.', 'gutenberg' ),
-			$autosave_id
+			array(
+				'autosave_id' => $autosave_id,
+			)
 		);
 	}
 
@@ -198,25 +208,14 @@ function gutenberg_handle_rest_pre_insert( $prepared_post ) {
 
 }
 
+
+/**
 /**
  * Hijack the response process to avoid throwing an error. Possibly could be client side instead.
  */
 function gutenberg_handle_rest_request_after_callbacks( $response, $handler, $request ) {
-
-	if (
-		isset( $_GET['gutenberg_autosave'] ) && '1' === $_GET['gutenberg_autosave'] &&
-		'gutenberg_create_post_autosave_interrupt' === $response->get_error_code()
-	) {
-			$post = get_post( (int) $response->get_error_data() );
-			$post->post_status = null;
-			$post->post_name   = null;
-			return $post;
-	}
-	return $response;
 }
-
 add_filter( 'rest_request_after_callbacks', 'gutenberg_handle_rest_request_after_callbacks', 10, 3 );
-
 /**
  * Creates autosave data for the specified post from $_POST data.
  *
@@ -231,6 +230,12 @@ function gutenberg_create_post_autosave( $post_data ) {
 
 	$post_id = (int) $post_data['ID'];
 	set_query_var( 'post_id', $post_id );
+}
+
+add_filter( 'rest_request_after_callbacks', 'gutenberg_handle_rest_request_after_callbacks', 10, 3 );
+}
+
+add_filter( 'rest_request_after_callbacks', 'gutenberg_handle_rest_request_after_callbacks', 10, 3 );
 	$post_author = get_current_user_id();
 
 	// Store one autosave per author. If there is already an autosave, overwrite it.
