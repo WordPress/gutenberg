@@ -183,6 +183,10 @@ function gutenberg_init( $return, $post ) {
 function gutenberg_handle_rest_pre_insert( $prepared_post ) {
 	if ( isset( $_GET['gutenberg_autosave'] ) && '1' === $_GET['gutenberg_autosave'] ) {
 		$autosave_id = gutenberg_create_post_autosave( (array) $prepared_post );
+		if ( ! current_user_can( 'edit_post', (int) $prepared_post->ID ) ) {
+			return $prepared_post;
+		}
+
 		return new WP_Error(
 			'gutenberg_create_post_autosave_interrupt',
 			__( 'Interrupt normal post saving to create an autosave for Gutenberg.', 'gutenberg' ),
