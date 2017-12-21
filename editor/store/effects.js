@@ -128,6 +128,8 @@ export default {
 				private: __( 'Post published privately!' ),
 				future: __( 'Post scheduled!' ),
 			}[ post.status ];
+		} else if ( isPublished && willPublish ) {
+			noticeMessage = false;
 		} else {
 			// Generic fallback notice
 			noticeMessage = __( 'Post updated!' );
