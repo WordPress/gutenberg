@@ -29,9 +29,17 @@
 	}
 
 	&.has-fixed-toolbar {
+		.editor-layout__content {
+			padding-top: $block-controls-height;
+		}
+
 		// on mobile, toolbars behave differently
 		@include break-small {
 			padding-top: $header-height + $block-toolbar-height;
+
+			.editor-layout__content {
+				padding-top: 0;
+			}
 		}
 
 		@include break-large {
