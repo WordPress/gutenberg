@@ -12,6 +12,7 @@ import {
 	without,
 	compact,
 	find,
+	some,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -126,15 +127,30 @@ export function getPreference( state, preferenceKey, defaultValue ) {
 }
 
 /**
- * Returns true if the editor sidebar is open, or false otherwise.
+ * Returns true if the sidebar is open, or false otherwise.
+ *
+ * @param  {Object}  state   Global application state
+ * @param  {string}  sidebar Sidebar name (leave undefined for the default sidebar)
+ * @return {Boolean}         Whether the given sidebar is open
+ */
+export function isSidebarOpened( state, sidebar ) {
+	const sidebars = getPreference( state, 'sidebars' );
+	if ( sidebar !== undefined ) {
+		return sidebars[ sidebar ];
+	}
+
+	return isMobile( state ) ? sidebars.mobile : sidebars.desktop;
+}
+
+/**
+ * Returns true if there's any open sidebar (mobile, desktop or publish)
  *
  * @param  {Object}  state Global application state
  * @return {Boolean}       Whether sidebar is open
  */
-export function isEditorSidebarOpened( state ) {
-	return isMobile( state ) ?
-		getPreference( state, 'isSidebarOpenedMobile' ) :
-		getPreference( state, 'isSidebarOpened' );
+export function hasOpenSidebar( state ) {
+	const sidebars = getPreference( state, 'sidebars' );
+	return some( sidebars );
 }
 
 /**
