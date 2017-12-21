@@ -42,7 +42,7 @@
 
 @mixin slide_in_right {
 	transform: translateX(+100%);
-	animation: slide_in_right 0.2s forwards;
+	animation: slide_in_right 0.1s forwards;
 }
 
 @keyframes slide_in_right {
