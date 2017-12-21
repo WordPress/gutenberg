@@ -17,6 +17,7 @@ import {
 	getDefaultBlockName,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -78,8 +79,14 @@ export default {
 			optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
 		} );
 		dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
-		const Model = wp.api.getPostTypeModel( getCurrentPostType( state ) );
-		new Model( toSend ).save().done( ( newPost ) => {
+		const Model = wp.api.getPostTypeModel( type );
+		const newModel = new Model( toSend );
+
+		// Tag the autosave action to avoid creating revisions.
+		if ( action.options && action.options.autosave ) {
+			newModel.url = addQueryArgs( newModel.url(), { 'gutenberg_autosave': '1' } );
+		}
+		newModel.save().done( ( newPost ) => {
 			dispatch( {
 				type: 'RESET_POST',
 				post: newPost,
@@ -91,16 +98,31 @@ export default {
 				optimist: { type: COMMIT, id: POST_UPDATE_TRANSACTION_ID },
 			} );
 		} ).fail( ( err ) => {
-			dispatch( {
-				type: 'REQUEST_POST_UPDATE_FAILURE',
-				error: get( err, 'responseJSON', {
-					code: 'unknown_error',
-					message: __( 'An unknown error occurred.' ),
-				} ),
-				post,
-				edits,
-				optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
-			} );
+			// No notices for autosaves.
+			if ( err.responseJSON && 'gutenberg_create_post_autosave_interrupt' === err.responseJSON.code ) {
+				dispatch( {
+					type: 'RESET_POST',
+					post: post,
+				} );
+				dispatch( {
+					type: 'REQUEST_POST_UPDATE_SUCCESS',
+					previousPost: post,
+					post: post,
+					optimist: { type: COMMIT, id: POST_UPDATE_TRANSACTION_ID },
+				} );
+			} else {
+
+				dispatch( {
+					type: 'REQUEST_POST_UPDATE_FAILURE',
+					error: get( err, 'responseJSON', {
+						code: 'unknown_error',
+						message: __( 'An unknown error occurred.' ),
+					} ),
+					post,
+					edits,
+					optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
+				} );
+			}
 		} );
 	},
 	REQUEST_POST_UPDATE_SUCCESS( action, store ) {
@@ -269,17 +291,12 @@ export default {
 			return;
 		}
 
-		if ( isCurrentPostPublished( state ) ) {
-			dispatch( savePost( { 'autosave': 1 } ) );
-			return;
-		}
-
 		// Change status from auto-draft to draft
 		if ( isEditedPostNew( state ) ) {
 			dispatch( editPost( { status: 'draft' } ) );
 		}
 
-		dispatch( savePost() );
+		dispatch( savePost( { 'autosave': 1 } ) );
 	},
 	SETUP_EDITOR( action ) {
 		const { post, settings } = action;
