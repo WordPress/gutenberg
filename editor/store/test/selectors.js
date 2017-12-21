@@ -416,10 +416,80 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'hasOpenSidebar', () => {
+		it( 'should return true if at least one sidebar is open (using the desktop sidebar as default)', () => {
+			const state = {
+				browser: {
+					width: 1000,
+				},
+				preferences: {
+					sidebars: {
+						desktop: true,
+						mobile: false,
+						publish: false,
+					},
+				},
+			};
+
+			expect( hasOpenSidebar( state ) ).toBe( true );
+		} );
+
+		it( 'should return true if at no sidebar is open (using the desktop sidebar as default)', () => {
+			const state = {
+				browser: {
+					width: 1000,
+				},
+				preferences: {
+					sidebars: {
+						desktop: false,
+						mobile: true,
+						publish: false,
+					},
+				},
+			};
+
+			expect( hasOpenSidebar( state ) ).toBe( false );
+		} );
+
+		it( 'should return true if at least one sidebar is open (using the mobile sidebar as default)', () => {
+			const state = {
+				browser: {
+					width: 100,
+				},
+				preferences: {
+					sidebars: {
+						desktop: false,
+						mobile: true,
+						publish: false,
+					},
+				},
+			};
+
+			expect( hasOpenSidebar( state ) ).toBe( true );
+		} );
+
+		it( 'should return true if at no sidebar is open (using the mobile sidebar as default)', () => {
+			const state = {
+				browser: {
+					width: 100,
+				},
+				preferences: {
+					sidebars: {
+						desktop: true,
+						mobile: false,
+						publish: false,
+					},
+				},
+			};
+
+			expect( hasOpenSidebar( state ) ).toBe( false );
+		} );
+	} );
+
 	describe( 'isEditorSidebarPanelOpened', () => {
 		it( 'should return false if no panels preference', () => {
 			const state = {
-				preferences: { isSidebarOpened: true },
+				preferences: {},
 			};
 
 			expect( isEditorSidebarPanelOpened( state, 'post-taxonomies' ) ).toBe( false );

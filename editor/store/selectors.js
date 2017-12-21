@@ -12,7 +12,6 @@ import {
 	without,
 	compact,
 	find,
-	some,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -150,7 +149,9 @@ export function isSidebarOpened( state, sidebar ) {
  */
 export function hasOpenSidebar( state ) {
 	const sidebars = getPreference( state, 'sidebars' );
-	return some( sidebars );
+	return isMobile( state ) ?
+		sidebars.mobile || sidebars.publish :
+		sidebars.desktop || sidebars.publish;
 }
 
 /**
