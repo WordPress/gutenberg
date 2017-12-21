@@ -1,5 +1,6 @@
 import validateNamespace from './validateNamespace.js';
 import validateHookName from './validateHookName.js';
+import { doAction } from './';
 
 /**
  * Returns a function which, when invoked, will remove a specified hook or all
@@ -64,6 +65,9 @@ function createRemoveHook( hooks, removeAll ) {
 					} );
 				}
 			}
+		}
+		if ( hookName !== 'hookRemoved' ) {
+			doAction( 'hookRemoved', hookName, namespace );
 		}
 
 		return handlersRemoved;
