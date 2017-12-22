@@ -4,13 +4,13 @@
 import shortcutMap from '../keyboard-shortcuts/map';
 
 function MenuItemsShortcut( { shortcut } ) {
-	shortcut = shortcutMap[ shortcut ];
+	const shortcutVal = shortcutMap[ shortcut ];
 
-	if ( ! shortcut ) {
+	if ( ! shortcutVal ) {
 		return null;
 	}
 	return (
-		<span key="shortcut" style={ { float: 'right', opacity: .5 } }>{ shortcut }</span>
+		<span key={ shortcut } style={ { float: 'right', opacity: .5 } }>{ shortcutVal }</span>
 	);
 }
 
