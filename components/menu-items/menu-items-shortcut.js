@@ -1,16 +1,10 @@
-/**
- * Internal dependencies
- */
-import shortcutMap from '../keyboard-shortcuts/map';
-
 function MenuItemsShortcut( { shortcut } ) {
-	const shortcutVal = shortcutMap[ shortcut ];
 
-	if ( ! shortcutVal ) {
+	if ( ! shortcut ) {
 		return null;
 	}
 	return (
-		<span key={ shortcut } style={ { float: 'right', opacity: .5 } }>{ shortcutVal }</span>
+		<span key={ shortcut } style={ { float: 'right', opacity: .5 } }>{ shortcut }</span>
 	);
 }
 
