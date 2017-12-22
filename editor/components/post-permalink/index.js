@@ -9,6 +9,7 @@ import { connect } from 'react-redux';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Dashicon, ClipboardButton, Button } from '@wordpress/components';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal Dependencies
@@ -64,7 +65,7 @@ class PostPermalink extends Component {
 			viewLink = link;
 		if ( samplePermalink ) {
 			permalink = samplePermalink[ 0 ].replace( '%postname%', samplePermalink[ 1 ] );
-			viewLink += '&preview=true';
+			viewLink = addQueryArgs( viewLink, { preview: true } );
 		}
 
 		const prefix = permalink.replace( /[^/]+\/?$/, '' ),
