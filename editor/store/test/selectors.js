@@ -81,6 +81,7 @@ import {
 	isSelectionEnabled,
 	getReusableBlocks,
 	getStateBeforeOptimisticTransaction,
+	hasFixedToolbar,
 	isFeatureActive,
 	isPublishingPost,
 	POST_UPDATE_TRANSACTION_ID,
@@ -2292,6 +2293,60 @@ describe( 'selectors', () => {
 
 			const reusableBlock = getReusableBlock( state, '358b59ee-bab3-4d6f-8445-e8c6971a5605' );
 			expect( reusableBlock ).toBeNull();
+		} );
+	} );
+
+	describe( 'hasFixedToolbar', () => {
+		it( 'should return true if fixedToolbar is active and is not mobile screen size', () => {
+			const state = {
+				mobile: false,
+				preferences: {
+					features: {
+						fixedToolbar: true,
+					},
+				},
+			};
+
+			expect( hasFixedToolbar( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if fixedToolbar is active and is mobile screen size', () => {
+			const state = {
+				mobile: true,
+				preferences: {
+					features: {
+						fixedToolbar: true,
+					},
+				},
+			};
+
+			expect( hasFixedToolbar( state ) ).toBe( false );
+		} );
+
+		it( 'should return false if fixedToolbar is disable and is not mobile screen size', () => {
+			const state = {
+				mobile: false,
+				preferences: {
+					features: {
+						fixedToolbar: false,
+					},
+				},
+			};
+
+			expect( hasFixedToolbar( state ) ).toBe( false );
+		} );
+
+		it( 'should return false if fixedToolbar is disable and is mobile screen size', () => {
+			const state = {
+				mobile: true,
+				preferences: {
+					features: {
+						fixedToolbar: false,
+					},
+				},
+			};
+
+			expect( hasFixedToolbar( state ) ).toBe( false );
 		} );
 	} );
 
