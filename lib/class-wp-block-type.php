@@ -130,9 +130,19 @@ class WP_Block_Type {
 	public function set_props( $args ) {
 		$args = wp_parse_args( $args, array(
 			'render_callback' => null,
+			'attributes'      => array(),
 		) );
 
 		$args['name'] = $this->name;
+
+		// All blocks can have annotations.
+		$args['attributes']['annotations'] = array(
+			'type'    => 'array',
+			'items'   => array(
+				'type' => 'integer',
+			),
+			'default' => array(),
+		);
 
 		foreach ( $args as $property_name => $property_value ) {
 			$this->$property_name = $property_value;

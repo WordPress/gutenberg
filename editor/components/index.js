@@ -9,6 +9,7 @@ export { default as EditorNotices } from './editor-notices';
 export { default as MetaBoxes } from './meta-boxes';
 export { default as PageAttributes } from './page-attributes';
 export { default as PageAttributesCheck } from './page-attributes/check';
+export { default as PostAnnotationsButton } from './post-annotations-button';
 export { default as PostAuthor } from './post-author';
 export { default as PostAuthorCheck } from './post-author/check';
 export { default as PostComments } from './post-comments';
@@ -43,6 +44,7 @@ export { default as UnsavedChangesWarning } from './unsaved-changes-warning';
 export { default as WordCount } from './word-count';
 
 // Content Related Components
+export { default as BlockAnnotationsButton } from './block-annotations-button';
 export { default as BlockInspector } from './block-inspector';
 export { default as BlockList } from './block-list';
 export { default as BlockMover } from './block-mover';

@@ -396,6 +396,8 @@ function gutenberg_register_post_types() {
 	register_post_type( 'wp_block', array(
 		'public' => false,
 	) );
+
+	WP_Annotation_Utils::register_post_type();
 }
 add_action( 'init', 'gutenberg_register_post_types' );
 
@@ -405,8 +407,11 @@ add_action( 'init', 'gutenberg_register_post_types' );
  * @since 0.10.0
  */
 function gutenberg_register_rest_routes() {
-	$controller = new WP_REST_Reusable_Blocks_Controller();
-	$controller->register_routes();
+	$reusable_blocks_controller = new WP_REST_Reusable_Blocks_Controller();
+	$reusable_blocks_controller->register_routes();
+
+	$annotations_controller = new WP_REST_Annotations_Controller();
+	$annotations_controller->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_routes' );
 

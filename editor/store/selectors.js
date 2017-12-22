@@ -12,6 +12,7 @@ import {
 	without,
 	compact,
 	find,
+	castArray,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -26,11 +27,14 @@ import { addQueryArgs } from '@wordpress/url';
  * Internal dependencies
  */
 import { BREAK_MEDIUM } from './constants';
+import { queryAnnotations } from '../utils/annotations';
 
 /***
  * Module constants
  */
 export const POST_UPDATE_TRANSACTION_ID = 'post-update';
+export const ANNOTATION_SAVE_TRANSACTION_ID = 'annotation-update';
+export const ANNOTATION_TRASH_TRANSACTION_ID = 'annotation-trash';
 const MAX_FREQUENT_BLOCKS = 3;
 
 /**
@@ -1100,6 +1104,160 @@ export function isSavingReusableBlock( state, ref ) {
  */
 export function getReusableBlocks( state ) {
 	return Object.values( state.reusableBlocks.data );
+}
+
+/**
+ * Returns an annotation with the given ID.
+ *
+ * @param  {Object} state  Global application state.
+ * @param  {Number} id     An annotation's ID.
+ *
+ * @return {(Object|null)} An annotation object, or null on failure.
+ */
+export function getAnnotation( state, id ) {
+	return state.annotations.data[ id ] || null;
+}
+
+/**
+ * Returns an array of annotation objects using a *memoized* query.
+ *
+ * @param  {Object}         state   Global application state.
+ * @param  {?(Object|null)} filters Any required {key: value} filters.
+ *                                  See {@link @wordpress/utils/objectMatches()}
+ *
+ * @param  {?Boolean}       deep    Include all children deeply? Default is true.
+ *
+ * @return {Object[]}               An array of annotation objects from a *memoized* query.
+ */
+export function getAnnotations( state, filters = null, deep = true ) {
+	if ( filters && filters.blockUid ) {
+		filters = {
+			...filters, // Shallow clone.
+			id: getBlockAnnotationIds( state, filters.blockUid ).sort(),
+		};
+	}
+	return queryAnnotations( Object.values( state.annotations.data ), filters, deep );
+}
+
+/**
+ * Returns all annotation IDs referenced by specific block(s).
+ *
+ * @param  {Object}             state Global application state.
+ * @param  {?(String|String[])} uids  One or more block IDs to query.
+ *                                    Defaults to all block IDs.
+ *
+ * @return {Number[]}                 An array of annotation IDs.
+ */
+export function getBlockAnnotationIds( state, uids ) {
+	uids = uids ? castArray( uids ) : [];
+	uids = uids.length ? uids : getBlockUids( state );
+
+	const blocks = uids.map( uid => getBlock( state, uid ) );
+	return reduce( blocks, ( accuIds, block ) => accuIds.concat( block.attributes.annotations ), [] );
+}
+
+/**
+ * Returns true if annotations are open.
+ *
+ * @param  {Object}  state Global application state.
+ *
+ * @return {Boolean}       True if annotations are open.
+ */
+export function isAnnotationsOpen( state ) {
+	return state.annotations.status.isOpen;
+}
+
+/**
+ * Returns current annotations anchor selector.
+ *
+ * @param  {Object} state Global application state.
+ *
+ * @return {String}       Anchor selector; e.g., .editor-post-title
+ */
+export function getAnnotationAnchor( state ) {
+	return state.annotations.status.anchor;
+}
+
+/**
+ * Returns current annotation filters.
+ *
+ * @param  {Object} state Global application state.
+ *
+ * @return {Object}       Current filters; e.g., { blockUid: [] }
+ */
+export function getAnnotationFilters( state ) {
+	return state.annotations.status.filters;
+}
+
+/**
+ * Returns true if annotation(s) are being fetched.
+ *
+ * @param  {Object}                state Global application state.
+ * @param  {?(String|Number|null)} idx   To check a specific annotation ID.
+ *                                       If empty, checks if any annotations are being fetched.
+ *                                       Or pass 'collection' to check if fetching a collection.
+ *
+ * @return {Boolean}                     True if currently fetching.
+ */
+export function isFetchingAnnotation( state, idx ) {
+	if ( idx ) {
+		return state.annotations.status.isFetching[ idx ] || false;
+	}
+	return Object.keys( state.annotations.status.isFetching ).length > 0;
+}
+
+/**
+ * Returns last time an annotations collection was fetched.
+ *
+ * @param  {Object} state Global application state.
+ *
+ * @return {Number}       Timestamp, or 0 if no fetching has occurred yet.
+ */
+export function getLastFetchAnnotationsTime( state ) {
+	return state.annotations.status.lastFetchCollectionTime || 0;
+}
+
+/**
+ * Returns an array of all annotation collection substatuses that have been fetched.
+ *
+ * @param  {Object} state Global application state.
+ *
+ * @return {String[]}     An array of substatuses; e.g., [ '', 'archive' ]
+ */
+export function getFetchedAnnotationSubstatuses( state ) {
+	return state.annotations.status.fetchedCollectionSubstatuses;
+}
+
+/**
+ * Returns true if annotation(s) are being saved.
+ *
+ * @param  {Object}         state Global application state.
+ * @param  {?(Number|null)} id    To check a specific annotation ID.
+ *                                If empty, checks if any annotations are being saved.
+ *
+ * @return {Boolean}              True if currently being saved.
+ */
+export function isSavingAnnotation( state, id ) {
+	if ( id ) {
+		return state.annotations.status.isSaving[ id ] || false;
+	}
+	return Object.keys( state.annotations.status.isSaving ).length > 0;
+}
+
+/**
+ * Returns true if annotation(s) are being trashed.
+ *
+ * @param  {Object}         state Global application state.
+ * @param  {?(Number|null)} id    To check a specific annotation ID.
+ *                                If empty, checks if any annotations are being trashed.
+ *
+ * @return {Boolean}              True if currently being trashed.
+ */
+export function isTrashingAnnotation( state, id ) {
+	if ( id ) {
+		return state.annotations.status.isTrashing[ id ] || false;
+	}
+	return Object.keys( state.annotations.status.isTrashing ).length > 0;
 }
 
 /**

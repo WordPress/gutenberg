@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import moment from 'moment';
 import optimist from 'redux-optimist';
 import { combineReducers } from 'redux';
 import {
@@ -19,6 +20,8 @@ import {
 	mapValues,
 	findIndex,
 	reject,
+	uniq,
+	castArray,
 } from 'lodash';
 
 /**
@@ -783,6 +786,207 @@ export const reusableBlocks = combineReducers( {
 	},
 } );
 
+export const annotations = combineReducers( {
+	data( state = {}, action ) {
+		switch ( action.type ) {
+			case 'FETCH_ANNOTATIONS_SUCCESS': {
+				const { fetchedData } = action;
+				const fetchedDataCollection = castArray( fetchedData );
+
+				return reduce( fetchedDataCollection, ( accuState, annotation ) => {
+					if ( annotation.status === 'trash' ) {
+						delete accuState[ annotation.id ];
+					} else {
+						accuState[ annotation.id ] = annotation;
+					}
+					return accuState;
+				}, { ...state } );
+			}
+
+			case 'ADD_ANNOTATION':
+			case 'UPDATE_ANNOTATION':
+			case 'SAVE_ANNOTATION_SUCCESS': {
+				const { newData: { id }, newData, replacesTempId } = action;
+				let newState = state; // Start w/ current state & only mutate if necessary.
+
+				if ( newData.status === 'trash' ) {
+					newState = omit( newState, id );
+				} else {
+					newState = reduce( newData, ( accuState, value, key ) => {
+						if ( ! accuState[ id ] || value !== accuState[ id ][ key ] ) {
+							if ( accuState === state ) {
+								accuState = { ...state };
+							}
+							accuState[ id ] = accuState[ id ] || {};
+							accuState[ id ][ key ] = value;
+						}
+						return accuState;
+					}, newState );
+				}
+
+				if ( replacesTempId ) {
+					if ( newState === state ) {
+						newState = omit( newState, replacesTempId );
+					} else {
+						delete newState[ replacesTempId ];
+					}
+				}
+
+				return newState;
+			}
+
+			case 'TRASH_ANNOTATION': {
+				return omit( state, action.id );
+			}
+		}
+
+		return state;
+	},
+
+	status( state = {
+		isOpen: false,
+		anchor: '',
+		filters: {},
+
+		isFetching: {},
+		lastFetchCollectionTime: 0,
+		fetchedCollectionSubstatuses: [],
+
+		isSaving: {},
+		isTrashing: {},
+	}, action ) {
+		switch ( action.type ) {
+			case 'OPEN_ANNOTATIONS':
+			case 'TOGGLE_ANNOTATIONS': {
+				const { anchor, filters } = action;
+
+				if ( action.type === 'TOGGLE_ANNOTATIONS' && state.isOpen ) {
+					return {
+						...state,
+						isOpen: false,
+					};
+				}
+
+				return {
+					...state,
+					isOpen: true,
+					anchor: anchor || state.anchor,
+					filters: {
+						...( filters || state.filters ),
+					},
+				};
+			}
+
+			case 'CLOSE_ANNOTATIONS': {
+				return {
+					...state,
+					isOpen: false,
+				};
+			}
+
+			case 'FETCH_ANNOTATIONS':
+			case 'FETCH_MORE_ANNOTATIONS': {
+				const { id, params } = action;
+
+				if ( id ) {
+					return {
+						...state,
+						isFetching: {
+							...state.isFetching,
+							[ id ]: true,
+						},
+					};
+				}
+
+				return {
+					...state,
+					isFetching: {
+						...state.isFetching,
+						collection: true,
+					},
+					lastFetchCollectionTime: moment().unix(),
+					fetchedCollectionSubstatuses: uniq(
+						state.fetchedCollectionSubstatuses.concat(
+							params.substatus || [ '' ]
+						)
+					),
+				};
+			}
+
+			case 'FETCH_ANNOTATIONS_SUCCESS':
+			case 'FETCH_ANNOTATIONS_FAILURE': {
+				const { id } = action;
+
+				if ( id ) {
+					return {
+						...state,
+						isFetching: {
+							...omit( state.isFetching, id ),
+						},
+					};
+				}
+
+				return {
+					...state,
+					isFetching: {
+						...omit( state.isFetching, 'collection' ),
+					},
+				};
+			}
+
+			case 'SAVE_ANNOTATION': {
+				const { id } = action;
+
+				return {
+					...state,
+					isSaving: {
+						...state.isSaving,
+						[ id ]: true,
+					},
+				};
+			}
+
+			case 'SAVE_ANNOTATION_SUCCESS':
+			case 'SAVE_ANNOTATION_FAILURE': {
+				const { id, tempId, replacesTempId } = action;
+
+				return {
+					...state,
+					isSaving: {
+						...omit( state.isSaving, [ id, tempId, replacesTempId ] ),
+					},
+				};
+			}
+
+			case 'TRASH_ANNOTATION': {
+				const { id } = action;
+
+				return {
+					...state,
+					isTrashing: {
+						...state.isTrashing,
+						[ id ]: true,
+					},
+				};
+			}
+
+			case 'TRASH_ANNOTATION_SUCCESS':
+			case 'TRASH_ANNOTATION_FAILURE': {
+				const { id } = action;
+
+				return {
+					...state,
+					isTrashing: {
+						...omit( state.isTrashing, id ),
+					},
+				};
+			}
+		}
+
+		return state;
+	},
+} );
+
 export default optimist( combineReducers( {
 	editor,
 	currentPost,
@@ -798,4 +1002,5 @@ export default optimist( combineReducers( {
 	metaBoxes,
 	browser,
 	reusableBlocks,
+	annotations,
 } ) );

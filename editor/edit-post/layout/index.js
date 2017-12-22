@@ -16,6 +16,7 @@ import { __ } from '@wordpress/i18n';
 import './style.scss';
 import Header from '../header';
 import Sidebar from '../sidebar';
+import Annotations from '../annotations';
 import TextEditor from '../modes/text-editor';
 import VisualEditor from '../modes/visual-editor';
 import DocumentTitle from '../document-title';
@@ -52,6 +53,7 @@ function Layout( { mode, isSidebarOpened, hasFixedToolbar } ) {
 				</div>
 			</div>
 			{ isSidebarOpened && <Sidebar /> }
+			<Annotations />
 			<Popover.Slot />
 		</div>
 	);

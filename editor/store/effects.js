@@ -1,8 +1,15 @@
 /**
  * External dependencies
  */
+import uuid from 'uuid/v4';
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, includes, map, castArray } from 'lodash';
+import {
+	get,
+	includes,
+	map,
+	castArray,
+	isEqual,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -50,7 +57,10 @@ import {
 	isEditedPostSaveable,
 	getBlock,
 	getReusableBlock,
+	getAnnotation,
 	POST_UPDATE_TRANSACTION_ID,
+	ANNOTATION_SAVE_TRANSACTION_ID,
+	ANNOTATION_TRASH_TRANSACTION_ID,
 } from './selectors';
 
 /**
@@ -59,6 +69,8 @@ import {
 const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
 const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
 const SAVE_REUSABLE_BLOCK_NOTICE_ID = 'SAVE_REUSABLE_BLOCK_NOTICE_ID';
+const SAVE_ANNOTATION_NOTICE_ID = 'SAVE_ANNOTATION_NOTICE_ID';
+const TRASH_ANNOTATION_NOTICE_ID = 'TRASH_ANNOTATION_NOTICE_ID';
 
 export default {
 	REQUEST_POST_UPDATE( action, store ) {
@@ -395,5 +407,220 @@ export default {
 	},
 	APPEND_DEFAULT_BLOCK() {
 		return insertBlock( createBlock( getDefaultBlockName() ) );
+	},
+
+	/*
+	 * Fetch annotations.
+	 */
+	FETCH_ANNOTATIONS( action, store ) {
+		const { id, params = {} } = action;
+		const { dispatch, getState } = store;
+
+		/*
+		 * This helper is used below to wrap a backbone fetch().
+		 * It's capable of fetching an entire collection recursively.
+		 * It also handles the dispatch of subsequent action callbacks.
+		 */
+		const doFetch = ( jqXHR, { fetchAll, collection } = {} ) => {
+			jqXHR.then(
+				( fetchedData ) => {
+					dispatch( {
+						type: 'FETCH_ANNOTATIONS_SUCCESS',
+						fetchedData, // Single annotation or an array.
+						id, // In the case of fetching just a single ID.
+					} );
+					if ( ! id && fetchAll && collection && collection.hasMore() ) {
+						dispatch( { ...action, type: 'FETCH_MORE_ANNOTATIONS' } );
+						doFetch( collection.more(), { fetchAll, collection } );
+					}
+				}
+			)
+				.fail(
+					( jqXHRError ) => {
+						dispatch( {
+							type: 'FETCH_ANNOTATIONS_FAILURE',
+							error: get( jqXHRError, 'responseJSON', {
+								code: 'unknown_error',
+								message: __( 'An unknown error occurred.' ),
+							} ),
+							id, // In the case of fetching just a single ID.
+						} );
+					}
+				);
+		};
+
+		if ( id ) { // One.
+			const model = new wp.api.models.Annotations( { id } );
+			doFetch( model.fetch( { data: { context: 'edit' } } ) );
+		} else { // Collection.
+			const state = getState();
+			const post = getCurrentPost( state );
+			const collection = new wp.api.collections.Annotations();
+
+			// Defaults to open annotations only.
+			const substatus = params.substatus || [ '' ];
+
+			// Only fetch all recursively if querying open annotations.
+			const fetchAll = isEqual( substatus, [ '' ] );
+
+			// If fetching all open annotations, retrieve 25 at a time for faster incremental rendering.
+			// If not fetching all, make one request for up to 100 max; e.g., archived annotations from the past.
+			const perPage = fetchAll ? 25 : 100; // @TODO support more than 100 archived annotations.
+
+			doFetch( collection.fetch( {
+				data: {
+					context: 'edit',
+					parent_post_id: post.id,
+					hierarchical: 'flat',
+					status: [ 'publish' ],
+					substatus: substatus,
+					orderby: 'date',
+					order: 'desc',
+					per_page: perPage,
+				},
+			}, { fetchAll, collection } ) );
+		}
+	},
+
+	/*
+	 * Save annotations.
+	 */
+	REQUEST_ANNOTATION_SAVE( action, store ) {
+		const { newData } = action;
+		const { dispatch, getState } = store;
+
+		const state = getState();
+		const post = getCurrentPost( state );
+
+		const isNew = newData.id ? false : true;
+		const tempId = newData.id ? '' : uuid();
+		const id = newData.id || tempId;
+
+		const oldData = getAnnotation( state, id );
+
+		newData.parent_post_id = post.id; // Enforce this.
+
+		dispatch( removeNotice( SAVE_ANNOTATION_NOTICE_ID ) );
+		dispatch( { type: 'SAVE_ANNOTATION', id } );
+
+		dispatch( { // Add/update optimistically.
+			type: isNew ? 'ADD_ANNOTATION' : 'UPDATE_ANNOTATION',
+			newData: { ...newData, id },
+			optimist: { type: BEGIN, id: ANNOTATION_SAVE_TRANSACTION_ID },
+		} );
+
+		new wp.api.models.Annotations( newData ).save().then(
+			( annotation ) => {
+				dispatch( {
+					type: 'REQUEST_ANNOTATION_SAVE_SUCCESS',
+
+					id: annotation.id,
+					replacesTempId: tempId,
+
+					oldData,
+					newData: annotation,
+
+					optimist: { type: COMMIT, id: ANNOTATION_SAVE_TRANSACTION_ID },
+				} );
+			}
+		)
+			.fail( ( jqXHRError ) => {
+				dispatch( {
+					type: 'REQUEST_ANNOTATION_SAVE_FAILURE',
+
+					id,
+					tempId,
+
+					error: get( jqXHRError, 'responseJSON', {
+						code: 'unknown_error',
+						message: __( 'An unknown error occurred.' ),
+					} ),
+					optimist: { type: REVERT, id: ANNOTATION_SAVE_TRANSACTION_ID },
+				} );
+			} );
+	},
+
+	REQUEST_ANNOTATION_SAVE_SUCCESS( action, store ) {
+		const { oldData, newData } = action;
+		const { dispatch } = store;
+
+		let message = __( 'Annotation saved.' );
+
+		if ( newData.status === 'publish' ) {
+			if ( ! oldData ) {
+				message = __( 'Annotation added.' );
+			} else if ( newData.substatus === 'archive' && newData.substatus !== oldData.substatus ) {
+				message = __( 'Annotation archived.' );
+			}
+		} else if ( newData.status === 'trash' ) {
+			message = __( 'Annotation trashed.' );
+		}
+
+		dispatch( { ...action, type: 'SAVE_ANNOTATION_SUCCESS' } );
+		dispatch( createSuccessNotice( message, { id: SAVE_ANNOTATION_NOTICE_ID } ) );
+	},
+
+	REQUEST_ANNOTATION_SAVE_FAILURE( action, store ) {
+		const { error } = action;
+		const { dispatch } = store;
+
+		dispatch( { ...action, type: 'SAVE_ANNOTATION_FAILURE' } );
+		dispatch( createErrorNotice(
+			get( error, 'message', __( 'An unknown error occured.' ) ),
+			{ id: SAVE_ANNOTATION_NOTICE_ID }
+		) );
+	},
+
+	/*
+	 * Trash annotations.
+	 */
+	REQUEST_ANNOTATION_TRASH( action, store ) {
+		const { id } = action;
+		const { dispatch } = store;
+
+		dispatch( removeNotice( TRASH_ANNOTATION_NOTICE_ID ) );
+
+		dispatch( { // Optimistically.
+			id, type: 'TRASH_ANNOTATION',
+			optimist: { type: BEGIN, id: ANNOTATION_TRASH_TRANSACTION_ID },
+		} );
+
+		new wp.api.models.Annotations( { id } ).destroy().then(
+			() => {
+				dispatch( {
+					id, type: 'REQUEST_ANNOTATION_TRASH_SUCCESS',
+					optimist: { type: COMMIT, id: ANNOTATION_TRASH_TRANSACTION_ID },
+				} );
+			}
+		)
+			.fail( ( jqXHRError ) => {
+				dispatch( {
+					id, type: 'REQUEST_ANNOTATION_TRASH_FAILURE',
+					error: get( jqXHRError, 'responseJSON', {
+						code: 'unknown_error',
+						message: __( 'An unknown error occurred.' ),
+					} ),
+					optimist: { type: REVERT, id: ANNOTATION_TRASH_TRANSACTION_ID },
+				} );
+			} );
+	},
+
+	REQUEST_ANNOTATION_TRASH_SUCCESS( action, store ) {
+		const { dispatch } = store;
+		const message = __( 'Annotation trashed.' );
+
+		dispatch( { ...action, type: 'TRASH_ANNOTATION_SUCCESS' } );
+		dispatch( createSuccessNotice( message, { id: TRASH_ANNOTATION_NOTICE_ID } ) );
+	},
+
+	REQUEST_ANNOTATION_TRASH_FAILURE( action, store ) {
+		const { error } = action;
+		const { dispatch } = store;
+
+		dispatch( { ...action, type: 'TRASH_ANNOTATION_FAILURE' } );
+		dispatch( createErrorNotice(
+			get( error, 'message', __( 'An unknown error occured.' ) ),
+			{ id: TRASH_ANNOTATION_NOTICE_ID }
+		) );
 	},
 };

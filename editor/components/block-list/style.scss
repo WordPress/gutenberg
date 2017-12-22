@@ -339,6 +339,21 @@
 				float: left;
 			}
 		}
+
+
+		> .editor-block-annotations-button {
+			position: absolute;
+			top: 8px;
+			right: -40px;
+			z-index: z-index( '.editor-block-annotations-button' );
+
+			// Mobile
+			display: none;
+
+			@include break-small {
+				display: block;
+			}
+		}
 	}
 }
 

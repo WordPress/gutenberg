@@ -22,6 +22,7 @@ $z-layers: (
 	'.editor-block-switcher__menu': 2,
 	'.components-popover__close': 2,
 	'.editor-block-mover': 1,
+	'.editor-block-annotations-button': 1,
 	'.blocks-gallery-image__inline-menu': 20,
 	'.editor-block-settings-menu__popover': 20, // Below the header
 	'.editor-header': 30,
@@ -44,6 +45,9 @@ $z-layers: (
 	'.components-popover': 1000000,
 	'.components-autocomplete__results': 1000000,
 	'.blocks-url-input__suggestions': 9999,
+
+	// Show annotations above most standard content, but below any overlays:
+	'.editor-annotations': 100,
 );
 
 @function z-index( $key ) {
