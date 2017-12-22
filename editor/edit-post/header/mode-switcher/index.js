@@ -31,10 +31,17 @@ const MODES = [
 ];
 
 function ModeSwitcher( { onSwitch, mode } ) {
+	const filteredModes = MODES.map( MODE => {
+		if ( MODE.value !== mode ) {
+			return { ...MODE, shortcut: 'toggle_editor_mode' };
+		}
+		return MODE;
+	} );
+
 	return (
 		<MenuItemsGroup
 			label={ __( 'Editor' ) }
-			choices={ MODES }
+			choices={ filteredModes }
 			value={ mode }
 			onSelect={ onSwitch }
 		/>
