@@ -48,7 +48,6 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 	 * @param string $parent_post_type Post type of the parent.
 	 */
 	public function __construct( $parent_post_type ) {
-		error_log('WP_REST_Autosaves_Controller');
 		$this->parent_post_type  = $parent_post_type;
 		$this->parent_controller = new WP_REST_Posts_Controller( $parent_post_type );
 		$this->namespace         = 'wp/v2';
@@ -65,7 +64,6 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 	 * @see register_rest_route()
 	 */
 	public function register_routes() {
-		error_log('register routes');
 		register_rest_route(
 			$this->namespace, '/' . $this->parent_base . '/(?P<parent>[\d]+)/' . $this->rest_base, array(
 				'args'   => array(
@@ -79,6 +77,12 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 					'callback'            => array( $this, 'get_items' ),
 					'permission_callback' => array( $this, 'get_items_permissions_check' ),
 					'args'                => $this->get_collection_params(),
+				),
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'create_item' ),
+					'permission_callback' => array( $this, 'create_item_permissions_check' ),
+					'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::CREATABLE ),
 				),
 				'schema' => array( $this, 'get_public_item_schema' ),
 			)
@@ -123,9 +127,65 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 	}
 
 	/**
+	 * Creates a single autosave.
+	 *
+	 * @since 5.0.0
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
+	public function create_item( $request ) {
+		// Map new fields onto the existing post data.
+		$parent = $this->get_parent( $request['parent'] );
+
+		foreach( $prepared_post as $key => $value ) {
+			$existing_post->$key = $value;
+		}
+		$prepared_post = $this->prepare_item_for_database( $request );
+
+		$autosave_id = gutenberg_create_post_autosave( (array) $existing_post );
+		$post = get_post( $autosave_id );
+
+		$request->set_param( 'context', 'edit' );
+
+		$response = $this->prepare_item_for_response( $post, $request );
+		$response = rest_ensure_response( $response );
+
+		$response->set_status( 201 );
+		$response->header( 'Location', rest_url( sprintf( '%s/%s/%d', $this->namespace, $this->rest_base, $post_id ) ) );
+
+		return $response;
+	}
+
+
+	/**
+	 * Checks if a given request has access to create an autosave.
+	 *
+	 * @since 5.0.0
+	 *
+	 * @param  WP_REST_Request $request Full details about the request.
+	 * @return bool|WP_Error True if the request has access to delete the item, WP_Error object otherwise.
+	 */
+	public function create_item_permissions_check( $request ) {
+		$parent = $this->get_parent( $request['parent'] );
+		if ( is_wp_error( $parent ) ) {
+			return $parent;
+		}
+
+		$response = $this->get_items_permissions_check( $request );
+		if ( ! $response || is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		$post_type = get_post_type_object( 'revision' );
+		return current_user_can( $post_type->cap->edit_post, $parent->ID );
+	}
+
+
+	/**
 	 * Get the parent post, if the ID is valid.
 	 *
-	 * @since 4.7.2
+	 * @since 5.0.0
 	 *
 	 * @param int $id Supplied ID.
 	 * @return WP_Post|WP_Error Post object if ID is valid, WP_Error otherwise.
@@ -145,23 +205,9 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 	}
 
 	/**
-	 * Checks if a given request has access to get autosaves.
-	 *
-	 * @since 5.0.0
-	 *
-	 * @param WP_REST_Request $request Full data about the request.
-	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
-	 */
-	public function get_items_permissions_check( $request ) {
-
-		return true;
-
-	}
-
-	/**
 	 * Get the revision, if the ID is valid.
 	 *
-	 * @since 4.7.2
+	 * @since 5.0.0
 	 *
 	 * @param int $id Supplied ID.
 	 * @return WP_Post|WP_Error Revision post object if ID is valid, WP_Error otherwise.
