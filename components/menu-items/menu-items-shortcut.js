@@ -1,5 +1,4 @@
 function MenuItemsShortcut( { shortcut } ) {
-
 	if ( ! shortcut ) {
 		return null;
 	}
