@@ -403,6 +403,35 @@ describe( 'state', () => {
 			expect( state.present.blockOrder ).toEqual( [ 'kumquat', 'persimmon', 'loquat' ] );
 		} );
 
+		it( 'should remove associated blocks when deleting a reusable block', () => {
+			const original = editor( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [ {
+					uid: 'chicken',
+					name: 'core/test-block',
+					attributes: {},
+				}, {
+					uid: 'ribs',
+					name: 'core/test-block',
+					attributes: {},
+				} ],
+			} );
+			const state = editor( original, {
+				type: 'REMOVE_REUSABLE_BLOCK',
+				id: 123,
+				associatedBlockUids: [ 'chicken', 'veggies' ],
+			} );
+
+			expect( state.present.blockOrder ).toEqual( [ 'ribs' ] );
+			expect( state.present.blocksByUid ).toEqual( {
+				ribs: {
+					uid: 'ribs',
+					name: 'core/test-block',
+					attributes: {},
+				},
+			} );
+		} );
+
 		describe( 'edits()', () => {
 			it( 'should save newly edited properties', () => {
 				const original = editor( undefined, {
@@ -1329,13 +1358,14 @@ describe( 'state', () => {
 			const state = reusableBlocks( undefined, {} );
 			expect( state ).toEqual( {
 				data: {},
+				isFetching: {},
 				isSaving: {},
 			} );
 		} );
 
 		it( 'should add fetched reusable blocks', () => {
 			const reusableBlock = {
-				id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
+				id: 123,
 				name: 'My cool block',
 				type: 'core/paragraph',
 				attributes: {
@@ -1352,13 +1382,14 @@ describe( 'state', () => {
 				data: {
 					[ reusableBlock.id ]: reusableBlock,
 				},
+				isFetching: {},
 				isSaving: {},
 			} );
 		} );
 
 		it( 'should add a reusable block', () => {
 			const reusableBlock = {
-				id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
+				id: 123,
 				name: 'My cool block',
 				type: 'core/paragraph',
 				attributes: {
@@ -1376,12 +1407,13 @@ describe( 'state', () => {
 				data: {
 					[ reusableBlock.id ]: reusableBlock,
 				},
+				isFetching: {},
 				isSaving: {},
 			} );
 		} );
 
 		it( 'should update a reusable block', () => {
-			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
+			const id = 123;
 			const initialState = {
 				data: {
 					[ id ]: {
@@ -1394,6 +1426,7 @@ describe( 'state', () => {
 						},
 					},
 				},
+				isFetching: {},
 				isSaving: {},
 			};
 
@@ -1420,12 +1453,13 @@ describe( 'state', () => {
 						},
 					},
 				},
+				isFetching: {},
 				isSaving: {},
 			} );
 		} );
 
 		it( 'should update the reusable block\'s id if it was temporary', () => {
-			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
+			const id = 123;
 			const initialState = {
 				data: {
 					[ id ]: {
@@ -1460,6 +1494,7 @@ describe( 'state', () => {
 						},
 					},
 				},
+				isFetching: {},
 				isSaving: {},
 			} );
 		} );
@@ -1478,6 +1513,7 @@ describe( 'state', () => {
 						},
 					},
 				},
+				isFetching: {},
 				isSaving: {},
 			};
 
@@ -1488,14 +1524,87 @@ describe( 'state', () => {
 
 			expect( state ).toEqual( {
 				data: {},
+				isFetching: {},
+				isSaving: {},
+			} );
+		} );
+
+		it( 'should indicate that a reusable block is fetching', () => {
+			const id = 123;
+			const initialState = {
+				data: {},
+				isFetching: {},
+				isSaving: {},
+			};
+
+			const state = reusableBlocks( initialState, {
+				type: 'FETCH_REUSABLE_BLOCKS',
+				id,
+			} );
+
+			expect( state ).toEqual( {
+				data: {},
+				isFetching: {
+					[ id ]: true,
+				},
+				isSaving: {},
+			} );
+		} );
+
+		it( 'should stop indicating that a reusable block is saving when the fetch succeeded', () => {
+			const id = 123;
+			const initialState = {
+				data: {
+					[ id ]: { id },
+				},
+				isFetching: {
+					[ id ]: true,
+				},
+				isSaving: {},
+			};
+
+			const state = reusableBlocks( initialState, {
+				type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
+				id,
+				updatedId: id,
+			} );
+
+			expect( state ).toEqual( {
+				data: {
+					[ id ]: { id },
+				},
+				isFetching: {},
+				isSaving: {},
+			} );
+		} );
+
+		it( 'should stop indicating that a reusable block is fetching when there is an error', () => {
+			const id = 123;
+			const initialState = {
+				data: {},
+				isFetching: {
+					[ id ]: true,
+				},
+				isSaving: {},
+			};
+
+			const state = reusableBlocks( initialState, {
+				type: 'FETCH_REUSABLE_BLOCKS_FAILURE',
+				id,
+			} );
+
+			expect( state ).toEqual( {
+				data: {},
+				isFetching: {},
 				isSaving: {},
 			} );
 		} );
 
 		it( 'should indicate that a reusable block is saving', () => {
-			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
+			const id = 123;
 			const initialState = {
 				data: {},
+				isFetching: {},
 				isSaving: {},
 			};
 
@@ -1506,6 +1615,7 @@ describe( 'state', () => {
 
 			expect( state ).toEqual( {
 				data: {},
+				isFetching: {},
 				isSaving: {
 					[ id ]: true,
 				},
@@ -1513,11 +1623,12 @@ describe( 'state', () => {
 		} );
 
 		it( 'should stop indicating that a reusable block is saving when the save succeeded', () => {
-			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
+			const id = 123;
 			const initialState = {
 				data: {
 					[ id ]: { id },
 				},
+				isFetching: {},
 				isSaving: {
 					[ id ]: true,
 				},
@@ -1533,14 +1644,16 @@ describe( 'state', () => {
 				data: {
 					[ id ]: { id },
 				},
+				isFetching: {},
 				isSaving: {},
 			} );
 		} );
 
 		it( 'should stop indicating that a reusable block is saving when there is an error', () => {
-			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
+			const id = 123;
 			const initialState = {
 				data: {},
+				isFetching: {},
 				isSaving: {
 					[ id ]: true,
 				},
@@ -1553,6 +1666,7 @@ describe( 'state', () => {
 
 			expect( state ).toEqual( {
 				data: {},
+				isFetching: {},
 				isSaving: {},
 			} );
 		} );

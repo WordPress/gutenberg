@@ -14,6 +14,7 @@ import {
 	createBlock,
 	serialize,
 	createReusableBlock,
+	isReusableBlock,
 	getDefaultBlockName,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
@@ -49,6 +50,7 @@ import {
 	isEditedPostNew,
 	isEditedPostSaveable,
 	getBlock,
+	getBlocks,
 	getReusableBlock,
 	POST_UPDATE_TRANSACTION_ID,
 } from './selectors';
@@ -330,6 +332,7 @@ export default {
 			( reusableBlockOrBlocks ) => {
 				dispatch( {
 					type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
+					id,
 					reusableBlocks: castArray( reusableBlockOrBlocks ).map( ( { id: itemId, title, content } ) => {
 						const [ { name: type, attributes } ] = parse( content );
 						return { id: itemId, title, type, attributes };
@@ -339,6 +342,7 @@ export default {
 			( error ) => {
 				dispatch( {
 					type: 'FETCH_REUSABLE_BLOCKS_FAILURE',
+					id,
 					error: error.responseJSON || {
 						code: 'unknown_error',
 						message: __( 'An unknown error occurred.' ),
@@ -377,13 +381,18 @@ export default {
 	},
 	DELETE_REUSABLE_BLOCK( action, store ) {
 		const { id } = action;
-		const { dispatch } = store;
+		const { getState, dispatch } = store;
+
+		const allBlocks = getBlocks( getState() );
+		const associatedBlocks = allBlocks.filter( block => isReusableBlock( block ) && block.attributes.ref === id );
+		const associatedBlockUids = associatedBlocks.map( block => block.uid );
 
 		const transactionId = uniqueId();
 
 		dispatch( {
 			type: 'REMOVE_REUSABLE_BLOCK',
 			id,
+			associatedBlockUids,
 			optimist: { type: BEGIN, id: transactionId },
 		} );
 
