@@ -79,6 +79,11 @@ export function recreateEditorInstance( target, settings ) {
 	);
 }
 
+let renderFunction = () => {};
+export function __reRenderEditor() {
+	renderFunction();
+}
+
 /**
  * Initializes and returns an instance of Editor.
  *
@@ -100,11 +105,14 @@ export function createEditorInstance( id, post, settings ) {
 		onError: reboot,
 	};
 
-	render( Editor, props, target );
+	renderFunction = () => {
+		render( Editor, props, target );
+	};
+	renderFunction();
 
 	if ( module.hot ) {
 		module.hot.accept( './components/editor', () => {
-			render( Editor, props, target );
+			renderFunction();
 		} );
 	}
 

@@ -31,3 +31,11 @@ export { default as UrlInputButton } from './url-input/button';
 // Deprecated matchers
 import { attr, prop, text, html, query, node, children } from './hooks/matchers';
 export const source = { attr, prop, text, html, query, node, children };
+
+if ( module.hot ) {
+	module.hot.accept();
+
+	if ( wp && wp.editor && wp.editor.__reRenderEditor ) {
+		wp.editor.__reRenderEditor();
+	}
+}
