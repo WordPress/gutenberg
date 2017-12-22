@@ -4,7 +4,7 @@
 import { connect } from 'react-redux';
 import {
 	findLast,
-	flatMap,
+	map,
 	invert,
 	isEqual,
 	mapValues,
@@ -211,7 +211,7 @@ class BlockList extends Component {
 		return (
 			<div>
 				{ !! blocks.length && <BlockListSiblingInserter /> }
-				{ flatMap( blocks, ( uid ) => [
+				{ map( blocks, ( uid ) => (
 					<BlockListBlock
 						key={ 'block-' + uid }
 						uid={ uid }
@@ -219,12 +219,8 @@ class BlockList extends Component {
 						onSelectionStart={ this.onSelectionStart }
 						onShiftSelection={ this.onShiftSelection }
 						showContextualToolbar={ showContextualToolbar }
-					/>,
-					<BlockListSiblingInserter
-						key={ 'sibling-inserter-' + uid }
-						uid={ uid }
-					/>,
-				] ) }
+					/>
+				) ) }
 			</div>
 		);
 	}

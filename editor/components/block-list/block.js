@@ -33,6 +33,7 @@ import BlockHtml from './block-html';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import BlockMultiControls from './multi-controls';
 import BlockMobileToolbar from './block-mobile-toolbar';
+import BlockListSiblingInserter from './sibling-inserter';
 import {
 	clearSelectedBlock,
 	editPost,
@@ -439,6 +440,7 @@ export class BlockListBlock extends Component {
 					{ showUI && <BlockMobileToolbar uid={ block.uid } /> }
 				</div>
 				{ !! error && <BlockCrashWarning /> }
+				<BlockListSiblingInserter uid={ block.uid } />
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
