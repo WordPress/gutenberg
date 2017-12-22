@@ -81,6 +81,7 @@ import {
 	isSelectionEnabled,
 	getReusableBlocks,
 	getStateBeforeOptimisticTransaction,
+	isFeatureActive,
 	isPublishingPost,
 	POST_UPDATE_TRANSACTION_ID,
 } from '../selectors';
@@ -2291,6 +2292,43 @@ describe( 'selectors', () => {
 
 			const reusableBlock = getReusableBlock( state, '358b59ee-bab3-4d6f-8445-e8c6971a5605' );
 			expect( reusableBlock ).toBeNull();
+		} );
+	} );
+
+	describe( 'isFeatureActive', () => {
+		it( 'should return true if feature is active', () => {
+			const state = {
+				preferences: {
+					features: {
+						chicken: true,
+					},
+				},
+			};
+
+			expect( isFeatureActive( state, 'chicken' ) ).toBe( true );
+		} );
+
+		it( 'should return false if feature is not active', () => {
+			const state = {
+				preferences: {
+					features: {
+						chicken: false,
+					},
+				},
+			};
+
+			expect( isFeatureActive( state, 'chicken' ) ).toBe( false );
+		} );
+
+		it( 'should return false if feature is not referred', () => {
+			const state = {
+				preferences: {
+					features: {
+					},
+				},
+			};
+
+			expect( isFeatureActive( state, 'chicken' ) ).toBe( false );
 		} );
 	} );
 
