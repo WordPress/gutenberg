@@ -12,7 +12,7 @@ import { KeyboardShortcuts } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { getEditorMode } from '../../../selectors';
+import { getEditorMode } from '../../../store/selectors';
 
 class EditorModeKeyboardShortcuts extends Component {
 	constructor() {
