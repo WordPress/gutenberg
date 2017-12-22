@@ -121,24 +121,15 @@ function gutenberg_pre_init() {
 	}
 }
 
-function gutenberg_add_rest_filters() {
-
-	// Read the request payload.
-	$request_body = file_get_contents('php://input');
-	$data = json_decode($request_body);
-
-	if ( ! $data ) {
-		return;
-	}
+function gutenberg_add_rest_endpoints() {
 
 	if ( isset( $_GET['gutenberg_autosave'] ) && '1' === $_GET['gutenberg_autosave'] ) {
 		$post_id = (int) $data->id;
 		$post = get_post( $post_id );
-		add_filter( 'rest_pre_insert_' . $post->post_type, 'gutenberg_handle_rest_pre_insert', 10, 2 );
 	}
 
 }
-add_action( 'rest_api_init', 'gutenberg_add_rest_filters' );
+add_action( 'rest_api_init', 'gutenberg_add_rest_endpoints' );
 /**
  * Initialize Gutenberg.
  *
@@ -208,14 +199,6 @@ function gutenberg_handle_rest_pre_insert( $prepared_post ) {
 
 }
 
-
-/**
-/**
- * Hijack the response process to avoid throwing an error. Possibly could be client side instead.
- */
-function gutenberg_handle_rest_request_after_callbacks( $response, $handler, $request ) {
-}
-add_filter( 'rest_request_after_callbacks', 'gutenberg_handle_rest_request_after_callbacks', 10, 3 );
 /**
  * Creates autosave data for the specified post from $_POST data.
  *
@@ -230,12 +213,7 @@ function gutenberg_create_post_autosave( $post_data ) {
 
 	$post_id = (int) $post_data['ID'];
 	set_query_var( 'post_id', $post_id );
-}
 
-add_filter( 'rest_request_after_callbacks', 'gutenberg_handle_rest_request_after_callbacks', 10, 3 );
-}
-
-add_filter( 'rest_request_after_callbacks', 'gutenberg_handle_rest_request_after_callbacks', 10, 3 );
 	$post_author = get_current_user_id();
 
 	// Store one autosave per author. If there is already an autosave, overwrite it.

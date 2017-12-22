@@ -407,6 +407,9 @@ add_action( 'init', 'gutenberg_register_post_types' );
 function gutenberg_register_rest_routes() {
 	$controller = new WP_REST_Reusable_Blocks_Controller();
 	$controller->register_routes();
+
+	$autosaves = new WP_REST_Autosaves_Controller( 'post' );
+	$autosaves->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_routes' );
 
