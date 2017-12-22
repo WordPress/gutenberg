@@ -10,7 +10,7 @@ function MenuItemsShortcut( { shortcut } ) {
 		return null;
 	}
 	return (
-		<span key="mode-switch-shortcut" style={ { float: 'right', opacity: .5 } }>{ shortcut }</span>
+		<span key="shortcut" style={ { float: 'right', opacity: .5 } }>{ shortcut }</span>
 	);
 }
 
