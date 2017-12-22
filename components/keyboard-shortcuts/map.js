@@ -1,3 +1,3 @@
 export default {
-	toggle_editor_mode: '[⌘+Shift+Alt+M]',
+	toggle_editor_mode: '⌘+Shift+Alt+M',
 };
