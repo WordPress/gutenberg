@@ -25,7 +25,6 @@ gutenberg_pre_init();
  */
 function the_gutenberg_project() {
 	global $post_type, $post_type_object;
-	$post_type_object = get_post_type_object( $post_type );
 	?>
 	<div class="gutenberg">
 		<h1 class="screen-reader-text"><?php echo esc_html( $post_type_object->labels->edit_item ); ?></h1>
