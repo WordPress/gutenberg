@@ -3,7 +3,7 @@ function MenuItemsShortcut( { shortcut } ) {
 		return null;
 	}
 	return (
-		<span key={ shortcut } style={ { float: 'right', opacity: .5 } }>{ shortcut }</span>
+		<span style={ { float: 'right', opacity: .5 } }>{ shortcut }</span>
 	);
 }
 
