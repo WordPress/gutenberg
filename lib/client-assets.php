@@ -11,10 +11,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Webpack hot module reloading
-if ( ! defined( 'WEBPACK_HMR' ) ) {
+if ( ! defined( 'GUTENBERG_WEBPACK_HMR' ) ) {
 	define( 'GUTENBERG_WEBPACK_HMR', false );
 }
-if ( ! defined( 'WEBPACK_DEV_SERVER' ) ) {
+if ( ! defined( 'GUTENBERG_WEBPACK_DEV_SERVER' ) ) {
 	define( 'GUTENBERG_WEBPACK_DEV_SERVER', 'http://localhost:3000/' );
 }
 
