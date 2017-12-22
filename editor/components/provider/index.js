@@ -53,9 +53,11 @@ class EditorProvider extends Component {
 		// Provide Backwards compatibility for enabling wide image support with `wide-images`.
 		if ( ! this.settings.alignWide && this.settings.wideImages === true ) {
 			this.settings.alignWide = true;
-			console.warn( __( "Adding theme support for `wide-images` inside the `gutenberg` array is deprecated.\n" +
-				"Instead, use `add_theme_support( 'align-wide' );`.\n" +
-				"See https://wordpress.org/gutenberg/handbook/reference/theme-support/"
+
+			// eslint-disable-next-line no-console
+			console.warn( __( 'Adding theme support for `wide-images` inside the `gutenberg` array is deprecated.\n' +
+				'Instead, use `add_theme_support( \'align-wide\' );`.\n' +
+				'See https://wordpress.org/gutenberg/handbook/reference/theme-support/'
 			) );
 		}
 
