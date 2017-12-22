@@ -56,6 +56,6 @@ export function BlockAlignmentToolbar( { value, onChange, controls = DEFAULT_CON
 
 export default withContext( 'editor' )(
 	( settings ) => ( {
-		wideControlsEnabled: settings.wideImages,
+		wideControlsEnabled: settings.alignWide,
 	} )
 )( BlockAlignmentToolbar );

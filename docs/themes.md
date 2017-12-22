@@ -9,7 +9,12 @@ To opt-in for one of these features, we should call `add_theme_support( 'gutenbe
 ```php
 function mytheme_setup_theme_supported_features() {
 	add_theme_support( 'gutenberg', array(
-		'wide-images' => true,
+		'colors' => array(
+			'#a156b4',
+			'#d0a5db',
+			'#eee',
+			'#444',
+		),
 	) );
 }
 
@@ -18,14 +23,12 @@ add_action( 'after_setup_theme', 'mytheme_setup_theme_supported_features' );
 
 ## Opt-in features
 
-### Wide Images:
+### Wide Alignment:
 
 Some blocks such as the image block have the possibility to define a "wide" or "full" alignment by adding the corresponding classname to the block's wrapper ( `alignwide` or `alignfull` ). A theme can opt-in for this feature by calling:
 
 ```php
-add_theme_support( 'gutenberg', array(
-   'wide-images' => true,
-) );
+add_theme_support( 'align-wide' );
 ```
 
 ### Colors:
@@ -34,7 +37,7 @@ Different blocks have the possibility of customizing colors. Gutenberg provides 
 
 ```php
 add_theme_support( 'gutenberg', array(
-   'colors' => array(
+	'colors' => array(
 		'#a156b4',
 		'#d0a5db',
 		'#eee',
