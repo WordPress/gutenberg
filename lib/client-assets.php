@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );
 }
 
-// Webpack hot module reloading
+// Webpack hot module reloading.
 if ( ! defined( 'GUTENBERG_WEBPACK_HMR' ) ) {
 	define( 'GUTENBERG_WEBPACK_HMR', false );
 }
@@ -39,7 +39,7 @@ function gutenberg_dir_path() {
  * @since 0.1.0
  */
 function gutenberg_url( $path, $hot = false ) {
-	if( $hot ) {
+	if ( $hot ) {
 		return GUTENBERG_WEBPACK_DEV_SERVER . $path;
 	}
 	return plugins_url( $path, dirname( __FILE__ ) );
