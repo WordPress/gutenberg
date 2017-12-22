@@ -601,3 +601,10 @@ export function appendDefaultBlock() {
 		type: 'APPEND_DEFAULT_BLOCK',
 	};
 }
+
+export function switchEditorMode( mode ) {
+	return {
+		type: 'SWITCH_MODE',
+		mode,
+	};
+}

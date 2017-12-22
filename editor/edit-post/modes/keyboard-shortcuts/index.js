@@ -12,8 +12,9 @@ import { KeyboardShortcuts } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { getEditorMode } from '../../../store/selectors';
 import shortcuts from '../../keyboard-shortcuts';
+import { getEditorMode } from '../../../store/selectors';
+import { switchEditorMode } from '../../../store/actions';
 
 class EditorModeKeyboardShortcuts extends Component {
 	constructor() {
@@ -45,9 +46,7 @@ export default connect(
 	( dispatch ) => {
 		return {
 			switchMode: ( mode ) => {
-				dispatch( {
-					type: 'SWITCH_MODE', mode: mode,
-				} );
+				dispatch( switchEditorMode( mode ) );
 			},
 		};
 	},

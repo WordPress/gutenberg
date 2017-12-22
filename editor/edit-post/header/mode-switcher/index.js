@@ -12,8 +12,9 @@ import { MenuItemsGroup } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { getEditorMode } from '../../../store/selectors';
 import shortcuts from '../../keyboard-shortcuts';
+import { getEditorMode } from '../../../store/selectors';
+import { switchEditorMode } from '../../../store/actions';
 
 /**
  * Set of available mode options.
@@ -55,10 +56,7 @@ export default connect(
 	} ),
 	( dispatch, ownProps ) => ( {
 		onSwitch( mode ) {
-			dispatch( {
-				type: 'SWITCH_MODE',
-				mode: mode,
-			} );
+			dispatch( switchEditorMode( mode ) );
 			ownProps.onSelect( mode );
 		},
 	} )
