@@ -24,7 +24,7 @@ import {
 	getEditorMode,
 	isEditorSidebarOpened,
 	isFeatureActive,
-} from '../../selectors';
+} from '../../store/selectors';
 
 function Layout( { mode, isSidebarOpened, hasFixedToolbar } ) {
 	const className = classnames( 'editor-layout', {
@@ -46,6 +46,9 @@ function Layout( { mode, isSidebarOpened, hasFixedToolbar } ) {
 				</div>
 				<div className="editor-layout__metaboxes">
 					<MetaBoxes location="normal" />
+				</div>
+				<div className="editor-layout__metaboxes">
+					<MetaBoxes location="advanced" />
 				</div>
 			</div>
 			{ isSidebarOpened && <Sidebar /> }

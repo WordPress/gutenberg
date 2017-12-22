@@ -21,7 +21,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { getPostEditUrl, getWPAdminURL } from './utils/url';
+import { getPostEditUrl, getWPAdminURL } from '../utils/url';
 import {
 	resetPost,
 	setupNewPost,
@@ -50,12 +50,15 @@ import {
 	isEditedPostSaveable,
 	getBlock,
 	getReusableBlock,
+	POST_UPDATE_TRANSACTION_ID,
 } from './selectors';
 
+/**
+ * Module Constants
+ */
 const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
 const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
 const SAVE_REUSABLE_BLOCK_NOTICE_ID = 'SAVE_REUSABLE_BLOCK_NOTICE_ID';
-export const POST_UPDATE_TRANSACTION_ID = 'post-update';
 
 export default {
 	REQUEST_POST_UPDATE( action, store ) {

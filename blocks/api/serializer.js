@@ -28,24 +28,25 @@ export function getBlockDefaultClassname( blockName ) {
 
 /**
  * Given a block type containg a save render implementation and attributes, returns the
- * static markup to be saved.
+ * enhanced element to be saved or string when raw HTML expected.
  *
  * @param  {Object} blockType  Block type
  * @param  {Object} attributes Block attributes
- * @return {string}            Save content
+ * @return {Object|string}     Save content
  */
-export function getSaveContent( blockType, attributes ) {
+export function getSaveElement( blockType, attributes ) {
 	const { save } = blockType;
-	let saveContent;
+
+	let saveElement;
 
 	if ( save.prototype instanceof Component ) {
-		saveContent = createElement( save, { attributes } );
+		saveElement = createElement( save, { attributes } );
 	} else {
-		saveContent = save( { attributes } );
+		saveElement = save( { attributes } );
 
 		// Special-case function render implementation to allow raw HTML return
-		if ( 'string' === typeof saveContent ) {
-			return saveContent;
+		if ( 'string' === typeof saveElement ) {
+			return saveElement;
 		}
 	}
 
@@ -59,10 +60,28 @@ export function getSaveContent( blockType, attributes ) {
 
 		return cloneElement( element, props );
 	};
-	const contentWithExtraProps = Children.map( saveContent, addExtraContainerProps );
+
+	return Children.map( saveElement, addExtraContainerProps );
+}
+
+/**
+ * Given a block type containg a save render implementation and attributes, returns the
+ * static markup to be saved.
+ *
+ * @param  {Object} blockType  Block type
+ * @param  {Object} attributes Block attributes
+ * @return {string}            Save content
+ */
+export function getSaveContent( blockType, attributes ) {
+	const saveElement = getSaveElement( blockType, attributes );
+
+	// Special-case function render implementation to allow raw HTML return
+	if ( 'string' === typeof saveElement ) {
+		return saveElement;
+	}
 
 	// Otherwise, infer as element
-	return renderToString( contentWithExtraProps );
+	return renderToString( saveElement );
 }
 
 /**

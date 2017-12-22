@@ -44,7 +44,7 @@ export function createBlock( name, blockAttributes = {} ) {
 		const value = blockAttributes[ key ];
 		if ( undefined !== value ) {
 			result[ key ] = value;
-		} else if ( source.default ) {
+		} else if ( source.hasOwnProperty( 'default' ) ) {
 			result[ key ] = source.default;
 		}
 

@@ -17,8 +17,8 @@ import { Spinner } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import { handleMetaBoxReload, metaBoxStateChanged, metaBoxLoaded } from '../../../actions';
-import { getMetaBox, isSavingPost } from '../../../selectors';
+import { handleMetaBoxReload, metaBoxStateChanged, metaBoxLoaded } from '../../../store/actions';
+import { getMetaBox, isSavingPost } from '../../../store/selectors';
 
 class MetaBoxesArea extends Component {
 	constructor() {

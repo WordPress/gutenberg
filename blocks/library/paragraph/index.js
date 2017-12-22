@@ -100,7 +100,7 @@ class ParagraphBlock extends Component {
 			focus && (
 				<InspectorControls key="inspector">
 					<BlockDescription>
-						<p>{ __( 'Text. Great things start here.' ) }</p>
+						<p>{ __( 'This is a simple text only block for inserting a single paragraph of content.' ) }</p>
 					</BlockDescription>
 					<PanelBody title={ __( 'Text Settings' ) }>
 						<ToggleControl

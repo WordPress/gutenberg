@@ -77,6 +77,12 @@ function gutenberg_register_scripts_and_styles() {
 
 	// Editor Scripts.
 	wp_register_script(
+		'wp-data',
+		gutenberg_url( 'data/build/index.js' ),
+		array(),
+		filemtime( gutenberg_dir_path() . 'data/build/index.js' )
+	);
+	wp_register_script(
 		'wp-utils',
 		gutenberg_url( 'utils/build/index.js' ),
 		array(),
@@ -643,7 +649,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	wp_enqueue_script(
 		'wp-editor',
 		gutenberg_url( 'editor/build/index.js' ),
-		array( 'jquery', 'wp-api', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element', 'wp-components', 'wp-utils', 'word-count', 'editor', 'heartbeat' ),
+		array( 'jquery', 'wp-api', 'wp-data', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element', 'wp-components', 'wp-utils', 'word-count', 'editor', 'heartbeat' ),
 		filemtime( gutenberg_dir_path() . 'editor/build/index.js' ),
 		true // enqueue in the footer.
 	);
@@ -737,9 +743,12 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		$post_to_edit['content']['raw'] = gutenberg_wpautop_block_content( $post_to_edit['content']['raw'] );
 	}
 
+	// Set the post type name.
+	$post_type = get_post_type( $post );
+
 	// Preload common data.
 	$preload_paths = array(
-		'/wp/v2/users/me?context=edit',
+		sprintf( '/wp/v2/users/me?post_type=%s&context=edit', $post_type ),
 		'/wp/v2/taxonomies?context=edit',
 		gutenberg_get_rest_link( $post_to_edit, 'about', 'edit' ),
 	);
@@ -808,9 +817,10 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$allowed_block_types = apply_filters( 'allowed_block_types', true );
 
 	$editor_settings = array(
-		'wideImages' => ! empty( $gutenberg_theme_support[0]['wide-images'] ),
-		'colors'     => $color_palette,
-		'blockTypes' => $allowed_block_types,
+		'wideImages'       => ! empty( $gutenberg_theme_support[0]['wide-images'] ),
+		'colors'           => $color_palette,
+		'blockTypes'       => $allowed_block_types,
+		'titlePlaceholder' => apply_filters( 'enter_title_here', __( 'Add title', 'gutenberg' ), $post ),
 	);
 
 	$post_type_object = get_post_type_object( $post_to_edit['type'] );

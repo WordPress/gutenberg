@@ -26,10 +26,10 @@ import {
 	fetchReusableBlocks,
 	convertBlockToStatic,
 	convertBlockToReusable,
-} from '../actions';
+} from '../../store/actions';
 import reducer from '../reducer';
 import effects from '../effects';
-import * as selectors from '../selectors';
+import * as selectors from '../../store/selectors';
 
 // Make all generated UUIDs the same for testing
 jest.mock( 'uuid/v4', () => {

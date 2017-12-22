@@ -17,8 +17,8 @@ import { compose } from '@wordpress/element';
  */
 import './style.scss';
 import { getBlockMoverLabel } from './mover-label';
-import { isFirstBlock, isLastBlock, getBlockIndex, getBlock } from '../../selectors';
-import { selectBlock } from '../../actions';
+import { isFirstBlock, isLastBlock, getBlockIndex, getBlock } from '../../store/selectors';
+import { selectBlock } from '../../store/actions';
 
 export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex, isLocked, ...props } ) {
 	if ( isLocked ) {

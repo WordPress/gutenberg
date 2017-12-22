@@ -12,7 +12,7 @@ import { IconButton } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { hasEditorUndo } from '../../selectors';
+import { hasEditorUndo } from '../../store/selectors';
 
 function EditorHistoryUndo( { hasUndo, undo } ) {
 	return (

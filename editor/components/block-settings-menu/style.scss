@@ -47,5 +47,7 @@
 }
 
 .editor-block-settings-menu__block-transformations {
-	border-top: 1px solid $dark-gray-500;
+	margin-top: $item-spacing;
+	padding-top: $item-spacing;
+	border-top: 1px solid $light-gray-500;
 }

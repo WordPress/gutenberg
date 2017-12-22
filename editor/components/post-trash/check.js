@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 /**
  * Internal dependencies
  */
-import { isEditedPostNew, getCurrentPostId } from '../../selectors';
+import { isEditedPostNew, getCurrentPostId } from '../../store/selectors';
 
 function PostTrashCheck( { isNew, postId, children } ) {
 	if ( isNew || ! postId ) {

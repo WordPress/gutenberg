@@ -1,9 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { Placeholder, Toolbar, Dashicon } from '@wordpress/components';
+import { Placeholder, Toolbar, Dashicon, DropZone } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import classnames from 'classnames';
+import { mediaUpload } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -67,6 +68,7 @@ registerBlockType( 'core/cover-image', {
 		const onSelectImage = ( media ) => setAttributes( { url: media.url, id: media.id } );
 		const toggleParallax = () => setAttributes( { hasParallax: ! hasParallax } );
 		const setDimRatio = ( ratio ) => setAttributes( { dimRatio: ratio } );
+		const dropFiles = ( files ) => mediaUpload( files, setAttributes );
 		const style = url ?
 			{ backgroundImage: `url(${ url })` } :
 			undefined;
@@ -131,6 +133,9 @@ registerBlockType( 'core/cover-image', {
 					icon="format-image"
 					label={ __( 'Cover Image' ) }
 					className={ className }>
+					<DropZone
+						onFilesDrop={ dropFiles }
+					/>
 					<MediaUploadButton
 						buttonProps={ uploadButtonProps }
 						onSelect={ onSelectImage }
@@ -166,7 +171,7 @@ registerBlockType( 'core/cover-image', {
 	},
 
 	save( { attributes, className } ) {
-		const { url, title, hasParallax, dimRatio } = attributes;
+		const { url, title, hasParallax, dimRatio, align } = attributes;
 		const style = url ?
 			{ backgroundImage: `url(${ url })` } :
 			undefined;
@@ -176,7 +181,8 @@ registerBlockType( 'core/cover-image', {
 			{
 				'has-background-dim': dimRatio !== 0,
 				'has-parallax': hasParallax,
-			}
+			},
+			align ? `align${ align }` : null,
 		);
 
 		return (

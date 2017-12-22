@@ -463,7 +463,7 @@ export function initializeMetaBoxState( metaBoxes ) {
 /**
  * Returns an action object used to signify that a meta box finished reloading.
  *
- * @param {String} location Location of meta box: 'normal', 'side'.
+ * @param {String} location Location of meta box: 'normal', 'side' or 'advanced'.
  *
  * @return {Object} Action object
  */
@@ -477,7 +477,7 @@ export function handleMetaBoxReload( location ) {
 /**
  * Returns an action object used to signify that a meta box finished loading.
  *
- * @param {String} location Location of meta box: 'normal', 'side'.
+ * @param {String} location Location of meta box: 'normal', 'side' or 'advanced'.
  *
  * @return {Object} Action object
  */
@@ -491,7 +491,7 @@ export function metaBoxLoaded( location ) {
 /**
  * Returns an action object used to request meta box update.
  *
- * @param {Array} locations Locations of meta boxes: ['normal', 'side' ].
+ * @param {Array} locations Locations of meta boxes: ['normal', 'side', 'advanced' ].
  *
  * @return {Object}     Action object
  */
@@ -505,7 +505,7 @@ export function requestMetaBoxUpdates( locations ) {
 /**
  * Returns an action object used to set meta box state changed.
  *
- * @param {String}  location   Location of meta box: 'normal', 'side'.
+ * @param {String}  location   Location of meta box: 'normal', 'side' or 'advanced'.
  * @param {Boolean} hasChanged Whether the meta box has changed.
  *
  * @return {Object} Action object

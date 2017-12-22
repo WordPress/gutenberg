@@ -14,8 +14,8 @@ import { isReusableBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { getBlock } from '../../selectors';
-import { convertBlockToStatic, convertBlockToReusable } from '../../actions';
+import { getBlock } from '../../store/selectors';
+import { convertBlockToStatic, convertBlockToReusable } from '../../store/actions';
 
 export function ReusableBlockToggle( { isReusable, convertToStatic, convertToReusable } ) {
 	return (

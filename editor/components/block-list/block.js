@@ -8,14 +8,13 @@ import { get, partial, reduce, size } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, compose, createElement } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
 import {
-	getBlockType,
 	BlockEdit,
-	getBlockDefaultClassname,
 	createBlock,
-	hasBlockSupport,
+	getBlockType,
+	getSaveElement,
 	isReusableBlock,
 } from '@wordpress/blocks';
 import { withFilters, withContext } from '@wordpress/components';
@@ -33,6 +32,7 @@ import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import BlockMultiControls from './multi-controls';
+import BlockMobileToolbar from './block-mobile-toolbar';
 import {
 	clearSelectedBlock,
 	editPost,
@@ -47,7 +47,7 @@ import {
 	updateBlockAttributes,
 	toggleSelection,
 	moveBlockToIndex,
-} from '../../actions';
+} from '../../store/actions';
 import {
 	getBlock,
 	getBlockFocus,
@@ -63,7 +63,7 @@ import {
 	isSelectionEnabled,
 	isTyping,
 	getBlockMode,
-} from '../../selectors';
+} from '../../store/selectors';
 
 const { BACKSPACE, ESCAPE, DELETE, ENTER, UP, RIGHT, DOWN, LEFT } = keycodes;
 
@@ -423,12 +423,6 @@ export class BlockListBlock extends Component {
 			wrapperProps = blockType.getEditWrapperProps( block.attributes );
 		}
 
-		// Generate a class name for the block's editable form
-		const generatedClassName = hasBlockSupport( blockType, 'className', true ) ?
-			getBlockDefaultClassname( block.name ) :
-			null;
-		const className = classnames( generatedClassName, block.attributes.className );
-
 		// Disable reason: Each block can be selected by clicking on it
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
@@ -449,7 +443,6 @@ export class BlockListBlock extends Component {
 					onClick={ this.onClick }
 					{ ...wrapperProps }
 				>
-
 					<div
 						id={ `block-overlay-${ this.props.uid }` }
 						draggable={ true }
@@ -486,6 +479,7 @@ export class BlockListBlock extends Component {
 						tabIndex="0"
 						aria-label={ blockLabel }
 					>
+
 						<BlockCrashBoundary onError={ this.onBlockError }>
 							{ isValid && mode === 'visual' && (
 								<BlockEdit
@@ -497,7 +491,6 @@ export class BlockListBlock extends Component {
 									onReplace={ isLocked ? undefined : onReplace }
 									setFocus={ partial( onFocus, block.uid ) }
 									mergeBlocks={ isLocked ? undefined : this.mergeBlocks }
-									className={ className }
 									id={ block.uid }
 									isSelectionEnabled={ this.props.isSelectionEnabled }
 									toggleSelection={ this.props.toggleSelection }
@@ -507,17 +500,16 @@ export class BlockListBlock extends Component {
 								<BlockHtml uid={ block.uid } />
 							) }
 							{ ! isValid && [
-								createElement( blockType.save, {
-									key: 'invalid-preview',
-									attributes: block.attributes,
-									className,
-								} ),
+								<div key="invalid-preview">
+									{ getSaveElement( blockType, block.attributes ) }
+								</div>,
 								<InvalidBlockWarning
 									key="invalid-warning"
 									block={ block }
 								/>,
 							] }
 						</BlockCrashBoundary>
+						{ showUI && <BlockMobileToolbar uid={ block.uid } /> }
 					</div>
 					{ !! error && <BlockCrashWarning /> }
 				</div>

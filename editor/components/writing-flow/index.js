@@ -27,8 +27,8 @@ import {
 	getMultiSelectedBlocksEndUid,
 	getMultiSelectedBlocks,
 	getSelectedBlock,
-} from '../../selectors';
-import { multiSelect, appendDefaultBlock } from '../../actions';
+} from '../../store/selectors';
+import { multiSelect, appendDefaultBlock } from '../../store/actions';
 
 /**
  * Module Constants

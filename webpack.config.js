@@ -52,6 +52,7 @@ const entryPointNames = [
 	'element',
 	'i18n',
 	'utils',
+	'data',
 ];
 
 const packageNames = [

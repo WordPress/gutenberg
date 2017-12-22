@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,14 +13,15 @@ import { compose } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { getCurrentPostType } from '../../selectors';
+import { getCurrentPostType } from '../../store/selectors';
 
 export function PostStickyCheck( { postType, children, user } ) {
+	const userCan = get( user.data, 'post_type_capabilities', false );
+
 	if (
 		postType !== 'post' ||
-		! user.data ||
-		! user.data.capabilities.publish_posts ||
-		! user.data.capabilities.edit_others_posts
+		! userCan.publish_posts ||
+		! userCan.edit_others_posts
 	) {
 		return null;
 	}
@@ -35,9 +37,11 @@ const applyConnect = connect(
 	},
 );
 
-const applyWithAPIData = withAPIData( () => {
+const applyWithAPIData = withAPIData( ( props ) => {
+	const { postType } = props;
+
 	return {
-		user: '/wp/v2/users/me?context=edit',
+		user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
 	};
 } );
 

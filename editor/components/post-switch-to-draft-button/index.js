@@ -13,11 +13,11 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './style.scss';
-import { editPost, savePost } from '../../actions';
+import { editPost, savePost } from '../../store/actions';
 import {
 	isSavingPost,
 	isCurrentPostPublished,
-} from '../../selectors';
+} from '../../store/selectors';
 
 function PostSwitchToDraftButton( { isSaving, isPublished, onClick } ) {
 	if ( ! isPublished ) {

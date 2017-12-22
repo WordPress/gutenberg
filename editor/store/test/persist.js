@@ -6,9 +6,9 @@ import { createStore } from 'redux';
 /**
  * Internal dependencies
  */
-import persistStore from '../store-persist';
+import { loadAndPersist, withRehydratation } from '../persist';
 
-describe( 'persistStore', () => {
+describe( 'loadAndPersist', () => {
 	it( 'should load the initial value from the local storage', () => {
 		const storageKey = 'dumbStorageKey';
 		window.localStorage.setItem( storageKey, JSON.stringify( { chicken: true } ) );
@@ -17,10 +17,12 @@ describe( 'persistStore', () => {
 				preferences: { ribs: true },
 			};
 		};
-		const store = createStore( reducer, persistStore( {
-			reducerKey: 'preferences',
+		const store = createStore( withRehydratation( reducer, 'preferences' ) );
+		loadAndPersist(
+			store,
+			'preferences',
 			storageKey,
-		} ) );
+		);
 		expect( store.getState().preferences ).toEqual( { chicken: true } );
 	} );
 
@@ -37,10 +39,12 @@ describe( 'persistStore', () => {
 				preferences: { ribs: true },
 			};
 		};
-		const store = createStore( reducer, persistStore( {
-			reducerKey: 'preferences',
+		const store = createStore( withRehydratation( reducer, 'preferences' ) );
+		loadAndPersist(
+			store,
+			'preferences',
 			storageKey,
-		} ) );
+		);
 		store.dispatch( { type: 'UPDATE' } );
 		expect( JSON.parse( window.localStorage.getItem( storageKey ) ) ).toEqual( { chicken: true } );
 	} );
@@ -64,11 +68,13 @@ describe( 'persistStore', () => {
 		// store preferences without the `counter` default
 		window.localStorage.setItem( storageKey, JSON.stringify( {} ) );
 
-		const store = createStore( reducer, persistStore( {
-			reducerKey: 'preferences',
+		const store = createStore( withRehydratation( reducer, 'preferences' ) );
+		loadAndPersist(
+			store,
+			'preferences',
 			storageKey,
-			defaults: defaultsPreferences,
-		} ) );
+			defaultsPreferences,
+		);
 		store.dispatch( { type: 'INCREMENT' } );
 
 		// the default should have been applied, as the `counter` was missing from the
@@ -94,11 +100,14 @@ describe( 'persistStore', () => {
 
 		window.localStorage.setItem( storageKey, JSON.stringify( { counter: 1 } ) );
 
-		const store = createStore( reducer, persistStore( {
-			reducerKey: 'preferences',
+		const store = createStore( withRehydratation( reducer, 'preferences' ) );
+
+		loadAndPersist(
+			store,
+			'preferences',
 			storageKey,
-			defaults: defaultsPreferences,
-		} ) );
+			defaultsPreferences,
+		);
 		store.dispatch( { type: 'INCREMENT' } );
 
 		expect( JSON.parse( window.localStorage.getItem( storageKey ) ) ).toEqual( { counter: 2 } );

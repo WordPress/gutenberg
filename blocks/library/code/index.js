@@ -70,6 +70,7 @@ registerBlockType( 'core/code', {
 				value={ attributes.content }
 				onChange={ ( event ) => setAttributes( { content: event.target.value } ) }
 				placeholder={ __( 'Write code…' ) }
+				aria-label={ __( 'Code' ) }
 			/>,
 		];
 	},

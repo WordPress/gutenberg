@@ -34,6 +34,7 @@
     "moment-timezone": "0.5.13",
     "mousetrap": "1.6.1",
     "prop-types": "15.5.10",
+    "querystringify": "1.0.0",
     "re-resizable": "4.0.3",
     "react": "16.2.0",
     "react-autosize-textarea": "2.0.0",
@@ -56,7 +57,7 @@
     "autoprefixer": "6.7.7",
     "babel-core": "6.26.0",
     "babel-eslint": "8.0.3",
-    "babel-jest": "21.2.0",
+    "babel-jest": "22.0.1",
     "babel-loader": "7.1.2",
     "babel-plugin-lodash": "3.2.11",
     "babel-plugin-transform-object-rest-spread": "6.26.0",
@@ -74,13 +75,13 @@
     "enzyme-adapter-react-16": "1.1.0",
     "eslint": "4.9.0",
     "eslint-config-wordpress": "2.0.0",
-    "eslint-plugin-jest": "21.4.2",
+    "eslint-plugin-jest": "21.5.0",
     "eslint-plugin-jsx-a11y": "6.0.2",
     "eslint-plugin-react": "7.5.1",
     "expose-loader": "0.7.3",
     "extract-text-webpack-plugin": "3.0.0",
     "gettext-parser": "1.3.0",
-    "jest": "21.2.1",
+    "jest": "22.0.1",
     "jest-enzyme": "4.0.1",
     "node-sass": "4.5.3",
     "pegjs": "0.10.0",
@@ -101,7 +102,7 @@
   },
   "jest": {
     "collectCoverageFrom": [
-      "(blocks|components|date|editor|element|i18n|utils)/**/*.js"
+      "(blocks|components|date|editor|element|i18n|data|utils)/**/*.js"
     ],
     "coveragePathIgnorePatterns": [
       "<rootDir>/[^/]+/build/index.js"
@@ -109,7 +110,7 @@
     "coverageDirectory": "coverage",
     "moduleNameMapper": {
       "\\.(scss|css)$": "<rootDir>/test/unit/style-mock.js",
-      "@wordpress\\/(blocks|components|date|editor|element|i18n|utils)": "$1"
+      "@wordpress\\/(blocks|components|date|editor|element|i18n|data|utils)": "$1"
     },
     "modulePaths": [
       "<rootDir>"
@@ -120,7 +121,7 @@
     ],
     "setupTestFrameworkScriptFile": "<rootDir>/test/unit/setup-test-framework.js",
     "testMatch": [
-      "<rootDir>/(blocks|components|date|editor|element|i18n|utils)/**/test/*.js"
+      "<rootDir>/(blocks|components|date|editor|element|i18n|data|utils)/**/test/*.js"
     ],
     "timers": "fake",
     "transform": {
