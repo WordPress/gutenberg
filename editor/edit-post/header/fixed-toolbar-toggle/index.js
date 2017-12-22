@@ -12,7 +12,7 @@ import { MenuItemsGroup, MenuItemsToggle, withInstanceId } from '@wordpress/comp
 /**
  * Internal Dependencies
  */
-import { isFeatureActive, isMobile } from '../../../store/selectors';
+import { hasFixedToolbar, isMobile } from '../../../store/selectors';
 import { toggleFeature } from '../../../store/actions';
 
 function FeatureToggle( { onToggle, active, onMobile } ) {
@@ -34,7 +34,7 @@ function FeatureToggle( { onToggle, active, onMobile } ) {
 
 export default connect(
 	( state ) => ( {
-		active: ! isFeatureActive( state, 'fixedToolbar' ),
+		active: hasFixedToolbar( state ),
 		onMobile: isMobile( state ),
 	} ),
 	( dispatch, ownProps ) => ( {
