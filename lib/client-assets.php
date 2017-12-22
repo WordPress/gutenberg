@@ -832,7 +832,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$script  = '( function() {';
 	$script .= sprintf( 'var editorSettings = %s;', wp_json_encode( $editor_settings ) );
 	$script .= <<<JS
-		window._wpLoadGutenbergEditor = Promise.all( [ wp.api.init(), wp.api.init( { versionString: 'gutenberg/v1/' } ) ] ).then( function() {
+		window._wpLoadGutenbergEditor = wp.api.init().then( function() {
 			return wp.editor.createEditorInstance( 'editor', window._wpGutenbergPost, editorSettings );
 		} );
 JS;
