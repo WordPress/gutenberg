@@ -11,7 +11,7 @@ import { mediaUpload } from '@wordpress/utils';
  */
 import './editor.scss';
 import './style.scss';
-import { registerBlockType } from '../../api';
+import { registerBlockType, createBlock } from '../../api';
 import Editable from '../../editable';
 import MediaUploadButton from '../../media-upload-button';
 import BlockControls from '../../block-controls';
@@ -53,6 +53,27 @@ registerBlockType( 'core/cover-image', {
 			type: 'number',
 			default: 50,
 		},
+	},
+
+	transforms: {
+		from: [
+			{
+				type: 'block',
+				blocks: [ 'core/heading' ],
+				transform: ( { content } ) => (
+					createBlock( 'core/cover-image', { title: content } )
+				),
+			},
+		],
+		to: [
+			{
+				type: 'block',
+				blocks: [ 'core/heading' ],
+				transform: ( { title } ) => (
+					createBlock( 'core/heading', { content: title } )
+				),
+			},
+		],
 	},
 
 	getEditWrapperProps( attributes ) {
@@ -125,13 +146,25 @@ registerBlockType( 'core/cover-image', {
 
 		if ( ! url ) {
 			const uploadButtonProps = { isLarge: true };
+			const icon = title ? undefined : 'format-image';
+			const label = title ? (
+				<Editable
+					tagName="h2"
+					value={ title }
+					focus={ focus }
+					onFocus={ setFocus }
+					onChange={ ( value ) => setAttributes( { title: value } ) }
+					inlineToolbar
+				/>
+			) : __( 'Cover Image' );
+
 			return [
 				controls,
 				<Placeholder
 					key="placeholder"
 					instructions={ __( 'Drag image here or insert from media library' ) }
-					icon="format-image"
-					label={ __( 'Cover Image' ) }
+					icon={ icon }
+					label={ label }
 					className={ className }>
 					<DropZone
 						onFilesDrop={ dropFiles }
