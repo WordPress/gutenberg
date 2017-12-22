@@ -391,15 +391,13 @@
 .editor-block-list__sibling-inserter {
 	z-index: z-index( '.editor-block-list__sibling-inserter' );
 	position: relative;
-	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible ) - ( 2 * $block-padding );
-	margin: 0 auto;
 
-	@include break-small {
-		max-width: $visual-editor-max-width - ( 2 * $block-padding );
-	}
-
-	&:not( [data-insert-index="0"] ) {
-		top: #{ -1 * ( $block-spacing / 2 ) };
+	&[data-insert-index="0"] {
+		max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible ) - ( 2 * $block-padding );
+		margin: 0 auto;
+		@include break-small {
+			max-width: $visual-editor-max-width - ( 2 * $block-padding );
+		}
 	}
 
 	&:before {
@@ -451,6 +449,19 @@
 		.dashicon {
 			vertical-align: bottom;
 		}
+	}
+}
+
+.editor-block-list__block > .editor-block-list__sibling-inserter {
+	position: absolute;
+	bottom: 0;
+	top: auto;
+	left: 0;
+	right: 0;
+
+	@include break-small {
+		left: $block-mover-padding-visible;
+		right: $block-mover-padding-visible;
 	}
 }
 
