@@ -31,6 +31,12 @@ define( 'GUTENBERG_WEBPACK_HMR', true );
 
 Build the project ( `npm run build` ), and start the hmr development server by running `npm run hot`. Any changes to files used by the editor ( `/editor` ), should be reflected in the browser without reloading the page.
 
+If the Webpack server is running on a different port than 3000, you need to configure Gutenberg to refer to the correct port. You can do this using the `GUTENBERG_WEBPACK_DEV_SERVER` constant:
+
+```php
+define( 'GUTENBERG_WEBPACK_DEV_SERVER', 'http://localhost:[your-port]' );
+```
+
 *Warning*: This is still an experimental development feature.
 
 ### On A Remote Server
