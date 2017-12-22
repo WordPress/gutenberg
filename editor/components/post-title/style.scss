@@ -2,7 +2,20 @@
 	position: relative;
 	padding: 5px 0;
 
-	.editor-post-title__input {
+	.editor-post-title__permalink-button {
+		position: absolute;
+		top: 35px;
+		left: 0px;
+	}
+
+	.editor-post-permalink {
+		position: absolute;
+		top: -34px;
+		left: 0;
+		right: 0;
+	}
+
+	div {
 		display: block;
 		width: 100%;
 		padding: #{ $block-padding + 5px } $block-padding;

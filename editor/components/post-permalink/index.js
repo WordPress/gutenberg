@@ -24,13 +24,10 @@ class PostPermalink extends Component {
 			editingSlug: false,
 		};
 		this.onCopy = this.onCopy.bind( this );
-<<<<<<< HEAD
 		this.onFinishCopy = this.onFinishCopy.bind( this );
-=======
 		this.onEditPermalink = this.onEditPermalink.bind( this );
 		this.onCancelEditPermalink = this.onCancelEditPermalink.bind( this );
 		this.onSavePermalink = this.onSavePermalink.bind( this );
->>>>>>> Open the slug edit form when clicking on the slug
 	}
 
 	componentWillUnmount() {
