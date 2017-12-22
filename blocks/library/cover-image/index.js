@@ -127,7 +127,7 @@ registerBlockType( 'core/cover-image', {
 				<BlockDescription>
 					<p>{ __( 'Cover Image is a bold image block with an optional title.' ) }</p>
 				</BlockDescription>
-				<h3>{ __( 'Cover Image Settings' ) }</h3>
+				<h2>{ __( 'Cover Image Settings' ) }</h2>
 				<ToggleControl
 					label={ __( 'Fixed Background' ) }
 					checked={ !! hasParallax }
