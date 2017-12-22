@@ -13,7 +13,7 @@ import { MenuItemsGroup } from '@wordpress/components';
  * Internal dependencies
  */
 import { getEditorMode } from '../../../store/selectors';
-import shortcutMap from '../../modes/keyboard-shortcuts/map';
+import shortcuts from '../../keyboard-shortcuts';
 
 /**
  * Set of available mode options.
@@ -34,7 +34,7 @@ const MODES = [
 function ModeSwitcher( { onSwitch, mode } ) {
 	const choices = MODES.map( choice => {
 		if ( choice.value !== mode ) {
-			return { ...choice, shortcut: shortcutMap[ 'toggle_editor_mode' ].label };
+			return { ...choice, shortcut: shortcuts.toggleEditorMode.label };
 		}
 		return choice;
 	} );
