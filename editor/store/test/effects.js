@@ -549,7 +549,7 @@ describe( 'effects', () => {
 			} );
 
 			it( 'should fetch a single reusable block', () => {
-				const id = 'a9691cf9-ecaa-42bd-a9ca-49587e817647';
+				const id = 123;
 
 				let modelAttributes;
 				const promise = Promise.resolve( {
@@ -577,9 +577,10 @@ describe( 'effects', () => {
 				return promise.then( () => {
 					expect( dispatch ).toHaveBeenCalledWith( {
 						type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
+						id,
 						reusableBlocks: [
 							{
-								id: 'a9691cf9-ecaa-42bd-a9ca-49587e817647',
+								id,
 								title: 'My cool block',
 								type: 'core/test-block',
 								attributes: {
@@ -719,24 +720,35 @@ describe( 'effects', () => {
 					}
 				} );
 
-				const state = reducer( undefined, {} );
+				const id = 123;
+
+				const associatedBlock = {
+					uid: 'd6b55aa9-16b5-4123-9675-749d75a7f14d',
+					name: 'core/block',
+					attributes: {
+						ref: id,
+					},
+				};
+
+				const initialState = reducer( undefined, {} );
+				const state = reducer( initialState, resetBlocks( [ associatedBlock ] ) );
+
 				const dispatch = jest.fn();
 				const store = { getState: () => state, dispatch };
 
-				handler( deleteReusableBlock( 123 ), store );
+				handler( deleteReusableBlock( id ), store );
 
 				expect( dispatch ).toHaveBeenCalledWith( {
 					type: 'REMOVE_REUSABLE_BLOCK',
-					id: 123,
+					id,
+					associatedBlockUids: [ associatedBlock.uid ],
 					optimist: expect.any( Object ),
 				} );
-				expect( modelAttributes ).toEqual( {
-					id: 123,
-				} );
+				expect( modelAttributes ).toEqual( { id } );
 				return promise.then( () => {
 					expect( dispatch ).toHaveBeenCalledWith( {
 						type: 'DELETE_REUSABLE_BLOCK_SUCCESS',
-						id: 123,
+						id,
 						optimist: expect.any( Object ),
 					} );
 				} );
