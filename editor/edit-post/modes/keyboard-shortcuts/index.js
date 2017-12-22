@@ -13,6 +13,7 @@ import { KeyboardShortcuts } from '@wordpress/components';
  * Internal dependencies
  */
 import { getEditorMode } from '../../../store/selectors';
+import shortcuts from '../../keyboard-shortcuts';
 
 class EditorModeKeyboardShortcuts extends Component {
 	constructor() {
@@ -29,7 +30,7 @@ class EditorModeKeyboardShortcuts extends Component {
 	render() {
 		return (
 			<KeyboardShortcuts shortcuts={ {
-				'mod+shift+alt+m': this.toggleMode,
+				[ shortcuts.toggleEditorMode.value ]: this.toggleMode,
 			} } />
 		);
 	}
