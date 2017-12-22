@@ -819,6 +819,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 	$editor_settings = array(
 		'alignWide'        => $align_wide,
+		'wideImages'       => ! empty( $gutenberg_theme_support[0]['wide-images'] ), // Backcompat. Use `align-wide`.
 		'colors'           => $color_palette,
 		'blockTypes'       => $allowed_block_types,
 		'titlePlaceholder' => apply_filters( 'enter_title_here', __( 'Add title', 'gutenberg' ), $post ),
