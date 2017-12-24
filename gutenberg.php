@@ -212,8 +212,6 @@ function gutenberg_handle_rest_pre_insert( $prepared_post ) {
 function gutenberg_create_post_autosave( $post_data ) {
 
 	$post_id = (int) $post_data['ID'];
-	set_query_var( 'post_id', $post_id );
-
 	$post_author = get_current_user_id();
 
 	// Store one autosave per author. If there is already an autosave, overwrite it.
