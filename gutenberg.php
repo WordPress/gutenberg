@@ -121,15 +121,6 @@ function gutenberg_pre_init() {
 	}
 }
 
-function gutenberg_add_rest_endpoints() {
-
-	if ( isset( $_GET['gutenberg_autosave'] ) && '1' === $_GET['gutenberg_autosave'] ) {
-		$post_id = (int) $data->id;
-		$post = get_post( $post_id );
-	}
-
-}
-add_action( 'rest_api_init', 'gutenberg_add_rest_endpoints' );
 /**
  * Initialize Gutenberg.
  *
