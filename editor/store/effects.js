@@ -127,9 +127,7 @@ export default {
 		} );
 		dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
 		const Model = wp.api.getPostTypeModel( getCurrentPostType( state ) );
-		const newModel = new Model( toSend );
-
-		newModel.save().done( ( newPost ) => {
+		new Model( toSend ).save().done( ( newPost ) => {
 			dispatch( {
 				type: 'RESET_POST',
 				post: newPost,
@@ -178,8 +176,6 @@ export default {
 				private: __( 'Post published privately!' ),
 				future: __( 'Post scheduled!' ),
 			}[ post.status ];
-		} else if ( isPublished && willPublish ) {
-			noticeMessage = false;
 		} else {
 			// Generic fallback notice
 			noticeMessage = __( 'Post updated!' );
