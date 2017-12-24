@@ -163,43 +163,6 @@ function gutenberg_init( $return, $post ) {
 }
 
 /**
- * In rest_pre_insert, possibly create an autosave.
- *
- * @param stdClass        $prepared_post An object representing a single post prepared
- *                                       for inserting or updating the database.
- * @param WP_REST_Request $request       Request object.
- *
- * @return array The prepared post data.
- */
-function gutenberg_handle_rest_pre_insert( $prepared_post ) {
-	if ( isset( $_GET['gutenberg_autosave'] ) && '1' === $_GET['gutenberg_autosave'] ) {
-		if ( ! current_user_can( 'edit_post', (int) $prepared_post->ID ) ) {
-			return $prepared_post;
-		}
-
-		// Map new fields onto the existing post data.
-		$existing_post = get_post( (int) $prepared_post->ID );
-		foreach( $prepared_post as $key => $value ) {
-			$existing_post->$key = $value;
-		}
-
-		$autosave_id = gutenberg_create_post_autosave( (array) $existing_post );
-
-		// Pass the autosave id as part of the error data so we can return the autosave data later.
-		return new WP_Error(
-			'gutenberg_create_post_autosave_interrupt',
-			__( 'Interrupt normal post saving to create an autosave for Gutenberg.', 'gutenberg' ),
-			array(
-				'autosave_id' => $autosave_id,
-			)
-		);
-	}
-
-	return $prepared_post;
-
-}
-
-/**
  * Emulate post.php
  */
 function gutenberg_intercept_edit_post() {
