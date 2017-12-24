@@ -75,13 +75,6 @@ export default {
 			parent:  post.id,
 		};
 
-		dispatch( {
-			type: 'UPDATE_POST',
-			edits: post,
-			optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
-		} );
-
-		dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
 		const Model = wp.api.getPostTypeAutosaveModel( getCurrentPostType( state ) );
 		const newModel = new Model( toSend );
 
@@ -90,15 +83,9 @@ export default {
 				type: 'RESET_POST',
 				post: post,
 			} );
-			dispatch( {
-				type: 'REQUEST_POST_UPDATE_SUCCESS',
-				previousPost: post,
-				post: post,
-				optimist: { type: COMMIT, id: POST_UPDATE_TRANSACTION_ID },
-			} );
 		} ).fail( ( err ) => {
 			dispatch( {
-				type: 'REQUEST_POST_UPDATE_FAILURE',
+				type: 'REQUEST_POST_AUTOSAVE_FAILURE',
 				error: get( err, 'responseJSON', {
 					code: 'unknown_error',
 					message: __( 'An unknown error occurred.' ),
@@ -311,13 +298,15 @@ export default {
 			return;
 		}
 
-		if ( ! isEditedPostNew( state ) && ! isEditedPostDirty( state ) ) {
-			return;
-		}
-
 		// Change status from auto-draft to draft
 		if ( isEditedPostNew( state ) ) {
 			dispatch( editPost( { status: 'draft' } ) );
+			dispatch( savePost() );
+			return;
+		}
+
+		if ( ! isEditedPostNew( state ) && ! isEditedPostDirty( state ) ) {
+			return;
 		}
 
 		dispatch( autosavePost() );
