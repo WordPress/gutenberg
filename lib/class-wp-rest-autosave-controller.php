@@ -156,7 +156,7 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 		$prepared_post     = $this->parent_controller->prepare_item_for_database( $request );
 		$prepared_post     = $this->parent_controller->prepare_item_for_database( $request );
 		$prepared_post->ID = $parent->ID;
-		$autosave_id       = gutenberg_create_post_autosave( (array) $prepared_post );
+		$autosave_id       = $this->create_post_autosave( (array) $prepared_post );
 		$post              = get_post( $autosave_id );
 
 		$request->set_param( 'context', 'edit' );
@@ -233,4 +233,58 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 		return $this->revision_controller->get_item_schema();
 	}
 
+	/**
+	 * Creates autosave data for the specified post from $_POST data.
+	 *
+	 * From core post.php.
+	 *
+	 * @since 2.6.0
+	 *
+	 * @param mixed $post_data Associative array containing the post data or int post ID.
+	 * @return mixed The autosave revision ID. WP_Error or 0 on error.
+	 */
+	public function create_post_autosave( $post_data ) {
+
+		$post_id = (int) $post_data['ID'];
+		$post_author = get_current_user_id();
+
+		// Store one autosave per author. If there is already an autosave, overwrite it.
+		if ( $old_autosave = wp_get_post_autosave( $post_id, $post_author ) ) {
+			$new_autosave                = _wp_post_revision_data( $post_data, true );
+			$new_autosave['ID']          = $old_autosave->ID;
+			$new_autosave['post_author'] = $post_author;
+
+			// If the new autosave has the same content as the post, delete the autosave.
+			$post                  = get_post( $post_id );
+			$autosave_is_different = false;
+			foreach ( array_intersect( array_keys( $new_autosave ), array_keys( _wp_post_revision_fields( $post ) ) ) as $field ) {
+				if ( normalize_whitespace( $new_autosave[ $field ] ) != normalize_whitespace( $post->$field ) ) {
+					$autosave_is_different = true;
+					break;
+				}
+			}
+
+			if ( ! $autosave_is_different ) {
+				wp_delete_post_revision( $old_autosave->ID );
+				return 0;
+			}
+
+			/**
+			 * Fires before an autosave is stored.
+			 *
+			 * @since 4.1.0
+			 *
+			 * @param array $new_autosave Post array - the autosave that is about to be saved.
+			 */
+			do_action( 'wp_creating_autosave', $new_autosave );
+
+			return wp_update_post( $new_autosave );
+		}
+
+		// _wp_put_post_revision() expects unescaped.
+		$post_data = wp_unslash( $post_data );
+
+		// Otherwise create the new autosave as a special post revision
+		return _wp_put_post_revision( $post_data, true );
+	}
 }
