@@ -469,6 +469,7 @@ function gutenberg_extend_wp_api_backbone_client() {
 		$rest_base = ! empty( $taxonomy_object->rest_base ) ? $taxonomy_object->rest_base : $taxonomy_object->name;
 		$taxonomy_rest_base_mapping[ $taxonomy_object->name ] = $rest_base;
 	}
+
 	$script  = sprintf( 'wp.api.postTypeRestBaseMapping = %s;', wp_json_encode( $post_type_rest_base_mapping ) );
 	$script .= sprintf( 'wp.api.taxonomyRestBaseMapping = %s;', wp_json_encode( $taxonomy_rest_base_mapping ) );
 	$script .= <<<JS
