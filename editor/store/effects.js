@@ -64,7 +64,6 @@ const SAVE_REUSABLE_BLOCK_NOTICE_ID = 'SAVE_REUSABLE_BLOCK_NOTICE_ID';
 
 export default {
 	REQUEST_POST_AUTOSAVE( action, store ) {
-		console.log( 'REQUEST_POST_AUTOSAVE' );
 		const { dispatch, getState } = store;
 		const state  = getState();
 		const post   = getCurrentPost( state );
