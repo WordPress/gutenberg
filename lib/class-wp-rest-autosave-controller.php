@@ -84,7 +84,7 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 				array(
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_items' ),
-					'permission_callback' => '__return_true',//array( $this->revision_controller, 'get_items_permissions_check' ),
+					'permission_callback' => array( $this->revision_controller, 'get_items_permissions_check' ),
 					'args'                => $this->get_collection_params(),
 				),
 				array(
@@ -171,25 +171,25 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 	}
 
 	/**
-	 * Get the revision, if the ID is valid.
+	 * Get the autosave, if the ID is valid.
 	 *
 	 * @since 5.0.0
 	 *
 	 * @param int $id Supplied ID.
 	 * @return WP_Post|WP_Error Revision post object if ID is valid, WP_Error otherwise.
 	 */
-	protected function get_revision( $id ) {
-		$error = new WP_Error( 'rest_post_invalid_id', __( 'Invalid revision ID.' ), array( 'status' => 404 ) );
+	public function get_item( $id ) {
+		$error = new WP_Error( 'rest_post_invalid_id', __( 'Invalid autosave ID.' ), array( 'status' => 404 ) );
 		if ( (int) $id <= 0 ) {
 			return $error;
 		}
 
-		$revision = get_post( (int) $id );
-		if ( empty( $revision ) || empty( $revision->ID ) || 'revision' !== $revision->post_type ) {
+		$autosave = get_post( (int) $id );
+		if ( empty( $autosave ) || empty( $autosave->ID ) || 'autosave' !== $autosave->post_type ) {
 			return $error;
 		}
 
-		return $revision;
+		return $autosave;
 	}
 
 	/**
@@ -214,7 +214,7 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 			return array();
 		}
 
-		$response = array();
+		$response   = array();
 		$data       = $this->prepare_item_for_response( $autosave, $request );
 		$response[] = $this->prepare_response_for_collection( $data );
 
