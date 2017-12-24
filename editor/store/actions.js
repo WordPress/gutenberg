@@ -234,10 +234,9 @@ export function editPost( edits ) {
 	};
 }
 
-export function savePost( options ) {
+export function savePost() {
 	return {
 		type: 'REQUEST_POST_UPDATE',
-		options,
 	};
 }
 
