@@ -33,6 +33,7 @@ import {
 	createErrorNotice,
 	removeNotice,
 	savePost,
+	autosavePost,
 	editPost,
 	requestMetaBoxUpdates,
 	updateReusableBlock,
@@ -62,6 +63,52 @@ const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
 const SAVE_REUSABLE_BLOCK_NOTICE_ID = 'SAVE_REUSABLE_BLOCK_NOTICE_ID';
 
 export default {
+	REQUEST_POST_AUTOSAVE( action, store ) {
+		console.log( 'REQUEST_POST_AUTOSAVE' );
+		const { dispatch, getState } = store;
+		const state  = getState();
+		const post   = getCurrentPost( state );
+		const edits  = getPostEdits( state );
+		const toSend = {
+			...edits,
+			content: getEditedPostContent( state ),
+			parent:  post.id,
+		};
+
+		dispatch( {
+			type: 'UPDATE_POST',
+			edits: post,
+			optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
+		} );
+
+		dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
+		const Model = wp.api.getPostTypeAutosaveModel( getCurrentPostType( state ) );
+		const newModel = new Model( toSend );
+
+		newModel.save().done( ( newPost ) => {
+			dispatch( {
+				type: 'RESET_POST',
+				post: post,
+			} );
+			dispatch( {
+				type: 'REQUEST_POST_UPDATE_SUCCESS',
+				previousPost: post,
+				post: post,
+				optimist: { type: COMMIT, id: POST_UPDATE_TRANSACTION_ID },
+			} );
+		} ).fail( ( err ) => {
+			dispatch( {
+				type: 'REQUEST_POST_UPDATE_FAILURE',
+				error: get( err, 'responseJSON', {
+					code: 'unknown_error',
+					message: __( 'An unknown error occurred.' ),
+				} ),
+				post,
+				edits,
+				optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
+			} );
+		} );
+	},
 	REQUEST_POST_UPDATE( action, store ) {
 		const { dispatch, getState } = store;
 		const state = getState();
@@ -79,13 +126,9 @@ export default {
 			optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
 		} );
 		dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
-		const Model = wp.api.getPostTypeModel( type );
+		const Model = wp.api.getPostTypeModel( getCurrentPostType( state ) );
 		const newModel = new Model( toSend );
 
-		// Tag the autosave action to avoid creating revisions.
-		if ( action.options && action.options.autosave ) {
-			newModel.url = addQueryArgs( newModel.url(), { 'gutenberg_autosave': '1' } );
-		}
 		newModel.save().done( ( newPost ) => {
 			dispatch( {
 				type: 'RESET_POST',
@@ -98,31 +141,16 @@ export default {
 				optimist: { type: COMMIT, id: POST_UPDATE_TRANSACTION_ID },
 			} );
 		} ).fail( ( err ) => {
-			// No notices for autosaves.
-			if ( err.responseJSON && 'gutenberg_create_post_autosave_interrupt' === err.responseJSON.code ) {
-				dispatch( {
-					type: 'RESET_POST',
-					post: post,
-				} );
-				dispatch( {
-					type: 'REQUEST_POST_UPDATE_SUCCESS',
-					previousPost: post,
-					post: post,
-					optimist: { type: COMMIT, id: POST_UPDATE_TRANSACTION_ID },
-				} );
-			} else {
-
-				dispatch( {
-					type: 'REQUEST_POST_UPDATE_FAILURE',
-					error: get( err, 'responseJSON', {
-						code: 'unknown_error',
-						message: __( 'An unknown error occurred.' ),
-					} ),
-					post,
-					edits,
-					optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
-				} );
-			}
+			dispatch( {
+				type: 'REQUEST_POST_UPDATE_FAILURE',
+				error: get( err, 'responseJSON', {
+					code: 'unknown_error',
+					message: __( 'An unknown error occurred.' ),
+				} ),
+				post,
+				edits,
+				optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
+			} );
 		} );
 	},
 	REQUEST_POST_UPDATE_SUCCESS( action, store ) {
@@ -296,7 +324,7 @@ export default {
 			dispatch( editPost( { status: 'draft' } ) );
 		}
 
-		dispatch( savePost( { 'autosave': 1 } ) );
+		dispatch( autosavePost() );
 	},
 	SETUP_EDITOR( action ) {
 		const { post, settings } = action;
