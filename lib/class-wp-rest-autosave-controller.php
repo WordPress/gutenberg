@@ -1,6 +1,6 @@
 <?php
 /**
- * REST API: WP_REST_Autosaves_Controller class
+ * REST API: WP_REST_Autosaves_Controller class.
  *
  * @package WordPress
  * @subpackage REST_API
@@ -284,7 +284,7 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 		// _wp_put_post_revision() expects unescaped.
 		$post_data = wp_unslash( $post_data );
 
-		// Otherwise create the new autosave as a special post revision
+		// Otherwise create the new autosave as a special post revision.
 		return _wp_put_post_revision( $post_data, true );
 	}
 }
