@@ -241,6 +241,13 @@ export function savePost( options ) {
 	};
 }
 
+export function autosavePost( options ) {
+	return {
+		type: 'REQUEST_POST_AUTOSAVE',
+		options,
+	};
+}
+
 export function trashPost( postId, postType ) {
 	return {
 		type: 'TRASH_POST',
