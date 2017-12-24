@@ -469,7 +469,6 @@ function gutenberg_extend_wp_api_backbone_client() {
 		$rest_base = ! empty( $taxonomy_object->rest_base ) ? $taxonomy_object->rest_base : $taxonomy_object->name;
 		$taxonomy_rest_base_mapping[ $taxonomy_object->name ] = $rest_base;
 	}
-
 	$script  = sprintf( 'wp.api.postTypeRestBaseMapping = %s;', wp_json_encode( $post_type_rest_base_mapping ) );
 	$script .= sprintf( 'wp.api.taxonomyRestBaseMapping = %s;', wp_json_encode( $taxonomy_rest_base_mapping ) );
 	$script .= <<<JS
@@ -477,6 +476,12 @@ function gutenberg_extend_wp_api_backbone_client() {
 			var route = '/' + wpApiSettings.versionString + this.postTypeRestBaseMapping[ postType ] + '/(?P<id>[\\\\d]+)';
 			return _.find( wp.api.models, function( model ) {
 				return model.prototype.route && route === model.prototype.route.index;
+			} );
+		};
+		wp.api.getPostTypeAutosaveModel = function( postType ) {
+			var route = '/' + wpApiSettings.versionString + wp.api.postTypeRestBaseMapping[ postType ] + '/(?P<parent>[\\\\d]+)/autosaves/(?P<id>[\\\\d]+)';
+			return _.find( wp.api.models, function( collection ) {
+				return collection.prototype.route && route === collection.prototype.route.index;
 			} );
 		};
 		wp.api.getTaxonomyModel = function( taxonomy ) {
