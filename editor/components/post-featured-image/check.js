@@ -4,7 +4,7 @@
 import PostTypeSupportCheck from '../post-type-support-check';
 
 function PostFeaturedImageCheck( props ) {
-	return <PostTypeSupportCheck { ...props } supportKey="thumbnail" />;
+	return <PostTypeSupportCheck { ...props } supportKeys="thumbnail" />;
 }
 
 export default PostFeaturedImageCheck;

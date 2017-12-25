@@ -4,7 +4,7 @@
 import PostTypeSupportCheck from '../post-type-support-check';
 
 function PostExcerptCheck( props ) {
-	return <PostTypeSupportCheck { ...props } supportKey="excerpt" />;
+	return <PostTypeSupportCheck { ...props } supportKeys="excerpt" />;
 }
 
 export default PostExcerptCheck;

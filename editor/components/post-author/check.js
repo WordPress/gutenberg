@@ -24,7 +24,7 @@ export function PostAuthorCheck( { user, users, children } ) {
 		return null;
 	}
 
-	return <PostTypeSupportCheck supportKey="author">{ children }</PostTypeSupportCheck>;
+	return <PostTypeSupportCheck supportKeys="author">{ children }</PostTypeSupportCheck>;
 }
 
 const applyConnect = connect(

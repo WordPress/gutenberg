@@ -15,9 +15,9 @@ import { compose } from '@wordpress/element';
  */
 import { getCurrentPostType } from '../../store/selectors';
 
-function PostTypeSupportCheck( { postType, children, supportKey } ) {
+function PostTypeSupportCheck( { postType, children, supportKeys } ) {
 	const isSupported = some(
-		castArray( supportKey ), key => get( postType, [ 'data', 'supports', key ], false )
+		castArray( supportKeys ), key => get( postType, [ 'data', 'supports', key ], false )
 	);
 
 	if ( ! isSupported ) {
