@@ -39,6 +39,7 @@ export { default as PostTextEditorToolbar } from './post-text-editor/toolbar';
 export { default as PostTitle } from './post-title';
 export { default as PostTrash } from './post-trash';
 export { default as PostTrashCheck } from './post-trash/check';
+export { default as PostTypeSupportCheck } from './post-type-support-check';
 export { default as PostVisibility } from './post-visibility';
 export { default as PostVisibilityLabel } from './post-visibility/label';
 export { default as TableOfContents } from './table-of-contents';
