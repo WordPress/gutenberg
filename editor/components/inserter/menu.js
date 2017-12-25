@@ -35,7 +35,7 @@ import { keycodes } from '@wordpress/utils';
 import './style.scss';
 
 import { getBlocks, getRecentlyUsedBlocks, getReusableBlocks } from '../../store/selectors';
-import { showInsertionPoint, hideInsertionPoint, fetchReusableBlocks } from '../../store/actions';
+import { fetchReusableBlocks } from '../../store/actions';
 import { default as InserterGroup } from './group';
 
 export const searchBlocks = ( blocks, searchTerm ) => {
@@ -232,8 +232,6 @@ export class InserterMenu extends Component {
 				labelledBy={ labelledBy }
 				bindReferenceNode={ this.bindReferenceNode }
 				selectBlock={ this.selectBlock }
-				showInsertionPoint={ this.props.showInsertionPoint }
-				hideInsertionPoint={ this.props.hideInsertionPoint }
 			/>
 		);
 	}
@@ -362,7 +360,7 @@ const connectComponent = connect(
 			reusableBlocks: getReusableBlocks( state ),
 		};
 	},
-	{ showInsertionPoint, hideInsertionPoint, fetchReusableBlocks }
+	{ fetchReusableBlocks }
 );
 
 export default compose(
