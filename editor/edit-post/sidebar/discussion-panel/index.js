@@ -23,15 +23,15 @@ const PANEL_NAME = 'discussion-panel';
 
 function DiscussionPanel( { isOpened, onTogglePanel } ) {
 	return (
-		<PostTypeSupportCheck supportKey={ [ 'comments', 'trackbacks' ] }>
+		<PostTypeSupportCheck supportKeys={ [ 'comments', 'trackbacks' ] }>
 			<PanelBody title={ __( 'Discussion' ) } opened={ isOpened } onToggle={ onTogglePanel }>
-				<PostTypeSupportCheck supportKey="comments">
+				<PostTypeSupportCheck supportKeys="comments">
 					<PanelRow>
 						<PostComments />
 					</PanelRow>
 				</PostTypeSupportCheck>
 
-				<PostTypeSupportCheck supportKey="trackbacks">
+				<PostTypeSupportCheck supportKeys="trackbacks">
 					<PanelRow>
 						<PostPingbacks />
 					</PanelRow>

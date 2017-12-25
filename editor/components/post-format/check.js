@@ -4,7 +4,7 @@
 import PostTypeSupportCheck from '../post-type-support-check';
 
 function PostFormatCheck( props ) {
-	return <PostTypeSupportCheck { ...props } supportKey="post-formats" />;
+	return <PostTypeSupportCheck { ...props } supportKeys="post-formats" />;
 }
 
 export default PostFormatCheck;
