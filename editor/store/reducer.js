@@ -482,18 +482,11 @@ export function blocksMode( state = {}, action ) {
  */
 export function blockInsertionPoint( state = {}, action ) {
 	switch ( action.type ) {
-		case 'SET_BLOCK_INSERTION_POINT':
-			const { position } = action;
-			return { ...state, position };
-
-		case 'CLEAR_BLOCK_INSERTION_POINT':
-			return { ...state, position: null };
-
 		case 'SHOW_INSERTION_POINT':
-			return { ...state, visible: true };
+			return { ...state, visible: true, position: action.index };
 
 		case 'HIDE_INSERTION_POINT':
-			return { ...state, visible: false };
+			return { ...state, visible: false, position: null };
 	}
 
 	return state;

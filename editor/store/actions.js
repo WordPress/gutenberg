@@ -189,41 +189,27 @@ export function insertBlocks( blocks, position ) {
 	};
 }
 
-export function showInsertionPoint() {
+/**
+ * Returns an action object showing the insertion point at a given index
+ *
+ * @param  {Number?} index  Index of the insertion point
+ * @return {Object}         Action object
+ */
+export function showInsertionPoint( index ) {
 	return {
 		type: 'SHOW_INSERTION_POINT',
+		index,
 	};
 }
 
+/**
+ * Returns an action object hiding the insertion point
+ *
+ * @return {Object}         Action object
+ */
 export function hideInsertionPoint() {
 	return {
 		type: 'HIDE_INSERTION_POINT',
-	};
-}
-
-/**
- * Returns an action object used in signalling that block insertion should
- * occur at the specified block index position.
- *
- * @param  {Number} position Position at which to insert
- * @return {Object}          Action object
- */
-export function setBlockInsertionPoint( position ) {
-	return {
-		type: 'SET_BLOCK_INSERTION_POINT',
-		position,
-	};
-}
-
-/**
- * Returns an action object used in signalling that the block insertion point
- * should be reset.
- *
- * @return {Object} Action object
- */
-export function clearBlockInsertionPoint() {
-	return {
-		type: 'CLEAR_BLOCK_INSERTION_POINT',
 	};
 }
 
