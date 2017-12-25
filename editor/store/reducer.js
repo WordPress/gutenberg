@@ -509,7 +509,7 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 				...state,
 				sidebars: {
 					...state.sidebars,
-					[ action.sidebar ]: action.force !== undefined ? action.force : ! state.sidebars[ action.sidebar ],
+					[ action.sidebar ]: action.forcedValue !== undefined ? action.forcedValue : ! state.sidebars[ action.sidebar ],
 				},
 			};
 		case 'TOGGLE_SIDEBAR_PANEL':

@@ -41,13 +41,12 @@ function Layout( {
 	isDefaultSidebarOpened,
 	isPublishSidebarOpened,
 	fixedToolbarActive,
-	onToggleSidebar,
+	onClosePublishPanel,
 } ) {
 	const className = classnames( 'editor-layout', {
 		'is-sidebar-opened': layoutHasOpenSidebar,
 		'has-fixed-toolbar': fixedToolbarActive,
 	} );
-	const closePublishPanel = () => onToggleSidebar( 'publish', false );
 
 	return (
 		<div className={ className }>
@@ -70,7 +69,7 @@ function Layout( {
 				</div>
 			</div>
 			{ isDefaultSidebarOpened && <Sidebar /> }
-			{ isPublishSidebarOpened && <PostPublishPanel onClose={ closePublishPanel } /> }
+			{ isPublishSidebarOpened && <PostPublishPanel onClose={ onClosePublishPanel } /> }
 			<Popover.Slot />
 		</div>
 	);
@@ -84,5 +83,7 @@ export default connect(
 		isPublishSidebarOpened: isSidebarOpened( state, 'publish' ),
 		fixedToolbarActive: hasFixedToolbar( state ),
 	} ),
-	{ onToggleSidebar: toggleSidebar }
+	{
+		onClosePublishPanel: () => toggleSidebar( 'publish', false ),
+	}
 )( navigateRegions( Layout ) );
