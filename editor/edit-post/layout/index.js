@@ -19,6 +19,7 @@ import Sidebar from '../sidebar';
 import TextEditor from '../modes/text-editor';
 import VisualEditor from '../modes/visual-editor';
 import DocumentTitle from '../document-title';
+import EditorModeKeyboardShortcuts from '../modes/keyboard-shortcuts';
 import {
 	MetaBoxes,
 	AutosaveMonitor,
@@ -57,6 +58,7 @@ function Layout( {
 			<div className="editor-layout__content" role="region" aria-label={ __( 'Editor content' ) } tabIndex="-1">
 				<EditorNotices />
 				<div className="editor-layout__editor">
+					<EditorModeKeyboardShortcuts />
 					{ mode === 'text' && <TextEditor /> }
 					{ mode === 'visual' && <VisualEditor /> }
 				</div>

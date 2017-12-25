@@ -19,6 +19,7 @@ function MenuItemsGroup( { label, value, choices = [], onSelect, children, insta
 							key={ item.value }
 							label={ item.label }
 							isSelected={ isSelected }
+							shortcut={ item.shortcut }
 							onClick={ () => {
 								if ( ! isSelected ) {
 									onSelect( item.value );
