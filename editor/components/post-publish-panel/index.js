@@ -19,7 +19,6 @@ import PostVisibilityLabel from '../post-visibility/label';
 import PostSchedule from '../post-schedule';
 import PostScheduleLabel from '../post-schedule/label';
 import PostPublishButton from '../post-publish-button';
-import PostSwitchToDraftButton from '../post-switch-to-draft-button';
 import { getCurrentPostType } from '../../store/selectors';
 
 function PostPublishPanel( { onClose, user } ) {
@@ -63,10 +62,6 @@ function PostPublishPanel( { onClose, user } ) {
 						<PostSchedule />
 					</PanelBody>
 				}
-			</div>
-
-			<div className="editor-post-publish-panel__footer">
-				<PostSwitchToDraftButton />
 			</div>
 		</div>
 	);

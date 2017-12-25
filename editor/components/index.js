@@ -34,6 +34,7 @@ export { default as PostSchedule } from './post-schedule';
 export { default as PostScheduleLabel } from './post-schedule/label';
 export { default as PostSticky } from './post-sticky';
 export { default as PostStickyCheck } from './post-sticky/check';
+export { default as PostSwitchToDraftButton } from './post-switch-to-draft-button';
 export { default as PostTaxonomies } from './post-taxonomies';
 export { default as PostTaxonomiesCheck } from './post-taxonomies/check';
 export { default as PostTextEditor } from './post-text-editor';
