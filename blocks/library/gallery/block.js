@@ -22,7 +22,6 @@ import SelectControl from '../../inspector-controls/select-control';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import GalleryImage from './gallery-image';
-import BlockDescription from '../../block-description';
 
 const isGallery = true;
 const MAX_COLUMNS = 8;
@@ -132,22 +131,6 @@ class GalleryBlock extends Component {
 		const { attributes, focus, className } = this.props;
 		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
 
-		const blockDescription = (
-			<BlockDescription>
-				<p>
-					{__( 'Image galleries are a great way to share groups of pictures on your site.' )}
-				</p>
-			</BlockDescription>
-		);
-
-		const inspectorControls = (
-			focus && (
-				<InspectorControls key="inspector">
-					{blockDescription}
-				</InspectorControls>
-			)
-		);
-
 		const dropZone = (
 			<DropZone
 				onFilesDrop={ this.dropFiles }
@@ -187,7 +170,6 @@ class GalleryBlock extends Component {
 
 			return [
 				controls,
-				inspectorControls,
 				<Placeholder
 					key="placeholder"
 					instructions={ __( 'Drag images here or insert from media library' ) }
@@ -221,7 +203,6 @@ class GalleryBlock extends Component {
 			controls,
 			focus && (
 				<InspectorControls key="inspector">
-					{blockDescription}
 					<h2>{ __( 'Gallery Settings' ) }</h2>
 					{ images.length > 1 && <RangeControl
 						label={ __( 'Columns' ) }

@@ -40,6 +40,16 @@ This is the display title for your block, which can be translated with our trans
 title: 'Book'
 ```
 
+#### Description (optional)
+
+* **Type:** `String`
+
+This is a short description for your block, which can be translated with our translation functions. This will be shown in the block inspector.
+
+```js
+description: 'Block showing a Book card.'
+```
+
 #### Category
 
 * **Type:** `String [ common | formatting | layout | widgets | embed ]`
