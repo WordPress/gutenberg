@@ -970,7 +970,7 @@ describe( 'state', () => {
 			} } ), {
 				type: 'TOGGLE_SIDEBAR',
 				sidebar: 'desktop',
-				force: false,
+				forcedValue: false,
 			} );
 
 			expect( state.sidebars ).toEqual( {

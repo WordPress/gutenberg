@@ -23,7 +23,12 @@ import HeaderToolbar from './header-toolbar';
 import { isSidebarOpened } from '../../store/selectors';
 import { toggleSidebar } from '../../store/actions';
 
-function Header( { onToggleSidebar, isDefaultSidebarOpened, isPublishSidebarOpened } ) {
+function Header( {
+	onToggleDefaultSidebar,
+	onTogglePublishSidebar,
+	isDefaultSidebarOpened,
+	isPublishSidebarOpened,
+} ) {
 	return (
 		<div
 			role="region"
@@ -38,11 +43,11 @@ function Header( { onToggleSidebar, isDefaultSidebarOpened, isPublishSidebarOpen
 					<PostPreviewButton />
 					<PostPublishPanelToggle
 						isOpen={ isPublishSidebarOpened }
-						onToggle={ () => onToggleSidebar( 'publish' ) }
+						onToggle={ onTogglePublishSidebar }
 					/>
 					<IconButton
 						icon="admin-generic"
-						onClick={ () => onToggleSidebar() }
+						onClick={ onToggleDefaultSidebar }
 						isToggled={ isDefaultSidebarOpened }
 						label={ __( 'Settings' ) }
 						aria-expanded={ isDefaultSidebarOpened }
@@ -60,6 +65,7 @@ export default connect(
 		isPublishSidebarOpened: isSidebarOpened( state, 'publish' ),
 	} ),
 	{
-		onToggleSidebar: toggleSidebar,
+		onToggleDefaultSidebar: () => toggleSidebar(),
+		onTogglePublishSidebar: () => toggleSidebar( 'publish' ),
 	}
 )( Header );

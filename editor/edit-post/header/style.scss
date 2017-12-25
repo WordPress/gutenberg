@@ -64,6 +64,7 @@
 
 	@include break-medium() {
 		&.editor-post-publish-button, &.editor-post-publish-panel__toggle {
+			margin: 0 10px;
 			height: 33px;
 			line-height: 32px;
 		}
