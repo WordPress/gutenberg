@@ -14,10 +14,11 @@ import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import InspectorControls from '../../inspector-controls';
 import AlignmentToolbar from '../../alignment-toolbar';
-import BlockDescription from '../../block-description';
 
 registerBlockType( 'core/heading', {
 	title: __( 'Heading' ),
+
+	description: __( 'Search engines use the headings to index the structure and content of your web pages.' ),
 
 	icon: 'heading',
 
@@ -118,9 +119,6 @@ registerBlockType( 'core/heading', {
 			),
 			focus && (
 				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'Search engines use the headings to index the structure and content of your web pages.' ) }</p>
-					</BlockDescription>
 					<h3>{ __( 'Heading Settings' ) }</h3>
 					<p>{ __( 'Size' ) }</p>
 					<Toolbar

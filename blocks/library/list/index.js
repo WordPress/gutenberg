@@ -16,8 +16,6 @@ import './editor.scss';
 import { registerBlockType, createBlock } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
-import InspectorControls from '../../inspector-controls';
-import BlockDescription from '../../block-description';
 
 const fromBrDelimitedContent = ( content ) => {
 	if ( undefined === content ) {
@@ -75,6 +73,7 @@ const toBrDelimitedContent = ( values ) => {
 
 registerBlockType( 'core/list', {
 	title: __( 'List' ),
+	description: __( 'List. Numbered or bulleted.' ),
 	icon: 'editor-ul',
 	category: 'common',
 	keywords: [ __( 'bullet list' ), __( 'ordered list' ), __( 'numbered list' ) ],
@@ -320,14 +319,6 @@ registerBlockType( 'core/list', {
 							},
 						] }
 					/>
-				),
-				focus && (
-					<InspectorControls key="inspector">
-						<BlockDescription>
-							<p>{ __( 'List. Numbered or bulleted.' ) }</p>
-						</BlockDescription>
-						<p>{ __( 'No advanced options.' ) }</p>
-					</InspectorControls>
 				),
 				<Editable
 					multiline="li"

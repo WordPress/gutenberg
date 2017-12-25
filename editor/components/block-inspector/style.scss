@@ -7,3 +7,33 @@
 	border-bottom: 1px solid $light-gray-500;
 	text-align: center;
 }
+
+
+.editor-block-inspector__card {
+	display: flex;
+	align-items: flex-start;
+	border-bottom: 1px solid $light-gray-500;
+	margin: -16px -16px 16px -16px;
+	padding: 16px;
+}
+
+.editor-block-inspector__card-icon {
+	border: 1px solid $light-gray-700;
+	padding: 8px;
+	margin-right: 10px;
+	height: 36px;
+	width: 36px;
+}
+
+.editor-block-inspector__card-content {
+	flex-grow: 1;
+}
+
+.editor-block-inspector__card-title {
+	font-weight: 500;
+	margin-bottom: 5px;
+}
+
+.editor-block-inspector__card-description {
+	font-size: 12px;
+}

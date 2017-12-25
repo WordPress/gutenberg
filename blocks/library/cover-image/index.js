@@ -19,12 +19,13 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import InspectorControls from '../../inspector-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
 import RangeControl from '../../inspector-controls/range-control';
-import BlockDescription from '../../block-description';
 
 const validAlignments = [ 'left', 'center', 'right', 'wide', 'full' ];
 
 registerBlockType( 'core/cover-image', {
 	title: __( 'Cover Image' ),
+
+	description: __( 'Cover Image is a bold image block with an optional title.' ),
 
 	icon: 'format-image',
 
@@ -124,9 +125,6 @@ registerBlockType( 'core/cover-image', {
 				</Toolbar>
 			</BlockControls>,
 			<InspectorControls key="inspector">
-				<BlockDescription>
-					<p>{ __( 'Cover Image is a bold image block with an optional title.' ) }</p>
-				</BlockDescription>
 				<h2>{ __( 'Cover Image Settings' ) }</h2>
 				<ToggleControl
 					label={ __( 'Fixed Background' ) }
