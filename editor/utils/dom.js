@@ -303,3 +303,17 @@ export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScro
 	selection.removeAllRanges();
 	selection.addRange( range );
 }
+
+/**
+ * Check whether the given node in an input field.
+ *
+ * @param  {HTMLElement} element The HTML element.
+ * @return {Boolean}             True if the element is an input field, false if not.
+ */
+export function isInputField( { nodeName, contentEditable } ) {
+	return (
+		nodeName === 'input' ||
+		nodeName === 'textarea' ||
+		contentEditable === 'true'
+	);
+}
