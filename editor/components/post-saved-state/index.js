@@ -59,7 +59,7 @@ export function PostSavedState( { isNew, isPublished, isDirty, isSaving, isSavea
 
 	return (
 		<Button className={ classnames( className, 'button-link' ) } onClick={ onClick }>
-			<span className="editor-post-saved-state__mobile">{ __( 'Save' ) }</span>
+			<span className="editor-post-saved-state__mobile">{ isPublished ? '' : __( 'Save' ) }</span>
 			<span className="editor-post-saved-state__desktop">{ isPublished ? '' : __( 'Save Draft' ) }</span>
 		</Button>
 	);
