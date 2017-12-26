@@ -145,6 +145,12 @@ function gutenberg_register_scripts_and_styles() {
 		filemtime( gutenberg_dir_path() . 'components/build/index.js' )
 	);
 	wp_register_script(
+		'wp-nux',
+		gutenberg_url( 'nux/build/index.js' ),
+		array( 'wp-element', 'wp-components', 'wp-data', 'wp-i18n' ),
+		filemtime( gutenberg_dir_path() . 'nux/build/index.js' )
+	);
+	wp_register_script(
 		'wp-blocks',
 		gutenberg_url( 'blocks/build/index.js' ),
 		array( 'wp-element', 'wp-components', 'wp-utils', 'wp-hooks', 'wp-i18n', 'tinymce-latest', 'tinymce-latest-lists', 'tinymce-latest-paste', 'tinymce-latest-table', 'media-views', 'media-models', 'shortcode' ),
@@ -167,6 +173,14 @@ function gutenberg_register_scripts_and_styles() {
 		filemtime( gutenberg_dir_path() . 'components/build/style.css' )
 	);
 	wp_style_add_data( 'wp-components', 'rtl', 'replace' );
+
+	wp_register_style(
+		'wp-nux',
+		gutenberg_url( 'nux/build/style.css' ),
+		array( 'wp-components' ),
+		filemtime( gutenberg_dir_path() . 'nux/build/style.css' )
+	);
+	wp_style_add_data( 'wp-nux', 'rtl', 'replace' );
 
 	wp_register_style(
 		'wp-blocks',
@@ -649,7 +663,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	wp_enqueue_script(
 		'wp-editor',
 		gutenberg_url( 'editor/build/index.js' ),
-		array( 'jquery', 'wp-api', 'wp-data', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element', 'wp-components', 'wp-utils', 'word-count', 'editor', 'heartbeat' ),
+		array( 'jquery', 'wp-api', 'wp-data', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element', 'wp-components', 'wp-utils', 'wp-nux', 'word-count', 'editor', 'heartbeat' ),
 		filemtime( gutenberg_dir_path() . 'editor/build/index.js' ),
 		true // enqueue in the footer.
 	);
@@ -859,7 +873,7 @@ JS;
 	wp_enqueue_style(
 		'wp-editor',
 		gutenberg_url( 'editor/build/style.css' ),
-		array( 'wp-components', 'wp-blocks', 'wp-edit-blocks' ),
+		array( 'wp-components', 'wp-blocks', 'wp-edit-blocks', 'wp-nux' ),
 		filemtime( gutenberg_dir_path() . 'editor/build/style.css' )
 	);
 	wp_style_add_data( 'wp-editor', 'rtl', 'replace' );

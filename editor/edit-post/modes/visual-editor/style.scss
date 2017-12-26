@@ -56,6 +56,7 @@
 	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );
 	margin: 0 auto;
 	clear: both;
+	position: relative;
 
 	padding: $block-padding;
 	padding-left: $block-padding - 8px; // Offset by left button's own padding
@@ -84,6 +85,12 @@
 		&:disabled {
 			@include button-style__disabled;
 		}
+	}
+
+	.nux-dot-tip {
+		position: absolute;
+		top: 10px;
+		left: 70px;
 	}
 }
 

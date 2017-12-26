@@ -12,6 +12,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { IconButton, withContext } from '@wordpress/components';
 import { Component, compose } from '@wordpress/element';
 import { createBlock, BlockIcon } from '@wordpress/blocks';
+import { DotTip } from '@wordpress/nux';
 
 /**
  * Internal dependencies
@@ -65,7 +66,11 @@ export class VisualEditorInserter extends Component {
 			>
 				<Inserter
 					insertIndex={ blockCount }
-					position="top right" />
+					position="top right"
+				/>
+				<DotTip id="core/editor.inserter">
+					{ __( 'This the inserter, click the "plus" button to open the inserter and add content blocks' ) }
+				</DotTip>
 				{ mostFrequentlyUsedBlocks && mostFrequentlyUsedBlocks.map( ( block ) => (
 					<IconButton
 						key={ 'frequently_used_' + block.name }

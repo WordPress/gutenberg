@@ -14,6 +14,7 @@ global.wp = {
 	'date',
 	'editor',
 	'data',
+	'nux',
 ].forEach( entryPointName => {
 	Object.defineProperty( global.wp, entryPointName, {
 		get: () => require( entryPointName ),

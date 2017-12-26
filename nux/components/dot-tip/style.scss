@@ -1,0 +1,56 @@
+.nux-dot-tip {
+	position: relative;
+	z-index: z-index( '.nux-dot-tip' )
+}
+
+.nux-dot-tip__button-container {
+	padding: 4px;
+	margin: 0;
+	position: absolute;
+
+	top: 0;
+	left: 0;
+}
+
+.nux-dot-tip__button {
+	background-color: $blue-medium-300;
+	width: 8px;
+	height: 8px;
+	text-indent: -9999px;
+	cursor: pointer;
+	overflow: hidden;
+	padding: 0;
+
+	position: relative;
+	transform: translate3d(0,0,0)  rotate(45deg);
+
+	border-radius: 4px;
+	box-shadow: 0 0 0 0 rgba( $blue-medium-300,  0.9);
+
+	animation: nuxdottip__pulse 1.6s infinite cubic-bezier(.17,.67,.92,.62);
+
+	&:off-after {
+		content: " ";
+		background: $blue-medium-300;
+		width: 4px;
+		height: 4px;
+
+		position: absolute;
+		transform: translate3d( 0, 0, 0 )  rotate( 45deg );
+
+		border-radius: 2px;
+		box-shadow: 0 0 0 0 rgba( 200, 215, 225,  0.7);
+
+		animation: nuxdottip__pulse 1.6s infinite cubic-bezier(.62,.2,.86,.53);
+	}
+}
+
+@keyframes nuxdottip__pulse {
+  100% {
+    box-shadow: 0 0 0 10px rgba( $blue-medium-300, 0);
+  }
+}
+
+.nux-dot-tip__content .components-popover__content {
+	padding: 10px;
+}
