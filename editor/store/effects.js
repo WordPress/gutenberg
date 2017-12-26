@@ -32,6 +32,7 @@ import {
 	createErrorNotice,
 	removeNotice,
 	savePost,
+	isAutosaving,
 	editPost,
 	requestMetaBoxUpdates,
 	updateReusableBlock,
@@ -61,38 +62,6 @@ const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
 const SAVE_REUSABLE_BLOCK_NOTICE_ID = 'SAVE_REUSABLE_BLOCK_NOTICE_ID';
 
 export default {
-	REQUEST_POST_AUTOSAVE ( action, store ) {
-		const { dispatch, getState } = store;
-		const state = getState();
-		const post = getCurrentPost( state );
-		const edits = getPostEdits( state );
-		const toSend = {
-			...edits,
-			content: getEditedPostContent( state ),
-			parent: post.id,
-		};
-
-		const Model = wp.api.getPostTypeAutosaveModel( getCurrentPostType( state ) );
-		const newModel = new Model( toSend );
-
-		newModel.save().done( ( newPost ) => {
-			dispatch( {
-				type: 'RESET_POST',
-				post: post,
-			} );
-		} ).fail( ( err ) => {
-			dispatch( {
-				type: 'REQUEST_POST_AUTOSAVE_FAILURE',
-				error: get( err, 'responseJSON', {
-					code: 'unknown_error',
-					message: __( 'An unknown error occurred.' ),
-				} ),
-				post,
-				edits,
-				optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
-			} );
-		} );
-	},
 	REQUEST_POST_UPDATE( action, store ) {
 		const { dispatch, getState } = store;
 		const state = getState();
@@ -124,6 +93,7 @@ export default {
 
 		newModel.save().done( ( newPost ) => {
 			if ( isAutosave ) {
+				dispatch( isAutosaving( false ) );
 				post.modified = newPost.modified;
 				post.modified_gmt = newPost.modified_gmt;
 				dispatch( {
@@ -149,6 +119,10 @@ export default {
 				} );
 			}
 		} ).fail( ( err ) => {
+			if ( isAutosave ) {
+				dispatch( isAutosaving( false ) );
+			}
+
 			dispatch( {
 				type: 'REQUEST_POST_UPDATE_FAILURE',
 				error: get( err, 'responseJSON', {
@@ -334,6 +308,7 @@ export default {
 			return;
 		}
 
+		dispatch( isAutosaving( true ) );
 		dispatch( savePost( { 'autosave': true } ) );
 	},
 	SETUP_EDITOR( action ) {
