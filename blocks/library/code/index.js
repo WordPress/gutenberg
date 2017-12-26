@@ -64,14 +64,14 @@ registerBlockType( 'core/code', {
 					</BlockDescription>
 				</InspectorControls>
 			),
-			<TextareaAutosize
-				key="block"
-				className={ className }
-				value={ attributes.content }
-				onChange={ ( event ) => setAttributes( { content: event.target.value } ) }
-				placeholder={ __( 'Write code…' ) }
-				aria-label={ __( 'Code' ) }
-			/>,
+			<div className={ className } key="block">
+				<TextareaAutosize
+					value={ attributes.content }
+					onChange={ ( event ) => setAttributes( { content: event.target.value } ) }
+					placeholder={ __( 'Write code…' ) }
+					aria-label={ __( 'Code' ) }
+				/>
+			</div>,
 		];
 	},
 

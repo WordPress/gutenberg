@@ -64,6 +64,7 @@ registerBlockType( 'core/html', {
 				key="preview"
 				dangerouslySetInnerHTML={ { __html: attributes.content } } /> :
 			<TextareaAutosize
+				className="wp-block-html"
 				key="editor"
 				value={ attributes.content }
 				onChange={ ( event ) => setAttributes( { content: event.target.value } ) }
