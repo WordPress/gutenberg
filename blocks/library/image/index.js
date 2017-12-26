@@ -65,12 +65,19 @@ registerBlockType( 'core/image', {
 		from: [
 			{
 				type: 'raw',
-				isMatch: ( node ) => {
+				isMatch( node ) {
 					const tag = node.nodeName.toLowerCase();
 					const hasText = !! node.textContent.trim();
 					const hasImage = node.querySelector( 'img' );
 
 					return tag === 'img' || ( hasImage && ! hasText ) || ( hasImage && tag === 'figure' );
+				},
+				transform( node ) {
+					const targetNode = node.parentNode.querySelector( 'figure,img' );
+					const matches = /align(left|center|right)/.exec( targetNode.className );
+					const align = matches ? matches[ 1 ] : undefined;
+
+					return createBlock( 'core/image', { align }, targetNode.outerHTML );
 				},
 			},
 			{

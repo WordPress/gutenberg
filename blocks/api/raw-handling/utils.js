@@ -49,7 +49,7 @@ const inlineWrapperWhiteList = {
 const whitelist = {
 	...inlineWhitelist,
 	...inlineWrapperWhiteList,
-	img: { attributes: [ 'src', 'alt' ] },
+	img: { attributes: [ 'src', 'alt' ], classes: [ 'alignleft', 'aligncenter', 'alignright', 'alignnone' ] },
 	figure: {},
 	blockquote: {},
 	hr: {},
@@ -98,6 +98,14 @@ function isInlineForTag( nodeName, tagName ) {
 export function isInline( node, tagName ) {
 	const nodeName = node.nodeName.toLowerCase();
 	return !! inlineWhitelist[ nodeName ] || isInlineForTag( nodeName, tagName );
+}
+
+export function isClassWhitelisted( tag, name ) {
+	return (
+		whitelist[ tag ] &&
+		whitelist[ tag ].classes &&
+		whitelist[ tag ].classes.indexOf( name ) !== -1
+	);
 }
 
 export function isInlineWrapper( node ) {

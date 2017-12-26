@@ -29,4 +29,8 @@ describe( 'stripAttributes', () => {
 	it( 'should keep some attributes', () => {
 		equal( deepFilterHTML( '<a href="#keep">test</a>', [ stripAttributes ] ), '<a href="#keep">test</a>' );
 	} );
+
+	it( 'should keep some classes', () => {
+		equal( deepFilterHTML( '<img class="alignright test" src="">', [ stripAttributes ] ), '<img class="alignright" src="">' );
+	} );
 } );
