@@ -473,6 +473,19 @@ export function blocksMode( state = {}, action ) {
 	return state;
 }
 
+export function isAutosaving( state = {}, action ) {
+	const { isAutosaving } = action;
+	switch ( action.type ) {
+		case 'DOING_AUTOSAVE':
+			return {
+				...state,
+				isAutosaving: isAutosaving,
+			};
+	}
+
+	return state;
+}
+
 /**
  * Reducer returning the block insertion point
  *
@@ -785,6 +798,7 @@ export const reusableBlocks = combineReducers( {
 
 export default optimist( combineReducers( {
 	editor,
+	isAutosaving,
 	currentPost,
 	isTyping,
 	blockSelection,
