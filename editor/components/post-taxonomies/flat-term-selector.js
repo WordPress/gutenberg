@@ -21,6 +21,7 @@ const DEFAULT_QUERY = {
 	per_page: 100,
 	orderby: 'count',
 	order: 'desc',
+	_fields: [ 'id', 'name' ],
 };
 const MAX_TERMS_SUGGESTIONS = 20;
 
