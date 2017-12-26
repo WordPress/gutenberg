@@ -10,7 +10,7 @@ import scrollIntoView from 'dom-scroll-into-view';
  */
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { keycodes } from '@wordpress/utils';
+import { keycodes, decodeEntities } from '@wordpress/utils';
 import { Spinner, withInstanceId, withSpokenMessages } from '@wordpress/components';
 
 const { UP, DOWN, ENTER } = keycodes;
@@ -220,7 +220,7 @@ class UrlInput extends Component {
 								onClick={ () => this.selectLink( post.link ) }
 								aria-selected={ index === selectedSuggestion }
 							>
-								{ post.title.rendered || __( '(no title)' ) }
+								{ decodeEntities( post.title.rendered ) || __( '(no title)' ) }
 							</button>
 						) ) }
 					</div>
