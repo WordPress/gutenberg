@@ -947,6 +947,16 @@ export function didPostSaveRequestFail( state ) {
 }
 
 /**
+ * Is the post autosaving?
+ *
+ * @param  {Object}  state Global application state
+ * @return {Boolean}       Whether the post is autosaving
+ */
+export function isAutosavingPost( state ) {
+	return !! state.isAutosaving.isAutosaving;
+}
+
+/**
  * Returns a suggested post format for the current post, inferred only if there
  * is a single block within the post and it is of a type known to match a
  * default post format. Returns null if the format cannot be determined.
