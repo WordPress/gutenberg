@@ -330,7 +330,7 @@ export default {
 			return;
 		}
 
-		if ( ! isEditedPostNew( state ) && ! isEditedPostDirty( state ) ) {
+		if ( ! isEditedPostDirty( state ) ) {
 			return;
 		}
 
