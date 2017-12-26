@@ -240,10 +240,9 @@ export function savePost() {
 	};
 }
 
-export function autosavePost( options ) {
+export function autosavePost() {
 	return {
 		type: 'REQUEST_POST_AUTOSAVE',
-		options,
 	};
 }
 
