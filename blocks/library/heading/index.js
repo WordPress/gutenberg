@@ -145,6 +145,7 @@ registerBlockType( 'core/heading', {
 			),
 			<Editable
 				key="editable"
+				wrapperClassName="wp-block-heading"
 				tagName={ nodeName.toLowerCase() }
 				value={ content }
 				focus={ focus }

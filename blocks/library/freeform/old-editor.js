@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
@@ -177,7 +182,7 @@ export default class OldEditor extends Component {
 	}
 
 	render() {
-		const { focus, id } = this.props;
+		const { focus, id, className } = this.props;
 
 		return [
 			focus && (
@@ -197,7 +202,7 @@ export default class OldEditor extends Component {
 			<div
 				key="editor"
 				id={ id }
-				className="blocks-editable__tinymce"
+				className={ classnames( className, 'blocks-editable__tinymce' ) }
 			/>,
 		];
 	}
