@@ -234,15 +234,10 @@ export function editPost( edits ) {
 	};
 }
 
-export function savePost() {
+export function savePost( options ) {
 	return {
 		type: 'REQUEST_POST_UPDATE',
-	};
-}
-
-export function autosavePost() {
-	return {
-		type: 'REQUEST_POST_AUTOSAVE',
+		options,
 	};
 }
 

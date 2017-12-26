@@ -32,7 +32,6 @@ import {
 	createErrorNotice,
 	removeNotice,
 	savePost,
-	autosavePost,
 	editPost,
 	requestMetaBoxUpdates,
 	updateReusableBlock,
@@ -62,15 +61,15 @@ const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
 const SAVE_REUSABLE_BLOCK_NOTICE_ID = 'SAVE_REUSABLE_BLOCK_NOTICE_ID';
 
 export default {
-	REQUEST_POST_AUTOSAVE( action, store ) {
+	REQUEST_POST_AUTOSAVE ( action, store ) {
 		const { dispatch, getState } = store;
-		const state  = getState();
-		const post   = getCurrentPost( state );
-		const edits  = getPostEdits( state );
+		const state = getState();
+		const post = getCurrentPost( state );
+		const edits = getPostEdits( state );
 		const toSend = {
 			...edits,
 			content: getEditedPostContent( state ),
-			parent:  post.id,
+			parent: post.id,
 		};
 
 		const Model = wp.api.getPostTypeAutosaveModel( getCurrentPostType( state ) );
@@ -104,25 +103,51 @@ export default {
 			content: getEditedPostContent( state ),
 			id: post.id,
 		};
+		const isAutosave = action.options && action.options.autosave;
+		let Model, newModel;
 
-		dispatch( {
-			type: 'UPDATE_POST',
-			edits: toSend,
-			optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
-		} );
-		dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
-		const Model = wp.api.getPostTypeModel( getCurrentPostType( state ) );
-		new Model( toSend ).save().done( ( newPost ) => {
+		if ( isAutosave ) {
+			toSend.parent = post.id;
+			delete toSend.id ;
+			Model = wp.api.getPostTypeAutosaveModel( getCurrentPostType( state ) );
+			newModel = new Model( toSend );
+		} else {
 			dispatch( {
-				type: 'RESET_POST',
-				post: newPost,
+				type: 'UPDATE_POST',
+				edits: toSend,
+				optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
 			} );
-			dispatch( {
-				type: 'REQUEST_POST_UPDATE_SUCCESS',
-				previousPost: post,
-				post: newPost,
-				optimist: { type: COMMIT, id: POST_UPDATE_TRANSACTION_ID },
-			} );
+			dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
+			Model = wp.api.getPostTypeModel( getCurrentPostType( state ) );
+			newModel = new Model( toSend );
+		}
+
+		newModel.save().done( ( newPost ) => {
+			if ( isAutosave ) {
+				post.modified = newPost.modified;
+				post.modified_gmt = newPost.modified_gmt;
+				dispatch( {
+					type: 'RESET_POST',
+					post: post,
+				} );
+				dispatch( {
+					type: 'REQUEST_POST_UPDATE_SUCCESS',
+					previousPost: post,
+					post: post,
+					isAutosave: true
+				} );
+			} else {
+				dispatch( {
+					type: 'RESET_POST',
+					post: newPost,
+				} );
+				dispatch( {
+					type: 'REQUEST_POST_UPDATE_SUCCESS',
+					previousPost: post,
+					post: newPost,
+					optimist: { type: COMMIT, id: POST_UPDATE_TRANSACTION_ID },
+				} );
+			}
 		} ).fail( ( err ) => {
 			dispatch( {
 				type: 'REQUEST_POST_UPDATE_FAILURE',
@@ -132,12 +157,12 @@ export default {
 				} ),
 				post,
 				edits,
-				optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
+				optimist: isAutosave ? false : { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
 			} );
 		} );
 	},
 	REQUEST_POST_UPDATE_SUCCESS( action, store ) {
-		const { previousPost, post } = action;
+		const { previousPost, post, isAutosave } = action;
 		const { dispatch, getState } = store;
 
 		const publishStatus = [ 'publish', 'private', 'future' ];
@@ -162,8 +187,10 @@ export default {
 				future: __( 'Post scheduled!' ),
 			}[ post.status ];
 		} else {
-			// Generic fallback notice
-			noticeMessage = __( 'Post updated!' );
+			if ( ! isAutosave ) {
+				// Generic fallback notice
+				noticeMessage = __( 'Post updated!' );
+			}
 		}
 
 		if ( noticeMessage ) {
@@ -307,7 +334,7 @@ export default {
 			return;
 		}
 
-		dispatch( autosavePost() );
+		dispatch( savePost( { 'autosave': true } ) );
 	},
 	SETUP_EDITOR( action ) {
 		const { post, settings } = action;
