@@ -23,6 +23,7 @@ import {
 	getEditedPostVisibility,
 	isEditedPostSaveable,
 	isEditedPostPublishable,
+	isAutosavingPost,
 } from '../../store/selectors';
 
 export function PostPublishButton( {
@@ -51,7 +52,7 @@ export function PostPublishButton( {
 	}
 
 	const className = classnames( 'editor-post-publish-button', {
-		'is-saving': isSaving,
+		'is-saving': isSaving && ! isAutosavingPost,
 	} );
 
 	const onClick = () => {
@@ -80,6 +81,7 @@ const applyConnect = connect(
 		visibility: getEditedPostVisibility( state ),
 		isSaveable: isEditedPostSaveable( state ),
 		isPublishable: isEditedPostPublishable( state ),
+		isAutosaving: isAutosavingPost( state ),
 	} ),
 	{
 		onStatusChange: ( status ) => editPost( { status } ),
