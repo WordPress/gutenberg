@@ -9,7 +9,7 @@ import { createMediaFromFile } from '@wordpress/utils';
  */
 import './style.scss';
 import './editor.scss';
-import { registerBlockType, createBlock } from '../../api';
+import { registerBlockType, createBlock, getBlockAttributes, getBlockType } from '../../api';
 import ImageBlock from './block';
 
 registerBlockType( 'core/image', {
@@ -76,8 +76,10 @@ registerBlockType( 'core/image', {
 					const targetNode = node.parentNode.querySelector( 'figure,img' );
 					const matches = /align(left|center|right)/.exec( targetNode.className );
 					const align = matches ? matches[ 1 ] : undefined;
+					const blockType = getBlockType( 'core/image' );
+					const attributes = getBlockAttributes( blockType, targetNode.outerHTML, { align } );
 
-					return createBlock( 'core/image', { align }, targetNode.outerHTML );
+					return createBlock( 'core/image', attributes );
 				},
 			},
 			{
