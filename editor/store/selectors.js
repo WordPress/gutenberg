@@ -22,11 +22,6 @@ import { serialize, getBlockType } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 
-/**
- * Internal dependencies
- */
-import { BREAK_MEDIUM } from './constants';
-
 /***
  * Module constants
  */
@@ -227,7 +222,7 @@ export function isCleanNewPost( state ) {
  * @return {Boolean}       Whether current window size corresponds to mobile resolutions
  */
 export function isMobile( state ) {
-	return state.browser.width < BREAK_MEDIUM;
+	return state.mobile;
 }
 
 /**

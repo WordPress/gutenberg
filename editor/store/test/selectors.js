@@ -329,9 +329,7 @@ describe( 'selectors', () => {
 	describe( 'isSidebarOpened', () => {
 		it( 'should return true when is not mobile and the normal sidebar is opened', () => {
 			const state = {
-				browser: {
-					width: 1000,
-				},
+				mobile: false,
 				preferences: {
 					sidebars: {
 						desktop: true,
@@ -345,9 +343,7 @@ describe( 'selectors', () => {
 
 		it( 'should return false when is not mobile and the normal sidebar is closed', () => {
 			const state = {
-				browser: {
-					width: 1000,
-				},
+				mobile: false,
 				preferences: {
 					sidebars: {
 						desktop: false,
@@ -361,9 +357,7 @@ describe( 'selectors', () => {
 
 		it( 'should return true when is mobile and the mobile sidebar is opened', () => {
 			const state = {
-				browser: {
-					width: 100,
-				},
+				mobile: true,
 				preferences: {
 					sidebars: {
 						desktop: false,
@@ -377,9 +371,7 @@ describe( 'selectors', () => {
 
 		it( 'should return false when is mobile and the mobile sidebar is closed', () => {
 			const state = {
-				browser: {
-					width: 100,
-				},
+				mobile: true,
 				preferences: {
 					sidebars: {
 						desktop: true,
@@ -419,9 +411,7 @@ describe( 'selectors', () => {
 	describe( 'hasOpenSidebar', () => {
 		it( 'should return true if at least one sidebar is open (using the desktop sidebar as default)', () => {
 			const state = {
-				browser: {
-					width: 1000,
-				},
+				mobile: false,
 				preferences: {
 					sidebars: {
 						desktop: true,
@@ -436,9 +426,7 @@ describe( 'selectors', () => {
 
 		it( 'should return true if at no sidebar is open (using the desktop sidebar as default)', () => {
 			const state = {
-				browser: {
-					width: 1000,
-				},
+				mobile: false,
 				preferences: {
 					sidebars: {
 						desktop: false,
@@ -453,9 +441,7 @@ describe( 'selectors', () => {
 
 		it( 'should return true if at least one sidebar is open (using the mobile sidebar as default)', () => {
 			const state = {
-				browser: {
-					width: 100,
-				},
+				mobile: true,
 				preferences: {
 					sidebars: {
 						desktop: false,
@@ -470,9 +456,7 @@ describe( 'selectors', () => {
 
 		it( 'should return true if at no sidebar is open (using the mobile sidebar as default)', () => {
 			const state = {
-				browser: {
-					width: 100,
-				},
+				mobile: true,
 				preferences: {
 					sidebars: {
 						desktop: true,
@@ -705,9 +689,7 @@ describe( 'selectors', () => {
 	describe( 'isMobile', () => {
 		it( 'should return true if resolution is equal or less than medium breakpoint', () => {
 			const state = {
-				browser: {
-					width: 100,
-				},
+				mobile: true,
 			};
 
 			expect( isMobile( state ) ).toBe( true );
@@ -715,9 +697,7 @@ describe( 'selectors', () => {
 
 		it( 'should return true if resolution is greater than medium breakpoint', () => {
 			const state = {
-				browser: {
-					width: 1000,
-				},
+				mobile: false,
 			};
 
 			expect( isMobile( state ) ).toBe( false );

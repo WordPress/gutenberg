@@ -712,9 +712,9 @@ export function metaBoxes( state = defaultMetaBoxState, action ) {
 	}
 }
 
-export function browser( state = {}, action ) {
-	if ( action.type === 'BROWSER_RESIZE' ) {
-		return { width: action.width, height: action.height };
+export function mobile( state = false, action ) {
+	if ( action.type === 'UPDATE_MOBILE_STATE' ) {
+		return action.isMobile;
 	}
 	return state;
 }
@@ -798,6 +798,6 @@ export default optimist( combineReducers( {
 	saving,
 	notices,
 	metaBoxes,
-	browser,
+	mobile,
 	reusableBlocks,
 } ) );
