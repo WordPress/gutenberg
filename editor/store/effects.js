@@ -321,18 +321,18 @@ export default {
 
 		let result;
 		if ( id ) {
-			result = new wp.api.models.ReusableBlocks( { id } ).fetch();
+			result = new wp.api.models.Blocks( { id } ).fetch();
 		} else {
-			result = new wp.api.collections.ReusableBlocks().fetch();
+			result = new wp.api.collections.Blocks().fetch();
 		}
 
 		result.then(
 			( reusableBlockOrBlocks ) => {
 				dispatch( {
 					type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
-					reusableBlocks: castArray( reusableBlockOrBlocks ).map( ( { id: itemId, name, content } ) => {
+					reusableBlocks: castArray( reusableBlockOrBlocks ).map( ( { id: itemId, title, content } ) => {
 						const [ { name: type, attributes } ] = parse( content );
-						return { id: itemId, name, type, attributes };
+						return { id: itemId, title, type, attributes };
 					} ),
 				} );
 			},
@@ -351,10 +351,10 @@ export default {
 		const { id } = action;
 		const { getState, dispatch } = store;
 
-		const { name, type, attributes, isTemporary } = getReusableBlock( getState(), id );
+		const { title, type, attributes, isTemporary } = getReusableBlock( getState(), id );
 		const content = serialize( createBlock( type, attributes ) );
-		const requestData = isTemporary ? { name, content } : { id, name, content };
-		new wp.api.models.ReusableBlocks( requestData ).save().then(
+		const requestData = isTemporary ? { title, content } : { id, title, content };
+		new wp.api.models.Blocks( requestData ).save().then(
 			( updatedReusableBlock ) => {
 				dispatch( {
 					type: 'SAVE_REUSABLE_BLOCK_SUCCESS',

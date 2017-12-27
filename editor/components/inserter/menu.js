@@ -149,7 +149,7 @@ export class InserterMenu extends Component {
 			initialAttributes: {
 				ref: reusableBlock.id,
 			},
-			title: reusableBlock.name,
+			title: reusableBlock.title,
 			icon: 'layout',
 			category: 'reusable-blocks',
 		} ) );
