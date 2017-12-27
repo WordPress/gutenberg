@@ -412,7 +412,6 @@ export class BlockListBlock extends Component {
 			'is-hovered': isHovered,
 			'is-reusable': isReusableBlock( blockType ),
 		} );
-		const blockContainerClassName = 'editor-block-list__block-container';
 		const blockUnderlayClassName = 'editor-block-list__block-underlay';
 
 		const { onMouseLeave, onFocus, onReplace } = this.props;
@@ -427,94 +426,88 @@ export class BlockListBlock extends Component {
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
 			<div
-				className={ blockContainerClassName }
-				id={ `block-container-${ this.props.uid }` }
+				id={ `block-${ this.props.uid }` }
+				ref={ this.setBlockListRef }
+				onMouseMove={ this.maybeHover }
+				onMouseEnter={ this.maybeHover }
+				onMouseLeave={ onMouseLeave }
+				className={ wrapperClassName }
+				data-type={ block.name }
+				onTouchStart={ this.onTouchStart }
+				onClick={ this.onClick }
+				{ ...wrapperProps }
 			>
-
 				<div
-					id={ `block-${ this.props.uid }` }
-					ref={ this.setBlockListRef }
-					onMouseMove={ this.maybeHover }
-					onMouseEnter={ this.maybeHover }
-					onMouseLeave={ onMouseLeave }
-					className={ wrapperClassName }
-					data-type={ block.name }
-					onTouchStart={ this.onTouchStart }
-					onClick={ this.onClick }
-					{ ...wrapperProps }
+					id={ `block-underlay-${ this.props.uid }` }
+					draggable={ true }
+					onDragStart={ this.onDragStart }
+					onDragEnd={ this.onDragEnd }
+					className={ blockUnderlayClassName }
 				>
-					<div
-						id={ `block-underlay-${ this.props.uid }` }
+					<div className="inner" ></div>
+				</div>
+
+				<BlockDropZone
+					index={ order }
+					onDrop={ this.onDrop }
+					dropEffect="reorder"
+				/>
+
+				{ ( showUI || isHovered ) &&
+					<BlockMover
 						draggable={ true }
 						onDragStart={ this.onDragStart }
 						onDragEnd={ this.onDragEnd }
-						className={ blockUnderlayClassName }
-					>
-						<div className="inner" ></div>
-					</div>
-
-					<BlockDropZone
-						index={ order }
-						onDrop={ this.onDrop }
-						dropEffect="reorder"
+						uids={ [ block.uid ] }
 					/>
+				}
+				{ ( showUI || isHovered ) && <BlockSettingsMenu uids={ [ block.uid ] } /> }
+				{ showUI && isValid && showContextualToolbar && <BlockContextualToolbar /> }
+				{ isFirstMultiSelected && <BlockMultiControls /> }
+				<div
+					ref={ this.bindBlockNode }
+					onKeyPress={ this.maybeStartTyping }
+					onDragStart={ ( event ) => event.preventDefault() }
+					onMouseDown={ this.onPointerDown }
+					onKeyDown={ this.onKeyDown }
+					onFocus={ this.onFocus }
+					className={ BlockListBlock.className }
+					tabIndex="0"
+					aria-label={ blockLabel }
+				>
 
-					{ ( showUI || isHovered ) &&
-						<BlockMover
-							draggable={ true }
-							onDragStart={ this.onDragStart }
-							onDragEnd={ this.onDragEnd }
-							uids={ [ block.uid ] }
-						/>
-					}
-					{ ( showUI || isHovered ) && <BlockSettingsMenu uids={ [ block.uid ] } /> }
-					{ showUI && isValid && showContextualToolbar && <BlockContextualToolbar /> }
-					{ isFirstMultiSelected && <BlockMultiControls /> }
-					<div
-						ref={ this.bindBlockNode }
-						onKeyPress={ this.maybeStartTyping }
-						onDragStart={ ( event ) => event.preventDefault() }
-						onMouseDown={ this.onPointerDown }
-						onKeyDown={ this.onKeyDown }
-						onFocus={ this.onFocus }
-						className={ BlockListBlock.className }
-						tabIndex="0"
-						aria-label={ blockLabel }
-					>
-
-						<BlockCrashBoundary onError={ this.onBlockError }>
-							{ isValid && mode === 'visual' && (
-								<BlockEdit
-									name={ blockName }
-									focus={ focus }
-									attributes={ block.attributes }
-									setAttributes={ this.setAttributes }
-									insertBlocksAfter={ isLocked ? undefined : this.insertBlocksAfter }
-									onReplace={ isLocked ? undefined : onReplace }
-									setFocus={ partial( onFocus, block.uid ) }
-									mergeBlocks={ isLocked ? undefined : this.mergeBlocks }
-									id={ block.uid }
-									isSelectionEnabled={ this.props.isSelectionEnabled }
-									toggleSelection={ this.props.toggleSelection }
-								/>
-							) }
-							{ isValid && mode === 'html' && (
-								<BlockHtml uid={ block.uid } />
-							) }
-							{ ! isValid && [
-								<div key="invalid-preview">
-									{ getSaveElement( blockType, block.attributes ) }
-								</div>,
-								<InvalidBlockWarning
-									key="invalid-warning"
-									block={ block }
-								/>,
-							] }
-						</BlockCrashBoundary>
-						{ showUI && <BlockMobileToolbar uid={ block.uid } /> }
-					</div>
-					{ !! error && <BlockCrashWarning /> }
+					<BlockCrashBoundary onError={ this.onBlockError }>
+						{ isValid && mode === 'visual' && (
+							<BlockEdit
+								name={ blockName }
+								focus={ focus }
+								attributes={ block.attributes }
+								setAttributes={ this.setAttributes }
+								insertBlocksAfter={ isLocked ? undefined : this.insertBlocksAfter }
+								onReplace={ isLocked ? undefined : onReplace }
+								setFocus={ partial( onFocus, block.uid ) }
+								mergeBlocks={ isLocked ? undefined : this.mergeBlocks }
+								id={ block.uid }
+								isSelectionEnabled={ this.props.isSelectionEnabled }
+								toggleSelection={ this.props.toggleSelection }
+							/>
+						) }
+						{ isValid && mode === 'html' && (
+							<BlockHtml uid={ block.uid } />
+						) }
+						{ ! isValid && [
+							<div key="invalid-preview">
+								{ getSaveElement( blockType, block.attributes ) }
+							</div>,
+							<InvalidBlockWarning
+								key="invalid-warning"
+								block={ block }
+							/>,
+						] }
+					</BlockCrashBoundary>
+					{ showUI && <BlockMobileToolbar uid={ block.uid } /> }
 				</div>
+				{ !! error && <BlockCrashWarning /> }
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
