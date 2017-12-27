@@ -5,7 +5,7 @@ import './style.scss';
 import { DatePicker } from './date';
 import { TimePicker } from './time';
 
-export { DatePicker, TimePicker }
+export { DatePicker, TimePicker };
 
 export function DateTimePicker( { currentDate, onChange, is12Hour, ...args } ) {
 	return [

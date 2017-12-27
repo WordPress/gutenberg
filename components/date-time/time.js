@@ -10,7 +10,7 @@ import moment from 'moment';
 import { __ } from '@wordpress/i18n';
 import Button from '../button';
 
-export function TimePicker( { currentTime, onChange, is12Hour, ...args } ) {
+export function TimePicker( { currentTime, onChange, is12Hour } ) {
 	const selected = currentTime ? moment( currentTime ) : moment();
 
 	const minutes = selected.format( 'mm' );
