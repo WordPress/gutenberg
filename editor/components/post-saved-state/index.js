@@ -23,15 +23,16 @@ import {
 	isEditedPostSaveable,
 	getCurrentPost,
 	getEditedPostAttribute,
+	isAutosavingPost,
 } from '../../store/selectors';
 
-export function PostSavedState( { isNew, isPublished, isDirty, isSaving, isSaveable, status, onStatusChange, onSave } ) {
+export function PostSavedState ( { isNew, isPublished, isDirty, isSaving, isSaveable, status, onStatusChange, onSave, isAutosaving } ) {
 	const className = 'editor-post-saved-state';
 
 	if ( isSaving ) {
 		return (
 			<span className={ className }>
-				{ __( 'Saving' ) }
+				{ isAutosaving ? __( 'Autosaving' )  : __( 'Saving' ) }
 			</span>
 		);
 	}
@@ -74,6 +75,7 @@ export default connect(
 		isSaving: isSavingPost( state ),
 		isSaveable: isEditedPostSaveable( state ),
 		status: getEditedPostAttribute( state, 'status' ),
+		isAutosaving: isAutosavingPost( state ),
 	} ),
 	{
 		onStatusChange: ( status ) => editPost( { status } ),
