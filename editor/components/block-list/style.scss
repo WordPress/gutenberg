@@ -2,27 +2,34 @@
 	position: relative;
 }
 
-.editor-block-list__block-overlay {
+.editor-block-list__block-underlay {
 	position: absolute;
 	top: 0;
 	right: 0;
 	bottom: 0;
 	left: 0;
-	background-color: $light-gray-200;
-	opacity: 0;
 	z-index: z-index( '.editor-block-list__block-underlay' );
 
-	&.visible {
+	>.inner {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		margin: 0 32px;
+		opacity: 0;
+		background-color: $light-gray-200;
+	}
+
+	&.visible *,
+	&.visible > * {
 		opacity: 1;
 		visibility: visible !important;
 	}
 }
 
 .editor-block-list__block {
-	&.hide * {
-		visibility: hidden;
-	}
-
+	&.hide *,
 	&.hide > * {
 		visibility: hidden;
 	}

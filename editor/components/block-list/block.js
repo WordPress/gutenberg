@@ -354,7 +354,7 @@ export class BlockListBlock extends Component {
 
 	onDragStart( event ) {
 		const block = document.getElementById( `block-${ this.props.uid }` );
-		const overlay = document.getElementById( `block-overlay-${ this.props.uid }` );
+		const underlay = document.getElementById( `block-underlay-${ this.props.uid }` );
 
 		document.body.classList.add( 'dragging' );
 		event.dataTransfer.effectAllowed = 'Move';
@@ -367,24 +367,24 @@ export class BlockListBlock extends Component {
 		event.dataTransfer.setDragImage( block, 0, 0 );
 		// event.stopPropagation();
 
-		setTimeout( addOverlay( block, overlay ) );
+		setTimeout( addUnderlay( block, underlay ) );
 
-		function addOverlay( _block, _overlay ) {
+		function addUnderlay( _block, _underlay ) {
 			return () => {
 				_block.classList.remove( 'dragged' );
 				_block.classList.add( 'hide' );
-				_overlay.classList.add( 'visible' );
+				_underlay.classList.add( 'visible' );
 			};
 		}
 	}
 
 	onDragEnd() {
 		const block = document.getElementById( `block-${ this.props.uid }` );
-		const overlay = document.getElementById( `block-overlay-${ this.props.uid }` );
+		const underlay = document.getElementById( `block-underlay-${ this.props.uid }` );
 
 		document.body.classList.remove( 'dragging' );
 		block.classList.remove( 'hide' );
-		overlay.classList.remove( 'visible' );
+		underlay.classList.remove( 'visible' );
 		// event.stopPropagation();
 	}
 
@@ -412,8 +412,8 @@ export class BlockListBlock extends Component {
 			'is-hovered': isHovered,
 			'is-reusable': isReusableBlock( blockType ),
 		} );
-		const containerClassName = 'editor-block-list__block-container';
-		const blockOverlayClassName = 'editor-block-list__block-overlay';
+		const blockContainerClassName = 'editor-block-list__block-container';
+		const blockUnderlayClassName = 'editor-block-list__block-underlay';
 
 		const { onMouseLeave, onFocus, onReplace } = this.props;
 
@@ -427,7 +427,7 @@ export class BlockListBlock extends Component {
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
 			<div
-				className={ containerClassName }
+				className={ blockContainerClassName }
 				id={ `block-container-${ this.props.uid }` }
 			>
 
@@ -444,12 +444,14 @@ export class BlockListBlock extends Component {
 					{ ...wrapperProps }
 				>
 					<div
-						id={ `block-overlay-${ this.props.uid }` }
+						id={ `block-underlay-${ this.props.uid }` }
 						draggable={ true }
 						onDragStart={ this.onDragStart }
 						onDragEnd={ this.onDragEnd }
-						className={ blockOverlayClassName }
-					></div>
+						className={ blockUnderlayClassName }
+					>
+						<div className="inner" ></div>
+					</div>
 
 					<BlockDropZone
 						index={ order }
