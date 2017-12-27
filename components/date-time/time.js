@@ -9,19 +9,9 @@ import moment from 'moment';
  */
 import { __ } from '@wordpress/i18n';
 import Button from '../button';
-import { settings } from '@wordpress/date';
 
-export function TimePicker( { currentTime, onChange } ) {
+export function TimePicker( { currentTime, onChange, is12Hour, ...args } ) {
 	const selected = currentTime ? moment( currentTime ) : moment();
-
-	// To know if the current timezone is a 12 hour time with look for "a" in the time format
-	// We also make sure this a is not escaped by a "/"
-	const is12Hour = /a(?!\\)/i.test(
-		settings.formats.time
-			.toLowerCase() // Test only the lower case a
-			.replace( /\\\\/g, '' ) // Replace "//" with empty strings
-			.split( '' ).reverse().join( '' ) // Reverse the string and test for "a" not followed by a slash
-	);
 
 	const minutes = selected.format( 'mm' );
 	const am = selected.format( 'A' );
