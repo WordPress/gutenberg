@@ -20,7 +20,6 @@ export function DateTimePicker( { currentDate, onChange, is12Hour, ...args } ) {
 			currentTime={ currentDate }
 			onChange={ onChange }
 			is12Hour={ is12Hour }
-			{ ...args }
 		/>,
 	];
 }
