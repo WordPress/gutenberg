@@ -17,7 +17,7 @@ import PageAttributesCheck from './check';
 import { editPost } from '../../store/actions';
 import { getEditedPostAttribute } from '../../store/selectors';
 
-export function PageAttributes( { onUpdateOrder, instanceId, order } ) {
+export function PageAttributesOrder( { onUpdateOrder, instanceId, order } ) {
 	const setUpdatedOrder = ( event ) => {
 		const newOrder = Number( event.target.value );
 		if ( newOrder >= 0 ) {
@@ -61,4 +61,4 @@ const applyConnect = connect(
 export default compose( [
 	applyConnect,
 	withInstanceId,
-] )( PageAttributes );
+] )( PageAttributesOrder );

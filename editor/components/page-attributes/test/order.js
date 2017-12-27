@@ -6,13 +6,13 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import { PageAttributes } from '../';
+import { PageAttributesOrder } from '../order';
 
-describe( 'PageAttributes', () => {
+describe( 'PageAttributesOrder', () => {
 	it( 'should reject invalid input', () => {
 		const onUpdateOrder = jest.fn();
 		const wrapper = shallow(
-			<PageAttributes onUpdateOrder={ onUpdateOrder } />
+			<PageAttributesOrder onUpdateOrder={ onUpdateOrder } />
 		);
 
 		wrapper.find( 'input' ).simulate( 'change', {
@@ -33,7 +33,7 @@ describe( 'PageAttributes', () => {
 	it( 'should update with valid input', () => {
 		const onUpdateOrder = jest.fn();
 		const wrapper = shallow(
-			<PageAttributes onUpdateOrder={ onUpdateOrder } />
+			<PageAttributesOrder onUpdateOrder={ onUpdateOrder } />
 		);
 
 		wrapper.find( 'input' ).simulate( 'change', {
