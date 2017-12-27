@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { isEqual } from 'lodash';
 import classnames from 'classnames';
 import { connect } from 'react-redux';
 import jQuery from 'jquery';
@@ -17,7 +16,7 @@ import { Spinner } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import { handleMetaBoxReload, metaBoxStateChanged, metaBoxLoaded } from '../../../store/actions';
+import { handleMetaBoxReload, metaBoxLoaded } from '../../../store/actions';
 import { getMetaBox, isSavingPost } from '../../../store/selectors';
 
 class MetaBoxesArea extends Component {
@@ -29,7 +28,6 @@ class MetaBoxesArea extends Component {
 		};
 		this.originalFormData = '';
 		this.bindNode = this.bindNode.bind( this );
-		this.checkState = this.checkState.bind( this );
 	}
 
 	bindNode( node ) {
@@ -43,15 +41,7 @@ class MetaBoxesArea extends Component {
 
 	componentWillUnmount() {
 		this.mounted = false;
-		this.unbindFormEvents();
 		document.querySelector( '#metaboxes' ).appendChild( this.form );
-	}
-
-	unbindFormEvents() {
-		if ( this.form ) {
-			this.form.removeEventListener( 'change', this.checkState );
-			this.form.removeEventListener( 'input', this.checkState );
-		}
 	}
 
 	componentWillReceiveProps( nextProps ) {
@@ -84,28 +74,11 @@ class MetaBoxesArea extends Component {
 		this.node.appendChild( this.form );
 		this.form.onSubmit = ( event ) => event.preventDefault();
 		this.originalFormData = this.getFormData();
-		this.form.addEventListener( 'change', this.checkState );
-		this.form.addEventListener( 'input', this.checkState );
 		this.props.metaBoxLoaded( location );
 	}
 
 	getFormData() {
 		return jQuery( this.form ).serialize();
-	}
-
-	checkState() {
-		const { loading } = this.state;
-		const { isDirty, changedMetaBoxState, location } = this.props;
-
-		const newIsDirty = ! isEqual( this.originalFormData, this.getFormData() );
-
-		/**
-		 * If we are not updating, then if dirty and equal to original, then set not dirty.
-		 * If we are not updating, then if not dirty and not equal to original, set as dirty.
-		 */
-		if ( ! loading && isDirty !== newIsDirty ) {
-			changedMetaBoxState( location, newIsDirty );
-		}
 	}
 
 	render() {
@@ -132,10 +105,9 @@ class MetaBoxesArea extends Component {
 
 function mapStateToProps( state, ownProps ) {
 	const metaBox = getMetaBox( state, ownProps.location );
-	const { isDirty, isUpdating } = metaBox;
+	const { isUpdating } = metaBox;
 
 	return {
-		isDirty,
 		isUpdating,
 		isPostSaving: isSavingPost( state ) ? true : false,
 	};
@@ -145,7 +117,6 @@ function mapDispatchToProps( dispatch ) {
 	return {
 		// Used to set the reference to the MetaBox in redux, fired when the component mounts.
 		metaBoxReloaded: ( location ) => dispatch( handleMetaBoxReload( location ) ),
-		changedMetaBoxState: ( location, hasChanged ) => dispatch( metaBoxStateChanged( location, hasChanged ) ),
 		metaBoxLoaded: ( location ) => dispatch( metaBoxLoaded( location ) ),
 	};
 }

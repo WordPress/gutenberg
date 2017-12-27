@@ -491,32 +491,11 @@ export function metaBoxLoaded( location ) {
 /**
  * Returns an action object used to request meta box update.
  *
- * @param {Array} locations Locations of meta boxes: ['normal', 'side',
- *                          'advanced' ].
- *
  * @returns {Object} Action object.
  */
-export function requestMetaBoxUpdates( locations ) {
+export function requestMetaBoxUpdates() {
 	return {
 		type: 'REQUEST_META_BOX_UPDATES',
-		locations,
-	};
-}
-
-/**
- * Returns an action object used to set meta box state changed.
- *
- * @param {string}  location   Location of meta box: 'normal', 'side'
- *                             or 'advanced'.
- * @param {boolean} hasChanged Whether the meta box has changed.
- *
- * @returns {Object} Action object.
- */
-export function metaBoxStateChanged( location, hasChanged ) {
-	return {
-		type: 'META_BOX_STATE_CHANGED',
-		location,
-		hasChanged,
 	};
 }
 

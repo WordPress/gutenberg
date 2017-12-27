@@ -283,7 +283,7 @@ describe( 'effects', () => {
 
 	describe( '.REQUEST_POST_UPDATE_SUCCESS', () => {
 		const handler = effects.REQUEST_POST_UPDATE_SUCCESS;
-		let getDirtyMetaBoxesSpy, replaceStateSpy;
+		let replaceStateSpy;
 
 		const defaultPost = {
 			id: 1,
@@ -304,18 +304,14 @@ describe( 'effects', () => {
 		} );
 
 		beforeAll( () => {
-			getDirtyMetaBoxesSpy = jest.spyOn( selectors, 'getDirtyMetaBoxes' );
 			replaceStateSpy = jest.spyOn( window.history, 'replaceState' );
 		} );
 
 		beforeEach( () => {
-			getDirtyMetaBoxesSpy.mockReset();
-			getDirtyMetaBoxesSpy.mockReturnValue( [ 'normal', 'side' ] );
 			replaceStateSpy.mockReset();
 		} );
 
 		afterAll( () => {
-			getDirtyMetaBoxesSpy.mockRestore();
 			replaceStateSpy.mockRestore();
 		} );
 
@@ -328,7 +324,7 @@ describe( 'effects', () => {
 			handler( { post: post, previousPost: post }, store );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
-			expect( dispatch ).toHaveBeenCalledWith( requestMetaBoxUpdates( [ 'normal', 'side' ] ) );
+			expect( dispatch ).toHaveBeenCalledWith( requestMetaBoxUpdates() );
 		} );
 
 		it( 'should dispatch notices when publishing or scheduling a post', () => {
