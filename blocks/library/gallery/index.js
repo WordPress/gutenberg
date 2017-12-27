@@ -68,7 +68,7 @@ registerBlockType( 'core/gallery', {
 				isMultiBlock: true,
 				blocks: [ 'core/image' ],
 				transform: ( blockAttributes ) => {
-					const validImages = filter( blockAttributes, ( { id, url } ) => id && url );
+					const validImages = filter( blockAttributes, ( { url } ) => url );
 					if ( validImages.length > 0 ) {
 						return createBlock( 'core/gallery', {
 							images: validImages.map( ( { id, url, alt } ) => ( { id, url, alt } ) ),
