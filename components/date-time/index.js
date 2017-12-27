@@ -9,7 +9,6 @@ export { DatePicker } from './date';
 export { TimePicker } from './time';
 
 export function DateTimePicker( { currentDate, onChange, locale, ...args } ) {
-
 	return [
 		<DatePicker
 			key="date-picker"
@@ -22,7 +21,6 @@ export function DateTimePicker( { currentDate, onChange, locale, ...args } ) {
 			key="time-picker"
 			currentTime={ currentDate }
 			onChange={ onChange }
-		/>
+		/>,
 	];
-
 }

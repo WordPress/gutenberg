@@ -10,7 +10,6 @@ import moment from 'moment';
 import { settings } from '@wordpress/date';
 
 export function DatePicker( { currentDate, onChange, locale = settings.l10n.locale, ...args } ) {
-
 	const momentDate = currentDate ? moment( currentDate ) : moment();
 
 	return <ReactDatePicker
@@ -20,5 +19,4 @@ export function DatePicker( { currentDate, onChange, locale = settings.l10n.loca
 		locale={ locale }
 		{ ...args }
 	/>;
-
 }

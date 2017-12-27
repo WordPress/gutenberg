@@ -25,7 +25,7 @@ export function PostSchedule( { date, onUpdateDate } ) {
 		currentDate={ date }
 		onChange={ handleChange }
 		locale={ settings.l10n.locale }
-	/>
+	/>;
 }
 
 export default connect(

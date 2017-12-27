@@ -12,7 +12,6 @@ import Button from '../button';
 import { settings } from '@wordpress/date';
 
 export function TimePicker( { currentTime, onChange } ) {
-
 	const selected = currentTime ? moment( currentTime ) : moment();
 
 	// To know if the current timezone is a 12 hour time with look for "a" in the time format
