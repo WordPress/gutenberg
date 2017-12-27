@@ -10,6 +10,7 @@
 	left: 0;
 	background-color: #F8F8F8;
 	opacity: 0;
+	z-index: z-index( '.editor-block-list__block-underlay' );
 
 	&.visible {
 		opacity: 1;
