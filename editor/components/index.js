@@ -9,6 +9,7 @@ export { default as EditorNotices } from './editor-notices';
 export { default as MetaBoxes } from './meta-boxes';
 export { default as PageAttributesCheck } from './page-attributes/check';
 export { default as PageAttributesOrder } from './page-attributes/order';
+export { default as PageAttributesParent } from './page-attributes/parent';
 export { default as PostAuthor } from './post-author';
 export { default as PostAuthorCheck } from './post-author/check';
 export { default as PostComments } from './post-comments';
