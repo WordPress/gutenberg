@@ -22,6 +22,11 @@
 		opacity: 1;
 		visibility: visible !important;
 	}
+
+	&:hover {
+		cursor: move;/* Fallback for IE/Edge < 14 */
+		cursor: grab;
+	}
 }
 
 .editor-block-list__block {

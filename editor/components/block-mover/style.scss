@@ -1,3 +1,11 @@
+.editor-block-mover {
+	/* Necessary for dragging block from the mover */
+	&:hover {
+		cursor: move;/* Fallback for IE/Edge < 14 */
+		cursor: grab;
+	}
+}
+
 .editor-block-mover__control {
 	display: block;
 	padding: 0;

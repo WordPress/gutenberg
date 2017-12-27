@@ -1,5 +1,5 @@
 body.dragging {
-	cursor: -webkit-grabbing;
+	cursor: move;/* Fallback for IE/Edge < 14 */
 	cursor: grabbing;
 }
 
