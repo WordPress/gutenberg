@@ -387,6 +387,7 @@ export function createNotice( status, content, options = {} ) {
 	const {
 		id = uuid(),
 		isDismissible = true,
+		spokenMessage,
 	} = options;
 	return {
 		type: 'CREATE_NOTICE',
@@ -395,6 +396,7 @@ export function createNotice( status, content, options = {} ) {
 			status,
 			content,
 			isDismissible,
+			spokenMessage,
 		},
 	};
 }
