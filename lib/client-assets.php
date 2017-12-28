@@ -750,6 +750,10 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		}
 	}
 
+	// If this autosave isn't newer and different from the current post, remove.
+	if ( $autosave && ! $show_autosave ) {
+		wp_delete_post_revision( $autosave->ID );
+	}
 
 	if ( $show_autosave ) {
 		wp_localize_script(
