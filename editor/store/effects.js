@@ -326,7 +326,7 @@ export default {
 			return;
 		}
 
-		// Change status from auto-draft to draft
+		// Change status from auto-draft to draft, saving the post.
 		if ( isEditedPostNew( state ) ) {
 			dispatch( editPost( { status: 'draft' } ) );
 			dispatch( savePost() );
