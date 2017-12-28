@@ -23,7 +23,6 @@ import QueryPanel from '../../query-panel';
 import InspectorControls from '../../inspector-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
 import RangeControl from '../../inspector-controls/range-control';
-import BlockDescription from '../../block-description';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
@@ -50,9 +49,6 @@ class LatestPostsBlock extends Component {
 
 		const inspectorControls = focus && (
 			<InspectorControls key="inspector">
-				<BlockDescription>
-					<p>{ __( 'Shows a list of your site\'s most recent posts.' ) }</p>
-				</BlockDescription>
 				<h3>{ __( 'Latest Posts Settings' ) }</h3>
 				<QueryPanel
 					{ ...{ order, orderBy } }

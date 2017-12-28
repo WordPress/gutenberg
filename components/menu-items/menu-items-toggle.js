@@ -1,11 +1,12 @@
 /**
  * Internal dependencies
  */
-import IconButton from '../icon-button';
 import Button from '../button';
+import Shortcut from './menu-items-shortcut';
+import IconButton from '../icon-button';
 import './style.scss';
 
-function MenuItemsToggle( { label, isSelected, onClick } ) {
+function MenuItemsToggle( { label, isSelected, onClick, shortcut } ) {
 	if ( isSelected ) {
 		return (
 			<IconButton
@@ -14,6 +15,7 @@ function MenuItemsToggle( { label, isSelected, onClick } ) {
 				onClick={ onClick }
 			>
 				{ label }
+				<Shortcut shortcut={ shortcut } />
 			</IconButton>
 		);
 	}
@@ -24,6 +26,7 @@ function MenuItemsToggle( { label, isSelected, onClick } ) {
 			onClick={ onClick }
 		>
 			{ label }
+			<Shortcut shortcut={ shortcut } />
 		</Button>
 	);
 }

@@ -14,6 +14,8 @@ import LatestPostsBlock from './block';
 registerBlockType( 'core/latest-posts', {
 	title: __( 'Latest Posts' ),
 
+	description: __( 'Shows a list of your site\'s most recent posts.' ),
+
 	icon: 'list-view',
 
 	category: 'widgets',

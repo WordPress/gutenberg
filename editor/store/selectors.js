@@ -22,11 +22,6 @@ import { serialize, getBlockType } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 
-/**
- * Internal dependencies
- */
-import { BREAK_MEDIUM } from './constants';
-
 /***
  * Module constants
  */
@@ -126,15 +121,32 @@ export function getPreference( state, preferenceKey, defaultValue ) {
 }
 
 /**
- * Returns true if the editor sidebar is open, or false otherwise.
+ * Returns true if the sidebar is open, or false otherwise.
+ *
+ * @param  {Object}  state   Global application state
+ * @param  {string}  sidebar Sidebar name (leave undefined for the default sidebar)
+ * @return {Boolean}         Whether the given sidebar is open
+ */
+export function isSidebarOpened( state, sidebar ) {
+	const sidebars = getPreference( state, 'sidebars' );
+	if ( sidebar !== undefined ) {
+		return sidebars[ sidebar ];
+	}
+
+	return isMobile( state ) ? sidebars.mobile : sidebars.desktop;
+}
+
+/**
+ * Returns true if there's any open sidebar (mobile, desktop or publish)
  *
  * @param  {Object}  state Global application state
  * @return {Boolean}       Whether sidebar is open
  */
-export function isEditorSidebarOpened( state ) {
+export function hasOpenSidebar( state ) {
+	const sidebars = getPreference( state, 'sidebars' );
 	return isMobile( state ) ?
-		getPreference( state, 'isSidebarOpenedMobile' ) :
-		getPreference( state, 'isSidebarOpened' );
+		sidebars.mobile || sidebars.publish :
+		sidebars.desktop || sidebars.publish;
 }
 
 /**
@@ -210,7 +222,7 @@ export function isCleanNewPost( state ) {
  * @return {Boolean}       Whether current window size corresponds to mobile resolutions
  */
 export function isMobile( state ) {
-	return state.browser.width < BREAK_MEDIUM;
+	return state.mobile;
 }
 
 /**

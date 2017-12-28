@@ -11,7 +11,7 @@ import { PostStickyCheck } from '../check';
 describe( 'PostSticky', () => {
 	const user = {
 		data: {
-			capabilities: {
+			post_type_capabilities: {
 				edit_others_posts: true,
 				publish_posts: true,
 			},
@@ -37,7 +37,7 @@ describe( 'PostSticky', () => {
 
 		wrapper = shallow(
 			<PostStickyCheck postType="post" user={
-				{ data: { capabilities: { edit_others_posts: false, publish_posts: true } } }
+				{ data: { post_type_capabilities: { edit_others_posts: false, publish_posts: true } } }
 			}>
 				Can Toggle Sticky
 			</PostStickyCheck>
@@ -46,7 +46,7 @@ describe( 'PostSticky', () => {
 
 		wrapper = shallow(
 			<PostStickyCheck postType="post" user={
-				{ data: { capabilities: { edit_others_posts: true, publish_posts: false } } }
+				{ data: { post_type_capabilities: { edit_others_posts: true, publish_posts: false } } }
 			}>
 				Can Toggle Sticky
 			</PostStickyCheck>

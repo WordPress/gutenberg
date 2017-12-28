@@ -55,8 +55,6 @@ export default class InserterGroup extends Component {
 				onClick={ selectBlock( block ) }
 				ref={ bindReferenceNode( block.name ) }
 				tabIndex={ current === block.name || disabled ? null : '-1' }
-				onMouseEnter={ ! disabled ? this.props.showInsertionPoint : null }
-				onMouseLeave={ ! disabled ? this.props.hideInsertionPoint : null }
 				disabled={ disabled }
 			>
 				<BlockIcon icon={ block.icon } />

@@ -12,7 +12,7 @@ import { PanelBody, PanelRow } from '@wordpress/components';
 /**
  * Internal Dependencies
  */
-import { PostComments, PostPingbacks } from '../../../components';
+import { PostComments, PostPingbacks, PostTypeSupportCheck } from '../../../components';
 import { isEditorSidebarPanelOpened } from '../../../store/selectors';
 import { toggleSidebarPanel } from '../../../store/actions';
 
@@ -23,14 +23,21 @@ const PANEL_NAME = 'discussion-panel';
 
 function DiscussionPanel( { isOpened, onTogglePanel } ) {
 	return (
-		<PanelBody title={ __( 'Discussion' ) } opened={ isOpened } onToggle={ onTogglePanel }>
-			<PanelRow>
-				<PostComments />
-			</PanelRow>
-			<PanelRow>
-				<PostPingbacks />
-			</PanelRow>
-		</PanelBody>
+		<PostTypeSupportCheck supportKeys={ [ 'comments', 'trackbacks' ] }>
+			<PanelBody title={ __( 'Discussion' ) } opened={ isOpened } onToggle={ onTogglePanel }>
+				<PostTypeSupportCheck supportKeys="comments">
+					<PanelRow>
+						<PostComments />
+					</PanelRow>
+				</PostTypeSupportCheck>
+
+				<PostTypeSupportCheck supportKeys="trackbacks">
+					<PanelRow>
+						<PostPingbacks />
+					</PanelRow>
+				</PostTypeSupportCheck>
+			</PanelBody>
+		</PostTypeSupportCheck>
 	);
 }
 

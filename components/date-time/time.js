@@ -2,14 +2,17 @@
  * External dependencies
  */
 import { isInteger } from 'lodash';
+import moment from 'moment';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Button } from '@wordpress/components';
+import Button from '../button';
 
-function PostScheduleClock( { is12Hour, selected, onChange } ) {
+export function TimePicker( { currentTime, onChange, is12Hour } ) {
+	const selected = currentTime ? moment( currentTime ) : moment();
+
 	const minutes = selected.format( 'mm' );
 	const am = selected.format( 'A' );
 	const hours = selected.format( is12Hour ? 'hh' : 'HH' );
@@ -56,30 +59,30 @@ function PostScheduleClock( { is12Hour, selected, onChange } ) {
 	};
 
 	return (
-		<div className="editor-post-schedule__clock">
+		<div className="components-time-picker">
 			<input
-				className="editor-post-schedule__clock-input"
+				className="components-time-picker__input"
 				type="text"
 				value={ hours }
 				onChange={ updateHours }
 			/>
-			<span className="editor-post-schedule__clock-separator">:</span>
+			<span className="components-time-picker__separator">:</span>
 			<input
-				className="editor-post-schedule__clock-input"
+				className="components-time-picker__input"
 				type="text"
 				value={ minutes }
 				onChange={ updateMinutes }
 			/>
 			{ is12Hour && <div>
 				<Button
-					className="button editor-post-schedule__clock-am-button"
+					className="button components-time-picker__am-button"
 					isToggled={ am === 'AM' }
 					onClick={ setAM }
 				>
 					{ __( 'AM' ) }
 				</Button>
 				<Button
-					className="button editor-post-schedule__clock-pm-button"
+					className="button components-time-picker__pm-button"
 					isToggled={ am === 'PM' }
 					onClick={ setPM }
 				>
@@ -89,5 +92,3 @@ function PostScheduleClock( { is12Hour, selected, onChange } ) {
 		</div>
 	);
 }
-
-export default PostScheduleClock;

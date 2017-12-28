@@ -394,7 +394,15 @@ add_filter( 'display_post_states', 'gutenberg_add_gutenberg_post_state', 10, 2 )
  */
 function gutenberg_register_post_types() {
 	register_post_type( 'wp_block', array(
-		'public' => false,
+		'labels'                => array(
+			'name'          => 'Blocks',
+			'singular_name' => 'Block',
+		),
+		'public'                => false,
+		'capability_type'       => 'post',
+		'show_in_rest'          => true,
+		'rest_base'             => 'blocks',
+		'rest_controller_class' => 'WP_REST_Blocks_Controller',
 	) );
 }
 add_action( 'init', 'gutenberg_register_post_types' );

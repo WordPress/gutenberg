@@ -19,7 +19,6 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import ColorPalette from '../../color-palette';
 import ContrastChecker from '../../contrast-checker';
 import InspectorControls from '../../inspector-controls';
-import BlockDescription from '../../block-description';
 
 const { getComputedStyle } = window;
 
@@ -99,10 +98,6 @@ class ButtonBlock extends Component {
 				/>
 				{ focus &&
 					<InspectorControls key="inspector">
-						<BlockDescription>
-							<p>{ __( 'A nice little button. Call something out with it.' ) }</p>
-						</BlockDescription>
-
 						<ToggleControl
 							label={ __( 'Stand on a line' ) }
 							checked={ !! clear }
@@ -148,6 +143,8 @@ class ButtonBlock extends Component {
 
 registerBlockType( 'core/button', {
 	title: __( 'Button' ),
+
+	description: __( 'A nice little button. Call something out with it.' ),
 
 	icon: 'button',
 

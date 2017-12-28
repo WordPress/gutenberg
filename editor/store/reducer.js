@@ -501,18 +501,11 @@ export function isAutosaving( state = false, action ) {
  */
 export function blockInsertionPoint( state = {}, action ) {
 	switch ( action.type ) {
-		case 'SET_BLOCK_INSERTION_POINT':
-			const { position } = action;
-			return { ...state, position };
-
-		case 'CLEAR_BLOCK_INSERTION_POINT':
-			return { ...state, position: null };
-
 		case 'SHOW_INSERTION_POINT':
-			return { ...state, visible: true };
+			return { ...state, visible: true, position: action.index };
 
 		case 'HIDE_INSERTION_POINT':
-			return { ...state, visible: false };
+			return { ...state, visible: false, position: null };
 	}
 
 	return state;
@@ -531,10 +524,12 @@ export function blockInsertionPoint( state = {}, action ) {
 export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 	switch ( action.type ) {
 		case 'TOGGLE_SIDEBAR':
-			const isSidebarOpenedKey = action.isMobile ? 'isSidebarOpenedMobile' : 'isSidebarOpened';
 			return {
 				...state,
-				[ isSidebarOpenedKey ]: ! state[ isSidebarOpenedKey ],
+				sidebars: {
+					...state.sidebars,
+					[ action.sidebar ]: action.force !== undefined ? action.force : ! state.sidebars[ action.sidebar ],
+				},
 			};
 		case 'TOGGLE_SIDEBAR_PANEL':
 			return {
@@ -729,9 +724,9 @@ export function metaBoxes( state = defaultMetaBoxState, action ) {
 	}
 }
 
-export function browser( state = {}, action ) {
-	if ( action.type === 'BROWSER_RESIZE' ) {
-		return { width: action.width, height: action.height };
+export function mobile( state = false, action ) {
+	if ( action.type === 'UPDATE_MOBILE_STATE' ) {
+		return action.isMobile;
 	}
 	return state;
 }
@@ -816,6 +811,6 @@ export default optimist( combineReducers( {
 	saving,
 	notices,
 	metaBoxes,
-	browser,
+	mobile,
 	reusableBlocks,
 } ) );

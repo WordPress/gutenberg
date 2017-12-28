@@ -11,7 +11,7 @@ import { PostSchedule } from '../';
 describe( 'PostSchedule', () => {
 	const user = {
 		data: {
-			capabilities: {
+			post_type_capabilities: {
 				publish_posts: true,
 			},
 		},
@@ -21,7 +21,7 @@ describe( 'PostSchedule', () => {
 		let wrapper = shallow( <PostSchedule user={ {} } /> );
 		expect( wrapper.type() ).toBe( null );
 		wrapper = shallow( <PostSchedule user={
-			{ data: { capabilities: { publish_posts: false } } }
+			{ data: { post_type_capabilities: { publish_posts: false } } }
 		} /> );
 		expect( wrapper.type() ).toBe( null );
 	} );
