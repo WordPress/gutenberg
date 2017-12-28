@@ -733,6 +733,22 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		wp_die( $post_to_edit->get_error_message() );
 	}
 
+	// Add autosave data.
+	$autosave = wp_get_post_autosave( $post->ID );
+	wp_localize_script(
+		'wp-editor',
+		'_wpAutosave',
+		$autosave ?
+			array(
+				'id' => $autosave->ID,
+				'title' => $autosave->post_title,
+				'excerpt' => $autosave->post_excerpt,
+				'content' => $autosave->post_content,
+				'edit_link' => get_edit_post_link( $autosave->ID ),
+			) :
+			false
+	);
+
 	// Set initial title to empty string for auto draft for duration of edit.
 	// Otherwise, title defaults to and displays as "Auto Draft".
 	$is_new_post = 'auto-draft' === $post_to_edit['status'];
@@ -839,7 +855,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$script .= sprintf( 'var editorSettings = %s;', wp_json_encode( $editor_settings ) );
 	$script .= <<<JS
 		window._wpLoadGutenbergEditor = wp.api.init().then( function() {
-			return wp.editor.createEditorInstance( 'editor', window._wpGutenbergPost, editorSettings );
+			return wp.editor.createEditorInstance( 'editor', window._wpGutenbergPost, editorSettings, window._wpAutosave );
 		} );
 JS;
 	$script .= '} )();';
