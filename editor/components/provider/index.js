@@ -19,7 +19,7 @@ import {
 /**
  * Internal Dependencies
  */
-import { setupEditor, undo } from '../../store/actions';
+import { setupEditor, undo, autosaveAlert } from '../../store/actions';
 import store from '../../store';
 
 /**
@@ -52,6 +52,12 @@ class EditorProvider extends Component {
 		// Assume that we don't need to initialize in the case of an error recovery.
 		if ( ! props.recovery ) {
 			this.store.dispatch( setupEditor( props.post, this.settings ) );
+
+			// @todo only show the autosave alert when there exists an autosave newer than the post
+			// and if that autosave is different than the post (title, excerpt & content)
+			if ( props.autosave ) {
+				this.store.dispatch( autosaveAlert( props.autosave ) );
+			}
 		}
 	}
 

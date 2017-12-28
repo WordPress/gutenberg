@@ -80,12 +80,12 @@ export function recreateEditorInstance( target, settings ) {
  * @param  {?Object} settings Editor settings object
  * @return {Object}           Editor interface
  */
-export function createEditorInstance( id, post, settings ) {
+export function createEditorInstance( id, post, settings, autosave ) {
 	const target = document.getElementById( id );
 	const reboot = recreateEditorInstance.bind( null, target, settings );
 
 	render(
-		<EditorProvider settings={ settings } post={ post }>
+		<EditorProvider settings={ settings } post={ post } autosave={ autosave }>
 			<ErrorBoundary onError={ reboot }>
 				<Layout />
 			</ErrorBoundary>
