@@ -260,6 +260,13 @@ export function isAutosaving( isAutosaving ) {
 	}
 }
 
+export function autosaveAlert( autosave ) {
+	return {
+		type: 'REQUEST_AUTOSAVE_EXISTS',
+		autosave,
+	}
+}
+
 /**
  * Returns an action object used in signalling that undo history should
  * restore last popped state.
