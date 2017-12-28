@@ -15,6 +15,7 @@
 		margin: 0 32px;
 		opacity: 0;
 		background-color: $light-gray-200;
+		z-index: z-index( '.editor-block-list__block-underlay' );
 	}
 
 	&.visible *,
