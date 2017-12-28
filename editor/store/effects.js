@@ -45,6 +45,8 @@ import {
 	getDirtyMetaBoxes,
 	getEditedPostContent,
 	getPostEdits,
+	getEditedPostTitle,
+	getEditedPostExcerpt,
 	isCurrentPostPublished,
 	isEditedPostDirty,
 	isEditedPostNew,
@@ -93,20 +95,27 @@ export default {
 
 		newModel.save().done( ( newPost ) => {
 			if ( isAutosave ) {
-				dispatch( isAutosaving( false ) );
-				post.modified = newPost.modified;
-				post.modified_gmt = newPost.modified_gmt;
+				const autosave = {
+					id: newPost.id,
+					title: getEditedPostTitle( state ),
+					excerpt: getEditedPostExcerpt( state ),
+					content: getEditedPostContent( state ),
+				};
 				dispatch( {
-					type: 'RESET_POST',
-					post: post,
+					type: 'RESET_AUTOSAVE',
+					post: autosave,
 				} );
+				dispatch( isAutosaving( false ) );
+
 				dispatch( {
 					type: 'REQUEST_POST_UPDATE_SUCCESS',
 					previousPost: post,
 					post: post,
-					isAutosave: true
+					isAutosave: true,
 				} );
 			} else {
+				// dispatch post autosaved false
+				// delete the autosave
 				dispatch( {
 					type: 'RESET_POST',
 					post: newPost,
