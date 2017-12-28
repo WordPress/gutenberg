@@ -15,15 +15,15 @@ import { autosave } from '../../store/actions';
 import {
 	isEditedPostDirty,
 	isEditedPostSaveable,
-	isAutosavingPost,
+	isPostAutosavable,
 } from '../../store/selectors';
 
 export class AutosaveMonitor extends Component {
 	componentDidUpdate( prevProps ) {
-		const { isDirty, isSaveable } = this.props;
-		if ( isDirty ||
-				prevProps.isSaveable !== isSaveable ) {
-			this.toggleTimer( isDirty && isSaveable );
+		const { isDirty, isSaveable, isAutosavable } = this.props;
+
+		if ( isDirty && isSaveable && isAutosavable ) {
+			this.toggleTimer( true );
 		}
 	}
 
@@ -52,7 +52,7 @@ export default connect(
 		return {
 			isDirty: isEditedPostDirty( state ),
 			isSaveable: isEditedPostSaveable( state ),
-			isAutosaving: isAutosavingPost( state ),
+			isAutosavable: isPostAutosavable( state ),
 		};
 	},
 	{ autosave }
