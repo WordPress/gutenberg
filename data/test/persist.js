@@ -17,7 +17,7 @@ describe( 'loadAndPersist', () => {
 				preferences: { ribs: true },
 			};
 		};
-		const store = createStore( withRehydratation( reducer, 'preferences' ) );
+		const store = createStore( withRehydratation( reducer, 'preferences', storageKey ) );
 		loadAndPersist(
 			store,
 			'preferences',
@@ -39,7 +39,7 @@ describe( 'loadAndPersist', () => {
 				preferences: { ribs: true },
 			};
 		};
-		const store = createStore( withRehydratation( reducer, 'preferences' ) );
+		const store = createStore( withRehydratation( reducer, 'preferences', storageKey ) );
 		loadAndPersist(
 			store,
 			'preferences',
@@ -68,7 +68,7 @@ describe( 'loadAndPersist', () => {
 		// store preferences without the `counter` default
 		window.localStorage.setItem( storageKey, JSON.stringify( {} ) );
 
-		const store = createStore( withRehydratation( reducer, 'preferences' ) );
+		const store = createStore( withRehydratation( reducer, 'preferences', storageKey ) );
 		loadAndPersist(
 			store,
 			'preferences',
@@ -100,7 +100,7 @@ describe( 'loadAndPersist', () => {
 
 		window.localStorage.setItem( storageKey, JSON.stringify( { counter: 1 } ) );
 
-		const store = createStore( withRehydratation( reducer, 'preferences' ) );
+		const store = createStore( withRehydratation( reducer, 'preferences', storageKey ) );
 
 		loadAndPersist(
 			store,

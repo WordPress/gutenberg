@@ -8,15 +8,16 @@ import { get } from 'lodash';
  *
  * @param {Function}   reducer     The reducer to enhance
  * @param {String}     reducerKey  The reducer key to persist
+ * @param {String}     storageKey  The storage key to use
  *
  * @return {Function}              Enhanced reducer
  */
-export function withRehydratation( reducer, reducerKey ) {
+export function withRehydratation( reducer, reducerKey, storageKey ) {
 	// EnhancedReducer with auto-rehydration
 	const enhancedReducer = ( state, action ) => {
 		const nextState = reducer( state, action );
 
-		if ( action.type === 'REDUX_REHYDRATE' ) {
+		if ( action.type === 'REDUX_REHYDRATE' && action.storageKey === storageKey ) {
 			return {
 				...nextState,
 				[ reducerKey ]: action.payload,
@@ -51,6 +52,7 @@ export function loadAndPersist( store, reducerKey, storageKey, defaults = {} ) {
 		store.dispatch( {
 			type: 'REDUX_REHYDRATE',
 			payload: persistedState,
+			storageKey,
 		} );
 	}
 

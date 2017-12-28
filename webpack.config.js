@@ -53,6 +53,7 @@ const entryPointNames = [
 	'i18n',
 	'utils',
 	'data',
+	'nux',
 ];
 
 const packageNames = [

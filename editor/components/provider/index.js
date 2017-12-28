@@ -15,6 +15,7 @@ import {
 	DropZoneProvider,
 	SlotFillProvider,
 } from '@wordpress/components';
+import { Provider as NuxProvider } from '@wordpress/nux';
 
 /**
  * Internal Dependencies
@@ -119,6 +120,11 @@ class EditorProvider extends Component {
 			// DropZone provider:
 			[
 				DropZoneProvider,
+			],
+
+			// Nux provider
+			[
+				NuxProvider,
 			],
 		];
 
