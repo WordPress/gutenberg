@@ -2,8 +2,8 @@
  * Internal dependencies
  */
 import './style.scss';
-import { DatePicker } from './date';
-import { TimePicker } from './time';
+import { default as DatePicker } from './date';
+import { default as TimePicker } from './time';
 
 export { DatePicker, TimePicker };
 

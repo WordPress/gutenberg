@@ -16,10 +16,6 @@ import { getEditedPostAttribute } from '../../store/selectors';
 import { editPost } from '../../store/actions';
 
 export function PostSchedule( { date, onUpdateDate } ) {
-	const handleChange = ( newDate ) => {
-		onUpdateDate( newDate.format( 'YYYY-MM-DDTHH:mm:ss' ) );
-	};
-
 	// To know if the current timezone is a 12 hour time with look for "a" in the time format
 	// We also make sure this a is not escaped by a "/"
 	const is12HourTime = /a(?!\\)/i.test(
@@ -33,7 +29,7 @@ export function PostSchedule( { date, onUpdateDate } ) {
 		<DateTimePicker
 			key="date-time-picker"
 			currentDate={ date }
-			onChange={ handleChange }
+			onChange={ onUpdateDate }
 			locale={ settings.l10n.locale }
 			is12Hour={ is12HourTime }
 		/>
