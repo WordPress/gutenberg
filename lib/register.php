@@ -413,9 +413,6 @@ add_action( 'init', 'gutenberg_register_post_types' );
  * @since 0.10.0
  */
 function gutenberg_register_rest_routes() {
-	$controller = new WP_REST_Reusable_Blocks_Controller();
-	$controller->register_routes();
-
 	foreach ( get_post_types( array(), 'objects' ) as $post_type_object ) {
 		if( ! empty( $post_type_object->rest_base ) ) {
 			if ( post_type_supports( $post_type_object->name, 'revisions' ) ) {
