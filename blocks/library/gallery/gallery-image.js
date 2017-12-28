@@ -10,6 +10,11 @@ import { Component } from '@wordpress/element';
 import { IconButton, withAPIData, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import RichText from '../../rich-text';
+
 class GalleryImage extends Component {
 	componentWillReceiveProps( { image } ) {
 		if ( image && image.data && ! this.props.url ) {
@@ -21,7 +26,7 @@ class GalleryImage extends Component {
 	}
 
 	render() {
-		const { url, alt, id, linkTo, link, isSelected, onClick, onRemove } = this.props;
+		const { url, alt, id, linkTo, link, imageIndex, isSelected, caption, onClick, onRemove, focus, setAttributes, onFocus } = this.props;
 
 		let href;
 
@@ -56,6 +61,17 @@ class GalleryImage extends Component {
 					</div>
 				}
 				{ href ? <a href={ href }>{ img }</a> : img }
+				{ ( caption && caption.length > 0 ) || ( focus && isSelected ) ? (
+					<RichText
+						tagName="figcaption"
+						placeholder={ __( 'Write caption…' ) }
+						value={ caption }
+						focus={ focus && focus.editableIndex === imageIndex ? focus : undefined }
+						onFocus={ onFocus }
+						onChange={ newCaption => setAttributes( { caption: newCaption } ) }
+						inlineToolbar
+					/>
+				) : null }
 			</figure>
 		);
 		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
