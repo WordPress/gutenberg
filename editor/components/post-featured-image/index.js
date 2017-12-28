@@ -36,6 +36,7 @@ function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, med
 						buttonProps={ { className: 'button-link editor-post-featured-image__preview' } }
 						onSelect={ onUpdateImage }
 						type="image"
+						modalClass="editor-post-featured-image__media-modal"
 					>
 						{ media && !! media.data &&
 							<ResponsiveWrapper
@@ -59,6 +60,7 @@ function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, med
 						buttonProps={ { className: 'editor-post-featured-image__toggle button-link' } }
 						onSelect={ onUpdateImage }
 						type="image"
+						modalClass="editor-post-featured-image__media-modal"
 					>
 						{ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
 					</MediaUploadButton>

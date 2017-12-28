@@ -30,3 +30,10 @@
 	font-style: italic;
 	margin: 10px 0;
 }
+
+// Should be replaced with a config in media modal.
+.editor-post-featured-image__media-modal {
+	.setting[data-setting="caption"], .setting[data-setting="description"] {
+		display: none;
+	}
+}
