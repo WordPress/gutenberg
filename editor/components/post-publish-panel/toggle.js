@@ -9,11 +9,11 @@ import { get } from 'lodash';
  */
 import { Button, withAPIData } from '@wordpress/components';
 import { compose } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal Dependencies
  */
-import PostPublishButtonLabel from '../post-publish-button/label';
 import PostPublishButton from '../post-publish-button';
 import {
 	isSavingPost,
@@ -46,7 +46,7 @@ function PostPublishPanelToggle( { user, isSaving, isPublishable, isSaveable, is
 			disabled={ ! isButtonEnabled }
 			isBusy={ isSaving && isPublished }
 		>
-			<PostPublishButtonLabel />...
+			{ __( 'Publish...' ) }
 		</Button>
 	);
 }
