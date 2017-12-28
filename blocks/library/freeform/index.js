@@ -13,6 +13,8 @@ import OldEditor from './old-editor';
 registerBlockType( 'core/freeform', {
 	title: __( 'Classic' ),
 
+	desription: __( 'The classic editor, in block form.' ),
+
 	icon: 'editor-kitchensink',
 
 	category: 'formatting',

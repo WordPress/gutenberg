@@ -25,7 +25,6 @@ import InspectorControls from '../../inspector-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
 import RangeControl from '../../inspector-controls/range-control';
 import ColorPalette from '../../color-palette';
-import BlockDescription from '../../block-description';
 import ContrastChecker from '../../contrast-checker';
 
 const { getComputedStyle } = window;
@@ -99,9 +98,6 @@ class ParagraphBlock extends Component {
 			),
 			focus && (
 				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'This is a simple text only block for inserting a single paragraph of content.' ) }</p>
-					</BlockDescription>
 					<PanelBody title={ __( 'Text Settings' ) }>
 						<ToggleControl
 							label={ __( 'Drop Cap' ) }
@@ -198,6 +194,8 @@ class ParagraphBlock extends Component {
 
 registerBlockType( 'core/paragraph', {
 	title: __( 'Paragraph' ),
+
+	description: __( 'This is a simple text only block for inserting a single paragraph of content.' ),
 
 	icon: 'editor-paragraph',
 

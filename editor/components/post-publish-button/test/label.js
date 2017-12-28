@@ -12,7 +12,7 @@ describe( 'PublishButtonLabel', () => {
 	const user = {
 		data: {
 			id: 1,
-			capabilities: {
+			post_type_capabilities: {
 				publish_posts: true,
 			},
 		},
@@ -20,7 +20,7 @@ describe( 'PublishButtonLabel', () => {
 
 	const contributor = merge( {}, user, {
 		data: {
-			capabilities: {
+			post_type_capabilities: {
 				publish_posts: false,
 			},
 		},

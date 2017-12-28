@@ -8,11 +8,11 @@ import { __ } from '@wordpress/i18n';
  */
 import './style.scss';
 import { registerBlockType, createBlock } from '../../api';
-import InspectorControls from '../../inspector-controls';
-import BlockDescription from '../../block-description';
 
 registerBlockType( 'core/separator', {
 	title: __( 'Separator' ),
+
+	description: __( 'Use the separator to indicate a thematic change in the content.' ),
 
 	icon: 'minus',
 
@@ -35,17 +35,8 @@ registerBlockType( 'core/separator', {
 		],
 	},
 
-	edit( { focus, className } ) {
-		return [
-			focus && (
-				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'Use the separator to indicate a thematic change in the content.' ) }</p>
-					</BlockDescription>
-				</InspectorControls>
-			),
-			<hr key="hr" className={ className } />,
-		];
+	edit( { className } ) {
+		return <hr className={ className } />;
 	},
 
 	save() {

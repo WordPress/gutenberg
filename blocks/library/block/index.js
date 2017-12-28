@@ -25,12 +25,12 @@ class ReusableBlockEdit extends Component {
 		this.startEditing = this.startEditing.bind( this );
 		this.stopEditing = this.stopEditing.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
-		this.setName = this.setName.bind( this );
+		this.setTitle = this.setTitle.bind( this );
 		this.updateReusableBlock = this.updateReusableBlock.bind( this );
 
 		this.state = {
 			isEditing: false,
-			name: null,
+			title: null,
 			attributes: null,
 		};
 	}
@@ -48,7 +48,7 @@ class ReusableBlockEdit extends Component {
 	stopEditing() {
 		this.setState( {
 			isEditing: false,
-			name: null,
+			title: null,
 			attributes: null,
 		} );
 	}
@@ -59,16 +59,16 @@ class ReusableBlockEdit extends Component {
 		} ) );
 	}
 
-	setName( name ) {
-		this.setState( { name } );
+	setTitle( title ) {
+		this.setState( { title } );
 	}
 
 	updateReusableBlock() {
-		const { name, attributes } = this.state;
+		const { title, attributes } = this.state;
 
 		// Use pickBy to include only changed (assigned) values in payload
 		const payload = pickBy( {
-			name,
+			title,
 			attributes,
 		} );
 
@@ -79,7 +79,7 @@ class ReusableBlockEdit extends Component {
 
 	render() {
 		const { focus, reusableBlock, isSaving, convertBlockToStatic } = this.props;
-		const { isEditing, name, attributes } = this.state;
+		const { isEditing, title, attributes } = this.state;
 
 		if ( ! reusableBlock ) {
 			return <Placeholder><Spinner /></Placeholder>;
@@ -102,11 +102,11 @@ class ReusableBlockEdit extends Component {
 				<ReusableBlockEditPanel
 					key="panel"
 					isEditing={ isEditing }
-					name={ name !== null ? name : reusableBlock.name }
+					title={ title !== null ? title : reusableBlock.title }
 					isSaving={ isSaving }
 					onEdit={ this.startEditing }
 					onDetach={ convertBlockToStatic }
-					onChangeName={ this.setName }
+					onChangeTitle={ this.setTitle }
 					onSave={ this.updateReusableBlock }
 					onCancel={ this.stopEditing }
 				/>

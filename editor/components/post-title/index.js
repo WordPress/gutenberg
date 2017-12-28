@@ -111,7 +111,7 @@ class PostTitle extends Component {
 				tabIndex={ -1 /* Necessary for Firefox to include relatedTarget in blur event */ }
 			>
 				{ isSelected && <PostPermalink /> }
-				<h1>
+				<div>
 					<Textarea
 						ref={ this.bindTextarea }
 						className="editor-post-title__input"
@@ -122,7 +122,7 @@ class PostTitle extends Component {
 						onKeyDown={ this.onKeyDown }
 						onKeyPress={ this.onUnselect }
 					/>
-				</h1>
+				</div>
 			</div>
 		);
 	}

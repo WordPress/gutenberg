@@ -17,11 +17,11 @@ import MediaUploadButton from '../../media-upload-button';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
-import InspectorControls from '../../inspector-controls';
-import BlockDescription from '../../block-description';
 
 registerBlockType( 'core/video', {
 	title: __( 'Video' ),
+
+	description: __( 'Video, locally hosted, locally sourced.' ),
 
 	icon: 'format-video',
 
@@ -90,12 +90,6 @@ registerBlockType( 'core/video', {
 					</MediaUploadButton>
 				</Toolbar>
 			</BlockControls>,
-
-			<InspectorControls key="inspector">
-				<BlockDescription>
-					<p>{ __( 'Video, locally hosted, locally sourced.' ) }</p>
-				</BlockDescription>
-			</InspectorControls>,
 		];
 
 		if ( ! src ) {

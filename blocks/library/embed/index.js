@@ -21,8 +21,6 @@ import { registerBlockType, createBlock } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
-import InspectorControls from '../../inspector-controls';
-import BlockDescription from '../../block-description';
 
 // These embeds do not work in sandboxes
 const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
@@ -30,6 +28,8 @@ const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
 function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, keywords = [] } ) {
 	return {
 		title,
+
+		description: __( 'The Embed block allows you to easily add videos, images, tweets, audio, and other content to your post or page.' ),
 
 		icon,
 
@@ -134,23 +134,14 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 				const { setAttributes, focus, setFocus } = this.props;
 				const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 
-				const controls = [
-					focus && (
-						<BlockControls key="controls">
-							<BlockAlignmentToolbar
-								value={ align }
-								onChange={ updateAlignment }
-							/>
-						</BlockControls>
-					),
-					focus && (
-						<InspectorControls key="inspector">
-							<BlockDescription>
-								<p>{ __( 'The Embed block allows you to easily add videos, images, tweets, audio, and other content to your post or page.' ) }</p>
-							</BlockDescription>
-						</InspectorControls>
-					),
-				];
+				const controls = focus && (
+					<BlockControls key="controls">
+						<BlockAlignmentToolbar
+							value={ align }
+							onChange={ updateAlignment }
+						/>
+					</BlockControls>
+				);
 
 				if ( fetching ) {
 					return [
