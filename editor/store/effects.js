@@ -30,6 +30,7 @@ import {
 	replaceBlocks,
 	createSuccessNotice,
 	createErrorNotice,
+	createWarningNotice,
 	removeNotice,
 	savePost,
 	isAutosaving,
@@ -60,6 +61,7 @@ import {
  * Module Constants
  */
 const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
+const AUTOSAVE_POST_NOTICE_ID = 'AUTOSAVE_POST_NOTICE_ID';
 const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
 const SAVE_REUSABLE_BLOCK_NOTICE_ID = 'SAVE_REUSABLE_BLOCK_NOTICE_ID';
 
@@ -89,6 +91,7 @@ export default {
 				optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
 			} );
 			dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
+			dispatch( removeNotice( AUTOSAVE_POST_NOTICE_ID ) );
 			Model = wp.api.getPostTypeModel( getCurrentPostType( state ) );
 			newModel = new Model( toSend );
 		}
@@ -143,6 +146,23 @@ export default {
 				optimist: isAutosave ? false : { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
 			} );
 		} );
+	},
+	REQUEST_AUTOSAVE_EXISTS( action, store ) {
+		const { autosave } = action;
+		const { dispatch, getState } = store;
+		if ( autosave ) {
+			dispatch( createWarningNotice(
+				<p>
+					<span>{ __( 'There is an autosave of this post that is more recent than the version below.' ) }</span>
+					{ ' ' }
+					{ <a href={ autosave.edit_link }>{ __( 'View the autosave' ) }</a> }
+				</p>,
+				{
+					id: AUTOSAVE_POST_NOTICE_ID,
+				}
+			) );
+
+		}
 	},
 	REQUEST_POST_UPDATE_SUCCESS( action, store ) {
 		const { previousPost, post, isAutosave } = action;
