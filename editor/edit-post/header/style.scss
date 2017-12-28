@@ -62,11 +62,16 @@
 		background: $dark-gray-500;
 	}
 
+	&.editor-post-publish-button, &.editor-post-publish-panel__toggle {
+		margin: 2px;
+		height: 33px;
+		line-height: 32px;
+		padding: 0 12px 2px;
+	}
+
 	@include break-medium() {
 		&.editor-post-publish-button, &.editor-post-publish-panel__toggle {
 			margin: 0 10px;
-			height: 33px;
-			line-height: 32px;
 		}
 	}
 }
