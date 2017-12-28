@@ -77,6 +77,15 @@ export const editor = flow( [
 	// resetting at each post save.
 	partialRight( withChangeDetection, { resetTypes: [ 'SETUP_EDITOR', 'RESET_POST' ] } ),
 ] )( {
+	autosave ( state = false, action ) {
+		const { post } = action;
+		switch ( action.type ) {
+			case 'RESET_AUTOSAVE':
+				return post;
+		}
+
+		return state;
+	},
 	edits( state = {}, action ) {
 		switch ( action.type ) {
 			case 'EDIT_POST':
@@ -473,14 +482,11 @@ export function blocksMode( state = {}, action ) {
 	return state;
 }
 
-export function isAutosaving( state = {}, action ) {
-	const { isAutosaving } = action;
+export function isAutosaving( state = false, action ) {
 	switch ( action.type ) {
 		case 'DOING_AUTOSAVE':
-			return {
-				...state,
-				isAutosaving: isAutosaving,
-			};
+			const { isAutosaving } = action;
+			return isAutosaving;
 	}
 
 	return state;
