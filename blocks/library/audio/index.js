@@ -13,6 +13,7 @@ import { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import './style.scss';
+import './editor.scss';
 import { registerBlockType } from '../../api';
 import MediaUploadButton from '../../media-upload-button';
 import Editable from '../../editable';
@@ -43,6 +44,9 @@ registerBlockType( 'core/audio', {
 			source: 'children',
 			selector: 'figcaption',
 		},
+		id: {
+			type: 'number',
+		},
 	},
 
 	getEditWrapperProps( attributes ) {
@@ -64,7 +68,7 @@ registerBlockType( 'core/audio', {
 			};
 		}
 		render() {
-			const { align, caption } = this.props.attributes;
+			const { align, caption, id } = this.props.attributes;
 			const { setAttributes, focus, setFocus } = this.props;
 			const { editing, className, src } = this.state;
 			const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
@@ -75,7 +79,7 @@ registerBlockType( 'core/audio', {
 				if ( media && media.url ) {
 					// sets the block's attribure and updates the edit component from the
 					// selected media, then switches off the editing UI
-					setAttributes( { src: media.url } );
+					setAttributes( { src: media.url, id: media.id } );
 					this.setState( { src: media.url, editing: false } );
 				}
 			};
@@ -98,7 +102,6 @@ registerBlockType( 'core/audio', {
 						<Button
 							className="components-icon-button components-toolbar__control"
 							aria-label={ __( 'Edit audio' ) }
-							type="audio"
 							onClick={ switchToEditing }
 						>
 							<Dashicon icon="edit" />
@@ -135,6 +138,7 @@ registerBlockType( 'core/audio', {
 							buttonProps={ { isLarge: true } }
 							onSelect={ onSelectAudio }
 							type="audio"
+							value={ id }
 						>
 							{ __( 'Insert from Media Library' ) }
 						</MediaUploadButton>

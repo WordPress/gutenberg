@@ -6,12 +6,14 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Placeholder, Toolbar, Dashicon } from '@wordpress/components';
+import { Placeholder, Toolbar, Dashicon, Button } from '@wordpress/components';
+import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
+import './editor.scss';
 import { registerBlockType } from '../../api';
 import MediaUploadButton from '../../media-upload-button';
 import Editable from '../../editable';
@@ -54,83 +56,117 @@ registerBlockType( 'core/video', {
 		}
 	},
 
-	edit( { attributes, setAttributes, className, focus, setFocus } ) {
-		const { src, caption, align, id } = attributes;
-		const onSelectVideo = ( media ) => {
-			if ( media && media.url ) {
-				setAttributes( {
-					src: media.url,
-					id: media.id,
-				} );
-			}
-		};
-		const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
-		const updateAlignment = ( nextAlign ) => {
-			setAttributes( { align: nextAlign } );
-		};
-
-		const controls = focus && [
-			<BlockControls key="controls">
-				<BlockAlignmentToolbar
-					value={ align }
-					onChange={ updateAlignment }
-				/>
-
-				<Toolbar>
-					<MediaUploadButton
-						buttonProps={ {
-							className: 'components-icon-button components-toolbar__control',
-							'aria-label': __( 'Edit video' ),
-						} }
-						onSelect={ onSelectVideo }
-						type="video"
-						value={ id }
-					>
-						<Dashicon icon="edit" />
-					</MediaUploadButton>
-				</Toolbar>
-			</BlockControls>,
-		];
-
-		if ( ! src ) {
-			return [
-				controls,
-				<Placeholder
-					key="placeholder"
-					icon="media-video"
-					label={ __( 'Video' ) }
-					instructions={ __( 'Select a video file from your library:' ) }
-					className={ className }>
-					<MediaUploadButton
-						buttonProps={ { isLarge: true } }
-						onSelect={ onSelectVideo }
-						type="video"
-					>
-						{ __( 'Insert from Media Library' ) }
-					</MediaUploadButton>
-				</Placeholder>,
-			];
+	edit: class extends Component {
+		constructor( { className } ) {
+			super( ...arguments );
+			// edit component has its own src in the state so it can be edited
+			// without setting the actual value outside of the edit UI
+			this.state = {
+				editing: ! this.props.attributes.src,
+				src: this.props.attributes.src,
+				className,
+			};
 		}
 
-		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
-		return [
-			controls,
-			<figure key="video" className={ className }>
-				<video controls src={ src } onClick={ setFocus } />
-				{ ( caption && caption.length > 0 ) || !! focus ? (
-					<Editable
-						tagName="figcaption"
-						placeholder={ __( 'Write caption…' ) }
-						value={ caption }
-						focus={ focus && focus.editable === 'caption' ? focus : undefined }
-						onFocus={ focusCaption }
-						onChange={ ( value ) => setAttributes( { caption: value } ) }
-						inlineToolbar
+		render() {
+			const { align, caption, id } = this.props.attributes;
+			const { setAttributes, focus, setFocus } = this.props;
+			const { editing, className, src } = this.state;
+			const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
+			const switchToEditing = () => {
+				this.setState( { editing: true } );
+			};
+			const onSelectVideo = ( media ) => {
+				if ( media && media.url ) {
+					// sets the block's attribure and updates the edit component from the
+					// selected media, then switches off the editing UI
+					setAttributes( { src: media.url, id: media.id } );
+					this.setState( { src: media.url, editing: false } );
+				}
+			};
+			const onSelectUrl = ( event ) => {
+				event.preventDefault();
+				if ( src ) {
+					// set the block's src from the edit component's state, and switch off the editing UI
+					setAttributes( { src } );
+					this.setState( { editing: false } );
+				}
+				return false;
+			};
+			const controls = focus && (
+				<BlockControls key="controls">
+					<BlockAlignmentToolbar
+						value={ align }
+						onChange={ updateAlignment }
 					/>
-				) : null }
-			</figure>,
-		];
-		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
+					<Toolbar>
+						<Button
+							className="components-icon-button components-toolbar__control"
+							aria-label={ __( 'Edit video' ) }
+							onClick={ switchToEditing }
+						>
+							<Dashicon icon="edit" />
+						</Button>
+					</Toolbar>
+				</BlockControls>
+			);
+
+			const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
+
+			if ( editing ) {
+				return [
+					controls,
+					<Placeholder
+						key="placeholder"
+						icon="media-video"
+						label={ __( 'Video' ) }
+						instructions={ __( 'Select a video file from your library, or upload a new one:' ) }
+						className={ className }>
+						<form onSubmit={ onSelectUrl }>
+							<input
+								type="url"
+								className="components-placeholder__input"
+								placeholder={ __( 'Enter URL of video file here…' ) }
+								onChange={ event => this.setState( { src: event.target.value } ) }
+								value={ src || '' } />
+							<Button
+								isLarge
+								type="submit">
+								{ __( 'Use URL' ) }
+							</Button>
+						</form>
+						<MediaUploadButton
+							buttonProps={ { isLarge: true } }
+							onSelect={ onSelectVideo }
+							type="video"
+							id={ id }
+						>
+							{ __( 'Insert from Media Library' ) }
+						</MediaUploadButton>
+					</Placeholder>,
+				];
+			}
+
+			/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
+			return [
+				controls,
+				<figure key="video" className={ className }>
+					<video controls src={ src } />
+					{ ( ( caption && caption.length ) || !! focus ) && (
+						<Editable
+							tagName="figcaption"
+							placeholder={ __( 'Write caption…' ) }
+							value={ caption }
+							focus={ focus && focus.editable === 'caption' ? focus : undefined }
+							onFocus={ focusCaption }
+							onChange={ ( value ) => setAttributes( { caption: value } ) }
+							inlineToolbar
+						/>
+					) }
+				</figure>,
+			];
+			/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
+		}
 	},
 
 	save( { attributes } ) {
