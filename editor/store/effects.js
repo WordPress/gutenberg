@@ -108,7 +108,7 @@ export default {
 					type: 'RESET_AUTOSAVE',
 					post: autosave,
 				} );
-				dispatch( isAutosaving( false ) );
+				dispatch( toggleAutosave( false ) );
 
 				dispatch( {
 					type: 'REQUEST_POST_UPDATE_SUCCESS',
@@ -132,7 +132,7 @@ export default {
 			}
 		} ).fail( ( err ) => {
 			if ( isAutosave ) {
-				dispatch( isAutosaving( false ) );
+				dispatch( toggleAutosave( false ) );
 			}
 
 			dispatch( {
@@ -337,7 +337,7 @@ export default {
 			return;
 		}
 
-		dispatch( isAutosaving( true ) );
+		dispatch( toggleAutosave( true ) );
 		dispatch( savePost( { 'autosave': true } ) );
 	},
 	SETUP_EDITOR( action ) {

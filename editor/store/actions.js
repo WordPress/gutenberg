@@ -253,7 +253,7 @@ export function autosave() {
 	};
 }
 
-export function isAutosaving( isAutosaving ) {
+export function toggleAutosave( isAutosaving ) {
 	return {
 		type: 'DOING_AUTOSAVE',
 		isAutosaving,
