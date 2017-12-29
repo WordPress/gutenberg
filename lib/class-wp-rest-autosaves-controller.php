@@ -155,9 +155,17 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 		$parent            = $this->revision_controller->get_parent( $request['parent'] );
 		$prepared_post     = $this->parent_controller->prepare_item_for_database( $request );
 		$prepared_post->ID = $parent->ID;
-		$autosave_id       = $this->create_post_autosave( (array) $prepared_post );
-		$post              = get_post( $autosave_id );
 
+		// If the parent post is in a draft state, autosaving updates it.
+		if ( 'draft' === $parent->post_status ) {
+			$post_id = wp_update_post( (array) $prepared_post, true );
+			if ( ! is_wp_error( $post_id ) ) {
+				$post = get_post( $post_id );
+			}
+		} else {
+			$autosave_id = $this->create_post_autosave( (array) $prepared_post );
+			$post        = get_post( $autosave_id );
+		}
 		$request->set_param( 'context', 'edit' );
 
 		$response = $this->prepare_item_for_response( $post, $request );
