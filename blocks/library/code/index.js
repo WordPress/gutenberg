@@ -13,11 +13,11 @@ import { __ } from '@wordpress/i18n';
  */
 import './editor.scss';
 import { registerBlockType, createBlock } from '../../api';
-import InspectorControls from '../../inspector-controls';
-import BlockDescription from '../../block-description';
 
 registerBlockType( 'core/code', {
 	title: __( 'Code' ),
+
+	description: __( 'The code block maintains spaces and tabs, great for showing code snippets.' ),
 
 	icon: 'editor-code',
 
@@ -55,24 +55,17 @@ registerBlockType( 'core/code', {
 		],
 	},
 
-	edit( { attributes, setAttributes, focus, className } ) {
-		return [
-			focus && (
-				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'The code block maintains spaces and tabs, great for showing code snippets.' ) }</p>
-					</BlockDescription>
-				</InspectorControls>
-			),
-			<TextareaAutosize
-				key="block"
-				className={ className }
-				value={ attributes.content }
-				onChange={ ( event ) => setAttributes( { content: event.target.value } ) }
-				placeholder={ __( 'Write code…' ) }
-				aria-label={ __( 'Code' ) }
-			/>,
-		];
+	edit( { attributes, setAttributes, className } ) {
+		return (
+			<div className={ className }>
+				<TextareaAutosize
+					value={ attributes.content }
+					onChange={ ( event ) => setAttributes( { content: event.target.value } ) }
+					placeholder={ __( 'Write code…' ) }
+					aria-label={ __( 'Code' ) }
+				/>
+			</div>
+		);
 	},
 
 	save( { attributes } ) {

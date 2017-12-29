@@ -40,6 +40,7 @@ $z-layers: (
 	// Show sidebar above wp-admin navigation bar for mobile viewports:
 	// #wpadminbar { z-index: 99999 }
 	'.editor-sidebar': 100000,
+	'.editor-layout .editor-post-publish-panel': 100001,
 
 	// Show notices below expanded wp-admin submenus:
 	// #adminmenuwrap { z-index: 9990 }

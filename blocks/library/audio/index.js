@@ -18,11 +18,11 @@ import MediaUploadButton from '../../media-upload-button';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
-import InspectorControls from '../../inspector-controls';
-import BlockDescription from '../../block-description';
 
 registerBlockType( 'core/audio', {
 	title: __( 'Audio' ),
+
+	description: __( 'The Audio block allows you to embed audio files and play them back using a simple player.' ),
 
 	icon: 'format-audio',
 
@@ -88,7 +88,7 @@ registerBlockType( 'core/audio', {
 				}
 				return false;
 			};
-			const controls = focus && [
+			const controls = focus && (
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar
 						value={ align }
@@ -104,14 +104,8 @@ registerBlockType( 'core/audio', {
 							<Dashicon icon="edit" />
 						</Button>
 					</Toolbar>
-				</BlockControls>,
-
-				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'The Audio block allows you to embed audio files and play them back using a simple player.' ) }</p>
-					</BlockDescription>
-				</InspectorControls>,
-			];
+				</BlockControls>
+			);
 
 			const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
 

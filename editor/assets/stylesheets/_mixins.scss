@@ -143,3 +143,60 @@ $float-margin: calc( 50% - #{ $visual-editor-max-width-padding / 2 } );
 	box-shadow: 0 0 0 1px $dark-gray-500;
 	color: $dark-gray-900;
 }
+
+/**
+ * Applies editor left position to the selector passed as argument
+ */
+@mixin editor-left( $selector ) {
+	.sticky-menu #{$selector} {	/* Sticky is when on smaller breakpoints, nav menu is manually opened */
+		@include break-medium() {
+			left: $admin-sidebar-width;
+		}
+	}
+
+	.auto-fold #{$selector} {		/* Auto fold is when on smaller breakpoints, nav menu auto colllapses */
+		@include break-medium() {
+			left: $admin-sidebar-width-collapsed;
+		}
+
+		@include break-large() {
+			left: $admin-sidebar-width;
+		}
+	}
+
+	/* Sidebar manually collapsed */
+	.folded #{$selector} {
+		left: 0;
+
+		@include break-medium() {
+			left: $admin-sidebar-width-collapsed;
+		}
+	}
+
+	/* Mobile menu opened */
+	@media ( max-width: #{ ( $break-medium ) } ) {
+		.auto-fold .wp-responsive-open #{$selector} {
+			left: $admin-sidebar-width-big;
+		}
+	}
+
+	/* In small screens with resposive menu expanded there is small white space */
+	@media ( max-width: #{ ( $break-small ) } ) {
+		.auto-fold .wp-responsive-open #{$selector} {
+			margin-left: -18px;
+		}
+	}
+}
+
+/**
+ * Applies editor right position to the selector passed as argument
+ */
+ @mixin editor-right( $selector ) {
+	#{$selector} {
+		right: 0;
+	}
+
+	.editor-layout.is-sidebar-opened #{$selector} {
+		right: $sidebar-width;
+	}
+}

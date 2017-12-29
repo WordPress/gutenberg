@@ -12,7 +12,7 @@ import { PanelBody } from '@wordpress/components';
 /**
  * Internal Dependencies
  */
-import { PostExcerpt as PostExcerptForm } from '../../../components';
+import { PostExcerpt as PostExcerptForm, PostExcerptCheck } from '../../../components';
 import { isEditorSidebarPanelOpened } from '../../../store/selectors';
 import { toggleSidebarPanel } from '../../../store/actions';
 
@@ -23,9 +23,11 @@ const PANEL_NAME = 'post-excerpt';
 
 function PostExcerpt( { isOpened, onTogglePanel } ) {
 	return (
-		<PanelBody title={ __( 'Excerpt' ) } opened={ isOpened } onToggle={ onTogglePanel }>
-			<PostExcerptForm />
-		</PanelBody>
+		<PostExcerptCheck>
+			<PanelBody title={ __( 'Excerpt' ) } opened={ isOpened } onToggle={ onTogglePanel }>
+				<PostExcerptForm />
+			</PanelBody>
+		</PostExcerptCheck>
 	);
 }
 

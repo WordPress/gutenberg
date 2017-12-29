@@ -13,6 +13,7 @@ import { compose } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import PostTypeSupportCheck from '../post-type-support-check';
 import { getCurrentPostType } from '../../store/selectors';
 
 export function PostAuthorCheck( { user, users, children } ) {
@@ -23,7 +24,7 @@ export function PostAuthorCheck( { user, users, children } ) {
 		return null;
 	}
 
-	return children;
+	return <PostTypeSupportCheck supportKeys="author">{ children }</PostTypeSupportCheck>;
 }
 
 const applyConnect = connect(

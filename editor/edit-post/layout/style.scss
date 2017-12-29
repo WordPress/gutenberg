@@ -7,10 +7,15 @@
 	position: relative;
 
 	.components-notice-list {
-		position: absolute;
-		top: 0;
+		position: sticky;
+		top: $header-height;
 		left: 0;
 		right: 0;
+
+		@include break-small {
+			position: fixed;
+			top: inherit;
+		}
 
 		.notice {
 			margin: 0 0 5px;
@@ -48,6 +53,9 @@
 	}
 }
 
+@include editor-left('.components-notice-list');
+@include editor-right('.components-notice-list');
+
 .editor-layout__metaboxes:not(:empty) {
 	border-top: 1px solid $light-gray-500;
 	margin-top: 10px;
@@ -69,4 +77,27 @@
 		overflow-y: auto;
 		-webkit-overflow-scrolling: touch;
 	}
+}
+
+.editor-layout .editor-post-publish-panel {
+	position: fixed;
+	z-index: z-index( '.editor-layout .editor-post-publish-panel' );
+	top: $admin-bar-height-big;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	overflow: auto;
+	position: fixed;
+
+	@include break-medium() {
+		top: $admin-bar-height;
+		left: auto;
+		width: $sidebar-width;
+		border-left: 1px solid $light-gray-500;
+		@include slide_in_right;
+	}
+}
+
+.editor-layout .editor-post-publish-panel__header-publish-button {
+	margin-right: 52px; // This number is approximative to keep the publish button at the same position when opening the panel
 }

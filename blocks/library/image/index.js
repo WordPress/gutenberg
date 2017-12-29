@@ -15,6 +15,8 @@ import ImageBlock from './block';
 registerBlockType( 'core/image', {
 	title: __( 'Image' ),
 
+	description: __( 'Worth a thousand words.' ),
+
 	icon: 'format-image',
 
 	category: 'common',

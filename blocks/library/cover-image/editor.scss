@@ -1,4 +1,4 @@
-.editor-block-list__block[data-type="core/cover-image"] {
+.wp-block-cover-image {
 	.blocks-editable__tinymce[data-is-empty="true"]:before {
 		position: inherit;
 	}
@@ -17,5 +17,9 @@
 
 	.blocks-editable strong {
 		font-weight: 300;
+	}
+
+	.components-placeholder h2 {
+		color: inherit;
 	}
 }

@@ -767,36 +767,14 @@ describe( 'state', () => {
 
 		it( 'should set insertion point position', () => {
 			const state = blockInsertionPoint( undefined, {
-				type: 'SET_BLOCK_INSERTION_POINT',
-				position: 5,
-			} );
-
-			expect( state ).toEqual( {
-				position: 5,
-			} );
-		} );
-
-		it( 'should clear insertion point position', () => {
-			const original = blockInsertionPoint( undefined, {
-				type: 'SET_BLOCK_INSERTION_POINT',
-				position: 5,
-			} );
-
-			const state = blockInsertionPoint( deepFreeze( original ), {
-				type: 'CLEAR_BLOCK_INSERTION_POINT',
-			} );
-
-			expect( state ).toEqual( {
-				position: null,
-			} );
-		} );
-
-		it( 'should show the insertion point', () => {
-			const state = blockInsertionPoint( undefined, {
 				type: 'SHOW_INSERTION_POINT',
+				index: 5,
 			} );
 
-			expect( state ).toEqual( { visible: true } );
+			expect( state ).toEqual( {
+				position: 5,
+				visible: true,
+			} );
 		} );
 
 		it( 'should clear the insertion point', () => {
@@ -804,23 +782,7 @@ describe( 'state', () => {
 				type: 'HIDE_INSERTION_POINT',
 			} );
 
-			expect( state ).toEqual( { visible: false } );
-		} );
-
-		it( 'should merge position and visible', () => {
-			const original = blockInsertionPoint( undefined, {
-				type: 'SHOW_INSERTION_POINT',
-			} );
-
-			const state = blockInsertionPoint( deepFreeze( original ), {
-				type: 'SET_BLOCK_INSERTION_POINT',
-				position: 5,
-			} );
-
-			expect( state ).toEqual( {
-				visible: true,
-				position: 5,
-			} );
+			expect( state ).toEqual( { visible: false, position: null } );
 		} );
 	} );
 
@@ -1012,55 +974,85 @@ describe( 'state', () => {
 				blockUsage: {},
 				recentlyUsedBlocks: [],
 				mode: 'visual',
-				isSidebarOpened: true,
-				isSidebarOpenedMobile: false,
+				sidebars: {
+					desktop: true,
+					mobile: false,
+					publish: false,
+				},
 				panels: { 'post-status': true },
 				features: { fixedToolbar: false },
 			} );
 		} );
 
-		it( 'should toggle the sidebar open flag', () => {
-			const state = preferences( deepFreeze( { isSidebarOpened: false } ), {
+		it( 'should toggle the given sidebar flag', () => {
+			const state = preferences( deepFreeze( { sidebars: {
+				mobile: true,
+				desktop: true,
+			} } ), {
 				type: 'TOGGLE_SIDEBAR',
+				sidebar: 'desktop',
 			} );
 
-			expect( state ).toEqual( { isSidebarOpened: true } );
+			expect( state.sidebars ).toEqual( {
+				mobile: true,
+				desktop: false,
+			} );
 		} );
 
-		it( 'should toggle the mobile sidebar open flag', () => {
-			const state = preferences( deepFreeze( { isSidebarOpenedMobile: false } ), {
+		it( 'should set the sidebar open flag to true if unset', () => {
+			const state = preferences( deepFreeze( { sidebars: {
+				mobile: true,
+			} } ), {
 				type: 'TOGGLE_SIDEBAR',
-				isMobile: true,
+				sidebar: 'desktop',
 			} );
 
-			expect( state ).toEqual( { isSidebarOpenedMobile: true } );
+			expect( state.sidebars ).toEqual( {
+				mobile: true,
+				desktop: true,
+			} );
+		} );
+
+		it( 'should force the given sidebar flag', () => {
+			const state = preferences( deepFreeze( { sidebars: {
+				mobile: true,
+			} } ), {
+				type: 'TOGGLE_SIDEBAR',
+				sidebar: 'desktop',
+				force: false,
+			} );
+
+			expect( state.sidebars ).toEqual( {
+				mobile: true,
+				desktop: false,
+			} );
 		} );
 
 		it( 'should set the sidebar panel open flag to true if unset', () => {
-			const state = preferences( deepFreeze( { isSidebarOpened: false } ), {
+			const state = preferences( deepFreeze( {} ), {
 				type: 'TOGGLE_SIDEBAR_PANEL',
 				panel: 'post-taxonomies',
 			} );
 
-			expect( state ).toEqual( { isSidebarOpened: false, panels: { 'post-taxonomies': true } } );
+			expect( state ).toEqual( { panels: { 'post-taxonomies': true } } );
 		} );
 
 		it( 'should toggle the sidebar panel open flag', () => {
-			const state = preferences( deepFreeze( { isSidebarOpened: false, panels: { 'post-taxonomies': true } } ), {
+			const state = preferences( deepFreeze( { panels: { 'post-taxonomies': true } } ), {
 				type: 'TOGGLE_SIDEBAR_PANEL',
 				panel: 'post-taxonomies',
 			} );
 
-			expect( state ).toEqual( { isSidebarOpened: false, panels: { 'post-taxonomies': false } } );
+			expect( state ).toEqual( { panels: { 'post-taxonomies': false } } );
 		} );
 
 		it( 'should return switched mode', () => {
-			const state = preferences( deepFreeze( { isSidebarOpened: false } ), {
+			const state = preferences( deepFreeze( {} ), {
 				type: 'SWITCH_MODE',
 				mode: 'text',
 			} );
 
-			expect( state ).toEqual( { isSidebarOpened: false, mode: 'text' } );
+			expect( state ).toEqual( { mode: 'text' } );
 		} );
 
 		it( 'should record recently used blocks', () => {

@@ -27,8 +27,8 @@ export const mobileMiddleware = ( { getState } ) => next => action => {
 			payload: disableIsSidebarOpenedOnMobile( action.payload ),
 		} );
 	}
-	if ( action.type === 'TOGGLE_SIDEBAR' && action.isMobile === undefined ) {
-		return next( toggleSidebar( isMobile( getState() ) ) );
+	if ( action.type === 'TOGGLE_SIDEBAR' && action.sidebar === undefined ) {
+		return next( toggleSidebar( isMobile( getState() ) ? 'mobile' : 'desktop', action.force ) );
 	}
 	return next( action );
 };

@@ -14,6 +14,8 @@ import CategoriesBlock from './block';
 registerBlockType( 'core/categories', {
 	title: __( 'Categories' ),
 
+	description: __( 'Shows a list of your site\'s categories.' ),
+
 	icon: 'list-view',
 
 	category: 'widgets',

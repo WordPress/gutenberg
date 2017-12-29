@@ -11,7 +11,7 @@ import { mediaUpload } from '@wordpress/utils';
  */
 import './editor.scss';
 import './style.scss';
-import { registerBlockType } from '../../api';
+import { registerBlockType, createBlock } from '../../api';
 import Editable from '../../editable';
 import MediaUploadButton from '../../media-upload-button';
 import BlockControls from '../../block-controls';
@@ -19,12 +19,13 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import InspectorControls from '../../inspector-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
 import RangeControl from '../../inspector-controls/range-control';
-import BlockDescription from '../../block-description';
 
 const validAlignments = [ 'left', 'center', 'right', 'wide', 'full' ];
 
 registerBlockType( 'core/cover-image', {
 	title: __( 'Cover Image' ),
+
+	description: __( 'Cover Image is a bold image block with an optional title.' ),
 
 	icon: 'format-image',
 
@@ -53,6 +54,27 @@ registerBlockType( 'core/cover-image', {
 			type: 'number',
 			default: 50,
 		},
+	},
+
+	transforms: {
+		from: [
+			{
+				type: 'block',
+				blocks: [ 'core/heading' ],
+				transform: ( { content } ) => (
+					createBlock( 'core/cover-image', { title: content } )
+				),
+			},
+		],
+		to: [
+			{
+				type: 'block',
+				blocks: [ 'core/heading' ],
+				transform: ( { title } ) => (
+					createBlock( 'core/heading', { content: title } )
+				),
+			},
+		],
 	},
 
 	getEditWrapperProps( attributes ) {
@@ -103,10 +125,7 @@ registerBlockType( 'core/cover-image', {
 				</Toolbar>
 			</BlockControls>,
 			<InspectorControls key="inspector">
-				<BlockDescription>
-					<p>{ __( 'Cover Image is a bold image block with an optional title.' ) }</p>
-				</BlockDescription>
-				<h3>{ __( 'Cover Image Settings' ) }</h3>
+				<h2>{ __( 'Cover Image Settings' ) }</h2>
 				<ToggleControl
 					label={ __( 'Fixed Background' ) }
 					checked={ !! hasParallax }
@@ -125,13 +144,25 @@ registerBlockType( 'core/cover-image', {
 
 		if ( ! url ) {
 			const uploadButtonProps = { isLarge: true };
+			const icon = title ? undefined : 'format-image';
+			const label = title ? (
+				<Editable
+					tagName="h2"
+					value={ title }
+					focus={ focus }
+					onFocus={ setFocus }
+					onChange={ ( value ) => setAttributes( { title: value } ) }
+					inlineToolbar
+				/>
+			) : __( 'Cover Image' );
+
 			return [
 				controls,
 				<Placeholder
 					key="placeholder"
 					instructions={ __( 'Drag image here or insert from media library' ) }
-					icon="format-image"
-					label={ __( 'Cover Image' ) }
+					icon={ icon }
+					label={ label }
 					className={ className }>
 					<DropZone
 						onFilesDrop={ dropFiles }

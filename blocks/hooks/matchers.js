@@ -4,7 +4,7 @@
 import { isFunction, mapValues } from 'lodash';
 
 /**
- * WordPress dependecies
+ * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
 
