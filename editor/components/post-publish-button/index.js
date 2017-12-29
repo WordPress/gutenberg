@@ -35,6 +35,7 @@ export function PostPublishButton( {
 	visibility,
 	isPublishable,
 	isSaveable,
+	 isAutosaving,
 	user,
 	onSubmit = noop,
 } ) {
@@ -53,7 +54,7 @@ export function PostPublishButton( {
 	}
 
 	const className = classnames( 'editor-post-publish-button', {
-		'is-saving': isSaving && ! isAutosavingPost,
+		'is-saving': isSaving && ! isAutosaving,
 	} );
 
 	const onClick = () => {
