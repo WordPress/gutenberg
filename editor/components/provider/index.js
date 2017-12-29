@@ -19,7 +19,7 @@ import {
 /**
  * Internal Dependencies
  */
-import { setupEditor, undo, autosaveAlert } from '../../store/actions';
+import { setupEditor, undo, showAutosaveAlert } from '../../store/actions';
 import store from '../../store';
 
 /**
@@ -56,7 +56,7 @@ class EditorProvider extends Component {
 			// @todo only show the autosave alert when there exists an autosave newer than the post
 			// and if that autosave is different than the post (title, excerpt & content)
 			if ( props.autosave ) {
-				this.store.dispatch( autosaveAlert( props.autosave ) );
+				this.store.dispatch( showAutosaveAlert( props.autosave ) );
 			}
 		}
 	}

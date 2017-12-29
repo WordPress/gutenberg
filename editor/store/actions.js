@@ -260,7 +260,7 @@ export function isAutosaving( isAutosaving ) {
 	}
 }
 
-export function autosaveAlert( autosave ) {
+export function showAutosaveAlert( autosave ) {
 	return {
 		type: 'REQUEST_AUTOSAVE_EXISTS',
 		autosave,
