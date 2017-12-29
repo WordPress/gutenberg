@@ -154,7 +154,6 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 		// Map new fields onto the existing post data.
 		$parent            = $this->revision_controller->get_parent( $request['parent'] );
 		$prepared_post     = $this->parent_controller->prepare_item_for_database( $request );
-		$prepared_post     = $this->parent_controller->prepare_item_for_database( $request );
 		$prepared_post->ID = $parent->ID;
 		$autosave_id       = $this->create_post_autosave( (array) $prepared_post );
 		$post              = get_post( $autosave_id );

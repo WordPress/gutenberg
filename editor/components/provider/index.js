@@ -53,8 +53,6 @@ class EditorProvider extends Component {
 		if ( ! props.recovery ) {
 			this.store.dispatch( setupEditor( props.post, this.settings ) );
 
-			// @todo only show the autosave alert when there exists an autosave newer than the post
-			// and if that autosave is different than the post (title, excerpt & content)
 			if ( props.autosave ) {
 				this.store.dispatch( showAutosaveAlert( props.autosave ) );
 			}
