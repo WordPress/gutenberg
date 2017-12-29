@@ -33,7 +33,7 @@ import {
 	createWarningNotice,
 	removeNotice,
 	savePost,
-	isAutosaving,
+	toggleAutosave,
 	editPost,
 	requestMetaBoxUpdates,
 	updateReusableBlock,
