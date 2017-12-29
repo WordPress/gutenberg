@@ -59,7 +59,7 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 		$this->parent_post_type    = $parent_post_type;
 		$this->parent_controller   = new WP_REST_Posts_Controller( $parent_post_type );
 		$this->revision_controller = new WP_REST_Revisions_Controller( $parent_post_type );
-		$this->namespace           = 'wp/v2';
+		$this->rest_namespace      = 'wp/v2';
 		$this->rest_base           = 'autosaves';
 		$post_type_object          = get_post_type_object( $parent_post_type );
 		$this->parent_base         = ! empty( $post_type_object->rest_base ) ? $post_type_object->rest_base : $post_type_object->name;
@@ -74,10 +74,10 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 	 */
 	public function register_routes() {
 		register_rest_route(
-			$this->namespace, '/' . $this->parent_base . '/(?P<parent>[\d]+)/' . $this->rest_base, array(
+			$this->rest_namespace, '/' . $this->parent_base . '/(?P<parent>[\d]+)/' . $this->rest_base, array(
 				'args'   => array(
 					'parent' => array(
-						'description' => __( 'The ID for the parent of the object.' ),
+						'description' => __( 'The ID for the parent of the object.', 'gutenberg' ),
 						'type'        => 'integer',
 					),
 				),
@@ -98,14 +98,14 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 		);
 
 		register_rest_route(
-			$this->namespace, '/' . $this->parent_base . '/(?P<parent>[\d]+)/' . $this->rest_base . '/(?P<id>[\d]+)', array(
+			$this->rest_namespace, '/' . $this->parent_base . '/(?P<parent>[\d]+)/' . $this->rest_base . '/(?P<id>[\d]+)', array(
 				'args'   => array(
 					'parent' => array(
-						'description' => __( 'The ID for the parent of the object.' ),
+						'description' => __( 'The ID for the parent of the object.', 'gutenberg' ),
 						'type'        => 'integer',
 					),
 					'id'     => array(
-						'description' => __( 'Unique identifier for the object.' ),
+						'description' => __( 'Unique identifier for the object.', 'gutenberg' ),
 						'type'        => 'integer',
 					),
 				),
@@ -125,7 +125,7 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 						'force' => array(
 							'type'        => 'boolean',
 							'default'     => false,
-							'description' => __( 'Required to be true, as autosaves do not support trashing.' ),
+							'description' => __( 'Required to be true, as autosaves do not support trashing.', 'gutenberg' ),
 						),
 					),
 				),
@@ -181,7 +181,7 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 		$response = rest_ensure_response( $response );
 
 		$response->set_status( 201 );
-		$response->header( 'Location', rest_url( sprintf( '%s/%s/%d', $this->namespace, $this->rest_base, $autosave_id ) ) );
+		$response->header( 'Location', rest_url( sprintf( '%s/%s/%d', $this->rest_namespace, $this->rest_base, $autosave_id ) ) );
 
 		return $response;
 	}
@@ -195,7 +195,7 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 	 * @return WP_Post|WP_Error Revision post object if ID is valid, WP_Error otherwise.
 	 */
 	public function get_item( $id ) {
-		$error = new WP_Error( 'rest_post_invalid_id', __( 'Invalid autosave ID.' ), array( 'status' => 404 ) );
+		$error = new WP_Error( 'rest_post_invalid_id', __( 'Invalid autosave ID.', 'gutenberg' ), array( 'status' => 404 ) );
 		if ( (int) $id <= 0 ) {
 			return $error;
 		}

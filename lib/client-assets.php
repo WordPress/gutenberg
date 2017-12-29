@@ -734,7 +734,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	}
 
 	// Add autosave data if it is newer and changed.
-	$autosave = wp_get_post_autosave( $post->ID );
+	$autosave      = wp_get_post_autosave( $post->ID );
 	$show_autosave = false;
 
 	// Is the autosave newer than the post?

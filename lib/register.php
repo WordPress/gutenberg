@@ -414,7 +414,7 @@ add_action( 'init', 'gutenberg_register_post_types' );
  */
 function gutenberg_register_rest_routes() {
 	foreach ( get_post_types( array(), 'objects' ) as $post_type_object ) {
-		if( ! empty( $post_type_object->rest_base ) ) {
+		if ( ! empty( $post_type_object->rest_base ) ) {
 			if ( post_type_supports( $post_type_object->name, 'revisions' ) ) {
 				$autosaves = new WP_REST_Autosaves_Controller( $post_type_object->name );
 				$autosaves->register_routes();
