@@ -261,11 +261,12 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 	 */
 	public function create_post_autosave( $post_data ) {
 
-		$post_id = (int) $post_data['ID'];
+		$post_id     = (int) $post_data['ID'];
 		$post_author = get_current_user_id();
 
 		// Store one autosave per author. If there is already an autosave, overwrite it.
-		if ( $old_autosave = wp_get_post_autosave( $post_id, $post_author ) ) {
+		$old_autosave = wp_get_post_autosave( $post_id, $post_author );
+		if ( $old_autosave ) {
 			$new_autosave                = _wp_post_revision_data( $post_data, true );
 			$new_autosave['ID']          = $old_autosave->ID;
 			$new_autosave['post_author'] = $post_author;
