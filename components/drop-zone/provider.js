@@ -162,9 +162,12 @@ class DropZoneProvider extends Component {
 		// This seemingly useless line has been shown to resolve a Safari issue
 		// where files dragged directly from the dock are not recognized
 		event.dataTransfer && event.dataTransfer.files.length; // eslint-disable-line no-unused-expressions
+
 		const { position, hoveredDropZone } = this.state;
 		const dropzone = hoveredDropZone !== -1 ? this.dropzones[ hoveredDropZone ] : null;
+
 		this.resetDragState();
+
 		if ( !! dropzone && !! dropzone.onDrop ) {
 			dropzone.onDrop( event, position );
 		}
@@ -174,7 +177,7 @@ class DropZoneProvider extends Component {
 			return;
 		}
 
-		if ( event.dataTransfer && !! dropzone && !! dropzone.onFilesDrop ) {
+		if ( event.dataTransfer && 'all' === event.dataTransfer.effectAllowed && !! dropzone && !! dropzone.onFilesDrop ) {
 			dropzone.onFilesDrop( Array.prototype.slice.call( event.dataTransfer.files ), position );
 		}
 

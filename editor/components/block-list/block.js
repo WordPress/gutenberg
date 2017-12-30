@@ -357,15 +357,16 @@ export class BlockListBlock extends Component {
 		const underlay = document.getElementById( `block-underlay-${ this.props.uid }` );
 
 		document.body.classList.add( 'dragging' );
-		event.dataTransfer.effectAllowed = 'Move';
+
+		event.dataTransfer.effectAllowed = 'move';
 		event.dataTransfer.setData(
 			'json/text',
 			JSON.stringify( { uid: this.props.uid, fromIndex: this.props.order } )
 		);
+
 		// order matters next. '.dragged' must be added before setting the drag image
 		block.classList.add( 'dragged' );
 		event.dataTransfer.setDragImage( block, 0, 0 );
-		// event.stopPropagation();
 
 		setTimeout( addUnderlay( block, underlay ) );
 
@@ -385,7 +386,6 @@ export class BlockListBlock extends Component {
 		document.body.classList.remove( 'dragging' );
 		block.classList.remove( 'hide' );
 		underlay.classList.remove( 'visible' );
-		// event.stopPropagation();
 	}
 
 	onDrop( uid, toIndex ) {
@@ -450,7 +450,6 @@ export class BlockListBlock extends Component {
 				<BlockDropZone
 					index={ order }
 					onDrop={ this.onDrop }
-					dropEffect="reorder"
 				/>
 
 				{ ( showUI || isHovered ) &&
