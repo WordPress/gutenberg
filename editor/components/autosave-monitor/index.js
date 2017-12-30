@@ -21,9 +21,12 @@ import {
 export class AutosaveMonitor extends Component {
 	componentDidUpdate( prevProps ) {
 		const { isDirty, isSaveable, isAutosavable } = this.props;
-
-		if ( isDirty && isSaveable && isAutosavable ) {
-			this.toggleTimer( true );
+		if (
+			prevProps.isDirty !== isDirty ||
+			prevProps.isSaveable !== isSaveable ||
+			prevProps.isAutosavable !== isAutosavable
+		) {
+			this.toggleTimer( isDirty && isSaveable && isAutosavable );
 		}
 	}
 
