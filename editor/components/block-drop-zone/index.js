@@ -46,7 +46,7 @@ function BlockDropZone( { index, isLocked, ...props } ) {
 	const onDrop = ( event, position ) => {
 		if ( event.dataTransfer && 'move' === event.dataTransfer.effectAllowed ) {
 			if ( index !== undefined ) {
-				const { uid, fromIndex } = JSON.parse( event.dataTransfer.getData( 'json/text' ) );
+				const { uid, fromIndex } = JSON.parse( event.dataTransfer.getData( 'text' ) );
 
 				if ( position.y === 'top' && index > fromIndex ) {
 					props.onDrop( uid, index - 1 );

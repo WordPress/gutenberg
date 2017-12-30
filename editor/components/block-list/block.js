@@ -360,7 +360,7 @@ export class BlockListBlock extends Component {
 
 		event.dataTransfer.effectAllowed = 'move';
 		event.dataTransfer.setData(
-			'json/text',
+			'text',
 			JSON.stringify( { uid: this.props.uid, fromIndex: this.props.order } )
 		);
 
