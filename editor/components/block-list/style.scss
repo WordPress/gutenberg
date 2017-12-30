@@ -1,10 +1,10 @@
-.editor-block-list__block-underlay {
+.editor-block-list__block-drag-inset {
 	position: absolute;
 	top: 0;
 	right: 0;
 	bottom: 0;
 	left: 0;
-	z-index: z-index( '.editor-block-list__block-underlay' );
+	z-index: z-index( '.editor-block-list__block-drag-inset' );
 
 	>.inner {
 		position: absolute;
@@ -14,7 +14,7 @@
 		right: 0;
 		opacity: 0;
 		background-color: $light-gray-200;
-		z-index: z-index( '.editor-block-list__block-underlay' );
+		z-index: z-index( '.editor-block-list__block-drag-inset' );
 
 		@include break-small() {
 			margin: 0 32px;

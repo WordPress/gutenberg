@@ -28,9 +28,9 @@ $z-layers: (
 	'.editor-text-editor__formatting': 30,
 
 	// Should have lower index than anything else positioned inside the block containers
-	'.editor-block-list__block-underlay': 0,
+	'.editor-block-list__block-drag-inset': 0,
 
-	// Should have higher index than the underlay used for dragging
+	// Should have higher index than the inset/underlay used for dragging
 	'.components-placeholder__fieldset': 1,
 
 	// Show drop zone above most standard content, but below any overlays

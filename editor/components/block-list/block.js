@@ -354,7 +354,7 @@ export class BlockListBlock extends Component {
 
 	onDragStart( event ) {
 		const block = document.getElementById( `block-${ this.props.uid }` );
-		const underlay = document.getElementById( `block-underlay-${ this.props.uid }` );
+		const dragInset = document.getElementById( `block-drag-inset-${ this.props.uid }` );
 
 		document.body.classList.add( 'dragging' );
 
@@ -364,28 +364,34 @@ export class BlockListBlock extends Component {
 			JSON.stringify( { uid: this.props.uid, fromIndex: this.props.order } )
 		);
 
-		// order matters next. '.dragged' must be added before setting the drag image
+		// Order matters next. '.dragged' must be added before setting the drag image.
 		block.classList.add( 'dragged' );
 		event.dataTransfer.setDragImage( block, 0, 0 );
 
-		setTimeout( addUnderlay( block, underlay ) );
+		setTimeout( setDragInset( block, dragInset ) );
 
-		function addUnderlay( _block, _underlay ) {
+		function setDragInset( _block, _dragInset ) {
 			return () => {
 				_block.classList.remove( 'dragged' );
 				_block.classList.add( 'hide' );
-				_underlay.classList.add( 'visible' );
+				_dragInset.classList.add( 'visible' );
 			};
 		}
 	}
 
 	onDragEnd() {
 		const block = document.getElementById( `block-${ this.props.uid }` );
-		const underlay = document.getElementById( `block-underlay-${ this.props.uid }` );
+		const dragInset = document.getElementById( `block-drag-inset-${ this.props.uid }` );
 
 		document.body.classList.remove( 'dragging' );
-		block.classList.remove( 'hide' );
-		underlay.classList.remove( 'visible' );
+		setTimeout( resetBlockDisplay( block, dragInset ) );
+
+		function resetBlockDisplay( _block, _dragInset ) {
+			return () => {
+				_block.classList.remove( 'hide' );
+				_dragInset.classList.remove( 'visible' );
+			};
+		}
 	}
 
 	onDrop( uid, toIndex ) {
@@ -412,7 +418,7 @@ export class BlockListBlock extends Component {
 			'is-hovered': isHovered,
 			'is-reusable': isReusableBlock( blockType ),
 		} );
-		const blockUnderlayClassName = 'editor-block-list__block-underlay';
+		const blockDragInsetClassName = 'editor-block-list__block-drag-inset';
 
 		const { onMouseLeave, onFocus, onReplace } = this.props;
 
@@ -438,11 +444,11 @@ export class BlockListBlock extends Component {
 				{ ...wrapperProps }
 			>
 				<div
-					id={ `block-underlay-${ this.props.uid }` }
+					id={ `block-drag-inset-${ this.props.uid }` }
 					draggable={ true }
 					onDragStart={ this.onDragStart }
 					onDragEnd={ this.onDragEnd }
-					className={ blockUnderlayClassName }
+					className={ blockDragInsetClassName }
 				>
 					<div className="inner" ></div>
 				</div>
