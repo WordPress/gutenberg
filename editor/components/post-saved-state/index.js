@@ -26,13 +26,13 @@ import {
 	isAutosavingPost,
 } from '../../store/selectors';
 
-export function PostSavedState ( { isNew, isPublished, isDirty, isSaving, isSaveable, status, onStatusChange, onSave, isAutosaving } ) {
+export function PostSavedState( { isNew, isPublished, isDirty, isSaving, isSaveable, status, onStatusChange, onSave, isAutosaving } ) {
 	const className = 'editor-post-saved-state';
 
 	if ( isSaving ) {
 		return (
 			<span className={ className }>
-				{ isAutosaving ? __( 'Autosaving' )  : __( 'Saving' ) }
+				{ isAutosaving ? __( 'Autosaving' ) : __( 'Saving' ) }
 			</span>
 		);
 	}

@@ -280,7 +280,7 @@ describe( 'effects', () => {
 			handler( {}, store );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 2 );
-			expect( dispatch ).toHaveBeenCalledWith( savePost( { 'autosave': true } ) );
+			expect( dispatch ).toHaveBeenCalledWith( savePost( { autosave: true } ) );
 		} );
 	} );
 

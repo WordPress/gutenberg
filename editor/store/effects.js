@@ -48,7 +48,6 @@ import {
 	getPostEdits,
 	getEditedPostTitle,
 	getEditedPostExcerpt,
-	isCurrentPostPublished,
 	isEditedPostDirty,
 	isEditedPostNew,
 	isEditedPostSaveable,
@@ -81,7 +80,7 @@ export default {
 
 		if ( isAutosave ) {
 			toSend.parent = post.id;
-			delete toSend.id ;
+			delete toSend.id;
 			Model = wp.api.getPostTypeAutosaveModel( getCurrentPostType( state ) );
 			newModel = new Model( toSend );
 		} else {
@@ -149,7 +148,7 @@ export default {
 	},
 	REQUEST_AUTOSAVE_EXISTS( action, store ) {
 		const { autosave } = action;
-		const { dispatch, getState } = store;
+		const { dispatch } = store;
 		if ( autosave ) {
 			dispatch( createWarningNotice(
 				<p>
@@ -161,7 +160,6 @@ export default {
 					id: AUTOSAVE_POST_NOTICE_ID,
 				}
 			) );
-
 		}
 	},
 	REQUEST_POST_UPDATE_SUCCESS( action, store ) {
@@ -189,11 +187,9 @@ export default {
 				private: __( 'Post published privately!' ),
 				future: __( 'Post scheduled!' ),
 			}[ post.status ];
-		} else {
-			if ( ! isAutosave ) {
-				// Generic fallback notice
-				noticeMessage = __( 'Post updated!' );
-			}
+		} else if ( ! isAutosave ) {
+			// Generic fallback notice
+			noticeMessage = __( 'Post updated!' );
 		}
 
 		if ( noticeMessage ) {
@@ -338,7 +334,7 @@ export default {
 		}
 
 		dispatch( toggleAutosave( true ) );
-		dispatch( savePost( { 'autosave': true } ) );
+		dispatch( savePost( { autosave: true } ) );
 	},
 	SETUP_EDITOR( action ) {
 		const { post, settings } = action;

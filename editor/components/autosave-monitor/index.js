@@ -11,7 +11,7 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { autosave } from '../../store/actions';
+import { doAutosave } from '../../store/actions';
 import {
 	isEditedPostDirty,
 	isEditedPostSaveable,
@@ -58,5 +58,5 @@ export default connect(
 			isAutosavable: isPostAutosavable( state ),
 		};
 	},
-	{ autosave }
+	{ doAutosave }
 )( AutosaveMonitor );

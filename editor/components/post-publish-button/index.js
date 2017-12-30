@@ -35,7 +35,7 @@ export function PostPublishButton( {
 	visibility,
 	isPublishable,
 	isSaveable,
-	 isAutosaving,
+	isAutosaving,
 	user,
 	onSubmit = noop,
 } ) {
