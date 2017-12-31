@@ -543,9 +543,3 @@ add_action( 'admin_print_scripts-edit.php', 'gutenberg_replace_default_add_new_b
 function gutenberg_add_admin_body_class( $classes ) {
 	return "$classes gutenberg-editor-page";
 }
-
-function wp_heartbeat_settings_gutenberg( $settings ) {
-    $settings['interval'] = 15; //Anything between 15-120
-    return $settings;
-}
-add_filter( 'heartbeat_settings', 'wp_heartbeat_settings_gutenberg' );
