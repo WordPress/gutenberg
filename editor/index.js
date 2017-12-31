@@ -17,6 +17,7 @@ import './assets/stylesheets/main.scss';
 import Layout from './edit-post/layout';
 import { EditorProvider, ErrorBoundary } from './components';
 import { initializeMetaBoxState } from './store/actions';
+import { setupHearthbeat } from './utils/heartbeat';
 
 export * from './components';
 import store from './store'; // Registers the state tree
@@ -36,15 +37,6 @@ if ( dateSettings.timezone.string ) {
 	moment.tz.add( unpackedTimezone );
 	moment.tz.setDefault( 'WP' );
 }
-
-/**
- * Configure heartbeat to refresh the wp-api nonce, keeping the editor authorization intact.
- */
-window.jQuery( document ).on( 'heartbeat-tick', ( event, response ) => {
-	if ( response[ 'rest-nonce' ] ) {
-		window.wpApiSettings.nonce = response[ 'rest-nonce' ];
-	}
-} );
 
 /**
  * Reinitializes the editor after the user chooses to reboot the editor after
@@ -83,6 +75,7 @@ export function recreateEditorInstance( target, settings ) {
 export function createEditorInstance( id, post, settings ) {
 	const target = document.getElementById( id );
 	const reboot = recreateEditorInstance.bind( null, target, settings );
+	setupHearthbeat();
 
 	render(
 		<EditorProvider settings={ settings } post={ post }>
