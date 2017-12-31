@@ -479,6 +479,12 @@ function gutenberg_extend_wp_api_backbone_client() {
 				return model.prototype.route && route === model.prototype.route.index;
 			} );
 		};
+		wp.api.getPostTypeAutosaveModel = function( postType ) {
+			var route = '/' + wpApiSettings.versionString + wp.api.postTypeRestBaseMapping[ postType ] + '/(?P<parent>[\\\\d]+)/autosaves/(?P<id>[\\\\d]+)';
+			return _.find( wp.api.models, function( collection ) {
+				return collection.prototype.route && route === collection.prototype.route.index;
+			} );
+		};
 		wp.api.getTaxonomyModel = function( taxonomy ) {
 			var route = '/' + wpApiSettings.versionString + this.taxonomyRestBaseMapping[ taxonomy ] + '/(?P<id>[\\\\d]+)';
 			return _.find( wp.api.models, function( model ) {
@@ -727,6 +733,39 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		wp_die( $post_to_edit->get_error_message() );
 	}
 
+	// Add autosave data if it is newer and changed.
+	$autosave      = wp_get_post_autosave( $post->ID );
+	$show_autosave = false;
+
+	// Is the autosave newer than the post?
+	if (
+		$autosave &&
+		mysql2date( 'U', $autosave->post_modified_gmt, false ) > mysql2date( 'U', $post->post_modified_gmt, false )
+	) {
+		foreach ( _wp_post_revision_fields( $post ) as $autosave_field => $_autosave_field ) {
+			if ( normalize_whitespace( $autosave->$autosave_field ) != normalize_whitespace( $post->$autosave_field ) ) {
+				$show_autosave = true;
+				break;
+			}
+		}
+	}
+
+	// If this autosave isn't newer and different from the current post, remove.
+	if ( $autosave && ! $show_autosave ) {
+		wp_delete_post_revision( $autosave->ID );
+	}
+
+	if ( $show_autosave ) {
+		wp_localize_script(
+			'wp-editor',
+			'_wpAutosave',
+			array(
+				'id'        => $autosave->ID,
+				'edit_link' => add_query_arg( 'gutenberg', true, get_edit_post_link( $autosave->ID ) ),
+			)
+		);
+	}
+
 	// Set initial title to empty string for auto draft for duration of edit.
 	// Otherwise, title defaults to and displays as "Auto Draft".
 	$is_new_post = 'auto-draft' === $post_to_edit['status'];
@@ -833,7 +872,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$script .= sprintf( 'var editorSettings = %s;', wp_json_encode( $editor_settings ) );
 	$script .= <<<JS
 		window._wpLoadGutenbergEditor = wp.api.init().then( function() {
-			return wp.editor.createEditorInstance( 'editor', window._wpGutenbergPost, editorSettings );
+			return wp.editor.createEditorInstance( 'editor', window._wpGutenbergPost, editorSettings, window._wpAutosave );
 		} );
 JS;
 	$script .= '} )();';

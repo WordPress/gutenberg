@@ -23,20 +23,21 @@ import {
 	isEditedPostSaveable,
 	getCurrentPost,
 	getEditedPostAttribute,
+	isAutosavingPost,
 } from '../../store/selectors';
 
-export function PostSavedState( { isNew, isPublished, isDirty, isSaving, isSaveable, status, onStatusChange, onSave } ) {
+export function PostSavedState( { isNew, isPublished, isDirty, isSaving, isSaveable, status, onStatusChange, onSave, isAutosaving } ) {
 	const className = 'editor-post-saved-state';
 
 	if ( isSaving ) {
 		return (
 			<span className={ className }>
-				{ __( 'Saving' ) }
+				{ isAutosaving ? __( 'Autosaving' ) : __( 'Saving' ) }
 			</span>
 		);
 	}
 
-	if ( ! isSaveable || isPublished ) {
+	if ( ! isSaveable ) {
 		return null;
 	}
 
@@ -59,8 +60,8 @@ export function PostSavedState( { isNew, isPublished, isDirty, isSaving, isSavea
 
 	return (
 		<Button className={ classnames( className, 'button-link' ) } onClick={ onClick }>
-			<span className="editor-post-saved-state__mobile">{ __( 'Save' ) }</span>
-			<span className="editor-post-saved-state__desktop">{ __( 'Save Draft' ) }</span>
+			<span className="editor-post-saved-state__mobile">{ isPublished ? '' : __( 'Save' ) }</span>
+			<span className="editor-post-saved-state__desktop">{ isPublished ? '' : __( 'Save Draft' ) }</span>
 		</Button>
 	);
 }
@@ -74,6 +75,7 @@ export default connect(
 		isSaving: isSavingPost( state ),
 		isSaveable: isEditedPostSaveable( state ),
 		status: getEditedPostAttribute( state, 'status' ),
+		isAutosaving: isAutosavingPost( state ),
 	} ),
 	{
 		onStatusChange: ( status ) => editPost( { status } ),

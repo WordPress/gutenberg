@@ -30,8 +30,10 @@ import {
 	replaceBlocks,
 	createSuccessNotice,
 	createErrorNotice,
+	createWarningNotice,
 	removeNotice,
 	savePost,
+	toggleAutosave,
 	editPost,
 	requestMetaBoxUpdates,
 	updateReusableBlock,
@@ -44,7 +46,8 @@ import {
 	getDirtyMetaBoxes,
 	getEditedPostContent,
 	getPostEdits,
-	isCurrentPostPublished,
+	getEditedPostTitle,
+	getEditedPostExcerpt,
 	isEditedPostDirty,
 	isEditedPostNew,
 	isEditedPostSaveable,
@@ -57,6 +60,7 @@ import {
  * Module Constants
  */
 const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
+const AUTOSAVE_POST_NOTICE_ID = 'AUTOSAVE_POST_NOTICE_ID';
 const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
 const SAVE_REUSABLE_BLOCK_NOTICE_ID = 'SAVE_REUSABLE_BLOCK_NOTICE_ID';
 
@@ -71,26 +75,65 @@ export default {
 			content: getEditedPostContent( state ),
 			id: post.id,
 		};
+		const isAutosave = action.options && action.options.autosave;
+		let Model, newModel;
 
-		dispatch( {
-			type: 'UPDATE_POST',
-			edits: toSend,
-			optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
-		} );
-		dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
-		const Model = wp.api.getPostTypeModel( getCurrentPostType( state ) );
-		new Model( toSend ).save().done( ( newPost ) => {
+		if ( isAutosave ) {
+			toSend.parent = post.id;
+			delete toSend.id;
+			Model = wp.api.getPostTypeAutosaveModel( getCurrentPostType( state ) );
+			newModel = new Model( toSend );
+		} else {
 			dispatch( {
-				type: 'RESET_POST',
-				post: newPost,
+				type: 'UPDATE_POST',
+				edits: toSend,
+				optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
 			} );
-			dispatch( {
-				type: 'REQUEST_POST_UPDATE_SUCCESS',
-				previousPost: post,
-				post: newPost,
-				optimist: { type: COMMIT, id: POST_UPDATE_TRANSACTION_ID },
-			} );
+			dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
+			dispatch( removeNotice( AUTOSAVE_POST_NOTICE_ID ) );
+			Model = wp.api.getPostTypeModel( getCurrentPostType( state ) );
+			newModel = new Model( toSend );
+		}
+
+		newModel.save().done( ( newPost ) => {
+			if ( isAutosave ) {
+				const autosave = {
+					id: newPost.id,
+					title: getEditedPostTitle( state ),
+					excerpt: getEditedPostExcerpt( state ),
+					content: getEditedPostContent( state ),
+				};
+				dispatch( {
+					type: 'RESET_AUTOSAVE',
+					post: autosave,
+				} );
+				dispatch( toggleAutosave( false ) );
+
+				dispatch( {
+					type: 'REQUEST_POST_UPDATE_SUCCESS',
+					previousPost: post,
+					post: post,
+					isAutosave: true,
+				} );
+			} else {
+				// dispatch post autosaved false
+				// delete the autosave
+				dispatch( {
+					type: 'RESET_POST',
+					post: newPost,
+				} );
+				dispatch( {
+					type: 'REQUEST_POST_UPDATE_SUCCESS',
+					previousPost: post,
+					post: newPost,
+					optimist: { type: COMMIT, id: POST_UPDATE_TRANSACTION_ID },
+				} );
+			}
 		} ).fail( ( err ) => {
+			if ( isAutosave ) {
+				dispatch( toggleAutosave( false ) );
+			}
+
 			dispatch( {
 				type: 'REQUEST_POST_UPDATE_FAILURE',
 				error: get( err, 'responseJSON', {
@@ -99,12 +142,28 @@ export default {
 				} ),
 				post,
 				edits,
-				optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
+				optimist: isAutosave ? false : { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
 			} );
 		} );
 	},
+	REQUEST_AUTOSAVE_EXISTS( action, store ) {
+		const { autosave } = action;
+		const { dispatch } = store;
+		if ( autosave ) {
+			dispatch( createWarningNotice(
+				<p>
+					<span>{ __( 'There is an autosave of this post that is more recent than the version below.' ) }</span>
+					{ ' ' }
+					{ <a href={ autosave.edit_link }>{ __( 'View the autosave' ) }</a> }
+				</p>,
+				{
+					id: AUTOSAVE_POST_NOTICE_ID,
+				}
+			) );
+		}
+	},
 	REQUEST_POST_UPDATE_SUCCESS( action, store ) {
-		const { previousPost, post } = action;
+		const { previousPost, post, isAutosave } = action;
 		const { dispatch, getState } = store;
 
 		const publishStatus = [ 'publish', 'private', 'future' ];
@@ -128,7 +187,7 @@ export default {
 				private: __( 'Post published privately!' ),
 				future: __( 'Post scheduled!' ),
 			}[ post.status ];
-		} else {
+		} else if ( ! isAutosave ) {
 			// Generic fallback notice
 			noticeMessage = __( 'Post updated!' );
 		}
@@ -263,25 +322,19 @@ export default {
 			return;
 		}
 
-		if ( ! isEditedPostNew( state ) && ! isEditedPostDirty( state ) ) {
-			return;
-		}
-
-		if ( isCurrentPostPublished( state ) ) {
-			// TODO: Publish autosave.
-			//  - Autosaves are created as revisions for published posts, but
-			//    the necessary REST API behavior does not yet exist
-			//  - May need to check for whether the status of the edited post
-			//    has changed from the saved copy (i.e. published -> pending)
-			return;
-		}
-
-		// Change status from auto-draft to draft
+		// Change status from auto-draft to draft, saving the post.
 		if ( isEditedPostNew( state ) ) {
 			dispatch( editPost( { status: 'draft' } ) );
+			dispatch( savePost() );
+			return;
 		}
 
-		dispatch( savePost() );
+		if ( ! isEditedPostDirty( state ) ) {
+			return;
+		}
+
+		dispatch( toggleAutosave( true ) );
+		dispatch( savePost( { autosave: true } ) );
 	},
 	SETUP_EDITOR( action ) {
 		const { post, settings } = action;

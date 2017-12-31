@@ -19,7 +19,7 @@ import {
 /**
  * Internal Dependencies
  */
-import { setupEditor, undo } from '../../store/actions';
+import { setupEditor, undo, showAutosaveAlert } from '../../store/actions';
 import store from '../../store';
 
 /**
@@ -52,6 +52,10 @@ class EditorProvider extends Component {
 		// Assume that we don't need to initialize in the case of an error recovery.
 		if ( ! props.recovery ) {
 			this.store.dispatch( setupEditor( props.post, this.settings ) );
+
+			if ( props.autosave ) {
+				this.store.dispatch( showAutosaveAlert( props.autosave ) );
+			}
 		}
 	}
 

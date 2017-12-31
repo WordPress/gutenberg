@@ -365,6 +365,44 @@ export function isEditedPostSaveable( state ) {
 }
 
 /**
+ * Returns true if the post can be autosaved, or false otherwise.
+ *
+ * @param  {Object}  state Global application state
+ * @return {Boolean}       Whether the post can be autosaved
+ */
+export function isPostAutosavable( state ) {
+	// If the post is autosaving, it is not autosavable.
+	if ( state.currentlyAutosaving ) {
+		return false;
+	}
+
+	// If we don't already have an autosave, the post is autosavable.
+	if ( ! hasAutosave( state ) ) {
+		return true;
+	}
+
+	const title = getEditedPostTitle( state );
+	const excerpt = getEditedPostExcerpt( state );
+	const content = getEditedPostContent( state );
+	const autosave = state.editor.present.autosave;
+
+	// If the title, excerpt or content has changed, the post is autosavable.
+	if (
+		( autosave.title && title !== autosave.title ) ||
+		( autosave.excerpt && excerpt !== autosave.excerpt ) ||
+		( autosave.content && content !== autosave.content )
+	) {
+		return true;
+	}
+
+	return false;
+}
+
+export function hasAutosave( state ) {
+	return !! state.editor.present.autosave;
+}
+
+/**
  * Return true if the post being edited is being scheduled. Preferring the
  * unsaved status values.
  *
@@ -956,6 +994,16 @@ export function didPostSaveRequestSucceed( state ) {
  */
 export function didPostSaveRequestFail( state ) {
 	return !! state.saving.error;
+}
+
+/**
+ * Is the post autosaving?
+ *
+ * @param  {Object}  state Global application state
+ * @return {Boolean}       Whether the post is autosaving
+ */
+export function isAutosavingPost( state ) {
+	return !! state.currentlyAutosaving;
 }
 
 /**

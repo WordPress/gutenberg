@@ -408,6 +408,23 @@ function gutenberg_register_post_types() {
 add_action( 'init', 'gutenberg_register_post_types' );
 
 /**
+ * Registers the REST API routes needed by the Gutenberg editor.
+ *
+ * @since 0.10.0
+ */
+function gutenberg_register_rest_routes() {
+	foreach ( get_post_types( array(), 'objects' ) as $post_type_object ) {
+		if ( ! empty( $post_type_object->rest_base ) ) {
+			if ( post_type_supports( $post_type_object->name, 'revisions' ) ) {
+				$autosaves = new WP_REST_Autosaves_Controller( $post_type_object->name );
+				$autosaves->register_routes();
+			}
+		}
+	}
+}
+add_action( 'rest_api_init', 'gutenberg_register_rest_routes' );
+
+/**
  * Gets revisions details for the selected post.
  *
  * @since 1.6.0

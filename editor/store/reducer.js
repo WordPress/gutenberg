@@ -77,6 +77,15 @@ export const editor = flow( [
 	// resetting at each post save.
 	partialRight( withChangeDetection, { resetTypes: [ 'SETUP_EDITOR', 'RESET_POST' ] } ),
 ] )( {
+	autosave( state = false, action ) {
+		const { post } = action;
+		switch ( action.type ) {
+			case 'RESET_AUTOSAVE':
+				return post;
+		}
+
+		return state;
+	},
 	edits( state = {}, action ) {
 		switch ( action.type ) {
 			case 'EDIT_POST':
@@ -473,6 +482,16 @@ export function blocksMode( state = {}, action ) {
 	return state;
 }
 
+export function currentlyAutosaving( state = false, action ) {
+	switch ( action.type ) {
+		case 'DOING_AUTOSAVE':
+			const { isAutosaving } = action;
+			return isAutosaving;
+	}
+
+	return state;
+}
+
 /**
  * Reducer returning the block insertion point
  *
@@ -780,6 +799,7 @@ export const reusableBlocks = combineReducers( {
 
 export default optimist( combineReducers( {
 	editor,
+	currentlyAutosaving,
 	currentPost,
 	isTyping,
 	blockSelection,
