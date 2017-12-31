@@ -43,6 +43,9 @@ if ( dateSettings.timezone.string ) {
 window.jQuery( document ).on( 'heartbeat-tick', ( event, response ) => {
 	if ( response[ 'rest-nonce' ] ) {
 		window.wpApiSettings.nonce = response[ 'rest-nonce' ];
+		if ( 'undefined' !== typeof wp.api.endpoints.at( 0 ) ) {
+			wp.api.endpoints.at( 0 ).set( 'nonce', response[ 'rest-nonce' ] );
+		}
 	}
 } );
 
