@@ -143,6 +143,36 @@ class ButtonBlock extends Component {
 	}
 }
 
+const blockAttributes = {
+	url: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'a',
+		attribute: 'href',
+	},
+	title: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'a',
+		attribute: 'title',
+	},
+	text: {
+		type: 'array',
+		source: 'children',
+		selector: 'a',
+	},
+	align: {
+		type: 'string',
+		default: 'none',
+	},
+	color: {
+		type: 'string',
+	},
+	textColor: {
+		type: 'string',
+	},
+};
+
 registerBlockType( 'core/button', {
 	title: __( 'Button' ),
 
@@ -152,35 +182,7 @@ registerBlockType( 'core/button', {
 
 	category: 'layout',
 
-	attributes: {
-		url: {
-			type: 'string',
-			source: 'attribute',
-			selector: 'a',
-			attribute: 'href',
-		},
-		title: {
-			type: 'string',
-			source: 'attribute',
-			selector: 'a',
-			attribute: 'title',
-		},
-		text: {
-			type: 'array',
-			source: 'children',
-			selector: 'a',
-		},
-		align: {
-			type: 'string',
-			default: 'none',
-		},
-		color: {
-			type: 'string',
-		},
-		textColor: {
-			type: 'string',
-		},
-	},
+	attributes: blockAttributes,
 
 	getEditWrapperProps( attributes ) {
 		const { align, clear } = attributes;
@@ -217,4 +219,18 @@ registerBlockType( 'core/button', {
 			</div>
 		);
 	},
+
+	deprecated: [ {
+		save( { attributes } ) {
+			const { url, text, title, align, color, textColor } = attributes;
+
+			return (
+				<div className={ `align${ align }` } style={ { backgroundColor: color } }>
+					<a href={ url } title={ title } style={ { color: textColor } }>
+						{ text }
+					</a>
+				</div>
+			);
+		},
+	} ],
 } );
