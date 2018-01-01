@@ -91,7 +91,7 @@ class ButtonBlock extends Component {
 					onFocus={ setFocus }
 					onChange={ ( value ) => setAttributes( { text: value } ) }
 					formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
-					className="wp-block-button-link"
+					className="wp-block-button__link"
 					style={ {
 						backgroundColor: color,
 						color: textColor,
@@ -207,7 +207,7 @@ registerBlockType( 'core/button', {
 			color: textColor,
 		};
 
-		const linkClass = 'wp-block-button-link';
+		const linkClass = 'wp-block-button__link';
 
 		return (
 			<div className={ `align${ align }` }>
