@@ -6,8 +6,8 @@ export const PREFERENCES_DEFAULTS = {
 		publish: false,
 	},
 	panels: { 'post-status': true },
-	recentlyUsedBlocks: [],
-	blockUsage: {},
+	recentInserts: [],
+	insertFrequency: {},
 	features: {
 		fixedToolbar: false,
 	},

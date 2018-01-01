@@ -8,17 +8,17 @@ import {
 	has,
 	last,
 	reduce,
-	keys,
-	without,
 	compact,
 	find,
+	unionWith,
+	isEqual,
 } from 'lodash';
 import createSelector from 'rememo';
 
 /**
  * WordPress dependencies
  */
-import { serialize, getBlockType } from '@wordpress/blocks';
+import { serialize, getBlockType, getBlockTypes } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -26,6 +26,7 @@ import { addQueryArgs } from '@wordpress/url';
  * Module constants
  */
 export const POST_UPDATE_TRANSACTION_ID = 'post-update';
+const MAX_RECENT_BLOCKS = 8;
 const MAX_FREQUENT_BLOCKS = 3;
 
 /**
@@ -1039,37 +1040,173 @@ export function getNotices( state ) {
 	return state.notices;
 }
 
-/**
- * Resolves the list of recently used block names into a list of block type settings.
- *
- * @param {Object} state Global application state
- * @return {Array}       List of recently used blocks
- */
-export function getRecentlyUsedBlocks( state ) {
-	// resolves the block names in the state to the block type settings
-	return compact( state.preferences.recentlyUsedBlocks.map( blockType => getBlockType( blockType ) ) );
+const getRecentInserts = createSelector(
+	state => {
+		// Filter out any inserts that are associated with a block type that isn't registered
+		const inserts = state.preferences.recentInserts.filter( ( { name } ) => getBlockType( name ) );
+
+		// Pad out the list of recent inserts with blocks in the 'common' category
+		const commonInserts = getBlockTypes()
+			.filter( ( { category } ) => category === 'common' )
+			.map( ( blockType ) => ( { name: blockType.name } ) );
+
+		return unionWith( inserts, commonInserts, isEqual ).slice( 0, MAX_RECENT_BLOCKS );
+	},
+	state => state.preferences.recentInserts
+);
+
+const getFrequentInserts = createSelector(
+	state => {
+		const { insertFrequency } = state.preferences;
+
+		// Sort the inserts by their usage frequency
+		const keysOrderedByUsage = Object.keys( insertFrequency ).sort( ( a, b ) =>
+			insertFrequency[ b ] - insertFrequency[ a ]
+		);
+
+		// Filter out any inserts that are associated with a block type that isn't registered
+		const inserts = keysOrderedByUsage
+			.map( key => JSON.parse( key ) )
+			.filter( ( { name } ) => getBlockType( name ) );
+
+		// Add in the paragraph and image blocks if they're not already there
+		const defaultInserts = [
+			{ name: 'core/paragraph' },
+			{ name: 'core/image' },
+		];
+
+		return unionWith( inserts, defaultInserts, isEqual ).slice( 0, MAX_FREQUENT_BLOCKS );
+	},
+	state => state.preferences.insertFrequency
+);
+
+function buildInserterItemFromBlockType( state, enabledBlockTypes, blockType ) {
+	if ( ! enabledBlockTypes || ! blockType ) {
+		return null;
+	}
+
+	const blockTypeIsDisabled = Array.isArray( enabledBlockTypes ) && ! enabledBlockTypes.includes( blockType.name );
+	if ( blockTypeIsDisabled ) {
+		return null;
+	}
+
+	if ( blockType.isPrivate ) {
+		return null;
+	}
+
+	return {
+		// Attributes used for insertion
+		name: blockType.name,
+		initialAttributes: {},
+
+		// Attributes shown in the inserter
+		title: blockType.title,
+		icon: blockType.icon,
+		category: blockType.category,
+
+		// Metadata
+		keywords: blockType.keywords,
+		isDisabled: !! blockType.useOnce && getBlocks( state ).some( block => block.name === blockType.name ),
+	};
+}
+
+function buildInserterItemFromReusableBlock( enabledBlockTypes, reusableBlock ) {
+	if ( ! enabledBlockTypes || ! reusableBlock ) {
+		return null;
+	}
+
+	const blockTypeIsDisabled = Array.isArray( enabledBlockTypes ) && ! enabledBlockTypes.includes( 'core/block' );
+	if ( blockTypeIsDisabled ) {
+		return null;
+	}
+
+	return {
+		// Attributes used for insertion
+		name: 'core/block',
+		initialAttributes: { ref: reusableBlock.id },
+
+		// Attributes shown in the inserter
+		title: reusableBlock.title,
+		icon: 'layout',
+		category: 'reusable-blocks',
+
+		// Metadata
+		keywords: [],
+		isDisabled: false,
+	};
+}
+
+function buildInserterItemFromInsert( state, enabledBlockTypes, insert ) {
+	switch ( insert.name ) {
+		case 'core/block':
+			const reusableBlock = getReusableBlock( state, insert.ref );
+			return buildInserterItemFromReusableBlock( enabledBlockTypes, reusableBlock );
+
+		default:
+			const blockType = getBlockType( insert.name );
+			return buildInserterItemFromBlockType( state, enabledBlockTypes, blockType );
+	}
 }
 
 /**
- * Resolves the block usage stats into a list of the most frequently used blocks.
- * Memoized so we're not generating block lists every time we render the list
- * in the inserter.
- *
- * @param {Object} state Global application state
- * @return {Array}       List of block type settings
+ * Generates a list of items that should appear in the inserter. Both static
+ * and dynamic (i.e. reusable) blocks are sourced from. Each item contains
+ * properties that are useful for rendering it in an inserter.
+ * 
+ * @param {Object} state                         Global application state
+ * @param {String[]|Boolean} [enabledBlockTypes] Enabled block type names, or true/false to enable/disable all types
+ * @returns {Object[]}                           Inserter items that ought to appear in the Frequent inserter
  */
-export const getMostFrequentlyUsedBlocks = createSelector(
-	( state ) => {
-		const { blockUsage } = state.preferences;
-		const orderedByUsage = keys( blockUsage ).sort( ( a, b ) => blockUsage[ b ] - blockUsage[ a ] );
-		// add in paragraph and image blocks if they're not already in the usage data
-		return compact(
-			[ ...orderedByUsage, ...without( [ 'core/paragraph', 'core/image' ], ...orderedByUsage ) ]
-				.map( blockType => getBlockType( blockType ) )
-		).slice( 0, MAX_FREQUENT_BLOCKS );
-	},
-	( state ) => state.preferences.blockUsage
-);
+export function getInserterItems( state, enabledBlockTypes = true ) {
+	if ( ! enabledBlockTypes ) {
+		return [];
+	}
+
+	const buildStaticItem = buildInserterItemFromBlockType.bind( null, state, enabledBlockTypes );
+	const staticItems = getBlockTypes().map( buildStaticItem );
+
+	const buildDynamicItem = buildInserterItemFromReusableBlock.bind( null, enabledBlockTypes );
+	const dynamicItems = getReusableBlocks( state ).map( buildDynamicItem );
+
+	const items = [ ...staticItems, ...dynamicItems ];
+	return compact( items );
+}
+
+/**
+ * Generates a list of items that should appear in an inserter that allows the
+ * user to quickly insert *recently* used blocks.
+ * 
+ * @param {Object} state                         Global application state
+ * @param {String[]|Boolean} [enabledBlockTypes] Enabled block type names, or true/false to enable/disable all types
+ * @returns {Object[]}                           Inserter items that ought to appear in the Frequent inserter
+ */
+export function getRecentInserterItems( state, enabledBlockTypes = true ) {
+	if ( ! enabledBlockTypes ) {
+		return [];
+	}
+
+	const buildItem = buildInserterItemFromInsert.bind( null, state, enabledBlockTypes );
+	const items = getRecentInserts( state ).map( buildItem );
+	return compact( items );
+}
+
+/**
+ * Generates a list of items that should appear in an inserter that allows the
+ * user to quickly insert *frequntly* used blocks.
+ * 
+ * @param {Object} state                         Global application state
+ * @param {String[]|Boolean} [enabledBlockTypes] Enabled block type names, or true/false to enable/disable all types
+ * @returns {Object[]}                           Inserter items that ought to appear in the Frequent inserter
+ */
+export function getFrequentInserterItems( state, enabledBlockTypes = true ) {
+	if ( ! enabledBlockTypes ) {
+		return [];
+	}
+
+	const buildItem = buildInserterItemFromInsert.bind( null, state, enabledBlockTypes );
+	const items = getFrequentInserts( state ).map( buildItem );
+	return compact( items );
+}
 
 /**
  * Returns whether the toolbar should be fixed or not.
