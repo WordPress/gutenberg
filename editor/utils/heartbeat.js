@@ -9,7 +9,7 @@ export function setupHearthbeat() {
 	} );
 
 	/**
-	 * Configure Heartbeat locks.
+	 * Configure Heartbeat post locks.
 	 *
 	 * Used to lock editing of an object by only one user at a time.
 	 *
@@ -34,8 +34,8 @@ export function setupHearthbeat() {
 		data[ 'wp-refresh-post-lock' ] = send;
 	} );
 
+	// Refresh post locks: update the lock string or show the dialog if somebody has taken over editing.
 	jQuery( document ).on( 'heartbeat-tick.refresh-lock', function( e, data ) {
-		// Post locks: update the lock string or show the dialog if somebody has taken over editing.
 		if ( data[ 'wp-refresh-post-lock' ] ) {
 			const received = data[ 'wp-refresh-post-lock' ];
 
