@@ -258,6 +258,50 @@ function gutenberg_wpautop_insert_post_data( $data ) {
 add_filter( 'wp_insert_post_data', 'gutenberg_wpautop_insert_post_data' );
 
 /**
+ * Extract the blocks from post content for the REST API post response.
+ *
+ * @since 1.1.0
+ *
+ * @param string $content The post content.
+ *
+ * @return array Array of block data.
+ */
+function gutenberg_add_blocks_to_post_resource( $content ) {
+	$registry = WP_Block_Type_Registry::get_instance();
+	$blocks   = gutenberg_parse_blocks( $content );
+	$data     = array();
+
+	// Loop thru the blocks, adding rendered content when available.
+	foreach ( $blocks as $block ) {
+		$block_name  = isset( $block['blockName'] ) ? $block['blockName'] : null;
+		$attributes  = is_array( $block['attrs'] ) ? $block['attrs'] : null;
+		$raw_content = isset( $block['rawContent'] ) ? $block['rawContent'] : null;
+
+		// Skip block if we didn’t get a valid block name.
+		if ( null === $block_name ) {
+			continue;
+		}
+
+		// Set up rendered content, if available.
+		$block['renderedContent'] = null;
+		$block_type = $registry->get_registered( $block_name );
+		if ( null !== $block_type ) {
+			$block['renderedContent'] = $block_type->render( $attributes, $raw_content );
+		}
+
+		// Add the item data.
+		$data[] = array(
+			'type'       => $block_name,
+			'attributes' => $attributes,
+			'content'    => $raw_content,
+			'rendered'   => $block['renderedContent'],
+		);
+	}
+
+	return $data;
+}
+
+/**
  * Attach a post's block data callback to the REST API response.
  *
  * @since 1.1.0
