@@ -87,8 +87,8 @@ class WP_REST_BlockAPI_Test extends WP_UnitTestCase {
 		$first_block_url_attribute = wp_unslash( $blocks[0]['attributes']['url'] );
 		$first_block_type          = wp_unslash( $blocks[0]['type'] );
 
-		$this->assertEquals( count( $blocks ), 43, 'The demo post content api call should contain 43 blocks.' );
-		$this->assertEquals( 'https://cldup.com/GCwahb3aOb.jpg', $first_block_url_attribute, 'Block attributes should be returned correctly.' );
+		$this->assertEquals( count( $blocks ), 36, 'The demo post content api call should contain 36 blocks.' );
+		$this->assertEquals( 'https://cldup.com/Fz-ASbo2s3.jpg', $first_block_url_attribute, 'Block attributes should be returned correctly.' );
 		$this->assertEquals( 'core/cover-image', $first_block_type, 'Block type should be returned correctly.' );
 	}
 
