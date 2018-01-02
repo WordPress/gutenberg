@@ -8,24 +8,22 @@ import { __ } from '@wordpress/i18n';
  */
 import './editor.scss';
 import './style.scss';
-import { registerBlockType, source } from '../../api';
+import { registerBlockType } from '../../api';
 import TableBlock from './table-block';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
-import InspectorControls from '../../inspector-controls';
-import BlockDescription from '../../block-description';
-
-const { children } = source;
 
 registerBlockType( 'core/table', {
 	title: __( 'Table' ),
+	description: __( 'Tables. Best used for tabular data.' ),
 	icon: 'editor-table',
 	category: 'formatting',
 
 	attributes: {
 		content: {
 			type: 'array',
-			source: children( 'table' ),
+			source: 'children',
+			selector: 'table',
 			default: [
 				<tbody key="1">
 					<tr><td><br /></td><td><br /></td></tr>
@@ -58,13 +56,6 @@ registerBlockType( 'core/table', {
 		const { content } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		return [
-			focus && (
-				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'Tables. Best used for tabular data.' ) }</p>
-					</BlockDescription>
-				</InspectorControls>
-			),
 			focus && (
 				<BlockControls key="toolbar">
 					<BlockAlignmentToolbar

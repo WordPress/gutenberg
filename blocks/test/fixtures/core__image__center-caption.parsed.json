@@ -4,10 +4,11 @@
         "attrs": {
             "align": "center"
         },
-        "rawContent": "\n<figure class=\"wp-block-image\"><img src=\"https://cldup.com/YLYhpou2oq.jpg\" class=\"aligncenter\"/><figcaption>Give it a try. Press the &quot;really wide&quot; button on the image toolbar.</figcaption></figure>\n"
+        "innerBlocks": [],
+        "innerHTML": "\n<figure class=\"wp-block-image aligncenter\"><img src=\"https://cldup.com/YLYhpou2oq.jpg\"/><figcaption>Give it a try. Press the &quot;really wide&quot; button on the image toolbar.</figcaption></figure>\n"
     },
     {
         "attrs": {},
-        "rawContent": "\n"
+        "innerHTML": "\n"
     }
 ]

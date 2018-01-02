@@ -6,12 +6,12 @@ import { mapValues, reduce, forEach, noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from 'element';
+import { Component, getWrapperDisplayName } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import request from './request';
+import request, { getCachedResponse } from './request';
 import { getRoute } from './routes';
 
 export default ( mapPropsToData ) => ( WrappedComponent ) => {
@@ -61,6 +61,11 @@ export default ( mapPropsToData ) => ( WrappedComponent ) => {
 					prevDataProps.hasOwnProperty( propName ) &&
 					prevDataProps[ propName ].path === dataProp.path
 				) {
+					return;
+				}
+
+				// Skip request is already assigned via cache
+				if ( dataProp[ this.getResponseDataKey( 'GET' ) ] ) {
 					return;
 				}
 
@@ -161,15 +166,17 @@ export default ( mapPropsToData ) => ( WrappedComponent ) => {
 					return result;
 				}
 
+				result[ propName ] = {};
+
 				const route = getRoute( this.schema, path );
 				if ( ! route ) {
 					return result;
 				}
 
-				result[ propName ] = route.methods.reduce( ( stateValue, method ) => {
+				route.methods.forEach( ( method ) => {
 					// Add request initiater into data props
 					const requestKey = this.getRequestKey( method );
-					stateValue[ requestKey ] = this.request.bind(
+					result[ propName ][ requestKey ] = this.request.bind(
 						this,
 						propName,
 						method,
@@ -178,13 +185,18 @@ export default ( mapPropsToData ) => ( WrappedComponent ) => {
 
 					// Initialize pending flags as explicitly false
 					const pendingKey = this.getPendingKey( method );
-					stateValue[ pendingKey ] = false;
+					result[ propName ][ pendingKey ] = false;
+
+					// If cached data already exists, populate in result
+					const cachedResponse = getCachedResponse( { path, method } );
+					if ( cachedResponse ) {
+						const dataKey = this.getResponseDataKey( method );
+						result[ propName ][ dataKey ] = cachedResponse.body;
+					}
 
 					// Track path for future map skipping
-					stateValue.path = path;
-
-					return stateValue;
-				}, {} );
+					result[ propName ].path = path;
+				} );
 
 				return result;
 			}, {} );
@@ -201,9 +213,7 @@ export default ( mapPropsToData ) => ( WrappedComponent ) => {
 		}
 	}
 
-	// Derive display name from original component
-	const { displayName = WrappedComponent.name || 'Component' } = WrappedComponent;
-	APIDataComponent.displayName = `apiData(${ displayName })`;
+	APIDataComponent.displayName = getWrapperDisplayName( WrappedComponent, 'apiData' );
 
 	APIDataComponent.contextTypes = {
 		getAPISchema: noop,

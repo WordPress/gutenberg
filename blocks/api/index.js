@@ -1,13 +1,13 @@
-/**
- * External dependencies
- */
-import * as source from './source';
-
-export { source };
-export { createBlock, switchToBlockType } from './factory';
-export { default as parse } from './parser';
-export { default as pasteHandler } from './paste';
-export { default as serialize, getBlockDefaultClassname } from './serializer';
+export { createBlock, getPossibleBlockTransformations, switchToBlockType, createReusableBlock } from './factory';
+export { default as parse, getBlockAttributes } from './parser';
+export { default as rawHandler } from './raw-handling';
+export {
+	default as serialize,
+	getBlockContent,
+	getBlockDefaultClassname,
+	getSaveElement,
+} from './serializer';
+export { isValidBlock } from './validation';
 export { getCategories } from './categories';
 export {
 	registerBlockType,
@@ -18,4 +18,7 @@ export {
 	getDefaultBlockName,
 	getBlockType,
 	getBlockTypes,
+	hasBlockSupport,
+	isReusableBlock,
 } from './registration';
+

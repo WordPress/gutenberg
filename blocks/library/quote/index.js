@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { isString, isObject } from 'lodash';
+import { isString, get } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -13,38 +14,50 @@ import { Toolbar } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, createBlock, source } from '../../api';
+import './editor.scss';
+import { registerBlockType, createBlock } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
 import Editable from '../../editable';
-import InspectorControls from '../../inspector-controls';
-import BlockDescription from '../../block-description';
 
-const { children, node: element, query } = source;
+const toEditableValue = value => value.map( ( subValue => subValue.children ) );
+const fromEditableValue = value => value.map( ( subValue ) => ( {
+	children: subValue,
+} ) );
+
+const blockAttributes = {
+	value: {
+		type: 'array',
+		source: 'query',
+		selector: 'blockquote > p',
+		query: {
+			children: {
+				source: 'node',
+			},
+		},
+		default: [],
+	},
+	citation: {
+		type: 'array',
+		source: 'children',
+		selector: 'cite',
+	},
+	align: {
+		type: 'string',
+	},
+	style: {
+		type: 'number',
+		default: 1,
+	},
+};
 
 registerBlockType( 'core/quote', {
 	title: __( 'Quote' ),
+	description: __( 'Quote. In quoting others, we cite ourselves. (Julio Cortázar)' ),
 	icon: 'format-quote',
 	category: 'common',
 
-	attributes: {
-		value: {
-			type: 'array',
-			source: query( 'blockquote > p', element() ),
-			default: [],
-		},
-		citation: {
-			type: 'array',
-			source: children( 'footer' ),
-		},
-		align: {
-			type: 'string',
-		},
-		style: {
-			type: 'number',
-			default: 1,
-		},
-	},
+	attributes: blockAttributes,
 
 	transforms: {
 		from: [
@@ -54,7 +67,7 @@ registerBlockType( 'core/quote', {
 				transform: ( { content } ) => {
 					return createBlock( 'core/quote', {
 						value: [
-							<p key="1">{ content }</p>,
+							{ children: <p key="1">{ content }</p> },
 						],
 					} );
 				},
@@ -65,7 +78,7 @@ registerBlockType( 'core/quote', {
 				transform: ( { content } ) => {
 					return createBlock( 'core/quote', {
 						value: [
-							<p key="1">{ content }</p>,
+							{ children: <p key="1">{ content }</p> },
 						],
 					} );
 				},
@@ -76,7 +89,7 @@ registerBlockType( 'core/quote', {
 				transform: ( { content } ) => {
 					return createBlock( 'core/quote', {
 						value: [
-							<p key="1">{ content }</p>,
+							{ children: <p key="1">{ content }</p> },
 						],
 					} );
 				},
@@ -90,63 +103,58 @@ registerBlockType( 'core/quote', {
 			{
 				type: 'block',
 				blocks: [ 'core/paragraph' ],
-				transform: ( { value, citation, ...attrs } ) => {
-					const textElement = value[ 0 ];
-					if ( ! textElement ) {
-						return createBlock( 'core/paragraph', {
-							content: citation,
-						} );
+				transform: ( { value, citation } ) => {
+					// transforming an empty quote
+					if ( ( ! value || ! value.length ) && ! citation ) {
+						return createBlock( 'core/paragraph' );
 					}
-					const textContent = isString( textElement ) ? textElement : textElement.props.children;
-					if ( Array.isArray( value ) || citation ) {
-						const text = createBlock( 'core/paragraph', {
-							content: textContent,
-						} );
-						const quote = createBlock( 'core/quote', {
-							...attrs,
-							citation,
-							value: Array.isArray( value ) ? value.slice( 1 ) : '',
-						} );
-
-						return [ text, quote ];
-					}
-					return createBlock( 'core/paragraph', {
-						content: textContent,
-					} );
+					// transforming a quote with content
+					return ( value || [] ).map( item => createBlock( 'core/paragraph', {
+						content: [ get( item, 'children.props.children', '' ) ],
+					} ) ).concat( citation ? createBlock( 'core/paragraph', {
+						content: citation,
+					} ) : [] );
 				},
 			},
 			{
 				type: 'block',
 				blocks: [ 'core/heading' ],
 				transform: ( { value, citation, ...attrs } ) => {
-					const isMultiParagraph = Array.isArray( value ) && isObject( value[ 0 ] ) && value[ 0 ].type === 'p';
-					const headingElement = isMultiParagraph ? value[ 0 ] : value;
-					const headingContent = isObject( headingElement ) && value[ 0 ].type === 'p'
-						? headingElement.props.children
-						: headingElement;
-					if ( isMultiParagraph || citation ) {
-						const heading = createBlock( 'core/heading', {
-							content: headingContent,
+					const textElement = value[ 0 ];
+					if ( ! textElement ) {
+						return createBlock( 'core/heading', {
+							content: citation,
+						} );
+					}
+					const textContent = isString( textElement.children ) ?
+						textElement.children :
+						textElement.children.props.children;
+					if ( Array.isArray( value ) || citation ) {
+						const text = createBlock( 'core/heading', {
+							content: textContent,
 						} );
 						const quote = createBlock( 'core/quote', {
 							...attrs,
 							citation,
-							value: Array.isArray( value ) ? value.slice( 1 ) : '',
+							value: Array.isArray( value ) ?
+								value.slice( 1 ) :
+								[],
 						} );
 
-						return [ heading, quote ];
+						return [ text, quote ];
 					}
 					return createBlock( 'core/heading', {
-						content: headingContent,
+						content: textContent,
 					} );
 				},
 			},
 		],
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, className } ) {
+	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, onReplace, className } ) {
 		const { align, value, citation, style } = attributes;
 		const focusedEditable = focus ? focus.editable || 'value' : null;
+		const containerClassname = classnames( className, style === 2 ? 'is-large' : '' );
 
 		return [
 			focus && (
@@ -167,34 +175,33 @@ registerBlockType( 'core/quote', {
 					/>
 				</BlockControls>
 			),
-			focus && (
-				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'Quote. In quoting others, we cite ourselves. (Julio Cortázar)' ) }</p>
-					</BlockDescription>
-				</InspectorControls>
-			),
 			<blockquote
 				key="quote"
-				className={ `${ className } blocks-quote-style-${ style }` }
+				className={ containerClassname }
 			>
 				<Editable
 					multiline="p"
-					value={ value }
+					value={ toEditableValue( value ) }
 					onChange={
 						( nextValue ) => setAttributes( {
-							value: nextValue,
+							value: fromEditableValue( nextValue ),
 						} )
 					}
 					focus={ focusedEditable === 'value' ? focus : null }
 					onFocus={ ( props ) => setFocus( { ...props, editable: 'value' } ) }
 					onMerge={ mergeBlocks }
+					onRemove={ ( forward ) => {
+						const hasEmptyCitation = ! citation || citation.length === 0;
+						if ( ! forward && hasEmptyCitation ) {
+							onReplace( [] );
+						}
+					} }
 					style={ { textAlign: align } }
 					placeholder={ __( 'Write quote…' ) }
 				/>
 				{ ( ( citation && citation.length > 0 ) || !! focus ) && (
 					<Editable
-						tagName="footer"
+						tagName="cite"
 						value={ citation }
 						placeholder={ __( 'Write citation…' ) }
 						onChange={
@@ -204,6 +211,11 @@ registerBlockType( 'core/quote', {
 						}
 						focus={ focusedEditable === 'citation' ? focus : null }
 						onFocus={ ( props ) => setFocus( { ...props, editable: 'citation' } ) }
+						onRemove={ ( forward ) => {
+							if ( ! forward ) {
+								setFocus( { ...focus, editable: 'value' } );
+							}
+						} }
 					/>
 				) }
 			</blockquote>,
@@ -215,16 +227,47 @@ registerBlockType( 'core/quote', {
 
 		return (
 			<blockquote
-				className={ `blocks-quote-style-${ style }` }
+				className={ style === 2 ? 'is-large' : '' }
 				style={ { textAlign: align ? align : null } }
 			>
 				{ value.map( ( paragraph, i ) => (
-					<p key={ i }>{ paragraph.props.children }</p>
+					<p key={ i }>{ paragraph.children && paragraph.children.props.children }</p>
 				) ) }
 				{ citation && citation.length > 0 && (
-					<footer>{ citation }</footer>
+					<cite>{ citation }</cite>
 				) }
 			</blockquote>
 		);
 	},
+
+	deprecated: [
+		{
+			attributes: {
+				...blockAttributes,
+				citation: {
+					type: 'array',
+					source: 'children',
+					selector: 'footer',
+				},
+			},
+
+			save( { attributes } ) {
+				const { align, value, citation, style } = attributes;
+
+				return (
+					<blockquote
+						className={ `blocks-quote-style-${ style }` }
+						style={ { textAlign: align ? align : null } }
+					>
+						{ value.map( ( paragraph, i ) => (
+							<p key={ i }>{ paragraph.children && paragraph.children.props.children }</p>
+						) ) }
+						{ citation && citation.length > 0 && (
+							<footer>{ citation }</footer>
+						) }
+					</blockquote>
+				);
+			},
+		},
+	],
 } );

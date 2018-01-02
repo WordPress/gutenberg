@@ -17,10 +17,10 @@ class SuggestionsList extends Component {
 		this.bindList = this.bindList.bind( this );
 	}
 
-	componentDidUpdate( prevProps ) {
+	componentDidUpdate() {
 		// only have to worry about scrolling selected suggestion into view
 		// when already expanded
-		if ( prevProps.isExpanded && this.props.isExpanded && this.props.selectedIndex > -1 && this.props.scrollIntoView ) {
+		if ( this.props.selectedIndex > -1 && this.props.scrollIntoView ) {
 			this.scrollingIntoView = true;
 			scrollIntoView( this.list.children[ this.props.selectedIndex ], this.list, {
 				onlyScrollIfNeeded: true,
@@ -72,10 +72,6 @@ class SuggestionsList extends Component {
 	}
 
 	render() {
-		const classes = classnames( 'components-form-token-field__suggestions-list', {
-			'is-expanded': this.props.isExpanded && this.props.suggestions.length > 0,
-		} );
-
 		// We set `tabIndex` here because otherwise Firefox sets focus on this
 		// div when tabbing off of the input in `TokenField` -- not really sure
 		// why, since usually a div isn't focusable by default
@@ -83,8 +79,7 @@ class SuggestionsList extends Component {
 		return (
 			<ul
 				ref={ this.bindList }
-				className={ classes }
-				tabIndex="-1"
+				className="components-form-token-field__suggestions-list"
 				id={ `components-form-token-suggestions-${ this.props.instanceId }` }
 				role="listbox"
 			>
@@ -100,7 +95,6 @@ class SuggestionsList extends Component {
 							<li
 								id={ `components-form-token-suggestions-${ this.props.instanceId }-${ index }` }
 								role="option"
-								tabIndex="-1"
 								className={ classeName }
 								key={ suggestion }
 								onMouseDown={ this.handleMouseDown }
@@ -108,8 +102,8 @@ class SuggestionsList extends Component {
 								onMouseEnter={ this.handleHover( suggestion ) }
 								aria-selected={ index === this.props.selectedIndex }
 							>
-								{ match
-									? (
+								{ match ?
+									(
 										<span aria-label={ this.props.displayTransform( suggestion ) }>
 											{ match.suggestionBeforeMatch }
 											<strong className="components-form-token-field__suggestion-match">
@@ -117,8 +111,8 @@ class SuggestionsList extends Component {
 											</strong>
 											{ match.suggestionAfterMatch }
 										</span>
-									)
-									: this.props.displayTransform( suggestion )
+									) :
+									this.props.displayTransform( suggestion )
 								}
 							</li>
 						);
@@ -131,7 +125,6 @@ class SuggestionsList extends Component {
 }
 
 SuggestionsList.defaultProps = {
-	isExpanded: false,
 	match: '',
 	onHover: () => {},
 	onSelect: () => {},

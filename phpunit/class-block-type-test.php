@@ -32,7 +32,7 @@ class Block_Type_Test extends WP_UnitTestCase {
 		$block_type = new WP_Block_Type( 'core/dummy', array(
 			'render_callback' => array( $this, 'render_dummy_block' ),
 		) );
-		$output = $block_type->render( $attributes );
+		$output     = $block_type->render( $attributes );
 		$this->assertEquals( $attributes, json_decode( $output, true ) );
 	}
 
@@ -41,12 +41,12 @@ class Block_Type_Test extends WP_UnitTestCase {
 			'foo' => 'bar',
 			'bar' => 'foo',
 		);
-		$content = '<p>Test content.</p>';
+		$content    = '<p>Test content.</p>';
 
-		$block_type = new WP_Block_Type( 'core/dummy', array(
+		$block_type             = new WP_Block_Type( 'core/dummy', array(
 			'render_callback' => array( $this, 'render_dummy_block_with_content' ),
 		) );
-		$output = $block_type->render( $attributes, $content );
+		$output                 = $block_type->render( $attributes, $content );
 		$attributes['_content'] = $content;
 		$this->assertSame( $attributes, json_decode( $output, true ) );
 	}
@@ -56,10 +56,10 @@ class Block_Type_Test extends WP_UnitTestCase {
 			'foo' => 'bar',
 			'bar' => 'foo',
 		);
-		$content = '<p>Test content.</p>';
+		$content    = '<p>Test content.</p>';
 
 		$block_type = new WP_Block_Type( 'core/dummy' );
-		$output = $block_type->render( $attributes, $content );
+		$output     = $block_type->render( $attributes, $content );
 		$this->assertSame( $content, $output );
 	}
 
@@ -74,17 +74,17 @@ class Block_Type_Test extends WP_UnitTestCase {
 
 		$block_type = new WP_Block_Type( 'core/dummy', array(
 			'attributes' => array(
-				'correct' => array(
+				'correct'            => array(
 					'type' => 'string',
 				),
-				'wrongType' => array(
+				'wrongType'          => array(
 					'type' => 'string',
 				),
 				'wrongTypeDefaulted' => array(
 					'type'    => 'string',
 					'default' => 'defaulted',
 				),
-				'missingDefaulted' => array(
+				'missingDefaulted'   => array(
 					'type'    => 'string',
 					'default' => 'define',
 				),

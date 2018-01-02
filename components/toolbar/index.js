@@ -24,11 +24,11 @@ function Toolbar( { controls = [], children, className } ) {
 	}
 
 	return (
-		<ul className={ classnames( 'components-toolbar', className ) }>
+		<div className={ classnames( 'components-toolbar', className ) }>
 			{ controlSets.reduce( ( result, controlSet, setIndex ) => [
 				...result,
 				...controlSet.map( ( control, controlIndex ) => (
-					<li
+					<div
 						key={ [ setIndex, controlIndex ].join() }
 						className={ setIndex > 0 && controlIndex === 0 ? 'has-left-divider' : null }
 					>
@@ -47,11 +47,11 @@ function Toolbar( { controls = [], children, className } ) {
 							disabled={ control.isDisabled }
 						/>
 						{ control.children }
-					</li>
+					</div>
 				) ),
 			], [] ) }
 			{ children }
-		</ul>
+		</div>
 	);
 }
 

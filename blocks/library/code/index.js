@@ -12,14 +12,12 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './editor.scss';
-import { registerBlockType, source, createBlock } from '../../api';
-import InspectorControls from '../../inspector-controls';
-import BlockDescription from '../../block-description';
-
-const { prop } = source;
+import { registerBlockType, createBlock } from '../../api';
 
 registerBlockType( 'core/code', {
 	title: __( 'Code' ),
+
+	description: __( 'The code block maintains spaces and tabs, great for showing code snippets.' ),
 
 	icon: 'editor-code',
 
@@ -28,8 +26,14 @@ registerBlockType( 'core/code', {
 	attributes: {
 		content: {
 			type: 'string',
-			source: prop( 'code', 'textContent' ),
+			source: 'property',
+			selector: 'code',
+			property: 'textContent',
 		},
+	},
+
+	supports: {
+		html: false,
 	},
 
 	transforms: {
@@ -51,23 +55,17 @@ registerBlockType( 'core/code', {
 		],
 	},
 
-	edit( { attributes, setAttributes, focus, className } ) {
-		return [
-			focus && (
-				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'The code block maintains spaces and tabs, great for showing code snippets.' ) }</p>
-					</BlockDescription>
-				</InspectorControls>
-			),
-			<TextareaAutosize
-				key="block"
-				className={ className }
-				value={ attributes.content }
-				onChange={ ( event ) => setAttributes( { content: event.target.value } ) }
-				placeholder={ __( 'Write code…' ) }
-			/>,
-		];
+	edit( { attributes, setAttributes, className } ) {
+		return (
+			<div className={ className }>
+				<TextareaAutosize
+					value={ attributes.content }
+					onChange={ ( event ) => setAttributes( { content: event.target.value } ) }
+					placeholder={ __( 'Write code…' ) }
+					aria-label={ __( 'Code' ) }
+				/>
+			</div>
+		);
 	},
 
 	save( { attributes } ) {

@@ -122,7 +122,7 @@ Selected state:
 
 Advanced block options:
 
-- Has description: "Text. Great things start here."
+- Has description: "This is a simple text only block for inserting a single paragraph of content."
 - Has option to enable or disable a drop-cap. Note that the drop-cap is only visible in the blocks unselected (preview) state.
 
 _Because the drop-cap feature is not critical to the basic operation of the block, it's in the advanced sidebar, thus keeping the Quick Toolbar light-weight._
@@ -189,7 +189,7 @@ _Note: this block doesn't exist in Gutenberg currently, but the above describes 
 
 ## Future Opportunities
 
-Gutenberg as part of the kickoff coal is primarily limited to the confines of the _content area_ (specifically `post_content`) of posts and pages. Within those confines, we are embracing the web as a vertical river of content, by appending blocks sequentially, then adding layout options to each block.
+Gutenberg as part of the kickoff goal is primarily limited to the confines of the _content area_ (specifically `post_content`) of posts and pages. Within those confines, we are embracing the web as a vertical river of content, by appending blocks sequentially, then adding layout options to each block.
 
 But just like how the verticality of the web itself doesn't prevent more advanced layouts from being possible, similarly there isn't any fixed limit to the kind of layout Gutenberg will be able to accomplish. As such, it's very possible for Gutenberg to grow beyond the confines of post and page _content_, to include the whole page, including everything that surrounds the content.
 
@@ -218,4 +218,6 @@ This concept is speculative, but it's one direction Gutenberg could go in the fu
 
 If you'd like to contribute, you can download a Sketch file of the Gutenberg mockups. Note that those are still mockups, and not 1:1 accurate: **<a href="https://cloudup.com/ccnN8GCsXwC">Download Sketch file</a>**.
 
-Be sure to also read <a href="https://github.com/WordPress/gutenberg/blob/master/docs/faq.md">the FAQ</a>, and <a href="http://gutenberg-devdoc.surge.sh/">how to build blocks</a>.
+A pattern file is here:  **<a href="https://cloudup.com/c0Q8RQDHByq">Download Pattern Sketch file</a>**
+
+Be sure to also read <a href="https://wordpress.org/gutenberg/handbook/reference/faq/">the FAQ</a>, and <a href="https://wordpress.org/gutenberg/handbook/">how to build blocks</a>.

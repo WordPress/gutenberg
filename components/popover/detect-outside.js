@@ -2,17 +2,11 @@
  * External dependencies
  */
 import clickOutside from 'react-click-outside';
-import { flowRight } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import withFocusReturn from '../higher-order/with-focus-return';
 
 class PopoverDetectOutside extends Component {
 	handleClickOutside( event ) {
@@ -27,7 +21,4 @@ class PopoverDetectOutside extends Component {
 	}
 }
 
-export default flowRight( [
-	withFocusReturn,
-	clickOutside,
-] )( PopoverDetectOutside );
+export default clickOutside( PopoverDetectOutside );

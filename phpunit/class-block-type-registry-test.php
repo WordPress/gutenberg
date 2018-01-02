@@ -60,6 +60,16 @@ class Block_Type_Registry_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Should reject blocks with uppercase characters
+	 *
+	 * @expectedIncorrectUsage WP_Block_Type_Registry::register
+	 */
+	function test_uppercase_characters() {
+		$result = $this->registry->register( 'Core/Paragraph', array() );
+		$this->assertFalse( $result );
+	}
+
+	/**
 	 * Should accept valid block names
 	 */
 	function test_register_block_type() {
@@ -128,7 +138,7 @@ class Block_Type_Registry_Test extends WP_UnitTestCase {
 	}
 
 	function test_get_all_registered() {
-		$names = array( 'core/paragraph', 'core/image', 'core/blockquote' );
+		$names    = array( 'core/paragraph', 'core/image', 'core/blockquote' );
 		$settings = array(
 			'icon' => 'random',
 		);

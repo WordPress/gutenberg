@@ -89,7 +89,7 @@ function normalizeParsedBlocks( blocks ) {
 
 describe( 'full post content fixture', () => {
 	beforeAll( () => {
-		window._wpBlocksAttributes = require( './server-attributes.json' );
+		window._wpBlocks = require( './server-registered.json' );
 
 		// Register all blocks.
 		require( 'blocks' );

@@ -8,6 +8,11 @@ import { get, isFunction, some } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { applyFilters } from '@wordpress/hooks';
+
+/**
+ * Internal dependencies
+ */
 import { getCategories } from './categories';
 
 /**
@@ -44,15 +49,21 @@ let defaultBlockName;
  *                             registered; otherwise `undefined`.
  */
 export function registerBlockType( name, settings ) {
+	settings = {
+		name,
+		...get( window._wpBlocks, name ),
+		...settings,
+	};
+
 	if ( typeof name !== 'string' ) {
 		console.error(
 			'Block names must be strings.'
 		);
 		return;
 	}
-	if ( ! /^[a-z0-9-]+\/[a-z0-9-]+$/.test( name ) ) {
+	if ( ! /^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/.test( name ) ) {
 		console.error(
-			'Block names must contain a namespace prefix. Example: my-plugin/my-custom-block'
+			'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block'
 		);
 		return;
 	}
@@ -104,13 +115,13 @@ export function registerBlockType( name, settings ) {
 		);
 		return;
 	}
-	const block = blocks[ name ] = {
-		name,
-		attributes: get( window._wpBlocksAttributes, name ),
-		...settings,
-	};
+	if ( ! settings.icon ) {
+		settings.icon = 'block-default';
+	}
 
-	return block;
+	settings = applyFilters( 'blocks.registerBlockType', settings, name );
+
+	return blocks[ name ] = settings;
 }
 
 /**
@@ -186,4 +197,36 @@ export function getBlockType( name ) {
  */
 export function getBlockTypes() {
 	return Object.values( blocks );
+}
+
+/**
+ * Returns true if the block defines support for a feature, or false otherwise
+ *
+ * @param  {(String|Object)} nameOrType      Block name or type object
+ * @param  {String}          feature         Feature to test
+ * @param  {Boolean}         defaultSupports Whether feature is supported by
+ *                                           default if not explicitly defined
+ * @return {Boolean}                         Whether block supports feature
+ */
+export function hasBlockSupport( nameOrType, feature, defaultSupports ) {
+	const blockType = 'string' === typeof nameOrType ?
+		getBlockType( nameOrType ) :
+		nameOrType;
+
+	return !! get( blockType, [
+		'supports',
+		feature,
+	], defaultSupports );
+}
+
+/**
+ * Determines whether or not the given block is a reusable block. This is a
+ * special block type that is used to point to a global block stored via the
+ * API.
+ *
+ * @param {Object} blockOrType Block or Block Type to test
+ * @return {Boolean}           Whether the given block is a reusable block
+ */
+export function isReusableBlock( blockOrType ) {
+	return blockOrType.name === 'core/block';
 }

@@ -1,15 +1,30 @@
 /**
  * Internal dependencies
  */
-import { createElement, renderToString, concatChildren, switchChildrenNodeName } from '../';
+import {
+	Component,
+	createElement,
+	concatChildren,
+	renderToString,
+	switchChildrenNodeName,
+	getWrapperDisplayName,
+} from '../';
 
 describe( 'element', () => {
 	describe( 'renderToString', () => {
-		it( 'should return an empty string for a falsey value', () => {
+		it( 'should return an empty string for booleans/null/undefined values', () => {
 			expect( renderToString() ).toBe( '' );
 			expect( renderToString( false ) ).toBe( '' );
+			expect( renderToString( true ) ).toBe( '' );
 			expect( renderToString( null ) ).toBe( '' );
-			expect( renderToString( 0 ) ).toBe( '' );
+		} );
+
+		it( 'should return a string 0', () => {
+			expect( renderToString( 0 ) ).toBe( '0' );
+		} );
+
+		it( 'should return a string 12345', () => {
+			expect( renderToString( 12345 ) ).toBe( '12345' );
 		} );
 
 		it( 'should return a string verbatim', () => {
@@ -45,7 +60,7 @@ describe( 'element', () => {
 				[ createElement( 'strong', {}, 'Courgette' ) ],
 				createElement( 'strong', {}, 'Concombre' )
 			);
-			expect( concat.length ).toBe( 2 );
+			expect( concat ).toHaveLength( 2 );
 			expect( concat[ 0 ].key ).toBe( '0,0' );
 			expect( concat[ 1 ].key ).toBe( '1,0' );
 		} );
@@ -58,7 +73,7 @@ describe( 'element', () => {
 
 		it( 'should switch strings', () => {
 			const children = switchChildrenNodeName( [ 'a', 'b' ], 'strong' );
-			expect( children.length ).toBe( 2 );
+			expect( children ).toHaveLength( 2 );
 			expect( children[ 0 ].type ).toBe( 'strong' );
 			expect( children[ 0 ].props.children ).toBe( 'a' );
 			expect( children[ 1 ].type ).toBe( 'strong' );
@@ -70,12 +85,51 @@ describe( 'element', () => {
 				createElement( 'strong', { align: 'left' }, 'Courgette' ),
 				createElement( 'strong', {}, 'Concombre' ),
 			], 'em' );
-			expect( children.length ).toBe( 2 );
+			expect( children ).toHaveLength( 2 );
 			expect( children[ 0 ].type ).toBe( 'em' );
 			expect( children[ 0 ].props.children ).toBe( 'Courgette' );
 			expect( children[ 0 ].props.align ).toBe( 'left' );
 			expect( children[ 1 ].type ).toBe( 'em' );
 			expect( children[ 1 ].props.children ).toBe( 'Concombre' );
+		} );
+	} );
+
+	describe( 'getWrapperDisplayName()', () => {
+		it( 'should use default name for anonymous function', () => {
+			expect( getWrapperDisplayName( () => <div />, 'test' ) ).toBe( 'Test(Component)' );
+		} );
+
+		it( 'should use camel case starting with upper for wrapper prefix ', () => {
+			expect( getWrapperDisplayName( () => <div />, 'one-two_threeFOUR' ) ).toBe( 'OneTwoThreeFour(Component)' );
+		} );
+
+		it( 'should use function name', () => {
+			function SomeComponent() {
+				return <div />;
+			}
+
+			expect( getWrapperDisplayName( SomeComponent, 'test' ) ).toBe( 'Test(SomeComponent)' );
+		} );
+
+		it( 'should use component class name', () => {
+			class SomeComponent extends Component {
+				render() {
+					return <div />;
+				}
+			}
+
+			expect( getWrapperDisplayName( SomeComponent, 'test' ) ).toBe( 'Test(SomeComponent)' );
+		} );
+
+		it( 'should use displayName property', () => {
+			class SomeComponent extends Component {
+				render() {
+					return <div />;
+				}
+			}
+			SomeComponent.displayName = 'CustomDisplayName';
+
+			expect( getWrapperDisplayName( SomeComponent, 'test' ) ).toBe( 'Test(CustomDisplayName)' );
 		} );
 	} );
 } );

@@ -36,108 +36,18 @@ class Admin_Test extends WP_UnitTestCase {
 	 */
 	public static function setUpBeforeClass() {
 
-		self::$editor_user_id = self::factory()->user->create( array(
+		self::$editor_user_id      = self::factory()->user->create( array(
 			'role' => 'editor',
 		) );
-		self::$post_with_blocks = self::factory()->post->create( array(
-			'post_title' => 'Example',
+		self::$post_with_blocks    = self::factory()->post->create( array(
+			'post_title'   => 'Example',
 			'post_content' => "<!-- wp:core/text {\"dropCap\":true} -->\n<p class=\"has-drop-cap\">Tester</p>\n<!-- /wp:core/text -->",
 		) );
 		self::$post_without_blocks = self::factory()->post->create( array(
-			'post_title' => 'Example',
+			'post_title'   => 'Example',
 			'post_content' => 'Tester',
 		) );
 		return parent::setUpBeforeClass();
-	}
-
-	/**
-	 * Tests gutenberg_add_admin_bar_edit_link().
-	 *
-	 * @covers gutenberg_add_admin_bar_edit_link
-	 */
-	function test_gutenberg_add_admin_bar_edit_link() {
-		$this->markTestIncomplete();
-	}
-
-	/**
-	 * Tests gutenberg_add_edit_links().
-	 *
-	 * @covers gutenberg_add_edit_links
-	 * @covers gutenberg_add_edit_links_filters
-	 */
-	function test_gutenberg_add_edit_links() {
-		gutenberg_add_edit_links_filters();
-
-		$original_actions = array(
-			'edit' => 'original',
-		);
-
-		$actions = apply_filters( 'post_row_actions', $original_actions, get_post( self::$post_with_blocks ) );
-		$this->assertEquals( $original_actions, $actions, 'User not logged-in so no ability to edit.' );
-
-		wp_set_current_user( self::$editor_user_id );
-
-		$actions = apply_filters( 'post_row_actions', $original_actions, get_post( self::$post_with_blocks ) );
-		$this->assertArrayHasKey( 'gutenberg hide-if-no-js', $actions );
-		$this->assertArrayHasKey( 'classic hide-if-no-js', $actions );
-		$this->assertContains( 'post.php', $actions['classic hide-if-no-js'] );
-
-		$actions = apply_filters( 'post_row_actions', $original_actions, get_post( self::$post_without_blocks ) );
-		$this->assertArrayHasKey( 'gutenberg hide-if-no-js', $actions );
-		$this->assertArrayHasKey( 'classic hide-if-no-js', $actions );
-		$this->assertContains( 'post.php', $actions['classic hide-if-no-js'] );
-
-		$trashed_post = $this->factory()->post->create( array(
-			'post_status' => 'trash',
-		) );
-		$actions = apply_filters( 'post_row_actions', $original_actions, get_post( $trashed_post ) );
-		$this->assertArrayNotHasKey( 'gutenberg hide-if-no-js', $actions );
-		$this->assertArrayNotHasKey( 'classic hide-if-no-js', $actions );
-
-		register_post_type( 'not_shown_in_rest', array(
-			'supports' => array( 'title', 'editor' ),
-			'show_in_rest' => false,
-		) );
-		$post_id = $this->factory()->post->create( array(
-			'post_type' => 'not_shown_in_rest',
-		) );
-		$actions = apply_filters( 'post_row_actions', $original_actions, get_post( $post_id ) );
-		$this->assertArrayNotHasKey( 'gutenberg hide-if-no-js', $actions );
-		$this->assertArrayNotHasKey( 'classic hide-if-no-js', $actions );
-
-		register_post_type( 'not_supports_editor', array(
-			'show_in_rest' => true,
-			'supports' => array( 'title' ),
-		) );
-		$post_id = $this->factory()->post->create( array(
-			'post_type' => 'not_supports_editor',
-		) );
-		$actions = apply_filters( 'post_row_actions', $original_actions, get_post( $post_id ) );
-		$this->assertArrayNotHasKey( 'gutenberg hide-if-no-js', $actions );
-		$this->assertArrayNotHasKey( 'classic hide-if-no-js', $actions );
-
-	}
-
-	/**
-	 * Tests gutenberg_get_edit_post_url().
-	 *
-	 * @covers gutenberg_get_edit_post_url
-	 */
-	function test_gutenberg_get_edit_post_url() {
-		$url = gutenberg_get_edit_post_url( self::$post_with_blocks );
-		$this->assertContains( 'page=gutenberg', $url );
-		$this->assertContains( 'post_id=' . self::$post_with_blocks, $url );
-	}
-
-	/**
-	 * Tests gutenberg_filter_edit_post_link().
-	 *
-	 * @covers gutenberg_filter_edit_post_link
-	 */
-	function test_gutenberg_filter_edit_post_link() {
-		wp_set_current_user( self::$editor_user_id );
-		$this->assertContains( 'gutenberg', get_edit_post_link( self::$post_with_blocks ) );
-		$this->assertNotContains( 'gutenberg', get_edit_post_link( self::$post_without_blocks ) );
 	}
 
 	/**
@@ -180,6 +90,19 @@ class Admin_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests gutenberg_content_has_blocks().
+	 *
+	 * @covers gutenberg_content_has_blocks
+	 */
+	function test_gutenberg_content_has_blocks() {
+		$content_with_blocks    = get_post_field( 'post_content', self::$post_with_blocks );
+		$content_without_blocks = get_post_field( 'post_content', self::$post_without_blocks );
+
+		$this->assertTrue( gutenberg_content_has_blocks( $content_with_blocks ) );
+		$this->assertFalse( gutenberg_content_has_blocks( $content_without_blocks ) );
+	}
+
+	/**
 	 * Tests gutenberg_add_gutenberg_post_state().
 	 *
 	 * @covers gutenberg_add_gutenberg_post_state
@@ -192,5 +115,42 @@ class Admin_Test extends WP_UnitTestCase {
 		// Without blocks.
 		$post_states = apply_filters( 'display_post_states', array(), get_post( self::$post_without_blocks ) );
 		$this->assertEquals( array(), $post_states );
+	}
+
+	/**
+	 * Test that the revisions 'return to editor' links are set correctly for Classic & Gutenberg editors.
+	 *
+	 * @covers gutenberg_revisions_link_to_editor
+	 */
+	function test_gutenberg_revisions_link_to_editor() {
+		global $pagenow;
+
+		// Set up $pagenow so the filter will work.
+		$pagenow = 'revision.php';
+
+		// Test the filter when Gutenberg is the active editor.
+		$_REQUEST['gutenberg'] = '1';
+		$link                  = apply_filters( 'get_edit_post_link', 'http://test.com' );
+		$this->assertEquals( 'http://test.com', $link );
+
+		// Test the filter when Gutenberg is not the active editor.
+		unset( $_REQUEST['gutenberg'] );
+		$link = apply_filters( 'get_edit_post_link', 'http://test.com' );
+		$this->assertEquals( 'http://test.com?classic-editor', $link );
+	}
+
+	/**
+	 * Test that the revisions 'restore this revision' button links correctly for Classic & Gutenberg editors.
+	 */
+	function test_gutenberg_revisions_restore() {
+		// Test the filter when Gutenberg is the active editor.
+		$_REQUEST['gutenberg'] = '1';
+		$link                  = apply_filters( 'wp_prepare_revision_for_js', array( 'restoreUrl' => 'http://test.com' ) );
+		$this->assertEquals( array( 'restoreUrl' => 'http://test.com?gutenberg=1' ), $link );
+
+		// Test the filter when Gutenberg is not the active editor.
+		unset( $_REQUEST['gutenberg'] );
+		$link = apply_filters( 'wp_prepare_revision_for_js', array( 'restoreUrl' => 'http://test.com' ) );
+		$this->assertEquals( array( 'restoreUrl' => 'http://test.com' ), $link );
 	}
 }

@@ -131,10 +131,123 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_ensure_wp_api_request', 20 );
  * @return array           Filtered settings.
  */
 function gutenberg_disable_editor_settings_wpautop( $settings ) {
-	if ( ! isset( $settings['wpautop'] ) ) {
-		$settings['wpautop'] = ! gutenberg_post_has_blocks( get_post()->ID );
+	$post = get_post();
+	if ( is_object( $post ) && gutenberg_post_has_blocks( $post ) ) {
+		$settings['wpautop'] = false;
 	}
 
 	return $settings;
 }
 add_filter( 'wp_editor_settings', 'gutenberg_disable_editor_settings_wpautop' );
+
+/**
+ * Add rest nonce to the heartbeat response.
+ *
+ * @param  array $response Original heartbeat response.
+ * @return array           New heartbeat response.
+ */
+function gutenberg_add_rest_nonce_to_heartbeat_response_headers( $response ) {
+	$response['rest-nonce'] = wp_create_nonce( 'wp_rest' );
+	return $response;
+}
+
+add_filter( 'wp_refresh_nonces', 'gutenberg_add_rest_nonce_to_heartbeat_response_headers' );
+
+/**
+ * Ensure that the wp-json index contains the `permalink_structure` setting as
+ * part of its site info elements.
+ *
+ * @see https://core.trac.wordpress.org/ticket/42465
+ *
+ * @param WP_REST_Response $response WP REST API response of the wp-json index.
+ * @return WP_REST_Response Response that contains the permalink structure.
+ */
+function gutenberg_ensure_wp_json_has_permalink_structure( $response ) {
+	$site_info = $response->get_data();
+
+	if ( ! array_key_exists( 'permalink_structure', $site_info ) ) {
+		$site_info['permalink_structure'] = get_option( 'permalink_structure' );
+	}
+
+	$response->set_data( $site_info );
+
+	return $response;
+}
+add_filter( 'rest_index', 'gutenberg_ensure_wp_json_has_permalink_structure' );
+
+/**
+ * As a substitute for the default content `wpautop` filter, applies autop
+ * behavior only for posts where content does not contain blocks.
+ *
+ * @param  string $content Post content.
+ * @return string          Paragraph-converted text if non-block content.
+ */
+function gutenberg_wpautop( $content ) {
+	if ( gutenberg_content_has_blocks( $content ) ) {
+		return $content;
+	}
+
+	return wpautop( $content );
+}
+remove_filter( 'the_content', 'wpautop' );
+add_filter( 'the_content', 'gutenberg_wpautop', 8 );
+
+/**
+ * Includes the value for the custom field `post_type_capabities` inside the REST API response of user.
+ *
+ * TODO: This is a temporary solution. Next step would be to edit the WP_REST_Users_Controller,
+ * once merged into Core.
+ *
+ * @since ?
+ *
+ * @param array           $user An array containing user properties.
+ * @param string          $name The name of the custom field.
+ * @param WP_REST_Request $request Full details about the REST API request.
+ * @return object The Post Type capabilities.
+ */
+function gutenberg_get_post_type_capabilities( $user, $name, $request ) {
+	$post_type = $request->get_param( 'post_type' );
+	$value     = new stdClass;
+
+	if ( ! empty( $user['id'] ) && $post_type && post_type_exists( $post_type ) ) {
+		// The Post Type object contains the Post Type's specific caps.
+		$post_type_object = get_post_type_object( $post_type );
+
+		// Loop in the Post Type's caps to validate the User's caps for it.
+		foreach ( $post_type_object->cap as $post_cap => $post_type_cap ) {
+			// Ignore caps requiring a post ID.
+			if ( in_array( $post_cap, array( 'edit_post', 'read_post', 'delete_post' ) ) ) {
+				continue;
+			}
+
+			// Set the User's post type capability.
+			$value->{$post_cap} = user_can( $user['id'], $post_type_cap );
+		}
+	}
+
+	return $value;
+}
+
+/**
+ * Adds the custom field `post_type_capabities` to the REST API response of user.
+ *
+ * TODO: This is a temporary solution. Next step would be to edit the WP_REST_Users_Controller,
+ * once merged into Core.
+ *
+ * @since ?
+ */
+function gutenberg_register_rest_api_post_type_capabilities() {
+	register_rest_field( 'user',
+		'post_type_capabilities',
+		array(
+			'get_callback' => 'gutenberg_get_post_type_capabilities',
+			'schema'       => array(
+				'description' => __( 'Post Type capabilities for the user.', 'gutenberg' ),
+				'type'        => 'object',
+				'context'     => array( 'edit' ),
+				'readonly'    => true,
+			),
+		)
+	);
+}
+add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_type_capabilities' );

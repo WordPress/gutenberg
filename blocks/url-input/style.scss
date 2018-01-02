@@ -4,13 +4,16 @@
 	flex-grow: 1;
 	position: relative;
 
-	input[type=url] {
+	input[type=text] {
 		padding: 10px;
 		font-size: $default-font-size;
 		width: 100%;
 		border: none;
 		outline: none;
 		box-shadow: none;
+		&::-ms-clear {
+			display: none;
+		}
 	}
 
 	&:focus {
@@ -54,13 +57,13 @@
 	text-align: left;
 
 	&.is-selected {
-		background: $blue-medium-500;
+		background: $blue-dark-900;
 		color: $white;
 	}
 }
 
 // Toolbar button
-ul.components-toolbar > li.blocks-url-input__button {
+.components-toolbar > .blocks-url-input__button {
 	position: inherit;	// let the dialog position according to parent
 }
 

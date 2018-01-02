@@ -7,19 +7,19 @@ import TextareaAutosize from 'react-autosize-textarea';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { withState } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './editor.scss';
-import { registerBlockType, source } from '../../api';
+import { registerBlockType } from '../../api';
 import BlockControls from '../../block-controls';
-
-const { html } = source;
 
 registerBlockType( 'core/html', {
 	title: __( 'Custom HTML' ),
+
+	description: __( 'Add custom HTML code and preview it right here in the editor.' ),
 
 	icon: 'html',
 
@@ -27,66 +27,50 @@ registerBlockType( 'core/html', {
 
 	keywords: [ __( 'embed' ) ],
 
-	className: false,
+	supports: {
+		customClassName: false,
+		className: false,
+		html: false,
+	},
 
 	attributes: {
 		content: {
 			type: 'string',
-			source: html(),
+			source: 'html',
 		},
 	},
 
-	edit: class extends Component {
-		constructor() {
-			super( ...arguments );
-			this.preview = this.preview.bind( this );
-			this.edit = this.edit.bind( this );
-			this.state = {
-				preview: false,
-			};
-		}
-
-		preview() {
-			this.setState( { preview: true } );
-		}
-
-		edit() {
-			this.setState( { preview: false } );
-		}
-
-		render() {
-			const { preview } = this.state;
-			const { attributes, setAttributes, focus } = this.props;
-
-			return (
-				<div>
-					{ focus &&
-						<BlockControls key="controls">
-							<ul className="components-toolbar">
-								<li>
-									<button className={ `components-tab-button ${ ! preview ? 'is-active' : '' }` } onClick={ this.edit }>
-										<span>HTML</span>
-									</button>
-								</li>
-								<li>
-									<button className={ `components-tab-button ${ preview ? 'is-active' : '' }` } onClick={ this.preview }>
-										<span>{ __( 'Preview' ) }</span>
-									</button>
-								</li>
-							</ul>
-						</BlockControls>
-					}
-					{ preview
-						? <div dangerouslySetInnerHTML={ { __html: attributes.content } } />
-						: <TextareaAutosize
-							value={ attributes.content }
-							onChange={ ( event ) => setAttributes( { content: event.target.value } ) }
-						/>
-					}
+	edit: withState( {
+		preview: false,
+	} )( ( { attributes, setAttributes, setState, focus, preview } ) => [
+		focus && (
+			<BlockControls key="controls">
+				<div className="components-toolbar">
+					<button
+						className={ `components-tab-button ${ ! preview ? 'is-active' : '' }` }
+						onClick={ () => setState( { preview: false } ) }>
+						<span>HTML</span>
+					</button>
+					<button
+						className={ `components-tab-button ${ preview ? 'is-active' : '' }` }
+						onClick={ () => setState( { preview: true } ) }>
+						<span>{ __( 'Preview' ) }</span>
+					</button>
 				</div>
-			);
-		}
-	},
+			</BlockControls>
+		),
+		preview ?
+			<div
+				key="preview"
+				dangerouslySetInnerHTML={ { __html: attributes.content } } /> :
+			<TextareaAutosize
+				className="wp-block-html"
+				key="editor"
+				value={ attributes.content }
+				onChange={ ( event ) => setAttributes( { content: event.target.value } ) }
+				aria-label={ __( 'HTML' ) }
+			/>,
+	] ),
 
 	save( { attributes } ) {
 		return attributes.content;

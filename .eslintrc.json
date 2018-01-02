@@ -47,13 +47,22 @@
 		"constructor-super": "error",
 		"dot-notation": "error",
 		"eol-last": "error",
+		"eqeqeq": "error",
 		"func-call-spacing": "error",
 		"indent": [ "error", "tab", { "SwitchCase": 1 } ],
+		"jsx-a11y/label-has-for": [ "error", {
+			"required": "id"
+		} ],
+		"jsx-a11y/media-has-caption": "off",
+		"jsx-a11y/no-noninteractive-tabindex": "off",
+		"jsx-a11y/role-has-required-aria-props": "off",
 		"jsx-quotes": "error",
 		"key-spacing": "error",
 		"keyword-spacing": "error",
+		"lines-around-comment": "off",
 		"no-alert": "error",
 		"no-bitwise": "error",
+		"no-caller": "error",
 		"no-console": "error",
 		"no-const-assign": "error",
 		"no-debugger": "error",
@@ -71,6 +80,7 @@
 		"no-mixed-spaces-and-tabs": "error",
 		"no-multiple-empty-lines": [ "error", { "max": 1 } ],
 		"no-multi-spaces": "error",
+		"no-multi-str": "off",
 		"no-negated-in-lhs": "error",
 		"no-nested-ternary": "error",
 		"no-redeclare": "error",
@@ -79,6 +89,38 @@
 			{
 				"selector": "ImportDeclaration[source.value=/^@wordpress\\u002F.+\\u002F/]",
 				"message": "Path access on WordPress dependencies is not allowed."
+			},
+			{
+				"selector": "ImportDeclaration[source.value=/^blocks$/]",
+				"message": "Use @wordpress/blocks as import path instead."
+			},
+			{
+				"selector": "ImportDeclaration[source.value=/^components$/]",
+				"message": "Use @wordpress/components as import path instead."
+			},
+			{
+				"selector": "ImportDeclaration[source.value=/^date$/]",
+				"message": "Use @wordpress/date as import path instead."
+			},
+			{
+				"selector": "ImportDeclaration[source.value=/^editor$/]",
+				"message": "Use @wordpress/editor as import path instead."
+			},
+			{
+				"selector": "ImportDeclaration[source.value=/^element$/]",
+				"message": "Use @wordpress/element as import path instead."
+			},
+			{
+				"selector": "ImportDeclaration[source.value=/^i18n$/]",
+				"message": "Use @wordpress/i18n as import path instead."
+			},
+			{
+				"selector": "ImportDeclaration[source.value=/^data$/]",
+				"message": "Use @wordpress/data as import path instead."
+			},
+			{
+				"selector": "ImportDeclaration[source.value=/^utils$/]",
+				"message": "Use @wordpress/utils as import path instead."
 			},
 			{
 				"selector": "CallExpression[callee.name=/^__|_n|_x$/]:not([arguments.0.type=/^Literal|BinaryExpression$/])",
@@ -94,16 +136,18 @@
 			}
 		],
 		"no-shadow": "error",
+		"no-undef": "error",
 		"no-undef-init": "error",
 		"no-unreachable": "error",
 		"no-unsafe-negation": "error",
+		"no-unused-expressions": "error",
+		"no-unused-vars": "error",
 		"no-useless-computed-key": "error",
 		"no-useless-constructor": "error",
 		"no-useless-return": "error",
 		"no-var": "error",
 		"no-whitespace-before-property": "error",
 		"object-curly-spacing": [ "error", "always" ],
-		"one-var": "off",
 		"padded-blocks": [ "error", "never" ],
 		"prefer-const": "error",
 		"quote-props": [ "error", "as-needed" ],
@@ -113,7 +157,9 @@
 		"react/jsx-indent": [ "error", "tab" ],
 		"react/jsx-indent-props": [ "error", "tab" ],
 		"react/jsx-key": "error",
-		"react/jsx-space-before-closing": "error",
+		"react/jsx-tag-spacing": "error",
+		"react/no-children-prop": "off",
+		"react/no-find-dom-node": "warn",
 		"react/prop-types": "off",
 		"semi": "error",
 		"semi-spacing": "error",
@@ -128,6 +174,7 @@
 		} ],
 		"template-curly-spacing": [ "error", "always" ],
 		"valid-jsdoc": [ "error", { "requireReturn": false } ],
-		"valid-typeof": "error"
+		"valid-typeof": "error",
+		"yoda": "off"
 	}
 }

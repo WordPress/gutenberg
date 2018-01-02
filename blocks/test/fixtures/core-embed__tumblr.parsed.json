@@ -4,10 +4,11 @@
         "attrs": {
             "url": "https://tumblr.com/"
         },
-        "rawContent": "\n<figure class=\"wp-block-embed-tumblr\">\n    https://tumblr.com/\n    <figcaption>Embedded content from tumblr</figcaption>\n</figure>\n"
+        "innerBlocks": [],
+        "innerHTML": "\n<figure class=\"wp-block-embed-tumblr\">\n    https://tumblr.com/\n    <figcaption>Embedded content from tumblr</figcaption>\n</figure>\n"
     },
     {
         "attrs": {},
-        "rawContent": "\n"
+        "innerHTML": "\n"
     }
 ]

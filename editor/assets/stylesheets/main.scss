@@ -1,6 +1,11 @@
-body.toplevel_page_gutenberg,
-body.gutenberg_page_gutenberg-demo {
+body.gutenberg-editor-page {
 	background: $white;
+
+	// on mobile the main content area has to scroll
+	// otherwise you can invoke the overscroll bounce on the non-scrolling container, causing (ノಠ益ಠ)ノ彡┻━┻
+	@include break-small {
+		overflow: hidden;
+	}
 
 	#update-nag, .update-nag {
 		display: none;
@@ -25,6 +30,11 @@ body.gutenberg_page_gutenberg-demo {
 
 	svg {
 		fill: currentColor;
+	}
+
+	ul#adminmenu a.wp-has-current-submenu:after,
+	ul#adminmenu>li.current>a.current:after {
+		border-right-color: $white;
 	}
 }
 
@@ -54,11 +64,20 @@ body.gutenberg_page_gutenberg-demo {
 }
 
 .gutenberg__editor {
-	position: relative;
-	height: calc( 100vh - #{ $admin-bar-height-big } );
+	// on mobile the main content area has to scroll
+	// otherwise you can invoke the overscroll bounce on the non-scrolling container, causing (ノಠ益ಠ)ノ彡┻━┻
+	@include break-small {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		min-height: calc( 100vh - #{ $admin-bar-height-big } );
+	}
 
+	// The WP header height changes at this breakpoint
 	@include break-medium {
-		height: calc( 100vh - #{ $admin-bar-height } );
+		min-height: calc( 100vh - #{ $admin-bar-height } );
 	}
 
 	img {
@@ -69,13 +88,13 @@ body.gutenberg_page_gutenberg-demo {
 		width: 100%;
 	}
 
-	@include break-small() {
-		padding-top: $header-height;
+	.components-navigate-regions {
+		height: 100%;
 	}
 }
 
 .editor-post-title,
-.editor-visual-editor__block {
+.editor-block-list__block {
 	input,
 	textarea {
 		border-radius: 4px;

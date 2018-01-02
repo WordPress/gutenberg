@@ -7,15 +7,13 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './editor.scss';
-import { registerBlockType, createBlock, source } from '../../api';
+import { registerBlockType, createBlock } from '../../api';
 import Editable from '../../editable';
-import InspectorControls from '../../inspector-controls';
-import BlockDescription from '../../block-description';
-
-const { children } = source;
 
 registerBlockType( 'core/verse', {
 	title: __( 'Verse' ),
+
+	description: __( 'Write poetry and other literary expressions honoring all spaces and line-breaks.' ),
 
 	icon: 'edit',
 
@@ -26,7 +24,8 @@ registerBlockType( 'core/verse', {
 	attributes: {
 		content: {
 			type: 'array',
-			source: children( 'pre' ),
+			source: 'children',
+			selector: 'pre',
 		},
 	},
 
@@ -52,17 +51,9 @@ registerBlockType( 'core/verse', {
 	edit( { attributes, setAttributes, focus, setFocus, className } ) {
 		const { content } = attributes;
 
-		return [
-			focus && (
-				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'Write poetry and other literary expressions honoring all spaces and line-breaks.' ) }</p>
-					</BlockDescription>
-				</InspectorControls>
-			),
+		return (
 			<Editable
 				tagName="pre"
-				key="editable"
 				value={ content }
 				onChange={ ( nextContent ) => {
 					setAttributes( {
@@ -72,10 +63,10 @@ registerBlockType( 'core/verse', {
 				focus={ focus }
 				onFocus={ setFocus }
 				placeholder={ __( 'Write…' ) }
-				wrapperClassname={ className }
+				wrapperClassName={ className }
 				formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
-			/>,
-		];
+			/>
+		);
 	},
 
 	save( { attributes, className } ) {

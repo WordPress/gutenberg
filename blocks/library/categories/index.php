@@ -30,20 +30,20 @@ function gutenberg_render_block_core_categories( $attributes ) {
 	);
 
 	if ( ! empty( $attributes['displayAsDropdown'] ) ) {
-		$id = 'wp-block-categories-' . $block_id;
-		$args['id'] = $id;
+		$id                       = 'wp-block-categories-' . $block_id;
+		$args['id']               = $id;
 		$args['show_option_none'] = __( 'Select Category', 'gutenberg' );
-		$wrapper_markup = '<div class="%1$s">%2$s</div>';
-		$items_markup = wp_dropdown_categories( $args );
-		$type = 'dropdown';
+		$wrapper_markup           = '<div class="%1$s">%2$s</div>';
+		$items_markup             = wp_dropdown_categories( $args );
+		$type                     = 'dropdown';
 
 		if ( ! is_admin() ) {
 			$wrapper_markup .= gutenberg_build_dropdown_script_block_core_categories( $id );
 		}
 	} else {
 		$wrapper_markup = '<div class="%1$s"><ul>%2$s</ul></div>';
-		$items_markup = wp_list_categories( $args );
-		$type = 'list';
+		$items_markup   = wp_list_categories( $args );
+		$type           = 'list';
 	}
 
 	$class = "wp-block-categories wp-block-categories-{$type} align{$align}";

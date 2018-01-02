@@ -9,17 +9,16 @@ import { Toolbar } from '@wordpress/components';
  * Internal dependencies
  */
 import './editor.scss';
-import { registerBlockType, createBlock, source } from '../../api';
+import { registerBlockType, createBlock } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import InspectorControls from '../../inspector-controls';
 import AlignmentToolbar from '../../alignment-toolbar';
-import BlockDescription from '../../block-description';
-
-const { children, prop } = source;
 
 registerBlockType( 'core/heading', {
 	title: __( 'Heading' ),
+
+	description: __( 'Search engines use the headings to index the structure and content of your web pages.' ),
 
 	icon: 'heading',
 
@@ -27,18 +26,22 @@ registerBlockType( 'core/heading', {
 
 	keywords: [ __( 'title' ), __( 'subtitle' ) ],
 
-	className: false,
-
-	supportAnchor: true,
+	supports: {
+		className: false,
+		anchor: true,
+	},
 
 	attributes: {
 		content: {
 			type: 'array',
-			source: children( 'h1,h2,h3,h4,h5,h6' ),
+			source: 'children',
+			selector: 'h1,h2,h3,h4,h5,h6',
 		},
 		nodeName: {
 			type: 'string',
-			source: prop( 'h1,h2,h3,h4,h5,h6', 'nodeName' ),
+			source: 'property',
+			selector: 'h1,h2,h3,h4,h5,h6',
+			property: 'nodeName',
 			default: 'H2',
 		},
 		align: {
@@ -96,7 +99,7 @@ registerBlockType( 'core/heading', {
 		};
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, insertBlocksAfter } ) {
+	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, insertBlocksAfter, onReplace } ) {
 		const { align, content, nodeName, placeholder } = attributes;
 
 		return [
@@ -116,9 +119,6 @@ registerBlockType( 'core/heading', {
 			),
 			focus && (
 				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'Search engines use the headings to index the structure and content of your web pages.' ) }</p>
-					</BlockDescription>
 					<h3>{ __( 'Heading Settings' ) }</h3>
 					<p>{ __( 'Size' ) }</p>
 					<Toolbar
@@ -143,19 +143,25 @@ registerBlockType( 'core/heading', {
 			),
 			<Editable
 				key="editable"
+				wrapperClassName="wp-block-heading"
 				tagName={ nodeName.toLowerCase() }
 				value={ content }
 				focus={ focus }
 				onFocus={ setFocus }
 				onChange={ ( value ) => setAttributes( { content: value } ) }
 				onMerge={ mergeBlocks }
-				onSplit={ ( before, after, ...blocks ) => {
-					setAttributes( { content: before } );
-					insertBlocksAfter( [
-						...blocks,
-						createBlock( 'core/paragraph', { content: after } ),
-					] );
-				} }
+				onSplit={
+					insertBlocksAfter ?
+						( before, after, ...blocks ) => {
+							setAttributes( { content: before } );
+							insertBlocksAfter( [
+								...blocks,
+								createBlock( 'core/paragraph', { content: after } ),
+							] );
+						} :
+						undefined
+				}
+				onRemove={ () => onReplace( [] ) }
 				style={ { textAlign: align } }
 				placeholder={ placeholder || __( 'Write heading…' ) }
 			/>,

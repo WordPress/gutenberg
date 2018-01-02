@@ -11,6 +11,7 @@
 	overflow: hidden;
 
 	.dashicon {
+		display: inline-block;
 		flex: 0 0 auto;
 	}
 
@@ -19,6 +20,6 @@
 	}
 
 	&:not( :disabled ):hover {
-		color: $blue-medium-500;
+		@include button-style__hover;
 	}
 }

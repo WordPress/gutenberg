@@ -9,7 +9,7 @@
 
 	> .components-panel__header:last-child,
 	> .components-panel__body:last-child {
-		margin-bottom: -1px;
+		border-bottom-width: 0;
 	}
 }
 
@@ -18,12 +18,15 @@
 }
 
 .components-panel__body {
-	padding: $panel-padding;
 	border-top: 1px solid $light-gray-500;
 	border-bottom: 1px solid $light-gray-500;
 
 	h3 {
 		margin: 0 0 .5em 0;
+	}
+
+	&.is-opened {
+		padding: $panel-padding;
 	}
 }
 
@@ -51,13 +54,15 @@
 	margin-top: -1px;
 }
 
-.components-panel .components-panel__body-title {
+.components-panel__body > .components-panel__body-title {
 	display: block;
 	padding: 0;
-	margin: -1 * $panel-padding;
 	font-size: inherit;
+	margin-top: 0;
+	margin-bottom: 0;
 }
-.components-panel__body.is-opened .components-panel__body-title {
+.components-panel__body.is-opened > .components-panel__body-title {
+	margin: -1 * $panel-padding;
 	margin-bottom: 0;
 }
 
@@ -71,14 +76,37 @@
 
 	.dashicon {
 		position: absolute;
-		right: 10px;
+		right: $item-spacing;
 		top: 50%;
 		transform: translateY( -50% );
 	}
+
+	// mirror the arrow horizontally in RTL languages
+	/* rtl:begin:ignore */
+	body.rtl & .dashicons-arrow-right {
+		transform: scaleX(-1);
+		-ms-filter: fliph;
+		filter: FlipH;
+		margin-top: -10px;
+	}
+	/* rtl:end:ignore */
 }
 
 .components-panel__body-toggle-icon {
 	margin-right: -5px;
+}
+
+.components-panel__color-title {
+	float: left;
+	height: 19px;
+}
+
+.components-panel__color-area {
+	width: 25px;
+	height: 16px;
+	margin-left: 15px;
+	border: 1px solid #DADADA;
+	display: inline-block;
 }
 
 .components-panel__row {
@@ -86,6 +114,17 @@
 	justify-content: space-between;
 	align-items: center;
 	margin-top: 20px;
+
+	select {
+		// Necessary for select to respond to flexbox
+		min-width: 0;
+	}
+
+	label {
+		margin-right: 10px;
+		flex-shrink: 0;
+		max-width: 75%;
+	}
 
 	&:empty {
 		margin-top: 0;

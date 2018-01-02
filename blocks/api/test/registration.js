@@ -17,11 +17,18 @@ import {
 	getDefaultBlockName,
 	getBlockType,
 	getBlockTypes,
+	hasBlockSupport,
+	isReusableBlock,
 } from '../registration';
 
 describe( 'blocks', () => {
 	const error = console.error;
 	const defaultBlockSettings = { save: noop, category: 'common', title: 'block title' };
+
+	beforeAll( () => {
+		// Load all hooks that modify blocks
+		require( 'blocks/hooks' );
+	} );
 
 	// Reset block state before each test.
 	beforeEach( () => {
@@ -34,7 +41,7 @@ describe( 'blocks', () => {
 		} );
 		setUnknownTypeHandlerName( undefined );
 		setDefaultBlockName( undefined );
-		window._wpBlocksAttributes = {};
+		window._wpBlocks = {};
 		console.error = error;
 	} );
 
@@ -47,26 +54,49 @@ describe( 'blocks', () => {
 
 		it( 'should reject blocks without a namespace', () => {
 			const block = registerBlockType( 'doing-it-wrong' );
-			expect( console.error ).toHaveBeenCalledWith( 'Block names must contain a namespace prefix. Example: my-plugin/my-custom-block' );
+			expect( console.error ).toHaveBeenCalledWith( 'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block' );
 			expect( block ).toBeUndefined();
 		} );
 
 		it( 'should reject blocks with too many namespaces', () => {
 			const block = registerBlockType( 'doing/it/wrong' );
-			expect( console.error ).toHaveBeenCalledWith( 'Block names must contain a namespace prefix. Example: my-plugin/my-custom-block' );
+			expect( console.error ).toHaveBeenCalledWith( 'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block' );
 			expect( block ).toBeUndefined();
 		} );
 
 		it( 'should reject blocks with invalid characters', () => {
 			const block = registerBlockType( 'still/_doing_it_wrong' );
-			expect( console.error ).toHaveBeenCalledWith( 'Block names must contain a namespace prefix. Example: my-plugin/my-custom-block' );
+			expect( console.error ).toHaveBeenCalledWith( 'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block' );
+			expect( block ).toBeUndefined();
+		} );
+
+		it( 'should reject blocks with uppercase characters', () => {
+			const block = registerBlockType( 'Core/Paragraph' );
+			expect( console.error ).toHaveBeenCalledWith( 'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block' );
+			expect( block ).toBeUndefined();
+		} );
+
+		it( 'should reject blocks not starting with a letter', () => {
+			const block = registerBlockType( 'my-plugin/4-fancy-block', defaultBlockSettings );
+			expect( console.error ).toHaveBeenCalledWith( 'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block' );
 			expect( block ).toBeUndefined();
 		} );
 
 		it( 'should accept valid block names', () => {
 			const block = registerBlockType( 'my-plugin/fancy-block-4', defaultBlockSettings );
 			expect( console.error ).not.toHaveBeenCalled();
-			expect( block ).toEqual( { name: 'my-plugin/fancy-block-4', save: noop, category: 'common', title: 'block title' } );
+			expect( block ).toEqual( {
+				name: 'my-plugin/fancy-block-4',
+				icon: 'block-default',
+				save: noop,
+				category: 'common',
+				title: 'block title',
+				attributes: {
+					className: {
+						type: 'string',
+					},
+				},
+			} );
 		} );
 
 		it( 'should prohibit registering the same block twice', () => {
@@ -133,8 +163,8 @@ describe( 'blocks', () => {
 
 		it( 'should default to browser-initialized global attributes', () => {
 			const attributes = { ok: { type: 'boolean' } };
-			window._wpBlocksAttributes = {
-				'core/test-block-with-attributes': attributes,
+			window._wpBlocks = {
+				'core/test-block-with-attributes': { attributes },
 			};
 
 			const blockType = { settingName: 'settingValue', save: noop, category: 'common', title: 'block title' };
@@ -145,7 +175,15 @@ describe( 'blocks', () => {
 				save: noop,
 				category: 'common',
 				title: 'block title',
-				attributes,
+				icon: 'block-default',
+				attributes: {
+					ok: {
+						type: 'boolean',
+					},
+					className: {
+						type: 'string',
+					},
+				},
 			} );
 		} );
 
@@ -159,6 +197,12 @@ describe( 'blocks', () => {
 				save: noop,
 				category: 'common',
 				title: 'block title',
+				icon: 'block-default',
+				attributes: {
+					className: {
+						type: 'string',
+					},
+				},
 			} );
 		} );
 	} );
@@ -173,11 +217,33 @@ describe( 'blocks', () => {
 		it( 'should unregister existing blocks', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 			expect( getBlockTypes() ).toEqual( [
-				{ name: 'core/test-block', save: noop, category: 'common', title: 'block title' },
+				{
+					name: 'core/test-block',
+					save: noop,
+					category: 'common',
+					title: 'block title',
+					icon: 'block-default',
+					attributes: {
+						className: {
+							type: 'string',
+						},
+					},
+				},
 			] );
 			const oldBlock = unregisterBlockType( 'core/test-block' );
 			expect( console.error ).not.toHaveBeenCalled();
-			expect( oldBlock ).toEqual( { name: 'core/test-block', save: noop, category: 'common', title: 'block title' } );
+			expect( oldBlock ).toEqual( {
+				name: 'core/test-block',
+				save: noop,
+				category: 'common',
+				title: 'block title',
+				icon: 'block-default',
+				attributes: {
+					className: {
+						type: 'string',
+					},
+				},
+			} );
 			expect( getBlockTypes() ).toEqual( [] );
 		} );
 	} );
@@ -218,6 +284,12 @@ describe( 'blocks', () => {
 				save: noop,
 				category: 'common',
 				title: 'block title',
+				icon: 'block-default',
+				attributes: {
+					className: {
+						type: 'string',
+					},
+				},
 			} );
 		} );
 
@@ -230,6 +302,12 @@ describe( 'blocks', () => {
 				save: noop,
 				category: 'common',
 				title: 'block title',
+				icon: 'block-default',
+				attributes: {
+					className: {
+						type: 'string',
+					},
+				},
 			} );
 		} );
 	} );
@@ -244,15 +322,107 @@ describe( 'blocks', () => {
 			const blockType = { settingName: 'settingValue', save: noop, category: 'common', title: 'block title' };
 			registerBlockType( 'core/test-block-with-settings', blockType );
 			expect( getBlockTypes() ).toEqual( [
-				{ name: 'core/test-block', save: noop, category: 'common', title: 'block title' },
+				{
+					name: 'core/test-block',
+					save: noop,
+					category: 'common',
+					title: 'block title',
+					icon: 'block-default',
+					attributes: {
+						className: {
+							type: 'string',
+						},
+					},
+				},
 				{
 					name: 'core/test-block-with-settings',
 					settingName: 'settingValue',
 					save: noop,
 					category: 'common',
 					title: 'block title',
+					icon: 'block-default',
+					attributes: {
+						className: {
+							type: 'string',
+						},
+					},
 				},
 			] );
+		} );
+	} );
+
+	describe( 'hasBlockSupport', () => {
+		it( 'should return false if block has no supports', () => {
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+
+			expect( hasBlockSupport( 'core/test-block', 'foo' ) ).toBe( false );
+		} );
+
+		it( 'should return false if block does not define support by name', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				supports: {
+					bar: true,
+				},
+			} );
+
+			expect( hasBlockSupport( 'core/test-block', 'foo' ) ).toBe( false );
+		} );
+
+		it( 'should return custom default supports if block does not define support by name', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				supports: {
+					bar: true,
+				},
+			} );
+
+			expect( hasBlockSupport( 'core/test-block', 'foo', true ) ).toBe( true );
+		} );
+
+		it( 'should return true if block type supports', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				supports: {
+					foo: true,
+				},
+			} );
+
+			expect( hasBlockSupport( 'core/test-block', 'foo' ) ).toBe( true );
+		} );
+
+		it( 'should return true if block author defines unsupported but truthy value', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				supports: {
+					foo: 'hmmm',
+				},
+			} );
+
+			expect( hasBlockSupport( 'core/test-block', 'foo' ) ).toBe( true );
+		} );
+
+		it( 'should handle block settings object as argument to test', () => {
+			const settings = {
+				...defaultBlockSettings,
+				supports: {
+					foo: true,
+				},
+			};
+
+			expect( hasBlockSupport( settings, 'foo' ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isReusableBlock', () => {
+		it( 'should return true for a reusable block', () => {
+			const block = { name: 'core/block' };
+			expect( isReusableBlock( block ) ).toBe( true );
+		} );
+
+		it( 'should return false for other blocks', () => {
+			const block = { name: 'core/paragraph' };
+			expect( isReusableBlock( block ) ).toBe( false );
 		} );
 	} );
 } );

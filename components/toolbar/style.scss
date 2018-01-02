@@ -5,15 +5,13 @@
 	display: inline-flex;
 }
 
-ul.components-toolbar {
-	list-style-type: none;
-
-	&> li {
+div.components-toolbar {
+	&> div {
 		display: inline-flex;
 		margin: 0;
 	}
 
-	&> li + li {
+	&> div + div {
 		margin-left: -3px;
 
 		&.has-left-divider {
@@ -41,57 +39,23 @@ ul.components-toolbar {
 	align-items: flex-end;
 	margin: 0;
 	padding: 3px;
-	background: none;
 	outline: none;
-	color: $dark-gray-500;
 	cursor: pointer;
 	position: relative;
 	width: $icon-button-size;
 	height: $icon-button-size;
 
-	&:hover,
-	/* the ":not(:disabled)" is needed to make it specific enough */
-	&:hover:not(:disabled),
-	&:focus {
-		color: $dark-gray-500;
-		outline: none;
-		box-shadow: none;
-	}
-
-	&.is-active,
-	&.is-active:hover {
-		color: $white;
-	}
-
 	&:disabled {
 		cursor: default;
 	}
 
-	&> svg {
-		border: 1px solid transparent;
-		padding: 4px;
+	& > svg {
+		padding: 5px;
 		box-sizing: content-box;
+		border-radius: $button-style__radius-roundrect;
 	}
 
-	&:hover > svg,
-	&:focus > svg {
-		color: $dark-gray-500;
-	}
-
-	&:not(:disabled) {
-		&.is-active > svg,
-		&:hover > svg,
-		&:focus > svg {
-			border: 1px solid $dark-gray-500;
-		}
-	}
-
-	&.is-active > svg,
-	&.is-active:hover > svg {
-		background-color: $dark-gray-500;
-		color: $white;
-	}
-
+	// subscript for numbered icon buttons, like headings
 	&[data-subscript] svg {
 		padding: 4px 8px 4px 0px;
 	}
@@ -102,8 +66,45 @@ ul.components-toolbar {
 		font-size: $default-font-size;
 		font-weight: bold;
 		position: absolute;
-		right: 6px;
+		right: 8px;
 		bottom: 8px;
+	}
+
+	// special hover style
+	&:not(:disabled) {
+		&.is-active > svg,
+		&:hover > svg {
+			box-shadow: inset 0 0 0 1px $dark-gray-500;
+		}
+	}
+
+	// special active style
+	&.is-active {
+		color: $white;
+		> svg {
+			background: $dark-gray-500;
+		}
+	}
+
+	// focus style
+	&:focus {
+		outline: none;
+		box-shadow: none;
+		background: none;
+	}
+
+	&:focus > svg {
+		@include button-style__focus-active;
+	}
+	&:focus:hover > svg {
+		@include button-style__focus-active;
+	}
+
+	// active focus style
+	&.is-active:focus > svg {
+		background: $dark-gray-500;
+		color: $white;
+		box-shadow: inset 0 0 0 1px $dark-gray-500, inset 0 0 0 2px $white;
 	}
 }
 

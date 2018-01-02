@@ -1,9 +1,4 @@
-.editor-visual-editor__block[data-type="core/table"] {
-
-	.editor-visual-editor__group > div {
-		display: flex;
-	}
-
+.editor-block-list__block[data-type="core/table"] {
 	&[data-align="left"],
 	&[data-align="right"] {
 		min-width: 33%;

@@ -26,19 +26,20 @@ function ToggleButton( { isVisible, toggleVisible } ) {
 }
 ```
 
-If you want Popover elementss to render to a specific location on the page to allow style cascade to take effect, you must render a `PopoverProvider` further up the element tree, specifying a target:
+If you want Popover elementss to render to a specific location on the page to allow style cascade to take effect, you must render a `Popover.Slot` further up the element tree:
 
-```
+```jsx
 import { render } from '@wordpress/element';
-import { PopoverContext } from '@wordpress/components';
-import App from './app';
+import { Popover } from '@wordpress/components';
+import Content from './Content';
 
 const app = document.getElementById( 'app' );
 
 render(
-	<PopoverContext target={ app }>
-		<App />
-	</PopoverContext>,
+	<div>
+		<Content />
+		<Popover.Slot />
+	</div>,
 	app
 );
 ```
@@ -98,3 +99,11 @@ A callback invoked when the user clicks outside the opened popover, passing the 
 
 - Type: `Function`
 - Required: No
+
+## expandOnMobile
+
+Opt-in prop to show popovers fullscreen on mobile, pass `false` in this prop to avoid this behavior.
+
+ - Type: `Boolean`
+ - Required: No
+ - Default: `false`

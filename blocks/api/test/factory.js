@@ -6,7 +6,7 @@ import { noop } from 'lodash';
 /**
  * Internal dependencies
  */
-import { createBlock, switchToBlockType } from '../factory';
+import { createBlock, getPossibleBlockTransformations, switchToBlockType, createReusableBlock } from '../factory';
 import { getBlockTypes, unregisterBlockType, setUnknownTypeHandlerName, registerBlockType } from '../registration';
 
 describe( 'block factory', () => {
@@ -20,6 +20,11 @@ describe( 'block factory', () => {
 		category: 'common',
 		title: 'block title',
 	};
+
+	beforeAll( () => {
+		// Load all hooks that modify blocks
+		require( 'blocks/hooks' );
+	} );
 
 	afterEach( () => {
 		setUnknownTypeHandlerName( undefined );
@@ -39,6 +44,10 @@ describe( 'block factory', () => {
 						type: 'boolean',
 						default: true,
 					},
+					includesFalseyDefault: {
+						type: 'number',
+						default: 0,
+					},
 				},
 				save: noop,
 				category: 'common',
@@ -51,34 +60,214 @@ describe( 'block factory', () => {
 			expect( block.name ).toEqual( 'core/test-block' );
 			expect( block.attributes ).toEqual( {
 				includesDefault: true,
+				includesFalseyDefault: 0,
 				align: 'left',
 			} );
 			expect( block.isValid ).toBe( true );
 			expect( typeof block.uid ).toBe( 'string' );
 		} );
 
-		it( 'should keep the anchor if the block supports it', () => {
+		it( 'should keep the className if the block supports it', () => {
 			registerBlockType( 'core/test-block', {
-				attributes: {
-					align: {
-						type: 'string',
-					},
-				},
+				attributes: {},
 				save: noop,
 				category: 'common',
 				title: 'test block',
-				supportAnchor: true,
 			} );
 			const block = createBlock( 'core/test-block', {
-				align: 'left',
-				anchor: 'chicken',
+				className: 'chicken',
 			} );
 
 			expect( block.attributes ).toEqual( {
-				anchor: 'chicken',
-				align: 'left',
+				className: 'chicken',
 			} );
 			expect( block.isValid ).toBe( true );
+		} );
+
+		it( 'should not keep the className if the block supports it', () => {
+			registerBlockType( 'core/test-block', {
+				attributes: {},
+				save: noop,
+				category: 'common',
+				title: 'test block',
+				supports: {
+					customClassName: false,
+				},
+			} );
+			const block = createBlock( 'core/test-block', {
+				className: 'chicken',
+			} );
+
+			expect( block.attributes ).toEqual( {} );
+			expect( block.isValid ).toBe( true );
+		} );
+	} );
+
+	describe( 'getPossibleBlockTransformations()', () => {
+		it( 'should should show as available a simple "from" transformation"', () => {
+			registerBlockType( 'core/updated-text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					from: [ {
+						type: 'block',
+						blocks: [ 'core/text-block' ],
+						transform: noop,
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'updated text block',
+			} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+
+			const block = createBlock( 'core/text-block', {
+				value: 'chicken',
+			} );
+
+			const availableBlocks = getPossibleBlockTransformations( [ block ] );
+
+			expect( availableBlocks ).toHaveLength( 1 );
+			expect( availableBlocks[ 0 ].name ).toBe( 'core/updated-text-block' );
+		} );
+
+		it( 'should show as available a simple "to" transformation"', () => {
+			registerBlockType( 'core/updated-text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					to: [ {
+						type: 'block',
+						blocks: [ 'core/text-block' ],
+						transform: noop,
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'updated text block',
+			} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+
+			const block = createBlock( 'core/updated-text-block', {
+				value: 'ribs',
+			} );
+
+			const availableBlocks = getPossibleBlockTransformations( [ block ] );
+
+			expect( availableBlocks ).toHaveLength( 1 );
+			expect( availableBlocks[ 0 ].name ).toBe( 'core/text-block' );
+		} );
+
+		it( 'should not show a transformation if multiple blocks are passed and the transformation is not multi block', () => {
+			registerBlockType( 'core/updated-text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					from: [ {
+						type: 'block',
+						blocks: [ 'core/text-block' ],
+						transform: noop,
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'updated text block',
+			} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+
+			const block1 = createBlock( 'core/text-block', {
+				value: 'chicken',
+			} );
+
+			const block2 = createBlock( 'core/text-block', {
+				value: 'ribs',
+			} );
+
+			const availableBlocks = getPossibleBlockTransformations( [ block1, block2 ] );
+
+			expect( availableBlocks ).toEqual( [] );
+		} );
+
+		it( 'should show a transformation as available if multiple blocks are passed and the transformation accepts multiple blocks', () => {
+			registerBlockType( 'core/updated-text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					from: [ {
+						type: 'block',
+						blocks: [ 'core/text-block' ],
+						transform: noop,
+						isMultiBlock: true,
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'updated text block',
+			} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+
+			const block1 = createBlock( 'core/text-block', {
+				value: 'chicken',
+			} );
+
+			const block2 = createBlock( 'core/text-block', {
+				value: 'ribs',
+			} );
+
+			const availableBlocks = getPossibleBlockTransformations( [ block1, block2 ] );
+
+			expect( availableBlocks ).toHaveLength( 1 );
+			expect( availableBlocks[ 0 ].name ).toBe( 'core/updated-text-block' );
+		} );
+
+		it( 'should show multiple possible transformations"', () => {
+			registerBlockType( 'core/updated-text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					to: [ {
+						type: 'block',
+						blocks: [ 'core/text-block' ],
+						transform: noop,
+						isMultiBlock: true,
+					}, {
+						type: 'block',
+						blocks: [ 'core/another-text-block' ],
+						transform: noop,
+						isMultiBlock: true,
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'updated text block',
+			} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+			registerBlockType( 'core/another-text-block', defaultBlockSettings );
+
+			const block = createBlock( 'core/updated-text-block', {
+				value: 'chicken',
+			} );
+
+			const availableBlocks = getPossibleBlockTransformations( [ block ] );
+
+			expect( availableBlocks ).toHaveLength( 2 );
+			expect( availableBlocks[ 0 ].name ).toBe( 'core/text-block' );
+			expect( availableBlocks[ 1 ].name ).toBe( 'core/another-text-block' );
 		} );
 	} );
 
@@ -424,6 +613,20 @@ describe( 'block factory', () => {
 			expect( transformedBlocks[ 1 ].isValid ).toBe( true );
 			expect( transformedBlocks[ 1 ].attributes ).toEqual( {
 				value: 'smoked ribs',
+			} );
+		} );
+	} );
+
+	describe( 'createReusableBlock', () => {
+		it( 'should create a reusable block', () => {
+			const type = 'core/test-block';
+			const attributes = { name: 'Big Bird' };
+
+			expect( createReusableBlock( type, attributes ) ).toMatchObject( {
+				id: expect.any( Number ),
+				title: 'Untitled block',
+				type,
+				attributes,
 			} );
 		} );
 	} );

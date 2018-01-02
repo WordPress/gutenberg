@@ -69,7 +69,7 @@ export function mediaUpload( filesList, setAttributes, gallery = false ) {
 export function createMediaFromFile( file ) {
 	// Create upload payload
 	const data = new window.FormData();
-	data.append( 'file', file );
+	data.append( 'file', file, file.name || file.type.replace( '/', '.' ) );
 
 	return new wp.api.models.Media().save( null, {
 		data: data,

@@ -2,13 +2,12 @@
     {
         "blockName": "core/more",
         "attrs": {
-            "customText": null,
             "noTeaser": false
         },
-        "rawContent": ""
+        "innerHTML": ""
     },
     {
         "attrs": {},
-        "rawContent": "\n"
+        "innerHTML": "\n"
     }
 ]

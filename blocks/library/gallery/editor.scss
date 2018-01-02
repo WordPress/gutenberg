@@ -1,12 +1,3 @@
-.wp-block-gallery:not( .components-placeholder ) {
-	margin-right: -16px;
-	margin-bottom: -16px;
-}
-
-.editor-visual-editor__block[data-type="core/gallery"] .editor-visual-editor__block-edit {
-	overflow: hidden;
-}
-
 .blocks-gallery-image {
 	position: relative;
 
@@ -17,13 +8,21 @@
 }
 
 .blocks-gallery-image__inline-menu {
+	padding: 2px;
 	position: absolute;
-	top: 8px;
-	right: 8px;
-	border: 1px solid $light-gray-500;
-	background-color: $white;
+	top: 0;
+	right: 0;
+	background-color: $blue-medium-500;
 	display: inline-flex;
 	z-index: z-index( '.blocks-gallery-image__inline-menu' );
+
+	.components-button {
+		color: $white;
+		&:hover,
+		&:focus {
+			color: $white;
+		}
+	}
 }
 
 .blocks-gallery-image__remove {

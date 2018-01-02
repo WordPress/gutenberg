@@ -1,4 +1,4 @@
-.editor-visual-editor__block[data-type="core/pullquote"] {
+.editor-block-list__block[data-type="core/pullquote"] {
 	&[data-align="left"],
 	&[data-align="right"] {
 		max-width: 400px;
@@ -11,7 +11,7 @@
 }
 
 .wp-block-pullquote {
-	footer .blocks-editable__tinymce[data-is-empty="true"]:before {
+	cite .blocks-editable__tinymce[data-is-empty="true"]:before {
 		font-size: 14px;
 		font-family: $default-font;
 	}

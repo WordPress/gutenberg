@@ -10,10 +10,15 @@ import scrollIntoView from 'dom-scroll-into-view';
  */
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { keycodes } from '@wordpress/utils';
+import { keycodes, decodeEntities } from '@wordpress/utils';
 import { Spinner, withInstanceId, withSpokenMessages } from '@wordpress/components';
 
 const { UP, DOWN, ENTER } = keycodes;
+
+// Since URLInput is rendered in the context of other inputs, but should be
+// considered a separate modal node, prevent keyboard events from propagating
+// as being considered from the input.
+const stopEventPropagation = ( event ) => event.stopPropagation();
 
 class UrlInput extends Component {
 	constructor() {
@@ -133,13 +138,18 @@ class UrlInput extends Component {
 				if ( this.state.selectedSuggestion ) {
 					event.stopPropagation();
 					const post = this.state.posts[ this.state.selectedSuggestion ];
-					this.props.onChange( post.link );
-					this.setState( {
-						showSuggestions: false,
-					} );
+					this.selectLink( post.link );
 				}
 			}
 		}
+	}
+
+	selectLink( link ) {
+		this.props.onChange( link );
+		this.setState( {
+			selectedSuggestion: null,
+			showSuggestions: false,
+		} );
 	}
 
 	componentWillUnmount() {
@@ -172,11 +182,12 @@ class UrlInput extends Component {
 			<div className="blocks-url-input">
 				<input
 					autoFocus
-					type="url"
+					type="text"
 					aria-label={ __( 'URL' ) }
 					required
 					value={ value }
 					onChange={ this.onChange }
+					onInput={ stopEventPropagation }
 					placeholder={ __( 'Paste URL or type' ) }
 					onKeyDown={ this.onKeyDown }
 					role="combobox"
@@ -206,10 +217,10 @@ class UrlInput extends Component {
 								className={ classnames( 'blocks-url-input__suggestion', {
 									'is-selected': index === selectedSuggestion,
 								} ) }
-								onClick={ () => this.props.onChange( post.link ) }
+								onClick={ () => this.selectLink( post.link ) }
 								aria-selected={ index === selectedSuggestion }
 							>
-								{ post.title.rendered }
+								{ decodeEntities( post.title.rendered ) || __( '(no title)' ) }
 							</button>
 						) ) }
 					</div>
