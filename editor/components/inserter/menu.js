@@ -11,6 +11,7 @@ import {
 	pick,
 	some,
 	sortBy,
+	isEmpty,
 } from 'lodash';
 import { connect } from 'react-redux';
 
@@ -253,6 +254,14 @@ export class InserterMenu extends Component {
 	}
 
 	renderCategories( visibleBlocksByCategory ) {
+		if ( isEmpty( visibleBlocksByCategory ) ) {
+			return (
+				<span className="editor-inserter__no-results">
+					{ __( 'No blocks found' ) }
+				</span>
+			);
+		}
+
 		return getCategories().map(
 			( category ) => this.renderCategory( category, visibleBlocksByCategory[ category.slug ] )
 		);
