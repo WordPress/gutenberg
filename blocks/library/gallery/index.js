@@ -17,7 +17,7 @@ import './style.scss';
 import { registerBlockType, createBlock } from '../../api';
 import { default as GalleryBlock, defaultColumnsNumber } from './block';
 
-const blockAttributes = {
+const galleryBlockAttributes = {
 	align: {
 		type: 'string',
 		default: 'none',
@@ -62,7 +62,7 @@ registerBlockType( 'core/gallery', {
 	category: 'common',
 	keywords: [ __( 'images' ), __( 'photos' ) ],
 
-	attributes: blockAttributes,
+	attributes: galleryBlockAttributes,
 
 	transforms: {
 		from: [
@@ -181,7 +181,7 @@ registerBlockType( 'core/gallery', {
 
 	deprecated: [ {
 		attributes: {
-			...blockAttributes,
+			...galleryBlockAttributes,
 			images: {
 				type: 'array',
 				default: [],
