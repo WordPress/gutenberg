@@ -90,7 +90,7 @@ export const DocumentOutline = ( { blocks = [], title, onSelect } ) => {
 		return (
 			<DocumentOutlineItem
 				key={ index }
-				level={ headingLevel }
+				level={ `H${ headingLevel }` }
 				isValid={ isValid }
 				onClick={ () => onSelectHeading( heading.uid ) }
 			>
@@ -105,7 +105,7 @@ export const DocumentOutline = ( { blocks = [], title, onSelect } ) => {
 			<ul>
 				{ title && (
 					<DocumentOutlineItem
-						level={ 1 }
+						level="Title"
 						isValid
 						onClick={ focusTitle }
 					>
