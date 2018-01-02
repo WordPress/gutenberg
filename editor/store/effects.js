@@ -17,6 +17,7 @@ import {
 	getDefaultBlockName,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -140,7 +141,7 @@ export default {
 					{ ' ' }
 					{ shouldShowLink && <a href={ post.link }>{ __( 'View post' ) }</a> }
 				</p>,
-				{ id: SAVE_POST_NOTICE_ID }
+				{ id: SAVE_POST_NOTICE_ID, spokenMessage: noticeMessage }
 			) );
 		}
 
@@ -361,17 +362,16 @@ export default {
 					updatedId: updatedReusableBlock.id,
 					id,
 				} );
-				dispatch( createSuccessNotice(
-					__( 'Block updated.' ),
-					{ id: SAVE_REUSABLE_BLOCK_NOTICE_ID }
-				) );
+				const message = __( 'Block updated.' );
+				dispatch( createSuccessNotice( message, { id: SAVE_REUSABLE_BLOCK_NOTICE_ID } ) );
 			},
 			( error ) => {
 				dispatch( { type: 'SAVE_REUSABLE_BLOCK_FAILURE', id } );
-				dispatch( createErrorNotice(
-					get( error.responseJSON, 'message', __( 'An unknown error occured.' ) ),
-					{ id: SAVE_REUSABLE_BLOCK_NOTICE_ID }
-				) );
+				const message = __( 'An unknown error occured.' );
+				dispatch( createErrorNotice( get( error.responseJSON, 'message', message ), {
+					id: SAVE_REUSABLE_BLOCK_NOTICE_ID,
+					spokenMessage: message,
+				} ) );
 			}
 		);
 	},
@@ -395,5 +395,9 @@ export default {
 	},
 	APPEND_DEFAULT_BLOCK() {
 		return insertBlock( createBlock( getDefaultBlockName() ) );
+	},
+	CREATE_NOTICE( { notice: { content, spokenMessage } } ) {
+		const message = spokenMessage || content;
+		speak( message, 'assertive' );
 	},
 };

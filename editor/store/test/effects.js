@@ -346,6 +346,7 @@ describe( 'effects', () => {
 					id: 'SAVE_POST_NOTICE_ID',
 					isDismissible: true,
 					status: 'success',
+					spokenMessage: 'Post published!',
 				},
 				type: 'CREATE_NOTICE',
 			} ) );
@@ -371,6 +372,7 @@ describe( 'effects', () => {
 					id: 'SAVE_POST_NOTICE_ID',
 					isDismissible: true,
 					status: 'success',
+					spokenMessage: 'Post reverted to draft.',
 				},
 				type: 'CREATE_NOTICE',
 			} ) );
@@ -392,6 +394,7 @@ describe( 'effects', () => {
 					id: 'SAVE_POST_NOTICE_ID',
 					isDismissible: true,
 					status: 'success',
+					spokenMessage: 'Post updated!',
 				},
 				type: 'CREATE_NOTICE',
 			} ) );
