@@ -221,6 +221,8 @@ registerBlockType( 'core/button', {
 	},
 
 	deprecated: [ {
+		attributes: blockAttributes,
+
 		save( { attributes } ) {
 			const { url, text, title, align, color, textColor } = attributes;
 
