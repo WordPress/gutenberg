@@ -46,10 +46,10 @@ class WP_REST_BlockAPI_Test extends WP_UnitTestCase {
 		);
 
 		self::$test_block_post_id = wp_insert_post( array(
-			'post_type' => 'post',
-			'post_status' => 'publish',
-			'post_name' => 'gutenberg-block-test',
-			'post_title' => 'My cool block',
+			'post_type'    => 'post',
+			'post_status'  => 'publish',
+			'post_name'    => 'gutenberg-block-test',
+			'post_title'   => 'My cool block',
 			'post_content' => self::$demo_post_content,
 		) );
 
@@ -85,7 +85,7 @@ class WP_REST_BlockAPI_Test extends WP_UnitTestCase {
 		$blocks = isset( $response->data['content']['blocks'] ) ? $response->data['content']['blocks'] : false;
 
 		$first_block_url_attribute = wp_unslash( $blocks[0]['attributes']['url'] );
-		$first_block_type = wp_unslash( $blocks[0]['type'] );
+		$first_block_type          = wp_unslash( $blocks[0]['type'] );
 
 		$this->assertEquals( count( $blocks ), 43, 'The demo post content api call should contain 43 blocks.' );
 		$this->assertEquals( 'https://cldup.com/GCwahb3aOb.jpg', $first_block_url_attribute, 'Block attributes should be returned correctly.' );

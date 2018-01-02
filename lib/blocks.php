@@ -284,7 +284,7 @@ function gutenberg_add_blocks_to_post_resource( $content ) {
 
 		// Set up rendered content, if available.
 		$block['renderedContent'] = null;
-		$block_type = $registry->get_registered( $block_name );
+		$block_type               = $registry->get_registered( $block_name );
 		if ( null !== $block_type ) {
 			$block['renderedContent'] = $block_type->render( $attributes, $raw_content );
 		}
@@ -348,7 +348,7 @@ function gutenberg_extract_blocks_from_post_content( $response, $post ) {
 	}
 
 	// Extract the block data from the post content.
-	$blocks = gutenberg_add_blocks_to_post_resource( $post->post_content );
+	$blocks                              = gutenberg_add_blocks_to_post_resource( $post->post_content );
 	$response->data['content']['blocks'] = $blocks;
 
 	return $response;
