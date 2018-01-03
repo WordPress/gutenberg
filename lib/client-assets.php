@@ -350,13 +350,13 @@ function gutenberg_vendor_script_filename( $src ) {
  * @param  array  $data    REST response data.
  * @param  string $link    Link relation.
  * @param  string $context Optional context to append.
- * @return string          Link relation URI.
+ * @return string          Link relation URI, or empty string if none exists.
  */
 function gutenberg_get_rest_link( $data, $link, $context = null ) {
 	// Check whether a link entry with href exists.
 	if ( empty( $data['_links'] ) || empty( $data['_links'][ $link ] ) ||
 			! isset( $data['_links'][ $link ][0]['href'] ) ) {
-		return;
+		return '';
 	}
 
 	$href = $data['_links'][ $link ][0]['href'];
