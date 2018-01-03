@@ -14,7 +14,7 @@ import { MenuItemsGroup } from '@wordpress/components';
  * Internal dependencies
  */
 import { getSidebars, activateSidebar } from '../../../api/sidebar';
-import { getActivePanel, isEditorSidebarOpened } from '../../../store/selectors';
+import { getActivePanel, hasOpenSidebar  } from '../../../store/selectors';
 import { toggleSidebar } from '../../../store/actions';
 
 /**
@@ -24,17 +24,17 @@ import { toggleSidebar } from '../../../store/actions';
  * @param {Function} props.onSwitch        Function to call when a plugin is
  *                                         switched to.
  * @param {string}   props.activePanel     The currently active panel.
- * @param {boolean}  props.isSidebarOpened Whether the sidebar is currently open.
+ * @param {boolean}  props.isSidebarOpen   Whether a sidebar is currently open.
  * @param {Function} props.onToggleSidebar Function to call when the sidebar
  *                                         should be toggled.
  *
  * @returns {Object} The rendered list of menu items.
  */
-function Plugins( { activePanel, onSwitch, isSidebarOpened, onToggleSidebar } ) {
+function Plugins( { activePanel, onSwitch, isSidebarOpen, onToggleSidebar } ) {
 	const sidebars = getSidebars();
 
 	// This makes sure no check mark is before a plugin if the sidebar is closed.
-	if ( ! isSidebarOpened ) {
+	if ( ! isSidebarOpen ) {
 		activePanel = '';
 	}
 
@@ -46,7 +46,7 @@ function Plugins( { activePanel, onSwitch, isSidebarOpened, onToggleSidebar } ) 
 	function onSelect( panelToActivate ) {
 		onSwitch( panelToActivate );
 
-		if ( ! isSidebarOpened ) {
+		if ( ! isSidebarOpen ) {
 			onToggleSidebar();
 		}
 	}
@@ -72,7 +72,7 @@ export default connect(
 	( state ) => {
 		return {
 			activePanel: getActivePanel( state ),
-			isSidebarOpened: isEditorSidebarOpened( state ),
+			isSidebarOpen: hasOpenSidebar( state ),
 		};
 	},
 	( dispatch, ownProps ) => {
