@@ -4,6 +4,7 @@ export { default as Autocomplete } from './autocomplete';
 export { default as Button } from './button';
 export { default as ClipboardButton } from './clipboard-button';
 export { default as Dashicon } from './dashicon';
+export { DateTimePicker, DatePicker, TimePicker } from './date-time';
 export { default as DropZone } from './drop-zone';
 export { default as DropZoneProvider } from './drop-zone/provider';
 export { default as Dropdown } from './dropdown';

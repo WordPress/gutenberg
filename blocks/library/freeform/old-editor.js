@@ -1,15 +1,14 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { keycodes } from '@wordpress/utils';
-
-/**
- * Internal dependencies
- */
-import InspectorControls from '../../inspector-controls';
-import BlockDescription from '../../block-description';
 
 const { BACKSPACE, DELETE } = keycodes;
 
@@ -177,16 +176,9 @@ export default class OldEditor extends Component {
 	}
 
 	render() {
-		const { focus, id } = this.props;
+		const { focus, id, className } = this.props;
 
 		return [
-			focus && (
-				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'The classic editor, in block form.' ) }</p>
-					</BlockDescription>
-				</InspectorControls>
-			),
 			<div
 				key="toolbar"
 				id={ id + '-toolbar' }
@@ -197,7 +189,7 @@ export default class OldEditor extends Component {
 			<div
 				key="editor"
 				id={ id }
-				className="blocks-editable__tinymce"
+				className={ classnames( className, 'blocks-editable__tinymce' ) }
 			/>,
 		];
 	}

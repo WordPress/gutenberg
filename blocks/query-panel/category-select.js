@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { get } from 'lodash';
+import { stringify } from 'querystringify';
 
 /**
  * WordPress dependencies
@@ -24,8 +25,14 @@ function CategorySelect( { label, noOptionLabel, categories, selectedCategory, o
 	);
 }
 
-const applyWithAPIData = withAPIData( () => ( {
-	categories: '/wp/v2/categories',
-} ) );
+const applyWithAPIData = withAPIData( () => {
+	const query = stringify( {
+		per_page: 100,
+		_fields: [ 'id', 'name', 'parent' ],
+	} );
+	return {
+		categories: `/wp/v2/categories?${ query }`,
+	};
+} );
 
 export default applyWithAPIData( CategorySelect );

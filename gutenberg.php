@@ -21,15 +21,13 @@ gutenberg_pre_init();
  * The main entry point for the Gutenberg editor. Renders the editor on the
  * wp-admin page for the plugin.
  *
- * @todo Remove the temporary fix for the NVDA screen reader and use meaningful
- *       content instead. See pull #2380 and issues #467 and #503.
- *
  * @since 0.1.0
  */
 function the_gutenberg_project() {
+	global $post_type_object;
 	?>
-	<div class="nvda-temp-fix screen-reader-text">&nbsp;</div>
 	<div class="gutenberg">
+		<h1 class="screen-reader-text"><?php echo esc_html( $post_type_object->labels->edit_item ); ?></h1>
 		<div id="editor" class="gutenberg__editor"></div>
 		<div id="metaboxes" style="display: none;">
 			<?php the_gutenberg_metaboxes(); ?>
@@ -82,7 +80,7 @@ function gutenberg_menu() {
 add_action( 'admin_menu', 'gutenberg_menu' );
 
 /**
- * Display a notice and deactivate the Gutenberg plugin.
+ * Display a version notice and deactivate the Gutenberg plugin.
  *
  * @since 0.1.0
  */
@@ -95,11 +93,27 @@ function gutenberg_wordpress_version_notice() {
 }
 
 /**
+ * Display a build notice.
+ *
+ * @since 0.1.0
+ */
+function gutenberg_build_files_notice() {
+	echo '<div class="error"><p>';
+	echo __( 'Gutenberg development mode requires files to be built. Run <code>npm install</code> to install dependencies, and <code>npm run dev</code> to build and watch the files. Read the <a href="https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md">contributing</a> file for more information.', 'gutenberg' );
+	echo '</p></div>';
+}
+
+/**
  * Verify that we can initialize the Gutenberg editor , then load it.
  *
  * @since 1.5.0
  */
 function gutenberg_pre_init() {
+	if ( GUTENBERG_DEVELOPMENT_MODE && ! file_exists( dirname( __FILE__ ) . '/blocks/build' ) ) {
+		add_action( 'admin_notices', 'gutenberg_build_files_notice' );
+		return;
+	}
+
 	// Get unmodified $wp_version.
 	include( ABSPATH . WPINC . '/version.php' );
 

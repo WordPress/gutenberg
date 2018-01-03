@@ -11,6 +11,7 @@ import {
 	pick,
 	some,
 	sortBy,
+	isEmpty,
 } from 'lodash';
 import { connect } from 'react-redux';
 
@@ -35,7 +36,7 @@ import { keycodes } from '@wordpress/utils';
 import './style.scss';
 
 import { getBlocks, getRecentlyUsedBlocks, getReusableBlocks } from '../../store/selectors';
-import { showInsertionPoint, hideInsertionPoint, fetchReusableBlocks } from '../../store/actions';
+import { fetchReusableBlocks } from '../../store/actions';
 import { default as InserterGroup } from './group';
 
 export const searchBlocks = ( blocks, searchTerm ) => {
@@ -149,7 +150,7 @@ export class InserterMenu extends Component {
 			initialAttributes: {
 				ref: reusableBlock.id,
 			},
-			title: reusableBlock.name,
+			title: reusableBlock.title,
 			icon: 'layout',
 			category: 'reusable-blocks',
 		} ) );
@@ -232,8 +233,6 @@ export class InserterMenu extends Component {
 				labelledBy={ labelledBy }
 				bindReferenceNode={ this.bindReferenceNode }
 				selectBlock={ this.selectBlock }
-				showInsertionPoint={ this.props.showInsertionPoint }
-				hideInsertionPoint={ this.props.hideInsertionPoint }
 			/>
 		);
 	}
@@ -255,6 +254,14 @@ export class InserterMenu extends Component {
 	}
 
 	renderCategories( visibleBlocksByCategory ) {
+		if ( isEmpty( visibleBlocksByCategory ) ) {
+			return (
+				<span className="editor-inserter__no-results">
+					{ __( 'No blocks found' ) }
+				</span>
+			);
+		}
+
 		return getCategories().map(
 			( category ) => this.renderCategory( category, visibleBlocksByCategory[ category.slug ] )
 		);
@@ -268,16 +275,31 @@ export class InserterMenu extends Component {
 
 	renderTabView( tab ) {
 		const blocksForTab = this.getBlocksForTab( tab );
+
+		// If the Recent tab is selected, don't render category headers
 		if ( 'recent' === tab ) {
 			return this.renderBlocks( blocksForTab );
 		}
 
-		const visibleBlocks = this.getVisibleBlocksByCategory( blocksForTab );
-		if ( 'embed' === tab ) {
-			return this.renderBlocks( visibleBlocks.embed );
+		// If the Saved tab is selected and we have no results, display a friendly message
+		if ( 'saved' === tab && blocksForTab.length === 0 ) {
+			return (
+				<p className="editor-inserter__no-tab-content-message">
+					{ __( 'No saved blocks.' ) }
+				</p>
+			);
 		}
 
-		return this.renderCategories( visibleBlocks );
+		const visibleBlocksByCategory = this.getVisibleBlocksByCategory( blocksForTab );
+
+		// If our results have only blocks from one category, don't render category headers
+		const categories = Object.keys( visibleBlocksByCategory );
+		if ( categories.length === 1 ) {
+			const [ soleCategory ] = categories;
+			return this.renderBlocks( visibleBlocksByCategory[ soleCategory ] );
+		}
+
+		return this.renderCategories( visibleBlocksByCategory );
 	}
 
 	interceptArrows( event ) {
@@ -362,7 +384,7 @@ const connectComponent = connect(
 			reusableBlocks: getReusableBlocks( state ),
 		};
 	},
-	{ showInsertionPoint, hideInsertionPoint, fetchReusableBlocks }
+	{ fetchReusableBlocks }
 );
 
 export default compose(

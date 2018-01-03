@@ -17,6 +17,7 @@ import {
 	getDefaultBlockName,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -140,7 +141,7 @@ export default {
 					{ ' ' }
 					{ shouldShowLink && <a href={ post.link }>{ __( 'View post' ) }</a> }
 				</p>,
-				{ id: SAVE_POST_NOTICE_ID }
+				{ id: SAVE_POST_NOTICE_ID, spokenMessage: noticeMessage }
 			) );
 		}
 
@@ -321,18 +322,18 @@ export default {
 
 		let result;
 		if ( id ) {
-			result = new wp.api.models.ReusableBlocks( { id } ).fetch();
+			result = new wp.api.models.Blocks( { id } ).fetch();
 		} else {
-			result = new wp.api.collections.ReusableBlocks().fetch();
+			result = new wp.api.collections.Blocks().fetch();
 		}
 
 		result.then(
 			( reusableBlockOrBlocks ) => {
 				dispatch( {
 					type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
-					reusableBlocks: castArray( reusableBlockOrBlocks ).map( ( { id: itemId, name, content } ) => {
+					reusableBlocks: castArray( reusableBlockOrBlocks ).map( ( { id: itemId, title, content } ) => {
 						const [ { name: type, attributes } ] = parse( content );
-						return { id: itemId, name, type, attributes };
+						return { id: itemId, title, type, attributes };
 					} ),
 				} );
 			},
@@ -351,27 +352,26 @@ export default {
 		const { id } = action;
 		const { getState, dispatch } = store;
 
-		const { name, type, attributes, isTemporary } = getReusableBlock( getState(), id );
+		const { title, type, attributes, isTemporary } = getReusableBlock( getState(), id );
 		const content = serialize( createBlock( type, attributes ) );
-		const requestData = isTemporary ? { name, content } : { id, name, content };
-		new wp.api.models.ReusableBlocks( requestData ).save().then(
+		const requestData = isTemporary ? { title, content } : { id, title, content };
+		new wp.api.models.Blocks( requestData ).save().then(
 			( updatedReusableBlock ) => {
 				dispatch( {
 					type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
 					updatedId: updatedReusableBlock.id,
 					id,
 				} );
-				dispatch( createSuccessNotice(
-					__( 'Block updated.' ),
-					{ id: SAVE_REUSABLE_BLOCK_NOTICE_ID }
-				) );
+				const message = __( 'Block updated.' );
+				dispatch( createSuccessNotice( message, { id: SAVE_REUSABLE_BLOCK_NOTICE_ID } ) );
 			},
 			( error ) => {
 				dispatch( { type: 'SAVE_REUSABLE_BLOCK_FAILURE', id } );
-				dispatch( createErrorNotice(
-					get( error.responseJSON, 'message', __( 'An unknown error occured.' ) ),
-					{ id: SAVE_REUSABLE_BLOCK_NOTICE_ID }
-				) );
+				const message = __( 'An unknown error occured.' );
+				dispatch( createErrorNotice( get( error.responseJSON, 'message', message ), {
+					id: SAVE_REUSABLE_BLOCK_NOTICE_ID,
+					spokenMessage: message,
+				} ) );
 			}
 		);
 	},
@@ -395,5 +395,9 @@ export default {
 	},
 	APPEND_DEFAULT_BLOCK() {
 		return insertBlock( createBlock( getDefaultBlockName() ) );
+	},
+	CREATE_NOTICE( { notice: { content, spokenMessage } } ) {
+		const message = spokenMessage || content;
+		speak( message, 'assertive' );
 	},
 };

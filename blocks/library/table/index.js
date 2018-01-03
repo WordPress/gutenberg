@@ -12,11 +12,10 @@ import { registerBlockType } from '../../api';
 import TableBlock from './table-block';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
-import InspectorControls from '../../inspector-controls';
-import BlockDescription from '../../block-description';
 
 registerBlockType( 'core/table', {
 	title: __( 'Table' ),
+	description: __( 'Tables. Best used for tabular data.' ),
 	icon: 'editor-table',
 	category: 'formatting',
 
@@ -57,13 +56,6 @@ registerBlockType( 'core/table', {
 		const { content } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		return [
-			focus && (
-				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'Tables. Best used for tabular data.' ) }</p>
-					</BlockDescription>
-				</InspectorControls>
-			),
 			focus && (
 				<BlockControls key="toolbar">
 					<BlockAlignmentToolbar

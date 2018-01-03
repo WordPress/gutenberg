@@ -9,11 +9,11 @@ import { __ } from '@wordpress/i18n';
 import './editor.scss';
 import { registerBlockType, createBlock } from '../../api';
 import Editable from '../../editable';
-import InspectorControls from '../../inspector-controls';
-import BlockDescription from '../../block-description';
 
 registerBlockType( 'core/preformatted', {
 	title: __( 'Preformatted' ),
+
+	description: __( 'Preformatted text keeps your spaces, tabs and linebreaks as they are.' ),
 
 	icon: 'text',
 
@@ -60,13 +60,6 @@ registerBlockType( 'core/preformatted', {
 		const { content } = attributes;
 
 		return [
-			focus && (
-				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'Preformatted text keeps your spaces, tabs and linebreaks as they are.' ) }</p>
-					</BlockDescription>
-				</InspectorControls>
-			),
 			<Editable
 				key="block"
 				tagName="pre"

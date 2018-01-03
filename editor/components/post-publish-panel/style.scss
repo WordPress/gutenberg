@@ -1,0 +1,61 @@
+.editor-post-publish-panel {
+	background: $white;
+	color: $dark-gray-500;
+}
+
+.editor-post-publish-panel__content {
+	padding: 16px;
+
+	.components-panel__body {
+		margin-left: -16px;
+		margin-right: -16px;
+		margin-bottom: -16px;
+		margin-top: 10px;
+		border: none;
+
+		.components-panel__body-toggle {
+			font-weight: normal;
+		}
+	}
+
+	.editor-post-visibility__dialog-legend {
+		display: none;
+	}
+}
+
+.editor-post-publish-panel__header {
+	padding-left: 16px;
+	height: $header-height;
+	border-bottom: 1px solid $light-gray-500;
+	display: flex;
+	align-items: center;
+	align-content: space-between;
+}
+
+.editor-post-publish-panel__header-publish-button {
+	flex-grow: 1;
+	text-align: right;
+}
+
+.editor-post-publish-panel__footer {
+	padding: 16px;
+}
+
+.wp-core-ui .editor-post-publish-panel__toggle.button-primary {
+	margin: 0 10px;
+	display: inline-flex;
+	align-items: center;
+
+	&.is-busy .dashicon {
+		display: none;
+	}
+
+	.dashicon {
+		margin-right: -4px;
+	}
+}
+
+.editor-post-publish-panel__link {
+	color: $blue-medium-700;
+	text-decoration: underline;
+}

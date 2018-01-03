@@ -12,7 +12,7 @@ import { PanelBody } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { PostTaxonomies as PostTaxonomiesForm } from '../../../components';
+import { PostTaxonomies as PostTaxonomiesForm, PostTaxonomiesCheck } from '../../../components';
 import { isEditorSidebarPanelOpened } from '../../../store/selectors';
 import { toggleSidebarPanel } from '../../../store/actions';
 
@@ -23,13 +23,15 @@ const PANEL_NAME = 'post-taxonomies';
 
 function PostTaxonomies( { isOpened, onTogglePanel } ) {
 	return (
-		<PanelBody
-			title={ __( 'Categories & Tags' ) }
-			opened={ isOpened }
-			onToggle={ onTogglePanel }
-		>
-			<PostTaxonomiesForm />
-		</PanelBody>
+		<PostTaxonomiesCheck>
+			<PanelBody
+				title={ __( 'Categories & Tags' ) }
+				opened={ isOpened }
+				onToggle={ onTogglePanel }
+			>
+				<PostTaxonomiesForm />
+			</PanelBody>
+		</PostTaxonomiesCheck>
 	);
 }
 

@@ -45,7 +45,7 @@ class PanelBody extends Component {
 		return (
 			<div className={ classes }>
 				{ !! title && (
-					<h3 className="components-panel__body-title">
+					<h2 className="components-panel__body-title">
 						<Button
 							className="components-panel__body-toggle"
 							onClick={ this.toggle }
@@ -54,7 +54,7 @@ class PanelBody extends Component {
 							<Dashicon icon={ icon } />
 							{ title }
 						</Button>
-					</h3>
+					</h2>
 				) }
 				{ isOpened && children }
 			</div>

@@ -141,7 +141,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-components',
 		gutenberg_url( 'components/build/index.js' ),
-		array( 'wp-element', 'wp-i18n', 'wp-utils', 'wp-hooks', 'wp-api-request' ),
+		array( 'wp-element', 'wp-i18n', 'wp-utils', 'wp-hooks', 'wp-api-request', 'moment' ),
 		filemtime( gutenberg_dir_path() . 'components/build/index.js' )
 	);
 	wp_register_script(
@@ -261,21 +261,21 @@ function gutenberg_register_vendor_scripts() {
 	$tinymce_version = '4.7.2';
 	gutenberg_register_vendor_script(
 		'tinymce-latest',
-		'https://fiddle.azurewebsites.net/tinymce/' . $tinymce_version . '/tinymce' . $suffix . '.js'
+		'https://unpkg.com/tinymce@' . $tinymce_version . '/tinymce' . $suffix . '.js'
 	);
 	gutenberg_register_vendor_script(
 		'tinymce-latest-lists',
-		'https://fiddle.azurewebsites.net/tinymce/' . $tinymce_version . '/plugins/lists/plugin' . $suffix . '.js',
+		'https://unpkg.com/tinymce@' . $tinymce_version . '/plugins/lists/plugin' . $suffix . '.js',
 		array( 'tinymce-latest' )
 	);
 	gutenberg_register_vendor_script(
 		'tinymce-latest-paste',
-		'https://fiddle.azurewebsites.net/tinymce/' . $tinymce_version . '/plugins/paste/plugin' . $suffix . '.js',
+		'https://unpkg.com/tinymce@' . $tinymce_version . '/plugins/paste/plugin' . $suffix . '.js',
 		array( 'tinymce-latest' )
 	);
 	gutenberg_register_vendor_script(
 		'tinymce-latest-table',
-		'https://fiddle.azurewebsites.net/tinymce/' . $tinymce_version . '/plugins/table/plugin' . $suffix . '.js',
+		'https://unpkg.com/tinymce@' . $tinymce_version . '/plugins/table/plugin' . $suffix . '.js',
 		array( 'tinymce-latest' )
 	);
 	gutenberg_register_vendor_script(
@@ -743,9 +743,12 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		$post_to_edit['content']['raw'] = gutenberg_wpautop_block_content( $post_to_edit['content']['raw'] );
 	}
 
+	// Set the post type name.
+	$post_type = get_post_type( $post );
+
 	// Preload common data.
 	$preload_paths = array(
-		'/wp/v2/users/me?context=edit',
+		sprintf( '/wp/v2/users/me?post_type=%s&context=edit', $post_type ),
 		'/wp/v2/taxonomies?context=edit',
 		gutenberg_get_rest_link( $post_to_edit, 'about', 'edit' ),
 	);
@@ -829,7 +832,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$script  = '( function() {';
 	$script .= sprintf( 'var editorSettings = %s;', wp_json_encode( $editor_settings ) );
 	$script .= <<<JS
-		window._wpLoadGutenbergEditor = Promise.all( [ wp.api.init(), wp.api.init( { versionString: 'gutenberg/v1/' } ) ] ).then( function() {
+		window._wpLoadGutenbergEditor = wp.api.init().then( function() {
 			return wp.editor.createEditorInstance( 'editor', window._wpGutenbergPost, editorSettings );
 		} );
 JS;
