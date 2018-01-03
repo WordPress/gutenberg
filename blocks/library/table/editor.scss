@@ -1,6 +1,6 @@
 .editor-block-list__block[data-type="core/table"] {
 
-	.editor-block-toolbar__group > div:not(.editor-block-toolbar__mobile-tools) {
+	.editor-block-toolbar__group > div {
 		display: flex;
 	}
 

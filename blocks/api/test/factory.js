@@ -44,6 +44,10 @@ describe( 'block factory', () => {
 						type: 'boolean',
 						default: true,
 					},
+					includesFalseyDefault: {
+						type: 'number',
+						default: 0,
+					},
 				},
 				save: noop,
 				category: 'common',
@@ -56,6 +60,7 @@ describe( 'block factory', () => {
 			expect( block.name ).toEqual( 'core/test-block' );
 			expect( block.attributes ).toEqual( {
 				includesDefault: true,
+				includesFalseyDefault: 0,
 				align: 'left',
 			} );
 			expect( block.isValid ).toBe( true );

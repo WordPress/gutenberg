@@ -303,6 +303,43 @@
 			display: block;
 		}
 	}
+
+	// Mobile tools
+	.editor-block-list__block-mobile-toolbar {
+		display: flex;
+		flex-direction: row;
+		margin-top: $item-spacing;
+
+		@include break-small() {
+			display: none;
+		}
+
+		// Movers & trash
+		.editor-block-settings-menu__toggle,
+		& > .editor-block-settings-menu__control,
+		.editor-block-mover__control {
+			width: 36px;
+			height: 36px;
+			padding: 3px;
+			text-indent: 100%;
+			justify-content: center;
+			align-items: center;
+
+			.dashicon {
+				margin: auto;
+			}
+		}
+
+		// Movers
+		.editor-block-mover {
+			margin-right: auto;
+
+			.editor-block-mover__control:first-child {
+				margin: 0;
+				float: left;
+			}
+		}
+	}
 }
 
 .editor-block-list .editor-inserter {

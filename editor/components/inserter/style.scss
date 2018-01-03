@@ -56,7 +56,7 @@ input[type="search"].editor-inserter__search {
 	flex-direction: column;
 	height: 100%;
 	@include break-medium {
-		width: 300px;
+		width: 350px;
 		height: 320px;
 	}
 }
@@ -68,7 +68,7 @@ input[type="search"].editor-inserter__search {
 .editor-inserter__block {
 	display: flex;
 	flex-direction: column;
-	width: calc( 50% - 16px );
+	width: calc( 33% - 16px );
 	border-radius: $button-style__radius-roundrect;
 	font-size: $default-font-size;
 	color: $dark-gray-500;
@@ -99,12 +99,12 @@ input[type="search"].editor-inserter__search {
 }
 
 .editor-inserter__separator {
-	border-top: 1px solid $light-gray-500;
+	border-bottom: 1px solid $light-gray-500;
 	background: rgba( $white, .8 );
 	text-align: center;
 	display: block;
 	margin: 0;
-	padding: 12px 14px 0 14px;
+	padding: 12px 14px 12px 14px;
 	font-size: $default-font-size;
 	font-weight: 600;
 	margin-top: -1px;	// hide the first top border
