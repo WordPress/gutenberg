@@ -443,7 +443,6 @@ function gutenberg_replace_default_add_new_button() {
 			position: relative;
 			top: -3px;
 			text-decoration: none;
-			border: none;
 			border: 1px solid #ccc;
 			border-radius: 2px;
 			background: #f7f7f7;
