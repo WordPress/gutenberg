@@ -15,6 +15,10 @@ import { DocumentOutline } from '../';
 
 describe( 'DocumentOutline', () => {
 	const paragraph = createBlock( 'core/paragraph' );
+	const headingH1 = createBlock( 'core/heading', {
+		content: 'Heading 1',
+		nodeName: 'H1',
+	} );
 	const headingParent = createBlock( 'core/heading', {
 		content: 'Heading parent',
 		nodeName: 'H2',
@@ -59,6 +63,13 @@ describe( 'DocumentOutline', () => {
 			const wrapper = shallow( <DocumentOutline blocks={ blocks } /> );
 
 			expect( wrapper.find( 'TableOfContentsItem' ) ).toHaveLength( 2 );
+		} );
+
+		it( 'should render warnings for multiple h1 heaedings', () => {
+			const blocks = [ headingH1, paragraph, headingH1, paragraph ];
+			const wrapper = shallow( <DocumentOutline blocks={ blocks } /> );
+
+			expect( wrapper ).toMatchSnapshot();
 		} );
 	} );
 } );

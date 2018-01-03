@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { filter } from 'lodash';
+import { filter, countBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -24,6 +24,10 @@ const emptyHeadingContent = <em>{ __( '(Empty heading)' ) }</em>;
 const incorrectLevelContent = [
 	<br key="incorrect-break" />,
 	<em key="incorrect-message">{ __( '(Incorrect heading level)' ) }</em>,
+];
+const multipleH1Headings = [
+	<br key="incorrect-break-h1" />,
+	<em key="incorrect-message-h1">{ __( '(Multiple H1 headings)' ) }</em>,
 ];
 
 const getHeadingLevel = heading => {
@@ -71,34 +75,13 @@ export const DocumentOutline = ( { blocks = [], title, onSelect } ) => {
 		}
 	};
 
-	const items = headings.map( ( heading, index ) => {
-		const headingLevel = getHeadingLevel( heading );
-		const isEmpty = isEmptyHeading( heading );
-
-		// Headings remain the same, go up by one, or down by any amount.
-		// Otherwise there are missing levels.
-		const isIncorrectLevel = headingLevel > prevHeadingLevel + 1;
-
-		const isValid = (
-			! isEmpty &&
-			! isIncorrectLevel &&
-			headingLevel
-		);
-
-		prevHeadingLevel = headingLevel;
-
-		return (
-			<DocumentOutlineItem
-				key={ index }
-				level={ `H${ headingLevel }` }
-				isValid={ isValid }
-				onClick={ () => onSelectHeading( heading.uid ) }
-			>
-				{ isEmpty ? emptyHeadingContent : heading.attributes.content }
-				{ isIncorrectLevel && incorrectLevelContent }
-			</DocumentOutlineItem>
-		);
-	} );
+	const items = headings.map( ( heading ) => ( {
+		...heading,
+		level: getHeadingLevel( heading ),
+		isEmpty: isEmptyHeading( heading ),
+	} ) );
+	const countByLevel = countBy( items, 'level' );
+	const hasMultipleH1 = countByLevel[ 1 ] > 1;
 
 	return (
 		<div className="document-outline">
@@ -112,7 +95,32 @@ export const DocumentOutline = ( { blocks = [], title, onSelect } ) => {
 						{ title }
 					</DocumentOutlineItem>
 				) }
-				{ items }
+				{ items.map( ( item, index ) => {
+					// Headings remain the same, go up by one, or down by any amount.
+					// Otherwise there are missing levels.
+					const isIncorrectLevel = item.level > prevHeadingLevel + 1;
+
+					const isValid = (
+						! item.isEmpty &&
+						! isIncorrectLevel &&
+						!! item.level &&
+						( item.level !== 1 || ! hasMultipleH1 )
+					);
+					prevHeadingLevel = item.level;
+
+					return (
+						<DocumentOutlineItem
+							key={ index }
+							level={ `H${ item.level }` }
+							isValid={ isValid }
+							onClick={ () => onSelectHeading( item.uid ) }
+						>
+							{ item.isEmpty ? emptyHeadingContent : item.attributes.content }
+							{ isIncorrectLevel && incorrectLevelContent }
+							{ item.level === 1 && hasMultipleH1 && multipleH1Headings }
+						</DocumentOutlineItem>
+					);
+				} ) }
 			</ul>
 		</div>
 	);
