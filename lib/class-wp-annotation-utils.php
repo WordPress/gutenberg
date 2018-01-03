@@ -52,9 +52,9 @@ final class WP_Annotation_Utils {
 				'editor',
 				'custom-fields',
 			),
+			'show_in_rest'          => true,
 			'rest_base'             => 'annotations',
 			'rest_controller_class' => 'WP_REST_Annotations_Controller',
-			'show_in_rest'          => false, // Gutenberg registers routes.
 
 			'map_meta_cap'          => true,
 			'capabilities'          => array(
