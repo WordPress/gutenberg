@@ -43,6 +43,14 @@ export default class InserterGroup extends Component {
 		}
 	}
 
+	hoverBlock( block ) {
+		return () => {
+			if ( this.props.onHover ) {
+				this.props.onHover( block );
+			}
+		};
+	}
+
 	renderItem( item ) {
 		const { current } = this.state;
 		const { onSelectItem } = this.props;
@@ -57,6 +65,8 @@ export default class InserterGroup extends Component {
 				onClick={ () => onSelectItem( item ) }
 				tabIndex={ isCurrent || item.isDisabled ? null : '-1' }
 				disabled={ item.isDisabled }
+				onMouseEnter={ this.hoverBlock( item ) }
+				onMouseLeave={ this.hoverBlock( null ) }
 			>
 				<BlockIcon icon={ item.icon } />
 				{ item.title }

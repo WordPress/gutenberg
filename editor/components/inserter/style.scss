@@ -1,3 +1,7 @@
+$content-height: 250px;
+$tabs-height: 38px;
+$preview-height: 200px;
+
 .editor-inserter {
 	display: inline-block;
 	background: none;
@@ -61,7 +65,11 @@ input[type="search"].editor-inserter__search {
 	height: 100%;
 	@include break-medium {
 		width: 350px;
-		height: 320px;
+
+		.editor-block-preview {
+			border-top: 1px solid $light-gray-500;
+			height: $preview-height;
+		}
 	}
 }
 
@@ -117,6 +125,10 @@ input[type="search"].editor-inserter__search {
 .editor-inserter__search-results {
 	flex-grow: 1;
 	overflow: auto;
+
+	@include break-medium {
+		height: $content-height + $tabs-height;
+	}
 }
 
 .editor-inserter__no-results {
@@ -136,6 +148,10 @@ input[type="search"].editor-inserter__search {
 
 	.components-tab-panel__tab-content {
 		overflow: auto;
+
+		@include break-medium {
+			height: $content-height;
+		}
 	}
 
 	.components-tab-panel__tabs {

@@ -37,6 +37,7 @@ import './style.scss';
 import { getInserterItems, getRecentInserterItems } from '../../store/selectors';
 import { fetchReusableBlocks } from '../../store/actions';
 import { default as InserterGroup } from './group';
+import BlockPreview from '../block-preview';
 
 export const searchItems = ( items, searchTerm ) => {
 	const normalizedSearchTerm = searchTerm.toLowerCase().trim();
@@ -59,6 +60,7 @@ export class InserterMenu extends Component {
 		this.state = {
 			filterValue: '',
 			tab: 'recent',
+			selectedItem: null,
 		};
 		this.filter = this.filter.bind( this );
 		this.searchItems = this.searchItems.bind( this );
@@ -68,6 +70,7 @@ export class InserterMenu extends Component {
 
 		this.tabScrollTop = { recent: 0, blocks: 0, embeds: 0 };
 		this.switchTab = this.switchTab.bind( this );
+		this.previewItem = this.previewItem.bind( this );
 	}
 
 	componentDidMount() {
@@ -96,6 +99,10 @@ export class InserterMenu extends Component {
 		this.setState( {
 			filterValue: event.target.value,
 		} );
+	}
+
+	previewItem( item ) {
+		this.setState( { selectedItem: item } );
 	}
 
 	selectItem( item ) {
@@ -170,6 +177,7 @@ export class InserterMenu extends Component {
 				items={ items }
 				labelledBy={ labelledBy }
 				onSelectItem={ this.selectItem }
+				onHover={ this.previewItem }
 			/>
 		);
 	}
@@ -260,10 +268,13 @@ export class InserterMenu extends Component {
 
 	render() {
 		const { instanceId, items } = this.props;
+		const { selectedItem } = this.state;
 		const isSearching = this.state.filterValue;
 
 		return (
-			<TabbableContainer className="editor-inserter__menu" deep
+			<TabbableContainer
+				className="editor-inserter__menu"
+				deep
 				eventToOffset={ this.eventToOffset }
 			>
 				<label htmlFor={ `editor-inserter__search-${ instanceId }` } className="screen-reader-text">
@@ -314,6 +325,7 @@ export class InserterMenu extends Component {
 						{ this.renderCategories( this.getVisibleItemsByCategory( items ) ) }
 					</div>
 				}
+				{ selectedItem && <BlockPreview name={ selectedItem.name } attributes={ selectedItem.initialAttributes } /> }
 			</TabbableContainer>
 		);
 	}
