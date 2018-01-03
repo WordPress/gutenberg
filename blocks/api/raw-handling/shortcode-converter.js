@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, get, dropRight, last, mapValues, pickBy } from 'lodash';
+import { castArray, find, get, dropRight, last, mapValues, pickBy } from 'lodash';
 
 /**
  * Internal dependencies
@@ -25,7 +25,7 @@ export default function( HTML ) {
 			return acc;
 		}
 
-		const transformTags = transform.tag instanceof Array ? transform.tag : [ transform.tag ];
+		const transformTags = castArray( transform.tag );
 
 		let match;
 		let lastIndex = 0;
