@@ -312,8 +312,8 @@ export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScro
  */
 export function isInputField( { nodeName, contentEditable } ) {
 	return (
-		nodeName === 'input' ||
-		nodeName === 'textarea' ||
+		nodeName === 'INPUT' ||
+		nodeName === 'TEXTAREA' ||
 		contentEditable === 'true'
 	);
 }
