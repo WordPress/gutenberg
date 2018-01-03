@@ -2,19 +2,19 @@
  * External dependencies
  */
 import { map } from 'lodash';
+import { connect } from 'react-redux';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { MenuItemsGroup } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { getSidebars, activateSidebar } from '../../../api/sidebar';
-import { MenuItemsGroup } from '../../../../components';
 import { getActivePanel, isEditorSidebarOpened } from '../../../store/selectors';
-import { connect } from 'react-redux';
 import { toggleSidebar } from '../../../store/actions';
 
 /**
