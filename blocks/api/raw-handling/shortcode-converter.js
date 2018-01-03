@@ -25,33 +25,37 @@ export default function( HTML ) {
 			return acc;
 		}
 
+		const transformTags = transform.tag instanceof Array ? transform.tag : [ transform.tag ];
+
 		let match;
 		let lastIndex = 0;
 
-		while ( ( match = shortcode.next( transform.tag, HTML, lastIndex ) ) ) {
-			lastIndex = match.index + match.content.length;
+		for ( const transformTag of transformTags ) {
+			while ( ( match = shortcode.next( transformTag, HTML, lastIndex ) ) ) {
+				lastIndex = match.index + match.content.length;
 
-			const attributes = mapValues(
-				pickBy( transform.attributes, ( schema ) => schema.shortcode ),
-				// Passing all of `match` as second argument is intentionally
-				// broad but shouldn't be too relied upon. See
-				// https://github.com/WordPress/gutenberg/pull/3610#discussion_r152546926
-				( schema ) => schema.shortcode( match.shortcode.attrs, match ),
-			);
+				const attributes = mapValues(
+					pickBy( transform.attributes, ( schema ) => schema.shortcode ),
+					// Passing all of `match` as second argument is intentionally
+					// broad but shouldn't be too relied upon. See
+					// https://github.com/WordPress/gutenberg/pull/3610#discussion_r152546926
+					( schema ) => schema.shortcode( match.shortcode.attrs, match ),
+				);
 
-			const block = createBlock(
-				blockType.name,
-				getBlockAttributes(
-					{
-						...blockType,
-						attributes: transform.attributes,
-					},
-					match.shortcode.content,
-					attributes,
-				)
-			);
+				const block = createBlock(
+					blockType.name,
+					getBlockAttributes(
+						{
+							...blockType,
+							attributes: transform.attributes,
+						},
+						match.shortcode.content,
+						attributes,
+					)
+				);
 
-			acc[ match.index ] = { block, lastIndex };
+				acc[ match.index ] = { block, lastIndex };
+			}
 		}
 
 		return acc;
