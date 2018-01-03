@@ -497,35 +497,6 @@ class WP_REST_Annotations_Controller extends WP_REST_Posts_Controller {
 	}
 
 	/**
-	 * Checks if post can be viewed or managed.
-	 *
-	 * @since [version]
-	 * @access protected
-	 *
-	 * @param  WP_Post_Type|string $post_type Post type name or object.
-	 * @return bool                Whether post type is allowed in REST.
-	 */
-	protected function check_is_post_type_allowed( $post_type ) {
-		if ( is_string( $post_type ) ) {
-			$post_type = get_post_type_object( $post_type );
-		}
-
-		if ( ! ( $post_type instanceof WP_Post_Type ) ) {
-			return false;
-		}
-
-		/*
-		 * Annotations are not registered with REST API support.
-		 * However, Gutenberg exposes *this* controller, which obviously *is* allowed.
-		 */
-		if ( $post_type->name === $this->post_type || ! empty( $post_type->show_in_rest ) ) {
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
 	 * Checks if a post can be read.
 	 *
 	 * @since [version]
