@@ -34,19 +34,19 @@ export function registerSidebar( name, settings ) {
 		console.error(
 			'Sidebar names must be strings.'
 		);
-		return;
+		return null;
 	}
 	if ( ! /^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/.test( name ) ) {
 		console.error(
 			'Sidebar names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-sidebar'
 		);
-		return;
+		return null;
 	}
 	if ( ! settings || ! isFunction( settings.render ) ) {
 		console.error(
 			'The "render" property must be specified and must be a valid function.'
 		);
-		return;
+		return null;
 	}
 	if ( sidebars[ name ] ) {
 		console.error(
@@ -54,17 +54,17 @@ export function registerSidebar( name, settings ) {
 		);
 	}
 
-	if ( ! ( 'title' in settings ) || settings.title === '' ) {
+	if ( ! settings.title ) {
 		console.error(
 			'The sidebar "' + name + '" must have a title.'
 		);
-		return;
+		return null;
 	}
 	if ( typeof settings.title !== 'string' ) {
 		console.error(
 			'Sidebar titles must be strings.'
 		);
-		return;
+		return null;
 	}
 
 	settings = applyFilters( 'editor.registerSidebar', settings, name );
@@ -77,12 +77,12 @@ export function registerSidebar( name, settings ) {
  *
  * @param {string} name The name of the sidebar to retrieve.
  *
- * @returns {false|Object} The settings object of the sidebar. Or false if the
+ * @returns {Object} The settings object of the sidebar. Or false if the
  *                         sidebar doesn't exist.
  */
 export function getSidebar( name ) {
 	if ( ! sidebars.hasOwnProperty( name ) ) {
-		return false;
+		return null;
 	}
 
 	return sidebars[ name ];
@@ -91,7 +91,7 @@ export function getSidebar( name ) {
 /**
  * Retrieves all sidebars that are registered.
  *
- * @returns {Object[]} Registered sidebars.
+ * @returns {Object} Registered sidebars.
  */
 export function getSidebars() {
 	return sidebars;
