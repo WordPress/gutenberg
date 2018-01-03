@@ -46,16 +46,30 @@ export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagNa
 		return parseWithGrammar( HTML );
 	}
 
-	// If there is a plain text version, the HTML version has no formatting,
-	// and there is at least a double line break,
-	// parse any Markdown inside the plain text.
-	if ( plainText && isPlain( HTML ) && plainText.indexOf( '\n\n' ) !== -1 ) {
+	// Parse Markdown (and HTML) if:
+	// * There is a plain text version.
+	// * The HTML version has no formatting.
+	if ( plainText && isPlain( HTML ) ) {
 		const converter = new showdown.Converter();
 
 		converter.setOption( 'noHeaderId', true );
 		converter.setOption( 'tables', true );
 
 		HTML = converter.makeHtml( plainText );
+
+		// Switch to inline mode if:
+		// * The current mode is AUTO.
+		// * The original plain text had no line breaks.
+		// * The original plain text was not an HTML paragraph.
+		// * The converted text is just a paragraph.
+		if (
+			mode === 'AUTO' &&
+			plainText.indexOf( '\n' ) === -1 &&
+			plainText.indexOf( '<p>' ) !== 0 &&
+			HTML.indexOf( '<p>' ) === 0
+		) {
+			mode = 'INLINE';
+		}
 	}
 
 	// An array of HTML strings and block objects. The blocks replace matched shortcodes.
