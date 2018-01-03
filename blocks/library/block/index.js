@@ -162,6 +162,7 @@ registerBlockType( 'core/block', {
 
 	supports: {
 		customClassName: false,
+		html: false,
 	},
 
 	edit: ConnectedReusableBlockEdit,
