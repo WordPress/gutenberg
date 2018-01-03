@@ -6,7 +6,7 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
 >
   <ul>
     <TableOfContentsItem
-      isValid={2}
+      isValid={true}
       key="0"
       level="H2"
       onClick={[Function]}
@@ -14,12 +14,53 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
       Heading parent
     </TableOfContentsItem>
     <TableOfContentsItem
-      isValid={3}
+      isValid={true}
       key="1"
       level="H3"
       onClick={[Function]}
     >
       Heading child
+    </TableOfContentsItem>
+  </ul>
+</div>
+`;
+
+exports[`DocumentOutline header blocks present should render warnings for multiple h1 heaedings 1`] = `
+<div
+  className="document-outline"
+>
+  <ul>
+    <TableOfContentsItem
+      isValid={false}
+      key="0"
+      level={1}
+      onClick={[Function]}
+    >
+      Heading 1
+      <br
+        key="incorrect-break-h1"
+      />
+      <em
+        key="incorrect-message-h1"
+      >
+        (Multiple H1 headings)
+      </em>
+    </TableOfContentsItem>
+    <TableOfContentsItem
+      isValid={false}
+      key="1"
+      level={1}
+      onClick={[Function]}
+    >
+      Heading 1
+      <br
+        key="incorrect-break-h1"
+      />
+      <em
+        key="incorrect-message-h1"
+      >
+        (Multiple H1 headings)
+      </em>
     </TableOfContentsItem>
   </ul>
 </div>
