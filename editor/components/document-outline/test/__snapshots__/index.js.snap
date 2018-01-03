@@ -8,7 +8,7 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
     <TableOfContentsItem
       isValid={2}
       key="0"
-      level={2}
+      level="H2"
       onClick={[Function]}
     >
       Heading parent
@@ -16,7 +16,7 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
     <TableOfContentsItem
       isValid={3}
       key="1"
-      level={3}
+      level="H3"
       onClick={[Function]}
     >
       Heading child
