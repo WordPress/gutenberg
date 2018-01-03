@@ -60,22 +60,25 @@ export default function( HTML ) {
 	let negativeI = 0;
 
 	// Sort the matches and return an array of text pieces and blocks.
-	return Object.keys( matches ).sort().reduce( ( acc, index ) => {
-		const match = matches[ index ];
+	return Object
+		.keys( matches )
+		.sort( ( a, b ) => parseInt( a, 10 ) - parseInt( b, 10 ) )
+		.reduce( ( acc, index ) => {
+			const match = matches[ index ];
 
-		acc = [
-			// Add all pieces except the last text piece.
-			...dropRight( acc ),
-			// Add the start of the last text piece.
-			last( acc ).slice( 0, index - negativeI ),
-			// Add the block.
-			match.block,
-			// Add the rest of the last text piece.
-			last( acc ).slice( match.lastIndex - negativeI ),
-		];
+			acc = [
+				// Add all pieces except the last text piece.
+				...dropRight( acc ),
+				// Add the start of the last text piece.
+				last( acc ).slice( 0, index - negativeI ),
+				// Add the block.
+				match.block,
+				// Add the rest of the last text piece.
+				last( acc ).slice( match.lastIndex - negativeI ),
+			];
 
-		negativeI = match.lastIndex;
+			negativeI = match.lastIndex;
 
-		return acc;
-	}, [ HTML ] );
+			return acc;
+		}, [ HTML ] );
 }
