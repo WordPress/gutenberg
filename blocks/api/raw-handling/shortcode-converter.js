@@ -60,7 +60,7 @@ export default function( HTML ) {
 	let negativeI = 0;
 
 	// Sort the matches and return an array of text pieces and blocks.
-	return Object.keys( matches ).sort().reduce( ( acc, index ) => {
+	return Object.keys( matches ).sort( ( a, b ) => a - b ).reduce( ( acc, index ) => {
 		const match = matches[ index ];
 
 		acc = [
