@@ -4,18 +4,16 @@ By default, blocks provide their styles to enable basic support for blocks in th
 
 Some advanced block features require opt-in support in the theme itself as it's difficult for the block to provide these styles, they may require some architecting of the theme itself, in order to work well.
 
-To opt-in for one of these features, we should call `add_theme_support( 'gutenberg', $features )` in the `functions.php` file of the theme. For example:
+To opt-in for one of these features, we should call `add_theme_support( 'feature-name', $optional-parameters )` in the `functions.php` file of the theme. For example:
 
 ```php
 function mytheme_setup_theme_supported_features() {
-	add_theme_support( 'gutenberg', array(
-		'colors' => array(
-			'#a156b4',
-			'#d0a5db',
-			'#eee',
-			'#444',
-		),
-	) );
+	add_theme_support( 'editor-color-palette',
+		'#a156b4',
+		'#d0a5db',
+		'#eee',
+		'#444'
+	);
 }
 
 add_action( 'after_setup_theme', 'mytheme_setup_theme_supported_features' );
@@ -31,19 +29,17 @@ Some blocks such as the image block have the possibility to define a "wide" or "
 add_theme_support( 'align-wide' );
 ```
 
-### Colors:
+### Block Color Palettes:
 
 Different blocks have the possibility of customizing colors. Gutenberg provides a default palette, but a theme can overwrite it and provide its own:
 
 ```php
-add_theme_support( 'gutenberg', array(
-	'colors' => array(
-		'#a156b4',
-		'#d0a5db',
-		'#eee',
-		'#444',
-	),
-) );
+add_theme_support( 'editor-color-palette',
+	'#a156b4',
+	'#d0a5db',
+	'#eee',
+	'#444'
+);
 ```
 
 The colors will be shown in order on the palette, and there's no limit to how many can be specified.

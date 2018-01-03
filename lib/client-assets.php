@@ -802,10 +802,24 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	// Initialize the editor.
 	$gutenberg_theme_support = get_theme_support( 'gutenberg' );
 	$align_wide              = get_theme_support( 'align-wide' );
-	$color_palette           = gutenberg_color_palette();
+	$color_palette           = get_theme_support( 'editor-color-palette' );
 
-	if ( ! empty( $gutenberg_theme_support[0]['colors'] ) ) {
-		$color_palette = $gutenberg_theme_support[0]['colors'];
+	// Backcompat for Color Palette set through `gutenberg` array.
+	if ( empty( $color_palette ) ) {
+		if ( ! empty( $gutenberg_theme_support[0]['colors'] ) ) {
+			$color_palette = $gutenberg_theme_support[0]['colors'];
+		} else {
+			$color_palette = gutenberg_color_palette();
+		}
+	}
+
+	if ( ! empty( $gutenberg_theme_support ) ) {
+		wp_add_inline_script(
+			'wp-editor',
+			'console.warn( "' .
+				__( 'Adding theme support using the `gutenberg` array is deprecated. See https://wordpress.org/gutenberg/handbook/reference/theme-support/ for details.', 'gutenberg' ) .
+			'");'
+		);
 	}
 
 	/**
@@ -818,8 +832,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$allowed_block_types = apply_filters( 'allowed_block_types', true );
 
 	$editor_settings = array(
-		'alignWide'        => $align_wide,
-		'wideImages'       => ! empty( $gutenberg_theme_support[0]['wide-images'] ), // Backcompat. Use `align-wide`.
+		'alignWide'        => $align_wide || ! empty( $gutenberg_theme_support[0]['wide-images'] ), // Backcompat. Use `align-wide` outside of `gutenberg` array.
 		'colors'           => $color_palette,
 		'blockTypes'       => $allowed_block_types,
 		'titlePlaceholder' => apply_filters( 'enter_title_here', __( 'Add title', 'gutenberg' ), $post ),
