@@ -30,6 +30,14 @@ export const settings = {
 		},
 	},
 
+	example: {
+		content: `
+<?php
+	echo "Beep Beeb Boop";
+?>
+`,
+	},
+
 	supports: {
 		html: false,
 	},

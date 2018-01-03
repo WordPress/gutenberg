@@ -157,6 +157,12 @@ className: false,
 html: false,
 ```
 
+### Example (optional)
+
+* **Type:** `Object`
+
+An object representing an example of the block attributes content. This is used to preview the block with sample data.
+
 ## Edit and Save
 
 The `edit` and `save` functions define the editor interface with which a user would interact, and the markup to be serialized back when a post is saved. They are the heart of how a block operates, so they are [covered separately](https://wordpress.org/gutenberg/handbook/block-edit-save/).
