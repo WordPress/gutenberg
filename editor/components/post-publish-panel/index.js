@@ -39,7 +39,7 @@ function PostPublishPanel( { onClose, user } ) {
 			</div>
 
 			<div className="editor-post-publish-panel__content">
-				<div><strong>{ __( 'All ready to go?' ) }</strong></div>
+				<div><strong>{ __( 'Are you ready to publish?' ) }</strong></div>
 				<p>{ __( 'Here, you can do a last-minute check up of your settings below, before you publish.' ) }</p>
 				{ ! canPublish &&
 					<div>
