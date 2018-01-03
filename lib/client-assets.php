@@ -10,6 +10,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );
 }
 
+// Webpack hot module reloading.
+if ( ! defined( 'GUTENBERG_WEBPACK_HMR' ) ) {
+	define( 'GUTENBERG_WEBPACK_HMR', false );
+}
+if ( ! defined( 'GUTENBERG_WEBPACK_DEV_SERVER' ) ) {
+	define( 'GUTENBERG_WEBPACK_DEV_SERVER', 'http://localhost:3000/' );
+}
+
 /**
  * Retrieves the root plugin path.
  *
@@ -25,12 +33,15 @@ function gutenberg_dir_path() {
  * Retrieves a URL to a file in the gutenberg plugin.
  *
  * @param  string $path Relative path of the desired file.
- *
- * @return string       Fully qualified URL pointing to the desired file.
+ * @param  bool   $hot  Serve the file from webpack dev server.
+ * @return string Fully qualified URL pointing to the desired file.
  *
  * @since 0.1.0
  */
-function gutenberg_url( $path ) {
+function gutenberg_url( $path, $hot = false ) {
+	if ( $hot ) {
+		return GUTENBERG_WEBPACK_DEV_SERVER . $path;
+	}
 	return plugins_url( $path, dirname( __FILE__ ) );
 }
 
@@ -146,10 +157,11 @@ function gutenberg_register_scripts_and_styles() {
 	);
 	wp_register_script(
 		'wp-blocks',
-		gutenberg_url( 'blocks/build/index.js' ),
+		gutenberg_url( 'blocks/build/index.js', GUTENBERG_WEBPACK_HMR  ),
 		array( 'wp-element', 'wp-components', 'wp-utils', 'wp-hooks', 'wp-i18n', 'tinymce-latest', 'tinymce-latest-lists', 'tinymce-latest-paste', 'tinymce-latest-table', 'media-views', 'media-models', 'shortcode' ),
-		filemtime( gutenberg_dir_path() . 'blocks/build/index.js' )
+        GUTENBERG_WEBPACK_HMR ? false : filemtime( gutenberg_dir_path() . 'blocks/build/index.js' )
 	);
+
 	wp_add_inline_script(
 		'wp-blocks',
 		gutenberg_get_script_polyfill( array(
@@ -648,9 +660,9 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	// The editor code itself.
 	wp_enqueue_script(
 		'wp-editor',
-		gutenberg_url( 'editor/build/index.js' ),
+		gutenberg_url( 'editor/build/index.js', GUTENBERG_WEBPACK_HMR ),
 		array( 'jquery', 'wp-api', 'wp-data', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element', 'wp-components', 'wp-utils', 'word-count', 'editor', 'heartbeat' ),
-		filemtime( gutenberg_dir_path() . 'editor/build/index.js' ),
+		GUTENBERG_WEBPACK_HMR ? false : filemtime( gutenberg_dir_path() . 'editor/build/index.js' ),
 		true // enqueue in the footer.
 	);
 

@@ -19,6 +19,26 @@ Alternatively, you can use your own local WordPress environment and clone this r
 
 Next, open a terminal (or if on Windows, a command prompt) and navigate to the repository you cloned. Now type `npm install` to get the dependencies all set up. Then you can type `npm run dev` in your terminal or command prompt to keep the plugin building in the background as you work on it.
 
+### Hot reloading
+
+Webpack hot module reloading (hmr) with is available for the editor. While developing this allows you to see your changes without having to refresh the page.
+
+To enable webpack hot module reloading, place the following line in `wp-config.php` (in the root of your WordPress installation):
+
+```php
+define( 'GUTENBERG_WEBPACK_HMR', true );
+```
+
+Build the project ( `npm run build` ), and start the hmr development server by running `npm run hot`. Any changes to files used by the editor ( `/editor` ), should be reflected in the browser without reloading the page.
+
+If the Webpack server is running on a different port than 3000, you need to configure Gutenberg to refer to the correct port. You can do this using the `GUTENBERG_WEBPACK_DEV_SERVER` constant:
+
+```php
+define( 'GUTENBERG_WEBPACK_DEV_SERVER', 'http://localhost:[your-port]' );
+```
+
+*Warning*: This is still an experimental development feature.
+
 ### On A Remote Server
 
 Open a terminal (or if on Windows, a command prompt) and navigate to the repository you cloned. Now type `npm install` to get the dependencies all set up. Once that finishes, you can type `npm run build`. You can now upload the entire repository to your `wp-content/plugins` directory on your webserver and activate the plugin from the WordPress admin.

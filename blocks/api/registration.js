@@ -80,10 +80,14 @@ export function registerBlockType( name, settings ) {
 		return;
 	}
 	if ( blocks[ name ] ) {
-		console.error(
-			'Block "' + name + '" is already registered.'
-		);
-		return;
+		if ( module.hot ) {
+			delete( blocks[ name ] );
+		} else {
+			console.error(
+				'Block "' + name + '" is already registered.'
+			);
+			return;
+		}
 	}
 	if ( 'keywords' in settings && settings.keywords.length > 3 ) {
 		console.error(
