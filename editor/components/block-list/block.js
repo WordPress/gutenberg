@@ -130,8 +130,7 @@ export class BlockListBlock extends Component {
 	componentWillReceiveProps( newProps ) {
 		if (
 			this.props.order !== newProps.order &&
-			( ( this.props.isSelected && newProps.isSelected ) ||
-			( this.props.isFirstMultiSelected && newProps.isFirstMultiSelected ) )
+			( newProps.isSelected || newProps.isFirstMultiSelected )
 		) {
 			this.previousOffset = this.node.getBoundingClientRect().top;
 		}
