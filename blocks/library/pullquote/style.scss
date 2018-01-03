@@ -15,7 +15,6 @@
 	}
 
 	> p {
-		font-family: $default-font;
 		font-size: 24px;
 		font-weight: 900;
 		line-height: 1.6;
@@ -27,9 +26,5 @@
 		font-weight: 900;
 		text-transform: uppercase;
 		font-size: 13px;
-	}
-
-	cite p {
-		font-family: $default-font;
 	}
 }
