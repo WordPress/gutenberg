@@ -87,7 +87,6 @@
 	right: 0;
 	left: 0;
 	overflow: auto;
-	position: fixed;
 
 	@include break-medium() {
 		top: $admin-bar-height;
