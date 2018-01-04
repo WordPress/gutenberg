@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import lodash from 'lodash';
+import { noop, reduce, set } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -31,8 +31,6 @@ import {
 import reducer from '../reducer';
 import effects from '../effects';
 import * as selectors from '../../store/selectors';
-
-const { noop, reduce, set } = lodash;
 
 // Make all generated UUIDs the same for testing
 jest.mock( 'uuid/v4', () => {
@@ -477,8 +475,6 @@ describe( 'effects', () => {
 
 	describe( 'reusable block effects', () => {
 		beforeAll( () => {
-			lodash.uniqueId = jest.spyOn( lodash, 'uniqueId' );
-
 			registerBlockType( 'core/test-block', {
 				title: 'Test block',
 				category: 'common',
@@ -497,13 +493,7 @@ describe( 'effects', () => {
 			} );
 		} );
 
-		beforeEach( () => {
-			lodash.uniqueId.mockReset();
-		} );
-
 		afterAll( () => {
-			lodash.uniqueId.mockRestore();
-
 			unregisterBlockType( 'core/test-block' );
 			unregisterBlockType( 'core/block' );
 		} );
@@ -858,13 +848,11 @@ describe( 'effects', () => {
 				const dispatch = jest.fn();
 				const store = { getState: () => state, dispatch };
 
-				lodash.uniqueId.mockReturnValue( 1 );
-
 				handler( convertBlockToReusable( staticBlock.uid ), store );
 
 				expect( dispatch ).toHaveBeenCalledWith(
-					updateReusableBlock( -1, {
-						id: -1,
+					updateReusableBlock( expect.any( Number ), {
+						id: expect.any( Number ),
 						isTemporary: true,
 						title: 'Untitled block',
 						type: staticBlock.name,
@@ -872,12 +860,12 @@ describe( 'effects', () => {
 					} )
 				);
 				expect( dispatch ).toHaveBeenCalledWith(
-					saveReusableBlock( -1 )
+					saveReusableBlock( expect.any( Number ) )
 				);
 				expect( dispatch ).toHaveBeenCalledWith(
 					replaceBlocks(
 						[ staticBlock.uid ],
-						[ createBlock( 'core/block', { ref: -1 } ) ]
+						[ createBlock( 'core/block', { ref: expect.any( Number ) } ) ]
 					)
 				);
 			} );
