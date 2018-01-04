@@ -20,7 +20,7 @@ import { TermTreeSelect } from '@wordpress/blocks';
 import { getCurrentPostId, getEditedPostAttribute, getCurrentPostType } from '../../store/selectors';
 import { editPost } from '../../store/actions';
 
-export function PageAttributesParent( { parent, postId, postType, items, onUpdateParent } ) {
+export function PageAttributesParent( { parent, postType, items, onUpdateParent } ) {
 	const isHierarchical = get( postType, 'data.hierarchical', false );
 	const parentPageLabel = get( postType, 'data.labels.parent_item_colon' );
 	const pageItems = get( items, 'data', [] );
@@ -28,7 +28,7 @@ export function PageAttributesParent( { parent, postId, postType, items, onUpdat
 		return null;
 	}
 
-	const pagesTree = buildTermsTree( pageItems.filter( item => item.id !== postId ).map( ( item ) => ( {
+	const pagesTree = buildTermsTree( pageItems.map( ( item ) => ( {
 		id: item.id,
 		parent: item.parent,
 		name: item.title.raw ? item.title.raw : `#${ item.id } (${ __( 'no title' ) })`,
@@ -67,11 +67,13 @@ const applyWithAPIDataPostType = withAPIData( ( props ) => {
 } );
 
 const applyWithAPIDataItems = withAPIData( ( props, { type } ) => {
-	const { postTypeSlug } = props;
+	const { postTypeSlug, postId } = props;
 	const isHierarchical = get( props, 'postType.data.hierarchical', false );
 	const queryString = stringify( {
 		context: 'edit',
 		per_page: 100,
+		exclude: postId,
+		parent_exclude: postId,
 		_fields: [ 'id', 'parent', 'title' ],
 	} );
 	return isHierarchical ? { items: `/wp/v2/${ type( postTypeSlug ) }?${ queryString }` } : {};
