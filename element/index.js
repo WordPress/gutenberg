@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { createElement, Component, cloneElement, Children } from 'react';
+import { createElement, Component, cloneElement, Children, Fragment } from 'react';
 import { render, findDOMNode, createPortal, unmountComponentAtNode } from 'react-dom';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { camelCase, flowRight, isString, upperFirst } from 'lodash';
@@ -57,6 +57,11 @@ export { cloneElement };
 export { findDOMNode };
 
 export { Children };
+
+/**
+ * A component which renders its children without any wrapping element.
+ */
+export { Fragment };
 
 /**
  * Creates a portal into which a component can be rendered.

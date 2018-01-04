@@ -13,6 +13,7 @@ import {
 	fetchReusableBlocks,
 	updateReusableBlock,
 	saveReusableBlock,
+	deleteReusableBlock,
 	convertBlockToStatic,
 	convertBlockToReusable,
 	toggleSelection,
@@ -616,6 +617,14 @@ describe( 'actions', () => {
 		const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
 		expect( saveReusableBlock( id ) ).toEqual( {
 			type: 'SAVE_REUSABLE_BLOCK',
+			id,
+		} );
+	} );
+
+	describe( 'deleteReusableBlock', () => {
+		const id = 123;
+		expect( deleteReusableBlock( id ) ).toEqual( {
+			type: 'DELETE_REUSABLE_BLOCK',
 			id,
 		} );
 	} );

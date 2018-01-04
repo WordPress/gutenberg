@@ -16,17 +16,17 @@ import { compose } from '@wordpress/element';
  */
 import { removeBlocks } from '../../store/actions';
 
-export function BlockDeleteButton( { onDelete, onClick = noop, isLocked, small = false } ) {
+export function BlockRemoveButton( { onRemove, onClick = noop, isLocked, small = false } ) {
 	if ( isLocked ) {
 		return null;
 	}
 
-	const label = __( 'Delete' );
+	const label = __( 'Remove' );
 
 	return (
 		<IconButton
 			className="editor-block-settings-menu__control"
-			onClick={ flow( onDelete, onClick ) }
+			onClick={ flow( onRemove, onClick ) }
 			icon="trash"
 			label={ small ? label : undefined }
 		>
@@ -39,7 +39,7 @@ export default compose(
 	connect(
 		undefined,
 		( dispatch, ownProps ) => ( {
-			onDelete() {
+			onRemove() {
 				dispatch( removeBlocks( ownProps.uids ) );
 			},
 		} )
@@ -51,4 +51,4 @@ export default compose(
 			isLocked: !! templateLock,
 		};
 	} ),
-)( BlockDeleteButton );
+)( BlockRemoveButton );
