@@ -53,10 +53,7 @@ registerBlockType( 'core/image', {
 		align: {
 			type: 'string',
 		},
-		width: {
-			type: 'number',
-		},
-		height: {
+		size: {
 			type: 'number',
 		},
 	},
@@ -153,10 +150,9 @@ registerBlockType( 'core/image', {
 	edit: ImageBlock,
 
 	save( { attributes } ) {
-		const { url, alt, caption, align, href, width, height } = attributes;
-		const extraImageProps = width || height ? { width, height } : {};
-		const figureStyle = width ? { width } : {};
-		const image = <img src={ url } alt={ alt } { ...extraImageProps } />;
+		const { url, alt, caption, align, href, size } = attributes;
+		const figureStyle = size ? { width: size + '%' } : {};
+		const image = <img src={ url } alt={ alt } />;
 
 		return (
 			<figure className={ align ? `align${ align }` : null } style={ figureStyle }>

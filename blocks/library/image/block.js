@@ -112,7 +112,8 @@ class ImageBlock extends Component {
 
 	render() {
 		const { attributes, setAttributes, focus, setFocus, className, settings, toggleSelection } = this.props;
-		const { url, alt, caption, align, id, href, width, height } = attributes;
+		const { url, alt, caption, align, id, href, size } = attributes;
+		const width = size ? size * settings.maxWidth / 100 : undefined;
 
 		const availableSizes = this.getAvailableSizes();
 		const figureStyle = width ? { width } : {};
@@ -226,10 +227,11 @@ class ImageBlock extends Component {
 							return img;
 						}
 
-						const currentWidth = width || imageWidthWithinContainer;
-						const currentHeight = height || imageHeightWithinContainer;
-
 						const ratio = imageWidth / imageHeight;
+
+						const currentWidth = width || imageWidthWithinContainer;
+						const currentHeight = ( width / ratio ) || imageHeightWithinContainer;
+
 						const minWidth = imageWidth < imageHeight ? MIN_SIZE : MIN_SIZE * ratio;
 						const minHeight = imageHeight < imageWidth ? MIN_SIZE : MIN_SIZE / ratio;
 
@@ -256,9 +258,9 @@ class ImageBlock extends Component {
 								} }
 								onResizeStop={ ( event, direction, elt, delta ) => {
 									setAttributes( {
-										width: parseInt( currentWidth + delta.width, 10 ),
-										height: parseInt( currentHeight + delta.height, 10 ),
+										size: parseInt( currentWidth + delta.width, 10 ) * 100 / settings.maxWidth,
 									} );
+
 									toggleSelection( true );
 								} }
 							>
