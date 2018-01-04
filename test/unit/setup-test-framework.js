@@ -1,6 +1,3 @@
-// `babel-jest` should be doing this instead, but apparently it's not working.
-require( 'core-js/modules/es7.object.values' );
-
 // It "mocks" enzyme, so that we can delay loading of
 // the utility functions until enzyme is imported in tests.
 // Props to @gdborton for sharing this technique in his article:
