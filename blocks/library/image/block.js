@@ -3,12 +3,6 @@
  */
 import classnames from 'classnames';
 import ResizableBox from 're-resizable';
-import {
-	startCase,
-	isEmpty,
-	map,
-	get,
-} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -22,7 +16,6 @@ import {
 	Toolbar,
 	DropZone,
 	FormFileUpload,
-	withAPIData,
 	withContext,
 } from '@wordpress/components';
 
@@ -33,7 +26,6 @@ import Editable from '../../editable';
 import MediaUploadButton from '../../media-upload-button';
 import InspectorControls from '../../inspector-controls';
 import TextControl from '../../inspector-controls/text-control';
-import SelectControl from '../../inspector-controls/select-control';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import UrlInputButton from '../../url-input/button';
@@ -106,16 +98,11 @@ class ImageBlock extends Component {
 		this.props.setAttributes( { url } );
 	}
 
-	getAvailableSizes() {
-		return get( this.props.image, [ 'data', 'media_details', 'sizes' ], {} );
-	}
-
 	render() {
 		const { attributes, setAttributes, focus, setFocus, className, settings, toggleSelection } = this.props;
 		const { url, alt, caption, align, id, href, size } = attributes;
 		const width = size ? size * settings.maxWidth / 100 : undefined;
 
-		const availableSizes = this.getAvailableSizes();
 		const figureStyle = width ? { width } : {};
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && ( ! viewPort.isExtraSmall() );
 		const uploadButtonProps = { isLarge: true };
@@ -195,17 +182,6 @@ class ImageBlock extends Component {
 				<InspectorControls key="inspector">
 					<h2>{ __( 'Image Settings' ) }</h2>
 					<TextControl label={ __( 'Textual Alternative' ) } value={ alt } onChange={ this.updateAlt } help={ __( 'Describe the purpose of the image. Leave empty if the image is not a key part of the content.' ) } />
-					{ ! isEmpty( availableSizes ) && (
-						<SelectControl
-							label={ __( 'Size' ) }
-							value={ url }
-							options={ map( availableSizes, ( size, name ) => ( {
-								value: size.source_url,
-								label: startCase( name ),
-							} ) ) }
-							onChange={ this.updateImageURL }
-						/>
-					) }
 				</InspectorControls>
 			),
 			<figure key="image" className={ classes } style={ figureStyle }>
@@ -289,15 +265,5 @@ class ImageBlock extends Component {
 export default compose( [
 	withContext( 'editor' )( ( settings ) => {
 		return { settings };
-	} ),
-	withAPIData( ( props ) => {
-		const { id } = props.attributes;
-		if ( ! id ) {
-			return {};
-		}
-
-		return {
-			image: `/wp/v2/media/${ id }`,
-		};
 	} ),
 ] )( ImageBlock );

@@ -150,9 +150,10 @@ registerBlockType( 'core/image', {
 	edit: ImageBlock,
 
 	save( { attributes } ) {
-		const { url, alt, caption, align, href, size } = attributes;
+		const { url, alt, caption, align, href, size, id } = attributes;
 		const figureStyle = size ? { width: size + '%' } : {};
-		const image = <img src={ url } alt={ alt } />;
+		// Class is important to set srcset with front-end filter.
+		const image = <img src={ url } alt={ alt } className={ id ? `wp-image-${ id }` : null } />;
 
 		return (
 			<figure className={ align ? `align${ align }` : null } style={ figureStyle }>
