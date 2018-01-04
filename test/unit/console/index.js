@@ -8,6 +8,30 @@ import { isEqual, some } from 'lodash';
 const spyError = jest.spyOn( console, 'error' );
 const spyWarn = jest.spyOn( console, 'warn' );
 
+const createToBeCalledMatcher = ( matcherName, methodName ) =>
+	( received ) => {
+		const spy = received[ methodName ];
+		const calls = spy.mock.calls;
+		const pass = calls.length > 0;
+		const message = pass ?
+			() =>
+				matcherHint( `.not${ matcherName }`, spy.getMockName() ) +
+				'\n\n' +
+				'Expected mock function not to be called but it was called with:\n' +
+				calls.map( printReceived ) :
+			() =>
+				matcherHint( matcherName, spy.getMockName() ) +
+				'\n\n' +
+				'Expected mock function to be called.';
+
+		spy.mockReset();
+
+		return {
+			message,
+			pass,
+		};
+	};
+
 const createToBeCalledWithMatcher = ( matcherName, methodName ) =>
 	( received, ...expected ) => {
 		const spy = received[ methodName ];
@@ -17,16 +41,17 @@ const createToBeCalledWithMatcher = ( matcherName, methodName ) =>
 			objects => isEqual( objects, expected )
 		);
 		const message = pass ?
-			() => matcherHint( `.not${ matcherName }`, spy.getMockName() ) +
+			() =>
+				matcherHint( `.not${ matcherName }`, spy.getMockName() ) +
 				'\n\n' +
-				'Expected mock function not to have been called with:\n' +
+				'Expected mock function not to be called with:\n' +
 				printExpected( expected ) :
 			() =>
 				matcherHint( matcherName, spy.getMockName() ) +
 				'\n\n' +
-				'Expected mock function to have been called with:\n' +
+				'Expected mock function to be called with:\n' +
 				printExpected( expected ) + '\n' +
-				'but have been called with:\n' +
+				'but it was called with:\n' +
 				calls.map( printReceived );
 
 		spy.mockReset();
@@ -38,7 +63,9 @@ const createToBeCalledWithMatcher = ( matcherName, methodName ) =>
 	};
 
 expect.extend( {
+	toHaveErrored: createToBeCalledMatcher( '.toHaveErrored', 'error' ),
 	toHaveErroredWith: createToBeCalledWithMatcher( '.toHaveErroredWith', 'error' ),
+	toHaveWarned: createToBeCalledMatcher( '.toHaveWarned', 'warn' ),
 	toHaveWarnedWith: createToBeCalledWithMatcher( '.toHaveWarnedWith', 'warn' ),
 } );
 
