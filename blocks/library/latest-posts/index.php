@@ -16,6 +16,9 @@ function gutenberg_render_block_core_latest_posts( $attributes ) {
 	$recent_posts = wp_get_recent_posts( array(
 		'numberposts' => $attributes['postsToShow'],
 		'post_status' => 'publish',
+		'order'       => $attributes['order'],
+		'orderby'     => $attributes['orderBy'],
+		'category'    => $attributes['categories'],
 	) );
 
 	$list_items_markup = '';
@@ -64,6 +67,9 @@ function gutenberg_render_block_core_latest_posts( $attributes ) {
 
 register_block_type( 'core/latest-posts', array(
 	'attributes'      => array(
+		'categories'      => array(
+			'type' => 'string',
+		),
 		'postsToShow'     => array(
 			'type'    => 'number',
 			'default' => 5,
@@ -83,6 +89,14 @@ register_block_type( 'core/latest-posts', array(
 		'align'           => array(
 			'type'    => 'string',
 			'default' => 'center',
+		),
+		'order'           => array(
+			'type'    => 'string',
+			'default' => 'desc',
+		),
+		'orderBy'         => array(
+			'type'    => 'string',
+			'default' => 'date',
 		),
 	),
 	'render_callback' => 'gutenberg_render_block_core_latest_posts',

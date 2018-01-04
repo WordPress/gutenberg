@@ -9,16 +9,16 @@ import { noop } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/components';
-import { getBlockType } from '@wordpress/blocks';
+import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import { getBlockMode, getBlock } from '../../selectors';
-import { toggleBlockMode } from '../../actions';
+import { getBlockMode, getBlock } from '../../store/selectors';
+import { toggleBlockMode } from '../../store/actions';
 
 export function BlockModeToggle( { blockType, mode, onToggleMode, small = false } ) {
-	if ( ! blockType || blockType.supportHTML === false ) {
+	if ( ! hasBlockSupport( blockType, 'html', true ) ) {
 		return null;
 	}
 

@@ -58,6 +58,7 @@
 	display: block;
 	padding: 0;
 	font-size: inherit;
+	margin-top: 0;
 	margin-bottom: 0;
 }
 .components-panel__body.is-opened > .components-panel__body-title {
@@ -75,10 +76,20 @@
 
 	.dashicon {
 		position: absolute;
-		right: 10px;
+		right: $item-spacing;
 		top: 50%;
 		transform: translateY( -50% );
 	}
+
+	// mirror the arrow horizontally in RTL languages
+	/* rtl:begin:ignore */
+	body.rtl & .dashicons-arrow-right {
+		transform: scaleX(-1);
+		-ms-filter: fliph;
+		filter: FlipH;
+		margin-top: -10px;
+	}
+	/* rtl:end:ignore */
 }
 
 .components-panel__body-toggle-icon {
@@ -104,8 +115,15 @@
 	align-items: center;
 	margin-top: 20px;
 
+	select {
+		// Necessary for select to respond to flexbox
+		min-width: 0;
+	}
+
 	label {
 		margin-right: 10px;
+		flex-shrink: 0;
+		max-width: 75%;
 	}
 
 	&:empty {

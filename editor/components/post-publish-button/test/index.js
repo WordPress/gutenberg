@@ -13,7 +13,7 @@ describe( 'PostPublishButton', () => {
 	const user = {
 		data: {
 			id: 1,
-			capabilities: {
+			post_type_capabilities: {
 				publish_posts: true,
 			},
 		},
@@ -21,7 +21,7 @@ describe( 'PostPublishButton', () => {
 
 	const contributor = merge( {}, user, {
 		data: {
-			capabilities: {
+			post_type_capabilities: {
 				publish_posts: false,
 			},
 		},

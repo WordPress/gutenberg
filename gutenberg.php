@@ -3,7 +3,7 @@
  * Plugin Name: Gutenberg
  * Plugin URI: https://github.com/WordPress/gutenberg
  * Description: Printing since 1440. This is the development plugin for the new block editor in core. <strong>Meant for development, do not run on real sites.</strong>
- * Version: 1.8.0
+ * Version: 1.9.0
  * Author: Gutenberg Team
  *
  * @package gutenberg
@@ -21,16 +21,17 @@ gutenberg_pre_init();
  * The main entry point for the Gutenberg editor. Renders the editor on the
  * wp-admin page for the plugin.
  *
- * @todo Remove the temporary fix for the NVDA screen reader and use meaningful
- *       content instead. See pull #2380 and issues #467 and #503.
- *
  * @since 0.1.0
  */
 function the_gutenberg_project() {
+	global $post_type_object;
 	?>
-	<div class="nvda-temp-fix screen-reader-text">&nbsp;</div>
 	<div class="gutenberg">
+		<h1 class="screen-reader-text"><?php echo esc_html( $post_type_object->labels->edit_item ); ?></h1>
 		<div id="editor" class="gutenberg__editor"></div>
+		<div id="metaboxes" style="display: none;">
+			<?php the_gutenberg_metaboxes(); ?>
+		</div>
 	</div>
 	<?php
 }
@@ -79,7 +80,7 @@ function gutenberg_menu() {
 add_action( 'admin_menu', 'gutenberg_menu' );
 
 /**
- * Display a notice and deactivate the Gutenberg plugin.
+ * Display a version notice and deactivate the Gutenberg plugin.
  *
  * @since 0.1.0
  */
@@ -92,13 +93,29 @@ function gutenberg_wordpress_version_notice() {
 }
 
 /**
+ * Display a build notice.
+ *
+ * @since 0.1.0
+ */
+function gutenberg_build_files_notice() {
+	echo '<div class="error"><p>';
+	echo __( 'Gutenberg development mode requires files to be built. Run <code>npm install</code> to install dependencies, and <code>npm run dev</code> to build and watch the files. Read the <a href="https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md">contributing</a> file for more information.', 'gutenberg' );
+	echo '</p></div>';
+}
+
+/**
  * Verify that we can initialize the Gutenberg editor , then load it.
  *
  * @since 1.5.0
  */
 function gutenberg_pre_init() {
+	if ( GUTENBERG_DEVELOPMENT_MODE && ! file_exists( dirname( __FILE__ ) . '/blocks/build' ) ) {
+		add_action( 'admin_notices', 'gutenberg_build_files_notice' );
+		return;
+	}
+
 	// Get unmodified $wp_version.
-	include( ABSPATH . WPINC . '/version.php' );
+	include ABSPATH . WPINC . '/version.php';
 
 	// Strip '-src' from the version string. Messes up version_compare().
 	$version = str_replace( '-src', '', $wp_version );
@@ -144,7 +161,7 @@ function gutenberg_init( $return, $post ) {
 	add_filter( 'screen_options_show_screen', '__return_false' );
 	add_filter( 'admin_body_class', 'gutenberg_add_admin_body_class' );
 
-	require_once( ABSPATH . 'wp-admin/admin-header.php' );
+	require_once ABSPATH . 'wp-admin/admin-header.php';
 	the_gutenberg_project();
 
 	return true;
@@ -230,7 +247,7 @@ function gutenberg_intercept_edit_post() {
 	}
 
 	if ( gutenberg_init( false, $post ) ) {
-		include( ABSPATH . 'wp-admin/admin-footer.php' );
+		include ABSPATH . 'wp-admin/admin-footer.php';
 		exit;
 	}
 }
@@ -294,7 +311,7 @@ function gutenberg_intercept_post_new() {
 	$post_ID = $post->ID;
 
 	if ( gutenberg_init( false, $post ) ) {
-		include( ABSPATH . 'wp-admin/admin-footer.php' );
+		include ABSPATH . 'wp-admin/admin-footer.php';
 		exit;
 	}
 }
@@ -426,7 +443,6 @@ function gutenberg_replace_default_add_new_button() {
 			position: relative;
 			top: -3px;
 			text-decoration: none;
-			border: none;
 			border: 1px solid #ccc;
 			border-radius: 2px;
 			background: #f7f7f7;
@@ -457,7 +473,11 @@ function gutenberg_replace_default_add_new_button() {
 			font: 400 20px/.5 dashicons;
 			speak: none;
 			top: 1px;
+			<?php if ( is_rtl() ) : ?>
+			right: -1px;
+			<?php else : ?>
 			left: -1px;
+			<?php endif; ?>
 			position: relative;
 			vertical-align: top;
 			-webkit-font-smoothing: antialiased;
@@ -481,7 +501,11 @@ function gutenberg_replace_default_add_new_button() {
 			display: block;
 			top: 0;
 			margin: -1px 0;
+			<?php if ( is_rtl() ) : ?>
+			padding-left: 9px;
+			<?php else : ?>
 			padding-right: 9px;
+			<?php endif; ?>
 		}
 
 	</style>
@@ -495,13 +519,13 @@ function gutenberg_replace_default_add_new_button() {
 			}
 
 			var url = button.href;
-			var newUrl = url.replace( /&?classic-editor/, '' );
+			var newUrl = url.replace( /[&\?]?classic-editor/, '' );
 
 			var newbutton = '<span id="split-page-title-action" class="split-page-title-action">';
 			newbutton += '<a href="' + newUrl + '">' + button.innerText + '</a>';
 			newbutton += '<span class="expander" tabindex="0" role="button" aria-haspopup="true" aria-label="<?php echo esc_js( __( 'Toggle editor selection menu', 'gutenberg' ) ); ?>"></span>';
 			newbutton += '<span class="dropdown"><a href="' + newUrl + '">Gutenberg</a>';
-			newbutton += '<a href="' + url + '"><?php echo esc_js( __( 'Classic Editor', 'gutenberg' ) ); ?></a></span></span>';
+			newbutton += '<a href="' + url + '"><?php echo esc_js( __( 'Classic Editor', 'gutenberg' ) ); ?></a></span></span><span class="page-title-action" style="display:none;"></span>';
 
 			button.insertAdjacentHTML( 'afterend', newbutton );
 			button.remove();

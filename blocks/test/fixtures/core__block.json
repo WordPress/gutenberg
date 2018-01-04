@@ -1,0 +1,11 @@
+[
+    {
+        "uid": "_uid_0",
+        "name": "core/block",
+        "isValid": true,
+        "attributes": {
+            "ref": 123
+        },
+        "originalContent": ""
+    }
+]

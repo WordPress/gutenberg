@@ -2,19 +2,6 @@
 	width: 100%;
 }
 
-.editor-post-visibility__toggle.button-link {
-	text-decoration: underline;
-	color: $blue-wordpress;
-
-	&:focus {
-		outline: none;
-	}
-
-	&:hover {
-		color: $blue-medium-500;
-	}
-}
-
 .editor-post-visibility__dialog .components-popover__content {
 	padding: 10px;
 

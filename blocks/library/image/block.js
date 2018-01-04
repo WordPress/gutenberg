@@ -8,14 +8,13 @@ import {
 	isEmpty,
 	map,
 	get,
-	flowRight,
 } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 import { mediaUpload, createMediaFromFile, getBlobByURL, revokeBlobURL, viewPort } from '@wordpress/utils';
 import {
 	Placeholder,
@@ -37,7 +36,6 @@ import TextControl from '../../inspector-controls/text-control';
 import SelectControl from '../../inspector-controls/select-control';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
-import BlockDescription from '../../block-description';
 import UrlInputButton from '../../url-input/button';
 import ImageSize from './image-size';
 
@@ -113,7 +111,7 @@ class ImageBlock extends Component {
 	}
 
 	render() {
-		const { attributes, setAttributes, focus, setFocus, className, settings } = this.props;
+		const { attributes, setAttributes, focus, setFocus, className, settings, toggleSelection } = this.props;
 		const { url, alt, caption, align, id, href, width, height } = attributes;
 
 		const availableSizes = this.getAvailableSizes();
@@ -194,10 +192,7 @@ class ImageBlock extends Component {
 			controls,
 			focus && (
 				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'Worth a thousand words.' ) }</p>
-					</BlockDescription>
-					<h3>{ __( 'Image Settings' ) }</h3>
+					<h2>{ __( 'Image Settings' ) }</h2>
 					<TextControl label={ __( 'Textual Alternative' ) } value={ alt } onChange={ this.updateAlt } help={ __( 'Describe the purpose of the image. Leave empty if the image is not a key part of the content.' ) } />
 					{ ! isEmpty( availableSizes ) && (
 						<SelectControl
@@ -256,11 +251,15 @@ class ImageBlock extends Component {
 									bottomLeft: 'wp-block-image__resize-handler-bottom-left',
 								} }
 								enable={ { top: false, right: true, bottom: false, left: false, topRight: true, bottomRight: true, bottomLeft: true, topLeft: true } }
+								onResizeStart={ () => {
+									toggleSelection( false );
+								} }
 								onResizeStop={ ( event, direction, elt, delta ) => {
 									setAttributes( {
 										width: parseInt( currentWidth + delta.width, 10 ),
 										height: parseInt( currentHeight + delta.height, 10 ),
 									} );
+									toggleSelection( true );
 								} }
 							>
 								{ img }
@@ -285,7 +284,7 @@ class ImageBlock extends Component {
 	}
 }
 
-export default flowRight( [
+export default compose( [
 	withContext( 'editor' )( ( settings ) => {
 		return { settings };
 	} ),

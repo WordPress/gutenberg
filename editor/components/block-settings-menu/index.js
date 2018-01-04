@@ -17,8 +17,10 @@ import './style.scss';
 import BlockInspectorButton from './block-inspector-button';
 import BlockModeToggle from './block-mode-toggle';
 import BlockDeleteButton from './block-delete-button';
+import BlockTransformations from './block-transformations';
+import ReusableBlockToggle from './reusable-block-toggle';
 import UnknownConverter from './unknown-converter';
-import { selectBlock } from '../../actions';
+import { selectBlock } from '../../store/actions';
 
 function BlockSettingsMenu( { uids, onSelect, focus } ) {
 	const count = uids.length;
@@ -43,7 +45,7 @@ function BlockSettingsMenu( { uids, onSelect, focus } ) {
 							onToggle();
 						} }
 						icon="ellipsis"
-						label={ isOpen ? __( 'Close Settings Menu' ) : __( 'Open Settings Menu' ) }
+						label={ __( 'More Options' ) }
 						aria-expanded={ isOpen }
 						focus={ focus }
 					/>
@@ -56,6 +58,8 @@ function BlockSettingsMenu( { uids, onSelect, focus } ) {
 					{ count === 1 && <BlockModeToggle uid={ uids[ 0 ] } onToggle={ onClose } /> }
 					{ count === 1 && <UnknownConverter uid={ uids[ 0 ] } /> }
 					<BlockDeleteButton uids={ uids } />
+					{ count === 1 && <ReusableBlockToggle uid={ uids[ 0 ] } onToggle={ onClose } /> }
+					<BlockTransformations uids={ uids } onClick={ onClose } />
 				</NavigableMenu>
 			) }
 		/>

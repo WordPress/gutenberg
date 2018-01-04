@@ -18,11 +18,17 @@ import {
 	getBlockType,
 	getBlockTypes,
 	hasBlockSupport,
+	isReusableBlock,
 } from '../registration';
 
 describe( 'blocks', () => {
 	const error = console.error;
 	const defaultBlockSettings = { save: noop, category: 'common', title: 'block title' };
+
+	beforeAll( () => {
+		// Load all hooks that modify blocks
+		require( 'blocks/hooks' );
+	} );
 
 	// Reset block state before each test.
 	beforeEach( () => {
@@ -35,7 +41,7 @@ describe( 'blocks', () => {
 		} );
 		setUnknownTypeHandlerName( undefined );
 		setDefaultBlockName( undefined );
-		window._wpBlocksAttributes = {};
+		window._wpBlocks = {};
 		console.error = error;
 	} );
 
@@ -157,8 +163,8 @@ describe( 'blocks', () => {
 
 		it( 'should default to browser-initialized global attributes', () => {
 			const attributes = { ok: { type: 'boolean' } };
-			window._wpBlocksAttributes = {
-				'core/test-block-with-attributes': attributes,
+			window._wpBlocks = {
+				'core/test-block-with-attributes': { attributes },
 			};
 
 			const blockType = { settingName: 'settingValue', save: noop, category: 'common', title: 'block title' };
@@ -405,6 +411,18 @@ describe( 'blocks', () => {
 			};
 
 			expect( hasBlockSupport( settings, 'foo' ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isReusableBlock', () => {
+		it( 'should return true for a reusable block', () => {
+			const block = { name: 'core/block' };
+			expect( isReusableBlock( block ) ).toBe( true );
+		} );
+
+		it( 'should return false for other blocks', () => {
+			const block = { name: 'core/paragraph' };
+			expect( isReusableBlock( block ) ).toBe( false );
 		} );
 	} );
 } );

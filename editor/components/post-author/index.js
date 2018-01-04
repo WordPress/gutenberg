@@ -2,21 +2,21 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { filter, flowRight } from 'lodash';
+import { filter } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { withAPIData, withInstanceId } from '@wordpress/components';
-import { Component } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import PostAuthorCheck from './check';
-import { getEditedPostAttribute } from '../../selectors';
-import { editPost } from '../../actions';
+import { getEditedPostAttribute } from '../../store/selectors';
+import { editPost } from '../../store/actions';
 
 export class PostAuthor extends Component {
 	constructor() {
@@ -89,7 +89,7 @@ const applyWithAPIData = withAPIData( () => {
 	};
 } );
 
-export default flowRight( [
+export default compose( [
 	applyConnect,
 	applyWithAPIData,
 	withInstanceId,

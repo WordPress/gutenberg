@@ -21,8 +21,8 @@ import PostFormat from '../post-format';
 import PostPendingStatus from '../post-pending-status';
 import {
 	isEditorSidebarPanelOpened,
-} from '../../../selectors';
-import { toggleSidebarPanel } from '../../../actions';
+} from '../../../store/selectors';
+import { toggleSidebarPanel } from '../../../store/actions';
 
 /**
  * Module Constants

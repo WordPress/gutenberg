@@ -352,6 +352,7 @@ export default class Editable extends Component {
 			HTML: this.pastedContent || HTML,
 			plainText: this.pastedPlainText,
 			mode,
+			tagName: this.props.tagName,
 		} );
 
 		if ( typeof content === 'string' ) {
@@ -507,15 +508,29 @@ export default class Editable extends Component {
 	 * @param {KeydownEvent} event The keydow event as triggered by tinyMCE.
 	 */
 	onKeyDown( event ) {
+		const dom = this.editor.dom;
+		const rootNode = this.editor.getBody();
+
 		if (
-			this.props.onMerge && (
-				( event.keyCode === BACKSPACE && this.isStartOfEditor() ) ||
-				( event.keyCode === DELETE && this.isEndOfEditor() )
-			)
+			( event.keyCode === BACKSPACE && this.isStartOfEditor() ) ||
+			( event.keyCode === DELETE && this.isEndOfEditor() )
 		) {
-			const forward = event.keyCode === DELETE;
+			if ( ! this.props.onMerge && ! this.props.onRemove ) {
+				return;
+			}
+
 			this.fireChange();
-			this.props.onMerge( forward );
+
+			const forward = event.keyCode === DELETE;
+
+			if ( this.props.onMerge ) {
+				this.props.onMerge( forward );
+			}
+
+			if ( this.props.onRemove && dom.isEmpty( rootNode ) ) {
+				this.props.onRemove( forward );
+			}
+
 			event.preventDefault();
 			event.stopImmediatePropagation();
 		}
@@ -528,14 +543,11 @@ export default class Editable extends Component {
 					return;
 				}
 
-				const rootNode = this.editor.getBody();
 				const selectedNode = this.editor.selection.getNode();
 
 				if ( selectedNode.parentNode !== rootNode ) {
 					return;
 				}
-
-				const dom = this.editor.dom;
 
 				if ( ! dom.isEmpty( selectedNode ) ) {
 					return;
@@ -558,6 +570,7 @@ export default class Editable extends Component {
 				if ( event.shiftKey || ! this.props.onSplit ) {
 					this.editor.execCommand( 'InsertLineBreak', false, event );
 				} else {
+					event.stopImmediatePropagation();
 					this.splitContent();
 				}
 			}
@@ -700,6 +713,12 @@ export default class Editable extends Component {
 	}
 
 	updateFocus() {
+		// We can't update focus if the editor hasn't finished initializing.
+		// Initialization callback `onInit` will call this function anyways.
+		if ( ! this.editor ) {
+			return;
+		}
+
 		const { focus } = this.props;
 		const isActive = this.isActive();
 

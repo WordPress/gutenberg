@@ -3,7 +3,7 @@
  */
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { flowRight, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,19 +11,18 @@ import { flowRight, isEmpty } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { Dropdown, IconButton, withContext } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
-import { Component } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import InserterMenu from './menu';
-import { getBlockInsertionPoint, getEditorMode } from '../../selectors';
+import { getBlockInsertionPoint, getEditorMode } from '../../store/selectors';
 import {
 	insertBlock,
-	setBlockInsertionPoint,
-	clearBlockInsertionPoint,
 	hideInsertionPoint,
-} from '../../actions';
+	showInsertionPoint,
+} from '../../store/actions';
 
 class Inserter extends Component {
 	constructor() {
@@ -35,19 +34,13 @@ class Inserter extends Component {
 	onToggle( isOpen ) {
 		const {
 			insertIndex,
-			setInsertionPoint,
-			clearInsertionPoint,
 			onToggle,
 		} = this.props;
 
-		// When inserting at specific index, assign as insertion point when
-		// the inserter is opened, clearing on close.
-		if ( insertIndex !== undefined ) {
-			if ( isOpen ) {
-				setInsertionPoint( insertIndex );
-			} else {
-				clearInsertionPoint();
-			}
+		if ( isOpen ) {
+			this.props.showInsertionPoint( insertIndex );
+		} else {
+			this.props.hideInsertionPoint();
 		}
 
 		// Surface toggle callback to parent component
@@ -63,9 +56,10 @@ class Inserter extends Component {
 			onInsertBlock,
 			insertionPoint,
 			hasSupportedBlocks,
+			isLocked,
 		} = this.props;
 
-		if ( ! hasSupportedBlocks ) {
+		if ( ! hasSupportedBlocks || isLocked ) {
 			return null;
 		}
 
@@ -88,9 +82,10 @@ class Inserter extends Component {
 					</IconButton>
 				) }
 				renderContent={ ( { onClose } ) => {
-					const onInsert = ( name ) => {
+					const onInsert = ( name, initialAttributes ) => {
 						onInsertBlock(
 							name,
+							initialAttributes,
 							insertionPoint
 						);
 
@@ -104,7 +99,7 @@ class Inserter extends Component {
 	}
 }
 
-export default flowRight( [
+export default compose( [
 	connect(
 		( state ) => {
 			return {
@@ -113,24 +108,24 @@ export default flowRight( [
 			};
 		},
 		( dispatch ) => ( {
-			onInsertBlock( name, position ) {
-				dispatch( hideInsertionPoint() );
+			onInsertBlock( name, initialAttributes, position ) {
 				dispatch( insertBlock(
-					createBlock( name ),
+					createBlock( name, initialAttributes ),
 					position
 				) );
 			},
 			...bindActionCreators( {
-				setInsertionPoint: setBlockInsertionPoint,
-				clearInsertionPoint: clearBlockInsertionPoint,
+				showInsertionPoint,
+				hideInsertionPoint,
 			}, dispatch ),
 		} )
 	),
 	withContext( 'editor' )( ( settings ) => {
-		const { blockTypes } = settings;
+		const { blockTypes, templateLock } = settings;
 
 		return {
 			hasSupportedBlocks: true === blockTypes || ! isEmpty( blockTypes ),
+			isLocked: !! templateLock,
 		};
 	} ),
 ] )( Inserter );

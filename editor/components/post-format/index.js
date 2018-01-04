@@ -2,21 +2,22 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { find, flowRight } from 'lodash';
+import { find } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { withInstanceId } from '@wordpress/components';
+import { compose } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import PostFormatCheck from './check';
-import { getEditedPostAttribute, getSuggestedPostFormat } from '../../selectors';
-import { editPost } from '../../actions';
+import { getEditedPostAttribute, getSuggestedPostFormat } from '../../store/selectors';
+import { editPost } from '../../store/actions';
 
 const POST_FORMATS = [
 	{ id: 'aside', caption: __( 'Aside' ) },
@@ -68,7 +69,7 @@ function PostFormat( { onUpdatePostFormat, postFormat = 'standard', suggestedFor
 	/* eslint-enable jsx-a11y/no-onchange */
 }
 
-export default flowRight( [
+export default compose( [
 	connect(
 		( state ) => {
 			return {

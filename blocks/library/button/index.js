@@ -19,7 +19,6 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import ColorPalette from '../../color-palette';
 import ContrastChecker from '../../contrast-checker';
 import InspectorControls from '../../inspector-controls';
-import BlockDescription from '../../block-description';
 
 const { getComputedStyle } = window;
 
@@ -83,7 +82,7 @@ class ButtonBlock extends Component {
 					<BlockAlignmentToolbar value={ align } onChange={ this.updateAlignment } />
 				</BlockControls>
 			),
-			<span key="button" className={ className } title={ title } style={ { backgroundColor: color } } ref={ this.bindRef }>
+			<span key="button" className={ className } title={ title } ref={ this.bindRef }>
 				<Editable
 					tagName="span"
 					placeholder={ __( 'Add text…' ) }
@@ -92,17 +91,15 @@ class ButtonBlock extends Component {
 					onFocus={ setFocus }
 					onChange={ ( value ) => setAttributes( { text: value } ) }
 					formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
+					className="wp-block-button__link"
 					style={ {
+						backgroundColor: color,
 						color: textColor,
 					} }
 					keepPlaceholderOnFocus
 				/>
 				{ focus &&
 					<InspectorControls key="inspector">
-						<BlockDescription>
-							<p>{ __( 'A nice little button. Call something out with it.' ) }</p>
-						</BlockDescription>
-
 						<ToggleControl
 							label={ __( 'Stand on a line' ) }
 							checked={ !! clear }
@@ -146,42 +143,46 @@ class ButtonBlock extends Component {
 	}
 }
 
+const blockAttributes = {
+	url: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'a',
+		attribute: 'href',
+	},
+	title: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'a',
+		attribute: 'title',
+	},
+	text: {
+		type: 'array',
+		source: 'children',
+		selector: 'a',
+	},
+	align: {
+		type: 'string',
+		default: 'none',
+	},
+	color: {
+		type: 'string',
+	},
+	textColor: {
+		type: 'string',
+	},
+};
+
 registerBlockType( 'core/button', {
 	title: __( 'Button' ),
+
+	description: __( 'A nice little button. Call something out with it.' ),
 
 	icon: 'button',
 
 	category: 'layout',
 
-	attributes: {
-		url: {
-			type: 'string',
-			source: 'attribute',
-			selector: 'a',
-			attribute: 'href',
-		},
-		title: {
-			type: 'string',
-			source: 'attribute',
-			selector: 'a',
-			attribute: 'title',
-		},
-		text: {
-			type: 'array',
-			source: 'children',
-			selector: 'a',
-		},
-		align: {
-			type: 'string',
-			default: 'none',
-		},
-		color: {
-			type: 'string',
-		},
-		textColor: {
-			type: 'string',
-		},
-	},
+	attributes: blockAttributes,
 
 	getEditWrapperProps( attributes ) {
 		const { align, clear } = attributes;
@@ -203,12 +204,35 @@ registerBlockType( 'core/button', {
 	save( { attributes } ) {
 		const { url, text, title, align, color, textColor } = attributes;
 
+		const buttonStyle = {
+			backgroundColor: color,
+			color: textColor,
+		};
+
+		const linkClass = 'wp-block-button__link';
+
 		return (
-			<div className={ `align${ align }` } style={ { backgroundColor: color } }>
-				<a href={ url } title={ title } style={ { color: textColor } }>
+			<div className={ `align${ align }` }>
+				<a className={ linkClass } href={ url } title={ title } style={ buttonStyle }>
 					{ text }
 				</a>
 			</div>
 		);
 	},
+
+	deprecated: [ {
+		attributes: blockAttributes,
+
+		save( { attributes } ) {
+			const { url, text, title, align, color, textColor } = attributes;
+
+			return (
+				<div className={ `align${ align }` } style={ { backgroundColor: color } }>
+					<a href={ url } title={ title } style={ { color: textColor } }>
+						{ text }
+					</a>
+				</div>
+			);
+		},
+	} ],
 } );

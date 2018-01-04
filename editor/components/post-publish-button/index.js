@@ -3,26 +3,28 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
-import { flowRight, noop } from 'lodash';
+import { noop, get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { Button, withAPIData } from '@wordpress/components';
+import { compose } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import PublishButtonLabel from './label';
-import { editPost, savePost } from '../../actions';
+import { editPost, savePost } from '../../store/actions';
 import {
 	isSavingPost,
 	isEditedPostBeingScheduled,
 	getEditedPostVisibility,
 	isEditedPostSaveable,
 	isEditedPostPublishable,
-} from '../../selectors';
+	getCurrentPostType,
+} from '../../store/selectors';
 
 export function PostPublishButton( {
 	isSaving,
@@ -36,7 +38,7 @@ export function PostPublishButton( {
 	onSubmit = noop,
 } ) {
 	const isButtonEnabled = user.data && ! isSaving && isPublishable && isSaveable;
-	const isContributor = user.data && ! user.data.capabilities.publish_posts;
+	const isContributor = ! get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );
 
 	let publishStatus;
 	if ( isContributor ) {
@@ -79,6 +81,7 @@ const applyConnect = connect(
 		visibility: getEditedPostVisibility( state ),
 		isSaveable: isEditedPostSaveable( state ),
 		isPublishable: isEditedPostPublishable( state ),
+		postType: getCurrentPostType( state ),
 	} ),
 	{
 		onStatusChange: ( status ) => editPost( { status } ),
@@ -86,13 +89,15 @@ const applyConnect = connect(
 	}
 );
 
-const applyWithAPIData = withAPIData( () => {
+const applyWithAPIData = withAPIData( ( props ) => {
+	const { postType } = props;
+
 	return {
-		user: '/wp/v2/users/me?context=edit',
+		user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
 	};
 } );
 
-export default flowRight( [
+export default compose( [
 	applyConnect,
 	applyWithAPIData,
 ] )( PostPublishButton );

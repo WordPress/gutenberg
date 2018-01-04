@@ -6,6 +6,7 @@ import {
 	getBlockAttributes,
 	asType,
 	createBlockWithFallback,
+	getAttributesFromDeprecatedVersion,
 	default as parse,
 } from '../parser';
 import {
@@ -14,6 +15,15 @@ import {
 	getBlockTypes,
 	setUnknownTypeHandlerName,
 } from '../registration';
+
+const expectFailingBlockValidation = () => {
+	/* eslint-disable no-console */
+	expect( console.error ).toHaveBeenCalled();
+	expect( console.warn ).toHaveBeenCalled();
+	console.warn.mockClear();
+	console.error.mockClear();
+	/* eslint-enable no-console */
+};
 
 describe( 'block parser', () => {
 	const defaultBlockSettings = {
@@ -38,6 +48,11 @@ describe( 'block parser', () => {
 		},
 		save: ( { attributes } ) => attributes.content,
 	};
+
+	beforeAll( () => {
+		// Load all hooks that modify blocks
+		require( 'blocks/hooks' );
+	} );
 
 	afterEach( () => {
 		setUnknownTypeHandlerName( undefined );
@@ -164,6 +179,62 @@ describe( 'block parser', () => {
 		} );
 	} );
 
+	describe( 'getAttributesFromDeprecatedVersion', () => {
+		it( 'should return undefined if the block has no deprecated versions', () => {
+			const attributes = getAttributesFromDeprecatedVersion(
+				defaultBlockSettings,
+				'<span class="wp-block-test-block">Bananas</span>',
+				{},
+			);
+			expect( attributes ).toBeUndefined();
+		} );
+
+		it( 'should return undefined if no valid deprecated version found', () => {
+			const attributes = getAttributesFromDeprecatedVersion(
+				{
+					name: 'core/test-block',
+					...defaultBlockSettings,
+					deprecated: [
+						{
+							save() {
+								return 'nothing';
+							},
+						},
+					],
+				},
+				'<span class="wp-block-test-block">Bananas</span>',
+				{},
+			);
+			expect( attributes ).toBeUndefined();
+			expectFailingBlockValidation();
+		} );
+
+		it( 'should return the attributes parsed by the deprecated version', () => {
+			const attributes = getAttributesFromDeprecatedVersion(
+				{
+					name: 'core/test-block',
+					...defaultBlockSettings,
+					save: ( props ) => <div>{ props.attributes.fruit }</div>,
+					deprecated: [
+						{
+							attributes: {
+								fruit: {
+									type: 'string',
+									source: 'text',
+									selector: 'span',
+								},
+							},
+							save: ( props ) => <span>{ props.attributes.fruit }</span>,
+						},
+					],
+				},
+				'<span class="wp-block-test-block">Bananas</span>',
+				{},
+			);
+			expect( attributes ).toEqual( { fruit: 'Bananas' } );
+		} );
+	} );
+
 	describe( 'createBlockWithFallback', () => {
 		it( 'should create the requested block if it exists', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
@@ -210,6 +281,42 @@ describe( 'block parser', () => {
 		it( 'should not create a block if no unknown type handler', () => {
 			const block = createBlockWithFallback( 'core/test-block', '' );
 			expect( block ).toBeUndefined();
+		} );
+
+		it( 'should fallback to an older version of the block if the current one is invalid', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					fruit: {
+						type: 'string',
+						source: 'text',
+						selector: 'div',
+					},
+				},
+				save: ( { attributes } ) => <div>{ attributes.fruit }</div>,
+				deprecated: [
+					{
+						attributes: {
+							fruit: {
+								type: 'string',
+								source: 'text',
+								selector: 'span',
+							},
+						},
+						save: ( { attributes } ) => <span>{ attributes.fruit }</span>,
+					},
+				],
+			} );
+
+			const block = createBlockWithFallback(
+				'core/test-block',
+				'<span class="wp-block-test-block">Bananas</span>',
+				{ fruit: 'Bananas' }
+			);
+			expect( block.name ).toEqual( 'core/test-block' );
+			expect( block.attributes ).toEqual( { fruit: 'Bananas' } );
+			expect( block.isValid ).toBe( true );
+			expectFailingBlockValidation();
 		} );
 	} );
 

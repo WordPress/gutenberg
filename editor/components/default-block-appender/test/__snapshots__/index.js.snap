@@ -6,12 +6,12 @@ exports[`DefaultBlockAppender no block present should match snapshot 1`] = `
 <div
   className="editor-default-block-appender"
 >
-  <Connect(BlockDropZone) />
+  <Connect(WrappedComponent) />
   <input
     className="editor-default-block-appender__content"
-    onClick={[Function]}
-    onFocus={[Function]}
-    onKeyDown={[Function]}
+    onClick={[MockFunction]}
+    onFocus={[MockFunction]}
+    onKeyDown={[MockFunction]}
     readOnly={true}
     type="text"
     value="Write your story"

@@ -17,15 +17,9 @@
 
 .editor-block-settings-menu__toggle {
 	border-radius: 50%;
-	padding: 0;
+	padding: 3px;
 	transform: rotate( 90deg );
-	transition-duration: 0.3s;
-	transition-property: transform;
 	width: auto;
-
-	&.is-opened {
-		transform: rotate( 0 );
-	}
 }
 
 .editor-block-settings-menu__control {
@@ -50,4 +44,10 @@
 	.dashicon {
 		margin-right: 5px;
 	}
+}
+
+.editor-block-settings-menu__block-transformations {
+	margin-top: $item-spacing;
+	padding-top: $item-spacing;
+	border-top: 1px solid $light-gray-500;
 }

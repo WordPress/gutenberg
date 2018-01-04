@@ -6,6 +6,8 @@ import { assign } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { getWrapperDisplayName } from '@wordpress/element';
+import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -46,33 +48,34 @@ export function addAttribute( settings ) {
 
 /**
  * Override the default edit UI to include a new block inspector control for
- * assigning the anchor ID, if block supports anchor
+ * assigning the anchor ID, if block supports anchor.
  *
- * @param  {Element} element Original edit element
- * @param  {Object}  props   Props passed to BlockEdit
- * @return {Element}         Filtered edit element
+ * @param  {function|Component} BlockEdit Original component
+ * @return {function}                     Wrapped component
  */
-export function addInspectorControl( element, props ) {
-	if ( hasBlockSupport( props.name, 'anchor' ) && props.focus ) {
-		element = [
-			element,
-			<InspectorControls key="inspector-anchor">
+export function withInspectorControl( BlockEdit ) {
+	const WrappedBlockEdit = ( props ) => {
+		const hasAnchor = hasBlockSupport( props.name, 'anchor' ) && props.focus;
+
+		return [
+			<BlockEdit key="block-edit-anchor" { ...props } />,
+			hasAnchor && <InspectorControls key="inspector-anchor">
 				<InspectorControls.TextControl
 					label={ __( 'HTML Anchor' ) }
 					help={ __( 'Anchors lets you link directly to a section on a page.' ) }
 					value={ props.attributes.anchor || '' }
 					onChange={ ( nextValue ) => {
 						nextValue = nextValue.replace( ANCHOR_REGEX, '-' );
-
 						props.setAttributes( {
 							anchor: nextValue,
 						} );
 					} } />
 			</InspectorControls>,
 		];
-	}
+	};
+	WrappedBlockEdit.displayName = getWrapperDisplayName( BlockEdit, 'anchor' );
 
-	return element;
+	return WrappedBlockEdit;
 }
 
 /**
@@ -93,8 +96,6 @@ export function addSaveProps( extraProps, blockType, attributes ) {
 	return extraProps;
 }
 
-export default function anchor( { addFilter } ) {
-	addFilter( 'registerBlockType', 'core-anchor-attribute', addAttribute );
-	addFilter( 'BlockEdit', 'core-anchor-inspector-control', addInspectorControl );
-	addFilter( 'getSaveContent.extraProps', 'core-anchor-save-props', addSaveProps );
-}
+addFilter( 'blocks.registerBlockType', 'core/anchor/attribute', addAttribute );
+addFilter( 'blocks.BlockEdit', 'core/anchor/inspector-control', withInspectorControl );
+addFilter( 'blocks.getSaveContent.extraProps', 'core/anchor/save-props', addSaveProps );

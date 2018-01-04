@@ -2,17 +2,18 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { get, flowRight } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { withAPIData } from '@wordpress/components';
+import { compose } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { getCurrentPostType } from '../../selectors';
+import { getCurrentPostType } from '../../store/selectors';
 
 export function PageAttributesCheck( { postType, children } ) {
 	const supportsPageAttributes = get( postType.data, [
@@ -44,7 +45,7 @@ const applyWithAPIData = withAPIData( ( props ) => {
 	};
 } );
 
-export default flowRight( [
+export default compose( [
 	applyConnect,
 	applyWithAPIData,
 ] )( PageAttributesCheck );

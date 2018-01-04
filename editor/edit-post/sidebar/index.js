@@ -17,14 +17,14 @@ import PostSettings from './post-settings';
 import BlockInspectorPanel from './block-inspector-panel';
 import Header from './header';
 
-import { getActivePanel } from '../../selectors';
+import { getActivePanel } from '../../store/selectors';
 
 const Sidebar = ( { panel } ) => {
 	return (
 		<div
 			className="editor-sidebar"
 			role="region"
-			aria-label={ __( 'Editor settings' ) }
+			aria-label={ __( 'Editor advanced settings' ) }
 			tabIndex="-1"
 		>
 			<Header />

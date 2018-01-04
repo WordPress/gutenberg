@@ -17,14 +17,14 @@ import PostLastRevisionCheck from './check';
 import {
 	getCurrentPostLastRevisionId,
 	getCurrentPostRevisionsCount,
-} from '../../selectors';
+} from '../../store/selectors';
 import { getWPAdminURL } from '../../utils/url';
 
 function LastRevision( { lastRevisionId, revisionsCount } ) {
 	return (
 		<PostLastRevisionCheck>
 			<IconButton
-				href={ getWPAdminURL( 'revision.php', { revision: lastRevisionId } ) }
+				href={ getWPAdminURL( 'revision.php', { revision: lastRevisionId, gutenberg: true } ) }
 				className="editor-post-last-revision__title"
 				icon="backup"
 			>

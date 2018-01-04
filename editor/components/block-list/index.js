@@ -33,8 +33,10 @@ import {
 	getMultiSelectedBlocks,
 	getMultiSelectedBlockUids,
 	getSelectedBlock,
-} from '../../selectors';
-import { startMultiSelect, stopMultiSelect, multiSelect, selectBlock } from '../../actions';
+	isSelectionEnabled,
+} from '../../store/selectors';
+import { startMultiSelect, stopMultiSelect, multiSelect, selectBlock } from '../../store/actions';
+import { isInputField } from '../../utils/dom';
 
 class BlockList extends Component {
 	constructor( props ) {
@@ -107,15 +109,23 @@ class BlockList extends Component {
 	}
 
 	onCopy( event ) {
-		const { multiSelectedBlocks } = this.props;
+		const { multiSelectedBlocks, selectedBlock } = this.props;
 
-		if ( multiSelectedBlocks.length ) {
-			const serialized = serialize( multiSelectedBlocks );
-
-			event.clipboardData.setData( 'text/plain', serialized );
-			event.clipboardData.setData( 'text/html', serialized );
-			event.preventDefault();
+		if ( ! multiSelectedBlocks.length && ! selectedBlock ) {
+			return;
 		}
+
+		// Let native copy behaviour take over in input fields.
+		if ( selectedBlock && isInputField( document.activeElement ) ) {
+			return;
+		}
+
+		const serialized = serialize( selectedBlock || multiSelectedBlocks );
+
+		event.clipboardData.setData( 'text/plain', serialized );
+		event.clipboardData.setData( 'text/html', serialized );
+
+		event.preventDefault();
 	}
 
 	onCut( event ) {
@@ -129,6 +139,10 @@ class BlockList extends Component {
 	}
 
 	onSelectionStart( uid ) {
+		if ( ! this.props.isSelectionEnabled ) {
+			return;
+		}
+
 		const boundaries = this.nodes[ uid ].getBoundingClientRect();
 
 		// Create a uid to Y coördinate map.
@@ -156,7 +170,7 @@ class BlockList extends Component {
 		const { selectionAtStart } = this;
 		const isAtStart = selectionAtStart === uid;
 
-		if ( ! selectionAtStart ) {
+		if ( ! selectionAtStart || ! this.props.isSelectionEnabled ) {
 			return;
 		}
 
@@ -185,6 +199,10 @@ class BlockList extends Component {
 	}
 
 	onShiftSelection( uid ) {
+		if ( ! this.props.isSelectionEnabled ) {
+			return;
+		}
+
 		const { selectedBlock, selectionStart, onMultiSelect, onSelect } = this.props;
 
 		if ( selectedBlock ) {
@@ -229,6 +247,7 @@ export default connect(
 		multiSelectedBlocks: getMultiSelectedBlocks( state ),
 		multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
 		selectedBlock: getSelectedBlock( state ),
+		isSelectionEnabled: isSelectionEnabled( state ),
 	} ),
 	( dispatch ) => ( {
 		onStartMultiSelect() {

@@ -3,6 +3,7 @@
  */
 const webpack = require( 'webpack' );
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
+const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
 
 // Main CSS loader for everything but blocks..
 const mainCSSExtractTextPlugin = new ExtractTextPlugin( {
@@ -35,7 +36,7 @@ const extractConfig = {
 			loader: 'sass-loader',
 			query: {
 				includePaths: [ 'editor/assets/stylesheets' ],
-				data: '@import "variables"; @import "mixins"; @import "animations";@import "z-index";',
+				data: '@import "colors"; @import "admin-schemes"; @import "breakpoints"; @import "variables"; @import "mixins"; @import "animations";@import "z-index";',
 				outputStyle: 'production' === process.env.NODE_ENV ?
 					'compressed' : 'nested',
 			},
@@ -51,6 +52,11 @@ const entryPointNames = [
 	'element',
 	'i18n',
 	'utils',
+	'data',
+];
+
+const packageNames = [
+	'hooks',
 ];
 
 const externals = {
@@ -59,19 +65,26 @@ const externals = {
 	'react-dom/server': 'ReactDOMServer',
 	tinymce: 'tinymce',
 	moment: 'moment',
+	jquery: 'jQuery',
 };
 
-entryPointNames.forEach( entryPointName => {
-	externals[ '@wordpress/' + entryPointName ] = {
-		this: [ 'wp', entryPointName ],
+[ ...entryPointNames, ...packageNames ].forEach( name => {
+	externals[ `@wordpress/${ name }` ] = {
+		this: [ 'wp', name ],
 	};
 } );
 
 const config = {
-	entry: entryPointNames.reduce( ( memo, entryPointName ) => {
-		memo[ entryPointName ] = './' + entryPointName + '/index.js';
-		return memo;
-	}, {} ),
+	entry: Object.assign(
+		entryPointNames.reduce( ( memo, entryPointName ) => {
+			memo[ entryPointName ] = `./${ entryPointName }/index.js`;
+			return memo;
+		}, {} ),
+		packageNames.reduce( ( memo, packageName ) => {
+			memo[ packageName ] = `./node_modules/@wordpress/${ packageName }`;
+			return memo;
+		}, {} )
+	),
 	output: {
 		filename: '[name]/build/index.js',
 		path: __dirname,
@@ -126,6 +139,13 @@ const config = {
 		blocksCSSPlugin,
 		editBlocksCSSPlugin,
 		mainCSSExtractTextPlugin,
+		// Create RTL files with a -rtl suffix
+		new WebpackRTLPlugin( {
+			suffix: '-rtl',
+			minify: {
+				safe: true,
+			},
+		} ),
 		new webpack.LoaderOptionsPlugin( {
 			minimize: process.env.NODE_ENV === 'production',
 			debug: process.env.NODE_ENV !== 'production',

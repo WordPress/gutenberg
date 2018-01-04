@@ -2,6 +2,7 @@
 build
 coverage
 cypress
+/hooks
 node_modules
 gutenberg.zip
 

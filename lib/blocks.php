@@ -53,6 +53,19 @@ function unregister_block_type( $name ) {
  * @return array  Array of parsed block objects.
  */
 function gutenberg_parse_blocks( $content ) {
+	/*
+	 * If there are no blocks in the content, return a single block, rather
+	 * than wasting time trying to parse the string.
+	 */
+	if ( ! gutenberg_content_has_blocks( $content ) ) {
+		return array(
+			array(
+				'attrs'     => array(),
+				'innerHTML' => $content,
+			),
+		);
+	}
+
 	$parser = new Gutenberg_PEG_Parser;
 	return $parser->parse( _gutenberg_utf8_split( $content ) );
 }
@@ -132,6 +145,33 @@ function gutenberg_serialize_block( $block ) {
 }
 
 /**
+ * Renders a single block into a HTML string.
+ *
+ * @since 1.9.0
+ *
+ * @param  array $block A single parsed block object.
+ * @return string String of rendered HTML.
+ */
+function gutenberg_render_block( $block ) {
+	$block_name  = isset( $block['blockName'] ) ? $block['blockName'] : null;
+	$attributes  = is_array( $block['attrs'] ) ? $block['attrs'] : array();
+	$raw_content = isset( $block['innerHTML'] ) ? $block['innerHTML'] : null;
+
+	if ( $block_name ) {
+		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
+		if ( null !== $block_type ) {
+			return $block_type->render( $attributes, $raw_content );
+		}
+	}
+
+	if ( $raw_content ) {
+		return $raw_content;
+	}
+
+	return '';
+}
+
+/**
  * Parses dynamic blocks out of `post_content` and re-renders them.
  *
  * @since 0.1.0
@@ -140,33 +180,15 @@ function gutenberg_serialize_block( $block ) {
  * @return string          Updated post content.
  */
 function do_blocks( $content ) {
-	$registry = WP_Block_Type_Registry::get_instance();
-
 	$blocks = gutenberg_parse_blocks( $content );
 
 	$content_after_blocks = '';
-
 	foreach ( $blocks as $block ) {
-		$block_name  = isset( $block['blockName'] ) ? $block['blockName'] : null;
-		$attributes  = is_array( $block['attrs'] ) ? $block['attrs'] : array();
-		$raw_content = isset( $block['innerHTML'] ) ? $block['innerHTML'] : null;
-
-		if ( $block_name ) {
-			$block_type = $registry->get_registered( $block_name );
-			if ( null !== $block_type ) {
-				$content_after_blocks .= $block_type->render( $attributes, $raw_content );
-				continue;
-			}
-		}
-
-		if ( $raw_content ) {
-			$content_after_blocks .= $raw_content;
-		}
+		$content_after_blocks .= gutenberg_render_block( $block );
 	}
-
 	return $content_after_blocks;
 }
-add_filter( 'the_content', 'do_blocks', 9 ); // BEFORE do_shortcode() and wpautop().
+add_filter( 'the_content', 'do_blocks', 9 ); // BEFORE do_shortcode().
 
 /**
  * Given a string, returns content normalized with automatic paragraphs applied

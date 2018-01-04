@@ -12,7 +12,7 @@ describe( 'PublishButtonLabel', () => {
 	const user = {
 		data: {
 			id: 1,
-			capabilities: {
+			post_type_capabilities: {
 				publish_posts: true,
 			},
 		},
@@ -20,7 +20,7 @@ describe( 'PublishButtonLabel', () => {
 
 	const contributor = merge( {}, user, {
 		data: {
-			capabilities: {
+			post_type_capabilities: {
 				publish_posts: false,
 			},
 		},
@@ -31,9 +31,14 @@ describe( 'PublishButtonLabel', () => {
 		expect( label ).toBe( 'Publishing…' );
 	} );
 
-	it( 'should show updating if saving in progress', () => {
-		const label = PublishButtonLabel( { user, isSaving: true } );
+	it( 'should show updating if published and saving in progress', () => {
+		const label = PublishButtonLabel( { user, isPublished: true, isSaving: true } );
 		expect( label ).toBe( 'Updating…' );
+	} );
+
+	it( 'should show publish if not published and saving in progress', () => {
+		const label = PublishButtonLabel( { user, isPublished: false, isSaving: true } );
+		expect( label ).toBe( 'Publish' );
 	} );
 
 	it( 'should show publish if user unknown', () => {

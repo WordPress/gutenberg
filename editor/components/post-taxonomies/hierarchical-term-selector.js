@@ -2,25 +2,27 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { unescape as unescapeString, without, groupBy, map, repeat, find } from 'lodash';
+import { unescape as unescapeString, without, map, repeat, find } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
-import { withInstanceId } from '@wordpress/components';
+import { Component, compose } from '@wordpress/element';
+import { withInstanceId, withSpokenMessages } from '@wordpress/components';
+import { buildTermsTree } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
-import { getEditedPostAttribute } from '../../selectors';
-import { editPost } from '../../actions';
+import { getEditedPostAttribute } from '../../store/selectors';
+import { editPost } from '../../store/actions';
 
 const DEFAULT_QUERY = {
 	per_page: 100,
 	orderby: 'count',
 	order: 'desc',
+	_fields: [ 'id', 'name', 'parent' ],
 };
 
 class HierarchicalTermSelector extends Component {
@@ -40,23 +42,6 @@ class HierarchicalTermSelector extends Component {
 			formParent: '',
 			showForm: false,
 		};
-	}
-
-	buildTermsTree( flatTerms ) {
-		const termsByParent = groupBy( flatTerms, 'parent' );
-		const fillWithChildren = ( terms ) => {
-			return terms.map( ( term ) => {
-				const children = termsByParent[ term.id ];
-				return {
-					...term,
-					children: children && children.length ?
-						fillWithChildren( children ) :
-						[],
-				};
-			} );
-		};
-
-		return fillWithChildren( termsByParent[ 0 ] || [] );
 	}
 
 	onChange( event ) {
@@ -86,8 +71,8 @@ class HierarchicalTermSelector extends Component {
 
 	onAddTerm( event ) {
 		event.preventDefault();
-		const { formName, formParent } = this.state;
-		if ( formName === '' ) {
+		const { formName, formParent, adding } = this.state;
+		if ( formName === '' || adding ) {
 			return;
 		}
 		const findOrCreatePromise = new Promise( ( resolve, reject ) => {
@@ -114,13 +99,15 @@ class HierarchicalTermSelector extends Component {
 			.then( ( term ) => {
 				const hasTerm = !! find( this.state.availableTerms, ( availableTerm ) => availableTerm.id === term.id );
 				const newAvailableTerms = hasTerm ? this.state.availableTerms : [ term, ...this.state.availableTerms ];
-				const { onUpdateTerms, restBase, terms } = this.props;
+				const { onUpdateTerms, restBase, terms, slug } = this.props;
+				const termAddedMessage = slug === 'category' ? __( 'Category added' ) : __( 'Term added' );
+				this.props.speak( termAddedMessage, 'assertive' );
 				this.setState( {
 					adding: false,
 					formName: '',
 					formParent: '',
 					availableTerms: newAvailableTerms,
-					availableTermsTree: this.buildTermsTree( newAvailableTerms ),
+					availableTermsTree: buildTermsTree( newAvailableTerms ),
 				} );
 				onUpdateTerms( [ ...terms, term.id ], restBase );
 			}, ( xhr ) => {
@@ -138,7 +125,7 @@ class HierarchicalTermSelector extends Component {
 		this.fetchRequest = new Collection()
 			.fetch( { data: DEFAULT_QUERY } )
 			.done( ( terms ) => {
-				const availableTermsTree = this.buildTermsTree( terms );
+				const availableTermsTree = buildTermsTree( terms );
 
 				this.setState( {
 					loading: false,
@@ -201,7 +188,7 @@ class HierarchicalTermSelector extends Component {
 	}
 
 	render() {
-		const { availableTermsTree, availableTerms, formName, formParent, loading, adding, showForm } = this.state;
+		const { availableTermsTree, availableTerms, formName, formParent, loading, showForm } = this.state;
 		const { label, slug, instanceId } = this.props;
 
 		const newTermButtonLabel = slug === 'category' ? __( 'Add new category' ) : __( 'Add new term' );
@@ -215,7 +202,7 @@ class HierarchicalTermSelector extends Component {
 		/* eslint-disable jsx-a11y/no-onchange */
 		return (
 			<div className="editor-post-taxonomies__hierarchical-terms-selector">
-				<h4 className="editor-post-taxonomies__hierarchical-terms-selector-title">{ label }</h4>
+				<h3 className="editor-post-taxonomies__hierarchical-terms-selector-title">{ label }</h3>
 				{ this.renderTerms( availableTermsTree ) }
 				{ ! loading &&
 					<button
@@ -264,7 +251,6 @@ class HierarchicalTermSelector extends Component {
 						<button
 							type="submit"
 							className="button editor-post-taxonomies__hierarchical-terms-submit"
-							disabled={ adding }
 						>
 							{ newTermSubmitLabel }
 						</button>
@@ -276,7 +262,7 @@ class HierarchicalTermSelector extends Component {
 	}
 }
 
-export default connect(
+const applyConnect = connect(
 	( state, onwProps ) => {
 		return {
 			terms: getEditedPostAttribute( state, onwProps.restBase ),
@@ -287,4 +273,10 @@ export default connect(
 			return editPost( { [ restBase ]: terms } );
 		},
 	}
-)( withInstanceId( HierarchicalTermSelector ) );
+);
+
+export default compose(
+	applyConnect,
+	withSpokenMessages,
+	withInstanceId
+)( HierarchicalTermSelector );

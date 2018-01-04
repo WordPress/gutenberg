@@ -40,6 +40,16 @@ This is the display title for your block, which can be translated with our trans
 title: 'Book'
 ```
 
+#### Description (optional)
+
+* **Type:** `String`
+
+This is a short description for your block, which can be translated with our translation functions. This will be shown in the block inspector.
+
+```js
+description: 'Block showing a Book card.'
+```
+
 #### Category
 
 * **Type:** `String [ common | formatting | layout | widgets | embed ]`
@@ -140,16 +150,11 @@ customClassName: false,
 className: false,
 ```
 
-#### supportHTML (optional)
-
-* **Type:** `Bool`
-* **Default:** `true`
-
-Whether a block can be edited in HTML mode.
+- `html` (default `true`): By default, Gutenberg will allow a block's markup to be edited individually. To disable this behavior, set `html` to `false`.
 
 ```js
 // Remove support for an HTML mode.
-supportHTML: false,
+html: false,
 ```
 
 ## Edit and Save

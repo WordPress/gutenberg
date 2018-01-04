@@ -40,14 +40,13 @@ describe( 'BlockIcon', () => {
 	} );
 
 	it( 'renders a component', () => {
+		class MyComponent extends Component {
+			render() {
+				return <span />;
+			}
+		}
 		const wrapper = shallow(
-			<BlockIcon icon={
-				class MyComponent extends Component {
-					render() {
-						return <span />;
-					}
-				}
-			} />
+			<BlockIcon icon={ MyComponent } />
 		);
 
 		expect( wrapper.name() ).toBe( 'MyComponent' );

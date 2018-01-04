@@ -12,7 +12,9 @@ import { MenuItemsGroup } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { getEditorMode } from '../../../selectors';
+import shortcuts from '../../keyboard-shortcuts';
+import { getEditorMode } from '../../../store/selectors';
+import { switchEditorMode } from '../../../store/actions';
 
 /**
  * Set of available mode options.
@@ -31,10 +33,17 @@ const MODES = [
 ];
 
 function ModeSwitcher( { onSwitch, mode } ) {
+	const choices = MODES.map( choice => {
+		if ( choice.value !== mode ) {
+			return { ...choice, shortcut: shortcuts.toggleEditorMode.label };
+		}
+		return choice;
+	} );
+
 	return (
 		<MenuItemsGroup
 			label={ __( 'Editor' ) }
-			choices={ MODES }
+			choices={ choices }
 			value={ mode }
 			onSelect={ onSwitch }
 		/>
@@ -47,10 +56,7 @@ export default connect(
 	} ),
 	( dispatch, ownProps ) => ( {
 		onSwitch( mode ) {
-			dispatch( {
-				type: 'SWITCH_MODE',
-				mode: mode,
-			} );
+			dispatch( switchEditorMode( mode ) );
 			ownProps.onSelect( mode );
 		},
 	} )

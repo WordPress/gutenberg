@@ -14,7 +14,6 @@ notifications:
 
 cache:
   directories:
-    - vendor
     - $HOME/.composer/cache
     - $HOME/.phpbrew
 

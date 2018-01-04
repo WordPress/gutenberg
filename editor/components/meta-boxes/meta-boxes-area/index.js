@@ -4,6 +4,7 @@
 import { isEqual } from 'lodash';
 import classnames from 'classnames';
 import { connect } from 'react-redux';
+import jQuery from 'jquery';
 
 /**
  * WordPress dependencies
@@ -16,17 +17,17 @@ import { Spinner } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import { handleMetaBoxReload, metaBoxStateChanged, metaBoxLoaded } from '../../../actions';
-import { getMetaBox, isSavingPost } from '../../../selectors';
+import { handleMetaBoxReload, metaBoxStateChanged, metaBoxLoaded } from '../../../store/actions';
+import { getMetaBox, isSavingPost } from '../../../store/selectors';
 
 class MetaBoxesArea extends Component {
 	constructor() {
 		super( ...arguments );
 
 		this.state = {
-			loading: true,
+			loading: false,
 		};
-		this.originalFormData = [];
+		this.originalFormData = '';
 		this.bindNode = this.bindNode.bind( this );
 		this.checkState = this.checkState.bind( this );
 	}
@@ -40,9 +41,10 @@ class MetaBoxesArea extends Component {
 		this.fetchMetaboxes();
 	}
 
-	componentWillUnmout() {
+	componentWillUnmount() {
 		this.mounted = false;
 		this.unbindFormEvents();
+		document.querySelector( '#metaboxes' ).appendChild( this.form );
 	}
 
 	unbindFormEvents() {
@@ -63,43 +65,32 @@ class MetaBoxesArea extends Component {
 				body: new window.FormData( this.form ),
 				credentials: 'include',
 			};
-			const request = window.fetch( addQueryArgs( window._wpMetaBoxUrl, { meta_box: location } ), fetchOptions );
-			this.onMetaboxResponse( request, false );
-			this.unbindFormEvents();
+
+			// Save the metaboxes
+			window.fetch( addQueryArgs( window._wpMetaBoxUrl, { meta_box: location } ), fetchOptions )
+				.then( () => {
+					if ( ! this.mounted ) {
+						return false;
+					}
+					this.setState( { loading: false } );
+					this.props.metaBoxReloaded( location );
+				} );
 		}
 	}
 
 	fetchMetaboxes() {
 		const { location } = this.props;
-		const request = window.fetch( addQueryArgs( window._wpMetaBoxUrl, { meta_box: location } ), { credentials: 'include' } );
-		this.onMetaboxResponse( request );
-	}
-
-	onMetaboxResponse( request, initial = true ) {
-		request.then( ( response ) => response.text() )
-			.then( ( body ) => {
-				if ( ! this.mounted ) {
-					return;
-				}
-				jQuery( this.node ).html( body );
-				this.form = this.node.querySelector( '.meta-box-form' );
-				this.form.onSubmit = ( event ) => event.preventDefault();
-				this.originalFormData = this.getFormData();
-				this.form.addEventListener( 'change', this.checkState );
-				this.form.addEventListener( 'input', this.checkState );
-				this.setState( { loading: false } );
-				if ( ! initial ) {
-					this.props.metaBoxReloaded( this.props.location );
-				} else {
-					this.props.metaBoxLoaded( this.props.location );
-				}
-			} );
+		this.form = document.querySelector( '.metabox-location-' + location );
+		this.node.appendChild( this.form );
+		this.form.onSubmit = ( event ) => event.preventDefault();
+		this.originalFormData = this.getFormData();
+		this.form.addEventListener( 'change', this.checkState );
+		this.form.addEventListener( 'input', this.checkState );
+		this.props.metaBoxLoaded( location );
 	}
 
 	getFormData() {
-		const data = new window.FormData( this.form );
-		const entries = Array.from( data.entries() );
-		return entries;
+		return jQuery( this.form ).serialize();
 	}
 
 	checkState() {
@@ -133,6 +124,7 @@ class MetaBoxesArea extends Component {
 			<div className={ classes }>
 				{ loading && <Spinner /> }
 				<div ref={ this.bindNode } />
+				<div className="editor-meta-boxes-area__clear" />
 			</div>
 		);
 	}

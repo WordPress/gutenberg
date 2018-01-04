@@ -65,7 +65,7 @@ This function allows the block to update individual attributes based on user int
 
 ```js
 // Defining the edit interface
-edit( { attributes, className, focus } ) {
+edit( { attributes, setAttributes, className, focus } ) {
 	// Simplify access to attributes
 	const { content, mySetting } = attributes;
 
