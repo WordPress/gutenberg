@@ -183,5 +183,13 @@
 				"MethodDefinition": true
 			}
 		} ]
-	}
+	},
+	"overrides": [
+		{
+			"files": [ "{blocks,components,date,editor,element,i18n,data,utils}/**/test/*.js" ],
+			"rules": {
+				"require-jsdoc": "off"
+			}
+		}
+	]
 }
