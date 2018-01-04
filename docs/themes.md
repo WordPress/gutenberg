@@ -4,7 +4,7 @@ By default, blocks provide their styles to enable basic support for blocks in th
 
 Some advanced block features require opt-in support in the theme itself as it's difficult for the block to provide these styles, they may require some architecting of the theme itself, in order to work well.
 
-To opt-in for one of these features, we should call `add_theme_support( 'feature-name', $optional-parameters )` in the `functions.php` file of the theme. For example:
+To opt-in for one of these features, call `add_theme_support` in the `functions.php` file of the theme. For example:
 
 ```php
 function mytheme_setup_theme_supported_features() {
