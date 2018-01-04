@@ -577,6 +577,13 @@ function gutenberg_prepare_blocks_for_js() {
  * @since 0.4.0
  */
 function gutenberg_common_scripts_and_styles() {
+	// We need to return early when this GET variable is set. This happens when
+	// the editor loads the metaboxes and for this case we don't need to enqueue
+	// scripts and styles.
+	if ( isset( $_GET['classic-editor'] ) ) {
+		return false;
+	}
+
 	// Enqueue basic styles built out of Gutenberg through `npm build`.
 	wp_enqueue_style( 'wp-blocks' );
 
