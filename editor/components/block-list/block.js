@@ -357,8 +357,6 @@ export class BlockListBlock extends Component {
 		const block = document.getElementById( `block-${ this.props.uid }` );
 		const dragInset = document.getElementById( `block-drag-inset-${ this.props.uid }` );
 
-		document.body.classList.add( 'dragging' );
-
 		event.dataTransfer.effectAllowed = 'move';
 		event.dataTransfer.setData(
 			'text',
@@ -371,7 +369,7 @@ export class BlockListBlock extends Component {
 
 		// Order matters next. '.dragged' must be added before setting the drag image.
 		block.classList.add( 'dragged' );
-		event.dataTransfer.setDragImage( block, 0, 0 );
+		event.dataTransfer.setDragImage( block, -15, -15 );
 
 		setTimeout( setDragInset( block, dragInset ) );
 
@@ -380,6 +378,7 @@ export class BlockListBlock extends Component {
 				_block.classList.remove( 'dragged' );
 				_block.classList.add( 'hide' );
 				_dragInset.classList.add( 'visible' );
+				document.body.classList.add( 'dragging' );
 			};
 		}
 	}
@@ -388,13 +387,13 @@ export class BlockListBlock extends Component {
 		const block = document.getElementById( `block-${ this.props.uid }` );
 		const dragInset = document.getElementById( `block-drag-inset-${ this.props.uid }` );
 
-		document.body.classList.remove( 'dragging' );
 		setTimeout( resetBlockDisplay( block, dragInset ) );
 
 		function resetBlockDisplay( _block, _dragInset ) {
 			return () => {
 				_block.classList.remove( 'hide' );
 				_dragInset.classList.remove( 'visible' );
+				document.body.classList.remove( 'dragging' );
 			};
 		}
 	}
