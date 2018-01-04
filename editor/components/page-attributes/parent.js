@@ -66,15 +66,15 @@ const applyWithAPIDataPostType = withAPIData( ( props ) => {
 	};
 } );
 
-const applyWithAPIDataItems = withAPIData( ( props ) => {
-	const restBase = get( props, 'postType.data.rest_base' );
+const applyWithAPIDataItems = withAPIData( ( props, { type } ) => {
+	const { postTypeSlug } = props;
 	const isHierarchical = get( props, 'postType.data.hierarchical', false );
 	const queryString = stringify( {
 		context: 'edit',
 		per_page: 100,
 		_fields: [ 'id', 'parent', 'title' ],
 	} );
-	return isHierarchical && restBase ? { items: `/wp/v2/${ restBase }?${ queryString }` } : {};
+	return isHierarchical ? { items: `/wp/v2/${ type( postTypeSlug ) }?${ queryString }` } : {};
 } );
 
 export default compose( [
