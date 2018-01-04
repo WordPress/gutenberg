@@ -3,7 +3,7 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
-import { get, partial, reduce, size } from 'lodash';
+import { debounce, get, partial, reduce, size } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -27,7 +27,6 @@ import BlockMover from '../block-mover';
 import BlockDropZone from '../block-drop-zone';
 import BlockSettingsMenu from '../block-settings-menu';
 import InvalidBlockWarning from './invalid-block-warning';
-import BlockListDeselect from './deselect';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
@@ -109,6 +108,7 @@ export class BlockListBlock extends Component {
 		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
 		this.onTouchStart = this.onTouchStart.bind( this );
 		this.onClick = this.onClick.bind( this );
+		this.deselect = debounce( this.props.onDeselect );
 
 		this.previousOffset = null;
 		this.hadTouchStart = false;
@@ -126,6 +126,8 @@ export class BlockListBlock extends Component {
 		if ( this.props.isTyping ) {
 			document.addEventListener( 'mousemove', this.stopTypingOnMouseMove );
 		}
+
+		this.bindClickOutside();
 	}
 
 	componentWillReceiveProps( newProps ) {
@@ -163,10 +165,27 @@ export class BlockListBlock extends Component {
 				this.removeStopTypingListener();
 			}
 		}
+
+		// Click outside detection is activated depending on selected state, so
+		// rebind when changing.
+		if (
+			this.props.isSelected !== prevProps.isSelected ||
+			this.props.isFirstMultiSelected !== prevProps.isFirstMultiSelected
+		) {
+			this.bindClickOutside();
+		}
+
+		// If we were multi-selecting, cancel deselect check since while a
+		// multi-select mouseup technically occurs outside the current block,
+		// it should not be treated as a deselect intent.
+		if ( ! this.props.isMultiSelecting && prevProps.isMultiSelecting ) {
+			this.deselect.cancel();
+		}
 	}
 
 	componentWillUnmount() {
 		this.removeStopTypingListener();
+		document.removeEventListener( 'mouseup', this.deselect, true );
 	}
 
 	removeStopTypingListener() {
@@ -179,6 +198,22 @@ export class BlockListBlock extends Component {
 
 	bindBlockNode( node ) {
 		this.node = node;
+	}
+
+	/**
+	 * Toggles event listener on document for mouse events to deselect block.
+	 */
+	bindClickOutside() {
+		const { isSelected, isFirstMultiSelected } = this.props;
+
+		// Listen for click outside if the block is selected. We target the
+		// first block of multi-selection since it is the one responsible for
+		// rendering the block controls, and because we don't need multiple
+		// mouse handlers to handle the deselection.
+		const isListening = isSelected || isFirstMultiSelected;
+
+		const bindFn = isListening ? 'addEventListener' : 'removeEventListener';
+		document[ bindFn ]( 'mouseup', this.deselect, true );
 	}
 
 	setAttributes( attributes ) {
@@ -206,7 +241,12 @@ export class BlockListBlock extends Component {
 		// Detect touchstart to disable hover on iOS
 		this.hadTouchStart = true;
 	}
+
 	onClick() {
+		// We debounce deslect to allow clicks bubbled within the block wrapper
+		// to prevent deselect from occurring.
+		this.deselect.cancel();
+
 		// Clear touchstart detection
 		// Browser will try to emulate mouse events also see https://www.html5rocks.com/en/mobile/touchandmouse/
 		this.hadTouchStart = false;
@@ -379,7 +419,7 @@ export class BlockListBlock extends Component {
 
 		// Disable reason: Each block can be selected by clicking on it
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
-		const element = (
+		return (
 			<div
 				ref={ this.setBlockListRef }
 				onMouseMove={ this.maybeHover }
@@ -442,16 +482,6 @@ export class BlockListBlock extends Component {
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
-
-		if ( isSelected || isMultiSelected ) {
-			return (
-				<BlockListDeselect onDeselect={ this.props.onDeselect }>
-					{ element }
-				</BlockListDeselect>
-			);
-		}
-
-		return element;
 	}
 }
 
@@ -461,6 +491,7 @@ const mapStateToProps = ( state, { uid } ) => ( {
 	block: getBlock( state, uid ),
 	isSelected: isBlockSelected( state, uid ),
 	isMultiSelected: isBlockMultiSelected( state, uid ),
+	isMultiSelecting: isMultiSelecting( state ),
 	isFirstMultiSelected: isFirstMultiSelectedBlock( state, uid ),
 	isHovered: isBlockHovered( state, uid ) && ! isMultiSelecting( state ),
 	focus: getBlockFocus( state, uid ),
