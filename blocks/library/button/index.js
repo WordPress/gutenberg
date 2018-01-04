@@ -101,7 +101,7 @@ class ButtonBlock extends Component {
 				{ focus &&
 					<InspectorControls key="inspector">
 						<ToggleControl
-							label={ __( 'Stand on a line' ) }
+							label={ __( 'Wrap text' ) }
 							checked={ !! clear }
 							onChange={ this.toggleClear }
 						/>
