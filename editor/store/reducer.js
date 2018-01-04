@@ -72,9 +72,9 @@ export const editor = flow( [
 	// Track undo history, starting at editor initialization.
 	partialRight( withHistory, { resetTypes: [ 'SETUP_EDITOR' ] } ),
 
-	// Track whether changes exist, starting at editor initialization and
-	// resetting at each post save.
-	partialRight( withChangeDetection, { resetTypes: [ 'SETUP_EDITOR', 'RESET_POST' ] } ),
+	// Track whether changes exist, resetting at each post save. Relies on
+	// editor initialization firing post reset as an effect.
+	partialRight( withChangeDetection, { resetTypes: [ 'RESET_POST' ] } ),
 ] )( {
 	edits( state = {}, action ) {
 		switch ( action.type ) {
