@@ -2,6 +2,7 @@
 	margin-bottom: $block-spacing;
 	position: relative;
 	padding: $block-padding;
+	pointer-events: none;
 
 	@include break-small {
 		// The block mover needs to stay inside the block to allow clicks when hovering the block
@@ -250,6 +251,10 @@
 
 	&[data-clear="true"] {
 		float: none;
+	}
+
+	> * {
+		pointer-events: auto;
 	}
 
 	& > .components-drop-zone {
