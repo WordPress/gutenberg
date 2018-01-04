@@ -72,7 +72,12 @@ export default connect(
 		onDelete( id ) {
 			// TODO: Make this a <Confirm /> component or similar
 			// eslint-disable-next-line no-alert
-			if ( window.confirm( __( 'Are you sure you want to permanently delete this Reusable Block?' ) ) ) {
+			const hasConfirmed = window.confirm( __(
+				'Are you sure you want to delete this Reusable Block?\n\n' +
+				'It will be permanently removed from all posts and pages that use it.'
+			) );
+
+			if ( hasConfirmed ) {
 				dispatch( deleteReusableBlock( id ) );
 				onToggle();
 			}
