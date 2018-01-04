@@ -25,9 +25,13 @@ const incorrectLevelContent = [
 	<br key="incorrect-break" />,
 	<em key="incorrect-message">{ __( '(Incorrect heading level)' ) }</em>,
 ];
-const multipleH1Headings = [
+const singleH1Headings = [
 	<br key="incorrect-break-h1" />,
-	<em key="incorrect-message-h1">{ __( '(Multiple H1 headings)' ) }</em>,
+	<em key="incorrect-message-h1">{ __( '(Your theme may already use a H1 for the post title)' ) }</em>,
+];
+const multipleH1Headings = [
+	<br key="incorrect-break-multiple-h1" />,
+	<em key="incorrect-message-multiple-h1">{ __( '(Multiple H1 headings are not recommended)' ) }</em>,
 ];
 
 const getHeadingLevel = heading => {
@@ -104,7 +108,7 @@ export const DocumentOutline = ( { blocks = [], title, onSelect } ) => {
 						! item.isEmpty &&
 						! isIncorrectLevel &&
 						!! item.level &&
-						( item.level !== 1 || ! hasMultipleH1 )
+						( item.level !== 1 || ( ! hasMultipleH1 && ! title ) )
 					);
 					prevHeadingLevel = item.level;
 
@@ -118,6 +122,7 @@ export const DocumentOutline = ( { blocks = [], title, onSelect } ) => {
 							{ item.isEmpty ? emptyHeadingContent : item.attributes.content }
 							{ isIncorrectLevel && incorrectLevelContent }
 							{ item.level === 1 && hasMultipleH1 && multipleH1Headings }
+							{ title && item.level === 1 && ! hasMultipleH1 && singleH1Headings }
 						</DocumentOutlineItem>
 					);
 				} ) }

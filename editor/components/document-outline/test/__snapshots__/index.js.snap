@@ -25,7 +25,7 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
 </div>
 `;
 
-exports[`DocumentOutline header blocks present should render warnings for multiple h1 heaedings 1`] = `
+exports[`DocumentOutline header blocks present should render warnings for multiple h1 headings 1`] = `
 <div
   className="document-outline"
 >
@@ -33,33 +33,33 @@ exports[`DocumentOutline header blocks present should render warnings for multip
     <TableOfContentsItem
       isValid={false}
       key="0"
-      level={1}
+      level="H1"
       onClick={[Function]}
     >
       Heading 1
       <br
-        key="incorrect-break-h1"
+        key="incorrect-break-multiple-h1"
       />
       <em
-        key="incorrect-message-h1"
+        key="incorrect-message-multiple-h1"
       >
-        (Multiple H1 headings)
+        (Multiple H1 headings are not recommended)
       </em>
     </TableOfContentsItem>
     <TableOfContentsItem
       isValid={false}
       key="1"
-      level={1}
+      level="H1"
       onClick={[Function]}
     >
       Heading 1
       <br
-        key="incorrect-break-h1"
+        key="incorrect-break-multiple-h1"
       />
       <em
-        key="incorrect-message-h1"
+        key="incorrect-message-multiple-h1"
       >
-        (Multiple H1 headings)
+        (Multiple H1 headings are not recommended)
       </em>
     </TableOfContentsItem>
   </ul>
