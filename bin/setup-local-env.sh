@@ -21,3 +21,9 @@ docker run -it --rm --volumes-from wordpress-dev --network container:wordpress-d
 
 # Activate Gutenberg
 docker run -it --rm --volumes-from wordpress-dev --network container:wordpress-dev wordpress:cli plugin activate gutenberg
+
+# Launch the PHPUnit docker
+docker-compose -f docker-compose.phpunit.yml up -d
+
+# Install the PHPUnit test scaffolding
+docker-compose -f docker-compose.phpunit.yml run --rm wordpress_phpunit /app/bin/install-wp-tests.sh wordpress_test root '' mysql_phpunit latest true
