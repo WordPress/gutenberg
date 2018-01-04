@@ -383,6 +383,13 @@ export default {
 		const { id } = action;
 		const { getState, dispatch } = store;
 
+		// Don't allow a reusable block with a temporary ID to be deleted
+		const reusableBlock = getReusableBlock( getState(), id );
+		if ( ! reusableBlock || reusableBlock.isTemporary ) {
+			return;
+		}
+
+		// Remove any other blocks that reference this reusable block
 		const allBlocks = getBlocks( getState() );
 		const associatedBlocks = allBlocks.filter( block => isReusableBlock( block ) && block.attributes.ref === id );
 		const associatedBlockUids = associatedBlocks.map( block => block.uid );

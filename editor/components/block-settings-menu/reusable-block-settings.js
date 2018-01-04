@@ -15,15 +15,13 @@ import { isReusableBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { getBlock } from '../../store/selectors';
+import { getBlock, getReusableBlock } from '../../store/selectors';
 import { convertBlockToStatic, convertBlockToReusable, deleteReusableBlock } from '../../store/actions';
 
-export function ReusableBlockSettings( { block, onConvertToStatic, onConvertToReusable, onDelete } ) {
-	const isReusable = isReusableBlock( block );
-
+export function ReusableBlockSettings( { reusableBlock, onConvertToStatic, onConvertToReusable, onDelete } ) {
 	return (
 		<Fragment>
-			{ ! isReusable && (
+			{ ! reusableBlock && (
 				<IconButton
 					className="editor-block-settings-menu__control"
 					icon="controls-repeat"
@@ -32,7 +30,7 @@ export function ReusableBlockSettings( { block, onConvertToStatic, onConvertToRe
 					{ __( 'Convert to Reusable Block' ) }
 				</IconButton>
 			) }
-			{ isReusable && (
+			{ reusableBlock && (
 				<div className="editor-block-settings-menu__section">
 					<IconButton
 						className="editor-block-settings-menu__control"
@@ -44,7 +42,8 @@ export function ReusableBlockSettings( { block, onConvertToStatic, onConvertToRe
 					<IconButton
 						className="editor-block-settings-menu__control"
 						icon="no"
-						onClick={ () => onDelete( block.attributes.ref ) }
+						disabled={ reusableBlock.isTemporary }
+						onClick={ () => onDelete( reusableBlock.id ) }
 					>
 						{ __( 'Delete Reusable Block' ) }
 					</IconButton>
@@ -56,8 +55,9 @@ export function ReusableBlockSettings( { block, onConvertToStatic, onConvertToRe
 
 export default connect(
 	( state, { uid } ) => {
+		const block = getBlock( state, uid );
 		return {
-			block: getBlock( state, uid ),
+			reusableBlock: isReusableBlock( block ) ? getReusableBlock( state, block.attributes.ref ) : null,
 		};
 	},
 	( dispatch, { uid, onToggle = noop } ) => ( {

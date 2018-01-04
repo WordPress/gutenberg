@@ -730,8 +730,11 @@ describe( 'effects', () => {
 					},
 				};
 
-				const initialState = reducer( undefined, {} );
-				const state = reducer( initialState, resetBlocks( [ associatedBlock ] ) );
+				const actions = [
+					resetBlocks( [ associatedBlock ] ),
+					updateReusableBlock( id, {} ),
+				];
+				const state = actions.reduce( reducer, undefined );
 
 				const dispatch = jest.fn();
 				const store = { getState: () => state, dispatch };
@@ -763,7 +766,8 @@ describe( 'effects', () => {
 					}
 				} );
 
-				const state = reducer( undefined, {} );
+				const state = reducer( undefined, updateReusableBlock( 123, {} ) );
+
 				const dispatch = jest.fn();
 				const store = { getState: () => state, dispatch };
 
@@ -776,6 +780,22 @@ describe( 'effects', () => {
 						optimist: expect.any( Object ),
 					} );
 				} );
+			} );
+
+			it( 'should not save reusable blocks with temporary IDs', () => {
+				const reusableBlock = {
+					id: -123,
+					isTemporary: true,
+				};
+
+				const state = reducer( undefined, updateReusableBlock( -123, reusableBlock ) );
+
+				const dispatch = jest.fn();
+				const store = { getState: () => state, dispatch };
+
+				handler( deleteReusableBlock( -123 ), store );
+
+				expect( dispatch ).not.toHaveBeenCalled();
 			} );
 		} );
 
@@ -843,8 +863,8 @@ describe( 'effects', () => {
 				handler( convertBlockToReusable( staticBlock.uid ), store );
 
 				expect( dispatch ).toHaveBeenCalledWith(
-					updateReusableBlock( 1, {
-						id: 1,
+					updateReusableBlock( -1, {
+						id: -1,
 						isTemporary: true,
 						title: 'Untitled block',
 						type: staticBlock.name,
@@ -852,12 +872,12 @@ describe( 'effects', () => {
 					} )
 				);
 				expect( dispatch ).toHaveBeenCalledWith(
-					saveReusableBlock( 1 )
+					saveReusableBlock( -1 )
 				);
 				expect( dispatch ).toHaveBeenCalledWith(
 					replaceBlocks(
 						[ staticBlock.uid ],
-						[ createBlock( 'core/block', { ref: 1 } ) ]
+						[ createBlock( 'core/block', { ref: -1 } ) ]
 					)
 				);
 			} );

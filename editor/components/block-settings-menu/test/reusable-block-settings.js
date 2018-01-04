@@ -13,7 +13,7 @@ describe( 'ReusableBlockSettings', () => {
 		const onConvert = jest.fn();
 		const wrapper = shallow(
 			<ReusableBlockSettings
-				block={ { name: 'core/paragraph' } }
+				reusableBlock={ null }
 				onConvertToReusable={ onConvert }
 			/>
 		);
@@ -29,7 +29,7 @@ describe( 'ReusableBlockSettings', () => {
 		const onConvert = jest.fn();
 		const wrapper = shallow(
 			<ReusableBlockSettings
-				block={ { name: 'core/block' } }
+				reusableBlock={ {} }
 				onConvertToStatic={ onConvert }
 			/>
 		);
@@ -45,7 +45,7 @@ describe( 'ReusableBlockSettings', () => {
 		const onDelete = jest.fn();
 		const wrapper = shallow(
 			<ReusableBlockSettings
-				block={ { name: 'core/block', attributes: { ref: 123 } } }
+				reusableBlock={ { id: 123 } }
 				onDelete={ onDelete }
 			/>
 		);
