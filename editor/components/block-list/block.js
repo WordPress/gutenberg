@@ -369,7 +369,9 @@ export class BlockListBlock extends Component {
 
 		// Order matters next. '.dragged' must be added before setting the drag image.
 		block.classList.add( 'dragged' );
-		event.dataTransfer.setDragImage( block, -15, -15 );
+		if ( 'function' === typeof event.dataTransfer.setDragImage ) {
+			event.dataTransfer.setDragImage( block, -15, -15 );
+		}
 
 		setTimeout( setDragInset( block, dragInset ) );
 
