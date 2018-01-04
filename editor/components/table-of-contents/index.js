@@ -41,11 +41,7 @@ function TableOfContents( { blocks } ) {
 				<div key="counts" className="table-of-contents__counts">
 					<div className="table-of-contents__count">
 						<WordCount />
-						{ __( 'Word Count' ) }
-					</div>
-					<div className="table-of-contents__count">
-						<span className="table-of-contents__number">{ blocks.length }</span>
-						{ __( 'Blocks' ) }
+						{ __( 'Words' ) }
 					</div>
 					<div className="table-of-contents__count">
 						<span className="table-of-contents__number">{ headings.length }</span>
@@ -54,6 +50,10 @@ function TableOfContents( { blocks } ) {
 					<div className="table-of-contents__count">
 						<span className="table-of-contents__number">{ paragraphs.length }</span>
 						{ __( 'Paragraphs' ) }
+					</div>
+					<div className="table-of-contents__count">
+						<span className="table-of-contents__number">{ blocks.length }</span>
+						{ __( 'Blocks' ) }
 					</div>
 				</div>,
 				headings.length > 0 && (
