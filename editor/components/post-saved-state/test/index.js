@@ -33,10 +33,10 @@ describe( 'PostSavedState', () => {
 		expect( wrapper.type() ).toBeNull();
 	} );
 
-	it( 'returns null if the post is published', () => {
+	it( 'returns a switch to draft link if the post is published', () => {
 		const wrapper = shallow( <PostSavedState isPublished /> );
 
-		expect( wrapper.type() ).toBeNull();
+		expect( wrapper ).toMatchSnapshot();
 	} );
 
 	it( 'should return Saved text if not new and not dirty', () => {

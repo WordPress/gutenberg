@@ -20,7 +20,6 @@ import PostSticky from '../post-sticky';
 import PostAuthor from '../post-author';
 import PostFormat from '../post-format';
 import PostPendingStatus from '../post-pending-status';
-import { PostSwitchToDraftButton } from '../../../components';
 import {
 	isEditorSidebarPanelOpened,
 } from '../../../store/selectors';
@@ -41,7 +40,6 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 			<PostPendingStatus />
 			<PostAuthor />
 			<PostTrash />
-			<PostSwitchToDraftButton />
 		</PanelBody>
 	);
 }
