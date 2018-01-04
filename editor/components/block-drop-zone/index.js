@@ -15,6 +15,7 @@ import { compose } from '@wordpress/element';
  * Internal dependencies
  */
 import { insertBlocks } from '../../store/actions';
+import { BLOCK_REORDER } from '../../store/constants';
 
 function BlockDropZone( { index, isLocked, ...props } ) {
 	if ( isLocked ) {
@@ -44,9 +45,13 @@ function BlockDropZone( { index, isLocked, ...props } ) {
 	};
 
 	const onDrop = ( event, position ) => {
-		if ( event.dataTransfer && 'move' === event.dataTransfer.effectAllowed ) {
-			if ( index !== undefined ) {
-				const { uid, fromIndex } = JSON.parse( event.dataTransfer.getData( 'text' ) );
+		if ( index !== undefined && event.dataTransfer && 'move' === event.dataTransfer.effectAllowed ) {
+			try {
+				const { uid, fromIndex, type } = JSON.parse( event.dataTransfer.getData( 'text' ) );
+
+				if ( type !== BLOCK_REORDER ) {
+					return;
+				}
 
 				if ( position.y === 'top' && index > fromIndex ) {
 					props.onDrop( uid, index - 1 );
@@ -57,6 +62,8 @@ function BlockDropZone( { index, isLocked, ...props } ) {
 				}
 
 				props.onDrop( uid, index );
+				return;
+			} catch ( err ) {
 				return;
 			}
 		}

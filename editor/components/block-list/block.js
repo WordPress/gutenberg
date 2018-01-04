@@ -64,6 +64,7 @@ import {
 	isTyping,
 	getBlockMode,
 } from '../../store/selectors';
+import { BLOCK_REORDER } from '../../store/constants';
 
 const { BACKSPACE, ESCAPE, DELETE, ENTER, UP, RIGHT, DOWN, LEFT } = keycodes;
 
@@ -361,7 +362,11 @@ export class BlockListBlock extends Component {
 		event.dataTransfer.effectAllowed = 'move';
 		event.dataTransfer.setData(
 			'text',
-			JSON.stringify( { uid: this.props.uid, fromIndex: this.props.order } )
+			JSON.stringify( {
+				uid: this.props.uid,
+				fromIndex: this.props.order,
+				type: BLOCK_REORDER
+			} )
 		);
 
 		// Order matters next. '.dragged' must be added before setting the drag image.

@@ -9,3 +9,9 @@ export const BREAK_LARGE = parseInt( breakpointsScssVariables.breakLarge );
 export const BREAK_MEDIUM = parseInt( breakpointsScssVariables.breakMedium );
 export const BREAK_SMALL = parseInt( breakpointsScssVariables.breakSmall );
 export const BREAK_MOBILE = parseInt( breakpointsScssVariables.breakMobile );
+
+/**
+ * Other constants used throughout the editor
+ */
+
+export const BLOCK_REORDER = 'BLOCK_REORDER';
