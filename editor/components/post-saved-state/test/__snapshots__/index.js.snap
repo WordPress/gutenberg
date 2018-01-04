@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PostSavedState returns a switch to draft link if the post is published 1`] = `
+<Connect(PostSwitchToDraftButton)
+  className="editor-post-saved-state button-link"
+/>
+`;

@@ -11,6 +11,11 @@
 
 	.wp-core-ui &.button-link {
 		margin-right: $item-spacing;
+		padding: 0;
+
+		&:hover {
+			background: none;
+		}
 	}
 }
 
