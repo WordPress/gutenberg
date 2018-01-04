@@ -10,7 +10,7 @@ function MenuItemsToggle( { label, isSelected, onClick, shortcut } ) {
 	if ( isSelected ) {
 		return (
 			<IconButton
-				className="components-menu-items__toggle is-selected"
+				className="components-menu-items__button is-toggle is-selected"
 				icon="yes"
 				onClick={ onClick }
 			>
@@ -22,7 +22,7 @@ function MenuItemsToggle( { label, isSelected, onClick, shortcut } ) {
 
 	return (
 		<Button
-			className="components-menu-items__toggle"
+			className="components-menu-items__button is-toggle"
 			onClick={ onClick }
 		>
 			{ label }
