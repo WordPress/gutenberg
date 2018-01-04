@@ -95,7 +95,7 @@ describe( 'Toolbar', () => {
 			const listItem = toolbar.find( 'IconButton' );
 			listItem.simulate( 'click', event );
 			expect( clickHandler ).toHaveBeenCalledTimes( 1 );
-			expect( clickHandler ).toHaveBeenCalledWith();
+			expect( clickHandler ).toHaveBeenCalledWith( event );
 		} );
 	} );
 } );

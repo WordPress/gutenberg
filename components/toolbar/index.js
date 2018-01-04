@@ -36,10 +36,7 @@ function Toolbar( { controls = [], children, className } ) {
 							icon={ control.icon }
 							label={ control.title }
 							data-subscript={ control.subscript }
-							onClick={ ( event ) => {
-								event.stopPropagation();
-								control.onClick();
-							} }
+							onClick={ control.onClick }
 							className={ classnames( 'components-toolbar__control', {
 								'is-active': control.isActive,
 							} ) }
