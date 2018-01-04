@@ -65,7 +65,7 @@ describe( 'DocumentOutline', () => {
 			expect( wrapper.find( 'TableOfContentsItem' ) ).toHaveLength( 2 );
 		} );
 
-		it( 'should render warnings for multiple h1 heaedings', () => {
+		it( 'should render warnings for multiple h1 headings', () => {
 			const blocks = [ headingH1, paragraph, headingH1, paragraph ];
 			const wrapper = shallow( <DocumentOutline blocks={ blocks } /> );
 
