@@ -787,10 +787,6 @@ export const reusableBlocks = combineReducers( {
 			case 'FETCH_REUSABLE_BLOCKS_SUCCESS':
 			case 'FETCH_REUSABLE_BLOCKS_FAILURE': {
 				const { id } = action;
-				if ( ! id ) {
-					return state;
-				}
-
 				return omit( state, id );
 			}
 		}
