@@ -6,20 +6,21 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createBlock, BlockEdit, getBlockType } from '@wordpress/blocks';
+import { createBlock, BlockEdit } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 
+/**
+ * Block Preview Component: It renders a preview given a block name and attributes.
+ *
+ * @param   {Object}    props Component props.
+ * @returns {WPElement}       Rendered element.
+ */
 function BlockPreview( { name, attributes } ) {
-	const blockType = getBlockType( name );
-	const initialAttributes = {
-		...blockType.example,
-		...attributes,
-	};
-	const block = createBlock( name, initialAttributes );
+	const block = createBlock( name, attributes );
 
 	return (
 		<div className="editor-block-preview">

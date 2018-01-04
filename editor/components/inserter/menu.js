@@ -26,7 +26,7 @@ import {
 	withSpokenMessages,
 	withContext,
 } from '@wordpress/components';
-import { getCategories } from '@wordpress/blocks';
+import { getCategories, isReusableBlock } from '@wordpress/blocks';
 import { keycodes } from '@wordpress/utils';
 
 /**
@@ -325,7 +325,9 @@ export class InserterMenu extends Component {
 						{ this.renderCategories( this.getVisibleItemsByCategory( items ) ) }
 					</div>
 				}
-				{ selectedItem && <BlockPreview name={ selectedItem.name } attributes={ selectedItem.initialAttributes } /> }
+				{ selectedItem && isReusableBlock( selectedItem ) &&
+					<BlockPreview name={ selectedItem.name } attributes={ selectedItem.initialAttributes } />
+				}
 			</TabbableContainer>
 		);
 	}

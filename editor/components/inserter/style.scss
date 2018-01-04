@@ -1,6 +1,5 @@
-$content-height: 250px;
-$tabs-height: 38px;
-$preview-height: 200px;
+$block-inserter-content-height: 250px;
+$block-inserter-tabs-height: 38px;
 
 .editor-inserter {
 	display: inline-block;
@@ -68,7 +67,7 @@ input[type="search"].editor-inserter__search {
 
 		.editor-block-preview {
 			border-top: 1px solid $light-gray-500;
-			height: $preview-height;
+			height: 200px;
 		}
 	}
 }
@@ -80,12 +79,11 @@ input[type="search"].editor-inserter__search {
 .editor-inserter__block {
 	display: flex;
 	flex-direction: column;
-	width: calc( 33% - 16px );
+	width: 33%;
 	border-radius: $button-style__radius-roundrect;
 	font-size: $default-font-size;
 	color: $dark-gray-500;
-	margin: 8px;
-	padding: 12px 6px 6px 6px;
+	padding: 12px;
 	align-items: center;
 	cursor: pointer;
 	border: none;
@@ -127,7 +125,7 @@ input[type="search"].editor-inserter__search {
 	overflow: auto;
 
 	@include break-medium {
-		height: $content-height + $tabs-height;
+		height: $block-inserter-content-height + $block-inserter-tabs-height;
 	}
 }
 
@@ -150,7 +148,7 @@ input[type="search"].editor-inserter__search {
 		overflow: auto;
 
 		@include break-medium {
-			height: $content-height;
+			height: $block-inserter-content-height;
 		}
 	}
 
