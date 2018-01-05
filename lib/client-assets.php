@@ -184,10 +184,12 @@ function gutenberg_register_scripts_and_styles() {
 	);
 	wp_style_add_data( 'wp-edit-blocks', 'rtl', 'replace' );
 
-	if ( WP_DEBUG ) {
+	if ( defined( 'GUTENBERG_LIVE_RELOAD' ) && GUTENBERG_LIVE_RELOAD ) {
+		$live_reload_url = ( GUTENBERG_LIVE_RELOAD === true ) ? 'http://localhost:35729/livereload.js' : GUTENBERG_LIVE_RELOAD;
+
 		wp_enqueue_script(
 			'gutenberg-live-reload',
-			'http://localhost:35729/livereload.js'
+			$live_reload_url
 		);
 	}
 }
