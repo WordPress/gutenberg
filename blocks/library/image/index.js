@@ -12,6 +12,38 @@ import './editor.scss';
 import { registerBlockType, createBlock, getBlockAttributes, getBlockType } from '../../api';
 import ImageBlock from './block';
 
+const blockAttributes = {
+	url: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'img',
+		attribute: 'src',
+	},
+	alt: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'img',
+		attribute: 'alt',
+	},
+	caption: {
+		type: 'array',
+		source: 'children',
+		selector: 'figcaption',
+	},
+	href: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'a',
+		attribute: 'href',
+	},
+	id: {
+		type: 'number',
+	},
+	align: {
+		type: 'string',
+	},
+};
+
 registerBlockType( 'core/image', {
 	title: __( 'Image' ),
 
@@ -24,35 +56,7 @@ registerBlockType( 'core/image', {
 	keywords: [ __( 'photo' ) ],
 
 	attributes: {
-		url: {
-			type: 'string',
-			source: 'attribute',
-			selector: 'img',
-			attribute: 'src',
-		},
-		alt: {
-			type: 'string',
-			source: 'attribute',
-			selector: 'img',
-			attribute: 'alt',
-		},
-		caption: {
-			type: 'array',
-			source: 'children',
-			selector: 'figcaption',
-		},
-		href: {
-			type: 'string',
-			source: 'attribute',
-			selector: 'a',
-			attribute: 'href',
-		},
-		id: {
-			type: 'number',
-		},
-		align: {
-			type: 'string',
-		},
+		...blockAttributes,
 		size: {
 			type: 'number',
 		},
@@ -162,4 +166,32 @@ registerBlockType( 'core/image', {
 			</figure>
 		);
 	},
+
+	deprecated: [
+		{
+			attributes: {
+				...blockAttributes,
+				width: {
+					type: 'number',
+				},
+				height: {
+					type: 'number',
+				},
+			},
+
+			save( { attributes } ) {
+				const { url, alt, caption, align, href, width, height } = attributes;
+				const extraImageProps = width || height ? { width, height } : {};
+				const figureStyle = width ? { width } : {};
+				const image = <img src={ url } alt={ alt } { ...extraImageProps } />;
+
+				return (
+					<figure className={ align ? `align${ align }` : null } style={ figureStyle }>
+						{ href ? <a href={ href }>{ image }</a> : image }
+						{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
+					</figure>
+				);
+			},
+		},
+	],
 } );
