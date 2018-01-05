@@ -6,7 +6,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Button, Dashicon, Placeholder, Toolbar } from '@wordpress/components';
+import { Button, IconButton, Placeholder, Toolbar } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 
 /**
@@ -99,13 +99,12 @@ registerBlockType( 'core/audio', {
 						onChange={ updateAlignment }
 					/>
 					<Toolbar>
-						<Button
+						<IconButton
 							className="components-icon-button components-toolbar__control"
-							aria-label={ __( 'Edit audio' ) }
+							label={ __( 'Edit audio' ) }
 							onClick={ switchToEditing }
-						>
-							<Dashicon icon="edit" />
-						</Button>
+							icon="edit"
+						/>
 					</Toolbar>
 				</BlockControls>
 			);

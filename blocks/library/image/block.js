@@ -121,6 +121,7 @@ class ImageBlock extends Component {
 		const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setAttributes );
 		const dropFiles = ( files ) => mediaUpload( files, setAttributes );
 
+		const editButtonLabel = __( 'Edit image' );
 		const controls = (
 			focus && (
 				<BlockControls key="controls">
@@ -133,11 +134,12 @@ class ImageBlock extends Component {
 						<MediaUploadButton
 							buttonProps={ {
 								className: 'components-icon-button components-toolbar__control',
-								'aria-label': __( 'Edit image' ),
+								'aria-label': editButtonLabel,
 							} }
 							onSelect={ this.onSelectImage }
 							type="image"
 							value={ id }
+							tooltip={ editButtonLabel }
 						>
 							<Dashicon icon="edit" />
 						</MediaUploadButton>
