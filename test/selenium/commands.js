@@ -15,7 +15,7 @@ module.exports.findElementWithText = findElementWithText;
 function findElementWithTextMatchingRe( context, selector, regexp ) {
 	return context.findElement( ( ctx ) => {
 		const buttons = ctx.findElements( By.css( selector ) );
-		return promise.filter( buttons, ( button ) => button.getText().then( ( tx ) => regexp.test(tx) ) );
+		return promise.filter( buttons, ( button ) => button.getText().then( ( tx ) => regexp.test( tx ) ) );
 	} );
 }
 module.exports.findElementWithTextMatchingRe = findElementWithTextMatchingRe;
@@ -53,6 +53,16 @@ function getPostText( driver ) {
 }
 module.exports.getPostText = getPostText;
 
+function makeNewParagraph( driver ) {
+	driver.findElements( By.css( '.editor-default-block-appender' ) ).then( ( list ) => {
+		if ( list.length === 1 ) {
+			return list[ 0 ].click();
+		}
+		return driver.findElement( By.css( '.editor-visual-editor__inserter [aria-label="Insert Paragraph"]' ) ).click();
+	} );
+}
+module.exports.makeNewParagraph = makeNewParagraph;
+
 function visitAdmin( config, driver, adminPath ) {
 	const targetUrl = config.baseUrl + '/wp-admin/' + adminPath;
 	driver.get( targetUrl );
@@ -63,7 +73,7 @@ function visitAdmin( config, driver, adminPath ) {
 	driver.getCurrentUrl().then( function( url ) {
 		if ( url.startsWith( config.baseUrl + '/wp-login.php' ) ) {
 			// wait a bit for the onload javascript to run so it doesn't change our focus in the middle of typing
-			driver.sleep(200);
+			driver.sleep( 200 );
 			driver.findElement( By.id( 'user_login' ) ).sendKeys( config.username );
 			driver.findElement( By.id( 'user_pass' ) ).sendKeys( config.password );
 			driver.findElement( By.id( 'wp-submit' ) ).click();

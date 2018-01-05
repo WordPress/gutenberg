@@ -7,7 +7,7 @@ module.exports.run = ( config, driver ) => {
 
 		it( 'Should insert content using the placeholder, the quick inserter, the regular inserter', function() {
 			// Using the placeholder
-			driver.findElement( By.css( '[value="Write your story"]' ) ).click();
+			driver.findElement( By.css( '.editor-default-block-appender' ) ).click();
 			driver.switchTo().activeElement().sendKeys( 'First Paragraph' );
 			const first = findBlockByIndex( driver, 0 );
 			first.getAttribute( 'data-type' ).then( ( type ) => chai.expect( type ).to.equal( 'core/paragraph' ) );
