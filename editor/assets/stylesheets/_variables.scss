@@ -12,6 +12,7 @@ $editor-font-size: 16px;
 $text-editor-font-size: 14px;
 $editor-line-height: 1.8;
 $big-font-size: 18px;
+$mobile-text-min-font-size: 16px;	// Any font size below 16px will cause Mobile Safari to "zoom in"
 
 // Widths, heights & dimensions
 $item-spacing: 10px;

@@ -10,6 +10,44 @@ import Editable from '../';
 import { diffAriaProps, pickAriaProps } from '../aria';
 
 describe( 'Editable', () => {
+	describe( 'Component', () => {
+		describe( '.adaptFormatter', () => {
+			const wrapper = shallow( <Editable value={ [ 'valid' ] } /> );
+			const options = {
+				type: 'inline-style',
+				style: {
+					'font-weight': 'bold',
+				},
+			};
+
+			test( 'should return an object on inline: span, and a styles property matching the style object provided', () => {
+				expect( wrapper.instance().adaptFormatter( options ) ).toEqual( {
+					inline: 'span',
+					styles: options.style,
+				} );
+			} );
+		} );
+		describe( '.getSettings', () => {
+			const value = [ 'Hi!' ];
+			const settings = {
+				setting: 'hi',
+			};
+
+			test( 'should return expected settings', () => {
+				const wrapper = shallow( <Editable value={ value } /> );
+				expect( wrapper.instance().getSettings( settings ) ).toEqual( {
+					setting: 'hi',
+					forced_root_block: false,
+				} );
+			} );
+
+			test( 'should be overriden', () => {
+				const mock = jest.fn().mockImplementation( () => 'mocked' );
+
+				expect( shallow( <Editable value={ value } multiline={ true } getSettings={ mock } /> ).instance().getSettings( settings ) ).toEqual( 'mocked' );
+			} );
+		} );
+	} );
 	describe( '.propTypes', () => {
 		/* eslint-disable no-console */
 		let consoleError;

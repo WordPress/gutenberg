@@ -1,0 +1,172 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ColorPalette Dropdown .renderContent should render dropdown content 1`] = `
+<Chrome
+  color="red"
+  disableAlpha={true}
+  hex="#ff0000"
+  hsl={
+    Object {
+      "a": 1,
+      "h": 0,
+      "l": 0.5,
+      "s": 1,
+    }
+  }
+  hsv={
+    Object {
+      "a": 1,
+      "h": 0,
+      "s": 1,
+      "v": 1,
+    }
+  }
+  oldHue={0}
+  onChange={[Function]}
+  onChangeComplete={[Function]}
+  rgb={
+    Object {
+      "a": 1,
+      "b": 0,
+      "g": 0,
+      "r": 255,
+    }
+  }
+  style={
+    Object {
+      "width": "100%",
+    }
+  }
+/>
+`;
+
+exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] = `
+<button
+  aria-expanded={true}
+  aria-label="Custom color picker"
+  className="blocks-color-palette__item"
+  onClick={[MockFunction]}
+  type="button"
+>
+  <span
+    className="blocks-color-palette__custom-color-gradient"
+  />
+</button>
+`;
+
+exports[`ColorPalette Dropdown should render it correctly 1`] = `
+<Dropdown
+  className="blocks-color-palette__item-wrapper blocks-color-palette__custom-color"
+  contentClassName="blocks-color-palette__picker "
+  renderContent={[Function]}
+  renderToggle={[Function]}
+/>
+`;
+
+exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+<div
+  className="blocks-color-palette"
+>
+  <div
+    className="blocks-color-palette__item-wrapper"
+    key="red"
+  >
+    <button
+      aria-label="Color: red"
+      aria-pressed={true}
+      className="blocks-color-palette__item is-active"
+      onClick={[Function]}
+      style={
+        Object {
+          "color": "red",
+        }
+      }
+      type="button"
+    />
+  </div>
+  <div
+    className="blocks-color-palette__item-wrapper"
+    key="white"
+  >
+    <button
+      aria-label="Color: white"
+      aria-pressed={false}
+      className="blocks-color-palette__item"
+      onClick={[Function]}
+      style={
+        Object {
+          "color": "white",
+        }
+      }
+      type="button"
+    />
+  </div>
+  <div
+    className="blocks-color-palette__item-wrapper"
+    key="blue"
+  >
+    <button
+      aria-label="Color: blue"
+      aria-pressed={false}
+      className="blocks-color-palette__item"
+      onClick={[Function]}
+      style={
+        Object {
+          "color": "blue",
+        }
+      }
+      type="button"
+    />
+  </div>
+  <Dropdown
+    className="blocks-color-palette__item-wrapper blocks-color-palette__custom-color"
+    contentClassName="blocks-color-palette__picker "
+    renderContent={[Function]}
+    renderToggle={[Function]}
+  />
+  <button
+    className="button-link blocks-color-palette__clear"
+    onClick={[Function]}
+    type="button"
+  >
+    Clear
+  </button>
+</div>
+`;
+
+exports[`ColorPalette should render a dynamic toolbar with default colors, when colors are not present 1`] = `
+<div
+  className="blocks-color-palette"
+>
+  <div
+    className="blocks-color-palette__item-wrapper"
+    key="green"
+  >
+    <button
+      aria-label="Color: green"
+      aria-pressed={false}
+      className="blocks-color-palette__item"
+      onClick={[Function]}
+      style={
+        Object {
+          "color": "green",
+        }
+      }
+      type="button"
+    />
+  </div>
+  <Dropdown
+    className="blocks-color-palette__item-wrapper blocks-color-palette__custom-color"
+    contentClassName="blocks-color-palette__picker "
+    renderContent={[Function]}
+    renderToggle={[Function]}
+  />
+  <button
+    className="button-link blocks-color-palette__clear"
+    onClick={[Function]}
+    type="button"
+  >
+    Clear
+  </button>
+</div>
+`;

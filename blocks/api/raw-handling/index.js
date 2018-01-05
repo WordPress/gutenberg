@@ -34,9 +34,10 @@ import shortcodeConverter from './shortcode-converter';
  *                                            * 'AUTO': Decide based on the content passed.
  *                                            * 'INLINE': Always handle as inline content, and return string.
  *                                            * 'BLOCKS': Always handle as blocks, and return array of blocks.
+ * @param  {Array}         [options.tagName]  The tag into which content will be inserted.
  * @return {Array|String}                     A list of blocks or a string, depending on `handlerMode`.
  */
-export default function rawHandler( { HTML, plainText = '', mode = 'AUTO' } ) {
+export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagName } ) {
 	// First of all, strip any meta tags.
 	HTML = HTML.replace( /<meta[^>]+>/, '' );
 
@@ -45,26 +46,50 @@ export default function rawHandler( { HTML, plainText = '', mode = 'AUTO' } ) {
 		return parseWithGrammar( HTML );
 	}
 
-	// If there is a plain text version, the HTML version has no formatting,
-	// and there is at least a double line break,
-	// parse any Markdown inside the plain text.
-	if ( plainText && isPlain( HTML ) && plainText.indexOf( '\n\n' ) !== -1 ) {
+	// Parse Markdown (and HTML) if:
+	// * There is a plain text version.
+	// * The HTML version has no formatting.
+	if ( plainText && isPlain( HTML ) ) {
 		const converter = new showdown.Converter();
 
 		converter.setOption( 'noHeaderId', true );
 		converter.setOption( 'tables', true );
 
 		HTML = converter.makeHtml( plainText );
+
+		// Switch to inline mode if:
+		// * The current mode is AUTO.
+		// * The original plain text had no line breaks.
+		// * The original plain text was not an HTML paragraph.
+		// * The converted text is just a paragraph.
+		if (
+			mode === 'AUTO' &&
+			plainText.indexOf( '\n' ) === -1 &&
+			plainText.indexOf( '<p>' ) !== 0 &&
+			HTML.indexOf( '<p>' ) === 0
+		) {
+			mode = 'INLINE';
+		}
 	}
 
-	// Return filtered HTML if it's inline paste or all content is inline.
-	if ( mode === 'INLINE' || ( mode === 'AUTO' && isInlineContent( HTML ) ) ) {
+	// An array of HTML strings and block objects. The blocks replace matched shortcodes.
+	const pieces = shortcodeConverter( HTML );
+
+	// The call to shortcodeConverter will always return more than one element if shortcodes are matched.
+	// The reason is when shortcodes are matched empty HTML strings are included.
+	const hasShortcodes = pieces.length > 1;
+
+	// True if mode is auto, no shortcode is included and HTML verifies the isInlineContent condition
+	const isAutoModeInline = mode === 'AUTO' && isInlineContent( HTML, tagName ) && ! hasShortcodes;
+
+	// Return filtered HTML if condition is true
+	if ( mode === 'INLINE' || isAutoModeInline ) {
 		HTML = deepFilterHTML( HTML, [
 			// Add semantic formatting before attributes are stripped.
 			formattingTransformer,
 			stripAttributes,
 			commentRemover,
-			createUnwrapper( ( node ) => ! isInline( node ) ),
+			createUnwrapper( ( node ) => ! isInline( node, tagName ) ),
 		] );
 
 		// Allows us to ask for this information when we get a report.
@@ -74,7 +99,7 @@ export default function rawHandler( { HTML, plainText = '', mode = 'AUTO' } ) {
 	}
 
 	// Before we parse any HTML, extract shorcodes so they don't get messed up.
-	return shortcodeConverter( HTML ).reduce( ( accu, piece ) => {
+	return pieces.reduce( ( accu, piece ) => {
 		// Already a block from shortcode.
 		if ( typeof piece !== 'string' ) {
 			return [ ...accu, piece ];

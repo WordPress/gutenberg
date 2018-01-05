@@ -59,7 +59,7 @@ const slimImageObject = ( img ) => {
 };
 
 class MediaUploadButton extends Component {
-	constructor( { multiple = false, type, gallery = false, title = __( 'Select or Upload Media' ) } ) {
+	constructor( { multiple = false, type, gallery = false, title = __( 'Select or Upload Media' ), modalClass } ) {
 		super( ...arguments );
 		this.openModal = this.openModal.bind( this );
 		this.onSelect = this.onSelect.bind( this );
@@ -87,6 +87,10 @@ class MediaUploadButton extends Component {
 			wp.media.frame = this.frame;
 		} else {
 			this.frame = wp.media( frameConfig );
+		}
+
+		if ( modalClass ) {
+			this.frame.$el.addClass( modalClass );
 		}
 
 		// When an image is selected in the media frame...

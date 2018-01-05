@@ -2,13 +2,12 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { flowRight } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 import { withInstanceId } from '@wordpress/components';
 
 /**
@@ -18,8 +17,8 @@ import { visibilityOptions } from './utils';
 import {
 	getEditedPostAttribute,
 	getEditedPostVisibility,
-} from '../../selectors';
-import { editPost, savePost } from '../../actions';
+} from '../../store/selectors';
+import { editPost, savePost } from '../../store/actions';
 
 export class PostVisibility extends Component {
 	constructor( props ) {
@@ -147,7 +146,7 @@ const applyConnect = connect(
 	}
 );
 
-export default flowRight(
+export default compose(
 	applyConnect,
 	withInstanceId
 )( PostVisibility );

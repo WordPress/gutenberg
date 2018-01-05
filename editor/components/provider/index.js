@@ -19,19 +19,19 @@ import {
 /**
  * Internal Dependencies
  */
-import { setupEditor, undo } from '../../actions';
-import createReduxStore from '../../store';
+import { setupEditor, undo } from '../../store/actions';
+import store from '../../store';
 
 /**
  * The default editor settings
  * You can override any default settings when calling createEditorInstance
  *
- *  wideImages   boolean   Enable/Disable Wide/Full Alignments
+ *  alignWide   boolean   Enable/Disable Wide/Full Alignments
  *
  * @var {Object} DEFAULT_SETTINGS
  */
 const DEFAULT_SETTINGS = {
-	wideImages: false,
+	alignWide: false,
 
 	// This is current max width of the block inner area
 	// It's used to constraint image resizing and this value could be overriden later by themes
@@ -42,15 +42,15 @@ class EditorProvider extends Component {
 	constructor( props ) {
 		super( ...arguments );
 
-		this.store = createReduxStore( props.initialState );
+		this.store = store;
+
 		this.settings = {
 			...DEFAULT_SETTINGS,
 			...props.settings,
 		};
 
-		// If initial state is passed, assume that we don't need to initialize,
-		// as in the case of an error recovery.
-		if ( ! props.initialState ) {
+		// Assume that we don't need to initialize in the case of an error recovery.
+		if ( ! props.recovery ) {
 			this.store.dispatch( setupEditor( props.post, this.settings ) );
 		}
 	}
@@ -63,7 +63,6 @@ class EditorProvider extends Component {
 
 	componentWillReceiveProps( nextProps ) {
 		if (
-			nextProps.store !== this.props.store ||
 			nextProps.settings !== this.props.settings
 		) {
 			// eslint-disable-next-line no-console

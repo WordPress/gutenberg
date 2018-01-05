@@ -1,4 +1,4 @@
-.editor-block-list__block[data-type="core/freeform"] .blocks-editable__tinymce {
+.wp-block-freeform.blocks-editable__tinymce {
 	p {
 		line-height: $editor-line-height;
 	}
@@ -59,7 +59,7 @@
 	}
 
 	a {
-		color: $blue-medium-500;
+		color: $blue-medium-700;
 	}
 
 	&:focus a[data-mce-selected] {
@@ -103,7 +103,7 @@
 }
 
 .freeform-toolbar.has-advanced-toolbar {
-	margin-top: -89px;	// pull upwards the classic text toolbar when enabled, height is manually entered
+	margin-top: -89px;	// pull upwards the classic block toolbar when enabled, height is manually entered
 }
 
 // Overwrite inline styles.

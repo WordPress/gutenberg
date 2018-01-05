@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, compact, get, initial, last } from 'lodash';
+import { find, compact, get, initial, last, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,8 +16,6 @@ import './editor.scss';
 import { registerBlockType, createBlock } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
-import InspectorControls from '../../inspector-controls';
-import BlockDescription from '../../block-description';
 
 const fromBrDelimitedContent = ( content ) => {
 	if ( undefined === content ) {
@@ -75,6 +73,7 @@ const toBrDelimitedContent = ( values ) => {
 
 registerBlockType( 'core/list', {
 	title: __( 'List' ),
+	description: __( 'List. Numbered or bulleted.' ),
 	icon: 'editor-ul',
 	category: 'common',
 	keywords: [ __( 'bullet list' ), __( 'ordered list' ), __( 'numbered list' ) ],
@@ -106,9 +105,11 @@ registerBlockType( 'core/list', {
 				isMultiBlock: true,
 				blocks: [ 'core/paragraph' ],
 				transform: ( blockAttributes ) => {
+					const items = blockAttributes.map( ( { content } ) => content );
+					const hasItems = ! items.every( isEmpty );
 					return createBlock( 'core/list', {
 						nodeName: 'UL',
-						values: blockAttributes.map( ( { content }, index ) => ( <li key={ index }>{ content }</li> ) ),
+						values: hasItems ? items.map( ( content, index ) => <li key={ index }>{ content }</li> ) : [],
 					} );
 				},
 			},
@@ -116,10 +117,14 @@ registerBlockType( 'core/list', {
 				type: 'block',
 				blocks: [ 'core/quote' ],
 				transform: ( { value, citation } ) => {
+					const items = value.map( p => get( p, 'children.props.children' ) );
+					if ( ! isEmpty( citation ) ) {
+						items.push( citation );
+					}
+					const hasItems = ! items.every( isEmpty );
 					return createBlock( 'core/list', {
 						nodeName: 'UL',
-						values: value.map( ( item, index ) => <li key={ index } >{ get( item, 'children.props.children', '' ) } </li> )
-							.concat( citation ? <li key="citation">{ citation }</li> : [] ),
+						values: hasItems ? items.map( ( content, index ) => <li key={ index }>{ content }</li> ) : [],
 					} );
 				},
 			},
@@ -154,16 +159,19 @@ registerBlockType( 'core/list', {
 				blocks: [ 'core/paragraph' ],
 				transform: ( { values } ) =>
 					compact( values.map( ( value ) => get( value, 'props.children', null ) ) )
-						.map( ( content ) => createBlock( 'core/paragraph', { content } ) ),
+						.map( ( content ) => createBlock( 'core/paragraph', {
+							content: [ content ],
+						} ) ),
 			},
 			{
 				type: 'block',
 				blocks: [ 'core/quote' ],
 				transform: ( { values } ) => {
 					return createBlock( 'core/quote', {
-						value: ( values.length === 1 ? values : initial( values ) )
-							.map( ( value ) => ( { children: <p> { get( value, 'props.children' ) } </p> } ) ),
-						citation: ( values.length === 1 ? undefined : get( last( values ), 'props.children' ) ),
+						value: compact( ( values.length === 1 ? values : initial( values ) )
+							.map( ( value ) => get( value, 'props.children', null ) ) )
+							.map( ( children ) => ( { children: <p>{ children }</p> } ) ),
+						citation: ( values.length === 1 ? undefined : [ get( last( values ), 'props.children' ) ] ),
 					} );
 				},
 			},
@@ -278,6 +286,7 @@ registerBlockType( 'core/list', {
 				insertBlocksAfter,
 				setAttributes,
 				mergeBlocks,
+				onReplace,
 			} = this.props;
 			const { nodeName, values } = attributes;
 
@@ -311,14 +320,6 @@ registerBlockType( 'core/list', {
 						] }
 					/>
 				),
-				focus && (
-					<InspectorControls key="inspector">
-						<BlockDescription>
-							<p>{ __( 'List. Numbered or bulleted.' ) }</p>
-						</BlockDescription>
-						<p>{ __( 'No advanced options.' ) }</p>
-					</InspectorControls>
-				),
 				<Editable
 					multiline="li"
 					key="editable"
@@ -351,6 +352,7 @@ registerBlockType( 'core/list', {
 							} :
 							undefined
 					}
+					onRemove={ () => onReplace( [] ) }
 				/>,
 			];
 		}

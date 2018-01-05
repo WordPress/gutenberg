@@ -9,17 +9,18 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+import { withContext } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import PostPermalink from '../post-permalink';
-import { getEditedPostTitle } from '../../selectors';
-import { insertBlock, editPost, clearSelectedBlock } from '../../actions';
+import { getEditedPostTitle } from '../../store/selectors';
+import { insertBlock, editPost, clearSelectedBlock } from '../../store/actions';
 
 /**
  * Constants
@@ -97,7 +98,7 @@ class PostTitle extends Component {
 	}
 
 	render() {
-		const { title } = this.props;
+		const { title, placeholder } = this.props;
 		const { isSelected } = this.state;
 		const className = classnames( 'editor-post-title', { 'is-selected': isSelected } );
 
@@ -110,24 +111,24 @@ class PostTitle extends Component {
 				tabIndex={ -1 /* Necessary for Firefox to include relatedTarget in blur event */ }
 			>
 				{ isSelected && <PostPermalink /> }
-				<h1>
+				<div>
 					<Textarea
 						ref={ this.bindTextarea }
 						className="editor-post-title__input"
 						value={ title }
 						onChange={ this.onChange }
-						placeholder={ __( 'Add title' ) }
+						placeholder={ placeholder || __( 'Add title' ) }
 						onClick={ this.onSelect }
 						onKeyDown={ this.onKeyDown }
 						onKeyPress={ this.onUnselect }
 					/>
-				</h1>
+				</div>
 			</div>
 		);
 	}
 }
 
-export default connect(
+const applyConnect = connect(
 	( state ) => ( {
 		title: getEditedPostTitle( state ),
 	} ),
@@ -140,4 +141,15 @@ export default connect(
 		},
 		clearSelectedBlock,
 	}
+);
+
+const applyEditorSettings = withContext( 'editor' )(
+	( settings ) => ( {
+		placeholder: settings.titlePlaceholder,
+	} )
+);
+
+export default compose(
+	applyConnect,
+	applyEditorSettings
 )( PostTitle );

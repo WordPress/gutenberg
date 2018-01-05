@@ -16,9 +16,11 @@ import { IconButton, Dropdown, NavigableMenu } from '@wordpress/components';
 import './style.scss';
 import BlockInspectorButton from './block-inspector-button';
 import BlockModeToggle from './block-mode-toggle';
-import BlockDeleteButton from './block-delete-button';
+import BlockRemoveButton from './block-remove-button';
+import BlockTransformations from './block-transformations';
+import ReusableBlockSettings from './reusable-block-settings';
 import UnknownConverter from './unknown-converter';
-import { selectBlock } from '../../actions';
+import { selectBlock } from '../../store/actions';
 
 function BlockSettingsMenu( { uids, onSelect, focus } ) {
 	const count = uids.length;
@@ -43,7 +45,7 @@ function BlockSettingsMenu( { uids, onSelect, focus } ) {
 							onToggle();
 						} }
 						icon="ellipsis"
-						label={ isOpen ? __( 'Close Settings Menu' ) : __( 'Open Settings Menu' ) }
+						label={ __( 'More Options' ) }
 						aria-expanded={ isOpen }
 						focus={ focus }
 					/>
@@ -55,7 +57,9 @@ function BlockSettingsMenu( { uids, onSelect, focus } ) {
 					<BlockInspectorButton onClick={ onClose } />
 					{ count === 1 && <BlockModeToggle uid={ uids[ 0 ] } onToggle={ onClose } /> }
 					{ count === 1 && <UnknownConverter uid={ uids[ 0 ] } /> }
-					<BlockDeleteButton uids={ uids } />
+					<BlockRemoveButton uids={ uids } />
+					{ count === 1 && <ReusableBlockSettings uid={ uids[ 0 ] } onToggle={ onClose } /> }
+					<BlockTransformations uids={ uids } onClick={ onClose } />
 				</NavigableMenu>
 			) }
 		/>

@@ -19,8 +19,6 @@ import { registerBlockType, createBlock } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
 import Editable from '../../editable';
-import InspectorControls from '../../inspector-controls';
-import BlockDescription from '../../block-description';
 
 const toEditableValue = value => value.map( ( subValue => subValue.children ) );
 const fromEditableValue = value => value.map( ( subValue ) => ( {
@@ -55,6 +53,7 @@ const blockAttributes = {
 
 registerBlockType( 'core/quote', {
 	title: __( 'Quote' ),
+	description: __( 'Quote. In quoting others, we cite ourselves. (Julio Cortázar)' ),
 	icon: 'format-quote',
 	category: 'common',
 
@@ -152,7 +151,7 @@ registerBlockType( 'core/quote', {
 		],
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, className } ) {
+	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, onReplace, className } ) {
 		const { align, value, citation, style } = attributes;
 		const focusedEditable = focus ? focus.editable || 'value' : null;
 		const containerClassname = classnames( className, style === 2 ? 'is-large' : '' );
@@ -176,13 +175,6 @@ registerBlockType( 'core/quote', {
 					/>
 				</BlockControls>
 			),
-			focus && (
-				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'Quote. In quoting others, we cite ourselves. (Julio Cortázar)' ) }</p>
-					</BlockDescription>
-				</InspectorControls>
-			),
 			<blockquote
 				key="quote"
 				className={ containerClassname }
@@ -198,12 +190,18 @@ registerBlockType( 'core/quote', {
 					focus={ focusedEditable === 'value' ? focus : null }
 					onFocus={ ( props ) => setFocus( { ...props, editable: 'value' } ) }
 					onMerge={ mergeBlocks }
+					onRemove={ ( forward ) => {
+						const hasEmptyCitation = ! citation || citation.length === 0;
+						if ( ! forward && hasEmptyCitation ) {
+							onReplace( [] );
+						}
+					} }
 					style={ { textAlign: align } }
 					placeholder={ __( 'Write quote…' ) }
 				/>
 				{ ( ( citation && citation.length > 0 ) || !! focus ) && (
 					<Editable
-						tagName="footer"
+						tagName="cite"
 						value={ citation }
 						placeholder={ __( 'Write citation…' ) }
 						onChange={
@@ -213,6 +211,11 @@ registerBlockType( 'core/quote', {
 						}
 						focus={ focusedEditable === 'citation' ? focus : null }
 						onFocus={ ( props ) => setFocus( { ...props, editable: 'citation' } ) }
+						onRemove={ ( forward ) => {
+							if ( ! forward ) {
+								setFocus( { ...focus, editable: 'value' } );
+							}
+						} }
 					/>
 				) }
 			</blockquote>,

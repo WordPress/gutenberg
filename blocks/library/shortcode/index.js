@@ -14,11 +14,11 @@ import { withInstanceId, Dashicon } from '@wordpress/components';
  */
 import './editor.scss';
 import { registerBlockType } from '../../api';
-import InspectorControls from '../../inspector-controls';
-import BlockDescription from '../../block-description';
 
 registerBlockType( 'core/shortcode', {
 	title: __( 'Shortcode' ),
+
+	description: __( 'A shortcode is a WordPress-specific code snippet that is written between square brackets as [shortcode]. ' ),
 
 	icon: 'marker',
 
@@ -39,7 +39,10 @@ registerBlockType( 'core/shortcode', {
 				// letters, but numbers and underscores should work fine too.
 				// Be wary of using hyphens (dashes), you'll be better off not
 				// using them." in https://codex.wordpress.org/Shortcode_API
-				tag: '[a-z0-9_-]+',
+				// Require that the first character be a letter. This notably
+				// prevents footnote markings ([1]) from being caught as
+				// shortcodes.
+				tag: '[a-z][a-z0-9_-]*',
 				attributes: {
 					text: {
 						type: 'string',
@@ -52,15 +55,14 @@ registerBlockType( 'core/shortcode', {
 		],
 	},
 
-	supportHTML: false,
-
 	supports: {
 		customClassName: false,
 		className: false,
+		html: false,
 	},
 
 	edit: withInstanceId(
-		( { attributes, setAttributes, instanceId, focus } ) => {
+		( { attributes, setAttributes, instanceId } ) => {
 			const inputId = `blocks-shortcode-input-${ instanceId }`;
 
 			return (
@@ -78,14 +80,6 @@ registerBlockType( 'core/shortcode', {
 							text: event.target.value,
 						} ) }
 					/>
-					{ focus &&
-						<InspectorControls>
-							<BlockDescription>
-								<p>{ __( 'A shortcode is a WordPress-specific code snippet that is written between square brackets as [shortcode]. ' ) }</p>
-							</BlockDescription>
-							<p>{ __( 'No advanced options.' ) }</p>
-						</InspectorControls>
-					}
 				</div>
 			);
 		}

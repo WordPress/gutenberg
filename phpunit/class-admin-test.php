@@ -116,4 +116,41 @@ class Admin_Test extends WP_UnitTestCase {
 		$post_states = apply_filters( 'display_post_states', array(), get_post( self::$post_without_blocks ) );
 		$this->assertEquals( array(), $post_states );
 	}
+
+	/**
+	 * Test that the revisions 'return to editor' links are set correctly for Classic & Gutenberg editors.
+	 *
+	 * @covers gutenberg_revisions_link_to_editor
+	 */
+	function test_gutenberg_revisions_link_to_editor() {
+		global $pagenow;
+
+		// Set up $pagenow so the filter will work.
+		$pagenow = 'revision.php';
+
+		// Test the filter when Gutenberg is the active editor.
+		$_REQUEST['gutenberg'] = '1';
+		$link                  = apply_filters( 'get_edit_post_link', 'http://test.com' );
+		$this->assertEquals( 'http://test.com', $link );
+
+		// Test the filter when Gutenberg is not the active editor.
+		unset( $_REQUEST['gutenberg'] );
+		$link = apply_filters( 'get_edit_post_link', 'http://test.com' );
+		$this->assertEquals( 'http://test.com?classic-editor', $link );
+	}
+
+	/**
+	 * Test that the revisions 'restore this revision' button links correctly for Classic & Gutenberg editors.
+	 */
+	function test_gutenberg_revisions_restore() {
+		// Test the filter when Gutenberg is the active editor.
+		$_REQUEST['gutenberg'] = '1';
+		$link                  = apply_filters( 'wp_prepare_revision_for_js', array( 'restoreUrl' => 'http://test.com' ) );
+		$this->assertEquals( array( 'restoreUrl' => 'http://test.com?gutenberg=1' ), $link );
+
+		// Test the filter when Gutenberg is not the active editor.
+		unset( $_REQUEST['gutenberg'] );
+		$link = apply_filters( 'wp_prepare_revision_for_js', array( 'restoreUrl' => 'http://test.com' ) );
+		$this->assertEquals( array( 'restoreUrl' => 'http://test.com' ), $link );
+	}
 }

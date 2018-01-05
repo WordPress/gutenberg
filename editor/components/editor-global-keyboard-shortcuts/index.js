@@ -2,19 +2,19 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { first, last, flow } from 'lodash';
+import { first, last } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 import { KeyboardShortcuts, withContext } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import { getBlockUids, getMultiSelectedBlockUids } from '../../selectors';
-import { clearSelectedBlock, multiSelect, redo, undo, removeBlocks } from '../../actions';
+import { getBlockUids, getMultiSelectedBlockUids } from '../../store/selectors';
+import { clearSelectedBlock, multiSelect, redo, undo, removeBlocks } from '../../store/actions';
 
 class EditorGlobalKeyboardShortcuts extends Component {
 	constructor() {
@@ -65,7 +65,7 @@ class EditorGlobalKeyboardShortcuts extends Component {
 	}
 }
 
-export default flow(
+export default compose(
 	connect(
 		( state ) => {
 			return {

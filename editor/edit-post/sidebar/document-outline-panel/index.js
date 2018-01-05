@@ -13,8 +13,8 @@ import { PanelBody } from '@wordpress/components';
  * Internal dependencies
  */
 import { DocumentOutline, DocumentOutlineCheck } from '../../../components';
-import { isEditorSidebarPanelOpened } from '../../../selectors';
-import { toggleSidebarPanel } from '../../../actions';
+import { isEditorSidebarPanelOpened } from '../../../store/selectors';
+import { toggleSidebarPanel } from '../../../store/actions';
 
 /**
  * Module constants
@@ -24,7 +24,7 @@ const PANEL_NAME = 'table-of-contents';
 function DocumentOutlinePanel( { isOpened, onTogglePanel } ) {
 	return (
 		<DocumentOutlineCheck>
-			<PanelBody title={ __( 'Document Outline' ) } opened={ isOpened } onToggle={ onTogglePanel }>
+			<PanelBody title={ __( 'Table of Contents' ) } opened={ isOpened } onToggle={ onTogglePanel }>
 				<DocumentOutline />
 			</PanelBody>
 		</DocumentOutlineCheck>

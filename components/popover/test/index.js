@@ -110,7 +110,7 @@ describe( 'Popover', () => {
 	} );
 
 	describe( '#setForcedPositions()', () => {
-		function getInstanceWithContentBounds( nodeBounds ) {
+		function getInstanceWithContentBounds( contentNodeBounds, anchorNodeBounds = {} ) {
 			const instance = new Popover( {} );
 
 			instance.nodes.content = {
@@ -120,10 +120,18 @@ describe( 'Popover', () => {
 						right: 0,
 						bottom: 0,
 						left: 0,
-						...nodeBounds,
+						...contentNodeBounds,
 					};
 				},
 			};
+
+			instance.getAnchorRect = () => ( {
+				top: 0,
+				right: 0,
+				bottom: 0,
+				left: 0,
+				...anchorNodeBounds,
+			} );
 
 			instance.setState = jest.fn();
 
@@ -138,7 +146,10 @@ describe( 'Popover', () => {
 		} );
 
 		it( 'should flip y axis to bottom if exceeding top', () => {
-			const instance = getInstanceWithContentBounds( { top: -1 } );
+			const instance = getInstanceWithContentBounds(
+				{ top: -1, bottom: 9, height: 20 },
+				{ top: 5, bottom: 10, height: 5 }
+			);
 			instance.setForcedPositions();
 
 			expect( instance.setState ).toHaveBeenCalledTimes( 1 );
@@ -148,7 +159,10 @@ describe( 'Popover', () => {
 		} );
 
 		it( 'should flip y axis to top if exceeding bottom', () => {
-			const instance = getInstanceWithContentBounds( { bottom: window.innerHeight + 1 } );
+			const instance = getInstanceWithContentBounds(
+				{ bottom: window.innerHeight + 1, height: 20 },
+				{ top: 30, bottom: window.innerHeight - 10, height: window.innerHeight - 20 }
+			);
 			instance.setForcedPositions();
 
 			expect( instance.setState ).toHaveBeenCalledTimes( 1 );
@@ -158,7 +172,10 @@ describe( 'Popover', () => {
 		} );
 
 		it( 'should flip x axis to right if exceeding left', () => {
-			const instance = getInstanceWithContentBounds( { left: -1 } );
+			const instance = getInstanceWithContentBounds(
+				{ left: -1, right: 9, width: 20 },
+				{ left: 5, right: 10, width: 5 }
+			);
 			instance.setForcedPositions();
 
 			expect( instance.setState ).toHaveBeenCalledTimes( 1 );
@@ -168,7 +185,10 @@ describe( 'Popover', () => {
 		} );
 
 		it( 'should flip x axis to left if exceeding right', () => {
-			const instance = getInstanceWithContentBounds( { right: window.innerWidth + 1 } );
+			const instance = getInstanceWithContentBounds(
+				{ right: window.innerWidth + 1, width: 20 },
+				{ left: 30, right: window.innerWidth - 10, width: window.innerWidth - 20 }
+			);
 			instance.setForcedPositions();
 
 			expect( instance.setState ).toHaveBeenCalledTimes( 1 );
@@ -178,7 +198,10 @@ describe( 'Popover', () => {
 		} );
 
 		it( 'should flip x and y axis', () => {
-			const instance = getInstanceWithContentBounds( { top: -1, left: -1 } );
+			const instance = getInstanceWithContentBounds(
+				{ top: -1, bottom: 9, height: 20, left: -1, right: 9, width: 20 },
+				{ top: 5, bottom: 10, height: 5, left: 5, right: 10, width: 5 },
+			);
 			instance.setForcedPositions();
 
 			expect( instance.setState ).toHaveBeenCalledTimes( 2 );

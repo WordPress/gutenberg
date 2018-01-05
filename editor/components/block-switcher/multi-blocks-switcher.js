@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
  */
 import './style.scss';
 import BlockSwitcher from './';
-import { getMultiSelectedBlockUids } from '../../selectors';
+import { getMultiSelectedBlockUids } from '../../store/selectors';
 
 function MultiBlocksSwitcher( { isMultiBlockSelection, selectedBlockUids } ) {
 	if ( ! isMultiBlockSelection ) {

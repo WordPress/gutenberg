@@ -8,7 +8,7 @@ window._wpGutenbergPost.title = {
 window._wpGutenbergPost.content = {
 	raw: [
 		'<!-- wp:cover-image {"url":"https://cldup.com/Fz-ASbo2s3.jpg","align":"wide"} -->',
-		'<section class="wp-block-cover-image has-background-dim" style="background-image:url(https://cldup.com/Fz-ASbo2s3.jpg)"><h2>Of Mountains &amp; Printing Presses</h2></section>',
+		'<section class="wp-block-cover-image has-background-dim alignwide" style="background-image:url(https://cldup.com/Fz-ASbo2s3.jpg)"><h2>Of Mountains &amp; Printing Presses</h2></section>',
 		'<!-- /wp:cover-image -->',
 
 		'<!-- wp:paragraph -->',
@@ -143,7 +143,7 @@ window._wpGutenbergPost.content = {
 		'<!-- /wp:paragraph -->',
 
 		'<!-- wp:button { "align": "center" } -->',
-		'<div class="wp-block-button aligncenter"><a href="https://github.com/WordPress/gutenberg"><span>Help build Gutenberg</span></a></div>',
+		'<div class="wp-block-button aligncenter"><a class="wp-block-button__link" href="https://github.com/WordPress/gutenberg">Help build Gutenberg</a></div>',
 		'<!-- /wp:button -->',
 
 		'<!-- wp:separator -->',

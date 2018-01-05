@@ -43,16 +43,18 @@ export default class InserterGroup extends Component {
 		const { current } = this.state;
 		const { selectBlock, bindReferenceNode } = this.props;
 		const { disabled } = block;
+
 		return (
 			<button
 				role="menuitem"
-				key={ block.name }
+				key={ block.name === 'core/block' && block.initialAttributes ?
+					block.name + block.initialAttributes.ref :
+					block.name
+				}
 				className="editor-inserter__block"
-				onClick={ selectBlock( block.name ) }
+				onClick={ selectBlock( block ) }
 				ref={ bindReferenceNode( block.name ) }
 				tabIndex={ current === block.name || disabled ? null : '-1' }
-				onMouseEnter={ ! disabled ? this.props.showInsertionPoint : null }
-				onMouseLeave={ ! disabled ? this.props.hideInsertionPoint : null }
 				disabled={ disabled }
 			>
 				<BlockIcon icon={ block.icon } />
@@ -77,7 +79,7 @@ export default class InserterGroup extends Component {
 		return (
 			<NavigableMenu
 				className="editor-inserter__category-blocks"
-				orientation="vertical"
+				orientation="both"
 				aria-labelledby={ labelledBy }
 				cycle={ false }
 				onNavigate={ this.onNavigate }>

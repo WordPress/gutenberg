@@ -4,6 +4,7 @@
 import { isEqual } from 'lodash';
 import classnames from 'classnames';
 import { connect } from 'react-redux';
+import jQuery from 'jquery';
 
 /**
  * WordPress dependencies
@@ -16,8 +17,8 @@ import { Spinner } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import { handleMetaBoxReload, metaBoxStateChanged, metaBoxLoaded } from '../../../actions';
-import { getMetaBox, isSavingPost } from '../../../selectors';
+import { handleMetaBoxReload, metaBoxStateChanged, metaBoxLoaded } from '../../../store/actions';
+import { getMetaBox, isSavingPost } from '../../../store/selectors';
 
 class MetaBoxesArea extends Component {
 	constructor() {
@@ -26,7 +27,7 @@ class MetaBoxesArea extends Component {
 		this.state = {
 			loading: false,
 		};
-		this.originalFormData = [];
+		this.originalFormData = '';
 		this.bindNode = this.bindNode.bind( this );
 		this.checkState = this.checkState.bind( this );
 	}
@@ -89,9 +90,7 @@ class MetaBoxesArea extends Component {
 	}
 
 	getFormData() {
-		const data = new window.FormData( this.form );
-		const entries = Array.from( data.entries() );
-		return entries;
+		return jQuery( this.form ).serialize();
 	}
 
 	checkState() {
@@ -125,6 +124,7 @@ class MetaBoxesArea extends Component {
 			<div className={ classes }>
 				{ loading && <Spinner /> }
 				<div ref={ this.bindNode } />
+				<div className="editor-meta-boxes-area__clear" />
 			</div>
 		);
 	}

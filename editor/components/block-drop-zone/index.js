@@ -2,18 +2,19 @@
  * External Dependencies
  */
 import { connect } from 'react-redux';
-import { reduce, get, find, flow } from 'lodash';
+import { reduce, get, find } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { DropZone, withContext } from '@wordpress/components';
 import { getBlockTypes } from '@wordpress/blocks';
+import { compose } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { insertBlocks } from '../../actions';
+import { insertBlocks } from '../../store/actions';
 
 function BlockDropZone( { index, isLocked, ...props } ) {
 	if ( isLocked ) {
@@ -49,7 +50,7 @@ function BlockDropZone( { index, isLocked, ...props } ) {
 	);
 }
 
-export default flow(
+export default compose(
 	connect(
 		undefined,
 		{ insertBlocks }

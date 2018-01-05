@@ -2,22 +2,22 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { every, uniq, get, reduce, find, flow } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { Dropdown, Dashicon, IconButton, Toolbar, NavigableMenu, withContext } from '@wordpress/components';
-import { getBlockType, getBlockTypes, switchToBlockType, BlockIcon } from '@wordpress/blocks';
+import { getBlockType, getPossibleBlockTransformations, switchToBlockType, BlockIcon } from '@wordpress/blocks';
+import { compose } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { replaceBlocks } from '../../actions';
-import { getBlock } from '../../selectors';
+import { replaceBlocks } from '../../store/actions';
+import { getBlock } from '../../store/selectors';
 
 /**
  * Module Constants
@@ -25,41 +25,14 @@ import { getBlock } from '../../selectors';
 const { DOWN } = keycodes;
 
 function BlockSwitcher( { blocks, onTransform, isLocked } ) {
-	if ( ! blocks || ! blocks[ 0 ] || isLocked ) {
+	const allowedBlocks = getPossibleBlockTransformations( blocks );
+
+	if ( isLocked || ! allowedBlocks.length ) {
 		return null;
 	}
-	const isMultiBlock = blocks.length > 1;
+
 	const sourceBlockName = blocks[ 0 ].name;
-
-	if ( isMultiBlock && ! every( blocks, ( block ) => ( block.name === sourceBlockName ) ) ) {
-		return null;
-	}
-
 	const blockType = getBlockType( sourceBlockName );
-	const blocksToBeTransformedFrom = reduce( getBlockTypes(), ( memo, type ) => {
-		const transformFrom = get( type, 'transforms.from', [] );
-		const transformation = find(
-			transformFrom,
-			t => t.type === 'block' && t.blocks.indexOf( sourceBlockName ) !== -1 &&
-				( ! isMultiBlock || t.isMultiBlock )
-		);
-		return transformation ? memo.concat( [ type.name ] ) : memo;
-	}, [] );
-	const blocksToBeTransformedTo = get( blockType, 'transforms.to', [] )
-		.reduce(
-			( memo, transformation ) =>
-				memo.concat( ! isMultiBlock || transformation.isMultiBlock ? transformation.blocks : [] ),
-			[]
-		);
-	const allowedBlocks = uniq( blocksToBeTransformedFrom.concat( blocksToBeTransformedTo ) )
-		.reduce( ( memo, name ) => {
-			const type = getBlockType( name );
-			return !! type ? memo.concat( type ) : memo;
-		}, [] );
-
-	if ( ! allowedBlocks.length ) {
-		return null;
-	}
 
 	return (
 		<Dropdown
@@ -126,7 +99,7 @@ function BlockSwitcher( { blocks, onTransform, isLocked } ) {
 	);
 }
 
-export default flow(
+export default compose(
 	connect(
 		( state, ownProps ) => {
 			return {

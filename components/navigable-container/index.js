@@ -121,21 +121,27 @@ class NavigableContainer extends Component {
 export class NavigableMenu extends Component {
 	render() {
 		const { role = 'menu', orientation = 'vertical', ...rest } = this.props;
+
 		const eventToOffset = ( evt ) => {
 			const { keyCode } = evt;
 
-			const isVertical = orientation === 'vertical';
-			const isHorizontal = orientation === 'horizontal';
+			let next = [ DOWN ];
+			let previous = [ UP ];
 
-			// Still handle any arrow keys, even if the opposite orientation
-			if ( LEFT === keyCode ) {
-				return isHorizontal ? -1 : 0;
-			} else if ( UP === keyCode ) {
-				return isVertical ? -1 : 0;
-			} else if ( RIGHT === keyCode ) {
-				return isHorizontal ? +1 : 0;
-			} else if ( DOWN === keyCode ) {
-				return isVertical ? +1 : 0;
+			if ( orientation === 'horizontal' ) {
+				next = [ RIGHT ];
+				previous = [ LEFT ];
+			}
+
+			if ( orientation === 'both' ) {
+				next = [ RIGHT, DOWN ];
+				previous = [ LEFT, UP ];
+			}
+
+			if ( next.includes( keyCode ) ) {
+				return 1;
+			} else if ( previous.includes( keyCode ) ) {
+				return -1;
 			}
 		};
 
@@ -158,6 +164,21 @@ export class TabbableContainer extends Component {
 			const { keyCode, shiftKey } = evt;
 			if ( TAB === keyCode ) {
 				return shiftKey ? -1 : 1;
+			}
+
+			// Allow custom handling of keys besides Tab.
+			//
+			// By default, TabbableContainer will move focus forward on Tab and
+			// backward on Shift+Tab. The handler below will be used for all other
+			// events. The semantics for `this.props.eventToOffset`'s return
+			// values are the following:
+			//
+			// - +1: move focus forward
+			// - -1: move focus backward
+			// -  0: don't move focus, but acknowledge event and thus stop it
+			// - undefined: do nothing, let the event propagate
+			if ( this.props.eventToOffset ) {
+				return this.props.eventToOffset( evt );
 			}
 		};
 

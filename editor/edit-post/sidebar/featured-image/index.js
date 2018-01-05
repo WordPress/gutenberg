@@ -12,9 +12,9 @@ import { PanelBody } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { PostFeaturedImage } from '../../../components';
-import { isEditorSidebarPanelOpened } from '../../../selectors';
-import { toggleSidebarPanel } from '../../../actions';
+import { PostFeaturedImage, PostFeaturedImageCheck } from '../../../components';
+import { isEditorSidebarPanelOpened } from '../../../store/selectors';
+import { toggleSidebarPanel } from '../../../store/actions';
 
 /**
  * Module Constants
@@ -23,9 +23,11 @@ const PANEL_NAME = 'featured-image';
 
 function FeaturedImage( { isOpened, onTogglePanel } ) {
 	return (
-		<PanelBody title={ __( 'Featured Image' ) } opened={ isOpened } onToggle={ onTogglePanel }>
-			<PostFeaturedImage />
-		</PanelBody>
+		<PostFeaturedImageCheck>
+			<PanelBody title={ __( 'Featured Image' ) } opened={ isOpened } onToggle={ onTogglePanel }>
+				<PostFeaturedImage />
+			</PanelBody>
+		</PostFeaturedImageCheck>
 	);
 }
 

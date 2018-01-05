@@ -21,9 +21,9 @@ import {
 	MultiBlocksSwitcher,
 } from '../../../components';
 import NavigableToolbar from '../../../components/navigable-toolbar';
-import { isFeatureActive } from '../../../selectors';
+import { hasFixedToolbar } from '../../../store/selectors';
 
-function HeaderToolbar( { hasFixedToolbar } ) {
+function HeaderToolbar( { fixedToolbarActive } ) {
 	return (
 		<NavigableToolbar
 			className="editor-header-toolbar"
@@ -34,7 +34,7 @@ function HeaderToolbar( { hasFixedToolbar } ) {
 			<EditorHistoryRedo />
 			<TableOfContents />
 			<MultiBlocksSwitcher />
-			{ hasFixedToolbar && (
+			{ fixedToolbarActive && (
 				<div className="editor-header-toolbar__block-toolbar">
 					<BlockToolbar />
 				</div>
@@ -45,6 +45,6 @@ function HeaderToolbar( { hasFixedToolbar } ) {
 
 export default connect(
 	( state ) => ( {
-		hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
+		fixedToolbarActive: hasFixedToolbar( state ),
 	} )
 )( HeaderToolbar );

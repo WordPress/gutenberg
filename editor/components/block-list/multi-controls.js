@@ -11,7 +11,7 @@ import BlockSettingsMenu from '../block-settings-menu';
 import {
 	getMultiSelectedBlockUids,
 	isMultiSelecting,
-} from '../../selectors';
+} from '../../store/selectors';
 
 function BlockListMultiControls( { multiSelectedBlockUids, isSelecting } ) {
 	if ( isSelecting ) {

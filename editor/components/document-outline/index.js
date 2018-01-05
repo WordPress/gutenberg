@@ -14,8 +14,8 @@ import { __ } from '@wordpress/i18n';
  */
 import './style.scss';
 import DocumentOutlineItem from './item';
-import { getBlocks } from '../../selectors';
-import { selectBlock } from '../../actions';
+import { getBlocks, getEditedPostTitle } from '../../store/selectors';
+import { selectBlock } from '../../store/actions';
 
 /**
  * Module constants
@@ -51,7 +51,7 @@ const getHeadingLevel = heading => {
 
 const isEmptyHeading = heading => ! heading.attributes.content || heading.attributes.content.length === 0;
 
-export const DocumentOutline = ( { blocks = [], onSelect } ) => {
+export const DocumentOutline = ( { blocks = [], title, onSelect } ) => {
 	const headings = filter( blocks, ( block ) => block.name === 'core/heading' );
 
 	if ( headings.length < 1 ) {
@@ -63,6 +63,13 @@ export const DocumentOutline = ( { blocks = [], onSelect } ) => {
 	// Select the corresponding block in the main editor
 	// when clicking on a heading item from the list.
 	const onSelectHeading = ( uid ) => onSelect( uid );
+	const focusTitle = () => {
+		// Not great but it's the simplest way to focus the title right now.
+		const titleNode = document.querySelector( '.editor-post-title__input' );
+		if ( titleNode ) {
+			titleNode.focus();
+		}
+	};
 
 	const items = headings.map( ( heading, index ) => {
 		const headingLevel = getHeadingLevel( heading );
@@ -83,7 +90,7 @@ export const DocumentOutline = ( { blocks = [], onSelect } ) => {
 		return (
 			<DocumentOutlineItem
 				key={ index }
-				level={ headingLevel }
+				level={ `H${ headingLevel }` }
 				isValid={ isValid }
 				onClick={ () => onSelectHeading( heading.uid ) }
 			>
@@ -95,7 +102,18 @@ export const DocumentOutline = ( { blocks = [], onSelect } ) => {
 
 	return (
 		<div className="document-outline">
-			<ul>{ items }</ul>
+			<ul>
+				{ title && (
+					<DocumentOutlineItem
+						level="Title"
+						isValid
+						onClick={ focusTitle }
+					>
+						{ title }
+					</DocumentOutlineItem>
+				) }
+				{ items }
+			</ul>
 		</div>
 	);
 };
@@ -103,6 +121,7 @@ export const DocumentOutline = ( { blocks = [], onSelect } ) => {
 export default connect(
 	( state ) => {
 		return {
+			title: getEditedPostTitle( state ),
 			blocks: getBlocks( state ),
 		};
 	},

@@ -2,12 +2,12 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escapeRegExp, find, filter, map, flowRight } from 'lodash';
+import { escapeRegExp, find, filter, map } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Component, renderToString } from '@wordpress/element';
+import { Component, compose, renderToString } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
 import { __, _n, sprintf } from '@wordpress/i18n';
 
@@ -497,7 +497,7 @@ export class Autocomplete extends Component {
 	}
 }
 
-export default flowRight( [
+export default compose( [
 	withSpokenMessages,
 	withInstanceId,
 	withFocusOutside, // this MUST be the innermost HOC as it calls handleFocusOutside

@@ -2,8 +2,6 @@
 	position: relative;
 	height: 100%;
 	margin: 0 auto;
-	margin-left: auto;
-	margin-right: auto;
 	padding: 50px 0;
 
 	&,
@@ -39,6 +37,17 @@
 	}
 }
 
+// This is a focus style shown for blocks that need an indicator even when in an isEditing state
+// like for example an image block that receives arrowkey focus.
+.editor-visual-editor .editor-block-list__block:not( .is-selected ) .editor-block-list__block-edit  {
+	box-shadow: 0 0 0 0 $white, 0 0 0 0 $dark-gray-900;
+	transition: .1s box-shadow;
+
+	&:focus {
+		box-shadow: 0 0 0 1px $white, 0 0 0 3px $dark-gray-900;
+	}
+}
+
 .editor-visual-editor__inserter {
 	display: flex;
 	align-items: baseline;
@@ -69,6 +78,10 @@
 	&:hover > .editor-inserter__block,
 	&.is-showing-controls > .editor-inserter__block {
 		opacity: 1;
+
+		&:disabled {
+			@include button-style__disabled;
+		}
 	}
 }
 
@@ -106,11 +119,9 @@
 	position: relative;
 
 	@include break-small() {
-		padding: 0 ( $block-mover-padding-visible - 1px );	// subtract 1px for border
 		padding: 0 $block-mover-padding-visible;
 
 		.editor-default-block-appender__content {
-			padding: 0 ( $block-padding - 1px );	// subtract 1px for border
 			padding: 0 $block-padding;
 		}
 	}

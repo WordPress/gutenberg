@@ -1,6 +1,12 @@
 body.gutenberg-editor-page {
 	background: $white;
 
+	// on mobile the main content area has to scroll
+	// otherwise you can invoke the overscroll bounce on the non-scrolling container, causing (ノಠ益ಠ)ノ彡┻━┻
+	@include break-small {
+		overflow: hidden;
+	}
+
 	#update-nag, .update-nag {
 		display: none;
 	}
@@ -58,16 +64,15 @@ body.gutenberg-editor-page {
 }
 
 .gutenberg__editor {
-	position: absolute;
-	top: $admin-bar-height-big;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	min-height: calc( 100vh - #{ $admin-bar-height-big } );
-
-	// The parent relative container changes
+	// on mobile the main content area has to scroll
+	// otherwise you can invoke the overscroll bounce on the non-scrolling container, causing (ノಠ益ಠ)ノ彡┻━┻
 	@include break-small {
+		position: absolute;
 		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		min-height: calc( 100vh - #{ $admin-bar-height-big } );
 	}
 
 	// The WP header height changes at this breakpoint

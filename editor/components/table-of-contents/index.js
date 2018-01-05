@@ -16,8 +16,8 @@ import { Dropdown, IconButton } from '@wordpress/components';
 import './style.scss';
 import WordCount from '../word-count';
 import DocumentOutline from '../document-outline';
-import { getBlocks } from '../../selectors';
-import { selectBlock } from '../../actions';
+import { getBlocks } from '../../store/selectors';
+import { selectBlock } from '../../store/actions';
 
 function TableOfContents( { blocks } ) {
 	const headings = filter( blocks, ( block ) => block.name === 'core/heading' );
@@ -40,20 +40,20 @@ function TableOfContents( { blocks } ) {
 			renderContent={ () => ( [
 				<div key="counts" className="table-of-contents__counts">
 					<div className="table-of-contents__count">
+						{ __( 'Words' ) }
 						<WordCount />
-						{ __( 'Word Count' ) }
 					</div>
 					<div className="table-of-contents__count">
-						<span className="table-of-contents__number">{ blocks.length }</span>
-						{ __( 'Blocks' ) }
-					</div>
-					<div className="table-of-contents__count">
-						<span className="table-of-contents__number">{ headings.length }</span>
 						{ __( 'Headings' ) }
+						<span className="table-of-contents__number">{ headings.length }</span>
 					</div>
 					<div className="table-of-contents__count">
-						<span className="table-of-contents__number">{ paragraphs.length }</span>
 						{ __( 'Paragraphs' ) }
+						<span className="table-of-contents__number">{ paragraphs.length }</span>
+					</div>
+					<div className="table-of-contents__count">
+						{ __( 'Blocks' ) }
+						<span className="table-of-contents__number">{ blocks.length }</span>
 					</div>
 				</div>,
 				headings.length > 0 && (

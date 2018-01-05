@@ -27,11 +27,11 @@ describe( 'RangeControl', () => {
 
 			wrapper = mount( <RangeControl /> );
 			icons = wrapper.find( 'Dashicon' );
-			expect( icons.length ).toBe( 0 );
+			expect( icons ).toHaveLength( 0 );
 
 			wrapper = mount( <RangeControl beforeIcon="format-image" /> );
 			icons = wrapper.find( 'Dashicon' );
-			expect( icons.length ).toBe( 1 );
+			expect( icons ).toHaveLength( 1 );
 			expect( icons.at( 0 ).prop( 'icon' ) ).toBe( 'format-image' );
 
 			wrapper = mount(
@@ -40,7 +40,7 @@ describe( 'RangeControl', () => {
 					afterIcon="format-video" />
 			);
 			icons = wrapper.find( 'Dashicon' );
-			expect( icons.length ).toBe( 2 );
+			expect( icons ).toHaveLength( 2 );
 			expect( icons.at( 0 ).prop( 'icon' ) ).toBe( 'format-image' );
 			expect( icons.at( 1 ).prop( 'icon' ) ).toBe( 'format-video' );
 		} );

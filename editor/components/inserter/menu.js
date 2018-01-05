@@ -11,6 +11,7 @@ import {
 	pick,
 	some,
 	sortBy,
+	isEmpty,
 } from 'lodash';
 import { connect } from 'react-redux';
 
@@ -18,7 +19,7 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 import {
 	TabPanel,
 	TabbableContainer,
@@ -34,8 +35,8 @@ import { keycodes } from '@wordpress/utils';
  */
 import './style.scss';
 
-import { getBlocks, getRecentlyUsedBlocks } from '../../selectors';
-import { showInsertionPoint, hideInsertionPoint } from '../../actions';
+import { getBlocks, getRecentlyUsedBlocks, getReusableBlocks } from '../../store/selectors';
+import { fetchReusableBlocks } from '../../store/actions';
 import { default as InserterGroup } from './group';
 
 export const searchBlocks = ( blocks, searchTerm ) => {
@@ -71,6 +72,10 @@ export class InserterMenu extends Component {
 		this.switchTab = this.switchTab.bind( this );
 	}
 
+	componentDidMount() {
+		this.props.fetchReusableBlocks();
+	}
+
 	componentDidUpdate( prevProps, prevState ) {
 		const searchResults = this.searchBlocks( this.getBlockTypes() );
 		// Announce the blocks search results to screen readers.
@@ -103,16 +108,16 @@ export class InserterMenu extends Component {
 		} );
 	}
 
-	selectBlock( name ) {
+	selectBlock( block ) {
 		return () => {
-			this.props.onSelect( name );
+			this.props.onSelect( block.name, block.initialAttributes );
 			this.setState( {
 				filterValue: '',
 			} );
 		};
 	}
 
-	getBlockTypes() {
+	getStaticBlockTypes() {
 		const { blockTypes } = this.props;
 
 		// If all block types disabled, return empty set
@@ -136,6 +141,28 @@ export class InserterMenu extends Component {
 		} );
 	}
 
+	getReusableBlockTypes() {
+		const { reusableBlocks } = this.props;
+
+		// Display reusable blocks that we've fetched in the inserter
+		return reusableBlocks.map( ( reusableBlock ) => ( {
+			name: 'core/block',
+			initialAttributes: {
+				ref: reusableBlock.id,
+			},
+			title: reusableBlock.title,
+			icon: 'layout',
+			category: 'reusable-blocks',
+		} ) );
+	}
+
+	getBlockTypes() {
+		return [
+			...this.getStaticBlockTypes(),
+			...this.getReusableBlockTypes(),
+		];
+	}
+
 	searchBlocks( blockTypes ) {
 		return searchBlocks( blockTypes, this.state.filterValue );
 	}
@@ -154,11 +181,15 @@ export class InserterMenu extends Component {
 					( { name } ) => find( blockTypes, { name } ) );
 
 			case 'blocks':
-				predicate = ( block ) => block.category !== 'embed';
+				predicate = ( block ) => block.category !== 'embed' && block.category !== 'reusable-blocks';
 				break;
 
 			case 'embeds':
 				predicate = ( block ) => block.category === 'embed';
+				break;
+
+			case 'saved':
+				predicate = ( block ) => block.category === 'reusable-blocks';
 				break;
 		}
 
@@ -202,8 +233,6 @@ export class InserterMenu extends Component {
 				labelledBy={ labelledBy }
 				bindReferenceNode={ this.bindReferenceNode }
 				selectBlock={ this.selectBlock }
-				showInsertionPoint={ this.props.showInsertionPoint }
-				hideInsertionPoint={ this.props.hideInsertionPoint }
 			/>
 		);
 	}
@@ -225,6 +254,14 @@ export class InserterMenu extends Component {
 	}
 
 	renderCategories( visibleBlocksByCategory ) {
+		if ( isEmpty( visibleBlocksByCategory ) ) {
+			return (
+				<span className="editor-inserter__no-results">
+					{ __( 'No blocks found' ) }
+				</span>
+			);
+		}
+
 		return getCategories().map(
 			( category ) => this.renderCategory( category, visibleBlocksByCategory[ category.slug ] )
 		);
@@ -238,28 +275,52 @@ export class InserterMenu extends Component {
 
 	renderTabView( tab ) {
 		const blocksForTab = this.getBlocksForTab( tab );
+
+		// If the Recent tab is selected, don't render category headers
 		if ( 'recent' === tab ) {
 			return this.renderBlocks( blocksForTab );
 		}
 
-		const visibleBlocks = this.getVisibleBlocksByCategory( blocksForTab );
-		if ( 'embed' === tab ) {
-			return this.renderBlocks( visibleBlocks.embed );
+		// If the Saved tab is selected and we have no results, display a friendly message
+		if ( 'saved' === tab && blocksForTab.length === 0 ) {
+			return (
+				<p className="editor-inserter__no-tab-content-message">
+					{ __( 'No saved blocks.' ) }
+				</p>
+			);
 		}
 
-		return this.renderCategories( visibleBlocks );
+		const visibleBlocksByCategory = this.getVisibleBlocksByCategory( blocksForTab );
+
+		// If our results have only blocks from one category, don't render category headers
+		const categories = Object.keys( visibleBlocksByCategory );
+		if ( categories.length === 1 ) {
+			const [ soleCategory ] = categories;
+			return this.renderBlocks( visibleBlocksByCategory[ soleCategory ] );
+		}
+
+		return this.renderCategories( visibleBlocksByCategory );
 	}
 
-	interceptArrows( event ) {
-		if ( includes( ARROWS, event.keyCode ) ) {
-			// Prevent cases of focus being unexpectedly stolen up in the tree,
-			// notably when using VisualEditorSiblingInserter, where focus is
-			// moved to sibling blocks.
-			//
-			// We don't need to stop the native event, which has its uses, e.g.
-			// allowing window scrolling.
-			event.stopPropagation();
+	// Passed to TabbableContainer, extending its event-handling logic
+	eventToOffset( event ) {
+		// If a tab (Recent, Blocks, …) is focused, pressing the down arrow
+		// moves focus to the selected panel below.
+		if (
+			event.keyCode === keycodes.DOWN &&
+			document.activeElement.getAttribute( 'role' ) === 'tab'
+		) {
+			return 1; // Move focus forward
 		}
+
+		// Prevent cases of focus being unexpectedly stolen up in the tree,
+		// notably when using VisualEditorSiblingInserter, where focus is
+		// moved to sibling blocks.
+		if ( includes( ARROWS, event.keyCode ) ) {
+			return 0; // Don't move focus, but prevent event propagation
+		}
+
+		// Implicit `undefined` return: let the event propagate
 	}
 
 	render() {
@@ -268,7 +329,7 @@ export class InserterMenu extends Component {
 
 		return (
 			<TabbableContainer className="editor-inserter__menu" deep
-				onKeyDown={ this.interceptArrows }
+				eventToOffset={ this.eventToOffset }
 			>
 				<label htmlFor={ `editor-inserter__search-${ instanceId }` } className="screen-reader-text">
 					{ __( 'Search for a block' ) }
@@ -300,6 +361,11 @@ export class InserterMenu extends Component {
 								title: __( 'Embeds' ),
 								className: 'editor-inserter__tab',
 							},
+							{
+								name: 'saved',
+								title: __( 'Saved' ),
+								className: 'editor-inserter__tab',
+							},
 						] }
 					>
 						{ ( tabKey ) => (
@@ -311,7 +377,7 @@ export class InserterMenu extends Component {
 				}
 				{ isSearching &&
 					<div role="menu" className="editor-inserter__search-results">
-						{ this.renderCategories( this.getVisibleBlocksByCategory( getBlockTypes() ) ) }
+						{ this.renderCategories( this.getVisibleBlocksByCategory( this.getBlockTypes() ) ) }
 					</div>
 				}
 			</TabbableContainer>
@@ -324,14 +390,15 @@ const connectComponent = connect(
 		return {
 			recentlyUsedBlocks: getRecentlyUsedBlocks( state ),
 			blocks: getBlocks( state ),
+			reusableBlocks: getReusableBlocks( state ),
 		};
 	},
-	{ showInsertionPoint, hideInsertionPoint }
+	{ fetchReusableBlocks }
 );
 
-export default flow(
-	withInstanceId,
-	withSpokenMessages,
+export default compose(
+	connectComponent,
 	withContext( 'editor' )( ( settings ) => pick( settings, 'blockTypes' ) ),
-	connectComponent
+	withSpokenMessages,
+	withInstanceId
 )( InserterMenu );

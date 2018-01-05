@@ -1,7 +1,22 @@
 /**
+ * External dependencies
+ */
+import { includes } from 'lodash';
+
+/**
  * Browser dependencies
  */
 const { ELEMENT_NODE, TEXT_NODE } = window.Node;
+
+/**
+ * An array of tag groups used by isInlineForTag function.
+ * If tagName and nodeName are present in the same group, the node should be treated as inline.
+ * @type {Array}
+ */
+const inlineWhitelistTagGroups = [
+	[ 'ul', 'li', 'ol' ],
+	[ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ],
+];
 
 const inlineWhitelist = {
 	strong: {},
@@ -34,7 +49,7 @@ const inlineWrapperWhiteList = {
 const whitelist = {
 	...inlineWhitelist,
 	...inlineWrapperWhiteList,
-	img: { attributes: [ 'src', 'alt' ] },
+	img: { attributes: [ 'src', 'alt' ], classes: [ 'alignleft', 'aligncenter', 'alignright', 'alignnone' ] },
 	figure: {},
 	blockquote: {},
 	hr: {},
@@ -63,8 +78,34 @@ export function isAttributeWhitelisted( tag, attribute ) {
 	);
 }
 
-export function isInline( node ) {
-	return !! inlineWhitelist[ node.nodeName.toLowerCase() ];
+/**
+ * Checks if nodeName should be treated as inline when being added to tagName.
+ * This happens if nodeName and tagName are in the same group defined in inlineWhitelistTagGroups.
+ *
+ * @param  {String}  nodeName Node name.
+ * @param  {String}  tagName  Tag name.
+ * @return {Boolean}          True if nodeName is inline in the context of tagName and false otherwise.
+ */
+function isInlineForTag( nodeName, tagName ) {
+	if ( ! tagName || ! nodeName ) {
+		return false;
+	}
+	return inlineWhitelistTagGroups.some( tagGroup =>
+		includes( tagGroup, nodeName ) && includes( tagGroup, tagName )
+	);
+}
+
+export function isInline( node, tagName ) {
+	const nodeName = node.nodeName.toLowerCase();
+	return !! inlineWhitelist[ nodeName ] || isInlineForTag( nodeName, tagName );
+}
+
+export function isClassWhitelisted( tag, name ) {
+	return (
+		whitelist[ tag ] &&
+		whitelist[ tag ].classes &&
+		whitelist[ tag ].classes.indexOf( name ) !== -1
+	);
 }
 
 export function isInlineWrapper( node ) {

@@ -13,16 +13,17 @@ import { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import './style.scss';
+import './editor.scss';
 import { registerBlockType } from '../../api';
 import MediaUploadButton from '../../media-upload-button';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
-import InspectorControls from '../../inspector-controls';
-import BlockDescription from '../../block-description';
 
 registerBlockType( 'core/audio', {
 	title: __( 'Audio' ),
+
+	description: __( 'The Audio block allows you to embed audio files and play them back using a simple player.' ),
 
 	icon: 'format-audio',
 
@@ -42,6 +43,9 @@ registerBlockType( 'core/audio', {
 			type: 'array',
 			source: 'children',
 			selector: 'figcaption',
+		},
+		id: {
+			type: 'number',
 		},
 	},
 
@@ -64,7 +68,7 @@ registerBlockType( 'core/audio', {
 			};
 		}
 		render() {
-			const { align, caption } = this.props.attributes;
+			const { align, caption, id } = this.props.attributes;
 			const { setAttributes, focus, setFocus } = this.props;
 			const { editing, className, src } = this.state;
 			const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
@@ -75,7 +79,7 @@ registerBlockType( 'core/audio', {
 				if ( media && media.url ) {
 					// sets the block's attribure and updates the edit component from the
 					// selected media, then switches off the editing UI
-					setAttributes( { src: media.url } );
+					setAttributes( { src: media.url, id: media.id } );
 					this.setState( { src: media.url, editing: false } );
 				}
 			};
@@ -88,7 +92,7 @@ registerBlockType( 'core/audio', {
 				}
 				return false;
 			};
-			const controls = focus && [
+			const controls = focus && (
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar
 						value={ align }
@@ -96,24 +100,15 @@ registerBlockType( 'core/audio', {
 					/>
 					<Toolbar>
 						<Button
-							buttonProps={ {
-								className: 'components-icon-button components-toolbar__control',
-								'aria-label': __( 'Edit audio' ),
-							} }
-							type="audio"
+							className="components-icon-button components-toolbar__control"
+							aria-label={ __( 'Edit audio' ) }
 							onClick={ switchToEditing }
 						>
 							<Dashicon icon="edit" />
 						</Button>
 					</Toolbar>
-				</BlockControls>,
-
-				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'The Audio block allows you to embed audio files and play them back using a simple player.' ) }</p>
-					</BlockDescription>
-				</InspectorControls>,
-			];
+				</BlockControls>
+			);
 
 			const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
 
@@ -143,6 +138,7 @@ registerBlockType( 'core/audio', {
 							buttonProps={ { isLarge: true } }
 							onSelect={ onSelectAudio }
 							type="audio"
+							value={ id }
 						>
 							{ __( 'Insert from Media Library' ) }
 						</MediaUploadButton>

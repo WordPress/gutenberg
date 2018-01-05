@@ -1,24 +1,24 @@
 /**
  * External dependencies
  */
+import { some } from 'lodash';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
-import { flow } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { IconButton, withContext } from '@wordpress/components';
-import { Component } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 import { createBlock, BlockIcon } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { Inserter } from '../../../components';
-import { insertBlock } from '../../../actions';
-import { getMostFrequentlyUsedBlocks, getBlockCount } from '../../../selectors';
+import { insertBlock } from '../../../store/actions';
+import { getMostFrequentlyUsedBlocks, getBlockCount, getBlocks } from '../../../store/selectors';
 
 export class VisualEditorInserter extends Component {
 	constructor() {
@@ -39,6 +39,10 @@ export class VisualEditorInserter extends Component {
 	insertBlock( name ) {
 		const { onInsertBlock } = this.props;
 		onInsertBlock( createBlock( name ) );
+	}
+
+	isDisabledBlock( block ) {
+		return block.useOnce && some( this.props.blocks, ( { name } ) => block.name === name );
 	}
 
 	render() {
@@ -68,6 +72,7 @@ export class VisualEditorInserter extends Component {
 						className="editor-inserter__block"
 						onClick={ () => this.insertBlock( block.name ) }
 						label={ sprintf( __( 'Insert %s' ), block.title ) }
+						disabled={ this.isDisabledBlock( block ) }
 						icon={ (
 							<span className="editor-visual-editor__inserter-block-icon">
 								<BlockIcon icon={ block.icon } />
@@ -82,12 +87,13 @@ export class VisualEditorInserter extends Component {
 	}
 }
 
-export default flow(
+export default compose(
 	connect(
 		( state ) => {
 			return {
 				mostFrequentlyUsedBlocks: getMostFrequentlyUsedBlocks( state ),
 				blockCount: getBlockCount( state ),
+				blocks: getBlocks( state ),
 			};
 		},
 		{ onInsertBlock: insertBlock },

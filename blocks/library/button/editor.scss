@@ -1,5 +1,3 @@
-$blocks-button__height: 46px;
-
 .editor-block-list__block[data-type="core/button"] {
 	&[data-align="center"] {
 		text-align: center;
@@ -11,9 +9,13 @@ $blocks-button__height: 46px;
 }
 
 .wp-block-button {
+	display: inline-block;
+	margin-bottom: 0;
+	position: relative;
+
 	.blocks-format-toolbar__link-modal {
 		z-index: 2;
-		top: $blocks-button__height + 2px;
+		top: calc( 100% + 2px );
 		left: 50%;
 		transform: translateX( -50% );
 	}

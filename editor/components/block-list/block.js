@@ -8,9 +8,15 @@ import { get, partial, reduce, size } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, compose, createElement } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
-import { getBlockType, BlockEdit, getBlockDefaultClassname, createBlock, hasBlockSupport } from '@wordpress/blocks';
+import {
+	BlockEdit,
+	createBlock,
+	getBlockType,
+	getSaveElement,
+	isReusableBlock,
+} from '@wordpress/blocks';
 import { withFilters, withContext } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -26,6 +32,7 @@ import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import BlockMultiControls from './multi-controls';
+import BlockMobileToolbar from './block-mobile-toolbar';
 import {
 	clearSelectedBlock,
 	editPost,
@@ -39,7 +46,7 @@ import {
 	stopTyping,
 	updateBlockAttributes,
 	toggleSelection,
-} from '../../actions';
+} from '../../store/actions';
 import {
 	getBlock,
 	getBlockFocus,
@@ -55,7 +62,7 @@ import {
 	isSelectionEnabled,
 	isTyping,
 	getBlockMode,
-} from '../../selectors';
+} from '../../store/selectors';
 
 const { BACKSPACE, ESCAPE, DELETE, ENTER, UP, RIGHT, DOWN, LEFT } = keycodes;
 
@@ -83,7 +90,7 @@ function getScrollContainer( node ) {
 	return getScrollContainer( node.parentNode );
 }
 
-class BlockListBlock extends Component {
+export class BlockListBlock extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -123,8 +130,7 @@ class BlockListBlock extends Component {
 	componentWillReceiveProps( newProps ) {
 		if (
 			this.props.order !== newProps.order &&
-			( ( this.props.isSelected && newProps.isSelected ) ||
-			( this.props.isFirstMultiSelected && newProps.isFirstMultiSelected ) )
+			( newProps.isSelected || newProps.isFirstMultiSelected )
 		) {
 			this.previousOffset = this.node.getBoundingClientRect().top;
 		}
@@ -359,6 +365,7 @@ class BlockListBlock extends Component {
 			'is-selected': showUI,
 			'is-multi-selected': isMultiSelected,
 			'is-hovered': isHovered,
+			'is-reusable': isReusableBlock( blockType ),
 		} );
 
 		const { onMouseLeave, onFocus, onReplace } = this.props;
@@ -368,12 +375,6 @@ class BlockListBlock extends Component {
 		if ( blockType.getEditWrapperProps ) {
 			wrapperProps = blockType.getEditWrapperProps( block.attributes );
 		}
-
-		// Generate a class name for the block's editable form
-		const generatedClassName = hasBlockSupport( blockType, 'className', true ) ?
-			getBlockDefaultClassname( block.name ) :
-			null;
-		const className = classnames( generatedClassName, block.attributes.className );
 
 		// Disable reason: Each block can be selected by clicking on it
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
@@ -401,7 +402,7 @@ class BlockListBlock extends Component {
 					onMouseDown={ this.onPointerDown }
 					onKeyDown={ this.onKeyDown }
 					onFocus={ this.onFocus }
-					className="editor-block-list__block-edit"
+					className={ BlockListBlock.className }
 					tabIndex="0"
 					aria-label={ blockLabel }
 				>
@@ -416,7 +417,6 @@ class BlockListBlock extends Component {
 								onReplace={ isLocked ? undefined : onReplace }
 								setFocus={ partial( onFocus, block.uid ) }
 								mergeBlocks={ isLocked ? undefined : this.mergeBlocks }
-								className={ className }
 								id={ block.uid }
 								isSelectionEnabled={ this.props.isSelectionEnabled }
 								toggleSelection={ this.props.toggleSelection }
@@ -426,17 +426,16 @@ class BlockListBlock extends Component {
 							<BlockHtml uid={ block.uid } />
 						) }
 						{ ! isValid && [
-							createElement( blockType.save, {
-								key: 'invalid-preview',
-								attributes: block.attributes,
-								className,
-							} ),
+							<div key="invalid-preview">
+								{ getSaveElement( blockType, block.attributes ) }
+							</div>,
 							<InvalidBlockWarning
 								key="invalid-warning"
 								block={ block }
 							/>,
 						] }
 					</BlockCrashBoundary>
+					{ showUI && <BlockMobileToolbar uid={ block.uid } /> }
 				</div>
 				{ !! error && <BlockCrashWarning /> }
 			</div>
@@ -524,8 +523,9 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 	},
 } );
 
+BlockListBlock.className = 'editor-block-list__block-edit';
+
 export default compose(
-	withFilters( 'Editor.BlockItem' ),
 	connect( mapStateToProps, mapDispatchToProps ),
 	withContext( 'editor' )( ( settings ) => {
 		const { templateLock } = settings;
@@ -534,4 +534,5 @@ export default compose(
 			isLocked: !! templateLock,
 		};
 	} ),
+	withFilters( 'editor.BlockListBlock' ),
 )( BlockListBlock );

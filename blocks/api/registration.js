@@ -6,9 +6,13 @@
 import { get, isFunction, some } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { applyFilters } from '@wordpress/hooks';
+
+/**
  * Internal dependencies
  */
-import { applyFilters } from '../hooks';
 import { getCategories } from './categories';
 
 /**
@@ -45,6 +49,12 @@ let defaultBlockName;
  *                             registered; otherwise `undefined`.
  */
 export function registerBlockType( name, settings ) {
+	settings = {
+		name,
+		...get( window._wpBlocks, name ),
+		...settings,
+	};
+
 	if ( typeof name !== 'string' ) {
 		console.error(
 			'Block names must be strings.'
@@ -109,13 +119,7 @@ export function registerBlockType( name, settings ) {
 		settings.icon = 'block-default';
 	}
 
-	settings = {
-		name,
-		attributes: get( window._wpBlocksAttributes, name, {} ),
-		...settings,
-	};
-
-	settings = applyFilters( 'registerBlockType', settings, name );
+	settings = applyFilters( 'blocks.registerBlockType', settings, name );
 
 	return blocks[ name ] = settings;
 }
@@ -213,4 +217,16 @@ export function hasBlockSupport( nameOrType, feature, defaultSupports ) {
 		'supports',
 		feature,
 	], defaultSupports );
+}
+
+/**
+ * Determines whether or not the given block is a reusable block. This is a
+ * special block type that is used to point to a global block stored via the
+ * API.
+ *
+ * @param {Object} blockOrType Block or Block Type to test
+ * @return {Boolean}           Whether the given block is a reusable block
+ */
+export function isReusableBlock( blockOrType ) {
+	return blockOrType.name === 'core/block';
 }

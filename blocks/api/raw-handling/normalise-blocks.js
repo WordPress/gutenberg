@@ -58,7 +58,9 @@ export default function( HTML ) {
 					accu.appendChild( node );
 				}
 			} else if ( isInline( node ) ) {
-				accu.appendChild( document.createElement( 'P' ) );
+				if ( ! accu.lastChild || accu.lastChild.nodeName !== 'P' ) {
+					accu.appendChild( document.createElement( 'P' ) );
+				}
 				accu.lastChild.appendChild( node );
 			} else {
 				accu.appendChild( node );

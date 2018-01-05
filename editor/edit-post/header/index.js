@@ -13,13 +13,17 @@ import { IconButton } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import { PostPreviewButton, PostSavedState, PostPublishWithDropdown } from '../../components';
+import {
+	PostPreviewButton,
+	PostSavedState,
+	PostPublishPanelToggle,
+} from '../../components';
 import EllipsisMenu from './ellipsis-menu';
 import HeaderToolbar from './header-toolbar';
-import { isEditorSidebarOpened } from '../../selectors';
-import { toggleSidebar } from '../../actions';
+import { isSidebarOpened } from '../../store/selectors';
+import { toggleSidebar } from '../../store/actions';
 
-function Header( { onToggleSidebar, isSidebarOpened } ) {
+function Header( { onToggleSidebar, isDefaultSidebarOpened, isPublishSidebarOpened } ) {
 	return (
 		<div
 			role="region"
@@ -28,28 +32,34 @@ function Header( { onToggleSidebar, isSidebarOpened } ) {
 			tabIndex="-1"
 		>
 			<HeaderToolbar />
-			<div className="editor-header__settings">
-				<PostSavedState />
-				<PostPreviewButton />
-				<PostPublishWithDropdown />
-				<IconButton
-					icon="admin-generic"
-					onClick={ onToggleSidebar }
-					isToggled={ isSidebarOpened }
-					label={ __( 'Settings' ) }
-					aria-expanded={ isSidebarOpened }
-				/>
-				<EllipsisMenu />
-			</div>
+			{ ! isPublishSidebarOpened && (
+				<div className="editor-header__settings">
+					<PostSavedState />
+					<PostPreviewButton />
+					<PostPublishPanelToggle
+						isOpen={ isPublishSidebarOpened }
+						onToggle={ () => onToggleSidebar( 'publish' ) }
+					/>
+					<IconButton
+						icon="admin-generic"
+						onClick={ () => onToggleSidebar() }
+						isToggled={ isDefaultSidebarOpened }
+						label={ __( 'Settings' ) }
+						aria-expanded={ isDefaultSidebarOpened }
+					/>
+					<EllipsisMenu key="ellipsis-menu" />
+				</div>
+			) }
 		</div>
 	);
 }
 
 export default connect(
 	( state ) => ( {
-		isSidebarOpened: isEditorSidebarOpened( state ),
+		isDefaultSidebarOpened: isSidebarOpened( state ),
+		isPublishSidebarOpened: isSidebarOpened( state, 'publish' ),
 	} ),
-	( dispatch ) => ( {
-		onToggleSidebar: () => dispatch( toggleSidebar() ),
-	} )
+	{
+		onToggleSidebar: toggleSidebar,
+	}
 )( Header );
