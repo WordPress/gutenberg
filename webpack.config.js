@@ -164,7 +164,7 @@ switch ( process.env.NODE_ENV ) {
 
 	default:
 		config.devtool = 'source-map';
-		config.plugins.push( new LiveReloadPlugin() );
+		config.plugins.push( new LiveReloadPlugin( { port: process.env.GUTENBERG_LIVE_RELOAD_PORT || 35729 } ) );
 }
 
 module.exports = config;
