@@ -19,7 +19,7 @@ import { toggleSidebar, setActivePanel } from '../../store/actions';
 export function BlockInspectorButton( {
 	isDefaultSidebarOpened,
 	panel,
-	onOpenSidebar,
+	toggleDefaultSidebar,
 	onShowInspector,
 	onClick = noop,
 	small = false,
@@ -27,7 +27,9 @@ export function BlockInspectorButton( {
 } ) {
 	const toggleInspector = () => {
 		onShowInspector();
-		onOpenSidebar( undefined, true );
+		if ( ! isDefaultSidebarOpened || panel === 'block' ) {
+			toggleDefaultSidebar();
+		}
 	};
 
 	const speakMessage = () => {
@@ -61,8 +63,8 @@ export default connect(
 		onShowInspector() {
 			dispatch( setActivePanel( 'block' ) );
 		},
-		onOpenSidebar() {
-			dispatch( toggleSidebar( undefined, true ) );
+		toggleDefaultSidebar() {
+			dispatch( toggleSidebar() );
 		},
 	} )
 )( withSpokenMessages( BlockInspectorButton ) );
