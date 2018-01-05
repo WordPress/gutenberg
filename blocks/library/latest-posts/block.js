@@ -93,10 +93,9 @@ class LatestPostsBlock extends Component {
 		}
 
 		// Removing posts from display should be instant.
-		const postsDifference = latestPosts.length - postsToShow;
-		if ( postsDifference > 0 ) {
-			latestPosts.splice( postsToShow, postsDifference );
-		}
+		const displayPosts = latestPosts.length > postsToShow ?
+			latestPosts.slice( 0, postsToShow ) :
+			latestPosts;
 
 		const layoutControls = [
 			{
@@ -133,7 +132,7 @@ class LatestPostsBlock extends Component {
 				} ) }
 				key="latest-posts"
 			>
-				{ latestPosts.map( ( post, i ) =>
+				{ displayPosts.map( ( post, i ) =>
 					<li key={ i }>
 						<a href={ post.link } target="_blank">{ decodeEntities( post.title.rendered.trim() ) || __( '(Untitled)' ) }</a>
 						{ displayPostDate && post.date_gmt &&
