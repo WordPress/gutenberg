@@ -23,6 +23,8 @@ class IconButton extends Component {
 	render() {
 		const { icon, children, label, className, tooltip, focus, ...additionalProps } = this.props;
 		const classes = classnames( 'components-icon-button', className );
+		const tooltipText = tooltip || label;
+		const showTooltip = !! tooltip || ( label && ! children && false !== tooltip );
 
 		let element = (
 			<Button { ...additionalProps } aria-label={ label } className={ classes } focus={ focus }>
@@ -31,8 +33,8 @@ class IconButton extends Component {
 			</Button>
 		);
 
-		if ( label && ! children && false !== tooltip ) {
-			element = <Tooltip text={ tooltip || label }>{ element }</Tooltip>;
+		if ( showTooltip ) {
+			element = <Tooltip text={ tooltipText }>{ element }</Tooltip>;
 		}
 
 		return element;
