@@ -41,7 +41,7 @@
 // like for example an image block that receives arrowkey focus.
 .editor-visual-editor .editor-block-list__block:not( .is-selected ) .editor-block-list__block-edit  {
 	box-shadow: 0 0 0 0 $white, 0 0 0 0 $dark-gray-900;
-	transition: .1s box-shadow;
+	transition: .1s box-shadow .05s;
 
 	&:focus {
 		box-shadow: 0 0 0 1px $white, 0 0 0 3px $dark-gray-900;
