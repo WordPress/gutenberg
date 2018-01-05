@@ -6,25 +6,23 @@
 	left: 0;
 	z-index: z-index( '.editor-block-list__block-drag-inset' );
 
-	>.inner {
+	> .inner {
 		position: absolute;
 		top: 0;
+		right: 0;
 		bottom: 0;
 		left: 0;
-		right: 0;
-		opacity: 0;
 		background-color: $light-gray-200;
-		z-index: z-index( '.editor-block-list__block-drag-inset' );
+		visibility: hidden;
 
 		@include break-small() {
 			margin: 0 32px;
 		}
 	}
 
-	&.visible *,
-	&.visible > * {
-		opacity: 1;
+	&.visible > .inner {
 		visibility: visible !important;
+		z-index: z-index( '.editor-block-list__block-drag-inset.visible > .inner' );
 	}
 
 	&:hover {

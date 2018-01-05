@@ -29,6 +29,8 @@ $z-layers: (
 
 	// Should have lower index than anything else positioned inside the block containers
 	'.editor-block-list__block-drag-inset': 0,
+	// Should have higher index than anything else positioned inside the block containers
+	'.editor-block-list__block-drag-inset.visible > .inner': 10000,
 
 	// Should have higher index than the inset/underlay used for dragging
 	'.components-placeholder__fieldset': 1,

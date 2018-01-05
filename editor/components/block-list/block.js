@@ -368,12 +368,12 @@ export class BlockListBlock extends Component {
 		);
 
 		// Order matters next. '.dragged' must be added before setting the drag image.
-		block.classList.add( 'dragged' );
 		if ( 'function' === typeof event.dataTransfer.setDragImage ) {
+			block.classList.add( 'dragged' );
 			event.dataTransfer.setDragImage( block, -15, -15 );
 		}
 
-		setTimeout( setDragInset( block, dragInset ) );
+		setTimeout( setDragInset( block, dragInset ), 0 );
 
 		function setDragInset( _block, _dragInset ) {
 			return () => {
@@ -389,7 +389,7 @@ export class BlockListBlock extends Component {
 		const block = document.getElementById( `block-${ this.props.uid }` );
 		const dragInset = document.getElementById( `block-drag-inset-${ this.props.uid }` );
 
-		setTimeout( resetBlockDisplay( block, dragInset ) );
+		setTimeout( resetBlockDisplay( block, dragInset ), 0 );
 
 		function resetBlockDisplay( _block, _dragInset ) {
 			return () => {
