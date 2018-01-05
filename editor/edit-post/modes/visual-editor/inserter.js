@@ -17,7 +17,7 @@ import { createBlock, BlockIcon } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { Inserter } from '../../../components';
-import { insertBlock } from '../../../store/actions';
+import { clearSelectedBlock, insertBlock } from '../../../store/actions';
 import { getMostFrequentlyUsedBlocks, getBlockCount, getBlocks } from '../../../store/selectors';
 
 export class VisualEditorInserter extends Component {
@@ -34,11 +34,14 @@ export class VisualEditorInserter extends Component {
 
 	toggleControls( isShowingControls ) {
 		this.setState( { isShowingControls } );
+
+		if ( isShowingControls && this.props.clearSelectedBlock ) {
+			this.props.clearSelectedBlock();
+		}
 	}
 
 	insertBlock( name ) {
-		const { onInsertBlock } = this.props;
-		onInsertBlock( createBlock( name ) );
+		this.props.insertBlock( createBlock( name ) );
 	}
 
 	isDisabledBlock( block ) {
@@ -96,7 +99,10 @@ export default compose(
 				blocks: getBlocks( state ),
 			};
 		},
-		{ onInsertBlock: insertBlock },
+		{
+			insertBlock,
+			clearSelectedBlock,
+		},
 	),
 	withContext( 'editor' )( ( settings ) => {
 		const { templateLock } = settings;
