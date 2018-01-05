@@ -12,6 +12,14 @@ function findElementWithText( context, selector, text ) {
 }
 module.exports.findElementWithText = findElementWithText;
 
+function findElementWithTextMatchingRe( context, selector, regexp ) {
+	return context.findElement( ( ctx ) => {
+		const buttons = ctx.findElements( By.css( selector ) );
+		return promise.filter( buttons, ( button ) => button.getText().then( ( tx ) => regexp.test(tx) ) );
+	} );
+}
+module.exports.findElementWithTextMatchingRe = findElementWithTextMatchingRe;
+
 function findBlockByIndex( driver, index ) {
 	return driver.findElement( ( ctx ) => {
 		return ctx.findElements( By.css( '.editor-block-list__block' ) ).then( ( blocks ) => {
@@ -37,10 +45,10 @@ module.exports.findBlockByIndex = findBlockByIndex;
 
 function getPostText( driver ) {
 	driver.findElement( By.css( '.editor-ellipsis-menu [aria-label="More"]' ) ).click();
-	findElementWithText( driver, '.components-choice-menu button.components-menu-items__toggle', 'Code Editor' ).click();
+	findElementWithTextMatchingRe( driver, '.components-choice-menu button.components-menu-items__toggle', /^Code Editor/ ).click();
 	const text = driver.findElement( By.css( 'textarea.editor-post-text-editor' ) ).getAttribute( 'value' );
 	driver.findElement( By.css( '.editor-ellipsis-menu [aria-label="More"]' ) ).click();
-	findElementWithText( driver, '.components-choice-menu button.components-menu-items__toggle', 'Visual Editor' ).click();
+	findElementWithTextMatchingRe( driver, '.components-choice-menu button.components-menu-items__toggle', /^Visual Editor/ ).click();
 	return text;
 }
 module.exports.getPostText = getPostText;
@@ -54,6 +62,8 @@ function visitAdmin( config, driver, adminPath ) {
 		catch( () => { /* ignore error caused by missing popup */ } );
 	driver.getCurrentUrl().then( function( url ) {
 		if ( url.startsWith( config.baseUrl + '/wp-login.php' ) ) {
+			// wait a bit for the onload javascript to run so it doesn't change our focus in the middle of typing
+			driver.sleep(200);
 			driver.findElement( By.id( 'user_login' ) ).sendKeys( config.username );
 			driver.findElement( By.id( 'user_pass' ) ).sendKeys( config.password );
 			driver.findElement( By.id( 'wp-submit' ) ).click();
@@ -77,7 +87,7 @@ function newPost( config, driver ) {
 					// click on the menu
 					driver.findElement( By.css( '.editor-ellipsis-menu [aria-label="More"]' ) ).click();
 					// find the visual mode button and click it
-					findElementWithText( driver, '.components-choice-menu button.components-menu-items__toggle', 'Visual Editor' ).click();
+					findElementWithTextMatchingRe( driver, '.components-choice-menu button.components-menu-items__toggle', /^Visual Editor/ ).click();
 					// wait until visual mode has rendered
 					driver.wait( until.elementLocated( By.css( 'input.editor-default-block-appender__content' ) ), 1000 );
 				}

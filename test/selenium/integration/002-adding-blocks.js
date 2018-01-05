@@ -29,7 +29,7 @@ module.exports.run = ( config, driver ) => {
 			const third = findBlockByIndex( driver, 2 );
 			third.getAttribute( 'data-type' ).then( ( type ) => chai.expect( type ).to.equal( 'core/quote' ) );
 			third.findElement( By.css( 'p' ) ).getText().then( ( text ) => chai.expect( text ).to.equal( 'The quotation' ) );
-			third.findElement( By.css( 'footer' ) ).getText().then( ( text ) => chai.expect( text ).to.equal( 'The citation' ) );
+			third.findElement( By.css( 'cite' ) ).getText().then( ( text ) => chai.expect( text ).to.equal( 'The citation' ) );
 
 			// Using the regular inserter
 			driver.findElement( By.css( '.editor-header [aria-label="Insert block"]' ) ).click();
@@ -54,9 +54,8 @@ module.exports.run = ( config, driver ) => {
 				'<!-- /wp:paragraph -->\n' +
 				'\n' +
 				'<!-- wp:quote -->\n' +
-				'<blockquote class="wp-block-quote blocks-quote-style-1">\n' +
-				'    <p>The quotation</p>\n' +
-				'    <footer>The citation</footer>\n' +
+				'<blockquote class="wp-block-quote">\n' +
+				'    <p>The quotation</p><cite>The citation</cite>' +
 				'</blockquote>\n' +
 				'<!-- /wp:quote -->\n' +
 				'\n' +
