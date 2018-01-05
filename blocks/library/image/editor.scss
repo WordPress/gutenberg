@@ -82,3 +82,7 @@
 		max-width: 370px !important;
 	}
 }
+
+.editor-block-list__block[data-type="core/image"][data-align="center"] figure {
+	margin: 0 auto;
+}

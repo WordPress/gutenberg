@@ -89,10 +89,14 @@ class ImageBlock extends Component {
 	}
 
 	updateAlignment( nextAlign ) {
-		const extraUpdatedAttributes = [ 'wide', 'full' ].indexOf( nextAlign ) !== -1 ?
-			{ width: undefined, height: undefined } :
-			{};
-		this.props.setAttributes( { ...extraUpdatedAttributes, align: nextAlign } );
+		const nextSize = [ 'left', 'center', 'right' ].indexOf( nextAlign ) !== -1 ?
+			this.props.attributes.size || 50 :
+			undefined;
+
+		this.props.setAttributes( {
+			align: nextAlign,
+			size: nextSize,
+		} );
 	}
 
 	updateImageURL( url ) {
@@ -100,6 +104,10 @@ class ImageBlock extends Component {
 	}
 
 	updateSize( size ) {
+		if ( ! size || size === 100 ) {
+			size = undefined;
+		}
+
 		this.props.setAttributes( { size } );
 	}
 
@@ -192,7 +200,7 @@ class ImageBlock extends Component {
 						type={ 'number' }
 						min={ 5 }
 						max={ 100 }
-						value={ size }
+						value={ size || 100 }
 						onChange={ this.updateSize }
 						help={ __( 'Set the image width as a percentage of the content width.' ) }
 					/>
