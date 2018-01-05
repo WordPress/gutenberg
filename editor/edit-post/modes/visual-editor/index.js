@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import 'element-closest';
 
 /**
  * Internal dependencies
@@ -21,12 +22,12 @@ import { clearSelectedBlock } from '../../../store/actions';
  */
 function preventChromeDeselect( event ) {
 	const { target } = event;
-	const isOutside = ! target || target.closest( [
+	const isOutside = target && ! target.closest( [
 		'.editor-header',
 		'.editor-sidebar',
 	].join( ',' ) );
 
-	if ( isOutside ) {
+	if ( ! isOutside ) {
 		event.preventDefault();
 	}
 }
