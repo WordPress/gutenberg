@@ -44,7 +44,7 @@ $ npm run test:coverage
 
 ## Releasing
 
-This repository uses [lerna](https://lernajs.io) to manage and release the packages. Lerna automatically releases all the outdated packages. To check which packages are outdated and will be released, type `lerna updated`.
+This repository uses [lerna](https://lernajs.io) to manage and release the packages. Lerna automatically releases all the outdated packages. To check which packages are outdated and will be released, type `npx lerna updated`.
 
 ### Development release
 
