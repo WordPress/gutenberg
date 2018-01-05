@@ -34,7 +34,7 @@ const SidebarHeader = ( { panel, onSetPanel, onToggleSidebar, count } ) => {
 				className={ `editor-sidebar__panel-tab ${ panel === 'block' ? 'is-active' : '' }` }
 				aria-label={ __( 'Format settings' ) }
 			>
-				{ sprintf( _n( 'Format', '%d Format', count ), count ) }
+				{ __( 'Format' ) }
 			</button>
 			<IconButton
 				onClick={ closeSidebar }
