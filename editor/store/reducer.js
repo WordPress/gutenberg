@@ -12,6 +12,7 @@ import {
 	first,
 	last,
 	omit,
+	omitBy,
 	without,
 	mapValues,
 	findIndex,
@@ -541,6 +542,16 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 					},
 				};
 			}, state );
+		case 'REMOVE_REUSABLE_BLOCK':
+			const { id } = action;
+			return {
+				...state,
+				recentInserts: reject( state.recentInserts, ( { ref } ) => ref === id ),
+				insertFrequency: omitBy( state.insertFrequency, ( frequency, key ) => {
+					const { ref } = JSON.parse( key );
+					return ref === id;
+				} ),
+			};
 		case 'TOGGLE_FEATURE':
 			return {
 				...state,

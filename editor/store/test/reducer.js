@@ -1055,6 +1055,37 @@ describe( 'state', () => {
 			} );
 		} );
 
+		it( 'should remove usage stats for reusable blocks that are removed', () => {
+			const initialState = {
+				recentInserts: [
+					{ name: 'core/paragraph' },
+					{ name: 'core/block', ref: 123 },
+					{ name: 'core/block', ref: 456 },
+				],
+				insertFrequency: {
+					[ JSON.stringify( { name: 'core/paragraph' } ) ]: 4,
+					[ JSON.stringify( { name: 'core/block', ref: 123 } ) ]: 2,
+					[ JSON.stringify( { name: 'core/block', ref: 456 } ) ]: 2,
+				},
+			};
+
+			const state = preferences( deepFreeze( initialState ), {
+				type: 'REMOVE_REUSABLE_BLOCK',
+				id: 123,
+			} );
+
+			expect( state ).toEqual( {
+				recentInserts: [
+					{ name: 'core/paragraph' },
+					{ name: 'core/block', ref: 456 },
+				],
+				insertFrequency: {
+					[ JSON.stringify( { name: 'core/paragraph' } ) ]: 4,
+					[ JSON.stringify( { name: 'core/block', ref: 456 } ) ]: 2,
+				},
+			} );
+		} );
+
 		it( 'should toggle a feature flag', () => {
 			const state = preferences( deepFreeze( { features: { chicken: true } } ), {
 				type: 'TOGGLE_FEATURE',
