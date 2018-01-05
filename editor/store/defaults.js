@@ -4,6 +4,7 @@ export const PREFERENCES_DEFAULTS = {
 		desktop: true,
 		mobile: false,
 		publish: false,
+		plugins: false,
 	},
 	panels: { 'post-status': true },
 	recentlyUsedBlocks: [],

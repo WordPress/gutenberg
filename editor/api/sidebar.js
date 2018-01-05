@@ -5,7 +5,7 @@ import { isFunction } from 'lodash';
 
 /* Internal dependencies */
 import store from '../store';
-import { setActivePanel } from '../store/actions';
+import { setActivePlugin } from '../store/actions';
 import { applyFilters } from '@wordpress/hooks';
 
 const sidebars = {};
@@ -103,5 +103,5 @@ export function getSidebars() {
  * @param {string} name The name of the sidebar to activate.
  */
 export function activateSidebar( name ) {
-	store.dispatch( setActivePanel( name ) );
+	store.dispatch( setActivePlugin( name ) );
 }

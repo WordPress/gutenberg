@@ -14,7 +14,7 @@ import { MenuItemsGroup } from '@wordpress/components';
  * Internal dependencies
  */
 import { getSidebars, activateSidebar } from '../../../api/sidebar';
-import { getActivePanel, hasOpenSidebar  } from '../../../store/selectors';
+import { getActivePanel, hasOpenSidebar } from '../../../store/selectors';
 import { toggleSidebar } from '../../../store/actions';
 
 /**
@@ -30,7 +30,7 @@ import { toggleSidebar } from '../../../store/actions';
  *
  * @returns {Object} The rendered list of menu items.
  */
-function Plugins( { activePanel, onSwitch, isSidebarOpen, onToggleSidebar } ) {
+function Plugins( { activePanel, onSwitch, isSidebarOpen, onTogglePluginsSidebar } ) {
 	const sidebars = getSidebars();
 
 	// This makes sure no check mark is before a plugin if the sidebar is closed.
@@ -47,7 +47,7 @@ function Plugins( { activePanel, onSwitch, isSidebarOpen, onToggleSidebar } ) {
 		onSwitch( panelToActivate );
 
 		if ( ! isSidebarOpen ) {
-			onToggleSidebar();
+			onTogglePluginsSidebar();
 		}
 	}
 
@@ -81,8 +81,8 @@ export default connect(
 				activateSidebar( value );
 				ownProps.onToggle( value );
 			},
-			onToggleSidebar: () => {
-				dispatch( toggleSidebar() );
+			onTogglePluginsSidebar: () => {
+				dispatch( toggleSidebar( 'plugins' ) );
 			},
 		};
 	}

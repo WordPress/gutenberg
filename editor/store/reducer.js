@@ -578,6 +578,15 @@ export function panel( state = 'document', action ) {
 	return state;
 }
 
+export function plugin( state = 'null', action ) {
+	switch( action.type ) {
+		case 'SET_ACTIVE_PLUGIN':
+			return action.plugin;
+	}
+
+	return state;
+}
+
 /**
  * Reducer returning current network request state (whether a request to the WP
  * REST API is in progress, successful, or failed).
@@ -786,6 +795,7 @@ export default optimist( combineReducers( {
 	hoveredBlock,
 	blocksMode,
 	blockInsertionPoint,
+	plugin,
 	preferences,
 	panel,
 	saving,

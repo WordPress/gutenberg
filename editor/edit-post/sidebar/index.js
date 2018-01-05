@@ -21,30 +21,6 @@ import { getSidebar } from '../../api/sidebar';
 import { getActivePanel } from '../../store/selectors';
 
 /**
- * Returns the sidebar that should be rendered in the sidebar registered by
- * plugins.
- *
- * @param {string} panel The currently active panel.
- *
- * @returns {Object} The React element to render as a panel.
- */
-function getPluginSidebar( panel ) {
-	const pluginSidebar = getSidebar( panel );
-
-	if ( ! pluginSidebar ) {
-		return () => {
-			return <Panel>
-				<PanelBody>
-					{ sprintf( __( 'No matching plugin sidebar found for panel "%s"' ), panel ) }
-				</PanelBody>
-			</Panel>;
-		};
-	}
-
-	return pluginSidebar.render;
-}
-
-/**
  * Returns the panel that should be rendered in the sidebar.
  *
  * @param {string} panel The currently active panel.
@@ -60,7 +36,7 @@ function getPanel( panel ) {
 			return BlockInspectorPanel;
 
 		default:
-			return getPluginSidebar( panel );
+			return PostSettings;
 	}
 }
 

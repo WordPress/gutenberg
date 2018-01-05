@@ -334,7 +334,7 @@ export function stopTyping() {
 /**
  * Returns an action object used in signalling that the user toggled the sidebar
  *
- * @param  {String} sidebar  Name of the sidebar to toggle (desktop, mobile or publish)
+ * @param  {String} sidebar  Name of the sidebar to toggle (desktop, mobile, plugins or publish)
  * @param  {Boolean?} force  Force a sidebar state
  * @return {Object}          Action object
  */
@@ -356,6 +356,19 @@ export function setActivePanel( panel ) {
 	return {
 		type: 'SET_ACTIVE_PANEL',
 		panel,
+	};
+}
+
+/**
+ * Returns an action object usid in signalling that the user switched the active plugin.
+ * 
+ * @param  {String} plugin  The plugin name
+ * @return {Object}         Action object
+ */
+export function setActivePlugin( plugin ) {
+	return {
+		type: 'SET_ACTIVE_PLUGIN',
+		plugin,
 	};
 }
 
