@@ -102,6 +102,7 @@
 	position: relative;
 	padding-left: $block-padding;
 	padding-right: $block-padding;
+	grid-column: content;
 
 	@include break-small() {
 		// The block mover needs to stay inside the block to allow clicks when hovering the block
