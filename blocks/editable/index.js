@@ -705,7 +705,7 @@ export default class Editable extends Component {
 		}
 
 		content = renderToString( content );
-		this.editor.setContent( content, { format: 'raw' } );
+		this.editor.setContent( content );
 	}
 
 	getContent() {
