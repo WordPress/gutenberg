@@ -33,7 +33,7 @@ function TableOfContents( { blocks } ) {
 					onClick={ onToggle }
 					icon="info-outline"
 					aria-expanded={ isOpen }
-					label={ __( 'Content Structure' ) }
+					label={ __( 'Table of Contents' ) }
 					disabled={ blocks.length === 0 }
 				/>
 			) }
