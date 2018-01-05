@@ -23,6 +23,7 @@ import {
 	requestMetaBoxUpdates,
 	updateReusableBlock,
 	saveReusableBlock,
+	deleteReusableBlock,
 	fetchReusableBlocks,
 	convertBlockToStatic,
 	convertBlockToReusable,
@@ -538,7 +539,7 @@ describe( 'effects', () => {
 			} );
 
 			it( 'should fetch a single reusable block', () => {
-				const id = 'a9691cf9-ecaa-42bd-a9ca-49587e817647';
+				const id = 123;
 
 				let modelAttributes;
 				const promise = Promise.resolve( {
@@ -566,9 +567,10 @@ describe( 'effects', () => {
 				return promise.then( () => {
 					expect( dispatch ).toHaveBeenCalledWith( {
 						type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
+						id,
 						reusableBlocks: [
 							{
-								id: 'a9691cf9-ecaa-42bd-a9ca-49587e817647',
+								id,
 								title: 'My cool block',
 								type: 'core/test-block',
 								attributes: {
@@ -691,6 +693,102 @@ describe( 'effects', () => {
 			} );
 		} );
 
+		describe( '.DELETE_REUSABLE_BLOCK', () => {
+			const handler = effects.DELETE_REUSABLE_BLOCK;
+
+			it( 'should delete a reusable block', () => {
+				let modelAttributes;
+				const promise = Promise.resolve( {} );
+
+				set( global, 'wp.api.models.Blocks', class {
+					constructor( attributes ) {
+						modelAttributes = attributes;
+					}
+
+					destroy() {
+						return promise;
+					}
+				} );
+
+				const id = 123;
+
+				const associatedBlock = {
+					uid: 'd6b55aa9-16b5-4123-9675-749d75a7f14d',
+					name: 'core/block',
+					attributes: {
+						ref: id,
+					},
+				};
+
+				const actions = [
+					resetBlocks( [ associatedBlock ] ),
+					updateReusableBlock( id, {} ),
+				];
+				const state = actions.reduce( reducer, undefined );
+
+				const dispatch = jest.fn();
+				const store = { getState: () => state, dispatch };
+
+				handler( deleteReusableBlock( id ), store );
+
+				expect( dispatch ).toHaveBeenCalledWith( {
+					type: 'REMOVE_REUSABLE_BLOCK',
+					id,
+					associatedBlockUids: [ associatedBlock.uid ],
+					optimist: expect.any( Object ),
+				} );
+				expect( modelAttributes ).toEqual( { id } );
+				return promise.then( () => {
+					expect( dispatch ).toHaveBeenCalledWith( {
+						type: 'DELETE_REUSABLE_BLOCK_SUCCESS',
+						id,
+						optimist: expect.any( Object ),
+					} );
+				} );
+			} );
+
+			it( 'should handle an API error', () => {
+				const promise = Promise.reject( {} );
+
+				set( global, 'wp.api.models.Blocks', class {
+					destroy() {
+						return promise;
+					}
+				} );
+
+				const state = reducer( undefined, updateReusableBlock( 123, {} ) );
+
+				const dispatch = jest.fn();
+				const store = { getState: () => state, dispatch };
+
+				handler( deleteReusableBlock( 123 ), store );
+
+				return promise.catch( () => {
+					expect( dispatch ).toHaveBeenCalledWith( {
+						type: 'DELETE_REUSABLE_BLOCK_FAILURE',
+						id: 123,
+						optimist: expect.any( Object ),
+					} );
+				} );
+			} );
+
+			it( 'should not save reusable blocks with temporary IDs', () => {
+				const reusableBlock = {
+					id: -123,
+					isTemporary: true,
+				};
+
+				const state = reducer( undefined, updateReusableBlock( -123, reusableBlock ) );
+
+				const dispatch = jest.fn();
+				const store = { getState: () => state, dispatch };
+
+				handler( deleteReusableBlock( -123 ), store );
+
+				expect( dispatch ).not.toHaveBeenCalled();
+			} );
+		} );
+
 		describe( '.CONVERT_BLOCK_TO_STATIC', () => {
 			const handler = effects.CONVERT_BLOCK_TO_STATIC;
 
@@ -753,8 +851,8 @@ describe( 'effects', () => {
 				handler( convertBlockToReusable( staticBlock.uid ), store );
 
 				expect( dispatch ).toHaveBeenCalledWith(
-					updateReusableBlock( 1, {
-						id: 1,
+					updateReusableBlock( expect.any( Number ), {
+						id: expect.any( Number ),
 						isTemporary: true,
 						title: 'Untitled block',
 						type: staticBlock.name,
@@ -762,12 +860,12 @@ describe( 'effects', () => {
 					} )
 				);
 				expect( dispatch ).toHaveBeenCalledWith(
-					saveReusableBlock( 1 )
+					saveReusableBlock( expect.any( Number ) )
 				);
 				expect( dispatch ).toHaveBeenCalledWith(
 					replaceBlocks(
 						[ staticBlock.uid ],
-						[ createBlock( 'core/block', { ref: 1 } ) ]
+						[ createBlock( 'core/block', { ref: expect.any( Number ) } ) ]
 					)
 				);
 			} );

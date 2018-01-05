@@ -78,11 +78,15 @@ class ReusableBlockEdit extends Component {
 	}
 
 	render() {
-		const { focus, reusableBlock, isSaving, convertBlockToStatic } = this.props;
+		const { focus, reusableBlock, isFetching, isSaving } = this.props;
 		const { isEditing, title, attributes } = this.state;
 
-		if ( ! reusableBlock ) {
+		if ( ! reusableBlock && isFetching ) {
 			return <Placeholder><Spinner /></Placeholder>;
+		}
+
+		if ( ! reusableBlock ) {
+			return <Placeholder>{ __( 'Block has been deleted or is unavailable.' ) }</Placeholder>;
 		}
 
 		const reusableBlockAttributes = { ...reusableBlock.attributes, ...attributes };
@@ -103,9 +107,8 @@ class ReusableBlockEdit extends Component {
 					key="panel"
 					isEditing={ isEditing }
 					title={ title !== null ? title : reusableBlock.title }
-					isSaving={ isSaving }
+					isSaving={ isSaving && ! reusableBlock.isTemporary }
 					onEdit={ this.startEditing }
-					onDetach={ convertBlockToStatic }
 					onChangeTitle={ this.setTitle }
 					onSave={ this.updateReusableBlock }
 					onCancel={ this.stopEditing }
@@ -118,6 +121,7 @@ class ReusableBlockEdit extends Component {
 const ConnectedReusableBlockEdit = connect(
 	( state, ownProps ) => ( {
 		reusableBlock: state.reusableBlocks.data[ ownProps.attributes.ref ],
+		isFetching: state.reusableBlocks.isFetching[ ownProps.attributes.ref ],
 		isSaving: state.reusableBlocks.isSaving[ ownProps.attributes.ref ],
 	} ),
 	( dispatch, ownProps ) => ( {
@@ -138,12 +142,6 @@ const ConnectedReusableBlockEdit = connect(
 			dispatch( {
 				type: 'SAVE_REUSABLE_BLOCK',
 				id: ownProps.attributes.ref,
-			} );
-		},
-		convertBlockToStatic() {
-			dispatch( {
-				type: 'CONVERT_BLOCK_TO_STATIC',
-				uid: ownProps.id,
 			} );
 		},
 	} )

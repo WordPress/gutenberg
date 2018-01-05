@@ -143,24 +143,46 @@ class CategoriesBlock extends Component {
 	}
 
 	render() {
-		const { setAttributes } = this.props;
+		const { attributes, focus, setAttributes } = this.props;
+		const { align, displayAsDropdown, showHierarchy, showPostCounts } = attributes;
 		const categories = this.getCategories();
 
+		const inspectorControls = focus && (
+			<InspectorControls key="inspector">
+				<h3>{ __( 'Categories Settings' ) }</h3>
+				<ToggleControl
+					label={ __( 'Display as dropdown' ) }
+					checked={ displayAsDropdown }
+					onChange={ this.toggleDisplayAsDropdown }
+				/>
+				<ToggleControl
+					label={ __( 'Show post counts' ) }
+					checked={ showPostCounts }
+					onChange={ this.toggleShowPostCounts }
+				/>
+				<ToggleControl
+					label={ __( 'Show hierarchy' ) }
+					checked={ showHierarchy }
+					onChange={ this.toggleShowHierarchy }
+				/>
+			</InspectorControls>
+		);
+
 		if ( ! categories.length ) {
-			return (
+			return [
+				inspectorControls,
 				<Placeholder
+					key="placeholder"
 					icon="admin-post"
 					label={ __( 'Categories' ) }
 				>
 					<Spinner />
-				</Placeholder>
-			);
+				</Placeholder>,
+			];
 		}
 
-		const { focus } = this.props;
-		const { align, displayAsDropdown, showHierarchy, showPostCounts } = this.props.attributes;
-
 		return [
+			inspectorControls,
 			focus && (
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar
@@ -171,26 +193,6 @@ class CategoriesBlock extends Component {
 						controls={ [ 'left', 'center', 'right', 'full' ] }
 					/>
 				</BlockControls>
-			),
-			focus && (
-				<InspectorControls key="inspector">
-					<h3>{ __( 'Categories Settings' ) }</h3>
-					<ToggleControl
-						label={ __( 'Display as dropdown' ) }
-						checked={ displayAsDropdown }
-						onChange={ this.toggleDisplayAsDropdown }
-					/>
-					<ToggleControl
-						label={ __( 'Show post counts' ) }
-						checked={ showPostCounts }
-						onChange={ this.toggleShowPostCounts }
-					/>
-					<ToggleControl
-						label={ __( 'Show hierarchy' ) }
-						checked={ showHierarchy }
-						onChange={ this.toggleShowHierarchy }
-					/>
-				</InspectorControls>
 			),
 			<div key="categories" className={ this.props.className }>
 				{
