@@ -94,7 +94,7 @@ export class BlockListBlock extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.setBlockListRef = this.setBlockListRef.bind( this );
+		this.bindWrapperNode = this.bindWrapperNode.bind( this );
 		this.bindBlockNode = this.bindBlockNode.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
 		this.maybeHover = this.maybeHover.bind( this );
@@ -108,7 +108,9 @@ export class BlockListBlock extends Component {
 		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
 		this.onTouchStart = this.onTouchStart.bind( this );
 		this.onClick = this.onClick.bind( this );
-		this.deselect = debounce( this.props.onDeselect );
+		this.debouncedDeselect = debounce( this.deselect.bind( this ) );
+		this.triggerDeselect = this.triggerDeselect.bind( this );
+		this.cancelDeselect = this.cancelDeselect.bind( this );
 
 		this.previousOffset = null;
 		this.hadTouchStart = false;
@@ -127,7 +129,7 @@ export class BlockListBlock extends Component {
 			document.addEventListener( 'mousemove', this.stopTypingOnMouseMove );
 		}
 
-		this.bindClickOutside();
+		this.bindFocusOutside();
 	}
 
 	componentWillReceiveProps( newProps ) {
@@ -166,33 +168,32 @@ export class BlockListBlock extends Component {
 			}
 		}
 
-		// Click outside detection is activated depending on selected state, so
+		// Focus outside detection is activated depending on selected state, so
 		// rebind when changing.
 		if (
 			this.props.isSelected !== prevProps.isSelected ||
 			this.props.isFirstMultiSelected !== prevProps.isFirstMultiSelected
 		) {
-			this.bindClickOutside();
-		}
-
-		// If we were multi-selecting, cancel deselect check since while a
-		// multi-select mouseup technically occurs outside the current block,
-		// it should not be treated as a deselect intent.
-		if ( ! this.props.isMultiSelecting && prevProps.isMultiSelecting ) {
-			this.deselect.cancel();
+			this.bindFocusOutside();
 		}
 	}
 
 	componentWillUnmount() {
 		this.removeStopTypingListener();
-		document.removeEventListener( 'mouseup', this.deselect, true );
+
+		// Remove and cancel deselect focus handlers
+		document.removeEventListener( 'focus', this.triggerDeselect, true );
+		document.removeEventListener( 'deselect', this.debouncedDeselect );
+		this.wrapperNode.removeEventListener( 'focusin', this.cancelDeselect );
+		this.debouncedDeselect.cancel();
 	}
 
 	removeStopTypingListener() {
 		document.removeEventListener( 'mousemove', this.stopTypingOnMouseMove );
 	}
 
-	setBlockListRef( node ) {
+	bindWrapperNode( node ) {
+		this.wrapperNode = node;
 		this.props.blockRef( node, this.props.uid );
 	}
 
@@ -201,19 +202,26 @@ export class BlockListBlock extends Component {
 	}
 
 	/**
-	 * Toggles event listener on document for mouse events to deselect block.
+	 * Toggles event listener on document for focus events to deselect block.
 	 */
-	bindClickOutside() {
+	bindFocusOutside() {
 		const { isSelected, isFirstMultiSelected } = this.props;
 
-		// Listen for click outside if the block is selected. We target the
+		// Listen for focus outside if the block is selected. We target the
 		// first block of multi-selection since it is the one responsible for
 		// rendering the block controls, and because we don't need multiple
-		// mouse handlers to handle the deselection.
+		// event handlers to handle the deselection.
 		const isListening = isSelected || isFirstMultiSelected;
 
 		const bindFn = isListening ? 'addEventListener' : 'removeEventListener';
-		document[ bindFn ]( 'mouseup', this.deselect, true );
+		document[ bindFn ]( 'focus', this.triggerDeselect, true );
+		document[ bindFn ]( 'deselect', this.debouncedDeselect );
+
+		// Bind to the DOM reference of the rendered wrapper node, since React
+		// synthetic event binding and focus normalization conflicts with our
+		// own document event binding and therefore canceling occurs before the
+		// deselect event is triggered (out of expected order).
+		this.wrapperNode[ bindFn ]( 'focusin', this.cancelDeselect );
 	}
 
 	setAttributes( attributes ) {
@@ -242,11 +250,45 @@ export class BlockListBlock extends Component {
 		this.hadTouchStart = true;
 	}
 
-	onClick() {
-		// We debounce deslect to allow clicks bubbled within the block wrapper
-		// to prevent deselect from occurring.
-		this.deselect.cancel();
+	/**
+	 * When focus occurs elsewhere in the page, triggers a deselect event on
+	 * the element receiving focus. We create a custom event because a focus
+	 * event cannot be canceled, but we want to allow parent components the
+	 * opportunity to cancel the deselect intent.
+	 *
+	 * @see https://developer.mozilla.org/en-US/docs/Web/Events/focus
+	 *
+	 * @param  {FocusEvent} event Focus event
+	 */
+	triggerDeselect( event ) {
+		const deselectEvent = new window.Event( 'deselect', {
+			bubbles: true,
+			cancelable: true,
+		} );
 
+		event.target.dispatchEvent( deselectEvent );
+	}
+
+	/**
+	 * Cancels the debounced deselect. Debouncing allows focus within the block
+	 * wrapper to prevent deselect from occurring.
+	 */
+	cancelDeselect() {
+		this.debouncedDeselect.cancel();
+	}
+
+	/**
+	 * Calls the `onDeselect` prop with the custom deselect event. A proxying
+	 * function handles the case where `onDeselect` prop changes over lifecycle
+	 * of the component.
+	 *
+	 * @param  {Event} event Custom deselect event
+	 */
+	deselect( event ) {
+		this.props.onDeselect( event );
+	}
+
+	onClick() {
 		// Clear touchstart detection
 		// Browser will try to emulate mouse events also see https://www.html5rocks.com/en/mobile/touchandmouse/
 		this.hadTouchStart = false;
@@ -421,7 +463,7 @@ export class BlockListBlock extends Component {
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
 			<div
-				ref={ this.setBlockListRef }
+				ref={ this.bindWrapperNode }
 				onMouseMove={ this.maybeHover }
 				onMouseEnter={ this.maybeHover }
 				onMouseLeave={ onMouseLeave }
