@@ -177,12 +177,7 @@
 		"template-curly-spacing": [ "error", "always" ],
 		"valid-jsdoc": [ "error", { "requireReturn": false } ],
 		"valid-typeof": "error",
-		"yoda": "off",
-		"require-jsdoc": [ "error", {
-			"require": {
-				"MethodDefinition": true
-			}
-		} ]
+		"yoda": "off"
 	},
 	"overrides": [
 		{

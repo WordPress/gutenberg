@@ -24,7 +24,7 @@
     "dom-scroll-into-view": "1.2.1",
     "element-closest": "2.0.2",
     "escape-string-regexp": "1.0.5",
-    "eslint-plugin-wordpress": "git://github.com/WordPress-Coding-Standards/eslint-plugin-wordpress.git#16a13c59b0b9e02b516d6ae1da184f42adf4a391",
+    "eslint-plugin-wordpress": "git://github.com/WordPress-Coding-Standards/eslint-plugin-wordpress.git#327b6bdec434177a6e841bd3210e87627ccfcecb",
     "hpq": "1.2.0",
     "jed": "1.1.1",
     "jquery": "3.2.1",
