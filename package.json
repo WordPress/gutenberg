@@ -16,6 +16,7 @@
 	},
 	"dependencies": {
 		"@wordpress/a11y": "1.0.3",
+		"@wordpress/autop": "1.0.0",
 		"@wordpress/hooks": "1.1.1",
 		"@wordpress/jest-console": "1.0.0",
 		"@wordpress/url": "1.0.0",
