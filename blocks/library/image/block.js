@@ -44,6 +44,7 @@ class ImageBlock extends Component {
 		this.onSelectImage = this.onSelectImage.bind( this );
 		this.onSetHref = this.onSetHref.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
+		this.updateSize = this.updateSize.bind( this );
 	}
 
 	componentDidMount() {
@@ -96,6 +97,10 @@ class ImageBlock extends Component {
 
 	updateImageURL( url ) {
 		this.props.setAttributes( { url } );
+	}
+
+	updateSize( size ) {
+		this.props.setAttributes( { size } );
 	}
 
 	render() {
@@ -169,7 +174,7 @@ class ImageBlock extends Component {
 		const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
 		const classes = classnames( className, {
 			'is-transient': 0 === url.indexOf( 'blob:' ),
-			'is-resized': !! width,
+			'is-resized': !! size,
 			'is-focused': !! focus,
 		} );
 
@@ -182,6 +187,15 @@ class ImageBlock extends Component {
 				<InspectorControls key="inspector">
 					<h2>{ __( 'Image Settings' ) }</h2>
 					<TextControl label={ __( 'Textual Alternative' ) } value={ alt } onChange={ this.updateAlt } help={ __( 'Describe the purpose of the image. Leave empty if the image is not a key part of the content.' ) } />
+					<TextControl
+						label={ __( 'Size' ) }
+						type={ 'number' }
+						min={ 5 }
+						max={ 100 }
+						value={ size }
+						onChange={ this.updateSize }
+						help={ __( 'Set the image width as a percentage of the content width.' ) }
+					/>
 				</InspectorControls>
 			),
 			<figure key="image" className={ classes } style={ figureStyle }>
@@ -233,10 +247,7 @@ class ImageBlock extends Component {
 									toggleSelection( false );
 								} }
 								onResizeStop={ ( event, direction, elt, delta ) => {
-									setAttributes( {
-										size: parseInt( currentWidth + delta.width, 10 ) * 100 / settings.maxWidth,
-									} );
-
+									this.updateSize( Math.round( ( currentWidth + delta.width ) * 100 / settings.maxWidth ) );
 									toggleSelection( true );
 								} }
 							>

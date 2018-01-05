@@ -141,9 +141,9 @@ registerBlockType( 'core/image', {
 	},
 
 	getEditWrapperProps( attributes ) {
-		const { align, width } = attributes;
+		const { align, size } = attributes;
 		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
-			return { 'data-align': align, 'data-resized': !! width };
+			return { 'data-align': align, 'data-resized': !! size };
 		}
 	},
 
