@@ -29,6 +29,7 @@
 
 	.wp-block-image.is-focused & {
 		display: block;
+		z-index: 1;
 	}
 }
 
