@@ -59,7 +59,7 @@ function TableOfContents( { blocks } ) {
 				headings.length > 0 && (
 					<div key="headings">
 						<hr />
-						<span className="table-of-contents__title">{ __( 'Table of Contents' ) }</span>
+						<span className="table-of-contents__title">{ __( 'Document Outline' ) }</span>
 						<DocumentOutline />
 					</div>
 				),
