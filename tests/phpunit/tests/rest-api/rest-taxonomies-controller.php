@@ -11,6 +11,20 @@
  */
 class WP_Test_REST_Taxonomies_Controller extends WP_Test_REST_Controller_Testcase {
 
+	protected static $contributor_id;
+
+	public static function wpSetUpBeforeClass( $factory ) {
+		self::$contributor_id = $factory->user->create(
+			array(
+				'role' => 'contributor',
+			)
+		);
+	}
+
+	public static function wpTearDownAfterClass() {
+		self::delete_user( self::$contributor_id );
+	}
+
 	public function test_register_routes() {
 		$routes = $this->server->get_routes();
 
@@ -101,10 +115,19 @@ class WP_Test_REST_Taxonomies_Controller extends WP_Test_REST_Controller_Testcas
 		$this->assertErrorResponse( 'rest_taxonomy_invalid', $response, 404 );
 	}
 
-	public function test_get_non_public_taxonomy() {
+	public function test_get_non_public_taxonomy_not_authenticated() {
 		register_taxonomy( 'api-private', 'post', array( 'public' => false ) );
 
 		$request = new WP_REST_Request( 'GET', '/wp/v2/taxonomies/api-private' );
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_forbidden', $response, 401 );
+	}
+
+		public function test_get_non_public_taxonomy_no_permission() {
+		wp_set_current_user( self::$contributor_id );
+		register_taxonomy( 'api-private', 'post', array( 'public' => false ) );
+
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/taxonomies/api-private' );
 		$response = $this->server->dispatch( $request );
 		$this->assertErrorResponse( 'rest_forbidden', $response, 403 );
 	}

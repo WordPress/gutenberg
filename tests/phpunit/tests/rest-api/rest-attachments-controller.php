@@ -468,7 +468,7 @@ class WP_Test_REST_Attachments_Controller extends WP_Test_REST_Post_Type_Control
 		$this->assertFalse( isset( $data['media_details']['sizes']['rest-api-test']['source_url'] ) );
 	}
 
-	public function test_get_item_private_post() {
+	public function test_get_item_private_post_not_authenticated() {
 		wp_set_current_user( 0 );
 		$draft_post = $this->factory->post->create( array( 'post_status' => 'draft' ) );
 		$id1 = $this->factory->attachment->create_object( $this->test_file, $draft_post, array(
@@ -477,7 +477,7 @@ class WP_Test_REST_Attachments_Controller extends WP_Test_REST_Post_Type_Control
 		) );
 		$request = new WP_REST_Request( 'GET', '/wp/v2/media/' . $id1 );
 		$response = $this->server->dispatch( $request );
-		$this->assertEquals( 403, $response->get_status() );
+		$this->assertEquals( 401, $response->get_status() );
 	}
 
 	public function test_get_item_inherit_status_with_invalid_parent() {
@@ -493,7 +493,7 @@ class WP_Test_REST_Attachments_Controller extends WP_Test_REST_Post_Type_Control
 		$this->assertEquals( $attachment_id, $data['id'] );
 	}
 
-	public function test_get_item_auto_status_with_invalid_parent_returns_error() {
+	public function test_get_item_auto_status_with_invalid_parent_not_authenticated_returns_error() {
 		$attachment_id = $this->factory->attachment->create_object( $this->test_file, REST_TESTS_IMPOSSIBLY_HIGH_NUMBER, array(
 			'post_mime_type' => 'image/jpeg',
 			'post_excerpt'   => 'A sample caption',
@@ -502,7 +502,7 @@ class WP_Test_REST_Attachments_Controller extends WP_Test_REST_Post_Type_Control
 		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/media/%d', $attachment_id ) );
 		$response = $this->server->dispatch( $request );
 
-		$this->assertErrorResponse( 'rest_forbidden', $response, 403 );
+		$this->assertErrorResponse( 'rest_forbidden', $response, 401 );
 	}
 
 	public function test_create_item() {

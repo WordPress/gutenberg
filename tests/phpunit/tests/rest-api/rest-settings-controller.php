@@ -10,16 +10,25 @@
  * @group restapi
  */
 class WP_Test_REST_Settings_Controller extends WP_Test_REST_Controller_Testcase {
+	
 	protected static $administrator;
+	protected static $author;
 
 	public static function wpSetUpBeforeClass( $factory ) {
 		self::$administrator = $factory->user->create( array(
 			'role' => 'administrator',
 		) );
+
+		self::$author        = $factory->user->create(
+			array(
+				'role' => 'author',
+			)
+		);
 	}
 
 	public static function wpTearDownAfterClass() {
 		self::delete_user( self::$administrator );
+		self::delete_user( self::$author );
 	}
 
 	public function setUp() {
@@ -43,8 +52,15 @@ class WP_Test_REST_Settings_Controller extends WP_Test_REST_Controller_Testcase 
 	public function test_context_param() {
 	}
 
-	public function test_get_item_is_not_public() {
+	public function test_get_item_is_not_public_not_authenticated() {
 		$request = new WP_REST_Request( 'GET', '/wp/v2/settings' );
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 401, $response->get_status() );
+	}
+
+	public function test_get_item_is_not_public_no_permission() {
+		wp_set_current_user( self::$author );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/settings' );
 		$response = $this->server->dispatch( $request );
 		$this->assertEquals( 403, $response->get_status() );
 	}
