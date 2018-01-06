@@ -5,7 +5,7 @@
   "main": "build/app.js",
   "repository": "git+https://github.com/WordPress/gutenberg.git",
   "author": "The WordPress Contributors",
-  "license": "GPL-2.0+",
+  "license": "GPL-2.0-or-later",
   "keywords": [
     "WordPress",
     "editor"
