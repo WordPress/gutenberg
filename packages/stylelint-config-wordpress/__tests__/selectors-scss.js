@@ -24,7 +24,7 @@ describe( 'flags no warnings with valid selectors scss', () => {
 
 	it( 'flags no warnings', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings.length ).toBe( 0 )
+			expect( data.results[0].warnings ).toHaveLength( 0 )
 		) );
 	});
 });
@@ -47,7 +47,7 @@ describe( 'flags warnings with invalid selectors scss', () => {
 
 	it( 'flags four warnings', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings.length ).toBe( 4 )
+			expect( data.results[0].warnings ).toHaveLength( 4 )
 		) );
 	});
 

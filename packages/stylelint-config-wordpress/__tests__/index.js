@@ -24,7 +24,7 @@ describe( 'flags no warnings with valid css', () => {
 
 	it( 'flags no warnings', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings.length ).toBe( 0 )
+			expect( data.results[0].warnings ).toHaveLength( 0 )
 		) );
 	});
 });
@@ -47,7 +47,7 @@ describe( 'flags warnings with invalid css', () => {
 
 	it( 'flags one warning', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings.length ).toBe( 1 )
+			expect( data.results[0].warnings ).toHaveLength( 1 )
 		) );
 	});
 

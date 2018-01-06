@@ -24,7 +24,7 @@ describe( 'flags no warnings with valid media queries css', () => {
 
 	it( 'flags no warnings', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings.length ).toBe( 0 )
+			expect( data.results[0].warnings ).toHaveLength( 0 )
 		) );
 	});
 });
@@ -47,7 +47,7 @@ describe( 'flags warnings with invalid media queries css', () => {
 
 	it( 'flags ten warnings', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings.length ).toBe( 11 )
+			expect( data.results[0].warnings ).toHaveLength( 11 )
 		) );
 	});
 
