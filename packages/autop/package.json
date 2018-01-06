@@ -9,7 +9,7 @@
   "main": "build/index.js",
   "module": "build-module/index.js",
   "author": "WordPress",
-  "license": "GPL-2.0+",
+  "license": "GPL-2.0-or-later",
   "publishConfig": {
     "access": "public"
   }

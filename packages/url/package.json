@@ -3,7 +3,7 @@
   "version": "0.1.0-beta.6",
   "description": "WordPress URL utilities",
   "author": "WordPress",
-  "license": "GPL-2.0+",
+  "license": "GPL-2.0-or-later",
   "keywords": [
     "url"
   ],
