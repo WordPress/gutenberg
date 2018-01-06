@@ -15,7 +15,7 @@ Consider a post component which displays a placeholder message while it loads, a
 
 ```jsx
 function MyPost( { post } ) {
-	if ( post.isLoading ) {
+	if ( post.isLoading || 'undefined' === typeof post.data ) {
 		return <div>Loading...</div>;
 	}
 
