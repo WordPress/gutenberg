@@ -357,7 +357,6 @@ export class BlockListBlock extends Component {
 		const block = document.getElementById( `block-${ this.props.uid }` );
 		const dragInset = document.getElementById( `block-drag-inset-${ this.props.uid }` );
 
-		event.dataTransfer.effectAllowed = 'move';
 		event.dataTransfer.setData(
 			'text',
 			JSON.stringify( {
