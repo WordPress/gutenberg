@@ -176,6 +176,8 @@ export default ( mapPropsToData ) => ( WrappedComponent ) => {
 				route.methods.forEach( ( method ) => {
 					// Add request initiater into data props
 					const requestKey = this.getRequestKey( method );
+					const pendingKey = this.getPendingKey( method );
+
 					result[ propName ][ requestKey ] = this.request.bind(
 						this,
 						propName,
@@ -183,15 +185,17 @@ export default ( mapPropsToData ) => ( WrappedComponent ) => {
 						path
 					);
 
-					// Initialize pending flags as explicitly false
-					const pendingKey = this.getPendingKey( method );
-					result[ propName ][ pendingKey ] = false;
+					// Initialize pending flags as explicitly `true` since we are starting an async request
+					result[ propName ][ pendingKey ] = true;
 
 					// If cached data already exists, populate in result
 					const cachedResponse = getCachedResponse( { path, method } );
 					if ( cachedResponse ) {
 						const dataKey = this.getResponseDataKey( method );
 						result[ propName ][ dataKey ] = cachedResponse.body;
+
+						// Make pending flags as explicitly `false` for cached requests, they aren't async
+						result[ propName ][ pendingKey ] = false;
 					}
 
 					// Track path for future map skipping
