@@ -1,3 +1,18 @@
+
+.editor-block-list__block-clone {
+	position: fixed;
+	top: 0;
+	left: -1000px;
+	padding: 20px;
+	background: transparent;
+
+	> div {
+		background-color: white;
+		opacity: 1;
+		box-shadow: $shadow-popover; // 0 0 30px 0 $dark-gray-500;
+	}
+}
+
 body.dragging {
 	cursor: move;/* Fallback for IE/Edge < 14 */
 	cursor: grabbing;

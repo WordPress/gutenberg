@@ -36,6 +36,10 @@
 	&.hide > * {
 		visibility: hidden;
 	}
+
+	&.dragged {
+		background-color: white;
+	}
 }
 
 .editor-block-list__block {
@@ -46,10 +50,6 @@
 	@include break-small {
 		// The block mover needs to stay inside the block to allow clicks when hovering the block
 		padding: $block-padding $block-padding + $block-mover-padding-visible;
-	}
-
-	&.dragged {
-		background-color: white;
 	}
 
 	&:before {
