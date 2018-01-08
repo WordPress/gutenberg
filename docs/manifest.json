@@ -42,6 +42,12 @@
 		"parent": "extensibility"
 	},
 	{
+		"title": "Theme Support",
+		"slug": "theme-support",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/themes.md",
+		"parent": "extensibility"
+	},
+	{
 		"title": "Creating Block Types",
 		"slug": "blocks",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/blocks.md",
@@ -82,12 +88,6 @@
 		"slug": "reference",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/reference.md",
 		"parent": null
-	},
-	{
-		"title": "Theme Support",
-		"slug": "theme-support",
-		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/themes.md",
-		"parent": "reference"
 	},
 	{
 		"title": "Glossary",
