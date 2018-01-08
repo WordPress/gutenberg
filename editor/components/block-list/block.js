@@ -184,7 +184,6 @@ export class BlockListBlock extends Component {
 		// Remove and cancel deselect focus handlers
 		document.removeEventListener( 'focus', this.triggerDeselect, true );
 		document.removeEventListener( 'deselect', this.debouncedDeselect );
-		this.wrapperNode.removeEventListener( 'focusin', this.cancelDeselect );
 		this.debouncedDeselect.cancel();
 	}
 
@@ -216,12 +215,6 @@ export class BlockListBlock extends Component {
 		const bindFn = isListening ? 'addEventListener' : 'removeEventListener';
 		document[ bindFn ]( 'focus', this.triggerDeselect, true );
 		document[ bindFn ]( 'deselect', this.debouncedDeselect );
-
-		// Bind to the DOM reference of the rendered wrapper node, since React
-		// synthetic event binding and focus normalization conflicts with our
-		// own document event binding and therefore canceling occurs before the
-		// deselect event is triggered (out of expected order).
-		this.wrapperNode[ bindFn ]( 'focusin', this.cancelDeselect );
 	}
 
 	setAttributes( attributes ) {
@@ -258,9 +251,14 @@ export class BlockListBlock extends Component {
 	 *
 	 * @see https://developer.mozilla.org/en-US/docs/Web/Events/focus
 	 *
-	 * @param  {FocusEvent} event Focus event
+	 * @param {FocusEvent} event Focus event
 	 */
 	triggerDeselect( event ) {
+		// Only deselect when focusing outside current node
+		if ( this.wrapperNode.contains( event.target ) ) {
+			return;
+		}
+
 		const deselectEvent = new window.Event( 'deselect', {
 			bubbles: true,
 			cancelable: true,
@@ -271,10 +269,20 @@ export class BlockListBlock extends Component {
 
 	/**
 	 * Cancels the debounced deselect. Debouncing allows focus within the block
-	 * wrapper to prevent deselect from occurring.
+	 * wrapper to prevent deselect from occurring. Stops propagation to work
+	 * around unreliable ordering of document-level event handlers.
+	 *
+	 * @param {Event} event Focus event
 	 */
-	cancelDeselect() {
+	cancelDeselect( event ) {
 		this.debouncedDeselect.cancel();
+
+		// Stop propagation for synthetic events, necessary because the order
+		// of the document-level focus deselect handler occurs after React's
+		// internal event hub's capture.
+		//
+		// See: https://github.com/facebook/react/issues/285
+		event.nativeEvent.stopImmediatePropagation();
 	}
 
 	/**
@@ -471,6 +479,7 @@ export class BlockListBlock extends Component {
 				data-type={ block.name }
 				onTouchStart={ this.onTouchStart }
 				onClick={ this.onClick }
+				onFocus={ this.cancelDeselect }
 				{ ...wrapperProps }
 			>
 				<BlockDropZone index={ order } />
