@@ -18,9 +18,15 @@ import { clearSelectedBlock } from '../../../store/actions';
  * several cases in which focus transitions outside the DOM space of a block,
  * but is not truly outside, e.g. managing toolbar or inspector controls.
  *
- * @param  {Event} event DOM event
+ * @param {Event} event DOM event
  */
 function preventChromeDeselect( event ) {
+	// Since we're only concerned with the focus deselect, ensure that other
+	// types of deselect are unhandled.
+	if ( ! event || event.type !== 'deselect' ) {
+		return;
+	}
+
 	const { target } = event;
 	const isOutside = target && ! target.closest( [
 		'.editor-header',
