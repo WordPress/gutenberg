@@ -261,9 +261,10 @@ add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_type_capabilities
  * @return WP_REST_Response Response containing the sample_permalink, where appropriate.
  */
 function gutenberg_add_sample_permalink_to_draft_posts( $response, $post, $request ) {
-	if ( 'draft' !== $response->data['status'] ) {
+	if ( empty( $response->data['status'] ) || 'draft' !== $response->data['status'] ) {
 		return $response;
 	}
+
 	if ( 'edit' !== $request['context'] ) {
 		return $response;
 	}
