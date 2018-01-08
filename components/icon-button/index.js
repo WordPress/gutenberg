@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isString } from 'lodash';
+import { isString, isArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -24,7 +24,15 @@ class IconButton extends Component {
 		const { icon, children, label, className, tooltip, focus, ...additionalProps } = this.props;
 		const classes = classnames( 'components-icon-button', className );
 		const tooltipText = tooltip || label;
-		const showTooltip = !! tooltip || ( label && ! children && false !== tooltip );
+
+		// Should show the tooltip if an explicit tooltip is passed
+		// or if there's a label and the children are empty and the tooltip is not explicitely disabled
+		const showTooltip = !! tooltip ||
+			(
+				label &&
+				( ! children || ( isArray( children ) && ! children.length ) ) &&
+				false !== tooltip
+			);
 
 		let element = (
 			<Button { ...additionalProps } aria-label={ label } className={ classes } focus={ focus }>
