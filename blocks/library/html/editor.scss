@@ -1,9 +1,9 @@
-.wp-block-html.blocks-plain-text {
-	font-family: $editor-html-font;
-	font-size: $text-editor-font-size;
-	color: $dark-gray-800;
-	padding: .8em 1.6em;
-	overflow-x: auto !important;
-	border: 1px solid $light-gray-500;
-	border-radius: 4px;
+.gutenberg .wp-block-html {
+	iframe {
+		display: block;
+	}
+
+	.CodeMirror {
+		margin: -$block-padding;
+	}
 }

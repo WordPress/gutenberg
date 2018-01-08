@@ -1,9 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`core/html block edit matches snapshot 1`] = `
-<textarea
-  aria-label="HTML"
-  class="blocks-plain-text wp-block-html"
-  rows="1"
-/>
+<div
+  class="wp-block-html"
+>
+  <textarea />
+</div>
 `;

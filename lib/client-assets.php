@@ -899,6 +899,9 @@ JS;
 		'post' => $post_to_edit['id'],
 	) );
 	wp_enqueue_editor();
+	wp_enqueue_code_editor( array(
+		'type' => 'text/html',
+	) );
 
 	/**
 	 * Styles
