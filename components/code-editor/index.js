@@ -17,11 +17,20 @@ class CodeEditor extends Component {
 
 		this.editor.on( 'blur', this.onBlur );
 		this.editor.on( 'keyHandled', this.onKeyHandled );
+
+		// TODO: We shouldn't need this RAF...
+		window.requestAnimationFrame( () => {
+			this.updateFocus();
+		} );
 	}
 
-	componentWillReceiveProps( { value } ) {
-		if ( this.props.value !== value && this.editor.getValue() !== value ) {
-			this.editor.setValue( value );
+	componentDidUpdate( prevProps ) {
+		if ( this.props.value !== prevProps.value && this.editor.getValue() !== this.props.value ) {
+			this.editor.setValue( this.props.value );
+		}
+
+		if ( this.props.focus !== prevProps.focus ) {
+			this.updateFocus();
 		}
 	}
 
@@ -44,6 +53,12 @@ class CodeEditor extends Component {
 		// behave like a textarea, e.g. pressing CMD+UP moves the cursor to the top of
 		// the editor, rather than to a different element.
 		event.stopImmediatePropagation();
+	}
+
+	updateFocus() {
+		if ( this.props.focus && ! this.editor.hasFocus() ) {
+			this.editor.focus();
+		}
 	}
 
 	render() {

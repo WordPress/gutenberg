@@ -33,6 +33,13 @@ The source code to load into the code editor.
 - Type: `string`
 - Required: Yes
 
+### focus
+
+Whether or not the code editor should be focused.
+
+- Type: `boolean`
+- Required: No
+
 ### onChange
 
 The function called when the user has modified the source code via the

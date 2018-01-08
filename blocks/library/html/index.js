@@ -71,7 +71,11 @@ export const settings = {
 			{ preview ? (
 				<SandBox html={ attributes.content } />
 			) : (
-				<CodeEditor value={ attributes.content } onChange={ content => setAttributes( { content } ) } />
+				<CodeEditor
+					value={ attributes.content }
+					focus={ !! focus }
+					onChange={ content => setAttributes( { content } ) }
+				/>
 			) }
 		</div>
 	) ),
