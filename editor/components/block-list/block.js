@@ -182,8 +182,8 @@ export class BlockListBlock extends Component {
 		this.removeStopTypingListener();
 
 		// Remove and cancel deselect focus handlers
-		document.removeEventListener( 'focus', this.triggerDeselect, true );
-		document.removeEventListener( 'deselect', this.debouncedDeselect );
+		window.removeEventListener( 'focus', this.triggerDeselect, true );
+		window.removeEventListener( 'deselect', this.debouncedDeselect );
 		this.debouncedDeselect.cancel();
 	}
 
@@ -213,8 +213,8 @@ export class BlockListBlock extends Component {
 		const isListening = isSelected || isFirstMultiSelected;
 
 		const bindFn = isListening ? 'addEventListener' : 'removeEventListener';
-		document[ bindFn ]( 'focus', this.triggerDeselect, true );
-		document[ bindFn ]( 'deselect', this.debouncedDeselect );
+		window[ bindFn ]( 'focus', this.triggerDeselect, true );
+		window[ bindFn ]( 'deselect', this.debouncedDeselect );
 	}
 
 	setAttributes( attributes ) {
@@ -254,8 +254,17 @@ export class BlockListBlock extends Component {
 	 * @param {FocusEvent} event Focus event
 	 */
 	triggerDeselect( event ) {
+		let { target } = event;
+
+		// We bind events to the global as an interoperability with React's
+		// synthetic events, but since most use of the target will assume an
+		// element node, emulate as an element for dispatch.
+		if ( target === window ) {
+			target = document.body;
+		}
+
 		// Only deselect when focusing outside current node
-		if ( this.wrapperNode.contains( event.target ) ) {
+		if ( this.wrapperNode.contains( target ) ) {
 			return;
 		}
 
@@ -264,25 +273,17 @@ export class BlockListBlock extends Component {
 			cancelable: true,
 		} );
 
-		event.target.dispatchEvent( deselectEvent );
+		target.dispatchEvent( deselectEvent );
 	}
 
 	/**
 	 * Cancels the debounced deselect. Debouncing allows focus within the block
-	 * wrapper to prevent deselect from occurring. Stops propagation to work
-	 * around unreliable ordering of document-level event handlers.
+	 * wrapper to prevent deselect from occurring.
 	 *
 	 * @param {Event} event Focus event
 	 */
-	cancelDeselect( event ) {
+	cancelDeselect() {
 		this.debouncedDeselect.cancel();
-
-		// Stop propagation for synthetic events, necessary because the order
-		// of the document-level focus deselect handler occurs after React's
-		// internal event hub's capture.
-		//
-		// See: https://github.com/facebook/react/issues/285
-		event.nativeEvent.stopImmediatePropagation();
 	}
 
 	/**
