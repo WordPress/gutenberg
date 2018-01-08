@@ -13,6 +13,7 @@ fi
 # failed `stat` calls from `filemtime()`.
 npm install || exit 1
 npm run build || exit 1
+composer install
 # Make sure phpegjs parser is up to date
 node bin/create-php-parser.js || exit 1
 if ! git diff --quiet --exit-code lib/parser.php; then
