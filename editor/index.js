@@ -20,6 +20,7 @@ import { initializeMetaBoxState } from './store/actions';
 
 export * from './components';
 import store from './store'; // Registers the state tree
+import shimMediaEditor from './edit-post/shim-media-editor';
 
 // Configure moment globally
 moment.locale( dateSettings.l10n.locale );
@@ -83,6 +84,7 @@ export function recreateEditorInstance( target, settings ) {
 export function createEditorInstance( id, post, settings ) {
 	const target = document.getElementById( id );
 	const reboot = recreateEditorInstance.bind( null, target, settings );
+	shimMediaEditor( store );
 
 	render(
 		<EditorProvider settings={ settings } post={ post }>

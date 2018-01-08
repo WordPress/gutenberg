@@ -14,6 +14,7 @@ import { Component, findDOMNode } from '@wordpress/element';
 import './style.scss';
 import { BlockList, PostTitle, WritingFlow, DefaultBlockAppender, EditorGlobalKeyboardShortcuts } from '../../../components';
 import VisualEditorInserter from './inserter';
+import MediaButtons from '../../media-buttons';
 import { hasFixedToolbar } from '../../../store/selectors';
 import { clearSelectedBlock } from '../../../store/actions';
 
@@ -54,6 +55,7 @@ class VisualEditor extends Component {
 				ref={ this.bindContainer }
 			>
 				<EditorGlobalKeyboardShortcuts />
+				<MediaButtons />
 				<WritingFlow>
 					<PostTitle />
 					<BlockList
