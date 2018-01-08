@@ -29,7 +29,7 @@
 
 	.wp-block-image.is-focused & {
 		display: block;
-		z-index: 1;
+		z-index: z-index( '.wp-block-image__resize-handlers' );
 	}
 }
 
