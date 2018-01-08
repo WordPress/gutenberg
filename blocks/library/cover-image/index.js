@@ -6,10 +6,9 @@ import { isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Placeholder, Toolbar, Dashicon, DropZone } from '@wordpress/components';
+import { Dashicon, Toolbar } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import classnames from 'classnames';
-import { mediaUpload } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -19,6 +18,7 @@ import './style.scss';
 import { registerBlockType, createBlock } from '../../api';
 import Editable from '../../editable';
 import MediaUploadButton from '../../media-upload-button';
+import ImagePlaceHolder from '../../image-placeholder';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import InspectorControls from '../../inspector-controls';
@@ -95,7 +95,7 @@ registerBlockType( 'core/cover-image', {
 		const onSelectImage = ( media ) => setAttributes( { url: media.url, id: media.id } );
 		const toggleParallax = () => setAttributes( { hasParallax: ! hasParallax } );
 		const setDimRatio = ( ratio ) => setAttributes( { dimRatio: ratio } );
-		const dropFiles = ( files ) => mediaUpload( files, setAttributes );
+
 		const style = url ?
 			{ backgroundImage: `url(${ url })` } :
 			undefined;
@@ -150,7 +150,6 @@ registerBlockType( 'core/cover-image', {
 		];
 
 		if ( ! url ) {
-			const uploadButtonProps = { isLarge: true };
 			const hasTitle = ! isEmpty( title );
 			const icon = hasTitle ? undefined : 'format-image';
 			const label = hasTitle ? (
@@ -166,23 +165,9 @@ registerBlockType( 'core/cover-image', {
 
 			return [
 				controls,
-				<Placeholder
-					key="placeholder"
-					instructions={ __( 'Drag image here or add from media library' ) }
-					icon={ icon }
-					label={ label }
-					className={ className }>
-					<DropZone
-						onFilesDrop={ dropFiles }
-					/>
-					<MediaUploadButton
-						buttonProps={ uploadButtonProps }
-						onSelect={ onSelectImage }
-						type="image"
-					>
-						{ __( 'Add from Media Library' ) }
-					</MediaUploadButton>
-				</Placeholder>,
+				<ImagePlaceHolder key="cover-image-placeholder"
+					{ ...{ className, icon, label, setAttributes, onSelectImage } }
+				/>,
 			];
 		}
 
