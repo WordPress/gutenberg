@@ -53,18 +53,20 @@ class UrlInputButton extends Component {
 					<form
 						className="blocks-format-toolbar__link-modal"
 						onSubmit={ this.submitLink }>
-						<IconButton
-							className="blocks-url-input__back"
-							icon="arrow-left-alt"
-							label={ __( 'Close' ) }
-							onClick={ this.toggle }
-						/>
-						<UrlInput value={ url || '' } onChange={ onChange } data-test="UrlInput" />
-						<IconButton
-							icon="editor-break"
-							label={ __( 'Submit' ) }
-							type="submit"
-						/>
+						<div className="blocks-format-toolbar__link-modal-line">
+							<IconButton
+								className="blocks-url-input__back"
+								icon="arrow-left-alt"
+								label={ __( 'Close' ) }
+								onClick={ this.toggle }
+							/>
+							<UrlInput value={ url || '' } onChange={ onChange } data-test="UrlInput" />
+							<IconButton
+								icon="editor-break"
+								label={ __( 'Submit' ) }
+								type="submit"
+							/>
+						</div>
 					</form>
 				}
 			</div>

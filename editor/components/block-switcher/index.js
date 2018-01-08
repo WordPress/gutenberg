@@ -46,6 +46,7 @@ function BlockSwitcher( { blocks, onTransform, isLocked } ) {
 						onToggle();
 					}
 				};
+				const label = __( 'Change block type' );
 
 				return (
 					<Toolbar>
@@ -55,7 +56,8 @@ function BlockSwitcher( { blocks, onTransform, isLocked } ) {
 							onClick={ onToggle }
 							aria-haspopup="true"
 							aria-expanded={ isOpen }
-							label={ __( 'Change block type' ) }
+							label={ label }
+							tooltip={ label }
 							onKeyDown={ openOnArrowDown }
 						>
 							<Dashicon icon="arrow-down" />

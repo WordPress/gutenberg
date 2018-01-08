@@ -2,75 +2,89 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { compose } from '@wordpress/element';
-import { withAPIData, PanelBody, IconButton } from '@wordpress/components';
+import { compose, Component } from '@wordpress/element';
+import { withAPIData, IconButton, Spinner } from '@wordpress/components';
 
 /**
  * Internal Dependencies
  */
 import './style.scss';
-import PostVisibility from '../post-visibility';
-import PostVisibilityLabel from '../post-visibility/label';
-import PostSchedule from '../post-schedule';
-import PostScheduleLabel from '../post-schedule/label';
 import PostPublishButton from '../post-publish-button';
-import { getCurrentPostType } from '../../store/selectors';
+import PostPublishPanelPrepublish from './prepublish';
+import PostPublishPanelPostpublish from './postpublish';
+import { getCurrentPostType, isCurrentPostPublished, isSavingPost } from '../../store/selectors';
 
-function PostPublishPanel( { onClose, user } ) {
-	const canPublish = user.data && user.data.capabilities.publish_posts;
+class PostPublishPanel extends Component {
+	constructor() {
+		super( ...arguments );
+		this.onPublish = this.onPublish.bind( this );
+		this.state = {
+			loading: false,
+			published: false,
+		};
+	}
 
-	return (
-		<div className="editor-post-publish-panel">
-			<div className="editor-post-publish-panel__header">
-				<div className="editor-post-publish-panel__header-publish-button">
-					<PostPublishButton onSubmit={ onClose } />
+	componentWillReceiveProps( newProps ) {
+		if (
+			newProps.isPublished &&
+			! this.state.published &&
+			! newProps.isSaving
+		) {
+			this.setState( {
+				published: true,
+				loading: false,
+			} );
+		}
+	}
+
+	onPublish() {
+		this.setState( { loading: true } );
+	}
+
+	render() {
+		const { onClose, user } = this.props;
+		const { loading, published } = this.state;
+		const canPublish = get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );
+
+		return (
+			<div className="editor-post-publish-panel">
+				<div className="editor-post-publish-panel__header">
+					{ ! published && (
+						<div className="editor-post-publish-panel__header-publish-button">
+							<PostPublishButton onSubmit={ this.onPublish } />
+						</div>
+					) }
+					{ published && (
+						<div className="editor-post-publish-panel__header-published">{ __( 'Published' ) }</div>
+					) }
+					<IconButton
+						onClick={ onClose }
+						icon="no-alt"
+						label={ __( 'Close Publish Panel' ) }
+					/>
 				</div>
-				<IconButton
-					onClick={ onClose }
-					icon="no-alt"
-					label={ __( 'Close Publish Panel' ) }
-				/>
+				<div className="editor-post-publish-panel__content">
+					{ canPublish && ! loading && ! published && <PostPublishPanelPrepublish /> }
+					{ loading && ! published && <Spinner /> }
+					{ published && <PostPublishPanelPostpublish /> }
+				</div>
 			</div>
-
-			<div className="editor-post-publish-panel__content">
-				<div><strong>{ __( 'Are you ready to publish?' ) }</strong></div>
-				<p>{ __( 'Here, you can do a last-minute check up of your settings below, before you publish.' ) }</p>
-				{ ! canPublish &&
-					<div>
-						<span>{ __( 'Visibility' ) }</span>
-						<span><PostVisibilityLabel /></span>
-					</div>
-				}
-				{ canPublish &&
-					<PanelBody initialOpen={ false } title={ [
-						__( 'Visibility: ' ),
-						<span className="editor-post-publish-panel__link" key="label"><PostVisibilityLabel /></span>,
-					] }>
-						<PostVisibility />
-					</PanelBody>
-				}
-				{ canPublish &&
-					<PanelBody initialOpen={ false } title={ [
-						__( 'Publish: ' ),
-						<span className="editor-post-publish-panel__link" key="label"><PostScheduleLabel /></span>,
-					] }>
-						<PostSchedule />
-					</PanelBody>
-				}
-			</div>
-		</div>
-	);
+		);
+	}
 }
 
 const applyConnect = connect(
 	( state ) => {
 		return {
 			postType: getCurrentPostType( state ),
+			isPublished: isCurrentPostPublished( state ),
+			isSaving: isSavingPost( state ),
 		};
 	},
 );
