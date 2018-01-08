@@ -334,15 +334,15 @@ export function stopTyping() {
 /**
  * Returns an action object used in signalling that the user toggled the sidebar
  *
- * @param  {String} sidebar  Name of the sidebar to toggle (desktop, mobile or publish)
- * @param  {Boolean?} force  Force a sidebar state
- * @return {Object}          Action object
+ * @param  {String}   sidebar      Name of the sidebar to toggle (desktop, mobile or publish)
+ * @param  {Boolean?} forcedValue  Force a sidebar state
+ * @return {Object}                Action object
  */
-export function toggleSidebar( sidebar, force ) {
+export function toggleSidebar( sidebar, forcedValue ) {
 	return {
 		type: 'TOGGLE_SIDEBAR',
 		sidebar,
-		force,
+		forcedValue,
 	};
 }
 

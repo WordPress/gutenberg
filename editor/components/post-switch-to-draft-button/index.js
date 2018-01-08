@@ -12,21 +12,20 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import './style.scss';
 import { editPost, savePost } from '../../store/actions';
 import {
 	isSavingPost,
 	isCurrentPostPublished,
 } from '../../store/selectors';
 
-function PostSwitchToDraftButton( { isSaving, isPublished, onClick } ) {
+function PostSwitchToDraftButton( { className, isSaving, isPublished, onClick } ) {
 	if ( ! isPublished ) {
 		return null;
 	}
 
 	return (
 		<Button
-			className="editor-post-publish-dropdown__switch-to-draft"
+			className={ className }
 			isLarge
 			onClick={ onClick }
 			disabled={ isSaving }

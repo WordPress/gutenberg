@@ -5,7 +5,7 @@
   "main": "build/app.js",
   "repository": "git+https://github.com/WordPress/gutenberg.git",
   "author": "The WordPress Contributors",
-  "license": "GPL-2.0+",
+  "license": "GPL-2.0-or-later",
   "keywords": [
     "WordPress",
     "editor"
@@ -85,6 +85,7 @@
     "gettext-parser": "1.3.0",
     "jest": "22.0.4",
     "jest-enzyme": "4.0.2",
+    "jest-matcher-utils": "22.0.3",
     "mocha": "4.1.0",
     "node-sass": "4.7.2",
     "pegjs": "0.10.0",
