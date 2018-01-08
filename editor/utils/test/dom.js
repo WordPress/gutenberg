@@ -81,14 +81,14 @@ describe( 'DOM', () => {
 			const input = document.createElement( 'input' );
 			input.value = 'value';
 			placeCaretAtHorizontalEdge( input, true );
-			expect( isHorizontalEdge( input, false ) ).toBe( true );
+			expect( isHorizontalEdge( input, true ) ).toBe( true );
 		} );
 
 		it( 'should place caret at the end of the input', () => {
 			const input = document.createElement( 'input' );
 			input.value = 'value';
 			placeCaretAtHorizontalEdge( input, false );
-			expect( isHorizontalEdge( input, true ) ).toBe( true );
+			expect( isHorizontalEdge( input, false ) ).toBe( true );
 		} );
 	} );
 

@@ -34,6 +34,9 @@ import TinyMCE from './tinymce';
 import { pickAriaProps } from './aria';
 import patterns from './patterns';
 import { EVENTS } from './constants';
+import {
+	isHorizontalEdge,
+} from '../../editor/utils/dom';
 
 const { BACKSPACE, DELETE, ENTER } = keycodes;
 
@@ -462,21 +465,7 @@ export default class Editable extends Component {
 	 * @returns {boolean} Whether or not the selection is at the start of the editor.
 	 */
 	isStartOfEditor() {
-		const range = this.editor.selection.getRng();
-		if ( range.startOffset !== 0 || ! range.collapsed ) {
-			return false;
-		}
-		const start = range.startContainer;
-		const body = this.editor.getBody();
-		let element = start;
-		while ( element !== body ) {
-			const child = element;
-			element = element.parentNode;
-			if ( element.firstChild !== child ) {
-				return false;
-			}
-		}
-		return true;
+		return isHorizontalEdge( this.editor.getBody(), true, true );
 	}
 
 	/**
@@ -485,21 +474,7 @@ export default class Editable extends Component {
 	 * @returns {boolean} Whether or not the selection is at the end of the editor.
 	 */
 	isEndOfEditor() {
-		const range = this.editor.selection.getRng();
-		if ( range.endOffset !== range.endContainer.textContent.length || ! range.collapsed ) {
-			return false;
-		}
-		const start = range.endContainer;
-		const body = this.editor.getBody();
-		let element = start;
-		while ( element !== body ) {
-			const child = element;
-			element = element.parentNode;
-			if ( element.lastChild !== child ) {
-				return false;
-			}
-		}
-		return true;
+		return isHorizontalEdge( this.editor.getBody(), false, true );
 	}
 
 	/**

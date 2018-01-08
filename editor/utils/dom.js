@@ -7,7 +7,60 @@ import { includes } from 'lodash';
  * Browser dependencies
  */
 const { getComputedStyle } = window;
-const { TEXT_NODE } = window.Node;
+
+const { ELEMENT_NODE, TEXT_NODE } = window.Node;
+
+// Note: the filtered cursor positions don't consider more than one <br> yet.
+
+// Returns an offset which ignores the last br if applicable
+function getFilteredCursorEnd( node ) {
+	const len = node.childNodes.length;
+	if ( len > 0 ) {
+		const last = node.childNodes[ len - 1 ];
+		const hasBrLast = last.nodeType === ELEMENT_NODE && last.nodeName.toLowerCase() === 'br';
+		return hasBrLast ? len - 1 : len;
+	}
+
+	return len;
+}
+
+// Returns an offset which ignores the first br if possible
+function getFilteredCursorStart( node ) {
+	const first = node.firstChild;
+	if ( ! first ) {
+		return 0;
+	}
+	const hasBrFirst = first.nodeType === ELEMENT_NODE && first.nodeName.toLowerCase() === 'br';
+	return hasBrFirst ? 1 : 0;
+}
+
+/**
+ * Check whether the offset is at the start of the node
+ *
+ * @param {Element} node    the DOM element
+ * @param {Integer} offset  the offset
+ * @return {Boolean}        whether or not the offset is at the first cursor position in node
+ */
+function isAtCursorStart( node, offset ) {
+	return offset === 0 || offset === getFilteredCursorStart( node );
+}
+
+/**
+ * Check whether the offset is at the end of the node
+ *
+ * @param {Element} node    the DOM element
+ * @param {Integer} offset  the offset
+ * @return {Boolean}        whether or not the offset is at the last cursor position in node
+ */
+function isAtCursorEnd( node, offset ) {
+	const nodeEnd = node.nodeType === TEXT_NODE ? node.nodeValue.length : node.childNodes.length;
+	return offset === nodeEnd || offset === getFilteredCursorEnd( node );
+}
+
+function isEdgeChild( isReverse, parent, child ) {
+	const candidate = isReverse ? parent.firstChild : parent.lastChild;
+	return candidate === child;
+}
 
 /**
  * Check whether the caret is horizontally at the edge of the container.
@@ -23,11 +76,8 @@ export function isHorizontalEdge( container, isReverse, collapseRanges = false )
 			return false;
 		}
 
-		if ( isReverse ) {
-			return container.selectionStart === 0;
-		}
-
-		return container.value.length === container.selectionStart;
+		const edge = isReverse ? 0 : container.value.length;
+		return container.selectionStart === edge;
 	}
 
 	if ( ! container.isContentEditable ) {
@@ -45,24 +95,24 @@ export function isHorizontalEdge( container, isReverse, collapseRanges = false )
 		return false;
 	}
 
-	const position = isReverse ? 'start' : 'end';
-	const order = isReverse ? 'first' : 'last';
-	const offset = range[ `${ position }Offset` ];
-
 	let node = range.startContainer;
+	const offset = range.startOffset;
 
-	if ( isReverse && offset !== 0 ) {
+	// If we are not at the start of our node (any node in container) then we are not at left edge.
+	if ( isReverse && ! isAtCursorStart( node, offset ) ) {
 		return false;
 	}
 
-	if ( ! isReverse && offset !== node.textContent.length ) {
+	// If we are not at the end of of our node (any node in container) then we are not at right edge
+	if ( ! isReverse && ! isAtCursorEnd( node, offset ) ) {
 		return false;
 	}
 
+	// Traverse up the tree, exiting early if we are ever not at the edge child
 	while ( node !== container ) {
 		const parentNode = node.parentNode;
 
-		if ( parentNode[ `${ order }Child` ] !== node ) {
+		if ( ! isEdgeChild( isReverse, parentNode, node ) ) {
 			return false;
 		}
 
@@ -163,13 +213,9 @@ export function placeCaretAtHorizontalEdge( container, isReverse ) {
 
 	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
 		container.focus();
-		if ( isReverse ) {
-			container.selectionStart = container.value.length;
-			container.selectionEnd = container.value.length;
-		} else {
-			container.selectionStart = 0;
-			container.selectionEnd = 0;
-		}
+		const offset = isReverse ? 0 : container.value.length;
+		container.selectionStart = offset;
+		container.selectionEnd = offset;
 		return;
 	}
 
