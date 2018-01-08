@@ -852,7 +852,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		wp_add_inline_script(
 			'wp-editor',
 			'console.warn( "' .
-				__( 'Adding theme support using the `gutenberg` array is deprecated. See https://wordpress.org/gutenberg/handbook/reference/theme-support/ for details.', 'gutenberg' ) .
+				__( 'Adding theme support using the `gutenberg` array is deprecated. See https://wordpress.org/gutenberg/handbook/extensibility/theme-support/ for details.', 'gutenberg' ) .
 			'");'
 		);
 	}
