@@ -3,8 +3,12 @@
 cd "$(dirname "$0")/../"
 
 export PATH="$HOME/.composer/vendor/bin:$PATH"
-bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
-source bin/install-php-phpunit.sh
+if [ ${DOCKER} = "true" ]; then
+	bin/setup-local-env.sh
+else
+	bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
+	source bin/install-php-phpunit.sh
+fi
 # Run the build because otherwise there will be a bunch of warnings about
 # failed `stat` calls from `filemtime()`.
 npm install || exit 1
@@ -24,5 +28,10 @@ phpunit --version
 # Check parser syntax
 php lib/parser.php || exit 1
 # Run PHPUnit tests
-phpunit || exit 1
-WP_MULTISITE=1 phpunit || exit 1
+if [ ${DOCKER} = "true" ]; then
+	npm run test-php || exit 1
+	npm run test-unit-php-multisite || exit 1
+else
+	phpunit || exit 1
+	WP_MULTISITE=1 phpunit || exit 1
+fi

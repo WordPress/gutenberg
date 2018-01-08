@@ -28,11 +28,9 @@ jobs:
         - npm run ci || exit 1
 
     - stage: test
-      env: WP_VERSION=latest
+      env: WP_VERSION=latest DOCKER=true
       script:
-        - composer install || exit 1;
-        - ./bin/setup-local-env.sh || exit 1
-        - npm run test-php
+        - ./bin/run-wp-unit-tests.sh
 
     - stage: test
       php: 5.6
