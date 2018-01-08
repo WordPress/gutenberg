@@ -154,6 +154,7 @@ export default withAPIData( ( props ) => {
 		order,
 		orderBy,
 		per_page: postsToShow,
+		_fields: [ 'date_gmt', 'link', 'title' ],
 	}, value => ! isUndefined( value ) ) );
 	return {
 		latestPosts: `/wp/v2/posts?${ queryString }`,
