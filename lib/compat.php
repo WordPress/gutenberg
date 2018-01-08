@@ -286,9 +286,10 @@ add_filter( 'rest_request_after_callbacks', 'gutenberg_filter_oembed_result', 10
  * @return WP_REST_Response Response containing the sample_permalink, where appropriate.
  */
 function gutenberg_add_sample_permalink_to_draft_posts( $response, $post, $request ) {
-	if ( 'draft' !== $response->data['status'] ) {
+	if ( empty( $response->data['status'] ) || 'draft' !== $response->data['status'] ) {
 		return $response;
 	}
+
 	if ( 'edit' !== $request['context'] ) {
 		return $response;
 	}
