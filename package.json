@@ -1,11 +1,16 @@
 {
   "license": "GPL-2.0-or-later",
+  "engines": {
+    "node": ">=8.0.0",
+    "npm": ">=5.0.0"
+  },
   "devDependencies": {
     "babel-core": "^6.25.0",
     "babel-loader": "^7.1.1",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "babel-preset-env": "^1.5.2",
     "chalk": "^2.0.1",
+    "check-node-version": "^3.1.1",
     "codecov": "^2.2.0",
     "glob": "^7.1.2",
     "jest": "^22.0.3",
@@ -25,7 +30,7 @@
   "scripts": {
     "build-clean": "rimraf ./packages/*/build ./packages/*/build-module",
     "build": "node ./scripts/build.js",
-    "postinstall": "lerna bootstrap && npm run build",
+    "postinstall": "lerna bootstrap && check-node-version --package && npm run build",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "test:coverage-ci": "jest --coverage && codecov",
