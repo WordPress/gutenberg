@@ -40,7 +40,7 @@ Check out the <a href="https://github.com/WordPress/gutenberg/blob/master/docs/f
 
 ## Compatibility
 
-Posts are backwards compatible, and shortcodes will still work. We are continuously exploring how highly-tailored meta-boxes can be accommodated, and are looking at solutions ranging from a plugin to disable Gutenberg to automatically detecting whether to load Gutenberg or not. While we want to make sure the new editing experience from writing to publishing is user-friendly, we’re committed to finding  a good solution for highly-tailored existing sites.
+Posts are backwards compatible, and shortcodes will still work. We are continuously exploring how highly-tailored meta boxes can be accommodated, and are looking at solutions ranging from a plugin to disable Gutenberg to automatically detecting whether to load Gutenberg or not. While we want to make sure the new editing experience from writing to publishing is user-friendly, we’re committed to finding  a good solution for highly-tailored existing sites.
 
 ## The stages of Gutenberg
 
