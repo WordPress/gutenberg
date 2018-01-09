@@ -1,6 +1,9 @@
 .gutenberg .wp-block-html {
 	iframe {
 		display: block;
+
+		// Disable pointer events so that we can click on the block to select it
+		pointer-events: none;
 	}
 
 	.CodeMirror {
