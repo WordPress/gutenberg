@@ -30,6 +30,12 @@
 		"parent": "block-api"
 	},
 	{
+		"title": "Static and Dynamic",
+		"slug": "static-and-dynamic",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/block-static-dynamic.md",
+		"parent": "block-api"
+	},
+	{
 		"title": "Extensibility",
 		"slug": "extensibility",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/extensibility.md",
