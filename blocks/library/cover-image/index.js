@@ -103,6 +103,7 @@ registerBlockType( 'core/cover-image', {
 			}
 		);
 
+		const editButtonLabel = __( 'Edit image' );
 		const controls = focus && [
 			<BlockControls key="controls">
 				<BlockAlignmentToolbar
@@ -114,11 +115,12 @@ registerBlockType( 'core/cover-image', {
 					<MediaUploadButton
 						buttonProps={ {
 							className: 'components-icon-button components-toolbar__control',
-							'aria-label': __( 'Edit image' ),
+							'aria-label': editButtonLabel,
 						} }
 						onSelect={ onSelectImage }
 						type="image"
 						value={ id }
+						tooltip={ editButtonLabel }
 					>
 						<Dashicon icon="edit" />
 					</MediaUploadButton>

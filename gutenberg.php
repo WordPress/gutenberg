@@ -480,8 +480,6 @@ function gutenberg_replace_default_add_new_button() {
 			<?php endif; ?>
 			position: relative;
 			vertical-align: top;
-			-webkit-font-smoothing: antialiased;
-			-moz-osx-font-smoothing: grayscale;
 			text-decoration: none !important;
 			padding: 4px 5px 4px 3px;
 		}

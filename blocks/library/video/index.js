@@ -6,7 +6,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Placeholder, Toolbar, Dashicon, Button } from '@wordpress/components';
+import { Placeholder, Toolbar, IconButton, Button } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 
 /**
@@ -100,13 +100,12 @@ registerBlockType( 'core/video', {
 						onChange={ updateAlignment }
 					/>
 					<Toolbar>
-						<Button
+						<IconButton
 							className="components-icon-button components-toolbar__control"
-							aria-label={ __( 'Edit video' ) }
+							label={ __( 'Edit video' ) }
 							onClick={ switchToEditing }
-						>
-							<Dashicon icon="edit" />
-						</Button>
+							icon="edit"
+						/>
 					</Toolbar>
 				</BlockControls>
 			);
