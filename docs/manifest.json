@@ -12,22 +12,40 @@
 		"parent": null
 	},
 	{
-		"title": "Extensibility",
-		"slug": "extensibility",
-		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/extensibility.md",
-		"parent": null
-	},
-	{
 		"title": "Block API",
 		"slug": "block-api",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/block-api.md",
 		"parent": null
 	},
 	{
+		"title": "Attributes",
+		"slug": "attributes",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/attributes.md",
+		"parent": "block-api"
+	},
+	{
 		"title": "Edit and Save",
 		"slug": "block-edit-save",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/block-edit-save.md",
+		"parent": "block-api"
+	},
+	{
+		"title": "Extensibility",
+		"slug": "extensibility",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/extensibility.md",
 		"parent": null
+	},
+	{
+		"title": "Meta Boxes",
+		"slug": "meta-box",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/meta-box.md",
+		"parent": "extensibility"
+	},
+	{
+		"title": "Theme Support",
+		"slug": "theme-support",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/themes.md",
+		"parent": "extensibility"
 	},
 	{
 		"title": "Creating Block Types",
@@ -70,24 +88,6 @@
 		"slug": "reference",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/reference.md",
 		"parent": null
-	},
-	{
-		"title": "Attributes",
-		"slug": "attributes",
-		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/attributes.md",
-		"parent": "reference"
-	},
-	{
-		"title": "Theme Support",
-		"slug": "theme-support",
-		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/themes.md",
-		"parent": "reference"
-	},
-	{
-		"title": "Meta Boxes",
-		"slug": "meta-box",
-		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/meta-box.md",
-		"parent": "reference"
 	},
 	{
 		"title": "Glossary",
