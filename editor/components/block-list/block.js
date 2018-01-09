@@ -356,9 +356,6 @@ export class BlockListBlock extends Component {
 	onDragStart( event ) {
 		const dragInset = document.getElementById( `block-drag-inset-${ this.props.uid }` );
 		const block = document.getElementById( `block-${ this.props.uid }` );
-		const browser = {
-			isSafari: /^((?!chrome|android).)*safari/i.test( navigator.userAgent ),
-		};
 
 		/**
 		 * Closure to remove the cloned node from the DOM (fired within timeout below)
@@ -391,39 +388,36 @@ export class BlockListBlock extends Component {
 		);
 
 		if ( 'function' === typeof event.dataTransfer.setDragImage ) {
-			if ( ! browser.isSafari ) {
-				const blockList = block.parentNode;
-				const cloneWrapper = document.createElement( 'div' );
-				const clone = block.cloneNode( true );
-				clone.id = `clone-${ block.id }`;
+			const blockList = block.parentNode;
+			const cloneWrapper = document.createElement( 'div' );
+			const clone = block.cloneNode( true );
+			const rec = block.getBoundingClientRect();
 
-				// We display the drag image right over the block:
-				//   - coordinates relative to the block and the cursor
-				//   - + 20px padding (used to fit the shadow)
-				const rec = block.getBoundingClientRect();
-				const left = parseInt( event.clientX, 10 ) - parseInt( rec.left, 10 ) + 20;
-				const top = parseInt( event.clientY, 10 ) - parseInt( rec.top, 10 ) + 20;
+			clone.id = `clone-${ block.id }`;
 
-				// Width of drag image:
-				//   - width of block + margin of the clone wrapper (used to fit the shadow)
-				cloneWrapper.style.width = `${ rec.width + 40 }px`;
+			cloneWrapper.classList.add( 'editor-block-list__block-clone' );
+			// Width of block clone: width of block + 40px padding (used to fit the shadow)
+			cloneWrapper.style.width = `${ rec.width + 40 }px`;
+			// Spawn the block clone right over the block:
+			//   - "left: -1000" to have it hidden by default will not work in Safari
+			//   - account for 20px padding (used to fit the shadow)
+			cloneWrapper.style.top = `${ parseInt( rec.top, 10 ) - 20 }px`;
+			cloneWrapper.style.left = `${ parseInt( rec.left, 10 ) - 20 }px`;
 
-				cloneWrapper.appendChild( clone );
-				cloneWrapper.classList.add( 'editor-block-list__block-clone' );
-				blockList.appendChild( cloneWrapper );
+			cloneWrapper.appendChild( clone );
 
-				event.dataTransfer.setDragImage( cloneWrapper, left, top);
-				setTimeout( clearDom( blockList, cloneWrapper ));
+			blockList.appendChild( cloneWrapper );
 
-			} else {
-				// Currently impossible to do the above in Safari.
-				const rec = block.getBoundingClientRect();
-				const left = parseInt( event.clientX, 10 ) - parseInt( rec.left, 10 );
-				const top = parseInt( event.clientY, 10 ) - parseInt( rec.top, 10 );
+			// Display the drag image right over the block:
+			//   - coordinates relative to the block and the cursor
+			//   - account for 20px padding (used to fit the shadow)
+			event.dataTransfer.setDragImage(
+				cloneWrapper,
+				parseInt( event.clientX, 10 ) - parseInt( rec.left, 10 ) + 20,
+				parseInt( event.clientY, 10 ) - parseInt( rec.top, 10 ) + 20
+			);
 
-				block.classList.add( 'dragged' );
-				event.dataTransfer.setDragImage( block, left, top );
-			}
+			setTimeout( clearDom( blockList, cloneWrapper ));
 		}
 
 		// Hide the visible block and show inset in its place.

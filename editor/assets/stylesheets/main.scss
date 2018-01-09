@@ -1,10 +1,9 @@
 
 .editor-block-list__block-clone {
 	position: fixed;
-	top: 0;
-	left: -1000px;
 	padding: 20px;
 	background: transparent;
+	pointer-events: none;
 
 	> div {
 		background-color: white;
