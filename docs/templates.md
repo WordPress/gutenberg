@@ -11,7 +11,7 @@ Planned additions:
 
 - Saved and assigned to pages as "page templates".
 - Defined in a `template.php` file or pulled from a custom post type (`wp_templates`) that is site specific.
-— As the equivalent of the theme hierarchy.
+- As the equivalent of the theme hierarchy.
 
 ## API
 
@@ -29,12 +29,11 @@ const template = [
 ),
 ```
 
-
 ## Custom Post types
 
 A custom post type can register its own template during registration:
 
-```
+```php
 function register_post_type() {
 	$args = array(
 		'public' => true,
@@ -67,5 +66,5 @@ Sometimes the intention might be to lock the template on the UI so that the bloc
 
 *Options:*
 
-* `all` — prevents all operations.
-* `insert` — prevents inserting new blocks, but allows moving existing ones.
+- `all` — prevents all operations.
+- `insert` — prevents inserting new blocks, but allows moving existing ones.
