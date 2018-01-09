@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import '../';
+import '..';
 
 describe( 'jest-console', () => {
 	describe( 'console.error', () => {

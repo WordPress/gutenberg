@@ -23,7 +23,7 @@ import {
 	didFilter,
 	actions,
 	filters,
-} from '../';
+} from '..';
 
 function filter_a( str ) {
 	return str + 'a';
@@ -64,8 +64,6 @@ function action_c() {
 	window.actionValue += 'c';
 }
 
-const consoleErrorOriginal = console.error;
-
 beforeEach( () => {
 	window.actionValue = '';
 	// Reset state in between tests (clear all callbacks, `didAction` counts,
@@ -76,11 +74,6 @@ beforeEach( () => {
 			delete hooks[ k ];
 		}
 	} );
-	console.error = jest.fn();
-} );
-
-afterEach( () => {
-	console.error = consoleErrorOriginal;
 } );
 
 test( 'hooks can be instantiated', () => {
@@ -118,119 +111,119 @@ test( 'remove a non-existent filter', () => {
 
 test( 'remove an invalid namespace from a filter', () => {
 	expect( removeFilter( 'test.filter', 42 ) ).toBe( undefined );
-	expect( console.error ).toHaveBeenCalledWith(
+	expect( console ).toHaveErroredWith(
 		'The namespace must be a non-empty string.'
 	);
 } );
 
 test( 'cannot add filters with non-string hook names', () => {
 	addFilter( 42, 'my_callback', () => null );
-	expect( console.error ).toHaveBeenCalledWith(
+	expect( console ).toHaveErroredWith(
 		'The hook name must be a non-empty string.'
 	);
 } );
 
 test( 'cannot add filters with empty-string hook names', () => {
 	addFilter( '', 'my_callback', () => null );
-	expect( console.error ).toHaveBeenCalledWith(
+	expect( console ).toHaveErroredWith(
 		'The hook name must be a non-empty string.'
 	);
 } );
 
 test( 'cannot add filters with empty-string namespaces', () => {
 	addFilter( 'hook_name', '', () => null );
-	expect( console.error ).toHaveBeenCalledWith(
+	expect( console ).toHaveErroredWith(
 		'The namespace must be a non-empty string.'
 	);
 } );
 
 test( 'cannot add filters with invalid namespaces', () => {
 	addFilter( 'hook_name', 'invalid_%&name', () => null );
-	expect( console.error ).toHaveBeenCalledWith(
+	expect( console ).toHaveErroredWith(
 		'The namespace can only contain numbers, letters, dashes, periods, underscores and slashes.'
 	);
 } );
 
 test( 'Can add filters with dashes in namespaces', () => {
 	addFilter( 'hook_name', 'with-dashes', () => null );
-	expect( console.error ).toHaveBeenCalledTimes( 0 );
+	expect( console ).not.toHaveErrored();
 } );
 
 test( 'Can add filters with capitals in namespaces', () => {
 	addFilter( 'hook_name', 'My_Name-OhNoaction', () => null );
-	expect( console.error ).toHaveBeenCalledTimes( 0 );
+	expect( console ).not.toHaveErrored();
 } );
 
 test( 'Can add filters with slashes in namespaces', () => {
 	addFilter( 'hook_name', 'my/name/action', () => null );
-	expect( console.error ).toHaveBeenCalledTimes( 0 );
+	expect( console ).not.toHaveErrored();
 } );
 
 test( 'Can add filters with periods in namespaces', () => {
 	addFilter( 'hook_name', 'my.name.action', () => null );
-	expect( console.error ).toHaveBeenCalledTimes( 0 );
+	expect( console ).not.toHaveErrored();
 } );
 
 test( 'Can add filters with capitals in hookName', () => {
 	addFilter( 'hookName', 'action', () => null );
-	expect( console.error ).toHaveBeenCalledTimes( 0 );
+	expect( console ).not.toHaveErrored();
 } );
 
 test( 'Can add filters with periods in namespaces', () => {
 	addFilter( 'hook_name', 'ok.action', () => null );
-	expect( console.error ).toHaveBeenCalledTimes( 0 );
+	expect( console ).not.toHaveErrored();
 } );
 
 test( 'Can add filters with periods in hookName', () => {
 	addFilter( 'hook.name', 'action', () => null );
-	expect( console.error ).toHaveBeenCalledTimes( 0 );
+	expect( console ).not.toHaveErrored();
 } );
 
 test( 'cannot add filters with invalid namespaces', () => {
 	addFilter( 'hook_name', '/invalid_name', () => null );
-	expect( console.error ).toHaveBeenCalledWith(
+	expect( console ).toHaveErroredWith(
 		'The namespace can only contain numbers, letters, dashes, periods, underscores and slashes.'
 	);
 } );
 
 test( 'cannot add filters with namespace containing backslash', () => {
 	addFilter( 'hook_name', 'i\n\v\a\l\i\d\n\a\m\e', () => null );
-	expect( console.error ).toHaveBeenCalledWith(
+	expect( console ).toHaveErroredWith(
 		'The namespace can only contain numbers, letters, dashes, periods, underscores and slashes.'
 	);
 } );
 
 test( 'cannot add filters named with __ prefix', () => {
 	addFilter( '__test', 'my_callback', () => null );
-	expect( console.error ).toHaveBeenCalledWith(
+	expect( console ).toHaveErroredWith(
 		'The hook name cannot begin with `__`.'
 	);
 } );
 
 test( 'cannot add filters with non-function callbacks', () => {
 	addFilter( 'test', 'my_callback', '42' );
-	expect( console.error ).toHaveBeenCalledWith(
+	expect( console ).toHaveErroredWith(
 		'The hook callback must be a function.'
 	);
 } );
 
 test( 'cannot add filters with non-numeric priorities', () => {
 	addFilter( 'test', 'my_callback', () => null, '42' );
-	expect( console.error ).toHaveBeenCalledWith(
+	expect( console ).toHaveErroredWith(
 		'If specified, the hook priority must be a number.'
 	);
 } );
 
 test( 'cannot run filters with non-string names', () => {
 	expect( applyFilters( () => {}, 42 ) ).toBe( undefined );
-	expect( console.error ).toHaveBeenCalledWith(
+	expect( console ).toHaveErroredWith(
 		'The hook name must be a non-empty string.'
 	);
 } );
 
 test( 'cannot run filters named with __ prefix', () => {
 	expect( applyFilters( '__test', 42 ) ).toBe( undefined );
-	expect( console.error ).toHaveBeenCalledWith(
+	expect( console ).toHaveErroredWith(
 		'The hook name cannot begin with `__`.'
 	);
 } );
@@ -335,7 +328,7 @@ test( 'fire action multiple times', () => {
 
 	function func() {
 		expect( true ).toBe( true );
-	};
+	}
 
 	addAction( 'test.action', 'my_callback', func );
 	doAction( 'test.action' );
@@ -577,7 +570,7 @@ test( 'adding and removing filters with recursion', () => {
 	function removeRecurseAndAdd2( val ) {
 		expect( removeFilter( 'remove_and_add', 'my_callback_recurse' ) ).toBe( 1 );
 		val += '-' + applyFilters( 'remove_and_add', '' ) + '-';
-		addFilter( 'remove_and_add', 'my_callback_recurse', 10 );
+		addFilter( 'remove_and_add', 'my_callback_recurse', removeRecurseAndAdd2, 10 );
 		return val + '2';
 	}
 
@@ -614,7 +607,7 @@ test( 'Test `this` context via composition', () => {
 	const theCallback = function() {
 		expect( this.test ).toBe( 'test this' );
 	};
-	addAction( 'test.action', 'my_callback', theCallback.apply( testObject ) );
+	addAction( 'test.action', 'my_callback', theCallback.bind( testObject ) );
 	doAction( 'test.action' );
 
 	const testObject2 = {};

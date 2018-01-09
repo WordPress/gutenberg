@@ -25,7 +25,8 @@
     "coveragePathIgnorePatterns": [
       "<rootDir>/.*/build.*"
     ],
-    "coverageDirectory": "coverage"
+    "coverageDirectory": "coverage",
+    "setupTestFrameworkScriptFile": "./packages/jest-console/build/index.js"
   },
   "scripts": {
     "build-clean": "rimraf ./packages/*/build ./packages/*/build-module",

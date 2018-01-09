@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { upperFirst } from 'lodash';
+
+/**
  * Internal dependencies
  */
 import './matchers';
@@ -17,8 +22,9 @@ const setConsoleMethodSpy = methodName => {
 	} );
 
 	afterEach( () => {
-		if ( spy.assertionsNumber === 0 ) {
-			expect( spy ).not.toHaveBeenCalled();
+		if ( spy.assertionsNumber === 0 && spy.mock.calls.length > 0 ) {
+			const matcherName = `toHave${ upperFirst( methodName ) }ed`;
+			expect( console ).not[ matcherName ]();
 		}
 	} );
 };
