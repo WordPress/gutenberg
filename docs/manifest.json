@@ -30,6 +30,12 @@
 		"parent": "block-api"
 	},
 	{
+		"title": "Templates",
+		"slug": "templates",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/templates.md",
+		"parent": null
+	},
+	{
 		"title": "Extensibility",
 		"slug": "extensibility",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/extensibility.md",
