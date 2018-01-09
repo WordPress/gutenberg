@@ -332,29 +332,29 @@ export function stopTyping() {
 }
 
 /**
- * Returns an action object used in signalling that the user toggled the sidebar
+ * Returns an action object used in signalling that the user toggled the general sidebar
  *
- * @param  {String} sidebar  Name of the sidebar to toggle (desktop, mobile, plugins or publish)
+ * @param  {String} sidebar  Name of the sidebar to toggle (editor or plugins)
  * @param  {Boolean?} force  Force a sidebar state
  * @return {Object}          Action object
  */
-export function toggleSidebar( sidebar, force ) {
+export function toggleGeneralSidebar( sidebar, force ) {
 	return {
-		type: 'TOGGLE_SIDEBAR',
+		type: 'TOGGLE_GENERAL_SIDEBAR',
 		sidebar,
 		force,
 	};
 }
 
 /**
- * Returns an action object used in signalling that the user switched the active sidebar tab panel
+ * Returns an action object used in signalling that the user switched the active sidebar tab panel.
  *
  * @param  {String} panel   The panel name
  * @return {Object}         Action object
  */
-export function setActivePanel( panel ) {
+export function setGeneralSidebarActivePanel( panel ) {
 	return {
-		type: 'SET_ACTIVE_PANEL',
+		type: 'SET_GENERAL_SIDEBAR_ACTIVE_PANEL',
 		panel,
 	};
 }
@@ -362,13 +362,13 @@ export function setActivePanel( panel ) {
 /**
  * Returns an action object usid in signalling that the user switched the active plugin.
  * 
- * @param  {String} plugin  The plugin name
+ * @param  {String} panel   The plugin name
  * @return {Object}         Action object
  */
-export function setActivePlugin( plugin ) {
+export function setPluginSidebarPanel( panel ) {
 	return {
-		type: 'SET_ACTIVE_PLUGIN',
-		plugin,
+		type: 'SET_PLUGIN_SIDEBAR_PANEL',
+		panel,
 	};
 }
 
@@ -378,10 +378,32 @@ export function setActivePlugin( plugin ) {
  * @param  {String} panel   The panel name
  * @return {Object}         Action object
  */
-export function toggleSidebarPanel( panel ) {
+export function setEditorSidebarPanel( panel ) {
 	return {
-		type: 'TOGGLE_SIDEBAR_PANEL',
+		type: 'SET_EDITOR_SIDEBAR_PANEL',
 		panel,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user opened the publish sidebar
+ *
+ * @return {Object} Action object
+ */
+export function openPublishSidebar() {
+	return {
+		type: 'OPEN_PUBLISH_SIDEBAR',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user toggled the publish sidebar
+ *
+ * @return {Object} Action object
+ */
+export function closePublishSidebar() {
+	return {
+		type: 'CLOSE_PUBLISH_SIDEBAR',
 	};
 }
 

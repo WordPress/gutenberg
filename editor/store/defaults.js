@@ -1,11 +1,8 @@
 export const PREFERENCES_DEFAULTS = {
-	mode: 'visual',
-	sidebars: {
-		desktop: true,
-		mobile: false,
-		publish: false,
-		plugins: false,
-	},
+	editorMode: 'visual',
+	viewMode: 'desktop', // 'desktop' | 'mobile'
+	generalSidebarActivePanel: null, // null | 'editor' | 'plugins'
+	activePlugin: null,
 	panels: { 'post-status': true },
 	recentlyUsedBlocks: [],
 	blockUsage: {},

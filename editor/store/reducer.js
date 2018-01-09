@@ -578,12 +578,13 @@ export function panel( state = 'document', action ) {
 	return state;
 }
 
-export function plugin( state = 'null', action ) {
-	switch( action.type ) {
-		case 'SET_ACTIVE_PLUGIN':
-			return action.plugin;
+export function publishSidebarActive( state = false, action ) {
+	switch ( action.type ) {
+		case 'OPEN_PUBLISH_SIDEBAR':
+			return true;
+		case 'CLOSE_PUBLISH_SIDEBAR':
+			return false;
 	}
-
 	return state;
 }
 
@@ -795,8 +796,8 @@ export default optimist( combineReducers( {
 	hoveredBlock,
 	blocksMode,
 	blockInsertionPoint,
-	plugin,
 	preferences,
+	publishSidebarActive,
 	panel,
 	saving,
 	notices,

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="WEB_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$/../../..">
+      <excludeFolder url="file://$MODULE_DIR$/../../languages" />
+      <excludeFolder url="file://$MODULE_DIR$/../akismet" />
+      <excludeFolder url="file://$MODULE_DIR$/../react-16-demonstration" />
+      <excludeFolder url="file://$MODULE_DIR$/../woocommerce" />
+      <excludeFolder url="file://$MODULE_DIR$/../wordpress-seo" />
+      <excludeFolder url="file://$MODULE_DIR$/../wordpress-seo-premium" />
+      <excludeFolder url="file://$MODULE_DIR$/../wpseo-video" />
+      <excludeFolder url="file://$MODULE_DIR$/../wpseo-woocommerce" />
+      <excludeFolder url="file://$MODULE_DIR$/../yoast-plugin-toggler" />
+      <excludeFolder url="file://$MODULE_DIR$/../../themes" />
+      <excludeFolder url="file://$MODULE_DIR$/../../upgrade" />
+      <excludeFolder url="file://$MODULE_DIR$/../../uploads" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>

@@ -104,7 +104,7 @@ export function getActivePanel( state ) {
  * @return {String}        Active plugin sidebar plugin
  */
 export function getActivePlugin( state ) {
-	return state.plugin;
+	return getPreference( state, 'activeplugin', null );
 }
 
 /**
@@ -138,12 +138,10 @@ export function getPreference( state, preferenceKey, defaultValue ) {
  * @return {Boolean}         Whether the given sidebar is open
  */
 export function isSidebarOpened( state, sidebar ) {
-	const sidebars = getPreference( state, 'sidebars' );
-	if ( sidebar !== undefined ) {
-		return sidebars[ sidebar ];
-	}
+	const generalSidebarOpen = getPreference( state, 'generalSidebarActivePanel' ) !== null;
+	const publishSidebarOpen = state.publishSidebarActive;
 
-	return isMobile( state ) ? sidebars.mobile : sidebars.desktop;
+	return generalSidebarOpen || publishSidebarOpen;
 }
 
 /**
@@ -153,10 +151,10 @@ export function isSidebarOpened( state, sidebar ) {
  * @return {Boolean}       Whether sidebar is open
  */
 export function hasOpenSidebar( state ) {
-	const sidebars = getPreference( state, 'sidebars' );
-	return isMobile( state ) ?
-		sidebars.mobile || sidebars.publish || sidebars.plugins :
-		sidebars.desktop || sidebars.publish || sidebars.plugins ;
+	const generalSidebarOpen = getPreference( state, 'generalSidebarActivePanel' ) !== null;
+	const publishSidebarOpen = state.publishSidebarActive;
+
+	return generalSidebarOpen || publishSidebarOpen;
 }
 
 /**
