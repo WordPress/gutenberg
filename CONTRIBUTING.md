@@ -16,7 +16,7 @@ You can pick among all the <a href="https://github.com/WordPress/packages/issues
 
 ## Developing
 
-Be sure to have [Node.js](https://nodejs.org/en/) installed first. You should be running a a Node version matching the [current active LTS release](https://github.com/nodejs/Release#release-schedule) or newer. You can check this with `node -v`.
+Be sure to have [Node.js](https://nodejs.org/en/) installed first. You should be running a Node.js version matching the [current active LTS release](https://github.com/nodejs/Release#release-schedule) or newer. You can check this with `node -v`.
 
 Make sure that npm is installed with version >= `5.0.0` using `npm -v`.
 
