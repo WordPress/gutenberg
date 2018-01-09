@@ -29,8 +29,9 @@
   },
   "scripts": {
     "build-clean": "rimraf ./packages/*/build ./packages/*/build-module",
+    "prebuild": "check-node-version --package",
     "build": "node ./scripts/build.js",
-    "postinstall": "lerna bootstrap && check-node-version --package && npm run build",
+    "postinstall": "lerna bootstrap && npm run build",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "test:coverage-ci": "jest --coverage && codecov",
