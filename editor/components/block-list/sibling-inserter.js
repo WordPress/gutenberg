@@ -19,9 +19,6 @@ import {
 	isBlockInsertionPointVisible,
 	isBlockWithinSelection,
 } from '../../store/selectors';
-import {
-	clearSelectedBlock,
-} from '../../store/actions';
 
 class BlockListSiblingInserter extends Component {
 	constructor() {
@@ -38,10 +35,6 @@ class BlockListSiblingInserter extends Component {
 		// Prevent mouseout and blur while navigating the open inserter menu
 		// from causing the inserter to be unmounted.
 		this.setState( { isForcedVisible: isOpen } );
-
-		if ( isOpen ) {
-			this.props.clearSelectedBlock();
-		}
 	}
 
 	render() {
@@ -88,8 +81,5 @@ export default connect(
 				getBlockInsertionPoint( state ) === insertIndex
 			),
 		};
-	},
-	{
-		clearSelectedBlock,
 	}
 )( BlockListSiblingInserter );

@@ -3,7 +3,7 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
-import { get, partial, reduce, size } from 'lodash';
+import { debounce, get, partial, reduce, size } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -94,7 +94,7 @@ export class BlockListBlock extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.setBlockListRef = this.setBlockListRef.bind( this );
+		this.bindWrapperNode = this.bindWrapperNode.bind( this );
 		this.bindBlockNode = this.bindBlockNode.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
 		this.maybeHover = this.maybeHover.bind( this );
@@ -108,6 +108,9 @@ export class BlockListBlock extends Component {
 		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
 		this.onTouchStart = this.onTouchStart.bind( this );
 		this.onClick = this.onClick.bind( this );
+		this.debouncedDeselect = debounce( this.deselect.bind( this ) );
+		this.triggerDeselect = this.triggerDeselect.bind( this );
+		this.cancelDeselect = this.cancelDeselect.bind( this );
 
 		this.previousOffset = null;
 		this.hadTouchStart = false;
@@ -125,6 +128,8 @@ export class BlockListBlock extends Component {
 		if ( this.props.isTyping ) {
 			document.addEventListener( 'mousemove', this.stopTypingOnMouseMove );
 		}
+
+		this.bindFocusOutside();
 	}
 
 	componentWillReceiveProps( newProps ) {
@@ -162,22 +167,54 @@ export class BlockListBlock extends Component {
 				this.removeStopTypingListener();
 			}
 		}
+
+		// Focus outside detection is activated depending on selected state, so
+		// rebind when changing.
+		if (
+			this.props.isSelected !== prevProps.isSelected ||
+			this.props.isFirstMultiSelected !== prevProps.isFirstMultiSelected
+		) {
+			this.bindFocusOutside();
+		}
 	}
 
 	componentWillUnmount() {
 		this.removeStopTypingListener();
+
+		// Remove and cancel deselect focus handlers
+		window.removeEventListener( 'focus', this.triggerDeselect, true );
+		window.removeEventListener( 'deselect', this.debouncedDeselect );
+		this.debouncedDeselect.cancel();
 	}
 
 	removeStopTypingListener() {
 		document.removeEventListener( 'mousemove', this.stopTypingOnMouseMove );
 	}
 
-	setBlockListRef( node ) {
+	bindWrapperNode( node ) {
+		this.wrapperNode = node;
 		this.props.blockRef( node, this.props.uid );
 	}
 
 	bindBlockNode( node ) {
 		this.node = node;
+	}
+
+	/**
+	 * Toggles event listener on document for focus events to deselect block.
+	 */
+	bindFocusOutside() {
+		const { isSelected, isFirstMultiSelected } = this.props;
+
+		// Listen for focus outside if the block is selected. We target the
+		// first block of multi-selection since it is the one responsible for
+		// rendering the block controls, and because we don't need multiple
+		// event handlers to handle the deselection.
+		const isListening = isSelected || isFirstMultiSelected;
+
+		const bindFn = isListening ? 'addEventListener' : 'removeEventListener';
+		window[ bindFn ]( 'focus', this.triggerDeselect, true );
+		window[ bindFn ]( 'deselect', this.debouncedDeselect );
 	}
 
 	setAttributes( attributes ) {
@@ -205,6 +242,61 @@ export class BlockListBlock extends Component {
 		// Detect touchstart to disable hover on iOS
 		this.hadTouchStart = true;
 	}
+
+	/**
+	 * When focus occurs elsewhere in the page, triggers a deselect event on
+	 * the element receiving focus. We create a custom event because a focus
+	 * event cannot be canceled, but we want to allow parent components the
+	 * opportunity to cancel the deselect intent.
+	 *
+	 * @see https://developer.mozilla.org/en-US/docs/Web/Events/focus
+	 *
+	 * @param {FocusEvent} event Focus event
+	 */
+	triggerDeselect( event ) {
+		let { target } = event;
+
+		// We bind events to the global as an interoperability with React's
+		// synthetic events, but since most use of the target will assume an
+		// element node, emulate as an element for dispatch.
+		if ( target === window ) {
+			target = document.body;
+		}
+
+		// Only deselect when focusing outside current node
+		if ( this.wrapperNode.contains( target ) ) {
+			return;
+		}
+
+		const deselectEvent = new window.Event( 'deselect', {
+			bubbles: true,
+			cancelable: true,
+		} );
+
+		target.dispatchEvent( deselectEvent );
+	}
+
+	/**
+	 * Cancels the debounced deselect. Debouncing allows focus within the block
+	 * wrapper to prevent deselect from occurring.
+	 *
+	 * @param {Event} event Focus event
+	 */
+	cancelDeselect() {
+		this.debouncedDeselect.cancel();
+	}
+
+	/**
+	 * Calls the `onDeselect` prop with the custom deselect event. A proxying
+	 * function handles the case where `onDeselect` prop changes over lifecycle
+	 * of the component.
+	 *
+	 * @param  {Event} event Custom deselect event
+	 */
+	deselect( event ) {
+		this.props.onDeselect( event );
+	}
+
 	onClick() {
 		// Clear touchstart detection
 		// Browser will try to emulate mouse events also see https://www.html5rocks.com/en/mobile/touchandmouse/
@@ -380,7 +472,7 @@ export class BlockListBlock extends Component {
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
 			<div
-				ref={ this.setBlockListRef }
+				ref={ this.bindWrapperNode }
 				onMouseMove={ this.maybeHover }
 				onMouseEnter={ this.maybeHover }
 				onMouseLeave={ onMouseLeave }
@@ -388,6 +480,7 @@ export class BlockListBlock extends Component {
 				data-type={ block.name }
 				onTouchStart={ this.onTouchStart }
 				onClick={ this.onClick }
+				onFocus={ this.cancelDeselect }
 				{ ...wrapperProps }
 			>
 				<BlockDropZone index={ order } />
@@ -450,6 +543,7 @@ const mapStateToProps = ( state, { uid } ) => ( {
 	block: getBlock( state, uid ),
 	isSelected: isBlockSelected( state, uid ),
 	isMultiSelected: isBlockMultiSelected( state, uid ),
+	isMultiSelecting: isMultiSelecting( state ),
 	isFirstMultiSelected: isFirstMultiSelectedBlock( state, uid ),
 	isHovered: isBlockHovered( state, uid ) && ! isMultiSelecting( state ),
 	focus: getBlockFocus( state, uid ),
@@ -468,8 +562,15 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 	onSelect() {
 		dispatch( selectBlock( ownProps.uid ) );
 	},
-	onDeselect() {
-		dispatch( clearSelectedBlock() );
+
+	onDeselect( event, ...args ) {
+		if ( ownProps.onDeselect ) {
+			ownProps.onDeselect( event, ...args );
+		}
+
+		if ( ! event || ! event.defaultPrevented ) {
+			dispatch( clearSelectedBlock() );
+		}
 	},
 
 	onStartTyping() {
@@ -534,5 +635,5 @@ export default compose(
 			isLocked: !! templateLock,
 		};
 	} ),
-	withFilters( 'editor.BlockListBlock' ),
+	withFilters( 'editor.BlockListBlock' )
 )( BlockListBlock );

@@ -15,13 +15,11 @@ import { VisualEditorInserter } from '../inserter';
 
 describe( 'VisualEditorInserter', () => {
 	it( 'should show controls when receiving focus', () => {
-		const clearSelectedBlock = jest.fn();
-		const wrapper = shallow( <VisualEditorInserter clearSelectedBlock={ clearSelectedBlock } /> );
+		const wrapper = shallow( <VisualEditorInserter /> );
 
 		wrapper.simulate( 'focus' );
 
 		expect( wrapper.state( 'isShowingControls' ) ).toBe( true );
-		expect( clearSelectedBlock ).toHaveBeenCalled();
 	} );
 
 	it( 'should hide controls when losing focus', () => {
@@ -34,10 +32,10 @@ describe( 'VisualEditorInserter', () => {
 	} );
 
 	it( 'should insert frequently used blocks', () => {
-		const insertBlock = jest.fn();
+		const onInsertBlock = jest.fn();
 		const mostFrequentlyUsedBlocks = [ getBlockType( 'core/paragraph' ), getBlockType( 'core/image' ) ];
 		const wrapper = shallow(
-			<VisualEditorInserter insertBlock={ insertBlock } mostFrequentlyUsedBlocks={ mostFrequentlyUsedBlocks } />
+			<VisualEditorInserter onInsertBlock={ onInsertBlock } mostFrequentlyUsedBlocks={ mostFrequentlyUsedBlocks } />
 		);
 		wrapper.state.preferences = {
 			blockUsage: {
@@ -50,7 +48,7 @@ describe( 'VisualEditorInserter', () => {
 			.findWhere( ( node ) => node.prop( 'children' ) === 'Paragraph' )
 			.simulate( 'click' );
 
-		expect( insertBlock ).toHaveBeenCalled();
-		expect( insertBlock.mock.calls[ 0 ][ 0 ].name ).toBe( 'core/paragraph' );
+		expect( onInsertBlock ).toHaveBeenCalled();
+		expect( onInsertBlock.mock.calls[ 0 ][ 0 ].name ).toBe( 'core/paragraph' );
 	} );
 } );

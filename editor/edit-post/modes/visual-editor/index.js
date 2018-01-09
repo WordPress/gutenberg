@@ -2,11 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-
-/**
- * WordPress dependencies
- */
-import { Component, findDOMNode } from '@wordpress/element';
+import 'element-closest';
 
 /**
  * Internal dependencies
@@ -17,62 +13,51 @@ import VisualEditorInserter from './inserter';
 import { hasFixedToolbar } from '../../../store/selectors';
 import { clearSelectedBlock } from '../../../store/actions';
 
-class VisualEditor extends Component {
-	constructor() {
-		super( ...arguments );
-		this.bindContainer = this.bindContainer.bind( this );
-		this.bindBlocksContainer = this.bindBlocksContainer.bind( this );
-		this.onClick = this.onClick.bind( this );
+/**
+ * Detects whether a block deselect attempt should be prevented. There are
+ * several cases in which focus transitions outside the DOM space of a block,
+ * but is not truly outside, e.g. managing toolbar or inspector controls.
+ *
+ * @param {Event} event DOM event
+ */
+function preventChromeDeselect( event ) {
+	// Since we're only concerned with the focus deselect, ensure that other
+	// types of deselect are unhandled.
+	if ( ! event || event.type !== 'deselect' ) {
+		return;
 	}
 
-	bindContainer( ref ) {
-		this.container = ref;
-	}
+	const { target } = event;
+	const isOutside = target && ! target.closest( [
+		'.editor-header',
+		'.editor-sidebar',
+	].join( ',' ) );
 
-	bindBlocksContainer( ref ) {
-		// Disable reason: Need DOM node to determine if clicking on layout
-		// canvas when intending to clear block selection.
-		// TODO: Refactor block selection clearing using blur events on block.
-		// eslint-disable-next-line react/no-find-dom-node
-		this.blocksContainer = findDOMNode( ref );
+	if ( ! isOutside ) {
+		event.preventDefault();
 	}
+}
 
-	onClick( event ) {
-		if ( event.target === this.container || event.target === this.blocksContainer ) {
-			this.props.clearSelectedBlock();
-		}
-	}
-
-	render() {
-		// Disable reason: Clicking the canvas should clear the selection
-		/* eslint-disable jsx-a11y/no-static-element-interactions */
-		return (
-			<div
-				className="editor-visual-editor"
-				onMouseDown={ this.onClick }
-				onTouchStart={ this.onClick }
-				ref={ this.bindContainer }
-			>
-				<EditorGlobalKeyboardShortcuts />
-				<WritingFlow>
-					<PostTitle />
-					<BlockList
-						ref={ this.bindBlocksContainer }
-						showContextualToolbar={ ! this.props.hasFixedToolbar }
-					/>
-					<DefaultBlockAppender />
-				</WritingFlow>
-				<VisualEditorInserter />
-			</div>
-		);
-		/* eslint-enable jsx-a11y/no-static-element-interactions */
-	}
+function VisualEditor( { isFixedToolbar } ) {
+	return (
+		<div className="editor-visual-editor">
+			<EditorGlobalKeyboardShortcuts />
+			<WritingFlow>
+				<PostTitle />
+				<BlockList
+					showContextualToolbar={ ! isFixedToolbar }
+					onDeselectBlock={ preventChromeDeselect } />
+				<DefaultBlockAppender />
+			</WritingFlow>
+			<VisualEditorInserter />
+		</div>
+	);
 }
 
 export default connect(
 	( state ) => {
 		return {
-			hasFixedToolbar: hasFixedToolbar( state ),
+			isFixedToolbar: hasFixedToolbar( state ),
 		};
 	},
 	{
