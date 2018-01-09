@@ -18,10 +18,7 @@ class CodeEditor extends Component {
 		this.editor.on( 'blur', this.onBlur );
 		this.editor.on( 'keyHandled', this.onKeyHandled );
 
-		// TODO: We shouldn't need this RAF...
-		window.requestAnimationFrame( () => {
-			this.updateFocus();
-		} );
+		this.updateFocus();
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -57,7 +54,10 @@ class CodeEditor extends Component {
 
 	updateFocus() {
 		if ( this.props.focus && ! this.editor.hasFocus() ) {
-			this.editor.focus();
+			// Need to wait for the next frame to be painted before we can focus the editor
+			window.requestAnimationFrame( () => {
+				this.editor.focus();
+			} );
 		}
 	}
 
