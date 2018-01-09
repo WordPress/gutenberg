@@ -3,7 +3,7 @@
  */
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Button } from '@wordpress/components';
+import { Button, Tooltip } from '@wordpress/components';
 import { pick } from 'lodash';
 
 // Getter for the sake of unit tests.
@@ -149,13 +149,19 @@ class MediaUploadButton extends Component {
 	}
 
 	render() {
-		const { children, buttonProps } = this.props;
+		const { children, buttonProps, tooltip } = this.props;
 
-		return (
+		let element = (
 			<Button onClick={ this.openModal } { ...buttonProps }>
 				{ children }
 			</Button>
 		);
+
+		if ( tooltip ) {
+			element = <Tooltip text={ tooltip }>{ element }</Tooltip>;
+		}
+
+		return element;
 	}
 }
 
