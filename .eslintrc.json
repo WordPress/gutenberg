@@ -152,7 +152,10 @@
 		"prefer-const": "error",
 		"quote-props": [ "error", "as-needed" ],
 		"react/display-name": "off",
-		"react/jsx-curly-spacing": [ "error", "always" ],
+		"react/jsx-curly-spacing": [ "error", {
+			"when": "always",
+			"children": true
+		} ],
 		"react/jsx-equals-spacing": "error",
 		"react/jsx-indent": [ "error", "tab" ],
 		"react/jsx-indent-props": [ "error", "tab" ],
