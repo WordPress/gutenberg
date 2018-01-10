@@ -18,6 +18,6 @@ describe( 'CodeEditor', () => {
 		} ) );
 
 		const wrapper = shallow( <CodeEditor value={ '<b>wowee</b>' } /> );
-		expect( wrapper.find( 'textarea' ) ).toHaveLength( 1 );
+		expect( wrapper ).toMatchSnapshot();
 	} );
 } );
