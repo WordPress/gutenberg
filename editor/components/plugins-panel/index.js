@@ -30,26 +30,33 @@ function getPluginSidebar( plugin ) {
 	const pluginSidebar = getSidebar( plugin );
 
 	if ( ! pluginSidebar ) {
-		return () => {
-			return <Panel>
-				<PanelBody>
-					{ sprintf( __( 'No matching plugin sidebar found for plugin "%s"' ), plugin ) }
-				</PanelBody>
-			</Panel>;
+		return {
+			title: __( 'Error: Unregistered plugin requested.' ),
+			render: () => {
+				return <Panel>
+					<PanelBody>
+						{ sprintf( __( 'No matching plugin sidebar found for plugin "%s"' ), plugin ) }
+					</PanelBody>
+				</Panel>;
+			},
 		};
 	}
-
-	return pluginSidebar.render;
+	return pluginSidebar;
 }
 
 function PluginsPanel( { onClose, plugin } ) {
+	const {
+		title,
+		render,
+	} = getPluginSidebar( plugin );
 	return (
-		<div 
+		<div
 			className="editor-sidebar"
 			role="region"
 			aria-label={ __( 'Editor plugins' ) }
 			tabIndex="-1">
 			<div className="components-panel__header editor-sidebar__panel-tabs">
+				<h3>{ title }</h3>
 				<IconButton
 					onClick={ onClose }
 					icon="no-alt"
@@ -57,7 +64,7 @@ function PluginsPanel( { onClose, plugin } ) {
 				/>
 			</div>
 			<div className="editor-plugins-panel__content">
-				{ getPluginSidebar( plugin )() }
+				{ render() }
 			</div>
 		</div>
 	);

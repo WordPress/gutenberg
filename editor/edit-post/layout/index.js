@@ -41,14 +41,14 @@ import {
 } from '../../store/actions';
 
 function GeneralSidebar( { openedGeneralSidebar } ) {
-	switch( openedGeneralSidebar ) {
+	switch ( openedGeneralSidebar ) {
 		case 'editor':
 			return <Sidebar />;
 		case 'plugins':
 			return <PluginsPanel />;
 		default:
-			return null;
 	}
+	return null;
 }
 
 function Layout( {

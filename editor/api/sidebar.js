@@ -75,17 +75,17 @@ export function registerSidebar( name, settings ) {
 /**
  * Retrieves the sidebar settings object.
  *
- * @param {string} name The name of the sidebar to retrieve.
+ * @param {string} pluginId The name of the sidebar to retrieve.
  *
  * @returns {Object} The settings object of the sidebar. Or false if the
  *                         sidebar doesn't exist.
  */
-export function getSidebar( name ) {
-	if ( ! sidebars.hasOwnProperty( name ) ) {
+export function getSidebar( pluginId ) {
+	if ( ! sidebars.hasOwnProperty( pluginId ) ) {
 		return null;
 	}
 
-	return sidebars[ name ];
+	return sidebars[ pluginId ];
 }
 
 /**
@@ -100,7 +100,8 @@ export function getSidebars() {
 /**
  * Activates the gives sidebar.
  *
- * @param {string} name The name of the sidebar to activate.
+ * @param  {string} pluginId The name of the sidebar to activate.
+ * @return {void}
  */
 export function activateSidebar( pluginId ) {
 	store.dispatch( setGeneralSidebarActivePanel( 'plugins', pluginId ) );

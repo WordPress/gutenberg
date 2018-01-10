@@ -27,11 +27,12 @@ import {
 import {
 	openGeneralSidebar,
 	closeGeneralSidebar,
-	togglePublishSidebar
+	togglePublishSidebar,
 } from '../../store/actions';
 
-function Header( { isGeneralSidebarOpened, onOpenGeneralSidebar, onCloseGeneralSidebar, onTogglePublishSidebar } ) {
-	const toggleGeneralSidebar = isGeneralSidebarOpened ? onCloseGeneralSidebar : onOpenGeneralSidebar;
+function Header( { isGeneralSidebarEditorOpen, isPublishSidebarOpen, onOpenGeneralSidebar, onCloseGeneralSidebar, onTogglePublishSidebar } ) {
+	const toggleGeneralSidebar = isGeneralSidebarEditorOpen ? onCloseGeneralSidebar : onOpenGeneralSidebar;
+
 	return (
 		<div
 			role="region"
@@ -40,20 +41,20 @@ function Header( { isGeneralSidebarOpened, onOpenGeneralSidebar, onCloseGeneralS
 			tabIndex="-1"
 		>
 			<HeaderToolbar />
-			{ ! isPublishSidebarOpened && (
+			{ ! isPublishSidebarOpen && (
 				<div className="editor-header__settings">
 					<PostSavedState />
 					<PostPreviewButton />
 					<PostPublishPanelToggle
-						isOpen={ isPublishSidebarOpened }
+						isOpen={ isPublishSidebarOpen }
 						onToggle={ onTogglePublishSidebar }
 					/>
 					<IconButton
 						icon="admin-generic"
 						onClick={ toggleGeneralSidebar }
-						isToggled={ isGeneralSidebarOpened }
+						isToggled={ isGeneralSidebarEditorOpen }
 						label={ __( 'Settings' ) }
-						aria-expanded={ isGeneralSidebarOpened }
+						aria-expanded={ isGeneralSidebarEditorOpen }
 					/>
 					<EllipsisMenu key="ellipsis-menu" />
 				</div>
@@ -64,8 +65,8 @@ function Header( { isGeneralSidebarOpened, onOpenGeneralSidebar, onCloseGeneralS
 
 export default connect(
 	( state ) => ( {
-		isGeneralSidebarOpened: !! getOpenedGeneralSidebar( state ),
-		isPublishSidebarOpened: isPublishSidebarOpened( state ),
+		isGeneralSidebarEditorOpen: getOpenedGeneralSidebar( state ) === 'editor',
+		isPublishSidebarOpen: isPublishSidebarOpened( state ),
 	} ),
 	{
 		onOpenGeneralSidebar: () => openGeneralSidebar( 'editor' ),
