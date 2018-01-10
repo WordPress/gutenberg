@@ -1,0 +1,33 @@
+.editor-post-saved-state {
+	display: flex;
+	align-items: center;
+	margin-right: $item-spacing;
+	color: $dark-gray-500;
+
+	.dashicon {
+		margin-right: 4px;
+		margin-left: -4px;
+	}
+
+	.wp-core-ui &.button-link {
+		margin-right: $item-spacing;
+		padding: 0;
+
+		&:hover {
+			background: none;
+		}
+	}
+}
+
+.editor-post-saved-state__mobile {
+	@include break-small {
+		display: none;
+	}
+}
+
+.editor-post-saved-state__desktop {
+	display: none;
+	@include break-small {
+		display: inline;
+	}
+}

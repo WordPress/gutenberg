@@ -1,33 +1,162 @@
-window.content = [
-	'<!-- wp:core/heading -->',
-	'<h1>1.0 Is The Loneliest Number</h1>',
-	'<!-- /wp:core/heading -->',
+/**
+ * Temporary test post content
+ */
+window._wpGutenbergPost.title = {
+	raw: 'Welcome to the Gutenberg Editor',
+};
 
-	'<!-- wp:core/text -->',
-	'<p>I imagine prior to the launch of the iPod, or the iPhone, there were teams saying the same thing: the copy + paste guys are <em>so close</em> to being ready and we know Walt Mossberg is going to ding us for this so let\'s just not ship to the manufacturers in China for just a few more weeks… The Apple teams were probably embarrassed. But <strong>if you\'re not embarrassed when you ship your first version you waited too long</strong>.</p>',
-	'<!-- /wp:core/text -->',
+window._wpGutenbergPost.content = {
+	raw: [
+		'<!-- wp:cover-image {"url":"https://cldup.com/Fz-ASbo2s3.jpg","align":"wide"} -->',
+		'<section class="wp-block-cover-image has-background-dim alignwide" style="background-image:url(https://cldup.com/Fz-ASbo2s3.jpg)"><h2>Of Mountains &amp; Printing Presses</h2></section>',
+		'<!-- /wp:cover-image -->',
 
-	'<!-- wp:core/image -->',
-	'<figure><img src="https://cldup.com/Bc9YxmqFnJ.jpg" /></figure>',
-	'<!-- /wp:core/image -->',
+		'<!-- wp:paragraph -->',
+		'<p>The goal of this new editor is to make adding rich content to WordPress simple and enjoyable. This whole post is composed of <em>pieces of content</em>—somewhat similar to LEGO bricks—that you can move around and interact with. Move your cursor around and you&#x27;ll notice the different blocks light up with outlines and arrows. Press the arrows to reposition blocks quickly, without fearing about losing things in the process of copying and pasting.</p>',
+		'<!-- /wp:paragraph -->',
 
-	'<!-- wp:core/text -->',
-	'<p>A beautiful thing about Apple is how quickly they obsolete their own products. I imagine this also makes the discipline of getting things out there easier. Like I mentioned before, the longer it’s been since the last release the more pressure there is, but if you know that if your bit of code doesn’t make this version but there’s the +0.1 coming out in 6 weeks, then it’s not that bad. It’s like flights from San Francisco to LA, if you miss one you know there’s another one an hour later so it’s not a big deal. Amazon has done a fantastic job of this with the Kindle as well, with a new model every year.</p>',
-	'<!-- /wp:core/text -->',
+		'<!-- wp:paragraph -->',
+		'<p>What you are reading now is a <strong>text block</strong>, the most basic block of all. The text block has its own controls to be moved freely around the post...</p>',
+		'<!-- /wp:paragraph -->',
 
-	'<!-- wp:core/quote -->',
-	'<blockquote><p>Real artists ship.</p><footer><p><a href="http://www.folklore.org/StoryView.py?story=Real_Artists_Ship.txt">Steve Jobs, 1983</a></p></footer></blockquote>',
-	'<!-- /wp:core/quote -->',
+		'<!-- wp:paragraph {"align":"right"} -->',
+		'<p style="text-align:right">... like this one, which is right aligned.</p>',
+		'<!-- /wp:paragraph -->',
 
-	'<!-- wp:core/image -->',
-	'<figure><img src="https://cldup.com/vuGcj2VB8M.jpg" /><figcaption>Beautiful landscape</figcaption></figure>',
-	'<!-- /wp:core/image -->',
+		'<!-- wp:paragraph -->',
+		'<p>Headings are separate blocks as well, which helps with the outline and organization of your content.</p>',
+		'<!-- /wp:paragraph -->',
 
-	'<!-- wp:core/text -->',
-	'<p>By shipping early and often you have the unique competitive advantage of hearing from real people what they think of your work, which in best case helps you anticipate market direction, and in worst case gives you a few people rooting for you that you can email when your team pivots to a new idea. Nothing can recreate the crucible of real usage.</p>',
-	'<!-- /wp:core/text -->',
+		'<!-- wp:heading -->',
+		'<h2>A Picture is worth a Thousand Words</h2>',
+		'<!-- /wp:heading -->',
 
-	'<!-- wp:core/embed url:https://www.youtube.com/watch?v=Nl6U7UotA-M -->',
-	'<iframe width="560" height="315" src="//www.youtube.com/embed/Nl6U7UotA-M" frameborder="0" allowfullscreen></iframe>',
-	'<!-- /wp:core/embed -->'
-].join( '' );
+		'<!-- wp:paragraph -->',
+		'<p>Handling images and media with the utmost care is a primary focus of the new editor. Hopefully, you&#x27;ll find aspects of adding captions or going full-width with your pictures much easier and robust than before.</p>',
+		'<!-- /wp:paragraph -->',
+
+		'<!-- wp:image {"align":"center"} -->',
+		'<figure class="wp-block-image aligncenter"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="Beautiful landscape" /><figcaption>Give it a try. Press the &quot;wide&quot; button on the image toolbar.</figcaption></figure>',
+		'<!-- /wp:image -->',
+
+		'<!-- wp:paragraph -->',
+		'<p>Try selecting and removing or editing the caption, now you don&#x27;t have to be careful about selecting the image or other text by mistake and ruining the presentation.</p>',
+		'<!-- /wp:paragraph -->',
+
+		'<!-- wp:heading -->',
+		'<h2>The <em>Inserter</em> Tool</h2>',
+		'<!-- /wp:heading -->',
+
+		'<!-- wp:paragraph -->',
+		'<p>Imagine everything that WordPress can do is available to you quickly and in the same place on the interface. No need to figure out HTML tags, classes, or remember complicated shortcode syntax. That&#x27;s the spirit behind the inserter—the <code>(+)</code> button you&#x27;ll see around the editor—which allows you to browse all available content blocks and insert them into your post. Plugins and themes are able to register their own, opening up all sort of possibilities for rich editing and publishing.</p>',
+		'<!-- /wp:paragraph -->',
+
+		'<!-- wp:paragraph -->',
+		'<p>Go give it a try, you may discover things WordPress can already insert into your posts that you didn&#x27;t know about. Here&#x27;s a short list of what you can currently find there:</p>',
+		'<!-- /wp:paragraph -->',
+
+		'<!-- wp:list -->',
+		'<ul><li>Text &amp; Headings</li><li>Images &amp; Videos</li><li>Galleries</li><li>Embeds, like YouTube, Tweets, or other WordPress posts.</li><li>Layout blocks, like Buttons, Hero Images, Separators, etc.</li><li>And <em>Lists</em> like this one of course :)</li></ul>',
+		'<!-- /wp:list -->',
+
+		'<!-- wp:separator -->',
+		'<hr class="wp-block-separator" />',
+		'<!-- /wp:separator -->',
+
+		'<!-- wp:heading -->',
+		'<h2>Visual Editing</h2>',
+		'<!-- /wp:heading -->',
+
+		'<!-- wp:paragraph -->',
+		'<p>A huge benefit of blocks is that you can edit them in place and manipulate your content directly. Instead of having fields for editing things like the source of a quote, or the text of a button, you can directly change the content. Try editing the following quote:</p>',
+		'<!-- /wp:paragraph -->',
+
+		'<!-- wp:quote {"style":1} -->',
+		'<blockquote class="wp-block-quote"><p>The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.</p><cite>Matt Mullenweg, 2017</cite></blockquote>',
+		'<!-- /wp:quote -->',
+
+		'<!-- wp:paragraph -->',
+		'<p>The information corresponding to the source of the quote is a separate text field, similar to captions under images, so the structure of the quote is protected even if you select, modify, or remove the source. It&#x27;s always easy to add it back.</p>',
+		'<!-- /wp:paragraph -->',
+
+		'<!-- wp:paragraph -->',
+		'<p>Blocks can be anything you need. For instance, you may want to insert a subdued quote as part of the composition of your text, or you may prefer to display a giant stylized one. All of these options are available in the inserter.</p>',
+		'<!-- /wp:paragraph -->',
+
+		'<!-- wp:gallery {"columns":2} -->',
+		'<div class="wp-block-gallery alignnone columns-2 is-cropped">',
+		'<figure class="blocks-gallery-image"><img src="https://cldup.com/n0g6ME5VKC.jpg" alt="" /></figure>',
+		'<figure class="blocks-gallery-image"><img src="https://cldup.com/ZjESfxPI3R.jpg" alt="" /></figure>',
+		'<figure class="blocks-gallery-image"><img src="https://cldup.com/EKNF8xD2UM.jpg" alt="" /></figure>',
+		'</div>',
+		'<!-- /wp:gallery -->',
+
+		'<!-- wp:paragraph -->',
+		'<p>You can change the amount of columns in your galleries by dragging a slider in the block inspector in the sidebar.</p>',
+		'<!-- /wp:paragraph -->',
+
+		'<!-- wp:heading -->',
+		'<h2>Media Rich</h2>',
+		'<!-- /wp:heading -->',
+
+		'<!-- wp:paragraph -->',
+		'<p>If you combine the new <strong>wide</strong> and <strong>full-wide</strong> alignments with galleries, you can create a very media rich layout, very quickly:</p>',
+		'<!-- /wp:paragraph -->',
+
+		'<!-- wp:image {"align":"full"} -->',
+		'<figure class="wp-block-image alignfull"><img src="https://cldup.com/8lhI-gKnI2.jpg" alt="Accessibility is important don&#x27;t forget image alt attribute" /></figure>',
+		'<!-- /wp:image -->',
+
+		'<!-- wp:paragraph -->',
+		'<p>Sure, the full-wide image can be pretty big. But sometimes the image is worth it.</p>',
+		'<!-- /wp:paragraph -->',
+
+		'<!-- wp:gallery {"align":"wide","images":[{"url":"https://cldup.com/_rSwtEeDGD.jpg","alt":""},{"url":"https://cldup.com/L-cC3qX2DN.jpg","alt":""}]} -->',
+		'<div class="wp-block-gallery alignwide columns-2 is-cropped">',
+		'<figure class="blocks-gallery-image"><img src="https://cldup.com/_rSwtEeDGD.jpg" alt="" /></figure>',
+		'<figure class="blocks-gallery-image"><img src="https://cldup.com/L-cC3qX2DN.jpg" alt="" /></figure>',
+		'</div>',
+		'<!-- /wp:gallery -->',
+
+		'<!-- wp:paragraph -->',
+		'<p>The above is a gallery with just two images. It\'s an easier way to create visually appealing layouts, without having to deal with floats. You can also easily convert the gallery back to individual images again, by using the block switcher.</p>',
+		'<!-- /wp:paragraph -->',
+
+		'<!-- wp:paragraph -->',
+		'<p>Any block can opt into these alignments. The embed block has them also, and is responsive out of the box:</p>',
+		'<!-- /wp:paragraph -->',
+
+		'<!-- wp:embed {"url":"https://vimeo.com/22439234","align":"wide"} -->',
+		'<figure class="wp-block-embed alignwide">https://vimeo.com/22439234</figure>',
+		'<!-- /wp:embed -->',
+
+		'<!-- wp:paragraph -->',
+		'<p>You can build any block you like, static or dynamic, decorative or plain. Here\'s a pullquote block:</p>',
+		'<!-- /wp:paragraph -->',
+
+		'<!-- wp:pullquote -->',
+		'<blockquote class="wp-block-pullquote alignnone"><p>Code is Poetry</p><cite>The WordPress community</cite></blockquote>',
+		'<!-- /wp:pullquote -->',
+
+		'<!-- wp:paragraph {"align":"center"} -->',
+		'<p style="text-align:center"><em>If you want to learn more about how to build additional blocks, or if you are interested in helping with the project, head over to the <a href="https://github.com/WordPress/gutenberg">GitHub repository</a>.</em></p>',
+		'<!-- /wp:paragraph -->',
+
+		'<!-- wp:button { "align": "center" } -->',
+		'<div class="wp-block-button aligncenter"><a class="wp-block-button__link" href="https://github.com/WordPress/gutenberg">Help build Gutenberg</a></div>',
+		'<!-- /wp:button -->',
+
+		'<!-- wp:separator -->',
+		'<hr class="wp-block-separator" />',
+		'<!-- /wp:separator -->',
+
+		'<!-- wp:paragraph {"align":"center"} -->',
+		'<p style="text-align:center">Thanks for testing Gutenberg!</p>',
+		'<!-- /wp:paragraph -->',
+
+		'<!-- wp:paragraph {"align":"center"} -->',
+		'<p style="text-align:center"><img draggable="false" class="emoji" alt="👋" src="https://s.w.org/images/core/emoji/2.3/svg/1f44b.svg" /></p>',
+		'<!-- /wp:paragraph -->',
+
+	].join( '' ),
+};

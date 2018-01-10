@@ -1,2 +1,5 @@
 build
-docs
+coverage
+cypress
+node_modules
+vendor

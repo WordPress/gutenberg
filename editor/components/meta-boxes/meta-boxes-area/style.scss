@@ -1,0 +1,96 @@
+
+.editor-meta-boxes-area {
+	position: relative;
+
+		/* Match width and positioning of the meta boxes. Override default styles. */
+	#poststuff {
+		margin: 0 auto;
+		padding-top: 0;
+		min-width: auto;
+	}
+
+	#post {
+		margin: 0;
+	}
+
+	/* Override Default meta box stylings */
+
+	#poststuff h3.hndle,
+	#poststuff .stuffbox > h3,
+	#poststuff h2.hndle { /* WordPress selectors yolo */
+		border-bottom: 1px solid $light-gray-500;
+		box-sizing: border-box;
+		color: $dark-gray-500;
+		font-weight: 600;
+		outline: none;
+		padding: 15px;
+		position: relative;
+		width: 100%;
+	}
+
+	.postbox {
+		border: 0;
+		color: $dark-gray-500;
+		margin-bottom: 0;
+	}
+
+	.postbox > .inside {
+		border-bottom: 1px solid $light-gray-500;
+		color: $dark-gray-500;
+		padding: 15px;
+		margin: 0;
+	}
+
+	input {
+		max-width: 300px;
+	}
+
+	input,
+	select,
+	textarea {
+		background: inherit;
+		border: 1px solid $light-gray-500;
+		border-radius: 4px;
+		box-shadow: none;
+		color: $dark-gray-800;
+		display: inline-block;
+		font-family: inherit;
+		font-size: 13px;
+		line-height: 24px;
+		outline: none;
+		padding: 4px;
+	}
+
+	input:hover,
+	select:hover,
+	textarea:hover {
+		border: 1px solid $light-gray-700;
+	}
+
+	.postbox .handlediv {
+		height: 44px;
+		width: 44px;
+	}
+
+	&.is-loading:before {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		content: '';
+		background: transparent;
+		z-index: z-index( '.editor-meta-boxes-area.is-loading:before');
+	}
+
+	.spinner {
+		position: absolute;
+		top: 10px;
+		right: 20px;
+		z-index: z-index( '.editor-meta-boxes-area .spinner');
+	}
+}
+
+.editor-meta-boxes-area__clear {
+	clear: both;
+}

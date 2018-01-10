@@ -1,0 +1,20 @@
+p.has-drop-cap {
+	&:first-letter {
+		float: left;
+		font-size: 4.1em;
+		line-height: 0.7;
+		font-family: serif;
+		font-weight: bold;
+		margin: .07em .23em 0 0;
+		text-transform: uppercase;
+		font-style: normal;
+	}
+}
+
+p.has-drop-cap:not( :focus )  {
+	overflow: hidden;
+}
+
+p.has-background {
+	padding: 20px 30px;
+}

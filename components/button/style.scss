@@ -1,0 +1,44 @@
+.components-button {
+	background: none;
+	border: none;
+	outline: none;
+	text-decoration: none;
+	margin: 0;
+	border-radius: 0;
+
+	&:active {
+		color: currentColor;
+	}
+
+	&:disabled {
+		opacity: 0.3;
+	}
+
+	&:not( :disabled ) {
+		cursor: pointer;
+	}
+
+	&:focus {
+		@include button-style__focus-active;
+	}
+
+	&.is-busy,
+	&.is-busy[disabled] {
+		animation: components-button__busy-animation 2500ms infinite linear;
+		background-size: 100px 100% !important;
+		background-image: linear-gradient( -45deg, $light-gray-500 28%, $white 28%, $white 72%, $light-gray-500 72%) !important;
+		opacity: 1;
+	}
+
+	&.button-primary.is-busy,
+	&.button-primary.is-busy[disabled] {
+		color: $white !important;
+		background-size: 100px 100% !important;
+		background-image: linear-gradient( -45deg, $blue-medium-500 28%, $blue-dark-900 28%, $blue-dark-900 72%, $blue-medium-500 72%) !important;
+		border-color: $blue-dark-900 !important;
+	}
+}
+
+@keyframes components-button__busy-animation {
+  0%   { background-position: 200px 0; }
+}

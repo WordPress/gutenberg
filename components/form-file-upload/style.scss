@@ -1,0 +1,14 @@
+.wp-core-ui .components-form-file-upload {
+	.button.button-large {
+		font-size: 0;
+		padding: 6px 0 3px;
+
+		@include break-medium() {
+			padding: 0 12px 2px;
+		}
+
+		@include break-large() {
+			font-size: inherit;
+		}
+	}
+}

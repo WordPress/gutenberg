@@ -1,0 +1,13 @@
+.components-block-description {
+	&:after {
+		content: '';
+		display: block;
+		border-bottom: 1px solid $light-gray-500;
+		margin: 1.5em 0;
+	}
+
+	p {
+		font-style: italic;
+		margin-top: 0;
+	}
+}
