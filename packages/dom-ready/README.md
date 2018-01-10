@@ -7,7 +7,7 @@ Executes a function after the DOM has loaded.
 Install the module
 
 ```bash
-npm install @wordpress/dom-ready@next --save
+npm install @wordpress/dom-ready --save
 ```
 
 ### Usage
