@@ -16,9 +16,7 @@ import './style.scss';
 import PostSettings from './post-settings';
 import BlockInspectorPanel from './block-inspector-panel';
 import Header from './header';
-import { getSidebar } from '../../api/sidebar';
-
-import { getActivePanel } from '../../store/selectors';
+import { getActiveEditorPanel } from '../../store/selectors';
 
 /**
  * Returns the panel that should be rendered in the sidebar.
@@ -70,7 +68,7 @@ const Sidebar = ( { panel } ) => {
 export default connect(
 	( state ) => {
 		return {
-			panel: getActivePanel( state ),
+			panel: getActiveEditorPanel( state ),
 		};
 	}
 )( withFocusReturn( Sidebar ) );

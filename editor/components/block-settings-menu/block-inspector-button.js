@@ -13,37 +13,31 @@ import { IconButton, withSpokenMessages } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { getActivePanel, isGeneralSidebarPanelOpened } from '../../store/selectors';
-import { toggleSidebar, setActivePanel } from '../../store/actions';
+import { getActiveEditorPanel, isGeneralSidebarPanelOpened } from '../../store/selectors';
+import { openGeneralSidebar } from '../../store/actions';
 
 export function BlockInspectorButton( {
-	isDefaultSidebarOpened,
+	isGeneralSidebarEditorOpened,
+	onOpenGeneralSidebarEditor,
 	panel,
-	onOpenSidebar,
-	onShowInspector,
 	onClick = noop,
 	small = false,
 	speak,
 } ) {
-	const toggleInspector = () => {
-		onShowInspector();
-		onOpenSidebar( undefined, true );
-	};
-
 	const speakMessage = () => {
-		if ( ! isDefaultSidebarOpened || ( isDefaultSidebarOpened && panel !== 'block' ) ) {
+		if ( ! isGeneralSidebarEditorOpened || ( isGeneralSidebarEditorOpened && panel !== 'block' ) ) {
 			speak( __( 'Additional settings are now available in the Editor advanced settings sidebar' ) );
 		} else {
 			speak( __( 'Advanced settings closed' ) );
 		}
 	};
 
-	const label = ( isDefaultSidebarOpened && panel === 'block' ) ? __( 'Hide Advanced Settings' ) : __( 'Show Advanced Settings' );
+	const label = ( isGeneralSidebarEditorOpened && panel === 'block' ) ? __( 'Hide Advanced Settings' ) : __( 'Show Advanced Settings' );
 
 	return (
 		<IconButton
 			className="editor-block-settings-menu__control"
-			onClick={ flow( toggleInspector, speakMessage, onClick ) }
+			onClick={ flow( onOpenGeneralSidebarEditor, speakMessage, onClick ) }
 			icon="admin-generic"
 			label={ small ? label : undefined } >
 			{ ! small && label }
@@ -54,14 +48,11 @@ export function BlockInspectorButton( {
 export default connect(
 	( state ) => ( {
 		isGeneralSidebarEditorOpened: isGeneralSidebarPanelOpened( state, 'editor' ),
-		panel: getActivePanel( state ),
+		panel: getActiveEditorPanel( state ),
 	} ),
 	( dispatch ) => ( {
-		onShowInspector() {
-			dispatch( setActivePanel( 'block' ) );
-		},
-		onOpenSidebar() {
-			dispatch( toggleSidebar( undefined, true ) );
+		onOpenGeneralSidebarEditor() {
+			dispatch( openGeneralSidebar( 'editor', 'block' ) );
 		},
 	} )
 )( withSpokenMessages( BlockInspectorButton ) );

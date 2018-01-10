@@ -93,8 +93,8 @@ export const isMetaBoxStateDirty = ( state ) => getDirtyMetaBoxes( state ).lengt
  * @param  {Object}  state Global application state
  * @return {String}        Active sidebar panel
  */
-export function getActivePanel( state ) {
-	return state.panel;
+export function getActiveEditorPanel( state ) {
+	return getPreference( state, 'activeSidebarPanel', {} ).editor;
 }
 
 /**

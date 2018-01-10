@@ -12,7 +12,7 @@ import { IconButton } from '@wordpress/components';
 /**
  * Internal Dependencies
  */
-import { getActivePanel, getSelectedBlockCount } from '../../store/selectors';
+import { getActiveEditorPanel, getSelectedBlockCount } from '../../store/selectors';
 import { closeGeneralSidebar, setGeneralSidebarActivePanel } from '../../store/actions';
 
 const SidebarHeader = ( { panel, onSetPanel, onCloseSidebar, count } ) => {
@@ -46,7 +46,7 @@ const SidebarHeader = ( { panel, onSetPanel, onCloseSidebar, count } ) => {
 
 export default connect(
 	( state ) => ( {
-		panel: getActivePanel( state ),
+		panel: getActiveEditorPanel( state ),
 		count: getSelectedBlockCount( state ),
 	} ),
 	{

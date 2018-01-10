@@ -14,7 +14,7 @@ import { MenuItemsGroup } from '@wordpress/components';
  * Internal dependencies
  */
 import { getSidebars, activateSidebar } from '../../../api/sidebar';
-import { getActivePanel, hasOpenSidebar } from '../../../store/selectors';
+import { getActiveEditorPanel, hasOpenSidebar } from '../../../store/selectors';
 import { openGeneralSidebar } from '../../../store/actions';
 
 /**
@@ -30,12 +30,12 @@ import { openGeneralSidebar } from '../../../store/actions';
  *
  * @returns {Object} The rendered list of menu items.
  */
-function Plugins( { activePanel, onSwitch, isSidebarOpen, onTogglePluginsSidebar } ) {
+function Plugins( { activeEditorPanel, onSwitch, isSidebarOpen, onTogglePluginsSidebar } ) {
 	const sidebars = getSidebars();
 
 	// This makes sure no check mark is before a plugin if the sidebar is closed.
 	if ( ! isSidebarOpen ) {
-		activePanel = '';
+		activeEditorPanel = '';
 	}
 
 	/**
@@ -62,7 +62,7 @@ function Plugins( { activePanel, onSwitch, isSidebarOpen, onTogglePluginsSidebar
 		<MenuItemsGroup
 			label={ __( 'Plugins' ) }
 			choices={ plugins }
-			value={ activePanel }
+			value={ activeEditorPanel }
 			onSelect={ onSelect }
 		/>
 	);
@@ -71,7 +71,7 @@ function Plugins( { activePanel, onSwitch, isSidebarOpen, onTogglePluginsSidebar
 export default connect(
 	( state ) => {
 		return {
-			activePanel: getActivePanel( state ),
+			activeEditorPanel: getActiveEditorPanel( state ),
 			isSidebarOpen: hasOpenSidebar( state ),
 		};
 	},
