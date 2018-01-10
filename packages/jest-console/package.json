@@ -19,12 +19,16 @@
   },
   "main": "build/index.js",
   "module": "build-module/index.js",
+  "files": [
+    "build",
+    "build-module"
+  ],
   "dependencies": {
     "jest-matcher-utils": "22.0.3",
     "lodash": "4.17.4"
   },
   "peerDependencies": {
-    "jest": ">=22.0.0"
+    "jest": ">=22"
   },
   "publishConfig": {
     "access": "public"
