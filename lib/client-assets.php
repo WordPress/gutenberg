@@ -284,7 +284,7 @@ function gutenberg_register_vendor_scripts() {
 	);
 	gutenberg_register_vendor_script(
 		'promise',
-		'https://unpkg.com/promise-polyfill/promise' . $suffix . '.js'
+		'https://unpkg.com/promise-polyfill@7.0.0/dist/promise.min.js'
 	);
 
 	// TODO: This is only necessary so long as WordPress 4.9 is not yet stable,
