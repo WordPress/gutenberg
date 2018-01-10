@@ -38,7 +38,7 @@ import '@wordpress/jest-console';
 
 ### `.toHaveErrored()`
 
-Use `.toHaveErrored` to ensure that `console.error` function got called.
+Use `.toHaveErrored` to ensure that `console.error` function was called.
 
 For example, let's say you have a `drinkAll( flavor )` function that makes you drink all available beverages.
 You might want to check if function calls `console.error` for `'octopus'` instead, because `'octopus'` flavor is really
@@ -71,14 +71,14 @@ You might want to check if function calls `console.error` with a specific messag
 describe( 'drinkAll', () => {
   test( 'errors with message when something is octopus-flavored', () => {
     drinkAll( 'octopus' );
-    expect( console ).toHaveErrored( 'Should I really drink something that is octopus-flavored?' );
+    expect( console ).toHaveErroredWith( 'Should I really drink something that is octopus-flavored?' );
   } );
 } );
 ```
 
 ### `.toHaveWarned()`
 
-Use `.toHaveWarned` to ensure that `console.warn` function got called.
+Use `.toHaveWarned` to ensure that `console.warn` function was called.
 
 Almost identical usage as `.toHaveErrored()`.
 
