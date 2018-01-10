@@ -15,9 +15,9 @@
     "npm": ">=5.0.0"
   },
   "dependencies": {
-    "@wordpress/a11y": "0.1.0-beta.1",
-    "@wordpress/hooks": "1.0.1",
-    "@wordpress/url": "0.1.0-beta.1",
+    "@wordpress/a11y": "1.0.3",
+    "@wordpress/hooks": "1.1.1",
+    "@wordpress/url": "1.0.0",
     "classnames": "2.2.5",
     "clipboard": "1.7.1",
     "dom-react": "2.2.0",
