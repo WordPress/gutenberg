@@ -23,7 +23,6 @@ import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import GalleryImage from './gallery-image';
 
-const isGallery = true;
 const MAX_COLUMNS = 8;
 const linkOptions = [
 	{ value: 'attachment', label: __( 'Attachment Page' ) },
@@ -95,7 +94,9 @@ class GalleryBlock extends Component {
 	}
 
 	uploadFromFiles( event ) {
-		mediaUpload( event.target.files, this.props.setAttributes, isGallery );
+		mediaUpload( event.target.files, ( images ) => {
+			this.props.setAttributes( { images } );
+		} );
 	}
 
 	setImageAttributes( index, attributes ) {
@@ -118,12 +119,11 @@ class GalleryBlock extends Component {
 		const { setAttributes } = this.props;
 		mediaUpload(
 			files,
-			( { images } ) => {
+			( images ) => {
 				setAttributes( {
 					images: currentImages.concat( images ),
 				} );
-			},
-			isGallery
+			}
 		);
 	}
 

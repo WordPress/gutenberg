@@ -166,7 +166,7 @@ registerBlockType( 'core/cover-image', {
 			return [
 				controls,
 				<ImagePlaceHolder key="cover-image-placeholder"
-					{ ...{ className, icon, label, setAttributes, onSelectImage } }
+					{ ...{ className, icon, label, onSelectImage } }
 				/>,
 			];
 		}
