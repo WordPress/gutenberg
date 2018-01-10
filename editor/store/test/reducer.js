@@ -28,6 +28,12 @@ import {
 	reusableBlocks,
 } from '../reducer';
 
+jest.mock( '../../edit-post/meta-boxes', () => {
+	return {
+		getLocationHtml: () => 'meta boxes content',
+	};
+} );
+
 describe( 'state', () => {
 	describe( 'getPostRawValue', () => {
 		it( 'returns original value for non-rendered content', () => {
@@ -1275,16 +1281,19 @@ describe( 'state', () => {
 					isActive: false,
 					isUpdating: false,
 					isLoaded: false,
+					html: 'meta boxes content',
 				},
 				side: {
 					isActive: true,
 					isUpdating: false,
 					isLoaded: false,
+					html: 'meta boxes content',
 				},
 				advanced: {
 					isActive: false,
 					isUpdating: false,
 					isLoaded: false,
+					html: 'meta boxes content',
 				},
 			};
 
@@ -1302,6 +1311,7 @@ describe( 'state', () => {
 			const expected = {
 				isActive: false,
 				isUpdating: false,
+				html: 'meta boxes content',
 			};
 
 			expect( actual ).toEqual( expected );

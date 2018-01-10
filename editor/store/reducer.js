@@ -32,6 +32,7 @@ import { getBlockTypes, getBlockType } from '@wordpress/blocks';
 import withHistory from '../utils/with-history';
 import withChangeDetection from '../utils/with-change-detection';
 import { PREFERENCES_DEFAULTS } from './defaults';
+import { getLocationHtml } from '../edit-post/meta-boxes';
 
 /***
  * Module constants
@@ -677,6 +678,7 @@ export function metaBoxes( state = defaultMetaBoxState, action ) {
 					...state[ location ],
 					isLoaded: false,
 					isActive: action.metaBoxes[ location ],
+					html: getLocationHtml( location ),
 				};
 				return newState;
 			}, { ...state } );
@@ -695,6 +697,7 @@ export function metaBoxes( state = defaultMetaBoxState, action ) {
 				[ action.location ]: {
 					...state[ action.location ],
 					isUpdating: false,
+					html: getLocationHtml( action.location ),
 				},
 			};
 		case 'REQUEST_META_BOX_UPDATES':
