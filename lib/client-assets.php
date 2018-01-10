@@ -75,114 +75,15 @@ function gutenberg_get_script_polyfill( $tests ) {
 function gutenberg_register_scripts_and_styles() {
 	gutenberg_register_vendor_scripts();
 
-	// Editor Scripts.
-	wp_register_script(
-		'wp-data',
-		gutenberg_url( 'data/build/index.js' ),
-		array(),
-		filemtime( gutenberg_dir_path() . 'data/build/index.js' )
-	);
-	wp_register_script(
-		'wp-utils',
-		gutenberg_url( 'utils/build/index.js' ),
-		array(),
-		filemtime( gutenberg_dir_path() . 'utils/build/index.js' )
-	);
-	wp_register_script(
-		'wp-hooks',
-		gutenberg_url( 'hooks/build/index.js' ),
-		array(),
-		filemtime( gutenberg_dir_path() . 'hooks/build/index.js' )
-	);
-	wp_register_script(
-		'wp-date',
-		gutenberg_url( 'date/build/index.js' ),
-		array( 'moment' ),
-		filemtime( gutenberg_dir_path() . 'date/build/index.js' )
-	);
-	global $wp_locale;
-	wp_add_inline_script( 'wp-date', 'window._wpDateSettings = ' . wp_json_encode( array(
-		'l10n'     => array(
-			'locale'        => get_locale(),
-			'months'        => array_values( $wp_locale->month ),
-			'monthsShort'   => array_values( $wp_locale->month_abbrev ),
-			'weekdays'      => array_values( $wp_locale->weekday ),
-			'weekdaysShort' => array_values( $wp_locale->weekday_abbrev ),
-			'meridiem'      => (object) $wp_locale->meridiem,
-			'relative'      => array(
-				/* translators: %s: duration */
-				'future' => __( '%s from now', 'default' ),
-				/* translators: %s: duration */
-				'past'   => __( '%s ago', 'default' ),
-			),
-		),
-		'formats'  => array(
-			'time'     => get_option( 'time_format', __( 'g:i a', 'default' ) ),
-			'date'     => get_option( 'date_format', __( 'F j, Y', 'default' ) ),
-			'datetime' => __( 'F j, Y g:i a', 'default' ),
-		),
-		'timezone' => array(
-			'offset' => get_option( 'gmt_offset', 0 ),
-			'string' => get_option( 'timezone_string', 'UTC' ),
-		),
-	) ), 'before' );
-	wp_register_script(
-		'wp-i18n',
-		gutenberg_url( 'i18n/build/index.js' ),
-		array(),
-		filemtime( gutenberg_dir_path() . 'i18n/build/index.js' )
-	);
-	wp_register_script(
-		'wp-element',
-		gutenberg_url( 'element/build/index.js' ),
-		array( 'react', 'react-dom', 'react-dom-server' ),
-		filemtime( gutenberg_dir_path() . 'element/build/index.js' )
-	);
-	wp_register_script(
-		'wp-components',
-		gutenberg_url( 'components/build/index.js' ),
-		array( 'wp-element', 'wp-i18n', 'wp-utils', 'wp-hooks', 'wp-api-request', 'moment' ),
-		filemtime( gutenberg_dir_path() . 'components/build/index.js' )
-	);
-	wp_register_script(
-		'wp-blocks',
-		gutenberg_url( 'blocks/build/index.js' ),
-		array( 'wp-element', 'wp-components', 'wp-utils', 'wp-hooks', 'wp-i18n', 'tinymce-latest', 'tinymce-latest-lists', 'tinymce-latest-paste', 'tinymce-latest-table', 'media-views', 'media-models', 'shortcode' ),
-		filemtime( gutenberg_dir_path() . 'blocks/build/index.js' )
-	);
-	wp_add_inline_script(
-		'wp-blocks',
-		gutenberg_get_script_polyfill( array(
-			'\'Promise\' in window' => 'promise',
-			'\'fetch\' in window'   => 'fetch',
-		) ),
-		'before'
-	);
-
-	// Editor Styles.
-	wp_register_style(
-		'wp-components',
-		gutenberg_url( 'components/build/style.css' ),
-		array(),
-		filemtime( gutenberg_dir_path() . 'components/build/style.css' )
-	);
-	wp_style_add_data( 'wp-components', 'rtl', 'replace' );
-
-	wp_register_style(
-		'wp-blocks',
-		gutenberg_url( 'blocks/build/style.css' ),
-		array(),
-		filemtime( gutenberg_dir_path() . 'blocks/build/style.css' )
-	);
-	wp_style_add_data( 'wp-blocks', 'rtl', 'replace' );
-
-	wp_register_style(
-		'wp-edit-blocks',
-		gutenberg_url( 'blocks/build/edit-blocks.css' ),
-		array(),
-		filemtime( gutenberg_dir_path() . 'blocks/build/edit-blocks.css' )
-	);
-	wp_style_add_data( 'wp-edit-blocks', 'rtl', 'replace' );
+	include gutenberg_dir_path() . 'data/script.php';
+	include gutenberg_dir_path() . 'date/script.php';
+	include gutenberg_dir_path() . 'utils/script.php';
+	include gutenberg_dir_path() . 'i18n/script.php';
+	include gutenberg_dir_path() . 'hooks/script.php';
+	include gutenberg_dir_path() . 'element/script.php';
+	include gutenberg_dir_path() . 'blocks/script.php';
+	include gutenberg_dir_path() . 'components/script.php';
+	include gutenberg_dir_path() . 'editor/script.php';
 }
 add_action( 'wp_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 );
 add_action( 'admin_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 );
@@ -681,14 +582,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	gutenberg_extend_wp_api_backbone_client();
 
 	// The editor code itself.
-	wp_enqueue_script(
-		'wp-editor',
-		gutenberg_url( 'editor/build/index.js' ),
-		array( 'jquery', 'wp-api', 'wp-data', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element', 'wp-components', 'wp-utils', 'word-count', 'editor', 'heartbeat' ),
-		filemtime( gutenberg_dir_path() . 'editor/build/index.js' ),
-		true // enqueue in the footer.
-	);
-
+	wp_enqueue_script( 'wp-editor' );
 	gutenberg_fix_jetpack_freeform_block_conflict();
 	wp_localize_script( 'wp-editor', 'wpEditorL10n', array(
 		'tinymce' => array(
@@ -900,19 +794,7 @@ JS;
 	/**
 	 * Styles
 	 */
-
-	wp_enqueue_style(
-		'wp-editor-font',
-		'https://fonts.googleapis.com/css?family=Noto+Serif:400,400i,700,700i'
-	);
-
-	wp_enqueue_style(
-		'wp-editor',
-		gutenberg_url( 'editor/build/style.css' ),
-		array( 'wp-components', 'wp-blocks', 'wp-edit-blocks' ),
-		filemtime( gutenberg_dir_path() . 'editor/build/style.css' )
-	);
-	wp_style_add_data( 'wp-editor', 'rtl', 'replace' );
+	wp_enqueue_style( 'wp-editor' );
 
 	/**
 	 * Fires after block assets have been enqueued for the editing interface.
