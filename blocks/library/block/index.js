@@ -41,6 +41,15 @@ class ReusableBlockEdit extends Component {
 		}
 	}
 
+	/**
+	 * @inheritdoc
+	 */
+	componentWillReceiveProps( nextProps ) {
+		if ( this.props.focus && ! nextProps.focus ) {
+			this.stopEditing();
+		}
+	}
+
 	startEditing() {
 		this.setState( { isEditing: true } );
 	}
