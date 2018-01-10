@@ -153,7 +153,6 @@ class ImageBlock extends Component {
 					icon="format-image"
 					label={ __( 'Image' ) }
 					onSelectImage={ this.onSelectImage }
-					setAttributes={ setAttributes }
 				/>,
 			];
 		}

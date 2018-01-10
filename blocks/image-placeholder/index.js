@@ -10,9 +10,16 @@ import { __ } from '@wordpress/i18n';
  */
 import MediaUploadButton from '../media-upload-button';
 
-export default function ImagePlaceHolder( { className, setAttributes, icon, label, onSelectImage } ) {
-	const dropFiles = ( files ) => mediaUpload( files, setAttributes );
-	const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setAttributes );
+/**
+ *  ImagePlaceHolder is a react component used by blocks containing user configurable images e.g: image and cover image.
+ *
+ * @param   {Object} props  React props passed to the component.
+ * @returns {Object}        Rendered placeholder.
+ */
+export default function ImagePlaceHolder( { className, icon, label, onSelectImage } ) {
+	const setImage = ( [ image ] ) => onSelectImage( image );
+	const dropFiles = ( files ) => mediaUpload( files, setImage );
+	const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setImage );
 	return (
 		<Placeholder
 			className={ className }
