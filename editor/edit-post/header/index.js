@@ -20,10 +20,18 @@ import {
 } from '../../components';
 import EllipsisMenu from './ellipsis-menu';
 import HeaderToolbar from './header-toolbar';
-import { isSidebarOpened } from '../../store/selectors';
-import { toggleSidebar } from '../../store/actions';
+import {
+	getOpenedGeneralSidebar,
+	isPublishSidebarOpened,
+} from '../../store/selectors';
+import {
+	openGeneralSidebar,
+	closeGeneralSidebar,
+	togglePublishSidebar
+} from '../../store/actions';
 
-function Header( { onToggleSidebar, isDefaultSidebarOpened, isPublishSidebarOpened } ) {
+function Header( { isGeneralSidebarOpened, onOpenGeneralSidebar, onCloseGeneralSidebar, onTogglePublishSidebar } ) {
+	const toggleGeneralSidebar = isGeneralSidebarOpened ? onCloseGeneralSidebar : onOpenGeneralSidebar;
 	return (
 		<div
 			role="region"
@@ -38,14 +46,14 @@ function Header( { onToggleSidebar, isDefaultSidebarOpened, isPublishSidebarOpen
 					<PostPreviewButton />
 					<PostPublishPanelToggle
 						isOpen={ isPublishSidebarOpened }
-						onToggle={ () => onToggleSidebar( 'publish' ) }
+						onToggle={ onTogglePublishSidebar }
 					/>
 					<IconButton
 						icon="admin-generic"
-						onClick={ () => onToggleSidebar() }
-						isToggled={ isDefaultSidebarOpened }
+						onClick={ toggleGeneralSidebar }
+						isToggled={ isGeneralSidebarOpened }
 						label={ __( 'Settings' ) }
-						aria-expanded={ isDefaultSidebarOpened }
+						aria-expanded={ isGeneralSidebarOpened }
 					/>
 					<EllipsisMenu key="ellipsis-menu" />
 				</div>
@@ -56,10 +64,12 @@ function Header( { onToggleSidebar, isDefaultSidebarOpened, isPublishSidebarOpen
 
 export default connect(
 	( state ) => ( {
-		isDefaultSidebarOpened: isSidebarOpened( state ),
-		isPublishSidebarOpened: isSidebarOpened( state, 'publish' ),
+		isGeneralSidebarOpened: !! getOpenedGeneralSidebar( state ),
+		isPublishSidebarOpened: isPublishSidebarOpened( state ),
 	} ),
 	{
-		onToggleSidebar: toggleSidebar,
-	}
+		onOpenGeneralSidebar: () => openGeneralSidebar( 'editor' ),
+		onCloseGeneralSidebar: closeGeneralSidebar,
+		onTogglePublishSidebar: togglePublishSidebar,
+	},
 )( Header );

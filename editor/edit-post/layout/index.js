@@ -26,31 +26,44 @@ import {
 	UnsavedChangesWarning,
 	EditorNotices,
 	PostPublishPanel,
-	PluginsPanel
+	PluginsPanel,
 } from '../../components';
 import {
 	getEditorMode,
 	hasOpenSidebar,
-	isSidebarOpened,
 	isFeatureActive,
+	getOpenedGeneralSidebar,
+	isPublishSidebarOpened,
 } from '../../store/selectors';
-import { toggleSidebar } from '../../store/actions';
+import {
+	closeGeneralSidebar,
+	closePublishSidebar
+} from '../../store/actions';
+
+function GeneralSidebar( { openedGeneralSidebar } ) {
+	switch( openedGeneralSidebar ) {
+		case 'editor':
+			return <Sidebar />;
+		case 'plugins':
+			return <PluginsPanel />;
+		default:
+			return null;
+	}
+}
 
 function Layout( {
 	mode,
 	layoutHasOpenSidebar,
-	isDefaultSidebarOpened,
-	isPublishSidebarOpened,
-	isPluginsSidebarOpened,
+	publishSidebarOpen,
+	openedGeneralSidebar,
 	hasFixedToolbar,
-	onToggleSidebar,
+	onCloseGeneralSidebar,
+	onClosePublishSidebar,
 } ) {
 	const className = classnames( 'editor-layout', {
 		'is-sidebar-opened': layoutHasOpenSidebar,
 		'has-fixed-toolbar': hasFixedToolbar,
 	} );
-	const closePublishPanel = () => onToggleSidebar( 'publish', false );
-	const closePluginsPanel = () => onToggleSidebar( 'plugins', false );
 
 	return (
 		<div className={ className }>
@@ -72,9 +85,12 @@ function Layout( {
 					<MetaBoxes location="advanced" />
 				</div>
 			</div>
-			{ isDefaultSidebarOpened && <Sidebar /> }
-			{ isPublishSidebarOpened && <PostPublishPanel onClose={ closePublishPanel } /> }
-			{ isPluginsSidebarOpened && <PluginsPanel onClose={ closePluginsPanel } /> }
+			{ publishSidebarOpen && <PostPublishPanel onClose={ onClosePublishSidebar } /> }
+			{
+				openedGeneralSidebar !== null && <GeneralSidebar
+					onCloseGeneralSidebar={ onCloseGeneralSidebar }
+					openedGeneralSidebar={ openedGeneralSidebar } />
+			}
 			<Popover.Slot />
 		</div>
 	);
@@ -84,10 +100,12 @@ export default connect(
 	( state ) => ( {
 		mode: getEditorMode( state ),
 		layoutHasOpenSidebar: hasOpenSidebar( state ),
-		isDefaultSidebarOpened: isSidebarOpened( state ),
-		isPublishSidebarOpened: isSidebarOpened( state, 'publish' ),
-		isPluginsSidebarOpened: isSidebarOpened( state, 'plugins' ),
+		openedGeneralSidebar: getOpenedGeneralSidebar( state ),
+		publishSidebarOpen: isPublishSidebarOpened( state ),
 		hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
 	} ),
-	{ onToggleSidebar: toggleSidebar }
+	{
+		onCloseGeneralSidebar: closeGeneralSidebar,
+		onClosePublishSidebar: closePublishSidebar,
+	}
 )( navigateRegions( Layout ) );

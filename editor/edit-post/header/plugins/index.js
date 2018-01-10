@@ -15,7 +15,7 @@ import { MenuItemsGroup } from '@wordpress/components';
  */
 import { getSidebars, activateSidebar } from '../../../api/sidebar';
 import { getActivePanel, hasOpenSidebar } from '../../../store/selectors';
-import { toggleSidebar } from '../../../store/actions';
+import { openGeneralSidebar } from '../../../store/actions';
 
 /**
  * Renders a list of plugins that will activate different UI elements.
@@ -82,7 +82,7 @@ export default connect(
 				ownProps.onToggle( value );
 			},
 			onTogglePluginsSidebar: () => {
-				dispatch( toggleSidebar( 'plugins' ) );
+				dispatch( openGeneralSidebar( 'plugins' ) );
 			},
 		};
 	}

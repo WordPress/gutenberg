@@ -9,13 +9,14 @@ import { connect } from 'react-redux';
 import { __, sprintf } from '@wordpress/i18n';
 import { compose } from '@wordpress/element';
 import { Panel, PanelBody, IconButton, withFocusReturn } from '@wordpress/components';
-import { getActivePlugin } from '../../store/selectors';
 
 /**
  * Internal Dependencies
  */
 import './style.scss';
 import { getSidebar } from '../../api/sidebar';
+import { getActivePlugin } from '../../store/selectors';
+import { closeGeneralSidebar } from '../../store/actions';
 
 /**
  * Returns the sidebar that should be rendered in the sidebar registered by
@@ -67,5 +68,7 @@ export default connect(
 		return {
 			plugin: getActivePlugin( state ),
 		};
+	}, {
+		onClose: closeGeneralSidebar,
 	}
 )( withFocusReturn( PluginsPanel ) );

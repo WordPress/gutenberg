@@ -13,12 +13,11 @@ import { IconButton } from '@wordpress/components';
  * Internal Dependencies
  */
 import { getActivePanel, getSelectedBlockCount } from '../../store/selectors';
-import { toggleSidebar, setActivePanel } from '../../store/actions';
+import { closeGeneralSidebar, setGeneralSidebarActivePanel } from '../../store/actions';
 
-const SidebarHeader = ( { panel, onSetPanel, onToggleSidebar, count } ) => {
+const SidebarHeader = ( { panel, onSetPanel, onCloseSidebar, count } ) => {
 	// Do not display "0 Blocks".
 	count = count === 0 ? 1 : count;
-	const closeSidebar = () => onToggleSidebar( undefined, false );
 
 	return (
 		<div className="components-panel__header editor-sidebar__panel-tabs">
@@ -37,7 +36,7 @@ const SidebarHeader = ( { panel, onSetPanel, onToggleSidebar, count } ) => {
 				{ sprintf( _n( 'Block', '%d Blocks', count ), count ) }
 			</button>
 			<IconButton
-				onClick={ closeSidebar }
+				onClick={ onCloseSidebar }
 				icon="no-alt"
 				label={ __( 'Close settings' ) }
 			/>
@@ -51,7 +50,7 @@ export default connect(
 		count: getSelectedBlockCount( state ),
 	} ),
 	{
-		onSetPanel: setActivePanel,
-		onToggleSidebar: toggleSidebar,
+		onSetPanel: setGeneralSidebarActivePanel.bind( null, 'editor' ),
+		onCloseSidebar: closeGeneralSidebar,
 	}
 )( SidebarHeader );

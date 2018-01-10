@@ -13,7 +13,7 @@ import { PanelBody, PanelRow } from '@wordpress/components';
  * Internal dependencies
  */
 import { PageAttributesCheck, PageAttributesOrder, PageAttributesParent } from '../../../components';
-import { toggleSidebarPanel } from '../../../store/actions';
+import { toggleGeneralSidebarEditorPanel } from '../../../store/actions';
 import { isEditorSidebarPanelOpened } from '../../../store/selectors';
 
 /**
@@ -46,7 +46,7 @@ export default connect(
 	},
 	{
 		onTogglePanel() {
-			return toggleSidebarPanel( PANEL_NAME );
+			return toggleGeneralSidebarEditorPanel( PANEL_NAME );
 		},
 	}
 )( PageAttributes );

@@ -349,39 +349,41 @@ export function toggleGeneralSidebar( sidebar, force ) {
 /**
  * Returns an action object used in signalling that the user switched the active sidebar tab panel.
  *
- * @param  {String} panel   The panel name
+ * @param  {String} sidebar Sidebar name
+ * @param  {String} panel   Panel name
  * @return {Object}         Action object
  */
-export function setGeneralSidebarActivePanel( panel ) {
+export function setGeneralSidebarActivePanel( sidebar, panel ) {
 	return {
 		type: 'SET_GENERAL_SIDEBAR_ACTIVE_PANEL',
+		sidebar,
 		panel,
 	};
 }
 
 /**
- * Returns an action object usid in signalling that the user switched the active plugin.
- * 
- * @param  {String} panel   The plugin name
- * @return {Object}         Action object
- */
-export function setPluginSidebarPanel( panel ) {
-	return {
-		type: 'SET_PLUGIN_SIDEBAR_PANEL',
-		panel,
-	};
-}
-
-/**
- * Returns an action object used in signalling that the user toggled a sidebar panel
+ * Returns an action object used in signalling that the user opened a sidebar.
  *
- * @param  {String} panel   The panel name
- * @return {Object}         Action object
+ * @param {string} sidebar        Sidebar to open.
+ * @param {string} [panel = null] Panel to open in the sidebar.
+ * @returns {Object}              Action object.
  */
-export function setEditorSidebarPanel( panel ) {
+export function openGeneralSidebar( sidebar, panel = null ) {
 	return {
-		type: 'SET_EDITOR_SIDEBAR_PANEL',
+		type: 'OPEN_GENERAL_SIDEBAR',
+		sidebar,
 		panel,
+	};
+}
+
+/**
+ * Returns an action object signalling that the user closed the sidebar.
+ *
+ * @returns {Object} Action object.
+ */
+export function closeGeneralSidebar() {
+	return {
+		type: 'CLOSE_GENERAL_SIDEBAR',
 	};
 }
 
@@ -397,13 +399,50 @@ export function openPublishSidebar() {
 }
 
 /**
- * Returns an action object used in signalling that the user toggled the publish sidebar
+ * Returns an action object used in signalling that the user closed the publish sidebar
  *
  * @return {Object} Action object
  */
 export function closePublishSidebar() {
 	return {
 		type: 'CLOSE_PUBLISH_SIDEBAR',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user toggles the publish sidebar
+ *
+ * @return {Object} Action object
+ */
+export function togglePublishSidebar() {
+	return {
+		type: 'TOGGLE_PUBLISH_SIDEBAR',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that use toggled a panel in the editor.
+ *
+ * @param {string}  panel The panel to toggle.
+ * @return {Object} Action object.
+ */
+export function toggleGeneralSidebarEditorPanel( panel ) {
+	return {
+		type: 'TOGGLE_GENERAL_SIDEBAR_EDITOR_PANEL',
+		panel,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the view mode preference should be set.
+ *
+ * @param {string} viewMode The view mode (desktop or mobile).
+ * @return {Object} Action object.
+ */
+export function setViewMode( viewMode ) {
+	return {
+		type: 'SET_VIEW_MODE',
+		viewMode,
 	};
 }
 

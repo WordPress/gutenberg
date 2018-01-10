@@ -13,7 +13,7 @@ import { IconButton, withSpokenMessages } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { getActivePanel, isSidebarOpened } from '../../store/selectors';
+import { getActivePanel, isGeneralSidebarPanelOpened } from '../../store/selectors';
 import { toggleSidebar, setActivePanel } from '../../store/actions';
 
 export function BlockInspectorButton( {
@@ -45,8 +45,7 @@ export function BlockInspectorButton( {
 			className="editor-block-settings-menu__control"
 			onClick={ flow( toggleInspector, speakMessage, onClick ) }
 			icon="admin-generic"
-			label={ small ? label : undefined }
-		>
+			label={ small ? label : undefined } >
 			{ ! small && label }
 		</IconButton>
 	);
@@ -54,7 +53,7 @@ export function BlockInspectorButton( {
 
 export default connect(
 	( state ) => ( {
-		isDefaultSidebarOpened: isSidebarOpened( state ),
+		isGeneralSidebarEditorOpened: isGeneralSidebarPanelOpened( state, 'editor' ),
 		panel: getActivePanel( state ),
 	} ),
 	( dispatch ) => ( {
