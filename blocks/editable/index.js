@@ -301,7 +301,8 @@ export default class Editable extends Component {
 			window.console.log( 'Received item:\n\n', blob );
 
 			if ( isEmpty && this.props.onReplace ) {
-				this.props.onReplace( content );
+				// Necessary to allow the paste bin to be removed without errors.
+				setTimeout( () => this.props.onReplace( content ) );
 			} else {
 				// Necessary to get the right range.
 				// Also done in the TinyMCE paste plugin.
