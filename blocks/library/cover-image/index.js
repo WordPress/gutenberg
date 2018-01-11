@@ -1,16 +1,22 @@
 /**
+ * External dependencies
+ */
+import { isEmpty } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-import { Placeholder, Toolbar, Dashicon } from '@wordpress/components';
+import { Placeholder, Toolbar, Dashicon, DropZone } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import classnames from 'classnames';
+import { mediaUpload } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
 import './editor.scss';
 import './style.scss';
-import { registerBlockType } from '../../api';
+import { registerBlockType, createBlock } from '../../api';
 import Editable from '../../editable';
 import MediaUploadButton from '../../media-upload-button';
 import BlockControls from '../../block-controls';
@@ -18,12 +24,13 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import InspectorControls from '../../inspector-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
 import RangeControl from '../../inspector-controls/range-control';
-import BlockDescription from '../../block-description';
 
 const validAlignments = [ 'left', 'center', 'right', 'wide', 'full' ];
 
 registerBlockType( 'core/cover-image', {
 	title: __( 'Cover Image' ),
+
+	description: __( 'Cover Image is a bold image block with an optional title.' ),
 
 	icon: 'format-image',
 
@@ -54,6 +61,27 @@ registerBlockType( 'core/cover-image', {
 		},
 	},
 
+	transforms: {
+		from: [
+			{
+				type: 'block',
+				blocks: [ 'core/heading' ],
+				transform: ( { content } ) => (
+					createBlock( 'core/cover-image', { title: content } )
+				),
+			},
+		],
+		to: [
+			{
+				type: 'block',
+				blocks: [ 'core/heading' ],
+				transform: ( { title } ) => (
+					createBlock( 'core/heading', { content: title } )
+				),
+			},
+		],
+	},
+
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
 		if ( -1 !== validAlignments.indexOf( align ) ) {
@@ -67,6 +95,7 @@ registerBlockType( 'core/cover-image', {
 		const onSelectImage = ( media ) => setAttributes( { url: media.url, id: media.id } );
 		const toggleParallax = () => setAttributes( { hasParallax: ! hasParallax } );
 		const setDimRatio = ( ratio ) => setAttributes( { dimRatio: ratio } );
+		const dropFiles = ( files ) => mediaUpload( files, setAttributes );
 		const style = url ?
 			{ backgroundImage: `url(${ url })` } :
 			undefined;
@@ -79,6 +108,7 @@ registerBlockType( 'core/cover-image', {
 			}
 		);
 
+		const editButtonLabel = __( 'Edit image' );
 		const controls = focus && [
 			<BlockControls key="controls">
 				<BlockAlignmentToolbar
@@ -90,21 +120,19 @@ registerBlockType( 'core/cover-image', {
 					<MediaUploadButton
 						buttonProps={ {
 							className: 'components-icon-button components-toolbar__control',
-							'aria-label': __( 'Edit image' ),
+							'aria-label': editButtonLabel,
 						} }
 						onSelect={ onSelectImage }
 						type="image"
 						value={ id }
+						tooltip={ editButtonLabel }
 					>
 						<Dashicon icon="edit" />
 					</MediaUploadButton>
 				</Toolbar>
 			</BlockControls>,
 			<InspectorControls key="inspector">
-				<BlockDescription>
-					<p>{ __( 'Cover Image is a bold image block with an optional title.' ) }</p>
-				</BlockDescription>
-				<h3>{ __( 'Cover Image Settings' ) }</h3>
+				<h2>{ __( 'Cover Image Settings' ) }</h2>
 				<ToggleControl
 					label={ __( 'Fixed Background' ) }
 					checked={ !! hasParallax }
@@ -123,20 +151,36 @@ registerBlockType( 'core/cover-image', {
 
 		if ( ! url ) {
 			const uploadButtonProps = { isLarge: true };
+			const hasTitle = ! isEmpty( title );
+			const icon = hasTitle ? undefined : 'format-image';
+			const label = hasTitle ? (
+				<Editable
+					tagName="h2"
+					value={ title }
+					focus={ focus }
+					onFocus={ setFocus }
+					onChange={ ( value ) => setAttributes( { title: value } ) }
+					inlineToolbar
+				/>
+			) : __( 'Cover Image' );
+
 			return [
 				controls,
 				<Placeholder
 					key="placeholder"
-					instructions={ __( 'Drag image here or insert from media library' ) }
-					icon="format-image"
-					label={ __( 'Cover Image' ) }
+					instructions={ __( 'Drag image here or add from media library' ) }
+					icon={ icon }
+					label={ label }
 					className={ className }>
+					<DropZone
+						onFilesDrop={ dropFiles }
+					/>
 					<MediaUploadButton
 						buttonProps={ uploadButtonProps }
 						onSelect={ onSelectImage }
 						type="image"
 					>
-						{ __( 'Insert from Media Library' ) }
+						{ __( 'Add from Media Library' ) }
 					</MediaUploadButton>
 				</Placeholder>,
 			];

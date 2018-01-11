@@ -9,8 +9,9 @@ import { registerReducer, registerSelectors } from '@wordpress/data';
 import { PREFERENCES_DEFAULTS } from './defaults';
 import reducer from './reducer';
 import { withRehydratation, loadAndPersist } from './persist';
-import enhanceWithBrowserSize from './browser';
-import store from './store';
+import enhanceWithBrowserSize from './mobile';
+import applyMiddlewares from './middlewares';
+import { BREAK_MEDIUM } from './constants';
 import { getEditedPostTitle } from './selectors';
 
 /**
@@ -19,9 +20,11 @@ import { getEditedPostTitle } from './selectors';
 const STORAGE_KEY = `GUTENBERG_PREFERENCES_${ window.userSettings.uid }`;
 const MODULE_KEY = 'core/editor';
 
-registerReducer( MODULE_KEY, withRehydratation( reducer, 'preferences' ) );
+const store = applyMiddlewares(
+	registerReducer( MODULE_KEY, withRehydratation( reducer, 'preferences' ) )
+);
 loadAndPersist( store, 'preferences', STORAGE_KEY, PREFERENCES_DEFAULTS );
-enhanceWithBrowserSize( store );
+enhanceWithBrowserSize( store, BREAK_MEDIUM );
 
 registerSelectors( MODULE_KEY, { getEditedPostTitle } );
 

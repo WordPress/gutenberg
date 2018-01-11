@@ -55,7 +55,9 @@ export function isHorizontalEdge( container, isReverse, collapseRanges = false )
 		return false;
 	}
 
-	if ( ! isReverse && offset !== node.textContent.length ) {
+	const maxOffset = node.nodeType === TEXT_NODE ? node.nodeValue.length : node.childNodes.length;
+
+	if ( ! isReverse && offset !== maxOffset ) {
 		return false;
 	}
 
@@ -302,4 +304,18 @@ export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScro
 	// This fixes it.
 	selection.removeAllRanges();
 	selection.addRange( range );
+}
+
+/**
+ * Check whether the given node in an input field.
+ *
+ * @param  {HTMLElement} element The HTML element.
+ * @return {Boolean}             True if the element is an input field, false if not.
+ */
+export function isInputField( { nodeName, contentEditable } ) {
+	return (
+		nodeName === 'INPUT' ||
+		nodeName === 'TEXTAREA' ||
+		contentEditable === 'true'
+	);
 }

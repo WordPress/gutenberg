@@ -24,3 +24,7 @@ input[type=text].editor-default-block-appender__content {
 		outline: 1px solid $light-gray-500;
 	}
 }
+
+.editor-default-block-appender .components-drop-zone__content-icon {
+	display: none;
+}

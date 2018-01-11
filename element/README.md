@@ -9,7 +9,7 @@ You may find yourself asking, "Why an abstraction layer?". For a few reasons:
 - It provides a mechanism to shield implementers by omitting features with uncertain futures (`createClass`, `PropTypes`).
 - It helps avoid incompatibilities between versions by ensuring that every plugin operates on a single centralized version of the code.
 
-On the `wp.element` global object, you will find the following, ordered roughly be likelihood you'll encounter it in your code:
+On the `wp.element` global object, you will find the following, ordered roughly by the likelihood you'll encounter it in your code:
 
 - [`createElement`](https://facebook.github.io/react/docs/react-api.html#createelement)
 - [`render`](https://facebook.github.io/react/docs/react-dom.html#render)

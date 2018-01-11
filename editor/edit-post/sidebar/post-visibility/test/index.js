@@ -11,7 +11,7 @@ import { PostVisibility } from '../';
 describe( 'PostVisibility', () => {
 	const user = {
 		data: {
-			capabilities: {
+			post_type_capabilities: {
 				publish_posts: true,
 			},
 		},
@@ -21,7 +21,7 @@ describe( 'PostVisibility', () => {
 		let wrapper = shallow( <PostVisibility user={ {} } /> );
 		expect( wrapper.find( 'a' ) ).toHaveLength( 0 );
 		wrapper = shallow( <PostVisibility postType="post" user={
-			{ data: { capabilities: { publish_posts: false } } }
+			{ data: { post_type_capabilities: { publish_posts: false } } }
 		} /> );
 		expect( wrapper.find( 'Dropdown' ) ).toHaveLength( 0 );
 	} );

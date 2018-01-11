@@ -17,7 +17,7 @@
 
 .editor-block-settings-menu__toggle {
 	border-radius: 50%;
-	padding: 0;
+	padding: 3px;
 	transform: rotate( 90deg );
 	width: auto;
 }
@@ -46,6 +46,8 @@
 	}
 }
 
-.editor-block-settings-menu__block-transformations {
-	border-top: 1px solid $dark-gray-500;
+.editor-block-settings-menu__section {
+	margin-top: $item-spacing;
+	padding-top: $item-spacing;
+	border-top: 1px solid $light-gray-500;
 }

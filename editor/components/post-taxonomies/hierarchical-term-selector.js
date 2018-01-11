@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { unescape as unescapeString, without, groupBy, map, repeat, find } from 'lodash';
+import { unescape as unescapeString, without, map, repeat, find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,6 +10,7 @@ import { unescape as unescapeString, without, groupBy, map, repeat, find } from 
 import { __, _x } from '@wordpress/i18n';
 import { Component, compose } from '@wordpress/element';
 import { withInstanceId, withSpokenMessages } from '@wordpress/components';
+import { buildTermsTree } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -21,6 +22,7 @@ const DEFAULT_QUERY = {
 	per_page: 100,
 	orderby: 'count',
 	order: 'desc',
+	_fields: [ 'id', 'name', 'parent' ],
 };
 
 class HierarchicalTermSelector extends Component {
@@ -40,23 +42,6 @@ class HierarchicalTermSelector extends Component {
 			formParent: '',
 			showForm: false,
 		};
-	}
-
-	buildTermsTree( flatTerms ) {
-		const termsByParent = groupBy( flatTerms, 'parent' );
-		const fillWithChildren = ( terms ) => {
-			return terms.map( ( term ) => {
-				const children = termsByParent[ term.id ];
-				return {
-					...term,
-					children: children && children.length ?
-						fillWithChildren( children ) :
-						[],
-				};
-			} );
-		};
-
-		return fillWithChildren( termsByParent[ 0 ] || [] );
 	}
 
 	onChange( event ) {
@@ -122,7 +107,7 @@ class HierarchicalTermSelector extends Component {
 					formName: '',
 					formParent: '',
 					availableTerms: newAvailableTerms,
-					availableTermsTree: this.buildTermsTree( newAvailableTerms ),
+					availableTermsTree: buildTermsTree( newAvailableTerms ),
 				} );
 				onUpdateTerms( [ ...terms, term.id ], restBase );
 			}, ( xhr ) => {
@@ -140,7 +125,7 @@ class HierarchicalTermSelector extends Component {
 		this.fetchRequest = new Collection()
 			.fetch( { data: DEFAULT_QUERY } )
 			.done( ( terms ) => {
-				const availableTermsTree = this.buildTermsTree( terms );
+				const availableTermsTree = buildTermsTree( terms );
 
 				this.setState( {
 					loading: false,
@@ -217,7 +202,7 @@ class HierarchicalTermSelector extends Component {
 		/* eslint-disable jsx-a11y/no-onchange */
 		return (
 			<div className="editor-post-taxonomies__hierarchical-terms-selector">
-				<h4 className="editor-post-taxonomies__hierarchical-terms-selector-title">{ label }</h4>
+				<h3 className="editor-post-taxonomies__hierarchical-terms-selector-title">{ label }</h3>
 				{ this.renderTerms( availableTermsTree ) }
 				{ ! loading &&
 					<button

@@ -4,7 +4,7 @@
 import { isFunction, mapValues } from 'lodash';
 
 /**
- * WordPress dependecies
+ * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
 
@@ -12,7 +12,7 @@ function warnAboutDeprecatedMatcher() {
 	// eslint-disable-next-line no-console
 	console.warn(
 		'Attributes matchers are deprecated and they will be removed in a future version of Gutenberg. ' +
-		'Please update your attributes definition https://wordpress.org/gutenberg/handbook/reference/attributes/'
+		'Please update your attributes definition https://wordpress.org/gutenberg/handbook/block-api/attributes/'
 	);
 }
 

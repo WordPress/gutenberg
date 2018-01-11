@@ -16,15 +16,6 @@ import {
 	setUnknownTypeHandlerName,
 } from '../registration';
 
-const expectFailingBlockValidation = () => {
-	/* eslint-disable no-console */
-	expect( console.error ).toHaveBeenCalled();
-	expect( console.warn ).toHaveBeenCalled();
-	console.warn.mockClear();
-	console.error.mockClear();
-	/* eslint-enable no-console */
-};
-
 describe( 'block parser', () => {
 	const defaultBlockSettings = {
 		attributes: {
@@ -206,7 +197,8 @@ describe( 'block parser', () => {
 				{},
 			);
 			expect( attributes ).toBeUndefined();
-			expectFailingBlockValidation();
+			expect( console ).toHaveErrored();
+			expect( console ).toHaveWarned();
 		} );
 
 		it( 'should return the attributes parsed by the deprecated version', () => {
@@ -316,7 +308,8 @@ describe( 'block parser', () => {
 			expect( block.name ).toEqual( 'core/test-block' );
 			expect( block.attributes ).toEqual( { fruit: 'Bananas' } );
 			expect( block.isValid ).toBe( true );
-			expectFailingBlockValidation();
+			expect( console ).toHaveErrored();
+			expect( console ).toHaveWarned();
 		} );
 	} );
 

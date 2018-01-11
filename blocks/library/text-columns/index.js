@@ -19,10 +19,11 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import RangeControl from '../../inspector-controls/range-control';
 import Editable from '../../editable';
 import InspectorControls from '../../inspector-controls';
-import BlockDescription from '../../block-description';
 
 registerBlockType( 'core/text-columns', {
 	title: __( 'Text Columns' ),
+
+	description: __( 'Add text across columns. This block is experimental' ),
 
 	icon: 'columns',
 
@@ -71,9 +72,6 @@ registerBlockType( 'core/text-columns', {
 			),
 			focus && (
 				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'Add text across columns. This block is experimental' ) }</p>
-					</BlockDescription>
 					<RangeControl
 						label={ __( 'Columns' ) }
 						value={ columns }
@@ -83,7 +81,7 @@ registerBlockType( 'core/text-columns', {
 					/>
 				</InspectorControls>
 			),
-			<section className={ `${ className } align${ width } columns-${ columns }` } key="block">
+			<div className={ `${ className } align${ width } columns-${ columns }` } key="block">
 				{ times( columns, ( index ) =>
 					<div className="wp-block-column" key={ `column-${ index }` }>
 						<Editable
@@ -104,20 +102,20 @@ registerBlockType( 'core/text-columns', {
 						/>
 					</div>
 				) }
-			</section>,
+			</div>,
 		];
 	},
 
 	save( { attributes } ) {
 		const { width, content, columns } = attributes;
 		return (
-			<section className={ `align${ width } columns-${ columns }` }>
+			<div className={ `align${ width } columns-${ columns }` }>
 				{ times( columns, ( index ) =>
 					<div className="wp-block-column" key={ `column-${ index }` }>
 						<p>{ content && content[ index ].children }</p>
 					</div>
 				) }
-			</section>
+			</div>
 		);
 	},
 } );

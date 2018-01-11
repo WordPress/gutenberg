@@ -42,6 +42,42 @@ class WP_Block_Type {
 	public $attributes;
 
 	/**
+	 * Block type editor script handle.
+	 *
+	 * @since 2.0.0
+	 * @access public
+	 * @var string
+	 */
+	public $editor_script;
+
+	/**
+	 * Block type front end script handle.
+	 *
+	 * @since 2.0.0
+	 * @access public
+	 * @var string
+	 */
+	public $script;
+
+	/**
+	 * Block type editor style handle.
+	 *
+	 * @since 2.0.0
+	 * @access public
+	 * @var string
+	 */
+	public $editor_style;
+
+	/**
+	 * Block type front end style handle.
+	 *
+	 * @since 2.0.0
+	 * @access public
+	 * @var string
+	 */
+	public $style;
+
+	/**
 	 * Constructor.
 	 *
 	 * Will populate object properties from the provided arguments.

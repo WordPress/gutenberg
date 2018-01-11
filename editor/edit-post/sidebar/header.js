@@ -18,6 +18,7 @@ import { toggleSidebar, setActivePanel } from '../../store/actions';
 const SidebarHeader = ( { panel, onSetPanel, onToggleSidebar, count } ) => {
 	// Do not display "0 Blocks".
 	count = count === 0 ? 1 : count;
+	const closeSidebar = () => onToggleSidebar( undefined, false );
 
 	return (
 		<div className="components-panel__header editor-sidebar__panel-tabs">
@@ -31,12 +32,12 @@ const SidebarHeader = ( { panel, onSetPanel, onToggleSidebar, count } ) => {
 			<button
 				onClick={ () => onSetPanel( 'block' ) }
 				className={ `editor-sidebar__panel-tab ${ panel === 'block' ? 'is-active' : '' }` }
-				aria-label={ __( 'Block settings' ) }
+				aria-label={ __( 'Format settings' ) }
 			>
-				{ sprintf( _n( 'Block', '%d Blocks', count ), count ) }
+				{ sprintf( _n( 'Format', 'Format (%d)', count ), count ) }
 			</button>
 			<IconButton
-				onClick={ onToggleSidebar }
+				onClick={ closeSidebar }
 				icon="no-alt"
 				label={ __( 'Close settings' ) }
 			/>
@@ -49,8 +50,8 @@ export default connect(
 		panel: getActivePanel( state ),
 		count: getSelectedBlockCount( state ),
 	} ),
-	( dispatch ) => ( {
-		onSetPanel: ( panel ) => dispatch( setActivePanel( panel ) ),
-		onToggleSidebar: () => dispatch( toggleSidebar() ),
-	} )
+	{
+		onSetPanel: setActivePanel,
+		onToggleSidebar: toggleSidebar,
+	}
 )( SidebarHeader );

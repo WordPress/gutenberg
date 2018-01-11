@@ -15,10 +15,12 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import './style.scss';
 
-function ColorPalette( { colors, value, onChange } ) {
+export function ColorPalette( { defaultColors, colors, value, onChange } ) {
+	const usedColors = colors || defaultColors;
+
 	return (
 		<div className="blocks-color-palette">
-			{ colors.map( ( color ) => {
+			{ usedColors.map( ( color ) => {
 				const style = { color: color };
 				const className = classnames( 'blocks-color-palette__item', { 'is-active': value === color } );
 
@@ -73,6 +75,6 @@ function ColorPalette( { colors, value, onChange } ) {
 
 export default withContext( 'editor' )(
 	( settings ) => ( {
-		colors: settings.colors,
+		defaultColors: settings.colors,
 	} )
 )( ColorPalette );

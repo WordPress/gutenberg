@@ -44,7 +44,7 @@ export function createBlock( name, blockAttributes = {} ) {
 		const value = blockAttributes[ key ];
 		if ( undefined !== value ) {
 			result[ key ] = value;
-		} else if ( source.default ) {
+		} else if ( source.hasOwnProperty( 'default' ) ) {
 			result[ key ] = source.default;
 		}
 
@@ -222,9 +222,9 @@ export function switchToBlockType( blocks, name ) {
  */
 export function createReusableBlock( type, attributes ) {
 	return {
-		id: +uniqueId(), // Temorary id replaced when the block is saved server side
+		id: -uniqueId(), // Temorary id replaced when the block is saved server side
 		isTemporary: true,
-		name: __( 'Untitled block' ),
+		title: __( 'Untitled block' ),
 		type,
 		attributes,
 	};

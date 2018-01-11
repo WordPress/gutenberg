@@ -17,7 +17,7 @@ import { createBlock, BlockIcon } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { Inserter } from '../../../components';
-import { insertBlock } from '../../../store/actions';
+import { clearSelectedBlock, insertBlock } from '../../../store/actions';
 import { getMostFrequentlyUsedBlocks, getBlockCount, getBlocks } from '../../../store/selectors';
 
 export class VisualEditorInserter extends Component {
@@ -34,11 +34,14 @@ export class VisualEditorInserter extends Component {
 
 	toggleControls( isShowingControls ) {
 		this.setState( { isShowingControls } );
+
+		if ( isShowingControls && this.props.clearSelectedBlock ) {
+			this.props.clearSelectedBlock();
+		}
 	}
 
 	insertBlock( name ) {
-		const { onInsertBlock } = this.props;
-		onInsertBlock( createBlock( name ) );
+		this.props.insertBlock( createBlock( name ) );
 	}
 
 	isDisabledBlock( block ) {
@@ -71,7 +74,7 @@ export class VisualEditorInserter extends Component {
 						key={ 'frequently_used_' + block.name }
 						className="editor-inserter__block"
 						onClick={ () => this.insertBlock( block.name ) }
-						label={ sprintf( __( 'Insert %s' ), block.title ) }
+						label={ sprintf( __( 'Add %s' ), block.title ) }
 						disabled={ this.isDisabledBlock( block ) }
 						icon={ (
 							<span className="editor-visual-editor__inserter-block-icon">
@@ -96,7 +99,10 @@ export default compose(
 				blocks: getBlocks( state ),
 			};
 		},
-		{ onInsertBlock: insertBlock },
+		{
+			insertBlock,
+			clearSelectedBlock,
+		},
 	),
 	withContext( 'editor' )( ( settings ) => {
 		const { templateLock } = settings;

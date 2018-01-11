@@ -16,9 +16,9 @@ import { IconButton, Dropdown, NavigableMenu } from '@wordpress/components';
 import './style.scss';
 import BlockInspectorButton from './block-inspector-button';
 import BlockModeToggle from './block-mode-toggle';
-import BlockDeleteButton from './block-delete-button';
+import BlockRemoveButton from './block-remove-button';
 import BlockTransformations from './block-transformations';
-import ReusableBlockToggle from './reusable-block-toggle';
+import ReusableBlockSettings from './reusable-block-settings';
 import UnknownConverter from './unknown-converter';
 import { selectBlock } from '../../store/actions';
 
@@ -57,8 +57,8 @@ function BlockSettingsMenu( { uids, onSelect, focus } ) {
 					<BlockInspectorButton onClick={ onClose } />
 					{ count === 1 && <BlockModeToggle uid={ uids[ 0 ] } onToggle={ onClose } /> }
 					{ count === 1 && <UnknownConverter uid={ uids[ 0 ] } /> }
-					<BlockDeleteButton uids={ uids } />
-					{ count === 1 && <ReusableBlockToggle uid={ uids[ 0 ] } onToggle={ onClose } /> }
+					<BlockRemoveButton uids={ uids } />
+					{ count === 1 && <ReusableBlockSettings uid={ uids[ 0 ] } onToggle={ onClose } /> }
 					<BlockTransformations uids={ uids } onClick={ onClose } />
 				</NavigableMenu>
 			) }

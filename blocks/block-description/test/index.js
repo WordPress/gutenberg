@@ -15,6 +15,9 @@ describe( 'BlockDescription', () => {
 			expect( blockDescription.hasClass( 'components-block-description' ) ).toBe( true );
 			expect( blockDescription.type() ).toBe( 'div' );
 			expect( blockDescription.text() ).toBe( 'Hello World' );
+			expect( console ).toHaveWarnedWith(
+				'The wp.blocks.BlockDescription component is deprecated. Use the "description" block property instead.'
+			);
 		} );
 	} );
 } );

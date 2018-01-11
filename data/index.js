@@ -19,21 +19,35 @@ const initialReducer = () => ( {} );
 const store = createStore( initialReducer, {}, flowRight( enhancers ) );
 
 /**
- * Registers a new sub reducer to the global state
+ * Registers a new sub reducer to the global state and returns a Redux-like store object.
  *
- * @param {String} key     Reducer key
- * @param {Object} reducer Reducer function
+ * @param {String}  key     Reducer key
+ * @param {Object}  reducer Reducer function
+ *
+ * @returns {Object}        Store Object
  */
 export function registerReducer( key, reducer ) {
 	reducers[ key ] = reducer;
 	store.replaceReducer( combineReducers( reducers ) );
+	const getState = () => store.getState()[ key ];
+
+	return {
+		dispatch: store.dispatch,
+		subscribe( listener ) {
+			let previousState = getState();
+			const unsubscribe = store.subscribe( () => {
+				const newState = getState();
+				if ( newState !== previousState ) {
+					listener();
+					previousState = newState;
+				}
+			} );
+
+			return unsubscribe;
+		},
+		getState,
+	};
 }
-
-export const subscribe = store.subscribe;
-
-export const dispatch = store.dispatch;
-
-export const getState = store.getState;
 
 /**
  * Registers selectors for external usage
@@ -48,9 +62,9 @@ export function registerSelectors( key, registeredSelectors ) {
 export const query = ( mapPropsToSelectors ) => ( WrappedComponent ) => {
 	return connect( ( state ) => {
 		const select = ( key, selectorName, ...args ) => {
-			return selectors[ key ][ selectorName ]( getState()[ key ], ...args );
+			return selectors[ key ][ selectorName ]( state[ key ], ...args );
 		};
 
 		return mapPropsToSelectors( select );
 	} )( WrappedComponent );
-}
+};

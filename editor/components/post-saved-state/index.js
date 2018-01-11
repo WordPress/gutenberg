@@ -14,6 +14,7 @@ import { Dashicon, Button } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
+import PostSwitchToDraftButton from '../post-switch-to-draft-button';
 import { editPost, savePost } from '../../store/actions';
 import {
 	isEditedPostNew,
@@ -36,7 +37,11 @@ export function PostSavedState( { isNew, isPublished, isDirty, isSaving, isSavea
 		);
 	}
 
-	if ( ! isSaveable || isPublished ) {
+	if ( isPublished ) {
+		return <PostSwitchToDraftButton className={ classnames( className, 'button-link' ) } />;
+	}
+
+	if ( ! isSaveable ) {
 		return null;
 	}
 
