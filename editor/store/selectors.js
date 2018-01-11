@@ -1105,6 +1105,16 @@ export const getMostFrequentlyUsedBlocks = createSelector(
 );
 
 /**
+ * Returns whether the toolbar should be fixed or not.
+ *
+ * @param  {Object}    state   Global application state.
+ * @return {Boolean}          True if toolbar is fixed.
+ */
+export function hasFixedToolbar( state ) {
+	return ! isMobile( state ) && isFeatureActive( state, 'fixedToolbar' );
+}
+
+/**
  * Returns whether the given feature is enabled or not
  *
  * @param {Object}    state   Global application state

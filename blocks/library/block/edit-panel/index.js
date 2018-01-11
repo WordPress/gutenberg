@@ -13,7 +13,7 @@ import './style.scss';
 const { ESCAPE } = keycodes;
 
 function ReusableBlockEditPanel( props ) {
-	const { isEditing, title, isSaving, onEdit, onDetach, onChangeTitle, onSave, onCancel } = props;
+	const { isEditing, title, isSaving, onEdit, onChangeTitle, onSave, onCancel } = props;
 
 	return [
 		( ! isEditing && ! isSaving ) && (
@@ -26,12 +26,6 @@ function ReusableBlockEditPanel( props ) {
 					className="reusable-block-edit-panel__button"
 					onClick={ onEdit }>
 					{ __( 'Edit' ) }
-				</Button>
-				<Button
-					isLarge
-					className="reusable-block-edit-panel__button"
-					onClick={ onDetach }>
-					{ __( 'Detach' ) }
 				</Button>
 			</div>
 		),

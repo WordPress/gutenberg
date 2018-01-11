@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { isEmpty } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { Placeholder, Toolbar, Dashicon, DropZone } from '@wordpress/components';
@@ -103,6 +108,7 @@ registerBlockType( 'core/cover-image', {
 			}
 		);
 
+		const editButtonLabel = __( 'Edit image' );
 		const controls = focus && [
 			<BlockControls key="controls">
 				<BlockAlignmentToolbar
@@ -114,11 +120,12 @@ registerBlockType( 'core/cover-image', {
 					<MediaUploadButton
 						buttonProps={ {
 							className: 'components-icon-button components-toolbar__control',
-							'aria-label': __( 'Edit image' ),
+							'aria-label': editButtonLabel,
 						} }
 						onSelect={ onSelectImage }
 						type="image"
 						value={ id }
+						tooltip={ editButtonLabel }
 					>
 						<Dashicon icon="edit" />
 					</MediaUploadButton>
@@ -144,8 +151,9 @@ registerBlockType( 'core/cover-image', {
 
 		if ( ! url ) {
 			const uploadButtonProps = { isLarge: true };
-			const icon = title ? undefined : 'format-image';
-			const label = title ? (
+			const hasTitle = ! isEmpty( title );
+			const icon = hasTitle ? undefined : 'format-image';
+			const label = hasTitle ? (
 				<Editable
 					tagName="h2"
 					value={ title }
@@ -160,7 +168,7 @@ registerBlockType( 'core/cover-image', {
 				controls,
 				<Placeholder
 					key="placeholder"
-					instructions={ __( 'Drag image here or insert from media library' ) }
+					instructions={ __( 'Drag image here or add from media library' ) }
 					icon={ icon }
 					label={ label }
 					className={ className }>
@@ -172,7 +180,7 @@ registerBlockType( 'core/cover-image', {
 						onSelect={ onSelectImage }
 						type="image"
 					>
-						{ __( 'Insert from Media Library' ) }
+						{ __( 'Add from Media Library' ) }
 					</MediaUploadButton>
 				</Placeholder>,
 			];

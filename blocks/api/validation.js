@@ -401,7 +401,7 @@ export function isEquivalentHTML( actual, expected ) {
 		}
 	}
 
-	while ( ( expectedToken = getNextNonWhitespaceToken( expectedTokens ) ) ) {
+	if ( ( expectedToken = getNextNonWhitespaceToken( expectedTokens ) ) ) {
 		// If any non-whitespace tokens remain in expected token set, this
 		// indicates inequality
 		log.warning( 'Expected %o, instead saw end of content.', expectedToken );

@@ -32,7 +32,7 @@ export default function AlignmentToolbar( { value, onChange } ) {
 				return {
 					...control,
 					isActive,
-					onClick: () => onChange( isActive ? null : align ),
+					onClick: () => onChange( isActive ? undefined : align ),
 				};
 			} ) }
 		/>

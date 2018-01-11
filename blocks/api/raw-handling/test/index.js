@@ -9,6 +9,7 @@ import { equal, deepEqual } from 'assert';
 import rawHandler from '../index';
 import { registerBlockType, unregisterBlockType, setUnknownTypeHandlerName } from '../../registration';
 import { createBlock } from '../../factory';
+import { getBlockContent } from '../../serializer';
 
 describe( 'rawHandler', () => {
 	it( 'should convert recognised raw content', () => {
@@ -104,13 +105,34 @@ describe( 'rawHandler', () => {
 		equal( filtered, '<em>test</em>' );
 	} );
 
-	it( 'should always return blocks', () => {
-		const blocks = rawHandler( {
-			HTML: 'test',
-			mode: 'BLOCKS',
+	it( 'should parse Markdown', () => {
+		const filtered = rawHandler( {
+			HTML: '* one<br>* two<br>* three',
+			plainText: '* one\n* two\n* three',
+			mode: 'AUTO',
+		} ).map( getBlockContent ).join( '' );
+
+		equal( filtered, '<ul>\n    <li>one</li>\n    <li>two</li>\n    <li>three</li>\n</ul>' );
+	} );
+
+	it( 'should parse inline Markdown', () => {
+		const filtered = rawHandler( {
+			HTML: 'Some **bold** text.',
+			plainText: 'Some **bold** text.',
+			mode: 'AUTO',
 		} );
 
-		equal( Array.isArray( blocks ), true );
+		equal( filtered, 'Some <strong>bold</strong> text.' );
+	} );
+
+	it( 'should parse HTML in plainText', () => {
+		const filtered = rawHandler( {
+			HTML: '&lt;p&gt;Some &lt;strong&gt;bold&lt;/strong&gt; text.&lt;/p&gt;',
+			plainText: '<p>Some <strong>bold</strong> text.</p>',
+			mode: 'AUTO',
+		} ).map( getBlockContent ).join( '' );
+
+		equal( filtered, '<p>Some <strong>bold</strong> text.</p>' );
 	} );
 } );
 

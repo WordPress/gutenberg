@@ -31,7 +31,10 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 			type: 'array',
 			source: 'children',
 			selector: 'p',
-		}
+		},
+		alignment: {
+			type: 'string',
+		},
 	},
 
 	edit: function( props ) {
@@ -76,9 +79,10 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 	},
 
 	save: function( props ) {
-		var content = props.attributes.content;
+		var content = props.attributes.content,
+			alignment = props.attributes.alignment;
 
-		return el( 'p', { className: props.className }, content );
+		return el( 'p', { className: props.className, style: { textAlign: alignment } }, content );
 	},
 } );
 ```
@@ -104,6 +108,9 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 			type: 'array',
 			source: 'children',
 			selector: 'p',
+		},
+		alignment: {
+			type: 'string',
 		},
 	},
 
@@ -141,9 +148,9 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 	},
 
 	save( { attributes, className } ) {
-		const { content } = attributes;
+		const { content, alignment } = attributes;
 
-		return <p className={ className }>{ content }</p>;
+		return <p className={ className } style={ textAlign: alignment }>{ content }</p>;
 	},
 } );
 ```

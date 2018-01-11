@@ -127,6 +127,15 @@ class GalleryBlock extends Component {
 		);
 	}
 
+	componentWillReceiveProps( nextProps ) {
+		// Deselect images when losing focus
+		if ( ! nextProps.focus && this.props.focus ) {
+			this.setState( {
+				selectedImage: null,
+			} );
+		}
+	}
+
 	render() {
 		const { attributes, focus, className } = this.props;
 		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
@@ -137,6 +146,7 @@ class GalleryBlock extends Component {
 			/>
 		);
 
+		const editButtonLabel = __( 'Edit Gallery' );
 		const controls = (
 			focus && (
 				<BlockControls key="controls">
@@ -149,13 +159,14 @@ class GalleryBlock extends Component {
 							<MediaUploadButton
 								buttonProps={ {
 									className: 'components-icon-button components-toolbar__control',
-									'aria-label': __( 'Edit Gallery' ),
+									'aria-label': editButtonLabel,
 								} }
 								onSelect={ this.onSelectImages }
 								type="image"
 								multiple
 								gallery
 								value={ images.map( ( img ) => img.id ) }
+								tooltip={ editButtonLabel }
 							>
 								<Dashicon icon="edit" />
 							</MediaUploadButton>
@@ -172,7 +183,7 @@ class GalleryBlock extends Component {
 				controls,
 				<Placeholder
 					key="placeholder"
-					instructions={ __( 'Drag images here or insert from media library' ) }
+					instructions={ __( 'Drag images here or add from media library' ) }
 					icon="format-gallery"
 					label={ __( 'Gallery' ) }
 					className={ className }>
@@ -193,7 +204,7 @@ class GalleryBlock extends Component {
 						multiple
 						gallery
 					>
-						{ __( 'Insert from Media Library' ) }
+						{ __( 'Add from Media Library' ) }
 					</MediaUploadButton>
 				</Placeholder>,
 			];

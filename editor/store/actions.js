@@ -616,6 +616,19 @@ export function saveReusableBlock( id ) {
 }
 
 /**
+ * Returns an action object used to delete a reusable block via the REST API.
+ * 
+ * @param {number} id  The ID of the reusable block to delete.
+ * @return {Object}    Action object.
+ */
+export function deleteReusableBlock( id ) {
+	return {
+		type: 'DELETE_REUSABLE_BLOCK',
+		id,
+	};
+}
+
+/**
  * Returns an action object used to convert a reusable block into a static
  * block.
  *

@@ -24,13 +24,6 @@ const FocusManaged = withFocusReturn( ( { children } ) => children );
 const { ESCAPE } = keycodes;
 
 /**
- * Offset by which popover should adjust horizontally to account for tail.
- *
- * @type {Number}
- */
-const ARROW_OFFSET = 20;
-
-/**
  * Name of slot in which popover should fill.
  *
  * @type {String}
@@ -194,14 +187,8 @@ class Popover extends Component {
 		popover.style.bottom = 'auto';
 		popover.style.right = 'auto';
 
-		if ( isRight ) {
-			popover.style.left = rect.left + ARROW_OFFSET + 'px';
-		} else if ( isLeft ) {
-			popover.style.left = ( rect.right - ARROW_OFFSET ) + 'px';
-		} else {
-			// Set popover at parent node center
-			popover.style.left = Math.round( rect.left + ( rect.width / 2 ) ) + 'px';
-		}
+		// Set popover at parent node center
+		popover.style.left = Math.round( rect.left + ( rect.width / 2 ) ) + 'px';
 
 		// Set at top or bottom of parent node based on popover position
 		popover.style.top = rect[ yAxis ] + 'px';

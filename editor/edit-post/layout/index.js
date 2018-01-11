@@ -30,6 +30,7 @@ import {
 } from '../../components';
 import {
 	getEditorMode,
+	hasFixedToolbar,
 	hasOpenSidebar,
 	isFeatureActive,
 	getOpenedGeneralSidebar,
@@ -62,7 +63,7 @@ function Layout( {
 } ) {
 	const className = classnames( 'editor-layout', {
 		'is-sidebar-opened': layoutHasOpenSidebar,
-		'has-fixed-toolbar': hasFixedToolbar,
+		'has-fixed-toolbar': fixedToolbarActive,
 	} );
 
 	return (

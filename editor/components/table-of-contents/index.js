@@ -40,26 +40,26 @@ function TableOfContents( { blocks } ) {
 			renderContent={ () => ( [
 				<div key="counts" className="table-of-contents__counts">
 					<div className="table-of-contents__count">
+						{ __( 'Words' ) }
 						<WordCount />
-						{ __( 'Word Count' ) }
 					</div>
 					<div className="table-of-contents__count">
-						<span className="table-of-contents__number">{ blocks.length }</span>
-						{ __( 'Blocks' ) }
-					</div>
-					<div className="table-of-contents__count">
-						<span className="table-of-contents__number">{ headings.length }</span>
 						{ __( 'Headings' ) }
+						<span className="table-of-contents__number">{ headings.length }</span>
 					</div>
 					<div className="table-of-contents__count">
-						<span className="table-of-contents__number">{ paragraphs.length }</span>
 						{ __( 'Paragraphs' ) }
+						<span className="table-of-contents__number">{ paragraphs.length }</span>
+					</div>
+					<div className="table-of-contents__count">
+						{ __( 'Blocks' ) }
+						<span className="table-of-contents__number">{ blocks.length }</span>
 					</div>
 				</div>,
 				headings.length > 0 && (
 					<div key="headings">
 						<hr />
-						<span className="table-of-contents__title">{ __( 'Table of Contents' ) }</span>
+						<span className="table-of-contents__title">{ __( 'Document Outline' ) }</span>
 						<DocumentOutline />
 					</div>
 				),

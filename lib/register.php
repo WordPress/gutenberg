@@ -189,13 +189,15 @@ function gutenberg_collect_meta_box_data() {
 		add_meta_box( 'authordiv', __( 'Author', 'gutenberg' ), 'post_author_meta_box', $screen, 'normal', 'core' );
 	}
 
+	// Run the hooks for adding meta boxes for a specific post type.
+	do_action( 'add_meta_boxes', $post_type, $post );
+	do_action( "add_meta_boxes_{$post_type}", $post );
+
 	// Set up meta box locations.
 	$locations = array( 'normal', 'advanced', 'side' );
 
 	// Foreach location run the hooks meta boxes are potentially registered on.
 	foreach ( $locations as $location ) {
-		do_action( 'add_meta_boxes', $post->post_type, $post );
-		do_action( "add_meta_boxes_{$post->post_type}", $post );
 		do_action(
 			'do_meta_boxes',
 			$screen,
