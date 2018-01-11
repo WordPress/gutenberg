@@ -154,7 +154,7 @@ class ImageBlock extends Component {
 				controls,
 				<Placeholder
 					key="placeholder"
-					instructions={ __( 'Drag image here or insert from media library' ) }
+					instructions={ __( 'Drag image here or add from media library' ) }
 					icon="format-image"
 					label={ __( 'Image' ) }
 					className={ className }>
@@ -174,7 +174,7 @@ class ImageBlock extends Component {
 						onSelect={ this.onSelectImage }
 						type="image"
 					>
-						{ __( 'Insert from Media Library' ) }
+						{ __( 'Add from Media Library' ) }
 					</MediaUploadButton>
 				</Placeholder>,
 			];

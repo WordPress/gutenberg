@@ -168,7 +168,7 @@ registerBlockType( 'core/cover-image', {
 				controls,
 				<Placeholder
 					key="placeholder"
-					instructions={ __( 'Drag image here or insert from media library' ) }
+					instructions={ __( 'Drag image here or add from media library' ) }
 					icon={ icon }
 					label={ label }
 					className={ className }>
@@ -180,7 +180,7 @@ registerBlockType( 'core/cover-image', {
 						onSelect={ onSelectImage }
 						type="image"
 					>
-						{ __( 'Insert from Media Library' ) }
+						{ __( 'Add from Media Library' ) }
 					</MediaUploadButton>
 				</Placeholder>,
 			];

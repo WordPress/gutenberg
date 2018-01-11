@@ -139,7 +139,7 @@ registerBlockType( 'core/audio', {
 							type="audio"
 							value={ id }
 						>
-							{ __( 'Insert from Media Library' ) }
+							{ __( 'Add from Media Library' ) }
 						</MediaUploadButton>
 					</Placeholder>,
 				];
