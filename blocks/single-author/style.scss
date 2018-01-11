@@ -1,0 +1,16 @@
+.blocks-single-author {
+	&.alignright, &.alignleft {
+		max-width: 50%;
+	}
+	&.with-bio {
+		text-align: left;
+	}
+	&.no-bio {
+		text-align: center;
+	}
+	p:after {
+		content: "";
+		clear: both;
+		display: block;
+	}
+}

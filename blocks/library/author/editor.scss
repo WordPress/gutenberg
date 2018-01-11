@@ -1,0 +1,22 @@
+.editor-block-list__block[data-type="core/author"] {
+	&[data-align="center"] {
+		text-align: center;
+	}
+
+	&[data-align="right"] {
+		text-align: right;
+	}
+
+	&[data-align="left"],
+	&[data-align="right"] {
+		max-width: 350px;
+		.blocks-single-author{
+			max-width: 100%;
+		}
+	}
+}
+.blocks-single-author.with-bio {
+	img {
+		margin-right: 10px;
+	}
+}

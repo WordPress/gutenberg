@@ -1,0 +1,14 @@
+[
+    {
+        "uid": "_uid_0",
+        "name": "core/author",
+        "isValid": true,
+        "attributes": {
+            "hideBio": true,
+            "hideAvatar": true,
+            "hideName": true,
+            "align": "center"
+        },
+        "originalContent": ""
+    }
+]

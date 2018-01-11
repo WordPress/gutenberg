@@ -1,0 +1,16 @@
+[
+    {
+        "blockName": "core/author",
+        "attrs": {
+            "hideBio": true,
+            "hideAvatar": true,
+            "hideName": true
+        },
+        "innerBlocks": [],
+        "innerHTML": ""
+    },
+    {
+        "attrs": {},
+        "innerHTML": "\n"
+    }
+]
