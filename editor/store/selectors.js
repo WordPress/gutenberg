@@ -1120,6 +1120,11 @@ function buildInserterItemFromReusableBlock( enabledBlockTypes, reusableBlock ) 
 		return null;
 	}
 
+	const referencedBlockType = getBlockType( reusableBlock.type );
+	if ( ! referencedBlockType ) {
+		return null;
+	}
+
 	return {
 		// Attributes used for insertion
 		name: 'core/block',
@@ -1127,7 +1132,7 @@ function buildInserterItemFromReusableBlock( enabledBlockTypes, reusableBlock ) 
 
 		// Attributes shown in the inserter
 		title: reusableBlock.title,
-		icon: 'layout',
+		icon: referencedBlockType.icon,
 		category: 'reusable-blocks',
 
 		// Metadata

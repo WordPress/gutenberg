@@ -98,6 +98,7 @@ describe( 'selectors', () => {
 			save: ( props ) => props.attributes.text,
 			category: 'common',
 			title: 'test block',
+			icon: 'test',
 			keywords: [ 'testing' ],
 			useOnce: true,
 		} );
@@ -2258,7 +2259,7 @@ describe( 'selectors', () => {
 					name: 'core/test-block',
 					initialAttributes: {},
 					title: 'test block',
-					icon: 'block-default',
+					icon: 'test',
 					category: 'common',
 					keywords: [ 'testing' ],
 					isDisabled: false,
@@ -2295,7 +2296,11 @@ describe( 'selectors', () => {
 				},
 				reusableBlocks: {
 					data: {
-						123: { id: 123, title: 'My reusable block' },
+						123: {
+							id: 123,
+							title: 'My reusable block',
+							type: 'core/test-block',
+						},
 					},
 				},
 			};
@@ -2305,7 +2310,7 @@ describe( 'selectors', () => {
 					name: 'core/block',
 					initialAttributes: { ref: 123 },
 					title: 'My reusable block',
-					icon: 'layout',
+					icon: 'test',
 					category: 'reusable-blocks',
 					keywords: [],
 					isDisabled: false,
@@ -2337,7 +2342,7 @@ describe( 'selectors', () => {
 				},
 				reusableBlocks: {
 					data: {
-						123: { id: 123 },
+						123: { id: 123, type: 'core/test-block' },
 					},
 				},
 			};
@@ -2391,7 +2396,7 @@ describe( 'selectors', () => {
 				},
 				reusableBlocks: {
 					data: {
-						123: { id: 123 },
+						123: { id: 123, type: 'core/test-block' },
 					},
 				},
 			};
