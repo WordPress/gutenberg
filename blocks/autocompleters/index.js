@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { sortBy } from 'lodash';
-import { connect } from 'react-redux';
 
 /**
  * Internal dependencies
@@ -10,7 +9,6 @@ import { connect } from 'react-redux';
 import './style.scss';
 import { createBlock, getBlockTypes } from '../api';
 import BlockIcon from '../block-icon';
-import { isEditedPostDirty } from '../../editor/store/selectors';
 
 /**
  * @typedef {Object} CompleterOption
@@ -148,5 +146,3 @@ export function userAutocompleter() {
 		setSearch,
 	};
 }
-
-
