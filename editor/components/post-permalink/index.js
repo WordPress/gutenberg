@@ -75,7 +75,8 @@ class PostPermalink extends Component {
 			<div className="editor-post-permalink">
 				<Dashicon icon="admin-links" />
 				<span className="editor-post-permalink__label">{ __( 'Permalink:' ) }</span>
-				{ ! editingSlug && <Button
+				{ ! editingSlug &&
+					<Button
 						className="editor-post-permalink__link"
 						href={ viewLink }
 						target="_blank"
