@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { isEmpty } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { Placeholder, Toolbar, Dashicon, DropZone } from '@wordpress/components';
@@ -146,8 +151,9 @@ registerBlockType( 'core/cover-image', {
 
 		if ( ! url ) {
 			const uploadButtonProps = { isLarge: true };
-			const icon = title ? undefined : 'format-image';
-			const label = title ? (
+			const hasTitle = ! isEmpty( title );
+			const icon = hasTitle ? undefined : 'format-image';
+			const label = hasTitle ? (
 				<Editable
 					tagName="h2"
 					value={ title }
