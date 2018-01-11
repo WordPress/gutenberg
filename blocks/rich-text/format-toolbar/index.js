@@ -18,22 +18,22 @@ const { ESCAPE, LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } = keycodes;
 const FORMATTING_CONTROLS = [
 	{
 		icon: 'editor-bold',
-		title: __( 'Bold' ),
+		title: __( 'Bold — ⌘B' ),
 		format: 'bold',
 	},
 	{
 		icon: 'editor-italic',
-		title: __( 'Italic' ),
+		title: __( 'Italic — ⌘I' ),
 		format: 'italic',
 	},
 	{
 		icon: 'editor-strikethrough',
-		title: __( 'Strikethrough' ),
+		title: __( 'Strikethrough — Ctrl+Alt+D' ),
 		format: 'strikethrough',
 	},
 	{
 		icon: 'admin-links',
-		title: __( 'Link' ),
+		title: __( 'Link — ⌘K' ),
 		format: 'link',
 	},
 ];
