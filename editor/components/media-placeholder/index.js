@@ -63,9 +63,14 @@ class MediaPlaceholder extends Component {
 	}
 
 	onFilesUpload( files ) {
-		const { onSelect, type, multiple } = this.props;
+		const { onSelect, type, multiple, onError } = this.props;
 		const setMedia = multiple ? onSelect : ( [ media ] ) => onSelect( media );
-		editorMediaUpload( files, setMedia, type );
+		editorMediaUpload( {
+			allowedType: type,
+			filesList: files,
+			onFileChange: setMedia,
+			onError,
+		} );
 	}
 
 	render() {
@@ -80,6 +85,7 @@ class MediaPlaceholder extends Component {
 			onSelectUrl,
 			onHTMLDrop = noop,
 			multiple = false,
+			notices,
 		} = this.props;
 
 		return (
@@ -88,6 +94,7 @@ class MediaPlaceholder extends Component {
 				label={ labels.title }
 				instructions={ sprintf( __( 'Drag %s, upload a new one or select a file from your library.' ), labels.name ) }
 				className={ classnames( 'editor-media-placeholder', className ) }
+				notices={ notices }
 			>
 				<DropZone
 					onFilesDrop={ this.onFilesUpload }

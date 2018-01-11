@@ -132,6 +132,26 @@
 
 	margin-bottom: $block-spacing;
 
+	/**
+	 * Notices
+	 */
+	 .components-placeholder .components-with-notices-ui {
+		margin: -10px 20px 12px 20px;
+		width: calc( 100% - 40px );
+	 }
+	 .components-with-notices-ui {
+		margin: 0 0 12px 0;
+		width: 100%;
+
+		.notice {
+			margin-left: 0px;
+			margin-right: 0px;
+
+			p {
+				font-size: $default-font-size;
+			}
+		}
+	 }
 
 	/**
 	 * Warnings
