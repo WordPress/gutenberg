@@ -131,14 +131,14 @@ export class Autocomplete extends Component {
 		this.search = this.search.bind( this );
 		this.handleKeyDown = this.handleKeyDown.bind( this );
 		this.getWordRect = this.getWordRect.bind( this );
-		this.debouncedSearch =  debounce( ( e ) => {
+		this.debouncedSearch = debounce( ( e ) => {
 			this.search( e );
-		}, 500);
+		}, 250 );
 		this.doSearch = ( event ) => {
 			// Ensure the synthetic event can be handled asynchronously.
 			event.persist();
 			this.debouncedSearch( event );
-		}
+		};
 
 		this.state = this.constructor.getInitialState();
 	}
