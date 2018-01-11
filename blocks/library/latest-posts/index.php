@@ -52,7 +52,7 @@ function gutenberg_render_block_core_latest_posts( $attributes ) {
 		$class .= ' is-grid';
 	}
 
-	if ( isset( $attributes['columns'] ) ) {
+	if ( isset( $attributes['columns'] ) && 'grid' === $attributes['layout'] ) {
 		$class .= ' columns-' . $attributes['columns'];
 	}
 

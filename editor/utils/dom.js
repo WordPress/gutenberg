@@ -55,7 +55,9 @@ export function isHorizontalEdge( container, isReverse, collapseRanges = false )
 		return false;
 	}
 
-	if ( ! isReverse && offset !== node.textContent.length ) {
+	const maxOffset = node.nodeType === TEXT_NODE ? node.nodeValue.length : node.childNodes.length;
+
+	if ( ! isReverse && offset !== maxOffset ) {
 		return false;
 	}
 

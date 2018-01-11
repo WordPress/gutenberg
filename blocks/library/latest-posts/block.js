@@ -127,8 +127,9 @@ class LatestPostsBlock extends Component {
 				</BlockControls>
 			),
 			<ul
-				className={ classnames( this.props.className, 'columns-' + columns, {
+				className={ classnames( this.props.className, {
 					'is-grid': layout === 'grid',
+					[ `columns-${ columns }` ]: layout === 'grid',
 				} ) }
 				key="latest-posts"
 			>
@@ -154,6 +155,7 @@ export default withAPIData( ( props ) => {
 		order,
 		orderBy,
 		per_page: postsToShow,
+		_fields: [ 'date_gmt', 'link', 'title' ],
 	}, value => ! isUndefined( value ) ) );
 	return {
 		latestPosts: `/wp/v2/posts?${ queryString }`,
