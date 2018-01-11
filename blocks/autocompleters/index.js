@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { sortBy } from 'lodash';
+import { connect } from 'react-redux';
 
 /**
  * Internal dependencies
@@ -9,6 +10,7 @@ import { sortBy } from 'lodash';
 import './style.scss';
 import { createBlock, getBlockTypes } from '../api';
 import BlockIcon from '../block-icon';
+import { isEditedPostDirty } from '../../editor/store/selectors';
 
 /**
  * @typedef {Object} CompleterOption
@@ -102,27 +104,38 @@ export function blockAutocompleter( { onReplace } ) {
  * @returns {Completer} Completer object used by the Autocomplete component.
  */
 export function userAutocompleter() {
-	const getOptions = () => {
-		return ( new wp.api.collections.Users() ).fetch().then( ( users ) => {
-			return users.map( ( user ) => {
-				return {
-					value: user,
-					label: [
-						<img key="avatar" className="blocks-autocompleters__user-avatar" alt="" src={ user.avatar_urls[ 24 ] } />,
-						<span key="name" className="blocks-autocompleters__user-name">{ user.name }</span>,
-						<span key="slug" className="blocks-autocompleters__user-slug">{ user.slug }</span>,
-					],
-					keywords: [ user.slug, user.name ],
-				};
-			} );
-		} );
+	const getOptions = ( search = '' ) => {
+		return (
+			new wp.api.collections.Users().fetch( { data: { search: search } } )
+				.then( ( users ) => {
+					return users.map( ( user ) => {
+						return {
+							value: user,
+							label: [
+								<img key="avatar" className="blocks-autocompleters__user-avatar" alt="" src={ user.avatar_urls[ 24 ] } />,
+								<span key="name" className="blocks-autocompleters__user-name">{ user.name }</span>,
+								<span key="slug" className="blocks-autocompleters__user-slug">{ user.slug }</span>,
+							],
+							keywords: [ user.slug, user.name ],
+						};
+					} );
+				} )
+		);
 	};
 
 	const allowNode = ( textNode ) => {
 		return textNode.parentElement.closest( 'a' ) === null;
 	};
 
+	const setSearch = ( search, getOptions ) => {
+		return getOptions( search );
+	};
+
 	const onSelect = ( user ) => {
+		console.log( user );
+		const search = getState( 'query' );
+		new wp.api.collections.Users().fetch(  ).then( ( users ) => {
+		} );
 		return <a href={ user.link }>{ '@' + user.name }</a>;
 	};
 
@@ -132,5 +145,8 @@ export function userAutocompleter() {
 		getOptions,
 		allowNode,
 		onSelect,
+		setSearch,
 	};
 }
+
+

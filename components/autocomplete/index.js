@@ -335,6 +335,19 @@ export class Autocomplete extends Component {
 		const suppress = ( open && wasSuppress === open.idx ) ? wasSuppress : undefined;
 		// update the state
 		if ( wasOpen || open ) {
+			if ( this.props.completers[ open.idx ].setSearch ) {
+				this.props.completers[ open.idx ].setSearch( query, this.props.completers[ open.idx ].getOptions ).then( ( options ) => {
+					const keyedOptions = map( options, ( option, i ) => ( { ...option, key: open.idx + '-' + i } ) );
+					const filteredOptions = filterOptions( this.state.search, keyedOptions );
+					const selectedIndex = filteredOptions.length === this.state.filteredOptions.length ? this.state.selectedIndex : 0;
+					this.setState( {
+						[ 'options_' + open.idx ]: keyedOptions,
+						filteredOptions,
+						selectedIndex,
+					} );
+
+				} );
+			}
 			this.setState( { selectedIndex: 0, filteredOptions, suppress, search, open, query, range } );
 		}
 		// announce the count of filtered options but only if they have loaded
