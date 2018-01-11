@@ -183,7 +183,7 @@ class GalleryBlock extends Component {
 				controls,
 				<Placeholder
 					key="placeholder"
-					instructions={ __( 'Drag images here or insert from media library' ) }
+					instructions={ __( 'Drag images here or add from media library' ) }
 					icon="format-gallery"
 					label={ __( 'Gallery' ) }
 					className={ className }>
@@ -204,7 +204,7 @@ class GalleryBlock extends Component {
 						multiple
 						gallery
 					>
-						{ __( 'Insert from Media Library' ) }
+						{ __( 'Add from Media Library' ) }
 					</MediaUploadButton>
 				</Placeholder>,
 			];

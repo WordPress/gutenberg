@@ -140,7 +140,7 @@ registerBlockType( 'core/video', {
 							type="video"
 							id={ id }
 						>
-							{ __( 'Insert from Media Library' ) }
+							{ __( 'Add from Media Library' ) }
 						</MediaUploadButton>
 					</Placeholder>,
 				];

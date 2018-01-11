@@ -42,12 +42,12 @@ function execCommand( command ) {
 const TABLE_CONTROLS = [
 	{
 		icon: 'table-row-before',
-		title: __( 'Insert Row Before' ),
+		title: __( 'Add Row Before' ),
 		onClick: execCommand( 'mceTableInsertRowBefore' ),
 	},
 	{
 		icon: 'table-row-after',
-		title: __( 'Insert Row After' ),
+		title: __( 'Add Row After' ),
 		onClick: execCommand( 'mceTableInsertRowAfter' ),
 	},
 	{
@@ -57,12 +57,12 @@ const TABLE_CONTROLS = [
 	},
 	{
 		icon: 'table-col-before',
-		title: __( 'Insert Column Before' ),
+		title: __( 'Add Column Before' ),
 		onClick: execCommand( 'mceTableInsertColBefore' ),
 	},
 	{
 		icon: 'table-col-after',
-		title: __( 'Insert Column After' ),
+		title: __( 'Add Column After' ),
 		onClick: execCommand( 'mceTableInsertColAfter' ),
 	},
 	{
