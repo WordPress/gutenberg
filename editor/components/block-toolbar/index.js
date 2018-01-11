@@ -20,9 +20,6 @@ function BlockToolbar( { block, mode } ) {
 		return null;
 	}
 
-	// Disable reason: Toolbar itself is non-interactive, but must capture
-	// bubbling events from children to determine focus shift intents.
-	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
 		<div className="editor-block-toolbar">
 			{ mode === 'visual' && [
@@ -31,7 +28,6 @@ function BlockToolbar( { block, mode } ) {
 			] }
 		</div>
 	);
-	/* eslint-enable jsx-a11y/no-static-element-interactions */
 }
 
 export default connect( ( state ) => {
