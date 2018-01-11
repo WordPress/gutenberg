@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escapeRegExp, find, filter, map } from 'lodash';
+import { escapeRegExp, find, filter, map, debounce } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -131,6 +131,14 @@ export class Autocomplete extends Component {
 		this.search = this.search.bind( this );
 		this.handleKeyDown = this.handleKeyDown.bind( this );
 		this.getWordRect = this.getWordRect.bind( this );
+		this.debouncedSearch =  debounce( ( e ) => {
+			this.search( e );
+		}, 500);
+		this.doSearch = ( event ) => {
+			// Ensure the synthetic event can be handled asynchronously.
+			event.persist();
+			this.debouncedSearch( event );
+		}
 
 		this.state = this.constructor.getInitialState();
 	}
@@ -330,7 +338,7 @@ export class Autocomplete extends Component {
 		// create a regular expression to filter the options
 		const search = open ? new RegExp( '(?:\\b|\\s|^)' + escapeRegExp( query ), 'i' ) : /./;
 		// filter the options we already have
-		const filteredOptions = open ? filterOptions( search, this.state[ 'options_' + open.idx ] ) : [];
+		let filteredOptions = open ? filterOptions( search, this.state[ 'options_' + open.idx ] ) : [];
 		// check if we should still suppress the popover
 		const suppress = ( open && wasSuppress === open.idx ) ? wasSuppress : undefined;
 		// update the state
@@ -469,7 +477,7 @@ export class Autocomplete extends Component {
 		return (
 			<div
 				ref={ this.bindNode }
-				onInput={ this.search }
+				onInput={ this.doSearch }
 				onClick={ this.resetWhenSuppressed }
 				className="components-autocomplete"
 			>
