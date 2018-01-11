@@ -11,7 +11,9 @@ describe( 'Adding blocks', () => {
 		cy.get( lastBlockSelector ).type( 'Paragraph block' );
 
 		// Using the slash command
-		cy.get( '.editor-inserter-with-shortcuts [aria-label="Add Paragraph"]' ).click();
+		cy.get( '.edit-post-header [aria-label="Add block"]' ).click();
+		cy.get( '[placeholder="Search for a block"]' ).type( 'Paragraph' );
+		cy.get( '.editor-inserter__block' ).contains( 'Paragraph' ).click();
 		cy.get( lastBlockSelector ).type( '/quote{enter}' );
 		cy.get( lastBlockSelector ).type( 'Quote block' );
 

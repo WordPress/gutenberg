@@ -7,7 +7,7 @@ import moment from 'moment';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { getBlockTypes, registerBlockType, registerCoreBlocks, unregisterBlockType } from '@wordpress/blocks';
+import { getBlockTypes, registerBlockType, unregisterBlockType, registerCoreBlocks } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -65,7 +65,6 @@ import {
 	getSuggestedPostFormat,
 	getNotices,
 	getInserterItems,
-	getMostFrequentlyUsedBlocks,
 	getRecentInserterItems,
 	getMetaBoxes,
 	hasMetaBoxes,
@@ -1859,39 +1858,6 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getMostFrequentlyUsedBlocks', () => {
-		beforeAll( () => {
-			registerCoreBlocks();
-		} );
-
-		it( 'should have paragraph and image to bring frequently used blocks up to three blocks', () => {
-			const noUsage = { preferences: { blockUsage: {} } };
-			const someUsage = { preferences: { blockUsage: { 'core/paragraph': 1 } } };
-
-			expect( getMostFrequentlyUsedBlocks( noUsage ).map( ( block ) => block.name ) )
-				.toEqual( [ 'core/paragraph', 'core/image' ] );
-
-			expect( getMostFrequentlyUsedBlocks( someUsage ).map( ( block ) => block.name ) )
-				.toEqual( [ 'core/paragraph', 'core/image' ] );
-		} );
-		it( 'should return the top 3 most recently used blocks', () => {
-			const state = {
-				preferences: {
-					blockUsage: {
-						'core/deleted-block': 20,
-						'core/paragraph': 4,
-						'core/image': 11,
-						'core/quote': 2,
-						'core/gallery': 1,
-					},
-				},
-			};
-
-			expect( getMostFrequentlyUsedBlocks( state ).map( ( block ) => block.name ) )
-				.toEqual( [ 'core/image', 'core/paragraph', 'core/quote' ] );
-		} );
-	} );
-
 	describe( 'getInserterItems', () => {
 		it( 'should list all non-private regular block types', () => {
 			const state = {
@@ -1994,11 +1960,10 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getRecentInserterItems', () => {
-		beforeAll( () => {
+	describe( 'getRecentlyUsedBlocks', () => {
+		beforeEach( () => {
 			registerCoreBlocks();
 		} );
-
 		it( 'should return the most recently used blocks', () => {
 			const state = {
 				preferences: {
