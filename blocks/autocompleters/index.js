@@ -130,10 +130,6 @@ export function userAutocompleter() {
 	};
 
 	const onSelect = ( user ) => {
-		console.log( user );
-		const search = getState( 'query' );
-		new wp.api.collections.Users().fetch(  ).then( ( users ) => {
-		} );
 		return <a href={ user.link }>{ '@' + user.name }</a>;
 	};
 
