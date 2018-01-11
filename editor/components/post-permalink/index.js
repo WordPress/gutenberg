@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
  */
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Dashicon, ClipboardButton, Button } from '@wordpress/components';
+import { Dashicon, Button } from '@wordpress/components';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -46,17 +46,17 @@ class PostPermalink extends Component {
 		} );
 	}
 
-	onEditPermalink( event ) {
+	onEditPermalink() {
 		this.setState( { editingSlug: true } );
 	}
 
-	onSavePermalink( event ) {
+	onSavePermalink() {
 		this.setState( { editingSlug: false } );
 	}
 
 	render() {
 		const { isNew, link, samplePermalink } = this.props;
-		const { showCopyConfirmation, editingSlug } = this.state;
+		const { editingSlug } = this.state;
 		if ( isNew || ! link ) {
 			return null;
 		}
