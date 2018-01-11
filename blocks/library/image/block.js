@@ -3,12 +3,6 @@
  */
 import classnames from 'classnames';
 import ResizableBox from 're-resizable';
-import {
-	startCase,
-	isEmpty,
-	map,
-	get,
-} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -22,7 +16,6 @@ import {
 	Toolbar,
 	DropZone,
 	FormFileUpload,
-	withAPIData,
 	withContext,
 } from '@wordpress/components';
 
@@ -33,7 +26,6 @@ import Editable from '../../editable';
 import MediaUploadButton from '../../media-upload-button';
 import InspectorControls from '../../inspector-controls';
 import TextControl from '../../inspector-controls/text-control';
-import SelectControl from '../../inspector-controls/select-control';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import UrlInputButton from '../../url-input/button';
@@ -52,6 +44,7 @@ class ImageBlock extends Component {
 		this.onSelectImage = this.onSelectImage.bind( this );
 		this.onSetHref = this.onSetHref.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
+		this.updateSize = this.updateSize.bind( this );
 	}
 
 	componentDidMount() {
@@ -96,25 +89,33 @@ class ImageBlock extends Component {
 	}
 
 	updateAlignment( nextAlign ) {
-		const extraUpdatedAttributes = [ 'wide', 'full' ].indexOf( nextAlign ) !== -1 ?
-			{ width: undefined, height: undefined } :
-			{};
-		this.props.setAttributes( { ...extraUpdatedAttributes, align: nextAlign } );
+		const nextSize = [ 'left', 'center', 'right' ].indexOf( nextAlign ) !== -1 ?
+			this.props.attributes.size || 50 :
+			undefined;
+
+		this.props.setAttributes( {
+			align: nextAlign,
+			size: nextSize,
+		} );
 	}
 
 	updateImageURL( url ) {
 		this.props.setAttributes( { url } );
 	}
 
-	getAvailableSizes() {
-		return get( this.props.image, [ 'data', 'media_details', 'sizes' ], {} );
+	updateSize( size ) {
+		if ( ! size || size === 100 ) {
+			size = undefined;
+		}
+
+		this.props.setAttributes( { size } );
 	}
 
 	render() {
 		const { attributes, setAttributes, focus, setFocus, className, settings, toggleSelection } = this.props;
-		const { url, alt, caption, align, id, href, width, height } = attributes;
+		const { url, alt, caption, align, id, href, size } = attributes;
+		const width = size ? size * settings.maxWidth / 100 : undefined;
 
-		const availableSizes = this.getAvailableSizes();
 		const figureStyle = width ? { width } : {};
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && ( ! viewPort.isExtraSmall() );
 		const uploadButtonProps = { isLarge: true };
@@ -183,7 +184,7 @@ class ImageBlock extends Component {
 		const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
 		const classes = classnames( className, {
 			'is-transient': 0 === url.indexOf( 'blob:' ),
-			'is-resized': !! width,
+			'is-resized': !! size,
 			'is-focused': !! focus,
 		} );
 
@@ -196,17 +197,15 @@ class ImageBlock extends Component {
 				<InspectorControls key="inspector">
 					<h2>{ __( 'Image Settings' ) }</h2>
 					<TextControl label={ __( 'Textual Alternative' ) } value={ alt } onChange={ this.updateAlt } help={ __( 'Describe the purpose of the image. Leave empty if the image is not a key part of the content.' ) } />
-					{ ! isEmpty( availableSizes ) && (
-						<SelectControl
-							label={ __( 'Size' ) }
-							value={ url }
-							options={ map( availableSizes, ( size, name ) => ( {
-								value: size.source_url,
-								label: startCase( name ),
-							} ) ) }
-							onChange={ this.updateImageURL }
-						/>
-					) }
+					<TextControl
+						label={ __( 'Size' ) }
+						type={ 'number' }
+						min={ 5 }
+						max={ 100 }
+						value={ size || 100 }
+						onChange={ this.updateSize }
+						help={ __( 'Set the image width as a percentage of the content width.' ) }
+					/>
 				</InspectorControls>
 			),
 			<figure key="image" className={ classes } style={ figureStyle }>
@@ -228,10 +227,11 @@ class ImageBlock extends Component {
 							return img;
 						}
 
-						const currentWidth = width || imageWidthWithinContainer;
-						const currentHeight = height || imageHeightWithinContainer;
-
 						const ratio = imageWidth / imageHeight;
+
+						const currentWidth = width || imageWidthWithinContainer;
+						const currentHeight = ( width / ratio ) || imageHeightWithinContainer;
+
 						const minWidth = imageWidth < imageHeight ? MIN_SIZE : MIN_SIZE * ratio;
 						const minHeight = imageHeight < imageWidth ? MIN_SIZE : MIN_SIZE / ratio;
 
@@ -257,10 +257,7 @@ class ImageBlock extends Component {
 									toggleSelection( false );
 								} }
 								onResizeStop={ ( event, direction, elt, delta ) => {
-									setAttributes( {
-										width: parseInt( currentWidth + delta.width, 10 ),
-										height: parseInt( currentHeight + delta.height, 10 ),
-									} );
+									this.updateSize( Math.round( ( currentWidth + delta.width ) * 100 / settings.maxWidth ) );
 									toggleSelection( true );
 								} }
 							>
@@ -289,15 +286,5 @@ class ImageBlock extends Component {
 export default compose( [
 	withContext( 'editor' )( ( settings ) => {
 		return { settings };
-	} ),
-	withAPIData( ( props ) => {
-		const { id } = props.attributes;
-		if ( ! id ) {
-			return {};
-		}
-
-		return {
-			image: `/wp/v2/media/${ id }`,
-		};
 	} ),
 ] )( ImageBlock );

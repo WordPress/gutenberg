@@ -12,6 +12,38 @@ import './editor.scss';
 import { registerBlockType, createBlock, getBlockAttributes, getBlockType } from '../../api';
 import ImageBlock from './block';
 
+const blockAttributes = {
+	url: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'img',
+		attribute: 'src',
+	},
+	alt: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'img',
+		attribute: 'alt',
+	},
+	caption: {
+		type: 'array',
+		source: 'children',
+		selector: 'figcaption',
+	},
+	href: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'a',
+		attribute: 'href',
+	},
+	id: {
+		type: 'number',
+	},
+	align: {
+		type: 'string',
+	},
+};
+
 registerBlockType( 'core/image', {
 	title: __( 'Image' ),
 
@@ -24,39 +56,8 @@ registerBlockType( 'core/image', {
 	keywords: [ __( 'photo' ) ],
 
 	attributes: {
-		url: {
-			type: 'string',
-			source: 'attribute',
-			selector: 'img',
-			attribute: 'src',
-		},
-		alt: {
-			type: 'string',
-			source: 'attribute',
-			selector: 'img',
-			attribute: 'alt',
-		},
-		caption: {
-			type: 'array',
-			source: 'children',
-			selector: 'figcaption',
-		},
-		href: {
-			type: 'string',
-			source: 'attribute',
-			selector: 'a',
-			attribute: 'href',
-		},
-		id: {
-			type: 'number',
-		},
-		align: {
-			type: 'string',
-		},
-		width: {
-			type: 'number',
-		},
-		height: {
+		...blockAttributes,
+		size: {
 			type: 'number',
 		},
 	},
@@ -144,19 +145,19 @@ registerBlockType( 'core/image', {
 	},
 
 	getEditWrapperProps( attributes ) {
-		const { align, width } = attributes;
-		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
-			return { 'data-align': align, 'data-resized': !! width };
+		const { align, size } = attributes;
+		if ( 'left' === align || 'center' === align || 'right' === align || 'wide' === align || 'full' === align ) {
+			return { 'data-align': align, 'data-resized': !! size };
 		}
 	},
 
 	edit: ImageBlock,
 
 	save( { attributes } ) {
-		const { url, alt, caption, align, href, width, height } = attributes;
-		const extraImageProps = width || height ? { width, height } : {};
-		const figureStyle = width ? { width } : {};
-		const image = <img src={ url } alt={ alt } { ...extraImageProps } />;
+		const { url, alt, caption, align, href, size, id } = attributes;
+		const figureStyle = size ? { width: size + '%' } : {};
+		// Class is important to set srcset with front-end filter.
+		const image = <img src={ url } alt={ alt } className={ id ? `wp-image-${ id }` : null } />;
 
 		return (
 			<figure className={ align ? `align${ align }` : null } style={ figureStyle }>
@@ -165,4 +166,32 @@ registerBlockType( 'core/image', {
 			</figure>
 		);
 	},
+
+	deprecated: [
+		{
+			attributes: {
+				...blockAttributes,
+				width: {
+					type: 'number',
+				},
+				height: {
+					type: 'number',
+				},
+			},
+
+			save( { attributes } ) {
+				const { url, alt, caption, align, href, width, height } = attributes;
+				const extraImageProps = width || height ? { width, height } : {};
+				const figureStyle = width ? { width } : {};
+				const image = <img src={ url } alt={ alt } { ...extraImageProps } />;
+
+				return (
+					<figure className={ align ? `align${ align }` : null } style={ figureStyle }>
+						{ href ? <a href={ href }>{ image }</a> : image }
+						{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
+					</figure>
+				);
+			},
+		},
+	],
 } );
