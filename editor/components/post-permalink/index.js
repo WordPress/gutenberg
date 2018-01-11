@@ -16,18 +16,52 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import './style.scss';
 import { isEditedPostNew, getEditedPostAttribute } from '../../store/selectors';
+import { editPermalinkSlug } from '../../store/actions';
 
 class PostPermalink extends Component {
 	constructor() {
 		super( ...arguments );
 		this.state = {
-			showCopyConfirmation: false,
 			editingSlug: false,
+			permalink: '',
+			slug: '',
 		};
+		this.getSlug = this.getSlug.bind( this );
 		this.onCopy = this.onCopy.bind( this );
 		this.onFinishCopy = this.onFinishCopy.bind( this );
+		this.onChangePermalink = this.onChangePermalink.bind( this );
 		this.onEditPermalink = this.onEditPermalink.bind( this );
 		this.onSavePermalink = this.onSavePermalink.bind( this );
+	}
+
+	getPermalink( slug ) {
+		let permalink = this.props.link;
+		const samplePermalink = this.props.samplePermalink;
+		if ( samplePermalink ) {
+			permalink = samplePermalink[ 0 ].replace( '%postname%', slug || samplePermalink[ 1 ] );
+		}
+
+		return permalink;
+	}
+
+	getSlug() {
+		if ( this.state.slug ) {
+			return this.state.slug;
+		}
+
+		const samplePermalink = this.props.samplePermalink;
+		if ( samplePermalink ) {
+			return samplePermalink[ 1 ];
+		}
+
+		return '';
+	}
+
+	componentDidMount() {
+		this.setState( {
+			permalink: this.getPermalink(),
+			slug: this.getSlug(),
+		} );
 	}
 
 	componentWillUnmount() {
@@ -46,30 +80,29 @@ class PostPermalink extends Component {
 		} );
 	}
 
+	onChangePermalink( event ) {
+		this.setState( { slug: event.target.value } );
+	}
+
 	onEditPermalink() {
 		this.setState( { editingSlug: true } );
 	}
 
 	onSavePermalink() {
-		this.setState( { editingSlug: false } );
+		this.setState( {
+			editingSlug: false,
+			permalink: this.getPermalink( this.state.slug ),
+		} );
+		editPermalinkSlug( this.state.slug );
 	}
 
 	render() {
-		const { isNew, link, samplePermalink } = this.props;
-		const { editingSlug } = this.state;
+		const { isNew, link } = this.props;
+		const { editingSlug, permalink, slug } = this.state;
 		if ( isNew || ! link ) {
 			return null;
 		}
-
-		let permalink = link,
-			viewLink = link;
-		if ( samplePermalink ) {
-			permalink = samplePermalink[ 0 ].replace( '%postname%', samplePermalink[ 1 ] );
-			viewLink = addQueryArgs( viewLink, { preview: true } );
-		}
-
-		const prefix = permalink.replace( /[^/]+\/?$/, '' ),
-			slug = permalink.replace( /.*\/([^/]+)\/?$/, '$1' );
+		const prefix = permalink.replace( /[^/]+\/?$/, '' );
 
 		return (
 			<div className="editor-post-permalink">
@@ -78,7 +111,7 @@ class PostPermalink extends Component {
 				{ ! editingSlug &&
 					<Button
 						className="editor-post-permalink__link"
-						href={ viewLink }
+						href={ addQueryArgs( this.props.link, { preview: true } ) }
 						target="_blank"
 					>
 						{ permalink }
@@ -92,7 +125,8 @@ class PostPermalink extends Component {
 						<input
 							type="text"
 							className="editor-post-permalink__slug-input"
-							value={ slug }
+							defaultValue={ slug }
+							onChange={ this.onChangePermalink }
 							required
 						/>
 						/
