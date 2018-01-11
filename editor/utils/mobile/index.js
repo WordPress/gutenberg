@@ -1,17 +1,24 @@
 /**
+ * External dependencies
+ */
+import { get } from 'lodash';
+
+/**
  * Internal dependencies
  */
 import { isMobile } from '../../store/selectors';
 import { toggleSidebar } from '../../store/actions';
 
 /**
- * Disables isSidebarOpened on rehydrate payload if the user is on a mobile screen size.
+ * Disables mobile sidebar if it is present on the payload.
  *
  * @param  {Object} payload rehydrate payload
- * @return {Object}         rehydrate payload with isSidebarOpened disabled if on mobile
+ * @return {Object}         rehydrate payload with mobile sidebar disabled
  */
-export const disableIsSidebarOpenedOnMobile = ( payload ) => (
-	payload.isSidebarOpenedMobile ? { ...payload, isSidebarOpenedMobile: false } : payload
+export const disableMobileSidebar = ( payload ) => (
+	get( payload, 'sidebars.mobile' ) ?
+		{ ...payload, ...{ sidebars: { ...payload.sidebars, mobile: false } } } :
+		payload
 );
 
 /**
@@ -22,7 +29,7 @@ export const mobileMiddleware = ( { getState } ) => next => action => {
 	if ( action.type === 'REDUX_REHYDRATE' ) {
 		return next( {
 			type: 'REDUX_REHYDRATE',
-			payload: disableIsSidebarOpenedOnMobile( action.payload ),
+			payload: disableMobileSidebar( action.payload ),
 		} );
 	}
 	if ( action.type === 'TOGGLE_SIDEBAR' && action.sidebar === undefined ) {

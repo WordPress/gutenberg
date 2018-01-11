@@ -1,43 +1,59 @@
 /**
  * Internal dependencies
  */
-import { disableIsSidebarOpenedOnMobile } from '../';
+import { disableMobileSidebar } from '../';
 
-describe( 'disableIsSidebarOpenOnMobile()', () => {
-	it( 'should disable isSidebarOpenedMobile and keep other properties as before', () => {
+describe( 'disableMobileSidebar()', () => {
+	it( 'should disable mobile sidebar and keep other properties as before', () => {
 		const input = {
-				isSidebarOpenedMobile: true,
+				sidebars: {
+					mobile: true,
+					desktop: false,
+				},
 				dummyPref: 'dummy',
 			},
 			output = {
-				isSidebarOpenedMobile: false,
+				sidebars: {
+					mobile: false,
+					desktop: false,
+				},
 				dummyPref: 'dummy',
 			};
 
-		expect( disableIsSidebarOpenedOnMobile( input ) ).toEqual( output );
+		expect( disableMobileSidebar( input ) ).toEqual( output );
 	} );
 
-	it( 'should keep isSidebarOpenedMobile as false if it was false', () => {
+	it( 'should keep mobile sidebar false if it was false', () => {
 		const input = {
-				isSidebarOpenedMobile: false,
+				sidebars: {
+					mobile: false,
+					desktop: false,
+				},
+				dummyPref: 'dummy',
+			},
+			output = {
+				sidebars: {
+					mobile: false,
+					desktop: false,
+				},
+				dummyPref: 'dummy',
+			};
+		expect( disableMobileSidebar( input ) ).toEqual( output );
+	} );
+
+	it( 'should not make any change if the payload does not contain mobile sidebar flag', () => {
+		const input = {
+				sidebars: {
+					chicken: 'ribs',
+				},
 				dummy: 'non-dummy',
 			},
 			output = {
-				isSidebarOpenedMobile: false,
+				sidebars: {
+					chicken: 'ribs',
+				},
 				dummy: 'non-dummy',
 			};
-		expect( disableIsSidebarOpenedOnMobile( input ) ).toEqual( output );
-	} );
-
-	it( 'should not make any change if the payload does not contain isSidebarOpenedMobile flag', () => {
-		const input = {
-				isSidebarOpened: true,
-				dummy: 'non-dummy',
-			},
-			output = {
-				isSidebarOpened: true,
-				dummy: 'non-dummy',
-			};
-		expect( disableIsSidebarOpenedOnMobile( input ) ).toEqual( output );
+		expect( disableMobileSidebar( input ) ).toEqual( output );
 	} );
 } );
