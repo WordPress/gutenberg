@@ -1,7 +1,8 @@
 .wp-block-quote {
 	margin: 0 0 16px;
 
-	cite {
+	cite,
+	footer {
 		color: $dark-gray-300;
 		margin-top: 1em;
 		position: relative;
@@ -17,7 +18,9 @@
 			font-style: italic;
 			line-height: 1.6;
 		}
-		cite {
+
+		cite,
+		footer {
 			font-size: 19px;
 			text-align: right;
 		}
