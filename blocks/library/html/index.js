@@ -67,6 +67,7 @@ registerBlockType( 'core/html', {
 				className="wp-block-html"
 				key="editor"
 				value={ attributes.content }
+				placeholder={ __( 'Write HTML...' ) }
 				onChange={ ( event ) => setAttributes( { content: event.target.value } ) }
 				aria-label={ __( 'HTML' ) }
 			/>,
