@@ -336,7 +336,7 @@ export class Autocomplete extends Component {
 		// create a regular expression to filter the options
 		const search = open ? new RegExp( '(?:\\b|\\s|^)' + escapeRegExp( query ), 'i' ) : /./;
 		// filter the options we already have
-		let filteredOptions = open ? filterOptions( search, this.state[ 'options_' + open.idx ] ) : [];
+		const filteredOptions = open ? filterOptions( search, this.state[ 'options_' + open.idx ] ) : [];
 		// check if we should still suppress the popover
 		const suppress = ( open && wasSuppress === open.idx ) ? wasSuppress : undefined;
 		// update the state
@@ -346,8 +346,8 @@ export class Autocomplete extends Component {
 				if ( currentCompleter.setSearch ) {
 					currentCompleter.setSearch( query ).then( ( options ) => {
 						const keyedOptions = map( options, ( option, i ) => ( { ...option, key: open.idx + '-' + i } ) );
-						filteredOptions = filterOptions( this.state.search, keyedOptions );
-						const selectedIndex = filteredOptions.length === this.state.filteredOptions.length ? this.state.selectedIndex : 0;
+						const openFilteredOptions = filterOptions( this.state.search, keyedOptions );
+						const selectedIndex = openFilteredOptions.length === this.state.filteredOptions.length ? this.state.selectedIndex : 0;
 						this.setState( {
 							[ 'options_' + open.idx ]: keyedOptions,
 							filteredOptions,
