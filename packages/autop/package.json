@@ -1,15 +1,22 @@
 {
 	"name": "@wordpress/autop",
 	"version": "1.0.1",
+	"description": "WordPress's automatic paragraph functions `autop` and `removep`",
+	"author": "WordPress",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"autop"
+	],
+	"homepage": "https://github.com/WordPress/packages/tree/master/packages/autop/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/packages.git"
 	},
-	"description": "WordPress's automatic paragraph functions `autop` and `removep`",
+	"bugs": {
+		"url": "https://github.com/WordPress/packages/issues"
+	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
-	"author": "WordPress",
-	"license": "GPL-2.0-or-later",
 	"publishConfig": {
 		"access": "public"
 	}
