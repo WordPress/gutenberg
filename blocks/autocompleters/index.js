@@ -96,7 +96,7 @@ export function blockAutocompleter( { onReplace } ) {
 	};
 }
 /**
- * Returns a "completer" definition for inserting links to the posts of a user.
+ * Returns a "completer" definition for inserting a user mention.
  * The definition can be understood by the Autocomplete component.
  *
  * @returns {Completer} Completer object used by the Autocomplete component.
@@ -123,7 +123,7 @@ export function userAutocompleter() {
 	};
 
 	const onSelect = ( user ) => {
-		return <a href={ user.link }>{ '@' + user.name }</a>;
+		return { '@' + user.slug };
 	};
 
 	return {
