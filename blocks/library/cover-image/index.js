@@ -131,14 +131,13 @@ registerBlockType( 'core/cover-image', {
 					</MediaUploadButton>
 				</Toolbar>
 			</BlockControls>,
-			<InspectorControls key="inspector">
+			!!url && <InspectorControls key="inspector">
 				<h2>{ __( 'Cover Image Settings' ) }</h2>
-				{url && [
 				<ToggleControl
 					label={ __( 'Fixed Background' ) }
 					checked={ !! hasParallax }
 					onChange={ toggleParallax }
-				/>,
+				/>
 				<RangeControl
 					label={ __( 'Background Dimness' ) }
 					value={ dimRatio }
@@ -147,9 +146,6 @@ registerBlockType( 'core/cover-image', {
 					max={ 100 }
 					step={ 10 }
 				/>
-				]
-				}
-				
 			</InspectorControls>,
 		];
 
