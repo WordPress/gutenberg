@@ -39,6 +39,12 @@ export class VisualEditorInserter extends Component {
 		}
 	}
 
+	/**
+	 * Invoked when a inserter item is selected from the quick inserter.
+	 * Dispatches an action to create the necessary block.
+	 * 
+	 * @param {Editor.InserterItem} item Selected inserter item.
+	 */
 	insertItem( { name, initialAttributes } ) {
 		this.props.insertBlock( createBlock( name, initialAttributes ) );
 	}

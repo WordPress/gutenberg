@@ -98,6 +98,12 @@ export class InserterMenu extends Component {
 		} );
 	}
 
+	/**
+	 * Constructs a callback that is invoked when an inserter item is selected.
+	 * 
+	 * @param {Editor.InserterItem} item Selected inserter item.
+	 * @returns {Function}               Callback to invoke when the item is selected.
+	 */
 	selectItem( item ) {
 		return () => {
 			this.props.onSelect( item );
@@ -107,10 +113,22 @@ export class InserterMenu extends Component {
 		};
 	}
 
+	/**
+	 * Determines which items should be visible based on the currently searched query.
+	 * 
+	 * @param {Editor.InserterItem[]}   items All inserter items.
+	 * @returns {Editor.InserterItem[]}       Visible inserter items.
+	 */
 	searchItems( items ) {
 		return searchItems( items, this.state.filterValue );
 	}
 
+	/**
+	 * Retrieves the inserter items that should appear in the given tab.
+	 * 
+	 * @param {string}                  tab Slug of the current tab, e.g. 'recent'.
+	 * @returns {Editor.InserterItem[]}     Inserter items belonging to this tab.
+	 */
 	getItemsForTab( tab ) {
 		const { items, recentItems } = this.props;
 
@@ -140,6 +158,12 @@ export class InserterMenu extends Component {
 		return filter( items, predicate );
 	}
 
+	/**
+	 * Sorts the given items into to the order that they should be displayed in the inserter.
+	 * 
+	 * @param {Editor.InserterItem[]}   items Items to sort.
+	 * @returns {Editor.InserterItem[]}       Sorted items.
+	 */
 	sortItems( items ) {
 		if ( 'recent' === this.state.tab && ! this.state.filterValue ) {
 			return items;
@@ -152,10 +176,22 @@ export class InserterMenu extends Component {
 		return sortBy( items, getCategoryIndex );
 	}
 
+	/**
+	 * Groups the given items by their category slug.
+	 * 
+	 * @param {Editor.InserterItem[]}                    items Items to group.
+	 * @returns {Object.<string, Editor.InserterItem[]>}       Grouped items.
+	 */
 	groupByCategory( items ) {
 		return groupBy( items, ( item ) => item.category );
 	}
 
+	/**
+	 * Determines which items should be visible based on the current state of the inserter.
+	 * 
+	 * @param {Editor.InserterItem[]}   items All inserter items.
+	 * @returns {Editor.InserterItem[]}       Visible inserter items.
+	 */
 	getVisibleItemsByCategory( items ) {
 		return flow(
 			this.searchItems,
@@ -164,6 +200,13 @@ export class InserterMenu extends Component {
 		)( items );
 	}
 
+	/**
+	 * Renders a list of items within a category.
+	 * 
+	 * @param {Editor.InserterItem[]} items         Inserter items to render.
+	 * @param {string}                separatorSlug Category slug that these items belong to.
+	 * @returns {JSX.Element}                       Rendered items.
+	 */
 	renderItems( items, separatorSlug ) {
 		const { instanceId } = this.props;
 		const labelledBy = separatorSlug === undefined ? null : `editor-inserter__separator-${ separatorSlug }-${ instanceId }`;
@@ -176,6 +219,13 @@ export class InserterMenu extends Component {
 		);
 	}
 
+	/**
+	 * Renders a group of menu items which share the same category.
+	 * 
+	 * @param {Object}                category Category slug that these items belong to.
+	 * @param {Editor.InserterItem[]} items    Inserter items belonging to this category.
+	 * @returns {JSX.Element}                  Rendered category.
+	 */
 	renderCategory( category, items ) {
 		const { instanceId } = this.props;
 		return items && (
@@ -192,6 +242,13 @@ export class InserterMenu extends Component {
 		);
 	}
 
+	/**
+	 * Renders a list of menu items grouped into their categories.
+	 * 
+	 * @param {Object.<string, Editor.InserterItem[]>} visibleItemsByCategory The items to render, grouped by their
+	 *                                                                        category slug.
+	 * @returns {JSX.Element}                                                 Rendered categories.
+	 */
 	renderCategories( visibleItemsByCategory ) {
 		if ( isEmpty( visibleItemsByCategory ) ) {
 			return (
@@ -206,6 +263,11 @@ export class InserterMenu extends Component {
 		);
 	}
 
+	/**
+	 * Switch the currently selected inserter tab.
+	 * 
+	 * @param {string} tab Tab identifier.
+	 */
 	switchTab( tab ) {
 		// store the scrollTop of the tab switched from
 		this.tabScrollTop[ this.state.tab ] = this.tabContainer.scrollTop;
@@ -262,6 +324,9 @@ export class InserterMenu extends Component {
 		// Implicit `undefined` return: let the event propagate
 	}
 
+	/**
+	 * @inheritdoc
+	 */
 	render() {
 		const { instanceId, items } = this.props;
 		const isSearching = this.state.filterValue;

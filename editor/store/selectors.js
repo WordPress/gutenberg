@@ -1080,6 +1080,28 @@ const getFrequentInserts = createSelector(
 	state => state.preferences.insertFrequency
 );
 
+/**
+ * An inserter item is an object that encapsulates something that can be
+ * inserted into the editor via one of our inserter UIs.
+ * 
+ * @typedef {Object} Editor.InserterItem
+ * @property {string}   name              Name of the block type to create when this isnerter item is selected.
+ * @property {Object}   initialAttributes Attributes which should be set on the created block when this item is selected.
+ * @property {string}   title             Text displayed on any UI components that select this inserter item.
+ * @property {string}   icon              Dashicon displayed on any UI components that select this inserter item.
+ * @property {string}   category          Slug of the block category that this inserter item is associated with.
+ * @property {string[]} keywords          Keywords that describe this inserter item, for search.
+ * @property {boolean}  isDisabled        Whether or not the user should be prevented from inserting this item.
+ */
+
+/**
+ * Constructs an inserter item from a static block type.
+ * 
+ * @param {State} state                        Global application state.
+ * @param {string[]|boolean} enabledBlockTypes Enabled block type names, or true/false to enable/disable all types.
+ * @param {Object} blockType                   Block type, likely from `getBlockType()`.
+ * @returns {?Editor.InserterItem}             Built inserter item, or null.
+ */
 function buildInserterItemFromBlockType( state, enabledBlockTypes, blockType ) {
 	if ( ! enabledBlockTypes || ! blockType ) {
 		return null;
@@ -1095,21 +1117,23 @@ function buildInserterItemFromBlockType( state, enabledBlockTypes, blockType ) {
 	}
 
 	return {
-		// Attributes used for insertion
 		name: blockType.name,
 		initialAttributes: {},
-
-		// Attributes shown in the inserter
 		title: blockType.title,
 		icon: blockType.icon,
 		category: blockType.category,
-
-		// Metadata
 		keywords: blockType.keywords,
 		isDisabled: !! blockType.useOnce && getBlocks( state ).some( block => block.name === blockType.name ),
 	};
 }
 
+/**
+ * Constructs an inserter item from a reusable block.
+ * 
+ * @param {string[]|boolean} enabledBlockTypes Enabled block type names, or true/false to enable/disable all types.
+ * @param {Object} reusableBlock               Reusable block, likely from `getReusableBlock()`.
+ * @returns {?Editor.InserterItem}             Built inserter item, or null.
+ */
 function buildInserterItemFromReusableBlock( enabledBlockTypes, reusableBlock ) {
 	if ( ! enabledBlockTypes || ! reusableBlock ) {
 		return null;
@@ -1126,21 +1150,26 @@ function buildInserterItemFromReusableBlock( enabledBlockTypes, reusableBlock ) 
 	}
 
 	return {
-		// Attributes used for insertion
 		name: 'core/block',
 		initialAttributes: { ref: reusableBlock.id },
-
-		// Attributes shown in the inserter
 		title: reusableBlock.title,
 		icon: referencedBlockType.icon,
 		category: 'reusable-blocks',
-
-		// Metadata
 		keywords: [],
 		isDisabled: false,
 	};
 }
 
+/**
+ * Constructs an inserter item from an 'insert' object. These are the objects
+ * that are stored in `state.preferences.recentInserts` or
+ * `state.preferences.insertFrequency`.
+ * 
+ * @param {State} state                        Global application state.
+ * @param {string[]|boolean} enabledBlockTypes Enabled block type names, or true/false to enable/disable all types.
+ * @param {Object} insert                      Object representing a recent or frequent insert made by the user.
+ * @returns {?Editor.InserterItem}             Built inserter item, or null.
+ */
 function buildInserterItemFromInsert( state, enabledBlockTypes, insert ) {
 	switch ( insert.name ) {
 		case 'core/block':
@@ -1158,9 +1187,9 @@ function buildInserterItemFromInsert( state, enabledBlockTypes, insert ) {
  * and dynamic (i.e. reusable) blocks are sourced from. Each item contains
  * properties that are useful for rendering it in an inserter.
  * 
- * @param {Object} state                         Global application state
- * @param {String[]|Boolean} [enabledBlockTypes] Enabled block type names, or true/false to enable/disable all types
- * @returns {Object[]}                           Inserter items that ought to appear in the Frequent inserter
+ * @param {Object} state                         Global application state.
+ * @param {string[]|boolean} [enabledBlockTypes] Enabled block type names, or true/false to enable/disable all types.
+ * @returns {Editor.InserterItem[]}              Inserter items that ought to appear in the Frequent inserter.
  */
 export function getInserterItems( state, enabledBlockTypes = true ) {
 	if ( ! enabledBlockTypes ) {
@@ -1181,9 +1210,9 @@ export function getInserterItems( state, enabledBlockTypes = true ) {
  * Generates a list of items that should appear in an inserter that allows the
  * user to quickly insert *recently* used blocks.
  * 
- * @param {Object} state                         Global application state
- * @param {String[]|Boolean} [enabledBlockTypes] Enabled block type names, or true/false to enable/disable all types
- * @returns {Object[]}                           Inserter items that ought to appear in the Frequent inserter
+ * @param {Object} state                         Global application state.
+ * @param {string[]|boolean} [enabledBlockTypes] Enabled block type names, or true/false to enable/disable all types.
+ * @returns {Editor.InserterItem[]}              Inserter items that ought to appear in the Frequent inserter.
  */
 export function getRecentInserterItems( state, enabledBlockTypes = true ) {
 	if ( ! enabledBlockTypes ) {
@@ -1199,9 +1228,9 @@ export function getRecentInserterItems( state, enabledBlockTypes = true ) {
  * Generates a list of items that should appear in an inserter that allows the
  * user to quickly insert *frequntly* used blocks.
  * 
- * @param {Object} state                         Global application state
- * @param {String[]|Boolean} [enabledBlockTypes] Enabled block type names, or true/false to enable/disable all types
- * @returns {Object[]}                           Inserter items that ought to appear in the Frequent inserter
+ * @param {Object} state                         Global application state.
+ * @param {string[]|boolean} [enabledBlockTypes] Enabled block type names, or true/false to enable/disable all types.
+ * @returns {Editor.InserterItem[]}              Inserter items that ought to appear in the Frequent inserter.
  */
 export function getFrequentInserterItems( state, enabledBlockTypes = true ) {
 	if ( ! enabledBlockTypes ) {

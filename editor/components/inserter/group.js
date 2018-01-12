@@ -10,11 +10,21 @@ import { Component } from '@wordpress/element';
 import { NavigableMenu } from '@wordpress/components';
 import { BlockIcon } from '@wordpress/blocks';
 
+/**
+ * Determines the inserter items that are able to be selected. These are the
+ * inserter items which are not disabled.
+ * 
+ * @param {Editor.InserterItem[]}   items Inserter items to filter.
+ * @returns {Editor.InserterItem[]}       Active inserter items.
+ */
 function deriveActiveItems( items ) {
 	return items.filter( ( item ) => ! item.isDisabled );
 }
 
 export default class InserterGroup extends Component {
+	/**
+	 * @inheritdoc
+	 */
 	constructor() {
 		super( ...arguments );
 
@@ -26,6 +36,9 @@ export default class InserterGroup extends Component {
 		};
 	}
 
+	/**
+	 * @inheritdoc
+	 */
 	componentWillReceiveProps( nextProps ) {
 		if ( ! isEqual( this.props.items, nextProps.items ) ) {
 			this.activeItems = deriveActiveItems( nextProps.items );
@@ -39,6 +52,13 @@ export default class InserterGroup extends Component {
 		}
 	}
 
+	/**
+	 * Renders a single inserter item as it ought to appear in the menu.
+	 * 
+	 * @param {Editor.InserterItem} item  Inserter item.
+	 * @param {number}              index Index of the item.
+	 * @returns {JSX.Element}             Rendered menu button.
+	 */
 	renderItem( item, index ) {
 		const { current } = this.state;
 		const { selectItem } = this.props;
@@ -58,6 +78,11 @@ export default class InserterGroup extends Component {
 		);
 	}
 
+	/**
+	 * Callback invoked when the user navigates the menu using their keyboard.
+	 * 
+	 * @param {number} index Index of the item selected by the user.
+	 */
 	onNavigate( index ) {
 		const { activeItems } = this;
 		const dest = activeItems[ index ];
