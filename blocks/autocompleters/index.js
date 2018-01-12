@@ -119,7 +119,7 @@ export function userAutocompleter() {
 	};
 
 	const allowNode = ( textNode ) => {
-		return textNode.parentElement.closest( 'a' ) === null;
+		true;
 	};
 
 	const onSelect = ( user ) => {
