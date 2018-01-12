@@ -77,10 +77,16 @@ class PostPermalink extends Component {
 		} );
 	}
 
+	/**
+	 * @inheritdoc
+	 */
 	componentWillUnmount() {
 		clearTimeout( this.dismissCopyConfirmation );
 	}
 
+	/**
+	 * @inheritdoc
+	 */
 	componentWillReceiveProps() {
 		const slug = this.getSlug();
 		this.setState( {
