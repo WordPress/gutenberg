@@ -27,10 +27,10 @@ export function addGeneratedClassName( extraProps, blockType ) {
 	if ( hasBlockSupport( blockType, 'className', true ) ) {
 		const blockDefaultClassname = getBlockDefaultClassname( blockType.name );
 
-		const blockDefaultClassnameIsDupe = ( typeof( extraProps.className ) === 'string'
-												&& extraProps.className.search( blockDefaultClassname ) !== -1 );
+		const blockDefaultClassnameIsDupe = ( typeof( extraProps.className ) === 'string' &&
+												extraProps.className.search( blockDefaultClassname ) !== -1 );
 
-		if( ! blockDefaultClassnameIsDupe ) {
+		if ( ! blockDefaultClassnameIsDupe ) {
 			/**
 			 * The block default classname has not been found in the
 			 * existing className string. This is not a duplicate class,
