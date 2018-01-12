@@ -9,6 +9,7 @@ import { sortBy } from 'lodash';
 import './style.scss';
 import { createBlock, getBlockTypes } from '../api';
 import BlockIcon from '../block-icon';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * @typedef {Object} CompleterOption
