@@ -16,7 +16,7 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import './style.scss';
 import { isEditedPostNew, getEditedPostAttribute } from '../../store/selectors';
-import {editPost} from '../../store/actions';
+import { editPost } from '../../store/actions';
 
 /**
  * Constants
@@ -38,6 +38,13 @@ class PostPermalink extends Component {
 		this.onSavePermalink = this.onSavePermalink.bind( this );
 	}
 
+	/**
+	 * Returns a permalink for a given post slug.
+	 *
+	 * @param {string} slug The post slug to insert in into the permalink.
+	 *
+	 * @returns {string} The full permalink.
+	 */
 	getPermalink( slug ) {
 		let permalink = this.props.link;
 		const samplePermalink = this.props.samplePermalink;
@@ -48,6 +55,11 @@ class PostPermalink extends Component {
 		return permalink;
 	}
 
+	/**
+	 * Returns the slug for the current post.
+	 *
+	 * @returns {string} The slug.
+	 */
 	getSlug() {
 		const samplePermalink = this.props.samplePermalink;
 		if ( samplePermalink ) {
@@ -57,6 +69,9 @@ class PostPermalink extends Component {
 		return '';
 	}
 
+	/**
+	 * @inheritdoc
+	 */
 	componentDidMount() {
 		this.setState( {
 			permalink: this.getPermalink(),
@@ -88,14 +103,25 @@ class PostPermalink extends Component {
 		} );
 	}
 
+	/**
+	 * Event handler for the slug input field being changed.
+	 *
+	 * @param {Object} event Change event
+	 */
 	onChangePermalink( event ) {
 		this.setState( { slug: event.target.value } );
 	}
 
+	/**
+	 * Event handler for the Edit button being clicked.
+	 */
 	onEditPermalink() {
 		this.setState( { editingSlug: true } );
 	}
 
+	/**
+	 * Event handler for the slug being saved.
+	 */
 	onSavePermalink() {
 		this.setState( {
 			editingSlug: false,
@@ -105,6 +131,9 @@ class PostPermalink extends Component {
 		this.props.onUpdate( newSlug );
 	}
 
+	/**
+	 * @inheritdoc
+	 */
 	render() {
 		const { isNew, link } = this.props;
 		const { editingSlug, permalink, slug } = this.state;
