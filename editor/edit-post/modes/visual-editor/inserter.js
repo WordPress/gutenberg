@@ -74,7 +74,7 @@ export class VisualEditorInserter extends Component {
 						key={ 'frequently_used_' + block.name }
 						className="editor-inserter__block"
 						onClick={ () => this.insertBlock( block.name ) }
-						label={ sprintf( __( 'Insert %s' ), block.title ) }
+						label={ sprintf( __( 'Add %s' ), block.title ) }
 						disabled={ this.isDisabledBlock( block ) }
 						icon={ (
 							<span className="editor-visual-editor__inserter-block-icon">

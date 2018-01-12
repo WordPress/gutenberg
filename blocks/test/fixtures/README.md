@@ -38,7 +38,7 @@ When adding a new test, it's only necessary to create file (1) above, then
 there is a command you can run to generate (2) through (4):
 
 ```sh
-GENERATE_MISSING_FIXTURES=y npm run test-unit -- --grep 'full post content fixture'
+GENERATE_MISSING_FIXTURES=y npm run test-unit blocks/test/full-content.js
 ```
 
 However, when using this command, please be sure to manually verify that the

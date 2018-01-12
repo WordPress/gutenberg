@@ -155,8 +155,15 @@ registerBlockType( 'core/image', {
 	save( { attributes } ) {
 		const { url, alt, caption, align, href, width, height } = attributes;
 		const extraImageProps = width || height ? { width, height } : {};
-		const figureStyle = width ? { width } : {};
 		const image = <img src={ url } alt={ alt } { ...extraImageProps } />;
+
+		let figureStyle = {};
+
+		if ( width ) {
+			figureStyle = { width };
+		} else if ( align === 'left' || align === 'right' ) {
+			figureStyle = { maxWidth: '50%' };
+		}
 
 		return (
 			<figure className={ align ? `align${ align }` : null } style={ figureStyle }>

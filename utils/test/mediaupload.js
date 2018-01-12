@@ -8,7 +8,7 @@ import { mediaUpload } from '../mediaupload';
 // mediaUpload is passed the setAttributes function
 // so we can stub that out have it pass the data to
 // console.error to check if proper thing is called
-const setAttributesStub = ( obj ) => console.error( obj );
+const onImagesChange = ( obj ) => console.error( obj );
 
 const invalidMediaObj = {
 	url: 'https://cldup.com/uuUqE_dXzy.jpg',
@@ -29,12 +29,12 @@ describe( 'mediaUpload', () => {
 	} );
 
 	it( 'should do nothing on no files', () => {
-		mediaUpload( [ ], setAttributesStub );
+		mediaUpload( [ ], onImagesChange );
 		expect( console.error ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should do nothing on invalid image type', () => {
-		mediaUpload( [ invalidMediaObj ], setAttributesStub );
+		mediaUpload( [ invalidMediaObj ], onImagesChange );
 		expect( console.error ).not.toHaveBeenCalled();
 	} );
 } );
