@@ -263,6 +263,10 @@ export class BlockListBlock extends Component {
 		} else {
 			onMerge( previousBlock, block );
 		}
+
+		// Manually trigger typing mode, since merging will remove this block and
+		// cause onKeyDown to not fire
+		this.maybeStartTyping();
 	}
 
 	insertBlocksAfter( blocks ) {
@@ -335,6 +339,9 @@ export class BlockListBlock extends Component {
 						}
 					}
 				}
+
+				// Pressing backspace should trigger typing mode
+				this.maybeStartTyping();
 				break;
 
 			case ESCAPE:
