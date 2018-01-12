@@ -12,14 +12,13 @@ import VisualEditorInserter from './inserter';
 import { hasFixedToolbar } from '../../../store/selectors';
 import { clearSelectedBlock } from '../../../store/actions';
 
-function VisualEditor( { showContextualToolbar } ) {
+function VisualEditor( { hasFixedToolbar } ) {
 	return (
 		<div className="editor-visual-editor">
 			<EditorGlobalKeyboardShortcuts />
 			<WritingFlow>
 				<PostTitle />
-				<BlockList
-					showContextualToolbar={ showContextualToolbar } />
+				<BlockList showContextualToolbar={ ! hasFixedToolbar } />
 				<DefaultBlockAppender />
 			</WritingFlow>
 			<VisualEditorInserter />
@@ -30,7 +29,7 @@ function VisualEditor( { showContextualToolbar } ) {
 export default connect(
 	( state ) => {
 		return {
-			showContextualToolbar: ! hasFixedToolbar( state ),
+			hasFixedToolbar: hasFixedToolbar( state ),
 		};
 	},
 	{
