@@ -103,7 +103,7 @@ export function blockAutocompleter( { onReplace } ) {
  */
 export function userAutocompleter() {
 	const getOptions = ( search = false ) => {
-		const searchData = search ? { data: { search: search } } : null;
+		const searchData = search ? { data: { search } } : null;
 		return ( new wp.api.collections.Users() ).fetch( searchData ).then( ( users ) => {
 			return users.map( ( user ) => {
 				return {
