@@ -98,12 +98,6 @@ export const editor = flow( [
 					return result;
 				}, state );
 
-			case 'EDIT_PERMALINK_SLUG':
-				return {
-					...state,
-					slug: action.slug,
-				};
-
 			case 'RESET_BLOCKS':
 				if ( 'content' in state ) {
 					return omit( state, 'content' );
