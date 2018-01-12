@@ -228,8 +228,8 @@ export class Autocomplete extends Component {
 		}
 	}
 
-	loadOptions( index ) {
-		this.props.completers[ index ].getOptions().then( ( options ) => {
+	loadOptions( index, query ) {
+		this.props.completers[ index ].getOptions( query ).then( ( options ) => {
 			const keyedOptions = map( options, ( option, i ) => ( { ...option, key: index + '-' + i } ) );
 			const filteredOptions = filterOptions( this.state.search, keyedOptions );
 			const selectedIndex = filteredOptions.length === this.state.filteredOptions.length ? this.state.selectedIndex : 0;
