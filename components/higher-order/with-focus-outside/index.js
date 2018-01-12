@@ -27,10 +27,7 @@ function withFocusOutside( WrappedComponent ) {
 		}
 
 		queueBlurCheck( event ) {
-			// React does not allow using an event reference asynchronously
-			// due to recycling behavior, except when explicitly persisted.
-			event.persist();
-
+			this.isBlurring = true;
 			this.blurCheckTimeout = setTimeout( () => {
 				if ( 'function' === typeof this.node.handleFocusOutside ) {
 					this.node.handleFocusOutside( event );
@@ -39,6 +36,7 @@ function withFocusOutside( WrappedComponent ) {
 		}
 
 		cancelBlurCheck() {
+			delete this.isBlurring;
 			clearTimeout( this.blurCheckTimeout );
 		}
 
