@@ -26,7 +26,7 @@ import { closeGeneralSidebar } from '../../store/actions';
  *
  * @returns {Object} The React element to render as a panel.
  */
-function getPluginSidebar( plugin ) {
+export function getPluginSidebar( plugin ) {
 	const pluginSidebar = getSidebar( plugin );
 
 	if ( ! pluginSidebar ) {

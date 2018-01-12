@@ -11,7 +11,7 @@ import { applyFilters } from '@wordpress/hooks';
 const sidebars = {};
 
 /**
- * Registers a sidebar with the editor.
+ * Registers a sidebar to the editor.
  *
  * A button will be shown in the settings menu to open the sidebar. The sidebar
  * can be manually opened by calling the `activateSidebar` function.
@@ -75,30 +75,48 @@ export function registerSidebar( name, settings ) {
 /**
  * Retrieves the sidebar settings object.
  *
- * @param {string} pluginId The name of the sidebar to retrieve.
+ * @param {string} name The name of the sidebar to retrieve.
  *
  * @returns {Object} The settings object of the sidebar. Or false if the
  *                         sidebar doesn't exist.
  */
-export function getSidebar( pluginId ) {
-	if ( ! sidebars.hasOwnProperty( pluginId ) ) {
+export function getSidebar( name ) {
+	if ( ! sidebars.hasOwnProperty( name ) ) {
 		return null;
 	}
-
-	return sidebars[ pluginId ];
+	return sidebars[ name ];
 }
 
 /**
- * Retrieves all sidebars that are registered.
+ * Renders a plugin sidebar.
  *
- * @returns {Object} Registered sidebars.
+ * @param {string}   name      The name of the plugin sidebar.
+ * @param {Object}   render    The render function for the plugin sidebar.
+ *
+ * @returns {void}
  */
-export function getSidebars() {
-	return sidebars;
+export function renderSidebar( name ) {
+	if ( ! sidebars[ name ] ) {
+		console.error(
+			'Sidebar "' + name + '" is not registered yet.'
+		);
+	}
+
+	let settings = sidebars[ name ].settings;
+
+	/*if ( ! settings || ! isFunction( settings.renderFunction ) ) {
+		console.error(
+			'The "renderFunction" property must be specified and must be a valid function.'
+		);
+		return null;
+	}*/
+
+	let render = getSidebar( name ).render;
+	render();
 }
 
 /**
- * Activates the gives sidebar.
+ * Activates the given sidebar.
  *
  * @param  {string} pluginId The name of the sidebar to activate.
  * @return {void}

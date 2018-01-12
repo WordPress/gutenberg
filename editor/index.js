@@ -20,6 +20,7 @@ import { initializeMetaBoxState } from './store/actions';
 
 export * from './components';
 export * from './api';
+export { getPluginSidebar } from './components/plugins-panel/index.js';
 import store from './store'; // Registers the state tree
 
 // Configure moment globally

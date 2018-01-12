@@ -63,7 +63,7 @@ function Layout( {
 } ) {
 	const className = classnames( 'editor-layout', {
 		'is-sidebar-opened': layoutHasOpenSidebar,
-		'has-fixed-toolbar': fixedToolbarActive,
+		'has-fixed-toolbar': hasFixedToolbar,
 	} );
 
 	return (
