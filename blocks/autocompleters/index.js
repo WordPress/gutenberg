@@ -122,7 +122,7 @@ export function userAutocompleter() {
 		return textNode.parentElement.closest( 'a' ) === null;
 	};
 
-	const setSearch = ( search, getOptions ) => {
+	const setSearch = ( search ) => {
 		return getOptions( search );
 	};
 

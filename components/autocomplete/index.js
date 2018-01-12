@@ -342,8 +342,9 @@ export class Autocomplete extends Component {
 		// update the state
 		if ( wasOpen || open ) {
 			if ( open ) {
-				if ( this.props.completers[ open.idx ].setSearch ) {
-					this.props.completers[ open.idx ].setSearch( query, this.props.completers[ open.idx ].getOptions ).then( ( options ) => {
+				const currentCompleter = this.props.completers[ open.idx ]
+				if ( currentCompleter.setSearch ) {
+					currentCompleter.setSearch( query ).then( ( options ) => {
 						const keyedOptions = map( options, ( option, i ) => ( { ...option, key: open.idx + '-' + i } ) );
 						filteredOptions = filterOptions( this.state.search, keyedOptions );
 						const selectedIndex = filteredOptions.length === this.state.filteredOptions.length ? this.state.selectedIndex : 0;
