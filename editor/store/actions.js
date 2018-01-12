@@ -254,13 +254,6 @@ export function editPost( edits ) {
 	};
 }
 
-export function editPermalinkSlug( slug ) {
-	return {
-		type: 'EDIT_PERMALINK_SLUG',
-		slug,
-	};
-}
-
 export function savePost() {
 	return {
 		type: 'REQUEST_POST_UPDATE',

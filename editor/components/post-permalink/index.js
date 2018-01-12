@@ -16,7 +16,12 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import './style.scss';
 import { isEditedPostNew, getEditedPostAttribute } from '../../store/selectors';
-import { editPermalinkSlug } from '../../store/actions';
+import {editPost} from '../../store/actions';
+
+/**
+ * Constants
+ */
+const REGEXP_NEWLINES = /[\r\n]+/g;
 
 class PostPermalink extends Component {
 	constructor() {
@@ -24,7 +29,6 @@ class PostPermalink extends Component {
 		this.state = {
 			editingSlug: false,
 			permalink: '',
-			slug: '',
 		};
 		this.getSlug = this.getSlug.bind( this );
 		this.onCopy = this.onCopy.bind( this );
@@ -45,10 +49,6 @@ class PostPermalink extends Component {
 	}
 
 	getSlug() {
-		if ( this.state.slug ) {
-			return this.state.slug;
-		}
-
 		const samplePermalink = this.props.samplePermalink;
 		if ( samplePermalink ) {
 			return samplePermalink[ 1 ];
@@ -66,6 +66,14 @@ class PostPermalink extends Component {
 
 	componentWillUnmount() {
 		clearTimeout( this.dismissCopyConfirmation );
+	}
+
+	componentWillReceiveProps() {
+		const slug = this.getSlug();
+		this.setState( {
+			permalink: this.getPermalink( slug ),
+			slug: slug,
+		} );
 	}
 
 	onCopy() {
@@ -93,7 +101,8 @@ class PostPermalink extends Component {
 			editingSlug: false,
 			permalink: this.getPermalink( this.state.slug ),
 		} );
-		editPermalinkSlug( this.state.slug );
+		const newSlug = this.state.slug.replace( REGEXP_NEWLINES, ' ' );
+		this.props.onUpdate( newSlug );
 	}
 
 	render() {
@@ -160,6 +169,11 @@ export default connect(
 			link: getEditedPostAttribute( state, 'link' ),
 			samplePermalink: getEditedPostAttribute( state, 'sample_permalink' ),
 		};
+	},
+	{
+		onUpdate( slug ) {
+			return editPost( { slug } );
+		},
 	}
 )( PostPermalink );
 
