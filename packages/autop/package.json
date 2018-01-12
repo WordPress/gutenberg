@@ -1,16 +1,16 @@
 {
-  "name": "@wordpress/autop",
-  "version": "1.0.1",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/WordPress/packages.git"
-  },
-  "description": "WordPress's automatic paragraph functions `autop` and `removep`",
-  "main": "build/index.js",
-  "module": "build-module/index.js",
-  "author": "WordPress",
-  "license": "GPL-2.0-or-later",
-  "publishConfig": {
-    "access": "public"
-  }
+	"name": "@wordpress/autop",
+	"version": "1.0.1",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/packages.git"
+	},
+	"description": "WordPress's automatic paragraph functions `autop` and `removep`",
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"author": "WordPress",
+	"license": "GPL-2.0-or-later",
+	"publishConfig": {
+		"access": "public"
+	}
 }
