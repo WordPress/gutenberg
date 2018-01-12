@@ -108,7 +108,15 @@ zip -r gutenberg.zip \
 	utils/build/*.{js,map} \
 	blocks/build/*.css \
 	components/build/*.css \
-	editor/build/*.css \
+	blocks/script.php \
+	components/script.php \
+	editor/script.php \
+	date/script.php \
+	element/script.php \
+	hooks/script.php \
+	i18n/script.php \
+	data/script.php \
+	utils/script.php \
 	README.md
 
 # Reset `gutenberg.php`
