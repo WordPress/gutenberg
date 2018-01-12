@@ -24,7 +24,7 @@ function FeatureToggle( { onToggle, active, onMobile } ) {
 			label={ __( 'Toolbar' ) }
 		>
 			<MenuItemsToggle
-				label={ __( 'Fix toolbar to top' ) }
+				label={ __( 'Fix Toolbar to Top' ) }
 				isSelected={ active }
 				onClick={ onToggle }
 			/>
