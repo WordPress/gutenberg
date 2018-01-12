@@ -406,6 +406,8 @@ function gutenberg_register_post_types() {
 		'rest_base'             => 'blocks',
 		'rest_controller_class' => 'WP_REST_Blocks_Controller',
 	) );
+
+	WP_Annotation_Utils::register_post_type();
 }
 add_action( 'init', 'gutenberg_register_post_types' );
 
