@@ -131,13 +131,12 @@ export class Autocomplete extends Component {
 		this.search = this.search.bind( this );
 		this.handleKeyDown = this.handleKeyDown.bind( this );
 		this.getWordRect = this.getWordRect.bind( this );
-		this.debouncedSearch = debounce( ( e ) => {
-			this.search( e );
+		this.debouncedSearch = debounce( () => {
+			this.search();
 		}, 250 );
 		this.doSearch = ( event ) => {
-			// Ensure the synthetic event can be handled asynchronously.
-			event.persist();
-			this.debouncedSearch( event );
+			this.searchContainer = event.target;
+			this.debouncedSearch();
 		};
 
 		this.state = this.constructor.getInitialState();
@@ -319,17 +318,16 @@ export class Autocomplete extends Component {
 		return { open, range, query };
 	}
 
-	search( event ) {
+	search() {
 		const { open: wasOpen, suppress: wasSuppress } = this.state;
 		const { completers } = this.props;
-		const container = event.target;
 		// ensure that the cursor location is unambiguous
-		const cursor = this.getCursor( container );
+		const cursor = this.getCursor( this.searchContainer );
 		if ( ! cursor ) {
 			return;
 		}
 		// look for the trigger prefix and search query just before the cursor location
-		const match = this.findMatch( container, cursor, completers, wasOpen );
+		const match = this.findMatch( this.searchContainer, cursor, completers, wasOpen );
 		const { open, query, range } = match || {};
 		// asynchronously load the options for the open completer
 		if ( open && ( ! wasOpen || open.idx !== wasOpen.idx ) ) {
