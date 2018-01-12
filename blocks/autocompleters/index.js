@@ -102,8 +102,9 @@ export function blockAutocompleter( { onReplace } ) {
  * @returns {Completer} Completer object used by the Autocomplete component.
  */
 export function userAutocompleter() {
-	const getOptions = ( search = '' ) => {
-		return ( new wp.api.collections.Users() ).fetch( { data: { search: search } } ).then( ( users ) => {
+	const getOptions = ( search = false ) => {
+		const searchData = search ? { data: { search: search } } : null;
+		return ( new wp.api.collections.Users() ).fetch( searchData ).then( ( users ) => {
 			return users.map( ( user ) => {
 				return {
 					value: user,
@@ -122,10 +123,6 @@ export function userAutocompleter() {
 		return textNode.parentElement.closest( 'a' ) === null;
 	};
 
-	const setSearch = ( search ) => {
-		return getOptions( search );
-	};
-
 	const onSelect = ( user ) => {
 		return <a href={ user.link }>{ '@' + user.name }</a>;
 	};
@@ -136,6 +133,5 @@ export function userAutocompleter() {
 		getOptions,
 		allowNode,
 		onSelect,
-		setSearch,
 	};
 }
