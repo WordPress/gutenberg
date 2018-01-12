@@ -120,7 +120,7 @@ registerBlockType( 'core/heading', {
 			focus && (
 				<InspectorControls key="inspector">
 					<h3>{ __( 'Heading Settings' ) }</h3>
-					<p>{ __( 'Size' ) }</p>
+					<p>{ __( 'Level' ) }</p>
 					<Toolbar
 						controls={
 							'123456'.split( '' ).map( ( level ) => ( {
