@@ -119,7 +119,7 @@ registerBlockType( 'core/video', {
 						key="placeholder"
 						icon="media-video"
 						label={ __( 'Video' ) }
-						instructions={ __( 'Select a video file from your library, or upload a new one:' ) }
+						instructions={ __( 'Select a video file from your library, or upload a new one' ) }
 						className={ className }>
 						<form onSubmit={ onSelectUrl }>
 							<input
