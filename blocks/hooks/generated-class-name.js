@@ -25,11 +25,24 @@ import { hasBlockSupport, getBlockDefaultClassname } from '../api';
 export function addGeneratedClassName( extraProps, blockType ) {
 	// Adding the generated className
 	if ( hasBlockSupport( blockType, 'className', true ) ) {
-		const updatedClassName = classnames(
-			getBlockDefaultClassname( blockType.name ),
-			extraProps.className,
-		);
-		extraProps.className = updatedClassName;
+		const blockDefaultClassname = getBlockDefaultClassname( blockType.name );
+
+		const blockDefaultClassnameIsDupe = ( typeof( extraProps.className ) === 'string'
+												&& extraProps.className.search( blockDefaultClassname ) !== -1 );
+
+		if( ! blockDefaultClassnameIsDupe ) {
+			/**
+			 * The block default classname has not been found in the
+			 * existing className string. This is not a duplicate class,
+			 * we can add the blockDefaultClassname to the set of classes.
+			 */
+			const updatedClassName = classnames(
+				blockDefaultClassname,
+				extraProps.className,
+			);
+
+			extraProps.className = updatedClassName;
+		}
 	}
 
 	return extraProps;
