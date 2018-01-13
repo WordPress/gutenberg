@@ -1,3 +1,16 @@
+.editor-block-list__block-clone {
+	position: fixed;
+	padding: 20px;
+	background: transparent;
+	pointer-events: none;
+
+	.editor-block-list__block-drag-inset > .inner {
+		visibility: visible;
+		background-color: white !important;
+		box-shadow: $shadow-popover;
+	}
+}
+
 .editor-block-list__block-drag-inset {
 	position: absolute;
 	top: 0;
@@ -35,10 +48,6 @@
 	&.hide *,
 	&.hide > * {
 		visibility: hidden;
-	}
-
-	&.dragged {
-		background-color: white;
 	}
 }
 

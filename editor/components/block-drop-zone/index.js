@@ -62,10 +62,7 @@ function BlockDropZone( { index, isLocked, ...props } ) {
 				}
 
 				props.onDrop( uid, index );
-				return;
-			} catch ( err ) {
-				return;
-			}
+			} catch ( err ) { }
 		}
 	};
 

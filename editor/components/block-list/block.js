@@ -357,21 +357,16 @@ export class BlockListBlock extends Component {
 		const dragInset = document.getElementById( `block-drag-inset-${ this.props.uid }` );
 		const block = document.getElementById( `block-${ this.props.uid }` );
 
-		/**
-		 * Closure to remove the cloned node from the DOM (fired within timeout below)
-		 */
-		const clearDom = ( _blockList, _cloneWrapper ) => {
+		// Closure to remove the cloned node from the DOM (fired within timeout below)
+		const removeBlockClone = ( _blockList, _cloneWrapper ) => {
 			return () => {
 				_blockList.removeChild( _cloneWrapper );
-			}
+			};
 		};
 
-		/**
-		 * Closure to hide the visible block and show inset in its place (fired within timeout below)
-		 */
-		const setDragInset = ( _block, _dragInset ) => {
+		// Closure to hide the visible block and show inset in its place (fired within timeout below)
+		const showInset = ( _block, _dragInset ) => {
 			return () => {
-				_block.classList.remove( 'dragged' );
 				_block.classList.add( 'hide' );
 				_dragInset.classList.add( 'visible' );
 				document.body.classList.add( 'dragging' );
@@ -383,7 +378,7 @@ export class BlockListBlock extends Component {
 			JSON.stringify( {
 				uid: this.props.uid,
 				fromIndex: this.props.order,
-				type: BLOCK_REORDER
+				type: BLOCK_REORDER,
 			} )
 		);
 
@@ -391,19 +386,18 @@ export class BlockListBlock extends Component {
 			const blockList = block.parentNode;
 			const cloneWrapper = document.createElement( 'div' );
 			const clone = block.cloneNode( true );
-			const rec = block.getBoundingClientRect();
+			const blockRect = block.getBoundingClientRect();
 
 			clone.id = `clone-${ block.id }`;
 
 			cloneWrapper.classList.add( 'editor-block-list__block-clone' );
 			// Width of block clone: width of block + 40px padding (used to fit the shadow)
-			cloneWrapper.style.width = `${ rec.width + 40 }px`;
+			cloneWrapper.style.width = `${ blockRect.width + 40 }px`;
 			// Spawn the block clone right over the block:
 			//   - "left: -1000" to have it hidden by default will not work in Safari
 			//   - account for 20px padding (used to fit the shadow)
-			cloneWrapper.style.top = `${ parseInt( rec.top, 10 ) - 20 }px`;
-			cloneWrapper.style.left = `${ parseInt( rec.left, 10 ) - 20 }px`;
-
+			cloneWrapper.style.top = `${ parseInt( blockRect.top, 10 ) - 20 }px`;
+			cloneWrapper.style.left = `${ parseInt( blockRect.left, 10 ) - 20 }px`;
 			cloneWrapper.appendChild( clone );
 
 			blockList.appendChild( cloneWrapper );
@@ -411,17 +405,23 @@ export class BlockListBlock extends Component {
 			// Display the drag image right over the block:
 			//   - coordinates relative to the block and the cursor
 			//   - account for 20px padding (used to fit the shadow)
+			//   - optimisation: if top ends of the block are outside the viewport,
+			//     then revert to top origin.
+			const top = parseInt( blockRect.top, 10 ) > 0 ?
+				parseInt( event.clientY, 10 ) - parseInt( blockRect.top, 10 ) + 20 :
+				parseInt( event.clientY, 10 ) + 20;
+
 			event.dataTransfer.setDragImage(
 				cloneWrapper,
-				parseInt( event.clientX, 10 ) - parseInt( rec.left, 10 ) + 20,
-				parseInt( event.clientY, 10 ) - parseInt( rec.top, 10 ) + 20
+				parseInt( event.clientX, 10 ) - parseInt( blockRect.left, 10 ) + 20,
+				top
 			);
 
-			setTimeout( clearDom( blockList, cloneWrapper ));
+			setTimeout( removeBlockClone( blockList, cloneWrapper ) );
 		}
 
 		// Hide the visible block and show inset in its place.
-		setTimeout( setDragInset( block, dragInset ) );
+		setTimeout( showInset( block, dragInset ) );
 	}
 
 	onDragEnd() {
