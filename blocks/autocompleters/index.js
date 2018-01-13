@@ -118,12 +118,12 @@ export function userAutocompleter() {
 		} );
 	};
 
-	const allowNode = ( textNode ) => {
+	const allowNode = () => {
 		return true;
 	};
 
 	const onSelect = ( user ) => {
-		return <span class="wp-user-mention">{ '@' + user.slug }</span>;
+		return <span className="wp-user-mention">{ '@' + user.slug }</span>;
 	};
 
 	return {
