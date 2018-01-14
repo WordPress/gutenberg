@@ -33,9 +33,9 @@
 		}
 	}
 
-	&.visible > .inner {
+	&.is-visible > .inner {
 		visibility: visible !important;
-		z-index: z-index( '.editor-block-list__block-drag-inset.visible > .inner' );
+		z-index: z-index( '.editor-block-list__block-drag-inset.is-visible > .inner' );
 	}
 
 	&:hover {
@@ -45,8 +45,8 @@
 }
 
 .editor-block-list__block {
-	&.hide *,
-	&.hide > * {
+	&.is-hidden *,
+	&.is-hidden > * {
 		visibility: hidden;
 	}
 }

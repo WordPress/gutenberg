@@ -119,6 +119,7 @@ export class BlockListBlock extends Component {
 
 		this.state = {
 			error: null,
+			dragging: false,
 		};
 	}
 
@@ -365,10 +366,9 @@ export class BlockListBlock extends Component {
 		};
 
 		// Closure to hide the visible block and show inset in its place (fired within timeout below)
-		const showInset = ( _block, _dragInset ) => {
+		const showInset = () => {
 			return () => {
-				_block.classList.add( 'hide' );
-				_dragInset.classList.add( 'visible' );
+				this.setState( state => Object.assign( {}, state, { dragging: true } ) );
 				document.body.classList.add( 'dragging' );
 			};
 		};
@@ -388,25 +388,27 @@ export class BlockListBlock extends Component {
 			const clone = block.cloneNode( true );
 			const blockRect = block.getBoundingClientRect();
 
+			// 1. Clone the current block, style it, and spawn over original block.
+
 			clone.id = `clone-${ block.id }`;
 
 			cloneWrapper.classList.add( 'editor-block-list__block-clone' );
-			// Width of block clone: width of block + 40px padding (used to fit the shadow)
+			// 40px padding for the shadow.
 			cloneWrapper.style.width = `${ blockRect.width + 40 }px`;
-			// Spawn the block clone right over the block:
-			//   - "left: -1000" to have it hidden by default will not work in Safari
-			//   - account for 20px padding (used to fit the shadow)
+			// Position clone right over the original block.
+			// 20px padding for the shadow.
 			cloneWrapper.style.top = `${ parseInt( blockRect.top, 10 ) - 20 }px`;
 			cloneWrapper.style.left = `${ parseInt( blockRect.left, 10 ) - 20 }px`;
-			cloneWrapper.appendChild( clone );
 
+			cloneWrapper.appendChild( clone );
 			blockList.appendChild( cloneWrapper );
 
+			// 2. Set clone as drag image and remove from DOM:
+
 			// Display the drag image right over the block:
-			//   - coordinates relative to the block and the cursor
-			//   - account for 20px padding (used to fit the shadow)
-			//   - optimisation: if top ends of the block are outside the viewport,
-			//     then revert to top origin.
+			//   - Coordinates relative to the block and the cursor/
+			//   - Optimisation: if top ends of the block are outside the viewport,
+			//     then revert to top 0 (relative to cursor).
 			const top = parseInt( blockRect.top, 10 ) > 0 ?
 				parseInt( event.clientY, 10 ) - parseInt( blockRect.top, 10 ) + 20 :
 				parseInt( event.clientY, 10 ) + 20;
@@ -421,22 +423,21 @@ export class BlockListBlock extends Component {
 		}
 
 		// Hide the visible block and show inset in its place.
-		setTimeout( showInset( block, dragInset ) );
+		setTimeout( showInset() );
 	}
 
 	onDragEnd() {
 		const block = document.getElementById( `block-${ this.props.uid }` );
 		const dragInset = document.getElementById( `block-drag-inset-${ this.props.uid }` );
 
-		setTimeout( resetBlockDisplay( block, dragInset ), 0 );
-
-		function resetBlockDisplay( _block, _dragInset ) {
+		const resetBlockDisplay = () => {
 			return () => {
-				_block.classList.remove( 'hide' );
-				_dragInset.classList.remove( 'visible' );
+				this.setState( state => Object.assign( {}, state, { dragging: false } ) );
 				document.body.classList.remove( 'dragging' );
 			};
 		}
+
+		setTimeout( resetBlockDisplay(), 0 );
 	}
 
 	onDrop( uid, toIndex ) {
@@ -455,15 +456,18 @@ export class BlockListBlock extends Component {
 		// Generate the wrapper class names handling the different states of the block.
 		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected, focus } = this.props;
 		const showUI = isSelected && ( ! this.props.isTyping || ( focus && focus.collapsed === false ) );
-		const { error } = this.state;
+		const { error, dragging } = this.state;
 		const wrapperClassName = classnames( 'editor-block-list__block', {
 			'has-warning': ! isValid || !! error,
 			'is-selected': showUI,
 			'is-multi-selected': isMultiSelected,
 			'is-hovered': isHovered,
 			'is-reusable': isReusableBlock( blockType ),
+			'is-hidden': dragging,
 		} );
-		const blockDragInsetClassName = 'editor-block-list__block-drag-inset';
+		const blockDragInsetClassName = classnames( 'editor-block-list__block-drag-inset', {
+			'is-visible': dragging
+		} );
 
 		const { onMouseLeave, onFocus, onReplace } = this.props;
 
