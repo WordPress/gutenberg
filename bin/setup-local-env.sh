@@ -4,10 +4,15 @@
 set -e
 
 # Change to the expected directory
-cd "$(dirname "$0")/../docker"
+cd "$(dirname "$0")/.."
 
 # Launch the containers
-docker-compose up -d
+if ! docker-compose up -d; then
+	# Launching may fail due to the docker config file directory having changed.
+	# Remove the old wordpress-dev container, and try again.
+	docker container rm -fv wordpress-dev
+	docker-compose up -d
+fi
 
 # Wait until the docker containers are setup properely
 echo "Attempting to connect to wordpress"

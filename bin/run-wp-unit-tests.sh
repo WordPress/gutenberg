@@ -27,8 +27,8 @@ fi
 
 echo Running with the following versions:
 if [ ${DOCKER} = "true" ]; then
-	docker-compose -f docker/docker-compose.yml run --rm wordpress_phpunit php -v
-	docker-compose -f docker/docker-compose.yml run --rm wordpress_phpunit phpunit --version
+	docker-compose run --rm wordpress_phpunit php -v
+	docker-compose run --rm wordpress_phpunit phpunit --version
 else
 	php -v
 	phpunit --version
