@@ -7,7 +7,7 @@ import moment from 'moment';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+import { registerBlockType, unregisterBlockType, getBlockTypes } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -70,8 +70,6 @@ import {
 	didPostSaveRequestFail,
 	getSuggestedPostFormat,
 	getNotices,
-	getMostFrequentlyUsedBlocks,
-	getRecentlyUsedBlocks,
 	getMetaBoxes,
 	getDirtyMetaBoxes,
 	getMetaBox,
@@ -85,6 +83,9 @@ import {
 	isFeatureActive,
 	isPublishingPost,
 	POST_UPDATE_TRANSACTION_ID,
+	getRecentInserterItems,
+	getFrequentInserterItems,
+	getInserterItems,
 } from '../selectors';
 
 jest.mock( '../constants', () => ( {
@@ -97,6 +98,9 @@ describe( 'selectors', () => {
 			save: ( props ) => props.attributes.text,
 			category: 'common',
 			title: 'test block',
+			icon: 'test',
+			keywords: [ 'testing' ],
+			useOnce: true,
 		} );
 	} );
 
@@ -2219,45 +2223,206 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getMostFrequentlyUsedBlocks', () => {
-		it( 'should have paragraph and image to bring frequently used blocks up to three blocks', () => {
-			const noUsage = { preferences: { blockUsage: {} } };
-			const someUsage = { preferences: { blockUsage: { 'core/paragraph': 1 } } };
-
-			expect( getMostFrequentlyUsedBlocks( noUsage ).map( ( block ) => block.name ) )
-				.toEqual( [ 'core/paragraph', 'core/image' ] );
-
-			expect( getMostFrequentlyUsedBlocks( someUsage ).map( ( block ) => block.name ) )
-				.toEqual( [ 'core/paragraph', 'core/image' ] );
-		} );
-		it( 'should return the top 3 most recently used blocks', () => {
+	describe( 'getInserterItems', () => {
+		it( 'should list all public static blocks', () => {
 			const state = {
-				preferences: {
-					blockUsage: {
-						'core/deleted-block': 20,
-						'core/paragraph': 4,
-						'core/image': 11,
-						'core/quote': 2,
-						'core/gallery': 1,
+				editor: {
+					present: {
+						blocksByUid: {},
+						blockOrder: [],
+					},
+				},
+				reusableBlocks: {
+					data: {},
+				},
+			};
+
+			const publicBlockTypes = getBlockTypes().filter( blockType => ! blockType.isPrivate );
+			expect( getInserterItems( state ) ).toHaveLength( publicBlockTypes.length );
+		} );
+
+		it( 'should properly list a static block', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUid: {},
+						blockOrder: [],
+					},
+				},
+				reusableBlocks: {
+					data: {},
+				},
+			};
+
+			expect( getInserterItems( state, [ 'core/test-block' ] ) ).toEqual( [
+				{
+					name: 'core/test-block',
+					initialAttributes: {},
+					title: 'test block',
+					icon: 'test',
+					category: 'common',
+					keywords: [ 'testing' ],
+					isDisabled: false,
+				},
+			] );
+		} );
+
+		it( 'should set isDisabled when a static block with useOnce has been used', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUid: {
+							1: { uid: 1, name: 'core/test-block', attributes: {} },
+						},
+						blockOrder: [ 1 ],
+					},
+				},
+				reusableBlocks: {
+					data: {},
+				},
+			};
+
+			const items = getInserterItems( state, [ 'core/test-block' ] );
+			expect( items[ 0 ].isDisabled ).toBe( true );
+		} );
+
+		it( 'should properly list all reusable blocks', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUid: {},
+						blockOrder: [],
+					},
+				},
+				reusableBlocks: {
+					data: {
+						123: {
+							id: 123,
+							title: 'My reusable block',
+							type: 'core/test-block',
+						},
 					},
 				},
 			};
 
-			expect( getMostFrequentlyUsedBlocks( state ).map( ( block ) => block.name ) )
-				.toEqual( [ 'core/image', 'core/paragraph', 'core/quote' ] );
+			expect( getInserterItems( state, [ 'core/block' ] ) ).toEqual( [
+				{
+					name: 'core/block',
+					initialAttributes: { ref: 123 },
+					title: 'My reusable block',
+					icon: 'test',
+					category: 'reusable-blocks',
+					keywords: [],
+					isDisabled: false,
+				},
+			] );
+		} );
+
+		it( 'should return nothing when all blocks are disabled', () => {
+			expect( getInserterItems( {}, false ) ).toEqual( [] );
 		} );
 	} );
 
-	describe( 'getRecentlyUsedBlocks', () => {
-		it( 'should return the most recently used blocks', () => {
+	describe( 'getRecentInserterItems', () => {
+		it( 'should return the 8 most recent inserts', () => {
 			const state = {
 				preferences: {
-					recentlyUsedBlocks: [ 'core/deleted-block', 'core/paragraph', 'core/image' ],
+					recentInserts: [
+						{ name: 'core/paragraph' },
+						{ name: 'core/block', ref: 123 },
+						{ name: 'core/image' },
+						{ name: 'core/quote' },
+						{ name: 'core/gallery' },
+						{ name: 'core/heading' },
+						{ name: 'core/list' },
+						{ name: 'core/video' },
+						{ name: 'core/audio' },
+						{ name: 'core/code' },
+					],
+				},
+				reusableBlocks: {
+					data: {
+						123: { id: 123, type: 'core/test-block' },
+					},
 				},
 			};
 
-			expect( getRecentlyUsedBlocks( state ).map( ( block ) => block.name ) )
-				.toEqual( [ 'core/paragraph', 'core/image' ] );
+			expect( getRecentInserterItems( state ) ).toMatchObject( [
+				{ name: 'core/paragraph', initialAttributes: {} },
+				{ name: 'core/block', initialAttributes: { ref: 123 } },
+				{ name: 'core/image', initialAttributes: {} },
+				{ name: 'core/quote', initialAttributes: {} },
+				{ name: 'core/gallery', initialAttributes: {} },
+				{ name: 'core/heading', initialAttributes: {} },
+				{ name: 'core/list', initialAttributes: {} },
+				{ name: 'core/video', initialAttributes: {} },
+			] );
+		} );
+
+		it( 'should pad list out with blocks from the common category', () => {
+			const state = {
+				preferences: {
+					recentInserts: [
+						{ name: 'core/deleted-block' },
+						{ name: 'core/audio' },
+					],
+				},
+			};
+
+			expect( getRecentInserterItems( state ) ).toMatchObject( [
+				{ name: 'core/audio', initialAttributes: {} },
+				{ name: 'core/image', initialAttributes: {} },
+				{ name: 'core/gallery', initialAttributes: {} },
+				{ name: 'core/heading', initialAttributes: {} },
+				{ name: 'core/quote', initialAttributes: {} },
+				{ name: 'core/list', initialAttributes: {} },
+				{ name: 'core/cover-image', initialAttributes: {} },
+				{ name: 'core/video', initialAttributes: {} },
+			] );
+		} );
+	} );
+
+	describe( 'getFrequentInserterItems', () => {
+		it( 'should return the 3 most frequent inserts', () => {
+			const state = {
+				preferences: {
+					insertFrequency: {
+						[ JSON.stringify( { name: 'core/deleted-block' } ) ]: 10,
+						[ JSON.stringify( { name: 'core/paragraph' } ) ]: 3,
+						[ JSON.stringify( { name: 'core/image' } ) ]: 2,
+						[ JSON.stringify( { name: 'core/block', ref: 123 } ) ]: 5,
+						[ JSON.stringify( { name: 'core/quote' } ) ]: 1,
+					},
+				},
+				reusableBlocks: {
+					data: {
+						123: { id: 123, type: 'core/test-block' },
+					},
+				},
+			};
+
+			expect( getFrequentInserterItems( state ) ).toMatchObject( [
+				{ name: 'core/block', initialAttributes: { ref: 123 } },
+				{ name: 'core/paragraph', initialAttributes: {} },
+				{ name: 'core/image', initialAttributes: {} },
+			] );
+		} );
+
+		it( 'should pad list out with common blocks', () => {
+			const state = {
+				preferences: {
+					insertFrequency: {
+						[ JSON.stringify( { name: 'core/quote' } ) ]: 5,
+						[ JSON.stringify( { name: 'core/image' } ) ]: 2,
+					},
+				},
+			};
+
+			expect( getFrequentInserterItems( state ) ).toMatchObject( [
+				{ name: 'core/quote', initialAttributes: {} },
+				{ name: 'core/image', initialAttributes: {} },
+				{ name: 'core/paragraph', initialAttributes: {} },
+			] );
 		} );
 	} );
 

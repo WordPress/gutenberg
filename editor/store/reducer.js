@@ -6,25 +6,24 @@ import { combineReducers } from 'redux';
 import {
 	flow,
 	partialRight,
-	difference,
 	get,
 	reduce,
 	keyBy,
-	keys,
 	first,
 	last,
 	omit,
-	pick,
+	omitBy,
 	without,
 	mapValues,
 	findIndex,
 	reject,
+	isEqual,
 } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { getBlockTypes, getBlockType } from '@wordpress/blocks';
+import { isReusableBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -32,11 +31,6 @@ import { getBlockTypes, getBlockType } from '@wordpress/blocks';
 import withHistory from '../utils/with-history';
 import withChangeDetection from '../utils/with-change-detection';
 import { PREFERENCES_DEFAULTS } from './defaults';
-
-/***
- * Module constants
- */
-const MAX_RECENT_BLOCKS = 8;
 
 /**
  * Returns a post attribute value, flattening nested rendered content using its
@@ -532,35 +526,31 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 				mode: action.mode,
 			};
 		case 'INSERT_BLOCKS':
-			// record the block usage and put the block in the recently used blocks
-			let blockUsage = state.blockUsage;
-			let recentlyUsedBlocks = [ ...state.recentlyUsedBlocks ];
-			action.blocks.forEach( ( block ) => {
-				const uses = ( blockUsage[ block.name ] || 0 ) + 1;
-				blockUsage = omit( blockUsage, block.name );
-				blockUsage[ block.name ] = uses;
-				recentlyUsedBlocks = [ block.name, ...without( recentlyUsedBlocks, block.name ) ].slice( 0, MAX_RECENT_BLOCKS );
-			} );
+			return action.blocks.reduce( ( prevState, block ) => {
+				const { name } = block;
+				const insert = isReusableBlock( block ) ? { name, ref: block.attributes.ref } : { name };
+				const key = JSON.stringify( insert );
+				return {
+					...prevState,
+					recentInserts: [
+						insert,
+						...reject( prevState.recentInserts, recentInsert => isEqual( insert, recentInsert ) ),
+					],
+					insertFrequency: {
+						...prevState.insertFrequency,
+						[ key ]: ( prevState.insertFrequency[ key ] || 0 ) + 1,
+					},
+				};
+			}, state );
+		case 'REMOVE_REUSABLE_BLOCK':
+			const { id } = action;
 			return {
 				...state,
-				blockUsage,
-				recentlyUsedBlocks,
-			};
-		case 'SETUP_EDITOR':
-			const isBlockDefined = name => getBlockType( name ) !== undefined;
-			const filterInvalidBlocksFromList = list => list.filter( isBlockDefined );
-			const filterInvalidBlocksFromObject = obj => pick( obj, keys( obj ).filter( isBlockDefined ) );
-			const commonBlocks = getBlockTypes()
-				.filter( ( blockType ) => 'common' === blockType.category )
-				.map( ( blockType ) => blockType.name );
-
-			return {
-				...state,
-				// recently used gets filled up to `MAX_RECENT_BLOCKS` with blocks from the common category
-				recentlyUsedBlocks: filterInvalidBlocksFromList( [ ...state.recentlyUsedBlocks ] )
-					.concat( difference( commonBlocks, state.recentlyUsedBlocks ) )
-					.slice( 0, MAX_RECENT_BLOCKS ),
-				blockUsage: filterInvalidBlocksFromObject( state.blockUsage ),
+				recentInserts: reject( state.recentInserts, ( { ref } ) => ref === id ),
+				insertFrequency: omitBy( state.insertFrequency, ( frequency, key ) => {
+					const { ref } = JSON.parse( key );
+					return ref === id;
+				} ),
 			};
 		case 'TOGGLE_FEATURE':
 			return {

@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { some } from 'lodash';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 
@@ -18,7 +17,7 @@ import { createBlock, BlockIcon } from '@wordpress/blocks';
  */
 import { Inserter } from '../../../components';
 import { clearSelectedBlock, insertBlock } from '../../../store/actions';
-import { getMostFrequentlyUsedBlocks, getBlockCount, getBlocks } from '../../../store/selectors';
+import { getFrequentInserterItems, getBlockCount } from '../../../store/selectors';
 
 export class VisualEditorInserter extends Component {
 	constructor() {
@@ -40,18 +39,20 @@ export class VisualEditorInserter extends Component {
 		}
 	}
 
-	insertBlock( name ) {
-		this.props.insertBlock( createBlock( name ) );
-	}
-
-	isDisabledBlock( block ) {
-		return block.useOnce && some( this.props.blocks, ( { name } ) => block.name === name );
+	/**
+	 * Invoked when a inserter item is selected from the quick inserter.
+	 * Dispatches an action to create the necessary block.
+	 * 
+	 * @param {Editor.InserterItem} item Selected inserter item.
+	 */
+	insertItem( { name, initialAttributes } ) {
+		this.props.insertBlock( createBlock( name, initialAttributes ) );
 	}
 
 	render() {
 		const { blockCount, isLocked } = this.props;
 		const { isShowingControls } = this.state;
-		const { mostFrequentlyUsedBlocks } = this.props;
+		const { frequentInserterItems } = this.props;
 		const classes = classnames( 'editor-visual-editor__inserter', {
 			'is-showing-controls': isShowingControls,
 		} );
@@ -69,20 +70,20 @@ export class VisualEditorInserter extends Component {
 				<Inserter
 					insertIndex={ blockCount }
 					position="top right" />
-				{ mostFrequentlyUsedBlocks && mostFrequentlyUsedBlocks.map( ( block ) => (
+				{ frequentInserterItems.map( ( item ) => (
 					<IconButton
-						key={ 'frequently_used_' + block.name }
+						key={ 'frequently_used_' + item.name }
 						className="editor-inserter__block"
-						onClick={ () => this.insertBlock( block.name ) }
-						label={ sprintf( __( 'Add %s' ), block.title ) }
-						disabled={ this.isDisabledBlock( block ) }
+						onClick={ () => this.insertItem( item ) }
+						label={ sprintf( __( 'Add %s' ), item.title ) }
+						disabled={ item.isDisabled }
 						icon={ (
 							<span className="editor-visual-editor__inserter-block-icon">
-								<BlockIcon icon={ block.icon } />
+								<BlockIcon icon={ item.icon } />
 							</span>
 						) }
 					>
-						{ block.title }
+						{ item.title }
 					</IconButton>
 				) ) }
 			</div>
@@ -91,12 +92,19 @@ export class VisualEditorInserter extends Component {
 }
 
 export default compose(
+	withContext( 'editor' )( ( settings ) => {
+		const { templateLock, blockTypes } = settings;
+
+		return {
+			isLocked: !! templateLock,
+			enabledBlockTypes: blockTypes,
+		};
+	} ),
 	connect(
-		( state ) => {
+		( state, ownProps ) => {
 			return {
-				mostFrequentlyUsedBlocks: getMostFrequentlyUsedBlocks( state ),
+				frequentInserterItems: getFrequentInserterItems( state, ownProps.enabledBlockTypes ),
 				blockCount: getBlockCount( state ),
-				blocks: getBlocks( state ),
 			};
 		},
 		{
@@ -104,11 +112,4 @@ export default compose(
 			clearSelectedBlock,
 		},
 	),
-	withContext( 'editor' )( ( settings ) => {
-		const { templateLock } = settings;
-
-		return {
-			isLocked: !! templateLock,
-		};
-	} ),
 )( VisualEditorInserter );
