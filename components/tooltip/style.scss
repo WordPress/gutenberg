@@ -25,3 +25,10 @@
 .components-tooltip:not(.is-mobile) .components-popover__content {
 	min-width: 0;
 }
+
+.components-tooltip__shortcut {
+	display: block;
+	text-align: center;
+	font-size: 12px;
+	opacity: 0.75;
+}
