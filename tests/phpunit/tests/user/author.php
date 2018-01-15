@@ -52,18 +52,18 @@ class Tests_User_Author_Template extends WP_UnitTestCase {
 		$this->assertEquals( 'test_author', get_the_author_meta( 'user_login' ) );
 		$this->assertEquals( 'test_author', get_the_author_meta( 'display_name' ) );
 
-		$this->assertEquals( '<p>test_author</p>', trim( get_the_author_meta( 'description' ) ) );
+		$this->assertEquals( 'test_author', trim( get_the_author_meta( 'description' ) ) );
 		$this->assertEquals( 'test_author', get_the_author_meta( 'user_description' ) );
 		add_user_meta( self::$author_id, 'user_description', 'user description' );
 		$this->assertEquals( 'user description', get_user_meta( self::$author_id, 'user_description', true ) );
 		// user_description in meta is ignored. The content of description is returned instead.
 		// See #20285
 		$this->assertEquals( 'test_author', get_the_author_meta( 'user_description' ) );
-		$this->assertEquals( '<p>test_author</p>', trim( get_the_author_meta( 'description' ) ) );
+		$this->assertEquals( 'test_author', trim( get_the_author_meta( 'description' ) ) );
 		update_user_meta( self::$author_id, 'user_description', '' );
 		$this->assertEquals( '', get_user_meta( self::$author_id, 'user_description', true ) );
 		$this->assertEquals( 'test_author', get_the_author_meta( 'user_description' ) );
-		$this->assertEquals( '<p>test_author</p>', trim( get_the_author_meta( 'description' ) ) );
+		$this->assertEquals( 'test_author', trim( get_the_author_meta( 'description' ) ) );
 
 		$this->assertEquals( '', get_the_author_meta( 'does_not_exist' ) );
 	}
