@@ -29,7 +29,6 @@ const element = (
 				<ModeSwitcher onSelect={ onClose } />
 				<div className="editor-ellipsis-menu__separator" />
 				<FixedToolbarToggle onToggle={ onClose } />
-				<div className="editor-ellipsis-menu__separator" />
 				<Plugins onToggle={ onClose } />
 			</div>
 		) }

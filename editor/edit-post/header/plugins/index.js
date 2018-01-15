@@ -47,13 +47,16 @@ function Plugins() {
 		};
 	} );
 
-	return (
+	return [
+		<div
+			key="plugins-separator"
+			className="editor-ellipsis-menu__separator" />,
 		<MenuItemsGroup
+			key="plugins-menu-items"
 			label={ __( 'Plugins' ) }
 			choices={ plugins }
-			onSelect={ onSelect }
-		/>
-	);
+			onSelect={ onSelect } />,
+	];
 }
 
 export default connect(
