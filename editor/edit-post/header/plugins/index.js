@@ -1,9 +1,8 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
+import { map, isEmpty } from 'lodash';
 import { connect } from 'react-redux';
-import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -24,6 +23,10 @@ import { getEllipsisMenuItems } from '../../../api/ellipsis-menu';
 function Plugins() {
 	const ellipsisMenuItems = getEllipsisMenuItems();
 
+	if ( isEmpty( ellipsisMenuItems ) ) {
+		return null;
+	}
+
 	/**
 	 * Handles the user clicking on one of the plugins in the menu
 	 *
@@ -43,10 +46,6 @@ function Plugins() {
 			label: menuItem.title,
 		};
 	} );
-
-	if ( isEmpty( ellipsisMenuItems ) ) {
-		return null;
-	}
 
 	return (
 		<MenuItemsGroup
