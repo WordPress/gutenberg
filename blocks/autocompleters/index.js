@@ -132,7 +132,7 @@ export function userAutocompleter() {
 	};
 
 	const onSelect = ( user ) => {
-		return applyFilters( 'editor.userAutocompleter.onSelect', <a href={ user.link }>{ '@' + user.name }</a>, user );
+		return <a href={ user.link }>{ '@' + user.name }</a>;
 	};
 
 	return {
