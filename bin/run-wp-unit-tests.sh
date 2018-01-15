@@ -13,8 +13,9 @@ else
 	# failed `stat` calls from `filemtime()`.
 	composer install || exit 1
 	npm install || exit 1
-	npm run build || exit 1
 fi
+
+npm run build || exit 1
 
 # Make sure phpegjs parser is up to date
 node bin/create-php-parser.js || exit 1
