@@ -1,6 +1,7 @@
 /* eslint no-console: [ 'error', { allow: [ 'error' ] } ] */
 
 /* External dependencies */
+import isFunction from "lodash/isFunction";
 
 /* Internal dependencies */
 import { applyFilters } from '@wordpress/hooks';
@@ -11,10 +12,11 @@ const menuItems = {};
  * Registers a plugin under the ellipsis menu.
  *
  *
- * @param {string} name              The name of the plugin. Should be in
- *                                   `[namespace]/[name]` format.
- * @param {Object}   settings        The settings for this menu item.
- * @param {string}   settings.title  The name to show in the settings menu.
+ * @param {string} name                The name of the plugin. Should be in
+ *                                     `[namespace]/[name]` format.
+ * @param {Object}   settings          The settings for this menu item.
+ * @param {string}   settings.title    The name to show in the settings menu.
+ * @param {func}     settings.callback The callback function that is called when the menu item is clicked.
  *
  * @returns {Object} The final sidebar settings object.
  */
@@ -51,6 +53,19 @@ export function registerEllipsisMenuItem( name, settings ) {
 	if ( typeof settings.title !== 'string' ) {
 		console.error(
 			'Menu items title must be strings.'
+		);
+		return null;
+	}
+
+	if ( ! settings.callback ) {
+		console.error(
+			'Menu item "' + name + '" must have a callback'
+		);
+		return null;
+	}
+	if( ! isFunction( settings.callback ) ) {
+		console.error(
+			'Menu item callback must be a function'
 		);
 		return null;
 	}

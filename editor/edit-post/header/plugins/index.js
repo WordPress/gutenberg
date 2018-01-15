@@ -28,9 +28,13 @@ function Plugins() {
 	 * Handles the user clicking on one of the plugins in the menu
 	 *
 	 * Does nothing currently, but should be used to trigger the plugins sidebar
+	 *
+	 * @param {string} pluginId The plugin id.
+	 *
+	 * @returns {void}
 	 */
-	function onSelect(value) {
-		console.log('selected ellepsis menu plugin: ', value);
+	function onSelect( pluginId ) {
+		ellipsisMenuItems[ pluginId ].callback();
 	}
 
 	const plugins = map( ellipsisMenuItems, ( menuItem ) => {
@@ -40,7 +44,7 @@ function Plugins() {
 		};
 	} );
 
-	if(isEmpty(ellipsisMenuItems)) {
+	if ( isEmpty( ellipsisMenuItems ) ) {
 		return null;
 	}
 
