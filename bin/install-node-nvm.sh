@@ -54,6 +54,11 @@ if [ "$(nvm current)" != "$(nvm version-remote --lts)" ]; then
 	echo -en $(status_message "Updating Node..." )
 	nvm install >/dev/null 2>&1
 	echo ' done!'
+
+	echo -e $(warning_message "A new node version was install, please run this command to use it:" )
+	echo -e $(warning_message "nvm use" )
+	echo -e $(warning_message "After that, re-run the setup script to continue." )
+	exit 1
 fi
 
 npm install
