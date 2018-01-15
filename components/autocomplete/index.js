@@ -26,6 +26,7 @@ const { ENTER, ESCAPE, UP, DOWN, LEFT, RIGHT, SPACE } = keycodes;
 /**
  * Recursively select the firstChild until hitting a leaf node.
  * @param {Node} node the node to find the recursive first child.
+ *
  * @returns {Node} the first leaf-node >= node in the ordering.
  */
 function descendFirst( node ) {
@@ -39,6 +40,7 @@ function descendFirst( node ) {
 /**
  * Recursively select the lastChild until hitting a leaf node.
  * @param {Node} node the node to find the recursive last child.
+ *
  * @returns {Node} the first leaf-node <= node in the ordering.
  */
 function descendLast( node ) {
@@ -52,6 +54,7 @@ function descendLast( node ) {
 /**
  * Is the node a text node.
  * @param {?Node} node the node to check.
+ *
  * @returns {boolean} true if the node is a text node.
  */
 function isTextNode( node ) {
@@ -61,6 +64,7 @@ function isTextNode( node ) {
 /**
  * Return the node only if it is a text node, otherwise return null.
  * @param {?Node} node the node to filter.
+ *
  * @returns {?Node} the node or null if it is not a text node.
  */
 function onlyTextNode( node ) {
@@ -70,6 +74,7 @@ function onlyTextNode( node ) {
 /**
  * Find the index of the last charater in the text that is whitespace.
  * @param {String} text the text to search.
+ *
  * @returns {Number} the last index of a white space character in the text or -1.
  */
 function lastIndexOfSpace( text ) {
