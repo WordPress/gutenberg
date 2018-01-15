@@ -9,12 +9,13 @@ import { filter } from 'lodash';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { mediaUpload } from '@wordpress/utils';
-import { IconButton, Button, DropZone, Toolbar, Placeholder, FormFileUpload } from '@wordpress/components';
+import { IconButton, DropZone, Toolbar } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import MediaUpload from '../../media-upload';
+import ImagePlaceHolder from '../../image-placeholder';
 import InspectorControls from '../../inspector-controls';
 import RangeControl from '../../inspector-controls/range-control';
 import ToggleControl from '../../inspector-controls/toggle-control';
@@ -44,7 +45,6 @@ class GalleryBlock extends Component {
 		this.setColumnsNumber = this.setColumnsNumber.bind( this );
 		this.updateAlignment = this.updateAlignment.bind( this );
 		this.toggleImageCrop = this.toggleImageCrop.bind( this );
-		this.uploadFromFiles = this.uploadFromFiles.bind( this );
 		this.onRemoveImage = this.onRemoveImage.bind( this );
 		this.setImageAttributes = this.setImageAttributes.bind( this );
 		this.dropFiles = this.dropFiles.bind( this );
@@ -91,12 +91,6 @@ class GalleryBlock extends Component {
 
 	toggleImageCrop() {
 		this.props.setAttributes( { imageCrop: ! this.props.attributes.imageCrop } );
-	}
-
-	uploadFromFiles( event ) {
-		mediaUpload( event.target.files, ( images ) => {
-			this.props.setAttributes( { images } );
-		} );
 	}
 
 	setImageAttributes( index, attributes ) {
@@ -179,34 +173,13 @@ class GalleryBlock extends Component {
 		if ( images.length === 0 ) {
 			return [
 				controls,
-				<Placeholder
-					key="placeholder"
-					instructions={ __( 'Drag images here or add from media library' ) }
+				<ImagePlaceHolder key="gallery-placeholder"
+					className={ className }
 					icon="format-gallery"
 					label={ __( 'Gallery' ) }
-					className={ className }>
-					{ dropZone }
-					<FormFileUpload
-						isLarge
-						className="wp-block-image__upload-button"
-						onChange={ this.uploadFromFiles }
-						accept="image/*"
-						multiple="true"
-					>
-						{ __( 'Upload' ) }
-					</FormFileUpload>
-					<MediaUpload
-						onSelect={ this.onSelectImages }
-						type="image"
-						multiple
-						gallery
-						render={ ( { open } ) => (
-							<Button isLarge onClick={ open }>
-								{ __( 'Add from Media Library' ) }
-							</Button>
-						) }
-					/>
-				</Placeholder>,
+					onSelectImage={ this.onSelectImages }
+					multiple
+				/>,
 			];
 		}
 
