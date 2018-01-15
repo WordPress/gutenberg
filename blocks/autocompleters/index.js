@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { sortBy } from 'lodash';
+import { sortBy, debounce } from 'lodash';
 
 /**
  * Internal dependencies
@@ -103,10 +103,9 @@ export function blockAutocompleter( { onReplace } ) {
  * @returns {Completer} Completer object used by the Autocomplete component.
  */
 export function userAutocompleter() {
-	const getOptions = ( search = false ) => {
-		const searchData = search ? { data: { search } } : null;
-		return ( new wp.api.collections.Users() ).fetch( searchData ).then( ( users ) => {
-			return users.map( ( user ) => {
+	const performSearch = debounce( function( resolve, searchData ) {
+		new wp.api.collections.Users().fetch( searchData ).then( ( users ) => {
+			users = users.map( ( user ) => {
 				return {
 					value: user,
 					label: [
@@ -117,6 +116,14 @@ export function userAutocompleter() {
 					keywords: [ user.slug, user.name ],
 				};
 			} );
+			resolve( users );
+		} );
+	}, 250 );
+
+	const getOptions = ( search = false ) => {
+		const searchData = search ? { data: { search } } : null;
+		return new Promise( ( resolve, reject ) => {
+			performSearch( resolve, searchData );
 		} );
 	};
 
