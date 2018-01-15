@@ -14,7 +14,7 @@ import { Component, findDOMNode } from '@wordpress/element';
 import './style.scss';
 import { BlockList, PostTitle, WritingFlow, DefaultBlockAppender, EditorGlobalKeyboardShortcuts } from '../../../components';
 import VisualEditorInserter from './inserter';
-import { isFeatureActive } from '../../../store/selectors';
+import { hasFixedToolbar } from '../../../store/selectors';
 import { clearSelectedBlock } from '../../../store/actions';
 
 class VisualEditor extends Component {
@@ -72,7 +72,7 @@ class VisualEditor extends Component {
 export default connect(
 	( state ) => {
 		return {
-			hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
+			hasFixedToolbar: hasFixedToolbar( state ),
 		};
 	},
 	{

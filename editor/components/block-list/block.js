@@ -33,6 +33,7 @@ import BlockHtml from './block-html';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import BlockMultiControls from './multi-controls';
 import BlockMobileToolbar from './block-mobile-toolbar';
+import BlockListSiblingInserter from './sibling-inserter';
 import {
 	clearSelectedBlock,
 	editPost,
@@ -70,7 +71,8 @@ const { BACKSPACE, ESCAPE, DELETE, ENTER, UP, RIGHT, DOWN, LEFT } = keycodes;
  * Given a DOM node, finds the closest scrollable container node.
  *
  * @param  {Element}  node Node from which to start
- * @return {?Element}      Scrollable container node, if found
+ *
+ * @returns {?Element} Scrollable container node, if found.
  */
 function getScrollContainer( node ) {
 	if ( ! node ) {
@@ -130,8 +132,7 @@ export class BlockListBlock extends Component {
 	componentWillReceiveProps( newProps ) {
 		if (
 			this.props.order !== newProps.order &&
-			( ( this.props.isSelected && newProps.isSelected ) ||
-			( this.props.isFirstMultiSelected && newProps.isFirstMultiSelected ) )
+			( newProps.isSelected || newProps.isFirstMultiSelected )
 		) {
 			this.previousOffset = this.node.getBoundingClientRect().top;
 		}
@@ -439,6 +440,7 @@ export class BlockListBlock extends Component {
 					{ showUI && <BlockMobileToolbar uid={ block.uid } /> }
 				</div>
 				{ !! error && <BlockCrashWarning /> }
+				<BlockListSiblingInserter uid={ block.uid } />
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */

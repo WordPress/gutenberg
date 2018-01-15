@@ -179,7 +179,7 @@ class ParagraphBlock extends Component {
 							onMerge={ mergeBlocks }
 							onReplace={ onReplace }
 							onRemove={ () => onReplace( [] ) }
-							placeholder={ placeholder || __( 'Add text or type / to insert content' ) }
+							placeholder={ placeholder || __( 'Add text or type / to add content' ) }
 							aria-autocomplete="list"
 							aria-expanded={ isExpanded }
 							aria-owns={ listBoxId }
@@ -195,7 +195,7 @@ class ParagraphBlock extends Component {
 registerBlockType( 'core/paragraph', {
 	title: __( 'Paragraph' ),
 
-	description: __( 'This is a simple text only block for inserting a single paragraph of content.' ),
+	description: __( 'This is a simple text only block for adding a single paragraph of content.' ),
 
 	icon: 'editor-paragraph',
 

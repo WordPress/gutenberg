@@ -25,7 +25,7 @@ function BlockTransformations( { blocks, small = false, onTransform, onClick = n
 		return null;
 	}
 	return (
-		<div className="editor-block-settings-menu__block-transformations">
+		<div className="editor-block-settings-menu__section">
 			{ possibleBlockTransformations.map( ( { name, title, icon } ) => {
 			/* translators: label indicating the transformation of a block into another block */
 				const shownText = sprintf( __( 'Turn into %s' ), title );

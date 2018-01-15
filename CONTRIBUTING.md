@@ -27,7 +27,14 @@ You can also type `npm run package-plugin` which will run the two commands above
 
 ## Workflow
 
-A good workflow is to work directly in this repo, branch off `master`, and submit your changes as a pull request.
+A good workflow for new contributors to follow is listed below:
+- Fork Gutenberg repository
+- Clone forked repository
+- Create new branch
+- Make code changes
+- Commit code changes within newly created branch
+- Push branch to forked repository
+- Submit Pull Request to Gutenberg repository
 
 Ideally name your branches with prefixes and descriptions, like this: `[type]/[change]`. A good prefix would be:
 

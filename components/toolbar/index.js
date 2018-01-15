@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { flatMap } from 'lodash';
 
 /**
  * Internal dependencies
@@ -25,9 +26,8 @@ function Toolbar( { controls = [], children, className } ) {
 
 	return (
 		<div className={ classnames( 'components-toolbar', className ) }>
-			{ controlSets.reduce( ( result, controlSet, setIndex ) => [
-				...result,
-				...controlSet.map( ( control, controlIndex ) => (
+			{ flatMap( controlSets, ( controlSet, setIndex ) => (
+				controlSet.map( ( control, controlIndex ) => (
 					<div
 						key={ [ setIndex, controlIndex ].join() }
 						className={ setIndex > 0 && controlIndex === 0 ? 'has-left-divider' : null }
@@ -48,8 +48,8 @@ function Toolbar( { controls = [], children, className } ) {
 						/>
 						{ control.children }
 					</div>
-				) ),
-			], [] ) }
+				) )
+			) ) }
 			{ children }
 		</div>
 	);

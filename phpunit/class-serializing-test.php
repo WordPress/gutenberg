@@ -13,7 +13,10 @@ class Serializing_Test extends WP_UnitTestCase {
 
 		require_once dirname( dirname( __FILE__ ) ) . '/lib/parser.php';
 
-		$fixture_filenames = glob( self::$fixtures_dir . '/*.{json,html}', GLOB_BRACE );
+		$fixture_filenames = array_merge(
+			glob( self::$fixtures_dir . '/*.json' ),
+			glob( self::$fixtures_dir . '/*.html' )
+		);
 		$fixture_filenames = array_values( array_unique( array_map(
 			array( $this, 'clean_fixture_filename' ),
 			$fixture_filenames

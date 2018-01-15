@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, includes, map, castArray } from 'lodash';
+import { get, includes, map, castArray, uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -14,6 +14,7 @@ import {
 	createBlock,
 	serialize,
 	createReusableBlock,
+	isReusableBlock,
 	getDefaultBlockName,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
@@ -50,6 +51,7 @@ import {
 	isEditedPostNew,
 	isEditedPostSaveable,
 	getBlock,
+	getBlocks,
 	getReusableBlock,
 	POST_UPDATE_TRANSACTION_ID,
 } from './selectors';
@@ -59,7 +61,7 @@ import {
  */
 const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
 const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
-const SAVE_REUSABLE_BLOCK_NOTICE_ID = 'SAVE_REUSABLE_BLOCK_NOTICE_ID';
+const REUSABLE_BLOCK_NOTICE_ID = 'REUSABLE_BLOCK_NOTICE_ID';
 
 export default {
 	REQUEST_POST_UPDATE( action, store ) {
@@ -331,6 +333,7 @@ export default {
 			( reusableBlockOrBlocks ) => {
 				dispatch( {
 					type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
+					id,
 					reusableBlocks: castArray( reusableBlockOrBlocks ).map( ( { id: itemId, title, content } ) => {
 						const [ { name: type, attributes } ] = parse( content );
 						return { id: itemId, title, type, attributes };
@@ -340,6 +343,7 @@ export default {
 			( error ) => {
 				dispatch( {
 					type: 'FETCH_REUSABLE_BLOCKS_FAILURE',
+					id,
 					error: error.responseJSON || {
 						code: 'unknown_error',
 						message: __( 'An unknown error occurred.' ),
@@ -362,14 +366,62 @@ export default {
 					updatedId: updatedReusableBlock.id,
 					id,
 				} );
-				const message = __( 'Block updated.' );
-				dispatch( createSuccessNotice( message, { id: SAVE_REUSABLE_BLOCK_NOTICE_ID } ) );
+				const message = isTemporary ? __( 'Block created.' ) : __( 'Block updated.' );
+				dispatch( createSuccessNotice( message, { id: REUSABLE_BLOCK_NOTICE_ID } ) );
 			},
 			( error ) => {
 				dispatch( { type: 'SAVE_REUSABLE_BLOCK_FAILURE', id } );
 				const message = __( 'An unknown error occured.' );
 				dispatch( createErrorNotice( get( error.responseJSON, 'message', message ), {
-					id: SAVE_REUSABLE_BLOCK_NOTICE_ID,
+					id: REUSABLE_BLOCK_NOTICE_ID,
+					spokenMessage: message,
+				} ) );
+			}
+		);
+	},
+	DELETE_REUSABLE_BLOCK( action, store ) {
+		const { id } = action;
+		const { getState, dispatch } = store;
+
+		// Don't allow a reusable block with a temporary ID to be deleted
+		const reusableBlock = getReusableBlock( getState(), id );
+		if ( ! reusableBlock || reusableBlock.isTemporary ) {
+			return;
+		}
+
+		// Remove any other blocks that reference this reusable block
+		const allBlocks = getBlocks( getState() );
+		const associatedBlocks = allBlocks.filter( block => isReusableBlock( block ) && block.attributes.ref === id );
+		const associatedBlockUids = associatedBlocks.map( block => block.uid );
+
+		const transactionId = uniqueId();
+
+		dispatch( {
+			type: 'REMOVE_REUSABLE_BLOCK',
+			id,
+			associatedBlockUids,
+			optimist: { type: BEGIN, id: transactionId },
+		} );
+
+		new wp.api.models.Blocks( { id } ).destroy().then(
+			() => {
+				dispatch( {
+					type: 'DELETE_REUSABLE_BLOCK_SUCCESS',
+					id,
+					optimist: { type: COMMIT, id: transactionId },
+				} );
+				const message = __( 'Block deleted.' );
+				dispatch( createSuccessNotice( message, { id: REUSABLE_BLOCK_NOTICE_ID } ) );
+			},
+			( error ) => {
+				dispatch( {
+					type: 'DELETE_REUSABLE_BLOCK_FAILURE',
+					id,
+					optimist: { type: REVERT, id: transactionId },
+				} );
+				const message = __( 'An unknown error occured.' );
+				dispatch( createErrorNotice( get( error.responseJSON, 'message', message ), {
+					id: REUSABLE_BLOCK_NOTICE_ID,
 					spokenMessage: message,
 				} ) );
 			}

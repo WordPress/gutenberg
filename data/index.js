@@ -22,7 +22,7 @@ const store = createStore( initialReducer, {}, flowRight( enhancers ) );
  * @param {String}  key     Reducer key
  * @param {Object}  reducer Reducer function
  *
- * @return {Object}         Store Object
+ * @returns {Object} Store Object.
  */
 export function registerReducer( key, reducer ) {
 	reducers[ key ] = reducer;
