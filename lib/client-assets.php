@@ -502,6 +502,12 @@ JS;
 			wp_json_encode( $schema_response->get_data() )
 		), 'before' );
 	}
+
+	/*
+	 * For API requests to happen over HTTP/1.0 methods,
+	 * as HTTP/1.1 methods are blocked in a variety of situations.
+	 */
+	wp_add_inline_script( 'wp-api', 'Backbone.emulateHTTP = true;', 'before' );
 }
 
 /**

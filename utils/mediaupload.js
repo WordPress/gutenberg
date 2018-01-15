@@ -47,7 +47,8 @@ export function mediaUpload( filesList, onImagesChange ) {
 
 /**
  * @param  {File}    file Media File to Save
- * @return {Promise}      Media Object Promise
+ *
+ * @returns {Promise} Media Object Promise.
  */
 export function createMediaFromFile( file ) {
 	// Create upload payload

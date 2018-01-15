@@ -45,8 +45,9 @@ let defaultBlockName;
  *
  * @param  {string}   name     Block name
  * @param  {Object}   settings Block settings
- * @return {?WPBlock}          The block, if it has been successfully
- *                             registered; otherwise `undefined`.
+ *
+ * @returns {?WPBlock} The block, if it has been successfully registered;
+ *                     otherwise `undefined`.
  */
 export function registerBlockType( name, settings ) {
 	settings = {
@@ -128,8 +129,9 @@ export function registerBlockType( name, settings ) {
  * Unregisters a block.
  *
  * @param  {string}   name Block name
- * @return {?WPBlock}      The previous block value, if it has been
- *                         successfully unregistered; otherwise `undefined`.
+ *
+ * @returns {?WPBlock} The previous block value, if it has been successfully
+ *                     unregistered; otherwise `undefined`.
  */
 export function unregisterBlockType( name ) {
 	if ( ! blocks[ name ] ) {
@@ -156,7 +158,7 @@ export function setUnknownTypeHandlerName( name ) {
  * Retrieves name of block handling unknown block types, or undefined if no
  * handler has been defined.
  *
- * @return {?string} Blog name
+ * @returns {?string} Blog name.
  */
 export function getUnknownTypeHandlerName() {
 	return unknownTypeHandlerName;
@@ -174,7 +176,7 @@ export function setDefaultBlockName( name ) {
 /**
  * Retrieves the default block name
  *
- * @return {?string} Blog name
+ * @returns {?string} Blog name.
  */
 export function getDefaultBlockName() {
 	return defaultBlockName;
@@ -184,7 +186,8 @@ export function getDefaultBlockName() {
  * Returns a registered block type.
  *
  * @param  {string}  name Block name
- * @return {?Object}      Block type
+ *
+ * @returns {?Object} Block type.
  */
 export function getBlockType( name ) {
 	return blocks[ name ];
@@ -193,7 +196,7 @@ export function getBlockType( name ) {
 /**
  * Returns all registered blocks.
  *
- * @return {Array} Block settings
+ * @returns {Array} Block settings.
  */
 export function getBlockTypes() {
 	return Object.values( blocks );
@@ -206,7 +209,8 @@ export function getBlockTypes() {
  * @param  {String}          feature         Feature to test
  * @param  {Boolean}         defaultSupports Whether feature is supported by
  *                                           default if not explicitly defined
- * @return {Boolean}                         Whether block supports feature
+ *
+ * @returns {Boolean} Whether block supports feature.
  */
 export function hasBlockSupport( nameOrType, feature, defaultSupports ) {
 	const blockType = 'string' === typeof nameOrType ?
@@ -225,7 +229,8 @@ export function hasBlockSupport( nameOrType, feature, defaultSupports ) {
  * API.
  *
  * @param {Object} blockOrType Block or Block Type to test
- * @return {Boolean}           Whether the given block is a reusable block
+ *
+ * @returns {Boolean} Whether the given block is a reusable block.
  */
 export function isReusableBlock( blockOrType ) {
 	return blockOrType.name === 'core/block';

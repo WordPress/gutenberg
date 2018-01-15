@@ -84,7 +84,9 @@ export function isAttributeWhitelisted( tag, attribute ) {
  *
  * @param  {String}  nodeName Node name.
  * @param  {String}  tagName  Tag name.
- * @return {Boolean}          True if nodeName is inline in the context of tagName and false otherwise.
+ *
+ * @returns {Boolean} True if nodeName is inline in the context of tagName and
+ *                    false otherwise.
  */
 function isInlineForTag( nodeName, tagName ) {
 	if ( ! tagName || ! nodeName ) {
@@ -219,7 +221,8 @@ export function deepFilterNodeList( nodeList, filters, doc ) {
  *
  * @param  {String} HTML    The HTML to filter.
  * @param  {Array}  filters An array of functions that can mutate with the provided node.
- * @return {String}         The filtered HTML.
+ *
+ * @returns {String} The filtered HTML.
  */
 export function deepFilterHTML( HTML, filters = [] ) {
 	const doc = document.implementation.createHTMLDocument( '' );

@@ -71,7 +71,8 @@ const { BACKSPACE, ESCAPE, DELETE, ENTER, UP, RIGHT, DOWN, LEFT } = keycodes;
  * Given a DOM node, finds the closest scrollable container node.
  *
  * @param  {Element}  node Node from which to start
- * @return {?Element}      Scrollable container node, if found
+ *
+ * @returns {?Element} Scrollable container node, if found.
  */
 function getScrollContainer( node ) {
 	if ( ! node ) {
