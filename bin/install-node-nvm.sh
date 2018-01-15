@@ -17,7 +17,7 @@ fi
 cd "$(dirname "$0")/.."
 
 # Check if nvm is installed
-if ! command_exists "nvm"; then
+if [ "$TRAVIS" != "true" ] && ! command_exists "nvm"; then
 	if ask "$(error_message "NVM isn't installed, would you like to download and install it automatically?")" Y; then
 		# The .bash_profile file needs to exist for NVM to install
 		if [ ! -e ~/.bash_profile ]; then
@@ -38,7 +38,7 @@ if ! command_exists "nvm"; then
 	exit 1
 fi
 
-if [ $NVM_VERSION != "v$(nvm --version)" ]; then
+if [ "$TRAVIS" != "true" ] && [ $NVM_VERSION != "v$(nvm --version)" ]; then
 	echo -en $(status_message "Updating NVM..." )
 	download "https://raw.githubusercontent.com/creationix/nvm/$NVM_VERSION/install.sh" | bash >/dev/null 2>&1
 	echo ' done!'
@@ -50,7 +50,7 @@ if [ $NVM_VERSION != "v$(nvm --version)" ]; then
 fi
 
 # Check if the current node version is up to date.
-if [ "$(nvm current)" != "$(nvm version-remote --lts)" ]; then
+if [ "$TRAVIS" != "true" ] && [ "$(nvm current)" != "$(nvm version-remote --lts)" ]; then
 	echo -en $(status_message "Updating Node..." )
 	nvm install >/dev/null 2>&1
 	echo ' done!'
@@ -66,7 +66,7 @@ echo -e $(status_message "Installing and updating NPM packages..." )
 npm install
 
 # There was a bug in NPM that caused has changes in package-lock.json. Handle that.
-if ! git diff --exit-code package-lock.json >/dev/null; then
+if [ "$TRAVIS" != "true" ] && ! git diff --exit-code package-lock.json >/dev/null; then
 	if ask "$(warning_message "There's an issue with your NPM cache, would you like to try and automatically clean it up?" )" N; then
 		rm -rf node_modules/
 		npm cache clean --force >/dev/null 2>&1
