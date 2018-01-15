@@ -65,7 +65,7 @@ export function registerSelectors( reducerKey, newSelectors ) {
 /**
  * Higher Order Component used to inject data using the registered selectors.
  *
- * @param {Function} mapSelectorsToProps Get's called with the selectors object
+ * @param {Function} mapSelectorsToProps Gets called with the selectors object
  *                                       to determine the data for the component.
  *
  * @returns {Func}                       Renders the wrapped component and passes it data.
