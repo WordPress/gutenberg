@@ -10,6 +10,10 @@ import {
 	mapValues,
 	sortBy,
 	throttle,
+	find,
+	first,
+	castArray,
+	every,
 } from 'lodash';
 import scrollIntoView from 'dom-scroll-into-view';
 import 'element-closest';
@@ -18,7 +22,8 @@ import 'element-closest';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { serialize } from '@wordpress/blocks';
+import { serialize, getPossibleShortcutTransformations } from '@wordpress/blocks';
+import { keycodes } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -37,8 +42,10 @@ import {
 	isSelectionEnabled,
 	isMultiSelecting,
 } from '../../store/selectors';
-import { startMultiSelect, stopMultiSelect, multiSelect, selectBlock } from '../../store/actions';
+import { startMultiSelect, stopMultiSelect, multiSelect, selectBlock, replaceBlocks } from '../../store/actions';
 import { documentHasSelection } from '../../utils/dom';
+
+const { isAccess } = keycodes;
 
 class BlockList extends Component {
 	constructor( props ) {
@@ -55,6 +62,7 @@ class BlockList extends Component {
 		// Browser does not fire `*move` event when the pointer position changes
 		// relative to the document, so fire it with the last known position.
 		this.onScroll = () => this.onPointerMove( { clientY: this.lastClientY } );
+		this.onKeyDown = this.onKeyDown.bind( this );
 
 		this.lastClientY = 0;
 		this.nodes = {};
@@ -73,6 +81,32 @@ class BlockList extends Component {
 	}
 
 	componentWillReceiveProps( nextProps ) {
+		const prevCommonName = this.commonName;
+
+		if ( nextProps.selectedBlock ) {
+			this.blocks = [ nextProps.selectedBlock ];
+			this.commonName = nextProps.selectedBlock.name;
+		} else if ( nextProps.multiSelectedBlocks.length ) {
+			this.blocks = nextProps.multiSelectedBlocks;
+
+			const firstName = first( nextProps.multiSelectedBlocks ).name
+
+			if ( every( nextProps.multiSelectedBlocks, ( { name } ) => name === firstName ) ) {
+				this.commonName = firstName;
+			} else {
+				delete this.commonName;
+			}
+		} else {
+			delete this.blocks;
+			delete this.commonName;
+		}
+
+		if ( ! this.commonName ) {
+			delete this.shortcutTransforms;
+		} else if ( this.commonName !== prevCommonName ) {
+			this.shortcutTransforms = getPossibleShortcutTransformations( this.commonName );
+		}
+
 		if ( isEqual( this.props.multiSelectedBlockUids, nextProps.multiSelectedBlockUids ) ) {
 			return;
 		}
@@ -245,11 +279,29 @@ class BlockList extends Component {
 		}
 	}
 
+	onKeyDown( event ) {
+		const { onReplace } = this.props;
+
+		if ( ! this.shortcutTransforms ) {
+			return;
+		}
+
+		const transform = find( this.shortcutTransforms, ( { shortcut } ) => isAccess( event, shortcut ) );
+
+		if ( transform ) {
+			const blocks = castArray( transform.transform( this.blocks.map( ( { attributes } ) => attributes ) ) );
+
+			onReplace( this.blocks.map( ( { uid } ) => uid ), blocks );
+
+			return;
+		}
+	}
+
 	render() {
 		const { blocks, showContextualToolbar, renderBlockMenu } = this.props;
 
 		return (
-			<BlockSelectionClearer>
+			<BlockSelectionClearer onKeyDown={ this.onKeyDown }>
 				{ !! blocks.length && <BlockInsertionPoint /> }
 				{ map( blocks, ( uid ) => (
 					<BlockListBlock
@@ -293,6 +345,9 @@ export default connect(
 		},
 		onRemove( uids ) {
 			dispatch( { type: 'REMOVE_BLOCKS', uids } );
+		},
+		onReplace( uids, blocks ) {
+			dispatch( replaceBlocks( uids, blocks ) );
 		},
 	} )
 )( BlockList );

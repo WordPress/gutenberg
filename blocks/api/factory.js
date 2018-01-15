@@ -72,8 +72,8 @@ export function createBlock( name, blockAttributes = {} ) {
  *
  * @returns {Function} Predicate that receives a block type.
  */
-const isTransformForBlockSource = ( sourceName, isMultiBlock = false ) => ( transform ) => (
-	transform.type === 'block' &&
+const isTransformForBlockSource = ( sourceName, transformType, isMultiBlock = false ) => ( transform ) => (
+	transform.type === transformType &&
 	transform.blocks.indexOf( sourceName ) !== -1 &&
 	( ! isMultiBlock || transform.isMultiBlock )
 );
@@ -88,10 +88,10 @@ const isTransformForBlockSource = ( sourceName, isMultiBlock = false ) => ( tran
  *
  * @returns {Function} Predicate that receives a block type.
  */
-const createIsTypeTransformableFrom = ( sourceName, isMultiBlock = false ) => ( type ) => (
+const createIsTypeTransformableFrom = ( sourceName, transformType, isMultiBlock = false ) => ( type ) => (
 	!! find(
 		get( type, 'transforms.from', [] ),
-		isTransformForBlockSource( sourceName, isMultiBlock ),
+		isTransformForBlockSource( sourceName, transformType, isMultiBlock ),
 	)
 );
 
@@ -118,7 +118,7 @@ export function getPossibleBlockTransformations( blocks ) {
 	//compute the block that have a from transformation able to transfer blocks passed as argument.
 	const blocksToBeTransformedFrom = filter(
 		getBlockTypes(),
-		createIsTypeTransformableFrom( sourceBlockName, isMultiBlock ),
+		createIsTypeTransformableFrom( sourceBlockName, 'block', isMultiBlock ),
 	).map( type => type.name );
 
 	const blockType = getBlockType( sourceBlockName );
@@ -141,6 +141,22 @@ export function getPossibleBlockTransformations( blocks ) {
 		}
 		return result;
 	}, [] );
+}
+
+/**
+ * Gets all possible shortcut transforms based on a block name.
+ *
+ * @param  {String} name Block name.
+ * @return {Array}       Array of transforms.
+ */
+export function getPossibleShortcutTransformations( name ) {
+	const transformsFrom = getBlockTypes()
+		.reduce( ( acc, blockType ) => [ ...acc, ...get( blockType, 'transforms.from', [] ) ], [] )
+		.filter( isTransformForBlockSource( name, 'shortcut', false ) );
+	const transformsTo = get( getBlockType( name ), 'transforms.to', [] )
+		.filter( ( { type } ) => type === 'shortcut' );
+
+	return [ ...transformsFrom, ...transformsTo ];
 }
 
 /**

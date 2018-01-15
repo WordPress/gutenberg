@@ -61,6 +61,19 @@ export const settings = {
 					} );
 				},
 			},
+			...[ 'OL', 'UL' ].map( ( tag ) => ( {
+				type: 'shortcut',
+				blocks: [ 'core/paragraph' ],
+				shortcut: tag.charAt( 0 ).toLowerCase(),
+				transform( blockAttributes ) {
+					const items = blockAttributes.map( ( { content } ) => content );
+					const hasItems = ! items.every( isEmpty );
+					return createBlock( 'core/list', {
+						nodeName: tag,
+						values: hasItems ? items.map( ( content, index ) => <li key={ index }>{ content }</li> ) : [],
+					} );
+				},
+			} ) ),
 			{
 				type: 'block',
 				blocks: [ 'core/quote' ],
@@ -123,6 +136,16 @@ export const settings = {
 					} );
 				},
 			},
+			...[ 'OL', 'UL' ].map( ( tag ) => ( {
+				type: 'shortcut',
+				shortcut: tag.charAt( 0 ).toLowerCase(),
+				transform( blockAttributes ) {
+					return createBlock( 'core/list', {
+						nodeName: 'OL',
+						values: blockAttributes.reduce( ( acc, { values } ) => [ ...acc, ...values ], [] ),
+					} );
+				},
+			} ) ),
 		],
 	},
 
