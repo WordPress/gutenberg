@@ -55,3 +55,5 @@ if [ "$(nvm current)" != "$(nvm version-remote --lts)" ]; then
 	nvm install >/dev/null 2>&1
 	echo ' done!'
 fi
+
+npm install
