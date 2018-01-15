@@ -312,7 +312,7 @@ export class Autocomplete extends Component {
 	}
 
 	search( event ) {
-		const { open: wasOpen, suppress: wasSuppress } = this.state;
+		const { open: wasOpen, suppress: wasSuppress, query: wasQuery } = this.state;
 		const { completers } = this.props;
 		const container = event.target;
 		// ensure that the cursor location is unambiguous
@@ -324,8 +324,8 @@ export class Autocomplete extends Component {
 		const match = this.findMatch( container, cursor, completers, wasOpen );
 		const { open, query, range } = match || {};
 		// asynchronously load the options for the open completer
-		if ( open && ( ! wasOpen || open.idx !== wasOpen.idx ) ) {
-			this.loadOptions( open.idx );
+		if ( open && ( ! wasOpen || open.idx !== wasOpen.idx || query !== wasQuery ) ) {
+			this.loadOptions( open.idx, query );
 		}
 		// create a regular expression to filter the options
 		const search = open ? new RegExp( '(?:\\b|\\s|^)' + escapeRegExp( query ), 'i' ) : /./;
