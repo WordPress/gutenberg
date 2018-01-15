@@ -548,7 +548,6 @@ export default class Editable extends Component {
 			}
 
 			event.preventDefault();
-			event.stopImmediatePropagation();
 		}
 
 		// If we click shift+Enter on inline Editables, we avoid creating two contenteditables
@@ -586,7 +585,6 @@ export default class Editable extends Component {
 				if ( event.shiftKey || ! this.props.onSplit ) {
 					this.editor.execCommand( 'InsertLineBreak', false, event );
 				} else {
-					event.stopImmediatePropagation();
 					this.splitContent();
 				}
 			}
