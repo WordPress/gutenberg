@@ -61,4 +61,25 @@ if [ "$(nvm current)" != "$(nvm version-remote --lts)" ]; then
 	exit 1
 fi
 
+# Install/update packages
+echo -e $(status_message "Installing and updating NPM packages..." )
 npm install
+
+# There was a bug in NPM that caused has changes in package-lock.json. Handle that.
+if ! git diff --exit-code package-lock.json >/dev/null; then
+	if ask "$(warning_message "There's an issue with your NPM cache, would you like to try and automatically clean it up?" )" N; then
+		rm -rf node_modules/
+		npm cache clean --force >/dev/null 2>&1
+		git checkout package-lock.json
+
+		echo -e $(status_message "Reinstalling NPM packages..." )
+		npm install
+
+		# Check that it's cleaned up now.
+		if git diff --exit-code package-lock.json >/dev/null; then
+			echo -e $(warning_message "Confirmed that the NPM cache is cleaned up." )
+		else
+			echo -e $(error_message "We were unable to clean the NPM cache, please manually review the changes to package-lock.json. Continuing with the setup process..." )
+		fi
+	fi
+fi
