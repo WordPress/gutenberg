@@ -8,7 +8,7 @@ import { Component } from '@wordpress/element';
  *
  * @param {WPElement}  WrappedComponent  The wrapped component
  *
- * @return {Component}                   Component with an instanceId prop.
+ * @returns {Component} Component with an instanceId prop.
  */
 function withInstanceId( WrappedComponent ) {
 	let instances = 0;

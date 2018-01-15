@@ -9,7 +9,7 @@ import { get } from 'lodash';
  * @param {Function}   reducer     The reducer to enhance
  * @param {String}     reducerKey  The reducer key to persist
  *
- * @return {Function}              Enhanced reducer
+ * @returns {Function} Enhanced reducer.
  */
 export function withRehydratation( reducer, reducerKey ) {
 	// EnhancedReducer with auto-rehydration
