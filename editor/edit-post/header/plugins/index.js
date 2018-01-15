@@ -20,7 +20,7 @@ import { getEllipsisMenuItems } from '../../../api/ellipsis-menu';
  *
  * @returns {Object} The rendered list of menu items.
  */
-function Plugins() {
+function Plugins( props ) {
 	const ellipsisMenuItems = getEllipsisMenuItems();
 
 	if ( isEmpty( ellipsisMenuItems ) ) {
@@ -37,6 +37,7 @@ function Plugins() {
 	 * @returns {void}
 	 */
 	function onSelect( pluginId ) {
+		props.onSelect();
 		ellipsisMenuItems[ pluginId ].callback();
 	}
 
