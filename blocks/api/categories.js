@@ -23,7 +23,7 @@ const categories = [
 /**
  * Returns all the block categories
  *
- * @return {Array} Block categories
+ * @returns {Array} Block categories.
  */
 export function getCategories() {
 	return categories;
