@@ -32,7 +32,6 @@ import { getBlockTypes, getBlockType } from '@wordpress/blocks';
 import withHistory from '../utils/with-history';
 import withChangeDetection from '../utils/with-change-detection';
 import { PREFERENCES_DEFAULTS } from './defaults';
-import { getLocationHtml } from '../edit-post/meta-boxes';
 
 /***
  * Module constants
@@ -664,49 +663,55 @@ const locations = [
 const defaultMetaBoxState = locations.reduce( ( result, key ) => {
 	result[ key ] = {
 		isActive: false,
-		isUpdating: false,
 	};
 
 	return result;
 }, {} );
 
+/**
+ * Reducer keeping track of the meta boxes saving state.
+ *
+ * @param {boolean} state  Previous state.
+ * @param {Object } action Action Object.
+ * @returns {Object}        Updated state.
+ */
+export function isSavingMetaBoxes( state = false, action ) {
+	switch ( action.type ) {
+		case 'REQUEST_META_BOX_UPDATES':
+			return true;
+		case 'META_BOX_UPDATES_SUCCESS':
+			return false;
+		default:
+			return state;
+	}
+}
+
+/**
+ *
+ * Reducer keeping track of the meta boxes state.
+ *
+ * @param {boolean} state  Previous state.
+ * @param {Object } action Action Object.
+ * @returns {Object}        Updated state.
+ */
 export function metaBoxes( state = defaultMetaBoxState, action ) {
 	switch ( action.type ) {
 		case 'INITIALIZE_META_BOX_STATE':
 			return locations.reduce( ( newState, location ) => {
 				newState[ location ] = {
 					...state[ location ],
-					isLoaded: false,
 					isActive: action.metaBoxes[ location ],
-					html: getLocationHtml( location ),
 				};
 				return newState;
 			}, { ...state } );
-		case 'META_BOX_LOADED':
-			return {
-				...state,
-				[ action.location ]: {
-					...state[ action.location ],
-					isLoaded: true,
-					isUpdating: false,
-				},
-			};
-		case 'HANDLE_META_BOX_RELOAD':
-			return {
-				...state,
-				[ action.location ]: {
-					...state[ action.location ],
-					isUpdating: false,
-					html: getLocationHtml( action.location ),
-				},
-			};
-		case 'REQUEST_META_BOX_UPDATES':
-			return mapValues( state, ( metaBox ) => {
-				return {
-					...metaBox,
-					isUpdating: metaBox.isActive,
+		case 'META_BOX_SET_SAVED_DATA':
+			return locations.reduce( ( newState, location ) => {
+				newState[ location ] = {
+					...state[ location ],
+					data: action.dataPerLocation[ location ],
 				};
-			} );
+				return newState;
+			}, { ...state } );
 		default:
 			return state;
 	}
@@ -827,6 +832,7 @@ export default optimist( combineReducers( {
 	saving,
 	notices,
 	metaBoxes,
+	isSavingMetaBoxes,
 	mobile,
 	reusableBlocks,
 } ) );

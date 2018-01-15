@@ -447,44 +447,14 @@ export function removeNotice( id ) {
  *
  * This indicates that the sidebar has a meta box but the normal area does not.
  *
- * @param {Object} metaBoxes Whether meta box locations are active.
+ * @param   {Object} metaBoxes Whether meta box locations are active.
  *
- * @returns {Object} Action object.
+ * @returns {Object}           Action object.
  */
 export function initializeMetaBoxState( metaBoxes ) {
 	return {
 		type: 'INITIALIZE_META_BOX_STATE',
 		metaBoxes,
-	};
-}
-
-/**
- * Returns an action object used to signify that a meta box finished reloading.
- *
- * @param {string} location Location of meta box: 'normal', 'side'
- *                          or 'advanced'.
- *
- * @returns {Object} Action object.
- */
-export function handleMetaBoxReload( location ) {
-	return {
-		type: 'HANDLE_META_BOX_RELOAD',
-		location,
-	};
-}
-
-/**
- * Returns an action object used to signify that a meta box finished loading.
- *
- * @param {string} location Location of meta box: 'normal', 'side'
- *                          or 'advanced'.
- *
- * @returns {Object} Action object.
- */
-export function metaBoxLoaded( location ) {
-	return {
-		type: 'META_BOX_LOADED',
-		location,
 	};
 }
 
@@ -496,6 +466,31 @@ export function metaBoxLoaded( location ) {
 export function requestMetaBoxUpdates() {
 	return {
 		type: 'REQUEST_META_BOX_UPDATES',
+	};
+}
+
+/**
+ * Returns an action object used signal a successfull meta nox update.
+ *
+ * @returns {Object} Action object.
+ */
+export function metaBoxUpdatesSuccess() {
+	return {
+		type: 'META_BOX_UPDATES_SUCCESS',
+	};
+}
+
+/**
+ * Returns an action object used set the saved meta boxes data.
+ * This is used to check if the meta boxes have been touched when leaving the editor.
+ *
+ * @param   {Object} dataPerLocation Meta Boxes Data per location.
+ * @returns {Object}                 Action object.
+ */
+export function metaBoxSetSavedData( dataPerLocation ) {
+	return {
+		type: 'META_BOX_SET_SAVED_DATA',
+		dataPerLocation,
 	};
 }
 

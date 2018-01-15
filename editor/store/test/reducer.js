@@ -24,13 +24,14 @@ import {
 	notices,
 	blocksMode,
 	blockInsertionPoint,
+	isSavingMetaBoxes,
 	metaBoxes,
 	reusableBlocks,
 } from '../reducer';
 
 jest.mock( '../../edit-post/meta-boxes', () => {
 	return {
-		getLocationHtml: () => 'meta boxes content',
+		getMetaBoxContainer: () => ( { innerHTML: 'meta boxes content' } ),
 	};
 } );
 
@@ -1242,21 +1243,43 @@ describe( 'state', () => {
 		} );
 	} );
 
+	describe( 'isSavingMetaBoxes', () => {
+		it( 'should return default state', () => {
+			const actual = isSavingMetaBoxes( undefined, {} );
+			expect( actual ).toBe( false );
+		} );
+
+		it( 'should set saving flag to true', () => {
+			const action = {
+				type: 'REQUEST_META_BOX_UPDATES',
+			};
+			const actual = isSavingMetaBoxes( false, action );
+
+			expect( actual ).toBe( true );
+		} );
+
+		it( 'should set saving flag to false', () => {
+			const action = {
+				type: 'META_BOX_UPDATES_SUCCESS',
+			};
+			const actual = isSavingMetaBoxes( true, action );
+
+			expect( actual ).toBe( false );
+		} );
+	} );
+
 	describe( 'metaBoxes()', () => {
 		it( 'should return default state', () => {
 			const actual = metaBoxes( undefined, {} );
 			const expected = {
 				normal: {
 					isActive: false,
-					isUpdating: false,
 				},
 				side: {
 					isActive: false,
-					isUpdating: false,
 				},
 				advanced: {
 					isActive: false,
-					isUpdating: false,
 				},
 			};
 
@@ -1279,53 +1302,31 @@ describe( 'state', () => {
 			const expected = {
 				normal: {
 					isActive: false,
-					isUpdating: false,
-					isLoaded: false,
-					html: 'meta boxes content',
 				},
 				side: {
 					isActive: true,
-					isUpdating: false,
-					isLoaded: false,
-					html: 'meta boxes content',
 				},
 				advanced: {
 					isActive: false,
-					isUpdating: false,
-					isLoaded: false,
-					html: 'meta boxes content',
 				},
 			};
 
 			expect( actual ).toEqual( expected );
 		} );
 
-		it( 'should switch updating to off', () => {
+		it( 'should set the meta boxes saved data', () => {
 			const action = {
-				type: 'HANDLE_META_BOX_RELOAD',
-				location: 'normal',
-			};
-
-			const theMetaBoxes = metaBoxes( { normal: { isUpdating: true, isActive: false } }, action );
-			const actual = theMetaBoxes.normal;
-			const expected = {
-				isActive: false,
-				isUpdating: false,
-				html: 'meta boxes content',
-			};
-
-			expect( actual ).toEqual( expected );
-		} );
-
-		it( 'should switch updating to on', () => {
-			const action = {
-				type: 'REQUEST_META_BOX_UPDATES',
+				type: 'META_BOX_SET_SAVED_DATA',
+				dataPerLocation: {
+					side: 'a=b',
+				},
 			};
 
 			const theMetaBoxes = metaBoxes( { normal: { isActive: true }, side: { isActive: false } }, action );
 			expect( theMetaBoxes ).toEqual( {
-				normal: { isActive: true, isUpdating: true },
-				side: { isActive: false, isUpdating: false },
+				advanced: { data: undefined },
+				normal: { isActive: true, data: undefined },
+				side: { isActive: false, data: 'a=b' },
 			} );
 		} );
 	} );

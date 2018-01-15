@@ -3,6 +3,7 @@
  */
 import { connect } from 'react-redux';
 import { some } from 'lodash';
+import jQuery from 'jquery';
 
 /**
  * WordPress dependencies
@@ -14,25 +15,41 @@ import { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import { isEditedPostDirty, getMetaBoxes } from '../../store/selectors';
-import { getLocationHtml } from '../../edit-post/meta-boxes';
+import { getMetaBoxContainer } from '../../edit-post/meta-boxes';
 
 class UnsavedChangesWarning extends Component {
+	/**
+	 * @inheritdoc
+	 */
 	constructor() {
 		super( ...arguments );
 		this.warnIfUnsavedChanges = this.warnIfUnsavedChanges.bind( this );
 	}
 
+	/**
+	 * @inheritdoc
+	 */
 	componentDidMount() {
 		window.addEventListener( 'beforeunload', this.warnIfUnsavedChanges );
 	}
 
+	/**
+	 * @inheritdoc
+	 */
 	componentWillUnmount() {
 		window.removeEventListener( 'beforeunload', this.warnIfUnsavedChanges );
 	}
 
+	/**
+	 * Warns the user if there are unsaved changes before leaving the editor.
+	 *
+	 * @param   {Event}   event Event Object.
+	 * @returns {string?}       Warning message.
+	 */
 	warnIfUnsavedChanges( event ) {
-		const areMetaBoxesDirty = some( this.props.metaBoxes, ( metaBoxe, location ) => {
-			return metaBoxe.isActive && getLocationHtml( location ) !== metaBoxe.html;
+		const areMetaBoxesDirty = some( this.props.metaBoxes, ( metaBox, location ) => {
+			return metaBox.isActive &&
+				jQuery( getMetaBoxContainer( location ) ).serialize() !== metaBox.html;
 		} );
 		if ( this.props.isDirty || areMetaBoxesDirty ) {
 			event.returnValue = __( 'You have unsaved changes. If you proceed, they will be lost.' );
@@ -40,6 +57,9 @@ class UnsavedChangesWarning extends Component {
 		}
 	}
 
+	/**
+	 * @inheritdoc
+	 */
 	render() {
 		return null;
 	}

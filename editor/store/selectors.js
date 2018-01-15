@@ -43,9 +43,8 @@ export function getEditorMode( state ) {
 /**
  * Returns the state of legacy meta boxes.
  *
- * @param {Object} state Global application state.
- *
- * @returns {Object} State of meta boxes.
+ * @param   {Object} state Global application state.
+ * @returns {Object}       State of meta boxes.
  */
 export function getMetaBoxes( state ) {
 	return state.metaBoxes;
@@ -79,19 +78,14 @@ export const hasMetaBoxes = createSelector(
 );
 
 /**
- * Returns true if the the Meta Boxes are being saved
+ * Returns true if the the Meta Boxes are being saved.
  *
- * @param  {Object} state Global application state
- * @return {boolean}      Whether the metaboxes are being saved.
+ * @param   {Object}  state Global application state.
+ * @returns {boolean}       Whether the metaboxes are being saved.
  */
-export const isSavingMetaBoxes = createSelector(
-	( state ) => {
-		return some( getMetaBoxes( state ), ( metaBox ) => {
-			return metaBox.isUpdating;
-		} );
-	},
-	( state ) => state.metaBoxes,
-);
+export function isSavingMetaBoxes( state ) {
+	return state.isSavingMetaBoxes;
+}
 
 /**
  * Returns the current active panel for the sidebar.

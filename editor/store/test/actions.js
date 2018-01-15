@@ -7,7 +7,6 @@ import {
 	startTyping,
 	stopTyping,
 	requestMetaBoxUpdates,
-	handleMetaBoxReload,
 	initializeMetaBoxState,
 	fetchReusableBlocks,
 	updateReusableBlock,
@@ -51,7 +50,6 @@ import {
 	createErrorNotice,
 	createWarningNotice,
 	removeNotice,
-	metaBoxLoaded,
 	toggleFeature,
 } from '../actions';
 
@@ -514,16 +512,6 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'metaBoxLoaded', () => {
-		it( 'should return META_BOX_LOADED action', () => {
-			const location = 'normal';
-			expect( metaBoxLoaded( location ) ).toEqual( {
-				type: 'META_BOX_LOADED',
-				location,
-			} );
-		} );
-	} );
-
 	describe( 'toggleFeature', () => {
 		it( 'should return TOGGLE_FEATURE action', () => {
 			const feature = 'name';
@@ -538,15 +526,6 @@ describe( 'actions', () => {
 		it( 'should return the REQUEST_META_BOX_UPDATES action', () => {
 			expect( requestMetaBoxUpdates() ).toEqual( {
 				type: 'REQUEST_META_BOX_UPDATES',
-			} );
-		} );
-	} );
-
-	describe( 'handleMetaBoxReload', () => {
-		it( 'should return the HANDLE_META_BOX_RELOAD action with a location and node', () => {
-			expect( handleMetaBoxReload( 'normal' ) ).toEqual( {
-				type: 'HANDLE_META_BOX_RELOAD',
-				location: 'normal',
 			} );
 		} );
 	} );

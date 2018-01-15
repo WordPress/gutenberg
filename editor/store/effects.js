@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, includes, map, castArray, uniqueId, some } from 'lodash';
+import { get, includes, map, castArray, uniqueId, reduce, values, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -36,9 +36,11 @@ import {
 	savePost,
 	editPost,
 	requestMetaBoxUpdates,
+	metaBoxUpdatesSuccess,
 	updateReusableBlock,
 	saveReusableBlock,
 	insertBlock,
+	metaBoxSetSavedData,
 } from './actions';
 import {
 	getCurrentPost,
@@ -52,8 +54,10 @@ import {
 	getBlock,
 	getBlocks,
 	getReusableBlock,
+	getMetaBoxes,
 	POST_UPDATE_TRANSACTION_ID,
 } from './selectors';
+import { getMetaBoxContainer } from '../edit-post/meta-boxes';
 
 /**
  * Module Constants
@@ -451,10 +455,42 @@ export default {
 		const message = spokenMessage || content;
 		speak( message, 'assertive' );
 	},
-	INITIALIZE_META_BOX_STATE( action ) {
+	INITIALIZE_META_BOX_STATE( action, store ) {
 		// Allow toggling metaboxes panels
 		if ( some( action.metaBoxes ) ) {
 			window.postboxes.add_postbox_toggles( 'post' );
 		}
+		const dataPerLocation = reduce( action.metaBoxes, ( memo, isActive, location ) => {
+			if ( isActive ) {
+				memo[ location ] = jQuery( getMetaBoxContainer( location ) ).serialize();
+			}
+			return memo;
+		}, {} );
+		store.dispatch( metaBoxSetSavedData( dataPerLocation ) );
+	},
+	REQUEST_META_BOX_UPDATES( action, store ) {
+		const dataPerLocation = reduce( getMetaBoxes( store.getState() ), ( memo, metabox, location ) => {
+			if ( metabox.isActive ) {
+				memo[ location ] = jQuery( getMetaBoxContainer( location ) ).serialize();
+			}
+			return memo;
+		}, {} );
+		store.dispatch( metaBoxSetSavedData( dataPerLocation ) );
+
+		// To save the metaboxes, we serialize each one of the location forms and combine them
+		// We also add the "common" hidden fields from the base .metabox-base-form
+		const formData = values( dataPerLocation ).concat(
+			jQuery( '.metabox-base-form' ).serialize()
+		).join( '&' );
+		const fetchOptions = {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+			body: formData,
+			credentials: 'include',
+		};
+
+		// Save the metaboxes
+		window.fetch( window._wpMetaBoxUrl, fetchOptions )
+			.then( () => store.dispatch( metaBoxUpdatesSuccess() ) );
 	},
 };

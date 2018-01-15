@@ -1,16 +1,16 @@
 /**
- * Function returning the current Meta Boxes HTML in the editor
+ * Function returning the current Meta Boxes DOM Node in the editor
  * whether the meta box area is opened or not.
- * This is not so clear, but I believe it's the only way to have this data synchronously
+ * If the MetaBox Area is visible returns it, and returns the original container instead.
  *
- * @param   {String} location Meta Box location
- * @returns {String}          HTML content
+ * @param   {string} location Meta Box location.
+ * @returns {string}          HTML content.
  */
-export const getLocationHtml = ( location ) => {
-	const area = document.querySelector( `.editor-meta-boxes-area.is-${ location } .editor-meta-boxes-area__container` );
+export const getMetaBoxContainer = ( location ) => {
+	const area = document.querySelector( `.editor-meta-boxes-area.is-${ location } .metabox-location-${ location }` );
 	if ( area ) {
-		return area.innerHTML;
+		return area;
 	}
 
-	return document.querySelector( '.metabox-location-' + location ).innerHTML;
+	return document.querySelector( '#metaboxes .metabox-location-' + location );
 };
