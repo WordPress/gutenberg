@@ -9,7 +9,6 @@ import { sortBy, debounce } from 'lodash';
 import './style.scss';
 import { createBlock, getBlockTypes } from '../api';
 import BlockIcon from '../block-icon';
-import { applyFilters } from '@wordpress/hooks';
 
 /**
  * @typedef {Object} CompleterOption
@@ -122,7 +121,7 @@ export function userAutocompleter() {
 
 	const getOptions = ( search = false ) => {
 		const searchData = search ? { data: { search } } : null;
-		return new Promise( ( resolve, reject ) => {
+		return new Promise( ( resolve ) => {
 			performSearch( resolve, searchData );
 		} );
 	};

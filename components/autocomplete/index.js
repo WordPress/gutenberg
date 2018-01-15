@@ -221,6 +221,12 @@ export class Autocomplete extends Component {
 		}
 	}
 
+	/**
+	 * Load options for an autocompleter.
+	 *
+	 * @param  {int} index    The autocompleter index.
+	 * @param  {string} query The query, if any.
+	 */
 	loadOptions( index, query ) {
 		this.props.completers[ index ].getOptions( query ).then( ( options ) => {
 			const keyedOptions = map( options, ( option, i ) => ( { ...option, key: ( option.value.slug ? option.value.slug : index ) + '-' + i } ) );
