@@ -21,15 +21,15 @@ const store = createStore( initialReducer, {}, flowRight( enhancers ) );
 /**
  * Registers a new sub reducer to the global state and returns a Redux-like store object.
  *
- * @param {string}  reduerKey Reducer key.
- * @param {Object}  reducer   Reducer function.
+ * @param {string}  reducerKey Reducer key.
+ * @param {Object}  reducer    Reducer function.
  *
- * @returns {Object}          Store Object.
+ * @returns {Object}           Store Object.
  */
-export function registerReducer( reduerKey, reducer ) {
-	reducers[ reduerKey ] = reducer;
+export function registerReducer( reducerKey, reducer ) {
+	reducers[ reducerKey ] = reducer;
 	store.replaceReducer( combineReducers( reducers ) );
-	const getState = () => store.getState()[ reduerKey ];
+	const getState = () => store.getState()[ reducerKey ];
 
 	return {
 		dispatch: store.dispatch,
