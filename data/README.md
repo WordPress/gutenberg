@@ -29,7 +29,7 @@ The dispatch function should be called to trigger the registered reducers functi
 
 If your module or plugin needs to expose its state to other modules and plugins, you'll have to register state seclectors.
 
-A selector is function that takes the current state value as a first argument and extra arguments if needed and returns any data extracted from the state.
+A selector is a function that takes the current state value as a first argument and extra arguments if needed and returns any data extracted from the state.
 
 #### Example:
 
@@ -41,7 +41,7 @@ wp.data.registerSelectors( 'myPlugin', { getTitle: ( state ) => state.title } );
 
 ### `wp.data.select( key: string, selectorName: string, ...args )`
 
-This function allows calling any registered selector. Given a module's key, a selector Name and extra arguments passed to the selector, this function calls the selector passing it the current state and the extra args provided.
+This function allows calling any registered selector. Given a module's key, a selector's name and extra arguments passed to the selector, this function calls the selector passing it the current state and the extra arguments provided.
 
 #### Example:
 
@@ -51,7 +51,7 @@ wp.data.select( 'myPlugin', 'getTitle' ); // Returns "My post title"
 
 ### `wp.data.query( mapSelectorsToProps: func )( WrappedComponent: Component )`
 
-If you use React or WordPress Element, a Higher Order Component is made available to inject data to your components like so:
+If you use a React or WordPress Element, a Higher Order Component is made available to inject data into your components like so:
 
 ```js
 const Component = ( { title } ) => <div>{ title }</div>;
