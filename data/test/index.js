@@ -42,17 +42,19 @@ describe( 'select', () => {
 
 describe( 'query', () => {
 	it( 'passes the relevant data to the component', () => {
-		registerReducer( 'reactReducer', () => 'reactState' );
-		registerSelectors( 'reactReducer', { reactSelector: state => state } );
-		const Component = query( ( selector ) => {
+		registerReducer( 'reactReducer', () => ( { reactKey: 'reactState' } ) );
+		registerSelectors( 'reactReducer', {
+			reactSelector: ( state, key ) => state[ key ],
+		} );
+		const Component = query( ( selectFunc, ownProps ) => {
 			return {
-				data: selector( 'reactReducer', 'reactSelector' ),
+				data: selectFunc( 'reactReducer', 'reactSelector', ownProps.keyName ),
 			};
 		} )( ( props ) => {
 			return <div>{ props.data }</div>;
 		} );
 
-		const tree = render( <Component /> );
+		const tree = render( <Component keyName="reactKey" /> );
 
 		expect( tree ).toMatchSnapshot();
 	} );

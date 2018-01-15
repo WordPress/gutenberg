@@ -54,12 +54,12 @@ export function registerReducer( reduerKey, reducer ) {
  *
  * @param {string} reducerKey          Part of the state shape to register the
  *                                     selectors for.
- * @param {Object} registeredSelectors Selectors to register. Keys will be used
+ * @param {Object} newSelectors        Selectors to register. Keys will be used
  *                                     as the public facing API. Selectors will
  *                                     get passed the state as first argument.
  */
-export function registerSelectors( reducerKey, registeredSelectors ) {
-	selectors[ reducerKey ] = registeredSelectors;
+export function registerSelectors( reducerKey, newSelectors ) {
+	selectors[ reducerKey ] = newSelectors;
 }
 
 /**
