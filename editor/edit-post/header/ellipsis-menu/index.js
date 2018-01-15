@@ -30,7 +30,7 @@ const element = (
 				<ModeSwitcher onSelect={ onClose } />
 				<div className="editor-ellipsis-menu__separator" />
 				<FixedToolbarToggle onToggle={ onClose } />
-        <div className="editor-ellipsis-menu__separator" />
+				<div className="editor-ellipsis-menu__separator" />
 				<EditorActions />
 				<Plugins onSelect={ onClose } />
 			</div>
@@ -38,6 +38,11 @@ const element = (
 	/>
 );
 
+/**
+ * Returns the EllipsisMenu component.
+ *
+ * @returns {ReactElement} The EllipsisMenu component.
+ */
 function EllipsisMenu() {
 	return element;
 }
