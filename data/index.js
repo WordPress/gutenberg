@@ -19,7 +19,7 @@ const initialReducer = () => ( {} );
 const store = createStore( initialReducer, {}, flowRight( enhancers ) );
 
 /**
- * Registers a new sub reducer to the global state and returns a Redux-like store object.
+ * Registers a new sub-reducer to the global state and returns a Redux-like store object.
  *
  * @param {string}  reducerKey Reducer key.
  * @param {Object}  reducer    Reducer function.
@@ -93,7 +93,7 @@ export const query = ( mapSelectorsToProps ) => ( WrappedComponent ) => {
  * @param {string} reducerKey   Part of the state shape to register the
  *                              selectors for.
  * @param {string} selectorName Selector name.
- * @param {*}      args         Selectors args.
+ * @param {*}      args         Selectors arguments.
  *
  * @returns {*}                 The selector's returned value.
  */
