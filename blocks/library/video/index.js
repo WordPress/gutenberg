@@ -23,7 +23,7 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 registerBlockType( 'core/video', {
 	title: __( 'Video' ),
 
-	description: __( 'Video, locally hosted, locally sourced.' ),
+	description: __( 'The Video block allows you to embed video files and play them back using a simple player.' ),
 
 	icon: 'format-video',
 
@@ -140,7 +140,7 @@ registerBlockType( 'core/video', {
 							type="video"
 							id={ id }
 						>
-							{ __( 'Insert from Media Library' ) }
+							{ __( 'Add from Media Library' ) }
 						</MediaUploadButton>
 					</Placeholder>,
 				];

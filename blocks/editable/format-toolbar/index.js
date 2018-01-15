@@ -130,7 +130,7 @@ class FormatToolbar extends Component {
 		event.preventDefault();
 		this.props.onChange( { link: { value: this.state.newLinkValue, target: this.state.opensInNewWindow ? '_blank' : '' } } );
 		if ( this.state.isAddingLink ) {
-			this.props.speak( __( 'Link inserted.' ), 'assertive' );
+			this.props.speak( __( 'Link added.' ), 'assertive' );
 		}
 	}
 

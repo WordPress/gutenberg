@@ -3,7 +3,7 @@
  * Plugin Name: Gutenberg
  * Plugin URI: https://github.com/WordPress/gutenberg
  * Description: Printing since 1440. This is the development plugin for the new block editor in core. <strong>Meant for development, do not run on real sites.</strong>
- * Version: 1.9.0
+ * Version: 2.0.0
  * Author: Gutenberg Team
  *
  * @package gutenberg
@@ -109,7 +109,7 @@ function gutenberg_build_files_notice() {
  * @since 1.5.0
  */
 function gutenberg_pre_init() {
-	if ( GUTENBERG_DEVELOPMENT_MODE && ! file_exists( dirname( __FILE__ ) . '/blocks/build' ) ) {
+	if ( defined( 'GUTENBERG_DEVELOPMENT_MODE' ) && GUTENBERG_DEVELOPMENT_MODE && ! file_exists( dirname( __FILE__ ) . '/blocks/build' ) ) {
 		add_action( 'admin_notices', 'gutenberg_build_files_notice' );
 		return;
 	}

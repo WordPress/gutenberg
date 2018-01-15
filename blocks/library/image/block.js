@@ -15,13 +15,10 @@ import {
  */
 import { __ } from '@wordpress/i18n';
 import { Component, compose } from '@wordpress/element';
-import { mediaUpload, createMediaFromFile, getBlobByURL, revokeBlobURL, viewPort } from '@wordpress/utils';
+import { createMediaFromFile, getBlobByURL, revokeBlobURL, viewPort } from '@wordpress/utils';
 import {
-	Placeholder,
 	Dashicon,
 	Toolbar,
-	DropZone,
-	FormFileUpload,
 	withAPIData,
 	withContext,
 } from '@wordpress/components';
@@ -30,6 +27,7 @@ import {
  * Internal dependencies
  */
 import Editable from '../../editable';
+import ImagePlaceHolder from '../../image-placeholder';
 import MediaUploadButton from '../../media-upload-button';
 import InspectorControls from '../../inspector-controls';
 import TextControl from '../../inspector-controls/text-control';
@@ -117,9 +115,6 @@ class ImageBlock extends Component {
 		const availableSizes = this.getAvailableSizes();
 		const figureStyle = width ? { width } : {};
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && ( ! viewPort.isExtraSmall() );
-		const uploadButtonProps = { isLarge: true };
-		const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setAttributes );
-		const dropFiles = ( files ) => mediaUpload( files, setAttributes );
 
 		const editButtonLabel = __( 'Edit image' );
 		const controls = (
@@ -152,31 +147,13 @@ class ImageBlock extends Component {
 		if ( ! url ) {
 			return [
 				controls,
-				<Placeholder
-					key="placeholder"
-					instructions={ __( 'Drag image here or insert from media library' ) }
+				<ImagePlaceHolder
+					className={ className }
+					key="image-placeholder"
 					icon="format-image"
 					label={ __( 'Image' ) }
-					className={ className }>
-					<DropZone
-						onFilesDrop={ dropFiles }
-					/>
-					<FormFileUpload
-						isLarge
-						className="wp-block-image__upload-button"
-						onChange={ uploadFromFiles }
-						accept="image/*"
-					>
-						{ __( 'Upload' ) }
-					</FormFileUpload>
-					<MediaUploadButton
-						buttonProps={ uploadButtonProps }
-						onSelect={ this.onSelectImage }
-						type="image"
-					>
-						{ __( 'Insert from Media Library' ) }
-					</MediaUploadButton>
-				</Placeholder>,
+					onSelectImage={ this.onSelectImage }
+				/>,
 			];
 		}
 

@@ -11,7 +11,8 @@ import { includes } from 'lodash';
  * @param  {Function} reducer            Original reducer
  * @param  {?Object}  options            Optional options
  * @param  {?Array}   options.resetTypes Action types upon which to reset dirty
- * @return {Function}                    Enhanced reducer
+ *
+ * @returns {Function} Enhanced reducer.
  */
 export default function withChangeDetection( reducer, options = {} ) {
 	return ( state, action ) => {

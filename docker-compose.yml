@@ -1,0 +1,31 @@
+version: '3.1'
+
+services:
+
+  wordpress:
+    image: wordpress
+    ports:
+      - 8888:80
+    environment:
+      WORDPRESS_DB_PASSWORD: example
+      ABSPATH: /usr/src/wordpress/
+    volumes:
+      - .:/var/www/html/wp-content/plugins/gutenberg
+    container_name: wordpress-dev
+
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: wordpress_test
+
+  wordpress_phpunit:
+    image: chriszarate/wordpress-phpunit
+    environment:
+      PHPUNIT_DB_HOST: mysql
+    volumes:
+      - .:/app
+      - testsuite:/tmp
+
+volumes:
+  testsuite: {}

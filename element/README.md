@@ -29,7 +29,7 @@ function Greeting( props ) {
 
 wp.element.render(
 	wp.element.createElement( Greeting, { toWhom: 'World' } ),
-	document.getElementById( 'app' )
+	document.getElementById( 'greeting' )
 );
 </script>
 ```

@@ -46,7 +46,8 @@ export const cache = mapKeys(
  * @see https://xhr.spec.whatwg.org/#the-getallresponseheaders()-method
  *
  * @param  {XMLHttpRequest} xhr XMLHttpRequest object
- * @return {Array[]}            Array of header tuples
+ *
+ * @returns {Array[]} Array of header tuples.
  */
 export function getResponseHeaders( xhr ) {
 	// 'date: Tue, 22 Aug 2017 18:45:28 GMT↵server: nginx'
@@ -64,7 +65,8 @@ export function getResponseHeaders( xhr ) {
  * undefined otherwise.
  *
  * @param  {Object}  request Request object (path, method)
- * @return {?Object}         Response object (body, headers)
+ *
+ * @returns {?Object} Response object (body, headers).
  */
 export function getCachedResponse( request ) {
 	if ( isRequestMethod( request, 'GET' ) ) {
