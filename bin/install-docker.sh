@@ -20,19 +20,18 @@ if ! docker info >/dev/null 2>&1; then
 fi
 
 # Launch the containers
-echo -en $(status_message "Starting Docker containers...")
-if ! docker-compose up -d >/dev/null 2>&1; then
+echo -e $(status_message "Updating and starting Docker containers...")
+if ! docker-compose up -d; then
 	# Launching may fail due to the docker config file directory having changed.
 	# Remove the old wordpress-dev container, and try again.
-	docker container rm -fv wordpress-dev >/dev/null 2>&1
-	docker-compose up -d >/dev/null 2>&1
+	docker container rm -fv wordpress-dev
+	docker-compose up -d
 fi
-echo ' done!'
 
 # Wait until the docker containers are setup properely
 echo -en $(status_message "Attempting to connect to wordpress...")
 until $(curl -L http://localhost:8888 -so - 2>&1 | grep -q "WordPress"); do
-    echo -e '.'
+    echo -n '.'
     sleep 5
 done
 echo ' done!'
