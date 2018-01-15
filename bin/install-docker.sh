@@ -1,5 +1,4 @@
 #!/bin/bash
-NVM_VERSION="v0.33.8"
 
 # Exit if any command fails
 set -e
@@ -28,9 +27,11 @@ if ! docker-compose up -d; then
 	docker-compose up -d
 fi
 
+HOST_PORT=$(docker inspect --format '{{(index (index .HostConfig.PortBindings "80/tcp") 0).HostPort}}' wordpress-dev)
+
 # Wait until the docker containers are setup properely
 echo -en $(status_message "Attempting to connect to wordpress...")
-until $(curl -L http://localhost:8888 -so - 2>&1 | grep -q "WordPress"); do
+until $(curl -L http://localhost:$HOST_PORT -so - 2>&1 | grep -q "WordPress"); do
     echo -n '.'
     sleep 5
 done
@@ -38,7 +39,13 @@ echo ' done!'
 
 # Install WordPress
 echo -en $(status_message "Installing WordPress...")
-docker run -it --rm --volumes-from wordpress-dev --network container:wordpress-dev wordpress:cli core install --url=localhost:8888 --title=Gutenberg --admin_user=admin --admin_password=password --admin_email=test@test.com >/dev/null
+docker run -it --rm --volumes-from wordpress-dev --network container:wordpress-dev wordpress:cli core install --url=localhost:$HOST_PORT --title=Gutenberg --admin_user=admin --admin_password=password --admin_email=test@test.com >/dev/null
+
+CURRENT_URL=$(docker run -it --rm --volumes-from wordpress-dev --network container:wordpress-dev wordpress:cli option get siteurl)
+if [ "$CURRENT_URL" != "http://localhost:$HOST_PORT" ]; then
+	docker run -it --rm --volumes-from wordpress-dev --network container:wordpress-dev wordpress:cli option update home "http://localhost:$HOST_PORT"
+	docker run -it --rm --volumes-from wordpress-dev --network container:wordpress-dev wordpress:cli option update siteurl "http://localhost:$HOST_PORT"
+fi
 echo ' done!'
 
 # Activate Gutenberg
@@ -52,6 +59,5 @@ docker-compose run --rm wordpress_phpunit /app/bin/install-wp-tests.sh wordpress
 echo ' done!'
 
 # Install Composer
-echo -en $(status_message "Installing Composer...")
-docker-compose run --rm composer install >/dev/null
-echo ' done!'
+echo -e $(status_message "Installing and updating Composer modules...")
+docker-compose run --rm composer install

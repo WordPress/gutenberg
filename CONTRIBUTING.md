@@ -13,7 +13,7 @@ To test the plugin, or to contribute to it, you can clone this repository and bu
 First, you need a WordPress Environment to run the plugin on. The quickest way to get up and running is to use the provided docker setup. Just install [docker](https://www.docker.com/) on your machine and run `./bin/setup-local-env.sh`.
 
 The WordPress installation should be available at `http://localhost:8888` (username: `admin`, password: `password`).
-Inside the "docker" directory, you can use any docker command to interact with your containers.
+Inside the "docker" directory, you can use any docker command to interact with your containers. If this port is in use, you can override it in your `docker-compose.override.yml` file.
 
 Alternatively, you can use your own local WordPress environment and clone this repository right into your `wp-content/plugins` directory.
 
