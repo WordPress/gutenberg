@@ -18,6 +18,7 @@ import { getEllipsisMenuItems } from '../../../api/ellipsis-menu';
 /**
  * Renders a list of plugins that will activate different UI elements.
  *
+ * @param   {Object} props The component props.
  * @returns {Object} The rendered list of menu items.
  */
 function Plugins( props ) {
@@ -33,7 +34,6 @@ function Plugins( props ) {
 	 * Does nothing currently, but should be used to trigger the plugins sidebar
 	 *
 	 * @param {string} pluginId The plugin id.
-	 *
 	 * @returns {void}
 	 */
 	function onSelect( pluginId ) {

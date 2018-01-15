@@ -1,7 +1,7 @@
 /* eslint no-console: [ 'error', { allow: [ 'error' ] } ] */
 
 /* External dependencies */
-import isFunction from "lodash/isFunction";
+import isFunction from 'lodash/isFunction';
 
 /* Internal dependencies */
 import { applyFilters } from '@wordpress/hooks';
@@ -63,7 +63,7 @@ export function registerEllipsisMenuItem( name, settings ) {
 		);
 		return null;
 	}
-	if( ! isFunction( settings.callback ) ) {
+	if ( ! isFunction( settings.callback ) ) {
 		console.error(
 			'Menu item callback must be a function'
 		);
