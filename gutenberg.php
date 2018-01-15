@@ -3,7 +3,7 @@
  * Plugin Name: Gutenberg
  * Plugin URI: https://github.com/WordPress/gutenberg
  * Description: Printing since 1440. This is the development plugin for the new block editor in core. <strong>Meant for development, do not run on real sites.</strong>
- * Version: 1.9.0
+ * Version: 2.0.0
  * Author: Gutenberg Team
  *
  * @package gutenberg
@@ -109,13 +109,13 @@ function gutenberg_build_files_notice() {
  * @since 1.5.0
  */
 function gutenberg_pre_init() {
-	if ( GUTENBERG_DEVELOPMENT_MODE && ! file_exists( dirname( __FILE__ ) . '/blocks/build' ) ) {
+	if ( defined( 'GUTENBERG_DEVELOPMENT_MODE' ) && GUTENBERG_DEVELOPMENT_MODE && ! file_exists( dirname( __FILE__ ) . '/blocks/build' ) ) {
 		add_action( 'admin_notices', 'gutenberg_build_files_notice' );
 		return;
 	}
 
 	// Get unmodified $wp_version.
-	include( ABSPATH . WPINC . '/version.php' );
+	include ABSPATH . WPINC . '/version.php';
 
 	// Strip '-src' from the version string. Messes up version_compare().
 	$version = str_replace( '-src', '', $wp_version );
@@ -161,7 +161,7 @@ function gutenberg_init( $return, $post ) {
 	add_filter( 'screen_options_show_screen', '__return_false' );
 	add_filter( 'admin_body_class', 'gutenberg_add_admin_body_class' );
 
-	require_once( ABSPATH . 'wp-admin/admin-header.php' );
+	require_once ABSPATH . 'wp-admin/admin-header.php';
 	the_gutenberg_project();
 
 	return true;
@@ -247,7 +247,7 @@ function gutenberg_intercept_edit_post() {
 	}
 
 	if ( gutenberg_init( false, $post ) ) {
-		include( ABSPATH . 'wp-admin/admin-footer.php' );
+		include ABSPATH . 'wp-admin/admin-footer.php';
 		exit;
 	}
 }
@@ -311,7 +311,7 @@ function gutenberg_intercept_post_new() {
 	$post_ID = $post->ID;
 
 	if ( gutenberg_init( false, $post ) ) {
-		include( ABSPATH . 'wp-admin/admin-footer.php' );
+		include ABSPATH . 'wp-admin/admin-footer.php';
 		exit;
 	}
 }
@@ -443,7 +443,6 @@ function gutenberg_replace_default_add_new_button() {
 			position: relative;
 			top: -3px;
 			text-decoration: none;
-			border: none;
 			border: 1px solid #ccc;
 			border-radius: 2px;
 			background: #f7f7f7;
@@ -481,8 +480,6 @@ function gutenberg_replace_default_add_new_button() {
 			<?php endif; ?>
 			position: relative;
 			vertical-align: top;
-			-webkit-font-smoothing: antialiased;
-			-moz-osx-font-smoothing: grayscale;
 			text-decoration: none !important;
 			padding: 4px 5px 4px 3px;
 		}

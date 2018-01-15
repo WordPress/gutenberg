@@ -1,3 +1,7 @@
+.wp-block-gallery:not( .components-placeholder ) {
+	margin: -8px;
+}
+
 .blocks-gallery-image {
 	position: relative;
 

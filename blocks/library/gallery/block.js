@@ -23,7 +23,6 @@ import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import GalleryImage from './gallery-image';
 
-const isGallery = true;
 const MAX_COLUMNS = 8;
 const linkOptions = [
 	{ value: 'attachment', label: __( 'Attachment Page' ) },
@@ -95,7 +94,9 @@ class GalleryBlock extends Component {
 	}
 
 	uploadFromFiles( event ) {
-		mediaUpload( event.target.files, this.props.setAttributes, isGallery );
+		mediaUpload( event.target.files, ( images ) => {
+			this.props.setAttributes( { images } );
+		} );
 	}
 
 	setImageAttributes( index, attributes ) {
@@ -118,13 +119,21 @@ class GalleryBlock extends Component {
 		const { setAttributes } = this.props;
 		mediaUpload(
 			files,
-			( { images } ) => {
+			( images ) => {
 				setAttributes( {
 					images: currentImages.concat( images ),
 				} );
-			},
-			isGallery
+			}
 		);
+	}
+
+	componentWillReceiveProps( nextProps ) {
+		// Deselect images when losing focus
+		if ( ! nextProps.focus && this.props.focus ) {
+			this.setState( {
+				selectedImage: null,
+			} );
+		}
 	}
 
 	render() {
@@ -137,6 +146,7 @@ class GalleryBlock extends Component {
 			/>
 		);
 
+		const editButtonLabel = __( 'Edit Gallery' );
 		const controls = (
 			focus && (
 				<BlockControls key="controls">
@@ -149,13 +159,14 @@ class GalleryBlock extends Component {
 							<MediaUploadButton
 								buttonProps={ {
 									className: 'components-icon-button components-toolbar__control',
-									'aria-label': __( 'Edit Gallery' ),
+									'aria-label': editButtonLabel,
 								} }
 								onSelect={ this.onSelectImages }
 								type="image"
 								multiple
 								gallery
 								value={ images.map( ( img ) => img.id ) }
+								tooltip={ editButtonLabel }
 							>
 								<Dashicon icon="edit" />
 							</MediaUploadButton>
@@ -172,7 +183,7 @@ class GalleryBlock extends Component {
 				controls,
 				<Placeholder
 					key="placeholder"
-					instructions={ __( 'Drag images here or insert from media library' ) }
+					instructions={ __( 'Drag images here or add from media library' ) }
 					icon="format-gallery"
 					label={ __( 'Gallery' ) }
 					className={ className }>
@@ -193,7 +204,7 @@ class GalleryBlock extends Component {
 						multiple
 						gallery
 					>
-						{ __( 'Insert from Media Library' ) }
+						{ __( 'Add from Media Library' ) }
 					</MediaUploadButton>
 				</Placeholder>,
 			];

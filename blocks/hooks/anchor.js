@@ -28,7 +28,8 @@ const ANCHOR_REGEX = /[\s#]/g;
  * of the first node
  *
  * @param  {Object} settings Original block settings
- * @return {Object}          Filtered block settings
+ *
+ * @returns {Object} Filtered block settings.
  */
 export function addAttribute( settings ) {
 	if ( hasBlockSupport( settings, 'anchor' ) ) {
@@ -51,7 +52,8 @@ export function addAttribute( settings ) {
  * assigning the anchor ID, if block supports anchor.
  *
  * @param  {function|Component} BlockEdit Original component
- * @return {function}                     Wrapped component
+ *
+ * @returns {function} Wrapped component.
  */
 export function withInspectorControl( BlockEdit ) {
 	const WrappedBlockEdit = ( props ) => {
@@ -86,7 +88,8 @@ export function withInspectorControl( BlockEdit ) {
  * @param  {Object} extraProps Additional props applied to save element
  * @param  {Object} blockType  Block type
  * @param  {Object} attributes Current block attributes
- * @return {Object}            Filtered props applied to save element
+ *
+ * @returns {Object} Filtered props applied to save element.
  */
 export function addSaveProps( extraProps, blockType, attributes ) {
 	if ( hasBlockSupport( blockType, 'anchor' ) ) {

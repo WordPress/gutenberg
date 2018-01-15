@@ -21,7 +21,8 @@ import { attr, prop, html, text, query, node, children } from './matchers';
  *
  * @param  {*}      value Original value
  * @param  {String} type  Type to coerce
- * @return {*}            Coerced value
+ *
+ * @returns {*} Coerced value.
  */
 export function asType( value, type ) {
 	switch ( type ) {
@@ -56,7 +57,8 @@ export function asType( value, type ) {
  * Returns an hpq matcher given a source object
  *
  * @param  {Object}   sourceConfig Attribute Source object
- * @return {Function}              hpq Matcher
+ *
+ * @returns {Function} hpq Matcher.
  */
 export function matcherFromSource( sourceConfig ) {
 	switch ( sourceConfig.source ) {
@@ -90,7 +92,7 @@ export function matcherFromSource( sourceConfig ) {
  * @param  {string} innerHTML           Block's raw content
  * @param  {Object} commentAttributes   Block's comment attributes
  *
- * @return {*}                          Attribute value
+ * @returns {*} Attribute value.
  */
 export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, commentAttributes ) {
 	let value;
@@ -119,7 +121,8 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
  * @param  {?Object} blockType  Block type
  * @param  {string}  innerHTML  Raw block content
  * @param  {?Object} attributes Known block attributes (from delimiters)
- * @return {Object}             All block attributes
+ *
+ * @returns {Object} All block attributes.
  */
 export function getBlockAttributes( blockType, innerHTML, attributes ) {
 	const blockAttributes = mapValues( blockType.attributes, ( attributeSchema, attributeKey ) => {
@@ -135,7 +138,8 @@ export function getBlockAttributes( blockType, innerHTML, attributes ) {
  * @param  {?Object} blockType  Block type
  * @param  {string}  innerHTML  Raw block content
  * @param  {?Object} attributes Known block attributes (from delimiters)
- * @return {Object}             Block attributes
+ *
+ * @returns {Object} Block attributes.
  */
 export function getAttributesFromDeprecatedVersion( blockType, innerHTML, attributes ) {
 	if ( ! blockType.deprecated ) {
@@ -161,7 +165,8 @@ export function getAttributesFromDeprecatedVersion( blockType, innerHTML, attrib
  * @param  {?String} name       Block type name
  * @param  {String}  innerHTML  Raw block content
  * @param  {?Object} attributes Attributes obtained from block delimiters
- * @return {?Object}            An initialized block object (if possible)
+ *
+ * @returns {?Object} An initialized block object (if possible).
  */
 export function createBlockWithFallback( name, innerHTML, attributes ) {
 	// Use type from block content, otherwise find unknown handler.
@@ -228,7 +233,8 @@ export function createBlockWithFallback( name, innerHTML, attributes ) {
  * Parses the post content with a PegJS grammar and returns a list of blocks.
  *
  * @param  {String} content The post content
- * @return {Array}          Block list
+ *
+ * @returns {Array} Block list.
  */
 export function parseWithGrammar( content ) {
 	return grammarParse( content ).reduce( ( memo, blockNode ) => {

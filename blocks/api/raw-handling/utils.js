@@ -49,7 +49,7 @@ const inlineWrapperWhiteList = {
 const whitelist = {
 	...inlineWhitelist,
 	...inlineWrapperWhiteList,
-	img: { attributes: [ 'src', 'alt' ] },
+	img: { attributes: [ 'src', 'alt' ], classes: [ 'alignleft', 'aligncenter', 'alignright', 'alignnone' ] },
 	figure: {},
 	blockquote: {},
 	hr: {},
@@ -84,7 +84,9 @@ export function isAttributeWhitelisted( tag, attribute ) {
  *
  * @param  {String}  nodeName Node name.
  * @param  {String}  tagName  Tag name.
- * @return {Boolean}          True if nodeName is inline in the context of tagName and false otherwise.
+ *
+ * @returns {Boolean} True if nodeName is inline in the context of tagName and
+ *                    false otherwise.
  */
 function isInlineForTag( nodeName, tagName ) {
 	if ( ! tagName || ! nodeName ) {
@@ -98,6 +100,14 @@ function isInlineForTag( nodeName, tagName ) {
 export function isInline( node, tagName ) {
 	const nodeName = node.nodeName.toLowerCase();
 	return !! inlineWhitelist[ nodeName ] || isInlineForTag( nodeName, tagName );
+}
+
+export function isClassWhitelisted( tag, name ) {
+	return (
+		whitelist[ tag ] &&
+		whitelist[ tag ].classes &&
+		whitelist[ tag ].classes.indexOf( name ) !== -1
+	);
 }
 
 export function isInlineWrapper( node ) {
@@ -211,7 +221,8 @@ export function deepFilterNodeList( nodeList, filters, doc ) {
  *
  * @param  {String} HTML    The HTML to filter.
  * @param  {Array}  filters An array of functions that can mutate with the provided node.
- * @return {String}         The filtered HTML.
+ *
+ * @returns {String} The filtered HTML.
  */
 export function deepFilterHTML( HTML, filters = [] ) {
 	const doc = document.implementation.createHTMLDocument( '' );
