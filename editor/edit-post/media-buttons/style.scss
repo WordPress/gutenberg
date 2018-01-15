@@ -1,0 +1,8 @@
+.editor-media-buttons:not(:empty) {
+	font-family: $default-font;
+	margin-bottom: 10px;
+
+	.button {
+		margin-right: 5px;
+	}
+}

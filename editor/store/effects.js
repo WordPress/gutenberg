@@ -16,6 +16,7 @@ import {
 	createReusableBlock,
 	isReusableBlock,
 	getDefaultBlockName,
+	getUnknownTypeHandlerName,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
@@ -53,6 +54,7 @@ import {
 	getBlock,
 	getBlocks,
 	getReusableBlock,
+	getBlockInsertionPoint,
 	POST_UPDATE_TRANSACTION_ID,
 } from './selectors';
 
@@ -451,5 +453,10 @@ export default {
 	CREATE_NOTICE( { notice: { content, spokenMessage } } ) {
 		const message = spokenMessage || content;
 		speak( message, 'assertive' );
+	},
+	INSERT_HTML( { html }, store ) {
+		const block = createBlock( getUnknownTypeHandlerName(), { content: html } );
+
+		return insertBlock( block, getBlockInsertionPoint( store.getState() ) );
 	},
 };

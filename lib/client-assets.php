@@ -872,11 +872,26 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	 */
 	$allowed_block_types = apply_filters( 'allowed_block_types', true );
 
+	// Remove the default media buttion.
+	remove_action( 'media_buttons', 'media_buttons' );
+	ob_start();
+	/**
+	 * Fires after the default media button(s) are displayed.
+	 *
+	 * @since 2.5.0
+	 *
+	 * @param string $editor_id Unique editor identifier, e.g. 'content'.
+	 */
+	do_action( 'media_buttons', 'content' );
+	$media_buttons = ob_get_contents();
+	ob_end_clean();
+
 	$editor_settings = array(
 		'alignWide'        => $align_wide || ! empty( $gutenberg_theme_support[0]['wide-images'] ), // Backcompat. Use `align-wide` outside of `gutenberg` array.
 		'colors'           => $color_palette,
 		'blockTypes'       => $allowed_block_types,
 		'titlePlaceholder' => apply_filters( 'enter_title_here', __( 'Add title', 'gutenberg' ), $post ),
+		'mediaButtons'     => $media_buttons,
 	);
 
 	$post_type_object = get_post_type_object( $post_to_edit['type'] );

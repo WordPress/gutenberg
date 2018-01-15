@@ -198,6 +198,19 @@ export function insertBlocks( blocks, position ) {
 }
 
 /**
+ * Returns an action object signaling new HTML inserted at the current position.
+ *
+ * @param  {String}  html  HTML to insert
+ * @return {Object}        Action object
+ */
+export function insertHtml( html ) {
+	return {
+		type: 'INSERT_HTML',
+		html,
+	};
+}
+
+/**
  * Returns an action object showing the insertion point at a given index
  *
  * @param  {Number?} index  Index of the insertion point
