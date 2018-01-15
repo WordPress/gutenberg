@@ -1155,6 +1155,16 @@ class Tests_Functions extends WP_UnitTestCase {
 						'proper_filename' => false,
 					),
 				),
+				// FLAC file.
+				array(
+					DIR_TESTDATA . '/uploads/small-audio.flac',
+					'small-audio.flac',
+					array(
+						'ext' => 'flac',
+						'type' => 'audio/flac',
+						'proper_filename' => false,
+					),
+				),
 			) );
 		}
 
