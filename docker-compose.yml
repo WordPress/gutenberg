@@ -27,5 +27,10 @@ services:
       - .:/app
       - testsuite:/tmp
 
+  composer:
+    image: composer
+    volumes:
+      - .:/app
+
 volumes:
   testsuite: {}

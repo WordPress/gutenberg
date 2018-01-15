@@ -51,3 +51,8 @@ echo ' done!'
 echo -en $(status_message "Installing PHPUnit test scaffolding...")
 docker-compose run --rm wordpress_phpunit /app/bin/install-wp-tests.sh wordpress_test root example mysql latest false >/dev/null
 echo ' done!'
+
+# Install Composer
+echo -en $(status_message "Installing Composer...")
+docker-compose run --rm composer install >/dev/null
+echo ' done!'
