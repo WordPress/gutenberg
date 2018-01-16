@@ -12,7 +12,7 @@ Under the hood, attribute sources are a superset of functionality provided by [h
 
 Use `attribute` to extract the value of an attribute from markup.
 
-_Example_: Extract the `src` attribute from an image found in the block's markup. 
+_Example_: Extract the `src` attribute from an image found in the block's markup.
 
 ```js
 {
