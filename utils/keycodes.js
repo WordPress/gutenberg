@@ -19,13 +19,13 @@ export const DELETE = 46;
 export const F10 = 121;
 
 /**
- * Check if the access keys and the gives letter are presssed.
+ * Check if the access keys and the given character are presssed.
  *
- * @param  {KeyboardEvent} event  The event object.
- * @param  {String}        letter The letter to check.
- * @return {Boolean}              True if the combination is pressed, false if not.
+ * @param  {KeyboardEvent} event     The event object.
+ * @param  {String}        character The character to check.
+ * @return {Boolean}                 True if the combination is pressed, false if not.
  */
-export function isAccess( event, letter ) {
+export function isAccess( event, character ) {
 	if ( isMac ) {
 		if ( ! event.ctrlKey || ! event.altKey ) {
 			return;
@@ -34,5 +34,19 @@ export function isAccess( event, letter ) {
 		return;
 	}
 
-	return event.keyCode === letter.toUpperCase().charCodeAt( 0 );
+	return character ? event.keyCode === character.toUpperCase().charCodeAt( 0 ) : true;
+}
+
+/**
+ * Get an access key combination based on a character.
+ *
+ * @param  {String} character The character for the access combination.
+ * @return {String}           The access combination.
+ */
+export function getAccessCombination( character ) {
+	const access = isMac ? 'Ctrl+Alt' : 'Shift+Alt';
+
+	character = character.toUpperCase();
+
+	return `${ access }+${ character }`;
 }

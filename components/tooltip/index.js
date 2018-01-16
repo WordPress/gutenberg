@@ -13,12 +13,15 @@ import {
 	findDOMNode,
 	concatChildren,
 } from '@wordpress/element';
+import { keycodes } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import Popover from '../popover';
+
+const { getAccessCombination } = keycodes;
 
 /**
  * Time over children to wait before showing tooltip
@@ -150,7 +153,7 @@ class Tooltip extends Component {
 	}
 
 	render() {
-		const { children, position, text } = this.props;
+		const { children, position, text, shortcut } = this.props;
 		if ( Children.count( children ) !== 1 ) {
 			if ( 'development' === process.env.NODE_ENV ) {
 				// eslint-disable-next-line no-console
@@ -179,6 +182,7 @@ class Tooltip extends Component {
 					aria-hidden="true"
 				>
 					{ text }
+					{ shortcut && <span className="components-tooltip__shortcut">{ getAccessCombination( shortcut ) }</span> }
 				</Popover>,
 			),
 		} );

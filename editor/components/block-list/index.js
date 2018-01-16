@@ -22,7 +22,7 @@ import 'element-closest';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { serialize, getPossibleShortcutTransformations } from '@wordpress/blocks';
+import { serialize, getPossibleShortcutTransformations, getBlockType } from '@wordpress/blocks';
 import { keycodes } from '@wordpress/utils';
 
 /**
@@ -42,7 +42,7 @@ import {
 	isSelectionEnabled,
 	isMultiSelecting,
 } from '../../store/selectors';
-import { startMultiSelect, stopMultiSelect, multiSelect, selectBlock, replaceBlocks } from '../../store/actions';
+import { startMultiSelect, stopMultiSelect, multiSelect, selectBlock, replaceBlocks, updateBlockAttributes } from '../../store/actions';
 import { documentHasSelection } from '../../utils/dom';
 
 const { isAccess } = keycodes;
@@ -72,12 +72,16 @@ class BlockList extends Component {
 		document.addEventListener( 'copy', this.onCopy );
 		document.addEventListener( 'cut', this.onCut );
 		window.addEventListener( 'mousemove', this.setLastClientY );
+		// Needs document to also work in inspector.
+		// In other words, if there is selection, but no focus.
+		document.addEventListener( 'keydown', this.onKeyDown );
 	}
 
 	componentWillUnmount() {
 		document.removeEventListener( 'copy', this.onCopy );
 		document.removeEventListener( 'cut', this.onCut );
 		window.removeEventListener( 'mousemove', this.setLastClientY );
+		document.removeEventListener( 'keydown', this.onKeyDown );
 	}
 
 	componentWillReceiveProps( nextProps ) {
@@ -89,7 +93,7 @@ class BlockList extends Component {
 		} else if ( nextProps.multiSelectedBlocks.length ) {
 			this.blocks = nextProps.multiSelectedBlocks;
 
-			const firstName = first( nextProps.multiSelectedBlocks ).name
+			const firstName = first( nextProps.multiSelectedBlocks ).name;
 
 			if ( every( nextProps.multiSelectedBlocks, ( { name } ) => name === firstName ) ) {
 				this.commonName = firstName;
@@ -280,20 +284,31 @@ class BlockList extends Component {
 	}
 
 	onKeyDown( event ) {
-		const { onReplace } = this.props;
+		const { onReplace, onChange } = this.props;
 
-		if ( ! this.shortcutTransforms ) {
+		if ( ! isAccess( event ) ) {
 			return;
 		}
 
-		const transform = find( this.shortcutTransforms, ( { shortcut } ) => isAccess( event, shortcut ) );
+		if ( this.commonName ) {
+			const blockType = getBlockType( this.commonName );
+			const transform = find( blockType.shortcuts || [], ( { shortcut } ) => isAccess( event, shortcut ) );
 
-		if ( transform ) {
-			const blocks = castArray( transform.transform( this.blocks.map( ( { attributes } ) => attributes ) ) );
+			if ( transform ) {
+				this.blocks.forEach( ( { uid } ) => {
+					onChange( uid, transform.attributes );
+				} );
+			}
+		}
 
-			onReplace( this.blocks.map( ( { uid } ) => uid ), blocks );
+		if ( this.shortcutTransforms ) {
+			const transform = find( this.shortcutTransforms, ( { shortcut } ) => isAccess( event, shortcut ) );
 
-			return;
+			if ( transform ) {
+				const blocks = castArray( transform.transform( this.blocks.map( ( { attributes } ) => attributes ) ) );
+
+				onReplace( this.blocks.map( ( { uid } ) => uid ), blocks );
+			}
 		}
 	}
 
@@ -301,7 +316,7 @@ class BlockList extends Component {
 		const { blocks, showContextualToolbar, renderBlockMenu } = this.props;
 
 		return (
-			<BlockSelectionClearer onKeyDown={ this.onKeyDown }>
+			<BlockSelectionClearer>
 				{ !! blocks.length && <BlockInsertionPoint /> }
 				{ map( blocks, ( uid ) => (
 					<BlockListBlock
@@ -348,6 +363,9 @@ export default connect(
 		},
 		onReplace( uids, blocks ) {
 			dispatch( replaceBlocks( uids, blocks ) );
+		},
+		onChange( uid, attributes ) {
+			dispatch( updateBlockAttributes( uid, attributes ) );
 		},
 	} )
 )( BlockList );

@@ -114,17 +114,38 @@ export const settings = {
 							return createBlock( 'core/paragraph', {
 								content,
 							} );
-						} else {
-							return createBlock( 'core/heading', {
-								nodeName: `H${ level }`,
-								content,
-							} );
 						}
+
+						return createBlock( 'core/heading', {
+							nodeName: `H${ level }`,
+							content,
+						} );
 					} );
 				},
 			} ) ),
 		],
 	},
+
+	shortcuts: [
+		{
+			shortcut: 'l',
+			attributes: {
+				align: 'left',
+			},
+		},
+		{
+			shortcut: 'c',
+			attributes: {
+				align: 'center',
+			},
+		},
+		{
+			shortcut: 'r',
+			attributes: {
+				align: 'right',
+			},
+		},
+	],
 
 	merge( attributes, attributesToMerge ) {
 		return {
@@ -143,6 +164,7 @@ export const settings = {
 						'234'.split( '' ).map( ( level ) => ( {
 							icon: 'heading',
 							title: sprintf( __( 'Heading %s' ), level ),
+							shortcut: level,
 							isActive: 'H' + level === nodeName,
 							onClick: () => setAttributes( { nodeName: 'H' + level } ),
 							subscript: level,
@@ -159,6 +181,7 @@ export const settings = {
 							'123456'.split( '' ).map( ( level ) => ( {
 								icon: 'heading',
 								title: sprintf( __( 'Heading %s' ), level ),
+								shortcut: level === '1' ? undefined : level,
 								isActive: 'H' + level === nodeName,
 								onClick: () => setAttributes( { nodeName: 'H' + level } ),
 								subscript: level,

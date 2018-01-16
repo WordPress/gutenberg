@@ -8,16 +8,19 @@ const ALIGNMENT_CONTROLS = [
 	{
 		icon: 'editor-alignleft',
 		title: __( 'Align left' ),
+		shortcut: 'l',
 		align: 'left',
 	},
 	{
 		icon: 'editor-aligncenter',
 		title: __( 'Align center' ),
+		shortcut: 'c',
 		align: 'center',
 	},
 	{
 		icon: 'editor-alignright',
 		title: __( 'Align right' ),
+		shortcut: 'r',
 		align: 'right',
 	},
 ];
