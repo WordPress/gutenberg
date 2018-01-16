@@ -9,7 +9,7 @@ import { __ } from '@wordpress/i18n';
 import './style.scss';
 import { registerBlockType, createBlock } from '../../api';
 
-registerBlockType( 'core/separator', {
+export const registerSeparatorBlock = () => registerBlockType( 'core/separator', {
 	title: __( 'Separator' ),
 
 	description: __( 'Use the separator to indicate a thematic change in the content.' ),

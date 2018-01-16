@@ -156,7 +156,7 @@ const ConnectedReusableBlockEdit = connect(
 	} )
 )( ReusableBlockEdit );
 
-registerBlockType( 'core/block', {
+export const registerReusableBlock = () => registerBlockType( 'core/block', {
 	title: __( 'Reusable Block' ),
 	category: 'reusable-blocks',
 	isPrivate: true,

@@ -11,7 +11,7 @@ import './style.scss';
 import { registerBlockType } from '../../api';
 import LatestPostsBlock from './block';
 
-registerBlockType( 'core/latest-posts', {
+export const registerLatestPostsBlock = () => registerBlockType( 'core/latest-posts', {
 	title: __( 'Latest Posts' ),
 
 	description: __( 'Shows a list of your site\'s most recent posts.' ),

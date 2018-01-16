@@ -20,7 +20,7 @@ import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
-registerBlockType( 'core/audio', {
+export const registerAudioBlock = () => registerBlockType( 'core/audio', {
 	title: __( 'Audio' ),
 
 	description: __( 'The Audio block allows you to embed audio files and play them back using a simple player.' ),

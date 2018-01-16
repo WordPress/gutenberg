@@ -7,6 +7,7 @@ import 'moment-timezone/moment-timezone-utils';
 /**
  * WordPress dependencies
  */
+import { registerCoreBlocks } from '@wordpress/blocks';
 import { render, unmountComponentAtNode } from '@wordpress/element';
 import { settings as dateSettings } from '@wordpress/date';
 
@@ -21,6 +22,8 @@ import { initializeMetaBoxState } from './store/actions';
 
 export * from './components';
 import store from './store'; // Registers the state tree
+
+registerCoreBlocks();
 
 // Configure moment globally
 moment.locale( dateSettings.l10n.locale );

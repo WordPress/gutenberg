@@ -28,7 +28,7 @@ import RangeControl from '../../inspector-controls/range-control';
 
 const validAlignments = [ 'left', 'center', 'right', 'wide', 'full' ];
 
-registerBlockType( 'core/cover-image', {
+export const registerCoverImageBlock = () => registerBlockType( 'core/cover-image', {
 	title: __( 'Cover Image' ),
 
 	description: __( 'Cover Image is a bold image block with an optional title.' ),

@@ -14,7 +14,7 @@ import { __ } from '@wordpress/i18n';
 import './editor.scss';
 import { registerBlockType, createBlock } from '../../api';
 
-registerBlockType( 'core/code', {
+export const registerCodeBlock = () => registerBlockType( 'core/code', {
 	title: __( 'Code' ),
 
 	description: __( 'The code block maintains spaces and tabs, great for showing code snippets.' ),

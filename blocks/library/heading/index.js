@@ -15,7 +15,7 @@ import BlockControls from '../../block-controls';
 import InspectorControls from '../../inspector-controls';
 import AlignmentToolbar from '../../alignment-toolbar';
 
-registerBlockType( 'core/heading', {
+export const registerHeadingBlock = () => registerBlockType( 'core/heading', {
 	title: __( 'Heading' ),
 
 	description: __( 'Search engines use the headings to index the structure and content of your web pages.' ),

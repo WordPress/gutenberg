@@ -13,7 +13,7 @@ import TableBlock from './table-block';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
-registerBlockType( 'core/table', {
+export const registerTableBlock = () => registerBlockType( 'core/table', {
 	title: __( 'Table' ),
 	description: __( 'Tables. Best used for tabular data.' ),
 	icon: 'editor-table',

@@ -12,7 +12,7 @@ import './editor.scss';
 import { registerBlockType, createBlock, getBlockAttributes, getBlockType } from '../../api';
 import ImageBlock from './block';
 
-registerBlockType( 'core/image', {
+export const registerImageBlock = () => registerBlockType( 'core/image', {
 	title: __( 'Image' ),
 
 	description: __( 'Worth a thousand words.' ),

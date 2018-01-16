@@ -16,7 +16,7 @@ import './editor.scss';
 import { registerBlockType } from '../../api';
 import BlockControls from '../../block-controls';
 
-registerBlockType( 'core/html', {
+export const registerHtmlBlock = () => registerBlockType( 'core/html', {
 	title: __( 'Custom HTML' ),
 
 	description: __( 'Add custom HTML code and preview it right here in the editor.' ),

@@ -20,7 +20,7 @@ import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
-registerBlockType( 'core/video', {
+export const registerVideoBlock = () => registerBlockType( 'core/video', {
 	title: __( 'Video' ),
 
 	description: __( 'The Video block allows you to embed video files and play them back using a simple player.' ),

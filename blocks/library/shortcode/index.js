@@ -15,7 +15,7 @@ import { withInstanceId, Dashicon } from '@wordpress/components';
 import './editor.scss';
 import { registerBlockType } from '../../api';
 
-registerBlockType( 'core/shortcode', {
+export const registerShortcodeBlock = () => registerBlockType( 'core/shortcode', {
 	title: __( 'Shortcode' ),
 
 	description: __( 'A shortcode is a WordPress-specific code snippet that is written between square brackets as [shortcode]. ' ),

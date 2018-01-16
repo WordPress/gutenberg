@@ -192,95 +192,97 @@ class ParagraphBlock extends Component {
 	}
 }
 
-registerBlockType( 'core/paragraph', {
-	title: __( 'Paragraph' ),
+export const registerParagraphBlock = () => {
+	registerBlockType( 'core/paragraph', {
+		title: __( 'Paragraph' ),
 
-	description: __( 'This is a simple text only block for adding a single paragraph of content.' ),
+		description: __( 'This is a simple text only block for adding a single paragraph of content.' ),
 
-	icon: 'editor-paragraph',
+		icon: 'editor-paragraph',
 
-	category: 'common',
+		category: 'common',
 
-	keywords: [ __( 'text' ) ],
+		keywords: [ __( 'text' ) ],
 
-	supports: {
-		className: false,
-	},
+		supports: {
+			className: false,
+		},
 
-	attributes: {
-		content: {
-			type: 'array',
-			source: 'children',
-			selector: 'p',
-		},
-		align: {
-			type: 'string',
-		},
-		dropCap: {
-			type: 'boolean',
-			default: false,
-		},
-		placeholder: {
-			type: 'string',
-		},
-		width: {
-			type: 'string',
-		},
-		textColor: {
-			type: 'string',
-		},
-		backgroundColor: {
-			type: 'string',
-		},
-		fontSize: {
-			type: 'number',
-		},
-	},
-
-	transforms: {
-		from: [
-			{
-				type: 'raw',
-				isMatch: ( node ) => (
-					node.nodeName === 'P' &&
-					// Do not allow embedded content.
-					! node.querySelector( 'audio, canvas, embed, iframe, img, math, object, svg, video' )
-				),
+		attributes: {
+			content: {
+				type: 'array',
+				source: 'children',
+				selector: 'p',
 			},
-		],
-	},
+			align: {
+				type: 'string',
+			},
+			dropCap: {
+				type: 'boolean',
+				default: false,
+			},
+			placeholder: {
+				type: 'string',
+			},
+			width: {
+				type: 'string',
+			},
+			textColor: {
+				type: 'string',
+			},
+			backgroundColor: {
+				type: 'string',
+			},
+			fontSize: {
+				type: 'number',
+			},
+		},
 
-	merge( attributes, attributesToMerge ) {
-		return {
-			content: concatChildren( attributes.content, attributesToMerge.content ),
-		};
-	},
+		transforms: {
+			from: [
+				{
+					type: 'raw',
+					isMatch: ( node ) => (
+						node.nodeName === 'P' &&
+						// Do not allow embedded content.
+						! node.querySelector( 'audio, canvas, embed, iframe, img, math, object, svg, video' )
+					),
+				},
+			],
+		},
 
-	getEditWrapperProps( attributes ) {
-		const { width } = attributes;
-		if ( [ 'wide', 'full', 'left', 'right' ].indexOf( width ) !== -1 ) {
-			return { 'data-align': width };
-		}
-	},
+		merge( attributes, attributesToMerge ) {
+			return {
+				content: concatChildren( attributes.content, attributesToMerge.content ),
+			};
+		},
 
-	edit: ParagraphBlock,
+		getEditWrapperProps( attributes ) {
+			const { width } = attributes;
+			if ( [ 'wide', 'full', 'left', 'right' ].indexOf( width ) !== -1 ) {
+				return { 'data-align': width };
+			}
+		},
 
-	save( { attributes } ) {
-		const { width, align, content, dropCap, backgroundColor, textColor, fontSize } = attributes;
-		const className = classnames( {
-			[ `align${ width }` ]: width,
-			'has-background': backgroundColor,
-			'has-drop-cap': dropCap,
-		} );
-		const styles = {
-			backgroundColor: backgroundColor,
-			color: textColor,
-			fontSize: fontSize,
-			textAlign: align,
-		};
+		edit: ParagraphBlock,
 
-		return <p style={ styles } className={ className ? className : undefined }>{ content }</p>;
-	},
-} );
+		save( { attributes } ) {
+			const { width, align, content, dropCap, backgroundColor, textColor, fontSize } = attributes;
+			const className = classnames( {
+				[ `align${ width }` ]: width,
+				'has-background': backgroundColor,
+				'has-drop-cap': dropCap,
+			} );
+			const styles = {
+				backgroundColor: backgroundColor,
+				color: textColor,
+				fontSize: fontSize,
+				textAlign: align,
+			};
 
-setDefaultBlockName( 'core/paragraph' );
+			return <p style={ styles } className={ className ? className : undefined }>{ content }</p>;
+		},
+	} );
+
+	setDefaultBlockName( 'core/paragraph' );
+};

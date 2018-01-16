@@ -17,7 +17,7 @@ import { registerBlockType, createBlock } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 
-registerBlockType( 'core/list', {
+export const registerListBlock = () => registerBlockType( 'core/list', {
 	title: __( 'List' ),
 	description: __( 'List. Numbered or bulleted.' ),
 	icon: 'editor-ul',

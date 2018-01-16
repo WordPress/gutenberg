@@ -11,7 +11,7 @@ import './style.scss';
 import { registerBlockType } from '../../api';
 import CategoriesBlock from './block';
 
-registerBlockType( 'core/categories', {
+export const registerCategoriesBlock = () => registerBlockType( 'core/categories', {
 	title: __( 'Categories' ),
 
 	description: __( 'Shows a list of your site\'s categories.' ),

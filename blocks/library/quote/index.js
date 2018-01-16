@@ -51,7 +51,7 @@ const blockAttributes = {
 	},
 };
 
-registerBlockType( 'core/quote', {
+export const registerQuoteBlock = () => registerBlockType( 'core/quote', {
 	title: __( 'Quote' ),
 	description: __( 'Quote. In quoting others, we cite ourselves. (Julio Cortázar)' ),
 	icon: 'format-quote',

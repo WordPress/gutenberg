@@ -10,7 +10,7 @@ import './editor.scss';
 import { registerBlockType, createBlock } from '../../api';
 import Editable from '../../editable';
 
-registerBlockType( 'core/preformatted', {
+export const registerPreformattedBlock = () => registerBlockType( 'core/preformatted', {
 	title: __( 'Preformatted' ),
 
 	description: __( 'Preformatted text keeps your spaces, tabs and linebreaks as they are.' ),

@@ -10,28 +10,30 @@ import './editor.scss';
 import { registerBlockType, setUnknownTypeHandlerName } from '../../api';
 import OldEditor from './old-editor';
 
-registerBlockType( 'core/freeform', {
-	title: __( 'Classic' ),
+export const registerFreeformBlock = () => {
+	registerBlockType( 'core/freeform', {
+		title: __( 'Classic' ),
 
-	desription: __( 'The classic editor, in block form.' ),
+		desription: __( 'The classic editor, in block form.' ),
 
-	icon: 'editor-kitchensink',
+		icon: 'editor-kitchensink',
 
-	category: 'formatting',
+		category: 'formatting',
 
-	attributes: {
-		content: {
-			type: 'string',
-			source: 'html',
+		attributes: {
+			content: {
+				type: 'string',
+				source: 'html',
+			},
 		},
-	},
 
-	edit: OldEditor,
+		edit: OldEditor,
 
-	save( { attributes } ) {
-		const { content } = attributes;
-		return content;
-	},
-} );
+		save( { attributes } ) {
+			const { content } = attributes;
+			return content;
+		},
+	} );
 
-setUnknownTypeHandlerName( 'core/freeform' );
+	setUnknownTypeHandlerName( 'core/freeform' );
+};

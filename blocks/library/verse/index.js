@@ -10,7 +10,7 @@ import './editor.scss';
 import { registerBlockType, createBlock } from '../../api';
 import Editable from '../../editable';
 
-registerBlockType( 'core/verse', {
+export const registerVerseBlock = () => registerBlockType( 'core/verse', {
 	title: __( 'Verse' ),
 
 	description: __( 'Write poetry and other literary expressions honoring all spaces and line-breaks.' ),

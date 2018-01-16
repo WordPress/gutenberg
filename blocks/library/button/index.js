@@ -173,7 +173,7 @@ const blockAttributes = {
 	},
 };
 
-registerBlockType( 'core/button', {
+export const registerButtonBlock = () => registerBlockType( 'core/button', {
 	title: __( 'Button' ),
 
 	description: __( 'A nice little button. Call something out with it.' ),

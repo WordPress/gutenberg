@@ -44,7 +44,7 @@ const blockAttributes = {
 	},
 };
 
-registerBlockType( 'core/pullquote', {
+export const registerPullquoteBlock = () => registerBlockType( 'core/pullquote', {
 
 	title: __( 'Pullquote' ),
 

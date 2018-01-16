@@ -6,7 +6,7 @@ import { shallow } from 'enzyme';
 /**
  * WordPress dependencies
  */
-import { getBlockType } from '@wordpress/blocks';
+import { getBlockType, registerCoreBlocks } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -14,6 +14,10 @@ import { getBlockType } from '@wordpress/blocks';
 import { VisualEditorInserter } from '../inserter';
 
 describe( 'VisualEditorInserter', () => {
+	beforeAll( () => {
+		registerCoreBlocks();
+	} );
+
 	it( 'should show controls when receiving focus', () => {
 		const clearSelectedBlock = jest.fn();
 		const wrapper = shallow( <VisualEditorInserter clearSelectedBlock={ clearSelectedBlock } /> );
