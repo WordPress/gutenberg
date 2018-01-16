@@ -30,6 +30,7 @@
 	"plugins": [
 		"wordpress",
 		"react",
+		"require-jsdoc-except",
 		"jsx-a11y",
 		"jest"
 	],
@@ -180,14 +181,17 @@
 		"template-curly-spacing": [ "error", "always" ],
 		"valid-jsdoc": [ "error", { "requireReturn": false } ],
 		"valid-typeof": "error",
-		"yoda": "off"
-	},
-	"overrides": [
-		{
-			"files": [ "{blocks,components,date,editor,element,i18n,data,utils}/**/test/*.js" ],
-			"rules": {
-				"require-jsdoc": "off"
-			}
-		}
-	]
+		"yoda": "off",
+		"require-jsdoc": "off",
+		"require-jsdoc-except/require-jsdoc": [ "error", {
+			"require": {
+				"FunctionDeclaration": true,
+				"MethodDefinition": false,
+				"ClassDeclaration": true,
+				"ArrowFunctionExpression": true,
+				"FunctionExpression": true
+			},
+			"ignore": ["constructor", "render"]
+		} ]
+	}
 }
