@@ -67,7 +67,7 @@ npm install
 
 # There was a bug in NPM that caused has changes in package-lock.json. Handle that.
 if [ "$TRAVIS" != "true" ] && ! git diff --exit-code package-lock.json >/dev/null; then
-	if ask "$(warning_message "There's an issue with your NPM cache, would you like to try and automatically clean it up?" )" N; then
+	if ask "$(warning_message "Your package-lock.json changed, which may mean there's an issue with your NPM cache. Would you like to try and automatically clean it up?" )" N 10; then
 		rm -rf node_modules/
 		npm cache clean --force >/dev/null 2>&1
 		git checkout package-lock.json
