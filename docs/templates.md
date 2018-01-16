@@ -69,9 +69,9 @@ Sometimes the intention might be to lock the template on the UI so that the bloc
 - `all` — prevents all operations.
 - `insert` — prevents inserting new blocks, but allows moving existing ones.
 
-## Default Post Types
+## Existing Post Types
 
-It is also possible to assign a template to a default post type like "posts" and "pages":
+It is also possible to assign a template to an existing post type like "posts" and "pages":
 
 ```php
 $post_type_object = get_post_type_object( 'post' );
