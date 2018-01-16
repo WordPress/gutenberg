@@ -39,6 +39,7 @@ import {
 	updateReusableBlock,
 	saveReusableBlock,
 	insertBlock,
+	toggleSavingBlocked,
 } from './actions';
 import {
 	getCurrentPost,
@@ -53,6 +54,7 @@ import {
 	getBlock,
 	getBlocks,
 	getReusableBlock,
+	isSavingBlocked,
 	POST_UPDATE_TRANSACTION_ID,
 } from './selectors';
 
@@ -156,6 +158,16 @@ export default {
 				'Post ' + post.id,
 				getPostEditUrl( post.id )
 			);
+		}
+	},
+	EDIT_POST( action, store ) {
+		if ( action.edits.hasOwnProperty( 'content' ) && ! isSavingBlocked( store.getState() ) ) {
+			return toggleSavingBlocked( true );
+		}
+	},
+	RESET_BLOCKS( action, store ) {
+		if ( isSavingBlocked( store.getState() ) ) {
+			return toggleSavingBlocked( false );
 		}
 	},
 	REQUEST_POST_UPDATE_FAILURE( action, store ) {

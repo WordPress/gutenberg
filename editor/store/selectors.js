@@ -378,15 +378,16 @@ export function isEditedPostPublishable( state ) {
 }
 
 /**
- * Returns true if the post can be saved, or false otherwise. A post must
- * contain a title, an excerpt, or non-empty content to be valid for save.
+ * Returns true if the post can be saved, or false otherwise. To be valid for
+ * save, a post must contain a non-empty title, an excerpt, or content, and
+ * save blocking must not be in effect.
  *
  * @param  {Object}  state Global application state
  *
  * @returns {Boolean} Whether the post can be saved.
  */
 export function isEditedPostSaveable( state ) {
-	return (
+	return ! isSavingBlocked( state ) && (
 		!! getEditedPostTitle( state ) ||
 		!! getEditedPostExcerpt( state ) ||
 		!! getEditedPostContent( state )
@@ -1248,4 +1249,14 @@ export function isPublishingPost( state ) {
 	// Consider as publishing when current post prior to request was not
 	// considered published
 	return !! stateBeforeRequest && ! isCurrentPostPublished( stateBeforeRequest );
+}
+
+/**
+ * Returns true if saving is currently blocked.
+ *
+ * @param  {Object}  state Global application state
+ * @return {Boolean}       Whether saving is blocked
+ */
+export function isSavingBlocked( state ) {
+	return !! state.saving.blocked;
 }

@@ -623,6 +623,16 @@ export function saving( state = {}, action ) {
 				successful: false,
 				error: action.error,
 			};
+
+		case 'TOGGLE_SAVING_BLOCKED':
+			if ( action.isBlocked === state.blocked ) {
+				return state;
+			}
+
+			return {
+				...state,
+				blocked: action.isBlocked,
+			};
 	}
 
 	return state;

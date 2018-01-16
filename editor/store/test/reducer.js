@@ -1127,6 +1127,29 @@ describe( 'state', () => {
 				},
 			} );
 		} );
+
+		it( 'should toggle blocking', () => {
+			const state = saving( undefined, {
+				type: 'TOGGLE_SAVING_BLOCKED',
+				isBlocked: true,
+			} );
+
+			expect( state ).toEqual( {
+				blocked: true,
+			} );
+		} );
+
+		it( 'should skip blocking toggle if the same', () => {
+			const original = deepFreeze( {
+				blocked: true,
+			} );
+			const state = saving( original, {
+				type: 'TOGGLE_SAVING_BLOCKED',
+				isBlocked: true,
+			} );
+
+			expect( state ).toBe( original );
+		} );
 	} );
 
 	describe( 'notices()', () => {
