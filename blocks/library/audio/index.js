@@ -118,7 +118,7 @@ registerBlockType( 'core/audio', {
 						key="placeholder"
 						icon="media-audio"
 						label={ __( 'Audio' ) }
-						instructions={ __( 'Select an audio file from your library, or upload a new one:' ) }
+						instructions={ __( 'Select an audio file from your library, or upload a new one' ) }
 						className={ className }>
 						<form onSubmit={ onSelectUrl }>
 							<input
