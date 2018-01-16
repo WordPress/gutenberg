@@ -61,6 +61,28 @@ export class InserterMenu extends Component {
 			filterValue: '',
 			tab: 'recent',
 		};
+		this.tabs = [
+			{
+				name: 'recent',
+				title: __( 'Recent' ),
+				className: 'editor-inserter__tab',
+			},
+			{
+				name: 'blocks',
+				title: __( 'Blocks' ),
+				className: 'editor-inserter__tab',
+			},
+			{
+				name: 'embeds',
+				title: __( 'Embeds' ),
+				className: 'editor-inserter__tab',
+			},
+			{
+				name: 'saved',
+				title: __( 'Saved' ),
+				className: 'editor-inserter__tab',
+			},
+		];
 		this.filter = this.filter.bind( this );
 		this.searchBlocks = this.searchBlocks.bind( this );
 		this.getBlocksForTab = this.getBlocksForTab.bind( this );
@@ -70,6 +92,7 @@ export class InserterMenu extends Component {
 
 		this.tabScrollTop = { recent: 0, blocks: 0, embeds: 0 };
 		this.switchTab = this.switchTab.bind( this );
+		this.validateTabs = this.validateTabs.bind( this );
 	}
 
 	componentDidMount() {
@@ -92,6 +115,24 @@ export class InserterMenu extends Component {
 		if ( this.state.tab !== prevState.tab ) {
 			this.tabContainer.scrollTop = this.tabScrollTop[ this.state.tab ];
 		}
+	}
+
+	componentWillUpdate( prevProps, prevState ) {
+		this.validateTabs();
+	}
+
+	validateTabs() {
+		this.tabs.map( ( tab, i ) => {
+			let blocks = this.getBlocksForTab( tab.name );
+
+			// a tab without blocks will go away
+			if ( blocks.length < 1 ) {
+				delete this.tabs[i];
+				return false;
+			}
+
+			return tab;
+		} );
 	}
 
 	isDisabledBlock( blockType ) {
@@ -345,28 +386,7 @@ export class InserterMenu extends Component {
 				{ ! isSearching &&
 					<TabPanel className="editor-inserter__tabs" activeClass="is-active"
 						onSelect={ this.switchTab }
-						tabs={ [
-							{
-								name: 'recent',
-								title: __( 'Recent' ),
-								className: 'editor-inserter__tab',
-							},
-							{
-								name: 'blocks',
-								title: __( 'Blocks' ),
-								className: 'editor-inserter__tab',
-							},
-							{
-								name: 'embeds',
-								title: __( 'Embeds' ),
-								className: 'editor-inserter__tab',
-							},
-							{
-								name: 'saved',
-								title: __( 'Saved' ),
-								className: 'editor-inserter__tab',
-							},
-						] }
+						tabs={ this.tabs }
 					>
 						{ ( tabKey ) => (
 							<div ref={ ( ref ) => this.tabContainer = ref }>
