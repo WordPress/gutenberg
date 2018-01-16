@@ -3,7 +3,6 @@
 	"parser": "babel-eslint",
 	"extends": [
 		"wordpress",
-		"plugin:wordpress/jsdoc",
 		"plugin:react/recommended",
 		"plugin:jsx-a11y/recommended",
 		"plugin:jest/recommended"
@@ -181,13 +180,5 @@
 		"valid-jsdoc": [ "error", { "requireReturn": false } ],
 		"valid-typeof": "error",
 		"yoda": "off"
-	},
-	"overrides": [
-		{
-			"files": [ "{blocks,components,date,editor,element,i18n,data,utils}/**/test/*.js" ],
-			"rules": {
-				"require-jsdoc": "off"
-			}
-		}
-	]
+	}
 }
