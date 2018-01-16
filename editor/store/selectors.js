@@ -18,7 +18,7 @@ import createSelector from 'rememo';
 /**
  * WordPress dependencies
  */
-import { serialize, getBlockType } from '@wordpress/blocks';
+import { serialize, getBlockType, getBlockTypes } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -1111,15 +1111,129 @@ export function getNotices( state ) {
 }
 
 /**
- * Resolves the list of recently used block names into a list of block type settings.
- *
- * @param {Object} state Global application state
- *
- * @returns {Array} List of recently used blocks.
+ * An item that appears in the inserter. Inserting this item will create a new
+ * block. Inserter items encapsulate both regular blocks and reusable blocks.
+ * 
+ * @typedef {Object} Editor.InserterItem
+ * @property {string}   name              The type of block to create.
+ * @property {Object}   initialAttributes Attributes to pass to the newly created block.
+ * @property {string}   title             Title of the item, as it appears in the inserter.
+ * @property {string}   icon              Dashicon for the item, as it appears in the inserter.
+ * @property {string}   category          Block category that the item is associated with.
+ * @property {string[]} keywords          Keywords that can be searched to find this item.
+ * @property {boolean}  isDisabled        Whether or not the user should be prevented from inserting this item.
  */
-export function getRecentlyUsedBlocks( state ) {
-	// resolves the block names in the state to the block type settings
-	return compact( state.preferences.recentlyUsedBlocks.map( blockType => getBlockType( blockType ) ) );
+
+/**
+ * Given a regular block type, constructs an item that appears in the inserter.
+ * 
+ * @param {Object}                state             Global application state.
+ * @param {string[]|boolean}      enabledBlockTypes Enabled block types, or true/false to enable/disable all types.
+ * @param {Object}                blockType         Block type, likely from getBlockType().
+ * @returns {Editor.InserterItem}                   Item that appears in inserter.
+ */
+function buildInserterItemFromBlockType( state, enabledBlockTypes, blockType ) {
+	if ( ! enabledBlockTypes || ! blockType ) {
+		return null;
+	}
+
+	const blockTypeIsDisabled = Array.isArray( enabledBlockTypes ) && ! enabledBlockTypes.includes( blockType.name );
+	if ( blockTypeIsDisabled ) {
+		return null;
+	}
+
+	if ( blockType.isPrivate ) {
+		return null;
+	}
+
+	return {
+		name: blockType.name,
+		initialAttributes: {},
+		title: blockType.title,
+		icon: blockType.icon,
+		category: blockType.category,
+		keywords: blockType.keywords,
+		isDisabled: !! blockType.useOnce && getBlocks( state ).some( block => block.name === blockType.name ),
+	};
+}
+
+/**
+ * Given a reusable block, constructs an item that appears in the inserter.
+ * 
+ * @param {string[]|boolean}      enabledBlockTypes Enabled block types, or true/false to enable/disable all types.
+ * @param {Object}                reusableBlock     Reusable block, likely from getReusableBlock().
+ * @returns {Editor.InserterItem}                   Item that appears in inserter.
+ */
+function buildInserterItemFromReusableBlock( enabledBlockTypes, reusableBlock ) {
+	if ( ! enabledBlockTypes || ! reusableBlock ) {
+		return null;
+	}
+
+	const blockTypeIsDisabled = Array.isArray( enabledBlockTypes ) && ! enabledBlockTypes.includes( 'core/block' );
+	if ( blockTypeIsDisabled ) {
+		return null;
+	}
+
+	const referencedBlockType = getBlockType( reusableBlock.type );
+	if ( ! referencedBlockType ) {
+		return null;
+	}
+
+	return {
+		name: 'core/block',
+		initialAttributes: { ref: reusableBlock.id },
+		title: reusableBlock.title,
+		icon: referencedBlockType.icon,
+		category: 'reusable-blocks',
+		keywords: [],
+		isDisabled: false,
+	};
+}
+
+/**
+ * Determines the items that appear in the the inserter. Includes both static
+ * items (e.g. a regular block type) and dynamic items (e.g. a reusable block).
+ * 
+ * @param {Object}                  state             Global application state.
+ * @param {string[]|boolean}        enabledBlockTypes Enabled block types, or true/false to enable/disable all types.
+ * @returns {Editor.InserterItem[]}                   Items that appear in inserter.
+ */
+export function getInserterItems( state, enabledBlockTypes = true ) {
+	if ( ! enabledBlockTypes ) {
+		return [];
+	}
+
+	const staticItems = getBlockTypes().map( blockType =>
+		buildInserterItemFromBlockType( state, enabledBlockTypes, blockType )
+	);
+
+	const dynamicItems = getReusableBlocks( state ).map( reusableBlock =>
+		buildInserterItemFromReusableBlock( enabledBlockTypes, reusableBlock )
+	);
+
+	const items = [ ...staticItems, ...dynamicItems ];
+	return compact( items );
+}
+
+/**
+ * Determines the items that appear in the 'Recent' tab of the inserter.
+ * 
+ * @param {Object}                  state             Global application state.
+ * @param {string[]|boolean}        enabledBlockTypes Enabled block types, or true/false to enable/disable all types.
+ * @returns {Editor.InserterItem[]}                   Items that appear in the 'Recent' tab.
+ */
+export function getRecentInserterItems( state, enabledBlockTypes = true ) {
+	if ( ! enabledBlockTypes ) {
+		return [];
+	}
+
+	const items = state.preferences.recentlyUsedBlocks.map( name =>
+		buildInserterItemFromBlockType( state, enabledBlockTypes, getBlockType( name ) )
+	);
+
+	// TODO: Merge in recently used reusable blocks
+
+	return compact( items );
 }
 
 /**

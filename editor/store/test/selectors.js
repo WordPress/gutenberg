@@ -7,7 +7,7 @@ import moment from 'moment';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+import { registerBlockType, unregisterBlockType, getBlockTypes } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -70,8 +70,9 @@ import {
 	didPostSaveRequestFail,
 	getSuggestedPostFormat,
 	getNotices,
+	getInserterItems,
 	getMostFrequentlyUsedBlocks,
-	getRecentlyUsedBlocks,
+	getRecentInserterItems,
 	getMetaBoxes,
 	getDirtyMetaBoxes,
 	getMetaBox,
@@ -97,6 +98,9 @@ describe( 'selectors', () => {
 			save: ( props ) => props.attributes.text,
 			category: 'common',
 			title: 'test block',
+			icon: 'test',
+			keywords: [ 'testing' ],
+			useOnce: true,
 		} );
 	} );
 
@@ -2248,7 +2252,107 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getRecentlyUsedBlocks', () => {
+	describe( 'getInserterItems', () => {
+		it( 'should list all non-private regular block types', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUid: {},
+						blockOrder: [],
+					},
+				},
+				reusableBlocks: {
+					data: {},
+				},
+			};
+
+			const blockTypes = getBlockTypes().filter( blockType => ! blockType.isPrivate );
+			expect( getInserterItems( state ) ).toHaveLength( blockTypes.length );
+		} );
+
+		it( 'should properly list a regular block type', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUid: {},
+						blockOrder: [],
+					},
+				},
+				reusableBlocks: {
+					data: {},
+				},
+			};
+
+			expect( getInserterItems( state, [ 'core/test-block' ] ) ).toEqual( [
+				{
+					name: 'core/test-block',
+					initialAttributes: {},
+					title: 'test block',
+					icon: 'test',
+					category: 'common',
+					keywords: [ 'testing' ],
+					isDisabled: false,
+				},
+			] );
+		} );
+
+		it( 'should set isDisabled when a regular block type with useOnce has been used', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUid: {
+							1: { uid: 1, name: 'core/test-block', attributes: {} },
+						},
+						blockOrder: [ 1 ],
+					},
+				},
+				reusableBlocks: {
+					data: {},
+				},
+			};
+
+			const items = getInserterItems( state, [ 'core/test-block' ] );
+			expect( items[ 0 ].isDisabled ).toBe( true );
+		} );
+
+		it( 'should properly list reusable blocks', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUid: {},
+						blockOrder: [],
+					},
+				},
+				reusableBlocks: {
+					data: {
+						123: {
+							id: 123,
+							title: 'My reusable block',
+							type: 'core/test-block',
+						},
+					},
+				},
+			};
+
+			expect( getInserterItems( state, [ 'core/block' ] ) ).toEqual( [
+				{
+					name: 'core/block',
+					initialAttributes: { ref: 123 },
+					title: 'My reusable block',
+					icon: 'test',
+					category: 'reusable-blocks',
+					keywords: [],
+					isDisabled: false,
+				},
+			] );
+		} );
+
+		it( 'should return nothing when all block types are disabled', () => {
+			expect( getInserterItems( {}, false ) ).toEqual( [] );
+		} );
+	} );
+
+	describe( 'getRecentInserterItems', () => {
 		it( 'should return the most recently used blocks', () => {
 			const state = {
 				preferences: {
@@ -2256,7 +2360,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getRecentlyUsedBlocks( state ).map( ( block ) => block.name ) )
+			expect( getRecentInserterItems( state ).map( ( item ) => item.name ) )
 				.toEqual( [ 'core/paragraph', 'core/image' ] );
 		} );
 	} );
