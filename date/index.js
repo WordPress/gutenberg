@@ -197,22 +197,24 @@ function setupLocale( settings ) {
 			LLL: settings.formats.datetime,
 			LLLL: null,
 		},
-		// From human_time_diff?
-		// Set to `(number, withoutSuffix, key, isFuture) => {}` instead.
+		// Required by humanTimeDiff() utility in this file.
+		// Maybe set to `(number, withoutSuffix, key, isFuture) => {}` in the future?
+		// i.e., Moment allows this to be a callback Function also: https://git.io/vN8EL
 		relativeTime: {
 			future: settings.l10n.relative.future,
 			past: settings.l10n.relative.past,
-			s: 'seconds',
-			m: 'a minute',
-			mm: '%d minutes',
-			h: 'an hour',
-			hh: '%d hours',
-			d: 'a day',
-			dd: '%d days',
-			M: 'a month',
-			MM: '%d months',
-			y: 'a year',
-			yy: '%d years',
+			s: settings.l10n.relative.s,
+			ss: settings.l10n.relative.ss,
+			m: settings.l10n.relative.m,
+			mm: settings.l10n.relative.mm,
+			h: settings.l10n.relative.h,
+			hh: settings.l10n.relative.hh,
+			d: settings.l10n.relative.d,
+			dd: settings.l10n.relative.dd,
+			M: settings.l10n.relative.M,
+			MM: settings.l10n.relative.MM,
+			y: settings.l10n.relative.y,
+			yy: settings.l10n.relative.yy,
 		},
 	} );
 	moment.locale( currentLocale );
@@ -333,7 +335,7 @@ export function humanTimeDiff( from, to, verbose = false ) {
 	const fromMoment = moment( from );
 	// Set the locale.
 	fromMoment.locale( window._wpDateSettings.l10n.locale );
-	// Format and return.
+	// Return human time difference.
 	return fromMoment.to( to, ! verbose ? true : false );
 }
 

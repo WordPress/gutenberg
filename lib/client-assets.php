@@ -114,6 +114,26 @@ function gutenberg_register_scripts_and_styles() {
 				'future' => __( '%s from now', 'default' ),
 				/* translators: %s: duration */
 				'past'   => __( '%s ago', 'default' ),
+
+				's'      => __( 'seconds', 'gutenberg' ),
+				'm'      => __( 'a minute', 'gutenberg' ),
+				'h'      => __( 'an hour', 'gutenberg' ),
+				'd'      => __( 'a day', 'gutenberg' ),
+				'M'      => __( 'a month', 'gutenberg' ),
+				'y'      => __( 'a year', 'gutenberg' ),
+
+				/* translators: %d: number of seconds */
+				'ss'     => __( '%d seconds', 'gutenberg' ),
+				/* translators: %d: number of minutes */
+				'mm'     => __( '%d minutes', 'gutenberg' ),
+				/* translators: %d: number of hours */
+				'hh'     => __( '%d hours', 'gutenberg' ),
+				/* translators: %d: number of days */
+				'dd'     => __( '%d days', 'gutenberg' ),
+				/* translators: %d: number of months */
+				'MM'     => __( '%d months', 'gutenberg' ),
+				/* translators: %d: number of years */
+				'yy'     => __( '%d years', 'gutenberg' ),
 			),
 		),
 		'formats'  => array(
