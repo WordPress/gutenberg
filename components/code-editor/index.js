@@ -2,104 +2,94 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { keycodes } from '@wordpress/utils';
+import { __ } from '@wordpress/i18n';
 
 /**
- * Module constants
+ * Internal dependencies
  */
-const { UP, DOWN } = keycodes;
+import CodeEditor from './editor';
+import Placeholder from '../placeholder';
+import Spinner from '../spinner';
 
-class CodeEditor extends Component {
+function loadScript() {
+	return new Promise( ( resolve, reject ) => {
+		const handles = [ 'wp-codemirror', 'code-editor', 'htmlhint', 'csslint', 'jshint' ];
+
+		// Don't load htmlhint-kses unless we need it
+		if ( window._wpGutenbergCodeEditorSettings.htmlhint.kses ) {
+			handles.push( 'htmlhint-kses' );
+		}
+
+		const script = document.createElement( 'script' );
+		script.src = `/wp-admin/load-scripts.php?load=${ handles.join( ',' ) }`;
+		script.onload = resolve;
+		script.onerror = reject;
+
+		document.head.appendChild( script );
+	} );
+}
+
+function loadStyle() {
+	return new Promise( ( resolve, reject ) => {
+		const handles = [ 'wp-codemirror', 'code-editor' ];
+
+		const style = document.createElement( 'link' );
+		style.rel = 'stylesheet';
+		style.href = `/wp-admin/load-styles.php?load=${ handles.join( ',' ) }`;
+		style.onload = resolve;
+		style.onerror = reject;
+
+		document.head.appendChild( style );
+	} );
+}
+
+let hasAlreadyLoadedAssets = false;
+
+function loadAssets() {
+	if ( hasAlreadyLoadedAssets ) {
+		return Promise.resolve();
+	}
+
+	return Promise.all( [ loadScript(), loadStyle() ] ).then( () => {
+		hasAlreadyLoadedAssets = true;
+	} );
+}
+
+class LazyCodeEditor extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.onFocus = this.onFocus.bind( this );
-		this.onBlur = this.onBlur.bind( this );
-		this.onCursorActivity = this.onCursorActivity.bind( this );
-		this.onKeyHandled = this.onKeyHandled.bind( this );
+		this.state = {
+			status: 'pending',
+		};
 	}
 
 	componentDidMount() {
-		const instance = wp.codeEditor.initialize( this.textarea );
-		this.editor = instance.codemirror;
-
-		this.editor.on( 'focus', this.onFocus );
-		this.editor.on( 'blur', this.onBlur );
-		this.editor.on( 'cursorActivity', this.onCursorActivity );
-		this.editor.on( 'keyHandled', this.onKeyHandled );
-
-		this.updateFocus();
-	}
-
-	componentDidUpdate( prevProps ) {
-		if ( this.props.value !== prevProps.value && this.editor.getValue() !== this.props.value ) {
-			this.editor.setValue( this.props.value );
-		}
-
-		if ( this.props.focus !== prevProps.focus ) {
-			this.updateFocus();
-		}
-	}
-
-	componentWillUnmount() {
-		this.editor.on( 'focus', this.onFocus );
-		this.editor.off( 'blur', this.onBlur );
-		this.editor.off( 'cursorActivity', this.onCursorActivity );
-		this.editor.off( 'keyHandled', this.onKeyHandled );
-
-		this.editor.toTextArea();
-		this.editor = null;
-	}
-
-	onFocus() {
-		if ( this.props.onFocus ) {
-			this.props.onFocus();
-		}
-	}
-
-	onBlur( editor ) {
-		if ( this.props.onChange ) {
-			this.props.onChange( editor.getValue() );
-		}
-	}
-
-	onCursorActivity( editor ) {
-		this.lastCursor = editor.getCursor();
-	}
-
-	onKeyHandled( editor, name, event ) {
-		/*
-		 * Pressing UP/DOWN should only move focus to another block if the cursor is
-		 * at the start or end of the editor.
-		 * 
-		 * We do this by stopping UP/DOWN from propagating if:
-		 *  - We know what the cursor was before this event; AND
-		 *  - This event caused the cursor to move 
-		 */
-		if ( event.keyCode === UP || event.keyCode === DOWN ) {
-			const areCursorsEqual = ( a, b ) => a.line === b.line && a.ch === b.ch;
-			if ( this.lastCursor && ! areCursorsEqual( editor.getCursor(), this.lastCursor ) ) {
-				event.stopImmediatePropagation();
+		loadAssets().then(
+			() => {
+				this.setState( { status: 'success' } );
+			},
+			() => {
+				this.setState( { status: 'error' } );
 			}
-		}
-	}
-
-	updateFocus() {
-		if ( this.props.focus && ! this.editor.hasFocus() ) {
-			// Need to wait for the next frame to be painted before we can focus the editor
-			window.requestAnimationFrame( () => {
-				this.editor.focus();
-			} );
-		}
-
-		if ( ! this.props.focus && this.editor.hasFocus() ) {
-			document.activeElement.blur();
-		}
+		);
 	}
 
 	render() {
-		return <textarea ref={ ref => ( this.textarea = ref ) } value={ this.props.value } />;
+		if ( this.state.status === 'pending' ) {
+			return (
+				<Placeholder>
+					<Spinner />
+				</Placeholder>
+			);
+		}
+
+		if ( this.state.status === 'error' ) {
+			return <Placeholder>{ __( 'An unknown error occurred.' ) }</Placeholder>;
+		}
+
+		return <CodeEditor { ...this.props } />;
 	}
 }
 
-export default CodeEditor;
+export default LazyCodeEditor;

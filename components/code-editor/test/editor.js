@@ -7,7 +7,7 @@ import { set, noop } from 'lodash';
 /**
  * Internal dependencies
  */
-import CodeEditor from '../';
+import CodeEditor from '../editor';
 
 describe( 'CodeEditor', () => {
 	it( 'should render without an error', () => {
