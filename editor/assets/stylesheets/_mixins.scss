@@ -121,31 +121,25 @@ $float-margin: calc( 50% - #{ $visual-editor-max-width-padding / 2 } );
 }
 
 @mixin button-style__hover {
-	color: $dark-gray-900;	// previously $blue-medium-500
+	color: $dark-gray-900;
 	box-shadow: inset 0 0 0 1px $light-gray-500, inset 0 0 0 2px $white;
 }
 
 @mixin button-style__focus-active() {
 	outline: none;
 	color: $dark-gray-900;
-	//box-shadow: inset 0 0 0 1px $dark-gray-500, inset 0 0 0 2px $white;
-	//background: $light-gray-300;
 	box-shadow: inset 0 0 0 1px $dark-gray-300, inset 0 0 0 2px $white;
 }
 
 @mixin button-style__active() {
 	outline: none;
 	color: $dark-gray-900;
-	//box-shadow: inset 0 0 0 1px $dark-gray-500, inset 0 0 0 2px $white;
-	//background: $light-gray-300;
 	box-shadow: inset 0 0 0 1px $dark-gray-400, inset 0 0 0 2px $white, 0 1px 1px rgba( $dark-gray-900, .2 );
 }
 
 @mixin tab-style__focus-active() {
 	outline: none;
 	color: $dark-gray-900;
-	//box-shadow: 0 0 0 1px $dark-gray-500;
-	//background: $light-gray-300;
 	box-shadow: inset 0 0 0 1px $dark-gray-300;
 }
 
