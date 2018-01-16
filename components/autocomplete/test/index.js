@@ -55,6 +55,7 @@ function makeAutocompleter( completers, AutocompleteComponent = Autocomplete ) {
 /**
  * Create a text node
  * @param {String} text text of text node.
+
  * @returns {Node} a text node.
  */
 function tx( text ) {
@@ -63,6 +64,7 @@ function tx( text ) {
 
 /**
  * Create a paragraph node with the arguments as children
+
  * @returns {Node} a paragraph node.
  */
 function par( /* arguments */ ) {
