@@ -1,13 +1,89 @@
 /**
+ * External dependencies
+ */
+import { extend } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
 
 /**
+ * Internal dependencies
+ */
+import withLazyDependencies from '../higher-order/with-lazy-dependencies';
+
+/**
  * Module constants
  */
 const { UP, DOWN } = keycodes;
+
+// TODO: How can we avoid repeating all of this?
+const defaultSettings = {
+	codemirror: {
+		indentUnit: 4,
+		indentWithTabs: true,
+		inputStyle: 'contenteditable',
+		lineNumbers: true,
+		lineWrapping: true,
+		styleActiveLine: true,
+		continueComments: true,
+		extraKeys: {
+			'Ctrl-Space': 'autocomplete',
+			'Ctrl-/': 'toggleComment',
+			'Cmd-/': 'toggleComment',
+			'Alt-F': 'findPersistent',
+		},
+		direction: 'ltr',
+		gutters: [ 'CodeMirror-lint-markers' ],
+		mode: 'htmlmixed',
+		lint: true,
+		autoCloseBrackets: true,
+		autoCloseTags: true,
+		matchTags: { bothTags: true },
+	},
+	csslint: {
+		errors: true,
+		'box-model': true,
+		'display-property-grouping': true,
+		'duplicate-properties': true,
+		'known-properties': true,
+		'outline-none': true,
+	},
+	htmlhint: {
+		'tagname-lowercase': true,
+		'attr-lowercase': true,
+		'attr-value-double-quotes': true,
+		'doctype-first': false,
+		'tag-pair': true,
+		'spec-char-escape': true,
+		'id-unique': true,
+		'src-not-empty': true,
+		'attr-no-duplication': true,
+		'alt-require': true,
+		'space-tab-mixed-disabled': 'tab',
+		'attr-unsafe-chars': true,
+	},
+	jshint: {
+		boss: true,
+		curly: true,
+		eqeqeq: true,
+		eqnull: true,
+		es3: true,
+		expr: true,
+		immed: true,
+		noarg: true,
+		nonbsp: true,
+		onevar: true,
+		quotmark: 'single',
+		trailing: true,
+		undef: true,
+		unused: true,
+		browser: true,
+		globals: { _: false, Backbone: false, jQuery: false, JSON: false, wp: false },
+	},
+};
 
 class CodeEditor extends Component {
 	constructor() {
@@ -20,6 +96,8 @@ class CodeEditor extends Component {
 	}
 
 	componentDidMount() {
+		extend( wp.codeEditor.defaultSettings, defaultSettings );
+
 		const instance = wp.codeEditor.initialize( this.textarea );
 		this.editor = instance.codemirror;
 
@@ -102,4 +180,15 @@ class CodeEditor extends Component {
 	}
 }
 
-export default CodeEditor;
+export default withLazyDependencies( {
+	scripts: [
+		'wp-codemirror',
+		'code-editor',
+		'htmlhint',
+		'csslint',
+		'jshint',
+		// TODO: Gotta check if user can unfiltered_html
+		...( true ? [ 'htmlhint-kses' ] : [] ),
+	],
+	styles: [ 'wp-codemirror', 'code-editor' ],
+} )( CodeEditor );
