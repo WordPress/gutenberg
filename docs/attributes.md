@@ -13,8 +13,6 @@ Under the hood, attribute sources are a superset of functionality provided by [h
 Use `attribute` to extract the value of an attribute from markup.
 
 _Example_: Extract the `src` attribute from an image found in the block's markup. 
-`default` parameter can be used to set a default value. 
-Images alt attribute default value should be set to `default: ''` (empty value) to follow WCAG criterias.
 
 ```js
 {
@@ -22,7 +20,6 @@ Images alt attribute default value should be set to `default: ''` (empty value) 
 		source: 'attribute',
 		selector: 'img',
 		attribute: 'src',
-		default: 'https://example.com/image.png',
 	}
 }
 // { "url": "https://lorempixel.com/1200/800/" }
