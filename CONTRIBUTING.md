@@ -59,3 +59,23 @@ If you'd like to contribute to the design or front-end, feel free to contribute 
 Documentation is automatically synced from master to the [Gutenberg Documentation Website](https://wordpress.org/gutenberg/handbook/) every 15 minutes.
 
 To add a new documentation page, you'll have to create a Markdown file in the [docs](https://github.com/WordPress/gutenberg/tree/master/docs) folder and add an item to the [manifest file](https://github.com/WordPress/gutenberg/blob/master/docs/manifest.json).
+
+### In Code Documentation
+
+This project uses [JSDoc](http://usejsdoc.org/) for doc blocks. Inline code should be used for describing individual pieces in detail. The in code documentation will hopefully in the future be repurposed for [the WordPress code reference](https://developer.wordpress.org/reference/). If you would like to help contribute to the in code documentation, try adding a JSDoc header to something that needs one! It would be greatly appreciated!
+
+In code documentation priorities:
+
+- Exports ( Any pieces exported by a file, especially ones that are available as part of a module's public interface. )
+- Selectors
+- Higher Order Components
+- Components ( These are often exports )
+- Redux related pieces ( i.e. Actions, Action Creators, Reducers, Effects )
+
+#### Documenting Components
+
+To better document components, provide the following information in a README.md in the component's folder:
+
+- Description
+- Usage ( Code example )
+- Properties ( if applicable )
