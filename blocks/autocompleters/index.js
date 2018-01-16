@@ -123,7 +123,7 @@ export function userAutocompleter() {
 	};
 
 	const onSelect = ( user ) => {
-		return <span className="wp-user-mention">{ '@' + user.slug }</span>;
+		return ( '@' + user.slug );
 	};
 
 	return {
