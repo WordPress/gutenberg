@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { first } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -250,6 +251,21 @@ export const settings = {
 				),
 			},
 		],
+		to: [ 'left', 'center', 'right' ].map( ( value ) => ( {
+			type: 'shortcut',
+			shortcut: value.charAt( 0 ),
+			transform( attributes ) {
+				const firstAlign = first( attributes ).align;
+				const isSame = attributes.every( ( { align } ) => align === firstAlign );
+
+				// If already aligned, set back to default.
+				if ( isSame && firstAlign === value ) {
+					return { align: undefined };
+				}
+
+				return { align: value };
+			},
+		} ) ),
 	},
 
 	merge( attributes, attributesToMerge ) {

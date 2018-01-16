@@ -22,7 +22,7 @@ import 'element-closest';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { serialize, getPossibleShortcutTransformations, getBlockType } from '@wordpress/blocks';
+import { serialize, getPossibleShortcutTransformations } from '@wordpress/blocks';
 import { keycodes } from '@wordpress/utils';
 
 /**
@@ -286,29 +286,29 @@ class BlockList extends Component {
 	onKeyDown( event ) {
 		const { onReplace, onChange } = this.props;
 
+		if ( ! this.shortcutTransforms ) {
+			return;
+		}
+
 		if ( ! isAccess( event ) ) {
 			return;
 		}
 
-		if ( this.commonName ) {
-			const blockType = getBlockType( this.commonName );
-			const transform = find( blockType.shortcuts || [], ( { shortcut } ) => isAccess( event, shortcut ) );
+		const transform = find( this.shortcutTransforms, ( { shortcut } ) => isAccess( event, shortcut ) );
 
-			if ( transform ) {
-				this.blocks.forEach( ( { uid } ) => {
-					onChange( uid, transform.attributes );
-				} );
-			}
+		if ( ! transform ) {
+			return;
 		}
 
-		if ( this.shortcutTransforms ) {
-			const transform = find( this.shortcutTransforms, ( { shortcut } ) => isAccess( event, shortcut ) );
+		const result = transform.transform( this.blocks.map( ( { attributes } ) => attributes ) );
 
-			if ( transform ) {
-				const blocks = castArray( transform.transform( this.blocks.map( ( { attributes } ) => attributes ) ) );
-
-				onReplace( this.blocks.map( ( { uid } ) => uid ), blocks );
-			}
+		// Check if we received blocks or attributes.
+		if ( result.uid || Array.isArray( result ) ) {
+			onReplace( this.blocks.map( ( { uid } ) => uid ), castArray( result ) );
+		} else {
+			this.blocks.forEach( ( { uid } ) => {
+				onChange( uid, result );
+			} );
 		}
 	}
 

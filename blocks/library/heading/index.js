@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { first } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -108,44 +113,39 @@ export const settings = {
 			...'23456'.split( '' ).map( ( level ) => ( {
 				type: 'shortcut',
 				shortcut: level,
-				transform( blockAttributes ) {
-					return blockAttributes.map( ( { content, nodeName } ) => {
-						if ( nodeName === `H${ level }` ) {
+				transform( attributes ) {
+					const firstNodeName = first( attributes ).nodeName;
+					const isSame = attributes.every( ( { nodeName } ) => nodeName === firstNodeName );
+
+					// If already at level, set back to paragraphs.
+					if ( isSame && firstNodeName === `H${ level }` ) {
+						return attributes.map( ( { content } ) => {
 							return createBlock( 'core/paragraph', {
 								content,
 							} );
-						}
-
-						return createBlock( 'core/heading', {
-							nodeName: `H${ level }`,
-							content,
 						} );
-					} );
+					}
+
+					return { nodeName: `H${ level }` };
+				},
+			} ) ),
+			...[ 'left', 'center', 'right' ].map( ( value ) => ( {
+				type: 'shortcut',
+				shortcut: value.charAt( 0 ),
+				transform( attributes ) {
+					const firstAlign = first( attributes ).align;
+					const isSame = attributes.every( ( { align } ) => align === firstAlign );
+
+					// If already aligned, set back to default.
+					if ( isSame && firstAlign === value ) {
+						return { align: undefined };
+					}
+
+					return { align: value };
 				},
 			} ) ),
 		],
 	},
-
-	shortcuts: [
-		{
-			shortcut: 'l',
-			attributes: {
-				align: 'left',
-			},
-		},
-		{
-			shortcut: 'c',
-			attributes: {
-				align: 'center',
-			},
-		},
-		{
-			shortcut: 'r',
-			attributes: {
-				align: 'right',
-			},
-		},
-	],
 
 	merge( attributes, attributesToMerge ) {
 		return {

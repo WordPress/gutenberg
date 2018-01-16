@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, compact, get, initial, last, isEmpty } from 'lodash';
+import { find, compact, get, initial, last, isEmpty, first } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -139,10 +139,25 @@ export const settings = {
 			...[ 'OL', 'UL' ].map( ( tag ) => ( {
 				type: 'shortcut',
 				shortcut: tag.charAt( 0 ).toLowerCase(),
-				transform( blockAttributes ) {
+				transform( attributes ) {
+					const firstNodeName = first( attributes ).nodeName;
+					const isSame = attributes.every( ( { nodeName } ) => nodeName === firstNodeName );
+
+					// All lists already with tag, set back to paragraphs.
+					if ( isSame && firstNodeName === tag ) {
+						return attributes.reduce( ( acc, { values } ) => [
+							...acc,
+							...compact( values.map( ( value ) => get( value, 'props.children', null ) ) )
+								.map( ( content ) => createBlock( 'core/paragraph', {
+									content: [ content ],
+								} ) ),
+						], [] );
+					}
+
+					// Merge list.
 					return createBlock( 'core/list', {
-						nodeName: 'OL',
-						values: blockAttributes.reduce( ( acc, { values } ) => [ ...acc, ...values ], [] ),
+						nodeName: tag,
+						values: attributes.reduce( ( acc, { values } ) => [ ...acc, ...values ], [] ),
 					} );
 				},
 			} ) ),
