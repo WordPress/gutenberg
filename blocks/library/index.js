@@ -23,3 +23,4 @@ import './video';
 import './audio';
 import './block';
 import './paragraph';
+import './search';

@@ -1,0 +1,28 @@
+.editor-block-list__block[data-type="core/search"] {
+
+	.search-form {
+
+		.search-label {
+			display: block;
+			margin: 0 0 0.3em;
+		}
+
+		.search-field {
+			display: block;
+			width: 100%;
+			background: #fff;
+			border: 1px solid #bbb;
+			border-radius: 3px;
+			padding: 0.7em;
+			margin: 0;
+		}
+
+		.search-submit {
+			display: inline-block;
+			width: auto;
+			text-align: center;
+			padding: 0.5em 0.8em;
+			margin: 0.7em 0 0;
+		}
+	}
+}
