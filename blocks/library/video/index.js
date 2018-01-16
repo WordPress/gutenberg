@@ -15,7 +15,7 @@ import { Component } from '@wordpress/element';
 import './style.scss';
 import './editor.scss';
 import { registerBlockType } from '../../api';
-import MediaUploadButton from '../../media-upload-button';
+import MediaUpload from '../../media-upload';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
@@ -134,14 +134,16 @@ registerBlockType( 'core/video', {
 								{ __( 'Use URL' ) }
 							</Button>
 						</form>
-						<MediaUploadButton
-							buttonProps={ { isLarge: true } }
+						<MediaUpload
 							onSelect={ onSelectVideo }
 							type="video"
 							id={ id }
-						>
-							{ __( 'Add from Media Library' ) }
-						</MediaUploadButton>
+							render={ ( { open } ) => (
+								<Button isLarge onClick={ open } >
+									{ __( 'Add from Media Library' ) }
+								</Button>
+							) }
+						/>
 					</Placeholder>,
 				];
 			}

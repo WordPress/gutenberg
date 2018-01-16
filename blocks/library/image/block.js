@@ -17,7 +17,7 @@ import { __ } from '@wordpress/i18n';
 import { Component, compose } from '@wordpress/element';
 import { createMediaFromFile, getBlobByURL, revokeBlobURL, viewPort } from '@wordpress/utils';
 import {
-	Dashicon,
+	IconButton,
 	Toolbar,
 	withAPIData,
 	withContext,
@@ -28,7 +28,7 @@ import {
  */
 import Editable from '../../editable';
 import ImagePlaceHolder from '../../image-placeholder';
-import MediaUploadButton from '../../media-upload-button';
+import MediaUpload from '../../media-upload';
 import InspectorControls from '../../inspector-controls';
 import TextControl from '../../inspector-controls/text-control';
 import SelectControl from '../../inspector-controls/select-control';
@@ -116,7 +116,6 @@ class ImageBlock extends Component {
 		const figureStyle = width ? { width } : {};
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && ( ! viewPort.isExtraSmall() );
 
-		const editButtonLabel = __( 'Edit image' );
 		const controls = (
 			focus && (
 				<BlockControls key="controls">
@@ -126,18 +125,19 @@ class ImageBlock extends Component {
 					/>
 
 					<Toolbar>
-						<MediaUploadButton
-							buttonProps={ {
-								className: 'components-icon-button components-toolbar__control',
-								'aria-label': editButtonLabel,
-							} }
+						<MediaUpload
 							onSelect={ this.onSelectImage }
 							type="image"
 							value={ id }
-							tooltip={ editButtonLabel }
-						>
-							<Dashicon icon="edit" />
-						</MediaUploadButton>
+							render={ ( { open } ) => (
+								<IconButton
+									className="components-toolbar__control"
+									label={ __( 'Edit image' ) }
+									icon="edit"
+									onClick={ open }
+								/>
+							) }
+						/>
 						<UrlInputButton onChange={ this.onSetHref } url={ href } />
 					</Toolbar>
 				</BlockControls>
