@@ -30,9 +30,10 @@ const element = (
 				<ModeSwitcher onSelect={ onClose } />
 				<div className="editor-ellipsis-menu__separator" />
 				<FixedToolbarToggle onToggle={ onClose } />
+				{ /* Plugins component renders it's own divider, because it may not show. */ }
+				<Plugins onSelect={ onClose } />
 				<div className="editor-ellipsis-menu__separator" />
 				<EditorActions />
-				<Plugins onSelect={ onClose } />
 			</div>
 		) }
 	/>
