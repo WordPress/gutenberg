@@ -21,6 +21,10 @@ const { setTimeout } = window;
 
 const { ESCAPE, ENTER, SPACE, BACKSPACE } = keycodes;
 
+const setSafeTimeout = ( editor, callback ) => {
+	return setTimeout( () => ! editor.removed && callback() );
+};
+
 export default function( editor ) {
 	const getContent = this.getContent.bind( this );
 	const { onReplace } = this.props;
@@ -64,9 +68,9 @@ export default function( editor ) {
 			enter();
 		// Wait for the browser to insert the character.
 		} else if ( keyCode === SPACE ) {
-			setTimeout( () => searchFirstText( spacePatterns ) );
+			setSafeTimeout( editor, () => searchFirstText( spacePatterns ) );
 		} else if ( keyCode > 47 && ! ( keyCode >= 91 && keyCode <= 93 ) ) {
-			setTimeout( inline );
+			setSafeTimeout( editor, inline );
 		}
 	}, true );
 
