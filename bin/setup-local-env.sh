@@ -12,14 +12,13 @@ cd "$(dirname "$0")/.."
 # Check Docker is installed and running
 . "$(dirname "$0")/install-docker.sh"
 
-GUTENBERG=$(cat <<EOT
-,---.     |              |                   
-|  _..   .|--- ,---.,---.|---.,---.,---.,---.
-|   ||   ||    |---'|   ||   ||---'|    |   |
-\`---'\`---'\`---'\`---'\`   '\`---'\`---'\`    \`---|
-                                        \`---'
+! read -d '' GUTENBERG <<"EOT"
+,⁻⁻⁻.       .                 |
+|  _. .   . |---  ,---. ,---. |---. ,---. ,---. ,---.
+|   | |   | |     |---' |   | |   | |---' |     |   |
+`---' `---' `---’ `---’ '   ` `---' `---’ `     `---|
+                                                `---'
 EOT
-)
 
 CURRENT_URL=$(docker run -it --rm --volumes-from wordpress-dev --network container:wordpress-dev wordpress:cli option get siteurl)
 CURRENT_URL="${CURRENT_URL//[[:space:]]/}"
