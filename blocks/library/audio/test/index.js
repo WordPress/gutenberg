@@ -4,7 +4,7 @@
 import '../';
 import { blockEditRender } from 'blocks/test/helpers';
 
-jest.mock( 'blocks/media-upload-button', () => () => '*** Mock(Media upload button) ***' );
+jest.mock( 'blocks/media-upload', () => () => '*** Mock(Media upload button) ***' );
 
 describe( 'core/audio', () => {
 	test( 'block edit matches snapshot', () => {

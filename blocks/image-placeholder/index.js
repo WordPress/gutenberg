@@ -1,14 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { DropZone, FormFileUpload, Placeholder } from '@wordpress/components';
+import { DropZone, FormFileUpload, Placeholder, Button } from '@wordpress/components';
 import { mediaUpload } from '@wordpress/utils';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import MediaUploadButton from '../media-upload-button';
+import MediaUpload from '../media-upload';
 
 /**
  *  ImagePlaceHolder is a react component used by blocks containing user configurable images e.g: image and cover image.
@@ -38,13 +38,15 @@ export default function ImagePlaceHolder( { className, icon, label, onSelectImag
 			>
 				{ __( 'Upload' ) }
 			</FormFileUpload>
-			<MediaUploadButton
-				buttonProps={ { isLarge: true } }
+			<MediaUpload
 				onSelect={ onSelectImage }
 				type="image"
-			>
-				{ __( 'Add from Media Library' ) }
-			</MediaUploadButton>
+				render={ ( { open } ) => (
+					<Button isLarge onClick={ open }>
+						{ __( 'Add from Media Library' ) }
+					</Button>
+				) }
+			/>
 		</Placeholder>
 	);
 }
