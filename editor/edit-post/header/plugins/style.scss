@@ -1,0 +1,25 @@
+.components-choice-menu-plugins {
+	width: 100%;
+	padding: 10px;
+}
+
+.components-choice-menu-plugins__label {
+	margin-bottom: 10px;
+	color: $dark-gray-300;
+}
+
+.components-menu-item-plugins__button,
+.components-menu-item-plugins__button.components-icon-button {
+	width: 100%;
+	padding: 8px 0;
+	text-align: left;
+	color: $dark-gray-500;
+
+	.dashicon {
+		margin-right: 5px;
+	}
+
+	&:hover {
+		color: $black;
+	}
+}

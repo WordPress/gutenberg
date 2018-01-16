@@ -8,11 +8,12 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { MenuItemsGroup } from '@wordpress/components';
+import { NavigableMenu, withInstanceId, IconButton } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
+import './style.scss';
 import { getEllipsisMenuItems } from '../../../api/ellipsis-menu';
 
 /**
@@ -27,6 +28,10 @@ function Plugins( props ) {
 	if ( isEmpty( ellipsisMenuItems ) ) {
 		return null;
 	}
+
+	const {
+		instanceId,
+	} = props;
 
 	/**
 	 * Handles the user clicking on one of the plugins in the menu
@@ -45,23 +50,43 @@ function Plugins( props ) {
 		return {
 			value: menuItem.name,
 			label: menuItem.title,
+			icon: menuItem.icon,
 		};
 	} );
+
+	const labelId = `components-choice-menu-plugins-label-${ instanceId }`;
 
 	return [
 		<div
 			key="plugins-separator"
 			className="editor-ellipsis-menu__separator" />,
-		<MenuItemsGroup
+		<div
 			key="plugins-menu-items"
-			label={ __( 'Plugins' ) }
-			choices={ plugins }
-			onSelect={ onSelect } />,
+			className="components-choice-menu-plugins" >
+			<div className="components-choice-menu-plugins__label">{ __( 'Plugins' ) }</div>
+			<NavigableMenu orientation="vertical" aria-labelledby={ labelId }>
+				{
+					plugins.map( plugin => {
+						return (
+							<IconButton
+								key={ plugin.value }
+								className="components-menu-item-plugins__button"
+								icon={ plugin.icon || 'yes-alt' }
+								onClick={ () => onSelect( plugin.value ) }>
+								{ plugin.label }
+							</IconButton>
+						);
+					} )
+				}
+			</NavigableMenu>
+		</div>,
 	];
 }
 
-export default connect(
-	( state ) => {
-		return state;
-	}
-)( Plugins );
+export default withInstanceId(
+	connect(
+		( state ) => {
+			return state;
+		}
+	)( Plugins )
+);

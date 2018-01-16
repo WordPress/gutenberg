@@ -5,6 +5,7 @@ import isFunction from 'lodash/isFunction';
 
 /* Internal dependencies */
 import { applyFilters } from '@wordpress/hooks';
+import { isString } from 'util';
 
 const menuItems = {};
 
@@ -16,7 +17,9 @@ const menuItems = {};
  *                                     `[namespace]/[name]` format.
  * @param {Object}   settings          The settings for this menu item.
  * @param {string}   settings.title    The name to show in the settings menu.
- * @param {func}     settings.callback The callback function that is called when the menu item is clicked.
+ * @param {func}     settings.callback The callback function that is called 
+ *                                     when the menu item is clicked.
+ * @param {string}   [settings.icon]   SVG Icon url.
  *
  * @returns {Object} The final sidebar settings object.
  */
@@ -66,6 +69,13 @@ export function registerEllipsisMenuItem( name, settings ) {
 	if ( ! isFunction( settings.callback ) ) {
 		console.error(
 			'Menu item callback must be a function'
+		);
+		return null;
+	}
+
+	if ( settings.icon && ! isString( settings.icon ) ) {
+		console.error(
+			'Menu item icon must be string'
 		);
 		return null;
 	}
