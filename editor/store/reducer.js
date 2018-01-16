@@ -578,6 +578,8 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 					[ action.feature ]: ! state.features[ action.feature ],
 				},
 			};
+		case 'REDUX_SERIALIZE':
+			return omit( state, [ 'sidebars.mobile', 'sidebars.publish' ] );
 	}
 
 	return state;
