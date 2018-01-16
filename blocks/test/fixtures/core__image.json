@@ -5,8 +5,9 @@
         "isValid": true,
         "attributes": {
             "url": "https://cldup.com/uuUqE_dXzy.jpg",
-            "caption": []
+            "caption": [],
+            "alt": ""
         },
-        "originalContent": "<figure class=\"wp-block-image\"><img src=\"https://cldup.com/uuUqE_dXzy.jpg\" /></figure>"
+        "originalContent": "<figure class=\"wp-block-image\"><img src=\"https://cldup.com/uuUqE_dXzy.jpg\" alt=\"\" /></figure>"
     }
 ]

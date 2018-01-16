@@ -35,6 +35,7 @@ registerBlockType( 'core/image', {
 			source: 'attribute',
 			selector: 'img',
 			attribute: 'alt',
+			default: '',
 		},
 		caption: {
 			type: 'array',
