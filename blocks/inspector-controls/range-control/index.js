@@ -10,24 +10,24 @@ import { __ } from '@wordpress/i18n';
 import BaseControl from './../base-control';
 import './style.scss';
 
-function RangeControl( { label, value, instanceId, onChange, beforeIcon, afterIcon, help, allowReset, showNumber=true, ...props } ) {
+function RangeControl( { label, value, instanceId, onChange, beforeIcon, afterIcon, help, allowReset, showNumber = true, ...props } ) {
 	const id = 'inspector-range-control-' + instanceId;
 	const onChangeValue = ( event ) => onChange( Number( event.target.value ) );
 
-  function renderNumber() {
-    if(!showNumber) {
-      return null
-    }
-    return (
-      <input
-        className="blocks-range-control__number"
-        type="number"
-        onChange={ onChangeValue }
-        value={ value }
-        { ...props }
-      />
-    )
-  }
+	function renderNumber() {
+		if ( ! showNumber ) {
+			return null;
+		}
+		return (
+			<input
+				className="blocks-range-control__number"
+				type="number"
+				onChange={ onChangeValue }
+				value={ value }
+				{ ...props }
+			/>
+		);
+	}
 
 	return (
 		<BaseControl label={ label } id={ id } help={ help } className="blocks-range-control">
@@ -41,7 +41,7 @@ function RangeControl( { label, value, instanceId, onChange, beforeIcon, afterIc
 				aria-describedby={ !! help ? id + '__help' : undefined }
 				{ ...props } />
 			{ afterIcon && <Dashicon icon={ afterIcon } /> }
-			{renderNumber()}
+			{ renderNumber() }
 			{ allowReset &&
 				<Button onClick={ () => onChange() } disabled={ value === undefined }>
 					{ __( 'Reset' ) }
