@@ -23,7 +23,7 @@ const inlineWhitelist = {
 	em: {},
 	del: {},
 	ins: {},
-	a: { attributes: [ 'href' ] },
+	a: { attributes: [ 'href', 'target', 'rel' ] },
 	code: {},
 	abbr: { attributes: [ 'title' ] },
 	sub: {},
