@@ -324,3 +324,20 @@ export function isInputField( { nodeName, contentEditable } ) {
 		contentEditable === 'true'
 	);
 }
+
+/**
+ * Check wether the current document has a selection.
+ * This checks both for focus in an input field and general text selection.
+ *
+ * @returns {Boolean} True if there is selection, false if not.
+ */
+export function documentHasSelection() {
+	if ( isInputField( document.activeElement ) ) {
+		return true;
+	}
+
+	const selection = window.getSelection();
+	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+
+	return range && ! range.collapsed;
+}
