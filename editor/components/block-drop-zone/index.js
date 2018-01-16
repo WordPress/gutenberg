@@ -44,7 +44,7 @@ function BlockDropZone( { index, isLocked, ...props } ) {
 		}
 	};
 
-	const onDrop = ( event, position ) => {
+	const reorderBlock = ( event, position ) => {
 		if ( index !== undefined && event.dataTransfer ) {
 			try {
 				const { uid, fromIndex, type } = JSON.parse( event.dataTransfer.getData( 'text' ) );
@@ -69,7 +69,7 @@ function BlockDropZone( { index, isLocked, ...props } ) {
 	return (
 		<DropZone
 			onFilesDrop={ dropFiles }
-			onDrop={ onDrop }
+			onDrop={ reorderBlock }
 		/>
 	);
 }

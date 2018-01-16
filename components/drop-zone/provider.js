@@ -177,10 +177,14 @@ class DropZoneProvider extends Component {
 			return;
 		}
 
-		if ( event.dataTransfer && !! dropzone && !! dropzone.onFilesDrop ) {
-			if ( event.dataTransfer.files && event.dataTransfer.files.length ) {
-				dropzone.onFilesDrop( Array.prototype.slice.call( event.dataTransfer.files ), position );
-			}
+		if (
+			!! dropzone &&
+			!! dropzone.onFilesDrop &&
+			event.dataTransfer &&
+			event.dataTransfer.files &&
+			event.dataTransfer.files.length
+		) {
+			dropzone.onFilesDrop( Array.prototype.slice.call( event.dataTransfer.files ), position );
 		}
 
 		event.stopPropagation();

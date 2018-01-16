@@ -103,14 +103,14 @@ export class BlockListBlock extends Component {
 		this.maybeStartTyping = this.maybeStartTyping.bind( this );
 		this.stopTypingOnMouseMove = this.stopTypingOnMouseMove.bind( this );
 		this.mergeBlocks = this.mergeBlocks.bind( this );
+		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
+		this.reorderBlock = this.reorderBlock.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onBlockError = this.onBlockError.bind( this );
-		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
 		this.onTouchStart = this.onTouchStart.bind( this );
 		this.onClick = this.onClick.bind( this );
-		this.onDrop = this.onDrop.bind( this );
 		this.onDragStart = this.onDragStart.bind( this );
 		this.onDragEnd = this.onDragEnd.bind( this );
 
@@ -359,16 +359,16 @@ export class BlockListBlock extends Component {
 		const block = document.getElementById( `block-${ this.props.uid }` );
 
 		// Closure to remove the cloned node from the DOM (fired within timeout below)
-		const removeBlockClone = ( _blockList, _cloneWrapper ) => {
+		const removeBlockClone = ( blockList, cloneWrapper ) => {
 			return () => {
-				_blockList.removeChild( _cloneWrapper );
+				blockList.removeChild( cloneWrapper );
 			};
 		};
 
 		// Closure to hide the visible block and show inset in its place (fired within timeout below)
 		const showInset = () => {
 			return () => {
-				this.setState( state => Object.assign( {}, state, { dragging: true } ) );
+				this.setState( { dragging: true } );
 				document.body.classList.add( 'dragging' );
 			};
 		};
@@ -419,11 +419,11 @@ export class BlockListBlock extends Component {
 				top
 			);
 
-			setTimeout( removeBlockClone( blockList, cloneWrapper ) );
+			setTimeout( removeBlockClone( blockList, cloneWrapper ), 0 );
 		}
 
 		// Hide the visible block and show inset in its place.
-		setTimeout( showInset() );
+		setTimeout( showInset(), 0 );
 	}
 
 	onDragEnd() {
@@ -432,7 +432,7 @@ export class BlockListBlock extends Component {
 
 		const resetBlockDisplay = () => {
 			return () => {
-				this.setState( state => Object.assign( {}, state, { dragging: false } ) );
+				this.setState( { dragging: false } );
 				document.body.classList.remove( 'dragging' );
 			};
 		}
@@ -440,7 +440,7 @@ export class BlockListBlock extends Component {
 		setTimeout( resetBlockDisplay(), 0 );
 	}
 
-	onDrop( uid, toIndex ) {
+	reorderBlock( uid, toIndex ) {
 		this.props.moveBlockToIndex( uid, toIndex );
 	}
 
@@ -504,7 +504,7 @@ export class BlockListBlock extends Component {
 
 				<BlockDropZone
 					index={ order }
-					onDrop={ this.onDrop }
+					onDrop={ this.reorderBlock }
 				/>
 
 				{ ( showUI || isHovered ) &&
