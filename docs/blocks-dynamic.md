@@ -89,7 +89,14 @@ Because it is a dynamic block it also needs a server component. The rendering ca
 <?php
 // block.php
 
-function my_plugin_render_block_latest_post( $attributes ) {
+/**
+ * Renders the Latest Post block output for given attributes and content.
+ *
+ * @param array       $attributes Block attributes.
+ * @param string|null $content    Raw block content, or null if none set.
+ * @return string Rendered output.
+ */
+function my_plugin_render_block_latest_post( $attributes, $content ) {
 	$recent_posts = wp_get_recent_posts( array(
 		'numberposts' => 1,
 		'post_status' => 'publish',
