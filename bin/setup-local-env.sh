@@ -3,6 +3,9 @@
 # Exit if any command fails
 set -e
 
+# Include useful functions
+. "$(dirname "$0")/includes.sh"
+
 # Change to the expected directory
 cd "$(dirname "$0")/.."
 
@@ -25,4 +28,4 @@ CURRENT_URL="${CURRENT_URL//[[:space:]]/}"
 
 echo -e "\nWelcome to...\n"
 echo -e "\033[95m$GUTENBERG\033[0m"
-echo -e "Run \033[32mnpm run dev\033[0m, then open \033[32m$CURRENT_URL\033[0m to get started!"
+echo -e "Run $(action_format "npm run dev"), then open $(action_format "$CURRENT_URL") to get started!"

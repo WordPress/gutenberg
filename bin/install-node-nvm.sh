@@ -29,10 +29,12 @@ if [ "$TRAVIS" != "true" ] && ! command_exists "nvm"; then
 		echo ' done!'
 
 		echo -e $(warning_message "NVM was updated, please run this command to reload it:" )
-		echo -e $(warning_message ". \$HOME/.nvm/nvm.sh" )
+		echo -e $(warning_message "$(action_format ". \$HOME/.nvm/nvm.sh")" )
 		echo -e $(warning_message "After that, re-run the setup script to continue." )
 	else
-		echo -e $(error_message "Please install NVM manually, then re-run the setup script to continue. NVM installation instructions can be found here: https://github.com/creationix/nvm")
+		echo -e $(error_message "")
+		echo -e $(error_message "Please install NVM manually, then re-run the setup script to continue.")
+		echo -e $(error_message "NVM installation instructions can be found here: $(action_format "https://github.com/creationix/nvm")")
 	fi
 
 	exit 1
@@ -44,7 +46,7 @@ if [ "$TRAVIS" != "true" ] && [ $NVM_VERSION != "v$(nvm --version)" ]; then
 	echo ' done!'
 
 	echo -e $(warning_message "NVM was updated, please run this command to reload it:" )
-	echo -e $(warning_message ". \$HOME/.nvm/nvm.sh" )
+	echo -e $(warning_message "$(action_format ". \$HOME/.nvm/nvm.sh")" )
 	echo -e $(warning_message "After that, re-run the setup script to continue." )
 	exit 1
 fi
@@ -56,7 +58,7 @@ if [ "$TRAVIS" != "true" ] && [ "$(nvm current)" != "$(nvm version-remote --lts)
 	echo ' done!'
 
 	echo -e $(warning_message "A new node version was install, please run this command to use it:" )
-	echo -e $(warning_message "nvm use" )
+	echo -e $(warning_message "$(action_format "nvm use")" )
 	echo -e $(warning_message "After that, re-run the setup script to continue." )
 	exit 1
 fi
@@ -81,5 +83,7 @@ if [ "$TRAVIS" != "true" ] && ! git diff --exit-code package-lock.json >/dev/nul
 		else
 			echo -e $(error_message "We were unable to clean the NPM cache, please manually review the changes to package-lock.json. Continuing with the setup process..." )
 		fi
+	else
+		echo -e $(warning_message "Please manually review the changes to package-lock.json. Continuing with the setup process..." )
 	fi
 fi

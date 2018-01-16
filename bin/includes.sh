@@ -112,6 +112,15 @@ status_message() {
 }
 
 ##
+# Add formatting to an action string.
+#
+# @param {string} message The string to add formatting to.
+##
+action_format() {
+	echo -en "\033[32m$1\033[0m"
+}
+
+##
 # Check if the command exists as some sort of executable.
 #
 # The executable form of the command could be an alias, function, builtin, executable file or shell keyword.
