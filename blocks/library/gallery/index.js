@@ -42,6 +42,7 @@ registerBlockType( 'core/gallery', {
 				alt: {
 					source: 'attribute',
 					attribute: 'alt',
+					default: '',
 				},
 				id: {
 					source: 'attribute',

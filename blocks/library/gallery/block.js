@@ -9,12 +9,12 @@ import { filter } from 'lodash';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { mediaUpload } from '@wordpress/utils';
-import { Dashicon, DropZone, Toolbar, Placeholder, FormFileUpload } from '@wordpress/components';
+import { IconButton, Button, DropZone, Toolbar, Placeholder, FormFileUpload } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import MediaUploadButton from '../../media-upload-button';
+import MediaUpload from '../../media-upload';
 import InspectorControls from '../../inspector-controls';
 import RangeControl from '../../inspector-controls/range-control';
 import ToggleControl from '../../inspector-controls/toggle-control';
@@ -146,7 +146,6 @@ class GalleryBlock extends Component {
 			/>
 		);
 
-		const editButtonLabel = __( 'Edit Gallery' );
 		const controls = (
 			focus && (
 				<BlockControls key="controls">
@@ -156,20 +155,21 @@ class GalleryBlock extends Component {
 					/>
 					{ !! images.length && (
 						<Toolbar>
-							<MediaUploadButton
-								buttonProps={ {
-									className: 'components-icon-button components-toolbar__control',
-									'aria-label': editButtonLabel,
-								} }
+							<MediaUpload
 								onSelect={ this.onSelectImages }
 								type="image"
 								multiple
 								gallery
 								value={ images.map( ( img ) => img.id ) }
-								tooltip={ editButtonLabel }
-							>
-								<Dashicon icon="edit" />
-							</MediaUploadButton>
+								render={ ( { open } ) => (
+									<IconButton
+										className="components-toolbar__control"
+										label={ __( 'Edit Gallery' ) }
+										icon="edit"
+										onClick={ open }
+									/>
+								) }
+							/>
 						</Toolbar>
 					) }
 				</BlockControls>
@@ -177,8 +177,6 @@ class GalleryBlock extends Component {
 		);
 
 		if ( images.length === 0 ) {
-			const uploadButtonProps = { isLarge: true };
-
 			return [
 				controls,
 				<Placeholder
@@ -197,15 +195,17 @@ class GalleryBlock extends Component {
 					>
 						{ __( 'Upload' ) }
 					</FormFileUpload>
-					<MediaUploadButton
-						buttonProps={ uploadButtonProps }
+					<MediaUpload
 						onSelect={ this.onSelectImages }
 						type="image"
 						multiple
 						gallery
-					>
-						{ __( 'Add from Media Library' ) }
-					</MediaUploadButton>
+						render={ ( { open } ) => (
+							<Button isLarge onClick={ open }>
+								{ __( 'Add from Media Library' ) }
+							</Button>
+						) }
+					/>
 				</Placeholder>,
 			];
 		}

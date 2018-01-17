@@ -10,7 +10,8 @@ import { partial, castArray } from 'lodash';
  *
  * @param  {Object} post     Post object
  * @param  {Object} settings Editor settings object
- * @returns {Object}         Action object
+ *
+ * @returns {Object} Action object.
  */
 export function setupEditor( post, settings ) {
 	return {

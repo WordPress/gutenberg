@@ -51,6 +51,19 @@ $scheme-sunrise__spot-color: #de823f;
 				border-color: $spot-color;
 			}
 		}
+
+		// Saving state indicators
+		.editor-post-publish-button.is-saving,
+		.editor-post-publish-button.is-saving:disabled {
+			// Yes, these need to be !important because they !important upstream too ¯\_(ツ)_/¯
+			border-color: darken( $spot-color, 10 ) darken( $spot-color, 20 ) darken( $spot-color, 20 ) !important;
+			box-shadow: 0 1px 0 darken( $spot-color, 20 ) !important;
+			text-shadow: 0 -1px 1px darken( $spot-color, 20 ), 1px 0 1px darken( $spot-color, 20 ), 0 1px 1px darken( $spot-color, 20 ), -1px 0 1px darken( $spot-color, 20 ) !important;
+
+			&:before {
+				background-image: repeating-linear-gradient( -45deg, darken( $spot-color, 20 ), darken( $spot-color, 20 ) 11px, darken( $spot-color, 10 ) 10px, darken( $spot-color, 10 ) 20px );
+			}
+		}
 	}
 }
 
