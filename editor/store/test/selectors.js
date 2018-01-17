@@ -1930,7 +1930,6 @@ describe( 'selectors', () => {
 		it( 'should return the uid of the selected block', () => {
 			const state = {
 				currentPost: {},
-				preferences: { mode: 'visual' },
 				blockSelection: {
 					start: 2,
 					end: 2,
@@ -1952,7 +1951,6 @@ describe( 'selectors', () => {
 
 		it( 'should return the assigned insertion point', () => {
 			const state = {
-				preferences: { mode: 'visual' },
 				blockSelection: {},
 				editor: {
 					present: {
@@ -1969,7 +1967,6 @@ describe( 'selectors', () => {
 
 		it( 'should return the last multi selected uid', () => {
 			const state = {
-				preferences: { mode: 'visual' },
 				blockSelection: {
 					start: 1,
 					end: 2,
@@ -1987,23 +1984,7 @@ describe( 'selectors', () => {
 
 		it( 'should return the last block if no selection', () => {
 			const state = {
-				preferences: { mode: 'visual' },
 				blockSelection: { start: null, end: null },
-				editor: {
-					present: {
-						blockOrder: [ 1, 2, 3 ],
-					},
-				},
-				blockInsertionPoint: {},
-			};
-
-			expect( getBlockInsertionPoint( state ) ).toBe( 3 );
-		} );
-
-		it( 'should return the last block for the text mode', () => {
-			const state = {
-				preferences: { mode: 'text' },
-				blockSelection: { start: 2, end: 2 },
 				editor: {
 					present: {
 						blockOrder: [ 1, 2, 3 ],

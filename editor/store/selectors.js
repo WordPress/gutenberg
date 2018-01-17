@@ -941,10 +941,6 @@ export function isTyping( state ) {
  * @returns {?String} Unique ID after which insertion will occur.
  */
 export function getBlockInsertionPoint( state ) {
-	if ( getEditorMode( state ) !== 'visual' ) {
-		return state.editor.present.blockOrder.length;
-	}
-
 	const position = getBlockSiblingInserterPosition( state );
 	if ( null !== position ) {
 		return position;
