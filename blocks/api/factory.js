@@ -150,8 +150,7 @@ export function getPossibleBlockTransformations( blocks ) {
  * @return {Array}       Array of transforms.
  */
 export function getPossibleShortcutTransformations( name ) {
-	const transformsFrom = getBlockTypes()
-		.reduce( ( acc, blockType ) => [ ...acc, ...get( blockType, 'transforms.from', [] ) ], [] )
+	const transformsFrom = flatMap( getBlockTypes(), ( blockType ) => get( blockType, 'transforms.from', [] ) )
 		.filter( isTransformForBlockSource( name, 'shortcut', false ) );
 	const transformsTo = get( getBlockType( name ), 'transforms.to', [] )
 		.filter( ( { type } ) => type === 'shortcut' );

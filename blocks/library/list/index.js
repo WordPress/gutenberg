@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, compact, get, initial, last, isEmpty, first, map } from 'lodash';
+import { find, compact, get, initial, last, isEmpty, first, map, flatMap } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -152,19 +152,19 @@ export const settings = {
 
 					// All lists already with tag, set back to paragraphs.
 					if ( isSame && firstNodeName === tag ) {
-						return blocks.reduce( ( acc, { attributes: { values } } ) => [
-							...acc,
-							...compact( values.map( ( value ) => get( value, 'props.children', null ) ) )
+						return flatMap( blocks, ( { attributes: { values } } ) =>
+							compact( values.map( ( value ) => get( value, 'props.children', null ) ) )
 								.map( ( content ) => createBlock( 'core/paragraph', {
 									content: [ content ],
 								} ) ),
-						], [] );
+						);
 					}
 
 					// Merge list.
 					return createBlock( 'core/list', {
 						nodeName: tag,
-						values: blocks.reduce( ( acc, { attributes: { values } } ) => [ ...acc, ...values ], [] ),
+						values: flatMap( blocks, ( { attributes: { values } } ) => values )
+							.map( ( value, i ) => <li key={ i }>{ get( value, 'props.children', null ) }</li> ),
 					} );
 				},
 			} ) ),
