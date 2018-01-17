@@ -22,7 +22,7 @@ class MetaBoxesArea extends Component {
 	 */
 	constructor() {
 		super( ...arguments );
-		this.bindNode = this.bindNode.bind( this );
+		this.bindContainerNode = this.bindContainerNode.bind( this );
 	}
 
 	/**
@@ -30,14 +30,18 @@ class MetaBoxesArea extends Component {
 	 */
 	componentDidMount() {
 		this.form = document.querySelector( '.metabox-location-' + this.props.location );
-		this.node.appendChild( this.form );
+		if ( this.form ) {
+			this.container.appendChild( this.form );
+		}
 	}
 
 	/**
 	 * Get the meta box location form from the original location.
 	 */
 	componentWillUnmount() {
-		document.querySelector( '#metaboxes' ).appendChild( this.form );
+		if ( this.form ) {
+			document.querySelector( '#metaboxes' ).appendChild( this.form );
+		}
 	}
 
 	/**
@@ -45,8 +49,8 @@ class MetaBoxesArea extends Component {
 	 *
 	 * @param {Element} node DOM Node.
 	 */
-	bindNode( node ) {
-		this.node = node;
+	bindContainerNode( node ) {
+		this.container = node;
 	}
 
 	/**
@@ -66,7 +70,7 @@ class MetaBoxesArea extends Component {
 		return (
 			<div className={ classes }>
 				{ isSaving && <Spinner /> }
-				<div className="editor-meta-boxes-area__container" ref={ this.bindNode } />
+				<div className="editor-meta-boxes-area__container" ref={ this.bindContainerNode } />
 				<div className="editor-meta-boxes-area__clear" />
 			</div>
 		);
