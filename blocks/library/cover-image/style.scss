@@ -1,16 +1,18 @@
 .wp-block-cover-image {
 	position: relative;
 	background-size: cover;
-	height: 430px;
+	min-height: 430px;
 	width: 100%;
-	margin: 0;
+	margin: 0 0 1.5em 0;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 
 	&.has-left-content {
 		justify-content: flex-start;
-		h2 {
+
+		h2,
+		.wp-block-cover-image-text {
 			margin-left: 0;
 			text-align: left;
 		}
@@ -18,17 +20,21 @@
 
 	&.has-right-content {
 		justify-content: flex-end;
-		h2 {
+
+		h2,
+		.wp-block-cover-image-text {
 			margin-right: 0;
 			text-align: right;
 		}
 	}
 
-	h2 {
+	h2,
+	.wp-block-cover-image-text {
 		color: white;
-		font-size: 24pt;
-		line-height: 1em;
+		font-size: 2em;
+		line-height: 1.25;
 		z-index: 1;
+		margin-bottom: 0;
 		max-width: $visual-editor-max-width;
 		padding: $block-padding;
 		text-align: center;
@@ -45,7 +51,7 @@
 		left: 0;
 		bottom: 0;
 		right: 0;
-		background: rgba( black, 0.5 );
+		background-color: rgba( black, 0.5 );
 	}
 
 	@for $i from 1 through 10 {

@@ -8,7 +8,7 @@ window._wpGutenbergPost.title = {
 window._wpGutenbergPost.content = {
 	raw: [
 		'<!-- wp:cover-image {"url":"https://cldup.com/Fz-ASbo2s3.jpg","align":"wide"} -->',
-		'<section class="wp-block-cover-image has-background-dim alignwide" style="background-image:url(https://cldup.com/Fz-ASbo2s3.jpg)"><h2>Of Mountains &amp; Printing Presses</h2></section>',
+		'<div class="wp-block-cover-image has-background-dim alignwide" style="background-image:url(https://cldup.com/Fz-ASbo2s3.jpg)"><p>Of Mountains &amp; Printing Presses</p></div>',
 		'<!-- /wp:cover-image -->',
 
 		'<!-- wp:paragraph -->',

@@ -3,10 +3,10 @@
         "blockName": "core/cover-image",
         "attrs": {
             "url": "https://cldup.com/uuUqE_dXzy.jpg",
-            "dimRatio": 40
+            "dimRatio": 50
         },
         "innerBlocks": [],
-        "innerHTML": "\n<section class=\"wp-block-cover-image has-background-dim-40 has-background-dim\" style=\"background-image:url(https://cldup.com/uuUqE_dXzy.jpg)\">\n    <h2>Guten Berg!</h2>\n</section>\n"
+        "innerHTML": "\n<div class=\"wp-block-cover-image has-background-dim\" style=\"background-image:url(https://cldup.com/uuUqE_dXzy.jpg)\">\n<p class=\"wp-block-cover-image-text\">Guten Berg!</p>\n</div>\n"
     },
     {
         "attrs": {},
