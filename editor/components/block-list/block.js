@@ -515,7 +515,14 @@ export class BlockListBlock extends Component {
 						uids={ [ block.uid ] }
 					/>
 				}
-				{ ( showUI || isHovered ) && <BlockSettingsMenu uids={ [ block.uid ] } /> }
+				{ ( showUI || isHovered ) &&
+					<BlockSettingsMenu
+						draggable={ true }
+						onDragStart={ this.onDragStart }
+						onDragEnd={ this.onDragEnd }
+						uids={ [ block.uid ] }
+					/>
+				}
 				{ showUI && isValid && showContextualToolbar && <BlockContextualToolbar /> }
 				{ isFirstMultiSelected && <BlockMultiControls /> }
 				<div

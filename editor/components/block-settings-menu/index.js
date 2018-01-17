@@ -22,7 +22,7 @@ import ReusableBlockToggle from './reusable-block-toggle';
 import UnknownConverter from './unknown-converter';
 import { selectBlock } from '../../store/actions';
 
-function BlockSettingsMenu( { uids, onSelect, focus } ) {
+function BlockSettingsMenu( { uids, onSelect, focus, ...additionalProps } ) {
 	const count = uids.length;
 
 	return (
@@ -30,6 +30,9 @@ function BlockSettingsMenu( { uids, onSelect, focus } ) {
 			className="editor-block-settings-menu"
 			contentClassName="editor-block-settings-menu__popover"
 			position="bottom left"
+			draggable={ additionalProps.draggable }
+			onDragStart={ additionalProps.onDragStart }
+			onDragEnd={ additionalProps.onDragEnd }
 			renderToggle={ ( { onToggle, isOpen } ) => {
 				const toggleClassname = classnames( 'editor-block-settings-menu__toggle', {
 					'is-opened': isOpen,
@@ -37,6 +40,9 @@ function BlockSettingsMenu( { uids, onSelect, focus } ) {
 
 				return (
 					<IconButton
+						draggable={ additionalProps.draggable }
+						onDragStart={ additionalProps.onDragStart }
+						onDragEnd={ additionalProps.onDragEnd }
 						className={ toggleClassname }
 						onClick={ () => {
 							if ( uids.length === 1 ) {
