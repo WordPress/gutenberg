@@ -1,16 +1,16 @@
 {
-  "env": {
-    "jest": true,
-    "node": true
-  },
-  "extends": [
-    "plugin:wordpress/recommended",
-    "plugin:jest/recommended"
-  ],
-  "parserOptions": {
-    "sourceType": "module"
-  },
-  "plugins": [
-    "jest"
-  ]
+	"env": {
+		"jest": true,
+		"node": true
+	},
+	"extends": [
+		"plugin:wordpress/recommended",
+		"plugin:jest/recommended"
+	],
+	"parserOptions": {
+		"sourceType": "module"
+	},
+	"plugins": [
+		"jest"
+	]
 }
