@@ -447,9 +447,9 @@ export function removeNotice( id ) {
  *
  * This indicates that the sidebar has a meta box but the normal area does not.
  *
- * @param   {Object} metaBoxes Whether meta box locations are active.
+ * @param {Object} metaBoxes Whether meta box locations are active.
  *
- * @returns {Object}           Action object.
+ * @returns {Object} Action object.
  */
 export function initializeMetaBoxState( metaBoxes ) {
 	return {
@@ -487,7 +487,7 @@ export function metaBoxUpdatesSuccess() {
  * @param   {Object} dataPerLocation Meta Boxes Data per location.
  * @returns {Object}                 Action object.
  */
-export function metaBoxSetSavedData( dataPerLocation ) {
+export function setMetaBoxSavedData( dataPerLocation ) {
 	return {
 		type: 'META_BOX_SET_SAVED_DATA',
 		dataPerLocation,

@@ -40,7 +40,7 @@ import {
 	updateReusableBlock,
 	saveReusableBlock,
 	insertBlock,
-	metaBoxSetSavedData,
+	setMetaBoxSavedData,
 } from './actions';
 import {
 	getCurrentPost,
@@ -466,7 +466,7 @@ export default {
 			}
 			return memo;
 		}, {} );
-		store.dispatch( metaBoxSetSavedData( dataPerLocation ) );
+		store.dispatch( setMetaBoxSavedData( dataPerLocation ) );
 	},
 	REQUEST_META_BOX_UPDATES( action, store ) {
 		const dataPerLocation = reduce( getMetaBoxes( store.getState() ), ( memo, metabox, location ) => {
@@ -475,7 +475,7 @@ export default {
 			}
 			return memo;
 		}, {} );
-		store.dispatch( metaBoxSetSavedData( dataPerLocation ) );
+		store.dispatch( setMetaBoxSavedData( dataPerLocation ) );
 
 		// To save the metaboxes, we serialize each one of the location forms and combine them
 		// We also add the "common" hidden fields from the base .metabox-base-form
