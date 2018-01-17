@@ -100,6 +100,18 @@ export const settings = {
 				type: 'raw',
 				isMatch: ( node ) => node.nodeName === 'BLOCKQUOTE',
 			},
+			{
+				type: 'shortcut',
+				blocks: [ 'core/paragraph' ],
+				shortcut: 'q',
+				transform( multiAttributes ) {
+					return createBlock( 'core/quote', {
+						value: multiAttributes.map( ( { content, i } ) => ( {
+							children: <p key={ i }>{ content }</p>,
+						} ) ),
+					} );
+				},
+			},
 		],
 		to: [
 			{
@@ -148,6 +160,28 @@ export const settings = {
 					return createBlock( 'core/heading', {
 						content: textContent,
 					} );
+				},
+			},
+			{
+				type: 'shortcut',
+				blocks: [ 'core/paragraph' ],
+				shortcut: 'q',
+				transform( multiAttributes ) {
+					return multiAttributes.reduce( ( acc, { value, citation } ) => {
+						value.forEach( ( paragraph ) => {
+							acc.push( createBlock( 'core/paragraph', {
+								content: [ get( paragraph, 'children.props.children', '' ) ],
+							} ) );
+						} );
+
+						if ( citation ) {
+							acc.push( createBlock( 'core/paragraph', {
+								content: citation
+							} ) );
+						}
+
+						return acc;
+					}, [] );
 				},
 			},
 		],
