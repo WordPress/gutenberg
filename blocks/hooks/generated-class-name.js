@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { uniq } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -26,24 +27,24 @@ import { hasBlockSupport, getBlockDefaultClassname } from '../api';
 export function addGeneratedClassName( extraProps, blockType ) {
 	// Adding the generated className
 	if ( hasBlockSupport( blockType, 'className', true ) ) {
-		const blockDefaultClassname = getBlockDefaultClassname( blockType.name );
 
-		const blockDefaultClassnameIsDupe = ( typeof( extraProps.className ) === 'string' &&
-												extraProps.className.search( blockDefaultClassname ) !== -1 );
+		if ( typeof extraProps.className === 'string' ) {
+			// We have some extra classes and want to add the default classname
+			// We use uniq to prevent duplicate classnames
 
-		if ( ! blockDefaultClassnameIsDupe ) {
-			/**
-			 * The block default classname has not been found in the
-			 * existing className string. This is not a duplicate class,
-			 * we can add the blockDefaultClassname to the set of classes.
-			 */
-			const updatedClassName = classnames(
-				blockDefaultClassname,
-				extraProps.className,
-			);
+			extraProps.className = uniq( [
+				getBlockDefaultClassname( blockType.name ),
+				...extraProps.className.split( ' ' ),
+			] ).join( ' ' );
 
-			extraProps.className = updatedClassName;
+		} else {
+
+			// There is no string in the className variable,
+			// so we just dump the default name in there
+			extraProps.className = getBlockDefaultClassname( blockType.name );
+
 		}
+
 	}
 
 	return extraProps;
