@@ -192,6 +192,9 @@ export default class RichText extends Component {
 	onInit() {
 		this.updateFocus();
 		this.registerCustomFormatters();
+
+		// Remove all default block-level shortcuts.
+		'123456789'.split( '' ).forEach( ( number ) => this.editor.shortcuts.remove( `access+${ number }` ) );
 	}
 
 	adaptFormatter( options ) {
