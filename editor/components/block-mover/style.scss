@@ -67,6 +67,22 @@
 	.editor-inserter__toggle {
 		width: $icon-button-size-small;
 		padding: 2px;
+
+		// Adjust inserter design
+		box-shadow: inset 0 0 0 1px $light-gray-500;
+
+		// Hide the outer ring on the inserter, to visually lighten it
+		&:before {
+			content: '';
+			position: absolute;
+			top: 2px;
+			right: 2px;
+			bottom: 2px;
+			left: 2px;
+			display: block;
+			border: 4px solid $white;
+			border-radius: 50%;
+		}
 	}
 
 	.editor-inserter {
