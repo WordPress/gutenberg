@@ -10,6 +10,7 @@ import { noop } from 'lodash';
 import { InserterMenu, searchItems } from '../menu';
 
 const textItem = {
+	id: 'core/text-block',
 	name: 'core/text-block',
 	initialAttributes: {},
 	title: 'Text',
@@ -18,6 +19,7 @@ const textItem = {
 };
 
 const advancedTextItem = {
+	id: 'core/advanced-text-block',
 	name: 'core/advanced-text-block',
 	initialAttributes: {},
 	title: 'Advanced Text',
@@ -26,6 +28,7 @@ const advancedTextItem = {
 };
 
 const someOtherItem = {
+	id: 'core/some-other-block',
 	name: 'core/some-other-block',
 	initialAttributes: {},
 	title: 'Some Other Block',
@@ -34,6 +37,7 @@ const someOtherItem = {
 };
 
 const moreItem = {
+	id: 'core/more-block',
 	name: 'core/more-block',
 	initialAttributes: {},
 	title: 'More',
@@ -42,6 +46,7 @@ const moreItem = {
 };
 
 const youtubeItem = {
+	id: 'core-embed/youtube',
 	name: 'core-embed/youtube',
 	initialAttributes: {},
 	title: 'YouTube',
@@ -51,6 +56,7 @@ const youtubeItem = {
 };
 
 const textEmbedItem = {
+	id: 'core-embed/a-text-embed',
 	name: 'core-embed/a-text-embed',
 	initialAttributes: {},
 	title: 'A Text Embed',
@@ -59,6 +65,7 @@ const textEmbedItem = {
 };
 
 const reusableItem = {
+	id: 'core/block/123',
 	name: 'core/block',
 	initialAttributes: { ref: 123 },
 	title: 'My reusable block',

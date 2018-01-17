@@ -1115,6 +1115,7 @@ export function getNotices( state ) {
  * block. Inserter items encapsulate both regular blocks and reusable blocks.
  * 
  * @typedef {Object} Editor.InserterItem
+ * @property {string}   id                Unique identifier for the item.
  * @property {string}   name              The type of block to create.
  * @property {Object}   initialAttributes Attributes to pass to the newly created block.
  * @property {string}   title             Title of the item, as it appears in the inserter.
@@ -1147,6 +1148,7 @@ function buildInserterItemFromBlockType( state, enabledBlockTypes, blockType ) {
 	}
 
 	return {
+		id: blockType.name,
 		name: blockType.name,
 		initialAttributes: {},
 		title: blockType.title,
@@ -1180,6 +1182,7 @@ function buildInserterItemFromReusableBlock( enabledBlockTypes, reusableBlock ) 
 	}
 
 	return {
+		id: `core/block/${ reusableBlock.id }`,
 		name: 'core/block',
 		initialAttributes: { ref: reusableBlock.id },
 		title: reusableBlock.title,

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEqual, find } from 'lodash';
+import { isEqual } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -29,9 +29,13 @@ export default class InserterGroup extends Component {
 	componentWillReceiveProps( nextProps ) {
 		if ( ! isEqual( this.props.items, nextProps.items ) ) {
 			this.activeItems = deriveActiveItems( nextProps.items );
+
 			// Try and preserve any still valid selected state.
-			const current = find( this.activeItems, ( item ) => isEqual( item, this.state.current ) );
-			if ( ! current ) {
+			const currentIsStillActive = this.state.current && this.activeItems.some( item =>
+				item.id === this.state.current.id
+			);
+
+			if ( ! currentIsStillActive ) {
 				this.setState( {
 					current: this.activeItems.length > 0 ? this.activeItems[ 0 ] : null,
 				} );
@@ -39,17 +43,19 @@ export default class InserterGroup extends Component {
 		}
 	}
 
-	renderItem( item, index ) {
+	renderItem( item ) {
 		const { current } = this.state;
 		const { onSelectItem } = this.props;
+
+		const isCurrent = current && current.id === item.id;
 
 		return (
 			<button
 				role="menuitem"
-				key={ index }
+				key={ item.id }
 				className="editor-inserter__block"
 				onClick={ () => onSelectItem( item ) }
-				tabIndex={ isEqual( current, item ) || item.isDisabled ? null : '-1' }
+				tabIndex={ isCurrent || item.isDisabled ? null : '-1' }
 				disabled={ item.isDisabled }
 			>
 				<BlockIcon icon={ item.icon } />

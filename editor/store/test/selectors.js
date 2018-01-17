@@ -2285,6 +2285,7 @@ describe( 'selectors', () => {
 
 			expect( getInserterItems( state, [ 'core/test-block' ] ) ).toEqual( [
 				{
+					id: 'core/test-block',
 					name: 'core/test-block',
 					initialAttributes: {},
 					title: 'test block',
@@ -2336,6 +2337,7 @@ describe( 'selectors', () => {
 
 			expect( getInserterItems( state, [ 'core/block' ] ) ).toEqual( [
 				{
+					id: 'core/block/123',
 					name: 'core/block',
 					initialAttributes: { ref: 123 },
 					title: 'My reusable block',
