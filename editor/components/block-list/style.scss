@@ -52,7 +52,7 @@
 		content: '';
 		position: absolute;
 		height: 36px;
-		top: 10px;
+		top: 8px;
 	}
 
 	&.is-selected > .editor-block-mover:before,
@@ -297,7 +297,7 @@
 	// Left side UI
 	> .editor-block-mover {
 		left: $block-mover-margin;
-		padding-top: 4px;
+		padding-top: 3px;
 		z-index: z-index( '.editor-block-mover' );
 
 		// Mobile
