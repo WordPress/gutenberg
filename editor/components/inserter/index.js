@@ -36,7 +36,7 @@ class Inserter extends Component {
 			insertIndex,
 			onToggle,
 		} = this.props;
-		console.log( 'isOpen', isOpen );
+
 		if ( isOpen ) {
 			this.props.showInsertionPoint( insertIndex );
 		} else {

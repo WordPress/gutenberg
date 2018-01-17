@@ -47,3 +47,10 @@
 		@include button-style__focus-active;
 	}
 }
+
+.editor-block-mover .editor-inserter {
+	position: absolute;
+	// fixme, should be variables
+	left: -36px;
+	top: 8px;
+}

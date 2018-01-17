@@ -356,16 +356,7 @@
 }
 
 .editor-block-list__insertion-point {
-	position: absolute;
-	bottom: 0;
-	top: auto;
-	left: 0;
-	right: 0;
-
-	@include break-small {
-		left: $block-mover-padding-visible;
-		right: $block-mover-padding-visible;
-	}
+	position: relative;
 
 	&:before {
 		position: absolute;
@@ -459,22 +450,6 @@
 			vertical-align: bottom;
 		}
 	}
-}
-
-.editor-block-list__block.is-last > .editor-block-mover {
-	display: none;
-}
-
-.editor-block-list__block.is-last > .editor-block-list__sibling-inserter {
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	width: $block-mover-padding-visible;
-}
-
-.editor-block-list__block.is-last.is-selected > .editor-block-list__sibling-inserter .editor-inserter__toggle {
-	opacity: 1;
 }
 
 .editor-block-list__block > .editor-block-list__sibling-inserter {

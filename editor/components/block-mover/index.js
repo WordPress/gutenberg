@@ -11,6 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { IconButton, withContext } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import { compose } from '@wordpress/element';
+import VisualEditorInserter from '../inserter';
 
 /**
  * Internal dependencies
@@ -61,6 +62,7 @@ export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, block
 				) }
 				aria-disabled={ isLast }
 			/>
+			<VisualEditorInserter />
 		</div>
 	);
 }

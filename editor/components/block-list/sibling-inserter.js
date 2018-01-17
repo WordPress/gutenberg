@@ -15,6 +15,8 @@ import { Component } from '@wordpress/element';
 import Inserter from '../inserter';
 import {
 	getBlockUids,
+	getBlockInsertionPoint,
+	isBlockInsertionPointVisible,
 	isBlockWithinSelection,
 } from '../../store/selectors';
 import {
@@ -47,11 +49,11 @@ class BlockListSiblingInserter extends Component {
 			return null;
 		}
 
-		const { insertIndex } = this.props;
+		const { insertIndex, showInsertionPoint } = this.props;
 		const { isForcedVisible } = this.state;
 
 		const classes = classnames( 'editor-block-list__sibling-inserter', {
-			'is-forced-visible': isForcedVisible,
+			'is-forced-visible': isForcedVisible || showInsertionPoint,
 		} );
 
 		return (
@@ -59,6 +61,9 @@ class BlockListSiblingInserter extends Component {
 				ref={ this.bindNode }
 				data-insert-index={ insertIndex }
 				className={ classes }>
+				{ showInsertionPoint && (
+					<div className="editor-block-list__insertion-point" />
+				) }
 				<Inserter
 					key="inserter"
 					position="bottom"
@@ -78,6 +83,10 @@ export default connect(
 		return {
 			shouldDisable: isBlockWithinSelection( state, uid ),
 			insertIndex,
+			showInsertionPoint: (
+				isBlockInsertionPointVisible( state ) &&
+				getBlockInsertionPoint( state ) === insertIndex
+			),
 		};
 	},
 	{
