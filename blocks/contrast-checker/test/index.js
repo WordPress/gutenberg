@@ -61,7 +61,7 @@ describe( 'ContrastChecker', () => {
 		expect( componentWrapper ).toMatchSnapshot();
 	} );
 
-	test( 'should render null when the colors meet AA WCAG guidelines, with only fallback colors', () => {
+	test( 'should render null when the colors meet AA WCAG guidelines, with only fallback colors.', () => {
 		const componentWrapper = shallow(
 			<ContrastChecker
 				isLargeText={ isLargeText }
@@ -70,5 +70,15 @@ describe( 'ContrastChecker', () => {
 		);
 
 		expect( componentWrapper.html() ).toBeNull();
+	} );
+
+	test( 'should render messages when the textColor is valid, but the fallback backgroundColor conflicts.', () => {
+		const componentWrapper = shallow(
+			<ContrastChecker
+				textColor={ textColor }
+				fallbackBackgroundColor={ textColor } />
+		);
+
+		expect( componentWrapper ).toMatchSnapshot();
 	} );
 } );
