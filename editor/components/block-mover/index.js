@@ -32,7 +32,9 @@ export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, block
 	return (
 		<div
 			className="editor-block-mover"
-			{ ...additionalProps }
+			draggable={ additionalProps.draggable }
+			onDragStart={ additionalProps.onDragStart }
+			onDragEnd={ additionalProps.onDragEnd }
 		>
 			<IconButton
 				className="editor-block-mover__control"

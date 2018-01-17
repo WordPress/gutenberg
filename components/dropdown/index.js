@@ -75,7 +75,9 @@ class Dropdown extends Component {
 			<div
 				className={ className }
 				ref={ this.bindContainer }
-				{ ...additionalProps }
+				draggable={ additionalProps.draggable }
+				onDragStart={ additionalProps.onDragStart }
+				onDragEnd={ additionalProps.onDragEnd }
 			>
 				{ renderToggle( args ) }
 				<Popover

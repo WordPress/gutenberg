@@ -387,6 +387,8 @@ export class BlockListBlock extends Component {
 			const cloneWrapper = document.createElement( 'div' );
 			const clone = block.cloneNode( true );
 			const blockRect = block.getBoundingClientRect();
+    		const blockTopOffset = parseInt( blockRect.top, 10 );
+    		const blockLeftOffset = parseInt( blockRect.left, 10 );
 
 			// 1. Clone the current block, style it, and spawn over original block.
 
@@ -394,11 +396,11 @@ export class BlockListBlock extends Component {
 
 			cloneWrapper.classList.add( 'editor-block-list__block-clone' );
 			// 40px padding for the shadow.
-			cloneWrapper.style.width = `${ blockRect.width + 40 }px`;
+			cloneWrapper.style.width = `${ parseInt( blockRect.width, 10 ) + 40 }px`;
 			// Position clone right over the original block.
 			// 20px padding for the shadow.
-			cloneWrapper.style.top = `${ parseInt( blockRect.top, 10 ) - 20 }px`;
-			cloneWrapper.style.left = `${ parseInt( blockRect.left, 10 ) - 20 }px`;
+			cloneWrapper.style.top = `${ blockTopOffset - 20 }px`;
+			cloneWrapper.style.left = `${ blockLeftOffset - 20 }px`;
 
 			cloneWrapper.appendChild( clone );
 			blockList.appendChild( cloneWrapper );
@@ -409,13 +411,13 @@ export class BlockListBlock extends Component {
 			//   - Coordinates relative to the block and the cursor/
 			//   - Optimisation: if top ends of the block are outside the viewport,
 			//     then revert to top 0 (relative to cursor).
-			const top = parseInt( blockRect.top, 10 ) > 0 ?
-				parseInt( event.clientY, 10 ) - parseInt( blockRect.top, 10 ) + 20 :
+			const top = blockTopOffset > 0 ?
+				parseInt( event.clientY, 10 ) - blockTopOffset + 20 :
 				parseInt( event.clientY, 10 ) + 20;
 
 			event.dataTransfer.setDragImage(
 				cloneWrapper,
-				parseInt( event.clientX, 10 ) - parseInt( blockRect.left, 10 ) + 20,
+				parseInt( event.clientX, 10 ) - blockLeftOffset + 20,
 				top
 			);
 
