@@ -19,6 +19,7 @@ import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
 import InspectorControls from '../../inspector-controls';
 import AlignmentToolbar from '../../alignment-toolbar';
+import alignmentShortcuts from '../../alignment-shortcuts';
 
 export const name = 'core/heading';
 
@@ -129,21 +130,7 @@ export const settings = {
 					return { nodeName: `H${ level }` };
 				},
 			} ) ),
-			...[ 'left', 'center', 'right' ].map( ( value ) => ( {
-				type: 'shortcut',
-				shortcut: value.charAt( 0 ),
-				transform( attributes ) {
-					const firstAlign = first( attributes ).align;
-					const isSame = attributes.every( ( { align } ) => align === firstAlign );
-
-					// If already aligned, set back to default.
-					if ( isSame && firstAlign === value ) {
-						return { align: undefined };
-					}
-
-					return { align: value };
-				},
-			} ) ),
+			...alignmentShortcuts,
 		],
 	},
 

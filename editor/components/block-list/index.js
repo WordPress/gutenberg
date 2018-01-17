@@ -286,11 +286,7 @@ class BlockList extends Component {
 	onKeyDown( event ) {
 		const { onReplace, onChange } = this.props;
 
-		if ( ! this.shortcutTransforms ) {
-			return;
-		}
-
-		if ( ! isAccess( event ) ) {
+		if ( ! this.shortcutTransforms || ! isAccess( event ) ) {
 			return;
 		}
 
@@ -300,11 +296,11 @@ class BlockList extends Component {
 			return;
 		}
 
-		const result = transform.transform( this.blocks.map( ( { attributes } ) => attributes ) );
+		const result = transform.transform( map( this.blocks, 'attributes' ) );
 
 		// Check if we received blocks or attributes.
 		if ( result.uid || Array.isArray( result ) ) {
-			onReplace( this.blocks.map( ( { uid } ) => uid ), castArray( result ) );
+			onReplace( map( this.blocks, 'uid' ), castArray( result ) );
 		} else {
 			this.blocks.forEach( ( { uid } ) => {
 				onChange( uid, result );

@@ -11,6 +11,7 @@ import './style.scss';
 import './editor.scss';
 import { createBlock, getBlockAttributes, getBlockType } from '../../api';
 import ImageBlock from './block';
+import alignmentShortcuts from '../../alignment-shortcuts';
 
 export const name = 'core/image';
 
@@ -150,6 +151,7 @@ export const settings = {
 				},
 			},
 		],
+		to: alignmentShortcuts,
 	},
 
 	getEditWrapperProps( attributes ) {

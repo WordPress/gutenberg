@@ -28,10 +28,10 @@ export const F10 = 121;
 export function isAccess( event, character ) {
 	if ( isMac ) {
 		if ( ! event.ctrlKey || ! event.altKey ) {
-			return;
+			return false;
 		}
 	} else if ( ! event.shiftKey || ! event.altKey ) {
-		return;
+		return false;
 	}
 
 	return character ? event.keyCode === character.toUpperCase().charCodeAt( 0 ) : true;

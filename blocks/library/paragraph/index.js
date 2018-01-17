@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { first } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -27,6 +26,7 @@ import ToggleControl from '../../inspector-controls/toggle-control';
 import RangeControl from '../../inspector-controls/range-control';
 import ColorPalette from '../../color-palette';
 import ContrastChecker from '../../contrast-checker';
+import alignmentShortcuts from '../../alignment-shortcuts';
 
 const { getComputedStyle } = window;
 
@@ -251,21 +251,7 @@ export const settings = {
 				),
 			},
 		],
-		to: [ 'left', 'center', 'right' ].map( ( value ) => ( {
-			type: 'shortcut',
-			shortcut: value.charAt( 0 ),
-			transform( attributes ) {
-				const firstAlign = first( attributes ).align;
-				const isSame = attributes.every( ( { align } ) => align === firstAlign );
-
-				// If already aligned, set back to default.
-				if ( isSame && firstAlign === value ) {
-					return { align: undefined };
-				}
-
-				return { align: value };
-			},
-		} ) ),
+		to: alignmentShortcuts,
 	},
 
 	merge( attributes, attributesToMerge ) {

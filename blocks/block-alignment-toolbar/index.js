@@ -8,14 +8,17 @@ const BLOCK_ALIGNMENTS_CONTROLS = {
 	left: {
 		icon: 'align-left',
 		title: __( 'Align left' ),
+		shortcut: 'l',
 	},
 	center: {
 		icon: 'align-center',
 		title: __( 'Align center' ),
+		shortcut: 'c',
 	},
 	right: {
 		icon: 'align-right',
 		title: __( 'Align right' ),
+		shortcut: 'r',
 	},
 	wide: {
 		icon: 'align-wide',
