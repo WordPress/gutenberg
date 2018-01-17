@@ -27,7 +27,7 @@ The dispatch function should be called to trigger the registered reducers functi
 
 ### `wp.data.registerSelectors( reducerKey: string, newSelectors: object )`
 
-If your module or plugin needs to expose its state to other modules and plugins, you'll have to register state seclectors.
+If your module or plugin needs to expose its state to other modules and plugins, you'll have to register state selectors.
 
 A selector is a function that takes the current state value as a first argument and extra arguments if needed and returns any data extracted from the state.
 
