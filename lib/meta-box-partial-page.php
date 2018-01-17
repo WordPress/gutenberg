@@ -308,10 +308,10 @@ function the_gutenberg_metaboxes() {
 
 	// Render meta boxes.
 	?>
-		<form class="metabox-base-form">
-		<?php gutenberg_meta_box_post_form_hidden_fields( $post ); ?>
-		</form>
-		<?php foreach ( $locations as $location ) { ?>
+	<form class="metabox-base-form">
+	<?php gutenberg_meta_box_post_form_hidden_fields( $post ); ?>
+	</form>
+	<?php foreach ( $locations as $location ) : ?>
 		<form class="metabox-location-<?php echo esc_attr( $location ); ?>">
 			<div id="poststuff" class="sidebar-open">
 				<div id="postbox-container-2" class="postbox-container">
@@ -325,7 +325,7 @@ function the_gutenberg_metaboxes() {
 				</div>
 			</div>
 		</form>
-		<?php } ?>
+	<?php endforeach; ?>
 	<?php
 
 	// Reset meta box data.
