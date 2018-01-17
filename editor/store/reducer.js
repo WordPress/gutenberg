@@ -669,11 +669,13 @@ const defaultMetaBoxState = locations.reduce( ( result, key ) => {
 }, {} );
 
 /**
- * Reducer keeping track of the meta boxes saving state.
+ * Reducer keeping track of the meta boxes isSaving state.
+ * A "true" value means the meta boxes saving request is in-flight.
  *
- * @param {boolean} state  Previous state.
- * @param {Object } action Action Object.
- * @returns {Object}        Updated state.
+ *
+ * @param {boolean}  state   Previous state.
+ * @param {Object}   action  Action Object.
+ * @returns {Object}         Updated state.
  */
 export function isSavingMetaBoxes( state = false, action ) {
 	switch ( action.type ) {
@@ -687,12 +689,16 @@ export function isSavingMetaBoxes( state = false, action ) {
 }
 
 /**
+ * Reducer keeping track of the state of each meta box location.
+ * This includes:
+ *  - isActive: Whether the location is active or not.
+ *  - data: The last saved form data for this location.
+ *    This is used to check whether the form is dirty
+ *    before leaving the page.
  *
- * Reducer keeping track of the meta boxes state.
- *
- * @param {boolean} state  Previous state.
- * @param {Object } action Action Object.
- * @returns {Object}        Updated state.
+ * @param {boolean}  state   Previous state.
+ * @param {Object}   action  Action Object.
+ * @returns {Object}         Updated state.
  */
 export function metaBoxes( state = defaultMetaBoxState, action ) {
 	switch ( action.type ) {
