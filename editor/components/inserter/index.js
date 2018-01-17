@@ -17,7 +17,7 @@ import { Component, compose } from '@wordpress/element';
  * Internal dependencies
  */
 import InserterMenu from './menu';
-import { getBlockInsertionPoint, getEditorMode } from '../../store/selectors';
+import { getEditorMode } from '../../store/selectors';
 import {
 	insertBlock,
 	hideInsertionPoint,
@@ -53,8 +53,6 @@ class Inserter extends Component {
 		const {
 			position,
 			children,
-			onInsertBlock,
-			insertionPoint,
 			hasSupportedBlocks,
 			isLocked,
 		} = this.props;
@@ -83,12 +81,8 @@ class Inserter extends Component {
 				) }
 				renderContent={ ( { onClose } ) => {
 					const onInsert = ( name, initialAttributes ) => {
-						onInsertBlock(
-							name,
-							initialAttributes,
-							insertionPoint
-						);
-
+						const { onInsertBlock } = this.props;
+						onInsertBlock( name, initialAttributes );
 						onClose();
 					};
 
@@ -103,15 +97,16 @@ export default compose( [
 	connect(
 		( state ) => {
 			return {
-				insertionPoint: getBlockInsertionPoint( state ),
 				mode: getEditorMode( state ),
 			};
 		},
-		( dispatch ) => ( {
-			onInsertBlock( name, initialAttributes, position ) {
+		( dispatch, ownProps ) => ( {
+			onInsertBlock( name, initialAttributes ) {
+				const { insertIndex } = ownProps;
+
 				dispatch( insertBlock(
 					createBlock( name, initialAttributes ),
-					position
+					insertIndex
 				) );
 			},
 			...bindActionCreators( {
