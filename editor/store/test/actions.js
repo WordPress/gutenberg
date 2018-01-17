@@ -31,8 +31,8 @@ import {
 	replaceBlock,
 	insertBlock,
 	insertBlocks,
-	showInsertionPoint,
-	hideInsertionPoint,
+	toggleInsertionPointVisible,
+	setInsertionPointIndex,
 	editPost,
 	savePost,
 	trashPost,
@@ -245,19 +245,20 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'showInsertionPoint', () => {
-		it( 'should return the SHOW_INSERTION_POINT action', () => {
-			expect( showInsertionPoint( 1 ) ).toEqual( {
-				type: 'SHOW_INSERTION_POINT',
-				index: 1,
+	describe( 'toggleInsertionPointVisible', () => {
+		it( 'should return the TOGGLE_INSERTION_POINT_VISIBLE action', () => {
+			expect( toggleInsertionPointVisible( true ) ).toEqual( {
+				type: 'TOGGLE_INSERTION_POINT_VISIBLE',
+				isVisible: true,
 			} );
 		} );
 	} );
 
-	describe( 'hideInsertionPoint', () => {
-		it( 'should return the HIDE_INSERTION_POINT action', () => {
-			expect( hideInsertionPoint() ).toEqual( {
-				type: 'HIDE_INSERTION_POINT',
+	describe( 'setInsertionPointIndex', () => {
+		it( 'should return the SET_INSERTION_POINT_INDEX action', () => {
+			expect( setInsertionPointIndex( 1 ) ).toEqual( {
+				type: 'SET_INSERTION_POINT_INDEX',
+				index: 1,
 			} );
 		} );
 	} );

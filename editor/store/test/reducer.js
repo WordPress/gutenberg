@@ -716,24 +716,30 @@ describe( 'state', () => {
 			expect( state ).toEqual( {} );
 		} );
 
-		it( 'should set insertion point position', () => {
+		it( 'should set insertion point index', () => {
 			const state = blockInsertionPoint( undefined, {
-				type: 'SHOW_INSERTION_POINT',
+				type: 'SET_INSERTION_POINT_INDEX',
 				index: 5,
 			} );
 
 			expect( state ).toEqual( {
-				position: 5,
-				visible: true,
+				index: 5,
 			} );
 		} );
 
-		it( 'should clear the insertion point', () => {
-			const state = blockInsertionPoint( deepFreeze( {} ), {
-				type: 'HIDE_INSERTION_POINT',
+		it( 'should toggle insertion point visibility', () => {
+			const originalState = deepFreeze( {
+				index: 5,
+			} );
+			const state = blockInsertionPoint( originalState, {
+				type: 'TOGGLE_INSERTION_POINT_VISIBLE',
+				isVisible: true,
 			} );
 
-			expect( state ).toEqual( { visible: false, position: null } );
+			expect( state ).toEqual( {
+				index: 5,
+				isVisible: true,
+			} );
 		} );
 	} );
 
