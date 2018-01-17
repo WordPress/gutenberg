@@ -21,9 +21,15 @@ const { setTimeout } = window;
 
 const { ESCAPE, ENTER, SPACE, BACKSPACE } = keycodes;
 
-const setSafeTimeout = ( editor, callback ) => {
-	return setTimeout( () => ! editor.removed && callback() );
-};
+/**
+ * Sets a timeout and checks if the given editor still exists.
+ *
+ * @param {Editor}   editor   TinyMCE editor instance.
+ * @param {Function} callback The function to call.
+ */
+function setSafeTimeout( editor, callback ) {
+	setTimeout( () => ! editor.removed && callback() );
+}
 
 export default function( editor ) {
 	const getContent = this.getContent.bind( this );
