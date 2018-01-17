@@ -274,30 +274,33 @@
 		}
 	}
 
-	> .editor-block-settings-menu {
+	// Left and right side UI
+	> .editor-block-settings-menu,
+	> .editor-block-mover {
 		position: absolute;
-		top: 2px;
-		right: 2px;
+		top: 0;
 		padding: 0;
+	}
+
+	// Right side UI
+	> .editor-block-settings-menu {
+		right: 2px;
 
 		// Mobile
 		display: none;
-
 		@include break-small {
 			display: flex;
 			flex-direction: column;
 		}
 	}
 
+	// Left side UI
 	> .editor-block-mover {
-		position: absolute;
-		top: 2px;
-		left: 3px;
-		height: $text-editor-font-size * 4; // same height as an empty paragraph
-		padding: 4px 14px 6px 0; // handles hover area
+		left: 2px;
+		padding-top: 4px;
 		z-index: z-index( '.editor-block-mover' );
 
-		// Mobile, to be revisited
+		// Mobile
 		display: none;
 		@include break-small {
 			display: block;
