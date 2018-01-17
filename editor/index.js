@@ -13,6 +13,7 @@ import { settings as dateSettings } from '@wordpress/date';
 /**
  * Internal dependencies
  */
+import './hooks';
 import './assets/stylesheets/main.scss';
 import Layout from './edit-post/layout';
 import { EditorProvider, ErrorBoundary } from './components';
