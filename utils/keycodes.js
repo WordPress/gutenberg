@@ -19,6 +19,16 @@ export const DELETE = 46;
 export const F10 = 121;
 
 /**
+ * Converts a character to a key code.
+ *
+ * @param  {String} character A single character.
+ * @return {Number}           The corresponding key code.
+ */
+function characterToKeyCode( character ) {
+	return character.toUpperCase().charCodeAt( 0 );
+}
+
+/**
  * Check if the access keys and the given character are presssed.
  *
  * @param  {KeyboardEvent} event     The event object.
@@ -26,15 +36,11 @@ export const F10 = 121;
  * @return {Boolean}                 True if the combination is pressed, false if not.
  */
 export function isAccess( event, character ) {
-	if ( isMac ) {
-		if ( ! event.ctrlKey || ! event.altKey ) {
-			return false;
-		}
-	} else if ( ! event.shiftKey || ! event.altKey ) {
+	if ( ! event[ isMac ? 'ctrlKey' : 'shiftKey' ] || ! event.altKey ) {
 		return false;
 	}
 
-	return character ? event.keyCode === character.toUpperCase().charCodeAt( 0 ) : true;
+	return ! character || ( event.keyCode === characterToKeyCode( character ) );
 }
 
 /**
