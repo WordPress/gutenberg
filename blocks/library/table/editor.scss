@@ -1,9 +1,4 @@
 .editor-block-list__block[data-type="core/table"] {
-
-	.editor-block-toolbar__group > div {
-		display: flex;
-	}
-
 	&[data-align="left"],
 	&[data-align="right"] {
 		min-width: 33%;

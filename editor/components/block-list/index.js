@@ -4,7 +4,7 @@
 import { connect } from 'react-redux';
 import {
 	findLast,
-	flatMap,
+	map,
 	invert,
 	isEqual,
 	mapValues,
@@ -36,6 +36,7 @@ import {
 	isSelectionEnabled,
 } from '../../store/selectors';
 import { startMultiSelect, stopMultiSelect, multiSelect, selectBlock } from '../../store/actions';
+import { isInputField } from '../../utils/dom';
 
 class BlockList extends Component {
 	constructor( props ) {
@@ -108,15 +109,23 @@ class BlockList extends Component {
 	}
 
 	onCopy( event ) {
-		const { multiSelectedBlocks } = this.props;
+		const { multiSelectedBlocks, selectedBlock } = this.props;
 
-		if ( multiSelectedBlocks.length ) {
-			const serialized = serialize( multiSelectedBlocks );
-
-			event.clipboardData.setData( 'text/plain', serialized );
-			event.clipboardData.setData( 'text/html', serialized );
-			event.preventDefault();
+		if ( ! multiSelectedBlocks.length && ! selectedBlock ) {
+			return;
 		}
+
+		// Let native copy behaviour take over in input fields.
+		if ( selectedBlock && isInputField( document.activeElement ) ) {
+			return;
+		}
+
+		const serialized = serialize( selectedBlock || multiSelectedBlocks );
+
+		event.clipboardData.setData( 'text/plain', serialized );
+		event.clipboardData.setData( 'text/html', serialized );
+
+		event.preventDefault();
 	}
 
 	onCut( event ) {
@@ -211,7 +220,7 @@ class BlockList extends Component {
 		return (
 			<div>
 				{ !! blocks.length && <BlockListSiblingInserter /> }
-				{ flatMap( blocks, ( uid ) => [
+				{ map( blocks, ( uid ) => (
 					<BlockListBlock
 						key={ 'block-' + uid }
 						uid={ uid }
@@ -219,12 +228,8 @@ class BlockList extends Component {
 						onSelectionStart={ this.onSelectionStart }
 						onShiftSelection={ this.onShiftSelection }
 						showContextualToolbar={ showContextualToolbar }
-					/>,
-					<BlockListSiblingInserter
-						key={ 'sibling-inserter-' + uid }
-						uid={ uid }
-					/>,
-				] ) }
+					/>
+				) ) }
 			</div>
 		);
 	}

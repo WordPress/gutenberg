@@ -17,4 +17,4 @@
 ## Checklist:
 - [ ] My code is tested.
 - [ ] My code follows the WordPress code style.
-- [ ] My code follows has proper inline documentation.
+- [ ] My code has proper inline documentation.

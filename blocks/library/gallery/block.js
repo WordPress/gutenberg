@@ -9,12 +9,12 @@ import { filter } from 'lodash';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { mediaUpload } from '@wordpress/utils';
-import { Dashicon, DropZone, Toolbar, Placeholder, FormFileUpload } from '@wordpress/components';
+import { IconButton, Button, DropZone, Toolbar, Placeholder, FormFileUpload } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import MediaUploadButton from '../../media-upload-button';
+import MediaUpload from '../../media-upload';
 import InspectorControls from '../../inspector-controls';
 import RangeControl from '../../inspector-controls/range-control';
 import ToggleControl from '../../inspector-controls/toggle-control';
@@ -22,9 +22,7 @@ import SelectControl from '../../inspector-controls/select-control';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import GalleryImage from './gallery-image';
-import BlockDescription from '../../block-description';
 
-const isGallery = true;
 const MAX_COLUMNS = 8;
 const linkOptions = [
 	{ value: 'attachment', label: __( 'Attachment Page' ) },
@@ -96,7 +94,9 @@ class GalleryBlock extends Component {
 	}
 
 	uploadFromFiles( event ) {
-		mediaUpload( event.target.files, this.props.setAttributes, isGallery );
+		mediaUpload( event.target.files, ( images ) => {
+			this.props.setAttributes( { images } );
+		} );
 	}
 
 	setImageAttributes( index, attributes ) {
@@ -119,34 +119,26 @@ class GalleryBlock extends Component {
 		const { setAttributes } = this.props;
 		mediaUpload(
 			files,
-			( { images } ) => {
+			( images ) => {
 				setAttributes( {
 					images: currentImages.concat( images ),
 				} );
-			},
-			isGallery
+			}
 		);
+	}
+
+	componentWillReceiveProps( nextProps ) {
+		// Deselect images when losing focus
+		if ( ! nextProps.focus && this.props.focus ) {
+			this.setState( {
+				selectedImage: null,
+			} );
+		}
 	}
 
 	render() {
 		const { attributes, focus, className } = this.props;
 		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
-
-		const blockDescription = (
-			<BlockDescription>
-				<p>
-					{__( 'Image galleries are a great way to share groups of pictures on your site.' )}
-				</p>
-			</BlockDescription>
-		);
-
-		const inspectorControls = (
-			focus && (
-				<InspectorControls key="inspector">
-					{blockDescription}
-				</InspectorControls>
-			)
-		);
 
 		const dropZone = (
 			<DropZone
@@ -163,19 +155,21 @@ class GalleryBlock extends Component {
 					/>
 					{ !! images.length && (
 						<Toolbar>
-							<MediaUploadButton
-								buttonProps={ {
-									className: 'components-icon-button components-toolbar__control',
-									'aria-label': __( 'Edit Gallery' ),
-								} }
+							<MediaUpload
 								onSelect={ this.onSelectImages }
 								type="image"
 								multiple
 								gallery
 								value={ images.map( ( img ) => img.id ) }
-							>
-								<Dashicon icon="edit" />
-							</MediaUploadButton>
+								render={ ( { open } ) => (
+									<IconButton
+										className="components-toolbar__control"
+										label={ __( 'Edit Gallery' ) }
+										icon="edit"
+										onClick={ open }
+									/>
+								) }
+							/>
 						</Toolbar>
 					) }
 				</BlockControls>
@@ -183,14 +177,11 @@ class GalleryBlock extends Component {
 		);
 
 		if ( images.length === 0 ) {
-			const uploadButtonProps = { isLarge: true };
-
 			return [
 				controls,
-				inspectorControls,
 				<Placeholder
 					key="placeholder"
-					instructions={ __( 'Drag images here or insert from media library' ) }
+					instructions={ __( 'Drag images here or add from media library' ) }
 					icon="format-gallery"
 					label={ __( 'Gallery' ) }
 					className={ className }>
@@ -204,15 +195,17 @@ class GalleryBlock extends Component {
 					>
 						{ __( 'Upload' ) }
 					</FormFileUpload>
-					<MediaUploadButton
-						buttonProps={ uploadButtonProps }
+					<MediaUpload
 						onSelect={ this.onSelectImages }
 						type="image"
 						multiple
 						gallery
-					>
-						{ __( 'Insert from Media Library' ) }
-					</MediaUploadButton>
+						render={ ( { open } ) => (
+							<Button isLarge onClick={ open }>
+								{ __( 'Add from Media Library' ) }
+							</Button>
+						) }
+					/>
 				</Placeholder>,
 			];
 		}
@@ -221,8 +214,7 @@ class GalleryBlock extends Component {
 			controls,
 			focus && (
 				<InspectorControls key="inspector">
-					{blockDescription}
-					<h3>{ __( 'Gallery Settings' ) }</h3>
+					<h2>{ __( 'Gallery Settings' ) }</h2>
 					{ images.length > 1 && <RangeControl
 						label={ __( 'Columns' ) }
 						value={ columns }

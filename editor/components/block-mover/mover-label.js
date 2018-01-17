@@ -14,7 +14,8 @@ import { __, sprintf } from '@wordpress/i18n';
  * @param  {boolean} isLast        This is the last block.
  * @param  {number}  dir           Direction of movement (> 0 is considered to be going
  *                                 down, < 0 is up).
- * @return {string}                Label for the block movement controls.
+ *
+ * @returns {string} Label for the block movement controls.
  */
 export function getBlockMoverLabel( selectedCount, type, firstIndex, isFirst, isLast, dir ) {
 	const position = ( firstIndex + 1 );
@@ -74,7 +75,8 @@ export function getBlockMoverLabel( selectedCount, type, firstIndex, isFirst, is
  * @param  {boolean} isLast        This is the last block.
  * @param  {number}  dir           Direction of movement (> 0 is considered to be going
  *                                 down, < 0 is up).
- * @return {string}                Label for the block movement controls.
+ *
+ * @returns {string} Label for the block movement controls.
  */
 export function getMultiBlockMoverLabel( selectedCount, firstIndex, isFirst, isLast, dir ) {
 	const position = ( firstIndex + 1 );

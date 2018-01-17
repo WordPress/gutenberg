@@ -1,4 +1,4 @@
-.editor-block-list__block[data-type="core/freeform"] .blocks-editable__tinymce {
+.wp-block-freeform.blocks-editable__tinymce {
 	p {
 		line-height: $editor-line-height;
 	}
@@ -234,10 +234,28 @@
 	}
 }
 
-.mce-tooltip {
-	display: none;
-}
-
 .components-toolbar__control .dashicon {
 	display: block;
+}
+
+
+.mce-widget.mce-tooltip {
+	display: block;
+	opacity: initial;
+
+	.mce-tooltip-inner {
+		padding: 4px 12px;
+		background: $dark-gray-400;
+		border-width: 0;
+		color: white;
+		white-space: nowrap;
+		box-shadow: none;
+		font-size: $default-font-size;
+		border-radius: 0;
+	}
+
+	.mce-tooltip-arrow {
+		border-top-color: $dark-gray-400;
+		border-bottom-color: $dark-gray-400;
+	}
 }

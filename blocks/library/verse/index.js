@@ -9,11 +9,11 @@ import { __ } from '@wordpress/i18n';
 import './editor.scss';
 import { registerBlockType, createBlock } from '../../api';
 import Editable from '../../editable';
-import InspectorControls from '../../inspector-controls';
-import BlockDescription from '../../block-description';
 
 registerBlockType( 'core/verse', {
 	title: __( 'Verse' ),
+
+	description: __( 'Write poetry and other literary expressions honoring all spaces and line-breaks.' ),
 
 	icon: 'edit',
 
@@ -51,17 +51,9 @@ registerBlockType( 'core/verse', {
 	edit( { attributes, setAttributes, focus, setFocus, className } ) {
 		const { content } = attributes;
 
-		return [
-			focus && (
-				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'Write poetry and other literary expressions honoring all spaces and line-breaks.' ) }</p>
-					</BlockDescription>
-				</InspectorControls>
-			),
+		return (
 			<Editable
 				tagName="pre"
-				key="editable"
 				value={ content }
 				onChange={ ( nextContent ) => {
 					setAttributes( {
@@ -73,8 +65,8 @@ registerBlockType( 'core/verse', {
 				placeholder={ __( 'Write…' ) }
 				wrapperClassName={ className }
 				formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
-			/>,
-		];
+			/>
+		);
 	},
 
 	save( { attributes, className } ) {

@@ -15,7 +15,8 @@ const { TEXT_NODE } = window.Node;
  * @param  {Element} container       Focusable element.
  * @param  {Boolean} isReverse       Set to true to check left, false for right.
  * @param  {Boolean} collapseRanges  Whether or not to collapse the selection range before the check
- * @return {Boolean}                 True if at the horizontal edge, false if not.
+ *
+ * @returns {Boolean} True if at the horizontal edge, false if not.
  */
 export function isHorizontalEdge( container, isReverse, collapseRanges = false ) {
 	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
@@ -55,7 +56,9 @@ export function isHorizontalEdge( container, isReverse, collapseRanges = false )
 		return false;
 	}
 
-	if ( ! isReverse && offset !== node.textContent.length ) {
+	const maxOffset = node.nodeType === TEXT_NODE ? node.nodeValue.length : node.childNodes.length;
+
+	if ( ! isReverse && offset !== maxOffset ) {
 		return false;
 	}
 
@@ -78,7 +81,8 @@ export function isHorizontalEdge( container, isReverse, collapseRanges = false )
  * @param  {Element} container       Focusable element.
  * @param  {Boolean} isReverse       Set to true to check top, false for bottom.
  * @param  {Boolean} collapseRanges  Whether or not to collapse the selection range before the check
- * @return {Boolean}                 True if at the edge, false if not.
+ *
+ * @returns {Boolean} True if at the edge, false if not.
  */
 export function isVerticalEdge( container, isReverse, collapseRanges = false ) {
 	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
@@ -199,7 +203,8 @@ export function placeCaretAtHorizontalEdge( container, isReverse ) {
  * @param  {Document} doc The document of the range.
  * @param  {Float}    x   Horizontal position within the current viewport.
  * @param  {Float}    y   Vertical position within the current viewport.
- * @return {?Range}       The best range for the given point.
+ *
+ * @returns {?Range} The best range for the given point.
  */
 function caretRangeFromPoint( doc, x, y ) {
 	if ( doc.caretRangeFromPoint ) {
@@ -228,7 +233,8 @@ function caretRangeFromPoint( doc, x, y ) {
  * @param  {Float}    x         Horizontal position within the current viewport.
  * @param  {Float}    y         Vertical position within the current viewport.
  * @param  {Element}  container Container in which the range is expected to be found.
- * @return {?Range}             The best range for the given point.
+ *
+ * @returns {?Range} The best range for the given point.
  */
 function hiddenCaretRangeFromPoint( doc, x, y, container ) {
 	container.style.zIndex = '10000';
@@ -302,4 +308,19 @@ export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScro
 	// This fixes it.
 	selection.removeAllRanges();
 	selection.addRange( range );
+}
+
+/**
+ * Check whether the given node in an input field.
+ *
+ * @param  {HTMLElement} element The HTML element.
+ *
+ * @returns {Boolean} True if the element is an input field, false if not.
+ */
+export function isInputField( { nodeName, contentEditable } ) {
+	return (
+		nodeName === 'INPUT' ||
+		nodeName === 'TEXTAREA' ||
+		contentEditable === 'true'
+	);
 }

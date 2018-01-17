@@ -26,12 +26,12 @@ import store from '../../store';
  * The default editor settings
  * You can override any default settings when calling createEditorInstance
  *
- *  wideImages   boolean   Enable/Disable Wide/Full Alignments
+ *  alignWide   boolean   Enable/Disable Wide/Full Alignments
  *
  * @var {Object} DEFAULT_SETTINGS
  */
 const DEFAULT_SETTINGS = {
-	wideImages: false,
+	alignWide: false,
 
 	// This is current max width of the block inner area
 	// It's used to constraint image resizing and this value could be overriden later by themes

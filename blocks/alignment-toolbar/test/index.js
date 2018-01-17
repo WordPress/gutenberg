@@ -24,13 +24,13 @@ describe( 'AlignmentToolbar', () => {
 		expect( wrapper ).toMatchSnapshot();
 	} );
 
-	test( 'should call on change with null when a control is already active', () => {
+	test( 'should call on change with undefined when a control is already active', () => {
 		const activeControl = controls.find( ( { isActive } ) => isActive );
 		activeControl.onClick();
 
 		expect( activeControl.align ).toBe( alignment );
 		expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
-		expect( onChangeSpy ).toHaveBeenCalledWith( null );
+		expect( onChangeSpy ).toHaveBeenCalledWith( undefined );
 	} );
 
 	test( 'should call on change a new value when the control is not active', () => {

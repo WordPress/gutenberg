@@ -19,12 +19,14 @@ import BlockIcon from '../block-icon';
 
 /**
  * @callback FnGetOptions
+ *
  * @returns {Promise.<Array.<CompleterOption>>} A promise that resolves to the list of completer options.
  */
 
 /**
  * @callback FnAllowNode
  * @param {Node} textNode check if the completer can handle this text node.
+ *
  * @returns {boolean} true if the completer can handle this text node.
  */
 
@@ -32,6 +34,7 @@ import BlockIcon from '../block-icon';
  * @callback FnAllowContext
  * @param {Range} before the range before the auto complete trigger and query.
  * @param {Range} after the range after the autocomplete trigger and query.
+ *
  * @returns {boolean} true if the completer can handle these ranges.
  */
 
@@ -40,6 +43,7 @@ import BlockIcon from '../block-icon';
  * @param {*} value the value of the completer option.
  * @param {Range} range the nodes included in the autocomplete trigger and query.
  * @param {String} query the text value of the autocomplete query.
+ *
  * @returns {?Component} optional html to replace the range.
  */
 
@@ -58,7 +62,8 @@ import BlockIcon from '../block-icon';
  * The definition can be understood by the Autocomplete component.
  *
  * @param  {Function} onReplace  Callback to replace the current block.
- * @returns {Completer}          Completer object used by the Autocomplete component.
+ *
+ * @returns {Completer} Completer object used by the Autocomplete component.
  */
 export function blockAutocompleter( { onReplace } ) {
 	// Prioritize common category in block type options
@@ -96,7 +101,7 @@ export function blockAutocompleter( { onReplace } ) {
 	};
 }
 /**
- * Returns a "completer" definition for inserting links to the posts of a user.
+ * Returns a "completer" definition for inserting a user mention.
  * The definition can be understood by the Autocomplete component.
  *
  * @returns {Completer} Completer object used by the Autocomplete component.
@@ -118,12 +123,12 @@ export function userAutocompleter() {
 		} );
 	};
 
-	const allowNode = ( textNode ) => {
-		return textNode.parentElement.closest( 'a' ) === null;
+	const allowNode = () => {
+		return true;
 	};
 
 	const onSelect = ( user ) => {
-		return <a href={ user.link }>{ '@' + user.name }</a>;
+		return ( '@' + user.slug );
 	};
 
 	return {

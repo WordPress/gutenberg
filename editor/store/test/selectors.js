@@ -15,7 +15,8 @@ import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import {
 	getEditorMode,
 	getPreference,
-	isEditorSidebarOpened,
+	isSidebarOpened,
+	hasOpenSidebar,
 	isEditorSidebarPanelOpened,
 	hasEditorUndo,
 	hasEditorRedo,
@@ -80,6 +81,8 @@ import {
 	isSelectionEnabled,
 	getReusableBlocks,
 	getStateBeforeOptimisticTransaction,
+	hasFixedToolbar,
+	isFeatureActive,
 	isPublishingPost,
 	POST_UPDATE_TRANSACTION_ID,
 } from '../selectors';
@@ -325,67 +328,154 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'isEditorSidebarOpened', () => {
+	describe( 'isSidebarOpened', () => {
 		it( 'should return true when is not mobile and the normal sidebar is opened', () => {
 			const state = {
-				browser: {
-					width: 1000,
-				},
+				mobile: false,
 				preferences: {
-					isSidebarOpened: true,
-					isSidebarOpenedMobile: false,
+					sidebars: {
+						desktop: true,
+						mobile: false,
+					},
 				},
 			};
 
-			expect( isEditorSidebarOpened( state ) ).toBe( true );
+			expect( isSidebarOpened( state ) ).toBe( true );
 		} );
 
 		it( 'should return false when is not mobile and the normal sidebar is closed', () => {
 			const state = {
-				browser: {
-					width: 1000,
-				},
+				mobile: false,
 				preferences: {
-					isSidebarOpened: false,
+					sidebars: {
+						desktop: false,
+						mobile: true,
+					},
 				},
 			};
 
-			expect( isEditorSidebarOpened( state ) ).toBe( false );
+			expect( isSidebarOpened( state ) ).toBe( false );
 		} );
 
 		it( 'should return true when is mobile and the mobile sidebar is opened', () => {
 			const state = {
-				browser: {
-					width: 100,
-				},
+				mobile: true,
 				preferences: {
-					isSidebarOpened: false,
-					isSidebarOpenedMobile: true,
+					sidebars: {
+						desktop: false,
+						mobile: true,
+					},
 				},
 			};
 
-			expect( isEditorSidebarOpened( state ) ).toBe( true );
+			expect( isSidebarOpened( state ) ).toBe( true );
 		} );
 
 		it( 'should return false when is mobile and the mobile sidebar is closed', () => {
 			const state = {
-				browser: {
-					width: 100,
-				},
+				mobile: true,
 				preferences: {
-					isSidebarOpened: true,
-					isSidebarOpenedMobile: false,
+					sidebars: {
+						desktop: true,
+						mobile: false,
+					},
 				},
 			};
 
-			expect( isEditorSidebarOpened( state ) ).toBe( false );
+			expect( isSidebarOpened( state ) ).toBe( false );
+		} );
+
+		it( 'should return true when the given is opened', () => {
+			const state = {
+				preferences: {
+					sidebars: {
+						publish: true,
+					},
+				},
+			};
+
+			expect( isSidebarOpened( state, 'publish' ) ).toBe( true );
+		} );
+
+		it( 'should return false when the given is not opened', () => {
+			const state = {
+				preferences: {
+					sidebars: {
+						publish: false,
+					},
+				},
+			};
+
+			expect( isSidebarOpened( state, 'publish' ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'hasOpenSidebar', () => {
+		it( 'should return true if at least one sidebar is open (using the desktop sidebar as default)', () => {
+			const state = {
+				mobile: false,
+				preferences: {
+					sidebars: {
+						desktop: true,
+						mobile: false,
+						publish: false,
+					},
+				},
+			};
+
+			expect( hasOpenSidebar( state ) ).toBe( true );
+		} );
+
+		it( 'should return true if at no sidebar is open (using the desktop sidebar as default)', () => {
+			const state = {
+				mobile: false,
+				preferences: {
+					sidebars: {
+						desktop: false,
+						mobile: true,
+						publish: false,
+					},
+				},
+			};
+
+			expect( hasOpenSidebar( state ) ).toBe( false );
+		} );
+
+		it( 'should return true if at least one sidebar is open (using the mobile sidebar as default)', () => {
+			const state = {
+				mobile: true,
+				preferences: {
+					sidebars: {
+						desktop: false,
+						mobile: true,
+						publish: false,
+					},
+				},
+			};
+
+			expect( hasOpenSidebar( state ) ).toBe( true );
+		} );
+
+		it( 'should return true if at no sidebar is open (using the mobile sidebar as default)', () => {
+			const state = {
+				mobile: true,
+				preferences: {
+					sidebars: {
+						desktop: true,
+						mobile: false,
+						publish: false,
+					},
+				},
+			};
+
+			expect( hasOpenSidebar( state ) ).toBe( false );
 		} );
 	} );
 
 	describe( 'isEditorSidebarPanelOpened', () => {
 		it( 'should return false if no panels preference', () => {
 			const state = {
-				preferences: { isSidebarOpened: true },
+				preferences: {},
 			};
 
 			expect( isEditorSidebarPanelOpened( state, 'post-taxonomies' ) ).toBe( false );
@@ -601,9 +691,7 @@ describe( 'selectors', () => {
 	describe( 'isMobile', () => {
 		it( 'should return true if resolution is equal or less than medium breakpoint', () => {
 			const state = {
-				browser: {
-					width: 100,
-				},
+				mobile: true,
 			};
 
 			expect( isMobile( state ) ).toBe( true );
@@ -611,9 +699,7 @@ describe( 'selectors', () => {
 
 		it( 'should return true if resolution is greater than medium breakpoint', () => {
 			const state = {
-				browser: {
-					width: 1000,
-				},
+				mobile: false,
 			};
 
 			expect( isMobile( state ) ).toBe( false );
@@ -2207,6 +2293,97 @@ describe( 'selectors', () => {
 
 			const reusableBlock = getReusableBlock( state, '358b59ee-bab3-4d6f-8445-e8c6971a5605' );
 			expect( reusableBlock ).toBeNull();
+		} );
+	} );
+
+	describe( 'hasFixedToolbar', () => {
+		it( 'should return true if fixedToolbar is active and is not mobile screen size', () => {
+			const state = {
+				mobile: false,
+				preferences: {
+					features: {
+						fixedToolbar: true,
+					},
+				},
+			};
+
+			expect( hasFixedToolbar( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if fixedToolbar is active and is mobile screen size', () => {
+			const state = {
+				mobile: true,
+				preferences: {
+					features: {
+						fixedToolbar: true,
+					},
+				},
+			};
+
+			expect( hasFixedToolbar( state ) ).toBe( false );
+		} );
+
+		it( 'should return false if fixedToolbar is disable and is not mobile screen size', () => {
+			const state = {
+				mobile: false,
+				preferences: {
+					features: {
+						fixedToolbar: false,
+					},
+				},
+			};
+
+			expect( hasFixedToolbar( state ) ).toBe( false );
+		} );
+
+		it( 'should return false if fixedToolbar is disable and is mobile screen size', () => {
+			const state = {
+				mobile: true,
+				preferences: {
+					features: {
+						fixedToolbar: false,
+					},
+				},
+			};
+
+			expect( hasFixedToolbar( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isFeatureActive', () => {
+		it( 'should return true if feature is active', () => {
+			const state = {
+				preferences: {
+					features: {
+						chicken: true,
+					},
+				},
+			};
+
+			expect( isFeatureActive( state, 'chicken' ) ).toBe( true );
+		} );
+
+		it( 'should return false if feature is not active', () => {
+			const state = {
+				preferences: {
+					features: {
+						chicken: false,
+					},
+				},
+			};
+
+			expect( isFeatureActive( state, 'chicken' ) ).toBe( false );
+		} );
+
+		it( 'should return false if feature is not referred', () => {
+			const state = {
+				preferences: {
+					features: {
+					},
+				},
+			};
+
+			expect( isFeatureActive( state, 'chicken' ) ).toBe( false );
 		} );
 	} );
 

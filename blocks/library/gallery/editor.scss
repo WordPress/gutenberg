@@ -1,5 +1,5 @@
-.editor-block-list__block[data-type="core/gallery"] .editor-block-list__block-edit {
-	overflow: hidden;
+.wp-block-gallery:not( .components-placeholder ) {
+	margin: -8px;
 }
 
 .blocks-gallery-image {

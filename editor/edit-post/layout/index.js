@@ -19,17 +19,33 @@ import Sidebar from '../sidebar';
 import TextEditor from '../modes/text-editor';
 import VisualEditor from '../modes/visual-editor';
 import DocumentTitle from '../document-title';
-import { MetaBoxes, AutosaveMonitor, UnsavedChangesWarning, EditorNotices } from '../../components';
+import EditorModeKeyboardShortcuts from '../modes/keyboard-shortcuts';
+import {
+	MetaBoxes,
+	AutosaveMonitor,
+	UnsavedChangesWarning,
+	EditorNotices,
+	PostPublishPanel,
+} from '../../components';
 import {
 	getEditorMode,
-	isEditorSidebarOpened,
-	isFeatureActive,
+	hasFixedToolbar,
+	hasOpenSidebar,
+	isSidebarOpened,
 } from '../../store/selectors';
+import { toggleSidebar } from '../../store/actions';
 
-function Layout( { mode, isSidebarOpened, hasFixedToolbar } ) {
+function Layout( {
+	mode,
+	layoutHasOpenSidebar,
+	isDefaultSidebarOpened,
+	isPublishSidebarOpened,
+	fixedToolbarActive,
+	onClosePublishPanel,
+} ) {
 	const className = classnames( 'editor-layout', {
-		'is-sidebar-opened': isSidebarOpened,
-		'has-fixed-toolbar': hasFixedToolbar,
+		'is-sidebar-opened': layoutHasOpenSidebar,
+		'has-fixed-toolbar': fixedToolbarActive,
 	} );
 
 	return (
@@ -41,6 +57,7 @@ function Layout( { mode, isSidebarOpened, hasFixedToolbar } ) {
 			<div className="editor-layout__content" role="region" aria-label={ __( 'Editor content' ) } tabIndex="-1">
 				<EditorNotices />
 				<div className="editor-layout__editor">
+					<EditorModeKeyboardShortcuts />
 					{ mode === 'text' && <TextEditor /> }
 					{ mode === 'visual' && <VisualEditor /> }
 				</div>
@@ -51,7 +68,8 @@ function Layout( { mode, isSidebarOpened, hasFixedToolbar } ) {
 					<MetaBoxes location="advanced" />
 				</div>
 			</div>
-			{ isSidebarOpened && <Sidebar /> }
+			{ isDefaultSidebarOpened && <Sidebar /> }
+			{ isPublishSidebarOpened && <PostPublishPanel onClose={ onClosePublishPanel } /> }
 			<Popover.Slot />
 		</div>
 	);
@@ -60,7 +78,12 @@ function Layout( { mode, isSidebarOpened, hasFixedToolbar } ) {
 export default connect(
 	( state ) => ( {
 		mode: getEditorMode( state ),
-		isSidebarOpened: isEditorSidebarOpened( state ),
-		hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
+		layoutHasOpenSidebar: hasOpenSidebar( state ),
+		isDefaultSidebarOpened: isSidebarOpened( state ),
+		isPublishSidebarOpened: isSidebarOpened( state, 'publish' ),
+		fixedToolbarActive: hasFixedToolbar( state ),
 	} ),
+	{
+		onClosePublishPanel: () => toggleSidebar( 'publish', false ),
+	}
 )( navigateRegions( Layout ) );

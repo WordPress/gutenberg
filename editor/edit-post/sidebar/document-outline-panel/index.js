@@ -24,7 +24,7 @@ const PANEL_NAME = 'table-of-contents';
 function DocumentOutlinePanel( { isOpened, onTogglePanel } ) {
 	return (
 		<DocumentOutlineCheck>
-			<PanelBody title={ __( 'Document Outline' ) } opened={ isOpened } onToggle={ onTogglePanel }>
+			<PanelBody title={ __( 'Table of Contents' ) } opened={ isOpened } onToggle={ onTogglePanel }>
 				<DocumentOutline />
 			</PanelBody>
 		</DocumentOutlineCheck>

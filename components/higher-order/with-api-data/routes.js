@@ -21,7 +21,8 @@ const RE_NAMED_SUBPATTERN = /\(\?P?[<']\w+[>'](.*?)\)/g;
  * slash, allowing query parameters, but otherwise enforcing strict equality.
  *
  * @param  {String} pattern PCRE regular expression string
- * @return {RegExp}         Equivalent JavaScript RegExp
+ *
+ * @returns {RegExp} Equivalent JavaScript RegExp.
  */
 export function getNormalizedRegExp( pattern ) {
 	pattern = pattern.replace( RE_NAMED_SUBPATTERN, '($1)' );
@@ -34,7 +35,8 @@ export function getNormalizedRegExp( pattern ) {
  *
  * @param  {String}  pattern PCRE route path pattern
  * @param  {String}  path    URL path
- * @return {Boolean}         Whether path is a match
+ *
+ * @returns {Boolean} Whether path is a match.
  */
 export function isRouteMatch( pattern, path ) {
 	return getNormalizedRegExp( pattern ).test( path );
@@ -45,7 +47,8 @@ export function isRouteMatch( pattern, path ) {
  *
  * @param  {Object}  schema REST schema
  * @param  {String}  path   URL path
- * @return {?Object}        REST route
+ *
+ * @returns {?Object} REST route.
  */
 export const getRoute = createSelector( ( schema, path ) => {
 	return find( schema.routes, ( route, pattern ) => {

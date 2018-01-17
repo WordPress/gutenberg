@@ -11,48 +11,23 @@
 	left: 0;
 	right: 0;
 
-	top: $admin-bar-height-big;
-	position: fixed;
+	// mobile edgecase for toolbar
+	top: 0;
+	position: sticky;
+
+	// on mobile the main content area has to scroll
+	// otherwise you can invoke the overscroll bounce on the non-scrolling container, causing (ノಠ益ಠ)ノ彡┻━┻
+	@include break-small {
+		position: fixed;
+		top: $admin-bar-height-big;
+	}
 
 	@include break-medium() {
 		top: $admin-bar-height;
 	}
-
-	@include break-large() {
-		left: $admin-sidebar-width;
-	}
 }
 
-.sticky-menu .editor-header {	/* Sticky is when on smaller breakpoints, nav menu is manually opened */
-	@include break-medium() {
-		left: $admin-sidebar-width;
-	}
-}
-
-.auto-fold .editor-header {		/* Auto fold is when on smaller breakpoints, nav menu auto colllapses */
-	@include break-medium() {
-		left: $admin-sidebar-width-collapsed;
-	}
-
-	@include break-large() {
-		left: $admin-sidebar-width;
-	}
-}
-
-/* Sidebar manually collapsed */
-.folded .editor-header {
-	left: 0;
-
-	@include break-medium() {
-		left: $admin-sidebar-width-collapsed;
-	}
-}
-
-/* Mobile menu opened */
-.auto-fold .wp-responsive-open .editor-header {
-	left: $admin-sidebar-width-big;
-	right: -$admin-sidebar-width-big;
-}
+@include editor-left('.editor-header');
 
 .editor-header__settings {
 	display: inline-flex;
@@ -87,10 +62,16 @@
 		background: $dark-gray-500;
 	}
 
+	&.editor-post-publish-button, &.editor-post-publish-panel__toggle {
+		margin: 2px;
+		height: 33px;
+		line-height: 32px;
+		padding: 0 12px 2px;
+	}
+
 	@include break-medium() {
-		&.editor-post-publish-button, &.editor-post-publish-with-dropdown__button {
-			height: 33px;
-			line-height: 32px;
+		&.editor-post-publish-button, &.editor-post-publish-panel__toggle {
+			margin: 0 10px;
 		}
 	}
 }

@@ -10,7 +10,7 @@ import { Component } from '@wordpress/element';
  *
  * @param {WPElement}  WrappedComponent  The disposable component
  *
- * @return {Component}                   Component with the focus restauration behaviour
+ * @returns {Component} Component with the focus restauration behaviour.
  */
 function withFocusReturn( WrappedComponent ) {
 	return class extends Component {

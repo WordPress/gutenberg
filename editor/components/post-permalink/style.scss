@@ -7,6 +7,14 @@
 	font-family: $default-font;
 	font-size: $default-font-size;
 	height: 40px;
+
+	// put toolbar snugly to edge on mobile
+	margin-left: -$block-padding - 1px;	// stack borders
+	margin-right: -$block-padding - 1px;
+	@include break-small() {
+		margin-left: auto;
+		margin-right: auto;
+	}
 }
 
 .editor-post-permalink__label {

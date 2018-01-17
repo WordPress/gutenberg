@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { isHorizontalEdge, placeCaretAtHorizontalEdge } from '../dom';
+import { isHorizontalEdge, placeCaretAtHorizontalEdge, isInputField } from '../dom';
 
 describe( 'DOM', () => {
 	let parent;
@@ -89,6 +89,28 @@ describe( 'DOM', () => {
 			input.value = 'value';
 			placeCaretAtHorizontalEdge( input, false );
 			expect( isHorizontalEdge( input, true ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isInputfield', () => {
+		it( 'should return true for an input element', () => {
+			expect( isInputField( document.createElement( 'input' ) ) ).toBe( true );
+		} );
+
+		it( 'should return true for an textarea element', () => {
+			expect( isInputField( document.createElement( 'textarea' ) ) ).toBe( true );
+		} );
+
+		it( 'should return true for a contenteditable element', () => {
+			const div = document.createElement( 'div' );
+
+			div.contentEditable = 'true';
+
+			expect( isInputField( div ) ).toBe( true );
+		} );
+
+		it( 'should return true for a normal div element', () => {
+			expect( isInputField( document.createElement( 'div' ) ) ).toBe( false );
 		} );
 	} );
 } );

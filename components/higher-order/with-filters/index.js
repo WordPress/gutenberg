@@ -9,7 +9,8 @@ import { applyFilters } from '@wordpress/hooks';
  * Filters get applied when the original component is about to be mounted.
  *
  * @param {String} hookName Hook name exposed to be used by filters.
- * @return {Function}       Higher-order component factory.
+ *
+ * @returns {Function} Higher-order component factory.
  */
 export default function withFilters( hookName ) {
 	return ( OriginalComponent ) => {

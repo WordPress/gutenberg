@@ -21,6 +21,7 @@ const DEFAULT_QUERY = {
 	per_page: 100,
 	orderby: 'count',
 	order: 'desc',
+	_fields: [ 'id', 'name' ],
 };
 const MAX_TERMS_SUGGESTIONS = 20;
 
@@ -105,8 +106,13 @@ class FlatTermSelector extends Component {
 				.then( resolve, ( xhr ) => {
 					const errorCode = xhr.responseJSON && xhr.responseJSON.code;
 					if ( errorCode === 'term_exists' ) {
-						return new Model( { id: xhr.responseJSON.data } )
-							.fetch().then( resolve, reject );
+						// search the new category created since last fetch
+						this.addRequest = new Model().fetch(
+							{ data: { ...DEFAULT_QUERY, search: termName } }
+						);
+						return this.addRequest.then( searchResult => {
+							resolve( find( searchResult, result => result.name === termName ) );
+						}, reject );
 					}
 					reject( xhr );
 				} );
@@ -156,7 +162,7 @@ class FlatTermSelector extends Component {
 
 		return (
 			<div className="editor-post-taxonomies__flat-terms-selector">
-				<h4 className="editor-post-taxonomies__flat-terms-selector-title">{ label }</h4>
+				<h3 className="editor-post-taxonomies__flat-terms-selector-title">{ label }</h3>
 				<FormTokenField
 					value={ selectedTerms }
 					displayTransform={ unescapeString }

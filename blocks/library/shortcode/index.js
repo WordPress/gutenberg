@@ -14,11 +14,11 @@ import { withInstanceId, Dashicon } from '@wordpress/components';
  */
 import './editor.scss';
 import { registerBlockType } from '../../api';
-import InspectorControls from '../../inspector-controls';
-import BlockDescription from '../../block-description';
 
 registerBlockType( 'core/shortcode', {
 	title: __( 'Shortcode' ),
+
+	description: __( 'A shortcode is a WordPress-specific code snippet that is written between square brackets as [shortcode]. ' ),
 
 	icon: 'marker',
 
@@ -62,7 +62,7 @@ registerBlockType( 'core/shortcode', {
 	},
 
 	edit: withInstanceId(
-		( { attributes, setAttributes, instanceId, focus } ) => {
+		( { attributes, setAttributes, instanceId } ) => {
 			const inputId = `blocks-shortcode-input-${ instanceId }`;
 
 			return (
@@ -80,14 +80,6 @@ registerBlockType( 'core/shortcode', {
 							text: event.target.value,
 						} ) }
 					/>
-					{ focus &&
-						<InspectorControls>
-							<BlockDescription>
-								<p>{ __( 'A shortcode is a WordPress-specific code snippet that is written between square brackets as [shortcode]. ' ) }</p>
-							</BlockDescription>
-							<p>{ __( 'No advanced options.' ) }</p>
-						</InspectorControls>
-					}
 				</div>
 			);
 		}

@@ -19,8 +19,6 @@ import { registerBlockType, createBlock } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
 import Editable from '../../editable';
-import InspectorControls from '../../inspector-controls';
-import BlockDescription from '../../block-description';
 
 const toEditableValue = value => value.map( ( subValue => subValue.children ) );
 const fromEditableValue = value => value.map( ( subValue ) => ( {
@@ -55,6 +53,7 @@ const blockAttributes = {
 
 registerBlockType( 'core/quote', {
 	title: __( 'Quote' ),
+	description: __( 'Quote. In quoting others, we cite ourselves. (Julio Cortázar)' ),
 	icon: 'format-quote',
 	category: 'common',
 
@@ -176,16 +175,10 @@ registerBlockType( 'core/quote', {
 					/>
 				</BlockControls>
 			),
-			focus && (
-				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'Quote. In quoting others, we cite ourselves. (Julio Cortázar)' ) }</p>
-					</BlockDescription>
-				</InspectorControls>
-			),
 			<blockquote
 				key="quote"
 				className={ containerClassname }
+				style={ { textAlign: align } }
 			>
 				<Editable
 					multiline="p"
@@ -204,14 +197,12 @@ registerBlockType( 'core/quote', {
 							onReplace( [] );
 						}
 					} }
-					style={ { textAlign: align } }
 					placeholder={ __( 'Write quote…' ) }
 				/>
 				{ ( ( citation && citation.length > 0 ) || !! focus ) && (
 					<Editable
 						tagName="cite"
 						value={ citation }
-						placeholder={ __( 'Write citation…' ) }
 						onChange={
 							( nextCitation ) => setAttributes( {
 								citation: nextCitation,
@@ -224,6 +215,7 @@ registerBlockType( 'core/quote', {
 								setFocus( { ...focus, editable: 'value' } );
 							}
 						} }
+						placeholder={ __( 'Write citation…' ) }
 					/>
 				) }
 			</blockquote>,

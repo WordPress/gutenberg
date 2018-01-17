@@ -15,13 +15,10 @@ import {
  */
 import { __ } from '@wordpress/i18n';
 import { Component, compose } from '@wordpress/element';
-import { mediaUpload, createMediaFromFile, getBlobByURL, revokeBlobURL, viewPort } from '@wordpress/utils';
+import { createMediaFromFile, getBlobByURL, revokeBlobURL, viewPort } from '@wordpress/utils';
 import {
-	Placeholder,
-	Dashicon,
+	IconButton,
 	Toolbar,
-	DropZone,
-	FormFileUpload,
 	withAPIData,
 	withContext,
 } from '@wordpress/components';
@@ -30,13 +27,13 @@ import {
  * Internal dependencies
  */
 import Editable from '../../editable';
-import MediaUploadButton from '../../media-upload-button';
+import ImagePlaceHolder from '../../image-placeholder';
+import MediaUpload from '../../media-upload';
 import InspectorControls from '../../inspector-controls';
 import TextControl from '../../inspector-controls/text-control';
 import SelectControl from '../../inspector-controls/select-control';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
-import BlockDescription from '../../block-description';
 import UrlInputButton from '../../url-input/button';
 import ImageSize from './image-size';
 
@@ -118,15 +115,6 @@ class ImageBlock extends Component {
 		const availableSizes = this.getAvailableSizes();
 		const figureStyle = width ? { width } : {};
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && ( ! viewPort.isExtraSmall() );
-		const uploadButtonProps = { isLarge: true };
-		const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setAttributes );
-		const dropFiles = ( files ) => mediaUpload( files, setAttributes );
-
-		const blockDescription = (
-			<BlockDescription>
-				<p>{ __( 'Worth a thousand words.' ) }</p>
-			</BlockDescription>
-		);
 
 		const controls = (
 			focus && (
@@ -137,17 +125,19 @@ class ImageBlock extends Component {
 					/>
 
 					<Toolbar>
-						<MediaUploadButton
-							buttonProps={ {
-								className: 'components-icon-button components-toolbar__control',
-								'aria-label': __( 'Edit image' ),
-							} }
+						<MediaUpload
 							onSelect={ this.onSelectImage }
 							type="image"
 							value={ id }
-						>
-							<Dashicon icon="edit" />
-						</MediaUploadButton>
+							render={ ( { open } ) => (
+								<IconButton
+									className="components-toolbar__control"
+									label={ __( 'Edit image' ) }
+									icon="edit"
+									onClick={ open }
+								/>
+							) }
+						/>
 						<UrlInputButton onChange={ this.onSetHref } url={ href } />
 					</Toolbar>
 				</BlockControls>
@@ -157,36 +147,13 @@ class ImageBlock extends Component {
 		if ( ! url ) {
 			return [
 				controls,
-				focus && (
-					<InspectorControls key="inspector">
-						{ blockDescription }
-					</InspectorControls>
-				),
-				<Placeholder
-					key="placeholder"
-					instructions={ __( 'Drag image here or insert from media library' ) }
+				<ImagePlaceHolder
+					className={ className }
+					key="image-placeholder"
 					icon="format-image"
 					label={ __( 'Image' ) }
-					className={ className }>
-					<DropZone
-						onFilesDrop={ dropFiles }
-					/>
-					<FormFileUpload
-						isLarge
-						className="wp-block-image__upload-button"
-						onChange={ uploadFromFiles }
-						accept="image/*"
-					>
-						{ __( 'Upload' ) }
-					</FormFileUpload>
-					<MediaUploadButton
-						buttonProps={ uploadButtonProps }
-						onSelect={ this.onSelectImage }
-						type="image"
-					>
-						{ __( 'Insert from Media Library' ) }
-					</MediaUploadButton>
-				</Placeholder>,
+					onSelectImage={ this.onSelectImage }
+				/>,
 			];
 		}
 
@@ -204,8 +171,7 @@ class ImageBlock extends Component {
 			controls,
 			focus && (
 				<InspectorControls key="inspector">
-					{ blockDescription }
-					<h3>{ __( 'Image Settings' ) }</h3>
+					<h2>{ __( 'Image Settings' ) }</h2>
 					<TextControl label={ __( 'Textual Alternative' ) } value={ alt } onChange={ this.updateAlt } help={ __( 'Describe the purpose of the image. Leave empty if the image is not a key part of the content.' ) } />
 					{ ! isEmpty( availableSizes ) && (
 						<SelectControl

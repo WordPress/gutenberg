@@ -189,13 +189,15 @@ function gutenberg_collect_meta_box_data() {
 		add_meta_box( 'authordiv', __( 'Author', 'gutenberg' ), 'post_author_meta_box', $screen, 'normal', 'core' );
 	}
 
+	// Run the hooks for adding meta boxes for a specific post type.
+	do_action( 'add_meta_boxes', $post_type, $post );
+	do_action( "add_meta_boxes_{$post_type}", $post );
+
 	// Set up meta box locations.
 	$locations = array( 'normal', 'advanced', 'side' );
 
 	// Foreach location run the hooks meta boxes are potentially registered on.
 	foreach ( $locations as $location ) {
-		do_action( 'add_meta_boxes', $post->post_type, $post );
-		do_action( "add_meta_boxes_{$post->post_type}", $post );
 		do_action(
 			'do_meta_boxes',
 			$screen,
@@ -394,22 +396,18 @@ add_filter( 'display_post_states', 'gutenberg_add_gutenberg_post_state', 10, 2 )
  */
 function gutenberg_register_post_types() {
 	register_post_type( 'wp_block', array(
-		'public' => false,
+		'labels'                => array(
+			'name'          => 'Blocks',
+			'singular_name' => 'Block',
+		),
+		'public'                => false,
+		'capability_type'       => 'post',
+		'show_in_rest'          => true,
+		'rest_base'             => 'blocks',
+		'rest_controller_class' => 'WP_REST_Blocks_Controller',
 	) );
 }
 add_action( 'init', 'gutenberg_register_post_types' );
-
-/**
- * Registers the REST API routes needed by the Gutenberg editor.
- *
- * @since 0.10.0
- */
-function gutenberg_register_rest_routes() {
-	$controller = new WP_REST_Reusable_Blocks_Controller();
-	$controller->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_routes' );
-
 
 /**
  * Gets revisions details for the selected post.

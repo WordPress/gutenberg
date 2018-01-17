@@ -69,22 +69,30 @@ class Dropdown extends Component {
 			contentClassName,
 			expandOnMobile,
 		} = this.props;
+
 		const args = { isOpen, onToggle: this.toggle, onClose: this.close };
+
 		return (
 			<div className={ className } ref={ this.bindContainer }>
-				{ renderToggle( args ) }
-				<Popover
-					className={ contentClassName }
-					isOpen={ isOpen }
-					position={ position }
-					onClose={ this.close }
-					onClickOutside={ this.clickOutside }
-					expandOnMobile={ expandOnMobile }
-				>
-					<FocusManaged>
-						{ renderContent( args ) }
-					</FocusManaged>
-				</Popover>
+				{ /**
+				   * This seemingly redundant wrapper node avoids root return
+				   * element styling impacting popover positioning.
+				   */ }
+				<div>
+					{ renderToggle( args ) }
+					<Popover
+						className={ contentClassName }
+						isOpen={ isOpen }
+						position={ position }
+						onClose={ this.close }
+						onClickOutside={ this.clickOutside }
+						expandOnMobile={ expandOnMobile }
+					>
+						<FocusManaged>
+							{ renderContent( args ) }
+						</FocusManaged>
+					</Popover>
+				</div>
 			</div>
 		);
 	}

@@ -14,7 +14,7 @@ import { speak } from '@wordpress/a11y';
  *
  * @param {WPElement}  WrappedComponent  The wrapped component
  *
- * @return {Component}                   Component with an instanceId prop.
+ * @returns {Component} Component with an instanceId prop.
  */
 function withSpokenMessages( WrappedComponent ) {
 	return class extends Component {

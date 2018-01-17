@@ -1,10 +1,6 @@
-
-.editor-block-list__block[data-type="core/latest-posts"] {
-
-	.wp-block-latest-posts {
-		padding-left: 2.5em;
-		&.is-grid {
-			padding-left: 0;
-		}
+.gutenberg .wp-block-latest-posts {
+	padding-left: 2.5em;
+	&.is-grid {
+		padding-left: 0;
 	}
 }
