@@ -49,7 +49,7 @@ class UnsavedChangesWarning extends Component {
 	warnIfUnsavedChanges( event ) {
 		const areMetaBoxesDirty = some( this.props.metaBoxes, ( metaBox, location ) => {
 			return metaBox.isActive &&
-				jQuery( getMetaBoxContainer( location ) ).serialize() !== metaBox.html;
+				jQuery( getMetaBoxContainer( location ) ).serialize() !== metaBox.data;
 		} );
 		if ( this.props.isDirty || areMetaBoxesDirty ) {
 			event.returnValue = __( 'You have unsaved changes. If you proceed, they will be lost.' );
