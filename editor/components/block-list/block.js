@@ -224,12 +224,9 @@ export class BlockListBlock extends Component {
 	}
 
 	maybeStartTyping() {
-		// We do not want to dispatch start typing if...
-		//  - State value already reflects that we're typing (dispatch noise)
-		//  - The current block is not selected (e.g. after a split occurs,
-		//    we'll still receive the keyDown event, but the focus has since
-		//    shifted to the newly created block)
-		if ( ! this.props.isTyping && this.props.isSelected ) {
+		// We do not want to dispatch start typing if state value already reflects
+		// that we're typing (dispatch noise)
+		if ( ! this.props.isTyping ) {
 			this.props.onStartTyping();
 		}
 	}
@@ -267,6 +264,10 @@ export class BlockListBlock extends Component {
 		} else {
 			onMerge( previousBlock, block );
 		}
+
+		// Manually trigger typing mode, since merging will remove this block and
+		// cause onKeyDown to not fire
+		this.maybeStartTyping();
 	}
 
 	insertBlocksAfter( blocks ) {
@@ -311,6 +312,9 @@ export class BlockListBlock extends Component {
 						createBlock( 'core/paragraph' ),
 					], this.props.order + 1 );
 				}
+
+				// Pressing enter should trigger typing mode after the content has split
+				this.maybeStartTyping();
 				break;
 
 			case UP:
@@ -336,6 +340,9 @@ export class BlockListBlock extends Component {
 						}
 					}
 				}
+
+				// Pressing backspace should trigger typing mode
+				this.maybeStartTyping();
 				break;
 
 			case ESCAPE:

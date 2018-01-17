@@ -193,12 +193,12 @@ function gutenberg_intercept_edit_post() {
 	$post = get_post( $post_id );
 
 	// Errors and invalid requests are handled in post.php, do not intercept.
-	if ( $post ) {
-		$post_type        = $post->post_type;
-		$post_type_object = get_post_type_object( $post_type );
-	} else {
+	if ( ! $post ) {
 		return;
 	}
+
+	$post_type        = $post->post_type;
+	$post_type_object = get_post_type_object( $post_type );
 
 	if ( ! $post_type_object ) {
 		return;

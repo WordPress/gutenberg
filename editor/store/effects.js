@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, includes, map, castArray, uniqueId } from 'lodash';
+import { get, includes, map, castArray, uniqueId, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -451,5 +451,11 @@ export default {
 	CREATE_NOTICE( { notice: { content, spokenMessage } } ) {
 		const message = spokenMessage || content;
 		speak( message, 'assertive' );
+	},
+	INITIALIZE_META_BOX_STATE( action ) {
+		// Allow toggling metaboxes panels
+		if ( some( action.metaBoxes ) ) {
+			window.postboxes.add_postbox_toggles( 'post' );
+		}
 	},
 };
