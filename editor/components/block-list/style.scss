@@ -284,7 +284,7 @@
 
 	// Right side UI
 	> .editor-block-settings-menu {
-		right: 2px;
+		right: $block-mover-margin;
 
 		// Mobile
 		display: none;
@@ -296,7 +296,7 @@
 
 	// Left side UI
 	> .editor-block-mover {
-		left: 2px;
+		left: $block-mover-margin;
 		padding-top: 4px;
 		z-index: z-index( '.editor-block-mover' );
 

@@ -1,3 +1,4 @@
+// Mover icon buttons$
 .editor-block-mover__control {
 	display: block;
 	padding: 2px;
@@ -8,6 +9,7 @@
 	color: $dark-gray-300;
 	cursor: pointer;
 	border-radius: 50%;
+	width: $icon-button-size-small;
 
 	&[aria-disabled="true"] {
 		cursor: default;
@@ -53,9 +55,6 @@
 
 // Side inserter
 .editor-block-mover {
-	// This makes the hoverable area larger
-	height: 100%;
-
 	.editor-inserter__toggle {
 		padding: 2px;
 	}
@@ -64,13 +63,5 @@
 		position: absolute;
 		left: -18px;
 		top: 16px;
-
-		// Hide until side menu is hovered
-		opacity: 0;
-		transition: opacity .1s linear;
-	}
-
-	&:hover .editor-inserter {
-		opacity: 1;
 	}
 }
