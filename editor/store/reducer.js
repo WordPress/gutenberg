@@ -495,11 +495,13 @@ export function blocksMode( state = {}, action ) {
  */
 export function blockInsertionPoint( state = {}, action ) {
 	switch ( action.type ) {
-		case 'SHOW_INSERTION_POINT':
-			return { ...state, visible: true, position: action.index };
+		case 'TOGGLE_INSERTION_POINT_VISIBLE':
+			const { isVisible } = action;
+			return { ...state, isVisible };
 
-		case 'HIDE_INSERTION_POINT':
-			return { ...state, visible: false, position: null };
+		case 'SET_INSERTION_POINT_INDEX':
+			const { index } = action;
+			return { ...state, index };
 	}
 
 	return state;

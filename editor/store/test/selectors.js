@@ -63,7 +63,6 @@ import {
 	getBlockMode,
 	isTyping,
 	getBlockInsertionPoint,
-	getBlockSiblingInserterPosition,
 	isBlockInsertionPointVisible,
 	isSavingPost,
 	didPostSaveRequestSucceed,
@@ -1960,7 +1959,7 @@ describe( 'selectors', () => {
 					},
 				},
 				blockInsertionPoint: {
-					position: 2,
+					index: 2,
 				},
 			};
 
@@ -2000,6 +1999,23 @@ describe( 'selectors', () => {
 			expect( getBlockInsertionPoint( state ) ).toBe( 3 );
 		} );
 
+		it( 'should return the last block if insertion point is explicitly null', () => {
+			const state = {
+				preferences: { mode: 'visual' },
+				blockSelection: { start: null, end: null },
+				editor: {
+					present: {
+						blockOrder: [ 1, 2, 3 ],
+					},
+				},
+				blockInsertionPoint: {
+					index: null,
+				},
+			};
+
+			expect( getBlockInsertionPoint( state ) ).toBe( 3 );
+		} );
+
 		it( 'should return the last block for the text mode', () => {
 			const state = {
 				preferences: { mode: 'text' },
@@ -2016,31 +2032,19 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getBlockSiblingInserterPosition', () => {
-		it( 'should return null if no sibling insertion point', () => {
+	describe( 'isBlockInsertionPointVisible', () => {
+		it( 'should return false by default', () => {
 			const state = {
 				blockInsertionPoint: {},
 			};
 
-			expect( getBlockSiblingInserterPosition( state ) ).toBe( null );
+			expect( isBlockInsertionPointVisible( state ) ).toBe( false );
 		} );
 
-		it( 'should return sibling insertion point', () => {
-			const state = {
-				blockInsertionPoint: {
-					position: 5,
-				},
-			};
-
-			expect( getBlockSiblingInserterPosition( state ) ).toBe( 5 );
-		} );
-	} );
-
-	describe( 'isBlockInsertionPointVisible', () => {
 		it( 'should return the value in state', () => {
 			const state = {
 				blockInsertionPoint: {
-					visible: true,
+					isVisible: true,
 				},
 			};
 

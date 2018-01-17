@@ -945,9 +945,9 @@ export function getBlockInsertionPoint( state ) {
 		return state.editor.present.blockOrder.length;
 	}
 
-	const position = getBlockSiblingInserterPosition( state );
-	if ( null !== position ) {
-		return position;
+	const { index } = state.blockInsertionPoint;
+	if ( Number.isInteger( index ) ) {
+		return index;
 	}
 
 	const lastMultiSelectedBlock = getLastMultiSelectedBlockUid( state );
@@ -964,23 +964,6 @@ export function getBlockInsertionPoint( state ) {
 }
 
 /**
- * Returns the position at which the block inserter will insert a new adjacent
- * sibling block, or null if the inserter is not actively visible.
- *
- * @param  {Object}  state Global application state
- *
- * @returns {?Number} Whether the inserter is currently visible.
- */
-export function getBlockSiblingInserterPosition( state ) {
-	const { position } = state.blockInsertionPoint;
-	if ( ! Number.isInteger( position ) ) {
-		return null;
-	}
-
-	return position;
-}
-
-/**
  * Returns true if we should show the block insertion point
  *
  * @param  {Object}  state Global application state
@@ -988,7 +971,7 @@ export function getBlockSiblingInserterPosition( state ) {
  * @returns {?Boolean} Whether the insertion point is visible or not.
  */
 export function isBlockInsertionPointVisible( state ) {
-	return !! state.blockInsertionPoint.visible;
+	return !! state.blockInsertionPoint.isVisible;
 }
 
 /**

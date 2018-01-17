@@ -21,24 +21,36 @@ import {
 } from '../../store/selectors';
 import {
 	clearSelectedBlock,
+	setInsertionPointIndex,
 } from '../../store/actions';
 
 class BlockListSiblingInserter extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.forceVisibleWhileInserting = this.forceVisibleWhileInserting.bind( this );
+		this.onToggle = this.onToggle.bind( this );
 
 		this.state = {
 			isForcedVisible: false,
 		};
 	}
 
-	forceVisibleWhileInserting( isOpen ) {
+	/**
+	 * Handles sibling inserter behaviors to occur when the inserter is opened
+	 * or closed.
+	 *
+	 * @param {Boolean} isOpen Whether inserter is open.
+	 */
+	onToggle( isOpen ) {
+		// Set index at which insertion point should display
+		const { setInsertionPoint, insertIndex } = this.props;
+		setInsertionPoint( isOpen ? insertIndex : null );
+
 		// Prevent mouseout and blur while navigating the open inserter menu
 		// from causing the inserter to be unmounted.
 		this.setState( { isForcedVisible: isOpen } );
 
+		// Clear block selection when opening
 		if ( isOpen ) {
 			this.props.clearSelectedBlock();
 		}
@@ -68,7 +80,7 @@ class BlockListSiblingInserter extends Component {
 					key="inserter"
 					position="bottom"
 					insertIndex={ insertIndex }
-					onToggle={ this.forceVisibleWhileInserting }
+					onToggle={ this.onToggle }
 				/>
 			</div>
 		);
@@ -91,5 +103,6 @@ export default connect(
 	},
 	{
 		clearSelectedBlock,
+		setInsertionPoint: setInsertionPointIndex,
 	}
 )( BlockListSiblingInserter );

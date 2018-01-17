@@ -199,27 +199,32 @@ export function insertBlocks( blocks, position ) {
 }
 
 /**
- * Returns an action object showing the insertion point at a given index
+ * Returns an action object used in signalling that the visibility of the
+ * insertion point is to be toggled.
  *
- * @param  {Number?} index  Index of the insertion point
+ * @param {Boolean} isVisible Whether the insertion point is visible.
  *
  * @returns {Object} Action object.
  */
-export function showInsertionPoint( index ) {
+export function toggleInsertionPointVisible( isVisible ) {
 	return {
-		type: 'SHOW_INSERTION_POINT',
-		index,
+		type: 'TOGGLE_INSERTION_POINT_VISIBLE',
+		isVisible,
 	};
 }
 
 /**
- * Returns an action object hiding the insertion point
+ * Returns an action object used in signalling that the insertion point is to
+ * be shown at a given index.
+ *
+ * @param {Number?} index Index of the insertion point, or null to unset.
  *
  * @returns {Object} Action object.
  */
-export function hideInsertionPoint() {
+export function setInsertionPointIndex( index ) {
 	return {
-		type: 'HIDE_INSERTION_POINT',
+		type: 'SET_INSERTION_POINT_INDEX',
+		index,
 	};
 }
 

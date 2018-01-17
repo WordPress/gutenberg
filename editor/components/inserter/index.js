@@ -2,8 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import { isEmpty } from 'lodash';
+import { isEmpty, over } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,92 +10,69 @@ import { isEmpty } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { Dropdown, IconButton, withContext } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
-import { Component, compose } from '@wordpress/element';
+import { compose } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import InserterMenu from './menu';
 import { getBlockInsertionPoint, getEditorMode } from '../../store/selectors';
-import {
-	insertBlock,
-	hideInsertionPoint,
-	showInsertionPoint,
-} from '../../store/actions';
+import { insertBlock, toggleInsertionPointVisible } from '../../store/actions';
 
-class Inserter extends Component {
-	constructor() {
-		super( ...arguments );
+/**
+ * Component to render a block inserter.
+ *
+ * @param {Object} props Component props.
+ *
+ * @returns {void}
+ */
+function Inserter( props ) {
+	const {
+		position,
+		children,
+		onInsertBlock,
+		insertionPoint,
+		hasSupportedBlocks,
+		isLocked,
+	} = props;
 
-		this.onToggle = this.onToggle.bind( this );
+	if ( ! hasSupportedBlocks || isLocked ) {
+		return null;
 	}
 
-	onToggle( isOpen ) {
-		const {
-			insertIndex,
-			onToggle,
-		} = this.props;
+	return (
+		<Dropdown
+			className="editor-inserter"
+			position={ position }
+			onToggle={ props.onToggle }
+			expandOnMobile
+			renderToggle={ ( { onToggle, isOpen } ) => (
+				<IconButton
+					icon="insert"
+					label={ __( 'Add block' ) }
+					onClick={ onToggle }
+					className="editor-inserter__toggle"
+					aria-haspopup="true"
+					aria-expanded={ isOpen }
+				>
+					{ children }
+				</IconButton>
+			) }
+			renderContent={ ( { onClose } ) => {
+				const onInsert = ( name, initialAttributes ) => {
+					onInsertBlock(
+						name,
+						initialAttributes,
+						insertionPoint
+					);
 
-		if ( isOpen ) {
-			this.props.showInsertionPoint( insertIndex );
-		} else {
-			this.props.hideInsertionPoint();
-		}
+					onClose();
+				};
 
-		// Surface toggle callback to parent component
-		if ( onToggle ) {
-			onToggle( isOpen );
-		}
-	}
-
-	render() {
-		const {
-			position,
-			children,
-			onInsertBlock,
-			insertionPoint,
-			hasSupportedBlocks,
-			isLocked,
-		} = this.props;
-
-		if ( ! hasSupportedBlocks || isLocked ) {
-			return null;
-		}
-
-		return (
-			<Dropdown
-				className="editor-inserter"
-				position={ position }
-				onToggle={ this.onToggle }
-				expandOnMobile
-				renderToggle={ ( { onToggle, isOpen } ) => (
-					<IconButton
-						icon="insert"
-						label={ __( 'Add block' ) }
-						onClick={ onToggle }
-						className="editor-inserter__toggle"
-						aria-haspopup="true"
-						aria-expanded={ isOpen }
-					>
-						{ children }
-					</IconButton>
-				) }
-				renderContent={ ( { onClose } ) => {
-					const onInsert = ( name, initialAttributes ) => {
-						onInsertBlock(
-							name,
-							initialAttributes,
-							insertionPoint
-						);
-
-						onClose();
-					};
-
-					return <InserterMenu onSelect={ onInsert } />;
-				} }
-			/>
-		);
-	}
+				return <InserterMenu onSelect={ onInsert } />;
+			} }
+		/>
+	);
 }
 
 export default compose( [
@@ -107,17 +83,22 @@ export default compose( [
 				mode: getEditorMode( state ),
 			};
 		},
-		( dispatch ) => ( {
+		( dispatch, ownProps ) => ( {
 			onInsertBlock( name, initialAttributes, position ) {
 				dispatch( insertBlock(
 					createBlock( name, initialAttributes ),
 					position
 				) );
 			},
-			...bindActionCreators( {
-				showInsertionPoint,
-				hideInsertionPoint,
-			}, dispatch ),
+
+			onToggle: over( [
+				// Allow parent component to handle toggle, e.g. setting an
+				// insertion point prior to it being shown
+				ownProps.onToggle,
+
+				// Toggle insertion point visibility to new value
+				( isOpen ) => dispatch( toggleInsertionPointVisible( isOpen ) ),
+			] ),
 		} )
 	),
 	withContext( 'editor' )( ( settings ) => {
