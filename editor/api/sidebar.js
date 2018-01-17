@@ -5,7 +5,7 @@ import { isFunction } from 'lodash';
 
 /* Internal dependencies */
 import store from '../store';
-import { setGeneralSidebarActivePanel } from '../store/actions';
+import { setGeneralSidebarActivePanel, openGeneralSidebar } from '../store/actions';
 import { applyFilters } from '@wordpress/hooks';
 
 const sidebars = {};
@@ -75,12 +75,13 @@ export function registerSidebar( name, settings ) {
 /**
  * Retrieves the sidebar settings object.
  *
- * @param {string} name The name of the sidebar to retrieve.
+ * @param {string} name The name of the sidebar to retrieve the settings for.
  *
- * @returns {Object} The settings object of the sidebar. Or false if the
+ * @returns {Object} The settings object of the sidebar. Or null if the
  *                         sidebar doesn't exist.
  */
-export function getSidebar( name ) {
+export function getSidebarSettings( name ) {
+	console.log("getSidebarSettings", sidebars)
 	if ( ! sidebars.hasOwnProperty( name ) ) {
 		return null;
 	}
@@ -91,36 +92,32 @@ export function getSidebar( name ) {
  * Renders a plugin sidebar.
  *
  * @param {string}   name      The name of the plugin sidebar.
- * @param {Object}   render    The render function for the plugin sidebar.
+ * @param {Object}   settings  The settings for this sidebar.
+ * @param {string}   settings.title  The name to show in the settings menu.
+ * @param {Function} settings.render The function that renders the sidebar.
  *
  * @returns {void}
  */
-export function renderSidebar( name ) {
-	if ( ! sidebars[ name ] ) {
-		console.error(
-			'Sidebar "' + name + '" is not registered yet.'
-		);
-	}
-
-	let settings = sidebars[ name ].settings;
-
-	/*if ( ! settings || ! isFunction( settings.renderFunction ) ) {
-		console.error(
-			'The "renderFunction" property must be specified and must be a valid function.'
-		);
-		return null;
-	}*/
-
-	let render = getSidebar( name ).render;
-	render();
+export function renderSidebar( name, settings ) {
+	registerSidebar( name, settings );
+	activateSidebar( name, settings );
+/*
+	let render = getSidebarSettings( name ).render;
+	render();*/
 }
 
 /**
  * Activates the given sidebar.
  *
- * @param  {string} pluginId The name of the sidebar to activate.
+ * @param  {string} name The name of the sidebar to activate.
  * @return {void}
  */
-export function activateSidebar( pluginId ) {
-	store.dispatch( setGeneralSidebarActivePanel( 'plugins', pluginId ) );
+export function activateSidebar( name ) {
+	if ( ! sidebars[ name ] ) {
+		console.error(
+			'Sidebar "' + name + '" is not registered yet.'
+		);
+	}
+	store.dispatch( openGeneralSidebar( 'plugins' ) );
+	store.dispatch( setGeneralSidebarActivePanel( 'plugins', name ) );
 }

@@ -14,7 +14,7 @@ import { Panel, PanelBody, IconButton, withFocusReturn } from '@wordpress/compon
  * Internal Dependencies
  */
 import './style.scss';
-import { getSidebar } from '../../api/sidebar';
+import { getSidebarSettings } from '../../api/sidebar';
 import { getActivePlugin } from '../../store/selectors';
 import { closeGeneralSidebar } from '../../store/actions';
 
@@ -27,7 +27,9 @@ import { closeGeneralSidebar } from '../../store/actions';
  * @returns {Object} The React element to render as a panel.
  */
 export function getPluginSidebar( plugin ) {
-	const pluginSidebar = getSidebar( plugin );
+	const pluginSidebar = getSidebarSettings( plugin );
+	console.log( "pluginSidebar", pluginSidebar );
+	console.log( "plugin", plugin );
 
 	if ( ! pluginSidebar ) {
 		return {
