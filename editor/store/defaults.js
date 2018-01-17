@@ -7,7 +7,6 @@ export const PREFERENCES_DEFAULTS = {
 	},
 	panels: { 'post-status': true },
 	recentlyUsedBlocks: [],
-	blockUsage: {},
 	features: {
 		fixedToolbar: false,
 	},

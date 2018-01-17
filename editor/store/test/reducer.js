@@ -922,7 +922,6 @@ describe( 'state', () => {
 			const state = preferences( undefined, {} );
 
 			expect( state ).toEqual( {
-				blockUsage: {},
 				recentlyUsedBlocks: [],
 				mode: 'visual',
 				sidebars: {
@@ -1007,7 +1006,7 @@ describe( 'state', () => {
 		} );
 
 		it( 'should record recently used blocks', () => {
-			const state = preferences( deepFreeze( { recentlyUsedBlocks: [], blockUsage: {} } ), {
+			const state = preferences( deepFreeze( { recentlyUsedBlocks: [] } ), {
 				type: 'INSERT_BLOCKS',
 				blocks: [ {
 					uid: 'bacon',
@@ -1017,7 +1016,7 @@ describe( 'state', () => {
 
 			expect( state.recentlyUsedBlocks[ 0 ] ).toEqual( 'core-embed/twitter' );
 
-			const twoRecentBlocks = preferences( deepFreeze( { recentlyUsedBlocks: [], blockUsage: {} } ), {
+			const twoRecentBlocks = preferences( deepFreeze( { recentlyUsedBlocks: [] } ), {
 				type: 'INSERT_BLOCKS',
 				blocks: [ {
 					uid: 'eggs',
@@ -1030,24 +1029,6 @@ describe( 'state', () => {
 
 			expect( twoRecentBlocks.recentlyUsedBlocks[ 0 ] ).toEqual( 'core-embed/youtube' );
 			expect( twoRecentBlocks.recentlyUsedBlocks[ 1 ] ).toEqual( 'core-embed/twitter' );
-		} );
-
-		it( 'should record block usage', () => {
-			const state = preferences( deepFreeze( { recentlyUsedBlocks: [], blockUsage: {} } ), {
-				type: 'INSERT_BLOCKS',
-				blocks: [ {
-					uid: 'eggs',
-					name: 'core-embed/twitter',
-				}, {
-					uid: 'bacon',
-					name: 'core-embed/youtube',
-				}, {
-					uid: 'milk',
-					name: 'core-embed/youtube',
-				} ],
-			} );
-
-			expect( state.blockUsage ).toEqual( { 'core-embed/youtube': 2, 'core-embed/twitter': 1 } );
 		} );
 
 		it( 'should populate recentlyUsedBlocks, filling up with common blocks, on editor setup', () => {
@@ -1069,13 +1050,6 @@ describe( 'state', () => {
 				type: 'SETUP_EDITOR',
 			} );
 			expect( state.recentlyUsedBlocks[ 0 ] ).toEqual( 'core-embed/youtube' );
-		} );
-
-		it( 'should remove unregistered blocks from persisted block usage stats', () => {
-			const state = preferences( deepFreeze( { recentlyUsedBlocks: [], blockUsage: { 'core/i-do-not-exist': 42, 'core-embed/youtube': 88 } } ), {
-				type: 'SETUP_EDITOR',
-			} );
-			expect( state.blockUsage ).toEqual( { 'core-embed/youtube': 88 } );
 		} );
 
 		it( 'should toggle a feature flag', () => {

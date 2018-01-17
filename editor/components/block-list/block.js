@@ -34,6 +34,7 @@ import BlockContextualToolbar from './block-contextual-toolbar';
 import BlockMultiControls from './multi-controls';
 import BlockMobileToolbar from './block-mobile-toolbar';
 import BlockListSiblingInserter from './sibling-inserter';
+import BlockListInsertionPoint from './insertion-point';
 import {
 	clearSelectedBlock,
 	editPost,
@@ -63,6 +64,7 @@ import {
 	isSelectionEnabled,
 	isTyping,
 	getBlockMode,
+	getBlockCount,
 } from '../../store/selectors';
 
 const { BACKSPACE, ESCAPE, DELETE, ENTER, UP, RIGHT, DOWN, LEFT } = keycodes;
@@ -357,7 +359,7 @@ export class BlockListBlock extends Component {
 	}
 
 	render() {
-		const { block, order, mode, showContextualToolbar, isLocked } = this.props;
+		const { block, order, mode, showContextualToolbar, isLocked, isLast } = this.props;
 		const { name: blockName, isValid } = block;
 		const blockType = getBlockType( blockName );
 		// translators: %s: Type of block (i.e. Text, Image etc)
@@ -375,6 +377,7 @@ export class BlockListBlock extends Component {
 			'is-multi-selected': isMultiSelected,
 			'is-hovered': isHovered,
 			'is-reusable': isReusableBlock( blockType ),
+			'is-last': isLast,
 		} );
 
 		const { onMouseLeave, onFocus, onReplace } = this.props;
@@ -448,27 +451,33 @@ export class BlockListBlock extends Component {
 				</div>
 				{ !! error && <BlockCrashWarning /> }
 				<BlockListSiblingInserter uid={ block.uid } />
+				<BlockListInsertionPoint uid={ block.uid } />
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 	}
 }
 
-const mapStateToProps = ( state, { uid } ) => ( {
-	previousBlock: getPreviousBlock( state, uid ),
-	nextBlock: getNextBlock( state, uid ),
-	block: getBlock( state, uid ),
-	isSelected: isBlockSelected( state, uid ),
-	isMultiSelected: isBlockMultiSelected( state, uid ),
-	isFirstMultiSelected: isFirstMultiSelectedBlock( state, uid ),
-	isHovered: isBlockHovered( state, uid ) && ! isMultiSelecting( state ),
-	focus: getBlockFocus( state, uid ),
-	isTyping: isTyping( state ),
-	order: getBlockIndex( state, uid ),
-	meta: getEditedPostAttribute( state, 'meta' ),
-	mode: getBlockMode( state, uid ),
-	isSelectionEnabled: isSelectionEnabled( state ),
-} );
+const mapStateToProps = ( state, { uid } ) => {
+	const index = getBlockIndex( state, uid );
+
+	return {
+		previousBlock: getPreviousBlock( state, uid ),
+		nextBlock: getNextBlock( state, uid ),
+		block: getBlock( state, uid ),
+		isSelected: isBlockSelected( state, uid ),
+		isMultiSelected: isBlockMultiSelected( state, uid ),
+		isFirstMultiSelected: isFirstMultiSelectedBlock( state, uid ),
+		isHovered: isBlockHovered( state, uid ) && ! isMultiSelecting( state ),
+		focus: getBlockFocus( state, uid ),
+		isTyping: isTyping( state ),
+		order: index,
+		meta: getEditedPostAttribute( state, 'meta' ),
+		mode: getBlockMode( state, uid ),
+		isSelectionEnabled: isSelectionEnabled( state ),
+		isLast: index === getBlockCount( state ) - 1,
+	};
+};
 
 const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 	onChange( uid, attributes ) {
