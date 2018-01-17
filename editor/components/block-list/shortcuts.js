@@ -91,6 +91,8 @@ class BlockListShortcuts extends Component {
 				onChange( uid, result );
 			} );
 		}
+
+		event.preventDefault();
 	}
 
 	render() {
