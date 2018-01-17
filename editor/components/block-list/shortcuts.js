@@ -98,14 +98,7 @@ class BlockListShortcuts extends Component {
 	}
 }
 
-export default connect(
-	null,
-	( dispatch ) => ( {
-		onReplace( uids, blocks ) {
-			dispatch( replaceBlocks( uids, blocks ) );
-		},
-		onChange( uid, attributes ) {
-			dispatch( updateBlockAttributes( uid, attributes ) );
-		},
-	} )
-)( BlockListShortcuts );
+export default connect( null, {
+	onReplace: replaceBlocks,
+	onChange: updateBlockAttributes,
+} )( BlockListShortcuts );
