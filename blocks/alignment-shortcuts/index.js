@@ -15,9 +15,9 @@ export default map( {
 }, ( shortcut, value ) => ( {
 	type: 'shortcut',
 	shortcut,
-	transform( attributes ) {
-		const firstAlign = first( attributes ).align;
-		const isSame = attributes.every( ( { align } ) => align === firstAlign );
+	transform( blocks ) {
+		const firstAlign = first( blocks ).attributes.align;
+		const isSame = blocks.every( ( { attributes: { align } } ) => align === firstAlign );
 
 		// If already aligned, set back to default.
 		if ( isSame && firstAlign === value ) {

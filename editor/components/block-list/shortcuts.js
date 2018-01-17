@@ -81,7 +81,7 @@ class BlockListShortcuts extends Component {
 			return;
 		}
 
-		const result = transform.transform( map( this.blocks, 'attributes' ) );
+		const result = transform.transform( this.blocks );
 
 		// Check if we received blocks or attributes.
 		if ( result.uid || Array.isArray( result ) ) {

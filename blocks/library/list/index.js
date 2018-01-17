@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, compact, get, initial, last, isEmpty, first } from 'lodash';
+import { find, compact, get, initial, last, isEmpty, first, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -61,13 +61,17 @@ export const settings = {
 					} );
 				},
 			},
-			...[ 'OL', 'UL' ].map( ( tag ) => ( {
+			...map( {
+				OL: 'o',
+				UL: 'u',
+			}, ( shortcut, tag ) => ( {
 				type: 'shortcut',
 				blocks: [ 'core/paragraph' ],
-				shortcut: tag.charAt( 0 ).toLowerCase(),
-				transform( blockAttributes ) {
-					const items = blockAttributes.map( ( { content } ) => content );
+				shortcut,
+				transform( blocks ) {
+					const items = blocks.map( ( { attributes: { content } } ) => content );
 					const hasItems = ! items.every( isEmpty );
+
 					return createBlock( 'core/list', {
 						nodeName: tag,
 						values: hasItems ? items.map( ( content, index ) => <li key={ index }>{ content }</li> ) : [],
@@ -136,16 +140,19 @@ export const settings = {
 					} );
 				},
 			},
-			...[ 'OL', 'UL' ].map( ( tag ) => ( {
+			...map( {
+				OL: 'o',
+				UL: 'u',
+			}, ( shortcut, tag ) => ( {
 				type: 'shortcut',
-				shortcut: tag.charAt( 0 ).toLowerCase(),
-				transform( attributes ) {
-					const firstNodeName = first( attributes ).nodeName;
-					const isSame = attributes.every( ( { nodeName } ) => nodeName === firstNodeName );
+				shortcut,
+				transform( blocks ) {
+					const firstNodeName = first( blocks ).attributes.nodeName;
+					const isSame = blocks.every( ( { attributes: { nodeName } } ) => nodeName === firstNodeName );
 
 					// All lists already with tag, set back to paragraphs.
 					if ( isSame && firstNodeName === tag ) {
-						return attributes.reduce( ( acc, { values } ) => [
+						return blocks.reduce( ( acc, { attributes: { values } } ) => [
 							...acc,
 							...compact( values.map( ( value ) => get( value, 'props.children', null ) ) )
 								.map( ( content ) => createBlock( 'core/paragraph', {
@@ -157,7 +164,7 @@ export const settings = {
 					// Merge list.
 					return createBlock( 'core/list', {
 						nodeName: tag,
-						values: attributes.reduce( ( acc, { values } ) => [ ...acc, ...values ], [] ),
+						values: blocks.reduce( ( acc, { attributes: { values } } ) => [ ...acc, ...values ], [] ),
 					} );
 				},
 			} ) ),
