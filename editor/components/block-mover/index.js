@@ -32,6 +32,7 @@ export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, block
 	// the rendering parent, leaving it unable to react to focus out.
 	return (
 		<div className="editor-block-mover">
+			<VisualEditorInserter />
 			<IconButton
 				className="editor-block-mover__control"
 				onClick={ isFirst ? null : onMoveUp }
@@ -62,7 +63,6 @@ export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, block
 				) }
 				aria-disabled={ isLast }
 			/>
-			<VisualEditorInserter />
 		</div>
 	);
 }

@@ -50,12 +50,22 @@
 
 	.dashicon {
 		display: block;
+		width: 16px;
+		height: 16px;
+		margin: 1px 2px 3px 2px;
 	}
+
+	&:first-child .dashicon {
+		margin: 3px 2px 1px 2px;
+	}
+
 }
 
 // Side inserter
 .editor-block-mover {
+	// Button itself
 	.editor-inserter__toggle {
+		width: $icon-button-size-small;
 		padding: 2px;
 	}
 

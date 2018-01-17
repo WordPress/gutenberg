@@ -317,13 +317,22 @@
 			display: none;
 		}
 
-		// Movers & trash
+		// Movers, inserter, trash & ellipsis
+		.editor-inserter {
+			position: relative;
+			left: auto;
+			top: auto;
+			margin: 0;
+		}
+
+		.editor-inserter__toggle,
 		.editor-block-settings-menu__toggle,
 		& > .editor-block-settings-menu__control,
 		.editor-block-mover__control {
-			width: 36px;
-			height: 36px;
+			width: $icon-button-size;
+			height: $icon-button-size;
 			padding: 3px;
+			margin: 0;
 			text-indent: 100%;
 			justify-content: center;
 			align-items: center;
@@ -337,8 +346,8 @@
 		.editor-block-mover {
 			margin-right: auto;
 
-			.editor-block-mover__control:first-child {
-				margin: 0;
+			.editor-inserter,
+			.editor-block-mover__control {
 				float: left;
 			}
 		}
