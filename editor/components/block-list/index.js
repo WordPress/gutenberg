@@ -10,10 +10,6 @@ import {
 	mapValues,
 	sortBy,
 	throttle,
-	find,
-	first,
-	castArray,
-	every,
 } from 'lodash';
 import scrollIntoView from 'dom-scroll-into-view';
 import 'element-closest';
@@ -22,8 +18,7 @@ import 'element-closest';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { serialize, getPossibleShortcutTransformations } from '@wordpress/blocks';
-import { keycodes } from '@wordpress/utils';
+import { serialize } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -32,6 +27,7 @@ import './style.scss';
 import BlockListBlock from './block';
 import BlockInsertionPoint from './insertion-point';
 import BlockSelectionClearer from '../block-selection-clearer';
+import BlockListShortcuts from './shortcuts';
 import {
 	getBlockUids,
 	getMultiSelectedBlocksStartUid,
@@ -42,10 +38,8 @@ import {
 	isSelectionEnabled,
 	isMultiSelecting,
 } from '../../store/selectors';
-import { startMultiSelect, stopMultiSelect, multiSelect, selectBlock, replaceBlocks, updateBlockAttributes } from '../../store/actions';
+import { startMultiSelect, stopMultiSelect, multiSelect, selectBlock } from '../../store/actions';
 import { documentHasSelection } from '../../utils/dom';
-
-const { isAccess } = keycodes;
 
 class BlockList extends Component {
 	constructor( props ) {
@@ -62,7 +56,6 @@ class BlockList extends Component {
 		// Browser does not fire `*move` event when the pointer position changes
 		// relative to the document, so fire it with the last known position.
 		this.onScroll = () => this.onPointerMove( { clientY: this.lastClientY } );
-		this.onKeyDown = this.onKeyDown.bind( this );
 
 		this.lastClientY = 0;
 		this.nodes = {};
@@ -72,45 +65,15 @@ class BlockList extends Component {
 		document.addEventListener( 'copy', this.onCopy );
 		document.addEventListener( 'cut', this.onCut );
 		window.addEventListener( 'mousemove', this.setLastClientY );
-		// Needs document to also work in inspector.
-		// In other words, if there is selection, but no focus.
-		document.addEventListener( 'keydown', this.onKeyDown );
 	}
 
 	componentWillUnmount() {
 		document.removeEventListener( 'copy', this.onCopy );
 		document.removeEventListener( 'cut', this.onCut );
 		window.removeEventListener( 'mousemove', this.setLastClientY );
-		document.removeEventListener( 'keydown', this.onKeyDown );
 	}
 
 	componentWillReceiveProps( nextProps ) {
-		const prevCommonName = this.commonName;
-
-		if ( nextProps.selectedBlock ) {
-			this.blocks = [ nextProps.selectedBlock ];
-			this.commonName = nextProps.selectedBlock.name;
-		} else if ( nextProps.multiSelectedBlocks.length ) {
-			this.blocks = nextProps.multiSelectedBlocks;
-
-			const firstName = first( nextProps.multiSelectedBlocks ).name;
-
-			if ( every( nextProps.multiSelectedBlocks, ( { name } ) => name === firstName ) ) {
-				this.commonName = firstName;
-			} else {
-				delete this.commonName;
-			}
-		} else {
-			delete this.blocks;
-			delete this.commonName;
-		}
-
-		if ( ! this.commonName ) {
-			delete this.shortcutTransforms;
-		} else if ( this.commonName !== prevCommonName ) {
-			this.shortcutTransforms = getPossibleShortcutTransformations( this.commonName );
-		}
-
 		if ( isEqual( this.props.multiSelectedBlockUids, nextProps.multiSelectedBlockUids ) ) {
 			return;
 		}
@@ -283,36 +246,15 @@ class BlockList extends Component {
 		}
 	}
 
-	onKeyDown( event ) {
-		const { onReplace, onChange } = this.props;
-
-		if ( ! this.shortcutTransforms || ! isAccess( event ) ) {
-			return;
-		}
-
-		const transform = find( this.shortcutTransforms, ( { shortcut } ) => isAccess( event, shortcut ) );
-
-		if ( ! transform ) {
-			return;
-		}
-
-		const result = transform.transform( map( this.blocks, 'attributes' ) );
-
-		// Check if we received blocks or attributes.
-		if ( result.uid || Array.isArray( result ) ) {
-			onReplace( map( this.blocks, 'uid' ), castArray( result ) );
-		} else {
-			this.blocks.forEach( ( { uid } ) => {
-				onChange( uid, result );
-			} );
-		}
-	}
-
 	render() {
-		const { blocks, showContextualToolbar, renderBlockMenu } = this.props;
+		const { blocks, showContextualToolbar, renderBlockMenu, selectedBlock, multiSelectedBlocks } = this.props;
 
 		return (
 			<BlockSelectionClearer>
+				<BlockListShortcuts
+					selectedBlock={ selectedBlock }
+					multiSelectedBlocks={ multiSelectedBlocks }
+				/>
 				{ !! blocks.length && <BlockInsertionPoint /> }
 				{ map( blocks, ( uid ) => (
 					<BlockListBlock
@@ -356,12 +298,6 @@ export default connect(
 		},
 		onRemove( uids ) {
 			dispatch( { type: 'REMOVE_BLOCKS', uids } );
-		},
-		onReplace( uids, blocks ) {
-			dispatch( replaceBlocks( uids, blocks ) );
-		},
-		onChange( uid, attributes ) {
-			dispatch( updateBlockAttributes( uid, attributes ) );
 		},
 	} )
 )( BlockList );
