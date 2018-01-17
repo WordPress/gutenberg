@@ -1,9 +1,15 @@
-const isMac = window.navigator.platform.toUpperCase().indexOf( 'MAC' ) >= 0;
-const mod = isMac ? '⌘' : 'Ctrl';
+/**
+ * WordPress dependencies
+ */
+import { keycodes } from '@wordpress/utils';
+
+const { getAccessCombination } = keycodes;
+
+const combination = getAccessCombination( 'm' );
 
 export default {
 	toggleEditorMode: {
-		value: 'mod+shift+alt+m',
-		label: `${ mod }+Shift+Alt+M`,
+		value: combination.toLowerCase(),
+		label: combination,
 	},
 };
