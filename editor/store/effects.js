@@ -16,6 +16,7 @@ import {
 	createReusableBlock,
 	isReusableBlock,
 	getDefaultBlockName,
+	getDefaultBlockForPostFormat,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
@@ -50,6 +51,7 @@ import {
 	isEditedPostNew,
 	isEditedPostSaveable,
 	getBlock,
+	getBlockCount,
 	getBlocks,
 	getReusableBlock,
 	getMetaBoxes,
@@ -300,6 +302,8 @@ export default {
 				} );
 			};
 			blocks = createBlocksFromTemplate( settings.template );
+		} else if ( getDefaultBlockForPostFormat( post.format ) ) {
+			blocks = [ createBlock( getDefaultBlockForPostFormat( post.format ) ) ];
 		} else {
 			blocks = [];
 		}
@@ -518,5 +522,15 @@ export default {
 		// Save the metaboxes
 		window.fetch( window._wpMetaBoxUrl, fetchOptions )
 			.then( () => store.dispatch( metaBoxUpdatesSuccess() ) );
+	},
+	EDIT_POST( action, { getState } ) {
+		const format = get( action, 'edits.format' );
+		if ( ! format ) {
+			return;
+		}
+		const blockName = getDefaultBlockForPostFormat( format );
+		if ( blockName && getBlockCount( getState() ) === 0 ) {
+			return insertBlock( createBlock( blockName ) );
+		}
 	},
 };
