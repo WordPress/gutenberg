@@ -34,6 +34,7 @@ import {
 	getMultiSelectedBlockUids,
 	getSelectedBlock,
 	isSelectionEnabled,
+	isMultiSelecting,
 } from '../../store/selectors';
 import { startMultiSelect, stopMultiSelect, multiSelect, selectBlock } from '../../store/actions';
 import { documentHasSelection } from '../../utils/dom';
@@ -100,7 +101,21 @@ class BlockList extends Component {
 		}
 	}
 
+	/**
+	 * Handles a pointer move event to update the extent of the current cursor
+	 * multi-selection.
+	 *
+	 * @param {MouseEvent} event A mousemove event object.
+	 *
+	 * @returns {void}
+	 */
 	onPointerMove( { clientY } ) {
+		// We don't start multi-selection until the mouse starts moving, so as
+		// to avoid dispatching multi-selection actions on an in-place click.
+		if ( ! this.props.isMultiSelecting ) {
+			this.props.onStartMultiSelect();
+		}
+
 		const boundaries = this.nodes[ this.selectionAtStart ].getBoundingClientRect();
 		const y = clientY - boundaries.top;
 		const key = findLast( this.coordMapKeys, ( coordY ) => coordY < y );
@@ -138,6 +153,14 @@ class BlockList extends Component {
 		}
 	}
 
+	/**
+	 * Binds event handlers to the document for tracking a pending multi-select
+	 * in response to a mousedown event occurring in a rendered block.
+	 *
+	 * @param {string} uid UID of the block where mousedown occurred.
+	 *
+	 * @returns {void}
+	 */
 	onSelectionStart( uid ) {
 		if ( ! this.props.isSelectionEnabled ) {
 			return;
@@ -161,8 +184,6 @@ class BlockList extends Component {
 		// Capture scroll on all elements.
 		window.addEventListener( 'scroll', this.onScroll, true );
 		window.addEventListener( 'mouseup', this.onSelectionEnd );
-
-		this.props.onStartMultiSelect();
 	}
 
 	onSelectionChange( uid ) {
@@ -183,6 +204,11 @@ class BlockList extends Component {
 		}
 	}
 
+	/**
+	 * Handles a mouseup event to end the current cursor multi-selection.
+	 *
+	 * @returns {void}
+	 */
 	onSelectionEnd() {
 		// Cancel throttled calls.
 		this.onPointerMove.cancel();
@@ -195,7 +221,11 @@ class BlockList extends Component {
 		window.removeEventListener( 'scroll', this.onScroll, true );
 		window.removeEventListener( 'mouseup', this.onSelectionEnd );
 
-		this.props.onStopMultiSelect();
+		// We may or may not be in a multi-selection when mouseup occurs (e.g.
+		// an in-place mouse click), so only trigger stop if multi-selecting.
+		if ( this.props.isMultiSelecting ) {
+			this.props.onStopMultiSelect();
+		}
 	}
 
 	onShiftSelection( uid ) {
@@ -244,6 +274,7 @@ export default connect(
 		multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
 		selectedBlock: getSelectedBlock( state ),
 		isSelectionEnabled: isSelectionEnabled( state ),
+		isMultiSelecting: isMultiSelecting( state ),
 	} ),
 	( dispatch ) => ( {
 		onStartMultiSelect() {
