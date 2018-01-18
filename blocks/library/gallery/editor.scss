@@ -9,6 +9,10 @@
 		outline: 4px solid $blue-medium-500;
 		outline-offset: -4px;
 	}
+
+	&.is-transient img {
+		@include loading_fade;
+	}
 }
 
 .blocks-gallery-item__inline-menu {

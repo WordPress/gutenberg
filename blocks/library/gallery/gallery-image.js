@@ -38,6 +38,7 @@ class GalleryImage extends Component {
 
 		const className = classnames( {
 			'is-selected': isSelected,
+			'is-transient': 0 === url.indexOf( 'blob:' ),
 		} );
 
 		// Disable reason: Each block can be selected by clicking on it and we should keep the same saved markup
