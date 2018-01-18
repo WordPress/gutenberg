@@ -8,7 +8,7 @@ import { reduce, get, find } from 'lodash';
  * WordPress dependencies
  */
 import { DropZone, withContext } from '@wordpress/components';
-import { getBlockTypes } from '@wordpress/blocks';
+import { getBlockTypes, rawHandler } from '@wordpress/blocks';
 import { compose } from '@wordpress/element';
 
 /**
@@ -21,7 +21,13 @@ function BlockDropZone( { index, isLocked, ...props } ) {
 		return null;
 	}
 
-	const dropFiles = ( files, position ) => {
+	const getInsertPosition = ( position ) => {
+		if ( index !== undefined ) {
+			return position.y === 'top' ? index : index + 1;
+		}
+	};
+
+	const onDropFiles = ( files, position ) => {
 		const transformation = reduce( getBlockTypes(), ( ret, blockType ) => {
 			if ( ret ) {
 				return ret;
@@ -33,19 +39,26 @@ function BlockDropZone( { index, isLocked, ...props } ) {
 		}, false );
 
 		if ( transformation ) {
-			let insertPosition;
-			if ( index !== undefined ) {
-				insertPosition = position.y === 'top' ? index : index + 1;
-			}
+			const insertPosition = getInsertPosition( position );
+
 			transformation.transform( files ).then( ( blocks ) => {
 				props.insertBlocks( blocks, insertPosition );
 			} );
 		}
 	};
 
+	const onHTMLDrop = ( HTML, position ) => {
+		const blocks = rawHandler( { HTML, mode: 'BLOCKS' } );
+
+		if ( blocks.length ) {
+			props.insertBlocks( blocks, getInsertPosition( position ) );
+		}
+	};
+
 	return (
 		<DropZone
-			onFilesDrop={ dropFiles }
+			onFilesDrop={ onDropFiles }
+			onHTMLDrop={ onHTMLDrop }
 		/>
 	);
 }

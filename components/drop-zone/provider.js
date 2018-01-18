@@ -29,8 +29,8 @@ class DropZoneProvider extends Component {
 	getChildContext() {
 		return {
 			dropzones: {
-				add: ( { element, updateState, onDrop, onFilesDrop } ) => {
-					this.dropzones.push( { element, updateState, onDrop, onFilesDrop } );
+				add: ( { element, updateState, onDrop, onFilesDrop, onHTMLDrop } ) => {
+					this.dropzones.push( { element, updateState, onDrop, onFilesDrop, onHTMLDrop } );
 				},
 				remove: ( element ) => {
 					this.dropzones = filter( this.dropzones, ( dropzone ) => dropzone.element !== element );
@@ -174,8 +174,15 @@ class DropZoneProvider extends Component {
 			return;
 		}
 
-		if ( event.dataTransfer && !! dropzone && !! dropzone.onFilesDrop ) {
-			dropzone.onFilesDrop( Array.prototype.slice.call( event.dataTransfer.files ), position );
+		if ( event.dataTransfer && !! dropzone ) {
+			const files = event.dataTransfer.files;
+			const HTML = event.dataTransfer.getData( 'text/html' );
+
+			if ( files.length ) {
+				dropzone.onFilesDrop && dropzone.onFilesDrop( [ ...event.dataTransfer.files ], position );
+			} else if ( HTML ) {
+				dropzone.onHTMLDrop && dropzone.onHTMLDrop( HTML, position );
+			}
 		}
 
 		event.stopPropagation();
