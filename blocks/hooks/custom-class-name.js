@@ -19,9 +19,9 @@ import InspectorControls from '../inspector-controls';
 
 /**
  * Filters registered block settings, extending attributes with anchor using ID
- * of the first node
+ * of the first node.
  *
- * @param  {Object} settings Original block settings
+ * @param {Object} settings Original block settings.
  *
  * @returns {Object} Filtered block settings.
  */
@@ -42,9 +42,9 @@ export function addAttribute( settings ) {
  * Override the default edit UI to include a new block inspector control for
  * assigning the custom class name, if block supports custom class name.
  *
- * @param  {function|Component} BlockEdit Original component
+ * @param {function|Component} BlockEdit Original component.
  *
- * @returns {function} Wrapped component.
+ * @returns {string} Wrapped component.
  */
 export function withInspectorControl( BlockEdit ) {
 	const WrappedBlockEdit = ( props ) => {
@@ -75,9 +75,9 @@ export function withInspectorControl( BlockEdit ) {
  * supports anchor. This is only applied if the block's save result is an
  * element and not a markup string.
  *
- * @param  {Object} extraProps Additional props applied to save element
- * @param  {Object} blockType  Block type
- * @param  {Object} attributes Current block attributes
+ * @param {Object} extraProps Additional props applied to save element.
+ * @param {Object} blockType  Block type.
+ * @param {Object} attributes Current block attributes.
  *
  * @returns {Object} Filtered props applied to save element.
  */

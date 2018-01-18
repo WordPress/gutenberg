@@ -11,7 +11,7 @@ import { find as findFocusable } from './focusable';
  *
  * @see https://bugzilla.mozilla.org/show_bug.cgi?id=1190261
  *
- * @param  {Element} element Element from which to retrieve
+ * @param {Element} element Element from which to retrieve.
  *
  * @returns {?Number} Tab index of element (default 0).
  */
@@ -23,9 +23,9 @@ function getTabIndex( element ) {
 /**
  * Returns true if the specified element is tabbable, or false otherwise.
  *
- * @param  {Element} element Element to test
+ * @param {Element} element Element to test.
  *
- * @returns {Boolean} Whether element is tabbable.
+ * @returns {boolean} Whether element is tabbable.
  */
 function isTabbableIndex( element ) {
 	return getTabIndex( element ) !== -1;
@@ -37,8 +37,8 @@ function isTabbableIndex( element ) {
  * sort where equal tabIndex should be left in order of their occurrence in the
  * document.
  *
- * @param  {Element} element Element
- * @param  {Number}  index   Array index of element
+ * @param {Element} element Element.
+ * @param {number}  index   Array index of element.
  *
  * @returns {Object} Mapped object with element, index.
  */
@@ -50,7 +50,7 @@ function mapElementToObjectTabbable( element, index ) {
  * An array map callback, returning an element of the given mapped object's
  * element value.
  *
- * @param  {Object}  object Mapped object with index
+ * @param {Object} object Mapped object with index.
  *
  * @returns {Element} Mapped object element.
  */
@@ -63,10 +63,10 @@ function mapObjectTabbableToElement( object ) {
  *
  * @see mapElementToObjectTabbable
  *
- * @param  {Object} a First object to compare
- * @param  {Object} b Second object to compare
+ * @param {Object} a First object to compare.
+ * @param {Object} b Second object to compare.
  *
- * @returns {Number} Comparator result.
+ * @returns {number} Comparator result.
  */
 function compareObjectTabbables( a, b ) {
 	const aTabIndex = getTabIndex( a.element );

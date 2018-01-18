@@ -42,7 +42,7 @@ const MAX_RECENT_BLOCKS = 8;
  * Returns a post attribute value, flattening nested rendered content using its
  * raw value in place of its original object form.
  *
- * @param  {*} value Original value
+ * @param {*} value Original value.
  *
  * @returns {*} Raw value.
  */
@@ -64,8 +64,8 @@ export function getPostRawValue( value ) {
  *  - blocksByUid: post content blocks keyed by UID
  *  - blockOrder: list of block UIDs in order
  *
- * @param  {Object} state  Current state
- * @param  {Object} action Dispatched action
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @returns {Object} Updated state.
  */
@@ -311,8 +311,8 @@ export const editor = flow( [
  * Reducer returning the last-known state of the current post, in the format
  * returned by the WP REST API.
  *
- * @param  {Object} state  Current state
- * @param  {Object} action Dispatched action
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @returns {Object} Updated state.
  */
@@ -341,10 +341,10 @@ export function currentPost( state = {}, action ) {
 /**
  * Reducer returning typing state.
  *
- * @param  {Boolean} state  Current state
- * @param  {Object}  action Dispatched action
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
  *
- * @returns {Boolean} Updated state.
+ * @returns {boolean} Updated state.
  */
 export function isTyping( state = false, action ) {
 	switch ( action.type ) {
@@ -361,8 +361,8 @@ export function isTyping( state = false, action ) {
 /**
  * Reducer returning the block selection's state.
  *
- * @param  {Object} state  Current state
- * @param  {Object} action Dispatched action
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @returns {Object} Updated state.
  */
@@ -449,8 +449,8 @@ export function blockSelection( state = {
 /**
  * Reducer returning hovered block state.
  *
- * @param  {Object} state  Current state
- * @param  {Object} action Dispatched action
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @returns {Object} Updated state.
  */
@@ -486,10 +486,10 @@ export function blocksMode( state = {}, action ) {
 }
 
 /**
- * Reducer returning the block insertion point
+ * Reducer returning the block insertion point.
  *
- * @param  {Object} state  Current state
- * @param  {Object} action Dispatched action
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @returns {Object} Updated state.
  */
@@ -506,13 +506,13 @@ export function blockInsertionPoint( state = {}, action ) {
 }
 
 /**
- * Reducer returning the user preferences:
+ * Reducer returning the user preferences.
  *
- * @param  {Object}  state                 Current state
- * @param  {string}  state.mode            Current editor mode, either "visual" or "text".
- * @param  {Boolean} state.isSidebarOpened Whether the sidebar is opened or closed
- * @param  {Object}  state.panels          The state of the different sidebar panels
- * @param  {Object}  action                Dispatched action
+ * @param {Object}  state                 Current state.
+ * @param {string}  state.mode            Current editor mode, either "visual" or "text".
+ * @param {boolean} state.isSidebarOpened Whether the sidebar is opened or closed.
+ * @param {Object}  state.panels          The state of the different sidebar panels.
+ * @param {Object}  action                Dispatched action.
  *
  * @returns {string} Updated state.
  */
@@ -593,11 +593,11 @@ export function panel( state = 'document', action ) {
 }
 
 /**
- * Reducer returning current network request state (whether a request to the WP
- * REST API is in progress, successful, or failed).
+ * Reducer returning current network request state (whether a request to
+ * the WP REST API is in progress, successful, or failed).
  *
- * @param  {Object} state  Current state
- * @param  {Object} action Dispatched action
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @returns {Object} Updated state.
  */
