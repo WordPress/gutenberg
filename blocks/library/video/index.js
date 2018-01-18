@@ -18,6 +18,7 @@ import MediaUpload from '../../media-upload';
 import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
+import alignmentShortcuts from '../../alignment-shortcuts';
 
 export const name = 'core/video';
 
@@ -48,6 +49,10 @@ export const settings = {
 			source: 'children',
 			selector: 'figcaption',
 		},
+	},
+
+	transforms: {
+		to: alignmentShortcuts,
 	},
 
 	getEditWrapperProps( attributes ) {

@@ -16,6 +16,7 @@ import './editor.scss';
 import './style.scss';
 import { createBlock } from '../../api';
 import { default as GalleryBlock, defaultColumnsNumber } from './block';
+import alignmentShortcuts from '../../alignment-shortcuts';
 
 const blockAttributes = {
 	align: {
@@ -149,6 +150,7 @@ export const settings = {
 					return createBlock( 'core/image' );
 				},
 			},
+			...alignmentShortcuts,
 		],
 	},
 

@@ -19,6 +19,7 @@ import { createBlock } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
 import RichText from '../../rich-text';
+import alignmentShortcuts from '../../alignment-shortcuts';
 
 const toRichTextValue = value => value.map( ( subValue => subValue.children ) );
 const fromRichTextValue = value => value.map( ( subValue ) => ( {
@@ -176,6 +177,7 @@ export const settings = {
 					] );
 				},
 			},
+			...alignmentShortcuts,
 		],
 	},
 

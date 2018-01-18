@@ -21,11 +21,12 @@ import { createBlock } from '../../api';
 import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
+import alignmentShortcuts from '../../alignment-shortcuts';
 
 // These embeds do not work in sandboxes
 const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
 
-function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, keywords = [] } ) {
+function getEmbedBlockSettings( { title, icon, category = 'embed', transforms = {}, keywords = [] } ) {
 	return {
 		title,
 
@@ -52,7 +53,10 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 			},
 		},
 
-		transforms,
+		transforms: {
+			from: transforms.from,
+			to: alignmentShortcuts,
+		},
 
 		getEditWrapperProps( attributes ) {
 			const { align } = attributes;
