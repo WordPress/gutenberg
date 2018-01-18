@@ -180,6 +180,45 @@ registerBlockType( 'core/gallery', {
 
 	deprecated: [
 		{
+			attributes: {
+				align: {
+					type: 'string',
+					default: 'none',
+				},
+				images: {
+					type: 'array',
+					default: [],
+					source: 'query',
+					selector: 'div.wp-block-gallery figure.blocks-gallery-image img',
+					query: {
+						url: {
+							source: 'attribute',
+							attribute: 'src',
+						},
+						alt: {
+							source: 'attribute',
+							attribute: 'alt',
+							default: '',
+						},
+						id: {
+							source: 'attribute',
+							attribute: 'data-id',
+						},
+					},
+				},
+				columns: {
+					type: 'number',
+				},
+				imageCrop: {
+					type: 'boolean',
+					default: true,
+				},
+				linkTo: {
+					type: 'string',
+					default: 'none',
+				},
+			},
+
 			save( { attributes } ) {
 				const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
 				return (

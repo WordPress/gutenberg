@@ -6,6 +6,7 @@
 	flex-wrap: wrap;
 	list-style-type: none;
 
+	.blocks-gallery-image,
 	.blocks-gallery-item {
 		margin: 8px;
 		display: flex;
@@ -26,6 +27,7 @@
 	}
 
 	// Cropped
+	&.is-cropped .blocks-gallery-image,
 	&.is-cropped .blocks-gallery-item {
 		img {
 			flex: 1;
@@ -43,16 +45,19 @@
 	}
 
 	// Responsive fallback value, 2 columns
+	& .blocks-gallery-image,
 	& .blocks-gallery-item {
 		width: calc( 100% / 2 - 16px );
 	}
 
+	&.columns-1 .blocks-gallery-image,
 	&.columns-1 .blocks-gallery-item {
 		width: calc(100% / 1 - 16px);
 	}
 
 	@include break-small {
 		@for $i from 3 through 8 {
+			&.columns-#{ $i } .blocks-gallery-image,
 			&.columns-#{ $i } .blocks-gallery-item {
 				width: calc(100% / #{ $i } - 16px );
 			}
