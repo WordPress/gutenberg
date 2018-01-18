@@ -14,13 +14,14 @@ import { Component } from '@wordpress/element';
  */
 import './style.scss';
 import './editor.scss';
-import { registerBlockType } from '../../api';
 import MediaUpload from '../../media-upload';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
-export const registerAudioBlock = () => registerBlockType( 'core/audio', {
+export const name = 'core/audio';
+
+export const settings = {
 	title: __( 'Audio' ),
 
 	description: __( 'The Audio block allows you to embed audio files and play them back using a simple player.' ),
@@ -178,4 +179,4 @@ export const registerAudioBlock = () => registerBlockType( 'core/audio', {
 			</figure>
 		);
 	},
-} );
+};

@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import { registerBlockType } from '../api';
 import { registerShortcodeBlock } from './shortcode';
 import { registerImageBlock } from './image';
 import { registerGalleryBlock } from './gallery';
@@ -27,7 +28,7 @@ import { registerCoverImageBlock } from './cover-image';
 import { registerTextColumnsBlock } from './text-columns';
 import { registerVerseBlock } from './verse';
 import { registerVideoBlock } from './video';
-import { registerAudioBlock } from './audio';
+import * as audio from './audio';
 import { registerReusableBlock } from './block';
 import { registerParagraphBlock } from './paragraph';
 import './subhead';
@@ -57,7 +58,7 @@ export const registerCoreBlocks = () => {
 	registerTextColumnsBlock();
 	registerVerseBlock();
 	registerVideoBlock();
-	registerAudioBlock();
+	registerBlockType( audio.name, audio.settings );
 	registerReusableBlock();
 	registerParagraphBlock();
 };
