@@ -239,7 +239,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 
 export const name = 'core/embed';
 
-export const settings =	getEmbedBlockSettings( {
+export const settings = getEmbedBlockSettings( {
 	title: __( 'Embed' ),
 	icon: 'embed-generic',
 	transforms: {

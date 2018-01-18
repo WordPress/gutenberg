@@ -3,7 +3,8 @@
  */
 import * as audio from './audio';
 import * as embed from './embed';
-import { registerBlockType } from '../api';
+import * as paragraph from './paragraph';
+import { registerBlockType, setDefaultBlockName } from '../api';
 import { registerShortcodeBlock } from './shortcode';
 import { registerImageBlock } from './image';
 import { registerGalleryBlock } from './gallery';
@@ -26,7 +27,6 @@ import { registerTextColumnsBlock } from './text-columns';
 import { registerVerseBlock } from './verse';
 import { registerVideoBlock } from './video';
 import { registerReusableBlock } from './block';
-import { registerParagraphBlock } from './paragraph';
 import './subhead';
 
 export const registerCoreBlocks = () => {
@@ -35,6 +35,7 @@ export const registerCoreBlocks = () => {
 		embed,
 		...embed.common,
 		...embed.others,
+		paragraph,
 	].forEach( ( { name, settings } ) => {
 		registerBlockType( name, settings );
 	} );
@@ -60,5 +61,6 @@ export const registerCoreBlocks = () => {
 	registerVerseBlock();
 	registerVideoBlock();
 	registerReusableBlock();
-	registerParagraphBlock();
+
+	setDefaultBlockName( paragraph.name );
 };

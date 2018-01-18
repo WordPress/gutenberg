@@ -15,7 +15,7 @@ import { Autocomplete, PanelBody, PanelColor, withFallbackStyles } from '@wordpr
  */
 import './editor.scss';
 import './style.scss';
-import { registerBlockType, createBlock, setDefaultBlockName } from '../../api';
+import { createBlock } from '../../api';
 import { blockAutocompleter, userAutocompleter } from '../../autocompleters';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
@@ -192,97 +192,95 @@ class ParagraphBlock extends Component {
 	}
 }
 
-export const registerParagraphBlock = () => {
-	registerBlockType( 'core/paragraph', {
-		title: __( 'Paragraph' ),
+export const name = 'core/paragraph';
 
-		description: __( 'This is a simple text only block for adding a single paragraph of content.' ),
+export const settings = {
+	title: __( 'Paragraph' ),
 
-		icon: 'editor-paragraph',
+	description: __( 'This is a simple text only block for adding a single paragraph of content.' ),
 
-		category: 'common',
+	icon: 'editor-paragraph',
 
-		keywords: [ __( 'text' ) ],
+	category: 'common',
 
-		supports: {
-			className: false,
+	keywords: [ __( 'text' ) ],
+
+	supports: {
+		className: false,
+	},
+
+	attributes: {
+		content: {
+			type: 'array',
+			source: 'children',
+			selector: 'p',
 		},
-
-		attributes: {
-			content: {
-				type: 'array',
-				source: 'children',
-				selector: 'p',
-			},
-			align: {
-				type: 'string',
-			},
-			dropCap: {
-				type: 'boolean',
-				default: false,
-			},
-			placeholder: {
-				type: 'string',
-			},
-			width: {
-				type: 'string',
-			},
-			textColor: {
-				type: 'string',
-			},
-			backgroundColor: {
-				type: 'string',
-			},
-			fontSize: {
-				type: 'number',
-			},
+		align: {
+			type: 'string',
 		},
-
-		transforms: {
-			from: [
-				{
-					type: 'raw',
-					isMatch: ( node ) => (
-						node.nodeName === 'P' &&
-						// Do not allow embedded content.
-						! node.querySelector( 'audio, canvas, embed, iframe, img, math, object, svg, video' )
-					),
-				},
-			],
+		dropCap: {
+			type: 'boolean',
+			default: false,
 		},
-
-		merge( attributes, attributesToMerge ) {
-			return {
-				content: concatChildren( attributes.content, attributesToMerge.content ),
-			};
+		placeholder: {
+			type: 'string',
 		},
-
-		getEditWrapperProps( attributes ) {
-			const { width } = attributes;
-			if ( [ 'wide', 'full', 'left', 'right' ].indexOf( width ) !== -1 ) {
-				return { 'data-align': width };
-			}
+		width: {
+			type: 'string',
 		},
-
-		edit: ParagraphBlock,
-
-		save( { attributes } ) {
-			const { width, align, content, dropCap, backgroundColor, textColor, fontSize } = attributes;
-			const className = classnames( {
-				[ `align${ width }` ]: width,
-				'has-background': backgroundColor,
-				'has-drop-cap': dropCap,
-			} );
-			const styles = {
-				backgroundColor: backgroundColor,
-				color: textColor,
-				fontSize: fontSize,
-				textAlign: align,
-			};
-
-			return <p style={ styles } className={ className ? className : undefined }>{ content }</p>;
+		textColor: {
+			type: 'string',
 		},
-	} );
+		backgroundColor: {
+			type: 'string',
+		},
+		fontSize: {
+			type: 'number',
+		},
+	},
 
-	setDefaultBlockName( 'core/paragraph' );
+	transforms: {
+		from: [
+			{
+				type: 'raw',
+				isMatch: ( node ) => (
+					node.nodeName === 'P' &&
+					// Do not allow embedded content.
+					! node.querySelector( 'audio, canvas, embed, iframe, img, math, object, svg, video' )
+				),
+			},
+		],
+	},
+
+	merge( attributes, attributesToMerge ) {
+		return {
+			content: concatChildren( attributes.content, attributesToMerge.content ),
+		};
+	},
+
+	getEditWrapperProps( attributes ) {
+		const { width } = attributes;
+		if ( [ 'wide', 'full', 'left', 'right' ].indexOf( width ) !== -1 ) {
+			return { 'data-align': width };
+		}
+	},
+
+	edit: ParagraphBlock,
+
+	save( { attributes } ) {
+		const { width, align, content, dropCap, backgroundColor, textColor, fontSize } = attributes;
+		const className = classnames( {
+			[ `align${ width }` ]: width,
+			'has-background': backgroundColor,
+			'has-drop-cap': dropCap,
+		} );
+		const styles = {
+			backgroundColor: backgroundColor,
+			color: textColor,
+			fontSize: fontSize,
+			textAlign: align,
+		};
+
+		return <p style={ styles } className={ className ? className : undefined }>{ content }</p>;
+	},
 };
