@@ -10,11 +10,11 @@ import { camelCase, flowRight, isString, upperFirst } from 'lodash';
  * Returns a new element of given type. Type can be either a string tag name or
  * another function which itself returns an element.
  *
- * @param  {?(string|Function)} type     Tag name or element creator
- * @param  {Object}             props    Element properties, either attribute
+ * @param {?(string|Function)} type     Tag name or element creator
+ * @param {Object}             props    Element properties, either attribute
  *                                       set to apply to DOM node or values to
  *                                       pass through to element creator
- * @param  {...WPElement}       children Descendant elements
+ * @param {...WPElement}       children Descendant elements
  *
  * @returns {WPElement} Element.
  */
@@ -43,8 +43,8 @@ export { Component };
 /**
  * Creates a copy of an element with extended props.
  *
- * @param  {WPElement} element Element
- * @param  {?Object}   props   Props to apply to cloned element
+ * @param {WPElement} element Element
+ * @param {?Object}   props   Props to apply to cloned element
  *
  * @returns {WPElement} Cloned element.
  */
@@ -76,18 +76,18 @@ export { Fragment };
 export { createPortal };
 
 /**
- * Renders a given element into a string
+ * Renders a given element into a string.
  *
- * @param  {WPElement} element Element to render
+ * @param {WPElement} element Element to render
  *
  * @returns {String} HTML.
  */
 export { renderToStaticMarkup as renderToString };
 
 /**
- * Concatenate two or more React children objects
+ * Concatenate two or more React children objects.
  *
- * @param  {...?Object} childrenArguments Array of children arguments (array of arrays/strings/objects) to concatenate
+ * @param {...?Object} childrenArguments Array of children arguments (array of arrays/strings/objects) to concatenate.
  *
  * @returns {Array} The concatenated value.
  */
@@ -108,10 +108,10 @@ export function concatChildren( ...childrenArguments ) {
 }
 
 /**
- * Switches the nodeName of all the elements in the children object
+ * Switches the nodeName of all the elements in the children object.
  *
- * @param  {?Object} children  Children object
- * @param  {String}  nodeName  Node name
+ * @param {?Object} children Children object.
+ * @param {string}  nodeName Node name.
  *
  * @returns {?Object} The updated children object.
  */
@@ -139,10 +139,10 @@ export { flowRight as compose };
  * Returns a wrapped version of a React component's display name.
  * Higher-order components use getWrapperDisplayName().
  *
- * @param {Function|Component} BaseComponent used to detect the existing display name.
- * @param {String} wrapperName Wrapper name to prepend to the display name.
+ * @param {Function|Component} BaseComponent Used to detect the existing display name.
+ * @param {string} wrapperName Wrapper name to prepend to the display name.
  *
- * @returns {String} Wrapped display name.
+ * @returns {string} Wrapped display name.
  */
 export function getWrapperDisplayName( BaseComponent, wrapperName ) {
 	const { displayName = BaseComponent.name || 'Component' } = BaseComponent;

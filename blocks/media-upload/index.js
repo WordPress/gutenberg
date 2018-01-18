@@ -19,7 +19,7 @@ const getGalleryDetailsMediaFrame = () => {
 		/**
 		 * Create the default states.
 		 *
-		 * @returns {void}
+		 * @returns {void} Void.
 		 */
 		createStates: function createStates() {
 			this.states.add( [

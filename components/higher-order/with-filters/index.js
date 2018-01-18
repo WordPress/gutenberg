@@ -5,10 +5,11 @@ import { Component, getWrapperDisplayName } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 
 /**
- * Creates a higher-order component which adds filtering capability to the wrapped component.
- * Filters get applied when the original component is about to be mounted.
+ * Creates a higher-order component which adds filtering capability to the
+ * wrapped component. Filters get applied when the original component is about
+ * to be mounted.
  *
- * @param {String} hookName Hook name exposed to be used by filters.
+ * @param {string} hookName Hook name exposed to be used by filters.
  *
  * @returns {Function} Higher-order component factory.
  */

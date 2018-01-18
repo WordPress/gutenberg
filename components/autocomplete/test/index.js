@@ -53,19 +53,20 @@ function makeAutocompleter( completers, AutocompleteComponent = Autocomplete ) {
 }
 
 /**
- * Create a text node
- * @param {String} text text of text node.
+ * Create a text node.
+ *
+ * @param {string} text Text of text node.
 
- * @returns {Node} a text node.
+ * @returns {Node} A text node.
  */
 function tx( text ) {
 	return document.createTextNode( text );
 }
 
 /**
- * Create a paragraph node with the arguments as children
+ * Create a paragraph node with the arguments as children.
 
- * @returns {Node} a paragraph node.
+ * @returns {Node} A paragraph node.
  */
 function par( /* arguments */ ) {
 	const p = document.createElement( 'p' );
@@ -77,9 +78,12 @@ function par( /* arguments */ ) {
  * Simulate typing into the fake editor by updating the content and simulating
  * an input event. It also updates the data-cursor attribute which is used to
  * simulate the cursor position in the test mocks.
- * @param {*} wrapper enzyme wrapper around react node containing a FakeEditor.
- * @param {Array.<Node>} nodeList array of dom nodes.
- * @param {Array.<Number>} cursorPosition array specifying the child indexes and offset of the cursor
+ *
+ * @param {*}              wrapper        Enzyme wrapper around react node
+ *                                        containing  a FakeEditor.
+ * @param {Array.<Node>}   nodeList       Array of dom nodes.
+ * @param {Array.<Number>} cursorPosition Array specifying the child indexes and
+ *                                        offset of the cursor.
  */
 function simulateInput( wrapper, nodeList, cursorPosition ) {
 	// update the editor content
@@ -100,8 +104,10 @@ function simulateInput( wrapper, nodeList, cursorPosition ) {
 
 /**
  * Fire a native keydown event on the fake editor in the wrapper.
- * @param {*} wrapper the wrapper containing the FakeEditor where the event will be dispatched.
- * @param {*} keyCode the keycode of the key event.
+ *
+ * @param {*} wrapper The wrapper containing the FakeEditor where the event will
+ *                    be dispatched.
+ * @param {*} keyCode The keycode of the key event.
  */
 function simulateKeydown( wrapper, keyCode ) {
 	const fakeEditor = wrapper.getDOMNode().querySelector( '.fake-editor' );
@@ -112,7 +118,8 @@ function simulateKeydown( wrapper, keyCode ) {
 
 /**
  * Check that the autocomplete matches the initial state.
- * @param {*} wrapper the enzyme react wrapper.
+ *
+ * @param {*} wrapper The enzyme react wrapper.
  */
 function expectInitialState( wrapper ) {
 	expect( wrapper.state( 'open' ) ).toBeUndefined();

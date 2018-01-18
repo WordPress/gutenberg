@@ -15,12 +15,12 @@ import { getCommentDelimitedContent } from './serializer';
 import { attr, prop, html, text, query, node, children } from './matchers';
 
 /**
- * Returns value coerced to the specified JSON schema type string
+ * Returns value coerced to the specified JSON schema type string.
  *
  * @see http://json-schema.org/latest/json-schema-validation.html#rfc.section.6.25
  *
- * @param  {*}      value Original value
- * @param  {String} type  Type to coerce
+ * @param {*}      value Original value.
+ * @param {string} type  Type to coerce.
  *
  * @returns {*} Coerced value.
  */
@@ -54,11 +54,11 @@ export function asType( value, type ) {
 }
 
 /**
- * Returns an hpq matcher given a source object
+ * Returns an hpq matcher given a source object.
  *
- * @param  {Object}   sourceConfig Attribute Source object
+ * @param {Object} sourceConfig Attribute Source object.
  *
- * @returns {Function} hpq Matcher.
+ * @returns {Function} A hpq Matcher.
  */
 export function matcherFromSource( sourceConfig ) {
 	switch ( sourceConfig.source ) {
@@ -84,13 +84,14 @@ export function matcherFromSource( sourceConfig ) {
 }
 
 /**
- * Given an attribute key, an attribute's schema, a block's raw content and the commentAttributes
- * returns the attribute value depending on its source definition of the given attribute key
+ * Given an attribute key, an attribute's schema, a block's raw content and the
+ * commentAttributes returns the attribute value depending on its source
+ * definition of the given attribute key.
  *
- * @param  {string} attributeKey        Attribute key
- * @param  {Object} attributeSchema     Attribute's schema
- * @param  {string} innerHTML           Block's raw content
- * @param  {Object} commentAttributes   Block's comment attributes
+ * @param {string} attributeKey      Attribute key.
+ * @param {Object} attributeSchema   Attribute's schema.
+ * @param {string} innerHTML         Block's raw content.
+ * @param {Object} commentAttributes Block's comment attributes.
  *
  * @returns {*} Attribute value.
  */
@@ -118,9 +119,9 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
 /**
  * Returns the block attributes of a registered block node given its type.
  *
- * @param  {?Object} blockType  Block type
- * @param  {string}  innerHTML  Raw block content
- * @param  {?Object} attributes Known block attributes (from delimiters)
+ * @param {?Object} blockType  Block type.
+ * @param {string}  innerHTML  Raw block content.
+ * @param {?Object} attributes Known block attributes (from delimiters).
  *
  * @returns {Object} All block attributes.
  */
@@ -133,11 +134,12 @@ export function getBlockAttributes( blockType, innerHTML, attributes ) {
 }
 
 /**
- * Attempt to parse the innerHTML using using a supplied `deprecated` definition.
+ * Attempt to parse the innerHTML using using a supplied `deprecated`
+ * definition.
  *
- * @param  {?Object} blockType  Block type
- * @param  {string}  innerHTML  Raw block content
- * @param  {?Object} attributes Known block attributes (from delimiters)
+ * @param {?Object} blockType  Block type.
+ * @param {string}  innerHTML  Raw block content.
+ * @param {?Object} attributes Known block attributes (from delimiters).
  *
  * @returns {Object} Block attributes.
  */
@@ -162,9 +164,9 @@ export function getAttributesFromDeprecatedVersion( blockType, innerHTML, attrib
 /**
  * Creates a block with fallback to the unknown type handler.
  *
- * @param  {?String} name       Block type name
- * @param  {String}  innerHTML  Raw block content
- * @param  {?Object} attributes Attributes obtained from block delimiters
+ * @param {?String} name       Block type name.
+ * @param {string}  innerHTML  Raw block content.
+ * @param {?Object} attributes Attributes obtained from block delimiters.
  *
  * @returns {?Object} An initialized block object (if possible).
  */
@@ -232,7 +234,7 @@ export function createBlockWithFallback( name, innerHTML, attributes ) {
 /**
  * Parses the post content with a PegJS grammar and returns a list of blocks.
  *
- * @param  {String} content The post content
+ * @param {string} content The post content.
  *
  * @returns {Array} Block list.
  */

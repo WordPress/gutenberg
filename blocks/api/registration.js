@@ -43,8 +43,8 @@ let defaultBlockName;
  * behavior. Once registered, the block is made available as an option to any
  * editor interface where blocks are implemented.
  *
- * @param  {string}   name     Block name
- * @param  {Object}   settings Block settings
+ * @param {string} name     Block name.
+ * @param {Object} settings Block settings.
  *
  * @returns {?WPBlock} The block, if it has been successfully registered;
  *                     otherwise `undefined`.
@@ -128,7 +128,7 @@ export function registerBlockType( name, settings ) {
 /**
  * Unregisters a block.
  *
- * @param  {string}   name Block name
+ * @param {string} name Block name.
  *
  * @returns {?WPBlock} The previous block value, if it has been successfully
  *                     unregistered; otherwise `undefined`.
@@ -148,7 +148,7 @@ export function unregisterBlockType( name ) {
 /**
  * Assigns name of block handling unknown block types.
  *
- * @param {string} name Block name
+ * @param {string} name Block name.
  */
 export function setUnknownTypeHandlerName( name ) {
 	unknownTypeHandlerName = name;
@@ -165,16 +165,16 @@ export function getUnknownTypeHandlerName() {
 }
 
 /**
- * Assigns the default block name
+ * Assigns the default block name.
  *
- * @param {string} name Block name
+ * @param {string} name Block name.
  */
 export function setDefaultBlockName( name ) {
 	defaultBlockName = name;
 }
 
 /**
- * Retrieves the default block name
+ * Retrieves the default block name.
  *
  * @returns {?string} Blog name.
  */
@@ -185,7 +185,7 @@ export function getDefaultBlockName() {
 /**
  * Returns a registered block type.
  *
- * @param  {string}  name Block name
+ * @param {string} name Block name.
  *
  * @returns {?Object} Block type.
  */
@@ -203,14 +203,14 @@ export function getBlockTypes() {
 }
 
 /**
- * Returns true if the block defines support for a feature, or false otherwise
+ * Returns true if the block defines support for a feature, or false otherwise.
  *
- * @param  {(String|Object)} nameOrType      Block name or type object
- * @param  {String}          feature         Feature to test
- * @param  {Boolean}         defaultSupports Whether feature is supported by
- *                                           default if not explicitly defined
+ * @param {(String|Object)} nameOrType      Block name or type object.
+ * @param {string}          feature         Feature to test.
+ * @param {boolean}         defaultSupports Whether feature is supported by
+ *                                          default if not explicitly defined.
  *
- * @returns {Boolean} Whether block supports feature.
+ * @returns {boolean} Whether block supports feature.
  */
 export function hasBlockSupport( nameOrType, feature, defaultSupports ) {
 	const blockType = 'string' === typeof nameOrType ?
@@ -225,12 +225,12 @@ export function hasBlockSupport( nameOrType, feature, defaultSupports ) {
 
 /**
  * Determines whether or not the given block is a reusable block. This is a
- * special block type that is used to point to a global block stored via the
- * API.
+ * special block type that is used to point to a global block stored via
+ * the API.
  *
- * @param {Object} blockOrType Block or Block Type to test
+ * @param {Object} blockOrType Block or Block Type to test.
  *
- * @returns {Boolean} Whether the given block is a reusable block.
+ * @returns {boolean} Whether the given block is a reusable block.
  */
 export function isReusableBlock( blockOrType ) {
 	return blockOrType.name === 'core/block';

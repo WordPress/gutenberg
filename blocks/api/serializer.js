@@ -16,9 +16,9 @@ import { applyFilters } from '@wordpress/hooks';
 import { getBlockType, getUnknownTypeHandlerName } from './registration';
 
 /**
- * Returns the block's default classname from its name
+ * Returns the block's default classname from its name.
  *
- * @param {String}   blockName  The block name
+ * @param {string} blockName The block name.
  *
  * @returns {string} The block's default class.
  */
@@ -31,8 +31,8 @@ export function getBlockDefaultClassname( blockName ) {
  * Given a block type containg a save render implementation and attributes, returns the
  * enhanced element to be saved or string when raw HTML expected.
  *
- * @param  {Object} blockType  Block type
- * @param  {Object} attributes Block attributes
+ * @param {Object} blockType  Block type.
+ * @param {Object} attributes Block attributes.
  *
  * @returns {Object|string} Save content.
  */
@@ -70,8 +70,8 @@ export function getSaveElement( blockType, attributes ) {
  * Given a block type containg a save render implementation and attributes, returns the
  * static markup to be saved.
  *
- * @param  {Object} blockType  Block type
- * @param  {Object} attributes Block attributes
+ * @param {Object} blockType  Block type.
+ * @param {Object} attributes Block attributes.
  *
  * @returns {string} Save content.
  */
@@ -98,8 +98,8 @@ export function getSaveContent( blockType, attributes ) {
  * This function returns only those attributes which are needed to persist and
  * which cannot be matched from the block content.
  *
- * @param   {Object<String,*>} allAttributes Attributes from in-memory block data
- * @param   {Object<String,*>} blockType     Block type
+ * @param {Object<String,*>} allAttributes Attributes from in-memory block data.
+ * @param {Object<String,*>} blockType     Block type.
  *
  * @returns {Object<String,*>} Subset of attributes for comment serialization.
  */
@@ -143,9 +143,9 @@ export function serializeAttributes( attrs ) {
  * Returns HTML markup processed by a markup beautifier configured for use in
  * block serialization.
  *
- * @param  {String} content Original HTML
+ * @param {string} content Original HTML.
  *
- * @returns {String} Beautiful HTML.
+ * @returns {string} Beautiful HTML.
  */
 export function getBeautifulContent( content ) {
 	return beautifyHtml( content, {
@@ -155,10 +155,11 @@ export function getBeautifulContent( content ) {
 }
 
 /**
- * Given a block object, returns the Block's Inner HTML markup
- * @param  {Object} block Block Object
+ * Given a block object, returns the Block's Inner HTML markup.
  *
- * @returns {String} HTML.
+ * @param {Object} block Block Object.
+ *
+ * @returns {string} HTML.
  */
 export function getBlockContent( block ) {
 	const blockType = getBlockType( block.name );
@@ -178,11 +179,11 @@ export function getBlockContent( block ) {
 /**
  * Returns the content of a block, including comment delimiters.
  *
- * @param  {String} rawBlockName  Block name
- * @param  {Object} attributes    Block attributes
- * @param  {String} content       Block save content
+ * @param {string} rawBlockName Block name.
+ * @param {Object} attributes   Block attributes.
+ * @param {string} content      Block save content.
  *
- * @returns {String} Comment-delimited block content.
+ * @returns {string} Comment-delimited block content.
  */
 export function getCommentDelimitedContent( rawBlockName, attributes, content ) {
 	const serializedAttributes = ! isEmpty( attributes ) ?
@@ -209,9 +210,9 @@ export function getCommentDelimitedContent( rawBlockName, attributes, content ) 
  * Returns the content of a block, including comment delimiters, determining
  * serialized attributes and content form from the current state of the block.
  *
- * @param  {Object} block Block instance
+ * @param {Object} block Block instance.
  *
- * @returns {String} Serialized block.
+ * @returns {string} Serialized block.
  */
 export function serializeBlock( block ) {
 	const blockName = block.name;
@@ -244,9 +245,9 @@ export function serializeBlock( block ) {
 /**
  * Takes a block or set of blocks and returns the serialized post content.
  *
- * @param  {Array}  blocks Block(s) to serialize
+ * @param {Array} blocks Block(s) to serialize.
  *
- * @returns {String} The post content.
+ * @returns {string} The post content.
  */
 export default function serialize( blocks ) {
 	return castArray( blocks ).map( serializeBlock ).join( '\n\n' );
