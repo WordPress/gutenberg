@@ -74,11 +74,14 @@ Sometimes the intention might be to lock the template on the UI so that the bloc
 It is also possible to assign a template to an existing post type like "posts" and "pages":
 
 ```php
-$post_type_object = get_post_type_object( 'post' );
-$post_type_object->template = array(
-	array( 'core/paragraph', array(
-		'placeholder' => 'Add Description...',
-	) ),
-);
-$post_type_object->template_lock = 'all';
+function my_add_template_to_posts() {
+	$post_type_object = get_post_type_object( 'post' );
+	$post_type_object->template = array(
+		array( 'core/paragraph', array(
+			'placeholder' => 'Add Description...',
+		) ),
+	);
+	$post_type_object->template_lock = 'all';
+}
+add_action( 'init', 'my_add_template_to_posts' );
 ```
