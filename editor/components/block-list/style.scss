@@ -332,6 +332,8 @@
 		top: 2px;
 		right: 4px;
 		padding: 16px 0 20px 14px; // handles hover area
+		cursor: move;/* Fallback for IE/Edge < 14 */
+		cursor: grabbing;
 
 		// Mobile
 		display: none;
