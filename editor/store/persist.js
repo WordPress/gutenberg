@@ -4,10 +4,10 @@
 import { get } from 'lodash';
 
 /**
- * Adds the rehydratation behavior to redux reducers
+ * Adds the rehydratation behavior to redux reducers.
  *
- * @param {Function}   reducer     The reducer to enhance
- * @param {String}     reducerKey  The reducer key to persist
+ * @param {Function} reducer    The reducer to enhance.
+ * @param {string}   reducerKey The reducer key to persist.
  *
  * @returns {Function} Enhanced reducer.
  */
@@ -30,21 +30,21 @@ export function withRehydratation( reducer, reducerKey ) {
 }
 
 /**
- * Loads the initial state and persist on changes
+ * Loads the initial state and persist on changes.
  *
- * This should be executed after the reducer's registration
+ * This should be executed after the reducer's registration.
  *
- * @param {Object}     store       Store to enhance
- * @param {String}     reducerKey  The reducer key to persist (example: reducerKey.subReducerKey)
- * @param {String}     storageKey  The storage key to use
- * @param {Object}     defaults    Default values of the reducer key
+ * @param {Object}   store      Store to enhance.
+ * @param {Function} reducer    The reducer function. Used to get default values and to allow custom serialization by the reducers.
+ * @param {string}   reducerKey The reducer key to persist (example: reducerKey.subReducerKey).
+ * @param {string}   storageKey The storage key to use.
  */
-export function loadAndPersist( store, reducerKey, storageKey, defaults = {} ) {
+export function loadAndPersist( store, reducer, reducerKey, storageKey ) {
 	// Load initially persisted value
 	const persistedString = window.localStorage.getItem( storageKey );
 	if ( persistedString ) {
 		const persistedState = {
-			...defaults,
+			...get( reducer( undefined, { type: 'DEFAULTS' } ), reducerKey ),
 			...JSON.parse( persistedString ),
 		};
 
@@ -60,7 +60,8 @@ export function loadAndPersist( store, reducerKey, storageKey, defaults = {} ) {
 		const newStateValue = get( store.getState(), reducerKey );
 		if ( newStateValue !== currentStateValue ) {
 			currentStateValue = newStateValue;
-			window.localStorage.setItem( storageKey, JSON.stringify( currentStateValue ) );
+			const stateToSave = get( reducer( store.getState(), { type: 'REDUX_SERIALIZE' } ), reducerKey );
+			window.localStorage.setItem( storageKey, JSON.stringify( stateToSave ) );
 		}
 	} );
 }

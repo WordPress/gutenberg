@@ -9,7 +9,7 @@ import { createStore } from 'redux';
 import { loadAndPersist, withRehydratation } from '../persist';
 
 describe( 'loadAndPersist', () => {
-	it( 'should load the initial value from the local storage', () => {
+	it( 'should load the initial value from the local storage integrating it into reducer default value.', () => {
 		const storageKey = 'dumbStorageKey';
 		window.localStorage.setItem( storageKey, JSON.stringify( { chicken: true } ) );
 		const reducer = () => {
@@ -20,15 +20,20 @@ describe( 'loadAndPersist', () => {
 		const store = createStore( withRehydratation( reducer, 'preferences' ) );
 		loadAndPersist(
 			store,
+			reducer,
 			'preferences',
 			storageKey,
 		);
-		expect( store.getState().preferences ).toEqual( { chicken: true } );
+		expect( store.getState().preferences ).toEqual( { chicken: true, ribs: true } );
 	} );
 
-	it( 'should persit to local storage once the state value changes', () => {
+	it( 'should persist to local storage once the state value changes', () => {
 		const storageKey = 'dumbStorageKey2';
 		const reducer = ( state, action ) => {
+			if ( action.type === 'REDUX_SERIALIZE' ) {
+				return state;
+			}
+
 			if ( action.type === 'UPDATE' ) {
 				return {
 					preferences: { chicken: true },
@@ -42,6 +47,7 @@ describe( 'loadAndPersist', () => {
 		const store = createStore( withRehydratation( reducer, 'preferences' ) );
 		loadAndPersist(
 			store,
+			reducer,
 			'preferences',
 			storageKey,
 		);
@@ -54,15 +60,13 @@ describe( 'loadAndPersist', () => {
 			counter: 41,
 		};
 		const storageKey = 'dumbStorageKey3';
-		const reducer = ( state, action ) => {
+		const reducer = ( state = { preferences: defaultsPreferences }, action ) => {
 			if ( action.type === 'INCREMENT' ) {
 				return {
 					preferences: { counter: state.preferences.counter + 1 },
 				};
 			}
-			return {
-				preferences: { counter: 0 },
-			};
+			return state;
 		};
 
 		// store preferences without the `counter` default
@@ -71,9 +75,9 @@ describe( 'loadAndPersist', () => {
 		const store = createStore( withRehydratation( reducer, 'preferences' ) );
 		loadAndPersist(
 			store,
+			reducer,
 			'preferences',
 			storageKey,
-			defaultsPreferences,
 		);
 		store.dispatch( { type: 'INCREMENT' } );
 
@@ -87,15 +91,13 @@ describe( 'loadAndPersist', () => {
 			counter: 41,
 		};
 		const storageKey = 'dumbStorageKey4';
-		const reducer = ( state, action ) => {
+		const reducer = ( state = { preferences: defaultsPreferences }, action ) => {
 			if ( action.type === 'INCREMENT' ) {
 				return {
 					preferences: { counter: state.preferences.counter + 1 },
 				};
 			}
-			return {
-				preferences: { counter: 0 },
-			};
+			return state;
 		};
 
 		window.localStorage.setItem( storageKey, JSON.stringify( { counter: 1 } ) );
@@ -104,9 +106,9 @@ describe( 'loadAndPersist', () => {
 
 		loadAndPersist(
 			store,
+			reducer,
 			'preferences',
 			storageKey,
-			defaultsPreferences,
 		);
 		store.dispatch( { type: 'INCREMENT' } );
 

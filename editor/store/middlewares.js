@@ -12,9 +12,9 @@ import { mobileMiddleware } from '../utils/mobile';
 import effects from './effects';
 
 /**
- * Applies the custom middlewares used specifically in the editor module
+ * Applies the custom middlewares used specifically in the editor module.
  *
- * @param  {Object}  store Store Object
+ * @param {Object} store Store Object.
  *
  * @returns {Object} Update Store Object.
  */

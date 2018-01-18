@@ -90,6 +90,12 @@
 		"parent": "blocks"
 	},
 	{
+		"title": "Speeding up writing blocks",
+		"slug": "speeding-up-writing-blocks",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/blocks-scaffolding.md",
+		"parent": "blocks"
+	},
+	{
 		"title": "Reference",
 		"slug": "reference",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/reference.md",

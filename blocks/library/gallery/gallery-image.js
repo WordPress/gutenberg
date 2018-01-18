@@ -36,7 +36,7 @@ class GalleryImage extends Component {
 
 		const img = url ? <img src={ url } alt={ alt } data-id={ id } /> : <Spinner />;
 
-		const className = classnames( 'blocks-gallery-image', {
+		const className = classnames( {
 			'is-selected': isSelected,
 		} );
 
@@ -45,11 +45,11 @@ class GalleryImage extends Component {
 		return (
 			<figure className={ className } onClick={ onClick }>
 				{ isSelected &&
-					<div className="blocks-gallery-image__inline-menu">
+					<div className="blocks-gallery-item__inline-menu">
 						<IconButton
 							icon="no-alt"
 							onClick={ onRemove }
-							className="blocks-gallery-image__remove"
+							className="blocks-gallery-item__remove"
 							label={ __( 'Remove Image' ) }
 						/>
 					</div>

@@ -55,6 +55,7 @@
 		left: 1px;
 	}
 
+	&.is-toggled:hover,
 	&.is-toggled:focus {
 		outline: none;
 		box-shadow: 0 0 0 1px $dark-gray-500, inset 0 0 0 1px $white;
