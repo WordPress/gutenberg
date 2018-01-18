@@ -16,11 +16,19 @@
 		pointer-events: none;
 	}
 
-	.dashicon {
-		display: block;
-	}
-
 	&:first-child {
 		margin-bottom: 4px;
+	}
+
+	&:not(:disabled):hover {
+		@include button-style__hover;
+	}
+
+	&:not(:disabled):active {
+		@include button-style__active;
+	}
+
+	&:not(:disabled):focus {
+		@include button-style__focus-active;
 	}
 }

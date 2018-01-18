@@ -25,10 +25,11 @@ const ANCHOR_REGEX = /[\s#]/g;
 
 /**
  * Filters registered block settings, extending attributes with anchor using ID
- * of the first node
+ * of the first node.
  *
- * @param  {Object} settings Original block settings
- * @return {Object}          Filtered block settings
+ * @param {Object} settings Original block settings.
+ *
+ * @returns {Object} Filtered block settings.
  */
 export function addAttribute( settings ) {
 	if ( hasBlockSupport( settings, 'anchor' ) ) {
@@ -50,8 +51,9 @@ export function addAttribute( settings ) {
  * Override the default edit UI to include a new block inspector control for
  * assigning the anchor ID, if block supports anchor.
  *
- * @param  {function|Component} BlockEdit Original component
- * @return {function}                     Wrapped component
+ * @param {function|Component} BlockEdit Original component.
+ *
+ * @returns {string} Wrapped component.
  */
 export function withInspectorControl( BlockEdit ) {
 	const WrappedBlockEdit = ( props ) => {
@@ -83,10 +85,11 @@ export function withInspectorControl( BlockEdit ) {
  * supports anchor. This is only applied if the block's save result is an
  * element and not a markup string.
  *
- * @param  {Object} extraProps Additional props applied to save element
- * @param  {Object} blockType  Block type
- * @param  {Object} attributes Current block attributes
- * @return {Object}            Filtered props applied to save element
+ * @param {Object} extraProps Additional props applied to save element.
+ * @param {Object} blockType  Block type.
+ * @param {Object} attributes Current block attributes.
+ *
+ * @returns {Object} Filtered props applied to save element.
  */
 export function addSaveProps( extraProps, blockType, attributes ) {
 	if ( hasBlockSupport( blockType, 'anchor' ) ) {

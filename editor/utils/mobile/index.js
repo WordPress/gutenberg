@@ -7,8 +7,9 @@ import { toggleSidebar } from '../../store/actions';
 /**
  * Disables isSidebarOpened on rehydrate payload if the user is on a mobile screen size.
  *
- * @param  {Object} payload rehydrate payload
- * @return {Object}         rehydrate payload with isSidebarOpened disabled if on mobile
+ * @param {Object} payload Rehydrate payload.
+ *
+ * @returns {Object} Rehydrate payload with isSidebarOpened disabled if on mobile.
  */
 export const disableIsSidebarOpenedOnMobile = ( payload ) => (
 	payload.isSidebarOpenedMobile ? { ...payload, isSidebarOpenedMobile: false } : payload
@@ -26,7 +27,7 @@ export const mobileMiddleware = ( { getState } ) => next => action => {
 		} );
 	}
 	if ( action.type === 'TOGGLE_SIDEBAR' && action.sidebar === undefined ) {
-		return next( toggleSidebar( isMobile( getState() ) ? 'mobile' : 'desktop', action.force ) );
+		return next( toggleSidebar( isMobile( getState() ) ? 'mobile' : 'desktop', action.forcedValue ) );
 	}
 	return next( action );
 };

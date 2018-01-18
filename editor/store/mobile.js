@@ -1,8 +1,8 @@
 /**
- * Enhance a redux store with the browser size
+ * Enhance a redux store with the browser size.
  *
- * @param {Object} store            Redux Store
- * @param {Number} mobileBreakpoint The mobile breakpoint
+ * @param {Object} store            Redux Store.
+ * @param {number} mobileBreakpoint The mobile breakpoint.
  */
 function enhanceWithBrowserSize( store, mobileBreakpoint ) {
 	const updateSize = () => {

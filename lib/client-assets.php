@@ -79,7 +79,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-data',
 		gutenberg_url( 'data/build/index.js' ),
-		array(),
+		array( 'wp-element' ),
 		filemtime( gutenberg_dir_path() . 'data/build/index.js' )
 	);
 	wp_register_script(
@@ -293,7 +293,7 @@ function gutenberg_register_vendor_scripts() {
 	);
 	gutenberg_register_vendor_script(
 		'promise',
-		'https://unpkg.com/promise-polyfill/promise' . $suffix . '.js'
+		'https://unpkg.com/promise-polyfill@7.0.0/dist/promise' . $suffix . '.js'
 	);
 
 	// TODO: This is only necessary so long as WordPress 4.9 is not yet stable,
@@ -359,13 +359,13 @@ function gutenberg_vendor_script_filename( $src ) {
  * @param  array  $data    REST response data.
  * @param  string $link    Link relation.
  * @param  string $context Optional context to append.
- * @return string          Link relation URI.
+ * @return string          Link relation URI, or empty string if none exists.
  */
 function gutenberg_get_rest_link( $data, $link, $context = null ) {
 	// Check whether a link entry with href exists.
 	if ( empty( $data['_links'] ) || empty( $data['_links'][ $link ] ) ||
 			! isset( $data['_links'][ $link ][0]['href'] ) ) {
-		return;
+		return '';
 	}
 
 	$href = $data['_links'][ $link ][0]['href'];
@@ -511,6 +511,12 @@ JS;
 			wp_json_encode( $schema_response->get_data() )
 		), 'before' );
 	}
+
+	/*
+	 * For API requests to happen over HTTP/1.0 methods,
+	 * as HTTP/1.1 methods are blocked in a variety of situations.
+	 */
+	wp_add_inline_script( 'wp-api', 'Backbone.emulateHTTP = true;', 'before' );
 }
 
 /**
@@ -613,6 +619,41 @@ add_action( 'wp_enqueue_scripts', 'gutenberg_common_scripts_and_styles' );
 add_action( 'admin_enqueue_scripts', 'gutenberg_common_scripts_and_styles' );
 
 /**
+ * Enqueues registered block scripts and styles, depending on current rendered
+ * context (only enqueuing editor scripts while in context of the editor).
+ *
+ * @since 2.0.0
+ */
+function gutenberg_enqueue_registered_block_scripts_and_styles() {
+	$is_editor = ( 'enqueue_block_editor_assets' === current_action() );
+
+	$block_registry = WP_Block_Type_Registry::get_instance();
+	foreach ( $block_registry->get_all_registered() as $block_name => $block_type ) {
+		// Front-end styles.
+		if ( ! empty( $block_type->style ) ) {
+			wp_enqueue_style( $block_type->style );
+		}
+
+		// Front-end script.
+		if ( ! empty( $block_type->script ) ) {
+			wp_enqueue_script( $block_type->script );
+		}
+
+		// Editor styles.
+		if ( $is_editor && ! empty( $block_type->editor_style ) ) {
+			wp_enqueue_style( $block_type->editor_style );
+		}
+
+		// Editor script.
+		if ( $is_editor && ! empty( $block_type->editor_script ) ) {
+			wp_enqueue_script( $block_type->editor_script );
+		}
+	}
+}
+add_action( 'enqueue_block_assets', 'gutenberg_enqueue_registered_block_scripts_and_styles' );
+add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_registered_block_scripts_and_styles' );
+
+/**
  * Returns a default color palette.
  *
  * @return array Color strings in hex format.
@@ -658,7 +699,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	wp_enqueue_script(
 		'wp-editor',
 		gutenberg_url( 'editor/build/index.js' ),
-		array( 'jquery', 'wp-api', 'wp-data', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element', 'wp-components', 'wp-utils', 'word-count', 'editor', 'heartbeat' ),
+		array( 'postbox', 'jquery', 'wp-api', 'wp-data', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element', 'wp-components', 'wp-utils', 'word-count', 'editor', 'heartbeat' ),
 		filemtime( gutenberg_dir_path() . 'editor/build/index.js' ),
 		true // enqueue in the footer.
 	);
@@ -826,7 +867,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		wp_add_inline_script(
 			'wp-editor',
 			'console.warn( "' .
-				__( 'Adding theme support using the `gutenberg` array is deprecated. See https://wordpress.org/gutenberg/handbook/reference/theme-support/ for details.', 'gutenberg' ) .
+				__( 'Adding theme support using the `gutenberg` array is deprecated. See https://wordpress.org/gutenberg/handbook/extensibility/theme-support/ for details.', 'gutenberg' ) .
 			'");'
 		);
 	}

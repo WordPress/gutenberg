@@ -2,8 +2,8 @@
 /**
  * Plugin Name: Gutenberg
  * Plugin URI: https://github.com/WordPress/gutenberg
- * Description: Printing since 1440. This is the development plugin for the new block editor in core. <strong>Meant for development, do not run on real sites.</strong>
- * Version: 1.9.0
+ * Description: Printing since 1440. This is the development plugin for the new block editor in core.
+ * Version: 2.0.0
  * Author: Gutenberg Team
  *
  * @package gutenberg
@@ -109,7 +109,7 @@ function gutenberg_build_files_notice() {
  * @since 1.5.0
  */
 function gutenberg_pre_init() {
-	if ( GUTENBERG_DEVELOPMENT_MODE && ! file_exists( dirname( __FILE__ ) . '/blocks/build' ) ) {
+	if ( defined( 'GUTENBERG_DEVELOPMENT_MODE' ) && GUTENBERG_DEVELOPMENT_MODE && ! file_exists( dirname( __FILE__ ) . '/blocks/build' ) ) {
 		add_action( 'admin_notices', 'gutenberg_build_files_notice' );
 		return;
 	}
@@ -193,12 +193,12 @@ function gutenberg_intercept_edit_post() {
 	$post = get_post( $post_id );
 
 	// Errors and invalid requests are handled in post.php, do not intercept.
-	if ( $post ) {
-		$post_type        = $post->post_type;
-		$post_type_object = get_post_type_object( $post_type );
-	} else {
+	if ( ! $post ) {
 		return;
 	}
+
+	$post_type        = $post->post_type;
+	$post_type_object = get_post_type_object( $post_type );
 
 	if ( ! $post_type_object ) {
 		return;
@@ -480,8 +480,6 @@ function gutenberg_replace_default_add_new_button() {
 			<?php endif; ?>
 			position: relative;
 			vertical-align: top;
-			-webkit-font-smoothing: antialiased;
-			-moz-osx-font-smoothing: grayscale;
 			text-decoration: none !important;
 			padding: 4px 5px 4px 3px;
 		}

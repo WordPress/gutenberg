@@ -6,7 +6,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Button, Dashicon, Placeholder, Toolbar } from '@wordpress/components';
+import { Button, IconButton, Placeholder, Toolbar } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 
 /**
@@ -15,7 +15,7 @@ import { Component } from '@wordpress/element';
 import './style.scss';
 import './editor.scss';
 import { registerBlockType } from '../../api';
-import MediaUploadButton from '../../media-upload-button';
+import MediaUpload from '../../media-upload';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
@@ -99,13 +99,12 @@ registerBlockType( 'core/audio', {
 						onChange={ updateAlignment }
 					/>
 					<Toolbar>
-						<Button
+						<IconButton
 							className="components-icon-button components-toolbar__control"
-							aria-label={ __( 'Edit audio' ) }
+							label={ __( 'Edit audio' ) }
 							onClick={ switchToEditing }
-						>
-							<Dashicon icon="edit" />
-						</Button>
+							icon="edit"
+						/>
 					</Toolbar>
 				</BlockControls>
 			);
@@ -119,7 +118,7 @@ registerBlockType( 'core/audio', {
 						key="placeholder"
 						icon="media-audio"
 						label={ __( 'Audio' ) }
-						instructions={ __( 'Select an audio file from your library, or upload a new one:' ) }
+						instructions={ __( 'Select an audio file from your library, or upload a new one' ) }
 						className={ className }>
 						<form onSubmit={ onSelectUrl }>
 							<input
@@ -134,14 +133,16 @@ registerBlockType( 'core/audio', {
 								{ __( 'Use URL' ) }
 							</Button>
 						</form>
-						<MediaUploadButton
-							buttonProps={ { isLarge: true } }
+						<MediaUpload
 							onSelect={ onSelectAudio }
 							type="audio"
 							value={ id }
-						>
-							{ __( 'Insert from Media Library' ) }
-						</MediaUploadButton>
+							render={ ( { open } ) => (
+								<Button isLarge onClick={ open }>
+									{ __( 'Add from Media Library' ) }
+								</Button>
+							) }
+						/>
 					</Placeholder>,
 				];
 			}

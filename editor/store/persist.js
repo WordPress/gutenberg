@@ -4,12 +4,12 @@
 import { get } from 'lodash';
 
 /**
- * Adds the rehydratation behavior to redux reducers
+ * Adds the rehydratation behavior to redux reducers.
  *
- * @param {Function}   reducer     The reducer to enhance
- * @param {String}     reducerKey  The reducer key to persist
+ * @param {Function} reducer    The reducer to enhance.
+ * @param {string}   reducerKey The reducer key to persist.
  *
- * @return {Function}              Enhanced reducer
+ * @returns {Function} Enhanced reducer.
  */
 export function withRehydratation( reducer, reducerKey ) {
 	// EnhancedReducer with auto-rehydration
@@ -30,14 +30,14 @@ export function withRehydratation( reducer, reducerKey ) {
 }
 
 /**
- * Loads the initial state and persist on changes
+ * Loads the initial state and persist on changes.
  *
- * This should be executed after the reducer's registration
+ * This should be executed after the reducer's registration.
  *
- * @param {Object}     store       Store to enhance
- * @param {String}     reducerKey  The reducer key to persist (example: reducerKey.subReducerKey)
- * @param {String}     storageKey  The storage key to use
- * @param {Object}     defaults    Default values of the reducer key
+ * @param {Object} store      Store to enhance.
+ * @param {string} reducerKey The reducer key to persist (example: reducerKey.subReducerKey).
+ * @param {string} storageKey The storage key to use.
+ * @param {Object} defaults   Default values of the reducer key.
  */
 export function loadAndPersist( store, reducerKey, storageKey, defaults = {} ) {
 	// Load initially persisted value

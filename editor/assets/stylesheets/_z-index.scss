@@ -22,10 +22,11 @@ $z-layers: (
 	'.editor-block-switcher__menu': 2,
 	'.components-popover__close': 2,
 	'.editor-block-mover': 1,
-	'.blocks-gallery-image__inline-menu': 20,
+	'.blocks-gallery-item__inline-menu': 20,
 	'.editor-block-settings-menu__popover': 20, // Below the header
 	'.editor-header': 30,
 	'.editor-text-editor__formatting': 30,
+	'.wp-block-image__resize-handlers': 1, // Resize handlers above sibling inserter
 
 	// Show drop zone above most standard content, but below any overlays
 	'.components-drop-zone': 100,

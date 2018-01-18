@@ -30,6 +30,7 @@ body.gutenberg-editor-page {
 
 	svg {
 		fill: currentColor;
+		outline: none;
 	}
 
 	ul#adminmenu a.wp-has-current-submenu:after,
@@ -43,11 +44,11 @@ body.gutenberg-editor-page {
 		box-sizing: border-box;
 	}
 
-	ul {
+	ul:not(.wp-block-gallery) {
 		list-style-type: disc;
 	}
 
-	ol {
+	ol:not(.wp-block-gallery) {
 		list-style-type: decimal;
 	}
 

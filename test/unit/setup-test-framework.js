@@ -1,3 +1,8 @@
+/**
+ * WordPress dependencies
+ */
+import '@wordpress/jest-console';
+
 // It "mocks" enzyme, so that we can delay loading of
 // the utility functions until enzyme is imported in tests.
 // Props to @gdborton for sharing this technique in his article:
@@ -17,18 +22,4 @@ jest.mock( 'enzyme', () => {
 		require.requireActual( 'jest-enzyme' );
 	}
 	return actualEnzyme;
-} );
-
-// Sets spies on console object to make it possible to convert them into test failures.
-const spyError = jest.spyOn( console, 'error' );
-const spyWarn = jest.spyOn( console, 'warn' );
-
-beforeEach( () => {
-	spyError.mockReset();
-	spyWarn.mockReset();
-} );
-
-afterEach( () => {
-	expect( spyError ).not.toHaveBeenCalled();
-	expect( spyWarn ).not.toHaveBeenCalled();
 } );

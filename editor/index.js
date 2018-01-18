@@ -38,7 +38,8 @@ if ( dateSettings.timezone.string ) {
 }
 
 /**
- * Configure heartbeat to refresh the wp-api nonce, keeping the editor authorization intact.
+ * Configure heartbeat to refresh the wp-api nonce, keeping the editor
+ * authorization intact.
  */
 window.jQuery( document ).on( 'heartbeat-tick', ( event, response ) => {
 	if ( response[ 'rest-nonce' ] ) {
@@ -51,8 +52,8 @@ window.jQuery( document ).on( 'heartbeat-tick', ( event, response ) => {
  * an unhandled error occurs, replacing previously mounted editor element using
  * an initial state from prior to the crash.
  *
- * @param {Element} target       DOM node in which editor is rendered
- * @param {?Object} settings     Editor settings object
+ * @param {Element} target   DOM node in which editor is rendered.
+ * @param {?Object} settings Editor settings object.
  */
 export function recreateEditorInstance( target, settings ) {
 	unmountComponentAtNode( target );
@@ -75,10 +76,11 @@ export function recreateEditorInstance( target, settings ) {
  * The return value of this function is not necessary if we change where we
  * call createEditorInstance(). This is due to metaBox timing.
  *
- * @param  {String}  id       Unique identifier for editor instance
- * @param  {Object}  post     API entity for post to edit
- * @param  {?Object} settings Editor settings object
- * @return {Object}           Editor interface
+ * @param {string}  id       Unique identifier for editor instance.
+ * @param {Object}  post     API entity for post to edit.
+ * @param {?Object} settings Editor settings object.
+ *
+ * @returns {Object} Editor interface.
  */
 export function createEditorInstance( id, post, settings ) {
 	const target = document.getElementById( id );

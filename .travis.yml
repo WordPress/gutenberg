@@ -23,17 +23,12 @@ before_install:
 jobs:
   include:
     - stage: test
-      php: 5.6
-      script: composer install && ./vendor/bin/phpcs
-
-    - stage: test
       script:
         - npm install || exit 1
         - npm run ci || exit 1
 
     - stage: test
-      php: 7.1
-      env: WP_VERSION=latest
+      env: WP_VERSION=latest DOCKER=true
       script:
         - ./bin/run-wp-unit-tests.sh
 

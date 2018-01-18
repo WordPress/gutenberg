@@ -55,6 +55,7 @@
 		left: 1px;
 	}
 
+	&.is-toggled:hover,
 	&.is-toggled:focus {
 		outline: none;
 		box-shadow: 0 0 0 1px $dark-gray-500, inset 0 0 0 1px $white;
@@ -62,10 +63,16 @@
 		background: $dark-gray-500;
 	}
 
+	&.editor-post-publish-button, &.editor-post-publish-panel__toggle {
+		margin: 2px;
+		height: 33px;
+		line-height: 32px;
+		padding: 0 12px 2px;
+	}
+
 	@include break-medium() {
 		&.editor-post-publish-button, &.editor-post-publish-panel__toggle {
-			height: 33px;
-			line-height: 32px;
+			margin: 0 10px;
 		}
 	}
 }

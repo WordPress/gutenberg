@@ -384,7 +384,7 @@ describe( 'actions', () => {
 			expect( toggleSidebar( 'publish', true ) ).toEqual( {
 				type: 'TOGGLE_SIDEBAR',
 				sidebar: 'publish',
-				force: true,
+				forcedValue: true,
 			} );
 		} );
 	} );

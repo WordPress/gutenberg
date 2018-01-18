@@ -70,7 +70,7 @@ class LatestPostsBlock extends Component {
 						value={ columns }
 						onChange={ ( value ) => setAttributes( { columns: value } ) }
 						min={ 2 }
-						max={ Math.min( MAX_POSTS_COLUMNS, latestPosts.length ) }
+						max={ ! hasPosts ? MAX_POSTS_COLUMNS : Math.min( MAX_POSTS_COLUMNS, latestPosts.length ) }
 					/>
 				}
 			</InspectorControls>
@@ -93,10 +93,9 @@ class LatestPostsBlock extends Component {
 		}
 
 		// Removing posts from display should be instant.
-		const postsDifference = latestPosts.length - postsToShow;
-		if ( postsDifference > 0 ) {
-			latestPosts.splice( postsToShow, postsDifference );
-		}
+		const displayPosts = latestPosts.length > postsToShow ?
+			latestPosts.slice( 0, postsToShow ) :
+			latestPosts;
 
 		const layoutControls = [
 			{
@@ -128,12 +127,13 @@ class LatestPostsBlock extends Component {
 				</BlockControls>
 			),
 			<ul
-				className={ classnames( this.props.className, 'columns-' + columns, {
+				className={ classnames( this.props.className, {
 					'is-grid': layout === 'grid',
+					[ `columns-${ columns }` ]: layout === 'grid',
 				} ) }
 				key="latest-posts"
 			>
-				{ latestPosts.map( ( post, i ) =>
+				{ displayPosts.map( ( post, i ) =>
 					<li key={ i }>
 						<a href={ post.link } target="_blank">{ decodeEntities( post.title.rendered.trim() ) || __( '(Untitled)' ) }</a>
 						{ displayPostDate && post.date_gmt &&
@@ -155,6 +155,7 @@ export default withAPIData( ( props ) => {
 		order,
 		orderBy,
 		per_page: postsToShow,
+		_fields: [ 'date_gmt', 'link', 'title' ],
 	}, value => ! isUndefined( value ) ) );
 	return {
 		latestPosts: `/wp/v2/posts?${ queryString }`,
