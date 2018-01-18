@@ -28,8 +28,6 @@ import { closeGeneralSidebar } from '../../store/actions';
  */
 export function getPluginSidebar( plugin ) {
 	const pluginSidebar = getSidebarSettings( plugin );
-	console.log( "pluginSidebar", pluginSidebar );
-	console.log( "plugin", plugin );
 
 	if ( ! pluginSidebar ) {
 		return {

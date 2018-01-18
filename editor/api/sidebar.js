@@ -81,7 +81,6 @@ export function registerSidebar( name, settings ) {
  *                         sidebar doesn't exist.
  */
 export function getSidebarSettings( name ) {
-	console.log("getSidebarSettings", sidebars)
 	if ( ! sidebars.hasOwnProperty( name ) ) {
 		return null;
 	}
@@ -100,10 +99,7 @@ export function getSidebarSettings( name ) {
  */
 export function renderSidebar( name, settings ) {
 	registerSidebar( name, settings );
-	activateSidebar( name, settings );
-/*
-	let render = getSidebarSettings( name ).render;
-	render();*/
+	activateSidebar( name );
 }
 
 /**
