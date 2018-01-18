@@ -7,7 +7,7 @@ import { filter, every } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { createMediaFromFile } from '@wordpress/utils';
+import { createMediaFromFile, preloadImage } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -115,14 +115,24 @@ registerBlockType( 'core/gallery', {
 				isMatch( files ) {
 					return files.length !== 1 && every( files, ( file ) => file.type.indexOf( 'image/' ) === 0 );
 				},
-				transform( files ) {
-					return Promise.all( files.map( ( file ) => createMediaFromFile( file ) ) )
-						.then( ( medias ) => createBlock( 'core/gallery', {
-							images: medias.map( media => ( {
-								id: media.id,
-								url: media.source_url,
-							} ) ),
-						} ) );
+				transform( files, onChange ) {
+					const block = createBlock( 'core/gallery', {
+						images: files.map( ( file ) => ( {
+							url: window.URL.createObjectURL( file ),
+						} ) ),
+					} );
+
+					Promise.all( files.map( ( file ) =>
+						createMediaFromFile( file )
+							.then( ( media ) => preloadImage( media.source_url ).then( () => media ) )
+					) ).then( ( medias ) => onChange( block.uid, {
+						images: medias.map( media => ( {
+							id: media.id,
+							url: media.source_url,
+						} ) ),
+					} ) );
+
+					return block;
 				},
 			},
 		],
