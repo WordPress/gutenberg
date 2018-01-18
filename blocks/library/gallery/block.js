@@ -238,16 +238,17 @@ class GalleryBlock extends Component {
 			<ul key="gallery" className={ `${ className } align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` }>
 				{ dropZone }
 				{ images.map( ( img, index ) => (
-					<GalleryImage
-						key={ img.id || img.url }
-						url={ img.url }
-						alt={ img.alt }
-						id={ img.id }
-						isSelected={ this.state.selectedImage === index }
-						onRemove={ this.onRemoveImage( index ) }
-						onClick={ this.onSelectImage( index ) }
-						setAttributes={ ( attrs ) => this.setImageAttributes( index, attrs ) }
-					/>
+					<li className="blocks-gallery-item" key={ img.id || img.url }>
+						<GalleryImage
+							url={ img.url }
+							alt={ img.alt }
+							id={ img.id }
+							isSelected={ this.state.selectedImage === index }
+							onRemove={ this.onRemoveImage( index ) }
+							onClick={ this.onSelectImage( index ) }
+							setAttributes={ ( attrs ) => this.setImageAttributes( index, attrs ) }
+						/>
+					</li>
 				) ) }
 			</ul>,
 		];

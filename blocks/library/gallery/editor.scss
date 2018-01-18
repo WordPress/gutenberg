@@ -5,7 +5,7 @@
 .blocks-gallery-item {
 	position: relative;
 
-	&.is-selected {
+	.is-selected {
 		outline: 4px solid $blue-medium-500;
 		outline-offset: -4px;
 	}
