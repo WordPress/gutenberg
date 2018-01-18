@@ -4,7 +4,6 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { sortBy, find } from 'lodash';
 
 /**
  * Block categories.
@@ -84,61 +83,3 @@ export function registerCategory( category ) {
 	return categories;
 }
 
-/**
- *
- * Get sorted categories by property.
- *
- * @param {String} sortProperty The key to sort by
- *
- * @returns {Array} categories
- */
-
-export function getSortedCategories( sortProperty ) {
-	if ( ! sortProperty ) {
-		console.error(
-			'The sortProperty must be defined'
-		);
-		return;
-	}
-	if ( typeof sortProperty !== 'string' ) {
-		console.error(
-			'The sortProperty must be a string'
-		);
-		return;
-	}
-
-	const sortedCategories = sortBy( categories, sortProperty );
-	return sortedCategories;
-}
-
-/**
- * Set the property 'order' for a category.
- *
- * @param {String}    slug    The slug for the category
- * @param {Number}    order   The order for the category
- *
- * @returns {Array} categories
- */
-export function setCategoryOrder( slug, order ) {
-	const category = find( categories, { slug: slug } );
-	if ( ! slug ) {
-		console.error(
-			'The slug must be defined'
-		);
-		return;
-	}
-	if ( typeof slug !== 'string' ) {
-		console.error(
-			'The slug must be a string'
-		);
-		return;
-	}
-	if ( ! ( order === parseInt( order, 10 ) ) ) {
-		console.error(
-			'The order must be an integer'
-		);
-		return;
-	}
-	category.order = order;
-	return categories;
-}
