@@ -17,51 +17,52 @@ import './style.scss';
 import { registerBlockType, createBlock } from '../../api';
 import { default as GalleryBlock, defaultColumnsNumber } from './block';
 
+const blockAttributes = {
+	align: {
+		type: 'string',
+		default: 'none',
+	},
+	images: {
+		type: 'array',
+		default: [],
+		source: 'query',
+		selector: 'ul.wp-block-gallery .blocks-gallery-item img',
+		query: {
+			url: {
+				source: 'attribute',
+				attribute: 'src',
+			},
+			alt: {
+				source: 'attribute',
+				attribute: 'alt',
+				default: '',
+			},
+			id: {
+				source: 'attribute',
+				attribute: 'data-id',
+			},
+		},
+	},
+	columns: {
+		type: 'number',
+	},
+	imageCrop: {
+		type: 'boolean',
+		default: true,
+	},
+	linkTo: {
+		type: 'string',
+		default: 'none',
+	},
+};
+
 registerBlockType( 'core/gallery', {
 	title: __( 'Gallery' ),
 	description: __( 'Image galleries are a great way to share groups of pictures on your site.' ),
 	icon: 'format-gallery',
 	category: 'common',
 	keywords: [ __( 'images' ), __( 'photos' ) ],
-
-	attributes: {
-		align: {
-			type: 'string',
-			default: 'none',
-		},
-		images: {
-			type: 'array',
-			default: [],
-			source: 'query',
-			selector: 'ul.wp-block-gallery .blocks-gallery-item img',
-			query: {
-				url: {
-					source: 'attribute',
-					attribute: 'src',
-				},
-				alt: {
-					source: 'attribute',
-					attribute: 'alt',
-					default: '',
-				},
-				id: {
-					source: 'attribute',
-					attribute: 'data-id',
-				},
-			},
-		},
-		columns: {
-			type: 'number',
-		},
-		imageCrop: {
-			type: 'boolean',
-			default: true,
-		},
-		linkTo: {
-			type: 'string',
-			default: 'none',
-		},
-	},
+	attributes: blockAttributes,
 
 	transforms: {
 		from: [
@@ -69,8 +70,8 @@ registerBlockType( 'core/gallery', {
 				type: 'block',
 				isMultiBlock: true,
 				blocks: [ 'core/image' ],
-				transform: ( blockAttributes ) => {
-					const validImages = filter( blockAttributes, ( { id, url } ) => id && url );
+				transform: ( attributes ) => {
+					const validImages = filter( attributes, ( { id, url } ) => id && url );
 					if ( validImages.length > 0 ) {
 						return createBlock( 'core/gallery', {
 							images: validImages.map( ( { id, url, alt } ) => ( { id, url, alt } ) ),
@@ -181,41 +182,10 @@ registerBlockType( 'core/gallery', {
 	deprecated: [
 		{
 			attributes: {
-				align: {
-					type: 'string',
-					default: 'none',
-				},
+				...blockAttributes,
 				images: {
-					type: 'array',
-					default: [],
-					source: 'query',
+					...blockAttributes.images,
 					selector: 'div.wp-block-gallery figure.blocks-gallery-image img',
-					query: {
-						url: {
-							source: 'attribute',
-							attribute: 'src',
-						},
-						alt: {
-							source: 'attribute',
-							attribute: 'alt',
-							default: '',
-						},
-						id: {
-							source: 'attribute',
-							attribute: 'data-id',
-						},
-					},
-				},
-				columns: {
-					type: 'number',
-				},
-				imageCrop: {
-					type: 'boolean',
-					default: true,
-				},
-				linkTo: {
-					type: 'string',
-					default: 'none',
 				},
 			},
 
@@ -238,11 +208,9 @@ registerBlockType( 'core/gallery', {
 							const img = <img src={ image.url } alt={ image.alt } data-id={ image.id } />;
 
 							return (
-								<li key={ image.id || image.url } className="blocks-gallery-item">
-									<figure>
-										{ href ? <a href={ href }>{ img }</a> : img }
-									</figure>
-								</li>
+								<figure key={ image.id || image.url } className="blocks-gallery-image">
+									{ href ? <a href={ href }>{ img }</a> : img }
+								</figure>
 							);
 						} ) }
 					</div>
