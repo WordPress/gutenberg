@@ -75,7 +75,6 @@
 		"deep-freeze": "0.0.1",
 		"enzyme": "3.2.0",
 		"enzyme-adapter-react-16": "1.1.0",
-		"eslines": "1.1.0",
 		"eslint": "4.9.0",
 		"eslint-config-wordpress": "2.0.0",
 		"eslint-plugin-jest": "21.5.0",
