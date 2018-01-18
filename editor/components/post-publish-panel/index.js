@@ -9,7 +9,7 @@ import { get } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { compose, Component } from '@wordpress/element';
-import { withAPIData, IconButton, Spinner } from '@wordpress/components';
+import { withAPIData, IconButton, Spinner, withFocusReturn } from '@wordpress/components';
 
 /**
  * Internal Dependencies
@@ -100,4 +100,5 @@ const applyWithAPIData = withAPIData( ( props ) => {
 export default compose( [
 	applyConnect,
 	applyWithAPIData,
+	withFocusReturn,
 ] )( PostPublishPanel );

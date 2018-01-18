@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
+import { focus } from '@wordpress/utils';
 
 /**
  * Higher Order Component used to be used to wrap disposable elements like Sidebars, modals, dropdowns.
@@ -19,10 +20,22 @@ function withFocusReturn( WrappedComponent ) {
 
 			this.setIsFocusedTrue = () => this.isFocused = true;
 			this.setIsFocusedFalse = () => this.isFocused = false;
+			this.bindContainer = this.bindContainer.bind( this );
 		}
 
 		componentWillMount() {
 			this.activeElementOnMount = document.activeElement;
+		}
+
+		componentDidMount() {
+			// Find first tabbable node within content and shift focus, falling
+			// back to the popover panel itself.
+			const firstTabbable = focus.tabbable.find( this.container )[ 0 ];
+			if ( firstTabbable ) {
+				firstTabbable.focus();
+			} else {
+				this.container.focus();
+			}
 		}
 
 		componentWillUnmount() {
@@ -37,11 +50,17 @@ function withFocusReturn( WrappedComponent ) {
 			}
 		}
 
+		bindContainer( ref ) {
+			this.container = ref;
+		}
+
 		render() {
 			return (
 				<div
 					onFocus={ this.setIsFocusedTrue }
 					onBlur={ this.setIsFocusedFalse }
+					ref={ this.bindContainer }
+					tabIndex="-1"
 				>
 					<WrappedComponent { ...this.props } />
 				</div>

@@ -1,0 +1,43 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`withFocusReturn() testing rendering and focus handling should focus the container on mount 1`] = `"<div tabindex=\\"-1\\"><div class=\\"test\\">Testing</div></div>"`;
+
+exports[`withFocusReturn() testing rendering and focus handling should pass additional props through to the wrapped element 1`] = `
+<_class
+  data-test="test"
+>
+  <div
+    onBlur={[Function]}
+    onFocus={[Function]}
+    tabIndex="-1"
+  >
+    <Test
+      data-test="test"
+    >
+      <div
+        className="test"
+      >
+        Testing
+      </div>
+    </Test>
+  </div>
+</_class>
+`;
+
+exports[`withFocusReturn() testing rendering and focus handling should render a basic Test component inside the HOC 1`] = `
+<_class>
+  <div
+    onBlur={[Function]}
+    onFocus={[Function]}
+    tabIndex="-1"
+  >
+    <Test>
+      <div
+        className="test"
+      >
+        Testing
+      </div>
+    </Test>
+  </div>
+</_class>
+`;
