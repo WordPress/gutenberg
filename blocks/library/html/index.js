@@ -37,7 +37,7 @@ registerBlockType( 'core/html', {
 
 	edit: withState( {
 		preview: false,
-	} )( ( { attributes, setAttributes, setState, focus, preview } ) => (
+	} )( ( { attributes, setAttributes, setState, focus, setFocus, preview } ) => (
 		<div className="wp-block-html">
 			{ focus && (
 				<BlockControls>
@@ -63,6 +63,7 @@ registerBlockType( 'core/html', {
 				<CodeEditor
 					value={ attributes.content }
 					focus={ !! focus }
+					onFocus={ setFocus }
 					onChange={ content => setAttributes( { content } ) }
 				/>
 			) }

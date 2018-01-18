@@ -40,6 +40,13 @@ Whether or not the code editor should be focused.
 - Type: `boolean`
 - Required: No
 
+### onFocus
+
+The function called when the editor is focused.
+
+- Type: `Function`
+- Required: No
+
 ### onChange
 
 The function called when the user has modified the source code via the

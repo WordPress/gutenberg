@@ -14,6 +14,7 @@ describe( 'CodeEditor', () => {
 		set( global, 'wp.codeEditor.initialize', () => ( {
 			codemirror: {
 				on: noop,
+				hasFocus: () => false,
 			},
 		} ) );
 
