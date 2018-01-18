@@ -857,7 +857,6 @@ export default class Dashicon extends wp.element.Component {
 
 		return (
 			<svg
-				tabindex="-1"
 				aria-hidden
 				role="img"
 				focusable="false"
