@@ -5,6 +5,16 @@ body.gutenberg-editor-page {
 	// otherwise you can invoke the overscroll bounce on the non-scrolling container, causing (ノಠ益ಠ)ノ彡┻━┻
 	@include break-small {
 		overflow: hidden;
+
+		#adminmenuwrap {
+			height: 100%;
+			max-height: 100%;
+			position: absolute;
+			top: 0;
+			left: 0;
+			overflow-y: auto;
+			overflow-x: hidden;
+		}
 	}
 
 	#update-nag, .update-nag {
