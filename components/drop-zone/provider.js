@@ -179,9 +179,13 @@ class DropZoneProvider extends Component {
 			const HTML = event.dataTransfer.getData( 'text/html' );
 
 			if ( files.length ) {
-				dropzone.onFilesDrop && dropzone.onFilesDrop( [ ...event.dataTransfer.files ], position );
+				if ( dropzone.onFilesDrop ) {
+					dropzone.onFilesDrop( [ ...event.dataTransfer.files ], position );
+				}
 			} else if ( HTML ) {
-				dropzone.onHTMLDrop && dropzone.onHTMLDrop( HTML, position );
+				if ( dropzone.onHTMLDrop ) {
+					dropzone.onHTMLDrop( HTML, position );
+				}
 			}
 		}
 
