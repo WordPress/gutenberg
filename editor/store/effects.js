@@ -326,34 +326,36 @@ export default {
 		const { dispatch } = store;
 
 		let result;
-		if ( id ) {
+		if ( id && wp.api.models.Blocks ) {
 			result = new wp.api.models.Blocks( { id } ).fetch();
-		} else {
+		} else if ( wp.api.collections.Blocks ) {
 			result = new wp.api.collections.Blocks().fetch();
 		}
 
-		result.then(
-			( reusableBlockOrBlocks ) => {
-				dispatch( {
-					type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
-					id,
-					reusableBlocks: castArray( reusableBlockOrBlocks ).map( ( { id: itemId, title, content } ) => {
-						const [ { name: type, attributes } ] = parse( content );
-						return { id: itemId, title, type, attributes };
-					} ),
-				} );
-			},
-			( error ) => {
-				dispatch( {
-					type: 'FETCH_REUSABLE_BLOCKS_FAILURE',
-					id,
-					error: error.responseJSON || {
-						code: 'unknown_error',
-						message: __( 'An unknown error occurred.' ),
-					},
-				} );
-			}
-		);
+		if ( typeof result.then === 'function' ) {
+			result.then(
+				( reusableBlockOrBlocks ) => {
+					dispatch( {
+						type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
+						id,
+						reusableBlocks: castArray( reusableBlockOrBlocks ).map( ( { id: itemId, title, content } ) => {
+							const [ { name: type, attributes } ] = parse( content );
+							return { id: itemId, title, type, attributes };
+						} ),
+					} );
+				},
+				( error ) => {
+					dispatch( {
+						type: 'FETCH_REUSABLE_BLOCKS_FAILURE',
+						id,
+						error: error.responseJSON || {
+							code: 'unknown_error',
+							message: __( 'An unknown error occurred.' ),
+						},
+					} );
+				}
+			);
+		}
 	},
 	SAVE_REUSABLE_BLOCK( action, store ) {
 		const { id } = action;
@@ -362,25 +364,27 @@ export default {
 		const { title, type, attributes, isTemporary } = getReusableBlock( getState(), id );
 		const content = serialize( createBlock( type, attributes ) );
 		const requestData = isTemporary ? { title, content } : { id, title, content };
-		new wp.api.models.Blocks( requestData ).save().then(
-			( updatedReusableBlock ) => {
-				dispatch( {
-					type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
-					updatedId: updatedReusableBlock.id,
-					id,
-				} );
-				const message = isTemporary ? __( 'Block created.' ) : __( 'Block updated.' );
-				dispatch( createSuccessNotice( message, { id: REUSABLE_BLOCK_NOTICE_ID } ) );
-			},
-			( error ) => {
-				dispatch( { type: 'SAVE_REUSABLE_BLOCK_FAILURE', id } );
-				const message = __( 'An unknown error occured.' );
-				dispatch( createErrorNotice( get( error.responseJSON, 'message', message ), {
-					id: REUSABLE_BLOCK_NOTICE_ID,
-					spokenMessage: message,
-				} ) );
-			}
-		);
+		if ( wp.api.models.Blocks ) {
+			new wp.api.models.Blocks( requestData ).save().then(
+				( updatedReusableBlock ) => {
+					dispatch( {
+						type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
+						updatedId: updatedReusableBlock.id,
+						id,
+					} );
+					const message = isTemporary ? __( 'Block created.' ) : __( 'Block updated.' );
+					dispatch( createSuccessNotice( message, { id: REUSABLE_BLOCK_NOTICE_ID } ) );
+				},
+				( error ) => {
+					dispatch( { type: 'SAVE_REUSABLE_BLOCK_FAILURE', id } );
+					const message = __( 'An unknown error occured.' );
+					dispatch( createErrorNotice( get( error.responseJSON, 'message', message ), {
+						id: REUSABLE_BLOCK_NOTICE_ID,
+						spokenMessage: message,
+					} ) );
+				}
+			);
+		}
 	},
 	DELETE_REUSABLE_BLOCK( action, store ) {
 		const { id } = action;
@@ -406,29 +410,31 @@ export default {
 			optimist: { type: BEGIN, id: transactionId },
 		} );
 
-		new wp.api.models.Blocks( { id } ).destroy().then(
-			() => {
-				dispatch( {
-					type: 'DELETE_REUSABLE_BLOCK_SUCCESS',
-					id,
-					optimist: { type: COMMIT, id: transactionId },
-				} );
-				const message = __( 'Block deleted.' );
-				dispatch( createSuccessNotice( message, { id: REUSABLE_BLOCK_NOTICE_ID } ) );
-			},
-			( error ) => {
-				dispatch( {
-					type: 'DELETE_REUSABLE_BLOCK_FAILURE',
-					id,
-					optimist: { type: REVERT, id: transactionId },
-				} );
-				const message = __( 'An unknown error occured.' );
-				dispatch( createErrorNotice( get( error.responseJSON, 'message', message ), {
-					id: REUSABLE_BLOCK_NOTICE_ID,
-					spokenMessage: message,
-				} ) );
-			}
-		);
+		if ( wp.api.models.Blocks ) {
+			new wp.api.models.Blocks( { id } ).destroy().then(
+				() => {
+					dispatch( {
+						type: 'DELETE_REUSABLE_BLOCK_SUCCESS',
+						id,
+						optimist: { type: COMMIT, id: transactionId },
+					} );
+					const message = __( 'Block deleted.' );
+					dispatch( createSuccessNotice( message, { id: REUSABLE_BLOCK_NOTICE_ID } ) );
+				},
+				( error ) => {
+					dispatch( {
+						type: 'DELETE_REUSABLE_BLOCK_FAILURE',
+						id,
+						optimist: { type: REVERT, id: transactionId },
+					} );
+					const message = __( 'An unknown error occured.' );
+					dispatch( createErrorNotice( get( error.responseJSON, 'message', message ), {
+						id: REUSABLE_BLOCK_NOTICE_ID,
+						spokenMessage: message,
+					} ) );
+				}
+			);
+		}
 	},
 	CONVERT_BLOCK_TO_STATIC( action, store ) {
 		const { getState, dispatch } = store;
