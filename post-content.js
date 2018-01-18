@@ -85,9 +85,9 @@ window._wpGutenbergPost.content = {
 
 		'<!-- wp:gallery {"columns":2} -->',
 		'<ul class="wp-block-gallery alignnone columns-2 is-cropped">',
-		'<li class="blocks-gallery-image"><figure><img src="https://cldup.com/n0g6ME5VKC.jpg" alt="" /></figure></li>',
-		'<li class="blocks-gallery-image"><figure><img src="https://cldup.com/ZjESfxPI3R.jpg" alt="" /></figure></li>',
-		'<li class="blocks-gallery-image"><figure><img src="https://cldup.com/EKNF8xD2UM.jpg" alt="" /></figure></li>',
+		'<li class="blocks-gallery-item"><figure><img src="https://cldup.com/n0g6ME5VKC.jpg" alt="" /></figure></li>',
+		'<li class="blocks-gallery-item"><figure><img src="https://cldup.com/ZjESfxPI3R.jpg" alt="" /></figure></li>',
+		'<li class="blocks-gallery-item"><figure><img src="https://cldup.com/EKNF8xD2UM.jpg" alt="" /></figure></li>',
 		'</ul>',
 		'<!-- /wp:gallery -->',
 

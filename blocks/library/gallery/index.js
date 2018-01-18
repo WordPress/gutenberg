@@ -33,7 +33,7 @@ registerBlockType( 'core/gallery', {
 			type: 'array',
 			default: [],
 			source: 'query',
-			selector: 'ul.wp-block-gallery .blocks-gallery-image img',
+			selector: 'ul.wp-block-gallery .blocks-gallery-item img',
 			query: {
 				url: {
 					source: 'attribute',
@@ -167,7 +167,7 @@ registerBlockType( 'core/gallery', {
 					const img = <img src={ image.url } alt={ image.alt } data-id={ image.id } />;
 
 					return (
-						<li key={ image.id || image.url } className="blocks-gallery-image">
+						<li key={ image.id || image.url } className="blocks-gallery-item">
 							<figure>
 								{ href ? <a href={ href }>{ img }</a> : img }
 							</figure>
@@ -199,7 +199,7 @@ registerBlockType( 'core/gallery', {
 							const img = <img src={ image.url } alt={ image.alt } data-id={ image.id } />;
 
 							return (
-								<li key={ image.id || image.url } className="blocks-gallery-image">
+								<li key={ image.id || image.url } className="blocks-gallery-item">
 									<figure>
 										{ href ? <a href={ href }>{ img }</a> : img }
 									</figure>

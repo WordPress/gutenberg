@@ -11,14 +11,14 @@
 	}
 }
 
-.blocks-gallery-image__inline-menu {
+.blocks-gallery-item__inline-menu {
 	padding: 2px;
 	position: absolute;
 	top: 0;
 	right: 0;
 	background-color: $blue-medium-500;
 	display: inline-flex;
-	z-index: z-index( '.blocks-gallery-image__inline-menu' );
+	z-index: z-index( '.blocks-gallery-item__inline-menu' );
 
 	.components-button {
 		color: $white;
@@ -29,6 +29,6 @@
 	}
 }
 
-.blocks-gallery-image__remove {
+.blocks-gallery-item__remove {
 	padding: 0;
 }
