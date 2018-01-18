@@ -67,8 +67,9 @@ export function createBlock( name, blockAttributes = {} ) {
  * given transformation is able to execute in the situation specified in the
  * params.
  *
- * @param {string}  sourceName   Block name.
- * @param {boolean} isMultiBlock Array of possible block transformations.
+ * @param {String}  sourceName    Block name
+ * @param {String}  transformType The transform type to check for.
+ * @param {Boolean} isMultiBlock  Array of possible block transformations
  *
  * @returns {Function} Predicate that receives a block type.
  */
@@ -83,8 +84,9 @@ const isTransformForBlockSource = ( sourceName, transformType, isMultiBlock = fa
  * block type contains a transformation able to execute in the situation
  * specified in the params.
  *
- * @param {string}  sourceName   Block name.
- * @param {boolean} isMultiBlock Array of possible block transformations.
+ * @param {String}  sourceName    Block name
+ * @param {String}  transformType The transform type to check for.
+ * @param {Boolean} isMultiBlock  Array of possible block transformations
  *
  * @returns {Function} Predicate that receives a block type.
  */
