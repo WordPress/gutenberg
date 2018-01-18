@@ -45,7 +45,7 @@ export function loadAndPersist( store, reducer, reducerKey, storageKey ) {
 	const persistedString = window.localStorage.getItem( storageKey );
 	if ( persistedString ) {
 		const persistedState = {
-			...get( reducer( undefined, { type: 'DEFAULTS' } ), reducerKey ),
+			...get( reducer( undefined, { type: '@@gutenberg/init' } ), reducerKey ),
 			...JSON.parse( persistedString ),
 		};
 
@@ -62,7 +62,7 @@ export function loadAndPersist( store, reducer, reducerKey, storageKey ) {
 		const newStateValue = get( store.getState(), reducerKey );
 		if ( newStateValue !== currentStateValue ) {
 			currentStateValue = newStateValue;
-			const stateToSave = get( reducer( store.getState(), { type: 'REDUX_SERIALIZE' } ), reducerKey );
+			const stateToSave = get( reducer( store.getState(), { type: 'SERIALIZE' } ), reducerKey );
 			window.localStorage.setItem( storageKey, JSON.stringify( stateToSave ) );
 		}
 	} );
