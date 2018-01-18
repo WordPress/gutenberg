@@ -205,7 +205,7 @@ export function getBlockTypes() {
 /**
  * Returns true if the block defines support for a feature, or false otherwise.
  *
- * @param {(String|Object)} nameOrType      Block name or type object.
+ * @param {(string|Object)} nameOrType      Block name or type object.
  * @param {string}          feature         Feature to test.
  * @param {boolean}         defaultSupports Whether feature is supported by
  *                                          default if not explicitly defined.

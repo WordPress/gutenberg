@@ -69,7 +69,7 @@ export function registerSelectors( reducerKey, newSelectors ) {
  *                                       to determine the data for the
  *                                       component.
  *
- * @returns {Func} Renders the wrapped component and passes it data.
+ * @returns {Function} Renders the wrapped component and passes it data.
  */
 export const query = ( mapSelectorsToProps ) => ( WrappedComponent ) => {
 	const connectWithStore = ( ...args ) => {

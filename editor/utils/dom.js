@@ -201,8 +201,8 @@ export function placeCaretAtHorizontalEdge( container, isReverse ) {
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Document/caretRangeFromPoint
  *
  * @param {Document} doc The document of the range.
- * @param {Float}    x   Horizontal position within the current viewport.
- * @param {Float}    y   Vertical position within the current viewport.
+ * @param {number}    x   Horizontal position within the current viewport.
+ * @param {number}    y   Vertical position within the current viewport.
  *
  * @returns {?Range} The best range for the given point.
  */
@@ -230,8 +230,8 @@ function caretRangeFromPoint( doc, x, y ) {
  * This is preferred over getting the UI nodes and set styles there.
  *
  * @param {Document} doc       The document of the range.
- * @param {Float}    x         Horizontal position within the current viewport.
- * @param {Float}    y         Vertical position within the current viewport.
+ * @param {number}    x         Horizontal position within the current viewport.
+ * @param {number}    y         Vertical position within the current viewport.
  * @param {Element}  container Container in which the range is expected to be found.
  *
  * @returns {?Range} The best range for the given point.

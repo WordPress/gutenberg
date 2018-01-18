@@ -82,7 +82,7 @@ function par( /* arguments */ ) {
  * @param {*}              wrapper        Enzyme wrapper around react node
  *                                        containing  a FakeEditor.
  * @param {Array.<Node>}   nodeList       Array of dom nodes.
- * @param {Array.<Number>} cursorPosition Array specifying the child indexes and
+ * @param {Array.<number>} cursorPosition Array specifying the child indexes and
  *                                        offset of the cursor.
  */
 function simulateInput( wrapper, nodeList, cursorPosition ) {

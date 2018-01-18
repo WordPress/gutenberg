@@ -98,10 +98,10 @@ export function getSaveContent( blockType, attributes ) {
  * This function returns only those attributes which are needed to persist and
  * which cannot be matched from the block content.
  *
- * @param {Object<String,*>} allAttributes Attributes from in-memory block data.
- * @param {Object<String,*>} blockType     Block type.
+ * @param {Object<string,*>} allAttributes Attributes from in-memory block data.
+ * @param {Object<string,*>} blockType     Block type.
  *
- * @returns {Object<String,*>} Subset of attributes for comment serialization.
+ * @returns {Object<string,*>} Subset of attributes for comment serialization.
  */
 export function getCommentAttributes( allAttributes, blockType ) {
 	const attributes = reduce( blockType.attributes, ( result, attributeSchema, key ) => {

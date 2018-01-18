@@ -161,7 +161,7 @@ export function toggleSelection( isSelectionEnabled = true ) {
  * Returns an action object signalling that a blocks should be replaced with
  * one or more replacement blocks.
  *
- * @param {(String|String[])} uids   Block UID(s) to replace.
+ * @param {(string|string[])} uids   Block UID(s) to replace.
  * @param {(Object|Object[])} blocks Replacement block(s).
  *
  * @returns {Object} Action object.
@@ -178,7 +178,7 @@ export function replaceBlocks( uids, blocks ) {
  * Returns an action object signalling that a single block should be replaced
  * with one or more replacement blocks.
  *
- * @param {(String|String[])} uid   Block UID(s) to replace.
+ * @param {(string|string[])} uid   Block UID(s) to replace.
  * @param {(Object|Object[])} block Replacement block(s).
  *
  * @returns {Object} Action object.
@@ -351,7 +351,7 @@ export function stopTyping() {
  *
  * @param {string}   sidebar     Name of the sidebar to toggle
  *                               (desktop, mobile or publish).
- * @param {Boolean?} forcedValue Force a sidebar state.
+ * @param {boolean?} forcedValue Force a sidebar state.
  *
  * @returns {Object} Action object.
  */
