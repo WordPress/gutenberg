@@ -72,7 +72,7 @@ class Inserter extends Component {
 				renderToggle={ ( { onToggle, isOpen } ) => (
 					<IconButton
 						icon="insert"
-						label={ __( 'Insert block' ) }
+						label={ __( 'Add block' ) }
 						onClick={ onToggle }
 						className="editor-inserter__toggle"
 						aria-haspopup="true"
@@ -82,17 +82,12 @@ class Inserter extends Component {
 					</IconButton>
 				) }
 				renderContent={ ( { onClose } ) => {
-					const onInsert = ( name, initialAttributes ) => {
-						onInsertBlock(
-							name,
-							initialAttributes,
-							insertionPoint
-						);
-
+					const onSelect = ( item ) => {
+						onInsertBlock( item, insertionPoint );
 						onClose();
 					};
 
-					return <InserterMenu onSelect={ onInsert } />;
+					return <InserterMenu onSelect={ onSelect } />;
 				} }
 			/>
 		);
@@ -108,9 +103,9 @@ export default compose( [
 			};
 		},
 		( dispatch ) => ( {
-			onInsertBlock( name, initialAttributes, position ) {
+			onInsertBlock( item, position ) {
 				dispatch( insertBlock(
-					createBlock( name, initialAttributes ),
+					createBlock( item.name, item.initialAttributes ),
 					position
 				) );
 			},

@@ -8,7 +8,8 @@ import { Component, getWrapperDisplayName } from '@wordpress/element';
  * via props.
  *
  * @param  {?Object}   initialState Optional initial state of the component
- * @return {Component}              Wrapped component
+ *
+ * @returns {Component} Wrapped component.
  */
 function withState( initialState = {} ) {
 	return ( OriginalComponent ) => {

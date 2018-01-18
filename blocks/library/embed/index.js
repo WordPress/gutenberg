@@ -495,13 +495,6 @@ registerBlockType(
 	} )
 );
 registerBlockType(
-	'core-embed/vine',
-	getEmbedBlockSettings( {
-		title: 'Vine',
-		icon: 'embed-video',
-	} )
-);
-registerBlockType(
 	'core-embed/wordpress-tv',
 	getEmbedBlockSettings( {
 		title: 'WordPress.tv',

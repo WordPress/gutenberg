@@ -4,7 +4,7 @@
 import { connect } from 'react-redux';
 import {
 	findLast,
-	flatMap,
+	map,
 	invert,
 	isEqual,
 	mapValues,
@@ -36,7 +36,7 @@ import {
 	isSelectionEnabled,
 } from '../../store/selectors';
 import { startMultiSelect, stopMultiSelect, multiSelect, selectBlock } from '../../store/actions';
-import { isInputField } from '../../utils/dom';
+import { documentHasSelection } from '../../utils/dom';
 
 class BlockList extends Component {
 	constructor( props ) {
@@ -116,7 +116,7 @@ class BlockList extends Component {
 		}
 
 		// Let native copy behaviour take over in input fields.
-		if ( selectedBlock && isInputField( document.activeElement ) ) {
+		if ( selectedBlock && documentHasSelection() ) {
 			return;
 		}
 
@@ -220,7 +220,7 @@ class BlockList extends Component {
 		return (
 			<div>
 				{ !! blocks.length && <BlockListSiblingInserter /> }
-				{ flatMap( blocks, ( uid ) => [
+				{ map( blocks, ( uid ) => (
 					<BlockListBlock
 						key={ 'block-' + uid }
 						uid={ uid }
@@ -228,12 +228,8 @@ class BlockList extends Component {
 						onSelectionStart={ this.onSelectionStart }
 						onShiftSelection={ this.onShiftSelection }
 						showContextualToolbar={ showContextualToolbar }
-					/>,
-					<BlockListSiblingInserter
-						key={ 'sibling-inserter-' + uid }
-						uid={ uid }
-					/>,
-				] ) }
+					/>
+				) ) }
 			</div>
 		);
 	}

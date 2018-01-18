@@ -8,7 +8,7 @@ import { addQueryArgs } from '@wordpress/url';
  *
  * @param  {Number} postId  Post ID
  *
- * @return {String}         URL
+ * @returns {String} Post edit URL.
  */
 export function getPostEditUrl( postId ) {
 	return getWPAdminURL( 'post.php', { post: postId, action: 'edit' } );
@@ -20,7 +20,7 @@ export function getPostEditUrl( postId ) {
  * @param  {String} page   page to navigate to
  * @param  {Object} query  Query Args
  *
- * @return {String}        URL
+ * @returns {String} WPAdmin URL.
  */
 export function getWPAdminURL( page, query ) {
 	return addQueryArgs( page, query );
@@ -31,7 +31,7 @@ export function getWPAdminURL( page, query ) {
  *
  * @param  {String} url    Original url
  *
- * @return {String}        Displayed URL
+ * @returns {String} Displayed URL.
  */
 export function filterURLForDisplay( url ) {
 	// remove protocol and www prefixes

@@ -44,7 +44,8 @@ const formatMap = {
 	 * Gets the ordinal suffix.
 	 *
 	 * @param {moment} momentDate Moment instance.
-	 * @return {string} Formatted date.
+	 *
+	 * @returns {string} Formatted date.
 	 */
 	S( momentDate ) {
 		// Do - D
@@ -58,7 +59,8 @@ const formatMap = {
 	 * Gets the day of the year (zero-indexed).
 	 *
 	 * @param {moment} momentDate Moment instance.
-	 * @return {string} Formatted date.
+	 *
+	 * @returns {string} Formatted date.
 	 */
 	z( momentDate ) {
 		// DDD - 1
@@ -77,7 +79,8 @@ const formatMap = {
 	 * Gets the days in the month.
 	 *
 	 * @param {moment} momentDate Moment instance.
-	 * @return {string} Formatted date.
+	 *
+	 * @returns {string} Formatted date.
 	 */
 	t( momentDate ) {
 		return momentDate.daysInMonth();
@@ -88,7 +91,8 @@ const formatMap = {
 	 * Gets whether the current year is a leap year.
 	 *
 	 * @param {moment} momentDate Moment instance.
-	 * @return {string} Formatted date.
+	 *
+	 * @returns {string} Formatted date.
 	 */
 	L( momentDate ) {
 		return momentDate.isLeapYear() ? '1' : '0';
@@ -104,7 +108,8 @@ const formatMap = {
 	 * Gets the current time in Swatch Internet Time (.beats).
 	 *
 	 * @param {moment} momentDate Moment instance.
-	 * @return {string} Formatted date.
+	 *
+	 * @returns {string} Formatted date.
 	 */
 	B( momentDate ) {
 		const timezoned = moment( momentDate ).utcOffset( 60 );
@@ -134,7 +139,8 @@ const formatMap = {
 	 * Gets whether the timezone is in DST currently.
 	 *
 	 * @param {moment} momentDate Moment instance.
-	 * @return {string} Formatted date.
+	 *
+	 * @returns {string} Formatted date.
 	 */
 	I( momentDate ) {
 		return momentDate.isDST() ? '1' : '0';
@@ -146,7 +152,8 @@ const formatMap = {
 	 * Gets the timezone offset in seconds.
 	 *
 	 * @param {moment} momentDate Moment instance.
-	 * @return {string} Formatted date.
+	 *
+	 * @returns {string} Formatted date.
 	 */
 	Z( momentDate ) {
 		// Timezone offset in seconds.
@@ -218,7 +225,8 @@ function setupLocale( settings ) {
  *                                                See php.net/date
  * @param {(Date|string|moment|null)} dateValue   Date object or string,
  *                                                parsable by moment.js.
- * @return {string} Formatted date.
+ *
+ * @returns {string} Formatted date.
  */
 export function format( dateFormat, dateValue = new Date() ) {
 	let i, char;
@@ -259,7 +267,7 @@ export function format( dateFormat, dateValue = new Date() ) {
  * @param {(Date|string|moment|null)} dateValue   Date object or string,
  *                                                parsable by moment.js.
  *
- * @return {string} Formatted date.
+ * @returns {string} Formatted date.
  */
 export function date( dateFormat, dateValue = new Date() ) {
 	const offset = window._wpDateSettings.timezone.offset * HOUR_IN_MINUTES;
@@ -275,7 +283,7 @@ export function date( dateFormat, dateValue = new Date() ) {
  * @param {(Date|string|moment|null)} dateValue   Date object or string,
  *                                                parsable by moment.js.
  *
- * @return {string} Formatted date.
+ * @returns {string} Formatted date.
  */
 export function gmdate( dateFormat, dateValue = new Date() ) {
 	const dateMoment = moment( dateValue ).utc();
@@ -292,7 +300,7 @@ export function gmdate( dateFormat, dateValue = new Date() ) {
  * @param {boolean}                   gmt         True for GMT/UTC, false for
  *                                                site's timezone.
  *
- * @return {string} Formatted date.
+ * @returns {string} Formatted date.
  */
 export function dateI18n( dateFormat, dateValue = new Date(), gmt = false ) {
 	// Defaults.

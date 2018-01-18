@@ -35,7 +35,8 @@ import shortcodeConverter from './shortcode-converter';
  *                                            * 'INLINE': Always handle as inline content, and return string.
  *                                            * 'BLOCKS': Always handle as blocks, and return array of blocks.
  * @param  {Array}         [options.tagName]  The tag into which content will be inserted.
- * @return {Array|String}                     A list of blocks or a string, depending on `handlerMode`.
+ *
+ * @returns {Array|String} A list of blocks or a string, depending on `handlerMode`.
  */
 export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagName } ) {
 	// First of all, strip any meta tags.

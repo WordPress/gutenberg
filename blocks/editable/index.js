@@ -84,7 +84,7 @@ export default class Editable extends Component {
 				`Invalid value of type ${ typeof value } passed to Editable ` +
 				'(expected array). Attribute values should be sourced using ' +
 				'the `children` source when used with Editable.\n\n' +
-				'See: https://wordpress.org/gutenberg/handbook/reference/attributes/#children'
+				'See: https://wordpress.org/gutenberg/handbook/block-api/attributes/#children'
 			);
 		}
 
@@ -288,12 +288,28 @@ export default class Editable extends Component {
 		const item = find( [ ...items, ...files ], ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
 
 		if ( item ) {
-			// Allows us to ask for this information when we get a report.
-			window.console.log( 'Received item:\n\n', item );
-
 			const blob = item.getAsFile ? item.getAsFile() : item;
+			const rootNode = this.editor.getBody();
+			const isEmpty = this.editor.dom.isEmpty( rootNode );
+			const content = rawHandler( {
+				HTML: `<img src="${ createBlobURL( blob ) }">`,
+				mode: 'BLOCKS',
+				tagName: this.props.tagName,
+			} );
 
-			this.pastedContent = `<img src="${ createBlobURL( blob ) }">`;
+			// Allows us to ask for this information when we get a report.
+			window.console.log( 'Received item:\n\n', blob );
+
+			if ( isEmpty && this.props.onReplace ) {
+				// Necessary to allow the paste bin to be removed without errors.
+				setTimeout( () => this.props.onReplace( content ) );
+			} else {
+				// Necessary to get the right range.
+				// Also done in the TinyMCE paste plugin.
+				setTimeout( () => this.splitContent( content ) );
+			}
+
+			event.preventDefault();
 		}
 
 		this.pastedPlainText = dataTransfer ? dataTransfer.getData( 'text/plain' ) : '';
@@ -313,7 +329,7 @@ export default class Editable extends Component {
 	onPastePreProcess( event ) {
 		const HTML = this.isPlainTextPaste ? this.pastedPlainText : event.content;
 		// Allows us to ask for this information when we get a report.
-		window.console.log( 'Received HTML:\n\n', this.pastedContent || HTML );
+		window.console.log( 'Received HTML:\n\n', HTML );
 		window.console.log( 'Received plain text:\n\n', this.pastedPlainText );
 
 		// There is a selection, check if a link is pasted.
@@ -349,7 +365,7 @@ export default class Editable extends Component {
 		}
 
 		const content = rawHandler( {
-			HTML: this.pastedContent || HTML,
+			HTML,
 			plainText: this.pastedPlainText,
 			mode,
 			tagName: this.props.tagName,
@@ -532,7 +548,6 @@ export default class Editable extends Component {
 			}
 
 			event.preventDefault();
-			event.stopImmediatePropagation();
 		}
 
 		// If we click shift+Enter on inline Editables, we avoid creating two contenteditables
@@ -570,7 +585,6 @@ export default class Editable extends Component {
 				if ( event.shiftKey || ! this.props.onSplit ) {
 					this.editor.execCommand( 'InsertLineBreak', false, event );
 				} else {
-					event.stopImmediatePropagation();
 					this.splitContent();
 				}
 			}
@@ -705,7 +719,7 @@ export default class Editable extends Component {
 		}
 
 		content = renderToString( content );
-		this.editor.setContent( content, { format: 'raw' } );
+		this.editor.setContent( content );
 	}
 
 	getContent() {

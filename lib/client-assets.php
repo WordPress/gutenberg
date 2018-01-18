@@ -79,7 +79,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-data',
 		gutenberg_url( 'data/build/index.js' ),
-		array(),
+		array( 'wp-element' ),
 		filemtime( gutenberg_dir_path() . 'data/build/index.js' )
 	);
 	wp_register_script(
@@ -284,7 +284,7 @@ function gutenberg_register_vendor_scripts() {
 	);
 	gutenberg_register_vendor_script(
 		'promise',
-		'https://unpkg.com/promise-polyfill/promise' . $suffix . '.js'
+		'https://unpkg.com/promise-polyfill@7.0.0/dist/promise' . $suffix . '.js'
 	);
 
 	// TODO: This is only necessary so long as WordPress 4.9 is not yet stable,
@@ -502,6 +502,12 @@ JS;
 			wp_json_encode( $schema_response->get_data() )
 		), 'before' );
 	}
+
+	/*
+	 * For API requests to happen over HTTP/1.0 methods,
+	 * as HTTP/1.1 methods are blocked in a variety of situations.
+	 */
+	wp_add_inline_script( 'wp-api', 'Backbone.emulateHTTP = true;', 'before' );
 }
 
 /**
@@ -684,7 +690,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	wp_enqueue_script(
 		'wp-editor',
 		gutenberg_url( 'editor/build/index.js' ),
-		array( 'jquery', 'wp-api', 'wp-data', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element', 'wp-components', 'wp-utils', 'word-count', 'editor', 'heartbeat' ),
+		array( 'postbox', 'jquery', 'wp-api', 'wp-data', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element', 'wp-components', 'wp-utils', 'word-count', 'editor', 'heartbeat' ),
 		filemtime( gutenberg_dir_path() . 'editor/build/index.js' ),
 		true // enqueue in the footer.
 	);
@@ -852,7 +858,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		wp_add_inline_script(
 			'wp-editor',
 			'console.warn( "' .
-				__( 'Adding theme support using the `gutenberg` array is deprecated. See https://wordpress.org/gutenberg/handbook/reference/theme-support/ for details.', 'gutenberg' ) .
+				__( 'Adding theme support using the `gutenberg` array is deprecated. See https://wordpress.org/gutenberg/handbook/extensibility/theme-support/ for details.', 'gutenberg' ) .
 			'");'
 		);
 	}

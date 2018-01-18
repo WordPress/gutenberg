@@ -97,7 +97,7 @@ Blocks will be able to provide base structural CSS styles, and themes can add st
 
 Other features, like the new _wide_ and _full-wide_ alignment options, will simply be CSS classes applied to blocks that offer this alignment. We are looking at how a theme can opt in to this feature, for example using `add_theme_support`.
 
-*See:* [Theme Support](https://wordpress.org/gutenberg/handbook/reference/theme-support/)
+*See:* [Theme Support](https://wordpress.org/gutenberg/handbook/extensibility/theme-support/)
 
 ## How will editor styles work?
 

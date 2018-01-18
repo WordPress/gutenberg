@@ -11,12 +11,12 @@ describe( 'Adding blocks', () => {
 		cy.get( lastBlockSelector ).type( 'Paragraph block' );
 
 		// Using the slash command
-		cy.get( '.editor-visual-editor__inserter [aria-label="Insert Paragraph"]' ).click();
+		cy.get( '.editor-visual-editor__inserter [aria-label="Add Paragraph"]' ).click();
 		cy.get( lastBlockSelector ).type( '/quote{enter}' );
 		cy.get( lastBlockSelector ).type( 'Quote block' );
 
 		// Using the regular inserter
-		cy.get( '.editor-header [aria-label="Insert block"]' ).click();
+		cy.get( '.editor-header [aria-label="Add block"]' ).click();
 		cy.get( '[placeholder="Search for a block"]' ).type( 'code' );
 		cy.get( '.editor-inserter__block' ).contains( 'Code' ).click();
 		cy.get( '[placeholder="Write code…"]' ).type( 'Code block' );

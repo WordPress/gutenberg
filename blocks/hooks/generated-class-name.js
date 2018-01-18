@@ -20,7 +20,8 @@ import { hasBlockSupport, getBlockDefaultClassname } from '../api';
  *
  * @param  {Object} extraProps Additional props applied to save element
  * @param  {Object} blockType  Block type
- * @return {Object}            Filtered props applied to save element
+ *
+ * @returns {Object} Filtered props applied to save element.
  */
 export function addGeneratedClassName( extraProps, blockType ) {
 	// Adding the generated className
