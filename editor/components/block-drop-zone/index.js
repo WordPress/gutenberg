@@ -43,9 +43,38 @@ function BlockDropZone( { index, isLocked, ...props } ) {
 		}
 	};
 
+	const drop = ( event, position ) => {
+		const numFiles = event.dataTransfer ? event.dataTransfer.files.length : 0;
+
+		if ( numFiles === 0 ) {
+			const html = event.dataTransfer.getData( 'text/html' );
+			const transformation = reduce( getBlockTypes(), ( ret, blockType ) => {
+				if ( ret ) {
+					return ret;
+				}
+
+				return find( get( blockType, 'transforms.from', [] ), ( transform ) => {
+					return transform.type === 'html' && transform.isMatch( html );
+				} );
+			}, false );
+
+			if ( transformation ) {
+				let insertPosition;
+				if ( index !== undefined ) {
+					insertPosition = position.y === 'top' ? index : index + 1;
+				}
+
+				transformation.transform( html ).then( ( blocks ) => {
+					props.insertBlocks( blocks, insertPosition );
+				} );
+			}
+		}
+	}
+
 	return (
 		<DropZone
 			onFilesDrop={ dropFiles }
+			onDrop={ drop }
 		/>
 	);
 }
