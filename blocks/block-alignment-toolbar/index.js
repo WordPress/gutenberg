@@ -4,21 +4,26 @@
 import { __ } from '@wordpress/i18n';
 import { Toolbar, withContext } from '@wordpress/components';
 
+/**
+ * Internal dependencies
+ */
+import { shortcuts } from '../alignment-shortcuts';
+
 const BLOCK_ALIGNMENTS_CONTROLS = {
 	left: {
 		icon: 'align-left',
 		title: __( 'Align left' ),
-		shortcut: 'l',
+		shortcut: shortcuts.left,
 	},
 	center: {
 		icon: 'align-center',
 		title: __( 'Align center' ),
-		shortcut: 'c',
+		shortcut: shortcuts.center,
 	},
 	right: {
 		icon: 'align-right',
 		title: __( 'Align right' ),
-		shortcut: 'r',
+		shortcut: shortcuts.right,
 	},
 	wide: {
 		icon: 'align-wide',

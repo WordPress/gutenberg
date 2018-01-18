@@ -4,23 +4,25 @@
 import { __ } from '@wordpress/i18n';
 import { Toolbar } from '@wordpress/components';
 
+import { shortcuts } from '../alignment-shortcuts';
+
 const ALIGNMENT_CONTROLS = [
 	{
 		icon: 'editor-alignleft',
 		title: __( 'Align left' ),
-		shortcut: 'l',
+		shortcut: shortcuts.left,
 		align: 'left',
 	},
 	{
 		icon: 'editor-aligncenter',
 		title: __( 'Align center' ),
-		shortcut: 'c',
+		shortcut: shortcuts.center,
 		align: 'center',
 	},
 	{
 		icon: 'editor-alignright',
 		title: __( 'Align right' ),
-		shortcut: 'r',
+		shortcut: shortcuts.right,
 		align: 'right',
 	},
 ];

@@ -3,16 +3,18 @@
  */
 import { map, first } from 'lodash';
 
+export const shortcuts = {
+	left: 'l',
+	center: 'c',
+	right: 'r',
+};
+
 /**
  * Holds an array of alignment shortcut transforms.
  *
  * @return {Array} Array of transforms.
  */
-export default map( {
-	left: 'l',
-	center: 'c',
-	right: 'r',
-}, ( shortcut, value ) => ( {
+export default map( shortcuts, ( shortcut, value ) => ( {
 	type: 'shortcut',
 	shortcut,
 	transform( blocks ) {
