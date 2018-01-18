@@ -20,30 +20,15 @@
 		margin-bottom: 4px;
 	}
 
-	// unstyle inherited icon button styles
-	&:not(:disabled):hover,
-  	&:not(:disabled):active,
-	&:not(:disabled):focus {
-		box-shadow: none;
-		color: inherit;
-	}
-
-	// apply styles to SVG directly
-	.dashicon {
-		display: block;
-		position: relative; // Fixing the Safari bug for `<button>`s overflow
-		border-radius: 50%;
-	}
-
-	&:not(:disabled):hover .dashicon {
+	&:not(:disabled):hover {
 		@include button-style__hover;
 	}
 
-	&:not(:disabled):active .dashicon {
+	&:not(:disabled):active {
 		@include button-style__active;
 	}
 
-	&:not(:disabled):focus .dashicon {
+	&:not(:disabled):focus {
 		@include button-style__focus-active;
 	}
 }
