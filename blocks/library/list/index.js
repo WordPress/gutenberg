@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, compact, get, initial, last, isEmpty } from 'lodash';
+import { find, get, last, isEmpty, castArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,6 +16,47 @@ import './editor.scss';
 import { registerBlockType, createBlock } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
+
+/**
+ * Converts an array of list items to an array of content.
+ *
+ * @param  {Array} items Array of React list items.
+ * @return {Array}       Array of Editable value arrays.
+ */
+function listItemsToArray( items ) {
+	return items.reduce( ( acc, item ) => {
+		// Ignore spacing between list items.
+		if ( typeof item === 'string' ) {
+			return acc;
+		}
+
+		const listContent = castArray( get( item, 'props.children', [] ) );
+
+		listContent.forEach( ( content, index ) => {
+			if ( content.type === 'ol' || content.type === 'ul' ) {
+				acc.push( ...listItemsToArray( castArray( get( content, 'props.children', [] ) ) ) );
+				acc.push( [] );
+			} else {
+				// No line breaks form prettier.
+				if ( ! /\S/.test( content ) ) {
+					return;
+				}
+
+				if ( index === 0 ) {
+					acc.push( [] );
+				}
+
+				last( acc ).push( content );
+			}
+		} );
+
+		if ( last( acc ).length === 0 ) {
+			acc.splice( -1, 1 );
+		}
+
+		return acc;
+	}, [] );
+}
 
 registerBlockType( 'core/list', {
 	title: __( 'List' ),
@@ -104,20 +145,16 @@ registerBlockType( 'core/list', {
 				type: 'block',
 				blocks: [ 'core/paragraph' ],
 				transform: ( { values } ) =>
-					compact( values.map( ( value ) => get( value, 'props.children', null ) ) )
-						.map( ( content ) => createBlock( 'core/paragraph', {
-							content: [ content ],
-						} ) ),
+					listItemsToArray( values )
+						.map( ( content ) => createBlock( 'core/paragraph', { content } ) ),
 			},
 			{
 				type: 'block',
 				blocks: [ 'core/quote' ],
 				transform: ( { values } ) => {
 					return createBlock( 'core/quote', {
-						value: compact( ( values.length === 1 ? values : initial( values ) )
-							.map( ( value ) => get( value, 'props.children', null ) ) )
-							.map( ( children ) => ( { children: <p>{ children }</p> } ) ),
-						citation: ( values.length === 1 ? undefined : [ get( last( values ), 'props.children' ) ] ),
+						value: listItemsToArray( values )
+							.map( ( content ) => ( { children: <p>{ content }</p> } ) ),
 					} );
 				},
 			},
