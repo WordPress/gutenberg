@@ -275,8 +275,17 @@ export class BlockListBlock extends Component {
 		this.props.onInsertBlocks( blocks, this.props.order + 1 );
 	}
 
+	/**
+	 * Marks the block as selected when focused and not already selected. This
+	 * specifically handles the case where block does not set focus on its own
+	 * (via `setFocus`), typically if there is no focusable input in the block.
+	 *
+	 * @param {FocusEvent} event A focus event
+	 *
+	 * @returns {void}
+	 */
 	onFocus( event ) {
-		if ( event.target === this.node ) {
+		if ( event.target === this.node && ! this.props.isSelected ) {
 			this.props.onSelect();
 		}
 	}
@@ -293,6 +302,13 @@ export class BlockListBlock extends Component {
 		event.preventDefault();
 	}
 
+	/**
+	 * Begins tracking cursor multi-selection when clicking down within block.
+	 *
+	 * @param {MouseEvent} event A mousedown event.
+	 *
+	 * @returns {void}
+	 */
 	onPointerDown( event ) {
 		// Not the main button.
 		// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
@@ -307,7 +323,10 @@ export class BlockListBlock extends Component {
 			}
 		} else {
 			this.props.onSelectionStart( this.props.uid );
-			this.props.onSelect();
+
+			if ( ! this.props.isSelected ) {
+				this.props.onSelect();
+			}
 		}
 	}
 
