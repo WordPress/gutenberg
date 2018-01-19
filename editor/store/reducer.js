@@ -375,6 +375,11 @@ export function blockSelection( state = {
 }, action ) {
 	switch ( action.type ) {
 		case 'CLEAR_SELECTED_BLOCK':
+			if ( state.start === null && state.end === null &&
+					state.focus === null && ! state.isMultiSelecting ) {
+				return state;
+			}
+
 			return {
 				...state,
 				start: null,
@@ -383,15 +388,24 @@ export function blockSelection( state = {
 				isMultiSelecting: false,
 			};
 		case 'START_MULTI_SELECT':
+			if ( state.isMultiSelecting ) {
+				return state;
+			}
+
 			return {
 				...state,
 				isMultiSelecting: true,
 			};
 		case 'STOP_MULTI_SELECT':
+			const nextFocus = state.start === state.end ? state.focus : null;
+			if ( ! state.isMultiSelecting && nextFocus === state.focus ) {
+				return state;
+			}
+
 			return {
 				...state,
 				isMultiSelecting: false,
-				focus: state.start === state.end ? state.focus : null,
+				focus: nextFocus,
 			};
 		case 'MULTI_SELECT':
 			return {

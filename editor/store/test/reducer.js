@@ -809,6 +809,15 @@ describe( 'state', () => {
 			expect( state ).toEqual( { start: 'ribs', end: 'ribs', focus: { editable: 'citation' }, isMultiSelecting: true } );
 		} );
 
+		it( 'should return same reference if already multi-selecting', () => {
+			const original = deepFreeze( { start: 'ribs', end: 'ribs', focus: { editable: 'citation' }, isMultiSelecting: true } );
+			const state = blockSelection( original, {
+				type: 'START_MULTI_SELECT',
+			} );
+
+			expect( state ).toBe( original );
+		} );
+
 		it( 'should end multi selection with selection', () => {
 			const original = deepFreeze( { start: 'ribs', end: 'chicken', focus: { editable: 'citation' }, isMultiSelecting: true } );
 			const state = blockSelection( original, {
@@ -816,6 +825,15 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( { start: 'ribs', end: 'chicken', focus: null, isMultiSelecting: false } );
+		} );
+
+		it( 'should return same reference if already ended multi-selecting', () => {
+			const original = deepFreeze( { start: 'ribs', end: 'chicken', focus: null, isMultiSelecting: false } );
+			const state = blockSelection( original, {
+				type: 'STOP_MULTI_SELECT',
+			} );
+
+			expect( state ).toBe( original );
 		} );
 
 		it( 'should end multi selection without selection', () => {
@@ -838,7 +856,7 @@ describe( 'state', () => {
 			expect( state1 ).toBe( original );
 		} );
 
-		it( 'should unset multi selection and select inserted block', () => {
+		it( 'should unset multi selection', () => {
 			const original = deepFreeze( { start: 'ribs', end: 'chicken' } );
 
 			const state1 = blockSelection( original, {
@@ -846,6 +864,20 @@ describe( 'state', () => {
 			} );
 
 			expect( state1 ).toEqual( { start: null, end: null, focus: null, isMultiSelecting: false } );
+		} );
+
+		it( 'should return same reference if clearing selection but no selection', () => {
+			const original = deepFreeze( { start: null, end: null, focus: null, isMultiSelecting: false } );
+
+			const state1 = blockSelection( original, {
+				type: 'CLEAR_SELECTED_BLOCK',
+			} );
+
+			expect( state1 ).toBe( original );
+		} );
+
+		it( 'should select inserted block', () => {
+			const original = deepFreeze( { start: 'ribs', end: 'chicken' } );
 
 			const state3 = blockSelection( original, {
 				type: 'INSERT_BLOCKS',
