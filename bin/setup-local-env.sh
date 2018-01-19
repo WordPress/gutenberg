@@ -23,8 +23,7 @@ cd "$(dirname "$0")/.."
                                                 `---'
 EOT
 
-CURRENT_URL=$(docker run -it --rm --volumes-from wordpress-dev --network container:wordpress-dev wordpress:cli option get siteurl)
-CURRENT_URL="${CURRENT_URL//[[:space:]]/}"
+CURRENT_URL=$(docker-compose run -T --rm cli option get siteurl)
 
 echo -e "\nWelcome to...\n"
 echo -e "\033[95m$GUTENBERG\033[0m"
