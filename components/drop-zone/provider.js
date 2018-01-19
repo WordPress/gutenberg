@@ -89,8 +89,8 @@ class DropZoneProvider extends Component {
 
 		// Index of hovered dropzone.
 		const hoveredDropZone = isDraggingOverDocument && findIndex( this.dropzones, ( { element } ) =>
-				this.isWithinZoneBounds( element, detail.clientX, detail.clientY )
-			);
+			this.isWithinZoneBounds( element, detail.clientX, detail.clientY )
+		);
 
 		let position = null;
 
@@ -128,11 +128,11 @@ class DropZoneProvider extends Component {
 			const index = this.dropzones.indexOf( dropzone );
 
 			// Safer in IIFE here. "updateState" is async.
-			( ( index, hoveredDropZone, position, isDraggingOverDocument ) => {
+			( ( _index, _hoveredDropZone, _position, _isDraggingOverDocument ) => {
 				dropzone.updateState( {
-					isDraggingOverElement: index === hoveredDropZone,
-					position: index === hoveredDropZone ? position : null,
-					isDraggingOverDocument,
+					isDraggingOverElement: _index === _hoveredDropZone,
+					position: _index === _hoveredDropZone ? _position : null,
+					_isDraggingOverDocument,
 				} );
 			} )( index, hoveredDropZone, position, isDraggingOverDocument );
 		} );
