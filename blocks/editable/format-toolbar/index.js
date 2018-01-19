@@ -12,7 +12,6 @@ import { keycodes } from '@wordpress/utils';
 import './style.scss';
 import UrlInput from '../../url-input';
 import { filterURLForDisplay } from '../../../editor/utils/url';
-import ToggleControl from '../../inspector-controls/toggle-control';
 
 const { ESCAPE, LEFT, RIGHT, UP, DOWN } = keycodes;
 
@@ -48,11 +47,10 @@ const stopKeyPropagation = ( event ) => event.stopPropagation();
 class FormatToolbar extends Component {
 	constructor() {
 		super( ...arguments );
+
 		this.state = {
 			isAddingLink: false,
 			isEditingLink: false,
-			settingsVisible: false,
-			opensInNewWindow: false,
 			newLinkValue: '',
 		};
 
@@ -62,8 +60,6 @@ class FormatToolbar extends Component {
 		this.submitLink = this.submitLink.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onChangeLinkValue = this.onChangeLinkValue.bind( this );
-		this.toggleLinkSettingsVisibility = this.toggleLinkSettingsVisibility.bind( this );
-		this.setLinkTarget = this.setLinkTarget.bind( this );
 	}
 
 	onKeyDown( event ) {
@@ -83,8 +79,6 @@ class FormatToolbar extends Component {
 			this.setState( {
 				isAddingLink: false,
 				isEditingLink: false,
-				settingsVisible: false,
-				opensInNewWindow: !! nextProps.formats.link && !! nextProps.formats.link.target,
 				newLinkValue: '',
 			} );
 		}
@@ -100,16 +94,6 @@ class FormatToolbar extends Component {
 				[ format ]: ! this.props.formats[ format ],
 			} );
 		};
-	}
-
-	toggleLinkSettingsVisibility() {
-		this.setState( ( state ) => ( { settingsVisible: ! state.settingsVisible } ) );
-	}
-
-	setLinkTarget( event ) {
-		const opensInNewWindow = event.target.checked;
-		this.setState( { opensInNewWindow } );
-		this.props.onChange( { link: { value: this.props.formats.link.value, target: opensInNewWindow ? '_blank' : '' } } );
 	}
 
 	addLink() {
@@ -128,7 +112,7 @@ class FormatToolbar extends Component {
 
 	submitLink( event ) {
 		event.preventDefault();
-		this.props.onChange( { link: { value: this.state.newLinkValue, target: this.state.opensInNewWindow ? '_blank' : '' } } );
+		this.props.onChange( { link: { value: this.state.newLinkValue } } );
 		if ( this.state.isAddingLink ) {
 			this.props.speak( __( 'Link added.' ), 'assertive' );
 		}
@@ -140,7 +124,7 @@ class FormatToolbar extends Component {
 
 	render() {
 		const { formats, focusPosition, enabledControls = DEFAULT_CONTROLS, customControls = [] } = this.props;
-		const { isAddingLink, isEditingLink, newLinkValue, settingsVisible, opensInNewWindow } = this.state;
+		const { isAddingLink, isEditingLink, newLinkValue } = this.state;
 		const linkStyle = focusPosition ?
 			{ position: 'absolute', ...focusPosition } :
 			null;
@@ -155,15 +139,6 @@ class FormatToolbar extends Component {
 					isActive: this.isFormatActive( control.format ) || ( isLink && isAddingLink ),
 				};
 			} );
-
-		const linkSettings = settingsVisible && (
-			<div className="blocks-format-toolbar__link-modal-line blocks-format-toolbar__link-settings">
-				<ToggleControl
-					label={ __( 'Open in new window' ) }
-					checked={ opensInNewWindow }
-					onChange={ this.setLinkTarget } />
-			</div>
-		);
 
 		return (
 			<div className="blocks-format-toolbar">
@@ -183,13 +158,7 @@ class FormatToolbar extends Component {
 								<UrlInput value={ newLinkValue } onChange={ this.onChangeLinkValue } />
 								<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
 								<IconButton icon="editor-unlink" label={ __( 'Remove link' ) } onClick={ this.dropLink } />
-								<IconButton
-									icon="admin-generic"
-									label={ __( 'Link Settings' ) }
-									onClick={ this.toggleLinkSettingsVisibility }
-									aria-expanded={ settingsVisible } />
 							</div>
-							{ linkSettings }
 						</form>
 					</Fill>
 					/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
@@ -214,13 +183,7 @@ class FormatToolbar extends Component {
 								</a>
 								<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ this.editLink } />
 								<IconButton icon="editor-unlink" label={ __( 'Remove link' ) } onClick={ this.dropLink } />
-								<IconButton
-									icon="admin-generic"
-									label={ __( 'Link Settings' ) }
-									onClick={ this.toggleLinkSettingsVisibility }
-									aria-expanded={ settingsVisible } />
 							</div>
-							{ linkSettings }
 						</div>
 					</Fill>
 					/* eslint-enable jsx-a11y/no-static-element-interactions */
