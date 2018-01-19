@@ -403,6 +403,35 @@ describe( 'state', () => {
 			expect( state.present.blockOrder ).toEqual( [ 'kumquat', 'persimmon', 'loquat' ] );
 		} );
 
+		it( 'should remove associated blocks when deleting a reusable block', () => {
+			const original = editor( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [ {
+					uid: 'chicken',
+					name: 'core/test-block',
+					attributes: {},
+				}, {
+					uid: 'ribs',
+					name: 'core/test-block',
+					attributes: {},
+				} ],
+			} );
+			const state = editor( original, {
+				type: 'REMOVE_REUSABLE_BLOCK',
+				id: 123,
+				associatedBlockUids: [ 'chicken', 'veggies' ],
+			} );
+
+			expect( state.present.blockOrder ).toEqual( [ 'ribs' ] );
+			expect( state.present.blocksByUid ).toEqual( {
+				ribs: {
+					uid: 'ribs',
+					name: 'core/test-block',
+					attributes: {},
+				},
+			} );
+		} );
+
 		describe( 'edits()', () => {
 			it( 'should save newly edited properties', () => {
 				const original = editor( undefined, {
@@ -689,36 +718,14 @@ describe( 'state', () => {
 
 		it( 'should set insertion point position', () => {
 			const state = blockInsertionPoint( undefined, {
-				type: 'SET_BLOCK_INSERTION_POINT',
-				position: 5,
-			} );
-
-			expect( state ).toEqual( {
-				position: 5,
-			} );
-		} );
-
-		it( 'should clear insertion point position', () => {
-			const original = blockInsertionPoint( undefined, {
-				type: 'SET_BLOCK_INSERTION_POINT',
-				position: 5,
-			} );
-
-			const state = blockInsertionPoint( deepFreeze( original ), {
-				type: 'CLEAR_BLOCK_INSERTION_POINT',
-			} );
-
-			expect( state ).toEqual( {
-				position: null,
-			} );
-		} );
-
-		it( 'should show the insertion point', () => {
-			const state = blockInsertionPoint( undefined, {
 				type: 'SHOW_INSERTION_POINT',
+				index: 5,
 			} );
 
-			expect( state ).toEqual( { visible: true } );
+			expect( state ).toEqual( {
+				position: 5,
+				visible: true,
+			} );
 		} );
 
 		it( 'should clear the insertion point', () => {
@@ -726,23 +733,7 @@ describe( 'state', () => {
 				type: 'HIDE_INSERTION_POINT',
 			} );
 
-			expect( state ).toEqual( { visible: false } );
-		} );
-
-		it( 'should merge position and visible', () => {
-			const original = blockInsertionPoint( undefined, {
-				type: 'SHOW_INSERTION_POINT',
-			} );
-
-			const state = blockInsertionPoint( deepFreeze( original ), {
-				type: 'SET_BLOCK_INSERTION_POINT',
-				position: 5,
-			} );
-
-			expect( state ).toEqual( {
-				visible: true,
-				position: 5,
-			} );
+			expect( state ).toEqual( { visible: false, position: null } );
 		} );
 	} );
 
@@ -934,55 +925,85 @@ describe( 'state', () => {
 				blockUsage: {},
 				recentlyUsedBlocks: [],
 				mode: 'visual',
-				isSidebarOpened: true,
-				isSidebarOpenedMobile: false,
+				sidebars: {
+					desktop: true,
+					mobile: false,
+					publish: false,
+				},
 				panels: { 'post-status': true },
 				features: { fixedToolbar: false },
 			} );
 		} );
 
-		it( 'should toggle the sidebar open flag', () => {
-			const state = preferences( deepFreeze( { isSidebarOpened: false } ), {
+		it( 'should toggle the given sidebar flag', () => {
+			const state = preferences( deepFreeze( { sidebars: {
+				mobile: true,
+				desktop: true,
+			} } ), {
 				type: 'TOGGLE_SIDEBAR',
+				sidebar: 'desktop',
 			} );
 
-			expect( state ).toEqual( { isSidebarOpened: true } );
+			expect( state.sidebars ).toEqual( {
+				mobile: true,
+				desktop: false,
+			} );
 		} );
 
-		it( 'should toggle the mobile sidebar open flag', () => {
-			const state = preferences( deepFreeze( { isSidebarOpenedMobile: false } ), {
+		it( 'should set the sidebar open flag to true if unset', () => {
+			const state = preferences( deepFreeze( { sidebars: {
+				mobile: true,
+			} } ), {
 				type: 'TOGGLE_SIDEBAR',
-				isMobile: true,
+				sidebar: 'desktop',
 			} );
 
-			expect( state ).toEqual( { isSidebarOpenedMobile: true } );
+			expect( state.sidebars ).toEqual( {
+				mobile: true,
+				desktop: true,
+			} );
+		} );
+
+		it( 'should force the given sidebar flag', () => {
+			const state = preferences( deepFreeze( { sidebars: {
+				mobile: true,
+			} } ), {
+				type: 'TOGGLE_SIDEBAR',
+				sidebar: 'desktop',
+				forcedValue: false,
+			} );
+
+			expect( state.sidebars ).toEqual( {
+				mobile: true,
+				desktop: false,
+			} );
 		} );
 
 		it( 'should set the sidebar panel open flag to true if unset', () => {
-			const state = preferences( deepFreeze( { isSidebarOpened: false } ), {
+			const state = preferences( deepFreeze( {} ), {
 				type: 'TOGGLE_SIDEBAR_PANEL',
 				panel: 'post-taxonomies',
 			} );
 
-			expect( state ).toEqual( { isSidebarOpened: false, panels: { 'post-taxonomies': true } } );
+			expect( state ).toEqual( { panels: { 'post-taxonomies': true } } );
 		} );
 
 		it( 'should toggle the sidebar panel open flag', () => {
-			const state = preferences( deepFreeze( { isSidebarOpened: false, panels: { 'post-taxonomies': true } } ), {
+			const state = preferences( deepFreeze( { panels: { 'post-taxonomies': true } } ), {
 				type: 'TOGGLE_SIDEBAR_PANEL',
 				panel: 'post-taxonomies',
 			} );
 
-			expect( state ).toEqual( { isSidebarOpened: false, panels: { 'post-taxonomies': false } } );
+			expect( state ).toEqual( { panels: { 'post-taxonomies': false } } );
 		} );
 
 		it( 'should return switched mode', () => {
-			const state = preferences( deepFreeze( { isSidebarOpened: false } ), {
+			const state = preferences( deepFreeze( {} ), {
 				type: 'SWITCH_MODE',
 				mode: 'text',
 			} );
 
-			expect( state ).toEqual( { isSidebarOpened: false, mode: 'text' } );
+			expect( state ).toEqual( { mode: 'text' } );
 		} );
 
 		it( 'should record recently used blocks', () => {
@@ -1329,13 +1350,14 @@ describe( 'state', () => {
 			const state = reusableBlocks( undefined, {} );
 			expect( state ).toEqual( {
 				data: {},
+				isFetching: {},
 				isSaving: {},
 			} );
 		} );
 
 		it( 'should add fetched reusable blocks', () => {
 			const reusableBlock = {
-				id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
+				id: 123,
 				name: 'My cool block',
 				type: 'core/paragraph',
 				attributes: {
@@ -1352,13 +1374,14 @@ describe( 'state', () => {
 				data: {
 					[ reusableBlock.id ]: reusableBlock,
 				},
+				isFetching: {},
 				isSaving: {},
 			} );
 		} );
 
 		it( 'should add a reusable block', () => {
 			const reusableBlock = {
-				id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
+				id: 123,
 				name: 'My cool block',
 				type: 'core/paragraph',
 				attributes: {
@@ -1376,12 +1399,13 @@ describe( 'state', () => {
 				data: {
 					[ reusableBlock.id ]: reusableBlock,
 				},
+				isFetching: {},
 				isSaving: {},
 			} );
 		} );
 
 		it( 'should update a reusable block', () => {
-			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
+			const id = 123;
 			const initialState = {
 				data: {
 					[ id ]: {
@@ -1394,6 +1418,7 @@ describe( 'state', () => {
 						},
 					},
 				},
+				isFetching: {},
 				isSaving: {},
 			};
 
@@ -1420,12 +1445,13 @@ describe( 'state', () => {
 						},
 					},
 				},
+				isFetching: {},
 				isSaving: {},
 			} );
 		} );
 
 		it( 'should update the reusable block\'s id if it was temporary', () => {
-			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
+			const id = 123;
 			const initialState = {
 				data: {
 					[ id ]: {
@@ -1460,14 +1486,117 @@ describe( 'state', () => {
 						},
 					},
 				},
+				isFetching: {},
+				isSaving: {},
+			} );
+		} );
+
+		it( 'should remove a reusable block', () => {
+			const id = 123;
+			const initialState = {
+				data: {
+					[ id ]: {
+						id,
+						name: 'My cool block',
+						type: 'core/paragraph',
+						attributes: {
+							content: 'Hello!',
+							dropCap: true,
+						},
+					},
+				},
+				isFetching: {},
+				isSaving: {},
+			};
+
+			const state = reusableBlocks( deepFreeze( initialState ), {
+				type: 'REMOVE_REUSABLE_BLOCK',
+				id,
+			} );
+
+			expect( state ).toEqual( {
+				data: {},
+				isFetching: {},
+				isSaving: {},
+			} );
+		} );
+
+		it( 'should indicate that a reusable block is fetching', () => {
+			const id = 123;
+			const initialState = {
+				data: {},
+				isFetching: {},
+				isSaving: {},
+			};
+
+			const state = reusableBlocks( initialState, {
+				type: 'FETCH_REUSABLE_BLOCKS',
+				id,
+			} );
+
+			expect( state ).toEqual( {
+				data: {},
+				isFetching: {
+					[ id ]: true,
+				},
+				isSaving: {},
+			} );
+		} );
+
+		it( 'should stop indicating that a reusable block is saving when the fetch succeeded', () => {
+			const id = 123;
+			const initialState = {
+				data: {
+					[ id ]: { id },
+				},
+				isFetching: {
+					[ id ]: true,
+				},
+				isSaving: {},
+			};
+
+			const state = reusableBlocks( initialState, {
+				type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
+				id,
+				updatedId: id,
+			} );
+
+			expect( state ).toEqual( {
+				data: {
+					[ id ]: { id },
+				},
+				isFetching: {},
+				isSaving: {},
+			} );
+		} );
+
+		it( 'should stop indicating that a reusable block is fetching when there is an error', () => {
+			const id = 123;
+			const initialState = {
+				data: {},
+				isFetching: {
+					[ id ]: true,
+				},
+				isSaving: {},
+			};
+
+			const state = reusableBlocks( initialState, {
+				type: 'FETCH_REUSABLE_BLOCKS_FAILURE',
+				id,
+			} );
+
+			expect( state ).toEqual( {
+				data: {},
+				isFetching: {},
 				isSaving: {},
 			} );
 		} );
 
 		it( 'should indicate that a reusable block is saving', () => {
-			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
+			const id = 123;
 			const initialState = {
 				data: {},
+				isFetching: {},
 				isSaving: {},
 			};
 
@@ -1478,6 +1607,7 @@ describe( 'state', () => {
 
 			expect( state ).toEqual( {
 				data: {},
+				isFetching: {},
 				isSaving: {
 					[ id ]: true,
 				},
@@ -1485,11 +1615,12 @@ describe( 'state', () => {
 		} );
 
 		it( 'should stop indicating that a reusable block is saving when the save succeeded', () => {
-			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
+			const id = 123;
 			const initialState = {
 				data: {
 					[ id ]: { id },
 				},
+				isFetching: {},
 				isSaving: {
 					[ id ]: true,
 				},
@@ -1505,14 +1636,16 @@ describe( 'state', () => {
 				data: {
 					[ id ]: { id },
 				},
+				isFetching: {},
 				isSaving: {},
 			} );
 		} );
 
 		it( 'should stop indicating that a reusable block is saving when there is an error', () => {
-			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
+			const id = 123;
 			const initialState = {
 				data: {},
+				isFetching: {},
 				isSaving: {
 					[ id ]: true,
 				},
@@ -1525,6 +1658,7 @@ describe( 'state', () => {
 
 			expect( state ).toEqual( {
 				data: {},
+				isFetching: {},
 				isSaving: {},
 			} );
 		} );

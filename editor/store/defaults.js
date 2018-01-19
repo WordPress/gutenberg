@@ -1,7 +1,10 @@
 export const PREFERENCES_DEFAULTS = {
 	mode: 'visual',
-	isSidebarOpened: true,
-	isSidebarOpenedMobile: false,
+	sidebars: {
+		desktop: true,
+		mobile: false,
+		publish: false,
+	},
 	panels: { 'post-status': true },
 	recentlyUsedBlocks: [],
 	blockUsage: {},

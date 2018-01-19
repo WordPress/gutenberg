@@ -30,9 +30,10 @@ import { getBlockType, getBlockTypes } from './registration';
 /**
  * Returns a block object given its type and attributes.
  *
- * @param  {String} name             Block name
- * @param  {Object} blockAttributes  Block attributes
- * @return {Object}                  Block object
+ * @param {string} name            Block name.
+ * @param {Object} blockAttributes Block attributes.
+ *
+ * @returns {Object} Block object.
  */
 export function createBlock( name, blockAttributes = {} ) {
 	// Get the type definition associated with a registered block.
@@ -44,7 +45,7 @@ export function createBlock( name, blockAttributes = {} ) {
 		const value = blockAttributes[ key ];
 		if ( undefined !== value ) {
 			result[ key ] = value;
-		} else if ( source.default ) {
+		} else if ( source.hasOwnProperty( 'default' ) ) {
 			result[ key ] = source.default;
 		}
 
@@ -62,12 +63,14 @@ export function createBlock( name, blockAttributes = {} ) {
 }
 
 /**
- * Returns a predicate that receives a transformation and returns true if the given
- * transformation is able to execute in the situation specified in the params
+ * Returns a predicate that receives a transformation and returns true if the
+ * given transformation is able to execute in the situation specified in the
+ * params.
  *
- * @param  {String}    sourceName    Block name
- * @param  {Boolean}   isMultiBlock  Array of possible block transformations
- * @return {Function}                Predicate that receives a block type.
+ * @param {string}  sourceName   Block name.
+ * @param {boolean} isMultiBlock Array of possible block transformations.
+ *
+ * @returns {Function} Predicate that receives a block type.
  */
 const isTransformForBlockSource = ( sourceName, isMultiBlock = false ) => ( transform ) => (
 	transform.type === 'block' &&
@@ -76,12 +79,14 @@ const isTransformForBlockSource = ( sourceName, isMultiBlock = false ) => ( tran
 );
 
 /**
- * Returns a predicate that receives a block type and returns true if the given block type contains a
- * transformation able to execute in the situation specified in the params
+ * Returns a predicate that receives a block type and returns true if the given
+ * block type contains a transformation able to execute in the situation
+ * specified in the params.
  *
- * @param  {String}    sourceName    Block name
- * @param  {Boolean}   isMultiBlock  Array of possible block transformations
- * @return {Function}                Predicate that receives a block type.
+ * @param {string}  sourceName   Block name.
+ * @param {boolean} isMultiBlock Array of possible block transformations.
+ *
+ * @returns {Function} Predicate that receives a block type.
  */
 const createIsTypeTransformableFrom = ( sourceName, isMultiBlock = false ) => ( type ) => (
 	!! find(
@@ -91,10 +96,12 @@ const createIsTypeTransformableFrom = ( sourceName, isMultiBlock = false ) => ( 
 );
 
 /**
- * Returns an array of possible block transformations that could happen on the set of blocks received as argument.
+ * Returns an array of possible block transformations that could happen on the
+ * set of blocks received as argument.
  *
- * @param  {Array}  blocks Blocks array
- * @return {Array}         Array of possible block transformations
+ * @param {Array} blocks Blocks array.
+ *
+ * @returns {Array} Array of possible block transformations.
  */
 export function getPossibleBlockTransformations( blocks ) {
 	const sourceBlock = first( blocks );
@@ -139,9 +146,10 @@ export function getPossibleBlockTransformations( blocks ) {
 /**
  * Switch one or more blocks into one or more blocks of the new block type.
  *
- * @param  {Array|Object}  blocks     Blocks array or block object
- * @param  {string}        name       Block name
- * @return {Array}                    Array of blocks
+ * @param {Array|Object} blocks Blocks array or block object.
+ * @param {string}       name   Block name.
+ *
+ * @returns {Array} Array of blocks.
  */
 export function switchToBlockType( blocks, name ) {
 	const blocksArray = castArray( blocks );
@@ -216,15 +224,18 @@ export function switchToBlockType( blocks, name ) {
 /**
  * Creates a new reusable block.
  *
- * @param {String} type       The type of the block referenced by the reusable block
- * @param {Object} attributes The attributes of the block referenced by the reusable block
- * @return {Object}           A reusable block object
+ * @param {string} type       The type of the block referenced by the reusable
+ *                            block.
+ * @param {Object} attributes The attributes of the block referenced by the
+ *                            reusable block.
+ *
+ * @returns {Object} A reusable block object.
  */
 export function createReusableBlock( type, attributes ) {
 	return {
-		id: +uniqueId(), // Temorary id replaced when the block is saved server side
+		id: -uniqueId(), // Temorary id replaced when the block is saved server side
 		isTemporary: true,
-		name: __( 'Untitled block' ),
+		title: __( 'Untitled block' ),
 		type,
 		attributes,
 	};

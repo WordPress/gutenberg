@@ -6,7 +6,7 @@ import { find, compact, get, initial, last, isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, createElement, Children } from '@wordpress/element';
+import { Component, createElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -16,65 +16,10 @@ import './editor.scss';
 import { registerBlockType, createBlock } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
-import InspectorControls from '../../inspector-controls';
-import BlockDescription from '../../block-description';
-
-const fromBrDelimitedContent = ( content ) => {
-	if ( undefined === content ) {
-		// converting an empty block to a list block
-		return content;
-	}
-	const listItems = [];
-	listItems.push( createElement( 'li', [], [] ) );
-	content.forEach( function( element, elementIndex, elements ) {
-		// "split" the incoming content on 'br' elements
-		if ( 'br' === element.type && elementIndex < elements.length - 1 ) {
-			// if is br and there are more elements to come, push a new list item
-			listItems.push( createElement( 'li', [], [] ) );
-		} else {
-			listItems[ listItems.length - 1 ].props.children.push( element );
-		}
-	} );
-	return listItems;
-};
-
-const toBrDelimitedContent = ( values ) => {
-	if ( undefined === values ) {
-		// converting an empty list
-		return values;
-	}
-	const content = [];
-	values.forEach( function( li, liIndex, listItems ) {
-		if ( typeof li === 'string' ) {
-			content.push( li );
-			return;
-		}
-
-		Children.toArray( li.props.children ).forEach( function( element, elementIndex, liChildren ) {
-			if ( 'ul' === element.type || 'ol' === element.type ) { // lists within lists
-				// we know we've just finished processing a list item, so break the text
-				content.push( createElement( 'br' ) );
-				// push each element from the child list's converted content
-				content.push.apply( content, toBrDelimitedContent( Children.toArray( element.props.children ) ) );
-				// add a break if there are more list items to come, because the recursive call won't
-				// have added it when it finished processing the child list because it thinks the content ended
-				if ( liIndex !== listItems.length - 1 ) {
-					content.push( createElement( 'br' ) );
-				}
-			} else {
-				content.push( element );
-				if ( elementIndex === liChildren.length - 1 && liIndex !== listItems.length - 1 ) {
-					// last element in this list item, but not last element overall
-					content.push( createElement( 'br' ) );
-				}
-			}
-		} );
-	} );
-	return content;
-};
 
 registerBlockType( 'core/list', {
 	title: __( 'List' ),
+	description: __( 'List. Numbered or bulleted.' ),
 	icon: 'editor-ul',
 	category: 'common',
 	keywords: [ __( 'bullet list' ), __( 'ordered list' ), __( 'numbered list' ) ],
@@ -139,7 +84,7 @@ registerBlockType( 'core/list', {
 				transform: ( { content } ) => {
 					return createBlock( 'core/list', {
 						nodeName: 'UL',
-						values: fromBrDelimitedContent( content ),
+						values: [ <li key="1">{ content }</li> ],
 					} );
 				},
 			},
@@ -149,7 +94,7 @@ registerBlockType( 'core/list', {
 				transform: ( { content } ) => {
 					return createBlock( 'core/list', {
 						nodeName: 'OL',
-						values: fromBrDelimitedContent( content ),
+						values: [ <li key="1">{ content }</li> ],
 					} );
 				},
 			},
@@ -320,14 +265,6 @@ registerBlockType( 'core/list', {
 							},
 						] }
 					/>
-				),
-				focus && (
-					<InspectorControls key="inspector">
-						<BlockDescription>
-							<p>{ __( 'List. Numbered or bulleted.' ) }</p>
-						</BlockDescription>
-						<p>{ __( 'No advanced options.' ) }</p>
-					</InspectorControls>
 				),
 				<Editable
 					multiline="li"

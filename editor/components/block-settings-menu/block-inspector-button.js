@@ -13,13 +13,13 @@ import { IconButton, withSpokenMessages } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { isEditorSidebarOpened, getActivePanel } from '../../store/selectors';
+import { getActivePanel, isSidebarOpened } from '../../store/selectors';
 import { toggleSidebar, setActivePanel } from '../../store/actions';
 
 export function BlockInspectorButton( {
-	isSidebarOpened,
+	isDefaultSidebarOpened,
 	panel,
-	onToggleSidebar,
+	toggleDefaultSidebar,
 	onShowInspector,
 	onClick = noop,
 	small = false,
@@ -27,20 +27,20 @@ export function BlockInspectorButton( {
 } ) {
 	const toggleInspector = () => {
 		onShowInspector();
-		if ( ! isSidebarOpened || ( isSidebarOpened && panel === 'block' ) ) {
-			onToggleSidebar();
+		if ( ! isDefaultSidebarOpened || panel === 'block' ) {
+			toggleDefaultSidebar();
 		}
 	};
 
 	const speakMessage = () => {
-		if ( ! isSidebarOpened || ( isSidebarOpened && panel !== 'block' ) ) {
+		if ( ! isDefaultSidebarOpened || ( isDefaultSidebarOpened && panel !== 'block' ) ) {
 			speak( __( 'Additional settings are now available in the Editor advanced settings sidebar' ) );
 		} else {
 			speak( __( 'Advanced settings closed' ) );
 		}
 	};
 
-	const label = ( isSidebarOpened && panel === 'block' ) ? __( 'Hide Advanced Settings' ) : __( 'Show Advanced Settings' );
+	const label = ( isDefaultSidebarOpened && panel === 'block' ) ? __( 'Hide Advanced Settings' ) : __( 'Show Advanced Settings' );
 
 	return (
 		<IconButton
@@ -56,14 +56,14 @@ export function BlockInspectorButton( {
 
 export default connect(
 	( state ) => ( {
-		isSidebarOpened: isEditorSidebarOpened( state ),
+		isDefaultSidebarOpened: isSidebarOpened( state ),
 		panel: getActivePanel( state ),
 	} ),
 	( dispatch ) => ( {
 		onShowInspector() {
 			dispatch( setActivePanel( 'block' ) );
 		},
-		onToggleSidebar() {
+		toggleDefaultSidebar() {
 			dispatch( toggleSidebar() );
 		},
 	} )

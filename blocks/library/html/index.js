@@ -15,11 +15,11 @@ import { withState } from '@wordpress/components';
 import './editor.scss';
 import { registerBlockType } from '../../api';
 import BlockControls from '../../block-controls';
-import InspectorControls from '../../inspector-controls';
-import BlockDescription from '../../block-description';
 
 registerBlockType( 'core/html', {
 	title: __( 'Custom HTML' ),
+
+	description: __( 'Add custom HTML code and preview it right here in the editor.' ),
 
 	icon: 'html',
 
@@ -64,17 +64,12 @@ registerBlockType( 'core/html', {
 				key="preview"
 				dangerouslySetInnerHTML={ { __html: attributes.content } } /> :
 			<TextareaAutosize
+				className="wp-block-html"
 				key="editor"
 				value={ attributes.content }
 				onChange={ ( event ) => setAttributes( { content: event.target.value } ) }
+				aria-label={ __( 'HTML' ) }
 			/>,
-		focus && (
-			<InspectorControls key="inspector">
-				<BlockDescription>
-					<p>{ __( 'Add custom HTML code and preview it right here in the editor.' ) }</p>
-				</BlockDescription>
-			</InspectorControls>
-		),
 	] ),
 
 	save( { attributes } ) {

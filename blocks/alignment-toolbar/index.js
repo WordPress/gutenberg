@@ -23,6 +23,10 @@ const ALIGNMENT_CONTROLS = [
 ];
 
 export default function AlignmentToolbar( { value, onChange } ) {
+	function applyOrUnset( align ) {
+		return () => onChange( value === align ? undefined : align );
+	}
+
 	return (
 		<Toolbar
 			controls={ ALIGNMENT_CONTROLS.map( ( control ) => {
@@ -32,7 +36,7 @@ export default function AlignmentToolbar( { value, onChange } ) {
 				return {
 					...control,
 					isActive,
-					onClick: () => onChange( isActive ? null : align ),
+					onClick: applyOrUnset( align ),
 				};
 			} ) }
 		/>

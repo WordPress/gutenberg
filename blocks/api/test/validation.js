@@ -30,18 +30,6 @@ describe( 'validation', () => {
 		title: 'block title',
 	};
 
-	/* eslint-disable no-console */
-	function expectError() {
-		expect( console.error ).toHaveBeenCalled();
-		console.error.mockClear();
-	}
-
-	function expectWarning() {
-		expect( console.warn ).toHaveBeenCalled();
-		console.warn.mockClear();
-	}
-	/* eslint-enable no-console */
-
 	afterEach( () => {
 		setUnknownTypeHandlerName( undefined );
 		getBlockTypes().forEach( ( block ) => {
@@ -114,7 +102,7 @@ describe( 'validation', () => {
 				{ chars: 'a \n c \t b  ' },
 			);
 
-			expectWarning();
+			expect( console ).toHaveWarned();
 			expect( isEqual ).toBe( false );
 		} );
 
@@ -214,7 +202,7 @@ describe( 'validation', () => {
 				]
 			);
 
-			expectWarning();
+			expect( console ).toHaveWarned();
 			expect( isEqual ).toBe( false );
 		} );
 
@@ -242,7 +230,7 @@ describe( 'validation', () => {
 					{ tagName: 'section' }
 				);
 
-				expectWarning();
+				expect( console ).toHaveWarned();
 				expect( isEqual ).toBe( false );
 			} );
 
@@ -263,7 +251,7 @@ describe( 'validation', () => {
 					}
 				);
 
-				expectWarning();
+				expect( console ).toHaveWarned();
 				expect( isEqual ).toBe( false );
 			} );
 
@@ -322,7 +310,7 @@ describe( 'validation', () => {
 				'<div>Hello <span class="a">World!</span></div>'
 			);
 
-			expectWarning();
+			expect( console ).toHaveWarned();
 			expect( isEquivalent ).toBe( false );
 		} );
 
@@ -341,7 +329,7 @@ describe( 'validation', () => {
 				'<div>Hello'
 			);
 
-			expectWarning();
+			expect( console ).toHaveWarned();
 			expect( isEquivalent ).toBe( false );
 		} );
 
@@ -351,7 +339,7 @@ describe( 'validation', () => {
 				'<div>Hello</div>'
 			);
 
-			expectWarning();
+			expect( console ).toHaveWarned();
 			expect( isEquivalent ).toBe( false );
 		} );
 
@@ -388,7 +376,7 @@ describe( 'validation', () => {
 				'<input>'
 			);
 
-			expectWarning();
+			expect( console ).toHaveWarned();
 			expect( isEquivalent ).toBe( false );
 		} );
 
@@ -398,7 +386,7 @@ describe( 'validation', () => {
 				'<div>'
 			);
 
-			expectWarning();
+			expect( console ).toHaveWarned();
 			expect( isEquivalent ).toBe( false );
 		} );
 
@@ -408,7 +396,7 @@ describe( 'validation', () => {
 				'<div>'
 			);
 
-			expectWarning();
+			expect( console ).toHaveWarned();
 			expect( isEquivalent ).toBe( false );
 		} );
 	} );
@@ -423,8 +411,8 @@ describe( 'validation', () => {
 				{ fruit: 'Bananas' }
 			);
 
-			expectWarning();
-			expectError();
+			expect( console ).toHaveWarned();
+			expect( console ).toHaveErrored();
 			expect( isValid ).toBe( false );
 		} );
 
@@ -442,7 +430,7 @@ describe( 'validation', () => {
 				{ fruit: 'Bananas' }
 			);
 
-			expectError();
+			expect( console ).toHaveErrored();
 			expect( isValid ).toBe( false );
 		} );
 

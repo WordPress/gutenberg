@@ -9,11 +9,12 @@ import { __ } from '@wordpress/i18n';
 import './editor.scss';
 import { registerBlockType } from '../../api';
 import InspectorControls from '../../inspector-controls';
-import BlockDescription from '../../block-description';
 import ToggleControl from '../../inspector-controls/toggle-control';
 
 registerBlockType( 'core/more', {
 	title: __( 'More' ),
+
+	description: __( '"More" allows you to break your post into a part shown on index pages, and the subsequent after clicking a "Read More" link.' ),
 
 	icon: 'editor-insertmore',
 
@@ -48,9 +49,6 @@ registerBlockType( 'core/more', {
 		return [
 			focus && (
 				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( '"More" allows you to break your post into a part shown on index pages, and the subsequent after clicking a "Read More" link.' ) }</p>
-					</BlockDescription>
 					<ToggleControl
 						label={ __( 'Hide the teaser before the "More" tag' ) }
 						checked={ !! noTeaser }

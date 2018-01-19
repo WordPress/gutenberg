@@ -124,6 +124,7 @@ class MetaBoxesArea extends Component {
 			<div className={ classes }>
 				{ loading && <Spinner /> }
 				<div ref={ this.bindNode } />
+				<div className="editor-meta-boxes-area__clear" />
 			</div>
 		);
 	}

@@ -13,6 +13,7 @@ import {
 	fetchReusableBlocks,
 	updateReusableBlock,
 	saveReusableBlock,
+	deleteReusableBlock,
 	convertBlockToStatic,
 	convertBlockToReusable,
 	toggleSelection,
@@ -32,8 +33,6 @@ import {
 	insertBlocks,
 	showInsertionPoint,
 	hideInsertionPoint,
-	setBlockInsertionPoint,
-	clearBlockInsertionPoint,
 	editPost,
 	savePost,
 	trashPost,
@@ -248,8 +247,9 @@ describe( 'actions', () => {
 
 	describe( 'showInsertionPoint', () => {
 		it( 'should return the SHOW_INSERTION_POINT action', () => {
-			expect( showInsertionPoint() ).toEqual( {
+			expect( showInsertionPoint( 1 ) ).toEqual( {
 				type: 'SHOW_INSERTION_POINT',
+				index: 1,
 			} );
 		} );
 	} );
@@ -258,24 +258,6 @@ describe( 'actions', () => {
 		it( 'should return the HIDE_INSERTION_POINT action', () => {
 			expect( hideInsertionPoint() ).toEqual( {
 				type: 'HIDE_INSERTION_POINT',
-			} );
-		} );
-	} );
-
-	describe( 'setBlockInsertionPoint', () => {
-		it( 'should return the SET_BLOCK_INSERTION_POINT action', () => {
-			const position = 1;
-			expect( setBlockInsertionPoint( position ) ).toEqual( {
-				type: 'SET_BLOCK_INSERTION_POINT',
-				position,
-			} );
-		} );
-	} );
-
-	describe( 'clearBlockInsertionPoint', () => {
-		it( 'should return the CLEAR_BLOCK_INSERTION_POINT action', () => {
-			expect( clearBlockInsertionPoint() ).toEqual( {
-				type: 'CLEAR_BLOCK_INSERTION_POINT',
 			} );
 		} );
 	} );
@@ -399,10 +381,10 @@ describe( 'actions', () => {
 
 	describe( 'toggleSidebar', () => {
 		it( 'should return TOGGLE_SIDEBAR action', () => {
-			const isMobile = true;
-			expect( toggleSidebar( isMobile ) ).toEqual( {
+			expect( toggleSidebar( 'publish', true ) ).toEqual( {
 				type: 'TOGGLE_SIDEBAR',
-				isMobile,
+				sidebar: 'publish',
+				forcedValue: true,
 			} );
 		} );
 	} );
@@ -635,6 +617,14 @@ describe( 'actions', () => {
 		const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
 		expect( saveReusableBlock( id ) ).toEqual( {
 			type: 'SAVE_REUSABLE_BLOCK',
+			id,
+		} );
+	} );
+
+	describe( 'deleteReusableBlock', () => {
+		const id = 123;
+		expect( deleteReusableBlock( id ) ).toEqual( {
+			type: 'DELETE_REUSABLE_BLOCK',
 			id,
 		} );
 	} );

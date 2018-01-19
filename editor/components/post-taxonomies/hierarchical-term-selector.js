@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { unescape as unescapeString, without, groupBy, map, repeat, find } from 'lodash';
+import { unescape as unescapeString, without, map, repeat, find, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,6 +10,7 @@ import { unescape as unescapeString, without, groupBy, map, repeat, find } from 
 import { __, _x } from '@wordpress/i18n';
 import { Component, compose } from '@wordpress/element';
 import { withInstanceId, withSpokenMessages } from '@wordpress/components';
+import { buildTermsTree } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -21,11 +22,13 @@ const DEFAULT_QUERY = {
 	per_page: 100,
 	orderby: 'count',
 	order: 'desc',
+	_fields: [ 'id', 'name', 'parent' ],
 };
 
 class HierarchicalTermSelector extends Component {
 	constructor() {
 		super( ...arguments );
+		this.findTerm = this.findTerm.bind( this );
 		this.onChange = this.onChange.bind( this );
 		this.onChangeFormName = this.onChangeFormName.bind( this );
 		this.onChangeFormParent = this.onChangeFormParent.bind( this );
@@ -40,23 +43,6 @@ class HierarchicalTermSelector extends Component {
 			formParent: '',
 			showForm: false,
 		};
-	}
-
-	buildTermsTree( flatTerms ) {
-		const termsByParent = groupBy( flatTerms, 'parent' );
-		const fillWithChildren = ( terms ) => {
-			return terms.map( ( term ) => {
-				const children = termsByParent[ term.id ];
-				return {
-					...term,
-					children: children && children.length ?
-						fillWithChildren( children ) :
-						[],
-				};
-			} );
-		};
-
-		return fillWithChildren( termsByParent[ 0 ] || [] );
 	}
 
 	onChange( event ) {
@@ -84,12 +70,35 @@ class HierarchicalTermSelector extends Component {
 		} ) );
 	}
 
+	findTerm( terms, parent, name ) {
+		return find( terms, term => {
+			return ( ( ! term.parent && ! parent ) || parseInt( term.parent ) === parseInt( parent ) ) &&
+				term.name === name;
+		} );
+	}
+
 	onAddTerm( event ) {
 		event.preventDefault();
-		const { formName, formParent, adding } = this.state;
+		const { onUpdateTerms, restBase, terms, slug } = this.props;
+		const { formName, formParent, adding, availableTerms } = this.state;
 		if ( formName === '' || adding ) {
 			return;
 		}
+
+		// check if the term we are adding already exists
+		const existingTerm = this.findTerm( availableTerms, formParent, formName );
+		if ( existingTerm ) {
+			// if the term we are adding exists but is not selected select it
+			if ( ! some( terms, term => term === existingTerm.id ) ) {
+				onUpdateTerms( [ ...terms, existingTerm.id ], restBase );
+			}
+			this.setState( {
+				formName: '',
+				formParent: '',
+			} );
+			return;
+		}
+
 		const findOrCreatePromise = new Promise( ( resolve, reject ) => {
 			this.setState( {
 				adding: true,
@@ -104,8 +113,13 @@ class HierarchicalTermSelector extends Component {
 				.then( resolve, ( xhr ) => {
 					const errorCode = xhr.responseJSON && xhr.responseJSON.code;
 					if ( errorCode === 'term_exists' ) {
-						this.addRequest = new Model( { id: xhr.responseJSON.data } ).fetch();
-						return this.addRequest.then( resolve, reject );
+						// search the new category created since last fetch
+						this.addRequest = new Model().fetch(
+							{ data: { ...DEFAULT_QUERY, parent: formParent || 0, search: formName } }
+						);
+						return this.addRequest.then( searchResult => {
+							resolve( this.findTerm( searchResult, formParent, formName ) );
+						}, reject );
 					}
 					reject( xhr );
 				} );
@@ -114,7 +128,6 @@ class HierarchicalTermSelector extends Component {
 			.then( ( term ) => {
 				const hasTerm = !! find( this.state.availableTerms, ( availableTerm ) => availableTerm.id === term.id );
 				const newAvailableTerms = hasTerm ? this.state.availableTerms : [ term, ...this.state.availableTerms ];
-				const { onUpdateTerms, restBase, terms, slug } = this.props;
 				const termAddedMessage = slug === 'category' ? __( 'Category added' ) : __( 'Term added' );
 				this.props.speak( termAddedMessage, 'assertive' );
 				this.setState( {
@@ -122,7 +135,7 @@ class HierarchicalTermSelector extends Component {
 					formName: '',
 					formParent: '',
 					availableTerms: newAvailableTerms,
-					availableTermsTree: this.buildTermsTree( newAvailableTerms ),
+					availableTermsTree: buildTermsTree( newAvailableTerms ),
 				} );
 				onUpdateTerms( [ ...terms, term.id ], restBase );
 			}, ( xhr ) => {
@@ -140,7 +153,7 @@ class HierarchicalTermSelector extends Component {
 		this.fetchRequest = new Collection()
 			.fetch( { data: DEFAULT_QUERY } )
 			.done( ( terms ) => {
-				const availableTermsTree = this.buildTermsTree( terms );
+				const availableTermsTree = buildTermsTree( terms );
 
 				this.setState( {
 					loading: false,
@@ -217,7 +230,7 @@ class HierarchicalTermSelector extends Component {
 		/* eslint-disable jsx-a11y/no-onchange */
 		return (
 			<div className="editor-post-taxonomies__hierarchical-terms-selector">
-				<h4 className="editor-post-taxonomies__hierarchical-terms-selector-title">{ label }</h4>
+				<h3 className="editor-post-taxonomies__hierarchical-terms-selector-title">{ label }</h3>
 				{ this.renderTerms( availableTermsTree ) }
 				{ ! loading &&
 					<button

@@ -15,21 +15,17 @@
 	}
 
 	> p {
-		font-family: $default-font;
 		font-size: 24px;
 		font-weight: 900;
 		line-height: 1.6;
 	}
 
-	cite {
+	cite,
+	footer {
 		color: $dark-gray-600;
 		position: relative;
 		font-weight: 900;
 		text-transform: uppercase;
 		font-size: 13px;
-	}
-
-	cite p {
-		font-family: $default-font;
 	}
 }

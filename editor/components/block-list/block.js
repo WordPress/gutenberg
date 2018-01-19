@@ -32,6 +32,8 @@ import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import BlockMultiControls from './multi-controls';
+import BlockMobileToolbar from './block-mobile-toolbar';
+import BlockListSiblingInserter from './sibling-inserter';
 import {
 	clearSelectedBlock,
 	editPost,
@@ -68,8 +70,9 @@ const { BACKSPACE, ESCAPE, DELETE, ENTER, UP, RIGHT, DOWN, LEFT } = keycodes;
 /**
  * Given a DOM node, finds the closest scrollable container node.
  *
- * @param  {Element}  node Node from which to start
- * @return {?Element}      Scrollable container node, if found
+ * @param {Element} node Node from which to start.
+ *
+ * @returns {?Element} Scrollable container node, if found.
  */
 function getScrollContainer( node ) {
 	if ( ! node ) {
@@ -101,6 +104,7 @@ export class BlockListBlock extends Component {
 		this.stopTypingOnMouseMove = this.stopTypingOnMouseMove.bind( this );
 		this.mergeBlocks = this.mergeBlocks.bind( this );
 		this.onFocus = this.onFocus.bind( this );
+		this.preventDrag = this.preventDrag.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onBlockError = this.onBlockError.bind( this );
@@ -129,8 +133,7 @@ export class BlockListBlock extends Component {
 	componentWillReceiveProps( newProps ) {
 		if (
 			this.props.order !== newProps.order &&
-			( ( this.props.isSelected && newProps.isSelected ) ||
-			( this.props.isFirstMultiSelected && newProps.isFirstMultiSelected ) )
+			( newProps.isSelected || newProps.isFirstMultiSelected )
 		) {
 			this.previousOffset = this.node.getBoundingClientRect().top;
 		}
@@ -222,12 +225,9 @@ export class BlockListBlock extends Component {
 	}
 
 	maybeStartTyping() {
-		// We do not want to dispatch start typing if...
-		//  - State value already reflects that we're typing (dispatch noise)
-		//  - The current block is not selected (e.g. after a split occurs,
-		//    we'll still receive the keyDown event, but the focus has since
-		//    shifted to the newly created block)
-		if ( ! this.props.isTyping && this.props.isSelected ) {
+		// We do not want to dispatch start typing if state value already reflects
+		// that we're typing (dispatch noise)
+		if ( ! this.props.isTyping ) {
 			this.props.onStartTyping();
 		}
 	}
@@ -265,6 +265,10 @@ export class BlockListBlock extends Component {
 		} else {
 			onMerge( previousBlock, block );
 		}
+
+		// Manually trigger typing mode, since merging will remove this block and
+		// cause onKeyDown to not fire
+		this.maybeStartTyping();
 	}
 
 	insertBlocksAfter( blocks ) {
@@ -275,6 +279,18 @@ export class BlockListBlock extends Component {
 		if ( event.target === this.node ) {
 			this.props.onSelect();
 		}
+	}
+
+	/**
+	 * Prevents default dragging behavior within a block to allow for multi-
+	 * selection to take effect unhampered.
+	 *
+	 * @param {DragEvent} event Drag event.
+	 *
+	 * @returns {void}
+	 */
+	preventDrag( event ) {
+		event.preventDefault();
 	}
 
 	onPointerDown( event ) {
@@ -309,6 +325,9 @@ export class BlockListBlock extends Component {
 						createBlock( 'core/paragraph' ),
 					], this.props.order + 1 );
 				}
+
+				// Pressing enter should trigger typing mode after the content has split
+				this.maybeStartTyping();
 				break;
 
 			case UP:
@@ -334,6 +353,9 @@ export class BlockListBlock extends Component {
 						}
 					}
 				}
+
+				// Pressing backspace should trigger typing mode
+				this.maybeStartTyping();
 				break;
 
 			case ESCAPE:
@@ -398,7 +420,7 @@ export class BlockListBlock extends Component {
 				<div
 					ref={ this.bindBlockNode }
 					onKeyPress={ this.maybeStartTyping }
-					onDragStart={ ( event ) => event.preventDefault() }
+					onDragStart={ this.preventDrag }
 					onMouseDown={ this.onPointerDown }
 					onKeyDown={ this.onKeyDown }
 					onFocus={ this.onFocus }
@@ -435,8 +457,10 @@ export class BlockListBlock extends Component {
 							/>,
 						] }
 					</BlockCrashBoundary>
+					{ showUI && <BlockMobileToolbar uid={ block.uid } /> }
 				</div>
 				{ !! error && <BlockCrashWarning /> }
+				<BlockListSiblingInserter uid={ block.uid } />
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */

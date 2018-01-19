@@ -6,23 +6,24 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Button, Dashicon, Placeholder, Toolbar } from '@wordpress/components';
+import { Button, IconButton, Placeholder, Toolbar } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
+import './editor.scss';
 import { registerBlockType } from '../../api';
-import MediaUploadButton from '../../media-upload-button';
+import MediaUpload from '../../media-upload';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
-import InspectorControls from '../../inspector-controls';
-import BlockDescription from '../../block-description';
 
 registerBlockType( 'core/audio', {
 	title: __( 'Audio' ),
+
+	description: __( 'The Audio block allows you to embed audio files and play them back using a simple player.' ),
 
 	icon: 'format-audio',
 
@@ -42,6 +43,9 @@ registerBlockType( 'core/audio', {
 			type: 'array',
 			source: 'children',
 			selector: 'figcaption',
+		},
+		id: {
+			type: 'number',
 		},
 	},
 
@@ -64,7 +68,7 @@ registerBlockType( 'core/audio', {
 			};
 		}
 		render() {
-			const { align, caption } = this.props.attributes;
+			const { align, caption, id } = this.props.attributes;
 			const { setAttributes, focus, setFocus } = this.props;
 			const { editing, className, src } = this.state;
 			const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
@@ -75,7 +79,7 @@ registerBlockType( 'core/audio', {
 				if ( media && media.url ) {
 					// sets the block's attribure and updates the edit component from the
 					// selected media, then switches off the editing UI
-					setAttributes( { src: media.url } );
+					setAttributes( { src: media.url, id: media.id } );
 					this.setState( { src: media.url, editing: false } );
 				}
 			};
@@ -88,30 +92,22 @@ registerBlockType( 'core/audio', {
 				}
 				return false;
 			};
-			const controls = focus && [
+			const controls = focus && (
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar
 						value={ align }
 						onChange={ updateAlignment }
 					/>
 					<Toolbar>
-						<Button
+						<IconButton
 							className="components-icon-button components-toolbar__control"
-							aria-label={ __( 'Edit audio' ) }
-							type="audio"
+							label={ __( 'Edit audio' ) }
 							onClick={ switchToEditing }
-						>
-							<Dashicon icon="edit" />
-						</Button>
+							icon="edit"
+						/>
 					</Toolbar>
-				</BlockControls>,
-
-				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'The Audio block allows you to embed audio files and play them back using a simple player.' ) }</p>
-					</BlockDescription>
-				</InspectorControls>,
-			];
+				</BlockControls>
+			);
 
 			const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
 
@@ -122,7 +118,7 @@ registerBlockType( 'core/audio', {
 						key="placeholder"
 						icon="media-audio"
 						label={ __( 'Audio' ) }
-						instructions={ __( 'Select an audio file from your library, or upload a new one:' ) }
+						instructions={ __( 'Select an audio file from your library, or upload a new one' ) }
 						className={ className }>
 						<form onSubmit={ onSelectUrl }>
 							<input
@@ -137,13 +133,16 @@ registerBlockType( 'core/audio', {
 								{ __( 'Use URL' ) }
 							</Button>
 						</form>
-						<MediaUploadButton
-							buttonProps={ { isLarge: true } }
+						<MediaUpload
 							onSelect={ onSelectAudio }
 							type="audio"
-						>
-							{ __( 'Insert from Media Library' ) }
-						</MediaUploadButton>
+							value={ id }
+							render={ ( { open } ) => (
+								<Button isLarge onClick={ open }>
+									{ __( 'Add from Media Library' ) }
+								</Button>
+							) }
+						/>
 					</Placeholder>,
 				];
 			}

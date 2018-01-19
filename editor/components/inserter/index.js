@@ -20,9 +20,8 @@ import InserterMenu from './menu';
 import { getBlockInsertionPoint, getEditorMode } from '../../store/selectors';
 import {
 	insertBlock,
-	setBlockInsertionPoint,
-	clearBlockInsertionPoint,
 	hideInsertionPoint,
+	showInsertionPoint,
 } from '../../store/actions';
 
 class Inserter extends Component {
@@ -35,19 +34,13 @@ class Inserter extends Component {
 	onToggle( isOpen ) {
 		const {
 			insertIndex,
-			setInsertionPoint,
-			clearInsertionPoint,
 			onToggle,
 		} = this.props;
 
-		// When inserting at specific index, assign as insertion point when
-		// the inserter is opened, clearing on close.
-		if ( insertIndex !== undefined ) {
-			if ( isOpen ) {
-				setInsertionPoint( insertIndex );
-			} else {
-				clearInsertionPoint();
-			}
+		if ( isOpen ) {
+			this.props.showInsertionPoint( insertIndex );
+		} else {
+			this.props.hideInsertionPoint();
 		}
 
 		// Surface toggle callback to parent component
@@ -79,7 +72,7 @@ class Inserter extends Component {
 				renderToggle={ ( { onToggle, isOpen } ) => (
 					<IconButton
 						icon="insert"
-						label={ __( 'Insert block' ) }
+						label={ __( 'Add block' ) }
 						onClick={ onToggle }
 						className="editor-inserter__toggle"
 						aria-haspopup="true"
@@ -89,17 +82,12 @@ class Inserter extends Component {
 					</IconButton>
 				) }
 				renderContent={ ( { onClose } ) => {
-					const onInsert = ( name, initialAttributes ) => {
-						onInsertBlock(
-							name,
-							initialAttributes,
-							insertionPoint
-						);
-
+					const onSelect = ( item ) => {
+						onInsertBlock( item, insertionPoint );
 						onClose();
 					};
 
-					return <InserterMenu onSelect={ onInsert } />;
+					return <InserterMenu onSelect={ onSelect } />;
 				} }
 			/>
 		);
@@ -115,16 +103,15 @@ export default compose( [
 			};
 		},
 		( dispatch ) => ( {
-			onInsertBlock( name, initialAttributes, position ) {
-				dispatch( hideInsertionPoint() );
+			onInsertBlock( item, position ) {
 				dispatch( insertBlock(
-					createBlock( name, initialAttributes ),
+					createBlock( item.name, item.initialAttributes ),
 					position
 				) );
 			},
 			...bindActionCreators( {
-				setInsertionPoint: setBlockInsertionPoint,
-				clearInsertionPoint: clearBlockInsertionPoint,
+				showInsertionPoint,
+				hideInsertionPoint,
 			}, dispatch ),
 		} )
 	),

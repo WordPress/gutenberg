@@ -4,6 +4,8 @@
 	left: 50%;
 
 	&:not(.is-mobile) {
+		margin-left: 2px;
+
 		&:before {
 			border: 8px solid $light-gray-500;
 		}

@@ -278,7 +278,7 @@
 		position: absolute;
 		top: 2px;
 		right: 4px;
-		padding: 16px 0 20px 14px; // handles hover area
+		padding: 13px 0 17px 8px; // handles hover area
 
 		// Mobile
 		display: none;
@@ -301,6 +301,43 @@
 		display: none;
 		@include break-small {
 			display: block;
+		}
+	}
+
+	// Mobile tools
+	.editor-block-list__block-mobile-toolbar {
+		display: flex;
+		flex-direction: row;
+		margin-top: $item-spacing;
+
+		@include break-small() {
+			display: none;
+		}
+
+		// Movers & trash
+		.editor-block-settings-menu__toggle,
+		& > .editor-block-settings-menu__control,
+		.editor-block-mover__control {
+			width: 36px;
+			height: 36px;
+			padding: 3px;
+			text-indent: 100%;
+			justify-content: center;
+			align-items: center;
+
+			.dashicon {
+				margin: auto;
+			}
+		}
+
+		// Movers
+		.editor-block-mover {
+			margin-right: auto;
+
+			.editor-block-mover__control:first-child {
+				margin: 0;
+				float: left;
+			}
 		}
 	}
 }
@@ -354,15 +391,13 @@
 .editor-block-list__sibling-inserter {
 	z-index: z-index( '.editor-block-list__sibling-inserter' );
 	position: relative;
-	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible ) - ( 2 * $block-padding );
-	margin: 0 auto;
 
-	@include break-small {
-		max-width: $visual-editor-max-width - ( 2 * $block-padding );
-	}
-
-	&:not( [data-insert-index="0"] ) {
-		top: #{ -1 * ( $block-spacing / 2 ) };
+	&[data-insert-index="0"] {
+		max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible ) - ( 2 * $block-padding );
+		margin: 0 auto;
+		@include break-small {
+			max-width: $visual-editor-max-width - ( 2 * $block-padding );
+		}
 	}
 
 	&:before {
@@ -370,7 +405,7 @@
 		position: absolute;
 		left: 0;
 		width: 100%;
-		height: 44px;
+		height: 28px;
 		transition: 0.1s height;
 		transform: translateY( -50% );
 	}
@@ -417,6 +452,19 @@
 	}
 }
 
+.editor-block-list__block > .editor-block-list__sibling-inserter {
+	position: absolute;
+	bottom: 0;
+	top: auto;
+	left: 0;
+	right: 0;
+
+	@include break-small {
+		left: $block-mover-padding-visible;
+		right: $block-mover-padding-visible;
+	}
+}
+
 $sticky-bottom-offset: 20px;
 
 .editor-block-contextual-toolbar {
@@ -428,7 +476,20 @@ $sticky-bottom-offset: 20px;
 	text-align: left;
 	pointer-events: none;
 	height: $block-toolbar-height;
-	top: -1px;	// stack borders
+
+	// put toolbar snugly to edge on mobile
+	margin-left: -$block-padding - 1px;	// stack borders
+	margin-right: -$block-padding - 1px;
+	@include break-small() {
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	// on mobile, toolbars fix differently
+	top: $header-height - 1px; // stack borders
+	@include break-small() {
+		top: -1px;	// stack borders
+	}
 
 	.editor-block-toolbar {
 		border: 1px solid $light-gray-500;

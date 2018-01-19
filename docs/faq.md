@@ -97,7 +97,7 @@ Blocks will be able to provide base structural CSS styles, and themes can add st
 
 Other features, like the new _wide_ and _full-wide_ alignment options, will simply be CSS classes applied to blocks that offer this alignment. We are looking at how a theme can opt in to this feature, for example using `add_theme_support`.
 
-*See:* [Theme Support](https://wordpress.org/gutenberg/handbook/reference/theme-support/)
+*See:* [Theme Support](https://wordpress.org/gutenberg/handbook/extensibility/theme-support/)
 
 ## How will editor styles work?
 
@@ -122,11 +122,11 @@ We realize it's a big change. We also think there will be many new opportunities
 
 We are looking at ways to make Gutenberg configurable for many use cases, including disabling different aspects (like blocks, panels, etc.).
 
-There is also be a "Classic Text" block, which is virtually the same as the current editor, except in block form. There’s also likely to be a very popular plugin in the repository to replace Gutenberg with the classic editor.
+There is also be a "Classic" block, which is virtually the same as the current editor, except in block form. There’s also likely to be a very popular plugin in the repository to replace Gutenberg with the classic editor.
 
 ## How will custom TinyMCE buttons work in Gutenberg?
 
-Custom TinyMCE buttons will still work in the "Classic Text" block, which is a block version of the classic editor you know today.
+Custom TinyMCE buttons will still work in the "Classic" block, which is a block version of the classic editor you know today.
 
 (Gutenberg comes with a new universal inserter tool, which gives you access to every block available, searchable, sorted by recency and categories. This inserter tool levels the playing field for every plugin that adds content to the editor, and provides a single interface to learn how to use.)
 

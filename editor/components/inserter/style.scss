@@ -31,13 +31,17 @@ input[type="search"].editor-inserter__search {
 	display: block;
 	width: 100%;
 	margin: 0;
-	box-shadow: none;
 	padding: 8px 11px;
-	font-size: $default-font-size;
 	position: relative;
 	z-index: 1;
 	border: none;
 	box-shadow: 0 1px 0 0 $light-gray-500;
+
+	// fonts smaller than 16px causes mobile safari to zoom
+	font-size: $mobile-text-min-font-size;
+	@include break-small {
+		font-size: $default-font-size;
+	}
 
 	&:focus {
 		@include input-style__focus-active;
@@ -56,7 +60,7 @@ input[type="search"].editor-inserter__search {
 	flex-direction: column;
 	height: 100%;
 	@include break-medium {
-		width: 300px;
+		width: 350px;
 		height: 320px;
 	}
 }
@@ -68,7 +72,7 @@ input[type="search"].editor-inserter__search {
 .editor-inserter__block {
 	display: flex;
 	flex-direction: column;
-	width: calc( 50% - 16px );
+	width: calc( 33% - 16px );
 	border-radius: $button-style__radius-roundrect;
 	font-size: $default-font-size;
 	color: $dark-gray-500;
@@ -99,12 +103,12 @@ input[type="search"].editor-inserter__search {
 }
 
 .editor-inserter__separator {
-	border-top: 1px solid $light-gray-500;
+	border-bottom: 1px solid $light-gray-500;
 	background: rgba( $white, .8 );
 	text-align: center;
 	display: block;
 	margin: 0;
-	padding: 12px 14px 0 14px;
+	padding: 12px 14px 12px 14px;
 	font-size: $default-font-size;
 	font-weight: 600;
 	margin-top: -1px;	// hide the first top border
@@ -113,6 +117,13 @@ input[type="search"].editor-inserter__search {
 .editor-inserter__search-results {
 	flex-grow: 1;
 	overflow: auto;
+}
+
+.editor-inserter__no-results {
+	display: block;
+	text-align: center;
+	font-style: italic;
+	padding: 8px;
 }
 
 .editor-inserter__tabs {
@@ -135,6 +146,13 @@ input[type="search"].editor-inserter__search {
 		background: $light-gray-300;
 		border-bottom: 1px solid $light-gray-500;
 		flex-shrink: 0;
+		margin-top: 1px;
+	}
+
+	.editor-inserter__no-tab-content-message {
+		font-style: italic;
+		margin-top: 3em;
+		text-align: center;
 	}
 }
 
