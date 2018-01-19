@@ -1,5 +1,5 @@
 /**
- * External dependencie
+ * External dependencies
  */
 import { noop } from 'lodash';
 

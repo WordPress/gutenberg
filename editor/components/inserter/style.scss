@@ -64,10 +64,17 @@ input[type="search"].editor-inserter__search {
 	height: 100%;
 	@include break-medium {
 		width: 350px;
+		position: relative;
 
 		.editor-block-preview {
-			border-top: 1px solid $light-gray-500;
-			height: 200px;
+			border: 1px solid $light-gray-500;
+			box-shadow: $shadow-popover;
+			background: $white;
+			position: absolute;
+			left: 100%;
+			top: -1px;
+			bottom: -1px;
+			width: 300px;
 		}
 	}
 }
