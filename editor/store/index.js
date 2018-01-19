@@ -11,7 +11,10 @@ import { withRehydratation, loadAndPersist } from './persist';
 import enhanceWithBrowserSize from './mobile';
 import applyMiddlewares from './middlewares';
 import { BREAK_MEDIUM } from './constants';
-import { getEditedPostTitle } from './selectors';
+import {
+	getEditedPostContent,
+	getEditedPostTitle,
+} from './selectors';
 
 /**
  * Module Constants
@@ -25,6 +28,9 @@ const store = applyMiddlewares(
 loadAndPersist( store, reducer, 'preferences', STORAGE_KEY );
 enhanceWithBrowserSize( store, BREAK_MEDIUM );
 
-registerSelectors( MODULE_KEY, { getEditedPostTitle } );
+registerSelectors( MODULE_KEY, {
+	getEditedPostContent,
+	getEditedPostTitle,
+} );
 
 export default store;
