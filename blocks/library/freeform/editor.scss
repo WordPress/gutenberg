@@ -162,7 +162,7 @@
 	color: $dark-gray-500;
 	cursor: pointer;
 	position: relative;
-	width: $icon-button-size;
+	min-width: $icon-button-size;
 	height: $icon-button-size;
 
 	// Overwrite
