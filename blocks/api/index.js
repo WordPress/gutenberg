@@ -11,8 +11,6 @@ export { isValidBlock } from './validation';
 export {
 	getCategories,
 	registerCategory,
-	getSortedCategories,
-	setCategoryOrder,
 } from './categories';
 export {
 	registerBlockType,
