@@ -359,7 +359,7 @@ export class BlockListBlock extends Component {
 	}
 
 	/*
-	 * Reorder via Drag & Drop. Step 1.
+	 * Reorder via Drag & Drop. Step 1 of 4.
 	 * Strategy: Clone the current block, style it, and spawn over original block.
 	 */
 	onDragStart( event ) {
@@ -372,14 +372,14 @@ export class BlockListBlock extends Component {
 		const blockTopOffset = parseInt( blockRect.top, 10 );
 		const blockLeftOffset = parseInt( blockRect.left, 10 );
 
-		const showInset = ( block, dragInset ) => {
+		const showInset = () => {
 			return () => {
 				// block.classList.add( 'is-hidden' );
 				// dragInset.classList.add( 'is-visible' );
 				this.setState( { dragging: true } );
 				document.body.classList.add( 'dragging' );
-			}
-		}
+			};
+		};
 
 		event.dataTransfer.setData(
 			'text',
@@ -416,7 +416,7 @@ export class BlockListBlock extends Component {
 	}
 
 	/*
-	 * Reorder via Drag & Drop. Step 2.
+	 * Reorder via Drag & Drop. Step 2 of 4.
 	 * Strategy: Update positioning of block clone based on mouse movement.
 	 */
 	onDragOver( event ) {
@@ -434,23 +434,23 @@ export class BlockListBlock extends Component {
 	}
 
 	/*
-	 * Reorder via Drag & Drop. Step 3.
+	 * Reorder via Drag & Drop. Step 3 of 4.
 	 * Strategy: Remove inset and block clone.
 	 */
-	onDragEnd( event ) {
+	onDragEnd() {
 		const block = document.getElementById( `block-${ this.props.uid }` );
 		const dragInset = document.getElementById( `block-drag-inset-${ this.props.uid }` );
 		const blockList = block.parentNode;
 		const cloneWrapper = document.getElementById( `clone-wrapper-${ block.id }` );
 
-		const resetBlockDisplay = ( block, dragInset ) => {
+		const resetBlockDisplay = () => {
 			return () => {
 				//block.classList.remove( 'is-hidden' );
 				//dragInset.classList.remove( 'is-visible' );
 				this.setState( { dragging: false } );
 				document.body.classList.remove( 'dragging' );
 			};
-		}
+		};
 
 		blockList.removeChild( cloneWrapper );
 		setTimeout( resetBlockDisplay( block, dragInset ), 0 );
@@ -459,7 +459,7 @@ export class BlockListBlock extends Component {
 	}
 
 	/*
-	 * Reorder via Drag & Drop. Step 4.
+	 * Reorder via Drag & Drop. Step 4 of 4.
 	 * Strategy: Initiate reordering.
 	 */
 	reorderBlock( uid, toIndex ) {
@@ -488,7 +488,7 @@ export class BlockListBlock extends Component {
 			'is-hidden': dragging,
 		} );
 		const blockDragInsetClassName = classnames( 'editor-block-list__block-drag-inset', {
-			'is-visible': dragging
+			'is-visible': dragging,
 		} );
 
 		const { onMouseLeave, onFocus, onReplace } = this.props;

@@ -68,7 +68,7 @@ class Dropdown extends Component {
 			className,
 			contentClassName,
 			expandOnMobile,
-			...additionalProps,
+			...additionalProps
 		} = this.props;
 		const args = { isOpen, onToggle: this.toggle, onClose: this.close };
 		return (
