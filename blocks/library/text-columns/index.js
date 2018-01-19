@@ -13,14 +13,15 @@ import { __ } from '@wordpress/i18n';
  */
 import './style.scss';
 import './editor.scss';
-import { registerBlockType } from '../../api';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import RangeControl from '../../inspector-controls/range-control';
 import Editable from '../../editable';
 import InspectorControls from '../../inspector-controls';
 
-export const registerTextColumnsBlock = () => registerBlockType( 'core/text-columns', {
+export const name = 'core/text-columns';
+
+export const settings = {
 	title: __( 'Text Columns' ),
 
 	description: __( 'Add text across columns. This block is experimental' ),
@@ -118,4 +119,4 @@ export const registerTextColumnsBlock = () => registerBlockType( 'core/text-colu
 			</div>
 		);
 	},
-} );
+};

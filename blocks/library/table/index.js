@@ -8,12 +8,13 @@ import { __ } from '@wordpress/i18n';
  */
 import './editor.scss';
 import './style.scss';
-import { registerBlockType } from '../../api';
 import TableBlock from './table-block';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
-export const registerTableBlock = () => registerBlockType( 'core/table', {
+export const name = 'core/table';
+
+export const settings = {
 	title: __( 'Table' ),
 	description: __( 'Tables. Best used for tabular data.' ),
 	icon: 'editor-table',
@@ -85,4 +86,4 @@ export const registerTableBlock = () => registerBlockType( 'core/table', {
 			</table>
 		);
 	},
-} );
+};

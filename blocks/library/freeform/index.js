@@ -7,33 +7,30 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './editor.scss';
-import { registerBlockType, setUnknownTypeHandlerName } from '../../api';
 import OldEditor from './old-editor';
 
-export const registerFreeformBlock = () => {
-	registerBlockType( 'core/freeform', {
-		title: __( 'Classic' ),
+export const name = 'core/freeform';
 
-		desription: __( 'The classic editor, in block form.' ),
+export const settings = {
+	title: __( 'Classic' ),
 
-		icon: 'editor-kitchensink',
+	desription: __( 'The classic editor, in block form.' ),
 
-		category: 'formatting',
+	icon: 'editor-kitchensink',
 
-		attributes: {
-			content: {
-				type: 'string',
-				source: 'html',
-			},
+	category: 'formatting',
+
+	attributes: {
+		content: {
+			type: 'string',
+			source: 'html',
 		},
+	},
 
-		edit: OldEditor,
+	edit: OldEditor,
 
-		save( { attributes } ) {
-			const { content } = attributes;
-			return content;
-		},
-	} );
-
-	setUnknownTypeHandlerName( 'core/freeform' );
+	save( { attributes } ) {
+		const { content } = attributes;
+		return content;
+	},
 };

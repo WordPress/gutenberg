@@ -7,9 +7,11 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, createBlock } from '../../api';
+import { createBlock } from '../../api';
 
-export const registerSeparatorBlock = () => registerBlockType( 'core/separator', {
+export const name = 'core/separator';
+
+export const settings = {
 	title: __( 'Separator' ),
 
 	description: __( 'Use the separator to indicate a thematic change in the content.' ),
@@ -42,4 +44,4 @@ export const registerSeparatorBlock = () => registerBlockType( 'core/separator',
 	save() {
 		return <hr />;
 	},
-} );
+};

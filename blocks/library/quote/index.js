@@ -15,7 +15,7 @@ import { Toolbar } from '@wordpress/components';
  */
 import './style.scss';
 import './editor.scss';
-import { registerBlockType, createBlock } from '../../api';
+import { createBlock } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
 import Editable from '../../editable';
@@ -51,7 +51,9 @@ const blockAttributes = {
 	},
 };
 
-export const registerQuoteBlock = () => registerBlockType( 'core/quote', {
+export const name = 'core/quote';
+
+export const settings = {
 	title: __( 'Quote' ),
 	description: __( 'Quote. In quoting others, we cite ourselves. (Julio Cortázar)' ),
 	icon: 'format-quote',
@@ -270,4 +272,4 @@ export const registerQuoteBlock = () => registerBlockType( 'core/quote', {
 			},
 		},
 	],
-} );
+};

@@ -13,11 +13,13 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './editor.scss';
-import { registerBlockType, createBlock } from '../../api';
+import { createBlock } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 
-export const registerListBlock = () => registerBlockType( 'core/list', {
+export const name = 'core/list';
+
+export const settings = {
 	title: __( 'List' ),
 	description: __( 'List. Numbered or bulleted.' ),
 	icon: 'editor-ul',
@@ -212,10 +214,10 @@ export const registerListBlock = () => registerBlockType( 'core/list', {
 			};
 		}
 
-		getEditorSettings( settings ) {
+		getEditorSettings( editorSettings ) {
 			return {
-				...settings,
-				plugins: ( settings.plugins || [] ).concat( 'lists' ),
+				...editorSettings,
+				plugins: ( editorSettings.plugins || [] ).concat( 'lists' ),
 				lists_indent_on_tab: false,
 			};
 		}
@@ -313,4 +315,4 @@ export const registerListBlock = () => registerBlockType( 'core/list', {
 			values
 		);
 	},
-} );
+};

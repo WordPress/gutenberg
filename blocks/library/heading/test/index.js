@@ -1,16 +1,12 @@
 /**
  * Internal dependencies
  */
-import { registerHeadingBlock } from '../';
+import { name, settings } from '../';
 import { blockEditRender } from 'blocks/test/helpers';
 
 describe( 'core/heading', () => {
-	beforeAll( () => {
-		registerHeadingBlock();
-	} );
-
 	test( 'block edit matches snapshot', () => {
-		const wrapper = blockEditRender( 'core/heading' );
+		const wrapper = blockEditRender( name, settings );
 
 		expect( wrapper ).toMatchSnapshot();
 	} );

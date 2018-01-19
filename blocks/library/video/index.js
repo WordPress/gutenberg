@@ -14,13 +14,14 @@ import { Component } from '@wordpress/element';
  */
 import './style.scss';
 import './editor.scss';
-import { registerBlockType } from '../../api';
 import MediaUpload from '../../media-upload';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
-export const registerVideoBlock = () => registerBlockType( 'core/video', {
+export const name = 'core/video';
+
+export const settings = {
 	title: __( 'Video' ),
 
 	description: __( 'The Video block allows you to embed video files and play them back using a simple player.' ),
@@ -180,4 +181,4 @@ export const registerVideoBlock = () => registerBlockType( 'core/video', {
 			</figure>
 		);
 	},
-} );
+};

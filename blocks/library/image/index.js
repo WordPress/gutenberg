@@ -9,10 +9,12 @@ import { createMediaFromFile, preloadImage } from '@wordpress/utils';
  */
 import './style.scss';
 import './editor.scss';
-import { registerBlockType, createBlock, getBlockAttributes, getBlockType } from '../../api';
+import { createBlock, getBlockAttributes, getBlockType } from '../../api';
 import ImageBlock from './block';
 
-export const registerImageBlock = () => registerBlockType( 'core/image', {
+export const name = 'core/image';
+
+export const settings = {
 	title: __( 'Image' ),
 
 	description: __( 'Worth a thousand words.' ),
@@ -179,4 +181,4 @@ export const registerImageBlock = () => registerBlockType( 'core/image', {
 			</figure>
 		);
 	},
-} );
+};

@@ -10,7 +10,6 @@ import { Dashicon, IconButton, PanelColor, withFallbackStyles } from '@wordpress
  */
 import './editor.scss';
 import './style.scss';
-import { registerBlockType } from '../../api';
 import Editable from '../../editable';
 import UrlInput from '../../url-input';
 import BlockControls from '../../block-controls';
@@ -173,7 +172,9 @@ const blockAttributes = {
 	},
 };
 
-export const registerButtonBlock = () => registerBlockType( 'core/button', {
+export const name = 'core/button';
+
+export const settings = {
 	title: __( 'Button' ),
 
 	description: __( 'A nice little button. Call something out with it.' ),
@@ -235,4 +236,4 @@ export const registerButtonBlock = () => registerBlockType( 'core/button', {
 			);
 		},
 	} ],
-} );
+};

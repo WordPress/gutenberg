@@ -14,7 +14,7 @@ import { createMediaFromFile, preloadImage } from '@wordpress/utils';
  */
 import './editor.scss';
 import './style.scss';
-import { registerBlockType, createBlock } from '../../api';
+import { createBlock } from '../../api';
 import { default as GalleryBlock, defaultColumnsNumber } from './block';
 
 const blockAttributes = {
@@ -56,7 +56,9 @@ const blockAttributes = {
 	},
 };
 
-export const registerGalleryBlock = () => registerBlockType( 'core/gallery', {
+export const name = 'core/gallery';
+
+export const settings = {
 	title: __( 'Gallery' ),
 	description: __( 'Image galleries are a great way to share groups of pictures on your site.' ),
 	icon: 'format-gallery',
@@ -228,5 +230,4 @@ export const registerGalleryBlock = () => registerBlockType( 'core/gallery', {
 			},
 		},
 	],
-
-} );
+};

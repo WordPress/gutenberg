@@ -1,66 +1,71 @@
 /**
  * Internal dependencies
  */
+import {
+	registerBlockType,
+	setDefaultBlockName,
+	setUnknownTypeHandlerName,
+} from '../api';
 import * as audio from './audio';
+import * as button from './button';
+import * as categories from './categories';
+import * as code from './code';
+import * as coverImage from './cover-image';
 import * as embed from './embed';
+import * as freeform from './freeform';
+import * as gallery from './gallery';
+import * as heading from './heading';
+import * as html from './html';
+import * as image from './image';
+import * as latestPosts from './latest-posts';
+import * as list from './list';
+import * as more from './more';
 import * as paragraph from './paragraph';
-import { registerBlockType, setDefaultBlockName } from '../api';
-import { registerShortcodeBlock } from './shortcode';
-import { registerImageBlock } from './image';
-import { registerGalleryBlock } from './gallery';
-import { registerHeadingBlock } from './heading';
-import { registerQuoteBlock } from './quote';
-import { registerListBlock } from './list';
-import { registerSeparatorBlock } from './separator';
-import { registerMoreBlock } from './more';
-import { registerButtonBlock } from './button';
-import { registerPullquoteBlock } from './pullquote';
-import { registerTableBlock } from './table';
-import { registerPreformattedBlock } from './preformatted';
-import { registerCodeBlock } from './code';
-import { registerHtmlBlock } from './html';
-import { registerFreeformBlock } from './freeform';
-import { registerLatestPostsBlock } from './latest-posts';
-import { registerCategoriesBlock } from './categories';
-import { registerCoverImageBlock } from './cover-image';
-import { registerTextColumnsBlock } from './text-columns';
-import { registerVerseBlock } from './verse';
-import { registerVideoBlock } from './video';
-import { registerReusableBlock } from './block';
+import * as preformatted from './preformatted';
+import * as pullquote from './pullquote';
+import * as quote from './quote';
+import * as reusableBlock from './block';
+import * as separator from './separator';
+import * as shortcode from './shortcode';
 import './subhead';
+import * as table from './table';
+import * as textColumns from './text-columns';
+import * as verse from './verse';
+import * as video from './video';
 
 export const registerCoreBlocks = () => {
 	[
 		audio,
+		button,
+		categories,
+		code,
+		coverImage,
 		embed,
 		...embed.common,
 		...embed.others,
+		freeform,
+		gallery,
+		heading,
+		html,
+		image,
+		list,
+		latestPosts,
+		more,
 		paragraph,
+		preformatted,
+		pullquote,
+		quote,
+		reusableBlock,
+		separator,
+		shortcode,
+		table,
+		textColumns,
+		verse,
+		video,
 	].forEach( ( { name, settings } ) => {
 		registerBlockType( name, settings );
 	} );
-	registerShortcodeBlock();
-	registerImageBlock();
-	registerGalleryBlock();
-	registerHeadingBlock();
-	registerQuoteBlock();
-	registerListBlock();
-	registerSeparatorBlock();
-	registerMoreBlock();
-	registerButtonBlock();
-	registerPullquoteBlock();
-	registerTableBlock();
-	registerPreformattedBlock();
-	registerCodeBlock();
-	registerHtmlBlock();
-	registerFreeformBlock();
-	registerLatestPostsBlock();
-	registerCategoriesBlock();
-	registerCoverImageBlock();
-	registerTextColumnsBlock();
-	registerVerseBlock();
-	registerVideoBlock();
-	registerReusableBlock();
 
 	setDefaultBlockName( paragraph.name );
+	setUnknownTypeHandlerName( freeform.name );
 };

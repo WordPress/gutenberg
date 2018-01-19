@@ -1,16 +1,12 @@
 /**
  * Internal dependencies
  */
-import { registerQuoteBlock } from '../';
+import { name, settings } from '../';
 import { blockEditRender } from 'blocks/test/helpers';
 
 describe( 'core/quote', () => {
-	beforeAll( () => {
-		registerQuoteBlock();
-	} );
-
 	test( 'block edit matches snapshot', () => {
-		const wrapper = blockEditRender( 'core/quote' );
+		const wrapper = blockEditRender( name, settings );
 
 		expect( wrapper ).toMatchSnapshot();
 	} );

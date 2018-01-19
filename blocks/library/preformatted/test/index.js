@@ -1,16 +1,12 @@
 /**
  * Internal dependencies
  */
-import { registerPreformattedBlock } from '../';
+import { name, settings } from '../';
 import { blockEditRender } from 'blocks/test/helpers';
 
 describe( 'core/preformatted', () => {
-	beforeAll( () => {
-		registerPreformattedBlock();
-	} );
-
 	test( 'block edit matches snapshot', () => {
-		const wrapper = blockEditRender( 'core/preformatted' );
+		const wrapper = blockEditRender( name, settings );
 
 		expect( wrapper ).toMatchSnapshot();
 	} );

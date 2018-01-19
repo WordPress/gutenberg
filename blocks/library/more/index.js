@@ -7,11 +7,12 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './editor.scss';
-import { registerBlockType } from '../../api';
 import InspectorControls from '../../inspector-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
 
-export const registerMoreBlock = () => registerBlockType( 'core/more', {
+export const name = 'core/more';
+
+export const settings = {
 	title: __( 'More' ),
 
 	description: __( '"More" allows you to break your post into a part shown on index pages, and the subsequent after clicking a "Read More" link.' ),
@@ -71,4 +72,4 @@ export const registerMoreBlock = () => registerBlockType( 'core/more', {
 	save() {
 		return null;
 	},
-} );
+};
