@@ -23,7 +23,7 @@ echo -e $(status_message "Stopping Docker containers...")
 docker-compose down --remove-orphans >/dev/null 2>&1
 
 # Download image updates
-echo -e $(status_message "Downlading Docker image updates...")
+echo -e $(status_message "Downloading Docker image updates...")
 docker-compose pull --parallel
 
 # Launch the containers
