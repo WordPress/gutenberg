@@ -268,7 +268,7 @@ export default class RichText extends Component {
 			if ( isEmpty && this.props.onReplace ) {
 				// Necessary to allow the paste bin to be removed without errors.
 				setTimeout( () => this.props.onReplace( content ) );
-			} else {
+			} else if ( this.props.onSplit ) {
 				// Necessary to get the right range.
 				// Also done in the TinyMCE paste plugin.
 				setTimeout( () => this.splitContent( content ) );
