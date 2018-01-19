@@ -14,7 +14,7 @@ import withLazyDependencies from '../higher-order/with-lazy-dependencies';
  */
 const { UP, DOWN } = keycodes;
 
-class CodeEditor extends Component {
+export class CodeEditor extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -108,14 +108,22 @@ class CodeEditor extends Component {
 }
 
 export default withLazyDependencies( {
-	scripts: [
-		'wp-codemirror',
-		'code-editor',
-		'htmlhint',
-		'csslint',
-		'jshint',
-		// TODO: Gotta check if user can unfiltered_html
-		...( true ? [ 'htmlhint-kses' ] : [] ),
-	],
+	scripts() {
+		const scripts = [
+			'wp-codemirror',
+			'code-editor',
+			'htmlhint',
+			'csslint',
+			'jshint',
+		];
+
+		// Don't load htmlhint-kses unless we need it
+		if ( window._wpGutenbergCodeEditorSettings.htmlhint.kses ) {
+			scripts.push( 'htmlhint-kses' );
+		}
+
+		return scripts;
+	},
+
 	styles: [ 'wp-codemirror', 'code-editor' ],
 } )( CodeEditor );

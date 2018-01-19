@@ -54,6 +54,14 @@ function loadStyle( url ) {
 }
 
 function loadDependencies( scripts, styles ) {
+	if ( typeof scripts === 'function' ) {
+		scripts = scripts();
+	}
+
+	if ( typeof styles === 'function' ) {
+		styles = styles();
+	}
+
 	const promises = [];
 
 	if ( scripts && scripts.length > 0 ) {
