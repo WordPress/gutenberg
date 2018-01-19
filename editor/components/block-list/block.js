@@ -113,6 +113,7 @@ export class BlockListBlock extends Component {
 		this.onClick = this.onClick.bind( this );
 		this.onDragStart = this.onDragStart.bind( this );
 		this.onDragEnd = this.onDragEnd.bind( this );
+		this.onDragOver = this.onDragOver.bind( this );
 
 		this.previousOffset = null;
 		this.hadTouchStart = false;
@@ -121,6 +122,9 @@ export class BlockListBlock extends Component {
 			error: null,
 			dragging: false,
 		};
+
+		this.cursorLeft = 0;
+		this.cursorTop = 0;
 	}
 
 	componentDidMount() {
@@ -354,24 +358,31 @@ export class BlockListBlock extends Component {
 		this.setState( { error } );
 	}
 
+	/*
+	 * Reorder via Drag & Drop. Step 1.
+	 * Strategy: Clone the current block, style it, and spawn over original block.
+	 */
 	onDragStart( event ) {
+
+		console.log( 123 );
+
 		const dragInset = document.getElementById( `block-drag-inset-${ this.props.uid }` );
 		const block = document.getElementById( `block-${ this.props.uid }` );
+		const blockList = block.parentNode;
+		const cloneWrapper = document.createElement( 'div' );
+		const clone = block.cloneNode( true );
+		const blockRect = block.getBoundingClientRect();
+		const blockTopOffset = parseInt( blockRect.top, 10 );
+		const blockLeftOffset = parseInt( blockRect.left, 10 );
 
-		// Closure to remove the cloned node from the DOM (fired within timeout below)
-		const removeBlockClone = ( blockList, cloneWrapper ) => {
+		const showInset = ( block, dragInset ) => {
 			return () => {
-				blockList.removeChild( cloneWrapper );
-			};
-		};
-
-		// Closure to hide the visible block and show inset in its place (fired within timeout below)
-		const showInset = () => {
-			return () => {
+				// block.classList.add( 'is-hidden' );
+				// dragInset.classList.add( 'is-visible' );
 				this.setState( { dragging: true } );
 				document.body.classList.add( 'dragging' );
-			};
-		};
+			}
+		}
 
 		event.dataTransfer.setData(
 			'text',
@@ -382,66 +393,84 @@ export class BlockListBlock extends Component {
 			} )
 		);
 
-		if ( 'function' === typeof event.dataTransfer.setDragImage ) {
-			const blockList = block.parentNode;
-			const cloneWrapper = document.createElement( 'div' );
-			const clone = block.cloneNode( true );
-			const blockRect = block.getBoundingClientRect();
-    		const blockTopOffset = parseInt( blockRect.top, 10 );
-    		const blockLeftOffset = parseInt( blockRect.left, 10 );
+		clone.id = `clone-${ block.id }`;
+		cloneWrapper.id = `clone-wrapper-${ block.id }`;
 
-			// 1. Clone the current block, style it, and spawn over original block.
+		cloneWrapper.classList.add( 'editor-block-list__block-clone' );
+		// 40px padding for the shadow.
+		cloneWrapper.style.width = `${ blockRect.width + 40 }px`;
+		// Position clone right over the original block.
+		// 20px padding for the shadow.
+		cloneWrapper.style.top = `${ blockTopOffset - 20 }px`;
+		cloneWrapper.style.left = `${ blockLeftOffset - 20 }px`;
 
-			clone.id = `clone-${ block.id }`;
+		cloneWrapper.appendChild( clone );
+		blockList.appendChild( cloneWrapper );
 
-			cloneWrapper.classList.add( 'editor-block-list__block-clone' );
-			// 40px padding for the shadow.
-			cloneWrapper.style.width = `${ parseInt( blockRect.width, 10 ) + 40 }px`;
-			// Position clone right over the original block.
-			// 20px padding for the shadow.
-			cloneWrapper.style.top = `${ blockTopOffset - 20 }px`;
-			cloneWrapper.style.left = `${ blockLeftOffset - 20 }px`;
-
-			cloneWrapper.appendChild( clone );
-			blockList.appendChild( cloneWrapper );
-
-			// 2. Set clone as drag image and remove from DOM:
-
-			// Display the drag image right over the block:
-			//   - Coordinates relative to the block and the cursor/
-			//   - Optimisation: if top ends of the block are outside the viewport,
-			//     then revert to top 0 (relative to cursor).
-			const top = blockTopOffset > 0 ?
-				parseInt( event.clientY, 10 ) - blockTopOffset + 20 :
-				parseInt( event.clientY, 10 ) + 20;
-
-			event.dataTransfer.setDragImage(
-				cloneWrapper,
-				parseInt( event.clientX, 10 ) - blockLeftOffset + 20,
-				top
-			);
-
-			setTimeout( removeBlockClone( blockList, cloneWrapper ), 0 );
-		}
+		// Mark the current cursor coordinates.
+		// - cause Mozilla is ahead of this game: https://bugzilla.mozilla.org/show_bug.cgi?id=505521
+		this.cursorLeft = event.clientX;
+		this.cursorTop = event.clientY;
 
 		// Hide the visible block and show inset in its place.
-		setTimeout( showInset(), 0 );
+		setTimeout( showInset( block, dragInset ), 0 );
+
+		document.addEventListener( 'dragover', this.onDragOver );
 	}
 
-	onDragEnd() {
+	/*
+	 * Reorder via Drag & Drop. Step 2.
+	 * Strategy: Update positioning of block clone based on mouse movement.
+	 */
+	onDragOver( event ) {
+
+		console.log( 234 );
+
+		const block = document.getElementById( `block-${ this.props.uid }` );
+		const cloneWrapper = document.getElementById( `clone-wrapper-${ block.id }` );
+
+		cloneWrapper.style.top =
+			`${ parseInt( cloneWrapper.style.top, 10 ) + parseInt( event.clientY, 10 ) - parseInt( this.cursorTop, 10 ) }px`;
+		cloneWrapper.style.left =
+			`${ parseInt( cloneWrapper.style.left, 10 ) + parseInt( event.clientX, 10 ) - parseInt( this.cursorLeft, 10 ) }px`;
+
+		// Update cursor coordinates.
+		this.cursorLeft = event.clientX;
+		this.cursorTop = event.clientY;
+	}
+
+	/*
+	 * Reorder via Drag & Drop. Step 3.
+	 * Strategy: Remove inset and block clone.
+	 */
+	onDragEnd( event ) {
+
+		console.log( 345 );
+
 		const block = document.getElementById( `block-${ this.props.uid }` );
 		const dragInset = document.getElementById( `block-drag-inset-${ this.props.uid }` );
+		const blockList = block.parentNode;
+		const cloneWrapper = document.getElementById( `clone-wrapper-${ block.id }` );
 
-		const resetBlockDisplay = () => {
+		const resetBlockDisplay = ( block, dragInset ) => {
 			return () => {
+				//block.classList.remove( 'is-hidden' );
+				//dragInset.classList.remove( 'is-visible' );
 				this.setState( { dragging: false } );
 				document.body.classList.remove( 'dragging' );
 			};
 		}
 
-		setTimeout( resetBlockDisplay(), 0 );
+		blockList.removeChild( cloneWrapper );
+		setTimeout( resetBlockDisplay( block, dragInset ), 0 );
+
+		document.removeEventListener( 'dragover', this.onDragOver );
 	}
 
+	/*
+	 * Reorder via Drag & Drop. Step 4.
+	 * Strategy: Initiate reordering.
+	 */
 	reorderBlock( uid, toIndex ) {
 		this.props.moveBlockToIndex( uid, toIndex );
 	}

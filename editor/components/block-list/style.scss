@@ -6,7 +6,7 @@
 
 	.editor-block-list__block-drag-inset > .inner {
 		visibility: visible;
-		background-color: white !important;
+		background: white !important;
 		box-shadow: $shadow-popover;
 	}
 }
@@ -34,7 +34,7 @@
 	}
 
 	&.is-visible > .inner {
-		visibility: visible !important;
+		visibility: visible;
 		z-index: z-index( '.editor-block-list__block-drag-inset.is-visible > .inner' );
 	}
 
