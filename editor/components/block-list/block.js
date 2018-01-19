@@ -363,9 +363,6 @@ export class BlockListBlock extends Component {
 	 * Strategy: Clone the current block, style it, and spawn over original block.
 	 */
 	onDragStart( event ) {
-
-		console.log( 123 );
-
 		const dragInset = document.getElementById( `block-drag-inset-${ this.props.uid }` );
 		const block = document.getElementById( `block-${ this.props.uid }` );
 		const blockList = block.parentNode;
@@ -423,9 +420,6 @@ export class BlockListBlock extends Component {
 	 * Strategy: Update positioning of block clone based on mouse movement.
 	 */
 	onDragOver( event ) {
-
-		console.log( 234 );
-
 		const block = document.getElementById( `block-${ this.props.uid }` );
 		const cloneWrapper = document.getElementById( `clone-wrapper-${ block.id }` );
 
@@ -444,9 +438,6 @@ export class BlockListBlock extends Component {
 	 * Strategy: Remove inset and block clone.
 	 */
 	onDragEnd( event ) {
-
-		console.log( 345 );
-
 		const block = document.getElementById( `block-${ this.props.uid }` );
 		const dragInset = document.getElementById( `block-drag-inset-${ this.props.uid }` );
 		const blockList = block.parentNode;

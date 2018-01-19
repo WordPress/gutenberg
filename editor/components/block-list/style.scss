@@ -3,6 +3,7 @@
 	padding: 20px;
 	background: transparent;
 	pointer-events: none;
+	z-index: z-index( '.editor-block-list__block-clone' );
 
 	.editor-block-list__block-drag-inset > .inner {
 		visibility: visible;
