@@ -149,6 +149,9 @@ export function getAttributesFromDeprecatedVersion( blockType, innerHTML, attrib
 		};
 
 		try {
+			// Parse using the deprecated block version .
+			// Try to validate the parsed block using this same deprecated version.
+			// Ignore this version if the the validation fails.
 			const deprecatedBlockAttributes = getBlockAttributes( deprecatedBlockType, innerHTML, attributes );
 			const migratedBlockAttributes = deprecatedBlockType.migrate ? deprecatedBlockType.migrate( deprecatedBlockAttributes ) : deprecatedBlockAttributes;
 			const isValid = isValidBlock( innerHTML, deprecatedBlockType, deprecatedBlockAttributes );
