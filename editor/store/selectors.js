@@ -18,7 +18,7 @@ import createSelector from 'rememo';
 /**
  * WordPress dependencies
  */
-import { serialize, getBlockType } from '@wordpress/blocks';
+import { serialize, getBlockType, getBlockTypes } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -31,9 +31,9 @@ const MAX_FREQUENT_BLOCKS = 3;
 /**
  * Returns the current editing mode.
  *
- * @param  {Object} state Global application state
+ * @param {Object} state Global application state.
  *
- * @returns {String} Editing mode.
+ * @returns {string} Editing mode.
  */
 export function getEditorMode( state ) {
 	return getPreference( state, 'mode', 'visual' );
@@ -42,7 +42,7 @@ export function getEditorMode( state ) {
 /**
  * Returns the state of legacy meta boxes.
  *
- * @param  {Object}  state Global application state
+ * @param {Object} state Global application state.
  *
  * @returns {Object} State of meta boxes.
  */
@@ -53,8 +53,8 @@ export function getMetaBoxes( state ) {
 /**
  * Returns the state of legacy meta boxes.
  *
- * @param  {Object} state    Global application state
- * @param  {String} location Location of the meta box.
+ * @param {Object} state    Global application state.
+ * @param {string} location Location of the meta box.
  *
  * @returns {Object} State of meta box at specified location.
  */
@@ -65,7 +65,7 @@ export function getMetaBox( state, location ) {
 /**
  * Returns a list of dirty meta box locations.
  *
- * @param  {Object} state Global application state
+ * @param {Object} state Global application state.
  *
  * @returns {Array} Array of locations for dirty meta boxes.
  */
@@ -86,27 +86,27 @@ export const getDirtyMetaBoxes = createSelector(
  * Checks whether the entire meta box state is dirty. So if a sidebar is dirty,
  * but a normal area is not dirty, this will overall return dirty.
  *
- * @param  {Object}  state Global application state
+ * @param {Object} state Global application state.
  *
- * @returns {Boolean} Whether state is dirty. True if dirty, false if not.
+ * @returns {boolean} Whether state is dirty. True if dirty, false if not.
  */
 export const isMetaBoxStateDirty = ( state ) => getDirtyMetaBoxes( state ).length > 0;
 
 /**
  * Returns the current active panel for the sidebar.
  *
- * @param  {Object}  state Global application state
+ * @param {Object} state Global application state.
  *
- * @returns {String} Active sidebar panel.
+ * @returns {string} Active sidebar panel.
  */
 export function getActivePanel( state ) {
 	return state.panel;
 }
 
 /**
- * Returns the preferences (these preferences are persisted locally)
+ * Returns the preferences (these preferences are persisted locally).
  *
- * @param  {Object}  state Global application state
+ * @param {Object} state Global application state.
  *
  * @returns {Object} Preferences Object.
  */
@@ -116,9 +116,9 @@ export function getPreferences( state ) {
 
 /**
  *
- * @param  {Object}  state          Global application state
- * @param  {String}  preferenceKey  Preference Key
- * @param  {Mixed}   defaultValue   Default Value
+ * @param {Object} state         Global application state.
+ * @param {string} preferenceKey Preference Key.
+ * @param {Mixed}  defaultValue  Default Value.
  *
  * @returns {Mixed} Preference Value.
  */
@@ -131,10 +131,10 @@ export function getPreference( state, preferenceKey, defaultValue ) {
 /**
  * Returns true if the sidebar is open, or false otherwise.
  *
- * @param  {Object}  state   Global application state
- * @param  {string}  sidebar Sidebar name (leave undefined for the default sidebar)
+ * @param {Object} state   Global application state.
+ * @param {string} sidebar Sidebar name (leave undefined for the default sidebar).
  *
- * @returns {Boolean} Whether the given sidebar is open.
+ * @returns {boolean} Whether the given sidebar is open.
  */
 export function isSidebarOpened( state, sidebar ) {
 	const sidebars = getPreference( state, 'sidebars' );
@@ -146,11 +146,11 @@ export function isSidebarOpened( state, sidebar ) {
 }
 
 /**
- * Returns true if there's any open sidebar (mobile, desktop or publish)
+ * Returns true if there's any open sidebar (mobile, desktop or publish).
  *
- * @param  {Object}  state Global application state
+ * @param {Object} state Global application state.
  *
- * @returns {Boolean} Whether sidebar is open.
+ * @returns {boolean} Whether sidebar is open.
  */
 export function hasOpenSidebar( state ) {
 	const sidebars = getPreference( state, 'sidebars' );
@@ -162,10 +162,10 @@ export function hasOpenSidebar( state ) {
 /**
  * Returns true if the editor sidebar panel is open, or false otherwise.
  *
- * @param  {Object}  state Global application state
- * @param  {STring}  panel Sidebar panel name
+ * @param {Object} state Global application state.
+ * @param {string} panel Sidebar panel name.
  *
- * @returns {Boolean} Whether sidebar is open.
+ * @returns {boolean} Whether sidebar is open.
  */
 export function isEditorSidebarPanelOpened( state, panel ) {
 	const panels = getPreference( state, 'panels' );
@@ -175,9 +175,9 @@ export function isEditorSidebarPanelOpened( state, panel ) {
 /**
  * Returns true if any past editor history snapshots exist, or false otherwise.
  *
- * @param  {Object}  state Global application state
+ * @param {Object} state Global application state.
  *
- * @returns {Boolean} Whether undo history exists.
+ * @returns {boolean} Whether undo history exists.
  */
 export function hasEditorUndo( state ) {
 	return state.editor.past.length > 0;
@@ -187,9 +187,9 @@ export function hasEditorUndo( state ) {
  * Returns true if any future editor history snapshots exist, or false
  * otherwise.
  *
- * @param  {Object}  state Global application state
+ * @param {Object} state Global application state.
  *
- * @returns {Boolean} Whether redo history exists.
+ * @returns {boolean} Whether redo history exists.
  */
 export function hasEditorRedo( state ) {
 	return state.editor.future.length > 0;
@@ -199,9 +199,9 @@ export function hasEditorRedo( state ) {
  * Returns true if the currently edited post is yet to be saved, or false if
  * the post has been saved.
  *
- * @param  {Object}  state Global application state
+ * @param {Object} state Global application state.
  *
- * @returns {Boolean} Whether the post is new.
+ * @returns {boolean} Whether the post is new.
  */
 export function isEditedPostNew( state ) {
 	return getCurrentPost( state ).status === 'auto-draft';
@@ -211,9 +211,9 @@ export function isEditedPostNew( state ) {
  * Returns true if there are unsaved values for the current edit session, or
  * false if the editing state matches the saved or new post.
  *
- * @param  {Object}  state Global application state
+ * @param {Object} state Global application state.
  *
- * @returns {Boolean} Whether unsaved values exist.
+ * @returns {boolean} Whether unsaved values exist.
  */
 export function isEditedPostDirty( state ) {
 	return state.editor.isDirty || isMetaBoxStateDirty( state );
@@ -223,20 +223,20 @@ export function isEditedPostDirty( state ) {
  * Returns true if there are no unsaved values for the current edit session and if
  * the currently edited post is new (and has never been saved before).
  *
- * @param  {Object}  state Global application state
+ * @param {Object} state Global application state.
  *
- * @returns {Boolean} Whether new post and unsaved values exist.
+ * @returns {boolean} Whether new post and unsaved values exist.
  */
 export function isCleanNewPost( state ) {
 	return ! isEditedPostDirty( state ) && isEditedPostNew( state );
 }
 
 /**
- * Returns true if the current window size corresponds to mobile resolutions (<= medium breakpoint)
+ * Returns true if the current window size corresponds to mobile resolutions (<= medium breakpoint).
  *
- * @param  {Object}  state Global application state
+ * @param {Object} state Global application state.
  *
- * @returns {Boolean} Whether current window size corresponds to
+ * @returns {boolean} Whether current window size corresponds to
  *                    mobile resolutions.
  */
 export function isMobile( state ) {
@@ -248,7 +248,7 @@ export function isMobile( state ) {
  * including unsaved edits. Returns an object containing relevant default post
  * values if the post has not yet been saved.
  *
- * @param  {Object} state Global application state
+ * @param {Object} state Global application state.
  *
  * @returns {Object} Post object.
  */
@@ -257,11 +257,11 @@ export function getCurrentPost( state ) {
 }
 
 /**
- * Returns the post type of the post currently being edited
+ * Returns the post type of the post currently being edited.
  *
- * @param  {Object} state Global application state
+ * @param {Object} state Global application state.
  *
- * @returns {String} Post type.
+ * @returns {string} Post type.
  */
 export function getCurrentPostType( state ) {
 	return state.currentPost.type;
@@ -271,7 +271,7 @@ export function getCurrentPostType( state ) {
  * Returns the ID of the post currently being edited, or null if the post has
  * not yet been saved.
  *
- * @param  {Object}  state Global application state
+ * @param {Object} state Global application state.
  *
  * @returns {?Number} ID of current post.
  */
@@ -282,9 +282,9 @@ export function getCurrentPostId( state ) {
 /**
  * Returns the number of revisions of the post currently being edited.
  *
- * @param  {Object}  state Global application state
+ * @param {Object} state Global application state.
  *
- * @returns {Number} Number of revisions.
+ * @returns {number} Number of revisions.
  */
 export function getCurrentPostRevisionsCount( state ) {
 	return get( getCurrentPost( state ), 'revisions.count', 0 );
@@ -294,7 +294,7 @@ export function getCurrentPostRevisionsCount( state ) {
  * Returns the last revision ID of the post currently being edited,
  * or null if the post has no revisions.
  *
- * @param  {Object}  state Global application state
+ * @param {Object} state Global application state.
  *
  * @returns {?Number} ID of the last revision.
  */
@@ -306,7 +306,7 @@ export function getCurrentPostLastRevisionId( state ) {
  * Returns any post values which have been changed in the editor but not yet
  * been saved.
  *
- * @param  {Object} state Global application state
+ * @param {Object} state Global application state.
  *
  * @returns {Object} Object of key value pairs comprising unsaved edits.
  */
@@ -319,8 +319,8 @@ export function getPostEdits( state ) {
  * edit if one exists, but falling back to the attribute for the last known
  * saved state of the post.
  *
- * @param  {Object} state         Global application state
- * @param  {String} attributeName Post attribute name
+ * @param {Object} state         Global application state.
+ * @param {string} attributeName Post attribute name.
  *
  * @returns {*} Post attribute value.
  */
@@ -335,9 +335,9 @@ export function getEditedPostAttribute( state, attributeName ) {
  * unsaved value if different than the saved post. The return value is one of
  * "private", "password", or "public".
  *
- * @param  {Object} state Global application state
+ * @param {Object} state Global application state.
  *
- * @returns {String} Post visibility.
+ * @returns {string} Post visibility.
  */
 export function getEditedPostVisibility( state ) {
 	const status = getEditedPostAttribute( state, 'status' );
@@ -354,9 +354,9 @@ export function getEditedPostVisibility( state ) {
 /**
  * Return true if the current post has already been published.
  *
- * @param  {Object}   state Global application state
+ * @param {Object} state Global application state.
  *
- * @returns {Boolean} Whether the post has been published.
+ * @returns {boolean} Whether the post has been published.
  */
 export function isCurrentPostPublished( state ) {
 	const post = getCurrentPost( state );
@@ -366,11 +366,11 @@ export function isCurrentPostPublished( state ) {
 }
 
 /**
- * Return true if the post being edited can be published
+ * Return true if the post being edited can be published.
  *
- * @param  {Object}   state Global application state
+ * @param {Object} state Global application state.
  *
- * @returns {Boolean} Whether the post can been published.
+ * @returns {boolean} Whether the post can been published.
  */
 export function isEditedPostPublishable( state ) {
 	const post = getCurrentPost( state );
@@ -381,9 +381,9 @@ export function isEditedPostPublishable( state ) {
  * Returns true if the post can be saved, or false otherwise. A post must
  * contain a title, an excerpt, or non-empty content to be valid for save.
  *
- * @param  {Object}  state Global application state
+ * @param {Object} state Global application state.
  *
- * @returns {Boolean} Whether the post can be saved.
+ * @returns {boolean} Whether the post can be saved.
  */
 export function isEditedPostSaveable( state ) {
 	return (
@@ -397,9 +397,9 @@ export function isEditedPostSaveable( state ) {
  * Return true if the post being edited is being scheduled. Preferring the
  * unsaved status values.
  *
- * @param  {Object}   state Global application state
+ * @param {Object} state Global application state.
  *
- * @returns {Boolean} Whether the post has been published.
+ * @returns {boolean} Whether the post has been published.
  */
 export function isEditedPostBeingScheduled( state ) {
 	const date = getEditedPostAttribute( state, 'date' );
@@ -413,9 +413,9 @@ export function isEditedPostBeingScheduled( state ) {
  * Returns the raw title of the post being edited, preferring the unsaved value
  * if different than the saved post.
  *
- * @param  {Object} state Global application state
+ * @param {Object} state Global application state.
  *
- * @returns {String} Raw post title.
+ * @returns {string} Raw post title.
  */
 export function getEditedPostTitle( state ) {
 	const editedTitle = getPostEdits( state ).title;
@@ -432,7 +432,7 @@ export function getEditedPostTitle( state ) {
 /**
  * Gets the document title to be used.
  *
- * @param  {Object}  state Global application state
+ * @param {Object} state Global application state.
  *
  * @returns {string} Document title.
  */
@@ -449,9 +449,9 @@ export function getDocumentTitle( state ) {
  * Returns the raw excerpt of the post being edited, preferring the unsaved
  * value if different than the saved post.
  *
- * @param  {Object} state Global application state
+ * @param {Object} state Global application state.
  *
- * @returns {String} Raw post excerpt.
+ * @returns {string} Raw post excerpt.
  */
 export function getEditedPostExcerpt( state ) {
 	return state.editor.present.edits.excerpt === undefined ?
@@ -462,9 +462,9 @@ export function getEditedPostExcerpt( state ) {
 /**
  * Returns a URL to preview the post being edited.
  *
- * @param  {Object} state Global application state
+ * @param {Object} state Global application state.
  *
- * @returns {String} Preview URL.
+ * @returns {string} Preview URL.
  */
 export function getEditedPostPreviewLink( state ) {
 	const link = state.currentPost.link;
@@ -481,8 +481,8 @@ export function getEditedPostPreviewLink( state ) {
  * state. This is not the block's registration settings, which must be
  * retrieved from the blocks module registration store.
  *
- * @param  {Object} state Global application state
- * @param  {String} uid   Block unique ID
+ * @param {Object} state Global application state.
+ * @param {string} uid   Block unique ID.
  *
  * @returns {Object} Parsed block object.
  */
@@ -536,7 +536,7 @@ function getPostMeta( state, key ) {
  * the order they appear in the post.
  * Note: It's important to memoize this selector to avoid return a new instance on each call
  *
- * @param  {Object}   state Global application state
+ * @param {Object} state Global application state.
  *
  * @returns {Object[]} Post blocks.
  */
@@ -553,9 +553,9 @@ export const getBlocks = createSelector(
 /**
  * Returns the number of blocks currently present in the post.
  *
- * @param  {Object} state Global application state
+ * @param {Object} state Global application state.
  *
- * @returns {Number} Number of blocks in the post.
+ * @returns {number} Number of blocks in the post.
  */
 export function getBlockCount( state ) {
 	return getBlockUids( state ).length;
@@ -564,9 +564,9 @@ export function getBlockCount( state ) {
 /**
  * Returns the number of blocks currently selected in the post.
  *
- * @param  {Object} state Global application state
+ * @param {Object} state Global application state.
  *
- * @returns {Number} Number of blocks selected in the post.
+ * @returns {number} Number of blocks selected in the post.
  */
 export function getSelectedBlockCount( state ) {
 	const multiSelectedBlockCount = getMultiSelectedBlockUids( state ).length;
@@ -581,7 +581,7 @@ export function getSelectedBlockCount( state ) {
 /**
  * Returns the currently selected block, or null if there is no selected block.
  *
- * @param  {Object}  state Global application state
+ * @param {Object} state Global application state.
  *
  * @returns {?Object} Selected block.
  */
@@ -598,7 +598,7 @@ export function getSelectedBlock( state ) {
  * Returns the current multi-selection set of blocks unique IDs, or an empty
  * array if there is no multi-selection.
  *
- * @param  {Object} state Global application state
+ * @param {Object} state Global application state.
  *
  * @returns {Array} Multi-selected block unique IDs.
  */
@@ -630,7 +630,7 @@ export const getMultiSelectedBlockUids = createSelector(
  * Returns the current multi-selection set of blocks, or an empty array if
  * there is no multi-selection.
  *
- * @param  {Object} state Global application state
+ * @param {Object} state Global application state.
  *
  * @returns {Array} Multi-selected block objects.
  */
@@ -650,7 +650,7 @@ export const getMultiSelectedBlocks = createSelector(
  * Returns the unique ID of the first block in the multi-selection set, or null
  * if there is no multi-selection.
  *
- * @param  {Object}  state Global application state
+ * @param {Object} state Global application state.
  *
  * @returns {?String} First unique block ID in the multi-selection set.
  */
@@ -662,7 +662,7 @@ export function getFirstMultiSelectedBlockUid( state ) {
  * Returns the unique ID of the last block in the multi-selection set, or null
  * if there is no multi-selection.
  *
- * @param  {Object}  state Global application state
+ * @param {Object} state Global application state.
  *
  * @returns {?String} Last unique block ID in the multi-selection set.
  */
@@ -675,10 +675,10 @@ export function getLastMultiSelectedBlockUid( state ) {
  * specified unique ID is the first block of the multi-selection set, or false
  * otherwise.
  *
- * @param  {Object}  state Global application state
- * @param  {String}  uid   Block unique ID
+ * @param {Object} state Global application state.
+ * @param {string} uid   Block unique ID.
  *
- * @returns {Boolean} Whether block is first in mult-selection.
+ * @returns {boolean} Whether block is first in mult-selection.
  */
 export function isFirstMultiSelectedBlock( state, uid ) {
 	return getFirstMultiSelectedBlockUid( state ) === uid;
@@ -688,10 +688,10 @@ export function isFirstMultiSelectedBlock( state, uid ) {
  * Returns true if the unique ID occurs within the block multi-selection, or
  * false otherwise.
  *
- * @param  {Object} state Global application state
- * @param  {String} uid   Block unique ID
+ * @param {Object} state Global application state.
+ * @param {string} uid   Block unique ID.
  *
- * @returns {Boolean} Whether block is in multi-selection set.
+ * @returns {boolean} Whether block is in multi-selection set.
  */
 export function isBlockMultiSelected( state, uid ) {
 	return getMultiSelectedBlockUids( state ).indexOf( uid ) !== -1;
@@ -704,7 +704,7 @@ export function isBlockMultiSelected( state, uid ) {
  * N.b.: This is not necessarily the first uid in the selection. See
  * getFirstMultiSelectedBlockUid().
  *
- * @param  {Object}  state Global application state
+ * @param {Object} state Global application state.
  *
  * @returns {?String} Unique ID of block beginning multi-selection.
  */
@@ -723,7 +723,7 @@ export function getMultiSelectedBlocksStartUid( state ) {
  * N.b.: This is not necessarily the last uid in the selection. See
  * getLastMultiSelectedBlockUid().
  *
- * @param  {Object}  state Global application state
+ * @param {Object} state Global application state.
  *
  * @returns {?String} Unique ID of block ending multi-selection.
  */
@@ -739,7 +739,7 @@ export function getMultiSelectedBlocksEndUid( state ) {
  * Returns an array containing all block unique IDs of the post being edited,
  * in the order they appear in the post.
  *
- * @param  {Object} state Global application state
+ * @param {Object} state Global application state.
  *
  * @returns {Array} Ordered unique IDs of post blocks.
  */
@@ -748,13 +748,13 @@ export function getBlockUids( state ) {
 }
 
 /**
- * Returns the index at which the block corresponding to the specified unique
- * ID occurs within the post block order, or `-1` if the block does not exist.
+ * Returns the index at which the block corresponding to the specified unique ID
+ * occurs within the post block order, or `-1` if the block does not exist.
  *
- * @param  {Object} state Global application state
- * @param  {String} uid   Block unique ID
+ * @param {Object} state Global application state.
+ * @param {string} uid   Block unique ID.
  *
- * @returns {Number} Index at which block exists in order.
+ * @returns {number} Index at which block exists in order.
  */
 export function getBlockIndex( state, uid ) {
 	return state.editor.present.blockOrder.indexOf( uid );
@@ -764,10 +764,10 @@ export function getBlockIndex( state, uid ) {
  * Returns true if the block corresponding to the specified unique ID is the
  * first block of the post, or false otherwise.
  *
- * @param  {Object}  state Global application state
- * @param  {String}  uid   Block unique ID
+ * @param {Object} state Global application state.
+ * @param {string} uid   Block unique ID.
  *
- * @returns {Boolean} Whether block is first in post.
+ * @returns {boolean} Whether block is first in post.
  */
 export function isFirstBlock( state, uid ) {
 	return first( state.editor.present.blockOrder ) === uid;
@@ -777,10 +777,10 @@ export function isFirstBlock( state, uid ) {
  * Returns true if the block corresponding to the specified unique ID is the
  * last block of the post, or false otherwise.
  *
- * @param  {Object}  state Global application state
- * @param  {String}  uid   Block unique ID
+ * @param {Object} state Global application state.
+ * @param {string} uid   Block unique ID.
  *
- * @returns {Boolean} Whether block is last in post.
+ * @returns {boolean} Whether block is last in post.
  */
 export function isLastBlock( state, uid ) {
 	return last( state.editor.present.blockOrder ) === uid;
@@ -790,8 +790,8 @@ export function isLastBlock( state, uid ) {
  * Returns the block object occurring before the one corresponding to the
  * specified unique ID.
  *
- * @param  {Object} state Global application state
- * @param  {String} uid   Block unique ID
+ * @param {Object} state Global application state.
+ * @param {string} uid   Block unique ID.
  *
  * @returns {Object} Block occurring before specified unique ID.
  */
@@ -804,8 +804,8 @@ export function getPreviousBlock( state, uid ) {
  * Returns the block object occurring after the one corresponding to the
  * specified unique ID.
  *
- * @param  {Object} state Global application state
- * @param  {String} uid   Block unique ID
+ * @param {Object} state Global application state.
+ * @param {string} uid   Block unique ID.
  *
  * @returns {Object} Block occurring after specified unique ID.
  */
@@ -818,10 +818,10 @@ export function getNextBlock( state, uid ) {
  * Returns true if the block corresponding to the specified unique ID is
  * currently selected and no multi-selection exists, or false otherwise.
  *
- * @param  {Object} state Global application state
- * @param  {String} uid   Block unique ID
+ * @param {Object} state Global application state.
+ * @param {string} uid   Block unique ID.
  *
- * @returns {Boolean} Whether block is selected and multi-selection exists.
+ * @returns {boolean} Whether block is selected and multi-selection exists.
  */
 export function isBlockSelected( state, uid ) {
 	const { start, end } = state.blockSelection;
@@ -839,10 +839,10 @@ export function isBlockSelected( state, uid ) {
  * refers to the block sequence in the document, _not_ the sequence of
  * multi-selection, which is why `state.blockSelection.end` isn't used.
  *
- * @param  {Object} state Global application state
- * @param  {String} uid   Block unique ID
+ * @param {Object} state Global application state.
+ * @param {string} uid   Block unique ID.
  *
- * @returns {Boolean} Whether block is selected and not the last in
+ * @returns {boolean} Whether block is selected and not the last in
  *                    the selection.
  */
 export function isBlockWithinSelection( state, uid ) {
@@ -859,10 +859,10 @@ export function isBlockWithinSelection( state, uid ) {
  * Returns true if the cursor is hovering the block corresponding to the
  * specified unique ID, or false otherwise.
  *
- * @param  {Object} state Global application state
- * @param  {String} uid   Block unique ID
+ * @param {Object} state Global application state.
+ * @param {string} uid   Block unique ID.
  *
- * @returns {Boolean} Whether block is hovered.
+ * @returns {boolean} Whether block is hovered.
  */
 export function isBlockHovered( state, uid ) {
 	return state.hoveredBlock === uid;
@@ -873,8 +873,8 @@ export function isBlockHovered( state, uid ) {
  * or null if the block is not selected. It is left to a block's implementation
  * to manage the content of this object, defaulting to an empty object.
  *
- * @param  {Object} state Global application state
- * @param  {String} uid   Block unique ID
+ * @param {Object} state Global application state.
+ * @param {string} uid   Block unique ID.
  *
  * @returns {Object} Block focus state.
  */
@@ -890,9 +890,9 @@ export function getBlockFocus( state, uid ) {
 /**
  * Whether in the process of multi-selecting or not.
  *
- * @param  {Object} state Global application state
+ * @param {Object} state Global application state.
  *
- * @returns {Boolean} True if multi-selecting, false if not.
+ * @returns {boolean} True if multi-selecting, false if not.
  */
 export function isMultiSelecting( state ) {
 	return state.blockSelection.isMultiSelecting;
@@ -901,19 +901,19 @@ export function isMultiSelecting( state ) {
 /**
  * Whether is selection disable or not.
  *
- * @param  {Object} state Global application state
+ * @param {Object} state Global application state.
  *
- * @returns {Boolean} True if multi is disable, false if not.
+ * @returns {boolean} True if multi is disable, false if not.
  */
 export function isSelectionEnabled( state ) {
 	return state.blockSelection.isEnabled;
 }
 
 /**
- * Returns thee block's editing mode
+ * Returns thee block's editing mode.
  *
- * @param  {Object} state Global application state
- * @param  {String} uid   Block unique ID
+ * @param {Object} state Global application state.
+ * @param {string} uid   Block unique ID.
  *
  * @returns {Object} Block editing mode.
  */
@@ -924,9 +924,9 @@ export function getBlockMode( state, uid ) {
 /**
  * Returns true if the user is typing, or false otherwise.
  *
- * @param  {Object}  state Global application state
+ * @param {Object} state Global application state.
  *
- * @returns {Boolean} Whether user is typing.
+ * @returns {boolean} Whether user is typing.
  */
 export function isTyping( state ) {
 	return state.isTyping;
@@ -934,9 +934,9 @@ export function isTyping( state ) {
 
 /**
  * Returns the insertion point, the index at which the new inserted block would
- * be placed. Defaults to the last position
+ * be placed. Defaults to the last position.
  *
- * @param  {Object}  state Global application state
+ * @param {Object} state Global application state.
  *
  * @returns {?String} Unique ID after which insertion will occur.
  */
@@ -967,7 +967,7 @@ export function getBlockInsertionPoint( state ) {
  * Returns the position at which the block inserter will insert a new adjacent
  * sibling block, or null if the inserter is not actively visible.
  *
- * @param  {Object}  state Global application state
+ * @param {Object} state Global application state.
  *
  * @returns {?Number} Whether the inserter is currently visible.
  */
@@ -981,9 +981,9 @@ export function getBlockSiblingInserterPosition( state ) {
 }
 
 /**
- * Returns true if we should show the block insertion point
+ * Returns true if we should show the block insertion point.
  *
- * @param  {Object}  state Global application state
+ * @param {Object} state Global application state.
  *
  * @returns {?Boolean} Whether the insertion point is visible or not.
  */
@@ -994,9 +994,9 @@ export function isBlockInsertionPointVisible( state ) {
 /**
  * Returns true if the post is currently being saved, or false otherwise.
  *
- * @param  {Object}  state Global application state
+ * @param {Object} state Global application state.
  *
- * @returns {Boolean} Whether post is being saved.
+ * @returns {boolean} Whether post is being saved.
  */
 export function isSavingPost( state ) {
 	return state.saving.requesting;
@@ -1006,9 +1006,9 @@ export function isSavingPost( state ) {
  * Returns true if a previous post save was attempted successfully, or false
  * otherwise.
  *
- * @param  {Object}  state Global application state
+ * @param {Object} state Global application state.
  *
- * @returns {Boolean} Whether the post was saved successfully.
+ * @returns {boolean} Whether the post was saved successfully.
  */
 export function didPostSaveRequestSucceed( state ) {
 	return state.saving.successful;
@@ -1018,9 +1018,9 @@ export function didPostSaveRequestSucceed( state ) {
  * Returns true if a previous post save was attempted but failed, or false
  * otherwise.
  *
- * @param  {Object}  state Global application state
+ * @param {Object} state Global application state.
  *
- * @returns {Boolean} Whether the post save failed.
+ * @returns {boolean} Whether the post save failed.
  */
 export function didPostSaveRequestFail( state ) {
 	return !! state.saving.error;
@@ -1031,7 +1031,7 @@ export function didPostSaveRequestFail( state ) {
  * is a single block within the post and it is of a type known to match a
  * default post format. Returns null if the format cannot be determined.
  *
- * @param  {Object}  state Global application state
+ * @param {Object} state Global application state.
  *
  * @returns {?String} Suggested post format.
  */
@@ -1079,9 +1079,9 @@ export function getSuggestedPostFormat( state ) {
  * Returns the content of the post being edited, preferring raw string edit
  * before falling back to serialization of block state.
  *
- * @param  {Object} state Global application state
+ * @param {Object} state Global application state.
  *
- * @returns {String} Post content.
+ * @returns {string} Post content.
  */
 export const getEditedPostContent = createSelector(
 	( state ) => {
@@ -1100,9 +1100,9 @@ export const getEditedPostContent = createSelector(
 );
 
 /**
- * Returns the user notices array
+ * Returns the user notices array.
  *
- * @param {Object} state Global application state
+ * @param {Object} state Global application state.
  *
  * @returns {Array} List of notices.
  */
@@ -1111,15 +1111,136 @@ export function getNotices( state ) {
 }
 
 /**
- * Resolves the list of recently used block names into a list of block type settings.
+ * An item that appears in the inserter. Inserting this item will create a new
+ * block. Inserter items encapsulate both regular blocks and reusable blocks.
  *
- * @param {Object} state Global application state
- *
- * @returns {Array} List of recently used blocks.
+ * @typedef {Object} Editor.InserterItem
+ * @property {string}   id                Unique identifier for the item.
+ * @property {string}   name              The type of block to create.
+ * @property {Object}   initialAttributes Attributes to pass to the newly created block.
+ * @property {string}   title             Title of the item, as it appears in the inserter.
+ * @property {string}   icon              Dashicon for the item, as it appears in the inserter.
+ * @property {string}   category          Block category that the item is associated with.
+ * @property {string[]} keywords          Keywords that can be searched to find this item.
+ * @property {boolean}  isDisabled        Whether or not the user should be prevented from inserting this item.
  */
-export function getRecentlyUsedBlocks( state ) {
-	// resolves the block names in the state to the block type settings
-	return compact( state.preferences.recentlyUsedBlocks.map( blockType => getBlockType( blockType ) ) );
+
+/**
+ * Given a regular block type, constructs an item that appears in the inserter.
+ *
+ * @param {Object}           state             Global application state.
+ * @param {string[]|boolean} enabledBlockTypes Enabled block types, or true/false to enable/disable all types.
+ * @param {Object}           blockType         Block type, likely from getBlockType().
+ *
+ * @returns {Editor.InserterItem} Item that appears in inserter.
+ */
+function buildInserterItemFromBlockType( state, enabledBlockTypes, blockType ) {
+	if ( ! enabledBlockTypes || ! blockType ) {
+		return null;
+	}
+
+	const blockTypeIsDisabled = Array.isArray( enabledBlockTypes ) && ! enabledBlockTypes.includes( blockType.name );
+	if ( blockTypeIsDisabled ) {
+		return null;
+	}
+
+	if ( blockType.isPrivate ) {
+		return null;
+	}
+
+	return {
+		id: blockType.name,
+		name: blockType.name,
+		initialAttributes: {},
+		title: blockType.title,
+		icon: blockType.icon,
+		category: blockType.category,
+		keywords: blockType.keywords,
+		isDisabled: !! blockType.useOnce && getBlocks( state ).some( block => block.name === blockType.name ),
+	};
+}
+
+/**
+ * Given a reusable block, constructs an item that appears in the inserter.
+ *
+ * @param {string[]|boolean} enabledBlockTypes Enabled block types, or true/false to enable/disable all types.
+ * @param {Object}           reusableBlock     Reusable block, likely from getReusableBlock().
+ *
+ * @returns {Editor.InserterItem} Item that appears in inserter.
+ */
+function buildInserterItemFromReusableBlock( enabledBlockTypes, reusableBlock ) {
+	if ( ! enabledBlockTypes || ! reusableBlock ) {
+		return null;
+	}
+
+	const blockTypeIsDisabled = Array.isArray( enabledBlockTypes ) && ! enabledBlockTypes.includes( 'core/block' );
+	if ( blockTypeIsDisabled ) {
+		return null;
+	}
+
+	const referencedBlockType = getBlockType( reusableBlock.type );
+	if ( ! referencedBlockType ) {
+		return null;
+	}
+
+	return {
+		id: `core/block/${ reusableBlock.id }`,
+		name: 'core/block',
+		initialAttributes: { ref: reusableBlock.id },
+		title: reusableBlock.title,
+		icon: referencedBlockType.icon,
+		category: 'reusable-blocks',
+		keywords: [],
+		isDisabled: false,
+	};
+}
+
+/**
+ * Determines the items that appear in the the inserter. Includes both static
+ * items (e.g. a regular block type) and dynamic items (e.g. a reusable block).
+ *
+ * @param {Object}           state             Global application state.
+ * @param {string[]|boolean} enabledBlockTypes Enabled block types, or true/false to enable/disable all types.
+ *
+ * @returns {Editor.InserterItem[]} Items that appear in inserter.
+ */
+export function getInserterItems( state, enabledBlockTypes = true ) {
+	if ( ! enabledBlockTypes ) {
+		return [];
+	}
+
+	const staticItems = getBlockTypes().map( blockType =>
+		buildInserterItemFromBlockType( state, enabledBlockTypes, blockType )
+	);
+
+	const dynamicItems = getReusableBlocks( state ).map( reusableBlock =>
+		buildInserterItemFromReusableBlock( enabledBlockTypes, reusableBlock )
+	);
+
+	const items = [ ...staticItems, ...dynamicItems ];
+	return compact( items );
+}
+
+/**
+ * Determines the items that appear in the 'Recent' tab of the inserter.
+ *
+ * @param {Object}           state             Global application state.
+ * @param {string[]|boolean} enabledBlockTypes Enabled block types, or true/false to enable/disable all types.
+ *
+ * @returns {Editor.InserterItem[]} Items that appear in the 'Recent' tab.
+ */
+export function getRecentInserterItems( state, enabledBlockTypes = true ) {
+	if ( ! enabledBlockTypes ) {
+		return [];
+	}
+
+	const items = state.preferences.recentlyUsedBlocks.map( name =>
+		buildInserterItemFromBlockType( state, enabledBlockTypes, getBlockType( name ) )
+	);
+
+	// TODO: Merge in recently used reusable blocks
+
+	return compact( items );
 }
 
 /**
@@ -1127,7 +1248,7 @@ export function getRecentlyUsedBlocks( state ) {
  * Memoized so we're not generating block lists every time we render the list
  * in the inserter.
  *
- * @param {Object} state Global application state
+ * @param {Object} state Global application state.
  *
  * @returns {Array} List of block type settings.
  */
@@ -1147,21 +1268,21 @@ export const getMostFrequentlyUsedBlocks = createSelector(
 /**
  * Returns whether the toolbar should be fixed or not.
  *
- * @param  {Object}    state   Global application state.
+ * @param {Object} state Global application state.
  *
- * @returns {Boolean} True if toolbar is fixed.
+ * @returns {boolean} True if toolbar is fixed.
  */
 export function hasFixedToolbar( state ) {
 	return ! isMobile( state ) && isFeatureActive( state, 'fixedToolbar' );
 }
 
 /**
- * Returns whether the given feature is enabled or not
+ * Returns whether the given feature is enabled or not.
  *
- * @param {Object}    state   Global application state
- * @param {String}    feature Feature slug
+ * @param {Object} state   Global application state.
+ * @param {string} feature Feature slug.
  *
- * @returns {Booleean} Is active.
+ * @returns {booleean} Is active.
  */
 export function isFeatureActive( state, feature ) {
 	return !! state.preferences.features[ feature ];
@@ -1170,8 +1291,8 @@ export function isFeatureActive( state, feature ) {
 /**
  * Returns the reusable block with the given ID.
  *
- * @param {Object} state Global application state
- * @param {String} ref   The reusable block's ID
+ * @param {Object} state Global application state.
+ * @param {string} ref   The reusable block's ID.
  *
  * @returns {Object} The reusable block, or null if none exists.
  */
@@ -1182,10 +1303,10 @@ export function getReusableBlock( state, ref ) {
 /**
  * Returns whether or not the reusable block with the given ID is being saved.
  *
- * @param {*} state  Global application state
- * @param {*} ref    The reusable block's ID
+ * @param {*} state Global application state.
+ * @param {*} ref   The reusable block's ID.
  *
- * @returns {Boolean} Whether or not the reusable block is being saved.
+ * @returns {boolean} Whether or not the reusable block is being saved.
  */
 export function isSavingReusableBlock( state, ref ) {
 	return state.reusableBlocks.isSaving[ ref ] || false;
@@ -1194,7 +1315,7 @@ export function isSavingReusableBlock( state, ref ) {
 /**
  * Returns an array of all reusable blocks.
  *
- * @param {Object} state Global application state
+ * @param {Object} state Global application state.
  *
  * @returns {Array} An array of all reusable blocks.
  */
@@ -1206,8 +1327,8 @@ export function getReusableBlocks( state ) {
  * Returns state object prior to a specified optimist transaction ID, or `null`
  * if the transaction corresponding to the given ID cannot be found.
  *
- * @param  {Object} state         Current global application state
- * @param  {Object} transactionId Optimist transaction ID
+ * @param {Object} state         Current global application state.
+ * @param {Object} transactionId Optimist transaction ID.
  *
  * @returns {Object} Global application state prior to transaction.
  */
@@ -1221,11 +1342,11 @@ export function getStateBeforeOptimisticTransaction( state, transactionId ) {
 }
 
 /**
- * Returns true if the post is being published, or false otherwise
+ * Returns true if the post is being published, or false otherwise.
  *
- * @param  {Object}  state Global application state
+ * @param {Object} state Global application state.
  *
- * @returns {Boolean} Whether post is being published.
+ * @returns {boolean} Whether post is being published.
  */
 export function isPublishingPost( state ) {
 	if ( ! isSavingPost( state ) ) {

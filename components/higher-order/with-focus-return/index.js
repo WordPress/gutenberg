@@ -4,11 +4,12 @@
 import { Component } from '@wordpress/element';
 
 /**
- * Higher Order Component used to be used to wrap disposable elements like Sidebars, modals, dropdowns.
- * When mounting the wrapped component, we track a reference to the current active element
- * so we know where to restore focus when the component is unmounted
+ * Higher Order Component used to be used to wrap disposable elements like
+ * sidebars, modals, dropdowns. When mounting the wrapped component, we track a
+ * reference to the current active element so we know where to restore focus
+ * when the component is unmounted.
  *
- * @param {WPElement}  WrappedComponent  The disposable component
+ * @param {WPElement} WrappedComponent The disposable component.
  *
  * @returns {Component} Component with the focus restauration behaviour.
  */

@@ -3,7 +3,6 @@
  */
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Button, Tooltip } from '@wordpress/components';
 import { pick } from 'lodash';
 
 // Getter for the sake of unit tests.
@@ -58,7 +57,7 @@ const slimImageObject = ( img ) => {
 	return pick( img, attrSet );
 };
 
-class MediaUploadButton extends Component {
+class MediaUpload extends Component {
 	constructor( { multiple = false, type, gallery = false, title = __( 'Select or Upload Media' ), modalClass } ) {
 		super( ...arguments );
 		this.openModal = this.openModal.bind( this );
@@ -149,20 +148,9 @@ class MediaUploadButton extends Component {
 	}
 
 	render() {
-		const { children, buttonProps, tooltip } = this.props;
-
-		let element = (
-			<Button onClick={ this.openModal } { ...buttonProps }>
-				{ children }
-			</Button>
-		);
-
-		if ( tooltip ) {
-			element = <Tooltip text={ tooltip }>{ element }</Tooltip>;
-		}
-
-		return element;
+		return this.props.render( { open: this.openModal } );
 	}
 }
 
-export default MediaUploadButton;
+export default MediaUpload;
+

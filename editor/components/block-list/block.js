@@ -70,7 +70,7 @@ const { BACKSPACE, ESCAPE, DELETE, ENTER, UP, RIGHT, DOWN, LEFT } = keycodes;
 /**
  * Given a DOM node, finds the closest scrollable container node.
  *
- * @param  {Element}  node Node from which to start
+ * @param {Element} node Node from which to start.
  *
  * @returns {?Element} Scrollable container node, if found.
  */
@@ -104,6 +104,7 @@ export class BlockListBlock extends Component {
 		this.stopTypingOnMouseMove = this.stopTypingOnMouseMove.bind( this );
 		this.mergeBlocks = this.mergeBlocks.bind( this );
 		this.onFocus = this.onFocus.bind( this );
+		this.preventDrag = this.preventDrag.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onBlockError = this.onBlockError.bind( this );
@@ -280,6 +281,18 @@ export class BlockListBlock extends Component {
 		}
 	}
 
+	/**
+	 * Prevents default dragging behavior within a block to allow for multi-
+	 * selection to take effect unhampered.
+	 *
+	 * @param {DragEvent} event Drag event.
+	 *
+	 * @returns {void}
+	 */
+	preventDrag( event ) {
+		event.preventDefault();
+	}
+
 	onPointerDown( event ) {
 		// Not the main button.
 		// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
@@ -407,7 +420,7 @@ export class BlockListBlock extends Component {
 				<div
 					ref={ this.bindBlockNode }
 					onKeyPress={ this.maybeStartTyping }
-					onDragStart={ ( event ) => event.preventDefault() }
+					onDragStart={ this.preventDrag }
 					onMouseDown={ this.onPointerDown }
 					onKeyDown={ this.onKeyDown }
 					onFocus={ this.onFocus }

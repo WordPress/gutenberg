@@ -61,7 +61,7 @@ import BlockIcon from '../block-icon';
  * Returns an "completer" definition for selecting from available blocks to replace the current one.
  * The definition can be understood by the Autocomplete component.
  *
- * @param  {Function} onReplace  Callback to replace the current block.
+ * @param {Function} onReplace  Callback to replace the current block.
  *
  * @returns {Completer} Completer object used by the Autocomplete component.
  */
@@ -101,7 +101,7 @@ export function blockAutocompleter( { onReplace } ) {
 	};
 }
 /**
- * Returns a "completer" definition for inserting links to the posts of a user.
+ * Returns a "completer" definition for inserting a user mention.
  * The definition can be understood by the Autocomplete component.
  *
  * @returns {Completer} Completer object used by the Autocomplete component.
@@ -123,12 +123,12 @@ export function userAutocompleter() {
 		} );
 	};
 
-	const allowNode = ( textNode ) => {
-		return textNode.parentElement.closest( 'a' ) === null;
+	const allowNode = () => {
+		return true;
 	};
 
 	const onSelect = ( user ) => {
-		return <a href={ user.link }>{ '@' + user.name }</a>;
+		return ( '@' + user.slug );
 	};
 
 	return {

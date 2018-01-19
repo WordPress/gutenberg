@@ -82,10 +82,10 @@ export function isAttributeWhitelisted( tag, attribute ) {
  * Checks if nodeName should be treated as inline when being added to tagName.
  * This happens if nodeName and tagName are in the same group defined in inlineWhitelistTagGroups.
  *
- * @param  {String}  nodeName Node name.
- * @param  {String}  tagName  Tag name.
+ * @param {string} nodeName Node name.
+ * @param {string} tagName  Tag name.
  *
- * @returns {Boolean} True if nodeName is inline in the context of tagName and
+ * @returns {boolean} True if nodeName is inline in the context of tagName and
  *                    false otherwise.
  */
 function isInlineForTag( nodeName, tagName ) {
@@ -197,9 +197,9 @@ export function isPlain( HTML ) {
 /**
  * Given node filters, deeply filters and mutates a NodeList.
  *
- * @param  {NodeList} nodeList The nodeList to filter.
- * @param  {Array}    filters  An array of functions that can mutate with the provided node.
- * @param  {Document} doc      The document of the nodeList.
+ * @param {NodeList} nodeList The nodeList to filter.
+ * @param {Array}    filters  An array of functions that can mutate with the provided node.
+ * @param {Document} doc      The document of the nodeList.
  */
 export function deepFilterNodeList( nodeList, filters, doc ) {
 	Array.from( nodeList ).forEach( ( node ) => {
@@ -219,10 +219,10 @@ export function deepFilterNodeList( nodeList, filters, doc ) {
 /**
  * Given node filters, deeply filters HTML tags.
  *
- * @param  {String} HTML    The HTML to filter.
- * @param  {Array}  filters An array of functions that can mutate with the provided node.
+ * @param {string} HTML    The HTML to filter.
+ * @param {Array}  filters An array of functions that can mutate with the provided node.
  *
- * @returns {String} The filtered HTML.
+ * @returns {string} The filtered HTML.
  */
 export function deepFilterHTML( HTML, filters = [] ) {
 	const doc = document.implementation.createHTMLDocument( '' );

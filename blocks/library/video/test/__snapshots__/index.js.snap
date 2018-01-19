@@ -26,7 +26,7 @@ exports[`core/video block edit matches snapshot 1`] = `
   <div
     class="components-placeholder__instructions"
   >
-    Select a video file from your library, or upload a new one:
+    Select a video file from your library, or upload a new one
   </div>
   <div
     class="components-placeholder__fieldset"

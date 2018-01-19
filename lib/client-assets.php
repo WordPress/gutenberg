@@ -79,7 +79,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-data',
 		gutenberg_url( 'data/build/index.js' ),
-		array(),
+		array( 'wp-element' ),
 		filemtime( gutenberg_dir_path() . 'data/build/index.js' )
 	);
 	wp_register_script(
@@ -690,7 +690,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	wp_enqueue_script(
 		'wp-editor',
 		gutenberg_url( 'editor/build/index.js' ),
-		array( 'jquery', 'wp-api', 'wp-data', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element', 'wp-components', 'wp-utils', 'word-count', 'editor', 'heartbeat' ),
+		array( 'postbox', 'jquery', 'wp-api', 'wp-data', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element', 'wp-components', 'wp-utils', 'word-count', 'editor', 'heartbeat' ),
 		filemtime( gutenberg_dir_path() . 'editor/build/index.js' ),
 		true // enqueue in the footer.
 	);

@@ -6,7 +6,7 @@ import { isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Dashicon, Toolbar } from '@wordpress/components';
+import { IconButton, Toolbar } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import classnames from 'classnames';
 
@@ -17,7 +17,7 @@ import './editor.scss';
 import './style.scss';
 import { registerBlockType, createBlock } from '../../api';
 import Editable from '../../editable';
-import MediaUploadButton from '../../media-upload-button';
+import MediaUpload from '../../media-upload';
 import ImagePlaceHolder from '../../image-placeholder';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
@@ -108,7 +108,6 @@ registerBlockType( 'core/cover-image', {
 			}
 		);
 
-		const editButtonLabel = __( 'Edit image' );
 		const controls = focus && [
 			<BlockControls key="controls">
 				<BlockAlignmentToolbar
@@ -117,18 +116,19 @@ registerBlockType( 'core/cover-image', {
 				/>
 
 				<Toolbar>
-					<MediaUploadButton
-						buttonProps={ {
-							className: 'components-icon-button components-toolbar__control',
-							'aria-label': editButtonLabel,
-						} }
+					<MediaUpload
 						onSelect={ onSelectImage }
 						type="image"
 						value={ id }
-						tooltip={ editButtonLabel }
-					>
-						<Dashicon icon="edit" />
-					</MediaUploadButton>
+						render={ ( { open } ) => (
+							<IconButton
+								className="components-toolbar__control"
+								label={ __( 'Edit image' ) }
+								icon="edit"
+								onClick={ open }
+							/>
+						) }
+					/>
 				</Toolbar>
 			</BlockControls>,
 			<InspectorControls key="inspector">
