@@ -90,8 +90,8 @@
 		"parent": "blocks"
 	},
 	{
-		"title": "Speeding up writing blocks",
-		"slug": "speeding-up-writing-blocks",
+		"title": "Generate Blocks with WP-CLI",
+		"slug": "generate-blocks-with-wp-cli",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/blocks-scaffolding.md",
 		"parent": "blocks"
 	},

@@ -1,4 +1,4 @@
-# Speeding up writing blocks
+# Generate Blocks with WP-CLI
 
 It turns out that writing the simplest possible block which contains only static content might not be the easiest task. It requires to follow closely the steps described in the documentation. It stems from the fact that you need to create at least 2 files and integrate your code with the existing APIs. One way to mitigate this inconvenience is to copy the source code of the existing block from one of the repositories that share working examples:
 - [WordPress/gutenberg-examples](https://github.com/WordPress/gutenberg-examples) - the official examples for extending Gutenberg with plugins which create blocks
