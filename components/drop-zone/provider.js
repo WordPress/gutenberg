@@ -14,7 +14,6 @@ class DropZoneProvider extends Component {
 
 		this.resetDragState = this.resetDragState.bind( this );
 		this.toggleDraggingOverDocument = this.toggleDraggingOverDocument.bind( this );
-		this.onDragOver = this.onDragOver.bind( this );
 		this.isWithinZoneBounds = this.isWithinZoneBounds.bind( this );
 		this.onDrop = this.onDrop.bind( this );
 
@@ -40,18 +39,14 @@ class DropZoneProvider extends Component {
 	}
 
 	componentDidMount() {
-		window.addEventListener( 'dragover', this.onDragOver );
+		window.addEventListener( 'dragover', this.toggleDraggingOverDocument );
 		window.addEventListener( 'drop', this.onDrop );
-		window.addEventListener( 'dragenter', this.toggleDraggingOverDocument );
-		window.addEventListener( 'dragleave', this.toggleDraggingOverDocument );
 		window.addEventListener( 'mouseup', this.resetDragState );
 	}
 
 	componentWillUnmount() {
-		window.removeEventListener( 'dragover', this.onDragOver );
+		window.removeEventListener( 'dragover', this.toggleDraggingOverDocument );
 		window.removeEventListener( 'drop', this.onDrop );
-		window.removeEventListener( 'dragenter', this.toggleDraggingOverDocument );
-		window.removeEventListener( 'dragleave', this.toggleDraggingOverDocument );
 		window.removeEventListener( 'mouseup', this.resetDragState );
 	}
 
@@ -76,10 +71,6 @@ class DropZoneProvider extends Component {
 		} );
 	}
 
-	onDragOver( event ) {
-		event.preventDefault();
-	}
-
 	toggleDraggingOverDocument( event ) {
 		// In some contexts, it may be necessary to capture and redirect the
 		// drag event (e.g. atop an `iframe`). To accommodate this, you can
@@ -92,14 +83,21 @@ class DropZoneProvider extends Component {
 		// Computing state
 		const { onVerifyValidTransfer } = this.props;
 		const isValidDrag = ! onVerifyValidTransfer || onVerifyValidTransfer( detail.dataTransfer );
+
+		// Always true (onVerifyValidTransfer is not defined).
 		const isDraggingOverDocument = isValidDrag; // && this.dragEnterNodes.length;
+
+		// Index of hovered dropzone.
 		const hoveredDropZone = isDraggingOverDocument && findIndex( this.dropzones, ( { element } ) =>
-			this.isWithinZoneBounds( element, detail.clientX, detail.clientY
-			) );
+				this.isWithinZoneBounds( element, detail.clientX, detail.clientY )
+			);
+
 		let position = null;
+
 		if ( hoveredDropZone !== -1 ) {
 			const rect = this.dropzones[ hoveredDropZone ].element.getBoundingClientRect();
-			position = hoveredDropZone === -1 ? null : {
+
+			position = {
 				x: detail.clientX - rect.left < rect.right - detail.clientX ? 'left' : 'right',
 				y: detail.clientY - rect.top < rect.bottom - detail.clientY ? 'top' : 'bottom',
 			};
@@ -107,6 +105,7 @@ class DropZoneProvider extends Component {
 
 		// Optimisation: Only update the changed dropzones
 		let dropzonesToUpdate = [];
+
 		if ( this.state.isDraggingOverDocument !== isDraggingOverDocument ) {
 			dropzonesToUpdate = this.dropzones;
 		} else if ( hoveredDropZone !== this.state.hoveredDropZone ) {
@@ -127,17 +126,25 @@ class DropZoneProvider extends Component {
 		// Notifying the dropzones
 		dropzonesToUpdate.map( ( dropzone ) => {
 			const index = this.dropzones.indexOf( dropzone );
-			dropzone.updateState( {
-				isDraggingOverElement: index === hoveredDropZone,
-				position: index === hoveredDropZone ? position : null,
-				isDraggingOverDocument,
-			} );
+
+			// Safer in IIFE here. "updateState" is async.
+			( ( index, hoveredDropZone, position, isDraggingOverDocument ) => {
+				dropzone.updateState( {
+					isDraggingOverElement: index === hoveredDropZone,
+					position: index === hoveredDropZone ? position : null,
+					isDraggingOverDocument,
+				} );
+			} )( index, hoveredDropZone, position, isDraggingOverDocument );
 		} );
+
 		this.setState( {
 			isDraggingOverDocument,
 			hoveredDropZone,
 			position,
 		} );
+
+		event.preventDefault();
+		event.stopPropagation();
 	}
 
 	isWithinZoneBounds( dropzone, x, y ) {
@@ -162,14 +169,18 @@ class DropZoneProvider extends Component {
 		// This seemingly useless line has been shown to resolve a Safari issue
 		// where files dragged directly from the dock are not recognized
 		event.dataTransfer && event.dataTransfer.files.length; // eslint-disable-line no-unused-expressions
+
 		const { position, hoveredDropZone } = this.state;
 		const dropzone = hoveredDropZone !== -1 ? this.dropzones[ hoveredDropZone ] : null;
+
 		this.resetDragState();
+
 		if ( !! dropzone && !! dropzone.onDrop ) {
 			dropzone.onDrop( event, position );
 		}
 
 		const { onVerifyValidTransfer } = this.props;
+
 		if ( onVerifyValidTransfer && ! onVerifyValidTransfer( event.dataTransfer ) ) {
 			return;
 		}
