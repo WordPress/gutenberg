@@ -16,7 +16,7 @@ a traditional `input` field, usually when the user exits the field.
 
 ### `onChange( value: Array ): Function`
 
-*Required.* Function to call when the value changes.
+*Required.* Called when the value changes.
 
 ### `tagName: String`
 
@@ -33,18 +33,33 @@ a traditional `input` field, usually when the user exits the field.
 
 ### `onFocus( focus: Object ): Function`
 
-*Optional.* Function to call when the editable receives focus.
+*Optional.* Called when the editable receives focus.
 
 ### `multiline: String`
 
 *Optional.* By default, a line break will be inserted on <kbd>Enter</kbd>. If the editable field can contain multiple paragraphs, this property can be set to `p` to create new paragraphs on <kbd>Enter</kbd>.
 
+### `onSplit( before: Array, after: Array, ...blocks: Object ): Function`
+
+*Optional.* Called when the content can be split with `before` and `after`. There might be blocks present, which should be inserted in between.
+
+### `onReplace( blocks: Array ): Function`
+
+*Optional.* Called when the `Editable` instance is empty and it can be replaced with the given blocks.
+
+### `onMerge( forward: Boolean ): Function`
+
+*Optional.* Called when blocks can be merged. `forward` is true when merging with the next block, false when merging with the previous block.
+
+### `onRemove( forward: Boolean ): Function`
+
+*Optional.* Called when the block can be removed. `forward` is true when the selection is expected to move to the next block, false to the previous block.
 
 ## Example
 
 ```js
 wp.blocks.registerBlockType( /* ... */, {
-	
+
 	// ...
 
 	attributes: {
