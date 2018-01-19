@@ -459,64 +459,38 @@ export function initializeMetaBoxState( metaBoxes ) {
 }
 
 /**
- * Returns an action object used to signify that a meta box finished reloading.
- *
- * @param {string} location Location of meta box: 'normal', 'side'
- *                          or 'advanced'.
- *
- * @returns {Object} Action object.
- */
-export function handleMetaBoxReload( location ) {
-	return {
-		type: 'HANDLE_META_BOX_RELOAD',
-		location,
-	};
-}
-
-/**
- * Returns an action object used to signify that a meta box finished loading.
- *
- * @param {string} location Location of meta box: 'normal', 'side'
- *                          or 'advanced'.
- *
- * @returns {Object} Action object.
- */
-export function metaBoxLoaded( location ) {
-	return {
-		type: 'META_BOX_LOADED',
-		location,
-	};
-}
-
-/**
  * Returns an action object used to request meta box update.
  *
- * @param {Array} locations Locations of meta boxes: ['normal', 'side',
- *                          'advanced' ].
- *
  * @returns {Object} Action object.
  */
-export function requestMetaBoxUpdates( locations ) {
+export function requestMetaBoxUpdates() {
 	return {
 		type: 'REQUEST_META_BOX_UPDATES',
-		locations,
 	};
 }
 
 /**
- * Returns an action object used to set meta box state changed.
- *
- * @param {string}  location   Location of meta box: 'normal', 'side'
- *                             or 'advanced'.
- * @param {boolean} hasChanged Whether the meta box has changed.
+ * Returns an action object used signal a successfull meta nox update.
  *
  * @returns {Object} Action object.
  */
-export function metaBoxStateChanged( location, hasChanged ) {
+export function metaBoxUpdatesSuccess() {
 	return {
-		type: 'META_BOX_STATE_CHANGED',
-		location,
-		hasChanged,
+		type: 'META_BOX_UPDATES_SUCCESS',
+	};
+}
+
+/**
+ * Returns an action object used set the saved meta boxes data.
+ * This is used to check if the meta boxes have been touched when leaving the editor.
+ *
+ * @param   {Object} dataPerLocation Meta Boxes Data per location.
+ * @returns {Object}                 Action object.
+ */
+export function setMetaBoxSavedData( dataPerLocation ) {
+	return {
+		type: 'META_BOX_SET_SAVED_DATA',
+		dataPerLocation,
 	};
 }
 

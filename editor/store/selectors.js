@@ -12,6 +12,7 @@ import {
 	without,
 	compact,
 	find,
+	some,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -42,9 +43,8 @@ export function getEditorMode( state ) {
 /**
  * Returns the state of legacy meta boxes.
  *
- * @param {Object} state Global application state.
- *
- * @returns {Object} State of meta boxes.
+ * @param   {Object} state Global application state.
+ * @returns {Object}       State of meta boxes.
  */
 export function getMetaBoxes( state ) {
 	return state.metaBoxes;
@@ -63,34 +63,29 @@ export function getMetaBox( state, location ) {
 }
 
 /**
- * Returns a list of dirty meta box locations.
+ * Returns true if the post is using Meta Boxes
  *
- * @param {Object} state Global application state.
- *
- * @returns {Array} Array of locations for dirty meta boxes.
+ * @param  {Object} state Global application state
+ * @return {boolean}      Whether there are metaboxes or not.
  */
-export const getDirtyMetaBoxes = createSelector(
+export const hasMetaBoxes = createSelector(
 	( state ) => {
-		return reduce( getMetaBoxes( state ), ( result, metaBox, location ) => {
-			return metaBox.isDirty && metaBox.isActive ?
-				[ ...result, location ] :
-				result;
-		}, [] );
+		return some( getMetaBoxes( state ), ( metaBox ) => {
+			return metaBox.isActive;
+		} );
 	},
 	( state ) => state.metaBoxes,
 );
 
 /**
- * Returns the dirty state of legacy meta boxes.
+ * Returns true if the the Meta Boxes are being saved.
  *
- * Checks whether the entire meta box state is dirty. So if a sidebar is dirty,
- * but a normal area is not dirty, this will overall return dirty.
- *
- * @param {Object} state Global application state.
- *
- * @returns {boolean} Whether state is dirty. True if dirty, false if not.
+ * @param   {Object}  state Global application state.
+ * @returns {boolean}       Whether the metaboxes are being saved.
  */
-export const isMetaBoxStateDirty = ( state ) => getDirtyMetaBoxes( state ).length > 0;
+export function isSavingMetaBoxes( state ) {
+	return state.isSavingMetaBoxes;
+}
 
 /**
  * Returns the current active panel for the sidebar.
@@ -216,7 +211,7 @@ export function isEditedPostNew( state ) {
  * @returns {boolean} Whether unsaved values exist.
  */
 export function isEditedPostDirty( state ) {
-	return state.editor.isDirty || isMetaBoxStateDirty( state );
+	return state.editor.isDirty;
 }
 
 /**
@@ -374,7 +369,7 @@ export function isCurrentPostPublished( state ) {
  */
 export function isEditedPostPublishable( state ) {
 	const post = getCurrentPost( state );
-	return isEditedPostDirty( state ) || [ 'publish', 'private', 'future' ].indexOf( post.status ) === -1;
+	return isEditedPostDirty( state ) || hasMetaBoxes( state ) || [ 'publish', 'private', 'future' ].indexOf( post.status ) === -1;
 }
 
 /**
@@ -999,7 +994,7 @@ export function isBlockInsertionPointVisible( state ) {
  * @returns {boolean} Whether post is being saved.
  */
 export function isSavingPost( state ) {
-	return state.saving.requesting;
+	return state.saving.requesting || isSavingMetaBoxes( state );
 }
 
 /**

@@ -16,9 +16,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 1.8.0
  *
  * @param string $post_type Current post type.
- * @param string $meta_box_context  The context location of the meta box. Referred to as context in core.
  */
-function gutenberg_meta_box_save( $post_type, $meta_box_context ) {
+function gutenberg_meta_box_save( $post_type ) {
 	/**
 	 * Needs classic editor to be active.
 	 *
@@ -45,33 +44,9 @@ function gutenberg_meta_box_save( $post_type, $meta_box_context ) {
 		return;
 	}
 
-	/**
-	 * Prevent over firing of the meta box rendering.
-	 *
-	 * The hook do_action( 'do_meta_boxes', ... ) fires three times in
-	 * edit-form-advanced.php
-	 *
-	 * To make sure we properly fire on all three meta box locations, except
-	 * advanced, as advanced is tied in with normal for ease of use reasons, we
-	 * need to verify that the action location/context matches our requests
-	 * meta box location/context. We then exit early if they do not match.
-	 * This will prevent execution thread from dieing, so the subsequent calls
-	 * to do_meta_boxes can fire.
-	 */
-	if ( $_REQUEST['meta_box'] !== $meta_box_context ) {
-		return;
-	}
-
 	// Ths action is not needed since it's an XHR call.
 	remove_action( 'admin_head', 'wp_admin_canonical_url' );
-
-	$location = $_REQUEST['meta_box'];
-
-	if ( ! in_array( $_REQUEST['meta_box'], array( 'side', 'normal', 'advanced' ) ) ) {
-		wp_die( __( 'The `meta_box` parameter should be one of "side", "normal", or "advanced".', 'gutenberg' ) );
-	}
-
-	the_gutenberg_metaboxes( array( $location ) );
+	the_gutenberg_metaboxes();
 }
 
 add_action( 'do_meta_boxes', 'gutenberg_meta_box_save', 1000, 2 );
@@ -88,13 +63,10 @@ add_action( 'do_meta_boxes', 'gutenberg_meta_box_save', 1000, 2 );
  * @hooked redirect_post_location priority 10
  */
 function gutenberg_meta_box_save_redirect( $location, $post_id ) {
-	if ( isset( $_REQUEST['gutenberg_meta_boxes'] )
-			&& isset( $_REQUEST['gutenberg_meta_box_location'] )
-			&& 'gutenberg_meta_boxes' === $_REQUEST['gutenberg_meta_boxes'] ) {
-		$meta_box_location = $_REQUEST['gutenberg_meta_box_location'];
-		$location          = add_query_arg(
+	if ( isset( $_REQUEST['gutenberg_meta_boxes'] ) ) {
+		$location = add_query_arg(
 			array(
-				'meta_box'       => $meta_box_location,
+				'meta_box'       => true,
 				'action'         => 'edit',
 				'classic-editor' => true,
 				'post'           => $post_id,
@@ -313,10 +285,8 @@ function gutenberg_show_meta_box_warning( $callback ) {
  * Renders the WP meta boxes forms.
  *
  * @since 1.8.0
- *
- * @param string $locations The metaboxes locations to render.
  */
-function the_gutenberg_metaboxes( $locations = array( 'advanced', 'normal', 'side' ) ) {
+function the_gutenberg_metaboxes() {
 	global $post, $current_screen, $wp_meta_boxes;
 
 	// Handle meta box state.
@@ -334,28 +304,29 @@ function the_gutenberg_metaboxes( $locations = array( 'advanced', 'normal', 'sid
 	 * @param array $wp_meta_boxes Global meta box state.
 	 */
 	$wp_meta_boxes = apply_filters( 'filter_gutenberg_meta_boxes', $wp_meta_boxes );
+	$locations     = array( 'side', 'normal', 'advanced' );
 
 	// Render meta boxes.
-	if ( ! empty( $locations ) ) {
-		foreach ( $locations as $location ) {
-			?>
-			<form class="metabox-location-<?php echo $location; ?>">
-				<div id="poststuff" class="sidebar-open">
-					<div id="postbox-container-2" class="postbox-container">
-						<?php
-						gutenberg_meta_box_post_form_hidden_fields( $post, $location );
-						do_meta_boxes(
-							$current_screen,
-							$location,
-							$post
-						);
-						?>
-					</div>
+	?>
+	<form class="metabox-base-form">
+	<?php gutenberg_meta_box_post_form_hidden_fields( $post ); ?>
+	</form>
+	<?php foreach ( $locations as $location ) : ?>
+		<form class="metabox-location-<?php echo esc_attr( $location ); ?>">
+			<div id="poststuff" class="sidebar-open">
+				<div id="postbox-container-2" class="postbox-container">
+					<?php
+					do_meta_boxes(
+						$current_screen,
+						$location,
+						$post
+					);
+					?>
 				</div>
-			</form>
-			<?php
-		}
-	}
+			</div>
+		</form>
+	<?php endforeach; ?>
+	<?php
 
 	// Reset meta box data.
 	$wp_meta_boxes = $_original_meta_boxes;
@@ -365,11 +336,10 @@ function the_gutenberg_metaboxes( $locations = array( 'advanced', 'normal', 'sid
  * Renders the hidden form required for the meta boxes form.
  *
  * @param WP_Post $post     Current post object.
- * @param string  $location The metaboxes location to render.
  *
  * @since 1.8.0
  */
-function gutenberg_meta_box_post_form_hidden_fields( $post, $location ) {
+function gutenberg_meta_box_post_form_hidden_fields( $post ) {
 	$form_extra = '';
 	if ( 'auto-draft' === $post->post_status ) {
 		$form_extra .= "<input type='hidden' id='auto_draft' name='auto_draft' value='1' />";
@@ -391,7 +361,6 @@ function gutenberg_meta_box_post_form_hidden_fields( $post, $location ) {
 	<input type="hidden" id="referredby" name="referredby" value="<?php echo $referer ? esc_url( $referer ) : ''; ?>" />
 	<!-- These fields are not part of the standard post form. Used to redirect back to this page on save. -->
 	<input type="hidden" name="gutenberg_meta_boxes" value="gutenberg_meta_boxes" />
-	<input type="hidden" name="gutenberg_meta_box_location" value="<?php echo esc_attr( $location ); ?>" />
 	<?php if ( ! empty( $active_post_lock ) ) : ?>
 	<input type="hidden" id="active_post_lock" value="<?php echo esc_attr( implode( ':', $active_post_lock ) ); ?>" />
 	<?php endif; ?>

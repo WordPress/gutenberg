@@ -24,9 +24,16 @@ import {
 	notices,
 	blocksMode,
 	blockInsertionPoint,
+	isSavingMetaBoxes,
 	metaBoxes,
 	reusableBlocks,
 } from '../reducer';
+
+jest.mock( '../../edit-post/meta-boxes', () => {
+	return {
+		getMetaBoxContainer: () => ( { innerHTML: 'meta boxes content' } ),
+	};
+} );
 
 describe( 'state', () => {
 	describe( 'getPostRawValue', () => {
@@ -1236,29 +1243,49 @@ describe( 'state', () => {
 		} );
 	} );
 
+	describe( 'isSavingMetaBoxes', () => {
+		it( 'should return default state', () => {
+			const actual = isSavingMetaBoxes( undefined, {} );
+			expect( actual ).toBe( false );
+		} );
+
+		it( 'should set saving flag to true', () => {
+			const action = {
+				type: 'REQUEST_META_BOX_UPDATES',
+			};
+			const actual = isSavingMetaBoxes( false, action );
+
+			expect( actual ).toBe( true );
+		} );
+
+		it( 'should set saving flag to false', () => {
+			const action = {
+				type: 'META_BOX_UPDATES_SUCCESS',
+			};
+			const actual = isSavingMetaBoxes( true, action );
+
+			expect( actual ).toBe( false );
+		} );
+	} );
+
 	describe( 'metaBoxes()', () => {
 		it( 'should return default state', () => {
 			const actual = metaBoxes( undefined, {} );
 			const expected = {
 				normal: {
 					isActive: false,
-					isDirty: false,
-					isUpdating: false,
 				},
 				side: {
 					isActive: false,
-					isDirty: false,
-					isUpdating: false,
 				},
 				advanced: {
 					isActive: false,
-					isDirty: false,
-					isUpdating: false,
 				},
 			};
 
 			expect( actual ).toEqual( expected );
 		} );
+
 		it( 'should set the sidebar to active', () => {
 			const theMetaBoxes = {
 				normal: false,
@@ -1275,73 +1302,32 @@ describe( 'state', () => {
 			const expected = {
 				normal: {
 					isActive: false,
-					isDirty: false,
-					isUpdating: false,
-					isLoaded: false,
 				},
 				side: {
 					isActive: true,
-					isDirty: false,
-					isUpdating: false,
-					isLoaded: false,
 				},
 				advanced: {
 					isActive: false,
-					isDirty: false,
-					isUpdating: false,
-					isLoaded: false,
 				},
 			};
 
 			expect( actual ).toEqual( expected );
 		} );
-		it( 'should switch updating to off', () => {
+
+		it( 'should set the meta boxes saved data', () => {
 			const action = {
-				type: 'HANDLE_META_BOX_RELOAD',
-				location: 'normal',
+				type: 'META_BOX_SET_SAVED_DATA',
+				dataPerLocation: {
+					side: 'a=b',
+				},
 			};
 
-			const theMetaBoxes = metaBoxes( { normal: { isUpdating: true, isActive: false, isDirty: true } }, action );
-			const actual = theMetaBoxes.normal;
-			const expected = {
-				isActive: false,
-				isUpdating: false,
-				isDirty: false,
-			};
-
-			expect( actual ).toEqual( expected );
-		} );
-		it( 'should switch updating to on', () => {
-			const action = {
-				type: 'REQUEST_META_BOX_UPDATES',
-				locations: [ 'normal' ],
-			};
-
-			const theMetaBoxes = metaBoxes( undefined, action );
-			const actual = theMetaBoxes.normal;
-			const expected = {
-				isActive: false,
-				isUpdating: true,
-				isDirty: false,
-			};
-
-			expect( actual ).toEqual( expected );
-		} );
-		it( 'should return with the isDirty flag as true', () => {
-			const action = {
-				type: 'META_BOX_STATE_CHANGED',
-				location: 'normal',
-				hasChanged: true,
-			};
-			const theMetaBoxes = metaBoxes( undefined, action );
-			const actual = theMetaBoxes.normal;
-			const expected = {
-				isActive: false,
-				isDirty: true,
-				isUpdating: false,
-			};
-
-			expect( actual ).toEqual( expected );
+			const theMetaBoxes = metaBoxes( { normal: { isActive: true }, side: { isActive: false } }, action );
+			expect( theMetaBoxes ).toEqual( {
+				advanced: { data: undefined },
+				normal: { isActive: true, data: undefined },
+				side: { isActive: false, data: 'a=b' },
+			} );
 		} );
 	} );
 

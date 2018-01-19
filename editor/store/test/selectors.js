@@ -74,9 +74,9 @@ import {
 	getMostFrequentlyUsedBlocks,
 	getRecentInserterItems,
 	getMetaBoxes,
-	getDirtyMetaBoxes,
+	hasMetaBoxes,
+	isSavingMetaBoxes,
 	getMetaBox,
-	isMetaBoxStateDirty,
 	getReusableBlock,
 	isSavingReusableBlock,
 	isSelectionEnabled,
@@ -105,7 +105,6 @@ describe( 'selectors', () => {
 	} );
 
 	beforeEach( () => {
-		getDirtyMetaBoxes.clear();
 		getBlock.clear();
 		getBlocks.clear();
 		getEditedPostContent.clear();
@@ -135,24 +134,53 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getDirtyMetaBoxes', () => {
-		it( 'should return array of just the side location', () => {
+	describe( 'hasMetaBoxes', () => {
+		it( 'should return true if there are active meta boxes', () => {
 			const state = {
 				metaBoxes: {
 					normal: {
 						isActive: false,
-						isDirty: false,
-						isUpdating: false,
 					},
 					side: {
 						isActive: true,
-						isDirty: true,
-						isUpdating: false,
 					},
 				},
 			};
 
-			expect( getDirtyMetaBoxes( state ) ).toEqual( [ 'side' ] );
+			expect( hasMetaBoxes( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if there are no active meta boxes', () => {
+			const state = {
+				metaBoxes: {
+					normal: {
+						isActive: false,
+					},
+					side: {
+						isActive: false,
+					},
+				},
+			};
+
+			expect( hasMetaBoxes( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isSavingMetaBoxes', () => {
+		it( 'should return true if some meta boxes are saving', () => {
+			const state = {
+				isSavingMetaBoxes: true,
+			};
+
+			expect( isSavingMetaBoxes( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if no meta boxes are saving', () => {
+			const state = {
+				isSavingMetaBoxes: false,
+			};
+
+			expect( isSavingMetaBoxes( state ) ).toBe( false );
 		} );
 	} );
 
@@ -161,24 +189,20 @@ describe( 'selectors', () => {
 			const state = {
 				metaBoxes: {
 					normal: {
-						isDirty: false,
-						isUpdating: false,
+						isActive: true,
 					},
 					side: {
-						isDirty: false,
-						isUpdating: false,
+						isActive: true,
 					},
 				},
 			};
 
 			expect( getMetaBoxes( state ) ).toEqual( {
 				normal: {
-					isDirty: false,
-					isUpdating: false,
+					isActive: true,
 				},
 				side: {
-					isDirty: false,
-					isUpdating: false,
+					isActive: true,
 				},
 			} );
 		} );
@@ -190,119 +214,16 @@ describe( 'selectors', () => {
 				metaBoxes: {
 					normal: {
 						isActive: false,
-						isDirty: false,
-						isUpdating: false,
 					},
 					side: {
 						isActive: true,
-						isDirty: false,
-						isUpdating: false,
 					},
 				},
 			};
 
 			expect( getMetaBox( state, 'side' ) ).toEqual( {
 				isActive: true,
-				isDirty: false,
-				isUpdating: false,
 			} );
-		} );
-	} );
-
-	describe( 'isMetaBoxStateDirty', () => {
-		it( 'should return false', () => {
-			const state = {
-				metaBoxes: {
-					normal: {
-						isActive: false,
-						isDirty: false,
-						isUpdating: false,
-					},
-					side: {
-						isActive: false,
-						isDirty: false,
-						isUpdating: false,
-					},
-				},
-			};
-
-			expect( isMetaBoxStateDirty( state ) ).toEqual( false );
-		} );
-
-		it( 'should return false when a dirty meta box is not active.', () => {
-			const state = {
-				metaBoxes: {
-					normal: {
-						isActive: false,
-						isDirty: true,
-						isUpdating: false,
-					},
-					side: {
-						isActive: false,
-						isDirty: false,
-						isUpdating: false,
-					},
-				},
-			};
-
-			expect( isMetaBoxStateDirty( state ) ).toEqual( false );
-		} );
-
-		it( 'should return false when both meta boxes are dirty but inactive.', () => {
-			const state = {
-				metaBoxes: {
-					normal: {
-						isActive: false,
-						isDirty: true,
-						isUpdating: false,
-					},
-					side: {
-						isActive: false,
-						isDirty: true,
-						isUpdating: false,
-					},
-				},
-			};
-
-			expect( isMetaBoxStateDirty( state ) ).toEqual( false );
-		} );
-
-		it( 'should return false when a dirty meta box is active.', () => {
-			const state = {
-				metaBoxes: {
-					normal: {
-						isActive: true,
-						isDirty: true,
-						isUpdating: false,
-					},
-					side: {
-						isActive: false,
-						isDirty: false,
-						isUpdating: false,
-					},
-				},
-			};
-
-			expect( isMetaBoxStateDirty( state ) ).toEqual( true );
-		} );
-
-		it( 'should return false when both meta boxes are dirty and active.', () => {
-			const state = {
-				metaBoxes: {
-					normal: {
-						isActive: true,
-						isDirty: true,
-						isUpdating: false,
-					},
-					side: {
-						isActive: true,
-						isDirty: true,
-						isUpdating: false,
-					},
-				},
-			};
-
-			expect( isMetaBoxStateDirty( state ) ).toEqual( true );
 		} );
 	} );
 
@@ -583,38 +504,11 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'isEditedPostDirty', () => {
-		const metaBoxes = {
-			normal: {
-				isActive: false,
-				isDirty: false,
-				isUpdating: false,
-			},
-			side: {
-				isActive: false,
-				isDirty: false,
-				isUpdating: false,
-			},
-		};
-		// Those dirty dang meta boxes.
-		const dirtyMetaBoxes = {
-			normal: {
-				isActive: true,
-				isDirty: true,
-				isUpdating: false,
-			},
-			side: {
-				isActive: false,
-				isDirty: false,
-				isUpdating: false,
-			},
-		};
-
 		it( 'should return true when post saved state dirty', () => {
 			const state = {
 				editor: {
 					isDirty: true,
 				},
-				metaBoxes,
 			};
 
 			expect( isEditedPostDirty( state ) ).toBe( true );
@@ -625,26 +519,14 @@ describe( 'selectors', () => {
 				editor: {
 					isDirty: false,
 				},
-				metaBoxes,
 			};
 
 			expect( isEditedPostDirty( state ) ).toBe( false );
 		} );
-
-		it( 'should return true when post saved state not dirty, but meta box state has changed.', () => {
-			const state = {
-				editor: {
-					isDirty: false,
-				},
-				metaBoxes: dirtyMetaBoxes,
-			};
-
-			expect( isEditedPostDirty( state ) ).toBe( true );
-		} );
 	} );
 
 	describe( 'isCleanNewPost', () => {
-		const metaBoxes = { isDirty: false, isUpdating: false };
+		const metaBoxes = {};
 
 		it( 'should return true when the post is not dirty and has not been saved before', () => {
 			const state = {
@@ -841,7 +723,7 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getDocumentTitle', () => {
-		const metaBoxes = { isDirty: false, isUpdating: false };
+		const metaBoxes = {};
 		it( 'should return current title unedited existing post', () => {
 			const state = {
 				currentPost: {
@@ -1067,7 +949,7 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'isEditedPostPublishable', () => {
-		const metaBoxes = { isDirty: false, isUpdating: false };
+		const metaBoxes = {};
 
 		it( 'should return true for pending posts', () => {
 			const state = {
@@ -2058,19 +1940,32 @@ describe( 'selectors', () => {
 				saving: {
 					requesting: true,
 				},
+				isSavingMetaBoxes: false,
 			};
 
 			expect( isSavingPost( state ) ).toBe( true );
 		} );
 
-		it( 'should return false if the post is currently being saved', () => {
+		it( 'should return false if the post is not currently being saved', () => {
 			const state = {
 				saving: {
 					requesting: false,
 				},
+				isSavingMetaBoxes: false,
 			};
 
 			expect( isSavingPost( state ) ).toBe( false );
+		} );
+
+		it( 'should return true if the post is not currently being saved but meta boxes are saving', () => {
+			const state = {
+				saving: {
+					requesting: false,
+				},
+				isSavingMetaBoxes: true,
+			};
+
+			expect( isSavingPost( state ) ).toBe( true );
 		} );
 	} );
 
