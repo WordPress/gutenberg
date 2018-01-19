@@ -126,15 +126,11 @@ class DropZoneProvider extends Component {
 		// Notifying the dropzones
 		dropzonesToUpdate.map( ( dropzone ) => {
 			const index = this.dropzones.indexOf( dropzone );
-
-			// Safer in IIFE here. "updateState" is async.
-			( ( _index, _hoveredDropZone, _position, _isDraggingOverDocument ) => {
-				dropzone.updateState( {
-					isDraggingOverElement: _index === _hoveredDropZone,
-					position: _index === _hoveredDropZone ? _position : null,
-					_isDraggingOverDocument,
-				} );
-			} )( index, hoveredDropZone, position, isDraggingOverDocument );
+			dropzone.updateState( {
+				isDraggingOverElement: index === hoveredDropZone,
+				position: index === hoveredDropZone ? position : null,
+				isDraggingOverDocument,
+			} );
 		} );
 
 		this.setState( {
