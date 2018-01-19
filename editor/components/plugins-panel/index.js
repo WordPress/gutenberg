@@ -55,7 +55,7 @@ function PluginsPanel( { onClose, plugin } ) {
 			role="region"
 			aria-label={ __( 'Editor plugins' ) }
 			tabIndex="-1">
-			<div className="components-panel__header editor-sidebar__panel-tabs">
+			<div className="editor-plugins-panel__header">
 				<h3>{ title }</h3>
 				<IconButton
 					onClick={ onClose }
