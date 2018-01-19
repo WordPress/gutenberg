@@ -55,6 +55,14 @@ a traditional `input` field, usually when the user exits the field.
 
 *Optional.* Called when the block can be removed. `forward` is true when the selection is expected to move to the next block, false to the previous block.
 
+### `formattingControls: Array`
+
+*Optional.* By default, all formatting controls are present. This setting can be used to fine-tune formatting controls. Possible items: `[ 'bold', 'italic', 'strikethrough', 'link' ]`.
+
+### `keepPlaceholderOnFocus: Boolean`
+
+*Optional.* By default, the placeholder will hide as soon as the editable field receives focus. With this setting it can be be kept while the field is focussed and empty.
+
 ## Example
 
 ```js
