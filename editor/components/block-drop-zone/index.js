@@ -14,7 +14,7 @@ import { compose } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { insertBlocks } from '../../store/actions';
+import { insertBlocks, updateBlockAttributes } from '../../store/actions';
 
 function BlockDropZone( { index, isLocked, ...props } ) {
 	if ( isLocked ) {
@@ -40,10 +40,8 @@ function BlockDropZone( { index, isLocked, ...props } ) {
 
 		if ( transformation ) {
 			const insertPosition = getInsertPosition( position );
-
-			transformation.transform( files ).then( ( blocks ) => {
-				props.insertBlocks( blocks, insertPosition );
-			} );
+			const blocks = transformation.transform( files, props.updateBlockAttributes );
+			props.insertBlocks( blocks, insertPosition );
 		}
 	};
 
@@ -66,7 +64,7 @@ function BlockDropZone( { index, isLocked, ...props } ) {
 export default compose(
 	connect(
 		undefined,
-		{ insertBlocks }
+		{ insertBlocks, updateBlockAttributes }
 	),
 	withContext( 'editor' )( ( settings ) => {
 		const { templateLock } = settings;
