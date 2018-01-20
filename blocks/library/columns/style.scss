@@ -1,0 +1,14 @@
+.wp-block-columns {
+	display: grid;
+	grid-auto-flow: dense;
+
+	@for $i from 2 through 6 {
+		&.has-#{ $i }-columns {
+			grid-template-columns: repeat( #{ $i }, 1fr );
+		}
+
+		.layout-column-#{ $i } {
+			grid-column: #{ $i };
+		}
+	}
+}

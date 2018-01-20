@@ -1,9 +1,0 @@
-.wp-block-columns {
-	display: flex;
-	padding: $item-spacing 0;
-
-	> div {
-		flex-basis: 100%;
-		flex-shrink: 1;
-	}
-}

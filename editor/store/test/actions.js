@@ -219,11 +219,11 @@ describe( 'actions', () => {
 			const block = {
 				uid: 'ribs',
 			};
-			const position = 5;
-			expect( insertBlock( block, position ) ).toEqual( {
+			const index = 5;
+			expect( insertBlock( block, index ) ).toEqual( {
 				type: 'INSERT_BLOCKS',
 				blocks: [ block ],
-				position,
+				index,
 			} );
 		} );
 	} );
@@ -233,11 +233,11 @@ describe( 'actions', () => {
 			const blocks = [ {
 				uid: 'ribs',
 			} ];
-			const position = 3;
-			expect( insertBlocks( blocks, position ) ).toEqual( {
+			const index = 3;
+			expect( insertBlocks( blocks, index ) ).toEqual( {
 				type: 'INSERT_BLOCKS',
 				blocks,
-				position,
+				index,
 			} );
 		} );
 	} );

@@ -187,29 +187,55 @@ export function replaceBlock( uid, block ) {
 	return replaceBlocks( uid, block );
 }
 
-export function insertBlock( block, position ) {
-	return insertBlocks( [ block ], position );
+/**
+ * Returns an action object used in signalling that a single block should be
+ * inserted, optionally at a specific index respective a root block list.
+ *
+ * @param {Object}  block   Block object to insert.
+ * @param {?Number} index   Index at which block should be inserted.
+ * @param {?String} rootUID Optional root UID of block list to insert.
+ *
+ * @returns {Object} Action object.
+ */
+export function insertBlock( block, index, rootUID ) {
+	return insertBlocks( [ block ], index, rootUID );
 }
 
-export function insertBlocks( blocks, position ) {
+/**
+ * Returns an action object used in signalling that an array of blocks should
+ * be inserted, optionally at a specific index respective a root block list.
+ *
+ * @param {Object[]} blocks  Block objects to insert.
+ * @param {?Number}  index   Index at which block should be inserted.
+ * @param {?String}  rootUID Optional root UID of block list to insert.
+ *
+ * @returns {Object} Action object.
+ */
+export function insertBlocks( blocks, index, rootUID ) {
 	return {
 		type: 'INSERT_BLOCKS',
 		blocks: castArray( blocks ),
-		position,
+		index,
+		rootUID,
 	};
 }
 
 /**
  * Returns an action object showing the insertion point at a given index.
  *
- * @param {Number?} index Index of the insertion point.
+ * @param {Number?} index   Index of the insertion point.
+ * @param {?String} rootUID Optional root UID of block list insertion point.
+ * @param {?String} layout  Optional layout context to restrict visibility of
+ *                          the shown insertion point.
  *
  * @returns {Object} Action object.
  */
-export function showInsertionPoint( index ) {
+export function showInsertionPoint( index, rootUID, layout ) {
 	return {
 		type: 'SHOW_INSERTION_POINT',
 		index,
+		rootUID,
+		layout,
 	};
 }
 
@@ -605,10 +631,20 @@ export function convertBlockToReusable( uid ) {
 		uid,
 	};
 }
-
-export function appendDefaultBlock() {
+/**
+ * Returns an action object used in signalling that a new block of the default
+ * type should be appended to the block list.
+ *
+ * @param {?Object} attributes Optional attributes of the block to assign.
+ * @param {?String} rootUID    Optional root UID of block list to append.
+ *
+ * @returns {Object} Action object
+ */
+export function appendDefaultBlock( attributes, rootUID ) {
 	return {
 		type: 'APPEND_DEFAULT_BLOCK',
+		attributes,
+		rootUID,
 	};
 }
 

@@ -448,8 +448,11 @@ export default {
 		dispatch( saveReusableBlock( reusableBlock.id ) );
 		dispatch( replaceBlocks( [ oldBlock.uid ], [ newBlock ] ) );
 	},
-	APPEND_DEFAULT_BLOCK() {
-		return insertBlock( createBlock( getDefaultBlockName() ) );
+	APPEND_DEFAULT_BLOCK( action ) {
+		const { attributes, rootUID } = action;
+		const block = createBlock( getDefaultBlockName(), attributes );
+
+		return insertBlock( block, undefined, rootUID );
 	},
 	CREATE_NOTICE( { notice: { content, spokenMessage } } ) {
 		const message = spokenMessage || content;

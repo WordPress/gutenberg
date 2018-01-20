@@ -14,7 +14,8 @@ import { Component } from '@wordpress/element';
  */
 import Inserter from '../inserter';
 import {
-	getBlockUids,
+	getBlock,
+	getBlockOrder,
 	getBlockInsertionPoint,
 	isBlockInsertionPointVisible,
 	isBlockWithinSelection,
@@ -49,7 +50,7 @@ class BlockListSiblingInserter extends Component {
 			return null;
 		}
 
-		const { insertIndex, showInsertionPoint } = this.props;
+		const { rootUID, insertIndex, showInsertionPoint, layout } = this.props;
 		const { isForcedVisible } = this.state;
 
 		const classes = classnames( 'editor-block-list__sibling-inserter', {
@@ -67,7 +68,9 @@ class BlockListSiblingInserter extends Component {
 				<Inserter
 					key="inserter"
 					position="bottom"
+					rootUID={ rootUID }
 					insertIndex={ insertIndex }
+					layout={ layout }
 					onToggle={ this.forceVisibleWhileInserting }
 				/>
 			</div>
@@ -76,17 +79,27 @@ class BlockListSiblingInserter extends Component {
 }
 
 export default connect(
-	( state, { uid } ) => {
-		const blockIndex = uid ? getBlockUids( state ).indexOf( uid ) : -1;
-		const insertIndex = blockIndex > -1 ? blockIndex + 1 : 0;
+	( state, { rootUID, uid, layout, insertBefore } ) => {
+		const increment = insertBefore ? 0 : 1;
+		const blockIndex = getBlockOrder( state, rootUID ).indexOf( uid );
+		const block = getBlock( state, uid );
+
+		let insertIndex, showInsertionPoint;
+		if ( block && blockIndex >= 0 ) {
+			insertIndex = blockIndex + increment;
+			showInsertionPoint = (
+				isBlockInsertionPointVisible( state, rootUID, layout ) &&
+				getBlockInsertionPoint( state, rootUID ) === insertIndex
+			);
+		} else {
+			insertIndex = 0;
+			showInsertionPoint = false;
+		}
 
 		return {
 			shouldDisable: isBlockWithinSelection( state, uid ),
 			insertIndex,
-			showInsertionPoint: (
-				isBlockInsertionPointVisible( state ) &&
-				getBlockInsertionPoint( state ) === insertIndex
-			),
+			showInsertionPoint,
 		};
 	},
 	{

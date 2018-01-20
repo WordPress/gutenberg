@@ -9,7 +9,6 @@ import {
 	difference,
 	get,
 	reduce,
-	keyBy,
 	keys,
 	first,
 	last,
@@ -55,6 +54,54 @@ export function getPostRawValue( value ) {
 }
 
 /**
+ * Given an array of blocks, returns an object where each key is a nesting
+ * context, the value of which is an array of block UIDs existing within that
+ * nesting context.
+ *
+ * @param {Array}   blocks  Blocks to map.
+ * @param {?string} rootUID Assumed root UID.
+ *
+ * @returns {Object} Block order map object.
+ */
+function mapBlockOrder( blocks, rootUID = '' ) {
+	const result = { [ rootUID ]: [] };
+
+	blocks.forEach( ( block ) => {
+		const { uid, innerBlocks } = block;
+
+		result[ rootUID ].push( uid );
+
+		Object.assign( result, mapBlockOrder( innerBlocks, uid ) );
+	} );
+
+	return result;
+}
+
+/**
+ * Given an array of blocks, returns an object containing all blocks, recursing
+ * into inner blocks. Keys correspond to the block UID, the value of which is
+ * the block object.
+ *
+ * @param {Array} blocks Blocks to flatten.
+ *
+ * @returns {Object} Flattened blocks object.
+ */
+function getFlattenedBlocks( blocks ) {
+	const flattenedBlocks = {};
+
+	const stack = [ ...blocks ];
+	while ( stack.length ) {
+		const block = stack.shift();
+
+		flattenedBlocks[ block.uid ] = block;
+
+		stack.unshift( ...block.innerBlocks );
+	}
+
+	return flattenedBlocks;
+}
+
+/**
  * Undoable reducer returning the editor post state, including blocks parsed
  * from current HTML markup.
  *
@@ -62,7 +109,8 @@ export function getPostRawValue( value ) {
  *  - edits: an object describing changes to be made to the current post, in
  *           the format accepted by the WP REST API
  *  - blocksByUid: post content blocks keyed by UID
- *  - blockOrder: list of block UIDs in order
+ *  - blockOrder: object where each key is a UID, its value an array of uids
+ *                representing the order of its inner blocks
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
@@ -126,7 +174,7 @@ export const editor = flow( [
 	blocksByUid( state = {}, action ) {
 		switch ( action.type ) {
 			case 'RESET_BLOCKS':
-				return keyBy( action.blocks, 'uid' );
+				return getFlattenedBlocks( action.blocks );
 
 			case 'UPDATE_BLOCK_ATTRIBUTES':
 				// Ignore updates if block isn't known
@@ -180,19 +228,18 @@ export const editor = flow( [
 			case 'INSERT_BLOCKS':
 				return {
 					...state,
-					...keyBy( action.blocks, 'uid' ),
+					...getFlattenedBlocks( action.blocks ),
 				};
 
 			case 'REPLACE_BLOCKS':
 				if ( ! action.blocks ) {
 					return state;
 				}
-				return action.blocks.reduce( ( memo, block ) => {
-					return {
-						...memo,
-						[ block.uid ]: block,
-					};
-				}, omit( state, action.uids ) );
+
+				return {
+					...omit( state, action.uids ),
+					...getFlattenedBlocks( action.blocks ),
+				};
 
 			case 'REMOVE_BLOCKS':
 				return omit( state, action.uids );
@@ -227,80 +274,132 @@ export const editor = flow( [
 		return state;
 	},
 
-	blockOrder( state = [], action ) {
+	blockOrder( state = {}, action ) {
 		switch ( action.type ) {
 			case 'RESET_BLOCKS':
-				return action.blocks.map( ( { uid } ) => uid );
+				return mapBlockOrder( action.blocks );
 
 			case 'INSERT_BLOCKS': {
-				const position = action.position !== undefined ? action.position : state.length;
-				return [
-					...state.slice( 0, position ),
-					...action.blocks.map( block => block.uid ),
-					...state.slice( position ),
-				];
+				const { rootUID = '', blocks } = action;
+
+				const subState = state[ rootUID ] || [];
+				const mappedBlocks = mapBlockOrder( blocks, rootUID );
+
+				const { index = subState.length } = action;
+
+				return {
+					...state,
+					...mappedBlocks,
+					[ rootUID ]: [
+						...subState.slice( 0, index ),
+						...mappedBlocks[ rootUID ],
+						...subState.slice( index ),
+					],
+				};
 			}
 
 			case 'MOVE_BLOCKS_UP': {
-				const firstUid = first( action.uids );
-				const lastUid = last( action.uids );
+				const { uids, rootUID = '' } = action;
+				const firstUid = first( uids );
+				const lastUid = last( uids );
+				const subState = state[ rootUID ];
 
-				if ( ! state.length || firstUid === first( state ) ) {
+				if ( ! subState.length || firstUid === first( subState ) ) {
 					return state;
 				}
 
-				const firstIndex = state.indexOf( firstUid );
-				const lastIndex = state.indexOf( lastUid );
-				const swappedUid = state[ firstIndex - 1 ];
+				const firstIndex = subState.indexOf( firstUid );
+				const lastIndex = subState.indexOf( lastUid );
+				const swappedUid = subState[ firstIndex - 1 ];
 
-				return [
-					...state.slice( 0, firstIndex - 1 ),
-					...action.uids,
-					swappedUid,
-					...state.slice( lastIndex + 1 ),
-				];
+				return {
+					...state,
+					[ rootUID ]: [
+						...subState.slice( 0, firstIndex - 1 ),
+						...uids,
+						swappedUid,
+						...subState.slice( lastIndex + 1 ),
+					],
+				};
 			}
 
 			case 'MOVE_BLOCKS_DOWN': {
-				const firstUid = first( action.uids );
-				const lastUid = last( action.uids );
+				const { uids, rootUID = '' } = action;
+				const firstUid = first( uids );
+				const lastUid = last( uids );
+				const subState = state[ rootUID ];
 
-				if ( ! state.length || lastUid === last( state ) ) {
+				if ( ! subState.length || lastUid === last( subState ) ) {
 					return state;
 				}
 
-				const firstIndex = state.indexOf( firstUid );
-				const lastIndex = state.indexOf( lastUid );
-				const swappedUid = state[ lastIndex + 1 ];
+				const firstIndex = subState.indexOf( firstUid );
+				const lastIndex = subState.indexOf( lastUid );
+				const swappedUid = subState[ lastIndex + 1 ];
 
-				return [
-					...state.slice( 0, firstIndex ),
-					swappedUid,
-					...action.uids,
-					...state.slice( lastIndex + 2 ),
-				];
+				return {
+					...state,
+					[ rootUID ]: [
+						...subState.slice( 0, firstIndex ),
+						swappedUid,
+						...uids,
+						...subState.slice( lastIndex + 2 ),
+					],
+				};
 			}
 
-			case 'REPLACE_BLOCKS':
-				if ( ! action.blocks ) {
+			case 'REPLACE_BLOCKS': {
+				const { blocks, uids } = action;
+				if ( ! blocks ) {
 					return state;
 				}
 
-				return state.reduce( ( memo, uid ) => {
-					if ( uid === action.uids[ 0 ] ) {
-						return memo.concat( action.blocks.map( ( block ) => block.uid ) );
-					}
-					if ( action.uids.indexOf( uid ) === -1 ) {
-						memo.push( uid );
-					}
-					return memo;
-				}, [] );
+				const mappedBlocks = mapBlockOrder( blocks );
+
+				return flow( [
+					( nextState ) => omit( nextState, uids ),
+					( nextState ) => mapValues( nextState, ( subState ) => (
+						reduce( subState, ( result, uid ) => {
+							if ( uid === uids[ 0 ] ) {
+								return [
+									...result,
+									...mappedBlocks[ '' ],
+								];
+							}
+
+							if ( uids.indexOf( uid ) === -1 ) {
+								result.push( uid );
+							}
+
+							return result;
+						}, [] )
+					) ),
+				] )( {
+					...state,
+					...omit( mappedBlocks, '' ),
+				} );
+
+				// mergeWith( {
+				// 	...state,
+				// 	...mappedBlocks,
+				// }, ( a, b ) => [ ...a, ...b ] ) );
+			}
 
 			case 'REMOVE_BLOCKS':
-				return without( state, ...action.uids );
+			case 'REMOVE_REUSABLE_BLOCK': {
+				const { type, uids, associatedBlockUids } = action;
+				const uidsToRemove = type === 'REMOVE_BLOCKS' ? uids : associatedBlockUids;
 
-			case 'REMOVE_REUSABLE_BLOCK':
-				return without( state, ...action.associatedBlockUids );
+				return flow( [
+					// Remove inner block ordering for removed blocks
+					( nextState ) => omit( nextState, uidsToRemove ),
+
+					// Remove deleted blocks from other blocks' orderings
+					( nextState ) => mapValues( nextState, ( subState ) => (
+						without( subState, ...uidsToRemove )
+					) ),
+				] )( state );
+			}
 		}
 
 		return state;
@@ -510,10 +609,21 @@ export function blocksMode( state = {}, action ) {
 export function blockInsertionPoint( state = {}, action ) {
 	switch ( action.type ) {
 		case 'SHOW_INSERTION_POINT':
-			return { ...state, visible: true, position: action.index };
+			const { rootUID, index, layout } = action;
+			return {
+				...state,
+				rootUID,
+				index,
+				layout,
+			};
 
 		case 'HIDE_INSERTION_POINT':
-			return { ...state, visible: false, position: null };
+			return {
+				...state,
+				rootUID: null,
+				index: null,
+				layout: null,
+			};
 	}
 
 	return state;

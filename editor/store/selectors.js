@@ -3,6 +3,7 @@
  */
 import moment from 'moment';
 import {
+	map,
 	first,
 	get,
 	has,
@@ -13,6 +14,7 @@ import {
 	compact,
 	find,
 	some,
+	includes,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -28,6 +30,15 @@ import { addQueryArgs } from '@wordpress/url';
  */
 export const POST_UPDATE_TRANSACTION_ID = 'post-update';
 const MAX_FREQUENT_BLOCKS = 3;
+
+/**
+ * Shared reference to an empty array used as the default block order return
+ * value when the state value is not explicitly assigned, since we want to
+ * avoid returning a new array reference on every invocation.
+ *
+ * @type {Array}
+ */
+const DEFAULT_BLOCK_ORDER = [];
 
 /**
  * Returns the current editing mode.
@@ -531,13 +542,17 @@ function getPostMeta( state, key ) {
  * the order they appear in the post.
  * Note: It's important to memoize this selector to avoid return a new instance on each call
  *
- * @param {Object} state Global application state.
+ * @param {Object}  state   Global application state.
+ * @param {?String} rootUID Optional root UID of block list.
  *
  * @returns {Object[]} Post blocks.
  */
 export const getBlocks = createSelector(
-	( state ) => {
-		return state.editor.present.blockOrder.map( ( uid ) => getBlock( state, uid ) );
+	( state, rootUID ) => {
+		return map( getBlockOrder( state, rootUID ), ( uid ) => ( {
+			...getBlock( state, uid ),
+			innerBlocks: getBlocks( state, uid ),
+		} ) );
 	},
 	( state ) => [
 		state.editor.present.blockOrder,
@@ -548,12 +563,13 @@ export const getBlocks = createSelector(
 /**
  * Returns the number of blocks currently present in the post.
  *
- * @param {Object} state Global application state.
+ * @param {Object}  state   Global application state.
+ * @param {?String} rootUID Optional root UID of block list.
  *
  * @returns {number} Number of blocks in the post.
  */
-export function getBlockCount( state ) {
-	return getBlockUids( state ).length;
+export function getBlockCount( state, rootUID ) {
+	return getBlockOrder( state, rootUID ).length;
 }
 
 /**
@@ -590,6 +606,101 @@ export function getSelectedBlock( state ) {
 }
 
 /**
+ * Given a block UID, returns the root block from which the block is nested, an
+ * empty string for top-level blocks, or null if the block does not exist.
+ *
+ * @param {Object} state Global application state.
+ * @param {String} uid   Block from which to find root UID.
+ *
+ * @returns {?string} Root UID, if exists
+ */
+export function getBlockRootUID( state, uid ) {
+	const { blockOrder } = state.editor.present;
+
+	for ( const rootUID in blockOrder ) {
+		if ( includes( blockOrder[ rootUID ], uid ) ) {
+			return rootUID;
+		}
+	}
+
+	return null;
+}
+
+/**
+ * Returns the block adjacent one at the given reference startUID and modifier
+ * directionality. Defaults start UID to the selected block, and direction as
+ * next block. Returns null if there is no adjacent block.
+ *
+ * @param {Object}  state    Global application state.
+ * @param {?string} startUID Optional UID of block from which to search.
+ * @param {?number} modifier Directionality multiplier (1 next, -1 previous).
+ *
+ * @returns {?Object} Adjacent block object, or null if none exists.
+ */
+export function getAdjacentBlock( state, startUID, modifier = 1 ) {
+	// Default to selected block.
+	if ( startUID === undefined ) {
+		startUID = get( getSelectedBlock( state ), 'uid' );
+	}
+
+	// Validate working start UID.
+	if ( ! startUID ) {
+		return null;
+	}
+
+	// Retrieve start block root UID, being careful to allow the falsey empty
+	// string top-level root UID by explicitly testing against null.
+	const rootUID = getBlockRootUID( state, startUID );
+	if ( rootUID === null ) {
+		return null;
+	}
+
+	const { blockOrder } = state.editor.present;
+	const orderSet = blockOrder[ rootUID ];
+	const index = orderSet.indexOf( startUID );
+	const nextIndex = ( index + ( 1 * modifier ) );
+
+	// Block was first in set and we're attempting to get previous.
+	if ( nextIndex < 0 ) {
+		return null;
+	}
+
+	// Block was last in set and we're attempting to get next.
+	if ( nextIndex === orderSet.length ) {
+		return null;
+	}
+
+	// Assume incremented index is within the set.
+	return getBlock( state, orderSet[ nextIndex ] );
+}
+
+/**
+ * Returns the previous block from the given reference startUID. Defaults start
+ * UID to the selected block. Returns null if there is no previous block.
+ *
+ * @param {Object}  state    Global application state.
+ * @param {?String} startUID Optional UID of block from which to search.
+ *
+ * @returns {?Object} Adjacent block object, or null if none exists.
+ */
+export function getPreviousBlock( state, startUID ) {
+	return getAdjacentBlock( state, startUID, -1 );
+}
+
+/**
+ * Returns the next block from the given reference startUID. Defaults start UID
+ * to the selected block. Returns null if there is no next block.
+ *
+ * @param {Object}  state    Global application state.
+ * @param {?String} startUID Optional UID of block from which to search.
+ *
+ * @returns {?Object} Adjacent block object, or null if none exists.
+ */
+export function getNextBlock( state, startUID ) {
+	return getAdjacentBlock( state, startUID, 1 );
+}
+
+/**
  * Returns the current multi-selection set of blocks unique IDs, or an empty
  * array if there is no multi-selection.
  *
@@ -599,12 +710,20 @@ export function getSelectedBlock( state ) {
  */
 export const getMultiSelectedBlockUids = createSelector(
 	( state ) => {
-		const { blockOrder } = state.editor.present;
 		const { start, end } = state.blockSelection;
 		if ( start === end ) {
 			return [];
 		}
 
+		// Retrieve root UID to aid in retrieving relevant nested block order,
+		// being careful to allow the falsey empty string top-level root UID by
+		// explicitly testing against null.
+		const rootUID = getBlockRootUID( state, start );
+		if ( rootUID === null ) {
+			return [];
+		}
+
+		const blockOrder = getBlockOrder( state, rootUID );
 		const startIndex = blockOrder.indexOf( start );
 		const endIndex = blockOrder.indexOf( end );
 
@@ -732,81 +851,31 @@ export function getMultiSelectedBlocksEndUid( state ) {
 
 /**
  * Returns an array containing all block unique IDs of the post being edited,
- * in the order they appear in the post.
+ * in the order they appear in the post. Optionally accepts a root UID of the
+ * block list for which the order should be returned, defaulting to the top-
+ * level block order.
  *
- * @param {Object} state Global application state.
+ * @param {Object}  state   Global application state.
+ * @param {?String} rootUID Optional root UID of block list.
  *
  * @returns {Array} Ordered unique IDs of post blocks.
  */
-export function getBlockUids( state ) {
-	return state.editor.present.blockOrder;
+export function getBlockOrder( state, rootUID ) {
+	return state.editor.present.blockOrder[ rootUID || '' ] || DEFAULT_BLOCK_ORDER;
 }
 
 /**
  * Returns the index at which the block corresponding to the specified unique ID
  * occurs within the post block order, or `-1` if the block does not exist.
  *
- * @param {Object} state Global application state.
- * @param {string} uid   Block unique ID.
+ * @param {Object}  state   Global application state.
+ * @param {string}  uid     Block unique ID.
+ * @param {?String} rootUID Optional root UID of block list.
  *
  * @returns {number} Index at which block exists in order.
  */
-export function getBlockIndex( state, uid ) {
-	return state.editor.present.blockOrder.indexOf( uid );
-}
-
-/**
- * Returns true if the block corresponding to the specified unique ID is the
- * first block of the post, or false otherwise.
- *
- * @param {Object} state Global application state.
- * @param {string} uid   Block unique ID.
- *
- * @returns {boolean} Whether block is first in post.
- */
-export function isFirstBlock( state, uid ) {
-	return first( state.editor.present.blockOrder ) === uid;
-}
-
-/**
- * Returns true if the block corresponding to the specified unique ID is the
- * last block of the post, or false otherwise.
- *
- * @param {Object} state Global application state.
- * @param {string} uid   Block unique ID.
- *
- * @returns {boolean} Whether block is last in post.
- */
-export function isLastBlock( state, uid ) {
-	return last( state.editor.present.blockOrder ) === uid;
-}
-
-/**
- * Returns the block object occurring before the one corresponding to the
- * specified unique ID.
- *
- * @param {Object} state Global application state.
- * @param {string} uid   Block unique ID.
- *
- * @returns {Object} Block occurring before specified unique ID.
- */
-export function getPreviousBlock( state, uid ) {
-	const order = getBlockIndex( state, uid );
-	return state.editor.present.blocksByUid[ state.editor.present.blockOrder[ order - 1 ] ] || null;
-}
-
-/**
- * Returns the block object occurring after the one corresponding to the
- * specified unique ID.
- *
- * @param {Object} state Global application state.
- * @param {string} uid   Block unique ID.
- *
- * @returns {Object} Block occurring after specified unique ID.
- */
-export function getNextBlock( state, uid ) {
-	const order = getBlockIndex( state, uid );
-	return state.editor.present.blocksByUid[ state.editor.present.blockOrder[ order + 1 ] ] || null;
+export function getBlockIndex( state, uid, rootUID ) {
+	return getBlockOrder( state, rootUID ).indexOf( uid );
 }
 
 /**
@@ -929,61 +998,60 @@ export function isTyping( state ) {
 
 /**
  * Returns the insertion point, the index at which the new inserted block would
- * be placed. Defaults to the last position.
+ * be placed. Defaults to the last index.
  *
- * @param {Object} state Global application state.
+ * @param {Object}  state   Global application state.
+ * @param {?String} rootUID Optional root UID of block list.
  *
  * @returns {?String} Unique ID after which insertion will occur.
  */
-export function getBlockInsertionPoint( state ) {
+export function getBlockInsertionPoint( state, rootUID ) {
 	if ( getEditorMode( state ) !== 'visual' ) {
-		return state.editor.present.blockOrder.length;
+		return getBlockOrder( state ).length;
 	}
 
-	const position = getBlockSiblingInserterPosition( state );
-	if ( null !== position ) {
-		return position;
+	const { rootUID: insertionPointRootUID, index } = state.blockInsertionPoint;
+	if ( Number.isInteger( index ) && insertionPointRootUID === rootUID ) {
+		return index;
 	}
 
 	const lastMultiSelectedBlock = getLastMultiSelectedBlockUid( state );
 	if ( lastMultiSelectedBlock ) {
-		return getBlockIndex( state, lastMultiSelectedBlock ) + 1;
+		return getBlockIndex( state, lastMultiSelectedBlock, rootUID ) + 1;
 	}
 
 	const selectedBlock = getSelectedBlock( state );
 	if ( selectedBlock ) {
-		return getBlockIndex( state, selectedBlock.uid ) + 1;
+		return getBlockIndex( state, selectedBlock.uid, rootUID ) + 1;
 	}
 
-	return state.editor.present.blockOrder.length;
-}
-
-/**
- * Returns the position at which the block inserter will insert a new adjacent
- * sibling block, or null if the inserter is not actively visible.
- *
- * @param {Object} state Global application state.
- *
- * @returns {?Number} Whether the inserter is currently visible.
- */
-export function getBlockSiblingInserterPosition( state ) {
-	const { position } = state.blockInsertionPoint;
-	if ( ! Number.isInteger( position ) ) {
-		return null;
-	}
-
-	return position;
+	return getBlockOrder( state, rootUID ).length;
 }
 
 /**
  * Returns true if we should show the block insertion point.
  *
- * @param {Object} state Global application state.
+ * @param {Object}  state   Global application state.
+ * @param {?String} rootUID Optional root UID of block list.
+ * @param {?String} layout  Optional layout of insertion point display.
  *
  * @returns {?Boolean} Whether the insertion point is visible or not.
  */
-export function isBlockInsertionPointVisible( state ) {
-	return !! state.blockInsertionPoint.visible;
+export function isBlockInsertionPointVisible( state, rootUID, layout ) {
+	return (
+		Number.isInteger( state.blockInsertionPoint.index ) &&
+		state.blockInsertionPoint.rootUID === rootUID &&
+
+		// Disable reason: Treat null and undefined as equivalent, both for the
+		// incoming layout argument and its value in state.
+		//
+		// ( null == undefined ) === true;
+		//
+		// See "null" option: https://eslint.org/docs/rules/eqeqeq#options
+		//
+		// eslint-disable-next-line eqeqeq
+		layout == state.blockInsertionPoint.layout
+	);
 }
 
 /**
@@ -1031,20 +1099,20 @@ export function didPostSaveRequestFail( state ) {
  * @returns {?String} Suggested post format.
  */
 export function getSuggestedPostFormat( state ) {
-	const blocks = state.editor.present.blockOrder;
+	const blocks = getBlockOrder( state );
 
 	let name;
 	// If there is only one block in the content of the post grab its name
 	// so we can derive a suitable post format from it.
 	if ( blocks.length === 1 ) {
-		name = state.editor.present.blocksByUid[ blocks[ 0 ] ].name;
+		name = getBlock( state, blocks[ 0 ] ).name;
 	}
 
 	// If there are two blocks in the content and the last one is a text blocks
 	// grab the name of the first one to also suggest a post format from it.
 	if ( blocks.length === 2 ) {
-		if ( state.editor.present.blocksByUid[ blocks[ 1 ] ].name === 'core/paragraph' ) {
-			name = state.editor.present.blocksByUid[ blocks[ 0 ] ].name;
+		if ( getBlock( state, blocks[ 1 ] ).name === 'core/paragraph' ) {
+			name = getBlock( state, blocks[ 0 ] ).name;
 		}
 	}
 
