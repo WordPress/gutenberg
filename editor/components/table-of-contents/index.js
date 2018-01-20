@@ -20,7 +20,8 @@ import { getBlocks } from '../../store/selectors';
 import { selectBlock } from '../../store/actions';
 
 function TableOfContents( { blocks } ) {
-	const headings = filter( blocks, ( block ) => block.name === 'core/heading' );
+	const headings = filter( blocks, ( block ) => block.name === 'core/heading' ||
+		block.name === 'core/cover-image' );
 	const paragraphs = filter( blocks, ( block ) => block.name === 'core/paragraph' );
 
 	return (

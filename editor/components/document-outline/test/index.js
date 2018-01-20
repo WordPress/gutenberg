@@ -27,6 +27,9 @@ describe( 'DocumentOutline', () => {
 		content: 'Heading child',
 		nodeName: 'H3',
 	} );
+	const coverImage = createBlock( 'core/cover-image', {
+		title: 'Cover image',
+	} );
 
 	describe( 'no header blocks present', () => {
 		it( 'should not render when no blocks provided', () => {
@@ -63,6 +66,14 @@ describe( 'DocumentOutline', () => {
 			const wrapper = shallow( <DocumentOutline blocks={ blocks } /> );
 
 			expect( wrapper.find( 'TableOfContentsItem' ) ).toHaveLength( 2 );
+		} );
+
+		it( 'should treat cover images as H2-level headings', () => {
+			const blocks = [ headingH1, paragraph, coverImage, paragraph ];
+			const wrapper = shallow( <DocumentOutline blocks={ blocks } /> );
+
+			expect( wrapper.find( 'TableOfContentsItem' ) ).toHaveLength( 2 );
+			expect( wrapper ).toMatchSnapshot();
 		} );
 
 		it( 'should render warnings for multiple h1 headings', () => {

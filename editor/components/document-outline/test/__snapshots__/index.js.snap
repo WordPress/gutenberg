@@ -25,6 +25,31 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
 </div>
 `;
 
+exports[`DocumentOutline header blocks present should treat cover images as H2-level headings 1`] = `
+<div
+  className="document-outline"
+>
+  <ul>
+    <TableOfContentsItem
+      isValid={true}
+      key="0"
+      level="H1"
+      onClick={[Function]}
+    >
+      Heading 1
+    </TableOfContentsItem>
+    <TableOfContentsItem
+      isValid={true}
+      key="1"
+      level="H2"
+      onClick={[Function]}
+    >
+      Cover image
+    </TableOfContentsItem>
+  </ul>
+</div>
+`;
+
 exports[`DocumentOutline header blocks present should render warnings for multiple h1 headings 1`] = `
 <div
   className="document-outline"
