@@ -65,6 +65,28 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
 }
 
 /**
+ * Given a block object, returns a copy of the block object, optionally merging
+ * new attributes and/or replacing its inner blocks.
+ *
+ * @param {Object} block           Block object.
+ * @param {Object} mergeAttributes Block attributes.
+ * @param {?Array} innerBlocks     Nested blocks.
+ *
+ * @return {Object} A cloned block.
+ */
+export function cloneBlock( block, mergeAttributes = {}, innerBlocks = block.innerBlocks ) {
+	return {
+		...block,
+		uid: uuid(),
+		attributes: {
+			...block.attributes,
+			...mergeAttributes,
+		},
+		innerBlocks,
+	};
+}
+
+/**
  * Returns a predicate that receives a transformation and returns true if the
  * given transformation is able to execute in the situation specified in the
  * params.

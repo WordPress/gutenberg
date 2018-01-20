@@ -23,7 +23,7 @@ describe( 'block parser', () => {
 				type: 'string',
 			},
 		},
-		save: ( { attributes } ) => attributes.fruit,
+		save: ( { attributes } ) => attributes.fruit || null,
 		category: 'common',
 		title: 'block title',
 	};
@@ -37,7 +37,7 @@ describe( 'block parser', () => {
 				source: 'html',
 			},
 		},
-		save: ( { attributes } ) => attributes.content,
+		save: ( { attributes } ) => attributes.content || null,
 	};
 
 	beforeAll( () => {

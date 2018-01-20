@@ -165,9 +165,6 @@
 		"react/jsx-indent": [ "error", "tab" ],
 		"react/jsx-indent-props": [ "error", "tab" ],
 		"react/jsx-key": "error",
-		"react/jsx-no-undef": [ "error", {
-			"allowGlobals": true
-		} ],
 		"react/jsx-tag-spacing": "error",
 		"react/no-children-prop": "off",
 		"react/no-find-dom-node": "warn",

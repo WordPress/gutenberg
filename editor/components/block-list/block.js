@@ -3,16 +3,17 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
-import { get, partial, reduce, size } from 'lodash';
+import { get, partial, reduce, size, castArray, noop } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Component, compose } from '@wordpress/element';
+import { Component, findDOMNode, compose } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
 import {
 	BlockEdit,
 	createBlock,
+	cloneBlock,
 	getBlockType,
 	getSaveElement,
 	isReusableBlock,
@@ -35,13 +36,14 @@ import BlockContextualToolbar from './block-contextual-toolbar';
 import BlockMultiControls from './multi-controls';
 import BlockMobileToolbar from './block-mobile-toolbar';
 import BlockInsertionPoint from './insertion-point';
+import IgnoreNestedEvents from './ignore-nested-events';
+import { createInnerBlockList } from './utils';
 import {
 	clearSelectedBlock,
 	editPost,
 	focusBlock,
 	insertBlocks,
 	mergeBlocks,
-	updateBlock,
 	removeBlock,
 	replaceBlocks,
 	selectBlock,
@@ -123,6 +125,22 @@ export class BlockListBlock extends Component {
 		};
 	}
 
+	getChildContext() {
+		const {
+			uid,
+			renderBlockMenu,
+			showContextualToolbar,
+		} = this.props;
+
+		return {
+			BlockList: createInnerBlockList(
+				uid,
+				renderBlockMenu,
+				showContextualToolbar
+			),
+		};
+	}
+
 	componentDidMount() {
 		if ( this.props.focus ) {
 			this.node.focus();
@@ -179,11 +197,23 @@ export class BlockListBlock extends Component {
 	}
 
 	setBlockListRef( node ) {
+		// Disable reason: The root return element uses a component to manage
+		// event nesting, but the parent block list layout needs the raw DOM
+		// node to track multi-selection.
+		//
+		// eslint-disable-next-line react/no-find-dom-node
+		node = findDOMNode( node );
+
 		this.props.blockRef( node, this.props.uid );
 	}
 
 	bindBlockNode( node ) {
-		this.node = node;
+		// Disable reason: The block element uses a component to manage event
+		// nesting, but we rely on a raw DOM node for focusing and preserving
+		// scroll offset on move.
+		//
+		// eslint-disable-next-line react/no-find-dom-node
+		this.node = findDOMNode( node );
 	}
 
 	setAttributes( attributes ) {
@@ -217,6 +247,16 @@ export class BlockListBlock extends Component {
 		this.hadTouchStart = false;
 	}
 
+	/**
+	 * A mouseover event handler to apply hover effect when a pointer device is
+	 * placed within the bounds of the block. The mouseover event is preferred
+	 * over mouseenter because it may be the case that a previous mouseenter
+	 * event was blocked from being handled by a IgnoreNestedEvents component,
+	 * therefore transitioning out of a nested block to the bounds of the block
+	 * would otherwise not trigger a hover effect.
+	 *
+	 * @see https://developer.mozilla.org/en-US/docs/Web/Events/mouseenter
+	 */
 	maybeHover() {
 		const { isHovered, isSelected, isMultiSelected, onHover } = this.props;
 
@@ -398,7 +438,18 @@ export class BlockListBlock extends Component {
 	}
 
 	render() {
-		const { block, order, mode, showContextualToolbar, isLocked, renderBlockMenu } = this.props;
+		const {
+			block,
+			order,
+			mode,
+			showContextualToolbar,
+			isLocked,
+			isFirst,
+			isLast,
+			rootUID,
+			layout,
+			renderBlockMenu,
+		} = this.props;
 		const { name: blockName, isValid } = block;
 		const blockType = getBlockType( blockName );
 		// translators: %s: Type of block (i.e. Text, Image etc)
@@ -426,13 +477,19 @@ export class BlockListBlock extends Component {
 			wrapperProps = blockType.getEditWrapperProps( block.attributes );
 		}
 
-		// Disable reason: Each block can be selected by clicking on it
-		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
+		// Disable reasons:
+		//
+		//  jsx-a11y/mouse-events-have-key-events:
+		//   - onMouseOver is explicitly handling hover effects
+		//
+		//  jsx-a11y/no-static-element-interactions:
+		//   - Each block can be selected by clicking on it
+
+		/* eslint-disable jsx-a11y/mouse-events-have-key-events, jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
-			<div
+			<IgnoreNestedEvents
 				ref={ this.setBlockListRef }
-				onMouseMove={ this.maybeHover }
-				onMouseEnter={ this.maybeHover }
+				onMouseOver={ this.maybeHover }
 				onMouseLeave={ onMouseLeave }
 				className={ wrapperClassName }
 				data-type={ block.name }
@@ -440,13 +497,36 @@ export class BlockListBlock extends Component {
 				onClick={ this.onClick }
 				{ ...wrapperProps }
 			>
-				<BlockDropZone index={ order } />
-				{ ( showUI || isHovered ) && <VisualEditorInserter onToggle={ this.selectOnOpen } /> }
-				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
-				{ ( showUI || isHovered ) && <BlockSettingsMenu uids={ [ block.uid ] } renderBlockMenu={ renderBlockMenu } /> }
+				<BlockDropZone
+					index={ order }
+					rootUID={ rootUID }
+					layout={ layout }
+				/>
+				{ ( showUI || isHovered ) && (
+					<VisualEditorInserter
+						onToggle={ this.selectOnOpen }
+						rootUID={ rootUID }
+						layout={ layout }
+					/>
+				) }
+				{ ( showUI || isHovered ) && (
+					<BlockMover
+						uids={ [ block.uid ] }
+						rootUID={ rootUID }
+						layout={ layout }
+						isFirst={ isFirst }
+						isLast={ isLast }
+					/>
+				) }
+				{ ( showUI || isHovered ) && (
+					<BlockSettingsMenu
+						uids={ [ block.uid ] }
+						renderBlockMenu={ renderBlockMenu }
+					/>
+				) }
 				{ showUI && isValid && showContextualToolbar && <BlockContextualToolbar /> }
-				{ isFirstMultiSelected && <BlockMultiControls /> }
-				<div
+				{ isFirstMultiSelected && <BlockMultiControls rootUID={ rootUID } /> }
+				<IgnoreNestedEvents
 					ref={ this.bindBlockNode }
 					onKeyPress={ this.maybeStartTyping }
 					onDragStart={ this.preventDrag }
@@ -468,8 +548,6 @@ export class BlockListBlock extends Component {
 								onReplace={ isLocked ? undefined : onReplace }
 								setFocus={ partial( onFocus, block.uid ) }
 								mergeBlocks={ isLocked ? undefined : this.mergeBlocks }
-								innerBlocks={ block.innerBlocks }
-								setInnerBlocks={ isLocked ? undefined : this.props.setInnerBlocks }
 								id={ block.uid }
 								isSelectionEnabled={ this.props.isSelectionEnabled }
 								toggleSelection={ this.props.toggleSelection }
@@ -489,16 +567,20 @@ export class BlockListBlock extends Component {
 						] }
 					</BlockCrashBoundary>
 					{ showUI && <BlockMobileToolbar uid={ block.uid } renderBlockMenu={ renderBlockMenu } /> }
-				</div>
+				</IgnoreNestedEvents>
 				{ !! error && <BlockCrashWarning /> }
-				<BlockInsertionPoint uid={ block.uid } />
-			</div>
+				<BlockInsertionPoint
+					uid={ block.uid }
+					rootUID={ rootUID }
+					layout={ layout }
+				/>
+			</IgnoreNestedEvents>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 	}
 }
 
-const mapStateToProps = ( state, { uid } ) => ( {
+const mapStateToProps = ( state, { uid, rootUID } ) => ( {
 	previousBlock: getPreviousBlock( state, uid ),
 	nextBlock: getNextBlock( state, uid ),
 	block: getBlock( state, uid ),
@@ -508,7 +590,7 @@ const mapStateToProps = ( state, { uid } ) => ( {
 	isHovered: isBlockHovered( state, uid ) && ! isMultiSelecting( state ),
 	focus: getBlockFocus( state, uid ),
 	isTyping: isTyping( state ),
-	order: getBlockIndex( state, uid ),
+	order: getBlockIndex( state, uid, rootUID ),
 	meta: getEditedPostAttribute( state, 'meta' ),
 	mode: getBlockMode( state, uid ),
 	isSelectionEnabled: isSelectionEnabled( state ),
@@ -549,8 +631,12 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 		} );
 	},
 
-	onInsertBlocks( blocks, position ) {
-		dispatch( insertBlocks( blocks, position ) );
+	onInsertBlocks( blocks, index ) {
+		const { rootUID, layout } = ownProps;
+
+		blocks = blocks.map( ( block ) => cloneBlock( block, { layout } ) );
+
+		dispatch( insertBlocks( blocks, index, rootUID ) );
 	},
 
 	onFocus( ...args ) {
@@ -566,6 +652,12 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 	},
 
 	onReplace( blocks ) {
+		const { layout } = ownProps;
+
+		blocks = castArray( blocks ).map( ( block ) => (
+			cloneBlock( block, { layout } )
+		) );
+
 		dispatch( replaceBlocks( [ ownProps.uid ], blocks ) );
 	},
 
@@ -576,13 +668,13 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 	toggleSelection( selectionEnabled ) {
 		dispatch( toggleSelection( selectionEnabled ) );
 	},
-
-	setInnerBlocks( innerBlocks ) {
-		dispatch( updateBlock( ownProps.uid, { innerBlocks } ) );
-	},
 } );
 
 BlockListBlock.className = 'editor-block-list__block-edit';
+
+BlockListBlock.childContextTypes = {
+	BlockList: noop,
+};
 
 export default compose(
 	connect( mapStateToProps, mapDispatchToProps ),

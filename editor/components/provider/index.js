@@ -58,7 +58,7 @@ class EditorProvider extends Component {
 	constructor( props ) {
 		super( ...arguments );
 
-		this.store = props.store || store;
+		this.store = store;
 		this.initializeMetaBoxes = this.initializeMetaBoxes.bind( this );
 
 		this.settings = {
@@ -67,7 +67,7 @@ class EditorProvider extends Component {
 		};
 
 		// Assume that we don't need to initialize in the case of an error recovery.
-		if ( ! props.recovery && props.post ) {
+		if ( ! props.recovery ) {
 			this.store.dispatch( setupEditor( props.post, this.settings ) );
 		}
 	}

@@ -15,6 +15,7 @@ import { hasFilter, applyFilters } from '@wordpress/hooks';
  * Internal dependencies
  */
 import { getBlockType, getUnknownTypeHandlerName } from './registration';
+import BlockContentProvider from '../block-content-provider';
 
 /**
  * Returns the block's default classname from its name.
@@ -78,7 +79,13 @@ export function getSaveElement( blockType, attributes, innerBlocks = [] ) {
 	 * @param {WPBlockType} blockType  Block type definition.
 	 * @param {Object}      attributes Block attributes.
 	 */
-	return applyFilters( 'blocks.getSaveElement', element, blockType, attributes );
+	element = applyFilters( 'blocks.getSaveElement', element, blockType, attributes );
+
+	return (
+		<BlockContentProvider innerBlocks={ innerBlocks }>
+			{ element }
+		</BlockContentProvider>
+	);
 }
 
 /**
@@ -173,9 +180,12 @@ export function getBlockContent( block ) {
 	const blockType = getBlockType( block.name );
 
 	// If block was parsed as invalid or encounters an error while generating
-	// save content, use original content instead to avoid content loss.
+	// save content, use original content instead to avoid content loss. If a
+	// block contains nested content, exempt it from this condition because we
+	// otherwise have no access to its original content and content loss would
+	// still occur.
 	let saveContent = block.originalContent;
-	if ( block.isValid ) {
+	if ( block.isValid || block.innerBlocks.length ) {
 		try {
 			saveContent = getSaveContent( blockType, block.attributes, block.innerBlocks );
 		} catch ( error ) {}

@@ -17,13 +17,7 @@ import { EditorProvider, ErrorBoundary } from '@wordpress/editor';
  */
 import './assets/stylesheets/main.scss';
 import Layout from './components/layout';
-import * as selectors from './store/selectors';
-import * as actions from './store/actions';
 import store from './store';
-
-export { createStore } from './store';
-export { selectors };
-export { actions };
 
 // Configure moment globally
 moment.locale( dateSettings.l10n.locale );

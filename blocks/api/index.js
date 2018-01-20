@@ -1,4 +1,10 @@
-export { createBlock, getPossibleBlockTransformations, switchToBlockType, createReusableBlock } from './factory';
+export {
+	createBlock,
+	cloneBlock,
+	getPossibleBlockTransformations,
+	switchToBlockType,
+	createReusableBlock,
+} from './factory';
 export { default as parse, getBlockAttributes } from './parser';
 export { default as rawHandler } from './raw-handling';
 export {
