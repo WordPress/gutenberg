@@ -20,7 +20,7 @@ import 'element-closest';
 /**
  * WordPress dependencies
  */
-import { createElement, Component, renderToString } from '@wordpress/element';
+import { createElement, Component, renderToString, Fragment } from '@wordpress/element';
 import { keycodes, createBlobURL, isHorizontalEdge, getRectangleFromRange } from '@wordpress/utils';
 import { withSafeTimeout, Slot, Fill } from '@wordpress/components';
 
@@ -29,6 +29,7 @@ import { withSafeTimeout, Slot, Fill } from '@wordpress/components';
  */
 import './style.scss';
 import { rawHandler } from '../api';
+import Autocomplete from '../autocomplete';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
 import { pickAriaProps } from './aria';
@@ -754,6 +755,7 @@ export class RichText extends Component {
 			keepPlaceholderOnFocus = false,
 			isSelected = false,
 			formatters,
+			autocompleters,
 		} = this.props;
 
 		const ariaProps = { ...pickAriaProps( this.props ), 'aria-multiline': !! MultilineTag };
@@ -788,27 +790,37 @@ export class RichText extends Component {
 						{ formatToolbar }
 					</div>
 				}
-				<TinyMCE
-					tagName={ Tagname }
-					getSettings={ this.getSettings }
-					onSetup={ this.onSetup }
-					style={ style }
-					defaultValue={ value }
-					isPlaceholderVisible={ isPlaceholderVisible }
-					aria-label={ placeholder }
-					{ ...ariaProps }
-					className={ className }
-					key={ key }
-				/>
-				{ isPlaceholderVisible &&
-					<Tagname
-						className={ classnames( 'blocks-rich-text__tinymce', className ) }
-						style={ style }
-					>
-						{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }
-					</Tagname>
-				}
-				{ isSelected && <Slot name="RichText.Siblings" /> }
+				<Autocomplete onReplace={ this.props.onReplace } completers={ autocompleters }>
+					{ ( { isExpanded, listBoxId, activeId } ) => (
+						<Fragment>
+							<TinyMCE
+								tagName={ Tagname }
+								getSettings={ this.getSettings }
+								onSetup={ this.onSetup }
+								style={ style }
+								defaultValue={ value }
+								isPlaceholderVisible={ isPlaceholderVisible }
+								aria-label={ placeholder }
+								aria-autocomplete="list"
+								aria-expanded={ isExpanded }
+								aria-owns={ listBoxId }
+								aria-activedescendant={ activeId }
+								{ ...ariaProps }
+								className={ className }
+								key={ key }
+							/>
+							{ isPlaceholderVisible &&
+								<Tagname
+									className={ classnames( 'blocks-rich-text__tinymce', className ) }
+									style={ style }
+								>
+									{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }
+								</Tagname>
+							}
+							{ isSelected && <Slot name="RichText.Siblings" /> }
+						</Fragment>
+					) }
+				</Autocomplete>
 			</div>
 		);
 	}
