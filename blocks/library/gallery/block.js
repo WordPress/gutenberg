@@ -73,8 +73,9 @@ class GalleryBlock extends Component {
 		};
 	}
 
-	onReorder( index ) {
-		console.log('reordering');
+	onReorderImage( index, direction ) {
+		console.log(index);
+		console.log(direction);
 		return () => {
 			// const images = filter( this.props.attributes.images, ( img, i ) => index !== i );
 			// this.props.setAttributes( {
@@ -256,7 +257,7 @@ class GalleryBlock extends Component {
 							isSelected={ this.state.selectedImage === index }
 							onRemove={ this.onRemoveImage( index ) }
 							onClick={ this.onSelectImage( index ) }
-							onReorder={this.onReorder( index )}
+							onReorder={(direction) => this.onReorderImage( index, direction )}
 							setAttributes={ ( attrs ) => this.setImageAttributes( index, attrs ) }
 						/>
 					</li>

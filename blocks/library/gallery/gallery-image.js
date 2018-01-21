@@ -58,13 +58,13 @@ class GalleryImage extends Component {
 						<div className="blocks-gallery-item__inline-menu lower">
 							<IconButton
 								icon="arrow-left-alt"
-								onClick={ onReorder }
+								onClick={ () => onReorder('left') }
 								className="blocks-gallery-item__arrow-left"
 								label={ __( 'Reorder Image Left' ) }
 							/>
 							<IconButton
 								icon="arrow-right-alt"
-								onClick={ onReorder }
+								onClick={ () => onReorder('right') }
 								className="blocks-gallery-item__arrow-right"
 								label={ __( 'Reorder Image Right' ) }
 							/>
