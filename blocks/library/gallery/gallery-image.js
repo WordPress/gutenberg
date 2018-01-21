@@ -21,7 +21,7 @@ class GalleryImage extends Component {
 	}
 
 	render() {
-		const { url, alt, id, linkTo, link, isSelected, onClick, onRemove, onReorder } = this.props;
+		const { url, alt, id, linkTo, link, isSelected, onClick, onRemove, onReorder, isFirst, isLast } = this.props;
 
 		let href;
 
@@ -56,18 +56,28 @@ class GalleryImage extends Component {
 							/>
 						</div>
 						<div className="blocks-gallery-item__inline-menu lower">
-							<IconButton
-								icon="arrow-left-alt"
-								onClick={ () => onReorder('left') }
-								className="blocks-gallery-item__arrow-left"
-								label={ __( 'Reorder Image Left' ) }
-							/>
-							<IconButton
-								icon="arrow-right-alt"
-								onClick={ () => onReorder('right') }
-								className="blocks-gallery-item__arrow-right"
-								label={ __( 'Reorder Image Right' ) }
-							/>
+							{!isFirst
+								?
+									<IconButton
+										icon="arrow-left-alt"
+										onClick={ () => onReorder('left') }
+										className="blocks-gallery-item__arrow-left"
+										label={ __( 'Reorder Image Left' ) }
+									/>
+								:
+									null
+							}
+							{!isLast
+								?
+									<IconButton
+										icon="arrow-right-alt"
+										onClick={ () => onReorder('right') }
+										className="blocks-gallery-item__arrow-right"
+										label={ __( 'Reorder Image Right' ) }
+									/>
+								:
+									null
+							}
 						</div>
 					</div>
 				}

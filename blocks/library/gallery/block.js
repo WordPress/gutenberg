@@ -267,6 +267,8 @@ class GalleryBlock extends Component {
 							onRemove={ this.onRemoveImage( index ) }
 							onClick={ this.onSelectImage( index ) }
 							onReorder={(direction) => this.onReorderImage( index, direction )}
+							isFirst={index === 0}
+							isLast={index === images.length - 1}
 							setAttributes={ ( attrs ) => this.setImageAttributes( index, attrs ) }
 						/>
 					</li>
