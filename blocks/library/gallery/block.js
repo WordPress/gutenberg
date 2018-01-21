@@ -46,6 +46,7 @@ class GalleryBlock extends Component {
 		this.toggleImageCrop = this.toggleImageCrop.bind( this );
 		this.uploadFromFiles = this.uploadFromFiles.bind( this );
 		this.onRemoveImage = this.onRemoveImage.bind( this );
+		this.onReorderImage = this.onReorderImage.bind( this );
 		this.setImageAttributes = this.setImageAttributes.bind( this );
 		this.dropFiles = this.dropFiles.bind( this );
 
@@ -56,6 +57,7 @@ class GalleryBlock extends Component {
 
 	onSelectImage( index ) {
 		return () => {
+			console.log(index);
 			this.setState( ( state ) => ( {
 				selectedImage: index === state.selectedImage ? null : index,
 			} ) );
@@ -73,7 +75,8 @@ class GalleryBlock extends Component {
 		};
 	}
 
-	onReorderImage( index, direction ) {
+	onReorderImage( event, index, direction ) {
+		event.stopPropagation();
 		const { attributes: { images }, setAttributes } = this.props;
 		let to = 0;
 		switch(direction) {
@@ -86,10 +89,13 @@ class GalleryBlock extends Component {
 			default:
 				return false;
 		}
-		
-		images.splice(to, 0, images.splice(index, 1)[0]);
 
-		setAttributes( { images: images } );
+		const newImages = Array.from(images);
+		
+		newImages.splice(to, 0, newImages.splice(index, 1)[0]);
+
+		this.setState({selectedImage: to});
+		setAttributes( { images: newImages } );
 		
 	}
 
@@ -266,7 +272,7 @@ class GalleryBlock extends Component {
 							isSelected={ this.state.selectedImage === index }
 							onRemove={ this.onRemoveImage( index ) }
 							onClick={ this.onSelectImage( index ) }
-							onReorder={(direction) => this.onReorderImage( index, direction )}
+							onReorder={(event, direction) => this.onReorderImage( event, index, direction )}
 							isFirst={index === 0}
 							isLast={index === images.length - 1}
 							setAttributes={ ( attrs ) => this.setImageAttributes( index, attrs ) }
