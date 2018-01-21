@@ -363,6 +363,8 @@ export class BlockListBlock extends Component {
 	 * Strategy: Clone the current block, style it, and spawn over original block.
 	 */
 	onDragStart( event ) {
+		event.stopPropagation();
+
 		const dragInset = document.getElementById( `block-drag-inset-${ this.props.uid }` );
 		const block = document.getElementById( `block-${ this.props.uid }` );
 		const blockList = block.parentNode;
@@ -377,9 +379,11 @@ export class BlockListBlock extends Component {
 				// block.classList.add( 'is-hidden' );
 				// dragInset.classList.add( 'is-visible' );
 				this.setState( { dragging: true } );
-				document.body.classList.add( 'dragging' );
+				// document.body.classList.add( 'dragging' );
 			};
 		};
+
+		document.body.classList.add( 'dragging' );
 
 		event.dataTransfer.setData(
 			'text',
@@ -437,7 +441,9 @@ export class BlockListBlock extends Component {
 	 * Reorder via Drag & Drop. Step 3 of 4.
 	 * Strategy: Remove inset and block clone.
 	 */
-	onDragEnd() {
+	onDragEnd( event ) {
+		event.stopPropagation();
+
 		const block = document.getElementById( `block-${ this.props.uid }` );
 		const dragInset = document.getElementById( `block-drag-inset-${ this.props.uid }` );
 		const blockList = block.parentNode;

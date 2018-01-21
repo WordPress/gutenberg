@@ -1,10 +1,20 @@
-body.dragging .gutenberg > #editor {
+body.dragging * {
+	// cursor: move;/* Fallback for IE/Edge < 14 */
+	// cursor: grabbing !important;
+	// cursor: inherit !important;
+}
+
+body.dragging *,
+body.dragging > * {
 	cursor: move;/* Fallback for IE/Edge < 14 */
 	cursor: grabbing !important;
 }
 
+
 body.gutenberg-editor-page {
 	background: $white;
+
+	cursor: inherit !important;
 
 	// on mobile the main content area has to scroll
 	// otherwise you can invoke the overscroll bounce on the non-scrolling container, causing (ノಠ益ಠ)ノ彡┻━┻
