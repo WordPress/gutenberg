@@ -1,15 +1,15 @@
 body.dragging * {
-	// cursor: move;/* Fallback for IE/Edge < 14 */
-	// cursor: grabbing !important;
-	// cursor: inherit !important;
-}
-
-body.dragging *,
-body.dragging > * {
 	cursor: move;/* Fallback for IE/Edge < 14 */
 	cursor: grabbing !important;
 }
 
+.invisible-drag-image {
+	position: fixed;
+	top: -1000px;
+	left: -1000px;
+	height: 50px;
+	width: 50px;
+}
 
 body.gutenberg-editor-page {
 	background: $white;

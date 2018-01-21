@@ -360,11 +360,11 @@ export class BlockListBlock extends Component {
 
 	/*
 	 * Reorder via Drag & Drop. Step 1 of 4.
-	 * Strategy: Clone the current block, style it, and spawn over original block.
+	 * Strategy: - Clone the current block and spawn over original block. Hide original block.
+	 * 			 - Set transfer data.
+	 * 			 - Add dragover listener.
 	 */
 	onDragStart( event ) {
-		event.stopPropagation();
-
 		const dragInset = document.getElementById( `block-drag-inset-${ this.props.uid }` );
 		const block = document.getElementById( `block-${ this.props.uid }` );
 		const blockList = block.parentNode;
@@ -373,17 +373,6 @@ export class BlockListBlock extends Component {
 		const blockRect = block.getBoundingClientRect();
 		const blockTopOffset = parseInt( blockRect.top, 10 );
 		const blockLeftOffset = parseInt( blockRect.left, 10 );
-
-		const showInset = () => {
-			return () => {
-				// block.classList.add( 'is-hidden' );
-				// dragInset.classList.add( 'is-visible' );
-				this.setState( { dragging: true } );
-				// document.body.classList.add( 'dragging' );
-			};
-		};
-
-		document.body.classList.add( 'dragging' );
 
 		event.dataTransfer.setData(
 			'text',
@@ -394,14 +383,15 @@ export class BlockListBlock extends Component {
 			} )
 		);
 
+		// Prepare block clone and append to blocks list.
+
 		clone.id = `clone-${ block.id }`;
 		cloneWrapper.id = `clone-wrapper-${ block.id }`;
 
 		cloneWrapper.classList.add( 'editor-block-list__block-clone' );
 		// 40px padding for the shadow.
 		cloneWrapper.style.width = `${ blockRect.width + 40 }px`;
-		// Position clone right over the original block.
-		// 20px padding for the shadow.
+		// Position clone right over the original block (20px padding).
 		cloneWrapper.style.top = `${ blockTopOffset - 20 }px`;
 		cloneWrapper.style.left = `${ blockLeftOffset - 20 }px`;
 
@@ -409,14 +399,34 @@ export class BlockListBlock extends Component {
 		blockList.appendChild( cloneWrapper );
 
 		// Mark the current cursor coordinates.
-		// - cause Mozilla is ahead of this game: https://bugzilla.mozilla.org/show_bug.cgi?id=505521
 		this.cursorLeft = event.clientX;
 		this.cursorTop = event.clientY;
 
+		// Set a fake drag image to avoid broswer defaults.
+		if ( 'function' === typeof event.dataTransfer.setDragImage ) {
+			const dragImage = document.createElement( 'div' );
+
+			dragImage.id = `drag-image-${ block.id }`;
+			dragImage.classList.add( 'invisible-drag-image' );
+			document.body.appendChild( dragImage );
+
+			event.dataTransfer.setDragImage( dragImage, 0, 0 );
+
+			setTimeout( ( ( _dragImage ) => () => {
+				document.body.removeChild( _dragImage );
+			} )( dragImage ), 0 );
+		}
+
 		// Hide the visible block and show inset in its place.
-		setTimeout( showInset( block, dragInset ), 0 );
+		setTimeout( () => {
+			this.setState( { dragging: true } );
+		}, 0 );
+
+		// Update cursor to 'grabbing', document wide.
+		document.body.classList.add( 'dragging' );
 
 		document.addEventListener( 'dragover', this.onDragOver );
+		event.stopPropagation();
 	}
 
 	/*
@@ -439,29 +449,27 @@ export class BlockListBlock extends Component {
 
 	/*
 	 * Reorder via Drag & Drop. Step 3 of 4.
-	 * Strategy: Remove inset and block clone.
+	 * Strategy: Remove inset and block clone, reset cursor, and remove drag listener.
 	 */
 	onDragEnd( event ) {
-		event.stopPropagation();
-
 		const block = document.getElementById( `block-${ this.props.uid }` );
 		const dragInset = document.getElementById( `block-drag-inset-${ this.props.uid }` );
 		const blockList = block.parentNode;
 		const cloneWrapper = document.getElementById( `clone-wrapper-${ block.id }` );
 
-		const resetBlockDisplay = () => {
-			return () => {
-				//block.classList.remove( 'is-hidden' );
-				//dragInset.classList.remove( 'is-visible' );
-				this.setState( { dragging: false } );
-				document.body.classList.remove( 'dragging' );
-			};
-		};
-
+		// Remove clone.
 		blockList.removeChild( cloneWrapper );
-		setTimeout( resetBlockDisplay( block, dragInset ), 0 );
+
+		// Hide inset and reset block display.
+		setTimeout( () => {
+			this.setState( { dragging: false } );
+		}, 0 );
+
+		// Reset cursor.
+		document.body.classList.remove( 'dragging' );
 
 		document.removeEventListener( 'dragover', this.onDragOver );
+		event.stopPropagation();
 	}
 
 	/*
