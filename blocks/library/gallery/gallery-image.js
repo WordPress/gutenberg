@@ -21,7 +21,7 @@ class GalleryImage extends Component {
 	}
 
 	render() {
-		const { url, alt, id, linkTo, link, isSelected, onClick, onRemove } = this.props;
+		const { url, alt, id, linkTo, link, isSelected, onClick, onRemove, onReorder } = this.props;
 
 		let href;
 
@@ -46,13 +46,29 @@ class GalleryImage extends Component {
 		return (
 			<figure className={ className } onClick={ onClick }>
 				{ isSelected &&
-					<div className="blocks-gallery-item__inline-menu">
-						<IconButton
-							icon="no-alt"
-							onClick={ onRemove }
-							className="blocks-gallery-item__remove"
-							label={ __( 'Remove Image' ) }
-						/>
+					<div>
+						<div className="blocks-gallery-item__inline-menu">
+							<IconButton
+								icon="no-alt"
+								onClick={ onRemove }
+								className="blocks-gallery-item__remove"
+								label={ __( 'Remove Image' ) }
+							/>
+						</div>
+						<div className="blocks-gallery-item__inline-menu lower">
+							<IconButton
+								icon="arrow-left-alt"
+								onClick={ onReorder }
+								className="blocks-gallery-item__arrow-left"
+								label={ __( 'Reorder Image Left' ) }
+							/>
+							<IconButton
+								icon="arrow-right-alt"
+								onClick={ onReorder }
+								className="blocks-gallery-item__arrow-right"
+								label={ __( 'Reorder Image Right' ) }
+							/>
+						</div>
 					</div>
 				}
 				{ href ? <a href={ href }>{ img }</a> : img }
