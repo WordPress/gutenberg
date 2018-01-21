@@ -74,14 +74,23 @@ class GalleryBlock extends Component {
 	}
 
 	onReorderImage( index, direction ) {
-		console.log(index);
-		console.log(direction);
-		return () => {
-			// const images = filter( this.props.attributes.images, ( img, i ) => index !== i );
-			// this.props.setAttributes( {
-			// 	images
-			// } );
-		};
+		const { attributes: { images }, setAttributes } = this.props;
+		let to = 0;
+		switch(direction) {
+			case 'left':
+				to = index - 1;
+				break;
+			case 'right':
+				to = index + 1;
+				break;
+			default:
+				return false;
+		}
+		
+		images.splice(to, 0, images.splice(index, 1)[0]);
+
+		setAttributes( { images: images } );
+		
 	}
 
 	onSelectImages( imgs ) {
