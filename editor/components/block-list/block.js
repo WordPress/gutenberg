@@ -374,6 +374,22 @@ export class BlockListBlock extends Component {
 		const blockTopOffset = parseInt( blockRect.top, 10 );
 		const blockLeftOffset = parseInt( blockRect.left, 10 );
 
+		// Set a fake drag image to avoid browser defaults.
+		if ( 'function' === typeof event.dataTransfer.setDragImage ) {
+			const dragImage = document.createElement( 'div' );
+
+			dragImage.id = `drag-image-${ block.id }`;
+			dragImage.classList.add( 'invisible-drag-image' );
+
+			document.body.appendChild( dragImage );
+
+			event.dataTransfer.setDragImage( dragImage, 0, 0 );
+
+			setTimeout( ( ( _dragImage ) => () => {
+				document.body.removeChild( _dragImage );
+			} )( dragImage ), 0 );
+		}
+
 		event.dataTransfer.setData(
 			'text',
 			JSON.stringify( {
@@ -409,21 +425,6 @@ export class BlockListBlock extends Component {
 		// Mark the current cursor coordinates.
 		this.cursorLeft = event.clientX;
 		this.cursorTop = event.clientY;
-
-		// Set a fake drag image to avoid browser defaults.
-		if ( 'function' === typeof event.dataTransfer.setDragImage ) {
-			const dragImage = document.createElement( 'div' );
-
-			dragImage.id = `drag-image-${ block.id }`;
-			dragImage.classList.add( 'invisible-drag-image' );
-			document.body.appendChild( dragImage );
-
-			event.dataTransfer.setDragImage( dragImage, 0, 0 );
-
-			setTimeout( ( ( _dragImage ) => () => {
-				document.body.removeChild( _dragImage );
-			} )( dragImage ), 0 );
-		}
 
 		// Hide the visible block and show inset in its place.
 		setTimeout( () => {
