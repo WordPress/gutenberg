@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { uniq } from 'lodash';
-import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -36,17 +35,12 @@ export function addGeneratedClassName( extraProps, blockType ) {
 				getBlockDefaultClassname( blockType.name ),
 				...extraProps.className.split( ' ' ),
 			] ).join( ' ' );
-
 		} else {
-
 			// There is no string in the className variable,
 			// so we just dump the default name in there
 			extraProps.className = getBlockDefaultClassname( blockType.name );
-
 		}
-
 	}
-
 	return extraProps;
 }
 
