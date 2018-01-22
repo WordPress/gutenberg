@@ -46,7 +46,6 @@ class GalleryBlock extends Component {
 		this.toggleImageCrop = this.toggleImageCrop.bind( this );
 		this.uploadFromFiles = this.uploadFromFiles.bind( this );
 		this.onRemoveImage = this.onRemoveImage.bind( this );
-		this.onReorderImage = this.onReorderImage.bind( this );
 		this.setImageAttributes = this.setImageAttributes.bind( this );
 		this.dropFiles = this.dropFiles.bind( this );
 
@@ -57,7 +56,6 @@ class GalleryBlock extends Component {
 
 	onSelectImage( index ) {
 		return () => {
-			console.log(index);
 			this.setState( ( state ) => ( {
 				selectedImage: index === state.selectedImage ? null : index,
 			} ) );
