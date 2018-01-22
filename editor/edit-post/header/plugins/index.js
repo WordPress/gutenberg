@@ -75,11 +75,17 @@ function Plugins( props ) {
 							'components-menu-items__button',
 							plugin.icon ? 'has-icon' : null
 						);
+						const Icon = (
+							<div style={ { width: '20px', height: '20px', overflow: 'hidden' } } >
+								{ plugin.icon }
+							</div>
+						);
+
 						return (
 							<IconButton
 								key={ plugin.value }
 								className={ buttonClassName }
-								icon={ plugin.icon }
+								icon={ Icon }
 								onClick={ () => onSelect( plugin.value ) }>
 								{ plugin.label }
 							</IconButton>
@@ -87,7 +93,7 @@ function Plugins( props ) {
 					} )
 				}
 			</NavigableMenu>
-		</div>
+		</div>,
 	];
 }
 
