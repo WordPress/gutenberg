@@ -38,7 +38,7 @@ export function registerSidebar( name, settings ) {
 	}
 	if ( ! /^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/.test( name ) ) {
 		console.error(
-			'Sidebar names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-sidebar'
+			'Sidebar names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-sidebar.'
 		);
 		return null;
 	}
@@ -50,13 +50,13 @@ export function registerSidebar( name, settings ) {
 	}
 	if ( sidebars[ name ] ) {
 		console.error(
-			'Sidebar "' + name + '" is already registered.'
+			`Sidebar ${ name } is already registered.`
 		);
 	}
 
 	if ( ! settings.title ) {
 		console.error(
-			'The sidebar "' + name + '" must have a title.'
+			`The sidebar ${ name } must have a title.`
 		);
 		return null;
 	}
@@ -108,12 +108,7 @@ export function renderSidebar( name, settings ) {
  * @param  {string} name The name of the sidebar to activate.
  * @return {void}
  */
-export function activateSidebar( name ) {
-	if ( ! sidebars[ name ] ) {
-		console.error(
-			'Sidebar "' + name + '" is not registered yet.'
-		);
-	}
+function activateSidebar( name ) {
 	store.dispatch( openGeneralSidebar( 'plugins' ) );
 	store.dispatch( setGeneralSidebarActivePanel( 'plugins', name ) );
 }
