@@ -1,6 +1,4 @@
 export {
-	registerSidebar,
 	renderSidebar,
-	activateSidebar,
-	getSidebar
+	getSidebarSettings
 } from './sidebar';
