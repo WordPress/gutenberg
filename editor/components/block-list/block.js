@@ -387,13 +387,21 @@ export class BlockListBlock extends Component {
 
 		clone.id = `clone-${ block.id }`;
 		cloneWrapper.id = `clone-wrapper-${ block.id }`;
-
 		cloneWrapper.classList.add( 'editor-block-list__block-clone' );
-		// 40px padding for the shadow.
 		cloneWrapper.style.width = `${ blockRect.width + 40 }px`;
-		// Position clone right over the original block (20px padding).
-		cloneWrapper.style.top = `${ blockTopOffset - 20 }px`;
-		cloneWrapper.style.left = `${ blockLeftOffset - 20 }px`;
+
+		if ( blockRect.height > 700 ) {
+			// Scale down clone if original block is larger than 700px.
+			cloneWrapper.style.transform = 'scale(0.5)';
+			cloneWrapper.style.transformOrigin = 'top left';
+			// Position clone near the cursor.
+			cloneWrapper.style.top = `${ parseInt( event.clientY, 10 ) - 100 }px`;
+			cloneWrapper.style.left = `${ parseInt( event.clientX, 10 ) }px`;
+		} else {
+			// Position clone right over the original block (20px padding).
+			cloneWrapper.style.top = `${ blockTopOffset - 20 }px`;
+			cloneWrapper.style.left = `${ blockLeftOffset - 20 }px`;
+		}
 
 		cloneWrapper.appendChild( clone );
 		blockList.appendChild( cloneWrapper );
@@ -402,7 +410,7 @@ export class BlockListBlock extends Component {
 		this.cursorLeft = event.clientX;
 		this.cursorTop = event.clientY;
 
-		// Set a fake drag image to avoid broswer defaults.
+		// Set a fake drag image to avoid browser defaults.
 		if ( 'function' === typeof event.dataTransfer.setDragImage ) {
 			const dragImage = document.createElement( 'div' );
 
