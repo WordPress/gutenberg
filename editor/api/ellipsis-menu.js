@@ -73,9 +73,9 @@ export function registerEllipsisMenuItem( name, settings ) {
 		return null;
 	}
 
-	if ( settings.icon && ! isString( settings.icon ) ) {
+	if ( settings.icon && isString( settings.icon ) ) {
 		console.error(
-			'Menu item icon must be string'
+			'Menu item icon must be a react component'
 		);
 		return null;
 	}

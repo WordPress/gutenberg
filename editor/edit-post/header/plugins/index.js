@@ -1,8 +1,9 @@
 /**
  * External dependencies
  */
-import { map, isEmpty } from 'lodash';
+import { map, isEmpty, isString } from 'lodash';
 import { connect } from 'react-redux';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -67,11 +68,18 @@ function Plugins( props ) {
 			<NavigableMenu orientation="vertical" aria-labelledby={ labelId }>
 				{
 					plugins.map( plugin => {
+						if ( isString( plugin.icon ) ) {
+							plugin.icon = null;
+						}
+						const buttonClassName = classnames(
+							'components-menu-items__button',
+							plugin.icon ? 'has-icon' : null
+						);
 						return (
 							<IconButton
 								key={ plugin.value }
-								className="components-menu-item-plugins__button"
-								icon={ plugin.icon || 'yes-alt' }
+								className={ buttonClassName }
+								icon={ plugin.icon }
 								onClick={ () => onSelect( plugin.value ) }>
 								{ plugin.label }
 							</IconButton>
@@ -79,7 +87,7 @@ function Plugins( props ) {
 					} )
 				}
 			</NavigableMenu>
-		</div>,
+		</div>
 	];
 }
 
