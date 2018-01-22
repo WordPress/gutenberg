@@ -93,7 +93,7 @@
 		"pegjs-loader": "0.5.4",
 		"phpegjs": "1.0.0-beta7",
 		"postcss-loader": "2.0.6",
-		"prettier-eslint": "8.8.1",
+		"prettier": "1.10.2",
 		"prismjs": "1.6.0",
 		"raw-loader": "0.5.1",
 		"react-test-renderer": "16.0.0",
