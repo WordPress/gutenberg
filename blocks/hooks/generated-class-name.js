@@ -26,7 +26,6 @@ import { hasBlockSupport, getBlockDefaultClassname } from '../api';
 export function addGeneratedClassName( extraProps, blockType ) {
 	// Adding the generated className
 	if ( hasBlockSupport( blockType, 'className', true ) ) {
-
 		if ( typeof extraProps.className === 'string' ) {
 			// We have some extra classes and want to add the default classname
 			// We use uniq to prevent duplicate classnames
