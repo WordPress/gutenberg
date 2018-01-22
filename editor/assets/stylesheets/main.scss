@@ -1,12 +1,6 @@
 body.gutenberg-editor-page {
 	background: $white;
 
-	// on mobile the main content area has to scroll
-	// otherwise you can invoke the overscroll bounce on the non-scrolling container, causing (ノಠ益ಠ)ノ彡┻━┻
-	@include break-small {
-		overflow: hidden;
-	}
-
 	#update-nag, .update-nag {
 		display: none;
 	}
