@@ -63,7 +63,7 @@ function getFormatProperties( formatName, parents ) {
 	switch ( formatName ) {
 		case 'link' : {
 			const anchor = find( parents, node => node.nodeName.toLowerCase() === 'a' );
-			return !! anchor ? { value: anchor.getAttribute( 'href' ) || '', target: anchor.getAttribute( 'target' ) || '', node: anchor } : {};
+			return !! anchor ? { value: anchor.getAttribute( 'href' ) || '', node: anchor } : {};
 		}
 		default:
 			return {};
@@ -126,7 +126,7 @@ export default class Editable extends Component {
 	}
 
 	/**
-	 * Handles the onSetup event for the tinyMCE component
+	 * Handles the onSetup event for the tinyMCE component.
 	 *
 	 * Will setup event handlers for the tinyMCE instance.
 	 * An `onSetup` function in the props will be called if it is present.
@@ -160,15 +160,15 @@ export default class Editable extends Component {
 	}
 
 	/**
-	 * Allows prop event handlers to handle an event
+	 * Allows prop event handlers to handle an event.
 	 *
-	 * Allow props an opportunity to handle the event, before default
-	 * Editable behavior takes effect. Should the event be handled by a
-	 * prop, it should `stopImmediatePropagation` on the event to stop
-	 * continued event handling.
+	 * Allow props an opportunity to handle the event, before default Editable
+	 * behavior takes effect. Should the event be handled by a prop, it should
+	 * `stopImmediatePropagation` on the event to stop continued event handling.
 	 *
 	 * @param {string} name The name of the event.
-	 * @returns {void}
+	 *
+	 * @returns {void} Void.
 	*/
 	proxyPropHandler( name ) {
 		return ( event ) => {
@@ -253,7 +253,7 @@ export default class Editable extends Component {
 	}
 
 	/**
-	 * Handles an undo event from tinyMCE
+	 * Handles an undo event from tinyMCE.
 	 *
 	 * When user attempts Undo when empty Undo stack, propagate undo
 	 * action to context handler. The compromise here is that: TinyMCE
@@ -276,7 +276,7 @@ export default class Editable extends Component {
 	}
 
 	/**
-	 * Handles a paste event from tinyMCE
+	 * Handles a paste event from tinyMCE.
 	 *
 	 * Saves the pasted data as plain text in `pastedPlainText`.
 	 *
@@ -319,12 +319,14 @@ export default class Editable extends Component {
 	}
 
 	/**
-	 * Handles a PrePasteProcess event from tinyMCE
+	 * Handles a PrePasteProcess event from tinyMCE.
 	 *
 	 * Will call the paste handler with the pasted data. If it is a string tries
-	 * to put it in the containing tinyMCE editor. Otherwise call the `onSplit` handler.
+	 * to put it in the containing tinyMCE editor. Otherwise call the `onSplit`
+	 * handler.
 	 *
-	 * @param {PrePasteProcessEvent} event The PrePasteProcess event as triggered by tinyMCE.
+	 * @param {PrePasteProcessEvent} event The PrePasteProcess event as triggered
+	 *                                     by tinyMCE.
 	 */
 	onPastePreProcess( event ) {
 		const HTML = this.isPlainTextPaste ? this.pastedPlainText : event.content;
@@ -519,7 +521,7 @@ export default class Editable extends Component {
 	}
 
 	/**
-	 * Handles a keydown event from tinyMCE
+	 * Handles a keydown event from tinyMCE.
 	 *
 	 * @param {KeydownEvent} event The keydow event as triggered by tinyMCE.
 	 */
@@ -548,7 +550,6 @@ export default class Editable extends Component {
 			}
 
 			event.preventDefault();
-			event.stopImmediatePropagation();
 		}
 
 		// If we click shift+Enter on inline Editables, we avoid creating two contenteditables
@@ -586,7 +587,6 @@ export default class Editable extends Component {
 				if ( event.shiftKey || ! this.props.onSplit ) {
 					this.editor.execCommand( 'InsertLineBreak', false, event );
 				} else {
-					event.stopImmediatePropagation();
 					this.splitContent();
 				}
 			}
@@ -594,7 +594,7 @@ export default class Editable extends Component {
 	}
 
 	/**
-	 * Handles tinyMCE key up event
+	 * Handles tinyMCE key up event.
 	 *
 	 * @param {number} keyCode The key code that has been pressed on the keyboard.
 	 */
@@ -721,7 +721,7 @@ export default class Editable extends Component {
 		}
 
 		content = renderToString( content );
-		this.editor.setContent( content, { format: 'raw' } );
+		this.editor.setContent( content );
 	}
 
 	getContent() {
@@ -804,7 +804,7 @@ export default class Editable extends Component {
 					if ( ! anchor ) {
 						this.removeFormat( 'link' );
 					}
-					this.applyFormat( 'link', { href: formatValue.value, target: formatValue.target }, anchor );
+					this.applyFormat( 'link', { href: formatValue.value }, anchor );
 				} else {
 					this.editor.execCommand( 'Unlink' );
 				}

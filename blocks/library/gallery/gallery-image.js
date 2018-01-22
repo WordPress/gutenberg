@@ -36,8 +36,9 @@ class GalleryImage extends Component {
 
 		const img = url ? <img src={ url } alt={ alt } data-id={ id } /> : <Spinner />;
 
-		const className = classnames( 'blocks-gallery-image', {
+		const className = classnames( {
 			'is-selected': isSelected,
+			'is-transient': 0 === url.indexOf( 'blob:' ),
 		} );
 
 		// Disable reason: Each block can be selected by clicking on it and we should keep the same saved markup
@@ -45,11 +46,11 @@ class GalleryImage extends Component {
 		return (
 			<figure className={ className } onClick={ onClick }>
 				{ isSelected &&
-					<div className="blocks-gallery-image__inline-menu">
+					<div className="blocks-gallery-item__inline-menu">
 						<IconButton
 							icon="no-alt"
 							onClick={ onRemove }
-							className="blocks-gallery-image__remove"
+							className="blocks-gallery-item__remove"
 							label={ __( 'Remove Image' ) }
 						/>
 					</div>

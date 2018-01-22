@@ -178,6 +178,7 @@ registerBlockType( 'core/quote', {
 			<blockquote
 				key="quote"
 				className={ containerClassname }
+				style={ { textAlign: align } }
 			>
 				<Editable
 					multiline="p"
@@ -196,14 +197,12 @@ registerBlockType( 'core/quote', {
 							onReplace( [] );
 						}
 					} }
-					style={ { textAlign: align } }
 					placeholder={ __( 'Write quote…' ) }
 				/>
 				{ ( ( citation && citation.length > 0 ) || !! focus ) && (
 					<Editable
 						tagName="cite"
 						value={ citation }
-						placeholder={ __( 'Write citation…' ) }
 						onChange={
 							( nextCitation ) => setAttributes( {
 								citation: nextCitation,
@@ -216,6 +215,7 @@ registerBlockType( 'core/quote', {
 								setFocus( { ...focus, editable: 'value' } );
 							}
 						} }
+						placeholder={ __( 'Write citation…' ) }
 					/>
 				) }
 			</blockquote>,

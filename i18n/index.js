@@ -10,7 +10,7 @@ let i18n;
  *
  * @see http://messageformat.github.io/Jed/
  *
- * @param {Object} data Locale data configuration
+ * @param {Object} data Locale data configuration.
  */
 export function setLocaleData( data ) {
 	i18n = new Jed( data );
@@ -20,7 +20,7 @@ export function setLocaleData( data ) {
  * Returns the current Jed instance, initializing with a default configuration
  * if not already assigned.
  *
- * @return {Jed} Jed instance
+ * @returns {Jed} Jed instance.
  */
 export function getI18n() {
 	if ( ! i18n ) {
@@ -35,8 +35,9 @@ export function getI18n() {
  *
  * @see https://developer.wordpress.org/reference/functions/__/
  *
- * @param  {string} text Text to translate
- * @return {string}      Translated text
+ * @param {string} text Text to translate.
+ *
+ * @returns {string} Translated text.
  */
 export function __( text ) {
 	return getI18n().gettext( text );
@@ -47,9 +48,10 @@ export function __( text ) {
  *
  * @see https://developer.wordpress.org/reference/functions/_x/
  *
- * @param  {string} text    Text to translate
- * @param  {string} context Context information for the translators
- * @return {string}         Translated context string without pipe
+ * @param {string} text    Text to translate.
+ * @param {string} context Context information for the translators.
+ *
+ * @returns {string} Translated context string without pipe.
  */
 export function _x( text, context ) {
 	return getI18n().pgettext( context, text );
@@ -61,11 +63,12 @@ export function _x( text, context ) {
  *
  * @see https://developer.wordpress.org/reference/functions/_n/
  *
- * @param  {string} single The text to be used if the number is singular
- * @param  {string} plural The text to be used if the number is plural
- * @param  {Number} number The number to compare against to use either the
- *                         singular or plural form
- * @return {string}        The translated singular or plural form
+ * @param {string} single The text to be used if the number is singular.
+ * @param {string} plural The text to be used if the number is plural.
+ * @param {number} number The number to compare against to use either the
+ *                         singular or plural form.
+ *
+ * @returns {string} The translated singular or plural form.
  */
 export function _n( single, plural, number ) {
 	return getI18n().ngettext( single, plural, number );
@@ -77,12 +80,13 @@ export function _n( single, plural, number ) {
  *
  * @see https://developer.wordpress.org/reference/functions/_nx/
  *
- * @param  {string} single  The text to be used if the number is singular
- * @param  {string} plural  The text to be used if the number is plural
- * @param  {Number} number  The number to compare against to use either the
- *                          singular or plural form
- * @param  {string} context Context information for the translators
- * @return {string}         The translated singular or plural form
+ * @param {string} single  The text to be used if the number is singular.
+ * @param {string} plural  The text to be used if the number is plural.
+ * @param {number} number  The number to compare against to use either the
+ *                          singular or plural form.
+ * @param {string} context Context information for the translators.
+ *
+ * @returns {string} The translated singular or plural form.
  */
 export function _nx( single, plural, number, context ) {
 	return getI18n().npgettext( context, single, plural, number );

@@ -15,13 +15,14 @@ import { getCommentDelimitedContent } from './serializer';
 import { attr, prop, html, text, query, node, children } from './matchers';
 
 /**
- * Returns value coerced to the specified JSON schema type string
+ * Returns value coerced to the specified JSON schema type string.
  *
  * @see http://json-schema.org/latest/json-schema-validation.html#rfc.section.6.25
  *
- * @param  {*}      value Original value
- * @param  {String} type  Type to coerce
- * @return {*}            Coerced value
+ * @param {*}      value Original value.
+ * @param {string} type  Type to coerce.
+ *
+ * @returns {*} Coerced value.
  */
 export function asType( value, type ) {
 	switch ( type ) {
@@ -53,10 +54,11 @@ export function asType( value, type ) {
 }
 
 /**
- * Returns an hpq matcher given a source object
+ * Returns an hpq matcher given a source object.
  *
- * @param  {Object}   sourceConfig Attribute Source object
- * @return {Function}              hpq Matcher
+ * @param {Object} sourceConfig Attribute Source object.
+ *
+ * @returns {Function} A hpq Matcher.
  */
 export function matcherFromSource( sourceConfig ) {
 	switch ( sourceConfig.source ) {
@@ -82,15 +84,16 @@ export function matcherFromSource( sourceConfig ) {
 }
 
 /**
- * Given an attribute key, an attribute's schema, a block's raw content and the commentAttributes
- * returns the attribute value depending on its source definition of the given attribute key
+ * Given an attribute key, an attribute's schema, a block's raw content and the
+ * commentAttributes returns the attribute value depending on its source
+ * definition of the given attribute key.
  *
- * @param  {string} attributeKey        Attribute key
- * @param  {Object} attributeSchema     Attribute's schema
- * @param  {string} innerHTML           Block's raw content
- * @param  {Object} commentAttributes   Block's comment attributes
+ * @param {string} attributeKey      Attribute key.
+ * @param {Object} attributeSchema   Attribute's schema.
+ * @param {string} innerHTML         Block's raw content.
+ * @param {Object} commentAttributes Block's comment attributes.
  *
- * @return {*}                          Attribute value
+ * @returns {*} Attribute value.
  */
 export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, commentAttributes ) {
 	let value;
@@ -116,10 +119,11 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
 /**
  * Returns the block attributes of a registered block node given its type.
  *
- * @param  {?Object} blockType  Block type
- * @param  {string}  innerHTML  Raw block content
- * @param  {?Object} attributes Known block attributes (from delimiters)
- * @return {Object}             All block attributes
+ * @param {?Object} blockType  Block type.
+ * @param {string}  innerHTML  Raw block content.
+ * @param {?Object} attributes Known block attributes (from delimiters).
+ *
+ * @returns {Object} All block attributes.
  */
 export function getBlockAttributes( blockType, innerHTML, attributes ) {
 	const blockAttributes = mapValues( blockType.attributes, ( attributeSchema, attributeKey ) => {
@@ -130,12 +134,14 @@ export function getBlockAttributes( blockType, innerHTML, attributes ) {
 }
 
 /**
- * Attempt to parse the innerHTML using using a supplied `deprecated` definition.
+ * Attempt to parse the innerHTML using using a supplied `deprecated`
+ * definition.
  *
- * @param  {?Object} blockType  Block type
- * @param  {string}  innerHTML  Raw block content
- * @param  {?Object} attributes Known block attributes (from delimiters)
- * @return {Object}             Block attributes
+ * @param {?Object} blockType  Block type.
+ * @param {string}  innerHTML  Raw block content.
+ * @param {?Object} attributes Known block attributes (from delimiters).
+ *
+ * @returns {Object} Block attributes.
  */
 export function getAttributesFromDeprecatedVersion( blockType, innerHTML, attributes ) {
 	if ( ! blockType.deprecated ) {
@@ -147,10 +153,19 @@ export function getAttributesFromDeprecatedVersion( blockType, innerHTML, attrib
 			...omit( blockType, [ 'attributes', 'save', 'supports' ] ), // Parsing/Serialization properties
 			...blockType.deprecated[ i ],
 		};
-		const deprecatedBlockAttributes = getBlockAttributes( deprecatedBlockType, innerHTML, attributes );
-		const isValid = isValidBlock( innerHTML, deprecatedBlockType, deprecatedBlockAttributes );
-		if ( isValid ) {
-			return deprecatedBlockAttributes;
+
+		try {
+			// Parse using the deprecated block version .
+			// Try to validate the parsed block using this same deprecated version.
+			// Ignore this version if the the validation fails.
+			const deprecatedBlockAttributes = getBlockAttributes( deprecatedBlockType, innerHTML, attributes );
+			const migratedBlockAttributes = deprecatedBlockType.migrate ? deprecatedBlockType.migrate( deprecatedBlockAttributes ) : deprecatedBlockAttributes;
+			const isValid = isValidBlock( innerHTML, deprecatedBlockType, deprecatedBlockAttributes );
+			if ( isValid ) {
+				return migratedBlockAttributes;
+			}
+		} catch ( error ) {
+			// ignore error, it means this deprecated version is invalid
 		}
 	}
 }
@@ -158,10 +173,11 @@ export function getAttributesFromDeprecatedVersion( blockType, innerHTML, attrib
 /**
  * Creates a block with fallback to the unknown type handler.
  *
- * @param  {?String} name       Block type name
- * @param  {String}  innerHTML  Raw block content
- * @param  {?Object} attributes Attributes obtained from block delimiters
- * @return {?Object}            An initialized block object (if possible)
+ * @param {?String} name       Block type name.
+ * @param {string}  innerHTML  Raw block content.
+ * @param {?Object} attributes Attributes obtained from block delimiters.
+ *
+ * @returns {?Object} An initialized block object (if possible).
  */
 export function createBlockWithFallback( name, innerHTML, attributes ) {
 	// Use type from block content, otherwise find unknown handler.
@@ -227,8 +243,9 @@ export function createBlockWithFallback( name, innerHTML, attributes ) {
 /**
  * Parses the post content with a PegJS grammar and returns a list of blocks.
  *
- * @param  {String} content The post content
- * @return {Array}          Block list
+ * @param {string} content The post content.
+ *
+ * @returns {Array} Block list.
  */
 export function parseWithGrammar( content ) {
 	return grammarParse( content ).reduce( ( memo, blockNode ) => {

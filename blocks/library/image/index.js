@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { createMediaFromFile } from '@wordpress/utils';
+import { createMediaFromFile, preloadImage } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -35,6 +35,7 @@ registerBlockType( 'core/image', {
 			source: 'attribute',
 			selector: 'img',
 			attribute: 'alt',
+			default: '',
 		},
 		caption: {
 			type: 'array',
@@ -87,12 +88,18 @@ registerBlockType( 'core/image', {
 				isMatch( files ) {
 					return files.length === 1 && files[ 0 ].type.indexOf( 'image/' ) === 0;
 				},
-				transform( files ) {
-					return createMediaFromFile( files[ 0 ] )
-						.then( ( media ) => createBlock( 'core/image', {
-							id: media.id,
-							url: media.source_url,
-						} ) );
+				transform( files, onChange ) {
+					const file = files[ 0 ];
+					const block = createBlock( 'core/image', {
+						url: window.URL.createObjectURL( file ),
+					} );
+
+					createMediaFromFile( file )
+						.then( ( media ) => preloadImage( media.source_url ).then(
+							() => onChange( block.uid, { id: media.id, url: media.source_url } )
+						) );
+
+					return block;
 				},
 			},
 			{
@@ -155,8 +162,15 @@ registerBlockType( 'core/image', {
 	save( { attributes } ) {
 		const { url, alt, caption, align, href, width, height } = attributes;
 		const extraImageProps = width || height ? { width, height } : {};
-		const figureStyle = width ? { width } : {};
 		const image = <img src={ url } alt={ alt } { ...extraImageProps } />;
+
+		let figureStyle = {};
+
+		if ( width ) {
+			figureStyle = { width };
+		} else if ( align === 'left' || align === 'right' ) {
+			figureStyle = { maxWidth: '50%' };
+		}
 
 		return (
 			<figure className={ align ? `align${ align }` : null } style={ figureStyle }>

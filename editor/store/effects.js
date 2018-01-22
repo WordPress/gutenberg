@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, includes, map, castArray, uniqueId } from 'lodash';
+import { get, includes, map, castArray, uniqueId, reduce, values, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -36,14 +36,15 @@ import {
 	savePost,
 	editPost,
 	requestMetaBoxUpdates,
+	metaBoxUpdatesSuccess,
 	updateReusableBlock,
 	saveReusableBlock,
 	insertBlock,
+	setMetaBoxSavedData,
 } from './actions';
 import {
 	getCurrentPost,
 	getCurrentPostType,
-	getDirtyMetaBoxes,
 	getEditedPostContent,
 	getPostEdits,
 	isCurrentPostPublished,
@@ -53,8 +54,10 @@ import {
 	getBlock,
 	getBlocks,
 	getReusableBlock,
+	getMetaBoxes,
 	POST_UPDATE_TRANSACTION_ID,
 } from './selectors';
+import { getMetaBoxContainer } from '../edit-post/meta-boxes';
 
 /**
  * Module Constants
@@ -108,7 +111,7 @@ export default {
 	},
 	REQUEST_POST_UPDATE_SUCCESS( action, store ) {
 		const { previousPost, post } = action;
-		const { dispatch, getState } = store;
+		const { dispatch } = store;
 
 		const publishStatus = [ 'publish', 'private', 'future' ];
 		const isPublished = includes( publishStatus, previousPost.status );
@@ -148,7 +151,7 @@ export default {
 		}
 
 		// Update dirty meta boxes.
-		dispatch( requestMetaBoxUpdates( getDirtyMetaBoxes( getState() ) ) );
+		dispatch( requestMetaBoxUpdates() );
 
 		if ( get( window.history.state, 'id' ) !== post.id ) {
 			window.history.replaceState(
@@ -451,5 +454,43 @@ export default {
 	CREATE_NOTICE( { notice: { content, spokenMessage } } ) {
 		const message = spokenMessage || content;
 		speak( message, 'assertive' );
+	},
+	INITIALIZE_META_BOX_STATE( action, store ) {
+		// Allow toggling metaboxes panels
+		if ( some( action.metaBoxes ) ) {
+			window.postboxes.add_postbox_toggles( 'post' );
+		}
+		const dataPerLocation = reduce( action.metaBoxes, ( memo, isActive, location ) => {
+			if ( isActive ) {
+				memo[ location ] = jQuery( getMetaBoxContainer( location ) ).serialize();
+			}
+			return memo;
+		}, {} );
+		store.dispatch( setMetaBoxSavedData( dataPerLocation ) );
+	},
+	REQUEST_META_BOX_UPDATES( action, store ) {
+		const dataPerLocation = reduce( getMetaBoxes( store.getState() ), ( memo, metabox, location ) => {
+			if ( metabox.isActive ) {
+				memo[ location ] = jQuery( getMetaBoxContainer( location ) ).serialize();
+			}
+			return memo;
+		}, {} );
+		store.dispatch( setMetaBoxSavedData( dataPerLocation ) );
+
+		// To save the metaboxes, we serialize each one of the location forms and combine them
+		// We also add the "common" hidden fields from the base .metabox-base-form
+		const formData = values( dataPerLocation ).concat(
+			jQuery( '.metabox-base-form' ).serialize()
+		).join( '&' );
+		const fetchOptions = {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+			body: formData,
+			credentials: 'include',
+		};
+
+		// Save the metaboxes
+		window.fetch( window._wpMetaBoxUrl, fetchOptions )
+			.then( () => store.dispatch( metaBoxUpdatesSuccess() ) );
 	},
 };

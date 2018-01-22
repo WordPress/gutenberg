@@ -7,8 +7,6 @@ import {
 	startTyping,
 	stopTyping,
 	requestMetaBoxUpdates,
-	handleMetaBoxReload,
-	metaBoxStateChanged,
 	initializeMetaBoxState,
 	fetchReusableBlocks,
 	updateReusableBlock,
@@ -52,7 +50,6 @@ import {
 	createErrorNotice,
 	createWarningNotice,
 	removeNotice,
-	metaBoxLoaded,
 	toggleFeature,
 } from '../actions';
 
@@ -515,16 +512,6 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'metaBoxLoaded', () => {
-		it( 'should return META_BOX_LOADED action', () => {
-			const location = 'normal';
-			expect( metaBoxLoaded( location ) ).toEqual( {
-				type: 'META_BOX_LOADED',
-				location,
-			} );
-		} );
-	} );
-
 	describe( 'toggleFeature', () => {
 		it( 'should return TOGGLE_FEATURE action', () => {
 			const feature = 'name';
@@ -537,28 +524,8 @@ describe( 'actions', () => {
 
 	describe( 'requestMetaBoxUpdates', () => {
 		it( 'should return the REQUEST_META_BOX_UPDATES action', () => {
-			expect( requestMetaBoxUpdates( [ 'normal' ] ) ).toEqual( {
+			expect( requestMetaBoxUpdates() ).toEqual( {
 				type: 'REQUEST_META_BOX_UPDATES',
-				locations: [ 'normal' ],
-			} );
-		} );
-	} );
-
-	describe( 'handleMetaBoxReload', () => {
-		it( 'should return the HANDLE_META_BOX_RELOAD action with a location and node', () => {
-			expect( handleMetaBoxReload( 'normal' ) ).toEqual( {
-				type: 'HANDLE_META_BOX_RELOAD',
-				location: 'normal',
-			} );
-		} );
-	} );
-
-	describe( 'metaBoxStateChanged', () => {
-		it( 'should return the META_BOX_STATE_CHANGED action with a hasChanged flag', () => {
-			expect( metaBoxStateChanged( 'normal', true ) ).toEqual( {
-				type: 'META_BOX_STATE_CHANGED',
-				location: 'normal',
-				hasChanged: true,
 			} );
 		} );
 	} );

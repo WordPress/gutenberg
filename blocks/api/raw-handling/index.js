@@ -28,14 +28,16 @@ import shortcodeConverter from './shortcode-converter';
 /**
  * Converts an HTML string to known blocks. Strips everything else.
  *
- * @param  {String}       options.HTML        The HTML to convert.
- * @param  {String}       [options.plainText] Plain text version.
- * @param  {String}       [options.mode]      Handle content as blocks or inline content.
- *                                            * 'AUTO': Decide based on the content passed.
- *                                            * 'INLINE': Always handle as inline content, and return string.
- *                                            * 'BLOCKS': Always handle as blocks, and return array of blocks.
- * @param  {Array}         [options.tagName]  The tag into which content will be inserted.
- * @return {Array|String}                     A list of blocks or a string, depending on `handlerMode`.
+ * @param {string} [options.HTML]      The HTML to convert.
+ * @param {string} [options.plainText] Plain text version.
+ * @param {string} [options.mode]      Handle content as blocks or inline content.
+ *                                     * 'AUTO': Decide based on the content passed.
+ *                                     * 'INLINE': Always handle as inline content, and return string.
+ *                                     * 'BLOCKS': Always handle as blocks, and return array of blocks.
+ * @param {Array}  [options.tagName]   The tag into which content will be
+ *                                     inserted.
+ *
+ * @returns {Array|String} A list of blocks or a string, depending on `handlerMode`.
  */
 export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagName } ) {
 	// First of all, strip any meta tags.

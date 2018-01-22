@@ -12,10 +12,11 @@ const { TEXT_NODE } = window.Node;
 /**
  * Check whether the caret is horizontally at the edge of the container.
  *
- * @param  {Element} container       Focusable element.
- * @param  {Boolean} isReverse       Set to true to check left, false for right.
- * @param  {Boolean} collapseRanges  Whether or not to collapse the selection range before the check
- * @return {Boolean}                 True if at the horizontal edge, false if not.
+ * @param {Element} container      Focusable element.
+ * @param {boolean} isReverse      Set to true to check left, false for right.
+ * @param {boolean} collapseRanges Whether or not to collapse the selection range before the check.
+ *
+ * @returns {boolean} True if at the horizontal edge, false if not.
  */
 export function isHorizontalEdge( container, isReverse, collapseRanges = false ) {
 	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
@@ -77,10 +78,11 @@ export function isHorizontalEdge( container, isReverse, collapseRanges = false )
 /**
  * Check whether the caret is vertically at the edge of the container.
  *
- * @param  {Element} container       Focusable element.
- * @param  {Boolean} isReverse       Set to true to check top, false for bottom.
- * @param  {Boolean} collapseRanges  Whether or not to collapse the selection range before the check
- * @return {Boolean}                 True if at the edge, false if not.
+ * @param {Element} container      Focusable element.
+ * @param {boolean} isReverse      Set to true to check top, false for bottom.
+ * @param {boolean} collapseRanges Whether or not to collapse the selection range before the check.
+ *
+ * @returns {boolean} True if at the edge, false if not.
  */
 export function isVerticalEdge( container, isReverse, collapseRanges = false ) {
 	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
@@ -156,7 +158,7 @@ export function computeCaretRect( container ) {
  * Places the caret at start or end of a given element.
  *
  * @param {Element} container Focusable element.
- * @param {Boolean} isReverse True for end, false for start.
+ * @param {boolean} isReverse True for end, false for start.
  */
 export function placeCaretAtHorizontalEdge( container, isReverse ) {
 	if ( ! container ) {
@@ -198,10 +200,11 @@ export function placeCaretAtHorizontalEdge( container, isReverse ) {
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Document/caretRangeFromPoint
  *
- * @param  {Document} doc The document of the range.
- * @param  {Float}    x   Horizontal position within the current viewport.
- * @param  {Float}    y   Vertical position within the current viewport.
- * @return {?Range}       The best range for the given point.
+ * @param {Document} doc The document of the range.
+ * @param {number}    x   Horizontal position within the current viewport.
+ * @param {number}    y   Vertical position within the current viewport.
+ *
+ * @returns {?Range} The best range for the given point.
  */
 function caretRangeFromPoint( doc, x, y ) {
 	if ( doc.caretRangeFromPoint ) {
@@ -226,11 +229,12 @@ function caretRangeFromPoint( doc, x, y ) {
  * Gives the container a temporary high z-index (above any UI).
  * This is preferred over getting the UI nodes and set styles there.
  *
- * @param  {Document} doc       The document of the range.
- * @param  {Float}    x         Horizontal position within the current viewport.
- * @param  {Float}    y         Vertical position within the current viewport.
- * @param  {Element}  container Container in which the range is expected to be found.
- * @return {?Range}             The best range for the given point.
+ * @param {Document} doc       The document of the range.
+ * @param {number}    x         Horizontal position within the current viewport.
+ * @param {number}    y         Vertical position within the current viewport.
+ * @param {Element}  container Container in which the range is expected to be found.
+ *
+ * @returns {?Range} The best range for the given point.
  */
 function hiddenCaretRangeFromPoint( doc, x, y, container ) {
 	container.style.zIndex = '10000';
@@ -246,9 +250,9 @@ function hiddenCaretRangeFromPoint( doc, x, y, container ) {
  * Places the caret at the top or bottom of a given element.
  *
  * @param {Element} container           Focusable element.
- * @param {Boolean} isReverse           True for bottom, false for top.
+ * @param {boolean} isReverse           True for bottom, false for top.
  * @param {DOMRect} [rect]              The rectangle to position the caret with.
- * @param {Boolean} [mayUseScroll=true] True to allow scrolling, false to disallow.
+ * @param {boolean} [mayUseScroll=true] True to allow scrolling, false to disallow.
  */
 export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScroll = true ) {
 	if ( ! container ) {
@@ -309,8 +313,9 @@ export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScro
 /**
  * Check whether the given node in an input field.
  *
- * @param  {HTMLElement} element The HTML element.
- * @return {Boolean}             True if the element is an input field, false if not.
+ * @param {HTMLElement} element The HTML element.
+ *
+ * @returns {boolean} True if the element is an input field, false if not.
  */
 export function isInputField( { nodeName, contentEditable } ) {
 	return (
@@ -318,4 +323,21 @@ export function isInputField( { nodeName, contentEditable } ) {
 		nodeName === 'TEXTAREA' ||
 		contentEditable === 'true'
 	);
+}
+
+/**
+ * Check wether the current document has a selection.
+ * This checks both for focus in an input field and general text selection.
+ *
+ * @returns {boolean} True if there is selection, false if not.
+ */
+export function documentHasSelection() {
+	if ( isInputField( document.activeElement ) ) {
+		return true;
+	}
+
+	const selection = window.getSelection();
+	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+
+	return range && ! range.collapsed;
 }
