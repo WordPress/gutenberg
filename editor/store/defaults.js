@@ -1,6 +1,6 @@
 export const PREFERENCES_DEFAULTS = {
 	editorMode: 'visual',
-	viewMode: 'desktop', // 'desktop' | 'mobile'
+	viewportType: 'desktop', // 'desktop' | 'mobile'
 	activeGeneralSidebar: null, // null | 'editor' | 'plugins'
 	activeSidebarPanel: { // The keys in this object should match activeSidebarPanel values
 		editor: null, // 'document' | 'block'

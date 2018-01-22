@@ -419,15 +419,15 @@ export function toggleGeneralSidebarEditorPanel( panel ) {
 }
 
 /**
- * Returns an action object used in signalling that the view mode preference should be set.
+ * Returns an action object used in signalling that the viewport type preference should be set.
  *
- * @param {string} viewMode The view mode (desktop or mobile).
+ * @param {string} viewportType The viewport type (desktop or mobile).
  * @return {Object} Action object.
  */
-export function setViewMode( viewMode ) {
+export function setViewportType( viewportType ) {
 	return {
 		type: 'SET_VIEW_MODE',
-		viewMode,
+		viewportType,
 	};
 }
 

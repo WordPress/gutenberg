@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { isMobile } from '../../store/selectors';
-import { setViewMode } from '../../store/actions';
+import { setViewportType } from '../../store/actions';
 
 /**
  * Disables isSidebarOpened on rehydrate payload if the user is on a mobile screen size.
@@ -26,7 +26,7 @@ export const mobileMiddleware = ( { getState } ) => next => action => {
 		} );
 	}
 	if ( action.type === 'TOGGLE_SIDEBAR' && action.sidebar === undefined ) {
-		return next( setViewMode( isMobile( getState() ) ? 'mobile' : 'desktop' ) );
+		return next( setViewportType( isMobile( getState() ) ? 'mobile' : 'desktop' ) );
 	}
 	return next( action );
 };
