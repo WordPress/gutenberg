@@ -30,15 +30,16 @@ import { getBlockType, getBlockTypes } from './registration';
 /**
  * Returns a block object given its type and attributes.
  *
- * @param {string} name            Block name.
- * @param {Object} blockAttributes Block attributes.
- * @param {?Array} innerBlocks     Nested blocks.
+ * @param {string}  name            Block name.
+ * @param {Object}  blockAttributes Block attributes.
+ * @param {?Array}  innerBlocks     Nested blocks.
+ * @param {?Object} blockRegistry   Block registry.
  *
  * @returns {Object} Block object.
  */
-export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
+export function createBlock( name, blockAttributes = {}, innerBlocks = [], blockRegistry = undefined ) {
 	// Get the type definition associated with a registered block.
-	const blockType = getBlockType( name );
+	const blockType = getBlockType( name, blockRegistry );
 
 	// Ensure attributes contains only values defined by block type, and merge
 	// default values for missing attributes.
@@ -123,11 +124,12 @@ const createIsTypeTransformableFrom = ( sourceName, isMultiBlock = false ) => ( 
  * Returns an array of possible block transformations that could happen on the
  * set of blocks received as argument.
  *
- * @param {Array} blocks Blocks array.
+ * @param {Array}  blocks          Blocks array.
+ * @param {Object} [blockRegistry] Block registry.
  *
  * @returns {Array} Array of possible block transformations.
  */
-export function getPossibleBlockTransformations( blocks ) {
+export function getPossibleBlockTransformations( blocks, blockRegistry = undefined ) {
 	const sourceBlock = first( blocks );
 	if ( ! blocks || ! sourceBlock ) {
 		return [];
@@ -141,11 +143,11 @@ export function getPossibleBlockTransformations( blocks ) {
 
 	//compute the block that have a from transformation able to transfer blocks passed as argument.
 	const blocksToBeTransformedFrom = filter(
-		getBlockTypes(),
+		getBlockTypes( blockRegistry ),
 		createIsTypeTransformableFrom( sourceBlockName, isMultiBlock ),
 	).map( type => type.name );
 
-	const blockType = getBlockType( sourceBlockName );
+	const blockType = getBlockType( sourceBlockName, blockRegistry );
 	const transformsTo = get( blockType, 'transforms.to', [] );
 
 	//computes a list of blocks that source block can be transformed into using the "to transformations" implemented in it.
@@ -159,7 +161,7 @@ export function getPossibleBlockTransformations( blocks ) {
 		...blocksToBeTransformedFrom,
 		...blocksToBeTransformedTo,
 	], ( result, name ) => {
-		const transformBlockType = getBlockType( name );
+		const transformBlockType = getBlockType( name, blockRegistry );
 		if ( transformBlockType && ! includes( result, transformBlockType ) ) {
 			result.push( transformBlockType );
 		}
@@ -170,12 +172,13 @@ export function getPossibleBlockTransformations( blocks ) {
 /**
  * Switch one or more blocks into one or more blocks of the new block type.
  *
- * @param {Array|Object} blocks Blocks array or block object.
- * @param {string}       name   Block name.
+ * @param {Array|Object} blocks          Blocks array or block object.
+ * @param {string}       name            Block name.
+ * @param {Object}       [blockRegistry] Block registry.
  *
  * @returns {Array} Array of blocks.
  */
-export function switchToBlockType( blocks, name ) {
+export function switchToBlockType( blocks, name, blockRegistry = undefined ) {
 	const blocksArray = castArray( blocks );
 	const isMultiBlock = blocksArray.length > 1;
 	const firstBlock = blocksArray[ 0 ];
@@ -187,8 +190,8 @@ export function switchToBlockType( blocks, name ) {
 
 	// Find the right transformation by giving priority to the "to"
 	// transformation.
-	const destinationType = getBlockType( name );
-	const sourceType = getBlockType( sourceName );
+	const destinationType = getBlockType( name, blockRegistry );
+	const sourceType = getBlockType( sourceName, blockRegistry );
 	const transformationsFrom = get( destinationType, 'transforms.from', [] );
 	const transformationsTo = get( sourceType, 'transforms.to', [] );
 	const transformation =
@@ -225,7 +228,7 @@ export function switchToBlockType( blocks, name ) {
 
 	// Ensure that every block object returned by the transformation has a
 	// valid block type.
-	if ( transformationResults.some( ( result ) => ! getBlockType( result.name ) ) ) {
+	if ( transformationResults.some( ( result ) => ! getBlockType( result.name, blockRegistry ) ) ) {
 		return null;
 	}
 
