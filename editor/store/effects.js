@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, includes, map, castArray, uniqueId, reduce, values, some } from 'lodash';
+import { get, has, includes, map, castArray, uniqueId, reduce, values, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -328,7 +328,7 @@ export default {
 		let result;
 		// TODO: these are potentially undefined, this fix is in place
 		// until there is a filter to not use reusable blocks if undefined
-		if ( ! wp.api.models.Blocks && ! wp.api.collections.Blocks ) {
+		if ( ! has( wp, 'api.models.Blocks' ) && ! has( wp, 'api.collections.Blocks' ) ) {
 			return;
 		}
 		if ( id ) {
@@ -363,7 +363,7 @@ export default {
 	SAVE_REUSABLE_BLOCK( action, store ) {
 		// TODO: these are potentially undefined, this fix is in place
 		// until there is a filter to not use reusable blocks if undefined
-		if ( ! wp.api.models.Blocks ) {
+		if ( ! has( wp, 'api.models.Blocks' ) ) {
 			return;
 		}
 
@@ -420,7 +420,7 @@ export default {
 
 		// TODO: these are potentially undefined, this fix is in place
 		// until there is a filter to not use reusable blocks if undefined
-		if ( ! wp.api.models.Blocks ) {
+		if ( ! has( wp, 'api.models.Blocks' ) ) {
 			return;
 		}
 		new wp.api.models.Blocks( { id } ).destroy().then(
