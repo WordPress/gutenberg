@@ -62,6 +62,17 @@ class UrlInput extends Component {
 			return;
 		}
 
+		// Disable suggestions for URLs
+		if ( 0 === value.indexOf( 'http://' ) || 0 === value.indexOf( 'https://' ) ) {
+			this.setState( {
+				showSuggestions: false,
+				selectedSuggestion: null,
+				loading: false,
+			} );
+
+			return;
+		}
+
 		this.setState( {
 			showSuggestions: true,
 			selectedSuggestion: null,
@@ -112,9 +123,9 @@ class UrlInput extends Component {
 
 	onKeyDown( event ) {
 		const { selectedSuggestion, posts } = this.state;
-		// If the suggestions are not shown, we shouldn't handle the arrow keys
+		// If the suggestions are not shown or loading, we shouldn't handle the arrow keys
 		// We shouldn't preventDefault to allow block arrow keys navigation
-		if ( ! this.state.showSuggestions || ! this.state.posts.length ) {
+		if ( ! this.state.showSuggestions || ! this.state.posts.length || this.suggestionsRequest ) {
 			return;
 		}
 
