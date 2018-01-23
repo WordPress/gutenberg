@@ -194,9 +194,8 @@ class PostPermalink extends Component {
 				}
 				{ ! editingSlug &&
 					<Button
-						className="editor-post-permalink__edit"
+						className="editor-post-permalink__edit button"
 						onClick={ this.onEditPermalink }
-						isLarge
 					>
 						{ __( 'Edit' ) }
 					</Button>
