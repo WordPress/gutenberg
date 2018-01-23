@@ -124,6 +124,9 @@ class PostPermalink extends Component {
 		this.props.onUpdate( newSlug );
 	}
 
+  /**
+	 * Event handler for the copy button to show feedback.
+   */
 	onCopy() {
 		this.setState( {
 			showCopyConfirmation: true,
