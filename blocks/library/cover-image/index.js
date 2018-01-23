@@ -228,7 +228,9 @@ export const settings = {
 
 		return (
 			<div className={ classes } style={ style }>
-				<p className="wp-block-cover-image-text">{ title }</p>
+				{ title && title.length > 0 && (
+					<p className="wp-block-cover-image-text">{ title }</p>
+				) }
 			</div>
 		);
 	},
