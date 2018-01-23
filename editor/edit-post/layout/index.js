@@ -30,7 +30,6 @@ import {
 } from '../../components';
 import {
 	getEditorMode,
-	hasFixedToolbar,
 	hasOpenSidebar,
 	isFeatureActive,
 	getOpenedGeneralSidebar,
@@ -38,7 +37,7 @@ import {
 } from '../../store/selectors';
 import {
 	closeGeneralSidebar,
-	closePublishSidebar
+	closePublishSidebar,
 } from '../../store/actions';
 
 function GeneralSidebar( { openedGeneralSidebar } ) {

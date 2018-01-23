@@ -566,14 +566,14 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 		case 'SET_VIEWPORT_TYPE':
 			return {
 				...state,
-				viewportType: action.viewportType
+				viewportType: action.viewportType,
 			};
 		case 'UPDATE_MOBILE_STATE':
 			return {
 				...state,
-				viewportType: action.isMobile ? 'mobile' : 'desktop'
+				viewportType: action.isMobile ? 'mobile' : 'desktop',
 			};
-			case 'SWITCH_MODE':
+		case 'SWITCH_MODE':
 			return {
 				...state,
 				mode: action.mode,

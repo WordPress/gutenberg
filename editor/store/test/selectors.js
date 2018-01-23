@@ -15,7 +15,7 @@ import { registerBlockType, unregisterBlockType, getBlockTypes } from '@wordpres
 import {
 	getEditorMode,
 	getPreference,
-	isSidebarOpened,
+	isGeneralSidebarPanelOpened,
 	hasOpenSidebar,
 	isEditorSidebarPanelOpened,
 	hasEditorUndo,
@@ -119,7 +119,7 @@ describe( 'selectors', () => {
 	describe( 'getEditorMode', () => {
 		it( 'should return the selected editor mode', () => {
 			const state = {
-				preferences: { mode: 'text' },
+				preferences: { editorMode: 'text' },
 			};
 
 			expect( getEditorMode( state ) ).toEqual( 'text' );
@@ -253,47 +253,58 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'isSidebarOpened', () => {
-		it( 'should return true when is not mobile and the normal sidebar is opened', () => {
+	describe( 'isGeneralSidebarPanelOpened', () => {
+		it( 'should return true when the specified sidebar panel is opened', () => {
 			const state = {
-				mobile: false,
 				preferences: {
-					sidebars: {
-						desktop: true,
-						mobile: false,
-					},
+					activeGeneralSidebar: 'editor',
+					viewportType: 'desktop',
+					activeSidebarPanel: 'document',
 				},
 			};
+			const panel = 'document';
+			const sidebar = 'editor';
 
-			expect( isSidebarOpened( state ) ).toBe( true );
+			expect( isGeneralSidebarPanelOpened( state, sidebar, panel ) ).toBe( true );
 		} );
 
-		it( 'should return false when is not mobile and the normal sidebar is closed', () => {
+		it( 'should return false when another panel than the specified sidebar panel is opened', () => {
 			const state = {
-				mobile: false,
 				preferences: {
-					sidebars: {
-						desktop: false,
-						mobile: true,
-					},
+					activeGeneralSidebar: 'editor',
+					viewportType: 'desktop',
+					activeSidebarPanel: 'blocks',
 				},
 			};
+			const panel = 'blocks';
+			const sidebar = 'editor';
 
-			expect( isSidebarOpened( state ) ).toBe( false );
+			expect( isGeneralSidebarPanelOpened( state, sidebar, panel ) ).toBe( false );
 		} );
 
-		it( 'should return true when is mobile and the mobile sidebar is opened', () => {
+		it( 'should return false when no sidebar panel is opened', () => {
 			const state = {
-				mobile: true,
 				preferences: {
-					sidebars: {
-						desktop: false,
-						mobile: true,
-					},
+					activeGeneralSidebar: null,
+					viewportType: 'desktop',
+					activeSidebarPanel: null,
+				},
+			};
+			const panel = 'blocks';
+			const sidebar = 'editor';
+
+			expect( isGeneralSidebarPanelOpened( state, sidebar, panel ) ).toBe( false );
+		} );
+		/*
+		it( 'should return true when the viewport type is mobile and the mobile sidebar is opened', () => {
+			const state = {
+				preferences: {
+					activeGeneralSidebar: 'mobile',
+					viewportType: 'mobile',
 				},
 			};
 
-			expect( isSidebarOpened( state ) ).toBe( true );
+			expect( isGeneralSidebarPanelOpened( state ) ).toBe( true );
 		} );
 
 		it( 'should return false when is mobile and the mobile sidebar is closed', () => {
@@ -332,7 +343,7 @@ describe( 'selectors', () => {
 			};
 
 			expect( isSidebarOpened( state, 'publish' ) ).toBe( false );
-		} );
+		} );*/
 	} );
 
 	describe( 'hasOpenSidebar', () => {

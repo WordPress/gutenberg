@@ -440,7 +440,7 @@ export function toggleGeneralSidebarEditorPanel( panel ) {
  */
 export function setViewportType( viewportType ) {
 	return {
-		type: 'SET_VIEW_MODE',
+		type: 'SET_VIEWPORT_TYPE',
 		viewportType,
 	};
 }

@@ -961,16 +961,17 @@ describe( 'state', () => {
 			const state = preferences( undefined, {} );
 
 			expect( state ).toEqual( {
-				blockUsage: {},
-				recentlyUsedBlocks: [],
-				mode: 'visual',
-				sidebars: {
-					desktop: true,
-					mobile: false,
-					publish: false,
+				activeGeneralSidebar: null,
+				activeSidebarPanel: {
+					editor: null,
+					plugins: null,
 				},
+				blockUsage: {},
+				editorMode: 'visual',
+				recentlyUsedBlocks: [],
 				panels: { 'post-status': true },
 				features: { fixedToolbar: false },
+				viewportType: 'desktop',
 			} );
 		} );
 

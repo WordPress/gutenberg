@@ -6,8 +6,8 @@ import { connect } from 'react-redux';
 /**
  * WordPress Dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
-import { withFocusReturn, Panel, PanelBody } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+import { withFocusReturn } from '@wordpress/components';
 
 /**
  * Internal Dependencies
