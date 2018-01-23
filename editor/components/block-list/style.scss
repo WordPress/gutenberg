@@ -297,8 +297,8 @@
 
 	// Left side UI
 	> .editor-block-mover {
-		left: $block-mover-margin;
-		padding-top: 5px;
+		left: $block-mover-margin + 2px;
+		padding-top: 6px;
 		z-index: z-index( '.editor-block-mover' );
 
 		// Mobile
