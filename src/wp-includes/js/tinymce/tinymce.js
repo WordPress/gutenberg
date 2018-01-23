@@ -25398,7 +25398,7 @@ define(
 
       var getImplementation = function () {
         var theme = editor.theme;
-        return theme.getNotificationManagerImpl ? theme.getNotificationManagerImpl() : NotificationManagerImpl(editor);
+        return theme && theme.getNotificationManagerImpl ? theme.getNotificationManagerImpl() : NotificationManagerImpl(editor);
       };
 
       var getTopNotification = function () {
@@ -25410,7 +25410,9 @@ define(
       };
 
       var reposition = function () {
-        getImplementation().reposition(notifications);
+        if (notifications.length > 0) {
+		  getImplementation().reposition(notifications);
+		}
       };
 
       var addNotification = function (notification) {
@@ -28295,7 +28297,7 @@ define(
 
       var getImplementation = function () {
         var theme = editor.theme;
-        return theme.getWindowManagerImpl ? theme.getWindowManagerImpl() : WindowManagerImpl(editor);
+        return theme && theme.getWindowManagerImpl ? theme.getWindowManagerImpl() : WindowManagerImpl(editor);
       };
 
       var funcBind = function (scope, f) {
@@ -28338,7 +28340,7 @@ define(
       };
 
       var getTopWindow = function () {
-        return Option.from(windows[0]);
+        return Option.from(windows[windows.length - 1]);
       };
 
       var open = function (args, params) {
@@ -30456,8 +30458,10 @@ define(
     var getRanges = function (selection) {
       var ranges = [];
 
-      for (var i = 0; i < selection.rangeCount; i++) {
-        ranges.push(selection.getRangeAt(i));
+      if (selection) {
+        for (var i = 0; i < selection.rangeCount; i++) {
+          ranges.push(selection.getRangeAt(i));
+        }
       }
 
       return ranges;
