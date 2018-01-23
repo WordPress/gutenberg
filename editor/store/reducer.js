@@ -563,7 +563,17 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 					[ action.panel ]: ! get( state, [ 'panels', action.panel ], false ),
 				},
 			};
-		case 'SWITCH_MODE':
+		case 'SET_VIEWPORT_TYPE':
+			return {
+				...state,
+				viewportType: action.viewportType
+			};
+		case 'UPDATE_MOBILE_STATE':
+			return {
+				...state,
+				viewportType: action.isMobile ? 'mobile' : 'desktop'
+			};
+			case 'SWITCH_MODE':
 			return {
 				...state,
 				mode: action.mode,
