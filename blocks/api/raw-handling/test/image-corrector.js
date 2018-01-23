@@ -21,4 +21,10 @@ describe( 'imageCorrector', () => {
 		const output = '';
 		equal( deepFilterHTML( input, [ imageCorrector ] ), output );
 	} );
+
+	it( 'should restore emoji', () => {
+		const input = '<img src="" class="emoji" alt="🍒">';
+		const output = '🍒';
+		equal( deepFilterHTML( input, [ imageCorrector ] ), output );
+	} );
 } );

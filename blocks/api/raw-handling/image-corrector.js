@@ -57,4 +57,9 @@ export default function( node ) {
 	if ( node.height === 1 || node.width === 1 ) {
 		node.parentNode.removeChild( node );
 	}
+
+	// Restore emoji as images.
+	if ( node.className === 'emoji' ) {
+		node.parentNode.replaceChild( document.createTextNode( node.alt ), node );
+	}
 }
