@@ -59,7 +59,7 @@ function Plugins( props ) {
 
 	return [
 		<div
-			key="plugins-separator"
+			key="plugins-separator" defaultValue=""
 			className="editor-ellipsis-menu__separator" />,
 		<div
 			key="plugins-menu-items"
@@ -72,20 +72,20 @@ function Plugins( props ) {
 							plugin.icon = null;
 						}
 						const buttonClassName = classnames(
-							'components-menu-items__button',
+							'components-menu-item-plugins__button',
 							plugin.icon ? 'has-icon' : null
-						);
-						const Icon = (
-							<div style={ { width: '20px', height: '20px', overflow: 'hidden' } } >
-								{ plugin.icon }
-							</div>
 						);
 
 						return (
 							<IconButton
 								key={ plugin.value }
 								className={ buttonClassName }
-								icon={ Icon }
+								icon={
+									plugin.icon ?
+										<div className="components-menu-item-plugins__icon-container" >
+											{ plugin.icon }
+										</div> : null
+								}
 								onClick={ () => onSelect( plugin.value ) }>
 								{ plugin.label }
 							</IconButton>
