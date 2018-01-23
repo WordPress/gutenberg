@@ -121,6 +121,7 @@ class PostTitle extends Component {
 						onClick={ this.onSelect }
 						onKeyDown={ this.onKeyDown }
 						onKeyPress={ this.onUnselect }
+						data-enable-grammarly="false"
 					/>
 				</div>
 			</div>

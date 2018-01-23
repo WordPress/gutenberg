@@ -7,6 +7,7 @@ exports[`core/embed block edit matches snapshot 1`] = `
   <table
     class="blocks-editable__tinymce"
     contenteditable="true"
+    data-enable-grammarly="false"
   >
     <tbody>
       <tr>

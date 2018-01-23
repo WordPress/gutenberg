@@ -8,6 +8,7 @@ exports[`core/list block edit matches snapshot 1`] = `
     aria-label="Write list…"
     class="blocks-editable__tinymce"
     contenteditable="true"
+    data-enable-grammarly="false"
   />
   <ul
     class="blocks-editable__tinymce"

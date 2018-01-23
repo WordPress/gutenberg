@@ -117,6 +117,7 @@ export default class TinyMCE extends Component {
 			className: classnames( className, 'blocks-editable__tinymce' ),
 			style,
 			...ariaProps,
+			'data-enable-grammarly': false,
 		}, children );
 	}
 }

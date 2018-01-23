@@ -15,6 +15,7 @@ exports[`core/paragraph block edit matches snapshot 1`] = `
           aria-label="Add text or type / to add content"
           class="wp-block-paragraph blocks-editable__tinymce"
           contenteditable="true"
+          data-enable-grammarly="false"
         />
         <p
           class="blocks-editable__tinymce wp-block-paragraph"

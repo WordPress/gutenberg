@@ -11,6 +11,7 @@ exports[`core/pullquote block edit matches snapshot 1`] = `
       aria-label="Write quote…"
       class="blocks-editable__tinymce"
       contenteditable="true"
+      data-enable-grammarly="false"
     />
     <div
       class="blocks-editable__tinymce"

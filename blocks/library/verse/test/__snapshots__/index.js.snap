@@ -8,6 +8,7 @@ exports[`core/verse block edit matches snapshot 1`] = `
     aria-label="Write…"
     class="blocks-editable__tinymce"
     contenteditable="true"
+    data-enable-grammarly="false"
   />
   <pre
     class="blocks-editable__tinymce"

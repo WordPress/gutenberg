@@ -8,6 +8,7 @@ exports[`core/preformatted block edit matches snapshot 1`] = `
     aria-label="Write preformatted text…"
     class="blocks-editable__tinymce"
     contenteditable="true"
+    data-enable-grammarly="false"
   />
   <pre
     class="blocks-editable__tinymce"

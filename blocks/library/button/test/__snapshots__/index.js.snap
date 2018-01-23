@@ -11,6 +11,7 @@ exports[`core/button block edit matches snapshot 1`] = `
       aria-label="Add text…"
       class="wp-block-button__link blocks-editable__tinymce"
       contenteditable="true"
+      data-enable-grammarly="false"
     />
     <span
       class="blocks-editable__tinymce wp-block-button__link"
