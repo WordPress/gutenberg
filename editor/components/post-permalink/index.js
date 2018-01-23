@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
  */
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Dashicon, Button } from '@wordpress/components';
+import { Dashicon, ClipboardButton, Button } from '@wordpress/components';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -34,6 +34,7 @@ class PostPermalink extends Component {
 		this.onChangePermalink = this.onChangePermalink.bind( this );
 		this.onEditPermalink = this.onEditPermalink.bind( this );
 		this.onSavePermalink = this.onSavePermalink.bind( this );
+		this.onCopy = this.onCopy.bind( this );
 	}
 
 	/**
@@ -123,6 +124,19 @@ class PostPermalink extends Component {
 		this.props.onUpdate( newSlug );
 	}
 
+	onCopy() {
+		this.setState( {
+			showCopyConfirmation: true,
+		} );
+
+		clearTimeout( this.dismissCopyConfirmation );
+		this.dismissCopyConfirmation = setTimeout( () => {
+			this.setState( {
+				showCopyConfirmation: false,
+			} );
+		}, 4000 );
+	}
+
 	/**
 	 * @inheritdoc
 	 */
@@ -168,6 +182,15 @@ class PostPermalink extends Component {
 							{ __( 'Ok' ) }
 						</Button>
 					</form>
+				}
+				{ ! editingSlug &&
+					<ClipboardButton
+						className="button"
+						text={ link }
+						onCopy={ this.onCopy }
+					>
+						{ this.state.showCopyConfirmation ? __( 'Copied!' ) : __( 'Copy' ) }
+					</ClipboardButton>
 				}
 				{ ! editingSlug &&
 					<Button
