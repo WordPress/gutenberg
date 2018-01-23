@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/a11y",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"description": "Collection of JS modules and tools for WordPress development",
 	"author": "WordPress",
 	"license": "GPL-2.0-or-later",
@@ -19,7 +19,7 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
-		"@wordpress/dom-ready": "^1.0.0"
+		"@wordpress/dom-ready": "^1.0.1"
 	},
 	"publishConfig": {
 		"access": "public"
