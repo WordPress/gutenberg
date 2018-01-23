@@ -59,8 +59,33 @@ const getHeadingLevel = heading => {
 
 const isEmptyHeading = heading => ! heading.attributes.content || heading.attributes.content.length === 0;
 
+/**
+ * Returns a block whose attributes look enough like a heading's attributes.
+ *
+ * This is only meant to support heading and cover image blocks, making
+ * assumptions about cover image blocks so that DocumentOutline can operate on
+ * them, i.e. making sure attributes `nodeName` and `content` are present. It
+ * does not attempt to remove or add other attribues.
+ *
+ * @param   {Object} block A heading or cover image block.
+ * @returns {Object}       A block with heading-like attributes.
+ */
+const castHeading = ( block ) =>
+	block.name !== 'core/cover-image' ?
+		block :
+		{
+			...block,
+			attributes: {
+				...block.attributes,
+				nodeName: 'H2',
+				content: block.attributes.title,
+			},
+		};
+
 export const DocumentOutline = ( { blocks = [], title, onSelect } ) => {
-	const headings = filter( blocks, ( block ) => block.name === 'core/heading' );
+	const headings = filter( blocks, ( { name } ) =>
+		name === 'core/heading' || name === 'core/cover-image'
+	).map( castHeading );
 
 	if ( headings.length < 1 ) {
 		return null;
