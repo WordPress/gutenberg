@@ -154,7 +154,7 @@ final class WP_Block_Type_Registry {
 	 * @since 0.6.0
 	 * @access public
 	 *
-	 * @param tring $name Block type name including namespace.
+	 * @param string $name Block type name including namespace.
 	 * @return bool True if the block type is registered, false otherwise.
 	 */
 	public function is_registered( $name ) {
