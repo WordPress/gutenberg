@@ -623,14 +623,18 @@ class WP_Test_REST_Categories_Controller extends WP_Test_REST_Controller_Testcas
 	 */
 	public function test_create_item_term_already_exists() {
 		wp_set_current_user( self::$administrator );
+		$existing_id = $this->factory->category->create( array( 'name' => 'Existing' ) );
+
 		$request = new WP_REST_Request( 'POST', '/wp/v2/categories' );
-		$request->set_param( 'name', 'test' );
-		$response = $this->server->dispatch( $request );
-		$this->assertEquals( 201, $response->get_status() );
+		$request->set_param( 'name', 'Existing' );
+
 		$response = $this->server->dispatch( $request );
 		$this->assertEquals( 409, $response->get_status() );
 		$data = $response->get_data();
 		$this->assertEquals( 'term_exists', $data['code'] );
+		$this->assertEquals( $existing_id, (int) $data['data']['term_id'] );
+
+		wp_delete_term( $existing_id, 'category' );
 	}
 
 	public function test_create_item_invalid_taxonomy() {
