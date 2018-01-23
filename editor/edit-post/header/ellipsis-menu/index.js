@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton, Dropdown } from '@wordpress/components';
+import { IconButton, Dropdown, MenuItemsSeparator } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -28,11 +28,11 @@ const element = (
 		renderContent={ ( { onClose } ) => (
 			<div>
 				<ModeSwitcher onSelect={ onClose } />
-				<div className="editor-ellipsis-menu__separator" />
+				<MenuItemsSeparator />
 				<FixedToolbarToggle onToggle={ onClose } />
-				{ /* Plugins component renders it's own divider, because it may not show. */ }
+				{ /* Plugins component renders its own divider, because it may not show. */ }
 				<Plugins onSelect={ onClose } />
-				<div className="editor-ellipsis-menu__separator" />
+				<MenuItemsSeparator />
 				<EditorActions />
 			</div>
 		) }

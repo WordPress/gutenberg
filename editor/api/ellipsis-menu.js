@@ -1,9 +1,13 @@
 /* eslint no-console: [ 'error', { allow: [ 'error' ] } ] */
 
-/* External dependencies */
-import isFunction from 'lodash/isFunction';
+/**
+ * External dependencies 
+ */
+import { isFunction } from 'lodash';
 
-/* Internal dependencies */
+/**
+ * Internal dependencies 
+ */
 import { applyFilters } from '@wordpress/hooks';
 import { isString } from 'util';
 
@@ -17,7 +21,7 @@ const menuItems = {};
  *                                     `[namespace]/[name]` format.
  * @param {Object}   settings          The settings for this menu item.
  * @param {string}   settings.title    The name to show in the settings menu.
- * @param {func}     settings.callback The callback function that is called 
+ * @param {func}     settings.callback The callback function that is called
  *                                     when the menu item is clicked.
  * @param {string}   [settings.icon]   SVG Icon url.
  *

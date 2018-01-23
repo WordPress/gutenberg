@@ -2,14 +2,13 @@
  * External dependencies
  */
 import { map, isEmpty, isString } from 'lodash';
-import { connect } from 'react-redux';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { NavigableMenu, withInstanceId, IconButton } from '@wordpress/components';
+import { NavigableMenu, withInstanceId, IconButton, MenuItemsSeparator } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -30,9 +29,7 @@ function Plugins( props ) {
 		return null;
 	}
 
-	const {
-		instanceId,
-	} = props;
+	const { instanceId } = props;
 
 	/**
 	 * Handles the user clicking on one of the plugins in the menu
@@ -47,47 +44,37 @@ function Plugins( props ) {
 		ellipsisMenuItems[ pluginId ].callback();
 	}
 
-	const plugins = map( ellipsisMenuItems, ( menuItem ) => {
-		return {
-			value: menuItem.name,
-			label: menuItem.title,
-			icon: menuItem.icon,
-		};
-	} );
-
 	const labelId = `components-choice-menu-plugins-label-${ instanceId }`;
 
 	return [
-		<div
-			key="plugins-separator" defaultValue=""
-			className="editor-ellipsis-menu__separator" />,
+		<MenuItemsSeparator key="plugins-separator" />,
 		<div
 			key="plugins-menu-items"
 			className="components-choice-menu-plugins" >
 			<div className="components-choice-menu-plugins__label">{ __( 'Plugins' ) }</div>
 			<NavigableMenu orientation="vertical" aria-labelledby={ labelId }>
 				{
-					plugins.map( plugin => {
-						if ( isString( plugin.icon ) ) {
-							plugin.icon = null;
+					map( ellipsisMenuItems, menuItem => {
+						if ( isString( menuItem.icon ) ) {
+							menuItem.icon = null;
 						}
 						const buttonClassName = classnames(
 							'components-menu-item-plugins__button',
-							plugin.icon ? 'has-icon' : null
+							menuItem.icon ? 'has-icon' : null
 						);
 
 						return (
 							<IconButton
-								key={ plugin.value }
+								key={ menuItem.name }
 								className={ buttonClassName }
 								icon={
-									plugin.icon ?
+									menuItem.icon ?
 										<div className="components-menu-item-plugins__icon-container" >
-											{ plugin.icon }
+											{ menuItem.icon }
 										</div> : null
 								}
-								onClick={ () => onSelect( plugin.value ) }>
-								{ plugin.label }
+								onClick={ () => onSelect( menuItem.name ) }>
+								{ menuItem.title }
 							</IconButton>
 						);
 					} )
@@ -97,10 +84,4 @@ function Plugins( props ) {
 	];
 }
 
-export default withInstanceId(
-	connect(
-		( state ) => {
-			return state;
-		}
-	)( Plugins )
-);
+export default withInstanceId( Plugins );
