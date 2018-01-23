@@ -17,77 +17,34 @@
 		pointer-events: none;
 	}
 
-	&:first-child {
-		margin-bottom: 4px;
-	}
-
-	// unstyle inherited icon button styles
-	&:not(:disabled):hover,
-	&:not(:disabled):active,
-	&:not(:disabled):focus {
-		box-shadow: none;
-		color: inherit;
-	}
-
-	// apply styles to SVG directly
-	svg {
-		display: block;
-		position: relative; // Fixing the Safari bug for `<button>`s overflow
-		border-radius: 50%;
-	}
-
-	&:not(:disabled):hover svg {
-		@include button-style__hover;
-	}
-
-	&:not(:disabled):active svg {
-		@include button-style__active;
-	}
-
-	&:not(:disabled):focus svg {
-		@include button-style__focus-active;
-	}
-
-	.dashicon {
-		display: block;
-		width: 16px;
-		height: 16px;
-		margin: 1px 2px 3px 2px;
-	}
-
-	&:first-child .dashicon {
-		margin: 3px 2px 1px 2px;
-	}
-
-}
-
-// Side inserter
-.editor-block-mover {
-	// Button itself
-	.editor-inserter__toggle {
-		width: $icon-button-size-small;
-		padding: 2px;
-
-		// Adjust inserter design
-		box-shadow: inset 0 0 0 1px $light-gray-500;
-
-		// Hide the outer ring on the inserter, to visually lighten it
-		&:before {
-			content: '';
-			position: absolute;
-			top: 2px;
-			right: 2px;
-			bottom: 2px;
-			left: 2px;
-			display: block;
-			border: 4px solid $white;
-			border-radius: 50%;
+	// apply styles to SVG for movers on the desktop breakpoint
+	@include break-small {
+		// unstyle inherited icon button styles
+		&:not(:disabled):hover,
+		&:not(:disabled):active,
+		&:not(:disabled):focus {
+			box-shadow: none;
+			color: inherit;
 		}
-	}
 
-	.editor-inserter {
-		position: absolute;
-		left: -16px;
-		top: 16px;
+		svg {
+			display: block;
+			position: relative; // Fixing the Safari bug for `<button>`s overflow
+			border-radius: 50%;
+			margin: auto;
+
+		}
+
+		&:not(:disabled):hover svg {
+			@include button-style__hover;
+		}
+
+		&:not(:disabled):active svg {
+			@include button-style__active;
+		}
+
+		&:not(:disabled):focus svg {
+			@include button-style__focus-active;
+		}
 	}
 }

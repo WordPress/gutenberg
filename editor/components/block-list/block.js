@@ -24,6 +24,7 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BlockMover from '../block-mover';
+import VisualEditorInserter from '../inserter';
 import BlockDropZone from '../block-drop-zone';
 import BlockSettingsMenu from '../block-settings-menu';
 import InvalidBlockWarning from './invalid-block-warning';
@@ -432,6 +433,7 @@ export class BlockListBlock extends Component {
 				{ ...wrapperProps }
 			>
 				<BlockDropZone index={ order } />
+				{ ( showUI || isHovered ) && <VisualEditorInserter /> }
 				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
 				{ ( showUI || isHovered ) && <BlockSettingsMenu uids={ [ block.uid ] } renderBlockMenu={ renderBlockMenu } /> }
 				{ showUI && isValid && showContextualToolbar && <BlockContextualToolbar /> }

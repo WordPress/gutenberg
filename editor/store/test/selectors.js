@@ -7,7 +7,7 @@ import moment from 'moment';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { getBlockTypes, registerBlockType, unregisterBlockType, registerCoreBlocks } from '@wordpress/blocks';
+import { registerBlockType, unregisterBlockType, registerCoreBlocks, getBlockTypes } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -64,8 +64,6 @@ import {
 	didPostSaveRequestFail,
 	getSuggestedPostFormat,
 	getNotices,
-	getInserterItems,
-	getRecentInserterItems,
 	getMetaBoxes,
 	hasMetaBoxes,
 	isSavingMetaBoxes,
@@ -76,6 +74,8 @@ import {
 	getReusableBlocks,
 	getStateBeforeOptimisticTransaction,
 	isPublishingPost,
+	getInserterItems,
+	getRecentInserterItems,
 	POST_UPDATE_TRANSACTION_ID,
 } from '../selectors';
 
@@ -1960,7 +1960,7 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getRecentlyUsedBlocks', () => {
+	describe( 'getRecentInserterItems', () => {
 		beforeEach( () => {
 			registerCoreBlocks();
 		} );

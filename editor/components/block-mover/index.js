@@ -11,7 +11,6 @@ import { __ } from '@wordpress/i18n';
 import { IconButton, withContext } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import { compose } from '@wordpress/element';
-import VisualEditorInserter from '../inserter';
 
 /**
  * Internal dependencies
@@ -32,7 +31,6 @@ export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, block
 	// the rendering parent, leaving it unable to react to focus out.
 	return (
 		<div className="editor-block-mover">
-			<VisualEditorInserter />
 			<IconButton
 				className="editor-block-mover__control"
 				onClick={ isFirst ? null : onMoveUp }
