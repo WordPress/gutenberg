@@ -113,8 +113,8 @@ window._wpGutenbergPost.content = {
 
 		'<!-- wp:gallery {"align":"wide","images":[{"url":"https://cldup.com/_rSwtEeDGD.jpg","alt":""},{"url":"https://cldup.com/L-cC3qX2DN.jpg","alt":""}]} -->',
 		'<ul class="wp-block-gallery alignwide columns-2 is-cropped">',
-		'<li class="blocks-gallery-image"><figure><img src="https://cldup.com/_rSwtEeDGD.jpg" alt="" /></figure></li>',
-		'<li class="blocks-gallery-image"><figure><img src="https://cldup.com/L-cC3qX2DN.jpg" alt="" /></figure></li>',
+		'<li class="blocks-gallery-item"><figure><img src="https://cldup.com/_rSwtEeDGD.jpg" alt="" /></figure></li>',
+		'<li class="blocks-gallery-item"><figure><img src="https://cldup.com/L-cC3qX2DN.jpg" alt="" /></figure></li>',
 		'</ul>',
 		'<!-- /wp:gallery -->',
 
