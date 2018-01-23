@@ -83,3 +83,25 @@ Opt-in prop to show popovers fullscreen on mobile, pass `false` in this prop to 
  - Type: `Boolean`
  - Required: No
  - Default: `false`
+
+## draggable
+
+A flag to specify whether element should be draggable, as per the HTML5 Drag & Drop API.
+
+ - Type: `Boolean`
+ - Required: No
+ - Default: `false`
+
+## onDragStart
+
+A callback invoked when the element is first dragged - an event listener as per the HTML5 Drag & Drop API.
+
+- Type: `Function`
+- Required: No
+
+## onDragEnd
+
+A callback invoked when a drag operation is over - an event listener as per the HTML5 Drag & Drop API.
+
+- Type: `Function`
+- Required: No

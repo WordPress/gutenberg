@@ -20,7 +20,7 @@ import { getBlockMoverLabel } from './mover-label';
 import { isFirstBlock, isLastBlock, getBlockIndex, getBlock } from '../../store/selectors';
 import { selectBlock } from '../../store/actions';
 
-export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex, isLocked, ...additionalProps } ) {
+export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex, isLocked, draggable, onDragStart, onDragEnd, } ) {
 	if ( isLocked ) {
 		return null;
 	}
@@ -32,16 +32,16 @@ export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, block
 	return (
 		<div
 			className="editor-block-mover"
-			draggable={ additionalProps.draggable }
-			onDragStart={ additionalProps.onDragStart }
-			onDragEnd={ additionalProps.onDragEnd }
+			draggable={ draggable }
+			onDragStart={ onDragStart }
+			onDragEnd={ onDragEnd }
 		>
 			<IconButton
 				className="editor-block-mover__control"
 				onClick={ isFirst ? null : onMoveUp }
-				draggable={ additionalProps.draggable }
-				onDragStart={ additionalProps.onDragStart }
-				onDragEnd={ additionalProps.onDragEnd }
+				draggable={ draggable }
+				onDragStart={ onDragStart }
+				onDragEnd={ onDragEnd }
 				icon="arrow-up-alt2"
 				tooltip={ __( 'Move Up' ) }
 				label={ getBlockMoverLabel(
@@ -57,9 +57,9 @@ export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, block
 			<IconButton
 				className="editor-block-mover__control"
 				onClick={ isLast ? null : onMoveDown }
-				draggable={ additionalProps.draggable }
-				onDragStart={ additionalProps.onDragStart }
-				onDragEnd={ additionalProps.onDragEnd }
+				draggable={ draggable }
+				onDragStart={ onDragStart }
+				onDragEnd={ onDragEnd }
 				icon="arrow-down-alt2"
 				tooltip={ __( 'Move Down' ) }
 				label={ getBlockMoverLabel(

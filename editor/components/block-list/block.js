@@ -360,9 +360,10 @@ export class BlockListBlock extends Component {
 
 	/*
 	 * Reorder via Drag & Drop. Step 1 of 4.
-	 * Strategy: - Clone the current block and spawn over original block. Hide original block.
-	 * 			 - Set transfer data.
-	 * 			 - Add dragover listener.
+	 * Strategy:
+	 * 	- Clone the current block and spawn over original block. Hide original block.
+	 *  - Set transfer data.
+	 *  - Add dragover listener.
 	 */
 	onDragStart( event ) {
 		const dragInset = document.getElementById( `block-drag-inset-${ this.props.uid }` );

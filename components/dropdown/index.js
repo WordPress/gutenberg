@@ -68,16 +68,18 @@ class Dropdown extends Component {
 			className,
 			contentClassName,
 			expandOnMobile,
-			...additionalProps
+			draggable,
+			onDragStart,
+			onDragEnd,
 		} = this.props;
 		const args = { isOpen, onToggle: this.toggle, onClose: this.close };
 		return (
 			<div
 				className={ className }
 				ref={ this.bindContainer }
-				draggable={ additionalProps.draggable }
-				onDragStart={ additionalProps.onDragStart }
-				onDragEnd={ additionalProps.onDragEnd }
+				draggable={ draggable }
+				onDragStart={ onDragStart }
+				onDragEnd={ onDragEnd }
 			>
 				{ renderToggle( args ) }
 				<Popover
