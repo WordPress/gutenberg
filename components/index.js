@@ -17,6 +17,7 @@ export { default as IconButton } from './icon-button';
 export { default as KeyboardShortcuts } from './keyboard-shortcuts';
 export { default as MenuItemsGroup } from './menu-items/menu-items-group';
 export { default as MenuItemsToggle } from './menu-items/menu-items-toggle';
+export { default as MenuItemsSeparator } from './menu-items-separator/menu-items-separator';
 export { NavigableMenu, TabbableContainer } from './navigable-container';
 export { default as Notice } from './notice';
 export { default as NoticeList } from './notice/list';
