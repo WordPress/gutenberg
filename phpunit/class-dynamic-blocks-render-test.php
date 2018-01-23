@@ -38,8 +38,12 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 
 		$this->dummy_block_instance_number = 0;
 
-		foreach ( WP_Block_Type_Registry::get_instance()->get_all_registered() as $name => $block_type ) {
-			WP_Block_Type_Registry::get_instance()->unregister( $name );
+		$registry = WP_Block_Type_Registry::get_instance();
+
+		foreach ( array( 'core/dummy' ) as $name ) {
+			if ( $registry->is_registered( $name ) ) {
+				$registry->unregister( $name );
+			}
 		}
 	}
 

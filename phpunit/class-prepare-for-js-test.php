@@ -10,26 +10,20 @@
  */
 class Prepare_For_JS_Test extends WP_UnitTestCase {
 
-	function setUp() {
-		parent::setUp();
-
-		$this->reset();
-	}
-
 	function tearDown() {
 		parent::tearDown();
 
-		$this->reset();
-	}
+		$registry = WP_Block_Type_Registry::get_instance();
 
-	function reset() {
-		foreach ( WP_Block_Type_Registry::get_instance()->get_all_registered() as $name => $block_type ) {
-			WP_Block_Type_Registry::get_instance()->unregister( $name );
+		foreach ( array( 'core/dummy' ) as $name ) {
+			if ( $registry->is_registered( $name ) ) {
+				$registry->unregister( $name );
+			}
 		}
 	}
 
 	function test_gutenberg_prepare_blocks_for_js() {
-		$name     = 'core/paragraph';
+		$name     = 'core/dummy';
 		$settings = array(
 			'icon'            => 'text',
 			'render_callback' => 'foo',
@@ -39,10 +33,7 @@ class Prepare_For_JS_Test extends WP_UnitTestCase {
 
 		$blocks = gutenberg_prepare_blocks_for_js();
 
-		$this->assertEquals( array(
-			'core/paragraph' => array(
-				'icon' => 'text',
-			),
-		), $blocks );
+		$this->assertArrayHasKey( $name, $blocks );
+		$this->assertSame( array( 'icon' => 'text' ), $blocks[ $name ] );
 	}
 }

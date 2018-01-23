@@ -73,15 +73,9 @@ class Reusuable_Blocks_Render_Test extends WP_UnitTestCase {
 		parent::setUp();
 
 		$this->registry = new WP_Block_Type_Registry();
+		$main_registry  = WP_Block_Type_Registry::get_instance();
 
-		$this->registry->register( 'core/block', array(
-			'attributes'      => array(
-				'ref' => array(
-					'type' => 'number',
-				),
-			),
-			'render_callback' => 'gutenberg_render_block_core_reusable_block',
-		) );
+		$this->registry->register( 'core/block', $main_registry->get_registered( 'core/block' ) );
 	}
 
 	/**
