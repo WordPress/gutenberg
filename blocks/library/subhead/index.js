@@ -8,12 +8,14 @@ import { __ } from '@wordpress/i18n';
  */
 import './editor.scss';
 import './style.scss';
-import { registerBlockType, createBlock } from '../../api';
+import { createBlock } from '../../api';
 import Editable from '../../editable';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
 
-registerBlockType( 'core/subhead', {
+export const name = 'core/subhead';
+
+export const settings = {
 	title: __( 'Subhead' ),
 
 	icon: 'text',
@@ -88,4 +90,4 @@ registerBlockType( 'core/subhead', {
 
 		return <p className={ className }>{ content }</p>;
 	},
-} );
+};

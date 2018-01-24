@@ -13,7 +13,6 @@ import { __ } from '@wordpress/i18n';
  */
 import './editor.scss';
 import './style.scss';
-import { registerBlockType } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
@@ -44,7 +43,9 @@ const blockAttributes = {
 	},
 };
 
-registerBlockType( 'core/pullquote', {
+export const name = 'core/pullquote';
+
+export const settings = {
 
 	title: __( 'Pullquote' ),
 
@@ -148,4 +149,4 @@ registerBlockType( 'core/pullquote', {
 			);
 		},
 	} ],
-} );
+};

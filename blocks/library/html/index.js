@@ -13,10 +13,11 @@ import { withState } from '@wordpress/components';
  * Internal dependencies
  */
 import './editor.scss';
-import { registerBlockType } from '../../api';
 import BlockControls from '../../block-controls';
 
-registerBlockType( 'core/html', {
+export const name = 'core/html';
+
+export const settings = {
 	title: __( 'Custom HTML' ),
 
 	description: __( 'Add custom HTML code and preview it right here in the editor.' ),
@@ -75,4 +76,4 @@ registerBlockType( 'core/html', {
 	save( { attributes } ) {
 		return attributes.content;
 	},
-} );
+};

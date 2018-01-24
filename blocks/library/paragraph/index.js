@@ -15,7 +15,7 @@ import { Autocomplete, PanelBody, PanelColor, withFallbackStyles } from '@wordpr
  */
 import './editor.scss';
 import './style.scss';
-import { registerBlockType, createBlock, setDefaultBlockName } from '../../api';
+import { createBlock } from '../../api';
 import { blockAutocompleter, userAutocompleter } from '../../autocompleters';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
@@ -192,7 +192,9 @@ class ParagraphBlock extends Component {
 	}
 }
 
-registerBlockType( 'core/paragraph', {
+export const name = 'core/paragraph';
+
+export const settings = {
 	title: __( 'Paragraph' ),
 
 	description: __( 'This is a simple text only block for adding a single paragraph of content.' ),
@@ -281,6 +283,4 @@ registerBlockType( 'core/paragraph', {
 
 		return <p style={ styles } className={ className ? className : undefined }>{ content }</p>;
 	},
-} );
-
-setDefaultBlockName( 'core/paragraph' );
+};
