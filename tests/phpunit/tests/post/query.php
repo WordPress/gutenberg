@@ -535,4 +535,42 @@ class Tests_Post_Query extends WP_UnitTestCase {
 		$this->assertEquals( 2, $q->found_posts );
 		$this->assertEquals( 2, $q->max_num_pages );
 	}
+
+	public function set_found_posts_provider() {
+		// count return 0 for null, but 1 for other data you may not expect
+		return array(
+			array( null, 0 ),
+			array( '', 1 ),
+			array( "To life, to life, l'chaim", 1 ),
+			array( false, 1 ),
+		);
+	}
+
+	/**
+	 * @ticket 42860
+	 *
+	 * @dataProvider set_found_posts_provider
+	 */
+	public function test_set_found_posts_not_posts_as_an_array( $posts, $expected ) {
+		if ( version_compare( PHP_VERSION, '5.3', '<' ) ) {
+			$this->markTestSkipped( 'ReflectionMethod::setAccessible is only available in PHP 5.3+' );
+			return;
+		}
+
+		$q = new WP_Query(
+			array(
+				'post_type'      => 'wptests_pt',
+				'posts_per_page' => 1,
+			)
+		);
+
+		$q->posts = $posts;
+
+		$methd = new \ReflectionMethod( 'WP_Query', 'set_found_posts' );
+		$methd->setAccessible( true );
+		$methd->invoke( $q, array( 'no_found_rows' => false ), array() );
+
+		$this->assertEquals( $expected, $q->found_posts );
+	}
+
 }
