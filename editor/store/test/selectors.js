@@ -276,7 +276,7 @@ describe( 'selectors', () => {
 					activeSidebarPanel: 'blocks',
 				},
 			};
-			const panel = 'blocks';
+			const panel = 'document';
 			const sidebar = 'editor';
 
 			expect( isGeneralSidebarPanelOpened( state, sidebar, panel ) ).toBe( false );
@@ -295,112 +295,24 @@ describe( 'selectors', () => {
 
 			expect( isGeneralSidebarPanelOpened( state, sidebar, panel ) ).toBe( false );
 		} );
-		/*
-		it( 'should return true when the viewport type is mobile and the mobile sidebar is opened', () => {
-			const state = {
-				preferences: {
-					activeGeneralSidebar: 'mobile',
-					viewportType: 'mobile',
-				},
-			};
-
-			expect( isGeneralSidebarPanelOpened( state ) ).toBe( true );
-		} );
-
-		it( 'should return false when is mobile and the mobile sidebar is closed', () => {
-			const state = {
-				mobile: true,
-				preferences: {
-					sidebars: {
-						desktop: true,
-						mobile: false,
-					},
-				},
-			};
-
-			expect( isSidebarOpened( state ) ).toBe( false );
-		} );
-
-		it( 'should return true when the given is opened', () => {
-			const state = {
-				preferences: {
-					sidebars: {
-						publish: true,
-					},
-				},
-			};
-
-			expect( isSidebarOpened( state, 'publish' ) ).toBe( true );
-		} );
-
-		it( 'should return false when the given is not opened', () => {
-			const state = {
-				preferences: {
-					sidebars: {
-						publish: false,
-					},
-				},
-			};
-
-			expect( isSidebarOpened( state, 'publish' ) ).toBe( false );
-		} );*/
 	} );
 
 	describe( 'hasOpenSidebar', () => {
-		it( 'should return true if at least one sidebar is open (using the desktop sidebar as default)', () => {
+		it( 'should return true if at least one sidebar is open', () => {
 			const state = {
-				mobile: false,
 				preferences: {
-					sidebars: {
-						desktop: true,
-						mobile: false,
-						publish: false,
-					},
+					activeSidebarPanel: null,
 				},
 			};
 
 			expect( hasOpenSidebar( state ) ).toBe( true );
 		} );
 
-		it( 'should return true if at no sidebar is open (using the desktop sidebar as default)', () => {
+		it( 'should return false if no sidebar is open', () => {
 			const state = {
-				mobile: false,
+				publishSidebarActive: false,
 				preferences: {
-					sidebars: {
-						desktop: false,
-						mobile: true,
-						publish: false,
-					},
-				},
-			};
-
-			expect( hasOpenSidebar( state ) ).toBe( false );
-		} );
-
-		it( 'should return true if at least one sidebar is open (using the mobile sidebar as default)', () => {
-			const state = {
-				mobile: true,
-				preferences: {
-					sidebars: {
-						desktop: false,
-						mobile: true,
-						publish: false,
-					},
-				},
-			};
-
-			expect( hasOpenSidebar( state ) ).toBe( true );
-		} );
-
-		it( 'should return true if at no sidebar is open (using the mobile sidebar as default)', () => {
-			const state = {
-				mobile: true,
-				preferences: {
-					sidebars: {
-						desktop: true,
-						mobile: false,
-						publish: false,
-					},
+					activeGeneralSidebar: null,
 				},
 			};
 
@@ -1899,7 +1811,7 @@ describe( 'selectors', () => {
 
 		it( 'should return the last block for the text mode', () => {
 			const state = {
-				preferences: { mode: 'text' },
+				preferences: { editorMode: 'text' },
 				blockSelection: { start: 2, end: 2 },
 				editor: {
 					present: {

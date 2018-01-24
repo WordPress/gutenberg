@@ -9,7 +9,7 @@ import { setViewportType } from '../../store/actions';
  */
 
 export const mobileMiddleware = ( { getState } ) => next => action => {
-	if ( action.type === 'OPEN_GENERAL_SIDEBAR' ) {
+	if ( action.type === 'TOGGLE_SIDEBAR' && action.sidebar === undefined ) {
 		return next( setViewportType( isMobile( getState() ) ? 'mobile' : 'desktop' ) );
 	}
 	return next( action );
