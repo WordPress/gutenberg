@@ -68,9 +68,6 @@ class PostPermalink extends Component {
 		return '';
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	componentDidMount() {
 		this.setState( {
 			permalink: this.getPermalink(),
@@ -78,16 +75,10 @@ class PostPermalink extends Component {
 		} );
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	componentWillUnmount() {
 		clearTimeout( this.dismissCopyConfirmation );
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	componentWillReceiveProps() {
 		const slug = this.getSlug();
 		this.setState( {
@@ -124,9 +115,9 @@ class PostPermalink extends Component {
 		this.props.onUpdate( newSlug );
 	}
 
-  /**
+	/**
 	 * Event handler for the copy button to show feedback.
-   */
+	 */
 	onCopy() {
 		this.setState( {
 			showCopyConfirmation: true,
@@ -140,9 +131,6 @@ class PostPermalink extends Component {
 		}, 4000 );
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	render() {
 		const { isNew, link } = this.props;
 		const { editingSlug, permalink, slug } = this.state;
