@@ -24,8 +24,8 @@ $z-layers: (
 	'.editor-block-mover': 1,
 	'.blocks-gallery-item__inline-menu': 20,
 	'.editor-block-settings-menu__popover': 20, // Below the header
-	'.editor-header': 30,
-	'.editor-text-editor__formatting': 30,
+	'.edit-post-header': 30,
+	'.edit-post-text-editor__formatting': 30,
 	'.wp-block-image__resize-handlers': 1, // Resize handlers above sibling inserter
 
 	// Show drop zone above most standard content, but below any overlays
@@ -34,8 +34,8 @@ $z-layers: (
 
 	// Show sidebar above wp-admin navigation bar for mobile viewports:
 	// #wpadminbar { z-index: 99999 }
-	'.editor-sidebar': 100000,
-	'.editor-layout .editor-post-publish-panel': 100001,
+	'.edit-post-sidebar': 100000,
+	'.edit-post-layout .edit-post-post-publish-panel': 100001,
 
 	// Show notices below expanded wp-admin submenus:
 	// #adminmenuwrap { z-index: 9990 }

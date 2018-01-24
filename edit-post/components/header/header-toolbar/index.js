@@ -26,7 +26,7 @@ import { hasFixedToolbar } from '../../../store/selectors';
 function HeaderToolbar( { fixedToolbarActive } ) {
 	return (
 		<NavigableToolbar
-			className="editor-header-toolbar"
+			className="edit-post-header-toolbar"
 			aria-label={ __( 'Editor Toolbar' ) }
 		>
 			<Inserter position="bottom right" />
@@ -35,7 +35,7 @@ function HeaderToolbar( { fixedToolbarActive } ) {
 			<TableOfContents />
 			<MultiBlocksSwitcher />
 			{ fixedToolbarActive && (
-				<div className="editor-header-toolbar__block-toolbar">
+				<div className="edit-post-header-toolbar__block-toolbar">
 					<BlockToolbar />
 				</div>
 			) }

@@ -23,17 +23,17 @@ const SidebarHeader = ( { panel, onSetPanel, onToggleSidebar, count } ) => {
 	const closeSidebar = () => onToggleSidebar( undefined, false );
 
 	return (
-		<div className="components-panel__header editor-sidebar__panel-tabs">
+		<div className="components-panel__header edit-post-sidebar__panel-tabs">
 			<button
 				onClick={ () => onSetPanel( 'document' ) }
-				className={ `editor-sidebar__panel-tab ${ panel === 'document' ? 'is-active' : '' }` }
+				className={ `edit-post-sidebar__panel-tab ${ panel === 'document' ? 'is-active' : '' }` }
 				aria-label={ __( 'Document settings' ) }
 			>
 				{ __( 'Document' ) }
 			</button>
 			<button
 				onClick={ () => onSetPanel( 'block' ) }
-				className={ `editor-sidebar__panel-tab ${ panel === 'block' ? 'is-active' : '' }` }
+				className={ `edit-post-sidebar__panel-tab ${ panel === 'block' ? 'is-active' : '' }` }
 				aria-label={ __( 'Block settings' ) }
 			>
 				{ sprintf( _n( 'Block', '%d Blocks', count ), count ) }

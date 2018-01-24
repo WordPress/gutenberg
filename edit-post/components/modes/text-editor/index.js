@@ -10,11 +10,11 @@ import './style.scss';
 
 function TextEditor() {
 	return (
-		<div className="editor-text-editor">
-			<div className="editor-text-editor__formatting">
+		<div className="edit-post-text-editor">
+			<div className="edit-post-text-editor__formatting">
 				<PostTextEditorToolbar />
 			</div>
-			<div className="editor-text-editor__body">
+			<div className="edit-post-text-editor__body">
 				<PostTitle />
 				<PostTextEditor />
 			</div>

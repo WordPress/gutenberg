@@ -12,7 +12,7 @@ import './style.scss';
 function LastRevision() {
 	return (
 		<PostLastRevisionCheck>
-			<PanelBody className="editor-last-revision__panel">
+			<PanelBody className="edit-post-last-revision__panel">
 				<PostLastRevision />
 			</PanelBody>
 		</PostLastRevisionCheck>

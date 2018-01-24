@@ -13,15 +13,15 @@ import './style.scss';
 export function PostSchedule() {
 	return (
 		<PostScheduleCheck>
-			<PanelRow className="editor-post-schedule">
+			<PanelRow className="edit-post-post-schedule">
 				<span>{ __( 'Publish' ) }</span>
 				<Dropdown
 					position="bottom left"
-					contentClassName="editor-post-schedule__dialog"
+					contentClassName="edit-post-post-schedule__dialog"
 					renderToggle={ ( { onToggle, isOpen } ) => (
 						<button
 							type="button"
-							className="editor-post-schedule__toggle button-link"
+							className="edit-post-post-schedule__toggle button-link"
 							onClick={ onToggle }
 							aria-expanded={ isOpen }
 						>

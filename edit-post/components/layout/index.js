@@ -43,7 +43,7 @@ function Layout( {
 	fixedToolbarActive,
 	onClosePublishPanel,
 } ) {
-	const className = classnames( 'editor-layout', {
+	const className = classnames( 'edit-post-layout', {
 		'is-sidebar-opened': layoutHasOpenSidebar,
 		'has-fixed-toolbar': fixedToolbarActive,
 	} );
@@ -54,17 +54,17 @@ function Layout( {
 			<UnsavedChangesWarning />
 			<AutosaveMonitor />
 			<Header />
-			<div className="editor-layout__content" role="region" aria-label={ __( 'Editor content' ) } tabIndex="-1">
+			<div className="edit-post-layout__content" role="region" aria-label={ __( 'Editor content' ) } tabIndex="-1">
 				<EditorNotices />
-				<div className="editor-layout__editor">
+				<div className="edit-post-layout__editor">
 					<EditorModeKeyboardShortcuts />
 					{ mode === 'text' && <TextEditor /> }
 					{ mode === 'visual' && <VisualEditor /> }
 				</div>
-				<div className="editor-layout__metaboxes">
+				<div className="edit-post-layout__metaboxes">
 					<MetaBoxes location="normal" />
 				</div>
-				<div className="editor-layout__metaboxes">
+				<div className="edit-post-layout__metaboxes">
 					<MetaBoxes location="advanced" />
 				</div>
 			</div>

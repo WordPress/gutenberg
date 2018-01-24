@@ -1,4 +1,4 @@
-.editor-text-editor__formatting {
+.edit-post-text-editor__formatting {
 	background: $white;
 	border-bottom: 1px solid $light-gray-500;
 	min-height: $admin-sidebar-width-collapsed;
@@ -20,7 +20,7 @@
 		margin-left: 0;
 		margin-right: 0;
 		position: fixed;
-		z-index: z-index( '.editor-text-editor__formatting' );
+		z-index: z-index( '.edit-post-text-editor__formatting' );
 	}
 
 	.auto-fold.sticky-menu &,
@@ -43,7 +43,7 @@
 	}
 }
 
-.editor-text-editor__body {
+.edit-post-text-editor__body {
 	padding-top: 40px;
 
 	@include break-small() {
@@ -56,7 +56,7 @@
 }
 
 /* Use padding to center text in the textarea, this allows you to click anywhere to focus it */
-.editor-text-editor {
+.edit-post-text-editor {
 	padding-left: 20px;
 	padding-right: 20px;
 
@@ -65,12 +65,12 @@
 		padding-right: calc( 50% - #{ $text-editor-max-width / 2 } );
 	}
 
-	.editor-post-text-editor {
+	.edit-post-post-text-editor {
 		padding-top: 20px;
 		padding-bottom: 0;
 	}
 
-	.editor-post-text-editor__toolbar {
+	.edit-post-post-text-editor__toolbar {
 		width: 100%;
 		max-width: $text-editor-max-width;
 		margin: 0 auto;

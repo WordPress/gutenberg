@@ -1,5 +1,5 @@
 // hide all action buttons except the inserter on mobile
-.editor-header-toolbar > .components-button {
+.edit-post-header-toolbar > .components-button {
 	display: none;
 
 	@include break-small() {
@@ -7,7 +7,7 @@
 	}
 }
 
-.editor-header-toolbar {
+.edit-post-header-toolbar {
 	display: inline-flex;
 	align-items: center;
 
@@ -16,7 +16,7 @@
 	}
 }
 
-.editor-header-toolbar__block-toolbar {
+.edit-post-header-toolbar__block-toolbar {
 	// stacked toolbar
 	position: absolute;
 	top: $header-height;
@@ -53,7 +53,7 @@
 	}
 }
 
-.editor-header-toolbar .table-of-contents {
+.edit-post-header-toolbar .table-of-contents {
 	display: none;
 
 	.is-sidebar-opened & {

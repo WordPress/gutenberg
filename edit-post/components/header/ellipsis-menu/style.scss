@@ -1,4 +1,4 @@
-.editor-ellipsis-menu {
+.edit-post-ellipsis-menu {
 	// the padding and margin of the ellipsis menu is intentionally non-standard
 	@include break-small() {
 		margin-left: 4px;
@@ -14,7 +14,7 @@
 	}
 }
 
-.editor-ellipsis-menu__separator {
+.edit-post-ellipsis-menu__separator {
 	height: 1px;
 	background: $light-gray-500;
 }

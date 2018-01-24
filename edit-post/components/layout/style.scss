@@ -1,9 +1,9 @@
-.editor-layout,
-.editor-layout__content {
+.edit-post-layout,
+.edit-post-layout__content {
 	height: 100%;
 }
 
-.editor-layout {
+.edit-post-layout {
 	position: relative;
 
 	.components-notice-list {
@@ -34,7 +34,7 @@
 	}
 
 	&.has-fixed-toolbar {
-		.editor-layout__content {
+		.edit-post-layout__content {
 			padding-top: $block-controls-height;
 		}
 
@@ -42,7 +42,7 @@
 		@include break-small {
 			padding-top: $header-height + $block-toolbar-height;
 
-			.editor-layout__content {
+			.edit-post-layout__content {
 				padding-top: 0;
 			}
 		}
@@ -56,7 +56,7 @@
 @include editor-left('.components-notice-list');
 @include editor-right('.components-notice-list');
 
-.editor-layout__metaboxes:not(:empty) {
+.edit-post-layout__metaboxes:not(:empty) {
 	border-top: 1px solid $light-gray-500;
 	margin-top: 10px;
 	padding: 10px 0 10px;
@@ -68,7 +68,7 @@
 	}
 }
 
-.editor-layout__content {
+.edit-post-layout__content {
 	position: relative;
 
 	// on mobile the main content area has to scroll
@@ -79,9 +79,9 @@
 	}
 }
 
-.editor-layout .editor-post-publish-panel {
+.edit-post-layout .editor-post-publish-panel {
 	position: fixed;
-	z-index: z-index( '.editor-layout .editor-post-publish-panel' );
+	z-index: z-index( '.edit-post-layout .edit-post-post-publish-panel' );
 	top: $admin-bar-height-big;
 	bottom: 0;
 	right: 0;
@@ -97,6 +97,6 @@
 	}
 }
 
-.editor-layout .editor-post-publish-panel__header-publish-button {
+.edit-post-layout .editor-post-publish-panel__header-publish-button {
 	margin-right: 52px; // This number is approximative to keep the publish button at the same position when opening the panel
 }

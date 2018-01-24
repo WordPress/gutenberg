@@ -12,7 +12,7 @@ import './style.scss';
 function BlockInspectorPanel() {
 	return (
 		<Panel>
-			<PanelBody className="editor-block-inspector-panel">
+			<PanelBody className="edit-post-block-inspector-panel">
 				<BlockInspector />
 			</PanelBody>
 		</Panel>

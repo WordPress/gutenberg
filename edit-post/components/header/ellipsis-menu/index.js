@@ -14,7 +14,7 @@ import EditorActions from '../editor-actions';
 
 const element = (
 	<Dropdown
-		className="editor-ellipsis-menu"
+		className="edit-post-ellipsis-menu"
 		position="bottom left"
 		renderToggle={ ( { isOpen, onToggle } ) => (
 			<IconButton
@@ -27,9 +27,9 @@ const element = (
 		renderContent={ ( { onClose } ) => (
 			<div>
 				<ModeSwitcher onSelect={ onClose } />
-				<div className="editor-ellipsis-menu__separator" />
+				<div className="edit-post-ellipsis-menu__separator" />
 				<FixedToolbarToggle onToggle={ onClose } />
-				<div className="editor-ellipsis-menu__separator" />
+				<div className="edit-post-ellipsis-menu__separator" />
 				<EditorActions />
 			</div>
 		) }

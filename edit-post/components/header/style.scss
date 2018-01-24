@@ -1,4 +1,4 @@
-.editor-header {
+.edit-post-header {
 	height: $header-height;
 	padding: $item-spacing;
 	border-bottom: 1px solid $light-gray-500;
@@ -7,7 +7,7 @@
 	flex-direction: row;
 	align-items: stretch;
 	justify-content: space-between;
-	z-index: z-index( '.editor-header' );
+	z-index: z-index( '.edit-post-header' );
 	left: 0;
 	right: 0;
 
@@ -27,14 +27,14 @@
 	}
 }
 
-@include editor-left('.editor-header');
+@include editor-left('.edit-post-header');
 
-.editor-header__settings {
+.edit-post-header__settings {
 	display: inline-flex;
 	align-items: center;
 }
 
-.editor-header .components-button {
+.edit-post-header .components-button {
 	border-radius: $button-style__radius-roundrect;
 
 	// header toggle buttons

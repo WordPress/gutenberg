@@ -13,18 +13,18 @@ import './style.scss';
 export function PostVisibility() {
 	return (
 		<PostVisibilityCheck render={ ( { canEdit } ) => (
-			<PanelRow className="editor-post-visibility">
+			<PanelRow className="edit-post-post-visibility">
 				<span>{ __( 'Visibility' ) }</span>
 				{ ! canEdit && <span><PostVisibilityLabel /></span> }
 				{ canEdit && (
 					<Dropdown
 						position="bottom left"
-						contentClassName="editor-post-visibility__dialog"
+						contentClassName="edit-post-post-visibility__dialog"
 						renderToggle={ ( { isOpen, onToggle } ) => (
 							<button
 								type="button"
 								aria-expanded={ isOpen }
-								className="editor-post-visibility__toggle button-link"
+								className="edit-post-post-visibility__toggle button-link"
 								onClick={ onToggle }
 							>
 								<PostVisibilityLabel />

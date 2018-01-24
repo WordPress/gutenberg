@@ -9,7 +9,7 @@ export default function EditorActions() {
 	const tools = applyFilters( 'editor.EditorActions.tools', [] );
 	return tools.length ? (
 		<MenuItemsGroup key="tools"
-			className="editor-actions"
+			className="edit-post-actions"
 			label={ __( 'Tools' ) }
 		>
 			{ tools }

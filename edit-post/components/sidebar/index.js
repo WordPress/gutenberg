@@ -22,7 +22,7 @@ import { getActivePanel } from '../../store/selectors';
 const Sidebar = ( { panel } ) => {
 	return (
 		<div
-			className="editor-sidebar"
+			className="edit-post-sidebar"
 			role="region"
 			aria-label={ __( 'Editor advanced settings' ) }
 			tabIndex="-1"

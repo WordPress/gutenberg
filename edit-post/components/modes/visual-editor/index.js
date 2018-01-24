@@ -25,7 +25,7 @@ import { hasFixedToolbar } from '../../../store/selectors';
 
 function VisualEditor( props ) {
 	return (
-		<BlockSelectionClearer className="editor-visual-editor">
+		<BlockSelectionClearer className="edit-post-visual-editor">
 			<EditorGlobalKeyboardShortcuts />
 			<WritingFlow>
 				<PostTitle />

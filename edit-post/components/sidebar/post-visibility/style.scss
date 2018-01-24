@@ -1,8 +1,8 @@
-.editor-post-visibility {
+.edit-post-post-visibility {
 	width: 100%;
 }
 
-.editor-post-visibility__dialog .components-popover__content {
+.edit-post-post-visibility__dialog .components-popover__content {
 	padding: 10px;
 
 	@include break-medium {
@@ -11,25 +11,25 @@
 	}
 }
 
-.editor-post-visibility__dialog-legend {
+.edit-post-post-visibility__dialog-legend {
 	font-weight: 600;
 }
 
-.editor-post-visibility__choice {
+.edit-post-post-visibility__choice {
 	margin: 10px 0;
 }
 
-.editor-post-visibility__dialog-radio,
-.editor-post-visibility__dialog-label {
+.edit-post-post-visibility__dialog-radio,
+.edit-post-post-visibility__dialog-label {
 	vertical-align: top;
 }
 
-.editor-post-visibility__dialog-password-input {
+.edit-post-post-visibility__dialog-password-input {
 	width: calc( 100% - 20px );
 	margin-left: 20px;
 }
 
-.editor-post-visibility__dialog-info {
+.edit-post-post-visibility__dialog-info {
 	color: $dark-gray-200;
 	padding-left: 20px;
 	font-style: italic;

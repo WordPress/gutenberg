@@ -44,7 +44,7 @@ export function BlockInspectorButton( {
 
 	return (
 		<IconButton
-			className="editor-block-settings-menu__control"
+			className="edit-post-block-settings-menu__control"
 			onClick={ flow( toggleInspector, speakMessage, onClick ) }
 			icon="admin-generic"
 			label={ small ? label : undefined }

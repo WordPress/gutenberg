@@ -33,12 +33,12 @@ function Header( {
 		<div
 			role="region"
 			aria-label={ __( 'Editor toolbar' ) }
-			className="editor-header"
+			className="edit-post-header"
 			tabIndex="-1"
 		>
 			<HeaderToolbar />
 			{ ! isPublishSidebarOpened && (
-				<div className="editor-header__settings">
+				<div className="edit-post-header__settings">
 					<PostSavedState />
 					<PostPreviewButton />
 					<PostPublishPanelToggle
