@@ -18,8 +18,8 @@ import {
 } from '../api';
 
 export function BlockEdit( props ) {
-	const { name, attributes = {} } = props;
-	const blockType = getBlockType( name );
+	const { name, attributes = {}, blockRegistry } = props;
+	const blockType = getBlockType( name, blockRegistry );
 
 	if ( ! blockType ) {
 		return null;

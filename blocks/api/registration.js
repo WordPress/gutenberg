@@ -45,11 +45,12 @@ let defaultBlockName;
  *
  * @param {string} name     Block name.
  * @param {Object} settings Block settings.
+ * @param {Object} [blockRegistry=blocks] The block registry to use.
  *
  * @returns {?WPBlock} The block, if it has been successfully registered;
  *                     otherwise `undefined`.
  */
-export function registerBlockType( name, settings ) {
+export function registerBlockType( name, settings, blockRegistry = blocks ) {
 	settings = {
 		name,
 		...get( window._wpBlocks, name ),
@@ -80,7 +81,7 @@ export function registerBlockType( name, settings ) {
 		);
 		return;
 	}
-	if ( blocks[ name ] ) {
+	if ( blockRegistry[ name ] ) {
 		console.error(
 			'Block "' + name + '" is already registered.'
 		);
@@ -122,26 +123,27 @@ export function registerBlockType( name, settings ) {
 
 	settings = applyFilters( 'blocks.registerBlockType', settings, name );
 
-	return blocks[ name ] = settings;
+	return blockRegistry[ name ] = settings;
 }
 
 /**
  * Unregisters a block.
  *
  * @param {string} name Block name.
+ * @param {Object} [blockRegistry=blocks] The block registry to use.
  *
  * @returns {?WPBlock} The previous block value, if it has been successfully
  *                     unregistered; otherwise `undefined`.
  */
-export function unregisterBlockType( name ) {
-	if ( ! blocks[ name ] ) {
+export function unregisterBlockType( name, blockRegistry = blocks ) {
+	if ( ! blockRegistry[ name ] ) {
 		console.error(
 			'Block "' + name + '" is not registered.'
 		);
 		return;
 	}
-	const oldBlock = blocks[ name ];
-	delete blocks[ name ];
+	const oldBlock = blockRegistry[ name ];
+	delete blockRegistry[ name ];
 	return oldBlock;
 }
 
@@ -186,20 +188,23 @@ export function getDefaultBlockName() {
  * Returns a registered block type.
  *
  * @param {string} name Block name.
+ * @param {Object} [blockRegistry=blocks] The block registry to use.
  *
  * @returns {?Object} Block type.
  */
-export function getBlockType( name ) {
-	return blocks[ name ];
+export function getBlockType( name, blockRegistry = blocks ) {
+	return blockRegistry[ name ];
 }
 
 /**
  * Returns all registered blocks.
  *
+ * @param {Object} [blockRegistry=blocks] The block registry to use.
+ *
  * @returns {Array} Block settings.
  */
-export function getBlockTypes() {
-	return Object.values( blocks );
+export function getBlockTypes( blockRegistry = blocks ) {
+	return Object.values( blockRegistry );
 }
 
 /**
