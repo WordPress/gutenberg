@@ -13,6 +13,7 @@ require dirname( __FILE__ ) . '/meta-box-partial-page.php';
 require dirname( __FILE__ ) . '/class-wp-block-type.php';
 require dirname( __FILE__ ) . '/class-wp-block-type-registry.php';
 require dirname( __FILE__ ) . '/class-wp-rest-blocks-controller.php';
+require dirname( __FILE__ ) . '/class-wp-rest-shortcodes-controller.php';
 require dirname( __FILE__ ) . '/blocks.php';
 require dirname( __FILE__ ) . '/client-assets.php';
 require dirname( __FILE__ ) . '/compat.php';
