@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
  */
 import { __ } from '@wordpress/i18n';
 import { PanelBody, PanelRow } from '@wordpress/components';
-import { PageAttributesCheck, PageAttributesOrder, PageAttributesParent } from '@wordpress/editor';
+import { PageAttributesCheck, PageAttributesOrder, PageAttributesParent, PageTemplate } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -29,6 +29,7 @@ export function PageAttributes( { isOpened, onTogglePanel } ) {
 				opened={ isOpened }
 				onToggle={ onTogglePanel }
 			>
+				<PageTemplate />
 				<PageAttributesParent />
 				<PanelRow>
 					<PageAttributesOrder />
