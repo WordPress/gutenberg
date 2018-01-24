@@ -251,3 +251,41 @@ function gutenberg_register_rest_api_post_type_capabilities() {
 	);
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_type_capabilities' );
+
+/**
+ * Add a sample permalink to draft posts in the post REST API response.
+ *
+ * @param WP_REST_Response $response WP REST API response of a post.
+ * @param WP_Post          $post The post being returned.
+ * @param WP_REST_Request  $request WP REST API request.
+ * @return WP_REST_Response Response containing the sample_permalink, where appropriate.
+ */
+function gutenberg_add_sample_permalink_to_draft_posts( $response, $post, $request ) {
+	if ( empty( $response->data['status'] ) || 'draft' !== $response->data['status'] ) {
+		return $response;
+	}
+
+	if ( 'edit' !== $request['context'] ) {
+		return $response;
+	}
+
+	if ( ! function_exists( 'get_sample_permalink' ) ) {
+		require_once ABSPATH . '/wp-admin/includes/post.php';
+	}
+
+	$response->data['sample_permalink'] = get_sample_permalink( $post );
+
+	return $response;
+}
+
+/**
+ * Whenever a post type is registered, ensure we're hooked into it's WP REST API response.
+ *
+ * @param string $post_type The newly registered post type.
+ * @return string That same post type.
+ */
+function gutenberg_register_sample_permalink_function( $post_type ) {
+	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_sample_permalink_to_draft_posts', 10, 3 );
+	return $post_type;
+}
+add_filter( 'registered_post_type', 'gutenberg_register_sample_permalink_function' );

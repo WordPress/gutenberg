@@ -34,3 +34,18 @@
 		@include long-content-fade( $size: 20% );
 	}
 }
+
+.editor-post-permalink__slug {
+	color: $dark-gray-300;
+	font-weight: bold;
+	padding: 0;
+}
+
+.editor-post-permalink__slug-form {
+	display: inline;
+	width: 100%;
+}
+
+.editor-post-permalink__save {
+	float: right;
+}
