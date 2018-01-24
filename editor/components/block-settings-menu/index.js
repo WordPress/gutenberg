@@ -14,7 +14,6 @@ import { IconButton, Dropdown, NavigableMenu } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import BlockInspectorButton from './block-inspector-button';
 import BlockModeToggle from './block-mode-toggle';
 import BlockRemoveButton from './block-remove-button';
 import BlockTransformations from './block-transformations';
@@ -22,7 +21,7 @@ import ReusableBlockSettings from './reusable-block-settings';
 import UnknownConverter from './unknown-converter';
 import { selectBlock } from '../../store/actions';
 
-function BlockSettingsMenu( { uids, onSelect, focus } ) {
+function BlockSettingsMenu( { uids, onSelect, focus, renderBlockMenu = () => null } ) {
 	const count = uids.length;
 
 	return (
@@ -54,7 +53,7 @@ function BlockSettingsMenu( { uids, onSelect, focus } ) {
 			renderContent={ ( { onClose } ) => (
 				// Should this just use a DropdownMenu instead of a DropDown ?
 				<NavigableMenu className="editor-block-settings-menu__content">
-					<BlockInspectorButton onClick={ onClose } />
+					{ renderBlockMenu( { onClose } ) }
 					{ count === 1 && <BlockModeToggle uid={ uids[ 0 ] } onToggle={ onClose } /> }
 					{ count === 1 && <UnknownConverter uid={ uids[ 0 ] } /> }
 					<BlockRemoveButton uids={ uids } />

@@ -34,7 +34,7 @@ import {
 	reusableBlocks,
 } from '../reducer';
 
-jest.mock( '../../edit-post/meta-boxes', () => {
+jest.mock( '../../utils/meta-boxes', () => {
 	return {
 		getMetaBoxContainer: () => ( { innerHTML: 'meta boxes content' } ),
 	};

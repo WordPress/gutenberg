@@ -26,6 +26,7 @@ import { serialize } from '@wordpress/blocks';
 import './style.scss';
 import BlockListBlock from './block';
 import BlockListSiblingInserter from './sibling-inserter';
+import BlockSelectionClearer from '../block-selection-clearer';
 import {
 	getBlockUids,
 	getMultiSelectedBlocksStartUid,
@@ -245,10 +246,10 @@ class BlockList extends Component {
 	}
 
 	render() {
-		const { blocks, showContextualToolbar } = this.props;
+		const { blocks, showContextualToolbar, renderBlockMenu } = this.props;
 
 		return (
-			<div>
+			<BlockSelectionClearer>
 				{ !! blocks.length && <BlockListSiblingInserter /> }
 				{ map( blocks, ( uid ) => (
 					<BlockListBlock
@@ -258,9 +259,10 @@ class BlockList extends Component {
 						onSelectionStart={ this.onSelectionStart }
 						onShiftSelection={ this.onShiftSelection }
 						showContextualToolbar={ showContextualToolbar }
+						renderBlockMenu={ renderBlockMenu }
 					/>
 				) ) }
-			</div>
+			</BlockSelectionClearer>
 		);
 	}
 }

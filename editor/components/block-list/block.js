@@ -389,7 +389,7 @@ export class BlockListBlock extends Component {
 	}
 
 	render() {
-		const { block, order, mode, showContextualToolbar, isLocked } = this.props;
+		const { block, order, mode, showContextualToolbar, isLocked, renderBlockMenu } = this.props;
 		const { name: blockName, isValid } = block;
 		const blockType = getBlockType( blockName );
 		// translators: %s: Type of block (i.e. Text, Image etc)
@@ -433,7 +433,7 @@ export class BlockListBlock extends Component {
 			>
 				<BlockDropZone index={ order } />
 				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
-				{ ( showUI || isHovered ) && <BlockSettingsMenu uids={ [ block.uid ] } /> }
+				{ ( showUI || isHovered ) && <BlockSettingsMenu uids={ [ block.uid ] } renderBlockMenu={ renderBlockMenu } /> }
 				{ showUI && isValid && showContextualToolbar && <BlockContextualToolbar /> }
 				{ isFirstMultiSelected && <BlockMultiControls /> }
 				<div
@@ -476,7 +476,7 @@ export class BlockListBlock extends Component {
 							/>,
 						] }
 					</BlockCrashBoundary>
-					{ showUI && <BlockMobileToolbar uid={ block.uid } /> }
+					{ showUI && <BlockMobileToolbar uid={ block.uid } renderBlockMenu={ renderBlockMenu } /> }
 				</div>
 				{ !! error && <BlockCrashWarning /> }
 				<BlockListSiblingInserter uid={ block.uid } />
