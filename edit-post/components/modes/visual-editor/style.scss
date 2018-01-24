@@ -59,7 +59,7 @@
 	}
 
 	@include break-small() {
-		padding: 5px ( $block-mover-padding-visible );
+		padding: 5px #{ $block-mover-padding-visible - 1px };	// subtract 1px border, because this is an outline
 
 		.editor-post-permalink {
 			left: $block-mover-padding-visible;
@@ -76,7 +76,7 @@
 	position: relative;
 
 	@include break-small() {
-		padding: 0 $block-mover-padding-visible;
+		padding: 0 $block-mover-padding-visible;	// don't subtract 1px border because it's a border not an outline
 
 		.editor-default-block-appender__content {
 			padding: 0 $block-padding;

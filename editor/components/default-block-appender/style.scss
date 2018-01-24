@@ -23,6 +23,7 @@ input[type=text].editor-default-block-appender__content {
 	height: $empty-paragraph-height;
 	font-size: $editor-font-size;
 	cursor: text;
+	margin: 0;
 	max-width: none;	// fixes a bleed issue from the admin
 
 	&:focus {
