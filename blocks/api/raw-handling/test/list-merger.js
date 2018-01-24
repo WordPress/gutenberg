@@ -30,4 +30,21 @@ describe( 'listMerger', () => {
 		const input = '<ul><li>one</li></ul><p></p><ul><li>two</li></ul>';
 		equal( deepFilterHTML( input, [ listMerger ] ), input );
 	} );
+
+	it( 'should merge list items if nested list parent has no content', () => {
+		const input = '<ul><li>1</li><li><ul><li>1.1</li><li>1.2</li></ul></li><li>2</li></ul>';
+		const output = '<ul><li>1<ul><li>1.1</li><li>1.2</li></ul></li><li>2</li></ul>';
+		equal( deepFilterHTML( input, [ listMerger ] ), output );
+	} );
+
+	it( 'Should remove empty list wrappers', () => {
+		const input = '<ul><li>\n<ul><li>test</li></ul>\n</li></ul>';
+		const output = '<ul><li>test</li></ul>';
+		equal( deepFilterHTML( input, [ listMerger ] ), output );
+	} );
+
+	it( 'Should not remove filled list wrappers', () => {
+		const input = '<ul><li>\ntest\n<ul><li>test</li></ul>\n</li></ul>';
+		equal( deepFilterHTML( input, [ listMerger ] ), input );
+	} );
 } );
