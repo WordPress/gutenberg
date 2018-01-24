@@ -52,7 +52,7 @@ describe( 'DefaultBlockAppender', () => {
 			const insertBlock = jest.fn();
 			const wrapper = shallow( <DefaultBlockAppender count={ 5 } blocks={ [ { name: 'core/image' } ] } appendDefaultBlock={ insertBlock } /> );
 
-			wrapper.find( 'button.editor-default-block-appender__content' ).simulate( 'click' );
+			wrapper.find( 'input.editor-default-block-appender__content' ).simulate( 'click' );
 
 			expectAppendDefaultBlockCalled( insertBlock );
 		} );
