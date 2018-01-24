@@ -27,7 +27,7 @@ import * as quote from './quote';
 import * as reusableBlock from './block';
 import * as separator from './separator';
 import * as shortcode from './shortcode';
-import './subhead';
+import * as subhead from './subhead';
 import * as table from './table';
 import * as textColumns from './text-columns';
 import * as verse from './verse';
@@ -58,6 +58,7 @@ export const registerCoreBlocks = () => {
 		reusableBlock,
 		separator,
 		shortcode,
+		subhead,
 		table,
 		textColumns,
 		verse,
