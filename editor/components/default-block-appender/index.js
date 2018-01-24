@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import classnames from 'classnames';
 import { last } from 'lodash';
 
 /**
@@ -26,12 +25,8 @@ export class DefaultBlockAppender extends Component {
 		const lastBlock = last( blocks );
 		const showAppender = lastBlock && lastBlock.name !== getDefaultBlockName();
 
-		const className = classnames( 'editor-default-block-appender', {
-			'is-visible-placeholder': count === 0,
-		} );
-
 		return (
-			<div className={ className }>
+			<div className="editor-default-block-appender">
 				<BlockDropZone />
 				{ count === 0 &&
 					<input
@@ -45,9 +40,14 @@ export class DefaultBlockAppender extends Component {
 					/>
 				}
 				{ count !== 0 && showAppender &&
-					<button
+					<input
 						className="editor-default-block-appender__content"
+						type="text"
+						readOnly
+						onFocus={ this.props.appendDefaultBlock }
 						onClick={ this.props.appendDefaultBlock }
+						onKeyDown={ this.props.appendDefaultBlock }
+						value=""
 					/>
 				}
 			</div>
