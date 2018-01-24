@@ -16,6 +16,9 @@ import {
 	getEditedPostTitle,
 } from './selectors';
 
+// TODO: Remove temporary hack to make tests pass.
+import '../../coediting';
+
 /**
  * Module Constants
  */
