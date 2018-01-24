@@ -15,7 +15,11 @@ import { addQueryArgs } from '@wordpress/url';
  * Internal Dependencies
  */
 import './style.scss';
-import { isEditedPostNew, getEditedPostAttribute } from '../../store/selectors';
+import {
+	isEditedPostNew,
+	isCurrentPostPublished,
+	getEditedPostAttribute,
+} from '../../store/selectors';
 import { editPost } from '../../store/actions';
 
 /**
@@ -60,7 +64,12 @@ class PostPermalink extends Component {
 	 * @returns {string} The slug.
 	 */
 	getSlug() {
-		const samplePermalink = this.props.samplePermalink;
+		const { actualSlug, isPublished, samplePermalink } = this.props;
+
+		if ( isPublished ) {
+			return actualSlug;
+		}
+
 		if ( samplePermalink ) {
 			return samplePermalink[ 1 ];
 		}
@@ -200,8 +209,10 @@ export default connect(
 	( state ) => {
 		return {
 			isNew: isEditedPostNew( state ),
+			isPublished: isCurrentPostPublished( state ),
 			link: getEditedPostAttribute( state, 'link' ),
 			samplePermalink: getEditedPostAttribute( state, 'sample_permalink' ),
+			actualSlug: getEditedPostAttribute( state, 'slug' ),
 		};
 	},
 	{
