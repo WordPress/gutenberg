@@ -11,16 +11,16 @@ import { getBlockType, registerCoreBlocks } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { VisualEditorInserter } from '../inserter';
+import { InserterWithShortcuts } from '../';
 
-describe( 'VisualEditorInserter', () => {
+describe( 'InserterWithShortcuts', () => {
 	beforeAll( () => {
 		registerCoreBlocks();
 	} );
 
 	it( 'should show controls when receiving focus', () => {
 		const clearSelectedBlock = jest.fn();
-		const wrapper = shallow( <VisualEditorInserter clearSelectedBlock={ clearSelectedBlock } /> );
+		const wrapper = shallow( <InserterWithShortcuts clearSelectedBlock={ clearSelectedBlock } /> );
 
 		wrapper.simulate( 'focus' );
 
@@ -29,7 +29,7 @@ describe( 'VisualEditorInserter', () => {
 	} );
 
 	it( 'should hide controls when losing focus', () => {
-		const wrapper = shallow( <VisualEditorInserter /> );
+		const wrapper = shallow( <InserterWithShortcuts /> );
 
 		wrapper.simulate( 'focus' );
 		wrapper.simulate( 'blur' );
@@ -41,7 +41,7 @@ describe( 'VisualEditorInserter', () => {
 		const insertBlock = jest.fn();
 		const mostFrequentlyUsedBlocks = [ getBlockType( 'core/paragraph' ), getBlockType( 'core/image' ) ];
 		const wrapper = shallow(
-			<VisualEditorInserter insertBlock={ insertBlock } mostFrequentlyUsedBlocks={ mostFrequentlyUsedBlocks } />
+			<InserterWithShortcuts insertBlock={ insertBlock } mostFrequentlyUsedBlocks={ mostFrequentlyUsedBlocks } />
 		);
 		wrapper.state.preferences = {
 			blockUsage: {

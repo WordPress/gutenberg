@@ -6,9 +6,9 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import { PostSchedule } from '../';
+import { PostScheduleCheck } from '../check';
 
-describe( 'PostSchedule', () => {
+describe( 'PostScheduleCheck', () => {
 	const user = {
 		data: {
 			post_type_capabilities: {
@@ -18,16 +18,16 @@ describe( 'PostSchedule', () => {
 	};
 
 	it( 'should not render anything if the user doesn\'t have the right capabilities', () => {
-		let wrapper = shallow( <PostSchedule user={ {} } /> );
+		let wrapper = shallow( <PostScheduleCheck user={ {} } >yes</PostScheduleCheck> );
 		expect( wrapper.type() ).toBe( null );
-		wrapper = shallow( <PostSchedule user={
+		wrapper = shallow( <PostScheduleCheck user={
 			{ data: { post_type_capabilities: { publish_posts: false } } }
-		} /> );
+		}>yes</PostScheduleCheck> );
 		expect( wrapper.type() ).toBe( null );
 	} );
 
 	it( 'should render if the user has the correct capability', () => {
-		const wrapper = shallow( <PostSchedule user={ user } /> );
+		const wrapper = shallow( <PostScheduleCheck user={ user }>yes</PostScheduleCheck> );
 		expect( wrapper.type() ).not.toBe( null );
 	} );
 } );

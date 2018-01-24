@@ -15,7 +15,7 @@ import { compose } from '@wordpress/element';
  */
 import { getCurrentPostType } from '../../store/selectors';
 
-export function PostVisibility( { user, render } ) {
+export function PostVisibilityCheck( { user, render } ) {
 	const canEdit = get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );
 
 	return render( { canEdit } );
@@ -40,4 +40,4 @@ const applyWithAPIData = withAPIData( ( props ) => {
 export default compose( [
 	applyConnect,
 	applyWithAPIData,
-] )( PostVisibility );
+] )( PostVisibilityCheck );
