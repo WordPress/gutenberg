@@ -9,6 +9,7 @@ import { registerReducer, registerSelectors, withRehydratation, loadAndPersist }
 import reducer from './reducer';
 import applyMiddlewares from './middlewares';
 import {
+	getCurrentPostType,
 	getEditedPostContent,
 	getEditedPostTitle,
 	getSelectedBlockCount,
@@ -26,6 +27,7 @@ const store = applyMiddlewares(
 loadAndPersist( store, reducer, 'preferences', STORAGE_KEY );
 
 registerSelectors( MODULE_KEY, {
+	getCurrentPostType,
 	getEditedPostContent,
 	getEditedPostTitle,
 	getSelectedBlockCount,
