@@ -108,7 +108,7 @@ export function renderSidebar( name, settings ) {
  * @param  {string} name The name of the sidebar to activate.
  * @return {void}
  */
-export function activateSidebar( name ) {
+function activateSidebar( name ) {
 	store.dispatch( openGeneralSidebar( 'plugins' ) );
 	store.dispatch( setGeneralSidebarActivePanel( 'plugins', name ) );
 }
