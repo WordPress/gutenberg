@@ -569,9 +569,16 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 				viewportType: action.viewportType,
 			};
 		case 'UPDATE_MOBILE_STATE':
+			if ( action.isMobile ){
+				return {
+					...state,
+					viewportType: 'mobile',
+					activeGeneralSidebar: null,
+				};
+			}
 			return {
 				...state,
-				viewportType: action.isMobile ? 'mobile' : 'desktop',
+				viewportType: 'desktop',
 			};
 		case 'SWITCH_MODE':
 			return {
