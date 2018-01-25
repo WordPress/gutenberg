@@ -412,6 +412,10 @@ function gutenberg_modify_add_new_button_url( $url, $path ) {
 
 	// The Add New button should be the only thing calling admin_url() from global scope.
 	$stack = wp_debug_backtrace_summary( null, 0, false );
+	// Accommodate environments that run WP in non-global scope.
+	if ( false !== strpos( end( $stack ), 'require' ) ) {
+		array_pop( $stack );
+	}
 	if ( 'admin_url' !== end( $stack ) ) {
 		return $url;
 	}
