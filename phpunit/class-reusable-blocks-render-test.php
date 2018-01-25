@@ -67,33 +67,11 @@ class Reusuable_Blocks_Render_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Set up.
-	 */
-	public function setUp() {
-		parent::setUp();
-
-		$this->registry = new WP_Block_Type_Registry();
-		$main_registry  = WP_Block_Type_Registry::get_instance();
-
-		$this->registry->register( 'core/block', $main_registry->get_registered( 'core/block' ) );
-	}
-
-	/**
-	 * Tear down.
-	 */
-	public function tearDown() {
-		parent::tearDown();
-
-		$this->registry = null;
-	}
-
-	/**
 	 * Test rendering of a reusable block.
 	 */
 	public function test_render() {
-		$block_type = $this->registry->get_registered( 'core/block' );
-
-		$output = $block_type->render( array( 'ref' => self::$block_id ) );
+		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( 'core/block' );
+		$output     = $block_type->render( array( 'ref' => self::$block_id ) );
 		$this->assertSame( '<p>Hello world!</p>', $output );
 	}
 
@@ -102,9 +80,8 @@ class Reusuable_Blocks_Render_Test extends WP_UnitTestCase {
 	 * rendering an empty string.
 	 */
 	public function test_ref_empty() {
-		$block_type = $this->registry->get_registered( 'core/block' );
-
-		$output = $block_type->render( array(), 'foo' );
+		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( 'core/block' );
+		$output     = $block_type->render( array(), 'foo' );
 		$this->assertSame( '', $output );
 	}
 
@@ -113,9 +90,8 @@ class Reusuable_Blocks_Render_Test extends WP_UnitTestCase {
 	 * should fail by rendering an empty string.
 	 */
 	public function test_ref_wrong_post_type() {
-		$block_type = $this->registry->get_registered( 'core/block' );
-
-		$output = $block_type->render( array( 'ref' => self::$post_id ), 'foo' );
+		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( 'core/block' );
+		$output     = $block_type->render( array( 'ref' => self::$post_id ), 'foo' );
 		$this->assertSame( '', $output );
 	}
 }

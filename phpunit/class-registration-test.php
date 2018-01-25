@@ -15,10 +15,8 @@ class Registration_Test extends WP_UnitTestCase {
 
 		$registry = WP_Block_Type_Registry::get_instance();
 
-		foreach ( array( 'core/dummy' ) as $name ) {
-			if ( $registry->is_registered( $name ) ) {
-				$registry->unregister( $name );
-			}
+		if ( $registry->is_registered( 'core/dummy' ) ) {
+			$registry->unregister( 'core/dummy' );
 		}
 	}
 

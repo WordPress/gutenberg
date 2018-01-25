@@ -14,12 +14,7 @@ class Prepare_For_JS_Test extends WP_UnitTestCase {
 		parent::tearDown();
 
 		$registry = WP_Block_Type_Registry::get_instance();
-
-		foreach ( array( 'core/dummy' ) as $name ) {
-			if ( $registry->is_registered( $name ) ) {
-				$registry->unregister( $name );
-			}
-		}
+		$registry->unregister( 'core/dummy' );
 	}
 
 	function test_gutenberg_prepare_blocks_for_js() {
