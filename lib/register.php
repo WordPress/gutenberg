@@ -410,6 +410,30 @@ function gutenberg_register_post_types() {
 add_action( 'init', 'gutenberg_register_post_types' );
 
 /**
+ * Initializes annotations.
+ *
+ * @since [version]
+ */
+function gutenberg_init_annotations() {
+	add_filter( 'map_meta_cap', 'WP_Annotation_Utils::on_map_meta_cap', 10, 4 );
+	add_filter( 'comments_clauses', 'WP_Annotation_Utils::on_comments_clauses', 1000, 2 );
+}
+add_action( 'init', 'gutenberg_init_annotations' );
+
+/**
+ * Initializes REST API for annotations.
+ *
+ * @since [version]
+ */
+function gutenberg_rest_api_init_annotations() {
+	$controller = new WP_REST_Annotations_Controller();
+	$controller->register_routes();
+
+	add_filter( 'rest_comment_query', 'WP_Annotation_Utils::on_rest_comment_query', 10, 2 );
+}
+add_action( 'rest_api_init', 'gutenberg_rest_api_init_annotations' );
+
+/**
  * Gets revisions details for the selected post.
  *
  * @since 1.6.0
