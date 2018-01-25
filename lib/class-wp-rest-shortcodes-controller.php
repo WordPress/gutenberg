@@ -1,6 +1,6 @@
 <?php
 /**
- * Reusable Blocks REST API: WP_REST_Reusable_Blocks_Controller class
+ * Shortcode Blocks REST API: WP_REST_Shortcodes_Controller class
  *
  * @package gutenberg
  * @since 0.10.0
@@ -91,7 +91,7 @@ class WP_REST_Shortcodes_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Retrieves a reusable block's schema, conforming to JSON Schema.
+	 * Retrieves a shortcode block's schema, conforming to JSON Schema.
 	 *
 	 * @since 0.10.0
 	 * @access public
@@ -101,7 +101,7 @@ class WP_REST_Shortcodes_Controller extends WP_REST_Controller {
 	public function get_item_schema() {
 		return array(
 			'$schema'    => 'http://json-schema.org/schema#',
-			'title'      => 'reusable-block',
+			'title'      => 'shortcode-block',
 			'type'       => 'object',
 			'properties' => array(
 				'shortcode' => array(
