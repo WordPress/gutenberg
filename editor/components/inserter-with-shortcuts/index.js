@@ -16,6 +16,7 @@ import { createBlock, BlockIcon } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
+import './style.scss';
 import Inserter from '../inserter';
 import { clearSelectedBlock, insertBlock } from '../../store/actions';
 import { getMostFrequentlyUsedBlocks, getBlockCount, getBlocks } from '../../store/selectors';
@@ -52,7 +53,7 @@ export class InserterWithShortcuts extends Component {
 		const { blockCount, isLocked } = this.props;
 		const { isShowingControls } = this.state;
 		const { mostFrequentlyUsedBlocks } = this.props;
-		const classes = classnames( 'editor-visual-editor__inserter', {
+		const classes = classnames( 'editor-inserter-with-shortcuts', {
 			'is-showing-controls': isShowingControls,
 		} );
 
@@ -77,7 +78,7 @@ export class InserterWithShortcuts extends Component {
 						label={ sprintf( __( 'Add %s' ), block.title ) }
 						disabled={ this.isDisabledBlock( block ) }
 						icon={ (
-							<span className="editor-visual-editor__inserter-block-icon">
+							<span className="editor-inserter-with-shortcuts__block-icon">
 								<BlockIcon icon={ block.icon } />
 							</span>
 						) }
