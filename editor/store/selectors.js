@@ -1303,7 +1303,7 @@ export function hasFixedToolbar( state ) {
  * @param {Object} state   Global application state.
  * @param {string} feature Feature slug.
  *
- * @returns {booleean} Is active.
+ * @returns {boolean} Is active.
  */
 export function isFeatureActive( state, feature ) {
 	return !! state.preferences.features[ feature ];
